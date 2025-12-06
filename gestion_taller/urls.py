@@ -98,6 +98,8 @@ def country_aware_clientes_redirect(request):
 
 urlpatterns = [
     path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
+    # Portal del Cliente
+    path("portal/", include("taller.portal.urls")),
     # Página de inicio - Selección de país
     path("", TemplateView.as_view(template_name="landing/seleccionar_pais.html"), name="home"),
     path("admin/", admin.site.urls),

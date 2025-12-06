@@ -24,8 +24,11 @@ def env_list(key, default=""):
 
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
-DEBUG = env_bool("DJANGO_DEBUG", True)
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "*")  # e.g. "egarage.cl, www.egarage.cl"
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+ALLOWED_HOSTS = os.getenv(
+    "DJANGO_ALLOWED_HOSTS",
+    "localhost,127.0.0.1,.pythonanywhere.com,atlantareciclajes.cl,www.atlantareciclajes.cl",
+).split(",")
 
 # ---------- CSRF / HTTPS (solo si no estás detrás de proxy que ya haga esto) ----------
 # En producción: define DJANGO_CSRF_TRUSTED_ORIGINS="https://egarage.cl, https://www.egarage.cl"
@@ -33,7 +36,10 @@ csrf_origins_env = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "")
 if csrf_origins_env:
     CSRF_TRUSTED_ORIGINS = [h if h.startswith("http") else f"https://{h}" for h in csrf_origins_env]
 else:
-    CSRF_TRUSTED_ORIGINS = []
+    CSRF_TRUSTED_ORIGINS = [
+        "https://atlantareciclajes.cl",
+        "https://www.atlantareciclajes.cl",
+    ]
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", not DEBUG)
 SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", not DEBUG)
 CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", not DEBUG)
@@ -365,12 +371,16 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 
 # ---------- CSRF trusted desde ALLOWED_HOSTS si no se define explícito ----------
 if len(CSRF_TRUSTED_ORIGINS) == 0:
-    # Siempre agregar egarage.cl (producción) incluso si DEBUG=True
+    # Siempre agregar egarage.cl y atlantareciclajes.cl (producción) incluso si DEBUG=True
     production_origins = [
         "https://egarage.cl",
         "https://www.egarage.cl",
+        "https://atlantareciclajes.cl",
+        "https://www.atlantareciclajes.cl",
         "http://egarage.cl",  # Por si acaso hay redirección HTTP
         "http://www.egarage.cl",
+        "http://atlantareciclajes.cl",
+        "http://www.atlantareciclajes.cl",
     ]
 
     # Agregar también desde ALLOWED_HOSTS si no es "*"

@@ -1,0 +1,444 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Recordatorios de Mantenimiento{% endblock %}
+
+{% block extra_head %}
+<style>
+    .recordatorios-container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .header-section {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+    .header-section h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .header-section p {
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid;
+    }
+
+    .stat-card.urgente {
+        border-left-color: #ef4444;
+    }
+
+    .stat-card.medio {
+        border-left-color: #f59e0b;
+    }
+
+    .stat-card.total {
+        border-left-color: #3b82f6;
+    }
+
+    .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .filters-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .filters-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        align-items: end;
+    }
+
+    .filter-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .filter-group select,
+    .filter-group input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    .btn-filter {
+        background: #667eea;
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .btn-filter:hover {
+        background: #5568d3;
+    }
+
+    .recordatorios-list {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .recordatorio-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .recordatorio-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+
+    .recordatorio-card.urgente {
+        border-left-color: #ef4444;
+    }
+
+    .recordatorio-card.medio {
+        border-left-color: #f59e0b;
+    }
+
+    .recordatorio-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: start;
+        margin-bottom: 1rem;
+    }
+
+    .recordatorio-info h3 {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.25rem;
+        color: #111827;
+    }
+
+    .recordatorio-info p {
+        margin: 0.25rem 0;
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    .badge {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .badge.urgente {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .badge.medio {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .recordatorio-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .detail-label {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+
+    .detail-value {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-whatsapp {
+        background: #25d366;
+        color: white;
+    }
+
+    .btn-whatsapp:hover {
+        background: #20ba5a;
+    }
+
+    .btn-email {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-email:hover {
+        background: #2563eb;
+    }
+
+    .btn-crear-documento {
+        background: #667eea;
+        color: white;
+    }
+
+    .btn-crear-documento:hover {
+        background: #5568d3;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+        opacity: 0.5;
+    }
+
+    .empty-state h3 {
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+    }
+
+    .empty-state p {
+        color: #9ca3af;
+    }
+
+    @media (max-width: 768px) {
+        .recordatorios-container {
+            padding: 0 0.5rem;
+        }
+
+        .header-section {
+            padding: 1.5rem;
+        }
+
+        .header-section h1 {
+            font-size: 1.5rem;
+        }
+
+        .recordatorio-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="recordatorios-container">
+    <!-- Header -->
+    <div class="header-section">
+        <h1>🚨 Recordatorios de Mantenimiento Predictivo</h1>
+        <p>Vehículos que necesitan atención pronto - Contacta proactivamente a tus clientes</p>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="stats-grid">
+        <div class="stat-card total">
+            <div class="stat-value">{{ total_recordatorios }}</div>
+            <div class="stat-label">Total Recordatorios</div>
+        </div>
+        <div class="stat-card urgente">
+            <div class="stat-value">{{ total_urgentes }}</div>
+            <div class="stat-label">Urgentes</div>
+        </div>
+        <div class="stat-card medio">
+            <div class="stat-value">{{ total_medios }}</div>
+            <div class="stat-label">Medios</div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="filters-section">
+        <form method="get" action="{% url 'reportes:recordatorios_mantenimiento' %}">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label for="tipo_servicio">Tipo de Servicio</label>
+                    <select name="tipo_servicio" id="tipo_servicio">
+                        {% for key, config in configuraciones_servicio.items %}
+                            <option value="{{ key }}" {% if tipo_servicio_actual == key %}selected{% endif %}>
+                                {{ config.nombre }} - {{ config.descripcion }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label for="servicio_km">Kilometraje del Servicio</label>
+                    <input type="number" name="servicio_km" id="servicio_km" 
+                           value="{{ config_actual.servicio_km }}" min="1000" step="1000">
+                </div>
+                <div class="filter-group">
+                    <label for="margen_alerta">Margen de Alerta (km)</label>
+                    <input type="number" name="margen_alerta" id="margen_alerta" 
+                           value="{{ config_actual.margen_alerta }}" min="100" step="100">
+                </div>
+                <div class="filter-group">
+                    <button type="submit" class="btn-filter">🔍 Aplicar Filtros</button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista de Recordatorios -->
+    {% if recordatorios %}
+        <div class="recordatorios-list">
+            {% for recordatorio in recordatorios %}
+                <div class="recordatorio-card {{ recordatorio.urgencia }}">
+                    <div class="recordatorio-header">
+                        <div class="recordatorio-info">
+                            <h3>
+                                🚗 {{ recordatorio.vehiculo.patente }}
+                                <span class="badge {{ recordatorio.urgencia }}">
+                                    {{ recordatorio.urgencia|upper }}
+                                </span>
+                            </h3>
+                            <p><strong>Cliente:</strong> {{ recordatorio.cliente }}</p>
+                            {% if recordatorio.telefono_cliente %}
+                                <p><strong>Teléfono:</strong> {{ recordatorio.telefono_cliente }}</p>
+                            {% endif %}
+                            {% if recordatorio.email_cliente %}
+                                <p><strong>Email:</strong> {{ recordatorio.email_cliente }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="recordatorio-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Kilometraje Actual</div>
+                            <div class="detail-value">{{ recordatorio.km_actual|intcomma }} km</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Último Servicio</div>
+                            <div class="detail-value">{{ recordatorio.km_ultimo_servicio|intcomma }} km</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Próximo Servicio</div>
+                            <div class="detail-value">{{ recordatorio.km_proximo_servicio|intcomma }} km</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Kilómetros Faltantes</div>
+                            <div class="detail-value" style="color: {% if recordatorio.urgencia == 'alta' %}#ef4444{% else %}#f59e0b{% endif %};">
+                                {{ recordatorio.km_faltantes|intcomma }} km
+                            </div>
+                        </div>
+                        {% if recordatorio.fecha_ultimo_servicio %}
+                            <div class="detail-item">
+                                <div class="detail-label">Fecha Último Servicio</div>
+                                <div class="detail-value">{{ recordatorio.fecha_ultimo_servicio|date:"d/m/Y" }}</div>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="action-buttons">
+                        {% if recordatorio.telefono_cliente %}
+                            <a href="https://wa.me/{{ recordatorio.telefono_cliente|slice:'1:' }}?text=Hola%20{{ recordatorio.cliente|urlencode }},%20tu%20vehículo%20{{ recordatorio.vehiculo.patente }}%20está%20a%20{{ recordatorio.km_faltantes }}%20km%20de%20necesitar%20mantenimiento.%20¿Te%20gustaría%20agendar%20un%20servicio?" 
+                               target="_blank" 
+                               class="btn-action btn-whatsapp">
+                                📱 WhatsApp
+                            </a>
+                        {% endif %}
+                        {% if recordatorio.email_cliente %}
+                            <a href="mailto:{{ recordatorio.email_cliente }}?subject=Recordatorio%20de%20Mantenimiento%20-%20{{ recordatorio.vehiculo.patente }}&body=Hola%20{{ recordatorio.cliente|urlencode }},%0A%0ATu%20vehículo%20{{ recordatorio.vehiculo.patente }}%20está%20a%20{{ recordatorio.km_faltantes }}%20km%20de%20necesitar%20mantenimiento.%20Te%20recomendamos%20agendar%20un%20servicio%20pronto.%0A%0ASaludos,%0A{{ empresa.nombre_taller }}" 
+                               class="btn-action btn-email">
+                                ✉️ Email
+                            </a>
+                        {% endif %}
+                        <a href="{% url 'documentos:crear_documento' %}?vehiculo_id={{ recordatorio.vehiculo.id }}" 
+                           class="btn-action btn-crear-documento">
+                            📝 Crear Documento
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon">✅</div>
+            <h3>¡Excelente!</h3>
+            <p>No hay vehículos que requieran atención inmediata según los filtros seleccionados.</p>
+            <p style="margin-top: 1rem; color: #6b7280;">
+                <small>Intenta ajustar los filtros para ver más recordatorios.</small>
+            </p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

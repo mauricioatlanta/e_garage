@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import select_template
 from django.contrib import messages
 from django.db import transaction
+from django.urls import reverse
 
 from taller.configuracion.rubros_logic import (
     get_responsable_label,
@@ -29,7 +30,7 @@ def _tecnicos_queryset_for_empresa(empresa, roles_permitidos=None):
         return Tecnico.objects.none()
 
     if not roles_permitidos:
-        roles_permitidos = ['TECNICO', 'VENDEDOR', 'MIXTO']
+        roles_permitidos = ["TECNICO", "VENDEDOR", "MIXTO"]
 
     return Tecnico.objects.filter(
         empresa=empresa,
@@ -113,6 +114,42 @@ def documento_crear(request, country_code="cl", lang_code="es"):
                     documento = form.save(commit=False)
                     documento.empresa = empresa
                     documento.save()
+
+                    # Detectar garantía automáticamente después de guardar
+                    # Nota: El registro de kilometraje se crea en el método save() del formulario,
+                    # así que necesitamos recargar el documento para acceder al registro
+                    if documento.vehiculo:
+                        try:
+                            # Recargar documento para obtener el registro de kilometraje recién creado
+                            documento.refresh_from_db()
+
+                            from taller.utils.garantias import obtener_contexto_garantia
+
+                            garantia_context = obtener_contexto_garantia(documento)
+
+                            # Si se detecta una garantía, mostrar mensaje informativo
+                            if garantia_context.get("garantia_detectada"):
+                                url_verificacion = (
+                                    reverse("reportes:verificar_garantia")
+                                    + f"?doc_garantia_id={documento.id}&doc_original_id={garantia_context['documento_original'].id}"
+                                )
+                                if garantia_context.get("dentro_garantia"):
+                                    messages.info(
+                                        request,
+                                        f"⚠️ Garantía detectada: El vehículo está dentro del límite de garantía "
+                                        f"({garantia_context.get('kilometros_recorridos', 0)} km recorridos). "
+                                        f"<a href='{url_verificacion}' target='_blank'>Ver detalles</a>",
+                                    )
+                                else:
+                                    messages.warning(
+                                        request,
+                                        f"⚠️ Garantía detectada: El vehículo EXCEDE el límite de garantía "
+                                        f"({garantia_context.get('kilometros_recorridos', 0)} km recorridos). "
+                                        f"<a href='{url_verificacion}' target='_blank'>Ver detalles</a>",
+                                    )
+                        except Exception:
+                            # Si hay error en la detección, continuar sin mostrar error al usuario
+                            pass
 
                     messages.success(
                         request,

@@ -362,6 +362,79 @@
     </div>
   </div>
 
+  <!-- 🚨 WIDGET: Recordatorios Urgentes y Garantías -->
+  {% if total_recordatorios_urgentes > 0 or garantias_potenciales > 0 %}
+  <div class="intelligence-hub" style="border-color: rgba(255, 107, 107, 0.5); border-width: 3px;">
+    <h2 class="chart-title mb-6" style="color: #ff6b6b;">🚨 Alertas de Negocio - Acción Inmediata</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+      <!-- Widget: Recordatorios Urgentes -->
+      <div class="kpi-card" style="border-color: #ff6b6b; background: rgba(255, 107, 107, 0.1);">
+        <div class="kpi-value" style="color: #ff6b6b;">{{ total_recordatorios_urgentes }}</div>
+        <div class="kpi-label" style="color: rgba(255, 255, 255, 0.9);">Recordatorios Urgentes</div>
+        <div class="kpi-trend" style="color: #ff6b6b; margin-top: 1rem;">
+          <span>💰 Ingresos potenciales hoy</span>
+        </div>
+        {% if total_recordatorios_urgentes > 0 %}
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255, 107, 107, 0.3);">
+          <a href="{% url 'reportes:recordatorios_mantenimiento' %}" 
+             class="action-btn" 
+             style="background: linear-gradient(45deg, #ff6b6b, #ff8787); width: 100%; text-align: center; display: block; text-decoration: none;">
+            Ver Recordatorios →
+          </a>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Widget: Garantías Potenciales -->
+      <div class="kpi-card" style="border-color: #f59e0b; background: rgba(245, 158, 11, 0.1);">
+        <div class="kpi-value" style="color: #f59e0b;">{{ garantias_potenciales }}</div>
+        <div class="kpi-label" style="color: rgba(255, 255, 255, 0.9);">Garantías Potenciales</div>
+        <div class="kpi-trend" style="color: #f59e0b; margin-top: 1rem;">
+          <span>🛡️ Documentos bajo garantía activa</span>
+        </div>
+        {% if garantias_potenciales > 0 %}
+        <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(245, 158, 11, 0.3);">
+          <a href="{% url 'reportes:verificar_garantia' %}" 
+             class="action-btn" 
+             style="background: linear-gradient(45deg, #f59e0b, #fbbf24); width: 100%; text-align: center; display: block; text-decoration: none;">
+            Verificar Garantías →
+          </a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Lista de Recordatorios Urgentes (Top 3) -->
+    {% if recordatorios_urgentes %}
+    <div style="margin-top: 1.5rem; padding-top: 1.5rem; border-top: 1px solid rgba(255, 107, 107, 0.3);">
+      <h3 class="chart-title mb-4" style="font-size: 1rem; color: #ff6b6b;">📋 Top 3 Recordatorios Urgentes</h3>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {% for recordatorio in recordatorios_urgentes|slice:":3" %}
+        <div style="background: rgba(255, 107, 107, 0.15); border-radius: 12px; padding: 1rem; border-left: 4px solid #ff6b6b;">
+          <div style="font-weight: 700; color: #fff; margin-bottom: 0.5rem;">
+            🚗 {{ recordatorio.vehiculo.patente }}
+          </div>
+          <div style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.8); margin-bottom: 0.25rem;">
+            <strong>Cliente:</strong> {{ recordatorio.cliente }}
+          </div>
+          <div style="font-size: 0.875rem; color: rgba(255, 255, 255, 0.8); margin-bottom: 0.5rem;">
+            <strong>Faltan:</strong> <span style="color: #ff6b6b; font-weight: 700;">{{ recordatorio.km_faltantes|intcomma }} km</span>
+          </div>
+          <a href="{% url 'reportes:recordatorios_mantenimiento' %}" 
+             style="display: inline-block; padding: 0.5rem 1rem; background: rgba(255, 107, 107, 0.3); border-radius: 8px; color: #fff; text-decoration: none; font-size: 0.875rem; font-weight: 600; transition: all 0.2s;"
+             onmouseover="this.style.background='rgba(255, 107, 107, 0.5)'"
+             onmouseout="this.style.background='rgba(255, 107, 107, 0.3)'">
+            Contactar →
+          </a>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+  {% endif %}
+
   <!-- 📈 Predicciones con IA -->
   <div class="intelligence-hub">
     <div class="ai-prediction">
@@ -430,6 +503,28 @@
   <!-- 🔔 Panel de Alertas y Oportunidades -->
   <div class="alerts-panel">
     <h3 class="text-xl font-bold text-red-400 mb-4">🔔 Alertas y Oportunidades</h3>
+
+    {% if total_recordatorios_urgentes > 0 %}
+    <div class="alert-item" style="background: rgba(255, 107, 107, 0.2); border-left-color: #ff6b6b;">
+      <span class="alert-icon">🚨</span>
+      <div>
+        <strong>{{ total_recordatorios_urgentes }} vehículos</strong> necesitan mantenimiento urgente (menos de 1,000 km restantes)
+        <br><span class="text-sm text-gray-400">💰 Oportunidad de ingresos proactivos - Contacta a tus clientes ahora</span>
+        <br><a href="{% url 'reportes:recordatorios_mantenimiento' %}" style="color: #ff6b6b; margin-top: 0.5rem; display: inline-block; text-decoration: underline; font-weight: 600;">Ver todos los recordatorios →</a>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if garantias_potenciales > 0 %}
+    <div class="alert-item" style="background: rgba(245, 158, 11, 0.2); border-left-color: #f59e0b;">
+      <span class="alert-icon">🛡️</span>
+      <div>
+        <strong>{{ garantias_potenciales }} documentos</strong> están bajo garantía activa (últimos 90 días, dentro de 5,000 km)
+        <br><span class="text-sm text-gray-400">⚠️ Monitorea estos vehículos - podrían regresar por garantía</span>
+        <br><a href="{% url 'reportes:verificar_garantia' %}" style="color: #f59e0b; margin-top: 0.5rem; display: inline-block; text-decoration: underline; font-weight: 600;">Verificar garantías →</a>
+      </div>
+    </div>
+    {% endif %}
 
     <div class="alert-item">
       <span class="alert-icon">⚠️</span>

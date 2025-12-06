@@ -1,0 +1,375 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Historial de Mantenimiento - {{ historial_data.vehiculo.patente }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .historial-container {
+        max-width: 1400px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .header-section {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+        box-shadow: 0 10px 30px rgba(59, 130, 246, 0.3);
+    }
+
+    .header-section h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .vehiculo-info {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .info-item {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .info-label {
+        font-size: 0.75rem;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 0.25rem;
+    }
+
+    .info-value {
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .resumen-section {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .resumen-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1rem;
+    }
+
+    .resumen-item {
+        text-align: center;
+    }
+
+    .resumen-value {
+        font-size: 1.75rem;
+        font-weight: 700;
+        color: #3b82f6;
+        margin-bottom: 0.5rem;
+    }
+
+    .resumen-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .historial-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .table-header {
+        background: #f9fafb;
+        padding: 1rem;
+        border-bottom: 2px solid #e5e7eb;
+        display: grid;
+        grid-template-columns: 100px 120px 1fr 150px 120px;
+        gap: 1rem;
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .table-row {
+        padding: 1rem;
+        border-bottom: 1px solid #e5e7eb;
+        display: grid;
+        grid-template-columns: 100px 120px 1fr 150px 120px;
+        gap: 1rem;
+        align-items: center;
+        transition: background 0.2s;
+    }
+
+    .table-row:hover {
+        background: #f9fafb;
+    }
+
+    .table-row:last-child {
+        border-bottom: none;
+    }
+
+    .doc-numero {
+        font-weight: 600;
+        color: #3b82f6;
+    }
+
+    .doc-tipo {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .tipo-ot {
+        background: #dbeafe;
+        color: #1e40af;
+    }
+
+    .tipo-pres {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .tipo-fac {
+        background: #d1fae5;
+        color: #065f46;
+    }
+
+    .km-value {
+        font-weight: 600;
+        color: #f59e0b;
+    }
+
+    .monto-value {
+        font-weight: 700;
+        color: #10b981;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #6b7280;
+    }
+
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        justify-content: center;
+    }
+
+    .btn-action {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.2s;
+    }
+
+    .btn-export-pdf {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-export-pdf:hover {
+        background: #dc2626;
+    }
+
+    .btn-export-excel {
+        background: #10b981;
+        color: white;
+    }
+
+    .btn-export-excel:hover {
+        background: #059669;
+    }
+
+    .btn-api {
+        background: #3b82f6;
+        color: white;
+    }
+
+    .btn-api:hover {
+        background: #2563eb;
+    }
+
+    @media (max-width: 768px) {
+        .table-header,
+        .table-row {
+            grid-template-columns: 1fr;
+            gap: 0.5rem;
+        }
+
+        .table-header {
+            display: none;
+        }
+
+        .table-row {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            padding: 1rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="historial-container">
+    <!-- Header -->
+    <div class="header-section">
+        <h1>📋 Historial de Mantenimiento</h1>
+        <p>Libro de Mantenciones Digital - Historial completo y verificable</p>
+        
+        <div class="vehiculo-info">
+            <div class="info-item">
+                <div class="info-label">Vehículo</div>
+                <div class="info-value">{{ historial_data.vehiculo.patente }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Marca / Modelo</div>
+                <div class="info-value">{{ historial_data.vehiculo.get_marca_display }} {{ historial_data.vehiculo.get_modelo_display }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Año</div>
+                <div class="info-value">{{ historial_data.vehiculo.anio }}</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Kilometraje Actual</div>
+                <div class="info-value">{{ historial_data.vehiculo.kilometraje_actual|intcomma }} km</div>
+            </div>
+            <div class="info-item">
+                <div class="info-label">Cliente</div>
+                <div class="info-value">{{ historial_data.vehiculo.cliente.nombre }}</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resumen -->
+    <div class="resumen-section">
+        <h2 style="margin: 0 0 1rem 0; font-size: 1.5rem; color: #111827;">📊 Resumen del Historial</h2>
+        <div class="resumen-grid">
+            <div class="resumen-item">
+                <div class="resumen-value">{{ historial_data.resumen.total_servicios }}</div>
+                <div class="resumen-label">Total Servicios</div>
+            </div>
+            <div class="resumen-item">
+                <div class="resumen-value">${{ historial_data.resumen.total_gastado|intcomma }}</div>
+                <div class="resumen-label">Total Invertido</div>
+            </div>
+            {% if historial_data.resumen.km_promedio_entre_servicios %}
+            <div class="resumen-item">
+                <div class="resumen-value">{{ historial_data.resumen.km_promedio_entre_servicios|intcomma }} km</div>
+                <div class="resumen-label">KM Promedio entre Servicios</div>
+            </div>
+            {% endif %}
+            {% if historial_data.resumen.dias_promedio_entre_servicios %}
+            <div class="resumen-item">
+                <div class="resumen-value">{{ historial_data.resumen.dias_promedio_entre_servicios|floatformat:0 }} días</div>
+                <div class="resumen-label">Días Promedio entre Servicios</div>
+            </div>
+            {% endif %}
+            {% if historial_data.resumen.fecha_primer_servicio %}
+            <div class="resumen-item">
+                <div class="resumen-value">{{ historial_data.resumen.fecha_primer_servicio|date:"d/m/Y" }}</div>
+                <div class="resumen-label">Primer Servicio</div>
+            </div>
+            {% endif %}
+            {% if historial_data.resumen.fecha_ultimo_servicio %}
+            <div class="resumen-item">
+                <div class="resumen-value">{{ historial_data.resumen.fecha_ultimo_servicio|date:"d/m/Y" }}</div>
+                <div class="resumen-label">Último Servicio</div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Historial Detallado -->
+    <div class="historial-table">
+        <div class="table-header">
+            <div>Fecha</div>
+            <div>Documento</div>
+            <div>Trabajos Realizados</div>
+            <div>Kilometraje</div>
+            <div>Monto</div>
+        </div>
+
+        {% if historial_data.historial %}
+            {% for entrada in historial_data.historial %}
+            <div class="table-row">
+                <div>{{ entrada.fecha|date:"d/m/Y" }}</div>
+                <div>
+                    <span class="doc-numero">{{ entrada.numero_documento }}</span>
+                    <br>
+                    <span class="doc-tipo tipo-{{ entrada.tipo|lower }}">{{ entrada.tipo }}</span>
+                </div>
+                <div style="font-size: 0.875rem; color: #374151;">
+                    {{ entrada.trabajos_realizados|truncatewords:15 }}
+                    {% if entrada.tecnico %}
+                        <br><small style="color: #6b7280;">Técnico: {{ entrada.tecnico }}</small>
+                    {% endif %}
+                </div>
+                <div>
+                    {% if entrada.kilometraje %}
+                        <span class="km-value">{{ entrada.kilometraje|intcomma }} km</span>
+                    {% else %}
+                        <span style="color: #9ca3af;">N/A</span>
+                    {% endif %}
+                </div>
+                <div>
+                    <span class="monto-value">${{ entrada.monto|intcomma }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                <h3>No hay historial registrado</h3>
+                <p>Este vehículo aún no tiene servicios registrados en el sistema.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Botones de Acción -->
+    {% if historial_data.historial %}
+    <div class="action-buttons">
+        <a href="{% url 'reportes:api_historial_vehiculo' historial_data.vehiculo.id %}" 
+           class="btn-action btn-api" 
+           target="_blank">
+            📡 Ver JSON (API)
+        </a>
+        <a href="{% url 'reportes:exportar_historial_pdf' historial_data.vehiculo.id %}" 
+           class="btn-action btn-export-pdf">
+            📄 Exportar PDF
+        </a>
+        <a href="{% url 'reportes:exportar_historial_excel' historial_data.vehiculo.id %}" 
+           class="btn-action btn-export-excel">
+            📊 Exportar Excel
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

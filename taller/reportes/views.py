@@ -17,7 +17,7 @@ from django.db.models import (
     Value,
 )
 from django.db.models.functions import Coalesce
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import render
 from django.utils import timezone
 from django.utils.dateparse import parse_date
@@ -34,6 +34,7 @@ from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 from taller.utils.empresa import get_or_create_empresa
 from taller.utils.motor_ia import MotorDiagnosticoIA
+from taller.reportes.kilometraje_reportes import ReporteKilometraje
 
 # from taller.utils import get_or_create_empresa  # Eliminado: usamos la función local
 
@@ -759,6 +760,55 @@ def dashboard_inteligencia_operativa(request):
     else:
         pct_down = 100.0 if ant > 0 else 0.0
 
+    # 🚨 WIDGET: Recordatorios de Mantenimiento Urgentes
+    recordatorios_urgentes = []
+    total_recordatorios_urgentes = 0
+    try:
+        reporte_km = ReporteKilometraje(empresa)
+        recordatorios = reporte_km.recordatorios_mantenimiento(
+            servicio_km=10000,  # Cambio de aceite cada 10k km
+            margen_alerta=1000,  # Alertar cuando falten 1k km
+        )
+        recordatorios_urgentes = [r for r in recordatorios if r["urgencia"] == "alta"][:5]  # Top 5
+        total_recordatorios_urgentes = len([r for r in recordatorios if r["urgencia"] == "alta"])
+    except Exception:
+        # Si hay error, continuar sin mostrar recordatorios
+        pass
+
+    # 🛡️ WIDGET: Garantías Potenciales Abiertas
+    garantias_potenciales = 0
+    try:
+        # Buscar documentos recientes (últimos 90 días) que podrían tener garantías activas
+        from datetime import timedelta
+
+        fecha_limite = timezone.now().date() - timedelta(days=90)
+
+        documentos_recientes = (
+            Documento.objects.filter(
+                empresa=empresa,
+                tipo__in=["OT", "PRES"],
+                estado="EMITIDO",
+                fecha_emision__gte=fecha_limite,
+                vehiculo__isnull=False,
+            )
+            .select_related("vehiculo", "registro_kilometraje")
+            .prefetch_related("vehiculo__historial_kilometraje")
+        )
+
+        # Contar documentos que tienen registro de kilometraje y podrían tener garantía activa
+        for doc in documentos_recientes:
+            if hasattr(doc, "registro_kilometraje") and doc.registro_kilometraje:
+                # Verificar si está dentro del límite de garantía (5,000 km)
+                km_registro = doc.registro_kilometraje.kilometraje
+                km_actual = doc.vehiculo.kilometraje_actual if doc.vehiculo else 0
+                if km_actual > 0:
+                    km_recorridos = km_actual - km_registro
+                    if km_recorridos < 5000:  # Dentro del límite de garantía
+                        garantias_potenciales += 1
+    except Exception:
+        # Si hay error, continuar sin contar garantías
+        pass
+
     context = {
         "facturacion_total": facturacion_total,
         "total_documentos": total_documentos,
@@ -780,6 +830,10 @@ def dashboard_inteligencia_operativa(request):
         "ingresos_por_hora": 22500,  # Simulado por ahora
         "vehiculos_por_semana": 23,  # Simulado por ahora
         "satisfaccion_cliente": 4.8,  # Simulado por ahora
+        # 🚨 Widgets de Kilometraje
+        "recordatorios_urgentes": recordatorios_urgentes,
+        "total_recordatorios_urgentes": total_recordatorios_urgentes,
+        "garantias_potenciales": garantias_potenciales,
     }
 
     return render(request, "taller/reportes/dashboard_inteligencia_operativa.html", context)
@@ -1173,7 +1227,7 @@ def reportes_otros_servicios_fecha(request, desde, hasta):
 def centro_contable_chile(request):
     """
     🧮 Centro Contable Chile - Contador Virtual
-    
+
     Vista especial para cierre contable con:
     - Resumen contable mensual
     - Alertas inteligentes de calidad de datos
@@ -1182,31 +1236,31 @@ def centro_contable_chile(request):
     """
     from datetime import datetime, timedelta
     from decimal import Decimal
-    
+
     empresa = get_or_create_empresa(request)
-    
+
     # Manejo de filtros de fecha avanzados
     hoy = date.today()
-    
+
     # Botones rápidos
-    periodo_rapido = request.GET.get('periodo_rapido', '')
-    fecha_desde_str = request.GET.get('fecha_desde', '')
-    fecha_hasta_str = request.GET.get('fecha_hasta', '')
-    
-    if periodo_rapido == 'mes_actual':
+    periodo_rapido = request.GET.get("periodo_rapido", "")
+    fecha_desde_str = request.GET.get("fecha_desde", "")
+    fecha_hasta_str = request.GET.get("fecha_hasta", "")
+
+    if periodo_rapido == "mes_actual":
         fecha_inicio = date(hoy.year, hoy.month, 1)
         if hoy.month == 12:
             fecha_fin = date(hoy.year + 1, 1, 1) - timedelta(days=1)
         else:
             fecha_fin = date(hoy.year, hoy.month + 1, 1) - timedelta(days=1)
-    elif periodo_rapido == 'mes_anterior':
+    elif periodo_rapido == "mes_anterior":
         if hoy.month == 1:
             fecha_inicio = date(hoy.year - 1, 12, 1)
             fecha_fin = date(hoy.year, 1, 1) - timedelta(days=1)
         else:
             fecha_inicio = date(hoy.year, hoy.month - 1, 1)
             fecha_fin = date(hoy.year, hoy.month, 1) - timedelta(days=1)
-    elif periodo_rapido == 'año_actual':
+    elif periodo_rapido == "año_actual":
         fecha_inicio = date(hoy.year, 1, 1)
         fecha_fin = date(hoy.year, 12, 31)
     elif fecha_desde_str and fecha_hasta_str:
@@ -1217,9 +1271,9 @@ def centro_contable_chile(request):
             fecha_inicio, fecha_fin = fecha_fin, fecha_inicio
     else:
         # Por defecto: mes actual
-        mes_seleccionado = request.GET.get('mes', hoy.strftime('%Y-%m'))
+        mes_seleccionado = request.GET.get("mes", hoy.strftime("%Y-%m"))
         try:
-            año, mes = map(int, mes_seleccionado.split('-'))
+            año, mes = map(int, mes_seleccionado.split("-"))
             fecha_inicio = date(año, mes, 1)
             if mes == 12:
                 fecha_fin = date(año + 1, 1, 1) - timedelta(days=1)
@@ -1231,42 +1285,42 @@ def centro_contable_chile(request):
                 fecha_fin = date(hoy.year + 1, 1, 1) - timedelta(days=1)
             else:
                 fecha_fin = date(hoy.year, hoy.month + 1, 1) - timedelta(days=1)
-    
+
     # === DATOS CONTABLES DEL MES ===
     # Tipos de documentos facturables
-    tipos_facturacion = ['FAC', 'BOL']
-    
+    tipos_facturacion = ["FAC", "BOL"]
+
     documentos_mes = Documento.objects.filter(
         empresa=empresa,
         fecha_emision__range=[fecha_inicio, fecha_fin],
         tipo__in=tipos_facturacion,  # Solo facturas y boletas
-        estado='EMITIDO'
-    ).select_related('cliente', 'vehiculo')
-    
+        estado="EMITIDO",
+    ).select_related("cliente", "vehiculo")
+
     # Totales contables
-    total_facturado = documentos_mes.aggregate(
-        total=Coalesce(Sum('total'), Value(Decimal('0')))
-    )['total'] or Decimal('0')
-    
+    total_facturado = documentos_mes.aggregate(total=Coalesce(Sum("total"), Value(Decimal("0"))))[
+        "total"
+    ] or Decimal("0")
+
     total_neto_repuestos = documentos_mes.aggregate(
-        total=Coalesce(Sum('neto_repuestos'), Value(Decimal('0')))
-    )['total'] or Decimal('0')
-    
+        total=Coalesce(Sum("neto_repuestos"), Value(Decimal("0")))
+    )["total"] or Decimal("0")
+
     total_neto_servicios = documentos_mes.aggregate(
-        total=Coalesce(Sum('neto_servicios'), Value(Decimal('0')))
-    )['total'] or Decimal('0')
-    
+        total=Coalesce(Sum("neto_servicios"), Value(Decimal("0")))
+    )["total"] or Decimal("0")
+
     total_neto_otros = documentos_mes.aggregate(
-        total=Coalesce(Sum('neto_otros_servicios'), Value(Decimal('0')))
-    )['total'] or Decimal('0')
-    
-    total_iva = documentos_mes.aggregate(
-        total=Coalesce(Sum('tax_amount'), Value(Decimal('0')))
-    )['total'] or Decimal('0')
-    
+        total=Coalesce(Sum("neto_otros_servicios"), Value(Decimal("0")))
+    )["total"] or Decimal("0")
+
+    total_iva = documentos_mes.aggregate(total=Coalesce(Sum("tax_amount"), Value(Decimal("0"))))[
+        "total"
+    ] or Decimal("0")
+
     # Calcular neto total (sin IVA)
     neto_total = total_neto_repuestos + total_neto_servicios + total_neto_otros
-    
+
     # === CÁLCULOS CONTABLES ESPECÍFICOS ===
     # Neto afecto = repuestos (base imponible 19%)
     neto_afecto = total_neto_repuestos
@@ -1276,302 +1330,921 @@ def centro_contable_chile(request):
     iva_periodo = total_iva
     # Total ventas = neto afecto + exento + IVA
     total_ventas = neto_afecto + neto_exento + iva_periodo
-    
+
     # === VENTAS DIARIAS PARA GRÁFICO ===
-    ventas_diarias_list = list(documentos_mes.values('fecha_emision').annotate(
-        total_dia=Coalesce(Sum('total'), Value(Decimal('0')))
-    ).order_by('fecha_emision'))
-    
+    ventas_diarias_list = list(
+        documentos_mes.values("fecha_emision")
+        .annotate(total_dia=Coalesce(Sum("total"), Value(Decimal("0"))))
+        .order_by("fecha_emision")
+    )
+
     # Convertir a formato JSON-friendly
     import json
     from django.core.serializers.json import DjangoJSONEncoder
-    ventas_diarias_json = json.dumps([
-        {
-            'fecha_emision': str(v['fecha_emision']),
-            'total_dia': float(v['total_dia'])
-        }
-        for v in ventas_diarias_list
-    ], cls=DjangoJSONEncoder)
-    
+
+    ventas_diarias_json = json.dumps(
+        [
+            {"fecha_emision": str(v["fecha_emision"]), "total_dia": float(v["total_dia"])}
+            for v in ventas_diarias_list
+        ],
+        cls=DjangoJSONEncoder,
+    )
+
     # === ALERTAS INTELIGENTES ORGANIZADAS POR SEVERIDAD ===
     alertas_criticas = []
     alertas_advertencias = []
     alertas_info = []
-    
+
     # 1. Documentos en borrador
     docs_borrador_list = Documento.objects.filter(
         empresa=empresa,
         fecha_emision__range=[fecha_inicio, fecha_fin],
         tipo__in=tipos_facturacion,
-        estado='BORRADOR'
+        estado="BORRADOR",
     )
     if docs_borrador_list.exists():
-        alertas_criticas.append({
-            'tipo': 'critica',
-            'icono': '🔴',
-            'titulo': f'{docs_borrador_list.count()} documento{{ docs_borrador_list.count()|pluralize }} en estado BORRADOR dentro del período',
-            'mensaje': 'Documentos en borrador que deben ser emitidos o eliminados antes del cierre.',
-            'documentos': list(docs_borrador_list.values_list('id', flat=True))
-        })
-    
+        alertas_criticas.append(
+            {
+                "tipo": "critica",
+                "icono": "🔴",
+                "titulo": f"{docs_borrador_list.count()} documento{{ docs_borrador_list.count()|pluralize }} en estado BORRADOR dentro del período",
+                "mensaje": "Documentos en borrador que deben ser emitidos o eliminados antes del cierre.",
+                "documentos": list(docs_borrador_list.values_list("id", flat=True)),
+            }
+        )
+
     # 2. Documentos sin número
-    docs_sin_numero = documentos_mes.filter(numero__in=['', None])
+    docs_sin_numero = documentos_mes.filter(numero__in=["", None])
     if docs_sin_numero.exists():
-        alertas_criticas.append({
-            'tipo': 'critica',
-            'icono': '🔴',
-            'titulo': f'{docs_sin_numero.count()} documento{{ docs_sin_numero.count()|pluralize }} sin número',
-            'mensaje': 'Documentos sin número de factura/boleta. Requiere atención inmediata.',
-            'documentos': list(docs_sin_numero.values_list('id', flat=True))
-        })
-    
+        alertas_criticas.append(
+            {
+                "tipo": "critica",
+                "icono": "🔴",
+                "titulo": f"{docs_sin_numero.count()} documento{{ docs_sin_numero.count()|pluralize }} sin número",
+                "mensaje": "Documentos sin número de factura/boleta. Requiere atención inmediata.",
+                "documentos": list(docs_sin_numero.values_list("id", flat=True)),
+            }
+        )
+
     # 3. Documentos sin cliente o sin RUT
     docs_sin_cliente = documentos_mes.filter(cliente__isnull=True)
-    docs_sin_rut_list = documentos_mes.filter(
-        cliente__isnull=False
-    ).filter(
-        Q(cliente__tax_id__isnull=True) | Q(cliente__tax_id='')
+    docs_sin_rut_list = documentos_mes.filter(cliente__isnull=False).filter(
+        Q(cliente__tax_id__isnull=True) | Q(cliente__tax_id="")
     )
-    
+
     if docs_sin_cliente.exists():
-        alertas_criticas.append({
-            'tipo': 'critica',
-            'icono': '🔴',
-            'titulo': f'{docs_sin_cliente.count()} documento{{ docs_sin_cliente.count()|pluralize }} sin cliente',
-            'mensaje': 'Documentos sin cliente asociado. Datos incompletos.',
-            'documentos': list(docs_sin_cliente.values_list('id', flat=True))
-        })
-    
-    if docs_sin_rut_list.exists():
-        alertas_criticas.append({
-            'tipo': 'critica',
-            'icono': '🔴',
-            'titulo': f'{docs_sin_rut_list.count()} documento{{ docs_sin_rut_list.count()|pluralize }} con cliente sin RUT',
-            'mensaje': 'Documentos con clientes que no tienen RUT registrado.',
-            'documentos': list(docs_sin_rut_list.values_list('id', flat=True))
-        })
-    
-    # 4. Inconsistencia en totales (IVA) - ADVERTENCIA
-    iva_esperado = total_neto_repuestos * Decimal('0.19')
-    diferencia_iva = abs(total_iva - iva_esperado)
-    if diferencia_iva > Decimal('100'):  # Tolerancia de $100 CLP
-        docs_inconsistentes = documentos_mes.filter(
-            Q(tax_amount__lt=ExpressionWrapper(F('neto_repuestos') * Decimal('0.19') - Decimal('50'), output_field=DecimalField())) |
-            Q(tax_amount__gt=ExpressionWrapper(F('neto_repuestos') * Decimal('0.19') + Decimal('50'), output_field=DecimalField()))
+        alertas_criticas.append(
+            {
+                "tipo": "critica",
+                "icono": "🔴",
+                "titulo": f"{docs_sin_cliente.count()} documento{{ docs_sin_cliente.count()|pluralize }} sin cliente",
+                "mensaje": "Documentos sin cliente asociado. Datos incompletos.",
+                "documentos": list(docs_sin_cliente.values_list("id", flat=True)),
+            }
         )
-        alertas_advertencias.append({
-            'tipo': 'advertencia',
-            'icono': '🟡',
-            'titulo': '1 documento con totales inconsistentes (revisar líneas)',
-            'mensaje': f'IVA calculado: ${total_iva:,.0f} | IVA esperado: ${iva_esperado:,.0f} | Diferencia: ${diferencia_iva:,.0f}',
-            'documentos': list(docs_inconsistentes.values_list('id', flat=True)) if docs_inconsistentes.exists() else []
-        })
-    
+
+    if docs_sin_rut_list.exists():
+        alertas_criticas.append(
+            {
+                "tipo": "critica",
+                "icono": "🔴",
+                "titulo": f"{docs_sin_rut_list.count()} documento{{ docs_sin_rut_list.count()|pluralize }} con cliente sin RUT",
+                "mensaje": "Documentos con clientes que no tienen RUT registrado.",
+                "documentos": list(docs_sin_rut_list.values_list("id", flat=True)),
+            }
+        )
+
+    # 4. Inconsistencia en totales (IVA) - ADVERTENCIA
+    iva_esperado = total_neto_repuestos * Decimal("0.19")
+    diferencia_iva = abs(total_iva - iva_esperado)
+    if diferencia_iva > Decimal("100"):  # Tolerancia de $100 CLP
+        docs_inconsistentes = documentos_mes.filter(
+            Q(
+                tax_amount__lt=ExpressionWrapper(
+                    F("neto_repuestos") * Decimal("0.19") - Decimal("50"),
+                    output_field=DecimalField(),
+                )
+            )
+            | Q(
+                tax_amount__gt=ExpressionWrapper(
+                    F("neto_repuestos") * Decimal("0.19") + Decimal("50"),
+                    output_field=DecimalField(),
+                )
+            )
+        )
+        alertas_advertencias.append(
+            {
+                "tipo": "advertencia",
+                "icono": "🟡",
+                "titulo": "1 documento con totales inconsistentes (revisar líneas)",
+                "mensaje": f"IVA calculado: ${total_iva:,.0f} | IVA esperado: ${iva_esperado:,.0f} | Diferencia: ${diferencia_iva:,.0f}",
+                "documentos": (
+                    list(docs_inconsistentes.values_list("id", flat=True))
+                    if docs_inconsistentes.exists()
+                    else []
+                ),
+            }
+        )
+
     # 5. Documentos con total en cero - ADVERTENCIA
-    docs_cero_list = documentos_mes.filter(total=Decimal('0'))
+    docs_cero_list = documentos_mes.filter(total=Decimal("0"))
     if docs_cero_list.exists():
-        alertas_advertencias.append({
-            'tipo': 'advertencia',
-            'icono': '🟡',
-            'titulo': f'{docs_cero_list.count()} documento{{ docs_cero_list.count()|pluralize }} con total $0',
-            'mensaje': 'Documentos con monto total en cero. Verificar líneas de detalle.',
-            'documentos': list(docs_cero_list.values_list('id', flat=True))
-        })
-    
+        alertas_advertencias.append(
+            {
+                "tipo": "advertencia",
+                "icono": "🟡",
+                "titulo": f"{docs_cero_list.count()} documento{{ docs_cero_list.count()|pluralize }} con total $0",
+                "mensaje": "Documentos con monto total en cero. Verificar líneas de detalle.",
+                "documentos": list(docs_cero_list.values_list("id", flat=True)),
+            }
+        )
+
     # 6. Documentos con tipo no definido - ADVERTENCIA
-    docs_tipo_indefinido = documentos_mes.filter(tipo__isnull=True) | documentos_mes.filter(tipo='')
+    docs_tipo_indefinido = documentos_mes.filter(tipo__isnull=True) | documentos_mes.filter(tipo="")
     if docs_tipo_indefinido.exists():
-        alertas_advertencias.append({
-            'tipo': 'advertencia',
-            'icono': '🟡',
-            'titulo': f'{docs_tipo_indefinido.count()} documento{{ docs_tipo_indefinido.count()|pluralize }} con tipo de documento no definido (usando "Interno")',
-            'mensaje': 'Documentos sin tipo definido. Se están usando como "Interno".',
-            'documentos': list(docs_tipo_indefinido.values_list('id', flat=True))
-        })
-    
+        alertas_advertencias.append(
+            {
+                "tipo": "advertencia",
+                "icono": "🟡",
+                "titulo": f'{docs_tipo_indefinido.count()} documento{{ docs_tipo_indefinido.count()|pluralize }} con tipo de documento no definido (usando "Interno")',
+                "mensaje": 'Documentos sin tipo definido. Se están usando como "Interno".',
+                "documentos": list(docs_tipo_indefinido.values_list("id", flat=True)),
+            }
+        )
+
     # 7. Documentos con descuento > 50% - ADVERTENCIA
     from taller.models.lineas_documento import LineaRepuesto, LineaServicio
-    lineas_descuento_alto = LineaRepuesto.objects.filter(
-        documento__empresa=empresa,
-        documento__fecha_emision__range=[fecha_inicio, fecha_fin],
-        documento__tipo__in=tipos_facturacion,
-        descuento__gt=50
-    ).values('documento_id').distinct()
-    
+
+    lineas_descuento_alto = (
+        LineaRepuesto.objects.filter(
+            documento__empresa=empresa,
+            documento__fecha_emision__range=[fecha_inicio, fecha_fin],
+            documento__tipo__in=tipos_facturacion,
+            descuento__gt=50,
+        )
+        .values("documento_id")
+        .distinct()
+    )
+
     if lineas_descuento_alto.exists():
-        alertas_advertencias.append({
-            'tipo': 'advertencia',
-            'icono': '🟡',
-            'titulo': f'{lineas_descuento_alto.count()} documento{{ lineas_descuento_alto.count()|pluralize }} con descuento > 50% en una línea (revisar)',
-            'mensaje': 'Documentos con descuentos muy altos. Verificar que sean correctos.',
-            'documentos': list(lineas_descuento_alto.values_list('documento_id', flat=True))
-        })
-    
+        alertas_advertencias.append(
+            {
+                "tipo": "advertencia",
+                "icono": "🟡",
+                "titulo": f"{lineas_descuento_alto.count()} documento{{ lineas_descuento_alto.count()|pluralize }} con descuento > 50% en una línea (revisar)",
+                "mensaje": "Documentos con descuentos muy altos. Verificar que sean correctos.",
+                "documentos": list(lineas_descuento_alto.values_list("documento_id", flat=True)),
+            }
+        )
+
     # 8. Documentos anulados - INFO
     docs_anulados_list = Documento.objects.filter(
         empresa=empresa,
         fecha_emision__range=[fecha_inicio, fecha_fin],
         tipo__in=tipos_facturacion,
-        estado='ANULADO'
+        estado="ANULADO",
     )
     if docs_anulados_list.exists():
-        alertas_info.append({
-            'tipo': 'info',
-            'icono': '🟢',
-            'titulo': f'{docs_anulados_list.count()} documento{{ docs_anulados_list.count()|pluralize }} anulado{{ docs_anulados_list.count()|pluralize }} en el período (no se consideran en totales)',
-            'mensaje': 'Documentos anulados en el período. No se incluyen en los totales contables.',
-            'documentos': list(docs_anulados_list.values_list('id', flat=True))
-        })
-    
+        alertas_info.append(
+            {
+                "tipo": "info",
+                "icono": "🟢",
+                "titulo": f"{docs_anulados_list.count()} documento{{ docs_anulados_list.count()|pluralize }} anulado{{ docs_anulados_list.count()|pluralize }} en el período (no se consideran en totales)",
+                "mensaje": "Documentos anulados en el período. No se incluyen en los totales contables.",
+                "documentos": list(docs_anulados_list.values_list("id", flat=True)),
+            }
+        )
+
     # Combinar todas las alertas para compatibilidad
     alertas = alertas_criticas + alertas_advertencias + alertas_info
-    
+
     # === CALIDAD DE DATOS ===
-    calidad_datos = {
-        'score': 100,
-        'problemas': []
-    }
-    
+    calidad_datos = {"score": 100, "problemas": []}
+
     total_docs = documentos_mes.count()
     if total_docs > 0:
         # Porcentaje de documentos con número
-        docs_sin_numero_count = documentos_mes.filter(numero__in=['', None]).count()
+        docs_sin_numero_count = documentos_mes.filter(numero__in=["", None]).count()
         pct_con_numero = ((total_docs - docs_sin_numero_count) / total_docs) * 100
         # Porcentaje de documentos con cliente
         docs_sin_cliente_count = documentos_mes.filter(cliente__isnull=True).count()
         pct_con_cliente = ((total_docs - docs_sin_cliente_count) / total_docs) * 100
         # Porcentaje de documentos con total válido
-        docs_cero_count = documentos_mes.filter(total=Decimal('0')).count()
+        docs_cero_count = documentos_mes.filter(total=Decimal("0")).count()
         pct_con_total = ((total_docs - docs_cero_count) / total_docs) * 100
-        
+
         # Score de calidad (promedio ponderado)
-        calidad_datos['score'] = int((pct_con_numero + pct_con_cliente + pct_con_total) / 3)
-        
+        calidad_datos["score"] = int((pct_con_numero + pct_con_cliente + pct_con_total) / 3)
+
         if pct_con_numero < 100:
-            calidad_datos['problemas'].append(f'{100 - pct_con_numero:.0f}% sin número')
+            calidad_datos["problemas"].append(f"{100 - pct_con_numero:.0f}% sin número")
         if pct_con_cliente < 100:
-            calidad_datos['problemas'].append(f'{100 - pct_con_cliente:.0f}% sin cliente')
+            calidad_datos["problemas"].append(f"{100 - pct_con_cliente:.0f}% sin cliente")
         if pct_con_total < 100:
-            calidad_datos['problemas'].append(f'{100 - pct_con_total:.0f}% con total $0')
+            calidad_datos["problemas"].append(f"{100 - pct_con_total:.0f}% con total $0")
     else:
-        calidad_datos['score'] = 0
-        calidad_datos['problemas'].append('No hay documentos en el período')
-    
+        calidad_datos["score"] = 0
+        calidad_datos["problemas"].append("No hay documentos en el período")
+
     # === RESUMEN POR TIPO DE DOCUMENTO ===
-    resumen_tipos = documentos_mes.values('tipo').annotate(
-        cantidad=Count('id'),
-        total=Coalesce(Sum('total'), Value(Decimal('0'))),
-        neto=Coalesce(Sum('neto_repuestos') + Sum('neto_servicios') + Sum('neto_otros_servicios'), Value(Decimal('0'))),
-        iva=Coalesce(Sum('tax_amount'), Value(Decimal('0')))
-    ).order_by('tipo')
-    
+    resumen_tipos = (
+        documentos_mes.values("tipo")
+        .annotate(
+            cantidad=Count("id"),
+            total=Coalesce(Sum("total"), Value(Decimal("0"))),
+            neto=Coalesce(
+                Sum("neto_repuestos") + Sum("neto_servicios") + Sum("neto_otros_servicios"),
+                Value(Decimal("0")),
+            ),
+            iva=Coalesce(Sum("tax_amount"), Value(Decimal("0"))),
+        )
+        .order_by("tipo")
+    )
+
     # === ESTADÍSTICAS ADICIONALES ===
     total_documentos = documentos_mes.count()
-    clientes_unicos = documentos_mes.values('cliente').distinct().count()
-    promedio_ticket = total_facturado / total_documentos if total_documentos > 0 else Decimal('0')
-    
+    clientes_unicos = documentos_mes.values("cliente").distinct().count()
+    promedio_ticket = total_facturado / total_documentos if total_documentos > 0 else Decimal("0")
+
     # Documentos en borrador
     docs_borrador = Documento.objects.filter(
         empresa=empresa,
         fecha_emision__range=[fecha_inicio, fecha_fin],
         tipo__in=tipos_facturacion,
-        estado='BORRADOR'
+        estado="BORRADOR",
     ).count()
-    
+
     # Documentos sin RUT de cliente (usando tax_id)
-    docs_sin_rut = documentos_mes.filter(
-        cliente__isnull=False
-    ).filter(
-        Q(cliente__tax_id__isnull=True) | Q(cliente__tax_id='')
-    ).count()
-    
+    docs_sin_rut = (
+        documentos_mes.filter(cliente__isnull=False)
+        .filter(Q(cliente__tax_id__isnull=True) | Q(cliente__tax_id=""))
+        .count()
+    )
+
     # Desglose por repuestos y servicios
     from taller.models.lineas_documento import LineaRepuesto, LineaServicio
+
     lineas_repuestos = LineaRepuesto.objects.filter(
         documento__empresa=empresa,
         documento__fecha_emision__range=[fecha_inicio, fecha_fin],
         documento__tipo__in=tipos_facturacion,
-        documento__estado='EMITIDO'
+        documento__estado="EMITIDO",
     )
-    
+
     lineas_servicios = LineaServicio.objects.filter(
         documento__empresa=empresa,
         documento__fecha_emision__range=[fecha_inicio, fecha_fin],
         documento__tipo__in=tipos_facturacion,
-        documento__estado='EMITIDO'
+        documento__estado="EMITIDO",
     )
-    
+
     # Repuestos vendidos (detallado)
-    repuestos_vendidos = lineas_repuestos.values(
-        'codigo', 'nombre'
-    ).annotate(
-        cantidad_total=Sum('cantidad'),
-        neto_total=Sum(ExpressionWrapper(F('cantidad') * F('precio_unitario'), output_field=DecimalField()))
-    ).order_by('-neto_total')
-    
+    repuestos_vendidos = (
+        lineas_repuestos.values("codigo", "nombre")
+        .annotate(
+            cantidad_total=Sum("cantidad"),
+            neto_total=Sum(
+                ExpressionWrapper(F("cantidad") * F("precio_unitario"), output_field=DecimalField())
+            ),
+        )
+        .order_by("-neto_total")
+    )
+
     # Servicios realizados (detallado)
-    servicios_realizados = lineas_servicios.values('nombre').annotate(
-        cantidad_total=Sum('cantidad'),
-        monto_total=Sum(ExpressionWrapper(F('cantidad') * F('precio_unitario'), output_field=DecimalField()))
-    ).order_by('-monto_total')
-    
+    servicios_realizados = (
+        lineas_servicios.values("nombre")
+        .annotate(
+            cantidad_total=Sum("cantidad"),
+            monto_total=Sum(
+                ExpressionWrapper(F("cantidad") * F("precio_unitario"), output_field=DecimalField())
+            ),
+        )
+        .order_by("-monto_total")
+    )
+
     # Top repuestos (para preview)
     top_repuestos = repuestos_vendidos[:10]
-    
+
     # Top servicios (para preview)
     top_servicios = servicios_realizados[:10]
-    
+
     # Calcular neto por documento para el template
     documentos_con_neto = []
     for doc in documentos_mes[:100]:
         neto_doc = doc.neto_repuestos + doc.neto_servicios + doc.neto_otros_servicios
         neto_exento_doc = doc.neto_servicios + doc.neto_otros_servicios
-        documentos_con_neto.append({
-            'doc': doc,
-            'neto': neto_doc,
-            'neto_exento': neto_exento_doc
-        })
-    
+        documentos_con_neto.append({"doc": doc, "neto": neto_doc, "neto_exento": neto_exento_doc})
+
     # === CONTEXTO ===
     context = {
-        'empresa': empresa,
-        'fecha_inicio': fecha_inicio,
-        'fecha_fin': fecha_fin,
-        'fecha_desde_str': fecha_desde_str or fecha_inicio.strftime('%Y-%m-%d'),
-        'fecha_hasta_str': fecha_hasta_str or fecha_fin.strftime('%Y-%m-%d'),
+        "empresa": empresa,
+        "fecha_inicio": fecha_inicio,
+        "fecha_fin": fecha_fin,
+        "fecha_desde_str": fecha_desde_str or fecha_inicio.strftime("%Y-%m-%d"),
+        "fecha_hasta_str": fecha_hasta_str or fecha_fin.strftime("%Y-%m-%d"),
         # Cálculos contables específicos
-        'neto_afecto': neto_afecto,
-        'neto_exento': neto_exento,
-        'iva_periodo': iva_periodo,
-        'total_ventas': total_ventas,
+        "neto_afecto": neto_afecto,
+        "neto_exento": neto_exento,
+        "iva_periodo": iva_periodo,
+        "total_ventas": total_ventas,
         # Datos para gráfico
-        'ventas_diarias': ventas_diarias_json,
+        "ventas_diarias": ventas_diarias_json,
         # Totales generales (compatibilidad)
-        'total_facturado': total_facturado,
-        'total_neto_repuestos': total_neto_repuestos,
-        'total_neto_servicios': total_neto_servicios,
-        'total_neto_otros': total_neto_otros,
-        'neto_total': neto_total,
-        'total_iva': total_iva,
+        "total_facturado": total_facturado,
+        "total_neto_repuestos": total_neto_repuestos,
+        "total_neto_servicios": total_neto_servicios,
+        "total_neto_otros": total_neto_otros,
+        "neto_total": neto_total,
+        "total_iva": total_iva,
         # Alertas organizadas
-        'alertas': alertas,
-        'alertas_criticas': alertas_criticas,
-        'alertas_advertencias': alertas_advertencias,
-        'alertas_info': alertas_info,
-        'calidad_datos': calidad_datos,
-        'resumen_tipos': resumen_tipos,
-        'total_documentos': total_documentos,
-        'clientes_unicos': clientes_unicos,
-        'promedio_ticket': promedio_ticket,
-        'documentos_mes': documentos_mes[:100],  # Primeros 100 para libro de ventas
-        'documentos_con_neto': documentos_con_neto,
-        'docs_borrador': docs_borrador,
-        'docs_sin_rut': docs_sin_rut,
+        "alertas": alertas,
+        "alertas_criticas": alertas_criticas,
+        "alertas_advertencias": alertas_advertencias,
+        "alertas_info": alertas_info,
+        "calidad_datos": calidad_datos,
+        "resumen_tipos": resumen_tipos,
+        "total_documentos": total_documentos,
+        "clientes_unicos": clientes_unicos,
+        "promedio_ticket": promedio_ticket,
+        "documentos_mes": documentos_mes[:100],  # Primeros 100 para libro de ventas
+        "documentos_con_neto": documentos_con_neto,
+        "docs_borrador": docs_borrador,
+        "docs_sin_rut": docs_sin_rut,
         # Repuestos y servicios detallados
-        'repuestos_vendidos': list(repuestos_vendidos),
-        'servicios_realizados': list(servicios_realizados),
-        'top_repuestos': list(top_repuestos),
-        'top_servicios': list(top_servicios),
+        "repuestos_vendidos": list(repuestos_vendidos),
+        "servicios_realizados": list(servicios_realizados),
+        "top_repuestos": list(top_repuestos),
+        "top_servicios": list(top_servicios),
     }
-    
-    return render(request, 'taller/reportes/centro_contable_chile.html', context)
+
+    return render(request, "taller/reportes/centro_contable_chile.html", context)
+
+
+# ==================== REPORTES DE KILOMETRAJE ====================
+
+
+@login_required_default
+def recordatorios_mantenimiento(request):
+    """
+    🚨 Vista de Recordatorios de Mantenimiento Predictivo
+
+    Muestra vehículos que están cerca de necesitar mantenimiento,
+    permitiendo al taller contactar proactivamente a los clientes.
+    """
+    # 🔒 FILTRO CRÍTICO POR EMPRESA
+    empresa = get_or_create_empresa(request)
+
+    # Obtener parámetros de configuración desde GET (con valores por defecto)
+    servicio_km = int(request.GET.get("servicio_km", 10000))  # Kilometraje del servicio
+    margen_alerta = int(request.GET.get("margen_alerta", 1000))  # Margen de alerta en km
+    tipo_servicio = request.GET.get("tipo_servicio", "cambio_aceite")  # Tipo de servicio
+
+    # Configuraciones predefinidas por tipo de servicio
+    configuraciones_servicio = {
+        "cambio_aceite": {
+            "servicio_km": 10000,
+            "margen_alerta": 1000,
+            "nombre": "Cambio de Aceite",
+            "descripcion": "Servicio recomendado cada 10,000 km",
+        },
+        "revision_menor": {
+            "servicio_km": 15000,
+            "margen_alerta": 2000,
+            "nombre": "Revisión Menor",
+            "descripcion": "Revisión menor cada 15,000 km",
+        },
+        "revision_mayor": {
+            "servicio_km": 50000,
+            "margen_alerta": 5000,
+            "nombre": "Revisión Mayor",
+            "descripcion": "Revisión mayor cada 50,000 km",
+        },
+        "personalizado": {
+            "servicio_km": servicio_km,
+            "margen_alerta": margen_alerta,
+            "nombre": "Personalizado",
+            "descripcion": f"Servicio cada {servicio_km:,} km",
+        },
+    }
+
+    # Obtener configuración del servicio seleccionado
+    config = configuraciones_servicio.get(tipo_servicio, configuraciones_servicio["cambio_aceite"])
+
+    # Si es personalizado, usar los valores de GET
+    if tipo_servicio == "personalizado":
+        config["servicio_km"] = servicio_km
+        config["margen_alerta"] = margen_alerta
+
+    # Crear instancia del reporte
+    reporte = ReporteKilometraje(empresa)
+
+    # Obtener recordatorios
+    recordatorios = reporte.recordatorios_mantenimiento(
+        servicio_km=config["servicio_km"], margen_alerta=config["margen_alerta"]
+    )
+
+    # Separar por urgencia
+    recordatorios_urgentes = [r for r in recordatorios if r["urgencia"] == "alta"]
+    recordatorios_medios = [r for r in recordatorios if r["urgencia"] == "media"]
+
+    # Estadísticas
+    total_recordatorios = len(recordatorios)
+    total_urgentes = len(recordatorios_urgentes)
+    total_medios = len(recordatorios_medios)
+
+    # Preparar contexto
+    context = {
+        "recordatorios": recordatorios,
+        "recordatorios_urgentes": recordatorios_urgentes,
+        "recordatorios_medios": recordatorios_medios,
+        "total_recordatorios": total_recordatorios,
+        "total_urgentes": total_urgentes,
+        "total_medios": total_medios,
+        "configuraciones_servicio": configuraciones_servicio,
+        "tipo_servicio_actual": tipo_servicio,
+        "config_actual": config,
+        "empresa": empresa,
+    }
+
+    return render(request, "taller/reportes/recordatorios_mantenimiento.html", context)
+
+
+@login_required_default
+def historial_mantenimiento_vehiculo(request, vehiculo_id):
+    """
+    📋 Vista de Historial de Mantenimiento Detallado de un Vehículo
+
+    Muestra el historial completo tipo "Libro de Mantenciones Digital"
+    """
+    # 🔒 FILTRO CRÍTICO POR EMPRESA
+    empresa = get_or_create_empresa(request)
+
+    # Obtener vehículo (con filtro de empresa)
+    try:
+        vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
+    except Vehiculo.DoesNotExist:
+        raise Http404("Vehículo no encontrado")
+
+    # Crear instancia del reporte
+    reporte = ReporteKilometraje(empresa)
+
+    # Obtener historial
+    historial_data = reporte.historial_mantenimiento_vehiculo(vehiculo)
+
+    # Preparar contexto
+    context = {
+        "historial_data": historial_data,
+        "vehiculo": vehiculo,
+        "empresa": empresa,
+    }
+
+    return render(request, "taller/reportes/historial_vehiculo.html", context)
+
+
+@login_required_default
+def api_historial_vehiculo(request, vehiculo_id):
+    """
+    📡 API Endpoint: Historial de Mantenimiento de un Vehículo
+
+    Retorna el historial completo en formato JSON estructurado.
+    Útil para Portal del Cliente y exportaciones.
+    """
+    # 🔒 FILTRO CRÍTICO POR EMPRESA
+    empresa = get_or_create_empresa(request)
+
+    try:
+        vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
+    except Vehiculo.DoesNotExist:
+        return JsonResponse({"error": "Vehículo no encontrado"}, status=404)
+
+    # Crear instancia del reporte
+    reporte = ReporteKilometraje(empresa)
+
+    # Exportar historial en formato estructurado
+    historial_export = reporte.exportar_historial_vehiculo(vehiculo, formato="dict")
+
+    # Serializar datos para JSON (convertir Decimal, datetime, etc.)
+    def serialize_value(value):
+        """Convierte valores no serializables a tipos básicos"""
+        if isinstance(value, Decimal):
+            return float(value)
+        elif hasattr(value, "isoformat"):  # datetime, date
+            return value.isoformat()
+        elif hasattr(value, "__dict__"):  # Objetos modelo
+            return str(value)
+        return value
+
+    def serialize_dict(d):
+        """Recursivamente serializa un diccionario"""
+        if isinstance(d, dict):
+            return {k: serialize_dict(v) for k, v in d.items()}
+        elif isinstance(d, list):
+            return [serialize_dict(item) for item in d]
+        else:
+            return serialize_value(d)
+
+    historial_serializado = serialize_dict(historial_export)
+
+    return JsonResponse(historial_serializado, safe=False)
+
+
+@login_required_default
+def exportar_historial_pdf(request, vehiculo_id):
+    """
+    📄 Exportar Historial de Mantenimiento a PDF
+
+    Genera un PDF del historial completo del vehículo usando WeasyPrint.
+    """
+    # 🔒 FILTRO CRÍTICO POR EMPRESA
+    empresa = get_or_create_empresa(request)
+
+    try:
+        vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
+    except Vehiculo.DoesNotExist:
+        raise Http404("Vehículo no encontrado")
+
+    # Crear instancia del reporte
+    reporte = ReporteKilometraje(empresa)
+    historial_data = reporte.historial_mantenimiento_vehiculo(vehiculo)
+
+    try:
+        from weasyprint import HTML
+        from weasyprint.text.fonts import FontConfiguration
+        from django.template.loader import render_to_string
+        from django.utils import timezone
+
+        # Preparar contexto
+        context = {
+            "historial_data": historial_data,
+            "vehiculo": vehiculo,
+            "empresa": empresa,
+            "fecha_generacion": timezone.now(),
+        }
+
+        # Renderizar HTML
+        html_string = render_to_string(
+            "taller/reportes/historial_vehiculo_pdf.html", context, request=request
+        )
+
+        # Configuración de fuentes
+        font_config = FontConfiguration()
+
+        # Base URL para recursos (logos, imágenes)
+        base_url = None
+        if request:
+            try:
+                base_url = request.build_absolute_uri("/")
+            except Exception:
+                base_url = None
+
+        # Generar PDF
+        html = HTML(string=html_string, base_url=base_url)
+        pdf_bytes = html.write_pdf(font_config=font_config)
+
+        # Nombre del archivo
+        patente_slug = vehiculo.patente.replace(" ", "_").replace("-", "_")
+        filename = f"Historial_Mantenimiento_{patente_slug}_{timezone.now().strftime('%Y%m%d')}.pdf"
+
+        # Retornar PDF como respuesta
+        response = HttpResponse(pdf_bytes, content_type="application/pdf")
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response
+
+    except ImportError:
+        # Si WeasyPrint no está instalado, retornar error
+        return HttpResponse(
+            "Error: WeasyPrint no está instalado. Por favor, instálelo con: pip install weasyprint",
+            status=500,
+            content_type="text/plain",
+        )
+    except Exception as e:
+        # Log del error y retornar mensaje
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error generando PDF de historial: {e}", exc_info=True)
+        return HttpResponse(
+            f"Error al generar PDF: {str(e)}", status=500, content_type="text/plain"
+        )
+
+
+@login_required_default
+def exportar_historial_excel(request, vehiculo_id):
+    """
+    📊 Exportar Historial de Mantenimiento a Excel
+
+    Genera un archivo Excel del historial completo del vehículo usando openpyxl.
+    """
+    # 🔒 FILTRO CRÍTICO POR EMPRESA
+    empresa = get_or_create_empresa(request)
+
+    try:
+        vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
+    except Vehiculo.DoesNotExist:
+        raise Http404("Vehículo no encontrado")
+
+    # Crear instancia del reporte
+    reporte = ReporteKilometraje(empresa)
+    historial_data = reporte.historial_mantenimiento_vehiculo(vehiculo)
+
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font, PatternFill, Alignment, Border, Side
+        from openpyxl.utils import get_column_letter
+        from django.utils import timezone
+        from io import BytesIO
+
+        # Crear workbook
+        wb = Workbook()
+        ws = wb.active
+        ws.title = "Historial de Mantenimiento"
+
+        # Estilos
+        header_fill = PatternFill(start_color="1e40af", end_color="1e40af", fill_type="solid")
+        header_font = Font(bold=True, color="FFFFFF", size=11)
+        title_font = Font(bold=True, size=14, color="1e40af")
+        border = Border(
+            left=Side(style="thin"),
+            right=Side(style="thin"),
+            top=Side(style="thin"),
+            bottom=Side(style="thin"),
+        )
+
+        # Título
+        ws.merge_cells("A1:E1")
+        ws["A1"] = f"Historial de Mantenimiento - {vehiculo.patente}"
+        ws["A1"].font = title_font
+        ws["A1"].alignment = Alignment(horizontal="center", vertical="center")
+        ws.row_dimensions[1].height = 30
+
+        # Información del vehículo
+        row = 3
+        ws[f"A{row}"] = "Información del Vehículo"
+        ws[f"A{row}"].font = Font(bold=True, size=12)
+        row += 1
+
+        info_data = [
+            ["Patente", vehiculo.patente],
+            ["Marca / Modelo", f"{vehiculo.get_marca_display()} {vehiculo.get_modelo_display()}"],
+            ["Año", vehiculo.anio],
+            ["Kilometraje Actual", f"{vehiculo.kilometraje_actual} km"],
+            ["Cliente", vehiculo.cliente.nombre if vehiculo.cliente else "N/A"],
+        ]
+
+        if vehiculo.vin:
+            info_data.append(["VIN", vehiculo.vin])
+
+        for label, value in info_data:
+            ws[f"A{row}"] = label
+            ws[f"A{row}"].font = Font(bold=True)
+            ws[f"B{row}"] = value
+            row += 1
+
+        row += 1
+
+        # Resumen
+        ws[f"A{row}"] = "Resumen"
+        ws[f"A{row}"].font = Font(bold=True, size=12)
+        row += 1
+
+        resumen_data = [
+            ["Total Servicios", historial_data["resumen"]["total_servicios"]],
+            ["Total Invertido", f"${historial_data['resumen']['total_gastado']:,.0f}"],
+        ]
+
+        if historial_data["resumen"].get("km_promedio_entre_servicios"):
+            resumen_data.append(
+                [
+                    "KM Promedio entre Servicios",
+                    f"{historial_data['resumen']['km_promedio_entre_servicios']:,.0f} km",
+                ]
+            )
+
+        if historial_data["resumen"].get("dias_promedio_entre_servicios"):
+            resumen_data.append(
+                [
+                    "Días Promedio entre Servicios",
+                    f"{historial_data['resumen']['dias_promedio_entre_servicios']:.0f} días",
+                ]
+            )
+
+        for label, value in resumen_data:
+            ws[f"A{row}"] = label
+            ws[f"A{row}"].font = Font(bold=True)
+            ws[f"B{row}"] = value
+            row += 1
+
+        row += 2
+
+        # Encabezados de tabla
+        headers = [
+            "Fecha",
+            "Documento",
+            "Tipo",
+            "Trabajos Realizados",
+            "Kilometraje",
+            "Monto",
+            "Técnico",
+        ]
+        for col_num, header in enumerate(headers, 1):
+            cell = ws.cell(row=row, column=col_num)
+            cell.value = header
+            cell.fill = header_fill
+            cell.font = header_font
+            cell.alignment = Alignment(horizontal="center", vertical="center")
+            cell.border = border
+
+        row += 1
+
+        # Datos del historial
+        for entrada in historial_data["historial"]:
+            ws.cell(row=row, column=1).value = (
+                entrada["fecha"].strftime("%d/%m/%Y") if entrada["fecha"] else ""
+            )
+            ws.cell(row=row, column=2).value = entrada["numero_documento"]
+            ws.cell(row=row, column=3).value = entrada["tipo"]
+            ws.cell(row=row, column=4).value = entrada["trabajos_realizados"]
+            ws.cell(row=row, column=5).value = (
+                f"{entrada['kilometraje']:,.0f} km" if entrada.get("kilometraje") else "N/A"
+            )
+            ws.cell(row=row, column=6).value = (
+                f"${entrada['monto']:,.0f}" if entrada.get("monto") else "$0"
+            )
+            ws.cell(row=row, column=7).value = entrada.get("tecnico", "N/A")
+
+            # Aplicar bordes
+            for col in range(1, 8):
+                ws.cell(row=row, column=col).border = border
+
+            row += 1
+
+        # Ajustar ancho de columnas
+        column_widths = {
+            "A": 12,  # Fecha
+            "B": 15,  # Documento
+            "C": 10,  # Tipo
+            "D": 40,  # Trabajos
+            "E": 15,  # Kilometraje
+            "F": 15,  # Monto
+            "G": 20,  # Técnico
+        }
+
+        for col_letter, width in column_widths.items():
+            ws.column_dimensions[col_letter].width = width
+
+        # Ajustar alineación
+        for row in ws.iter_rows(min_row=row - len(historial_data["historial"]), max_row=row - 1):
+            row[0].alignment = Alignment(horizontal="center")  # Fecha
+            row[1].alignment = Alignment(horizontal="center")  # Documento
+            row[2].alignment = Alignment(horizontal="center")  # Tipo
+            row[4].alignment = Alignment(horizontal="center")  # Kilometraje
+            row[5].alignment = Alignment(horizontal="right")  # Monto
+            row[6].alignment = Alignment(horizontal="center")  # Técnico
+
+        # Footer
+        row += 2
+        ws.merge_cells(f"A{row}:G{row}")
+        ws[f"A{row}"] = (
+            f"Documento generado por eGarage el {timezone.now().strftime('%d/%m/%Y %H:%M')}"
+        )
+        ws[f"A{row}"].font = Font(size=9, italic=True, color="666666")
+        ws[f"A{row}"].alignment = Alignment(horizontal="center")
+
+        # Guardar en BytesIO
+        output = BytesIO()
+        wb.save(output)
+        output.seek(0)
+
+        # Nombre del archivo
+        patente_slug = vehiculo.patente.replace(" ", "_").replace("-", "_")
+        filename = (
+            f"Historial_Mantenimiento_{patente_slug}_{timezone.now().strftime('%Y%m%d')}.xlsx"
+        )
+
+        # Retornar Excel como respuesta
+        response = HttpResponse(
+            output.getvalue(),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+        response["Content-Disposition"] = f'attachment; filename="{filename}"'
+        return response
+
+    except ImportError:
+        # Si openpyxl no está instalado, retornar error
+        return HttpResponse(
+            "Error: openpyxl no está instalado. Por favor, instálelo con: pip install openpyxl",
+            status=500,
+            content_type="text/plain",
+        )
+    except Exception as e:
+        # Log del error y retornar mensaje
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.error(f"Error generando Excel de historial: {e}", exc_info=True)
+        return HttpResponse(
+            f"Error al generar Excel: {str(e)}", status=500, content_type="text/plain"
+        )
+
+
+@login_required_default
+def verificar_garantia(request):
+    """
+    ✅ Vista para Verificar Trazabilidad de Garantías
+
+    Permite verificar si un documento de garantía está dentro del límite.
+    Puede recibir IDs de documentos o buscar automáticamente garantías activas.
+    """
+    # 🔒 FILTRO CRÍTICO POR EMPRESA
+    empresa = get_or_create_empresa(request)
+
+    # Obtener IDs de documentos desde GET
+    doc_garantia_id = request.GET.get("doc_garantia_id")
+    doc_original_id = request.GET.get("doc_original_id")
+    vehiculo_id = request.GET.get("vehiculo_id")
+
+    resultado = None
+    error = None
+    doc_garantia = None
+    doc_original = None
+    garantias_activas = []
+
+    # Si se proporciona vehículo, buscar garantías activas automáticamente
+    if vehiculo_id:
+        try:
+            from taller.models.vehiculos import Vehiculo
+
+            vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
+
+            # Buscar documentos recientes del vehículo que podrían ser garantías
+            documentos_recientes = (
+                Documento.objects.filter(
+                    empresa=empresa, vehiculo=vehiculo, tipo__in=["OT", "PRES"], estado="EMITIDO"
+                )
+                .select_related("registro_kilometraje")
+                .order_by("-fecha_emision")[:10]
+            )
+
+            # Buscar documentos anteriores que podrían ser el original
+            for doc_reciente in documentos_recientes:
+                if doc_reciente.registro_kilometraje:
+                    # Buscar documentos anteriores del mismo vehículo
+                    docs_anteriores = (
+                        Documento.objects.filter(
+                            empresa=empresa,
+                            vehiculo=vehiculo,
+                            tipo__in=["OT", "PRES"],
+                            fecha_emision__lt=doc_reciente.fecha_emision,
+                            estado="EMITIDO",
+                        )
+                        .select_related("registro_kilometraje")
+                        .order_by("-fecha_emision")[:5]
+                    )
+
+                    for doc_anterior in docs_anteriores:
+                        if doc_anterior.registro_kilometraje:
+                            reporte = ReporteKilometraje(empresa)
+                            verificacion = reporte.verificar_garantia(doc_reciente, doc_anterior)
+                            if verificacion and not verificacion.get("error"):
+                                garantias_activas.append(
+                                    {
+                                        "documento_garantia": doc_reciente,
+                                        "documento_original": doc_anterior,
+                                        "verificacion": verificacion,
+                                    }
+                                )
+        except Vehiculo.DoesNotExist:
+            error = "Vehículo no encontrado"
+        except Exception as e:
+            error = f"Error al buscar garantías: {str(e)}"
+
+    # Si se proporcionan IDs específicos, verificar esa garantía
+    if doc_garantia_id and doc_original_id:
+        try:
+            # Obtener documentos (con filtro de empresa)
+            doc_garantia = Documento.objects.get(pk=doc_garantia_id, empresa=empresa)
+            doc_original = Documento.objects.get(pk=doc_original_id, empresa=empresa)
+
+            # Crear instancia del reporte
+            reporte = ReporteKilometraje(empresa)
+
+            # Verificar garantía
+            resultado = reporte.verificar_garantia(doc_garantia, doc_original)
+
+        except Documento.DoesNotExist:
+            error = "Uno o ambos documentos no fueron encontrados"
+        except Exception as e:
+            error = f"Error al verificar garantía: {str(e)}"
+
+    # Preparar contexto
+    context = {
+        "resultado": resultado,
+        "error": error,
+        "documento_garantia": doc_garantia,
+        "documento_original": doc_original,
+        "garantias_activas": garantias_activas,
+        "vehiculo_id": vehiculo_id,
+        "empresa": empresa,
+    }
+
+    return render(request, "taller/reportes/verificar_garantia.html", context)

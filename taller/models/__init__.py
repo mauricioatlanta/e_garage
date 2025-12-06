@@ -15,6 +15,9 @@ from .team_member import TeamMember
 from .clientes import Cliente
 from .vehiculos import Vehiculo
 
+# Modelos de kilometraje
+from .kilometraje import KilometrajeRegistro
+
 # Modelos de documentos
 from .documento import Documento
 from .lineas_documento import LineaServicio, LineaRepuesto, LineaOtroServicio
@@ -38,6 +41,8 @@ __all__ = [
     # Clientes y vehículos
     "Cliente",
     "Vehiculo",
+    # Kilometraje
+    "KilometrajeRegistro",
     # Documentos
     "Documento",
     "LineaServicio",

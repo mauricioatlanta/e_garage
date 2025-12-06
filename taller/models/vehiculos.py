@@ -182,6 +182,139 @@ class Vehiculo(TenantScoped):
         except Exception:
             return "/vehiculos/"  # fallback seguro
 
+    @property
+    def kilometraje_actual(self):
+        """
+        Devuelve el kilometraje más reciente registrado para este vehículo.
+
+        Returns:
+            int: El kilometraje más reciente, o 0 si no hay registros.
+        """
+        try:
+            registro = self.historial_kilometraje.first()  # Usa el ordering de KilometrajeRegistro
+            return registro.kilometraje if registro else 0
+        except Exception:
+            # Fallback en caso de error (por ejemplo, si el modelo aún no existe)
+            return 0
+
+    def kilometros_recorridos_desde_documento(self, documento_original):
+        """
+        Calcula los kilómetros recorridos desde un documento original hasta el kilometraje actual.
+        Útil para verificar garantías.
+
+        Args:
+            documento_original: Documento de la reparación original
+
+        Returns:
+            dict: {
+                'kilometros_recorridos': int,
+                'kilometraje_original': int,
+                'kilometraje_actual': int,
+                'dias_transcurridos': int o None
+            }
+        """
+        from taller.models import KilometrajeRegistro
+
+        # Obtener registro del documento original
+        try:
+            registro_original = documento_original.registro_kilometraje
+        except Exception:
+            registro_original = None
+
+        if not registro_original:
+            return {
+                "kilometros_recorridos": None,
+                "kilometraje_original": None,
+                "kilometraje_actual": self.kilometraje_actual,
+                "dias_transcurridos": None,
+                "error": "No se encontró registro de kilometraje en el documento original",
+            }
+
+        km_actual = self.kilometraje_actual
+        km_original = registro_original.kilometraje
+        km_recorridos = km_actual - km_original
+
+        # Calcular días transcurridos
+        dias = None
+        if registro_original.fecha_registro:
+            from django.utils import timezone
+
+            delta = timezone.now() - registro_original.fecha_registro
+            dias = delta.days
+
+        return {
+            "kilometros_recorridos": km_recorridos,
+            "kilometraje_original": km_original,
+            "kilometraje_actual": km_actual,
+            "dias_transcurridos": dias,
+            "fecha_original": registro_original.fecha_registro,
+        }
+
+    def estadisticas_uso(self):
+        """
+        Calcula estadísticas de uso del vehículo basadas en el historial de kilometraje.
+
+        Returns:
+            dict: {
+                'total_registros': int,
+                'km_promedio_entre_servicios': float,
+                'dias_promedio_entre_servicios': float,
+                'km_total_recorridos': int,
+                'fecha_primer_registro': datetime o None,
+                'fecha_ultimo_registro': datetime o None
+            }
+        """
+        registros = self.historial_kilometraje.all()
+        total_registros = registros.count()
+
+        if total_registros < 2:
+            return {
+                "total_registros": total_registros,
+                "km_promedio_entre_servicios": None,
+                "dias_promedio_entre_servicios": None,
+                "km_total_recorridos": self.kilometraje_actual,
+                "fecha_primer_registro": (
+                    registros.last().fecha_registro if registros.exists() else None
+                ),
+                "fecha_ultimo_registro": (
+                    registros.first().fecha_registro if registros.exists() else None
+                ),
+            }
+
+        # Calcular diferencias entre registros consecutivos
+        km_diferencias = []
+        dias_diferencias = []
+
+        registros_ordenados = list(registros.order_by("fecha_registro"))
+
+        for i in range(1, len(registros_ordenados)):
+            anterior = registros_ordenados[i - 1]
+            actual = registros_ordenados[i]
+
+            km_diff = actual.kilometraje - anterior.kilometraje
+            if km_diff > 0:  # Solo contar si es positivo (evitar errores de datos)
+                km_diferencias.append(km_diff)
+
+            if anterior.fecha_registro and actual.fecha_registro:
+                delta = actual.fecha_registro - anterior.fecha_registro
+                dias_diferencias.append(delta.days)
+
+        km_promedio = sum(km_diferencias) / len(km_diferencias) if km_diferencias else None
+        dias_promedio = sum(dias_diferencias) / len(dias_diferencias) if dias_diferencias else None
+
+        return {
+            "total_registros": total_registros,
+            "km_promedio_entre_servicios": round(km_promedio, 2) if km_promedio else None,
+            "dias_promedio_entre_servicios": round(dias_promedio, 2) if dias_promedio else None,
+            "km_total_recorridos": self.kilometraje_actual,
+            "fecha_primer_registro": (
+                registros_ordenados[0].fecha_registro if registros_ordenados else None
+            ),
+            "fecha_ultimo_registro": (
+                registros_ordenados[-1].fecha_registro if registros_ordenados else None
+            ),
+        }
+
     class Meta(TenantScoped.Meta):
         ordering = ["marca", "modelo", "patente"]
         verbose_name = "Vehículo"

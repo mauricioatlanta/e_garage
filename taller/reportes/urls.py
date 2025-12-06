@@ -63,6 +63,38 @@ urlpatterns = [
         views.reportes_otros_servicios_fecha,
         name="reportes_otros_servicios_fecha",
     ),
+    # === REPORTES DE KILOMETRAJE ===
+    path(
+        "kilometraje/recordatorios/",
+        views.recordatorios_mantenimiento,
+        name="recordatorios_mantenimiento",
+    ),
+    path(
+        "kilometraje/historial/<int:vehiculo_id>/",
+        views.historial_mantenimiento_vehiculo,
+        name="historial_mantenimiento_vehiculo",
+    ),
+    path(
+        "kilometraje/verificar-garantia/",
+        views.verificar_garantia,
+        name="verificar_garantia",
+    ),
+    # === API ENDPOINTS PARA HISTORIAL ===
+    path(
+        "kilometraje/api/historial/<int:vehiculo_id>/",
+        views.api_historial_vehiculo,
+        name="api_historial_vehiculo",
+    ),
+    path(
+        "kilometraje/historial/<int:vehiculo_id>/pdf/",
+        views.exportar_historial_pdf,
+        name="exportar_historial_pdf",
+    ),
+    path(
+        "kilometraje/historial/<int:vehiculo_id>/excel/",
+        views.exportar_historial_excel,
+        name="exportar_historial_excel",
+    ),
 ]
 
 # Agregar rutas de rentabilidad dinámicamente para evitar imports circulares

@@ -55,6 +55,15 @@ class DocumentoForm(forms.ModelForm):
     payment_status = forms.CharField(required=False)
     apply_vat = forms.BooleanField(required=False)
 
+    # Campo de kilometraje que NO se guarda en el modelo Documento
+    # Se usa solo para crear el KilometrajeRegistro asociado
+    kilometraje_ingreso = forms.IntegerField(
+        label="Kilometraje Actual",
+        required=False,
+        min_value=0,
+        help_text="Kilometraje del vehículo al momento de crear el documento",
+    )
+
     class Meta:
         model = Documento
         fields = [
@@ -64,7 +73,7 @@ class DocumentoForm(forms.ModelForm):
             "cliente",
             "vehiculo",
             "tecnico_responsable",
-            "kilometraje",
+            "kilometraje",  # Mantenido para compatibilidad, pero no se usará
             "millas",
             "observaciones",
             "pagado",
@@ -76,6 +85,7 @@ class DocumentoForm(forms.ModelForm):
             "nota_pago",
             "descuento",
         ]
+        # NOTA: kilometraje_ingreso NO está en fields porque no es un campo del modelo
 
         # Campos obligatorios: solo los esenciales
         # NOTA: 'numero' se autogenera en el modelo, NO es requerido en el form
@@ -118,6 +128,9 @@ class DocumentoForm(forms.ModelForm):
         # Configurar campos requeridos: solo los esenciales
         self._configure_required_fields()
 
+        # Configurar campo kilometraje_ingreso dinámicamente
+        self._configure_kilometraje_ingreso()
+
     def _configure_labels_by_country(self):
         """Configura labels dinámicos según el país y rubro de la empresa"""
         # Obtener configuración de la empresa para determinar rubro
@@ -141,6 +154,7 @@ class DocumentoForm(forms.ModelForm):
                     else "Assigned Technician"
                 ),
                 "kilometraje": "Mileage",
+                "kilometraje_ingreso": "Current Mileage",
                 "millas": "Miles",
                 "observaciones": "Notes",
                 "pagado": "Paid",
@@ -158,6 +172,7 @@ class DocumentoForm(forms.ModelForm):
                 "vehiculo": "Vehículo",
                 "tecnico_responsable": responsable_label,
                 "kilometraje": "Kilometraje",
+                "kilometraje_ingreso": "Kilometraje Actual",
                 "millas": "Millas",
                 "observaciones": "Observaciones",
                 "pagado": "Pagado",
@@ -208,6 +223,7 @@ class DocumentoForm(forms.ModelForm):
             "vehiculo": "id_vehiculo",
             "tecnico_responsable": "id_tecnico_responsable",
             "kilometraje": "id_kilometraje",
+            "kilometraje_ingreso": "id_kilometraje_ingreso",
             "millas": "id_millas",
             "observaciones": "id_observaciones",
             "pagado": "id_pagado",
@@ -244,6 +260,37 @@ class DocumentoForm(forms.ModelForm):
             self.fields["numero"].required = False
             self.fields["numero"].help_text = "Se generará automáticamente si se deja vacío"
 
+    def _configure_kilometraje_ingreso(self):
+        """
+        Configura el campo kilometraje_ingreso según el país y si hay vehículo.
+        Si hay un vehículo en la instancia, muestra el kilometraje actual como sugerencia.
+        """
+        if "kilometraje_ingreso" not in self.fields:
+            return
+
+        # Configurar widget con atributos
+        self.fields["kilometraje_ingreso"].widget.attrs.update(
+            {
+                "class": "form-control",
+                "min": "0",
+                "step": "1",
+            }
+        )
+
+        # Si hay una instancia con vehículo, mostrar el kilometraje actual como placeholder
+        if self.instance and self.instance.pk and self.instance.vehiculo:
+            try:
+                kilometraje_actual = self.instance.vehiculo.kilometraje_actual
+                if kilometraje_actual:
+                    self.fields["kilometraje_ingreso"].widget.attrs[
+                        "placeholder"
+                    ] = f"Kilometraje actual: {kilometraje_actual} km"
+            except Exception:
+                pass
+
+        # En USA, el label puede ser "Mileage" o "Current Mileage"
+        # Ya se configuró en _configure_labels_by_country
+
     def clean(self):
         """Validaciones robustas multi-tenant"""
         cleaned_data = super().clean()
@@ -269,22 +316,78 @@ class DocumentoForm(forms.ModelForm):
                 raise forms.ValidationError(
                     "El campo millas no puede usarse en documentos de Chile."
                 )
+            # En Chile, si hay vehículo, el kilometraje_ingreso debería ser requerido
+            vehiculo = cleaned_data.get("vehiculo")
+            if vehiculo and not cleaned_data.get("kilometraje_ingreso"):
+                # Advertencia, no error - permitir crear sin kilometraje si es necesario
+                pass
         elif self.country == "US":
-            # En USA, al menos uno de kilometraje o millas debe tener valor
-            if not cleaned_data.get("kilometraje") and not cleaned_data.get("millas"):
-                raise forms.ValidationError("Debe especificar al menos kilometraje o millas.")
+            # En USA, al menos uno de kilometraje_ingreso o millas debe tener valor si hay vehículo
+            vehiculo = cleaned_data.get("vehiculo")
+            if vehiculo:
+                kilometraje = cleaned_data.get("kilometraje_ingreso")
+                millas = cleaned_data.get("millas")
+                if not kilometraje and not millas:
+                    raise forms.ValidationError(
+                        "Debe especificar al menos kilometraje o millas cuando hay un vehículo."
+                    )
 
         return cleaned_data
 
     def save(self, commit=True):
-        """Override save para procesar datos JSON y crear líneas del documento"""
+        """
+        Override save para:
+        1. Guardar el documento
+        2. Procesar datos JSON y crear líneas del documento
+        3. Crear el registro de kilometraje si se proporcionó kilometraje_ingreso
+        """
+        # Extraer kilometraje_ingreso antes de guardar (no es campo del modelo)
+        # Lo guardamos en una variable de instancia para usarlo después
+        kilometraje_ingreso = self.cleaned_data.get("kilometraje_ingreso")
+
+        # Guardar el documento (kilometraje_ingreso no está en fields del Meta,
+        # así que Django lo ignorará automáticamente)
         documento = super().save(commit=commit)
 
         if commit:
             # Procesar datos JSON solo si el documento se guardó
             self._process_json_data(documento)
 
+            # Crear registro de kilometraje si se proporcionó y hay vehículo
+            if kilometraje_ingreso is not None and documento.vehiculo:
+                self._crear_registro_kilometraje(documento, kilometraje_ingreso)
+
         return documento
+
+    def _crear_registro_kilometraje(self, documento, kilometraje):
+        """
+        Crea un registro de kilometraje asociado al documento.
+
+        Args:
+            documento: Instancia de Documento guardada
+            kilometraje: Valor del kilometraje a registrar
+        """
+        from taller.models import KilometrajeRegistro
+
+        # Validar que el kilometraje sea un entero positivo
+        try:
+            kilometraje_int = int(kilometraje)
+            if kilometraje_int < 0:
+                return  # No crear registro si es negativo
+        except (ValueError, TypeError):
+            return  # No crear registro si no es válido
+
+        # Obtener técnico responsable (puede ser None)
+        tecnico = documento.tecnico_responsable
+
+        # Crear el registro de kilometraje
+        KilometrajeRegistro.objects.create(
+            empresa=documento.empresa,
+            vehiculo=documento.vehiculo,
+            documento=documento,
+            kilometraje=kilometraje_int,
+            registrado_por=tecnico,
+        )
 
     def _process_json_data(self, documento):
         """Procesa los datos JSON y crea las líneas del documento"""

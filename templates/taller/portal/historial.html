@@ -1,0 +1,164 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Mi Historial de Mantenimiento{% endblock %}
+
+{% block extra_head %}
+<style>
+    .portal-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .portal-header {
+        background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        color: white;
+    }
+
+    .portal-header h1 {
+        margin: 0 0 0.5rem 0;
+        font-size: 2rem;
+    }
+
+    .portal-header .user-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .vehiculo-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        border-left: 4px solid #3b82f6;
+    }
+
+    .vehiculo-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .vehiculo-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #1e40af;
+    }
+
+    .btn-view {
+        padding: 0.5rem 1rem;
+        background: #3b82f6;
+        color: white;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: background 0.2s;
+    }
+
+    .btn-view:hover {
+        background: #2563eb;
+    }
+
+    .resumen-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .resumen-item {
+        text-align: center;
+        padding: 1rem;
+        background: #f3f4f6;
+        border-radius: 8px;
+    }
+
+    .resumen-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #3b82f6;
+    }
+
+    .resumen-label {
+        font-size: 0.875rem;
+        color: #6b7280;
+        margin-top: 0.5rem;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        color: #6b7280;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="portal-container">
+    <!-- Header -->
+    <div class="portal-header">
+        <h1>📋 Mi Historial de Mantenimiento</h1>
+        <div class="user-info">
+            <div>
+                <p style="margin: 0; opacity: 0.9;">Bienvenido, <strong>{{ cliente.nombre }}</strong></p>
+            </div>
+            <a href="{% url 'portal:logout' %}" style="color: white; text-decoration: underline;">
+                Cerrar Sesión
+            </a>
+        </div>
+    </div>
+
+    <!-- Vehículos -->
+    {% if historiales %}
+        {% for item in historiales %}
+        <div class="vehiculo-card">
+            <div class="vehiculo-header">
+                <div>
+                    <div class="vehiculo-title">
+                        🚗 {{ item.vehiculo.patente }}
+                    </div>
+                    <p style="margin: 0.5rem 0 0 0; color: #6b7280;">
+                        {{ item.vehiculo.get_marca_display }} {{ item.vehiculo.get_modelo_display }} - {{ item.vehiculo.anio }}
+                    </p>
+                </div>
+                <a href="{% url 'portal:historial_vehiculo' item.vehiculo.id %}" class="btn-view">
+                    Ver Detalles →
+                </a>
+            </div>
+
+            <div class="resumen-grid">
+                <div class="resumen-item">
+                    <div class="resumen-value">{{ item.historial_data.resumen.total_servicios }}</div>
+                    <div class="resumen-label">Total Servicios</div>
+                </div>
+                <div class="resumen-item">
+                    <div class="resumen-value">${{ item.historial_data.resumen.total_gastado|intcomma }}</div>
+                    <div class="resumen-label">Total Invertido</div>
+                </div>
+                {% if item.historial_data.resumen.km_promedio_entre_servicios %}
+                <div class="resumen-item">
+                    <div class="resumen-value">{{ item.historial_data.resumen.km_promedio_entre_servicios|intcomma }} km</div>
+                    <div class="resumen-label">KM Promedio</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">🚗</div>
+            <h3>No tienes vehículos registrados</h3>
+            <p>Contacta a tu taller para registrar tus vehículos.</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+
