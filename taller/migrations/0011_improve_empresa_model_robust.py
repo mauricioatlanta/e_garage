@@ -60,14 +60,14 @@ class Migration(migrations.Migration):
         migrations.AddConstraint(
             model_name="empresa",
             constraint=models.CheckConstraint(
-                condition=models.Q(("dias_prueba__gte", 0)),
+                check=models.Q(("dias_prueba__gte", 0)),
                 name="empresa_dias_prueba_gte_0",
             ),
         ),
         migrations.AddConstraint(
             model_name="empresa",
             constraint=models.CheckConstraint(
-                condition=models.Q(("valor_mensual__gte", 0)),
+                check=models.Q(("valor_mensual__gte", 0)),
                 name="empresa_valor_mensual_gte_0",
             ),
         ),
