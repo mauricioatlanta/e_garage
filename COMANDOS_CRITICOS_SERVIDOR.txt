@@ -1,0 +1,34 @@
+COMANDOS CRÍTICOS PARA ACTUALIZAR REPORTES EN EL SERVIDOR
+==========================================================
+
+Ejecuta estos comandos EN ORDEN en el servidor:
+
+1. ACTUALIZAR CÓDIGO:
+   cd /ruta/al/proyecto/e_garage
+   git pull origin main
+
+2. FORZAR ACTUALIZACIÓN DEL TEMPLATE:
+   git checkout HEAD -- templates/taller/reportes/reportes.html
+
+3. LIMPIAR CACHE DE DJANGO:
+   python manage.py shell -c "from django.core.cache import cache; cache.clear()"
+
+4. LIMPIAR CACHE DE PYTHON:
+   find . -type f -name "*.pyc" -delete
+   find . -type d -name "__pycache__" -exec rm -r {} + 2>/dev/null
+
+5. REINICIAR SERVIDOR (CRÍTICO):
+   sudo systemctl restart gunicorn
+   # o según tu configuración:
+   # sudo systemctl restart uwsgi
+   # sudo systemctl restart apache2
+
+6. VERIFICAR QUE FUNCIONA:
+   # Acceder a: http://tu-servidor/reportes/
+   # Debe aparecer "Recordatorios de Mantenimiento" en "Reportes Destacados"
+
+VERIFICACIÓN RÁPIDA:
+--------------------
+grep "kilometraje/recordatorios" templates/taller/reportes/reportes.html
+# Debe mostrar la línea con el enlace
+
