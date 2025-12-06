@@ -231,3 +231,6 @@ Significa que la URL no está correcta. Verificar:
 **Nota**: Este fix es independiente del fix de scroll en móviles implementado anteriormente. Ambos cambios ya están en GitHub y listos para desplegar.
 
 
+
+
+

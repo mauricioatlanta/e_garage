@@ -94,3 +94,6 @@ def country_aware_signup(request, *args, **kwargs):
     """Wrapper funcional para mantener compatibilidad con las URLs actuales."""
     view = CountryAwareSignupView.as_view()
     return view(request, *args, **kwargs)
+
+
+

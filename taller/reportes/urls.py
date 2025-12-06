@@ -7,6 +7,7 @@ app_name = "reportes"
 urlpatterns = [
     path("", views.reportes_dashboard, name="reportes_dashboard"),
     path("dashboard/", views.reportes_dashboard, name="dashboard"),
+    path("centro-contable-chile/", views.centro_contable_chile, name="centro_contable_chile"),
     path("repuestos/", views.reporte_repuestos, name="reporte_repuestos"),
     path("servicios/", views.reporte_servicios, name="reporte_servicios"),
     path(

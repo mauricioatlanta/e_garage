@@ -70,3 +70,6 @@ def country_context(request):
         "lang_code": lang_code,
         "url_prefix": config.get("url_prefix", f"/{country_code.lower()}"),
     }
+
+
+

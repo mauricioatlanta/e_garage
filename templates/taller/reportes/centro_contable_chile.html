@@ -1,0 +1,1077 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load moneda %}
+
+{% block title %}🧮 Centro Contable – Contador Virtual{% endblock %}
+
+{% block extra_head %}
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+<link href="/static/css/galaxy_theme.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&display=swap');
+  
+  /* 🧮 Estilos futuristas para el Centro Contable */
+  .centro-contable-container {
+    min-height: 100vh;
+    padding: 2rem 1rem;
+    background: linear-gradient(135deg, #0a0a0a 0%, #0d1117 50%, #0f172a 100%);
+    position: relative;
+    overflow-x: hidden;
+  }
+  
+  .centro-contable-content {
+    position: relative;
+    z-index: 1;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+  
+  /* Header */
+  .header-contable {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1));
+    border-radius: 24px;
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(6, 182, 212, 0.2);
+  }
+  
+  .header-contable h1 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    font-family: 'Orbitron', sans-serif;
+    background: linear-gradient(135deg, #00e6d0, #8b5cf6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+  
+  .header-contable .subtitle {
+    font-size: 1.2rem;
+    color: #b0b3b8;
+    font-weight: 500;
+  }
+  
+  /* FILA 1: Filtros + Estado */
+  .fila-filtros-estado {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  @media (max-width: 1024px) {
+    .fila-filtros-estado {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  /* Panel de Filtros */
+  .panel-filtros {
+    background: linear-gradient(135deg, rgba(10, 25, 41, 0.9), rgba(13, 17, 27, 0.9));
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    backdrop-filter: blur(10px);
+  }
+  
+  .panel-filtros h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #00e6d0;
+    margin-bottom: 1.5rem;
+    font-family: 'Rajdhani', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .filtros-grid {
+    display: grid;
+    gap: 1rem;
+  }
+  
+  .filtro-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .filtro-label {
+    font-size: 0.9rem;
+    color: #b0b3b8;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .filtro-input, .filtro-select {
+    background: rgba(10, 25, 41, 0.8);
+    border: 2px solid rgba(6, 182, 212, 0.4);
+    border-radius: 12px;
+    padding: 0.75rem 1rem;
+    color: #00e6d0;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+  }
+  
+  .filtro-input:focus, .filtro-select:focus {
+    outline: none;
+    border-color: #00fff7;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
+  }
+  
+  .botones-rapidos {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .btn-rapido {
+    flex: 1;
+    min-width: 120px;
+    padding: 0.75rem 1rem;
+    background: rgba(6, 182, 212, 0.1);
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    border-radius: 10px;
+    color: #00e6d0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-rapido:hover {
+    background: rgba(6, 182, 212, 0.2);
+    border-color: #00fff7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+  }
+  
+  .btn-actualizar {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(135deg, #00e6d0, #8b5cf6);
+    border: none;
+    border-radius: 12px;
+    color: #000;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 1rem;
+  }
+  
+  .btn-actualizar:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(6, 182, 212, 0.4);
+  }
+  
+  /* Panel de Estado */
+  .panel-estado {
+    background: linear-gradient(135deg, rgba(10, 25, 41, 0.9), rgba(13, 17, 27, 0.9));
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    backdrop-filter: blur(10px);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .medidor-circular {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    margin-bottom: 1.5rem;
+  }
+  
+  .medidor-svg {
+    transform: rotate(-90deg);
+  }
+  
+  .medidor-bg {
+    fill: none;
+    stroke: rgba(6, 182, 212, 0.2);
+    stroke-width: 12;
+  }
+  
+  .medidor-progress {
+    fill: none;
+    stroke-width: 12;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 1s ease;
+  }
+  
+  .medidor-progress.excelente {
+    stroke: #10b981;
+  }
+  
+  .medidor-progress.buena {
+    stroke: #3b82f6;
+  }
+  
+  .medidor-progress.regular {
+    stroke: #f59e0b;
+  }
+  
+  .medidor-progress.critica {
+    stroke: #ef4444;
+  }
+  
+  .medidor-texto {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  
+  .medidor-porcentaje {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #00fff7;
+    font-family: 'Rajdhani', sans-serif;
+  }
+  
+  .medidor-label {
+    font-size: 0.9rem;
+    color: #b0b3b8;
+    margin-top: 0.25rem;
+  }
+  
+  .estado-texto {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  .estado-texto-grande {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #00e6d0;
+    margin-bottom: 0.5rem;
+  }
+  
+  .estado-subtexto {
+    font-size: 0.9rem;
+    color: #b0b3b8;
+    line-height: 1.6;
+  }
+  
+  /* FILA 2: Resumen IVA y Estado General */
+  .fila-resumen-iva {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  
+  .card-resumen {
+    background: linear-gradient(135deg, rgba(10, 25, 41, 0.9), rgba(13, 17, 27, 0.9));
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+  
+  .card-resumen:hover {
+    border-color: #00fff7;
+    box-shadow: 0 0 30px rgba(6, 182, 212, 0.4);
+    transform: translateY(-4px);
+  }
+  
+  .card-resumen-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  
+  .card-resumen-icon {
+    font-size: 2rem;
+    color: #00e6d0;
+  }
+  
+  .card-resumen-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #00e6d0;
+    flex: 1;
+  }
+  
+  .card-resumen-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #00fff7;
+    text-shadow: 0 0 15px rgba(6, 182, 212, 0.6);
+    font-family: 'Rajdhani', sans-serif;
+  }
+  
+  .card-resumen-label {
+    font-size: 0.9rem;
+    color: #b0b3b8;
+    margin-top: 0.5rem;
+  }
+  
+  /* FILA 3: Libro de Ventas + Acciones */
+  .fila-libro-ventas {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  @media (max-width: 1024px) {
+    .fila-libro-ventas {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .panel-libro-ventas {
+    background: linear-gradient(135deg, rgba(10, 25, 41, 0.9), rgba(13, 17, 27, 0.9));
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    backdrop-filter: blur(10px);
+  }
+  
+  .panel-libro-ventas h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #00e6d0;
+    margin-bottom: 1.5rem;
+    font-family: 'Rajdhani', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .tabla-libro-ventas {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .tabla-libro-ventas thead {
+    background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(139, 92, 246, 0.2));
+  }
+  
+  .tabla-libro-ventas th {
+    padding: 1rem;
+    text-align: left;
+    color: #00e6d0;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  
+  .tabla-libro-ventas td {
+    padding: 0.75rem 1rem;
+    color: #b0b3b8;
+    border-top: 1px solid rgba(6, 182, 212, 0.1);
+  }
+  
+  .tabla-libro-ventas tbody tr:hover {
+    background: rgba(6, 182, 212, 0.1);
+  }
+  
+  .panel-acciones {
+    background: linear-gradient(135deg, rgba(10, 25, 41, 0.9), rgba(13, 17, 27, 0.9));
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    backdrop-filter: blur(10px);
+  }
+  
+  .panel-acciones h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #00e6d0;
+    margin-bottom: 1.5rem;
+    font-family: 'Rajdhani', sans-serif;
+  }
+  
+  .btn-accion {
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: rgba(6, 182, 212, 0.1);
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    border-radius: 12px;
+    color: #00e6d0;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  
+  .btn-accion:hover {
+    background: rgba(6, 182, 212, 0.2);
+    border-color: #00fff7;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+  }
+  
+  /* FILA 4: Detalle Inteligente */
+  .fila-detalle-inteligente {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2rem;
+    margin-bottom: 2rem;
+  }
+  
+  @media (max-width: 1200px) {
+    .fila-detalle-inteligente {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .panel-detalle {
+    background: linear-gradient(135deg, rgba(10, 25, 41, 0.9), rgba(13, 17, 27, 0.9));
+    border-radius: 20px;
+    padding: 2rem;
+    border: 2px solid rgba(6, 182, 212, 0.3);
+    backdrop-filter: blur(10px);
+  }
+  
+  .panel-detalle h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #00e6d0;
+    margin-bottom: 1.5rem;
+    font-family: 'Rajdhani', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .lista-detalle {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .item-detalle {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background: rgba(6, 182, 212, 0.05);
+    border-left: 3px solid rgba(6, 182, 212, 0.5);
+    border-radius: 8px;
+    transition: all 0.3s ease;
+  }
+  
+  .item-detalle:hover {
+    background: rgba(6, 182, 212, 0.1);
+    border-left-color: #00fff7;
+    transform: translateX(4px);
+  }
+  
+  .item-detalle-nombre {
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+  }
+  
+  .item-detalle-valor {
+    color: #00e6d0;
+    font-size: 0.9rem;
+  }
+  
+  .alerta-item {
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 8px;
+    border-left: 3px solid;
+    transition: all 0.3s ease;
+  }
+  
+  .alerta-item.error {
+    background: rgba(239, 68, 68, 0.1);
+    border-left-color: #ef4444;
+  }
+  
+  .alerta-item.warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-left-color: #f59e0b;
+  }
+  
+  .alerta-item.info {
+    background: rgba(59, 130, 246, 0.1);
+    border-left-color: #3b82f6;
+  }
+  
+  .alerta-item:hover {
+    transform: translateX(4px);
+  }
+  
+  .alerta-titulo {
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .alerta-mensaje {
+    color: #b0b3b8;
+    font-size: 0.9rem;
+  }
+</style>
+{% endblock %}
+
+{% block fondo_extra %}
+<div class="fixed inset-0 overflow-hidden pointer-events-none">
+  <div class="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#0d1117] to-[#0f172a]"></div>
+  <div class="absolute top-16 left-12 w-2 h-2 bg-cyan-400 rounded-full animate-ping opacity-20"></div>
+  <div class="absolute top-1/3 right-20 w-1 h-1 bg-fuchsia-400 rounded-full animate-pulse opacity-30"></div>
+  <div class="absolute bottom-24 left-1/4 w-1.5 h-1.5 bg-lime-400 rounded-full animate-bounce opacity-25"></div>
+</div>
+{% endblock %}
+
+{% block content %}
+<div class="centro-contable-container">
+  <div class="centro-contable-content">
+    
+    <!-- Header -->
+    <div class="header-contable">
+      <h1><i class="fas fa-calculator"></i> Centro Contable – Contador Virtual</h1>
+      <p class="subtitle">Todo lo que tu contador necesita, ordenado por eGarage en 3 clics.</p>
+    </div>
+    
+    <!-- FILA 1: Filtros + Estado -->
+    <div class="fila-filtros-estado">
+      <!-- Panel de Filtros -->
+      <div class="panel-filtros">
+        <h3><i class="fas fa-filter"></i> Filtros</h3>
+        <form method="get" id="formFiltros">
+          <div class="filtros-grid">
+            <div class="filtro-grupo">
+              <label class="filtro-label">
+                <i class="fas fa-building"></i> Empresa
+              </label>
+              <select name="empresa" class="filtro-select">
+                <option value="{{ empresa.id }}" selected>{{ empresa.nombre|default:"Mi Empresa" }}</option>
+              </select>
+            </div>
+            
+            <div class="filtro-grupo">
+              <label class="filtro-label">
+                <i class="fas fa-calendar-alt"></i> Período
+              </label>
+              <div class="botones-rapidos">
+                <button type="button" class="btn-rapido" onclick="setPeriodoRapido('mes_actual')">
+                  <i class="fas fa-calendar-day"></i> Mes Actual
+                </button>
+                <button type="button" class="btn-rapido" onclick="setPeriodoRapido('mes_anterior')">
+                  <i class="fas fa-calendar-minus"></i> Mes Anterior
+                </button>
+                <button type="button" class="btn-rapido" onclick="setPeriodoRapido('año_actual')">
+                  <i class="fas fa-calendar"></i> Año Actual
+                </button>
+              </div>
+            </div>
+            
+            <div class="filtro-grupo">
+              <label class="filtro-label">
+                <i class="fas fa-calendar-check"></i> Desde
+              </label>
+              <input type="date" name="fecha_desde" class="filtro-input" value="{{ fecha_desde_str }}">
+            </div>
+            
+            <div class="filtro-grupo">
+              <label class="filtro-label">
+                <i class="fas fa-calendar-check"></i> Hasta
+              </label>
+              <input type="date" name="fecha_hasta" class="filtro-input" value="{{ fecha_hasta_str }}">
+            </div>
+          </div>
+          <button type="submit" class="btn-actualizar">
+            <i class="fas fa-sync-alt"></i> Actualizar Resumen
+          </button>
+        </form>
+      </div>
+      
+      <!-- Panel de Estado -->
+      <div class="panel-estado">
+        <div class="estado-texto">
+          <div class="estado-texto-grande">Estado contable del período: {{ calidad_datos.score }}% listo</div>
+          <div class="estado-subtexto">
+            {% if docs_borrador > 0 %}{{ docs_borrador }} documento{{ docs_borrador|pluralize }} en borrador<br>{% endif %}
+            {% if docs_sin_rut > 0 %}{{ docs_sin_rut }} documento{{ docs_sin_rut|pluralize }} sin RUT de cliente{% endif %}
+          </div>
+        </div>
+        
+        <!-- Medidor Circular -->
+        <div class="medidor-circular">
+          <svg class="medidor-svg" width="200" height="200">
+            <circle class="medidor-bg" cx="100" cy="100" r="85"></circle>
+            <circle class="medidor-progress {% if calidad_datos.score >= 90 %}excelente{% elif calidad_datos.score >= 60 %}buena{% elif calidad_datos.score >= 30 %}regular{% else %}critica{% endif %}" 
+                    cx="100" cy="100" r="85" 
+                    stroke-dasharray="534" 
+                    id="medidor-progress-circle"></circle>
+          </svg>
+          <div class="medidor-texto">
+            <div class="medidor-porcentaje">{{ calidad_datos.score }}%</div>
+            <div class="medidor-label">Listo</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- FILA 2: Resumen IVA y Estado General -->
+    <div class="fila-resumen-iva">
+      <div class="card-resumen">
+        <div class="card-resumen-header">
+          <i class="fas fa-dollar-sign card-resumen-icon"></i>
+          <div class="card-resumen-title">💵 Neto afecto (Repuestos)</div>
+        </div>
+        <div class="card-resumen-value">{{ neto_afecto|clp }}</div>
+        <div class="card-resumen-label">Base imponible 19% (según líneas de repuestos)</div>
+      </div>
+      
+      <div class="card-resumen">
+        <div class="card-resumen-header">
+          <i class="fas fa-file-invoice-dollar card-resumen-icon"></i>
+          <div class="card-resumen-title">🧾 Neto exento (Servicios)</div>
+        </div>
+        <div class="card-resumen-value">{{ neto_exento|clp }}</div>
+        <div class="card-resumen-label">Servicios sin IVA (regla Chile actual de eGarage)</div>
+      </div>
+      
+      <div class="card-resumen">
+        <div class="card-resumen-header">
+          <i class="fas fa-calculator card-resumen-icon"></i>
+          <div class="card-resumen-title">🧮 IVA del período</div>
+        </div>
+        <div class="card-resumen-value">{{ iva_periodo|clp }}</div>
+        <div class="card-resumen-label">Cálculo automático 19% sobre neto afecto</div>
+      </div>
+      
+      <div class="card-resumen">
+        <div class="card-resumen-header">
+          <i class="fas fa-chart-bar card-resumen-icon"></i>
+          <div class="card-resumen-title">📊 Total Ventas</div>
+        </div>
+        <div class="card-resumen-value">{{ total_ventas|clp }}</div>
+        <div class="card-resumen-label">Neto afecto + exento + IVA</div>
+      </div>
+    </div>
+    
+    <!-- Mini-banda de resumen + Gráfico -->
+    <div style="display: grid; grid-template-columns: 1fr 400px; gap: 2rem; margin-bottom: 2rem;">
+      <div style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 16px; padding: 1.5rem; border: 2px solid rgba(6, 182, 212, 0.3); backdrop-filter: blur(10px); display: flex; align-items: center;">
+        <div>
+          <p style="color: #b0b3b8; font-size: 0.95rem; line-height: 1.6; margin: 0;">
+            <strong style="color: #00e6d0;">Estos montos son la base sugerida para el IVA ventas del período.</strong> Tu contador puede usar directamente los PDF/Excel de abajo.
+          </p>
+        </div>
+      </div>
+      <div style="background: linear-gradient(135deg, rgba(10, 25, 41, 0.9), rgba(13, 17, 27, 0.9)); border-radius: 16px; padding: 1.5rem; border: 2px solid rgba(6, 182, 212, 0.3); backdrop-filter: blur(10px);">
+        <h4 style="color: #00e6d0; font-size: 1rem; margin-bottom: 1rem; font-weight: 600;">Ventas Diarias</h4>
+        <canvas id="chartVentasDiarias" style="max-height: 150px;"></canvas>
+      </div>
+    </div>
+    
+    <!-- FILA 3: Libro de Ventas + Acciones -->
+    <div class="fila-libro-ventas">
+      <!-- Libro de Ventas -->
+      <div class="panel-libro-ventas">
+        <h3><i class="fas fa-book"></i> Libro de Ventas eGarage</h3>
+        
+        <!-- Filtros -->
+        <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
+          <div style="flex: 1; min-width: 200px;">
+            <label style="display: block; color: #b0b3b8; font-size: 0.9rem; margin-bottom: 0.5rem;">
+              <i class="fas fa-filter"></i> Tipo de documento
+            </label>
+            <select id="filtroTipoDoc" class="filtro-input" style="width: 100%;" multiple>
+              <option value="FAC" selected>Factura</option>
+              <option value="BOL" selected>Boleta</option>
+              <option value="INTERNO">Interno</option>
+            </select>
+          </div>
+          <div style="display: flex; gap: 1rem; align-items: flex-end;">
+            <label style="display: flex; align-items: center; gap: 0.5rem; color: #b0b3b8; cursor: pointer;">
+              <input type="checkbox" id="incluirAnulados" style="accent-color: #00e6d0;">
+              <span>Incluir anulados</span>
+            </label>
+            <label style="display: flex; align-items: center; gap: 0.5rem; color: #b0b3b8; cursor: pointer;">
+              <input type="checkbox" id="soloEmitidos" checked style="accent-color: #00e6d0;">
+              <span>Solo emitidos</span>
+            </label>
+          </div>
+        </div>
+        
+        <!-- Botones de acción encima de la tabla -->
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
+          <button class="btn-accion" onclick="exportarPDFLibro()" style="flex: 1; min-width: 150px;">
+            <i class="fas fa-file-pdf"></i> PDF Libro de Ventas
+          </button>
+          <button class="btn-accion" onclick="exportarExcelLibro()" style="flex: 1; min-width: 150px;">
+            <i class="fas fa-file-excel"></i> Excel Libro de Ventas
+          </button>
+          <button class="btn-accion" onclick="exportarPackContador()" style="flex: 1; min-width: 180px; background: linear-gradient(135deg, #00e6d0, #8b5cf6); color: #000; font-weight: 700;" title="Incluye resumen IVA, libro de ventas, repuestos vendidos y servicios realizados.">
+            <i class="fas fa-file-archive"></i> Pack para Contador (ZIP)
+          </button>
+        </div>
+        
+        <div style="max-height: 600px; overflow-y: auto;">
+          <table class="tabla-libro-ventas">
+            <thead>
+              <tr>
+                <th>Fecha emisión</th>
+                <th>Tipo doc</th>
+                <th>N° doc eGarage</th>
+                <th>RUT cliente</th>
+                <th>Nombre cliente</th>
+                <th>Neto afecto</th>
+                <th>Neto exento</th>
+                <th>IVA</th>
+                <th>Total documento</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for item in documentos_con_neto %}
+              <tr>
+                <td>{{ item.doc.fecha_emision|date:"d/m/Y" }}</td>
+                <td>
+                  {% if item.doc.tipo == 'FAC' %}Factura
+                  {% elif item.doc.tipo == 'BOL' %}Boleta
+                  {% elif item.doc.tipo == 'OT' %}Interno
+                  {% else %}{{ item.doc.tipo }}{% endif %}
+                </td>
+                <td>{{ item.doc.numero|default:"Sin número" }}</td>
+                <td>{{ item.doc.cliente.tax_id|default:"-" }}</td>
+                <td>{{ item.doc.cliente|default:"Sin cliente" }}</td>
+                <td>{{ item.doc.neto_repuestos|clp }}</td>
+                <td>{{ item.neto_exento|clp }}</td>
+                <td>{{ item.doc.tax_amount|clp }}</td>
+                <td><strong>{{ item.doc.total|clp }}</strong></td>
+                <td>
+                  {% if item.doc.estado == 'EMITIDO' %}<span style="color: #10b981;">Emitido</span>
+                  {% elif item.doc.estado == 'ANULADO' %}<span style="color: #ef4444;">Anulado</span>
+                  {% elif item.doc.estado == 'BORRADOR' %}<span style="color: #f59e0b;">Borrador</span>
+                  {% else %}{{ item.doc.estado }}{% endif %}
+                </td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="10" style="text-align: center; color: #b0b3b8; padding: 2rem;">
+                  No hay documentos en el período seleccionado
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Panel de Acciones -->
+      <div class="panel-acciones">
+        <h3><i class="fas fa-tools"></i> Acciones</h3>
+        <a href="{% url 'taller:reportes:reportes_dashboard' %}" class="btn-accion" style="text-decoration: none;">
+          <i class="fas fa-arrow-left"></i> Volver a Reportes
+        </a>
+      </div>
+    </div>
+    
+    <!-- FILA 4: Detalle Inteligente -->
+    <div class="fila-detalle-inteligente">
+      <!-- Repuestos Vendidos -->
+      <div class="panel-detalle">
+        <h3><i class="fas fa-cog"></i> 🔧 Repuestos vendidos en el período</h3>
+        <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
+          <button class="btn-accion" onclick="exportarPDFRepuestos()" style="flex: 1; padding: 0.75rem; font-size: 0.85rem;">
+            <i class="fas fa-file-pdf"></i> PDF
+          </button>
+          <button class="btn-accion" onclick="exportarExcelRepuestos()" style="flex: 1; padding: 0.75rem; font-size: 0.85rem;">
+            <i class="fas fa-file-excel"></i> Excel
+          </button>
+        </div>
+        <div style="max-height: 400px; overflow-y: auto;">
+          <table class="tabla-libro-ventas" style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>Código</th>
+                <th>Nombre</th>
+                <th>Cantidad</th>
+                <th>Neto Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for rep in repuestos_vendidos %}
+              <tr>
+                <td>{{ rep.codigo|default:"-" }}</td>
+                <td>{{ rep.nombre|default:"Sin nombre" }}</td>
+                <td>{{ rep.cantidad_total|default:0 }}</td>
+                <td>{{ rep.neto_total|clp }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="4" style="text-align: center; color: #b0b3b8; padding: 1rem;">
+                  No hay repuestos en el período
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Servicios Realizados -->
+      <div class="panel-detalle">
+        <h3><i class="fas fa-wrench"></i> 🛠 Servicios realizados en el período</h3>
+        <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
+          <button class="btn-accion" onclick="exportarPDFServicios()" style="flex: 1; padding: 0.75rem; font-size: 0.85rem;">
+            <i class="fas fa-file-pdf"></i> PDF
+          </button>
+          <button class="btn-accion" onclick="exportarExcelServicios()" style="flex: 1; padding: 0.75rem; font-size: 0.85rem;">
+            <i class="fas fa-file-excel"></i> Excel
+          </button>
+        </div>
+        <div style="max-height: 400px; overflow-y: auto;">
+          <table class="tabla-libro-ventas" style="font-size: 0.85rem;">
+            <thead>
+              <tr>
+                <th>Nombre servicio</th>
+                <th>Cantidad</th>
+                <th>Monto Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for serv in servicios_realizados %}
+              <tr>
+                <td>{{ serv.nombre|default:"Sin nombre" }}</td>
+                <td>{{ serv.cantidad_total|default:0 }}</td>
+                <td>{{ serv.monto_total|clp }}</td>
+              </tr>
+              {% empty %}
+              <tr>
+                <td colspan="3" style="text-align: center; color: #b0b3b8; padding: 1rem;">
+                  No hay servicios en el período
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      
+      <!-- Alertas Contables -->
+      <div class="panel-detalle">
+        <h3><i class="fas fa-exclamation-triangle"></i> ⚠ Alertas contables del período</h3>
+        <div style="max-height: 500px; overflow-y: auto;">
+          {% if alertas_criticas %}
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="color: #ef4444; font-size: 1rem; margin-bottom: 0.75rem; font-weight: 700;">🔴 Críticas:</h4>
+            {% for alerta in alertas_criticas %}
+            <div class="alerta-item error" style="margin-bottom: 0.75rem;">
+              <div class="alerta-titulo">
+                {{ alerta.titulo }}
+              </div>
+              <div class="alerta-mensaje">{{ alerta.mensaje }}</div>
+              {% if alerta.documentos %}
+              <div style="margin-top: 0.5rem;">
+                {% for doc_id in alerta.documentos|slice:":3" %}
+                <a href="{% url 'taller:documentos:ver_documento' doc_id %}" target="_blank" style="display: inline-block; margin-right: 0.5rem; margin-top: 0.25rem; padding: 0.25rem 0.75rem; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 6px; color: #ef4444; text-decoration: none; font-size: 0.8rem; transition: all 0.3s;">
+                  Ver Doc #{{ doc_id }}
+                </a>
+                {% endfor %}
+                {% if alerta.documentos|length > 3 %}
+                <span style="color: #b0b3b8; font-size: 0.8rem;">y {{ alerta.documentos|length|add:"-3" }} más...</span>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          {% if alertas_advertencias %}
+          <div style="margin-bottom: 1.5rem;">
+            <h4 style="color: #f59e0b; font-size: 1rem; margin-bottom: 0.75rem; font-weight: 700;">🟡 Advertencias:</h4>
+            {% for alerta in alertas_advertencias %}
+            <div class="alerta-item warning" style="margin-bottom: 0.75rem;">
+              <div class="alerta-titulo">
+                {{ alerta.titulo }}
+              </div>
+              <div class="alerta-mensaje">{{ alerta.mensaje }}</div>
+              {% if alerta.documentos %}
+              <div style="margin-top: 0.5rem;">
+                {% for doc_id in alerta.documentos|slice:":3" %}
+                <a href="{% url 'taller:documentos:ver_documento' doc_id %}" target="_blank" style="display: inline-block; margin-right: 0.5rem; margin-top: 0.25rem; padding: 0.25rem 0.75rem; background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; border-radius: 6px; color: #f59e0b; text-decoration: none; font-size: 0.8rem; transition: all 0.3s;">
+                  Ver Doc #{{ doc_id }}
+                </a>
+                {% endfor %}
+                {% if alerta.documentos|length > 3 %}
+                <span style="color: #b0b3b8; font-size: 0.8rem;">y {{ alerta.documentos|length|add:"-3" }} más...</span>
+                {% endif %}
+              </div>
+              {% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          {% if alertas_info %}
+          <div>
+            <h4 style="color: #3b82f6; font-size: 1rem; margin-bottom: 0.75rem; font-weight: 700;">🟢 Info:</h4>
+            {% for alerta in alertas_info %}
+            <div class="alerta-item info" style="margin-bottom: 0.75rem;">
+              <div class="alerta-titulo">
+                {{ alerta.titulo }}
+              </div>
+              <div class="alerta-mensaje">{{ alerta.mensaje }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+          
+          {% if not alertas_criticas and not alertas_advertencias and not alertas_info %}
+          <div class="alerta-item info">
+            <div class="alerta-titulo">
+              <i class="fas fa-check-circle"></i>
+              Todo en orden
+            </div>
+            <div class="alerta-mensaje">No se detectaron problemas en el período.</div>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+<script>
+// Inicializar medidor circular y gráfico
+document.addEventListener('DOMContentLoaded', function() {
+  // Medidor circular
+  const score = {{ calidad_datos.score }};
+  const circle = document.getElementById('medidor-progress-circle');
+  if (circle) {
+    const circumference = 2 * Math.PI * 85; // r = 85
+    const offset = circumference - (score / 100) * circumference;
+    circle.style.strokeDashoffset = offset;
+  }
+  
+  // Gráfico de ventas diarias
+  const ventasData = {{ ventas_diarias|safe }};
+  const ctx = document.getElementById('chartVentasDiarias');
+  if (ctx && ventasData) {
+    const ventasArray = typeof ventasData === 'string' ? JSON.parse(ventasData) : ventasData;
+    if (ventasArray && ventasArray.length > 0) {
+      const labels = ventasArray.map(v => {
+        const fecha = new Date(v.fecha_emision);
+        return fecha.getDate() + '/' + (fecha.getMonth() + 1);
+      });
+      const data = ventasArray.map(v => parseFloat(v.total_dia) || 0);
+    
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Ventas Diarias',
+          data: data,
+          backgroundColor: 'rgba(6, 182, 212, 0.3)',
+          borderColor: '#00e6d0',
+          borderWidth: 2,
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            backgroundColor: 'rgba(10, 25, 41, 0.95)',
+            titleColor: '#00fff7',
+            bodyColor: '#fff',
+            borderColor: '#00e6d0',
+            borderWidth: 1,
+            callbacks: {
+              label: function(context) {
+                return 'Total: $' + context.parsed.y.toLocaleString('es-CL');
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: { color: '#b0b3b8', font: { size: 10 } }
+          },
+          y: {
+            grid: { color: 'rgba(6, 182, 212, 0.1)' },
+            ticks: { 
+              color: '#b0b3b8', 
+              font: { size: 10 },
+              callback: function(value) {
+                return '$' + (value / 1000).toFixed(0) + 'k';
+              }
+            }
+          }
+        }
+      }
+    });
+    }
+  }
+});
+
+function setPeriodoRapido(periodo) {
+  const form = document.getElementById('formFiltros');
+  const input = document.createElement('input');
+  input.type = 'hidden';
+  input.name = 'periodo_rapido';
+  input.value = periodo;
+  form.appendChild(input);
+  form.submit();
+}
+
+function exportarPDFLibro() {
+  alert('Función de exportación PDF Libro de Ventas en desarrollo');
+}
+
+function exportarExcelLibro() {
+  alert('Función de exportación Excel Libro de Ventas en desarrollo');
+}
+
+function exportarPackContador() {
+  alert('Función de exportación Pack para Contador (ZIP) en desarrollo');
+}
+
+function exportarPDFRepuestos() {
+  alert('Función de exportación PDF Repuestos en desarrollo');
+}
+
+function exportarExcelRepuestos() {
+  alert('Función de exportación Excel Repuestos en desarrollo');
+}
+
+function exportarPDFServicios() {
+  alert('Función de exportación PDF Servicios en desarrollo');
+}
+
+function exportarExcelServicios() {
+  alert('Función de exportación Excel Servicios en desarrollo');
+}
+</script>
+{% endblock %}

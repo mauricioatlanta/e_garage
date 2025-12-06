@@ -339,3 +339,6 @@ touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
 **Próximo Paso:** Actualizar servidor y verificar en dispositivo móvil real 📱
 
 
+
+
+

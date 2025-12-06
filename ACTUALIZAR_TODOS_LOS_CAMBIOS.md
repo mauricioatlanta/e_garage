@@ -155,3 +155,6 @@ Si el scroll automático sigue ocurriendo:
 - **Espías de debug activos** ✅
 
 
+
+
+

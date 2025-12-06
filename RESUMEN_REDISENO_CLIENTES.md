@@ -244,3 +244,6 @@ Tu página de clientes ahora tiene un diseño:
 *Creado: $(Get-Date -Format "yyyy-MM-dd HH:mm:ss")*
 *Versión: 1.0 - Rediseño Futurista*
 
+
+
+

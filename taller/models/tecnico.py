@@ -51,10 +51,11 @@ class TecnicoManager(models.Manager):
 class Tecnico(models.Model):
     """Modelo unificado de Técnico/Vendedor con validaciones multi-tenant"""
 
-    class Rol(models.TextChoices):
-        TECNICO = "TECNICO", "Técnico"
-        VENDEDOR = "VENDEDOR", "Vendedor"
-        MIXTO = "MIXTO", "Técnico/Vendedor"
+    ROL_CHOICES = [
+        ('TECNICO', 'Técnico'),
+        ('VENDEDOR', 'Vendedor'),
+        ('MIXTO', 'Técnico/Vendedor'),
+    ]
 
     empresa = models.ForeignKey(
         Empresa,
@@ -73,7 +74,7 @@ class Tecnico(models.Model):
     direccion = models.TextField(blank=True, null=True, help_text="Dirección del técnico")
 
     # Unificación técnico/vendedor
-    rol = models.CharField(max_length=12, choices=Rol, default=Rol.MIXTO, db_index=True)
+    rol = models.CharField(max_length=12, choices=ROL_CHOICES, default='MIXTO', db_index=True)
 
     activo = models.BooleanField(default=True, db_index=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -83,7 +84,7 @@ class Tecnico(models.Model):
 
     def __str__(self):
         estado = "✅" if self.activo else "❌"
-        rol_display = f" ({self.get_rol_display()})" if self.rol != self.Rol.MIXTO else ""
+        rol_display = f" ({self.get_rol_display()})" if self.rol != 'MIXTO' else ""
         return f"{estado} {self.nombre}{rol_display}"
 
     def clean(self):
@@ -98,11 +99,11 @@ class Tecnico(models.Model):
 
     def es_vendedor(self):
         """Helper para verificar si es vendedor (incluye MIXTO)"""
-        return self.rol in [self.Rol.VENDEDOR, self.Rol.MIXTO]
+        return self.rol in ['VENDEDOR', 'MIXTO']
 
     def es_tecnico(self):
         """Helper para verificar si es técnico (incluye MIXTO)"""
-        return self.rol in [self.Rol.TECNICO, self.Rol.MIXTO]
+        return self.rol in ['TECNICO', 'MIXTO']
 
     class Meta:
         verbose_name = "Técnico"

@@ -152,11 +152,10 @@ class DocumentoPDFExporter:
         servicios_qs = list(self.documento.lineas_servicio.all())
         otros_servicios_qs = list(self.documento.lineas_otro_servicio.all())
 
-        total_repuestos = sum((getattr(r, "subtotal", None) or Decimal("0")) for r in repuestos_qs)
-        total_servicios = sum((getattr(s, "subtotal", None) or Decimal("0")) for s in servicios_qs)
-        total_otros_servicios = sum(
-            (getattr(os, "subtotal", None) or Decimal("0")) for os in otros_servicios_qs
-        )
+        # Calcular totales usando la propiedad subtotal que ya considera descuentos
+        total_repuestos = sum(Decimal(str(r.subtotal)) for r in repuestos_qs)
+        total_servicios = sum(Decimal(str(s.subtotal)) for s in servicios_qs)
+        total_otros_servicios = sum(Decimal(str(os.subtotal)) for os in otros_servicios_qs)
 
         # Contexto con todos los datos del documento
         context = {
@@ -204,7 +203,8 @@ class DocumentoPDFExporter:
             + context["total_servicios"]
             + context["total_otros_servicios"]
         )
-        iva = subtotal * Decimal("0.19") if self.documento.incluir_iva else 0
+        # IVA (19% solo sobre repuestos según la lógica de negocio de Chile)
+        iva = context["total_repuestos"] * Decimal("0.19") if self.documento.incluir_iva else 0
         total = subtotal + iva
 
         context.update(

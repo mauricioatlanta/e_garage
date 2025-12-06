@@ -106,3 +106,6 @@ echo "✅ VERIFICACIÓN COMPLETADA - TODO CORRECTO"
 echo "======================================================"
 
 
+
+
+

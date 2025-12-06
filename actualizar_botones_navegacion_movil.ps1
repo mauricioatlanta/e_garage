@@ -31,3 +31,6 @@ Write-Host "[OK] Los botones deben mostrar TEXTO + ICONO" -ForegroundColor Green
 Write-Host ""
 
 
+
+
+

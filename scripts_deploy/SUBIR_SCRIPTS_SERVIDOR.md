@@ -86,3 +86,6 @@ ls -la 1_backup_FIXED.sh 2_actualizar_ESTRUCTURA_COMPLETA.sh
 Si ves los archivos listados, están subidos correctamente.
 
 
+
+
+

@@ -46,3 +46,6 @@ Si prefieres no subir el script nuevo, puedes usar el que ya está en el servido
 Este script también funciona, pero `2_actualizar_ESTRUCTURA_COMPLETA.sh` es más completo e incluye más carpetas de templates.
 
 
+
+
+

@@ -109,15 +109,19 @@
           {% endif %}
 
           <!-- Chile Location -->
-          {% if cliente.region or cliente.ciudad %}
+          {% if cliente.empresa.pais != 'US' %}
           <div class="p-4 rounded-xl bg-black/30 border border-cyan-900/40 backdrop-blur">
             <p class="text-xs uppercase tracking-wider text-gray-400">{% if request.path|slice:':3' == '/us' %}Chile Location{% else %}Ubicación Chile{% endif %}</p>
             <div class="mt-1 space-y-1">
               {% if cliente.region %}
                 <p class="text-lg font-medium text-gray-200">{% if request.path|slice:':3' == '/us' %}Region:{% else %}Región:{% endif %} {{ cliente.region.nombre }}</p>
+              {% else %}
+                <p class="text-lg font-medium text-gray-400 italic">{% if request.path|slice:':3' == '/us' %}Region:{% else %}Región:{% endif %} {% if request.path|slice:':3' == '/us' %}Not specified{% else %}No especificada{% endif %}</p>
               {% endif %}
               {% if cliente.ciudad %}
                 <p class="text-lg font-medium text-gray-200">{% if request.path|slice:':3' == '/us' %}City:{% else %}Ciudad:{% endif %} {{ cliente.ciudad.nombre }}</p>
+              {% else %}
+                <p class="text-lg font-medium text-gray-400 italic">{% if request.path|slice:':3' == '/us' %}City:{% else %}Ciudad:{% endif %} {% if request.path|slice:':3' == '/us' %}Not specified{% else %}No especificada{% endif %}</p>
               {% endif %}
             </div>
           </div>

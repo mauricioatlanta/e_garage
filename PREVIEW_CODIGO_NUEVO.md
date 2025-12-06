@@ -478,3 +478,6 @@ O seguir los comandos en `COMANDOS_RAPIDOS.md`
 
 Los botones lucirán como en el centro de operaciones, con efectos cyber y totalmente optimizados para móvil.
 
+
+
+

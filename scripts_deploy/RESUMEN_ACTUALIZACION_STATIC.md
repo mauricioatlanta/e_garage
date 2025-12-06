@@ -149,3 +149,6 @@ ls -la static/js/ | head -10
 **¡Listo!** 🎉 Ahora los archivos CSS/JS se incluirán automáticamente en cada actualización.
 
 
+
+
+

@@ -157,3 +157,6 @@ class Command(BaseCommand):
         self.stdout.write(f"   Dashboard Chile: http://127.0.0.1:8000/cl/")
         self.stdout.write(f"   Login Servidor: https://www.egarage.cl/cl/accounts/login/")
         self.stdout.write("=" * 80)
+
+
+

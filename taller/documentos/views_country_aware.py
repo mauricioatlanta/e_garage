@@ -29,7 +29,7 @@ def _tecnicos_queryset_for_empresa(empresa, roles_permitidos=None):
         return Tecnico.objects.none()
 
     if not roles_permitidos:
-        roles_permitidos = [Tecnico.Rol.TECNICO, Tecnico.Rol.VENDEDOR, Tecnico.Rol.MIXTO]
+        roles_permitidos = ['TECNICO', 'VENDEDOR', 'MIXTO']
 
     return Tecnico.objects.filter(
         empresa=empresa,

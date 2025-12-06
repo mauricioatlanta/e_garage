@@ -14,3 +14,6 @@ urlpatterns = [
     path("articulo/<slug:slug>/", HelpArticuloView.as_view(), name="articulo"),
     path("buscar/", help_buscar, name="buscar"),
 ]
+
+
+

@@ -47,3 +47,6 @@ class Command(BaseCommand):
         self.stdout.write(
             self.style.SUCCESS(f"📋 Primeras 10 marcas: {', '.join(marcas_list[:10])}")
         )
+
+
+

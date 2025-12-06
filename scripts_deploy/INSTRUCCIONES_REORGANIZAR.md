@@ -51,3 +51,6 @@ chmod +x SOLUCION_RAPIDA_SERVIDOR.sh
 ```
 
 
+
+
+

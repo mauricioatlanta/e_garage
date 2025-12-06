@@ -25,6 +25,7 @@ from django.db.models import (
     DecimalField,
     ExpressionWrapper,
     F,
+    Q,
     Sum,
     Value,
     When,
@@ -265,7 +266,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             return template_names
 
     def get_queryset(self):
-        """Filtrar documentos por empresa del usuario"""
+        """Filtrar documentos por empresa del usuario con filtros funcionales"""
         try:
             empresa = self.request.user.empresa
             base_queryset = (
@@ -277,6 +278,60 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
                     "lineas_otro_servicio",
                 )
             )
+
+            # === FILTROS FUNCIONALES ===
+            # Filtro por cliente (nombre o apellido)
+            cliente_search = self.request.GET.get("cliente", "").strip()
+            if cliente_search:
+                base_queryset = base_queryset.filter(
+                    Q(cliente__nombre__icontains=cliente_search) |
+                    Q(cliente__apellido__icontains=cliente_search) |
+                    Q(cliente__email__icontains=cliente_search)
+                )
+
+            # Filtro por vehículo (patente o modelo)
+            vehiculo_search = self.request.GET.get("vehiculo", "").strip()
+            if vehiculo_search:
+                base_queryset = base_queryset.filter(
+                    Q(vehiculo__patente__icontains=vehiculo_search) |
+                    Q(vehiculo__marca__nombre__icontains=vehiculo_search) |
+                    Q(vehiculo__modelo__nombre__icontains=vehiculo_search)
+                )
+
+            # Filtro por estado
+            estado = self.request.GET.get("estado", "").strip()
+            if estado:
+                base_queryset = base_queryset.filter(estado=estado.upper())
+
+            # Filtro por tipo
+            tipo = self.request.GET.get("tipo", "").strip()
+            if tipo:
+                base_queryset = base_queryset.filter(tipo=tipo.upper())
+
+            # Filtro por fecha desde
+            fecha_desde = self.request.GET.get("desde", "").strip()
+            if fecha_desde:
+                try:
+                    from datetime import datetime
+                    fecha_desde_obj = datetime.strptime(fecha_desde, "%Y-%m-%d").date()
+                    base_queryset = base_queryset.filter(fecha_emision__gte=fecha_desde_obj)
+                except ValueError:
+                    pass
+
+            # Filtro por fecha hasta
+            fecha_hasta = self.request.GET.get("hasta", "").strip()
+            if fecha_hasta:
+                try:
+                    from datetime import datetime
+                    fecha_hasta_obj = datetime.strptime(fecha_hasta, "%Y-%m-%d").date()
+                    base_queryset = base_queryset.filter(fecha_emision__lte=fecha_hasta_obj)
+                except ValueError:
+                    pass
+
+            # Filtro por número de documento
+            numero = self.request.GET.get("numero", "").strip()
+            if numero:
+                base_queryset = base_queryset.filter(numero__icontains=numero)
 
             decimal_zero = Value(
                 Decimal("0"),
@@ -356,18 +411,149 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
         context["country"] = getattr(self.request.user.empresa, "pais", "cl").lower()
 
         # Asignar los valores calculados a las propiedades que el template espera
-        for documento in context.get("documentos", []):
+        documentos = context.get("documentos", [])
+        for documento in documentos:
             # Usar los valores calculados en las anotaciones
             if hasattr(documento, "rep_sum"):
                 documento.neto_repuestos = documento.rep_sum or Decimal("0")
+            else:
+                documento.neto_repuestos = Decimal("0")
+                
             if hasattr(documento, "serv_sum"):
                 documento.neto_servicios = documento.serv_sum or Decimal("0")
+            else:
+                documento.neto_servicios = Decimal("0")
+                
             if hasattr(documento, "otros_sum"):
                 documento.neto_otros_servicios = documento.otros_sum or Decimal("0")
+            else:
+                documento.neto_otros_servicios = Decimal("0")
+                
             if hasattr(documento, "iva_calc"):
                 documento.tax_amount = documento.iva_calc or Decimal("0")
-            if hasattr(documento, "total_display"):
-                documento.total = documento.total_display or Decimal("0")
+            else:
+                documento.tax_amount = Decimal("0")
+                
+            # Calcular el total si no existe total_display o si es None/0
+            if hasattr(documento, "total_display") and documento.total_display:
+                documento.total = documento.total_display
+            elif hasattr(documento, "legacy_total_general") and documento.legacy_total_general:
+                documento.total = documento.legacy_total_general
+            else:
+                # Calcular total manualmente si no hay anotación
+                neto_rep = getattr(documento, "neto_repuestos", Decimal("0"))
+                neto_serv = getattr(documento, "neto_servicios", Decimal("0"))
+                neto_otros = getattr(documento, "neto_otros_servicios", Decimal("0"))
+                iva = getattr(documento, "tax_amount", Decimal("0"))
+                documento.total = neto_rep + neto_serv + neto_otros + iva
+            
+            # Asegurar que total nunca sea None
+            if not documento.total or documento.total is None:
+                documento.total = Decimal("0")
+
+        # === KPIs Y ESTADÍSTICAS CALCULADAS ===
+        # Usar un queryset separado SIN annotations para las estadísticas
+        # IMPORTANTE: Crear un queryset completamente nuevo sin ninguna annotation previa
+        empresa = self.request.user.empresa
+        # Usar .all() para asegurar que no hay annotations previas
+        stats_qs = Documento.objects.filter(empresa=empresa)
+        
+        # Aplicar los mismos filtros que en get_queryset para que los KPIs reflejen los filtros activos
+        cliente_search = self.request.GET.get("cliente", "").strip()
+        if cliente_search:
+            stats_qs = stats_qs.filter(
+                Q(cliente__nombre__icontains=cliente_search) |
+                Q(cliente__apellido__icontains=cliente_search) |
+                Q(cliente__email__icontains=cliente_search)
+            )
+        
+        vehiculo_search = self.request.GET.get("vehiculo", "").strip()
+        if vehiculo_search:
+            stats_qs = stats_qs.filter(
+                Q(vehiculo__patente__icontains=vehiculo_search) |
+                Q(vehiculo__marca__nombre__icontains=vehiculo_search) |
+                Q(vehiculo__modelo__nombre__icontains=vehiculo_search)
+            )
+        
+        estado = self.request.GET.get("estado", "").strip()
+        if estado:
+            stats_qs = stats_qs.filter(estado=estado.upper())
+        
+        tipo = self.request.GET.get("tipo", "").strip()
+        if tipo:
+            stats_qs = stats_qs.filter(tipo=tipo.upper())
+        
+        fecha_desde = self.request.GET.get("desde", "").strip()
+        if fecha_desde:
+            try:
+                from datetime import datetime
+                fecha_desde_obj = datetime.strptime(fecha_desde, "%Y-%m-%d").date()
+                stats_qs = stats_qs.filter(fecha_emision__gte=fecha_desde_obj)
+            except ValueError:
+                pass
+        
+        fecha_hasta = self.request.GET.get("hasta", "").strip()
+        if fecha_hasta:
+            try:
+                from datetime import datetime
+                fecha_hasta_obj = datetime.strptime(fecha_hasta, "%Y-%m-%d").date()
+                stats_qs = stats_qs.filter(fecha_emision__lte=fecha_hasta_obj)
+            except ValueError:
+                pass
+        
+        numero = self.request.GET.get("numero", "").strip()
+        if numero:
+            stats_qs = stats_qs.filter(numero__icontains=numero)
+
+        # Calcular estadísticas con agregaciones (usando el queryset sin annotations)
+        from datetime import date, timedelta
+        hoy = date.today()
+        hace_30_dias = hoy - timedelta(days=30)
+        
+        # Calcular estadísticas con agregaciones
+        # Usar el campo 'legacy_total_general' que es el campo DB real (db_column="total_general")
+        # o calcular el total sumando los campos individuales para evitar conflictos
+        estadisticas = stats_qs.aggregate(
+            total=Count("id"),
+            emitidos=Count("id", filter=Q(estado="EMITIDO")),
+            borradores=Count("id", filter=Q(estado="BORRADOR")),
+            anulados=Count("id", filter=Q(estado="ANULADO")),
+            hoy=Count("id", filter=Q(fecha_emision=hoy)),
+            ultimos_30_dias=Count("id", filter=Q(fecha_emision__gte=hace_30_dias)),
+            pendientes_pago=Count("id", filter=Q(estado_pago="NO_PAGADO", estado="EMITIDO")),
+            presupuestos_pendientes=Count("id", filter=Q(tipo="PRES", estado="EMITIDO")),
+            ots_sin_cerrar=Count("id", filter=Q(tipo="OT", estado__in=["EMITIDO", "BORRADOR"])),
+        )
+        
+        # Calcular el total sumando los campos individuales para evitar conflictos con annotations
+        total_calculado = stats_qs.aggregate(
+            sum_rep=Sum("neto_repuestos"),
+            sum_serv=Sum("neto_servicios"),
+            sum_otros=Sum("neto_otros_servicios"),
+            sum_tax=Sum("tax_amount"),
+        )
+        estadisticas["total_monto"] = (
+            (total_calculado["sum_rep"] or Decimal("0")) +
+            (total_calculado["sum_serv"] or Decimal("0")) +
+            (total_calculado["sum_otros"] or Decimal("0")) +
+            (total_calculado["sum_tax"] or Decimal("0"))
+        )
+        
+        context["estadisticas"] = estadisticas
+        context["documentos_pendientes"] = estadisticas.get("borradores", 0)
+        context["documentos_proceso"] = estadisticas.get("emitidos", 0)
+        context["documentos_completados"] = estadisticas.get("emitidos", 0)
+        
+        # Pasar los valores de filtros al template para mantenerlos en el formulario
+        context["filtros_activos"] = {
+            "cliente": cliente_search,
+            "vehiculo": vehiculo_search,
+            "estado": estado,
+            "tipo": tipo,
+            "desde": fecha_desde,
+            "hasta": fecha_hasta,
+            "numero": numero,
+        }
 
         return context
 
@@ -755,8 +941,22 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        documento = self.object
-        empresa = self.request.user.empresa
+        # Asegurar que tenemos el objeto documento
+        documento = self.object or getattr(self, 'object', None)
+        if not documento:
+            # Si no está en self.object, intentar obtenerlo del pk
+            pk = self.kwargs.get('pk')
+            if pk:
+                documento = self.get_object()
+        
+        if not documento:
+            from django.http import Http404
+            raise Http404("Documento no encontrado")
+        
+        empresa = getattr(self.request.user, "empresa", None) or getattr(self.request, "empresa", None)
+        if not empresa:
+            from django.http import Http404
+            raise Http404("Empresa no encontrada")
 
         # Obtener líneas del documento para edición
         servicios = documento.lineas_servicio.all().select_related("servicio")
@@ -800,12 +1000,70 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         cliente = getattr(documento, "cliente", None)
         vehiculo = getattr(documento, "vehiculo", None)
 
+        # Obtener ui_config de la empresa
+        ui_config = {}
+        try:
+            from taller.configuracion.rubros_logic import get_ui_config
+            config = getattr(empresa, "config", None)
+            if config:
+                ui_config = get_ui_config(config)
+        except Exception:
+            pass
+        
+        # Si no hay configuración, usar valores por defecto
+        if not ui_config:
+            ui_config = {
+                "show_repuestos": True,
+                "show_services": True,
+                "show_otros_servicios": True,
+                "show_kilometraje": True,
+                "show_vehicle": True,
+            }
+
+        # Serializar datos para JavaScript
+        repuestos_json = []
+        for rep in repuestos:
+            repuestos_json.append({
+                "id": rep.id,
+                "repuesto_id": rep.repuesto_id if rep.repuesto else None,
+                "codigo": rep.codigo or "",
+                "nombre": rep.nombre or "",
+                "cantidad": float(rep.cantidad or 0),
+                "precio": float(rep.precio_unitario or 0),
+                "descuento": float(getattr(rep, "descuento", 0) or 0),
+            })
+        
+        servicios_json = []
+        for serv in servicios:
+            servicios_json.append({
+                "id": serv.id,
+                "servicio_id": serv.servicio_id if serv.servicio else None,
+                "nombre": serv.nombre or "",
+                "cantidad": float(serv.cantidad or 0),
+                "precio": float(serv.precio_unitario or 0),
+                "descuento": float(getattr(serv, "descuento", 0) or 0),
+            })
+        
+        otros_json = []
+        for otro in otros_servicios:
+            otros_json.append({
+                "id": otro.id,
+                "servicio_id": otro.servicio_id if otro.servicio else None,
+                "nombre": otro.nombre or "",
+                "empresa_ext": getattr(otro, "empresa_externa", "") or "",
+                "precio_taller": float(getattr(otro, "costo_interno", 0) or 0),
+                "precio": float(getattr(otro, "precio_cliente", 0) or 0),
+            })
+
         context.update(
             {
                 "documento": documento,
                 "servicios": servicios,
                 "repuestos": repuestos,
                 "otros_servicios": otros_servicios,
+                "repuestos_json": repuestos_json,
+                "servicios_json": servicios_json,
+                "otros_json": otros_json,
                 "subtotal_repuestos": subtotal_repuestos,
                 "subtotal_servicios": subtotal_servicios,
                 "subtotal_otros_servicios": subtotal_otros_servicios,
@@ -816,6 +1074,9 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
                 "tecnicos": mecanicos,  # Alias para compatibilidad con templates
                 "es_edicion": True,
                 "company_country": company_country,
+                "empresa": empresa,  # Agregar empresa al contexto para que esté disponible en el template
+                "ui_config": ui_config,
+                "kilometraje": getattr(documento, "kilometraje_vehiculo", None) or getattr(documento, "kilometraje", None),
                 "cliente_info": {
                     "id": getattr(cliente, "id", ""),
                     "nombre": str(cliente) if cliente else "",

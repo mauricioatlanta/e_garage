@@ -12,6 +12,7 @@ from django.db.models import (
     ExpressionWrapper,
     F,
     FloatField,
+    Q,
     Sum,
     Value,
 )
@@ -721,10 +722,11 @@ def dashboard_inteligencia_operativa(request):
 
     # Clientes que no han vuelto en 60 días - FILTRADO POR EMPRESA
     hace_60_dias = hoy - timedelta(days=60)
+    tipos_facturacion_local = ["FAC", "BOL"]
     clientes_inactivos = (
         Cliente.objects.filter(
             documentos__fecha_emision__lt=hace_60_dias,
-            documentos__tipo__in=tipos_facturacion,
+            documentos__tipo__in=tipos_facturacion_local,
             empresa=empresa,  # 🔒 FILTRO EMPRESA
         )
         .distinct()
@@ -1165,3 +1167,411 @@ def reportes_otros_servicios_fecha(request, desde, hasta):
     """Reportes de otros servicios en un rango de fechas"""
 
     return JsonResponse({"desde": desde, "hasta": hasta, "data": []})
+
+
+@login_required_default
+def centro_contable_chile(request):
+    """
+    🧮 Centro Contable Chile - Contador Virtual
+    
+    Vista especial para cierre contable con:
+    - Resumen contable mensual
+    - Alertas inteligentes de calidad de datos
+    - Validación de consistencia contable
+    - Flujo optimizado para el dueño del taller (3 clics)
+    """
+    from datetime import datetime, timedelta
+    from decimal import Decimal
+    
+    empresa = get_or_create_empresa(request)
+    
+    # Manejo de filtros de fecha avanzados
+    hoy = date.today()
+    
+    # Botones rápidos
+    periodo_rapido = request.GET.get('periodo_rapido', '')
+    fecha_desde_str = request.GET.get('fecha_desde', '')
+    fecha_hasta_str = request.GET.get('fecha_hasta', '')
+    
+    if periodo_rapido == 'mes_actual':
+        fecha_inicio = date(hoy.year, hoy.month, 1)
+        if hoy.month == 12:
+            fecha_fin = date(hoy.year + 1, 1, 1) - timedelta(days=1)
+        else:
+            fecha_fin = date(hoy.year, hoy.month + 1, 1) - timedelta(days=1)
+    elif periodo_rapido == 'mes_anterior':
+        if hoy.month == 1:
+            fecha_inicio = date(hoy.year - 1, 12, 1)
+            fecha_fin = date(hoy.year, 1, 1) - timedelta(days=1)
+        else:
+            fecha_inicio = date(hoy.year, hoy.month - 1, 1)
+            fecha_fin = date(hoy.year, hoy.month, 1) - timedelta(days=1)
+    elif periodo_rapido == 'año_actual':
+        fecha_inicio = date(hoy.year, 1, 1)
+        fecha_fin = date(hoy.year, 12, 31)
+    elif fecha_desde_str and fecha_hasta_str:
+        # Filtros personalizados
+        fecha_inicio = parse_date(fecha_desde_str) or date(hoy.year, hoy.month, 1)
+        fecha_fin = parse_date(fecha_hasta_str) or hoy
+        if fecha_inicio > fecha_fin:
+            fecha_inicio, fecha_fin = fecha_fin, fecha_inicio
+    else:
+        # Por defecto: mes actual
+        mes_seleccionado = request.GET.get('mes', hoy.strftime('%Y-%m'))
+        try:
+            año, mes = map(int, mes_seleccionado.split('-'))
+            fecha_inicio = date(año, mes, 1)
+            if mes == 12:
+                fecha_fin = date(año + 1, 1, 1) - timedelta(days=1)
+            else:
+                fecha_fin = date(año, mes + 1, 1) - timedelta(days=1)
+        except:
+            fecha_inicio = date(hoy.year, hoy.month, 1)
+            if hoy.month == 12:
+                fecha_fin = date(hoy.year + 1, 1, 1) - timedelta(days=1)
+            else:
+                fecha_fin = date(hoy.year, hoy.month + 1, 1) - timedelta(days=1)
+    
+    # === DATOS CONTABLES DEL MES ===
+    # Tipos de documentos facturables
+    tipos_facturacion = ['FAC', 'BOL']
+    
+    documentos_mes = Documento.objects.filter(
+        empresa=empresa,
+        fecha_emision__range=[fecha_inicio, fecha_fin],
+        tipo__in=tipos_facturacion,  # Solo facturas y boletas
+        estado='EMITIDO'
+    ).select_related('cliente', 'vehiculo')
+    
+    # Totales contables
+    total_facturado = documentos_mes.aggregate(
+        total=Coalesce(Sum('total'), Value(Decimal('0')))
+    )['total'] or Decimal('0')
+    
+    total_neto_repuestos = documentos_mes.aggregate(
+        total=Coalesce(Sum('neto_repuestos'), Value(Decimal('0')))
+    )['total'] or Decimal('0')
+    
+    total_neto_servicios = documentos_mes.aggregate(
+        total=Coalesce(Sum('neto_servicios'), Value(Decimal('0')))
+    )['total'] or Decimal('0')
+    
+    total_neto_otros = documentos_mes.aggregate(
+        total=Coalesce(Sum('neto_otros_servicios'), Value(Decimal('0')))
+    )['total'] or Decimal('0')
+    
+    total_iva = documentos_mes.aggregate(
+        total=Coalesce(Sum('tax_amount'), Value(Decimal('0')))
+    )['total'] or Decimal('0')
+    
+    # Calcular neto total (sin IVA)
+    neto_total = total_neto_repuestos + total_neto_servicios + total_neto_otros
+    
+    # === CÁLCULOS CONTABLES ESPECÍFICOS ===
+    # Neto afecto = repuestos (base imponible 19%)
+    neto_afecto = total_neto_repuestos
+    # Neto exento = servicios (sin IVA en Chile)
+    neto_exento = total_neto_servicios + total_neto_otros
+    # IVA = 19% sobre neto afecto
+    iva_periodo = total_iva
+    # Total ventas = neto afecto + exento + IVA
+    total_ventas = neto_afecto + neto_exento + iva_periodo
+    
+    # === VENTAS DIARIAS PARA GRÁFICO ===
+    ventas_diarias_list = list(documentos_mes.values('fecha_emision').annotate(
+        total_dia=Coalesce(Sum('total'), Value(Decimal('0')))
+    ).order_by('fecha_emision'))
+    
+    # Convertir a formato JSON-friendly
+    import json
+    from django.core.serializers.json import DjangoJSONEncoder
+    ventas_diarias_json = json.dumps([
+        {
+            'fecha_emision': str(v['fecha_emision']),
+            'total_dia': float(v['total_dia'])
+        }
+        for v in ventas_diarias_list
+    ], cls=DjangoJSONEncoder)
+    
+    # === ALERTAS INTELIGENTES ORGANIZADAS POR SEVERIDAD ===
+    alertas_criticas = []
+    alertas_advertencias = []
+    alertas_info = []
+    
+    # 1. Documentos en borrador
+    docs_borrador_list = Documento.objects.filter(
+        empresa=empresa,
+        fecha_emision__range=[fecha_inicio, fecha_fin],
+        tipo__in=tipos_facturacion,
+        estado='BORRADOR'
+    )
+    if docs_borrador_list.exists():
+        alertas_criticas.append({
+            'tipo': 'critica',
+            'icono': '🔴',
+            'titulo': f'{docs_borrador_list.count()} documento{{ docs_borrador_list.count()|pluralize }} en estado BORRADOR dentro del período',
+            'mensaje': 'Documentos en borrador que deben ser emitidos o eliminados antes del cierre.',
+            'documentos': list(docs_borrador_list.values_list('id', flat=True))
+        })
+    
+    # 2. Documentos sin número
+    docs_sin_numero = documentos_mes.filter(numero__in=['', None])
+    if docs_sin_numero.exists():
+        alertas_criticas.append({
+            'tipo': 'critica',
+            'icono': '🔴',
+            'titulo': f'{docs_sin_numero.count()} documento{{ docs_sin_numero.count()|pluralize }} sin número',
+            'mensaje': 'Documentos sin número de factura/boleta. Requiere atención inmediata.',
+            'documentos': list(docs_sin_numero.values_list('id', flat=True))
+        })
+    
+    # 3. Documentos sin cliente o sin RUT
+    docs_sin_cliente = documentos_mes.filter(cliente__isnull=True)
+    docs_sin_rut_list = documentos_mes.filter(
+        cliente__isnull=False
+    ).filter(
+        Q(cliente__tax_id__isnull=True) | Q(cliente__tax_id='')
+    )
+    
+    if docs_sin_cliente.exists():
+        alertas_criticas.append({
+            'tipo': 'critica',
+            'icono': '🔴',
+            'titulo': f'{docs_sin_cliente.count()} documento{{ docs_sin_cliente.count()|pluralize }} sin cliente',
+            'mensaje': 'Documentos sin cliente asociado. Datos incompletos.',
+            'documentos': list(docs_sin_cliente.values_list('id', flat=True))
+        })
+    
+    if docs_sin_rut_list.exists():
+        alertas_criticas.append({
+            'tipo': 'critica',
+            'icono': '🔴',
+            'titulo': f'{docs_sin_rut_list.count()} documento{{ docs_sin_rut_list.count()|pluralize }} con cliente sin RUT',
+            'mensaje': 'Documentos con clientes que no tienen RUT registrado.',
+            'documentos': list(docs_sin_rut_list.values_list('id', flat=True))
+        })
+    
+    # 4. Inconsistencia en totales (IVA) - ADVERTENCIA
+    iva_esperado = total_neto_repuestos * Decimal('0.19')
+    diferencia_iva = abs(total_iva - iva_esperado)
+    if diferencia_iva > Decimal('100'):  # Tolerancia de $100 CLP
+        docs_inconsistentes = documentos_mes.filter(
+            Q(tax_amount__lt=ExpressionWrapper(F('neto_repuestos') * Decimal('0.19') - Decimal('50'), output_field=DecimalField())) |
+            Q(tax_amount__gt=ExpressionWrapper(F('neto_repuestos') * Decimal('0.19') + Decimal('50'), output_field=DecimalField()))
+        )
+        alertas_advertencias.append({
+            'tipo': 'advertencia',
+            'icono': '🟡',
+            'titulo': '1 documento con totales inconsistentes (revisar líneas)',
+            'mensaje': f'IVA calculado: ${total_iva:,.0f} | IVA esperado: ${iva_esperado:,.0f} | Diferencia: ${diferencia_iva:,.0f}',
+            'documentos': list(docs_inconsistentes.values_list('id', flat=True)) if docs_inconsistentes.exists() else []
+        })
+    
+    # 5. Documentos con total en cero - ADVERTENCIA
+    docs_cero_list = documentos_mes.filter(total=Decimal('0'))
+    if docs_cero_list.exists():
+        alertas_advertencias.append({
+            'tipo': 'advertencia',
+            'icono': '🟡',
+            'titulo': f'{docs_cero_list.count()} documento{{ docs_cero_list.count()|pluralize }} con total $0',
+            'mensaje': 'Documentos con monto total en cero. Verificar líneas de detalle.',
+            'documentos': list(docs_cero_list.values_list('id', flat=True))
+        })
+    
+    # 6. Documentos con tipo no definido - ADVERTENCIA
+    docs_tipo_indefinido = documentos_mes.filter(tipo__isnull=True) | documentos_mes.filter(tipo='')
+    if docs_tipo_indefinido.exists():
+        alertas_advertencias.append({
+            'tipo': 'advertencia',
+            'icono': '🟡',
+            'titulo': f'{docs_tipo_indefinido.count()} documento{{ docs_tipo_indefinido.count()|pluralize }} con tipo de documento no definido (usando "Interno")',
+            'mensaje': 'Documentos sin tipo definido. Se están usando como "Interno".',
+            'documentos': list(docs_tipo_indefinido.values_list('id', flat=True))
+        })
+    
+    # 7. Documentos con descuento > 50% - ADVERTENCIA
+    from taller.models.lineas_documento import LineaRepuesto, LineaServicio
+    lineas_descuento_alto = LineaRepuesto.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__range=[fecha_inicio, fecha_fin],
+        documento__tipo__in=tipos_facturacion,
+        descuento__gt=50
+    ).values('documento_id').distinct()
+    
+    if lineas_descuento_alto.exists():
+        alertas_advertencias.append({
+            'tipo': 'advertencia',
+            'icono': '🟡',
+            'titulo': f'{lineas_descuento_alto.count()} documento{{ lineas_descuento_alto.count()|pluralize }} con descuento > 50% en una línea (revisar)',
+            'mensaje': 'Documentos con descuentos muy altos. Verificar que sean correctos.',
+            'documentos': list(lineas_descuento_alto.values_list('documento_id', flat=True))
+        })
+    
+    # 8. Documentos anulados - INFO
+    docs_anulados_list = Documento.objects.filter(
+        empresa=empresa,
+        fecha_emision__range=[fecha_inicio, fecha_fin],
+        tipo__in=tipos_facturacion,
+        estado='ANULADO'
+    )
+    if docs_anulados_list.exists():
+        alertas_info.append({
+            'tipo': 'info',
+            'icono': '🟢',
+            'titulo': f'{docs_anulados_list.count()} documento{{ docs_anulados_list.count()|pluralize }} anulado{{ docs_anulados_list.count()|pluralize }} en el período (no se consideran en totales)',
+            'mensaje': 'Documentos anulados en el período. No se incluyen en los totales contables.',
+            'documentos': list(docs_anulados_list.values_list('id', flat=True))
+        })
+    
+    # Combinar todas las alertas para compatibilidad
+    alertas = alertas_criticas + alertas_advertencias + alertas_info
+    
+    # === CALIDAD DE DATOS ===
+    calidad_datos = {
+        'score': 100,
+        'problemas': []
+    }
+    
+    total_docs = documentos_mes.count()
+    if total_docs > 0:
+        # Porcentaje de documentos con número
+        docs_sin_numero_count = documentos_mes.filter(numero__in=['', None]).count()
+        pct_con_numero = ((total_docs - docs_sin_numero_count) / total_docs) * 100
+        # Porcentaje de documentos con cliente
+        docs_sin_cliente_count = documentos_mes.filter(cliente__isnull=True).count()
+        pct_con_cliente = ((total_docs - docs_sin_cliente_count) / total_docs) * 100
+        # Porcentaje de documentos con total válido
+        docs_cero_count = documentos_mes.filter(total=Decimal('0')).count()
+        pct_con_total = ((total_docs - docs_cero_count) / total_docs) * 100
+        
+        # Score de calidad (promedio ponderado)
+        calidad_datos['score'] = int((pct_con_numero + pct_con_cliente + pct_con_total) / 3)
+        
+        if pct_con_numero < 100:
+            calidad_datos['problemas'].append(f'{100 - pct_con_numero:.0f}% sin número')
+        if pct_con_cliente < 100:
+            calidad_datos['problemas'].append(f'{100 - pct_con_cliente:.0f}% sin cliente')
+        if pct_con_total < 100:
+            calidad_datos['problemas'].append(f'{100 - pct_con_total:.0f}% con total $0')
+    else:
+        calidad_datos['score'] = 0
+        calidad_datos['problemas'].append('No hay documentos en el período')
+    
+    # === RESUMEN POR TIPO DE DOCUMENTO ===
+    resumen_tipos = documentos_mes.values('tipo').annotate(
+        cantidad=Count('id'),
+        total=Coalesce(Sum('total'), Value(Decimal('0'))),
+        neto=Coalesce(Sum('neto_repuestos') + Sum('neto_servicios') + Sum('neto_otros_servicios'), Value(Decimal('0'))),
+        iva=Coalesce(Sum('tax_amount'), Value(Decimal('0')))
+    ).order_by('tipo')
+    
+    # === ESTADÍSTICAS ADICIONALES ===
+    total_documentos = documentos_mes.count()
+    clientes_unicos = documentos_mes.values('cliente').distinct().count()
+    promedio_ticket = total_facturado / total_documentos if total_documentos > 0 else Decimal('0')
+    
+    # Documentos en borrador
+    docs_borrador = Documento.objects.filter(
+        empresa=empresa,
+        fecha_emision__range=[fecha_inicio, fecha_fin],
+        tipo__in=tipos_facturacion,
+        estado='BORRADOR'
+    ).count()
+    
+    # Documentos sin RUT de cliente (usando tax_id)
+    docs_sin_rut = documentos_mes.filter(
+        cliente__isnull=False
+    ).filter(
+        Q(cliente__tax_id__isnull=True) | Q(cliente__tax_id='')
+    ).count()
+    
+    # Desglose por repuestos y servicios
+    from taller.models.lineas_documento import LineaRepuesto, LineaServicio
+    lineas_repuestos = LineaRepuesto.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__range=[fecha_inicio, fecha_fin],
+        documento__tipo__in=tipos_facturacion,
+        documento__estado='EMITIDO'
+    )
+    
+    lineas_servicios = LineaServicio.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__range=[fecha_inicio, fecha_fin],
+        documento__tipo__in=tipos_facturacion,
+        documento__estado='EMITIDO'
+    )
+    
+    # Repuestos vendidos (detallado)
+    repuestos_vendidos = lineas_repuestos.values(
+        'codigo', 'nombre'
+    ).annotate(
+        cantidad_total=Sum('cantidad'),
+        neto_total=Sum(ExpressionWrapper(F('cantidad') * F('precio_unitario'), output_field=DecimalField()))
+    ).order_by('-neto_total')
+    
+    # Servicios realizados (detallado)
+    servicios_realizados = lineas_servicios.values('nombre').annotate(
+        cantidad_total=Sum('cantidad'),
+        monto_total=Sum(ExpressionWrapper(F('cantidad') * F('precio_unitario'), output_field=DecimalField()))
+    ).order_by('-monto_total')
+    
+    # Top repuestos (para preview)
+    top_repuestos = repuestos_vendidos[:10]
+    
+    # Top servicios (para preview)
+    top_servicios = servicios_realizados[:10]
+    
+    # Calcular neto por documento para el template
+    documentos_con_neto = []
+    for doc in documentos_mes[:100]:
+        neto_doc = doc.neto_repuestos + doc.neto_servicios + doc.neto_otros_servicios
+        neto_exento_doc = doc.neto_servicios + doc.neto_otros_servicios
+        documentos_con_neto.append({
+            'doc': doc,
+            'neto': neto_doc,
+            'neto_exento': neto_exento_doc
+        })
+    
+    # === CONTEXTO ===
+    context = {
+        'empresa': empresa,
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'fecha_desde_str': fecha_desde_str or fecha_inicio.strftime('%Y-%m-%d'),
+        'fecha_hasta_str': fecha_hasta_str or fecha_fin.strftime('%Y-%m-%d'),
+        # Cálculos contables específicos
+        'neto_afecto': neto_afecto,
+        'neto_exento': neto_exento,
+        'iva_periodo': iva_periodo,
+        'total_ventas': total_ventas,
+        # Datos para gráfico
+        'ventas_diarias': ventas_diarias_json,
+        # Totales generales (compatibilidad)
+        'total_facturado': total_facturado,
+        'total_neto_repuestos': total_neto_repuestos,
+        'total_neto_servicios': total_neto_servicios,
+        'total_neto_otros': total_neto_otros,
+        'neto_total': neto_total,
+        'total_iva': total_iva,
+        # Alertas organizadas
+        'alertas': alertas,
+        'alertas_criticas': alertas_criticas,
+        'alertas_advertencias': alertas_advertencias,
+        'alertas_info': alertas_info,
+        'calidad_datos': calidad_datos,
+        'resumen_tipos': resumen_tipos,
+        'total_documentos': total_documentos,
+        'clientes_unicos': clientes_unicos,
+        'promedio_ticket': promedio_ticket,
+        'documentos_mes': documentos_mes[:100],  # Primeros 100 para libro de ventas
+        'documentos_con_neto': documentos_con_neto,
+        'docs_borrador': docs_borrador,
+        'docs_sin_rut': docs_sin_rut,
+        # Repuestos y servicios detallados
+        'repuestos_vendidos': list(repuestos_vendidos),
+        'servicios_realizados': list(servicios_realizados),
+        'top_repuestos': list(top_repuestos),
+        'top_servicios': list(top_servicios),
+    }
+    
+    return render(request, 'taller/reportes/centro_contable_chile.html', context)

@@ -182,8 +182,9 @@ input:disabled, select:disabled, textarea:disabled {
 </style>
 
 {% block documento_title %}
-{% with active_country=company_country|default:'' %}
-{% with is_cl=active_country|default:''|upper %}
+{% load i18n %}
+{% with active_country=company_country|default:request.company_country|default:empresa.pais|default:'CL' %}
+{% with is_cl=active_country|default:'CL'|upper %}
 <!-- Header de Página - Design System -->
 <div class="mb-6 sm:mb-8 px-4 sm:px-6">
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -234,8 +235,9 @@ function submitLanguageDoc(lang) {
 {% endblock %}
 
 {% block documento_content %}
-{% with active_country=company_country|default:'' %}
-{% with is_cl=active_country|default:''|upper %}
+{% load i18n %}
+{% with active_country=company_country|default:request.company_country|default:empresa.pais|default:'CL' %}
+{% with is_cl=active_country|default:'CL'|upper %}
         <form method="post" id="document-form" class="max-w-7xl mx-auto"
               data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
               data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
@@ -295,14 +297,14 @@ function submitLanguageDoc(lang) {
 
         <label for="id_tipo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Tipo de documento{% else %}{% trans "Document Type" %}{% endif %}</label>
         <select id="id_tipo" name="tipo" class="form-select w-full text-base">
-          <option value="OT">{% if is_cl == 'CL' %}Orden de trabajo{% else %}{% trans "Work Order" %}{% endif %}</option>
-          <option value="FAC">{% if is_cl == 'CL' %}Factura / Boleta{% else %}{% trans "Invoice/Receipt" %}{% endif %}</option>
-          <option value="PRES">{% if is_cl == 'CL' %}Presupuesto{% else %}{% trans "Estimate" %}{% endif %}</option>
+          <option value="OT" {% if form.tipo.value == 'OT' or documento.tipo == 'OT' %}selected{% endif %}>{% if is_cl == 'CL' %}Orden de trabajo{% else %}{% trans "Work Order" %}{% endif %}</option>
+          <option value="FAC" {% if form.tipo.value == 'FAC' or documento.tipo == 'FAC' %}selected{% endif %}>{% if is_cl == 'CL' %}Factura / Boleta{% else %}{% trans "Invoice/Receipt" %}{% endif %}</option>
+          <option value="PRES" {% if form.tipo.value == 'PRES' or documento.tipo == 'PRES' %}selected{% endif %}>{% if is_cl == 'CL' %}Presupuesto{% else %}{% trans "Estimate" %}{% endif %}</option>
         </select>
 
         <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Número{% else %}{% trans "Number" %}{% endif %}</label>
         <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-2 sm:py-3 text-sm sm:text-base" id="id_numero">
-          {% if is_cl == 'CL' %}Se generará automáticamente{% else %}{% trans "Will be generated automatically" %}{% endif %}
+          {% if es_edicion and documento.numero_documento %}{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% elif is_cl == 'CL' %}Se generará automáticamente{% else %}{% trans "Will be generated automatically" %}{% endif %}
         </div>
       </div>
 
@@ -359,7 +361,7 @@ function submitLanguageDoc(lang) {
         <select name="tecnico_responsable" id="id_tecnico_responsable" class="form-select w-full text-base">
           <option value="">{% if is_cl == 'CL' %}Selecciona…{% else %}{% trans "Select..." %}{% endif %}</option>
           {% for t in tecnicos %}
-            <option value="{{ t.id }}">{{ t.nombre }}</option>
+            <option value="{{ t.id }}" {% if form.tecnico_responsable.value == t.id|stringformat:"s" or documento.tecnico_responsable_id == t.id %}selected{% endif %}>{{ t.nombre }}</option>
           {% endfor %}
         </select>
         {% endwith %}
@@ -374,7 +376,7 @@ function submitLanguageDoc(lang) {
 
         {% if ui_config.show_kilometraje %}
         <label for="id_kilometraje" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Kilometraje{% else %}{% trans "Mileage" %}{% endif %}</label>
-        <input id="id_kilometraje" type="number" name="kilometraje" min="0" class="form-control w-full text-base" placeholder="{% if is_cl == 'CL' %}0{% else %}0{% endif %}">
+        <input id="id_kilometraje" type="number" name="kilometraje" min="0" value="{% if es_edicion %}{{ documento.kilometraje|default:kilometraje|default_if_none:'' }}{% endif %}" class="form-control w-full text-base" placeholder="{% if is_cl == 'CL' %}0{% else %}0{% endif %}">
         {% endif %}
       </div>
     </div>
@@ -1205,8 +1207,31 @@ function setupRepuestoRow(row){
       if (item.nombre) labelParts.push(item.nombre);
       searchInput.value = labelParts.join(' • ') || '';
     }
-                recalc();
-              }
+    recalc();
+  }
+  
+  // Exponer función para aplicar datos desde fuera
+  row.__applyRepData = function(data) {
+    if (!data) return;
+    // Aplicar datos básicos
+    applyPartData({
+      id: data.id || '',
+      codigo: data.codigo || '',
+      nombre: data.nombre || '',
+      precio_venta: data.precio || 0,
+    });
+    // Aplicar cantidad y descuento
+    if (qEl && data.cantidad) {
+      qEl.value = data.cantidad;
+      qEl.dispatchEvent(new Event('input'));
+    }
+    if (row.querySelector('.rep-descuento') && data.descuento) {
+      const descInput = row.querySelector('.rep-descuento');
+      descInput.value = data.descuento;
+      descInput.dispatchEvent(new Event('input'));
+    }
+    recalc();
+  };
 
   async function searchRepuestos(q){
     if (!drop) return;
@@ -1514,6 +1539,9 @@ function setupServicioRow(row){
     }
     recalc();
   };
+  
+  // Alias para compatibilidad con el código de carga
+  row.__applyServData = row.__applyServicioData;
 }
 
 window.addOtroRow = function addOtroRow(){
@@ -1695,7 +1723,18 @@ function setupOtroRow(row){
   precioEl?.addEventListener('input', recalc);
   precioTallerEl?.addEventListener('input', recalc);
 
-  row.__applyOtroData = aplicarDatos;
+  // Exponer función para aplicar datos desde fuera con formato correcto
+  row.__applyOtroData = function(data) {
+    if (!data) return;
+    aplicarDatos({
+      id: data.id || data.servicio_id || '',
+      nombre: data.nombre || '',
+      empresa: data.empresa || data.empresa_ext || '',
+      empresa_ext: data.empresa_ext || data.empresa || '',
+      precio_cliente: data.precio_cliente || data.precio || 0,
+      precio_taller: data.precio_taller || 0,
+    });
+  };
 }
 
 // ===============
@@ -1857,8 +1896,175 @@ function submitDocumentForm(){
   }
 
   setupClienteSearchHandlers();
+  // Cargar datos existentes si estamos editando
+  {% if es_edicion %}
+  // Inicializar campos básicos del formulario ANTES de aplicar tema
+  const documentoData = {
+    tipo: '{{ documento.tipo|default:form.tipo.value|default:"" }}',
+    clienteId: '{{ cliente_info.id|default:"" }}',
+    clienteNombre: '{{ cliente_info.nombre|default:""|escapejs }}',
+    clienteEmail: '{{ cliente_info.email|default:""|escapejs }}',
+    clienteTelefono: '{{ cliente_info.telefono|default:""|escapejs }}',
+    vehiculoId: '{{ vehiculo_inicial_id|default:"" }}',
+    tecnicoId: '{{ documento.tecnico_responsable_id|default:form.tecnico_responsable.value|default:"" }}',
+    paymentStatus: '{{ documento.payment_status|default:"pending" }}',
+    numero: '{{ documento.numero_documento|default:documento.numero|default:"" }}'
+  };
+  
+  console.log('📄 Inicializando documento para edición:', documentoData);
+  
+  // Establecer tipo de documento PRIMERO
+  if (documentoData.tipo) {
+    const tipoSelect = document.getElementById('id_tipo');
+    if (tipoSelect) {
+      tipoSelect.value = documentoData.tipo;
+      if (typeof applyTheme === 'function') {
+        applyTheme(documentoData.tipo);
+      }
+    }
+  } else {
+    applyTheme(selTipo?.value || 'OT');
+  }
+  
+  // Establecer número de documento
+  if (documentoData.numero) {
+    const numView = document.getElementById('id_numero');
+    if (numView) {
+      numView.textContent = documentoData.numero;
+    }
+  } else {
+    updateDocumentNumber();
+  }
+  
+  // Inicializar cliente si existe
+  if (documentoData.clienteId && documentoData.clienteNombre) {
+    // Esperar a que la función esté disponible
+    setTimeout(() => {
+      if (typeof seleccionarCliente === 'function') {
+        seleccionarCliente({
+          id: documentoData.clienteId,
+          nombre: documentoData.clienteNombre,
+          email: documentoData.clienteEmail,
+          telefono: documentoData.clienteTelefono
+        });
+        
+        // Cargar vehículos del cliente y seleccionar el vehículo inicial
+        if (documentoData.vehiculoId) {
+          setTimeout(() => {
+            const vehiculoSelect = document.getElementById('id_vehiculo');
+            if (vehiculoSelect) {
+              // Esperar a que se carguen los vehículos
+              setTimeout(() => {
+                vehiculoSelect.value = documentoData.vehiculoId;
+                vehiculoSelect.dispatchEvent(new Event('change'));
+              }, 800);
+            }
+          }, 500);
+        }
+      }
+    }, 100);
+  }
+  
+  // Establecer técnico responsable
+  if (documentoData.tecnicoId) {
+    setTimeout(() => {
+      const tecnicoSelect = document.getElementById('id_tecnico_responsable');
+      if (tecnicoSelect) {
+        tecnicoSelect.value = documentoData.tecnicoId;
+      }
+    }, 100);
+  }
+  
+  // Establecer estado de pago
+  if (documentoData.paymentStatus) {
+    setTimeout(() => {
+      const paymentSelect = document.getElementById('id_payment_status');
+      if (paymentSelect) {
+        paymentSelect.value = documentoData.paymentStatus;
+      }
+    }, 100);
+  }
+  
+  const repuestosData = {{ repuestos_json|safe|default:"[]" }};
+  const serviciosData = {{ servicios_json|safe|default:"[]" }};
+  const otrosData = {{ otros_json|safe|default:"[]" }};
+  
+  console.log('📦 Cargando datos existentes para edición:', {
+    repuestos: repuestosData.length,
+    servicios: serviciosData.length,
+    otros: otrosData.length
+  });
+  
+  // Cargar repuestos con delay para asegurar que las funciones estén disponibles
+  setTimeout(() => {
+    if (repuestosData && repuestosData.length > 0) {
+      repuestosData.forEach(rep => {
+        if (typeof window.addRepuestoRow === 'function') {
+          const row = window.addRepuestoRow();
+          if (row && row.__applyRepData) {
+            row.__applyRepData({
+              id: rep.repuesto_id || '',
+              codigo: rep.codigo || '',
+              nombre: rep.nombre || '',
+              cantidad: rep.cantidad || 1,
+              precio: rep.precio || 0,
+              descuento: rep.descuento || 0,
+            });
+          }
+        }
+      });
+    }
+    
+    // Cargar servicios
+    if (serviciosData && serviciosData.length > 0) {
+      serviciosData.forEach(serv => {
+        if (typeof window.addServicioRow === 'function') {
+          const row = window.addServicioRow();
+          if (row && row.__applyServData) {
+            row.__applyServData({
+              id: serv.servicio_id || '',
+              nombre: serv.nombre || '',
+              cantidad: serv.cantidad || 1,
+              precio: serv.precio || 0,
+              descuento: serv.descuento || 0,
+            });
+          }
+        }
+      });
+    }
+    
+    // Cargar otros servicios
+    if (otrosData && otrosData.length > 0) {
+      otrosData.forEach(otro => {
+        if (typeof window.addOtroRow === 'function') {
+          const row = window.addOtroRow();
+          if (row && row.__applyOtroData) {
+            row.__applyOtroData({
+              id: otro.servicio_id || '',
+              nombre: otro.nombre || '',
+              empresa: otro.empresa_ext || '',
+              empresa_ext: otro.empresa_ext || '',
+              precio_cliente: otro.precio || 0,
+              precio_taller: otro.precio_taller || 0,
+            });
+          }
+        }
+      });
+    }
+    
+    // Recalcular totales después de cargar todos los datos
+    setTimeout(() => {
+      if (typeof window.recalcTotales === 'function') {
+        window.recalcTotales();
+      }
+    }, 300);
+  }, 200);
+  {% else %}
+  // Si no es edición, aplicar tema y actualizar número normalmente
   applyTheme(selTipo?.value || 'OT');
   updateDocumentNumber();
+  {% endif %}
+  
   serializeRows();
 
   clienteBusqueda?.addEventListener('input', (event)=> window.handleClienteInput(event.target.value));

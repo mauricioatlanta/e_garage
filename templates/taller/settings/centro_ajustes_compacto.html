@@ -198,16 +198,90 @@
         display: none !important;
     }
 
+    /* Responsive */
+    @media (max-width: 768px) {
+        .settings-container {
+            padding: 1rem 0.75rem;
+        }
+
+        .section-buttons-row {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+
+        .section-button {
+            padding: 1rem 1.25rem;
+            min-height: 44px;
+            font-size: 0.85rem;
+        }
+
+        .settings-section {
+            padding: 1.5rem 1rem;
+        }
+
+        .settings-section-header h3 {
+            font-size: 1.1rem;
+        }
+
+        .form-control,
+        .form-select,
+        textarea.form-control {
+            padding: 0.875rem;
+            min-height: 44px;
+            font-size: 16px; /* Evita zoom en iOS */
+        }
+
+        .btn-save {
+            width: 100%;
+            padding: 1rem;
+            min-height: 44px;
+        }
+
+        .tecnico-card {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .settings-container {
+            padding: 0.75rem 0.5rem;
+        }
+
+        h1.mb-3 {
+            font-size: 1rem !important;
+        }
+
+        .section-button {
+            padding: 0.875rem 1rem;
+            font-size: 0.8rem;
+        }
+
+        .settings-section {
+            padding: 1rem 0.75rem;
+        }
+
+        .settings-section-header h3 {
+            font-size: 1rem;
+        }
+
+        .form-label {
+            font-size: 0.8rem;
+        }
+    }
+
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="settings-container">
     <h1 class="mb-3" style="font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: .18em; font-size: 1.2rem;">
-        {% if request.LANGUAGE_CODE == 'es' %}⚙️ Centro de Ajustes{% else %}⚙️ Settings Center{% endif %}
+        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}⚙️ Centro de Ajustes{% else %}⚙️ Settings Center{% endif %}
     </h1>
     <p class="mb-4" style="color: var(--text-secondary);">
-        {% if request.LANGUAGE_CODE == 'es' %}Elige qué quieres editar. Solo se muestra una sección a la vez.{% else %}Choose what you want to edit. Only one section is shown at a time.{% endif %}
+        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Elige qué quieres editar. Solo se muestra una sección a la vez.{% else %}Choose what you want to edit. Only one section is shown at a time.{% endif %}
     </p>
 
     <!-- BOTONES DE NAVEGACIÓN (solo esto visible al principio) -->
@@ -218,7 +292,7 @@
                 onclick="openSettingsSection('profile')">
             <span>
                 <i class="fas fa-building"></i>
-                {% if request.LANGUAGE_CODE == 'es' %}INFORMACIÓN DE EMPRESA{% else %}COMPANY INFORMATION{% endif %}
+                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}INFORMACIÓN DE EMPRESA{% else %}COMPANY INFORMATION{% endif %}
             </span>
             <span class="arrow">
                 <i class="fas fa-chevron-down"></i>
@@ -231,7 +305,7 @@
                 onclick="openSettingsSection('financial')">
             <span>
                 <i class="fas fa-receipt"></i>
-                {% if request.LANGUAGE_CODE == 'es' %}IMPUESTOS Y FINANZAS{% else %}TAXES & FINANCE{% endif %}
+                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}IMPUESTOS Y FINANZAS{% else %}TAXES & FINANCE{% endif %}
             </span>
             <span class="arrow">
                 <i class="fas fa-chevron-down"></i>
@@ -244,7 +318,7 @@
                 onclick="openSettingsSection('theme')">
             <span>
                 <i class="fas fa-palette"></i>
-                {% if request.LANGUAGE_CODE == 'es' %}TEMA Y COLORES{% else %}THEME & COLORS{% endif %}
+                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}TEMA Y COLORES{% else %}THEME & COLORS{% endif %}
             </span>
             <span class="arrow">
                 <i class="fas fa-chevron-down"></i>
@@ -257,7 +331,7 @@
                 onclick="openSettingsSection('modules')">
             <span>
                 <i class="fas fa-industry"></i>
-                {% if request.LANGUAGE_CODE == 'es' %}RUBRO Y MÓDULOS{% else %}INDUSTRY & MODULES{% endif %}
+                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}RUBRO Y MÓDULOS{% else %}INDUSTRY & MODULES{% endif %}
             </span>
             <span class="arrow">
                 <i class="fas fa-chevron-down"></i>
@@ -270,7 +344,7 @@
                 onclick="openSettingsSection('employees')">
             <span>
                 <i class="fas fa-users"></i>
-                {% if request.LANGUAGE_CODE == 'es' %}GESTIÓN DE EMPLEADOS{% else %}EMPLOYEE MANAGEMENT{% endif %}
+                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}GESTIÓN DE EMPLEADOS{% else %}EMPLOYEE MANAGEMENT{% endif %}
             </span>
             <span class="arrow">
                 <i class="fas fa-chevron-down"></i>
@@ -281,7 +355,7 @@
     <!-- MENSAJE INICIAL -->
     <div id="settings-placeholder">
         <i class="fas fa-hand-pointer"></i>
-        <p class="mt-2">{% if request.LANGUAGE_CODE == 'es' %}Selecciona una sección para comenzar a editar tu configuración.{% else %}Select a section to start editing your settings.{% endif %}</p>
+        <p class="mt-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Selecciona una sección para comenzar a editar tu configuración.{% else %}Select a section to start editing your settings.{% endif %}</p>
     </div>
 
     <!-- CONTENEDOR DE SECCIÓN (solo UNA visible) -->
@@ -295,7 +369,7 @@
 
                 <div class="settings-section-header">
                     <i class="fas fa-building"></i>
-                    <h3>{% if request.LANGUAGE_CODE == 'es' %}Información de Empresa{% else %}Company Information{% endif %}</h3>
+                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Información de Empresa{% else %}Company Information{% endif %}</h3>
                 </div>
 
                 <div class="row g-3">
@@ -353,7 +427,7 @@
 
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-save">
-                        <i class="fas fa-save me-2"></i>{% if request.LANGUAGE_CODE == 'es' %}Guardar información{% else %}Save company info{% endif %}
+                        <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar información{% else %}Save company info{% endif %}
                     </button>
                 </div>
             </form>
@@ -367,7 +441,7 @@
 
                 <div class="settings-section-header">
                     <i class="fas fa-receipt"></i>
-                    <h3>{% if request.LANGUAGE_CODE == 'es' %}Impuestos y Finanzas{% else %}Taxes & Finance{% endif %}</h3>
+                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Impuestos y Finanzas{% else %}Taxes & Finance{% endif %}</h3>
                 </div>
 
                 <div class="row g-3">
@@ -394,7 +468,7 @@
 
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-save">
-                        <i class="fas fa-save me-2"></i>{% if request.LANGUAGE_CODE == 'es' %}Guardar configuración fiscal{% else %}Save financial settings{% endif %}
+                        <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar configuración fiscal{% else %}Save financial settings{% endif %}
                     </button>
                 </div>
             </form>
@@ -408,7 +482,7 @@
 
                 <div class="settings-section-header">
                     <i class="fas fa-palette"></i>
-                    <h3>{% if request.LANGUAGE_CODE == 'es' %}Tema y Colores{% else %}Theme & Colors{% endif %}</h3>
+                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tema y Colores{% else %}Theme & Colors{% endif %}</h3>
                 </div>
 
                 <div class="row g-3">
@@ -438,7 +512,7 @@
 
                 <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-save">
-                        <i class="fas fa-save me-2"></i>{% if request.LANGUAGE_CODE == 'es' %}Guardar tema{% else %}Save theme{% endif %}
+                        <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar tema{% else %}Save theme{% endif %}
                     </button>
                 </div>
             </form>
@@ -452,7 +526,7 @@
 
                 <div class="settings-section-header">
                     <i class="fas fa-industry"></i>
-                    <h3>{% if request.LANGUAGE_CODE == 'es' %}Rubro y módulos del documento{% else %}Industry & document modules{% endif %}</h3>
+                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Rubro y módulos del documento{% else %}Industry & document modules{% endif %}</h3>
                 </div>
 
                 <div class="row g-3">
@@ -468,7 +542,7 @@
                         <label class="form-label d-block">{{ rubro_form.usa_vehiculos.label }}</label>
                         <div class="form-check form-switch text-secondary">
                             {{ rubro_form.usa_vehiculos }}
-                            <span class="ms-2">{% if request.LANGUAGE_CODE == 'es' %}Mostrar selección de vehículos{% else %}Show vehicle selector{% endif %}</span>
+                            <span class="ms-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Mostrar selección de vehículos{% else %}Show vehicle selector{% endif %}</span>
                         </div>
                         {{ rubro_form.usa_vehiculos.errors }}
                     </div>
@@ -476,7 +550,7 @@
                         <label class="form-label d-block">{{ rubro_form.usa_servicios.label }}</label>
                         <div class="form-check form-switch text-secondary">
                             {{ rubro_form.usa_servicios }}
-                            <span class="ms-2">{% if request.LANGUAGE_CODE == 'es' %}Mostrar servicios internos{% else %}Show services section{% endif %}</span>
+                            <span class="ms-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Mostrar servicios internos{% else %}Show services section{% endif %}</span>
                         </div>
                         {{ rubro_form.usa_servicios.errors }}
                     </div>
@@ -484,7 +558,7 @@
                         <label class="form-label d-block">{{ rubro_form.usa_otros_servicios.label }}</label>
                         <div class="form-check form-switch text-secondary">
                             {{ rubro_form.usa_otros_servicios }}
-                            <span class="ms-2">{% if request.LANGUAGE_CODE == 'es' %}Activar servicios externos{% else %}Enable outsourced services{% endif %}</span>
+                            <span class="ms-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Activar servicios externos{% else %}Enable outsourced services{% endif %}</span>
                         </div>
                         {{ rubro_form.usa_otros_servicios.errors }}
                     </div>
@@ -492,7 +566,7 @@
                         <label class="form-label d-block">{{ rubro_form.usa_kilometraje.label }}</label>
                         <div class="form-check form-switch text-secondary">
                             {{ rubro_form.usa_kilometraje }}
-                            <span class="ms-2">{% if request.LANGUAGE_CODE == 'es' %}Solicitar kilometraje{% else %}Request mileage{% endif %}</span>
+                            <span class="ms-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Solicitar kilometraje{% else %}Request mileage{% endif %}</span>
                         </div>
                         {{ rubro_form.usa_kilometraje.errors }}
                     </div>
@@ -500,7 +574,7 @@
 
                 <div class="d-flex justify-content-end mt-4">
                     <button type="submit" class="btn btn-save">
-                        <i class="fas fa-save me-2"></i>{% if request.LANGUAGE_CODE == 'es' %}Guardar rubro y módulos{% else %}Save industry & modules{% endif %}
+                        <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar rubro y módulos{% else %}Save industry & modules{% endif %}
                     </button>
                 </div>
             </form>
@@ -510,7 +584,7 @@
         <div id="section-employees" class="settings-section">
             <div class="settings-section-header">
                 <i class="fas fa-users"></i>
-                <h3>{% if request.LANGUAGE_CODE == 'es' %}Gestión de Empleados{% else %}Employee Management{% endif %}</h3>
+                <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Gestión de Empleados{% else %}Employee Management{% endif %}</h3>
             </div>
 
             <!-- Formulario para crear técnico -->
@@ -518,21 +592,21 @@
                 {% csrf_token %}
                 <div class="row g-3">
                     <div class="col-md-4">
-                        <label class="form-label">{% if request.LANGUAGE_CODE == 'es' %}Nombre Completo *{% else %}Full Name *{% endif %}</label>
+                        <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Nombre Completo *{% else %}Full Name *{% endif %}</label>
                         <input type="text" name="nombre" class="form-control" required>
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">{% if request.LANGUAGE_CODE == 'es' %}Teléfono{% else %}Phone{% endif %}</label>
+                        <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Teléfono{% else %}Phone{% endif %}</label>
                         <input type="text" name="telefono" class="form-control">
                     </div>
                     <div class="col-md-4">
-                        <label class="form-label">{% if request.LANGUAGE_CODE == 'es' %}Dirección{% else %}Address{% endif %}</label>
+                        <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dirección{% else %}Address{% endif %}</label>
                         <input type="text" name="direccion" class="form-control">
                     </div>
                 </div>
                 <div class="d-flex justify-content-end mt-3">
                     <button type="submit" name="crear_tecnico" class="btn btn-save">
-                        <i class="fas fa-plus me-2"></i>{% if request.LANGUAGE_CODE == 'es' %}Agregar Empleado{% else %}Add Employee{% endif %}
+                        <i class="fas fa-plus me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Agregar Empleado{% else %}Add Employee{% endif %}
                     </button>
                 </div>
             </form>
@@ -540,7 +614,7 @@
             <!-- Lista de técnicos -->
             {% if tecnicos %}
                 <h5 class="mb-3" style="color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                    <i class="fas fa-list me-2"></i>{% if request.LANGUAGE_CODE == 'es' %}Empleados Registrados ({{ tecnicos|length }}){% else %}Registered Employees ({{ tecnicos|length }}){% endif %}
+                    <i class="fas fa-list me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Empleados Registrados ({{ tecnicos|length }}){% else %}Registered Employees ({{ tecnicos|length }}){% endif %}
                 </h5>
                 {% for tecnico in tecnicos %}
                     <div style="background: rgba(10, 14, 39, 0.6); border: 1px solid rgba(0, 255, 255, 0.2); border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
@@ -554,9 +628,9 @@
                             <input type="hidden" name="toggle_tecnico" value="{{ tecnico.id }}">
                             <button type="submit" class="btn btn-save" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
                                 {% if tecnico.activo %}
-                                    <i class="fas fa-ban me-1"></i>{% if request.LANGUAGE_CODE == 'es' %}Desactivar{% else %}Deactivate{% endif %}
+                                    <i class="fas fa-ban me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Desactivar{% else %}Deactivate{% endif %}
                                 {% else %}
-                                    <i class="fas fa-check me-1"></i>{% if request.LANGUAGE_CODE == 'es' %}Activar{% else %}Activate{% endif %}
+                                    <i class="fas fa-check me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Activar{% else %}Activate{% endif %}
                                 {% endif %}
                             </button>
                         </form>
@@ -564,7 +638,7 @@
                 {% endfor %}
             {% else %}
                 <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">
-                    <i class="fas fa-info-circle me-2"></i>{% if request.LANGUAGE_CODE == 'es' %}No hay empleados registrados. Agrega uno usando el formulario arriba.{% else %}No employees registered. Add one using the form above.{% endif %}
+                    <i class="fas fa-info-circle me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}No hay empleados registrados. Agrega uno usando el formulario arriba.{% else %}No employees registered. Add one using the form above.{% endif %}
                 </p>
             {% endif %}
         </div>

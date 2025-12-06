@@ -40,3 +40,6 @@ class HelpArticleAdmin(admin.ModelAdmin):
     )
 
     readonly_fields = ["creado", "actualizado", "visitas"]
+
+
+

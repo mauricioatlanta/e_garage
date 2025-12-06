@@ -1009,3 +1009,6 @@ class Command(BaseCommand):
                 f"Países procesados: {len(countries_to_process)}\n"
             )
         )
+
+
+

@@ -1392,3 +1392,6 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS(f"   - Categorías: {len(categorias_creadas)}"))
         self.stdout.write(self.style.SUCCESS(f"   - Artículos: {total_articulos}"))
         self.stdout.write(self.style.SUCCESS(f"\n🌐 Accede al Centro de Ayuda en: /help/"))
+
+
+

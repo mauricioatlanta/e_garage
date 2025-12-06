@@ -1,0 +1,772 @@
+{
+  "tabla": "taller_marca",
+  "columnas": [
+    "id",
+    "nombre",
+    "country"
+  ],
+  "tipos": [
+    "INTEGER",
+    "varchar(50)",
+    "varchar(2)"
+  ],
+  "filas": [
+    {
+      "id": 1,
+      "nombre": "Acura",
+      "country": "US"
+    },
+    {
+      "id": 2,
+      "nombre": "Audi",
+      "country": "US"
+    },
+    {
+      "id": 3,
+      "nombre": "BMW",
+      "country": "US"
+    },
+    {
+      "id": 4,
+      "nombre": "Buick",
+      "country": "US"
+    },
+    {
+      "id": 5,
+      "nombre": "Cadillac",
+      "country": "US"
+    },
+    {
+      "id": 6,
+      "nombre": "Chevrolet",
+      "country": "US"
+    },
+    {
+      "id": 7,
+      "nombre": "Chrysler",
+      "country": "US"
+    },
+    {
+      "id": 8,
+      "nombre": "Dodge",
+      "country": "US"
+    },
+    {
+      "id": 9,
+      "nombre": "Ford",
+      "country": "US"
+    },
+    {
+      "id": 10,
+      "nombre": "GMC",
+      "country": "US"
+    },
+    {
+      "id": 11,
+      "nombre": "Honda",
+      "country": "US"
+    },
+    {
+      "id": 12,
+      "nombre": "Hyundai",
+      "country": "US"
+    },
+    {
+      "id": 13,
+      "nombre": "Infiniti",
+      "country": "US"
+    },
+    {
+      "id": 14,
+      "nombre": "Jeep",
+      "country": "US"
+    },
+    {
+      "id": 15,
+      "nombre": "Kia",
+      "country": "US"
+    },
+    {
+      "id": 16,
+      "nombre": "Lexus",
+      "country": "US"
+    },
+    {
+      "id": 17,
+      "nombre": "Lincoln",
+      "country": "US"
+    },
+    {
+      "id": 18,
+      "nombre": "Mazda",
+      "country": "US"
+    },
+    {
+      "id": 19,
+      "nombre": "Mercedes-Benz",
+      "country": "US"
+    },
+    {
+      "id": 20,
+      "nombre": "Mitsubishi",
+      "country": "US"
+    },
+    {
+      "id": 21,
+      "nombre": "Nissan",
+      "country": "US"
+    },
+    {
+      "id": 22,
+      "nombre": "Ram",
+      "country": "US"
+    },
+    {
+      "id": 23,
+      "nombre": "Subaru",
+      "country": "US"
+    },
+    {
+      "id": 24,
+      "nombre": "Toyota",
+      "country": "US"
+    },
+    {
+      "id": 25,
+      "nombre": "Volkswagen",
+      "country": "US"
+    },
+    {
+      "id": 26,
+      "nombre": "Volvo",
+      "country": "US"
+    },
+    {
+      "id": 27,
+      "nombre": "Tesla",
+      "country": "US"
+    },
+    {
+      "id": 28,
+      "nombre": "Genesis",
+      "country": "US"
+    },
+    {
+      "id": 29,
+      "nombre": "Alfa Romeo",
+      "country": "US"
+    },
+    {
+      "id": 30,
+      "nombre": "Jaguar",
+      "country": "US"
+    },
+    {
+      "id": 31,
+      "nombre": "Land Rover",
+      "country": "US"
+    },
+    {
+      "id": 32,
+      "nombre": "Porsche",
+      "country": "US"
+    },
+    {
+      "id": 33,
+      "nombre": "Mini",
+      "country": "US"
+    },
+    {
+      "id": 34,
+      "nombre": "Fiat",
+      "country": "US"
+    },
+    {
+      "id": 35,
+      "nombre": "Maserati",
+      "country": "US"
+    },
+    {
+      "id": 36,
+      "nombre": "Bentley",
+      "country": "US"
+    },
+    {
+      "id": 37,
+      "nombre": "Rolls-Royce",
+      "country": "US"
+    },
+    {
+      "id": 38,
+      "nombre": "Aston Martin",
+      "country": "US"
+    },
+    {
+      "id": 39,
+      "nombre": "McLaren",
+      "country": "US"
+    },
+    {
+      "id": 40,
+      "nombre": "Ferrari",
+      "country": "US"
+    },
+    {
+      "id": 41,
+      "nombre": "Lamborghini",
+      "country": "US"
+    },
+    {
+      "id": 42,
+      "nombre": "Audi",
+      "country": "CL"
+    },
+    {
+      "id": 43,
+      "nombre": "BYD",
+      "country": "CL"
+    },
+    {
+      "id": 44,
+      "nombre": "Changan",
+      "country": "CL"
+    },
+    {
+      "id": 45,
+      "nombre": "Chery",
+      "country": "CL"
+    },
+    {
+      "id": 46,
+      "nombre": "Chevrolet",
+      "country": "CL"
+    },
+    {
+      "id": 47,
+      "nombre": "Citroën",
+      "country": "CL"
+    },
+    {
+      "id": 48,
+      "nombre": "Daihatsu",
+      "country": "CL"
+    },
+    {
+      "id": 49,
+      "nombre": "Fiat",
+      "country": "CL"
+    },
+    {
+      "id": 50,
+      "nombre": "Ford",
+      "country": "CL"
+    },
+    {
+      "id": 51,
+      "nombre": "Great Wall",
+      "country": "CL"
+    },
+    {
+      "id": 52,
+      "nombre": "Honda",
+      "country": "CL"
+    },
+    {
+      "id": 53,
+      "nombre": "Hyundai",
+      "country": "CL"
+    },
+    {
+      "id": 54,
+      "nombre": "Isuzu",
+      "country": "CL"
+    },
+    {
+      "id": 55,
+      "nombre": "JAC",
+      "country": "CL"
+    },
+    {
+      "id": 56,
+      "nombre": "Jeep",
+      "country": "CL"
+    },
+    {
+      "id": 57,
+      "nombre": "Kia",
+      "country": "CL"
+    },
+    {
+      "id": 58,
+      "nombre": "Mahindra",
+      "country": "CL"
+    },
+    {
+      "id": 59,
+      "nombre": "Mazda",
+      "country": "CL"
+    },
+    {
+      "id": 60,
+      "nombre": "Mercedes-Benz",
+      "country": "CL"
+    },
+    {
+      "id": 61,
+      "nombre": "MG",
+      "country": "CL"
+    },
+    {
+      "id": 62,
+      "nombre": "Mitsubishi",
+      "country": "CL"
+    },
+    {
+      "id": 63,
+      "nombre": "Nissan",
+      "country": "CL"
+    },
+    {
+      "id": 64,
+      "nombre": "Opel",
+      "country": "CL"
+    },
+    {
+      "id": 65,
+      "nombre": "Peugeot",
+      "country": "CL"
+    },
+    {
+      "id": 66,
+      "nombre": "Renault",
+      "country": "CL"
+    },
+    {
+      "id": 67,
+      "nombre": "SsangYong",
+      "country": "CL"
+    },
+    {
+      "id": 68,
+      "nombre": "Subaru",
+      "country": "CL"
+    },
+    {
+      "id": 69,
+      "nombre": "Suzuki",
+      "country": "CL"
+    },
+    {
+      "id": 70,
+      "nombre": "Toyota",
+      "country": "CL"
+    },
+    {
+      "id": 71,
+      "nombre": "Volkswagen",
+      "country": "CL"
+    },
+    {
+      "id": 72,
+      "nombre": "BMW",
+      "country": "CL"
+    },
+    {
+      "id": 73,
+      "nombre": "Chevrolet",
+      "country": "CO"
+    },
+    {
+      "id": 74,
+      "nombre": "Renault",
+      "country": "CO"
+    },
+    {
+      "id": 75,
+      "nombre": "Nissan",
+      "country": "CO"
+    },
+    {
+      "id": 76,
+      "nombre": "Mazda",
+      "country": "CO"
+    },
+    {
+      "id": 77,
+      "nombre": "Toyota",
+      "country": "CO"
+    },
+    {
+      "id": 78,
+      "nombre": "Hyundai",
+      "country": "CO"
+    },
+    {
+      "id": 79,
+      "nombre": "Kia",
+      "country": "CO"
+    },
+    {
+      "id": 80,
+      "nombre": "Suzuki",
+      "country": "CO"
+    },
+    {
+      "id": 81,
+      "nombre": "Mitsubishi",
+      "country": "CO"
+    },
+    {
+      "id": 82,
+      "nombre": "Honda",
+      "country": "CO"
+    },
+    {
+      "id": 83,
+      "nombre": "Volkswagen",
+      "country": "CO"
+    },
+    {
+      "id": 84,
+      "nombre": "Ford",
+      "country": "CO"
+    },
+    {
+      "id": 85,
+      "nombre": "BMW",
+      "country": "CO"
+    },
+    {
+      "id": 86,
+      "nombre": "Mercedes-Benz",
+      "country": "CO"
+    },
+    {
+      "id": 87,
+      "nombre": "Audi",
+      "country": "CO"
+    },
+    {
+      "id": 88,
+      "nombre": "Toyota",
+      "country": "PE"
+    },
+    {
+      "id": 89,
+      "nombre": "Nissan",
+      "country": "PE"
+    },
+    {
+      "id": 90,
+      "nombre": "Chevrolet",
+      "country": "PE"
+    },
+    {
+      "id": 91,
+      "nombre": "Hyundai",
+      "country": "PE"
+    },
+    {
+      "id": 92,
+      "nombre": "Kia",
+      "country": "PE"
+    },
+    {
+      "id": 93,
+      "nombre": "Mazda",
+      "country": "PE"
+    },
+    {
+      "id": 94,
+      "nombre": "Suzuki",
+      "country": "PE"
+    },
+    {
+      "id": 95,
+      "nombre": "Mitsubishi",
+      "country": "PE"
+    },
+    {
+      "id": 96,
+      "nombre": "Honda",
+      "country": "PE"
+    },
+    {
+      "id": 97,
+      "nombre": "Volkswagen",
+      "country": "PE"
+    },
+    {
+      "id": 98,
+      "nombre": "Renault",
+      "country": "PE"
+    },
+    {
+      "id": 99,
+      "nombre": "Peugeot",
+      "country": "PE"
+    },
+    {
+      "id": 100,
+      "nombre": "Fiat",
+      "country": "PE"
+    },
+    {
+      "id": 101,
+      "nombre": "BMW",
+      "country": "PE"
+    },
+    {
+      "id": 102,
+      "nombre": "Mercedes-Benz",
+      "country": "PE"
+    },
+    {
+      "id": 103,
+      "nombre": "Audi",
+      "country": "PE"
+    },
+    {
+      "id": 104,
+      "nombre": "Ford",
+      "country": "PE"
+    },
+    {
+      "id": 105,
+      "nombre": "Isuzu",
+      "country": "PE"
+    },
+    {
+      "id": 106,
+      "nombre": "Chevrolet",
+      "country": "EC"
+    },
+    {
+      "id": 107,
+      "nombre": "Toyota",
+      "country": "EC"
+    },
+    {
+      "id": 108,
+      "nombre": "Nissan",
+      "country": "EC"
+    },
+    {
+      "id": 109,
+      "nombre": "Hyundai",
+      "country": "EC"
+    },
+    {
+      "id": 110,
+      "nombre": "Kia",
+      "country": "EC"
+    },
+    {
+      "id": 111,
+      "nombre": "Mazda",
+      "country": "EC"
+    },
+    {
+      "id": 112,
+      "nombre": "Suzuki",
+      "country": "EC"
+    },
+    {
+      "id": 113,
+      "nombre": "Mitsubishi",
+      "country": "EC"
+    },
+    {
+      "id": 114,
+      "nombre": "Honda",
+      "country": "EC"
+    },
+    {
+      "id": 115,
+      "nombre": "Volkswagen",
+      "country": "EC"
+    },
+    {
+      "id": 116,
+      "nombre": "Renault",
+      "country": "EC"
+    },
+    {
+      "id": 117,
+      "nombre": "Ford",
+      "country": "EC"
+    },
+    {
+      "id": 118,
+      "nombre": "BMW",
+      "country": "EC"
+    },
+    {
+      "id": 119,
+      "nombre": "Mercedes-Benz",
+      "country": "EC"
+    },
+    {
+      "id": 120,
+      "nombre": "Audi",
+      "country": "EC"
+    },
+    {
+      "id": 121,
+      "nombre": "Volkswagen",
+      "country": "BR"
+    },
+    {
+      "id": 122,
+      "nombre": "Fiat",
+      "country": "BR"
+    },
+    {
+      "id": 123,
+      "nombre": "Chevrolet",
+      "country": "BR"
+    },
+    {
+      "id": 124,
+      "nombre": "Ford",
+      "country": "BR"
+    },
+    {
+      "id": 125,
+      "nombre": "Toyota",
+      "country": "BR"
+    },
+    {
+      "id": 126,
+      "nombre": "Renault",
+      "country": "BR"
+    },
+    {
+      "id": 127,
+      "nombre": "Hyundai",
+      "country": "BR"
+    },
+    {
+      "id": 128,
+      "nombre": "Honda",
+      "country": "BR"
+    },
+    {
+      "id": 129,
+      "nombre": "Nissan",
+      "country": "BR"
+    },
+    {
+      "id": 130,
+      "nombre": "Jeep",
+      "country": "BR"
+    },
+    {
+      "id": 131,
+      "nombre": "Peugeot",
+      "country": "BR"
+    },
+    {
+      "id": 132,
+      "nombre": "Citroën",
+      "country": "BR"
+    },
+    {
+      "id": 133,
+      "nombre": "BMW",
+      "country": "BR"
+    },
+    {
+      "id": 134,
+      "nombre": "Mercedes-Benz",
+      "country": "BR"
+    },
+    {
+      "id": 135,
+      "nombre": "Audi",
+      "country": "BR"
+    },
+    {
+      "id": 136,
+      "nombre": "Chevrolet",
+      "country": "VE"
+    },
+    {
+      "id": 137,
+      "nombre": "Ford",
+      "country": "VE"
+    },
+    {
+      "id": 138,
+      "nombre": "Toyota",
+      "country": "VE"
+    },
+    {
+      "id": 139,
+      "nombre": "Nissan",
+      "country": "VE"
+    },
+    {
+      "id": 140,
+      "nombre": "Hyundai",
+      "country": "VE"
+    },
+    {
+      "id": 141,
+      "nombre": "Kia",
+      "country": "VE"
+    },
+    {
+      "id": 142,
+      "nombre": "Mazda",
+      "country": "VE"
+    },
+    {
+      "id": 143,
+      "nombre": "Suzuki",
+      "country": "VE"
+    },
+    {
+      "id": 144,
+      "nombre": "Mitsubishi",
+      "country": "VE"
+    },
+    {
+      "id": 145,
+      "nombre": "Honda",
+      "country": "VE"
+    },
+    {
+      "id": 146,
+      "nombre": "Volkswagen",
+      "country": "VE"
+    },
+    {
+      "id": 147,
+      "nombre": "Renault",
+      "country": "VE"
+    },
+    {
+      "id": 148,
+      "nombre": "Peugeot",
+      "country": "VE"
+    },
+    {
+      "id": 149,
+      "nombre": "BMW",
+      "country": "VE"
+    },
+    {
+      "id": 150,
+      "nombre": "Mercedes-Benz",
+      "country": "VE"
+    },
+    {
+      "id": 151,
+      "nombre": "Audi",
+      "country": "VE"
+    }
+  ],
+  "total_registros": 151,
+  "timestamp": "2025-12-06T00:52:51.405339"
+}

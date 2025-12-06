@@ -69,3 +69,6 @@ django-cors-headers>=4.2.0  # Si necesitas CORS para API
 # ======================================================
 
 
+
+
+

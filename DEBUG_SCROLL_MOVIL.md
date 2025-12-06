@@ -165,3 +165,6 @@ if (window.innerWidth > 768) {
 Una vez tengamos eso, tendremos el archivo y línea exacta del problema y podremos arreglarlo en minutos.
 
 
+
+
+

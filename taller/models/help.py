@@ -77,3 +77,6 @@ class HelpArticle(models.Model):
         """Incrementa el contador de visitas"""
         self.visitas += 1
         self.save(update_fields=["visitas"])
+
+
+

@@ -1,158 +1,800 @@
 {% extends 'base.html' %}
 {% load i18n %}
 {% load country_url %}
-{% block title %}Clientes · eGarage{% endblock %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Centro de Operaciones de Clientes · eGarage{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --cyber-blue: #00ffff;
+    --cyber-green: #00ff88;
+    --cyber-purple: #8000ff;
+    --cyber-red: #ff0044;
+    --cyber-gold: #ffd700;
+    --cyber-orange: #ff8800;
+    --dark-bg: #0a0a0a;
+    --card-bg: rgba(16, 20, 24, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+  }
+
+  body {
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(2px 2px at 20% 30%, rgba(0, 230, 208, 0.2), transparent),
+      radial-gradient(2px 2px at 60% 70%, rgba(0, 255, 247, 0.15), transparent);
+    background-size: 200% 200%;
+    animation: particleMove 20s ease infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes particleMove {
+    0%, 100% { background-position: 0% 0%, 100% 100%; }
+    50% { background-position: 100% 0%, 0% 100%; }
+  }
+
+  .clientes-container {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+
+  /* Header futurista */
+  .header-section {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(20, 25, 50, 0.8) 100%);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    border: 2px solid rgba(0, 230, 208, 0.3);
+    backdrop-filter: blur(15px);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 247, 0.1), transparent);
+    animation: scan 3s linear infinite;
+  }
+
+  @keyframes scan {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+
+  .header-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #00fff7 0%, #00ff88 50%, #8000ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 0 30px rgba(0, 255, 247, 0.5);
+    margin-bottom: 0.5rem;
+  }
+
+  /* KPIs Grid */
+  .kpis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .kpi-card {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.9) 0%, rgba(20, 25, 50, 0.7) 100%);
+    border-radius: 16px;
+    padding: 1.25rem;
+    border: 2px solid rgba(0, 230, 208, 0.3);
+    backdrop-filter: blur(15px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--cyber-blue), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .kpi-card:hover {
+    border-color: #00fff7;
+    box-shadow: 0 8px 32px rgba(0, 230, 208, 0.3);
+    transform: translateY(-4px);
+  }
+
+  .kpi-card:hover::before {
+    opacity: 1;
+  }
+
+  .kpi-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    color: #b0b3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+
+  .kpi-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #00fff7;
+    text-shadow: 0 0 15px rgba(0, 255, 247, 0.5);
+  }
+
+  .kpi-icon {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    filter: drop-shadow(0 0 10px rgba(0, 255, 247, 0.5));
+  }
+
+  /* Filtros avanzados */
+  .filters-section {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.9) 0%, rgba(20, 25, 50, 0.7) 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 2px solid rgba(0, 230, 208, 0.3);
+    backdrop-filter: blur(15px);
+  }
+
+  .filter-form {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-items: end;
+  }
+
+  .filter-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .filter-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    color: #00fff7;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+
+  .filter-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 230, 208, 0.3);
+    border-radius: 8px;
+    padding: 0.75rem;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    transition: all 0.3s ease;
+  }
+
+  .filter-input:focus {
+    outline: none;
+    border-color: #00fff7;
+    box-shadow: 0 0 15px rgba(0, 255, 247, 0.3);
+  }
+
+  .btn-filter {
+    background: linear-gradient(135deg, #00fff7 0%, #00ff88 100%);
+    border: none;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .btn-filter:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 255, 247, 0.4);
+  }
+
+  /* Vista Cards */
+  .clientes-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .cliente-card {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(20, 25, 50, 0.8) 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 2px solid rgba(0, 230, 208, 0.3);
+    backdrop-filter: blur(15px);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cliente-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 100%;
+    background: linear-gradient(180deg, var(--cyber-blue), var(--cyber-purple));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .cliente-card:hover {
+    border-color: #00fff7;
+    box-shadow: 0 8px 32px rgba(0, 230, 208, 0.3);
+    transform: translateY(-4px);
+  }
+
+  .cliente-card:hover::before {
+    opacity: 1;
+  }
+
+  .cliente-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: start;
+    margin-bottom: 1rem;
+  }
+
+  .cliente-nombre {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #00fff7;
+    text-shadow: 0 0 10px rgba(0, 255, 247, 0.5);
+  }
+
+  .cliente-id {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--cyber-purple);
+    text-shadow: 0 0 8px rgba(128, 0, 255, 0.5);
+  }
+
+  .cliente-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .cliente-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    color: #b0b3b8;
+  }
+
+  .cliente-info-icon {
+    color: var(--cyber-blue);
+    width: 20px;
+    text-align: center;
+  }
+
+  .cliente-actions {
+    display: flex;
+    gap: 0.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 230, 208, 0.2);
+  }
+
+  .btn-action {
+    flex: 1;
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 230, 208, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem;
+    color: #00fff7;
+    text-decoration: none;
+    text-align: center;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    font-size: 0.85rem;
+  }
+
+  .btn-action:hover {
+    background: rgba(0, 255, 247, 0.1);
+    border-color: #00fff7;
+    box-shadow: 0 0 15px rgba(0, 255, 247, 0.3);
+  }
+
+  .btn-action.delete {
+    color: var(--cyber-red);
+    border-color: rgba(255, 0, 68, 0.3);
+  }
+
+  .btn-action.delete:hover {
+    background: rgba(255, 0, 68, 0.1);
+    border-color: var(--cyber-red);
+    box-shadow: 0 0 15px rgba(255, 0, 68, 0.3);
+  }
+
+  /* Vista Tabla */
+  .clientes-table-container {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(20, 25, 50, 0.8) 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    border: 2px solid rgba(0, 230, 208, 0.3);
+    backdrop-filter: blur(15px);
+    overflow-x: auto;
+  }
+
+  .clientes-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .clientes-table thead th {
+    background: rgba(0, 0, 0, 0.4);
+    color: #00fff7;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 2px solid rgba(0, 230, 208, 0.3);
+    text-shadow: 0 0 10px rgba(0, 255, 247, 0.5);
+  }
+
+  .clientes-table tbody td {
+    padding: 1rem;
+    color: #b0b3b8;
+    font-family: 'Rajdhani', sans-serif;
+    border-bottom: 1px solid rgba(0, 230, 208, 0.1);
+  }
+
+  .clientes-table tbody tr {
+    transition: all 0.3s ease;
+  }
+
+  .clientes-table tbody tr:hover {
+    background: rgba(0, 255, 247, 0.05);
+  }
+
+  /* Gráfico */
+  .chart-container {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.95) 0%, rgba(20, 25, 50, 0.8) 100%);
+    border-radius: 16px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+    border: 2px solid rgba(0, 230, 208, 0.3);
+    backdrop-filter: blur(15px);
+  }
+
+  .chart-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #00fff7;
+    margin-bottom: 1rem;
+    text-shadow: 0 0 10px rgba(0, 255, 247, 0.5);
+  }
+
+  /* Toggle de vista */
+  .view-toggle {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    justify-content: flex-end;
+  }
+
+  .btn-toggle {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(0, 230, 208, 0.3);
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    color: #00fff7;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+
+  .btn-toggle.active {
+    background: linear-gradient(135deg, #00fff7 0%, #00ff88 100%);
+    color: #000;
+    border-color: #00fff7;
+  }
+
+  .btn-toggle:hover {
+    border-color: #00fff7;
+    box-shadow: 0 0 15px rgba(0, 255, 247, 0.3);
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .clientes-container {
+      padding: 1rem;
+    }
+
+    .header-title {
+      font-size: 1.75rem;
+    }
+
+    .kpis-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .clientes-cards {
+      grid-template-columns: 1fr;
+    }
+
+    .filter-form {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="relative mx-auto max-w-7xl px-6 mt-10">
-  <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-    <div class="absolute -top-32 -left-20 w-96 h-96 bg-gradient-to-tr from-cyan-500 via-fuchsia-500 to-lime-400 opacity-20 blur-3xl rounded-full animate-pulse"></div>
-    <div class="absolute bottom-0 right-0 w-[34rem] h-[34rem] bg-gradient-to-tr from-fuchsia-500 via-cyan-400 to-emerald-400 opacity-10 blur-3xl rounded-full animate-spin-slow"></div>
-  </div>
-  <div class="flex flex-col md:flex-row md:items-center gap-6 mb-10">
-    <div>
-      <div class="flex items-center gap-3 mb-2">
-        <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-lime-300 to-fuchsia-400 drop-shadow">Gestión de Clientes</h1>
-        {% include "components/country_badge.html" %}
+<div class="clientes-container">
+  <!-- Header -->
+  <div class="header-section">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <div>
+        <h1 class="header-title">👥 Centro de Operaciones de Clientes</h1>
+        <p class="text-gray-400 font-rajdhani">Sistema de gestión y análisis avanzado de clientes</p>
       </div>
-      <p class="mt-2 text-gray-400 max-w-2xl text-sm md:text-base">Listado inteligente con búsqueda dinámica, paginación y acciones rápidas.</p>
-    </div>
-    <div class="md:ml-auto flex flex-col sm:flex-row gap-4 w-full md:w-auto">
-      <form method="get" class="flex-1 relative group">
-        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Buscar por nombre o apellido..." class="w-full bg-[#0f172a] border border-cyan-500/40 focus:border-cyan-400/70 rounded-xl px-5 py-3 text-cyan-100 placeholder-gray-500 shadow-lg focus:ring-2 focus:ring-cyan-400/40 transition outline-none font-mono" />
-        <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition"><i class="fas fa-search"></i></button>
-      </form>
-      <a href="{% country_url 'clientes:crear_cliente' %}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-lime-500 to-fuchsia-500 text-[#0d1117] font-bold shadow-lg hover:shadow-cyan-500/40 text-sm md:text-base tracking-wide hover:scale-[1.03] transition active:scale-95"><span>➕</span><span>Nuevo Cliente</span></a>
+      <div class="flex gap-3">
+        <a href="{% country_url 'clientes:crear_cliente' %}" class="btn-filter">
+          <i class="fas fa-plus"></i> Nuevo Cliente
+        </a>
+      </div>
     </div>
   </div>
-  <div class="relative rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-[#0d1117] via-[#0f172a] to-[#111827] shadow-2xl overflow-hidden">
-    <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-cyan-700/50 scrollbar-track-transparent">
-      <table class="w-full text-left text-sm md:text-base">
-        <thead class="bg-[#0e1a2b] uppercase text-xs tracking-wider font-semibold">
-          <tr>
-            <th class="px-5 py-4" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">ID</th>
-            <th class="px-5 py-4" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">Nombre</th>
-            <th class="px-5 py-4 hidden md:table-cell" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">Email</th>
-            <th class="px-5 py-4 hidden md:table-cell" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">Teléfono</th>
-            <th class="px-5 py-4 hidden xl:table-cell" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">Ciudad</th>
-            <th class="px-5 py-4" style="color: #00f3ff !important; text-shadow: 0 0 20px rgba(0, 243, 255, 1), 0 0 40px rgba(0, 243, 255, 0.8), 0 0 60px rgba(0, 243, 255, 0.6);">Acciones</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-cyan-900/40">
-          {% for cliente in cliente_list %}
-            <tr class="hover:bg-cyan-500/10 transition group">
-              <td class="px-5 py-4 font-mono text-cyan-300">#{{ cliente.pk }}</td>
-              <td class="px-5 py-4">
-                <div class="flex flex-col">
-                  <span class="font-semibold text-cyan-100 group-hover:text-lime-200 transition">{{ cliente.nombre }} {{ cliente.apellido }}</span>
-                  <span class="md:hidden text-xs text-gray-400">{{ cliente.email }}</span>
-                </div>
-              </td>
-              <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ cliente.email|default:'—' }}</td>
-              <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ cliente.telefono|default:'—' }}</td>
-              <td class="px-5 py-4 hidden xl:table-cell text-gray-300">{% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}—{% endif %}</td>
-              <td class="px-5 py-4">
-                <div class="flex items-center gap-3">
-                  <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="Ver">
-                    <i class="fas fa-eye"></i>
-                  </a>
-                  <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="text-cyan-300 hover:text-lime-300 transition" title="Editar">
-                    <i class="fas fa-edit"></i>
-                  </a>
-                  <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" class="text-red-400 hover:text-red-300 transition" title="Eliminar" >
-                    <i class="fas fa-trash"></i>
-                  </a>
-                </div>
-              </td>
-            </tr>
-          {% empty %}
-            <tr>
-              <td colspan="6" class="px-5 py-12 text-center text-gray-400">No hay clientes registrados.</td>
-            </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-    </div>
 
-    <!-- Paginación -->
-    {% if is_paginated %}
-    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-5 bg-[#0e1a2b]/60 border-t border-cyan-900/40">
-      <div class="text-xs text-gray-400 font-mono">
-        Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }} registros
+  <!-- KPIs -->
+  <div class="kpis-grid">
+    <div class="kpi-card">
+      <div class="kpi-icon">👥</div>
+      <div class="kpi-label">Total Clientes</div>
+      <div class="kpi-value">{{ estadisticas.total|default:0|intcomma }}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🚗</div>
+      <div class="kpi-label">Con Vehículos</div>
+      <div class="kpi-value">{{ estadisticas.con_vehiculos|default:0|intcomma }}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">📧</div>
+      <div class="kpi-label">Con Email</div>
+      <div class="kpi-value">{{ estadisticas.con_email|default:0|intcomma }}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">📱</div>
+      <div class="kpi-label">Con Teléfono</div>
+      <div class="kpi-value">{{ estadisticas.con_telefono|default:0|intcomma }}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">🆕</div>
+      <div class="kpi-label">Nuevos (30 días)</div>
+      <div class="kpi-value">{{ estadisticas.nuevos_30_dias|default:0|intcomma }}</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-icon">⚡</div>
+      <div class="kpi-label">Activos (90 días)</div>
+      <div class="kpi-value">{{ clientes_activos|default:0|intcomma }}</div>
+    </div>
+  </div>
+
+  <!-- Gráfico -->
+  <div class="chart-container">
+    <div class="chart-title">📈 Clientes Nuevos por Mes (Últimos 6 Meses)</div>
+    <canvas id="clientesChart" height="80"></canvas>
+  </div>
+
+  {{ datos_grafico|json_script:"datosGrafico" }}
+
+  <!-- Filtros -->
+  <div class="filters-section">
+    <form method="get" class="filter-form">
+      <div class="filter-group">
+        <label class="filter-label">Buscar</label>
+        <input type="text" name="q" value="{{ request.GET.q }}" placeholder="Nombre, email, teléfono..." class="filter-input">
       </div>
-      <div class="flex items-center gap-2">
-        {% if page_obj.has_previous %}
-          <a href="?q={{ request.GET.q }}&page=1" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">««</a>
-          <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">«</a>
-        {% else %}
-          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">««</span>
-          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">«</span>
+      <div class="filter-group">
+        <button type="submit" class="btn-filter">
+          <i class="fas fa-search"></i> Buscar
+        </button>
+      </div>
+      <div class="filter-group">
+        <a href="{% country_url 'clientes:lista_clientes' %}" class="btn-filter" style="text-decoration: none; display: block; text-align: center;">
+          <i class="fas fa-redo"></i> Limpiar
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Toggle de Vista -->
+  <div class="view-toggle">
+    <button class="btn-toggle active" onclick="showCards()">
+      <i class="fas fa-th"></i> Vista Cards
+    </button>
+    <button class="btn-toggle" onclick="showTable()">
+      <i class="fas fa-table"></i> Vista Tabla
+    </button>
+  </div>
+
+  <!-- Vista Cards -->
+  <div id="cards-view" class="clientes-cards">
+    {% for cliente in cliente_list %}
+    <div class="cliente-card">
+      <div class="cliente-header">
+        <div>
+          <div class="cliente-nombre">{{ cliente.nombre }} {{ cliente.apellido }}</div>
+          <div class="cliente-id">#{{ cliente.pk }}</div>
+        </div>
+      </div>
+      <div class="cliente-info">
+        {% if cliente.email %}
+        <div class="cliente-info-item">
+          <i class="fas fa-envelope cliente-info-icon"></i>
+          <span>{{ cliente.email }}</span>
+        </div>
         {% endif %}
-
-        <span class="px-4 py-1 rounded-lg bg-cyan-600/20 text-cyan-200 font-semibold tracking-wider text-xs">
-          {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
-        </span>
-
-        {% if page_obj.has_next %}
-          <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»</a>
-          <a href="?q={{ request.GET.q }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»»</a>
-        {% else %}
-          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»</span>
-          <span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»»</span>
+        {% if cliente.telefono %}
+        <div class="cliente-info-item">
+          <i class="fas fa-phone cliente-info-icon"></i>
+          <span>{{ cliente.telefono }}</span>
+        </div>
+        {% endif %}
+        {% if cliente.ciudad or cliente.ciudad_usa %}
+        <div class="cliente-info-item">
+          <i class="fas fa-map-marker-alt cliente-info-icon"></i>
+          <span>
+            {% if cliente.empresa.pais == 'US' %}
+              {% if cliente.ciudad_usa %}{{ cliente.ciudad_usa }}, {{ cliente.estado_usa }}{% else %}—{% endif %}
+            {% else %}
+              {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}—{% endif %}
+            {% endif %}
+          </span>
+        </div>
         {% endif %}
       </div>
+      <div class="cliente-actions">
+        <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="btn-action">
+          <i class="fas fa-eye"></i> Ver
+        </a>
+        <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="btn-action">
+          <i class="fas fa-edit"></i> Editar
+        </a>
+        <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
+           class="btn-action delete"
+           onclick="return confirm('¿Eliminar cliente {{ cliente.nombre }} {{ cliente.apellido }}?')">
+          <i class="fas fa-trash"></i> Eliminar
+        </a>
+      </div>
     </div>
-    {% endif %}
+    {% empty %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; color: #b0b3b8;">
+      <i class="fas fa-users" style="font-size: 4rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+      <p style="font-family: 'Rajdhani', sans-serif; font-size: 1.25rem;">No se encontraron clientes</p>
+    </div>
+    {% endfor %}
   </div>
+
+  <!-- Vista Tabla -->
+  <div id="table-view" class="clientes-table-container" style="display: none;">
+    <table class="clientes-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nombre</th>
+          <th>Email</th>
+          <th>Teléfono</th>
+          <th>Ciudad</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for cliente in cliente_list %}
+        <tr>
+          <td style="font-family: 'Share Tech Mono', monospace; color: var(--cyber-purple);">#{{ cliente.pk }}</td>
+          <td style="color: #00fff7; font-weight: 600;">{{ cliente.nombre }} {{ cliente.apellido }}</td>
+          <td>{{ cliente.email|default:'—' }}</td>
+          <td>{{ cliente.telefono|default:'—' }}</td>
+          <td>
+            {% if cliente.empresa.pais == 'US' %}
+              {% if cliente.ciudad_usa %}{{ cliente.ciudad_usa }}, {{ cliente.estado_usa }}{% else %}—{% endif %}
+            {% else %}
+              {% if cliente.ciudad %}{{ cliente.ciudad.nombre }}{% else %}—{% endif %}
+            {% endif %}
+          </td>
+          <td>
+            <div style="display: flex; gap: 0.5rem;">
+              <a href="{% country_url 'clientes:ver_cliente' cliente.pk %}" class="btn-action" style="padding: 0.25rem 0.5rem;">
+                <i class="fas fa-eye"></i>
+              </a>
+              <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="btn-action" style="padding: 0.25rem 0.5rem;">
+                <i class="fas fa-edit"></i>
+              </a>
+              <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
+                 class="btn-action delete" 
+                 style="padding: 0.25rem 0.5rem;"
+                 onclick="return confirm('¿Eliminar cliente {{ cliente.nombre }} {{ cliente.apellido }}?')">
+                <i class="fas fa-trash"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 3rem; color: #b0b3b8;">
+            No se encontraron clientes
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Paginación -->
+  {% if is_paginated %}
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding: 1rem; background: rgba(0, 0, 0, 0.4); border-radius: 12px; border: 1px solid rgba(0, 230, 208, 0.3);">
+    <div style="font-family: 'Rajdhani', sans-serif; color: #b0b3b8; font-size: 0.9rem;">
+      Mostrando {{ page_obj.start_index }} - {{ page_obj.end_index }} de {{ page_obj.paginator.count }}
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      {% if page_obj.has_previous %}
+        <a href="?q={{ request.GET.q }}&page=1" class="btn-action" style="padding: 0.5rem 1rem;">
+          <i class="fas fa-angle-double-left"></i>
+        </a>
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.previous_page_number }}" class="btn-action" style="padding: 0.5rem 1rem;">
+          <i class="fas fa-angle-left"></i>
+        </a>
+      {% endif %}
+      <span class="btn-action active" style="padding: 0.5rem 1rem; background: linear-gradient(135deg, #00fff7 0%, #00ff88 100%); color: #000;">
+        {{ page_obj.number }} / {{ page_obj.paginator.num_pages }}
+      </span>
+      {% if page_obj.has_next %}
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.next_page_number }}" class="btn-action" style="padding: 0.5rem 1rem;">
+          <i class="fas fa-angle-right"></i>
+        </a>
+        <a href="?q={{ request.GET.q }}&page={{ page_obj.paginator.num_pages }}" class="btn-action" style="padding: 0.5rem 1rem;">
+          <i class="fas fa-angle-double-right"></i>
+        </a>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
 </div>
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
-<style>
-@keyframes spin-slow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-.animate-spin-slow {
-  animation: spin-slow 30s linear infinite;
-}
-.scrollbar-thin::-webkit-scrollbar {
-  height: 10px;
-  width: 10px;
-}
-.scrollbar-thin::-webkit-scrollbar-track {
-  background: transparent;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb {
-  background: #164159;
-  border-radius: 6px;
-}
-.scrollbar-thin::-webkit-scrollbar-thumb:hover {
-  background: #1d5a79;
-}
-
-/* Forzar títulos de la tabla a color blanco - Sobrescribir CSS global */
-table thead th,
-thead th,
-th[class*="px-5"] {
-  color: #ffffff !important;
-}
-
-/* Sobrescribir cualquier CSS global que fuerce color negro en thead */
-.bg-\[#0e1a2b\] th,
-table thead.bg-\[#0e1a2b\] th,
-table thead th,
-thead tr th {
-  color: #ffffff !important;
-}
-
-/* Asegurar que todos los th dentro del thead sean blancos */
-table thead th[class*="py-4"] {
-  color: #ffffff !important;
-}
-</style>
-
 <script>
-function confirmarEliminacion(nombre) {
-  return confirm('¿Estás seguro de que deseas eliminar al cliente "' + nombre + '"? Esta acción no se puede deshacer.');
+// Gráfico de clientes nuevos
+const ctx = document.getElementById('clientesChart');
+if (ctx) {
+  const datosScript = document.getElementById('datosGrafico');
+  const datos = datosScript ? JSON.parse(datosScript.textContent) : [];
+  new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: datos.map(d => d.mes),
+      datasets: [{
+        label: 'Clientes Nuevos',
+        data: datos.map(d => d.cantidad),
+        borderColor: '#00fff7',
+        backgroundColor: 'rgba(0, 255, 247, 0.1)',
+        borderWidth: 3,
+        fill: true,
+        tension: 0.4,
+        pointBackgroundColor: '#00fff7',
+        pointBorderColor: '#00fff7',
+        pointRadius: 6,
+        pointHoverRadius: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          display: true,
+          labels: {
+            color: '#00fff7',
+            font: {
+              family: 'Orbitron',
+              size: 12
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            color: '#b0b3b8',
+            font: {
+              family: 'Rajdhani'
+            }
+          },
+          grid: {
+            color: 'rgba(0, 255, 247, 0.1)'
+          }
+        },
+        x: {
+          ticks: {
+            color: '#b0b3b8',
+            font: {
+              family: 'Rajdhani'
+            }
+          },
+          grid: {
+            color: 'rgba(0, 255, 247, 0.1)'
+          }
+        }
+      }
+    }
+  });
+}
+
+// Toggle de vista
+function showCards() {
+  document.getElementById('cards-view').style.display = 'grid';
+  document.getElementById('table-view').style.display = 'none';
+  document.querySelectorAll('.btn-toggle')[0].classList.add('active');
+  document.querySelectorAll('.btn-toggle')[1].classList.remove('active');
+  localStorage.setItem('clientes-view-mode', 'cards');
+}
+
+function showTable() {
+  document.getElementById('cards-view').style.display = 'none';
+  document.getElementById('table-view').style.display = 'block';
+  document.querySelectorAll('.btn-toggle')[0].classList.remove('active');
+  document.querySelectorAll('.btn-toggle')[1].classList.add('active');
+  localStorage.setItem('clientes-view-mode', 'table');
+}
+
+// Cargar preferencia guardada
+const savedView = localStorage.getItem('clientes-view-mode');
+if (savedView === 'table') {
+  showTable();
+} else {
+  showCards();
 }
 </script>
 {% endblock %}

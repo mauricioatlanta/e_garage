@@ -177,3 +177,6 @@ touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
 
 **Ahora sabrás EXACTAMENTE qué template estás viendo! 🎨**
 
+
+
+

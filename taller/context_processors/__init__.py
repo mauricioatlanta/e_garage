@@ -56,6 +56,27 @@ def company_branding(request):
     from taller.models.empresa import Empresa
 
     user = getattr(request, "user", None)
+    
+    # Si estamos en la página raíz o de selección de país, siempre usar "eGarage"
+    if request.path == '/' or request.path == '' or 'seleccionar_pais' in request.path:
+        brand = {
+            "logo_url": getattr(settings, "DEFAULT_BRAND_LOGO_URL", None),
+            "name": "eGarage",
+            "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Control total para tu taller"),
+            "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
+            "currency": getattr(settings, "DEFAULT_BRAND_CURRENCY", "CLP"),
+            "primary_color": getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#0d6efd"),
+            "secondary_color": getattr(settings, "DEFAULT_BRAND_SECONDARY_COLOR", "#6c757d"),
+        }
+        return {
+            "BRAND": brand,
+            "company_name": "eGarage",
+            "company_logo_url": brand["logo_url"],
+            "company_tagline": brand.get("tagline"),
+            "primary_color": brand["primary_color"],
+            "secondary_color": brand["secondary_color"],
+            "company_color": brand["primary_color"],
+        }
 
     # Defaults del sistema
     brand = {

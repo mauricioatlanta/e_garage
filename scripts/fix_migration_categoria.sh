@@ -87,3 +87,6 @@ echo "  python manage.py check"
 echo "  python manage.py showmigrations"
 
 
+
+
+

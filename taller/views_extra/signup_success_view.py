@@ -28,3 +28,6 @@ def signup_success_view(request):
     }
 
     return render(request, "account/signup_success.html", context)
+
+
+

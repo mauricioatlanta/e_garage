@@ -26,3 +26,6 @@ RESPONSABLE_LABEL_POR_RUBRO = {
 
 # Etiqueta por defecto si el rubro no está en el mapa
 DEFAULT_RESPONSABLE_LABEL = "Responsable"
+
+
+

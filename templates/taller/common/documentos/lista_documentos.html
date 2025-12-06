@@ -5,14 +5,15 @@
 {% load money %}
 {% load i18n %}
 
-{% block page_title %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Management{% else %}Gestión de Documentos{% endif %}{% endblock %}
-{% block page_subtitle %}{{ empresa.nombre_taller }} - {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Workshop Document List{% else %}Lista de Documentos del Taller{% endif %}{% endblock %}
+{% block page_title %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Control Center{% else %}Centro de Control de Documentos{% endif %}{% endblock %}
+{% block page_subtitle %}{{ empresa.nombre_taller }} - {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Workshop Document Control Center{% else %}Centro de Control de Documentos del Taller{% endif %}{% endblock %}
 {% block page_icon %}📄{% endblock %}
 
 {% block page_extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 <style>
-/* 🎨 Estilo futurista para lista de documentos */
-:root {
+  :root {
     --cyber-blue: #00ffff;
     --cyber-green: #00ff88;
     --cyber-purple: #8000ff;
@@ -22,473 +23,1338 @@
     --dark-bg: #0a0a0a;
     --card-bg: rgba(16, 20, 24, 0.95);
     --glass-bg: rgba(255, 255, 255, 0.05);
-}
+  }
 
-.cyber-container {
-    background: var(--card-bg);
-    border: 1px solid var(--cyber-blue);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
-}
+  body {
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+    position: relative;
+    overflow-x: hidden;
+  }
 
-.document-card {
-    background: linear-gradient(145deg, var(--glass-bg), rgba(0, 255, 255, 0.05));
-    border: 1px solid var(--cyber-blue);
-    border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 1rem;
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      radial-gradient(2px 2px at 20% 30%, rgba(0, 230, 208, 0.2), transparent),
+      radial-gradient(2px 2px at 60% 70%, rgba(0, 255, 247, 0.15), transparent);
+    background-size: 200% 200%;
+    animation: particleMove 20s ease infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes particleMove {
+    0%, 100% { background-position: 0% 0%, 100% 100%; }
+    50% { background-position: 100% 0%, 0% 100%; }
+  }
+
+  .documentos-container {
+    position: relative;
+    z-index: 1;
+    padding: 2rem;
+    max-width: 1800px;
+    margin: 0 auto;
+  }
+
+  /* KPIs mejorados */
+  .kpis-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+
+  .kpi-card {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.9) 0%, rgba(20, 25, 50, 0.7) 100%);
+    border-radius: 16px;
+    padding: 1.25rem;
+    border: 2px solid rgba(0, 230, 208, 0.3);
+    backdrop-filter: blur(15px);
     transition: all 0.3s ease;
+  }
+
+  .kpi-card:hover {
+    border-color: #00fff7;
+    box-shadow: 0 8px 32px rgba(0, 230, 208, 0.3);
+    transform: translateY(-4px);
+  }
+
+  .kpi-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    color: #b0b3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+  }
+
+  .kpi-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: #00fff7;
+    text-shadow: 0 0 15px rgba(0, 255, 247, 0.5);
+  }
+
+  .kpi-subvalue {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    color: #00e6d0;
+    margin-top: 0.25rem;
+  }
+
+  /* Toggle de vista */
+  .view-toggle {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .toggle-view-btn {
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, rgba(0, 230, 208, 0.2) 0%, rgba(0, 255, 247, 0.2) 100%);
+    border: 2px solid rgba(0, 255, 247, 0.3);
+    border-radius: 12px;
+    color: #00fff7;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .toggle-view-btn:hover,
+  .toggle-view-btn.active {
+    background: linear-gradient(135deg, rgba(0, 230, 208, 0.4) 0%, rgba(0, 255, 247, 0.4) 100%);
+    border-color: #00fff7;
+    box-shadow: 0 0 20px rgba(0, 255, 247, 0.4);
+  }
+
+  /* Filtros funcionales */
+  .filtros-section {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.8) 0%, rgba(20, 25, 50, 0.6) 100%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 2px solid rgba(0, 230, 208, 0.3);
+    backdrop-filter: blur(15px);
+    margin-bottom: 2rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .filtros-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 1rem;
+  }
+
+  .filtro-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .filtro-label {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.85rem;
+    color: #00e6d0;
+    margin-bottom: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .filtro-input {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(0, 230, 208, 0.3);
+    border-radius: 10px;
+    padding: 0.75rem;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+  }
+
+  .filtro-input:focus {
+    outline: none;
+    border-color: #00fff7;
+    box-shadow: 0 0 15px rgba(0, 255, 247, 0.3);
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  /* Secciones por tipo de documento */
+  .documentos-por-tipo {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    margin-bottom: 2rem;
+  }
+
+  .tipo-seccion {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.6) 0%, rgba(20, 25, 50, 0.4) 100%);
+    border-radius: 24px;
+    padding: 2rem;
+    border: 2px solid rgba(0, 230, 208, 0.2);
+    backdrop-filter: blur(15px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+
+  .tipo-seccion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(0, 230, 208, 0.3);
+  }
+
+  .tipo-seccion-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #00fff7;
+    text-shadow: 0 0 15px rgba(0, 255, 247, 0.5);
+  }
+
+  .tipo-seccion-icon {
+    font-size: 2rem;
+    filter: drop-shadow(0 0 10px rgba(0, 255, 247, 0.6));
+  }
+
+  .tipo-seccion-count {
+    font-family: 'Rajdhani', sans-serif;
+    font-size: 1rem;
+    color: #b0b3b8;
+    background: rgba(0, 230, 208, 0.2);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    border: 1px solid rgba(0, 230, 208, 0.3);
+  }
+
+  .tipo-seccion-count strong {
+    color: #00fff7;
+    font-size: 1.2rem;
+  }
+
+  /* Grid de documentos (vista cards) */
+  .documentos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* Colores específicos por tipo */
+  .tipo-seccion[data-tipo="FAC"] {
+    border-color: rgba(0, 255, 136, 0.3);
+  }
+
+  .tipo-seccion[data-tipo="FAC"] .tipo-seccion-title {
+    color: #00ff88;
+    text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+  }
+
+  .tipo-seccion[data-tipo="OT"] {
+    border-color: rgba(0, 230, 208, 0.3);
+  }
+
+  .tipo-seccion[data-tipo="OT"] .tipo-seccion-title {
+    color: #00e6d0;
+    text-shadow: 0 0 15px rgba(0, 230, 208, 0.5);
+  }
+
+  .tipo-seccion[data-tipo="PRES"] {
+    border-color: rgba(255, 136, 0, 0.3);
+  }
+
+  .tipo-seccion[data-tipo="PRES"] .tipo-seccion-title {
+    color: #ff8800;
+    text-shadow: 0 0 15px rgba(255, 136, 0, 0.5);
+  }
+
+  .documento-card {
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.9) 0%, rgba(20, 25, 50, 0.7) 100%);
+    border-radius: 20px;
+    padding: 1.5rem;
+    border: 2px solid rgba(0, 230, 208, 0.3);
+    backdrop-filter: blur(15px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     position: relative;
     overflow: hidden;
-}
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    min-height: 100%;
+    box-sizing: border-box;
+  }
+  
+  .documento-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+    cursor: pointer;
+    position: relative;
+  }
+  
+  .documento-card-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
 
-.document-card:hover {
-    border-color: var(--cyber-green);
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
-    transform: translateY(-2px);
-}
-
-.document-card::before {
+  .documento-card-link::before {
     content: '';
     position: absolute;
     top: 0;
     left: -100%;
     width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+    height: calc(100% - 80px);
+    background: linear-gradient(90deg, transparent, rgba(0, 255, 247, 0.08), transparent);
     transition: left 0.5s;
-}
+    pointer-events: none;
+  }
 
-.document-card:hover::before {
+  .documento-card:hover .documento-card-link::before {
     left: 100%;
-}
+  }
 
-.document-header {
+  .documento-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    border-color: #00fff7;
+    box-shadow: 0 20px 60px rgba(0, 230, 208, 0.4), 0 0 40px rgba(0, 255, 247, 0.3);
+  }
+
+  .documento-card-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 1rem;
-}
+    position: relative;
+    z-index: 1;
+  }
 
-.document-title {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: var(--cyber-blue);
-    text-shadow: 0 0 10px var(--cyber-blue);
-}
-
-.document-status {
-    padding: 4px 12px;
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.status-pendiente { background: var(--cyber-orange); color: #000; }
-.status-proceso { background: var(--cyber-blue); color: #000; }
-.status-completado { background: var(--cyber-green); color: #000; }
-.status-cancelado { background: var(--cyber-red); color: #fff; }
-
-.document-info {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    margin-bottom: 1rem;
-}
-
-.info-item {
+  .documento-tipo {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #00e6d0;
+    text-shadow: 0 0 10px rgba(0, 230, 208, 0.5);
     display: flex;
-    flex-direction: column;
-}
+    align-items: center;
+    gap: 0.5rem;
+  }
 
-.info-label {
-    color: #b0b8c1;
-    font-size: 0.8rem;
+  .documento-estado {
+    padding: 0.4rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .estado-emitido {
+    background: linear-gradient(135deg, #00ff88 0%, #00e6d0 100%);
+    color: #000;
+  }
+
+  .estado-borrador {
+    background: linear-gradient(135deg, #ff8800 0%, #ffaa00 100%);
+    color: #000;
+  }
+
+  .estado-anulado {
+    background: linear-gradient(135deg, #ff0044 0%, #ff6666 100%);
+    color: #fff;
+  }
+
+  .documento-numero {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.9rem;
+    color: #b0b3b8;
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .documento-info {
+    margin-bottom: 1rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+    font-size: 0.9rem;
+  }
+
+  .info-icon {
+    font-size: 1rem;
+    color: #00e6d0;
+    filter: drop-shadow(0 0 5px rgba(0, 230, 208, 0.5));
+    width: 20px;
+    text-align: center;
+  }
+
+  .info-text {
+    color: #b0b3b8;
+    flex: 1;
+  }
+
+  .info-text strong {
+    color: #fff;
+  }
+
+  /* Badge de edad del documento */
+  .edad-badge {
+    display: inline-block;
+    padding: 0.25rem 0.6rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-left: 0.5rem;
+  }
+
+  .edad-normal {
+    background: rgba(0, 230, 208, 0.2);
+    color: #00e6d0;
+    border: 1px solid rgba(0, 230, 208, 0.3);
+  }
+
+  .edad-alerta {
+    background: rgba(255, 136, 0, 0.2);
+    color: #ff8800;
+    border: 1px solid rgba(255, 136, 0, 0.3);
+  }
+
+  .edad-critica {
+    background: rgba(255, 0, 68, 0.2);
+    color: #ff4466;
+    border: 1px solid rgba(255, 0, 68, 0.3);
+  }
+
+  /* Estado de pago */
+  .pago-badge {
+    display: inline-block;
+    padding: 0.3rem 0.7rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    margin-top: 0.5rem;
+  }
+
+  .pago-pagado {
+    background: linear-gradient(135deg, #00ff88 0%, #00e6d0 100%);
+    color: #000;
+  }
+
+  .pago-parcial {
+    background: linear-gradient(135deg, #ffaa00 0%, #ff8800 100%);
+    color: #000;
+  }
+
+  .pago-pendiente {
+    background: linear-gradient(135deg, #ff0044 0%, #ff6666 100%);
+    color: #fff;
+  }
+
+  .documento-total {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 230, 208, 0.2);
+    position: relative;
+    z-index: 1;
+  }
+
+  .total-label {
+    font-size: 0.75rem;
+    color: #b0b3b8;
     text-transform: uppercase;
     letter-spacing: 1px;
     margin-bottom: 0.25rem;
-}
+  }
 
-.info-value {
-    color: #ffffff;
-    font-weight: bold;
-    font-size: 0.9rem;
-}
+  .total-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #00fff7;
+    text-shadow: 0 0 15px rgba(0, 255, 247, 0.6);
+  }
 
-.document-actions {
+  .documento-acciones {
     display: flex;
     gap: 0.5rem;
     flex-wrap: wrap;
-}
-
-.action-button {
-    background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green));
-    border: none;
-    border-radius: 20px;
-    padding: 8px 16px;
-    color: #000;
-    font-weight: bold;
-    text-decoration: none;
-    font-size: 0.8rem;
-    transition: all 0.3s ease;
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 230, 208, 0.2);
     position: relative;
-    overflow: hidden;
-}
-
-.action-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
-    color: #000;
-    text-decoration: none;
-}
-
-.action-button.secondary {
-    background: linear-gradient(45deg, var(--cyber-purple), var(--cyber-orange));
-}
-
-.action-button.danger {
-    background: linear-gradient(45deg, var(--cyber-red), #ff6666);
-    color: #fff;
-}
-
-.section-title {
-    color: var(--cyber-blue);
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin-bottom: 1rem;
-    text-shadow: 0 0 10px var(--cyber-blue);
-}
-
-.create-button {
-    background: linear-gradient(45deg, var(--cyber-green), var(--cyber-blue));
-    border: none;
-    border-radius: 25px;
-    padding: 14px 28px;
-    color: #000;
-    font-weight: bold;
-    font-size: 1rem;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    margin-bottom: 2rem;
+    z-index: 10;
+    pointer-events: auto;
     width: 100%;
-    max-width: 400px;
-}
-@media (min-width: 640px) {
-    .create-button {
-        width: auto;
-        padding: 12px 24px;
-        font-size: 0.9rem;
-    }
-}
+    box-sizing: border-box;
+    flex-shrink: 0;
+  }
 
-.create-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
-    color: #000;
-    text-decoration: none;
-}
-
-.filters-section {
-    background: var(--card-bg);
-    border: 1px solid var(--cyber-purple);
+  .accion-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 0.6rem 1rem;
+    background: linear-gradient(135deg, rgba(0, 230, 208, 0.2) 0%, rgba(0, 255, 247, 0.2) 100%);
+    border: 1px solid rgba(0, 255, 247, 0.3);
     border-radius: 12px;
-    padding: 1.5rem;
-    margin-bottom: 2rem;
-}
-
-.filter-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 1rem;
-    align-items: end;
-}
-
-.filter-group {
+    color: #00fff7;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-decoration: none;
+    text-align: center;
+    transition: all 0.3s ease;
     display: flex;
-    flex-direction: column;
-}
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+  }
 
-.filter-label {
-    color: #b0b8c1;
-    font-size: 0.8rem;
+  .accion-btn:hover {
+    background: linear-gradient(135deg, rgba(0, 230, 208, 0.3) 0%, rgba(0, 255, 247, 0.3) 100%);
+    border-color: #00fff7;
+    box-shadow: 0 0 20px rgba(0, 255, 247, 0.4);
+    transform: translateY(-2px);
+    color: #00fff7;
+    text-decoration: none;
+  }
+
+  .accion-btn.danger {
+    background: linear-gradient(135deg, rgba(255, 0, 68, 0.2) 0%, rgba(255, 102, 102, 0.2) 100%);
+    border-color: rgba(255, 0, 68, 0.3);
+    color: #ff4466;
+  }
+
+  .accion-btn.danger:hover {
+    background: linear-gradient(135deg, rgba(255, 0, 68, 0.3) 0%, rgba(255, 102, 102, 0.3) 100%);
+    border-color: #ff4466;
+    box-shadow: 0 0 20px rgba(255, 0, 68, 0.4);
+    color: #ff4466;
+  }
+
+  /* Vista tabla */
+  .vista-tabla {
+    display: none;
+  }
+
+  .vista-tabla.active {
+    display: block;
+  }
+
+  .documentos-tabla {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.9) 0%, rgba(20, 25, 50, 0.7) 100%);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 2px solid rgba(0, 230, 208, 0.3);
+    backdrop-filter: blur(15px);
+  }
+
+  .documentos-tabla thead {
+    background: linear-gradient(135deg, rgba(0, 230, 208, 0.2) 0%, rgba(0, 255, 247, 0.2) 100%);
+  }
+
+  .documentos-tabla th {
+    padding: 1rem;
+    text-align: left;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #00fff7;
     text-transform: uppercase;
     letter-spacing: 1px;
-    margin-bottom: 0.5rem;
-}
+    border-bottom: 2px solid rgba(0, 230, 208, 0.3);
+  }
 
-.filter-input {
-    background: var(--glass-bg);
-    border: 1px solid var(--cyber-purple);
-    border-radius: 8px;
-    padding: 8px 12px;
-    color: #ffffff;
+  .documentos-tabla td {
+    padding: 1rem;
+    border-bottom: 1px solid rgba(0, 230, 208, 0.1);
+    color: #b0b3b8;
+    font-family: 'Rajdhani', sans-serif;
     font-size: 0.9rem;
-}
+  }
 
-.filter-input:focus {
-    outline: none;
-    border-color: var(--cyber-green);
-    box-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
-}
+  .documentos-tabla tbody tr {
+    transition: all 0.3s ease;
+  }
 
-.empty-state {
+  .documentos-tabla tbody tr:hover {
+    background: rgba(0, 230, 208, 0.1);
+  }
+
+  .documentos-tabla tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  /* Vista cards */
+  .vista-cards {
+    display: block;
+  }
+
+  .vista-cards.hidden {
+    display: none;
+  }
+
+  .crear-documento-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1rem 2rem;
+    background: linear-gradient(135deg, #00e6d0 0%, #00fff7 100%);
+    border: 2px solid #00fff7;
+    border-radius: 16px;
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 230, 208, 0.3);
+    margin-bottom: 2rem;
+  }
+
+  .crear-documento-btn:hover {
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 12px 48px rgba(0, 230, 208, 0.5);
+    color: #000;
+    text-decoration: none;
+  }
+
+  .empty-state {
     text-align: center;
     padding: 4rem 2rem;
-    color: #888;
-}
+    background: linear-gradient(135deg, rgba(10, 14, 39, 0.5) 0%, rgba(20, 25, 50, 0.3) 100%);
+    border-radius: 20px;
+    border: 2px dashed rgba(0, 230, 208, 0.3);
+  }
 
-.empty-icon {
-    font-size: 4rem;
+  .empty-icon {
+    font-size: 5rem;
     margin-bottom: 1rem;
     opacity: 0.5;
-}
+    filter: drop-shadow(0 0 20px rgba(0, 230, 208, 0.3));
+  }
 
-.empty-title {
-    font-size: 1.5rem;
+  .empty-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    color: #00e6d0;
     margin-bottom: 0.5rem;
-    color: #b0b8c1;
-}
+    text-shadow: 0 0 15px rgba(0, 230, 208, 0.5);
+  }
 
-.empty-description {
+  .empty-description {
+    font-family: 'Rajdhani', sans-serif;
     font-size: 1rem;
+    color: #b0b3b8;
     margin-bottom: 2rem;
-}
+  }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
+  /* Botón exportar para contador */
+  .exportar-contador-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1.5rem;
+    background: linear-gradient(135deg, rgba(128, 0, 255, 0.3) 0%, rgba(255, 136, 0, 0.3) 100%);
+    border: 2px solid rgba(128, 0, 255, 0.5);
+    border-radius: 12px;
+    color: #fff;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    margin-left: 1rem;
+  }
 
-.pulse-animation {
-    animation: pulse 2s infinite;
-}
+  .exportar-contador-btn:hover {
+    background: linear-gradient(135deg, rgba(128, 0, 255, 0.4) 0%, rgba(255, 136, 0, 0.4) 100%);
+    border-color: rgba(128, 0, 255, 0.7);
+    box-shadow: 0 0 20px rgba(128, 0, 255, 0.4);
+    color: #fff;
+    text-decoration: none;
+  }
+
+  @media (max-width: 768px) {
+    .documentos-container {
+      padding: 1rem 0.75rem;
+    }
+
+    .documentos-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .documento-card {
+      padding: 1.25rem;
+    }
+
+    .documento-tipo {
+      font-size: 1rem;
+    }
+
+    .total-value {
+      font-size: 1.3rem;
+    }
+
+    .filtros-grid {
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+    }
+
+    .filtros-section {
+      padding: 1rem;
+    }
+
+    .filtro-input {
+      padding: 0.875rem;
+      min-height: 44px;
+      font-size: 16px; /* Evita zoom en iOS */
+    }
+
+    .kpis-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 0.75rem;
+    }
+
+    .kpi-card {
+      padding: 1rem;
+    }
+
+    .kpi-value {
+      font-size: 1.5rem;
+    }
+
+    .toggle-view-btn {
+      padding: 0.875rem 1rem;
+      min-height: 44px;
+      font-size: 0.85rem;
+    }
+
+    .view-toggle {
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .accion-btn {
+      padding: 0.75rem 0.875rem;
+      min-height: 44px;
+      font-size: 0.8rem;
+    }
+
+    .crear-documento-btn {
+      padding: 0.875rem 1.5rem;
+      min-height: 44px;
+      font-size: 0.9rem;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .exportar-contador-btn {
+      padding: 0.875rem 1.25rem;
+      min-height: 44px;
+      font-size: 0.85rem;
+      margin-left: 0;
+      margin-top: 0.75rem;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .tipo-seccion {
+      padding: 1.5rem 1rem;
+    }
+
+    .tipo-seccion-title {
+      font-size: 1.25rem;
+    }
+
+    .documentos-tabla {
+      font-size: 0.8rem;
+    }
+
+    .documentos-tabla th,
+    .documentos-tabla td {
+      padding: 0.75rem 0.5rem;
+    }
+
+    .vista-tabla {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .documentos-tabla {
+      min-width: 800px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .documentos-container {
+      padding: 0.5rem;
+    }
+
+    .kpis-grid {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+
+    .kpi-card {
+      padding: 0.875rem;
+    }
+
+    .kpi-value {
+      font-size: 1.3rem;
+    }
+
+    .documento-card {
+      padding: 1rem;
+    }
+
+    .documento-acciones {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .accion-btn {
+      width: 100%;
+      padding: 0.875rem;
+    }
+
+    .tipo-seccion {
+      padding: 1rem 0.75rem;
+    }
+
+    .tipo-seccion-title {
+      font-size: 1.1rem;
+    }
+
+    .filtros-section {
+      padding: 0.75rem;
+    }
+
+    .empty-state {
+      padding: 2rem 1rem;
+    }
+
+    .empty-title {
+      font-size: 1.5rem;
+    }
+  }
+
+  .documento-card[data-tipo="FAC"] {
+    border-left: 4px solid #00ff88;
+  }
+
+  .documento-card[data-tipo="OT"] {
+    border-left: 4px solid #00e6d0;
+  }
+
+  .documento-card[data-tipo="PRES"] {
+    border-left: 4px solid #ff8800;
+  }
 </style>
 {% endblock %}
 
 {% block main_actions %}
-<a href="{% country_url 'documentos:crear_documento' %}"
-   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-sm font-semibold border border-emerald-400/40 shadow-lg shadow-emerald-900/40 transition-all">
-  <span>➕</span>
-  <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create New Document{% else %}Crear Nuevo Documento{% endif %}</span>
-</a>
+<div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+  <a href="{% country_url 'documentos:crear_documento' %}" class="crear-documento-btn">
+    <i class="fas fa-plus-circle"></i>
+    <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create New Document{% else %}Crear Nuevo Documento{% endif %}</span>
+  </a>
+  <a href="{% url 'reportes_cl_es:centro_contable_chile' %}" class="exportar-contador-btn">
+    <i class="fas fa-file-export"></i>
+    <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Export for Accountant{% else %}Exportar para Contador{% endif %}</span>
+  </a>
+</div>
 {% endblock %}
 
 {% block page_stats %}
-<div class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs text-gray-400">
-    <div class="flex items-center gap-2">
-        <span class="text-cyan-300">📄</span>
-        <span>{{ documentos.count|default:"0" }} {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Total Documents{% else %}Total Documentos{% endif %}</span>
-    </div>
-    <div class="flex items-center gap-2">
-        <span class="text-orange-300">⏳</span>
-        <span>{{ documentos_pendientes|default:"0" }} {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Pending{% else %}Pendientes{% endif %}</span>
-    </div>
-    <div class="flex items-center gap-2">
-        <span class="text-blue-300">⚙️</span>
-        <span>{{ documentos_proceso|default:"0" }} {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}In Progress{% else %}En Proceso{% endif %}</span>
-    </div>
-    <div class="flex items-center gap-2">
-        <span class="text-green-300">✅</span>
-        <span>{{ documentos_completados|default:"0" }} {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Completed{% else %}Completados{% endif %}</span>
-    </div>
+<div class="kpis-grid">
+  <div class="kpi-card">
+    <div class="kpi-label">📄 Total Documentos</div>
+    <div class="kpi-value">{{ estadisticas.total|default:"0" }}</div>
+    <div class="kpi-subvalue">{% if estadisticas.total_monto %}{{ estadisticas.total_monto|money_by_country:country }}{% endif %}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">✅ Emitidos</div>
+    <div class="kpi-value">{{ estadisticas.emitidos|default:"0" }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">⏳ Borradores</div>
+    <div class="kpi-value">{{ estadisticas.borradores|default:"0" }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">📅 Hoy</div>
+    <div class="kpi-value">{{ estadisticas.hoy|default:"0" }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">💰 Por Cobrar</div>
+    <div class="kpi-value">{{ estadisticas.pendientes_pago|default:"0" }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">📋 Presupuestos Pendientes</div>
+    <div class="kpi-value">{{ estadisticas.presupuestos_pendientes|default:"0" }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">🔧 OTs Sin Cerrar</div>
+    <div class="kpi-value">{{ estadisticas.ots_sin_cerrar|default:"0" }}</div>
+  </div>
+  <div class="kpi-card">
+    <div class="kpi-label">📊 Últimos 30 días</div>
+    <div class="kpi-value">{{ estadisticas.ultimos_30_dias|default:"0" }}</div>
+  </div>
 </div>
 {% endblock %}
 
 {% block search_bar %}
-    <div class="filters-section">
-        <h3 class="section-title" style="font-size: 1.5rem; margin-bottom: 1rem;">🔍 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search Filters{% else %}Filtros de Búsqueda{% endif %}</h3>
-        <div class="filter-grid">
-            <div class="filter-group">
-                <label class="filter-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search by Customer{% else %}Buscar por Cliente{% endif %}</label>
-                <input type="text" class="filter-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Customer name...{% else %}Nombre del cliente...{% endif %}">
-            </div>
-            <div class="filter-group">
-                <label class="filter-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search by Vehicle{% else %}Buscar por Vehículo{% endif %}</label>
-                <input type="text" class="filter-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}License plate or model...{% else %}Patente o modelo...{% endif %}">
-            </div>
-            <div class="filter-group">
-                <label class="filter-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Status{% else %}Estado{% endif %}</label>
-                <select class="filter-input">
-                    <option value="">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}All statuses{% else %}Todos los estados{% endif %}</option>
-                    <option value="pendiente">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Pending{% else %}Pendiente{% endif %}</option>
-                    <option value="proceso">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}In Progress{% else %}En Proceso{% endif %}</option>
-                    <option value="completado">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Completed{% else %}Completado{% endif %}</option>
-                    <option value="cancelado">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Cancelled{% else %}Cancelado{% endif %}</option>
-                </select>
-            </div>
-            <div class="filter-group">
-                <label class="filter-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Date From{% else %}Fecha Desde{% endif %}</label>
-                <input type="date" class="filter-input">
-            </div>
-            <div class="filter-group">
-                <label class="filter-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Date To{% else %}Fecha Hasta{% endif %}</label>
-                <input type="date" class="filter-input">
-            </div>
-            <div class="filter-group">
-                <button class="action-button" style="margin-top: 0;">🔍 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search{% else %}Buscar{% endif %}</button>
-            </div>
-        </div>
+<div class="filtros-section">
+  <h3 class="section-title" style="font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: #00e6d0; margin-bottom: 1.5rem; text-shadow: 0 0 10px rgba(0, 230, 208, 0.5);">
+    <i class="fas fa-filter"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search Filters{% else %}Filtros de Búsqueda{% endif %}
+  </h3>
+  <form method="get" class="filtros-grid">
+    <div class="filtro-group">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search by Customer{% else %}Buscar por Cliente{% endif %}</label>
+      <input type="text" name="cliente" value="{{ filtros_activos.cliente|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Customer name...{% else %}Nombre del cliente...{% endif %}">
     </div>
+    <div class="filtro-group">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search by Vehicle{% else %}Buscar por Vehículo{% endif %}</label>
+      <input type="text" name="vehiculo" value="{{ filtros_activos.vehiculo|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}License plate or model...{% else %}Patente o modelo...{% endif %}">
+    </div>
+    <div class="filtro-group">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Type{% else %}Tipo de Documento{% endif %}</label>
+      <select name="tipo" class="filtro-input">
+        <option value="">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}All types{% else %}Todos los tipos{% endif %}</option>
+        <option value="FAC" {% if filtros_activos.tipo == 'FAC' %}selected{% endif %}>Factura</option>
+        <option value="OT" {% if filtros_activos.tipo == 'OT' %}selected{% endif %}>Orden de Trabajo</option>
+        <option value="PRES" {% if filtros_activos.tipo == 'PRES' %}selected{% endif %}>Presupuesto</option>
+      </select>
+    </div>
+    <div class="filtro-group">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Status{% else %}Estado{% endif %}</label>
+      <select name="estado" class="filtro-input">
+        <option value="">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}All statuses{% else %}Todos los estados{% endif %}</option>
+        <option value="EMITIDO" {% if filtros_activos.estado == 'EMITIDO' %}selected{% endif %}>Emitido</option>
+        <option value="BORRADOR" {% if filtros_activos.estado == 'BORRADOR' %}selected{% endif %}>Borrador</option>
+        <option value="ANULADO" {% if filtros_activos.estado == 'ANULADO' %}selected{% endif %}>Anulado</option>
+      </select>
+    </div>
+    <div class="filtro-group">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Number{% else %}Número de Documento{% endif %}</label>
+      <input type="text" name="numero" value="{{ filtros_activos.numero|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document number...{% else %}Número...{% endif %}">
+    </div>
+    <div class="filtro-group">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Date From{% else %}Fecha Desde{% endif %}</label>
+      <input type="date" name="desde" value="{{ filtros_activos.desde|default:'' }}" class="filtro-input">
+    </div>
+    <div class="filtro-group">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Date To{% else %}Fecha Hasta{% endif %}</label>
+      <input type="date" name="hasta" value="{{ filtros_activos.hasta|default:'' }}" class="filtro-input">
+    </div>
+    <div class="filtro-group">
+      <button type="submit" class="accion-btn" style="margin-top: 1.5rem;">
+        <i class="fas fa-search"></i>
+        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search{% else %}Buscar{% endif %}</span>
+      </button>
+      {% if filtros_activos.cliente or filtros_activos.vehiculo or filtros_activos.estado or filtros_activos.tipo or filtros_activos.desde or filtros_activos.hasta or filtros_activos.numero %}
+      <a href="{% url 'documentos:lista_documentos' %}" class="accion-btn" style="margin-top: 0.5rem; background: linear-gradient(135deg, rgba(255, 0, 68, 0.2) 0%, rgba(255, 102, 102, 0.2) 100%); border-color: rgba(255, 0, 68, 0.3); color: #ff4466;">
+        <i class="fas fa-times"></i>
+        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Clear{% else %}Limpiar{% endif %}</span>
+      </a>
+      {% endif %}
+    </div>
+  </form>
+</div>
 {% endblock %}
 
 {% block panel_content %}
-    {% if documentos %}
-        <div class="space-y-4">
-            {% for documento in documentos %}
-            <div class="document-card bg-slate-900/60 border border-slate-700/80 rounded-xl p-4 sm:p-5 shadow-md hover:shadow-lg transition-all">
-                <div class="flex items-start justify-between mb-3">
-                    <div class="flex-1">
-                        <h3 class="text-base sm:text-lg font-semibold text-white mb-1">
-                            📄 {{ documento.tipo_documento|default:"Documento" }} #{{ documento.numero|default:documento.id }}
-                        </h3>
-                    </div>
-                    <span class="document-status status-{{ documento.estado|default:'pendiente' }} text-xs sm:text-sm px-2 py-1 rounded-full font-semibold">
-                        {{ documento.estado|default:"Pendiente"|title }}
+<div class="documentos-container">
+  <!-- Toggle de vista -->
+  <div class="view-toggle">
+    <button class="toggle-view-btn active" data-view="cards" onclick="toggleView('cards')">
+      <i class="fas fa-th-large"></i>
+      <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Card View{% else %}Vista Matriz{% endif %}</span>
+    </button>
+    <button class="toggle-view-btn" data-view="table" onclick="toggleView('table')">
+      <i class="fas fa-table"></i>
+      <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Table View{% else %}Vista Tabla{% endif %}</span>
+    </button>
+  </div>
+
+  {% if documentos %}
+    <!-- Vista Cards - Organizada por tipo -->
+    <div class="vista-cards" id="vista-cards">
+      <div class="documentos-por-tipo">
+        {% regroup documentos by tipo as documentos_por_tipo %}
+        
+        {% for grupo in documentos_por_tipo %}
+        <div class="tipo-seccion" data-tipo="{{ grupo.grouper }}">
+          <div class="tipo-seccion-header">
+            <div class="tipo-seccion-title">
+              <span class="tipo-seccion-icon">
+                {% if grupo.grouper == 'FAC' %}🧾
+                {% elif grupo.grouper == 'OT' %}🔧
+                {% elif grupo.grouper == 'PRES' %}📋
+                {% else %}📄{% endif %}
+              </span>
+              <span>
+                {% if grupo.grouper == 'FAC' %}Facturas
+                {% elif grupo.grouper == 'OT' %}Órdenes de Trabajo
+                {% elif grupo.grouper == 'PRES' %}Presupuestos
+                {% else %}{{ grupo.grouper }}{% endif %}
+              </span>
+            </div>
+            <div class="tipo-seccion-count">
+              <strong>{{ grupo.list|length }}</strong> documento{{ grupo.list|length|pluralize }}
+            </div>
+          </div>
+          
+          <div class="documentos-grid">
+            {% for documento in grupo.list %}
+            <div class="documento-card" data-tipo="{{ documento.tipo }}">
+              <a href="{% country_url 'documentos:ver_documento' documento.id %}" class="documento-card-link" style="text-decoration: none; color: inherit; display: block;">
+                <div class="documento-card-header">
+                  <div class="documento-tipo">
+                    <span class="documento-tipo-icon">
+                      {% if documento.tipo == 'FAC' %}🧾
+                      {% elif documento.tipo == 'OT' %}🔧
+                      {% elif documento.tipo == 'PRES' %}📋
+                      {% else %}📄{% endif %}
                     </span>
+                    <span>
+                      {% if documento.tipo == 'FAC' %}Factura
+                      {% elif documento.tipo == 'OT' %}Orden de Trabajo
+                      {% elif documento.tipo == 'PRES' %}Presupuesto
+                      {% else %}{{ documento.tipo }}{% endif %}
+                    </span>
+                  </div>
+                  <span class="documento-estado estado-{{ documento.estado|lower|default:'borrador' }}">
+                    {{ documento.estado|default:"BORRADOR"|title }}
+                  </span>
                 </div>
 
-                <div class="space-y-2 mb-3">
-                    <div class="flex items-center gap-2 text-sm text-slate-300">
-                        <i class="fas fa-user text-cyan-400 text-xs"></i>
-                        <span>
-                            {% if documento.cliente %}
-                                {{ documento.cliente.nombre|default_if_none:"" }} {{ documento.cliente.apellido|default_if_none:"" }}
-                            {% else %}
-                                Sin cliente
-                            {% endif %}
-                        </span>
-                    </div>
-                    {% if documento.vehiculo %}
-                    <div class="flex items-center gap-2 text-sm text-slate-300">
-                        <i class="fas fa-car text-cyan-400 text-xs"></i>
-                        <span>{{ documento.vehiculo.display_label|default:documento.vehiculo.patente|default:"Sin vehículo" }}</span>
-                    </div>
+                <div class="documento-numero">
+                  <strong>#{{ documento.numero|default:documento.id }}</strong>
+                  {% now "Y-m-d" as hoy %}
+                  {% if documento.fecha_emision %}
+                    {% with dias_diferencia=documento.fecha_emision|timesince %}
+                      {% if documento.estado == 'BORRADOR' or documento.estado == 'EMITIDO' %}
+                        {% if documento.fecha_emision|timesince|slice:":1"|add:"0" > 15 %}
+                          <span class="edad-badge edad-critica">⚠️ Hace {{ documento.fecha_emision|timesince }}</span>
+                        {% elif documento.fecha_emision|timesince|slice:":1"|add:"0" > 7 %}
+                          <span class="edad-badge edad-alerta">Hace {{ documento.fecha_emision|timesince }}</span>
+                        {% else %}
+                          <span class="edad-badge edad-normal">Hace {{ documento.fecha_emision|timesince }}</span>
+                        {% endif %}
+                      {% endif %}
+                    {% endwith %}
+                  {% endif %}
+                </div>
+
+                <div class="documento-info">
+                  {% if documento.cliente %}
+                  <div class="info-row">
+                    <i class="fas fa-user info-icon"></i>
+                    <span class="info-text">
+                      <strong>{{ documento.cliente.nombre|default_if_none:"" }} {{ documento.cliente.apellido|default_if_none:"" }}</strong>
+                    </span>
+                  </div>
+                  {% endif %}
+
+                  {% if documento.vehiculo %}
+                  <div class="info-row">
+                    <i class="fas fa-car info-icon"></i>
+                    <span class="info-text">
+                      {{ documento.vehiculo.display_label|default:documento.vehiculo.patente|default:"Sin vehículo" }}
+                    </span>
+                  </div>
+                  {% endif %}
+
+                  {% if documento.tecnico_responsable %}
+                  <div class="info-row">
+                    <i class="fas fa-user-gear info-icon"></i>
+                    <span class="info-text">
+                      <span>Técnico/Vendedor:</span>
+                      <strong>{{ documento.tecnico_responsable.nombre }}</strong>
+                    </span>
+                  </div>
+                  {% endif %}
+
+                  <div class="info-row">
+                    <i class="fas fa-calendar-alt info-icon"></i>
+                    <span class="info-text">
+                      {{ documento.fecha_emision|date:"d/m/Y"|default:"N/A" }}
+                    </span>
+                  </div>
+
+                  {% if documento.estado_pago %}
+                  <div class="pago-badge pago-{{ documento.estado_pago|lower|default:'pendiente' }}">
+                    {% if documento.estado_pago == 'PAGADO' %}✅ Pagado
+                    {% elif documento.estado_pago == 'PARCIAL' %}⚠️ Pago Parcial
+                    {% else %}💰 Por Cobrar{% endif %}
+                  </div>
+                  {% endif %}
+                </div>
+
+                <div class="documento-total">
+                  <div class="total-label">Total</div>
+                  <div class="total-value">
+                    {% if documento.total and documento.total > 0 %}
+                      {{ documento.total|money_by_country:country }}
+                    {% else %}
+                      {% if country == 'cl' or country == 'CL' %}
+                        $0
+                      {% else %}
+                        $0.00
+                      {% endif %}
                     {% endif %}
-                    <div class="flex items-center gap-2 text-sm text-slate-300">
-                        <i class="fas fa-calendar text-cyan-400 text-xs"></i>
-                        <span>{{ documento.created_at|date:"d/m/Y H:i"|default:"N/A" }}</span>
-                    </div>
-                    <div class="flex items-center justify-between pt-2 border-t border-slate-700/50">
-                        <span class="text-xs text-slate-400">Total:</span>
-                        <span class="text-base sm:text-lg font-bold text-cyan-300">{{ documento.total|money_by_country:country }}</span>
-                    </div>
+                  </div>
                 </div>
+              </a>
 
-                <div class="flex items-center gap-2 pt-3 border-t border-slate-700/50 flex-wrap">
-                    <a href="{% country_url 'documentos:ver_documento' documento.id %}" class="flex-1 sm:flex-initial text-center py-2 px-3 text-sm font-semibold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 min-w-[100px]">👁️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}View{% else %}Ver{% endif %}</a>
-                    <a href="{% country_url 'documentos:documento_editar' documento.id %}" class="flex-1 sm:flex-initial text-center py-2 px-3 text-sm font-semibold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 min-w-[100px]">✏️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Edit{% else %}Editar{% endif %}</a>
-                    <a href="{% country_url 'documentos:exportar_documento_pdf' documento.id %}" class="flex-1 sm:flex-initial text-center py-2 px-3 text-sm font-semibold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 min-w-[80px]">📄 PDF</a>
-                    <a href="#" class="flex-1 sm:flex-initial text-center py-2 px-3 text-sm font-semibold rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 min-w-[100px]" onclick="enviarWhatsApp({{ documento.id }}, '{{ documento.cliente.telefono|default:"" }}', '{{ documento.cliente.nombre|default:"" }} {{ documento.cliente.apellido|default:"" }}')">📱 WhatsApp</a>
-                    <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="flex-1 sm:flex-initial text-center py-2 px-3 text-sm font-semibold rounded-lg bg-red-900/30 hover:bg-red-800/40 border border-red-600/50 text-red-200 hover:text-red-100 transition-all focus:outline-none focus:ring-2 focus:ring-red-400/60 min-w-[100px]">🗑️ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Delete{% else %}Eliminar{% endif %}</a>
-                </div>
+              <div class="documento-acciones">
+                <a href="{% country_url 'documentos:ver_documento' documento.id %}" class="accion-btn">
+                  <i class="fas fa-eye"></i>
+                  <span>Ver</span>
+                </a>
+                <a href="{% country_url 'documentos:documento_editar' documento.id %}" class="accion-btn">
+                  <i class="fas fa-edit"></i>
+                  <span>Editar</span>
+                </a>
+                <a href="{% country_url 'documentos:exportar_documento_pdf' documento.id %}" class="accion-btn">
+                  <i class="fas fa-file-pdf"></i>
+                  <span>PDF</span>
+                </a>
+                <a href="#"
+                   class="accion-btn"
+                   onclick="enviarWhatsApp({{ documento.id }}, '{{ documento.cliente.telefono|default_if_none:""|default:"" }}', '{{ documento.cliente.nombre|default_if_none:""|default:"" }} {{ documento.cliente.apellido|default_if_none:""|default:"" }}'); return false;">
+                  <i class="fab fa-whatsapp"></i>
+                  <span>WhatsApp</span>
+                </a>
+                {% if documento.tipo == 'PRES' and documento.estado == 'EMITIDO' %}
+                <a href="#" class="accion-btn" onclick="convertirAOT({{ documento.id }}); return false;" title="Convertir a Orden de Trabajo">
+                  <i class="fas fa-arrow-right"></i>
+                  <span>→ OT</span>
+                </a>
+                {% endif %}
+                {% if documento.tipo == 'OT' and documento.estado == 'EMITIDO' %}
+                <a href="#" class="accion-btn" onclick="crearFactura({{ documento.id }}); return false;" title="Crear Factura">
+                  <i class="fas fa-file-invoice"></i>
+                  <span>→ FAC</span>
+                </a>
+                {% endif %}
+                <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="accion-btn danger" onclick="return confirm('¿Estás seguro de eliminar este documento?');">
+                  <i class="fas fa-trash"></i>
+                  <span>Eliminar</span>
+                </a>
+              </div>
             </div>
             {% endfor %}
+          </div>
         </div>
-    {% else %}
-            <!-- Empty State - Design System -->
-            <div class="text-center py-12 sm:py-16 px-4">
-                <div class="text-6xl mb-4 opacity-50">📄</div>
-                <h3 class="text-xl sm:text-2xl font-semibold text-slate-200 mb-2">
-                    {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No documents{% else %}No hay documentos{% endif %}
-                </h3>
-                <p class="text-sm sm:text-base text-slate-400 mb-6 max-w-md mx-auto">
-                    {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No documents have been created in the system yet. Create your first document to start managing the workshop.{% else %}Aún no se han creado documentos en el sistema. Crea tu primer documento para comenzar a gestionar el taller.{% endif %}
-                </p>
-                <a href="{% country_url 'documentos:crear_documento' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">
-                    ➕ {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create First Document{% else %}Crear Primer Documento{% endif %}
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Vista Tabla -->
+    <div class="vista-tabla" id="vista-tabla">
+      <table class="documentos-tabla">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Tipo</th>
+            <th>Número</th>
+            <th>Cliente</th>
+            <th>Vehículo</th>
+            <th>Neto</th>
+            <th>IVA</th>
+            <th>Total</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for documento in documentos %}
+          <tr>
+            <td>{{ documento.fecha_emision|date:"d/m/Y"|default:"N/A" }}</td>
+            <td>
+              {% if documento.tipo == 'FAC' %}🧾 Factura
+              {% elif documento.tipo == 'OT' %}🔧 OT
+              {% elif documento.tipo == 'PRES' %}📋 Presupuesto
+              {% else %}{{ documento.tipo }}{% endif %}
+            </td>
+            <td><strong>#{{ documento.numero|default:documento.id }}</strong></td>
+            <td>
+              {% if documento.cliente %}
+                {{ documento.cliente.nombre|default_if_none:"" }} {{ documento.cliente.apellido|default_if_none:"" }}
+              {% else %}
+                Sin cliente
+              {% endif %}
+            </td>
+            <td>
+              {% if documento.vehiculo %}
+                {{ documento.vehiculo.patente|default:"N/A" }}
+              {% else %}
+                -
+              {% endif %}
+            </td>
+            <td>{{ documento.neto_repuestos|add:documento.neto_servicios|money_by_country:country|default:"$0" }}</td>
+            <td>{{ documento.tax_amount|money_by_country:country|default:"$0" }}</td>
+            <td><strong>{{ documento.total|money_by_country:country|default:"$0" }}</strong></td>
+            <td>
+              <span class="documento-estado estado-{{ documento.estado|lower|default:'borrador' }}" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
+                {{ documento.estado|default:"BORRADOR"|title }}
+              </span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <a href="{% country_url 'documentos:ver_documento' documento.id %}" class="accion-btn" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">
+                  <i class="fas fa-eye"></i>
                 </a>
-            </div>
-    {% endif %}
+                <a href="{% country_url 'documentos:exportar_documento_pdf' documento.id %}" class="accion-btn" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">
+                  <i class="fas fa-file-pdf"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <div class="empty-state">
+      <div class="empty-icon">📄</div>
+      <h3 class="empty-title">
+        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No documents{% else %}No hay documentos{% endif %}
+      </h3>
+      <p class="empty-description">
+        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No documents have been created in the system yet. Create your first document to start managing the workshop.{% else %}Aún no se han creado documentos en el sistema. Crea tu primer documento para comenzar a gestionar el taller.{% endif %}
+      </p>
+      <a href="{% country_url 'documentos:crear_documento' %}" class="crear-documento-btn">
+        <i class="fas fa-plus-circle"></i>
+        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create First Document{% else %}Crear Primer Documento{% endif %}</span>
+      </a>
+    </div>
+  {% endif %}
+</div>
 {% endblock %}
 
 {% block page_extra_js %}
 <script>
+function toggleView(view) {
+  const cardsView = document.getElementById('vista-cards');
+  const tableView = document.getElementById('vista-tabla');
+  const buttons = document.querySelectorAll('.toggle-view-btn');
+  
+  buttons.forEach(btn => btn.classList.remove('active'));
+  event.target.closest('.toggle-view-btn').classList.add('active');
+  
+  if (view === 'cards') {
+    cardsView.classList.remove('hidden');
+    tableView.classList.remove('active');
+  } else {
+    cardsView.classList.add('hidden');
+    tableView.classList.add('active');
+  }
+  
+  // Guardar preferencia
+  localStorage.setItem('documentos-view-preference', view);
+}
+
+// Cargar preferencia guardada
 document.addEventListener('DOMContentLoaded', function() {
-
-    // Animación de hover en las tarjetas
-    const documentCards = document.querySelectorAll('.document-card');
-    documentCards.forEach(card => {
-        card.addEventListener('mouseenter', function() {
-            this.style.transform = 'translateY(-4px) scale(1.01)';
-        });
-
-        card.addEventListener('mouseleave', function() {
-            this.style.transform = 'translateY(0) scale(1)';
-        });
+  const savedView = localStorage.getItem('documentos-view-preference') || 'cards';
+  if (savedView === 'table') {
+    toggleView('table');
+  }
+  
+  // Animación de hover mejorada
+  const documentCards = document.querySelectorAll('.documento-card');
+  documentCards.forEach(card => {
+    card.addEventListener('mouseenter', function() {
+      this.style.transform = 'translateY(-8px) scale(1.02)';
     });
-
-
-    // Funcionalidad de filtros
-    const filterInputs = document.querySelectorAll('.filter-input');
-    filterInputs.forEach(input => {
-        input.addEventListener('input', function() {
-            // Aquí se implementaría la lógica de filtrado
-            console.log('Filtrando por:', this.value);
-        });
+    card.addEventListener('mouseleave', function() {
+      this.style.transform = 'translateY(0) scale(1)';
     });
-
+  });
 });
 
-// Función para enviar documento por WhatsApp
+function convertirAOT(presupuestoId) {
+  if (confirm('¿Convertir este presupuesto a Orden de Trabajo?')) {
+    // Aquí implementarías la lógica para convertir PRES → OT
+    window.location.href = `/cl/es/documentos/${presupuestoId}/convertir-a-ot/`;
+  }
+}
+
+function crearFactura(otId) {
+  if (confirm('¿Crear factura desde esta Orden de Trabajo?')) {
+    // Aquí implementarías la lógica para crear FAC desde OT
+    window.location.href = `/cl/es/documentos/${otId}/crear-factura/`;
+  }
+}
+
 function enviarWhatsApp(documentoId, telefono, nombreCliente) {
-    if (!telefono) {
-        alert('❌ El cliente no tiene número de teléfono registrado.');
-        return;
+  if (!telefono) {
+    alert('❌ El cliente no tiene número de teléfono registrado.');
+    return;
+  }
+
+  const boton = event.target.closest('.accion-btn');
+  const textoOriginal = boton.innerHTML;
+  boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Enviando...</span>';
+  boton.disabled = true;
+
+  fetch(`/cl/documentos/${documentoId}/enviar_whatsapp/`, {
+    method: 'GET',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Content-Type': 'application/json',
     }
-
-    // Mostrar indicador de carga
-    const boton = event.target;
-    const textoOriginal = boton.textContent;
-    boton.textContent = '⏳ Enviando...';
-    boton.disabled = true;
-
-    // Llamar a la API del backend
-    fetch(`/cl/documentos/${documentoId}/enviar_whatsapp/`, {
-        method: 'GET',
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Content-Type': 'application/json',
-        }
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            // Abrir WhatsApp con el mensaje generado
-            const ventanaWhatsApp = window.open(data.url_whatsapp, '_blank', 'width=800,height=600');
-
-            if (!ventanaWhatsApp) {
-                // Si no se puede abrir ventana, mostrar mensaje alternativo
-                alert(`📱 WhatsApp no disponible.
-
-Número del cliente: ${data.telefono}
-Mensaje a enviar:
-${data.mensaje}
-
-Puede copiar este mensaje y enviarlo manualmente por WhatsApp.`);
-            } else {
-                // Mostrar mensaje de confirmación
-                setTimeout(() => {
-                    alert('✅ WhatsApp abierto. Si el cliente no tiene WhatsApp, puede enviar el mensaje por SMS.');
-                }, 1000);
-            }
-        } else {
-            alert(`❌ Error: ${data.error}`);
-        }
-    })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('❌ Error al procesar la solicitud. Intente nuevamente.');
-    })
-    .finally(() => {
-        // Restaurar botón
-        boton.textContent = textoOriginal;
-        boton.disabled = false;
-    });
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      const ventanaWhatsApp = window.open(data.url_whatsapp, '_blank', 'width=800,height=600');
+      if (!ventanaWhatsApp) {
+        alert(`📱 WhatsApp no disponible.\n\nNúmero del cliente: ${data.telefono}\nMensaje a enviar:\n${data.mensaje}\n\nPuede copiar este mensaje y enviarlo manualmente por WhatsApp.`);
+      } else {
+        setTimeout(() => {
+          alert('✅ WhatsApp abierto. Si el cliente no tiene WhatsApp, puede enviar el mensaje por SMS.');
+        }, 1000);
+      }
+    } else {
+      alert(`❌ Error: ${data.error}`);
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('❌ Error al procesar la solicitud. Intente nuevamente.');
+  })
+  .finally(() => {
+    boton.innerHTML = textoOriginal;
+    boton.disabled = false;
+  });
 }
 </script>
 {% endblock %}

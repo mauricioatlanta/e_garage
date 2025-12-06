@@ -306,3 +306,6 @@ scp taller\vehiculos\views_fbv.py atlantareciclajes@atlantareciclajes.pythonanyw
 
 
 
+
+
+
