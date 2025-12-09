@@ -1,3 +1,13 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 eGarage. Todos los derechos reservados.
+#
+# PROPIEDAD INTELECTUAL PROTEGIDA. ESTRICTAMENTE CONFIDENCIAL.
+# Este archivo contiene vistas y endpoints que utilizan el motor de IA.
+#
+# Consulta el archivo LICENSE en la raíz del repositorio para más detalles
+# sobre la protección de la Propiedad Intelectual de eGarage.
+# -----------------------------------------------------------------------------
+
 # ==================== EXPORTAR MECÁNICOS A EXCEL ====================
 
 # import openpyxl
@@ -23,6 +33,7 @@ from django.utils import timezone
 from django.utils.dateparse import parse_date
 
 from taller.auth.decorators import login_required_default
+from taller.middleware.rate_limiting import rate_limit
 from taller.models import Documento
 from taller.models.clientes import Cliente
 from taller.models.lineas_documento import (
@@ -840,10 +851,12 @@ def dashboard_inteligencia_operativa(request):
 
 
 @login_required_default
+@rate_limit(action="ia_prediccion", per_ip=True, per_user=True)
 def diagnostico_ia(request):
     """
     🧠 Diagnóstico por IA - Análisis Predictivo Avanzado
     Motor de inteligencia artificial para optimización de talleres automotrices
+    Protegido con rate limiting estricto
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA (siempre autenticado y robusto)
     empresa = get_or_create_empresa(request)

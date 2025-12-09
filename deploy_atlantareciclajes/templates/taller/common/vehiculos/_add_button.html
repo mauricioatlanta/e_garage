@@ -1,0 +1,21 @@
+<!-- Add Vehicle Button -->
+{% load country_url %}
+{% load i18n %}
+<div class="mt-8 flex justify-center">
+  <a href="{% country_url 'vehiculos:crear_vehiculo' %}"
+     class="futuristic-card px-8 py-4 text-center hover:scale-105 transition-transform">
+    <div class="flex items-center space-x-3">
+      <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-600 flex items-center justify-center">
+        <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+      </div>
+      <span class="text-white font-semibold">{% trans "Add Vehicle" %}</span>
+    </div>
+  </a>
+</div>
+
+
+
+
+

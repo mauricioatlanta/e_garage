@@ -21,18 +21,28 @@ def generate_pwa_icons():
         print("   pip install cairosvg pillow")
         return False
 
-    # Rutas
-    svg_path = Path("static/images/egarage_default_logo.svg")
-    output_dir = Path("static/images")
+    # Rutas - Intentar usar el SVG maskable primero (mejor para iconos PWA)
+    maskable_svg = Path("static/images/egarage_icon_maskable.svg")
+    default_svg = Path("static/images/egarage_default_logo.svg")
 
-    if not svg_path.exists():
-        print(f"❌ No se encontró el archivo SVG: {svg_path}")
+    # Preferir el SVG maskable si existe
+    if maskable_svg.exists():
+        svg_path = maskable_svg
+        print("   ℹ️  Usando SVG maskable (sin texto)")
+    elif default_svg.exists():
+        svg_path = default_svg
+        print("   ℹ️  Usando SVG default (puede contener texto)")
+    else:
+        print(f"❌ No se encontró ningún archivo SVG")
+        print(f"   Buscados: {maskable_svg} o {default_svg}")
         return False
+
+    output_dir = Path("static/images")
 
     print(f"\n🎨 Generando iconos desde: {svg_path}")
 
-    # Tamaños requeridos para PWA
-    sizes = [192, 512, 1024]  # Incluimos 1024 para mejor calidad
+    # Tamaños requeridos para PWA (todos los del manifest.json)
+    sizes = [72, 96, 128, 144, 152, 192, 384, 512, 1024]
 
     for size in sizes:
         output_path = output_dir / f"egarage_icon_{size}x{size}.png"
@@ -75,10 +85,9 @@ def generate_pwa_icons():
 
     print("\n✅ ¡Iconos generados exitosamente!")
     print("\n📱 Archivos generados:")
-    print(f"   - egarage_icon_192x192.png (para Android)")
-    print(f"   - egarage_icon_512x512.png (para splash screens)")
-    print(f"   - egarage_icon_1024x1024.png (alta resolución)")
+    print(f"   - egarage_icon_72x72.png hasta egarage_icon_1024x1024.png")
     print(f"   - egarage_default_logo.png (actualizado)")
+    print("\n💡 Tip: Usa 'generar_iconos_maskable_pwa.py' para generar iconos maskable desde cero")
 
     return True
 

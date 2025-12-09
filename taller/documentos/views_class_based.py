@@ -112,8 +112,9 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
         try:
             return get_object_or_404(Documento, pk=pk, empresa=empresa)
         except Http404:
+            # 🔒 SEGURIDAD: Filtrar por empresa incluso en debug para aislamiento multi-tenant
             # Debug info en caso de error
-            documento_exists = Documento.objects.filter(pk=pk).first()
+            documento_exists = Documento.objects.filter(pk=pk, empresa=empresa).first()
             if documento_exists:
                 messages.error(self.request, f"Documento {pk} no pertenece a tu empresa")
             else:

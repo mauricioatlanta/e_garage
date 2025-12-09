@@ -644,8 +644,9 @@ def api_vehiculos_cliente(request):
 
         logger.info(f"Cliente encontrado: {cliente.nombre}")
 
-        # Obtener vehículos asociados al cliente
-        vehiculos = Vehiculo.objects.filter(cliente=cliente)
+        # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
+        # Obtener vehículos asociados al cliente y empresa
+        vehiculos = Vehiculo.objects.filter(cliente=cliente, empresa=empresa)
         logger.info(f"Vehículos encontrados: {vehiculos.count()}")
 
         vehiculos_data = []
@@ -896,17 +897,28 @@ def documento_form(request, pk=None):
     else:
         documento = None
 
-    # Obtener país desde el contexto de la empresa o request
-    company_country = getattr(request, "company_country", getattr(empresa, "pais", None))
+    # Obtener país desde múltiples fuentes con fallbacks robustos
+    # 1. Primero intentar desde request.company_country (context processor o middleware)
+    # 2. Luego desde empresa.pais
+    # 3. Finalmente desde la URL
+    # 4. Último recurso: 'CL' por defecto
+    company_country = (
+        getattr(request, "company_country", None) or getattr(empresa, "pais", None) or None
+    )
+
+    # Si aún no tenemos país, detectarlo desde la URL
     if not company_country:
-        # Fallback desde la URL
         path = request.path
-        if path.startswith("/cl/"):
-            company_country = "CL"
-        elif path.startswith("/us/"):
+        if path.startswith("/us/"):
             company_country = "US"
-        else:
+        elif path.startswith("/cl/"):
             company_country = "CL"
+        else:
+            # Fallback final: usar 'CL' como valor por defecto seguro
+            company_country = "CL"
+
+    # Normalizar a mayúsculas para consistencia
+    company_country = str(company_country).upper() if company_country else "CL"
 
     if request.method == "POST":
         form = DocumentoForm(

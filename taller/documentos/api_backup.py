@@ -132,16 +132,20 @@ def api_create(request):
         emp = Empresa.objects.get(id=payload["empresa_id"])
     except Empresa.DoesNotExist:
         return JsonResponse({"error": "empresa_not_found"}, status=400)
+
+    # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
     try:
-        cli = Cliente.objects.get(id=payload["cliente_id"])
+        cli = Cliente.objects.get(id=payload["cliente_id"], empresa=emp)
     except Cliente.DoesNotExist:
         return JsonResponse({"error": "cliente_not_found"}, status=400)
+
+    # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
     try:
-        veh = Vehiculo.objects.get(id=payload["vehiculo_id"])
+        veh = Vehiculo.objects.get(id=payload["vehiculo_id"], empresa=emp)
     except Vehiculo.DoesNotExist:
         return JsonResponse({"error": "vehiculo_not_found"}, status=400)
 
-    # Consistencia de empresa (FKs deben pertenecer a la misma)
+    # Validación adicional de consistencia (redundante pero defensiva)
     if cli.empresa_id != emp.id or veh.empresa_id != emp.id:
         return JsonResponse({"error": "empresa_mismatch_fk"}, status=400)
 

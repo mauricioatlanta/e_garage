@@ -1,0 +1,26 @@
+.galaxy-bg {
+  background: url('/static/img/galaxy.png') no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+.translucent-card {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 1rem;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.3);
+}
+
+.btn-futuristic {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  color: black;
+  padding: 0.75rem 2rem;
+  font-weight: bold;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.btn-futuristic:hover {
+  transform: scale(1.05);
+}

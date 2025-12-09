@@ -1,0 +1,41 @@
+{% extends "taller/common/base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Editar Cliente" %}{% endblock %}
+
+{% block extra_head %}
+<!-- 🟣 CRUZ MORADA - Template: taller/common/clientes/cliente_form.html -->
+<style>
+.debug-marker {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 99999;
+  background: rgba(128, 0, 128, 0.9);
+  color: white;
+  padding: 10px 15px;
+  border-radius: 5px;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 14px;
+  box-shadow: 0 0 20px rgba(128, 0, 128, 0.8);
+  border: 3px solid #800080;
+}
+.debug-marker::before {
+  content: '🟣 CRUZ MORADA - taller/common/cliente_form.html';
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="debug-marker"></div>
+<div class="container py-4">
+  <h2 class="mb-4">{% trans "Editar Cliente" %} 🟣</h2>
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">{% trans "Guardar" %}</button>
+    <a href="{% url 'clientes:lista_clientes' %}" class="btn btn-secondary">{% trans "Cancelar" %}</a>
+  </form>
+</div>
+{% endblock %}

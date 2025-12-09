@@ -44,8 +44,8 @@ class MotorPorModeloAutocomplete(
 
         modelo_id = self.forwarded.get("modelo")
         if modelo_id:
-            # Soporta relación M2M (modelos) o FK (modelo)
-            qs = qs.filter(Q(modelos__id=modelo_id) | Q(modelo_id=modelo_id)).distinct()
+            # Filtrar por relación ManyToMany (MotorVehiculo/CajaVehiculo solo tienen 'modelos', no 'modelo_id')
+            qs = qs.filter(modelos__id=modelo_id)
 
         q = (self.q or "").strip()
         if q:

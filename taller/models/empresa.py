@@ -65,7 +65,9 @@ class Empresa(models.Model):
     }
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="empresa")
-    nombre_taller = models.CharField(max_length=100, default="Mi Taller")
+    nombre_taller = models.CharField(
+        max_length=100, default="Mi Taller"
+    )  # Migrado desde TallerInfo
     empresa = models.CharField(max_length=100, blank=True, help_text="Razón social o compañía")
 
     pais = models.CharField(
@@ -77,7 +79,9 @@ class Empresa(models.Model):
 
     logo = models.ImageField(upload_to="logos_talleres/", null=True, blank=True)
     direccion = models.CharField(max_length=200, blank=True)
-    telefono = models.CharField(max_length=20, blank=True)
+    telefono = models.CharField(max_length=32, blank=True)  # Migrado desde TallerInfo
+    # Indica si la empresa ya usó la prueba gratuita (migrado desde TallerInfo.ha_usado_prueba)
+    ha_usado_prueba = models.BooleanField(default=False)
     email = models.EmailField(max_length=100, blank=True, help_text="Email de contacto")
 
     zona_horaria = models.CharField(
@@ -199,10 +203,18 @@ class Empresa(models.Model):
             "vencida": "gray",
         }.get(self.estado_suscripcion, "gray")
 
-    def extender_suscripcion(self, dias=30):
+    def extender_suscripcion(self, dias=30, enviar_notificacion=False):
+        """
+        Extender suscripción por un número de días
+
+        Args:
+            dias: Número de días a extender
+            enviar_notificacion: Si True, envía notificación de renovación (Email + WhatsApp)
+        """
         base = (
             self.fecha_fin if self.fecha_fin and self.fecha_fin > timezone.now() else timezone.now()
         )
+        fecha_fin_anterior = self.fecha_fin
         self.fecha_fin = base + timedelta(days=dias)
         self.suscripcion_activa = True
         self.ultimo_pago = timezone.now()
@@ -210,6 +222,28 @@ class Empresa(models.Model):
         self.notificacion_1_dia = False
         self.notificacion_vencido = False
         self.save()
+
+        # Enviar notificación de renovación si se solicita
+        # (solo si la suscripción ya estaba activa y se está extendiendo)
+        if enviar_notificacion and self.suscripcion_activa and fecha_fin_anterior:
+            try:
+                from taller.utils.notificaciones_suscripcion import notificar_renovacion_exitosa
+
+                notificar_renovacion_exitosa(
+                    empresa=self,
+                    plan=self.plan,
+                    monto=self.valor_mensual,
+                    dias_renovados=dias,
+                )
+                import logging
+
+                logger = logging.getLogger(__name__)
+                logger.info(f"✅ Notificación de renovación enviada a {self.user.email}")
+            except Exception as e:
+                import logging
+
+                logger = logging.getLogger(__name__)
+                logger.error(f"⚠️ Error al enviar notificación de renovación: {str(e)}")
 
     def marcar_pago_recibido(self, monto=None, plan=None):
         if monto is not None:
@@ -265,6 +299,175 @@ class Empresa(models.Model):
         if dias <= 5:
             return f"⚠️ Tu suscripción vence en {dias} días. Considera renovar pronto."
         return ""
+
+    @classmethod
+    def admin_grant_courtesy_extension(
+        cls, user_email, duration_months, reason="", admin_user=None
+    ):
+        """
+        Función administrativa para otorgar extensión de cortesía a una suscripción
+
+        Args:
+            user_email: Email del usuario al que se le otorga la cortesía
+            duration_months: Duración en meses (1, 6 o 12)
+            reason: Razón de la cortesía (opcional)
+            admin_user: Usuario administrador que ejecuta la acción (opcional)
+
+        Returns:
+            dict: Resultado de la operación con detalles
+
+        Raises:
+            ValueError: Si el usuario no existe o la duración no es válida
+        """
+        from django.contrib.auth.models import User
+        from taller.models.auditoria import LogAuditoria
+        from taller.utils.notificaciones_suscripcion import notificar_renovacion_exitosa
+
+        # 1. Validación de inputs
+        try:
+            user = User.objects.get(email=user_email)
+        except User.DoesNotExist:
+            raise ValueError(f"Usuario con email '{user_email}' no encontrado")
+
+        try:
+            empresa = cls.objects.get(user=user)
+        except cls.DoesNotExist:
+            raise ValueError(f"Empresa asociada al usuario '{user_email}' no encontrada")
+
+        # Validar duración
+        valid_durations = [1, 6, 12]
+        if duration_months not in valid_durations:
+            raise ValueError(
+                f"Duración inválida. Debe ser 1, 6 o 12 meses. Recibido: {duration_months}"
+            )
+
+        # 2. Calcular la extensión
+        # Calcular días según meses
+        days_map = {
+            1: 30,
+            6: 180,
+            12: 365,
+        }
+        dias_a_anadir = days_map[duration_months]
+
+        # Obtener fecha base (actual o fecha_fin si es futura)
+        fecha_base = (
+            empresa.fecha_fin
+            if (empresa.fecha_fin and empresa.fecha_fin > timezone.now())
+            else timezone.now()
+        )
+
+        # Calcular nueva fecha de expiración
+        nueva_fecha_fin = fecha_base + timedelta(days=dias_a_anadir)
+
+        # Guardar estado anterior para auditoría
+        datos_antes = {
+            "fecha_fin": empresa.fecha_fin.isoformat() if empresa.fecha_fin else None,
+            "suscripcion_activa": empresa.suscripcion_activa,
+            "plan": empresa.plan,
+        }
+
+        # 3. Actualizar DB
+        empresa.fecha_fin = nueva_fecha_fin
+        empresa.suscripcion_activa = True
+        empresa.ultimo_pago = timezone.now()
+        empresa.notificacion_5_dias = False
+        empresa.notificacion_1_dia = False
+        empresa.notificacion_vencido = False
+        empresa.save()
+
+        # Guardar estado posterior para auditoría
+        datos_despues = {
+            "fecha_fin": empresa.fecha_fin.isoformat(),
+            "suscripcion_activa": empresa.suscripcion_activa,
+            "plan": empresa.plan,
+        }
+
+        # 4. Crear registro de auditoría
+        admin_username = admin_user.username if admin_user else "ADMIN_SYSTEM"
+        descripcion = (
+            f"Extensión de cortesía otorgada: {duration_months} mes(es) "
+            f"({dias_a_anadir} días). Nueva fecha de expiración: {nueva_fecha_fin.strftime('%Y-%m-%d')}. "
+            f"Razón: {reason if reason else 'No especificada'}"
+        )
+
+        LogAuditoria.log_accion(
+            usuario=(
+                admin_user if admin_user else user
+            ),  # Usar admin_user si existe, sino el usuario de la empresa
+            empresa=empresa,
+            accion="UPDATE",
+            modelo="EMPRESA",
+            objeto_id=empresa.id,
+            descripcion=descripcion,
+            datos_antes=datos_antes,
+            datos_despues=datos_despues,
+        )
+
+        # 5. Enviar notificación especializada de cortesía
+        try:
+            notificar_renovacion_exitosa(
+                empresa=empresa,
+                plan=empresa.plan,
+                monto=Decimal("0.00"),  # Monto cero para indicar que es gratuito
+                dias_renovados=dias_a_anadir,
+                is_courtesy=True,  # Flag de cortesía
+                duration_months=duration_months,  # Meses otorgados
+            )
+        except Exception as e:
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error al enviar notificación de cortesía: {str(e)}")
+            # No fallar si la notificación falla
+
+        # 6. Enviar notificación de auditoría interna por WhatsApp
+        try:
+            from django.conf import settings
+            from taller.utils.notificaciones_suscripcion import enviar_whatsapp_a_numero
+
+            # Número de administrador para notificaciones de auditoría
+            # Puede ser configurado en settings o usar el valor por defecto
+            admin_phone = getattr(settings, "ADMIN_AUDIT_PHONE", "+56963607348")
+
+            # Obtener los detalles de la extensión
+            duration_display = f"{duration_months} {'Meses' if duration_months > 1 else 'Mes'}"
+
+            # Crear el mensaje de auditoría interna
+            mensaje_auditoria = (
+                f"🚨 AUDITORÍA - CORTESÍA APROBADA\n"
+                f"✅ Extensión de plan ejecutada por Admin.\n"
+                f"👤 USUARIO: {user_email}\n"
+                f"🎁 DURACIÓN: {duration_display}\n"
+                f"📜 RAZÓN: {reason if reason else 'No especificada'}\n"
+                f"📅 NUEVA FECHA FIN: {empresa.fecha_fin.strftime('%d/%m/%Y')}"
+            )
+
+            # Enviar WhatsApp de auditoría (usar empresa para obtener configuración si está disponible)
+            enviar_whatsapp_a_numero(
+                numero_telefono=admin_phone,
+                mensaje=mensaje_auditoria,
+                empresa=empresa,  # Pasar empresa para intentar usar su configuración
+            )
+
+        except Exception as e:
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.error(f"Error al enviar notificación de auditoría interna: {str(e)}")
+            # No fallar si la notificación de auditoría falla
+
+        return {
+            "success": True,
+            "empresa": empresa.nombre_taller,
+            "user_email": user_email,
+            "duration_months": duration_months,
+            "dias_anadidos": dias_a_anadir,
+            "fecha_anterior": fecha_base.strftime("%Y-%m-%d"),
+            "nueva_fecha_fin": nueva_fecha_fin.strftime("%Y-%m-%d"),
+            "reason": reason,
+            "admin": admin_username,
+        }
 
     class Meta:
         verbose_name = "Empresa"

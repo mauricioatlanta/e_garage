@@ -1,0 +1,210 @@
+{% extends "base.html" %}
+{% load i18n static widget_tweaks %}
+{% load country_url %}
+
+{% block content %}
+{# Depuración visual: solo en DEBUG #}
+{% if debug %}
+  <div style="position: fixed; top: 40%; left: 50%; transform: translate(-50%, -50%); z-index: 9999; font-size: 100px; color: yellow; text-shadow: 0 0 20px yellow;">❌</div>
+{% endif %}
+<!-- Fondo animado -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none">
+  <div class="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#0d1117] to-[#0f172a]"></div>
+  <!-- Partículas animadas -->
+  <div class="absolute top-16 left-12 w-2 h-2 bg-cyan-400 rounded-full animate-ping opacity-20"></div>
+  <div class="absolute top-1/3 right-20 w-1 h-1 bg-fuchsia-400 rounded-full animate-pulse opacity-30"></div>
+  <div class="absolute bottom-24 left-1/4 w-1.5 h-1.5 bg-lime-400 rounded-full animate-bounce opacity-25"></div>
+  <div class="absolute top-2/3 left-1/5 w-1 h-1 bg-emerald-400 rounded-full animate-ping opacity-20"></div>
+  <div class="absolute bottom-1/2 right-1/3 w-2 h-2 bg-purple-400 rounded-full animate-pulse opacity-15"></div>
+</div>
+
+<div class="relative min-h-screen p-4 sm:p-6">
+  <!-- Header -->
+  <div class="relative mb-6">
+    <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-lime-400 opacity-20 blur-xl animate-pulse"></div>
+    <div class="relative rounded-2xl border border-cyan-400/30 bg-gradient-to-r from-[#0d1117]/90 to-[#111827]/90 backdrop-blur-sm p-4">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-xl shadow-lg ring-2 ring-emerald-400/40">🚗</div>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-lime-300 to-green-400">
+              {% trans "Vehicle List" %}
+            </h1>
+            <p class="text-gray-400 text-xs mt-0.5">{% trans "Manage your vehicle fleet" %}</p>
+          </div>
+        </div>
+
+        {% country_url 'vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+        {% if not url_crear_vehiculo %}
+            {% url 'vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+        {% endif %}
+        {% if not url_crear_vehiculo %}
+            {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo %}
+        {% endif %}
+        <a href="{% if url_crear_vehiculo %}{{ url_crear_vehiculo }}{% else %}/us/vehiculos/crear/{% endif %}"
+           id="add-vehicle-btn"
+           class="inline-flex items-center justify-center space-x-2 px-4 py-3 sm:px-6 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 border border-emerald-400/50 text-white font-semibold hover:from-emerald-500 hover:to-green-500 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto min-w-[200px]"
+           aria-label="{% trans 'Add new vehicle' %}">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="text-sm sm:text-base">{% trans "Add Vehicle" %}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicle List -->
+  <div class="max-w-7xl mx-auto">
+    {% if vehiculos %}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for vehiculo in vehiculos %}
+          {# Generar URLs correctamente según país #}
+          {% country_url 'vehiculos:ver_vehiculo' vehiculo.pk as url_ver %}
+          {% country_url 'vehiculos:editar_vehiculo' vehiculo.pk as url_edit %}
+
+          <div class="relative group">
+            <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-emerald-500/20 via-lime-500/20 to-green-500/20 blur-xl group-hover:opacity-100 opacity-0 transition-opacity duration-300"></div>
+            <div class="relative rounded-xl border border-emerald-400/30 bg-gradient-to-r from-[#0d1117]/90 to-[#111827]/90 backdrop-blur-sm p-6 hover:border-emerald-400/50 transition-all duration-300">
+              <div class="flex items-start justify-between mb-4">
+                <div class="flex items-center space-x-3">
+                  <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-emerald-500/30 to-green-500/30 border border-emerald-400/40 flex items-center justify-center">
+                    <span class="text-emerald-300 text-lg">🚗</span>
+                  </div>
+                  <div>
+                    <h3 class="text-lg font-bold text-emerald-300">
+                      {{ vehiculo.marca_texto|default:vehiculo.marca.nombre|default:"-" }} {{ vehiculo.modelo_texto|default:vehiculo.modelo.nombre|default:"-" }}
+                    </h3>
+                    <p class="text-gray-400 text-sm">{{ vehiculo.anio|default:"N/A" }}</p>
+                  </div>
+                </div>
+                <div class="flex space-x-2">
+                  <a href="{{ url_ver }}"
+                     class="p-2 rounded-lg bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40 text-cyan-300 hover:from-cyan-500/30 hover:to-blue-500/30 transition-all duration-200"
+                     title="{% trans 'View Details' %}"
+                     aria-label="{% trans 'View vehicle details' %}">
+                    👁️
+                  </a>
+                  <a href="{{ url_edit }}"
+                     class="p-2 rounded-lg bg-gradient-to-r from-orange-600/20 to-yellow-600/20 border border-orange-400/40 text-orange-300 hover:from-orange-500/30 hover:to-yellow-500/30 transition-all duration-200"
+                     title="{% trans 'Edit' %}"
+                     aria-label="{% trans 'Edit vehicle' %}">
+                    ✏️
+                  </a>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <div class="flex items-center space-x-2 text-sm">
+                  <span class="text-gray-400">👤</span>
+                  <span class="text-gray-300">{{ vehiculo.cliente.nombre|default:"No Client" }}</span>
+                </div>
+                {% if vehiculo.patente %}
+                  <div class="flex items-center space-x-2 text-sm">
+                    <span class="text-gray-400">🔢</span>
+                    <span class="text-gray-300">{{ vehiculo.patente }}</span>
+                  </div>
+                {% endif %}
+                {% if vehiculo.color %}
+                  <div class="flex items-center space-x-2 text-sm">
+                    <span class="text-gray-400">🎨</span>
+                    <span class="text-gray-300">{{ vehiculo.color.nombre|default:"-" }}</span>
+                  </div>
+                {% endif %}
+                {% if vehiculo.vin %}
+                  <div class="flex items-center space-x-2 text-sm">
+                    <span class="text-gray-400">🔍</span>
+                    <span class="text-gray-300 font-mono text-xs">{{ vehiculo.vin|truncatechars:17 }}</span>
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="text-center py-12">
+        <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-br from-gray-500/20 to-gray-600/20 border border-gray-400/30 flex items-center justify-center">
+          <span class="text-4xl text-gray-400">🚗</span>
+        </div>
+        <h3 class="text-xl font-bold text-gray-300 mb-2">{% trans "No vehicles found" %}</h3>
+        <p class="text-gray-400 mb-6">{% trans "Start by adding your first vehicle to the system" %}</p>
+        {% country_url 'vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
+        {% if not url_crear_vehiculo_empty %}
+            {% url 'vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
+        {% endif %}
+        {% if not url_crear_vehiculo_empty %}
+            {% url 'usa:vehiculos:crear_vehiculo' as url_crear_vehiculo_empty %}
+        {% endif %}
+        <a href="{% if url_crear_vehiculo_empty %}{{ url_crear_vehiculo_empty }}{% else %}/us/vehiculos/crear/{% endif %}"
+           id="add-vehicle-btn-empty"
+           class="inline-flex items-center justify-center space-x-2 px-6 py-3 rounded-xl bg-gradient-to-r from-emerald-600 to-green-600 border border-emerald-400/50 text-white font-semibold hover:from-emerald-500 hover:to-green-500 hover:shadow-lg hover:shadow-emerald-500/50 transition-all duration-300 transform hover:scale-105 w-full sm:w-auto min-w-[220px] mx-auto"
+           aria-label="{% trans 'Add your first vehicle' %}">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          <span class="text-sm sm:text-base">{% trans "Add First Vehicle" %}</span>
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<style>
+/* Respetar preferencia de movimiento reducido (accesibilidad) */
+@media (prefers-reduced-motion: reduce) {
+  .animate-ping, .animate-pulse, .animate-bounce {
+    animation: none !important;
+  }
+}
+</style>
+
+<script>
+// Asegurar que el botón siempre tenga el ID correcto
+(function() {
+    function ensureButtonExists() {
+        // Buscar el botón de múltiples formas
+        let btn = document.getElementById('add-vehicle-btn');
+        
+        if (!btn) {
+            // Buscar por texto
+            const links = document.querySelectorAll('a');
+            for (let link of links) {
+                if (link.textContent.includes('Add Vehicle') || link.textContent.includes('➕')) {
+                    link.id = 'add-vehicle-btn';
+                    btn = link;
+                    console.log('✅ Botón encontrado y ID asignado');
+                    break;
+                }
+            }
+        }
+        
+        if (!btn) {
+            // Buscar por href
+            const crearLinks = document.querySelectorAll('a[href*="crear"]');
+            for (let link of crearLinks) {
+                if (link.href.includes('vehiculos') && link.href.includes('crear')) {
+                    link.id = 'add-vehicle-btn';
+                    btn = link;
+                    console.log('✅ Botón encontrado por href y ID asignado');
+                    break;
+                }
+            }
+        }
+        
+        return btn;
+    }
+    
+    // Ejecutar inmediatamente
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', ensureButtonExists);
+    } else {
+        ensureButtonExists();
+    }
+    
+    // También ejecutar después de un pequeño delay por si acaso
+    setTimeout(ensureButtonExists, 100);
+    setTimeout(ensureButtonExists, 500);
+})();
+</script>
+{% endblock %}

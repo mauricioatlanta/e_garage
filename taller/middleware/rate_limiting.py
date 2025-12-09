@@ -37,6 +37,11 @@ class RateLimiter:
                 "window": 60,  # 1 minuto
                 "block_time": 300,  # 5 minutos
             },
+            "ia_prediccion": {
+                "attempts": 2,  # Solo 2 intentos permitidos
+                "window": 300,  # Ventana de 5 minutos
+                "block_time": 3600,  # Bloqueo de 1 hora (3600 segundos)
+            },
         }
 
     def get_cache_key(self, action, identifier):
@@ -293,6 +298,15 @@ class RateLimitMiddleware:
             "/api/",
         ]
 
+        # Rutas específicas de IA que requieren rate limiting estricto
+        self.ia_protected_paths = [
+            "/analytics/predictive-api/",
+            "/analytics/ai-insights/",
+            "/taller/reportes/diagnostico/",
+            "/analytics/revenue-api/",
+            "/analytics/predictive-api/",
+        ]
+
     def __call__(self, request):
         # Verificar si la ruta está protegida
         path = request.path
@@ -300,11 +314,17 @@ class RateLimitMiddleware:
             path.startswith(protected_path) for protected_path in self.protected_paths
         )
 
-        if should_protect and request.method == "POST":
+        # Verificar si es una ruta de IA (requiere protección más estricta)
+        is_ia_path = any(path.startswith(ia_path) for ia_path in self.ia_protected_paths)
+
+        if (should_protect or is_ia_path) and (request.method == "POST" or request.method == "GET"):
             ip = get_client_ip(request)
 
             # Determinar tipo de acción
-            if "login" in path:
+            if is_ia_path:
+                # Rate limiting estricto para endpoints de IA
+                action = "ia_prediccion"
+            elif "login" in path:
                 action = "login"
             elif "password" in path:
                 action = "password_reset"

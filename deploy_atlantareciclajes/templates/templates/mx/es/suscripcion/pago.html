@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}Pago de Suscripción - eGarage México{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+body {
+    background: linear-gradient(135deg, #006341 0%, #0b3d2e 50%, #ce1126 100%);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    padding: 40px 20px;
+}
+
+.payment-container {
+    max-width: 700px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    padding: 40px;
+}
+
+.payment-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-bottom: 24px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.payment-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 8px;
+}
+
+.payment-subtitle {
+    color: #718096;
+    font-size: 14px;
+}
+
+.plan-info {
+    background: linear-gradient(135deg, #00634115, #ce112615);
+    border: 2px solid #006341;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 32px;
+}
+
+.plan-name {
+    font-size: 20px;
+    font-weight: 700;
+    color: #006341;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.plan-name span {
+    font-size: 28px;
+}
+
+.plan-price {
+    font-size: 36px;
+    font-weight: 900;
+    color: #1a202c;
+    margin-bottom: 4px;
+}
+
+.plan-period {
+    color: #718096;
+    font-size: 14px;
+}
+
+.bank-details {
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.bank-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1a202c;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.bank-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.bank-row:last-child {
+    border-bottom: none;
+}
+
+.bank-label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 14px;
+}
+
+.bank-value {
+    font-weight: 700;
+    color: #1a202c;
+    font-size: 15px;
+    font-family: 'Courier New', monospace;
+}
+
+.copy-btn {
+    background: #006341;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    margin-left: 8px;
+    transition: all 0.2s;
+}
+
+.copy-btn:hover {
+    background: #0b7c5e;
+}
+
+.instructions {
+    background: #fffbea;
+    border: 2px solid #f59e0b;
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 24px;
+}
+
+.instructions-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #b45309;
+    margin-bottom: 12px;
+}
+
+.instructions ol {
+    margin-left: 20px;
+    color: #92400e;
+}
+
+.instructions li {
+    margin-bottom: 8px;
+    line-height: 1.6;
+}
+
+.alert {
+    padding: 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+
+.alert-info {
+    background: #dcfce7;
+    border: 2px solid #16a34a;
+    color: #166534;
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 24px;
+}
+
+.back-link a {
+    color: #006341;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.back-link a:hover {
+    text-decoration: underline;
+}
+
+.reference {
+    background: #e0f2f1;
+    border-radius: 10px;
+    padding: 12px 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    color: #0f766e;
+}
+
+@media (max-width: 640px) {
+    body {
+        padding: 20px;
+    }
+    .payment-container {
+        padding: 24px;
+    }
+    .bank-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    .plan-price {
+        font-size: 32px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="payment-container">
+    <div class="payment-header">
+        <h1 class="payment-title">Pago de suscripción - eGarage México 🇲🇽</h1>
+        <p class="payment-subtitle">
+            Completa la transferencia bancaria para activar tu plan. Envíanos el comprobante para validar tu cuenta.
+        </p>
+    </div>
+
+    <div class="plan-info">
+        <div class="plan-name">
+            <span>📦</span> Plan {{ plan_info.nombre }}
+        </div>
+        <div class="plan-price">${{ plan_info.valor|intcomma }} MXN</div>
+        <div class="plan-period">Incluye {{ plan_info.dias }} días de acceso ilimitado</div>
+    </div>
+
+    <div class="bank-details">
+        <div class="bank-title">
+            <span>🏦</span> Datos bancarios para transferencia
+        </div>
+        <div class="bank-row">
+            <span class="bank-label">Banco</span>
+            <span class="bank-value">{{ datos_banco.banco }}</span>
+        </div>
+        <div class="bank-row">
+            <span class="bank-label">Titular</span>
+            <span class="bank-value">{{ datos_banco.titular }}</span>
+        </div>
+        <div class="bank-row">
+            <span class="bank-label">Cuenta</span>
+            <span class="bank-value">{{ datos_banco.numero_cuenta }}</span>
+        </div>
+        <div class="bank-row">
+            <span class="bank-label">CLABE</span>
+            <span class="bank-value">{{ datos_banco.clabe }}</span>
+            <button class="copy-btn" onclick="copyToClipboard('{{ datos_banco.clabe }}')">Copiar</button>
+        </div>
+        <div class="bank-row">
+            <span class="bank-label">Confirmación</span>
+            <span class="bank-value">{{ datos_banco.email_confirmacion }}</span>
+        </div>
+    </div>
+
+    <div class="instructions">
+        <div class="instructions-title">Pasos para activar tu suscripción</div>
+        <ol>
+            <li>Realiza la transferencia bancaria por el monto indicado.</li>
+            <li>Incluye en el concepto: <strong>{{ referencia }}</strong></li>
+            <li>Envía el comprobante al correo: <strong>{{ datos_banco.email_confirmacion }}</strong></li>
+            <li>Nuestro equipo activará tu cuenta en un periodo de 24-48 horas hábiles.</li>
+        </ol>
+    </div>
+
+    <div class="alert alert-info">
+        Si prefieres facturación electrónica con CFDI, por favor envíanos tus datos fiscales a
+        {{ datos_banco.email_confirmacion }}.
+    </div>
+
+    <div class="back-link">
+        <a href="/mx/es/dashboard/">&larr; Volver al panel</a>
+    </div>
+</div>
+
+<script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(function() {
+        alert("CLABE copiada al portapapeles");
+    });
+}
+</script>
+{% endblock %}
+

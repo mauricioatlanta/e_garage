@@ -1,0 +1,798 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}Crear Cuenta - eGarage{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js" defer></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0a0a;
+    font-family: 'Inter', sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.grid-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: 1;
+}
+
+.signup-container {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+.glass-card {
+    background: linear-gradient(135deg, rgba(8, 12, 30, 0.95) 0%, rgba(15, 23, 42, 0.92) 100%);
+    backdrop-filter: blur(30px);
+    border-radius: 20px;
+    border: 2px solid rgba(0, 245, 255, 0.3);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.5),
+        0 0 0 1px rgba(0, 245, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 36px 32px;
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.1), transparent);
+    animation: shimmer 3s infinite;
+    pointer-events: none;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.logo-section {
+    text-align: center;
+    margin-bottom: 24px;
+}
+
+.logo {
+    width: 70px;
+    height: 70px;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.6));
+}
+
+.brand-name {
+    font-size: 32px;
+    font-weight: 900;
+    color: #22d3ee;
+    font-family: 'Orbitron', monospace;
+    text-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
+    margin-bottom: 8px;
+}
+
+.subtitle {
+    color: #94a3b8;
+    font-size: 14px;
+}
+
+.signup-title {
+    font-size: 22px;
+    font-weight: 700;
+    color: #00f5ff;
+    margin-bottom: 24px;
+    text-align: center;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 15px rgba(0, 245, 255, 0.6);
+}
+
+.form-section {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #00f5ff;
+    margin-bottom: 12px;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0, 245, 255, 0.5);
+}
+
+.form-group {
+    margin-bottom: 14px;
+}
+
+.form-label {
+    display: block;
+    font-size: 12px;
+    font-weight: 700;
+    color: #00f5ff;
+    margin-bottom: 6px;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.form-input, .form-select, input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select, .input-futurista {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: 'Inter', sans-serif;
+    color: #ffffff !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    border: 2px solid rgba(0, 245, 255, 0.4) !important;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(0, 245, 255, 0.1);
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+.form-input:focus, .form-select:focus, input[type="text"]:focus, input[type="email"]:focus, input[type="tel"]:focus, input[type="password"]:focus, select:focus, .input-futurista:focus {
+    outline: none !important;
+    border-color: #00f5ff !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.4),
+        0 0 0 2px rgba(0, 245, 255, 0.3),
+        0 0 20px rgba(0, 245, 255, 0.4),
+        0 0 40px rgba(0, 245, 255, 0.2);
+    color: #ffffff !important;
+}
+
+.form-input:hover, .form-select:hover {
+    border-color: rgba(0, 245, 255, 0.6);
+    box-shadow: 
+        inset 0 2px 4px rgba(0, 0, 0, 0.3),
+        0 0 0 1px rgba(0, 245, 255, 0.2),
+        0 0 15px rgba(0, 245, 255, 0.2);
+}
+
+.form-input::placeholder {
+    color: #64748b;
+    opacity: 0.7;
+}
+
+.form-select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300f5ff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
+.help-text {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 4px;
+    font-style: italic;
+}
+
+.error-message {
+    color: #ff6b6b;
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.error-message::before {
+    content: '⚠';
+    font-size: 14px;
+}
+
+/* Pricing Cards */
+.pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+}
+
+.plan-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(34, 211, 238, 0.2);
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    transition: all 0.3s;
+    cursor: pointer;
+    position: relative;
+}
+
+.plan-card:hover {
+    border-color: #22d3ee;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(34, 211, 238, 0.3);
+}
+
+.plan-card.selected {
+    border-color: #22d3ee;
+    background: rgba(34, 211, 238, 0.1);
+    box-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
+}
+
+.plan-card.recommended {
+    border-color: #fbbf24;
+}
+
+.plan-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #22d3ee, #3b82f6);
+    color: #000;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 12px;
+}
+
+.plan-badge.gold {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+}
+
+.plan-name {
+    font-size: 18px;
+    font-weight: 700;
+    color: #ffffff;
+    margin-bottom: 12px;
+    font-family: 'Orbitron', monospace;
+}
+
+.plan-price {
+    font-size: 28px;
+    font-weight: 900;
+    color: #22d3ee;
+    margin-bottom: 4px;
+    font-family: 'Orbitron', monospace;
+}
+
+.plan-period {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+}
+
+.plan-savings {
+    background: rgba(34, 211, 238, 0.15);
+    color: #22d3ee;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 12px;
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #94a3b8;
+    text-align: left;
+}
+
+.plan-features li {
+    margin-bottom: 8px;
+    padding-left: 20px;
+    position: relative;
+}
+
+.plan-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #22d3ee;
+    font-weight: 700;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 16px 0;
+    padding: 12px;
+    background: rgba(8, 12, 30, 0.5);
+    border-radius: 8px;
+    border: 1px solid rgba(0, 245, 255, 0.2);
+}
+
+.form-checkbox {
+    width: 18px;
+    height: 18px;
+    accent-color: #00f5ff;
+    cursor: pointer;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.checkbox-label {
+    font-size: 13px;
+    color: #cbd5e1;
+    cursor: pointer;
+    line-height: 1.5;
+}
+
+.checkbox-label a {
+    color: #22d3ee;
+    text-decoration: none;
+}
+
+.checkbox-label a:hover {
+    text-decoration: underline;
+}
+
+.signup-button {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #000000;
+    background: linear-gradient(135deg, #00f5ff 0%, #00d4ff 50%, #0099cc 100%);
+    border: 2px solid rgba(0, 245, 255, 0.5);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 
+        0 0 30px rgba(0, 245, 255, 0.6),
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.signup-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s;
+}
+
+.signup-button:hover::before {
+    left: 100%;
+}
+
+.signup-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 
+        0 0 40px rgba(0, 245, 255, 0.9),
+        0 6px 20px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    border-color: #00f5ff;
+}
+
+.signup-button:active {
+    transform: translateY(0);
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 245, 255, 0.2);
+}
+
+.login-text {
+    font-size: 13px;
+    color: #94a3b8;
+}
+
+.login-link a {
+    color: #00f5ff;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+}
+
+.login-link a:hover {
+    text-shadow: 0 0 10px rgba(0, 245, 255, 0.8);
+    color: #00d4ff;
+}
+
+/* Efectos futuristas adicionales */
+.form-input, .form-select {
+    position: relative;
+}
+
+/* FORZAR FONDOS OSCUROS - ELIMINAR CUALQUIER FONDO BLANCO */
+#signup-form input,
+#signup-form select,
+form input,
+form select,
+.glass-card input,
+.glass-card select,
+.signup-container input,
+.signup-container select {
+    background: rgba(0, 0, 0, 0.4) !important;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+    color: #ffffff !important;
+    border: 2px solid rgba(0, 245, 255, 0.4) !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    appearance: none !important;
+}
+
+#signup-form input:focus,
+#signup-form select:focus,
+form input:focus,
+form select:focus,
+.glass-card input:focus,
+.glass-card select:focus,
+.signup-container input:focus,
+.signup-container select:focus {
+    background: rgba(0, 0, 0, 0.6) !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
+    border-color: #00f5ff !important;
+    outline: none !important;
+}
+
+/* Eliminar fondos blancos del autofill del navegador */
+#signup-form input:-webkit-autofill,
+#signup-form input:-webkit-autofill:hover,
+#signup-form input:-webkit-autofill:focus,
+#signup-form input:-webkit-autofill:active,
+form input:-webkit-autofill,
+form input:-webkit-autofill:hover,
+form input:-webkit-autofill:focus,
+form input:-webkit-autofill:active,
+.glass-card input:-webkit-autofill,
+.glass-card input:-webkit-autofill:hover,
+.glass-card input:-webkit-autofill:focus,
+.glass-card input:-webkit-autofill:active,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.4) inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+#signup-form input:-webkit-autofill:focus,
+form input:-webkit-autofill:focus,
+.glass-card input:-webkit-autofill:focus,
+input:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.6) inset !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+    background-color: rgba(0, 0, 0, 0.6) !important;
+}
+
+#signup-form select:-webkit-autofill,
+#signup-form select:-webkit-autofill:hover,
+#signup-form select:-webkit-autofill:focus,
+#signup-form select:-webkit-autofill:active,
+form select:-webkit-autofill,
+form select:-webkit-autofill:hover,
+form select:-webkit-autofill:focus,
+form select:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.4) inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background: rgba(0, 0, 0, 0.4) !important;
+    background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+@keyframes borderPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+}
+
+@media (max-width: 768px) {
+    .glass-card {
+        padding: 28px 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 12px;
+    }
+    
+    .form-section {
+        margin-bottom: 16px;
+    }
+    
+    .pricing-grid {
+        grid-template-columns: 1fr;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Vanta.js background -->
+<div id="vanta-bg" style="position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0;"></div>
+<div class="grid-bg"></div>
+
+<div class="signup-container">
+    <div class="glass-card">
+        <!-- Logo -->
+        <div class="logo-section">
+            <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
+            <div class="brand-name">eGarage</div>
+            <div class="subtitle">Gestión Profesional Automotriz</div>
+        </div>
+
+        <h2 class="signup-title">Crea Tu Cuenta</h2>
+
+        <!-- Mensajes -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" id="signup-form">
+            {% csrf_token %}
+
+            <!-- SECCIÓN 1: Datos Personales -->
+            <div class="form-section">
+                <h3 class="section-title">Información Personal</h3>
+
+                <div class="form-group">
+                    <label class="form-label">Nombre y Apellido *</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <div class="error-message">{{ form.first_name.errors }}</div>
+                    {% endif %}
+                    {% if form.first_name.help_text %}
+                    <div class="help-text">{{ form.first_name.help_text }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Celular (WhatsApp) *</label>
+                    {{ form.telefono }}
+                    {% if form.telefono.errors %}
+                    <div class="error-message">{{ form.telefono.errors }}</div>
+                    {% endif %}
+                    {% if form.telefono.help_text %}
+                    <div class="help-text">{{ form.telefono.help_text }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Correo Electrónico (Opcional)</label>
+                    {{ form.email }}
+                    {% if form.email.errors %}
+                    <div class="error-message">{{ form.email.errors }}</div>
+                    {% endif %}
+                    <div class="help-text">Recomendado pero no obligatorio</div>
+                </div>
+
+                {% if form.country %}
+                <div class="form-group">
+                    <label class="form-label">País</label>
+                    {{ form.country }}
+                    {% if form.country.errors %}
+                    <div class="error-message">{{ form.country.errors }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Mensaje sobre prueba gratuita -->
+            <div class="form-section" style="background: linear-gradient(135deg, rgba(0, 245, 255, 0.12) 0%, rgba(0, 200, 255, 0.08) 100%); padding: 16px; border-radius: 10px; border: 1px solid rgba(0, 245, 255, 0.4); margin-bottom: 16px; box-shadow: 0 0 20px rgba(0, 245, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.1);">
+                <p style="color: #a5f3fc; text-align: center; font-weight: 600; font-size: 13px; line-height: 1.6; margin: 0;">
+                    ✅ Tu cuenta incluye 30 días gratis de eGarage.<br>
+                    No pedimos tarjeta. Al terminar la prueba podrás elegir entre plan mensual, 6 meses o anual.
+                </p>
+            </div>
+
+            <!-- SECCIÓN 3: Contraseña -->
+            <div class="form-section">
+                <h3 class="section-title">Seguridad</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">Contraseña</label>
+                        {{ form.password1 }}
+                        <div class="help-text">{{ form.password1.help_text }}</div>
+                        {% if form.password1.errors %}
+                        <div class="error-message">{{ form.password1.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Confirmar Contraseña</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                        <div class="error-message">{{ form.password2.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Términos (si existe el campo) -->
+            {% if form.acepta_terminos %}
+            <div class="checkbox-container">
+                {{ form.acepta_terminos }}
+                <label for="id_acepta_terminos" class="checkbox-label">
+                    Acepto los <a href="/legal/">términos y condiciones</a>
+                </label>
+            </div>
+            {% if form.acepta_terminos.errors %}
+            <div class="error-message">{{ form.acepta_terminos.errors }}</div>
+            {% endif %}
+            {% endif %}
+
+            <!-- Errores generales -->
+            {% if form.non_field_errors %}
+            <div class="error-message">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <!-- Botón Submit -->
+            <button type="submit" class="signup-button">
+                CREAR CUENTA
+            </button>
+        </form>
+
+        <!-- Link a Login -->
+        <div class="login-link">
+            <span class="login-text">¿Ya tienes una cuenta?</span>
+            <a href="/cl/es/accounts/login/">Iniciar sesión</a>
+        </div>
+    </div>
+</div>
+
+<script>
+// ---------- VANTA BG ----------
+function initVantaBackground() {
+    if (typeof VANTA !== 'undefined' && VANTA.NET) {
+        VANTA.NET({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x22d3ee,
+            backgroundColor: 0x0a0a0a,
+            points: 8.00,
+            maxDistance: 20.00,
+            spacing: 18.00
+        });
+    }
+}
+
+// ---------- SELECCIÓN DE PLAN ----------
+function selectPlan(planName) {
+    const planSelect = document.getElementById('id_plan');
+    if (planSelect) {
+        planSelect.value = planName;
+    }
+
+    document.querySelectorAll('.plan-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+
+    const selected = document.querySelector(`[data-plan="${planName}"]`);
+    if (selected) {
+        selected.classList.add('selected');
+    }
+}
+
+// ---------- INICIALIZACIÓN ----------
+function initializeSignupPage() {
+    const paisSelect = document.getElementById('id_pais');
+    
+    // Pre-seleccionar plan si viene de la URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const planParam = urlParams.get('plan');
+    if (planParam) {
+        selectPlan(planParam);
+    }
+
+    // Listener para cambio de plan
+    const planSelect = document.getElementById('id_plan');
+    if (planSelect) {
+        planSelect.addEventListener('change', function() {
+            selectPlan(this.value);
+        });
+    }
+}
+
+// ---------- FORZAR FONDOS OSCUROS - ELIMINAR BLANCOS ----------
+function forceDarkBackgrounds() {
+    const allInputs = document.querySelectorAll('input[type="text"], input[type="email"], input[type="tel"], input[type="password"], select');
+    allInputs.forEach(function(input) {
+        // Forzar fondo oscuro
+        input.style.setProperty('background', 'rgba(0, 0, 0, 0.4)', 'important');
+        input.style.setProperty('background-color', 'rgba(0, 0, 0, 0.4)', 'important');
+        input.style.setProperty('color', '#ffffff', 'important');
+        input.style.setProperty('-webkit-appearance', 'none', 'important');
+        input.style.setProperty('-moz-appearance', 'none', 'important');
+        input.style.setProperty('appearance', 'none', 'important');
+        
+        // Event listener para mantener el fondo oscuro
+        input.addEventListener('focus', function() {
+            this.style.setProperty('background', 'rgba(0, 0, 0, 0.6)', 'important');
+            this.style.setProperty('background-color', 'rgba(0, 0, 0, 0.6)', 'important');
+        });
+        
+        input.addEventListener('blur', function() {
+            this.style.setProperty('background', 'rgba(0, 0, 0, 0.4)', 'important');
+            this.style.setProperty('background-color', 'rgba(0, 0, 0, 0.4)', 'important');
+        });
+    });
+}
+
+// ---------- ARRANQUE GLOBAL ----------
+document.addEventListener('DOMContentLoaded', function() {
+    initVantaBackground();
+    initializeSignupPage();
+    
+    // Forzar fondos oscuros inmediatamente y después de delays
+    forceDarkBackgrounds();
+    setTimeout(forceDarkBackgrounds, 100);
+    setTimeout(forceDarkBackgrounds, 500);
+    setTimeout(forceDarkBackgrounds, 1000);
+    
+    // Observar cambios en el DOM
+    const observer = new MutationObserver(function(mutations) {
+        forceDarkBackgrounds();
+    });
+    
+    observer.observe(document.body, {
+        childList: true,
+        subtree: true
+    });
+});
+</script>
+{% endblock %}
+
+

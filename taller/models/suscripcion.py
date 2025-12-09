@@ -4,6 +4,12 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.utils import timezone
 
+# Intentamos importar Empresa para marcar 'ha_usado_prueba' al activar trial
+try:
+    from taller.models.empresa import Empresa
+except Exception:
+    Empresa = None
+
 TIPOS_SUSCRIPCION = [
     ("trial", "Prueba gratuita"),
     ("mensual", "Mensual"),
@@ -20,6 +26,24 @@ class Suscripcion(models.Model):
     activa = models.BooleanField(default=False)
 
     def activar(self):
+        # Marcar que la empresa vinculada (si existe) ya usó la prueba
+        if self.tipo == "trial":
+            try:
+                # Buscar un TeamMember activo que vincule al usuario con una Empresa
+                team_member = None
+                if hasattr(self.user, "team_memberships"):
+                    team_member = self.user.team_memberships.filter(is_active=True).first()
+
+                # Si existe team_member y empresa, marcar el flag en Empresa
+                if team_member and getattr(team_member, "empresa", None):
+                    empresa = team_member.empresa
+                    if Empresa is not None and hasattr(empresa, "ha_usado_prueba"):
+                        empresa.ha_usado_prueba = True
+                        empresa.save(update_fields=["ha_usado_prueba"])
+            except Exception as e:
+                # No impedir la activación por errores en la lógica de empresa
+                print(f"Advertencia: no se pudo actualizar ha_usado_prueba: {e}")
+
         self.fecha_inicio = timezone.now().date()
         if self.tipo == "trial":
             self.fecha_fin = self.fecha_inicio + timedelta(days=30)

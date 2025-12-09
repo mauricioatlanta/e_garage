@@ -1,0 +1,472 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}⚙️ Settings Center - eGarage{% endblock %}
+
+{% block extra_css %}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+    
+    :root {
+        --neon-cyan: #00ffff;
+        --neon-purple: #b026ff;
+        --neon-pink: #ff00ff;
+        --dark-bg: #0a0e27;
+        --dark-card: #151932;
+        --dark-border: #1e2447;
+        --text-primary: #ffffff;
+        --text-secondary: #a0aec0;
+        --accent-glow: rgba(0, 255, 255, 0.3);
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
+        background-attachment: fixed;
+        font-family: 'Rajdhani', sans-serif;
+        color: var(--text-primary);
+        min-height: 100vh;
+    }
+
+    .settings-container {
+        max-width: 1600px;
+        margin: 0 auto;
+        padding: 2rem;
+        position: relative;
+        z-index: 10;
+    }
+
+
+    /* Botones de sección */
+    .section-buttons-container {
+        margin-top: 2rem;
+    }
+
+    .section-button {
+        background: rgba(21, 25, 50, 0.7);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(0, 255, 255, 0.3);
+        border-radius: 15px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        width: 100%;
+        text-align: left;
+    }
+
+    .section-button:hover {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        transform: translateY(-3px);
+    }
+
+    .section-button.active {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 40px rgba(0, 255, 255, 0.5);
+        background: rgba(0, 255, 255, 0.1);
+    }
+
+    .section-button h3 {
+        margin: 0;
+        color: var(--neon-cyan);
+        font-family: 'Orbitron', sans-serif;
+        font-weight: 700;
+        font-size: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .section-button h3 i {
+        font-size: 2rem;
+        margin-right: 1rem;
+    }
+
+    .section-button .arrow {
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .section-button.active .arrow {
+        transform: rotate(180deg);
+    }
+
+    /* Formularios ocultos por defecto */
+    .settings-card-form {
+        display: none;
+        margin-bottom: 2rem;
+    }
+
+    .settings-card-form.active {
+        display: block;
+    }
+
+    .tecnicos-section {
+        display: none;
+    }
+
+    .tecnicos-section.active {
+        display: block;
+    }
+
+    /* Form Section */
+    .form-section {
+        background: rgba(21, 25, 50, 0.7);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 2.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    }
+
+    .form-section h4 {
+        color: var(--neon-cyan);
+        margin-bottom: 2rem;
+        font-weight: 700;
+        font-size: 1.5rem;
+        font-family: 'Orbitron', sans-serif;
+    }
+
+    .form-label {
+        color: var(--text-primary);
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        background: rgba(10, 14, 39, 0.6);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 10px;
+        padding: 0.875rem 1.25rem;
+        color: var(--text-primary);
+        font-size: 1rem;
+        width: 100%;
+    }
+
+    .form-control:focus, .form-select:focus {
+        background: rgba(10, 14, 39, 0.8);
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+        outline: none;
+        color: var(--text-primary);
+    }
+
+    .btn-save {
+        background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(176, 38, 255, 0.2) 100%);
+        border: 2px solid var(--neon-cyan);
+        color: var(--text-primary);
+        padding: 1rem 2.5rem;
+        border-radius: 12px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.3s ease;
+        text-transform: uppercase;
+        cursor: pointer;
+    }
+
+    .btn-save:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(0, 255, 255, 0.5);
+        border-color: var(--neon-purple);
+    }
+
+    /* Ocultar header y mensajes */
+    .settings-header, .alert-settings {
+        display: none !important;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="settings-container">
+    <!-- Botones de Secciones -->
+    <div class="section-buttons-container">
+        <div class="section-button" data-section="profile" onclick="toggleSection('profile')">
+            <h3>
+                <span><i class="fas fa-building"></i>Company Information</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </h3>
+        </div>
+
+        <div class="section-button" data-section="financial" onclick="toggleSection('financial')">
+            <h3>
+                <span><i class="fas fa-receipt"></i>Taxes & Finance</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </h3>
+        </div>
+
+        <div class="section-button" data-section="theme" onclick="toggleSection('theme')">
+            <h3>
+                <span><i class="fas fa-palette"></i>Theme & Colors</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </h3>
+        </div>
+
+        <div class="section-button" data-section="tecnicos" onclick="toggleSection('tecnicos')">
+            <h3>
+                <span><i class="fas fa-users"></i>Employee Management</span>
+                <i class="fas fa-chevron-down arrow"></i>
+            </h3>
+        </div>
+    </div>
+
+    <!-- Sección 1: Información de Empresa -->
+    <form method="post" enctype="multipart/form-data" class="settings-card-form" id="form-profile" data-section="profile">
+        {% csrf_token %}
+        <input type="hidden" name="section" value="profile">
+        
+        <div class="form-section">
+            <h4><i class="fas fa-building"></i>Información de Empresa</h4>
+
+            <div class="row">
+                <div class="col-md-8 mb-3">
+                    <label class="form-label">{{ profile_form.company_name.label }}</label>
+                    {{ profile_form.company_name }}
+                    {{ profile_form.company_name.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">{{ profile_form.tagline.label }}</label>
+                    {{ profile_form.tagline }}
+                    {{ profile_form.tagline.errors }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <label class="form-label">{{ profile_form.logo.label }}</label>
+                    {{ profile_form.logo }}
+                    {{ profile_form.logo.errors }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ profile_form.phone.label }}</label>
+                    {{ profile_form.phone }}
+                    {{ profile_form.phone.errors }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ profile_form.email.label }}</label>
+                    {{ profile_form.email }}
+                    {{ profile_form.email.errors }}
+                </div>
+                <div class="col-md-12 mb-3">
+                    <label class="form-label">{{ profile_form.website.label }}</label>
+                    {{ profile_form.website }}
+                    {{ profile_form.website.errors }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <label class="form-label">{{ profile_form.address.label }}</label>
+                    {{ profile_form.address }}
+                    {{ profile_form.address.errors }}
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ profile_form.tax_id.label }}</label>
+                    {{ profile_form.tax_id }}
+                    {{ profile_form.tax_id.errors }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ profile_form.business_license.label }}</label>
+                    {{ profile_form.business_license }}
+                    {{ profile_form.business_license.errors }}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4 pt-3" style="border-top: 2px solid rgba(0, 255, 255, 0.3);">
+                <button type="submit" class="btn btn-save">
+                    <i class="fas fa-save me-2"></i>Guardar Información de Empresa
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Sección 2: Impuestos y Finanzas -->
+    <form method="post" class="settings-card-form" id="form-financial" data-section="financial">
+        {% csrf_token %}
+        <input type="hidden" name="section" value="financial">
+        
+        <div class="form-section">
+            <h4><i class="fas fa-receipt"></i>Impuestos y Finanzas</h4>
+
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">{{ financial_form.currency.label }}</label>
+                    {{ financial_form.currency }}
+                    {{ financial_form.currency.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <label class="form-label">{{ financial_form.tax_rate.label }}</label>
+                    {{ financial_form.tax_rate }}
+                    <small class="form-text text-muted" style="color: var(--text-secondary);">
+                        {{ financial_form.tax_rate.help_text }}
+                    </small>
+                    {{ financial_form.tax_rate.errors }}
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="form-check mt-4">
+                        {{ financial_form.apply_tax_by_default }}
+                        <label class="form-check-label">
+                            {{ financial_form.apply_tax_by_default.label }}
+                        </label>
+                        <small class="form-text text-muted" style="color: var(--text-secondary);">
+                            {{ financial_form.apply_tax_by_default.help_text }}
+                        </small>
+                        {{ financial_form.apply_tax_by_default.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4 pt-3" style="border-top: 2px solid rgba(0, 255, 255, 0.3);">
+                <button type="submit" class="btn btn-save">
+                    <i class="fas fa-save me-2"></i>Guardar Configuración Fiscal
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Sección 3: Tema y Colores -->
+    <form method="post" class="settings-card-form" id="form-theme" data-section="theme">
+        {% csrf_token %}
+        <input type="hidden" name="section" value="theme">
+        
+        <div class="form-section">
+            <h4><i class="fas fa-palette"></i>Tema y Colores</h4>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ theme_form.primary_color.label }}</label>
+                    {{ theme_form.primary_color }}
+                    {{ theme_form.primary_color.errors }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">{{ theme_form.secondary_color.label }}</label>
+                    {{ theme_form.secondary_color }}
+                    {{ theme_form.secondary_color.errors }}
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <div class="form-check">
+                        {{ theme_form.separate_by_technician }}
+                        <label class="form-check-label">
+                            {{ theme_form.separate_by_technician.label }}
+                        </label>
+                        {{ theme_form.separate_by_technician.errors }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4 pt-3" style="border-top: 2px solid rgba(0, 255, 255, 0.3);">
+                <button type="submit" class="btn btn-save">
+                    <i class="fas fa-save me-2"></i>Guardar Tema y Colores
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Sección 4: Gestión de Empleados -->
+    <div class="tecnicos-section" id="form-tecnicos">
+        <div class="form-section">
+            <h4><i class="fas fa-users"></i>Gestión de Empleados</h4>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Nombre Completo *</label>
+                        <input type="text" name="nombre" class="form-control" required>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Teléfono</label>
+                        <input type="text" name="telefono" class="form-control">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Dirección</label>
+                        <input type="text" name="direccion" class="form-control">
+                    </div>
+                </div>
+                <button type="submit" name="crear_tecnico" class="btn btn-save">
+                    <i class="fas fa-plus me-2"></i>Agregar Empleado
+                </button>
+            </form>
+
+            {% if tecnicos %}
+                <h5 class="mt-4 mb-3" style="color: var(--neon-cyan);">
+                    <i class="fas fa-list me-2"></i>Empleados Registrados ({{ tecnicos|length }})
+                </h5>
+                {% for tecnico in tecnicos %}
+                    <div style="background: rgba(10, 14, 39, 0.6); border: 1px solid rgba(0, 255, 255, 0.2); border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h5 style="margin: 0; color: var(--text-primary);">{{ tecnico.nombre }}</h5>
+                            {% if tecnico.telefono %}<p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);"><i class="fas fa-phone"></i> {{ tecnico.telefono }}</p>{% endif %}
+                            {% if tecnico.direccion %}<p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);"><i class="fas fa-map-marker-alt"></i> {{ tecnico.direccion }}</p>{% endif %}
+                        </div>
+                        <form method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="toggle_tecnico" value="{{ tecnico.id }}">
+                            <button type="submit" class="btn btn-save" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                                {% if tecnico.activo %}<i class="fas fa-ban me-1"></i>Desactivar{% else %}<i class="fas fa-check me-1"></i>Activar{% endif %}
+                            </button>
+                        </form>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Función para mostrar/ocultar secciones
+    window.toggleSection = function(sectionName) {
+        // Ocultar todos los formularios
+        document.querySelectorAll('.settings-card-form').forEach(form => {
+            form.classList.remove('active');
+        });
+        document.querySelectorAll('.tecnicos-section').forEach(section => {
+            section.classList.remove('active');
+        });
+        
+        // Remover clase active de todos los botones
+        document.querySelectorAll('.section-button').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        
+        // Mostrar el formulario correspondiente
+        if (sectionName === 'tecnicos') {
+            const section = document.getElementById('form-tecnicos');
+            if (section) section.classList.add('active');
+        } else {
+            const form = document.getElementById('form-' + sectionName);
+            if (form) form.classList.add('active');
+        }
+        
+        // Agregar clase active al botón correspondiente
+        const button = document.querySelector(`[data-section="${sectionName}"]`);
+        if (button) button.classList.add('active');
+        
+        // Scroll suave
+        setTimeout(() => {
+            const targetElement = sectionName === 'tecnicos' 
+                ? document.getElementById('form-tecnicos')
+                : document.getElementById('form-' + sectionName);
+            if (targetElement) {
+                targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }, 100);
+    };
+});
+</script>
+{% endblock %}

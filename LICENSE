@@ -1,0 +1,51 @@
+# 🔒 PROPIEDAD DE E GARAGE / TODOS LOS DERECHOS RESERVADOS
+
+**Copyright (c) 2025 eGarage. Todos los derechos reservados.**
+
+El código fuente, los algoritmos, la lógica de negocio y la documentación asociados con el software eGarage son propiedad intelectual exclusiva de eGarage.
+
+Queda estrictamente prohibida la copia, modificación, distribución, venta o ingeniería inversa no autorizada de este software. El acceso y uso de este código está regido únicamente por los Términos de Servicio (TOS) y los Acuerdos de Licencia de Usuario Final (EULA) de eGarage.
+
+**US Patent Pending.**  
+**Chile Software Registration Pending.**
+
+---
+
+## PROHIBICIONES ESPECÍFICAS
+
+1. **Reproducción**: No se permite copiar, duplicar o reproducir cualquier parte del código fuente, algoritmos o documentación.
+
+2. **Modificación**: Está prohibido modificar, adaptar, traducir o crear trabajos derivados basados en este software.
+
+3. **Distribución**: No se permite distribuir, sublicenciar, vender, alquilar, arrendar o transferir el software o cualquier parte del mismo.
+
+4. **Ingeniería Inversa**: Queda estrictamente prohibida la descompilación, desensamblado, ingeniería inversa o cualquier intento de derivar el código fuente del software.
+
+5. **Uso Comercial No Autorizado**: El uso comercial de este software está restringido únicamente a los términos establecidos en los Acuerdos de Licencia de Usuario Final (EULA) de eGarage.
+
+## COMPONENTES PROTEGIDOS
+
+Los siguientes componentes están especialmente protegidos como propiedad intelectual de eGarage:
+
+- **Motor de Inteligencia Artificial**: Algoritmos de predicción, análisis predictivo y sistemas de recomendación (`taller/utils/motor_ia.py`, `taller/analytics/ai_reports.py`)
+- **Lógica de Negocio**: Sistemas de gestión, procesamiento de datos y algoritmos de optimización
+- **Interfaces y Diseños**: Diseños de usuario, interfaces gráficas y experiencias de usuario
+- **Documentación**: Manuales, guías técnicas y documentación de API
+
+## DERECHOS RESERVADOS
+
+Todos los derechos no expresamente otorgados en este documento están reservados. eGarage se reserva el derecho de tomar acciones legales contra cualquier violación de estos términos.
+
+## CONTACTO LEGAL
+
+Para consultas sobre licencias, permisos o uso autorizado del software, contacte a:
+
+**eGarage Legal Department**  
+Email: suscripcion@atlantareciclajes.cl
+
+---
+
+**Última actualización**: 2025-12-08
+
+
+

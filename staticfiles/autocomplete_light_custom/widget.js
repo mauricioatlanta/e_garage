@@ -1,0 +1,1 @@
+// widget.js – lógica principal del widget DAL

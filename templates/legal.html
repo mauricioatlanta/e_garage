@@ -24,7 +24,7 @@
           {% endif %}
         </h1>
         <p class="text-gray-400 text-sm mb-6">
-          eGarage • © 2024
+          eGarage • © 2025 • All Rights Reserved
         </p>
         <p class="text-xs text-gray-500 mb-8">
           {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
@@ -114,6 +114,42 @@
                 {% endif %}
               </li>
             </ul>
+          </section>
+
+          <section>
+            <h2 class="text-xl font-semibold text-cyan-300 mb-3">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                Propiedad Intelectual
+              {% else %}
+                Intellectual Property
+              {% endif %}
+            </h2>
+            <p class="text-gray-300 text-sm mb-3">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                El código fuente, algoritmos, lógica de negocio y documentación de eGarage son propiedad intelectual exclusiva de eGarage. Todos los derechos reservados.
+              {% else %}
+                The source code, algorithms, business logic and documentation of eGarage are the exclusive intellectual property of eGarage. All rights reserved.
+              {% endif %}
+            </p>
+            <p class="text-gray-400 text-sm mb-3">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                Queda estrictamente prohibida la copia, modificación, distribución, venta o ingeniería inversa no autorizada de este software. El acceso y uso está regido por los Términos de Servicio (TOS) y Acuerdos de Licencia de Usuario Final (EULA) de eGarage.
+              {% else %}
+                Copying, modification, distribution, sale or unauthorized reverse engineering of this software is strictly prohibited. Access and use is governed by eGarage's Terms of Service (TOS) and End User License Agreements (EULA).
+              {% endif %}
+            </p>
+            <p class="text-gray-400 text-sm">
+              <strong class="text-cyan-400">
+                {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                  Para más información, consulte el archivo LICENSE en el repositorio del código fuente.
+                {% else %}
+                  For more information, see the LICENSE file in the source code repository.
+                {% endif %}
+              </strong>
+            </p>
+            <p class="text-xs text-gray-500 mt-2">
+              <strong>US Patent Pending.</strong> <strong>Chile Software Registration Pending.</strong>
+            </p>
           </section>
 
           <section>

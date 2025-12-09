@@ -140,6 +140,8 @@ MIDDLEWARE = [
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Rate limiting global (protege /api/ y rutas de login automáticamente)
+    "taller.middleware.rate_limiting.RateLimitMiddleware",
     # País/empresa (provee request.empresa / request.empresa.pais)
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
@@ -213,6 +215,7 @@ TEMPLATES = [
                 "taller.context_processors.namespaces.ui_namespaces",
                 "taller.context_processors.company_context",
                 "taller.context_processors.company_branding",
+                "taller.context_processors.company_country",  # ✅ Asegura que company_country esté siempre disponible
                 "taller.context_processors.company_header",
                 "taller.context_processors.country_config.country_context",
             ],
@@ -426,3 +429,7 @@ DEFAULT_BRAND_COUNTRY = "cl"
 DEFAULT_BRAND_CURRENCY = "CLP"
 DEFAULT_BRAND_PRIMARY_COLOR = "#0d6efd"
 DEFAULT_BRAND_SECONDARY_COLOR = "#6c757d"
+
+# ---------- Admin Audit Configuration ----------
+# Número de teléfono para recibir notificaciones de auditoría de cortesías
+ADMIN_AUDIT_PHONE = os.getenv("ADMIN_AUDIT_PHONE", "+56963607348")

@@ -66,6 +66,15 @@ class PagoPendiente(models.Model):
 
         dias = dias_plan.get(self.plan, 30)
 
+        # Detectar si es nueva suscripción, cambio de plan o renovación
+        plan_anterior = self.empresa.plan
+        es_nueva_suscripcion = not self.empresa.suscripcion_activa or self.empresa.plan == "trial"
+        es_cambio_plan = (
+            self.empresa.suscripcion_activa
+            and plan_anterior != self.plan
+            and plan_anterior != "trial"
+        )
+
         # Actualizar empresa
         self.empresa.extender_suscripcion(dias=dias)
         self.empresa.plan = self.plan
@@ -78,52 +87,46 @@ class PagoPendiente(models.Model):
         self.verificado_por = admin_user
         self.save()
 
-        # 📧 ENVIAR EMAIL DE CONFIRMACIÓN
+        # 📧 ENVIAR NOTIFICACIONES AUTOMÁTICAS (Email + WhatsApp)
         try:
-            # Determinar idioma según país
-            language = "es" if self.empresa.pais in {"CL", "MX"} else "en"
-
-            # Determinar moneda
-            moneda = (
-                "CLP"
-                if self.empresa.pais == "CL"
-                else "MXN" if self.empresa.pais == "MX" else "USD"
+            from taller.utils.notificaciones_suscripcion import (
+                notificar_cambio_plan,
+                notificar_nueva_suscripcion,
+                notificar_renovacion_exitosa,
             )
 
-            # Asunto según idioma
-            if language == "en":
-                subject = "✅ Payment Confirmed - eGarage"
+            if es_nueva_suscripcion:
+                # A. NUEVA SUSCRIPCIÓN
+                notificar_nueva_suscripcion(
+                    empresa=self.empresa,
+                    plan=self.plan,
+                    monto=self.monto,
+                    es_nueva_empresa=es_nueva_suscripcion,
+                )
+                print(f"✅ Notificación de nueva suscripción enviada a {self.empresa.user.email}")
+            elif es_cambio_plan:
+                # B. CAMBIO DE PLAN
+                notificar_cambio_plan(
+                    empresa=self.empresa,
+                    plan_anterior=plan_anterior,
+                    plan_nuevo=self.plan,
+                    monto=self.monto,
+                    fecha_inicio=self.empresa.fecha_inicio,
+                )
+                print(f"✅ Notificación de cambio de plan enviada a {self.empresa.user.email}")
             else:
-                subject = "✅ Pago Confirmado - eGarage"
-
-            # Renderizar HTML
-            html_message = render_to_string(
-                "email/pago_confirmado.html",
-                {
-                    "empresa": self.empresa,
-                    "plan": self.plan,
-                    "monto": self.monto,
-                    "moneda": moneda,
-                    "fecha_fin": self.empresa.fecha_fin,
-                    "language": language,
-                },
-            )
-
-            # Enviar email
-            send_mail(
-                subject=subject,
-                message="",  # Text version (vacío, usamos HTML)
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[self.empresa.email],
-                html_message=html_message,
-                fail_silently=False,
-            )
-
-            print(f"✅ Email de confirmación enviado a {self.empresa.email}")
+                # C. RENOVACIÓN EXITOSA
+                notificar_renovacion_exitosa(
+                    empresa=self.empresa,
+                    plan=self.plan,
+                    monto=self.monto,
+                    dias_renovados=dias,
+                )
+                print(f"✅ Notificación de renovación exitosa enviada a {self.empresa.user.email}")
 
         except Exception as e:
-            print(f"⚠️ Error al enviar email de confirmación: {str(e)}")
-            # No fallar si el email falla, el pago ya está aprobado
+            print(f"⚠️ Error al enviar notificaciones: {str(e)}")
+            # No fallar si las notificaciones fallan, el pago ya está aprobado
 
     def rechazar_pago(self, admin_user, razon=""):
         """

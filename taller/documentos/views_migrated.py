@@ -284,18 +284,18 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             cliente_search = self.request.GET.get("cliente", "").strip()
             if cliente_search:
                 base_queryset = base_queryset.filter(
-                    Q(cliente__nombre__icontains=cliente_search) |
-                    Q(cliente__apellido__icontains=cliente_search) |
-                    Q(cliente__email__icontains=cliente_search)
+                    Q(cliente__nombre__icontains=cliente_search)
+                    | Q(cliente__apellido__icontains=cliente_search)
+                    | Q(cliente__email__icontains=cliente_search)
                 )
 
             # Filtro por vehículo (patente o modelo)
             vehiculo_search = self.request.GET.get("vehiculo", "").strip()
             if vehiculo_search:
                 base_queryset = base_queryset.filter(
-                    Q(vehiculo__patente__icontains=vehiculo_search) |
-                    Q(vehiculo__marca__nombre__icontains=vehiculo_search) |
-                    Q(vehiculo__modelo__nombre__icontains=vehiculo_search)
+                    Q(vehiculo__patente__icontains=vehiculo_search)
+                    | Q(vehiculo__marca__nombre__icontains=vehiculo_search)
+                    | Q(vehiculo__modelo__nombre__icontains=vehiculo_search)
                 )
 
             # Filtro por estado
@@ -313,6 +313,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             if fecha_desde:
                 try:
                     from datetime import datetime
+
                     fecha_desde_obj = datetime.strptime(fecha_desde, "%Y-%m-%d").date()
                     base_queryset = base_queryset.filter(fecha_emision__gte=fecha_desde_obj)
                 except ValueError:
@@ -323,6 +324,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             if fecha_hasta:
                 try:
                     from datetime import datetime
+
                     fecha_hasta_obj = datetime.strptime(fecha_hasta, "%Y-%m-%d").date()
                     base_queryset = base_queryset.filter(fecha_emision__lte=fecha_hasta_obj)
                 except ValueError:
@@ -418,22 +420,22 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
                 documento.neto_repuestos = documento.rep_sum or Decimal("0")
             else:
                 documento.neto_repuestos = Decimal("0")
-                
+
             if hasattr(documento, "serv_sum"):
                 documento.neto_servicios = documento.serv_sum or Decimal("0")
             else:
                 documento.neto_servicios = Decimal("0")
-                
+
             if hasattr(documento, "otros_sum"):
                 documento.neto_otros_servicios = documento.otros_sum or Decimal("0")
             else:
                 documento.neto_otros_servicios = Decimal("0")
-                
+
             if hasattr(documento, "iva_calc"):
                 documento.tax_amount = documento.iva_calc or Decimal("0")
             else:
                 documento.tax_amount = Decimal("0")
-                
+
             # Calcular el total si no existe total_display o si es None/0
             if hasattr(documento, "total_display") and documento.total_display:
                 documento.total = documento.total_display
@@ -446,7 +448,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
                 neto_otros = getattr(documento, "neto_otros_servicios", Decimal("0"))
                 iva = getattr(documento, "tax_amount", Decimal("0"))
                 documento.total = neto_rep + neto_serv + neto_otros + iva
-            
+
             # Asegurar que total nunca sea None
             if not documento.total or documento.total is None:
                 documento.total = Decimal("0")
@@ -457,59 +459,62 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
         empresa = self.request.user.empresa
         # Usar .all() para asegurar que no hay annotations previas
         stats_qs = Documento.objects.filter(empresa=empresa)
-        
+
         # Aplicar los mismos filtros que en get_queryset para que los KPIs reflejen los filtros activos
         cliente_search = self.request.GET.get("cliente", "").strip()
         if cliente_search:
             stats_qs = stats_qs.filter(
-                Q(cliente__nombre__icontains=cliente_search) |
-                Q(cliente__apellido__icontains=cliente_search) |
-                Q(cliente__email__icontains=cliente_search)
+                Q(cliente__nombre__icontains=cliente_search)
+                | Q(cliente__apellido__icontains=cliente_search)
+                | Q(cliente__email__icontains=cliente_search)
             )
-        
+
         vehiculo_search = self.request.GET.get("vehiculo", "").strip()
         if vehiculo_search:
             stats_qs = stats_qs.filter(
-                Q(vehiculo__patente__icontains=vehiculo_search) |
-                Q(vehiculo__marca__nombre__icontains=vehiculo_search) |
-                Q(vehiculo__modelo__nombre__icontains=vehiculo_search)
+                Q(vehiculo__patente__icontains=vehiculo_search)
+                | Q(vehiculo__marca__nombre__icontains=vehiculo_search)
+                | Q(vehiculo__modelo__nombre__icontains=vehiculo_search)
             )
-        
+
         estado = self.request.GET.get("estado", "").strip()
         if estado:
             stats_qs = stats_qs.filter(estado=estado.upper())
-        
+
         tipo = self.request.GET.get("tipo", "").strip()
         if tipo:
             stats_qs = stats_qs.filter(tipo=tipo.upper())
-        
+
         fecha_desde = self.request.GET.get("desde", "").strip()
         if fecha_desde:
             try:
                 from datetime import datetime
+
                 fecha_desde_obj = datetime.strptime(fecha_desde, "%Y-%m-%d").date()
                 stats_qs = stats_qs.filter(fecha_emision__gte=fecha_desde_obj)
             except ValueError:
                 pass
-        
+
         fecha_hasta = self.request.GET.get("hasta", "").strip()
         if fecha_hasta:
             try:
                 from datetime import datetime
+
                 fecha_hasta_obj = datetime.strptime(fecha_hasta, "%Y-%m-%d").date()
                 stats_qs = stats_qs.filter(fecha_emision__lte=fecha_hasta_obj)
             except ValueError:
                 pass
-        
+
         numero = self.request.GET.get("numero", "").strip()
         if numero:
             stats_qs = stats_qs.filter(numero__icontains=numero)
 
         # Calcular estadísticas con agregaciones (usando el queryset sin annotations)
         from datetime import date, timedelta
+
         hoy = date.today()
         hace_30_dias = hoy - timedelta(days=30)
-        
+
         # Calcular estadísticas con agregaciones
         # Usar el campo 'legacy_total_general' que es el campo DB real (db_column="total_general")
         # o calcular el total sumando los campos individuales para evitar conflictos
@@ -524,7 +529,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             presupuestos_pendientes=Count("id", filter=Q(tipo="PRES", estado="EMITIDO")),
             ots_sin_cerrar=Count("id", filter=Q(tipo="OT", estado__in=["EMITIDO", "BORRADOR"])),
         )
-        
+
         # Calcular el total sumando los campos individuales para evitar conflictos con annotations
         total_calculado = stats_qs.aggregate(
             sum_rep=Sum("neto_repuestos"),
@@ -533,17 +538,17 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             sum_tax=Sum("tax_amount"),
         )
         estadisticas["total_monto"] = (
-            (total_calculado["sum_rep"] or Decimal("0")) +
-            (total_calculado["sum_serv"] or Decimal("0")) +
-            (total_calculado["sum_otros"] or Decimal("0")) +
-            (total_calculado["sum_tax"] or Decimal("0"))
+            (total_calculado["sum_rep"] or Decimal("0"))
+            + (total_calculado["sum_serv"] or Decimal("0"))
+            + (total_calculado["sum_otros"] or Decimal("0"))
+            + (total_calculado["sum_tax"] or Decimal("0"))
         )
-        
+
         context["estadisticas"] = estadisticas
         context["documentos_pendientes"] = estadisticas.get("borradores", 0)
         context["documentos_proceso"] = estadisticas.get("emitidos", 0)
         context["documentos_completados"] = estadisticas.get("emitidos", 0)
-        
+
         # Pasar los valores de filtros al template para mantenerlos en el formulario
         context["filtros_activos"] = {
             "cliente": cliente_search,
@@ -726,6 +731,27 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                     }
                 )
 
+        # Obtener ui_config de la empresa
+        ui_config = {}
+        try:
+            from taller.configuracion.rubros_logic import get_ui_config
+
+            config = getattr(empresa, "config", None)
+            if config:
+                ui_config = get_ui_config(config)
+        except Exception:
+            pass
+
+        # Si no hay configuración, usar valores por defecto
+        if not ui_config:
+            ui_config = {
+                "show_repuestos": True,
+                "show_services": True,
+                "show_otros_servicios": True,
+                "show_kilometraje": True,
+                "show_vehicle": True,
+            }
+
         context.update(
             {
                 "clientes_prefetch": clientes_prefetch,
@@ -733,6 +759,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 "repuestos_prefetch": repuestos_prefetch,
                 "servicios_prefetch": servicios_prefetch,
                 "otros_servicios_prefetch": otros_servicios_prefetch,
+                "ui_config": ui_config,  # ✅ Agregar ui_config al contexto
             }
         )
         return context
@@ -876,16 +903,16 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         """Asegurar que solo se editen documentos de la empresa"""
         if not self.request.user.is_authenticated:
             return Documento.objects.none()
-        
+
         # Obtener empresa de forma robusta
         empresa = getattr(self.request.user, "empresa", None)
         if not empresa:
             # Intentar obtener empresa desde el middleware
             empresa = getattr(self.request, "empresa", None)
-        
+
         if not empresa:
             return Documento.objects.none()
-        
+
         # Filtrar por empresa sin prefetch que pueda fallar
         # El prefetch se hará después en get_context_data si es necesario
         return Documento.objects.filter(empresa=empresa)
@@ -893,15 +920,17 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
     def get_object(self, queryset=None):
         """Obtener el documento con mejor manejo de errores"""
         from django.shortcuts import get_object_or_404
-        
+
         if queryset is None:
             queryset = self.get_queryset()
-        
+
         pk = self.kwargs.get("pk")
-        
+
         # Obtener empresa para verificación
-        empresa_user = getattr(self.request.user, "empresa", None) or getattr(self.request, "empresa", None)
-        
+        empresa_user = getattr(self.request.user, "empresa", None) or getattr(
+            self.request, "empresa", None
+        )
+
         # Intentar obtener del queryset filtrado
         try:
             documento = queryset.get(pk=pk)
@@ -919,43 +948,44 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
                     try:
                         documento = Documento.objects.get(pk=pk)
                         from django.contrib import messages
+
                         messages.error(
-                            self.request,
-                            f"El documento #{pk} no pertenece a tu empresa."
+                            self.request, f"El documento #{pk} no pertenece a tu empresa."
                         )
                     except Documento.DoesNotExist:
                         from django.contrib import messages
-                        messages.error(
-                            self.request,
-                            f"El documento #{pk} no existe."
-                        )
+
+                        messages.error(self.request, f"El documento #{pk} no existe.")
             else:
                 from django.contrib import messages
-                messages.error(
-                    self.request,
-                    "No tienes una empresa asociada."
-                )
-            
+
+                messages.error(self.request, "No tienes una empresa asociada.")
+
             from django.http import Http404
+
             raise Http404(f"No se encontró el documento #{pk}")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         # Asegurar que tenemos el objeto documento
-        documento = self.object or getattr(self, 'object', None)
+        documento = self.object or getattr(self, "object", None)
         if not documento:
             # Si no está en self.object, intentar obtenerlo del pk
-            pk = self.kwargs.get('pk')
+            pk = self.kwargs.get("pk")
             if pk:
                 documento = self.get_object()
-        
+
         if not documento:
             from django.http import Http404
+
             raise Http404("Documento no encontrado")
-        
-        empresa = getattr(self.request.user, "empresa", None) or getattr(self.request, "empresa", None)
+
+        empresa = getattr(self.request.user, "empresa", None) or getattr(
+            self.request, "empresa", None
+        )
         if not empresa:
             from django.http import Http404
+
             raise Http404("Empresa no encontrada")
 
         # Obtener líneas del documento para edición
@@ -1004,12 +1034,13 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         ui_config = {}
         try:
             from taller.configuracion.rubros_logic import get_ui_config
+
             config = getattr(empresa, "config", None)
             if config:
                 ui_config = get_ui_config(config)
         except Exception:
             pass
-        
+
         # Si no hay configuración, usar valores por defecto
         if not ui_config:
             ui_config = {
@@ -1023,37 +1054,43 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         # Serializar datos para JavaScript
         repuestos_json = []
         for rep in repuestos:
-            repuestos_json.append({
-                "id": rep.id,
-                "repuesto_id": rep.repuesto_id if rep.repuesto else None,
-                "codigo": rep.codigo or "",
-                "nombre": rep.nombre or "",
-                "cantidad": float(rep.cantidad or 0),
-                "precio": float(rep.precio_unitario or 0),
-                "descuento": float(getattr(rep, "descuento", 0) or 0),
-            })
-        
+            repuestos_json.append(
+                {
+                    "id": rep.id,
+                    "repuesto_id": rep.repuesto_id if rep.repuesto else None,
+                    "codigo": rep.codigo or "",
+                    "nombre": rep.nombre or "",
+                    "cantidad": float(rep.cantidad or 0),
+                    "precio": float(rep.precio_unitario or 0),
+                    "descuento": float(getattr(rep, "descuento", 0) or 0),
+                }
+            )
+
         servicios_json = []
         for serv in servicios:
-            servicios_json.append({
-                "id": serv.id,
-                "servicio_id": serv.servicio_id if serv.servicio else None,
-                "nombre": serv.nombre or "",
-                "cantidad": float(serv.cantidad or 0),
-                "precio": float(serv.precio_unitario or 0),
-                "descuento": float(getattr(serv, "descuento", 0) or 0),
-            })
-        
+            servicios_json.append(
+                {
+                    "id": serv.id,
+                    "servicio_id": serv.servicio_id if serv.servicio else None,
+                    "nombre": serv.nombre or "",
+                    "cantidad": float(serv.cantidad or 0),
+                    "precio": float(serv.precio_unitario or 0),
+                    "descuento": float(getattr(serv, "descuento", 0) or 0),
+                }
+            )
+
         otros_json = []
         for otro in otros_servicios:
-            otros_json.append({
-                "id": otro.id,
-                "servicio_id": otro.servicio_id if otro.servicio else None,
-                "nombre": otro.nombre or "",
-                "empresa_ext": getattr(otro, "empresa_externa", "") or "",
-                "precio_taller": float(getattr(otro, "costo_interno", 0) or 0),
-                "precio": float(getattr(otro, "precio_cliente", 0) or 0),
-            })
+            otros_json.append(
+                {
+                    "id": otro.id,
+                    "servicio_id": otro.servicio_id if otro.servicio else None,
+                    "nombre": otro.nombre or "",
+                    "empresa_ext": getattr(otro, "empresa_externa", "") or "",
+                    "precio_taller": float(getattr(otro, "costo_interno", 0) or 0),
+                    "precio": float(getattr(otro, "precio_cliente", 0) or 0),
+                }
+            )
 
         context.update(
             {
@@ -1076,7 +1113,8 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
                 "company_country": company_country,
                 "empresa": empresa,  # Agregar empresa al contexto para que esté disponible en el template
                 "ui_config": ui_config,
-                "kilometraje": getattr(documento, "kilometraje_vehiculo", None) or getattr(documento, "kilometraje", None),
+                "kilometraje": getattr(documento, "kilometraje_vehiculo", None)
+                or getattr(documento, "kilometraje", None),
                 "cliente_info": {
                     "id": getattr(cliente, "id", ""),
                     "nombre": str(cliente) if cliente else "",

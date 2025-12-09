@@ -613,6 +613,21 @@ document.addEventListener('DOMContentLoaded', function() {
         card.style.opacity = '1';
         card.style.transform = 'translateY(0)';
     }, 100);
+    
+    // Asegurar que el fix de iOS se aplica a los campos de contraseña
+    const passwordInputs = document.querySelectorAll('input[type="password"]');
+    passwordInputs.forEach(function(input) {
+        // Agregar atributos adicionales si no están presentes
+        if (!input.hasAttribute('autocapitalize')) {
+            input.setAttribute('autocapitalize', 'none');
+        }
+        if (!input.hasAttribute('autocorrect')) {
+            input.setAttribute('autocorrect', 'off');
+        }
+        if (!input.hasAttribute('spellcheck')) {
+            input.setAttribute('spellcheck', 'false');
+        }
+    });
 });
 </script>
 {% endblock %}

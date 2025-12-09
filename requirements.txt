@@ -48,6 +48,9 @@ pytest-cov>=4.1.0
 # Seguridad
 django-cors-headers>=4.2.0  # Si necesitas CORS para API
 
+# Ofuscación de Código (Solo para desarrollo/build)
+pyarmor>=8.5.0  # Para ofuscar motor_ia_core.py antes de producción
+
 # ======================================================
 # Notas de Instalación:
 # ======================================================
@@ -67,6 +70,7 @@ django-cors-headers>=4.2.0  # Si necesitas CORS para API
 #   pip install -r requirements.txt
 #
 # ======================================================
+
 
 
 

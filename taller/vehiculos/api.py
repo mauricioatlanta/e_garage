@@ -241,11 +241,12 @@ def api_create(request):
         return JsonResponse({"error": "empresa_not_found"}, status=400)
 
     try:
-        cli = Cliente.objects.get(id=payload["cliente_id"])
+        # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
+        cli = Cliente.objects.get(id=payload["cliente_id"], empresa=emp)
     except Cliente.DoesNotExist:
         return JsonResponse({"error": "cliente_not_found"}, status=400)
 
-    # Consistencia de empresa
+    # Validación adicional de consistencia (redundante pero defensiva)
     if getattr(cli, "empresa_id", None) != emp.id:
         return JsonResponse({"error": "empresa_mismatch_cliente"}, status=400)
 

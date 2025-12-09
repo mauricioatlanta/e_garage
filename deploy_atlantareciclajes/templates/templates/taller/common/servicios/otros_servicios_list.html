@@ -1,0 +1,10 @@
+{% load country_url %}
+{% extends "base.html" %}
+{% block content %}
+<div class="flex items-center gap-3 mb-4">
+  <h1 class="text-2xl font-bold">Otros Servicios</h1>
+  {% include "components/country_badge.html" %}
+</div>
+<a href="{% country_url 'servicios:crear_otro_servicio' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg shadow bg-gradient-to-r from-cyan-500 to-fuchsia-500 text-white font-semibold hover:from-fuchsia-500 hover:to-cyan-500 transition-all duration-200 border border-cyan-400/60 mb-4" style="box-shadow:0 2px 12px 0 #00ffe7a0,0 1.5px 0 0 #fff2;">➕ Agregar Otro Servicio</a>
+<p>Aquí irá la tabla con todos los otros servicios registrados.</p>
+{% endblock %}

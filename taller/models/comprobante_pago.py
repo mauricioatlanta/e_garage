@@ -60,17 +60,63 @@ class ComprobantePago(models.Model):
         self.fecha_procesado = timezone.now()
         self.procesado_por = procesado_por
 
+        # Detectar si es nueva suscripción, cambio de plan o renovación
+        plan_anterior = self.empresa.plan
+        es_nueva_suscripcion = not self.empresa.suscripcion_activa or self.empresa.plan == "trial"
+        es_cambio_plan = (
+            self.empresa.suscripcion_activa
+            and plan_anterior != self.plan_solicitado
+            and plan_anterior != "trial"
+        )
+
         # Extender suscripción de la empresa
         dias_extension = self.meses_pagados * 30
-        self.empresa.extender_suscripcion(dias_extension)
+        self.empresa.extender_suscripcion(
+            dias_extension, enviar_notificacion=False
+        )  # No enviar aquí, lo haremos después
         self.empresa.plan = self.plan_solicitado
         self.empresa.valor_mensual = self.monto / self.meses_pagados
         self.empresa.save()
 
         self.save()
 
-        # Enviar notificación de aprobación
-        self.enviar_notificacion_aprobacion()
+        # Enviar notificaciones automáticas (Email + WhatsApp)
+        try:
+            from taller.utils.notificaciones_suscripcion import (
+                notificar_cambio_plan,
+                notificar_nueva_suscripcion,
+                notificar_renovacion_exitosa,
+            )
+
+            if es_nueva_suscripcion:
+                # A. NUEVA SUSCRIPCIÓN
+                notificar_nueva_suscripcion(
+                    empresa=self.empresa,
+                    plan=self.plan_solicitado,
+                    monto=self.monto,
+                    es_nueva_empresa=es_nueva_suscripcion,
+                )
+            elif es_cambio_plan:
+                # B. CAMBIO DE PLAN
+                notificar_cambio_plan(
+                    empresa=self.empresa,
+                    plan_anterior=plan_anterior,
+                    plan_nuevo=self.plan_solicitado,
+                    monto=self.monto,
+                    fecha_inicio=self.empresa.fecha_inicio,
+                )
+            else:
+                # C. RENOVACIÓN EXITOSA
+                notificar_renovacion_exitosa(
+                    empresa=self.empresa,
+                    plan=self.plan_solicitado,
+                    monto=self.monto,
+                    dias_renovados=dias_extension,
+                )
+        except Exception as e:
+            print(f"⚠️ Error al enviar notificaciones: {str(e)}")
+            # Si fallan las notificaciones nuevas, usar el método antiguo como fallback
+            self.enviar_notificacion_aprobacion()
 
     def rechazar(self, motivo="", procesado_por="Sistema"):
         """Rechazar el comprobante"""

@@ -1,0 +1,22 @@
+<!-- AI/Professional Badges -->
+{% load i18n %}
+{% if empresa.flags.ai_tools_enabled or empresa.plan in "pro,enterprise" %}
+<div class="ai-badges mb-4">
+  <div class="flex flex-wrap gap-2">
+    <span class="px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-semibold">
+      🤖 {% trans "AI Powered" %}
+    </span>
+    <span class="px-3 py-1 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-semibold">
+      ⚡ {% trans "Professional" %}
+    </span>
+    <span class="px-3 py-1 rounded-full bg-gradient-to-r from-purple-500 to-pink-600 text-white text-xs font-semibold">
+      🚀 {% trans "Advanced" %}
+    </span>
+  </div>
+</div>
+{% endif %}
+
+
+
+
+

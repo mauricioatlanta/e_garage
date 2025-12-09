@@ -31,6 +31,11 @@ class CustomLoginForm(LoginForm):
                 "class": "premium-input",
                 "placeholder": "Contraseña",
                 "autocomplete": "current-password",
+                # Fix para iOS: Atributos específicos para evitar problemas de entrada
+                "autocapitalize": "none",
+                "autocorrect": "off",
+                "spellcheck": "false",
+                "inputmode": "text",
             }
         )
 

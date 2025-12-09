@@ -1,0 +1,853 @@
+{% extends 'layouts/base_egarage_panel.html' %}
+{% load custom_filters %}
+{% load country_url %}
+{% load static %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Crear Cliente" %}{% endblock %}
+{% block page_subtitle %}{% trans "Agregar un nuevo cliente al sistema" %}{% endblock %}
+{% block page_icon %}👤{% endblock %}
+
+{% block main_actions %}
+{% country_url 'clientes:lista_clientes' as url_lista_clientes %}
+<a href="{% if url_lista_clientes %}{{ url_lista_clientes }}{% else %}/cl/es/clientes/{% endif %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white text-sm font-semibold transition-all">
+  <span>←</span>
+  <span>{% trans "Volver a la lista" %}</span>
+</a>
+{% endblock %}
+
+{% block page_extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(0, 230, 208, 0.5),
+                0 0 40px rgba(0, 230, 208, 0.3),
+                0 0 60px rgba(0, 230, 208, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(0, 230, 208, 0.8),
+                0 0 60px rgba(0, 230, 208, 0.5),
+                0 0 90px rgba(0, 230, 208, 0.2);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    border-color: rgba(0, 230, 208, 0.3);
+    box-shadow: 0 0 10px rgba(0, 230, 208, 0.2);
+  }
+  50% {
+    border-color: rgba(0, 230, 208, 0.6);
+    box-shadow: 0 0 20px rgba(0, 230, 208, 0.4);
+  }
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+.form-card {
+  background: rgba(10, 14, 39, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 2px solid rgba(0, 230, 208, 0.2);
+  border-radius: 16px;
+  padding: 32px;
+  margin-bottom: 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 230, 208, 0.1), 
+    transparent);
+  animation: shimmer 3s infinite;
+}
+
+.form-group {
+  margin-bottom: 24px;
+  position: relative;
+  animation: slideIn 0.6s ease-out backwards;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.2s; }
+.form-group:nth-child(3) { animation-delay: 0.3s; }
+.form-group:nth-child(4) { animation-delay: 0.4s; }
+.form-group:nth-child(5) { animation-delay: 0.5s; }
+.form-group:nth-child(6) { animation-delay: 0.6s; }
+.form-group:nth-child(7) { animation-delay: 0.7s; }
+.form-group:nth-child(8) { animation-delay: 0.8s; }
+
+.form-group label {
+  display: block;
+  font-weight: 700;
+  color: #00e6d0 !important;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 10px rgba(0, 230, 208, 0.5);
+  position: relative;
+  padding-left: 8px;
+}
+
+.form-group label::before {
+  content: '▶';
+  position: absolute;
+  left: -12px;
+  color: #00e6d0;
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.form-control, 
+select, 
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+select.form-control {
+  width: 100% !important;
+  padding: 14px 16px !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid rgba(0, 230, 208, 0.3) !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 500 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.form-control:focus, 
+select:focus, 
+input:focus {
+  outline: none !important;
+  border-color: #00e6d0 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 
+    0 0 0 3px rgba(0, 230, 208, 0.2),
+    0 0 20px rgba(0, 230, 208, 0.4),
+    inset 0 0 10px rgba(0, 230, 208, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.btn-futuristic {
+  background: linear-gradient(135deg, #00e6d0 0%, #00b3a0 50%, #008a7a 100%);
+  border: 2px solid rgba(0, 230, 208, 0.5);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-block;
+  margin-right: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 230, 208, 0.3);
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.btn-futuristic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-futuristic:hover::before {
+  left: 100%;
+}
+
+.btn-futuristic:hover {
+  background: linear-gradient(135deg, #00b3a0 0%, #008a7a 50%, #006b5f 100%);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 230, 208, 0.5);
+  border-color: rgba(0, 230, 208, 0.8);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #545b62 50%, #495057 100%);
+  border: 2px solid rgba(108, 117, 125, 0.5);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #545b62 0%, #495057 50%, #3d4146 100%);
+  border-color: rgba(108, 117, 125, 0.8);
+}
+
+.errorlist {
+  color: #ff6b6b !important;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 4px;
+  font-size: 13px;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.helptext {
+  color: rgba(0, 230, 208, 0.7) !important;
+  font-size: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  margin-top: 4px;
+}
+
+.btn-add-city {
+  background: linear-gradient(135deg, #00e6d0 0%, #00b3a0 50%, #008a7a 100%);
+  border: 2px solid rgba(0, 230, 208, 0.5);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Rajdhani', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-add-city:hover {
+  background: linear-gradient(135deg, #00b3a0 0%, #008a7a 50%, #006b5f 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 230, 208, 0.4);
+}
+
+.ciudad-input-group {
+  display: flex;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.ciudad-input-group select {
+  flex: 1;
+}
+
+.ciudad-input-group .btn-add-city {
+  margin-top: 0;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  z-index: 10000;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-overlay.active {
+  display: flex;
+}
+
+.modal-content {
+  background: rgba(10, 14, 39, 0.95);
+  backdrop-filter: blur(20px);
+  border: 2px solid rgba(0, 230, 208, 0.3);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.modal-content h3 {
+  color: #00e6d0;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 12px 16px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 2px solid rgba(0, 230, 208, 0.3);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 15px;
+  font-family: 'Rajdhani', sans-serif;
+  margin-bottom: 16px;
+}
+
+.modal-content input:focus {
+  outline: none;
+  border-color: #00e6d0;
+  box-shadow: 0 0 0 3px rgba(0, 230, 208, 0.2);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<div class="form-card max-w-4xl mx-auto">
+  <form method="post" id="client-form" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if form.errors %}
+      <div class="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
+        <h3 class="text-red-300 font-bold mb-2 font-orbitron">⚠️ {% trans "Errores en el formulario:" %}</h3>
+        {% for field, errors in form.errors.items %}
+          <div class="mb-2">
+            <strong class="text-red-200">{{ field }}:</strong>
+            {% for error in errors %}
+              <span class="text-red-100 block">{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="form-group">
+        <label for="{{ form.nombre.id_for_label }}">{% trans "Nombre" %}</label>
+        {{ form.nombre }}
+        {% if form.nombre.errors %}
+          <div class="errorlist">{{ form.nombre.errors.0 }}</div>
+        {% endif %}
+        {% if form.nombre.help_text %}
+          <div class="helptext">{{ form.nombre.help_text }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.apellido.id_for_label }}">{% trans "Apellido" %}</label>
+        {{ form.apellido }}
+        {% if form.apellido.errors %}
+          <div class="errorlist">{{ form.apellido.errors.0 }}</div>
+        {% endif %}
+        {% if form.apellido.help_text %}
+          <div class="helptext">{{ form.apellido.help_text }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.email.id_for_label }}">{% trans "Correo electrónico" %}</label>
+        {{ form.email }}
+        {% if form.email.errors %}
+          <div class="errorlist">{{ form.email.errors.0 }}</div>
+        {% endif %}
+        {% if form.email.help_text %}
+          <div class="helptext">{{ form.email.help_text }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.telefono.id_for_label }}">{% trans "Teléfono" %}</label>
+        {{ form.telefono }}
+        {% if form.telefono.errors %}
+          <div class="errorlist">{{ form.telefono.errors.0 }}</div>
+        {% endif %}
+        {% if form.telefono.help_text %}
+          <div class="helptext">{{ form.telefono.help_text }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group md:col-span-2">
+        <label for="{{ form.direccion.id_for_label }}">{% trans "Dirección" %}</label>
+        {{ form.direccion }}
+        {% if form.direccion.errors %}
+          <div class="errorlist">{{ form.direccion.errors.0 }}</div>
+        {% endif %}
+        {% if form.direccion.help_text %}
+          <div class="helptext">{{ form.direccion.help_text }}</div>
+        {% endif %}
+      </div>
+
+      {% if usa_estado_ciudad %}
+      <div class="form-group">
+        <label for="{{ form.estado_usa.id_for_label }}">{% trans "Estado" %}</label>
+        {{ form.estado_usa }}
+        {% if form.estado_usa.errors %}
+          <div class="errorlist">{{ form.estado_usa.errors.0 }}</div>
+        {% endif %}
+        {% if form.estado_usa.help_text %}
+          <div class="helptext">{{ form.estado_usa.help_text }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.ciudad_usa.id_for_label }}">{% trans "Ciudad" %}</label>
+        {{ form.ciudad_usa }}
+        {% if form.ciudad_usa.errors %}
+          <div class="errorlist">{{ form.ciudad_usa.errors.0 }}</div>
+        {% endif %}
+        {% if form.ciudad_usa.help_text %}
+          <div class="helptext">{{ form.ciudad_usa.help_text }}</div>
+        {% endif %}
+        <div id="ciudad-loading" style="display: none; color: #00e6d0; font-size: 12px; margin-top: 4px;">
+          {% trans "Cargando ciudades..." %}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.zipcode.id_for_label }}">{% trans "Código Postal" %}</label>
+        {{ form.zipcode }}
+        {% if form.zipcode.errors %}
+          <div class="errorlist">{{ form.zipcode.errors.0 }}</div>
+        {% endif %}
+        {% if form.zipcode.help_text %}
+          <div class="helptext">{{ form.zipcode.help_text }}</div>
+        {% endif %}
+      </div>
+      {% else %}
+      <div class="form-group">
+        <label for="{{ form.region.id_for_label }}">{% trans "Región" %}</label>
+        {{ form.region }}
+        {% if form.region.errors %}
+          <div class="errorlist">{{ form.region.errors.0 }}</div>
+        {% endif %}
+        {% if form.region.help_text %}
+          <div class="helptext">{{ form.region.help_text }}</div>
+        {% endif %}
+        {% if not form.region.field.queryset.exists %}
+          <div class="helptext" style="color: #ff6b6b;">
+            ⚠️ {% trans "No hay regiones disponibles. Por favor contacte al soporte." %}
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="form-group">
+        <label for="{{ form.ciudad.id_for_label }}">{% trans "Ciudad" %}</label>
+        <div class="ciudad-input-group">
+          {{ form.ciudad }}
+          <button type="button" class="btn-add-city" id="btn-agregar-ciudad" title="{% trans 'Agregar nueva ciudad' %}">
+            ➕ {% trans "Agregar" %}
+          </button>
+        </div>
+        {% if form.ciudad.errors %}
+          <div class="errorlist">{{ form.ciudad.errors.0 }}</div>
+        {% endif %}
+        {% if form.ciudad.help_text %}
+          <div class="helptext">{{ form.ciudad.help_text }}</div>
+        {% endif %}
+        <div id="ciudad-loading-region" style="display: none; color: #00e6d0; font-size: 12px; margin-top: 4px;">
+          {% trans "Cargando ciudades..." %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Modal para agregar nueva ciudad -->
+    <div id="modal-agregar-ciudad" class="modal-overlay">
+      <div class="modal-content">
+        <h3>➕ {% trans "Agregar Nueva Ciudad" %}</h3>
+        <input type="text" id="input-nombre-ciudad" placeholder="{% trans 'Nombre de la ciudad' %}" autocomplete="off">
+        <div class="modal-actions">
+          <button type="button" class="btn-futuristic" id="btn-guardar-ciudad">
+            💾 {% trans "Guardar" %}
+          </button>
+          <button type="button" class="btn-futuristic btn-secondary" id="btn-cancelar-ciudad">
+            ❌ {% trans "Cancelar" %}
+          </button>
+        </div>
+        <div id="ciudad-error-message" style="display: none; color: #ff6b6b; margin-top: 12px; font-size: 13px;"></div>
+      </div>
+    </div>
+
+    <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
+      <button type="submit" class="btn-futuristic">
+        💾 {% trans "Crear Cliente" %}
+      </button>
+      <a href="{% country_url 'clientes:lista_clientes' %}" class="btn-futuristic btn-secondary">
+        ❌ {% trans "Cancelar" %}
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block page_extra_js %}
+{% if usa_estado_ciudad %}
+<script>
+// JavaScript para cargar ciudades cuando se selecciona un estado
+document.addEventListener('DOMContentLoaded', function() {
+    const estadoSelect = document.getElementById('id_estado_usa');
+    const ciudadSelect = document.getElementById('id_ciudad_usa');
+    
+    if (estadoSelect && ciudadSelect) {
+        estadoSelect.addEventListener('change', function() {
+            const estadoId = this.value;
+            
+            if (estadoId) {
+                ciudadSelect.innerHTML = '<option value="">{% trans "Cargando ciudades..." %}</option>';
+                ciudadSelect.disabled = true;
+                const loadingDiv = document.getElementById('ciudad-loading');
+                if (loadingDiv) loadingDiv.style.display = 'block';
+                
+                const url = `{% country_url 'clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`;
+                
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        ciudadSelect.innerHTML = '<option value="">{% trans "Seleccione Ciudad" %}</option>';
+                        ciudadSelect.disabled = false;
+                        if (loadingDiv) loadingDiv.style.display = 'none';
+                        
+                        const ciudades = Array.isArray(data) ? data : (data.ciudades || []);
+                        
+                        if (ciudades.length > 0) {
+                            ciudades.forEach(ciudad => {
+                                const option = document.createElement('option');
+                                option.value = ciudad.id;
+                                option.textContent = ciudad.nombre;
+                                ciudadSelect.appendChild(option);
+                            });
+                        } else {
+                            ciudadSelect.innerHTML = '<option value="">{% trans "No hay ciudades disponibles" %}</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error loading cities:', error);
+                        ciudadSelect.innerHTML = '<option value="">{% trans "Error al cargar ciudades" %}</option>';
+                        ciudadSelect.disabled = false;
+                        if (loadingDiv) loadingDiv.style.display = 'none';
+                    });
+            } else {
+                ciudadSelect.innerHTML = '<option value="">{% trans "Seleccione Estado primero" %}</option>';
+                ciudadSelect.disabled = true;
+                const loadingDiv = document.getElementById('ciudad-loading');
+                if (loadingDiv) loadingDiv.style.display = 'none';
+            }
+        });
+    }
+});
+</script>
+{% else %}
+<script>
+// JavaScript para cargar ciudades cuando se selecciona una región (Chile)
+(function() {
+    'use strict';
+    
+    function initCiudadLoader() {
+        try {
+            const regionSelect = document.getElementById('id_region');
+            const ciudadSelect = document.getElementById('id_ciudad');
+            const loadingDiv = document.getElementById('ciudad-loading-region');
+            
+            // Verificar que los elementos existan
+            if (!regionSelect) {
+                console.warn('⚠️ Selector de región no encontrado (id_region)');
+                return;
+            }
+            
+            if (!ciudadSelect) {
+                console.warn('⚠️ Selector de ciudad no encontrado (id_ciudad)');
+                return;
+            }
+            
+            console.log('✅ Selectores encontrados: región y ciudad');
+            console.log('📊 Regiones disponibles:', regionSelect.options.length);
+            
+            // Verificar si hay opciones en el selector de región
+            if (regionSelect.options.length <= 1) {
+                console.warn('⚠️ El selector de región no tiene opciones (solo tiene la opción vacía)');
+            }
+            
+            // Función para cargar ciudades
+            function cargarCiudades(regionId) {
+                if (!regionId) {
+                    ciudadSelect.innerHTML = '<option value="">{% trans "Seleccione Región primero" %}</option>';
+                    ciudadSelect.disabled = true;
+                    if (loadingDiv) loadingDiv.style.display = 'none';
+                    return;
+                }
+                
+                ciudadSelect.innerHTML = '<option value="">{% trans "Cargando ciudades..." %}</option>';
+                ciudadSelect.disabled = true;
+                if (loadingDiv) loadingDiv.style.display = 'block';
+                
+                // Generar URL usando el tag country_url
+                const baseUrl = '{% country_url "clientes:obtener_ciudades" %}';
+                const url = `${baseUrl}?region_id=${regionId}`;
+                console.log('🔗 URL generada:', url);
+                
+                fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json',
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(response => {
+                        console.log('📡 Respuesta recibida:', response.status, response.statusText);
+                        if (!response.ok) {
+                            // Intentar leer el texto de error
+                            return response.text().then(text => {
+                                console.error('❌ Error en respuesta:', text);
+                                throw new Error(`HTTP error! status: ${response.status}, body: ${text}`);
+                            });
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('📦 Datos recibidos:', data);
+                        ciudadSelect.innerHTML = '<option value="">{% trans "Seleccione Ciudad" %}</option>';
+                        ciudadSelect.disabled = false;
+                        if (loadingDiv) loadingDiv.style.display = 'none';
+                        
+                        const ciudades = Array.isArray(data) ? data : (data.ciudades || []);
+                        console.log('🏙️ Ciudades procesadas:', ciudades.length);
+                        
+                        if (ciudades.length > 0) {
+                            ciudades.forEach(ciudad => {
+                                const option = document.createElement('option');
+                                option.value = ciudad.id;
+                                option.textContent = ciudad.nombre;
+                                ciudadSelect.appendChild(option);
+                            });
+                            console.log('✅ Ciudades cargadas exitosamente');
+                        } else {
+                            ciudadSelect.innerHTML = '<option value="">{% trans "No hay ciudades disponibles" %}</option>';
+                            console.warn('⚠️ No se encontraron ciudades para esta región');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error completo al cargar ciudades:', error);
+                        if (error.stack) {
+                            console.error('Stack trace:', error.stack);
+                        }
+                        ciudadSelect.innerHTML = '<option value="">{% trans "Error al cargar ciudades" %}</option>';
+                        ciudadSelect.disabled = false;
+                        if (loadingDiv) loadingDiv.style.display = 'none';
+                        
+                        // Mostrar mensaje de error más detallado
+                        const errorMsg = error.message || 'Error desconocido';
+                        console.error('Mensaje de error:', errorMsg);
+                    });
+            }
+            
+            // Agregar event listener para cambios en la región
+            regionSelect.addEventListener('change', function() {
+                const regionId = this.value;
+                console.log('🌍 Región seleccionada:', regionId);
+                cargarCiudades(regionId);
+                
+                // Mostrar/ocultar botón de agregar ciudad
+                if (btnAgregarCiudad) {
+                    if (regionId) {
+                        btnAgregarCiudad.style.display = 'inline-flex';
+                    } else {
+                        btnAgregarCiudad.style.display = 'none';
+                    }
+                }
+            });
+            
+            // Cargar ciudades si ya hay una región seleccionada (al editar)
+            if (regionSelect.value) {
+                console.log('🔄 Región ya seleccionada al cargar:', regionSelect.value);
+                cargarCiudades(regionSelect.value);
+            } else {
+                // Inicializar ciudad como deshabilitada si no hay región seleccionada
+                ciudadSelect.innerHTML = '<option value="">{% trans "Seleccione Región primero" %}</option>';
+                ciudadSelect.disabled = true;
+            }
+            
+            // Funcionalidad para agregar nueva ciudad
+            const btnAgregarCiudad = document.getElementById('btn-agregar-ciudad');
+            
+            // Ocultar botón inicialmente si no hay región seleccionada
+            if (btnAgregarCiudad) {
+                if (!regionSelect.value) {
+                    btnAgregarCiudad.style.display = 'none';
+                }
+            }
+            const modalAgregarCiudad = document.getElementById('modal-agregar-ciudad');
+            const inputNombreCiudad = document.getElementById('input-nombre-ciudad');
+            const btnGuardarCiudad = document.getElementById('btn-guardar-ciudad');
+            const btnCancelarCiudad = document.getElementById('btn-cancelar-ciudad');
+            const errorMessage = document.getElementById('ciudad-error-message');
+            
+            if (btnAgregarCiudad && modalAgregarCiudad) {
+                // Abrir modal
+                btnAgregarCiudad.addEventListener('click', function() {
+                    const regionId = regionSelect.value;
+                    if (!regionId) {
+                        alert('{% trans "Por favor seleccione una región primero" %}');
+                        return;
+                    }
+                    inputNombreCiudad.value = '';
+                    errorMessage.style.display = 'none';
+                    modalAgregarCiudad.classList.add('active');
+                    inputNombreCiudad.focus();
+                });
+                
+                // Cerrar modal
+                function cerrarModal() {
+                    modalAgregarCiudad.classList.remove('active');
+                    inputNombreCiudad.value = '';
+                    errorMessage.style.display = 'none';
+                }
+                
+                btnCancelarCiudad.addEventListener('click', cerrarModal);
+                
+                // Cerrar al hacer clic fuera del modal
+                modalAgregarCiudad.addEventListener('click', function(e) {
+                    if (e.target === modalAgregarCiudad) {
+                        cerrarModal();
+                    }
+                });
+                
+                // Guardar ciudad
+                btnGuardarCiudad.addEventListener('click', function() {
+                    const nombreCiudad = inputNombreCiudad.value.trim();
+                    const regionId = regionSelect.value;
+                    
+                    if (!nombreCiudad) {
+                        errorMessage.textContent = '{% trans "El nombre de la ciudad es requerido" %}';
+                        errorMessage.style.display = 'block';
+                        return;
+                    }
+                    
+                    if (!regionId) {
+                        errorMessage.textContent = '{% trans "Debe seleccionar una región primero" %}';
+                        errorMessage.style.display = 'block';
+                        return;
+                    }
+                    
+                    // Deshabilitar botón mientras se procesa
+                    btnGuardarCiudad.disabled = true;
+                    btnGuardarCiudad.textContent = '{% trans "Guardando..." %}';
+                    errorMessage.style.display = 'none';
+                    
+                    // Obtener URL para agregar ciudad
+                    const urlAgregarCiudad = '{% country_url "clientes:agregar_ciudad" %}';
+                    
+                    fetch(urlAgregarCiudad, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        body: JSON.stringify({
+                            nombre: nombreCiudad,
+                            region_id: regionId
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Agregar la nueva ciudad al select
+                            const option = document.createElement('option');
+                            option.value = data.ciudad.id;
+                            option.textContent = data.ciudad.nombre;
+                            ciudadSelect.appendChild(option);
+                            ciudadSelect.value = data.ciudad.id;
+                            ciudadSelect.disabled = false;
+                            
+                            cerrarModal();
+                        } else {
+                            errorMessage.textContent = data.error || '{% trans "Error al crear la ciudad" %}';
+                            errorMessage.style.display = 'block';
+                            btnGuardarCiudad.disabled = false;
+                            btnGuardarCiudad.textContent = '💾 {% trans "Guardar" %}';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error al crear ciudad:', error);
+                        errorMessage.textContent = '{% trans "Error al crear la ciudad. Por favor intente nuevamente." %}';
+                        errorMessage.style.display = 'block';
+                        btnGuardarCiudad.disabled = false;
+                        btnGuardarCiudad.textContent = '💾 {% trans "Guardar" %}';
+                    });
+                });
+                
+                // Permitir guardar con Enter
+                inputNombreCiudad.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        btnGuardarCiudad.click();
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('❌ Error al inicializar el cargador de ciudades:', error);
+            // No bloquear la carga de la página si hay un error
+        }
+    }
+    
+    // Intentar inicializar cuando el DOM esté listo
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initCiudadLoader);
+    } else {
+        // DOM ya está listo
+        initCiudadLoader();
+    }
+})();
+</script>
+{% endif %}
+{% endblock %}

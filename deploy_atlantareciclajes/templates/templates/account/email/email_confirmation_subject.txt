@@ -1,0 +1,4 @@
+{% load i18n %}
+{% autoescape off %}
+{% trans "Confirma tu email en eGarage" %}
+{% endautoescape %}

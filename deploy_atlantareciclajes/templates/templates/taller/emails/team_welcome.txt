@@ -1,0 +1,44 @@
+{% if lang == 'en' %}Welcome to eGarage{% else %}¡Bienvenido a eGarage!{% endif %}
+
+{% if lang == 'en' %}Hello{% else %}Hola{% endif %} {{ nombre }},
+
+{% if lang == 'en' %}
+You have been added to the team of {{ empresa }} on eGarage.
+
+Here are your login credentials:
+
+Username: {{ username }}
+Password: {{ password }}
+Role: {{ rol }}
+
+⚠️ IMPORTANT:
+Please log in and change your password as soon as possible for security reasons.
+
+Log in here: {{ login_url }}
+
+If you have any questions or need assistance, please contact your administrator.
+
+This is an automated message from eGarage. Please do not reply to this email.
+
+© {% now "Y" %} eGarage. All rights reserved.
+{% else %}
+Has sido añadido al equipo de {{ empresa }} en eGarage.
+
+Aquí tienes tus credenciales de acceso:
+
+Usuario: {{ username }}
+Contraseña: {{ password }}
+Rol: {{ rol }}
+
+⚠️ IMPORTANTE:
+Por favor, inicia sesión y cambia tu contraseña lo antes posible por razones de seguridad.
+
+Inicia sesión aquí: {{ login_url }}
+
+Si tienes alguna pregunta o necesitas ayuda, por favor contacta a tu administrador.
+
+Este es un mensaje automático de eGarage. Por favor no respondas a este correo.
+
+© {% now "Y" %} eGarage. Todos los derechos reservados.
+{% endif %}
+

@@ -52,9 +52,9 @@ class Tecnico(models.Model):
     """Modelo unificado de Técnico/Vendedor con validaciones multi-tenant"""
 
     ROL_CHOICES = [
-        ('TECNICO', 'Técnico'),
-        ('VENDEDOR', 'Vendedor'),
-        ('MIXTO', 'Técnico/Vendedor'),
+        ("TECNICO", "Técnico"),
+        ("VENDEDOR", "Vendedor"),
+        ("MIXTO", "Técnico/Vendedor"),
     ]
 
     empresa = models.ForeignKey(
@@ -65,6 +65,23 @@ class Tecnico(models.Model):
         blank=True,
     )
     nombre = models.CharField(max_length=100)
+    user = models.OneToOneField(
+        "auth.User",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="tecnico",
+        help_text="Usuario asociado si el técnico tiene acceso al sistema.",
+    )
+    # Alternativamente, si usas TeamMember:
+    # team_member = models.OneToOneField(
+    #     'taller.TeamMember',
+    #     on_delete=models.SET_NULL,
+    #     null=True,
+    #     blank=True,
+    #     related_name='tecnico',
+    #     help_text='TeamMember asociado si el técnico tiene acceso.'
+    # )
     telefono = models.CharField(
         max_length=20,
         blank=True,
@@ -74,7 +91,7 @@ class Tecnico(models.Model):
     direccion = models.TextField(blank=True, null=True, help_text="Dirección del técnico")
 
     # Unificación técnico/vendedor
-    rol = models.CharField(max_length=12, choices=ROL_CHOICES, default='MIXTO', db_index=True)
+    rol = models.CharField(max_length=12, choices=ROL_CHOICES, default="MIXTO", db_index=True)
 
     activo = models.BooleanField(default=True, db_index=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
@@ -84,7 +101,7 @@ class Tecnico(models.Model):
 
     def __str__(self):
         estado = "✅" if self.activo else "❌"
-        rol_display = f" ({self.get_rol_display()})" if self.rol != 'MIXTO' else ""
+        rol_display = f" ({self.get_rol_display()})" if self.rol != "MIXTO" else ""
         return f"{estado} {self.nombre}{rol_display}"
 
     def clean(self):
@@ -99,11 +116,11 @@ class Tecnico(models.Model):
 
     def es_vendedor(self):
         """Helper para verificar si es vendedor (incluye MIXTO)"""
-        return self.rol in ['VENDEDOR', 'MIXTO']
+        return self.rol in ["VENDEDOR", "MIXTO"]
 
     def es_tecnico(self):
         """Helper para verificar si es técnico (incluye MIXTO)"""
-        return self.rol in ['TECNICO', 'MIXTO']
+        return self.rol in ["TECNICO", "MIXTO"]
 
     class Meta:
         verbose_name = "Técnico"

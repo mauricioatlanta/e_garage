@@ -1,0 +1,148 @@
+{% load i18n %}
+<!DOCTYPE html>
+<html lang="{{ language|default:'es' }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if language == 'en' %}Plan Changed Successfully{% else %}Plan Cambiado Exitosamente{% endif %}</title>
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Helvetica', 'Arial', sans-serif; background-color: #0a0a0a; color: #ffffff;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0a0a0a;">
+        <tr>
+            <td align="center" style="padding: 40px 20px;">
+                <table width="600" cellpadding="0" cellspacing="0" style="background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(96, 165, 250, 0.08) 100%); border: 1px solid rgba(34, 211, 238, 0.3); border-radius: 16px; padding: 40px;">
+                    <!-- Logo y check -->
+                    <tr>
+                        <td align="center" style="padding-bottom: 20px;">
+                            <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981 0%, #22d3ee 100%); border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+                                <span style="font-size: 48px;">✅</span>
+                            </div>
+                            <h1 style="color: #22d3ee; font-size: 32px; margin: 10px 0 0 0; font-weight: bold;">🚀 eGarage</h1>
+                        </td>
+                    </tr>
+
+                    <!-- Título -->
+                    <tr>
+                        <td align="center" style="padding-bottom: 20px;">
+                            <h2 style="color: #ffffff; font-size: 28px; margin: 0;">
+                                {% if language == 'en' %}
+                                ✅ Plan Changed Successfully
+                                {% else %}
+                                ✅ Plan Cambiado Exitosamente
+                                {% endif %}
+                            </h2>
+                        </td>
+                    </tr>
+
+                    <!-- Mensaje principal -->
+                    <tr>
+                        <td style="color: #cbd5e1; font-size: 16px; line-height: 1.6; padding-bottom: 30px;">
+                            <p>
+                                {% if language == 'en' %}
+                                Hello <strong style="color: #ffffff;">{{ empresa.nombre_taller }}</strong>,
+                                {% else %}
+                                Hola <strong style="color: #ffffff;">{{ empresa.nombre_taller }}</strong>,
+                                {% endif %}
+                            </p>
+
+                            <p>
+                                {% if language == 'en' %}
+                                Thank you for your trust in eGarage! Your subscription plan has been successfully changed.
+                                {% else %}
+                                ¡Gracias por tu confianza en eGarage! Tu plan de suscripción ha sido cambiado exitosamente.
+                                {% endif %}
+                            </p>
+
+                            <!-- Detalles del Cambio -->
+                            <div style="background: rgba(0, 0, 0, 0.3); border-left: 4px solid #22d3ee; padding: 20px; margin: 20px 0; border-radius: 8px;">
+                                <h3 style="color: #22d3ee; margin-top: 0; margin-bottom: 15px;">
+                                    {% if language == 'en' %}📋 Plan Change Details{% else %}📋 Detalles del Cambio{% endif %}
+                                </h3>
+                                <table width="100%" style="color: #ffffff;">
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>{% if language == 'en' %}Previous Plan:{% else %}Plan Anterior:{% endif %}</strong></td>
+                                        <td style="padding: 8px 0; text-align: right; color: #94a3b8;">{{ plan_anterior_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>{% if language == 'en' %}New Plan:{% else %}Plan Nuevo:{% endif %}</strong></td>
+                                        <td style="padding: 8px 0; text-align: right; color: #10b981; font-weight: bold;">{{ plan_nuevo_display }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>{% if language == 'en' %}Amount:{% else %}Monto:{% endif %}</strong></td>
+                                        <td style="padding: 8px 0; text-align: right;">${{ monto|floatformat:0 }} {{ moneda }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>{% if language == 'en' %}Start Date:{% else %}Fecha de Inicio:{% endif %}</strong></td>
+                                        <td style="padding: 8px 0; text-align: right;">{{ fecha_inicio|date:"d/m/Y" }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td style="padding: 8px 0;"><strong>{% if language == 'en' %}Expiration Date:{% else %}Fecha de Expiración:{% endif %}</strong></td>
+                                        <td style="padding: 8px 0; text-align: right;">{{ fecha_fin|date:"d/m/Y" }}</td>
+                                    </tr>
+                                    <tr style="border-top: 1px solid rgba(255, 255, 255, 0.2);">
+                                        <td style="padding: 12px 0 0 0;"><strong style="color: #10b981;">{% if language == 'en' %}Status:{% else %}Estado:{% endif %}</strong></td>
+                                        <td style="padding: 12px 0 0 0; text-align: right; color: #10b981; font-weight: bold;">{% if language == 'en' %}ACTIVE{% else %}ACTIVA{% endif %}</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <p style="margin-top: 20px;">
+                                {% if language == 'en' %}
+                                You can now enjoy all the benefits of your new plan. If you have any questions, don't hesitate to contact us.
+                                {% else %}
+                                Ya puedes disfrutar de todos los beneficios de tu nuevo plan. Si tienes alguna pregunta, no dudes en contactarnos.
+                                {% endif %}
+                            </p>
+                        </td>
+                    </tr>
+
+                    <!-- Botón CTA -->
+                    <tr>
+                        <td align="center" style="padding: 20px 0;">
+                            <a href="{% if language == 'en' %}https://www.egarage.cl/us/en/dashboard/{% else %}https://www.egarage.cl/cl/es/dashboard/{% endif %}" style="display: inline-block; padding: 16px 40px; background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%); color: #000000; text-decoration: none; border-radius: 50px; font-size: 18px; font-weight: bold; box-shadow: 0 4px 15px rgba(34, 211, 238, 0.4);">
+                                🚀 {% if language == 'en' %}Access Dashboard{% else %}Acceder al Panel{% endif %}
+                            </a>
+                        </td>
+                    </tr>
+
+                    <!-- Soporte -->
+                    <tr>
+                        <td style="color: #94a3b8; font-size: 14px; line-height: 1.6; padding-top: 30px; border-top: 1px solid rgba(255, 255, 255, 0.1);">
+                            <p>
+                                {% if language == 'en' %}
+                                Need help? Our support team is here to assist you:
+                                {% else %}
+                                ¿Necesitas ayuda? Nuestro equipo de soporte está aquí para asistirte:
+                                {% endif %}
+                            </p>
+                            <p style="color: #22d3ee;">📧 subcription@egarage.cl</p>
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td align="center" style="padding-top: 30px; color: #64748b; font-size: 14px;">
+                            <p>
+                                {% if language == 'en' %}
+                                Thank you for your continued trust in eGarage,<br>
+                                <strong style="color: #22d3ee;">The eGarage Team</strong>
+                                {% else %}
+                                Gracias por tu continua confianza en eGarage,<br>
+                                <strong style="color: #22d3ee;">Equipo eGarage</strong>
+                                {% endif %}
+                            </p>
+
+                            <p style="margin-top: 20px; font-size: 12px;">
+                                📧 subcription@egarage.cl | 🌐 www.egarage.cl
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+
+
+

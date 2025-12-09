@@ -5,6 +5,7 @@ URLs para el panel administrativo de monitoreo de suscripciones
 from django.urls import path
 
 from taller.views_extra import admin_monitoring
+from taller.views_extra import cortesia_admin
 
 app_name = "admin_monitoring"
 
@@ -38,5 +39,17 @@ urlpatterns = [
         "api/stats/",
         admin_monitoring.subscription_api_stats,
         name="subscription_api_stats",
+    ),
+    # Extensión de cortesía
+    path(
+        "cortesia/",
+        cortesia_admin.cortesia_extension_view,
+        name="cortesia_extension",
+    ),
+    # API para extensión de cortesía (AJAX)
+    path(
+        "cortesia/api/",
+        cortesia_admin.cortesia_extension_api,
+        name="cortesia_extension_api",
     ),
 ]

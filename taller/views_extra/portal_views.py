@@ -35,9 +35,17 @@ def portal_login(request):
         password = request.POST.get("password")
 
         try:
+            # 🔒 SEGURIDAD: Filtrar por empresa si es posible (aunque en login no tenemos empresa aún)
             # Buscar cliente por email
+            # Nota: En login público, no podemos filtrar por empresa, pero debemos validar
+            # que el cliente tiene empresa asignada
             cliente = Cliente.objects.filter(email_cliente=email).first()
             if not cliente:
+                messages.error(request, "Cliente no encontrado")
+                return render(request, "portal/login.html")
+
+            # Validar que el cliente tiene empresa asignada
+            if not hasattr(cliente, "empresa") or not cliente.empresa:
                 messages.error(request, "Cliente no encontrado")
                 return render(request, "portal/login.html")
 
@@ -86,11 +94,13 @@ def portal_dashboard(request):
         # Obtener configuración del portal
         portal_config = PortalConfiguracion.objects.filter(empresa=cliente.empresa).first()
 
+        # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
         # Estadísticas básicas
-        vehiculos = Vehiculo.objects.filter(id_cliente=cliente)
-        documentos_recientes = Documento.objects.filter(id_cliente=cliente).order_by(
-            "-fecha_documento"
-        )[:5]
+        # Nota: Este código usa campos legacy (id_cliente). Debe migrar a 'cliente'
+        vehiculos = Vehiculo.objects.filter(cliente=cliente, empresa=cliente.empresa)
+        documentos_recientes = Documento.objects.filter(
+            cliente=cliente, empresa=cliente.empresa
+        ).order_by("-fecha_emision")[:5]
 
         solicitudes_pendientes = SolicitudPresupuesto.objects.filter(
             cliente=cliente, estado__in=["PENDIENTE", "EN_REVISION"]
@@ -134,31 +144,34 @@ def portal_documentos(request):
         fecha_desde = request.GET.get("fecha_desde")
         fecha_hasta = request.GET.get("fecha_hasta")
 
+        # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
         # Query base
-        documentos = Documento.objects.filter(id_cliente=cliente)
+        # Nota: Migrado de id_cliente a cliente, id_vehiculo a vehiculo, fecha_documento a fecha_emision, tipo_documento a tipo
+        documentos = Documento.objects.filter(cliente=cliente, empresa=cliente.empresa)
 
         # Aplicar filtros
         if vehiculo_id:
-            documentos = documentos.filter(id_vehiculo_id=vehiculo_id)
+            documentos = documentos.filter(vehiculo_id=vehiculo_id)
         if tipo_doc:
-            documentos = documentos.filter(tipo_documento=tipo_doc)
+            documentos = documentos.filter(tipo=tipo_doc)
         if fecha_desde:
-            documentos = documentos.filter(fecha_documento__gte=fecha_desde)
+            documentos = documentos.filter(fecha_emision__gte=fecha_desde)
         if fecha_hasta:
-            documentos = documentos.filter(fecha_documento__lte=fecha_hasta)
+            documentos = documentos.filter(fecha_emision__lte=fecha_hasta)
 
-        documentos = documentos.order_by("-fecha_documento")
+        documentos = documentos.order_by("-fecha_emision")
 
         # Paginación
         paginator = Paginator(documentos, 10)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
 
+        # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
         # Datos para filtros
-        vehiculos = Vehiculo.objects.filter(id_cliente=cliente)
+        vehiculos = Vehiculo.objects.filter(cliente=cliente, empresa=cliente.empresa)
         tipos_documento = (
-            Documento.objects.filter(id_cliente=cliente)
-            .values_list("tipo_documento", flat=True)
+            Documento.objects.filter(cliente=cliente, empresa=cliente.empresa)
+            .values_list("tipo", flat=True)
             .distinct()
         )
 
@@ -208,7 +221,10 @@ def portal_solicitar_presupuesto(request):
             fecha_deseada = request.POST.get("fecha_deseada")
 
             try:
-                vehiculo = Vehiculo.objects.get(id=vehiculo_id, id_cliente=cliente)
+                # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
+                vehiculo = Vehiculo.objects.get(
+                    id=vehiculo_id, cliente=cliente, empresa=cliente.empresa
+                )
 
                 solicitud = SolicitudPresupuesto.objects.create(
                     empresa=cliente.empresa,
@@ -241,8 +257,9 @@ def portal_solicitar_presupuesto(request):
             except Exception as e:
                 messages.error(request, f"Error al crear solicitud: {str(e)}")
 
+        # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
         # Obtener vehículos del cliente
-        vehiculos = Vehiculo.objects.filter(id_cliente=cliente)
+        vehiculos = Vehiculo.objects.filter(cliente=cliente, empresa=cliente.empresa)
 
         context = {
             "cliente": cliente,
@@ -301,7 +318,8 @@ def portal_vehiculos(request):
         cliente_usuario = ClienteUsuario.objects.get(user=request.user)
         cliente = cliente_usuario.cliente
 
-        vehiculos = Vehiculo.objects.filter(id_cliente=cliente)
+        # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
+        vehiculos = Vehiculo.objects.filter(cliente=cliente, empresa=cliente.empresa)
 
         context = {
             "cliente": cliente,
@@ -340,15 +358,23 @@ def ajax_detalle_documento(request, documento_id):
         cliente_usuario = ClienteUsuario.objects.get(user=request.user)
         cliente = cliente_usuario.cliente
 
-        documento = get_object_or_404(Documento, id=documento_id, id_cliente=cliente)
+        # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
+        documento = get_object_or_404(
+            Documento, id=documento_id, cliente=cliente, empresa=cliente.empresa
+        )
 
+        # Nota: Campos migrados de legacy a actuales
         data = {
-            "numero": documento.numero_documento,
-            "fecha": documento.fecha_documento.strftime("%d/%m/%Y"),
-            "tipo": documento.tipo_documento,
-            "vehiculo": f"{documento.id_vehiculo.marca} {documento.id_vehiculo.modelo}",
+            "numero": getattr(documento, "numero", getattr(documento, "numero_documento", "")),
+            "fecha": documento.fecha_emision.strftime("%d/%m/%Y"),
+            "tipo": documento.tipo,
+            "vehiculo": (
+                f"{documento.vehiculo.marca_texto or documento.vehiculo.marca} {documento.vehiculo.modelo_texto or documento.vehiculo.modelo}"
+                if documento.vehiculo
+                else "N/A"
+            ),
             "total": float(documento.total),
-            "observaciones": documento.observaciones,
+            "observaciones": getattr(documento, "observaciones", ""),
         }
 
         return JsonResponse(data)

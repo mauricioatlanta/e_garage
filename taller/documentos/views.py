@@ -574,16 +574,8 @@ def ver_documento(request, documento_id):
         empresa = request.user.empresa
         print(f"[DEBUG VER] Empresa del usuario: {empresa.nombre_taller}")
 
-        # Primero verificar si el documento existe
-        if not Documento.objects.filter(id=documento_id).exists():
-            print(f"[DEBUG VER] ❌ Documento {documento_id} NO EXISTE en la base de datos")
-            from django.http import Http404
-
-            raise Http404(f"Documento {documento_id} no encontrado")
-
-        print(f"[DEBUG VER] ✅ Documento {documento_id} existe en la base de datos")
-
-        # Verificar si pertenece a la empresa del usuario
+        # 🔒 SEGURIDAD: Filtrar por empresa desde el inicio para aislamiento multi-tenant
+        # Verificar si el documento existe y pertenece a la empresa del usuario
         if not Documento.objects.filter(id=documento_id, empresa=empresa).exists():
             print(
                 f"[DEBUG VER] ❌ Documento {documento_id} NO pertenece a la empresa {empresa.nombre_taller}"
@@ -1103,9 +1095,11 @@ def exportar_documento_pdf(request, documento_id):
     la utilería centralizada DocumentoPDFExporter.
     """
     empresa = getattr(request.user, "empresa", None)
-    queryset = Documento.objects.all()
+    # 🔒 SEGURIDAD: Filtrar por empresa desde el inicio para aislamiento multi-tenant
     if empresa is not None:
-        queryset = queryset.filter(empresa=empresa)
+        queryset = Documento.objects.filter(empresa=empresa)
+    else:
+        queryset = Documento.objects.none()
 
     documento = get_object_or_404(queryset, id=documento_id)
 

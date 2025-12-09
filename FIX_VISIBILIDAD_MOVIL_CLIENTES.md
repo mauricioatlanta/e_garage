@@ -171,3 +171,6 @@ console.log(window.innerWidth);  // Debe ser <= 768 para activar estilos móvil
 
 
 
+
+
+

@@ -7,7 +7,13 @@ from taller.models.clientes import Cliente
 
 @login_required
 def lista_clientes(request):
-    clientes = Cliente.objects.filter(user=request.user)
+    # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
+    # Nota: Este archivo parece usar campo legacy 'user'. Debe migrar a 'empresa'
+    empresa = getattr(request.user, "empresa", None)
+    if empresa:
+        clientes = Cliente.objects.filter(empresa=empresa)
+    else:
+        clientes = Cliente.objects.none()
     return render(request, "clientes/lista_clientes.html", {"clientes": clientes})
 
 
@@ -27,5 +33,12 @@ def crear_cliente(request):
 
 @login_required
 def detalle_cliente(request, cliente_id):
-    cliente = get_object_or_404(Cliente, id=cliente_id, user=request.user)
+    # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
+    empresa = getattr(request.user, "empresa", None)
+    if empresa:
+        cliente = get_object_or_404(Cliente, id=cliente_id, empresa=empresa)
+    else:
+        from django.http import Http404
+
+        raise Http404("Cliente no encontrado")
     return render(request, "clientes/detalle_cliente.html", {"cliente": cliente})

@@ -8,7 +8,6 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from taller.config.country_settings import CountrySettings
-from taller.models.taller_info import TallerInfo
 from taller.services.registration_service import RegistrationService
 from taller.utils.country_config import get_country_config
 
@@ -94,15 +93,10 @@ def registro(request):
             user = result["user"]
             empresa = result["empresa"]
 
-            # Crear TallerInfo si no existe (compatibilidad con código existente)
-            TallerInfo.objects.get_or_create(
-                user=user,
-                defaults={
-                    "nombre_taller": nombre_taller,
-                    "telefono": telefono,
-                    "ha_usado_prueba": (tipo_registro == "trial"),
-                },
-            )
+            # Actualizar empresa con datos adicionales si es necesario
+            if tipo_registro == "trial":
+                empresa.ha_usado_prueba = True
+                empresa.save(update_fields=["ha_usado_prueba"])
 
             # 🚀 LOGIN AUTOMÁTICO (Magic UX - Sin Código)
             user = authenticate(username=email, password=password)

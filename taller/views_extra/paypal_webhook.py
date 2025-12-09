@@ -100,6 +100,13 @@ def handle_payment_completed(payload):
             estado="procesado",  # Ya procesado por PayPal
         )
 
+        # Detectar si es nueva suscripción o renovación
+        plan_anterior = empresa.plan
+        es_nueva_suscripcion = not empresa.suscripcion_activa or empresa.plan == "trial"
+        es_cambio_plan = (
+            empresa.suscripcion_activa and plan_anterior != plan and plan_anterior != "trial"
+        )
+
         # Activar suscripción
         empresa.suscripcion_activa = True
         empresa.plan = plan
@@ -110,30 +117,41 @@ def handle_payment_completed(payload):
 
         logger.info(f"✅ Pago PayPal procesado para {empresa.nombre_taller}")
 
-        # Enviar email de confirmación
-        from django.core.mail import send_mail
-        from django.template.loader import render_to_string
-
-        html_message = render_to_string(
-            "email/pago_confirmado.html",
-            {
-                "empresa": empresa,
-                "plan": plan,
-                "monto": amount,
-                "moneda": currency,
-                "fecha_fin": empresa.fecha_fin,
-                "language": "en",
-            },
+        # Enviar notificaciones automáticas (Email + WhatsApp)
+        from taller.utils.notificaciones_suscripcion import (
+            notificar_cambio_plan,
+            notificar_nueva_suscripcion,
+            notificar_renovacion_exitosa,
         )
 
-        send_mail(
-            subject="✅ Payment Confirmed - eGarage",
-            message="",
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[empresa.email],
-            html_message=html_message,
-            fail_silently=True,
-        )
+        if es_nueva_suscripcion:
+            # A. NUEVA SUSCRIPCIÓN
+            notificar_nueva_suscripcion(
+                empresa=empresa,
+                plan=plan,
+                monto=amount,
+                es_nueva_empresa=es_nueva_suscripcion,
+            )
+            logger.info(f"📧 Notificación de nueva suscripción enviada a {empresa.user.email}")
+        elif es_cambio_plan:
+            # B. CAMBIO DE PLAN
+            notificar_cambio_plan(
+                empresa=empresa,
+                plan_anterior=plan_anterior,
+                plan_nuevo=plan,
+                monto=amount,
+                fecha_inicio=empresa.fecha_inicio,
+            )
+            logger.info(f"📧 Notificación de cambio de plan enviada a {empresa.user.email}")
+        else:
+            # C. RENOVACIÓN EXITOSA
+            notificar_renovacion_exitosa(
+                empresa=empresa,
+                plan=plan,
+                monto=amount,
+                dias_renovados=dias,
+            )
+            logger.info(f"📧 Notificación de renovación exitosa enviada a {empresa.user.email}")
 
         return JsonResponse({"status": "success"})
 

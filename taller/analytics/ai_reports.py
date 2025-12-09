@@ -1,6 +1,18 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 eGarage. Todos los derechos reservados.
+#
+# PROPIEDAD INTELECTUAL PROTEGIDA. ESTRICTAMENTE CONFIDENCIAL.
+# Este archivo es la lógica central de predicción de la IA.
+#
+# Consulta el archivo LICENSE en la raíz del repositorio para más detalles
+# sobre la protección de la Propiedad Intelectual de eGarage.
+# -----------------------------------------------------------------------------
 """
 Sistema de Reportes Inteligentes con AI Analytics
 Diferenciación por país con visualizaciones futuristas
+
+U.S. Patent Pending
+Chile Software Registration Pending
 """
 
 from datetime import timedelta

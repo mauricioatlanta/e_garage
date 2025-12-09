@@ -1,3 +1,12 @@
+# -----------------------------------------------------------------------------
+# Copyright (c) 2025 eGarage. Todos los derechos reservados.
+#
+# PROPIEDAD INTELECTUAL PROTEGIDA. ESTRICTAMENTE CONFIDENCIAL.
+# Este archivo contiene endpoints y vistas del motor de IA.
+#
+# Consulta el archivo LICENSE en la raíz del repositorio para más detalles
+# sobre la protección de la Propiedad Intelectual de eGarage.
+# -----------------------------------------------------------------------------
 """
 Views para Dashboard AI con visualizaciones futuristas
 Diferenciación por país con tecnología avanzada
@@ -13,6 +22,7 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from taller.auth.decorators import login_required_default
+from taller.middleware.rate_limiting import rate_limit
 
 from .ai_reports import AIReportEngine, ReportExporter
 
@@ -92,8 +102,9 @@ def clientes_analytics_api(request):
 
 @login_required
 @login_required_default
+@rate_limit(action="ia_prediccion", per_ip=True, per_user=True)
 def predictive_analytics_api(request):
-    """API para predicciones con IA"""
+    """API para predicciones con IA - Protegida con rate limiting estricto"""
 
     engine = AIReportEngine(request.user.empresa)
 
@@ -112,8 +123,9 @@ def predictive_analytics_api(request):
 
 
 @method_decorator(csrf_exempt, name="dispatch")
+@method_decorator(rate_limit(action="ia_prediccion", per_ip=True, per_user=True), name="dispatch")
 class AIInsightView(View):
-    """Vista para insights generados por IA"""
+    """Vista para insights generados por IA - Protegida con rate limiting estricto"""
 
     def post(self, request):
         try:

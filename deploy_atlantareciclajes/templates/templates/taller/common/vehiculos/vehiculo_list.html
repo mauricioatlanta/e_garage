@@ -1,0 +1,350 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n static %}
+{% load country_url %}
+
+{% block page_title %}{% trans "Vehicle Fleet" %}{% endblock %}
+{% block page_subtitle %}{% trans "Advanced vehicle management system" %}{% endblock %}
+{% block page_icon %}🚗{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  /* Vehicle Cards - Compact and Transparent */
+  .vehicle-card {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 10px;
+    padding: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .vehicle-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #a855f7, #ec4899, #3b82f6);
+    transform: scaleX(0);
+    transition: transform 0.3s ease;
+  }
+
+  .vehicle-card:hover::before {
+    transform: scaleX(1);
+  }
+
+  .vehicle-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(168, 85, 247, 0.6);
+    box-shadow:
+      0 10px 25px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(168, 85, 247, 0.2);
+  }
+
+  /* Interactive Elements */
+  .interactive-btn {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2));
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: #c084fc;
+    font-size: 12px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .interactive-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+    transition: left 0.3s ease;
+  }
+
+  .interactive-btn:hover::before {
+    left: 100%;
+  }
+
+  .interactive-btn:hover {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(236, 72, 153, 0.4));
+    border-color: rgba(168, 85, 247, 0.8);
+    color: #d8b4fe;
+    transform: translateY(-1px);
+  }
+
+  /* Status Indicators */
+  .status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    position: relative;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .status-active {
+    background: #a855f7;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.5);
+  }
+
+  .status-inactive {
+    background: #ff4444;
+    box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+  }
+
+  /* Futuristic Search */
+  .futuristic-search {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 16px;
+    padding: 20px;
+    position: relative;
+  }
+
+  .futuristic-search::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(45deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05));
+    border-radius: 16px;
+    z-index: -1;
+  }
+
+  .search-input {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 12px;
+    padding: 12px 16px;
+    color: #ffffff;
+    font-size: 14px;
+    transition: all 0.3s ease;
+  }
+
+  .search-input:focus {
+    outline: none;
+    border-color: #ffffff;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+    background: rgba(0, 0, 0, 0.6);
+  }
+
+  .search-input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+  }
+
+  /* Grid Layout for Compact Cards */
+  .vehicles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+  }
+
+  /* Futuristic Cards */
+  .futuristic-card {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+  }
+
+  .futuristic-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(168, 85, 247, 0.1), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .futuristic-card:hover::before {
+    left: 100%;
+  }
+
+  .futuristic-card:hover {
+    transform: translateY(-5px) scale(1.02);
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow:
+      0 20px 40px rgba(168, 85, 247, 0.1),
+      0 0 20px rgba(168, 85, 247, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Add Vehicle Button - Lively and Animated */
+  .add-vehicle-btn {
+    background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    border: 2px solid rgba(16, 185, 129, 0.6);
+    box-shadow: 
+      0 4px 15px rgba(16, 185, 129, 0.4),
+      0 0 20px rgba(16, 185, 129, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    position: relative;
+    transform: translateY(0);
+  }
+
+  .add-vehicle-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.5s ease;
+  }
+
+  .add-vehicle-btn:hover::before {
+    left: 100%;
+  }
+
+  .add-vehicle-btn:hover {
+    transform: translateY(-2px) scale(1.05);
+    border-color: rgba(16, 185, 129, 1);
+    box-shadow: 
+      0 8px 25px rgba(16, 185, 129, 0.6),
+      0 0 40px rgba(16, 185, 129, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+  }
+
+  .add-vehicle-btn:active {
+    transform: translateY(0) scale(1.02);
+  }
+
+  .add-icon {
+    display: inline-block;
+    animation: bounce 2s ease-in-out infinite;
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.5));
+  }
+
+  @keyframes bounce {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    25% { transform: translateY(-3px) rotate(-5deg); }
+    50% { transform: translateY(0) rotate(0deg); }
+    75% { transform: translateY(-2px) rotate(5deg); }
+  }
+
+  .add-vehicle-btn:hover .add-icon {
+    animation: spin-bounce 0.6s ease-in-out;
+    transform: rotate(90deg) scale(1.2);
+  }
+
+  @keyframes spin-bounce {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.3); }
+    100% { transform: rotate(360deg) scale(1.2); }
+  }
+
+  .btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+    transition: left 0.6s ease;
+    pointer-events: none;
+  }
+
+  .add-vehicle-btn:hover .btn-shine {
+    left: 100%;
+  }
+
+  .btn-pulse {
+    position: absolute;
+    inset: -4px;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #10b981, #34d399, #10b981);
+    background-size: 200% 200%;
+    opacity: 0;
+    z-index: -1;
+    animation: pulse-glow 2s ease-in-out infinite;
+    filter: blur(8px);
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      opacity: 0.3;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.6;
+      transform: scale(1.05);
+    }
+  }
+
+  .add-vehicle-btn:hover .btn-pulse {
+    animation: pulse-glow-fast 1s ease-in-out infinite;
+  }
+
+  @keyframes pulse-glow-fast {
+    0%, 100% {
+      opacity: 0.5;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 0.8;
+      transform: scale(1.1);
+    }
+  }
+
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .vehicles-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .vehicle-card {
+      padding: 10px;
+    }
+
+    .add-vehicle-btn {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block main_actions %}
+<a href="{% country_url 'vehiculos:crear_vehiculo' %}"
+   class="add-vehicle-btn inline-flex items-center gap-2 px-6 py-3 rounded-xl text-white text-sm font-bold border transition-all duration-300 relative overflow-hidden group">
+  <span class="relative z-10 flex items-center gap-2">
+    <span class="add-icon text-lg">➕</span>
+    <span>{% trans "Add Vehicle" %}</span>
+  </span>
+  <span class="btn-shine"></span>
+  <span class="btn-pulse"></span>
+</a>
+{% endblock %}
+
+{% block search_bar %}
+  {% include "taller/common/vehiculos/_filters_toolbar.html" %}
+{% endblock %}
+
+{% block panel_content %}
+  {% include "taller/common/vehiculos/_ai_badges.html" %}
+  {% include "taller/common/vehiculos/_table.html" %}
+  {% include "taller/common/vehiculos/_empty_state.html" %}
+  {% include "taller/common/vehiculos/_pagination.html" %}
+{% endblock %}

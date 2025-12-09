@@ -135,7 +135,8 @@ def buscar_motores_api(request):
         qs = qs.filter(empresa=empresa)
 
     # Filtrar por modelo_id (ahora validado)
-    qs = qs.filter(modelo_id=modelo_id)
+    # Usar modelos__id porque MotorVehiculo tiene relación ManyToMany con Modelo
+    qs = qs.filter(modelos__id=modelo_id)
 
     # Soporte para búsqueda por texto
     q = (request.GET.get("q") or "").strip()
@@ -183,7 +184,8 @@ def buscar_cajas_api(request):
         qs = qs.filter(empresa=empresa)
 
     # Filtrar por modelo_id (ahora validado)
-    qs = qs.filter(modelo_id=modelo_id)
+    # Usar modelos__id porque CajaVehiculo tiene relación ManyToMany con Modelo
+    qs = qs.filter(modelos__id=modelo_id)
 
     # Soporte para búsqueda por texto
     q = (request.GET.get("q") or "").strip()

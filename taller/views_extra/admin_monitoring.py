@@ -344,7 +344,8 @@ def subscription_actions(request, empresa_id):
 
     elif action == "extend":
         days = int(request.POST.get("days", 30))
-        empresa.extender_suscripcion(days)
+        # Extender suscripción con notificación automática
+        empresa.extender_suscripcion(days, enviar_notificacion=True)
 
         smart_logger.log_subscription_change(
             empresa_id=empresa.id,
@@ -353,7 +354,12 @@ def subscription_actions(request, empresa_id):
             reason=f"Extensión de {days} días por admin: {request.user.username}",
         )
 
-        return JsonResponse({"success": True, "message": f"Suscripción extendida {days} días"})
+        return JsonResponse(
+            {
+                "success": True,
+                "message": f"Suscripción extendida {days} días. Notificación enviada al cliente.",
+            }
+        )
 
     else:
         return JsonResponse({"error": "Acción no válida"}, status=400)

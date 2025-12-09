@@ -136,3 +136,6 @@ El campo `rol` del modelo `Tecnico` ahora usa `ROL_CHOICES` en lugar de la clase
 **¡Todo listo!** 🚀
 
 
+
+
+

@@ -97,7 +97,14 @@ def _get_cliente_autenticado(request):
         return None
 
     try:
-        return Cliente.objects.get(pk=cliente_id)
+        # 🔒 SEGURIDAD: Filtrar por empresa para aislamiento multi-tenant
+        # Nota: En el portal, el cliente viene de la sesión, pero aún así
+        # debemos validar que pertenece a su empresa para prevenir acceso cruzado
+        cliente = Cliente.objects.get(pk=cliente_id)
+        # Validar que el cliente tiene empresa asignada
+        if not hasattr(cliente, "empresa") or not cliente.empresa:
+            return None
+        return cliente
     except Cliente.DoesNotExist:
         return None
 

@@ -1,42 +1,13 @@
-﻿# Python / Django
-__pycache__/
-*.pyc
-.venv/
-venv/
-.env
-media/
-static_root/
-db.sqlite3
+﻿# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
+*.png
+*.jpg
+*.mp4
+playwright-report/
+test-results.json
 
-# Editores
-*.code-workspace
-.idea/
-.vscode/
-
-# Otros
-*.zip
-
-# Archivos .txt.py que no son Python válidos
-*.txt.py
-# Build artifacts / generados
-staticfiles/
-media/
-__pycache__/
-.env
-.venv/
-# Build artifacts / generados
-staticfiles/
-media/
-__pycache__/
-.env
-.venv/
-
-# Carpetas de despliegue y updates locales
-deploy_atlantareciclajes/
-egarage_update_clientes_template/
-egarage_update_fixes/
-egarage_update_otros_servicios/
-
-# Scripts solo locales
-start_mobile.*
-WSGI_CORRECTO_PYTHONANYWHERE.py
+# Node
+node_modules/
+package-lock.json

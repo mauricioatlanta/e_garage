@@ -1,0 +1,526 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% load i18n %}
+
+{% block title %}{% trans "Sign In" %} - eGarage{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" defer></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js" defer></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: #0a0a0a !important;
+    font-family: 'Exo 2', sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.font-futuristic {
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.05em;
+}
+
+.font-tech {
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.02em;
+}
+
+/* Grid background */
+.grid-bg {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    z-index: 1;
+    pointer-events: none;
+}
+
+/* Scan line effect */
+.scan-line {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.8), transparent);
+    animation: scan 4s linear infinite;
+    z-index: 3;
+    pointer-events: none;
+}
+
+@keyframes scan {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(100vh); }
+}
+
+/* Login container */
+.login-container {
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 480px;
+    padding: 20px;
+}
+
+.glass-card {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%);
+    backdrop-filter: blur(25px);
+    border-radius: 1.5rem;
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    box-shadow:
+        0 8px 32px rgba(34, 211, 238, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 48px 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.1), transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+.neon-button {
+    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+    color: #000;
+    padding: 12px 32px;
+    border-radius: 999px;
+    font-weight: 700;
+    border: none;
+    box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.neon-button:hover {
+    box-shadow: 0 0 35px rgba(34, 211, 238, 0.8);
+    transform: translateY(-2px);
+}
+
+/* Logo section */
+.logo-section {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.logo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.6));
+    animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% { filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.6)); }
+    50% { filter: drop-shadow(0 0 30px rgba(34, 211, 238, 0.9)); }
+}
+
+.brand-name {
+    font-size: 36px;
+    font-weight: 900;
+    color: #22d3ee;
+    margin-bottom: 8px;
+    text-shadow: 0 0 30px rgba(34, 211, 238, 0.8);
+}
+
+.welcome-text {
+    font-size: 14px;
+    color: #94a3b8;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+}
+
+.country-badge {
+    display: inline-block;
+    background: rgba(34, 211, 238, 0.1);
+    border: 1px solid rgba(34, 211, 238, 0.4);
+    color: #22d3ee;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-top: 12px;
+}
+
+.login-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #22d3ee;
+    margin-bottom: 28px;
+    text-align: center;
+    text-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
+}
+
+/* Form styles */
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: #22d3ee;
+    margin-bottom: 8px;
+    letter-spacing: 0.05em;
+}
+
+.form-input {
+    width: 100%;
+    padding: 14px 16px;
+    font-size: 15px;
+    font-family: 'JetBrains Mono', monospace;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(34, 211, 238, 0.3);
+    border-radius: 10px;
+    transition: all 0.3s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #22d3ee;
+    background: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+}
+
+.form-input::placeholder {
+    color: #64748b;
+}
+
+.error-message {
+    color: #f87171;
+    font-size: 13px;
+    margin-top: 6px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.remember-me {
+    display: flex;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.remember-me input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: #22d3ee;
+}
+
+.remember-me label {
+    font-size: 14px;
+    color: #94a3b8;
+    cursor: pointer;
+}
+
+.login-button {
+    width: 100%;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    color: #000000;
+    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.05em;
+}
+
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 35px rgba(34, 211, 238, 0.8);
+}
+
+.forgot-password {
+    text-align: center;
+    margin-top: 18px;
+}
+
+.forgot-password a {
+    color: #22d3ee;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.forgot-password a:hover {
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+}
+
+.signup-section {
+    text-align: center;
+    margin-top: 28px;
+    padding-top: 28px;
+    border-top: 1px solid rgba(34, 211, 238, 0.2);
+}
+
+.signup-text {
+    font-size: 14px;
+    color: #94a3b8;
+}
+
+.signup-link {
+    color: #22d3ee;
+    text-decoration: none;
+    font-weight: 600;
+    margin-left: 4px;
+    transition: all 0.2s;
+}
+
+.signup-link:hover {
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
+}
+
+/* Alert messages */
+.alert {
+    padding: 14px 16px;
+    border-radius: 10px;
+    margin-bottom: 22px;
+    font-size: 14px;
+    font-weight: 500;
+    border: 1px solid;
+}
+
+.alert-error {
+    background: rgba(248, 113, 113, 0.1);
+    color: #f87171;
+    border-color: #f87171;
+}
+
+.alert-success {
+    background: rgba(34, 211, 238, 0.1);
+    color: #22d3ee;
+    border-color: #22d3ee;
+}
+
+/* Language selector for USA */
+.language-selector {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 20px;
+}
+
+.lang-btn {
+    padding: 8px 16px;
+    border: 2px solid rgba(34, 211, 238, 0.3);
+    background: rgba(0, 0, 0, 0.5);
+    color: #22d3ee;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.3s;
+}
+
+.lang-btn:hover {
+    border-color: #22d3ee;
+    background: rgba(34, 211, 238, 0.1);
+    box-shadow: 0 0 15px rgba(34, 211, 238, 0.3);
+}
+
+.lang-btn.active {
+    border-color: #22d3ee;
+    background: #22d3ee;
+    color: #000;
+}
+
+@media (max-width: 480px) {
+    .glass-card {
+        padding: 36px 28px;
+    }
+
+    .brand-name {
+        font-size: 28px;
+    }
+
+    .login-title {
+        font-size: 22px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Vanta.js background -->
+<div id="vanta-bg" style="position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0;"></div>
+
+<!-- Grid background -->
+<div class="grid-bg"></div>
+
+<!-- Scan line effect -->
+<div class="scan-line"></div>
+
+<div class="login-container">
+    <div class="glass-card">
+        <!-- Logo y Marca -->
+        <div class="logo-section">
+            <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
+            <div class="brand-name font-futuristic">eGarage</div>
+            <div class="welcome-text font-tech">{% trans "Professional Automotive Management" %}</div>
+
+            {% if request.country == 'CL' %}
+            <div class="country-badge font-tech">🇨🇱 Chile</div>
+            {% elif request.country == 'US' %}
+            <div class="country-badge font-tech">🇺🇸 United States</div>
+            {% endif %}
+        </div>
+
+        <!-- Título -->
+        <h2 class="login-title font-futuristic">{% trans "Sign In" %}</h2>
+
+        <!-- Mensajes de error generales -->
+        {% if form.non_field_errors %}
+        <div class="alert alert-error">
+            {{ form.non_field_errors }}
+        </div>
+        {% endif %}
+
+        <!-- Mensajes de éxito (filtrados) -->
+        {% if messages %}
+            {% for message in messages %}
+                {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Professional Automotive Management System" not in message|stringformat:"s" and "Ha iniciado sesión exitosamente" not in message|stringformat:"s" and "Ha cerrado sesión" not in message|stringformat:"s" and "iniciado sesión exitosamente" not in message|stringformat:"s" and "cerrado sesión" not in message|stringformat:"s" and "Información de empresa guardada exitosamente" not in message|stringformat:"s" %}
+                    <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+
+        <!-- Formulario -->
+        <form method="POST" action="{% url 'account_login' %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.GET.next }}">
+
+            <!-- Email/Usuario -->
+            <div class="form-group">
+                <label for="id_login" class="form-label font-tech">
+                    {% trans "Email or Username" %}
+                </label>
+                {{ form.login|add_class:"form-input"|attr:"placeholder:Enter your email" }}
+                {% if form.login.errors %}
+                <div class="error-message">
+                    {% for error in form.login.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Contraseña -->
+            <div class="form-group">
+                <label for="id_password" class="form-label font-tech">
+                    {% trans "Password" %}
+                </label>
+                {{ form.password|add_class:"form-input"|attr:"placeholder:Enter your password"|attr:"type:password" }}
+                {% if form.password.errors %}
+                <div class="error-message">
+                    {% for error in form.password.errors %}{{ error }}{% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Remember Me -->
+            {% if form.remember %}
+            <div class="remember-me">
+                {{ form.remember }}
+                <label for="id_remember">{% trans "Remember me" %}</label>
+            </div>
+            {% endif %}
+
+            <!-- Botón Submit -->
+            <button type="submit" class="login-button">
+                {% trans "SIGN IN" %}
+            </button>
+        </form>
+
+        <!-- Forgot Password -->
+        <div class="forgot-password">
+            <a href="{% url 'account_reset_password' %}" class="font-tech">
+                {% trans "Forgot your password?" %}
+            </a>
+        </div>
+
+        <!-- Sign Up -->
+        <div class="signup-section">
+            <span class="signup-text">{% trans "Don't have an account?" %}</span>
+            <a href="{% url 'account_signup' %}" class="signup-link">
+                {% trans "Sign up" %}
+            </a>
+        </div>
+
+        <!-- Language Selector (solo para USA) -->
+        {% if request.country == 'US' %}
+        <div class="language-selector">
+            <a href="?lang=en" class="lang-btn font-tech {% if request.LANGUAGE_CODE == 'en' %}active{% endif %}">
+                🇺🇸 English
+            </a>
+            <a href="?lang=es" class="lang-btn font-tech {% if request.LANGUAGE_CODE == 'es' %}active{% endif %}">
+                🇪🇸 Español
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+// Initialize Vanta.js NET effect
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof VANTA !== 'undefined' && VANTA.NET) {
+        VANTA.NET({
+            el: "#vanta-bg",
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200.00,
+            minWidth: 200.00,
+            scale: 1.00,
+            scaleMobile: 1.00,
+            color: 0x22d3ee,
+            backgroundColor: 0x0a0a0a,
+            points: 10.00,
+            maxDistance: 25.00,
+            spacing: 16.00
+        });
+    }
+});
+</script>
+{% endblock %}

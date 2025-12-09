@@ -185,12 +185,22 @@ def crear_documento_alpine(request):
         # GET: Mostrar formulario vacío
         form = DocumentoForm(user=request.user, country=country)
 
+    # Obtener company_country con fallbacks robustos
+    company_country = (
+        getattr(request, "company_country", None)
+        or getattr(empresa, "pais", None)
+        or country
+        or "CL"
+    )
+    company_country = str(company_country).upper() if company_country else "CL"
+
     # Preparar contexto para template
     context = {
         "form": form,
         "tasa_impuesto": float(tasa),  # Pasar como float para JavaScript
         "repuestos_json": "[]",  # Vacío si es nuevo documento
         "servicios_json": "[]",
+        "company_country": company_country,  # ✅ Asegurar que company_country esté disponible
     }
 
     return render(request, "taller/common/documentos/document_form_alpine_example.html", context)
@@ -364,12 +374,22 @@ def editar_documento_alpine(request, documento_id):
             ]
         )
 
+    # Obtener company_country con fallbacks robustos
+    company_country = (
+        getattr(request, "company_country", None)
+        or getattr(empresa, "pais", None)
+        or country
+        or "CL"
+    )
+    company_country = str(company_country).upper() if company_country else "CL"
+
     # Preparar contexto
     context = {
         "form": form,
         "tasa_impuesto": float(tasa),
         "repuestos_json": repuestos_json,
         "servicios_json": servicios_json,
+        "company_country": company_country,  # ✅ Asegurar que company_country esté disponible
     }
 
     return render(request, "taller/common/documentos/document_form_alpine_example.html", context)

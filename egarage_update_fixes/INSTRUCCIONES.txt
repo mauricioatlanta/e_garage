@@ -1,0 +1,105 @@
+# ACTUALIZACIÓN EGARAGE - Fixes de Registro
+Fecha: 2 Diciembre 2025
+
+## Archivos Modificados:
+
+1. taller/forms/custom_signup.py
+   - Fix: Cambio de kwargs.get('request') a getattr(self, 'request', None)
+   - Soluciona: Error 'QueryDict' object has no attribute 'path'
+   - Líneas: 65-97 (método __init__)
+   - IMPORTANTE: Allauth ya establece self.request en el formulario
+
+2. templates/base.html
+   - Agregado: Bloque de mensajes globales con estilos futuristas
+   - Ubicación: Líneas 658-677 (dentro de <main>)
+   - Funcionalidad: Muestra mensajes success/error/warning con colores
+   - Estilos: emerald (success), red (error), amber (warning), slate (info)
+
+## Instrucciones de Instalación en PythonAnywhere:
+
+### PASO 1: BACKUP (OBLIGATORIO)
+```bash
+cd /home/atlantareciclajes/scripts_deploy/
+./1_backup_FIXED.sh
+# Anota el nombre del backup y descárgalo a tu PC
+```
+
+### PASO 2: SUBIR ARCHIVOS
+Con FileZilla (SFTP):
+- Host: atlantareciclajes.pythonanywhere.com
+- Puerto: 22
+- Usuario: atlantareciclajes
+
+Subir este paquete comprimido a: /home/atlantareciclajes/egarage_update_fixes/
+
+### PASO 3: INSTALAR EN EL SERVIDOR
+```bash
+cd /home/atlantareciclajes/egarage_update_fixes/
+
+# Copiar custom_signup.py
+cp taller/forms/custom_signup.py /home/atlantareciclajes/apps/egarage/current/taller/forms/
+
+# Copiar base.html
+cp templates/base.html /home/atlantareciclajes/apps/egarage/current/templates/
+```
+
+### PASO 4: VERIFICAR PERMISOS
+```bash
+chmod 644 /home/atlantareciclajes/apps/egarage/current/taller/forms/custom_signup.py
+chmod 644 /home/atlantareciclajes/apps/egarage/current/templates/base.html
+```
+
+### PASO 5: RELOAD DE LA APLICACIÓN
+1. Ve a: https://www.pythonanywhere.com/user/atlantareciclajes/
+2. Pestaña: "Web"
+3. Botón verde: "Reload atlantareciclajes.pythonanywhere.com"
+4. Espera 15-20 segundos
+
+### PASO 6: PROBAR
+URL de prueba: https://atlantareciclajes.pythonanywhere.com/accounts/signup/?from=cl
+
+Pruebas recomendadas:
+1. Registro sin teléfono → Debe mostrar error de validación
+2. Registro completo → Debe crear usuario y mostrar mensaje verde de éxito
+
+## Cambios Técnicos Detallados:
+
+### custom_signup.py (línea 93):
+ANTES: request = kwargs.get("request") or (args[0] if args else None)
+DESPUÉS: request = getattr(self, "request", None)
+
+RAZÓN: Allauth ya establece self.request en SignupForm, por lo que no necesitamos extraerlo de kwargs/args. Esto previene errores cuando args[0] es un QueryDict en lugar de un HttpRequest.
+
+### base.html (líneas 658-677):
+Se agregó un bloque condicional {% if messages %} dentro de <main> que:
+- Muestra mensajes de Django con estilos Tailwind CSS
+- Usa colores específicos según el tipo de mensaje (success, error, warning)
+- Integra perfectamente con el tema futurista existente
+- Se posiciona correctamente antes de {% block content %}
+
+## Archivos en este Paquete:
+- taller/forms/custom_signup.py (5.3 KB)
+- templates/base.html (23.8 KB)
+- INSTRUCCIONES.txt (este archivo)
+
+## Rollback (si algo falla):
+```bash
+cd /home/atlantareciclajes/scripts_deploy/
+./4_rollback.sh
+# Ingresa la fecha del backup que anotaste
+```
+
+## Soporte:
+Si tienes problemas, revisa los logs en:
+https://www.pythonanywhere.com/user/atlantareciclajes/files/var/log/
+
+¡Listo! 🚀
+
+
+
+
+
+
+
+
+

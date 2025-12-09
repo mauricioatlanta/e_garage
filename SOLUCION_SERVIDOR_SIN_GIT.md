@@ -166,3 +166,6 @@ scp E:\projecto\e_garage\taller\documentos\views_country_aware.py atlantarecicla
 **Nota:** Ajusta la ruta del servidor si tu proyecto está en otro lugar.
 
 
+
+
+

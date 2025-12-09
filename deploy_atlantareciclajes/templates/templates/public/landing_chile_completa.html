@@ -1,0 +1,752 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}eGarage Chile — La Plataforma Inteligente #1 para Talleres{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Fondo animado: gradiente + blur "neón" */
+  .eg-animated-bg{
+    position:absolute; inset:0; overflow:hidden; z-index:-1;
+    background: radial-gradient(1200px 600px at 10% 10%, rgba(56,189,248,.15), transparent 60%),
+                radial-gradient(900px 500px at 90% 20%, rgba(167,139,250,.14), transparent 60%),
+                radial-gradient(1000px 700px at 40% 90%, rgba(16,185,129,.10), transparent 60%),
+                linear-gradient(120deg,#0f172a,#0b1220 60%,#0a0f1f);
+  }
+  .eg-animated-bg::before{
+    content:""; position:absolute; width:120%; height:120%; left:-10%; top:-10%;
+    background: conic-gradient(from 90deg at 50% 50%, rgba(56,189,248,.18), rgba(167,139,250,.18), rgba(16,185,129,.18), rgba(56,189,248,.18));
+    filter: blur(80px);
+    animation: spin 28s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  /* Partículas suaves */
+  .eg-particle{position:absolute; border-radius:9999px; opacity:.35; filter:blur(1px); animation: drift 18s ease-in-out infinite;}
+  .eg-p1{width:10px;height:10px; left:12%; top:30%; background:#60a5fa; animation-delay:-2s}
+  .eg-p2{width:8px;height:8px; left:65%; top:20%; background:#34d399; animation-delay:-6s}
+  .eg-p3{width:12px;height:12px; left:80%; top:70%; background:#a78bfa; animation-delay:-10s}
+  .eg-p4{width:9px;height:9px; left:28%; top:75%; background:#22d3ee; animation-delay:-14s}
+  @keyframes drift{
+    0%,100%{transform:translateY(0) translateX(0)}
+    50%{transform:translateY(-30px) translateX(20px)}
+  }
+
+  /* Navegación futurista */
+  .eg-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  /* Efectos adicionales */
+  .eg-card-hover {
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
+  .eg-card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  }
+
+  .eg-glow-button {
+    position: relative;
+    overflow: hidden;
+  }
+  .eg-glow-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+  }
+  .eg-glow-button:hover::before {
+    left: 100%;
+  }
+
+  /* Tabla de impacto */
+  .impact-table {
+    background: rgba(15, 23, 42, 0.6);
+    border-radius: 1rem;
+    padding: 2rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  .impact-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  .impact-row:last-child {
+    border-bottom: none;
+  }
+  .impact-metric {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #34d399;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Navegación personalizada -->
+<nav class="eg-nav py-4 px-6">
+  <div class="max-w-7xl mx-auto flex justify-between items-center">
+    <div class="flex items-center gap-4">
+      <div class="relative">
+        <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-10 w-auto">
+        <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-green-400/20 rounded-full blur-xl scale-110"></div>
+      </div>
+      <div>
+        <span class="text-xl font-bold bg-gradient-to-r from-sky-400 to-emerald-400 bg-clip-text text-transparent">
+          eGarage
+        </span>
+        <div class="text-xs text-slate-400 font-medium">
+          🇨🇱 Chile
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-4">
+      <a href="#precios" class="hidden md:inline-block text-slate-300 hover:text-white px-4 py-2 rounded-lg transition">
+        Precios
+      </a>
+      <a href="#ventajas" class="hidden md:inline-block text-slate-300 hover:text-white px-4 py-2 rounded-lg transition">
+        Ventajas
+      </a>
+      <a href="/cl/es/accounts/login/" class="bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-white px-6 py-2 rounded-xl font-semibold transition eg-glow-button">
+        Iniciar Sesión
+      </a>
+    </div>
+  </div>
+</nav>
+
+<section class="relative text-slate-100">
+  <div class="eg-animated-bg">
+    <span class="eg-particle eg-p1"></span>
+    <span class="eg-particle eg-p2"></span>
+    <span class="eg-particle eg-p3"></span>
+    <span class="eg-particle eg-p4"></span>
+  </div>
+
+  <!-- HERO -->
+  <div class="mx-auto max-w-7xl px-6 pt-20 pb-16 sm:pt-28">
+    <div class="grid lg:grid-cols-2 gap-10 items-center">
+      <div>
+        <span class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-emerald-300 text-sm ring-1 ring-emerald-400/30">
+          ✓ Sistema Funcional — Chile
+        </span>
+        <h1 class="mt-6 text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight">
+          La Plataforma Inteligente <span class="bg-gradient-to-r from-sky-400 via-emerald-300 to-indigo-300 bg-clip-text text-transparent">#1 para Talleres</span> en Chile
+        </h1>
+        <p class="mt-6 text-xl text-slate-300/90 leading-relaxed">
+          Deja atrás el Excel y el papel. eGarage es el sistema en la nube diseñado para talleres automotrices chilenos que quieren ordenar su negocio, aumentar la rentabilidad y dar una experiencia profesional a sus clientes.
+        </p>
+        <p class="mt-4 text-lg text-emerald-300 font-semibold">
+          Funciones reales. Soporte en español. IA aplicada al día a día del taller.
+        </p>
+        <div class="mt-10 flex flex-wrap gap-4">
+          <a href="/cl/es/accounts/signup/" class="eg-glow-button rounded-xl px-6 py-4 font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-900 shadow-lg shadow-emerald-500/20 transition text-lg">
+            <span class="flex items-center gap-2">
+              <span>🚀</span> Probar Gratis 30 días
+            </span>
+          </a>
+          <a href="#precios" class="rounded-xl px-6 py-4 font-semibold ring-2 ring-sky-400/40 hover:bg-sky-400/10 transition text-lg">
+            <span class="flex items-center gap-2">
+              <span>💳</span> Ver planes para Chile
+            </span>
+          </a>
+        </div>
+        <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-slate-400">
+          <div class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            Sin tarjeta para prueba
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            Usuarios ilimitados
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            Soporte en español
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            Adaptado a Chile
+          </div>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="rounded-3xl bg-slate-900/40 ring-1 ring-white/10 p-6 backdrop-blur-sm eg-card-hover">
+          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Dashboard Preview" class="rounded-2xl w-full object-cover h-80 bg-gradient-to-br from-slate-800 to-slate-900 flex items-center justify-center text-slate-500 border border-slate-700">
+          <div class="absolute top-4 right-4 bg-emerald-500 text-slate-900 px-3 py-1 rounded-full text-sm font-bold">
+            🔴 Demo en Vivo
+          </div>
+        </div>
+        <div class="absolute -bottom-6 -left-6 hidden md:block blur-xl opacity-40 w-40 h-40 bg-emerald-400/40 rounded-full"></div>
+        <div class="absolute -top-6 -right-6 hidden md:block blur-xl opacity-30 w-32 h-32 bg-sky-400/40 rounded-full"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ¿QUÉ ES EGARAGE? -->
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold">¿Qué es eGarage?</h2>
+    </div>
+    <div class="max-w-4xl mx-auto">
+      <p class="text-xl text-slate-300/90 leading-relaxed text-center">
+        eGarage es una plataforma web tipo ERP, en la nube, que integra <strong class="text-white">trabajos</strong>, <strong class="text-white">inventario</strong>, <strong class="text-white">clientes</strong>, <strong class="text-white">documentos</strong> y <strong class="text-white">reportes</strong> con <strong class="text-emerald-400">IA para optimizar decisiones</strong>.
+      </p>
+      <p class="mt-6 text-lg text-slate-300/80 leading-relaxed text-center">
+        Está adaptado a la realidad de talleres en Chile (no solo una traducción). Diseñado específicamente para cumplir con las necesidades del mercado automotriz chileno.
+      </p>
+    </div>
+  </section>
+
+  <!-- SECTORES / TIPOS DE NEGOCIOS -->
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold">Sectores que Potenciamos</h2>
+      <p class="mt-4 text-xl text-slate-300/90">eGarage funciona para todo tipo de negocios automotrices</p>
+    </div>
+
+    <div class="mt-12 grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">🔧</div>
+        <div class="text-lg font-bold mb-2">Taller Mecánico Integral</div>
+      </div>
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">🏍️</div>
+        <div class="text-lg font-bold mb-2">Taller de Motos</div>
+      </div>
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">🚛</div>
+        <div class="text-lg font-bold mb-2">Taller de Camiones/Buses</div>
+      </div>
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">📦</div>
+        <div class="text-lg font-bold mb-2">Casa de Repuestos / Autopartes</div>
+      </div>
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">🛞</div>
+        <div class="text-lg font-bold mb-2">Vulcanización / Neumáticos</div>
+      </div>
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">🎨</div>
+        <div class="text-lg font-bold mb-2">Carrocería y Pintura</div>
+      </div>
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">✨</div>
+        <div class="text-lg font-bold mb-2">Lavado / Detailing / Estética</div>
+      </div>
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">⚡</div>
+        <div class="text-lg font-bold mb-2">Electricidad / Electrónica</div>
+      </div>
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">🔊</div>
+        <div class="text-lg font-bold mb-2">Parabrisas, Vidrios, Audio y Accesorios</div>
+      </div>
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">🚗</div>
+        <div class="text-lg font-bold mb-2">Mantención de Flotas</div>
+      </div>
+      <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover text-center">
+        <div class="text-4xl mb-4">🏢</div>
+        <div class="text-lg font-bold mb-2">Negocios Mixtos</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEMAS QUE RESUELVE -->
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold">Problemas que Resuelve eGarage</h2>
+      <p class="mt-4 text-xl text-slate-300/90">Deja atrás los problemas del pasado</p>
+    </div>
+
+    <div class="max-w-4xl mx-auto">
+      <div class="grid md:grid-cols-2 gap-6 mb-12">
+        <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-red-400/30">
+          <div class="text-2xl mb-3">❌</div>
+          <div class="text-lg font-bold mb-2 text-red-300">Gestión manual de inventario</div>
+          <p class="text-slate-300/90">Control de stock en papel o Excel desactualizado</p>
+        </div>
+        <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-red-400/30">
+          <div class="text-2xl mb-3">❌</div>
+          <div class="text-lg font-bold mb-2 text-red-300">Presupuestos en papel o WhatsApp</div>
+          <p class="text-slate-300/90">Sin trazabilidad ni profesionalismo</p>
+        </div>
+        <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-red-400/30">
+          <div class="text-2xl mb-3">❌</div>
+          <div class="text-lg font-bold mb-2 text-red-300">Cero visibilidad de rentabilidad</div>
+          <p class="text-slate-300/90">No sabes qué servicios o repuestos generan más ganancia</p>
+        </div>
+        <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-red-400/30">
+          <div class="text-2xl mb-3">❌</div>
+          <div class="text-lg font-bold mb-2 text-red-300">Comunicación confusa con clientes</div>
+          <p class="text-slate-300/90">Información dispersa y sin registro</p>
+        </div>
+        <div class="rounded-2xl p-6 bg-slate-900/40 ring-1 ring-red-400/30">
+          <div class="text-2xl mb-3">❌</div>
+          <div class="text-lg font-bold mb-2 text-red-300">Ausencia de reportes e insights</div>
+          <p class="text-slate-300/90">Decisiones basadas en intuición, no en datos</div>
+        </div>
+      </div>
+
+      <!-- BLOQUE ESPECIAL: GARANTÍAS -->
+      <div class="rounded-3xl p-8 bg-gradient-to-br from-red-900/30 to-orange-900/30 ring-2 ring-red-400/50 mb-8">
+        <div class="flex items-start gap-4">
+          <div class="text-4xl">⚠️</div>
+          <div>
+            <h3 class="text-2xl font-bold mb-4 text-red-300">Garantías sin respaldo claro</h3>
+            <p class="text-lg text-slate-200 leading-relaxed">
+              Llega un auto exigiendo una garantía y el taller no tiene claro cuándo se hizo el trabajo, quién lo realizó, qué repuesto se instaló ni cuántos kilómetros tenía el vehículo. <strong class="text-white">eGarage registra cada detalle</strong> y te da argumentos claros para aceptar o rechazar una garantía con confianza.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- VENTAJAS / BENEFICIOS -->
+  <section id="ventajas" class="mx-auto max-w-7xl px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold">Ventajas de usar eGarage</h2>
+      <p class="mt-4 text-xl text-slate-300/90">Todo lo que necesitas para hacer crecer tu taller</p>
+    </div>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Aumento de rentabilidad -->
+      <div class="rounded-2xl p-8 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover">
+        <div class="text-4xl mb-4">📈</div>
+        <div class="text-xl font-bold mb-4">Aumento de Rentabilidad</div>
+        <ul class="space-y-2 text-slate-300/90">
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">+</span>
+            <span><strong class="text-emerald-300">+30% rentabilidad</strong></span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">-</span>
+            <span><strong class="text-emerald-300">–15% pérdidas por inventario</strong></span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Ahorro de tiempo -->
+      <div class="rounded-2xl p-8 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover">
+        <div class="text-4xl mb-4">⏱️</div>
+        <div class="text-xl font-bold mb-4">Ahorro de Tiempo</div>
+        <ul class="space-y-2 text-slate-300/90">
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Cotizaciones de <strong class="text-white">45 min → 5 min</strong></span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">-</span>
+            <span><strong class="text-emerald-300">–60% tiempo de cotización</strong></span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">-</span>
+            <span><strong class="text-emerald-300">–50% errores operacionales</strong></span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- IA predictiva -->
+      <div class="rounded-2xl p-8 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover">
+        <div class="text-4xl mb-4">🤖</div>
+        <div class="text-xl font-bold mb-4">IA Predictiva</div>
+        <ul class="space-y-2 text-slate-300/90">
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Predicción de mantenimientos y repuestos</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Proyección de ingresos (3, 6, 12 meses)</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Gestión de inventario -->
+      <div class="rounded-2xl p-8 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover">
+        <div class="text-4xl mb-4">📦</div>
+        <div class="text-xl font-bold mb-4">Gestión de Inventario</div>
+        <ul class="space-y-2 text-slate-300/90">
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Stock en tiempo real</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Alertas de desabastecimiento</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Inventario visual con fotos</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Reportes e insights -->
+      <div class="rounded-2xl p-8 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover">
+        <div class="text-4xl mb-4">📊</div>
+        <div class="text-xl font-bold mb-4">Reportes e Insights</div>
+        <ul class="space-y-2 text-slate-300/90">
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Rentabilidad por servicio, repuesto, técnico, sucursal</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Comunicación con clientes -->
+      <div class="rounded-2xl p-8 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover">
+        <div class="text-4xl mb-4">💬</div>
+        <div class="text-xl font-bold mb-4">Comunicación con Clientes (WhatsApp)</div>
+        <ul class="space-y-2 text-slate-300/90">
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Envío de presupuestos, OT, avances, comprobantes</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Interfaz moderna -->
+      <div class="rounded-2xl p-8 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover">
+        <div class="text-4xl mb-4">💻</div>
+        <div class="text-xl font-bold mb-4">Interfaz Moderna y Responsive</div>
+        <ul class="space-y-2 text-slate-300/90">
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Gestión de documentos digitales</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Multiempresa / multi-país / multiidioma</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Precio competitivo -->
+      <div class="rounded-2xl p-8 bg-slate-900/40 ring-1 ring-white/10 eg-card-hover">
+        <div class="text-4xl mb-4">💰</div>
+        <div class="text-xl font-bold mb-4">Precio Competitivo y Prueba Gratis</div>
+        <ul class="space-y-2 text-slate-300/90">
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>30 días gratis sin tarjeta</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="text-emerald-400">✓</span>
+            <span>Planes desde $20.000 CLP/mes</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESUMEN DE IMPACTO -->
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold">Resumen de Impacto</h2>
+    </div>
+    <div class="max-w-3xl mx-auto impact-table">
+      <div class="impact-row">
+        <div class="font-semibold text-lg">Rentabilidad</div>
+        <div class="impact-metric">+30%</div>
+      </div>
+      <div class="impact-row">
+        <div class="font-semibold text-lg">Tiempo de cotización</div>
+        <div class="impact-metric">–60% (45 → 5 min)</div>
+      </div>
+      <div class="impact-row">
+        <div class="font-semibold text-lg">Satisfacción cliente</div>
+        <div class="impact-metric">+90%</div>
+      </div>
+      <div class="impact-row">
+        <div class="font-semibold text-lg">Errores operacionales</div>
+        <div class="impact-metric">–50%</div>
+      </div>
+      <div class="impact-row">
+        <div class="font-semibold text-lg">Pérdidas por inventario</div>
+        <div class="impact-metric">–15%</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LÍNEA DE TIEMPO / CÓMO FUNCIONA -->
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold">Línea de Tiempo del Éxito</h2>
+      <p class="mt-4 text-xl text-slate-300/90">Comienza en minutos, no en semanas</p>
+    </div>
+
+    <div class="max-w-4xl mx-auto grid md:grid-cols-3 gap-8">
+      <div class="text-center">
+        <div class="text-5xl mb-4">1️⃣</div>
+        <div class="text-xl font-bold mb-3">Registra tu taller en minutos</div>
+        <p class="text-slate-300/90">Configuración rápida y sencilla</p>
+      </div>
+      <div class="text-center">
+        <div class="text-5xl mb-4">2️⃣</div>
+        <div class="text-xl font-bold mb-3">Importa tus clientes e inventario desde Excel</div>
+        <p class="text-slate-300/90">Migración sin complicaciones</p>
+      </div>
+      <div class="text-center">
+        <div class="text-5xl mb-4">3️⃣</div>
+        <div class="text-xl font-bold mb-3">Comienza a trabajar más inteligente, no más duro</div>
+        <p class="text-slate-300/90">Resultados desde el primer día</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PLANES Y PRECIOS -->
+  <section id="precios" class="mx-auto max-w-7xl px-6 py-20">
+    <div class="text-center mb-12">
+      <h2 class="text-3xl md:text-4xl font-bold">Planes y Precios para Chile</h2>
+      <p class="mt-4 text-xl text-slate-300/90">Precios transparentes. Sin letra chica. Sin tarjeta para la prueba.</p>
+    </div>
+
+    <div class="grid md:grid-cols-4 gap-6">
+      <!-- Prueba Gratis -->
+      <div class="rounded-3xl bg-slate-900/50 ring-1 ring-white/10 p-8 eg-card-hover">
+        <div class="text-sm uppercase tracking-wider text-emerald-400 font-semibold mb-4">Prueba Gratis</div>
+        <div class="mb-4">
+          <span class="text-5xl font-extrabold text-white">$0</span>
+          <span class="ml-2 text-slate-400 text-xl">/30 días</span>
+        </div>
+        <p class="text-slate-300/90 mb-8 text-lg">Prueba completa sin restricciones</p>
+        <ul class="space-y-3 text-slate-300 mb-8">
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>30 días gratis</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Sin tarjeta de crédito</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Acceso completo</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Usuarios ilimitados</span>
+          </li>
+        </ul>
+        <a href="/cl/es/accounts/signup/" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
+          Probar Ahora
+        </a>
+      </div>
+
+      <!-- Mensual -->
+      <div class="rounded-3xl bg-slate-900/50 ring-1 ring-white/10 p-8 eg-card-hover">
+        <div class="text-sm uppercase tracking-wider text-emerald-400 font-semibold mb-4">Mensual</div>
+        <div class="mb-4">
+          <span class="text-5xl font-extrabold text-white">$20.000</span>
+          <span class="ml-2 text-slate-400 text-xl">CLP/mes</span>
+        </div>
+        <p class="text-slate-300/90 mb-8 text-lg">Ideal para empezar</p>
+        <ul class="space-y-3 text-slate-300 mb-8">
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Usuarios ilimitados</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Todas las funciones</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Soporte en español</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Cancelar cuando quieras</span>
+          </li>
+        </ul>
+        <a href="/cl/es/accounts/signup/" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
+          Elegir Mensual
+        </a>
+      </div>
+
+      <!-- Semestral -->
+      <div class="rounded-3xl bg-slate-900/50 ring-2 ring-emerald-400/60 p-8 relative transform scale-105 eg-card-hover">
+        <span class="absolute -top-4 left-1/2 transform -translate-x-1/2 text-sm bg-emerald-500 text-slate-900 px-4 py-2 rounded-full font-bold">
+          Ahorro ~17%
+        </span>
+        <div class="text-sm uppercase tracking-wider text-emerald-400 font-semibold mb-4">Semestral</div>
+        <div class="mb-4">
+          <span class="text-5xl font-extrabold text-white">$100.000</span>
+          <span class="ml-2 text-slate-400 text-xl">CLP/6 meses</span>
+        </div>
+        <p class="text-slate-300/90 mb-8 text-lg">Mejor relación precio/valor</p>
+        <ul class="space-y-3 text-slate-300 mb-8">
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Usuarios ilimitados</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Todas las funciones</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Soporte prioritario</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Ahorro ~17%</span>
+          </li>
+        </ul>
+        <a href="/cl/es/accounts/signup/" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
+          Elegir Semestral
+        </a>
+      </div>
+
+      <!-- Anual -->
+      <div class="rounded-3xl bg-slate-900/50 ring-1 ring-white/10 p-8 eg-card-hover">
+        <div class="text-sm uppercase tracking-wider text-emerald-400 font-semibold mb-4">Anual</div>
+        <div class="mb-4">
+          <span class="text-5xl font-extrabold text-white">$200.000</span>
+          <span class="ml-2 text-slate-400 text-xl">CLP/año</span>
+        </div>
+        <p class="text-slate-300/90 mb-8 text-lg">Mejor precio, ahorro ~17%</p>
+        <ul class="space-y-3 text-slate-300 mb-8">
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Usuarios ilimitados</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Todas las funciones</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Soporte prioritario</span>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="text-emerald-400">✓</span>
+            <span>Máximo ahorro</span>
+          </li>
+        </ul>
+        <a href="/cl/es/accounts/signup/" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
+          Elegir Anual
+        </a>
+      </div>
+    </div>
+
+    <p class="mt-8 text-center text-slate-400">
+      * Precios en CLP (pesos chilenos). IVA incluido. Sin letra chica. Sin tarjeta para la prueba. Usuarios ilimitados. Soporte en español (Chile).
+    </p>
+  </section>
+
+  <!-- TESTIMONIOS -->
+  <section class="mx-auto max-w-7xl px-6 py-20">
+    <h2 class="text-3xl md:text-4xl font-bold text-center mb-4">Testimonios de Talleres Chilenos</h2>
+    <p class="text-center text-xl text-slate-300/90 mb-12">Experiencias reales de talleres que dejaron Excel y papel</p>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <figure class="rounded-2xl bg-slate-900/40 ring-1 ring-white/10 p-8 eg-card-hover">
+        <div class="flex text-yellow-400 mb-4">
+          ⭐⭐⭐⭐⭐
+        </div>
+        <blockquote class="text-slate-200/90 mb-6 text-lg leading-relaxed">
+          "Finalmente dejamos el Excel y el papel. Ahora tenemos todo organizado y nuestros clientes notan la diferencia profesional."
+        </blockquote>
+        <figcaption class="text-slate-400">
+          <div class="font-semibold text-white">Carlos M.</div>
+          <div class="text-sm">Santiago • <span class="text-emerald-400">Taller Mecánico</span></div>
+        </figcaption>
+      </figure>
+
+      <figure class="rounded-2xl bg-slate-900/40 ring-1 ring-white/10 p-8 eg-card-hover">
+        <div class="flex text-yellow-400 mb-4">
+          ⭐⭐⭐⭐⭐
+        </div>
+        <blockquote class="text-slate-200/90 mb-6 text-lg leading-relaxed">
+          "El control de stock mejoró completamente. Ya no perdemos repuestos y sabemos exactamente qué tenemos en inventario."
+        </blockquote>
+        <figcaption class="text-slate-400">
+          <div class="font-semibold text-white">María P.</div>
+          <div class="text-sm">Valparaíso • <span class="text-sky-400">Casa de Repuestos</span></div>
+        </figcaption>
+      </figure>
+
+      <figure class="rounded-2xl bg-slate-900/40 ring-1 ring-white/10 p-8 eg-card-hover">
+        <div class="flex text-yellow-400 mb-4">
+          ⭐⭐⭐⭐⭐
+        </div>
+        <blockquote class="text-slate-200/90 mb-6 text-lg leading-relaxed">
+          "Nuestra imagen frente al cliente cambió totalmente. Ahora enviamos presupuestos profesionales y seguimos cada trabajo en tiempo real."
+        </blockquote>
+        <figcaption class="text-slate-400">
+          <div class="font-semibold text-white">Roberto L.</div>
+          <div class="text-sm">Concepción • <span class="text-purple-400">Taller Integral</span></div>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- CTA FINAL -->
+  <section class="mx-auto max-w-7xl px-6 pb-24">
+    <div class="rounded-3xl bg-gradient-to-br from-emerald-900/40 to-sky-900/40 ring-2 ring-emerald-400/50 p-10 md:p-12">
+      <div class="text-center">
+        <h3 class="text-3xl md:text-4xl font-bold mb-6">¿Listo para dejar atrás el Excel y el papel?</h3>
+        <p class="text-xl text-slate-200/90 mb-8 max-w-2xl mx-auto">
+          Únete a los talleres chilenos que ya están trabajando de forma más inteligente con eGarage.
+        </p>
+        <div class="flex flex-wrap justify-center gap-4">
+          <a href="/cl/es/accounts/signup/" class="inline-block rounded-2xl px-8 py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-xl shadow-lg transition eg-glow-button">
+            <span class="flex items-center gap-3">
+              <span>🚀</span> Probar Gratis 30 días
+            </span>
+          </a>
+          <a href="#precios" class="inline-block rounded-2xl px-8 py-5 ring-2 ring-sky-400/50 hover:bg-sky-400/10 text-white font-bold text-xl transition">
+            <span class="flex items-center gap-3">
+              <span>💳</span> Ver planes para Chile
+            </span>
+          </a>
+        </div>
+        <p class="mt-6 text-sm text-slate-300">
+          30 días gratis • Sin tarjeta de crédito • Usuarios ilimitados • Soporte en español
+        </p>
+      </div>
+    </div>
+  </section>
+</section>
+
+<script>
+  // Smooth scroll para enlaces internos
+  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+      e.preventDefault();
+      const target = document.querySelector(this.getAttribute('href'));
+      if (target) {
+        target.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    });
+  });
+</script>
+{% endblock %}
+
+
+
+
+
+
+
