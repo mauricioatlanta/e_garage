@@ -44,7 +44,7 @@ class DetalleDocumento(models.Model):
     )
     tipo_item = models.CharField(
         max_length=20,
-        choices=TipoItem,
+        choices=TipoItem.choices,
         default=TipoItem.SERVICIO,
         verbose_name="Tipo de ítem",
     )
