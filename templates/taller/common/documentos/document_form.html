@@ -395,7 +395,7 @@ function submitLanguageDoc(lang) {
           <button type="button" id="add-servicio" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addServicioRow()">{% if is_cl == 'CL' %}+ Agregar servicio{% else %}+ {% trans "Add Service" %}{% endif %}</button>
           {% endif %}
           {% if ui_config.show_otros_servicios %}
-          <button type="button" id="add-otro" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addOtroRow()">{% if is_cl == 'CL' %}+ Agregar servicio externo{% else %}+ {% trans "Add Other Service" %}{% endif %}</button>
+          <button type="button" id="add-otro" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addOtroRow()">{% if is_cl == 'CL' %}+ Agregar otros servicios{% else %}+ {% trans "Add Other Services" %}{% endif %}</button>
           {% endif %}
         </div>
 
