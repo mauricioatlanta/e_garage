@@ -13,6 +13,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.mail import send_mail
 from django.db import transaction
+from django.db.models import Q
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import activate
@@ -199,6 +200,11 @@ class RegistrationService:
 
         ⚡ USADO POR ALLAUTH: Allauth ya crea el usuario, este método solo crea la empresa.
 
+        ✅ CONTROL DE TRIAL:
+        - Verifica si el email o teléfono ya fueron usados para un trial
+        - Si ya se usó, crea la empresa sin trial
+        - Si no se usó, otorga trial de 30 días
+
         Args:
             user: Instancia de User ya creada (por Allauth u otro sistema)
             company_data: dict con datos de la empresa {
@@ -216,6 +222,7 @@ class RegistrationService:
                 'empresa': Empresa,
                 'suscripcion': Suscripcion (opcional),
                 'country_config': dict,
+                'obtuvo_trial': bool,
             }
 
         Raises:
@@ -236,17 +243,62 @@ class RegistrationService:
             "nombre_taller", f"Taller de {user.get_full_name() or user.username or user.email}"
         )
 
+        # Obtener email y teléfono normalizado
+        email = user.email
+        telefono = company_data.get("telefono", "")
+
+        # ✅ VERIFICAR SI YA SE USÓ TRIAL CON ESTE EMAIL O TELÉFONO
+        obtuvo_trial = False
+        trial_started_at = None
+        trial_ends_at = None
+
+        if plan_type == "trial":
+            # Buscar si existe alguna empresa con trial_already_used = True
+            # que tenga el mismo email o teléfono
+            empresa_con_trial_previo = Empresa.objects.filter(
+                Q(email=email) | Q(telefono=telefono), trial_already_used=True
+            ).first()
+
+            if empresa_con_trial_previo:
+                # Ya se usó trial con este email o teléfono
+                log.info(
+                    f"[RegistrationService] Email {email} o teléfono {telefono} ya usó trial. "
+                    f"No se otorga nuevo trial."
+                )
+                obtuvo_trial = False
+                trial_already_used = True
+            else:
+                # Otorgar trial de 30 días
+                obtuvo_trial = True
+                trial_started_at = timezone.now()
+                trial_ends_at = trial_started_at + timedelta(days=30)
+                trial_already_used = True
+                log.info(f"[RegistrationService] Otorgando trial de 30 días a {email}")
+        else:
+            # No es trial, pero marcar como usado si ya se usó antes
+            empresa_con_trial_previo = Empresa.objects.filter(
+                Q(email=email) | Q(telefono=telefono), trial_already_used=True
+            ).first()
+            trial_already_used = bool(empresa_con_trial_previo)
+
         empresa = Empresa.objects.create(
             user=user,
             nombre_taller=nombre_taller,
             email=user.email,
-            telefono=company_data.get("telefono", ""),
+            telefono=telefono,
             direccion=company_data.get("direccion", ""),
             pais=country_code,
             moneda=country_config["currency"],  # ✅ Automático según país
             zona_horaria=country_config["timezone"],  # ✅ Automático según país
             plan=plan_type,
             suscripcion_activa=True,
+            # Campos de trial
+            is_trial=obtuvo_trial,
+            trial_started_at=trial_started_at,
+            trial_ends_at=trial_ends_at,
+            trial_already_used=(
+                trial_already_used if plan_type == "trial" else (trial_already_used or False)
+            ),
         )
         log.info(
             f"[RegistrationService] Empresa creada para usuario existente: {empresa.nombre_taller} ({country_code})"
@@ -305,10 +357,21 @@ class RegistrationService:
         # Configurar idioma según país
         activate(country_config.get("lang", "es"))
 
+        # ✅ REGISTRAR CREACIÓN DE EMPRESA EN EL EMBUDO
+        try:
+            from taller.services.registro_embudo_service import registrar_empresa_creada
+
+            registrar_empresa_creada(user)
+        except Exception as e:
+            log.warning(f"[RegistrationService] Error registrando empresa creada en embudo: {e}")
+
         return {
             "empresa": empresa,
             "suscripcion": suscripcion,
             "country_config": country_config,
+            "obtuvo_trial": obtuvo_trial,
+            "trial_started_at": trial_started_at,
+            "trial_ends_at": trial_ends_at,
         }
 
     @staticmethod

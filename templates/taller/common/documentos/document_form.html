@@ -179,6 +179,124 @@ input:disabled, select:disabled, textarea:disabled {
     box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
   }
 }
+
+/* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÓN ==================== */
+/* Description fields - Better spacing and alignment */
+.description-field {
+  flex: 1 1 auto !important;
+  min-width: 200px !important;
+  max-width: 100% !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.description-field input {
+  width: 100% !important;
+}
+
+/* Container for dynamic rows - Better flexbox distribution */
+.dynamic-element > div {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.75rem !important;
+  align-items: flex-end !important;
+}
+
+/* Specific description field containers */
+.rep-search-container,
+.srv-input-container,
+.otr-search-container {
+  flex: 1 1 auto !important;
+  min-width: 200px !important;
+  max-width: 100% !important;
+  position: relative !important;
+}
+
+/* Responsive adjustments for description fields */
+@media (max-width: 1024px) {
+  .description-field,
+  .rep-search-container,
+  .srv-input-container,
+  .otr-search-container {
+    min-width: 180px !important;
+    flex: 1 1 45% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  .description-field,
+  .rep-search-container,
+  .srv-input-container,
+  .otr-search-container {
+    min-width: 100% !important;
+    flex: 1 1 100% !important;
+    margin-bottom: 1rem !important;
+  }
+  
+  .dynamic-element > div {
+    gap: 1rem !important;
+  }
+  
+  /* Stack all fields on mobile */
+  .dynamic-element > div > div {
+    width: 100% !important;
+    flex: 1 1 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .dynamic-element > div {
+    padding: 0.75rem !important;
+    gap: 0.875rem !important;
+  }
+  
+  .description-field input,
+  .rep-search-container input,
+  .srv-input-container input,
+  .otr-search-container input {
+    padding: 12px 14px !important;
+    font-size: 15px !important;
+  }
+}
+
+/* Better spacing for labels in description fields */
+.description-field label,
+.rep-search-container label,
+.srv-input-container label,
+.otr-search-container label {
+  margin-bottom: 0.5rem !important;
+  display: block !important;
+}
+
+/* Ensure proper alignment of description fields with other fields */
+.dynamic-element > div > div {
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Better gap distribution for field groups */
+@media (min-width: 769px) {
+  .dynamic-element > div {
+    gap: 1rem !important;
+  }
+}
+
+/* Improved spacing for description fields on larger screens */
+@media (min-width: 1025px) {
+  .rep-search-container {
+    min-width: 320px !important;
+    flex: 1 1 35% !important;
+  }
+  
+  .srv-input-container {
+    min-width: 380px !important;
+    flex: 1 1 40% !important;
+  }
+  
+  .otr-search-container {
+    min-width: 240px !important;
+    flex: 1 1 30% !important;
+  }
+}
 </style>
 
 {% block documento_title %}
@@ -1099,46 +1217,46 @@ window.addRepuestoRow = function addRepuestoRow(){
   row.className = 'dynamic-element';
   row.innerHTML = `
     <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
-      <div class="flex-1 w-full sm:min-w-64 relative">
+      <div class="w-full sm:w-28 relative">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.code}</label>
+        <input type="text" class="rep-codigo form-control w-full text-base" placeholder="${I18N.code}" autocomplete="off">
+        <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        <input type="hidden" class="rep-id">
+      </div>
+      <div class="description-field rep-search-container w-full sm:flex-1 sm:min-w-80 relative">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.name}</label>
         <input type="text" class="rep-search form-control w-full text-base" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
         <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
-        <input type="hidden" class="rep-id">
+        <input type="hidden" class="rep-nombre">
         <button type="button" class="rep-create-btn absolute top-8 sm:top-8 right-2 px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white text-xs sm:text-sm font-semibold border border-purple-300/40 shadow-sm transition-all">➕</button>
       </div>
-      <div class="w-full sm:w-32">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.code}</label>
-        <input type="text" class="rep-codigo form-control w-full text-base" placeholder="${I18N.code}">
-      </div>
-      <div class="flex-1 w-full sm:min-w-64">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.name}</label>
-        <input type="text" class="rep-nombre form-control w-full text-base" readonly>
-      </div>
-      <div class="w-full sm:w-20">
+      <div class="w-full sm:w-16">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.qty}</label>
         <input type="number" class="rep-cantidad form-control w-full text-base" min="1" max="999" value="1">
       </div>
-      <div class="w-full sm:w-24 cost-price-container hidden">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.cost_price}</label>
-        <input type="text" class="rep-precio-compra form-control w-full text-base" placeholder="$0">
-      </div>
-      <div class="w-full sm:w-24">
+      <div class="w-full sm:w-28">
         <label class="block text-cyan-200 text-sm mb-1 flex items-center gap-1">
           <span>${I18N.sale_price}</span>
           <button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>
         </label>
-        <input type="text" class="rep-precio-venta form-control w-full text-base" placeholder="$0">
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="rep-precio-venta form-control w-full text-base pl-6" placeholder="0">
+        </div>
       </div>
-      <div class="w-full sm:w-20">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.discount_pct}</label>
-        <input type="number" class="rep-descuento form-control w-full text-base" min="0" max="100" value="0">
+      <div class="w-full sm:w-28 cost-price-container hidden">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.cost_price}</label>
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="rep-precio-compra form-control w-full text-base pl-6" placeholder="0">
+        </div>
       </div>
-      <div class="w-full sm:w-32">
+      <div class="w-full sm:w-28">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
         <input type="hidden" class="rep-subtotal" value="0">
         <div class="rep-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
       </div>
-      <div class="w-full sm:w-16">
+      <div class="w-full sm:w-12">
         <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
       </div>
     </div>`;
@@ -1152,6 +1270,7 @@ function setupRepuestoRow(row){
   const drop        = row.querySelector('.rep-dropdown');
   const idHidden    = $('.rep-id', row);
   const inpCode     = $('.rep-codigo', row);
+  const codeDrop    = row.querySelector('.rep-codigo-dropdown');
   const inpName     = $('.rep-nombre', row);
   const inpPC       = $('.rep-precio-compra', row);
   const inpPV       = $('.rep-precio-venta', row);
@@ -1160,6 +1279,7 @@ function setupRepuestoRow(row){
   const view        = $('.rep-subtotal-view', row);
 
   let timer = null;
+  let codeTimer = null;
 
   const btnCreate = row.querySelector('.rep-create-btn');
   btnCreate?.addEventListener('click', ()=>{
@@ -1198,16 +1318,16 @@ function setupRepuestoRow(row){
     if (inpCode) inpCode.value = item.codigo || '';
     if (inpName) inpName.value = item.nombre || '';
     if (inpPV && item.precio_venta !== undefined && item.precio_venta !== null) {
-      inpPV.value = formatNumberInput(item.precio_venta);
+      const precio = parseNumericInput(item.precio_venta);
+      inpPV.value = precio > 0 ? formatNumberInput(precio) : '';
     }
     if (inpPC && item.precio_compra !== undefined && item.precio_compra !== null) {
-      inpPC.value = formatNumberInput(item.precio_compra);
+      const precio = parseNumericInput(item.precio_compra);
+      inpPC.value = precio > 0 ? formatNumberInput(precio) : '';
     }
     if (searchInput) {
-      const labelParts = [];
-      if (item.codigo) labelParts.push(item.codigo);
-      if (item.nombre) labelParts.push(item.nombre);
-      searchInput.value = labelParts.join(' • ') || '';
+      // Solo mostrar el nombre del repuesto, sin el código
+      searchInput.value = item.nombre || '';
     }
     recalc();
   }
@@ -1329,7 +1449,122 @@ function setupRepuestoRow(row){
     }
   });
 
-  inpCode?.addEventListener('change', ()=> fetchByCode(inpCode.value.trim()));
+  // Búsqueda en tiempo real por código
+  async function searchByCode(q){
+    if (!codeDrop) return;
+    if (!q || q.length < 2){
+      codeDrop.classList.add('hidden');
+      return;
+    }
+
+    const localMatches = filterPrefetchItems(PREFETCH.repuestos, ['codigo'], q, 15);
+    if (localMatches.length){
+      renderResultadosCodigo(localMatches);
+    }
+
+    try {
+      const url = EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/';
+      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
+      // Filtrar por código que empiece con la búsqueda
+      const filteredItems = items.filter(item => {
+        const codigo = (item.codigo || item.code || '').toLowerCase();
+        return codigo.startsWith(q.toLowerCase());
+      });
+      if (filteredItems.length) renderResultadosCodigo(filteredItems);
+    }catch(err){
+      console.error('❌ buscarPorCodigo', err);
+      if (!localMatches || !localMatches.length) {
+        codeDrop.innerHTML = `<div class="p-3 text-red-300">${I18N.server_error}</div>`;
+        codeDrop.classList.remove('hidden');
+      }
+    }
+  }
+
+  function renderResultadosCodigo(lista){
+    if (!codeDrop) return;
+    codeDrop.innerHTML = '';
+    if (!lista.length){
+      codeDrop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_parts}</div>`;
+      codeDrop.classList.remove('hidden');
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    lista.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      div.setAttribute('role', 'option');
+      const codigo = item.codigo || item.code || '';
+      const nombre = item.nombre || item.text || '';
+      const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
+      const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
+      div.dataset.id = item.id || '';
+      div.dataset.codigo = codigo;
+      div.dataset.nombre = nombre;
+      div.dataset.precio = precioVenta;
+      div.dataset.cost = precioCompra;
+      div.innerHTML = `
+        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo}${nombre ? ` • ${nombre}` : ''}</div>
+        ${precioVenta > 0 ? `<div class="text-xs text-gray-300">${money(precioVenta)}</div>` : ''}`;
+      frag.appendChild(div);
+    });
+    codeDrop.appendChild(frag);
+    codeDrop.setAttribute('role', 'listbox');
+    codeDrop.classList.remove('hidden');
+  }
+
+  function seleccionarPorCodigo(el){
+    if (!el) return;
+    applyPartData({
+      id: el.dataset.id,
+      codigo: el.dataset.codigo,
+      nombre: el.dataset.nombre,
+      precio_venta: parseNumericInput(el.dataset.precio),
+      precio_compra: parseNumericInput(el.dataset.cost),
+    });
+    codeDrop?.classList.add('hidden');
+  }
+
+  inpCode?.addEventListener('input', (e)=>{
+    clearTimeout(codeTimer);
+    const value = e.target.value.trim();
+    codeTimer = setTimeout(()=> searchByCode(value), 250);
+  });
+
+  inpCode?.addEventListener('focus', ()=>{
+    if (inpCode.value.trim().length >= 2) {
+      searchByCode(inpCode.value.trim());
+    }
+  });
+
+  inpCode?.addEventListener('change', ()=> {
+    if (inpCode.value.trim().length >= 2) {
+      fetchByCode(inpCode.value.trim());
+    }
+  });
+
+  codeDrop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+    if (!item) return;
+    seleccionarPorCodigo(item);
+  });
+
+  codeDrop?.addEventListener('keydown', (e)=>{
+    const item = e.target.closest('[role="option"]');
+    if (!item) return;
+    if (e.key === 'Enter') {
+      seleccionarPorCodigo(item);
+    }
+  });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) {
+      codeDrop?.classList.add('hidden');
+    }
+  });
+
   qEl?.addEventListener('input', recalc);
   inpPV?.addEventListener('input', recalc);
   $('.rep-descuento', row)?.addEventListener('input', recalc);
@@ -1384,25 +1619,25 @@ window.addServicioRow = function addServicioRow(){
   row.className = 'dynamic-element';
   row.innerHTML = `
     <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
-      <div class="flex-1 w-full sm:min-w-60 relative">
+      <div class="description-field srv-input-container w-full sm:flex-1 sm:min-w-96 relative">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
         <input type="text" class="srv-input form-control w-full text-base" placeholder="${I18N.type_to_search_services}" autocomplete="off">
-        <div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        <div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto top-full mt-1"></div>
         <input type="hidden" class="srv-id">
       </div>
-
-      <div class="w-full sm:w-40">
+      <div class="w-full sm:w-28">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
-        <input type="text" class="serv-precio form-control w-full text-base" placeholder="$0">
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="serv-precio form-control w-full text-base pl-6" placeholder="0">
+        </div>
       </div>
-
-      <div class="w-full sm:w-40">
+      <div class="w-full sm:w-28">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
         <input type="hidden" class="serv-subtotal" value="0">
         <div class="serv-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
       </div>
-
-      <div class="w-full sm:w-16">
+      <div class="w-full sm:w-12">
         <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
       </div>
     </div>`;
@@ -1422,6 +1657,7 @@ function setupServicioRow(row){
   let timer = null;
 
           async function searchServicios(q){
+            if (!drop) return;
             if (!q || q.length < 2){
               drop.classList.add('hidden');
               return;
@@ -1450,14 +1686,17 @@ function setupServicioRow(row){
             }catch(err){
               console.error('servicios buscar:', err);
               if (!localMatches || !localMatches.length) {
-                drop.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
-                drop.classList.remove('hidden');
+                if (drop) {
+                  drop.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
+                  drop.classList.remove('hidden');
+                }
               }
             }
           }
 
   function renderResultados(lista){
-    if (!lista.length){
+    if (!drop) return;
+    if (!lista || !lista.length){
       drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_services}</div>`;
       drop.classList.remove('hidden');
       return;
@@ -1488,7 +1727,7 @@ function setupServicioRow(row){
 
     // Si no hay precio ingresado, sugerir el base
     if ((pEl.value || '').trim() === '' && sprice > 0){
-      pEl.value = sprice;
+      pEl.value = formatNumberInput(sprice);
     }
     recalc();
   }
@@ -1535,9 +1774,11 @@ function setupServicioRow(row){
     if (idHid) idHid.value = item.id || '';
     if (input) input.value = item.nombre || item.text || '';
     if (pEl && item.precio_cliente !== undefined && item.precio_cliente !== null) {
-      pEl.value = formatNumberInput(item.precio_cliente);
+      const precio = parseNumericInput(item.precio_cliente);
+      pEl.value = precio > 0 ? formatNumberInput(precio) : '';
     } else if (pEl && item.precio !== undefined && item.precio !== null) {
-      pEl.value = formatNumberInput(item.precio);
+      const precio = parseNumericInput(item.precio);
+      pEl.value = precio > 0 ? formatNumberInput(precio) : '';
     }
     recalc();
   };
@@ -1556,7 +1797,7 @@ window.addOtroRow = function addOtroRow(){
   row.className = 'dynamic-element';
   row.innerHTML = `
     <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
-      <div class="flex-1 w-full sm:min-w-60 relative">
+      <div class="description-field otr-search-container w-full sm:flex-1 sm:min-w-60 relative">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
         <input type="text" class="otr-search form-control w-full text-base" placeholder="${I18N.type_to_search_external}" autocomplete="off">
         <div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
@@ -1566,15 +1807,21 @@ window.addOtroRow = function addOtroRow(){
         <label class="block text-cyan-200 text-sm mb-1">${I18N.external_company}</label>
         <input type="text" class="otr-empresa form-control w-full text-base">
       </div>
-      <div class="w-full sm:w-32">
+      <div class="w-full sm:w-24">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.shop_price}</label>
-        <input type="text" class="otr-precio-taller form-control w-full text-base" placeholder="$0">
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="otr-precio-taller form-control w-full text-base pl-6" placeholder="0">
+        </div>
       </div>
-      <div class="w-full sm:w-32">
+      <div class="w-full sm:w-24">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
-        <input type="text" class="otr-precio form-control w-full text-base" placeholder="$0">
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="otr-precio form-control w-full text-base pl-6" placeholder="0">
+        </div>
       </div>
-      <div class="w-full sm:w-32">
+      <div class="w-full sm:w-24">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
         <input type="hidden" class="otr-subtotal" value="0">
         <div class="otr-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
@@ -1615,10 +1862,12 @@ function setupOtroRow(row){
       empresaEl.value = item.empresa || item.empresa_ext;
     }
     if (precioTallerEl && item.precio_taller !== undefined && item.precio_taller !== null) {
-      precioTallerEl.value = formatNumberInput(item.precio_taller);
+      const precio = parseNumericInput(item.precio_taller);
+      precioTallerEl.value = precio > 0 ? formatNumberInput(precio) : '';
     }
     if (precioEl && item.precio_cliente !== undefined && item.precio_cliente !== null) {
-      precioEl.value = formatNumberInput(item.precio_cliente);
+      const precio = parseNumericInput(item.precio_cliente);
+      precioEl.value = precio > 0 ? formatNumberInput(precio) : '';
     }
     recalc();
   }

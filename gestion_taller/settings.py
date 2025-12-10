@@ -73,19 +73,20 @@ AUTHENTICATION_BACKENDS = (
 )
 
 # Allauth correcto
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"  # <- en vez de ACCOUNT_LOGIN_METHODS
+ACCOUNT_AUTHENTICATION_METHOD = "email"  # Usar email para autenticación
 ACCOUNT_EMAIL_VERIFICATION = os.getenv(
     "ACCOUNT_EMAIL_VERIFICATION",
     "mandatory",  # 🔒 Siempre obligatorio
 )
 ACCOUNT_EMAIL_REQUIRED = True  # 🔒 Email es REQUERIDO
+ACCOUNT_UNIQUE_EMAIL = True  # 🔒 Email único (no repetir email)
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # Confirmar email con un solo clic
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 ACCOUNT_RATE_LIMITS = {"confirm_email": "1/m"}
 
 ACCOUNT_FORMS = {
     "login": "taller.forms.custom_login.CustomLoginForm",
-    # "signup": "taller.forms.custom_signup.CustomSignupForm",  # <- si quieres controlar campos
+    "signup": "taller.forms.custom_signup.CustomSignupForm",  # ✅ Formulario personalizado con telefono y first_name
 }
 
 LOGIN_URL = "/accounts/login/"

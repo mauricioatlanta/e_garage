@@ -3,6 +3,7 @@ Signals para notificaciones automáticas en eGarage
 """
 
 from django.conf import settings
+from django.contrib.auth.signals import user_logged_in
 from django.core.mail import send_mail
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -102,3 +103,38 @@ def verificar_vencimiento_suscripcion(sender, instance, **kwargs):
             instance.suscripcion_activa = False
             instance.save(update_fields=["suscripcion_activa"])
             print(f"⚠️ Suscripción vencida para {instance.nombre_taller}")
+
+
+@receiver(post_save, sender="allauth.account.models.EmailAddress")
+def registrar_email_confirmado_embudo(sender, instance, **kwargs):
+    """
+    ✅ Registra en el embudo cuando se confirma un email.
+
+    Se dispara cuando Allauth marca un EmailAddress como verified=True
+    """
+    if instance.verified:
+        try:
+            from taller.services.registro_embudo_service import registrar_email_confirmado
+
+            registrar_email_confirmado(instance.user)
+        except Exception as e:
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.warning(f"[Signals] Error registrando email confirmado en embudo: {e}")
+
+
+@receiver(user_logged_in)
+def registrar_primer_login_embudo(sender, request, user, **kwargs):
+    """
+    ✅ Registra en el embudo cuando un usuario hace login por primera vez.
+    """
+    try:
+        from taller.services.registro_embudo_service import registrar_primer_login
+
+        registrar_primer_login(user)
+    except Exception as e:
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.warning(f"[Signals] Error registrando primer login en embudo: {e}")

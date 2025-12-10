@@ -175,6 +175,15 @@ RUBRO_CHOICES = [
     ("ELECTRIC", "Electricidad / electrónica automotriz"),
     ("GLASS_AUDIO", "Parabrisas, vidrios y audio / accesorios"),
     ("FLEET", "Mantención de flotas empresariales"),
+    ("SUSPENSION_STEERING", "Taller de Suspensión y Dirección"),
+    ("BRAKES", "Taller de Frenos"),
+    ("OBD_DIAGNOSTIC", "Taller de Diagnóstico Computarizado (OBD-II)"),
+    ("CLASSIC_CARS", "Taller de Reparación de Vehículos Clásicos"),
+    ("AUDIO_ENTERTAINMENT", "Taller de Sistemas de Audio y Entretenimiento Automotriz"),
+    ("GAS_CONVERSION", "Taller de Conversiones a Gas"),
+    ("FLEET_REPAIR", "Taller de Reparación de Flotas Corporativas"),
+    ("BODY_GLASS", "Taller de Carrocería y Reparación de Vidrios"),
+    ("TUNING", "Taller de Tuning / Personalización"),
     ("MIXED", "Mixto (varios rubros)"),
 ]
 
@@ -214,6 +223,11 @@ class ServicioBase(models.Model):
         blank=True,
         null=True,
         help_text="Rubro donde este servicio es más común",
+    )
+    rubros = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Lista de rubros a los que pertenece este servicio (múltiples rubros)",
     )
     es_generico = models.BooleanField(
         default=False,

@@ -84,6 +84,21 @@ class Empresa(models.Model):
     ha_usado_prueba = models.BooleanField(default=False)
     email = models.EmailField(max_length=100, blank=True, help_text="Email de contacto")
 
+    # Campos para control de trial de 30 días
+    is_trial = models.BooleanField(
+        default=False, help_text="Indica si la empresa está actualmente en período de prueba"
+    )
+    trial_started_at = models.DateTimeField(
+        null=True, blank=True, help_text="Fecha y hora en que comenzó el período de prueba"
+    )
+    trial_ends_at = models.DateTimeField(
+        null=True, blank=True, help_text="Fecha y hora en que termina el período de prueba"
+    )
+    trial_already_used = models.BooleanField(
+        default=False,
+        help_text="Marca que esta empresa ya utilizó una prueba gratis (por email o teléfono)",
+    )
+
     zona_horaria = models.CharField(
         max_length=50,
         choices=TIMEZONE_CHOICES,

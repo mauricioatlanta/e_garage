@@ -25,6 +25,28 @@ class CustomSignupView(SignupView):
     form_class = CustomSignupForm
     template_name = "account/signup.html"
 
+    def get_form_kwargs(self):
+        """Pasa country_code y default_phone_prefix al formulario"""
+        kwargs = super().get_form_kwargs()
+
+        # Detectar país desde URL
+        current_country = (
+            CountrySettings.get_country_from_url(self.request.path)
+            or getattr(self.request, "country_code", None)
+            or "CL"
+        )
+        current_country = current_country.upper()
+
+        # Obtener configuración del país
+        country_config = get_country_config(current_country)
+        default_phone_prefix = country_config.get("phone_prefix", "+56")
+
+        # Pasar al formulario
+        kwargs["country_code"] = current_country
+        kwargs["default_phone_prefix"] = default_phone_prefix
+
+        return kwargs
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["page_title"] = "Create Account - eGarage"
@@ -36,6 +58,7 @@ class CustomSignupView(SignupView):
             or getattr(self.request, "country_code", None)
             or "CL"
         )
+        current_country = current_country.upper()
         context["current_country"] = current_country
         context["country_config"] = get_country_config(
             current_country
@@ -48,8 +71,14 @@ class CustomSignupView(SignupView):
         Allauth maneja la creación del usuario y el envío de emails.
         El formulario (CustomSignupForm.save()) crea la empresa usando RegistrationService.
         """
-        # Obtener el país seleccionado
-        country_code = form.cleaned_data.get("country", "US")
+        # Obtener el país desde el formulario o desde la URL
+        country_code = (
+            getattr(form, "country_code", None)
+            or CountrySettings.get_country_from_url(self.request.path)
+            or getattr(self.request, "country_code", None)
+            or "CL"
+        )
+        country_code = country_code.upper()
 
         # ✅ Configurar idioma usando country_config
         country_config = get_country_config(country_code)
@@ -69,20 +98,14 @@ class CustomSignupView(SignupView):
         )
 
         if requires_email_verification:
-            # NO hacer login automático, dejar que allauth maneje la redirección
-            # Allauth automáticamente redirige a account_email_verification_sent
-            if language == "es":
-                messages.success(
-                    self.request,
-                    "¡Cuenta creada exitosamente! Por favor, revisa tu email para activar tu cuenta.",
-                )
-            else:
-                messages.success(
-                    self.request,
-                    "Account created successfully! Please check your email to activate your account.",
-                )
-            # Usar el método de allauth para obtener la URL de confirmación
-            return redirect("account_email_verification_sent")
+            # Redirigir a página de registro exitoso
+            # Construir URL de registro exitoso con prefijo de país
+            registro_exitoso_url = CountrySettings.build_url(
+                country_code, "auth/registro-exitoso/", request=self.request
+            )
+            # Guardar email en sesión para mostrar en la página de éxito
+            self.request.session["registro_email"] = user.email
+            return redirect(registro_exitoso_url)
         else:
             # Si NO se requiere verificación, hacer login automático
             backend = settings.AUTHENTICATION_BACKENDS[0]
@@ -112,8 +135,12 @@ class CustomSignupView(SignupView):
 
     def form_invalid(self, form):
         # Mantener el idioma seleccionado en caso de error usando country_config
-        country = self.request.POST.get("country", "US")
-        country_config = get_country_config(country)
+        country_code = (
+            CountrySettings.get_country_from_url(self.request.path)
+            or getattr(self.request, "country_code", None)
+            or "CL"
+        )
+        country_config = get_country_config(country_code)
         language = country_config.get("lang", "es")
         activate(language)
         return super().form_invalid(form)

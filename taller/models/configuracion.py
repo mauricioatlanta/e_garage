@@ -143,6 +143,15 @@ class ConfiguracionEmpresa(models.Model):
         ("ELECTRIC", "Electricidad / electrónica automotriz"),
         ("GLASS_AUDIO", "Parabrisas, vidrios y audio / accesorios"),
         ("FLEET", "Mantención de flotas empresariales"),
+        ("SUSPENSION_STEERING", "Taller de Suspensión y Dirección"),
+        ("BRAKES", "Taller de Frenos"),
+        ("OBD_DIAGNOSTIC", "Taller de Diagnóstico Computarizado (OBD-II)"),
+        ("CLASSIC_CARS", "Taller de Reparación de Vehículos Clásicos"),
+        ("AUDIO_ENTERTAINMENT", "Taller de Sistemas de Audio y Entretenimiento Automotriz"),
+        ("GAS_CONVERSION", "Taller de Conversiones a Gas"),
+        ("FLEET_REPAIR", "Taller de Reparación de Flotas Corporativas"),
+        ("BODY_GLASS", "Taller de Carrocería y Reparación de Vidrios"),
+        ("TUNING", "Taller de Tuning / Personalización"),
         ("MIXED", "Mixto (varios rubros)"),
     ]
 
@@ -152,6 +161,12 @@ class ConfiguracionEmpresa(models.Model):
         default="WORKSHOP",
         verbose_name="Rubro Principal",
         help_text="Rubro principal automotriz de la empresa",
+    )
+    rubros = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name="Rubros",
+        help_text="Lista de rubros que ofrece el taller (múltiples rubros)",
     )
 
     # Auditoría

@@ -530,45 +530,23 @@
                 </div>
 
                 <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">{{ rubro_form.rubro_principal.label }}</label>
-                        {{ rubro_form.rubro_principal }}
-                        {{ rubro_form.rubro_principal.errors }}
-                    </div>
-                </div>
-
-                <div class="row g-4 mt-1">
-                    <div class="col-md-3">
-                        <label class="form-label d-block">{{ rubro_form.usa_vehiculos.label }}</label>
-                        <div class="form-check form-switch text-secondary">
-                            {{ rubro_form.usa_vehiculos }}
-                            <span class="ms-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Mostrar selección de vehículos{% else %}Show vehicle selector{% endif %}</span>
+                    <div class="col-12">
+                        <label class="form-label">{{ rubro_form.rubros.label }}</label>
+                        <div class="row g-3 mt-2">
+                            {% for checkbox in rubro_form.rubros %}
+                                <div class="col-md-4 col-lg-3">
+                                    <div class="form-check">
+                                        {{ checkbox.tag }}
+                                        <label for="{{ checkbox.id_for_label }}" class="form-check-label text-secondary">
+                                            {{ checkbox.choice_label }}
+                                        </label>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
-                        {{ rubro_form.usa_vehiculos.errors }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label d-block">{{ rubro_form.usa_servicios.label }}</label>
-                        <div class="form-check form-switch text-secondary">
-                            {{ rubro_form.usa_servicios }}
-                            <span class="ms-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Mostrar servicios internos{% else %}Show services section{% endif %}</span>
-                        </div>
-                        {{ rubro_form.usa_servicios.errors }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label d-block">{{ rubro_form.usa_otros_servicios.label }}</label>
-                        <div class="form-check form-switch text-secondary">
-                            {{ rubro_form.usa_otros_servicios }}
-                            <span class="ms-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Activar servicios externos{% else %}Enable outsourced services{% endif %}</span>
-                        </div>
-                        {{ rubro_form.usa_otros_servicios.errors }}
-                    </div>
-                    <div class="col-md-3">
-                        <label class="form-label d-block">{{ rubro_form.usa_kilometraje.label }}</label>
-                        <div class="form-check form-switch text-secondary">
-                            {{ rubro_form.usa_kilometraje }}
-                            <span class="ms-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Solicitar kilometraje{% else %}Request mileage{% endif %}</span>
-                        </div>
-                        {{ rubro_form.usa_kilometraje.errors }}
+                        {% if rubro_form.rubros.errors %}
+                            <div class="text-danger mt-2">{{ rubro_form.rubros.errors }}</div>
+                        {% endif %}
                     </div>
                 </div>
 

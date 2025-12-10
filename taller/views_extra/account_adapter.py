@@ -112,3 +112,38 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
         request.session["django_language"] = "es"
         request.session["country"] = "chile"
         return self._reverse_by_country("CL", "taller:dashboard")
+
+    def get_email_confirmation_redirect_url(self, request):
+        """
+        Redirige después de confirmar email al login del país correspondiente.
+        """
+        # Detectar país desde la empresa del usuario o desde la URL
+        if request.user.is_authenticated:
+            try:
+                if hasattr(request.user, "empresa") and request.user.empresa:
+                    country = self._normalize_country(request.user.empresa.pais)
+                    if country:
+                        # Construir URL de login con prefijo de país
+                        from taller.config.country_settings import CountrySettings
+
+                        login_url = CountrySettings.build_url(
+                            country, "auth/login/", request=request
+                        )
+                        if login_url:
+                            return login_url
+            except Exception:
+                pass
+
+        # Fallback: detectar desde URL
+        path = (request.path or "").strip().lower()
+        if path.startswith("/us/") or path == "/us":
+            from taller.config.country_settings import CountrySettings
+
+            return CountrySettings.build_url("US", "auth/login/", request=request)
+        elif path.startswith("/cl/") or path == "/cl":
+            from taller.config.country_settings import CountrySettings
+
+            return CountrySettings.build_url("CL", "auth/login/", request=request)
+
+        # Fallback final: login genérico
+        return "/accounts/login/"

@@ -9,9 +9,11 @@ from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 
 from taller.views.country_aware_auth import country_aware_login
+from taller.views_extra.custom_signup import CustomSignupView
 from taller.views_extra.lang_switch import set_language_us
 from taller.views_extra.login_redirector import login_redirector
 from taller.views_extra.logout_redirect_view import logout_redirect_view
+from taller.views_extra.registro_exitoso import registro_exitoso
 from taller.views_health import health_check, health_simple
 
 # Importar vista de suscripción bloqueada
@@ -134,7 +136,13 @@ urlpatterns = [
     ),
     # Login personalizado con contexto de país
     path("accounts/login/", country_aware_login, name="account_login"),
-    # Allauth para el resto de funcionalidades
+    # Signup personalizado con CustomSignupView (ANTES de allauth.urls para que tenga prioridad)
+    path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
+    # Registro exitoso (con prefijos de país)
+    path("auth/registro-exitoso/", registro_exitoso, name="registro_exitoso"),
+    path("cl/auth/registro-exitoso/", registro_exitoso, name="registro_exitoso_cl"),
+    path("us/auth/registro-exitoso/", registro_exitoso, name="registro_exitoso_us"),
+    # Allauth para el resto de funcionalidades (excluyendo signup que ya está arriba)
     path("accounts/", include("allauth.urls")),
     # Wrappers country-aware para login y signup
     path("cl/accounts/login/", redirect_qs("/accounts/login/")),

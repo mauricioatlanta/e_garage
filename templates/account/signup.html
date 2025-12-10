@@ -46,11 +46,11 @@ body {
 }
 
 .glass-card {
-    background: linear-gradient(135deg, rgba(34, 211, 238, 0.08) 0%, rgba(96, 165, 250, 0.05) 100%);
+    background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(26, 34, 62, 0.9) 100%);
     backdrop-filter: blur(25px);
     border-radius: 24px;
-    border: 1px solid rgba(34, 211, 238, 0.3);
-    box-shadow: 0 8px 32px rgba(34, 211, 238, 0.15);
+    border: 2px solid rgba(34, 211, 238, 0.4);
+    box-shadow: 0 8px 32px rgba(34, 211, 238, 0.2), inset 0 0 60px rgba(34, 211, 238, 0.05);
     padding: 48px 40px;
 }
 
@@ -94,15 +94,23 @@ body {
 }
 
 .section-title {
-    font-size: 16px;
-    font-weight: 600;
+    font-size: 18px;
+    font-weight: 700;
     color: #22d3ee;
-    margin-bottom: 16px;
+    margin-bottom: 20px;
     font-family: 'Orbitron', monospace;
     letter-spacing: 0.05em;
+    text-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
+    padding-bottom: 12px;
+    border-bottom: 2px solid rgba(34, 211, 238, 0.3);
 }
 
 .form-group {
+    margin-bottom: 24px;
+}
+
+/* Mejorar visibilidad de los campos en el grid */
+.grid .form-group {
     margin-bottom: 20px;
 }
 
@@ -112,35 +120,117 @@ body {
     font-weight: 600;
     color: #22d3ee;
     margin-bottom: 8px;
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.3);
 }
 
-.form-input, .form-select {
+/* Estilos para todos los campos de formulario - FORZAR fondos oscuros */
+.form-input, 
+.form-select,
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="number"],
+select,
+textarea,
+.input-futurista,
+#signup-form input,
+#signup-form select,
+#signup-form textarea,
+form input,
+form select,
+form textarea {
     width: 100%;
     padding: 14px 16px;
     font-size: 15px;
     font-family: 'Inter', sans-serif;
-    color: #ffffff;
-    background: rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(34, 211, 238, 0.3);
+    color: #ffffff !important;
+    background: rgba(0, 0, 0, 0.7) !important;
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    border: 2px solid rgba(34, 211, 238, 0.5) !important;
     border-radius: 10px;
     transition: all 0.3s;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-.form-input:focus, .form-select:focus {
-    outline: none;
-    border-color: #22d3ee;
-    background: rgba(0, 0, 0, 0.7);
-    box-shadow: 0 0 20px rgba(34, 211, 238, 0.3);
+.form-input:focus, 
+.form-select:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+input[type="password"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus,
+.input-futurista:focus,
+#signup-form input:focus,
+#signup-form select:focus,
+#signup-form textarea:focus,
+form input:focus,
+form select:focus,
+form textarea:focus {
+    outline: none !important;
+    border-color: #22d3ee !important;
+    background: rgba(0, 0, 0, 0.9) !important;
+    background-color: rgba(0, 0, 0, 0.9) !important;
+    box-shadow: 0 0 25px rgba(34, 211, 238, 0.6), inset 0 0 10px rgba(34, 211, 238, 0.1) !important;
+    transform: translateY(-1px);
 }
 
-.form-input::placeholder {
-    color: #64748b;
+.form-input::placeholder,
+input::placeholder,
+textarea::placeholder,
+#signup-form input::placeholder,
+#signup-form textarea::placeholder {
+    color: #94a3b8 !important;
+    opacity: 0.9;
+    font-style: italic;
+}
+
+/* Select específico - estilo personalizado */
+select.form-select,
+select.input-futurista,
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2322d3ee' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 16px center !important;
+    background-size: 12px !important;
+    padding-right: 40px !important;
+    cursor: pointer;
+}
+
+select.form-select option,
+select.input-futurista option,
+select option {
+    background: #1a1a2e !important;
+    color: #ffffff !important;
+    padding: 10px;
+}
+
+/* Eliminar cualquier fondo blanco del navegador */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px rgba(0, 0, 0, 0.7) inset !important;
+    -webkit-text-fill-color: #ffffff !important;
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    border-color: rgba(34, 211, 238, 0.5) !important;
 }
 
 .help-text {
     font-size: 12px;
-    color: #64748b;
-    margin-top: 4px;
+    color: #94a3b8;
+    margin-top: 6px;
+    font-style: italic;
+    opacity: 0.9;
 }
 
 .error-message {
@@ -148,6 +238,10 @@ body {
     font-size: 13px;
     margin-top: 6px;
     font-weight: 500;
+    background: rgba(248, 113, 113, 0.1);
+    padding: 8px 12px;
+    border-radius: 6px;
+    border-left: 3px solid #f87171;
 }
 
 /* Pricing Cards */
@@ -328,6 +422,127 @@ body {
     text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
 }
 
+/* Estilos adicionales para mejorar contraste y visibilidad - Aplicar a TODOS los inputs */
+#signup-form input,
+#signup-form select,
+#signup-form textarea,
+form input,
+form select,
+form textarea,
+.glass-card input,
+.glass-card select,
+.glass-card textarea {
+    background: rgba(0, 0, 0, 0.7) !important;
+    background-color: rgba(0, 0, 0, 0.7) !important;
+    color: #ffffff !important;
+    border: 2px solid rgba(34, 211, 238, 0.5) !important;
+}
+
+#signup-form input:focus,
+#signup-form select:focus,
+#signup-form textarea:focus,
+form input:focus,
+form select:focus,
+form textarea:focus,
+.glass-card input:focus,
+.glass-card select:focus,
+.glass-card textarea:focus {
+    background: rgba(0, 0, 0, 0.9) !important;
+    background-color: rgba(0, 0, 0, 0.9) !important;
+    border-color: #22d3ee !important;
+    box-shadow: 0 0 25px rgba(34, 211, 238, 0.6), inset 0 0 10px rgba(34, 211, 238, 0.1) !important;
+}
+
+/* Mejorar visibilidad de los labels */
+.form-label {
+    text-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
+    font-weight: 700;
+}
+
+/* Estilos para mensajes de éxito/error */
+.messages {
+    margin-bottom: 24px;
+}
+
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-weight: 500;
+}
+
+.alert-success {
+    background: rgba(34, 211, 238, 0.15);
+    color: #22d3ee;
+    border-left: 4px solid #22d3ee;
+}
+
+.alert-error,
+.alert-danger {
+    background: rgba(248, 113, 113, 0.15);
+    color: #f87171;
+    border-left: 4px solid #f87171;
+}
+
+/* Mejorar contraste de las tarjetas de planes */
+.plan-card {
+    background: rgba(0, 0, 0, 0.7) !important;
+    border: 2px solid rgba(34, 211, 238, 0.3) !important;
+}
+
+.plan-card:hover {
+    background: rgba(0, 0, 0, 0.8) !important;
+    border-color: #22d3ee !important;
+}
+
+.plan-card.selected {
+    background: rgba(34, 211, 238, 0.15) !important;
+    border-color: #22d3ee !important;
+}
+
+/* Asegurar que el texto en los campos sea siempre visible */
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="number"],
+select,
+textarea,
+#signup-form input,
+#signup-form select,
+#signup-form textarea {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 500;
+}
+
+/* Mejorar visibilidad del texto en select cuando está abierto */
+select option {
+    background: #1a1a2e !important;
+    color: #ffffff !important;
+    padding: 12px !important;
+    font-weight: 500;
+}
+
+select option:hover,
+select option:focus,
+select option:checked {
+    background: rgba(34, 211, 238, 0.2) !important;
+    color: #22d3ee !important;
+}
+
+/* Estilos para el campo select (país) */
+select#id_country,
+select[name="country"] {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2322d3ee' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat !important;
+    background-position: right 16px center !important;
+    background-size: 12px !important;
+    padding-right: 40px !important;
+    cursor: pointer;
+    color: #ffffff !important;
+}
+
 @media (max-width: 768px) {
     .glass-card {
         padding: 32px 24px;
@@ -335,6 +550,10 @@ body {
 
     .pricing-grid {
         grid-template-columns: 1fr;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
     }
 }
 </style>
@@ -360,7 +579,16 @@ body {
         {% if messages %}
         <div class="messages">
             {% for message in messages %}
-            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        
+        <!-- Errores generales del formulario -->
+        {% if form.non_field_errors %}
+        <div class="messages">
+            {% for error in form.non_field_errors %}
+            <div class="alert alert-error">{{ error }}</div>
             {% endfor %}
         </div>
         {% endif %}
@@ -373,42 +601,98 @@ body {
                 <h3 class="section-title">{% trans "Personal Information" %}</h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {% if form.first_name %}
                     <div class="form-group">
-                        <label class="form-label">{% trans "First Name" %}</label>
-                        {{ form.nombre }}
-                        {% if form.nombre.errors %}
-                        <div class="error-message">{{ form.nombre.errors }}</div>
+                        <label class="form-label">{{ form.first_name.label }} *</label>
+                        {{ form.first_name }}
+                        {% if form.first_name.errors %}
+                        <div class="error-message">{{ form.first_name.errors }}</div>
+                        {% endif %}
+                        {% if form.first_name.help_text %}
+                        <div class="help-text">{{ form.first_name.help_text }}</div>
                         {% endif %}
                     </div>
+                    {% endif %}
 
+                    {% if form.last_name %}
                     <div class="form-group">
-                        <label class="form-label">{% trans "Last Name" %}</label>
-                        {{ form.apellido }}
-                        {% if form.apellido.errors %}
-                        <div class="error-message">{{ form.apellido.errors }}</div>
+                        <label class="form-label">{{ form.last_name.label }} *</label>
+                        {{ form.last_name }}
+                        {% if form.last_name.errors %}
+                        <div class="error-message">{{ form.last_name.errors }}</div>
+                        {% endif %}
+                        {% if form.last_name.help_text %}
+                        <div class="help-text">{{ form.last_name.help_text }}</div>
                         {% endif %}
                     </div>
+                    {% endif %}
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">{% trans "Email" %}</label>
+                    <label class="form-label">{{ form.telefono.label }} *</label>
+                    {{ form.telefono }}
+                    {% if form.telefono.errors %}
+                    <div class="error-message">{{ form.telefono.errors }}</div>
+                    {% endif %}
+                    {% if form.telefono.help_text %}
+                    <div class="help-text">{{ form.telefono.help_text }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">{{ form.email.label }} *</label>
                     {{ form.email }}
                     {% if form.email.errors %}
                     <div class="error-message">{{ form.email.errors }}</div>
                     {% endif %}
+                    {% if form.email.help_text %}
+                    <div class="help-text">{{ form.email.help_text }}</div>
+                    {% endif %}
+                </div>
+
+                {% if form.country %}
+                <div class="form-group">
+                    <label class="form-label">{{ form.country.label }} *</label>
+                    {{ form.country }}
+                    {% if form.country.errors %}
+                    <div class="error-message">{{ form.country.errors }}</div>
+                    {% endif %}
+                    {% if form.country.help_text %}
+                    <div class="help-text">{{ form.country.help_text }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- SECCIÓN 2: Contraseña -->
+            <div class="form-section">
+                <h3 class="section-title">{% trans "Security" %}</h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Password" %} *</label>
+                        {{ form.password1 }}
+                        {% if form.password1.help_text %}
+                        <div class="help-text">{{ form.password1.help_text }}</div>
+                        {% endif %}
+                        {% if form.password1.errors %}
+                        <div class="error-message">{{ form.password1.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">{% trans "Confirm Password" %} *</label>
+                        {{ form.password2 }}
+                        {% if form.password2.errors %}
+                        <div class="error-message">{{ form.password2.errors }}</div>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
 
-            <!-- SECCIÓN 2: Selección de Plan -->
+            <!-- SECCIÓN 3: Selección de Plan -->
             <div class="form-section">
                 <h3 class="section-title">{% trans "Select Your Plan" %}</h3>
-
-                <div class="form-group">
-                    {{ form.plan }}
-                    {% if form.plan.errors %}
-                    <div class="error-message">{{ form.plan.errors }}</div>
-                    {% endif %}
-                </div>
 
                 <!-- Pricing Cards -->
                 <div class="pricing-grid">
@@ -510,42 +794,12 @@ body {
                         </ul>
                     </div>
                 </div>
+                
+                <!-- Campo oculto para el plan seleccionado -->
+                <input type="hidden" name="plan" id="id_plan" value="trial">
             </div>
 
-            <!-- SECCIÓN 4: Contraseña -->
-            <div class="form-section">
-                <h3 class="section-title">{% trans "Security" %}</h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label class="form-label">{% trans "Password" %}</label>
-                        {{ form.password1 }}
-                        <div class="help-text">{{ form.password1.help_text }}</div>
-                        {% if form.password1.errors %}
-                        <div class="error-message">{{ form.password1.errors }}</div>
-                        {% endif %}
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label">{% trans "Confirm Password" %}</label>
-                        {{ form.password2 }}
-                        {% if form.password2.errors %}
-                        <div class="error-message">{{ form.password2.errors }}</div>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-
-            <!-- Términos -->
-            <div class="checkbox-container">
-                {{ form.acepta_terminos }}
-                <label for="id_acepta_terminos" class="checkbox-label">
-                    {% trans "I accept the" %} <a href="/legal/">{% trans "terms and conditions" %}</a>
-                </label>
-            </div>
-            {% if form.acepta_terminos.errors %}
-            <div class="error-message">{{ form.acepta_terminos.errors }}</div>
-            {% endif %}
 
             <!-- Errores generales -->
             {% if form.non_field_errors %}
@@ -649,22 +903,15 @@ function selectPlan(planName) {
 }
 
 // Highlight plan cuando se selecciona del dropdown
-document.getElementById('id_plan').addEventListener('change', function() {
-    selectPlan(this.value);
-});
+const planInput = document.getElementById('id_plan');
+if (planInput) {
+    planInput.addEventListener('change', function() {
+        selectPlan(this.value);
+    });
+}
 
-// Actualizar precios cuando cambia país
-document.getElementById('id_pais').addEventListener('change', function() {
-    updatePlanPrices(this.value);
-});
-
-// Inicializar con país por defecto si ya hay uno seleccionado
+// Inicializar con país por defecto
 window.addEventListener('load', function() {
-    const paisSelect = document.getElementById('id_pais');
-    if (paisSelect && paisSelect.value) {
-        updatePlanPrices(paisSelect.value);
-    }
-    
     // Detectar país desde la URL
     const path = window.location.pathname;
     const urlParams = new URLSearchParams(window.location.search);
