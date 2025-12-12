@@ -45,3 +45,6 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 >>>>>>> 95f08c61 (Add .gitignore (ignore caches and local sqlite db))
+
+# Local DB backups
+*.BACKUP.*
