@@ -29,13 +29,25 @@ def signup_complete(request):
     from_country = request.GET.get("from", "us").lower()
 
     # 🌐 ACTIVAR IDIOMA SEGÚN PAÍS
-    if from_country == "cl":
+    if from_country == "br":
+        activate("pt")  # Portugués para Brasil
+        initial_country = "BR"
+        language_code = "pt"
+    elif from_country == "cl":
         activate("es")  # Español para Chile
         initial_country = "CL"
         language_code = "es"
     elif from_country == "mx":
         activate("es")  # Español para México
         initial_country = "MX"
+        language_code = "es"
+    elif from_country == "pe":
+        activate("es")  # Español para Perú
+        initial_country = "PE"
+        language_code = "es"
+    elif from_country == "ve":
+        activate("es")  # Español para Venezuela
+        initial_country = "VE"
         language_code = "es"
     else:
         activate("en")  # Inglés por defecto (USA)
@@ -75,9 +87,12 @@ def signup_complete(request):
                         "trial": {
                             "dias": 30,
                             "valores": {
+                                "BR": Decimal("0.00"),
                                 "CL": Decimal("0.00"),
-                                "US": Decimal("0.00"),
                                 "MX": Decimal("0.00"),
+                                "PE": Decimal("0.00"),
+                                "US": Decimal("0.00"),
+                                "VE": Decimal("0.00"),
                             },
                             "suscripcion_activa": True,  # Trial activo inmediatamente
                             "plan_nombre": "trial",
@@ -85,9 +100,12 @@ def signup_complete(request):
                         "mensual": {
                             "dias": 30,
                             "valores": {
+                                "BR": Decimal("100.00"),  # R$ 100 BRL
                                 "CL": Decimal("10000.00"),  # $10,000 CLP
-                                "US": Decimal("20.00"),  # $20 USD
                                 "MX": Decimal("399.00"),  # $399 MXN
+                                "PE": Decimal("70.00"),  # S/ 70 PEN
+                                "US": Decimal("20.00"),  # $20 USD
+                                "VE": Decimal("730.00"),  # Bs. 730 VES
                             },
                             "suscripcion_activa": False,  # Debe pagar primero
                             "plan_nombre": "basic",
@@ -95,9 +113,12 @@ def signup_complete(request):
                         "semestral": {
                             "dias": 180,
                             "valores": {
+                                "BR": Decimal("500.00"),  # R$ 500 BRL
                                 "CL": Decimal("55000.00"),  # $55,000 CLP
-                                "US": Decimal("110.00"),  # $110 USD
                                 "MX": Decimal("2199.00"),  # $2,199 MXN
+                                "PE": Decimal("350.00"),  # S/ 350 PEN
+                                "US": Decimal("110.00"),  # $110 USD
+                                "VE": Decimal("3650.00"),  # Bs. 3,650 VES
                             },
                             "suscripcion_activa": False,
                             "plan_nombre": "premium",
@@ -105,9 +126,12 @@ def signup_complete(request):
                         "anual": {
                             "dias": 365,
                             "valores": {
+                                "BR": Decimal("1000.00"),  # R$ 1,000 BRL
                                 "CL": Decimal("100000.00"),  # $100,000 CLP
-                                "US": Decimal("200.00"),  # $200 USD
                                 "MX": Decimal("3990.00"),  # $3,990 MXN
+                                "PE": Decimal("700.00"),  # S/ 700 PEN
+                                "US": Decimal("200.00"),  # $200 USD
+                                "VE": Decimal("7300.00"),  # Bs. 7,300 VES
                             },
                             "suscripcion_activa": False,
                             "plan_nombre": "enterprise",
@@ -252,21 +276,39 @@ def signup_complete(request):
                     # 🔥 PASO 9: REDIRIGIR SEGÚN PAÍS Y PLAN
                     if plan == "trial":
                         # Trial: acceso inmediato al dashboard
-                        if pais == "CL":
-                            return redirect("/cl/es/centro-operaciones/")
+                        if pais == "BR":
+                            return redirect("/br/pt/dashboard/")
+                        elif pais == "CL":
+                            return redirect("/cl/es/dashboard/")
                         elif pais == "MX":
-                            return redirect("/mx/es/centro-operaciones/")
+                            return redirect("/mx/es/dashboard/")
+                        elif pais == "PE":
+                            return redirect("/pe/es/dashboard/")
+                        elif pais == "VE":
+                            return redirect("/ve/es/dashboard/")
                         else:
                             return redirect("/us/en/centro-operaciones-espacial/")
                     else:
                         # Planes pagados: a página de pago
-                        if pais == "CL":
+                        if pais == "BR":
+                            return redirect(
+                                f"/br/pt/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
+                            )
+                        elif pais == "CL":
                             return redirect(
                                 f"/cl/es/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
                             )
                         elif pais == "MX":
                             return redirect(
                                 f"/mx/es/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
+                            )
+                        elif pais == "PE":
+                            return redirect(
+                                f"/pe/es/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
+                            )
+                        elif pais == "VE":
+                            return redirect(
+                                f"/ve/es/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
                             )
                         else:
                             return redirect(

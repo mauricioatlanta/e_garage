@@ -198,21 +198,11 @@ def api_crear_servicio(request):
 
     except Exception as e:
         return JsonResponse({"error": str(e)}, status=400)
-    if not q:
-        return JsonResponse([], safe=False)
-    servicios = Servicio.objects.filter(nombre__icontains=q)[:20]
-    data = [
-        {
-            "id": s.pk,
-            "nombre": s.nombre,
-        }
-        for s in servicios
-    ]
-    return JsonResponse(data, safe=False)
 
 
 # Alias para autocompletar servicios por nombre
 autocomplete_servicio_nombre = autocomplete_servicio
+
 
 from taller.models.clientes import Cliente
 
@@ -287,6 +277,7 @@ def obtener_vehiculos_por_cliente(request):
 import logging
 
 log = logging.getLogger(__name__)
+
 from .views_cbv import (
     DocumentoCreateView,
     DocumentoDetailView,
@@ -313,18 +304,6 @@ def crear_documento(request, *args, **kwargs):
 def editar_documento(request, *args, **kwargs):
     log.info("FBV shim: editar_documento")
     return DocumentoUpdateView.as_view()(request, *args, **kwargs)
-    # Los servicios son globales, pero requieren autenticación
-    q = request.GET.get("q", "")
-    servicios = Servicio.objects.filter(nombre__icontains=q)[:20]
-    results = [
-        {
-            "id": s.id,
-            "text": s.nombre,
-            "precio": getattr(s, "precio", None),  # Si el modelo tiene precio
-        }
-        for s in servicios
-    ]
-    return JsonResponse({"results": results})
 
 
 import os
@@ -1152,7 +1131,8 @@ def enviar_documento_whatsapp(request, documento_id):
 
     from django.http import JsonResponse
 
-    from taller.models import Documento
+    # Use the Documento model imported at module level instead of re-importing it here
+    # (the module-level import is present earlier in this file)
 
     try:
         documento = Documento.objects.get(id=documento_id, empresa=request.user.empresa)
@@ -1205,10 +1185,11 @@ Para ver el documento completo, visite:
 
 ¡Gracias por confiar en nuestros servicios!"""
 
-    # Crear URL de WhatsApp
-    # Nota: No se pueden usar backslashes directamente en expresiones f-string
-    mensaje_encoded = mensaje.replace(" ", "%20").replace("\n", "%0A")
-    url_whatsapp = f"https://wa.me/{telefono}?text={mensaje_encoded}"
+    # Crear URL de WhatsApp (codificando el mensaje)
+    from urllib.parse import quote
+
+    mensaje_url = quote(mensaje, safe="")
+    url_whatsapp = f"https://wa.me/{telefono}?text={mensaje_url}"
 
     return JsonResponse(
         {

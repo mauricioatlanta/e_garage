@@ -3,19 +3,39 @@
 🎯 Objetivo: Landing page interactiva, futurista y persuasiva para eGarage.
 -->
 
-<!-- Hero principal con video de fondo y gradiente neón -->
-<section class="relative h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900 flex items-center justify-center text-white overflow-hidden">
+<!-- Hero selector de países -->
+<section class="relative min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-blue-900 flex items-center justify-center text-white overflow-hidden">
     <video autoplay loop muted class="absolute inset-0 w-full h-full object-cover opacity-30 z-0">
         <source src="{% static 'videos/tallerpro.mp4' %}" type="video/mp4">
     </video>
-    <div class="relative z-10 text-center px-4 w-full flex flex-col items-center justify-center">
-        <h1 class="text-6xl md:text-8xl font-orbitron font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-lime-300 drop-shadow-2xl mb-8 animate-fade-in">eGarage</h1>
-        <p class="text-3xl md:text-4xl font-poppins mb-6 text-cyan-200 animate-fade-in">Automatiza. Analiza. Acelera tu taller.</p>
-        <p class="text-xl md:text-2xl font-poppins mb-10 text-fuchsia-400 animate-fade-in">Transforma tu negocio automotriz con tecnología premium y gestión inteligente.</p>
-        <div class="flex flex-col md:flex-row gap-8 justify-center mt-8">
-            <a href="{% url 'account_signup' %}" class="bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-lime-300 text-gray-900 font-extrabold py-5 px-12 rounded-3xl shadow-2xl text-2xl tracking-wide hover:scale-105 transition-all duration-300 border-4 border-fuchsia-400 animate-bounce">Probar gratis 30 días</a>
-            <a href="#planes" class="bg-gradient-to-r from-lime-400 via-cyan-400 to-fuchsia-500 text-gray-900 font-bold py-5 px-12 rounded-3xl shadow-xl text-2xl tracking-wide border-4 border-lime-400 transition-all duration-300 hover:scale-105">Ver planes desde $20.000 CLP</a>
-            <a href="{% url 'account_login' %}" class="bg-gray-900 hover:bg-cyan-900 text-cyan-200 font-bold py-5 px-12 rounded-3xl shadow-xl text-2xl tracking-wide border-4 border-cyan-400 transition-all duration-300">Iniciar sesión</a>
+    <div class="relative z-10 text-center px-6 w-full flex flex-col items-center justify-center space-y-12">
+        <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-24 w-auto drop-shadow-2xl animate-pulse">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6 max-w-5xl w-full">
+            <a href="https://www.egarage.cl/us/" class="group rounded-3xl p-6 bg-gradient-to-br from-blue-500 via-white to-red-500 shadow-2xl transform hover:scale-105 transition-all border-2 border-white/30 flex flex-col items-center space-y-3">
+                <span class="text-5xl">🇺🇸</span>
+                <div class="text-xl font-bold text-gray-900 group-hover:text-blue-600">United States</div>
+                <div class="text-sm text-gray-700">USD · English</div>
+            </a>
+            <a href="https://www.egarage.cl/br/" class="group rounded-3xl p-6 bg-gradient-to-br from-green-600 via-yellow-400 to-blue-600 shadow-2xl transform hover:scale-105 transition-all border-2 border-white/30 flex flex-col items-center space-y-3">
+                <span class="text-5xl">🇧🇷</span>
+                <div class="text-xl font-bold text-gray-900 group-hover:text-green-700">Brasil</div>
+                <div class="text-sm text-gray-800">BRL · Português</div>
+            </a>
+            <a href="https://www.egarage.cl/ve/" class="group rounded-3xl p-6 bg-gradient-to-br from-yellow-400 via-blue-500 to-red-600 shadow-2xl transform hover:scale-105 transition-all border-2 border-white/30 flex flex-col items-center space-y-3">
+                <span class="text-5xl">🇻🇪</span>
+                <div class="text-xl font-bold text-gray-900 group-hover:text-yellow-500">Venezuela</div>
+                <div class="text-sm text-gray-800">VES · Español</div>
+            </a>
+            <a href="https://www.egarage.cl/pe/" class="group rounded-3xl p-6 bg-gradient-to-br from-red-500 via-white to-red-500 shadow-2xl transform hover:scale-105 transition-all border-2 border-white/30 flex flex-col items-center space-y-3">
+                <span class="text-5xl">🇵🇪</span>
+                <div class="text-xl font-bold text-gray-900 group-hover:text-red-600">Perú</div>
+                <div class="text-sm text-gray-800">PEN · Español</div>
+            </a>
+            <a href="https://www.egarage.cl/cl/" class="group rounded-3xl p-6 bg-gradient-to-br from-blue-700 via-white to-red-600 shadow-2xl transform hover:scale-105 transition-all border-2 border-white/30 flex flex-col items-center space-y-3">
+                <span class="text-5xl">🇨🇱</span>
+                <div class="text-xl font-bold text-gray-900 group-hover:text-blue-700">Chile</div>
+                <div class="text-sm text-gray-800">CLP · IVA 19%</div>
+            </a>
         </div>
     </div>
 </section>

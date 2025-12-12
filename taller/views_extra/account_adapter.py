@@ -8,12 +8,12 @@ from django.utils.translation import activate
 class CountryAwareAccountAdapter(DefaultAccountAdapter):
     """
     Decide el redirect post-login según el país, respetando ?next=
-    y evitando hardcodes. Usa namespaces: usa:taller:dashboard / chile:taller:dashboard
+    y evitando hardcodes. Usa namespaces: usa:dashboard / chile:dashboard
     """
 
     COUNTRY_MAP = {
-        "US": {"ns": "usa", "lang": "en", "default_url_name": "taller:dashboard"},
-        "CL": {"ns": "chile", "lang": "es", "default_url_name": "taller:dashboard"},
+        "US": {"ns": "usa", "lang": "en", "default_url_name": "dashboard"},
+        "CL": {"ns": "chile", "lang": "es", "default_url_name": "dashboard"},
     }
 
     def _normalize_country(self, value):
@@ -26,124 +26,136 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
             return "CL"
         return None
 
-    def _reverse_by_country(self, country_code, view_path="taller:dashboard", *args, **kwargs):
+    def _reverse_by_country(self, country_code, view_path="dashboard", *args, **kwargs):
         """
-        view_path puede ser 'taller:dashboard' o 'clientes:lista_clientes', etc.
+        view_path puede ser 'dashboard' o 'clientes:lista_clientes', etc.
+        Si view_path contiene ':', se asume que ya incluye el namespace completo.
+        Si no, se construye como {country_ns}:{view_path}
         """
         meta = self.COUNTRY_MAP.get(country_code)
         if not meta:
             # Fallback conservador a CL
             meta = self.COUNTRY_MAP["CL"]
-        # Si view_path ya trae subnamespace (p.ej. 'clientes:lista_clientes'), lo respetamos
-        if ":" in view_path and not view_path.startswith("taller:"):
-            name = f"{meta['ns']}:{view_path}"
+
+        # Si view_path ya trae namespace completo (p.ej. 'taller_cl:dashboard' o 'clientes:lista_clientes'), lo respetamos
+        if ":" in view_path:
+            name = view_path
         else:
-            # 'taller:dashboard' o similar
+            # Construir como {country_ns}:{view_path}
             name = f"{meta['ns']}:{view_path}"
-        return reverse(name, args=args, kwargs=kwargs)
+
+        url = reverse(name, args=args, kwargs=kwargs)
+        print(
+            f"[CountryAwareAccountAdapter] _reverse_by_country: country={country_code}, view_path={view_path}, name={name}, url={url}"
+        )
+        return url
 
     def get_login_redirect_url(self, request):
+        print(f"[CountryAwareAccountAdapter] get_login_redirect_url iniciado")
+        print(f"[CountryAwareAccountAdapter] Path: {request.path}")
+        print(f"[CountryAwareAccountAdapter] User authenticated: {request.user.is_authenticated}")
+        print(f"[CountryAwareAccountAdapter] User: {request.user}")
+
         # 0) Respetar ?next= si es seguro/permitido por allauth
         next_url = request.GET.get("next") or request.POST.get("next")
+        print(f"[CountryAwareAccountAdapter] Next URL: {next_url}")
+
         if next_url and self.is_safe_url(next_url, request.get_host()):
-            # Si next_url no empieza por /us/ o /cl/, lo dejamos igual
-            # (allauth valida seguridad de la redirección).
+            print(f"[CountryAwareAccountAdapter] ✅ Redirigiendo a next_url (seguro): {next_url}")
             return next_url
+        elif next_url:
+            print(f"[CountryAwareAccountAdapter] ⚠️ Next URL no es seguro, ignorando: {next_url}")
 
         # 1) Empresa del usuario (fuente primaria)
         if request.user.is_authenticated:
+            empresa = getattr(request.user, "empresa", None)
+            empresa_pais = getattr(empresa, "pais", None) if empresa else None
+            print(f"[CountryAwareAccountAdapter] Empresa: {empresa}, País empresa: {empresa_pais}")
+
             # empresa.pais
-            country = self._normalize_country(
-                getattr(getattr(request.user, "empresa", None), "pais", None)
-            )
+            country = self._normalize_country(empresa_pais)
+            print(f"[CountryAwareAccountAdapter] Country from empresa: {country}")
+
             if not country:
                 # perfil.pais (secundaria)
-                country = self._normalize_country(
-                    getattr(getattr(request.user, "perfil", None), "pais", None)
-                )
+                perfil = getattr(request.user, "perfil", None)
+                perfil_pais = getattr(perfil, "pais", None) if perfil else None
+                print(f"[CountryAwareAccountAdapter] Perfil: {perfil}, País perfil: {perfil_pais}")
+                country = self._normalize_country(perfil_pais)
+                print(f"[CountryAwareAccountAdapter] Country from perfil: {country}")
+
             if country:
                 # Setear idioma y sesión
                 meta = self.COUNTRY_MAP[country]
                 activate(meta["lang"])
                 request.session["django_language"] = meta["lang"]
                 request.session["country"] = meta["ns"]  # 'usa' o 'chile'
-                return self._reverse_by_country(country, "taller:dashboard")
+                print(
+                    f"[CountryAwareAccountAdapter] ✅ Redirigiendo a dashboard de {country} (desde empresa/perfil)"
+                )
+                return self._reverse_by_country(country, "dashboard")
 
         # 2) request.country (middleware)
-        country = self._normalize_country(getattr(request, "country", None))
+        request_country = getattr(request, "country", None)
+        print(f"[CountryAwareAccountAdapter] request.country: {request_country}")
+        country = self._normalize_country(request_country)
         if country:
             meta = self.COUNTRY_MAP[country]
             activate(meta["lang"])
             request.session["django_language"] = meta["lang"]
             request.session["country"] = meta["ns"]
-            return self._reverse_by_country(country, "taller:dashboard")
+            print(
+                f"[CountryAwareAccountAdapter] ✅ Redirigiendo a dashboard de {country} (desde request.country)"
+            )
+            return self._reverse_by_country(country, "dashboard")
 
         # 3) Parámetros y sesión
-        country = self._normalize_country(request.GET.get("country"))
+        country_param = request.GET.get("country")
+        print(f"[CountryAwareAccountAdapter] GET country param: {country_param}")
+        country = self._normalize_country(country_param)
+
         if not country:
             sess_country_ns = (request.session.get("country") or "").strip().lower()
+            print(f"[CountryAwareAccountAdapter] Session country: {sess_country_ns}")
             # Mapear ns de sesión -> código país
             country = (
                 "US" if sess_country_ns == "usa" else ("CL" if sess_country_ns == "chile" else None)
             )
+            print(f"[CountryAwareAccountAdapter] Country from session: {country}")
 
         if country:
             meta = self.COUNTRY_MAP[country]
             activate(meta["lang"])
             request.session["django_language"] = meta["lang"]
             request.session["country"] = meta["ns"]
-            return self._reverse_by_country(country, "taller:dashboard")
+            print(
+                f"[CountryAwareAccountAdapter] ✅ Redirigiendo a dashboard de {country} (desde params/session)"
+            )
+            return self._reverse_by_country(country, "dashboard")
 
         # 4) Path prefix (último recurso)
         path = (request.path or "").strip().lower()
+        print(f"[CountryAwareAccountAdapter] Path prefix check: {path}")
         if path.startswith("/us/") or path == "/us":
             activate("en")
             request.session["django_language"] = "en"
             request.session["country"] = "usa"
-            return self._reverse_by_country("US", "taller:dashboard")
+            print(
+                f"[CountryAwareAccountAdapter] ✅ Redirigiendo a dashboard US (desde path prefix)"
+            )
+            return self._reverse_by_country("US", "dashboard")
         if path.startswith("/cl/") or path == "/cl":
             activate("es")
             request.session["django_language"] = "es"
             request.session["country"] = "chile"
-            return self._reverse_by_country("CL", "taller:dashboard")
+            print(
+                f"[CountryAwareAccountAdapter] ✅ Redirigiendo a dashboard CL (desde path prefix)"
+            )
+            return self._reverse_by_country("CL", "dashboard")
 
         # 5) Fallback final a CL (explícito y namespaced)
         activate("es")
         request.session["django_language"] = "es"
         request.session["country"] = "chile"
-        return self._reverse_by_country("CL", "taller:dashboard")
-
-    def get_email_confirmation_redirect_url(self, request):
-        """
-        Redirige después de confirmar email al login del país correspondiente.
-        """
-        # Detectar país desde la empresa del usuario o desde la URL
-        if request.user.is_authenticated:
-            try:
-                if hasattr(request.user, "empresa") and request.user.empresa:
-                    country = self._normalize_country(request.user.empresa.pais)
-                    if country:
-                        # Construir URL de login con prefijo de país
-                        from taller.config.country_settings import CountrySettings
-
-                        login_url = CountrySettings.build_url(
-                            country, "auth/login/", request=request
-                        )
-                        if login_url:
-                            return login_url
-            except Exception:
-                pass
-
-        # Fallback: detectar desde URL
-        path = (request.path or "").strip().lower()
-        if path.startswith("/us/") or path == "/us":
-            from taller.config.country_settings import CountrySettings
-
-            return CountrySettings.build_url("US", "auth/login/", request=request)
-        elif path.startswith("/cl/") or path == "/cl":
-            from taller.config.country_settings import CountrySettings
-
-            return CountrySettings.build_url("CL", "auth/login/", request=request)
-
-        # Fallback final: login genérico
-        return "/accounts/login/"
+        print(f"[CountryAwareAccountAdapter] ✅ Redirigiendo a dashboard CL (fallback final)")
+        return self._reverse_by_country("CL", "dashboard")

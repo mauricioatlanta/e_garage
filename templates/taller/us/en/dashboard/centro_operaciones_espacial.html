@@ -1355,6 +1355,184 @@ body {
     </div>
     {% endif %}
 
+    <!-- 📊 KPIs Adicionales del Template Normal -->
+    <div class="space-container p-6 mt-6">
+        <h3 class="text-xl font-bold text-cyan-400 mb-4 console-text">📊 {% trans "OPERATIONAL METRICS" %}</h3>
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">📄 {% trans "DOCS WEEK" %}</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ documentos_semana|default:"0" }}</div>
+                    <div class="metric-small">{% trans "Last 7 days" %}</div>
+                </div>
+            </div>
+
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">💰 {% trans "SALES TODAY" %}</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ moneda }}{{ facturacion_servicios_hoy|floatformat:0|default:"0" }}</div>
+                    <div class="metric-small">{% trans "Today's revenue" %}</div>
+                </div>
+            </div>
+
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">💵 {% trans "MONTH SALES" %}</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ moneda }}{{ facturacion_mes_total|floatformat:0|default:"0" }}</div>
+                    <div class="metric-small">{% trans "This month" %}</div>
+                </div>
+            </div>
+
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">👥 {% trans "ACTIVE CLIENTS" %}</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ clientes_activos|default:"0" }}</div>
+                    <div class="metric-small">{% trans "Total clients" %}</div>
+                </div>
+            </div>
+
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">🆕 {% trans "NEW CLIENTS" %}</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ clientes_nuevos_mes|default:"0" }}</div>
+                    <div class="metric-small">{% trans "This month" %}</div>
+                </div>
+            </div>
+
+            <div class="windows-tile tile-small">
+                <div class="tile-header">
+                    <span class="tile-title">👨‍🔧 {% trans "TECHNICIANS" %}</span>
+                </div>
+                <div class="tile-content metric-tile">
+                    <div class="metric-big">{{ tecnicos_activos|default:"0" }}</div>
+                    <div class="metric-small">{% trans "Active" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📈 Estado Operativo -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+        <!-- Estado de Documentos -->
+        <div class="space-container p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">📋 {% trans "DOCUMENT STATUS" %}</h3>
+            <div class="space-y-3">
+                <div class="flex justify-between items-center">
+                    <span class="text-sm">{% trans "Pending Quotes" %}</span>
+                    <span class="status-badge status-pending">{{ presupuestos_pendientes|default:"0" }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm">{% trans "Orders in Process" %}</span>
+                    <span class="status-badge status-active">{{ ordenes_en_proceso|default:"0" }}</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span class="text-sm">{% trans "Month Invoices" %}</span>
+                    <span class="status-badge status-active">{{ facturas_mes|default:"0" }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Métricas de Eficiencia -->
+        <div class="space-container p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">🎯 {% trans "EFFICIENCY METRICS" %}</h3>
+            <div class="space-y-3">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-cyan-400">{{ moneda }}{{ ticket_promedio|floatformat:0|default:"0" }}</div>
+                    <div class="text-sm text-gray-400">{% trans "Average Ticket" %}</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-400">{{ eficiencia_conversion|floatformat:1|default:"0" }}%</div>
+                    <div class="text-sm text-gray-400">{% trans "Conversion Rate" %}</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-purple-400">{{ marcas_atendidas|default:"0" }}</div>
+                    <div class="text-sm text-gray-400">{% trans "Brands Served" %}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Proyecciones IA -->
+        <div class="space-container p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">🤖 {% trans "AI PROJECTIONS" %}</h3>
+            <div class="space-y-3">
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-gold-400">{{ proyeccion_docs_mes|default:"0" }}</div>
+                    <div class="text-sm text-gray-400">{% trans "Projected Docs/Month" %}</div>
+                </div>
+                <div class="text-center">
+                    <div class="text-2xl font-bold text-green-400">{{ moneda }}{{ proyeccion_facturacion|floatformat:0|default:"0" }}</div>
+                    <div class="text-sm text-gray-400">{% trans "Projected Revenue" %}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 🔧 Rankings y Tops -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+        <!-- Top Servicios -->
+        <div class="space-container p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">⚙️ {% trans "TOP SERVICES" %}</h3>
+            {% for servicio in servicios_top %}
+            <div class="ranking-item mb-3">
+                <div>
+                    <div class="font-semibold text-sm">{{ servicio.nombre }}</div>
+                    <div class="text-xs text-gray-400">{% blocktrans with cantidad=servicio.cantidad %}{{ cantidad }} services{% endblocktrans %}</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-lg font-bold text-cyan-400">{{ servicio.cantidad }}x</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-gray-400 py-4 text-sm">{% trans "No service data" %}</div>
+            {% endfor %}
+        </div>
+
+        <!-- Top Técnicos -->
+        <div class="space-container p-6">
+            <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">👨‍🔧 {% trans "TOP TECHNICIANS" %}</h3>
+            {% for tecnico in tecnicos_productivos %}
+            <div class="ranking-item mb-3">
+                <div>
+                    <div class="font-semibold text-sm">{{ tecnico.tecnico.nombre|default:"Unknown" }}</div>
+                    <div class="text-xs text-gray-400">{% blocktrans count count=tecnico.docs_realizados %}{{ count }} document{% plural %}{{ count }} documents{% endblocktrans %}</div>
+                </div>
+                <div class="text-right">
+                    <div class="text-lg font-bold text-green-400">{{ moneda }}{{ tecnico.ingresos_generados|floatformat:0|default:"0" }}</div>
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center text-gray-400 py-4 text-sm">{% trans "No technician data" %}</div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ⚠️ Alertas y Oportunidades -->
+    {% if alertas %}
+    <div class="space-container p-6 mt-6">
+        <h3 class="text-lg font-bold text-cyan-400 mb-4 console-text">⚠️ {% trans "ALERTS & OPPORTUNITIES" %}</h3>
+        {% for alerta in alertas %}
+        <div class="alert-card mb-3">
+            <div class="flex items-start justify-between">
+                <div>
+                    <div class="font-semibold text-{{ alerta.tipo }}-400 text-sm">{{ alerta.titulo }}</div>
+                    <div class="text-xs text-gray-400">{{ alerta.descripcion }}</div>
+                </div>
+                <div class="text-sm text-cyan-400">{{ alerta.accion }}</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
 </div>
 </main>
 

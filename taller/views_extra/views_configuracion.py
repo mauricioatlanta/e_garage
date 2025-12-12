@@ -102,7 +102,7 @@ def configuracion_empresa(request):
         },
     }
 
-    return render(request, "taller/configuracion/empresa_simple.html", context)
+    return render(request, "taller/configuracion/empresa.html", context)
 
 
 @login_required(login_url=None)  # Usa LOGIN_URL global

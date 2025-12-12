@@ -60,10 +60,13 @@ body {
 }
 
 .logo {
-    width: 70px;
-    height: 70px;
-    margin-bottom: 16px;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 24px;
     filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.6));
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .brand-name {
@@ -569,8 +572,6 @@ select[name="country"] {
         <!-- Logo -->
         <div class="logo-section">
             <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
-            <div class="brand-name">eGarage</div>
-            <div class="subtitle">{% trans "Professional Automotive Management" %}</div>
         </div>
 
         <h2 class="signup-title">{% trans "Create Your Account" %}</h2>
@@ -649,25 +650,11 @@ select[name="country"] {
                     <div class="help-text">{{ form.email.help_text }}</div>
                     {% endif %}
                 </div>
-
-                {% if form.country %}
-                <div class="form-group">
-                    <label class="form-label">{{ form.country.label }} *</label>
-                    {{ form.country }}
-                    {% if form.country.errors %}
-                    <div class="error-message">{{ form.country.errors }}</div>
-                    {% endif %}
-                    {% if form.country.help_text %}
-                    <div class="help-text">{{ form.country.help_text }}</div>
-                    {% endif %}
-                </div>
-                {% endif %}
             </div>
 
             <!-- SECCIÓN 2: Contraseña -->
             <div class="form-section">
                 <h3 class="section-title">{% trans "Security" %}</h3>
-
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div class="form-group">
                         <label class="form-label">{% trans "Password" %} *</label>

@@ -11,3 +11,13 @@ test-results.json
 # Node
 node_modules/
 package-lock.json
+
+# scripts locales diagnostico
+verificar_*.py
+diagnostico_*.py
+corregir_*.py
+
+# sensibles / demo local
+CREDENCIALES_PRUEBA.md
+eg_cl_demo_20251115.json
+

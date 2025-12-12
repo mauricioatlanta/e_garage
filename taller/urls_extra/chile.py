@@ -1,24 +1,6 @@
-"""
-URLs específicas para Chile (español)
-    path('taller/servicios/', include(('taller.servicios.urls', 'servicios'), namespace='servicios_admin')),
-    path('taller/documentos/', include(('taller.documentos.urls', 'documentos'), namespace='documentos')),
-    path('taller/reportes/', include('taller.reportes.urls')),
-
-    # Servicios también bajo /cl/servicios/ para disponibilidad global del namespace
-    path('servicios/', include(('taller.servicios.urls', 'servicios'), namespace='servicios')),
-
-    # Documentos también bajo /cl/documentos/ para disponibilidad global del namespace
-    path('documentos/', include(('taller.documentos.urls', 'documentos'), namespace='documentos_global')),o: /cl/
-"""
-
-import logging
-
-from django.urls import include, path
+from django.urls import path, include
 from django.views.generic import TemplateView
-
-# Configuración de logging para este módulo
-logger = logging.getLogger(__name__)
-logger.debug("CARGANDO taller/urls_extra/chile.py")
+import logging
 from django.http import HttpResponseRedirect
 
 from taller.taller_views import dashboard_suscripciones
@@ -36,7 +18,9 @@ from taller.views_extra.views_configuracion import (
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.documentos import views_country_aware as views_documentos
 
-# from taller.views_extra.crear_motor_caja import crear_motor, crear_caja, crear_color  # ❌ Desactivado - usando views_create_parts
+# Configuración de logging para este módulo
+logger = logging.getLogger(__name__)
+logger.debug("CARGANDO taller/urls_extra/chile.py")
 
 app_name = "chile"
 
@@ -47,25 +31,6 @@ urlpatterns = [
     # Incluir las rutas específicas que necesitamos
     path("dashboard/", dashboard, name="dashboard"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
-    path(
-        "centro-operaciones-espacial/",
-        dashboard_centro_operaciones_espacial,
-        name="centro_operaciones_espacial",
-    ),
-    path("admin/dashboard/", dashboard_suscripciones, name="dashboard_suscripciones"),
-    path("configuracion/", configuracion_empresa, name="configuracion"),
-    path("configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"),
-    path("settings/", company_settings_view, name="company_settings"),
-    # Dashboard principal Chile (requiere autenticación) - Usar el de taller_main_urls
-    # path("dashboard/", dashboard_cl_view, name="dashboard"),
-    # Test endpoint Chile
-    path("test/", test_chile_view, name="test"),
-    # Página de bienvenida para Chile
-    path(
-        "egarage/",
-        TemplateView.as_view(template_name="onboarding/bienvenida_chile.html"),
-        name="bienvenida_chile",
-    ),
     # Página de bienvenida alternativa (ruta estándar)
     path(
         "bienvenida/",

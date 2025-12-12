@@ -60,10 +60,13 @@ body {
 }
 
 .logo {
-    width: 70px;
-    height: 70px;
-    margin-bottom: 16px;
+    width: 120px;
+    height: 120px;
+    margin-bottom: 24px;
     filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.6));
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .brand-name {
@@ -350,8 +353,6 @@ body {
         <!-- Logo -->
         <div class="logo-section">
             <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
-            <div class="brand-name">eGarage</div>
-            <div class="subtitle">{% trans "Professional Automotive Management" %}</div>
         </div>
 
         <h2 class="signup-title">{% trans "Create Your Account" %}</h2>
@@ -395,6 +396,14 @@ body {
                     {{ form.email }}
                     {% if form.email.errors %}
                     <div class="error-message">{{ form.email.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">{% trans "Phone" %}</label>
+                    {{ form.telefono }}
+                    {% if form.telefono.errors %}
+                    <div class="error-message">{{ form.telefono.errors }}</div>
                     {% endif %}
                 </div>
 
@@ -573,16 +582,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Actualizar precios según país
 function updatePlanPrices(country) {
+    // Por ahora solo mostramos precios para CL y US
+    // Los demás países pueden usar los precios por defecto o agregarse después
     const showCL = country === 'CL';
     const showUS = country === 'US';
+    const showMX = country === 'MX';
+    const showBR = country === 'BR';
+    const showPE = country === 'PE';
+    const showVE = country === 'VE';
 
+    // Mostrar/ocultar precios CL
     document.querySelectorAll('.price-cl, .period-cl').forEach(el => {
         el.style.display = showCL ? 'inline' : 'none';
     });
 
+    // Mostrar/ocultar precios US
     document.querySelectorAll('.price-us, .period-us').forEach(el => {
         el.style.display = showUS ? 'inline' : 'none';
     });
+
+    // Para otros países, por defecto mostrar US si no hay precios específicos
+    if (showMX || showBR || showPE || showVE) {
+        document.querySelectorAll('.price-us, .period-us').forEach(el => {
+            el.style.display = 'inline';
+        });
+        document.querySelectorAll('.price-cl, .period-cl').forEach(el => {
+            el.style.display = 'none';
+        });
+    }
 }
 
 // Seleccionar plan
@@ -616,10 +643,6 @@ const translations = {
         'Email': 'Correo Electrónico',
         'Phone': 'Teléfono',
         'Country': 'País',
-
-        // Sección 2: Información de la Empresa
-        'Company Information': 'Información de la Empresa',
-        'Company Name': 'Nombre de la Empresa',
 
         // Sección 3: Plan
         'Choose Your Plan': 'Elige tu Plan',
@@ -661,8 +684,6 @@ const translations = {
         'Email': 'Email',
         'Phone': 'Phone',
         'Country': 'Country',
-        'Company Information': 'Company Information',
-        'Company Name': 'Company Name',
         'Choose Your Plan': 'Choose Your Plan',
         'Free Trial': 'Free Trial',
         '30 days free': '30 days free',
@@ -720,15 +741,13 @@ function changeLanguage(country) {
             'id_nombre': 'Juan',
             'id_apellido': 'Pérez',
             'id_email': 'juan@empresa.cl',
-            'id_telefono': '+56912345678',
-            'id_nombre_taller': 'Mi Taller'
+            'id_telefono': '+56912345678'
         },
         'US': {
             'id_nombre': 'John',
             'id_apellido': 'Doe',
             'id_email': 'john@company.com',
-            'id_telefono': '+1(555)123-4567',
-            'id_nombre_taller': 'My Auto Shop'
+            'id_telefono': '+1(555)123-4567'
         }
     };
 

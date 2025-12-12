@@ -136,7 +136,6 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",  # ✅ WhiteNoise para archivos estáticos (después de SecurityMiddleware)
     "django.contrib.sessions.middleware.SessionMiddleware",
-    # LocaleMiddleware debe ir DESPUÉS de SessionMiddleware
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -150,9 +149,7 @@ MIDDLEWARE = [
     "taller.middleware.lang_policy.LanguagePolicyMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    # Suscripción / trial (después de auth + allauth)
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
-    # "taller.middleware.trial_middleware.TrialAccessMiddleware",
 ]
 
 # AccountMiddleware de allauth: agregar dinámicamente si existe
