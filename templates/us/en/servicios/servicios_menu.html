@@ -2,20 +2,33 @@
 {% load country_url %}
 {% load i18n static %}
 
-{% block title %}Automotive Services - {{ empresa.nombre_taller }}{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Servicios Automotrices{% else %}Automotive Services{% endif %} - {{ empresa.nombre_taller }}{% endblock %}
 
 {% block extra_css %}
 <style>
     /* Futuristic Service Cards */
     .futuristic-card {
         position: relative;
-        background: linear-gradient(135deg, rgba(5, 15, 30, 0.95) 0%, rgba(10, 20, 35, 0.95) 100%);
-        border: 1px solid rgba(0, 212, 255, 0.3);
+        background: linear-gradient(135deg, rgba(5, 15, 30, 0.98) 0%, rgba(10, 20, 35, 0.98) 100%);
+        border: 1px solid rgba(0, 212, 255, 0.4);
         border-radius: 12px;
         padding: 1.5rem;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         overflow: hidden;
         backdrop-filter: blur(10px);
+    }
+    
+    .futuristic-card h3 {
+        color: #e0f2fe !important;
+        font-weight: 700;
+    }
+    
+    .futuristic-card .space-text {
+        color: #e0f2fe !important;
+    }
+    
+    .futuristic-card .space-text-muted {
+        color: #b8d4e8 !important;
     }
 
     .futuristic-card::before {
@@ -118,12 +131,13 @@
     }
 
     .filter-select {
-        background: rgba(5, 15, 30, 0.8);
-        border: 1px solid rgba(0, 212, 255, 0.3);
+        background: rgba(5, 15, 30, 0.95);
+        border: 1px solid rgba(0, 212, 255, 0.5);
         border-radius: 8px;
         padding: 0.75rem 1rem;
-        color: #b0e0ff;
+        color: #e0f2fe !important;
         font-size: 0.9rem;
+        font-weight: 500;
         transition: all 0.3s;
         appearance: none;
         background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300d4ff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
@@ -133,14 +147,18 @@
     }
 
     .filter-select:hover {
-        border-color: rgba(0, 212, 255, 0.6);
-        box-shadow: 0 0 10px rgba(0, 212, 255, 0.2);
+        border-color: rgba(0, 212, 255, 0.7);
+        box-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+        background: rgba(5, 15, 30, 1);
+        color: #ffffff !important;
     }
 
     .filter-select:focus {
         outline: none;
-        border-color: rgba(0, 212, 255, 0.8);
-        box-shadow: 0 0 15px rgba(0, 212, 255, 0.3);
+        border-color: rgba(0, 212, 255, 0.9);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+        background: rgba(5, 15, 30, 1);
+        color: #ffffff !important;
     }
 
     /* Category Badge */
@@ -149,26 +167,30 @@
         align-items: center;
         gap: 0.5rem;
         padding: 0.5rem 1rem;
-        background: linear-gradient(135deg, rgba(0, 212, 255, 0.2) 0%, rgba(0, 255, 255, 0.1) 100%);
-        border: 1px solid rgba(0, 212, 255, 0.4);
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.25) 0%, rgba(0, 255, 255, 0.15) 100%);
+        border: 1px solid rgba(0, 212, 255, 0.5);
         border-radius: 20px;
         font-size: 0.85rem;
-        color: #b0e0ff;
+        font-weight: 600;
+        color: #e0f2fe !important;
         margin: 0.25rem;
         transition: all 0.3s;
         cursor: pointer;
     }
 
     .category-badge:hover {
-        background: linear-gradient(135deg, rgba(0, 212, 255, 0.3) 0%, rgba(0, 255, 255, 0.2) 100%);
-        border-color: rgba(0, 212, 255, 0.6);
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.4) 0%, rgba(0, 255, 255, 0.3) 100%);
+        border-color: rgba(0, 212, 255, 0.8);
         transform: scale(1.05);
+        color: #ffffff !important;
     }
 
     .category-badge.active {
-        background: linear-gradient(135deg, rgba(0, 212, 255, 0.4) 0%, rgba(0, 255, 255, 0.3) 100%);
-        border-color: rgba(0, 212, 255, 0.8);
-        box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+        background: linear-gradient(135deg, rgba(0, 212, 255, 0.5) 0%, rgba(0, 255, 255, 0.4) 100%);
+        border-color: rgba(0, 212, 255, 1);
+        box-shadow: 0 0 15px rgba(0, 212, 255, 0.6);
+        color: #ffffff !important;
+        font-weight: 700;
     }
 
     /* Service Icon */
@@ -204,25 +226,28 @@
 
     /* Search Input */
     .futuristic-search {
-        background: rgba(5, 15, 30, 0.8);
-        border: 1px solid rgba(0, 212, 255, 0.3);
+        background: rgba(5, 15, 30, 0.95);
+        border: 1px solid rgba(0, 212, 255, 0.5);
         border-radius: 12px;
         padding: 1rem 1.5rem;
-        color: #b0e0ff;
+        color: #e0f2fe !important;
         font-size: 1rem;
+        font-weight: 500;
         transition: all 0.3s;
         width: 100%;
     }
 
     .futuristic-search:focus {
         outline: none;
-        border-color: rgba(0, 212, 255, 0.8);
-        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
-        background: rgba(5, 15, 30, 0.95);
+        border-color: rgba(0, 212, 255, 0.9);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+        background: rgba(5, 15, 30, 1);
+        color: #ffffff !important;
     }
 
     .futuristic-search::placeholder {
-        color: rgba(176, 224, 255, 0.5);
+        color: rgba(224, 242, 254, 0.7) !important;
+        font-weight: 400;
     }
 
     /* Empty State */
@@ -250,12 +275,50 @@
     .subcategory-tag {
         display: inline-block;
         padding: 0.25rem 0.75rem;
-        background: rgba(0, 212, 255, 0.1);
-        border: 1px solid rgba(0, 212, 255, 0.3);
+        background: rgba(0, 212, 255, 0.2);
+        border: 1px solid rgba(0, 212, 255, 0.5);
         border-radius: 12px;
         font-size: 0.75rem;
-        color: #7dd3fc;
+        font-weight: 500;
+        color: #a5e1ff !important;
         margin: 0.125rem;
+    }
+    
+    /* Mejorar contraste de títulos */
+    .space-text {
+        color: #e0f2fe !important;
+    }
+    
+    .space-text-muted {
+        color: #b8d4e8 !important;
+        opacity: 0.95;
+    }
+    
+    /* Títulos principales más visibles */
+    h1, h2, h3 {
+        color: #e0f2fe !important;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.3);
+    }
+    
+    /* Estadísticas más visibles */
+    .stat-card .text-3xl {
+        color: #00d4ff !important;
+        font-weight: 800;
+        text-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+    }
+    
+    .stat-card .text-sm {
+        color: #c8e8ff !important;
+        font-weight: 600;
+    }
+    
+    /* Headers de categorías más visibles */
+    .category-header h2,
+    .category-header h3 {
+        color: #e0f2fe !important;
+        font-weight: 700;
+        text-shadow: 0 0 10px rgba(0, 212, 255, 0.4);
     }
 </style>
 {% endblock %}
@@ -268,14 +331,14 @@
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div>
             <h1 class="text-4xl font-bold space-text mb-3 bg-gradient-to-r from-cyan-400 via-blue-400 to-cyan-300 bg-clip-text text-transparent">
-                🚀 Automotive Services
+                🚀 {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Servicios Automotrices{% else %}Automotive Services{% endif %}
             </h1>
-            <p class="space-text-muted text-lg">Manage your workshop services catalog with precision</p>
+            <p class="space-text-muted text-lg">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Gestiona tu catálogo de servicios del taller con precisión{% else %}Manage your workshop services catalog with precision{% endif %}</p>
         </div>
         <a href="{% country_url 'servicios:crear_servicio' %}" 
            class="relative overflow-hidden group space-button bg-gradient-to-r from-cyan-500 to-lime-500 hover:from-cyan-600 hover:to-lime-600 text-white font-semibold px-8 py-4 rounded-xl shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center gap-3">
             <span class="text-2xl relative z-10">⚡</span>
-            <span class="relative z-10">Add New Service</span>
+            <span class="relative z-10">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Agregar Nuevo Servicio{% else %}Add New Service{% endif %}</span>
             <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent transform -skew-x-12 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
         </a>
     </div>
@@ -286,19 +349,19 @@
 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
     <div class="stat-card">
         <div class="text-3xl font-bold text-cyan-400 mb-1">{{ stats.total_servicios }}</div>
-        <div class="text-sm space-text-muted">Total Services</div>
+        <div class="text-sm space-text-muted">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Servicios Totales{% else %}Total Services{% endif %}</div>
     </div>
     <div class="stat-card">
         <div class="text-3xl font-bold text-blue-400 mb-1">{{ stats.total_categorias }}</div>
-        <div class="text-sm space-text-muted">Categories</div>
+        <div class="text-sm space-text-muted">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Categorías{% else %}Categories{% endif %}</div>
     </div>
     <div class="stat-card">
         <div class="text-3xl font-bold text-lime-400 mb-1">{{ stats.total_subcategorias }}</div>
-        <div class="text-sm space-text-muted">Subcategories</div>
+        <div class="text-sm space-text-muted">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Subcategorías{% else %}Subcategories{% endif %}</div>
     </div>
     <div class="stat-card">
         <div class="text-3xl font-bold text-purple-400 mb-1">{{ stats.categorias_con_servicios }}</div>
-        <div class="text-sm space-text-muted">Active Categories</div>
+        <div class="text-sm space-text-muted">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Categorías Activas{% else %}Active Categories{% endif %}</div>
     </div>
 </div>
 {% endif %}
@@ -312,13 +375,13 @@
                    id="searchInput" 
                    name="q" 
                    value="{{ request.GET.q }}"
-                   placeholder="Search by name, category or subcategory..."
+                   placeholder="{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Buscar por nombre, categoría o subcategoría...{% else %}Search by name, category or subcategory...{% endif %}"
                    class="futuristic-search pl-12">
         </div>
         <button type="button" 
                 id="searchBtn" 
                 class="space-button px-6 py-3 whitespace-nowrap">
-            SEARCH
+            {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}BUSCAR{% else %}SEARCH{% endif %}
         </button>
     </div>
 </div>
@@ -328,11 +391,11 @@
     <div class="mb-4">
         <h3 class="text-lg font-semibold space-text mb-3 flex items-center gap-2">
             <span class="text-cyan-400">📂</span>
-            Filter by Category
+            {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Filtrar por Categoría{% else %}Filter by Category{% endif %}
         </h3>
         <div class="flex flex-wrap gap-2 mb-4">
             <button class="category-badge active" data-category-code="" onclick="filterByCategory('')">
-                All Categories
+                {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Todas las Categorías{% else %}All Categories{% endif %}
             </button>
             {% for categoria in categorias %}
             <button class="category-badge" 
@@ -348,10 +411,10 @@
     <div>
         <h3 class="text-lg font-semibold space-text mb-3 flex items-center gap-2">
             <span class="text-blue-400">🏷️</span>
-            Filter by Subcategory
+            {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Filtrar por Subcategoría{% else %}Filter by Subcategory{% endif %}
         </h3>
         <select id="subcategoriaFilter" class="filter-select w-full">
-            <option value="">All Subcategories</option>
+            <option value="">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Todas las Subcategorías{% else %}All Subcategories{% endif %}</option>
             {% for subcategoria in subcategorias %}
             <option value="{{ subcategoria.code }}" data-categoria-code="{{ subcategoria.categoria.code }}">
                 {{ subcategoria.label_localizado|default:subcategoria.get_label }}
@@ -370,11 +433,10 @@
     <div class="category-header">
         <h2 class="text-2xl font-bold space-text mb-4 flex items-center gap-3">
             <span class="text-cyan-400">📂</span>
-            Available Categories
+            {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Categorías Disponibles{% else %}Available Categories{% endif %}
         </h2>
         <p class="space-text-muted mb-4">
-            You have {{ categorias|length }} categor{{ categorias|length|pluralize:"y,ies" }} available. 
-            Start adding services to these categories to build your catalog.
+            {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Tienes {{ categorias|length }} categor{{ categorias|length|pluralize:"ía,ías" }} disponible{{ categorias|length|pluralize:",s" }}. Comienza agregando servicios a estas categorías para construir tu catálogo.{% else %}You have {{ categorias|length }} categor{{ categorias|length|pluralize:"y,ies" }} available. Start adding services to these categories to build your catalog.{% endif %}
         </p>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {% for categoria in categorias %}
@@ -390,7 +452,7 @@
                 </div>
                 {% if categoria.subcategorias_list %}
                 <div class="mt-3 pt-3 border-t border-cyan-400/20">
-                    <p class="text-xs space-text-muted mb-2">{{ categoria.subcategorias_list|length }} subcategor{{ categoria.subcategorias_list|length|pluralize:"y,ies" }}:</p>
+                    <p class="text-xs space-text-muted mb-2">{{ categoria.subcategorias_list|length }} {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}subcategor{{ categoria.subcategorias_list|length|pluralize:"ía,ías" }}{% else %}subcategor{{ categoria.subcategorias_list|length|pluralize:"y,ies" }}{% endif %}:</p>
                     <div class="flex flex-wrap gap-1">
                         {% for subcat in categoria.subcategorias_list %}
                         <span class="subcategory-tag text-xs">{{ subcat.label_localizado }}</span>
@@ -402,7 +464,7 @@
                     <a href="{% country_url 'servicios:crear_servicio' %}?categoria={{ categoria.id }}" 
                        class="text-xs space-button inline-flex items-center gap-1">
                         <span>➕</span>
-                        <span>Add Service</span>
+                        <span>{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Agregar Servicio{% else %}Add Service{% endif %}</span>
                     </a>
                 </div>
             </div>
@@ -429,10 +491,10 @@
                                 {{ categoria.label_localizado|default:categoria.get_label }}
                             </h2>
                             <div class="flex items-center gap-4 text-sm space-text-muted">
-                                <span>{{ servicios_cat|length }} service{{ servicios_cat|length|pluralize }}</span>
+                                <span>{{ servicios_cat|length }} {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}servicio{{ servicios_cat|length|pluralize }}{% else %}service{{ servicios_cat|length|pluralize }}{% endif %}</span>
                                 {% if categoria.subcategorias_list %}
                                 <span class="text-cyan-400">•</span>
-                                <span>{{ categoria.subcategorias_list|length }} subcategor{{ categoria.subcategorias_list|length|pluralize:"y,ies" }}</span>
+                                <span>{{ categoria.subcategorias_list|length }} {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}subcategor{{ categoria.subcategorias_list|length|pluralize:"ía,ías" }}{% else %}subcategor{{ categoria.subcategorias_list|length|pluralize:"y,ies" }}{% endif %}</span>
                                 {% endif %}
                             </div>
                         </div>
@@ -498,7 +560,7 @@
 
                     {% if servicio.tipo_label %}
                     <div class="text-xs space-text-muted mt-2">
-                        Type: <span class="text-cyan-400">{{ servicio.tipo_label }}</span>
+                        {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Tipo:{% else %}Type:{% endif %} <span class="text-cyan-400">{{ servicio.tipo_label }}</span>
                     </div>
                     {% endif %}
                 </div>
@@ -510,27 +572,27 @@
         <!-- Empty State -->
         <div class="empty-state">
             <div class="empty-state-icon">🔧</div>
-            <h3 class="text-2xl font-bold space-text mb-2">No Services Found</h3>
+            <h3 class="text-2xl font-bold space-text mb-2">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}No se encontraron servicios{% else %}No Services Found{% endif %}</h3>
             <p class="space-text-muted mb-6">
                 {% if debug_info.total_servicios_raw == 0 %}
-                    No services have been created yet for country <strong>{{ country_code }}</strong>.
+                    {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Aún no se han creado servicios para el país <strong>{{ country_code }}</strong>.{% else %}No services have been created yet for country <strong>{{ country_code }}</strong>.{% endif %}
                 {% else %}
-                    No services match your current filters. Try adjusting your search or filters.
+                    {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Ningún servicio coincide con tus filtros actuales. Intenta ajustar tu búsqueda o filtros.{% else %}No services match your current filters. Try adjusting your search or filters.{% endif %}
                 {% endif %}
             </p>
             {% if categorias %}
             <div class="mb-4 p-4 bg-cyan-400/10 border border-cyan-400/30 rounded-lg">
                 <p class="text-sm space-text-muted mb-2">
-                    <strong class="text-cyan-400">ℹ️ Info:</strong> You have {{ categorias|length }} categor{{ categorias|length|pluralize:"y,ies" }} available, but no services have been created yet.
+                    <strong class="text-cyan-400">ℹ️ {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Info:{% else %}Info:{% endif %}</strong> {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Tienes {{ categorias|length }} categor{{ categorias|length|pluralize:"ía,ías" }} disponible{{ categorias|length|pluralize:",s" }}, pero aún no se han creado servicios.{% else %}You have {{ categorias|length }} categor{{ categorias|length|pluralize:"y,ies" }} available, but no services have been created yet.{% endif %}
                 </p>
                 <p class="text-xs space-text-muted">
-                    Categories are ready to use. Start adding services to build your catalog.
+                    {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Las categorías están listas para usar. Comienza agregando servicios para construir tu catálogo.{% else %}Categories are ready to use. Start adding services to build your catalog.{% endif %}
                 </p>
             </div>
             {% endif %}
             <a href="{% country_url 'servicios:crear_servicio' %}" class="space-button inline-flex items-center gap-2">
                 <span>⚡</span>
-                <span>Add First Service</span>
+                <span>{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Agregar Primer Servicio{% else %}Add First Service{% endif %}</span>
             </a>
             {% if debug_info %}
             <div class="mt-6 p-4 bg-gray-800/50 border border-gray-700/50 rounded-lg text-xs space-text-muted">
@@ -559,9 +621,9 @@
             <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
                 <div class="flex items-center space-x-2 space-text-muted text-sm">
                     <span class="text-cyan-300">📊</span>
-                    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    <span>{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Página{% else %}Page{% endif %} {{ page_obj.number }} {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}de{% else %}of{% endif %} {{ page_obj.paginator.num_pages }}</span>
                     <span class="text-gray-600">•</span>
-                    <span>{{ paginator.count }} records</span>
+                    <span>{{ paginator.count }} {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}registros{% else %}records{% endif %}</span>
                 </div>
 
                 <nav class="flex items-center space-x-2">
@@ -569,24 +631,24 @@
                     <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                        class="space-button text-xs">
                         <span>⏮️</span>
-                        <span class="hidden sm:inline">First</span>
+                        <span class="hidden sm:inline">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Primera{% else %}First{% endif %}</span>
                     </a>
                     <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                        class="space-button text-xs">
                         <span>⬅️</span>
-                        <span class="hidden sm:inline">Previous</span>
+                        <span class="hidden sm:inline">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Anterior{% else %}Previous{% endif %}</span>
                     </a>
                     {% endif %}
 
                     {% if page_obj.has_next %}
                     <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                        class="space-button text-xs">
-                        <span class="hidden sm:inline">Next</span>
+                        <span class="hidden sm:inline">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Siguiente{% else %}Next{% endif %}</span>
                         <span>➡️</span>
                     </a>
                     <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                        class="space-button text-xs">
-                        <span class="hidden sm:inline">Last</span>
+                        <span class="hidden sm:inline">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Última{% else %}Last{% endif %}</span>
                         <span>⏭️</span>
                     </a>
                     {% endif %}
@@ -609,16 +671,16 @@
                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-600/20 to-pink-600/20 border border-red-400/40 flex items-center justify-center">
                         <span class="text-red-400 text-2xl">⚠️</span>
                     </div>
-                    <h3 class="text-xl font-bold space-text mb-2">Confirm Deletion</h3>
-                    <p class="space-text-muted mb-6">Are you sure you want to delete the service <span id="nombreServicio" class="text-red-400 font-semibold"></span>?</p>
+                    <h3 class="text-xl font-bold space-text mb-2">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Confirmar Eliminación{% else %}Confirm Deletion{% endif %}</h3>
+                    <p class="space-text-muted mb-6">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}¿Está seguro de que desea eliminar el servicio{% else %}Are you sure you want to delete the service{% endif %} <span id="nombreServicio" class="text-red-400 font-semibold"></span>?</p>
                     <div class="flex space-x-3">
                         <button onclick="cerrarModal()"
                                 class="flex-1 space-button bg-gray-600/20 border-gray-500/40 space-text">
-                            Cancel
+                            {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancel{% endif %}
                         </button>
                         <button onclick="eliminarServicio()"
                                 class="flex-1 space-button bg-red-600/20 border-red-400/40 text-red-300">
-                            Delete
+                            {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Eliminar{% else %}Delete{% endif %}
                         </button>
                     </div>
                 </div>
@@ -778,12 +840,12 @@ window.eliminarServicio = function() {
         if (response.ok) {
             window.location.reload();
         } else {
-            alert('Error deleting service');
+            alert('{% if LANGUAGE_CODE == "es" or request.LANGUAGE_CODE == "es" %}Error al eliminar servicio{% else %}Error deleting service{% endif %}');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error deleting service');
+        alert('{% if LANGUAGE_CODE == "es" or request.LANGUAGE_CODE == "es" %}Error al eliminar servicio{% else %}Error deleting service{% endif %}');
     });
 };
 </script>

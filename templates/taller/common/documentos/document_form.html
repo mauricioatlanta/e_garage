@@ -309,10 +309,10 @@ input:disabled, select:disabled, textarea:disabled {
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
     <div class="flex-1">
       <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-        📝 {% if is_cl == 'CL' %}Crear documento{% else %}{% trans "Create Document" %}{% endif %}
+        📝 {{ ui_labels.new_document }}
       </h1>
       <p class="text-sm sm:text-base text-slate-300">
-        {% if is_cl == 'CL' %}Crea un nuevo documento para el taller{% else %}{% trans "Create a new document for the workshop" %}{% endif %}
+        {{ ui_labels.new_document }}
       </p>
     </div>
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
@@ -417,12 +417,12 @@ function submitLanguageDoc(lang) {
 
         <label for="id_tipo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Tipo de documento{% else %}{% trans "Document Type" %}{% endif %}</label>
         <select id="id_tipo" name="tipo" class="form-select w-full text-base">
-          <option value="OT" {% if form.tipo.value == 'OT' or documento.tipo == 'OT' %}selected{% endif %}>{% if is_cl == 'CL' %}Orden de trabajo{% else %}{% trans "Work Order" %}{% endif %}</option>
-          <option value="FAC" {% if form.tipo.value == 'FAC' or documento.tipo == 'FAC' %}selected{% endif %}>{% if is_cl == 'CL' %}Factura / Boleta{% else %}{% trans "Invoice/Receipt" %}{% endif %}</option>
-          <option value="PRES" {% if form.tipo.value == 'PRES' or documento.tipo == 'PRES' %}selected{% endif %}>{% if is_cl == 'CL' %}Presupuesto{% else %}{% trans "Estimate" %}{% endif %}</option>
+          <option value="OT" {% if form.tipo.value == 'OT' or documento.tipo == 'OT' %}selected{% endif %}>{{ ui_labels.document_type_work_order }}</option>
+          <option value="FAC" {% if form.tipo.value == 'FAC' or documento.tipo == 'FAC' %}selected{% endif %}>{{ ui_labels.document_type_invoice }}</option>
+          <option value="PRES" {% if form.tipo.value == 'PRES' or documento.tipo == 'PRES' %}selected{% endif %}>{{ ui_labels.document_type_estimate }}</option>
         </select>
 
-        <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Número{% else %}{% trans "Number" %}{% endif %}</label>
+        <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{{ ui_labels.document_number }}</label>
         <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-2 sm:py-3 text-sm sm:text-base" id="id_numero">
           {% if es_edicion and documento.numero_documento %}{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% elif is_cl == 'CL' %}Se generará automáticamente{% else %}{% trans "Will be generated automatically" %}{% endif %}
         </div>
@@ -623,7 +623,7 @@ function submitLanguageDoc(lang) {
           {% if is_cl == 'CL' %}🌐 Ir a otros servicios{% else %}🌐 {% trans "Go to Other Services" %}{% endif %}
         </a>
       </div>
-      <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">{% if is_cl == 'CL' %}💾 Guardar documento{% else %}💾 {% trans "Save Document" %}{% endif %}</button>
+      <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">💾 {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{{ ui_labels.create_button }}{% endif %}</button>
     </div>
   </div>
 

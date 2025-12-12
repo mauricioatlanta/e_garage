@@ -157,3 +157,5 @@ Esto te confirmará si el problema es que el teléfono está forzando un "Modo O
 
 
 
+
+

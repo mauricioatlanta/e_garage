@@ -10,7 +10,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            background: linear-gradient(135deg, #0a0a23 0%, #1a1a2e 50%, #16213e 100%);
+            /* Fondo estático profesional - sin animaciones */
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
             font-family: 'Exo 2', sans-serif;
             color: #fff;
             min-height: 100vh;
@@ -24,108 +25,31 @@
             letter-spacing: 0.05em;
         }
 
-        /* Grid animada de fondo */
-        .tech-grid {
-            background-image:
-                linear-gradient(rgba(0, 230, 255, 0.1) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 230, 255, 0.1) 1px, transparent 1px);
-            background-size: 50px 50px;
-            animation: grid-move 20s linear infinite;
-            position: fixed;
-            inset: 0;
-            z-index: -1;
-        }
+        /* Grid animada de fondo - DESACTIVADA para diseño serio */
+        /* .tech-grid { ... } */
 
-        @keyframes grid-move {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
+        /* Partículas flotantes - DESACTIVADAS */
+        /* .particles { ... } */
 
-        /* Partículas flotantes */
-        .particles {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
+        /* Líneas de energía - DESACTIVADAS */
+        /* .energy-lines { ... } */
 
-        .particle {
-            position: absolute;
-            width: 3px;
-            height: 3px;
-            background: #00e6ff;
-            border-radius: 50%;
-            animation: particle-float 8s linear infinite;
-            box-shadow: 0 0 10px #00e6ff;
-        }
-
-        @keyframes particle-float {
-            0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-100px) translateX(50px) rotate(360deg); opacity: 0; }
-        }
-
-        /* Líneas de energía */
-        .energy-lines {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            pointer-events: none;
-        }
-
-        .energy-line {
-            position: absolute;
-            width: 2px;
-            height: 150px;
-            background: linear-gradient(to bottom, transparent, #00e6ff, transparent);
-            animation: energy-flow 4s linear infinite;
-        }
-
-        @keyframes energy-flow {
-            0% { transform: translateY(-200px); opacity: 0; }
-            50% { opacity: 1; }
-            100% { transform: translateY(120vh); opacity: 0; }
-        }
-
-        /* Glass morphism para tarjetas */
+        /* Glass morphism simplificado - diseño serio */
         .glass-card {
-            background: linear-gradient(135deg, rgba(0, 230, 255, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
-            backdrop-filter: blur(25px);
-            border-radius: 2rem;
-            border: 1px solid rgba(0, 230, 255, 0.3);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow:
-                0 8px 32px rgba(0, 230, 255, 0.15),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.8); /* Slate oscuro sólido */
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
         }
 
-        .glass-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(0, 230, 255, 0.2), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .glass-card:hover::before {
-            left: 100%;
-        }
-
         .glass-card:hover {
-            border-color: rgba(0, 230, 255, 0.8);
-            transform: translateY(-8px) scale(1.02);
-            box-shadow:
-                0 25px 50px rgba(0, 230, 255, 0.3),
-                0 0 30px rgba(0, 230, 255, 0.2),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border-color: rgba(148, 163, 184, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
         }
 
         /* Tarjeta premium con efecto especial */
@@ -299,30 +223,14 @@
     </style>
 </head>
 <body>
-    <!-- Grid de fondo -->
-    <div class="tech-grid"></div>
+    <!-- Grid de fondo - DESACTIVADO para diseño serio -->
+    <!-- <div class="tech-grid"></div> -->
 
-    <!-- Partículas flotantes -->
-    <div class="particles">
-        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
-        <div class="particle" style="left: 20%; animation-delay: 1s;"></div>
-        <div class="particle" style="left: 30%; animation-delay: 2s;"></div>
-        <div class="particle" style="left: 40%; animation-delay: 3s;"></div>
-        <div class="particle" style="left: 50%; animation-delay: 4s;"></div>
-        <div class="particle" style="left: 60%; animation-delay: 0.5s;"></div>
-        <div class="particle" style="left: 70%; animation-delay: 1.5s;"></div>
-        <div class="particle" style="left: 80%; animation-delay: 2.5s;"></div>
-        <div class="particle" style="left: 90%; animation-delay: 3.5s;"></div>
-    </div>
+    <!-- Partículas flotantes - DESACTIVADAS para diseño serio -->
+    <!-- <div class="particles">...</div> -->
 
-    <!-- Líneas de energía -->
-    <div class="energy-lines">
-        <div class="energy-line" style="left: 15%; animation-delay: 0s;"></div>
-        <div class="energy-line" style="left: 35%; animation-delay: 1s;"></div>
-        <div class="energy-line" style="left: 55%; animation-delay: 2s;"></div>
-        <div class="energy-line" style="left: 75%; animation-delay: 1.5s;"></div>
-        <div class="energy-line" style="left: 95%; animation-delay: 0.5s;"></div>
-    </div>
+    <!-- Líneas de energía - DESACTIVADAS para diseño serio -->
+    <!-- <div class="energy-lines">...</div> -->
 
     <!-- Contenido principal -->
     <div class="relative z-10 container mx-auto px-4 py-16">

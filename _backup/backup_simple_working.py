@@ -80,9 +80,7 @@ class BackupSimplificado:
                     "telefono": empresa.telefono,
                     "email": empresa.email,
                     "created_at": (
-                        empresa.created_at.isoformat()
-                        if hasattr(empresa, "created_at")
-                        else None
+                        empresa.created_at.isoformat() if hasattr(empresa, "created_at") else None
                     ),
                 },
                 "timestamp": timestamp,
@@ -122,17 +120,13 @@ class BackupSimplificado:
                     backup_data["datos"]["repuestos_documento"] = json.loads(
                         serializers.serialize(
                             "json",
-                            RepuestoDocumento.objects.filter(
-                                documento__in=documentos_empresa
-                            ),
+                            RepuestoDocumento.objects.filter(documento__in=documentos_empresa),
                         )
                     )
                     backup_data["datos"]["servicios_documento"] = json.loads(
                         serializers.serialize(
                             "json",
-                            ServicioDocumento.objects.filter(
-                                documento__in=documentos_empresa
-                            ),
+                            ServicioDocumento.objects.filter(documento__in=documentos_empresa),
                         )
                     )
                 except Exception as e:

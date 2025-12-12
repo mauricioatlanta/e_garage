@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
 
-{% block title %}Historial de Mantenimiento - {{ historial_data.vehiculo.patente }}{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Maintenance History{% else %}Historial de Mantenimiento{% endif %} - {{ historial_data.vehiculo.patente }}{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -206,13 +206,13 @@
         background: #059669;
     }
 
-    .btn-api {
-        background: #3b82f6;
+    .btn-whatsapp {
+        background: #25d366;
         color: white;
     }
 
-    .btn-api:hover {
-        background: #2563eb;
+    .btn-whatsapp:hover {
+        background: #20ba5a;
     }
 
     @media (max-width: 768px) {
@@ -240,28 +240,28 @@
 <div class="historial-container">
     <!-- Header -->
     <div class="header-section">
-        <h1>📋 Historial de Mantenimiento</h1>
-        <p>Libro de Mantenciones Digital - Historial completo y verificable</p>
+        <h1>📋 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Maintenance History{% else %}Historial de Mantenimiento{% endif %}</h1>
+        <p>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Digital Maintenance Book - Complete and verifiable history{% else %}Libro de Mantenciones Digital - Historial completo y verificable{% endif %}</p>
         
         <div class="vehiculo-info">
             <div class="info-item">
-                <div class="info-label">Vehículo</div>
+                <div class="info-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Vehicle{% else %}Vehículo{% endif %}</div>
                 <div class="info-value">{{ historial_data.vehiculo.patente }}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">Marca / Modelo</div>
+                <div class="info-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Brand / Model{% else %}Marca / Modelo{% endif %}</div>
                 <div class="info-value">{{ historial_data.vehiculo.get_marca_display }} {{ historial_data.vehiculo.get_modelo_display }}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">Año</div>
+                <div class="info-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Year{% else %}Año{% endif %}</div>
                 <div class="info-value">{{ historial_data.vehiculo.anio }}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">Kilometraje Actual</div>
-                <div class="info-value">{{ historial_data.vehiculo.kilometraje_actual|intcomma }} km</div>
+                <div class="info-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Current Mileage{% else %}Kilometraje Actual{% endif %}</div>
+                <div class="info-value">{{ historial_data.vehiculo.kilometraje_actual|intcomma }} {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}mi{% else %}km{% endif %}</div>
             </div>
             <div class="info-item">
-                <div class="info-label">Cliente</div>
+                <div class="info-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Customer{% else %}Cliente{% endif %}</div>
                 <div class="info-value">{{ historial_data.vehiculo.cliente.nombre }}</div>
             </div>
         </div>
@@ -269,38 +269,38 @@
 
     <!-- Resumen -->
     <div class="resumen-section">
-        <h2 style="margin: 0 0 1rem 0; font-size: 1.5rem; color: #111827;">📊 Resumen del Historial</h2>
+        <h2 style="margin: 0 0 1rem 0; font-size: 1.5rem; color: #111827;">📊 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}History Summary{% else %}Resumen del Historial{% endif %}</h2>
         <div class="resumen-grid">
             <div class="resumen-item">
                 <div class="resumen-value">{{ historial_data.resumen.total_servicios }}</div>
-                <div class="resumen-label">Total Servicios</div>
+                <div class="resumen-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Total Services{% else %}Total Servicios{% endif %}</div>
             </div>
             <div class="resumen-item">
                 <div class="resumen-value">${{ historial_data.resumen.total_gastado|intcomma }}</div>
-                <div class="resumen-label">Total Invertido</div>
+                <div class="resumen-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Total Invested{% else %}Total Invertido{% endif %}</div>
             </div>
             {% if historial_data.resumen.km_promedio_entre_servicios %}
             <div class="resumen-item">
-                <div class="resumen-value">{{ historial_data.resumen.km_promedio_entre_servicios|intcomma }} km</div>
-                <div class="resumen-label">KM Promedio entre Servicios</div>
+                <div class="resumen-value">{{ historial_data.resumen.km_promedio_entre_servicios|intcomma }} {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}mi{% else %}km{% endif %}</div>
+                <div class="resumen-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Average Miles between Services{% else %}KM Promedio entre Servicios{% endif %}</div>
             </div>
             {% endif %}
             {% if historial_data.resumen.dias_promedio_entre_servicios %}
             <div class="resumen-item">
-                <div class="resumen-value">{{ historial_data.resumen.dias_promedio_entre_servicios|floatformat:0 }} días</div>
-                <div class="resumen-label">Días Promedio entre Servicios</div>
+                <div class="resumen-value">{{ historial_data.resumen.dias_promedio_entre_servicios|floatformat:0 }} {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}days{% else %}días{% endif %}</div>
+                <div class="resumen-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Average Days between Services{% else %}Días Promedio entre Servicios{% endif %}</div>
             </div>
             {% endif %}
             {% if historial_data.resumen.fecha_primer_servicio %}
             <div class="resumen-item">
                 <div class="resumen-value">{{ historial_data.resumen.fecha_primer_servicio|date:"d/m/Y" }}</div>
-                <div class="resumen-label">Primer Servicio</div>
+                <div class="resumen-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}First Service{% else %}Primer Servicio{% endif %}</div>
             </div>
             {% endif %}
             {% if historial_data.resumen.fecha_ultimo_servicio %}
             <div class="resumen-item">
                 <div class="resumen-value">{{ historial_data.resumen.fecha_ultimo_servicio|date:"d/m/Y" }}</div>
-                <div class="resumen-label">Último Servicio</div>
+                <div class="resumen-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Last Service{% else %}Último Servicio{% endif %}</div>
             </div>
             {% endif %}
         </div>
@@ -309,11 +309,11 @@
     <!-- Historial Detallado -->
     <div class="historial-table">
         <div class="table-header">
-            <div>Fecha</div>
-            <div>Documento</div>
-            <div>Trabajos Realizados</div>
-            <div>Kilometraje</div>
-            <div>Monto</div>
+            <div>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Date{% else %}Fecha{% endif %}</div>
+            <div>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Document{% else %}Documento{% endif %}</div>
+            <div>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Work Performed{% else %}Trabajos Realizados{% endif %}</div>
+            <div>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Mileage{% else %}Kilometraje{% endif %}</div>
+            <div>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Amount{% else %}Monto{% endif %}</div>
         </div>
 
         {% if historial_data.historial %}
@@ -323,17 +323,22 @@
                 <div>
                     <span class="doc-numero">{{ entrada.numero_documento }}</span>
                     <br>
-                    <span class="doc-tipo tipo-{{ entrada.tipo|lower }}">{{ entrada.tipo }}</span>
+                    <span class="doc-tipo tipo-{{ entrada.documento.tipo|lower }}">
+                        {% if entrada.documento.tipo == 'FAC' %}{{ ui_labels.document_type_invoice }}
+                        {% elif entrada.documento.tipo == 'OT' %}{{ ui_labels.document_type_work_order }}
+                        {% elif entrada.documento.tipo == 'PRES' %}{{ ui_labels.document_type_estimate }}
+                        {% else %}{{ entrada.documento.tipo }}{% endif %}
+                    </span>
                 </div>
                 <div style="font-size: 0.875rem; color: #374151;">
                     {{ entrada.trabajos_realizados|truncatewords:15 }}
                     {% if entrada.tecnico %}
-                        <br><small style="color: #6b7280;">Técnico: {{ entrada.tecnico }}</small>
+                        <br><small style="color: #6b7280;">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Technician:{% else %}Técnico:{% endif %} {{ entrada.tecnico }}</small>
                     {% endif %}
                 </div>
                 <div>
                     {% if entrada.kilometraje %}
-                        <span class="km-value">{{ entrada.kilometraje|intcomma }} km</span>
+                        <span class="km-value">{{ entrada.kilometraje|intcomma }} {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}mi{% else %}km{% endif %}</span>
                     {% else %}
                         <span style="color: #9ca3af;">N/A</span>
                     {% endif %}
@@ -346,8 +351,8 @@
         {% else %}
             <div class="empty-state">
                 <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
-                <h3>No hay historial registrado</h3>
-                <p>Este vehículo aún no tiene servicios registrados en el sistema.</p>
+                <h3>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No maintenance history recorded{% else %}No hay historial registrado{% endif %}</h3>
+                <p>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}This vehicle does not yet have services registered in the system.{% else %}Este vehículo aún no tiene servicios registrados en el sistema.{% endif %}</p>
             </div>
         {% endif %}
     </div>
@@ -355,21 +360,41 @@
     <!-- Botones de Acción -->
     {% if historial_data.historial %}
     <div class="action-buttons">
-        <a href="{% url 'reportes:api_historial_vehiculo' historial_data.vehiculo.id %}" 
-           class="btn-action btn-api" 
-           target="_blank">
-            📡 Ver JSON (API)
-        </a>
         <a href="{% url 'reportes:exportar_historial_pdf' historial_data.vehiculo.id %}" 
            class="btn-action btn-export-pdf">
-            📄 Exportar PDF
+            📄 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Export PDF{% else %}Exportar PDF{% endif %}
         </a>
         <a href="{% url 'reportes:exportar_historial_excel' historial_data.vehiculo.id %}" 
            class="btn-action btn-export-excel">
-            📊 Exportar Excel
+            📊 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Export Excel{% else %}Exportar Excel{% endif %}
         </a>
+        {% if historial_data.vehiculo.cliente.telefono %}
+        <a href="#" 
+           onclick="sendWhatsAppReport('{{ historial_data.vehiculo.cliente.telefono|slice:"1:" }}', '{{ historial_data.vehiculo.cliente.nombre }}', '{{ historial_data.vehiculo.patente }}', '{{ request.build_absolute_uri }}'); return false;"
+           class="btn-action btn-whatsapp">
+            📱 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Send via WhatsApp{% else %}Enviar por WhatsApp{% endif %}
+        </a>
+        {% endif %}
     </div>
     {% endif %}
 </div>
+
+<script>
+function sendWhatsAppReport(telefono, nombreCliente, patente, urlReporte) {
+    const isEnglish = '{{ LANGUAGE_CODE }}' === 'en' || '{{ request.LANGUAGE_CODE }}' === 'en';
+    
+    let mensaje;
+    if (isEnglish) {
+        mensaje = `Hello ${nombreCliente},\n\nHere is the maintenance history report for your vehicle ${patente}:\n${urlReporte}\n\nThank you for trusting us! 🚗✨`;
+    } else {
+        mensaje = `Hola ${nombreCliente},\n\nAquí está el reporte de historial de mantenimiento de tu vehículo ${patente}:\n${urlReporte}\n\n¡Gracias por confiar en nosotros! 🚗✨`;
+    }
+    
+    const mensajeEncoded = encodeURIComponent(mensaje);
+    const whatsappUrl = `https://wa.me/${telefono}?text=${mensajeEncoded}`;
+    
+    window.open(whatsappUrl, '_blank');
+}
+</script>
 {% endblock %}
 

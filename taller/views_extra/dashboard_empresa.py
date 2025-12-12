@@ -573,7 +573,7 @@ def dashboard_centro_operaciones_espacial(request):
     # 📊 DATOS PARA GRÁFICOS (DATOS REALES)
     import json
     from calendar import month_abbr
-    
+
     # 1. Gráfico de Ingresos Mensuales (últimos 7 meses)
     ingresos_mensuales_labels = []
     ingresos_mensuales_data = []
@@ -581,7 +581,7 @@ def dashboard_centro_operaciones_espacial(request):
         # Calcular el mes retrocediendo correctamente
         mes_actual = hoy.month
         año_actual = hoy.year
-        
+
         # Retroceder i meses
         meses_retroceder = i
         if mes_actual > meses_retroceder:
@@ -593,13 +593,13 @@ def dashboard_centro_operaciones_espacial(request):
             if mes_target == 0:
                 mes_target = 12
             año_target = año_actual - (1 + meses_restantes // 12)
-        
+
         inicio_mes = date(año_target, mes_target, 1)
         if mes_target == 12:
             fin_mes = date(año_target + 1, 1, 1)
         else:
             fin_mes = date(año_target, mes_target + 1, 1)
-        
+
         # Calcular facturación del mes (servicios + repuestos)
         facturacion_mes_srv = total_servicios(
             LineaServicio.objects.filter(
@@ -609,7 +609,7 @@ def dashboard_centro_operaciones_espacial(request):
                 documento__fecha_emision__lt=fin_mes,
             )
         ) or Decimal("0")
-        
+
         facturacion_mes_rep = total_repuestos(
             LineaRepuesto.objects.filter(
                 documento__empresa=empresa,
@@ -618,40 +618,46 @@ def dashboard_centro_operaciones_espacial(request):
                 documento__fecha_emision__lt=fin_mes,
             )
         ) or Decimal("0")
-        
+
         total_mes = float(facturacion_mes_srv + facturacion_mes_rep)
         ingresos_mensuales_labels.append(month_abbr[inicio_mes.month].upper())
         ingresos_mensuales_data.append(total_mes)
-    
+
     # 2. Gráfico de Servicios (distribución porcentual de los top servicios)
     servicios_chart_labels = []
     servicios_chart_data = []
-    servicios_chart_colors = ['#00ffff', '#8a2be2', '#ffd700', '#00ff88', '#ff3b3b']
-    
+    servicios_chart_colors = ["#00ffff", "#8a2be2", "#ffd700", "#00ff88", "#ff3b3b"]
+
     if servicios_top:
-        total_servicios_count = sum(s['cantidad'] for s in servicios_top)
+        total_servicios_count = sum(s["cantidad"] for s in servicios_top)
         for idx, servicio in enumerate(servicios_top[:5]):  # Top 5
-            servicios_chart_labels.append(servicio['nombre'][:20])  # Limitar longitud
-            porcentaje = (servicio['cantidad'] / total_servicios_count * 100) if total_servicios_count > 0 else 0
+            servicios_chart_labels.append(servicio["nombre"][:20])  # Limitar longitud
+            porcentaje = (
+                (servicio["cantidad"] / total_servicios_count * 100)
+                if total_servicios_count > 0
+                else 0
+            )
             servicios_chart_data.append(round(porcentaje, 1))
     else:
         # Si no hay datos, mostrar mensaje vacío
         servicios_chart_labels = []
         servicios_chart_data = []
-    
+
     # 3. Gráfico de Técnicos Productivos (barras con ingresos generados)
     tecnicos_chart_labels = []
     tecnicos_chart_data = []
-    
+
     if tecnicos_productivos:
         for tecnico in tecnicos_productivos[:4]:  # Top 4 técnicos
-            nombre = tecnico['tecnico'].nombre if tecnico['tecnico'] else "Unknown"
+            nombre = tecnico["tecnico"].nombre if tecnico["tecnico"] else "Unknown"
             tecnicos_chart_labels.append(nombre[:15])  # Limitar longitud
             # Calcular porcentaje de productividad basado en ingresos (normalizado)
-            ingresos = float(tecnico['ingresos_generados'] or 0)
+            ingresos = float(tecnico["ingresos_generados"] or 0)
             # Si hay ingresos, calcular un porcentaje relativo (máximo 100%)
             if ingresos > 0 and tecnicos_productivos:
-                max_ingresos = max(float(t['ingresos_generados'] or 0) for t in tecnicos_productivos)
+                max_ingresos = max(
+                    float(t["ingresos_generados"] or 0) for t in tecnicos_productivos
+                )
                 porcentaje = (ingresos / max_ingresos * 100) if max_ingresos > 0 else 0
             else:
                 porcentaje = 0
@@ -660,22 +666,24 @@ def dashboard_centro_operaciones_espacial(request):
         # Si no hay datos, mostrar mensaje vacío
         tecnicos_chart_labels = []
         tecnicos_chart_data = []
-    
+
     # Convertir a JSON para pasar al template
-    chart_data_json = json.dumps({
-        'ingresos_mensuales': {
-            'labels': ingresos_mensuales_labels,
-            'data': ingresos_mensuales_data,
-        },
-        'servicios': {
-            'labels': servicios_chart_labels,
-            'data': servicios_chart_data,
-        },
-        'tecnicos': {
-            'labels': tecnicos_chart_labels,
-            'data': tecnicos_chart_data,
+    chart_data_json = json.dumps(
+        {
+            "ingresos_mensuales": {
+                "labels": ingresos_mensuales_labels,
+                "data": ingresos_mensuales_data,
+            },
+            "servicios": {
+                "labels": servicios_chart_labels,
+                "data": servicios_chart_data,
+            },
+            "tecnicos": {
+                "labels": tecnicos_chart_labels,
+                "data": tecnicos_chart_data,
+            },
         }
-    })
+    )
 
     # Branding - Usar la misma lógica que el context processor
     from django.conf import settings
@@ -736,7 +744,11 @@ def dashboard_centro_operaciones_espacial(request):
         company_name = empresa.nombre_taller
     if not tagline:
         tagline = getattr(empresa, "tagline", None)
-    if company_color == getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#00ffff") and hasattr(empresa, "color_primario") and empresa.color_primario:
+    if (
+        company_color == getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#00ffff")
+        and hasattr(empresa, "color_primario")
+        and empresa.color_primario
+    ):
         company_color = empresa.color_primario
 
     context = {

@@ -42,13 +42,13 @@ class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMi
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         empresa = getattr(self.request.user, "empresa", None)
-        
+
         if not empresa:
             return context
-        
+
         # Obtener queryset base para estadísticas
         base_qs = Cliente.objects.filter(empresa=empresa)
-        
+
         # Aplicar los mismos filtros de búsqueda a las estadísticas
         q = (self.request.GET.get("q") or "").strip()
         if q:
@@ -59,12 +59,12 @@ class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMi
                 | models.Q(telefono__icontains=q)
                 | models.Q(tax_id__icontains=q)
             )
-        
+
         hoy = date.today()
         hace_30_dias = hoy - timedelta(days=30)
         hace_7_dias = hoy - timedelta(days=7)
         inicio_mes = hoy.replace(day=1)
-        
+
         # Calcular estadísticas
         estadisticas = base_qs.aggregate(
             total=Count("id"),
@@ -75,25 +75,26 @@ class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMi
             nuevos_30_dias=Count("id", filter=Q(created_at__date__gte=hace_30_dias)),
             nuevos_7_dias=Count("id", filter=Q(created_at__date__gte=hace_7_dias)),
         )
-        
+
         # Clientes por ciudad (top 5)
         clientes_por_ciudad = (
             base_qs.values("ciudad__nombre")
             .annotate(cantidad=Count("id"))
             .order_by("-cantidad")[:5]
         )
-        
+
         # Clientes con más vehículos (top 5)
         clientes_con_vehiculos = (
             base_qs.annotate(num_vehiculos=Count("vehiculo"))
             .filter(num_vehiculos__gt=0)
             .order_by("-num_vehiculos")[:5]
         )
-        
+
         # Clientes activos (con documentos en los últimos 90 días)
         hace_90_dias = hoy - timedelta(days=90)
         try:
             from taller.models.documentos import Documento
+
             clientes_activos = (
                 base_qs.filter(
                     documentos__fecha_emision__gte=hace_90_dias,
@@ -104,9 +105,10 @@ class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMi
             )
         except Exception:
             clientes_activos = 0
-        
+
         # Datos para gráfico de clientes nuevos por mes (últimos 6 meses)
         from datetime import datetime
+
         datos_grafico = []
         for i in range(6):
             mes_fecha = hoy.replace(day=1) - timedelta(days=30 * i)
@@ -114,32 +116,35 @@ class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMi
                 mes_anterior = mes_fecha.replace(year=mes_fecha.year - 1, month=12)
             else:
                 mes_anterior = mes_fecha.replace(month=mes_fecha.month - 1)
-            
+
             # Convertir a datetime para comparar con created_at
             inicio_mes_dt = datetime.combine(mes_anterior, datetime.min.time())
             fin_mes_dt = datetime.combine(mes_fecha + timedelta(days=32), datetime.min.time())
-            
+
             clientes_mes = base_qs.filter(
-                created_at__gte=inicio_mes_dt,
-                created_at__lt=fin_mes_dt
+                created_at__gte=inicio_mes_dt, created_at__lt=fin_mes_dt
             ).count()
-            
-            datos_grafico.append({
-                "mes": mes_fecha.strftime("%b %Y"),
-                "cantidad": clientes_mes,
-            })
-        
+
+            datos_grafico.append(
+                {
+                    "mes": mes_fecha.strftime("%b %Y"),
+                    "cantidad": clientes_mes,
+                }
+            )
+
         datos_grafico.reverse()  # Ordenar cronológicamente
-        
-        context.update({
-            "estadisticas": estadisticas,
-            "clientes_por_ciudad": list(clientes_por_ciudad),
-            "clientes_con_vehiculos": list(clientes_con_vehiculos),
-            "clientes_activos": clientes_activos,
-            "datos_grafico": datos_grafico,
-            "empresa": empresa,
-        })
-        
+
+        context.update(
+            {
+                "estadisticas": estadisticas,
+                "clientes_por_ciudad": list(clientes_por_ciudad),
+                "clientes_con_vehiculos": list(clientes_con_vehiculos),
+                "clientes_activos": clientes_activos,
+                "datos_grafico": datos_grafico,
+                "empresa": empresa,
+            }
+        )
+
         return context
 
 

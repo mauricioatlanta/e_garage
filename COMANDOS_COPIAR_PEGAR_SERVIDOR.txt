@@ -1,0 +1,62 @@
+═══════════════════════════════════════════════════════════
+  📋 COMANDOS PARA COPIAR Y PEGAR EN EL SERVIDOR
+═══════════════════════════════════════════════════════════
+
+⚠️  EJECUTAR EN ORDEN (uno por uno):
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  IR AL DIRECTORIO DEL PROYECTO
+
+cd /ruta/a/egarage
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+2️⃣  ACTIVAR VIRTUAL ENVIRONMENT
+
+source venv/bin/activate
+
+# O si usas workon:
+workon venv_egarage310
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+3️⃣  VERIFICAR ARCHIVOS SUBIDOS
+
+ls -la templates/us/en/onboarding/bienvenida.html
+ls -la templates/us/es/onboarding/bienvenida.html
+ls -la templates/account/signup.html
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+4️⃣  VERIFICAR DJANGO
+
+python manage.py check --deploy
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+5️⃣  RECOLECTAR ARCHIVOS ESTÁTICOS
+
+python manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+6️⃣  REINICIAR SERVIDOR WEB
+
+# PythonAnywhere: Ir a Web tab → Reload
+# Otros:
+sudo systemctl restart gunicorn-egarage
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ VERIFICAR:
+
+# Abrir en navegador:
+http://servidor/us/en/bienvenida/
+http://servidor/accounts/signup/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+
+

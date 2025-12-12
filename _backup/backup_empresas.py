@@ -46,9 +46,7 @@ class BackupEmpresa:
         try:
             empresa = Empresa.objects.get(id=empresa_id)
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            backup_name = (
-                f"backup_{empresa.nombre_taller.replace(' ', '_')}_{timestamp}"
-            )
+            backup_name = f"backup_{empresa.nombre_taller.replace(' ', '_')}_{timestamp}"
             backup_path = os.path.join(self.backup_dir, backup_name)
 
             os.makedirs(backup_path, exist_ok=True)
@@ -92,9 +90,7 @@ class BackupEmpresa:
     def _backup_empresa_data(self, empresa, backup_path):
         """Backup datos de la empresa"""
         data = serializers.serialize("json", [empresa], indent=2)
-        with open(
-            os.path.join(backup_path, "empresa.json"), "w", encoding="utf-8"
-        ) as f:
+        with open(os.path.join(backup_path, "empresa.json"), "w", encoding="utf-8") as f:
             f.write(data)
         print("   📋 Empresa exportada")
 
@@ -103,9 +99,7 @@ class BackupEmpresa:
         clientes = Cliente.objects.filter(empresa=empresa)
         if clientes.exists():
             data = serializers.serialize("json", clientes, indent=2)
-            with open(
-                os.path.join(backup_path, "clientes.json"), "w", encoding="utf-8"
-            ) as f:
+            with open(os.path.join(backup_path, "clientes.json"), "w", encoding="utf-8") as f:
                 f.write(data)
             print(f"   👥 {clientes.count()} clientes exportados")
         else:
@@ -117,9 +111,7 @@ class BackupEmpresa:
             vehiculos = Vehiculo.objects.filter(empresa=empresa)
             if vehiculos.exists():
                 data = serializers.serialize("json", vehiculos, indent=2)
-                with open(
-                    os.path.join(backup_path, "vehiculos.json"), "w", encoding="utf-8"
-                ) as f:
+                with open(os.path.join(backup_path, "vehiculos.json"), "w", encoding="utf-8") as f:
                     f.write(data)
                 print(f"   🚗 {vehiculos.count()} vehículos exportados")
             else:
@@ -133,9 +125,7 @@ class BackupEmpresa:
         if documentos.exists():
             # Exportar documentos
             data = serializers.serialize("json", documentos, indent=2)
-            with open(
-                os.path.join(backup_path, "documentos.json"), "w", encoding="utf-8"
-            ) as f:
+            with open(os.path.join(backup_path, "documentos.json"), "w", encoding="utf-8") as f:
                 f.write(data)
 
             # Exportar repuestos de documentos
@@ -171,9 +161,7 @@ class BackupEmpresa:
         logs = LogAuditoria.objects.filter(empresa=empresa)
         if logs.exists():
             data = serializers.serialize("json", logs, indent=2)
-            with open(
-                os.path.join(backup_path, "auditoria.json"), "w", encoding="utf-8"
-            ) as f:
+            with open(os.path.join(backup_path, "auditoria.json"), "w", encoding="utf-8") as f:
                 f.write(data)
             print(f"   📊 {logs.count()} logs de auditoría exportados")
         else:
@@ -198,19 +186,13 @@ class BackupEmpresa:
                 "clientes": Cliente.objects.filter(empresa=empresa).count(),
                 "vehiculos": Vehiculo.objects.filter(empresa=empresa).count(),
                 "documentos": Documento.objects.filter(empresa=empresa).count(),
-                "repuestos": LineaRepuesto.objects.filter(
-                    documento__empresa=empresa
-                ).count(),
-                "servicios": LineaServicio.objects.filter(
-                    documento__empresa=empresa
-                ).count(),
+                "repuestos": LineaRepuesto.objects.filter(documento__empresa=empresa).count(),
+                "servicios": LineaServicio.objects.filter(documento__empresa=empresa).count(),
                 "logs_auditoria": LogAuditoria.objects.filter(empresa=empresa).count(),
             },
         }
 
-        with open(
-            os.path.join(backup_path, "metadata.json"), "w", encoding="utf-8"
-        ) as f:
+        with open(os.path.join(backup_path, "metadata.json"), "w", encoding="utf-8") as f:
             json.dump(metadata, f, indent=2, ensure_ascii=False)
 
         print("   ℹ️ Metadata creada")

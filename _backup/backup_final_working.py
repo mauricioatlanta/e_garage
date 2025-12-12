@@ -102,9 +102,7 @@ class BackupFinal:
                     "telefono": empresa.telefono,
                     "email": empresa.email,
                     "fecha_inicio": (
-                        empresa.fecha_inicio.isoformat()
-                        if empresa.fecha_inicio
-                        else None
+                        empresa.fecha_inicio.isoformat() if empresa.fecha_inicio else None
                     ),
                     "suscripcion_activa": empresa.suscripcion_activa,
                 },
@@ -145,17 +143,13 @@ class BackupFinal:
                     backup_data["datos"]["repuestos_documento"] = json.loads(
                         serializers.serialize(
                             "json",
-                            RepuestoDocumento.objects.filter(
-                                documento__in=documentos_empresa
-                            ),
+                            RepuestoDocumento.objects.filter(documento__in=documentos_empresa),
                         )
                     )
                     backup_data["datos"]["servicios_documento"] = json.loads(
                         serializers.serialize(
                             "json",
-                            ServicioDocumento.objects.filter(
-                                documento__in=documentos_empresa
-                            ),
+                            ServicioDocumento.objects.filter(documento__in=documentos_empresa),
                         )
                     )
 
@@ -166,12 +160,8 @@ class BackupFinal:
                         documento__in=documentos_empresa
                     ).count()
 
-                    logger.info(
-                        f"  - repuestos_documento: {repuestos_doc_count} registros"
-                    )
-                    logger.info(
-                        f"  - servicios_documento: {servicios_doc_count} registros"
-                    )
+                    logger.info(f"  - repuestos_documento: {repuestos_doc_count} registros")
+                    logger.info(f"  - servicios_documento: {servicios_doc_count} registros")
 
                     total_registros += repuestos_doc_count + servicios_doc_count
 
@@ -256,9 +246,7 @@ class BackupFinal:
                         logger.info(f"Backup antiguo eliminado: {backup_file.name}")
 
                 except Exception as e:
-                    logger.warning(
-                        f"No se pudo procesar archivo {backup_file.name}: {e}"
-                    )
+                    logger.warning(f"No se pudo procesar archivo {backup_file.name}: {e}")
                     continue
 
             if archivos_eliminados > 0:

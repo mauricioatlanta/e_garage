@@ -59,9 +59,7 @@ class BackupScheduler:
         """Crear backup completo de una empresa"""
         try:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            empresa_name = getattr(
-                empresa, "nombre_taller", getattr(empresa, "empresa", "empresa")
-            )
+            empresa_name = getattr(empresa, "nombre_taller", getattr(empresa, "empresa", "empresa"))
             backup_filename = f"backup_{empresa_name}_{timestamp}.json"
             backup_path = self.backup_dir / backup_filename
 
@@ -91,9 +89,7 @@ class BackupScheduler:
             backup_data = {
                 "empresa": {
                     "id": getattr(empresa, "id", None),
-                    "nombre": getattr(
-                        empresa, "nombre_taller", getattr(empresa, "empresa", None)
-                    ),
+                    "nombre": getattr(empresa, "nombre_taller", getattr(empresa, "empresa", None)),
                     "rut": getattr(empresa, "rut", None),
                     "direccion": getattr(empresa, "direccion", None),
                     "telefono": getattr(empresa, "telefono", None),
@@ -226,9 +222,7 @@ class BackupScheduler:
                             logger.info(f"Backup antiguo eliminado: {backup_file.name}")
 
                 except (ValueError, IndexError) as e:
-                    logger.warning(
-                        f"No se pudo procesar fecha del archivo {backup_file.name}: {e}"
-                    )
+                    logger.warning(f"No se pudo procesar fecha del archivo {backup_file.name}: {e}")
                     continue
 
             if archivos_eliminados > 0:
@@ -261,9 +255,7 @@ class BackupScheduler:
                     backups_empresa.sort(key=lambda x: x.stat().st_mtime)
 
                     # Eliminar los más antiguos
-                    backups_a_eliminar = backups_empresa[
-                        : -self.max_backups_per_empresa
-                    ]
+                    backups_a_eliminar = backups_empresa[: -self.max_backups_per_empresa]
 
                     for backup in backups_a_eliminar:
                         backup.unlink()

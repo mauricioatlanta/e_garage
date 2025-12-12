@@ -11,3 +11,14 @@ test-results.json
 # Node
 node_modules/
 package-lock.json
+__pycache__/
+*.py[cod]
+*.sqlite3
+db.sqlite3
+staticfiles/
+node_modules/
+playwright-report/
+test-results/
+htmlcov/
+.pytest_cache/
+.ruff_cache/

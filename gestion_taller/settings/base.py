@@ -132,6 +132,7 @@ TEMPLATES = [
                 "taller.context_processors.company_context",
                 "taller.context_processors.company_branding",
                 "taller.context_processors.company_header",
+                "taller.context_processors.ui_labels.ui_labels_context",
             ],
         },
     },

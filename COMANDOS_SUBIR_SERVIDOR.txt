@@ -1,0 +1,96 @@
+╔════════════════════════════════════════════════════════╗
+║  🚀 COMANDOS PARA SUBIR CAMBIOS AL SERVIDOR            ║
+╚════════════════════════════════════════════════════════╝
+
+📦 ARCHIVOS A SUBIR:
+
+1. templates/us/en/onboarding/bienvenida.html
+2. templates/us/es/onboarding/bienvenida.html
+3. templates/account/signup.html (si fue modificado)
+4. templates/us/en/account/signup.html (si fue creado/modificado)
+5. taller/forms/custom_signup.py (si fue modificado)
+6. gestion_taller/urls.py (si fue modificado)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 OPCIÓN 1: SCP (PowerShell/CMD)
+
+# Desde tu PC Windows, ejecutar en PowerShell:
+scp templates/us/en/onboarding/bienvenida.html usuario@servidor:/ruta/a/egarage/templates/us/en/onboarding/
+scp templates/us/es/onboarding/bienvenida.html usuario@servidor:/ruta/a/egarage/templates/us/es/onboarding/
+
+# Si también modificaste estos:
+scp templates/account/signup.html usuario@servidor:/ruta/a/egarage/templates/account/
+scp templates/us/en/account/signup.html usuario@servidor:/ruta/a/egarage/templates/us/en/account/
+scp taller/forms/custom_signup.py usuario@servidor:/ruta/a/egarage/taller/forms/
+scp gestion_taller/urls.py usuario@servidor:/ruta/a/egarage/gestion_taller/
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 OPCIÓN 2: FileZilla/WinSCP (Recomendado)
+
+1. Abrir FileZilla o WinSCP
+2. Conectar a tu servidor:
+   - Host: tu-servidor.com
+   - Usuario: tu-usuario
+   - Puerto: 22 (SFTP)
+   - Contraseña: tu-contraseña
+
+3. Navegar a: /ruta/a/egarage/
+
+4. Arrastrar y soltar estos archivos:
+   - templates/us/en/onboarding/bienvenida.html
+   - templates/us/es/onboarding/bienvenida.html
+   - templates/account/signup.html (si existe)
+   - templates/us/en/account/signup.html (si existe)
+   - taller/forms/custom_signup.py (si existe)
+   - gestion_taller/urls.py (si existe)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 OPCIÓN 3: Git (si usas repositorio)
+
+# En tu PC local:
+git add templates/us/en/onboarding/bienvenida.html
+git add templates/us/es/onboarding/bienvenida.html
+git add templates/account/signup.html
+git add templates/us/en/account/signup.html
+git add taller/forms/custom_signup.py
+git add gestion_taller/urls.py
+
+git commit -m "Actualización: Botones USA con estilo futurista y signup mejorado"
+git push origin main
+
+# En el servidor (SSH):
+cd /ruta/a/egarage
+git pull origin main
+python manage.py collectstatic --noinput
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ DESPUÉS DE SUBIR:
+
+# En el servidor (SSH):
+cd /ruta/a/egarage
+
+# Recolectar archivos estáticos (si hay cambios en CSS)
+python manage.py collectstatic --noinput
+
+# Reiniciar servidor web (si es necesario)
+# PythonAnywhere: Ir a Web tab → Reload
+# Otros: sudo systemctl restart gunicorn-egarage
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 VERIFICAR:
+
+1. Abrir: http://servidor/us/en/bienvenida/
+   - Verificar que los botones tienen bordes neon brillantes
+   - Verificar que "Subscribe" redirige a signup
+
+2. Abrir: http://servidor/accounts/signup/
+   - Verificar que aparecen todos los campos
+   - Verificar que los planes se muestran
+
+
+

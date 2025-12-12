@@ -42,9 +42,7 @@ def lista_vehiculos(request):
         vehiculos = vehiculos.filter(search_query)
 
         # Agregar mensaje de búsqueda
-        messages.info(
-            request, f'🔍 Búsqueda: "{q}" - {vehiculos.count()} vehículos encontrados'
-        )
+        messages.info(request, f'🔍 Búsqueda: "{q}" - {vehiculos.count()} vehículos encontrados')
 
     # Estadísticas para el dashboard
     total_vehiculos = vehiculos.count()
@@ -53,15 +51,11 @@ def lista_vehiculos(request):
 
     # Distribución por marca
     distribucion_marcas = (
-        vehiculos.values("marca__nombre")
-        .annotate(count=Count("id"))
-        .order_by("-count")[:5]
+        vehiculos.values("marca__nombre").annotate(count=Count("id")).order_by("-count")[:5]
     )
 
     # Distribución por año - CORREGIDO: usar 'anio' en lugar de 'ano'
-    distribucion_anios = (
-        vehiculos.values("anio").annotate(count=Count("id")).order_by("-anio")[:10]
-    )
+    distribucion_anios = vehiculos.values("anio").annotate(count=Count("id")).order_by("-anio")[:10]
 
     context = {
         "vehiculos": vehiculos,
@@ -81,9 +75,7 @@ def lista_vehiculos(request):
         from django.template.loader import render_to_string
 
         # Render only the table content for AJAX
-        table_html = render_to_string(
-            "taller/common/vehiculos/_table.html", context, request
-        )
+        table_html = render_to_string("taller/common/vehiculos/_table.html", context, request)
         pagination_html = render_to_string(
             "taller/common/vehiculos/_pagination.html", context, request
         )
@@ -122,12 +114,8 @@ def crear_vehiculo(request):
     context = {
         "form": form,
         "country": "CL",
-        "clientes": Cliente.objects.filter(empresa=empresa)[
-            :500
-        ],  # BLINDAJE: Filtrado por empresa
+        "clientes": Cliente.objects.filter(empresa=empresa)[:500],  # BLINDAJE: Filtrado por empresa
         "marcas": Marca.objects.filter(country="CL").order_by("nombre"),
-        "colores": ColorVehiculo.get_colores_para_pais(
-            "CL"
-        ),  # CORREGIDO: Colores en español
+        "colores": ColorVehiculo.get_colores_para_pais("CL"),  # CORREGIDO: Colores en español
     }
     return render(request, "taller/vehiculos/crear_vehiculo.html", context)

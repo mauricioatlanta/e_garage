@@ -913,7 +913,7 @@ body {
 <nav class="w-full bg-black/80 backdrop-blur-xl border-b-2 border-white/30 shadow-lg py-4 px-6 z-50 relative" style="box-shadow: 0 0 20px rgba(255, 255, 255, 0.2), 0 4px 15px rgba(0, 0, 0, 0.5);">
   <div class="flex flex-col items-center justify-center gap-3">
     {% if request.user.is_authenticated %}
-      <!-- Fila 1: CENTER, CLIENTS, DOCUMENTS, SETTINGS -->
+      <!-- Fila 1: CENTER, CLIENTS, INVOICED, SETTINGS -->
       <div class="flex items-center justify-center gap-3 flex-wrap" style="white-space: nowrap;">
         <a href="/us/centro-operaciones-espacial/" class="nav-button-standard">
           <span class="nav-icon">🚀</span>
@@ -925,7 +925,7 @@ body {
         </a>
         <a href="/us/documentos/" class="nav-button-standard">
           <span class="nav-icon">📄</span>
-          <span>{% trans "DOCUMENTS" %}</span>
+          <span>INVOICED</span>
         </a>
         <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
           <span class="nav-icon">⚙️</span>

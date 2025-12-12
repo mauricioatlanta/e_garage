@@ -847,31 +847,31 @@
   {% if request.path != '/accounts/login/' %}
   <div id="main-navigation" class="flex flex-col items-center justify-center mt-4 gap-3">
     {% if request.user.is_authenticated %}
-      {# Para Chile: siempre español. Para USA: inglés. Si no es /us/, es Chile #}
+      {# Para Chile: siempre español. Para USA: verifica LANGUAGE_CODE (es/en). Si es español, muestra textos en español #}
       <!-- Fila 1: AJUSTES, CENTRO, CLIENTES, DOCUMENTOS, EXTRA -->
       <div class="flex items-center justify-center gap-3 flex-wrap max-w-7xl w-full px-4">
         <!-- AJUSTES -->
         <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">⚙️</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}AJUSTES{% else %}SETTINGS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}AJUSTES{% else %}SETTINGS{% endif %}</span>
         </a>
 
         <!-- CENTRO -->
         <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚀</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}CENTRO{% else %}CENTER{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}CENTRO{% else %}CENTER{% endif %}</span>
         </a>
 
         <!-- CLIENTES -->
         <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">👥</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}CLIENTES{% else %}CLIENTS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}CLIENTES{% else %}CLIENTS{% endif %}</span>
         </a>
 
         <!-- DOCUMENTOS -->
         <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">📄</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}DOCUMENTOS{% else %}DOCUMENTS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}DOCUMENTOS{% else %}INVOICED{% endif %}</span>
         </a>
 
         <!-- EXTRA -->
@@ -886,19 +886,19 @@
         <!-- REPUESTOS -->
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🔧</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}REPUESTOS{% else %}PARTS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}REPUESTOS{% else %}PARTS{% endif %}</span>
         </a>
 
         <!-- REPORTES -->
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">📊</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}REPORTES{% else %}REPORTS{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}REPORTES{% else %}REPORTS{% endif %}</span>
         </a>
 
         <!-- SERVICIOS -->
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🛠️</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SERVICIOS{% else %}SERVICES{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SERVICIOS{% else %}SERVICES{% endif %}</span>
         </a>
 
         <!-- VEHÍCULOS -->
@@ -906,12 +906,12 @@
         {% if vehiculos_url %}
         <a href="{{ vehiculos_url }}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚗</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚗</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
         </a>
         {% endif %}
 
@@ -920,7 +920,7 @@
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚪</span>
-            <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SALIR{% else %}LOGOUT{% endif %}</span>
+            <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SALIR{% else %}LOGOUT{% endif %}</span>
           </button>
         </form>
       </div>
@@ -969,7 +969,7 @@
 
   {# --- PWA Install Prompt Script --- #}
   {# NOTA: No usar defer aquí porque beforeinstallprompt puede dispararse antes #}
-  <script src="{% static 'js/pwa-install-prompt.js' %}?v=2.1.3"></script>
+  <script src="{% static 'js/pwa-install-prompt.js' %}?v=2.1.4"></script>
   
   {# --- PWA Install Debug (TEMPORAL - remover en producción) --- #}
   {# Descomenta la siguiente línea para diagnosticar problemas #}

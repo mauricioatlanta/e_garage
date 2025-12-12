@@ -61,10 +61,14 @@ python manage.py dumpdata \
     --exclude=sessions \
     --output=$BACKUP_JSON
 
-# Backup de SQLite completo
+# Backup de SQLite completo (verificar múltiples ubicaciones posibles)
 if [ -f "db.sqlite3" ]; then
-    echo "   → Backup SQLite completo..."
+    echo "   → Backup SQLite completo (db.sqlite3)..."
     cp db.sqlite3 "$BACKUP_SQLITE"
+    echo -e "${GREEN}   ✅ Backup SQLite: $BACKUP_SQLITE${NC}"
+elif [ -f "/home/atlantareciclajes/apps/egarage/shared/db/db.sqlite3" ]; then
+    echo "   → Backup SQLite completo (shared/db)..."
+    cp /home/atlantareciclajes/apps/egarage/shared/db/db.sqlite3 "$BACKUP_SQLITE"
     echo -e "${GREEN}   ✅ Backup SQLite: $BACKUP_SQLITE${NC}"
 fi
 
@@ -157,6 +161,9 @@ elif [ -d "../venv" ]; then
 elif command -v workon &> /dev/null; then
     echo -e "${YELLOW}🔧 Activando virtual environment (workon)...${NC}"
     workon venv_egarage310 || true
+elif [ -d "/home/atlantareciclajes/.virtualenvs/venv_egarage310" ]; then
+    echo -e "${YELLOW}🔧 Activando virtual environment (ruta absoluta)...${NC}"
+    source /home/atlantareciclajes/.virtualenvs/venv_egarage310/bin/activate
 fi
 
 echo -e "${YELLOW}📦 Actualizando dependencias...${NC}"

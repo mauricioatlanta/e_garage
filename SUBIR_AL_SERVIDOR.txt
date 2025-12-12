@@ -1,0 +1,52 @@
+╔════════════════════════════════════════════════════════╗
+║  📦 ARCHIVOS PARA SUBIR AL SERVIDOR                    ║
+║  Actualización: Signup y Botones USA                  ║
+╚════════════════════════════════════════════════════════╝
+
+📋 ARCHIVOS MODIFICADOS:
+
+1. templates/account/signup.html
+2. templates/us/en/account/signup.html
+3. templates/us/en/onboarding/bienvenida.html
+4. templates/us/es/onboarding/bienvenida.html
+5. taller/forms/custom_signup.py
+6. gestion_taller/urls.py
+
+🚀 MÉTODO RÁPIDO - FileZilla/WinSCP:
+
+1. Conectar al servidor
+2. Navegar a la carpeta del proyecto
+3. Subir estos archivos manteniendo la estructura:
+   
+   templates/
+   ├── account/
+   │   └── signup.html
+   └── us/
+       ├── en/
+       │   ├── account/
+       │   │   └── signup.html
+       │   └── onboarding/
+       │       └── bienvenida.html
+       └── es/
+           └── onboarding/
+               └── bienvenida.html
+   
+   taller/
+   └── forms/
+       └── custom_signup.py
+   
+   gestion_taller/
+   └── urls.py
+
+4. En el servidor, ejecutar:
+   cd /ruta/a/egarage
+   python manage.py collectstatic --noinput
+   # Reiniciar servidor web si es necesario
+
+✅ VERIFICAR:
+- http://servidor/accounts/signup/ - Debe mostrar todos los campos
+- http://servidor/us/en/bienvenida/ - Botones con bordes neon
+- Botón "Subscribe" debe redirigir a signup
+
+
+

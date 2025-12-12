@@ -110,13 +110,15 @@ class VehiculoForm(forms.ModelForm):
                     # Intentar generar la URL absoluta con reverse para asegurar que tenga el prefijo correcto
                     try:
                         absolute_url = reverse(autocomplete_url)
-                        log.info(
-                            f"[VehiculoForm] URL generada por reverse: {absolute_url}"
-                        )
-                        
+                        log.info(f"[VehiculoForm] URL generada por reverse: {absolute_url}")
+
                         # Verificar si la URL ya tiene el prefijo correcto
-                        expected_prefix = "/us/" if path.startswith("/us/") else "/cl/" if path.startswith("/cl/") else None
-                        
+                        expected_prefix = (
+                            "/us/"
+                            if path.startswith("/us/")
+                            else "/cl/" if path.startswith("/cl/") else None
+                        )
+
                         if expected_prefix and not absolute_url.startswith(expected_prefix):
                             # Si falta el prefijo, agregarlo
                             if absolute_url.startswith("/"):
@@ -126,7 +128,7 @@ class VehiculoForm(forms.ModelForm):
                             log.info(
                                 f"[VehiculoForm] Prefijo agregado, URL corregida: {absolute_url}"
                             )
-                        
+
                         # Usar la URL absoluta en el atributo data-ajax--url como fallback
                         if hasattr(self.fields["cliente"].widget, "attrs"):
                             self.fields["cliente"].widget.attrs["data-ajax--url"] = absolute_url
@@ -137,7 +139,7 @@ class VehiculoForm(forms.ModelForm):
                         log.warning(
                             f"[VehiculoForm] No se pudo generar URL absoluta: {reverse_error}, usando namespace: {autocomplete_url}"
                         )
-                    
+
                     # También establecer el namespace para que DAL lo use
                     self.fields["cliente"].widget.url = autocomplete_url
                     log.info(
@@ -505,6 +507,33 @@ class VehiculoForm(forms.ModelForm):
 
         # Configurar valores iniciales si estamos editando
         self._configurar_valores_iniciales_usa()
+
+        # ✅ Asegurar que todos los campos básicos tengan sus valores iniciales
+        # Esto es necesario porque al reconfigurar campos, Django puede perder los valores iniciales
+        if self.instance and self.instance.pk:
+            # Restaurar valores iniciales de campos básicos que podrían haberse perdido
+            if hasattr(self.instance, "patente"):
+                self.fields["patente"].initial = self.instance.patente
+            if hasattr(self.instance, "vin"):
+                self.fields["vin"].initial = self.instance.vin
+            if hasattr(self.instance, "anio") and self.instance.anio:
+                self.fields["anio"].initial = str(self.instance.anio)
+            if hasattr(self.instance, "millas") and self.instance.millas is not None:
+                self.fields["millas"].initial = self.instance.millas
+            if hasattr(self.instance, "cliente_id") and self.instance.cliente_id:
+                # Para campos con autocomplete, asegurar que el cliente esté en el queryset
+                if self.instance.cliente_id not in [c.pk for c in self.fields["cliente"].queryset]:
+                    # Agregar el cliente actual al queryset si no está
+                    from taller.models.clientes import Cliente
+
+                    cliente_actual = Cliente.objects.filter(pk=self.instance.cliente_id).first()
+                    if cliente_actual:
+                        self.fields["cliente"].queryset = self.fields[
+                            "cliente"
+                        ].queryset | Cliente.objects.filter(pk=self.instance.cliente_id)
+                self.fields["cliente"].initial = self.instance.cliente_id
+            if hasattr(self.instance, "color_id") and self.instance.color_id:
+                self.fields["color"].initial = self.instance.color_id
 
     def _configurar_campos_latam(self, pais):
         """Configurar campos específicos para usuarios de países Latinoamericanos (CL, MX, etc.)"""

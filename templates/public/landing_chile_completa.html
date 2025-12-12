@@ -5,32 +5,15 @@
 
 {% block extra_css %}
 <style>
-  /* Fondo animado: gradiente + blur "neón" */
+  /* Fondo estático profesional - Sin animaciones */
   .eg-animated-bg{
     position:absolute; inset:0; overflow:hidden; z-index:-1;
-    background: radial-gradient(1200px 600px at 10% 10%, rgba(56,189,248,.15), transparent 60%),
-                radial-gradient(900px 500px at 90% 20%, rgba(167,139,250,.14), transparent 60%),
-                radial-gradient(1000px 700px at 40% 90%, rgba(16,185,129,.10), transparent 60%),
-                linear-gradient(120deg,#0f172a,#0b1220 60%,#0a0f1f);
+    /* Gradiente estático suave: azul industrial oscuro */
+    background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
   }
-  .eg-animated-bg::before{
-    content:""; position:absolute; width:120%; height:120%; left:-10%; top:-10%;
-    background: conic-gradient(from 90deg at 50% 50%, rgba(56,189,248,.18), rgba(167,139,250,.18), rgba(16,185,129,.18), rgba(56,189,248,.18));
-    filter: blur(80px);
-    animation: spin 28s linear infinite;
-  }
-  @keyframes spin{to{transform:rotate(360deg)}}
-
-  /* Partículas suaves */
-  .eg-particle{position:absolute; border-radius:9999px; opacity:.35; filter:blur(1px); animation: drift 18s ease-in-out infinite;}
-  .eg-p1{width:10px;height:10px; left:12%; top:30%; background:#60a5fa; animation-delay:-2s}
-  .eg-p2{width:8px;height:8px; left:65%; top:20%; background:#34d399; animation-delay:-6s}
-  .eg-p3{width:12px;height:12px; left:80%; top:70%; background:#a78bfa; animation-delay:-10s}
-  .eg-p4{width:9px;height:9px; left:28%; top:75%; background:#22d3ee; animation-delay:-14s}
-  @keyframes drift{
-    0%,100%{transform:translateY(0) translateX(0)}
-    50%{transform:translateY(-30px) translateX(20px)}
-  }
+  
+  /* Partículas desactivadas - Removidas para diseño serio */
+  /* .eg-particle{display:none;} */
 
   /* Navegación futurista */
   .eg-nav {
@@ -91,7 +74,7 @@
   .impact-metric {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #34d399;
+    color: #10b981; /* Verde más sobrio */
   }
 </style>
 {% endblock %}
@@ -103,10 +86,10 @@
     <div class="flex items-center gap-4">
       <div class="relative">
         <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-10 w-auto">
-        <div class="absolute inset-0 bg-gradient-to-r from-blue-400/20 to-green-400/20 rounded-full blur-xl scale-110"></div>
+        <!-- Efecto de logo simplificado -->
       </div>
       <div>
-        <span class="text-xl font-bold bg-gradient-to-r from-sky-400 to-emerald-400 bg-clip-text text-transparent">
+        <span class="text-xl font-bold text-slate-100">
           eGarage
         </span>
         <div class="text-xs text-slate-400 font-medium">
@@ -116,13 +99,13 @@
     </div>
 
     <div class="flex items-center gap-4">
-      <a href="#precios" class="hidden md:inline-block text-slate-300 hover:text-white px-4 py-2 rounded-lg transition">
-        Precios
+      <a href="{% url 'precios' %}" class="hidden md:inline-block text-slate-300 hover:text-white px-4 py-2 rounded-lg transition">
+        PLANES
       </a>
       <a href="#ventajas" class="hidden md:inline-block text-slate-300 hover:text-white px-4 py-2 rounded-lg transition">
         Ventajas
       </a>
-      <a href="/cl/es/accounts/login/" class="bg-gradient-to-r from-emerald-500 to-sky-500 hover:from-emerald-400 hover:to-sky-400 text-white px-6 py-2 rounded-xl font-semibold transition eg-glow-button">
+      <a href="/cl/es/accounts/login/" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-xl font-semibold transition">
         Iniciar Sesión
       </a>
     </div>
@@ -131,10 +114,7 @@
 
 <section class="relative text-slate-100">
   <div class="eg-animated-bg">
-    <span class="eg-particle eg-p1"></span>
-    <span class="eg-particle eg-p2"></span>
-    <span class="eg-particle eg-p3"></span>
-    <span class="eg-particle eg-p4"></span>
+    <!-- Partículas removidas para diseño profesional serio -->
   </div>
 
   <!-- HERO -->
@@ -145,7 +125,7 @@
           ✓ Sistema Funcional — Chile
         </span>
         <h1 class="mt-6 text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight">
-          La Plataforma Inteligente <span class="bg-gradient-to-r from-sky-400 via-emerald-300 to-indigo-300 bg-clip-text text-transparent">#1 para Talleres</span> en Chile
+          La Plataforma Inteligente <span class="text-emerald-400">#1 para Talleres</span> en Chile
         </h1>
         <p class="mt-6 text-xl text-slate-300/90 leading-relaxed">
           Deja atrás el Excel y el papel. eGarage es el sistema en la nube diseñado para talleres automotrices chilenos que quieren ordenar su negocio, aumentar la rentabilidad y dar una experiencia profesional a sus clientes.
@@ -154,14 +134,14 @@
           Funciones reales. Soporte en español. IA aplicada al día a día del taller.
         </p>
         <div class="mt-10 flex flex-wrap gap-4">
-          <a href="/cl/es/accounts/signup/" class="eg-glow-button rounded-xl px-6 py-4 font-bold bg-emerald-500 hover:bg-emerald-400 text-slate-900 shadow-lg shadow-emerald-500/20 transition text-lg">
+          <a href="{% url 'account_signup' %}?plan=free" class="rounded-xl px-6 py-4 font-bold bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition text-lg">
             <span class="flex items-center gap-2">
               <span>🚀</span> Probar Gratis 30 días
             </span>
           </a>
-          <a href="#precios" class="rounded-xl px-6 py-4 font-semibold ring-2 ring-sky-400/40 hover:bg-sky-400/10 transition text-lg">
+          <a href="{% url 'precios' %}" class="rounded-xl px-6 py-4 font-semibold ring-2 ring-slate-500/40 hover:bg-slate-800/50 text-slate-200 transition text-lg">
             <span class="flex items-center gap-2">
-              <span>💳</span> Ver planes para Chile
+              <span>💳</span> PLANES
             </span>
           </a>
         </div>
@@ -708,14 +688,14 @@
           Únete a los talleres chilenos que ya están trabajando de forma más inteligente con eGarage.
         </p>
         <div class="flex flex-wrap justify-center gap-4">
-          <a href="/cl/es/accounts/signup/" class="inline-block rounded-2xl px-8 py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-xl shadow-lg transition eg-glow-button">
+          <a href="{% url 'account_signup' %}?plan=free" class="inline-block rounded-2xl px-8 py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-xl shadow-lg transition eg-glow-button">
             <span class="flex items-center gap-3">
               <span>🚀</span> Probar Gratis 30 días
             </span>
           </a>
-          <a href="#precios" class="inline-block rounded-2xl px-8 py-5 ring-2 ring-sky-400/50 hover:bg-sky-400/10 text-white font-bold text-xl transition">
+          <a href="{% url 'precios' %}" class="inline-block rounded-2xl px-8 py-5 ring-2 ring-slate-500/40 hover:bg-slate-800/50 text-slate-200 font-bold text-xl transition">
             <span class="flex items-center gap-3">
-              <span>💳</span> Ver planes para Chile
+              <span>💳</span> PLANES
             </span>
           </a>
         </div>
@@ -743,6 +723,8 @@
   });
 </script>
 {% endblock %}
+
+
 
 
 

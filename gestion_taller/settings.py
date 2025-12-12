@@ -219,6 +219,7 @@ TEMPLATES = [
                 "taller.context_processors.company_country",  # ✅ Asegura que company_country esté siempre disponible
                 "taller.context_processors.company_header",
                 "taller.context_processors.country_config.country_context",
+                "taller.context_processors.ui_labels.ui_labels_context",
             ],
         },
     },

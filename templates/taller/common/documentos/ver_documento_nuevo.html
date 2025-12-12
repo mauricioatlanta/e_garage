@@ -262,7 +262,7 @@
 
       <a href="{% url 'documentos_cl_es:documento_editar' documento.pk %}"
          class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-        ✏️ Editar Documento
+        ✏️ {{ ui_labels.edit_button }}
       </a>
 
       <a href="{% url 'documentos_cl_es:exportar_documento_pdf' documento.pk %}"

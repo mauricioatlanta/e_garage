@@ -51,7 +51,8 @@
     }
 
     body {
-      background: #0a0a0a !important;
+      /* Fondo estático profesional - Sin animaciones */
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%) !important;
       font-family: 'Exo 2', sans-serif;
       color: #ffffff;
       min-height: 100vh;
@@ -398,36 +399,19 @@
     </div>
   </header>
 
-  <!-- Fondos animados múltiples -->
-  <div id="vanta-globe" class="fixed inset-0 -z-10"></div>
-  <div id="vanta-dots" class="fixed inset-0 -z-20"></div>
-  <div class="grid-bg fixed inset-0 -z-30"></div>
+  <!-- Fondos animados múltiples - DESACTIVADOS para diseño serio -->
+  <!-- <div id="vanta-globe" class="fixed inset-0 -z-10"></div> -->
+  <!-- <div id="vanta-dots" class="fixed inset-0 -z-20"></div> -->
+  <!-- <div class="grid-bg fixed inset-0 -z-30"></div> -->
 
-  <!-- Líneas de energía -->
-  <div class="energy-lines">
-    <div class="energy-line" style="left: 10%; animation-delay: 0s;"></div>
-    <div class="energy-line" style="left: 30%; animation-delay: 1s;"></div>
-    <div class="energy-line" style="left: 50%; animation-delay: 2s;"></div>
-    <div class="energy-line" style="left: 70%; animation-delay: 0.5s;"></div>
-    <div class="energy-line" style="left: 90%; animation-delay: 1.5s;"></div>
-  </div>
+  <!-- Líneas de energía - DESACTIVADAS -->
+  <!-- <div class="energy-lines">...</div> -->
 
-  <!-- Partículas flotantes -->
-  <div class="particles">
-    <div class="particle" style="left: 5%; animation-delay: 0s;"></div>
-    <div class="particle" style="left: 15%; animation-delay: 1s;"></div>
-    <div class="particle" style="left: 25%; animation-delay: 2s;"></div>
-    <div class="particle" style="left: 35%; animation-delay: 3s;"></div>
-    <div class="particle" style="left: 45%; animation-delay: 4s;"></div>
-    <div class="particle" style="left: 55%; animation-delay: 5s;"></div>
-    <div class="particle" style="left: 65%; animation-delay: 0.5s;"></div>
-    <div class="particle" style="left: 75%; animation-delay: 1.5s;"></div>
-    <div class="particle" style="left: 85%; animation-delay: 2.5s;"></div>
-    <div class="particle" style="left: 95%; animation-delay: 3.5s;"></div>
-  </div>
+  <!-- Partículas flotantes - DESACTIVADAS -->
+  <!-- <div class="particles">...</div> -->
 
-  <!-- Línea de escaneo -->
-  <div class="scan-line"></div>
+  <!-- Línea de escaneo - DESACTIVADA -->
+  <!-- <div class="scan-line"></div> -->
 
   <main class="relative z-10">
     <!-- Hero Section -->
@@ -941,7 +925,8 @@
       // Respeta reduce-motion para accesibilidad
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-      if (!reduce) {
+      // Vanta.js - DESACTIVADO para diseño serio
+      /* if (!reduce) {
         // Vanta.js Globe
         if (typeof VANTA !== 'undefined' && VANTA.GLOBE) {
           VANTA.GLOBE({
@@ -979,17 +964,17 @@
             showLines: false
           });
         }
+      } */
 
-        // AOS.js animaciones scroll
-        if (typeof AOS !== 'undefined') {
-          AOS.init({
-            duration: 900,
-            once: true,
-            offset: 80,
-            delay: 100,
-            easing: 'ease-in-out-cubic'
-          });
-        }
+      // AOS.js animaciones scroll
+      if (typeof AOS !== 'undefined') {
+        AOS.init({
+          duration: 900,
+          once: true,
+          offset: 80,
+          delay: 100,
+          easing: 'ease-in-out-cubic'
+        });
       }
 
       console.log('Página cargada completamente');

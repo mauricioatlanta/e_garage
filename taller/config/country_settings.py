@@ -145,6 +145,38 @@ class CountrySettings:
             "date_format": "DD/MM/YYYY",
             "namespace": "venezuela",
         },
+        "AR": {
+            "name": "Argentina",
+            "name_es": "Argentina",
+            "name_en": "Argentina",
+            "language": "es",
+            "currency": "ARS",
+            "currency_symbol": "$",
+            "url_prefix": "/ar",
+            "url_prefix_legacy": None,
+            "timezone": "America/Argentina/Buenos_Aires",
+            "tax_rate": 21.0,  # IVA 21%
+            "tax_label": "IVA",
+            "phone_prefix": "+54",
+            "date_format": "DD/MM/YYYY",
+            "namespace": "argentina",
+        },
+        "UY": {
+            "name": "Uruguay",
+            "name_es": "Uruguay",
+            "name_en": "Uruguay",
+            "language": "es",
+            "currency": "UYU",
+            "currency_symbol": "$",
+            "url_prefix": "/uy",
+            "url_prefix_legacy": None,
+            "timezone": "America/Montevideo",
+            "tax_rate": 22.0,  # IVA 22%
+            "tax_label": "IVA",
+            "phone_prefix": "+598",
+            "date_format": "DD/MM/YYYY",
+            "namespace": "uruguay",
+        },
     }
 
     # País por defecto
@@ -321,6 +353,8 @@ class CountrySettings:
                 "EC": "🇪🇨",
                 "BR": "🇧🇷",
                 "VE": "🇻🇪",
+                "AR": "🇦🇷",
+                "UY": "🇺🇾",
             }.get(country_code, "")
 
             display_name = f"{flag_emoji} {name}" if flag_emoji else name
