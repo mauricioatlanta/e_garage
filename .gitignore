@@ -1,13 +1,9 @@
-﻿# Playwright
-/test-results/
-/playwright-report/
-/playwright/.cache/
-*.png
-*.jpg
-*.mp4
-playwright-report/
-test-results.json
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
 
+<<<<<<< HEAD
 # Node
 node_modules/
 package-lock.json
@@ -26,3 +22,26 @@ eg_cl_demo_20251115.json
 __pycache__/
 *.pyc
 
+=======
+# Django / DB local
+db.sqlite3
+*.sqlite3
+
+# Test / tooling caches
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Env
+.env
+*.env
+
+# Uploads (Django MEDIA)
+media/
+
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+>>>>>>> 95f08c61 (Add .gitignore (ignore caches and local sqlite db))
