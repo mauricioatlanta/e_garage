@@ -14,7 +14,7 @@ from taller.utils.country_config import get_country_config
 
 @csrf_exempt  # Habilitar si recibes POST desde landing pages externas
 @require_http_methods(["GET", "POST"])
-def registro_gratuito(request):
+def account_signup(request):
     """
     API Endpoint para registro rápido/gratuito.
 
@@ -143,17 +143,17 @@ def registro_gratuito(request):
     # Template según país e idioma
     # Soporte para 8 países con templates específicos o fallback
     template_map = {
-        "US": "taller/us/en/onboarding/registro_gratuito.html",
-        "CL": "taller/cl/es/onboarding/registro_gratuito.html",
-        "MX": "taller/cl/es/onboarding/registro_gratuito.html",  # Usar template de CL como fallback
-        "PE": "taller/cl/es/onboarding/registro_gratuito.html",
-        "CO": "taller/cl/es/onboarding/registro_gratuito.html",
-        "EC": "taller/cl/es/onboarding/registro_gratuito.html",
-        "BR": "taller/cl/es/onboarding/registro_gratuito.html",  # TODO: Crear template en portugués
-        "VE": "taller/cl/es/onboarding/registro_gratuito.html",
+        "US": "taller/us/en/onboarding/account_signup.html",
+        "CL": "taller/cl/es/onboarding/account_signup.html",
+        "MX": "taller/cl/es/onboarding/account_signup.html",  # Usar template de CL como fallback
+        "PE": "taller/cl/es/onboarding/account_signup.html",
+        "CO": "taller/cl/es/onboarding/account_signup.html",
+        "EC": "taller/cl/es/onboarding/account_signup.html",
+        "BR": "taller/cl/es/onboarding/account_signup.html",  # TODO: Crear template en portugués
+        "VE": "taller/cl/es/onboarding/account_signup.html",
     }
 
-    template = template_map.get(country_code, "taller/cl/es/onboarding/registro_gratuito.html")
+    template = template_map.get(country_code, "taller/cl/es/onboarding/account_signup.html")
 
     return render(
         request,
@@ -168,7 +168,7 @@ def registro_gratuito(request):
 def bienvenida_onboarding(request):
     """Pantalla de bienvenida con primeros pasos"""
     if not request.user.is_authenticated:
-        return redirect("onboarding:registro_gratuito")
+        return redirect("account_signup")
 
     # Obtener empresa del usuario
     try:
@@ -186,7 +186,7 @@ def bienvenida_onboarding(request):
 def onboarding_paso(request):
     """Pasos del onboarding interactivo"""
     if not request.user.is_authenticated:
-        return redirect("onboarding:registro_gratuito")
+        return redirect("account_signup")
 
     # Obtener paso del GET parameter, default 1
     paso = int(request.GET.get("paso", 1))
@@ -247,3 +247,12 @@ def onboarding_paso(request):
     }
 
     return render(request, pasos[paso]["template"], context)
+
+# --- HOTFIX: vista requerida por scripts/onboarding_urls.py ---
+def registro_gratuito(request):
+    """
+    Entrada al onboarding/registro.
+    Mantener este nombre porque scripts/onboarding_urls.py lo referencia.
+    """
+    from django.shortcuts import redirect
+    return redirect("account_signup")
