@@ -168,7 +168,7 @@ def registro_gratuito(request):
 def bienvenida_onboarding(request):
     """Pantalla de bienvenida con primeros pasos"""
     if not request.user.is_authenticated:
-        return redirect("registro_gratuito")
+        return redirect("onboarding:registro_gratuito")
 
     # Obtener empresa del usuario
     try:
@@ -178,9 +178,11 @@ def bienvenida_onboarding(request):
 
     context = {"empresa": empresa, "usuario": request.user, "primer_ingreso": True}
 
-    return render(request, "onboarding/bienvenida.html", context)
+    lang = getattr(request, "LANGUAGE_CODE", "")
 
+    template = "us/en/onboarding/bienvenida.html" if str(lang).startswith("en") else "us/es/onboarding/bienvenida.html"
 
+    return render(request, template, context)
 def onboarding_paso(request):
     """Pasos del onboarding interactivo"""
     if not request.user.is_authenticated:
