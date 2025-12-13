@@ -210,7 +210,19 @@ urlpatterns = [
         TemplateView.as_view(template_name="legal.html"),
         name="legal",
     ),
-    # 🇺🇸 USA - Unificado (inglés y español)
+    
+    # 🇦🇷 Argentina (usa rutas tipo Chile)
+    path(
+        "ar/",
+        include(("taller.urls_extra.argentina", "argentina"), namespace="argentina"),
+    ),
+    # 🇺🇾 Uruguay (usa rutas tipo Chile)
+    path(
+        "uy/",
+        include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
+    ),
+
+# 🇺🇸 USA - Unificado (inglés y español)
     path(
         "us/",
         include(("taller.urls_extra.usa", "usa"), namespace="usa"),
