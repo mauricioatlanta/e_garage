@@ -1,112 +1,52 @@
-# settings_prod.py - Configuración de producción para eGarage
 import os
+from .settings import *  # noqa
 
-from .settings import *  # Importa toda la configuración base
 
-# Debug deshabilitado en producción por defecto
-DEBUG = False
+def env_bool(key, default=False):
+    return os.getenv(key, str(default)).strip().lower() in {"1", "true", "yes", "on"}
 
-# Override para permitir debug en casos específicos de desarrollo local
-if os.environ.get("FORCE_DEBUG", "0") == "1":
-    DEBUG = True
 
-# Hosts permitidos para producción
-ALLOWED_HOSTS = [
-    "atlantareciclajes.cl",
-    "*.pythonanywhere.com",
-    "127.0.0.1",
-    "localhost",
-]
+def env_list(key, default=""):
+    raw = os.getenv(key, default) or ""
+    return [x.strip() for x in raw.split(",") if x.strip()]
 
-# Configuración para proxy SSL (PythonAnywhere)
+
+# --- Debug ---
+DEBUG = env_bool("DJANGO_DEBUG", False)
+
+# --- FIX 400 (hosts) ---
+ALLOWED_HOSTS = env_list(
+    "DJANGO_ALLOWED_HOSTS",
+    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,.pythonanywhere.com,localhost,127.0.0.1",
+)
+
+# --- CSRF (POST/login con HTTPS) ---
+CSRF_TRUSTED_ORIGINS = env_list(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    "https://egarage.cl,https://www.egarage.cl,https://atlantareciclajes.cl,https://www.atlantareciclajes.cl,https://*.pythonanywhere.com",
+)
+
+# --- HTTPS detrás de PythonAnywhere ---
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = env_bool("DJANGO_USE_X_FORWARDED_HOST", True)
 
-# Configuración de seguridad SSL
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
+SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", True)
+CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", True)
 
-# Overrides para desarrollo local si se fuerza DEBUG
-if DEBUG:
-    SECURE_SSL_REDIRECT = False
-    SESSION_COOKIE_SECURE = False
-    CSRF_COOKIE_SECURE = False
-
-# HSTS (HTTP Strict Transport Security) - Solo activar cuando todo esté bajo HTTPS
-SECURE_HSTS_SECONDS = 31536000  # 1 año
-SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+# --- HSTS ---
+SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "31536000"))
+SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", True)
 SECURE_HSTS_PRELOAD = True
 
-# CSRF trusted origins para dominios de producción
-CSRF_TRUSTED_ORIGINS = [
-    "https://atlantareciclajes.cl",
-    "https://*.pythonanywhere.com",
-]
-
-# Cabeceras de seguridad adicionales
+# --- Security headers (los tenías antes) ---
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
-# Configuración de logging para producción
-LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {message}",
-            "style": "{",
-        },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
-        },
-    },
-    "handlers": {
-        "console": {"class": "logging.StreamHandler", "formatter": "simple"},
-        "file": {
-            "class": "logging.FileHandler",
-            "filename": "django_prod.log",
-            "formatter": "verbose",
-        },
-    },
-    "root": {
-        "handlers": ["console"],
-        "level": "INFO",
-    },
-    "loggers": {
-        "django": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "taller": {
-            "handlers": ["console", "file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-    },
-}
-
-# Deshabilitamos la configuración de mimetypes que solo es para desarrollo
-if not DEBUG:
-    # Configuración de cacheo en producción
-    CACHES = {
-        "default": {
-            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-            "LOCATION": "unique-snowflake",
-        }
-    }
-
-    # Configuración optimizada para archivos estáticos en producción
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
-
-# Overrides de archivos estáticos para django-autocomplete-light (Select2)
-DAL_SELECT2_CSS = {"all": ("autocomplete_light_custom/vendor/select2/dist/css/select2.min.css",)}
-
-DAL_SELECT2_JS = (
-    "autocomplete_light_custom/vendor/select2/dist/js/select2.full.min.js",
-    "autocomplete_light_custom/init.js",
-    "autocomplete_light_custom/jquery.init.js",
-    "autocomplete_light_custom/autocomplete.init.js",
-)
+# --- DB: usar shared SOLO si es sqlite ---
+if DATABASES["default"]["ENGINE"].endswith("sqlite3"):
+    DATABASES["default"]["NAME"] = os.getenv(
+        "DJANGO_DB_PATH",
+        "/home/atlantareciclajes/apps/egarage/shared/db/db.sqlite3",
+    )
