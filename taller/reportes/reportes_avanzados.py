@@ -33,7 +33,7 @@ def reportes_rentabilidad(request):
     # Servicios subcontratados - análisis de rentabilidad (LineaOtroServicio)
     servicios_externos = (
         LineaOtroServicio.objects.filter(documento__tipo="FAC")
-        .values("nombre_servicio", "empresa_externa")
+        .values(nombre_servicio=F("nombre"), "empresa_externa")
         .annotate(
             cantidad=Count("id"),
             ingresos_totales=Sum("precio_cliente"),
@@ -91,7 +91,7 @@ def reportes_rentabilidad(request):
         margen = ((precio_cliente - (costo_interno or 0)) / precio_cliente) * 100
         servicios_alto_margen.append(
             {
-                "nombre": getattr(servicio, "nombre_servicio", "N/A"),
+                "nombre": getattr(servicio, "nombre", "N/A"),
                 "proveedor": getattr(servicio, "empresa_externa", "N/A"),
                 "margen": round(margen, 2),
                 "ganancia": (precio_cliente - (costo_interno or 0)),
@@ -126,12 +126,12 @@ def reporte_comparativo_precios(request):
     analisis_servicios = []
 
     servicios_unicos = (
-        LineaOtroServicio.objects.filter(documento__tipo="FAC").values("nombre_servicio").distinct()
+        LineaOtroServicio.objects.filter(documento__tipo="FAC").values(nombre_servicio=F("nombre")).distinct()
     )
 
     for servicio in servicios_unicos:
         nombre = servicio["nombre_servicio"]
-        registros = LineaOtroServicio.objects.filter(nombre_servicio=nombre)
+        registros = LineaOtroServicio.objects.filter(nombre=nombre)
 
         stats = registros.aggregate(
             cantidad=Count("id"),
@@ -201,7 +201,7 @@ def reporte_servicios_subcontratados(request):
     """
     # Servicios más frecuentes
     servicios_frecuentes = (
-        LineaOtroServicio.objects.values("nombre_servicio")
+        LineaOtroServicio.objects.values(nombre_servicio=F("nombre"))
         .annotate(
             frecuencia=Count("id"),
             volumen_total=Sum("precio_cliente"),
@@ -214,7 +214,7 @@ def reporte_servicios_subcontratados(request):
         LineaOtroServicio.objects.values("empresa_externa")
         .annotate(
             servicios_realizados=Count("id"),
-            tipos_servicios=Count("nombre_servicio", distinct=True),
+            tipos_servicios=Count("nombre", distinct=True),
             volumen_total=Sum("precio_cliente"),
             ganancia_generada=Sum(F("precio_cliente") - F("costo_interno")),
         )
