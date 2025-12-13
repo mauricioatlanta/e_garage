@@ -50,3 +50,7 @@ if DATABASES["default"]["ENGINE"].endswith("sqlite3"):
         "DJANGO_DB_PATH",
         "/home/atlantareciclajes/apps/egarage/shared/db/db.sqlite3",
     )
+
+# --- FORCE canonical templates dir (evita planillas antiguas de deploy/backups) ---
+from pathlib import Path
+TEMPLATES[0]["DIRS"] = [str(Path(BASE_DIR) / "templates")]
