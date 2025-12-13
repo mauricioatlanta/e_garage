@@ -33,7 +33,7 @@ def reportes_rentabilidad(request):
     # Servicios subcontratados - análisis de rentabilidad (LineaOtroServicio)
     servicios_externos = (
         LineaOtroServicio.objects.filter(documento__tipo="FAC")
-        .values(nombre_servicio=F("nombre"), "empresa_externa")
+        .values("empresa_externa", nombre_servicio=F("nombre"))
         .annotate(
             cantidad=Count("id"),
             ingresos_totales=Sum("precio_cliente"),
