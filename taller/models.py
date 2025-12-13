@@ -14,6 +14,7 @@ class Marca(models.Model):
         ("US", "Estados Unidos"),
         ("MX", "México"),
         ("AR", "Argentina"),
+        ("UY", "Uruguay"),
         ("BR", "Brasil"),
         ("PE", "Perú"),
     )
