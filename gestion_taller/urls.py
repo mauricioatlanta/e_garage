@@ -283,12 +283,12 @@ urlpatterns = [
     # 🇦🇷 Argentina - Español
     path(
         "ar/es/",
-        include(("taller.urls_extra.argentina", "argentina"), namespace="argentina"),
+        include(("taller.urls_extra.argentina", "argentina"), namespace="argentina_es"),
     ),
     # 🇺🇾 Uruguay - Español
     path(
         "uy/es/",
-        include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
+        include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay_es"),
     ),
     # Chile - Specific routes before general redirect
     path(

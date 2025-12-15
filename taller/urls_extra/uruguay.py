@@ -3,11 +3,32 @@ URLs específicas para Uruguay (español)
 Prefijo: /uy/es/
 """
 
+
+
+def _render_first_existing(request, candidates, context=None):
+    context = context or {}
+    for tname in candidates:
+        try:
+            loader.get_template(tname)
+            return render(request, tname, context)
+        except TemplateDoesNotExist:
+            continue
+    from django.http import HttpResponse
+    return HttpResponse("Template de bienvenida no encontrado.", status=500)
 import logging
 
 from django.http import HttpResponseRedirect
 from django.urls import include, path
+from django.shortcuts import redirect, render
+from django.template import loader, TemplateDoesNotExist
 from django.views.generic import TemplateView
+
+def uruguay_home(request):
+    # Canonicaliza /uy/ -> /uy/es/
+    if request.path == "/uy/":
+        return redirect("/uy/es/", permanent=False)
+    return _render_first_existing(request, ['uy/es/onboarding/bienvenida.html', 'uy/onboarding/bienvenida.html', 'onboarding/bienvenida_uruguay.html', 'onboarding/bienvenida.html'])
+
 
 from taller.taller_views import dashboard_suscripciones
 from taller.views_extra.company_settings_views import company_settings_view
@@ -31,7 +52,7 @@ app_name = "uruguay"
 
 urlpatterns = [
     # Vista de inicio para /uy/es/ - redirige a la página principal de Uruguay
-    path("", lambda request: HttpResponseRedirect("/uy/"), name="uruguay_home"),
+    path("", uruguay_home, name="uruguay_home"),
     # URLs principales de taller (configuración, settings, etc.)
     path("dashboard/", dashboard, name="dashboard"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
@@ -49,7 +70,7 @@ urlpatterns = [
     # Página de bienvenida para Uruguay
     path(
         "egarage/",
-        TemplateView.as_view(template_name="onboarding/bienvenida_uruguay.html"),
+        TemplateView.as_view(template_name="uy/es/onboarding/bienvenida.html"),
         name="bienvenida_uruguay",
     ),
     # Página de bienvenida alternativa (ruta estándar)

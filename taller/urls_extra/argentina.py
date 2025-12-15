@@ -3,11 +3,32 @@ URLs específicas para Argentina (español)
 Prefijo: /ar/es/
 """
 
+
+
+def _render_first_existing(request, candidates, context=None):
+    context = context or {}
+    for tname in candidates:
+        try:
+            loader.get_template(tname)
+            return render(request, tname, context)
+        except TemplateDoesNotExist:
+            continue
+    from django.http import HttpResponse
+    return HttpResponse("Template de bienvenida no encontrado.", status=500)
 import logging
 
 from django.http import HttpResponseRedirect
 from django.urls import include, path
+from django.shortcuts import redirect, render
+from django.template import loader, TemplateDoesNotExist
 from django.views.generic import TemplateView
+
+def argentina_home(request):
+    # Canonicaliza /ar/ -> /ar/es/
+    if request.path == "/ar/":
+        return redirect("/ar/es/", permanent=False)
+    return _render_first_existing(request, ['ar/es/onboarding/bienvenida.html', 'ar/onboarding/bienvenida.html', 'onboarding/bienvenida_argentina.html', 'onboarding/bienvenida.html'])
+
 
 from taller.taller_views import dashboard_suscripciones
 from taller.views_extra.company_settings_views import company_settings_view
@@ -31,7 +52,7 @@ app_name = "argentina"
 
 urlpatterns = [
     # Vista de inicio para /ar/es/ - redirige a la página principal de Argentina
-    path("", lambda request: HttpResponseRedirect("/ar/"), name="argentina_home"),
+    path("", argentina_home, name="argentina_home"),
     # URLs principales de taller (configuración, settings, etc.)
     path("dashboard/", dashboard, name="dashboard"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
