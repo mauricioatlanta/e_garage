@@ -33,19 +33,29 @@ def redirect_to_home(request):
     if request.user.is_authenticated:
         try:
             if hasattr(request.user, "empresa") and request.user.empresa:
-                if request.user.empresa.pais == "CL":
+                pais = request.user.empresa.pais
+                if pais == "CL":
                     return redirect("/cl/")
-                elif request.user.empresa.pais == "US":
+                elif pais == "US":
                     return redirect("/us/")
+                elif pais == "AR":
+                    return redirect("/ar/")
+                elif pais == "UY":
+                    return redirect("/uy/")
         except Exception:
             pass
 
     # Si hay contexto de país en el request (desde middleware)
     if hasattr(request, "country"):
-        if request.country == "CL":
+        country = request.country
+        if country == "CL":
             return redirect("/cl/")
-        elif request.country == "US":
+        elif country == "US":
             return redirect("/us/")
+        elif country == "AR":
+            return redirect("/ar/")
+        elif country == "UY":
+            return redirect("/uy/")
 
     # Fallback: redirigir a Chile por defecto (cambiar de USA a CL)
     return redirect("/cl/")
@@ -210,7 +220,6 @@ urlpatterns = [
         TemplateView.as_view(template_name="legal.html"),
         name="legal",
     ),
-    
     # 🇦🇷 Argentina (usa rutas tipo Chile)
     path(
         "ar/",
@@ -221,8 +230,7 @@ urlpatterns = [
         "uy/",
         include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
     ),
-
-# 🇺🇸 USA - Unificado (inglés y español)
+    # 🇺🇸 USA - Unificado (inglés y español)
     path(
         "us/",
         include(("taller.urls_extra.usa", "usa"), namespace="usa"),
@@ -271,6 +279,16 @@ urlpatterns = [
     path(
         "br/es/",
         include(("taller.urls_extra.brasil", "brasil"), namespace="brasil"),
+    ),
+    # 🇦🇷 Argentina - Español
+    path(
+        "ar/es/",
+        include(("taller.urls_extra.argentina", "argentina"), namespace="argentina"),
+    ),
+    # 🇺🇾 Uruguay - Español
+    path(
+        "uy/es/",
+        include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
     ),
     # Chile - Specific routes before general redirect
     path(
@@ -345,6 +363,18 @@ urlpatterns = [
         TemplateView.as_view(template_name="landing_inicio.html"),
         name="cl_home_welcome",
     ),
+    # Página de bienvenida para Argentina - /ar/ directamente
+    path(
+        "ar/",
+        TemplateView.as_view(template_name="landing_inicio.html"),
+        name="ar_home_welcome",
+    ),
+    # Página de bienvenida para Uruguay - /uy/ directamente
+    path(
+        "uy/",
+        TemplateView.as_view(template_name="landing_inicio.html"),
+        name="uy_home_welcome",
+    ),
     # Redirect cl/ to cl/es/ preserving the rest of the path - DESHABILITADO - Causa bucles infinitos
     # path(
     #     "cl/",
@@ -411,6 +441,31 @@ urlpatterns = [
     path(
         "us/reportes/",
         include(("taller.reportes.urls", "reportes_us_en"), namespace="reportes_us_en"),
+    ),
+    path(
+        "ar/documentos/",
+        include(("taller.documentos.urls", "documentos_ar_es"), namespace="documentos_ar_es"),
+    ),
+    path(
+        "uy/documentos/",
+        include(("taller.documentos.urls", "documentos_uy_es"), namespace="documentos_uy_es"),
+    ),
+    # Autocomplete URLs por país
+    path(
+        "ar/autocomplete/",
+        include(("taller.autocomplete_urls", "autocomplete"), namespace="ar_autocomplete"),
+    ),
+    path(
+        "uy/autocomplete/",
+        include(("taller.autocomplete_urls", "autocomplete"), namespace="uy_autocomplete"),
+    ),
+    path(
+        "ar/reportes/",
+        include(("taller.reportes.urls", "reportes_ar_es"), namespace="reportes_ar_es"),
+    ),
+    path(
+        "uy/reportes/",
+        include(("taller.reportes.urls", "reportes_uy_es"), namespace="reportes_uy_es"),
     ),
     # Ruta de seguridad para /login/ global
     path("login/", login_redirector, name="login_redirector"),

@@ -26,6 +26,7 @@ from django.db.models import (
     Sum,
     Value,
 )
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import render
@@ -808,14 +809,19 @@ def dashboard_inteligencia_operativa(request):
 
         # Contar documentos que tienen registro de kilometraje y podrían tener garantía activa
         for doc in documentos_recientes:
-            if hasattr(doc, "registro_kilometraje") and doc.registro_kilometraje:
-                # Verificar si está dentro del límite de garantía (5,000 km)
-                km_registro = doc.registro_kilometraje.kilometraje
-                km_actual = doc.vehiculo.kilometraje_actual if doc.vehiculo else 0
-                if km_actual > 0:
-                    km_recorridos = km_actual - km_registro
-                    if km_recorridos < 5000:  # Dentro del límite de garantía
-                        garantias_potenciales += 1
+            try:
+                registro_km = doc.registro_kilometraje
+                if registro_km:
+                    # Verificar si está dentro del límite de garantía (5,000 km)
+                    km_registro = registro_km.kilometraje
+                    km_actual = doc.vehiculo.kilometraje_actual if doc.vehiculo else 0
+                    if km_actual > 0:
+                        km_recorridos = km_actual - km_registro
+                        if km_recorridos < 5000:  # Dentro del límite de garantía
+                            garantias_potenciales += 1
+            except (ObjectDoesNotExist, AttributeError):
+                # Documento no tiene registro_kilometraje asociado
+                continue
     except Exception:
         # Si hay error, continuar sin contar garantías
         pass
@@ -2200,32 +2206,44 @@ def verificar_garantia(request):
 
             # Buscar documentos anteriores que podrían ser el original
             for doc_reciente in documentos_recientes:
-                if doc_reciente.registro_kilometraje:
-                    # Buscar documentos anteriores del mismo vehículo
-                    docs_anteriores = (
-                        Documento.objects.filter(
-                            empresa=empresa,
-                            vehiculo=vehiculo,
-                            tipo__in=["OT", "PRES"],
-                            fecha_emision__lt=doc_reciente.fecha_emision,
-                            estado="EMITIDO",
+                try:
+                    registro_reciente = doc_reciente.registro_kilometraje
+                    if registro_reciente:
+                        # Buscar documentos anteriores del mismo vehículo
+                        docs_anteriores = (
+                            Documento.objects.filter(
+                                empresa=empresa,
+                                vehiculo=vehiculo,
+                                tipo__in=["OT", "PRES"],
+                                fecha_emision__lt=doc_reciente.fecha_emision,
+                                estado="EMITIDO",
+                            )
+                            .select_related("registro_kilometraje")
+                            .order_by("-fecha_emision")[:5]
                         )
-                        .select_related("registro_kilometraje")
-                        .order_by("-fecha_emision")[:5]
-                    )
 
-                    for doc_anterior in docs_anteriores:
-                        if doc_anterior.registro_kilometraje:
-                            reporte = ReporteKilometraje(empresa)
-                            verificacion = reporte.verificar_garantia(doc_reciente, doc_anterior)
-                            if verificacion and not verificacion.get("error"):
-                                garantias_activas.append(
-                                    {
-                                        "documento_garantia": doc_reciente,
-                                        "documento_original": doc_anterior,
-                                        "verificacion": verificacion,
-                                    }
-                                )
+                        for doc_anterior in docs_anteriores:
+                            try:
+                                registro_anterior = doc_anterior.registro_kilometraje
+                                if registro_anterior:
+                                    reporte = ReporteKilometraje(empresa)
+                                    verificacion = reporte.verificar_garantia(
+                                        doc_reciente, doc_anterior
+                                    )
+                                    if verificacion and not verificacion.get("error"):
+                                        garantias_activas.append(
+                                            {
+                                                "documento_garantia": doc_reciente,
+                                                "documento_original": doc_anterior,
+                                                "verificacion": verificacion,
+                                            }
+                                        )
+                            except (ObjectDoesNotExist, AttributeError):
+                                # Documento anterior no tiene registro_kilometraje asociado
+                                continue
+                except (ObjectDoesNotExist, AttributeError):
+                    # Documento reciente no tiene registro_kilometraje asociado
+                    continue
         except Vehiculo.DoesNotExist:
             error = "Vehículo no encontrado"
         except Exception as e:

@@ -29,9 +29,7 @@ print(f"🏢 Empresas encontradas: {empresas.count()}")
 
 for empresa in empresas:
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    nombre_archivo = (
-        f"backup_{empresa.nombre_taller.replace(' ', '_')}_{timestamp}.json"
-    )
+    nombre_archivo = f"backup_{empresa.nombre_taller.replace(' ', '_')}_{timestamp}.json"
     ruta_archivo = os.path.join(backup_dir, nombre_archivo)
 
     # Obtener documentos de la empresa

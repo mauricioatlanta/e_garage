@@ -76,6 +76,101 @@ body {
   background: rgba(0,230,208,0.15) !important;
   box-shadow: 0 0 0 2px rgba(0,230,208,0.2);
 }
+
+/* Estilos para campos con autocomplete (Select2/DAL) */
+.select2-container--default .select2-selection--single,
+.select2-container--default .select2-selection--multiple {
+  background: rgba(0,230,208,0.1) !important;
+  border: 1px solid rgba(0,230,208,0.3) !important;
+  border-radius: 6px !important;
+  color: #fff !important;
+  min-height: 48px !important;
+  padding: 0 !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__rendered {
+  color: #fff !important;
+  line-height: 48px !important;
+  padding-left: 12px !important;
+  padding-right: 20px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 46px !important;
+  right: 8px !important;
+}
+
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+  border-color: #00e6d0 transparent transparent transparent !important;
+}
+
+.select2-container--default.select2-container--focus .select2-selection--single,
+.select2-container--default.select2-container--open .select2-selection--single {
+  border-color: #00e6d0 !important;
+  background: rgba(0,230,208,0.15) !important;
+  box-shadow: 0 0 0 2px rgba(0,230,208,0.2) !important;
+}
+
+.select2-container--default .select2-search--dropdown .select2-search__field {
+  background: rgba(0,230,208,0.1) !important;
+  border: 1px solid rgba(0,230,208,0.3) !important;
+  color: #fff !important;
+  border-radius: 6px !important;
+}
+
+.select2-dropdown {
+  background: rgba(0,0,0,0.9) !important;
+  border: 1px solid rgba(0,230,208,0.3) !important;
+  border-radius: 6px !important;
+}
+
+.select2-container--default .select2-results__option {
+  background: transparent !important;
+  color: #fff !important;
+  padding: 10px 12px !important;
+}
+
+.select2-container--default .select2-results__option--highlighted[aria-selected] {
+  background: rgba(0,230,208,0.3) !important;
+  color: #00e6d0 !important;
+}
+
+.select2-container--default .select2-results__option[aria-selected=true] {
+  background: rgba(0,230,208,0.2) !important;
+  color: #00e6d0 !important;
+}
+
+/* Placeholder para Select2 */
+.select2-container--default .select2-selection--single .select2-selection__placeholder {
+  color: rgba(255,255,255,0.6) !important;
+}
+
+/* Para campos múltiples */
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+  background: rgba(0,230,208,0.2) !important;
+  border: 1px solid rgba(0,230,208,0.4) !important;
+  color: #fff !important;
+  padding: 4px 8px !important;
+  border-radius: 4px !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+  color: #00e6d0 !important;
+  margin-right: 6px !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-selection__rendered {
+  padding: 6px 12px !important;
+  min-height: 48px !important;
+}
+
+.select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
+  background: transparent !important;
+  border: none !important;
+  color: #fff !important;
+  margin-top: 6px !important;
+  padding: 0 !important;
+}
 .btn-futuristic {
   background: linear-gradient(45deg, #00e6d0, #00b3a0);
   border: none;
@@ -151,7 +246,7 @@ body {
         </div>
 
         <div class="form-group">
-          <label for="{{ form.millas.id_for_label }}">Millas/Kilometraje</label>
+          <label for="{{ form.millas.id_for_label }}">{% if request.path|slice:":4" == "/us/" %}Miles{% else %}Kilometraje{% endif %}</label>
           {{ form.millas }}
           {% if form.millas.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.millas.errors.0 }}</div>
@@ -832,33 +927,35 @@ document.addEventListener('DOMContentLoaded', function() {
             var motorId = '{{ vehiculo.motor_id }}';
             var motorNombre = '{{ vehiculo.motor.nombre|escapejs }}';
             if (motorSelect.length && motorId) {
+                // Siempre agregar la opción si no existe (importante para Select2 autocomplete)
+                if (motorSelect.find('option[value="' + motorId + '"]').length === 0) {
+                    var newOption = new Option(motorNombre, motorId, true, true);
+                    motorSelect.append(newOption);
+                }
+                
+                // Establecer el valor primero
+                motorSelect.val(motorId);
+                
                 // Verificar si Select2 está inicializado
                 if (motorSelect.hasClass('select2-hidden-accessible')) {
-                    // Para Select2 con autocomplete, necesitamos agregar la opción si no existe
-                    if (motorSelect.find('option[value="' + motorId + '"]').length === 0) {
-                        var newOption = new Option(motorNombre, motorId, true, true);
-                        motorSelect.append(newOption);
-                    }
-                    // Establecer el valor usando Select2 API
-                    motorSelect.val(motorId);
+                    // Establecer usando Select2 API
                     motorSelect.trigger('change.select2');
-                    // Verificar que el valor se estableció correctamente
-                    if (motorSelect.val() == motorId) {
-                        console.log('✅ Motor inicial establecido:', motorId, motorNombre);
-                        motorListo = true;
-                    } else {
-                        // Si no se estableció, intentar de nuevo
-                        motorListo = false;
-                    }
+                    // Verificar después de un pequeño delay
+                    setTimeout(function() {
+                        var currentVal = motorSelect.val();
+                        if (currentVal == motorId || motorSelect.find('option[value="' + motorId + '"]:selected').length > 0) {
+                            console.log('✅ Motor inicial establecido (Select2):', motorId, motorNombre);
+                            motorListo = true;
+                        } else {
+                            // Reintentar
+                            motorSelect.val(motorId).trigger('change.select2');
+                            motorListo = true;
+                        }
+                    }, 100);
                 } else {
-                    // Si no es Select2, establecer el valor directamente
-                    motorSelect.val(motorId);
-                    if (motorSelect.val() == motorId) {
-                        console.log('✅ Motor inicial establecido (sin Select2):', motorId);
-                        motorListo = true;
-                    } else {
-                        motorListo = false;
-                    }
+                    // Si no es Select2 aún, el valor ya está establecido
+                    console.log('✅ Motor inicial establecido (sin Select2 aún):', motorId);
+                    motorListo = true;
                 }
             } else {
                 motorListo = true; // No hay motor que establecer
@@ -872,33 +969,35 @@ document.addEventListener('DOMContentLoaded', function() {
             var cajaId = '{{ vehiculo.caja_id }}';
             var cajaNombre = '{{ vehiculo.caja.nombre|escapejs }}';
             if (cajaSelect.length && cajaId) {
+                // Siempre agregar la opción si no existe (importante para Select2 autocomplete)
+                if (cajaSelect.find('option[value="' + cajaId + '"]').length === 0) {
+                    var newOption = new Option(cajaNombre, cajaId, true, true);
+                    cajaSelect.append(newOption);
+                }
+                
+                // Establecer el valor primero
+                cajaSelect.val(cajaId);
+                
                 // Verificar si Select2 está inicializado
                 if (cajaSelect.hasClass('select2-hidden-accessible')) {
-                    // Para Select2 con autocomplete, necesitamos agregar la opción si no existe
-                    if (cajaSelect.find('option[value="' + cajaId + '"]').length === 0) {
-                        var newOption = new Option(cajaNombre, cajaId, true, true);
-                        cajaSelect.append(newOption);
-                    }
-                    // Establecer el valor usando Select2 API
-                    cajaSelect.val(cajaId);
+                    // Establecer usando Select2 API
                     cajaSelect.trigger('change.select2');
-                    // Verificar que el valor se estableció correctamente
-                    if (cajaSelect.val() == cajaId) {
-                        console.log('✅ Caja inicial establecida:', cajaId, cajaNombre);
-                        cajaLista = true;
-                    } else {
-                        // Si no se estableció, intentar de nuevo
-                        cajaLista = false;
-                    }
+                    // Verificar después de un pequeño delay
+                    setTimeout(function() {
+                        var currentVal = cajaSelect.val();
+                        if (currentVal == cajaId || cajaSelect.find('option[value="' + cajaId + '"]:selected').length > 0) {
+                            console.log('✅ Caja inicial establecida (Select2):', cajaId, cajaNombre);
+                            cajaLista = true;
+                        } else {
+                            // Reintentar
+                            cajaSelect.val(cajaId).trigger('change.select2');
+                            cajaLista = true;
+                        }
+                    }, 100);
                 } else {
-                    // Si no es Select2, establecer el valor directamente
-                    cajaSelect.val(cajaId);
-                    if (cajaSelect.val() == cajaId) {
-                        console.log('✅ Caja inicial establecida (sin Select2):', cajaId);
-                        cajaLista = true;
-                    } else {
-                        cajaLista = false;
-                    }
+                    // Si no es Select2 aún, el valor ya está establecido
+                    console.log('✅ Caja inicial establecida (sin Select2 aún):', cajaId);
+                    cajaLista = true;
                 }
             } else {
                 cajaLista = true; // No hay caja que establecer
@@ -921,8 +1020,17 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Iniciar después de un pequeño delay para permitir que form.media se cargue
-        setTimeout(establecerValoresIniciales, 500);
+        // Iniciar después de un delay para permitir que form.media y Select2 se carguen
+        setTimeout(establecerValoresIniciales, 800);
+        
+        // También intentar después de que la página esté completamente cargada
+        if (document.readyState === 'complete') {
+            setTimeout(establecerValoresIniciales, 1200);
+        } else {
+            window.addEventListener('load', function() {
+                setTimeout(establecerValoresIniciales, 1200);
+            });
+        }
     })();
     {% endif %}
 });

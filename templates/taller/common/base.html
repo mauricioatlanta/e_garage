@@ -487,7 +487,7 @@
 
     <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
       <span class="nav-icon">📄</span>
-      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Documents{% else %}Documentos{% endif %}</span>
+      <span>{{ ui_labels.documents_menu }}</span>
     </a>
 
     <a href="{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/en/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">

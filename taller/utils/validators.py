@@ -27,6 +27,8 @@ def _alias_tax_id_type(tipo: str) -> str:
         "PE_RUC": "RUC",
         "VE_RIF": "RIF",
         "MX_RFC": "RFC_MX",
+        "AR_CUIT": "CUIT",
+        "UY_CI": "CI_UY",
     }
     return mapping.get(tipo, tipo)
 
@@ -88,6 +90,29 @@ def normalizar_tax_id(tax_id, tipo):
         tax_id_limpio = re.sub(r"[-]", "", tax_id_limpio)
         if len(tax_id_limpio) == 9:
             tax_id_limpio = f"{tax_id_limpio[:3]}-{tax_id_limpio[3:5]}-{tax_id_limpio[5:]}"
+
+    elif tipo_normalizado == "CUIT":
+        # CUIT Argentina: XX-XXXXXXXX-X (formato con guiones)
+        tax_id_limpio = re.sub(r"[-]", "", tax_id_limpio)
+        if len(tax_id_limpio) == 11:
+            tax_id_limpio = f"{tax_id_limpio[:2]}-{tax_id_limpio[2:10]}-{tax_id_limpio[10]}"
+
+    elif tipo_normalizado == "CI_UY":
+        # CI Uruguay: X.XXX.XXX-X (formato con puntos y guion)
+        # La CI uruguaya puede tener 7 u 8 dígitos
+        # Normalizar: remover puntos y guiones, luego formatear
+        tax_id_limpio = re.sub(r"[.\s-]", "", tax_id_limpio)
+        # Formatear: X.XXX.XXX-X (7 dígitos) o XX.XXX.XXX-X (8 dígitos)
+        if len(tax_id_limpio) == 7:
+            # 7 dígitos: X.XXX.XXX-X
+            tax_id_limpio = (
+                f"{tax_id_limpio[0]}.{tax_id_limpio[1:4]}.{tax_id_limpio[4:7]}-{tax_id_limpio[6]}"
+            )
+        elif len(tax_id_limpio) == 8:
+            # 8 dígitos: XX.XXX.XXX-X
+            tax_id_limpio = (
+                f"{tax_id_limpio[0:2]}.{tax_id_limpio[2:5]}.{tax_id_limpio[5:8]}-{tax_id_limpio[7]}"
+            )
 
     # CPF, CNPJ, RUC, RIF: Solo dígitos (sin guiones)
     # Ya están limpios
@@ -305,6 +330,92 @@ def validar_rfc_mexico(rfc):
         raise ValidationError(_("RFC debe tener formato válido: AAAAYYMMDDXXX o AAAYYMMDDXXX"))
 
 
+def validar_cuit_argentina(cuit):
+    """
+    Validar CUIT argentino (Clave Única de Identificación Tributaria).
+
+    Formato esperado: XX-XXXXXXXX-X (11 dígitos con guiones)
+    Los primeros 2 dígitos indican el tipo de contribuyente:
+    - 20: Persona física
+    - 27: Persona física (monotributo)
+    - 30: Empresa
+    - 33: Empresa (IVA exento)
+    - 34: Empresa (IVA no responsable)
+
+    Args:
+        cuit (str): CUIT a validar
+
+    Raises:
+        ValidationError: Si el CUIT es inválido
+    """
+    if not cuit:
+        return
+
+    # Normalizar
+    cuit_limpio = re.sub(r"[^0-9]", "", str(cuit))
+
+    if len(cuit_limpio) != 11:
+        raise ValidationError(_("CUIT debe tener 11 dígitos"))
+
+    # Verificar que los primeros 2 dígitos sean válidos
+    tipo_contribuyente = int(cuit_limpio[:2])
+    tipos_validos = [20, 23, 24, 27, 30, 33, 34]
+
+    if tipo_contribuyente not in tipos_validos:
+        raise ValidationError(
+            _(
+                "CUIT con tipo de contribuyente inválido. Debe empezar con 20, 23, 24, 27, 30, 33 o 34"
+            )
+        )
+
+    # Calcular dígito verificador
+    multiplicadores = [5, 4, 3, 2, 7, 6, 5, 4, 3, 2]
+    suma = sum(int(cuit_limpio[i]) * multiplicadores[i] for i in range(10))
+    resto = suma % 11
+
+    if resto < 2:
+        dv_esperado = resto
+    else:
+        dv_esperado = 11 - resto
+
+    dv_ingresado = int(cuit_limpio[10])
+
+    if dv_ingresado != dv_esperado:
+        raise ValidationError(
+            _(f"CUIT inválido. Dígito verificador incorrecto. Esperado: {dv_esperado}")
+        )
+
+
+def validar_ci_uruguay(ci):
+    """
+    Validar CI uruguayo (Cédula de Identidad).
+
+    Formato esperado: X.XXX.XXX-X o XX.XXX.XXX-X (7-8 dígitos con puntos y guion)
+    La CI puede tener 7 u 8 dígitos.
+
+    Args:
+        ci (str): CI a validar
+
+    Raises:
+        ValidationError: Si la CI es inválida
+    """
+    if not ci:
+        return
+
+    # Normalizar (remover puntos, guiones y espacios)
+    ci_limpio = re.sub(r"[.\s-]", "", str(ci))
+
+    if len(ci_limpio) < 7 or len(ci_limpio) > 8:
+        raise ValidationError(_("CI debe tener entre 7 y 8 dígitos"))
+
+    # Validación básica: solo dígitos
+    if not ci_limpio.isdigit():
+        raise ValidationError(_("CI debe contener solo dígitos"))
+
+    # Nota: La CI uruguaya no tiene un algoritmo de dígito verificador estándar
+    # como el RUT chileno o el CUIT argentino. Se valida solo el formato y longitud.
+
+
 def validar_ein_usa(ein):
     """
     Validar EIN estadounidense (Employer Identification Number).
@@ -424,6 +535,10 @@ def validar_tax_id(tax_id, tax_id_type):
         validar_ssn_usa(tax_id_normalizado)
     elif tipo == "RFC_MX":
         validar_rfc_mexico(tax_id_normalizado)
+    elif tipo == "CUIT":
+        validar_cuit_argentina(tax_id_normalizado)
+    elif tipo == "CI_UY":
+        validar_ci_uruguay(tax_id_normalizado)
 
     return tax_id_normalizado
 

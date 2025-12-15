@@ -5,8 +5,8 @@
 {% load money %}
 {% load i18n %}
 
-{% block page_title %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Control Center{% else %}Centro de Control de Documentos{% endif %}{% endblock %}
-{% block page_subtitle %}{{ empresa.nombre_taller }} - {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Workshop Document Control Center{% else %}Centro de Control de Documentos del Taller{% endif %}{% endblock %}
+{% block page_title %}{{ ui_labels.document_center }}{% endblock %}
+{% block page_subtitle %}{{ empresa.nombre_taller }} - {{ ui_labels.document_center }}{% endblock %}
 {% block page_icon %}📄{% endblock %}
 
 {% block page_extra_css %}
@@ -880,11 +880,7 @@
 <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
   <a href="{% country_url 'documentos:crear_documento' %}" class="crear-documento-btn">
     <i class="fas fa-plus-circle"></i>
-    <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create New Document{% else %}Crear Nuevo Documento{% endif %}</span>
-  </a>
-  <a href="{% url 'reportes_cl_es:centro_contable_chile' %}" class="exportar-contador-btn">
-    <i class="fas fa-file-export"></i>
-    <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Export for Accountant{% else %}Exportar para Contador{% endif %}</span>
+    <span>{{ ui_labels.new_document }}</span>
   </a>
 </div>
 {% endblock %}
@@ -892,36 +888,36 @@
 {% block page_stats %}
 <div class="kpis-grid">
   <div class="kpi-card">
-    <div class="kpi-label">📄 Total Documentos</div>
+    <div class="kpi-label">📄 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Total Documents{% else %}Total Documentos{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.total|default:"0" }}</div>
     <div class="kpi-subvalue">{% if estadisticas.total_monto %}{{ estadisticas.total_monto|money_by_country:country }}{% endif %}</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">✅ Emitidos</div>
+    <div class="kpi-label">✅ {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Issued{% else %}Emitidos{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.emitidos|default:"0" }}</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">⏳ Borradores</div>
+    <div class="kpi-label">⏳ {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Drafts{% else %}Borradores{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.borradores|default:"0" }}</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">📅 Hoy</div>
+    <div class="kpi-label">📅 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Today{% else %}Hoy{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.hoy|default:"0" }}</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">💰 Por Cobrar</div>
+    <div class="kpi-label">💰 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Pending Payment{% else %}Por Cobrar{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.pendientes_pago|default:"0" }}</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">📋 Presupuestos Pendientes</div>
+    <div class="kpi-label">📋 {{ ui_labels.document_type_estimate }} {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Pending{% else %}Pendientes{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.presupuestos_pendientes|default:"0" }}</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">🔧 OTs Sin Cerrar</div>
+    <div class="kpi-label">🔧 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Open Work Orders{% else %}OTs Sin Cerrar{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.ots_sin_cerrar|default:"0" }}</div>
   </div>
   <div class="kpi-card">
-    <div class="kpi-label">📊 Últimos 30 días</div>
+    <div class="kpi-label">📊 {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Last 30 Days{% else %}Últimos 30 días{% endif %}</div>
     <div class="kpi-value">{{ estadisticas.ultimos_30_dias|default:"0" }}</div>
   </div>
 </div>
@@ -930,56 +926,56 @@
 {% block search_bar %}
 <div class="filtros-section">
   <h3 class="section-title" style="font-family: 'Orbitron', sans-serif; font-size: 1.3rem; color: #00e6d0; margin-bottom: 1.5rem; text-shadow: 0 0 10px rgba(0, 230, 208, 0.5);">
-    <i class="fas fa-filter"></i> {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search Filters{% else %}Filtros de Búsqueda{% endif %}
+    <i class="fas fa-filter"></i> {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Search Filters{% else %}Filtros de Búsqueda{% endif %}
   </h3>
   <form method="get" class="filtros-grid">
     <div class="filtro-group">
-      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search by Customer{% else %}Buscar por Cliente{% endif %}</label>
-      <input type="text" name="cliente" value="{{ filtros_activos.cliente|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Customer name...{% else %}Nombre del cliente...{% endif %}">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Search by Customer{% else %}Buscar por Cliente{% endif %}</label>
+      <input type="text" name="cliente" value="{{ filtros_activos.cliente|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Customer name...{% else %}Nombre del cliente...{% endif %}">
     </div>
     <div class="filtro-group">
-      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search by Vehicle{% else %}Buscar por Vehículo{% endif %}</label>
-      <input type="text" name="vehiculo" value="{{ filtros_activos.vehiculo|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}License plate or model...{% else %}Patente o modelo...{% endif %}">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Search by Vehicle{% else %}Buscar por Vehículo{% endif %}</label>
+      <input type="text" name="vehiculo" value="{{ filtros_activos.vehiculo|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}License plate or model...{% else %}Patente o modelo...{% endif %}">
     </div>
     <div class="filtro-group">
-      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Type{% else %}Tipo de Documento{% endif %}</label>
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Document Type{% else %}Tipo de Documento{% endif %}</label>
       <select name="tipo" class="filtro-input">
-        <option value="">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}All types{% else %}Todos los tipos{% endif %}</option>
-        <option value="FAC" {% if filtros_activos.tipo == 'FAC' %}selected{% endif %}>Factura</option>
-        <option value="OT" {% if filtros_activos.tipo == 'OT' %}selected{% endif %}>Orden de Trabajo</option>
-        <option value="PRES" {% if filtros_activos.tipo == 'PRES' %}selected{% endif %}>Presupuesto</option>
+        <option value="">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}All types{% else %}Todos los tipos{% endif %}</option>
+        <option value="FAC" {% if filtros_activos.tipo == 'FAC' %}selected{% endif %}>{{ ui_labels.document_type_invoice }}</option>
+        <option value="OT" {% if filtros_activos.tipo == 'OT' %}selected{% endif %}>{{ ui_labels.document_type_work_order }}</option>
+        <option value="PRES" {% if filtros_activos.tipo == 'PRES' %}selected{% endif %}>{{ ui_labels.document_type_estimate }}</option>
       </select>
     </div>
     <div class="filtro-group">
-      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Status{% else %}Estado{% endif %}</label>
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Status{% else %}Estado{% endif %}</label>
       <select name="estado" class="filtro-input">
-        <option value="">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}All statuses{% else %}Todos los estados{% endif %}</option>
+        <option value="">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}All statuses{% else %}Todos los estados{% endif %}</option>
         <option value="EMITIDO" {% if filtros_activos.estado == 'EMITIDO' %}selected{% endif %}>Emitido</option>
         <option value="BORRADOR" {% if filtros_activos.estado == 'BORRADOR' %}selected{% endif %}>Borrador</option>
         <option value="ANULADO" {% if filtros_activos.estado == 'ANULADO' %}selected{% endif %}>Anulado</option>
       </select>
     </div>
     <div class="filtro-group">
-      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Number{% else %}Número de Documento{% endif %}</label>
-      <input type="text" name="numero" value="{{ filtros_activos.numero|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document number...{% else %}Número...{% endif %}">
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Document Number{% else %}Número de Documento{% endif %}</label>
+      <input type="text" name="numero" value="{{ filtros_activos.numero|default:'' }}" class="filtro-input" placeholder="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Document number...{% else %}Número...{% endif %}">
     </div>
     <div class="filtro-group">
-      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Date From{% else %}Fecha Desde{% endif %}</label>
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Date From{% else %}Fecha Desde{% endif %}</label>
       <input type="date" name="desde" value="{{ filtros_activos.desde|default:'' }}" class="filtro-input">
     </div>
     <div class="filtro-group">
-      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Date To{% else %}Fecha Hasta{% endif %}</label>
+      <label class="filtro-label">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Date To{% else %}Fecha Hasta{% endif %}</label>
       <input type="date" name="hasta" value="{{ filtros_activos.hasta|default:'' }}" class="filtro-input">
     </div>
     <div class="filtro-group">
       <button type="submit" class="accion-btn" style="margin-top: 1.5rem;">
         <i class="fas fa-search"></i>
-        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search{% else %}Buscar{% endif %}</span>
+        <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Search{% else %}Buscar{% endif %}</span>
       </button>
       {% if filtros_activos.cliente or filtros_activos.vehiculo or filtros_activos.estado or filtros_activos.tipo or filtros_activos.desde or filtros_activos.hasta or filtros_activos.numero %}
       <a href="{% url 'documentos:lista_documentos' %}" class="accion-btn" style="margin-top: 0.5rem; background: linear-gradient(135deg, rgba(255, 0, 68, 0.2) 0%, rgba(255, 102, 102, 0.2) 100%); border-color: rgba(255, 0, 68, 0.3); color: #ff4466;">
         <i class="fas fa-times"></i>
-        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Clear{% else %}Limpiar{% endif %}</span>
+        <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Clear{% else %}Limpiar{% endif %}</span>
       </a>
       {% endif %}
     </div>
@@ -993,11 +989,11 @@
   <div class="view-toggle">
     <button class="toggle-view-btn active" data-view="cards" onclick="toggleView('cards')">
       <i class="fas fa-th-large"></i>
-      <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Card View{% else %}Vista Matriz{% endif %}</span>
+      <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Card View{% else %}Vista Matriz{% endif %}</span>
     </button>
     <button class="toggle-view-btn" data-view="table" onclick="toggleView('table')">
       <i class="fas fa-table"></i>
-      <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Table View{% else %}Vista Tabla{% endif %}</span>
+      <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Table View{% else %}Vista Tabla{% endif %}</span>
     </button>
   </div>
 
@@ -1018,9 +1014,9 @@
                 {% else %}📄{% endif %}
               </span>
               <span>
-                {% if grupo.grouper == 'FAC' %}Facturas
-                {% elif grupo.grouper == 'OT' %}Órdenes de Trabajo
-                {% elif grupo.grouper == 'PRES' %}Presupuestos
+                {% if grupo.grouper == 'FAC' %}{{ ui_labels.document_type_invoice }}
+                {% elif grupo.grouper == 'OT' %}{{ ui_labels.document_type_work_order }}
+                {% elif grupo.grouper == 'PRES' %}{{ ui_labels.document_type_estimate }}
                 {% else %}{{ grupo.grouper }}{% endif %}
               </span>
             </div>
@@ -1042,9 +1038,9 @@
                       {% else %}📄{% endif %}
                     </span>
                     <span>
-                      {% if documento.tipo == 'FAC' %}Factura
-                      {% elif documento.tipo == 'OT' %}Orden de Trabajo
-                      {% elif documento.tipo == 'PRES' %}Presupuesto
+                      {% if documento.tipo == 'FAC' %}{{ ui_labels.document_type_invoice }}
+                      {% elif documento.tipo == 'OT' %}{{ ui_labels.document_type_work_order }}
+                      {% elif documento.tipo == 'PRES' %}{{ ui_labels.document_type_estimate }}
                       {% else %}{{ documento.tipo }}{% endif %}
                     </span>
                   </div>
@@ -1135,11 +1131,11 @@
               <div class="documento-acciones">
                 <a href="{% country_url 'documentos:ver_documento' documento.id %}" class="accion-btn">
                   <i class="fas fa-eye"></i>
-                  <span>Ver</span>
+                  <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}View{% else %}Ver{% endif %}</span>
                 </a>
                 <a href="{% country_url 'documentos:documento_editar' documento.id %}" class="accion-btn">
                   <i class="fas fa-edit"></i>
-                  <span>Editar</span>
+                  <span>{{ ui_labels.edit_button }}</span>
                 </a>
                 <a href="{% country_url 'documentos:exportar_documento_pdf' documento.id %}" class="accion-btn">
                   <i class="fas fa-file-pdf"></i>
@@ -1152,20 +1148,20 @@
                   <span>WhatsApp</span>
                 </a>
                 {% if documento.tipo == 'PRES' and documento.estado == 'EMITIDO' %}
-                <a href="#" class="accion-btn" onclick="convertirAOT({{ documento.id }}); return false;" title="Convertir a Orden de Trabajo">
+                <a href="#" class="accion-btn" onclick="convertirAOT({{ documento.id }}); return false;" title="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Convert to Work Order{% else %}Convertir a Orden de Trabajo{% endif %}">
                   <i class="fas fa-arrow-right"></i>
                   <span>→ OT</span>
                 </a>
                 {% endif %}
                 {% if documento.tipo == 'OT' and documento.estado == 'EMITIDO' %}
-                <a href="#" class="accion-btn" onclick="crearFactura({{ documento.id }}); return false;" title="Crear Factura">
+                <a href="#" class="accion-btn" onclick="crearFactura({{ documento.id }}); return false;" title="Crear {{ ui_labels.document_type_invoice }}">
                   <i class="fas fa-file-invoice"></i>
                   <span>→ FAC</span>
                 </a>
                 {% endif %}
-                <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="accion-btn danger" onclick="return confirm('¿Estás seguro de eliminar este documento?');">
+                <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="accion-btn danger" onclick="return confirm('{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Are you sure you want to delete this document?{% else %}¿Estás seguro de eliminar este documento?{% endif %}');">
                   <i class="fas fa-trash"></i>
-                  <span>Eliminar</span>
+                  <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Delete{% else %}Eliminar{% endif %}</span>
                 </a>
               </div>
             </div>
@@ -1198,9 +1194,9 @@
           <tr>
             <td>{{ documento.fecha_emision|date:"d/m/Y"|default:"N/A" }}</td>
             <td>
-              {% if documento.tipo == 'FAC' %}🧾 Factura
-              {% elif documento.tipo == 'OT' %}🔧 OT
-              {% elif documento.tipo == 'PRES' %}📋 Presupuesto
+              {% if documento.tipo == 'FAC' %}🧾 {{ ui_labels.document_type_invoice }}
+              {% elif documento.tipo == 'OT' %}🔧 {{ ui_labels.document_type_work_order }}
+              {% elif documento.tipo == 'PRES' %}📋 {{ ui_labels.document_type_estimate }}
               {% else %}{{ documento.tipo }}{% endif %}
             </td>
             <td><strong>#{{ documento.numero|default:documento.id }}</strong></td>
@@ -1245,14 +1241,14 @@
     <div class="empty-state">
       <div class="empty-icon">📄</div>
       <h3 class="empty-title">
-        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No documents{% else %}No hay documentos{% endif %}
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No documents{% else %}No hay documentos{% endif %}
       </h3>
       <p class="empty-description">
-        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No documents have been created in the system yet. Create your first document to start managing the workshop.{% else %}Aún no se han creado documentos en el sistema. Crea tu primer documento para comenzar a gestionar el taller.{% endif %}
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No documents have been created in the system yet. Create your first document to start managing the workshop.{% else %}Aún no se han creado documentos en el sistema. Crea tu primer documento para comenzar a gestionar el taller.{% endif %}
       </p>
       <a href="{% country_url 'documentos:crear_documento' %}" class="crear-documento-btn">
         <i class="fas fa-plus-circle"></i>
-        <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Create First Document{% else %}Crear Primer Documento{% endif %}</span>
+        <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Create First Document{% else %}Crear Primer Documento{% endif %}</span>
       </a>
     </div>
   {% endif %}
@@ -1261,6 +1257,9 @@
 
 {% block page_extra_js %}
 <script>
+// Idioma actual para traducciones JavaScript
+const CURRENT_LANG = '{{ LANGUAGE_CODE|default:request.LANGUAGE_CODE|default:"es" }}';
+
 function toggleView(view) {
   const cardsView = document.getElementById('vista-cards');
   const tableView = document.getElementById('vista-tabla');
@@ -1301,14 +1300,20 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function convertirAOT(presupuestoId) {
-  if (confirm('¿Convertir este presupuesto a Orden de Trabajo?')) {
+  const msg = CURRENT_LANG === 'en' 
+    ? 'Convert this estimate to Work Order?' 
+    : '¿Convertir este presupuesto a Orden de Trabajo?';
+  if (confirm(msg)) {
     // Aquí implementarías la lógica para convertir PRES → OT
     window.location.href = `/cl/es/documentos/${presupuestoId}/convertir-a-ot/`;
   }
 }
 
 function crearFactura(otId) {
-  if (confirm('¿Crear factura desde esta Orden de Trabajo?')) {
+  const msg = CURRENT_LANG === 'en'
+    ? 'Create invoice from this Work Order?'
+    : '¿Crear factura desde esta Orden de Trabajo?';
+  if (confirm(msg)) {
     // Aquí implementarías la lógica para crear FAC desde OT
     window.location.href = `/cl/es/documentos/${otId}/crear-factura/`;
   }
@@ -1316,13 +1321,17 @@ function crearFactura(otId) {
 
 function enviarWhatsApp(documentoId, telefono, nombreCliente) {
   if (!telefono) {
-    alert('❌ El cliente no tiene número de teléfono registrado.');
+    const msg = CURRENT_LANG === 'en'
+      ? '❌ The client does not have a registered phone number.'
+      : '❌ El cliente no tiene número de teléfono registrado.';
+    alert(msg);
     return;
   }
 
   const boton = event.target.closest('.accion-btn');
   const textoOriginal = boton.innerHTML;
-  boton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Enviando...</span>';
+  const sendingText = CURRENT_LANG === 'en' ? 'Sending...' : 'Enviando...';
+  boton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${sendingText}</span>`;
   boton.disabled = true;
 
   fetch(`/cl/documentos/${documentoId}/enviar_whatsapp/`, {
@@ -1337,10 +1346,16 @@ function enviarWhatsApp(documentoId, telefono, nombreCliente) {
     if (data.success) {
       const ventanaWhatsApp = window.open(data.url_whatsapp, '_blank', 'width=800,height=600');
       if (!ventanaWhatsApp) {
-        alert(`📱 WhatsApp no disponible.\n\nNúmero del cliente: ${data.telefono}\nMensaje a enviar:\n${data.mensaje}\n\nPuede copiar este mensaje y enviarlo manualmente por WhatsApp.`);
+        const msg = CURRENT_LANG === 'en'
+          ? `📱 WhatsApp not available.\n\nClient number: ${data.telefono}\nMessage to send:\n${data.mensaje}\n\nYou can copy this message and send it manually via WhatsApp.`
+          : `📱 WhatsApp no disponible.\n\nNúmero del cliente: ${data.telefono}\nMensaje a enviar:\n${data.mensaje}\n\nPuede copiar este mensaje y enviarlo manualmente por WhatsApp.`;
+        alert(msg);
       } else {
         setTimeout(() => {
-          alert('✅ WhatsApp abierto. Si el cliente no tiene WhatsApp, puede enviar el mensaje por SMS.');
+          const msg = CURRENT_LANG === 'en'
+            ? '✅ WhatsApp opened. If the client does not have WhatsApp, you can send the message via SMS.'
+            : '✅ WhatsApp abierto. Si el cliente no tiene WhatsApp, puede enviar el mensaje por SMS.';
+          alert(msg);
         }, 1000);
       }
     } else {
@@ -1349,7 +1364,10 @@ function enviarWhatsApp(documentoId, telefono, nombreCliente) {
   })
   .catch(error => {
     console.error('Error:', error);
-    alert('❌ Error al procesar la solicitud. Intente nuevamente.');
+    const msg = CURRENT_LANG === 'en'
+      ? '❌ Error processing the request. Please try again.'
+      : '❌ Error al procesar la solicitud. Intente nuevamente.';
+    alert(msg);
   })
   .finally(() => {
     boton.innerHTML = textoOriginal;

@@ -1,0 +1,137 @@
+═══════════════════════════════════════════════════════════
+  🖥️  COMANDOS PARA EJECUTAR EN EL TERMINAL DEL SERVIDOR
+═══════════════════════════════════════════════════════════
+
+⚠️  IMPORTANTE: Ejecutar DESPUÉS de subir los archivos con FileZilla
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📂 PASO 1: Ir al directorio del proyecto
+
+cd /ruta/a/egarage
+
+# Si no sabes la ruta exacta, buscar:
+find ~ -name "manage.py" -type f 2>/dev/null | head -1
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔧 PASO 2: Activar virtual environment
+
+source venv/bin/activate
+
+# O si usas workon (PythonAnywhere):
+workon venv_egarage310
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ PASO 3: Verificar que los archivos están subidos
+
+ls -la templates/us/en/onboarding/bienvenida.html
+ls -la templates/us/es/onboarding/bienvenida.html
+ls -la templates/account/signup.html
+
+# Deben mostrar información del archivo (no "No such file")
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔍 PASO 4: Verificar Django (opcional pero recomendado)
+
+python manage.py check --deploy
+
+# Debe mostrar "System check identified no issues"
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎨 PASO 5: Recolectar archivos estáticos
+
+python manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput
+
+# Esto actualiza los archivos CSS/JS estáticos
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔄 PASO 6: Reiniciar servidor web
+
+# OPCIÓN A: PythonAnywhere
+# 1. Ir a: https://www.pythonanywhere.com/user/tu-usuario/web/
+# 2. Clic en el botón "Reload" (verde)
+# 3. Esperar 10-15 segundos
+
+# OPCIÓN B: Gunicorn (otros servidores)
+sudo systemctl restart gunicorn-egarage
+
+# OPCIÓN C: Supervisor
+sudo supervisorctl restart egarage
+
+# OPCIÓN D: Si no tienes sudo, solo recargar:
+touch /var/www/tu-servidor_wsgi.py
+# O el archivo WSGI de tu configuración
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ PASO 7: Verificar cambios
+
+# Abrir en navegador:
+http://tu-servidor/us/en/bienvenida/
+
+# Verificar:
+✅ Botones con bordes neon brillantes
+✅ Botón "Subscribe" redirige a signup
+✅ Espaciado entre botones aumentado
+
+http://tu-servidor/accounts/signup/
+
+# Verificar:
+✅ Campos: Nombre, Apellido, Teléfono, Email, País
+✅ Sección de contraseñas
+✅ Sección de planes
+✅ Fondos oscuros con buen contraste
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🆘 SI LOS BOTONES NO SE ACTUALIZAN (CACHE):
+
+# Opción 1: Usar script automático de limpieza
+chmod +x FIX_CACHE_SERVIDOR.sh
+./FIX_CACHE_SERVIDOR.sh
+
+# Opción 2: Limpiar manualmente
+find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+find . -type f -name "*.pyc" -delete 2>/dev/null || true
+python manage.py collectstatic --noinput --clear
+python manage.py collectstatic --noinput
+
+# Verificar archivos
+chmod +x VERIFICAR_ARCHIVOS_SERVIDOR.sh
+./VERIFICAR_ARCHIVOS_SERVIDOR.sh
+
+# IMPORTANTE: Reiniciar servidor web después de limpiar cache
+# PythonAnywhere: Web tab → Reload
+# Otros: sudo systemctl restart gunicorn-egarage
+
+🆘 SI ALGO FALLA:
+
+# Ver logs de errores
+tail -f logs/django.log
+
+# O si no existe logs/, verificar:
+python manage.py check
+
+# Verificar permisos de archivos
+chmod 644 templates/us/en/onboarding/bienvenida.html
+chmod 644 templates/us/es/onboarding/bienvenida.html
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📝 RESUMEN RÁPIDO (copiar y pegar todo junto):
+
+cd /ruta/a/egarage && \
+source venv/bin/activate && \
+python manage.py check --deploy && \
+python manage.py collectstatic --noinput --clear && \
+python manage.py collectstatic --noinput && \
+echo "✅ Actualización completada. Reinicia el servidor web."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+

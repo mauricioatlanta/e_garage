@@ -51,7 +51,8 @@
     }
 
     body {
-      background: #0a0a0a !important;
+      /* Fondo estático profesional - Sin animaciones */
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%) !important;
       font-family: 'Exo 2', sans-serif;
       color: #ffffff;
       min-height: 100vh;
@@ -351,35 +352,29 @@
   <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/30">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-end">
       <!-- Navegación -->
-      <nav class="hidden md:flex items-center gap-3">
-        <a href="#pricing" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800/50 border border-sky-400/30 text-sky-400 hover:bg-slate-700/70 hover:border-sky-400/60 hover:text-sky-300 transition-all duration-300 font-semibold text-sm backdrop-blur-sm hover:shadow-lg hover:shadow-sky-400/20 hover:-translate-y-0.5">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-          </svg>
-          <span class="lang-en">Pricing</span><span class="lang-es" style="display: none;">Precios</span>
+      <nav class="hidden md:flex items-center gap-5">
+        <a href="#pricing" class="px-4 py-2 bg-gradient-to-r from-purple-700/90 via-purple-600/90 to-pink-600/90 backdrop-blur border-2 border-purple-400/90 text-white font-futuristic font-bold rounded-full text-sm neon-glow-purple hover:from-purple-600 hover:via-purple-500 hover:to-pink-500 hover:border-purple-300 transition-all">
+          💰 <span class="lang-en">Pricing</span><span class="lang-es" style="display: none;">Precios</span>
         </a>
-        <a href="#virtues" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-800/50 border border-emerald-400/30 text-emerald-400 hover:bg-slate-700/70 hover:border-emerald-400/60 hover:text-emerald-300 transition-all duration-300 font-semibold text-sm backdrop-blur-sm hover:shadow-lg hover:shadow-emerald-400/20 hover:-translate-y-0.5">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
-          </svg>
-          <span class="lang-en">Features</span><span class="lang-es" style="display: none;">Características</span>
+        <a href="#virtues" class="px-4 py-2 bg-gradient-to-r from-blue-700/90 via-blue-600/90 to-indigo-600/90 backdrop-blur border-2 border-blue-400/90 text-white font-futuristic font-bold rounded-full text-sm neon-glow-blue hover:from-blue-600 hover:via-blue-500 hover:to-indigo-500 hover:border-blue-300 transition-all">
+          ⚡ <span class="lang-en">Features</span><span class="lang-es" style="display: none;">Características</span>
         </a>
       </nav>
 
       <!-- Botones de Acción -->
-      <div class="flex items-center gap-3">
-        <a href="/accounts/login/?country=US" class="px-4 py-2 text-cyan-400 hover:text-cyan-300 transition-colors font-tech">
-          <span class="lang-en">Login</span><span class="lang-es" style="display: none;">Iniciar sesión</span>
+      <div class="flex items-center gap-5">
+        <a href="/accounts/login/?country=US" class="px-4 py-2 bg-gradient-to-r from-cyan-700/90 via-cyan-600/90 to-teal-600/90 backdrop-blur border-2 border-cyan-400/90 text-white font-futuristic font-bold rounded-full text-sm neon-glow-cyan hover:from-cyan-600 hover:via-cyan-500 hover:to-teal-500 hover:border-cyan-300 transition-all">
+          🔑 <span class="lang-en">Login</span><span class="lang-es" style="display: none;">Iniciar sesión</span>
         </a>
-        <a href="/accounts/signup/?from=us" class="px-4 py-2 neon-button text-black font-futuristic font-bold rounded-full text-sm">
+        <a href="/accounts/signup/?from=us" class="px-4 py-2 bg-gradient-to-r from-amber-600/90 via-yellow-500/90 to-orange-500/90 backdrop-blur border-2 border-yellow-400/90 text-white font-futuristic font-bold rounded-full text-sm neon-glow-yellow hover:from-amber-500 hover:via-yellow-400 hover:to-orange-400 hover:border-yellow-300 transition-all">
           🚀 <span class="lang-en">Start Free</span><span class="lang-es" style="display: none;">Probar Gratis</span>
         </a>
-        <a href="/us/pricing/" class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-futuristic font-bold rounded-full text-sm transition-all">
-          💳 <span class="lang-en">Subscribe</span><span class="lang-es" style="display: none;">Suscribirse</span>
+        <a href="/us/pricing/" class="px-4 py-2 bg-gradient-to-r from-green-700/90 via-green-600/90 to-emerald-600/90 backdrop-blur border-2 border-green-400/90 text-white font-futuristic font-bold rounded-full text-sm neon-glow-green hover:from-green-600 hover:via-green-500 hover:to-emerald-500 hover:border-green-300 transition-all">
+          💳 <span class="lang-en">PLANES</span><span class="lang-es" style="display: none;">PLANES</span>
         </a>
 
         <!-- Language Selector -->
-        <div class="ml-3">
+        <div class="ml-5">
           <form id="language-form" action="{% url 'set_language_us' %}" method="post" class="inline">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ request.get_full_path }}">
@@ -398,22 +393,22 @@
     </div>
   </header>
 
-  <!-- Fondos animados múltiples -->
-  <div id="vanta-globe" class="fixed inset-0 -z-10"></div>
-  <div id="vanta-dots" class="fixed inset-0 -z-20"></div>
-  <div class="grid-bg fixed inset-0 -z-30"></div>
+  <!-- Fondos animados múltiples - DESACTIVADOS para diseño serio -->
+  <!-- <div id="vanta-globe" class="fixed inset-0 -z-10"></div> -->
+  <!-- <div id="vanta-dots" class="fixed inset-0 -z-20"></div> -->
+  <!-- <div class="grid-bg fixed inset-0 -z-30"></div> -->
 
-  <!-- Líneas de energía -->
-  <div class="energy-lines">
+  <!-- Líneas de energía - DESACTIVADAS -->
+  <!-- <div class="energy-lines">
     <div class="energy-line" style="left: 10%; animation-delay: 0s;"></div>
     <div class="energy-line" style="left: 30%; animation-delay: 1s;"></div>
     <div class="energy-line" style="left: 50%; animation-delay: 2s;"></div>
     <div class="energy-line" style="left: 70%; animation-delay: 0.5s;"></div>
     <div class="energy-line" style="left: 90%; animation-delay: 1.5s;"></div>
-  </div>
+  </div> -->
 
-  <!-- Partículas flotantes -->
-  <div class="particles">
+  <!-- Partículas flotantes - DESACTIVADAS -->
+  <!-- <div class="particles">
     <div class="particle" style="left: 5%; animation-delay: 0s;"></div>
     <div class="particle" style="left: 15%; animation-delay: 1s;"></div>
     <div class="particle" style="left: 25%; animation-delay: 2s;"></div>
@@ -426,8 +421,8 @@
     <div class="particle" style="left: 95%; animation-delay: 3.5s;"></div>
   </div>
 
-  <!-- Línea de escaneo -->
-  <div class="scan-line"></div>
+  <!-- Línea de escaneo - DESACTIVADA para diseño serio -->
+  <!-- <div class="scan-line"></div> -->
 
   <main class="relative z-10">
     <!-- Hero Section -->
@@ -449,18 +444,18 @@
          <a href="/accounts/signup/?from=us" class="px-10 py-4 neon-button text-black font-futuristic font-bold rounded-full text-xl">
            🚀 <span class="lang-en">Start Free Trial</span><span class="lang-es" style="display: none;">Prueba Gratis</span>
          </a>
-         <a href="/accounts/login/" class="px-10 py-4 bg-black/60 backdrop-blur border border-cyan-400/50 text-cyan-400 font-futuristic font-bold rounded-full text-xl hover:bg-black/80 transition-all">
+         <a href="/accounts/login/" class="px-10 py-4 bg-gradient-to-r from-cyan-600/80 to-blue-600/80 backdrop-blur border-2 border-cyan-400/70 text-white font-futuristic font-bold rounded-full text-xl hover:from-cyan-500 hover:to-blue-500 hover:border-cyan-300 hover:shadow-lg hover:shadow-cyan-400/50 transition-all">
            🔑 <span class="lang-en">Login</span><span class="lang-es" style="display: none;">Iniciar Sesión</span>
          </a>
          <a href="/us/pricing/" class="px-10 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-futuristic font-bold rounded-full text-xl transition-all shadow-lg hover:shadow-green-500/50">
-           💳 <span class="lang-en">Subscribe to a Plan</span><span class="lang-es" style="display: none;">Suscribirse a un Plan</span>
+           💳 <span class="lang-en">PLANES</span><span class="lang-es" style="display: none;">PLANES</span>
          </a>
        </div>
     </section>
 
          <!-- Botón sticky CTA flotante con Quick Actions -->
      <div class="sticky-cta flex flex-col gap-3">
-       <a href="#cta" class="neon-button text-black px-6 py-3 rounded-full text-lg font-futuristic font-bold" aria-label="{% trans 'Start your free trial now' %}">🚀 <span class="lang-en">Start Now</span><span class="lang-es" style="display: none;">Comenzar Ahora</span></a>
+       <a href="/accounts/signup/?from=us" class="neon-button text-black px-6 py-3 rounded-full text-lg font-futuristic font-bold" aria-label="{% trans 'Start your free trial now' %}">🚀 <span class="lang-en">Start Now</span><span class="lang-es" style="display: none;">Comenzar Ahora</span></a>
        
        <!-- Quick Actions Dropdown -->
        <div class="flex gap-2">
@@ -747,7 +742,7 @@
         <a href="/accounts/signup/?from=us" class="px-10 py-4 neon-button text-black text-xl font-bold rounded-2xl">
           🚀 <span class="lang-en">Start Free Today</span><span class="lang-es" style="display: none;">Comienza Gratis Hoy</span>
         </a>
-        <a href="/us/pricing/" class="px-10 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-xl font-bold rounded-2xl transition-all shadow-lg hover:shadow-green-500/50">
+        <a href="/accounts/signup/?from=us" class="px-10 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-xl font-bold rounded-2xl transition-all shadow-lg hover:shadow-green-500/50">
           💳 <span class="lang-en">View Plans</span><span class="lang-es" style="display: none;">Ver Planes</span>
         </a>
       </div>
@@ -1059,8 +1054,8 @@
       const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       if (!reduce) {
-        // Vanta.js Globe
-        if (typeof VANTA !== 'undefined' && VANTA.GLOBE) {
+        // Vanta.js Globe - DESACTIVADO para diseño serio
+        /* if (typeof VANTA !== 'undefined' && VANTA.GLOBE) {
           VANTA.GLOBE({
             el: "#vanta-globe",
             mouseControls: true,
@@ -1077,8 +1072,8 @@
           });
         }
 
-        // Vanta.js Dots
-        if (typeof VANTA !== 'undefined' && VANTA.DOTS) {
+        // Vanta.js Dots - DESACTIVADO para diseño serio
+        /* if (typeof VANTA !== 'undefined' && VANTA.DOTS) {
           VANTA.DOTS({
             el: "#vanta-dots",
             mouseControls: true,
@@ -1095,7 +1090,7 @@
             spacing: 35.00,
             showLines: false
           });
-        }
+        } */
 
         // AOS.js animaciones scroll
         if (typeof AOS !== 'undefined') {
@@ -1311,3 +1306,4 @@
   </script>
 </body>
 </html>
+<!-- PC_DEPLOY_MARKER 2025-12-12T16:12:22 -->

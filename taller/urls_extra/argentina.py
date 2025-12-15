@@ -1,11 +1,16 @@
-from django.urls import path, include
-from django.views.generic import TemplateView
+"""
+URLs específicas para Argentina (español)
+Prefijo: /ar/es/
+"""
+
 import logging
+
 from django.http import HttpResponseRedirect
+from django.urls import include, path
+from django.views.generic import TemplateView
 
 from taller.taller_views import dashboard_suscripciones
 from taller.views_extra.company_settings_views import company_settings_view
-from taller.views_extra.country_views import test_chile_view
 from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones,
     dashboard_centro_operaciones_espacial,
@@ -24,49 +29,51 @@ logger.debug("CARGANDO taller/urls_extra/argentina.py")
 
 app_name = "argentina"
 
-
-def strip_es(request, rest=""):
-    # /ar/es/...  -> /ar/...
-    return HttpResponseRedirect(
-        f"/ar/{rest}".rstrip("/") + ("/" if rest and not rest.endswith("/") else "")
-    )
-
-
 urlpatterns = [
-    # Alias: /ar/es/ -> /ar/
-    path("es/", strip_es),
-    path("es/<path:rest>", strip_es),
-    # Home AR - NO redirige a /cl/
-    path(
-        "",
-        TemplateView.as_view(template_name="ar/es/onboarding/bienvenida.html"),
-        name="argentina_home",
-    ),
-    # URLs principales de taller
+    # Vista de inicio para /ar/es/ - redirige a la página principal de Argentina
+    path("", lambda request: HttpResponseRedirect("/ar/"), name="argentina_home"),
+    # URLs principales de taller (configuración, settings, etc.)
     path("dashboard/", dashboard, name="dashboard"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
-    # Página de bienvenida
+    path(
+        "centro-operaciones-espacial/",
+        dashboard_centro_operaciones_espacial,
+        name="centro_operaciones_espacial",
+    ),
+    path("admin/dashboard/", dashboard_suscripciones, name="dashboard_suscripciones"),
+    path("configuracion/", configuracion_empresa, name="configuracion"),
+    path("configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"),
+    path("settings/", company_settings_view, name="company_settings"),
+    # Test endpoint Argentina
+    path("test/", lambda request: HttpResponseRedirect("/ar/"), name="test"),
+    # Página de bienvenida para Argentina
+    path(
+        "egarage/",
+        TemplateView.as_view(template_name="onboarding/bienvenida_argentina.html"),
+        name="bienvenida_argentina",
+    ),
+    # Página de bienvenida alternativa (ruta estándar)
     path(
         "bienvenida/",
         TemplateView.as_view(template_name="ar/es/onboarding/bienvenida.html"),
         name="bienvenida_argentina_alt",
     ),
-    # Login
+    # Login para suscriptores de Argentina
     path(
         "login/",
         TemplateView.as_view(template_name="registration/login.html"),
         name="account_login",
     ),
-    # Activación de trial
+    # Activación de trial para Argentina
     path("activar-trial/", activar_trial, name="activar_trial"),
-    # Registro
+    # Registro para Argentina (español por defecto)
     path(
         "registro/",
         include(("scripts.onboarding_urls", "onboarding"), namespace="argentina_onboarding"),
     ),
     # Dashboard de suscriptor
     path("", include("taller.analytics.urls_suscriptor")),
-    # Servicios y documentos
+    # Servicios y documentos con namespace bajo /ar/taller/
     path(
         "taller/servicios/",
         include(("taller.servicios.urls", "servicios"), namespace="servicios_admin"),
@@ -75,7 +82,7 @@ urlpatterns = [
         "taller/reportes/",
         include(("taller.reportes.urls", "reportes"), namespace="reportes_ar"),
     ),
-    # Módulos principales del sistema (con country_code="ar")
+    # Módulos principales del sistema (disponibilidad directa bajo /ar/es/)
     path(
         "clientes/",
         include(("taller.clientes.urls", "clientes"), namespace="clientes"),
@@ -95,12 +102,14 @@ urlpatterns = [
         {"country_code": "ar", "lang_code": "es"},
         name="lista_documentos_ar",
     ),
+    # Crear documento Argentina
     path(
         "documentos/nuevo/",
         views_documentos.documento_crear,
         {"country_code": "ar", "lang_code": "es"},
         name="crear_documento_ar",
     ),
+    # Editar documento Argentina
     path(
         "documentos/<int:pk>/editar/",
         views_documentos.documento_editar,
@@ -123,7 +132,7 @@ urlpatterns = [
         "tecnicos/",
         include(("taller.tecnicos.urls", "tecnicos"), namespace="tecnicos"),
     ),
-    # Business Intelligence
+    # Business Intelligence bajo /ar/business-intelligence/
     path(
         "business-intelligence/",
         include(
@@ -131,10 +140,12 @@ urlpatterns = [
             namespace="business_intelligence",
         ),
     ),
-    # APIs
+    # === APIs ===
     path("api/", include(("taller.api.urls", "api"), namespace="api")),
+    # === AJAX ENDPOINTS ===
     path("ajax/", include(("taller.ajax.urls", "ajax"), namespace="ajax")),
-    # URLs principales de taller
+    # === MÓDULOS PRINCIPALES ===
+    # Incluir URLs principales de taller (clientes, vehiculos, repuestos, etc.)
     path("", include(("taller.urls", "taller"), namespace="taller")),
     path(
         "autocomplete/",

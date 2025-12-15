@@ -16,6 +16,7 @@ from taller.views_extra.views_configuracion import (
     configuracion_tecnicos,
 )
 from taller.views_extra.views_trial_activate import activar_trial
+from taller.views_extra.views_suscripciones import precios
 from taller.documentos import views_country_aware as views_documentos
 
 # Configuración de logging para este módulo
@@ -45,6 +46,8 @@ urlpatterns = [
     ),
     # Activación de trial para Chile
     path("activar-trial/", activar_trial, name="activar_trial"),
+    # Precios y planes para Chile
+    path("precios/", precios, name="precios"),
     # Registro para Chile (español por defecto)
     path(
         "registro/",

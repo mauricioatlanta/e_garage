@@ -24,7 +24,7 @@
         // Solo mostrar en dispositivos móviles
         MOBILE_ONLY: true,
         // Mostrar notificación en desktop
-        SHOW_DESKTOP_NOTIFICATION: true,
+        SHOW_DESKTOP_NOTIFICATION: false, // Desactivado: no mostrar en PC, solo en móviles
         // Verificar instalación iOS cada X segundos
         IOS_INSTALL_CHECK_INTERVAL: 2000
     };

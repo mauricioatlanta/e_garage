@@ -70,12 +70,12 @@ DEFAULT_VEHICLE_TEMPLATES = {
 def _get_country_from_path(path: str) -> tuple[str, str]:
     """
     Extrae country_code y lang_code desde la URL path.
-    
+
     Returns:
         tuple: (country_code, lang_code) ej: ("cl", "es"), ("us", "en")
     """
     path_lower = path.lower()
-    
+
     # Mapeo de prefijos a (country, lang)
     country_map = {
         "/cl/es/": ("cl", "es"),
@@ -88,12 +88,12 @@ def _get_country_from_path(path: str) -> tuple[str, str]:
         "/mx/es/": ("mx", "es"),
         "/br/es/": ("br", "es"),
     }
-    
+
     # Buscar prefijo más largo primero
     for prefix, (country, lang) in sorted(country_map.items(), key=lambda x: -len(x[0])):
         if path_lower.startswith(prefix):
             return country, lang
-    
+
     # Fallback: detectar país desde path
     if path_lower.startswith("/us/"):
         return "us", "en"
@@ -111,7 +111,7 @@ def _get_country_from_path(path: str) -> tuple[str, str]:
         return "ve", "es"
     elif path_lower.startswith("/br/"):
         return "br", "es"
-    
+
     # Default
     return "cl", "es"
 
@@ -277,7 +277,7 @@ def lista_vehiculos(request):
 
     # Detectar país e idioma desde la URL
     country, lang = _get_country_from_path(request.path)
-    
+
     # Usar select_template con fallback a common
     template_obj = select_template(
         [
@@ -286,10 +286,14 @@ def lista_vehiculos(request):
         ]
     )
 
-    return render(request, template_obj.template.name, {
-        "vehiculos": vehiculos,
-        "empresa": empresa,
-    })
+    return render(
+        request,
+        template_obj.template.name,
+        {
+            "vehiculos": vehiculos,
+            "empresa": empresa,
+        },
+    )
 
 
 @login_required

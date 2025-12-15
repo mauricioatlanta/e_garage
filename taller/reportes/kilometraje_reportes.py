@@ -12,6 +12,7 @@ from datetime import timedelta
 from decimal import Decimal
 from typing import Dict, List, Optional
 
+from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Avg, Count, F, Q, Sum
 from django.utils import timezone
 
@@ -107,15 +108,20 @@ class ReporteKilometraje:
 
         garantias = []
         for doc in documentos:
-            if doc.registro_kilometraje:
-                # Aquí se podría agregar lógica para identificar garantías
-                garantias.append(
-                    {
-                        "documento": doc,
-                        "kilometraje": doc.registro_kilometraje.kilometraje,
-                        "fecha": doc.fecha_emision,
-                    }
-                )
+            try:
+                registro_km = doc.registro_kilometraje
+                if registro_km:
+                    # Aquí se podría agregar lógica para identificar garantías
+                    garantias.append(
+                        {
+                            "documento": doc,
+                            "kilometraje": registro_km.kilometraje,
+                            "fecha": doc.fecha_emision,
+                        }
+                    )
+            except (ObjectDoesNotExist, AttributeError):
+                # Documento no tiene registro_kilometraje asociado
+                continue
 
         return garantias
 
@@ -322,8 +328,13 @@ class ReporteKilometraje:
         for doc in documentos:
             # Obtener kilometraje
             km = None
-            if doc.registro_kilometraje:
-                km = doc.registro_kilometraje.kilometraje
+            try:
+                registro_km = doc.registro_kilometraje
+                if registro_km:
+                    km = registro_km.kilometraje
+            except (ObjectDoesNotExist, AttributeError):
+                # Documento no tiene registro_kilometraje asociado
+                km = None
 
             # Resumir trabajos realizados
             trabajos = []

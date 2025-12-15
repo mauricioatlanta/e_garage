@@ -9,21 +9,21 @@ from taller.configuracion.rubros_responsables import (
 from taller.models.tecnico import Tecnico
 
 
-DEFAULT_ROLES = ['TECNICO', 'VENDEDOR', 'MIXTO']
+DEFAULT_ROLES = ["TECNICO", "VENDEDOR", "MIXTO"]
 
 ROLES_POR_RUBRO = {
-    "WORKSHOP": ['TECNICO', 'MIXTO'],
-    "WORKSHOP_MOTO": ['TECNICO', 'MIXTO'],
-    "WORKSHOP_HEAVY": ['TECNICO', 'MIXTO'],
-    "EXHAUST": ['TECNICO', 'MIXTO'],
-    "BODYSHOP": ['TECNICO', 'MIXTO'],
-    "ELECTRIC": ['TECNICO', 'MIXTO'],
-    "TIRE": ['TECNICO', 'MIXTO'],
-    "PARTS": ['VENDEDOR', 'MIXTO'],
-    "DETAILING": ['TECNICO', 'VENDEDOR', 'MIXTO'],
-    "GLASS_AUDIO": ['TECNICO', 'VENDEDOR', 'MIXTO'],
-    "FLEET": ['TECNICO', 'MIXTO'],
-    "MIXED": ['TECNICO', 'VENDEDOR', 'MIXTO'],
+    "WORKSHOP": ["TECNICO", "MIXTO"],
+    "WORKSHOP_MOTO": ["TECNICO", "MIXTO"],
+    "WORKSHOP_HEAVY": ["TECNICO", "MIXTO"],
+    "EXHAUST": ["TECNICO", "MIXTO"],
+    "BODYSHOP": ["TECNICO", "MIXTO"],
+    "ELECTRIC": ["TECNICO", "MIXTO"],
+    "TIRE": ["TECNICO", "MIXTO"],
+    "PARTS": ["VENDEDOR", "MIXTO"],
+    "DETAILING": ["TECNICO", "VENDEDOR", "MIXTO"],
+    "GLASS_AUDIO": ["TECNICO", "VENDEDOR", "MIXTO"],
+    "FLEET": ["TECNICO", "MIXTO"],
+    "MIXED": ["TECNICO", "VENDEDOR", "MIXTO"],
 }
 
 
@@ -53,6 +53,3 @@ def get_ui_config(config):
         "show_repuestos": True,
         "show_kilometraje": False,
     }
-
-
-

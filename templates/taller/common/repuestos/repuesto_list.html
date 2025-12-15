@@ -3,8 +3,8 @@
 {% load i18n static %}
 {% load money %}
 
-{% block page_title %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Parts & Inventory{% else %}Repuestos e Inventario{% endif %}{% endblock %}
-{% block page_subtitle %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Advanced parts management system{% else %}Sistema avanzado de gestión de repuestos{% endif %}{% endblock %}
+{% block page_title %}{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Parts & Inventory{% else %}Repuestos e Inventario{% endif %}{% endblock %}
+{% block page_subtitle %}{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Advanced parts management system{% else %}Sistema avanzado de gestión de repuestos{% endif %}{% endblock %}
 {% block page_icon %}🔧{% endblock %}
 
 {% block page_extra_css %}
@@ -113,7 +113,7 @@
 {% block main_actions %}
 <a href="{% country_url 'repuestos:crear_repuesto' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-sm font-semibold border border-emerald-400/40 shadow-lg shadow-emerald-900/40 transition-all">
   <span>➕</span>
-  <span>{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add Part{% else %}Agregar Repuesto{% endif %}</span>
+  <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Add Part{% else %}Agregar Repuesto{% endif %}</span>
 </a>
 {% endblock %}
 
@@ -123,21 +123,21 @@
     <span class="text-cyan-300">📦</span>
     <div>
       <div class="text-white font-bold text-lg">{{ object_list.count }}</div>
-      <div class="text-gray-400">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Total Parts{% else %}Repuestos Totales{% endif %}</div>
+      <div class="text-gray-400">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Total Parts{% else %}Repuestos Totales{% endif %}</div>
     </div>
   </div>
   <div class="flex items-center gap-2 bg-black/40 border border-cyan-400/30 rounded-lg p-3">
     <span class="text-green-300">💰</span>
     <div>
       <div class="text-white font-bold text-lg">{{ total_value|money_by_country:country }}</div>
-      <div class="text-gray-400">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Total Value{% else %}Valor Total{% endif %}</div>
+      <div class="text-gray-400">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Total Value{% else %}Valor Total{% endif %}</div>
     </div>
   </div>
   <div class="flex items-center gap-2 bg-black/40 border border-cyan-400/30 rounded-lg p-3">
     <span class="text-orange-300">⚠️</span>
     <div>
       <div class="text-white font-bold text-lg">{{ low_stock_count|default:"0" }}</div>
-      <div class="text-gray-400">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Low Stock{% else %}Stock Bajo{% endif %}</div>
+      <div class="text-gray-400">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Low Stock{% else %}Stock Bajo{% endif %}</div>
     </div>
   </div>
 </div>
@@ -149,11 +149,11 @@
   <div class="relative flex items-center gap-3 rounded-lg border border-cyan-500/30 bg-black/40 backdrop-blur-sm px-3 py-2">
     <div class="relative flex-1">
       <input type="text" id="searchInput" 
-             placeholder="{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search by part number, name, or category...{% else %}Buscar por código, nombre o categoría...{% endif %}"
+             placeholder="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Search by part number, name, or category...{% else %}Buscar por código, nombre o categoría...{% endif %}"
              class="search-input" value="{{ request.GET.q }}" autocomplete="off">
     </div>
     <button onclick="searchParts()" class="cyber-button text-sm">
-      {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Search{% else %}Buscar{% endif %}
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Search{% else %}Buscar{% endif %}
     </button>
   </div>
 </div>
@@ -184,20 +184,20 @@
 
     {% if repuesto.categoria %}
     <div class="text-sm text-gray-400 mb-2">
-      {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Category{% else %}Categoría{% endif %}: {{ repuesto.categoria.nombre }}
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Category{% else %}Categoría{% endif %}: {{ repuesto.categoria.nombre }}
     </div>
     {% endif %}
 
     <div class="flex justify-between items-center mt-4">
       <div class="part-price">{{ repuesto.precio_venta|money_by_country:country }}</div>
       <div class="text-sm text-gray-400">
-        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Stock{% else %}Stock{% endif %}: {{ repuesto.cantidad_stock|default:"0" }}
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Stock{% else %}Stock{% endif %}: {{ repuesto.cantidad_stock|default:"0" }}
       </div>
     </div>
 
     {% if repuesto.proveedor %}
     <div class="text-xs text-gray-500 mt-2">
-      {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Supplier{% else %}Proveedor{% endif %}: {{ repuesto.proveedor }}
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Supplier{% else %}Proveedor{% endif %}: {{ repuesto.proveedor }}
     </div>
     {% endif %}
   </div>
@@ -205,13 +205,13 @@
   <div class="col-span-full text-center py-12">
     <div class="text-6xl mb-4 opacity-50">🔧</div>
     <h3 class="text-xl font-bold text-white mb-2">
-      {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}No Parts Found{% else %}No hay repuestos{% endif %}
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No Parts Found{% else %}No hay repuestos{% endif %}
     </h3>
     <p class="text-gray-400 mb-4">
-      {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Start by adding your first automotive part{% else %}Comienza agregando tu primer repuesto{% endif %}
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Start by adding your first automotive part{% else %}Comienza agregando tu primer repuesto{% endif %}
     </p>
     <a href="{% country_url 'repuestos:crear_repuesto' %}" class="cyber-button inline-block no-underline">
-      {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Add First Part{% else %}Agregar Primer Repuesto{% endif %}
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Add First Part{% else %}Agregar Primer Repuesto{% endif %}
     </a>
   </div>
   {% endfor %}
@@ -221,28 +221,28 @@
 {% if is_paginated %}
 <div class="pagination-container">
   {% if page_obj.has_previous %}
-    <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+      <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
        class="cyber-button text-sm">
-      {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}First{% else %}Primera{% endif %}
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}First{% else %}Primera{% endif %}
     </a>
     <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
        class="cyber-button text-sm">
-      {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Previous{% else %}Anterior{% endif %}
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Previous{% else %}Anterior{% endif %}
     </a>
   {% endif %}
 
   <span class="text-cyan-400 font-bold px-4">
-    {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Page{% else %}Página{% endif %} {{ page_obj.number }} {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}of{% else %}de{% endif %} {{ page_obj.paginator.num_pages }}
+    {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Page{% else %}Página{% endif %} {{ page_obj.number }} {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}of{% else %}de{% endif %} {{ page_obj.paginator.num_pages }}
   </span>
 
   {% if page_obj.has_next %}
     <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
        class="cyber-button text-sm">
-      {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Next{% else %}Siguiente{% endif %}
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Next{% else %}Siguiente{% endif %}
     </a>
     <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
        class="cyber-button text-sm">
-      {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Last{% else %}Última{% endif %}
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Last{% else %}Última{% endif %}
     </a>
   {% endif %}
 </div>
@@ -255,17 +255,17 @@
       <div class="text-center">
         <div class="text-red-500 text-4xl mb-4">⚠️</div>
         <h3 class="text-xl font-bold text-white mb-2">
-          {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Confirm Deletion{% else %}Confirmar Eliminación{% endif %}
+          {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Confirm Deletion{% else %}Confirmar Eliminación{% endif %}
         </h3>
         <p class="text-gray-300 mb-6">
-          {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Are you sure you want to delete the part{% else %}¿Seguro que deseas eliminar el repuesto{% endif %} <span id="partName" class="text-red-400 font-bold"></span>?
+          {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Are you sure you want to delete the part{% else %}¿Seguro que deseas eliminar el repuesto{% endif %} <span id="partName" class="text-red-400 font-bold"></span>?
         </p>
         <div class="flex gap-3">
           <button onclick="closeModal()" class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
-            {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Cancel{% else %}Cancelar{% endif %}
+            {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Cancel{% else %}Cancelar{% endif %}
           </button>
           <button onclick="confirmDelete()" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
-            {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Delete{% else %}Eliminar{% endif %}
+            {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Delete{% else %}Eliminar{% endif %}
           </button>
         </div>
       </div>
@@ -333,7 +333,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function performSearch(query) {
         if (!partsContainer) return;
         
-        partsContainer.innerHTML = '<div class="col-span-full text-center py-12"><div class="text-cyan-400 text-xl">{% if LANGUAGE_CODE == "en" or request.path|slice:":3" == "/us" %}Searching...{% else %}Buscando...{% endif %}</div></div>';
+        partsContainer.innerHTML = '<div class="col-span-full text-center py-12"><div class="text-cyan-400 text-xl">{% if LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}Searching...{% else %}Buscando...{% endif %}</div></div>';
         
         fetch(searchAjaxUrl, {
             method: 'POST',
@@ -359,7 +359,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            partsContainer.innerHTML = data.html || '<div class="col-span-full text-center py-12"><div class="text-6xl mb-4">🔧</div><h3 class="text-xl font-bold text-white mb-2">{% if LANGUAGE_CODE == "en" or request.path|slice:":3" == "/us" %}No Parts Found{% else %}No hay repuestos{% endif %}</h3></div>';
+            partsContainer.innerHTML = data.html || '<div class="col-span-full text-center py-12"><div class="text-6xl mb-4">🔧</div><h3 class="text-xl font-bold text-white mb-2">{% if LANGUAGE_CODE == "en" or request.LANGUAGE_CODE == "en" %}No Parts Found{% else %}No hay repuestos{% endif %}</h3></div>';
             
             const url = new URL(window.location);
             if (query.trim()) {

@@ -149,28 +149,33 @@ MIDDLEWARE = [
 # pero donde el middleware no está disponible
 try:
     from allauth.account.middleware import AccountMiddleware
+
     # El middleware existe, agregarlo después de AuthenticationMiddleware
-    auth_middleware_index = MIDDLEWARE.index("django.contrib.auth.middleware.AuthenticationMiddleware")
+    auth_middleware_index = MIDDLEWARE.index(
+        "django.contrib.auth.middleware.AuthenticationMiddleware"
+    )
     MIDDLEWARE.insert(auth_middleware_index + 1, "allauth.account.middleware.AccountMiddleware")
 except ImportError:
     # El middleware no existe, pero allauth puede requerirlo
     # Intentar desactivar la verificación si es posible
     try:
         import allauth.account.apps
+
         # Monkey patch para desactivar la verificación del middleware (solo una vez)
-        if not hasattr(allauth.account.apps.AccountConfig.ready, '_patched_for_middleware'):
+        if not hasattr(allauth.account.apps.AccountConfig.ready, "_patched_for_middleware"):
             original_ready = allauth.account.apps.AccountConfig.ready
-            
+
             def patched_ready(self):
                 # Verificar si el middleware está en MIDDLEWARE antes de lanzar error
                 try:
                     from allauth.account.middleware import AccountMiddleware
+
                     # Si el middleware existe, usar la verificación original
                     return original_ready(self)
                 except ImportError:
                     # El middleware no existe, omitir la verificación
                     pass
-            
+
             patched_ready._patched_for_middleware = True
             allauth.account.apps.AccountConfig.ready = patched_ready
     except Exception:

@@ -2,27 +2,12 @@
 __pycache__/
 *.py[cod]
 *.pyo
+*.pyc
 
-<<<<<<< HEAD
 # Node
 node_modules/
 package-lock.json
 
-# scripts locales diagnostico
-verificar_*.py
-diagnostico_*.py
-corregir_*.py
-
-# sensibles / demo local
-CREDENCIALES_PRUEBA.md
-eg_cl_demo_20251115.json
-
-
-# python cache
-__pycache__/
-*.pyc
-
-=======
 # Django / DB local
 db.sqlite3
 *.sqlite3
@@ -30,8 +15,11 @@ db.sqlite3
 # Test / tooling caches
 .pytest_cache/
 .mypy_cache/
+.ruff_cache/
 .coverage
 htmlcov/
+playwright-report/
+test-results/
 
 # Env
 .env
@@ -40,11 +28,22 @@ htmlcov/
 # Uploads (Django MEDIA)
 media/
 
+# Static files (generated)
+staticfiles/
+
 # OS
 Thumbs.db
 Desktop.ini
 .DS_Store
->>>>>>> 95f08c61 (Add .gitignore (ignore caches and local sqlite db))
+
+# Scripts locales diagnostico
+verificar_*.py
+diagnostico_*.py
+corregir_*.py
+
+# Sensibles / demo local
+CREDENCIALES_PRUEBA.md
+eg_cl_demo_20251115.json
 
 # Local DB backups
 *.BACKUP.*

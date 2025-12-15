@@ -608,8 +608,20 @@ def otros_servicios_menu(request):
 
     empresa = getattr(request.user, "empresa", None)
     country_code = _detectar_pais(request)
-    language = COUNTRY_LANGUAGE_MAP.get(country_code, "es")
-    labels = OTHER_LABELS.get(country_code, OTHER_LABELS["CL"])
+    # Detectar idioma real del request, no solo el mapeo por país
+    language = (
+        get_language()
+        or getattr(request, "LANGUAGE_CODE", None)
+        or COUNTRY_LANGUAGE_MAP.get(country_code, "es")
+    )
+    # Si el idioma es español, usar labels de CL (que están en español)
+    # Si el idioma es inglés y el país es US, usar labels de US
+    if language == "es":
+        labels = OTHER_LABELS.get("CL", OTHER_LABELS["CL"])
+    elif country_code == "US" and language == "en":
+        labels = OTHER_LABELS.get("US", OTHER_LABELS["CL"])
+    else:
+        labels = OTHER_LABELS.get(country_code, OTHER_LABELS["CL"])
     currency_settings = CURRENCY_SETTINGS.get(country_code, CURRENCY_SETTINGS["CL"])
 
     if empresa:

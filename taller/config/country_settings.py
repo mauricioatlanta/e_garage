@@ -155,7 +155,7 @@ class CountrySettings:
             "url_prefix": "/ar",
             "url_prefix_legacy": None,
             "timezone": "America/Argentina/Buenos_Aires",
-            "tax_rate": 21.0,
+            "tax_rate": 21.0,  # IVA 21%
             "tax_label": "IVA",
             "phone_prefix": "+54",
             "date_format": "DD/MM/YYYY",
@@ -171,13 +171,12 @@ class CountrySettings:
             "url_prefix": "/uy",
             "url_prefix_legacy": None,
             "timezone": "America/Montevideo",
-            "tax_rate": 22.0,
+            "tax_rate": 22.0,  # IVA 22%
             "tax_label": "IVA",
             "phone_prefix": "+598",
             "date_format": "DD/MM/YYYY",
             "namespace": "uruguay",
         },
-
     }
 
     # País por defecto
@@ -354,6 +353,8 @@ class CountrySettings:
                 "EC": "🇪🇨",
                 "BR": "🇧🇷",
                 "VE": "🇻🇪",
+                "AR": "🇦🇷",
+                "UY": "🇺🇾",
             }.get(country_code, "")
 
             display_name = f"{flag_emoji} {name}" if flag_emoji else name

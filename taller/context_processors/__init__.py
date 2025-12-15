@@ -56,9 +56,9 @@ def company_branding(request):
     from taller.models.empresa import Empresa
 
     user = getattr(request, "user", None)
-    
+
     # Si estamos en la página raíz o de selección de país, siempre usar "eGarage"
-    if request.path == '/' or request.path == '' or 'seleccionar_pais' in request.path:
+    if request.path == "/" or request.path == "" or "seleccionar_pais" in request.path:
         brand = {
             "logo_url": getattr(settings, "DEFAULT_BRAND_LOGO_URL", None),
             "name": "eGarage",

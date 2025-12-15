@@ -42,16 +42,8 @@ def lista_vehiculos(request):
     vehiculos = Vehiculo.objects.filter(empresa=empresa).select_related(
         "cliente", "marca", "modelo"
     )
-    marcas = (
-        MarcaUSA.objects.filter(activa=True).order_by("nombre")[:500]
-        if MarcaUSA
-        else []
-    )
-    modelos = (
-        ModeloUSA.objects.filter(activo=True).order_by("nombre")[:500]
-        if ModeloUSA
-        else []
-    )
+    marcas = MarcaUSA.objects.filter(activa=True).order_by("nombre")[:500] if MarcaUSA else []
+    modelos = ModeloUSA.objects.filter(activo=True).order_by("nombre")[:500] if ModeloUSA else []
     return render(
         request,
         _template_us("vehiculo_list.html"),
@@ -80,14 +72,10 @@ def crear_vehiculo(request):
         "clientes": Cliente.objects.filter(empresa=empresa)[:500],
         "colores": ColorVehiculo.get_colores_para_pais("US"),
         "marcas_usa": (
-            MarcaUSA.objects.filter(activa=True).order_by("nombre")[:500]
-            if MarcaUSA
-            else []
+            MarcaUSA.objects.filter(activa=True).order_by("nombre")[:500] if MarcaUSA else []
         ),
         "modelos_usa": (
-            ModeloUSA.objects.filter(activo=True).order_by("nombre")[:500]
-            if ModeloUSA
-            else []
+            ModeloUSA.objects.filter(activo=True).order_by("nombre")[:500] if ModeloUSA else []
         ),
     }
     return render(request, _template_us("crear.html"), ctx)
@@ -97,9 +85,7 @@ def crear_vehiculo(request):
 def ver_vehiculo(request, pk):
     empresa = _get_empresa(request)
     vehiculo = get_object_or_404(Vehiculo, pk=pk, empresa=empresa)
-    return render(
-        request, _template_us("detalle.html"), {"vehiculo": vehiculo, "country": "US"}
-    )
+    return render(request, _template_us("detalle.html"), {"vehiculo": vehiculo, "country": "US"})
 
 
 @login_required

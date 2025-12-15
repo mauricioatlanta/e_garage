@@ -2,10 +2,35 @@
 {% load country_url %}
 {% load i18n static %}
 
-{% block title %}External Services - {{ empresa.nombre_taller }}{% endblock %}
+{% block title %}{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Servicios Externos{% else %}External Services{% endif %} - {{ empresa.nombre_taller }}{% endblock %}
 
 {% block content %}
 {% csrf_token %}
+
+<!-- Header Section -->
+<div class="mb-6">
+    <div class="relative">
+        <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-lime-400 opacity-20 blur-xl animate-pulse"></div>
+        <div class="relative rounded-xl border border-cyan-400/30 bg-black/40 backdrop-blur-sm p-4 lg:p-6">
+            <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                <div class="flex items-start gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-400 to-blue-600 flex items-center justify-center text-xl shadow-lg ring-2 ring-cyan-400/40">🤝</div>
+                    <div>
+                        <h1 class="text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-lime-300 to-emerald-400">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}{% if labels.title %}{{ labels.title }}{% else %}Servicios Externos{% endif %}{% else %}{% if labels.title %}{{ labels.title }}{% else %}External Services{% endif %}{% endif %}</h1>
+                        <p class="text-gray-400 text-sm">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}{% if labels.subtitle %}{{ labels.subtitle }}{% else %}Trabajos manejados por proveedores terceros de confianza.{% endif %}{% else %}{% if labels.subtitle %}{{ labels.subtitle }}{% else %}Jobs handled by trusted third-party vendors.{% endif %}{% endif %}</p>
+                    </div>
+                </div>
+                <div>
+                    <a href="{% country_url 'servicios:crear_otro_servicio' %}"
+                       class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-sm font-semibold border border-emerald-400/40 shadow-lg shadow-emerald-900/40 transition-all">
+                        <span>➕</span>
+                        <span>{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}{% if labels.button_add %}{{ labels.button_add }}{% else %}Registrar Servicio Externo{% endif %}{% else %}{% if labels.button_add %}{{ labels.button_add }}{% else %}Register External Service{% endif %}{% endif %}</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Search Section -->
 <div class="mb-4">
@@ -14,12 +39,12 @@
             <div class="flex rounded-lg overflow-hidden">
                 <div class="flex-1 relative">
                     <input type="search" id="searchInput" name="q" value="{{ request.GET.q }}"
-                           placeholder="Search external services by name, category or subcategory..."
+                           placeholder="{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}{% if labels.search_placeholder %}{{ labels.search_placeholder }}{% else %}Buscar por servicio o proveedor...{% endif %}{% else %}{% if labels.search_placeholder %}{{ labels.search_placeholder }}{% else %}Search by service or vendor...{% endif %}{% endif %}"
                            class="space-input w-full">
                     <div class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-400 text-sm">🔍</div>
                 </div>
                 <button type="button" id="searchBtn" class="space-button ml-2">
-                    SEARCH
+                    {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}BUSCAR{% else %}SEARCH{% endif %}
                 </button>
             </div>
         </div>
@@ -30,14 +55,14 @@
 <div class="mb-4">
     <div class="flex flex-wrap gap-2">
         <select id="categoriaFilter" class="space-input">
-            <option value="">All Categories</option>
+            <option value="">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Todas las Categorías{% else %}All Categories{% endif %}</option>
             {% for categoria in categorias %}
             <option value="{{ categoria.code }}">{{ categoria.get_label }}</option>
             {% endfor %}
         </select>
 
         <select id="subcategoriaFilter" class="space-input">
-            <option value="">All Subcategories</option>
+            <option value="">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Todas las Subcategorías{% else %}All Subcategories{% endif %}</option>
             {% for subcategoria in subcategorias %}
             <option value="{{ subcategoria.code }}">{{ subcategoria.get_label }}</option>
             {% endfor %}
@@ -49,20 +74,20 @@
 <div class="mb-6">
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="space-card p-4 text-center">
-            <div class="text-2xl font-bold space-text">{{ stats.total_otros_servicios }}</div>
-            <div class="text-sm space-text-muted">External Services</div>
+            <div class="text-2xl font-bold space-text">{{ stats.total_servicios|default:"0" }}</div>
+            <div class="text-sm space-text-muted">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}{% if labels.stats_total %}{{ labels.stats_total }}{% else %}Servicios Externos Registrados{% endif %}{% else %}{% if labels.stats_total %}{{ labels.stats_total }}{% else %}External Services{% endif %}{% endif %}</div>
         </div>
         <div class="space-card p-4 text-center">
-            <div class="text-2xl font-bold space-text">{{ stats.total_categorias }}</div>
-            <div class="text-sm space-text-muted">Categories</div>
+            <div class="text-2xl font-bold space-text">{{ stats.total_proveedores|default:"0" }}</div>
+            <div class="text-sm space-text-muted">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}{% if labels.stats_providers %}{{ labels.stats_providers }}{% else %}Proveedores Activos{% endif %}{% else %}{% if labels.stats_providers %}{{ labels.stats_providers }}{% else %}Active Partner Vendors{% endif %}{% endif %}</div>
         </div>
         <div class="space-card p-4 text-center">
-            <div class="text-2xl font-bold space-text">{{ stats.total_subcategorias }}</div>
-            <div class="text-sm space-text-muted">Subcategories</div>
+            <div class="text-2xl font-bold space-text">{{ stats.total_categorias|default:"0" }}</div>
+            <div class="text-sm space-text-muted">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Categorías Vinculadas{% else %}Linked Categories{% endif %}</div>
         </div>
         <div class="space-card p-4 text-center">
-            <div class="text-2xl font-bold space-text">{{ stats.total_empresas_externas }}</div>
-            <div class="text-sm space-text-muted">External Companies</div>
+            <div class="text-2xl font-bold space-text">{{ stats.total_subcategorias|default:"0" }}</div>
+            <div class="text-sm space-text-muted">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Subcategorías{% else %}Subcategories{% endif %}</div>
         </div>
     </div>
 </div>
@@ -133,10 +158,10 @@
         <!-- No External Services Message -->
         <div class="text-center py-12">
             <div class="text-6xl mb-4">🤝</div>
-            <h3 class="text-xl font-bold space-text mb-2">No External Services Found</h3>
-            <p class="space-text-muted mb-4">Start by adding your first external automotive service</p>
+            <h3 class="text-xl font-bold space-text mb-2">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}{% if labels.empty_title %}{{ labels.empty_title }}{% else %}Sin servicios externos{% endif %}{% else %}{% if labels.empty_title %}{{ labels.empty_title }}{% else %}No external services yet{% endif %}{% endif %}</h3>
+            <p class="space-text-muted mb-4">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}{% if labels.empty_message %}{{ labels.empty_message }}{% else %}Registra trabajos subcontratados para mantener tu taller completamente rastreado.{% endif %}{% else %}{% if labels.empty_message %}{{ labels.empty_message }}{% else %}Log outsourced work to keep your workshop fully tracked.{% endif %}{% endif %}</p>
             <a href="{% country_url 'servicios:crear_otro_servicio' %}" class="space-button">
-                Add First External Service
+                {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}{% if labels.button_add %}{{ labels.button_add }}{% else %}➕ Registrar Servicio Externo{% endif %}{% else %}{% if labels.button_add %}{{ labels.button_add }}{% else %}➕ Register External Service{% endif %}{% endif %}
             </a>
         </div>
     {% endif %}
@@ -150,9 +175,9 @@
             <div class="flex flex-col sm:flex-row items-center justify-between space-y-3 sm:space-y-0">
                 <div class="flex items-center space-x-2 space-text-muted text-sm">
                     <span class="text-cyan-300">📊</span>
-                    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                    <span>{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Página{% else %}Page{% endif %} {{ page_obj.number }} {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}de{% else %}of{% endif %} {{ page_obj.paginator.num_pages }}</span>
                     <span class="text-gray-600">•</span>
-                    <span>{{ paginator.count }} records</span>
+                    <span>{{ paginator.count }} {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}registros{% else %}records{% endif %}</span>
                 </div>
 
                 <nav class="flex items-center space-x-2">
@@ -160,24 +185,24 @@
                     <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                        class="space-button text-xs">
                         <span>⏮️</span>
-                        <span class="hidden sm:inline">First</span>
+                        <span class="hidden sm:inline">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Primera{% else %}First{% endif %}</span>
                     </a>
                     <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                        class="space-button text-xs">
                         <span>⬅️</span>
-                        <span class="hidden sm:inline">Previous</span>
+                        <span class="hidden sm:inline">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Anterior{% else %}Previous{% endif %}</span>
                     </a>
                     {% endif %}
 
                     {% if page_obj.has_next %}
                     <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                        class="space-button text-xs">
-                        <span class="hidden sm:inline">Next</span>
+                        <span class="hidden sm:inline">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Siguiente{% else %}Next{% endif %}</span>
                         <span>➡️</span>
                     </a>
                     <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
                        class="space-button text-xs">
-                        <span class="hidden sm:inline">Last</span>
+                        <span class="hidden sm:inline">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Última{% else %}Last{% endif %}</span>
                         <span>⏭️</span>
                     </a>
                     {% endif %}
@@ -200,16 +225,16 @@
                     <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-red-600/20 to-pink-600/20 border border-red-400/40 flex items-center justify-center">
                         <span class="text-red-400 text-2xl">⚠️</span>
                     </div>
-                    <h3 class="text-xl font-bold space-text mb-2">Confirm Deletion</h3>
-                    <p class="space-text-muted mb-6">Are you sure you want to delete the external service <span id="nombreServicio" class="text-red-400 font-semibold"></span>?</p>
+                    <h3 class="text-xl font-bold space-text mb-2">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Confirmar Eliminación{% else %}Confirm Deletion{% endif %}</h3>
+                    <p class="space-text-muted mb-6">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}¿Está seguro de que desea eliminar el servicio externo{% else %}Are you sure you want to delete the external service{% endif %} <span id="nombreServicio" class="text-red-400 font-semibold"></span>?</p>
                     <div class="flex space-x-3">
                         <button onclick="cerrarModal()"
                                 class="flex-1 space-button bg-gray-600/20 border-gray-500/40 space-text">
-                            Cancel
+                            {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Cancelar{% else %}Cancel{% endif %}
                         </button>
                         <button onclick="eliminarServicio()"
                                 class="flex-1 space-button bg-red-600/20 border-red-400/40 text-red-300">
-                            Delete
+                            {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Eliminar{% else %}Delete{% endif %}
                         </button>
                     </div>
                 </div>
@@ -303,12 +328,12 @@ window.eliminarServicio = function() {
         if (response.ok) {
             window.location.reload();
         } else {
-            alert('Error deleting external service');
+            alert('{% if LANGUAGE_CODE == "es" or request.LANGUAGE_CODE == "es" %}Error al eliminar servicio externo{% else %}Error deleting external service{% endif %}');
         }
     })
     .catch(error => {
         console.error('Error:', error);
-        alert('Error deleting external service');
+        alert('{% if LANGUAGE_CODE == "es" or request.LANGUAGE_CODE == "es" %}Error al eliminar servicio externo{% else %}Error deleting external service{% endif %}');
     });
 };
 </script>
