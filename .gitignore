@@ -65,4 +65,3 @@ staticfiles/
 
 # backups
 *.BAK_*
-scripts/deploy_rapido.sh
