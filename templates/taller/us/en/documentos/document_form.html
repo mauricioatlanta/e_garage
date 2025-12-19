@@ -358,7 +358,7 @@ function submitLanguageDoc(lang) {
 {# ✅ Manejo robusto de company_country con múltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-        <form method="post" id="document-form" class="max-w-7xl mx-auto"
+        <form method="post" id="document-form" class="max-w-7xl mx-auto" enctype="multipart/form-data">
               data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
               data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
               data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
