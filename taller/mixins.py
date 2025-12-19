@@ -39,16 +39,22 @@ class CountryLangTemplateMixin:
             else None
         )
 
-        # Determinar país: prioridad empresa.pais > request.country > URL path > CL
-        country = "CL"  # default
-        if empresa and hasattr(empresa, "pais") and empresa.pais:
-            country = empresa.pais
+        # Determinar país: prioridad URL path > request.country > empresa.pais > CL
+        # Primero intentar desde el prefijo del path
+        path = (getattr(request, "path_info", "") or request.path or "").lower()
+        parts = [
+            p for p in path.split("/") if p
+        ]  # "/us/documentos/form/" -> ["us","documentos","form"]
+
+        prefix = parts[0] if parts else ""
+        if prefix in {"us", "cl", "mx", "pe", "co", "ec", "ve", "br"}:
+            country = prefix.upper()
         elif hasattr(request, "country") and request.country:
             country = request.country
-        elif request.path.startswith("/us/"):
-            country = "US"
-        elif request.path.startswith("/cl/"):
-            country = "CL"
+        elif empresa and hasattr(empresa, "pais") and empresa.pais:
+            country = empresa.pais
+        else:
+            country = "CL"  # default
 
         # Use the language set by LanguagePolicyMiddleware
         lang = getattr(request, "LANGUAGE_CODE", None) or get_language() or "es"
@@ -102,7 +108,23 @@ class CountryLangTemplateMixin:
             if hasattr(request, "user") and request.user.is_authenticated
             else None
         )
-        country = getattr(empresa, "pais", "CL") if empresa else "CL"
+
+        # Determinar país: prioridad URL path > request.country > empresa.pais > CL
+        path = (getattr(request, "path_info", "") or request.path or "").lower()
+        parts = [
+            p for p in path.split("/") if p
+        ]  # "/us/documentos/form/" -> ["us","documentos","form"]
+
+        prefix = parts[0] if parts else ""
+        if prefix in {"us", "cl", "mx", "pe", "co", "ec", "ve", "br"}:
+            country = prefix.upper()
+        elif hasattr(request, "country") and request.country:
+            country = request.country
+        elif empresa and hasattr(empresa, "pais") and empresa.pais:
+            country = empresa.pais
+        else:
+            country = "CL"  # default
+
         lang = get_language() or "es"
 
         # Seleccionar template apropiado
