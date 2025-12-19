@@ -68,3 +68,6 @@ staticfiles/
 scripts/deploy_rapido.sh
 # Variantes locales (NO USADA, copias, etc.)
 db.sqlite3.*
+
+# local safety backups
+*.bak.*
