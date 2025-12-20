@@ -414,6 +414,7 @@
 
                 <div class="row g-3 mt-3">
                     <div class="col-md-6">
+{% if request.user.empresa.pais != "US" %}<!-- HIDE_US_TAX_FIELDS -->
                         <label class="form-label">{{ profile_form.tax_id.label }}</label>
                         {{ profile_form.tax_id }}
                         {{ profile_form.tax_id.errors }}
@@ -422,6 +423,7 @@
                         <label class="form-label">{{ profile_form.business_license.label }}</label>
                         {{ profile_form.business_license }}
                         {{ profile_form.business_license.errors }}
+{% endif %}<!-- /HIDE_US_TAX_FIELDS -->
                     </div>
                 </div>
 
