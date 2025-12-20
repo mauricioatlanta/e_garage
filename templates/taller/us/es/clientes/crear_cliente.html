@@ -1,0 +1,890 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load country_url %}
+{% load static %}
+{% load i18n %}
+
+{% block extra_head %}
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+<link href="/static/css/galaxy_theme.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<!-- Fondo dinámico removido - usando gradiente profesional estático -->
+<style>
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes glowPulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(0, 230, 208, 0.5),
+                0 0 40px rgba(0, 230, 208, 0.3),
+                0 0 60px rgba(0, 230, 208, 0.1);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(0, 230, 208, 0.8),
+                0 0 60px rgba(0, 230, 208, 0.5),
+                0 0 90px rgba(0, 230, 208, 0.2);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes borderGlow {
+  0%, 100% {
+    border-color: rgba(0, 230, 208, 0.3);
+    box-shadow: 0 0 10px rgba(0, 230, 208, 0.2);
+  }
+  50% {
+    border-color: rgba(0, 230, 208, 0.6);
+    box-shadow: 0 0 20px rgba(0, 230, 208, 0.4);
+  }
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+body {
+  background: linear-gradient(135deg, #1a1f3a 0%, #0f1419 25%, #1a1f3a 50%, #0f1419 75%, #1a1f3a 100%);
+  background-size: 200% 200%;
+  animation: subtleGradient 20s ease-in-out infinite;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: 
+    radial-gradient(circle at 20% 30%, rgba(0, 150, 200, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 80% 70%, rgba(100, 150, 255, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 50% 50%, rgba(0, 100, 150, 0.04) 0%, transparent 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    repeating-linear-gradient(45deg, transparent, transparent 100px, rgba(0, 150, 200, 0.02) 100px, rgba(0, 150, 200, 0.02) 102px),
+    repeating-linear-gradient(-45deg, transparent, transparent 100px, rgba(100, 150, 255, 0.02) 100px, rgba(100, 150, 255, 0.02) 102px);
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Animación más suave y profesional para el fondo */
+@keyframes subtleGradient {
+  0%, 100% { 
+    background-position: 0% 50%;
+    opacity: 1;
+  }
+  50% { 
+    background-position: 100% 50%;
+    opacity: 0.98;
+  }
+}
+
+.cuadro {
+  position: relative;
+  z-index: 2;
+  animation: slideIn 0.6s ease-out;
+}
+
+.cuadro, .cuadro *, .form-card, .form-card * {
+  color: #fff !important;
+}
+
+.form-card {
+  background: rgba(10, 14, 39, 0.85) !important;
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  border: 2px solid rgba(0, 230, 208, 0.2);
+  border-radius: 16px;
+  padding: 40px;
+  margin-bottom: 20px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+  animation: borderGlow 3s ease-in-out infinite;
+}
+
+.form-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 230, 208, 0.1), 
+    transparent);
+  animation: shimmer 3s infinite;
+}
+
+.form-group {
+  margin-bottom: 24px;
+  position: relative;
+  animation: slideIn 0.6s ease-out backwards;
+}
+
+.form-group:nth-child(1) { animation-delay: 0.1s; }
+.form-group:nth-child(2) { animation-delay: 0.2s; }
+.form-group:nth-child(3) { animation-delay: 0.3s; }
+.form-group:nth-child(4) { animation-delay: 0.4s; }
+.form-group:nth-child(5) { animation-delay: 0.5s; }
+.form-group:nth-child(6) { animation-delay: 0.6s; }
+.form-group:nth-child(7) { animation-delay: 0.7s; }
+.form-group:nth-child(8) { animation-delay: 0.8s; }
+
+.form-group label {
+  display: block;
+  font-weight: 700;
+  color: #00e6d0 !important;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  margin-bottom: 10px;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 10px rgba(0, 230, 208, 0.5);
+  position: relative;
+  padding-left: 8px;
+}
+
+.form-group label::before {
+  content: '▶';
+  position: absolute;
+  left: -12px;
+  color: #00e6d0;
+  font-size: 10px;
+  opacity: 0.7;
+}
+
+.form-control, 
+select, 
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+select.form-control {
+  width: 100% !important;
+  padding: 14px 16px !important;
+  background: rgba(0, 0, 0, 0.4) !important;
+  border: 2px solid rgba(0, 230, 208, 0.3) !important;
+  border-radius: 8px !important;
+  color: #fff !important;
+  font-size: 15px !important;
+  font-family: 'Rajdhani', sans-serif !important;
+  font-weight: 500 !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+}
+
+.form-control:focus, 
+select:focus, 
+input:focus {
+  outline: none !important;
+  border-color: #00e6d0 !important;
+  background: rgba(0, 0, 0, 0.6) !important;
+  box-shadow: 
+    0 0 0 3px rgba(0, 230, 208, 0.2),
+    0 0 20px rgba(0, 230, 208, 0.4),
+    inset 0 0 10px rgba(0, 230, 208, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.btn-futuristic {
+  background: linear-gradient(135deg, #00e6d0 0%, #00b3a0 50%, #008a7a 100%);
+  border: 2px solid rgba(0, 230, 208, 0.5);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  display: inline-block;
+  margin-right: 12px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'Orbitron', sans-serif;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 13px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 230, 208, 0.3);
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+.btn-futuristic::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+.btn-futuristic:hover::before {
+  left: 100%;
+}
+
+.btn-futuristic:hover {
+  background: linear-gradient(135deg, #00b3a0 0%, #008a7a 50%, #006b5f 100%);
+  color: white;
+  text-decoration: none;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 0 8px 25px rgba(0, 230, 208, 0.5);
+  border-color: rgba(0, 230, 208, 0.8);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #545b62 50%, #495057 100%);
+  border: 2px solid rgba(108, 117, 125, 0.5);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #545b62 0%, #495057 50%, #3d4146 100%);
+  border-color: rgba(108, 117, 125, 0.8);
+}
+
+.font-orbitron {
+  font-family: 'Orbitron', 'Arial', sans-serif;
+}
+
+h1 {
+  background: linear-gradient(135deg, #00e6d0 0%, #00ffff 50%, #00e6d0 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 3s linear infinite;
+  text-shadow: 0 0 30px rgba(0, 230, 208, 0.5);
+  font-weight: 900;
+  letter-spacing: 2px;
+}
+
+.errorlist {
+  color: #ff6b6b !important;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 6px;
+  padding: 8px 12px;
+  margin-top: 4px;
+  font-size: 13px;
+  font-family: 'Rajdhani', sans-serif;
+}
+
+.helptext {
+  color: rgba(0, 230, 208, 0.7) !important;
+  font-size: 12px;
+  font-family: 'Rajdhani', sans-serif;
+  margin-top: 4px;
+}
+</style>
+{% endblock %}
+
+{% block fondo_extra %}
+<!-- Fondo profesional estático - sin partículas dinámicas -->
+{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto cuadro">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-4xl font-bold font-orbitron">🚀 Create Client</h1>
+    <a href="{% country_url 'clientes:lista_clientes' %}" class="btn-futuristic btn-secondary">← Back to list</a>
+  </div>
+
+  <div class="form-card">
+    <form method="post" id="client-form">
+      {% csrf_token %}
+
+      {% if form.errors %}
+        <div class="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
+          <h3 class="text-red-300 font-bold mb-2 font-orbitron">⚠️ Form Errors:</h3>
+          {% for field, errors in form.errors.items %}
+            <div class="mb-2">
+              <strong class="text-red-200">{{ field }}:</strong>
+              {% for error in errors %}
+                <span class="text-red-100 block">{{ error }}</span>
+              {% endfor %}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="form-group">
+          <label for="{{ form.nombre.id_for_label }}">First Name</label>
+          {{ form.nombre }}
+          {% if form.nombre.errors %}
+            <div class="errorlist">{{ form.nombre.errors.0 }}</div>
+          {% endif %}
+          {% if form.nombre.help_text %}
+            <div class="helptext">{{ form.nombre.help_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.apellido.id_for_label }}">Last Name</label>
+          {{ form.apellido }}
+          {% if form.apellido.errors %}
+            <div class="errorlist">{{ form.apellido.errors.0 }}</div>
+          {% endif %}
+          {% if form.apellido.help_text %}
+            <div class="helptext">{{ form.apellido.help_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}
+            <div class="errorlist">{{ form.email.errors.0 }}</div>
+          {% endif %}
+          {% if form.email.help_text %}
+            <div class="helptext">{{ form.email.help_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.telefono.id_for_label }}">Phone</label>
+          {{ form.telefono }}
+          {% if form.telefono.errors %}
+            <div class="errorlist">{{ form.telefono.errors.0 }}</div>
+          {% endif %}
+          {% if form.telefono.help_text %}
+            <div class="helptext">{{ form.telefono.help_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group md:col-span-2">
+          <label for="{{ form.direccion.id_for_label }}">Address</label>
+          {{ form.direccion }}
+          {% if form.direccion.errors %}
+            <div class="errorlist">{{ form.direccion.errors.0 }}</div>
+          {% endif %}
+          {% if form.direccion.help_text %}
+            <div class="helptext">{{ form.direccion.help_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.estado_usa.id_for_label }}">State</label>
+          <div style="display: flex !important; gap: 12px !important; align-items: flex-end !important; width: 100% !important;">
+            <div style="flex: 1;">
+              {{ form.estado_usa }}
+            </div>
+            <button type="button" class="btn-add-field" onclick="openStateModal()" id="btn-add-state" title="Add a new state" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-width: 120px !important; background: linear-gradient(135deg, #7b2ff7 0%, #5a1fb8 50%, #3d0f7a 100%) !important; border: 2px solid rgba(123, 47, 247, 0.6) !important; color: white !important; padding: 16px 24px !important; border-radius: 8px !important; font-weight: 700 !important; cursor: pointer !important; font-family: 'Orbitron', sans-serif !important; text-transform: uppercase !important; letter-spacing: 1px !important; font-size: 11px !important;">
+              ➕ ADD STATE
+            </button>
+          </div>
+          {% if form.estado_usa.errors %}
+            <div class="errorlist">{{ form.estado_usa.errors.0 }}</div>
+          {% endif %}
+          {% if form.estado_usa.help_text %}
+            <div class="helptext">{{ form.estado_usa.help_text }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.ciudad_usa.id_for_label }}">City</label>
+          <div style="display: flex !important; gap: 12px !important; align-items: flex-end !important; width: 100% !important;">
+            <div style="flex: 1;">
+              {{ form.ciudad_usa }}
+            </div>
+            <button type="button" class="btn-add-field" onclick="openCityModal()" id="btn-add-city" title="Add a new city" style="display: inline-block !important; visibility: visible !important; opacity: 1 !important; position: relative !important; z-index: 10 !important; min-width: 120px !important; background: linear-gradient(135deg, #7b2ff7 0%, #5a1fb8 50%, #3d0f7a 100%) !important; border: 2px solid rgba(123, 47, 247, 0.6) !important; color: white !important; padding: 16px 24px !important; border-radius: 8px !important; font-weight: 700 !important; cursor: pointer !important; font-family: 'Orbitron', sans-serif !important; text-transform: uppercase !important; letter-spacing: 1px !important; font-size: 11px !important;">
+              ➕ ADD CITY
+            </button>
+          </div>
+          {% if form.ciudad_usa.errors %}
+            <div class="errorlist">{{ form.ciudad_usa.errors.0 }}</div>
+          {% endif %}
+          {% if form.ciudad_usa.help_text %}
+            <div class="helptext">{{ form.ciudad_usa.help_text }}</div>
+          {% endif %}
+          <div id="ciudad-loading" style="display: none; color: #00e6d0; font-size: 12px; margin-top: 4px;">
+            Loading cities...
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ form.zipcode.id_for_label }}">ZIP Code</label>
+          {{ form.zipcode }}
+          {% if form.zipcode.errors %}
+            <div class="errorlist">{{ form.zipcode.errors.0 }}</div>
+          {% endif %}
+          {% if form.zipcode.help_text %}
+            <div class="helptext">{{ form.zipcode.help_text }}</div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
+        <button type="submit" class="btn-futuristic">
+          💾 Create Client
+        </button>
+        <a href="{% country_url 'clientes:lista_clientes' %}" class="btn-futuristic btn-secondary">
+          ❌ Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// JavaScript para cargar ciudades cuando se selecciona un estado
+document.addEventListener('DOMContentLoaded', function() {
+    const estadoSelect = document.getElementById('id_estado_usa');
+    const ciudadSelect = document.getElementById('id_ciudad_usa');
+    
+    console.log('🔍 Estado select:', estadoSelect);
+    console.log('🔍 Ciudad select:', ciudadSelect);
+    
+    // Verificar si los estados están cargados
+    if (estadoSelect) {
+        const estadoOptions = estadoSelect.options.length;
+        console.log(`📊 Estados disponibles: ${estadoOptions}`);
+        if (estadoOptions <= 1) {
+            console.warn('⚠️ No hay estados cargados en el formulario. Verifica que el queryset de estados tenga datos.');
+        }
+    }
+    
+    if (estadoSelect && ciudadSelect) {
+        estadoSelect.addEventListener('change', function() {
+            const estadoId = this.value;
+            console.log('📍 Estado seleccionado:', estadoId);
+            
+            if (estadoId) {
+                // Limpiar ciudades
+                ciudadSelect.innerHTML = '<option value="">Loading cities...</option>';
+                ciudadSelect.disabled = true;
+                const loadingDiv = document.getElementById('ciudad-loading');
+                if (loadingDiv) loadingDiv.style.display = 'block';
+                
+                // Construir URL del endpoint
+                const url = `{% country_url 'clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`;
+                console.log('🌐 URL de ciudades:', url);
+                
+                // Hacer petición AJAX para obtener ciudades
+                fetch(url, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                    credentials: 'same-origin'
+                })
+                    .then(response => {
+                        console.log('📡 Response status:', response.status);
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('✅ Datos recibidos:', data);
+                        ciudadSelect.innerHTML = '<option value="">Select City</option>';
+                        ciudadSelect.disabled = false;
+                        if (loadingDiv) loadingDiv.style.display = 'none';
+                        
+                        // El endpoint retorna un array directo, no un objeto con 'ciudades'
+                        const ciudades = Array.isArray(data) ? data : (data.ciudades || []);
+                        
+                        if (ciudades.length > 0) {
+                            ciudades.forEach(ciudad => {
+                                const option = document.createElement('option');
+                                option.value = ciudad.id;
+                                option.textContent = ciudad.nombre;
+                                ciudadSelect.appendChild(option);
+                            });
+                            console.log(`✅ ${ciudades.length} ciudades cargadas`);
+                        } else {
+                            console.warn('⚠️ No se encontraron ciudades para este estado');
+                            ciudadSelect.innerHTML = '<option value="">No cities available</option>';
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error loading cities:', error);
+                        ciudadSelect.innerHTML = '<option value="">Error loading cities</option>';
+                        ciudadSelect.disabled = false;
+                        if (loadingDiv) loadingDiv.style.display = 'none';
+                    });
+            } else {
+                ciudadSelect.innerHTML = '<option value="">Select State first</option>';
+                ciudadSelect.disabled = true;
+                const loadingDiv = document.getElementById('ciudad-loading');
+                if (loadingDiv) loadingDiv.style.display = 'none';
+            }
+        });
+        
+        // Cargar ciudades si ya hay un estado seleccionado (al editar)
+        if (estadoSelect.value) {
+            estadoSelect.dispatchEvent(new Event('change'));
+        }
+    } else {
+        console.error('❌ No se encontraron los campos estado_usa o ciudad_usa');
+    }
+    
+    // Cargar estados en el modal de ciudad
+    loadStatesIntoCityModal();
+});
+
+function loadStatesIntoCityModal() {
+    const estadoSelect = document.getElementById('id_estado_usa');
+    const cityModalStateSelect = document.getElementById('newCityState');
+    
+    if (estadoSelect && cityModalStateSelect) {
+        cityModalStateSelect.innerHTML = '<option value="">Select State</option>';
+        Array.from(estadoSelect.options).forEach(option => {
+            if (option.value) {
+                const newOption = document.createElement('option');
+                newOption.value = option.value;
+                newOption.textContent = option.text;
+                cityModalStateSelect.appendChild(newOption);
+            }
+        });
+    }
+}
+
+// Modal Functions
+function openStateModal() {
+    const modal = document.getElementById('stateModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.getElementById('newStateName').value = '';
+        document.getElementById('newStateCode').value = '';
+        const errorDiv = document.getElementById('stateErrorMessage');
+        const successDiv = document.getElementById('stateSuccessMessage');
+        if (errorDiv) errorDiv.style.display = 'none';
+        if (successDiv) successDiv.style.display = 'none';
+    }
+}
+
+function closeStateModal() {
+    const modal = document.getElementById('stateModal');
+    if (modal) modal.style.display = 'none';
+}
+
+function openCityModal() {
+    const estadoSelect = document.getElementById('id_estado_usa');
+    if (!estadoSelect || !estadoSelect.value) {
+        alert('Please select a state first before adding a city.');
+        if (estadoSelect) estadoSelect.focus();
+        return;
+    }
+    
+    loadStatesIntoCityModal();
+    const modal = document.getElementById('cityModal');
+    if (modal) {
+        modal.style.display = 'flex';
+        document.getElementById('newCityName').value = '';
+        document.getElementById('newCityState').value = estadoSelect.value;
+        const errorDiv = document.getElementById('cityErrorMessage');
+        const successDiv = document.getElementById('citySuccessMessage');
+        if (errorDiv) errorDiv.style.display = 'none';
+        if (successDiv) successDiv.style.display = 'none';
+    }
+}
+
+function closeCityModal() {
+    const modal = document.getElementById('cityModal');
+    if (modal) modal.style.display = 'none';
+}
+
+// Close modals on overlay click
+document.getElementById('stateModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeStateModal();
+});
+
+document.getElementById('cityModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeCityModal();
+});
+
+// Create State
+function createState() {
+    const name = document.getElementById('newStateName').value.trim();
+    const code = document.getElementById('newStateCode').value.trim().toUpperCase();
+    const errorDiv = document.getElementById('stateErrorMessage');
+    const successDiv = document.getElementById('stateSuccessMessage');
+    const createBtn = event.target;
+    
+    if (errorDiv) errorDiv.style.display = 'none';
+    if (successDiv) successDiv.style.display = 'none';
+    
+    if (!name || !code) {
+        if (errorDiv) {
+            errorDiv.textContent = 'State name and code are required.';
+            errorDiv.style.display = 'block';
+        }
+        return;
+    }
+    
+    if (code.length > 10) {
+        if (errorDiv) {
+            errorDiv.textContent = 'State code must be 10 characters or less.';
+            errorDiv.style.display = 'block';
+        }
+        return;
+    }
+    
+    createBtn.classList.add('loading');
+    createBtn.disabled = true;
+    
+    const formData = new FormData();
+    formData.append('nombre', name);
+    formData.append('codigo', code);
+    
+    fetch('{% country_url "clientes:ajax_crear_estado_usa" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        createBtn.classList.remove('loading');
+        createBtn.disabled = false;
+        
+        if (data.success) {
+            if (successDiv) {
+                successDiv.textContent = data.message || `State "${name}" created successfully!`;
+                successDiv.style.display = 'block';
+            }
+            
+            const estadoSelect = document.getElementById('id_estado_usa');
+            if (estadoSelect) {
+                const option = document.createElement('option');
+                option.value = data.estado.id;
+                option.textContent = data.estado.nombre;
+                option.selected = true;
+                estadoSelect.appendChild(option);
+            }
+            
+            document.getElementById('newStateName').value = '';
+            document.getElementById('newStateCode').value = '';
+            
+            setTimeout(() => {
+                closeStateModal();
+                const estadoSelect = document.getElementById('id_estado_usa');
+                if (estadoSelect) estadoSelect.dispatchEvent(new Event('change'));
+            }, 1500);
+        } else {
+            if (errorDiv) {
+                errorDiv.textContent = data.error || 'Error creating state.';
+                errorDiv.style.display = 'block';
+            }
+        }
+    })
+    .catch(error => {
+        createBtn.classList.remove('loading');
+        createBtn.disabled = false;
+        if (errorDiv) {
+            errorDiv.textContent = 'Network error. Please try again.';
+            errorDiv.style.display = 'block';
+        }
+        console.error('Error:', error);
+    });
+}
+
+// Create City
+function createCity() {
+    const name = document.getElementById('newCityName').value.trim();
+    const stateId = document.getElementById('newCityState').value;
+    const errorDiv = document.getElementById('cityErrorMessage');
+    const successDiv = document.getElementById('citySuccessMessage');
+    const createBtn = event.target;
+    
+    if (errorDiv) errorDiv.style.display = 'none';
+    if (successDiv) successDiv.style.display = 'none';
+    
+    if (!name) {
+        if (errorDiv) {
+            errorDiv.textContent = 'City name is required.';
+            errorDiv.style.display = 'block';
+        }
+        return;
+    }
+    
+    if (!stateId) {
+        if (errorDiv) {
+            errorDiv.textContent = 'Please select a state.';
+            errorDiv.style.display = 'block';
+        }
+        return;
+    }
+    
+    createBtn.classList.add('loading');
+    createBtn.disabled = true;
+    
+    const formData = new FormData();
+    formData.append('nombre', name);
+    formData.append('estado_id', stateId);
+    
+    fetch('{% country_url "clientes:ajax_crear_ciudad_usa" %}', {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        createBtn.classList.remove('loading');
+        createBtn.disabled = false;
+        
+        if (data.success) {
+            if (successDiv) {
+                successDiv.textContent = data.message || `City "${name}" created successfully!`;
+                successDiv.style.display = 'block';
+            }
+            
+            const ciudadSelect = document.getElementById('id_ciudad_usa');
+            if (ciudadSelect) {
+                const option = document.createElement('option');
+                option.value = data.ciudad.id;
+                option.textContent = data.ciudad.nombre;
+                option.selected = true;
+                ciudadSelect.appendChild(option);
+            }
+            
+            const estadoSelect = document.getElementById('id_estado_usa');
+            if (estadoSelect && estadoSelect.value !== stateId) {
+                estadoSelect.value = stateId;
+                estadoSelect.dispatchEvent(new Event('change'));
+            }
+            
+            document.getElementById('newCityName').value = '';
+            
+            setTimeout(() => {
+                closeCityModal();
+            }, 1500);
+        } else {
+            if (errorDiv) {
+                errorDiv.textContent = data.error || 'Error creating city.';
+                errorDiv.style.display = 'block';
+            }
+        }
+    })
+    .catch(error => {
+        createBtn.classList.remove('loading');
+        createBtn.disabled = false;
+        if (errorDiv) {
+            errorDiv.textContent = 'Network error. Please try again.';
+            errorDiv.style.display = 'block';
+        }
+        console.error('Error:', error);
+    });
+}
+
+// Auto-uppercase state code
+document.getElementById('newStateCode')?.addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+});
+</script>
+
+<!-- State Modal -->
+<div id="stateModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 9999; align-items: center; justify-content: center;">
+  <div style="background: rgba(10, 14, 39, 0.98); backdrop-filter: blur(30px) saturate(200%); border: 3px solid rgba(0, 230, 208, 0.5); border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8); position: relative;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid rgba(0, 230, 208, 0.3);">
+      <h2 style="font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 700; color: #00ffff; text-transform: uppercase; letter-spacing: 2px; margin: 0;">➕ ADD NEW STATE</h2>
+      <button onclick="closeStateModal()" style="background: transparent; border: 2px solid rgba(255, 107, 107, 0.5); color: #ff6b6b; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; font-weight: bold;">&times;</button>
+    </div>
+    <div>
+      <div id="stateSuccessMessage" style="background: rgba(0, 255, 0, 0.15); border: 2px solid rgba(0, 255, 0, 0.5); color: #00ff00; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none;"></div>
+      <div id="stateErrorMessage" style="color: #ff6b6b; font-size: 12px; margin-bottom: 20px; display: none;"></div>
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-weight: 600; color: #00e6d0; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-family: 'Orbitron', sans-serif;">STATE NAME</label>
+        <input type="text" id="newStateName" placeholder="e.g., California" style="width: 100%; padding: 14px 18px; background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(0, 230, 208, 0.4); border-radius: 8px; color: #ffffff; font-size: 15px; font-family: 'Rajdhani', sans-serif;">
+      </div>
+      <div style="margin-bottom: 30px;">
+        <label style="display: block; font-weight: 600; color: #00e6d0; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-family: 'Orbitron', sans-serif;">STATE CODE</label>
+        <input type="text" id="newStateCode" placeholder="e.g., CA" maxlength="10" style="width: 100%; padding: 14px 18px; background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(0, 230, 208, 0.4); border-radius: 8px; color: #ffffff; font-size: 15px; font-family: 'Rajdhani', sans-serif; text-transform: uppercase;">
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: flex-end; padding-top: 20px; border-top: 2px solid rgba(0, 230, 208, 0.3);">
+      <button onclick="closeStateModal()" style="padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; background: transparent; border: 2px solid rgba(108, 117, 125, 0.6); color: #9ca3af;">CANCEL</button>
+      <button onclick="createState()" style="padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; background: linear-gradient(135deg, #00e6d0 0%, #00b3a0 100%); border: 2px solid rgba(0, 230, 208, 0.6); color: white;">CREATE STATE</button>
+    </div>
+  </div>
+</div>
+
+<!-- City Modal -->
+<div id="cityModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(10px); z-index: 9999; align-items: center; justify-content: center;">
+  <div style="background: rgba(10, 14, 39, 0.98); backdrop-filter: blur(30px) saturate(200%); border: 3px solid rgba(0, 230, 208, 0.5); border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; box-shadow: 0 25px 70px rgba(0, 0, 0, 0.8); position: relative;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding-bottom: 20px; border-bottom: 2px solid rgba(0, 230, 208, 0.3);">
+      <h2 style="font-family: 'Orbitron', sans-serif; font-size: 24px; font-weight: 700; color: #00ffff; text-transform: uppercase; letter-spacing: 2px; margin: 0;">➕ ADD NEW CITY</h2>
+      <button onclick="closeCityModal()" style="background: transparent; border: 2px solid rgba(255, 107, 107, 0.5); color: #ff6b6b; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-size: 20px; font-weight: bold;">&times;</button>
+    </div>
+    <div>
+      <div id="citySuccessMessage" style="background: rgba(0, 255, 0, 0.15); border: 2px solid rgba(0, 255, 0, 0.5); color: #00ff00; padding: 12px; border-radius: 8px; margin-bottom: 20px; display: none;"></div>
+      <div id="cityErrorMessage" style="color: #ff6b6b; font-size: 12px; margin-bottom: 20px; display: none;"></div>
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-weight: 600; color: #00e6d0; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-family: 'Orbitron', sans-serif;">CITY NAME</label>
+        <input type="text" id="newCityName" placeholder="e.g., Los Angeles" style="width: 100%; padding: 14px 18px; background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(0, 230, 208, 0.4); border-radius: 8px; color: #ffffff; font-size: 15px; font-family: 'Rajdhani', sans-serif;">
+      </div>
+      <div style="margin-bottom: 30px;">
+        <label style="display: block; font-weight: 600; color: #00e6d0; font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 8px; font-family: 'Orbitron', sans-serif;">SELECT STATE</label>
+        <select id="newCityState" style="width: 100%; padding: 14px 18px; background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(0, 230, 208, 0.4); border-radius: 8px; color: #ffffff; font-size: 15px; font-family: 'Rajdhani', sans-serif;">
+          <option value="">Select a state first</option>
+        </select>
+      </div>
+    </div>
+    <div style="display: flex; gap: 10px; justify-content: flex-end; padding-top: 20px; border-top: 2px solid rgba(0, 230, 208, 0.3);">
+      <button onclick="closeCityModal()" style="padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; background: transparent; border: 2px solid rgba(108, 117, 125, 0.6); color: #9ca3af;">CANCEL</button>
+      <button onclick="createCity()" style="padding: 12px 24px; border-radius: 8px; font-weight: 700; cursor: pointer; font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: 1px; font-size: 12px; background: linear-gradient(135deg, #00e6d0 0%, #00b3a0 100%); border: 2px solid rgba(0, 230, 208, 0.6); color: white;">CREATE CITY</button>
+    </div>
+  </div>
+</div>
+
+<style>
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+    position: relative;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
