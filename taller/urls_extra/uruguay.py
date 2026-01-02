@@ -4,7 +4,6 @@ Prefijo: /uy/es/
 """
 
 
-
 def _render_first_existing(request, candidates, context=None):
     context = context or {}
     for tname in candidates:
@@ -14,7 +13,10 @@ def _render_first_existing(request, candidates, context=None):
         except TemplateDoesNotExist:
             continue
     from django.http import HttpResponse
+
     return HttpResponse("Template de bienvenida no encontrado.", status=500)
+
+
 import logging
 
 from django.http import HttpResponseRedirect
@@ -23,14 +25,23 @@ from django.shortcuts import redirect, render
 from django.template import loader, TemplateDoesNotExist
 from django.views.generic import TemplateView
 
+
 def uruguay_home(request):
     # Canonicaliza /uy/ -> /uy/es/
     if request.path == "/uy/":
         return redirect("/uy/es/", permanent=False)
-    return _render_first_existing(request, ['uy/es/onboarding/bienvenida.html', 'uy/onboarding/bienvenida.html', 'onboarding/bienvenida_uruguay.html', 'onboarding/bienvenida.html'])
+    return _render_first_existing(
+        request,
+        [
+            "uy/es/onboarding/bienvenida.html",
+            "uy/onboarding/bienvenida.html",
+            "onboarding/bienvenida_uruguay.html",
+            "onboarding/bienvenida.html",
+        ],
+    )
 
 
-from taller.taller_views import dashboard_suscripciones
+from taller.views_extra.views import dashboard_suscripciones
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones,

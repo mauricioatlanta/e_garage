@@ -2,7 +2,7 @@ from django.urls import include, path
 from django.views.generic import TemplateView
 
 from taller import ajax_views
-from taller.taller_views import dashboard_suscripciones
+from taller.views_extra.views import dashboard_suscripciones
 from taller.views_extra.bienvenida_usa import bienvenida_usa
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.dashboard_empresa import (

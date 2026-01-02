@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 import logging
 from django.http import HttpResponseRedirect
 
-from taller.taller_views import dashboard_suscripciones
+from taller.views_extra.views import dashboard_suscripciones
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.country_views import test_chile_view
 from taller.views_extra.dashboard_empresa import (
