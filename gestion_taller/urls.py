@@ -1,4 +1,4 @@
-﻿from urllib.parse import urlencode
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.conf.urls.static import static
@@ -18,6 +18,19 @@ from taller.views_health import health_check, health_simple
 
 # Importar vista de suscripción bloqueada
 from taller.views_extra.suscripcion import registro, suscripcion_bloqueada
+from taller.views_extra.admin_suscriptores import (
+    admin_suscriptores,
+    extender_suscripcion_ajax,
+    detalle_suscriptor,
+)
+
+# Forzar importación del admin de WhatsApp para que se registre
+# Capturamos cualquier excepción para que no rompa el admin si hay problemas
+try:
+    import whatsapp.admin  # noqa: F401
+except Exception:
+    # Silenciosamente ignorar errores de importación para no romper el admin
+    pass
 
 # Importar vistas de trial
 from taller.views_extra.views_trial import registro_trial
@@ -114,6 +127,17 @@ urlpatterns = [
     path("portal/", include("taller.portal.urls")),
     # Página de inicio - Selección de país
     path("", TemplateView.as_view(template_name="landing/seleccionar_pais.html"), name="home"),
+    # Panel de administración de suscriptores (ANTES de admin.site.urls para que no sea capturado)
+    path("admin/suscriptores/", admin_suscriptores, name="admin_suscriptores"),
+    path(
+        "admin/suscriptores/<int:empresa_id>/", detalle_suscriptor, name="admin_detalle_suscriptor"
+    ),
+    path(
+        "admin/suscriptores/<int:empresa_id>/extender/",
+        extender_suscripcion_ajax,
+        name="admin_extender_suscripcion",
+    ),
+    # Admin de Django (después de las rutas personalizadas)
     path("admin/", admin.site.urls),
     # Health check para monitoreo
     path("health/", health_check, name="health_check"),
@@ -357,10 +381,10 @@ urlpatterns = [
         RedirectView.as_view(url="/cl/es/centro-operaciones-espacial/", permanent=False),
         name="cl_centro_operaciones_redirect",
     ),
-    # Página de bienvenida para Chile - /cl/ directamente
+    # Redirigir /cl/ a /cl/es/bienvenida/
     path(
         "cl/",
-        TemplateView.as_view(template_name="landing_inicio.html"),
+        RedirectView.as_view(url="/cl/es/bienvenida/", permanent=False),
         name="cl_home_welcome",
     ),
     # Página de bienvenida para Argentina - /ar/ directamente
@@ -396,6 +420,17 @@ urlpatterns = [
     ),
     # APIs globales (sin prefijo de país)
     path("api/v1/", include("taller.api.urls")),
+    # API de ubicaciones (multi-país)
+    path("api/", include(("ubicacion.urls", "ubicacion"), namespace="ubicacion")),
+    # Marketplace - APIs para consulta de precios
+    path("marketplace/", include(("marketplace.urls", "marketplace"), namespace="marketplace")),
+    # WhatsApp - eGarage Air
+    path("whatsapp/", include(("whatsapp.urls", "whatsapp"), namespace="whatsapp")),
+    # URLs públicas para acceso de clientes (sin autenticación, protegidas por UUID)
+    path(
+        "publico/",
+        include(("taller.urls_modules.publico_urls", "publico"), namespace="publico"),
+    ),
     # Redirección de documentos sin país a Chile por defecto
     path(
         "documentos/",
@@ -428,11 +463,11 @@ urlpatterns = [
     # Autocomplete URLs por país
     path(
         "cl/autocomplete/",
-        include(("taller.autocomplete_urls", "autocomplete"), namespace="cl_autocomplete"),
+        include(("taller.autocomplete.urls", "autocomplete"), namespace="cl_autocomplete"),
     ),
     path(
         "us/autocomplete/",
-        include(("taller.autocomplete_urls", "autocomplete"), namespace="usa_autocomplete"),
+        include(("taller.autocomplete.urls", "autocomplete"), namespace="usa_autocomplete"),
     ),
     path(
         "cl/reportes/",
@@ -453,11 +488,11 @@ urlpatterns = [
     # Autocomplete URLs por país
     path(
         "ar/autocomplete/",
-        include(("taller.autocomplete_urls", "autocomplete"), namespace="ar_autocomplete"),
+        include(("taller.autocomplete.urls", "autocomplete"), namespace="ar_autocomplete"),
     ),
     path(
         "uy/autocomplete/",
-        include(("taller.autocomplete_urls", "autocomplete"), namespace="uy_autocomplete"),
+        include(("taller.autocomplete.urls", "autocomplete"), namespace="uy_autocomplete"),
     ),
     path(
         "ar/reportes/",
