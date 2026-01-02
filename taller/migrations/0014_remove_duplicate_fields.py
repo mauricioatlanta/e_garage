@@ -13,8 +13,9 @@ class Migration(migrations.Migration):
             model_name="documento",
             name="correlativo",
         ),
-        migrations.RemoveField(
-            model_name="documento",
-            name="numero_documento_db",
-        ),
+        # numero_documento_db was never added to the model, so we don't need to remove it
+        # migrations.RemoveField(
+        #     model_name="documento",
+        #     name="numero_documento_db",
+        # ),
     ]

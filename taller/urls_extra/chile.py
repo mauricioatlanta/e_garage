@@ -32,6 +32,10 @@ urlpatterns = [
     # Incluir las rutas específicas que necesitamos
     path("dashboard/", dashboard, name="dashboard"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
+    path("configuracion/", configuracion_empresa, name="configuracion"),  # Configuración empresa
+    path(
+        "configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"
+    ),  # Configuración técnicos
     # Página de bienvenida alternativa (ruta estándar)
     path(
         "bienvenida/",
