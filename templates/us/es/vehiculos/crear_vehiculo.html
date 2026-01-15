@@ -566,185 +566,241 @@ input:focus {
 
 {% block page_extra_js %}
 
+{# CRÍTICO: form.media debe cargarse ANTES del JavaScript personalizado #}
+{{ form.media }}
+
 <script>
-// Cache buster: 2024-12-19 - Versión actualizada sin warnings de Select2
+// Cache buster: 2024-12-19 - Versión actualizada - Inicialización mejorada de Select2/DAL
 // Definir countryPrefix globalmente
 const countryPrefix = '/us/';
 
 // --- INICIALIZACIÓN DE SELECT2 Y DAL ---
 window.clienteSelect2Init = { attempted: false, success: false };
 
-$(document).ready(function() {
-    function checkAndStyleSelect2() {
-        // Si ya está inicializado o ya intentamos, no hacer nada
-        if (window.clienteSelect2Init.success || window.clienteSelect2Init.attempted) return;
-        
-        // Aplicar estilos a contenedores existentes de Select2
-        $('.select2-container').css('width', '100%');
-        
-        const clienteField = $('#id_cliente');
-        if (!clienteField.length) {
-            console.warn('⚠️ Campo cliente no encontrado');
-            return;
-        }
-        
-        console.log('🔍 Verificando campo cliente:', {
-            exists: clienteField.length > 0,
-            hasSelect2: clienteField.hasClass('select2-hidden-accessible'),
-            currentUrl: clienteField.attr('data-autocomplete-light-url') || clienteField.attr('data-ajax--url')
-        });
-        
-        // Si ya está inicializado, marcar como exitoso y salir
-        if (clienteField.hasClass('select2-hidden-accessible')) {
-            window.clienteSelect2Init.success = true;
-            console.log('✅ Select2 ya está inicializado');
-            return;
-        }
-        
-        // Marcar que intentamos inicializar (solo una vez)
-        window.clienteSelect2Init.attempted = true;
+// Función para inicializar Select2 del campo cliente
+function initializeClienteSelect2() {
+    // Si ya está inicializado o ya intentamos, no hacer nada
+    if (window.clienteSelect2Init.success || window.clienteSelect2Init.attempted) {
+        return;
+    }
+    
+    // Marcar que intentamos inicializar (solo una vez)
+    window.clienteSelect2Init.attempted = true;
+    
+    const clienteField = $('#id_cliente');
+    if (!clienteField.length) {
+        console.warn('⚠️ Campo cliente no encontrado');
+        return;
+    }
+    
+    console.log('🔍 Verificando campo cliente:', {
+        exists: clienteField.length > 0,
+        hasSelect2: clienteField.hasClass('select2-hidden-accessible'),
+        currentUrl: clienteField.attr('data-autocomplete-light-url') || clienteField.attr('data-ajax--url'),
+        widgetType: clienteField.attr('class')
+    });
+    
+    // Si ya está inicializado, marcar como exitoso y salir
+    if (clienteField.hasClass('select2-hidden-accessible')) {
+        window.clienteSelect2Init.success = true;
+        console.log('✅ Select2 ya está inicializado por DAL');
+        aplicarEstilosSelect2();
+        return;
+    }
 
-        // Corrección de URL para DAL - Asegurar que tenga el prefijo del país
-        let autocompleteUrl = clienteField.attr('data-autocomplete-light-url') || 
-                              clienteField.attr('data-ajax--url') ||
-                              clienteField.data('autocomplete-light-url') ||
-                              clienteField.data('ajax-url');
-        
-        if (autocompleteUrl) {
-            // Si la URL no tiene el prefijo del país, agregarlo
-            if (!autocompleteUrl.startsWith(countryPrefix) && !autocompleteUrl.startsWith('/us/')) {
-                // Remover cualquier prefijo existente y agregar el correcto
-                const cleanUrl = autocompleteUrl.replace(/^\/+(us|cl|mx)\//, '').replace(/^\//, '');
-                const nuevaUrl = countryPrefix + cleanUrl;
-                clienteField.attr('data-autocomplete-light-url', nuevaUrl);
-                clienteField.attr('data-ajax--url', nuevaUrl);
-                console.log('🔧 URL de autocomplete corregida:', autocompleteUrl, '→', nuevaUrl);
-            } else {
-                console.log('✅ URL de autocomplete ya tiene prefijo correcto:', autocompleteUrl);
-            }
+    // Corrección de URL para DAL - Asegurar que tenga el prefijo del país
+    let autocompleteUrl = clienteField.attr('data-autocomplete-light-url') || 
+                          clienteField.attr('data-ajax--url') ||
+                          clienteField.data('autocomplete-light-url') ||
+                          clienteField.data('ajax-url');
+    
+    if (autocompleteUrl) {
+        // Si la URL no tiene el prefijo del país, agregarlo
+        if (!autocompleteUrl.startsWith(countryPrefix) && !autocompleteUrl.startsWith('/us/')) {
+            // Remover cualquier prefijo existente y agregar el correcto
+            const cleanUrl = autocompleteUrl.replace(/^\/+(us|cl|mx)\//, '').replace(/^\//, '');
+            const nuevaUrl = countryPrefix + cleanUrl;
+            clienteField.attr('data-autocomplete-light-url', nuevaUrl);
+            clienteField.attr('data-ajax--url', nuevaUrl);
+            console.log('🔧 URL de autocomplete corregida:', autocompleteUrl, '→', nuevaUrl);
         } else {
-            // Si no hay URL, establecerla manualmente
-            const defaultUrl = countryPrefix + 'vehiculos/autocomplete/cliente/';
-            clienteField.attr('data-autocomplete-light-url', defaultUrl);
-            clienteField.attr('data-ajax--url', defaultUrl);
-            console.log('🔧 URL de autocomplete establecida por defecto:', defaultUrl);
+            console.log('✅ URL de autocomplete ya tiene prefijo correcto:', autocompleteUrl);
+        }
+    } else {
+        // Si no hay URL, establecerla manualmente
+        const defaultUrl = countryPrefix + 'vehiculos/autocomplete/cliente/';
+        clienteField.attr('data-autocomplete-light-url', defaultUrl);
+        clienteField.attr('data-ajax--url', defaultUrl);
+        console.log('🔧 URL de autocomplete establecida por defecto:', defaultUrl);
+    }
+    
+    // Intentar inicialización solo si tenemos las dependencias
+    if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
+        // Primero, intentar disparar evento de DAL para que inicialice automáticamente
+        try {
+            $(document).trigger('autocompleteLightInitialize');
+            console.log('🔔 Evento autocompleteLightInitialize disparado');
+        } catch (e) {
+            console.warn('⚠️ Error al disparar evento DAL:', e);
         }
         
-        // Intentar inicialización solo si tenemos las dependencias
-        if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
-            // Disparar evento de DAL
-            $(document).trigger('autocompleteLightInitialize');
-            
-            // Verificar después de un tiempo si se inicializó
-            setTimeout(() => {
-                if (clienteField.hasClass('select2-hidden-accessible')) {
-                    window.clienteSelect2Init.success = true;
-                    console.log('✅ Select2 inicializado correctamente por DAL');
-                } else {
-                    console.warn('⚠️ Select2 no se inicializó automáticamente, intentando fallback manual');
-                    // Fallback manual solo si DAL no funcionó
-                    try {
-                        // Verificar URL antes de inicializar
-                        const finalUrl = clienteField.attr('data-autocomplete-light-url') || 
-                                        clienteField.attr('data-ajax--url');
-                        console.log('🔗 URL final antes de inicializar Select2:', finalUrl);
-                        
-                        clienteField.select2({ 
-                            placeholder: 'Buscar cliente...', 
-                            allowClear: true, 
-                            width: '100%',
-                            ajax: finalUrl ? {
-                                url: finalUrl,
-                                dataType: 'json',
-                                delay: 250,
-                                data: function (params) {
+        // Verificar después de un tiempo si se inicializó automáticamente
+        setTimeout(() => {
+            if (clienteField.hasClass('select2-hidden-accessible')) {
+                window.clienteSelect2Init.success = true;
+                console.log('✅ Select2 inicializado correctamente por DAL');
+                aplicarEstilosSelect2();
+            } else {
+                console.warn('⚠️ Select2 no se inicializó automáticamente, intentando fallback manual');
+                // Fallback manual solo si DAL no funcionó
+                try {
+                    // Verificar URL antes de inicializar
+                    const finalUrl = clienteField.attr('data-autocomplete-light-url') || 
+                                    clienteField.attr('data-ajax--url') ||
+                                    countryPrefix + 'vehiculos/autocomplete/cliente/';
+                    console.log('🔗 URL final antes de inicializar Select2:', finalUrl);
+                    
+                    clienteField.select2({ 
+                        placeholder: 'Escribe para buscar clientes por nombre, email o teléfono...', 
+                        allowClear: true, 
+                        width: '100%',
+                        minimumInputLength: 1,
+                        language: {
+                            inputTooShort: function() {
+                                return 'Escribe al menos 1 carácter para buscar...';
+                            },
+                            noResults: function() {
+                                return 'No se encontraron clientes';
+                            },
+                            searching: function() {
+                                return 'Buscando...';
+                            }
+                        },
+                        ajax: {
+                            url: finalUrl,
+                            dataType: 'json',
+                            delay: 250,
+                            data: function (params) {
+                                return {
+                                    q: params.term, // término de búsqueda
+                                    page: params.page || 1
+                                };
+                            },
+                            processResults: function (data, params) {
+                                // DAL devuelve {results: [{id, text}, ...]}
+                                if (data.results && Array.isArray(data.results)) {
                                     return {
-                                        q: params.term, // término de búsqueda
-                                        page: params.page
+                                        results: data.results,
+                                        pagination: {
+                                            more: data.pagination && data.pagination.more || false
+                                        }
                                     };
-                                },
-                                processResults: function (data, params) {
-                                    // DAL devuelve {results: [{id, text}, ...]}
-                                    if (data.results) {
-                                        return {
-                                            results: data.results
-                                        };
-                                    }
-                                    // Si es un array directo
-                                    if (Array.isArray(data)) {
-                                        return {
-                                            results: data.map(item => ({
-                                                id: item.id || item.pk,
-                                                text: item.text || item.nombre || String(item)
-                                            }))
-                                        };
-                                    }
-                                    return {results: []};
-                                },
-                                cache: true
-                            } : undefined
-                        });
-                        window.clienteSelect2Init.success = true;
-                        console.log('✅ Select2 inicializado manualmente');
-                    } catch (e) {
-                        console.error('❌ Error al inicializar Select2 manualmente:', e);
-                    }
-                }
-            }, 1000);
-        }
-    }
-    
-    // Esperar a que form.media se cargue, luego verificar una sola vez
-    setTimeout(checkAndStyleSelect2, 1000);
-    
-    // Función para aplicar estilos a Select2 después de inicialización
-    function aplicarEstilosSelect2() {
-        // Aplicar estilos a todos los contenedores Select2
-        $('.select2-container').each(function() {
-            var $container = $(this);
-            var $selection = $container.find('.select2-selection--single, .select2-selection--multiple');
-            
-            // Asegurar que tenga el ancho correcto
-            $container.css('width', '100%');
-            
-            // Aplicar estilos al contenedor de selección
-            if ($selection.length) {
-                $selection.css({
-                    'background': 'rgba(0, 0, 0, 0.4)',
-                    'border': '2px solid rgba(0, 230, 208, 0.3)',
-                    'border-radius': '8px',
-                    'min-height': '48px',
-                    'height': '48px',
-                    'padding': '0'
-                });
-                
-                // Aplicar estilos al texto renderizado
-                var $rendered = $selection.find('.select2-selection__rendered');
-                if ($rendered.length) {
-                    $rendered.css({
-                        'line-height': '48px',
-                        'padding-left': '16px',
-                        'padding-right': '40px',
-                        'color': '#fff',
-                        'font-family': "'Rajdhani', sans-serif",
-                        'font-weight': '500',
-                        'font-size': '15px'
+                                }
+                                // Si es un array directo
+                                if (Array.isArray(data)) {
+                                    return {
+                                        results: data.map(item => ({
+                                            id: item.id || item.pk,
+                                            text: item.text || item.nombre || String(item)
+                                        }))
+                                    };
+                                }
+                                console.warn('⚠️ Formato de respuesta no reconocido:', data);
+                                return {results: []};
+                            },
+                            cache: true
+                        }
                     });
+                    window.clienteSelect2Init.success = true;
+                    console.log('✅ Select2 inicializado manualmente');
+                    aplicarEstilosSelect2();
+                } catch (e) {
+                    console.error('❌ Error al inicializar Select2 manualmente:', e);
+                    console.error('Stack trace:', e.stack);
                 }
             }
-        });
+        }, 1500); // Aumentar tiempo de espera a 1.5 segundos
+    } else {
+        console.error('❌ jQuery o Select2 no están disponibles');
     }
+}
+
+// Función para aplicar estilos a Select2 después de inicialización
+function aplicarEstilosSelect2() {
+    // Aplicar estilos a todos los contenedores Select2
+    $('.select2-container').each(function() {
+        var $container = $(this);
+        var $selection = $container.find('.select2-selection--single, .select2-selection--multiple');
+        
+        // Asegurar que tenga el ancho correcto
+        $container.css('width', '100%');
+        
+        // Aplicar estilos al contenedor de selección
+        if ($selection.length) {
+            $selection.css({
+                'background': 'rgba(0, 0, 0, 0.4)',
+                'border': '2px solid rgba(0, 230, 208, 0.3)',
+                'border-radius': '8px',
+                'min-height': '48px',
+                'height': '48px',
+                'padding': '0'
+            });
+            
+            // Aplicar estilos al texto renderizado
+            var $rendered = $selection.find('.select2-selection__rendered');
+            if ($rendered.length) {
+                $rendered.css({
+                    'line-height': '48px',
+                    'padding-left': '16px',
+                    'padding-right': '40px',
+                    'color': '#fff',
+                    'font-family': "'Rajdhani', sans-serif",
+                    'font-weight': '500',
+                    'font-size': '15px'
+                });
+            }
+        }
+    });
+}
+
+$(document).ready(function() {
+    // Esperar a que form.media se cargue completamente antes de inicializar
+    // Usar múltiples intentos para asegurar que funcione
+    setTimeout(initializeClienteSelect2, 500);
+    setTimeout(initializeClienteSelect2, 1500);
+    setTimeout(initializeClienteSelect2, 2500);
     
     // Aplicar estilos después de que Select2 se inicialice
     // Usar múltiples intentos para asegurar que se apliquen
-    setTimeout(aplicarEstilosSelect2, 1500);
-    setTimeout(aplicarEstilosSelect2, 2500);
-    setTimeout(aplicarEstilosSelect2, 3500);
+    setTimeout(aplicarEstilosSelect2, 2000);
+    setTimeout(aplicarEstilosSelect2, 3000);
+    setTimeout(aplicarEstilosSelect2, 4000);
     
     // También aplicar cuando Select2 se inicialice dinámicamente
     $(document).on('select2:open', function() {
         setTimeout(aplicarEstilosSelect2, 100);
     });
+    
+    // Observar cambios en el DOM para detectar cuando Select2 se inicializa
+    const observer = new MutationObserver(function(mutations) {
+        const clienteField = $('#id_cliente');
+        if (clienteField.length && clienteField.hasClass('select2-hidden-accessible') && !window.clienteSelect2Init.success) {
+            window.clienteSelect2Init.success = true;
+            console.log('✅ Select2 detectado por MutationObserver');
+            aplicarEstilosSelect2();
+        }
+    });
+    
+    // Observar el contenedor del formulario
+    const formContainer = document.querySelector('.form-card');
+    if (formContainer) {
+        observer.observe(formContainer, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class']
+        });
+    }
 });
 
 // --- LÓGICA DE CARGA DE MODELOS (AJAX) ---
@@ -1481,9 +1537,8 @@ $(document).ready(function() {
         }, 1500); // Esperar un poco más para que Select2 se inicialice completamente
     }
     
-    // Esperar a que form.media se cargue
-    setTimeout(initializeDAL, 1000);
+    // Esperar a que form.media se cargue (ya se cargó antes)
+    setTimeout(initializeDAL, 500);
 })();
 </script>
-{{ form.media }}
 {% endblock %}

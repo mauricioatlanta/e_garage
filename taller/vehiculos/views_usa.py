@@ -71,7 +71,7 @@ def crear_vehiculo(request):
     log.info(f"[crear_vehiculo] Template final seleccionado: {template}")
 
     if request.method == "POST":
-        form = VehiculoForm(request.POST, user=request.user)
+        form = VehiculoForm(request.POST, user=request.user, request=request)
 
         if form.is_valid():
             try:
@@ -98,7 +98,7 @@ def crear_vehiculo(request):
         else:
             messages.error(request, error_msg)
     else:
-        form = VehiculoForm(user=request.user)
+        form = VehiculoForm(user=request.user, request=request)
 
     # Obtener clientes filtrados por empresa
     clientes = Cliente.objects.filter(empresa=empresa)[:500]

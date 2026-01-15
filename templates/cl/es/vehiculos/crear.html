@@ -5,6 +5,7 @@
 {% load i18n %}
 
 {% block extra_css %}
+{{ block.super }}
 <style>
   /* Mejoras responsive para móviles */
   @media (max-width: 768px) {
@@ -89,10 +90,71 @@
       width: 100%;
     }
   }
+  
+  /* FIX: Estilos para Select2 - Asegurar visibilidad del dropdown y texto */
+  .select2-container {
+    z-index: 9999 !important; /* Asegurar que esté por encima de todo */
+  }
+  
+  .select2-dropdown {
+    background: rgba(0, 0, 0, 0.95) !important;
+    border: 1px solid rgba(0, 230, 208, 0.5) !important;
+    box-shadow: 0 4px 20px rgba(0, 230, 208, 0.3) !important;
+    z-index: 10000 !important;
+  }
+  
+  .select2-results__option {
+    background-color: transparent !important;
+    color: #00e6d4 !important; /* Color cyan visible */
+    padding: 10px 15px !important;
+    line-height: 1.5 !important;
+    font-size: 14px !important;
+  }
+  
+  .select2-results__option--highlighted {
+    background-color: rgba(0, 230, 208, 0.2) !important;
+    color: #00ffff !important;
+  }
+  
+  .select2-results__option[aria-selected="true"] {
+    background-color: rgba(0, 230, 208, 0.3) !important;
+    color: #00ffff !important;
+  }
+  
+  .select2-selection {
+    background: rgba(0, 230, 208, 0.1) !important;
+    border: 1px solid rgba(0, 230, 208, 0.3) !important;
+    color: #00e6d4 !important;
+    min-height: 48px !important;
+  }
+  
+  .select2-selection__rendered {
+    color: #00e6d4 !important;
+    line-height: 48px !important;
+    padding-left: 12px !important;
+  }
+  
+  .select2-selection__arrow {
+    height: 46px !important;
+  }
+  
+  .select2-search__field {
+    background: rgba(0, 0, 0, 0.8) !important;
+    color: #00e6d4 !important;
+    border: 1px solid rgba(0, 230, 208, 0.3) !important;
+  }
+  
+  /* Asegurar que el dropdown no quede oculto por backdrop-filter */
+  .select2-container--open .select2-dropdown {
+    position: absolute !important;
+  }
+  
 </style>
 {% endblock %}
 
 {% block content %}
+<!-- ESTO ES VITAL: Los CSS de Select2 y Django Autocomplete Light se cargan en extra_css -->
+
 <div class="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black text-white relative overflow-hidden">
   <!-- Fondo estelar -->
   <canvas id="starfield" class="absolute inset-0 w-full h-full"></canvas>
@@ -116,7 +178,7 @@
     <div class="max-w-4xl mx-auto">
       <!-- Endpoints para el formulario jerárquico -->
       <div id="vehiculos-endpoints"
-           data-ep-modelos="{% country_url 'vehiculos:ajax_modelos_por_marca_anio' %}"
+           data-ep-modelos="{% country_url 'vehiculos:modelos_por_marca_api' %}"
            data-ep-motores="{% country_url 'vehiculos:ajax_motores_por_modelo' %}"
            data-ep-cajas="{% country_url 'vehiculos:ajax_cajas_por_modelo' %}"
            data-ep-agregar-marca="{% country_url 'vehiculos:ajax_agregar_marca' %}"
@@ -131,6 +193,10 @@
             action="{% country_url 'vehiculos:crear_vehiculo' %}"
             class="space-y-6">
         {% csrf_token %}
+        
+        <!-- Hidden inputs para preservar cliente_id y next en POST -->
+        <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
+        <input type="hidden" name="cliente_id" value="{% firstof cliente_id request.GET.cliente_id '' %}">
 
         <!-- Información del cliente -->
         <div class="relative group">
@@ -145,10 +211,13 @@
               <label for="id_cliente" class="block text-sm font-medium text-gray-300 mb-2">
                 Cliente *
               </label>
-              {% render_field form.cliente class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400" %}
+              <div id="cliente-container" class="relative">
+                {% render_field form.cliente class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400" %}
+              </div>
               {% if form.cliente.errors %}
                 <div class="mt-1 text-xs text-red-400">{{ form.cliente.errors }}</div>
               {% endif %}
+              <div class="mt-1 text-xs text-gray-400">Escribe para buscar clientes por nombre, email o teléfono...</div>
             </div>
           </div>
         </div>
@@ -162,9 +231,9 @@
               Datos del Vehículo
             </h3>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
               <!-- Año -->
-              <div>
+              <div class="md:col-span-1">
                 <label for="id_anio" class="block text-sm font-medium text-gray-300 mb-2">
                   Año *
                 </label>
@@ -175,7 +244,7 @@
               </div>
 
               <!-- Marca -->
-              <div class="md:col-span-2">
+              <div class="md:col-span-3">
                 <label for="id_marca" class="block text-sm font-medium text-gray-300 mb-2">
                   Marca *
                 </label>
@@ -191,15 +260,7 @@
                 {% if form.marca.errors %}
                   <div class="mt-1 text-xs text-red-400">{{ form.marca.errors }}</div>
                 {% endif %}
-                {% if form.marca.field.choices|length <= 1 %}
-                  <div class="mt-2 text-xs text-yellow-400 bg-yellow-900/20 border border-yellow-500/30 rounded px-3 py-2">
-                    ⚠️ No hay marcas disponibles. Usa el botón "+" para agregar una nueva marca.
-                  </div>
-                {% else %}
-                  <div class="mt-1 text-xs text-emerald-400 opacity-70">
-                    ℹ️ {{ form.marca.field.choices|length|add:"-1" }} marca(s) disponible(s)
-                  </div>
-                {% endif %}
+                {# Las marcas se cargan dinámicamente vía AJAX, no mostrar mensaje estático #}
               </div>
             </div>
 
@@ -481,7 +542,7 @@
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-{{ form.media }}
+<!-- Los JS de Django Autocomplete Light se cargan en extra_js -->
 <script src="{% static 'js/formulario_jerarquico.js' %}?v=5"></script>
 <script>
 function openAddBrandModal() {
@@ -550,12 +611,22 @@ document.getElementById('addBrandForm').addEventListener('submit', function(e) {
         return;
       }
       const selectMarca = document.getElementById('id_marca');
-      const opcion = document.createElement('option');
-      opcion.value = data.marca.id;
-      opcion.textContent = data.marca.nombre;
-      selectMarca.appendChild(opcion);
+      // Verificar si la opción ya existe
+      const existingOption = selectMarca.querySelector(`option[value="${data.marca.id}"]`);
+      if (!existingOption) {
+        const opcion = document.createElement('option');
+        opcion.value = data.marca.id;
+        opcion.textContent = data.marca.nombre;
+        selectMarca.appendChild(opcion);
+      }
       selectMarca.value = data.marca.id;
-      selectMarca.dispatchEvent(new Event('change', { bubbles: true }));
+      
+      // Si está usando Select2, actualizar
+      if (window.jQuery && jQuery.fn && jQuery.fn.select2 && jQuery(selectMarca).hasClass('select2-hidden-accessible')) {
+        jQuery(selectMarca).trigger('change');
+      } else {
+        selectMarca.dispatchEvent(new Event('change', { bubbles: true }));
+      }
 
       closeAddBrandModal();
       alert('Marca agregada correctamente.');
@@ -665,46 +736,321 @@ document.getElementById('addColorForm').addEventListener('submit', function(e) {
     });
 });
 
-document.addEventListener('DOMContentLoaded', function() {
-  if (window.jQuery && jQuery.fn && jQuery.fn.select2) {
-    jQuery('#id_cliente').select2({
-      placeholder: "Buscar cliente...",
-      allowClear: true,
-      minimumInputLength: 2,
-      ajax: {
-        delay: 250,
-        transport: function (params, success, failure) {
-          const q = params.data.q || "";
-          fetch("{% country_url 'vehiculos:api_busqueda_clientes' %}?q=" + encodeURIComponent(q), {
-            headers: { "X-Requested-With": "XMLHttpRequest" }
-          })
-            .then(r => r.json())
-            .then(success)
-            .catch(failure);
+// Función para cargar marcas vía AJAX según el país del suscriptor
+// IMPORTANTE: Siempre carga dinámicamente para asegurar que use el país correcto del suscriptor
+async function cargarMarcas(forceReload = false) {
+    const marcaSelect = document.getElementById('id_marca');
+    if (!marcaSelect) {
+      console.error('❌ Campo marca (id_marca) no encontrado');
+      return;
+    }
+    
+    let urlMarcas = "{% country_url 'vehiculos:api_marcas' %}";
+    
+    // Fallback si country_url no funciona
+    if (!urlMarcas || urlMarcas.trim() === '' || urlMarcas.includes('country_url')) {
+      // Construir URL manualmente basándose en el path actual
+      const currentPath = window.location.pathname || '/cl/es/';
+      const pathParts = currentPath.split('/').filter(p => p && p.length > 0);
+      const country = pathParts[0] || 'cl';
+      const lang = pathParts[1] || 'es';
+      urlMarcas = `/${country}/${lang}/vehiculos/api/marcas/`;
+      console.warn('⚠️ URL generada manualmente:', urlMarcas);
+    }
+    
+    console.log('🔄 Cargando marcas desde:', urlMarcas);
+    console.log('📋 País del suscriptor se detecta automáticamente desde el servidor (empresa.pais)');
+    
+    // Verificar que la URL no esté vacía
+    if (!urlMarcas || urlMarcas.trim() === '') {
+      console.error('❌ ERROR: URL de marcas está vacía o no se generó correctamente');
+      marcaSelect.innerHTML = '<option value="">Error: URL no configurada</option>';
+      return;
+    }
+    
+    // Guardar valor actual si existe
+    const valorActual = marcaSelect.value;
+    
+    // Verificar si ya tiene opciones válidas (solo si no se fuerza recarga)
+    if (!forceReload) {
+      const hasValidOptions = marcaSelect.options.length > 1 || 
+                             (marcaSelect.options.length === 1 && marcaSelect.options[0].value !== '');
+      
+      if (hasValidOptions) {
+        console.log('ℹ️ Campo marca ya tiene opciones. Para forzar recarga, usa cargarMarcas(true)');
+        return;
+      }
+    }
+    
+    try {
+      // Mostrar loading
+      marcaSelect.innerHTML = '<option value="">Cargando marcas...</option>';
+      marcaSelect.disabled = true;
+      
+      const response = await fetch(urlMarcas, {
+        method: 'GET',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         },
-        processResults: data => ({
-          results: (data || []).map(c => ({
-            id: c.id,
-            text: [c.nombre, c.apellido].filter(Boolean).join(" ") +
-                  (c.email ? " · " + c.email : (c.telefono ? " · " + c.telefono : ""))
-          }))
-        })
+        credentials: 'same-origin' // Incluye cookies/CSRF
+      });
+      
+      console.log('📡 Respuesta del servidor:', {
+        status: response.status,
+        statusText: response.statusText,
+        ok: response.ok,
+        url: urlMarcas
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      console.log('✅ Datos recibidos del servidor:', data);
+      console.log(`📊 Total de marcas recibidas: ${Array.isArray(data) ? data.length : 0}`);
+      
+      // Limpiar opciones
+      marcaSelect.innerHTML = '<option value="">---------</option>';
+      
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(marca => {
+          const option = document.createElement('option');
+          option.value = marca.id;
+          option.textContent = marca.nombre;
+          marcaSelect.appendChild(option);
+        });
+        
+        // Restaurar valor anterior si existía
+        if (valorActual) {
+          marcaSelect.value = valorActual;
+        }
+        
+        // Inicializar Select2 en marca después de cargar las opciones
+        if (window.jQuery && jQuery.fn && jQuery.fn.select2) {
+          if (!jQuery(marcaSelect).hasClass('select2-hidden-accessible')) {
+            // Buscar el contenedor padre más cercano para dropdownParent
+            const formContainer = marcaSelect.closest('.max-w-4xl') || marcaSelect.closest('form') || document.body;
+            jQuery(marcaSelect).select2({ 
+              placeholder: "Selecciona marca...",
+              allowClear: true,
+              dropdownParent: jQuery(formContainer), // FIX: Evita problemas de z-index y blur
+              theme: 'default'
+            });
+          } else {
+            jQuery(marcaSelect).trigger('change');
+          }
+        }
+        
+        console.log(`✅ Marcas cargadas exitosamente: ${data.length} marcas para el país del suscriptor`);
+      } else {
+        console.warn('⚠️ No se encontraron marcas en la respuesta. El servidor devolvió un array vacío.');
+        console.warn('💡 Esto puede significar:');
+        console.warn('   1. No hay marcas registradas para el país del suscriptor en la base de datos');
+        console.warn('   2. El país detectado no coincide con las marcas existentes');
+        console.warn('   3. Usa el botón "+" para agregar una nueva marca');
+        marcaSelect.innerHTML = '<option value="">No hay marcas disponibles</option>';
+      }
+      
+      marcaSelect.disabled = false;
+    } catch (error) {
+      console.error('❌ Error al cargar marcas:', error);
+      console.error('Detalles del error:', {
+        message: error.message,
+        url: urlMarcas,
+        stack: error.stack
+      });
+      marcaSelect.innerHTML = '<option value="">Error al cargar marcas</option>';
+      marcaSelect.disabled = false;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  // CARGA INICIAL DE MARCAS - Esto es crítico para poblar el select vacío
+  console.log('🚀 Iniciando carga inicial de marcas...');
+  
+  const marcaSelect = document.getElementById('id_marca');
+  if (!marcaSelect) {
+    console.error('❌ Campo #id_marca no encontrado en el DOM');
+    return;
+  }
+  
+  // URL de la API de marcas
+  let urlMarcas = "{% country_url 'vehiculos:api_marcas' %}";
+  
+  // Fallback si country_url no funciona
+  if (!urlMarcas || urlMarcas.trim() === '' || urlMarcas.includes('country_url')) {
+    const currentPath = window.location.pathname || '/cl/es/';
+    const pathParts = currentPath.split('/').filter(p => p && p.length > 0);
+    const country = pathParts[0] || 'cl';
+    const lang = pathParts[1] || 'es';
+    urlMarcas = `/${country}/${lang}/vehiculos/api/marcas/`;
+    console.warn('⚠️ URL generada manualmente:', urlMarcas);
+  }
+  
+  // Carga inicial usando fetch directo
+  fetch(urlMarcas, {
+    method: 'GET',
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest',
+      'Accept': 'application/json',
+      'Content-Type': 'application/json'
+    },
+    credentials: 'same-origin'
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('✅ Datos recibidos en carga inicial:', data);
+      console.log(`📊 Total de marcas: ${Array.isArray(data) ? data.length : 0}`);
+      
+      // Limpiar y poblar el select
+      marcaSelect.innerHTML = '<option value="">Selecciona marca...</option>';
+      
+      if (Array.isArray(data) && data.length > 0) {
+        data.forEach(item => {
+          const option = document.createElement('option');
+          option.value = item.id;
+          option.textContent = item.nombre;
+          marcaSelect.appendChild(option);
+        });
+        console.log(`✅ ${data.length} marcas cargadas en el select`);
+      } else {
+        console.warn('⚠️ No se recibieron marcas en la carga inicial');
+        marcaSelect.innerHTML = '<option value="">No hay marcas disponibles</option>';
+      }
+      
+      // Disparar evento change para que Select2 se actualice
+      if (window.jQuery && jQuery.fn && jQuery.fn.select2) {
+        jQuery(marcaSelect).trigger('change');
+      }
+    })
+    .catch(error => {
+      console.error('❌ Error en carga inicial de marcas:', error);
+      marcaSelect.innerHTML = '<option value="">Error al cargar marcas</option>';
+    });
+  
+  // También intentar con la función cargarMarcas como fallback
+  setTimeout(function() {
+    console.log('🔄 Ejecutando carga de marcas (fallback con función)...');
+    try {
+      if (typeof cargarMarcas === 'function') {
+        cargarMarcas(true);
+      }
+    } catch (error) {
+      console.error('Error en carga de marcas (fallback):', error);
+    }
+  }, 500);
+  
+  // DEBUG: Listener para detectar cuando se abre Select2 de marca
+  if (window.jQuery) {
+    jQuery(document).on('select2:open', function(e) {
+      if (e.target && e.target.id === 'id_marca') {
+        console.log('🔍 Select2 de marca abierto - Verificando opciones...');
+        const marcaSelect = document.getElementById('id_marca');
+        console.log('📊 Opciones disponibles:', marcaSelect.options.length);
+        if (marcaSelect.options.length <= 1) {
+          console.warn('⚠️ No hay opciones en el select de marca, forzando recarga...');
+          cargarMarcas(true);
+        }
       }
     });
+  }
+  
+  // Pre-seleccionar cliente si viene en la URL (Mejora Profesional)
+  // Detecta dinámicamente país/idioma y carga el cliente con fetch + headers AJAX
+  jQuery(document).ready(function($) {
+    const urlParams = new URLSearchParams(window.location.search);
+    const clienteId = urlParams.get('cliente_id');
+    const $clienteSelect = $('#id_cliente');
 
-    jQuery('#id_anio').select2({ placeholder: "Selecciona año..." });
-    jQuery('#id_marca').select2({ placeholder: "Selecciona marca..." });
-    jQuery('#id_modelo').select2({ placeholder: "Selecciona modelo..." });
+    if (clienteId && $clienteSelect.length) {
+      // Detectar país e idioma dinámicamente desde el path actual
+      const pathParts = window.location.pathname.split('/').filter(function(p) { return p && p.length > 0; });
+      const country = pathParts[0] || 'cl';
+      const lang = (pathParts[1] === 'es' || pathParts[1] === 'en') ? pathParts[1] : 'es';
+      
+      // Construir URL dinámica del endpoint de búsqueda de clientes
+      const apiUrl = `/${country}/${lang}/vehiculos/api/clientes/?id=${clienteId}`;
+
+      // Fetch con headers AJAX para evitar bloqueos de Django
+      fetch(apiUrl, { 
+        headers: { 
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        } 
+      })
+        .then(function(r) {
+          if (!r.ok) {
+            throw new Error('HTTP ' + r.status);
+          }
+          return r.json();
+        })
+        .then(function(data) {
+          // Manejar tanto formato Select2 como array plano
+          const c = data.results ? data.results[0] : (data.length > 0 ? data[0] : null);
+          
+          if (c) {
+            // Construir el texto del cliente (nombre + apellido)
+            const text = c.text || ((c.nombre || '') + ' ' + (c.apellido || '')).trim();
+            const clienteIdValue = c.id || c.pk || clienteId;
+            
+            // Crear y agregar la opción para Select2/DAL
+            const newOption = new Option(text, clienteIdValue, true, true);
+            $clienteSelect.append(newOption).trigger('change');
+            
+            // Notificar a Select2/DAL que se seleccionó un cliente
+            $clienteSelect.trigger({
+              type: 'select2:select',
+              params: { data: { id: clienteIdValue, text: text } }
+            });
+            
+            console.log('✅ Cliente preseleccionado:', text);
+          } else {
+            console.warn('⚠️ Cliente no encontrado con ID:', clienteId);
+          }
+        })
+        .catch(function(err) {
+          console.error('❌ Error cargando cliente:', err);
+        });
+    }
+    
+    // Inicialización de Select2 para campos del formulario
+    jQuery('#id_anio').select2({ 
+      placeholder: "Selecciona año...",
+      dropdownParent: jQuery('#id_anio').closest('form') || jQuery('body')
+    });
+    // NO inicializar Select2 en marca todavía - se hará después de cargar las marcas
+    // jQuery('#id_marca').select2({ placeholder: "Selecciona marca..." });
+    jQuery('#id_modelo').select2({ 
+      placeholder: "Selecciona modelo...",
+      dropdownParent: jQuery('#id_modelo').closest('form') || jQuery('body')
+    });
     if (jQuery('#id_motor').length) {
-      jQuery('#id_motor').select2({ placeholder: "Selecciona motor..." });
+      jQuery('#id_motor').select2({ 
+        placeholder: "Selecciona motor...",
+        dropdownParent: jQuery('#id_motor').closest('form') || jQuery('body')
+      });
     }
     if (jQuery('#id_caja').length) {
-      jQuery('#id_caja').select2({ placeholder: "Selecciona transmisión..." });
+      jQuery('#id_caja').select2({ 
+        placeholder: "Selecciona transmisión...",
+        dropdownParent: jQuery('#id_caja').closest('form') || jQuery('body')
+      });
     }
     if (jQuery('#id_color').length) {
-      jQuery('#id_color').select2({ placeholder: "Selecciona color..." });
+      jQuery('#id_color').select2({ 
+        placeholder: "Selecciona color...",
+        dropdownParent: jQuery('#id_color').closest('form') || jQuery('body')
+      });
     }
-  }
+  });
 
   // Configuración de endpoints y carga de modelos
   const endpointsTag = document.getElementById('vehiculos-endpoints');
@@ -730,6 +1076,8 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   async function cargarModelos() {
+    // Obtener el valor directamente del elemento justo al iniciar la función
+    // Esto asegura que obtenemos el valor correcto incluso si Select2 está en proceso de actualización
     const marcaId = jQuery('#id_marca').val();
     const year = jQuery('#id_anio').val();
     const $modelo = jQuery('#id_modelo');
@@ -779,26 +1127,52 @@ document.addEventListener('DOMContentLoaded', function() {
       }
       
       const data = await res.json();
-      console.log('📦 Datos recibidos:', data);
+      console.log('📦 Datos recibidos (raw):', data);
+      console.log('📦 Tipo de datos:', typeof data, Array.isArray(data));
       
-      const modelos = Array.isArray(data)
-        ? data
-        : Array.isArray(data.results)
-          ? data.results
-          : Array.isArray(data.modelos)
-            ? data.modelos
-            : [];
+      // Manejar diferentes formatos de respuesta
+      let modelos = [];
+      if (Array.isArray(data)) {
+        // Formato array plano: [{"id": 1, "nombre": "Modelo 1"}, ...]
+        modelos = data;
+        console.log('✅ Formato detectado: Array plano');
+      } else if (data.results && Array.isArray(data.results)) {
+        // Formato Select2: {"results": [{"id": 1, "text": "Modelo 1"}, ...]}
+        modelos = data.results;
+        console.log('✅ Formato detectado: Select2 (results)');
+      } else if (data.modelos && Array.isArray(data.modelos)) {
+        // Formato alternativo: {"modelos": [...]}
+        modelos = data.modelos;
+        console.log('✅ Formato detectado: Alternativo (modelos)');
+      } else if (data.error) {
+        // Error del servidor
+        console.error('❌ Error del servidor:', data.error);
+        $modelo.empty().append(new Option(`❌ Error: ${data.error}`, ''));
+        $modelo.prop('disabled', false).trigger('change');
+        return;
+      } else {
+        console.warn('⚠️ Formato de respuesta desconocido:', data);
+      }
       
-      console.log(`✅ ${modelos.length} modelo(s) encontrado(s)`);
+      console.log(`✅ ${modelos.length} modelo(s) encontrado(s) después de procesar`);
+      console.log('📋 Primeros modelos:', modelos.slice(0, 3));
       
       $modelo.empty().append(new Option('Selecciona modelo...', ''));
       
       if (modelos.length === 0) {
         $modelo.append(new Option('❌ No hay modelos disponibles', ''));
         console.warn('⚠️ No se encontraron modelos para esta marca');
+        console.warn('🔍 Información de debug:', {
+          marcaId: marcaId,
+          year: year,
+          url: url,
+          status: res.status,
+          dataReceived: data
+        });
       } else {
         modelos.forEach(item => {
-          const text = item.text || item.nombre || item.label || item.value || '';
+          // Manejar formato Select2 (text) o formato API (nombre) indistintamente
+          const text = item.nombre || item.text || item.label || item.value || '';
           const id = item.id || item.pk || item.value;
           if (id && text) {
             const opt = new Option(text, id, false, false);
@@ -807,7 +1181,26 @@ document.addEventListener('DOMContentLoaded', function() {
         });
       }
       
-      $modelo.prop('disabled', false).trigger('change');
+      $modelo.prop('disabled', false);
+      
+      // CRÍTICO: Disparar evento 'change' para que DAL y los campos dependientes (motor, caja) se enteren
+      // Primero disparar el evento nativo, luego Select2 si está inicializado
+      $modelo.trigger('change');
+      
+      // Forzar refresco de Select2 después de actualizar opciones
+      if (window.jQuery && jQuery.fn && jQuery.fn.select2 && $modelo.hasClass('select2-hidden-accessible')) {
+        $modelo.trigger('change.select2');
+      }
+      
+      // Si hay un modelo seleccionado después de cargar, cargar motores y cajas
+      const modeloSeleccionado = $modelo.val();
+      if (modeloSeleccionado && typeof cargarMotores === 'function' && typeof cargarCajas === 'function') {
+        console.log('🔄 Modelo ya seleccionado, cargando motores y cajas...');
+        setTimeout(function() {
+          cargarMotores();
+          cargarCajas();
+        }, 100);
+      }
     } catch (error) {
       console.error('❌ Error cargando modelos:', error);
       console.error('Stack:', error.stack);
@@ -815,10 +1208,165 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // Función para cargar motores por modelo
+  async function cargarMotores() {
+    const modeloId = jQuery('#id_modelo').val();
+    const $motor = jQuery('#id_motor');
+    const motoresUrl = endpointsTag ? endpointsTag.dataset.epMotores : null;
+
+    console.log('🔧 cargarMotores() llamado:', { modeloId, motoresUrl });
+
+    if (!motoresUrl) {
+      console.error('❌ Error: URL de motores no configurada');
+      return;
+    }
+
+    if (!modeloId) {
+      console.log('⚠️ No hay modelo seleccionado');
+      $motor.empty().append(new Option('Selecciona modelo primero...', ''));
+      $motor.prop('disabled', true).trigger('change');
+      return;
+    }
+
+    const url = `${motoresUrl}?modelo_id=${encodeURIComponent(modeloId)}`;
+    console.log('📤 URL de motores:', url);
+
+    try {
+      $motor.empty().append(new Option('⏳ Cargando motores...', ''));
+      $motor.prop('disabled', true).trigger('change');
+
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: { 
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        },
+        credentials: 'same-origin'
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log('📦 Motores recibidos:', data);
+
+      // La API devuelve {success: true, motores: [...]}
+      const motores = (data.motores || []);
+      console.log(`✅ ${motores.length} motor(es) encontrado(s)`);
+
+      $motor.empty().append(new Option('Selecciona motor...', ''));
+
+      if (motores.length === 0) {
+        $motor.append(new Option('No hay motores disponibles', ''));
+        console.warn('⚠️ No se encontraron motores para este modelo');
+      } else {
+        motores.forEach(item => {
+          const text = item.text || item.nombre || item.label || '';
+          const id = item.id || item.pk || item.value;
+          if (id && text) {
+            const opt = new Option(text, id, false, false);
+            $motor.append(opt);
+          }
+        });
+      }
+
+      $motor.prop('disabled', false).trigger('change');
+    } catch (error) {
+      console.error('❌ Error cargando motores:', error);
+      $motor.empty().append(new Option('Error al cargar motores', '')).prop('disabled', true).trigger('change');
+    }
+  }
+
+  // Función para cargar cajas por modelo
+  async function cargarCajas() {
+    const modeloId = jQuery('#id_modelo').val();
+    const $caja = jQuery('#id_caja');
+    const cajasUrl = endpointsTag ? endpointsTag.dataset.epCajas : null;
+
+    console.log('🔧 cargarCajas() llamado:', { modeloId, cajasUrl });
+
+    if (!cajasUrl) {
+      console.error('❌ Error: URL de cajas no configurada');
+      return;
+    }
+
+    if (!modeloId) {
+      console.log('⚠️ No hay modelo seleccionado');
+      $caja.empty().append(new Option('Selecciona modelo primero...', ''));
+      $caja.prop('disabled', true).trigger('change');
+      return;
+    }
+
+    const url = `${cajasUrl}?modelo_id=${encodeURIComponent(modeloId)}`;
+    console.log('📤 URL de cajas:', url);
+
+    try {
+      $caja.empty().append(new Option('⏳ Cargando transmisiones...', ''));
+      $caja.prop('disabled', true).trigger('change');
+
+      const res = await fetch(url, {
+        method: 'GET',
+        headers: { 
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        },
+        credentials: 'same-origin'
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP error! status: ${res.status}`);
+      }
+
+      const data = await res.json();
+      console.log('📦 Cajas recibidas:', data);
+
+      // La API devuelve {success: true, cajas: [...]}
+      const cajas = (data.cajas || []);
+      console.log(`✅ ${cajas.length} transmisión(es) encontrada(s)`);
+
+      $caja.empty().append(new Option('Selecciona transmisión...', ''));
+
+      if (cajas.length === 0) {
+        $caja.append(new Option('No hay transmisiones disponibles', ''));
+        console.warn('⚠️ No se encontraron transmisiones para este modelo');
+      } else {
+        cajas.forEach(item => {
+          const text = item.text || item.nombre || item.label || '';
+          const id = item.id || item.pk || item.value;
+          if (id && text) {
+            const opt = new Option(text, id, false, false);
+            $caja.append(opt);
+          }
+        });
+      }
+
+      $caja.prop('disabled', false).trigger('change');
+    } catch (error) {
+      console.error('❌ Error cargando cajas:', error);
+      $caja.empty().append(new Option('Error al cargar transmisiones', '')).prop('disabled', true).trigger('change');
+    }
+  }
+
   // Cargar modelos cuando cambia la marca (año es opcional)
-  jQuery('#id_marca').on('change', function() {
-    console.log('🔄 Marca cambiada');
-    cargarModelos();
+  // Usar $(document).on() para capturar eventos incluso si DAL reinicializa el elemento
+  $(document).on('change', '#id_marca', function (e) {
+    // Extraer el ID correctamente tanto si es evento nativo como Select2
+    const marcaId = $(this).val(); 
+    console.log('🔍 Cambio detectado - Marca ID:', marcaId);
+    
+    if (marcaId) {
+      cargarModelos(); // Esta función ahora recibirá el ID correcto
+      // Limpiar modelo, motor y caja cuando cambia la marca
+      jQuery('#id_modelo').empty().append(new Option('Selecciona modelo...', '')).trigger('change');
+      jQuery('#id_motor').val('').trigger('change');
+      jQuery('#id_caja').val('').trigger('change');
+    } else {
+      console.log('⚠️ No hay marca seleccionada');
+      $('#id_modelo').empty().append(new Option('Selecciona marca primero...', ''));
+      $('#id_motor').val('').trigger('change');
+      $('#id_caja').val('').trigger('change');
+    }
   });
   
   // Si cambia el año y ya hay marca, recargar modelos
@@ -829,11 +1377,58 @@ document.addEventListener('DOMContentLoaded', function() {
       cargarModelos();
     }
   });
+
+  // Cargar motores y cajas cuando cambia el modelo
+  jQuery('#id_modelo').on('change', function() {
+    const modeloId = jQuery('#id_modelo').val();
+    console.log('🔄 Modelo cambiado:', modeloId);
+    if (modeloId) {
+      cargarMotores();
+      cargarCajas();
+    } else {
+      // Limpiar motor y caja si no hay modelo
+      jQuery('#id_motor').empty().append(new Option('Selecciona modelo primero...', '')).prop('disabled', true).trigger('change');
+      jQuery('#id_caja').empty().append(new Option('Selecciona modelo primero...', '')).prop('disabled', true).trigger('change');
+    }
+  });
   
-  // Cargar modelos iniciales si hay marca seleccionada
-  if (jQuery('#id_marca').val()) {
-    cargarModelos();
+  // Cargar marcas al inicio - Ejecutar inmediatamente y también con delays
+  console.log('🚀 Iniciando carga de marcas...');
+  
+  // Intentar cargar inmediatamente
+  try {
+    cargarMarcas(true);
+  } catch (error) {
+    console.error('Error en carga inicial de marcas:', error);
   }
+  
+  // También intentar después de un pequeño delay para asegurar que el DOM esté listo
+  setTimeout(function() {
+    console.log('🔄 Ejecutando carga de marcas (delay 300ms)...');
+    try {
+      cargarMarcas(true);
+    } catch (error) {
+      console.error('Error en carga de marcas (delay 300ms):', error);
+    }
+    
+    // Cargar modelos iniciales si hay marca seleccionada
+    if (jQuery && jQuery('#id_marca').val()) {
+      cargarModelos();
+    }
+  }, 300);
+  
+  // Fallback adicional: intentar cargar marcas después de un delay más largo
+  setTimeout(function() {
+    const marcaSelect = document.getElementById('id_marca');
+    if (marcaSelect && (marcaSelect.options.length <= 1 || marcaSelect.options[0].value === '')) {
+      console.log('🔄 Reintentando carga de marcas (fallback 1000ms)...');
+      try {
+        cargarMarcas(true);
+      } catch (error) {
+        console.error('Error en carga de marcas (fallback):', error);
+      }
+    }
+  }, 1000);
 
   const btnCrearMotor = document.getElementById('btn-crear-motor');
   if (btnCrearMotor && agregarMotorUrl) {
@@ -911,6 +1506,222 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
+}); // Cierre de document.addEventListener('DOMContentLoaded', function() {
+
+// NOTA: No inicializar Select2 manualmente para #id_marca
+// Dejar que DAL lo maneje completamente para evitar conflictos
+// El listener de cambio usa $(document).on() para capturar eventos correctamente
+
+// Script adicional para asegurar que Select2 funcione correctamente con el diseño galáctico
+jQuery(document).ready(function($) {
+  // Forzar que todos los dropdowns de Select2 se vean sobre el fondo galáctico
+  // Esto se ejecuta después de que DAL haya inicializado los campos
+  setTimeout(function() {
+    $('select').each(function() {
+      if ($(this).hasClass('select2-hidden-accessible')) {
+        // Si ya está inicializado, actualizar dropdownParent
+        const $select = $(this);
+        const formContainer = $select.closest('form') || $select.closest('.max-w-4xl') || $('body');
+        
+        // Re-inicializar con dropdownParent si no lo tiene
+        if (!$select.data('select2') || !$select.data('select2').options.dropdownParent) {
+          $select.select2('destroy');
+          $select.select2({
+            dropdownParent: formContainer,
+            theme: 'default'
+          });
+        }
+      }
+    });
+  }, 500);
+
+  // NOTA: El listener principal para #id_marca está más arriba usando $(document).on()
+  // Este listener duplicado ha sido eliminado para evitar conflictos con DAL
+  
+  // Listener para detectar cuando Select2 se abre
+  $(document).on('select2:open', function(e) {
+    const selectId = e.target.id;
+    console.log('🔍 Select2 abierto:', selectId);
+    
+    // Asegurar que el dropdown tenga el z-index correcto
+    setTimeout(function() {
+      $('.select2-dropdown').css({
+        'z-index': '99999',
+        'position': 'absolute'
+      });
+    }, 10);
+  });
+});
+
+</script>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+{# CRÍTICO: form.media debe cargarse ANTES del JavaScript personalizado #}
+{{ form.media }}
+<script>
+// Inicialización mejorada de Select2/DAL para el campo cliente en Chile
+(function() {
+  const countryPrefix = '/cl/';
+  let initAttempted = false;
+  
+  function initializeClienteSelect2() {
+    // Evitar múltiples intentos
+    if (initAttempted) return;
+    
+    const clienteField = document.getElementById('id_cliente');
+    if (!clienteField) {
+      console.warn('⚠️ Campo cliente no encontrado');
+      return;
+    }
+    
+    // Verificar si ya está inicializado
+    if (jQuery && jQuery(clienteField).hasClass('select2-hidden-accessible')) {
+      console.log('✅ Select2 ya está inicializado por DAL');
+      initAttempted = true;
+      return;
+    }
+    
+    initAttempted = true;
+    
+    // Verificar URL del autocomplete
+    let autocompleteUrl = clienteField.getAttribute('data-autocomplete-light-url') || 
+                          clienteField.getAttribute('data-ajax--url') ||
+                          clienteField.dataset.autocompleteLightUrl ||
+                          clienteField.dataset.ajaxUrl;
+    
+    console.log('🔍 URL de autocomplete encontrada:', autocompleteUrl);
+    
+    if (autocompleteUrl) {
+      // Asegurar que tenga el prefijo correcto
+      if (!autocompleteUrl.startsWith(countryPrefix) && !autocompleteUrl.startsWith('/cl/')) {
+        const cleanUrl = autocompleteUrl.replace(/^\/+(cl|us|mx)\//, '').replace(/^\//, '');
+        const nuevaUrl = countryPrefix + cleanUrl;
+        clienteField.setAttribute('data-autocomplete-light-url', nuevaUrl);
+        clienteField.setAttribute('data-ajax--url', nuevaUrl);
+        console.log('🔧 URL de autocomplete corregida:', autocompleteUrl, '→', nuevaUrl);
+        autocompleteUrl = nuevaUrl;
+      } else {
+        console.log('✅ URL de autocomplete correcta:', autocompleteUrl);
+      }
+    } else {
+      // Establecer URL por defecto
+      const defaultUrl = countryPrefix + 'vehiculos/autocomplete/cliente/';
+      clienteField.setAttribute('data-autocomplete-light-url', defaultUrl);
+      clienteField.setAttribute('data-ajax--url', defaultUrl);
+      console.log('🔧 URL de autocomplete establecida por defecto:', defaultUrl);
+      autocompleteUrl = defaultUrl;
+    }
+    
+    // Disparar evento de DAL para inicialización automática
+    if (jQuery) {
+      try {
+        jQuery(document).trigger('autocompleteLightInitialize');
+        console.log('🔔 Evento autocompleteLightInitialize disparado');
+        
+        // Verificar después de un tiempo si se inicializó
+        setTimeout(function() {
+          if (jQuery(clienteField).hasClass('select2-hidden-accessible')) {
+            console.log('✅ Select2 inicializado correctamente por DAL');
+          } else {
+            console.warn('⚠️ Select2 no se inicializó automáticamente, intentando fallback manual');
+            // Fallback manual
+            try {
+              jQuery(clienteField).select2({
+                placeholder: 'Escribe para buscar clientes por nombre, email o teléfono...',
+                allowClear: true,
+                width: '100%',
+                minimumInputLength: 1,
+                language: {
+                  inputTooShort: function() {
+                    return 'Escribe al menos 1 carácter para buscar...';
+                  },
+                  noResults: function() {
+                    return 'No se encontraron clientes';
+                  },
+                  searching: function() {
+                    return 'Buscando...';
+                  }
+                },
+                ajax: {
+                  url: autocompleteUrl,
+                  dataType: 'json',
+                  delay: 250,
+                  data: function (params) {
+                    return {
+                      q: params.term,
+                      page: params.page || 1
+                    };
+                  },
+                  processResults: function (data, params) {
+                    if (data.results && Array.isArray(data.results)) {
+                      return {
+                        results: data.results,
+                        pagination: {
+                          more: data.pagination && data.pagination.more || false
+                        }
+                      };
+                    }
+                    if (Array.isArray(data)) {
+                      return {
+                        results: data.map(item => ({
+                          id: item.id || item.pk,
+                          text: item.text || item.nombre || String(item)
+                        }))
+                      };
+                    }
+                    return {results: []};
+                  },
+                  cache: true
+                }
+              });
+              console.log('✅ Select2 inicializado manualmente');
+            } catch (e) {
+              console.error('❌ Error al inicializar Select2 manualmente:', e);
+            }
+          }
+        }, 1500);
+      } catch (e) {
+        console.warn('⚠️ Error al disparar evento DAL:', e);
+      }
+    }
+  }
+  
+  // Esperar a que el DOM y las librerías estén listas
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(initializeClienteSelect2, 500);
+      setTimeout(initializeClienteSelect2, 1500);
+      setTimeout(initializeClienteSelect2, 2500);
+    });
+  } else {
+    setTimeout(initializeClienteSelect2, 500);
+    setTimeout(initializeClienteSelect2, 1500);
+    setTimeout(initializeClienteSelect2, 2500);
+  }
+  
+  // Observar cambios en el DOM para detectar cuando Select2 se inicializa
+  if (window.MutationObserver) {
+    const observer = new MutationObserver(function(mutations) {
+      const clienteField = document.getElementById('id_cliente');
+      if (clienteField && jQuery && jQuery(clienteField).hasClass('select2-hidden-accessible')) {
+        console.log('✅ Select2 detectado por MutationObserver');
+        observer.disconnect();
+      }
+    });
+    
+    const formContainer = document.querySelector('form') || document.body;
+    if (formContainer) {
+      observer.observe(formContainer, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class']
+      });
+    }
+  }
+})();
 </script>
 {% endblock %}
 
