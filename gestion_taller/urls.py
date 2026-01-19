@@ -3,8 +3,74 @@ from urllib.parse import urlencode
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
+from django.contrib.auth import login as auth_login, get_user_model
+from django.contrib.auth.forms import AuthenticationForm
+from django import forms
 from django.shortcuts import redirect
-from django.urls import include, path
+from django.urls import reverse
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+
+# Sobrescribir el login del admin para que NO use allauth
+# Usar directamente LoginView de Django
+from django.contrib.auth.views import LoginView as DjangoLoginView
+from django.contrib.auth.backends import ModelBackend
+
+
+class AdminAuthenticationForm(AuthenticationForm):
+    """Formulario de autenticación para admin que permite login por username o email"""
+
+    username = forms.CharField(
+        label="Usuario o Email",
+        widget=forms.TextInput(attrs={"autofocus": True, "class": "form-control"}),
+    )
+
+
+class AdminLoginView(DjangoLoginView):
+    """Login view personalizado para el admin que NO usa allauth"""
+
+    template_name = "admin/login.html"
+    authentication_form = AdminAuthenticationForm
+
+    def form_valid(self, form):
+        """Si el login es exitoso, redirigir al admin index"""
+        # Usar el backend que autenticó al usuario (puede ser ModelBackend o EmailOrPhoneBackend)
+        user = form.get_user()
+        # Si el usuario no tiene backend asignado, usar ModelBackend como fallback
+        if not hasattr(user, "backend") or not user.backend:
+            from django.contrib.auth.backends import ModelBackend
+
+            backend = ModelBackend()
+            user.backend = f"{backend.__class__.__module__}.{backend.__class__.__name__}"
+        auth_login(self.request, user)
+
+        next_url = (
+            self.request.GET.get("next") or self.request.POST.get("next") or reverse("admin:index")
+        )
+        return redirect(next_url)
+
+    def dispatch(self, request, *args, **kwargs):
+        """Si ya está autenticado y es staff, redirigir al index"""
+        if request.user.is_authenticated and request.user.is_staff:
+            return redirect(reverse("admin:index"))
+        return super().dispatch(request, *args, **kwargs)
+
+
+# Crear el método login que llama a la vista
+_admin_login_view = AdminLoginView.as_view()
+
+
+def admin_login_method(request, extra_context=None):
+    """Método login del admin que llama a la vista personalizada"""
+    context = extra_context or {}
+    return _admin_login_view(request, extra_context=context)
+
+
+# Asignar el método de login personalizado al admin
+admin.site.login = admin_login_method
+admin.site.login_template = "admin/login.html"
+
+from django.urls import include, path, re_path
 from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 
@@ -14,6 +80,7 @@ from taller.views_extra.lang_switch import set_language_us
 from taller.views_extra.login_redirector import login_redirector
 from taller.views_extra.logout_redirect_view import logout_redirect_view
 from taller.views_extra.registro_exitoso import registro_exitoso
+from taller.views_extra.signup_redirects import signup_redirect
 from taller.views_health import health_check, health_simple
 
 # Importar vista de suscripción bloqueada
@@ -22,6 +89,7 @@ from taller.views_extra.admin_suscriptores import (
     admin_suscriptores,
     extender_suscripcion_ajax,
     detalle_suscriptor,
+    actualizar_telefono_ajax,
 )
 
 # Forzar importación del admin de WhatsApp para que se registre
@@ -137,6 +205,11 @@ urlpatterns = [
         extender_suscripcion_ajax,
         name="admin_extender_suscripcion",
     ),
+    path(
+        "admin/suscriptores/<int:empresa_id>/actualizar-telefono/",
+        actualizar_telefono_ajax,
+        name="admin_actualizar_telefono",
+    ),
     # Admin de Django (después de las rutas personalizadas)
     path("admin/", admin.site.urls),
     # Health check para monitoreo
@@ -181,8 +254,9 @@ urlpatterns = [
     # Wrappers country-aware para login y signup
     path("cl/accounts/login/", redirect_qs("/accounts/login/")),
     path("us/accounts/login/", redirect_qs("/accounts/login/")),
-    path("cl/accounts/signup/", redirect_qs("/accounts/signup/")),
-    path("us/accounts/signup/", redirect_qs("/accounts/signup/")),
+    # Signup CL y US - redirect a signup universal con parámetro from
+    path("cl/accounts/signup/", lambda r: signup_redirect(r, "cl"), name="account_signup_cl"),
+    path("us/accounts/signup/", lambda r: signup_redirect(r, "us"), name="account_signup_us"),
     # Redirects amigables para login
     path("cl/login/", redirect_qs("/cl/accounts/login/")),
     path("cl/es/login/", redirect_qs("/cl/accounts/login/")),
@@ -254,20 +328,11 @@ urlpatterns = [
         "uy/",
         include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
     ),
-    # 🇺🇸 USA - Unificado (inglés y español)
+    # 🇺🇸 USA - Unificado (contiene en/ y es/ dentro)
+    # Nota: taller.urls_extra.usa ya incluye rutas con prefijos en/ y es/ internamente
     path(
         "us/",
         include(("taller.urls_extra.usa", "usa"), namespace="usa"),
-    ),
-    # 🇺🇸 USA - Inglés específico
-    path(
-        "us/en/",
-        include(("taller.urls_extra.usa", "usa"), namespace="usa_en"),
-    ),
-    # 🇺🇸 USA - Español específico
-    path(
-        "us/es/",
-        include(("taller.urls_extra.usa", "usa"), namespace="usa_es"),
     ),
     # 🇨🇱 Chile - Español
     path(
@@ -418,19 +483,23 @@ urlpatterns = [
         "compat/",
         include(("taller.urls", "taller"), namespace="taller"),
     ),
+    # Analytics global (sin prefijo de país)
+    path("analytics/", include(("taller.analytics.urls", "analytics"), namespace="analytics")),
     # APIs globales (sin prefijo de país)
     path("api/v1/", include("taller.api.urls")),
     # API de ubicaciones (multi-país)
     path("api/", include(("ubicacion.urls", "ubicacion"), namespace="ubicacion")),
     # Marketplace - APIs para consulta de precios
-    path("marketplace/", include(("marketplace.urls", "marketplace"), namespace="marketplace")),
+    # Habilitado mediante feature flag EGARAGE_ENABLE_MARKETPLACE
     # WhatsApp - eGarage Air
-    path("whatsapp/", include(("whatsapp.urls", "whatsapp"), namespace="whatsapp")),
+    # Comentado temporalmente si el módulo no existe en el servidor
+    # path("whatsapp/", include(("whatsapp.urls", "whatsapp"), namespace="whatsapp")),
     # URLs públicas para acceso de clientes (sin autenticación, protegidas por UUID)
-    path(
-        "publico/",
-        include(("taller.urls_modules.publico_urls", "publico"), namespace="publico"),
-    ),
+    # Comentado temporalmente si el módulo no existe en el servidor
+    # path(
+    #     "publico/",
+    #     include(("taller.urls_modules.publico_urls", "publico"), namespace="publico"),
+    # ),
     # Redirección de documentos sin país a Chile por defecto
     path(
         "documentos/",
@@ -586,6 +655,12 @@ urlpatterns = [
         ),
     ),
 ]
+
+# Marketplace - Habilitado mediante feature flag
+if getattr(settings, "EGARAGE_ENABLE_MARKETPLACE", False):
+    urlpatterns += [
+        path("marketplace/", include(("marketplace.urls", "marketplace"), namespace="marketplace")),
+    ]
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
