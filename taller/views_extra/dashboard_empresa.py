@@ -337,7 +337,7 @@ def dashboard_centro_operaciones(request):
 
     template_name = select_country_lang_template(
         "dashboard/centro_operaciones.html",
-        getattr(request.user.empresa, "pais", "cl").lower(),
+        getattr(empresa, "pais", "cl").lower(),
         get_language(),
     )
 
