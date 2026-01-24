@@ -1,0 +1,134 @@
+
+{% extends 'base.html' %}
+{% extends 'base.html' %}
+{% load i18n %}
+{% block title %}{% if LANGUAGE_CODE == 'es' %}Clientes{% else %}Clients{% endif %} · eGarage{% endblock %}
+{% block content %}
+<div class="relative mx-auto max-w-7xl px-6 mt-10">
+  <div class="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-32 -left-20 w-96 h-96 bg-gradient-to-tr from-cyan-500 via-fuchsia-500 to-lime-400 opacity-20 blur-3xl rounded-full animate-pulse"></div>
+    <div class="absolute bottom-0 right-0 w-[34rem] h-[34rem] bg-gradient-to-tr from-fuchsia-500 via-cyan-400 to-emerald-400 opacity-10 blur-3xl rounded-full animate-spin-slow"></div>
+  </div>
+  <div class="flex flex-col md:flex-row md:items-center gap-6 mb-10">
+    <div>
+      <div class="flex items-center gap-3 mb-2">
+        <h1 class="text-4xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-lime-300 to-fuchsia-400 drop-shadow">{% if LANGUAGE_CODE == 'es' %}Gestión de Clientes{% else %}Client Management{% endif %}</h1>
+        {% include "components/country_badge.html" %}
+      </div>
+      <p class="mt-2 text-gray-400 max-w-2xl text-sm md:text-base">{% if LANGUAGE_CODE == 'es' %}Listado inteligente con búsqueda dinámica, paginación y acciones rápidas.{% else %}Smart list with dynamic search, pagination and quick actions.{% endif %}</p>
+    </div>
+    <div class="md:ml-auto flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+      <form method="get" class="flex-1 relative group">
+        <input type="text" name="q" value="{{ q }}" placeholder="{% if LANGUAGE_CODE == 'es' %}Buscar por nombre o apellido...{% else %}Search by first or last name...{% endif %}" class="w-full bg-[#0f172a] border border-cyan-500/40 focus:border-cyan-400/70 rounded-xl px-5 py-3 text-cyan-100 placeholder-gray-500 shadow-lg focus:ring-2 focus:ring-cyan-400/40 transition outline-none font-mono" />
+        <button type="submit" class="absolute top-1/2 -translate-y-1/2 right-3 text-cyan-300 hover:text-lime-300 transition"><i class="fas fa-search"></i></button>
+      </form>
+      {% url 'taller:clientes:crear_cliente' as url_crear %}
+      {% if not url_crear %}{% url 'taller:clientes:crear_cliente' as url_crear %}{% endif %}
+      <a href="{{ url_crear }}" class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-cyan-500 via-lime-500 to-fuchsia-500 text-[#0d1117] font-bold shadow-lg hover:shadow-cyan-500/40 text-sm md:text-base tracking-wide hover:scale-[1.03] transition active:scale-95"><span>➕</span><span>{% if LANGUAGE_CODE == 'es' %}Nuevo Cliente{% else %}New Client{% endif %}</span></a>
+    </div>
+  </div>
+  <div class="relative rounded-3xl border border-cyan-400/20 bg-gradient-to-br from-[#0d1117] via-[#0f172a] to-[#111827] shadow-2xl overflow-hidden">
+    <div class="overflow-x-auto scrollbar-thin scrollbar-thumb-cyan-700/50 scrollbar-track-transparent">
+      <table class="w-full text-left text-sm md:text-base">
+        <thead class="bg-[#0e1a2b] text-cyan-300/90 uppercase text-xs tracking-wider font-semibold">
+          <tr>
+            <th class="px-5 py-4">ID</th>
+            <th class="px-5 py-4">{% if LANGUAGE_CODE == 'es' %}Nombre{% else %}Name{% endif %}</th>
+            <th class="px-5 py-4 hidden md:table-cell">Email</th>
+            <th class="px-5 py-4 hidden md:table-cell">{% if LANGUAGE_CODE == 'es' %}Teléfono{% else %}Phone{% endif %}</th>
+            <th class="px-5 py-4 hidden xl:table-cell">{% if LANGUAGE_CODE == 'es' %}Ciudad{% else %}City{% endif %}</th>
+            <th class="px-5 py-4">{% if LANGUAGE_CODE == 'es' %}Acciones{% else %}Actions{% endif %}</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-cyan-900/40">
+          {% for c in clientes %}
+            <tr class="hover:bg-cyan-500/10 transition group">
+              <td class="px-5 py-4 font-mono text-cyan-300">#{{ c.pk }}</td>
+              <td class="px-5 py-4"><div class="flex flex-col"><span class="font-semibold text-cyan-100 group-hover:text-lime-200 transition">{{ c.nombre }} {{ c.apellido }}</span><span class="md:hidden text-xs text-gray-400">{{ c.email }}</span></div></td>
+              <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ c.email|default:'—' }}</td>
+              <td class="px-5 py-4 hidden md:table-cell text-gray-300">{{ c.telefono|default:'—' }}</td>
+              <td class="px-5 py-4 hidden xl:table-cell text-gray-300">{% if c.ciudad %}{{ c.ciudad.nombre }}{% else %}—{% endif %}</td>
+              <td class="px-5 py-4"><div class="flex items-center gap-3">{% url 'taller:clientes:ver_cliente' c.pk as url_ver %}{% if not url_ver %}{% url 'taller:clientes:ver_cliente' c.pk as url_ver %}{% endif %}<a href="{{ url_ver }}" class="text-cyan-300 hover:text-lime-300 transition" title="Ver"><i class="fas fa-eye"></i></a>{% url 'taller:clientes:editar_cliente' c.pk as url_editar %}{% if not url_editar %}{% url 'taller:clientes:editar_cliente' c.pk as url_editar %}{% endif %}<a href="{{ url_editar }}" class="text-cyan-300 hover:text-lime-300 transition" title="Editar"><i class="fas fa-edit"></i></a>{% url 'taller:clientes:eliminar_cliente' cliente_id=c.pk as url_eliminar %}{% if not url_eliminar %}{% url 'taller:clientes:eliminar_cliente' cliente_id=c.pk as url_eliminar %}{% endif %}<a href="{{ url_eliminar }}" class="text-red-400 hover:text-red-300 transition" title="Eliminar" ><i class="fas fa-trash"></i></a></div></td>
+            </tr>
+          {% empty %}
+            <tr><td colspan="6" class="px-5 py-12 text-center text-gray-400">{% if LANGUAGE_CODE == 'es' %}No hay clientes registrados.{% else %}No clients found.{% endif %}</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 px-6 py-5 bg-[#0e1a2b]/60 border-t border-cyan-900/40">
+      <div class="text-xs text-gray-400 font-mono">{% if LANGUAGE_CODE == 'es' %}Mostrando{% else %}Showing{% endif %} {{ clientes|length }} {% if LANGUAGE_CODE == 'es' %}de{% else %}of{% endif %} {{ page_obj.paginator.count }} {% if LANGUAGE_CODE == 'es' %}registros{% else %}records{% endif %}</div>
+      <div class="flex items-center gap-2">{% if page_obj.has_previous %}<a href="?q={{ q }}&page=1" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">««</a><a href="?q={{ q }}&page={{ page_obj.previous_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">«</a>{% else %}<span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">««</span><span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">«</span>{% endif %}<span class="px-4 py-1 rounded-lg bg-cyan-600/20 text-cyan-200 font-semibold tracking-wider text-xs">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>{% if page_obj.has_next %}<a href="?q={{ q }}&page={{ page_obj.next_page_number }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»</a><a href="?q={{ q }}&page={{ page_obj.paginator.num_pages }}" class="px-3 py-1 rounded-lg bg-[#132034] text-cyan-300 hover:bg-cyan-600/20 transition text-xs">»»</a>{% else %}<span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»</span><span class="px-3 py-1 rounded-lg bg-[#101a29] text-gray-600 text-xs">»»</span>{% endif %}</div>
+    </div>
+  </div>
+</div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+<style>@keyframes spin-slow { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } } .animate-spin-slow { animation: spin-slow 30s linear infinite; } .scrollbar-thin::-webkit-scrollbar { height: 10px; width: 10px; } .scrollbar-thin::-webkit-scrollbar-track { background: transparent; } .scrollbar-thin::-webkit-scrollbar-thumb { background: #164159; border-radius: 6px; } .scrollbar-thin::-webkit-scrollbar-thumb:hover { background: #1d5a79; }</style>
+{% endblock %}
+        <div>
+          <label class="text-sm text-gray-300">Desde</label>
+          <input id="fstart" type="date" class="w-full mt-1 p-2 rounded bg-black/30 border border-[#662d91] text-white">
+        </div>
+        <div>
+          <label class="text-sm text-gray-300">Hasta</label>
+          <input id="fend" type="date" class="w-full mt-1 p-2 rounded bg-black/30 border border-[#662d91] text-white">
+        </div>
+        <div>
+          <label class="text-sm text-gray-300">País</label>
+          <select id="fcountry" class="w-full mt-1 p-2 rounded bg-black/30 border border-[#662d91] text-white">
+            <option value="">Todos</option>
+            <option value="CL">Chile</option>
+            <option value="US">USA</option>
+          </select>
+        </div>
+      </div>
+      <div class="flex flex-col lg:flex-row gap-6 items-stretch">
+        <div class="flex-1 bg-black/20 rounded-lg p-3 flex items-center justify-center">
+          <canvas id="clientes-region-chart" width="480" height="220" class="rounded-lg bg-transparent"></canvas>
+        </div>
+        <div class="w-full lg:w-1/3 text-sm text-gray-300 flex flex-col justify-center">
+          <p class="mb-3">Este gráfico muestra el número de clientes por región. Usa los controles para filtrar y pasa el cursor para más detalles.</p>
+          <ul id="leyenda-regiones" class="grid grid-cols-1 gap-2"></ul>
+        </div>
+      </div>
+    </div>
+    <script>
+      const input = document.getElementById('busqueda-clientes-input');
+      let timeout = null;
+      input.addEventListener('input', function() {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          const q = input.value;
+          fetch(`ajax/buscar/?q=${encodeURIComponent(q)}`)
+            .then(r => r.json())
+            .then(data => {
+              document.getElementById('tabla-clientes').innerHTML = data.html;
+            });
+        }, 350);
+      });
+    </script>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="{% static 'js/clientes-chart.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function(){
+    const start = document.getElementById('fstart');
+    const end = document.getElementById('fend');
+    const country = document.getElementById('fcountry');
+
+    function applyFilters(){
+      const opts = {};
+      if(start.value) opts.start_date = start.value;
+      if(end.value) opts.end_date = end.value;
+      if(country.value) opts.country = country.value;
+      window.refreshClientesChart(opts);
+    }
+
+    [start,end,country].forEach(el=>el.addEventListener('change', applyFilters));
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,884 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Crear Cuenta - eGarage Perú{% endblock %}
+
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: radial-gradient(circle at 20% 50%, rgba(217, 16, 35, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0a0a 0%, #1a0505 50%, #0a0a0a 100%);
+    font-family: 'Rajdhani', sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Grid futurista */
+.cyber-grid {
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(217, 16, 35, 0.1) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(217, 16, 35, 0.1) 2px, transparent 2px);
+    background-size: 60px 60px;
+    animation: grid-flow 20s linear infinite;
+    z-index: 1;
+    pointer-events: none;
+}
+
+@keyframes grid-flow {
+    0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+    100% { transform: perspective(500px) rotateX(60deg) translateY(60px); }
+}
+
+/* Particles */
+.particles {
+    position: fixed;
+    inset: 0;
+    z-index: 2;
+    pointer-events: none;
+}
+
+.particle {
+    position: absolute;
+    width: 3px;
+    height: 3px;
+    background: rgba(217, 16, 35, 0.6);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(217, 16, 35, 0.8);
+    animation: float-particle 15s infinite;
+}
+
+@keyframes float-particle {
+    0%, 100% { transform: translateY(100vh) translateX(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(-100px) translateX(100px); }
+}
+
+/* Scan line */
+.scan-line {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, rgba(217, 16, 35, 0.8), transparent);
+    animation: scan 4s linear infinite;
+    z-index: 100;
+    pointer-events: none;
+}
+
+@keyframes scan {
+    0% { transform: translateY(0); opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { transform: translateY(100vh); opacity: 0; }
+}
+
+/* Container */
+.signup-container {
+    position: relative;
+    z-index: 10;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 20px;
+}
+
+/* Glass card */
+.glass-card {
+    background: linear-gradient(135deg,
+        rgba(217, 16, 35, 0.15) 0%,
+        rgba(10, 10, 10, 0.9) 50%,
+        rgba(217, 16, 35, 0.1) 100%);
+    backdrop-filter: blur(25px) saturate(180%);
+    border-radius: 24px;
+    border: 2px solid transparent;
+    box-shadow:
+        0 30px 80px rgba(217, 16, 35, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 24px;
+    padding: 2px;
+    background: linear-gradient(135deg, #D91023, transparent, #FFFFFF);
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0.6;
+}
+
+.signup-content {
+    position: relative;
+    z-index: 1;
+}
+
+/* Logo section */
+.logo-section {
+    text-align: center;
+    margin-bottom: 2.5rem;
+}
+
+.logo {
+    width: 90px;
+    height: 90px;
+    margin: 0 auto 1.5rem;
+    filter: drop-shadow(0 0 30px rgba(217, 16, 35, 0.8));
+    animation: logo-pulse 3s ease-in-out infinite;
+}
+
+@keyframes logo-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.brand-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.5rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #D91023 0%, #FFFFFF 50%, #D91023 100%);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    letter-spacing: 0.1em;
+    animation: gradient-shift 4s ease infinite;
+}
+
+@keyframes gradient-shift {
+    0%, 100% { background-position: 0% center; }
+    50% { background-position: 100% center; }
+}
+
+.subtitle {
+    color: #94a3b8;
+    font-size: 1rem;
+    font-weight: 500;
+}
+
+.signup-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-align: center;
+    margin-bottom: 3rem;
+    text-shadow: 0 0 20px rgba(217, 16, 35, 0.6);
+    letter-spacing: 0.05em;
+}
+
+.signup-title::after {
+    content: '';
+    display: block;
+    width: 80px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #D91023, transparent);
+    margin: 1rem auto 0;
+}
+
+/* SECTION: Plan Selection - FUTURISTIC */
+.plan-selection-section {
+    margin-bottom: 3rem;
+}
+
+.section-header {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #D91023;
+    text-align: center;
+    margin-bottom: 2rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+}
+
+/* Plan cards - FUTURISTIC DESIGN */
+.plan-card {
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(217, 16, 35, 0.2);
+    border-radius: 20px;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.plan-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(217, 16, 35, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.4s;
+}
+
+.plan-card:hover::before {
+    opacity: 1;
+}
+
+.plan-card:hover {
+    border-color: #D91023;
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(217, 16, 35, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.plan-card.selected {
+    border-color: #D91023;
+    border-width: 3px;
+    background: linear-gradient(135deg, rgba(217, 16, 35, 0.2), rgba(0, 0, 0, 0.8));
+    box-shadow: 0 25px 70px rgba(217, 16, 35, 0.5),
+                inset 0 0 50px rgba(217, 16, 35, 0.1);
+    transform: scale(1.05);
+}
+
+.plan-card.recommended {
+    border-color: #FFDF00;
+    position: relative;
+}
+
+.plan-card.recommended::after {
+    content: '⭐ RECOMENDADO';
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #FFDF00, #FFA500);
+    color: #000;
+    padding: 6px 20px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 900;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.1em;
+    box-shadow: 0 4px 15px rgba(255, 223, 0, 0.5);
+}
+
+.plan-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #D91023, #8B0000);
+    color: #FFF;
+    padding: 6px 16px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    font-family: 'Orbitron', monospace;
+    letter-spacing: 0.1em;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    box-shadow: 0 4px 15px rgba(217, 16, 35, 0.4);
+}
+
+.plan-name {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #FFFFFF;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.plan-price {
+    font-family: 'Orbitron', monospace;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #D91023;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 20px rgba(217, 16, 35, 0.6);
+}
+
+.plan-period {
+    font-size: 0.9rem;
+    color: #94a3b8;
+    margin-bottom: 1.5rem;
+    font-weight: 500;
+}
+
+.plan-savings {
+    display: inline-block;
+    background: linear-gradient(135deg, rgba(0, 255, 94, 0.3), rgba(0, 255, 94, 0.2));
+    border: 2px solid #00ff5e;
+    color: #00ff5e;
+    padding: 6px 18px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    font-family: 'Orbitron', monospace;
+    margin-bottom: 1rem;
+    box-shadow: 0 0 20px rgba(0, 255, 94, 0.3);
+    animation: pulse-savings 2s ease-in-out infinite;
+}
+
+@keyframes pulse-savings {
+    0%, 100% { box-shadow: 0 0 20px rgba(0, 255, 94, 0.3); }
+    50% { box-shadow: 0 0 30px rgba(0, 255, 94, 0.6); }
+}
+
+.plan-features {
+    list-style: none;
+    padding: 0;
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.plan-features li {
+    padding: 0.6rem 0;
+    font-size: 0.95rem;
+    color: #94a3b8;
+    padding-left: 1.5rem;
+    position: relative;
+}
+
+.plan-features li::before {
+    content: '✓';
+    position: absolute;
+    left: 0;
+    color: #D91023;
+    font-weight: 900;
+    font-size: 1.2rem;
+}
+
+.plan-radio {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* Form sections */
+.form-section {
+    margin-bottom: 2.5rem;
+}
+
+.section-title {
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #D91023;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #D91023;
+    margin-bottom: 0.6rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.form-input, .form-select {
+    width: 100%;
+    padding: 1rem 1.2rem;
+    font-size: 1rem;
+    font-family: 'Rajdhani', sans-serif;
+    color: #ffffff;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid rgba(217, 16, 35, 0.3);
+    border-radius: 12px;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.form-input:focus, .form-select:focus {
+    outline: none;
+    border-color: #D91023;
+    background: rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 0 4px rgba(217, 16, 35, 0.1),
+                0 0 30px rgba(217, 16, 35, 0.3);
+    transform: translateY(-2px);
+}
+
+.form-input::placeholder {
+    color: #64748b;
+}
+
+.help-text {
+    font-size: 0.85rem;
+    color: #64748b;
+    margin-top: 0.5rem;
+}
+
+/* Checkbox */
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    margin: 2rem 0;
+}
+
+.form-checkbox {
+    width: 22px;
+    height: 22px;
+    accent-color: #D91023;
+    cursor: pointer;
+}
+
+.checkbox-label {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.checkbox-label a {
+    color: #D91023;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.checkbox-label a:hover {
+    text-shadow: 0 0 10px rgba(217, 16, 35, 0.8);
+}
+
+/* Submit button */
+.signup-button {
+    width: 100%;
+    padding: 1.5rem;
+    font-family: 'Orbitron', monospace;
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #FFFFFF;
+    background: linear-gradient(135deg, #D91023 0%, #8B0000 100%);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 10px 30px rgba(217, 16, 35, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    position: relative;
+    overflow: hidden;
+}
+
+.signup-button::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.signup-button:hover::before {
+    width: 600px;
+    height: 600px;
+}
+
+.signup-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 50px rgba(217, 16, 35, 0.6);
+}
+
+/* Login link */
+.login-link {
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(217, 16, 35, 0.2);
+}
+
+.login-text {
+    color: #94a3b8;
+    font-size: 1rem;
+}
+
+.login-link a {
+    color: #D91023;
+    text-decoration: none;
+    font-weight: 700;
+    margin-left: 0.5rem;
+}
+
+.login-link a:hover {
+    color: #FFFFFF;
+    text-shadow: 0 0 15px rgba(217, 16, 35, 0.8);
+}
+
+/* Error messages */
+.error-message {
+    background: rgba(217, 16, 35, 0.2);
+    border: 1px solid rgba(217, 16, 35, 0.5);
+    color: #FFFFFF;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .plans-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .glass-card {
+        padding: 2rem 1.5rem;
+    }
+    
+    .brand-title {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .plan-price {
+        font-size: 2rem;
+    }
+    
+    .brand-title {
+        font-size: 1.8rem;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Grid futurista -->
+<div class="cyber-grid"></div>
+
+<!-- Scan line -->
+<div class="scan-line"></div>
+
+<!-- Partículas -->
+<div class="particles" id="particles"></div>
+
+<!-- Signup Container -->
+<div class="signup-container">
+    <div class="glass-card">
+        <div class="signup-content">
+            <!-- Logo y marca -->
+            <div class="logo-section">
+                <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
+                <h1 class="brand-title">eGarage Perú 🇵🇪</h1>
+                <p class="subtitle">Sistema de Gestión Profesional para Talleres</p>
+            </div>
+
+            <h2 class="signup-title">CREAR TU CUENTA</h2>
+
+            <!-- Mensajes -->
+            {% if messages %}
+            {% for message in messages %}
+            <div class="error-message">{{ message }}</div>
+            {% endfor %}
+            {% endif %}
+
+            <form method="POST" id="signup-form">
+                {% csrf_token %}
+
+                <!-- SECCIÓN: SELECCIONAR PLAN -->
+                <div class="plan-selection-section">
+                    <h3 class="section-header">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline w-6 h-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z" />
+                            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd" />
+                        </svg>
+                        Selecciona tu Plan
+                    </h3>
+
+                    <div class="plans-grid">
+                        <!-- Plan FREE -->
+                        <div class="plan-card" onclick="selectPlan('free', this)" data-plan="free">
+                            <input type="radio" name="plan" value="free" id="plan-free" class="plan-radio" checked>
+                            <div class="plan-badge">GRATIS</div>
+                            <div class="plan-name">Trial</div>
+                            <div class="plan-price">S/ 0</div>
+                            <div class="plan-period">30 días</div>
+                            <ul class="plan-features">
+                                <li>Acceso completo</li>
+                                <li>Sin tarjeta</li>
+                                <li>Cancela cuando quieras</li>
+                                <li>Soporte por email</li>
+                            </ul>
+                        </div>
+
+                        <!-- Plan MENSUAL -->
+                        <div class="plan-card" onclick="selectPlan('monthly', this)" data-plan="monthly">
+                            <input type="radio" name="plan" value="monthly" id="plan-monthly" class="plan-radio">
+                            <div class="plan-badge">1 MES</div>
+                            <div class="plan-name">Mensual</div>
+                            <div class="plan-price">S/ 75</div>
+                            <div class="plan-period">/ mes</div>
+                            <ul class="plan-features">
+                                <li>Usuarios ilimitados</li>
+                                <li>Órdenes ilimitadas</li>
+                                <li>Inventario completo</li>
+                                <li>Soporte 24/7</li>
+                            </ul>
+                        </div>
+
+                        <!-- Plan SEMESTRAL -->
+                        <div class="plan-card recommended" onclick="selectPlan('semiannual', this)" data-plan="semiannual">
+                            <input type="radio" name="plan" value="semiannual" id="plan-semiannual" class="plan-radio">
+                            <div class="plan-badge">6 MESES</div>
+                            <div class="plan-name">Semestral</div>
+                            <div class="plan-price">S/ 375</div>
+                            <div class="plan-period">/ 6 meses</div>
+                            <div class="plan-savings">💰 Ahorra 17%</div>
+                            <ul class="plan-features">
+                                <li>Usuarios ilimitados</li>
+                                <li>Órdenes ilimitadas</li>
+                                <li>Inventario completo</li>
+                                <li>Soporte prioritario</li>
+                            </ul>
+                        </div>
+
+                        <!-- Plan ANUAL -->
+                        <div class="plan-card" onclick="selectPlan('annual', this)" data-plan="annual">
+                            <input type="radio" name="plan" value="annual" id="plan-annual" class="plan-radio">
+                            <div class="plan-badge">12 MESES</div>
+                            <div class="plan-name">Anual</div>
+                            <div class="plan-price">S/ 750</div>
+                            <div class="plan-period">/ año</div>
+                            <div class="plan-savings">💎 Ahorra 33%</div>
+                            <ul class="plan-features">
+                                <li>Usuarios ilimitados</li>
+                                <li>Órdenes ilimitadas</li>
+                                <li>Inventario completo</li>
+                                <li>Soporte dedicado</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: Información Personal -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
+                        </svg>
+                        Información Personal
+                    </h3>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Nombre</label>
+                            {{ form.nombre|add_class:"form-input" }}
+                            {% if form.nombre.errors %}
+                            <div class="error-message">{{ form.nombre.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Apellido</label>
+                            {{ form.apellido|add_class:"form-input" }}
+                            {% if form.apellido.errors %}
+                            <div class="error-message">{{ form.apellido.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                                <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                            </svg>
+                            Email
+                        </label>
+                        {{ form.email|add_class:"form-input" }}
+                        <div class="help-text">Usa tu mejor correo de trabajo</div>
+                        {% if form.email.errors %}
+                        <div class="error-message">{{ form.email.errors }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: Información del Negocio -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd" />
+                        </svg>
+                        Información del Negocio
+                    </h3>
+
+                    <div class="form-group">
+                        <label class="form-label">Nombre del Taller</label>
+                        {{ form.nombre_taller|add_class:"form-input" }}
+                        {% if form.nombre_taller.errors %}
+                        <div class="error-message">{{ form.nombre_taller.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                                </svg>
+                                Teléfono
+                            </label>
+                            {{ form.telefono|add_class:"form-input" }}
+                            <div class="help-text">Con código de área</div>
+                            {% if form.telefono.errors %}
+                            <div class="error-message">{{ form.telefono.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="inline w-4 h-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                                </svg>
+                                País
+                            </label>
+                            {{ form.pais|add_class:"form-select" }}
+                            {% if form.pais.errors %}
+                            <div class="error-message">{{ form.pais.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECCIÓN: Seguridad -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="inline w-5 h-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clip-rule="evenodd" />
+                        </svg>
+                        Seguridad
+                    </h3>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Contraseña</label>
+                            {{ form.password1|add_class:"form-input" }}
+                            <div class="help-text">Mínimo 8 caracteres</div>
+                            {% if form.password1.errors %}
+                            <div class="error-message">{{ form.password1.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">Confirmar Contraseña</label>
+                            {{ form.password2|add_class:"form-input" }}
+                            {% if form.password2.errors %}
+                            <div class="error-message">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Términos y condiciones -->
+                <div class="checkbox-container">
+                    {{ form.acepta_terminos|add_class:"form-checkbox" }}
+                    <label for="id_acepta_terminos" class="checkbox-label">
+                        Acepto los <a href="#">términos y condiciones</a>
+                    </label>
+                </div>
+                {% if form.acepta_terminos.errors %}
+                <div class="error-message">{{ form.acepta_terminos.errors }}</div>
+                {% endif %}
+
+                <!-- Errores generales -->
+                {% if form.non_field_errors %}
+                <div class="error-message">{{ form.non_field_errors }}</div>
+                {% endif %}
+
+                <!-- Submit Button -->
+                <button type="submit" class="signup-button">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="inline w-6 h-6 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                    </svg>
+                    Crear Cuenta
+                </button>
+            </form>
+
+            <!-- Login Link -->
+            <div class="login-link">
+                <span class="login-text">¿Ya tienes una cuenta?</span>
+                <a href="{% url 'peru:login' %}">Iniciar sesión →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Generar partículas
+const particlesContainer = document.getElementById('particles');
+const particleCount = 40;
+
+for (let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = `${Math.random() * 100}%`;
+    particle.style.top = `${100 + Math.random() * 20}%`;
+    particle.style.animationDelay = `${Math.random() * 15}s`;
+    particle.style.animationDuration = `${10 + Math.random() * 10}s`;
+    particlesContainer.appendChild(particle);
+}
+
+// Seleccionar plan
+function selectPlan(planId, element) {
+    // Remover selección de todos
+    document.querySelectorAll('.plan-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    
+    // Marcar seleccionado
+    element.classList.add('selected');
+    
+    // Marcar radio button
+    document.getElementById('plan-' + planId).checked = true;
+}
+
+// Pre-seleccionar plan free al cargar
+window.addEventListener('load', function() {
+    const freeCard = document.querySelector('[data-plan="free"]');
+    if (freeCard) {
+        freeCard.classList.add('selected');
+    }
+});
+</script>
+{% endblock %}

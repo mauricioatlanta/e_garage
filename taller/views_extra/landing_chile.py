@@ -28,11 +28,11 @@ def landing_chile(request):
     request.session["django_language"] = "es"
 
     context = {
-        "page_title": "eGarage Chile - Gestión Profesional Automotriz",
-        "meta_description": "La plataforma integral para talleres mecánicos, tiendas de repuestos, talleres de neumáticos y autolavados en Chile.",
+        "page_title": "eGarage Chile - El Sistema que Acelera tu Taller",
+        "meta_description": "Gestiona servicios en segundos y genera archivos de facturación para el SII con un solo clic. Creado por mecánicos para dueños de talleres que quieren ser millonarios. Sin burocracia. Sin fricción.",
         "is_chile_market": True,
-        "seo_title": "eGarage Chile | Sistema Profesional de Gestión Automotriz",
-        "seo_description": "Prueba eGarage, la plataforma más avanzada de gestión automotriz para Chile. Características profesionales, cumplimiento tributario y diseño moderno.",
+        "seo_title": "eGarage Chile | Acelera tu Taller y Simplifica tu Vida",
+        "seo_description": "El sistema que acelera tu taller y simplifica tu vida. Registra clientes en 10 segundos. Genera archivos SII al instante. Sin burocracia. Sin fricción. Solo resultados. Prueba gratis 30 días.",
         "og_image": "/static/img/og_chile_landing.png",
         "current_language": "es",  # Siempre español para Chile
         "spanish_only": True,  # Flag para ocultar selector de idioma

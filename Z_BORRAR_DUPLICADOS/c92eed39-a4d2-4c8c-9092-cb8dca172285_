@@ -1,0 +1,331 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Company Settings" %} - eGarage{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      
+      <h2 class="mb-4">
+        <i class="fas fa-building"></i>
+        {% trans "Company Settings" %}
+      </h2>
+      
+      <form method="post" enctype="multipart/form-data" id="company-settings-form">
+        {% csrf_token %}
+        
+        <!-- Información de la Empresa -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>{% trans "Company Information" %}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.nombre_publico.label_tag }}
+                  {{ form.nombre_publico }}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.tagline.label_tag }}
+                  {{ form.tagline }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.logo.label_tag }}
+                  {{ form.logo }}
+                  {% if form.instance.logo %}
+                    <div class="mt-2">
+                      <img src="{{ form.instance.logo.url }}" alt="Logo actual" style="max-height: 100px;">
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  {{ form.brand_color.label_tag }}
+                  {{ form.brand_color }}
+                  <small class="form-text text-muted">
+                    {% trans "Brand color for UI customization" %}
+                  </small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Contacto -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>{% trans "Contact Information" %}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.telefono.label_tag }}
+                  {{ form.telefono }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.email_contacto.label_tag }}
+                  {{ form.email_contacto }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.sitio_web.label_tag }}
+                  {{ form.sitio_web }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Dirección Legal -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>
+              <i class="fas fa-map-marker-alt"></i>
+              {% trans "Legal Address" %}
+            </h5>
+          </div>
+          <div class="card-body">
+            <!-- País / Estado / Ciudad -->
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.legal_country.label_tag }}
+                  {{ form.legal_country }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  <label for="id_legal_state">{% trans "State/Department" %}</label>
+                  <select id="id_legal_state" name="legal_state" class="form-control" disabled>
+                    <option value="">--</option>
+                  </select>
+                  <small class="form-text text-muted">
+                    {% trans "Select country first" %}
+                  </small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.legal_city.label_tag }}
+                  {{ form.legal_city }}
+                </div>
+              </div>
+            </div>
+            
+            <!-- Dirección -->
+            <div class="row">
+              <div class="col-md-8">
+                <div class="mb-3">
+                  {{ form.legal_line1.label_tag }}
+                  {{ form.legal_line1 }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.legal_postal_code.label_tag }}
+                  {{ form.legal_postal_code }}
+                </div>
+              </div>
+            </div>
+            
+            <div class="row">
+              <div class="col-md-12">
+                <div class="mb-3">
+                  {{ form.legal_line2.label_tag }}
+                  {{ form.legal_line2 }}
+                </div>
+              </div>
+            </div>
+            
+            <!-- Preview de dirección completa -->
+            <div class="alert alert-secondary" id="address-preview" style="display: none;">
+              <strong>{% trans "Address preview:" %}</strong>
+              <div id="address-preview-text"></div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Configuración Fiscal -->
+        <div class="card mb-4">
+          <div class="card-header">
+            <h5>{% trans "Tax Settings" %}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.moneda.label_tag }}
+                  {{ form.moneda }}
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3">
+                  {{ form.tasa_impuesto.label_tag }}
+                  {{ form.tasa_impuesto }}
+                  <small class="form-text text-muted">
+                    {% trans "Default tax rate (%)" %}
+                  </small>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="mb-3 form-check mt-4">
+                  {{ form.aplicar_impuesto_por_defecto }}
+                  {{ form.aplicar_impuesto_por_defecto.label_tag }}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Botones -->
+        <div class="d-flex justify-content-between mb-5">
+          <a href="{% url 'taller:dashboard' %}" class="btn btn-secondary">
+            <i class="fas fa-times"></i>
+            {% trans "Cancel" %}
+          </a>
+          <button type="submit" class="btn btn-primary btn-lg">
+            <i class="fas fa-save"></i>
+            {% trans "Save Settings" %}
+          </button>
+        </div>
+        
+      </form>
+      
+    </div>
+  </div>
+</div>
+
+<!-- JavaScript para cascada de ubicaciones -->
+<script type="module">
+  import { bindCountryStateCity, detectCountryFromPath } from "{% static 'js/locations.js' %}";
+  
+  // Bind cascada de dirección legal
+  await bindCountryStateCity('#id_legal_country', '#id_legal_state', '#id_legal_city', {
+    loadingText: '{% trans "Loading..." %}',
+    emptyText: '{% trans "Select..." %}',
+    debug: true
+  });
+  
+  // Auto-detectar país desde URL o empresa
+  const countrySelect = document.getElementById('id_legal_country');
+  if (!countrySelect.value) {
+    // Intentar desde URL
+    let detectedCountry = detectCountryFromPath();
+    
+    // O desde empresa del usuario (Django template variable)
+    if (!detectedCountry) {
+      detectedCountry = '{{ request.user.empresa.pais|default:"" }}';
+    }
+    
+    if (detectedCountry) {
+      countrySelect.value = detectedCountry;
+      countrySelect.dispatchEvent(new Event('change'));
+    }
+  }
+  
+  // Preview de dirección completa
+  const line1Input = document.querySelector('[name="legal_line1"]');
+  const line2Input = document.querySelector('[name="legal_line2"]');
+  const postalCodeInput = document.querySelector('[name="legal_postal_code"]');
+  const citySelect = document.getElementById('id_legal_city');
+  const addressPreview = document.getElementById('address-preview');
+  const addressPreviewText = document.getElementById('address-preview-text');
+  
+  function updateAddressPreview() {
+    const line1 = line1Input.value.trim();
+    const line2 = line2Input.value.trim();
+    const postalCode = postalCodeInput.value.trim();
+    const cityText = citySelect.options[citySelect.selectedIndex]?.text || '';
+    const stateSelect = document.getElementById('id_legal_state');
+    const stateText = stateSelect.options[stateSelect.selectedIndex]?.text || '';
+    const country = countrySelect.options[countrySelect.selectedIndex]?.text || '';
+    
+    if (line1 && cityText && stateText && country) {
+      let preview = line1;
+      if (line2) preview += ', ' + line2;
+      preview += '<br>' + cityText + ', ' + stateText;
+      preview += '<br>' + country;
+      if (postalCode) preview += ' ' + postalCode;
+      
+      addressPreviewText.innerHTML = preview;
+      addressPreview.style.display = 'block';
+    } else {
+      addressPreview.style.display = 'none';
+    }
+  }
+  
+  // Listeners para preview
+  [line1Input, line2Input, postalCodeInput, citySelect].forEach(el => {
+    if (el) {
+      el.addEventListener('change', updateAddressPreview);
+      el.addEventListener('input', updateAddressPreview);
+    }
+  });
+  
+  // Preview inicial
+  updateAddressPreview();
+</script>
+
+<style>
+  .card {
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+  }
+  
+  .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-weight: 600;
+    border-bottom: none;
+  }
+  
+  .card-header h5 {
+    margin: 0;
+    font-size: 1.1rem;
+  }
+  
+  .form-control:disabled {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+  
+  .form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+  }
+  
+  .btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    transition: all 0.3s ease;
+  }
+  
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  }
+</style>
+{% endblock %}
+

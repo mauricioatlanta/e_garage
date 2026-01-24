@@ -8,6 +8,7 @@ from taller.forms.company_settings_forms import (
     FinancialSettingsForm,
     ThemeSettingsForm,
 )
+from taller.forms.configuracion_empresa_form import ConfiguracionEmpresaForm
 from taller.forms.configuracion_forms import ConfiguracionRubroForm
 from taller.models import Tecnico
 from taller.models.company_settings import CompanySettings
@@ -111,29 +112,28 @@ def company_settings_view(request):
             profile_form = CompanyProfileForm(
                 request.POST or None, request.FILES or None, instance=config
             )
+            empresa_form = ConfiguracionEmpresaForm(
+                request.POST or None,
+                request.FILES or None,
+                instance=config_empresa,
+            )
             financial_form = FinancialSettingsForm(request.POST or None, instance=config)
             theme_form = ThemeSettingsForm(request.POST or None, instance=config)
 
             # Validar y guardar según la sección
             if section == "profile":
-                if profile_form.is_valid():
+                ok_profile = profile_form.is_valid()
+                ok_empresa = empresa_form.is_valid()
+
+                if ok_profile and ok_empresa:
                     profile_form.save()
-                    cache_key = f"company_branding_{request.user.id}"
-                    cache.delete(cache_key)
-                    if is_spanish:
-                        messages.success(
-                            request, "✅ Información de empresa guardada exitosamente."
-                        )
-                    else:
-                        messages.success(request, "✅ Company information saved.")
+                    empresa_form.save()  # <-- aquí se guarda logo en ConfiguracionEmpresa
+                    cache.delete(f"company_branding_{request.user.id}")
+
+                    messages.success(request, "✅ Información de empresa guardada exitosamente." if is_spanish else "✅ Company information saved.")
                     return redirect(request.path)
                 else:
-                    if is_spanish:
-                        messages.error(
-                            request, "❌ Por favor corrija los errores en Información de Empresa."
-                        )
-                    else:
-                        messages.error(request, "❌ Please fix the errors in Company Information.")
+                    messages.error(request, "❌ Corrige los errores en Información de Empresa." if is_spanish else "❌ Please fix the errors in Company Information.")
             elif section == "financial":
                 if financial_form.is_valid():
                     financial_form.save()
@@ -186,6 +186,7 @@ def company_settings_view(request):
     else:
         # GET request - crear formularios limpios
         profile_form = CompanyProfileForm(instance=config)
+        empresa_form = ConfiguracionEmpresaForm(instance=config_empresa)
         financial_form = FinancialSettingsForm(instance=config)
         theme_form = ThemeSettingsForm(instance=config)
         rubro_form = ConfiguracionRubroForm(instance=config_empresa, request=request)
@@ -197,8 +198,10 @@ def company_settings_view(request):
     context = {
         "tecnicos": tecnicos,
         "config": config,
+        "config_empresa": config_empresa,
         "empresa": empresa,
         "profile_form": profile_form,
+        "empresa_form": empresa_form,
         "financial_form": financial_form,
         "theme_form": theme_form,
         "rubro_form": rubro_form,

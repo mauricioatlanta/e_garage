@@ -43,10 +43,15 @@ def editar_repuesto(request, *args, **kwargs):
 
 
 def eliminar_repuesto(request, pk):
-    """Eliminar un repuesto"""
+    """Eliminar un repuesto - FILTRADO POR EMPRESA"""
     if request.method == "POST":
         try:
-            repuesto = get_object_or_404(Repuesto, pk=pk)
+            # 🔒 BLINDAJE MULTI-TENANT: SIEMPRE filtrar por empresa
+            empresa = getattr(request.user, "empresa", None)
+            if not empresa:
+                return JsonResponse({"success": False, "error": "Usuario sin empresa asignada"}, status=403)
+            
+            repuesto = get_object_or_404(Repuesto, pk=pk, empresa=empresa)
             repuesto.delete()
             messages.success(request, "Repuesto eliminado exitosamente.")
             return JsonResponse({"success": True})

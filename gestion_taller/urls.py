@@ -252,15 +252,63 @@ urlpatterns = [
     # Allauth para el resto de funcionalidades (excluyendo signup que ya está arriba)
     path("accounts/", include("allauth.urls")),
     # Wrappers country-aware para login y signup
-    path("cl/accounts/login/", redirect_qs("/accounts/login/")),
+    path("cl/accounts/login/", country_aware_login, name="account_login_cl"),
     path("us/accounts/login/", redirect_qs("/accounts/login/")),
+    path("co/accounts/login/", country_aware_login, name="account_login_co"),
+    path("ec/accounts/login/", country_aware_login, name="account_login_ec"),
+    path("pe/accounts/login/", country_aware_login, name="account_login_pe"),
     # Signup CL y US - redirect a signup universal con parámetro from
     path("cl/accounts/signup/", lambda r: signup_redirect(r, "cl"), name="account_signup_cl"),
     path("us/accounts/signup/", lambda r: signup_redirect(r, "us"), name="account_signup_us"),
+    # Redirecciones /xx/signup/ -> /accounts/signup/?from=xx (preserva ?plan=, etc.) para que los
+    # enlaces de onboarding/bienvenida (ej. /cl/signup/, /ar/signup/) resuelvan en todos los países
+    path(
+        "cl/signup/",
+        lambda r: redirect("/accounts/signup/?from=cl" + ("&" + r.GET.urlencode() if r.GET else "")),
+        name="signup_redirect_cl",
+    ),
+    path(
+        "ar/signup/",
+        lambda r: redirect("/accounts/signup/?from=ar" + ("&" + r.GET.urlencode() if r.GET else "")),
+        name="signup_redirect_ar",
+    ),
+    path(
+        "ec/signup/",
+        lambda r: redirect("/accounts/signup/?from=ec" + ("&" + r.GET.urlencode() if r.GET else "")),
+        name="signup_redirect_ec",
+    ),
+    path(
+        "co/signup/",
+        lambda r: redirect("/accounts/signup/?from=co" + ("&" + r.GET.urlencode() if r.GET else "")),
+        name="signup_redirect_co",
+    ),
+    path(
+        "pe/signup/",
+        lambda r: redirect("/accounts/signup/?from=pe" + ("&" + r.GET.urlencode() if r.GET else "")),
+        name="signup_redirect_pe",
+    ),
+    path(
+        "ve/signup/",
+        lambda r: redirect("/accounts/signup/?from=ve" + ("&" + r.GET.urlencode() if r.GET else "")),
+        name="signup_redirect_ve",
+    ),
+    path(
+        "br/signup/",
+        lambda r: redirect("/accounts/signup/?from=br" + ("&" + r.GET.urlencode() if r.GET else "")),
+        name="signup_redirect_br",
+    ),
     # Redirects amigables para login
     path("cl/login/", redirect_qs("/cl/accounts/login/")),
     path("cl/es/login/", redirect_qs("/cl/accounts/login/")),
     path("us/login/", redirect_qs("/us/accounts/login/")),
+    path("co/login/", redirect_qs("/co/accounts/login/")),
+    path("co/es/login/", redirect_qs("/co/accounts/login/")),
+    path("ec/login/", redirect_qs("/ec/accounts/login/")),
+    path("ec/es/login/", redirect_qs("/ec/accounts/login/")),
+    path("pe/login/", redirect_qs("/pe/accounts/login/"), name="pe_login_redirect"),
+    path("pe/es/login/", redirect_qs("/pe/accounts/login/"), name="pe_es_login_redirect"),
+    path("ve/login/", redirect_qs("/ve/es/accounts/login/")),
+    path("ve/es/login/", redirect_qs("/ve/es/accounts/login/")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
     path("us/accounts/logout/", redirect_qs("/accounts/logout/")),
@@ -364,9 +412,9 @@ urlpatterns = [
         "mx/es/",
         include(("taller.urls_extra.mexico", "mexico"), namespace="mexico"),
     ),
-    # 🇧🇷 Brasil - Español (puede cambiar a pt-br en el futuro)
+    # 🇧🇷 Brasil - Portugués (SOLO pt, /br/es/ redirige a /br/pt/)
     path(
-        "br/es/",
+        "br/",
         include(("taller.urls_extra.brasil", "brasil"), namespace="brasil"),
     ),
     # 🇦🇷 Argentina - Español
@@ -656,11 +704,18 @@ urlpatterns = [
     ),
 ]
 
-# Marketplace - Habilitado mediante feature flag
-if getattr(settings, "EGARAGE_ENABLE_MARKETPLACE", False):
-    urlpatterns += [
-        path("marketplace/", include(("marketplace.urls", "marketplace"), namespace="marketplace")),
-    ]
+# Marketplace (deshabilitado si no está instalado)
+# Para habilitar: instalar app marketplace y su urls.py
+# Luego descomentar y configurar EGARAGE_ENABLE_MARKETPLACE en settings
+# if getattr(settings, "EGARAGE_ENABLE_MARKETPLACE", False):
+#     try:
+#         urlpatterns += [
+#             path("marketplace/", include(("marketplace.urls", "marketplace"), namespace="marketplace")),
+#         ]
+#     except (ImportError, ModuleNotFoundError):
+#         # Silenciosamente ignorar si marketplace no está instalado
+#         pass
+# (por ahora se omite para evitar crash en migrate)
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

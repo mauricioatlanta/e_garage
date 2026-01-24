@@ -1,0 +1,27 @@
+{% extends 'taller/base.html' %}
+{% load country_url %}
+{% load static %}
+
+{% block title %}Crear Otro Servicio{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <img src="{% static 'img/TallerPro_logo.png' %}" alt="Logo Suscriptor" style="height:48px;">
+            <h1 class="h3 mb-0">Crear Otro Servicio</h1>
+            {% include "components/country_badge.html" %}
+        </div>
+        <div>
+            <a href="{% country_url 'otros_servicios_menu' %}" class="btn btn-secondary">Volver</a>
+        </div>
+    </div>
+    <div class="card p-4 shadow">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-success">Guardar</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

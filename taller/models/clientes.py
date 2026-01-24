@@ -134,6 +134,15 @@ class Cliente(AuditModelMixin, TenantScoped):
         help_text="RUT/EIN/SSN/CPF/CNPJ/RUC/RIF/RFC según el tipo seleccionado",
     )
 
+    # Campo para actividad económica / giro comercial
+    giro = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Giro / Actividad Económica",
+        help_text="Giro comercial o actividad económica del cliente (requerido para facturación)",
+    )
+
     # Campo para identificación por color
     color = models.ForeignKey(
         ColorCliente,
@@ -266,3 +275,103 @@ class Cliente(AuditModelMixin, TenantScoped):
                     f"Cliente {self.id}: Teléfono {self.telefono} no pudo ser validado "
                     f"con libphonenumber (país: {pais})"
                 )
+
+    # === MÉTODOS PARA VALIDACIÓN CONDICIONAL DE FACTURACIÓN ===
+
+    def is_billing_ready(self):
+        """
+        Verifica si el cliente tiene todos los campos necesarios para facturación.
+        
+        Campos requeridos para facturación:
+        - nombre (siempre requerido)
+        - tax_id (identificador tributario)
+        - giro (actividad económica)
+        - billing_address o dirección completa (comuna/ciudad)
+        
+        Returns:
+            bool: True si el cliente está listo para facturar, False en caso contrario
+        """
+        # Nombre siempre es requerido (ya está en el modelo como CharField sin blank)
+        if not self.nombre:
+            return False
+        
+        # Tax ID es requerido para facturación
+        if not self.tax_id or not self.tax_id.strip():
+            return False
+        
+        # Giro es requerido para facturación
+        if not self.giro or not self.giro.strip():
+            return False
+        
+        # Dirección: debe tener billing_address o al menos ciudad/región (legacy)
+        has_address = (
+            self.billing_address is not None
+            or (self.ciudad is not None)  # Legacy Chile
+            or (self.ciudad_usa is not None)  # Legacy otros países
+        )
+        
+        if not has_address:
+            return False
+        
+        return True
+
+    def get_missing_billing_fields(self):
+        """
+        Retorna una lista de campos que faltan para que el cliente esté listo para facturación.
+        
+        Returns:
+            list: Lista de nombres de campos faltantes (en español para mostrar al usuario)
+        """
+        missing = []
+        
+        if not self.nombre or not self.nombre.strip():
+            missing.append("Nombre")
+        
+        if not self.tax_id or not self.tax_id.strip():
+            # Mostrar el nombre del campo según el tipo
+            tax_id_name = dict(self.TAX_ID_TYPES).get(self.tax_id_type, "Identificador Tributario")
+            missing.append(tax_id_name)
+        
+        if not self.giro or not self.giro.strip():
+            missing.append("Giro / Actividad Económica")
+        
+        has_address = (
+            self.billing_address is not None
+            or (self.ciudad is not None)
+            or (self.ciudad_usa is not None)
+        )
+        
+        if not has_address:
+            missing.append("Dirección / Comuna")
+        
+        return missing
+
+    def get_profile_status(self):
+        """
+        Retorna el estado del perfil del cliente: 'simple' o 'completo'.
+        
+        Returns:
+            dict: {
+                'status': 'simple' | 'completo',
+                'label': 'Perfil Simple' | 'Perfil Completo',
+                'is_billing_ready': bool,
+                'missing_fields': list
+            }
+        """
+        is_ready = self.is_billing_ready()
+        missing = self.get_missing_billing_fields()
+        
+        if is_ready:
+            return {
+                'status': 'completo',
+                'label': 'Perfil Completo',
+                'is_billing_ready': True,
+                'missing_fields': []
+            }
+        else:
+            return {
+                'status': 'simple',
+                'label': 'Perfil Simple',
+                'is_billing_ready': False,
+                'missing_fields': missing
+            }

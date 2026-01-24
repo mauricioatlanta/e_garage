@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+{% load static widget_tweaks %}
+
+{% block content %}
+<!-- 🚀 SUPER TECNOLÓGICO - CONFIGURACIÓN FUTURISTA -->
+<link rel="stylesheet" href="{% static 'css/configuracion_futurista.css' %}">
+
+<!-- 🌌 FONDO MATRIX -->
+<div class="matrix-bg"></div>
+
+<div class="config-container">
+    <!-- 🚀 HEADER TECNOLÓGICO -->
+    <div class="config-header">
+        <h1 class="config-title">⚙️ CONFIGURACIÓN AVANZADA</h1>
+        <p class="config-subtitle">Sistema de Control Central - Taller Inteligente</p>
+    </div>
+
+    {% if created %}
+    <div class="config-panel" style="border-color: var(--neon-green);">
+        <div class="panel-title" style="color: var(--neon-green);">
+            🎉 ¡Bienvenido al Sistema!
+        </div>
+        <p style="color: var(--neon-cyan); font-family: 'Courier New', monospace; line-height: 1.6;">
+            Esta es tu primera configuración del taller. Completa los datos para activar todas las funcionalidades del sistema.
+        </p>
+    </div>
+    {% endif %}
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+        <!-- 👤 DATOS PERSONALES -->
+        <div class="config-panel">
+            <div class="panel-title">👤 Datos Personales</div>
+            <form method="post" class="futuristic-form">
+                {% csrf_token %}
+                <input type="hidden" name="datos_form" value="1">
+
+                <div class="form-group">
+                    <label class="form-label" for="id_first_name">{{ datos_form.first_name.label }}</label>
+                    {{ datos_form.first_name|add_class:'form-input' }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_last_name">{{ datos_form.last_name.label }}</label>
+                    {{ datos_form.last_name|add_class:'form-input' }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_email">{{ datos_form.email.label }}</label>
+                    {{ datos_form.email|add_class:'form-input' }}
+                </div>
+
+                <button class="cyber-btn" type="submit">💾 Guardar Datos</button>
+            </form>
+        </div>
+
+        <!-- 🏢 DATOS DE LA EMPRESA -->
+        <div class="config-panel">
+            <div class="panel-title">🏢 Datos de la Empresa</div>
+            <form method="post" enctype="multipart/form-data" class="futuristic-form">
+                {% csrf_token %}
+                <input type="hidden" name="empresa_form" value="1">
+
+                <div class="form-group">
+                    <label class="form-label" for="id_nombre_taller">{{ empresa_form.nombre_taller.label }}</label>
+                    {{ empresa_form.nombre_taller|add_class:'form-input' }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_empresa">{{ empresa_form.empresa.label }}</label>
+                    {{ empresa_form.empresa|add_class:'form-input' }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_direccion">{{ empresa_form.direccion.label }}</label>
+                    {{ empresa_form.direccion|add_class:'form-input' }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_telefono">{{ empresa_form.telefono.label }}</label>
+                    {{ empresa_form.telefono|add_class:'form-input' }}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_logo">{{ empresa_form.logo.label }}</label>
+                    {{ empresa_form.logo|add_class:'form-input' }}
+                    {% if empresa.logo %}
+                    <div style="margin-top: 1rem; text-align: center;">
+                        <p style="color: var(--neon-cyan); margin-bottom: 0.5rem; font-family: 'Courier New', monospace;">Logo actual:</p>
+                        <img src="{{ empresa.logo.url }}" alt="Logo actual" style="max-width: 150px; height: auto; border: 2px solid var(--neon-cyan); border-radius: 10px; box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);">
+                    </div>
+                    {% endif %}
+                </div>
+
+                <button class="cyber-btn" type="submit">💾 Guardar Empresa</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 📊 ESTADO DE LA CUENTA -->
+    <div class="config-panel">
+        <div class="panel-title">📊 Estado del Sistema</div>
+        <div class="status-grid">
+            <div class="status-card">
+                <div class="status-value">{{ empresa.dias_restantes }}</div>
+                <div class="status-label">Días Restantes</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value">{{ empresa.suscripcion_activa|yesno:"✅,❌" }}</div>
+                <div class="status-label">Suscripción</div>
+            </div>
+            <div class="status-card">
+                <div class="status-value">{{ empresa.fecha_inicio|date:"d/m/Y" }}</div>
+                <div class="status-label">Fecha de Inicio</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 👥 GESTIÓN DE TÉCNICOS -->
+    {% if tecnicos is not None %}
+    <div class="config-panel">
+        <div class="panel-title">👥 Gestión de Técnicos</div>
+
+        <!-- Formulario rápido -->
+        <form method="post" style="display: grid; grid-template-columns: 2fr 1fr 1fr auto; gap: 1rem; align-items: end; background: var(--glass-bg); padding: 1.5rem; border-radius: 10px; border: 1px solid var(--neon-purple); margin-bottom: 1.5rem;">
+            {% csrf_token %}
+            <input type="hidden" name="crear_tecnico_rapido" value="1">
+
+            <div class="form-group">
+                <label class="form-label" for="tec_nombre">Nombre del Técnico</label>
+                <input id="tec_nombre" name="nombre" required minlength="2" placeholder="Nombre completo" class="form-input" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="tec_tel">Teléfono</label>
+                <input id="tec_tel" name="telefono" placeholder="+56..." class="form-input" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="tec_dir">Dirección</label>
+                <input id="tec_dir" name="direccion" placeholder="Opcional" class="form-input" />
+            </div>
+
+            <button type="submit" class="cyber-btn" style="padding: 1rem;">➕ Crear</button>
+        </form>
+
+        <!-- Lista de técnicos -->
+        {% if tecnicos %}
+        <div class="tech-grid">
+            {% for t in tecnicos %}
+            <div class="tech-card">
+                <div class="tech-info">
+                    <div class="tech-name">{{ t.nombre }}</div>
+                    <div class="tech-status {{ t.activo|yesno:'active,inactive' }}">
+                        {{ t.activo|yesno:'🟢 ACTIVO','🔴 INACTIVO' }}
+                    </div>
+                </div>
+                <form method="post" style="margin: 0;">
+                    {% csrf_token %}
+                    <button name="toggle_tecnico" value="{{ t.id }}"
+                            class="cyber-btn"
+                            style="padding: 0.5rem 1rem; font-size: 0.8rem; background: {{ t.activo|yesno:'linear-gradient(135deg, #ff6b6b, #ff8e8e)','linear-gradient(135deg, #00ff88, #00ffaa)' }};">
+                        {{ t.activo|yesno:'Desactivar','Activar' }}
+                    </button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p style="color: var(--neon-cyan); text-align: center; font-family: 'Courier New', monospace; padding: 2rem;">
+            No hay técnicos registrados en el sistema.
+        </p>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    <!-- 🚀 NAVEGACIÓN -->
+    <div style="text-align: center; margin-top: 2rem;">
+        <a href="/" class="cyber-btn" style="background: linear-gradient(135deg, var(--neon-gold), var(--neon-pink));">
+            🏠 Volver al Dashboard
+        </a>
+    </div>
+</div>
+
+<script src="{% static 'js/image_preview_simple.js' %}"></script>
+
+{% endblock content %}

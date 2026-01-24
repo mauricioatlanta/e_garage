@@ -122,12 +122,15 @@ class AddressAdmin(admin.ModelAdmin):
 
     @admin.display(description="Sales Tax")
     def sales_tax_display(self, obj):
-        """Sales tax total"""
+        """Sales tax desde el estado (si existe)"""
         try:
-            tax = obj.sales_tax
-            return format_html('<span style="color: green;">{:.2f}%</span>', tax)
-        except:
-            return "-"
+            if obj.city and obj.city.estado and hasattr(obj.city.estado, "sales_tax"):
+                tax = float(obj.city.estado.sales_tax)
+                return format_html('<span style="color: green;">{:.2f}%</span>', tax)
+        except (AttributeError, ValueError, TypeError) as e:
+            # Log error en desarrollo si es necesario
+            pass
+        return "-"
 
     @admin.display(description="Dirección Completa")
     def full_address_display(self, obj):

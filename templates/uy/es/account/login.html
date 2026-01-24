@@ -3,7 +3,7 @@
 {% load widget_tweaks %}
 {% load i18n %}
 
-{% block title %}{% trans "Sign In" %} - eGarage{% endblock %}
+{% block title %}Iniciar sesión - eGarage{% endblock %}
 
 {% block extra_head %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -411,12 +411,12 @@ body {
     <div class="particle" style="left: 85%; animation-delay: 5s;"></div>
 </div>
 
-<!-- Botón de regreso -->
-<a href="{% if request.country == 'US' %}/us/{% elif request.country == 'CL' %}/cl/{% else %}/{% endif %}" class="back-button font-futuristic">
+<!-- Botón de regreso: from=uy → /uy/es/bienvenida/ -->
+<a href="/uy/es/bienvenida/" class="back-button font-futuristic">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
     </svg>
-    <span>{% trans "Back" %}</span>
+    <span>Atrás</span>
 </a>
 
 <div class="login-container">
@@ -445,8 +445,12 @@ body {
                         <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
                     {% elif detected_country == 'BR' %}
                         <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
+                    {% elif detected_country == 'UY' %}
+                        <div class="country-badge font-futuristic">🇺🇾 URUGUAY</div>
                     {% endif %}
                 {% endwith %}
+            {% elif request.GET.from == 'uy' or request.GET.country == 'UY' %}
+                <div class="country-badge font-futuristic">🇺🇾 URUGUAY</div>
             {% elif request.GET.country == 'CO' %}
                 <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
             {% elif request.GET.country == 'EC' %}
@@ -480,7 +484,11 @@ body {
                     <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
                 {% elif request.country == 'BR' %}
                     <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
+                {% elif request.country == 'UY' %}
+                    <div class="country-badge font-futuristic">🇺🇾 URUGUAY</div>
                 {% endif %}
+            {% elif request.GET.from == 'uy' or request.path|slice:":4" == '/uy/' %}
+                <div class="country-badge font-futuristic">🇺🇾 URUGUAY</div>
             {% elif request.path|slice:":4" == '/co/' %}
                 <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
             {% elif request.path|slice:":4" == '/ec/' %}
@@ -536,14 +544,14 @@ body {
         <!-- Formulario -->
         <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
             {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
             <!-- Email/Usuario -->
             <div class="form-group">
                 <label for="id_login" class="form-label font-futuristic">
-                    {% trans "Email or Username" %}
+                    Correo o Usuario
                 </label>
-                {{ form.login|add_class:"form-input"|attr:"placeholder:Enter your credentials"|attr:"autocomplete:email" }}
+                {{ form.login|add_class:"form-input"|attr:"placeholder:Ingresa tus credenciales"|attr:"autocomplete:email" }}
                 {% if form.login.errors %}
                 <div class="error-message">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -557,9 +565,9 @@ body {
             <!-- Contraseña -->
             <div class="form-group">
                 <label for="id_password" class="form-label font-futuristic">
-                    {% trans "Password" %}
+                    Contraseña
                 </label>
-                {{ form.password|add_class:"form-input"|attr:"placeholder:Enter your secure password"|attr:"type:password"|attr:"autocomplete:current-password" }}
+                {{ form.password|add_class:"form-input"|attr:"placeholder:Ingresa tu contraseña segura"|attr:"type:password"|attr:"autocomplete:current-password" }}
                 {% if form.password.errors %}
                 <div class="error-message">
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -574,7 +582,7 @@ body {
             {% if form.remember %}
             <div class="remember-me">
                 {{ form.remember }}
-                <label for="id_remember">{% trans "Keep me signed in" %}</label>
+                <label for="id_remember">Mantenerme conectado</label>
             </div>
             {% endif %}
 
@@ -584,7 +592,7 @@ body {
                     <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
                     </svg>
-                    {% trans "Access System" %}
+                    Acceder al Sistema
                 </span>
             </button>
         </form>
@@ -595,15 +603,15 @@ body {
                 <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
-                {% trans "Reset password" %}
+                Restablecer contraseña
             </a>
         </div>
 
         <!-- Sign Up -->
         <div class="signup-section">
-            <div class="signup-text">{% trans "New to eGarage?" %}</div>
-            <a href="{% url 'account_signup' %}" class="signup-link font-futuristic">
-                {% trans "Create your account" %} →
+            <div class="signup-text">¿Nuevo en eGarage?</div>
+            <a href="{% url 'account_signup' %}?from=uy" class="signup-link font-futuristic">
+                Crea tu cuenta →
             </a>
         </div>
     </div>

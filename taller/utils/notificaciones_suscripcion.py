@@ -335,6 +335,30 @@ Tu suscripción ya está activa.
         except Exception as e:
             logger.error(f"⚠️ Error al enviar WhatsApp de nueva suscripción: {str(e)}")
 
+        # === NOTIFICAR AL ADMIN DE EGARAGE ===
+        # 🔒 IDEMPOTENCIA: Usar flag en memoria + comprobante_pago_id/pago_pendiente_id si está disponible
+        if not getattr(empresa, '_admin_whatsapp_notified', False):
+            try:
+                from taller.whatsapp.admin_notifications import notify_admin_new_subscription
+                
+                # Intentar obtener IDs de pago/comprobante desde el contexto si están disponibles
+                comprobante_pago_id = getattr(empresa, '_current_comprobante_pago_id', None)
+                pago_pendiente_id = getattr(empresa, '_current_pago_pendiente_id', None)
+                
+                notify_admin_new_subscription(
+                    empresa=empresa,
+                    plan=plan,
+                    monto=monto,
+                    es_nueva_suscripcion=True,
+                    comprobante_pago_id=comprobante_pago_id,
+                    pago_pendiente_id=pago_pendiente_id,
+                )
+                # Marcar como notificado para evitar duplicados en esta operación
+                empresa._admin_whatsapp_notified = True
+            except Exception as e:
+                # 🔒 FAIL-SAFE: No romper flujo si falla notificación admin
+                logger.error(f"⚠️ Error al notificar admin de nueva suscripción (ignorado): {str(e)}")
+
         return True
 
     except Exception as e:
@@ -688,6 +712,31 @@ We appreciate your loyalty! 🙏"""
 
         except Exception as e:
             logger.error(f"⚠️ Error al enviar WhatsApp de renovación: {str(e)}")
+
+        # === NOTIFICAR AL ADMIN DE EGARAGE ===
+        # 🔒 IDEMPOTENCIA: Usar flag en memoria + comprobante_pago_id/pago_pendiente_id si está disponible
+        if not getattr(empresa, '_admin_whatsapp_notified', False):
+            try:
+                from taller.whatsapp.admin_notifications import notify_admin_new_subscription
+                
+                # Intentar obtener IDs de pago/comprobante desde el contexto si están disponibles
+                comprobante_pago_id = getattr(empresa, '_current_comprobante_pago_id', None)
+                pago_pendiente_id = getattr(empresa, '_current_pago_pendiente_id', None)
+                
+                notify_admin_new_subscription(
+                    empresa=empresa,
+                    plan=plan,
+                    monto=monto,
+                    es_nueva_suscripcion=False,
+                    dias_renovados=dias_renovados,
+                    comprobante_pago_id=comprobante_pago_id,
+                    pago_pendiente_id=pago_pendiente_id,
+                )
+                # Marcar como notificado para evitar duplicados en esta operación
+                empresa._admin_whatsapp_notified = True
+            except Exception as e:
+                # 🔒 FAIL-SAFE: No romper flujo si falla notificación admin
+                logger.error(f"⚠️ Error al notificar admin de renovación (ignorado): {str(e)}")
 
         return True
 

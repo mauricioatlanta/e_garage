@@ -478,10 +478,8 @@
 
 <!-- Scripts auxiliares -->
 <script src="{% static 'js/starfield.js' %}"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-{{ form.media }}
+<!-- jQuery, Select2 y DAL se cargan desde base.html y form.media (DAL oficial) - NO duplicar aquí -->
+{# form.media ya se carga en base.html (CSS en head, JS al final del body) - NO duplicar aquí #}
 <script src="{% static 'js/formulario_jerarquico.js' %}?v=5"></script>
 <script>
 // Funciones globales para abrir/cerrar modales

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% load static i18n %}
+
+{% block title %}{% trans "Registro exitoso" %} | eGarage{% endblock %}
+
+{% block content %}
+<div style="text-align: center; padding: 60px 20px; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; max-width: 800px; margin: auto;">
+    <h1 style="color: #2c3e50; font-size: 2.5em;">🚀 {% trans "¡Ya casi llegamos!" %}</h1>
+    <p style="font-size: 1.3em; color: #34495e; line-height: 1.6;">
+        {% trans "Bienvenido" %} <strong>{{ email }}</strong>. {% trans "El registro para" %} <strong>{{ nombre_taller }}</strong> {% trans "ha sido un éxito." %}
+    </p>
+    
+    <div style="background: #f8f9fa; border-left: 5px solid #3498db; padding: 30px; border-radius: 8px; margin: 40px 0; text-align: left;">
+        <h2 style="margin-top: 0; color: #2980b9;">✅ {% trans "¿Qué sigue?" %}</h2>
+        <p style="font-size: 1.1em; color: #2c3e50;">
+            {% trans "Estás a segundos de tener el mejor centro de operaciones del mundo." %} 
+            <strong>{% trans "Hemos enviado un correo electrónico" %}</strong> {% trans "con tus credenciales de acceso y los pasos iniciales para configurar tu taller." %}
+        </p>
+        <p style="font-style: italic; color: #7f8c8d;">
+            * {% trans "Si no lo ves en unos minutos, revisa tu carpeta de Correos no deseados (SPAM)." %}
+        </p>
+    </div>
+
+    <a href="{% url 'account_login' %}" style="background: #3498db; color: white; padding: 15px 35px; text-decoration: none; border-radius: 50px; font-weight: bold; font-size: 1.1em; transition: 0.3s; display: inline-block;">
+        {% trans "Ir al Inicio de Sesión" %}
+    </a>
+</div>
+{% endblock %}

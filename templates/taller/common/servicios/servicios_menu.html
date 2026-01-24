@@ -503,6 +503,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const renderServiceCard = (item) => {
     const pk = item.pk || item.id;
+    // Si no hay ID, no renderizar basura
+    if (!pk) return '';
+    
     const rawName = item.nombre || "";
     const rawCategoria = item.categoria || "";
     const rawSubcategoria = item.subcategoria || "";
@@ -665,17 +668,27 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 
   const fetchServices = async () => {
+    console.log('[DEBUG] fetchServices llamado');
+    
     if (!searchInput || !searchInput.dataset.endpoint) {
+      console.log('[DEBUG] No hay searchInput o endpoint, usando filtro local');
       performLocalFilter();
       return;
     }
 
     const endpoint = searchInput.dataset.endpoint;
+    console.log('[DEBUG] Endpoint:', endpoint);
+    
     const params = new URLSearchParams();
     const query = searchInput.value.trim();
-    if (query) params.append('q', query);
+    // Siempre enviar query, incluso si está vacío (para obtener todos los servicios)
+    params.append('q', query || '');
     if (categoriaFilter?.value) params.append('categoria', categoriaFilter.value);
     if (subcategoriaFilter?.value) params.append('subcategoria', subcategoriaFilter.value);
+    
+    console.log('[DEBUG] Query:', query);
+    console.log('[DEBUG] Params:', params.toString());
+    console.log('[DEBUG] URL completa:', `${endpoint}?${params.toString()}`);
 
     ensureStatusVisible();
     setLoading(true);
@@ -686,17 +699,53 @@ document.addEventListener('DOMContentLoaded', function() {
 
     try {
       const response = await fetch(`${endpoint}?${params.toString()}`, {
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        headers: { 
+          'X-Requested-With': 'XMLHttpRequest',
+          'Accept': 'application/json'
+        },
+        credentials: 'include', // Incluir cookies para autenticación
         signal: abortController.signal,
       });
-      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error(`HTTP ${response.status} - ${errorText.substring(0, 200)}`);
+        
+        // Si es un error 302 o 403, probablemente es un problema de autenticación
+        if (response.status === 302 || response.status === 403) {
+          console.error('Error de autenticación. Redirigiendo a login...');
+          window.location.href = '/login/';
+          return;
+        }
+        
+        throw new Error(`HTTP ${response.status}`);
+      }
+      
+      // Verificar que la respuesta sea JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('La respuesta no es JSON:', contentType);
+        throw new Error('Respuesta no es JSON');
+      }
+      
       const data = await response.json();
       const items = data.servicios || data.results || [];
+      
+      // Debug: Log para diagnóstico
+      console.log(`[DEBUG] Respuesta recibida:`, data);
+      console.log(`[DEBUG] Búsqueda: "${query}" - Encontrados: ${items.length} servicios`);
+      if (items.length > 0) {
+        console.log(`[DEBUG] Primeros 3 servicios:`, items.slice(0, 3));
+      } else {
+        console.warn(`[DEBUG] No se encontraron servicios para la búsqueda: "${query}"`);
+      }
+      
       renderServices(items);
       updateStatus(data.total ?? items.length);
     } catch (error) {
       if (error.name === 'AbortError') return;
       console.error('Error buscando servicios', error);
+      console.error('Endpoint:', endpoint);
+      console.error('Query params:', params.toString());
       showError(LABELS.errorSearch);
     } finally {
       setLoading(false);
@@ -779,7 +828,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // =================== EVENT LISTENERS ===================
   if (searchInput) {
-    searchInput.addEventListener('input', debouncedFetch);
+    console.log('[DEBUG] searchInput encontrado, agregando event listeners');
+    console.log('[DEBUG] Endpoint configurado:', searchInput.dataset.endpoint);
+    
+    searchInput.addEventListener('input', function(e) {
+      console.log('[DEBUG] Evento input disparado, valor:', e.target.value);
+      debouncedFetch();
+    });
     searchInput.addEventListener('keydown', function(e) {
       if (e.key === 'Enter') {
         e.preventDefault();
@@ -827,7 +882,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // =================== INICIALIZACIÓN ===================
   createParticles();
-  updateStatus(serviceCards.length);
+  
+  // Cargar servicios iniciales desde el servidor si hay endpoint
+  if (searchInput && searchInput.dataset.endpoint) {
+    console.log('[DEBUG] Cargando servicios iniciales desde el servidor...');
+    fetchServices();
+  } else {
+    // Si no hay endpoint, usar los servicios que ya están en el DOM
+    updateStatus(serviceCards.length);
+  }
 
   setInterval(() => {
     const x = Math.random() * window.innerWidth;

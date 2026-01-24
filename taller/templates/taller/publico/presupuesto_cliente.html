@@ -1,0 +1,347 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+{% load money %}
+
+{% block title %}{{ NOMBRE_EMPRESA_PERSONALIZADO|default:"Mi Taller" }} - Presupuesto {{ documento.numero_documento|default:documento.numero }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
+  <div class="container mx-auto px-4 max-w-4xl">
+    
+    <!-- Header con logo y nombre del taller -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4" style="border-top-color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+      <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-4">
+          {% if LOGO_PERSONALIZADO %}
+          <img src="{{ LOGO_PERSONALIZADO }}" 
+               alt="{{ NOMBRE_EMPRESA_PERSONALIZADO|default:'Logo' }}"
+               class="h-20 w-auto object-contain">
+          {% endif %}
+          <div>
+            <h1 class="text-2xl font-bold" style="color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+              {{ NOMBRE_EMPRESA_PERSONALIZADO|default:documento.empresa.nombre_taller }}
+            </h1>
+            {% if company_settings and company_settings.tagline %}
+            <p class="text-gray-600 text-sm">{{ company_settings.tagline }}</p>
+            {% endif %}
+          </div>
+        </div>
+        <div class="text-right">
+          <div class="text-sm text-gray-500">Presupuesto</div>
+          <div class="text-xl font-bold" style="color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+            {{ documento.numero_documento|default:documento.numero }}
+          </div>
+          <div class="text-sm text-gray-500 mt-1">
+            {{ documento.fecha_emision|date:"d/m/Y" }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Información del Cliente -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4" style="color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+        👤 Información del Cliente
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <p class="text-gray-600 text-sm">Nombre</p>
+          <p class="font-semibold">{{ documento.cliente.nombre }} {{ documento.cliente.apellido|default:"" }}</p>
+        </div>
+        {% if documento.cliente.telefono %}
+        <div>
+          <p class="text-gray-600 text-sm">Teléfono</p>
+          <p class="font-semibold">{{ documento.cliente.telefono }}</p>
+        </div>
+        {% endif %}
+        {% if documento.cliente.email %}
+        <div>
+          <p class="text-gray-600 text-sm">Email</p>
+          <p class="font-semibold">{{ documento.cliente.email }}</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Información del Vehículo -->
+    {% if documento.vehiculo %}
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4" style="color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+        🚗 Información del Vehículo
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <p class="text-gray-600 text-sm">Marca</p>
+          <p class="font-semibold">{{ documento.vehiculo.marca }}</p>
+        </div>
+        <div>
+          <p class="text-gray-600 text-sm">Modelo</p>
+          <p class="font-semibold">{{ documento.vehiculo.modelo }}</p>
+        </div>
+        <div>
+          <p class="text-gray-600 text-sm">Patente</p>
+          <p class="font-semibold">{{ documento.vehiculo.patente }}</p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Detalle del Presupuesto -->
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4" style="color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+        📋 Detalle del Presupuesto
+      </h2>
+      
+      <!-- Repuestos -->
+      {% if documento.lineas_repuesto.exists %}
+      <div class="mb-6">
+        <h3 class="font-semibold mb-2 text-gray-700">Repuestos</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="bg-gray-100" style="background-color: {{ COLOR_PRIMARIO|default:'#00ffff' }}20;">
+                <th class="border p-2 text-left">Descripción</th>
+                <th class="border p-2 text-center">Cantidad</th>
+                <th class="border p-2 text-right">Precio Unit.</th>
+                <th class="border p-2 text-right">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for linea in documento.lineas_repuesto.all %}
+              <tr>
+                <td class="border p-2">{{ linea.repuesto.nombre|default:linea.descripcion }}</td>
+                <td class="border p-2 text-center">{{ linea.cantidad }}</td>
+                <td class="border p-2 text-right">${{ linea.precio_unitario|floatformat:0|intcomma }}</td>
+                <td class="border p-2 text-right">${{ linea.subtotal|floatformat:0|intcomma }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Servicios -->
+      {% if documento.lineas_servicio.exists %}
+      <div class="mb-6">
+        <h3 class="font-semibold mb-2 text-gray-700">Servicios</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="bg-gray-100" style="background-color: {{ COLOR_PRIMARIO|default:'#00ffff' }}20;">
+                <th class="border p-2 text-left">Descripción</th>
+                <th class="border p-2 text-right">Precio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for linea in documento.lineas_servicio.all %}
+              <tr>
+                <td class="border p-2">{{ linea.descripcion }}</td>
+                <td class="border p-2 text-right">${{ linea.precio|floatformat:0|intcomma }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Otros Servicios -->
+      {% if documento.lineas_otro_servicio.exists %}
+      <div class="mb-6">
+        <h3 class="font-semibold mb-2 text-gray-700">Otros Servicios</h3>
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead>
+              <tr class="bg-gray-100" style="background-color: {{ COLOR_PRIMARIO|default:'#00ffff' }}20;">
+                <th class="border p-2 text-left">Descripción</th>
+                <th class="border p-2 text-right">Precio</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for linea in documento.lineas_otro_servicio.all %}
+              <tr>
+                <td class="border p-2">{{ linea.descripcion }}</td>
+                <td class="border p-2 text-right">${{ linea.precio|floatformat:0|intcomma }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Totales -->
+      <div class="mt-6 pt-4 border-t-2" style="border-color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+        <div class="flex justify-end">
+          <div class="w-full md:w-1/2">
+            {% if documento.descuento and documento.descuento > 0 %}
+            <div class="flex justify-between mb-2">
+              <span class="text-gray-600">Subtotal:</span>
+              <span class="font-semibold">${{ documento.total|add:documento.descuento|floatformat:0|intcomma }}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+              <span class="text-gray-600">Descuento:</span>
+              <span class="font-semibold text-red-600">-${{ documento.descuento|floatformat:0|intcomma }}</span>
+            </div>
+            {% endif %}
+            {% if documento.tax_amount and documento.tax_amount > 0 %}
+            <div class="flex justify-between mb-2">
+              <span class="text-gray-600">IVA ({{ documento.tax_rate_applied }}%):</span>
+              <span class="font-semibold">${{ documento.tax_amount|floatformat:0|intcomma }}</span>
+            </div>
+            {% endif %}
+            <div class="flex justify-between text-xl font-bold pt-2 border-t-2" style="border-color: {{ COLOR_PRIMARIO|default:'#00ffff' }}; color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+              <span>TOTAL:</span>
+              <span>${{ documento.total|floatformat:0|intcomma }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Observaciones -->
+    {% if documento.observaciones %}
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4" style="color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+        📝 Observaciones
+      </h2>
+      <p class="text-gray-700 whitespace-pre-line">{{ documento.observaciones }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Términos y Condiciones -->
+    {% if COMPANY_TERMS %}
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <h2 class="text-xl font-semibold mb-4" style="color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+        📄 Términos y Condiciones
+      </h2>
+      <p class="text-gray-700 text-sm whitespace-pre-line">{{ COMPANY_TERMS|linebreaks }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Datos Bancarios -->
+    {% if COMPANY_BANK %}
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-2" style="border-color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+      <h2 class="text-xl font-semibold mb-4" style="color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+        💳 Datos para Transferencia
+      </h2>
+      <p class="text-gray-700 whitespace-pre-line">{{ COMPANY_BANK|linebreaks }}</p>
+    </div>
+    {% endif %}
+
+    <!-- Botón de Aprobación -->
+    {% if not ya_aprobado %}
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6 border-t-4" style="border-top-color: {{ COLOR_PRIMARIO|default:'#00ffff' }};">
+      <h3 class="text-xl font-semibold mb-4 text-center">
+        ¿Deseas autorizar estos trabajos?
+      </h3>
+      
+      <form action="{% url 'publico:aprobar_presupuesto' documento.uuid %}" method="post" class="mb-4">
+        {% csrf_token %}
+        <button type="submit" 
+                class="w-full py-4 text-xl font-bold text-white rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105"
+                style="background: linear-gradient(135deg, {{ COLOR_PRIMARIO|default:'#00ffff' }} 0%, {{ COLOR_SECUNDARIO|default:'#0d6efd' }} 100%);">
+          <i class="fas fa-check-circle mr-2"></i>
+          APROBAR PRESUPUESTO
+        </button>
+      </form>
+      
+      <p class="text-xs text-gray-500 text-center italic">
+        * Al hacer clic en aprobar, notificaremos a <strong>{{ NOMBRE_EMPRESA_PERSONALIZADO|default:documento.empresa.nombre_taller }}</strong> para iniciar el trabajo.
+      </p>
+    </div>
+    {% else %}
+    <!-- Mensaje de ya aprobado -->
+    <div class="bg-green-50 rounded-xl shadow-lg p-6 mb-6 border-2 border-green-500">
+      <div class="flex items-center justify-center gap-3">
+        <i class="fas fa-check-circle text-green-500 text-3xl"></i>
+        <div>
+          <h3 class="text-xl font-semibold text-green-700">Presupuesto Aprobado</h3>
+          <p class="text-sm text-green-600">
+            Aprobado el {{ documento.approved_at|date:"d/m/Y" }} a las {{ documento.approved_at|date:"H:i" }}
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Sección de Pago -->
+    {% if ya_aprobado and documento.estado_pago != 'PAGADO' and COMPANY_BANK %}
+    <div class="bg-gradient-to-br from-gray-800 to-gray-900 rounded-xl shadow-lg p-6 mb-6 border-2 border-dashed animate-pulse" 
+         style="border-color: {{ COLOR_PRIMARIO|default:'#00ffff' }}; background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.9) 100%);">
+      <h3 class="text-2xl font-bold text-center mb-4" style="color: {{ COLOR_PRIMARIO|default:'#00ffff' }}; font-family: 'Orbitron', 'Arial Black', monospace;">
+        <i class="fas fa-wallet mr-2"></i> DATOS DE PAGO
+      </h3>
+      <hr class="my-4" style="border-color: {{ COLOR_PRIMARIO|default:'#00ffff' }}4D;">
+      
+      <div class="text-white text-sm mb-4">
+        <p class="mb-3 text-center">
+          <strong>Instrucciones:</strong> Por favor, realice la transferencia y envíe el comprobante por WhatsApp.
+        </p>
+        <div class="p-4 bg-black/50 rounded-lg border-2" style="border-color: {{ COLOR_PRIMARIO|default:'#00ffff' }}40;">
+          <div class="whitespace-pre-line text-base leading-relaxed">{{ COMPANY_BANK|linebreaks }}</div>
+        </div>
+      </div>
+      
+      {% if whatsapp_pago_url %}
+      <a href="{{ whatsapp_pago_url }}" 
+         target="_blank"
+         class="block w-full py-3 px-4 text-center font-bold text-white rounded-lg transition-all shadow-lg hover:shadow-xl transform hover:scale-105 mt-4"
+         style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%);">
+        <i class="fab fa-whatsapp mr-2"></i> ENVIAR COMPROBANTE POR WHATSAPP
+      </a>
+      {% else %}
+      <div class="bg-yellow-900/30 border border-yellow-600 rounded-lg p-3 text-yellow-200 text-sm text-center">
+        <i class="fas fa-info-circle mr-2"></i>
+        No hay número de teléfono configurado para enviar el comprobante.
+      </div>
+      {% endif %}
+      
+      <p class="text-xs text-gray-400 text-center mt-4 italic">
+        * Una vez recibido el comprobante, {{ NOMBRE_EMPRESA_PERSONALIZADO|default:documento.empresa.nombre_taller }} confirmará el pago.
+      </p>
+    </div>
+    {% elif ya_aprobado and documento.estado_pago == 'PAGADO' %}
+    <!-- Mensaje de pago completado -->
+    <div class="bg-green-50 rounded-xl shadow-lg p-6 mb-6 border-2 border-green-500">
+      <div class="flex items-center justify-center gap-3">
+        <i class="fas fa-check-circle text-green-500 text-3xl"></i>
+        <div>
+          <h3 class="text-xl font-semibold text-green-700">Pago Confirmado</h3>
+          <p class="text-sm text-green-600">
+            El pago de este documento ha sido confirmado. ¡Gracias!
+          </p>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Redes Sociales -->
+    {% if COMPANY_INSTAGRAM or COMPANY_FACEBOOK %}
+    <div class="bg-white rounded-xl shadow-lg p-6 text-center">
+      <p class="text-sm text-gray-600 mb-2">Síguenos en nuestras redes sociales:</p>
+      <div class="flex justify-center gap-4">
+        {% if COMPANY_INSTAGRAM %}
+        <a href="https://instagram.com/{{ COMPANY_INSTAGRAM }}" 
+           target="_blank"
+           class="text-pink-500 hover:text-pink-600 transition-colors">
+          <i class="fab fa-instagram text-2xl"></i>
+        </a>
+        {% endif %}
+        {% if COMPANY_FACEBOOK %}
+        <a href="{{ COMPANY_FACEBOOK }}" 
+           target="_blank"
+           class="text-blue-600 hover:text-blue-700 transition-colors">
+          <i class="fab fa-facebook text-2xl"></i>
+        </a>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}
+

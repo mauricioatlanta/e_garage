@@ -18,7 +18,8 @@
 
 {% block page_extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+{# Select2 CSS se carga desde base.html via form.media.css - También lo agregamos aquí para asegurar que se cargue #}
+{% if form %}{{ form.media.css }}{% endif %}
 <style>
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
@@ -354,6 +355,7 @@ input:focus {
 <div class="form-card max-w-4xl mx-auto">
     <form method="post" id="vehicle-form">
       {% csrf_token %}
+      <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -1059,9 +1061,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 
-{# form.media es CRÍTICO para que DAL inicialice Select2 correctamente #}
-{# Cargamos form.media completo (CSS + JS) para asegurar que todo esté disponible #}
-{# Los scripts base de DAL ya están en base.html, form.media puede duplicarlos #}
+{# form.media ya se carga en base.html (CSS en head, JS al final del body) - NO duplicar aquí #}
 {# Solución: Prevenir doble registro pero permitir inicialización correcta #}
 <script>
 // Proteger contra doble registro ANTES de que form.media se cargue
@@ -1101,7 +1101,7 @@ document.addEventListener('DOMContentLoaded', function() {
     setupProtection();
 })();
 </script>
-{{ form.media }}
+{# form.media ya se carga en base.html - NO duplicar aquí #}
 
 {# Asegurar que los botones de navegación funcionen correctamente #}
 <script>
@@ -1197,5 +1197,6 @@ $(document).ready(function() {
     setTimeout(initializeDAL, 2000);
 })();
 </script>
-{{ form.media }}
+{# JS de form.media (DAL/Select2) - Asegurar que se cargue #}
+{% if form %}{{ form.media.js }}{% endif %}
 {% endblock %}

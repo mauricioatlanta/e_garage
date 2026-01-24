@@ -1,0 +1,7 @@
+{# templates/pe/es/documentos/lista_documentos.html #}
+{% extends "taller/common/documentos/lista_documentos.html" %}
+{% load i18n %}
+
+{% block title %}
+  {{ empresa.nombre_taller|default:"eGarage" }} - {% trans "Lista de Documentos" %}
+{% endblock %}

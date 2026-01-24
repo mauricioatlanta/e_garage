@@ -1,0 +1,23 @@
+<table class="min-w-full text-sm translucent-card border border-slate-200 rounded shadow-sm text-slate-700">
+  <thead class="bg-indigo-700 text-white">
+    <tr>
+      <th class="px-4 py-2 text-left">Servicio</th>
+      <th class="px-4 py-2 text-right">Precio</th>
+      <th class="px-4 py-2 text-center">Acciones</th>
+    </tr>
+  </thead>
+  <tbody class="divide-y divide-slate-100">
+    {% for servicio in servicios %}
+    <tr>
+      <td class="px-4 py-2">{{ servicio.nombre }}</td>
+      <td class="px-4 py-2 text-right">${{ servicio.precio }}</td>
+      <td class="px-4 py-2 text-center">
+        <a href="{% url 'editar_servicio' servicio.id %}" class="text-yellow-500 hover:underline">✏️</a>
+        <a href="{% url 'eliminar_servicio' servicio.id %}" class="text-red-500 hover:underline">🗑️</a>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="3" class="text-center text-slate-500 py-4">No hay servicios registrados.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

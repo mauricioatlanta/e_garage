@@ -987,11 +987,11 @@
 <div class="documentos-container">
   <!-- Toggle de vista -->
   <div class="view-toggle">
-    <button class="toggle-view-btn active" data-view="cards" onclick="toggleView('cards')">
+    <button class="toggle-view-btn active" data-view="cards" onclick="toggleView('cards', this)">
       <i class="fas fa-th-large"></i>
       <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Card View{% else %}Vista Matriz{% endif %}</span>
     </button>
-    <button class="toggle-view-btn" data-view="table" onclick="toggleView('table')">
+    <button class="toggle-view-btn" data-view="table" onclick="toggleView('table', this)">
       <i class="fas fa-table"></i>
       <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Table View{% else %}Vista Tabla{% endif %}</span>
     </button>
@@ -1141,12 +1141,38 @@
                   <i class="fas fa-file-pdf"></i>
                   <span>PDF</span>
                 </a>
-                <a href="#"
+                {% load whatsapp_tags %}
+                {% whatsapp_document_link documento request as wa_link %}
+                {% if wa_link %}
+                <a href="{{ wa_link }}" 
+                   target="_blank"
                    class="accion-btn"
-                   onclick="enviarWhatsApp({{ documento.id }}, '{{ documento.cliente.telefono|default_if_none:""|default:"" }}', '{{ documento.cliente.nombre|default_if_none:""|default:"" }} {{ documento.cliente.apellido|default_if_none:""|default:"" }}'); return false;">
+                   style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border-color: rgba(255, 255, 255, 0.3); color: white;">
                   <i class="fab fa-whatsapp"></i>
                   <span>WhatsApp</span>
                 </a>
+                {% else %}
+                  {# Verificar si tiene teléfono pero no cumple validación #}
+                  {% if documento.cliente.telefono %}
+                    <button type="button" 
+                            class="accion-btn"
+                            disabled
+                            style="opacity: 0.5; cursor: not-allowed;"
+                            title="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Phone number does not meet minimum length requirements for this country{% else %}El número de teléfono no cumple con la longitud mínima requerida para este país{% endif %}">
+                      <i class="fab fa-whatsapp"></i>
+                      <span>WhatsApp</span>
+                    </button>
+                  {% else %}
+                    <button type="button" 
+                            class="accion-btn"
+                            disabled
+                            style="opacity: 0.5; cursor: not-allowed;"
+                            title="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Client has no WhatsApp number registered{% else %}El cliente no tiene número de teléfono registrado{% endif %}">
+                      <i class="fab fa-whatsapp"></i>
+                      <span>WhatsApp</span>
+                    </button>
+                  {% endif %}
+                {% endif %}
                 {% if documento.tipo == 'PRES' and documento.estado == 'EMITIDO' %}
                 <a href="#" class="accion-btn" onclick="convertirAOT({{ documento.id }}); return false;" title="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Convert to Work Order{% else %}Convertir a Orden de Trabajo{% endif %}">
                   <i class="fas fa-arrow-right"></i>
@@ -1260,13 +1286,23 @@
 // Idioma actual para traducciones JavaScript
 const CURRENT_LANG = '{{ LANGUAGE_CODE|default:request.LANGUAGE_CODE|default:"es" }}';
 
-function toggleView(view) {
+function toggleView(view, element) {
   const cardsView = document.getElementById('vista-cards');
   const tableView = document.getElementById('vista-tabla');
   const buttons = document.querySelectorAll('.toggle-view-btn');
   
   buttons.forEach(btn => btn.classList.remove('active'));
-  event.target.closest('.toggle-view-btn').classList.add('active');
+  
+  // Activar el botón correspondiente
+  if (element) {
+    element.classList.add('active');
+  } else {
+    // Si no se pasa el elemento, buscar por data-view
+    const targetButton = document.querySelector(`.toggle-view-btn[data-view="${view}"]`);
+    if (targetButton) {
+      targetButton.classList.add('active');
+    }
+  }
   
   if (view === 'cards') {
     cardsView.classList.remove('hidden');
@@ -1284,7 +1320,8 @@ function toggleView(view) {
 document.addEventListener('DOMContentLoaded', function() {
   const savedView = localStorage.getItem('documentos-view-preference') || 'cards';
   if (savedView === 'table') {
-    toggleView('table');
+    const tableButton = document.querySelector('.toggle-view-btn[data-view="table"]');
+    toggleView('table', tableButton);
   }
   
   // Animación de hover mejorada

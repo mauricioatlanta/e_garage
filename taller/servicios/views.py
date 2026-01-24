@@ -765,11 +765,100 @@ def crear_otro_servicio(request):
     return render(request, template_name, context)
 
 
+@login_required
+def editar_otro_servicio(request, pk):
+    """Vista para editar servicios externos"""
+    from django.contrib import messages
+    from django.shortcuts import get_object_or_404, redirect, render
+
+    from taller.servicios.models import CategoriaServicio, ServicioExterno
+    from taller.utils.templates import select_country_lang_template
+
+    servicio = get_object_or_404(ServicioExterno, pk=pk, empresa=getattr(request.user, "empresa", None))
+
+    # Determinar el país basándose en la URL
+    country_code = _detectar_pais(request)
+    lang = get_language() or COUNTRY_LANGUAGE_MAP.get(country_code, "es")
+
+    if request.method == "POST":
+        try:
+            # Obtener datos del formulario
+            nombre = request.POST.get("nombre")
+            empresa_externa = request.POST.get("empresa_externa")
+            categoria_id = request.POST.get("categoria")
+            costo_taller = request.POST.get("costo_taller")
+            precio_cliente = request.POST.get("precio_cliente")
+            descripcion = request.POST.get("descripcion", "")
+            tiempo_estimado = request.POST.get("tiempo_estimado", "")
+
+            # Validaciones básicas
+            if not all([nombre, empresa_externa, categoria_id, costo_taller, precio_cliente]):
+                messages.error(request, "Todos los campos requeridos deben ser completados")
+                return redirect("servicios:editar_otro_servicio", pk=pk)
+
+            # Actualizar servicio externo
+            categoria = CategoriaServicio.objects.get(id=categoria_id)
+            servicio.nombre = nombre
+            servicio.empresa_externa = empresa_externa
+            servicio.categoria = categoria
+            servicio.costo_taller = costo_taller
+            servicio.precio_cliente = precio_cliente
+            servicio.descripcion = descripcion
+            servicio.tiempo_estimado = tiempo_estimado
+            servicio.save()
+
+            messages.success(request, f"Servicio externo '{servicio.nombre}' actualizado exitosamente")
+            return redirect("servicios:otros_servicios_menu")
+
+        except Exception as e:
+            messages.error(request, f"Error al actualizar servicio externo: {str(e)}")
+
+    # GET: Mostrar formulario
+    categorias = CategoriaServicio.objects.filter(country=country_code)
+
+    context = {
+        "servicio": servicio,
+        "categorias": categorias,
+        "country": country_code,
+    }
+
+    template_name = select_country_lang_template(
+        "servicios/editar_otro_servicio.html", country_code, lang
+    )
+
+    return render(request, template_name, context)
+
+
+@login_required
+@require_POST
+@login_required
+def eliminar_otro_servicio(request, pk):
+    """Vista para eliminar servicios externos - FILTRADO POR EMPRESA"""
+    from django.contrib import messages
+    from django.shortcuts import get_object_or_404, redirect
+
+    from taller.servicios.models import ServicioExterno
+
+    # 🔒 BLINDAJE MULTI-TENANT: Verificar empresa antes de buscar
+    empresa = getattr(request.user, "empresa", None)
+    if not empresa:
+        messages.error(request, "Usuario sin empresa asignada")
+        return redirect("servicios:otros_servicios_menu")
+    
+    servicio = get_object_or_404(ServicioExterno, pk=pk, empresa=empresa)
+    nombre_servicio = servicio.nombre
+    servicio.delete()
+
+    messages.success(request, f"Servicio externo '{nombre_servicio}' eliminado exitosamente")
+    return redirect("servicios:otros_servicios_menu")
+
+
 import logging
 
 log = logging.getLogger(__name__)
 from .views_cbv import (
     ServicioCreateView,
+    ServicioDeleteView,
     ServicioDetailView,
     ServicioListView,
     ServicioUpdateView,
@@ -794,3 +883,9 @@ def crear_servicio(request, *args, **kwargs):
 def editar_servicio(request, *args, **kwargs):
     log.info("FBV shim: editar_servicio")
     return ServicioUpdateView.as_view()(request, *args, **kwargs)
+
+
+def eliminar_servicio(request, *args, **kwargs):
+    """Vista para eliminar un servicio"""
+    log.info("FBV shim: eliminar_servicio")
+    return ServicioDeleteView.as_view()(request, *args, **kwargs)

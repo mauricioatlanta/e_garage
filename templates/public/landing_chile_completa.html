@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}eGarage Chile — La Plataforma Inteligente #1 para Talleres{% endblock %}
+{% block title %}eGarage Chile — El Sistema que Acelera tu Taller y Simplifica tu Vida{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -74,7 +74,27 @@
   .impact-metric {
     font-size: 1.5rem;
     font-weight: bold;
-    color: #10b981; /* Verde más sobrio */
+    color: #06b6d4; /* Cyan neón */
+  }
+
+  /* Efectos de neón para botones y elementos destacados */
+  .neon-glow {
+    box-shadow: 0 0 10px rgba(6, 182, 212, 0.5),
+                0 0 20px rgba(6, 182, 212, 0.3),
+                0 0 30px rgba(6, 182, 212, 0.2);
+  }
+
+  .neon-glow-green {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.5),
+                0 0 20px rgba(16, 185, 129, 0.3),
+                0 0 30px rgba(16, 185, 129, 0.2);
+  }
+
+  /* Responsive mejorado para móviles */
+  @media (max-width: 640px) {
+    .eg-card-hover:hover {
+      transform: none; /* Desactivar hover en móvil */
+    }
   }
 </style>
 {% endblock %}
@@ -117,50 +137,54 @@
     <!-- Partículas removidas para diseño profesional serio -->
   </div>
 
-  <!-- HERO -->
+  <!-- HERO SECTION (Impacto Directo) -->
   <div class="mx-auto max-w-7xl px-6 pt-20 pb-16 sm:pt-28">
     <div class="grid lg:grid-cols-2 gap-10 items-center">
       <div>
-        <span class="inline-flex items-center gap-2 rounded-full bg-emerald-500/10 px-3 py-1 text-emerald-300 text-sm ring-1 ring-emerald-400/30">
-          ✓ Sistema Funcional — Chile
+        <span class="inline-flex items-center gap-2 rounded-full bg-cyan-500/10 px-3 py-1 text-cyan-300 text-sm ring-1 ring-cyan-400/30 animate-pulse">
+          ⚡ Sistema que Acelera tu Taller — Chile
         </span>
         <h1 class="mt-6 text-4xl sm:text-6xl font-extrabold tracking-tight leading-tight">
-          La Plataforma Inteligente <span class="text-emerald-400">#1 para Talleres</span> en Chile
+          El sistema que <span class="text-cyan-400">acelera tu taller</span> y simplifica tu vida.
         </h1>
         <p class="mt-6 text-xl text-slate-300/90 leading-relaxed">
-          Deja atrás el Excel y el papel. eGarage es el sistema en la nube diseñado para talleres automotrices chilenos que quieren ordenar su negocio, aumentar la rentabilidad y dar una experiencia profesional a sus clientes.
+          Gestiona servicios en segundos y genera archivos de facturación masiva o individual para el SII con un solo clic. 
+          <strong class="text-white">Creado por mecánicos para dueños de talleres que quieren ser millonarios.</strong>
         </p>
-        <p class="mt-4 text-lg text-emerald-300 font-semibold">
-          Funciones reales. Soporte en español. IA aplicada al día a día del taller.
+        <p class="mt-4 text-lg text-cyan-300 font-semibold">
+          ⚡ Sin fricción. ⚡ Sin burocracia. ⚡ Solo resultados.
         </p>
         <div class="mt-10 flex flex-wrap gap-4">
-          <a href="{% url 'account_signup' %}?plan=free" class="rounded-xl px-6 py-4 font-bold bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg transition text-lg">
+          <a href="{% url 'account_signup' %}?plan=free" class="rounded-xl px-8 py-5 font-bold bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-white shadow-2xl transition-all transform hover:scale-105 text-lg animate-pulse">
             <span class="flex items-center gap-2">
-              <span>🚀</span> Probar Gratis 30 días
+              <span>🚀</span> ¡Haz crecer mi taller ahora!
             </span>
           </a>
-          <a href="{% url 'precios' %}" class="rounded-xl px-6 py-4 font-semibold ring-2 ring-slate-500/40 hover:bg-slate-800/50 text-slate-200 transition text-lg">
+          <a href="{% url 'precios' %}" class="rounded-xl px-6 py-5 font-semibold ring-2 ring-cyan-500/40 hover:bg-cyan-900/30 text-cyan-200 transition text-lg">
             <span class="flex items-center gap-2">
-              <span>💳</span> PLANES
+              <span>💳</span> Ver Planes
             </span>
           </a>
         </div>
+        <p class="mt-6 text-sm text-cyan-400 font-medium">
+          Únete a la red de talleres más eficientes de Chile.
+        </p>
         <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm text-slate-400">
           <div class="flex items-center gap-2">
-            <span class="text-emerald-400">✓</span>
+            <span class="text-cyan-400">✓</span>
             Sin tarjeta para prueba
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-emerald-400">✓</span>
+            <span class="text-cyan-400">✓</span>
             Usuarios ilimitados
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-emerald-400">✓</span>
+            <span class="text-cyan-400">✓</span>
             Soporte en español
           </div>
           <div class="flex items-center gap-2">
-            <span class="text-emerald-400">✓</span>
-            Adaptado a Chile
+            <span class="text-cyan-400">✓</span>
+            100% Compatible SII
           </div>
         </div>
       </div>
@@ -177,18 +201,108 @@
     </div>
   </div>
 
-  <!-- ¿QUÉ ES EGARAGE? -->
+  <!-- SECCIÓN: ADIÓS A LA BUROCRACIA SII (Nuestra Ventaja Competitiva) -->
+  <section class="mx-auto max-w-7xl px-6 py-16">
+    <div class="rounded-3xl bg-gradient-to-br from-cyan-900/40 via-emerald-900/40 to-cyan-900/40 ring-2 ring-cyan-400/50 p-10 md:p-12 backdrop-blur-sm">
+      <div class="text-center mb-8">
+        <span class="inline-flex items-center gap-2 rounded-full bg-cyan-500/20 px-4 py-2 text-cyan-300 text-sm ring-1 ring-cyan-400/50 mb-4">
+          🎯 Nuestra Ventaja Competitiva
+        </span>
+        <h2 class="text-3xl md:text-5xl font-extrabold mb-4">
+          Adiós a la <span class="text-cyan-400">Burocracia del SII</span>
+        </h2>
+        <p class="text-xl text-slate-200/90 max-w-3xl mx-auto">
+          El único sistema que entiende que un mecánico no tiene tiempo para llenar 10 campos mientras tiene al cliente al frente y las manos con grasa.
+        </p>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-8 mt-12">
+        <!-- Flujo Inteligente -->
+        <div class="bg-slate-900/60 rounded-2xl p-8 ring-1 ring-cyan-400/30">
+          <div class="text-4xl mb-4">⚡</div>
+          <h3 class="text-2xl font-bold text-cyan-300 mb-4">Registro Veloz</h3>
+          <p class="text-slate-300/90 leading-relaxed mb-4">
+            Registra clientes solo con <strong class="text-white">nombre y teléfono</strong> para no perder tiempo. 
+            Crea órdenes de trabajo en <strong class="text-cyan-400">10 segundos</strong>. Sin fricción.
+          </p>
+          <div class="flex items-center gap-2 text-cyan-400 text-sm font-semibold">
+            <span>✓</span>
+            <span>Sin campos obligatorios innecesarios</span>
+          </div>
+        </div>
+
+        <div class="bg-slate-900/60 rounded-2xl p-8 ring-1 ring-emerald-400/30">
+          <div class="text-4xl mb-4">🤖</div>
+          <h3 class="text-2xl font-bold text-emerald-300 mb-4">Asistente Inteligente SII</h3>
+          <p class="text-slate-300/90 leading-relaxed mb-4">
+            Si el cliente pide factura, eGarage activa un asistente que te pide el <strong class="text-white">RUT y Giro</strong>, 
+            generando el archivo compatible con el portal SII de inmediato.
+          </p>
+          <div class="flex items-center gap-2 text-emerald-400 text-sm font-semibold">
+            <span>✓</span>
+            <span>Validación de RUT en tiempo real (Módulo 11)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-8 text-center">
+        <p class="text-2xl font-bold text-cyan-300 mb-2">
+          No más pérdida de tiempo digitando en el portal del SII.
+        </p>
+        <p class="text-xl text-slate-200/90">
+          <strong class="text-white">Exporta, sube y factura.</strong> Todo en un solo paso.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- TARJETAS DE BENEFICIOS (Virtudes) -->
   <section class="mx-auto max-w-7xl px-6 py-16">
     <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-bold">¿Qué es eGarage?</h2>
+      <h2 class="text-3xl md:text-4xl font-bold mb-4">Por qué eGarage es Diferente</h2>
+      <p class="text-xl text-slate-300/90">Diseñado para mecánicos, no para contadores</p>
     </div>
-    <div class="max-w-4xl mx-auto">
-      <p class="text-xl text-slate-300/90 leading-relaxed text-center">
-        eGarage es una plataforma web tipo ERP, en la nube, que integra <strong class="text-white">trabajos</strong>, <strong class="text-white">inventario</strong>, <strong class="text-white">clientes</strong>, <strong class="text-white">documentos</strong> y <strong class="text-white">reportes</strong> con <strong class="text-emerald-400">IA para optimizar decisiones</strong>.
-      </p>
-      <p class="mt-6 text-lg text-slate-300/80 leading-relaxed text-center">
-        Está adaptado a la realidad de talleres en Chile (no solo una traducción). Diseñado específicamente para cumplir con las necesidades del mercado automotriz chileno.
-      </p>
+
+    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <!-- Registro Veloz -->
+      <div class="rounded-2xl p-6 bg-gradient-to-br from-cyan-900/40 to-slate-900/60 ring-1 ring-cyan-400/30 eg-card-hover">
+        <div class="text-4xl mb-4">⚡</div>
+        <div class="text-xl font-bold mb-3 text-cyan-300">Registro Veloz</div>
+        <p class="text-slate-300/90 text-sm leading-relaxed">
+          Crea órdenes de trabajo en <strong class="text-white">10 segundos</strong>. Sin fricción. 
+          Sin campos obligatorios innecesarios.
+        </p>
+      </div>
+
+      <!-- Ficha Evolutiva -->
+      <div class="rounded-2xl p-6 bg-gradient-to-br from-emerald-900/40 to-slate-900/60 ring-1 ring-emerald-400/30 eg-card-hover">
+        <div class="text-4xl mb-4">🔄</div>
+        <div class="text-xl font-bold mb-3 text-emerald-300">Ficha de Cliente Evolutiva</div>
+        <p class="text-slate-300/90 text-sm leading-relaxed">
+          El cliente empieza como <strong class="text-white">persona natural</strong> y crece a <strong class="text-white">empresa</strong> 
+          sin perder su historial. Un solo registro, múltiples usos.
+        </p>
+      </div>
+
+      <!-- Control Total -->
+      <div class="rounded-2xl p-6 bg-gradient-to-br from-purple-900/40 to-slate-900/60 ring-1 ring-purple-400/30 eg-card-hover">
+        <div class="text-4xl mb-4">🎛️</div>
+        <div class="text-xl font-bold mb-3 text-purple-300">Control Total</div>
+        <p class="text-slate-300/90 text-sm leading-relaxed">
+          Repuestos, mano de obra y estados de pago en <strong class="text-white">un solo lugar</strong>. 
+          Dashboard inteligente con métricas en tiempo real.
+        </p>
+      </div>
+
+      <!-- Compatibilidad Total Chile -->
+      <div class="rounded-2xl p-6 bg-gradient-to-br from-yellow-900/40 to-slate-900/60 ring-1 ring-yellow-400/30 eg-card-hover">
+        <div class="text-4xl mb-4">🇨🇱</div>
+        <div class="text-xl font-bold mb-3 text-yellow-300">Compatibilidad Total Chile</div>
+        <p class="text-slate-300/90 text-sm leading-relaxed">
+          Validado con <strong class="text-white">algoritmos de RUT chileno (Módulo 11)</strong> y 
+          <strong class="text-white">listado oficial de comunas</strong>. El SII nunca rechazará tu archivo.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -298,11 +412,11 @@
     </div>
   </section>
 
-  <!-- VENTAJAS / BENEFICIOS -->
+  <!-- VENTAJAS / BENEFICIOS (Mantener sección existente pero con mejor diseño) -->
   <section id="ventajas" class="mx-auto max-w-7xl px-6 py-16">
     <div class="text-center mb-12">
-      <h2 class="text-3xl md:text-4xl font-bold">Ventajas de usar eGarage</h2>
-      <p class="mt-4 text-xl text-slate-300/90">Todo lo que necesitas para hacer crecer tu taller</p>
+      <h2 class="text-3xl md:text-4xl font-bold">Todo lo que Necesitas para Hacer Crecer tu Taller</h2>
+      <p class="mt-4 text-xl text-slate-300/90">Funciones reales. Resultados medibles. Crecimiento garantizado.</p>
     </div>
 
     <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -679,29 +793,48 @@
     </div>
   </section>
 
-  <!-- CTA FINAL -->
+  <!-- CTA FINAL (Llamado a la Acción Mejorado) -->
   <section class="mx-auto max-w-7xl px-6 pb-24">
-    <div class="rounded-3xl bg-gradient-to-br from-emerald-900/40 to-sky-900/40 ring-2 ring-emerald-400/50 p-10 md:p-12">
-      <div class="text-center">
-        <h3 class="text-3xl md:text-4xl font-bold mb-6">¿Listo para dejar atrás el Excel y el papel?</h3>
-        <p class="text-xl text-slate-200/90 mb-8 max-w-2xl mx-auto">
-          Únete a los talleres chilenos que ya están trabajando de forma más inteligente con eGarage.
+    <div class="rounded-3xl bg-gradient-to-br from-cyan-900/50 via-emerald-900/50 to-cyan-900/50 ring-2 ring-cyan-400/60 p-10 md:p-16 backdrop-blur-sm relative overflow-hidden">
+      <!-- Efectos de fondo animados -->
+      <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-transparent to-emerald-500/10 animate-pulse"></div>
+      <div class="relative z-10 text-center">
+        <h3 class="text-3xl md:text-5xl font-extrabold mb-6 text-white">
+          ¿Listo para <span class="text-cyan-400">acelerar tu taller</span> y <span class="text-emerald-400">simplificar tu vida</span>?
+        </h3>
+        <p class="text-xl md:text-2xl text-slate-200/90 mb-8 max-w-3xl mx-auto font-semibold">
+          Únete a la red de talleres más eficientes de Chile. 
+          <span class="text-cyan-300">Sin burocracia. Sin fricción. Solo resultados.</span>
         </p>
-        <div class="flex flex-wrap justify-center gap-4">
-          <a href="{% url 'account_signup' %}?plan=free" class="inline-block rounded-2xl px-8 py-5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-bold text-xl shadow-lg transition eg-glow-button">
+        <div class="flex flex-wrap justify-center gap-4 mb-6">
+          <a href="{% url 'account_signup' %}?plan=free" class="inline-block rounded-2xl px-10 py-6 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-white font-extrabold text-xl md:text-2xl shadow-2xl transition-all transform hover:scale-105 eg-glow-button animate-pulse">
             <span class="flex items-center gap-3">
-              <span>🚀</span> Probar Gratis 30 días
+              <span>🚀</span> ¡Haz crecer mi taller ahora!
             </span>
           </a>
-          <a href="{% url 'precios' %}" class="inline-block rounded-2xl px-8 py-5 ring-2 ring-slate-500/40 hover:bg-slate-800/50 text-slate-200 font-bold text-xl transition">
+          <a href="{% url 'precios' %}" class="inline-block rounded-2xl px-8 py-6 ring-2 ring-cyan-400/60 hover:bg-cyan-900/40 text-cyan-200 font-bold text-lg md:text-xl transition">
             <span class="flex items-center gap-3">
-              <span>💳</span> PLANES
+              <span>💳</span> Ver Planes y Precios
             </span>
           </a>
         </div>
-        <p class="mt-6 text-sm text-slate-300">
-          30 días gratis • Sin tarjeta de crédito • Usuarios ilimitados • Soporte en español
+        <p class="mt-6 text-base md:text-lg text-cyan-300 font-medium">
+          30 días gratis • Sin tarjeta de crédito • Usuarios ilimitados • Soporte en español • 100% Compatible SII
         </p>
+        <div class="mt-8 flex flex-wrap justify-center gap-6 text-sm text-slate-400">
+          <div class="flex items-center gap-2">
+            <span class="text-cyan-400">✓</span>
+            <span>Validación RUT Módulo 11</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-cyan-400">✓</span>
+            <span>Comunas oficiales SII</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-cyan-400">✓</span>
+            <span>Exportación CSV instantánea</span>
+          </div>
+        </div>
       </div>
     </div>
   </section>

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌎 {{ country_name }} - Detalle | eGarage Admin</title>
+    
+    <!-- Fuentes futuristas -->
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Exo+2:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --neon-cyan: #00f5ff;
+            --neon-pink: #ff00ff;
+            --neon-green: #00ff88;
+            --neon-blue: #0066ff;
+            --neon-purple: #b347d9;
+            --dark-bg: #0a0a0f;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Exo 2', sans-serif;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%),
+                linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .orbitron {
+            font-family: 'Orbitron', monospace;
+        }
+
+        /* Header */
+        .header-compact {
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid var(--neon-cyan);
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn-back {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .btn-back:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 10px rgba(0, 245, 255, 0.3);
+        }
+
+        .country-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--neon-cyan);
+        }
+
+        /* Contenedor principal */
+        .main-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Tabs */
+        .tabs-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(0, 245, 255, 0.3);
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 1rem;
+            border-bottom: 2px solid rgba(0, 245, 255, 0.2);
+            margin-bottom: 2rem;
+        }
+
+        .tab-button {
+            background: transparent;
+            border: none;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-family: 'Exo 2', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .tab-button:hover {
+            color: var(--neon-cyan);
+        }
+
+        .tab-button.active {
+            color: var(--neon-cyan);
+            border-bottom-color: var(--neon-cyan);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Cards */
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .glass-card:hover {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 8px 32px rgba(0, 245, 255, 0.2);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.3rem;
+            color: var(--neon-cyan);
+            margin-bottom: 1rem;
+        }
+
+        /* Resumen país */
+        .resumen-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .resumen-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .resumen-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.5rem;
+        }
+
+        .resumen-value {
+            font-family: 'Orbitron', monospace;
+            font-size: 2rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, var(--neon-cyan), var(--neon-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Gráficos */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+
+        /* Tabla de empresas */
+        .empresas-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .empresas-table th {
+            background: rgba(0, 245, 255, 0.1);
+            border: 1px solid rgba(0, 245, 255, 0.3);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--neon-cyan);
+        }
+
+        .empresas-table td {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0.75rem 1rem;
+        }
+
+        .empresas-table tr:hover {
+            background: rgba(0, 245, 255, 0.05);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-trial {
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+            border: 1px solid #ffaa00;
+        }
+
+        .badge-basic {
+            background: rgba(0, 245, 255, 0.2);
+            color: var(--neon-cyan);
+            border: 1px solid var(--neon-cyan);
+        }
+
+        .badge-premium {
+            background: rgba(255, 0, 255, 0.2);
+            color: var(--neon-pink);
+            border: 1px solid var(--neon-pink);
+        }
+
+        .badge-enterprise {
+            background: rgba(0, 255, 136, 0.2);
+            color: var(--neon-green);
+            border: 1px solid var(--neon-green);
+        }
+
+        /* Botones de acción */
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .action-btn {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.2), rgba(0, 255, 136, 0.2));
+            border: 1px solid var(--neon-cyan);
+            border-radius: 8px;
+            padding: 0.75rem 1.5rem;
+            color: #fff;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, rgba(0, 245, 255, 0.4), rgba(0, 255, 136, 0.4));
+            box-shadow: 0 0 15px rgba(0, 245, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--neon-cyan);
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header-compact">
+        <div class="header-left">
+            <a href="/analytics/admin/centro-control-america/" class="btn-back">← Volver</a>
+            <h1 class="country-title">{{ country_name }}</h1>
+        </div>
+    </header>
+
+    <!-- Contenedor principal -->
+    <div class="main-container">
+        <div class="tabs-container">
+            <!-- Tabs -->
+            <div class="tabs-header">
+                <button class="tab-button active" onclick="switchTab('resumen')">Resumen</button>
+                <button class="tab-button" onclick="switchTab('empresas')">Empresas</button>
+                <button class="tab-button" onclick="switchTab('actividad')">Actividad</button>
+                <button class="tab-button" onclick="switchTab('facturacion')">Facturación</button>
+            </div>
+
+            <!-- Tab: Resumen -->
+            <div id="tab-resumen" class="tab-content active">
+                <div id="resumenContent" class="loading">Cargando datos del país...</div>
+            </div>
+
+            <!-- Tab: Empresas -->
+            <div id="tab-empresas" class="tab-content">
+                <div class="glass-card">
+                    <h2 class="card-title">Empresas Suscritas</h2>
+                    <table class="empresas-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Rubro</th>
+                                <th>Plan</th>
+                                <th>Estado</th>
+                                <th>Fecha Alta</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for empresa in empresas %}
+                            <tr>
+                                <td>{{ empresa.nombre_taller }}</td>
+                                <td>
+                                    {% if empresa.config %}
+                                        {{ empresa.config.get_rubro_principal_display|default:"N/A" }}
+                                    {% else %}
+                                        N/A
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <span class="badge badge-{{ empresa.plan }}">
+                                        {{ empresa.get_plan_display }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if empresa.suscripcion_activa %}
+                                        <span style="color: #00ff88;">✓ Activa</span>
+                                    {% else %}
+                                        <span style="color: #ff4444;">✗ Inactiva</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ empresa.fecha_inicio|date:"d/m/Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 2rem;">
+                                    No hay empresas registradas
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Tab: Actividad -->
+            <div id="tab-actividad" class="tab-content">
+                <div class="glass-card">
+                    <h2 class="card-title">Actividad</h2>
+                    <p style="color: rgba(255,255,255,0.7);">
+                        Métricas de actividad próximamente disponibles.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Tab: Facturación -->
+            <div id="tab-facturacion" class="tab-content">
+                <div class="glass-card">
+                    <h2 class="card-title">Facturación</h2>
+                    <div class="chart-container">
+                        <canvas id="facturacionChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="action-buttons">
+            <a href="/analytics/admin/region/{{ country_code|lower }}/?tab=empresas" class="action-btn">
+                Ver lista completa de empresas
+            </a>
+            <a href="#" class="action-btn">
+                Ver embudo de ventas
+            </a>
+            <a href="#" class="action-btn">
+                Ver mapa interno (próximamente)
+            </a>
+        </div>
+    </div>
+
+    <script>
+        const countryCode = '{{ country_code }}';
+        let facturacionChart = null;
+
+        // Cambiar tab
+        function switchTab(tabName) {
+            // Ocultar todos los tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // Mostrar tab seleccionado
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            event.target.classList.add('active');
+
+            // Cargar datos si es necesario
+            if (tabName === 'resumen') {
+                loadCountryDetail();
+            } else if (tabName === 'facturacion') {
+                loadFacturacionChart();
+            }
+        }
+
+        // Cargar detalle del país
+        async function loadCountryDetail() {
+            try {
+                const response = await fetch(`/analytics/admin/api/region/${countryCode.toLowerCase()}/resumen/`);
+                const data = await response.json();
+
+                const resumenContent = document.getElementById('resumenContent');
+                
+                // Resumen país
+                let html = `
+                    <div class="resumen-grid">
+                        <div class="resumen-item">
+                            <div class="resumen-label">Total Suscriptores</div>
+                            <div class="resumen-value">${data.resumen.total}</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-label">Activos</div>
+                            <div class="resumen-value">${data.resumen.activos}</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-label">Nuevos (30 días)</div>
+                            <div class="resumen-value">${data.resumen.nuevos_30d}</div>
+                        </div>
+                        <div class="resumen-item">
+                            <div class="resumen-label">MRR País</div>
+                            <div class="resumen-value">${formatCurrency(data.resumen.mrr)}</div>
+                        </div>
+                    </div>
+                `;
+
+                // Distribución por plan
+                if (data.distribucion_plan && data.distribucion_plan.length > 0) {
+                    html += `
+                        <div class="glass-card">
+                            <h2 class="card-title">Distribución por Plan</h2>
+                            <div class="chart-container">
+                                <canvas id="planChart"></canvas>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Distribución por rubro
+                if (data.distribucion_rubro && data.distribucion_rubro.length > 0) {
+                    html += `
+                        <div class="glass-card">
+                            <h2 class="card-title">Distribución por Rubro</h2>
+                            <div class="chart-container">
+                                <canvas id="rubroChart"></canvas>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // Distribución por idioma (solo USA)
+                if (data.distribucion_idioma) {
+                    html += `
+                        <div class="glass-card">
+                            <h2 class="card-title">Distribución por Idioma</h2>
+                            <div class="chart-container">
+                                <canvas id="idiomaChart"></canvas>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                resumenContent.innerHTML = html;
+
+                // Crear gráficos
+                if (data.distribucion_plan && data.distribucion_plan.length > 0) {
+                    createPlanChart(data.distribucion_plan);
+                }
+                if (data.distribucion_rubro && data.distribucion_rubro.length > 0) {
+                    createRubroChart(data.distribucion_rubro);
+                }
+                if (data.distribucion_idioma) {
+                    createIdiomaChart(data.distribucion_idioma);
+                }
+
+            } catch (error) {
+                console.error('Error cargando detalle:', error);
+                document.getElementById('resumenContent').innerHTML = 
+                    '<p style="color: #ff4444;">Error cargando datos del país</p>';
+            }
+        }
+
+        // Crear gráfico de planes
+        function createPlanChart(data) {
+            const ctx = document.getElementById('planChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: data.map(d => d.nombre),
+                    datasets: [{
+                        data: data.map(d => d.count),
+                        backgroundColor: [
+                            'rgba(255, 170, 0, 0.8)',
+                            'rgba(0, 245, 255, 0.8)',
+                            'rgba(255, 0, 255, 0.8)',
+                            'rgba(0, 255, 136, 0.8)'
+                        ],
+                        borderColor: [
+                            '#ffaa00',
+                            '#00f5ff',
+                            '#ff00ff',
+                            '#00ff88'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#fff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Crear gráfico de rubros
+        function createRubroChart(data) {
+            const ctx = document.getElementById('rubroChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.map(d => d.nombre),
+                    datasets: [{
+                        label: 'Empresas',
+                        data: data.map(d => d.count),
+                        backgroundColor: 'rgba(0, 245, 255, 0.6)',
+                        borderColor: '#00f5ff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                color: '#fff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#fff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Crear gráfico de idiomas
+        function createIdiomaChart(data) {
+            const ctx = document.getElementById('idiomaChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.map(d => d.idioma),
+                    datasets: [{
+                        data: data.map(d => d.porcentaje),
+                        backgroundColor: [
+                            'rgba(0, 245, 255, 0.8)',
+                            'rgba(0, 255, 136, 0.8)'
+                        ],
+                        borderColor: [
+                            '#00f5ff',
+                            '#00ff88'
+                        ],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#fff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Cargar gráfico de facturación
+        function loadFacturacionChart() {
+            if (facturacionChart) return;
+
+            const ctx = document.getElementById('facturacionChart').getContext('2d');
+            facturacionChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
+                    datasets: [{
+                        label: 'MRR',
+                        data: [0, 0, 0, 0, 0, 0],
+                        borderColor: '#00f5ff',
+                        backgroundColor: 'rgba(0, 245, 255, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#fff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            ticks: {
+                                color: '#fff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#fff'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Formatear moneda
+        function formatCurrency(value) {
+            if (value >= 1000000) {
+                return '$' + (value / 1000000).toFixed(1) + 'M';
+            } else if (value >= 1000) {
+                return '$' + (value / 1000).toFixed(1) + 'K';
+            }
+            return '$' + value.toFixed(0);
+        }
+
+        // Cargar datos al iniciar
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCountryDetail();
+        });
+    </script>
+</body>
+</html>
+

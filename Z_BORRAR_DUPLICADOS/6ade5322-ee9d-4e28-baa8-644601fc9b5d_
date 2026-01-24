@@ -1,0 +1,219 @@
+{% extends "taller/documentos/base/base_documento.html" %}
+{% load static %}
+{% load humanize %}
+{% load i18n %}
+{% load country_url %}
+
+{% block title %}{{ empresa.nombre_taller }} - Document List{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 🎨 Futuristic style for document list */
+:root {
+    --cyber-blue: #00ffff;
+    --cyber-green: #00ff88;
+    --cyber-purple: #8000ff;
+    --cyber-red: #ff0044;
+    --cyber-gold: #ffd700;
+    --cyber-orange: #ff8800;
+    --dark-bg: #0a0a0a;
+    --card-bg: rgba(16, 20, 24, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.cyber-container {
+    background: var(--card-bg);
+    border: 1px solid var(--cyber-blue);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
+}
+
+.document-card {
+    background: linear-gradient(145deg, var(--glass-bg), rgba(0, 255, 255, 0.05));
+    border: 1px solid var(--cyber-blue);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.3s ease;
+}
+
+.document-card:hover {
+    border-color: var(--cyber-green);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    transform: translateY(-2px);
+}
+
+.create-button {
+    background: linear-gradient(45deg, var(--cyber-green), var(--cyber-blue));
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+}
+
+.create-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+}
+
+.action-button {
+    background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green));
+    border: none;
+    border-radius: 20px;
+    padding: 8px 16px;
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 0.8rem;
+    transition: all 0.3s ease;
+    display: inline-block;
+}
+
+.action-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.action-button.secondary {
+    background: linear-gradient(45deg, var(--cyber-purple), var(--cyber-orange));
+}
+
+.action-button.danger {
+    background: linear-gradient(45deg, var(--cyber-red), #ff6666);
+    color: #fff;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div style="position: fixed; top: 60px; left: 10px; width: 200px; height: 80px; background-color: #00ff00; z-index: 9999; border: 3px solid #000; display: flex; flex-direction: column; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 10px; padding: 5px;">
+  <div> US/EN DOCS LIST</div>
+  <div>Template loaded</div>
+  <div>Path: {{ request.path }}</div>
+  <div>Lang: {{ LANGUAGE_CODE }}</div>
+</div>
+
+<div class="max-w-7xl mx-auto p-6">
+    <!-- 🏢 Header -->
+    <div class="cyber-container p-8 mb-6 text-center">
+        <h1 class="text-4xl font-bold text-cyan-400 mb-2">
+            📄 {% trans "Document Management" %}
+        </h1>
+        <p class="text-gray-300">{{ empresa.nombre_taller }} - {% trans "Work Order List" %}</p>
+        <p class="text-gray-500 text-sm mt-2">{% trans "User" %}: {{ user.username }} | {{ empresa.get_pais_display }}</p>
+    </div>
+
+    <!-- ➕ Create Button -->
+    <div class="text-center mb-6">
+        <a href="{% country_url 'documentos:documento_crear' %}" class="create-button">
+            ➕ {% trans "Create New Document" %}
+        </a>
+    </div>
+
+    <!-- 📋 Document List -->
+    <div class="cyber-container p-6">
+        <h2 class="text-2xl font-bold text-cyan-400 mb-6 text-center">
+            📋 {% trans "Work Orders" %}
+        </h2>
+
+        {% if documentos %}
+            <div class="space-y-4">
+            {% for documento in documentos %}
+            <div class="document-card">
+                <div class="flex justify-between items-center mb-4">
+                    <div class="text-xl font-bold text-cyan-400">
+                        📄 {{ documento.tipo_documento|default:"{% trans 'Document' %}" }} #{{ documento.id }}
+                    </div>
+                    <div class="px-4 py-1 rounded-full text-sm font-bold bg-cyan-500 text-black">
+                        {{ documento.estado|default:"{% trans 'Pending' %}"|title }}
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4 text-sm">
+                    <div>
+                        <div class="text-gray-400 uppercase text-xs">{% trans "Customer" %}</div>
+                        <div class="text-white font-bold">{{ documento.cliente.nombre|default:"{% trans 'No customer' %}" }} {{ documento.cliente.apellido|default:"" }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 uppercase text-xs">{% trans "Vehicle" %}</div>
+                        <div class="text-white font-bold">{{ documento.vehiculo.patente|default:"{% trans 'No vehicle' %}" }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 uppercase text-xs">{% trans "Date" %}</div>
+                        <div class="text-white font-bold">{{ documento.fecha_creacion|date:"m/d/Y"|default:"{% trans 'N/A' %}" }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 uppercase text-xs">{% trans "Total" %}</div>
+                        <div class="text-white font-bold">${{ documento.total|floatformat:2|default:"0.00" }}</div>
+                    </div>
+                    <div>
+                        <div class="text-gray-400 uppercase text-xs">{% trans "Technician" %}</div>
+                        <div class="text-white font-bold">{{ documento.tecnico_responsable.nombre|default:"{% trans 'Unassigned' %}" }}</div>
+                    </div>
+                </div>
+
+                <div class="flex gap-2 flex-wrap">
+                    <a href="{% country_url 'documentos:ver_documento' documento.id %}" class="action-button">
+                        👁️ {% trans "View" %}
+                    </a>
+                    <a href="{% country_url 'documentos:documento_editar' documento.id %}" class="action-button secondary">
+                        ✏️ {% trans "Edit" %}
+                    </a>
+                    <a href="{% country_url 'documentos:exportar_documento_pdf' documento.id %}" class="action-button secondary">
+                        📄 {% trans "PDF" %}
+                    </a>
+                    <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="action-button danger">
+                        🗑️ {% trans "Delete" %}
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-12">
+                <div class="text-6xl mb-4 opacity-50">📄</div>
+                <div class="text-2xl text-gray-300 mb-2">{% trans "No documents" %}</div>
+                <div class="text-gray-400 mb-6">
+                    {% trans "No work orders have been created yet" %}.<br>
+                    {% trans "Create your first document to start managing the shop" %}.
+                </div>
+                <a href="{% country_url 'documentos:documento_crear' %}" class="create-button">
+                    ➕ {% trans "Create First Document" %}
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- 📊 Quick Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+        <div class="cyber-container p-6 text-center">
+            <div class="text-3xl font-bold text-cyan-400">{{ documentos.count|default:"0" }}</div>
+            <div class="text-sm text-gray-400">{% trans "Total Documents" %}</div>
+        </div>
+        <div class="cyber-container p-6 text-center">
+            <div class="text-3xl font-bold text-orange-400">{{ documentos_pendientes|default:"0" }}</div>
+            <div class="text-sm text-gray-400">{% trans "Pending" %}</div>
+        </div>
+        <div class="cyber-container p-6 text-center">
+            <div class="text-3xl font-bold text-blue-400">{{ documentos_proceso|default:"0" }}</div>
+            <div class="text-sm text-gray-400">{% trans "In Progress" %}</div>
+        </div>
+        <div class="cyber-container p-6 text-center">
+            <div class="text-3xl font-bold text-green-400">{{ documentos_completados|default:"0" }}</div>
+            <div class="text-sm text-gray-400">{% trans "Completed" %}</div>
+        </div>
+    </div>
+</div>
+{% endblock %}

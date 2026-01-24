@@ -321,6 +321,7 @@ body {
             <!-- Formulario -->
             <form method="POST" action="{% url 'venezuela:account_login' %}">
                 {% csrf_token %}
+                {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
                 <!-- Email o Usuario -->
                 <div class="form-group">
@@ -342,8 +343,8 @@ body {
 
                 <!-- Remember me -->
                 <div class="checkbox-container">
-                    {{ form.remember|add_class:"form-checkbox" }}
-                    <label for="id_remember" class="checkbox-label">
+                    {{ form.remember_me|add_class:"form-checkbox" }}
+                    <label for="id_remember_me" class="checkbox-label">
                         Mantener sesión iniciada
                     </label>
                 </div>

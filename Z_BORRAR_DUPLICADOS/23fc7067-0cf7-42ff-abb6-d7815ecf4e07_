@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% block extra_head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto py-12">
+  <h1 class="text-4xl font-extrabold text-center mb-10 futuristic-glow">Panel de Suscripciones</h1>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+    <div class="glass-3d p-8 rounded-2xl text-center shadow-xl">
+      <div class="text-6xl font-bold text-lime-400 mb-2">{{ activas }}</div>
+      <div class="text-xl text-cyan-100">Activas</div>
+    </div>
+    <div class="glass-3d p-8 rounded-2xl text-center shadow-xl">
+      <div class="text-6xl font-bold text-yellow-300 mb-2">{{ por_vencer }}</div>
+      <div class="text-xl text-cyan-100">Por vencer (≤5 días)</div>
+    </div>
+    <div class="glass-3d p-8 rounded-2xl text-center shadow-xl">
+      <div class="text-6xl font-bold text-fuchsia-400 mb-2">{{ vencidas }}</div>
+      <div class="text-xl text-cyan-100">Vencidas</div>
+    </div>
+  </div>
+
+  <!-- Filtros por plan -->
+  <div class="flex flex-wrap gap-4 justify-center mb-8">
+    <a href="?plan=all" class="px-6 py-2 rounded-full font-bold shadow-md transition-all text-lg bg-gradient-to-r from-cyan-400 via-lime-400 to-fuchsia-500 text-gray-900 hover:scale-105">Todos</a>
+    <a href="?plan=trial" class="px-6 py-2 rounded-full font-bold shadow-md transition-all text-lg bg-[#23263a] text-lime-400 hover:scale-105">Trial</a>
+    <a href="?plan=mensual" class="px-6 py-2 rounded-full font-bold shadow-md transition-all text-lg bg-cyan-400 text-gray-900 hover:scale-105">Mensual</a>
+    <a href="?plan=semestral" class="px-6 py-2 rounded-full font-bold shadow-md transition-all text-lg bg-fuchsia-500 text-white hover:scale-105">Semestral</a>
+    <a href="?plan=anual" class="px-6 py-2 rounded-full font-bold shadow-md transition-all text-lg bg-lime-400 text-gray-900 hover:scale-105">Anual</a>
+  </div>
+
+  <!-- Gráfico Chart.js -->
+  <div class="bg-[#181c1f] rounded-2xl p-8 shadow-xl mb-12">
+    <canvas id="suscripcionesChart" height="120"></canvas>
+  </div>
+
+  <!-- Alertas visuales -->
+  {% if por_vencer > 0 %}
+    <div class="mb-4 p-4 rounded-xl bg-yellow-900/80 text-yellow-200 text-xl text-center font-bold shadow-lg animate-pulse">
+      ¡Atención! Hay {{ por_vencer }} suscripciones por vencer en los próximos días.
+    </div>
+  {% endif %}
+  {% if vencidas > 0 %}
+    <div class="mb-4 p-4 rounded-xl bg-fuchsia-900/80 text-fuchsia-200 text-xl text-center font-bold shadow-lg animate-pulse">
+      Hay {{ vencidas }} suscripciones vencidas. ¡Toma acción!
+    </div>
+  {% endif %}
+</div>
+<script>
+const ctx = document.getElementById('suscripcionesChart').getContext('2d');
+const chartData = {
+  labels: {{ chart_labels|safe }},
+  datasets: [{
+    label: 'Suscripciones por plan',
+    data: {{ chart_data|safe }},
+    backgroundColor: [
+      '#a3ff12', '#00ffe7', '#ff00ea', '#facc15'
+    ],
+    borderWidth: 2
+  }]
+};
+const suscripcionesChart = new Chart(ctx, {
+  type: 'doughnut',
+  data: chartData,
+  options: {
+    plugins: {
+      legend: { position: 'bottom', labels: { color: '#eafcff', font: { size: 18 } } }
+    }
+  }
+});
+</script>
+{% endblock %}

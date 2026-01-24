@@ -3,7 +3,7 @@ from allauth.account.views import SignupView
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
-from django.shortcuts import redirect
+from django.shortcuts import redirect, render
 from django.utils.translation import activate
 
 from taller.config.country_settings import CountrySettings
@@ -29,11 +29,13 @@ class CustomSignupView(SignupView):
         """Pasa country_code y default_phone_prefix al formulario"""
         kwargs = super().get_form_kwargs()
 
-        # Detectar país desde URL
+        # ✅ Detectar país con prioridad: 1) parámetro ?from=xx, 2) URL path, 3) request.country_code, 4) CL por defecto
+        from_param = self.request.GET.get("from", "").upper()
         current_country = (
-            CountrySettings.get_country_from_url(self.request.path)
-            or getattr(self.request, "country_code", None)
-            or "CL"
+            from_param  # Prioridad 1: parámetro ?from=xx
+            or CountrySettings.get_country_from_url(self.request.path)  # Prioridad 2: URL path
+            or getattr(self.request, "country_code", None)  # Prioridad 3: request.country_code
+            or "CL"  # Prioridad 4: CL por defecto
         )
         current_country = current_country.upper()
 
@@ -52,17 +54,17 @@ class CustomSignupView(SignupView):
         context["page_title"] = "Create Account - eGarage"
         context["is_universal_signup"] = True
 
-        # Pasar el país actual al template usando country_config
+        # Pasar el país actual al template: prioridad ?from=xx, path, request.country_code, CL
+        from_param = self.request.GET.get("from", "").upper()
         current_country = (
-            CountrySettings.get_country_from_url(self.request.path)
+            from_param
+            or CountrySettings.get_country_from_url(self.request.path)
             or getattr(self.request, "country_code", None)
             or "CL"
         )
-        current_country = current_country.upper()
+        current_country = current_country.upper() if current_country else "CL"
         context["current_country"] = current_country
-        context["country_config"] = get_country_config(
-            current_country
-        )  # ✅ Usa sistema centralizado
+        context["country_config"] = get_country_config(current_country)
 
         return context
 
@@ -71,14 +73,17 @@ class CustomSignupView(SignupView):
         Allauth maneja la creación del usuario y el envío de emails.
         El formulario (CustomSignupForm.save()) crea la empresa usando RegistrationService.
         """
-        # Obtener el país desde el formulario o desde la URL
+        # ✅ Obtener el país: 1) selección del usuario en el formulario, 2) ?from=xx, 3) URL, 4) CL por defecto
+        from_param = self.request.GET.get("from", "").upper()
         country_code = (
-            getattr(form, "country_code", None)
+            (form.cleaned_data.get("country") or "").upper().strip()  # Prioridad 1: selector de país en el form
+            or from_param
+            or getattr(form, "country_code", None)
             or CountrySettings.get_country_from_url(self.request.path)
             or getattr(self.request, "country_code", None)
             or "CL"
         )
-        country_code = country_code.upper()
+        country_code = (country_code or "CL").upper()
 
         # ✅ Configurar idioma usando country_config
         country_config = get_country_config(country_code)
@@ -92,46 +97,40 @@ class CustomSignupView(SignupView):
         # CustomSignupForm.save() crea la empresa automáticamente
         user = form.save(self.request)
 
-        # Verificar si se requiere verificación de email
+        # Obtener nombre del taller desde la empresa del usuario
+        nombre_taller = "tu taller"
+        try:
+            if hasattr(user, "empresa") and user.empresa:
+                nombre_taller = user.empresa.nombre_taller
+        except Exception:
+            # Si no hay empresa aún, usar un valor por defecto
+            pass
+
+        # Si NO se requiere verificación de email, hacer login automático
+        # para que el usuario pueda acceder directamente después de revisar el correo
         requires_email_verification = (
             getattr(settings, "ACCOUNT_EMAIL_VERIFICATION", "mandatory") == "mandatory"
         )
-
-        if requires_email_verification:
-            # Redirigir a página de registro exitoso
-            # Construir URL de registro exitoso con prefijo de país
-            registro_exitoso_url = CountrySettings.build_url(
-                country_code, "auth/registro-exitoso/", request=self.request
-            )
-            # Guardar email en sesión para mostrar en la página de éxito
-            self.request.session["registro_email"] = user.email
-            return redirect(registro_exitoso_url)
-        else:
-            # Si NO se requiere verificación, hacer login automático
+        
+        if not requires_email_verification:
+            # Login automático para acceso inmediato después de revisar correo
             backend = settings.AUTHENTICATION_BACKENDS[0]
             user.backend = backend
             login(self.request, user, backend=backend)
 
-            # Construir URL de redirección usando CountrySettings
-            namespace = country_config.get("namespace", country_code.lower())
-            dashboard_url = CountrySettings.build_url(
-                country_code, "dashboard/", request=self.request
-            )
-
-            # Mensaje de éxito personalizado según país
-            if language == "es":
-                messages.success(
-                    self.request,
-                    f"¡Cuenta creada exitosamente! Bienvenido a eGarage {country_config.get('name_es', country_code)}.",
-                )
-            else:
-                messages.success(
-                    self.request,
-                    f"Account created successfully! Welcome to eGarage {country_config.get('name_en', country_code)}.",
-                )
-
-            # Redirigir al dashboard según país
-            return redirect(dashboard_url or f"/{country_code.lower()}/dashboard/")
+        # ✅ Renderizar directamente la página de registro exitoso (Thank You Page)
+        # Esto genera expectativa y confianza antes de mostrar el dashboard vacío
+        # y evita el Error 500 al intentar redirigir a URLs que pueden no existir
+        return render(
+            self.request,
+            "taller/registro_exitoso.html",
+            {
+                "email": user.email,
+                "nombre_taller": nombre_taller,
+                "country_code": country_code,
+                "country_config": country_config,
+            },
+        )
 
     def form_invalid(self, form):
         # Mantener el idioma seleccionado en caso de error usando country_config

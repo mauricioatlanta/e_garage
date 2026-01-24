@@ -5,6 +5,7 @@ from . import api, api_servicios, views
 from . import views_moderno as views_moderno
 from . import views_inventory  # ✅ Vistas de inventario (emitir, anular)
 from . import views_pdf  # ✅ Vistas de PDF y WhatsApp
+from . import views_export_sii  # ✅ Vistas de exportación SII
 from .redirect_views import redirect_documento_crear, redirect_documento_editar
 from .views_cbv import DocumentoDetailView
 from .views_migrated import DocumentoCreateView, DocumentoDeleteView
@@ -12,6 +13,7 @@ from .views_migrated import DocumentoDetailView as MigratedDetailView
 from .views_migrated import DocumentoListView
 from .views_migrated import DocumentoUpdateView as MigratedUpdateView
 from .api_repuestos import buscar_repuestos_api  # ✅ API de autocomplete para Alpine.js
+from . import views_seguimiento  # ✅ Vistas de seguimiento y memoria
 
 # Comentado temporalmente - módulo no existe
 # sys.path.append(
@@ -141,6 +143,33 @@ urlpatterns = [
         "<int:pk>/whatsapp/enlace/",
         views_pdf.generar_enlace_whatsapp,
         name="generar_enlace_whatsapp",
+    ),
+    # Exportación CSV SII
+    path(
+        "<int:documento_id>/exportar-sii/",
+        views_export_sii.exportar_csv_sii,
+        name="exportar_csv_sii",
+    ),
+    path(
+        "<int:documento_id>/verificar-facturacion/",
+        views_export_sii.verificar_facturacion_documento,
+        name="verificar_facturacion_documento",
+    ),
+    # Seguimiento público y memoria
+    path(
+        "seguimiento/<str:token>/",
+        views_seguimiento.seguimiento_publico,
+        name="seguimiento_publico",
+    ),
+    path(
+        "<int:documento_id>/memoria/",
+        views_seguimiento.gestionar_memoria_documento,
+        name="gestionar_memoria",
+    ),
+    path(
+        "<int:documento_id>/crear-seguimiento/",
+        views_seguimiento.crear_seguimiento_publico,
+        name="crear_seguimiento_publico",
     ),
     # Endpoint de diagnóstico
     # path("lista-debug/", lista_debug, name="lista_debug"),  # Función no existe

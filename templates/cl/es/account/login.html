@@ -1,576 +1,89 @@
-{% extends 'base.html' %}
+{% extends 'base_login.html' %}
 {% load static %}
 {% load widget_tweaks %}
 {% load i18n %}
 
 {% block title %}{% trans "Sign In" %} - eGarage{% endblock %}
 
-{% block extra_head %}
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-<script src="https://cdn.tailwindcss.com"></script>
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    background: linear-gradient(135deg, #0a0a23 0%, #1a1a2e 50%, #16213e 100%);
-    font-family: 'Exo 2', sans-serif;
-    color: #ffffff;
-    min-height: 100vh;
-    overflow-x: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-}
-
-.font-futuristic {
-    font-family: 'Orbitron', monospace;
-    letter-spacing: 0.05em;
-}
-
-/* Grid animado de fondo */
-.tech-grid {
-    background-image:
-        linear-gradient(rgba(0, 230, 255, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 230, 255, 0.08) 1px, transparent 1px);
-    background-size: 50px 50px;
-    animation: grid-move 20s linear infinite;
-    position: fixed;
-    inset: 0;
-    z-index: 1;
-}
-
-@keyframes grid-move {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(50px, 50px); }
-}
-
-/* Partículas flotantes */
-.particles {
-    position: fixed;
-    inset: 0;
-    z-index: 2;
-    overflow: hidden;
-    pointer-events: none;
-}
-
-.particle {
-    position: absolute;
-    width: 3px;
-    height: 3px;
-    background: #00e6ff;
-    border-radius: 50%;
-    animation: particle-float 10s linear infinite;
-    box-shadow: 0 0 10px #00e6ff;
-}
-
-@keyframes particle-float {
-    0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { transform: translateY(-100px) translateX(100px) rotate(360deg); opacity: 0; }
-}
-
-/* Login container */
-.login-container {
-    position: relative;
-    z-index: 10;
-    width: 100%;
-    max-width: 500px;
-    padding: 20px;
-}
-
-/* Glass morphism card */
-.glass-card {
-    background: linear-gradient(135deg, rgba(0, 230, 255, 0.1) 0%, rgba(99, 102, 241, 0.05) 100%);
-    backdrop-filter: blur(30px);
-    border-radius: 2rem;
-    border: 2px solid rgba(0, 230, 255, 0.3);
-    box-shadow: 
-        0 20px 60px rgba(0, 230, 255, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    padding: 3rem 2.5rem;
-    position: relative;
-    overflow: hidden;
-}
-
-.glass-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(0, 230, 255, 0.15), transparent);
-    animation: shimmer 4s infinite;
-}
-
-@keyframes shimmer {
-    0% { left: -100%; }
-    100% { left: 100%; }
-}
-
-/* Logo section */
-.logo-section {
-    text-align: center;
-    margin-bottom: 2.5rem;
-}
-
-.logo-container {
-    position: relative;
-    display: inline-block;
-    margin-bottom: 1.5rem;
-}
-
-.logo {
-    height: 100px;
-    width: auto;
-    filter: drop-shadow(0 0 30px rgba(0, 230, 255, 0.8));
-    animation: pulse-glow 3s ease-in-out infinite;
-}
-
-@keyframes pulse-glow {
-    0%, 100% { 
-        filter: drop-shadow(0 0 30px rgba(0, 230, 255, 0.8));
-        transform: scale(1);
-    }
-    50% { 
-        filter: drop-shadow(0 0 40px rgba(0, 230, 255, 1));
-        transform: scale(1.02);
-    }
-}
-
-.welcome-text {
-    font-size: 1rem;
-    color: #94a3b8;
-    font-weight: 500;
-    letter-spacing: 0.05em;
-    margin-bottom: 0.5rem;
-}
-
-.subtitle-text {
-    font-size: 0.875rem;
-    background: linear-gradient(45deg, #00e6ff, #6366f1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    font-weight: 600;
-}
-
-.country-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, rgba(0, 230, 255, 0.15), rgba(99, 102, 241, 0.1));
-    border: 1px solid rgba(0, 230, 255, 0.4);
-    color: #00e6ff;
-    padding: 8px 20px;
-    border-radius: 25px;
-    font-size: 0.875rem;
-    font-weight: 700;
-    margin-top: 1rem;
-    box-shadow: 0 0 15px rgba(0, 230, 255, 0.3);
-}
-
-/* Form styles */
-.form-group {
-    margin-bottom: 1.5rem;
-}
-
-.form-label {
-    display: block;
-    font-size: 0.875rem;
-    font-weight: 700;
-    color: #00e6ff;
-    margin-bottom: 0.5rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}
-
-.form-input {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1rem;
-    color: #ffffff;
-    background: rgba(0, 0, 0, 0.4);
-    border: 2px solid rgba(0, 230, 255, 0.3);
-    border-radius: 0.75rem;
-    transition: all 0.3s ease;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: #00e6ff;
-    background: rgba(0, 0, 0, 0.6);
-    box-shadow: 0 0 20px rgba(0, 230, 255, 0.4);
-}
-
-.form-input::placeholder {
-    color: #64748b;
-}
-
-.error-message {
-    color: #ef4444;
-    font-size: 0.8125rem;
-    margin-top: 0.5rem;
-    font-weight: 500;
-    display: flex;
-    align-items: center;
-    gap: 0.25rem;
-}
-
-.remember-me {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1.5rem;
-}
-
-.remember-me input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin-right: 12px;
-    cursor: pointer;
-    accent-color: #00e6ff;
-    border: 2px solid rgba(0, 230, 255, 0.5);
-    border-radius: 4px;
-}
-
-.remember-me label {
-    font-size: 0.875rem;
-    color: #94a3b8;
-    cursor: pointer;
-    user-select: none;
-}
-
-/* Botón principal */
-.login-button {
-    width: 100%;
-    padding: 1rem;
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: #000000;
-    background: linear-gradient(135deg, #00e6ff 0%, #6366f1 100%);
-    border: none;
-    border-radius: 0.75rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 0 30px rgba(0, 230, 255, 0.5);
-    font-family: 'Orbitron', monospace;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    position: relative;
-    overflow: hidden;
-}
-
-.login-button::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.login-button:hover::before {
-    width: 300px;
-    height: 300px;
-}
-
-.login-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 40px rgba(0, 230, 255, 0.8);
-}
-
-.forgot-password {
-    text-align: center;
-    margin-top: 1.25rem;
-}
-
-.forgot-password a {
-    color: #00e6ff;
-    text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 600;
-    transition: all 0.2s;
-}
-
-.forgot-password a:hover {
-    text-shadow: 0 0 10px rgba(0, 230, 255, 0.8);
-}
-
-.signup-section {
-    text-align: center;
-    margin-top: 2rem;
-    padding-top: 2rem;
-    border-top: 1px solid rgba(0, 230, 255, 0.2);
-}
-
-.signup-text {
-    font-size: 0.875rem;
-    color: #94a3b8;
-}
-
-.signup-link {
-    color: #00e6ff;
-    text-decoration: none;
-    font-weight: 700;
-    margin-left: 0.5rem;
-    transition: all 0.2s;
-}
-
-.signup-link:hover {
-    text-shadow: 0 0 10px rgba(0, 230, 255, 0.8);
-}
-
-/* Alert messages */
-.alert {
-    padding: 1rem;
-    border-radius: 0.75rem;
-    margin-bottom: 1.5rem;
-    font-size: 0.875rem;
-    font-weight: 500;
-    border: 1px solid;
-}
-
-.alert-error {
-    background: rgba(239, 68, 68, 0.1);
-    color: #ef4444;
-    border-color: #ef4444;
-}
-
-.alert-success {
-    background: rgba(0, 230, 255, 0.1);
-    color: #00e6ff;
-    border-color: #00e6ff;
-}
-
-/* Botón de regreso */
-.back-button {
-    position: absolute;
-    top: 1.5rem;
-    left: 1.5rem;
-    z-index: 20;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.25rem;
-    background: rgba(0, 230, 255, 0.1);
-    border: 1px solid rgba(0, 230, 255, 0.3);
-    border-radius: 0.75rem;
-    color: #00e6ff;
-    text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-}
-
-.back-button:hover {
-    background: rgba(0, 230, 255, 0.2);
-    border-color: #00e6ff;
-    box-shadow: 0 0 20px rgba(0, 230, 255, 0.4);
-    transform: translateX(-3px);
-}
-
-@media (max-width: 640px) {
-    .glass-card {
-        padding: 2rem 1.5rem;
-    }
-    
-    .logo {
-        height: 80px;
-    }
-    
-    .back-button {
-        top: 1rem;
-        left: 1rem;
-        padding: 0.5rem 1rem;
-        font-size: 0.8125rem;
-    }
-}
-</style>
-{% endblock %}
-
 {% block content %}
-<!-- Grid de fondo -->
-<div class="tech-grid"></div>
-
-<!-- Partículas flotantes -->
-<div class="particles">
-    <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
-    <div class="particle" style="left: 25%; animation-delay: 2s;"></div>
-    <div class="particle" style="left: 40%; animation-delay: 4s;"></div>
-    <div class="particle" style="left: 55%; animation-delay: 1s;"></div>
-    <div class="particle" style="left: 70%; animation-delay: 3s;"></div>
-    <div class="particle" style="left: 85%; animation-delay: 5s;"></div>
-</div>
-
-<!-- Botón de regreso -->
-<a href="{% if request.country == 'US' %}/us/{% elif request.country == 'CL' %}/cl/{% else %}/{% endif %}" class="back-button font-futuristic">
-    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-    </svg>
-    <span>{% trans "Back" %}</span>
-</a>
-
 <div class="login-container">
     <div class="glass-card">
-        <!-- Logo -->
         <div class="logo-section">
             <div class="logo-container">
                 <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="logo">
             </div>
-            {% comment %}Detectar país del usuario o desde URL{% endcomment %}
-            {% if request.user.is_authenticated and request.user.empresa %}
-                {% with detected_country=request.user.empresa.pais %}
-                    {% if detected_country == 'CL' %}
-                        <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-                    {% elif detected_country == 'US' %}
-                        <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-                    {% elif detected_country == 'MX' %}
-                        <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-                    {% elif detected_country == 'CO' %}
-                        <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-                    {% elif detected_country == 'EC' %}
-                        <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-                    {% elif detected_country == 'PE' %}
-                        <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-                    {% elif detected_country == 'VE' %}
-                        <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-                    {% elif detected_country == 'BR' %}
-                        <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-                    {% endif %}
-                {% endwith %}
-            {% elif request.GET.country == 'CO' %}
+            {% with c=country|default:request.country|default:"" %}
+            {% if c == 'CO' or request.path|slice:":4" == '/co/' %}
                 <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-            {% elif request.GET.country == 'EC' %}
+            {% elif c == 'EC' or request.path|slice:":4" == '/ec/' %}
                 <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-            {% elif request.GET.country == 'MX' %}
-                <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-            {% elif request.GET.country == 'US' %}
-                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-            {% elif request.GET.country == 'CL' %}
-                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-            {% elif request.GET.country == 'PE' %}
+            {% elif c == 'PE' or request.path|slice:":4" == '/pe/' %}
                 <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-            {% elif request.GET.country == 'VE' %}
+            {% elif c == 'VE' or request.path|slice:":4" == '/ve/' %}
                 <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-            {% elif request.GET.country == 'BR' %}
+            {% elif c == 'BR' or request.path|slice:":4" == '/br/' %}
                 <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-            {% elif request.country %}
-                {% if request.country == 'CL' %}
-                    <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-                {% elif request.country == 'US' %}
-                    <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-                {% elif request.country == 'MX' %}
-                    <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-                {% elif request.country == 'CO' %}
-                    <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-                {% elif request.country == 'EC' %}
-                    <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-                {% elif request.country == 'PE' %}
-                    <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-                {% elif request.country == 'VE' %}
-                    <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-                {% elif request.country == 'BR' %}
-                    <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-                {% endif %}
-            {% elif request.path|slice:":4" == '/co/' %}
-                <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-            {% elif request.path|slice:":4" == '/ec/' %}
-                <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-            {% elif request.path|slice:":4" == '/us/' %}
-                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-            {% elif request.path|slice:":4" == '/cl/' %}
-                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-            {% elif request.path|slice:":4" == '/mx/' %}
+            {% elif c == 'MX' or request.path|slice:":4" == '/mx/' %}
                 <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-            {% elif request.path|slice:":4" == '/pe/' %}
-                <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-            {% elif request.path|slice:":4" == '/ve/' %}
-                <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-            {% elif request.path|slice:":4" == '/br/' %}
-                <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-            {% elif request.GET.country == 'CO' %}
-                <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-            {% elif request.GET.country == 'EC' %}
-                <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-            {% elif request.GET.country == 'US' %}
+            {% elif c == 'US' or request.path|slice:":4" == '/us/' %}
                 <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-            {% elif request.GET.country == 'CL' %}
+            {% elif c == 'UY' or request.path|slice:":4" == '/uy/' %}
+                <div class="country-badge font-futuristic">🇺🇾 URUGUAY</div>
+            {% elif c == 'AR' or request.path|slice:":4" == '/ar/' %}
+                <div class="country-badge font-futuristic">🇦🇷 ARGENTINA</div>
+            {% else %}
                 <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
             {% endif %}
+            {% endwith %}
         </div>
 
-        <!-- Mensajes de error generales -->
         {% if form.non_field_errors %}
         <div class="alert alert-error">
             {% for error in form.non_field_errors %}
                 <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                     {{ error }}
                 </div>
             {% endfor %}
         </div>
         {% endif %}
 
-        <!-- Mensajes de éxito (filtrados) -->
         {% if messages %}
             {% for message in messages %}
-                {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Professional Automotive Management System" not in message|stringformat:"s" %}
-                    <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endif %}
+                {% with message_str=message|stringformat:"s" %}
+                    {% if "Successfully signed in" not in message_str and "You have signed out" not in message_str and "Professional Automotive Management System" not in message_str and "Ha iniciado sesión exitosamente" not in message_str and "Ha cerrado sesión" not in message_str and "iniciado sesión exitosamente" not in message_str and "cerrado sesión" not in message_str and "Información de empresa guardada exitosamente" not in message_str %}
+                        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">{{ message }}</div>
+                    {% endif %}
+                {% endwith %}
             {% endfor %}
         {% endif %}
 
-        <!-- Formulario -->
-        <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
+        <form method="POST" action="" class="space-y-6">
             {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% if "next" in request.GET %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
-            <!-- Email/Usuario -->
             <div class="form-group">
-                <label for="id_login" class="form-label font-futuristic">
-                    {% trans "Email or Username" %}
-                </label>
+                <label for="id_login" class="form-label font-futuristic">{% trans "Email or Username" %}</label>
                 {{ form.login|add_class:"form-input"|attr:"placeholder:Enter your credentials"|attr:"autocomplete:email" }}
                 {% if form.login.errors %}
                 <div class="error-message">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                     {% for error in form.login.errors %}{{ error }}{% endfor %}
                 </div>
                 {% endif %}
             </div>
 
-            <!-- Contraseña -->
             <div class="form-group">
-                <label for="id_password" class="form-label font-futuristic">
-                    {% trans "Password" %}
-                </label>
+                <label for="id_password" class="form-label font-futuristic">{% trans "Password" %}</label>
                 {{ form.password|add_class:"form-input"|attr:"placeholder:Enter your secure password"|attr:"type:password"|attr:"autocomplete:current-password" }}
                 {% if form.password.errors %}
                 <div class="error-message">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
                     {% for error in form.password.errors %}{{ error }}{% endfor %}
                 </div>
                 {% endif %}
             </div>
 
-            <!-- Remember Me -->
             {% if form.remember %}
             <div class="remember-me">
                 {{ form.remember }}
@@ -578,49 +91,25 @@ body {
             </div>
             {% endif %}
 
-            <!-- Botón Submit -->
             <button type="submit" class="login-button">
                 <span class="relative z-10">
-                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                    </svg>
+                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
                     {% trans "Access System" %}
                 </span>
             </button>
         </form>
 
-        <!-- Forgot Password -->
         <div class="forgot-password">
             <a href="{% url 'account_reset_password' %}" class="font-futuristic">
-                <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
+                <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
                 {% trans "Reset password" %}
             </a>
         </div>
 
-        <!-- Sign Up -->
         <div class="signup-section">
             <div class="signup-text">{% trans "New to eGarage?" %}</div>
-            <a href="{% url 'account_signup' %}" class="signup-link font-futuristic">
-                {% trans "Create your account" %} →
-            </a>
+            <a href="{% url 'account_signup' %}" class="signup-link font-futuristic">{% trans "Create your account" %} →</a>
         </div>
     </div>
 </div>
-
-<script>
-// Animación de entrada
-document.addEventListener('DOMContentLoaded', function() {
-    const card = document.querySelector('.glass-card');
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(30px)';
-    
-    setTimeout(() => {
-        card.style.transition = 'all 0.8s ease-out';
-        card.style.opacity = '1';
-        card.style.transform = 'translateY(0)';
-    }, 100);
-});
-</script>
 {% endblock %}

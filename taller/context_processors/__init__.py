@@ -10,6 +10,7 @@ Django obtenga el callable correcto.
 from django.core.cache import cache
 
 from .company_header import company_header  # ✅ NUEVO - Información de contacto
+from .support_context import support_context  # ✅ Información de soporte centralizada
 
 # Traer la función existente definida en submódulo independiente
 from .empresa_contexto import empresa_contexto as _empresa_contexto_impl
@@ -146,6 +147,13 @@ def company_branding(request):
                 brand["country"] = conf.pais
         except ConfiguracionEmpresa.DoesNotExist:
             pass
+        except Exception as e:
+            # Capturar OperationalError y otros errores de DB (ej: columna 'rubros' no existe)
+            # Esto puede ocurrir si faltan migraciones en la base de datos
+            import logging
+            logger = logging.getLogger(__name__)
+            logger.debug(f"Error obteniendo ConfiguracionEmpresa (posible migración faltante): {e}")
+            pass
 
         # 3. TERCERA PRIORIDAD: Empresa directamente (fallback)
         if not brand["logo_url"] and hasattr(empresa, "logo") and empresa.logo:
@@ -212,6 +220,7 @@ __all__ = [
     "company_country",
     "company_context",
     "company_header",  # ✅ NUEVO - Información de contacto
+    "support_context",  # ✅ Información de soporte centralizada
     "invalidate_company_cache",
     "ui_namespaces",
 ]

@@ -1,0 +1,1103 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="{% if current_language == 'es' %}es{% else %}en{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if current_language == 'es' %}eGarage Estados Unidos - Sistema Profesional de Gestión Automotriz{% else %}eGarage United States - Professional Automotive Management System{% endif %}</title>
+    <meta name="description" content="{% if current_language == 'es' %}Sistema profesional de gestión automotriz diseñado para el mercado estadounidense. Perfecto para talleres de reparación, tiendas de repuestos, vulcanizaciones y centros automotrices integrales.{% else %}Professional automotive management system built for the United States market. Perfect for repair shops, parts stores, tire services, and multi-service automotive centers.{% endif %}">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Custom Styles -->
+    <style>
+        :root {
+            --primary-indigo: #4f46e5;
+            --primary-indigo-dark: #3730a3;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --text-gray: #374151;
+            --text-gray-light: #6b7280;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .gradient-bg {
+            background:
+                linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gradient-bg::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(138, 43, 226, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(79, 70, 229, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(6, 182, 212, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 60% 60%, rgba(255, 0, 255, 0.1) 0%, transparent 50%);
+            animation: backgroundShift 20s ease-in-out infinite;
+        }
+
+        .gradient-bg::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(45deg, transparent 30%, rgba(138, 43, 226, 0.03) 50%, transparent 70%),
+                linear-gradient(-45deg, transparent 30%, rgba(79, 70, 229, 0.03) 50%, transparent 70%);
+            animation: matrixRain 30s linear infinite;
+        }
+
+        @keyframes backgroundShift {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        @keyframes matrixRain {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes neonPulse {
+            0%, 100% {
+                text-shadow:
+                    0 0 5px #8a2be2,
+                    0 0 10px #8a2be2,
+                    0 0 15px #8a2be2,
+                    0 0 20px #8a2be2;
+            }
+            50% {
+                text-shadow:
+                    0 0 2px #8a2be2,
+                    0 0 5px #8a2be2,
+                    0 0 8px #8a2be2,
+                    0 0 12px #8a2be2;
+            }
+        }
+
+        @keyframes neonGlow {
+            0%, 100% {
+                box-shadow:
+                    0 0 5px #8a2be2,
+                    0 0 10px #8a2be2,
+                    0 0 15px #8a2be2,
+                    inset 0 0 5px rgba(138, 43, 226, 0.1);
+            }
+            50% {
+                box-shadow:
+                    0 0 10px #8a2be2,
+                    0 0 20px #8a2be2,
+                    0 0 30px #8a2be2,
+                    inset 0 0 10px rgba(138, 43, 226, 0.2);
+            }
+        }
+
+        .gradient-indigo {
+            background: linear-gradient(135deg, #312e81 0%, #3730a3 50%, #4f46e5 100%);
+            position: relative;
+        }
+
+        .gradient-indigo::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 30% 70%, rgba(99, 102, 241, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 70% 30%, rgba(79, 70, 229, 0.1) 0%, transparent 50%);
+            animation: indigoGlow 15s ease-in-out infinite;
+        }
+
+        @keyframes indigoGlow {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #8a2be2 0%, #4f46e5 50%, #06b6d4 100%);
+            transition: all 0.3s ease;
+            box-shadow:
+                0 0 20px rgba(138, 43, 226, 0.5),
+                0 0 40px rgba(79, 70, 229, 0.3),
+                inset 0 0 20px rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid #8a2be2;
+            animation: neonGlow 3s ease-in-out infinite;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-secondary {
+            border: 2px solid #6366f1;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-secondary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: rgba(99, 102, 241, 0.1);
+            transition: width 0.3s ease;
+        }
+
+        .btn-secondary:hover::before {
+            width: 100%;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+        }
+
+        .feature-card {
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, transparent 30%, rgba(255, 255, 255, 0.05) 50%, transparent 70%);
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+        }
+
+        .feature-card:hover::before {
+            transform: translateX(100%);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .text-gradient {
+            background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-purple) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .floating-animation {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes pulse-glow {
+            from { box-shadow: 0 0 20px rgba(79, 70, 229, 0.3); }
+            to { box-shadow: 0 0 40px rgba(79, 70, 229, 0.6); }
+        }
+
+        /* Futuristic Background Elements */
+        .tech-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(79, 70, 229, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(79, 70, 229, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .floating-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: rgba(79, 70, 229, 0.6);
+            border-radius: 50%;
+            animation: particleFloat 15s linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% {
+                transform: translateY(100vh) translateX(0);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) translateX(100px);
+                opacity: 0;
+            }
+        }
+
+        .circuit-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(90deg, transparent 0%, rgba(79, 70, 229, 0.1) 50%, transparent 100%),
+                linear-gradient(0deg, transparent 0%, rgba(139, 92, 246, 0.1) 50%, transparent 100%);
+            background-size: 200px 200px;
+            animation: circuitPulse 10s ease-in-out infinite;
+        }
+
+        @keyframes circuitPulse {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .testimonial-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .testimonial-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(79, 70, 229, 0.1) 0%, transparent 50%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .testimonial-card:hover::before {
+            opacity: 1;
+        }
+
+        .testimonial-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .company-logo {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+
+        .testimonial-card:hover .company-logo {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+
+        .tech-icon {
+            animation: techRotate 10s linear infinite;
+        }
+
+        @keyframes techRotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .glow-text {
+            text-shadow:
+                0 0 5px #8a2be2,
+                0 0 10px #8a2be2,
+                0 0 15px #8a2be2,
+                0 0 20px #8a2be2,
+                0 0 35px #8a2be2,
+                0 0 40px #8a2be2;
+            animation: neonPulse 2s ease-in-out infinite;
+        }
+
+        .neon-title {
+            background: linear-gradient(45deg, #8a2be2, #4f46e5, #06b6d4, #ff00ff);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .holographic-effect {
+            background: linear-gradient(45deg,
+                rgba(79, 70, 229, 0.1) 0%,
+                rgba(139, 92, 246, 0.1) 25%,
+                rgba(6, 182, 212, 0.1) 50%,
+                rgba(99, 102, 241, 0.1) 75%,
+                rgba(79, 70, 229, 0.1) 100%);
+            background-size: 400% 400%;
+            animation: holographicShift 8s ease-in-out infinite;
+        }
+
+        @keyframes holographicShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Header with Login/Register and Language Selector -->
+    <header class="fixed top-0 left-0 right-0 z-50 glass-effect">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center space-x-4">
+                    <div class="flex space-x-3">
+                        <a href="/accounts/login/?country={% if is_chile_market %}CL{% else %}US{% endif %}" class="px-4 py-2 text-sm font-medium text-white bg-transparent border border-white/30 rounded-lg hover:bg-white/10 transition-all duration-300">
+                            {% if current_language == 'es' %}Iniciar Sesión{% else %}Sign In{% endif %}
+                        </a>
+                        <a href="/accounts/signup/?country={% if is_chile_market %}CL{% else %}US{% endif %}" class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-all duration-300">
+                            {% if current_language == 'es' %}Registrarse{% else %}Sign Up{% endif %}
+                        </a>
+                    </div>
+                </div>
+                {% if not spanish_only %}
+                <div class="flex items-center space-x-2">
+                    {% if is_chile_market %}
+                        <a href="?lang=es" class="px-3 py-1 text-sm font-medium text-white bg-white/20 rounded-lg">🇨🇱 Español</a>
+                        <a href="?lang=en" class="px-3 py-1 text-sm font-medium text-white/70 hover:text-white transition-colors">🇺🇸 English</a>
+                    {% else %}
+                        <a href="?lang=es" class="px-3 py-1 text-sm font-medium text-white/70 hover:text-white transition-colors">🇨🇱 Español</a>
+                        <a href="?lang=en" class="px-3 py-1 text-sm font-medium text-white bg-white/20 rounded-lg">🇺🇸 English</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="gradient-bg text-white pt-24 pb-16 px-6 lg:px-20 relative overflow-hidden">
+        <!-- Futuristic Background Elements -->
+        <div class="tech-grid"></div>
+        <div class="circuit-lines"></div>
+        <div class="floating-particles" id="particles-container"></div>
+
+        <div class="max-w-6xl mx-auto text-center relative z-10">
+            <div class="floating-animation mb-8">
+                <div class="inline-block p-6 rounded-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-500 relative">
+                    <div class="absolute inset-0 rounded-full bg-gradient-to-r from-purple-500 via-indigo-500 to-cyan-500 animate-ping opacity-75"></div>
+                    <span class="text-5xl relative z-10">⚡</span>
+                </div>
+            </div>
+            <h1 class="text-4xl lg:text-6xl font-extrabold mb-6 neon-title">
+                {% if current_language == 'es' %}🇺🇸 eGarage Estados Unidos{% else %}🇺🇸 eGarage United States{% endif %}
+            </h1>
+            <p class="text-xl lg:text-2xl text-gray-300 mb-10">
+                {% if current_language == 'es' %}
+                    Sistema Profesional de Gestión Automotriz — Construido para el Mercado Estadounidense
+                {% else %}
+                    Professional Automotive Management System — Built for the United States Market
+                {% endif %}
+            </p>
+            <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                <a href="#trial" class="btn-primary inline-block text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all duration-300 relative">
+                    <span class="relative z-10">{% if current_language == 'es' %}Comenzar Prueba Gratuita{% else %}Start Free Trial{% endif %}</span>
+                </a>
+                <a href="#demo" class="btn-secondary inline-block text-indigo-200 font-bold py-3 px-8 rounded-xl transition-all duration-300 relative">
+                    <span class="relative z-10">{% if current_language == 'es' %}Ver Demo{% else %}Watch Demo{% endif %}</span>
+                </a>
+            </div>
+
+            <!-- Tech Icons -->
+            <div class="mt-12 flex justify-center space-x-8 opacity-60">
+                <div class="tech-icon text-2xl">🔧</div>
+                <div class="tech-icon text-2xl" style="animation-delay: 2s;">⚙️</div>
+                <div class="tech-icon text-2xl" style="animation-delay: 4s;">🚗</div>
+                <div class="tech-icon text-2xl" style="animation-delay: 6s;">📊</div>
+                <div class="tech-icon text-2xl" style="animation-delay: 8s;">💻</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Main Features Section -->
+    <section class="py-20 bg-gradient-to-br from-gray-50 to-gray-100 text-gray-900 relative overflow-hidden">
+        <!-- AI Background Elements -->
+        <div class="absolute inset-0 opacity-5">
+            <div class="absolute top-10 left-10 w-32 h-32 bg-purple-500 rounded-full blur-3xl animate-pulse"></div>
+            <div class="absolute bottom-10 right-10 w-40 h-40 bg-indigo-500 rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+            <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-cyan-500 rounded-full blur-2xl animate-pulse" style="animation-delay: 4s;"></div>
+        </div>
+
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-16">
+                <div class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-purple-100 to-indigo-100 rounded-full mb-6">
+                    <span class="text-2xl mr-2">🤖</span>
+                    <span class="text-sm font-semibold text-gray-700">Powered by AI Technology</span>
+                </div>
+                <h2 class="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 via-purple-900 to-indigo-900 bg-clip-text text-transparent">
+                    {% if current_language == 'es' %}
+                        La Plataforma Más Completa para Negocios Automotrices
+                    {% else %}
+                        The Most Complete Platform for Automotive Businesses
+                    {% endif %}
+                </h2>
+                <p class="text-xl text-gray-600 max-w-4xl mx-auto">
+                    {% if current_language == 'es' %}
+                        Ya sea que administres un <strong class="text-blue-600">taller de reparación</strong>, un <strong class="text-purple-600">taller de carrocería y pintura</strong>, una <strong class="text-cyan-600">tienda de repuestos</strong>, un <strong class="text-indigo-600">servicio de neumáticos</strong> o un <strong class="text-pink-600">centro automotriz multi-servicio</strong>, eGarage se adapta perfectamente a tu modelo de negocio con inteligencia artificial.
+                    {% else %}
+                        Whether you run a <strong class="text-blue-600">repair shop</strong>, a <strong class="text-purple-600">collision & paint shop</strong>, a <strong class="text-cyan-600">parts store</strong>, a <strong class="text-indigo-600">tire service</strong> or a <strong class="text-pink-600">multi-service automotive center</strong>, eGarage adapts perfectly to your business model with artificial intelligence.
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <!-- Features List -->
+                <div class="space-y-6">
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center mr-4">
+                                <span class="text-white text-xl">🚗</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                    {% if current_language == 'es' %}Gestión Inteligente de Vehículos{% else %}Smart Vehicle Management{% endif %}
+                                </h3>
+                                <p class="text-gray-600">
+                                    {% if current_language == 'es' %}Historial completo, mantenimientos predictivos y programación automática de servicios con IA.{% else %}Complete history, predictive maintenance and automatic service scheduling with AI.{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mr-4">
+                                <span class="text-white text-xl">👥</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                    {% if current_language == 'es' %}CRM Avanzado con IA{% else %}Advanced AI-Powered CRM{% endif %}
+                                </h3>
+                                <p class="text-gray-600">
+                                    {% if current_language == 'es' %}Control inteligente de relaciones, historial de comunicación y programas de fidelización automatizados.{% else %}Smart relationship management, communication history and automated loyalty programs.{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-indigo-500 to-blue-500 rounded-xl flex items-center justify-center mr-4">
+                                <span class="text-white text-xl">📦</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                    {% if current_language == 'es' %}Inventario Predictivo{% else %}Predictive Inventory{% endif %}
+                                </h3>
+                                <p class="text-gray-600">
+                                    {% if current_language == 'es' %}Stock en tiempo real, alertas inteligentes de reposición y gestión automática de proveedores.{% else %}Real-time stock, smart reorder alerts and automatic supplier management.{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center mr-4">
+                                <span class="text-white text-xl">🧾</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                    {% if current_language == 'es' %}Facturación Automatizada{% else %}Automated Billing{% endif %}
+                                </h3>
+                                <p class="text-gray-600">
+                                    {% if current_language == 'es' %}Facturas profesionales, control automático de pagos y reportes inteligentes.{% else %}Professional invoices, automatic payment tracking and smart reports.{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-cyan-500 to-teal-500 rounded-xl flex items-center justify-center mr-4">
+                                <span class="text-white text-xl">📊</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                    {% if current_language == 'es' %}Analytics con IA{% else %}AI-Powered Analytics{% endif %}
+                                </h3>
+                                <p class="text-gray-600">
+                                    {% if current_language == 'es' %}KPIs inteligentes, predicciones de ventas, análisis de rentabilidad y métricas de desempeño en tiempo real.{% else %}Smart KPIs, sales predictions, profitability analysis and real-time performance metrics.{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-xl border border-gray-200/50 hover:shadow-2xl transition-all duration-300">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0 w-12 h-12 bg-gradient-to-r from-emerald-500 to-green-500 rounded-xl flex items-center justify-center mr-4">
+                                <span class="text-white text-xl">📱</span>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-bold text-gray-900 mb-2">
+                                    {% if current_language == 'es' %}Multi-Pantalla Inteligente{% else %}Smart Multi-Screen{% endif %}
+                                </h3>
+                                <p class="text-gray-600">
+                                    {% if current_language == 'es' %}Accede desde cualquier dispositivo: móvil, tablet, desktop o smart TV. Sincronización automática en tiempo real.{% else %}Access from any device: mobile, tablet, desktop or smart TV. Automatic real-time synchronization.{% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Dashboard Preview -->
+                <div class="relative">
+                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-8 shadow-2xl border border-gray-700">
+                        <div class="flex items-center justify-between mb-6">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-3 h-3 bg-red-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-yellow-500 rounded-full"></div>
+                                <div class="w-3 h-3 bg-green-500 rounded-full"></div>
+                            </div>
+                            <span class="text-sm text-gray-400">
+                                {% if current_language == 'es' %}eGarage USA Dashboard{% else %}eGarage USA Dashboard{% endif %}
+                            </span>
+                        </div>
+
+                        <div class="space-y-4">
+                            <div class="h-4 bg-gradient-to-r from-purple-500 to-indigo-500 rounded w-3/4"></div>
+                            <div class="h-3 bg-gray-600 rounded w-1/2"></div>
+                            <div class="grid grid-cols-2 gap-4 mt-6">
+                                <div class="h-20 bg-gradient-to-br from-purple-500 to-pink-600 rounded-lg"></div>
+                                <div class="h-20 bg-gradient-to-br from-indigo-500 to-blue-600 rounded-lg"></div>
+                                <div class="h-20 bg-gradient-to-br from-cyan-500 to-teal-600 rounded-lg"></div>
+                                <div class="h-20 bg-gradient-to-br from-orange-500 to-red-600 rounded-lg"></div>
+                            </div>
+                        </div>
+
+                        <div class="absolute -top-4 -right-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white text-xs font-bold py-2 px-4 rounded-full shadow-lg animate-pulse">
+                            ✨ AI Powered
+                        </div>
+                    </div>
+
+                    <!-- Floating Elements -->
+                    <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-r from-purple-500 to-indigo-500 rounded-lg flex items-center justify-center">
+                                <span class="text-white text-sm">📱</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">Multi-Device</p>
+                                <p class="text-xs text-gray-500">Real-time sync</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="absolute -top-6 -left-6 bg-white rounded-2xl p-4 shadow-xl border border-gray-200">
+                        <div class="flex items-center space-x-3">
+                            <div class="w-8 h-8 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-lg flex items-center justify-center">
+                                <span class="text-white text-sm">🤖</span>
+                            </div>
+                            <div>
+                                <p class="text-sm font-semibold text-gray-900">AI Assistant</p>
+                                <p class="text-xs text-gray-500">Smart predictions</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonials Section -->
+    <section class="py-20 bg-gray-900 text-white relative overflow-hidden">
+        <div class="tech-grid"></div>
+        <div class="max-w-6xl mx-auto text-center px-6 relative z-10">
+            <h2 class="text-3xl font-bold mb-6 glow-text">
+                {% if current_language == 'es' %}Empresas que confían en eGarage USA{% else %}Companies Trusting eGarage USA{% endif %}
+            </h2>
+            <p class="text-lg mb-12 text-gray-300">
+                {% if current_language == 'es' %}
+                    Más de 500 talleres y empresas automotrices en Chile ya transformaron su gestión con eGarage
+                {% else %}
+                    Over 500 automotive shops and businesses in Chile have already transformed their management with eGarage
+                {% endif %}
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Testimonial 1 -->
+                <div class="testimonial-card p-6 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-white font-bold text-lg">AM</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">
+                                {% if current_language == 'es' %}AutoMecánica Santiago{% else %}AutoMech Santiago{% endif %}
+                            </h4>
+                            <p class="text-sm text-gray-400">
+                                {% if current_language == 'es' %}Taller Mecánico{% else %}Repair Shop{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        {% if current_language == 'es' %}
+                            "eGarage revolucionó nuestro taller. Ahora gestionamos 3x más vehículos con la misma eficiencia.
+                            La facturación automática nos ahorra 2 horas diarias."
+                        {% else %}
+                            "eGarage revolutionized our shop. We now manage 3x more vehicles with the same efficiency.
+                            Automated billing saves us 2 hours daily."
+                        {% endif %}
+                    </p>
+                    <div class="flex text-yellow-400">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                </div>
+
+                <!-- Testimonial 2 -->
+                <div class="testimonial-card p-6 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-cyan-500 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-white font-bold text-lg">TS</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">
+                                {% if current_language == 'es' %}Tire Service Pro{% else %}Tire Service Pro{% endif %}
+                            </h4>
+                            <p class="text-sm text-gray-400">
+                                {% if current_language == 'es' %}Servicio de Neumáticos{% else %}Tire Service{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        {% if current_language == 'es' %}
+                            "El control de inventario es increíble. Nunca más nos quedamos sin neumáticos.
+                            Los reportes nos ayudan a tomar mejores decisiones de compra."
+                        {% else %}
+                            "Inventory control is incredible. We never run out of tires anymore.
+                            Reports help us make better purchasing decisions."
+                        {% endif %}
+                    </p>
+                    <div class="flex text-yellow-400">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                </div>
+
+                <!-- Testimonial 3 -->
+                <div class="testimonial-card p-6 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-white font-bold text-lg">CB</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">
+                                {% if current_language == 'es' %}Carrocería Best{% else %}Best Body Shop{% endif %}
+                            </h4>
+                            <p class="text-sm text-gray-400">
+                                {% if current_language == 'es' %}Desabolladura y Pintura{% else %}Collision & Paint{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        {% if current_language == 'es' %}
+                            "La gestión de clientes mejoró 100%. Ahora tenemos el historial completo de cada vehículo
+                            y podemos ofrecer servicios personalizados."
+                        {% else %}
+                            "Customer management improved 100%. We now have complete history of each vehicle
+                            and can offer personalized services."
+                        {% endif %}
+                    </p>
+                    <div class="flex text-yellow-400">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                </div>
+
+                <!-- Testimonial 4 -->
+                <div class="testimonial-card p-6 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-purple-500 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-white font-bold text-lg">PS</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">
+                                {% if current_language == 'es' %}Parts Store Plus{% else %}Parts Store Plus{% endif %}
+                            </h4>
+                            <p class="text-sm text-gray-400">
+                                {% if current_language == 'es' %}Tienda de Repuestos{% else %}Parts Store{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        {% if current_language == 'es' %}
+                            "El sistema de inventario es perfecto. Controlamos stock en tiempo real y
+                            las alertas automáticas nos mantienen siempre abastecidos."
+                        {% else %}
+                            "Inventory system is perfect. We control stock in real-time and
+                            automatic alerts keep us always supplied."
+                        {% endif %}
+                    </p>
+                    <div class="flex text-yellow-400">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                </div>
+
+                <!-- Testimonial 5 -->
+                <div class="testimonial-card p-6 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-white font-bold text-lg">AC</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">
+                                {% if current_language == 'es' %}Centro Automotriz{% else %}Auto Center{% endif %}
+                            </h4>
+                            <p class="text-sm text-gray-400">
+                                {% if current_language == 'es' %}Multi-Servicio{% else %}Multi-Service{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        {% if current_language == 'es' %}
+                            "eGarage nos permitió integrar todos nuestros servicios. Mecánica, repuestos,
+                            vulcanización y lavado, todo en una sola plataforma."
+                        {% else %}
+                            "eGarage allowed us to integrate all our services. Repairs, parts,
+                            tire service and car wash, all in one platform."
+                        {% endif %}
+                    </p>
+                    <div class="flex text-yellow-400">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                </div>
+
+                <!-- Testimonial 6 -->
+                <div class="testimonial-card p-6 rounded-xl">
+                    <div class="flex items-center mb-4">
+                        <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mr-4">
+                            <span class="text-white font-bold text-lg">MS</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold">
+                                {% if current_language == 'es' %}Taller Moderno{% else %}Modern Shop{% endif %}
+                            </h4>
+                            <p class="text-sm text-gray-400">
+                                {% if current_language == 'es' %}Taller Integral{% else %}Full Service{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                    <p class="text-gray-300 mb-4">
+                        {% if current_language == 'es' %}
+                            "Los reportes y KPIs nos ayudaron a aumentar las ventas en 40%.
+                            Ahora sabemos exactamente qué servicios son más rentables."
+                        {% else %}
+                            "Reports and KPIs helped us increase sales by 40%.
+                            Now we know exactly which services are most profitable."
+                        {% endif %}
+                    </p>
+                    <div class="flex text-yellow-400">
+                        ⭐⭐⭐⭐⭐
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Choose eGarage Section -->
+    <section class="gradient-indigo text-white py-20 relative overflow-hidden">
+        <div class="circuit-lines"></div>
+        <div class="max-w-6xl mx-auto text-center px-6 relative z-10">
+            <h2 class="text-3xl font-bold mb-6 glow-text">
+                {% if current_language == 'es' %}¿Por qué elegir eGarage USA?{% else %}Why Choose eGarage USA?{% endif %}
+            </h2>
+            <p class="text-lg mb-10">
+                {% if current_language == 'es' %}
+                    Confiado por profesionales automotrices en todo Chile y ahora expandiéndose en Estados Unidos.
+                    Diseñado para simplificar operaciones, aumentar ventas y mantener a los clientes regresando.
+                {% else %}
+                    Trusted by automotive professionals across Chile and now expanding in the United States.
+                    Designed to simplify operations, boost sales, and keep customers coming back.
+                {% endif %}
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+                <div class="p-6 bg-indigo-800 rounded-xl shadow-lg feature-card">
+                    <h3 class="font-bold mb-3 text-lg">
+                        {% if current_language == 'es' %}Para Talleres Especializados{% else %}For Specialized Shops{% endif %}
+                    </h3>
+                    <p>
+                        {% if current_language == 'es' %}
+                            Perfecto para talleres de reparación, tiendas de neumáticos, o negocios de pintura y carrocería que necesitan una herramienta inteligente, simple y poderosa.
+                        {% else %}
+                            Perfect for auto repair shops, tire stores, or paint & body businesses that need a smart, simple and powerful tool.
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="p-6 bg-indigo-800 rounded-xl shadow-lg feature-card">
+                    <h3 class="font-bold mb-3 text-lg">
+                        {% if current_language == 'es' %}Para Centros Multi-Servicio{% else %}For Multi-Service Centers{% endif %}
+                    </h3>
+                    <p>
+                        {% if current_language == 'es' %}
+                            Gestiona reparaciones, ventas de repuestos, servicios de neumáticos y más — todo en una plataforma integrada.
+                        {% else %}
+                            Manage repairs, parts sales, tire services and more — all in one integrated platform.
+                        {% endif %}
+                    </p>
+                </div>
+                <div class="p-6 bg-indigo-800 rounded-xl shadow-lg feature-card">
+                    <h3 class="font-bold mb-3 text-lg">
+                        {% if current_language == 'es' %}Para Dueños Orientados al Crecimiento{% else %}For Growth-Oriented Owners{% endif %}
+                    </h3>
+                    <p>
+                        {% if current_language == 'es' %}
+                            Rastrea KPIs, aumenta la eficiencia y obtén insights en tiempo real sobre rentabilidad y rendimiento.
+                        {% else %}
+                            Track KPIs, increase efficiency, and gain real-time insights into profitability and performance.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="py-20 bg-gray-50">
+        <div class="max-w-6xl mx-auto text-center px-6">
+            <h2 class="text-3xl font-bold mb-6 text-gray-900">
+                {% if current_language == 'es' %}Planes de Precios{% else %}Pricing Plans{% endif %}
+            </h2>
+            <p class="text-lg text-gray-600 mb-12">
+                {% if current_language == 'es' %}Elige el plan que mejor se adapte a tu negocio{% else %}Choose the plan that best fits your business{% endif %}
+            </p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Monthly Plan -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
+                    <h3 class="text-xl font-bold mb-4">
+                        {% if current_language == 'es' %}Mensual{% else %}Monthly{% endif %}
+                    </h3>
+                    <div class="text-4xl font-bold text-indigo-600 mb-2">$20</div>
+                    <p class="text-gray-600 mb-6">
+                        {% if current_language == 'es' %}por mes{% else %}per month{% endif %}
+                    </p>
+                    <ul class="text-left space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Todas las funciones de IA{% else %}All AI features{% endif %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Soporte por email{% else %}Email support{% endif %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Multi-pantalla (móvil, tablet, desktop){% else %}Multi-screen (mobile, tablet, desktop){% endif %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Hasta 100 vehículos{% else %}Up to 100 vehicles{% endif %}
+                        </li>
+                    </ul>
+                    <a href="/accounts/signup/?country=US" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                        {% if current_language == 'es' %}Comenzar{% else %}Get Started{% endif %}
+                    </a>
+                </div>
+
+                <!-- 6-Month Plan -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 border-2 border-indigo-500 relative">
+                    <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                        <span class="bg-indigo-500 text-white px-4 py-1 rounded-full text-sm font-medium">
+                            {% if current_language == 'es' %}Más Popular{% else %}Most Popular{% endif %}
+                        </span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4">
+                        {% if current_language == 'es' %}6 Meses{% else %}6 Months{% endif %}
+                    </h3>
+                    <div class="text-4xl font-bold text-indigo-600 mb-2">$110</div>
+                    <p class="text-gray-600 mb-2">
+                        {% if current_language == 'es' %}por 6 meses{% else %}for 6 months{% endif %}
+                    </p>
+                    <p class="text-sm text-green-600 font-medium mb-6">
+                        {% if current_language == 'es' %}Ahorra 10%{% else %}Save 10%{% endif %}
+                    </p>
+                    <ul class="text-left space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Todas las funciones de IA{% else %}All AI features{% endif %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Soporte prioritario{% else %}Priority support{% endif %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Multi-pantalla (móvil, tablet, desktop){% else %}Multi-screen (mobile, tablet, desktop){% endif %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Hasta 500 vehículos{% else %}Up to 500 vehicles{% endif %}
+                        </li>
+                    </ul>
+                    <a href="/accounts/signup/?country=US" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                        {% if current_language == 'es' %}Comenzar{% else %}Get Started{% endif %}
+                    </a>
+                </div>
+
+                <!-- Annual Plan -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
+                    <h3 class="text-xl font-bold mb-4">
+                        {% if current_language == 'es' %}Anual{% else %}Annual{% endif %}
+                    </h3>
+                    <div class="text-4xl font-bold text-indigo-600 mb-2">$200</div>
+                    <p class="text-gray-600 mb-2">
+                        {% if current_language == 'es' %}por año{% else %}per year{% endif %}
+                    </p>
+                    <p class="text-sm text-green-600 font-medium mb-6">
+                        {% if current_language == 'es' %}Ahorra 20%{% else %}Save 20%{% endif %}
+                    </p>
+                    <ul class="text-left space-y-3 mb-8">
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Todas las funciones de IA{% else %}All AI features{% endif %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Soporte 24/7{% else %}24/7 support{% endif %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Multi-pantalla (móvil, tablet, desktop){% else %}Multi-screen (mobile, tablet, desktop){% endif %}
+                        </li>
+                        <li class="flex items-center">
+                            <span class="text-green-500 mr-2">✓</span>
+                            {% if current_language == 'es' %}Vehículos ilimitados{% else %}Unlimited vehicles{% endif %}
+                        </li>
+                    </ul>
+                    <a href="/accounts/signup/?country=US" class="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg font-medium hover:bg-indigo-700 transition-colors">
+                        {% if current_language == 'es' %}Comenzar{% else %}Get Started{% endif %}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12 text-center">
+        <div class="max-w-6xl mx-auto px-6">
+            <p class="mb-4">
+                © 2025 {% if current_language == 'es' %}eGarage Estados Unidos{% else %}eGarage United States{% endif %}.
+                {% if current_language == 'es' %}Todos los derechos reservados.{% else %}All rights reserved.{% endif %}
+            </p>
+            <div class="flex justify-center space-x-6">
+                <a href="/support" class="hover:text-white transition-colors">
+                    {% if current_language == 'es' %}Soporte{% else %}Support{% endif %}
+                </a>
+                <a href="/pricing" class="hover:text-white transition-colors">
+                    {% if current_language == 'es' %}Precios{% else %}Pricing{% endif %}
+                </a>
+                <a href="/company" class="hover:text-white transition-colors">
+                    {% if current_language == 'es' %}Empresa{% else %}About{% endif %}
+                </a>
+                <a href="/contact" class="hover:text-white transition-colors">
+                    {% if current_language == 'es' %}Contacto{% else %}Contact{% endif %}
+                </a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Smooth scrolling script -->
+    <script>
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Floating particles animation
+        function createParticles() {
+            const container = document.getElementById('particles-container');
+            if (!container) return;
+
+            for (let i = 0; i < 50; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(particle);
+            }
+        }
+
+        // Initialize particles when page loads
+        document.addEventListener('DOMContentLoaded', createParticles);
+    </script>
+</body>
+</html>

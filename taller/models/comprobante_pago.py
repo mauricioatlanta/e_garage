@@ -71,13 +71,23 @@ class ComprobantePago(models.Model):
 
         # Extender suscripción de la empresa
         dias_extension = self.meses_pagados * 30
+        # 🔒 ANTI-DUPLICADO: No enviar notificación aquí, la enviaremos después
+        # Esto evita doble notificación si extender_suscripcion() también notifica
         self.empresa.extender_suscripcion(
             dias_extension, enviar_notificacion=False
-        )  # No enviar aquí, lo haremos después
+        )
         self.empresa.plan = self.plan_solicitado
         self.empresa.valor_mensual = self.monto / self.meses_pagados
         self.empresa.save()
-
+        
+        # 🔒 IDEMPOTENCIA: Pasar ID del comprobante para tracking en DB
+        # Resetear flag de notificación antes de notificar
+        if hasattr(self.empresa, '_admin_whatsapp_notified'):
+            delattr(self.empresa, '_admin_whatsapp_notified')
+        
+        # Pasar ID del comprobante para idempotencia
+        self.empresa._current_comprobante_pago_id = self.id
+        
         self.save()
 
         # Enviar notificaciones automáticas (Email + WhatsApp)

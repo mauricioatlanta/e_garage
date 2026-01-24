@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "rest_framework",
     "ubicacion.apps.UbicacionConfig",
+    "marketplace.apps.MarketplaceConfig",
 ]
 
 # Middleware común - ORDEN RECOMENDADO POR DJANGO
@@ -52,6 +53,8 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     # 2. Sesiones (antes de autenticación)
     "django.contrib.sessions.middleware.SessionMiddleware",
+    # 2b. Redirigir /accounts/login/ → /cl/accounts/login/ (evita UY por sesión)
+    "taller.middleware.force_accounts_to_cl.ForceAccountsToCLMiddleware",
     # 3. Localización (antes de CommonMiddleware)
     "django.middleware.locale.LocaleMiddleware",
     # 4. Common (después de sesiones y locale)
@@ -164,6 +167,9 @@ FORMAT_MODULE_PATH = ["gestion_taller.formats"]
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 APPEND_SLASH = True
 
+# STATIC / MEDIA
+STATIC_URL = os.getenv("DJANGO_STATIC_URL", "/static/")
+
 # Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = ["bootstrap5"]
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -200,8 +206,16 @@ ACCOUNT_FORMS = {
     "login": "taller.forms.custom_login.CustomLoginForm",
 }
 
-# Login default
-LOGIN_URL = "/accounts/login/"
+# Login default: ruta con país para que @login_required lleve a Chile por defecto
+LOGIN_URL = "/cl/accounts/login/"
+
+# ---------- eGarage país e idioma por defecto ----------
+# Si alguien entra por /accounts/login/ (ruta sin país), el fallback es Chile, no Uruguay.
+# Uruguay solo accesible vía /uy/...; login/signup solo vía rutas país.
+EGARAGE_DEFAULT_COUNTRY = os.getenv("EGARAGE_DEFAULT_COUNTRY", "cl")
+EGARAGE_DEFAULT_LANG = os.getenv("EGARAGE_DEFAULT_LANG", "es")
+# Alias para middleware/context que usan getattr(settings, "DEFAULT_COUNTRY", "CL")
+DEFAULT_COUNTRY = EGARAGE_DEFAULT_COUNTRY.upper()
 
 # Adaptador personalizado para redirección según país
 ACCOUNT_ADAPTER = "taller.views_extra.account_adapter.CountryAwareAccountAdapter"

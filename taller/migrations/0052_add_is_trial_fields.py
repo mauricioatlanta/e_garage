@@ -13,36 +13,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name="empresa",
-            name="is_trial",
-            field=models.BooleanField(
-                default=False,
-                help_text="Indica si la empresa está actualmente en período de prueba",
-            ),
-        ),
-        migrations.AddField(
-            model_name="empresa",
-            name="trial_already_used",
-            field=models.BooleanField(
-                default=False,
-                help_text="Marca que esta empresa ya utilizó una prueba gratis (por email o teléfono)",
-            ),
-        ),
-        migrations.AddField(
-            model_name="empresa",
-            name="trial_ends_at",
-            field=models.DateTimeField(
-                blank=True, help_text="Fecha y hora en que termina el período de prueba", null=True
-            ),
-        ),
-        migrations.AddField(
-            model_name="empresa",
-            name="trial_started_at",
-            field=models.DateTimeField(
-                blank=True, help_text="Fecha y hora en que comenzó el período de prueba", null=True
-            ),
-        ),
         migrations.AlterField(
             model_name="configuracionempresa",
             name="rubro_principal",
@@ -186,75 +156,5 @@ class Migration(migrations.Migration):
                 max_length=30,
                 null=True,
             ),
-        ),
-        migrations.CreateModel(
-            name="RegistroEmbudoSuscriptor",
-            fields=[
-                (
-                    "id",
-                    models.BigAutoField(
-                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
-                    ),
-                ),
-                (
-                    "pais",
-                    models.CharField(help_text="Código de país (CL, US, MX, etc.)", max_length=5),
-                ),
-                (
-                    "fecha_registro",
-                    models.DateTimeField(help_text="Fecha y hora en que completó el signup"),
-                ),
-                (
-                    "email_confirmado_at",
-                    models.DateTimeField(
-                        blank=True, help_text="Fecha y hora en que confirmó el email", null=True
-                    ),
-                ),
-                (
-                    "primer_login_at",
-                    models.DateTimeField(
-                        blank=True, help_text="Fecha y hora del primer login", null=True
-                    ),
-                ),
-                (
-                    "empresa_creada_at",
-                    models.DateTimeField(
-                        blank=True, help_text="Fecha y hora en que se creó la empresa", null=True
-                    ),
-                ),
-                (
-                    "obtuvo_trial",
-                    models.BooleanField(
-                        default=False, help_text="Indica si obtuvo trial de 30 días"
-                    ),
-                ),
-                (
-                    "trial_started_at",
-                    models.DateTimeField(
-                        blank=True, help_text="Fecha y hora en que comenzó el trial", null=True
-                    ),
-                ),
-                (
-                    "trial_ends_at",
-                    models.DateTimeField(
-                        blank=True, help_text="Fecha y hora en que termina el trial", null=True
-                    ),
-                ),
-                ("created_at", models.DateTimeField(auto_now_add=True)),
-                ("updated_at", models.DateTimeField(auto_now=True)),
-                (
-                    "user",
-                    models.OneToOneField(
-                        on_delete=django.db.models.deletion.CASCADE,
-                        related_name="embudo_registro",
-                        to=settings.AUTH_USER_MODEL,
-                    ),
-                ),
-            ],
-            options={
-                "verbose_name": "Embudo de Registro Suscriptor",
-                "verbose_name_plural": "Embudo de Registro Suscriptores",
-                "ordering": ["-fecha_registro"],
-            },
         ),
     ]

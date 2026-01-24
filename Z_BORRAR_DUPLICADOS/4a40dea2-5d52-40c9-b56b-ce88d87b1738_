@@ -1,0 +1,23 @@
+<style>
+  /* Activa modo oscuro con <html class="dark"> o data-theme="dark" en <body> */
+  .dark .doc-shell,
+  [data-theme="dark"] .doc-shell {
+    /* quita el blur y los fondos translucidos en dark (mejor contraste) */
+    background: #0b0d12;
+    border-color: rgba(148, 163, 184, 0.25); /* slate-400/25 */
+    box-shadow: none;
+  }
+
+  .dark .theme-ot,
+  [data-theme="dark"] .theme-ot { border-color: rgba(148, 163, 184, 0.45); }  /* slate */
+  .dark .theme-pres,
+  [data-theme="dark"] .theme-pres { border-color: rgba(245, 158, 11, 0.45); } /* amber */
+  .dark .theme-rec,
+  [data-theme="dark"] .theme-rec { border-color: rgba(16, 185, 129, 0.45); }  /* emerald */
+
+  .dark .doc-chip,
+  [data-theme="dark"] .doc-chip { filter: none; opacity: 0.95; }
+  .dark .chip-ot,   [data-theme="dark"] .chip-ot   { background: #111827; color: #e5e7eb; } /* gray-900 / gray-200 */
+  .dark .chip-pres, [data-theme="dark"] .chip-pres { background: #78350f; color: #fde68a; } /* amber-900 / amber-200 */
+  .dark .chip-rec,  [data-theme="dark"] .chip-rec  { background: #064e3b; color: #a7f3d0; } /* emerald-900 / emerald-200 */
+</style>

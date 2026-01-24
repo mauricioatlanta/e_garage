@@ -46,6 +46,13 @@
       position: relative;
     }
 
+    /* Asegurar que el contenido esté por encima del fondo */
+    body > main,
+    body > section {
+      position: relative;
+      z-index: 1;
+    }
+
     /* Background animado con colores de Brasil */
     body::before {
       content: '';
@@ -59,8 +66,9 @@
         radial-gradient(circle at 80% 70%, rgba(254, 223, 0, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 50% 50%, rgba(0, 39, 118, 0.08) 0%, transparent 50%),
         linear-gradient(135deg, #000814 0%, #001d3d 50%, #000814 100%);
-      z-index: 0;
+      z-index: -1;
       animation: bgShift 20s ease-in-out infinite;
+      pointer-events: none;
     }
 
     @keyframes bgShift {
@@ -338,9 +346,21 @@
       position: relative;
       z-index: 1;
     }
+
+    /* Asegurar que el contenido esté visible */
+    main {
+      position: relative;
+      z-index: 10;
+    }
+
+    body > * {
+      position: relative;
+      z-index: 1;
+    }
   </style>
 </head>
 <body class="grid-bg">
+  <main class="relative z-10">
   
   <!-- Hero Section -->
   <section class="hero-section">
@@ -845,6 +865,8 @@
       </div>
     </div>
   </footer>
+
+  </main>
 
   <script>
     // Initialize AOS (Animate On Scroll)

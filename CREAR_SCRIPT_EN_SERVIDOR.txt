@@ -1,0 +1,205 @@
+# ============================================
+# Comandos para crear el script directamente en el servidor
+# Copia y pega estos comandos en la terminal del servidor
+# ============================================
+
+# 1. Primero, ver los últimos errores detallados de gunicorn
+sudo journalctl -u gunicorn -n 100 --no-pager
+
+# 2. Verificar dónde está el proyecto
+find /home /srv /var/www -name "manage.py" -type f 2>/dev/null | head -1
+
+# 3. Verificar ALLOWED_HOSTS actual
+grep "ALLOWED_HOSTS" /srv/egarage/gestion_taller/settings.py 2>/dev/null || \
+grep "ALLOWED_HOSTS" $(find /home /srv /var/www -name "settings.py" -path "*/gestion_taller/settings.py" 2>/dev/null | head -1)
+
+# 4. Verificar permisos de la BD
+ls -la /srv/egarage/db.sqlite3 2>/dev/null || \
+ls -la $(find /home /srv /var/www -name "db.sqlite3" 2>/dev/null | head -1)
+
+# 5. Crear el script de fix (copia todo desde aquí hasta el marcador ===END===)
+
+cat > /root/FIX_ERROR_500_DIGITALOCEAN.sh << 'SCRIPT_END'
+#!/bin/bash
+# ============================================
+# Script: Fix Error 500 en DigitalOcean
+# Soluciona problemas comunes de ALLOWED_HOSTS y permisos de BD
+# ============================================
+
+set -e
+
+# Colores
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+CYAN='\033[0;36m'
+NC='\033[0m'
+
+echo -e "${CYAN}========================================${NC}"
+echo -e "${CYAN}🔧 Fix Error 500 - DigitalOcean${NC}"
+echo -e "${CYAN}========================================${NC}"
+echo ""
+
+# Detectar ruta del proyecto
+if [ -d "/srv/egarage" ]; then
+    PROJECT_DIR="/srv/egarage"
+elif [ -d "/home/egarage/app" ]; then
+    PROJECT_DIR="/home/egarage/app"
+elif [ -d "/var/www/egarage" ]; then
+    PROJECT_DIR="/var/www/egarage"
+else
+    echo -e "${YELLOW}⚠️  Buscando directorio del proyecto...${NC}"
+    PROJECT_DIR=$(find /home /srv /var/www -name "manage.py" -type f 2>/dev/null | head -1 | xargs dirname)
+    if [ -z "$PROJECT_DIR" ]; then
+        echo -e "${RED}❌ No se encontró el directorio del proyecto${NC}"
+        echo "Por favor, ejecuta: cd /ruta/a/tu/proyecto"
+        exit 1
+    fi
+fi
+
+echo -e "${YELLOW}📁 Directorio del proyecto: ${PROJECT_DIR}${NC}"
+cd "$PROJECT_DIR"
+
+SETTINGS_FILE="$PROJECT_DIR/gestion_taller/settings.py"
+
+# ============================================
+# Paso 1: Verificar y actualizar ALLOWED_HOSTS
+# ============================================
+echo ""
+echo -e "${CYAN}▶ Paso 1: Verificando ALLOWED_HOSTS...${NC}"
+
+if [ ! -f "$SETTINGS_FILE" ]; then
+    echo -e "${RED}❌ No se encontró settings.py en: $SETTINGS_FILE${NC}"
+    exit 1
+fi
+
+# Verificar si ya tiene los hosts correctos en el default
+if grep -q "ALLOWED_HOSTS = env_list(\"DJANGO_ALLOWED_HOSTS\", \[\"159.223.200.106\", \"localhost\", \"egarage.cl\", \"www.egarage.cl\"" "$SETTINGS_FILE"; then
+    echo -e "${GREEN}✅ ALLOWED_HOSTS ya está configurado correctamente en settings.py${NC}"
+else
+    echo -e "${YELLOW}⚠️  Actualizando ALLOWED_HOSTS en settings.py...${NC}"
+    # Backup
+    cp "$SETTINGS_FILE" "${SETTINGS_FILE}.backup.$(date +%Y%m%d_%H%M%S)"
+    
+    # Actualizar la línea de ALLOWED_HOSTS
+    sed -i 's/ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", \[.*\]/ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["159.223.200.106", "localhost", "egarage.cl", "www.egarage.cl", "garage.cl", "www.garage.cl"]/' "$SETTINGS_FILE"
+    echo -e "${GREEN}✅ ALLOWED_HOSTS actualizado${NC}"
+fi
+
+# Verificar variable de entorno .env
+ENV_FILE="$PROJECT_DIR/.env"
+if [ -f "$ENV_FILE" ]; then
+    if grep -q "DJANGO_ALLOWED_HOSTS" "$ENV_FILE"; then
+        echo -e "${YELLOW}⚠️  Variable DJANGO_ALLOWED_HOSTS encontrada en .env${NC}"
+        echo -e "${CYAN}   Verificando valor...${NC}"
+        if ! grep -q "DJANGO_ALLOWED_HOSTS=.*159.223.200.106.*egarage.cl.*www.egarage.cl" "$ENV_FILE"; then
+            echo -e "${YELLOW}   Actualizando .env...${NC}"
+            sed -i 's/^DJANGO_ALLOWED_HOSTS=.*/DJANGO_ALLOWED_HOSTS=159.223.200.106,localhost,egarage.cl,www.egarage.cl/' "$ENV_FILE"
+            echo -e "${GREEN}✅ .env actualizado${NC}"
+        else
+            echo -e "${GREEN}✅ .env ya tiene los hosts correctos${NC}"
+        fi
+    else
+        echo -e "${YELLOW}⚠️  Agregando DJANGO_ALLOWED_HOSTS a .env...${NC}"
+        echo "" >> "$ENV_FILE"
+        echo "# ALLOWED_HOSTS para DigitalOcean" >> "$ENV_FILE"
+        echo "DJANGO_ALLOWED_HOSTS=159.223.200.106,localhost,egarage.cl,www.egarage.cl" >> "$ENV_FILE"
+        echo -e "${GREEN}✅ Variable agregada a .env${NC}"
+    fi
+else
+    echo -e "${YELLOW}⚠️  No se encontró archivo .env (opcional)${NC}"
+fi
+
+# ============================================
+# Paso 2: Ajustar permisos de la base de datos
+# ============================================
+echo ""
+echo -e "${CYAN}▶ Paso 2: Ajustando permisos de la base de datos...${NC}"
+
+# Buscar archivo db.sqlite3
+DB_FILE=$(find "$PROJECT_DIR" -name "db.sqlite3" -type f 2>/dev/null | head -1)
+
+if [ -n "$DB_FILE" ]; then
+    echo -e "${YELLOW}📁 Base de datos encontrada: $DB_FILE${NC}"
+    
+    # Cambiar dueño a www-data
+    echo -e "${CYAN}   Cambiando dueño a www-data...${NC}"
+    chown www-data:www-data "$DB_FILE" 2>/dev/null || echo -e "${YELLOW}   ⚠️  No se pudo cambiar dueño${NC}"
+    
+    # Permisos del archivo
+    chmod 664 "$DB_FILE"
+    echo -e "${GREEN}✅ Permisos del archivo ajustados (664)${NC}"
+    
+    # Permisos del directorio
+    DB_DIR=$(dirname "$DB_FILE")
+    chmod 775 "$DB_DIR"
+    echo -e "${GREEN}✅ Permisos del directorio ajustados (775)${NC}"
+else
+    echo -e "${YELLOW}⚠️  No se encontró db.sqlite3 (puede estar usando PostgreSQL)${NC}"
+fi
+
+# Cambiar dueño de todo el proyecto (por si acaso)
+echo ""
+echo -e "${CYAN}   Cambiando dueño de todo el proyecto a www-data...${NC}"
+chown -R www-data:www-data "$PROJECT_DIR" || echo -e "${YELLOW}   ⚠️  No se pudo cambiar dueño completo${NC}"
+echo -e "${GREEN}✅ Permisos del proyecto ajustados${NC}"
+
+# ============================================
+# Paso 3: Reiniciar servicios
+# ============================================
+echo ""
+echo -e "${CYAN}▶ Paso 3: Reiniciando servicios...${NC}"
+
+# Reiniciar gunicorn
+if systemctl is-active --quiet gunicorn 2>/dev/null; then
+    echo -e "${CYAN}   Reiniciando gunicorn...${NC}"
+    systemctl restart gunicorn
+    echo -e "${GREEN}✅ Gunicorn reiniciado${NC}"
+elif systemctl is-active --quiet egarage 2>/dev/null; then
+    echo -e "${CYAN}   Reiniciando egarage...${NC}"
+    systemctl restart egarage
+    echo -e "${GREEN}✅ Servicio egarage reiniciado${NC}"
+elif systemctl is-active --quiet django 2>/dev/null; then
+    echo -e "${CYAN}   Reiniciando django...${NC}"
+    systemctl restart django
+    echo -e "${GREEN}✅ Servicio django reiniciado${NC}"
+else
+    echo -e "${YELLOW}⚠️  No se encontró servicio systemd activo${NC}"
+    echo -e "${YELLOW}   Verifica manualmente con: systemctl list-units --type=service | grep -E 'gunicorn|egarage|django'${NC}"
+fi
+
+# Reiniciar nginx
+if systemctl is-active --quiet nginx 2>/dev/null; then
+    echo -e "${CYAN}   Recargando nginx...${NC}"
+    systemctl reload nginx || systemctl restart nginx
+    echo -e "${GREEN}✅ Nginx recargado${NC}"
+fi
+
+# ============================================
+# Resumen y comandos útiles
+# ============================================
+echo ""
+echo -e "${GREEN}========================================${NC}"
+echo -e "${GREEN}✅ Fix completado!${NC}"
+echo -e "${GREEN}========================================${NC}"
+echo ""
+echo -e "${CYAN}📋 Próximos pasos:${NC}"
+echo ""
+echo -e "${YELLOW}1. Ver logs en tiempo real:${NC}"
+echo -e "   ${CYAN}journalctl -u gunicorn -f${NC}"
+echo ""
+echo -e "${YELLOW}2. Probar el sitio:${NC}"
+echo -e "   ${CYAN}curl -I http://egarage.cl${NC}"
+echo -e "   ${CYAN}curl -I http://www.egarage.cl${NC}"
+echo ""
+echo -e "${YELLOW}3. Ver logs de nginx si hay problemas:${NC}"
+echo -e "   ${CYAN}tail -f /var/log/nginx/error.log${NC}"
+echo ""
+SCRIPT_END
+
+chmod +x /root/FIX_ERROR_500_DIGITALOCEAN.sh
+
+echo "✅ Script creado en /root/FIX_ERROR_500_DIGITALOCEAN.sh"
+echo ""
+echo "Ahora ejecuta:"
+echo "  /root/FIX_ERROR_500_DIGITALOCEAN.sh"

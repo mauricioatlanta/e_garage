@@ -4,8 +4,6 @@ Middleware para resolver la empresa activa y su país de forma consistente.
 
 from django.utils.deprecation import MiddlewareMixin
 
-from taller.models import Empresa
-
 
 class CompanyCountryMiddleware(MiddlewareMixin):
     """
@@ -19,6 +17,10 @@ class CompanyCountryMiddleware(MiddlewareMixin):
     """
 
     def process_request(self, request):
+        from django.apps import apps
+
+        Empresa = apps.get_model("taller", "Empresa")
+
         company = None
         company_id = request.session.get("empresa_id")
 

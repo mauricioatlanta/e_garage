@@ -1,0 +1,1353 @@
+{% extends "taller/documentos/base/base_documento.html" %}
+{% load i18n %}
+
+{% load static %}
+{% load country_url %}
+
+<!-- 🇨🇱 CHILE TEMPLATE -  AMARILLA -->
+<!-- ⚡ TEMPLATE ACTIVO PARA CHILE (ES) -->
+
+{% block documento_content %}
+<form method="post" id="document-form" class="max-w-7xl mx-auto">
+  {% csrf_token %}
+
+  <!-- Campos ocultos requeridos -->
+  <input type="hidden" name="empresa" value="{{ empresa.id }}">
+  <input type="hidden" name="correlativo" value="1">
+  <input type="hidden" name="moneda" value="CLP">
+  <input type="hidden" name="country" value="{{ empresa.pais|default:'CL' }}">
+  <input type="hidden" name="neto_repuestos" id="neto_repuestos" value="0">
+  <input type="hidden" name="neto_servicios" id="neto_servicios" value="0">
+  <input type="hidden" name="neto_otros_servicios" id="neto_otros_servicios" value="0">
+  <input type="hidden" name="descuento" id="descuento_total" value="0">
+  <input type="hidden" name="tax_rate_applied" id="tax_rate_applied" value="19">
+  <input type="hidden" name="tax_amount" id="tax_amount" value="0">
+  <input type="hidden" name="total" id="total_documento" value="0">
+  <input type="hidden" name="created_at" value="{{ today|date:'Y-m-d' }}">
+
+  <!-- Mensajes del sistema -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert {{ message.tags }} bg-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-900/50 border border-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-400 rounded-xl p-4 mb-6">
+        <div class="text-{% if message.tags == 'error' %}red{% elif message.tags == 'success' %}green{% else %}blue{% endif %}-200 font-semibold">{{ message }}</div>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Errores de validación -->
+        {% if form.errors %}
+    <div class="bg-red-900/50 border border-red-400 rounded-xl p-4 mb-6">
+      <div class="text-red-200 font-semibold mb-2">Errores de validación:</div>
+      {{ form.errors }}
+    </div>
+  {% endif %}
+
+  <!-- Shell del documento con tema dinámico -->
+  <div id="doc-shell"
+       class="rounded-3xl p-6 theme-ot border-2"
+       data-url-veh="{% url 'chile:cl_ajax_vehiculos_por_cliente' %}"
+       data-url-rep="{% url 'taller:repuestos:api_repuesto_por_codigo' %}"
+       data-url-clientes="{% url 'chile:cl_ajax_buscar_clientes' %}"
+       data-url-nextnum="{% url 'taller:documentos:api_obtener_numero_documento' %}"
+       data-country="{{ empresa.pais|default:'CL' }}">
+
+    <!-- Cabecera del documento -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+
+      <!-- Tipo de documento y Estado de pago -->
+      <div class="space-y-4">
+        <label class="block text-cyan-200 font-semibold">Tipo de Documento</label>
+        <select id="id_tipo" name="tipo" class="form-select w-full">
+          <option value="OT">Orden de Trabajo</option>
+          <option value="REC">Recibo/Boleta</option>
+          <option value="PRES">Presupuesto</option>
+        </select>
+
+        <label class="block text-cyan-200 font-semibold">Estado de Pago</label>
+        <select name="estado_pago" class="form-select w-full">
+          <option value="NO_PAGADO" selected>No Pagado</option>
+          <option value="PAGADO">Pagado</option>
+          <option value="PARCIAL">Pago Parcial</option>
+        </select>
+
+                 <!-- Número (readonly) -->
+         <label class="block text-cyan-200 font-semibold">Número</label>
+         <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-3" id="id_numero">
+           Se generará automáticamente
+         </div>
+        <input type="hidden" name="numero_documento" id="numero_documento">
+        <input type="hidden" name="numero_documento_db" id="numero_documento_db">
+      </div>
+
+      <!-- Cliente y Vehículo -->
+      <div class="space-y-4">
+        <label class="block text-cyan-200 font-semibold">Cliente</label>
+
+        <!-- Campo de búsqueda AJAX -->
+        <div class="relative">
+          <input type="text" id="cliente-busqueda" class="form-control w-full" placeholder="Escribe para buscar clientes..." autocomplete="off">
+          <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        </div>
+
+        <!-- Campo de selección de cliente - ELIMINADO: Se usa solo el sistema de búsqueda AJAX -->
+
+        <!-- Campo oculto para almacenar el ID del cliente seleccionado -->
+        <input type="hidden" id="id_cliente" name="cliente" value="">
+
+        <!-- Campo oculto de respaldo para cliente -->
+        <input type="hidden" id="cliente_backup" name="cliente_backup" value="">
+
+
+
+        <!-- Información del cliente seleccionado -->
+        <div id="cliente-info" class="hidden p-3 bg-cyan-900/20 border border-cyan-400 rounded-lg">
+          <div class="text-cyan-200 text-sm">
+            <strong id="cliente-nombre"></strong><br>
+            <span id="cliente-email"></span><br>
+            <span id="cliente-telefono"></span>
+          </div>
+        </div>
+
+        <label class="block text-cyan-200 font-semibold">Vehículo</label>
+        <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
+          <option value="">Seleccione cliente primero...</option>
+        </select>
+      </div>
+
+      <!-- Técnico y Fecha -->
+      <div class="space-y-4">
+        <label class="block text-cyan-200 font-semibold">Técnico Responsable</label>
+        <select name="tecnico_responsable" class="form-select w-full">
+          <option value="">Seleccione técnico...</option>
+          {% for tecnico in tecnicos %}
+            <option value="{{ tecnico.id }}">{{ tecnico.nombre }}</option>
+          {% endfor %}
+        </select>
+
+        <label class="block text-cyan-200 font-semibold">Fecha de Emisión</label>
+        <input type="date" name="fecha_emision" class="form-control w-full" value="{{ today|date:'Y-m-d' }}">
+      </div>
+    </div>
+
+    <!-- Información adicional -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="space-y-4">
+        <label class="block text-cyan-200 font-semibold">Kilometraje</label>
+        <input type="number" name="kilometraje" min="0" class="form-control w-full" placeholder="0">
+      </div>
+    </div>
+
+    <!-- Líneas de repuestos -->
+    <!-- Management forms para repuestos -->
+    <input type="hidden" id="id_rep-TOTAL_FORMS" name="rep-TOTAL_FORMS" value="0">
+    <input type="hidden" name="rep-INITIAL_FORMS" value="0">
+    <input type="hidden" name="rep-MIN_NUM_FORMS" value="0">
+    <input type="hidden" name="rep-MAX_NUM_FORMS" value="1000">
+
+    <div class="mb-8">
+      <h3 class="text-2xl font-bold text-cyan-300 mb-4">🔧 Repuestos</h3>
+
+      <!-- Encabezados de repuestos -->
+      <div class="rep-headers mb-2" style="display: none;">
+             <div class="flex flex-wrap gap-4 items-end">
+                               <div class="w-20">
+                  <label class="block text-cyan-200 text-sm mb-1">Código</label>
+                </div>
+                <div class="flex-1 min-w-[150px]">
+                  <label class="block text-cyan-200 text-sm mb-1">Nombre</label>
+                </div>
+                <div class="w-20">
+                  <label class="block text-cyan-200 text-sm mb-1">Cantidad</label>
+                </div>
+                <div class="w-24">
+                   <label class="block text-cyan-200 text-sm mb-1">Precio Compra</label>
+                 </div>
+                 <div class="w-24">
+                   <label class="block text-cyan-200 text-sm mb-1">Precio Venta</label>
+                 </div>
+                 <div class="w-20">
+                   <label class="block text-cyan-200 text-sm mb-1">Descuento %</label>
+                 </div>
+                 <div class="w-32">
+                   <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
+                 </div>
+             </div>
+           </div>
+
+      <div id="repuestos-container">
+        <!-- Se llenará dinámicamente -->
+      </div>
+      <button type="button" id="add-repuesto" class="btn-secondary">+ Agregar Repuesto</button>
+    </div>
+
+    <!-- Líneas de servicios -->
+    <!-- Management forms para servicios -->
+    <input type="hidden" id="id_serv-TOTAL_FORMS" name="serv-TOTAL_FORMS" value="0">
+    <input type="hidden" name="serv-INITIAL_FORMS" value="0">
+    <input type="hidden" name="serv-MIN_NUM_FORMS" value="0">
+    <input type="hidden" name="serv-MAX_NUM_FORMS" value="1000">
+
+    <div class="mb-8">
+      <h3 class="text-2xl font-bold text-cyan-300 mb-4">🛠️ Servicios</h3>
+
+      <!-- Encabezados de servicios -->
+      <div class="serv-headers mb-2" style="display: none;">
+             <div class="flex flex-wrap gap-4 items-end">
+                               <div class="flex-1 min-w-[200px]">
+                  <label class="block text-cyan-200 text-sm mb-1">Servicio</label>
+                </div>
+                <div class="w-24">
+                  <label class="block text-cyan-200 text-sm mb-1">Precio Cliente</label>
+                </div>
+                <div class="w-32">
+                  <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
+                </div>
+             </div>
+           </div>
+
+      <div id="servicios-container">
+        <!-- Se llenará dinámicamente -->
+      </div>
+      <button type="button" id="add-servicio" class="btn-secondary">+ Agregar Servicio</button>
+    </div>
+
+    <!-- Líneas de otros servicios -->
+    <!-- Management forms para otros servicios -->
+    <input type="hidden" id="id_otr-TOTAL_FORMS" name="otr-TOTAL_FORMS" value="0">
+    <input type="hidden" name="otr-INITIAL_FORMS" value="0">
+    <input type="hidden" name="otr-MIN_NUM_FORMS" value="0">
+    <input type="hidden" name="otr-MAX_NUM_FORMS" value="1000">
+
+    <div class="mb-8">
+      <h3 class="text-2xl font-bold text-cyan-300 mb-4">🏢 Otros Servicios</h3>
+
+      <!-- Encabezados de otros servicios -->
+      <div class="otros-headers mb-2" style="display: none;">
+             <div class="flex flex-wrap gap-4 items-end">
+                               <div class="flex-1 min-w-[200px]">
+                  <label class="block text-cyan-200 text-sm mb-1">Servicio</label>
+                </div>
+                <div class="flex-1 min-w-[150px]">
+                  <label class="block text-cyan-200 text-sm mb-1">Empresa Externa</label>
+                </div>
+                <div class="w-24">
+                  <label class="block text-cyan-200 text-sm mb-1">Precio Taller</label>
+                </div>
+                <div class="w-24">
+                  <label class="block text-cyan-200 text-sm mb-1">Precio Cliente</label>
+                </div>
+                <div class="w-32">
+                  <label class="block text-cyan-200 text-sm mb-1">Subtotal</label>
+                </div>
+             </div>
+           </div>
+
+      <div id="otros-container">
+        <!-- Se llenará dinámicamente -->
+      </div>
+      <button type="button" id="add-otro" class="btn-secondary">+ Agregar Otro Servicio</button>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="mb-8">
+      <h3 class="text-2xl font-bold text-cyan-300 mb-4">📝 Observaciones</h3>
+      <div class="space-y-4">
+        <label class="block text-cyan-200 font-semibold">Notas adicionales</label>
+        <textarea
+          name="observaciones"
+          class="form-control w-full h-32 resize-y"
+          placeholder="Observaciones opcionales - Puede dejarse vacío si no hay información adicional..."
+        ></textarea>
+      </div>
+    </div>
+
+    <!-- Totales -->
+    <div class="totales-section">
+      <h3 class="text-2xl font-bold text-cyan-300 mb-4">💰 Totales</h3>
+
+      <!-- Checkboxes IVA junto a totales -->
+      <div class="mb-4">
+        <div class="flex flex-wrap gap-6 items-center">
+          <label class="flex items-center text-cyan-200">
+            <input type="checkbox" id="id_apply_vat" name="apply_vat" class="form-check-input" checked>
+            <span class="ml-2">Aplicar IVA (19%)</span>
+          </label>
+          <label class="flex items-center text-cyan-200">
+            <input type="checkbox" id="id_exclude_vat" name="exclude_vat" class="form-check-input">
+            <span class="ml-2">Excluir IVA</span>
+          </label>
+        </div>
+      </div>
+
+             <div class="space-y-2">
+                  <div class="totales-row">
+            <span class="text-cyan-200">Neto Repuestos:</span>
+            <span id="t_rep" class="text-cyan-300 font-bold">$0</span>
+          </div>
+          <div class="totales-row">
+            <span class="text-cyan-200">Neto Servicios:</span>
+            <span id="t_serv" class="text-cyan-300 font-bold">$0</span>
+          </div>
+          <div class="totales-row">
+            <span class="text-cyan-200">Neto Otros Servicios:</span>
+            <span id="t_otros" class="text-cyan-300 font-bold">$0</span>
+          </div>
+          <div class="totales-row">
+            <span class="text-cyan-200">IVA 19%:</span>
+            <span id="t_iva" class="text-cyan-300 font-bold">$0</span>
+          </div>
+          <div class="totales-row totales-total">
+            <span class="text-cyan-300 font-bold text-lg">Total:</span>
+            <span id="t_total" class="text-cyan-300 font-bold text-xl">$0</span>
+          </div>
+       </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="flex justify-between mt-8">
+      <a href="/cl/es/documentos/" class="btn-secondary">← Volver</a>
+      <button type="submit" class="btn-primary">💾 Guardar Documento</button>
+    </div>
+
+  </div>
+
+  {% include "taller/documentos/base/includes/payment_status_select.html" %}
+</form>
+
+<!-- JavaScript para funcionalidad interactiva -->
+<script>
+/* URLs y configuración leídas del DOM */
+const shell = document.getElementById('doc-shell');
+const urlVeh = shell.dataset.urlVeh;
+const urlRep = shell.dataset.urlRep;
+const urlBuscarClientes = shell.dataset.urlClientes;
+const urlNextNumber = shell.dataset.urlNextnum;
+const COUNTRY = shell.dataset.country || "CL";
+
+console.log(' TEMPLATE NUEVO CHILE CARGADO');
+console.log('🔗 URLs cargadas:', {
+  urlVeh,
+  urlRep,
+  urlBuscarClientes,
+  urlNextNumber,
+  COUNTRY
+});
+
+// 1) Saneador robusto: "$15.000", "15,000.50", "  15000  " -> número
+function numRaw(v) {
+  if (typeof v === 'number') return v;
+  v = (v ?? '').toString().trim();
+  if (!v) return 0;
+  v = v.replace(/[^\d,.\-]/g, '');
+  if (COUNTRY === 'CL') {
+    v = v.replace(/\./g, '').replace(',', '.');
+  } else {
+    v = v.replace(/,/g, '');
+  }
+  const n = parseFloat(v);
+  return isNaN(n) ? 0 : n;
+}
+
+function formatCLP(n) {
+  return new Intl.NumberFormat('es-CL', { style:'currency', currency:'CLP', maximumFractionDigits:0 }).format(Number(n)||0);
+}
+
+function money(n){
+  return COUNTRY==='CL' ? formatCLP(n) : new Intl.NumberFormat('en-US',{style:'currency',currency:'USD'}).format(Number(n)||0);
+}
+
+// util para setear texto seguro
+function setTxt(selOrEl, v){
+  const el = typeof selOrEl==='string' ? document.querySelector(selOrEl) : selOrEl;
+  if (el) el.textContent = v;
+}
+
+// Cambio de tema por tipo de documento
+const selTipo = document.getElementById('id_tipo');
+
+function applyTheme(tipo) {
+  shell.classList.remove('theme-ot', 'theme-rec', 'theme-pres');
+  if (tipo === 'REC') shell.classList.add('theme-rec');
+  else if (tipo === 'PRES') shell.classList.add('theme-pres');
+  else shell.classList.add('theme-ot');
+
+  updateDocumentNumber();
+}
+
+ async function updateDocumentNumber() {
+   const tipo = selTipo.value;
+   const numeroField = document.getElementById('id_numero');
+   const numeroHidden = document.getElementById('numero_documento');
+   const numeroDbHidden = document.getElementById('numero_documento_db');
+
+   if (!tipo || !urlNextNumber) {
+     numeroField.textContent = 'Se generará automáticamente';
+     numeroHidden.value = '';
+     numeroDbHidden.value = '';
+     return;
+   }
+
+   try {
+       console.log('🔢 Obteniendo próximo número:', { tipo, url: urlNextNumber });
+
+       const response = await fetch(`${urlNextNumber}?tipo=${encodeURIComponent(tipo)}`, {
+         headers: {
+           'X-Requested-With': 'XMLHttpRequest'
+         }
+       });
+
+       if (response.ok) {
+         const data = await response.json();
+         const num = data.numero || '';
+         numeroField.textContent = num || `Se generará automáticamente (${tipo})`;
+         numeroHidden.value = num;
+         numeroDbHidden.value = num;
+         console.log('✅ Número obtenido:', data.numero);
+       } else {
+         console.warn('⚠️ No se pudo obtener número automático');
+         numeroField.textContent = `Se generará automáticamente (${tipo})`;
+         numeroHidden.value = '';
+         numeroDbHidden.value = '';
+       }
+     } catch (error) {
+       console.error('❌ Error obteniendo número:', error);
+       numeroField.textContent = `Se generará automáticamente (${tipo})`;
+       numeroHidden.value = '';
+       numeroDbHidden.value = '';
+     }
+ }
+
+// Función para cargar vehículos por cliente
+async function cargarVehiculosPorCliente(clienteId) {
+  const selVeh = document.getElementById('id_vehiculo');
+  if (!selVeh || !clienteId) {
+    if (selVeh) selVeh.innerHTML = '<option value="">Seleccione cliente primero...</option>';
+    console.log('❌ No se puede cargar vehículos:', { selVeh: !!selVeh, clienteId });
+    return;
+  }
+
+  console.log('🔄 Cargando vehículos para cliente:', clienteId, 'URL:', urlVeh);
+  selVeh.innerHTML = '<option value="">-- Cargando vehículos... --</option>';
+
+  try {
+    const r = await fetch(`${urlVeh}?cliente=${encodeURIComponent(clienteId)}`, {
+      headers: { 'X-Requested-With': 'XMLHttpRequest' },
+      credentials: 'same-origin'
+    });
+
+    console.log('📡 Respuesta vehículos:', { status: r.status, ok: r.ok });
+
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const data = await r.json();
+
+    console.log('✅ Datos vehículos recibidos:', data);
+
+    const items = Array.isArray(data) ? data : (data.results || []);
+    if (!items.length) {
+      selVeh.innerHTML = '<option value="">-- No hay vehículos registrados --</option>';
+      console.log('⚠️ Cliente sin vehículos registrados');
+      return;
+    }
+
+    selVeh.innerHTML = '<option value="">Seleccione vehículo...</option>' +
+      items.map(v => {
+        const label = v.text || [v.patente, v.marca, v.modelo].filter(Boolean).join(' ') || `Vehículo #${v.id}`;
+        return `<option value="${v.id}">${label}</option>`;
+      }).join('');
+
+    console.log(`✅ ${items.length} vehículos cargados correctamente`);
+
+  } catch (err) {
+    console.error('❌ Error cargando vehículos:', err);
+    selVeh.innerHTML = '<option value="">-- Error al cargar vehículos --</option>';
+  }
+}
+
+// Búsqueda AJAX de clientes
+let searchTimeout;
+const clienteBusqueda = document.getElementById('cliente-busqueda');
+const clienteResultados = document.getElementById('cliente-resultados');
+const clienteSelect = document.getElementById('id_cliente');
+const clienteInfo = document.getElementById('cliente-info');
+
+async function buscarClientes(query) {
+  if (!query || query.length < 2) {
+    clienteResultados.classList.add('hidden');
+    return;
+  }
+
+  console.log('🔍 Buscando clientes con:', query, 'URL:', urlBuscarClientes);
+
+  try {
+    const response = await fetch(`${urlBuscarClientes}?q=${encodeURIComponent(query)}`, {
+      method: 'GET',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Content-Type': 'application/json',
+      },
+      credentials: 'same-origin'
+    });
+
+    console.log('📡 Respuesta:', {
+      status: response.status,
+      ok: response.ok,
+      contentType: response.headers.get('content-type')
+    });
+
+    if (response.status === 302 || response.status === 401) {
+      console.error('❌ Usuario no autenticado - redirigiendo a login');
+      clienteResultados.innerHTML = '<div class="p-3 text-red-400">⚠️ Sesión expirada. <a href="/accounts/login/" class="underline text-cyan-200">Inicia sesión</a></div>';
+      clienteResultados.classList.remove('hidden');
+      return;
+    }
+
+    if (response.ok) {
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        console.error('❌ Respuesta no es JSON:', contentType);
+        clienteResultados.innerHTML = '<div class="p-3 text-red-400">❌ Error: respuesta no válida del servidor</div>';
+        clienteResultados.classList.remove('hidden');
+        return;
+      }
+
+      const data = await response.json();
+      console.log('✅ Datos recibidos:', data);
+
+      let clientes = [];
+      if (Array.isArray(data)) {
+        clientes = data;
+      } else if (data && Array.isArray(data.results)) {
+        clientes = data.results;
+      } else if (data && Array.isArray(data.items)) {
+        clientes = data.items;
+      } else {
+        console.warn('⚠️ Formato inesperado:', data);
+        clientes = [];
+      }
+
+      mostrarResultadosClientes(clientes);
+    } else {
+      console.error('❌ Error HTTP:', response.status, response.statusText);
+      clienteResultados.innerHTML = '<div class="p-3 text-red-400">❌ Error del servidor</div>';
+      clienteResultados.classList.remove('hidden');
+    }
+  } catch (error) {
+    console.error('❌ Error completo:', error);
+    clienteResultados.innerHTML = '<div class="p-3 text-red-400">❌ Error de conexión</div>';
+    clienteResultados.classList.remove('hidden');
+  }
+}
+
+function mostrarResultadosClientes(clientes) {
+  if (clientes.length === 0) {
+    clienteResultados.innerHTML = '<div class="p-3 text-gray-400">No se encontraron clientes</div>';
+    clienteResultados.classList.remove('hidden');
+    return;
+  }
+
+  clienteResultados.replaceChildren(); // limpia
+  const frag = document.createDocumentFragment();
+
+  for (const cliente of clientes) {
+    const item = document.createElement('div');
+    item.className = 'cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+    item.dataset.id = cliente.id || '';
+
+    const nombre = (cliente.text || cliente.nombre_completo || cliente.nombre || cliente.razon_social || `Cliente #${cliente.id}` || '').toString();
+    const email = (cliente.email || '').toString();
+    const telefono = (cliente.telefono || '').toString();
+    const rut = (cliente.rut || '').toString();
+
+    item.dataset.nombre = nombre;
+    item.dataset.email = email;
+    item.dataset.telefono = telefono;
+    item.dataset.rut = rut;
+
+    const title = document.createElement('div');
+    title.className = 'font-semibold text-cyan-200';
+    title.textContent = nombre;
+
+    const meta = document.createElement('div');
+    meta.className = 'text-sm text-gray-300';
+    const bits = [];
+    if (rut) bits.push(`RUT: ${rut}`);
+    if (telefono) bits.push(`📞 ${telefono}`);
+    if (email) bits.push(`📧 ${email}`);
+    meta.textContent = bits.join(' | ') || 'Sin información adicional';
+
+    item.append(title, meta);
+    frag.appendChild(item);
+  }
+
+  clienteResultados.appendChild(frag);
+
+  clienteResultados.classList.remove('hidden');
+  console.log('✅ Resultados de clientes mostrados:', clientes.length);
+}
+
+async function seleccionarCliente(clienteId, nombre, email, telefono) {
+  clienteResultados.classList.add('hidden');
+  clienteBusqueda.value = nombre;
+
+  // Usar el campo oculto en lugar del select
+  const clienteHidden = document.getElementById('id_cliente');
+  if (clienteHidden) {
+    clienteHidden.value = clienteId;
+  }
+
+  document.getElementById('cliente-nombre').textContent = nombre;
+  document.getElementById('cliente-email').textContent = email || 'Sin email';
+  document.getElementById('cliente-telefono').textContent = telefono || 'Sin teléfono';
+  clienteInfo.classList.remove('hidden');
+
+  await cargarVehiculosPorCliente(clienteId);
+}
+
+// Función para cargar clientes en el select - ELIMINADA: Ya no usamos select
+
+// Recalcular totales
+function sumValues(selectorList){
+  const nodes = document.querySelectorAll(selectorList);
+  let acc = 0;
+  nodes.forEach(el => {
+    const v = ('value' in el) ? el.value : el.textContent;
+    acc += numRaw(v);
+  });
+  return acc;
+}
+
+window.recalcTotales = function(){
+  const rep = sumValues('.rep-subtotal');
+  const serv = sumValues('.serv-subtotal');
+  const otros = sumValues('.otr-subtotal');
+  const applyVat = document.getElementById('id_apply_vat')?.checked;
+  const excludeVat = document.getElementById('id_exclude_vat')?.checked;
+
+  // Lógica de IVA: si está marcado "Excluir IVA", no se aplica IVA
+  // Si está marcado "Aplicar IVA" y no está marcado "Excluir IVA", se aplica IVA
+  let iva = 0;
+  let taxRate = 0;
+  if (COUNTRY === 'CL' && applyVat && !excludeVat) {
+    taxRate = 19;
+    iva = Math.round((rep + serv + otros) * 0.19);
+  }
+
+  const tot = rep + serv + otros + iva;
+
+  // Actualizar campos visibles
+  setTxt('#t_rep',  money(rep));
+  setTxt('#t_serv', money(serv));
+  setTxt('#t_otros', money(otros));
+  setTxt('#t_iva',  money(iva));
+  setTxt('#t_total',money(tot));
+
+         // Actualizar campos ocultos para el envío del formulario
+         const netoRepuestos = document.getElementById('neto_repuestos');
+         const netoServicios = document.getElementById('neto_servicios');
+         const netoOtrosServicios = document.getElementById('neto_otros_servicios');
+         const descuentoTotal = document.getElementById('descuento_total');
+         const taxRateApplied = document.getElementById('tax_rate_applied');
+         const taxAmount = document.getElementById('tax_amount');
+         const totalDocumento = document.getElementById('total_documento');
+         const clienteBackup = document.getElementById('cliente_backup');
+         const clienteSelect = document.getElementById('id_cliente');
+
+         if (netoRepuestos) netoRepuestos.value = rep;
+         if (netoServicios) netoServicios.value = serv;
+         if (netoOtrosServicios) netoOtrosServicios.value = otros;
+         if (descuentoTotal) descuentoTotal.value = 0; // Por ahora sin descuentos globales
+         if (taxRateApplied) taxRateApplied.value = taxRate;
+         if (taxAmount) taxAmount.value = iva;
+         if (totalDocumento) totalDocumento.value = tot;
+
+         // Asegurar que el cliente se envíe
+         const clienteHidden = document.getElementById('id_cliente');
+         if (clienteBackup && clienteHidden) {
+           clienteBackup.value = clienteHidden.value || '';
+         }
+};
+
+// Event listeners
+selTipo?.addEventListener('change', e => applyTheme(e.target.value));
+
+clienteBusqueda?.addEventListener('input', (e) => {
+  clearTimeout(searchTimeout);
+  searchTimeout = setTimeout(() => {
+    buscarClientes(e.target.value);
+  }, 300);
+});
+
+clienteBusqueda?.addEventListener('focus', () => {
+  if (clienteBusqueda.value.length >= 2) {
+    buscarClientes(clienteBusqueda.value);
+  }
+});
+
+document.addEventListener('click', (e) => {
+  if (clienteBusqueda && clienteResultados &&
+      !clienteBusqueda.contains(e.target) && !clienteResultados.contains(e.target)) {
+    clienteResultados.classList.add('hidden');
+  }
+});
+
+clienteResultados?.addEventListener('click', (e) => {
+  const clienteItem = e.target.closest('.cliente-item');
+  if (clienteItem) {
+    const id = clienteItem.dataset.id;
+    const nombre = clienteItem.dataset.nombre;
+    const email = clienteItem.dataset.email;
+    const telefono = clienteItem.dataset.telefono;
+    seleccionarCliente(id, nombre, email, telefono);
+  }
+});
+
+// Event listener para cuando se selecciona un cliente del select - ELIMINADO: Ya no usamos select
+
+// Función para manejar la lógica mutuamente excluyente de los checkboxes de IVA
+function handleVatCheckboxes() {
+  const applyVat = document.getElementById('id_apply_vat');
+  const excludeVat = document.getElementById('id_exclude_vat');
+
+  if (applyVat && excludeVat) {
+    // Si se marca "Excluir IVA", desmarcar "Aplicar IVA"
+    excludeVat.addEventListener('change', function() {
+      if (this.checked) {
+        applyVat.checked = false;
+      }
+      window.recalcTotales();
+    });
+
+    // Si se marca "Aplicar IVA", desmarcar "Excluir IVA"
+    applyVat.addEventListener('change', function() {
+      if (this.checked) {
+        excludeVat.checked = false;
+      }
+      window.recalcTotales();
+    });
+  }
+}
+
+// Inicializar la lógica de checkboxes
+handleVatCheckboxes();
+
+document.addEventListener('DOMContentLoaded', () => {
+  applyTheme(selTipo?.value);
+  updateDocumentNumber();
+
+  // Cargar clientes en el select - ELIMINADO: Ya no usamos select
+
+  // Inicializar totales con formato chileno
+  setTimeout(() => {
+    window.recalcTotales();
+  }, 100);
+});
+
+// Agregar filas dinámicamente
+document.getElementById('add-repuesto')?.addEventListener('click', () => {
+  const container = document.getElementById('repuestos-container');
+  const formCount = document.getElementById('id_rep-TOTAL_FORMS');
+  const currentCount = parseInt(formCount?.value || 0);
+
+  const newRow = document.createElement('div');
+  newRow.className = 'rep-row linea-row';
+  newRow.innerHTML = `
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="w-20">
+        <input type="text" name="rep-${currentCount}-codigo" class="rep-codigo form-control w-full" placeholder="Código">
+      </div>
+      <div class="flex-1 min-w-[150px]">
+        <input type="text" name="rep-${currentCount}-nombre" class="rep-nombre form-control w-full" readonly placeholder="Nombre">
+      </div>
+      <div class="w-20">
+        <input type="number" name="rep-${currentCount}-cantidad" class="rep-cantidad form-control w-full" min="1" max="99" value="1" placeholder="Cant.">
+      </div>
+      <div class="w-24">
+        <input type="text" name="precio_compra" class="rep-precio-compra form-control w-full" readonly placeholder="$0" title="Precio Compra">
+      </div>
+      <div class="w-24">
+        <input type="text" name="rep-${currentCount}-precio_unitario" class="rep-precio-venta form-control w-full" placeholder="$0" title="Precio Venta">
+      </div>
+      <div class="w-20">
+        <input type="number" name="rep-${currentCount}-descuento" class="form-control w-full" min="0" max="100" value="0" placeholder="Desc.%" title="Descuento %">
+      </div>
+      <div class="w-32">
+        <input type="hidden" class="rep-subtotal" value="0">
+        <div class="rep-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(newRow);
+  if (formCount) formCount.value = currentCount + 1;
+
+  // Mostrar encabezados cuando se agrega el primer repuesto
+  if (currentCount === 0) {
+    const headers = document.querySelector('.rep-headers');
+    if (headers) {
+      headers.style.display = 'block';
+    }
+  }
+
+  // Wire la nueva fila
+  wireRepRow(newRow);
+
+  // Posicionar cursor en el campo "código" (part number) para todas las filas
+  const newCodeField = newRow.querySelector('.rep-codigo');
+  if (newCodeField) {
+    // Usar setTimeout para asegurar que el campo esté completamente renderizado
+    setTimeout(() => {
+      newCodeField.focus();
+      // Seleccionar todo el texto si hay alguno para facilitar la edición
+      newCodeField.select();
+    }, 50);
+  }
+});
+
+document.getElementById('add-servicio')?.addEventListener('click', () => {
+  const container = document.getElementById('servicios-container');
+  const formCount = document.getElementById('id_serv-TOTAL_FORMS');
+  const currentCount = parseInt(formCount?.value || 0);
+
+  const newRow = document.createElement('div');
+  newRow.className = 'serv-row linea-row';
+  newRow.innerHTML = `
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-[200px] relative">
+        <input type="text" name="serv-${currentCount}-servicio-search" class="serv-search form-control w-full" placeholder="Buscar servicio..." autocomplete="off">
+        <input type="hidden" name="serv-${currentCount}-servicio" class="serv-servicio-id" value="">
+        <div class="serv-resultados absolute z-50 bg-gray-900 border border-cyan-500 rounded-lg max-h-48 overflow-y-auto hidden w-full" style="top: 100%; left: 0;"></div>
+      </div>
+      <div class="w-24">
+        <input type="text" name="serv-${currentCount}-precio_unitario" class="serv-precio form-control w-full" placeholder="$0" title="Precio Cliente">
+      </div>
+      <div class="w-32">
+        <input type="hidden" class="serv-subtotal" value="0">
+        <div class="serv-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(newRow);
+  if (formCount) formCount.value = currentCount + 1;
+
+  // Mostrar encabezados cuando se agrega el primer servicio
+  if (currentCount === 0) {
+    const headers = document.querySelector('.serv-headers');
+    if (headers) {
+      headers.style.display = 'block';
+    }
+  }
+
+  // Wire la nueva fila
+  wireServRow(newRow);
+
+  // Posicionar cursor en el campo de búsqueda de servicio
+  const newSearchField = newRow.querySelector('.serv-search');
+  if (newSearchField) {
+    // Usar setTimeout para asegurar que el campo esté completamente renderizado
+    setTimeout(() => {
+      newSearchField.focus();
+      // Seleccionar todo el texto si hay alguno para facilitar la edición
+      newSearchField.select();
+    }, 50);
+  }
+});
+
+document.getElementById('add-otro')?.addEventListener('click', () => {
+  const container = document.getElementById('otros-container');
+  const formCount = document.getElementById('id_otr-TOTAL_FORMS');
+  const currentCount = parseInt(formCount?.value || 0);
+
+  const newRow = document.createElement('div');
+  newRow.className = 'otr-row linea-row';
+  newRow.innerHTML = `
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-[200px] relative">
+        <input type="text" name="otr-${currentCount}-servicio-search" class="otr-search form-control w-full" placeholder="Buscar servicio..." autocomplete="off">
+        <input type="hidden" name="otr-${currentCount}-servicio" class="otr-servicio-id" value="">
+        <div class="otr-resultados absolute z-50 bg-gray-900 border border-cyan-500 rounded-lg max-h-48 overflow-y-auto hidden w-full" style="top: 100%; left: 0;"></div>
+      </div>
+      <div class="flex-1 min-w-[150px]">
+        <input type="text" name="otr-${currentCount}-empresa_externa" class="form-control w-full" placeholder="Empresa Externa" title="Empresa Externa">
+      </div>
+      <div class="w-24">
+        <input type="text" name="precio_taller" class="otr-precio-taller form-control w-full" placeholder="$0" title="Precio Taller">
+      </div>
+      <div class="w-24">
+        <input type="text" name="otr-${currentCount}-precio_cliente" class="otr-precio form-control w-full" placeholder="$0" title="Precio Cliente">
+      </div>
+      <div class="w-32">
+        <input type="hidden" class="otr-subtotal" value="0">
+        <div class="otr-subtotal-view subtotal-field w-full text-right font-bold">$0</div>
+      </div>
+    </div>
+  `;
+
+  container.appendChild(newRow);
+  if (formCount) formCount.value = currentCount + 1;
+
+  // Mostrar encabezados cuando se agrega el primer otro servicio
+  if (currentCount === 0) {
+    const headers = document.querySelector('.otros-headers');
+    if (headers) {
+      headers.style.display = 'block';
+    }
+  }
+
+  // Wire la nueva fila
+  wireOtroRow(newRow);
+});
+
+// Funciones para autocompletado de repuestos
+let repuestoDropdown = null;
+
+function hideRepuestoDropdown() {
+  if (repuestoDropdown) {
+    repuestoDropdown.remove();
+    repuestoDropdown = null;
+  }
+}
+
+function showRepuestoDropdown(suggestions, inputElement, nameField, pcField, pvField) {
+  // Ocultar dropdown anterior si existe
+  hideRepuestoDropdown();
+
+  if (!suggestions || suggestions.length === 0) {
+    return;
+  }
+
+  // Crear dropdown
+  repuestoDropdown = document.createElement('div');
+  repuestoDropdown.className = 'repuesto-dropdown';
+  repuestoDropdown.style.cssText = `
+    position: absolute;
+    background: rgba(20, 20, 40, 0.95);
+    border: 2px solid #00f2fe;
+    border-radius: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    min-width: 300px;
+    box-shadow: 0 8px 25px rgba(0, 242, 254, 0.4);
+    backdrop-filter: blur(10px);
+  `;
+
+  // Agregar cada sugerencia
+  suggestions.forEach(repuesto => {
+    const item = document.createElement('div');
+    item.className = 'repuesto-suggestion';
+    item.style.cssText = `
+      padding: 0.75rem;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+      color: #fff;
+      transition: background 0.2s;
+    `;
+
+    item.innerHTML = `
+      <div style="font-weight: bold; color: #00f2fe;">${repuesto.codigo || 'Sin código'}</div>
+      <div style="font-size: 0.9rem; color: #94a3b8;">${repuesto.nombre || 'Sin nombre'}</div>
+      <div style="font-size: 0.8rem; color: #7f00ff;">Precio: $${repuesto.precio_venta || '0'}</div>
+    `;
+
+    // Eventos de hover
+    item.addEventListener('mouseenter', () => {
+      item.style.background = 'rgba(0, 242, 254, 0.2)';
+    });
+
+    item.addEventListener('mouseleave', () => {
+      item.style.background = 'transparent';
+    });
+
+    // Seleccionar repuesto al hacer click
+    item.addEventListener('click', () => {
+      inputElement.value = repuesto.codigo;
+      nameField.value = repuesto.nombre || '';
+      pcField.value = money(repuesto.precio_compra || '0');
+      pvField.value = money(repuesto.precio_venta || '0');
+      hideRepuestoDropdown();
+      recalc();
+      console.log('✅ Repuesto seleccionado:', repuesto);
+    });
+
+    repuestoDropdown.appendChild(item);
+  });
+
+  // Posicionar el dropdown
+  const rect = inputElement.getBoundingClientRect();
+  repuestoDropdown.style.left = rect.left + 'px';
+  repuestoDropdown.style.top = (rect.bottom + window.scrollY + 5) + 'px';
+
+  // Agregar al documento
+  document.body.appendChild(repuestoDropdown);
+
+  // Ocultar al hacer click fuera
+  setTimeout(() => {
+    document.addEventListener('click', hideRepuestoDropdown, { once: true });
+  }, 100);
+}
+
+async function fetchRepuestosSuggestions(code, inputElement, nameField, pcField, pvField) {
+  try {
+    console.log('🔧 Buscando sugerencias para:', code);
+
+    const response = await fetch(`${urlRep}?codigo=${encodeURIComponent(code)}`);
+    if (!response.ok) return;
+
+    const data = await response.json();
+    console.log('🔧 Sugerencias recibidas:', data);
+
+    if (data && data.results && data.results.length > 0) {
+      showRepuestoDropdown(data.results, inputElement, nameField, pcField, pvField);
+    } else {
+      hideRepuestoDropdown();
+    }
+  } catch (error) {
+    console.error('❌ Error buscando sugerencias:', error);
+    hideRepuestoDropdown();
+  }
+}
+
+// Funciones para wire de filas
+function wireRepRow(row) {
+  const inpCode = row.querySelector('.rep-codigo');
+  const inpName = row.querySelector('.rep-nombre');
+  const inpPC = row.querySelector('.rep-precio-compra');
+  const inpPV = row.querySelector('.rep-precio-venta');
+  const qEl = row.querySelector('.rep-cantidad');
+  const sub = row.querySelector('.rep-subtotal');
+  const view = row.querySelector('.rep-subtotal-view');
+
+  async function fetchByCode(c) {
+    if (!c || urlRep === '#') return;
+    try {
+      const r = await fetch(`${urlRep}?codigo=${encodeURIComponent(c)}`);
+      if (!r.ok) return;
+      const j = await r.json();
+
+      console.log('🔧 Respuesta de repuestos:', j);
+
+      // Manejar nueva estructura con results
+      if (j && j.results && j.results.length > 0) {
+        // Tomar el primer resultado que coincida exactamente, o el primero si no hay coincidencia exacta
+        let repuesto = j.results.find(r => r.codigo && r.codigo.toLowerCase() === c.toLowerCase());
+        if (!repuesto) {
+          repuesto = j.results[0]; // Tomar el primero si no hay coincidencia exacta
+        }
+
+        if (repuesto && repuesto.id) {
+          inpName.value = repuesto.nombre || '';
+          inpPC.value = money(repuesto.precio_compra || '0');
+          inpPV.value = money(repuesto.precio_venta || '0');
+          recalc();
+          console.log('✅ Repuesto encontrado:', repuesto);
+        }
+      } else if (j && j.id) {
+        // Compatibilidad con estructura anterior
+        inpName.value = j.nombre || '';
+        inpPC.value = money(j.precio_compra || '0');
+        inpPV.value = money(j.precio_venta || '0');
+        recalc();
+        console.log('✅ Repuesto encontrado (formato anterior):', j);
+      } else {
+        console.log('⚠️ No se encontraron repuestos para:', c);
+      }
+    } catch (error) {
+      console.error('❌ Error buscando repuesto:', error);
+    }
+  }
+
+  function recalc() {
+    const q = numRaw(qEl?.value);
+    const pv = numRaw(inpPV?.value);
+    const s = (q * pv) || 0;
+    if (sub) sub.value = Math.round(s);
+    if (view) view.textContent = money(s);
+    window.recalcTotales?.();
+  }
+
+  // Búsqueda en tiempo real mientras escribes
+  let searchTimeout;
+  inpCode?.addEventListener('input', (e) => {
+    const value = e.target.value.trim();
+
+    // Limpiar timeout anterior
+    if (searchTimeout) {
+      clearTimeout(searchTimeout);
+    }
+
+    // Búsqueda con debounce (esperar 300ms después de que deje de escribir)
+    if (value.length >= 2) {
+      searchTimeout = setTimeout(() => {
+        fetchRepuestosSuggestions(value, inpCode, inpName, inpPC, inpPV);
+      }, 300);
+    } else {
+      // Limpiar campos si no hay suficientes caracteres
+      inpName.value = '';
+      inpPC.value = '';
+      inpPV.value = '';
+      hideRepuestoDropdown();
+    }
+  });
+
+  // También mantener la búsqueda en change para compatibilidad
+  inpCode?.addEventListener('change', () => fetchByCode(inpCode.value.trim()));
+  qEl?.addEventListener('input', recalc);
+  inpPV?.addEventListener('input', recalc);
+
+  recalc(); // Inicializar
+}
+
+function wireServRow(row) {
+  const searchEl = row.querySelector('.serv-search');
+  const idEl = row.querySelector('.serv-servicio-id');
+  const pEl = row.querySelector('.serv-precio');
+  const sub = row.querySelector('.serv-subtotal');
+  const view = row.querySelector('.serv-subtotal-view');
+  const resultadosEl = row.querySelector('.serv-resultados');
+
+  function recalc() {
+    const p = numRaw(pEl?.value);
+    const s = p || 0; // Los servicios no tienen cantidad, solo precio
+    if (sub) sub.value = Math.round(s);
+    if (view) view.textContent = money(s);
+    window.recalcTotales?.();
+  }
+
+  // Búsqueda de servicios
+  let searchTimeout;
+  async function buscarServicios(query) {
+    if (!query || query.length < 2) {
+      resultadosEl.classList.add('hidden');
+      return;
+    }
+
+    console.log('🔍 Buscando servicios:', query);
+
+    try {
+      const response = await fetch(`/cl/documentos/api/autocomplete-servicio/?q=${encodeURIComponent(query)}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+
+      if (response.ok) {
+        const servicios = await response.json();
+        mostrarResultadosServicios(servicios);
+      } else {
+        console.error('❌ Error buscando servicios:', response.status);
+        resultadosEl.classList.add('hidden');
+      }
+    } catch (error) {
+      console.error('❌ Error buscando servicios:', error);
+      resultadosEl.classList.add('hidden');
+    }
+  }
+
+  function mostrarResultadosServicios(servicios) {
+    if (servicios.length === 0) {
+      resultadosEl.innerHTML = '<div class="p-3 text-gray-400">No se encontraron servicios</div>';
+      resultadosEl.classList.remove('hidden');
+      return;
+    }
+
+    resultadosEl.replaceChildren();
+    const frag = document.createDocumentFragment();
+
+    servicios.forEach(servicio => {
+      const item = document.createElement('div');
+      item.className = 'servicio-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      item.dataset.id = servicio.id || '';
+      item.dataset.nombre = servicio.nombre || '';
+      item.dataset.precio = servicio.precio || '0';
+
+      const title = document.createElement('div');
+      title.className = 'font-semibold text-cyan-200';
+      title.textContent = servicio.nombre || 'Servicio sin nombre';
+
+      const meta = document.createElement('div');
+      meta.className = 'text-sm text-gray-300';
+      meta.textContent = `Precio: ${money(servicio.precio || 0)}`;
+
+      item.append(title, meta);
+      frag.appendChild(item);
+    });
+
+    resultadosEl.appendChild(frag);
+    resultadosEl.classList.remove('hidden');
+    console.log('✅ Resultados de servicios mostrados:', servicios.length);
+  }
+
+  async function seleccionarServicio(servicioId, nombre, precio) {
+    resultadosEl.classList.add('hidden');
+    if (searchEl) searchEl.value = nombre;
+    if (idEl) idEl.value = servicioId;
+  if (pEl) {
+      pEl.value = money(precio);
+      recalc();
+    }
+    console.log('✅ Servicio seleccionado:', { id: servicioId, nombre, precio });
+  }
+
+  // Event listeners
+  searchEl?.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      buscarServicios(e.target.value);
+    }, 300);
+  });
+
+  searchEl?.addEventListener('focus', () => {
+    if (searchEl.value.length >= 2) {
+      buscarServicios(searchEl.value);
+    }
+  });
+
+  resultadosEl?.addEventListener('click', (e) => {
+    const servicioItem = e.target.closest('.servicio-item');
+    if (servicioItem) {
+      const id = servicioItem.dataset.id;
+      const nombre = servicioItem.dataset.nombre;
+      const precio = servicioItem.dataset.precio;
+      seleccionarServicio(id, nombre, precio);
+    }
+  });
+
+  pEl?.addEventListener('input', recalc);
+
+  // Ocultar resultados al hacer click fuera
+  document.addEventListener('click', (e) => {
+    if (searchEl && resultadosEl &&
+        !searchEl.contains(e.target) && !resultadosEl.contains(e.target)) {
+      resultadosEl.classList.add('hidden');
+    }
+  });
+
+  recalc(); // Inicializar
+}
+
+function wireOtroRow(row) {
+  const searchEl = row.querySelector('.otr-search');
+  const idEl = row.querySelector('.otr-servicio-id');
+  const pEl = row.querySelector('.otr-precio');
+  const sub = row.querySelector('.otr-subtotal');
+  const view = row.querySelector('.otr-subtotal-view');
+  const resultadosEl = row.querySelector('.otr-resultados');
+
+  function recalc() {
+    const p = numRaw(pEl?.value);
+    const s = p || 0; // Los otros servicios no tienen cantidad, solo precio
+    if (sub) sub.value = Math.round(s);
+    if (view) view.textContent = money(s);
+    window.recalcTotales?.();
+  }
+
+  // Búsqueda de servicios
+  let searchTimeout;
+  async function buscarServicios(query) {
+    if (!query || query.length < 2) {
+      resultadosEl.classList.add('hidden');
+      return;
+    }
+
+    console.log('🔍 Buscando servicios (otros):', query);
+
+    try {
+      const response = await fetch(`/cl/documentos/api/autocomplete-servicio/?q=${encodeURIComponent(query)}`, {
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+      });
+
+      if (response.ok) {
+        const servicios = await response.json();
+        mostrarResultadosServicios(servicios);
+      } else {
+        console.error('❌ Error buscando servicios:', response.status);
+        resultadosEl.classList.add('hidden');
+      }
+    } catch (error) {
+      console.error('❌ Error buscando servicios:', error);
+      resultadosEl.classList.add('hidden');
+    }
+  }
+
+  function mostrarResultadosServicios(servicios) {
+    if (servicios.length === 0) {
+      resultadosEl.innerHTML = '<div class="p-3 text-gray-400">No se encontraron servicios</div>';
+      resultadosEl.classList.remove('hidden');
+      return;
+    }
+
+    resultadosEl.replaceChildren();
+    const frag = document.createDocumentFragment();
+
+    servicios.forEach(servicio => {
+      const item = document.createElement('div');
+      item.className = 'servicio-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      item.dataset.id = servicio.id || '';
+      item.dataset.nombre = servicio.nombre || '';
+      item.dataset.precio = servicio.precio || '0';
+
+      const title = document.createElement('div');
+      title.className = 'font-semibold text-cyan-200';
+      title.textContent = servicio.nombre || 'Servicio sin nombre';
+
+      const meta = document.createElement('div');
+      meta.className = 'text-sm text-gray-300';
+      meta.textContent = `Precio: ${money(servicio.precio || 0)}`;
+
+      item.append(title, meta);
+      frag.appendChild(item);
+    });
+
+    resultadosEl.appendChild(frag);
+    resultadosEl.classList.remove('hidden');
+    console.log('✅ Resultados de servicios (otros) mostrados:', servicios.length);
+  }
+
+  async function seleccionarServicio(servicioId, nombre, precio) {
+    resultadosEl.classList.add('hidden');
+    if (searchEl) searchEl.value = nombre;
+    if (idEl) idEl.value = servicioId;
+    if (pEl) {
+      pEl.value = money(precio);
+      recalc();
+    }
+    console.log('✅ Servicio (otros) seleccionado:', { id: servicioId, nombre, precio });
+  }
+
+// Event listeners
+  searchEl?.addEventListener('input', (e) => {
+    clearTimeout(searchTimeout);
+    searchTimeout = setTimeout(() => {
+      buscarServicios(e.target.value);
+    }, 300);
+  });
+
+  searchEl?.addEventListener('focus', () => {
+    if (searchEl.value.length >= 2) {
+      buscarServicios(searchEl.value);
+    }
+  });
+
+  resultadosEl?.addEventListener('click', (e) => {
+    const servicioItem = e.target.closest('.servicio-item');
+    if (servicioItem) {
+      const id = servicioItem.dataset.id;
+      const nombre = servicioItem.dataset.nombre;
+      const precio = servicioItem.dataset.precio;
+      seleccionarServicio(id, nombre, precio);
+    }
+  });
+
+  pEl?.addEventListener('input', recalc);
+
+  // Ocultar resultados al hacer click fuera
+  document.addEventListener('click', (e) => {
+    if (searchEl && resultadosEl &&
+        !searchEl.contains(e.target) && !resultadosEl.contains(e.target)) {
+      resultadosEl.classList.add('hidden');
+    }
+  });
+
+  recalc(); // Inicializar
+}
+</script>
+{% endblock %}

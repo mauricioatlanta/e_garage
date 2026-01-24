@@ -5,7 +5,15 @@
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="UTF-8">
-  <title>{% block title %}{{ company_name|default:"eGarage" }}{% endblock %}</title>
+  <title>
+    {% block title %}
+      {% if request.user.is_authenticated and company_name %}
+        {{ company_name }} | Panel
+      {% else %}
+        eGarage | Control total
+      {% endif %}
+    {% endblock %}
+  </title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   {# --- PWA Configuration --- #}
@@ -39,15 +47,38 @@
 
   {# --- Branding variables --- #}
   <style>
+    /* Prioridad: COLOR_PRIMARIO desde logo_empresa > company_color desde company_branding > default */
     :root{
-      --company-primary: {{ company_color|default:"#0d6efd" }};
-      --company-secondary: {{ secondary_color|default:"#6c757d" }};
-      --bs-primary: {{ company_color|default:"#0d6efd" }};
-      --bs-secondary: {{ secondary_color|default:"#6c757d" }};
+      --company-primary: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }};
+      --company-secondary: {{ COLOR_SECUNDARIO|default:secondary_color|default:"#0d6efd" }};
+      
+      /* Variables de Bootstrap para compatibilidad */
+      --bs-primary: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }};
+      --bs-secondary: {{ COLOR_SECUNDARIO|default:secondary_color|default:"#0d6efd" }};
     }
+    
+    /* Estilos base con colores personalizados */
     .text-primary,.navbar-brand{color:var(--company-primary)!important}
     .bg-primary{background-color:var(--company-primary)!important}
-    .btn-primary{background-color:var(--company-primary)!important;border-color:var(--company-primary)!important}
+    .btn-primary{
+        background-color:var(--company-primary)!important;
+        border-color:var(--company-primary)!important;
+        /* Mejora legibilidad del texto en botones con colores claros */
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        color: #ffffff !important;
+    }
+    
+    /* Efectos hover y bordes con transparencia para botones de navegación */
+    .nav-button-standard {
+        border-color: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }}4D; /* 4D = 30% opacidad */
+        /* Mejora legibilidad del texto en botones de navegación */
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+    
+    .nav-button-standard:hover {
+        box-shadow: 0 0 20px {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }}66; /* 66 = 40% opacidad */
+        border-color: var(--company-primary);
+    }
     .btn-primary:hover{
       background-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
       border-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
@@ -775,16 +806,14 @@
   })();
   </script>
 
-  {# --- jQuery / DAL --- #}
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
-  <script src="{% static 'autocomplete_light_custom/jquery.init.js' %}"></script>
-  <script src="{% static 'autocomplete_light_custom/select2.js' %}"></script>
-  <script src="{% static 'autocomplete_light_custom/autocomplete_light.js' %}"></script>
-  <script src="{% static 'autocomplete_light_custom/autocomplete.init.js' %}"></script>
+  {# --- jQuery (solo una vez, necesario para DAL) --- #}
+  {# jQuery se carga aquí una sola vez. DAL oficial (form.media) cargará Select2 y autocomplete_light después #}
+  <script src="{% static 'vendor/jquery/jquery-3.6.0.min.js' %}"></script>
 
   {% block extra_head %}{% endblock %}
   {% block extra_css %}{% endblock %}
+  {# CSS de form.media (DAL/Select2) - se carga aquí si hay formulario #}
+  {% if form %}{{ form.media.css }}{% endif %}
 </head>
 
 <body class="min-h-screen flex flex-col">
@@ -802,19 +831,16 @@
   {% endif %}
 
   {# --- Header --- #}
-  {% if request.path != '/accounts/login/' %}
+  {% if '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
   <header class="company-header flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 p-4 sm:p-6">
     <!-- Logo y nombre de la empresa -->
     <div class="flex items-center gap-4 sm:gap-6">
-      {% if company_logo_url %}
-        <img src="{{ company_logo_url }}" alt="{% if request.path == '/' or request.path == '' or 'seleccionar_pais' in request.path %}eGarage{% else %}{{ company_name|default:'eGarage' }}{% endif %} Logo"
-             class="company-logo h-24 sm:h-32 w-auto rounded-lg shadow-2xl border-2 border-opacity-40"
-             style="border-color: {{ company_color|default:'#00ffff' }}; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));"
-             onerror="this.onerror=null; this.src='{% static 'images/egarage_default_logo.svg' %}';">
-      {% else %}
-        <img src="{% static 'images/egarage_default_logo.svg' %}" alt="{% if request.path == '/' or request.path == '' or 'seleccionar_pais' in request.path %}eGarage{% else %}{{ company_name|default:'eGarage' }}{% endif %} Logo"
-             class="company-logo h-24 sm:h-32 w-auto rounded-lg shadow-2xl border-2 border-opacity-40"
-             style="border-color: {{ company_color|default:'#00ffff' }}; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));">
+      {% if LOGO_PERSONALIZADO or company_logo_url or COMPANY_LOGO %}
+        {# Logo personalizado de la empresa del suscriptor - Prioridad: LOGO_PERSONALIZADO > company_logo_url > COMPANY_LOGO #}
+        <img src="{% if LOGO_PERSONALIZADO %}{{ LOGO_PERSONALIZADO }}{% elif company_logo_url %}{{ company_logo_url }}{% else %}{{ COMPANY_LOGO }}{% endif %}" 
+             alt="{% if NOMBRE_EMPRESA_PERSONALIZADO %}{{ NOMBRE_EMPRESA_PERSONALIZADO }}{% elif company_name %}{{ company_name }}{% elif COMPANY_NAME %}{{ COMPANY_NAME }}{% else %}Logo{% endif %}"
+             class="company-logo h-24 sm:h-32 w-auto object-contain rounded-lg shadow-2xl border-2 border-opacity-40"
+             style="border-color: {{ COLOR_PRIMARIO|default:company_color|default:'#00ffff' }}; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));">
       {% endif %}
 
       <div class="flex flex-col">
@@ -822,11 +848,23 @@
           {% if request.path == '/' or request.path == '' or 'seleccionar_pais' in request.path %}
             eGarage
           {% else %}
-            {{ company_name|default:"eGarage" }}
+            {% if NOMBRE_EMPRESA_PERSONALIZADO %}
+              {{ NOMBRE_EMPRESA_PERSONALIZADO }}
+            {% elif company_name %}
+              {{ company_name }}
+            {% elif COMPANY_NAME %}
+              {{ COMPANY_NAME }}
+            {% else %}
+              Mi Taller
+            {% endif %}
           {% endif %}
         </h1>
-        {% if company_tagline %}
+        {% if TAGLINE_PERSONALIZADO %}
+          <span class="text-lg sm:text-xl text-cyan-200 font-semibold mt-1 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ TAGLINE_PERSONALIZADO }}</span>
+        {% elif company_tagline %}
           <span class="text-lg sm:text-xl text-cyan-200 font-semibold mt-1 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ company_tagline }}</span>
+        {% elif COMPANY_TAGLINE %}
+          <span class="text-lg sm:text-xl text-cyan-200 font-semibold mt-1 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ COMPANY_TAGLINE }}</span>
         {% else %}
           <span class="text-lg sm:text-xl text-cyan-200 font-semibold mt-1 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{% trans "the best in town" %}</span>
         {% endif %}
@@ -844,7 +882,7 @@
   {% endif %}
 
   {# --- Navegación principal - DOS FILAS --- #}
-  {% if request.path != '/accounts/login/' %}
+  {% if '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
   <div id="main-navigation" class="flex flex-col items-center justify-center mt-4 gap-3">
     {% if request.user.is_authenticated %}
       {# Para Chile: siempre español. Para USA: verifica LANGUAGE_CODE (es/en). Si es español, muestra textos en español #}
@@ -945,7 +983,8 @@
     {% block content %}{% endblock %}
   </main>
 
-  {# --- FOOTER ÚNICO --- #}
+  {# --- FOOTER ÚNICO (oculto en login/signup para vista full-screen) --- #}
+  {% if '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
   <footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
     <div class="container mx-auto px-4 text-center">
       {% if company_settings.address or company_settings.phone or company_settings.email %}
@@ -955,17 +994,42 @@
           {% if company_settings.email %}• {{ company_settings.email }}{% endif %}
         </span>
       {% endif %}
-      <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm">
+      <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm flex-wrap">
         <span class="font-medium">eGarage</span>
         <span aria-hidden="true">•</span>
         <span>© 2025</span>
         <span aria-hidden="true">•</span>
-        <a href="/legal/" class="text-cyan-400 hover:underline">Legal</a>
+        <a href="mailto:{{ support_email }}" class="text-cyan-400 hover:underline">
+          {{ support_email }}
+        </a>
+        <span aria-hidden="true">•</span>
+        <a href="https://wa.me/{{ support_whatsapp_wa_me }}?text={% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' or LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Hola,%20necesito%20ayuda%20con%20eGarage{% else %}Hi,%20I%20need%20help%20with%20eGarage{% endif %}" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           class="text-green-400 hover:underline flex items-center gap-1">
+          <i class="fab fa-whatsapp"></i>
+          {{ support_whatsapp_display }}
+        </a>
+        <span aria-hidden="true">•</span>
+        <a href="/legal/" class="text-cyan-400 hover:underline">
+          {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' or LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+            Términos y Privacidad
+          {% else %}
+            Legal
+          {% endif %}
+        </a>
+        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' or LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+        <span aria-hidden="true">•</span>
+        <a href="/legal/#proteccion-datos-tributarios" class="text-emerald-400 hover:underline text-xs">
+          Datos Tributarios
+        </a>
+        {% endif %}
         <span aria-hidden="true">•</span>
         <span class="text-xs text-gray-500">All Rights Reserved</span>
       </div>
     </div>
   </footer>
+  {% endif %}
 
   {# --- PWA Install Prompt Script --- #}
   {# NOTA: No usar defer aquí porque beforeinstallprompt puede dispararse antes #}
@@ -977,6 +1041,8 @@
 
   {# --- JS extra + Starfield JS si aplica --- #}
   {% block extra_js %}{% endblock %}
+  {# JS de form.media (DAL/Select2) - se carga aquí si hay formulario #}
+  {% if form %}{{ form.media.js }}{% endif %}
   {# TEMP: desactivar starfield para probar scroll en móviles #}
   {# {% if enable_space_bg|default:1 and enable_space_bg != 2 %}
     <script src="{% static 'js/starfield.js' %}"></script>

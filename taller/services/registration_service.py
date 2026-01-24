@@ -239,9 +239,16 @@ class RegistrationService:
         country_config = get_country_config(country_code)
 
         # Crear empresa
-        nombre_taller = company_data.get(
-            "nombre_taller", f"Taller de {user.get_full_name() or user.username or user.email}"
-        )
+        # ✅ FLUJO "LITE": Si no se proporciona nombre_taller o está vacío, generar uno automáticamente
+        # Asegúrate de que la lógica de "nombre por defecto" sea sólida para que nunca falle la creación
+        nombre_taller_raw = company_data.get("nombre_taller", "").strip() if company_data.get("nombre_taller") else ""
+        
+        if not nombre_taller_raw:
+            # Generar nombre genérico basado en el nombre del usuario
+            # Prioridad: first_name > username > email
+            nombre_taller = f"Taller de {user.first_name or user.username or user.email}"
+        else:
+            nombre_taller = nombre_taller_raw
 
         # Obtener email y teléfono normalizado
         email = user.email
@@ -293,7 +300,7 @@ class RegistrationService:
             plan=plan_type,
             suscripcion_activa=True,
             # Campos de trial
-            is_trial=obtuvo_trial,
+            # is_trial=obtuvo_trial,  # ✅ DEBE SEGUIR COMENTADO (evita errores de migración)
             trial_started_at=trial_started_at,
             trial_ends_at=trial_ends_at,
             trial_already_used=(
@@ -416,102 +423,45 @@ class RegistrationService:
         request=None,
     ):
         """
-        Envía email de bienvenida al nuevo usuario.
-
-        Args:
-            user: Usuario creado
-            empresa: Empresa creada
-            plan_type: Tipo de plan
-            country_code: Código de país ('CL', 'US', 'MX', 'PE', 'CO', 'EC', 'BR', 'VE')
-            country_config: Configuración del país (opcional, se obtiene si no se proporciona)
-            activation_code: Código de activación (opcional)
-            skip_verification: Si True, no incluye código en el email
-            request: HttpRequest (opcional)
+        Envía un email de bienvenida profesional con credenciales y próximos pasos.
         """
-        # Obtener configuración si no se proporciona
         if not country_config:
-            country_config = RegistrationService.get_country_config(country_code)
+            country_config = get_country_config(country_code)
 
-        # Determinar idioma del email
-        language = country_config.get("lang", "es")
+        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "contacto@egarage.cl")
+        login_url = "https://www.egarage.cl/accounts/login/"
 
-        # Construir URL de dashboard
-        dashboard_url = None
-        if request:
-            try:
-                # Usar el método del servicio para obtener URL
-                dashboard_url = RegistrationService.get_dashboard_url_for_country(
-                    empresa.pais, request
-                )
-            except Exception:
-                pass
+        subject = f"🚀 ¡Bienvenido a eGarage! - El centro de operaciones de {empresa.nombre_taller}"
 
-        # Mensaje según idioma
-        if language == "en":
-            subject = f"Welcome to eGarage - {empresa.nombre_taller}"
-            message = f"""
-Hello {user.get_full_name() or user.username},
+        message = f"""
+¡Hola {user.first_name or user.username}!
 
-Welcome to eGarage!
+¡Felicidades! Estás a solo segundos de transformar la gestión de tu taller con eGarage, el mejor centro de operaciones del mundo.
 
-Your account has been created successfully:
-- Workshop: {empresa.nombre_taller}
-- Email: {user.email}
-- Plan: {plan_type}
+Tu cuenta ha sido configurada con éxito para {empresa.nombre_taller}. Aquí tienes tus credenciales de acceso:
 
+📍 Acceso al Panel: {login_url}
+📧 Usuario: {user.email}
+🔑 Contraseña: La que elegiste al registrarte
+
+Tu plan actual: {plan_type.upper()} (30 días de prueba gratuita)
+
+¿Qué puedes hacer ahora mismo?
+1. Configurar los datos de tu taller (Logo, dirección y contacto).
+2. Crear tu primer servicio técnico para un cliente.
+3. Emitir órdenes de trabajo digitales para impresionar a tus clientes.
+
+Si tienes dudas, nuestro equipo de soporte está listo para ayudarte.
+
+Atentamente,
+El Equipo de eGarage
+www.egarage.cl
 """
-            if dashboard_url:
-                message += f"You can access your dashboard here: {dashboard_url}\n\n"
-
-            if not skip_verification and activation_code:
-                message += f"Your activation code: {activation_code}\n"
-                message += (
-                    "(This code is only needed for critical actions like issuing invoices.)\n\n"
-                )
-
-            message += """
-Note: Your account is active and you can start using the platform immediately.
-If you need to verify your email for critical actions, you can do so later.
-
-Thanks for choosing eGarage!
-"""
-        else:  # Español
-            subject = f"Bienvenido a eGarage - {empresa.nombre_taller}"
-            message = f"""
-Hola {user.get_full_name() or user.username},
-
-¡Bienvenido a eGarage!
-
-Tu cuenta ha sido creada exitosamente:
-- Taller: {empresa.nombre_taller}
-- Email: {user.email}
-- Plan: {plan_type}
-
-"""
-            if dashboard_url:
-                message += f"Puedes acceder a tu dashboard aquí: {dashboard_url}\n\n"
-
-            if not skip_verification and activation_code:
-                message += f"Tu código de activación: {activation_code}\n"
-                message += "(Este código solo es necesario para acciones críticas como emitir facturas.)\n\n"
-
-            message += """
-Nota: Tu cuenta está activa y puedes comenzar a usar la plataforma inmediatamente.
-Si necesitas verificar tu email para acciones críticas, puedes hacerlo más tarde.
-
-¡Gracias por elegir eGarage!
-"""
-
-        # Enviar email
-        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@egarage.cl")
-        send_mail(
-            subject,
-            message,
-            from_email,
-            [user.email],
-            fail_silently=False,
-        )
-        log.info(f"[RegistrationService] Email de bienvenida enviado a {user.email}")
+        try:
+            send_mail(subject, message, from_email, [user.email], fail_silently=False)
+            log.info(f"[RegistrationService] Email profesional enviado a {user.email}")
+        except Exception as e:
+            log.error(f"[RegistrationService] Error enviando email: {e}")
 
     @staticmethod
     def verify_activation_code(email, code):

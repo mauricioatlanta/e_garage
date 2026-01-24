@@ -8,7 +8,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ("taller", "0025_agregar_soporte_peru"),
-        ("ubicacion", "0004_agregar_modelo_address"),
+        ("ubicacion", "0001_initial"),
     ]
 
     operations = [

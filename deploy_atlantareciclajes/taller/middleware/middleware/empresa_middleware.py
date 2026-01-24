@@ -14,15 +14,16 @@ class EmpresaMiddleware:
                 request.empresa = request.user.empresa
 
                 # Verificar si la suscripción está vencida
-                if request.empresa.debe_bloquear and not self.is_exempt_url(request.path):
+                if request.empresa and request.empresa.debe_bloquear and not self.is_exempt_url(request.path):
                     return redirect("suspension")
 
-            except Empresa.DoesNotExist:
+            except Exception:  # O Empresa.DoesNotExist
                 request.empresa = None
         else:
             request.empresa = None
 
-        return self.get_response(request)
+        response = self.get_response(request)
+        return response
 
     def is_exempt_url(self, path):
         """URLs que no requieren suscripción activa"""

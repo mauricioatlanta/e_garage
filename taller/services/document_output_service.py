@@ -179,6 +179,7 @@ class DocumentOutputService:
         lineas_otro_servicio = list(documento.lineas_otro_servicio.all())
 
         # Datos para el template
+        from django.conf import settings
         context = {
             "doc": documento,
             "empresa": empresa,
@@ -194,6 +195,10 @@ class DocumentOutputService:
             "MONEDA_CODE": currency["code"],
             # Fecha formateada según país
             "fecha_formateada": documento.fecha_emision.strftime("%d/%m/%Y"),
+            # Variables de soporte centralizadas
+            "support_email": getattr(settings, "SUPPORT_EMAIL", "support@egarage.cl"),
+            "support_whatsapp_display": getattr(settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683"),
+            "support_whatsapp_wa_me": getattr(settings, "SUPPORT_WHATSAPP_WA_ME", "56953574683"),
         }
 
         # Renderizar HTML

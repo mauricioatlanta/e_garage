@@ -297,8 +297,9 @@ def lista_vehiculos(request):
 
 
 @login_required
-def crear_vehiculo(request):
+def crear_vehiculo(request, *args, **kwargs):
     """Crear vehículo con reglas CL/US y multi-tenant."""
+    lang = kwargs.pop("lang", None)
     compat_redirect = _compat_canonical_redirect(request, "vehiculos:crear_vehiculo")
     if compat_redirect:
         return compat_redirect
@@ -350,13 +351,20 @@ def crear_vehiculo(request):
         else:
             messages.error(request, "Por favor corrige los errores en el formulario")
     else:
-        form = VehiculoForm(user=request.user, request=request)
+        # Pre-llenar patente desde URL params (ej: /vehiculos/crear/?patente=ABCD12)
+        initial_data = {}
+        patente_from_url = request.GET.get('patente', '').strip().upper()
+        if patente_from_url:
+            initial_data['patente'] = patente_from_url
+        
+        form = VehiculoForm(user=request.user, request=request, initial=initial_data)
 
     # Contexto para el template
     ctx = {
         "form": form,
         "country": country,
         "empresa": empresa,
+        "patente_detectada": request.GET.get('patente', '').strip().upper() or None,
     }
 
     template_name = _vehicle_template("crear", country)

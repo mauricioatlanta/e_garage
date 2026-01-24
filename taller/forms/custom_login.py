@@ -1,9 +1,14 @@
 from allauth.account.forms import LoginForm
+from allauth.account.adapter import get_adapter
 
 from django import forms
 
 
 class CustomLoginForm(LoginForm):
+    """
+    Formulario de login personalizado que permite login a superusuarios
+    sin verificación de email
+    """
     remember_me = forms.BooleanField(
         label="Recordar credenciales",
         required=False,
@@ -39,6 +44,48 @@ class CustomLoginForm(LoginForm):
             }
         )
 
+    def clean(self):
+        """
+        Validar formulario, pero permitir login a superusuarios sin verificación
+        """
+        # Llamar al clean del padre primero
+        cleaned_data = super().clean()
+        
+        # Si hay un usuario y es superuser/staff, saltar verificación de email
+        login = cleaned_data.get('login')
+        if login:
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+            
+            # Buscar usuario por username o email
+            # Usar .first() en lugar de .get() para manejar múltiples usuarios con el mismo email
+            user = None
+            
+            # Primero intentar buscar por username (más específico)
+            user = User.objects.filter(username=login).first()
+            
+            # Si no se encuentra por username, buscar por email
+            # Si hay múltiples usuarios con el mismo email, tomar el primero activo
+            if not user:
+                user = User.objects.filter(email=login, is_active=True).first()
+            
+            # Si es superuser o staff, permitir login sin verificación
+            if user and (user.is_superuser or user.is_staff):
+                # Forzar que el email se considere verificado
+                if hasattr(user, 'email') and user.email:
+                    from allauth.account.models import EmailAddress
+                    email_addr, _ = EmailAddress.objects.get_or_create(
+                        user=user,
+                        email=user.email,
+                        defaults={'verified': True, 'primary': True}
+                    )
+                    if not email_addr.verified:
+                        email_addr.verified = True
+                        email_addr.primary = True
+                        email_addr.save()
+        
+        return cleaned_data
+    
     def login(self, request, redirect_url=None):
         """
         Personalizar el login para manejar la funcionalidad "recordar"

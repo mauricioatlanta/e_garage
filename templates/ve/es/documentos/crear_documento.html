@@ -1,0 +1,9 @@
+{# templates/ve/es/documentos/crear_documento.html #}
+{% extends "taller/common/documentos/document_form.html" %}
+{% load i18n %}
+{% load static %}
+{% load country_url %}
+
+{% block title %}
+  {{ empresa.nombre_taller|default:"eGarage" }} - {% trans "Crear Documento" %}
+{% endblock %}

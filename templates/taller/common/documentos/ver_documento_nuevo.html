@@ -2,6 +2,7 @@
 {% load static %}
 {% load humanize %}
 {% load money %}
+{% load country_url %}
 
 <!-- 🟢 CRUZ VERDE - TEMPLATE VER DOCUMENTO NUEVO -->
 <div style="position: fixed; top: 10px; left: 10px; width: 50px; height: 50px; background-color: #00ff00; z-index: 9999; border: 3px solid #000; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 12px;">VER</div>
@@ -253,24 +254,701 @@
     </div>
     {% endif %}
 
-    <!-- Botones de acción -->
-    <div class="flex flex-wrap gap-4 justify-center">
-      <a href="{% url 'documentos_cl_es:lista_documentos' %}"
+    <!-- Memoria Interna (Notas y Etiquetas) -->
+    <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-purple-400/30 p-6 mb-6">
+      <h3 class="text-xl font-semibold text-purple-200 mb-4 flex items-center">
+        🧠 Memoria Interna
+      </h3>
+
+      <!-- Etiquetas -->
+      {% if etiquetas_asignadas %}
+      <div class="mb-4">
+        <h4 class="text-lg font-semibold text-purple-300 mb-2">Etiquetas</h4>
+        <div class="flex flex-wrap gap-2">
+          {% for asignacion in etiquetas_asignadas %}
+          <span class="px-3 py-1 rounded-full text-sm font-medium"
+                style="background-color: {{ asignacion.etiqueta.color }}33; color: {{ asignacion.etiqueta.color }}; border: 1px solid {{ asignacion.etiqueta.color }}66;">
+            {{ asignacion.etiqueta.nombre }}
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Notas -->
+      {% if notas %}
+      <div>
+        <h4 class="text-lg font-semibold text-purple-300 mb-2">Notas</h4>
+        <div class="space-y-3">
+          {% for nota in notas %}
+          <div class="bg-gray-900/50 rounded-lg p-4 border border-purple-400/20">
+            <div class="flex justify-between items-start mb-2">
+              <span class="text-sm text-gray-400">{{ nota.created_at|date:"d/m/Y H:i" }}</span>
+              {% if nota.solo_staff %}
+              <span class="text-xs text-purple-400 bg-purple-400/20 px-2 py-1 rounded">Solo Staff</span>
+              {% endif %}
+            </div>
+            <p class="text-white whitespace-pre-wrap">{{ nota.contenido }}</p>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      {% if not etiquetas_asignadas and not notas %}
+      <p class="text-gray-400 italic">No hay notas ni etiquetas registradas.</p>
+      {% endif %}
+    </div>
+
+    <!-- Evidencias (Fotos y Videos) -->
+    {% if evidencias %}
+    <div class="bg-gray-800/50 backdrop-blur-lg rounded-xl border border-emerald-400/30 p-6 mb-6">
+      <h3 class="text-xl font-semibold text-emerald-200 mb-4 flex items-center">
+        📸 Evidencias
+        <span class="ml-2 text-sm text-gray-400">({{ fotos_count }} fotos, {{ videos_count }} videos)</span>
+      </h3>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for evidencia in evidencias %}
+        <div class="bg-gray-900/50 rounded-lg p-4 border border-emerald-400/20">
+          {% if evidencia.tipo == "FOTO" %}
+          <img src="{{ evidencia.archivo.url }}" alt="{{ evidencia.descripcion|default:'Evidencia' }}"
+               class="w-full h-48 object-cover rounded-lg mb-2">
+          {% else %}
+          <video src="{{ evidencia.archivo.url }}" controls
+                 class="w-full h-48 object-cover rounded-lg mb-2"></video>
+          {% endif %}
+          {% if evidencia.descripcion %}
+          <p class="text-sm text-gray-300 mt-2">{{ evidencia.descripcion }}</p>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Botones de acción principales -->
+    <div class="flex flex-wrap gap-4 justify-center mb-6">
+      <a href="{% country_url 'documentos:lista_documentos' %}"
          class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
         ← Volver a la Lista
       </a>
 
-      <a href="{% url 'documentos_cl_es:documento_editar' documento.pk %}"
+      <a href="{% country_url 'documentos:documento_editar' documento.pk %}"
          class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
         ✏️ {{ ui_labels.edit_button }}
       </a>
 
-      <a href="{% url 'documentos_cl_es:exportar_documento_pdf' documento.pk %}"
-         class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors">
+      <a href="{% country_url 'documentos:descargar_pdf' documento.pk %}"
+         class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+         target="_blank">
         📄 Exportar PDF
       </a>
+
+      <!-- Botón: Copiar link de seguimiento -->
+      {% if seguimiento_publico %}
+      <button onclick="copiarLinkSeguimiento()"
+              class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors"
+              id="btn-copiar-link">
+        🔗 Copiar Link de Seguimiento
+      </button>
+      {% else %}
+      <form method="post" action="{% country_url 'documentos:crear_seguimiento_publico' documento.pk %}" class="inline">
+        {% csrf_token %}
+        <button type="submit"
+                class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors">
+          🔗 Crear Link de Seguimiento
+        </button>
+      </form>
+      {% endif %}
+
+      <!-- Botón: WhatsApp -->
+      {% load whatsapp_tags %}
+      {% whatsapp_document_link documento request as wa_link %}
+      {% if wa_link %}
+      <a href="{{ wa_link }}" 
+         target="_blank"
+         class="px-6 py-3 text-white rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center inline-block"
+         style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border: 2px solid rgba(255, 255, 255, 0.3);">
+        <i class="fab fa-whatsapp mr-2"></i>
+        💬 WhatsApp
+      </a>
+      {% else %}
+      <button type="button" 
+              class="px-6 py-3 bg-gray-500 text-white rounded-lg cursor-not-allowed opacity-50"
+              disabled
+              title="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Client has no WhatsApp number registered{% else %}El cliente no tiene número de teléfono registrado{% endif %}">
+        <i class="fab fa-whatsapp mr-2"></i>
+        💬 WhatsApp ({% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Not available{% else %}No disponible{% endif %})
+      </button>
+      {% endif %}
     </div>
+
+    <!-- Botones de cierre de servicio -->
+    {% if documento.tipo_documento == 'Presupuesto' or documento.tipo_documento == 'Orden de trabajo' %}
+    <div class="bg-gradient-to-r from-green-900/50 to-blue-900/50 backdrop-blur-lg rounded-xl border-2 border-green-400/50 p-6 mb-6">
+      <h3 class="text-xl font-semibold text-green-200 mb-4 flex items-center">
+        ✅ Finalizar Servicio
+      </h3>
+      <p class="text-gray-300 mb-4">
+        Elige cómo deseas finalizar este servicio:
+      </p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <!-- Botón Verde: Finalizar Servicio (Solo registro interno) -->
+        <button type="button" 
+                id="btn-finalizar-servicio"
+                class="px-8 py-4 bg-green-600 hover:bg-green-700 text-white rounded-lg transition-all shadow-lg hover:shadow-xl font-semibold text-lg">
+          ✅ Finalizar Servicio
+          <span class="block text-sm font-normal mt-1">(Solo registro interno)</span>
+        </button>
+
+        <!-- Botón Azul: Generar Archivo Factura SII -->
+        <button type="button" 
+                id="btn-generar-sii"
+                data-documento-id="{{ documento.pk }}"
+                data-cliente-id="{{ documento.cliente.pk }}"
+                data-cliente-nombre="{{ documento.cliente.nombre }}"
+                class="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all shadow-lg hover:shadow-xl font-semibold text-lg">
+          📋 Generar Archivo Factura SII
+        </button>
+      </div>
+    </div>
+    {% endif %}
 
   </div>
 </div>
+
+<!-- Modal para completar datos de facturación -->
+<div id="modal-billing-data" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
+  <div class="bg-gray-800 rounded-xl border-2 border-cyan-400/50 p-8 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-cyan-200 flex items-center">
+        ⚠️ Datos incompletos para Facturar
+      </h2>
+      <button type="button" 
+              id="btn-close-modal"
+              class="text-gray-400 hover:text-white text-2xl">
+        ×
+      </button>
+    </div>
+
+    <p class="text-gray-300 mb-6">
+      Para generar el archivo compatible con el SII, necesitamos completar la ficha de empresa de 
+      <span class="font-semibold text-cyan-300" id="modal-cliente-nombre"></span>:
+    </p>
+
+    <form id="form-billing-data" method="post">
+      {% csrf_token %}
+      <input type="hidden" id="modal-cliente-id" name="cliente_id" value="">
+      
+      <div class="space-y-4">
+        <!-- RUT/TAX_ID -->
+        <div>
+          <label for="modal-tax-id-type" class="block text-sm font-semibold text-cyan-300 mb-2">
+            Tipo de Identificador Tributario
+          </label>
+          <select id="modal-tax-id-type" name="tax_id_type" required
+                  class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-cyan-400/50 focus:border-cyan-400 focus:outline-none">
+            <option value="CL_RUT">RUT (Chile)</option>
+            <option value="US_EIN">EIN (USA - Empresa)</option>
+            <option value="US_SSN">SSN (USA - Persona)</option>
+            <option value="BR_CPF">CPF (Brasil - Pessoa)</option>
+            <option value="BR_CNPJ">CNPJ (Brasil - Empresa)</option>
+            <option value="PE_RUC">RUC (Perú)</option>
+            <option value="VE_RIF">RIF (Venezuela)</option>
+            <option value="MX_RFC">RFC (México)</option>
+          </select>
+        </div>
+
+        <div>
+          <label for="modal-tax-id" class="block text-sm font-semibold text-cyan-300 mb-2">
+            RUT / Identificador Tributario <span class="text-red-400">*</span>
+          </label>
+          <input type="text" id="modal-tax-id" name="tax_id" required
+                 class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-cyan-400/50 focus:border-cyan-400 focus:outline-none"
+                 placeholder="Ej: 12.345.678-9"
+                 autocomplete="off">
+          <div id="modal-tax-id-error" class="hidden mt-1 text-sm text-red-400"></div>
+          <div id="modal-tax-id-success" class="hidden mt-1 text-sm text-green-400">✓ RUT válido</div>
+        </div>
+
+        <!-- Giro -->
+        <div>
+          <label for="modal-giro" class="block text-sm font-semibold text-cyan-300 mb-2">
+            Giro <span class="text-red-400">*</span>
+          </label>
+          <input type="text" id="modal-giro" name="giro" required
+                 class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-cyan-400/50 focus:border-cyan-400 focus:outline-none"
+                 placeholder="Ej: Transporte, Construcción, Comercio...">
+        </div>
+
+        <!-- Dirección (simplificada - se puede expandir después) -->
+        <div>
+          <label for="modal-direccion" class="block text-sm font-semibold text-cyan-300 mb-2">
+            Dirección <span class="text-red-400">*</span>
+          </label>
+          <input type="text" id="modal-direccion" name="line1" required
+                 class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-cyan-400/50 focus:border-cyan-400 focus:outline-none"
+                 placeholder="Calle, número, edificio">
+        </div>
+
+        <!-- Región (para Chile) -->
+        <div id="modal-region-container" style="display: none;">
+          <label for="modal-region" class="block text-sm font-semibold text-cyan-300 mb-2">
+            Región <span class="text-red-400">*</span>
+          </label>
+          <select id="modal-region" name="region_id"
+                  class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-cyan-400/50 focus:border-cyan-400 focus:outline-none">
+            <option value="">Selecciona una región...</option>
+          </select>
+        </div>
+
+        <!-- Comuna / Ciudad (con búsqueda) -->
+        <div>
+          <label for="modal-city" class="block text-sm font-semibold text-cyan-300 mb-2">
+            Comuna / Ciudad <span class="text-red-400">*</span>
+            <span class="text-xs text-gray-400 block mt-1">Selecciona del listado oficial para evitar errores con el SII</span>
+          </label>
+          <select id="modal-city" name="city" required
+                  class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-cyan-400/50 focus:border-cyan-400 focus:outline-none"
+                  style="display: none;">
+            <option value="">Primero selecciona una región...</option>
+          </select>
+          <input type="text" id="modal-city-search" 
+                 class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-cyan-400/50 focus:border-cyan-400 focus:outline-none"
+                 placeholder="Buscar comuna... (selecciona región primero)"
+                 autocomplete="off">
+          <div id="modal-city-results" class="hidden mt-2 max-h-48 overflow-y-auto bg-gray-700 rounded-lg border border-cyan-400/30"></div>
+        </div>
+      </div>
+
+      <div class="flex gap-4 mt-6">
+        <button type="button" 
+                id="btn-cancel-modal"
+                class="flex-1 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
+          Cancelar
+        </button>
+        <button type="submit" 
+                id="btn-save-billing"
+                class="flex-1 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors font-semibold">
+          💾 Guardar y Descargar Archivo
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// JavaScript para manejar el flujo de facturación SII
+document.addEventListener('DOMContentLoaded', function() {
+  const btnGenerarSII = document.getElementById('btn-generar-sii');
+  const btnFinalizarServicio = document.getElementById('btn-finalizar-servicio');
+  const modal = document.getElementById('modal-billing-data');
+  const btnCloseModal = document.getElementById('btn-close-modal');
+  const btnCancelModal = document.getElementById('btn-cancel-modal');
+  const formBilling = document.getElementById('form-billing-data');
+  const modalClienteNombre = document.getElementById('modal-cliente-nombre');
+  const modalClienteId = document.getElementById('modal-cliente-id');
+
+  // Abrir modal
+  function openModal(clienteNombre, clienteId) {
+    modalClienteNombre.textContent = clienteNombre;
+    modalClienteId.value = clienteId;
+    
+    // Resetear formulario
+    if (formBilling) formBilling.reset();
+    if (modalTaxIdError) modalTaxIdError.classList.add('hidden');
+    if (modalTaxIdSuccess) modalTaxIdSuccess.classList.add('hidden');
+    if (modalCityResults) modalCityResults.classList.add('hidden');
+    
+    modal.classList.remove('hidden');
+  }
+
+  // Cerrar modal
+  function closeModal() {
+    modal.classList.add('hidden');
+  }
+
+  // Cargar regiones y ciudades para el modal
+  const modalRegion = document.getElementById('modal-region');
+  const modalCity = document.getElementById('modal-city');
+  const modalCitySearch = document.getElementById('modal-city-search');
+  const modalCityResults = document.getElementById('modal-city-results');
+  const modalRegionContainer = document.getElementById('modal-region-container');
+
+  // Detectar país y cargar regiones si es Chile
+  function loadRegionsForModal() {
+    const urlPrefix = window.location.pathname.split('/').slice(0, 2).join('/') || '/cl';
+    const isChile = urlPrefix.includes('/cl');
+    
+    if (isChile && modalRegion) {
+      modalRegionContainer.style.display = 'block';
+      
+      // Intentar cargar regiones desde endpoint unificado
+      fetch(`${urlPrefix}/api/locations?country=CL`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.states && data.states.length > 0) {
+            modalRegion.innerHTML = '<option value="">Selecciona una región...</option>';
+            data.states.forEach(region => {
+              const opt = document.createElement('option');
+              // El endpoint puede devolver 'id' o usar 'code' como identificador
+              opt.value = region.id || region.code;
+              opt.textContent = region.name;
+              opt.dataset.code = region.code || '';
+              modalRegion.appendChild(opt);
+            });
+          }
+        })
+        .catch(err => {
+          console.warn('No se pudieron cargar regiones desde /api/locations, usando fallback');
+          // Si el endpoint unificado no funciona, ocultar selector de región
+          // y permitir escribir comuna manualmente
+          modalRegionContainer.style.display = 'none';
+          if (modalCitySearch) {
+            modalCitySearch.placeholder = 'Escribe el nombre de la comuna...';
+          }
+        });
+    }
+  }
+
+  // Cargar ciudades cuando se selecciona región
+  if (modalRegion) {
+    modalRegion.addEventListener('change', function() {
+      const regionId = this.value;
+      if (!regionId) {
+        modalCity.innerHTML = '<option value="">Selecciona una región primero...</option>';
+        modalCitySearch.placeholder = 'Selecciona una región primero...';
+        modalCityResults.classList.add('hidden');
+        return;
+      }
+
+      const urlPrefix = window.location.pathname.split('/').slice(0, 2).join('/') || '/cl';
+      
+      // Intentar primero con el endpoint de clientes (compatible con modelo legacy)
+      fetch(`${urlPrefix}/api/clientes/ajax/ciudades/?region_id=${regionId}`)
+        .then(r => r.json())
+        .then(data => {
+          const ciudades = Array.isArray(data) ? data : (data.ciudades || []);
+          modalCity.innerHTML = '<option value="">Selecciona una comuna...</option>';
+          ciudades.forEach(ciudad => {
+            const opt = document.createElement('option');
+            opt.value = ciudad.id;
+            opt.textContent = ciudad.nombre;
+            modalCity.appendChild(opt);
+          });
+          modalCitySearch.placeholder = `Buscar entre ${ciudades.length} comunas...`;
+          modalCity.style.display = 'none'; // Ocultar select, mostrar búsqueda
+        })
+        .catch(err => {
+          console.error('Error cargando ciudades:', err);
+          // Si falla, permitir escribir manualmente
+          modalCitySearch.placeholder = 'Escribe el nombre de la comuna...';
+        });
+    });
+  }
+
+  // Búsqueda de ciudades con autocompletado
+  if (modalCitySearch) {
+    let searchTimeout;
+    
+    modalCitySearch.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase().trim();
+      
+      // Limpiar timeout anterior
+      clearTimeout(searchTimeout);
+      
+      if (!searchTerm) {
+        modalCityResults.classList.add('hidden');
+        return;
+      }
+
+      // Debounce: esperar 300ms antes de buscar
+      searchTimeout = setTimeout(() => {
+        const options = Array.from(modalCity.options);
+        const matches = options.filter(opt => 
+          opt.textContent.toLowerCase().includes(searchTerm) && opt.value
+        );
+
+        if (matches.length > 0) {
+          modalCityResults.innerHTML = '';
+          matches.slice(0, 10).forEach(opt => {
+            const div = document.createElement('div');
+            div.className = 'px-4 py-2 hover:bg-cyan-600/30 cursor-pointer text-white border-b border-gray-600';
+            div.textContent = opt.textContent;
+            div.onclick = () => {
+              modalCity.value = opt.value;
+              modalCitySearch.value = opt.textContent;
+              modalCityResults.classList.add('hidden');
+            };
+            modalCityResults.appendChild(div);
+          });
+          modalCityResults.classList.remove('hidden');
+        } else {
+          modalCityResults.innerHTML = '<div class="px-4 py-2 text-gray-400 text-sm">No se encontraron comunas</div>';
+          modalCityResults.classList.remove('hidden');
+        }
+      }, 300);
+    });
+    
+    // Cerrar resultados al hacer clic fuera
+    document.addEventListener('click', function(e) {
+      if (!modalCitySearch.contains(e.target) && !modalCityResults.contains(e.target)) {
+        modalCityResults.classList.add('hidden');
+      }
+    });
+  }
+
+  // Validación de RUT en tiempo real
+  const modalTaxId = document.getElementById('modal-tax-id');
+  const modalTaxIdError = document.getElementById('modal-tax-id-error');
+  const modalTaxIdSuccess = document.getElementById('modal-tax-id-success');
+  const modalTaxIdType = document.getElementById('modal-tax-id-type');
+
+  function validateRUT(rut, tipo) {
+    if (!rut || tipo !== 'CL_RUT') {
+      modalTaxIdError.classList.add('hidden');
+      modalTaxIdSuccess.classList.add('hidden');
+      return;
+    }
+
+    // Normalizar RUT
+    rut = rut.replace(/[.\s]/g, '').toUpperCase();
+    
+    // Validar formato básico
+    const match = rut.match(/^(\d+)-?([0-9K])$/);
+    if (!match) {
+      modalTaxIdError.textContent = 'Formato inválido. Use: 12345678-9';
+      modalTaxIdError.classList.remove('hidden');
+      modalTaxIdSuccess.classList.add('hidden');
+      return;
+    }
+
+    const numero = match[1];
+    const dv = match[2];
+
+    // Calcular dígito verificador (Módulo 11)
+    let suma = 0;
+    let multiplo = 2;
+
+    for (let i = numero.length - 1; i >= 0; i--) {
+      suma += parseInt(numero[i]) * multiplo;
+      multiplo++;
+      if (multiplo === 8) multiplo = 2;
+    }
+
+    const resto = suma % 11;
+    let dvCalculado = 11 - resto;
+
+    if (dvCalculado === 11) dvCalculado = 0;
+    if (dvCalculado === 10) dvCalculado = 'K';
+
+    if (String(dvCalculado) === dv) {
+      modalTaxIdError.classList.add('hidden');
+      modalTaxIdSuccess.classList.remove('hidden');
+    } else {
+      modalTaxIdError.textContent = `Dígito verificador incorrecto. Esperado: ${dvCalculado}`;
+      modalTaxIdError.classList.remove('hidden');
+      modalTaxIdSuccess.classList.add('hidden');
+    }
+  }
+
+  if (modalTaxId && modalTaxIdType) {
+    modalTaxId.addEventListener('input', function() {
+      const tipo = modalTaxIdType.value;
+      validateRUT(this.value, tipo);
+    });
+
+    modalTaxIdType.addEventListener('change', function() {
+      if (this.value === 'CL_RUT' && modalTaxId.value) {
+        validateRUT(modalTaxId.value, this.value);
+      } else {
+        modalTaxIdError.classList.add('hidden');
+        modalTaxIdSuccess.classList.add('hidden');
+      }
+    });
+  }
+
+  // Botón Generar SII
+  if (btnGenerarSII) {
+    btnGenerarSII.addEventListener('click', async function() {
+      const documentoId = this.dataset.documentoId;
+      const clienteId = this.dataset.clienteId;
+      const clienteNombre = this.dataset.clienteNombre;
+
+      // Cargar regiones antes de abrir modal
+      loadRegionsForModal();
+
+      // Verificar estado de facturación
+      try {
+        // Obtener prefijo de país desde la URL actual
+        const urlPrefix = window.location.pathname.split('/').slice(0, 2).join('/') || '/cl';
+        const verifyUrl = `${urlPrefix}/api/documentos/${documentoId}/verificar-facturacion/`;
+        
+        const response = await fetch(verifyUrl);
+        const data = await response.json();
+
+        if (data.is_ready) {
+          // Cliente listo - descargar CSV directamente
+          window.location.href = `${urlPrefix}/api/documentos/${documentoId}/exportar-sii/`;
+        } else {
+          // Mostrar modal para completar datos
+          openModal(clienteNombre, clienteId);
+        }
+      } catch (error) {
+        console.error('Error verificando facturación:', error);
+        alert('Error al verificar datos de facturación. Por favor, intenta nuevamente.');
+      }
+    });
+  }
+
+  // Botón Finalizar Servicio
+  if (btnFinalizarServicio) {
+    btnFinalizarServicio.addEventListener('click', function() {
+      // TODO: Implementar lógica de finalización de servicio
+      alert('Servicio finalizado correctamente (solo registro interno).');
+    });
+  }
+
+  // Cerrar modal
+  if (btnCloseModal) {
+    btnCloseModal.addEventListener('click', closeModal);
+  }
+  if (btnCancelModal) {
+    btnCancelModal.addEventListener('click', closeModal);
+  }
+
+  // Enviar formulario de datos de facturación
+  if (formBilling) {
+    formBilling.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const documentoId = btnGenerarSII?.dataset.documentoId;
+      if (!documentoId) return;
+
+      const formData = new FormData(this);
+      
+      // Obtener prefijo de país desde la URL actual
+      const urlPrefix = window.location.pathname.split('/').slice(0, 2).join('/') || '/cl';
+      const countryCode = urlPrefix.replace('/', '').toUpperCase() || 'CL';
+      
+      // Obtener región y ciudad seleccionadas
+      const regionId = modalRegion?.value;
+      const cityId = modalCity?.value;
+      
+      // Validar que se haya seleccionado una ciudad
+      if (!cityId) {
+        alert('Por favor, selecciona una comuna del listado.');
+        return;
+      }
+      
+      // Agregar datos adicionales necesarios
+      formData.append('country', countryCode);
+      if (regionId) {
+        formData.append('region_id', regionId);
+      }
+      formData.append('city', cityId); // Requerido
+      
+      try {
+        const response = await fetch(`${urlPrefix}/api/documentos/${documentoId}/exportar-sii/`, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+          }
+        });
+
+        if (response.ok && response.headers.get('content-type')?.includes('text/csv')) {
+          // Descargar CSV
+          const blob = await response.blob();
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `factura_sii_${documentoId}_${new Date().toISOString().split('T')[0]}.csv`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          window.URL.revokeObjectURL(url);
+          
+          closeModal();
+          alert('✅ Datos guardados y archivo descargado exitosamente.');
+        } else {
+          const data = await response.json();
+          if (data.form_errors) {
+            alert('Error: ' + JSON.stringify(data.form_errors));
+          } else {
+            alert('Error: ' + (data.error || 'Error al generar archivo'));
+          }
+        }
+      } catch (error) {
+        console.error('Error enviando datos:', error);
+        alert('Error al guardar datos. Por favor, intenta nuevamente.');
+      }
+    });
+  }
+
+  // Función para copiar link de seguimiento
+  function copiarLinkSeguimiento() {
+    {% if seguimiento_publico %}
+    const url = '{{ request.scheme }}://{{ request.get_host }}{% url "documentos:seguimiento_publico" seguimiento_publico.token %}';
+    navigator.clipboard.writeText(url).then(function() {
+      const btn = document.getElementById('btn-copiar-link');
+      const textoOriginal = btn.textContent;
+      btn.textContent = '✅ Link copiado!';
+      btn.classList.add('bg-green-600');
+      btn.classList.remove('bg-purple-600');
+      setTimeout(function() {
+        btn.textContent = textoOriginal;
+        btn.classList.remove('bg-green-600');
+        btn.classList.add('bg-purple-600');
+      }, 2000);
+    }).catch(function(err) {
+      console.error('Error al copiar:', err);
+      alert('Error al copiar el link. Por favor, cópialo manualmente.');
+    });
+    {% endif %}
+  }
+
+  // Función para abrir WhatsApp con mensaje prellenado
+  function abrirWhatsApp() {
+    {% if documento.cliente.telefono %}
+    const telefono = '{{ documento.cliente.telefono|default:"" }}'.replace(/[^0-9]/g, '');
+    if (!telefono) {
+      alert('No hay teléfono disponible');
+      return;
+    }
+    
+    // Construir mensaje (manejar placeholders desconocidos)
+    let mensajeTexto = 'Hola ';
+    {% if documento.cliente.nombre %}
+    mensajeTexto += '{{ documento.cliente.nombre|escapejs }}';
+    {% else %}
+    mensajeTexto += 'cliente';
+    {% endif %}
+    mensajeTexto += ', aquí está tu {{ documento.get_tipo_display|escapejs }} {{ documento.numero_documento|escapejs }}';
+    {% if seguimiento_publico %}
+    mensajeTexto += ':\n\n{{ request.scheme }}://{{ request.get_host }}{% url "documentos:seguimiento_publico" seguimiento_publico.token %}';
+    {% else %}
+    mensajeTexto += '.';
+    {% endif %}
+    
+    // URL-encode del mensaje (quote)
+    const mensaje = encodeURIComponent(mensajeTexto);
+    const url = 'https://wa.me/' + telefono + '?text=' + mensaje;
+    window.open(url, '_blank');
+    {% else %}
+    // Si no hay teléfono, ofrecer copiar mensaje o link
+    {% if seguimiento_publico %}
+    const link = '{{ request.scheme }}://{{ request.get_host }}{% url "documentos:seguimiento_publico" seguimiento_publico.token %}';
+    if (confirm('No hay teléfono disponible. ¿Deseas copiar el link de seguimiento?')) {
+      navigator.clipboard.writeText(link).then(function() {
+        alert('Link copiado al portapapeles');
+      });
+    }
+    {% else %}
+    alert('No hay teléfono disponible');
+    {% endif %}
+    {% endif %}
+  }
+});
+</script>
 {% endblock %}

@@ -129,6 +129,7 @@ class TenantIsolationMiddleware:
             "/media/",
             "/comprobante-pago/",
             "/accounts/profile/",
+            "/analytics/",  # Analytics dashboard - requiere login pero no suscripción activa
         ]
         return any(path.startswith(url) for url in exempt_urls)
 

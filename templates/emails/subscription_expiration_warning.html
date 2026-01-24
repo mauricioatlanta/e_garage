@@ -165,11 +165,9 @@
         </div>
 
         <div class="footer">
-            <p>📧 <strong>Soporte:</strong> {{ support_email }}</p>
-            <p>📞 <strong>WhatsApp:</strong> +57 300 123 4567</p>
-            <p>🕒 <strong>Horario:</strong> Lun-Vie 8am-6pm, Sáb 9am-2pm</p>
-            <p>© {{ today.year }} eGarage - Tu socio tecnológico de confianza</p>
-            <p><small>Renueva antes del {{ expiration_date|date:"d/m/Y" }} para mantener tu acceso sin interrupciones.</small></p>
+            <p><a href="mailto:{{ support_email }}" style="color: #22d3ee; text-decoration: none;">{{ support_email }}</a></p>
+            <p><strong>WhatsApp:</strong> <a href="https://wa.me/{{ support_whatsapp_wa_me }}?text=Hola,%20tengo%20una%20pregunta%20sobre%20mi%20suscripción%20eGarage" target="_blank" rel="noopener noreferrer" style="color: #10b981; text-decoration: none;">{{ support_whatsapp_display }}</a></p>
+            <p>© {{ today.year }} eGarage</p>
         </div>
     </div>
 </body>

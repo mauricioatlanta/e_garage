@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}{% if object %}Editar{% else %}Crear{% endif %} Miembro del Equipo - eGarage{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+        <div class="md:col-span-1">
+            <h3 class="text-lg font-medium leading-6 text-gray-900">
+                {% if object %}Editar Miembro{% else %}Nuevo Miembro{% endif %}
+            </h3>
+            <p class="mt-1 text-sm text-gray-500">
+                Esta persona tendrá acceso a los datos de tu taller según el rol que le asignes.
+            </p>
+        </div>
+        
+        <div class="mt-5 md:col-span-2 md:mt-0">
+            <div class="shadow sm:overflow-hidden sm:rounded-md">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="space-y-6 bg-white px-4 py-5 sm:p-6">
+                        
+                        {% if form.non_field_errors %}
+                        <div class="rounded-md bg-red-50 p-4">
+                            <div class="flex">
+                                <div class="flex-shrink-0">
+                                    <i class="fas fa-exclamation-circle text-red-400"></i>
+                                </div>
+                                <div class="ml-3">
+                                    <h3 class="text-sm font-medium text-red-800">
+                                        Error en el formulario
+                                    </h3>
+                                    <div class="mt-2 text-sm text-red-700">
+                                        {{ form.non_field_errors }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="grid grid-cols-6 gap-6">
+                            <!-- Nombre -->
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Nombre <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" 
+                                       name="{{ form.first_name.name }}" 
+                                       id="{{ form.first_name.id_for_label }}" 
+                                       value="{{ form.first_name.value|default:'' }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm {% if form.first_name.errors %}border-red-300{% endif %}"
+                                       required>
+                                {% if form.first_name.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.first_name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Apellido -->
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Apellido <span class="text-red-500">*</span>
+                                </label>
+                                <input type="text" 
+                                       name="{{ form.last_name.name }}" 
+                                       id="{{ form.last_name.id_for_label }}" 
+                                       value="{{ form.last_name.value|default:'' }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm {% if form.last_name.errors %}border-red-300{% endif %}"
+                                       required>
+                                {% if form.last_name.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.last_name.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Email -->
+                            <div class="col-span-6">
+                                <label for="{{ form.email.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Email (Usuario) <span class="text-red-500">*</span>
+                                </label>
+                                <input type="email" 
+                                       name="{{ form.email.name }}" 
+                                       id="{{ form.email.id_for_label }}" 
+                                       value="{{ form.email.value|default:'' }}"
+                                       {% if object %}readonly{% endif %}
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm {% if object %}bg-gray-100{% endif %} {% if form.email.errors %}border-red-300{% endif %}"
+                                       required>
+                                {% if form.email.help_text %}
+                                <p class="mt-2 text-sm text-gray-500">{{ form.email.help_text }}</p>
+                                {% endif %}
+                                {% if form.email.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.email.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Rol -->
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.rol.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Rol <span class="text-red-500">*</span>
+                                </label>
+                                <select name="{{ form.rol.name }}" 
+                                        id="{{ form.rol.id_for_label }}" 
+                                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm {% if form.rol.errors %}border-red-300{% endif %}"
+                                        required>
+                                    {% for value, label in form.rol.field.choices %}
+                                        {% if value %}
+                                        <option value="{{ value }}" {% if form.rol.value == value %}selected{% endif %}>
+                                            {{ label }}
+                                        </option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <p class="mt-2 text-xs text-gray-500">
+                                    <strong>Admin:</strong> Gestión total (excepto Config).<br>
+                                    <strong>Vendedor:</strong> Cotizaciones y ventas.<br>
+                                    <strong>Técnico:</strong> Solo OTs asignadas.<br>
+                                    <strong>Mixto:</strong> Vendedor + Técnico.
+                                </p>
+                                {% if form.rol.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.rol.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+
+                            <!-- Contraseña -->
+                            {% if not object %}
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Contraseña Temporal <span class="text-red-500">*</span>
+                                </label>
+                                <input type="password" 
+                                       name="{{ form.password.name }}" 
+                                       id="{{ form.password.id_for_label }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm {% if form.password.errors %}border-red-300{% endif %}"
+                                       required>
+                                {% if form.password.help_text %}
+                                <p class="mt-2 text-sm text-gray-500">{{ form.password.help_text }}</p>
+                                {% endif %}
+                                {% if form.password.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.password.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            {% else %}
+                            <div class="col-span-6 sm:col-span-3">
+                                <label for="{{ form.password.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Nueva Contraseña
+                                </label>
+                                <input type="password" 
+                                       name="{{ form.password.name }}" 
+                                       id="{{ form.password.id_for_label }}"
+                                       class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm {% if form.password.errors %}border-red-300{% endif %}">
+                                {% if form.password.help_text %}
+                                <p class="mt-2 text-sm text-gray-500">{{ form.password.help_text }}</p>
+                                {% endif %}
+                                {% if form.password.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.password.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+
+                            <!-- Notas -->
+                            <div class="col-span-6">
+                                <label for="{{ form.notas.id_for_label }}" class="block text-sm font-medium text-gray-700">
+                                    Notas
+                                </label>
+                                <textarea name="{{ form.notas.name }}" 
+                                          id="{{ form.notas.id_for_label }}" 
+                                          rows="3"
+                                          class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm {% if form.notas.errors %}border-red-300{% endif %}">{{ form.notas.value|default:'' }}</textarea>
+                                {% if form.notas.help_text %}
+                                <p class="mt-2 text-sm text-gray-500">{{ form.notas.help_text }}</p>
+                                {% endif %}
+                                {% if form.notas.errors %}
+                                <p class="mt-2 text-sm text-red-600">{{ form.notas.errors.0 }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <div class="bg-gray-50 px-4 py-3 text-right sm:px-6">
+                        <a href="{% url 'team:team_list' %}" class="text-sm text-gray-600 hover:text-gray-900 mr-4">
+                            Cancelar
+                        </a>
+                        <button type="submit" class="inline-flex justify-center rounded-md border border-transparent bg-indigo-600 py-2 px-4 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                            <i class="fas fa-save mr-2"></i> Guardar
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

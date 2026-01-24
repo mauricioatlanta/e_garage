@@ -10,6 +10,8 @@ urlpatterns = [
     path("clientes/", views.api_listar_clientes, name="listar_clientes"),
     path("clientes/buscar/", views.buscar_clientes_api, name="buscar_clientes_api"),
     path("clientes/<int:cliente_id>/", views.info_cliente_api, name="info_cliente_api"),
+    path("clientes/<int:cliente_id>/verificar-facturacion/", views.api_verificar_facturacion_cliente, name="verificar_facturacion_cliente"),
+    path("clientes/<int:cliente_id>/completar-facturacion/", views.api_completar_datos_facturacion, name="completar_facturacion_cliente"),
     path(
         "vehiculos/<int:cliente_id>/",
         views.vehiculos_cliente_api,
@@ -31,4 +33,6 @@ urlpatterns = [
     # Onboarding APIs
     path("clientes/crear/", views.api_crear_cliente_onboarding, name="crear_cliente_onboarding"),
     path("vehiculos/crear/", views.api_crear_vehiculo_onboarding, name="crear_vehiculo_onboarding"),
+    # API para procesar foto de patente
+    path("vehiculos/procesar-foto-patente/", views.api_procesar_foto_patente, name="procesar_foto_patente"),
 ]

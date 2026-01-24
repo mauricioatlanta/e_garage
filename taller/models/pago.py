@@ -76,7 +76,16 @@ class PagoPendiente(models.Model):
         )
 
         # Actualizar empresa
-        self.empresa.extender_suscripcion(dias=dias)
+        # 🔒 IDEMPOTENCIA: Pasar ID del pago para tracking en DB
+        # No enviar notificación aquí, se enviará después si corresponde
+        self.empresa.extender_suscripcion(dias=dias, enviar_notificacion=False)
+        
+        # Resetear flag de notificación antes de notificar
+        if hasattr(self.empresa, '_admin_whatsapp_notified'):
+            delattr(self.empresa, '_admin_whatsapp_notified')
+        
+        # Pasar ID del pago para idempotencia
+        self.empresa._current_pago_pendiente_id = self.id
         self.empresa.plan = self.plan
         self.empresa.valor_mensual = self.monto
         self.empresa.save()

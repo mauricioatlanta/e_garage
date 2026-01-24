@@ -1,0 +1,16 @@
+[Unit]
+Description=eGarage Sync Subscriptions - Sincroniza estado de suscripciones
+After=network.target
+
+[Service]
+Type=oneshot
+User=www-data
+Group=www-data
+WorkingDirectory=/ruta/completa/al/proyecto
+Environment="PATH=/ruta/al/venv/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/ruta/al/venv/bin/python manage.py sync_subscriptions
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

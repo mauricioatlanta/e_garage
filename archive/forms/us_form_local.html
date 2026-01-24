@@ -1,0 +1,4102 @@
+
+
+
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+  <title>Taller de mauricio - 
+
+
+
+
+<!-- Header de Página - Design System -->
+<div class="mb-6 sm:mb-8 px-4 sm:px-6">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div class="flex-1">
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
+        📝 Nuevo Documento
+      </h1>
+      <p class="text-sm sm:text-base text-slate-300">
+        Nuevo Documento
+      </p>
+    </div>
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+      <!-- Language Selector -->
+      <form id="language-form-doc" action="/i18n/setlang/" method="post" class="inline">
+        <input type="hidden" name="csrfmiddlewaretoken" value="z3vqRgNeARKEne1l75KMgmGu1vrYScoogSOHLtuuDNckoPQFzG3pXa56DahDtoFv">
+        <input type="hidden" name="next" value="/us/documentos/form/">
+        <input type="hidden" name="language" id="language-input-doc" value="es">
+        <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50" style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+          <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
+                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 text-gray-400 hover:text-cyan-300"
+                  >
+            🇺🇸 EN
+          </button>
+          <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc"
+                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 text-gray-400 hover:text-cyan-300"
+                  >
+            🇪🇸 ES
+          </button>
+        </div>
+      </form>
+      
+      <label class="flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
+        <input type="checkbox" id="id_pagado" name="pagado" class="mr-2 form-control focus:outline-none focus:ring-2 focus:ring-cyan-400/60">
+        Documento pagado
+      </label>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+function submitLanguageDoc(lang) {
+  document.getElementById('language-input-doc').value = lang;
+  document.getElementById('language-form-doc').submit();
+}
+</script>
+</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  <meta name="theme-color" content="#0a0e27">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="eGarage">
+  <link rel="manifest" href="/static/manifest.json">
+  <link rel="apple-touch-icon" href="/static/images/egarage_icon_192x192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/images/egarage_icon_192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/static/images/egarage_icon_512x512.png">
+  <link rel="icon" type="image/svg+xml" href="/static/images/egarage_default_logo.svg">
+  
+  
+  <script src="/static/js/ios-password-fix.js?v=2.1.2" defer></script>
+
+  
+  <link rel="stylesheet" href="/static/css/pwa-install-prompt.css?v=2.1.2">
+
+  
+  <script src="/jsi18n/"></script>
+
+  
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="stylesheet" href="/static/css/output.css">
+
+  
+  
+    <link rel="stylesheet" href="/static/css/starfield.css">
+  
+
+  
+  <style>
+    :root{
+      --company-primary: #1a202c;
+      --company-secondary: #6c757d;
+      --bs-primary: #1a202c;
+      --bs-secondary: #6c757d;
+    }
+    .text-primary,.navbar-brand{color:var(--company-primary)!important}
+    .bg-primary{background-color:var(--company-primary)!important}
+    .btn-primary{background-color:var(--company-primary)!important;border-color:var(--company-primary)!important}
+    .btn-primary:hover{
+      background-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
+      border-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
+    }
+    .border-primary{border-color:var(--company-primary)!important}
+    .company-logo{max-height:160px;max-width:400px;object-fit:contain;transition:transform 0.3s ease,filter 0.3s ease}
+    .company-logo:hover{transform:scale(1.05);filter:drop-shadow(0 0 25px rgba(0,245,255,0.9))!important}
+    .company-header{
+      background:linear-gradient(135deg,rgba(10,14,39,0.95) 0%,rgba(15,23,52,0.95) 50%,rgba(10,14,39,0.95) 100%);
+      border-bottom:3px solid rgba(0,212,255,0.6);
+      box-shadow:0 10px 40px rgba(0,212,255,0.3),inset 0 1px 0 rgba(0,255,255,0.2);
+      backdrop-filter:blur(10px)
+    }
+    .company-title{
+      font-family:'Orbitron','Arial Black',monospace !important;
+      color:#00ffff !important;
+      text-shadow:
+        0 0 20px rgba(0,255,255,1),
+        0 0 40px rgba(0,212,255,0.8),
+        0 0 60px rgba(0,212,255,0.6),
+        0 2px 10px rgba(0,0,0,0.8) !important;
+      filter:drop-shadow(0 4px 12px rgba(0,212,255,0.5));
+      font-weight:900 !important;
+      letter-spacing:2px !important;
+      animation:title-glow 3s ease-in-out infinite
+    }
+    @keyframes title-glow{
+      0%,100%{text-shadow:0 0 20px rgba(0,255,255,1),0 0 40px rgba(0,212,255,0.8),0 0 60px rgba(0,212,255,0.6),0 2px 10px rgba(0,0,0,0.8)}
+      50%{text-shadow:0 0 30px rgba(0,255,255,1),0 0 60px rgba(0,212,255,1),0 0 90px rgba(0,212,255,0.8),0 2px 10px rgba(0,0,0,0.8)}
+    }
+    
+    /* Fix de contraste para móvil - NOMBRE DE EMPRESA VISIBLE */
+    @media screen and (max-width: 768px) {
+      .company-title {
+        color: #00ffff !important;
+        font-size: 1.5rem !important;
+        text-shadow: 
+          0 0 20px rgba(0, 255, 255, 1),
+          0 0 40px rgba(0, 255, 255, 0.8),
+          0 2px 8px rgba(0, 0, 0, 1) !important;
+        font-weight: 900 !important;
+        -webkit-text-stroke: 1px rgba(0, 255, 255, 0.3);
+      }
+      
+      .company-tagline,
+      header .text-gray-300,
+      header .text-gray-400 {
+        color: #b0e0ff !important;
+        text-shadow: 0 0 10px rgba(176, 224, 255, 0.6) !important;
+      }
+    }
+
+    /* Estilo cinematográfico futurista para botones de navegación */
+    .nav-button-standard {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.3rem;
+      background: linear-gradient(135deg, rgba(5, 15, 30, 0.95) 0%, rgba(10, 20, 35, 0.95) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.3);
+      border-radius: 8px;
+      text-decoration: none;
+      color: #b0e0ff;
+      font-weight: 600;
+      font-size: 0.875rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+      overflow: visible;
+      white-space: nowrap;
+      isolation: isolate;
+      box-shadow: 0 2px 8px rgba(0, 212, 255, 0.2);
+    }
+
+    /* Borde eléctrico azul calipso que se mueve alrededor */
+    .nav-button-standard::before {
+      content: '';
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      right: -2px;
+      bottom: -2px;
+      background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(0, 212, 255, 0.8) 50%, 
+        transparent 70%);
+      border-radius: 10px;
+      z-index: -1;
+      opacity: 0.6;
+      animation: electric-border 3s linear infinite;
+      background-size: 200% 200%;
+    }
+
+    /* Efecto de brillo que se desplaza sobre el botón */
+    .nav-button-standard::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(0, 212, 255, 0.15) 30%,
+        rgba(0, 255, 255, 0.25) 50%,
+        rgba(0, 212, 255, 0.15) 70%,
+        transparent 100%);
+      border-radius: 8px;
+      animation: shine-sweep 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    @keyframes electric-border {
+      0% {
+        background-position: 0% 0%;
+        opacity: 0.6;
+      }
+      25% {
+        background-position: 100% 0%;
+        opacity: 0.8;
+      }
+      50% {
+        background-position: 100% 100%;
+        opacity: 0.6;
+      }
+      75% {
+        background-position: 0% 100%;
+        opacity: 0.8;
+      }
+      100% {
+        background-position: 0% 0%;
+        opacity: 0.6;
+      }
+    }
+
+    @keyframes shine-sweep {
+      0% {
+        left: -100%;
+        opacity: 0;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        left: 100%;
+        opacity: 0;
+      }
+    }
+
+    .nav-button-standard:hover {
+      transform: translateY(-2px);
+      border-color: rgba(0, 212, 255, 0.8);
+      color: #ffffff;
+      background: linear-gradient(135deg, rgba(10, 25, 45, 0.98) 0%, rgba(15, 35, 55, 0.98) 100%);
+      box-shadow:
+        0 0 20px rgba(0, 212, 255, 0.4),
+        0 0 40px rgba(0, 212, 255, 0.3),
+        0 0 60px rgba(0, 212, 255, 0.2),
+        inset 0 1px 0 rgba(0, 255, 255, 0.3);
+    }
+
+    .nav-button-standard:hover::before {
+      opacity: 1;
+      animation-duration: 1.5s;
+    }
+
+    .nav-button-standard:hover::after {
+      animation-duration: 2s;
+    }
+
+    .nav-button-standard:active {
+      transform: translateY(0);
+    }
+
+    .nav-button-standard .nav-icon {
+      font-size: 1rem;
+      filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.6));
+      transition: filter 0.3s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-button-standard:hover .nav-icon {
+      filter: drop-shadow(0 0 6px rgba(0, 255, 255, 1));
+    }
+
+    .nav-button-standard span:last-child,
+    .nav-button-standard .nav-text {
+      position: relative;
+      z-index: 1;
+      text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+      display: inline-block;
+    }
+
+    .nav-button-standard:hover span:last-child,
+    .nav-button-standard:hover .nav-text {
+      text-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
+    }
+
+    /* Estilo para botón de salir (rojo eléctrico) */
+    .nav-button-standard.logout-btn {
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ffb3b3;
+    }
+
+    .nav-button-standard.logout-btn::before {
+      background: linear-gradient(45deg, 
+        transparent 30%, 
+        rgba(239, 68, 68, 0.8) 50%, 
+        transparent 70%);
+    }
+
+    .nav-button-standard.logout-btn::after {
+      background: linear-gradient(90deg, 
+        transparent 0%, 
+        rgba(239, 68, 68, 0.15) 30%,
+        rgba(255, 100, 100, 0.25) 50%,
+        rgba(239, 68, 68, 0.15) 70%,
+        transparent 100%);
+    }
+
+    .nav-button-standard.logout-btn:hover {
+      border-color: rgba(239, 68, 68, 0.8);
+      box-shadow:
+        0 0 20px rgba(239, 68, 68, 0.4),
+        0 0 40px rgba(239, 68, 68, 0.3),
+        0 0 60px rgba(239, 68, 68, 0.2),
+        inset 0 1px 0 rgba(255, 150, 150, 0.3);
+    }
+
+    .nav-button-standard.logout-btn .nav-icon {
+      filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.6));
+    }
+
+    .nav-button-standard.logout-btn:hover .nav-icon {
+      filter: drop-shadow(0 0 6px rgba(255, 100, 100, 1));
+    }
+
+    .nav-button-standard.logout-btn span:last-child {
+      text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    }
+
+    .nav-button-standard.logout-btn:hover span:last-child {
+      text-shadow: 0 0 12px rgba(255, 100, 100, 0.8);
+    }
+
+    /* Responsive: Botones con TEXTO TECNOLÓGICO en móviles */
+    @media (max-width: 768px) {
+      .nav-button-standard {
+        padding: 0.6rem 0.4rem;
+        font-size: 0.65rem;
+        gap: 0.2rem;
+        min-width: 0;
+        flex: 1 1 auto;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 70px;
+      }
+
+      .nav-button-standard span:last-child,
+      .nav-button-standard .nav-text {
+        display: block !important;
+        font-family: 'Orbitron', 'Arial', monospace !important; /* Fuente tecnológica */
+        font-weight: 800 !important; /* Más bold */
+        font-size: 0.75rem !important; /* Más grande */
+        color: #00ffff !important; /* Color cyan brillante */
+        text-shadow: 
+          0 0 8px rgba(0, 255, 255, 0.9),
+          0 0 15px rgba(0, 212, 255, 0.6),
+          0 2px 4px rgba(0, 0, 0, 0.8) !important; /* Glow más fuerte */
+        opacity: 1 !important;
+        visibility: visible !important;
+        white-space: nowrap !important; /* Una sola línea */
+        text-align: center !important;
+        line-height: 1.3 !important;
+        margin-top: 0.25rem !important;
+        letter-spacing: 0.5px !important; /* Espaciado tecnológico */
+        text-transform: uppercase !important;
+      }
+
+      .nav-button-standard .nav-icon {
+        font-size: 1.4rem !important; /* Iconos un poco más grandes */
+        display: block !important;
+        margin-bottom: 0.15rem !important;
+        filter: drop-shadow(0 0 6px rgba(0, 212, 255, 0.8)) !important;
+      }
+
+      /* Asegurar que cada fila use grid para distribución uniforme */
+      #main-navigation .flex.flex-col > div {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        gap: 0.5rem;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 0.5rem;
+      }
+
+      /* Primera fila: 5 botones - distribuir en 3+2 o 2+3 según espacio */
+      #main-navigation .flex.flex-col > div:first-child {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      /* Segunda fila: 5 botones - distribuir igual */
+      #main-navigation .flex.flex-col > div:last-child {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      /* En pantallas pequeñas, ajustar a menos columnas pero mantener en 2 filas */
+      @media (max-width: 480px) {
+        #main-navigation .flex.flex-col > div:first-child {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        #main-navigation .flex.flex-col > div:last-child {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .nav-button-standard {
+          padding: 0.5rem 0.4rem;
+          font-size: 0.6rem;
+          flex-direction: column;
+          gap: 0.2rem;
+          min-height: 65px;
+          justify-content: center;
+          align-items: center;
+          background: linear-gradient(135deg, rgba(5, 15, 30, 0.98) 0%, rgba(10, 20, 35, 0.98) 100%) !important;
+          border: 1.5px solid rgba(0, 212, 255, 0.5) !important;
+          box-shadow: 0 2px 10px rgba(0, 212, 255, 0.3) !important;
+        }
+
+        .nav-button-standard span:last-child,
+        .nav-button-standard .nav-text {
+          display: block !important; /* Mostrar texto en móviles para mejor identificación */
+          font-size: 0.7rem !important;
+          line-height: 1.3 !important;
+          text-align: center !important;
+          word-break: break-word !important;
+          max-width: 100% !important;
+          font-weight: 700 !important;
+          color: #b0e0ff !important;
+          text-shadow: 0 0 6px rgba(0, 212, 255, 1) !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          position: relative !important;
+          z-index: 10 !important;
+          white-space: normal !important;
+          margin-top: 0.2rem !important;
+        }
+
+        .nav-button-standard .nav-icon {
+          font-size: 1.3rem !important;
+          margin-bottom: 0.2rem !important;
+          filter: drop-shadow(0 0 6px rgba(0, 212, 255, 1)) !important;
+          opacity: 1 !important;
+        }
+      }
+
+      /* En pantallas medianas, ajustar distribución */
+      @media (min-width: 481px) and (max-width: 640px) {
+        #main-navigation .flex.flex-col > div:first-child {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        #main-navigation .flex.flex-col > div:last-child {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .nav-button-standard {
+          padding: 0.5rem 0.5rem;
+          font-size: 0.65rem;
+          flex-direction: column;
+          gap: 0.25rem;
+          min-height: 65px;
+          justify-content: center;
+          align-items: center;
+        }
+
+        .nav-button-standard span:last-child,
+        .nav-button-standard .nav-text {
+          display: block !important;
+          font-size: 0.7rem !important;
+          line-height: 1.2 !important;
+          text-align: center !important;
+          font-weight: 700 !important;
+          color: #b0e0ff !important;
+          text-shadow: 0 0 4px rgba(0, 212, 255, 0.8) !important;
+          opacity: 1 !important;
+          visibility: visible !important;
+          white-space: normal !important;
+          margin-top: 0.2rem !important;
+        }
+
+        .nav-button-standard .nav-icon {
+          font-size: 1.3rem;
+          filter: drop-shadow(0 0 4px rgba(0, 212, 255, 0.8));
+        }
+      }
+    }
+
+    /* FORZAR TEXTO TECNOLÓGICO EN MÓVILES - MÁXIMA PRIORIDAD */
+    @media (max-width: 768px) {
+      .nav-button-standard {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 75px !important;
+      }
+
+      .nav-button-standard span:last-child,
+      .nav-button-standard .nav-text {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-family: 'Orbitron', 'Arial Black', monospace !important;
+        font-size: 0.8rem !important;
+        font-weight: 900 !important;
+        color: #00ffff !important;
+        text-shadow: 
+          0 0 10px rgba(0, 255, 255, 1),
+          0 0 20px rgba(0, 212, 255, 0.8),
+          0 2px 5px rgba(0, 0, 0, 1) !important;
+        line-height: 1.3 !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        word-break: normal !important;
+        margin-top: 0.3rem !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+      }
+      
+      .nav-button-standard .nav-icon {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 1.5rem !important;
+        margin-bottom: 0.3rem !important;
+        filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.9)) !important;
+      }
+    }
+
+    /* ESTILO TECNOLÓGICO ULTRA-ESPECÍFICO - MÁXIMA PRIORIDAD */
+    @media screen and (max-width: 768px) {
+      #main-navigation .nav-button-standard {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 80px !important;
+        padding: 0.7rem 0.5rem !important;
+        gap: 0.3rem !important;
+      }
+
+      #main-navigation .nav-button-standard span:not(.nav-icon),
+      #main-navigation .nav-button-standard .nav-text {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-family: 'Orbitron', 'Arial Black', monospace !important;
+        font-size: 0.85rem !important;
+        font-weight: 900 !important;
+        color: #00ffff !important;
+        text-shadow: 
+          0 0 12px rgba(0, 255, 255, 1),
+          0 0 24px rgba(0, 212, 255, 0.9),
+          0 3px 6px rgba(0, 0, 0, 1) !important;
+        line-height: 1.4 !important;
+        text-align: center !important;
+        margin-top: 0.35rem !important;
+        white-space: nowrap !important;
+        word-break: normal !important;
+        max-width: 100% !important;
+        width: 100% !important;
+        position: relative !important;
+        z-index: 10 !important;
+        letter-spacing: 1.2px !important;
+        text-transform: uppercase !important;
+      }
+
+      #main-navigation .nav-button-standard .nav-icon {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 1.6rem !important;
+        margin-bottom: 0.35rem !important;
+        filter: drop-shadow(0 0 10px rgba(0, 255, 255, 1)) !important;
+      }
+    }
+
+    /* TEXTO TECNOLÓGICO EN TODOS LOS MÓVILES Y TABLETS */
+    @media screen and (max-width: 1024px) {
+      .nav-button-standard {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      .nav-button-standard .nav-text,
+      .nav-button-standard span:not(.nav-icon) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-family: 'Orbitron', 'Arial Black', monospace !important;
+        font-size: 0.85rem !important;
+        font-weight: 900 !important;
+        color: #00ffff !important;
+        text-shadow: 
+          0 0 12px rgba(0, 255, 255, 1),
+          0 0 20px rgba(0, 212, 255, 0.8),
+          0 2px 5px rgba(0, 0, 0, 1) !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        margin-top: 0.3rem !important;
+        letter-spacing: 1px !important;
+        text-transform: uppercase !important;
+      }
+
+      .nav-button-standard .nav-icon {
+        display: block !important;
+        margin-bottom: 0.3rem !important;
+        filter: drop-shadow(0 0 8px rgba(0, 255, 255, 0.9)) !important;
+      }
+    }
+
+    /* 🔥 FIX FINAL - ULTRA ESPECÍFICO PARA MÓVIL - MÁXIMA PRIORIDAD 🔥 */
+    @media screen and (max-width: 480px) {
+      /* Forzar flex-direction column en móviles pequeños */
+      body #main-navigation .nav-button-standard {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 85px !important;
+        padding: 0.8rem 0.6rem !important;
+      }
+
+      /* FORZAR VISIBILIDAD DEL TEXTO CON MÁXIMA ESPECIFICIDAD */
+      body #main-navigation .nav-button-standard span[class="nav-text"],
+      body #main-navigation .nav-button-standard span.nav-text,
+      body #main-navigation a.nav-button-standard > span:not(.nav-icon),
+      body .nav-button-standard span[class*="nav-text"] {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        position: relative !important;
+        width: auto !important;
+        height: auto !important;
+        overflow: visible !important;
+        clip: auto !important;
+        font-family: 'Orbitron', 'Arial Black', monospace !important;
+        font-size: 0.75rem !important;
+        font-weight: 900 !important;
+        color: #00ffff !important;
+        text-shadow: 
+          0 0 15px rgba(0, 255, 255, 1),
+          0 0 25px rgba(0, 212, 255, 0.9),
+          0 3px 6px rgba(0, 0, 0, 1) !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        margin-top: 0.4rem !important;
+        letter-spacing: 1.5px !important;
+        text-transform: uppercase !important;
+        line-height: 1.2 !important;
+        z-index: 10 !important;
+      }
+
+      /* Iconos también visibles */
+      body #main-navigation .nav-button-standard .nav-icon {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 1.8rem !important;
+        margin-bottom: 0.4rem !important;
+        filter: drop-shadow(0 0 12px rgba(0, 255, 255, 1)) !important;
+      }
+    }
+
+    /* 🔥 TAMBIÉN PARA TABLETS Y MÓVILES MÁS GRANDES 🔥 */
+    @media screen and (min-width: 481px) and (max-width: 768px) {
+      body #main-navigation .nav-button-standard {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 80px !important;
+      }
+
+      body #main-navigation .nav-button-standard span.nav-text,
+      body #main-navigation a.nav-button-standard > span:not(.nav-icon) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.8rem !important;
+        font-weight: 900 !important;
+        color: #00ffff !important;
+        text-shadow: 0 0 12px rgba(0, 255, 255, 1) !important;
+        margin-top: 0.3rem !important;
+      }
+    }
+  </style>
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+  
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  
+  <script>
+  (function() {
+    // Detectar si es móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    
+    if (!isMobile) {
+      console.log('✅ Desktop detectado - sin restricciones de scroll');
+      return; // En desktop, no aplicar restricciones
+    }
+
+    console.log('📱 Móvil detectado - activando protección anti-scroll automático');
+
+    // Flag para detectar interacción real del usuario
+    let isUserInteraction = false;
+    let scrollLock = false;
+    let initialScrollPos = 0;
+
+    // Marcar interacción del usuario en eventos táctiles y de mouse
+    ['touchstart', 'touchmove', 'mousedown', 'wheel', 'scroll'].forEach(function(event) {
+      document.addEventListener(event, function() {
+        isUserInteraction = true;
+        setTimeout(function() { isUserInteraction = false; }, 100);
+      }, { passive: true, capture: true });
+    });
+
+    // Función para restaurar posición de scroll
+    function preventAutoScroll() {
+      if (scrollLock && !isUserInteraction) {
+        window.scrollTo(0, initialScrollPos);
+        document.documentElement.scrollTop = initialScrollPos;
+        document.body.scrollTop = initialScrollPos;
+      }
+    }
+
+    // Interceptar window.scrollTo
+    const origScrollTo = window.scrollTo;
+    window.scrollTo = function(x, y) {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scrollTo(' + x + ',' + y + ') sin interacción del usuario');
+        return; // Bloquear scroll automático
+      }
+      return origScrollTo.call(window, x, y);
+    };
+
+    // Interceptar scrollIntoView
+    const origScrollIntoView = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function() {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scrollIntoView en', this.tagName, this.id || this.className);
+        return; // Bloquear scrollIntoView automático
+      }
+      return origScrollIntoView.apply(this, arguments);
+    };
+
+    // Interceptar window.scroll
+    const origScroll = window.scroll;
+    window.scroll = function(x, y) {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scroll(' + x + ',' + y + ') sin interacción del usuario');
+        return;
+      }
+      return origScroll.call(window, x, y);
+    };
+
+    // Modificar focus para no hacer scroll en móviles
+    const origFocus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function(options) {
+      if (isMobile) {
+        // En móviles, focus sin scroll
+        const newOptions = Object.assign({}, options, { preventScroll: true });
+        return origFocus.call(this, newOptions);
+      }
+      return origFocus.call(this, options);
+    };
+
+    // Activar protección al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+      initialScrollPos = window.pageYOffset || document.documentElement.scrollTop || 0;
+      scrollLock = true;
+      
+      // Mantener lock por 3 segundos después de carga
+      setTimeout(function() {
+        scrollLock = false;
+        console.log('✅ Protección anti-scroll desactivada - página cargada');
+      }, 3000);
+
+      // Prevenir scroll en focus de inputs
+      document.addEventListener('focusin', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+          if (!isUserInteraction) {
+            const scrollBefore = window.pageYOffset || document.documentElement.scrollTop || 0;
+            setTimeout(function() {
+              const scrollAfter = window.pageYOffset || document.documentElement.scrollTop || 0;
+              if (Math.abs(scrollAfter - scrollBefore) > 3) {
+                window.scrollTo(0, scrollBefore);
+                document.documentElement.scrollTop = scrollBefore;
+                document.body.scrollTop = scrollBefore;
+              }
+            }, 0);
+          }
+        }
+      }, true);
+    });
+
+    // Prevenir scroll al abrir/cerrar teclado virtual
+    let lastHeight = window.innerHeight;
+    window.addEventListener('resize', function() {
+      const currentHeight = window.innerHeight;
+      if (Math.abs(currentHeight - lastHeight) > 100) {
+        // Cambio grande = probablemente teclado virtual
+        setTimeout(preventAutoScroll, 50);
+      }
+      lastHeight = currentHeight;
+    });
+
+    console.log('✅ Protección anti-scroll activada para móvil');
+  })();
+  </script>
+
+  
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+  <script src="/static/autocomplete_light_custom/jquery.init.js"></script>
+  <script src="/static/autocomplete_light_custom/select2.js"></script>
+  <script src="/static/autocomplete_light_custom/autocomplete_light.js"></script>
+  <script src="/static/autocomplete_light_custom/autocomplete.init.js"></script>
+
+  
+  
+<style>
+/* 🎨 Estilo futurista para formularios de documentos */
+:root {
+    --cyber-blue: #00ffff;
+    --cyber-green: #00ff88;
+    --cyber-purple: #8000ff;
+    --cyber-red: #ff0044;
+    --cyber-gold: #ffd700;
+    --cyber-orange: #ff8800;
+    --dark-bg: #0a0a0a;
+    --card-bg: rgba(16, 20, 24, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.cyber-container {
+    background: var(--card-bg);
+    border: 1px solid var(--cyber-blue);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
+}
+
+.form-section {
+    background: var(--card-bg);
+    border: 1px solid var(--cyber-purple);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    color: var(--cyber-blue);
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 1.5rem;
+    text-shadow: 0 0 10px var(--cyber-blue);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    color: #ffffff !important;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    display: block;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* 🎯 ESTILOS PARA ETIQUETAS - MEJOR CONTRASTE */
+label,
+.form-label,
+.form-group label,
+.form-check-label {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Estilos para etiquetas de campos específicos */
+#document-form label,
+#document-form .form-label {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* 🎨 ESTILOS UNIFICADOS PARA TODOS LOS CAMPOS DE FORMULARIO - MEJORADO PARA MEJOR CONTRASTE */
+.form-input,
+.form-select,
+.form-textarea,
+.form-control,
+input[type="text"],
+input[type="date"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+select,
+textarea,
+input {
+    background: rgba(15, 15, 35, 0.98) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.15) !important;
+    min-height: 48px !important;
+    line-height: 1.4 !important;
+}
+
+/* 🎯 FORZAR ESTILOS NEGROS PARA TODOS LOS INPUTS - SIN EXCEPCIONES */
+*[type="text"],
+*[type="date"],
+*[type="number"],
+*[type="email"],
+*[type="tel"],
+*[type="password"],
+*[type="search"],
+*[type="url"],
+*[type="hidden"],
+select,
+textarea,
+input,
+.form-control,
+.form-select,
+.form-input,
+.form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* 🎯 ESPECÍFICO PARA CAMPOS DAL (Django Autocomplete Light) */
+.select2-container .select2-selection--single,
+.select2-container .select2-selection--multiple,
+.select2-dropdown {
+    background: rgba(15, 15, 35, 0.98) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    color: #ffffff !important;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered,
+.select2-container .select2-selection--multiple .select2-selection__choice {
+    color: #ffffff !important;
+}
+
+.select2-results__option {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+}
+
+.select2-results__option--highlighted {
+    background: rgba(0, 255, 136, 0.3) !important;
+    color: #ffffff !important;
+}
+
+/* 🎯 ESTILOS ADICIONALES PARA ASEGURAR FONDO NEGRO EN TODOS LOS CAMPOS */
+/* Forzar estilos en todos los elementos del formulario */
+form input,
+form select,
+form textarea,
+form .form-control,
+form .form-select,
+form .form-input,
+form .form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para campos específicos del formulario de documentos */
+#document-form input,
+#document-form select,
+#document-form textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para tablas y elementos adicionales */
+.table input,
+.table select,
+.table textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para elementos de Bootstrap que puedan interferir */
+.form-control,
+.form-select,
+.form-input,
+.form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para elementos de Django forms */
+.django-form input,
+.django-form select,
+.django-form textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus,
+.form-control:focus,
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 25px rgba(0, 255, 136, 0.6) !important;
+    background: rgba(0, 255, 136, 0.12) !important;
+    transform: translateY(-1px) !important;
+    color: #ffffff !important;
+}
+
+/* Estilos específicos para campos readonly */
+.form-input[readonly],
+.form-control[readonly],
+input[readonly] {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border-color: var(--cyber-blue) !important;
+    color: var(--cyber-blue) !important;
+    cursor: not-allowed !important;
+}
+
+/* Estilos para campos deshabilitados */
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled,
+.form-control:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background: rgba(15, 15, 25, 0.95) !important;
+    border-color: #444 !important;
+    color: #888 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+/* Placeholder styling */
+.form-input::placeholder,
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+    font-style: italic !important;
+}
+
+/* Select options styling - Mejorado para mejor contraste */
+select option {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    padding: 12px 16px !important;
+    font-weight: 500 !important;
+    border: none !important;
+}
+
+select option:hover {
+    background: rgba(0, 255, 136, 0.2) !important;
+    color: #ffffff !important;
+}
+
+select option:checked {
+    background: rgba(0, 255, 136, 0.3) !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+}
+
+/* Hover effects */
+.form-input:hover:not(:focus):not(:disabled),
+.form-select:hover:not(:focus):not(:disabled),
+.form-textarea:hover:not(:focus):not(:disabled),
+.form-control:hover:not(:focus):not(:disabled),
+input:hover:not(:focus):not(:disabled),
+select:hover:not(:focus):not(:disabled),
+textarea:hover:not(:focus):not(:disabled) {
+    border-color: var(--cyber-blue) !important;
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.15) !important;
+}
+
+/* 🎯 ESTILOS ESPECÍFICOS PARA CAMPOS DEL FORMULARIO DE DOCUMENTOS */
+/* Campo de número (readonly) */
+#id_numero {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: var(--cyber-blue) !important;
+    font-family: 'Courier New', monospace !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    cursor: not-allowed !important;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1) !important;
+}
+
+/* Campos de búsqueda AJAX */
+#cliente-busqueda,
+.rep-codigo,
+.serv-search,
+.otr-search {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+#cliente-busqueda:focus,
+.rep-codigo:focus,
+.serv-search:focus,
+.otr-search:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de información del cliente */
+#cliente-info {
+    background: rgba(0, 255, 255, 0.08) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1) !important;
+}
+
+/* Campos de repuestos */
+.rep-nombre,
+.rep-precio-compra,
+.rep-precio-venta,
+.rep-cantidad,
+.serv-precio,
+.otr-precio,
+.otr-precio-taller {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+.rep-nombre:focus,
+.rep-precio-compra:focus,
+.rep-precio-venta:focus,
+.rep-cantidad:focus,
+.serv-precio:focus,
+.otr-precio:focus,
+.otr-precio-taller:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos readonly de repuestos */
+.rep-nombre,
+.rep-precio-compra {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border-color: var(--cyber-blue) !important;
+    color: var(--cyber-blue) !important;
+    cursor: not-allowed !important;
+}
+
+/* Campos de empresa externa */
+input[name*="empresa_externa"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="empresa_externa"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de observaciones */
+textarea[name="observaciones"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    min-height: 120px !important;
+    resize: vertical !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+textarea[name="observaciones"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Checkbox de IVA */
+input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    accent-color: var(--cyber-green) !important;
+    cursor: pointer !important;
+}
+
+/* Checkbox específico para "Excluir IVA" */
+#id_exclude_vat {
+    accent-color: var(--cyber-orange) !important;
+}
+
+/* Labels de checkboxes IVA */
+label[for="id_apply_vat"],
+label[for="id_exclude_vat"] {
+    color: #b0b8c1 !important;
+    font-size: 0.9rem !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+label[for="id_apply_vat"]:hover,
+label[for="id_exclude_vat"]:hover {
+    color: var(--cyber-blue) !important;
+    text-shadow: 0 0 8px var(--cyber-blue) !important;
+}
+
+/* Dropdowns de resultados */
+#cliente-resultados,
+.serv-resultados,
+.otr-resultados,
+.repuesto-dropdown {
+    background: rgba(20, 20, 40, 0.98) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    backdrop-filter: blur(15px) !important;
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3) !important;
+}
+
+/* Items de dropdown */
+.cliente-item,
+.servicio-item,
+.repuesto-suggestion {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease !important;
+}
+
+.cliente-item:hover,
+.servicio-item:hover,
+.repuesto-suggestion:hover {
+    background: rgba(0, 255, 255, 0.1) !important;
+    border-color: var(--cyber-blue) !important;
+}
+
+/* 🎯 CAMPOS DE TOTALES Y ELEMENTOS ESPECIALES */
+/* Campos de subtotal (readonly) */
+.subtotal-field,
+.rep-subtotal-view,
+.serv-subtotal-view,
+.otr-subtotal-view {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: var(--cyber-blue) !important;
+    font-family: 'Courier New', monospace !important;
+    font-weight: bold !important;
+    text-align: right !important;
+    cursor: not-allowed !important;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1) !important;
+    min-height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+}
+
+/* Campos de descuento */
+input[name*="descuento"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="descuento"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de cantidad */
+input[name*="cantidad"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="cantidad"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio unitario */
+input[name*="precio_unitario"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="precio_unitario"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio cliente */
+input[name*="precio_cliente"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="precio_cliente"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio taller */
+input[name*="precio_taller"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="precio_taller"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio compra */
+input[name*="precio_compra"] {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: var(--cyber-blue) !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    cursor: not-allowed !important;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1) !important;
+}
+
+/* Campos de kilometraje */
+input[name="kilometraje"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name="kilometraje"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de fecha de emisión */
+input[name="fecha_emision"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name="fecha_emision"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de técnico responsable */
+select[name="tecnico_responsable"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+select[name="tecnico_responsable"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de tipo de documento */
+select[name="tipo"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+select[name="tipo"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campo de estado de pago */
+select[name="estado_pago"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+select[name="estado_pago"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Estilos específicos para opciones de estado de pago */
+select[name="estado_pago"] option[value="NO_PAGADO"] {
+    color: var(--cyber-orange) !important;
+}
+
+select[name="estado_pago"] option[value="PAGADO"] {
+    color: var(--cyber-green) !important;
+}
+
+select[name="estado_pago"] option[value="PARCIAL"] {
+    color: var(--cyber-blue) !important;
+}
+
+/* Campos de cliente y vehículo - Estilos mejorados con mayor especificidad */
+select[name="cliente"],
+select[name="vehiculo"],
+#id_cliente,
+#id_vehiculo,
+.form-select[name="cliente"],
+.form-select[name="vehiculo"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+    min-height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+select[name="cliente"]:focus,
+select[name="vehiculo"]:focus,
+#id_cliente:focus,
+#id_vehiculo:focus,
+.form-select[name="cliente"]:focus,
+.form-select[name="vehiculo"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+select[name="cliente"]:hover:not(:focus),
+select[name="vehiculo"]:hover:not(:focus),
+#id_cliente:hover:not(:focus),
+#id_vehiculo:hover:not(:focus),
+.form-select[name="cliente"]:hover:not(:focus),
+.form-select[name="vehiculo"]:hover:not(:focus) {
+    border-color: var(--cyber-blue) !important;
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.15) !important;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green));
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    color: #000;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, var(--cyber-purple), var(--cyber-orange));
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(128, 0, 255, 0.5);
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, var(--cyber-red), #ff6666);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 0, 68, 0.5);
+    color: #fff;
+    text-decoration: none;
+}
+
+.header-section {
+    background: var(--card-bg);
+    border: 1px solid var(--cyber-blue);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.header-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--cyber-blue);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 15px var(--cyber-blue);
+}
+
+.header-subtitle {
+    color: #b0b8c1;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.header-info {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.error-message {
+    background: rgba(255, 0, 68, 0.1);
+    border: 1px solid var(--cyber-red);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--cyber-red);
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid var(--cyber-green);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--cyber-green);
+    margin-bottom: 1rem;
+}
+
+.info-message {
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid var(--cyber-blue);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--cyber-blue);
+    margin-bottom: 1rem;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--cyber-blue);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+
+  
+  
+    <div id="bg-starfield" aria-hidden="true">
+      <div class="stars layer1"></div>
+      
+        <div class="stars layer2"></div>
+        <div class="stars layer3"></div>
+      
+    </div>
+  
+
+  
+  
+  <header class="company-header flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 p-4 sm:p-6">
+    <!-- Logo y nombre de la empresa -->
+    <div class="flex items-center gap-4 sm:gap-6">
+      
+        <img src="/static/images/egarage_default_logo.svg" alt="Taller de mauricio Logo"
+             class="company-logo h-24 sm:h-32 w-auto rounded-lg shadow-2xl border-2 border-opacity-40"
+             style="border-color: #1a202c; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));">
+      
+
+      <div class="flex flex-col">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,255,255,0.8)]" style="font-family: 'Orbitron', 'Arial Black', monospace; letter-spacing: 2px;">
+          
+            Taller de mauricio
+          
+        </h1>
+        
+          <span class="text-lg sm:text-xl text-cyan-200 font-semibold mt-1 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">Control total para tu taller</span>
+        
+      </div>
+    </div>
+
+    <!-- Selector de idioma -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Selector de idioma: Solo mostrar para USA, no para Chile -->
+      
+        
+
+<div class="language-switcher-cinematic">
+  <form action="/lang/set/" method="post" class="lang-form-cinematic">
+    <input type="hidden" name="csrfmiddlewaretoken" value="z3vqRgNeARKEne1l75KMgmGu1vrYScoogSOHLtuuDNckoPQFzG3pXa56DahDtoFv">
+    <input type="hidden" name="next" value="/us/documentos/form/">
+    <select 
+      id="lang-select-cinematic" 
+      name="language" 
+      class="lang-select-cinematic"
+      onchange="this.form.submit()"
+    >
+      <option value="en" >🇺🇸 English</option>
+      <option value="es" selected>🇪🇸 Español</option>
+    </select>
+  </form>
+</div>
+
+<style>
+.language-switcher-cinematic {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  z-index: 50;
+}
+
+.lang-form-cinematic {
+  margin: 0;
+  padding: 0;
+}
+
+.lang-select-cinematic {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.3rem;
+  background: linear-gradient(135deg, rgba(5, 15, 30, 0.95) 0%, rgba(10, 20, 35, 0.95) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  border-radius: 8px;
+  color: #b0e0ff;
+  font-weight: 600;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: visible;
+  white-space: nowrap;
+  isolation: isolate;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300d4ff' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.8rem center;
+  padding-right: 2.5rem;
+  outline: none;
+}
+
+.lang-select-cinematic::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: -2px;
+  right: -2px;
+  bottom: -2px;
+  background: linear-gradient(45deg,
+    transparent 30%,
+    rgba(0, 212, 255, 0.8) 50%,
+    transparent 70%);
+  border-radius: 10px;
+  z-index: -1;
+  opacity: 0.6;
+  animation: electric-border 3s linear infinite;
+  background-size: 200% 200%;
+}
+
+.lang-select-cinematic::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(0, 212, 255, 0.15) 30%,
+    rgba(0, 255, 255, 0.25) 50%,
+    rgba(0, 212, 255, 0.15) 70%,
+    transparent 100%);
+  border-radius: 8px;
+  animation: shine-sweep 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+.lang-select-cinematic:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 212, 255, 0.8);
+  color: #ffffff;
+  background: linear-gradient(135deg, rgba(10, 25, 45, 0.98) 0%, rgba(15, 35, 55, 0.98) 100%);
+  box-shadow:
+    0 0 20px rgba(0, 212, 255, 0.4),
+    0 0 40px rgba(0, 212, 255, 0.3),
+    0 0 60px rgba(0, 212, 255, 0.2),
+    inset 0 1px 0 rgba(0, 255, 255, 0.3);
+}
+
+.lang-select-cinematic:hover::before {
+  opacity: 1;
+  animation-duration: 1.5s;
+}
+
+.lang-select-cinematic:hover::after {
+  animation-duration: 2s;
+}
+
+.lang-select-cinematic:focus {
+  border-color: rgba(0, 212, 255, 0.8);
+  box-shadow:
+    0 0 20px rgba(0, 212, 255, 0.4),
+    0 0 40px rgba(0, 212, 255, 0.3),
+    inset 0 1px 0 rgba(0, 255, 255, 0.3);
+}
+
+.lang-select-cinematic option {
+  background: #0a1e2d;
+  color: #b0e0ff;
+  padding: 0.5rem;
+}
+
+@keyframes electric-border {
+  0% {
+    background-position: 0% 0%;
+    opacity: 0.6;
+  }
+  25% {
+    background-position: 100% 0%;
+    opacity: 0.8;
+  }
+  50% {
+    background-position: 100% 100%;
+    opacity: 0.6;
+  }
+  75% {
+    background-position: 0% 100%;
+    opacity: 0.8;
+  }
+  100% {
+    background-position: 0% 0%;
+    opacity: 0.6;
+  }
+}
+
+@keyframes shine-sweep {
+  0% {
+    left: -100%;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
+</style>
+
+
+
+      
+    </div>
+  </header>
+  
+
+  
+  
+  <div id="main-navigation" class="flex flex-col items-center justify-center mt-4 gap-3">
+    
+      
+      <!-- Fila 1: AJUSTES, CENTRO, CLIENTES, DOCUMENTOS, EXTRA -->
+      <div class="flex items-center justify-center gap-3 flex-wrap max-w-7xl w-full px-4">
+        <!-- AJUSTES -->
+        <a href="/us/settings/" class="nav-button-standard">
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">⚙️</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">AJUSTES</span>
+        </a>
+
+        <!-- CENTRO -->
+        <a href="/us/centro-operaciones/" class="nav-button-standard">
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚀</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">CENTRO</span>
+        </a>
+
+        <!-- CLIENTES -->
+        <a href="/us/clientes/" class="nav-button-standard">
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">👥</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">CLIENTES</span>
+        </a>
+
+        <!-- DOCUMENTOS -->
+        <a href="/us/documentos/" class="nav-button-standard">
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">📄</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">DOCUMENTOS</span>
+        </a>
+
+        <!-- EXTRA -->
+        <a href="/us/es/servicios/otros-servicios/" class="nav-button-standard">
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">⭐</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">EXTRA</span>
+        </a>
+      </div>
+
+      <!-- Fila 2: REPUESTOS, REPORTES, SERVICIOS, VEHÍCULOS, SALIR -->
+      <div class="flex items-center justify-center gap-3 flex-wrap max-w-7xl w-full px-4">
+        <!-- REPUESTOS -->
+        <a href="/us/repuestos/" class="nav-button-standard">
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🔧</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">REPUESTOS</span>
+        </a>
+
+        <!-- REPORTES -->
+        <a href="/us/reportes/" class="nav-button-standard">
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">📊</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">REPORTES</span>
+        </a>
+
+        <!-- SERVICIOS -->
+        <a href="/us/servicios/" class="nav-button-standard">
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🛠️</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">SERVICIOS</span>
+        </a>
+
+        <!-- VEHÍCULOS -->
+        
+        
+        <a href="/us/vehiculos/" class="nav-button-standard">
+          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚗</span>
+          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">VEHÍCULOS</span>
+        </a>
+        
+
+        <!-- SALIR -->
+        <form action="/accounts/logout/" method="post" class="inline-block">
+          <input type="hidden" name="csrfmiddlewaretoken" value="z3vqRgNeARKEne1l75KMgmGu1vrYScoogSOHLtuuDNckoPQFzG3pXa56DahDtoFv">
+          <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
+            <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚪</span>
+            <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">SALIR</span>
+          </button>
+        </form>
+      </div>
+
+    
+    </div>
+  </div>
+  
+
+  
+  
+  <main class="flex-1">
+    
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- 🏢 Cabecera del Documento -->
+    <div class="header-section">
+        <h1 class="header-title">
+            📄 🇺🇸 Document Management
+        </h1>
+        <p class="header-subtitle">Taller de mauricio - Document Form</p>
+        <p class="header-info">User: mauricio | Chile | </p>
+    </div>
+
+    <!-- Mensajes del sistema -->
+    
+
+    <!-- Contenido del documento -->
+    
+
+
+
+
+        <form method="post" id="document-form" class="max-w-7xl mx-auto" enctype="multipart/form-data">
+              data-mode="create"
+              data-url-next-number="/us/documentos/api/obtener-numero-documento/"
+              data-url-client-search="/us/ajax/clientes/buscar/"
+              data-url-vehiculos-by-cli="/us/ajax/vehiculos-por-cliente/"
+              data-url-repuesto-by-code="/us/api/repuestos/by-code"
+              data-url-repuesto-search="/us/api/repuestos/"
+              data-url-repuesto-create="/us/api/repuestos/crear/"
+              data-url-service-search="/us/servicios/api/buscar/"
+              data-url-outsourced-services="/us/servicios/api/otros/buscar/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="z3vqRgNeARKEne1l75KMgmGu1vrYScoogSOHLtuuDNckoPQFzG3pXa56DahDtoFv">
+
+  <!-- System messages - Design System -->
+  
+
+  <!-- Validation errors - Design System -->
+  
+
+  <!-- Document shell with dynamic theme -->
+  <div id="doc-shell" class="rounded-2xl p-4 sm:p-6 theme-ot border-2 shadow-lg">
+
+    <!-- Document header -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+
+      <!-- Columna 1: FECHA primero + TIPO + NÚMERO -->
+      <div class="space-y-3 sm:space-y-4">
+                <label for="id_fecha_emision" class="block text-cyan-200 font-semibold text-sm sm:text-base">Fecha de emisión</label>
+                <input id="id_fecha_emision" type="date" name="fecha_emision" class="form-control w-full text-base"
+                       value="2025-12-22">
+
+        <label for="id_tipo" class="block text-cyan-200 font-semibold text-sm sm:text-base">Tipo de documento</label>
+        <select id="id_tipo" name="tipo" class="form-select w-full text-base">
+          <option value="OT" >Orden de Trabajo</option>
+          <option value="FAC" >Factura</option>
+          <option value="PRES" >Presupuesto</option>
+        </select>
+
+        <label class="block text-cyan-200 font-semibold text-sm sm:text-base">N° Documento</label>
+        <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-2 sm:py-3 text-sm sm:text-base" id="id_numero">
+          Se generará automáticamente
+        </div>
+      </div>
+
+      <!-- Columna 2: Cliente/Vehículo -->
+      <div class="space-y-3 sm:space-y-4">
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+          <label class="block text-cyan-200 font-semibold text-sm sm:text-base">Cliente</label>
+          <button type="button" onclick="openClienteModal()" class="px-4 py-2 sm:px-3 sm:py-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold rounded-lg text-sm sm:text-xs transition-all w-full sm:w-auto">
+            ➕ Nuevo
+          </button>
+        </div>
+        <div class="relative">
+          <input type="text" id="cliente-busqueda" class="form-control w-full"
+                 placeholder="Escribe para buscar clientes…"
+                 autocomplete="off"
+                 oninput="window.handleClienteInput?.(this.value)"
+                 onfocus="window.handleClienteFocus?.(this.value)"
+                 onkeydown="return window.handleClienteKeydown?.(event)">
+          <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        </div>
+
+        <select id="id_cliente" name="cliente" class="form-select w-full hidden">
+          <option value="">Selecciona cliente…</option>
+        </select>
+
+        <!-- Selected client information -->
+        <div id="cliente-info" class="hidden p-3 bg-cyan-900/20 border border-cyan-400 rounded-lg">
+          <div class="text-cyan-200">
+            <strong id="cliente-nombre"></strong><br>
+            <span id="cliente-email"></span><br>
+            <span id="cliente-telefono"></span>
+          </div>
+        </div>
+
+        
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+          <label for="id_vehiculo" class="block text-cyan-200 font-semibold text-sm sm:text-base">Vehículo</label>
+          <button type="button" onclick="openVehiculoModal()" class="px-4 py-2 sm:px-3 sm:py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-lg text-sm sm:text-xs transition-all w-full sm:w-auto">
+            🚗 Nuevo
+          </button>
+        </div>
+        <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
+          <option value="">Selecciona cliente primero…</option>
+        </select>
+        
+      </div>
+
+      <!-- Columna 3: Técnico + Payment Status + Kilometraje -->
+      <div class="space-y-3 sm:space-y-4">
+        
+        <label for="id_tecnico_responsable" class="block text-cyan-200 font-semibold text-sm sm:text-base">
+          Mecánico responsable
+        </label>
+        <select name="tecnico_responsable" id="id_tecnico_responsable" class="form-select w-full text-base">
+          <option value="">Selecciona…</option>
+          
+        </select>
+        
+
+        <label for="id_payment_status" class="block text-cyan-200 font-semibold text-sm sm:text-base">Estado de pago</label>
+        <select id="id_payment_status" name="payment_status" class="form-select w-full text-base">
+          <option value="pending">Pendiente</option>
+          <option value="paid">Pagado</option>
+          <option value="partial">Parcial</option>
+          <option value="canceled">Anulado</option>
+        </select>
+
+        
+      </div>
+    </div>
+
+    <!-- Dynamic sections -->
+    <div class="space-y-4 sm:space-y-6">
+      <div class="seccion-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
+        <h3 class="text-lg sm:text-xl font-semibold text-cyan-300 mb-4 flex items-center gap-2">🔧 Repuestos y servicios</h3>
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+          
+          <button type="button" id="add-repuesto" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addRepuestoRow()">+ Agregar repuesto</button>
+          
+          
+          <button type="button" id="add-servicio" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addServicioRow()">+ Agregar servicio</button>
+          
+          
+        </div>
+
+        <!-- Parts container -->
+        
+        <div id="repuestos-container" class="space-y-4">
+          <!-- Dynamic parts will be added here -->
+        </div>
+        
+
+        <!-- Services container -->
+        
+        <div id="servicios-container" class="space-y-4">
+          <!-- Dynamic services will be added here -->
+        </div>
+        
+
+        <!-- Other services container -->
+        
+      </div>
+
+      <!-- Observations -->
+      <div class="observaciones-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
+        <label for="id_observaciones" class="block text-cyan-200 font-semibold text-sm sm:text-base mb-3">Observaciones</label>
+        <textarea id="id_observaciones" name="observaciones" rows="4" class="form-control w-full text-base focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900" placeholder="Observaciones opcionales — puedes dejar este campo vacío si no hay información adicional."></textarea>
+      </div>
+    </div>
+
+    <!-- Totals Section - Mejorada y reorganizada -->
+    <div class="totales-section mt-6 sm:mt-8 pt-4 sm:pt-6 border-t-2 border-cyan-500/30">
+      <div class="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 rounded-2xl p-4 sm:p-6 border border-cyan-400/50 shadow-lg">
+        <h3 class="text-xl sm:text-2xl font-bold text-cyan-300 mb-4 sm:mb-6 text-center">
+          💰 Resumen de Totales
+        </h3>
+        
+        <!-- VAT checkbox -->
+        <div class="mb-6 flex justify-center">
+          <label for="id_apply_vat" class="flex items-center text-cyan-200 bg-cyan-900/40 px-4 py-2 rounded-lg border border-cyan-400/50 cursor-pointer hover:bg-cyan-900/60 transition-all">
+            <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2 w-5 h-5 accent-cyan-400 cursor-pointer">
+            <span class="font-semibold">Aplicar impuesto</span>
+          </label>
+        </div>
+
+        <!-- Totals Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <!-- Parts Subtotal -->
+          
+          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+            <div class="flex justify-between items-center">
+              <span class="text-cyan-200 text-sm font-semibold">Subtotal Repuestos</span>
+              <span id="t_repuestos" class="text-cyan-300 font-bold text-lg">$0</span>
+            </div>
+          </div>
+          
+          
+          <!-- Services Subtotal -->
+          
+          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+            <div class="flex justify-between items-center">
+              <span class="text-cyan-200 text-sm font-semibold">Subtotal Servicios</span>
+              <span id="t_servicios" class="text-cyan-300 font-bold text-lg">$0</span>
+            </div>
+          </div>
+          
+          
+          <!-- Other Services Subtotal -->
+          
+          
+          <!-- Tax -->
+          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+            <div class="flex justify-between items-center">
+              <label class="flex items-center text-cyan-200 text-sm font-semibold cursor-pointer">
+                <input type="checkbox" id="include_tax" checked class="mr-2 w-4 h-4 accent-cyan-400 cursor-pointer">
+                <span>IVA</span>
+              </label>
+              <span id="t_iva" class="text-cyan-300 font-bold text-lg">$0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Grand Total -->
+        <div class="bg-gradient-to-r from-cyan-600/30 to-blue-600/30 rounded-lg p-5 border-2 border-cyan-400 shadow-xl">
+          <div class="flex justify-between items-center">
+            <span class="text-white font-bold text-xl">Total General</span>
+            <span id="t_total" class="text-white font-bold text-2xl">$0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action buttons - Design System -->
+    <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+        <a href="/us/documentos/" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">← Volver</a>
+        <a href="/us/servicios/otros-servicios/" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">
+          🌐 Ir a otros servicios
+        </a>
+      </div>
+      <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">💾 Crear Documento</button>
+    </div>
+  </div>
+
+  <!-- Hidden inputs para serializar filas dinámicas -->
+  <input type="hidden" name="repuestos_json" id="id_repuestos_json">
+  <input type="hidden" name="servicios_json" id="id_servicios_json">
+  <input type="hidden" name="otros_json" id="id_otros_json">
+</form>
+
+<script id="prefetchClientes" type="application/json">[]</script>
+<script id="prefetchVehiculos" type="application/json">[]</script>
+<script id="prefetchRepuestos" type="application/json">[]</script>
+<script id="prefetchServicios" type="application/json">[]</script>
+<script id="prefetchOtrosServicios" type="application/json">[]</script>
+
+
+
+
+
+    <!-- Acciones del formulario -->
+    
+    <div class="form-actions">
+        <button type="submit" class="btn-primary" form="document-form">
+            💾 Save Document
+        </button>
+        
+          <a href="/us/documentos/" class="btn-secondary">← Back to List</a>
+          
+        
+    </div>
+    
+
+</div>
+
+<!-- JavaScript para funcionalidades -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Efecto de typing en el título
+    const title = document.querySelector('.header-title');
+    if (title) {
+        const text = title.textContent;
+        title.textContent = '';
+        let i = 0;
+        const typeWriter = () => {
+            if (i < text.length) {
+                title.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            }
+        };
+        setTimeout(typeWriter, 500);
+    }
+
+    // Validación de formularios
+    const form = document.getElementById('document-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // DEBUG: Log todos los campos del formulario
+            console.log('🔍 DEBUG: Campos del formulario antes del envío:');
+            const formData = new FormData(this);
+            for (let [key, value] of formData.entries()) {
+                console.log(`  ${key}: ${value}`);
+            }
+
+            // Validar que se haya seleccionado un cliente
+            const clienteHidden = document.getElementById('id_cliente');
+
+            console.log('🔍 DEBUG: Cliente hidden value:', clienteHidden?.value);
+
+            if (!clienteHidden || !clienteHidden.value) {
+                e.preventDefault();
+                
+                  alert('Please select a customer before continuing.');
+                
+                return false;
+            }
+
+            // Actualizar campos ocultos antes de enviar
+            if (typeof window.recalcTotales === 'function') {
+                window.recalcTotales();
+            }
+
+            // Agregar clase de loading
+            this.classList.add('loading');
+
+            // Aquí se pueden agregar validaciones adicionales
+            console.log('✅ Enviando formulario...');
+        });
+    }
+
+    // Auto-save functionality (opcional)
+    const inputs = document.querySelectorAll('.form-input, .form-select, .form-textarea');
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Aquí se puede implementar auto-save
+            console.log('Campo modificado:', this.name);
+        });
+    });
+
+    // Animaciones de hover en botones
+    const buttons = document.querySelectorAll('.btn-primary, .btn-secondary, .btn-danger');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+        });
+
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+});
+</script>
+
+<!-- Django Autocomplete Light -->
+<link href="/static/admin/css/vendor/select2/select2.css" media="screen" rel="stylesheet">
+<link href="/static/admin/css/autocomplete.css" media="screen" rel="stylesheet">
+<link href="/static/autocomplete_light/select2.css" media="screen" rel="stylesheet">
+<script src="/static/admin/js/vendor/select2/select2.full.js"></script>
+<script src="/static/autocomplete_light/autocomplete_light.js"></script>
+<script src="/static/autocomplete_light/select2.js"></script>
+<script src="/static/autocomplete_light/i18n/es.js"></script>
+
+  </main>
+
+  
+  <footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
+    <div class="container mx-auto px-4 text-center">
+      
+      <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm">
+        <span class="font-medium">eGarage</span>
+        <span aria-hidden="true">•</span>
+        <span>© 2025</span>
+        <span aria-hidden="true">•</span>
+        <a href="/legal/" class="text-cyan-400 hover:underline">Legal</a>
+        <span aria-hidden="true">•</span>
+        <span class="text-xs text-gray-500">All Rights Reserved</span>
+      </div>
+    </div>
+  </footer>
+
+  
+  
+  <script src="/static/js/pwa-install-prompt.js?v=2.1.4"></script>
+  
+  
+  
+  
+
+  
+  
+
+<script>
+function initDocumentFormScript(){
+  // Evita doble inicialización
+  if (window.EG && window.EG._docFormInit) {
+    return;
+  }
+  const EG = (window.EG = window.EG || {});
+  EG._docFormInit = true;
+
+  // === CSRF ===
+  function getCookie(name) {
+    const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
+    return m ? m.pop() : '';
+  }
+  const CSRF = getCookie('csrftoken');
+
+  async function egFetch(url, opts={}){
+    const defaults = {
+      credentials: 'same-origin',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'X-CSRFToken': CSRF,
+      }
+    };
+    const cfg = {
+      ...defaults,
+      ...opts,
+      headers: { ...(defaults.headers||{}), ...((opts||{}).headers||{}) }
+    };
+    return fetch(url, cfg);
+  }
+  EG.fetch = egFetch;
+
+  // === CONFIG: no pisa si ya existe ===
+  EG.cfg = EG.cfg || {};
+  if (!EG.cfg.country) {
+    const path = (location.pathname || '').toLowerCase();
+    EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
+  }
+  (function(){
+    // Leer endpoints desde data-* attributes del formulario
+    const FORM = document.getElementById('document-form');
+    if (FORM) {
+      EG.cfg.URL_NEXT_NUMBER        = EG.cfg.URL_NEXT_NUMBER        || FORM.dataset.urlNextNumber;
+      EG.cfg.URL_CLIENT_SEARCH      = EG.cfg.URL_CLIENT_SEARCH      || FORM.dataset.urlClientSearch;
+      EG.cfg.URL_VEHICULOS_BY_CLI   = EG.cfg.URL_VEHICULOS_BY_CLI   || FORM.dataset.urlVehiculosByCli;
+      EG.cfg.URL_REPUESTO_BY_CODE   = EG.cfg.URL_REPUESTO_BY_CODE   || FORM.dataset.urlRepuestoByCode;
+      EG.cfg.URL_REPUESTO_SEARCH   = EG.cfg.URL_REPUESTO_SEARCH   || FORM.dataset.urlRepuestoSearch;
+      EG.cfg.URL_REPUESTO_CREATE   = EG.cfg.URL_REPUESTO_CREATE   || FORM.dataset.urlRepuestoCreate;
+      EG.cfg.URL_SERVICE_SEARCH     = EG.cfg.URL_SERVICE_SEARCH     || FORM.dataset.urlServiceSearch;
+      EG.cfg.URL_OUTSOURCED_SERVICES= EG.cfg.URL_OUTSOURCED_SERVICES|| FORM.dataset.urlOutsourcedServices;
+    }
+    // Fallback a path-based si no hay data-* (legacy)
+    if (!EG.cfg.URL_NEXT_NUMBER && FORM) {
+      const p = location.pathname || '';
+      const base = p.startsWith('/us/') ? '/us' : (p.startsWith('/cl/') ? '/cl' : '');
+      EG.cfg.URL_NEXT_NUMBER      = FORM.dataset.urlNextNumber || `${base}/documentos/api/obtener-numero-documento/`;
+      EG.cfg.URL_CLIENT_SEARCH    = FORM.dataset.urlClientSearch || `${base}/ajax/clientes/buscar/`;
+      EG.cfg.URL_VEHICULOS_BY_CLI = FORM.dataset.urlVehiculosByCli || `${base}/ajax/vehiculos-por-cliente/`;
+      EG.cfg.URL_REPUESTO_BY_CODE = FORM.dataset.urlRepuestoByCode || `${base}/api/repuestos/by-code`;
+      EG.cfg.URL_REPUESTO_SEARCH = FORM.dataset.urlRepuestoSearch || `${base}/api/repuestos/`;
+      EG.cfg.URL_SERVICE_SEARCH   = FORM.dataset.urlServiceSearch || `${base}/api/servicios/`;
+      EG.cfg.URL_OUTSOURCED_SERVICES = FORM.dataset.urlOutsourcedServices || `${base}/api/otros-servicios/`;
+    }
+    // Sales tax configurable (ej.: desde CompanySettings)
+    EG.cfg.salesTax = typeof EG.cfg.salesTax === 'number' ? EG.cfg.salesTax : 0.08;
+  })();
+
+  // Exponer seguro
+  window.EG = EG;
+
+// ===============
+// CONFIG ENDPOINTS - Evitar redeclaración
+// ===============
+window.EG = window.EG || {};
+EG.cfg = EG.cfg || {};
+if (!EG.cfg.country) {
+  const path = (location.pathname || '').toLowerCase();
+  EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
+}
+EG.COUNTRY = EG.COUNTRY || (EG.cfg.country || 'CL');
+const COUNTRY_REF = (EG.COUNTRY || 'CL').toUpperCase(); // usa COUNTRY_REF en lugar de COUNTRY
+
+// ==== PREFETCH & HELPERS ====
+(function(){
+  function safeJSON(id) {
+    try {
+      const el = document.getElementById(id);
+      return el ? JSON.parse(el.textContent) : [];
+    } catch (err) {
+      console.warn('⚠️ PREFETCH inválido para', id, err);
+      return [];
+    }
+  }
+
+  const global = window;
+  global.PREFETCH = global.PREFETCH || {
+    clientes:  safeJSON('prefetchClientes'),
+    vehiculos: safeJSON('prefetchVehiculos'),
+    repuestos: safeJSON('prefetchRepuestos'),
+    servicios: safeJSON('prefetchServicios'),
+    otros:     safeJSON('prefetchOtrosServicios'),
+  };
+
+  if (typeof global.filterPrefetchItems !== 'function') {
+    global.filterPrefetchItems = function(list, fields, query, limit = 15) {
+      if (!Array.isArray(list) || !fields?.length) return [];
+      const normalize = (value) => (value ?? '')
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '');
+      const needle = normalize(query);
+      if (!needle) return [];
+
+      const results = [];
+      for (const item of list) {
+        for (const field of fields) {
+          if (normalize(item?.[field]).includes(needle)) {
+            results.push(item);
+            break;
+          }
+        }
+        if (results.length >= limit) break;
+      }
+      return results;
+    };
+  }
+})();
+
+// ===============
+// I18N DICCIONARIO
+// ===============
+const I18N = {
+  no_clients: "No clients found",
+  loading_vehicles: "Loading vehicles…",
+  no_vehicles: "No vehicles registered",
+  select_vehicle: "Select vehicle…",
+  server_error: "Error del servidor",
+  error_loading_vehicles: "Error loading vehicles",
+  no_services: "No services found",
+  select_service: "Select service...",
+  issue_date_required: "Issue Date is required",
+  document_type_required: "Document Type is required",
+  client_required: "Client is required",
+  vehicle_required: "Vehicle is required",
+  code: "Código",
+  name: "Name",
+  qty: "Qty",
+  cost_price: "Cost Price",
+  sale_price: "Sale Price",
+  discount_pct: "Discount %",
+  subtotal: "Subtotal",
+  service: "Service",
+  type_to_search_services: "Type to search services...",
+  type_to_search_parts: "Type to search parts...",
+  type_to_search_external: "Type to search external services...",
+  no_parts: "No parts found",
+  no_external_services: "No external services found",
+  external_company: "External Company",
+  create_part: "Create Part",
+  part_number_required: "Part number is required",
+  part_name_required: "Part name is required",
+  part_created: "Part created successfully",
+  part_exists: "Existing part loaded",
+  save: "Guardar",
+  cancel: "Cancelar",
+};
+
+if (COUNTRY_REF === 'CL') {
+  Object.assign(I18N, {
+    no_clients: "Sin clientes encontrados",
+    loading_vehicles: "Cargando vehículos…",
+    no_vehicles: "Sin vehículos registrados",
+    select_vehicle: "Selecciona vehículo…",
+    server_error: "Error del servidor",
+    error_loading_vehicles: "Error cargando vehículos",
+    no_parts: "Sin repuestos coincidentes",
+    no_external_services: "Sin servicios externos",
+    select_service: "Selecciona servicio…",
+    issue_date_required: "La fecha de emisión es obligatoria",
+    document_type_required: "El tipo de documento es obligatorio",
+    client_required: "Debes seleccionar un cliente",
+    vehicle_required: "Debes seleccionar un vehículo",
+    code: "Código",
+    name: "Nombre",
+    qty: "Cant.",
+    cost_price: "Precio compra",
+    sale_price: "Precio venta",
+    discount_pct: "% desc",
+    subtotal: "Subtotal",
+    service: "Servicio",
+    type_to_search_services: "Escribe para buscar servicios…",
+    type_to_search_parts: "Escribe para buscar repuestos…",
+    type_to_search_external: "Escribe para buscar servicios externos…",
+    client_price: "Precio al cliente",
+    shop_price: "Costo al taller",
+    external_company: "Empresa externa",
+    create_part: "Crear repuesto",
+    part_number_required: "El código del repuesto es obligatorio",
+    part_name_required: "El nombre del repuesto es obligatorio",
+    part_created: "Repuesto creado correctamente",
+    part_exists: "Repuesto existente seleccionado",
+    save: "Guardar",
+    cancel: "Cancelar",
+  });
+}
+
+// ===============
+// HELPERS
+// ===============
+const $ = (sel, ctx=document) => ctx.querySelector(sel);
+const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+
+function showFieldError(el, msg){
+  const hint = document.createElement('div');
+  hint.className = 'mt-1 text-red-300 text-sm eg-hint';
+  hint.textContent = msg;
+  el.closest('div')?.appendChild(hint);
+  el.classList.add('ring-2','ring-red-500');
+}
+
+function setText(selOrEl, txt) {
+  const el = typeof selOrEl==='string' ? $(selOrEl) : selOrEl;
+  if (el) el.textContent = txt;
+}
+
+const MONEY_FORMATS = {
+  US: { locale: 'en-US', currency: 'USD', min: 2, max: 2 },
+  CL: { locale: 'es-CL', currency: 'CLP', min: 0, max: 0 },
+  MX: { locale: 'es-MX', currency: 'MXN', min: 2, max: 2 },
+  PE: { locale: 'es-PE', currency: 'PEN', min: 2, max: 2 },
+  VE: { locale: 'es-VE', currency: 'VES', min: 2, max: 2 },
+  BR: { locale: 'pt-BR', currency: 'BRL', min: 2, max: 2 },
+};
+
+function buildMoneyFormatter(country){
+  const cfg = MONEY_FORMATS[country] || MONEY_FORMATS.CL;
+  return new Intl.NumberFormat(cfg.locale, {
+    style: 'currency',
+    currency: cfg.currency,
+    minimumFractionDigits: cfg.min ?? 2,
+    maximumFractionDigits: cfg.max ?? 2,
+  });
+}
+
+function formatNumberInput(value){
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '';
+  const digits = MONEY_FORMATS[COUNTRY_REF]?.max ?? 2;
+  return num.toFixed(digits);
+}
+
+function parseNumericInput(value){
+  if (value === undefined || value === null) return 0;
+  const num = Number(value.toString().replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(num) ? num : 0;
+}
+
+function buildEndpoint(url){
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith('/')) return url;
+  const path = window.location.pathname || '/';
+  const parts = path.split('/').filter(Boolean);
+  if (!parts.length) {
+    return `/${url.replace(/^\//, '')}`;
+  }
+  const countrySegment = parts[0];
+  return `/${countrySegment}/${url.replace(/^\//, '')}`;
+}
+
+let MONEY_FORMATTER = buildMoneyFormatter(COUNTRY_REF);
+
+function money(n){
+  if (!MONEY_FORMATTER) {
+    MONEY_FORMATTER = buildMoneyFormatter(COUNTRY_REF);
+  }
+  const value = Number(n) || 0;
+  return MONEY_FORMATTER.format(value);
+}
+
+// ===============
+// THEME + NÚMERO
+// ===============
+const shell   = $('#doc-shell');
+const selTipo = $('#id_tipo');
+const numeroView = $('#id_numero');
+const numeroHidden = document.createElement('input'); // guarda para POST
+numeroHidden.type = 'hidden';
+numeroHidden.name = 'numero_documento';
+$('#document-form').appendChild(numeroHidden);
+
+function applyTheme(tipo) {
+  shell.classList.remove('theme-ot','theme-fac','theme-pres');
+  shell.classList.add(tipo==='FAC' ? 'theme-fac' : (tipo==='PRES' ? 'theme-pres' : 'theme-ot'));
+}
+
+async function updateDocumentNumber(){
+          if (!selTipo) return;
+          const tipo = selTipo.value;
+          if (!tipo) return;
+          try{
+            const r = await EG.fetch(`${EG.cfg.URL_NEXT_NUMBER}?tipo=${encodeURIComponent(tipo)}`);
+            if(!r.ok) throw new Error(`HTTP ${r.status}`);
+            const data = await r.json();
+            const next = data.number || data.numero || data.next || 'Auto-generated';
+            setText(numeroView, next);
+            numeroHidden.value = next;
+          }catch(err){
+            console.error('❌ Error next-number:', err);
+            setText(numeroView, '— error —');
+            numeroHidden.value = '';
+          }
+        }
+
+// ===============
+// CLIENTE + VEHÍCULOS
+// ===============
+let clienteBusqueda, clienteResultados, clienteSelect, clienteInfoBox, cliNombre, cliEmail, cliFono, vehiculoSelect;
+let searchTimer = null;
+
+function getClienteElements(){
+  if (!clienteBusqueda) clienteBusqueda = document.getElementById('cliente-busqueda');
+  if (!clienteResultados) clienteResultados = document.getElementById('cliente-resultados');
+  if (!clienteSelect) clienteSelect = document.getElementById('id_cliente');
+  if (!clienteInfoBox) clienteInfoBox = document.getElementById('cliente-info');
+  if (!cliNombre) cliNombre = document.getElementById('cliente-nombre');
+  if (!cliEmail) cliEmail = document.getElementById('cliente-email');
+  if (!cliFono) cliFono = document.getElementById('cliente-telefono');
+  if (!vehiculoSelect) vehiculoSelect = document.getElementById('id_vehiculo');
+}
+
+async function buscarClientes(q){
+          getClienteElements();
+          if (!q || q.length < 2){
+            if (clienteResultados) clienteResultados.classList.add('hidden');
+            return;
+          }
+          if (!clienteResultados) return;
+          const localMatches = filterPrefetchItems(PREFETCH.clientes, ['nombre', 'nombre_completo', 'email', 'telefono'], q, 15);
+          if (localMatches.length){
+            renderResultadosClientes(localMatches);
+          }
+          try{
+            const url = buildEndpoint(EG.cfg.URL_CLIENT_SEARCH || '/ajax/clientes/buscar/');
+            const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+            if(!r.ok) throw new Error(`HTTP ${r.status}`);
+            const data = await r.json();
+            const items = Array.isArray(data) ? data : (data.results || data.items || []);
+            renderResultadosClientes(items);
+          }catch(err){
+            console.error('❌ buscarClientes:', err);
+            clienteResultados.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
+            clienteResultados.classList.remove('hidden');
+          }
+        }
+
+function renderResultadosClientes(lista){
+  getClienteElements();
+  if (!clienteResultados) return;
+  clienteResultados.innerHTML = '';
+  if (!lista.length){
+    const empty = document.createElement('div');
+    empty.className = 'p-3 text-gray-300';
+    empty.textContent = I18N.no_clients;
+    clienteResultados.appendChild(empty);
+    clienteResultados.classList.remove('hidden');
+    return;
+  }
+  for (const item of lista){
+    const id = item.id || item.pk || '';
+    const nombre = item.text || item.nombre_completo || item.nombre || item.razon_social || `Client #${id}`;
+    const email = item.email || '';
+    const fono  = item.telefono || item.fono || '';
+    const div = document.createElement('div');
+    div.className = 'cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+    div.setAttribute('role','option');
+    div.tabIndex = 0;
+    div.dataset.id = id;
+    div.dataset.nombre = nombre;
+    div.dataset.email = email;
+    div.dataset.telefono = fono;
+
+    const title = document.createElement('div');
+    title.className = 'font-semibold text-cyan-200';
+    title.textContent = nombre;
+    div.appendChild(title);
+
+    if (email){
+      const em = document.createElement('div');
+      em.className = 'text-sm text-gray-300';
+      em.textContent = `📧 ${email}`;
+      div.appendChild(em);
+    }
+    if (fono){
+      const ph = document.createElement('div');
+      ph.className = 'text-sm text-gray-300';
+      ph.textContent = `📞 ${fono}`;
+      div.appendChild(ph);
+    }
+    clienteResultados.appendChild(div);
+  }
+  clienteResultados.setAttribute('role','listbox');
+  clienteResultados.classList.remove('hidden');
+}
+
+async function seleccionarCliente({id, nombre, email, telefono}){
+  console.log(`👤 Cliente seleccionado: ${nombre} (ID: ${id})`);
+  
+  getClienteElements();
+  if (clienteResultados) clienteResultados.classList.add('hidden');
+  if (clienteBusqueda) clienteBusqueda.value = nombre;
+  if (clienteSelect){ // mantener el valor para POST si backend lo requiere
+    clienteSelect.innerHTML = `<option value="${id}" selected>${nombre}</option>`;
+    clienteSelect.classList.add('hidden');
+  }
+  if (cliNombre) cliNombre.textContent = nombre;
+  if (cliEmail)  cliEmail.textContent  = email || '—';
+  if (cliFono)   cliFono.textContent   = telefono || '—';
+  if (clienteInfoBox) clienteInfoBox.classList.remove('hidden');
+  
+  // ⚡ IMPORTANTE: Cargar vehículos del cliente seleccionado
+  console.log(`🔄 Iniciando carga de vehículos para cliente ${id}...`);
+  await cargarVehiculosPorCliente(id);
+}
+
+async function cargarVehiculosPorCliente(clienteId){
+  getClienteElements();
+  if (!vehiculoSelect) {
+    console.warn('⚠️ Elemento #id_vehiculo no encontrado');
+    return;
+  }
+
+  if (!clienteId) {
+    console.warn('⚠️ No se proporcionó clienteId');
+    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle}</option>`;
+    return;
+  }
+
+  console.log(`🚗 Cargando vehículos para cliente ID: ${clienteId}`);
+
+  const alreadyHasOptions = vehiculoSelect.options && vehiculoSelect.options.length > 1;
+  if (alreadyHasOptions && vehiculoSelect.dataset.source === 'form') {
+    console.log('ℹ️ Ya tiene opciones desde el formulario, omitiendo carga');
+    return;
+  }
+
+  vehiculoSelect.disabled = true;
+  vehiculoSelect.innerHTML = `<option value="">${I18N.loading_vehicles || 'Cargando vehículos...'}</option>`;
+
+  // Intentar primero con prefetch local (más rápido)
+  const localMatches = (PREFETCH?.vehiculos || []).filter((v)=> String(v.cliente_id) === String(clienteId));
+  if (localMatches.length){
+    console.log(`✅ Encontrados ${localMatches.length} vehículos en prefetch`);
+    const options = localMatches.map((v)=> `<option value="${v.id}">${v.label || v.text || ''}</option>`).join('');
+    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
+    vehiculoSelect.dataset.source = 'prefetch';
+    vehiculoSelect.disabled = false;
+    return; // Salir temprano si encontramos en prefetch
+  }
+
+  // Si no hay en prefetch, hacer petición AJAX
+  try{
+    const urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/ajax/vehiculos-por-cliente/';
+    const url = buildEndpoint(urlRaw);
+    const fullUrl = `${url}?cliente_id=${encodeURIComponent(clienteId)}`;
+    
+    console.log(`📡 Llamando a: ${fullUrl}`);
+    
+    const r = await EG.fetch(fullUrl);
+    
+    if(!r.ok) {
+      const errorText = await r.text();
+      console.error(`❌ HTTP ${r.status}:`, errorText);
+      throw new Error(`HTTP ${r.status}: ${errorText}`);
+    }
+    
+    const data = await r.json();
+    console.log('📦 Respuesta recibida:', data);
+    
+    const items = Array.isArray(data) ? data : (data.results || data.items || []);
+    console.log(`📋 Procesando ${items.length} vehículos`);
+    
+    if (!items.length){
+      console.log('ℹ️ No se encontraron vehículos');
+      vehiculoSelect.innerHTML = `<option value="">${I18N.no_vehicles || 'No hay vehículos'}</option>`;
+      vehiculoSelect.dataset.source = 'empty';
+    } else {
+      const options = items.map(v => {
+        const id = v.id ?? v.pk;
+        const label = v.text || v.label || v.patente || `Vehicle #${id}`;
+        return `<option value="${id}">${label}</option>`;
+      }).join('');
+      vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
+      vehiculoSelect.dataset.source = 'fetch';
+      console.log(`✅ ${items.length} vehículos cargados exitosamente`);
+    }
+  }catch(err){
+    console.error('❌ Error cargando vehículos:', err);
+    console.error('Stack:', err.stack);
+    vehiculoSelect.innerHTML = `<option value="">${I18N.error_loading_vehicles || 'Error al cargar vehículos'}</option>`;
+    vehiculoSelect.dataset.source = 'error';
+  }finally{
+    vehiculoSelect.disabled = false;
+  }
+}
+
+// ===============
+// TOTALES
+// ===============
+function sumFromInputs(selector){
+  return $$(selector).reduce((acc, el)=>{
+    const raw = el.tagName==='INPUT' ? el.value : el.textContent;
+    const num = Number((raw||'').toString().replace(/[^0-9.-]/g,''));
+    return acc + (isNaN(num) ? 0 : num);
+  }, 0);
+}
+
+function recalcTotales(){
+          const rep   = sumFromInputs('.rep-subtotal');
+          const serv  = sumFromInputs('.serv-subtotal');
+          const otros = sumFromInputs('.otr-subtotal');
+
+          console.log(`Totales: rep=${rep}, serv=${serv}, otros=${otros}`);
+
+          // Obtener checkbox de include_tax (el nuevo) o id_apply_vat (el viejo)
+          const includeTaxCheckbox = $('#include_tax') || $('#id_apply_vat');
+          const ivaOn = includeTaxCheckbox?.checked ?? false;
+          let tax = 0;
+
+          if (COUNTRY_REF==='CL') {
+            tax = ivaOn ? rep * 0.19 : 0; // IVA 19% sólo repuestos
+          } else if (COUNTRY_REF==='US') {
+            const rate = Number(EG.cfg.salesTax ?? 0);
+            tax = ivaOn ? rep * rate : 0; // Tax sólo sobre repuestos
+          } else {
+            // Para otros países, también solo sobre repuestos
+            const rate = Number(EG.cfg.salesTax ?? 0);
+            tax = ivaOn ? rep * rate : 0;
+          }
+
+          setText('#t_repuestos', money(rep));
+          setText('#t_servicios', money(serv));
+          setText('#t_otros',     money(otros));
+          setText('#t_iva',       money(tax));
+          setText('#t_total',     money(rep + serv + otros + tax));
+        }
+window.recalcTotales = recalcTotales;
+
+// Agregar event listener al checkbox de TAX
+const includeTaxCheckbox = $('#include_tax');
+if (includeTaxCheckbox) {
+  includeTaxCheckbox.addEventListener('change', recalcTotales);
+}
+
+// ===============
+// FILAS DINÁMICAS
+// ===============
+// IDs de botones en tu HTML: #add-repuesto, #add-servicio, #add-otro
+// Los event listeners se registran en DOMContentLoaded
+
+window.addRepuestoRow = function addRepuestoRow(){
+  const container = document.getElementById('repuestos-container');
+  if (!container) {
+    console.error('❌ Contenedor de repuestos no encontrado');
+    return;
+  }
+  const row = document.createElement('div');
+  row.className = 'dynamic-element';
+  row.innerHTML = `
+    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
+      <div class="w-full sm:w-28 relative">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.code}</label>
+        <input type="text" class="rep-codigo form-control w-full text-base" placeholder="${I18N.code}" autocomplete="off">
+        <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        <input type="hidden" class="rep-id">
+      </div>
+      <div class="description-field rep-search-container w-full sm:flex-1 sm:min-w-80 relative">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.name}</label>
+        <input type="text" class="rep-search form-control w-full text-base" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
+        <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        <input type="hidden" class="rep-nombre">
+        <button type="button" class="rep-create-btn absolute top-8 sm:top-8 right-2 px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white text-xs sm:text-sm font-semibold border border-purple-300/40 shadow-sm transition-all">➕</button>
+      </div>
+      <div class="w-full sm:w-16">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.qty}</label>
+        <input type="number" class="rep-cantidad form-control w-full text-base" min="1" max="999" value="1">
+      </div>
+      <div class="w-full sm:w-28">
+        <label class="block text-cyan-200 text-sm mb-1 flex items-center gap-1">
+          <span>${I18N.sale_price}</span>
+          <button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>
+        </label>
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="rep-precio-venta form-control w-full text-base pl-6" placeholder="0">
+        </div>
+      </div>
+      <div class="w-full sm:w-28 cost-price-container hidden">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.cost_price}</label>
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="rep-precio-compra form-control w-full text-base pl-6" placeholder="0">
+        </div>
+      </div>
+      <div class="w-full sm:w-28">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
+        <input type="hidden" class="rep-subtotal" value="0">
+        <div class="rep-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
+      </div>
+      <div class="w-full sm:w-12">
+        <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+      </div>
+    </div>`;
+  container.appendChild(row);
+  setupRepuestoRow(row);
+  return row;
+}
+
+function setupRepuestoRow(row){
+  const searchInput = $('.rep-search', row);
+  const drop        = row.querySelector('.rep-dropdown');
+  const idHidden    = $('.rep-id', row);
+  const inpCode     = $('.rep-codigo', row);
+  const codeDrop    = row.querySelector('.rep-codigo-dropdown');
+  const inpName     = $('.rep-nombre', row);
+  const inpPC       = $('.rep-precio-compra', row);
+  const inpPV       = $('.rep-precio-venta', row);
+  const qEl         = $('.rep-cantidad', row);
+  const sub         = $('.rep-subtotal', row);
+  const view        = $('.rep-subtotal-view', row);
+
+  let timer = null;
+  let codeTimer = null;
+
+  const btnCreate = row.querySelector('.rep-create-btn');
+  btnCreate?.addEventListener('click', ()=>{
+    currentRepuestoRow = row;
+    const searchValue = (searchInput?.value || '').split('•')[0].trim();
+    const data = {
+      part_number: inpCode?.value?.trim() || searchValue,
+      nombre: inpName?.value?.trim() || '',
+      precio_compra: inpPC?.value || '',
+      precio_venta: inpPV?.value || '',
+    };
+    openRepuestoModal(data);
+  });
+
+          async function fetchByCode(code){
+            if (!code) return;
+    try {
+              const r = await EG.fetch(`${EG.cfg.URL_REPUESTO_BY_CODE}?code=${encodeURIComponent(code)}`);
+      if (!r.ok) return;
+              const data = await r.json();
+      applyPartData({
+        id: data.id || '',
+        codigo: data.codigo || code,
+        nombre: data.nombre || '',
+        precio_venta: data.precio_venta_sugerido || data.precio_venta || '',
+        precio_compra: data.precio_compra || '',
+      });
+    } catch (err) {
+      console.error('rep fetchByCode', err);
+    }
+  }
+
+  function applyPartData(item){
+    if (!item) return;
+    if (idHidden) idHidden.value = item.id || '';
+    if (inpCode) inpCode.value = item.codigo || '';
+    if (inpName) inpName.value = item.nombre || '';
+    if (inpPV && item.precio_venta !== undefined && item.precio_venta !== null) {
+      const precio = parseNumericInput(item.precio_venta);
+      inpPV.value = precio > 0 ? formatNumberInput(precio) : '';
+    }
+    if (inpPC && item.precio_compra !== undefined && item.precio_compra !== null) {
+      const precio = parseNumericInput(item.precio_compra);
+      inpPC.value = precio > 0 ? formatNumberInput(precio) : '';
+    }
+    if (searchInput) {
+      // Solo mostrar el nombre del repuesto, sin el código
+      searchInput.value = item.nombre || '';
+    }
+    recalc();
+  }
+  
+  // Exponer función para aplicar datos desde fuera
+  row.__applyRepData = function(data) {
+    if (!data) return;
+    // Aplicar datos básicos
+    applyPartData({
+      id: data.id || '',
+      codigo: data.codigo || '',
+      nombre: data.nombre || '',
+      precio_venta: data.precio || 0,
+    });
+    // Aplicar cantidad y descuento
+    if (qEl && data.cantidad) {
+      qEl.value = data.cantidad;
+      qEl.dispatchEvent(new Event('input'));
+    }
+    if (row.querySelector('.rep-descuento') && data.descuento) {
+      const descInput = row.querySelector('.rep-descuento');
+      descInput.value = data.descuento;
+      descInput.dispatchEvent(new Event('input'));
+    }
+    recalc();
+  };
+
+  async function searchRepuestos(q){
+    if (!drop) return;
+    if (!q || q.length < 2){
+      drop.classList.add('hidden');
+      return;
+    }
+
+    const localMatches = filterPrefetchItems(PREFETCH.repuestos, ['codigo', 'nombre'], q, 15);
+    if (localMatches.length){
+      renderResultadosRepuestos(localMatches);
+    }
+
+    try {
+      const url = EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/';
+      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
+      if (items.length) renderResultadosRepuestos(items);
+    }catch(err){
+      console.error('❌ buscarRepuestos', err);
+      if (!localMatches.length) {
+        drop.innerHTML = `<div class=\"p-3 text-red-300\">${I18N.server_error}</div>`;
+        drop.classList.remove('hidden');
+      }
+    }
+  }
+
+  function renderResultadosRepuestos(lista){
+    if (!drop) return;
+    drop.innerHTML = '';
+    if (!lista.length){
+      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_parts}</div>`;
+      drop.classList.remove('hidden');
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    lista.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      div.setAttribute('role', 'option');
+      const codigo = item.codigo || item.code || '';
+      const nombre = item.nombre || item.text || '';
+      const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
+      const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
+      div.dataset.id = item.id || '';
+      div.dataset.codigo = codigo;
+      div.dataset.nombre = nombre;
+      div.dataset.precio = precioVenta;
+      div.dataset.cost = precioCompra;
+      div.innerHTML = `
+        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo ? `${codigo} • ${nombre}` : nombre}</div>
+        <div class="text-xs text-gray-300">${money(precioVenta)}</div>`;
+      frag.appendChild(div);
+    });
+    drop.appendChild(frag);
+    drop.setAttribute('role', 'listbox');
+    drop.classList.remove('hidden');
+  }
+
+  function seleccionarRepuesto(el){
+    if (!el) return;
+    applyPartData({
+      id: el.dataset.id,
+      codigo: el.dataset.codigo,
+      nombre: el.dataset.nombre,
+      precio_venta: parseNumericInput(el.dataset.precio),
+      precio_compra: parseNumericInput(el.dataset.cost),
+    });
+    drop?.classList.add('hidden');
+          }
+
+          function recalc(){
+            const q = Number(qEl?.value || 0);
+    const p = parseNumericInput(inpPV?.value || 0);
+    const d = Number(($('.rep-descuento', row)?.value || 0)) || 0;
+            const subtotal = q * p * (1 - (d/100));
+            if (sub)  sub.value = subtotal;
+            if (view) view.textContent = money(subtotal);
+            recalcTotales();
+          }
+
+  searchInput?.addEventListener('input', (e)=>{
+    clearTimeout(timer);
+    const value = e.target.value.trim();
+    timer = setTimeout(()=> searchRepuestos(value), 250);
+  });
+
+  searchInput?.addEventListener('focus', ()=>{
+    if (searchInput.value.trim().length >= 2) {
+      searchRepuestos(searchInput.value.trim());
+    }
+  });
+
+  // Búsqueda en tiempo real por código
+  async function searchByCode(q){
+    if (!codeDrop) return;
+    if (!q || q.length < 2){
+      codeDrop.classList.add('hidden');
+      return;
+    }
+
+    const localMatches = filterPrefetchItems(PREFETCH.repuestos, ['codigo'], q, 15);
+    if (localMatches.length){
+      renderResultadosCodigo(localMatches);
+    }
+
+    try {
+      const url = EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/';
+      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
+      // Filtrar por código que empiece con la búsqueda
+      const filteredItems = items.filter(item => {
+        const codigo = (item.codigo || item.code || '').toLowerCase();
+        return codigo.startsWith(q.toLowerCase());
+      });
+      if (filteredItems.length) renderResultadosCodigo(filteredItems);
+    }catch(err){
+      console.error('❌ buscarPorCodigo', err);
+      if (!localMatches || !localMatches.length) {
+        codeDrop.innerHTML = `<div class="p-3 text-red-300">${I18N.server_error}</div>`;
+        codeDrop.classList.remove('hidden');
+      }
+    }
+  }
+
+  function renderResultadosCodigo(lista){
+    if (!codeDrop) return;
+    codeDrop.innerHTML = '';
+    if (!lista.length){
+      codeDrop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_parts}</div>`;
+      codeDrop.classList.remove('hidden');
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    lista.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      div.setAttribute('role', 'option');
+      const codigo = item.codigo || item.code || '';
+      const nombre = item.nombre || item.text || '';
+      const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
+      const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
+      div.dataset.id = item.id || '';
+      div.dataset.codigo = codigo;
+      div.dataset.nombre = nombre;
+      div.dataset.precio = precioVenta;
+      div.dataset.cost = precioCompra;
+      div.innerHTML = `
+        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo}${nombre ? ` • ${nombre}` : ''}</div>
+        ${precioVenta > 0 ? `<div class="text-xs text-gray-300">${money(precioVenta)}</div>` : ''}`;
+      frag.appendChild(div);
+    });
+    codeDrop.appendChild(frag);
+    codeDrop.setAttribute('role', 'listbox');
+    codeDrop.classList.remove('hidden');
+  }
+
+  function seleccionarPorCodigo(el){
+    if (!el) return;
+    applyPartData({
+      id: el.dataset.id,
+      codigo: el.dataset.codigo,
+      nombre: el.dataset.nombre,
+      precio_venta: parseNumericInput(el.dataset.precio),
+      precio_compra: parseNumericInput(el.dataset.cost),
+    });
+    codeDrop?.classList.add('hidden');
+  }
+
+  inpCode?.addEventListener('input', (e)=>{
+    clearTimeout(codeTimer);
+    const value = e.target.value.trim();
+    codeTimer = setTimeout(()=> searchByCode(value), 250);
+  });
+
+  inpCode?.addEventListener('focus', ()=>{
+    if (inpCode.value.trim().length >= 2) {
+      searchByCode(inpCode.value.trim());
+    }
+  });
+
+  inpCode?.addEventListener('change', ()=> {
+    if (inpCode.value.trim().length >= 2) {
+      fetchByCode(inpCode.value.trim());
+    }
+  });
+
+  codeDrop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+    if (!item) return;
+    seleccionarPorCodigo(item);
+  });
+
+  codeDrop?.addEventListener('keydown', (e)=>{
+    const item = e.target.closest('[role="option"]');
+    if (!item) return;
+    if (e.key === 'Enter') {
+      seleccionarPorCodigo(item);
+    }
+  });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) {
+      codeDrop?.classList.add('hidden');
+    }
+  });
+
+  qEl?.addEventListener('input', recalc);
+  inpPV?.addEventListener('input', recalc);
+  $('.rep-descuento', row)?.addEventListener('input', recalc);
+
+  drop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+    if (!item) return;
+    seleccionarRepuesto(item);
+  });
+
+  drop?.addEventListener('keydown', (e)=>{
+    const item = e.target.closest('[role="option"]');
+    if (!item) return;
+    if (e.key === 'Enter') {
+      seleccionarRepuesto(item);
+    }
+  });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) {
+      drop?.classList.add('hidden');
+    }
+  });
+
+  // Botón para mostrar/ocultar precio de compra
+  const toggleCostBtn = row.querySelector('.toggle-cost-price-btn');
+  toggleCostBtn?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const costContainer = row.querySelector('.cost-price-container');
+    if (costContainer) {
+      costContainer.classList.toggle('hidden');
+      // Cambiar el icono según si está visible o no
+      if (costContainer.classList.contains('hidden')) {
+        toggleCostBtn.textContent = '👁️';
+      } else {
+        toggleCostBtn.textContent = '🙈';
+      }
+    }
+  });
+
+  row.__applyPartData = applyPartData;
+}
+
+window.addServicioRow = function addServicioRow(){
+  const container = document.getElementById('servicios-container');
+  if (!container) {
+    console.error('❌ Contenedor de servicios no encontrado');
+    return;
+  }
+  const row = document.createElement('div');
+  row.className = 'dynamic-element';
+  row.innerHTML = `
+    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
+      <div class="description-field srv-input-container w-full sm:flex-1 sm:min-w-96 relative">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
+        <input type="text" class="srv-input form-control w-full text-base" placeholder="${I18N.type_to_search_services}" autocomplete="off">
+        <div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto top-full mt-1"></div>
+        <input type="hidden" class="srv-id">
+      </div>
+      <div class="w-full sm:w-28">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="serv-precio form-control w-full text-base pl-6" placeholder="0">
+        </div>
+      </div>
+      <div class="w-full sm:w-28">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
+        <input type="hidden" class="serv-subtotal" value="0">
+        <div class="serv-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
+      </div>
+      <div class="w-full sm:w-12">
+        <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+      </div>
+    </div>`;
+  container.appendChild(row);
+  setupServicioRow(row);
+  return row;
+}
+
+function setupServicioRow(row){
+  const input  = row.querySelector('.srv-input');
+  const drop   = row.querySelector('.srv-dropdown');
+  const idHid  = row.querySelector('.srv-id');
+  const pEl    = row.querySelector('.serv-precio');
+  const sub    = row.querySelector('.serv-subtotal');
+  const view   = row.querySelector('.serv-subtotal-view');
+
+  let timer = null;
+
+          async function searchServicios(q){
+            if (!drop) return;
+            if (!q || q.length < 2){
+              drop.classList.add('hidden');
+              return;
+            }
+            
+            // Primero buscar en el prefetch local (más rápido)
+            let localMatches = filterPrefetchItems(PREFETCH.servicios, ['nombre', 'categoria', 'subcategoria'], q, 15);
+            if (localMatches.length){
+              renderResultados(localMatches);
+            }
+            
+            try{
+              const url = `${EG.cfg.URL_SERVICE_SEARCH}?q=${encodeURIComponent(q)}`;
+              const r = await EG.fetch(url);
+              if (!r.ok) throw new Error(`HTTP ${r.status}`);
+              const data = await r.json();
+              const items = Array.isArray(data)
+                ? data
+                : (data.servicios || data.results || []);
+              // Normalizar items: convertir 'pk' a 'id' si es necesario
+              const normalizedItems = items.map(item => ({
+                ...item,
+                id: item.id || item.pk || '',
+              }));
+              if (normalizedItems.length) renderResultados(normalizedItems);
+            }catch(err){
+              console.error('servicios buscar:', err);
+              if (!localMatches || !localMatches.length) {
+                if (drop) {
+                  drop.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
+                  drop.classList.remove('hidden');
+                }
+              }
+            }
+          }
+
+  function renderResultados(lista){
+    if (!drop) return;
+    if (!lista || !lista.length){
+      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_services}</div>`;
+      drop.classList.remove('hidden');
+      return;
+    }
+    drop.innerHTML = lista.map(s => {
+      // Normalizar id (puede venir como 'id' o 'pk')
+      const servicioId = s.id || s.pk || '';
+      const precioBase = Number(s.precio_cliente ?? s.precio_sugerido ?? s.precio ?? 0);
+      return `
+      <div class="srv-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0"
+           role="option" tabindex="0" data-id="${servicioId}" data-precio="${precioBase}" data-text="${s.nombre || ''}">
+        <div class="font-semibold text-cyan-200">${s.nombre || ''}</div>
+        ${s.categoria ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Categoría' : 'Category'}: ${s.categoria}</div>` : ``}
+        ${precioBase ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Tarifa base' : 'Base'}: ${money(precioBase)}</div>` : ``}
+      </div>
+    `}).join('');
+    drop.setAttribute('role', 'listbox');
+    drop.classList.remove('hidden');
+  }
+
+  function seleccionarServicio(el){
+    const sid   = el.dataset.id;
+    const stext = el.dataset.text || '';
+    const sprice= Number(el.dataset.precio || 0);
+    idHid.value = sid || '';
+    input.value = stext;
+    drop.classList.add('hidden');
+
+    // Si no hay precio ingresado, sugerir el base
+    if ((pEl.value || '').trim() === '' && sprice > 0){
+      pEl.value = formatNumberInput(sprice);
+    }
+    recalc();
+  }
+
+  function recalc(){
+    // SIN cantidad: subtotal == precio
+    const p = Number((pEl?.value || '0').toString().replace(/[^0-9.-]/g,'')) || 0;
+    sub.value = p;
+    view.textContent = money(p);
+    window.recalcTotales();
+  }
+
+  input?.addEventListener('input', (e)=>{
+    clearTimeout(timer);
+    timer = setTimeout(()=> searchServicios(e.target.value.trim()), 250);
+  });
+
+  input?.addEventListener('focus', ()=>{
+    if (input.value.trim().length >= 2) searchServicios(input.value.trim());
+  });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) drop.classList.add('hidden');
+  });
+
+  drop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+    if (!item) return;
+    seleccionarServicio(item);
+  });
+
+  drop?.addEventListener('keydown', (e)=>{
+    const item = e.target.closest('[role="option"]');
+    if (!item) return;
+    if (e.key === 'Enter') {
+      seleccionarServicio(item);
+    }
+  });
+
+  pEl?.addEventListener('input', recalc);
+
+  row.__applyServicioData = function(item){
+    if (!item) return;
+    if (idHid) idHid.value = item.id || '';
+    if (input) input.value = item.nombre || item.text || '';
+    if (pEl && item.precio_cliente !== undefined && item.precio_cliente !== null) {
+      const precio = parseNumericInput(item.precio_cliente);
+      pEl.value = precio > 0 ? formatNumberInput(precio) : '';
+    } else if (pEl && item.precio !== undefined && item.precio !== null) {
+      const precio = parseNumericInput(item.precio);
+      pEl.value = precio > 0 ? formatNumberInput(precio) : '';
+    }
+    recalc();
+  };
+  
+  // Alias para compatibilidad con el código de carga
+  row.__applyServData = row.__applyServicioData;
+}
+
+window.addOtroRow = function addOtroRow(){
+  const container = document.getElementById('otros-container');
+  if (!container) {
+    console.error('❌ Contenedor de otros servicios no encontrado');
+    return;
+  }
+  const row = document.createElement('div');
+  row.className = 'dynamic-element';
+  row.innerHTML = `
+    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
+      <div class="description-field otr-search-container w-full sm:flex-1 sm:min-w-60 relative">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
+        <input type="text" class="otr-search form-control w-full text-base" placeholder="${I18N.type_to_search_external}" autocomplete="off">
+        <div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        <input type="hidden" class="otr-servicio-id">
+      </div>
+      <div class="flex-1 w-full sm:min-w-48">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.external_company}</label>
+        <input type="text" class="otr-empresa form-control w-full text-base">
+      </div>
+      <div class="w-full sm:w-24">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.shop_price}</label>
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="otr-precio-taller form-control w-full text-base pl-6" placeholder="0">
+        </div>
+      </div>
+      <div class="w-full sm:w-24">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="otr-precio form-control w-full text-base pl-6" placeholder="0">
+        </div>
+      </div>
+      <div class="w-full sm:w-24">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
+        <input type="hidden" class="otr-subtotal" value="0">
+        <div class="otr-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
+      </div>
+      <div class="w-full sm:w-16">
+        <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+      </div>
+    </div>`;
+  container.appendChild(row);
+  setupOtroRow(row);
+  return row;
+}
+
+function setupOtroRow(row){
+  const searchInput = $('.otr-search', row);
+  const drop        = row.querySelector('.otr-dropdown');
+  const idHidden    = $('.otr-servicio-id', row);
+  const empresaEl   = $('.otr-empresa', row);
+  const precioTallerEl = $('.otr-precio-taller', row);
+  const precioEl    = $('.otr-precio', row);
+  const sub         = $('.otr-subtotal', row);
+  const view        = $('.otr-subtotal-view', row);
+
+  let timer = null;
+
+  function recalc(){
+    const subtotal = parseNumericInput(precioEl?.value || 0);
+    if (sub)  sub.value = subtotal;
+    if (view) view.textContent = money(subtotal);
+    recalcTotales();
+  }
+
+  function aplicarDatos(item){
+  if (!item) return;
+    if (idHidden) idHidden.value = item.id || '';
+    if (searchInput) searchInput.value = item.nombre || '';
+    if (empresaEl && (item.empresa || item.empresa_ext)) {
+      empresaEl.value = item.empresa || item.empresa_ext;
+    }
+    if (precioTallerEl && item.precio_taller !== undefined && item.precio_taller !== null) {
+      const precio = parseNumericInput(item.precio_taller);
+      precioTallerEl.value = precio > 0 ? formatNumberInput(precio) : '';
+    }
+    if (precioEl && item.precio_cliente !== undefined && item.precio_cliente !== null) {
+      const precio = parseNumericInput(item.precio_cliente);
+      precioEl.value = precio > 0 ? formatNumberInput(precio) : '';
+    }
+    recalc();
+  }
+
+  async function searchOtrosServicios(q){
+    if (!drop) return;
+    if (!q || q.length < 2){
+      drop.classList.add('hidden');
+    return;
+  }
+  
+    const localMatches = filterPrefetchItems(PREFETCH.otros, ['nombre', 'empresa', 'empresa_ext'], q, 15);
+    if (localMatches.length){
+      renderResultadosOtros(localMatches);
+    }
+
+    try {
+      const url = EG.cfg.URL_OUTSOURCED_SERVICES || '/cl/api/otros-servicios/';
+      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const items = await (Array.isArray(data) ? data : (data.otros_servicios || data.results || []));
+      if (items.length) renderResultadosOtros(items);
+    } catch (err) {
+      console.error('❌ buscarOtrosServicios', err);
+      if (!localMatches.length) {
+        drop.innerHTML = `<div class=\"p-3 text-red-300\">${I18N.server_error}</div>`;
+        drop.classList.remove('hidden');
+      }
+    }
+  }
+
+  function renderResultadosOtros(lista){
+    drop.innerHTML = '';
+    if (!lista.length){
+      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_external_services}</div>`;
+      drop.classList.remove('hidden');
+    return;
+  }
+    const frag = document.createDocumentFragment();
+    lista.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      div.setAttribute('role', 'option');
+      div.dataset.id = item.pk || item.id || '';
+      div.dataset.nombre = item.nombre || item.text || '';
+      div.dataset.empresa = item.empresa_externa || item.empresa || '';
+      const precioCliente = Number(item.precio_cliente ?? item.precio ?? 0);
+      const precioTaller = Number(item.costo_taller ?? item.precio_taller ?? 0);
+      div.dataset.precioCliente = precioCliente;
+      div.dataset.precioTaller = precioTaller;
+      div.innerHTML = `
+        <div class="text-cyan-200 font-semibold text-sm truncate">${div.dataset.nombre}</div>
+        <div class="text-xs text-gray-300">${div.dataset.empresa || ''}</div>
+        <div class="text-xs text-gray-500">${money(precioCliente)}</div>`;
+      frag.appendChild(div);
+    });
+    drop.appendChild(frag);
+    drop.setAttribute('role', 'listbox');
+    drop.classList.remove('hidden');
+  }
+
+  function seleccionarOtro(servicio){
+    if (!servicio) return;
+    aplicarDatos({
+      id: servicio.dataset.id,
+      nombre: servicio.dataset.nombre,
+      empresa: servicio.dataset.empresa,
+      empresa_ext: servicio.dataset.empresa,
+      precio_cliente: parseNumericInput(servicio.dataset.precioCliente),
+      precio_taller: parseNumericInput(servicio.dataset.precioTaller),
+    });
+    drop.classList.add('hidden');
+  }
+
+  searchInput?.addEventListener('input', (e)=>{
+    clearTimeout(timer);
+    const value = e.target.value.trim();
+    timer = setTimeout(()=> searchOtrosServicios(value), 250);
+  });
+
+  searchInput?.addEventListener('focus', ()=>{
+    if (searchInput.value.trim().length >= 2) {
+      searchOtrosServicios(searchInput.value.trim());
+    }
+  });
+
+  drop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+  if (!item) return;
+    seleccionarOtro(item);
+  });
+
+  drop?.addEventListener('keydown', (e)=>{
+  const item = e.target.closest('[role="option"]');
+  if (!item) return;
+    if (e.key === 'Enter') seleccionarOtro(item);
+  });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) drop?.classList.add('hidden');
+  });
+
+  precioEl?.addEventListener('input', recalc);
+  precioTallerEl?.addEventListener('input', recalc);
+
+  // Exponer función para aplicar datos desde fuera con formato correcto
+  row.__applyOtroData = function(data) {
+    if (!data) return;
+    aplicarDatos({
+      id: data.id || data.servicio_id || '',
+      nombre: data.nombre || '',
+      empresa: data.empresa || data.empresa_ext || '',
+      empresa_ext: data.empresa_ext || data.empresa || '',
+      precio_cliente: data.precio_cliente || data.precio || 0,
+      precio_taller: data.precio_taller || 0,
+    });
+  };
+}
+
+// ===============
+// EVENTOS
+// ===============
+selTipo?.addEventListener('change', () => { applyTheme(selTipo.value); updateDocumentNumber(); });
+
+        // Event listeners de búsqueda de clientes se mueven a DOMContentLoaded
+// Event listeners de click en resultados se mueven a initDocumentForm
+
+// INIT
+// Serializar filas dinámicas antes de enviar
+function serializeRows(){
+  console.log('🔍 Serializando filas dinámicas...');
+
+  const rep = $$('#repuestos-container .dynamic-element').map(row=>({
+    id:        $('.rep-id', row)?.value?.trim() || '',
+    codigo:    $('.rep-codigo', row)?.value?.trim() || '',
+    nombre:    $('.rep-nombre', row)?.value?.trim() || '',
+    cantidad:  Number($('.rep-cantidad', row)?.value || 0),
+    precio:    parseNumericInput($('.rep-precio-venta', row)?.value || 0),
+    descuento: Number($('.rep-descuento', row)?.value || 0),
+  }));
+  const serv = $$('#servicios-container .dynamic-element').map(row=>({
+    servicio_id: $('.srv-id', row)?.value || '',
+    precio:      parseNumericInput($('.serv-precio', row)?.value || 0),
+  }));
+  const otros = $$('#otros-container .dynamic-element').map(row=>({
+    servicio_id:   $('.otr-servicio-id', row)?.value || '',
+    nombre:        $('.otr-search', row)?.value?.trim() || '',
+    empresa_ext:   $('.otr-empresa', row)?.value?.trim() || '',
+    precio_taller: parseNumericInput($('.otr-precio-taller', row)?.value || 0),
+    precio:        parseNumericInput($('.otr-precio', row)?.value || 0),
+  }));
+
+  console.log('📦 Repuestos encontrados:', rep.length, rep);
+  console.log('🔧 Servicios encontrados:', serv.length, serv);
+  console.log('🌐 Otros servicios encontrados:', otros.length, otros);
+
+  $('#id_repuestos_json').value = JSON.stringify(rep);
+  $('#id_servicios_json').value = JSON.stringify(serv);
+  $('#id_otros_json').value     = JSON.stringify(otros);
+
+  console.log('💾 JSON guardado');
+}
+
+function submitDocumentForm(){
+  const form = document.getElementById('document-form');
+  if (!form) return;
+  serializeRows();
+  form.submit();
+}
+
+  serializeRows();
+
+  function setupClienteSearchHandlers(){
+    getClienteElements();
+
+    window.handleClienteInput = function(value){
+      getClienteElements();
+      const query = (value ?? clienteBusqueda?.value ?? '').trim();
+      clearTimeout(searchTimer);
+      if (query.length < 2){
+        clienteResultados?.classList.add('hidden');
+    return;
+  }
+      searchTimer = setTimeout(()=> buscarClientes(query), 200);
+    };
+
+    window.handleClienteFocus = function(value){
+      getClienteElements();
+      const query = (value ?? clienteBusqueda?.value ?? '').trim();
+      if (query.length >= 2) buscarClientes(query);
+    };
+
+    window.handleClienteKeydown = function(event){
+      getClienteElements();
+      const query = clienteBusqueda?.value?.trim() || '';
+      if (event.key === 'ArrowDown' && query.length >= 2 && (clienteResultados?.classList.contains('hidden') ?? true)){
+        event.preventDefault();
+        buscarClientes(query);
+        return false;
+      }
+
+      if (!clienteResultados || clienteResultados.classList.contains('hidden')){
+        return true;
+      }
+
+      const items = Array.from(clienteResultados.querySelectorAll('.cliente-item'));
+      if (!items.length) return true;
+
+      const active = document.activeElement;
+      const currentIndex = items.findIndex(el => el === active);
+
+      if (event.key === 'ArrowDown'){
+        event.preventDefault();
+        const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % items.length : 0;
+        items[nextIndex].focus();
+        return false;
+      }
+
+      if (event.key === 'ArrowUp'){
+        event.preventDefault();
+        const prevIndex = currentIndex >= 0 ? (currentIndex - 1 + items.length) % items.length : items.length - 1;
+        items[prevIndex].focus();
+        return false;
+      }
+
+      if (event.key === 'Enter'){
+        event.preventDefault();
+        const target = active?.classList.contains('cliente-item') ? active : items[0];
+        if (target){
+          seleccionarCliente({
+            id: target.dataset.id,
+            nombre: target.dataset.nombre,
+            email: target.dataset.email,
+            telefono: target.dataset.telefono,
+          });
+          clienteBusqueda?.focus();
+        }
+        return false;
+      }
+
+      if (event.key === 'Escape'){
+        event.preventDefault();
+        clienteResultados.classList.add('hidden');
+        clienteBusqueda?.focus();
+        return false;
+      }
+
+      return true;
+    };
+
+    clienteResultados?.addEventListener('click', (event)=>{
+      const item = event.target.closest('.cliente-item');
+      if (!item) return;
+      seleccionarCliente({
+        id: item.dataset.id,
+        nombre: item.dataset.nombre,
+        email: item.dataset.email,
+        telefono: item.dataset.telefono,
+      });
+      clienteBusqueda?.focus();
+    });
+
+    clienteResultados?.addEventListener('keydown', (event)=>{
+      if (event.key !== 'Enter') return;
+      const item = event.target.closest('.cliente-item');
+      if (!item) return;
+      event.preventDefault();
+      seleccionarCliente({
+        id: item.dataset.id,
+        nombre: item.dataset.nombre,
+        email: item.dataset.email,
+        telefono: item.dataset.telefono,
+      });
+      clienteBusqueda?.focus();
+    });
+  }
+
+  setupClienteSearchHandlers();
+  // Cargar datos existentes si estamos editando
+  
+  // Si no es edición, aplicar tema y actualizar número normalmente
+  applyTheme(selTipo?.value || 'OT');
+  updateDocumentNumber();
+  
+  
+  serializeRows();
+
+  clienteBusqueda?.addEventListener('input', (event)=> window.handleClienteInput(event.target.value));
+  clienteBusqueda?.addEventListener('focus', (event)=> window.handleClienteFocus(event.target.value));
+  clienteBusqueda?.addEventListener('keydown', (event)=> window.handleClienteKeydown(event));
+  console.log('📄 Document form inicializado', EG.cfg);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDocumentFormScript);
+      } else {
+  initDocumentFormScript();
+}
+</script>
+
+  
+  {# 
+    <script src="/static/js/starfield.js"></script>
+   #}
+
+  <script>
+    // CSRF helper
+    function getCookie(name){
+      let v=null; if(document.cookie && document.cookie!==''){
+        const cs=document.cookie.split(';');
+        for(let i=0;i<cs.length;i++){
+          const c=cs[i].trim(); if(c.substring(0,name.length+1)===(name+'=')){ v=decodeURIComponent(c.substring(name.length+1)); break; }
+        }
+      } return v;
+    }
+    const csrftoken=getCookie('csrftoken');
+
+    // Confirmación eliminar
+    function confirmarEliminacion(nombreCliente){
+      const message=`⚠️ ¿Está seguro de eliminar a "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.`;
+      return confirm(message);
+    }
+
+    // Service Worker Registration para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/static/service-worker.js')
+          .then(function(registration) {
+            console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+            
+            // Verificar actualizaciones cada hora
+            setInterval(function() {
+              registration.update();
+            }, 3600000); // 1 hora
+            
+            // Escuchar actualizaciones del service worker
+            registration.addEventListener('updatefound', function() {
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', function() {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // Hay una nueva versión disponible
+                  if (confirm('🎉 Nueva versión de eGarage disponible. ¿Deseas actualizar ahora?')) {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+          })
+          .catch(function(error) {
+            console.warn('⚠️ Error al registrar Service Worker:', error);
+          });
+      });
+    }
+    
+    // PWA Install Prompt Handler (maneja beforeinstallprompt y iOS)
+    // El script pwa-install-prompt.js se carga después y maneja todo
+  </script>
+</body>
+</html>

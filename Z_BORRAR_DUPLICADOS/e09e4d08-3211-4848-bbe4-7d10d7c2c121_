@@ -1,0 +1,288 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% load country_url %}
+
+{% block extra_head %}
+<link href="/static/css/estilo_futurista.css" rel="stylesheet">
+<link href="/static/css/galaxy_theme.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  tsParticles.load("tsparticles", {
+    fullScreen: { enable: false },
+    background: { color: { value: "transparent" } },
+    particles: {
+      number: { value: 100 },
+      color: { value: "#00ffff" },
+      size: { value: 2 },
+      move: { enable: true, speed: 0.7 },
+      links: { enable: true, color: "#00e6d0", opacity: 0.3 }
+    }
+  });
+});
+</script>
+<style>
+body {
+  background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%) fixed;
+  min-height: 100vh;
+}
+#tsparticles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+}
+.cuadro {
+  position: relative;
+  z-index: 2;
+}
+.cuadro, .cuadro *, table, thead, tbody, th, td {
+  color: #fff !important;
+}
+input[type="text"] {
+  background: #222 !important;
+  color: #fff !important;
+  border: 1px solid #4fd1c5 !important;
+}
+input[type="text"]::placeholder {
+  color: #b2f5ea !important;
+}
+
+/* Estilos para el campo de búsqueda mejorado */
+#busqueda-vehiculo {
+  background: linear-gradient(135deg, #1a1a2e, #16213e) !important;
+  color: #fff !important;
+  border: 2px solid #4fd1c5 !important;
+  box-shadow: 0 4px 15px rgba(79, 209, 197, 0.2) !important;
+  font-size: 16px !important;
+  font-weight: 500 !important;
+}
+
+#busqueda-vehiculo:focus {
+  border-color: #00d4ff !important;
+  box-shadow: 0 0 25px rgba(0, 212, 255, 0.4) !important;
+  background: linear-gradient(135deg, #1a1a2e, #0f3460) !important;
+}
+
+#busqueda-vehiculo::placeholder {
+  color: #64b5f6 !important;
+  font-weight: 400 !important;
+}
+
+/* Contador de resultados */
+#contador-resultados {
+  background: rgba(30, 58, 138, 0.8) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+}
+.translucent-card {
+  background: rgba(0,0,0,0.6) !important;
+  color: #fff !important;
+  padding: 18px 32px;
+  margin-bottom: 32px;
+  backdrop-filter: blur(8px) saturate(120%);
+  -webkit-backdrop-filter: blur(8px) saturate(120%);
+  border: 1.5px solid rgba(0,230,208,0.12);
+}
+.font-orbitron {
+  font-family: 'Orbitron', 'Arial', sans-serif;
+}
+</style>
+{% endblock %}
+
+{% block fondo_extra %}
+<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto cuadro">
+  <div class="flex justify-between items-center mb-4">
+    <div class="flex items-center gap-3">
+      <h1 class="text-2xl font-bold">Vehículos Registrados</h1>
+      {% include "components/country_badge.html" %}
+    </div>
+    <a class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
+       href="{% country_url 'crear_vehiculo' app_namespace='vehiculos' %}">+ Agregar Vehículo</a>
+  </div>
+
+  <div class="mb-4">
+    <div class="relative">
+      <input class="w-full rounded-lg px-6 py-4 text-black text-lg border-2 border-blue-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-200 transition-all duration-300"
+             id="busqueda-vehiculo"
+             placeholder="🔍 Buscar vehículo por patente, marca, modelo, año, cliente..."
+             type="text"/>
+      <div class="absolute inset-y-0 right-0 pr-3 flex items-center">
+        <button type="button" id="limpiar-busqueda" class="text-gray-400 hover:text-red-400 transition-colors duration-200 mr-2" title="Limpiar búsqueda (ESC)">
+          <i class="fas fa-times-circle text-xl"></i>
+        </button>
+        <div class="text-gray-400 text-xl pointer-events-none">
+          <i class="fas fa-search"></i>
+        </div>
+      </div>
+    </div>
+    <div class="mt-2 text-sm text-gray-300">
+      <i class="fas fa-info-circle me-1"></i>
+      Búsqueda inteligente: patente, marca, modelo, año, nombre del cliente
+    </div>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm text-left">
+      <thead class="bg-gray-700 text-white">
+        <tr>
+          <th class="px-4 py-2">Patente</th>
+          <th class="px-4 py-2">Marca</th>
+          <th class="px-4 py-2">Modelo</th>
+          <th class="px-4 py-2">Año</th>
+          <th class="px-4 py-2">Cliente</th>
+          <th class="px-4 py-2">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="translucent-card text-black" id="tabla-vehiculos">
+        {% for vehiculo in vehiculos %}
+        <tr class="border-b border-gray-300">
+          <td class="px-4 py-2">{{ vehiculo.patente }}</td>
+          <td class="px-4 py-2">{{ vehiculo.marca|sin_pais }}</td>
+          <td class="px-4 py-2">{{ vehiculo.modelo }}</td>
+          <td class="px-4 py-2">{{ vehiculo.anio }}</td>
+          <td class="px-4 py-2">{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</td>
+          <td class="px-4 py-2 space-x-2">
+            <a class="text-blue-600 hover:underline" href="{% url 'chile:taller:vehiculos:ver_vehiculo' vehiculo.id %}" title="Ver">👁️</a>
+            <a class="text-yellow-600 hover:underline" href="{% url 'chile:taller:vehiculos:editar_vehiculo' vehiculo_id=vehiculo.id %}" title="Editar">✏️</a>
+            <a class="text-red-600 hover:underline" href="{% url 'chile:taller:vehiculos:eliminar_vehiculo' vehiculo_id=vehiculo.id %}" title="Eliminar">🗑️</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td class="px-4 py-4 text-center text-gray-500" colspan="6">Sin vehículos</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const input = document.getElementById('busqueda-vehiculo');
+    const filas = document.querySelectorAll('#tabla-vehiculos tr');
+
+    // Función de búsqueda mejorada
+    function buscarVehiculos(filtro) {
+      const filtroLower = filtro.toLowerCase();
+      let encontrados = 0;
+
+      filas.forEach(fila => {
+        // Obtener todas las celdas de la fila
+        const celdas = fila.querySelectorAll('td');
+        if (celdas.length === 0) return; // Saltar filas vacías
+
+        // Buscar en cada celda específicamente
+        let coincide = false;
+
+        celdas.forEach((celda, index) => {
+          const texto = celda.textContent.toLowerCase();
+
+          // Búsqueda específica por tipo de campo
+          switch(index) {
+            case 0: // Patente
+              if (texto.includes(filtroLower)) coincide = true;
+              break;
+            case 1: // Marca
+              if (texto.includes(filtroLower)) coincide = true;
+              break;
+            case 2: // Modelo
+              if (texto.includes(filtroLower)) coincide = true;
+              break;
+            case 3: // Año
+              if (texto.includes(filtroLower)) coincide = true;
+              break;
+            case 4: // Cliente (nombre + apellido)
+              if (texto.includes(filtroLower)) coincide = true;
+              break;
+          }
+        });
+
+        // Mostrar/ocultar fila
+        if (coincide) {
+          fila.style.display = '';
+          encontrados++;
+        } else {
+          fila.style.display = 'none';
+        }
+      });
+
+      // Mostrar contador de resultados
+      mostrarContadorResultados(encontrados, filtro);
+    }
+
+    // Función para mostrar contador de resultados
+    function mostrarContadorResultados(encontrados, filtro) {
+      let contador = document.getElementById('contador-resultados');
+      if (!contador) {
+        contador = document.createElement('div');
+        contador.id = 'contador-resultados';
+        contador.className = 'mt-3 p-3 bg-blue-900 bg-opacity-50 rounded-lg text-center';
+        input.parentNode.parentNode.appendChild(contador);
+      }
+
+      if (filtro.length > 0) {
+        contador.innerHTML = `
+          <i class="fas fa-search me-2"></i>
+          <span class="font-semibold">${encontrados}</span> vehículo${encontrados !== 1 ? 's' : ''} encontrado${encontrados !== 1 ? 's' : ''} para "<strong>${filtro}</strong>"
+        `;
+        contador.style.display = 'block';
+      } else {
+        contador.style.display = 'none';
+      }
+    }
+
+    // Evento de búsqueda
+    input.addEventListener('input', function() {
+      const filtro = this.value.trim();
+      if (filtro.length === 0) {
+        // Mostrar todos si no hay filtro
+        filas.forEach(fila => fila.style.display = '');
+        const contador = document.getElementById('contador-resultados');
+        if (contador) contador.style.display = 'none';
+      } else {
+        buscarVehiculos(filtro);
+      }
+    });
+
+    // Búsqueda al presionar Enter
+    input.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        this.blur(); // Quitar foco
+      }
+    });
+
+    // Limpiar búsqueda con Escape
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') {
+        this.value = '';
+        this.dispatchEvent(new Event('input'));
+        this.focus();
+      }
+    });
+
+    // Botón de limpiar búsqueda
+    const btnLimpiar = document.getElementById('limpiar-busqueda');
+    btnLimpiar.addEventListener('click', function() {
+      input.value = '';
+      input.dispatchEvent(new Event('input'));
+      input.focus();
+    });
+
+    // Mostrar/ocultar botón de limpiar según contenido
+    input.addEventListener('input', function() {
+      if (this.value.length > 0) {
+        btnLimpiar.style.display = 'block';
+      } else {
+        btnLimpiar.style.display = 'none';
+      }
+    });
+
+    // Ocultar botón inicialmente
+    btnLimpiar.style.display = 'none';
+  });
+</script>
+{% endblock %}

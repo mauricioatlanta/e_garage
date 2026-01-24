@@ -1,6 +1,7 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
-from django.views.generic import CreateView, DetailView, ListView, UpdateView
+from django.urls import reverse_lazy
+from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from core.views import TenantViewMixin
 from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaServicio
@@ -53,6 +54,18 @@ class ServicioUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
     model = Servicio
     template_name = "servicios/editar_servicio.html"
     fields = ["nombre", "categoria", "subcategoria"]
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["categorias"] = CategoriaServicio.objects.all()
+        context["subcategorias"] = SubcategoriaServicio.objects.all()
+        return context
+
+
+class ServicioDeleteView(LoginRequiredMixin, TenantViewMixin, DeleteView):
+    model = Servicio
+    template_name = "servicios/eliminar_servicio_confirmar.html"
+    success_url = reverse_lazy("servicios:servicios_menu")
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

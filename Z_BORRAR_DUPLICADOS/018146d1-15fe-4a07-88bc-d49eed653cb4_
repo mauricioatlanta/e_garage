@@ -1,0 +1,1054 @@
+{% load i18n static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% trans "Bienvenido a eGarage Chile" %}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.waves.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
+  <style>
+    .glitch {
+      color: #0ff;
+      position: relative;
+      display: inline-block;
+    }
+    .glitch::after {
+      content: attr(data-text);
+      position: absolute;
+      left: 2px;
+      top: 0;
+      color: #f0f;
+      opacity: 0.7;
+      text-shadow: -1px 0 red;
+      animation: glitch 1s infinite linear alternate-reverse;
+    }
+    @keyframes glitch {
+      0% { left:2px; opacity:0.7; }
+      20% { left:-2px; opacity:0.5; }
+      40% { left:2px; opacity:0.8; }
+      60% { left:1px; opacity:0.6; }
+      80% { left:-1px; opacity:0.9; }
+      100% { left:2px; opacity:0.7; }
+    }
+    .toggle-switch {
+      position: fixed;
+      top: 1.5rem;
+      right: 1.5rem;
+      z-index: 50;
+      background: rgba(0,0,0,0.7);
+      border-radius: 9999px;
+      padding: 0.5rem 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      box-shadow: 0 2px 12px #00ffff44;
+      transition: background 0.3s;
+    }
+    .toggle-switch:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    .light-mode {
+      background: #f7fafc !important;
+      color: #222 !important;
+    }
+    .light-mode .glass-card, .light-mode .glass {
+      background: rgba(0,0,0,0.08) !important;
+      color: #222 !important;
+    }
+    .light-mode .futuristic-glow {
+      text-shadow: 0 0 12px #00f0ff, 0 0 2px #fff;
+      color: #0d0d0d !important;
+    }
+    .light-mode .svg-blob path[fill] {
+      fill: #f7fafc !important;
+    }
+    .light-mode .svg-blob path[stroke] {
+      stroke: #00ffff !important;
+    }
+    .light-mode .icon-float {
+      color: #0d0d0d !important;
+    }
+    .sticky-cta {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      z-index: 50;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    @media (max-width: 640px) {
+      .sticky-cta {
+        right: 0.5rem;
+        left: 0.5rem;
+        bottom: 0.5rem;
+        justify-content: center;
+      }
+    }
+    body {
+      background: #0d0d0d !important;
+      font-family: 'Share Tech Mono', 'Orbitron', monospace;
+      color: #fff;
+      min-height: 100vh;
+    }
+    h1, h2, h3, h4, .futuristic-glow {
+      font-family: 'Orbitron', 'Share Tech Mono', monospace !important;
+      letter-spacing: 1.5px;
+      text-shadow: 0 0 10px rgba(0,255,255,0.3);
+    }
+    p, span, li {
+      text-shadow: 0 0 5px rgba(255,255,255,0.1);
+    }
+    .futuristic-glow {
+      text-shadow: 0 0 24px #00ffff, 0 0 12px #00f0ff, 0 0 4px #fff;
+    }
+    .glass-card, .glass {
+      background: rgba(255,255,255,0.12);
+      backdrop-filter: blur(12px);
+      border-radius: 1.5rem;
+      box-shadow: 0 8px 32px 0 rgba(0,255,255,0.15);
+      color: #fff;
+      transition: transform 0.2s, background 0.2s;
+      border: 1px solid rgba(0,255,255,0.2);
+    }
+    .glass-card:hover, .glass:hover {
+      transform: scale(1.04);
+      background: rgba(0,255,255,0.18);
+      border-color: rgba(0,255,255,0.4);
+    }
+    .svg-blob {
+      width: 100vw;
+      height: 100px;
+      display: block;
+      margin: 0;
+      z-index: 2;
+    }
+    .icon-float {
+      transition: transform 0.3s, color 0.3s;
+      will-change: transform;
+    }
+    .icon-float:hover {
+      transform: scale(1.25) rotate(-8deg);
+      color: #f472b6;
+    }
+    .lordicon-cta {
+      width: 80px;
+      height: 80px;
+      margin: 0 auto 1.5rem auto;
+      display: block;
+    }
+    .aos-animate {
+      opacity: 1 !important;
+      transform: none !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between bg-[#0d0d0d]">
+
+  <!-- 🌟 Cabecera de Navegación con Login/Registro -->
+  <header class="relative z-50 bg-gradient-to-r from-black/80 via-gray-900/80 to-black/80 backdrop-blur-md border-b border-cyan-400/30">
+    <nav class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between items-center py-4">
+
+        <!-- RED CROSSES - BIENVENIDA CHILE -->
+        <div class="flex items-center gap-2 text-red-500 text-2xl mr-4">
+          <span>❌</span>
+          <span>❌</span>
+          <span>❌</span>
+        </div>
+
+        <!-- Logo -->
+        <div class="flex items-center space-x-3">
+          <img src="{% static 'img/logo.png' %}" alt="eGarage" class="w-8 h-8 animate-pulse" style="filter: drop-shadow(0 0 8px #00ffff88);">
+          <!-- BLUE triangle indicator - templates/onboarding/ -->
+          <div class="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[10px] border-l-transparent border-r-transparent border-b-blue-500 animate-pulse"></div>
+          <span class="text-xl font-bold text-cyan-400 font-mono">eGarage</span>
+          <span class="px-2 py-1 text-xs bg-cyan-400/20 text-cyan-300 rounded-full border border-cyan-400/30">🇨🇱 Chile</span>
+        </div>
+
+        <!-- Menú de Navegación -->
+        <div class="hidden md:flex items-center space-x-8">
+          <!-- Navigation items removed as requested -->
+        </div>
+
+        <!-- Botones de Autenticación -->
+        <div class="flex items-center space-x-4">
+
+          <!-- Botón de Login -->
+          {% load country_url %}
+          <a href="{% country_url 'account_login' %}" class="inline-flex items-center px-4 py-2 text-sm font-medium text-cyan-400 bg-transparent border border-cyan-400/50 rounded-lg hover:bg-cyan-400/10 hover:border-cyan-400 transition-all duration-300 group">
+            <i class="fas fa-sign-in-alt mr-2 group-hover:scale-110 transition-transform"></i>
+            Ingresar
+          </a>
+
+          <!-- Botón de Registro -->
+          <a href="/registro/" class="inline-flex items-center px-4 py-2 text-sm font-medium text-black bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg hover:from-cyan-300 hover:to-blue-400 hover:scale-105 transition-all duration-300 shadow-lg group">
+            <i class="fas fa-user-plus mr-2 group-hover:scale-110 transition-transform"></i>
+            Registrarse
+          </a>
+
+        </div>
+
+        <!-- Menú Móvil Toggle -->
+        <div class="md:hidden">
+          <button id="mobile-menu-toggle" class="text-gray-300 hover:text-cyan-400 focus:outline-none">
+            <i class="fas fa-bars text-xl"></i>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Menú Móvil Desplegable -->
+      <div id="mobile-menu" class="md:hidden hidden border-t border-cyan-400/30 py-4">
+        <div class="flex flex-col space-y-4">
+          <!-- Navigation items removed as requested -->
+          <div class="flex space-x-4 px-4 pt-4 border-t border-cyan-400/30">
+            <a href="{% country_url 'account_login' %}" class="flex-1 text-center px-4 py-2 text-cyan-400 border border-cyan-400/50 rounded-lg hover:bg-cyan-400/10 transition-all">
+              <i class="fas fa-sign-in-alt mr-2"></i>Ingresar
+            </a>
+            <a href="/registro/" class="flex-1 text-center px-4 py-2 text-black bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg hover:scale-105 transition-all">
+              <i class="fas fa-user-plus mr-2"></i>Registrarse
+            </a>
+          </div>
+        </div>
+      </div>
+
+    </nav>
+  </header>
+
+  <div id="vanta-matrix" class="fixed top-0 left-0 w-full h-[420px] -z-10"></div>
+  <div id="vanta-bg" class="fixed inset-0 -z-20"></div>
+  <main class="relative z-10">
+    <!-- Hero Section -->
+    <section class="text-center py-24 px-6 relative" data-aos="fade-up">
+      <img src="{% static 'img/logo.png' %}" alt="eGarage Logo" class="mx-auto mb-8 w-32 md:w-40 animate-spin-slow" style="filter: drop-shadow(0 0 24px #00ffff88);">
+      <h1 class="text-5xl md:text-6xl font-extrabold futuristic-glow mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-400 via-blue-500 to-[#00fff7] drop-shadow-lg animate-pulse" style="letter-spacing:2px;">La plataforma N°1 para talleres en Chile</h1>
+      <div class="absolute left-1/2 -translate-x-1/2 top-8 md:top-10 z-10">
+        <lord-icon
+          src="https://cdn.lordicon.com/wxhtpnnk.json"
+          trigger="loop"
+          colors="primary:#00ffff,secondary:#00bfff"
+          style="width:64px;height:64px;filter:drop-shadow(0 0 16px #00ffffcc);"
+        ></lord-icon>
+      </div>
+      <p class="text-xl text-cyan-200 mb-8">Confiado por técnicos de todo Chile. Funcionalidades reales. Soporte bilingüe. Sin riesgos.</p>
+      <div class="mt-10 flex flex-col md:flex-row gap-4 justify-center">
+        <a href="/registro/" class="px-10 py-4 bg-gradient-to-r from-lime-400 to-cyan-400 text-black font-bold rounded-full shadow-lg hover:scale-105 transition-all card-glow text-xl">🚀 Comenzar prueba gratis</a>
+        <a href="#plans" class="px-10 py-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold rounded-full shadow-lg hover:scale-105 transition-all card-glow text-xl">💰 Ver precios</a>
+      </div>
+    </section>
+    <div class="sticky-cta">
+      <a href="#cta" class="bg-gradient-to-r from-cyan-400 to-blue-500 text-black px-6 py-3 rounded-full shadow-lg hover:scale-105 transition text-lg font-bold">🚀 ¡Empieza ahora!</a>
+    </div>
+    <div class="svg-blob">
+      <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,80 Q720,0 1440,80 L1440,100 L0,100 Z" fill="#0d0d0d"/><path d="M0,80 Q720,0 1440,80" stroke="#00eaff" stroke-width="4" fill="none"/></svg>
+    </div>
+    <section class="max-w-5xl mx-auto py-20 px-4 grid md:grid-cols-3 gap-12" id="virtues">
+      <div data-aos="fade-right">
+        <h2 class="text-4xl font-bold text-cyan-300 mb-6 futuristic-glow">Gestión</h2>
+        <div class="glass-card p-6 mb-6 flex flex-col items-center">
+          <i class="fas fa-shield-alt text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Control de Garantías</h3>
+          <p class="text-lg text-gray-300">Lleva el control de garantías por tiempo o kilometraje con alertas y registros digitales.</p>
+        </div>
+        <div class="glass-card p-6 flex flex-col items-center">
+          <i class="fas fa-chart-line text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Reportes de Rentabilidad</h3>
+          <p class="text-lg text-gray-300">Conoce tus ganancias por servicios, repuestos o ambos — en tiempo real.</p>
+        </div>
+      </div>
+      <div data-aos="fade-up">
+        <h2 class="text-4xl font-bold text-cyan-300 mb-6 futuristic-glow">Automatización</h2>
+        <div class="glass-card p-6 mb-6 flex flex-col items-center">
+          <i class="fas fa-user-cog text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Rendimiento de Técnicos</h3>
+          <p class="text-lg text-gray-300">Mide desempeño, tiempos de trabajo y destaca a los mejores.</p>
+        </div>
+        <div class="glass-card p-6 flex flex-col items-center">
+          <i class="fas fa-boxes text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Alertas de Inventario</h3>
+          <p class="text-lg text-gray-300">Recibe notificaciones cuando el stock esté bajo o inactivo.</p>
+        </div>
+      </div>
+      <div data-aos="fade-left">
+        <h2 class="text-4xl font-bold text-lime-300 mb-6 futuristic-glow">Cliente</h2>
+        <div class="glass-card p-6 mb-6 flex flex-col items-center">
+          <i class="fas fa-file-signature text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Documentos Digitales</h3>
+          <p class="text-lg text-gray-300">Órdenes de trabajo, diagnósticos y recibos sin papel.</p>
+        </div>
+        <div class="glass-card p-6 flex flex-col items-center">
+          <i class="fas fa-users text-5xl mb-4 icon-float"></i>
+          <h3 class="text-2xl font-bold mb-2">Portal del Cliente</h3>
+          <p class="text-lg text-gray-300">Tus clientes pueden ver facturas, historial y actualizaciones online.</p>
+        </div>
+      </div>
+    </section>
+    <div class="svg-blob">
+      <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 Q720,100 1440,20 L1440,100 L0,100 Z" fill="#0d0d0d"/><path d="M0,20 Q720,100 1440,20" stroke="#00bfff" stroke-width="4" fill="none"/></svg>
+    </div>
+    <section class="max-w-6xl mx-auto py-20 px-4 flex flex-col gap-24">
+      <div class="flex flex-col md:flex-row items-center gap-12" data-aos="fade-right">
+        <div class="flex-1">
+          <h2 class="text-4xl font-bold text-cyan-200 mb-4 futuristic-glow">Dashboard Todo-en-Uno</h2>
+          <p class="text-lg text-gray-400">Todo lo que necesitas en un solo lugar: trabajos, inventario, clientes y más.</p>
+        </div>
+        <div class="flex-1 flex justify-center">
+          <i class="fas fa-tachometer-alt text-7xl text-cyan-400 icon-float"></i>
+        </div>
+      </div>
+      <div class="flex flex-col items-center text-center" data-aos="fade-up">
+        <h2 class="text-4xl font-bold text-cyan-200 mb-4 futuristic-glow">Recordatorios Automáticos</h2>
+        <i class="fas fa-bell text-6xl text-cyan-400 mb-4 icon-float"></i>
+        <p class="text-lg text-gray-400 max-w-2xl">Nunca pierdas un servicio o seguimiento. Notificaciones automáticas para ti y tus clientes.</p>
+      </div>
+      <div class="relative" data-aos="fade-left">
+        <div class="absolute left-0 top-1/2 w-2 h-64 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full -translate-y-1/2"></div>
+        <div class="ml-12">
+          <h2 class="text-4xl font-bold text-lime-200 mb-4 futuristic-glow">Tu Ruta al Éxito</h2>
+          <ul class="space-y-6">
+            <li class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-black font-bold">1</span>
+              <span class="text-lg text-gray-300">Registra tu taller en minutos</span>
+            </li>
+            <li class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-black font-bold">2</span>
+              <span class="text-lg text-gray-300">Importa tus clientes e inventario</span>
+            </li>
+            <li class="flex items-center gap-4">
+              <span class="w-8 h-8 rounded-full bg-lime-400 flex items-center justify-center text-black font-bold">3</span>
+              <span class="text-lg text-gray-300">¡Comienza a trabajar de forma inteligente!</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+      <div class="w-full py-16 flex flex-col items-center justify-center bg-gradient-to-r from-blue-900/30 via-cyan-900/30 to-black/80 rounded-3xl" data-aos="fade-up">
+        <h2 class="text-4xl font-bold text-cyan-300 mb-4 futuristic-glow">Analítica en Tiempo Real</h2>
+        <i class="fas fa-chart-pie text-6xl text-cyan-400 mb-4 icon-float"></i>
+        <p class="text-lg text-gray-400 max-w-2xl">Visualiza el crecimiento de tu negocio y toma decisiones basadas en datos al instante.</p>
+      </div>
+    </section>
+    <div class="svg-blob">
+      <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,60 Q720,100 1440,60 L1440,100 L0,100 Z" fill="#0d0d0d"/><path d="M0,60 Q720,100 1440,60" stroke="#00eaff" stroke-width="4" fill="none"/></svg>
+    </div>
+    <!-- 📊 Dashboard de Satisfacción del Cliente -->
+    <section class="max-w-7xl mx-auto py-20 px-4" id="testimonials">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold text-cyan-300 mb-6 futuristic-glow" data-aos="fade-up">Resultados Reales de Nuestros Clientes</h2>
+        <p class="text-xl text-gray-400 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          Datos reales de talleres que han transformado su operación con eGarage
+        </p>
+      </div>
+
+      <!-- Métricas Principales -->
+      <div class="grid md:grid-cols-4 gap-8 mb-16">
+        <div class="glass-card p-6 text-center" data-aos="fade-up">
+          <div class="text-4xl font-bold text-cyan-400 mb-2">98%</div>
+          <div class="text-gray-300">Satisfacción del Cliente</div>
+          <div class="w-full bg-gray-700 rounded-full h-2 mt-3">
+            <div class="bg-gradient-to-r from-cyan-400 to-blue-500 h-2 rounded-full" style="width: 98%"></div>
+          </div>
+        </div>
+
+        <div class="glass-card p-6 text-center" data-aos="fade-up" data-aos-delay="100">
+          <div class="text-4xl font-bold text-lime-400 mb-2">+45%</div>
+          <div class="text-gray-300">Aumento en Productividad</div>
+          <div class="w-full bg-gray-700 rounded-full h-2 mt-3">
+            <div class="bg-gradient-to-r from-lime-400 to-cyan-400 h-2 rounded-full" style="width: 45%"></div>
+          </div>
+        </div>
+
+        <div class="glass-card p-6 text-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="text-4xl font-bold text-purple-400 mb-2">-60%</div>
+          <div class="text-gray-300">Reducción en Tiempo Administrativo</div>
+          <div class="w-full bg-gray-700 rounded-full h-2 mt-3">
+            <div class="bg-gradient-to-r from-purple-400 to-pink-500 h-2 rounded-full" style="width: 60%"></div>
+          </div>
+        </div>
+
+        <div class="glass-card p-6 text-center" data-aos="fade-up" data-aos-delay="300">
+          <div class="text-4xl font-bold text-orange-400 mb-2">+30%</div>
+          <div class="text-gray-300">Incremento en Ventas</div>
+          <div class="w-full bg-gray-700 rounded-full h-2 mt-3">
+            <div class="bg-gradient-to-r from-orange-400 to-red-500 h-2 rounded-full" style="width: 30%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gráfico Interactivo de Satisfacción -->
+      <div class="glass-card p-8 mb-16" data-aos="fade-up">
+        <h3 class="text-2xl font-bold text-cyan-300 mb-8 text-center">Distribución de Calificaciones</h3>
+        <div class="grid md:grid-cols-2 gap-8 items-center">
+          <div>
+            <div class="space-y-4">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-300">⭐⭐⭐⭐⭐ Excelente</span>
+                <span class="text-cyan-400 font-bold">78%</span>
+              </div>
+              <div class="w-full bg-gray-700 rounded-full h-3">
+                <div class="bg-gradient-to-r from-cyan-400 to-blue-500 h-3 rounded-full" style="width: 78%"></div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <span class="text-gray-300">⭐⭐⭐⭐ Muy Bueno</span>
+                <span class="text-lime-400 font-bold">18%</span>
+              </div>
+              <div class="w-full bg-gray-700 rounded-full h-3">
+                <div class="bg-gradient-to-r from-lime-400 to-cyan-400 h-3 rounded-full" style="width: 18%"></div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <span class="text-gray-300">⭐⭐⭐ Bueno</span>
+                <span class="text-purple-400 font-bold">3%</span>
+              </div>
+              <div class="w-full bg-gray-700 rounded-full h-3">
+                <div class="bg-gradient-to-r from-purple-400 to-pink-500 h-3 rounded-full" style="width: 3%"></div>
+              </div>
+
+              <div class="flex items-center justify-between">
+                <span class="text-gray-300">⭐⭐ Regular</span>
+                <span class="text-orange-400 font-bold">1%</span>
+              </div>
+              <div class="w-full bg-gray-700 rounded-full h-3">
+                <div class="bg-gradient-to-r from-orange-400 to-red-500 h-3 rounded-full" style="width: 1%"></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-center">
+            <div class="relative w-48 h-48 mx-auto">
+              <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="#374151" stroke-width="8"/>
+                <circle cx="50" cy="50" r="40" fill="none" stroke="url(#gradient)" stroke-width="8"
+                        stroke-dasharray="251.2" stroke-dashoffset="55.2" stroke-linecap="round"/>
+                <defs>
+                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" style="stop-color:#00ffff"/>
+                    <stop offset="100%" style="stop-color:#00bfff"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-center">
+                  <div class="text-3xl font-bold text-cyan-400">4.8</div>
+                  <div class="text-sm text-gray-400">de 5.0</div>
+                </div>
+              </div>
+            </div>
+            <p class="text-gray-400 mt-4">Calificación promedio basada en 1,247 reseñas</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonios Destacados -->
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="glass-card p-6" data-aos="fade-up">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mr-3">
+              <span class="text-black font-bold">DL</span>
+            </div>
+            <div>
+              <div class="font-bold text-cyan-300">Daniela López</div>
+              <div class="text-sm text-gray-400">Taller Automotriz, Santiago</div>
+            </div>
+          </div>
+          <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
+          <p class="text-gray-300 italic">"El control de inventario automático nos ahorra 4 horas diarias. Los reportes de rentabilidad son increíbles."</p>
+          <div class="mt-4 text-sm text-cyan-400">
+            <strong>Resultado:</strong> +40% eficiencia operativa
+          </div>
+        </div>
+
+        <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="100">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-gradient-to-r from-lime-400 to-cyan-400 rounded-full flex items-center justify-center mr-3">
+              <span class="text-black font-bold">JS</span>
+            </div>
+            <div>
+              <div class="font-bold text-lime-300">Jorge Santander</div>
+              <div class="text-sm text-gray-400">AutoPro, Viña del Mar</div>
+            </div>
+          </div>
+          <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
+          <p class="text-gray-300 italic">"La integración con WhatsApp Business revolucionó nuestra comunicación con clientes. Muy recomendado."</p>
+          <div class="mt-4 text-sm text-lime-400">
+            <strong>Resultado:</strong> +65% satisfacción del cliente
+          </div>
+        </div>
+
+        <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="200">
+          <div class="flex items-center mb-4">
+            <div class="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mr-3">
+              <span class="text-black font-bold">MR</span>
+            </div>
+            <div>
+              <div class="font-bold text-purple-300">María Rodríguez</div>
+              <div class="text-sm text-gray-400">Speed Garage, Concepción</div>
+            </div>
+          </div>
+          <div class="text-yellow-400 mb-3">⭐⭐⭐⭐⭐</div>
+          <p class="text-gray-300 italic">"El diagnóstico con IA nos ayuda a detectar problemas antes de que se vuelvan costosos. Excelente herramienta."</p>
+          <div class="mt-4 text-sm text-purple-400">
+            <strong>Resultado:</strong> -35% costos de reparación
+          </div>
+        </div>
+      </div>
+    </section>
+    <div class="svg-blob">
+      <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,80 Q720,0 1440,80 L1440,100 L0,100 Z" fill="#0d0d0d"/><path d="M0,80 Q720,0 1440,80" stroke="#00eaff" stroke-width="4" fill="none"/></svg>
+    </div>
+
+    <!-- 🚀 Características Avanzadas de eGarage -->
+    <section class="max-w-7xl mx-auto py-20 px-4" id="features">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold text-cyan-300 mb-6 futuristic-glow" data-aos="fade-up">Más que un Software, es tu Socio Digital</h2>
+        <p class="text-xl text-gray-400 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          Descubre todas las funcionalidades que hacen de eGarage la solución más completa para talleres en Chile.
+        </p>
+      </div>
+
+      <div class="grid lg:grid-cols-2 gap-12 mb-16">
+
+        <!-- Gestión Inteligente -->
+        <div class="glass-card p-8" data-aos="fade-right">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-lg flex items-center justify-center mr-4">
+              <i class="fas fa-brain text-2xl text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-cyan-300">Inteligencia Artificial</h3>
+          </div>
+          <ul class="space-y-3 text-gray-300">
+            <li class="flex items-center">
+              <i class="fas fa-check text-cyan-400 mr-3"></i>
+              <span>Diagnóstico automático de vehículos</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-cyan-400 mr-3"></i>
+              <span>Predicción de fallas basada en historial</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-cyan-400 mr-3"></i>
+              <span>Optimización automática de inventario</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-cyan-400 mr-3"></i>
+              <span>Análisis de rentabilidad por servicio</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Integración Total -->
+        <div class="glass-card p-8" data-aos="fade-left">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-lime-400 to-cyan-400 rounded-lg flex items-center justify-center mr-4">
+              <i class="fas fa-plug text-2xl text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-lime-300">Integraciones Avanzadas</h3>
+          </div>
+          <ul class="space-y-3 text-gray-300">
+            <li class="flex items-center">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>WhatsApp Business API completa</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>Integración con bancos chilenos</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>Conectores con proveedores de repuestos</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>API REST para desarrolladores</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Seguridad y Cumplimiento -->
+        <div class="glass-card p-8" data-aos="fade-right">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-purple-400 to-pink-500 rounded-lg flex items-center justify-center mr-4">
+              <i class="fas fa-shield-alt text-2xl text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-purple-300">Seguridad y Cumplimiento</h3>
+          </div>
+          <ul class="space-y-3 text-gray-300">
+            <li class="flex items-center">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>Encriptación de extremo a extremo</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>Cumplimiento con normativas chilenas</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>Auditoría completa de acciones</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>Backup automático en la nube</span>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Movilidad y Acceso -->
+        <div class="glass-card p-8" data-aos="fade-left">
+          <div class="flex items-center mb-6">
+            <div class="w-12 h-12 bg-gradient-to-r from-orange-400 to-red-500 rounded-lg flex items-center justify-center mr-4">
+              <i class="fas fa-mobile-alt text-2xl text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-orange-300">Movilidad Total</h3>
+          </div>
+          <ul class="space-y-3 text-gray-300">
+            <li class="flex items-center">
+              <i class="fas fa-check text-orange-400 mr-3"></i>
+              <span>App móvil nativa para iOS y Android</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-orange-400 mr-3"></i>
+              <span>Acceso offline con sincronización</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-orange-400 mr-3"></i>
+              <span>Portal web responsive</span>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-check text-orange-400 mr-3"></i>
+              <span>Notificaciones push inteligentes</span>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Características Específicas para Chile -->
+      <div class="glass-card p-8 max-w-5xl mx-auto" data-aos="fade-up">
+        <div class="text-center mb-8">
+          <h3 class="text-3xl font-bold text-cyan-300 mb-4">🇨🇱 Específicamente Diseñado para Chile</h3>
+          <p class="text-gray-400">Funcionalidades adaptadas a la realidad del mercado automotriz chileno</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-8">
+          <div class="text-center">
+            <div class="w-16 h-16 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-receipt text-2xl text-black"></i>
+            </div>
+            <h4 class="text-xl font-bold text-cyan-300 mb-2">Documentación Legal</h4>
+            <p class="text-gray-400">Boletas, facturas y documentos según normativa SII</p>
+          </div>
+
+          <div class="text-center">
+            <div class="w-16 h-16 bg-gradient-to-r from-lime-400 to-cyan-400 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-map-marker-alt text-2xl text-black"></i>
+            </div>
+            <h4 class="text-xl font-bold text-lime-300 mb-2">Base de Datos Chilena</h4>
+            <p class="text-gray-400">Todas las regiones, comunas y códigos postales</p>
+          </div>
+
+          <div class="text-center">
+            <div class="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-calculator text-2xl text-black"></i>
+            </div>
+            <h4 class="text-xl font-bold text-purple-300 mb-2">Cálculos Automáticos</h4>
+            <p class="text-gray-400">IVA 19%, impuestos y conversiones CLP/USD</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="svg-blob">
+      <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,20 Q720,100 1440,20 L1440,100 L0,100 Z" fill="#0d0d0d"/><path d="M0,20 Q720,100 1440,20" stroke="#00bfff" stroke-width="4" fill="none"/></svg>
+    </div>
+
+    <!-- 🚀 Planes de Precios Profesionales -->
+    <section class="max-w-7xl mx-auto py-20 px-4" id="plans">
+      <div class="text-center mb-16">
+        <h2 class="text-5xl font-bold text-cyan-300 mb-6 futuristic-glow" data-aos="fade-up">💰 Planes que se Adaptan a tu Taller</h2>
+        <p class="text-xl text-gray-300 max-w-3xl mx-auto" data-aos="fade-up" data-aos-delay="100">
+          Desde talleres pequeños hasta grandes operaciones. Precios en USD para estabilidad, pago en CLP al tipo de cambio del día.
+        </p>
+        <div class="mt-6 p-4 bg-gradient-to-r from-cyan-900/30 to-blue-900/30 rounded-lg border border-cyan-400/30" data-aos="fade-up" data-aos-delay="200">
+          <p class="text-cyan-200 font-semibold">🎉 ¡30 días de prueba GRATIS en todos los planes!</p>
+        </div>
+      </div>
+
+      <div class="grid lg:grid-cols-3 gap-8 max-w-6xl mx-auto">
+
+        <!-- Plan Básico -->
+        <div class="glass-card p-8 relative border-2 border-cyan-400/40 hover:border-cyan-400/80 transition-all duration-300" data-aos="fade-up">
+          <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <i class="fas fa-tools text-2xl text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-cyan-300 mb-2">Plan Básico</h3>
+            <p class="text-gray-300 mb-4">Perfecto para talleres pequeños</p>
+            <div class="text-4xl font-bold text-white mb-2">$15 <span class="text-lg text-gray-300">USD/mes</span></div>
+            <div class="text-sm text-cyan-400 font-semibold">≈ $15,000 CLP/mes</div>
+          </div>
+
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-cyan-400 mr-3"></i>
+              <span>Hasta 100 clientes</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-cyan-400 mr-3"></i>
+              <span>Control de inventario básico</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-cyan-400 mr-3"></i>
+              <span>Órdenes de trabajo digitales</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-cyan-400 mr-3"></i>
+              <span>Reportes básicos</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-cyan-400 mr-3"></i>
+              <span>Soporte por email</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-cyan-400 mr-3"></i>
+              <span>Backup automático</span>
+            </li>
+          </ul>
+
+          <a href="/registro/?plan=basico" class="block w-full text-center px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold rounded-lg hover:scale-105 transition-all duration-300">
+            Comenzar Prueba Gratis
+          </a>
+        </div>
+
+        <!-- Plan Profesional (Destacado) -->
+        <div class="glass-card p-8 relative border-2 border-lime-400/80 hover:border-lime-400 transition-all duration-300 transform scale-105 shadow-2xl" data-aos="fade-up" data-aos-delay="100">
+          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
+            <span class="bg-gradient-to-r from-lime-400 to-cyan-400 text-black px-6 py-2 rounded-full text-sm font-bold shadow-lg animate-pulse">
+              ⭐ MÁS POPULAR
+            </span>
+          </div>
+
+          <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-r from-lime-400 to-cyan-400 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <i class="fas fa-crown text-2xl text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-lime-300 mb-2">Plan Profesional</h3>
+            <p class="text-gray-300 mb-4">Para talleres en crecimiento</p>
+            <div class="text-4xl font-bold text-white mb-2">$35 <span class="text-lg text-gray-300">USD/mes</span></div>
+            <div class="text-sm text-lime-400 font-semibold">≈ $35,000 CLP/mes</div>
+          </div>
+
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>Clientes ilimitados</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>Inventario avanzado con alertas</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>Portal del cliente</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>Reportes avanzados con IA</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>Integración WhatsApp Business</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>Control de garantías</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>Soporte prioritario 24/7</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-lime-400 mr-3"></i>
+              <span>Capacitación incluida</span>
+            </li>
+          </ul>
+
+          <a href="/registro/?plan=profesional" class="block w-full text-center px-6 py-3 bg-gradient-to-r from-lime-400 to-cyan-400 text-black font-bold rounded-lg hover:scale-105 transition-all duration-300">
+            Comenzar Prueba Gratis
+          </a>
+        </div>
+
+        <!-- Plan Empresarial -->
+        <div class="glass-card p-8 relative border-2 border-purple-400/40 hover:border-purple-400/80 transition-all duration-300" data-aos="fade-up" data-aos-delay="200">
+          <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-gradient-to-r from-purple-400 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4 shadow-lg">
+              <i class="fas fa-building text-2xl text-black"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-purple-300 mb-2">Plan Empresarial</h3>
+            <p class="text-gray-300 mb-4">Para grandes operaciones</p>
+            <div class="text-4xl font-bold text-white mb-2">$75 <span class="text-lg text-gray-300">USD/mes</span></div>
+            <div class="text-sm text-purple-400 font-semibold">≈ $75,000 CLP/mes</div>
+          </div>
+
+          <ul class="space-y-4 mb-8">
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>Todo del Plan Profesional</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>Múltiples sucursales</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>API personalizada</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>Reportes ejecutivos avanzados</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>Integración con sistemas externos</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>Gerente de cuenta dedicado</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>Capacitación personalizada</span>
+            </li>
+            <li class="flex items-center text-gray-300">
+              <i class="fas fa-check text-purple-400 mr-3"></i>
+              <span>SLA garantizado 99.9%</span>
+            </li>
+          </ul>
+
+          <a href="/registro/?plan=empresarial" class="block w-full text-center px-6 py-3 bg-gradient-to-r from-purple-400 to-pink-500 text-black font-bold rounded-lg hover:scale-105 transition-all duration-300">
+            Comenzar Prueba Gratis
+          </a>
+        </div>
+      </div>
+
+      <!-- Información adicional -->
+      <div class="text-center mt-12" data-aos="fade-up">
+        <div class="glass-card p-8 max-w-4xl mx-auto border-2 border-cyan-400/30">
+          <h3 class="text-2xl font-bold text-cyan-300 mb-6">¿Necesitas algo personalizado?</h3>
+          <p class="text-gray-300 mb-6">
+            Todos los planes incluyen 30 días de prueba gratuita, sin compromiso.
+            Si necesitas funcionalidades específicas para tu taller, contáctanos para un plan personalizado.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="mailto:soporte@egarage.cl" class="px-6 py-3 bg-gradient-to-r from-cyan-400 to-blue-500 text-black font-bold rounded-lg hover:scale-105 transition-all duration-300 shadow-lg">
+              <i class="fas fa-envelope mr-2"></i>Contactar Ventas
+            </a>
+            <a href="tel:+56912345678" class="px-6 py-3 border-2 border-cyan-400 text-cyan-400 font-bold rounded-lg hover:bg-cyan-400/10 transition-all duration-300">
+              <i class="fas fa-phone mr-2"></i>+56 9 1234 5678
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="svg-blob">
+      <svg viewBox="0 0 1440 100" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M0,80 Q720,0 1440,80 L1440,100 L0,100 Z" fill="#0d0d0d"/><path d="M0,80 Q720,0 1440,80" stroke="#00eaff" stroke-width="4" fill="none"/></svg>
+    </div>
+    <section id="cta" class="w-full min-h-[60vh] flex flex-col items-center justify-center py-32 relative" style="background:#0d0d0d;" data-aos="zoom-in">
+      <div class="flex flex-col items-center justify-center mb-6">
+        <lord-icon
+          src="https://cdn.lordicon.com/wxhtpnnk.json"
+          trigger="loop"
+          colors="primary:#00ffff,secondary:#00bfff"
+          style="width:80px;height:80px;filter:drop-shadow(0 0 24px #00eaffcc);"
+        ></lord-icon>
+      </div>
+      <h2 class="text-5xl text-cyan-300 font-bold futuristic-glow text-center mb-8">
+        ¿Listo para llevar tu taller al siguiente nivel?
+      </h2>
+      <a href="/registro/" class="mt-8 px-10 py-4 bg-gradient-to-r from-cyan-400 to-blue-500 text-black text-xl font-bold rounded-2xl hover:scale-105 transition shadow-2xl">Comienza gratis hoy</a>
+    </section>
+    <footer class="mt-20 text-center text-gray-400 text-sm pb-10">
+      <p>&copy; 2025 eGarage Chile. Desarrollado con IA para técnicos</p>
+    </footer>
+  </main>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script>
+    VANTA.NET({
+      el: "#vanta-matrix",
+      mouseControls: true,
+      touchControls: true,
+      minHeight: 420.00,
+      minWidth: 200.00,
+      scale: 1.0,
+      scaleMobile: 1.0,
+      color: 0x00ffff,
+      backgroundColor: 0x0d0d0d,
+      points: 12.0,
+      maxDistance: 22.0,
+      spacing: 18.0
+    });
+    VANTA.WAVES({
+      el: "#vanta-bg",
+      color: 0x00ffff,
+      shininess: 50,
+      waveHeight: 20,
+      waveSpeed: 0.7,
+      zoom: 0.85,
+      backgroundColor: 0x0d0d0d
+    });
+    AOS.init({
+      duration: 900,
+      once: true,
+      offset: 80,
+      delay: 100,
+      easing: 'ease-in-out-cubic'
+    });
+    document.addEventListener('DOMContentLoaded', function() {
+      const toggle = document.createElement('div');
+      toggle.className = 'toggle-switch';
+      toggle.innerHTML = '<span>🌙</span><span id="toggle-label">Oscuro</span>';
+      document.body.appendChild(toggle);
+      let isLight = false;
+      toggle.onclick = function() {
+        isLight = !isLight;
+        document.body.classList.toggle('light-mode', isLight);
+        document.getElementById('toggle-label').textContent = isLight ? 'Claro' : 'Oscuro';
+        toggle.firstChild.textContent = isLight ? '☀️' : '🌙';
+      };
+    });
+  </script>
+</body>
+</html>
+                    <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-cyan-400/20 p-6 hover-lift cyber-border">
+                        <i class="fas fa-map-marker-alt feature-icon text-4xl mb-4 block text-center"></i>
+                        <h5 class="text-xl font-semibold text-center mb-3 text-cyan-300">{% trans "Regions of Chile" %}</h5>
+                        <p class="text-gray-400 text-center">{% trans "Complete database with all cities and communes" %}</p>
+                    </div>
+                    <div class="bg-gray-800/50 backdrop-blur-sm rounded-xl border border-cyan-400/20 p-6 hover-lift cyber-border">
+                        <i class="fas fa-receipt feature-icon text-4xl mb-4 block text-center"></i>
+                        <h5 class="text-xl font-semibold text-center mb-3 text-cyan-300">{% trans "Legal Documents" %}</h5>
+                        <p class="text-gray-400 text-center">{% trans "Billing according to Chilean regulations" %}</p>
+                    </div>
+                </div>
+
+                <!-- Beneficios -->
+                <div class="mb-12">
+                    <h3 class="text-3xl font-bold text-center mb-8 text-transparent bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text">
+                        🚀 Lo que obtienes con eGarage Chile:
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Customer and vehicle management" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Automatic quotes in CLP" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Spare parts inventory control" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Appointments and services schedule" %}</span>
+                            </div>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Advanced reports with AI" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "WhatsApp Business integration" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Automatic cloud backup" %}</span>
+                            </div>
+                            <div class="flex items-center space-x-3">
+                                <i class="fas fa-check-circle check-icon text-xl"></i>
+                                <span class="text-gray-300">{% trans "Technical support in Spanish" %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
+                    <a href="/dashboard/" class="btn-chile text-white px-8 py-3 rounded-lg font-semibold text-lg hover:shadow-lg flex items-center space-x-2 min-w-[200px] justify-center">
+                        <i class="fas fa-tachometer-alt"></i>
+                        <span>{% trans "Go to Dashboard" %}</span>
+                    </a>
+                    <a href="/registro/" class="border border-cyan-400 text-cyan-400 px-8 py-3 rounded-lg font-semibold text-lg hover:bg-cyan-400 hover:text-gray-900 transition-all duration-300 flex items-center space-x-2 min-w-[200px] justify-center">
+                        <i class="fas fa-user-plus"></i>
+                        <span>{% trans "Create Account" %}</span>
+                    </a>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="text-center pt-8 border-t border-cyan-400/20">
+                    <div class="space-y-2 text-gray-400">
+                        <p class="flex items-center justify-center space-x-2">
+                            <i class="fas fa-phone text-cyan-400"></i>
+                            <span>{% trans "Support: +56 9 1234 5678" %}</span>
+                        </p>
+                        <p class="flex items-center justify-center space-x-2">
+                            <i class="fas fa-envelope text-cyan-400"></i>
+                            <span>{% trans "Email: soporte@egarage.cl" %}</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Créditos -->
+                <div class="text-center mt-8 pt-6 border-t border-cyan-400/10">
+                    <p class="text-sm text-gray-500">
+                        {% trans "Developed with ❤️ by" %} <span class="text-cyan-400 font-semibold">Atlanta Reciclajes</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 📱 JavaScript para Menú Móvil -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+            const mobileMenu = document.getElementById('mobile-menu');
+
+            if (mobileMenuToggle && mobileMenu) {
+                mobileMenuToggle.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+
+                    // Cambiar icono del botón
+                    const icon = mobileMenuToggle.querySelector('i');
+                    if (mobileMenu.classList.contains('hidden')) {
+                        icon.className = 'fas fa-bars text-xl';
+                    } else {
+                        icon.className = 'fas fa-times text-xl';
+                    }
+                });
+            }
+
+            // Cerrar menú al hacer clic en enlaces
+            const mobileMenuLinks = mobileMenu.querySelectorAll('a');
+            mobileMenuLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    mobileMenu.classList.add('hidden');
+                    const icon = mobileMenuToggle.querySelector('i');
+                    icon.className = 'fas fa-bars text-xl';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

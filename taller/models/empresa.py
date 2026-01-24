@@ -4,7 +4,7 @@ from math import ceil
 
 import pytz
 
-from django.contrib.auth.models import User
+from django.conf import settings
 from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.utils import timezone
@@ -64,7 +64,9 @@ class Empresa(models.Model):
         "America/Mazatlan",
     }
 
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="empresa")
+    user = models.OneToOneField(
+        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="empresa"
+    )
     nombre_taller = models.CharField(
         max_length=100, default="Mi Taller"
     )  # Migrado desde TallerInfo
@@ -116,10 +118,22 @@ class Empresa(models.Model):
     valor_mensual = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
     moneda = models.CharField(max_length=3, choices=MONEDA_CHOICES, default="CLP")
 
-    notificacion_5_dias = models.BooleanField(default=False)
-    notificacion_1_dia = models.BooleanField(default=False)
-    notificacion_vencido = models.BooleanField(default=False)
-    # Opcional: timestamps de notificación
+    # Campos de control de notificaciones de vencimiento
+    # NOTA: notificacion_5_dias se reutiliza para notificaciones tempranas (7 y 3 días antes)
+    #       para evitar múltiples campos similares. Es un campo genérico de "aviso temprano"
+    notificacion_5_dias = models.BooleanField(
+        default=False,
+        help_text="Indica si se envió notificación temprana (7 o 3 días antes del vencimiento). Reutilizado para ambos intervalos."
+    )
+    notificacion_1_dia = models.BooleanField(
+        default=False,
+        help_text="Indica si se envió notificación a 1 día antes del vencimiento."
+    )
+    notificacion_vencido = models.BooleanField(
+        default=False,
+        help_text="Indica si se envió notificación cuando la suscripción ya venció."
+    )
+    # Opcional: timestamps de notificación (descomentar si se necesita auditoría)
     # notificado_5_dias_en = models.DateTimeField(null=True, blank=True)
     # notificado_1_dia_en = models.DateTimeField(null=True, blank=True)
     # notificado_vencido_en = models.DateTimeField(null=True, blank=True)
@@ -260,12 +274,84 @@ class Empresa(models.Model):
                 logger = logging.getLogger(__name__)
                 logger.error(f"⚠️ Error al enviar notificación de renovación: {str(e)}")
 
-    def marcar_pago_recibido(self, monto=None, plan=None):
+    def marcar_pago_recibido(self, monto=None, plan=None, enviar_notificacion=True):
+        """
+        Marcar pago como recibido y extender suscripción por 30 días
+        
+        Args:
+            monto: Monto del pago (opcional)
+            plan: Plan de suscripción (opcional)
+            enviar_notificacion: Si True, envía notificación de renovación (Email + WhatsApp)
+        """
+        # Guardar estado anterior para detectar tipo de evento
+        plan_anterior = self.plan
+        es_nueva_suscripcion = not self.suscripcion_activa or self.plan == "trial"
+        es_cambio_plan = (
+            self.suscripcion_activa
+            and plan is not None
+            and plan_anterior != plan
+            and plan_anterior != "trial"
+        )
+        
         if monto is not None:
             self.valor_mensual = Decimal(str(monto))
         if plan:
             self.plan = plan
-        self.extender_suscripcion(30)
+        
+        # Extender suscripción (sin notificación aquí, la enviaremos después)
+        self.extender_suscripcion(30, enviar_notificacion=False)
+        
+        # Enviar notificaciones automáticas si se solicita
+        if enviar_notificacion:
+            try:
+                from taller.utils.notificaciones_suscripcion import (
+                    notificar_cambio_plan,
+                    notificar_nueva_suscripcion,
+                    notificar_renovacion_exitosa,
+                )
+                
+                monto_notificacion = monto if monto is not None else self.valor_mensual
+                plan_notificacion = plan if plan else self.plan
+                
+                if es_nueva_suscripcion:
+                    # A. NUEVA SUSCRIPCIÓN
+                    notificar_nueva_suscripcion(
+                        empresa=self,
+                        plan=plan_notificacion,
+                        monto=monto_notificacion,
+                        es_nueva_empresa=es_nueva_suscripcion,
+                    )
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.info(f"✅ Notificación de nueva suscripción enviada a {self.user.email}")
+                elif es_cambio_plan:
+                    # B. CAMBIO DE PLAN
+                    notificar_cambio_plan(
+                        empresa=self,
+                        plan_anterior=plan_anterior,
+                        plan_nuevo=plan_notificacion,
+                        monto=monto_notificacion,
+                        fecha_inicio=self.fecha_inicio,
+                    )
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.info(f"✅ Notificación de cambio de plan enviada a {self.user.email}")
+                else:
+                    # C. RENOVACIÓN EXITOSA
+                    notificar_renovacion_exitosa(
+                        empresa=self,
+                        plan=plan_notificacion,
+                        monto=monto_notificacion,
+                        dias_renovados=30,
+                    )
+                    import logging
+                    logger = logging.getLogger(__name__)
+                    logger.info(f"✅ Notificación de renovación exitosa enviada a {self.user.email}")
+            except Exception as e:
+                import logging
+                logger = logging.getLogger(__name__)
+                logger.error(f"⚠️ Error al enviar notificación en marcar_pago_recibido: {str(e)}")
+                # No fallar si la notificación falla
 
     # TZ helpers (versión Django-friendly)
     def _tz(self):
@@ -334,7 +420,9 @@ class Empresa(models.Model):
         Raises:
             ValueError: Si el usuario no existe o la duración no es válida
         """
-        from django.contrib.auth.models import User
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
         from taller.models.auditoria import LogAuditoria
         from taller.utils.notificaciones_suscripcion import notificar_renovacion_exitosa
 
@@ -483,6 +571,11 @@ class Empresa(models.Model):
             "reason": reason,
             "admin": admin_username,
         }
+
+    @property
+    def is_trial(self):
+        """Atajo para saber si la empresa está en el plan de prueba"""
+        return self.plan == "trial"
 
     class Meta:
         verbose_name = "Empresa"

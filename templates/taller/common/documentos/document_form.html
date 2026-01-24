@@ -5,138 +5,206 @@
 {% load country_url %}
 
 <style>
-/* ==================== ESTILOS MEJORADOS CON MÁXIMO CONTRASTE ==================== */
+/* ==================== ESTILOS OPTIMIZADOS - SIN !important ==================== */
+/* Usando colores personalizados de Tailwind config (neon-cyan, cyber-dark, etc.) */
 
-/* Campos de formulario - CONTRASTE ULTRA MEJORADO */
+/* Campos de formulario - Diseño limpio y profesional */
 .form-control, .form-select, input[type="text"], input[type="number"], input[type="date"], input[type="email"], input[type="tel"], textarea, select {
-  background-color: rgba(5, 5, 20, 0.98) !important;
-  border: 2.5px solid #00f2fe !important;
-  color: #ffffff !important;
-  border-radius: 10px !important;
-  padding: 14px 18px !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 0 10px rgba(0, 242, 254, 0.3), inset 0 2px 6px rgba(0, 0, 0, 0.5) !important;
-  letter-spacing: 0.3px !important;
+  background-color: rgba(5, 5, 20, 0.98);
+  border: 1px solid #00f2fe;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.3);
+  letter-spacing: 0.2px;
 }
 
-/* Focus state - MUY VISIBLE + Accesible */
+/* Focus state - Neón solo cuando está activo (UX mejorada) */
 .form-control:focus, .form-select:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, input[type="email"]:focus, input[type="tel"]:focus, textarea:focus, select:focus {
-  background-color: rgba(10, 10, 30, 1) !important;
-  border-color: #00ffff !important;
-  border-width: 3px !important;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(0, 255, 255, 0.2) !important;
-  outline: none !important;
-  color: #ffffff !important;
-  transform: scale(1.01) !important;
+  background-color: rgba(10, 10, 30, 1);
+  border-color: #00ffff;
+  border-width: 1px;
+  box-shadow: 0 0 12px rgba(0, 255, 255, 0.5), inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(0, 255, 255, 0.15);
+  outline: none;
+  color: #ffffff;
 }
 
-/* Placeholders - MÁS VISIBLES */
+/* Placeholders - Legibles pero sutiles */
 .form-control::placeholder, input::placeholder, textarea::placeholder {
-  color: rgba(150, 200, 255, 0.6) !important;
-  opacity: 1 !important;
-  font-weight: 500 !important;
-  font-style: italic !important;
+  color: rgba(150, 200, 255, 0.5);
+  opacity: 1;
+  font-weight: 400;
+  font-style: italic;
 }
 
-/* Opciones de select - MÁXIMO CONTRASTE */
+/* Opciones de select - Contraste adecuado */
 select option {
-  background-color: #000000 !important;
-  color: #ffffff !important;
-  padding: 12px !important;
-  font-weight: 600 !important;
-  font-size: 15px !important;
+  background-color: #000000;
+  color: #ffffff;
+  padding: 12px;
+  font-weight: 500;
+  font-size: 15px;
 }
 
 select option:hover, select option:checked {
-  background-color: #00f2fe !important;
-  color: #000000 !important;
+  background-color: #00f2fe;
+  color: #000000;
 }
 
-/* Checkboxes - MÁS GRANDES Y VISIBLES */
+/* Checkboxes - Tamaño adecuado, neón solo en focus/checked */
 input[type="checkbox"] {
-  background-color: rgba(5, 5, 20, 0.98) !important;
-  border: 2.5px solid #00f2fe !important;
-  border-radius: 5px !important;
-  width: 22px !important;
-  height: 22px !important;
-  accent-color: #00f2fe !important;
-  cursor: pointer !important;
-  box-shadow: 0 0 8px rgba(0, 242, 254, 0.4) !important;
+  background-color: rgba(5, 5, 20, 0.98);
+  border: 1px solid #00f2fe;
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  accent-color: #00f2fe;
+  cursor: pointer;
+  box-shadow: 0 0 4px rgba(0, 242, 254, 0.2);
+  transition: all 0.2s ease;
 }
 
 input[type="checkbox"]:checked {
-  background-color: #00f2fe !important;
-  box-shadow: 0 0 15px rgba(0, 242, 254, 0.8) !important;
-  border-color: #ffffff !important;
+  background-color: #00f2fe;
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
+  border-color: #ffffff;
 }
 
-/* Campos de subtotal - ULTRA VISIBLE */
+/* Campos de subtotal - Legibles sin exceso */
 .subtotal-field {
-  background-color: rgba(5, 5, 20, 0.98) !important;
-  border: 2.5px solid #00f2fe !important;
-  color: #ffffff !important;
-  border-radius: 10px !important;
-  padding: 14px 18px !important;
-  font-weight: 700 !important;
-  font-size: 17px !important;
-  text-shadow: 0 0 8px rgba(255, 255, 255, 0.5) !important;
+  background-color: rgba(5, 5, 20, 0.98);
+  border: 1px solid #00f2fe;
+  color: #ffffff;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-weight: 600;
+  font-size: 16px;
 }
 
-/* Dropdowns de resultados - CONTRASTE MEJORADO */
+/* Dropdowns de resultados - Interacción clara */
 .cliente-item, .srv-dropdown {
-  background-color: rgba(5, 5, 20, 0.98) !important;
-  border: 2px solid rgba(0, 242, 254, 0.5) !important;
-  color: #ffffff !important;
-  padding: 12px !important;
-  transition: all 0.2s ease !important;
-  font-weight: 600 !important;
+  background-color: rgba(5, 5, 20, 0.98);
+  border: 1px solid rgba(0, 242, 254, 0.4);
+  color: #ffffff;
+  padding: 12px;
+  transition: all 0.2s ease;
+  font-weight: 500;
 }
 
 .cliente-item:hover {
-  background-color: rgba(0, 242, 254, 0.3) !important;
-  border-color: #00ffff !important;
-  cursor: pointer !important;
-  transform: translateX(4px) !important;
-  box-shadow: 0 0 15px rgba(0, 242, 254, 0.6) !important;
+  background-color: rgba(0, 242, 254, 0.2);
+  border-color: #00ffff;
+  cursor: pointer;
+  transform: translateX(2px);
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
 }
 
-/* Labels - ULTRA VISIBLES */
+/* Labels - Title Case en lugar de UPPERCASE (menos fatiga visual) */
 label {
-  color: #00ffff !important;
-  font-weight: 700 !important;
-  font-size: 15px !important;
-  text-shadow: 0 0 10px rgba(0, 242, 254, 0.6) !important;
-  letter-spacing: 0.5px !important;
-  text-transform: uppercase !important;
-  margin-bottom: 8px !important;
-  display: block !important;
+  color: #a0d2ff;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  text-transform: none;
+  margin-bottom: 6px;
+  display: block;
 }
 
-/* Botones - CONTRASTE MÁXIMO */
+/* Labels importantes (como títulos de sección) pueden usar neón */
+label.text-cyan-200,
+label.text-cyan-300 {
+  color: #00d4e6;
+}
+
+/* Botones - Neón solo en CTA principal */
 .btn-primary, button[type="submit"] {
-  background: linear-gradient(135deg, #7f00ff, #00f2fe) !important;
-  color: #ffffff !important;
-  font-weight: 800 !important;
-  font-size: 17px !important;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5) !important;
-  box-shadow: 0 0 20px rgba(0, 242, 254, 0.6) !important;
-  border: 2px solid #00f2fe !important;
+  background: linear-gradient(135deg, #7f00ff, #00f2fe);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 16px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
+  border: 1px solid #00f2fe;
+  transition: all 0.2s ease;
 }
 
 .btn-primary:hover, button[type="submit"]:hover {
-  box-shadow: 0 0 30px rgba(0, 242, 254, 0.9) !important;
-  transform: translateY(-2px) !important;
+  box-shadow: 0 0 16px rgba(0, 242, 254, 0.6);
+  transform: translateY(-1px);
 }
 
-/* Campos deshabilitados - VISIBLES */
+/* ==================== CLASES REUTILIZABLES PARA BOTONES ==================== */
+/* Botón con gradiente cian (para botones principales) - Sin !important */
+.btn-cyan-gradient {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(to right, #06b6d4, #3b82f6);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  border: 1px solid rgba(34, 211, 238, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-cyan-gradient:hover {
+  background: linear-gradient(to right, #22d3ee, #60a5fa);
+  border-color: rgba(34, 211, 238, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cyan-gradient:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.4);
+}
+
+/* Botón con gradiente verde (para acciones de agregar) - Sin !important */
+.btn-green-gradient {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(to right, rgba(5, 150, 105, 0.9), rgba(22, 163, 74, 0.9));
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  border: 1px solid rgba(34, 211, 238, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-green-gradient:hover {
+  background: linear-gradient(to right, #10b981, #16a34a);
+  border-color: rgba(34, 211, 238, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+@media (min-width: 640px) {
+  .btn-cyan-gradient, .btn-green-gradient {
+    width: auto;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Campos deshabilitados - Claramente visibles */
 input:disabled, select:disabled, textarea:disabled {
-  background-color: rgba(40, 40, 60, 0.6) !important;
-  color: rgba(255, 255, 255, 0.5) !important;
-  cursor: not-allowed !important;
-  opacity: 0.7 !important;
+  background-color: rgba(40, 40, 60, 0.6);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+  opacity: 0.7;
 }
 
 /* Estilos mejorados para la sección de totales */
@@ -158,57 +226,47 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .totales-section .bg-black\/40 {
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .totales-section .bg-black\/40:hover {
-  border-color: rgba(0, 242, 254, 0.6) !important;
-  box-shadow: 0 0 15px rgba(0, 242, 254, 0.3) !important;
-  transform: translateY(-2px);
+  border-color: rgba(0, 242, 254, 0.5);
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.2);
+  transform: translateY(-1px);
 }
 
-.totales-section .bg-gradient-to-r {
-  animation: pulse-glow 3s ease-in-out infinite;
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    box-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 30px rgba(0, 242, 254, 0.6);
-  }
-}
+/* Eliminada animación infinite para mejor rendimiento móvil */
+/* El neón solo aparece en hover/focus, no en animación constante */
 
 /* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÓN ==================== */
-/* Description fields - Better spacing and alignment */
+/* Description fields - Better spacing and alignment - Sin !important */
 .description-field {
-  flex: 1 1 auto !important;
-  min-width: 200px !important;
-  max-width: 100% !important;
-  margin-bottom: 0.5rem !important;
+  flex: 1 1 auto;
+  min-width: 200px;
+  max-width: 100%;
+  margin-bottom: 0.5rem;
 }
 
 .description-field input {
-  width: 100% !important;
+  width: 100%;
 }
 
 /* Container for dynamic rows - Better flexbox distribution */
 .dynamic-element > div {
-  display: flex !important;
-  flex-wrap: wrap !important;
-  gap: 0.75rem !important;
-  align-items: flex-end !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
 }
 
 /* Specific description field containers */
 .rep-search-container,
 .srv-input-container,
 .otr-search-container {
-  flex: 1 1 auto !important;
-  min-width: 200px !important;
-  max-width: 100% !important;
-  position: relative !important;
+  flex: 1 1 auto;
+  min-width: 200px;
+  max-width: 100%;
+  position: relative;
 }
 
 /* Responsive adjustments for description fields */
@@ -217,8 +275,8 @@ input:disabled, select:disabled, textarea:disabled {
   .rep-search-container,
   .srv-input-container,
   .otr-search-container {
-    min-width: 180px !important;
-    flex: 1 1 45% !important;
+    min-width: 180px;
+    flex: 1 1 45%;
   }
 }
 
@@ -227,34 +285,34 @@ input:disabled, select:disabled, textarea:disabled {
   .rep-search-container,
   .srv-input-container,
   .otr-search-container {
-    min-width: 100% !important;
-    flex: 1 1 100% !important;
-    margin-bottom: 1rem !important;
+    min-width: 100%;
+    flex: 1 1 100%;
+    margin-bottom: 1rem;
   }
   
   .dynamic-element > div {
-    gap: 1rem !important;
+    gap: 1rem;
   }
   
   /* Stack all fields on mobile */
   .dynamic-element > div > div {
-    width: 100% !important;
-    flex: 1 1 100% !important;
+    width: 100%;
+    flex: 1 1 100%;
   }
 }
 
 @media (max-width: 640px) {
   .dynamic-element > div {
-    padding: 0.75rem !important;
-    gap: 0.875rem !important;
+    padding: 0.75rem;
+    gap: 0.875rem;
   }
   
   .description-field input,
   .rep-search-container input,
   .srv-input-container input,
   .otr-search-container input {
-    padding: 12px 14px !important;
-    font-size: 15px !important;
+    padding: 12px 14px;
+    font-size: 15px;
   }
 }
 
@@ -263,39 +321,92 @@ input:disabled, select:disabled, textarea:disabled {
 .rep-search-container label,
 .srv-input-container label,
 .otr-search-container label {
-  margin-bottom: 0.5rem !important;
-  display: block !important;
+  margin-bottom: 0.5rem;
+  display: block;
 }
 
 /* Ensure proper alignment of description fields with other fields */
 .dynamic-element > div > div {
-  display: flex !important;
-  flex-direction: column !important;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Better gap distribution for field groups */
 @media (min-width: 769px) {
   .dynamic-element > div {
-    gap: 1rem !important;
+    gap: 1rem;
   }
 }
 
 /* Improved spacing for description fields on larger screens */
 @media (min-width: 1025px) {
   .rep-search-container {
-    min-width: 320px !important;
-    flex: 1 1 35% !important;
+    min-width: 320px;
+    flex: 1 1 35%;
   }
   
   .srv-input-container {
-    min-width: 380px !important;
-    flex: 1 1 40% !important;
+    min-width: 380px;
+    flex: 1 1 40%;
   }
   
   .otr-search-container {
-    min-width: 240px !important;
-    flex: 1 1 30% !important;
+    min-width: 240px;
+    flex: 1 1 30%;
   }
+}
+
+/* ==================== BOTONES MODERNOS CON BORDE ILUMINADO ==================== */
+.btn-modern-add {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%);
+  border: 1px solid rgba(34, 211, 238, 0.5);
+  box-shadow: 
+    0 0 8px rgba(34, 211, 238, 0.3),
+    0 0 16px rgba(34, 211, 238, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-modern-add::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.4s;
+}
+
+.btn-modern-add:hover::before {
+  left: 100%;
+}
+
+.btn-modern-add:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 1) 0%, rgba(5, 150, 105, 1) 100%);
+  border-color: rgba(34, 211, 238, 0.8);
+  box-shadow: 
+    0 0 12px rgba(34, 211, 238, 0.5),
+    0 0 24px rgba(34, 211, 238, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn-modern-add:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 
+    0 0 6px rgba(34, 211, 238, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-modern-add:focus {
+  outline: none;
+  box-shadow: 
+    0 0 10px rgba(34, 211, 238, 0.4),
+    0 0 0 2px rgba(34, 211, 238, 0.25);
 }
 </style>
 
@@ -320,7 +431,7 @@ input:disabled, select:disabled, textarea:disabled {
       <form id="language-form-doc" action="/i18n/setlang/" method="post" class="inline">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <input type="hidden" name="language" id="language-input-doc" value="{% if is_cl == 'CL' %}es{% else %}{{ LANGUAGE_CODE|default:'en' }}{% endif %}">
+        <input type="hidden" name="language" id="language-input-doc" value="{{ LANGUAGE_CODE|default:'es' }}">
         <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50" style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
           <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
                   class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
@@ -336,8 +447,8 @@ input:disabled, select:disabled, textarea:disabled {
       </form>
       
       <label class="flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
-        <input type="checkbox" id="id_pagado" name="pagado" class="mr-2 form-control focus:outline-none focus:ring-2 focus:ring-cyan-400/60">
-        {% if is_cl == 'CL' %}Documento pagado{% else %}{% trans "Document paid" %}{% endif %}
+        {{ form.pagado }}
+        {% trans "Document paid" %}
       </label>
     </div>
   </div>
@@ -346,6 +457,220 @@ input:disabled, select:disabled, textarea:disabled {
 {% endwith %}
 
 <script>
+// Funciones para abrir modales de cliente y vehículo - Disponibles inmediatamente
+(function() {
+  'use strict';
+  
+  function openClienteModal() {
+    try {
+      const currentPath = window.location.pathname || '/cl/documentos/form/';
+      const nextUrl = encodeURIComponent(currentPath);
+      
+      // Parsear el path: /cl/documentos/form/ -> ['cl', 'documentos', 'form']
+      const pathParts = currentPath.split('/').filter(function(p) { return p && p.length > 0; });
+      
+      // Detectar país e idioma desde el path
+      let countryPrefix = 'cl';
+      let langPrefix = 'es';
+      
+      if (pathParts.length > 0) {
+        countryPrefix = pathParts[0];
+        if (pathParts.length > 1 && (pathParts[1] === 'es' || pathParts[1] === 'en')) {
+          langPrefix = pathParts[1];
+        }
+      }
+      
+      const createUrl = '/' + countryPrefix + '/' + langPrefix + '/clientes/crear/?next=' + nextUrl;
+      console.log('🔵 Abriendo modal de cliente:', createUrl);
+      window.location.href = createUrl;
+    } catch (error) {
+      console.error('❌ Error al abrir modal de cliente:', error);
+      alert('Error al abrir la página de crear cliente. Por favor, intente nuevamente.');
+    }
+  }
+
+  function openVehiculoModal() {
+    try {
+      const currentPath = window.location.pathname || '/cl/documentos/form/';
+      const nextUrl = encodeURIComponent(currentPath);
+      
+      // Obtener el cliente seleccionado
+      // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
+      let clienteId = null;
+      const clienteSelect = document.getElementById('id_cliente');
+      
+      if (clienteSelect) {
+        // Intentar obtener el valor desde Select2 si está inicializado
+        if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
+          clienteId = jQuery(clienteSelect).val();
+          console.log('👤 Cliente obtenido desde Select2:', clienteId);
+        } else {
+          // Fallback: obtener del campo directamente
+          clienteId = clienteSelect.value || null;
+          console.log('👤 Cliente obtenido del campo:', clienteId);
+        }
+      }
+      
+      // Si aún no hay valor, intentar desde el campo oculto de Select2
+      if (!clienteId && window.jQuery) {
+        const select2Container = jQuery('#id_cliente').next('.select2-container');
+        if (select2Container.length) {
+          const select2Selection = select2Container.find('.select2-selection__rendered');
+          const dataId = select2Selection.attr('data-id');
+          if (dataId) {
+            clienteId = dataId;
+            console.log('👤 Cliente obtenido desde data-id:', clienteId);
+          }
+        }
+      }
+      
+      // LÓGICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+      // Si empieza con /us/, usar /us/en/
+      let countryPrefix = 'cl';
+      let langPrefix = 'es';
+      
+      if (currentPath.indexOf('/cl/') === 0) {
+        countryPrefix = 'cl';
+        langPrefix = 'es';
+      } else if (currentPath.indexOf('/us/') === 0) {
+        countryPrefix = 'us';
+        langPrefix = 'en';
+      }
+      
+      let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
+      
+      // Agregar cliente_id si está seleccionado
+      if (clienteId) {
+        createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+        console.log('👤 Cliente seleccionado:', clienteId);
+      }
+      
+      console.log('🚗 Abriendo modal de vehículo:', createUrl);
+      window.location.href = createUrl;
+    } catch (error) {
+      console.error('❌ Error al abrir modal de vehículo:', error);
+      alert('Error al abrir la página de crear vehículo. Por favor, intente nuevamente.');
+    }
+  }
+
+  // Hacer funciones disponibles globalmente inmediatamente
+  window.openClienteModal = openClienteModal;
+  window.openVehiculoModal = openVehiculoModal;
+  
+  // Verificar que las funciones estén disponibles
+  console.log('✅ Funciones de modal disponibles:', {
+    openClienteModal: typeof window.openClienteModal,
+    openVehiculoModal: typeof window.openVehiculoModal
+  });
+})();
+
+// Función global para manejar el click del botón de vehículo
+// Esta función se llama directamente desde el onclick del botón como respaldo
+function handleNuevoVehiculoClick(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  
+  console.log('🚗 handleNuevoVehiculoClick llamado');
+  
+  try {
+    // Intentar usar openVehiculoModal si está disponible
+    if (window.openVehiculoModal && typeof window.openVehiculoModal === 'function') {
+      console.log('✅ Usando openVehiculoModal desde handleNuevoVehiculoClick');
+      window.openVehiculoModal();
+      return false;
+    }
+    
+    // Fallback: construir URL manualmente
+    const currentPath = window.location.pathname || '/cl/documentos/form/';
+    const nextUrl = encodeURIComponent(currentPath);
+    
+    // Obtener el cliente seleccionado
+    // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
+    let clienteId = null;
+    const clienteSelect = document.getElementById('id_cliente');
+    
+    console.log('🔍 Buscando cliente seleccionado...');
+    console.log('🔍 Campo cliente encontrado:', !!clienteSelect);
+    
+    if (clienteSelect) {
+      console.log('🔍 Valor directo del campo:', clienteSelect.value);
+      console.log('🔍 jQuery disponible:', !!window.jQuery);
+      
+      // Intentar obtener el valor desde Select2 si está inicializado
+      if (window.jQuery) {
+        const $clienteSelect = jQuery(clienteSelect);
+        console.log('🔍 Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
+        
+        if ($clienteSelect.hasClass('select2-hidden-accessible')) {
+          clienteId = $clienteSelect.val();
+          console.log('✅ Cliente obtenido desde Select2:', clienteId);
+        } else {
+          // Fallback: obtener del campo directamente
+          clienteId = clienteSelect.value || null;
+          console.log('✅ Cliente obtenido del campo directamente:', clienteId);
+        }
+      } else {
+        // Sin jQuery, obtener del campo directamente
+        clienteId = clienteSelect.value || null;
+        console.log('✅ Cliente obtenido del campo (sin jQuery):', clienteId);
+      }
+    }
+    
+    // Si aún no hay valor, intentar desde el campo oculto de Select2
+    if (!clienteId && window.jQuery) {
+      console.log('🔍 Intentando obtener cliente desde Select2 rendered...');
+      const select2Container = jQuery('#id_cliente').next('.select2-container');
+      if (select2Container.length) {
+        const select2Selection = select2Container.find('.select2-selection__rendered');
+        const select2Text = select2Selection.text();
+        console.log('🔍 Texto en Select2:', select2Text);
+        // Intentar obtener el ID desde el atributo data
+        const dataId = select2Selection.attr('data-id');
+        if (dataId) {
+          clienteId = dataId;
+          console.log('✅ Cliente obtenido desde data-id:', clienteId);
+        }
+      }
+    }
+    
+    console.log('🔍 Cliente ID final:', clienteId);
+    
+    // LÓGICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+    // Si empieza con /us/, usar /us/en/
+    let countryPrefix = 'cl';
+    let langPrefix = 'es';
+    
+    if (currentPath.indexOf('/cl/') === 0) {
+      countryPrefix = 'cl';
+      langPrefix = 'es';
+    } else if (currentPath.indexOf('/us/') === 0) {
+      countryPrefix = 'us';
+      langPrefix = 'en';
+    }
+    
+    let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
+    
+    // Agregar cliente_id si está seleccionado
+    if (clienteId) {
+      createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+      console.log('👤 Cliente seleccionado:', clienteId);
+    }
+    
+    console.log('🚗 Navegando a (desde handleNuevoVehiculoClick):', createUrl);
+    window.location.href = createUrl;
+    return false;
+  } catch (error) {
+    console.error('❌ Error en handleNuevoVehiculoClick:', error);
+    alert('Error al abrir la página de crear vehículo. Por favor, intente nuevamente.');
+    return false;
+  }
+}
+
+// Hacer la función disponible globalmente
+window.handleNuevoVehiculoClick = handleNuevoVehiculoClick;
+
 function submitLanguageDoc(lang) {
   document.getElementById('language-input-doc').value = lang;
   document.getElementById('language-form-doc').submit();
@@ -373,21 +698,23 @@ function submitLanguageDoc(lang) {
   <!-- System messages - Design System -->
   {% if messages %}
     {% for message in messages %}
-      {% if message.tags == 'success' %}
-      <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-        <span class="text-2xl flex-shrink-0">✅</span>
-        <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
-      </div>
-      {% elif message.tags == 'error' %}
-      <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-        <span class="text-2xl flex-shrink-0">❌</span>
-        <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
-      </div>
-      {% else %}
-      <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-        <span class="text-2xl flex-shrink-0">ℹ️</span>
-        <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
-      </div>
+      {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Ha iniciado sesión exitosamente" not in message|stringformat:"s" and "Ha cerrado sesión" not in message|stringformat:"s" and "iniciado sesión exitosamente" not in message|stringformat:"s" and "cerrado sesión" not in message|stringformat:"s" and "Logo actualizado exitosamente" not in message|stringformat:"s" and "Tema y colores guardados exitosamente" not in message|stringformat:"s" and "Logo subido exitosamente" not in message|stringformat:"s" and "actualizada exitosamente" not in message|stringformat:"s" %}
+        {% if message.tags == 'success' %}
+        <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">✅</span>
+          <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
+        </div>
+        {% elif message.tags == 'error' %}
+        <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">❌</span>
+          <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
+        </div>
+        {% else %}
+        <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">ℹ️</span>
+          <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
+        </div>
+        {% endif %}
       {% endif %}
     {% endfor %}
   {% endif %}
@@ -397,7 +724,7 @@ function submitLanguageDoc(lang) {
     <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-start gap-3">
       <span class="text-2xl flex-shrink-0">❌</span>
       <div class="flex-1">
-        <p class="text-sm sm:text-base text-red-200 font-semibold mb-1">{% if is_cl == 'CL' %}Errores de validación{% else %}{% trans "Validation errors" %}{% endif %}:</p>
+        <p class="text-sm sm:text-base text-red-200 font-semibold mb-1">{% trans "Validation errors" %}:</p>
         <div class="text-sm text-red-300">{{ form.errors }}</div>
       </div>
     </div>
@@ -411,34 +738,30 @@ function submitLanguageDoc(lang) {
 
       <!-- Columna 1: FECHA primero + TIPO + NÚMERO -->
       <div class="space-y-3 sm:space-y-4">
-                <label for="id_fecha_emision" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Fecha de emisión{% else %}{% trans "Issue Date" %}{% endif %}</label>
+                <label for="id_fecha_emision" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Issue Date" %}</label>
                 <input id="id_fecha_emision" type="date" name="fecha_emision" class="form-control w-full text-base"
                        value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
 
-        <label for="id_tipo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Tipo de documento{% else %}{% trans "Document Type" %}{% endif %}</label>
-        <select id="id_tipo" name="tipo" class="form-select w-full text-base">
-          <option value="OT" {% if form.tipo.value == 'OT' or documento.tipo == 'OT' %}selected{% endif %}>{{ ui_labels.document_type_work_order }}</option>
-          <option value="FAC" {% if form.tipo.value == 'FAC' or documento.tipo == 'FAC' %}selected{% endif %}>{{ ui_labels.document_type_invoice }}</option>
-          <option value="PRES" {% if form.tipo.value == 'PRES' or documento.tipo == 'PRES' %}selected{% endif %}>{{ ui_labels.document_type_estimate }}</option>
-        </select>
+        <label for="id_tipo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Document Type" %}</label>
+        {{ form.tipo }}
 
         <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{{ ui_labels.document_number }}</label>
         <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-2 sm:py-3 text-sm sm:text-base" id="id_numero">
-          {% if es_edicion and documento.numero_documento %}{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% elif is_cl == 'CL' %}Se generará automáticamente{% else %}{% trans "Will be generated automatically" %}{% endif %}
+          {% if es_edicion and documento.numero_documento %}{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}{% trans "Will be generated automatically" %}{% endif %}
         </div>
       </div>
 
       <!-- Columna 2: Cliente/Vehículo -->
       <div class="space-y-3 sm:space-y-4">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-          <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Cliente{% else %}{% trans "Client" %}{% endif %}</label>
-          <button type="button" onclick="openClienteModal()" class="px-4 py-2 sm:px-3 sm:py-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold rounded-lg text-sm sm:text-xs transition-all w-full sm:w-auto">
-            {% if is_cl == 'CL' %}➕ Nuevo{% else %}➕ {% trans "New" %}{% endif %}
+          <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Client" %}</label>
+          <button type="button" id="btn-nuevo-cliente" class="btn-green-gradient">
+            ➕ {% trans "New Client" %}
           </button>
         </div>
         <div class="relative">
           <input type="text" id="cliente-busqueda" class="form-control w-full"
-                 placeholder="{% if is_cl == 'CL' %}Escribe para buscar clientes…{% else %}{% trans 'Type to search clients...' %}{% endif %}"
+                 placeholder="{% trans 'Type to search clients...' %}"
                  autocomplete="off"
                  oninput="window.handleClienteInput?.(this.value)"
                  onfocus="window.handleClienteFocus?.(this.value)"
@@ -447,7 +770,7 @@ function submitLanguageDoc(lang) {
         </div>
 
         <select id="id_cliente" name="cliente" class="form-select w-full hidden">
-          <option value="">{% if is_cl == 'CL' %}Selecciona cliente…{% else %}{% trans "Select client..." %}{% endif %}</option>
+          <option value="">{% trans "Select client..." %}</option>
         </select>
 
         <!-- Selected client information -->
@@ -461,14 +784,12 @@ function submitLanguageDoc(lang) {
 
         {% if ui_config.show_vehicle %}
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-          <label for="id_vehiculo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Vehículo{% else %}{% trans "Vehicle" %}{% endif %}</label>
-          <button type="button" onclick="openVehiculoModal()" class="px-4 py-2 sm:px-3 sm:py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-lg text-sm sm:text-xs transition-all w-full sm:w-auto">
-            {% if is_cl == 'CL' %}🚗 Nuevo{% else %}🚗 {% trans "New" %}{% endif %}
+          <label for="id_vehiculo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Vehicle" %}</label>
+          <button type="button" id="btn-nuevo-vehiculo" class="btn-green-gradient">
+            ➕ {% trans "New" %}
           </button>
         </div>
-        <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
-          <option value="">{% if is_cl == 'CL' %}Selecciona cliente primero…{% else %}{% trans "Select client first..." %}{% endif %}</option>
-        </select>
+        {{ form.vehiculo }}
         {% endif %}
       </div>
 
@@ -478,25 +799,32 @@ function submitLanguageDoc(lang) {
         <label for="id_tecnico_responsable" class="block text-cyan-200 font-semibold text-sm sm:text-base">
           {{ current_label }}
         </label>
-        <select name="tecnico_responsable" id="id_tecnico_responsable" class="form-select w-full text-base">
-          <option value="">{% if is_cl == 'CL' %}Selecciona…{% else %}{% trans "Select..." %}{% endif %}</option>
-          {% for t in tecnicos %}
-            <option value="{{ t.id }}" {% if form.tecnico_responsable.value == t.id|stringformat:"s" or documento.tecnico_responsable_id == t.id %}selected{% endif %}>{{ t.nombre }}</option>
-          {% endfor %}
-        </select>
+        {{ form.tecnico_responsable }}
         {% endwith %}
 
-        <label for="id_payment_status" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Estado de pago{% else %}{% trans "Payment Status" %}{% endif %}</label>
-        <select id="id_payment_status" name="payment_status" class="form-select w-full text-base">
-          <option value="pending">{% if is_cl == 'CL' %}Pendiente{% else %}{% trans "Pending" %}{% endif %}</option>
-          <option value="paid">{% if is_cl == 'CL' %}Pagado{% else %}{% trans "Paid" %}{% endif %}</option>
-          <option value="partial">{% if is_cl == 'CL' %}Parcial{% else %}{% trans "Partial" %}{% endif %}</option>
-          <option value="canceled">{% if is_cl == 'CL' %}Anulado{% else %}{% trans "Canceled" %}{% endif %}</option>
-        </select>
+        <label for="id_payment_status" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Payment Status" %}</label>
+        {{ form.payment_status }}
 
         {% if ui_config.show_kilometraje %}
-        <label for="id_kilometraje" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Kilometraje{% else %}{% trans "Mileage" %}{% endif %}</label>
-        <input id="id_kilometraje" type="number" name="kilometraje" min="0" value="{% if es_edicion %}{{ documento.kilometraje|default:kilometraje|default_if_none:'' }}{% endif %}" class="form-control w-full text-base" placeholder="{% if is_cl == 'CL' %}0{% else %}0{% endif %}">
+        <div class="flex flex-col gap-2">
+          <label for="{{ form.kilometraje.id_for_label }}" class="block text-cyan-200 font-semibold text-sm sm:text-base">
+            {% trans "Mileage" %} 
+            {% get_current_language as lang %}
+            {% if lang == 'es' %}(km){% else %}(mi){% endif %}
+          </label>
+          <div class="relative">
+            {{ form.kilometraje }}
+            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-300 font-semibold pointer-events-none">
+              {% get_current_language as lang %}
+              {% if lang == 'es' %}km{% else %}mi{% endif %}
+            </span>
+          </div>
+          {% if form.kilometraje.errors %}
+            <div class="text-red-400 text-xs italic mt-1 bg-red-900/20 p-2 rounded border border-red-500/50">
+              {{ form.kilometraje.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
         {% endif %}
       </div>
     </div>
@@ -504,17 +832,20 @@ function submitLanguageDoc(lang) {
     <!-- Dynamic sections -->
     <div class="space-y-4 sm:space-y-6">
       <div class="seccion-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
-        <h3 class="text-lg sm:text-xl font-semibold text-cyan-300 mb-4 flex items-center gap-2">{% if is_cl == 'CL' %}🔧 Repuestos y servicios{% else %}🔧 {% trans "Parts & Services" %}{% endif %}</h3>
+        <h3 class="text-lg sm:text-xl font-semibold text-cyan-300 mb-4 flex items-center gap-2">🔧 {% trans "Parts & Services" %}</h3>
         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
           {% if ui_config.show_repuestos %}
-          <button type="button" id="add-repuesto" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addRepuestoRow()">{% if is_cl == 'CL' %}+ Agregar repuesto{% else %}+ {% trans "Add Part" %}{% endif %}</button>
+          <button type="button" id="add-repuesto" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addRepuestoRow()">+ {% trans "Add Part" %}</button>
           {% endif %}
           {% if ui_config.show_services %}
-          <button type="button" id="add-servicio" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addServicioRow()">{% if is_cl == 'CL' %}+ Agregar servicio{% else %}+ {% trans "Add Service" %}{% endif %}</button>
+          <button type="button" id="add-servicio" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addServicioRow()">+ {% trans "Add Service" %}</button>
           {% endif %}
           {% if ui_config.show_otros_servicios %}
-          <button type="button" id="add-otro" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addOtroRow()">{% if is_cl == 'CL' %}+ Agregar otros servicios{% else %}+ {% trans "Add Other Services" %}{% endif %}</button>
+          <button type="button" id="add-otro" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addOtroRow()">+ {% trans "Add Other Services" %}</button>
           {% endif %}
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto text-center">
+            🌐 {% trans "Go to Other Services" %}
+          </a>
         </div>
 
         <!-- Parts container -->
@@ -541,8 +872,8 @@ function submitLanguageDoc(lang) {
 
       <!-- Observations -->
       <div class="observaciones-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
-        <label for="id_observaciones" class="block text-cyan-200 font-semibold text-sm sm:text-base mb-3">{% if is_cl == 'CL' %}Observaciones{% else %}{% trans "Observations" %}{% endif %}</label>
-        <textarea id="id_observaciones" name="observaciones" rows="4" class="form-control w-full text-base focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900" placeholder="{% if is_cl == 'CL' %}Observaciones opcionales — puedes dejar este campo vacío si no hay información adicional.{% else %}{% trans "Optional observations - Can be left empty if no additional information..." %}{% endif %}">{{ form.observaciones.value|default_if_none:'' }}</textarea>
+        <label for="id_observaciones" class="block text-cyan-200 font-semibold text-sm sm:text-base mb-3">{% trans "Observations" %}</label>
+        {{ form.observaciones }}
       </div>
     </div>
 
@@ -550,25 +881,27 @@ function submitLanguageDoc(lang) {
     <div class="totales-section mt-6 sm:mt-8 pt-4 sm:pt-6 border-t-2 border-cyan-500/30">
       <div class="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 rounded-2xl p-4 sm:p-6 border border-cyan-400/50 shadow-lg">
         <h3 class="text-xl sm:text-2xl font-bold text-cyan-300 mb-4 sm:mb-6 text-center">
-          {% if is_cl == 'CL' %}💰 Resumen de Totales{% else %}💰 {% trans "Totals Summary" %}{% endif %}
+          💰 {% trans "Totals Summary" %}
         </h3>
         
-        <!-- VAT checkbox -->
+        {# Checkbox global de aplicar impuestos - Controla todos los checkboxes de tax_lines #}
+        {% if ui_config.tax_lines|length > 0 %}
         <div class="mb-6 flex justify-center">
-          <label for="id_apply_vat" class="flex items-center text-cyan-200 bg-cyan-900/40 px-4 py-2 rounded-lg border border-cyan-400/50 cursor-pointer hover:bg-cyan-900/60 transition-all">
-            <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2 w-5 h-5 accent-cyan-400 cursor-pointer">
-            <span class="font-semibold">{% if is_cl == 'CL' %}Aplicar impuesto{% else %}{% trans "Apply tax" %}{% endif %}</span>
+          <label class="flex items-center text-cyan-200 bg-cyan-900/40 px-4 py-2 rounded-lg border border-cyan-400/50 cursor-pointer hover:bg-cyan-900/60 transition-all">
+            <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2 w-5 h-5 accent-cyan-400 cursor-pointer" onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
+            <span class="font-semibold">{% trans "Apply all taxes" %}</span>
           </label>
         </div>
+        {% endif %}
 
-        <!-- Totals Grid -->
+        <!-- Totals Grid - Estructura Dinámica Modular -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <!-- Parts Subtotal -->
           {% if ui_config.show_repuestos %}
           <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
             <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% if is_cl == 'CL' %}Subtotal Repuestos{% else %}{% trans "Parts Subtotal" %}{% endif %}</span>
-              <span id="t_repuestos" class="text-cyan-300 font-bold text-lg">$0</span>
+              <span class="text-cyan-200 text-sm font-semibold">{% trans "Parts Subtotal" %}</span>
+              <span id="t_repuestos" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
             </div>
           </div>
           {% endif %}
@@ -577,8 +910,8 @@ function submitLanguageDoc(lang) {
           {% if ui_config.show_services %}
           <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
             <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% if is_cl == 'CL' %}Subtotal Servicios{% else %}{% trans "Services Subtotal" %}{% endif %}</span>
-              <span id="t_servicios" class="text-cyan-300 font-bold text-lg">$0</span>
+              <span class="text-cyan-200 text-sm font-semibold">{% trans "Services Subtotal" %}</span>
+              <span id="t_servicios" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
             </div>
           </div>
           {% endif %}
@@ -587,29 +920,36 @@ function submitLanguageDoc(lang) {
           {% if ui_config.show_otros_servicios %}
           <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
             <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% if is_cl == 'CL' %}Subtotal Servicios Externos{% else %}{% trans "Other Services Subtotal" %}{% endif %}</span>
-              <span id="t_otros" class="text-cyan-300 font-bold text-lg">$0</span>
+              <span class="text-cyan-200 text-sm font-semibold">{% trans "Other Services Subtotal" %}</span>
+              <span id="t_otros" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
             </div>
           </div>
           {% endif %}
           
-          <!-- Tax -->
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+          {# Líneas de Impuestos Dinámicas - El template NO sabe qué es IVA o Sales Tax #}
+          {% for tax_line in ui_config.tax_lines %}
+          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30 tax-line" data-tax-id="{{ tax_line.id }}">
             <div class="flex justify-between items-center">
               <label class="flex items-center text-cyan-200 text-sm font-semibold cursor-pointer">
-                <input type="checkbox" id="include_tax" checked class="mr-2 w-4 h-4 accent-cyan-400 cursor-pointer">
-                <span>{% if is_cl == 'CL' %}IVA{% else %}{% trans "Tax" %}{% endif %}</span>
+                <input type="checkbox" 
+                       id="include_{{ tax_line.id }}" 
+                       checked 
+                       class="mr-2 w-4 h-4 accent-cyan-400 cursor-pointer tax-checkbox"
+                       data-tax-id="{{ tax_line.id }}"
+                       data-tax-rate="{{ tax_line.rate }}">
+                <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
               </label>
-              <span id="t_iva" class="text-cyan-300 font-bold text-lg">$0</span>
+              <span id="t_{{ tax_line.id }}" class="text-cyan-300 font-bold text-lg calculated-field" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
             </div>
           </div>
+          {% endfor %}
         </div>
 
         <!-- Grand Total -->
         <div class="bg-gradient-to-r from-cyan-600/30 to-blue-600/30 rounded-lg p-5 border-2 border-cyan-400 shadow-xl">
           <div class="flex justify-between items-center">
-            <span class="text-white font-bold text-xl">{% if is_cl == 'CL' %}Total General{% else %}{% trans "Grand Total" %}{% endif %}</span>
-            <span id="t_total" class="text-white font-bold text-2xl">$0</span>
+            <span class="text-white font-bold text-xl">{% trans "Grand Total" %}</span>
+            <span id="t_total" class="text-white font-bold text-2xl calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
           </div>
         </div>
       </div>
@@ -618,9 +958,9 @@ function submitLanguageDoc(lang) {
     <!-- Action buttons - Design System -->
     <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
       <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-        <a href="{% country_url 'documentos:lista_documentos' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">{% if is_cl == 'CL' %}← Volver{% else %}← {% trans "Back" %}{% endif %}</a>
+        <a href="{% country_url 'documentos:lista_documentos' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">← {% trans "Back" %}</a>
         <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">
-          {% if is_cl == 'CL' %}🌐 Ir a otros servicios{% else %}🌐 {% trans "Go to Other Services" %}{% endif %}
+          🌐 {% trans "Go to Other Services" %}
         </a>
       </div>
       <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">💾 {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{{ ui_labels.create_button }}{% endif %}</button>
@@ -638,6 +978,7 @@ function submitLanguageDoc(lang) {
 {{ repuestos_prefetch|json_script:"prefetchRepuestos" }}
 {{ servicios_prefetch|json_script:"prefetchServicios" }}
 {{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
+{{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
 
 {% endwith %}
 {% endwith %}
@@ -645,6 +986,7 @@ function submitLanguageDoc(lang) {
 
 {% block extra_js %}
 {{ block.super }}
+<script src="{% static 'marketplace_tooltip.js' %}"></script>
 <script>
 function initDocumentFormScript(){
   // Evita doble inicialización
@@ -709,8 +1051,22 @@ function initDocumentFormScript(){
       EG.cfg.URL_SERVICE_SEARCH   = FORM.dataset.urlServiceSearch || `${base}/api/servicios/`;
       EG.cfg.URL_OUTSOURCED_SERVICES = FORM.dataset.urlOutsourcedServices || `${base}/api/otros-servicios/`;
     }
-    // Sales tax configurable (ej.: desde CompanySettings)
+    // Sales tax configurable (ej.: desde CompanySettings) - Legacy, mantener por compatibilidad
     EG.cfg.salesTax = typeof EG.cfg.salesTax === 'number' ? EG.cfg.salesTax : 0.08;
+    
+    // Inicializar taxLines desde ui_config (pasado desde el backend)
+    // Esto permite que el JavaScript calcule impuestos dinámicamente sin conocer el país
+    const taxLinesScript = document.getElementById('uiConfigTaxLines');
+    if (taxLinesScript) {
+      try {
+        EG.cfg.taxLines = JSON.parse(taxLinesScript.textContent);
+      } catch (e) {
+        console.error('Error parsing taxLines:', e);
+        EG.cfg.taxLines = [];
+      }
+    } else {
+      EG.cfg.taxLines = [];
+    }
   })();
 
   // Exponer seguro
@@ -870,6 +1226,19 @@ function showFieldError(el, msg){
 function setText(selOrEl, txt) {
   const el = typeof selOrEl==='string' ? $(selOrEl) : selOrEl;
   if (el) el.textContent = txt;
+}
+
+/**
+ * Normaliza un servicio para asegurar que siempre tenga 'id' y 'pk'
+ * Esto resuelve inconsistencias entre APIs que devuelven 'id' vs 'pk'
+ */
+function normalizeServicio(servicio) {
+  if (!servicio || typeof servicio !== 'object') return servicio;
+  return {
+    ...servicio,
+    id: servicio.id || servicio.pk || '',
+    pk: servicio.pk || servicio.id || '',
+  };
 }
 
 const MONEY_FORMATS = {
@@ -1069,10 +1438,19 @@ async function seleccionarCliente({id, nombre, email, telefono}){
   
   // ⚡ IMPORTANTE: Cargar vehículos del cliente seleccionado
   console.log(`🔄 Iniciando carga de vehículos para cliente ${id}...`);
-  await cargarVehiculosPorCliente(id);
+  
+  // Verificar si hay un vehículo a preseleccionar (desde URL o documentoData)
+  const urlParams = new URLSearchParams(window.location.search);
+  const newVehiculoId = urlParams.get('new_vehiculo_id');
+  const prefillVehiculoId = (typeof documentoData !== 'undefined' && documentoData.prefillVehiculoId) 
+    ? documentoData.prefillVehiculoId 
+    : null;
+  const vehiculoIdToSelect = newVehiculoId || prefillVehiculoId || null;
+  
+  await cargarVehiculosPorCliente(id, vehiculoIdToSelect);
 }
 
-async function cargarVehiculosPorCliente(clienteId){
+async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
   getClienteElements();
   if (!vehiculoSelect) {
     console.warn('⚠️ Elemento #id_vehiculo no encontrado');
@@ -1085,11 +1463,15 @@ async function cargarVehiculosPorCliente(clienteId){
     return;
   }
 
-  console.log(`🚗 Cargando vehículos para cliente ID: ${clienteId}`);
+  console.log(`🚗 Cargando vehículos para cliente ID: ${clienteId}${vehiculoIdToSelect ? ` (preseleccionar: ${vehiculoIdToSelect})` : ''}`);
 
   const alreadyHasOptions = vehiculoSelect.options && vehiculoSelect.options.length > 1;
   if (alreadyHasOptions && vehiculoSelect.dataset.source === 'form') {
     console.log('ℹ️ Ya tiene opciones desde el formulario, omitiendo carga');
+    // Aún así, intentar preseleccionar si se especificó
+    if (vehiculoIdToSelect) {
+      setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
+    }
     return;
   }
 
@@ -1104,6 +1486,10 @@ async function cargarVehiculosPorCliente(clienteId){
     vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
     vehiculoSelect.dataset.source = 'prefetch';
     vehiculoSelect.disabled = false;
+    // Preseleccionar vehículo si se especificó
+    if (vehiculoIdToSelect) {
+      setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
+    }
     return; // Salir temprano si encontramos en prefetch
   }
 
@@ -1142,6 +1528,11 @@ async function cargarVehiculosPorCliente(clienteId){
       vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
       vehiculoSelect.dataset.source = 'fetch';
       console.log(`✅ ${items.length} vehículos cargados exitosamente`);
+      
+      // Preseleccionar vehículo si se especificó
+      if (vehiculoIdToSelect) {
+        setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
+      }
     }
   }catch(err){
     console.error('❌ Error cargando vehículos:', err);
@@ -1150,6 +1541,40 @@ async function cargarVehiculosPorCliente(clienteId){
     vehiculoSelect.dataset.source = 'error';
   }finally{
     vehiculoSelect.disabled = false;
+  }
+}
+
+// Función auxiliar para preseleccionar un vehículo
+function preseleccionarVehiculo(vehiculoId) {
+  getClienteElements();
+  if (!vehiculoSelect) {
+    console.warn('⚠️ Elemento #id_vehiculo no encontrado para preselección');
+    return;
+  }
+  
+  const vehiculoIdStr = String(vehiculoId);
+  console.log(`🎯 Intentando preseleccionar vehículo ID: ${vehiculoIdStr}`);
+  
+  // Verificar si el vehículo existe en las opciones
+  const option = Array.from(vehiculoSelect.options).find(opt => String(opt.value) === vehiculoIdStr);
+  
+  if (option) {
+    vehiculoSelect.value = vehiculoIdStr;
+    vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado exitosamente`);
+  } else {
+    console.warn(`⚠️ Vehículo ${vehiculoIdStr} no encontrado en las opciones disponibles`);
+    // Intentar nuevamente después de un breve delay (por si los vehículos aún se están cargando)
+    setTimeout(() => {
+      const retryOption = Array.from(vehiculoSelect.options).find(opt => String(opt.value) === vehiculoIdStr);
+      if (retryOption) {
+        vehiculoSelect.value = vehiculoIdStr;
+        vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado en reintento`);
+      } else {
+        console.error(`❌ No se pudo preseleccionar vehículo ${vehiculoIdStr} después del reintento`);
+      }
+    }, 500);
   }
 }
 
@@ -1171,35 +1596,54 @@ function recalcTotales(){
 
           console.log(`Totales: rep=${rep}, serv=${serv}, otros=${otros}`);
 
-          // Obtener checkbox de include_tax (el nuevo) o id_apply_vat (el viejo)
-          const includeTaxCheckbox = $('#include_tax') || $('#id_apply_vat');
-          const ivaOn = includeTaxCheckbox?.checked ?? false;
-          let tax = 0;
+          // Calcular impuestos dinámicamente desde ui_config.tax_lines
+          // El JavaScript NO sabe qué es IVA o Sales Tax, solo itera sobre tax_lines
+          let totalTaxes = 0;
+          const taxLines = window.EG?.cfg?.taxLines || [];
+          
+          taxLines.forEach(taxLine => {
+            const checkbox = document.getElementById(`include_${taxLine.id}`);
+            const isEnabled = checkbox?.checked ?? false;
+            
+            if (isEnabled) {
+              // Aplicar impuesto según applies_to
+              let baseAmount = 0;
+              if (taxLine.applies_to === 'repuestos') {
+                baseAmount = rep;
+              } else if (taxLine.applies_to === 'servicios') {
+                baseAmount = serv;
+              } else if (taxLine.applies_to === 'all') {
+                baseAmount = rep + serv + otros;
+              }
+              
+              const taxRate = Number(taxLine.rate) / 100; // Convertir porcentaje a decimal
+              const taxAmount = baseAmount * taxRate;
+              totalTaxes += taxAmount;
+              
+              // Actualizar display de esta línea de impuesto
+              setText(`#t_${taxLine.id}`, money(taxAmount));
+            } else {
+              // Si está deshabilitado, mostrar 0
+              setText(`#t_${taxLine.id}`, money(0));
+            }
+          });
 
-          if (COUNTRY_REF==='CL') {
-            tax = ivaOn ? rep * 0.19 : 0; // IVA 19% sólo repuestos
-          } else if (COUNTRY_REF==='US') {
-            const rate = Number(EG.cfg.salesTax ?? 0);
-            tax = ivaOn ? rep * rate : 0; // Tax sólo sobre repuestos
-          } else {
-            // Para otros países, también solo sobre repuestos
-            const rate = Number(EG.cfg.salesTax ?? 0);
-            tax = ivaOn ? rep * rate : 0;
-          }
-
+          // Actualizar subtotales
           setText('#t_repuestos', money(rep));
           setText('#t_servicios', money(serv));
           setText('#t_otros',     money(otros));
-          setText('#t_iva',       money(tax));
-          setText('#t_total',     money(rep + serv + otros + tax));
+          
+          // Calcular y mostrar total general
+          const grandTotal = rep + serv + otros + totalTaxes;
+          setText('#t_total', money(grandTotal));
         }
 window.recalcTotales = recalcTotales;
 
-// Agregar event listener al checkbox de TAX
-const includeTaxCheckbox = $('#include_tax');
-if (includeTaxCheckbox) {
-  includeTaxCheckbox.addEventListener('change', recalcTotales);
-}
+// Agregar event listeners a TODOS los checkboxes de impuestos dinámicamente
+// El JavaScript NO sabe cuántos impuestos hay, los detecta automáticamente
+document.querySelectorAll('.tax-checkbox').forEach(checkbox => {
+  checkbox.addEventListener('change', recalcTotales);
+});
 
 // ===============
 // FILAS DINÁMICAS
@@ -1530,7 +1974,19 @@ function setupRepuestoRow(row){
   inpCode?.addEventListener('input', (e)=>{
     clearTimeout(codeTimer);
     const value = e.target.value.trim();
-    codeTimer = setTimeout(()=> searchByCode(value), 250);
+    // Debounce mejorado: 400ms para reducir peticiones al servidor
+    codeTimer = setTimeout(()=> {
+      searchByCode(value);
+      // Consultar precios del marketplace si existe la funcionalidad
+      if (window.MarketplaceTooltip && value.length >= 3) {
+        // inpCode puede ser un objeto jQuery o un elemento DOM
+        const inputElement = (inpCode && inpCode.length && inpCode[0]) ? inpCode[0] : 
+                           (typeof inpCode === 'object' && inpCode.nodeType) ? inpCode : null;
+        if (inputElement) {
+          window.MarketplaceTooltip.consultarPrecios(value, inputElement);
+        }
+      }
+    }, 400); // Aumentado de 250ms a 400ms para mejor rendimiento
   });
 
   inpCode?.addEventListener('focus', ()=>{
@@ -1677,11 +2133,8 @@ function setupServicioRow(row){
               const items = Array.isArray(data)
                 ? data
                 : (data.servicios || data.results || []);
-              // Normalizar items: convertir 'pk' a 'id' si es necesario
-              const normalizedItems = items.map(item => ({
-                ...item,
-                id: item.id || item.pk || '',
-              }));
+              // Normalizar items usando función centralizada
+              const normalizedItems = items.map(normalizeServicio);
               if (normalizedItems.length) renderResultados(normalizedItems);
             }catch(err){
               console.error('servicios buscar:', err);
@@ -1702,14 +2155,15 @@ function setupServicioRow(row){
       return;
     }
     drop.innerHTML = lista.map(s => {
-      // Normalizar id (puede venir como 'id' o 'pk')
-      const servicioId = s.id || s.pk || '';
-      const precioBase = Number(s.precio_cliente ?? s.precio_sugerido ?? s.precio ?? 0);
+      // Normalizar servicio usando función centralizada
+      const servicio = normalizeServicio(s);
+      const servicioId = servicio.id || servicio.pk || '';
+      const precioBase = Number(servicio.precio_cliente ?? servicio.precio_sugerido ?? servicio.precio ?? 0);
       return `
       <div class="srv-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0"
-           role="option" tabindex="0" data-id="${servicioId}" data-precio="${precioBase}" data-text="${s.nombre || ''}">
-        <div class="font-semibold text-cyan-200">${s.nombre || ''}</div>
-        ${s.categoria ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Categoría' : 'Category'}: ${s.categoria}</div>` : ``}
+           role="option" tabindex="0" data-id="${servicioId}" data-precio="${precioBase}" data-text="${servicio.nombre || ''}">
+        <div class="font-semibold text-cyan-200">${servicio.nombre || ''}</div>
+        ${servicio.categoria ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Categoría' : 'Category'}: ${servicio.categoria}</div>` : ``}
         ${precioBase ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Tarifa base' : 'Base'}: ${money(precioBase)}</div>` : ``}
       </div>
     `}).join('');
@@ -2157,6 +2611,7 @@ function submitDocumentForm(){
     clienteEmail: '{{ cliente_info.email|default:""|escapejs }}',
     clienteTelefono: '{{ cliente_info.telefono|default:""|escapejs }}',
     vehiculoId: '{{ vehiculo_inicial_id|default:"" }}',
+    prefillVehiculoId: '{{ prefill_vehiculo_id|default:"" }}',
     tecnicoId: '{{ documento.tecnico_responsable_id|default:form.tecnico_responsable.value|default:"" }}',
     paymentStatus: '{{ documento.payment_status|default:"pending" }}',
     numero: '{{ documento.numero_documento|default:documento.numero|default:"" }}'
@@ -2200,17 +2655,12 @@ function submitDocumentForm(){
         });
         
         // Cargar vehículos del cliente y seleccionar el vehículo inicial
-        if (documentoData.vehiculoId) {
-          setTimeout(() => {
-            const vehiculoSelect = document.getElementById('id_vehiculo');
-            if (vehiculoSelect) {
-              // Esperar a que se carguen los vehículos
-              setTimeout(() => {
-                vehiculoSelect.value = documentoData.vehiculoId;
-                vehiculoSelect.dispatchEvent(new Event('change'));
-              }, 800);
-            }
-          }, 500);
+        // Priorizar prefillVehiculoId (vehículo recién creado) sobre vehiculoId (edición)
+        const vehiculoIdToSelect = documentoData.prefillVehiculoId || documentoData.vehiculoId;
+        if (vehiculoIdToSelect) {
+          console.log(`🎯 Vehículo a preseleccionar: ${vehiculoIdToSelect}`);
+          // La función cargarVehiculosPorCliente ahora acepta el ID para preseleccionar
+          // Se llamará automáticamente desde seleccionarCliente con el parámetro
         }
       }
     }, 100);
@@ -2321,13 +2771,119 @@ function submitDocumentForm(){
   clienteBusqueda?.addEventListener('input', (event)=> window.handleClienteInput(event.target.value));
   clienteBusqueda?.addEventListener('focus', (event)=> window.handleClienteFocus(event.target.value));
   clienteBusqueda?.addEventListener('keydown', (event)=> window.handleClienteKeydown(event));
+  
+  // El botón "Nuevo Cliente" - Solución directa sin bloqueos
+  const btnNuevoCliente = document.getElementById('btn-nuevo-cliente');
+  if (btnNuevoCliente) {
+    // Forzar estilos VERDE BRILLANTE (estilo WhatsApp) - Muy visible
+    // Usar clase CSS en lugar de estilos inline con !important
+    // La clase btn-green-gradient ya está definida en el CSS
+    btnNuevoCliente.classList.add('btn-green-gradient');
+    
+    // Asegurar href
+    if (!btnNuevoCliente.getAttribute('href') || btnNuevoCliente.getAttribute('href') === '#' || btnNuevoCliente.getAttribute('href') === '') {
+      const nextUrl = encodeURIComponent(window.location.pathname);
+      const pathParts = window.location.pathname.split('/').filter(p => p);
+      const country = pathParts[0] || 'cl';
+      const lang = pathParts[1] || 'es';
+      btnNuevoCliente.setAttribute('href', `/${country}/${lang}/clientes/crear/?next=${nextUrl}`);
+    }
+    
+    // Eliminar TODOS los listeners previos clonando el elemento
+    const newBtn = btnNuevoCliente.cloneNode(true);
+    btnNuevoCliente.parentNode.replaceChild(newBtn, btnNuevoCliente);
+    
+    // Asegurar href en el nuevo botón
+    if (!newBtn.getAttribute('href') || newBtn.getAttribute('href') === '#' || newBtn.getAttribute('href') === '') {
+      const nextUrl = encodeURIComponent(window.location.pathname);
+      const pathParts = window.location.pathname.split('/').filter(p => p);
+      const country = pathParts[0] || 'cl';
+      const lang = pathParts[1] || 'es';
+      newBtn.setAttribute('href', `/${country}/${lang}/clientes/crear/?next=${nextUrl}`);
+    }
+    
+    // Añadir efectos hover
+    newBtn.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.05)';
+      this.style.boxShadow = '0 0 35px rgba(34, 197, 94, 1), 0 6px 20px rgba(0, 0, 0, 0.4)';
+    });
+    
+    newBtn.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+      this.style.boxShadow = '0 0 25px rgba(34, 197, 94, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3)';
+    });
+    
+    // Listener simple que NO use preventDefault - permite navegación nativa
+    newBtn.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && href !== '#' && href !== '') {
+        console.log('🚀 Navegando a:', href);
+        // NO usar preventDefault - dejar que el navegador maneje la navegación
+        window.location.href = href;
+      }
+    }, false);
+    
+    console.log('✅ Botón Nuevo Cliente configurado (VERDE BRILLANTE):', newBtn.getAttribute('href'));
+    console.log('🎨 Color aplicado: VERDE #22c55e con resplandor');
+  } else {
+    console.error('❌ Botón btn-nuevo-cliente NO encontrado en el DOM');
+  }
+  
   console.log('📄 Document form inicializado', EG.cfg);
 }
 
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initDocumentFormScript);
-      } else {
+} else {
   initDocumentFormScript();
 }
+
+// === NAVEGACIÓN BLINDADA eGarage (Corrección 404) ===
+document.addEventListener('click', function(e) {
+    const btnCliente = e.target.closest('#btn-nuevo-cliente');
+    const btnVehiculo = e.target.closest('#btn-nuevo-vehiculo');
+    
+    if (btnCliente || btnVehiculo) {
+        e.preventDefault();
+        e.stopPropagation();
+        
+        // 1. Extraer país e idioma de la URL actual (ej: /cl/es/...)
+        const pathParts = window.location.pathname.split('/').filter(function(p) { return p && p.length > 0; });
+        const country = pathParts[0] || 'cl';
+        const lang = (pathParts[1] === 'es' || pathParts[1] === 'en') ? pathParts[1] : 'es';
+
+        // 2. Preparar el retorno (next) para volver al formulario actual
+        const nextUrl = encodeURIComponent(window.location.pathname);
+        let destUrl = "";
+
+        if (btnCliente) {
+            // URL correcta según URLconf: /cl/es/clientes/crear/
+            destUrl = '/' + country + '/' + lang + '/clientes/crear/?next=' + nextUrl;
+        } else {
+            // URL correcta según URLconf: /cl/es/vehiculos/crear/
+            // Capturamos el cliente_id desde Select2/DAL
+            let clienteId = '';
+            if (window.jQuery) {
+                const $clienteSelect = jQuery('#id_cliente');
+                if ($clienteSelect.length) {
+                    clienteId = $clienteSelect.val() || '';
+                }
+            }
+            destUrl = '/' + country + '/' + lang + '/vehiculos/crear/?next=' + nextUrl;
+            
+            if (clienteId) {
+                destUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+            }
+        }
+
+        console.log("🚀 Redirigiendo a ruta validada:", destUrl);
+        window.location.href = destUrl;
+    }
+});
+
 </script>
+
+{# ==================== CARGA DE DOCUMENT ENGINE ==================== #}
+{# "Capa de Inteligencia" - UX Móvil y Blindaje de Campos Calculados #}
+<script src="{% static 'js/document_engine.js' %}"></script>
 {% endblock extra_js %}

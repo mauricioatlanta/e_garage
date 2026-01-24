@@ -145,7 +145,8 @@
   })();
   </script>
   
-  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  {# jQuery se carga desde base.html (si este template extiende de base) o desde static/vendor/jquery/ #}
+  {# NO cargar jQuery aquí para evitar duplicados - usar el stack unificado #}
   <style>
     :root {
       --company-primary: {{ BRAND.primary_color|default:'#00d4ff' }};
@@ -558,5 +559,8 @@
     &copy; 2025 eGarage
   </footer>
   {% block extra_js %}{% endblock %}
+  {# CRÍTICO: Cargar form.media para DAL/Select2 en todas las páginas con formularios #}
+  {# Esto asegura que los scripts de autocomplete se carguen correctamente #}
+  {% if form %}{{ form.media }}{% endif %}
 </body>
 </html>

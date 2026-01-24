@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+{% load country_url %}
+
+{% block title %}{% if modo == 'crear' %}Nuevo{% else %}Editar{% endif %} Técnico - eGarage Pro{% endblock %}
+
+{% block content %}
+<!-- Fondo animado -->
+<div class="fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute -top-32 -left-20 w-96 h-96 bg-gradient-to-br from-cyan-500 via-blue-500 to-purple-600 opacity-30 blur-3xl rounded-full animate-pulse"></div>
+    <div class="absolute top-1/2 -right-20 w-80 h-80 bg-gradient-to-br from-emerald-400 via-cyan-400 to-blue-500 opacity-20 blur-3xl rounded-full animate-spin-slow"></div>
+    <div class="absolute bottom-0 left-1/3 w-64 h-64 bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 opacity-25 blur-3xl rounded-full animate-pulse animation-delay-2s"></div>
+</div>
+
+<div class="min-h-screen py-8 px-4">
+    <div class="max-w-4xl mx-auto">
+        <!-- Header dinámico con datos del técnico -->
+        <div class="relative mb-8">
+            <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-600/20 rounded-3xl blur-sm"></div>
+            <div class="relative bg-gray-900/80 backdrop-blur-xl border border-cyan-500/30 rounded-3xl p-8 shadow-2xl">
+                <div class="flex flex-col lg:flex-row items-center gap-6">
+                    <!-- Avatar del técnico -->
+                    <div class="relative">
+                        <div class="w-24 h-24 bg-gradient-to-br from-cyan-400 via-blue-500 to-purple-600 rounded-full flex items-center justify-center shadow-lg">
+                            <i class="fas fa-{% if modo == 'crear' %}user-plus{% else %}user-edit{% endif %} text-3xl text-white"></i>
+                        </div>
+                        <div class="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-r from-emerald-400 to-cyan-400 rounded-full flex items-center justify-center">
+                            <i class="fas fa-{% if modo == 'crear' %}plus{% else %}pencil-alt{% endif %} text-sm text-gray-900"></i>
+                        </div>
+                    </div>
+
+                    <!-- Información del header -->
+                    <div class="flex-1 text-center lg:text-left">
+                        <h1 class="text-4xl font-bold bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent mb-2">
+                            {% if modo == 'crear' %}Nuevo Técnico{% else %}Editar Técnico{% endif %}
+                        </h1>
+                        <p class="text-gray-300 text-lg">
+                            {% if modo == 'crear' %}
+                                Agrega un nuevo miembro especializado a tu equipo de trabajo
+                            {% else %}
+                                Actualiza la información del profesional seleccionado
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <!-- Panel de estado -->
+                    <div class="bg-gray-800/50 backdrop-blur-sm border border-cyan-500/20 rounded-2xl p-6 text-center">
+                        <div class="text-cyan-400 text-2xl mb-2">
+                            <i class="fas fa-{% if modo == 'crear' %}rocket{% else %}tools{% endif %}"></i>
+                        </div>
+                        <div class="text-gray-400 text-sm">Estado</div>
+                        <div class="text-cyan-300 font-bold">{% if modo == 'crear' %}Creando{% else %}Editando{% endif %}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Formulario Principal -->
+        <form method="post" class="space-y-8">
+            {% csrf_token %}
+
+            <!-- Sección: Información del Técnico -->
+            <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-emerald-500/10 via-cyan-500/10 to-blue-500/10 rounded-2xl blur-sm"></div>
+                <div class="relative bg-gray-900/80 backdrop-blur-xl border border-emerald-500/30 rounded-2xl p-6 shadow-xl">
+                    <!-- Header de sección -->
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-user text-xl text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Datos Personales</h2>
+                            <p class="text-gray-400">Información básica del técnico</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Campo Nombre -->
+                        <div class="lg:col-span-2">
+                            <label class="block text-sm font-semibold text-gray-300 mb-3">
+                                <i class="fas fa-signature mr-2 text-cyan-400"></i>Nombre Completo
+                            </label>
+                            <div class="relative group">
+                                {{ form.nombre }}
+                                <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-xl blur opacity-0 group-hover:opacity-100 transition-opacity -z-10"></div>
+                            </div>
+                            {% if form.nombre.errors %}
+                                <div class="mt-2 text-red-400 text-sm">
+                                    <i class="fas fa-exclamation-triangle mr-1"></i>{{ form.nombre.errors.0 }}
+                                </div>
+                            {% endif %}
+                            <p class="mt-2 text-xs text-gray-500">Nombre y apellido del profesional</p>
+                        </div>
+
+                        <!-- Switch de Estado Activo -->
+                        <div class="flex flex-col justify-center">
+                            <label class="block text-sm font-semibold text-gray-300 mb-3">
+                                <i class="fas fa-power-off mr-2 text-emerald-400"></i>Estado del Técnico
+                            </label>
+                            <div class="relative">
+                                <div class="bg-gray-800/50 border border-gray-600/50 rounded-xl p-4">
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-gray-300">Activo</span>
+                                        <label class="relative inline-flex items-center cursor-pointer">
+                                            {{ form.activo }}
+                                            <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-cyan-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gradient-to-r peer-checked:from-emerald-500 peer-checked:to-cyan-500"></div>
+                                        </label>
+                                    </div>
+                                    {% if form.activo.errors %}
+                                        <div class="mt-2 text-red-400 text-sm">{{ form.activo.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Sección: Panel de Especialidades (Futuro) -->
+            <div class="relative">
+                <div class="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-red-500/10 rounded-2xl blur-sm"></div>
+                <div class="relative bg-gray-900/80 backdrop-blur-xl border border-purple-500/30 rounded-2xl p-6 shadow-xl">
+                    <div class="flex items-center gap-4 mb-6">
+                        <div class="w-12 h-12 bg-gradient-to-br from-purple-400 to-pink-500 rounded-xl flex items-center justify-center">
+                            <i class="fas fa-cogs text-xl text-white"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold text-white">Especialidades</h2>
+                            <p class="text-gray-400">Habilidades y áreas de expertise</p>
+                        </div>
+                    </div>
+
+                    <div class="text-center py-8">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-pink-500/20 rounded-full mx-auto mb-4 flex items-center justify-center">
+                            <i class="fas fa-rocket text-2xl text-purple-400"></i>
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-300 mb-2">Próximamente</h3>
+                        <p class="text-gray-500 max-w-md mx-auto">
+                            Campos como especialidades técnicas, nivel de experiencia, certificaciones, horarios de trabajo y más funcionalidades avanzadas estarán disponibles en futuras actualizaciones.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botones de Acción -->
+            <div class="flex flex-col sm:flex-row gap-4 pt-8">
+                <button type="submit" class="flex-1 group relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-xl blur opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                    <div class="relative bg-gradient-to-r from-emerald-500 to-cyan-500 hover:from-emerald-400 hover:to-cyan-400 text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-[1.02] flex items-center justify-center gap-3">
+                        <i class="fas fa-save text-lg"></i>
+                        <span class="text-lg">
+                            {% if modo == 'crear' %}Crear Técnico{% else %}Guardar Cambios{% endif %}
+                        </span>
+                    </div>
+                </button>
+
+                <a href="{% country_url 'configuracion_tecnicos' app_namespace='direct' %}" class="flex-1 group relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-gray-600 to-gray-500 rounded-xl blur opacity-50 group-hover:opacity-75 transition-opacity"></div>
+                    <div class="relative bg-gray-800 hover:bg-gray-700 border border-gray-600 text-gray-300 hover:text-white font-bold py-4 px-8 rounded-xl transition-all duration-200 transform hover:scale-[1.02] flex items-center justify-center gap-3">
+                        <i class="fas fa-arrow-left text-lg"></i>
+                        <span class="text-lg">Volver a la Lista</span>
+                    </div>
+                </a>
+            </div>
+        </form>
+
+        <!-- Panel de Ayuda Contextual -->
+        <div class="mt-8 relative">
+            <div class="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-indigo-500/10 to-purple-500/10 rounded-2xl blur-sm"></div>
+            <div class="relative bg-gray-900/80 backdrop-blur-xl border border-blue-500/30 rounded-2xl p-6 shadow-xl">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Guía rápida -->
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-8 h-8 bg-gradient-to-br from-blue-400 to-indigo-500 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-question-circle text-sm text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">¿Qué es un Técnico?</h3>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">
+                            Los técnicos son profesionales especializados que forman parte del equipo operativo de tu taller. Pueden incluir mecánicos, electricistas, chapistas, vendedores y cualquier personal que contribuya directamente a los servicios ofrecidos.
+                        </p>
+                    </div>
+
+                    <!-- Tips y consejos -->
+                    <div>
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-cyan-500 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-lightbulb text-sm text-white"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-white">Consejos Prácticos</h3>
+                        </div>
+                        <ul class="space-y-2 text-gray-300">
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-emerald-400 text-sm"></i>
+                                <span>Usa nombres completos para facilitar la identificación</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-emerald-400 text-sm"></i>
+                                <span>Mantén actualizado el estado de cada técnico</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-emerald-400 text-sm"></i>
+                                <span>Puedes editar la información en cualquier momento</span>
+                            </li>
+                            <li class="flex items-center gap-2">
+                                <i class="fas fa-check-circle text-emerald-400 text-sm"></i>
+                                <span>Los técnicos inactivos no aparecen en reportes</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom form styling */
+    .form-control {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--border-glow);
+        border-radius: 12px;
+        color: var(--text-primary);
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+
+    .form-control:focus {
+        background: rgba(255, 255, 255, 0.1);
+        border-color: var(--accent-blue);
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+        color: var(--text-primary);
+    }
+
+    .form-control::placeholder {
+        color: var(--text-secondary);
+    }
+
+    .form-label {
+        color: var(--text-primary);
+        margin-bottom: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .form-check-input {
+        background-color: rgba(255, 255, 255, 0.1);
+        border: 2px solid var(--border-glow);
+        border-radius: 8px;
+        width: 3rem;
+        height: 1.5rem;
+    }
+
+    .form-check-input:checked {
+        background-color: var(--accent-blue);
+        border-color: var(--accent-blue);
+    }
+
+    .form-check-input:focus {
+        box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+    }
+
+    .form-check-label {
+        color: var(--text-secondary);
+        font-weight: 500;
+    }
+
+    /* Help section styling */
+    .bg-light {
+        background: rgba(0, 212, 255, 0.05) !important;
+        border: 1px solid rgba(0, 212, 255, 0.1);
+    }
+
+    /* Button spacing */
+    .gap-3 {
+        gap: 1rem !important;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+        .d-flex.justify-content-center.gap-3 {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-lg {
+            width: 100%;
+            max-width: 300px;
+            margin-bottom: 1rem;
+        }
+    }
+
+    /* Form validation styling */
+    .needs-validation .form-control.is-invalid {
+        border-color: #dc3545;
+        box-shadow: 0 0 20px rgba(220, 53, 69, 0.3);
+    }
+
+    .needs-validation .form-control.is-valid {
+        border-color: #28a745;
+        box-shadow: 0 0 20px rgba(40, 167, 69, 0.3);
+    }
+</style>
+{% endblock %}

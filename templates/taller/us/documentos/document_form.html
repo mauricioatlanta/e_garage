@@ -1,0 +1,31 @@
+{# Template Unificado para USA - Usa traducciones dinámicas #}
+{# Hereda TODO del template común, solo agrega lógica específica de USA #}
+{% extends "taller/common/documentos/document_form.html" %}
+{% load i18n %}
+{% load static %}
+{% load country_url %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+  // Lógica específica de USA (ej: integración con Stripe, métodos de pago, etc.)
+  // El template común ya maneja todo lo demás
+  
+  // Ejemplo: Configuración específica de USA
+  if (window.EG && window.EG.cfg) {
+    // Puedes agregar configuraciones específicas de USA aquí
+    // Por ejemplo: métodos de pago, validaciones específicas, etc.
+  }
+</script>
+{% endblock extra_js %}
+
+{% block legal_footer %}
+{# Footer legal específico de USA - Opcional #}
+<div class="mt-6 pt-4 border-t border-cyan-500/30">
+  <p class="text-xs text-gray-400 text-center">
+    {% trans "All services are subject to local state taxes. Standard warranty applies for 12 months or 12,000 miles, whichever comes first." %}
+  </p>
+</div>
+{% endblock legal_footer %}
+
+

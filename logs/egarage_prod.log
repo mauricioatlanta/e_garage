@@ -1,0 +1,150 @@
+INFO 2026-01-20 23:34:47,347 autoreload 8760 11280 Watching for file changes with StatReloader
+INFO 2026-01-20 23:35:12,284 autoreload 11024 9728 Watching for file changes with StatReloader
+INFO 2026-01-20 23:35:56,456 autoreload 12800 10040 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:35:59,682 ocr 12800 10040 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:37:02,155 autoreload 16220 464 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:37:03,428 ocr 16220 464 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:40:13,139 autoreload 2560 1740 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:40:14,467 ocr 2560 1740 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:40:49,205 autoreload 1016 15972 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:40:50,554 ocr 1016 15972 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:42:07,931 autoreload 5360 2184 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:42:09,228 ocr 5360 2184 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:43:00,029 autoreload 15892 1840 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:43:01,421 ocr 15892 14740 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:43:27,494 autoreload 12224 15600 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:43:28,808 ocr 12224 15600 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:44:08,823 autoreload 10756 8644 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:44:10,203 ocr 10756 8644 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:44:29,766 autoreload 2536 3464 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:44:31,091 ocr 2536 3464 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:45:34,975 autoreload 9356 11696 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:45:36,301 ocr 9356 11696 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:47:55,507 autoreload 12508 14212 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:47:56,943 ocr 12508 14212 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:50:02,771 autoreload 16152 2424 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:50:04,219 ocr 16152 2424 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:50:13,785 autoreload 13944 4196 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:50:15,128 ocr 13944 4196 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:52:20,796 autoreload 512 2400 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:52:22,400 ocr 512 2400 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:52:41,576 autoreload 3324 6936 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:52:43,306 ocr 3324 6936 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:53:51,940 autoreload 10088 12752 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:53:53,428 ocr 10088 12752 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:54:07,116 autoreload 9484 15980 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:54:08,678 ocr 9484 15980 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:54:45,402 autoreload 9300 10012 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:54:46,844 ocr 9300 10012 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:55:54,584 autoreload 11720 6416 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:55:56,203 ocr 11720 6416 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:56:07,824 autoreload 10460 1220 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:56:09,284 ocr 10460 1220 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:57:43,409 autoreload 9772 14884 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:57:45,091 ocr 9772 14884 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-20 23:58:53,176 autoreload 8772 15388 Watching for file changes with StatReloader
+WARNING 2026-01-20 23:58:54,623 ocr 8772 15388 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 00:02:11,906 autoreload 8380 576 Watching for file changes with StatReloader
+WARNING 2026-01-21 00:02:13,519 ocr 8380 576 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 00:04:48,324 autoreload 1924 748 Watching for file changes with StatReloader
+WARNING 2026-01-21 00:04:49,865 ocr 1924 13456 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 00:10:34,464 autoreload 15568 10328 Watching for file changes with StatReloader
+WARNING 2026-01-21 00:10:36,127 ocr 15568 10328 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 00:12:01,917 autoreload 14548 2448 Watching for file changes with StatReloader
+WARNING 2026-01-21 00:12:04,226 ocr 14548 2448 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 00:12:15,873 autoreload 1276 2540 Watching for file changes with StatReloader
+WARNING 2026-01-21 00:12:17,408 ocr 1276 2540 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 00:21:04,574 autoreload 11624 1816 Watching for file changes with StatReloader
+WARNING 2026-01-21 00:21:06,071 ocr 11624 1816 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 00:22:58,153 autoreload 11792 11992 Watching for file changes with StatReloader
+WARNING 2026-01-21 00:22:59,689 ocr 11792 11992 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 08:41:11,729 autoreload 17176 17232 Watching for file changes with StatReloader
+WARNING 2026-01-21 08:41:13,215 ocr 17176 17232 EasyOCR no est√° instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 08:53:40,797 autoreload 9772 14884 E:\projecto\e_garage\taller\migrations\0056_add_company_settings_fields.py changed, reloading.
+INFO 2026-01-21 08:53:40,820 autoreload 512 2400 E:\projecto\e_garage\marketplace\migrations\0002_whatsappenvio.py changed, reloading.
+INFO 2026-01-21 08:53:40,963 autoreload 1016 15972 E:\projecto\e_garage\taller\vehiculos\views_fbv.py changed, reloading.
+INFO 2026-01-21 08:53:41,162 autoreload 10756 8644 E:\projecto\e_garage\ubicacion\migrations\0001_initial.py changed, reloading.
+INFO 2026-01-21 08:53:41,260 autoreload 12508 14212 E:\projecto\e_garage\marketplace\migrations\0002_whatsappenvio.py changed, reloading.
+INFO 2026-01-21 08:53:41,265 autoreload 9484 15980 E:\projecto\e_garage\taller\migrations\0056_add_company_settings_fields.py changed, reloading.
+INFO 2026-01-21 08:53:41,545 autoreload 16152 2424 E:\projecto\e_garage\taller\migrations\0054_merge_20260101_2354.py changed, reloading.
+INFO 2026-01-21 08:53:41,829 autoreload 15892 1840 E:\projecto\e_garage\marketplace\models.py changed, reloading.
+INFO 2026-01-21 08:53:41,988 autoreload 5360 2184 E:\projecto\e_garage\taller\models\signals_memoria.py changed, reloading.
+INFO 2026-01-21 08:53:41,999 autoreload 12800 10040 E:\projecto\e_garage\taller\views_extra\signup_redirects.py changed, reloading.
+INFO 2026-01-21 08:53:42,070 autoreload 10460 1220 E:\projecto\e_garage\taller\utils\billing_validation.py changed, reloading.
+INFO 2026-01-21 08:53:42,188 autoreload 11720 6416 E:\projecto\e_garage\taller\models\empresa.py changed, reloading.
+INFO 2026-01-21 08:53:42,413 autoreload 3324 6936 E:\projecto\e_garage\taller\vehiculos\views_fbv.py changed, reloading.
+INFO 2026-01-21 08:53:42,429 autoreload 10088 12752 E:\projecto\e_garage\marketplace\migrations\0002_whatsappenvio.py changed, reloading.
+INFO 2026-01-21 08:53:42,577 autoreload 13944 4196 E:\projecto\e_garage\taller\models\empresa.py changed, reloading.
+INFO 2026-01-21 08:53:48,384 autoreload 12576 2540 Watching for file changes with StatReloader
+WARNING 2026-01-21 08:53:49,847 ocr 12576 2540 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 08:56:45,590 autoreload 15116 11760 Watching for file changes with StatReloader
+WARNING 2026-01-21 08:56:46,746 ocr 15116 11760 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:10:13,062 autoreload 12576 2540 E:\projecto\e_garage\taller\migrations\0070_hotfix_add_cliente_giro.py changed, reloading.
+INFO 2026-01-21 09:10:14,346 autoreload 7944 16016 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:10:15,702 ocr 7944 16016 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:11:41,827 autoreload 7944 16016 E:\projecto\e_garage\taller\migrations\0003_remove_companysettings_terms_and_conditions_and_more.py changed, reloading.
+INFO 2026-01-21 09:11:43,265 autoreload 2824 13308 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:11:44,829 ocr 2824 13308 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:12:08,075 autoreload 2824 13308 E:\projecto\e_garage\taller\migrations\0003_remove_companysettings_terms_and_conditions_and_more.py changed, reloading.
+INFO 2026-01-21 09:12:09,466 autoreload 17280 15340 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:12:10,982 ocr 17280 15340 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:12:34,184 autoreload 17280 15340 E:\projecto\e_garage\taller\migrations\0003_remove_companysettings_terms_and_conditions_and_more.py changed, reloading.
+INFO 2026-01-21 09:12:35,599 autoreload 13752 8812 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:12:37,213 ocr 13752 8812 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:12:51,394 autoreload 13752 8812 E:\projecto\e_garage\taller\migrations\0012_empresa_data_cleanup.py changed, reloading.
+INFO 2026-01-21 09:12:52,931 autoreload 4648 11472 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:12:54,494 ocr 4648 11472 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:13:12,765 autoreload 4648 11472 E:\projecto\e_garage\taller\migrations\0022_remove_modelovehiculo_marca_and_more.py changed, reloading.
+INFO 2026-01-21 09:13:14,261 autoreload 13284 5476 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:13:15,868 ocr 13284 5476 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:13:28,587 autoreload 13284 5476 E:\projecto\e_garage\taller\migrations\0033_alter_cajavehiculo_country_and_more.py changed, reloading.
+INFO 2026-01-21 09:13:30,046 autoreload 5312 16992 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:13:31,767 ocr 5312 16992 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:13:39,345 autoreload 5312 16992 E:\projecto\e_garage\taller\migrations\0033_alter_cajavehiculo_country_and_more.py changed, reloading.
+INFO 2026-01-21 09:13:40,922 autoreload 8100 15304 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:13:42,564 ocr 8100 15304 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:13:48,750 autoreload 8100 15304 E:\projecto\e_garage\taller\migrations\0033_alter_cajavehiculo_country_and_more.py changed, reloading.
+INFO 2026-01-21 09:13:50,354 autoreload 14236 12216 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:13:52,000 ocr 14236 12216 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:14:10,504 autoreload 14236 12216 E:\projecto\e_garage\taller\migrations\0038_remove_modelovehiculo_marca_and_more.py changed, reloading.
+INFO 2026-01-21 09:14:12,031 autoreload 7328 12460 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:14:13,644 ocr 7328 12460 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:14:50,381 autoreload 7328 12460 E:\projecto\e_garage\taller\migrations\0049_remove_tallerinfo_model.py changed, reloading.
+INFO 2026-01-21 09:14:51,877 autoreload 14904 15080 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:14:53,450 ocr 14904 15080 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:15:08,745 autoreload 14904 15080 E:\projecto\e_garage\taller\migrations\0052_add_is_trial_fields.py changed, reloading.
+INFO 2026-01-21 09:15:10,299 autoreload 15640 17368 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:15:11,880 ocr 15640 17368 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:15:29,711 autoreload 15640 17368 E:\projecto\e_garage\taller\migrations\0052_add_is_trial_fields.py changed, reloading.
+INFO 2026-01-21 09:15:31,101 autoreload 968 4388 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:15:32,576 ocr 968 4388 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:15:51,993 autoreload 968 4388 E:\projecto\e_garage\taller\migrations\0055_remove_logauditoria_empresa_and_more.py changed, reloading.
+INFO 2026-01-21 09:15:53,399 autoreload 8184 13800 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:15:55,025 ocr 8184 13800 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:16:02,402 autoreload 8184 13800 E:\projecto\e_garage\taller\migrations\0055_remove_logauditoria_empresa_and_more.py changed, reloading.
+INFO 2026-01-21 09:16:03,927 autoreload 6600 3288 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:16:05,816 ocr 6600 3288 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:16:14,818 autoreload 6600 3288 E:\projecto\e_garage\taller\migrations\0055_remove_logauditoria_empresa_and_more.py changed, reloading.
+INFO 2026-01-21 09:16:16,503 autoreload 14260 16272 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:16:18,128 ocr 14260 16272 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:16:33,486 autoreload 14260 16272 E:\projecto\e_garage\taller\migrations\0069_db_align_configuracionempresa_usa_servicios.py changed, reloading.
+INFO 2026-01-21 09:16:34,950 autoreload 3416 13032 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:16:36,560 ocr 3416 13032 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:16:46,953 autoreload 3416 13032 E:\projecto\e_garage\taller\migrations\0061_db_align_configuracionempresa_usa_vehiculos.py changed, reloading.
+INFO 2026-01-21 09:16:48,411 autoreload 16096 10096 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:16:50,030 ocr 16096 10096 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:17:02,729 autoreload 16096 10096 E:\projecto\e_garage\taller\migrations\0070_hotfix_add_cliente_giro.py changed, reloading.
+INFO 2026-01-21 09:17:04,203 autoreload 15472 7352 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:17:05,791 ocr 15472 7352 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:20:41,818 autoreload 15472 7352 E:\projecto\e_garage\taller\views_extra\views_configuracion.py changed, reloading.
+INFO 2026-01-21 09:20:43,419 autoreload 3928 16064 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:20:45,168 ocr 3928 16064 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:21:00,581 autoreload 3928 16064 E:\projecto\e_garage\taller\views_extra\views_configuracion.py changed, reloading.
+INFO 2026-01-21 09:21:02,329 autoreload 1892 7704 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:21:04,096 ocr 1892 7704 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:22:25,640 autoreload 1892 7704 E:\projecto\e_garage\taller\migrations\0055_remove_logauditoria_empresa_and_more.py changed, reloading.
+INFO 2026-01-21 09:22:27,186 autoreload 16472 9688 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:22:28,812 ocr 16472 9688 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-01-21 09:23:51,584 autoreload 16472 9688 E:\projecto\e_garage\taller\views_extra\views_configuracion.py changed, reloading.
+INFO 2026-01-21 09:23:53,623 autoreload 13316 6896 Watching for file changes with StatReloader
+WARNING 2026-01-21 09:23:55,302 ocr 13316 6896 EasyOCR no est· instalado. Ejecuta: pip install easyocr opencv-python-headless

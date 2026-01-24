@@ -10,6 +10,8 @@ NOTA IMPORTANTE:
 - Los valores dependen del país/idioma.
 """
 
+from django.conf import settings
+
 
 # ---------------------------
 # USA - Inglés
@@ -175,8 +177,9 @@ UI_LABELS_UY_ES = {
 # Helper principal
 # ---------------------------
 
-DEFAULT_COUNTRY_CODE = "CL"
-DEFAULT_LANGUAGE_CODE = "es"
+# Desde settings (EGARAGE_DEFAULT_*) para una sola fuente de verdad; fallback Chile/es
+DEFAULT_COUNTRY_CODE = getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl").upper()
+DEFAULT_LANGUAGE_CODE = getattr(settings, "EGARAGE_DEFAULT_LANG", "es")
 
 
 def get_ui_labels(country_code=None, language_code=None):

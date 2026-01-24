@@ -18,7 +18,8 @@
 
 {% block page_extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet">
+{# Select2 CSS se carga desde base.html via form.media.css - También lo agregamos aquí para asegurar que se cargue #}
+{% if form %}{{ form.media.css }}{% endif %}
 <style>
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
@@ -566,8 +567,7 @@ input:focus {
 
 {% block page_extra_js %}
 
-{# CRÍTICO: form.media debe cargarse ANTES del JavaScript personalizado #}
-{{ form.media }}
+{# form.media ya se carga en base.html (CSS en head, JS al final del body) - NO duplicar aquí #}
 
 <script>
 // Cache buster: 2024-12-19 - Versión actualizada - Inicialización mejorada de Select2/DAL
@@ -1541,4 +1541,6 @@ $(document).ready(function() {
     setTimeout(initializeDAL, 500);
 })();
 </script>
+{# JS de form.media (DAL/Select2) - Asegurar que se cargue #}
+{% if form %}{{ form.media.js }}{% endif %}
 {% endblock %}

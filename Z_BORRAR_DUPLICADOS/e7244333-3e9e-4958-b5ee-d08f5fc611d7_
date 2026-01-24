@@ -1,0 +1,5 @@
+<div class="timezone-widget" style="display: inline-flex; align-items: center; gap: 0.5rem; font-size: 0.9rem; color: #6c757d;">
+    <i class="fas fa-clock"></i>
+    <span class="timezone-name">{{ timezone_display }}</span>
+    <span class="current-time">{{ formatted_time }}</span>
+</div>

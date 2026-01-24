@@ -107,6 +107,18 @@
     gap: 12px;
     margin-top: 2rem;
   }
+
+  /* Asegurar que el modal esté oculto por defecto */
+  #deleteModal.hidden {
+    display: none !important;
+  }
+
+  /* Asegurar que los botones de acción sean clickeables */
+  button[onclick*="deletePart"],
+  a[href*="editar_repuesto"] {
+    cursor: pointer;
+    user-select: none;
+  }
 </style>
 {% endblock %}
 
@@ -160,111 +172,115 @@
 {% endblock %}
 
 {% block panel_content %}
-<div class="data-grid" id="partsContainer">
-  {% for repuesto in object_list %}
-  <div class="part-card" data-part-number="{{ repuesto.part_number }}"
-       data-part-name="{{ repuesto.nombre }}"
-       data-category="{{ repuesto.categoria.nombre|default:'' }}">
+<div class="relative">
+  <div class="data-grid" id="partsContainer">
+    {% for repuesto in object_list %}
+    <div class="part-card" data-part-number="{{ repuesto.part_number }}"
+         data-part-name="{{ repuesto.nombre }}"
+         data-category="{{ repuesto.categoria.nombre|default:'' }}">
 
-    <div class="flex justify-between items-start mb-3">
-      <div class="part-code">{{ repuesto.part_number|default:"N/A" }}</div>
-      <div class="flex gap-2">
-        <a href="{% country_url 'repuestos:editar_repuesto' repuesto.pk %}"
-           class="text-cyan-400 hover:text-cyan-300 transition-colors">
-          ✏️
-        </a>
-        <button onclick="deletePart({{ repuesto.pk }}, '{{ repuesto.nombre|escapejs|safe }}')"
-                class="text-red-400 hover:text-red-300 transition-colors">
-          🗑️
-        </button>
+      <div class="flex justify-between items-start mb-3">
+        <div class="part-code">{{ repuesto.part_number|default:"N/A" }}</div>
+        <div class="flex gap-2">
+          <a href="{% country_url 'repuestos:editar_repuesto' repuesto.pk %}"
+             class="text-cyan-400 hover:text-cyan-300 transition-colors text-lg"
+             title="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Edit{% else %}Editar{% endif %}">
+            ✏️
+          </a>
+          <button onclick="deletePart({{ repuesto.pk }}, '{{ repuesto.nombre|escapejs|safe }}')"
+                  class="text-red-400 hover:text-red-300 transition-colors text-lg cursor-pointer bg-transparent border-none"
+                  title="{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Delete{% else %}Eliminar{% endif %}">
+            🗑️
+          </button>
+        </div>
       </div>
-    </div>
 
-    <div class="part-name">{{ repuesto.nombre }}</div>
+      <div class="part-name">{{ repuesto.nombre }}</div>
 
-    {% if repuesto.categoria %}
-    <div class="text-sm text-gray-400 mb-2">
-      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Category{% else %}Categoría{% endif %}: {{ repuesto.categoria.nombre }}
+      {% if repuesto.categoria %}
+      <div class="text-sm text-slate-400 mb-2">
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Category{% else %}Categoría{% endif %}: <span class="text-cyan-300">{{ repuesto.categoria.nombre }}</span>
+      </div>
+      {% endif %}
+
+      <div class="flex justify-between items-center mt-4">
+        <div class="part-price">{{ repuesto.precio_venta|money_by_country:country }}</div>
+        <div class="text-sm text-slate-400">
+          {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Stock{% else %}Stock{% endif %}: <span class="text-lime-300 font-bold">{{ repuesto.cantidad_stock|default:"0" }}</span>
+        </div>
+      </div>
+
+      {% if repuesto.proveedor %}
+      <div class="text-xs text-slate-500 mt-2">
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Supplier{% else %}Proveedor{% endif %}: {{ repuesto.proveedor }}
+      </div>
+      {% endif %}
     </div>
+    {% empty %}
+    <div class="col-span-full text-center py-12">
+      <div class="text-6xl mb-4 opacity-50">🔧</div>
+      <h3 class="text-2xl font-extrabold text-white mb-2">
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No Parts Found{% else %}No hay repuestos{% endif %}
+      </h3>
+      <p class="text-slate-400 mb-6">
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Start by adding your first automotive part{% else %}Comienza agregando tu primer repuesto{% endif %}
+      </p>
+      <a href="{% country_url 'repuestos:crear_repuesto' %}" class="cyber-button inline-block no-underline">
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Add First Part{% else %}Agregar Primer Repuesto{% endif %}
+      </a>
+    </div>
+    {% endfor %}
+  </div>
+
+  <!-- Pagination -->
+  {% if is_paginated %}
+  <div class="pagination-container">
+    {% if page_obj.has_previous %}
+        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+         class="cyber-button text-sm">
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}First{% else %}Primera{% endif %}
+      </a>
+      <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+         class="cyber-button text-sm">
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Previous{% else %}Anterior{% endif %}
+      </a>
     {% endif %}
 
-    <div class="flex justify-between items-center mt-4">
-      <div class="part-price">{{ repuesto.precio_venta|money_by_country:country }}</div>
-      <div class="text-sm text-gray-400">
-        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Stock{% else %}Stock{% endif %}: {{ repuesto.cantidad_stock|default:"0" }}
-      </div>
-    </div>
+    <span class="text-cyan-400 font-bold px-4">
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Page{% else %}Página{% endif %} {{ page_obj.number }} {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}of{% else %}de{% endif %} {{ page_obj.paginator.num_pages }}
+    </span>
 
-    {% if repuesto.proveedor %}
-    <div class="text-xs text-gray-500 mt-2">
-      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Supplier{% else %}Proveedor{% endif %}: {{ repuesto.proveedor }}
-    </div>
+    {% if page_obj.has_next %}
+      <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+         class="cyber-button text-sm">
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Next{% else %}Siguiente{% endif %}
+      </a>
+      <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+         class="cyber-button text-sm">
+        {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Last{% else %}Última{% endif %}
+      </a>
     {% endif %}
   </div>
-  {% empty %}
-  <div class="col-span-full text-center py-12">
-    <div class="text-6xl mb-4 opacity-50">🔧</div>
-    <h3 class="text-xl font-bold text-white mb-2">
-      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No Parts Found{% else %}No hay repuestos{% endif %}
-    </h3>
-    <p class="text-gray-400 mb-4">
-      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Start by adding your first automotive part{% else %}Comienza agregando tu primer repuesto{% endif %}
-    </p>
-    <a href="{% country_url 'repuestos:crear_repuesto' %}" class="cyber-button inline-block no-underline">
-      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Add First Part{% else %}Agregar Primer Repuesto{% endif %}
-    </a>
-  </div>
-  {% endfor %}
-</div>
-
-<!-- Pagination -->
-{% if is_paginated %}
-<div class="pagination-container">
-  {% if page_obj.has_previous %}
-      <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-       class="cyber-button text-sm">
-      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}First{% else %}Primera{% endif %}
-    </a>
-    <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-       class="cyber-button text-sm">
-      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Previous{% else %}Anterior{% endif %}
-    </a>
-  {% endif %}
-
-  <span class="text-cyan-400 font-bold px-4">
-    {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Page{% else %}Página{% endif %} {{ page_obj.number }} {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}of{% else %}de{% endif %} {{ page_obj.paginator.num_pages }}
-  </span>
-
-  {% if page_obj.has_next %}
-    <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-       class="cyber-button text-sm">
-      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Next{% else %}Siguiente{% endif %}
-    </a>
-    <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
-       class="cyber-button text-sm">
-      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Last{% else %}Última{% endif %}
-    </a>
   {% endif %}
 </div>
-{% endif %}
 
 <!-- Delete Confirmation Modal -->
-<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50">
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50" style="display: none;">
   <div class="flex items-center justify-center min-h-screen p-4">
-    <div class="bg-gray-900 border border-red-500 rounded-lg p-6 max-w-md w-full">
+    <div class="bg-slate-900 border-2 border-red-500/60 rounded-xl p-6 max-w-md w-full shadow-2xl">
       <div class="text-center">
-        <div class="text-red-500 text-4xl mb-4">⚠️</div>
-        <h3 class="text-xl font-bold text-white mb-2">
+        <div class="text-red-400 text-5xl mb-4">⚠️</div>
+        <h3 class="text-2xl font-extrabold text-white mb-3">
           {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Confirm Deletion{% else %}Confirmar Eliminación{% endif %}
         </h3>
-        <p class="text-gray-300 mb-6">
+        <p class="text-slate-300 mb-6 text-sm">
           {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Are you sure you want to delete the part{% else %}¿Seguro que deseas eliminar el repuesto{% endif %} <span id="partName" class="text-red-400 font-bold"></span>?
         </p>
         <div class="flex gap-3">
-          <button onclick="closeModal()" class="flex-1 bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition-colors">
+          <button onclick="closeModal()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-3 px-4 rounded-lg font-semibold transition-all">
             {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Cancel{% else %}Cancelar{% endif %}
           </button>
-          <button onclick="confirmDelete()" class="flex-1 bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors">
+          <button onclick="confirmDelete()" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg font-semibold transition-all">
             {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Delete{% else %}Eliminar{% endif %}
           </button>
         </div>
@@ -387,12 +403,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const partNameEl = document.getElementById('partName');
         const deleteModal = document.getElementById('deleteModal');
         if (partNameEl) partNameEl.textContent = partName;
-        if (deleteModal) deleteModal.classList.remove('hidden');
+        if (deleteModal) {
+            deleteModal.classList.remove('hidden');
+            deleteModal.style.display = 'flex';
+        }
     }
     
     function closeModal() {
         const deleteModal = document.getElementById('deleteModal');
-        if (deleteModal) deleteModal.classList.add('hidden');
+        if (deleteModal) {
+            deleteModal.classList.add('hidden');
+            deleteModal.style.display = 'none';
+        }
         deleteUrl = '';
     }
     

@@ -1,0 +1,168 @@
+[
+  {
+    "code": "MAINT_OIL_SYNTH",
+    "category": "mantenimiento",
+    "translations": {
+      "US": {"label": "Full Synthetic Oil Change", "aliases": ["lube", "oil filter", "synthetic", "full synthetic", "oil service"]},
+      "CL": {"label": "Cambio de Aceite Sintético", "aliases": ["mantención", "aceite", "filtro", "aceite sintético", "sintético"]},
+      "MX": {"label": "Afinación Menor (Sintético)", "aliases": ["servicio", "cambio de aceite", "afinación menor", "sintético"]},
+      "AR": {"label": "Service de Aceite Sintético", "aliases": ["service", "cambio de aceite", "lubricentro", "aceite sintético"]},
+      "CO": {"label": "Cambio de Aceite Sintético", "aliases": ["sincronización", "lubricación", "aceite sintético", "sintético"]},
+      "EC": {"label": "ABC de Motor (Sintético)", "aliases": ["mantenimiento", "aceite", "abc", "sintético"]},
+      "PE": {"label": "Cambio de Aceite Sintético", "aliases": ["aceite sintético", "sintético", "mantenimiento"]},
+      "VE": {"label": "Cambio de Aceite Sintético", "aliases": ["aceite sintético", "sintético", "mantenimiento"]},
+      "UY": {"label": "Cambio de Aceite Sintético", "aliases": ["aceite sintético", "sintético", "mantenimiento"]},
+      "BR": {"label": "Troca de Óleo Sintético", "aliases": ["revisão", "lubrificante", "óleo sintético", "sintético"]}
+    }
+  },
+  {
+    "code": "MAINT_OIL_CONV",
+    "category": "mantenimiento",
+    "translations": {
+      "US": {"label": "Conventional Oil Change", "aliases": ["oil change", "conventional", "regular oil", "mineral oil"]},
+      "CL": {"label": "Cambio de Aceite Convencional", "aliases": ["aceite mineral", "cambio aceite", "aceite convencional", "mantención"]},
+      "MX": {"label": "Servicio de Aceite", "aliases": ["cambio de aceite", "aceite mineral", "servicio menor", "afinación menor"]},
+      "AR": {"label": "Cambio de Aceite", "aliases": ["cambio de aceite", "aceite", "service", "lubricación"]},
+      "CO": {"label": "Cambio de Aceite", "aliases": ["cambio de aceite", "aceite", "lubricación"]},
+      "EC": {"label": "Cambio de Aceite", "aliases": ["cambio de aceite", "aceite", "mantenimiento"]},
+      "PE": {"label": "Cambio de Aceite y Filtro", "aliases": ["cambio de aceite", "aceite", "filtro"]},
+      "VE": {"label": "Cambio de Aceite", "aliases": ["cambio de aceite", "aceite", "mantenimiento"]},
+      "UY": {"label": "Cambio de Aceite", "aliases": ["cambio de aceite", "aceite", "lubricación"]},
+      "BR": {"label": "Troca de Óleo", "aliases": ["troca óleo", "óleo", "lubrificação"]}
+    }
+  },
+  {
+    "code": "TIRE_REPAIR_GENERIC",
+    "category": "mantenimiento",
+    "translations": {
+      "CL": {"label": "Vulcanización", "aliases": ["parche", "pinchazo", "neumático", "vulcanizado", "reparación neumático"]},
+      "AR": {"label": "Gomería - Parche", "aliases": ["cubierta", "auxilio", "ponchadura", "goma", "parche cubierta"]},
+      "CO": {"label": "Montallantas", "aliases": ["despinche", "llanta", "parche", "montallantas", "reparación llanta"]},
+      "MX": {"label": "Reparación de Llantas", "aliases": ["talacha", "vulcanizadora", "parche", "llantera", "reparación llanta"]},
+      "EC": {"label": "Vulcanizadora", "aliases": ["llanta", "parche", "vulcanización", "reparación llanta"]},
+      "PE": {"label": "Vulcanización", "aliases": ["parche", "neumático", "vulcanizado", "reparación neumático"]},
+      "VE": {"label": "Vulcanización", "aliases": ["parche", "caucho", "vulcanizado", "reparación caucho"]},
+      "UY": {"label": "Gomería", "aliases": ["pinchazo", "cubierta", "parche", "goma"]},
+      "US": {"label": "Tire Patch / Repair", "aliases": ["flat tire", "plug", "puncture", "tire repair", "tire shop"]},
+      "BR": {"label": "Conserto de Pneu", "aliases": ["furo", "borracharia", "remendo", "reparação pneu"]}
+    }
+  },
+  {
+    "code": "BODY_PAINT_PANEL",
+    "category": "bodyshop",
+    "translations": {
+      "CO": {"label": "Latonería y Pintura (Pieza)", "aliases": ["golpe", "latas", "pintura", "latonería", "enderezado"]},
+      "AR": {"label": "Chapa y Pintura", "aliases": ["chapista", "choque", "bollo", "pintura", "chapa"]},
+      "EC": {"label": "Enderezada y Pintura (Pieza)", "aliases": ["choque", "enderezado", "pintura", "enderezar"]},
+      "CL": {"label": "Desabolladura y Pintura (Pieza)", "aliases": ["toque", "pintura", "desabollado", "chapa", "abolladura"]},
+      "MX": {"label": "Desabolladura y Pintura (Pieza)", "aliases": ["golpe", "pintura", "desabollado", "chapa", "enderezado"]},
+      "PE": {"label": "Desabolladura y Pintura (Pieza)", "aliases": ["golpe", "pintura", "desabollado", "chapa"]},
+      "VE": {"label": "Desabolladura y Pintura (Pieza)", "aliases": ["golpe", "pintura", "desabollado", "chapa"]},
+      "UY": {"label": "Chapa y Pintura (Pieza)", "aliases": ["chapeado", "golpe", "pintura", "chapa"]},
+      "US": {"label": "Panel Painting & Dent", "aliases": ["pdr", "refinish", "bodywork", "dent repair", "paint"]},
+      "BR": {"label": "Funilaria e Pintura (Peça)", "aliases": ["funilaria", "amassado", "pintura", "chapa"]}
+    }
+  },
+  {
+    "code": "ENGINE_TUNEUP",
+    "category": "motor",
+    "translations": {
+      "CL": {"label": "Afinamiento de Motor", "aliases": ["limpieza inyectores", "bujías", "afinamiento", "tune up", "afinación"]},
+      "MX": {"label": "Afinación Mayor", "aliases": ["servicio", "bujías", "afinación", "tune up", "servicio mayor", "afinación mayor"]},
+      "AR": {"label": "Puesta a Punto / Service", "aliases": ["afinación", "correa", "service", "puesta a punto", "tune up"]},
+      "CO": {"label": "Sincronización de Motor", "aliases": ["afinación", "bujías", "sincronización", "tune up"]},
+      "EC": {"label": "ABC de Motor", "aliases": ["mantenimiento", "limpieza", "abc", "tune up"]},
+      "PE": {"label": "Afinamiento de Motor", "aliases": ["afinamiento", "bujías", "tune up", "servicio"]},
+      "VE": {"label": "Afinamiento de Motor", "aliases": ["afinamiento", "bujías", "tune up", "servicio"]},
+      "UY": {"label": "Afinación de Motor", "aliases": ["afinación", "bujías", "tune up", "servicio"]},
+      "US": {"label": "Engine Tune-up", "aliases": ["spark plugs", "coils", "tune up", "engine service"]},
+      "BR": {"label": "Regulagem de Motor", "aliases": ["regulagem", "velas", "tune up", "serviço motor"]}
+    }
+  },
+  {
+    "code": "BRAKE_PADS_FRONT",
+    "category": "mantenimiento",
+    "translations": {
+      "CL": {"label": "Cambio de Pastillas de Freno Delanteras", "aliases": ["pastillas delanteras", "frenos delanteros", "pastillas", "frenos"]},
+      "MX": {"label": "Cambio de Balatas Delanteras", "aliases": ["balatas delanteras", "frenos delanteros", "balatas", "frenos", "pastillas"]},
+      "AR": {"label": "Cambio de Pastillas de Freno Delanteras", "aliases": ["pastillas delanteras", "frenos delanteros", "pastillas"]},
+      "CO": {"label": "Cambio de Pastillas de Freno Delanteras", "aliases": ["pastillas delanteras", "frenos delanteros", "pastillas"]},
+      "EC": {"label": "Cambio de Pastillas de Freno Delanteras", "aliases": ["pastillas delanteras", "frenos delanteros", "pastillas"]},
+      "PE": {"label": "Cambio de Pastillas de Freno Delanteras", "aliases": ["pastillas delanteras", "frenos delanteros", "pastillas"]},
+      "VE": {"label": "Cambio de Pastillas de Freno Delanteras", "aliases": ["pastillas delanteras", "frenos delanteros", "pastillas"]},
+      "UY": {"label": "Cambio de Pastillas de Freno Delanteras", "aliases": ["pastillas delanteras", "frenos delanteros", "pastillas"]},
+      "US": {"label": "Front Brake Pads Replacement", "aliases": ["front pads", "front brakes", "brake pads", "front brake pads"]},
+      "BR": {"label": "Troca de Pastilhas Dianteiras", "aliases": ["pastilhas dianteiras", "freios dianteiros", "pastilhas"]}
+    }
+  },
+  {
+    "code": "TIRE_ROTATION",
+    "category": "mantenimiento",
+    "translations": {
+      "CL": {"label": "Rotación de Neumáticos", "aliases": ["rotación", "rotar neumáticos", "cambio posición llantas", "rotación llantas"]},
+      "MX": {"label": "Rotación de Llantas", "aliases": ["rotación", "rotar llantas", "cambio posición", "rotación neumáticos"]},
+      "AR": {"label": "Rotación de Cubiertas", "aliases": ["rotación", "rotar cubiertas", "cambio posición", "cubiertas"]},
+      "CO": {"label": "Rotación de Llantas", "aliases": ["rotación", "rotar llantas", "cambio posición"]},
+      "EC": {"label": "Rotación de Llantas", "aliases": ["rotación", "rotar llantas", "cambio posición"]},
+      "PE": {"label": "Rotación de Neumáticos", "aliases": ["rotación", "rotar neumáticos", "cambio posición"]},
+      "VE": {"label": "Rotación de Cauchos", "aliases": ["rotación", "rotar cauchos", "cambio posición", "rotación gomas"]},
+      "UY": {"label": "Rotación de Cubiertas", "aliases": ["rotación", "rotar cubiertas", "cambio posición"]},
+      "US": {"label": "Tire Rotation", "aliases": ["rotation", "tire rotation", "rotate tires", "wheel rotation"]},
+      "BR": {"label": "Rotação de Pneus", "aliases": ["rotação", "rotar pneus", "troca posição", "rotação rodas"]}
+    }
+  },
+  {
+    "code": "AC_RECHARGE",
+    "category": "especialidades",
+    "translations": {
+      "CL": {"label": "Carga de Gas Refrigerante", "aliases": ["gas", "recarga aire", "aire acondicionado", "gas refrigerante", "r134a"]},
+      "MX": {"label": "Recarga de Gas para Aire Acondicionado", "aliases": ["gas", "recarga aire", "aire", "gas refrigerante", "r134a", "clima"]},
+      "AR": {"label": "Carga de Gas para Aire Acondicionado", "aliases": ["gas", "recarga aire", "aire", "gas refrigerante"]},
+      "CO": {"label": "Recarga de Gas Refrigerante", "aliases": ["gas", "recarga aire", "aire acondicionado", "gas refrigerante"]},
+      "EC": {"label": "Recarga de Gas Refrigerante", "aliases": ["gas", "recarga aire", "aire acondicionado", "gas refrigerante"]},
+      "PE": {"label": "Carga de Gas Refrigerante", "aliases": ["gas", "recarga aire", "aire acondicionado", "gas refrigerante"]},
+      "VE": {"label": "Carga de Gas Refrigerante", "aliases": ["gas", "recarga aire", "aire acondicionado", "gas refrigerante"]},
+      "UY": {"label": "Carga de Gas Refrigerante", "aliases": ["gas", "recarga aire", "aire acondicionado", "gas refrigerante"]},
+      "US": {"label": "A/C System Recharge", "aliases": ["ac recharge", "refrigerant", "ac gas", "air conditioning", "r134a"]},
+      "BR": {"label": "Recarga de Gás Refrigerante", "aliases": ["gás", "recarga ar", "ar condicionado", "gás refrigerante"]}
+    }
+  },
+  {
+    "code": "ALIGNMENT",
+    "category": "especialidades",
+    "translations": {
+      "CL": {"label": "Alineación y Balanceo", "aliases": ["alineación", "balanceo", "alinear", "balancear", "geometría"]},
+      "MX": {"label": "Alineación y Balanceo", "aliases": ["alineación", "balanceo", "alinear", "balancear", "geometría"]},
+      "AR": {"label": "Alineación y Balanceo", "aliases": ["alineación", "balanceo", "alinear", "balancear"]},
+      "CO": {"label": "Alineación y Balanceo", "aliases": ["alineación", "balanceo", "alinear", "balancear"]},
+      "EC": {"label": "Alineación y Balanceo", "aliases": ["alineación", "balanceo", "alinear", "balancear"]},
+      "PE": {"label": "Alineación y Balanceo", "aliases": ["alineación", "balanceo", "alinear", "balancear"]},
+      "VE": {"label": "Alineación y Balanceo", "aliases": ["alineación", "balanceo", "alinear", "balancear"]},
+      "UY": {"label": "Alineación y Balanceo", "aliases": ["alineación", "balanceo", "alinear", "balancear"]},
+      "US": {"label": "Wheel Alignment", "aliases": ["alignment", "wheel alignment", "front end alignment", "4-wheel alignment"]},
+      "BR": {"label": "Alinhamento e Balanceamento", "aliases": ["alinhamento", "balanceamento", "alinhar", "balancear"]}
+    }
+  },
+  {
+    "code": "DIAGNOSTIC_SCAN",
+    "category": "especialidades",
+    "translations": {
+      "CL": {"label": "Diagnóstico Computarizado", "aliases": ["scanner", "diagnóstico", "obd", "check engine", "códigos", "lectura códigos"]},
+      "MX": {"label": "Escaneo Diagnóstico", "aliases": ["scanner", "diagnóstico", "obd", "check engine", "códigos", "lectura"]},
+      "AR": {"label": "Diagnóstico Computarizado", "aliases": ["scanner", "diagnóstico", "obd", "check engine", "códigos"]},
+      "CO": {"label": "Diagnóstico Computarizado", "aliases": ["scanner", "diagnóstico", "obd", "check engine"]},
+      "EC": {"label": "Diagnóstico Computarizado", "aliases": ["scanner", "diagnóstico", "obd", "check engine"]},
+      "PE": {"label": "Diagnóstico Computarizado", "aliases": ["scanner", "diagnóstico", "obd", "check engine"]},
+      "VE": {"label": "Diagnóstico Computarizado", "aliases": ["scanner", "diagnóstico", "obd", "check engine"]},
+      "UY": {"label": "Diagnóstico Computarizado", "aliases": ["scanner", "diagnóstico", "obd", "check engine"]},
+      "US": {"label": "Computerized Diagnostic Scan", "aliases": ["scanner", "diagnostic", "obd", "check engine", "code reading", "scan"]},
+      "BR": {"label": "Varredura Diagnóstica", "aliases": ["scanner", "diagnóstico", "obd", "check engine", "leitura códigos"]}
+    }
+  }
+]
+
+
+
+
+
+

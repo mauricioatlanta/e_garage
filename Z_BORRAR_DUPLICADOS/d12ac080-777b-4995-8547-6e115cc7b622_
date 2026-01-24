@@ -1,0 +1,77 @@
+{% load i18n %}
+<style>
+  /* Reglas para impresión/PDF */
+  @media print {
+    /* Página y márgenes con header/footer */
+    @page {
+      size: A4;
+      margin: 18mm 14mm 20mm 14mm; /* top right bottom left */
+
+      /* Inserta los elementos "en ejecución" */
+      @top-center { content: element(pdf-header); }
+      @bottom-right { content: element(pdf-footer); }
+    }
+
+    /* Header/Pie "running elements" */
+    .pdf-header { position: running(pdf-header); }
+    .pdf-footer { position: running(pdf-footer); }
+
+    /* Estilos sobrios para header/footer */
+    .pdf-header, .pdf-footer {
+      font-size: 11px;
+      color: #111827; /* gray-900 */
+    }
+    .pdf-header {
+      border-bottom: 1px solid #cbd5e1; /* slate-300 */
+      padding-bottom: 6px;
+      margin-bottom: 8px;
+    }
+    .pdf-footer {
+      border-top: 1px solid #cbd5e1;
+      padding-top: 6px;
+      margin-top: 8px;
+    }
+
+    /* Alineaciones utilitarias */
+    .row { display: flex; justify-content: space-between; align-items: center; }
+    .muted { color: #475569; } /* slate-600 */
+
+    /* Reset visual: sin sombras ni transparencias */
+    .doc-shell {
+      background: #ffffff !important;
+      border-width: 1px !important;
+      box-shadow: none !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    /* Bordes por tipo, sobrios y legibles en B/N */
+    .theme-ot   { border-color: #64748b !important; } /* slate-500 */
+    .theme-pres { border-color: #b45309 !important; } /* amber-700 */
+    .theme-rec  { border-color: #047857 !important; } /* emerald-700 */
+
+    /* Chip compacto para cabecera */
+    .doc-chip  {
+      border-radius: 9999px;
+      padding: 2px 8px;
+      font-size: 11px;
+      line-height: 1.2;
+      background: #f3f4f6 !important; /* gray-100 */
+      color: #111827 !important;       /* gray-900 */
+    }
+
+    /* Encabezados/labels más oscuros en papel */
+    .form-label, label { color: #111827 !important; }
+    input, select, textarea {
+      border: 1px solid #cbd5e1 !important; /* slate-300 */
+      box-shadow: none !important;
+    }
+
+    /* Ocultar botones y elementos no relevantes en PDF */
+    .no-print, button, .btn, [role="button"] { display: none !important; }
+
+    /* WeasyPrint reemplaza .page/.pages automáticamente */
+    .page::after { content: counter(page); }
+    .pages::after { content: counter(pages); }
+  }
+</style>

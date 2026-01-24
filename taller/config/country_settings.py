@@ -179,8 +179,8 @@ class CountrySettings:
         },
     }
 
-    # País por defecto
-    DEFAULT_COUNTRY = "CL"
+    # País por defecto: desde settings (EGARAGE_DEFAULT_COUNTRY) para una sola fuente de verdad
+    DEFAULT_COUNTRY = getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl").upper()
 
     # Mapeo de prefijos legacy a países (para canonicalización)
     LEGACY_PREFIX_TO_COUNTRY = {

@@ -246,6 +246,28 @@ input:focus {
   transform: translateY(-2px);
 }
 
+/* Estilos para las opciones del select - FIX contraste dropdown */
+select option {
+  background-color: rgba(0, 0, 0, 0.95) !important;
+  color: #ffffff !important;
+  padding: 12px 16px !important;
+  font-weight: 500 !important;
+  font-size: 15px !important;
+  font-family: 'Rajdhani', sans-serif !important;
+}
+
+select option:hover,
+select option:focus {
+  background-color: rgba(0, 230, 208, 0.3) !important;
+  color: #00e6d0 !important;
+}
+
+select option:checked {
+  background-color: rgba(0, 230, 208, 0.5) !important;
+  color: #ffffff !important;
+  font-weight: 600 !important;
+}
+
 .btn-futuristic {
   background: linear-gradient(135deg, #00e6d0 0%, #00b3a0 50%, #008a7a 100%);
   border: 2px solid rgba(0, 230, 208, 0.5);
@@ -352,6 +374,7 @@ h1 {
   <div class="form-card">
     <form method="post" id="client-form" enctype="multipart/form-data">
       {% csrf_token %}
+      <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
 
       {% if form.errors %}
         <div class="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
@@ -462,24 +485,42 @@ h1 {
         {% else %}
         <div class="form-group">
           <label for="{{ form.region.id_for_label }}">{% trans "Region" %}</label>
-          {{ form.region }}
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div style="flex: 1;">{{ form.region }}</div>
+            <button type="button" id="btn-agregar-region" class="btn-futuristic" style="padding: 10px 16px; margin: 0; white-space: nowrap; font-size: 12px;" title="{% trans 'Agregar nueva región' %}">
+              ➕ {% trans "Add" %}
+            </button>
+          </div>
           {% if form.region.errors %}
             <div class="errorlist">{{ form.region.errors.0 }}</div>
           {% endif %}
           {% if form.region.help_text %}
             <div class="helptext">{{ form.region.help_text }}</div>
           {% endif %}
+          {% if not form.region.field.queryset.exists %}
+            <div class="helptext" style="color: #ff6b6b;">
+              ⚠️ {% trans "No hay regiones disponibles. Por favor contacte al soporte." %}
+            </div>
+          {% endif %}
         </div>
 
         <div class="form-group">
           <label for="{{ form.ciudad.id_for_label }}">{% trans "City" %}</label>
-          {{ form.ciudad }}
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <div style="flex: 1;">{{ form.ciudad }}</div>
+            <button type="button" id="btn-agregar-ciudad" class="btn-futuristic" style="padding: 10px 16px; margin: 0; white-space: nowrap; font-size: 12px;" title="{% trans 'Agregar nueva ciudad' %}" disabled>
+              ➕ {% trans "Add" %}
+            </button>
+          </div>
           {% if form.ciudad.errors %}
             <div class="errorlist">{{ form.ciudad.errors.0 }}</div>
           {% endif %}
           {% if form.ciudad.help_text %}
             <div class="helptext">{{ form.ciudad.help_text }}</div>
           {% endif %}
+          <div id="ciudad-loading-region" style="display: none; color: #00e6d0; font-size: 12px; margin-top: 4px;">
+            {% trans "Loading cities..." %}
+          </div>
         </div>
         {% endif %}
       </div>
@@ -567,56 +608,166 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
     const regionSelect = document.getElementById('id_region');
     const ciudadSelect = document.getElementById('id_ciudad');
+    const btnAgregarRegion = document.getElementById('btn-agregar-region');
+    const btnAgregarCiudad = document.getElementById('btn-agregar-ciudad');
+    const ciudadLoading = document.getElementById('ciudad-loading-region');
+    
+    // Función para cargar ciudades de una región
+    function cargarCiudades(regionId) {
+        if (!regionId) {
+            ciudadSelect.innerHTML = '<option value="">{% trans "Select Region first" %}</option>';
+            ciudadSelect.disabled = true;
+            btnAgregarCiudad.disabled = true;
+            return;
+        }
+        
+        ciudadSelect.innerHTML = '<option value="">{% trans "Loading cities..." %}</option>';
+        ciudadSelect.disabled = true;
+        if (ciudadLoading) ciudadLoading.style.display = 'block';
+        
+        const url = `{% country_url 'clientes:obtener_ciudades' %}?region_id=${regionId}`;
+        
+        fetch(url, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            credentials: 'same-origin'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                ciudadSelect.innerHTML = '<option value="">{% trans "Select City" %}</option>';
+                ciudadSelect.disabled = false;
+                btnAgregarCiudad.disabled = false;
+                if (ciudadLoading) ciudadLoading.style.display = 'none';
+                
+                const ciudades = Array.isArray(data) ? data : (data.ciudades || []);
+                
+                if (ciudades.length > 0) {
+                    ciudades.forEach(ciudad => {
+                        const option = document.createElement('option');
+                        option.value = ciudad.id;
+                        option.textContent = ciudad.nombre;
+                        ciudadSelect.appendChild(option);
+                    });
+                } else {
+                    ciudadSelect.innerHTML = '<option value="">{% trans "No cities available" %}</option>';
+                }
+            })
+            .catch(error => {
+                console.error('Error loading cities:', error);
+                ciudadSelect.innerHTML = '<option value="">{% trans "Error loading cities" %}</option>';
+                ciudadSelect.disabled = false;
+                btnAgregarCiudad.disabled = false;
+                if (ciudadLoading) ciudadLoading.style.display = 'none';
+            });
+    }
     
     if (regionSelect && ciudadSelect) {
+        // Cargar ciudades cuando cambia la región
         regionSelect.addEventListener('change', function() {
-            const regionId = this.value;
-            
-            if (regionId) {
-                ciudadSelect.innerHTML = '<option value="">{% trans "Loading cities..." %}</option>';
-                ciudadSelect.disabled = true;
-                
-                const url = `{% country_url 'clientes:obtener_ciudades' %}?region_id=${regionId}`;
-                
-                fetch(url, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                    },
-                    credentials: 'same-origin'
-                })
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        ciudadSelect.innerHTML = '<option value="">{% trans "Select City" %}</option>';
-                        ciudadSelect.disabled = false;
-                        
-                        const ciudades = Array.isArray(data) ? data : (data.ciudades || []);
-                        
-                        if (ciudades.length > 0) {
-                            ciudades.forEach(ciudad => {
-                                const option = document.createElement('option');
-                                option.value = ciudad.id;
-                                option.textContent = ciudad.nombre;
-                                ciudadSelect.appendChild(option);
-                            });
-                        } else {
-                            ciudadSelect.innerHTML = '<option value="">{% trans "No cities available" %}</option>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error loading cities:', error);
-                        ciudadSelect.innerHTML = '<option value="">{% trans "Error loading cities" %}</option>';
-                        ciudadSelect.disabled = false;
-                    });
-            } else {
-                ciudadSelect.innerHTML = '<option value="">{% trans "Select Region first" %}</option>';
-                ciudadSelect.disabled = true;
-            }
+            cargarCiudades(this.value);
         });
+        
+        // Cargar ciudades si ya hay una región seleccionada al cargar la página
+        if (regionSelect.value) {
+            cargarCiudades(regionSelect.value);
+        }
+        
+        // Agregar nueva región
+        if (btnAgregarRegion) {
+            btnAgregarRegion.addEventListener('click', function() {
+                const nombreRegion = prompt('{% trans "Ingrese el nombre de la nueva región:" %}');
+                if (!nombreRegion || !nombreRegion.trim()) {
+                    return;
+                }
+                
+                const url = '{% country_url "clientes:agregar_region" %}';
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ nombre: nombreRegion.trim() })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Agregar la nueva región al select
+                        const option = document.createElement('option');
+                        option.value = data.region.id;
+                        option.textContent = data.region.nombre;
+                        regionSelect.appendChild(option);
+                        regionSelect.value = data.region.id;
+                        // Cargar ciudades de la nueva región
+                        cargarCiudades(data.region.id);
+                        alert('{% trans "Región agregada exitosamente" %}');
+                    } else {
+                        alert('{% trans "Error:" %} ' + (data.error || '{% trans "Error desconocido" %}'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding region:', error);
+                    alert('{% trans "Error al agregar la región" %}');
+                });
+            });
+        }
+        
+        // Agregar nueva ciudad
+        if (btnAgregarCiudad) {
+            btnAgregarCiudad.addEventListener('click', function() {
+                const regionId = regionSelect.value;
+                if (!regionId) {
+                    alert('{% trans "Por favor seleccione una región primero" %}');
+                    return;
+                }
+                
+                const nombreCiudad = prompt('{% trans "Ingrese el nombre de la nueva ciudad:" %}');
+                if (!nombreCiudad || !nombreCiudad.trim()) {
+                    return;
+                }
+                
+                const url = '{% country_url "clientes:agregar_ciudad" %}';
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify({ 
+                        nombre: nombreCiudad.trim(),
+                        region_id: regionId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Agregar la nueva ciudad al select
+                        const option = document.createElement('option');
+                        option.value = data.ciudad.id;
+                        option.textContent = data.ciudad.nombre;
+                        ciudadSelect.appendChild(option);
+                        ciudadSelect.value = data.ciudad.id;
+                        alert('{% trans "Ciudad agregada exitosamente" %}');
+                    } else {
+                        alert('{% trans "Error:" %} ' + (data.error || '{% trans "Error desconocido" %}'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding city:', error);
+                    alert('{% trans "Error al agregar la ciudad" %}');
+                });
+            });
+        }
     }
 });
 </script>

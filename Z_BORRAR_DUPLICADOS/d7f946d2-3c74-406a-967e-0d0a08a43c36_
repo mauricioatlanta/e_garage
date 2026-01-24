@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load country_url %}
+{% load static i18n widget_tweaks %}
+
+{% block title %}{% if LANGUAGE_CODE == 'es' %}Editar repuesto{% else %}Edit part{% endif %}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Estilos específicos para formularios de repuestos */
+.form-group { margin-bottom: 20px; }
+.form-group label { display:block; font-weight:600; color:#00e6d0 !important; font-size:14px; }
+</style>
+{% endblock extra_css %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+  <div class="bg-slate-900/70 rounded-2xl p-6 shadow-xl border border-cyan-500/20" data-country="{{ request.user.empresa.pais|default:'CL' }}">
+    <div class="flex items-center gap-3 mb-4">
+      <h1 class="text-xl font-bold text-cyan-200">
+        {% if form.instance.pk %}
+          {% if LANGUAGE_CODE == 'es' %}✏️ Editar repuesto{% else %}✏️ Edit part{% endif %}
+        {% else %}
+          {% if LANGUAGE_CODE == 'es' %}➕ Nuevo repuesto{% else %}➕ New part{% endif %}
+        {% endif %}
+      </h1>
+      {% include "components/country_badge.html" %}
+    </div>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <!-- Campos del formulario -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {% for field in form.visible_fields %}
+          <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {% render_field field class+="w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2" %}
+            {% if field.help_text %}<p class="text-cyan-300/80 text-xs mt-1">{{ field.help_text }}</p>{% endif %}
+            {% for e in field.errors %}<p class="text-red-400 text-xs mt-1">{{ e }}</p>{% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="mt-6 flex items-center gap-2">
+        <!-- Mensaje de ayuda para precios -->
+        <div class="w-full bg-blue-900/30 border border-blue-400/30 rounded-lg p-4 mb-4">
+          <div class="flex items-center gap-2 text-blue-300">
+            <i class="fas fa-info-circle"></i>
+            <span class="font-semibold">Formato de Precios</span>
+          </div>
+          <p class="text-blue-200/80 text-sm mt-2">
+            Ingresa los precios como números decimales. Ejemplo: <code class="bg-black/40 px-1 rounded">15000.50</code>
+          </p>
+        </div>
+
+        <button type="submit" class="px-4 py-2 rounded-lg bg-cyan-600 hover:bg-cyan-700 text-white shadow">
+          {% if form.instance.pk %}
+            {% if LANGUAGE_CODE == 'es' %}Guardar cambios{% else %}Save changes{% endif %}
+          {% else %}
+            {% if LANGUAGE_CODE == 'es' %}Crear repuesto{% else %}Create part{% endif %}
+          {% endif %}
+        </button>
+        <a href="{% country_url 'repuestos:lista_repuestos' %}"
+           class="inline-flex items-center px-4 py-2 border border-cyan-400/60 rounded-lg text-white bg-black/60 hover:bg-cyan-900/30">
+          {% if LANGUAGE_CODE == 'es' %}← Volver a la lista{% else %}← Back to list{% endif %}
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock content %}
+
+{% block extra_js %}
+{% endblock extra_js %}

@@ -525,18 +525,20 @@ body {
         <!-- Mensajes de éxito (filtrados) -->
         {% if messages %}
             {% for message in messages %}
-                {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Professional Automotive Management System" not in message|stringformat:"s" and "Ha iniciado sesión exitosamente" not in message|stringformat:"s" and "Ha cerrado sesión" not in message|stringformat:"s" and "iniciado sesión exitosamente" not in message|stringformat:"s" and "cerrado sesión" not in message|stringformat:"s" and "Información de empresa guardada exitosamente" not in message|stringformat:"s" %}
-                    <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endif %}
+                {% with message_str=message|stringformat:"s" %}
+                    {% if "Successfully signed in" not in message_str and "You have signed out" not in message_str and "Professional Automotive Management System" not in message_str and "Ha iniciado sesión exitosamente" not in message_str and "Ha cerrado sesión" not in message_str and "iniciado sesión exitosamente" not in message_str and "cerrado sesión" not in message_str and "Información de empresa guardada exitosamente" not in message_str %}
+                        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
+                            {{ message }}
+                        </div>
+                    {% endif %}
+                {% endwith %}
             {% endfor %}
         {% endif %}
 
         <!-- Formulario -->
         <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
             {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.GET.next }}">
+            {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
             <!-- Email/Usuario -->
             <div class="form-group">

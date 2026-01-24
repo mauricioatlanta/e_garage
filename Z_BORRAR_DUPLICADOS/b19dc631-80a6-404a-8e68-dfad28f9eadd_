@@ -1,0 +1,31 @@
+{% load static %}
+
+<!-- Scripts específicos para formulario de documentos -->
+<!-- Orden correcto: jQuery → jQuery UI → Select2 → DAL → eGarage -->
+
+{# Vendor (orden importa) #}
+<script src="{% static 'vendor/jquery/jquery-3.6.0.min.js' %}"></script>
+<script src="{% static 'vendor/dist/js/jquery-ui.min.js' %}"></script>
+<script src="{% static 'vendor/dist/js/select2.min.js' %}"></script>
+
+{# DAL init único #}
+<script src="{% static 'autocomplete_light_custom/autocomplete.init.js' %}"></script>
+
+{# Bundle canónico eGarage #}
+<script src="{% static 'taller/common/js/documentos_form.js' %}"></script>
+
+{# Configuración de endpoints (opcional) #}
+<script>
+  // Configuración global para el formulario de documentos
+  window.EG = window.EG || {};
+  window.EG.endpoints = window.EG.endpoints || {};
+
+  // Endpoints específicos del formulario
+  {% if request.resolver_match.url_name == 'documento_editar' %}
+    window.EG.endpoints.docNextNumberUrl = "{% url 'documentos:api_next_number' %}";
+  {% endif %}
+
+  // Configuración de país
+  window.EG.config = window.EG.config || {};
+  window.EG.config.COUNTRY = "{{ request.user.empresa.pais|default:'CL' }}";
+</script>

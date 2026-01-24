@@ -1,0 +1,2 @@
+/* TailwindCSS dummy */
+body { background: #1a202c; color: white; }

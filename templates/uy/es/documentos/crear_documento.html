@@ -1,9 +1,9 @@
-{# templates/cl/es/documentos/crear_documento.html #}
+{# templates/uy/es/documentos/crear_documento.html #}
 {% extends "taller/common/documentos/document_form.html" %}
 {% load i18n %}
 {% load static %}
 {% load country_url %}
 
 {% block title %}
-  {{ empresa.nombre_taller }} - {% trans "Nuevo documento" %}
+  {{ empresa.nombre_taller|default:"eGarage" }} - {% trans "Crear Documento" %}
 {% endblock %}

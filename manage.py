@@ -1,41 +1,25 @@
 #!/usr/bin/env python
-import logging
 import os
 import sys
+import logging
 
-# Configuración básica de logging
-logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
-
-
-# 🔹 Punto de entrada principal del proyecto Django
 def main():
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
-
-    # 🔍 Verificar dependencias clave (no importar paquetes opcionales pesados aquí)
-    try:
-        import django
-    except ImportError as exc:
-        logging.critical(
-            "No se pudo importar Django. Asegúrate de haberlo instalado y de haber activado tu entorno virtual."
-        )
-        raise exc
-
-    # Comprobar si estamos en modo de desarrollo
-    if os.environ.get("DJANGO_SETTINGS_MODULE") == "gestion_taller.settings":
+    # Warning solo en desarrollo
+    if os.getenv("EGARAGE_ENV", "dev").lower() != "prod":
         logging.warning("Modo de desarrollo activado. Asegúrate de no usar esto en producción.")
+
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:
-        logging.critical(
-            "No se pudo importar Django. Asegúrate de haberlo instalado y de haber activado tu entorno virtual."
-        )
-        raise exc
+        raise ImportError(
+            "Couldn't import Django. Are you sure it's installed and "
+            "available on your PYTHONPATH environment variable? Did you "
+            "forget to activate a virtual environment?"
+        ) from exc
 
-    # Log inicial
-    logging.info("Iniciando servidor Django...")
     execute_from_command_line(sys.argv)
-
 
 if __name__ == "__main__":
     main()

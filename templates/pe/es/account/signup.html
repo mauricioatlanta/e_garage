@@ -743,14 +743,9 @@ body {
                         Información del Negocio
                     </h3>
 
-                    <div class="form-group">
-                        <label class="form-label">Nombre del Taller</label>
-                        {{ form.nombre_taller|add_class:"form-input" }}
-                        {% if form.nombre_taller.errors %}
-                        <div class="error-message">{{ form.nombre_taller.errors }}</div>
-                        {% endif %}
-                    </div>
-
+                    <!-- ✅ FLUJO "LITE": El nombre del taller se genera automáticamente -->
+                    <!-- El usuario puede configurarlo después en Settings -->
+                    
                     <div class="form-grid">
                         <div class="form-group">
                             <label class="form-label">

@@ -1,0 +1,351 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Panel de Administración - Suscriptores{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6">
+        <h1 class="text-3xl font-bold text-cyan-400 mb-2">📊 Panel de Administración de Suscriptores</h1>
+        <p class="text-gray-300">Gestiona suscriptores, extiende planes y envía notificaciones</p>
+    </div>
+
+    <!-- Estadísticas Generales -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        <div class="bg-gray-800 rounded-lg p-4 border border-cyan-500">
+            <div class="text-gray-400 text-sm">Total Empresas</div>
+            <div class="text-2xl font-bold text-cyan-400">{{ total_empresas }}</div>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-4 border border-green-500">
+            <div class="text-gray-400 text-sm">Activas</div>
+            <div class="text-2xl font-bold text-green-400">{{ empresas_activas }}</div>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-4 border border-red-500">
+            <div class="text-gray-400 text-sm">Vencidas</div>
+            <div class="text-2xl font-bold text-red-400">{{ empresas_vencidas }}</div>
+        </div>
+        <div class="bg-gray-800 rounded-lg p-4 border border-yellow-500">
+            <div class="text-gray-400 text-sm">Críticas (&lt;5 días)</div>
+            <div class="text-2xl font-bold text-yellow-400">{{ empresas_criticas|length }}</div>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="bg-gray-800 rounded-lg p-4 mb-6 border border-gray-700">
+        <form method="get" class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">País</label>
+                <select name="pais" class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600">
+                    <option value="">Todos</option>
+                    {% for codigo, config in paises.items %}
+                    <option value="{{ codigo }}" {% if pais_filter == codigo %}selected{% endif %}>
+                        {{ config.name|default:codigo }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
+                <select name="status" class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600">
+                    <option value="">Todos</option>
+                    <option value="activa" {% if status_filter == 'activa' %}selected{% endif %}>Activa</option>
+                    <option value="vencida" {% if status_filter == 'vencida' %}selected{% endif %}>Vencida</option>
+                    <option value="trial" {% if status_filter == 'trial' %}selected{% endif %}>Trial</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Días Restantes</label>
+                <select name="dias" class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600">
+                    <option value="">Todos</option>
+                    <option value="critico" {% if dias_filter == 'critico' %}selected{% endif %}>🔴 Crítico (≤1 día)</option>
+                    <option value="advertencia" {% if dias_filter == 'advertencia' %}selected{% endif %}>⚠️ Advertencia (≤5 días)</option>
+                    <option value="vencido" {% if dias_filter == 'vencido' %}selected{% endif %}>❌ Vencido</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Búsqueda</label>
+                <input type="text" name="search" value="{{ search_query }}" 
+                       placeholder="Nombre, email, teléfono..."
+                       class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600">
+            </div>
+            <div class="flex items-end">
+                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">
+                    🔍 Filtrar
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Estadísticas por País -->
+    <div class="bg-gray-800 rounded-lg p-4 mb-6 border border-gray-700">
+        <h2 class="text-xl font-bold text-cyan-400 mb-4">📈 Estadísticas por País</h2>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {% for codigo, stats in stats_por_pais.items %}
+            <div class="bg-gray-700 rounded p-3">
+                <div class="font-bold text-cyan-300">{{ stats.nombre }}</div>
+                <div class="text-sm text-gray-400">Total: {{ stats.total }}</div>
+                <div class="text-sm text-green-400">Activas: {{ stats.activas }}</div>
+                <div class="text-sm text-red-400">Vencidas: {{ stats.vencidas }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Tabla de Suscriptores -->
+    <div class="bg-gray-800 rounded-lg border border-gray-700 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-700">
+                    <tr>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Empresa</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">País</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Email</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Plan</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Días Restantes</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Vencimiento</th>
+                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-700">
+                    {% for empresa in empresas %}
+                    {% if empresa.user %}
+                    <tr class="hover:bg-gray-700 
+                        {% if empresa.estado_suscripcion == 'vencida' %}bg-gray-900/30
+                        {% elif empresa.estado_suscripcion == 'critico' %}bg-red-900/30
+                        {% elif empresa.estado_suscripcion == 'advertencia' %}bg-yellow-900/20
+                        {% else %}bg-green-900/10{% endif %}">
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-white">{{ empresa.nombre_taller|default:"N/A" }}</div>
+                            {% if empresa.telefono %}
+                            <div class="text-sm text-gray-400">📱 {{ empresa.telefono }}</div>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-xs rounded bg-cyan-900 text-cyan-300">
+                                {{ empresa.pais|default:"N/A" }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3 text-gray-300 text-sm">
+                            {{ empresa.user.email|default:"N/A" }}
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-xs rounded {% if empresa.plan == 'trial' %}bg-yellow-900 text-yellow-300{% else %}bg-green-900 text-green-300{% endif %}">
+                                {{ empresa.plan|default:"N/A"|title }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="font-bold 
+                                {% if empresa.estado_suscripcion == 'vencida' %}text-gray-400
+                                {% elif empresa.estado_suscripcion == 'critico' %}text-red-400
+                                {% elif empresa.estado_suscripcion == 'advertencia' %}text-yellow-400
+                                {% else %}text-green-400{% endif %}">
+                                {% if empresa.dias_restantes is not None %}{{ empresa.dias_restantes }} días{% else %}N/A{% endif %}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if empresa.estado_suscripcion == 'activa' %}
+                            <span class="px-2 py-1 text-xs rounded bg-green-900 text-green-300">✅ Activa</span>
+                            {% elif empresa.estado_suscripcion == 'advertencia' %}
+                            <span class="px-2 py-1 text-xs rounded bg-yellow-900 text-yellow-300">⚠️ Advertencia</span>
+                            {% elif empresa.estado_suscripcion == 'critico' %}
+                            <span class="px-2 py-1 text-xs rounded bg-red-900 text-red-300">🔴 Crítico</span>
+                            {% else %}
+                            <span class="px-2 py-1 text-xs rounded bg-gray-900 text-gray-300">❌ Vencida</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3 text-gray-300 text-sm">
+                            {% if empresa.fecha_fin %}
+                            {{ empresa.fecha_fin|date:"d/m/Y" }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="flex gap-2">
+                                <button onclick="mostrarModalExtension({{ empresa.id }}, '{{ empresa.nombre_taller|escapejs }}')" 
+                                        class="bg-cyan-600 hover:bg-cyan-700 text-white text-xs px-3 py-1 rounded">
+                                    ⏱️ Extender
+                                </button>
+                                <a href="{% url 'admin_detalle_suscriptor' empresa.id %}" 
+                                   class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-3 py-1 rounded">
+                                    👁️ Ver
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="px-4 py-8 text-center text-gray-400">
+                            No se encontraron suscriptores con los filtros seleccionados.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Paginación -->
+        {% if page_obj.has_other_pages %}
+        <div class="px-4 py-3 bg-gray-700 border-t border-gray-600">
+            <div class="flex justify-between items-center">
+                <div class="text-sm text-gray-400">
+                    Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                </div>
+                <div class="flex gap-2">
+                    {% if page_obj.has_previous %}
+                    <a href="?page={{ page_obj.previous_page_number }}{% if pais_filter %}&pais={{ pais_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if dias_filter %}&dias={{ dias_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                       class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded">Anterior</a>
+                    {% endif %}
+                    {% if page_obj.has_next %}
+                    <a href="?page={{ page_obj.next_page_number }}{% if pais_filter %}&pais={{ pais_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if dias_filter %}&dias={{ dias_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}" 
+                       class="bg-gray-600 hover:bg-gray-500 text-white px-4 py-2 rounded">Siguiente</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Modal de Extensión -->
+<div id="modalExtension" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full border border-cyan-500">
+        <h3 class="text-xl font-bold text-cyan-400 mb-4">⏱️ Extender Suscripción</h3>
+        <p class="text-gray-300 mb-4">Empresa: <span id="modalEmpresaNombre" class="font-bold"></span></p>
+        
+        <form id="formExtension" onsubmit="extenderSuscripcion(event)">
+            {% csrf_token %}
+            <input type="hidden" id="modalEmpresaId" name="empresa_id">
+            
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Meses a extender</label>
+                <select id="mesesExtension" name="meses" class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600" required>
+                    <option value="1">1 mes</option>
+                    <option value="6">6 meses</option>
+                    <option value="12">12 meses</option>
+                </select>
+                <p class="text-xs text-gray-400 mt-1">Nota: Solo se permiten 1, 6 o 12 meses (según admin_grant_courtesy_extension)</p>
+            </div>
+            
+            <div class="mb-4">
+                <label class="flex items-center text-gray-300">
+                    <input type="checkbox" id="enviarNotificacion" name="enviar_notificacion" checked class="mr-2">
+                    Enviar notificación (Email + WhatsApp)
+                </label>
+            </div>
+            
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">
+                    ✅ Extender
+                </button>
+                <button type="button" onclick="cerrarModal()" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+        
+        <div id="mensajeResultado" class="mt-4 hidden"></div>
+    </div>
+</div>
+
+<script>
+function mostrarModalExtension(empresaId, empresaNombre) {
+    document.getElementById('modalEmpresaId').value = empresaId;
+    document.getElementById('modalEmpresaNombre').textContent = empresaNombre;
+    document.getElementById('modalExtension').classList.remove('hidden');
+}
+
+function cerrarModal() {
+    document.getElementById('modalExtension').classList.add('hidden');
+    document.getElementById('mensajeResultado').classList.add('hidden');
+    document.getElementById('formExtension').reset();
+}
+
+function extenderSuscripcion(event) {
+    event.preventDefault();
+    
+    const empresaId = document.getElementById('modalEmpresaId').value;
+    const meses = document.getElementById('mesesExtension').value;
+    const enviarNotificacion = document.getElementById('enviarNotificacion').checked;
+    const mensajeDiv = document.getElementById('mensajeResultado');
+    
+    // Mostrar loading
+    mensajeDiv.innerHTML = '<div class="text-cyan-400">⏳ Extendiendo suscripción...</div>';
+    mensajeDiv.classList.remove('hidden');
+    
+    // Enviar petición AJAX
+    const formData = new FormData();
+    formData.append('meses', meses);
+    formData.append('enviar_notificacion', enviarNotificacion);
+    
+    // Obtener CSRF token
+    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || 
+                      document.cookie.split('; ').find(row => row.startsWith('csrftoken='))?.split('=')[1];
+    
+    fetch(`/admin/suscriptores/${empresaId}/extender/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrftoken
+        }
+    })
+    .then(response => {
+        // Verificar si la respuesta es JSON
+        const contentType = response.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+            // Si no es JSON, intentar leer como texto para ver el error
+            return response.text().then(text => {
+                throw new Error(`El servidor devolvió HTML en lugar de JSON. Status: ${response.status}. Contenido: ${text.substring(0, 200)}`);
+            });
+        }
+        // Si es JSON, parsearlo
+        if (!response.ok) {
+            // Si hay un error HTTP, intentar parsear el JSON del error
+            return response.json().then(data => {
+                throw new Error(data.error || `Error HTTP ${response.status}`);
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            mensajeDiv.innerHTML = `
+                <div class="bg-green-900 text-green-300 p-3 rounded">
+                    ✅ ${data.message}<br>
+                    Nueva fecha: ${data.nueva_fecha_fin}<br>
+                    Días restantes: ${data.dias_restantes}<br>
+                    ${data.notificaciones_enviadas ? '📧 Notificaciones enviadas' : '⚠️ Notificaciones no enviadas'}
+                </div>
+            `;
+            // Recargar página después de 2 segundos
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
+        } else {
+            mensajeDiv.innerHTML = `
+                <div class="bg-red-900 text-red-300 p-3 rounded">
+                    ❌ Error: ${data.error}
+                </div>
+            `;
+        }
+    })
+    .catch(error => {
+        mensajeDiv.innerHTML = `
+            <div class="bg-red-900 text-red-300 p-3 rounded">
+                ❌ Error de conexión: ${error.message}
+            </div>
+        `;
+    });
+}
+
+// Cerrar modal al hacer clic fuera
+document.getElementById('modalExtension').addEventListener('click', function(e) {
+    if (e.target === this) {
+        cerrarModal();
+    }
+});
+</script>
+{% endblock %}
+

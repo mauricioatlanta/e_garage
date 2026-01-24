@@ -539,10 +539,7 @@
 
 <!-- Scripts auxiliares -->
 <script src="{% static 'js/starfield.js' %}"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-<!-- Los JS de Django Autocomplete Light se cargan en extra_js -->
+<!-- jQuery, Select2 y DAL se cargan desde base.html y form.media (DAL oficial) - NO duplicar aquí -->
 <script src="{% static 'js/formulario_jerarquico.js' %}?v=5"></script>
 <script>
 function openAddBrandModal() {
@@ -1558,8 +1555,7 @@ jQuery(document).ready(function($) {
 
 {% block extra_js %}
 {{ block.super }}
-{# CRÍTICO: form.media debe cargarse ANTES del JavaScript personalizado #}
-{{ form.media }}
+{# form.media ya se carga en base.html (CSS en head, JS al final del body) - NO duplicar aquí #}
 <script>
 // Inicialización mejorada de Select2/DAL para el campo cliente en Chile
 (function() {

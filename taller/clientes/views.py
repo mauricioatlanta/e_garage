@@ -10,6 +10,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.models.clientes import Cliente
+from taller.utils.empresa import get_active_empresa
 
 
 def ajax_buscar_clientes(request):
@@ -21,7 +22,7 @@ def ajax_buscar_clientes(request):
     if not request.user.is_authenticated:
         return JsonResponse([], safe=False)
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_active_empresa(request)
     if not empresa:
         return JsonResponse([], safe=False)
 
@@ -128,14 +129,14 @@ def ver_cliente(request, *args, **kwargs):
 
 def crear_cliente(request, *args, **kwargs):
     log.info("FBV shim: crear_cliente")
-    # Pasar empresa explícitamente al formulario
-    empresa = getattr(request.user, "empresa", None)
+
+    from taller.utils.empresa import get_or_create_empresa
+    # Asegurar que la empresa existe (la crea si falta)
+    get_or_create_empresa(request)
+    # La vista CBV obtendrá request.user.empresa automáticamente
+
     view = ClienteCreateView.as_view()
-    if request.method == "POST":
-        request.POST = request.POST.copy()
-        # No es necesario modificar POST, solo pasar empresa en kwargs
-        return view(request, empresa=empresa, *args, **kwargs)
-    return view(request, empresa=empresa, *args, **kwargs)
+    return view(request, *args, **kwargs)
 
 
 def editar_cliente(request, *args, **kwargs):
@@ -165,9 +166,10 @@ def cliente_delete(request, pk=None, cliente_id=None):
     if not request.user.is_authenticated:
         raise PermissionDenied("Usuario no autenticado")
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_active_empresa(request)
     if not empresa:
-        raise PermissionDenied("Usuario sin empresa asignada")
+        messages.warning(request, "Tu usuario no tiene empresa activa. Crea o asigna una empresa primero.")
+        return redirect("taller:dashboard")
 
     cliente = get_object_or_404(Cliente, pk=client_id, empresa=empresa)
 
@@ -216,7 +218,7 @@ def clientes_stats(request):
     if not request.user.is_authenticated:
         return JsonResponse({"labels": [], "counts": []})
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_active_empresa(request)
     if not empresa:
         return JsonResponse({"labels": [], "counts": []})
 
@@ -251,7 +253,7 @@ def agregar_ciudad_usa(request):
         return JsonResponse({"success": False, "error": "User not authenticated"})
 
     # Verificar que el usuario tiene empresa
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_active_empresa(request)
     if not empresa:
         return JsonResponse({"success": False, "error": "User without company"})
 
@@ -304,7 +306,7 @@ def agregar_ciudad(request):
         return JsonResponse({"success": False, "error": "Usuario no autenticado"})
 
     # Verificar que el usuario tiene empresa
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_active_empresa(request)
     if not empresa:
         return JsonResponse({"success": False, "error": "Usuario sin empresa"})
 
@@ -379,7 +381,7 @@ def agregar_region(request):
     if not request.user.is_authenticated:
         return JsonResponse({"success": False, "error": "Usuario no autenticado"}, status=401)
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = get_active_empresa(request)
     if not empresa or getattr(empresa, "pais", "CL") != "CL":
         return JsonResponse({"success": False, "error": "Solo disponible para Chile"}, status=400)
 
@@ -408,8 +410,8 @@ def agregar_estado(request):
     if not request.user.is_authenticated:
         return JsonResponse({"success": False, "error": "Usuario no autenticado"}, status=401)
 
-    empresa = getattr(request.user, "empresa", None)
-    pais = getattr(empresa, "pais", None)
+    empresa = get_active_empresa(request)
+    pais = getattr(empresa, "pais", None) if empresa else None
     if not empresa or not pais:
         return JsonResponse({"success": False, "error": "Empresa sin país configurado"}, status=400)
 

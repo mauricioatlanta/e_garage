@@ -58,26 +58,37 @@ class LanguagePolicyMiddleware:
 
             # SOLUCIÓN SIMPLE: Solo para USA, respetar preferencia de sesión
             if pais == "US":
-                # Leer idioma de la sesión (LocaleMiddleware ya lo estableció)
-                session_lang = request.session.get(DJANGO_LANGUAGE_SESSION_KEY)
-
-                # Si hay idioma en sesión y es válido para USA, usarlo
-                if session_lang in ["en", "es"]:
-                    lang = session_lang
-                    print(f"[DEBUG] USA - Usando idioma de sesión: {lang}")
+                # PRIORIDAD 1: La URL explícita /us/en/... o /us/es/... manda sobre sesión/cookie.
+                # Así, al entrar desde el selector de país a /us/en/bienvenida/ se muestra siempre en inglés.
+                if request.path.startswith("/us/en/"):
+                    lang = "en"
+                    request.session[DJANGO_LANGUAGE_SESSION_KEY] = "en"
+                    print(f"[DEBUG] USA - Idioma desde URL /us/en/: {lang}")
+                elif request.path.startswith("/us/es/"):
+                    lang = "es"
+                    request.session[DJANGO_LANGUAGE_SESSION_KEY] = "es"
+                    print(f"[DEBUG] USA - Idioma desde URL /us/es/: {lang}")
                 else:
-                    # Verificar si hay idioma en cookie (LocaleMiddleware lo puede leer)
-                    cookie_lang = request.COOKIES.get("django_language")
-                    if cookie_lang in ["en", "es"]:
-                        lang = cookie_lang
-                        # Guardar en sesión para consistencia
-                        request.session[DJANGO_LANGUAGE_SESSION_KEY] = lang
-                        print(
-                            f"[DEBUG] USA - Usando idioma de cookie y guardando en sesión: {lang}"
-                        )
+                    # Leer idioma de la sesión (LocaleMiddleware ya lo estableció)
+                    session_lang = request.session.get(DJANGO_LANGUAGE_SESSION_KEY)
+
+                    # Si hay idioma en sesión y es válido para USA, usarlo
+                    if session_lang in ["en", "es"]:
+                        lang = session_lang
+                        print(f"[DEBUG] USA - Usando idioma de sesión: {lang}")
                     else:
-                        lang = "en"  # Default para USA
-                        print(f"[DEBUG] USA - Sin preferencia, usando default: {lang}")
+                        # Verificar si hay idioma en cookie (LocaleMiddleware lo puede leer)
+                        cookie_lang = request.COOKIES.get("django_language")
+                        if cookie_lang in ["en", "es"]:
+                            lang = cookie_lang
+                            # Guardar en sesión para consistencia
+                            request.session[DJANGO_LANGUAGE_SESSION_KEY] = lang
+                            print(
+                                f"[DEBUG] USA - Usando idioma de cookie y guardando en sesión: {lang}"
+                            )
+                        else:
+                            lang = "en"  # Default para USA
+                            print(f"[DEBUG] USA - Sin preferencia, usando default: {lang}")
             else:
                 # Para otros países, usar default
                 lang = DEFAULT_BY_COUNTRY.get(pais, "es")

@@ -1,0 +1,346 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% load i18n %}{% trans "TallerPro USA - Suscripción | Software para Talleres" %}</title>
+  <meta name="description" content="Suscríbete a TallerPro USA: software profesional para talleres técnicos en Estados Unidos. Prueba gratis, planes flexibles, testimonios y soporte en español e inglés.">
+  <meta name="keywords" content="taller técnico USA, software automotriz, gestión taller, suscripción, demo USA">
+  <meta name="robots" content="index, follow">
+  <meta property="og:title" content="TallerPro USA - Suscripción">
+  <meta property="og:description" content="Prueba gratis el software líder para talleres técnicos en USA. Planes flexibles, testimonios y soporte bilingüe.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://tallerpro.com/usa/">
+  <style>
+    :root {
+      --usa-blue: #002868;
+      --usa-red: #bf0a30;
+      --usa-white: #ffffff;
+      --usa-silver: #e5e5e5;
+      --primary-green: #00ff9f;
+      --shadow-glow: 0 0 20px rgba(0, 255, 159, 0.3);
+    }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: radial-gradient(circle at 60% 40%, #002868 0%, #0a0a0a 60%, #1a1a2e 100%);
+      color: var(--usa-white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .bg-animation {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: -1;
+      pointer-events: none;
+      opacity: 0.18;
+    }
+
+    .logo {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 2rem;
+      margin-bottom: 2rem;
+    }
+    .logo img {
+    }
+    .hero {
+      text-align: center;
+      margin-bottom: 3rem;
+      padding: 3rem 2rem;
+      background: rgba(191,10,48,0.08);
+      border-radius: 20px;
+      border: 2px solid var(--usa-red);
+      position: relative;
+      overflow: hidden;
+    }
+    .hero h1 {
+      font-size: 3.2rem;
+      font-weight: 900;
+      color: var(--usa-blue);
+      background: linear-gradient(45deg, var(--usa-blue), var(--primary-green));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-shadow: 0 0 30px rgba(191,10,48,0.2);
+    }
+    .hero p {
+      font-size: 1.3rem;
+      color: #222;
+      margin-bottom: 1.5rem;
+    }
+    .cta-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+    .cta-btn {
+      background: linear-gradient(45deg, var(--usa-blue), var(--primary-green));
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 25px;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 1.1rem;
+      transition: all 0.3s ease;
+      box-shadow: var(--shadow-glow);
+      border: none;
+      cursor: pointer;
+    }
+    .cta-btn.secondary {
+      background: linear-gradient(45deg, var(--usa-red), var(--usa-silver));
+      color: var(--usa-blue);
+    }
+    .cta-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 30px rgba(0, 255, 159, 0.5);
+    }
+    /* ...otros estilos heredados de atlanta_publico.html... */
+  </style>
+</head>
+<body class="min-h-screen bg-[url('/static/img/fondo_neon.jpg')] bg-fixed bg-cover bg-center text-white">
+
+
+
+
+  <div class="logo">
+    <img src="/static/img/TallerPro_logo.png" alt="E-Garage Logo" class="mb-4 w-28 h-28 md:w-36 md:h-36 object-contain mx-auto neon-border" />
+  </div>
+  <section class="hero">
+    <h1 style="color:#fff; font-size:3.2rem; font-weight:900; text-shadow:0 0 24px #002868, 0 0 8px #00ff9f; background:linear-gradient(90deg,#00ff9f,#002868,#bf0a30); -webkit-background-clip:text; -webkit-text-fill-color:transparent;">{% trans "La plataforma más avanzada para talleres en USA" %}</h1>
+    <p style="color:#e5e5e5; font-size:1.3rem; margin-bottom:1.5rem; text-shadow:0 0 8px #002868;">{% trans "Descubre TallerPro USA: software profesional para talleres técnicos en Estados Unidos. Prueba gratis, planes flexibles, testimonios y soporte bilingüe. Sin compromiso, sin letra chica." %}</p>
+    <div class="cta-buttons">
+      <a href="#virtudes" class="cta-btn" style="background:linear-gradient(90deg,#00ff9f,#002868); color:#fff;">✨ {% trans "Virtudes" %}</a>
+      <a href="#planes" class="cta-btn secondary" style="background:linear-gradient(90deg,#bf0a30,#002868); color:#fff;">💸 {% trans "Planes" %}</a>
+      <a href="#testimonios" class="cta-btn secondary" style="background:linear-gradient(90deg,#002868,#00ff9f); color:#fff;">⭐ {% trans "Testimonios" %}</a>
+      <a href="/registro/" class="cta-btn" style="background:linear-gradient(90deg,#00ff9f,#bf0a30); color:#fff;">🚀 {% trans "Prueba Gratis" %}</a>
+
+    </div>
+  </section>
+  <section id="virtudes" style="margin-top:3rem;">
+    <h2 style="text-align:center; color:var(--usa-blue); font-size:2rem; font-weight:900; margin-bottom:2rem;">{% trans "Virtudes de TallerPro USA" %}</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:2rem;">
+      <div style="background:rgba(0,40,104,0.08); border-radius:16px; padding:2rem; text-align:center;">
+        <h3 style="color:var(--usa-red); font-size:1.3rem;">{% trans "Gestión integral de documentos" %}</h3>
+        <p>{% trans "Presupuestos, órdenes de trabajo y facturas en segundos." %}</p>
+      </div>
+      <div style="background:rgba(0,40,104,0.08); border-radius:16px; padding:2rem; text-align:center;">
+        <h3 style="color:var(--primary-green); font-size:1.3rem;">{% trans "Inventario inteligente" %}</h3>
+        <p>{% trans "Control visual y automático de repuestos y precios." %}</p>
+      </div>
+      <div style="background:rgba(0,40,104,0.08); border-radius:16px; padding:2rem; text-align:center;">
+        <h3 style="color:var(--usa-blue); font-size:1.3rem;">{% trans "Reportes avanzados" %}</h3>
+        <p>{% trans "Ventas, ganancias y ranking de servicios en tiempo real." %}</p>
+      </div>
+    </div>
+  </section>
+  <section id="planes" style="margin-top:4rem;">
+    <h2 style="text-align:center; color:var(--usa-red); font-size:2rem; font-weight:900; margin-bottom:2rem;">{% trans "Planes de Suscripción" %}</h2>
+    <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:2rem;">
+      <div style="background:rgba(0,40,104,0.12); border-radius:16px; padding:2rem; min-width:220px; text-align:center; border:2px solid var(--usa-blue);">
+        <h3 style="color:var(--usa-blue); font-size:1.5rem;">{% trans "1 mes" %}</h3>
+        <p style="font-size:2rem; color:var(--primary-green); font-weight:bold;">$20 USD</p>
+        <p>{% trans "Acceso total, sin límite de usuarios ni documentos." %}</p>
+      </div>
+      <div style="background:rgba(0,40,104,0.12); border-radius:16px; padding:2rem; min-width:220px; text-align:center; border:2px solid var(--usa-red);">
+        <h3 style="color:var(--usa-red); font-size:1.5rem;">{% trans "6 meses" %}</h3>
+        <p style="font-size:2rem; color:var(--primary-green); font-weight:bold;">$110 USD</p>
+        <p>{% trans "Ahorra 10%. Acceso total, soporte prioritario." %}</p>
+      </div>
+      <div style="background:rgba(0,40,104,0.12); border-radius:16px; padding:2rem; min-width:220px; text-align:center; border:2px solid var(--primary-green);">
+        <h3 style="color:var(--primary-green); font-size:1.5rem;">{% trans "1 año" %}</h3>
+        <p style="font-size:2rem; color:var(--primary-green); font-weight:bold;">$200 USD</p>
+        <p>{% trans "Ahorra 20%. Acceso total, soporte premium." %}</p>
+      </div>
+    </div>
+    <div style="text-align:center; margin-top:2rem;">
+      <a href="/registro/" class="cta-btn">🚀 {% trans "Comenzar Prueba Gratis" %}</a>
+    </div>
+  </section>
+  <section id="testimonios" style="margin-top:4rem;">
+    <h2 style="text-align:center; color:var(--usa-blue); font-size:2rem; font-weight:900; margin-bottom:2rem;">{% trans "Testimonios de Usuarios" %}</h2>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(320px,1fr)); gap:2rem;">
+      <div style="background:rgba(0,40,104,0.08); border-radius:16px; padding:2rem;">
+        <blockquote style="font-style:italic; color:#fff;">“{% trans "Antes usábamos Excel y papel... ahora todo está automatizado. ¡Un cambio total para nuestro taller!" %}”<br><span style="color:#00ff9f; font-weight:bold;">— {% trans "Taller Don Luis, Atlanta GA" %}</span></blockquote>
+      </div>
+      <div style="background:rgba(0,40,104,0.08); border-radius:16px; padding:2rem;">
+        <blockquote style="font-style:italic; color:#fff;">“{% trans "El soporte en español e inglés nos ayudó a migrar rápido. Recomendado para cualquier taller en USA." %}”<br><span style="color:#bf0a30; font-weight:bold;">— {% trans "AutoPro Miami FL" %}</span></blockquote>
+      </div>
+      <div style="background:rgba(0,40,104,0.08); border-radius:16px; padding:2rem;">
+        <blockquote style="font-style:italic; color:#fff;">“{% trans "La prueba gratis nos convenció. Ahora gestionamos todo digital y los clientes lo notan." %}”<br><span style="color:#002868; font-weight:bold;">— {% trans "Speed Garage, Dallas TX" %}</span></blockquote>
+      </div>
+    </div>
+  </section>
+  <footer style="margin-top:4rem; padding:2rem 0; background:rgba(0,40,104,0.08); border-top:2px solid var(--usa-blue); text-align:center;">
+    <div style="margin-bottom:1rem;">
+
+    </div>
+    <div style="color:var(--usa-blue); font-weight:bold;">© 2025 TallerPro USA. All rights reserved.</div>
+    <div style="margin-top:1rem;">
+      <a href="mailto:contacto@tallerpro.com" style="color:var(--usa-red); font-weight:bold; margin-right:1rem;">contacto@tallerpro.com</a>
+      <a href="https://facebook.com/tallerprousa" target="_blank" style="color:var(--usa-blue); font-weight:bold; margin-right:1rem;">Facebook</a>
+      <a href="https://wa.me/14045550123" target="_blank" style="color:var(--primary-green); font-weight:bold;">WhatsApp</a>
+    </div>
+  </footer>
+  <style>
+    .animate-fade-in-down {
+      animation: fadeInDown 1s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    @keyframes fadeInDown {
+      0% {
+        opacity: 0;
+        transform: translateY(-40px) scale(0.95);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+  <script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const estadoSelect = document.getElementById('state-select');
+    const ciudadGroup = document.getElementById('ciudad-group');
+    const ciudadSelect = document.getElementById('ciudad');
+    const otraCiudadContainer = document.getElementById('otra-ciudad-container');
+    const otraCiudadInput = document.getElementById('otra-ciudad-input');
+    const addCityBtn = document.getElementById('add-city-btn');
+    const realState = document.getElementById('real-state');
+
+    // Ocultar ciudad al inicio
+    ciudadGroup.classList.add('hidden');
+    otraCiudadContainer.classList.add('hidden');
+
+    // Refuerzo anti-selección automática
+    estadoSelect.selectedIndex = 0;
+    estadoSelect.value = '';
+
+    // Mostrar select ciudad solo si hay estado
+    estadoSelect.addEventListener('change', function() {
+      const estadoId = estadoSelect.value;
+      if (!estadoId) {
+        ciudadGroup.classList.add('hidden');
+        otraCiudadContainer.classList.add('hidden');
+        ciudadSelect.innerHTML = '<option value="">Selecciona una ciudad</option><option value="otra">Otra ciudad...</option>';
+        return;
+      }
+      // Mostrar grupo ciudad
+      ciudadGroup.classList.remove('hidden');
+      otraCiudadContainer.classList.add('hidden');
+      // Cargar ciudades dinámicamente
+      fetch(`/ubicacion/api/ciudades/${estadoId}/`)
+        .then(res => res.json())
+        .then(data => {
+          let options = '<option value="">Selecciona una ciudad</option>';
+          data.forEach(ciudad => {
+            options += `<option value="${ciudad.nombre}">${ciudad.nombre}</option>`;
+          });
+          options += '<option value="otra">Otra ciudad...</option>';
+          ciudadSelect.innerHTML = options;
+        });
+    });
+
+    // Mostrar input manual solo si se elige "otra"
+    ciudadSelect.addEventListener('change', function() {
+      if (ciudadSelect.value === 'otra') {
+        otraCiudadContainer.classList.remove('hidden');
+        otraCiudadInput.focus();
+      } else {
+        otraCiudadContainer.classList.add('hidden');
+      }
+    });
+
+    // Botón + alterna el input manual
+    addCityBtn.addEventListener('click', function() {
+      otraCiudadContainer.classList.toggle('hidden');
+      if (!otraCiudadContainer.classList.contains('hidden')) {
+        otraCiudadInput.focus();
+      }
+    });
+
+    // Sincronizar valor real antes de submit
+    document.getElementById('usa-signup-form').addEventListener('submit', function() {
+      realState.value = estadoSelect.value;
+    });
+  });
+  </script>
+  <style>
+    .fondo-tarjeta {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(6px);
+      border: 1px solid rgba(0, 255, 255, 0.2);
+      box-shadow: 0 0 20px rgba(0, 255, 255, 0.15);
+    }
+    #add-city-btn {
+      display: inline-block !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+    }
+    #usa-signup-form input,
+    #usa-signup-form select,
+    #usa-signup-form textarea {
+      background: #000 !important;
+      color: #fff !important;
+      border-color: #222 !important;
+    }
+    .logo-neon {
+      filter: drop-shadow(0 0 10px #0ff) drop-shadow(0 0 20px #0ff) hue-rotate(20deg);
+    }
+    .animate-pulse {
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 #0ff; }
+      50% { box-shadow: 0 0 16px 4px #0ff; }
+    }
+  </style>
+<script>
+    // CSRF helper
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Mejorar cambio de idioma
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('a[href*="?lang="]').forEach(function(link) {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                var lang = this.href.split('lang=')[1];
+                var csrftoken = getCookie('csrftoken');
+                fetch('/cambiar-idioma/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': csrftoken
+                    },
+                    body: JSON.stringify({ idioma: lang })
+                })
+                .then(function(resp) {
+                    if (resp.ok) {
+                        window.location.search = '?lang=' + lang;
+                    } else {
+                        alert('Error cambiando idioma');
+                    }
+                })
+                .catch(function() {
+                    alert('Error de red al cambiar idioma');
+                });
+            });
+        });
+    });
+</script>
+</body>
+</html>

@@ -40,6 +40,10 @@ gunicorn>=21.2.0
 Pillow>=10.0.0  # Para manejo de imágenes (logos, fotos)
 python-dateutil>=2.8.2
 
+# OCR para reconocimiento de patentes (EasyOCR - Open Source)
+easyocr>=1.7.0  # OCR con Deep Learning
+opencv-python-headless>=4.8.0  # Procesamiento de imágenes (sin GUI)
+
 # Testing (Desarrollo)
 pytest>=7.4.0
 pytest-django>=4.5.0

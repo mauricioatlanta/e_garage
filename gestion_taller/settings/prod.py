@@ -6,6 +6,18 @@ Configuración segura y optimizada para producción.
 from .base import *
 
 # =============================================================================
+# HELPERS DE ENTORNO
+# =============================================================================
+
+def env_list(name: str, default: str | list[str] = "") -> list[str]:
+    """Convierte variable de entorno separada por comas en lista."""
+    # Si default es una lista, convertirla a string separado por comas
+    if isinstance(default, list):
+        default = ",".join(default)
+    raw = os.getenv(name, default) or ""
+    return [x.strip() for x in raw.split(",") if x.strip()]
+
+# =============================================================================
 # CONFIGURACIÓN DE PRODUCCIÓN
 # =============================================================================
 
@@ -15,25 +27,26 @@ DEBUG = False
 # SEGURIDAD
 # =============================================================================
 
-# Hosts permitidos (configurar según tu dominio)
-ALLOWED_HOSTS = [
-    "tu-dominio.com",
-    "www.tu-dominio.com",
-    "api.tu-dominio.com",
-    # Añadir IPs de servidores si es necesario
-    # "192.168.1.100",
-]
+# Hosts permitidos
+ALLOWED_HOSTS = env_list(
+    "DJANGO_ALLOWED_HOSTS",
+    ["egarage.cl", "www.egarage.cl"],
+)
 
 # CSRF
-CSRF_TRUSTED_ORIGINS = [
-    "https://tu-dominio.com",
-    "https://www.tu-dominio.com",
-    "https://api.tu-dominio.com",
-]
+CSRF_TRUSTED_ORIGINS = env_list(
+    "DJANGO_CSRF_TRUSTED_ORIGINS",
+    ["https://egarage.cl", "https://www.egarage.cl"],
+)
 
 # SSL/HTTPS (activar si usas HTTPS)
-SECURE_SSL_REDIRECT = True
+# 🔥 IMPRESCINDIBLE: Configuración fija para producción (no controlada por env)
+# Este header es CRÍTICO cuando Django está detrás de un proxy (Nginx, Cloudflare, etc.)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+# 🔥 IMPRESCINDIBLE: Fijo en True para producción (requiere SECURE_PROXY_SSL_HEADER arriba)
+SECURE_SSL_REDIRECT = True
 
 # Cookies seguras
 SESSION_COOKIE_SECURE = True
@@ -55,36 +68,45 @@ SECURE_HSTS_PRELOAD = True
 # BASE DE DATOS
 # =============================================================================
 
-# Configuración de base de datos para producción
-# Usar variables de entorno para credenciales
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME", "egarage_prod"),
-        "USER": os.getenv("DB_USER", "egarage_user"),
-        "PASSWORD": os.getenv("DB_PASSWORD", ""),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
-        "OPTIONS": {
-            "sslmode": "require",
-        },
+# =========================
+# Database (PROD)
+# Prefer DATABASE_URL if provided (e.g. sqlite), else fallback to Postgres env defaults
+# =========================
+import os
+
+DATABASE_URL = os.getenv("DATABASE_URL", "")
+
+if DATABASE_URL.startswith("sqlite:"):
+    # sqlite:////absolute/path.db
+    db_path = DATABASE_URL.replace("sqlite:///", "/", 1)
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": db_path,
+        }
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": os.getenv("DB_NAME", "egarage_prod"),
+            "USER": os.getenv("DB_USER", "egarage_user"),
+            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "HOST": os.getenv("DB_HOST", "127.0.0.1"),
+            "PORT": os.getenv("DB_PORT", "5432"),
+            "OPTIONS": {"sslmode": os.getenv("DB_SSLMODE", "disable")},
+        }
+    }
 
 # =============================================================================
 # CACHÉ
 # =============================================================================
 
-# Configuración de caché para producción
 CACHES = {
     "default": {
-        "BACKEND": "django.core.cache.backends.redis.RedisCache",
-        "LOCATION": os.getenv("REDIS_URL", "redis://localhost:6379/1"),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        },
-        "KEY_PREFIX": "egarage_prod",
-        "TIMEOUT": 300,  # 5 minutos
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "egarage_prod",
+        "TIMEOUT": 300,
     }
 }
 
@@ -167,21 +189,19 @@ EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@tu-dominio.com")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@egarage.cl")
 
 # =============================================================================
 # ARCHIVOS ESTÁTICOS
 # =============================================================================
 
-# Configuración de archivos estáticos para producción
+STATIC_URL = "/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
+STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # si existe /srv/egarage/static
+
 STORAGES = {
-    "default": {
-        "BACKEND": "django.core.files.storage.FileSystemStorage",
-    },
-    "staticfiles": {
-        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
-    },
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"},
 }
 
 # Configuración de archivos media para producción
@@ -196,12 +216,17 @@ MEDIA_URL = "/media/"
 DEBUG_TOOLBAR = False
 
 # Configuración de sesiones
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
+# ✅ FIX: Usar DB en lugar de cache para evitar pérdida de sesiones con múltiples workers
+# LocMemCache no funciona con múltiples workers de Gunicorn (cada worker tiene su propia memoria)
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
+# SESSION_CACHE_ALIAS ya no es necesario con sesiones en DB
 
 # Configuración de archivos
-FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+# Límites de subida de archivos (debe coincidir con client_max_body_size en Nginx)
+# Nginx está configurado para 50MB, Django permite hasta 20MB en memoria
+# Archivos más grandes se guardan en disco temporal automáticamente
+FILE_UPLOAD_MAX_MEMORY_SIZE = 20971520  # 20MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20971520  # 20MB
 
 # =============================================================================
 # MONITOREO
@@ -227,10 +252,10 @@ DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 SECRET_KEY = os.getenv("SECRET_KEY", "your-secret-key-here")
 
 # Configuración de CORS (si usas API)
-CORS_ALLOWED_ORIGINS = [
-    "https://tu-dominio.com",
-    "https://www.tu-dominio.com",
-]
+CORS_ALLOWED_ORIGINS = env_list(
+    "DJANGO_CORS_ALLOWED_ORIGINS",
+    ["https://egarage.cl", "https://www.egarage.cl"],
+)
 
 # =============================================================================
 # CONFIGURACIÓN ESPECÍFICA DE eGARAGE

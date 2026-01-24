@@ -5,32 +5,44 @@
 {% load country_url %}
 
 <style>
-/* ==================== ESTILOS MEJORADOS CON MÁXIMO CONTRASTE ==================== */
+/* ==================== SISTEMA DE DISEÑO UNIFICADO FUTURISTA ==================== */
 
-/* Campos de formulario - CONTRASTE ULTRA MEJORADO */
-.form-control, .form-select, input[type="text"], input[type="number"], input[type="date"], input[type="email"], input[type="tel"], textarea, select {
-  background-color: rgba(5, 5, 20, 0.98) !important;
-  border: 2.5px solid #00f2fe !important;
-  color: #ffffff !important;
-  border-radius: 10px !important;
-  padding: 14px 18px !important;
-  font-size: 16px !important;
-  font-weight: 600 !important;
-  font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif !important;
-  transition: all 0.3s ease !important;
-  box-shadow: 0 0 10px rgba(0, 242, 254, 0.3), inset 0 2px 6px rgba(0, 0, 0, 0.5) !important;
-  letter-spacing: 0.3px !important;
+/* Variables de diseño */
+:root {
+  --primary-cyan: #00ffff;
+  --primary-cyan-dark: #00b8d4;
+  --primary-cyan-glow: rgba(0, 255, 255, 0.4);
+  --bg-dark: rgba(5, 5, 20, 0.98);
+  --bg-darker: rgba(10, 10, 30, 1);
+  --border-width: 2px;
+  --border-radius: 12px;
+  --font-futuristic: 'Orbitron', 'Montserrat', 'Segoe UI', sans-serif;
 }
 
-/* Focus state - MUY VISIBLE + Accesible */
+/* Campos de formulario - DISEÑO UNIFICADO */
+.form-control, .form-select, input[type="text"], input[type="number"], input[type="date"], input[type="email"], input[type="tel"], textarea, select {
+  background-color: var(--bg-dark) !important;
+  border: var(--border-width) solid var(--primary-cyan) !important;
+  color: #ffffff !important;
+  border-radius: var(--border-radius) !important;
+  padding: 14px 18px !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  font-family: var(--font-futuristic) !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 0 8px var(--primary-cyan-glow), inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Focus state - UNIFICADO */
 .form-control:focus, .form-select:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, input[type="email"]:focus, input[type="tel"]:focus, textarea:focus, select:focus {
-  background-color: rgba(10, 10, 30, 1) !important;
-  border-color: #00ffff !important;
-  border-width: 3px !important;
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.8), inset 0 2px 6px rgba(0, 0, 0, 0.5), 0 0 0 3px rgba(0, 255, 255, 0.2) !important;
+  background-color: var(--bg-darker) !important;
+  border-color: var(--primary-cyan) !important;
+  border-width: 2px !important;
+  box-shadow: 0 0 16px rgba(0, 255, 255, 0.6), inset 0 2px 4px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(0, 255, 255, 0.2) !important;
   outline: none !important;
   color: #ffffff !important;
-  transform: scale(1.01) !important;
+  transform: translateY(-1px) !important;
 }
 
 /* Placeholders - MÁS VISIBLES */
@@ -103,16 +115,56 @@ input[type="checkbox"]:checked {
   box-shadow: 0 0 15px rgba(0, 242, 254, 0.6) !important;
 }
 
-/* Labels - ULTRA VISIBLES */
-label {
-  color: #00ffff !important;
-  font-weight: 700 !important;
-  font-size: 15px !important;
-  text-shadow: 0 0 10px rgba(0, 242, 254, 0.6) !important;
-  letter-spacing: 0.5px !important;
+/* Labels - TÍTULOS FUTURISTAS UNIFICADOS */
+label, .form-label {
+  color: var(--primary-cyan) !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  font-family: var(--font-futuristic) !important;
+  text-shadow: 0 0 6px var(--primary-cyan-glow) !important;
+  letter-spacing: 1px !important;
   text-transform: uppercase !important;
-  margin-bottom: 8px !important;
+  margin-bottom: 10px !important;
   display: block !important;
+  position: relative;
+  padding-left: 12px;
+}
+
+label::before, .form-label::before {
+  content: '▸';
+  position: absolute;
+  left: 0;
+  color: var(--primary-cyan);
+  text-shadow: 0 0 6px var(--primary-cyan-glow);
+  font-size: 10px;
+}
+
+/* Títulos de sección - FUTURISTAS */
+.section-title {
+  color: var(--primary-cyan) !important;
+  font-family: var(--font-futuristic) !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 0 12px var(--primary-cyan-glow), 0 0 24px var(--primary-cyan-glow) !important;
+  margin-bottom: 20px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 2px solid var(--primary-cyan) !important;
+  position: relative !important;
+}
+
+.section-title::before {
+  content: '▶';
+  position: absolute;
+  left: -24px;
+  color: var(--primary-cyan);
+  text-shadow: 0 0 8px var(--primary-cyan-glow);
+  font-size: 14px;
+}
+
+.font-futuristic {
+  font-family: var(--font-futuristic) !important;
 }
 
 /* Botones - CONTRASTE MÁXIMO */
@@ -297,68 +349,213 @@ input:disabled, select:disabled, textarea:disabled {
     flex: 1 1 30% !important;
   }
 }
+
+/* ==================== SISTEMA DE DISEÑO UNIFICADO ==================== */
+
+/* Secciones/Cards - UNIFICADAS */
+.seccion-card, .observaciones-card {
+  background: rgba(15, 23, 42, 0.7) !important;
+  border: 2px solid var(--primary-cyan) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 0 12px var(--primary-cyan-glow), inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  transition: all 0.3s ease !important;
+}
+
+.seccion-card:hover, .observaciones-card:hover {
+  border-color: var(--primary-cyan) !important;
+  box-shadow: 0 0 20px var(--primary-cyan-glow), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Títulos de sección - FUTURISTAS UNIFICADOS */
+.seccion-card h3, .observaciones-card h3, .section-title {
+  color: var(--primary-cyan) !important;
+  font-family: var(--font-futuristic) !important;
+  font-weight: 700 !important;
+  font-size: 18px !important;
+  letter-spacing: 1.5px !important;
+  text-transform: uppercase !important;
+  text-shadow: 0 0 10px var(--primary-cyan-glow), 0 0 20px var(--primary-cyan-glow) !important;
+  margin-bottom: 20px !important;
+  padding-bottom: 12px !important;
+  border-bottom: 2px solid var(--primary-cyan) !important;
+  position: relative !important;
+}
+
+.seccion-card h3::before, .section-title::before {
+  content: '▶';
+  position: absolute;
+  left: -20px;
+  color: var(--primary-cyan);
+  text-shadow: 0 0 8px var(--primary-cyan-glow);
+  font-size: 14px;
+}
+
+/* Botones secundarios - UNIFICADOS */
+.btn-secondary {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(30, 41, 59, 0.9) 100%) !important;
+  border: 2px solid var(--primary-cyan) !important;
+  color: var(--primary-cyan) !important;
+  font-family: var(--font-futuristic) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  letter-spacing: 0.5px !important;
+  border-radius: var(--border-radius) !important;
+  padding: 12px 20px !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: 0 0 8px var(--primary-cyan-glow) !important;
+  text-transform: uppercase !important;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(15, 23, 42, 0.9) 100%) !important;
+  border-color: var(--primary-cyan) !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 16px var(--primary-cyan-glow), 0 0 24px var(--primary-cyan-glow) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+/* Campos de totales - UNIFICADOS */
+.totales-section .bg-black\/40 {
+  background: rgba(15, 23, 42, 0.7) !important;
+  border: 2px solid var(--primary-cyan) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 0 8px var(--primary-cyan-glow) !important;
+}
+
+.totales-section .bg-gradient-to-r {
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.3) 0%, rgba(59, 130, 246, 0.3) 100%) !important;
+  border: 2px solid var(--primary-cyan) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 0 16px var(--primary-cyan-glow), 0 0 32px rgba(0, 255, 255, 0.2) !important;
+}
+
+/* Información de cliente seleccionado - UNIFICADA */
+#cliente-info {
+  background: rgba(15, 23, 42, 0.7) !important;
+  border: 2px solid var(--primary-cyan) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 0 8px var(--primary-cyan-glow) !important;
+}
+
+/* Dropdown de resultados - UNIFICADO */
+#cliente-resultados {
+  background: rgba(15, 23, 42, 0.95) !important;
+  border: 2px solid var(--primary-cyan) !important;
+  border-radius: var(--border-radius) !important;
+  box-shadow: 0 0 16px var(--primary-cyan-glow) !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Botones modernos con borde iluminado */
+.btn-modern-add {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important;
+  background-color: #22c55e !important;
+  border: 2px solid var(--primary-cyan) !important;
+  box-shadow: 
+    0 0 12px var(--primary-cyan-glow),
+    0 0 24px rgba(34, 211, 238, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: blur(8px);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  z-index: 10;
+}
+
+.btn-modern-add::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+  pointer-events: none; /* Permite que los clics pasen a través del pseudo-elemento */
+  z-index: 1;
+}
+
+.btn-modern-add:hover::before {
+  left: 100%;
+}
+
+.btn-modern-add:hover {
+  background: linear-gradient(135deg, #16a34a 0%, #15803d 100%) !important;
+  background-color: #16a34a !important;
+  border-color: rgba(34, 211, 238, 0.9) !important;
+  box-shadow: 
+    0 0 20px rgba(34, 211, 238, 0.6),
+    0 0 40px rgba(34, 211, 238, 0.4),
+    0 0 60px rgba(34, 211, 238, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-1px) scale(1.02);
+}
+
+.btn-modern-add:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 
+    0 0 8px rgba(34, 211, 238, 0.4),
+    inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.btn-modern-add:focus {
+  outline: none;
+  box-shadow: 
+    0 0 20px rgba(34, 211, 238, 0.6),
+    0 0 40px rgba(34, 211, 238, 0.4),
+    0 0 0 3px rgba(34, 211, 238, 0.3) !important;
+}
 </style>
 
 {% block documento_title %}
 {% load i18n %}
-{# ✅ Manejo robusto de company_country con múltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
-{% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-<!-- Header de Página - Design System -->
+{% with is_cl=active_country|upper %}
 <div class="mb-6 sm:mb-8 px-4 sm:px-6">
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
     <div class="flex-1">
       <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
         📝 {{ ui_labels.new_document }}
       </h1>
-      <p class="text-sm sm:text-base text-slate-300">
-        {{ ui_labels.new_document }}
-      </p>
     </div>
     <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-      <!-- Language Selector -->
       <form id="language-form-doc" action="/i18n/setlang/" method="post" class="inline">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <input type="hidden" name="language" id="language-input-doc" value="{% if is_cl == 'CL' %}es{% else %}{{ LANGUAGE_CODE|default:'en' }}{% endif %}">
-        <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50" style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
-          <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
-                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
-                  {% if LANGUAGE_CODE == 'en' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            🇺🇸 EN
-          </button>
-          <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc"
-                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'es' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
-                  {% if LANGUAGE_CODE == 'es' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            🇪🇸 ES
-          </button>
+        <input type="hidden" name="language" id="language-input-doc" value="{{ LANGUAGE_CODE }}">
+        <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50">
+          <button type="button" onclick="submitLanguageDoc('en')" class="px-3 py-1 rounded-md text-sm font-bold {% if LANGUAGE_CODE == 'en' %}bg-cyan-500 text-white{% else %}text-gray-400{% endif %}">🇺🇸 EN</button>
+          <button type="button" onclick="submitLanguageDoc('es')" class="px-3 py-1 rounded-md text-sm font-bold {% if LANGUAGE_CODE == 'es' %}bg-cyan-500 text-white{% else %}text-gray-400{% endif %}">🇪🇸 ES</button>
         </div>
       </form>
-      
-      <label class="flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
-        <input type="checkbox" id="id_pagado" name="pagado" class="mr-2 form-control focus:outline-none focus:ring-2 focus:ring-cyan-400/60">
-        {% if is_cl == 'CL' %}Documento pagado{% else %}{% trans "Document paid" %}{% endif %}
-      </label>
     </div>
   </div>
 </div>
-{% endwith %}
-{% endwith %}
 
 <script>
+// Función simple para el cambio de idioma
 function submitLanguageDoc(lang) {
   document.getElementById('language-input-doc').value = lang;
   document.getElementById('language-form-doc').submit();
 }
 </script>
+{% endwith %}
+{% endwith %}
 {% endblock documento_title %}
+
+{% block extra_js %}
+{{ block.super }}
+{% endblock extra_js %}
 
 {% block documento_content %}
 {% load i18n %}
 {# ✅ Manejo robusto de company_country con múltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-        <form method="post" id="document-form" class="max-w-7xl mx-auto" enctype="multipart/form-data">
+        <form method="post" id="document-form" class="max-w-7xl mx-auto" enctype="multipart/form-data"
               data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
               data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
               data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
@@ -373,22 +570,26 @@ function submitLanguageDoc(lang) {
   <!-- System messages - Design System -->
   {% if messages %}
     {% for message in messages %}
-      {% if message.tags == 'success' %}
-      <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-        <span class="text-2xl flex-shrink-0">✅</span>
-        <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
-      </div>
-      {% elif message.tags == 'error' %}
-      <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-        <span class="text-2xl flex-shrink-0">❌</span>
-        <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
-      </div>
-      {% else %}
-      <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-        <span class="text-2xl flex-shrink-0">ℹ️</span>
-        <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
-      </div>
+      {% with message_str=message|stringformat:"s" %}
+      {% if "Successfully signed in" not in message_str and "You have signed out" not in message_str and "Ha iniciado sesión exitosamente" not in message_str and "Ha cerrado sesión" not in message_str and "iniciado sesión exitosamente" not in message_str and "cerrado sesión" not in message_str and "Logo actualizado exitosamente" not in message_str and "Tema y colores guardados exitosamente" not in message_str and "Logo subido exitosamente" not in message_str and "actualizada exitosamente" not in message_str and not ("Técnico" in message_str and "creado exitosamente" in message_str) %}
+        {% if message.tags == 'success' %}
+        <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">✅</span>
+          <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
+        </div>
+        {% elif message.tags == 'error' %}
+        <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">❌</span>
+          <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
+        </div>
+        {% else %}
+        <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">ℹ️</span>
+          <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
+        </div>
+        {% endif %}
       {% endif %}
+      {% endwith %}
     {% endfor %}
   {% endif %}
 
@@ -411,18 +612,18 @@ function submitLanguageDoc(lang) {
 
       <!-- Columna 1: FECHA primero + TIPO + NÚMERO -->
       <div class="space-y-3 sm:space-y-4">
-                <label for="id_fecha_emision" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Fecha de emisión{% else %}{% trans "Issue Date" %}{% endif %}</label>
+                <label for="id_fecha_emision" class="block">{% if is_cl == 'CL' %}Fecha de emisión{% else %}{% trans "Issue Date" %}{% endif %}</label>
                 <input id="id_fecha_emision" type="date" name="fecha_emision" class="form-control w-full text-base"
                        value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
 
-        <label for="id_tipo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Tipo de documento{% else %}{% trans "Document Type" %}{% endif %}</label>
+        <label for="id_tipo" class="block">{% if is_cl == 'CL' %}Tipo de documento{% else %}{% trans "Document Type" %}{% endif %}</label>
         <select id="id_tipo" name="tipo" class="form-select w-full text-base">
           <option value="OT" {% if form.tipo.value == 'OT' or documento.tipo == 'OT' %}selected{% endif %}>{{ ui_labels.document_type_work_order }}</option>
           <option value="FAC" {% if form.tipo.value == 'FAC' or documento.tipo == 'FAC' %}selected{% endif %}>{{ ui_labels.document_type_invoice }}</option>
           <option value="PRES" {% if form.tipo.value == 'PRES' or documento.tipo == 'PRES' %}selected{% endif %}>{{ ui_labels.document_type_estimate }}</option>
         </select>
 
-        <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{{ ui_labels.document_number }}</label>
+        <label class="block">{{ ui_labels.document_number }}</label>
         <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-2 sm:py-3 text-sm sm:text-base" id="id_numero">
           {% if es_edicion and documento.numero_documento %}{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% elif is_cl == 'CL' %}Se generará automáticamente{% else %}{% trans "Will be generated automatically" %}{% endif %}
         </div>
@@ -431,43 +632,40 @@ function submitLanguageDoc(lang) {
       <!-- Columna 2: Cliente/Vehículo -->
       <div class="space-y-3 sm:space-y-4">
         <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-          <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Cliente{% else %}{% trans "Client" %}{% endif %}</label>
-          <button type="button" onclick="openClienteModal()" class="px-4 py-2 sm:px-3 sm:py-1 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white font-bold rounded-lg text-sm sm:text-xs transition-all w-full sm:w-auto">
-            {% if is_cl == 'CL' %}➕ Nuevo{% else %}➕ {% trans "New" %}{% endif %}
-          </button>
+          <label class="block">{% if is_cl == 'CL' %}Cliente{% else %}{% trans "Client" %}{% endif %}</label>
+          
+          <a href="{% country_url 'clientes:crear_cliente' %}?next={{ request.get_full_path|urlencode }}" 
+             id="btn-nuevo-cliente"
+             style="display: inline-flex !important; align-items: center !important; justify-content: center !important; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important; background-color: #22c55e !important; color: #ffffff !important; font-weight: 900 !important; padding: 10px 20px !important; border-radius: 10px !important; text-decoration: none !important; border: 3px solid #10b981 !important; box-shadow: 0 0 25px rgba(34, 197, 94, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3) !important; cursor: pointer !important; pointer-events: auto !important; z-index: 9999 !important; position: relative !important; font-size: 13px !important; text-transform: uppercase !important; letter-spacing: 0.5px !important; transition: all 0.3s ease !important;"
+             onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0 0 35px rgba(34, 197, 94, 1), 0 6px 20px rgba(0, 0, 0, 0.4)';"
+             onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 0 25px rgba(34, 197, 94, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3)';"
+             onclick="window.location.href=this.getAttribute('href'); return false;">
+            {% if is_cl == 'CL' %}➕ NUEVO CLIENTE{% else %}➕ {% trans "NEW CLIENT" %}{% endif %}
+          </a>
         </div>
+
         <div class="relative">
           <input type="text" id="cliente-busqueda" class="form-control w-full"
-                 placeholder="{% if is_cl == 'CL' %}Escribe para buscar clientes…{% else %}{% trans 'Type to search clients...' %}{% endif %}"
+                 placeholder="{% trans 'Type to search clients...' %}"
                  autocomplete="off"
-                 oninput="window.handleClienteInput?.(this.value)"
-                 onfocus="window.handleClienteFocus?.(this.value)"
-                 onkeydown="return window.handleClienteKeydown?.(event)">
-          <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+                 oninput="window.handleClienteInput?.(this.value)">
+          <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden"></div>
         </div>
 
-        <select id="id_cliente" name="cliente" class="form-select w-full hidden">
-          <option value="">{% if is_cl == 'CL' %}Selecciona cliente…{% else %}{% trans "Select client..." %}{% endif %}</option>
+        <select id="id_cliente" name="cliente" class="hidden">
+          <option value="">{% trans "Select client..." %}</option>
         </select>
 
-        <!-- Selected client information -->
-        <div id="cliente-info" class="hidden p-3 bg-cyan-900/20 border border-cyan-400 rounded-lg">
-          <div class="text-cyan-200">
-            <strong id="cliente-nombre"></strong><br>
-            <span id="cliente-email"></span><br>
-            <span id="cliente-telefono"></span>
-          </div>
-        </div>
-
         {% if ui_config.show_vehicle %}
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-          <label for="id_vehiculo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Vehículo{% else %}{% trans "Vehicle" %}{% endif %}</label>
-          <button type="button" onclick="openVehiculoModal()" class="px-4 py-2 sm:px-3 sm:py-1 bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold rounded-lg text-sm sm:text-xs transition-all w-full sm:w-auto">
-            {% if is_cl == 'CL' %}🚗 Nuevo{% else %}🚗 {% trans "New" %}{% endif %}
-          </button>
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0 mt-4">
+          <label for="id_vehiculo" class="block">{% trans "Vehicle" %}</label>
+          <a href="{% country_url 'vehiculos:crear_vehiculo' %}?next={{ request.get_full_path|urlencode }}" 
+             class="btn-modern-add no-underline inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-gradient-to-r from-emerald-600/90 to-green-600/90 text-white font-semibold rounded-lg text-sm border border-cyan-400/60 shadow-lg">
+            {% if is_cl == 'CL' %}➕ Nuevo{% else %}➕ {% trans "New" %}{% endif %}
+          </a>
         </div>
         <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
-          <option value="">{% if is_cl == 'CL' %}Selecciona cliente primero…{% else %}{% trans "Select client first..." %}{% endif %}</option>
+          <option value="">{% trans "Select client first..." %}</option>
         </select>
         {% endif %}
       </div>
@@ -475,7 +673,7 @@ function submitLanguageDoc(lang) {
       <!-- Columna 3: Técnico + Payment Status + Kilometraje -->
       <div class="space-y-3 sm:space-y-4">
         {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
-        <label for="id_tecnico_responsable" class="block text-cyan-200 font-semibold text-sm sm:text-base">
+        <label for="id_tecnico_responsable" class="block">
           {{ current_label }}
         </label>
         <select name="tecnico_responsable" id="id_tecnico_responsable" class="form-select w-full text-base">
@@ -486,7 +684,7 @@ function submitLanguageDoc(lang) {
         </select>
         {% endwith %}
 
-        <label for="id_payment_status" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Estado de pago{% else %}{% trans "Payment Status" %}{% endif %}</label>
+        <label for="id_payment_status" class="block">{% if is_cl == 'CL' %}Estado de pago{% else %}{% trans "Payment Status" %}{% endif %}</label>
         <select id="id_payment_status" name="payment_status" class="form-select w-full text-base">
           <option value="pending">{% if is_cl == 'CL' %}Pendiente{% else %}{% trans "Pending" %}{% endif %}</option>
           <option value="paid">{% if is_cl == 'CL' %}Pagado{% else %}{% trans "Paid" %}{% endif %}</option>
@@ -495,16 +693,21 @@ function submitLanguageDoc(lang) {
         </select>
 
         {% if ui_config.show_kilometraje %}
-        <label for="id_kilometraje" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% if is_cl == 'CL' %}Kilometraje{% else %}{% trans "Mileage" %}{% endif %}</label>
-        <input id="id_kilometraje" type="number" name="kilometraje" min="0" value="{% if es_edicion %}{{ documento.kilometraje|default:kilometraje|default_if_none:'' }}{% endif %}" class="form-control w-full text-base" placeholder="{% if is_cl == 'CL' %}0{% else %}0{% endif %}">
+        <label for="id_kilometraje" class="block">{% if is_cl == 'CL' %}Kilometraje{% else %}{% trans "Mileage" %}{% endif %} {% if is_cl != 'CL' %}(mi){% else %}(km){% endif %}</label>
+        <div class="relative">
+          <input id="id_kilometraje" type="number" name="kilometraje" min="0" value="{% if es_edicion %}{{ form.kilometraje.value|default:documento.kilometraje|default:kilometraje|default_if_none:'' }}{% endif %}" class="form-control w-full text-base pr-10" placeholder="{% if is_cl == 'CL' %}0{% else %}0{% endif %}">
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-300 font-semibold">
+            {% if is_cl == 'CL' %}km{% else %}mi{% endif %}
+          </span>
+        </div>
         {% endif %}
       </div>
     </div>
 
     <!-- Dynamic sections -->
     <div class="space-y-4 sm:space-y-6">
-      <div class="seccion-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
-        <h3 class="text-lg sm:text-xl font-semibold text-cyan-300 mb-4 flex items-center gap-2">{% if is_cl == 'CL' %}🔧 Repuestos y servicios{% else %}🔧 {% trans "Parts & Services" %}{% endif %}</h3>
+      <div class="seccion-card p-4 sm:p-6">
+        <h3 class="section-title flex items-center gap-2">{% if is_cl == 'CL' %}🔧 REPUESTOS Y SERVICIOS{% else %}🔧 {% trans "PARTS & SERVICES" %}{% endif %}</h3>
         <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
           {% if ui_config.show_repuestos %}
           <button type="button" id="add-repuesto" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addRepuestoRow()">{% if is_cl == 'CL' %}+ Agregar repuesto{% else %}+ {% trans "Add Part" %}{% endif %}</button>
@@ -515,6 +718,9 @@ function submitLanguageDoc(lang) {
           {% if ui_config.show_otros_servicios %}
           <button type="button" id="add-otro" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addOtroRow()">{% if is_cl == 'CL' %}+ Agregar otros servicios{% else %}+ {% trans "Add Other Services" %}{% endif %}</button>
           {% endif %}
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto text-center">
+            {% if is_cl == 'CL' %}🌐 Ir a otros servicios{% else %}🌐 {% trans "Go to Other Services" %}{% endif %}
+          </a>
         </div>
 
         <!-- Parts container -->
@@ -540,24 +746,24 @@ function submitLanguageDoc(lang) {
       </div>
 
       <!-- Observations -->
-      <div class="observaciones-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
-        <label for="id_observaciones" class="block text-cyan-200 font-semibold text-sm sm:text-base mb-3">{% if is_cl == 'CL' %}Observaciones{% else %}{% trans "Observations" %}{% endif %}</label>
+      <div class="observaciones-card p-4 sm:p-6">
+        <label for="id_observaciones" class="block mb-3">{% if is_cl == 'CL' %}OBSERVACIONES{% else %}{% trans "OBSERVATIONS" %}{% endif %}</label>
         <textarea id="id_observaciones" name="observaciones" rows="4" class="form-control w-full text-base focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900" placeholder="{% if is_cl == 'CL' %}Observaciones opcionales — puedes dejar este campo vacío si no hay información adicional.{% else %}{% trans "Optional observations - Can be left empty if no additional information..." %}{% endif %}">{{ form.observaciones.value|default_if_none:'' }}</textarea>
       </div>
     </div>
 
     <!-- Totals Section - Mejorada y reorganizada -->
     <div class="totales-section mt-6 sm:mt-8 pt-4 sm:pt-6 border-t-2 border-cyan-500/30">
-      <div class="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 rounded-2xl p-4 sm:p-6 border border-cyan-400/50 shadow-lg">
-        <h3 class="text-xl sm:text-2xl font-bold text-cyan-300 mb-4 sm:mb-6 text-center">
-          {% if is_cl == 'CL' %}💰 Resumen de Totales{% else %}💰 {% trans "Totals Summary" %}{% endif %}
+      <div class="bg-gradient-to-r p-4 sm:p-6">
+        <h3 class="section-title text-center text-xl sm:text-2xl mb-4 sm:mb-6">
+          {% if is_cl == 'CL' %}💰 RESUMEN DE TOTALES{% else %}💰 {% trans "TOTALS SUMMARY" %}{% endif %}
         </h3>
         
         <!-- VAT checkbox -->
         <div class="mb-6 flex justify-center">
-          <label for="id_apply_vat" class="flex items-center text-cyan-200 bg-cyan-900/40 px-4 py-2 rounded-lg border border-cyan-400/50 cursor-pointer hover:bg-cyan-900/60 transition-all">
+          <label for="id_apply_vat" class="flex items-center text-cyan-200 bg-black/40 px-4 py-2 rounded-lg border-2 border-cyan-400 cursor-pointer hover:bg-black/60 transition-all">
             <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2 w-5 h-5 accent-cyan-400 cursor-pointer">
-            <span class="font-semibold">{% if is_cl == 'CL' %}Aplicar impuesto{% else %}{% trans "Apply tax" %}{% endif %}</span>
+            <span class="font-semibold font-futuristic uppercase tracking-wide">{% if is_cl == 'CL' %}Aplicar impuesto{% else %}{% trans "Apply tax" %}{% endif %}</span>
           </label>
         </div>
 
@@ -565,51 +771,51 @@ function submitLanguageDoc(lang) {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           <!-- Parts Subtotal -->
           {% if ui_config.show_repuestos %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+          <div class="bg-black/40 rounded-lg p-4">
             <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% if is_cl == 'CL' %}Subtotal Repuestos{% else %}{% trans "Parts Subtotal" %}{% endif %}</span>
-              <span id="t_repuestos" class="text-cyan-300 font-bold text-lg">$0</span>
+              <span class="text-cyan-200 text-sm font-semibold font-futuristic uppercase tracking-wide">{% if is_cl == 'CL' %}Subtotal Repuestos{% else %}{% trans "Parts Subtotal" %}{% endif %}</span>
+              <span id="t_repuestos" class="text-cyan-300 font-bold text-lg font-mono">$0</span>
             </div>
           </div>
           {% endif %}
           
           <!-- Services Subtotal -->
           {% if ui_config.show_services %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+          <div class="bg-black/40 rounded-lg p-4">
             <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% if is_cl == 'CL' %}Subtotal Servicios{% else %}{% trans "Services Subtotal" %}{% endif %}</span>
-              <span id="t_servicios" class="text-cyan-300 font-bold text-lg">$0</span>
+              <span class="text-cyan-200 text-sm font-semibold font-futuristic uppercase tracking-wide">{% if is_cl == 'CL' %}Subtotal Servicios{% else %}{% trans "Services Subtotal" %}{% endif %}</span>
+              <span id="t_servicios" class="text-cyan-300 font-bold text-lg font-mono">$0</span>
             </div>
           </div>
           {% endif %}
           
           <!-- Other Services Subtotal -->
           {% if ui_config.show_otros_servicios %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+          <div class="bg-black/40 rounded-lg p-4">
             <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% if is_cl == 'CL' %}Subtotal Servicios Externos{% else %}{% trans "Other Services Subtotal" %}{% endif %}</span>
-              <span id="t_otros" class="text-cyan-300 font-bold text-lg">$0</span>
+              <span class="text-cyan-200 text-sm font-semibold font-futuristic uppercase tracking-wide">{% if is_cl == 'CL' %}Subtotal Servicios Externos{% else %}{% trans "Other Services Subtotal" %}{% endif %}</span>
+              <span id="t_otros" class="text-cyan-300 font-bold text-lg font-mono">$0</span>
             </div>
           </div>
           {% endif %}
           
           <!-- Tax -->
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+          <div class="bg-black/40 rounded-lg p-4">
             <div class="flex justify-between items-center">
-              <label class="flex items-center text-cyan-200 text-sm font-semibold cursor-pointer">
+              <label class="flex items-center text-cyan-200 text-sm font-semibold font-futuristic uppercase tracking-wide cursor-pointer">
                 <input type="checkbox" id="include_tax" checked class="mr-2 w-4 h-4 accent-cyan-400 cursor-pointer">
                 <span>{% if is_cl == 'CL' %}IVA{% else %}{% trans "Tax" %}{% endif %}</span>
               </label>
-              <span id="t_iva" class="text-cyan-300 font-bold text-lg">$0</span>
+              <span id="t_iva" class="text-cyan-300 font-bold text-lg font-mono">$0</span>
             </div>
           </div>
         </div>
 
         <!-- Grand Total -->
-        <div class="bg-gradient-to-r from-cyan-600/30 to-blue-600/30 rounded-lg p-5 border-2 border-cyan-400 shadow-xl">
+        <div class="bg-gradient-to-r rounded-lg p-5 border-2 shadow-xl">
           <div class="flex justify-between items-center">
-            <span class="text-white font-bold text-xl">{% if is_cl == 'CL' %}Total General{% else %}{% trans "Grand Total" %}{% endif %}</span>
-            <span id="t_total" class="text-white font-bold text-2xl">$0</span>
+            <span class="text-white font-bold text-xl font-futuristic uppercase tracking-wider">{% if is_cl == 'CL' %}Total General{% else %}{% trans "Grand Total" %}{% endif %}</span>
+            <span id="t_total" class="text-white font-bold text-2xl font-mono">$0</span>
           </div>
         </div>
       </div>
@@ -623,7 +829,12 @@ function submitLanguageDoc(lang) {
           {% if is_cl == 'CL' %}🌐 Ir a otros servicios{% else %}🌐 {% trans "Go to Other Services" %}{% endif %}
         </a>
       </div>
-      <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">💾 {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{{ ui_labels.create_button }}{% endif %}</button>
+      <div class="flex flex-col items-end gap-2">
+        <div class="text-slate-400 text-xs italic text-right">
+          🌿 {% if is_cl == 'CL' %}Documento digital: Al guardar, podrás enviarlo por WhatsApp o Email.{% else %}{% trans "Digital document: After saving, you can send it via WhatsApp or Email." %}{% endif %}
+        </div>
+        <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">💾 {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{{ ui_labels.create_button }}{% endif %}</button>
+      </div>
     </div>
   </div>
 
@@ -1228,6 +1439,8 @@ window.addRepuestoRow = function addRepuestoRow(){
         <input type="text" class="rep-search form-control w-full text-base" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
         <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-nombre">
+        <div class="rep-stock-info mt-1 text-xs hidden"></div>
+        <input type="text" class="rep-nota form-control w-full text-xs mt-1 bg-slate-900/50 border-cyan-900/50 text-gray-300 placeholder:text-gray-500" placeholder="${COUNTRY_REF === 'CL' ? 'Nota adicional (marca, estado, etc)...' : 'Additional note (brand, condition, etc)...'}" style="padding: 6px 10px; border-width: 1px;">
         <button type="button" class="rep-create-btn absolute top-8 sm:top-8 right-2 px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white text-xs sm:text-sm font-semibold border border-purple-300/40 shadow-sm transition-all">➕</button>
       </div>
       <div class="w-full sm:w-16">
@@ -1250,6 +1463,10 @@ window.addRepuestoRow = function addRepuestoRow(){
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
           <input type="text" class="rep-precio-compra form-control w-full text-base pl-6" placeholder="0">
         </div>
+      </div>
+      <div class="w-full sm:w-20">
+        <label class="block text-cyan-200 text-sm mb-1">${COUNTRY_REF === 'CL' ? '% Desc.' : '% Disc.'}</label>
+        <input type="number" class="rep-descuento form-control w-full text-base" value="0" min="0" max="100" placeholder="0">
       </div>
       <div class="w-full sm:w-28">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
@@ -1306,6 +1523,9 @@ function setupRepuestoRow(row){
         nombre: data.nombre || '',
         precio_venta: data.precio_venta_sugerido || data.precio_venta || '',
         precio_compra: data.precio_compra || '',
+        stock: data.stock !== undefined ? data.stock : (data.stock_disponible !== undefined ? data.stock_disponible : (data.stock_actual !== undefined ? data.stock_actual : null)),
+        stock_disponible: data.stock_disponible !== undefined ? data.stock_disponible : (data.stock_actual !== undefined ? data.stock_actual : (data.stock !== undefined ? data.stock : null)),
+        stock_actual: data.stock_actual !== undefined ? data.stock_actual : (data.stock !== undefined ? data.stock : (data.stock_disponible !== undefined ? data.stock_disponible : null)),
       });
     } catch (err) {
       console.error('rep fetchByCode', err);
@@ -1314,9 +1534,26 @@ function setupRepuestoRow(row){
 
   function applyPartData(item){
     if (!item) return;
+    
+    // Guardamos el stock disponible en un atributo 'data' para validarlo luego
+    // Prioridad: stock_actual > stock > stock_disponible
+    const stockDisponible = item.stock_actual !== undefined && item.stock_actual !== null ? Number(item.stock_actual) : 
+                           (item.stock !== undefined && item.stock !== null ? Number(item.stock) : 
+                           (item.stock_disponible !== undefined && item.stock_disponible !== null ? Number(item.stock_disponible) : 0));
+    
+    // Guardar stock disponible en el campo de cantidad para validación directa
+    if (qEl) {
+      qEl.dataset.availableStock = stockDisponible;
+      qEl.setAttribute('max', stockDisponible);
+    }
+    
+    // Guardar también en el row para compatibilidad
+    row.dataset.stockDisponible = stockDisponible;
+    
     if (idHidden) idHidden.value = item.id || '';
     if (inpCode) inpCode.value = item.codigo || '';
     if (inpName) inpName.value = item.nombre || '';
+    
     if (inpPV && item.precio_venta !== undefined && item.precio_venta !== null) {
       const precio = parseNumericInput(item.precio_venta);
       inpPV.value = precio > 0 ? formatNumberInput(precio) : '';
@@ -1329,6 +1566,47 @@ function setupRepuestoRow(row){
       // Solo mostrar el nombre del repuesto, sin el código
       searchInput.value = item.nombre || '';
     }
+    
+    // Alerta inmediata si el repuesto seleccionado no tiene existencias
+    if (stockDisponible <= 0 && qEl) {
+      showFieldError(qEl, COUNTRY_REF === 'CL' ? 'No hay unidades disponibles' : 'No stock available');
+    }
+    
+    // Mostrar información de stock en el indicador visual
+    if (stockInfo) {
+      // Limpiar alertas previas
+      const prevHint = stockInfo.querySelector('.eg-hint');
+      if (prevHint) prevHint.remove();
+      stockInfo.classList.remove('hidden');
+      
+      if (stockDisponible > 0) {
+        let stockClass = 'text-cyan-300';
+        let stockIcon = '📦';
+        let stockMessage = `${stockDisponible} ${COUNTRY_REF === 'CL' ? 'unidades disponibles' : 'units available'}`;
+        
+        // Alerta de stock mínimo (entre 1 y 3 unidades)
+        if (stockDisponible <= 3) {
+          stockClass = 'text-orange-400';
+          stockIcon = '⚠️';
+          stockMessage = `${COUNTRY_REF === 'CL' ? 'Stock bajo' : 'Low stock'}: ${stockDisponible} ${COUNTRY_REF === 'CL' ? 'unidades' : 'units'}`;
+        } else if (stockDisponible <= 5) {
+          stockClass = 'text-yellow-400';
+          stockIcon = '⚠️';
+          stockMessage = `${COUNTRY_REF === 'CL' ? 'Stock crítico' : 'Critical stock'}: ${stockDisponible} ${COUNTRY_REF === 'CL' ? 'unidades' : 'units'}`;
+        } else if (stockDisponible <= 10) {
+          stockClass = 'text-orange-300';
+          stockIcon = '📦';
+          stockMessage = `${stockDisponible} ${COUNTRY_REF === 'CL' ? 'unidades disponibles' : 'units available'}`;
+        }
+        
+        stockInfo.innerHTML = `<span class="${stockClass} font-semibold">${stockIcon} ${stockMessage}</span>`;
+        stockInfo.classList.remove('hidden');
+      } else {
+        stockInfo.innerHTML = `<span class="text-red-400 font-semibold">⚠️ ${COUNTRY_REF === 'CL' ? 'Sin stock disponible' : 'Out of stock'}</span>`;
+        stockInfo.classList.remove('hidden');
+      }
+    }
+    
     recalc();
   }
   
@@ -1347,10 +1625,15 @@ function setupRepuestoRow(row){
       qEl.value = data.cantidad;
       qEl.dispatchEvent(new Event('input'));
     }
-    if (row.querySelector('.rep-descuento') && data.descuento) {
+    if (row.querySelector('.rep-descuento') && data.descuento !== undefined) {
       const descInput = row.querySelector('.rep-descuento');
-      descInput.value = data.descuento;
+      descInput.value = data.descuento || 0;
       descInput.dispatchEvent(new Event('input'));
+    }
+    // Aplicar nota
+    if (row.querySelector('.rep-nota') && data.nota !== undefined) {
+      const notaInput = row.querySelector('.rep-nota');
+      notaInput.value = data.nota || '';
     }
     recalc();
   };
@@ -1400,14 +1683,34 @@ function setupRepuestoRow(row){
       const nombre = item.nombre || item.text || '';
       const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
       const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
+      // Aceptar múltiples nombres de campo para compatibilidad: stock_actual, stock, stock_disponible
+      const stock = item.stock_actual !== undefined ? item.stock_actual : 
+                   (item.stock !== undefined ? item.stock : 
+                   (item.stock_disponible !== undefined ? item.stock_disponible : null));
+      const stockDisponible = item.stock_disponible !== undefined ? item.stock_disponible : 
+                             (item.stock_actual !== undefined ? item.stock_actual : stock);
       div.dataset.id = item.id || '';
       div.dataset.codigo = codigo;
       div.dataset.nombre = nombre;
       div.dataset.precio = precioVenta;
       div.dataset.cost = precioCompra;
+      if (stock !== null && stock !== undefined) {
+        div.dataset.stock = stock;
+      }
+      if (stockDisponible !== null && stockDisponible !== undefined) {
+        div.dataset.stockDisponible = stockDisponible;
+      }
+      // Capturamos el stock desde la API
+      const stockActual = stockDisponible !== null && stockDisponible !== undefined ? Number(stockDisponible) : 0;
+      const stockColor = stockActual === 0 ? 'text-red-400' : 
+                        (stockActual <= 3 ? 'text-orange-400' : 'text-gray-300');
+      
       div.innerHTML = `
         <div class="text-cyan-200 font-semibold text-sm truncate">${codigo ? `${codigo} • ${nombre}` : nombre}</div>
-        <div class="text-xs text-gray-300">${money(precioVenta)}</div>`;
+        <div class="flex justify-between text-xs">
+          <span class="text-gray-400">${money(precioVenta)}</span>
+          <span class="${stockColor} font-bold">Stock: ${stockActual}</span>
+        </div>`;
       frag.appendChild(div);
     });
     drop.appendChild(frag);
@@ -1417,20 +1720,60 @@ function setupRepuestoRow(row){
 
   function seleccionarRepuesto(el){
     if (!el) return;
+    const stock = el.dataset.stock !== undefined && el.dataset.stock !== '' ? el.dataset.stock : null;
+    const stockDisponible = el.dataset.stockDisponible !== undefined && el.dataset.stockDisponible !== '' ? el.dataset.stockDisponible : stock;
     applyPartData({
       id: el.dataset.id,
       codigo: el.dataset.codigo,
       nombre: el.dataset.nombre,
       precio_venta: parseNumericInput(el.dataset.precio),
       precio_compra: parseNumericInput(el.dataset.cost),
+      stock: stock,
+      stock_disponible: stockDisponible,
     });
     drop?.classList.add('hidden');
           }
 
           function recalc(){
             const q = Number(qEl?.value || 0);
-    const p = parseNumericInput(inpPV?.value || 0);
-    const d = Number(($('.rep-descuento', row)?.value || 0)) || 0;
+            const stock = Number(qEl?.dataset.availableStock || 0); // Recuperado de la búsqueda
+            const p = parseNumericInput(inpPV?.value || 0);
+            const d = Number(($('.rep-descuento', row)?.value || 0)) || 0;
+            
+            // --- VALIDACIÓN DE INVENTARIO ---
+            // Limpiar alertas y estilos previos
+            qEl.classList.remove('ring-2', 'ring-red-500', 'border-red-500', 'animate-pulse');
+            qEl.style.borderColor = "";
+            qEl.style.boxShadow = ""; // Limpiar efecto neón previo
+            const existingHint = qEl.closest('div')?.querySelector('.eg-hint');
+            if (existingHint) existingHint.remove();
+            
+            if (stock > 0) {
+              if (q > stock) {
+                // Error: Stock excedido - Alerta Neón Rojo Intenso
+                showFieldError(qEl, `⚠️ ${COUNTRY_REF === 'CL' ? 'Solo hay' : 'Only'} ${stock} ${COUNTRY_REF === 'CL' ? 'unidades disponibles' : 'units available'}`);
+                qEl.classList.add('border-red-500', 'animate-pulse'); // Alerta visual neón
+                // Efecto neón rojo más intenso y visible
+                qEl.style.boxShadow = "0 0 15px #ff0044, 0 0 25px rgba(255, 0, 68, 0.5)";
+                qEl.style.borderColor = "#ff0044";
+                qEl.style.borderWidth = "2px";
+                qEl.title = `${COUNTRY_REF === 'CL' ? 'Cantidad supera el stock disponible' : 'Quantity exceeds available stock'} (${stock})`;
+              } else if (stock > 0 && stock <= 3 && q > 0) {
+                // Alerta de stock mínimo (Naranja) - Efecto Neón Naranja
+                qEl.style.borderColor = "#fb923c"; // Orange-400
+                qEl.style.boxShadow = "0 0 10px #fb923c, 0 0 15px rgba(251, 146, 60, 0.3)"; // Efecto neón naranja preventivo
+                const hint = document.createElement('div');
+                hint.className = 'mt-1 text-orange-400 text-xs eg-hint font-semibold';
+                hint.textContent = `⚠️ ${COUNTRY_REF === 'CL' ? 'Stock crítico' : 'Critical stock'}: ${COUNTRY_REF === 'CL' ? 'Reponer pronto' : 'Restock soon'}`;
+                qEl.closest('div')?.appendChild(hint);
+              } else {
+                // Limpiar efectos si la cantidad es válida
+                qEl.style.boxShadow = "";
+                qEl.style.borderColor = "";
+                qEl.style.borderWidth = "";
+              }
+            }
+            
             const subtotal = q * p * (1 - (d/100));
             if (sub)  sub.value = subtotal;
             if (view) view.textContent = money(subtotal);
@@ -1500,14 +1843,34 @@ function setupRepuestoRow(row){
       const nombre = item.nombre || item.text || '';
       const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
       const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
+      // Aceptar múltiples nombres de campo para compatibilidad: stock_actual, stock, stock_disponible
+      const stock = item.stock_actual !== undefined ? item.stock_actual : 
+                   (item.stock !== undefined ? item.stock : 
+                   (item.stock_disponible !== undefined ? item.stock_disponible : null));
+      const stockDisponible = item.stock_disponible !== undefined ? item.stock_disponible : 
+                             (item.stock_actual !== undefined ? item.stock_actual : stock);
       div.dataset.id = item.id || '';
       div.dataset.codigo = codigo;
       div.dataset.nombre = nombre;
       div.dataset.precio = precioVenta;
       div.dataset.cost = precioCompra;
+      if (stock !== null && stock !== undefined) {
+        div.dataset.stock = stock;
+      }
+      if (stockDisponible !== null && stockDisponible !== undefined) {
+        div.dataset.stockDisponible = stockDisponible;
+      }
+      // Capturamos el stock desde la API
+      const stockActual = stockDisponible !== null && stockDisponible !== undefined ? Number(stockDisponible) : 0;
+      const stockColor = stockActual === 0 ? 'text-red-400' : 
+                        (stockActual <= 3 ? 'text-orange-400' : 'text-gray-300'); // Alerta de stock mínimo
+      
       div.innerHTML = `
         <div class="text-cyan-200 font-semibold text-sm truncate">${codigo}${nombre ? ` • ${nombre}` : ''}</div>
-        ${precioVenta > 0 ? `<div class="text-xs text-gray-300">${money(precioVenta)}</div>` : ''}`;
+        <div class="flex justify-between text-xs">
+          ${precioVenta > 0 ? `<span class="text-gray-400">${money(precioVenta)}</span>` : '<span></span>'}
+          <span class="${stockColor} font-bold">Stock: ${stockActual}</span>
+        </div>`;
       frag.appendChild(div);
     });
     codeDrop.appendChild(frag);
@@ -1517,12 +1880,16 @@ function setupRepuestoRow(row){
 
   function seleccionarPorCodigo(el){
     if (!el) return;
+    const stock = el.dataset.stock !== undefined && el.dataset.stock !== '' ? el.dataset.stock : null;
+    const stockDisponible = el.dataset.stockDisponible !== undefined && el.dataset.stockDisponible !== '' ? el.dataset.stockDisponible : stock;
     applyPartData({
       id: el.dataset.id,
       codigo: el.dataset.codigo,
       nombre: el.dataset.nombre,
       precio_venta: parseNumericInput(el.dataset.precio),
       precio_compra: parseNumericInput(el.dataset.cost),
+      stock: stock,
+      stock_disponible: stockDisponible,
     });
     codeDrop?.classList.add('hidden');
   }
@@ -2008,6 +2375,7 @@ function serializeRows(){
     cantidad:  Number($('.rep-cantidad', row)?.value || 0),
     precio:    parseNumericInput($('.rep-precio-venta', row)?.value || 0),
     descuento: Number($('.rep-descuento', row)?.value || 0),
+    nota:      $('.rep-nota', row)?.value?.trim() || '',
   }));
   const serv = $$('#servicios-container .dynamic-element').map(row=>({
     servicio_id: $('.srv-id', row)?.value || '',
@@ -2032,9 +2400,87 @@ function serializeRows(){
   console.log('💾 JSON guardado');
 }
 
+// Función de validación de stock
+function validarStock(inputCantidad, stockDisponible) {
+  if (!inputCantidad || stockDisponible === null || stockDisponible === undefined) {
+    return true; // Si no hay información de stock, permitir
+  }
+  const cantidad = parseInt(inputCantidad.value) || 0;
+  const stockNum = Number(stockDisponible);
+  
+  if (cantidad > stockNum) {
+    showFieldError(inputCantidad, `⚠️ ${COUNTRY_REF === 'CL' ? 'Solo hay' : 'Only'} ${stockNum} ${COUNTRY_REF === 'CL' ? 'unidades disponibles' : 'units available'}`);
+    return false;
+  } else {
+    // Limpiar error si la cantidad es válida
+    inputCantidad.classList.remove('ring-2', 'ring-red-500');
+    const hint = inputCantidad.closest('div')?.querySelector('.eg-hint');
+    if (hint) hint.remove();
+    return true;
+  }
+}
+
+// Validar todas las filas de repuestos antes de enviar
+function validarStockEnTodasLasFilas() {
+  const filas = document.querySelectorAll('#repuestos-container .dynamic-element');
+  let hayErrores = false;
+  
+  filas.forEach(row => {
+    const cantidadInput = $('.rep-cantidad', row);
+    
+    if (cantidadInput) {
+      // Buscar stock disponible en dataset.availableStock (prioridad) o row.dataset.stockDisponible
+      const stock = parseInt(cantidadInput.dataset.availableStock || row.dataset.stockDisponible || 9999);
+      const cantidad = parseInt(cantidadInput.value || 0);
+      
+      if (cantidad > stock) {
+        showFieldError(cantidadInput, `⚠️ ${COUNTRY_REF === 'CL' ? 'Solo hay' : 'Only'} ${stock} ${COUNTRY_REF === 'CL' ? 'unidades disponibles' : 'units in stock'}`);
+        cantidadInput.classList.add('border-red-500', 'animate-pulse');
+        // Aplicar efecto neón rojo intenso para error de stock
+        cantidadInput.style.boxShadow = "0 0 15px #ff0044, 0 0 25px rgba(255, 0, 68, 0.5)";
+        cantidadInput.style.borderColor = "#ff0044";
+        cantidadInput.style.borderWidth = "2px";
+        hayErrores = true;
+      } else {
+        // Limpiar efectos si la cantidad es válida
+        cantidadInput.style.boxShadow = "";
+        cantidadInput.style.borderColor = "";
+        cantidadInput.style.borderWidth = "";
+      }
+    }
+  });
+  
+  return !hayErrores; // Retorna true si no hay errores
+}
+
 function submitDocumentForm(){
   const form = document.getElementById('document-form');
   if (!form) return;
+  
+  // Bloqueo de seguridad: No permite guardar si hay campos en rojo
+  // Verificar errores de stock de forma directa
+  const stockErrors = Array.from(document.querySelectorAll('.rep-cantidad')).some(input => {
+    const cantidad = parseFloat(input.value || 0);
+    const stock = parseFloat(input.dataset.availableStock || 9999);
+    return cantidad > stock;
+  });
+  
+  // También verificar errores visuales (box-shadow rojo) como respaldo
+  const erroresVisuales = document.querySelectorAll('.rep-cantidad[style*="box-shadow"]');
+  
+  // Verificar si hay errores de stock (resplandor rojo)
+  const erroresNeonRojo = Array.from(document.querySelectorAll('.rep-cantidad')).filter(input => {
+    const style = window.getComputedStyle(input);
+    return style.boxShadow.includes('#ff0044') || style.boxShadow.includes('rgb(255, 0, 68)');
+  });
+  
+  if (stockErrors || erroresVisuales.length > 0 || erroresNeonRojo.length > 0 || !validarStockEnTodasLasFilas()) {
+    alert(COUNTRY_REF === 'CL' 
+      ? '⚠️ Por favor corrige las cantidades. No hay stock suficiente para algunos repuestos marcados en rojo.' 
+      : '⚠️ Please correct the quantities. There is not enough stock for some parts marked in red.');
+    return false;
+  }
+  
   serializeRows();
   form.submit();
 }
@@ -2260,6 +2706,7 @@ function submitDocumentForm(){
               cantidad: rep.cantidad || 1,
               precio: rep.precio || 0,
               descuento: rep.descuento || 0,
+              nota: rep.nota || '',
             });
           }
         }
@@ -2316,11 +2763,103 @@ function submitDocumentForm(){
   updateDocumentNumber();
   {% endif %}
   
+  // Asegurar que serializeRows() se ejecute antes de enviar el formulario
+  // Y validar stock antes de permitir el envío
+  const form = document.getElementById('document-form');
+  if (form) {
+    form.addEventListener('submit', function(e) {
+      // Validar stock antes de enviar
+      if (!validarStockEnTodasLasFilas()) {
+        e.preventDefault();
+        e.stopPropagation();
+        alert(COUNTRY_REF === 'CL' 
+          ? '⚠️ Hay errores de stock. Por favor, corrige las cantidades antes de guardar.' 
+          : '⚠️ There are stock errors. Please correct the quantities before saving.');
+        return false;
+      }
+      
+      serializeRows();
+      // Permitir que el formulario se envíe normalmente
+    });
+  }
+
   serializeRows();
 
   clienteBusqueda?.addEventListener('input', (event)=> window.handleClienteInput(event.target.value));
   clienteBusqueda?.addEventListener('focus', (event)=> window.handleClienteFocus(event.target.value));
   clienteBusqueda?.addEventListener('keydown', (event)=> window.handleClienteKeydown(event));
+  
+  // El botón "Nuevo Cliente" - Solución directa sin bloqueos
+  const btnNuevoCliente = document.getElementById('btn-nuevo-cliente');
+  if (btnNuevoCliente) {
+    // Forzar estilos VERDE BRILLANTE (estilo WhatsApp) - Muy visible
+    const greenStyles = 'display: inline-flex !important; align-items: center !important; justify-content: center !important; background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%) !important; background-color: #22c55e !important; color: #ffffff !important; font-weight: 900 !important; padding: 10px 20px !important; border-radius: 10px !important; text-decoration: none !important; border: 3px solid #10b981 !important; box-shadow: 0 0 25px rgba(34, 197, 94, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3) !important; cursor: pointer !important; pointer-events: auto !important; z-index: 9999 !important; position: relative !important; font-size: 13px !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;';
+    
+    btnNuevoCliente.style.cssText = greenStyles;
+    
+    // Asegurar href
+    if (!btnNuevoCliente.getAttribute('href') || btnNuevoCliente.getAttribute('href') === '#' || btnNuevoCliente.getAttribute('href') === '') {
+      const nextUrl = encodeURIComponent(window.location.pathname);
+      const pathParts = window.location.pathname.split('/').filter(p => p);
+      const country = pathParts[0] || 'cl';
+      const lang = pathParts[1] || 'es';
+      btnNuevoCliente.setAttribute('href', `/${country}/${lang}/clientes/crear/?next=${nextUrl}`);
+    }
+    
+    // Eliminar TODOS los listeners previos clonando el elemento
+    const newBtn = btnNuevoCliente.cloneNode(true);
+    btnNuevoCliente.parentNode.replaceChild(newBtn, btnNuevoCliente);
+    
+    // Aplicar estilos VERDE al nuevo botón
+    newBtn.style.cssText = greenStyles;
+    
+    // Asegurar href en el nuevo botón
+    if (!newBtn.getAttribute('href') || newBtn.getAttribute('href') === '#' || newBtn.getAttribute('href') === '') {
+      const nextUrl = encodeURIComponent(window.location.pathname);
+      const pathParts = window.location.pathname.split('/').filter(p => p);
+      const country = pathParts[0] || 'cl';
+      const lang = pathParts[1] || 'es';
+      newBtn.setAttribute('href', `/${country}/${lang}/clientes/crear/?next=${nextUrl}`);
+    }
+    
+    // Añadir efectos hover
+    newBtn.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.05)';
+      this.style.boxShadow = '0 0 35px rgba(34, 197, 94, 1), 0 6px 20px rgba(0, 0, 0, 0.4)';
+    });
+    
+    newBtn.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+      this.style.boxShadow = '0 0 25px rgba(34, 197, 94, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3)';
+    });
+    
+    // Listener simple que NO use preventDefault - permite navegación nativa
+    newBtn.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && href !== '#' && href !== '') {
+        console.log('🚀 Navegando a:', href);
+        // NO usar preventDefault - dejar que el navegador maneje la navegación
+        window.location.href = href;
+      }
+    }, false);
+    
+    console.log('✅ Botón Nuevo Cliente configurado (VERDE BRILLANTE):', newBtn.getAttribute('href'));
+    console.log('🎨 Color aplicado: VERDE #22c55e con resplandor');
+  } else {
+    console.error('❌ Botón btn-nuevo-cliente NO encontrado en el DOM');
+  }
+  
+  // Asegurar que el botón "Nuevo Vehículo" funcione
+  const btnNuevoVehiculo = document.querySelector('a.btn-modern-add[href*="crear_vehiculo"]');
+  if (btnNuevoVehiculo) {
+    btnNuevoVehiculo.addEventListener('click', function(e) {
+      const href = this.getAttribute('href');
+      if (href && href !== '#' && href !== '') {
+        window.location.href = href;
+      }
+    });
+  }
+  
   console.log('📄 Document form inicializado', EG.cfg);
 }
 

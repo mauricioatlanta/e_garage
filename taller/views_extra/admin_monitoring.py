@@ -29,21 +29,14 @@ def subscription_dashboard(request):
 
     stats = {
         "total_empresas": Empresa.objects.count(),
-        "activas": Empresa.objects.filter(estado_suscripcion="activa").count(),
-        "vencidas": Empresa.objects.filter(estado_suscripcion="vencida").count(),
-        "suspendidas": Empresa.objects.filter(estado_suscripcion="suspendida").count(),
-        "canceladas": Empresa.objects.filter(estado_suscripcion="cancelada").count(),
+        "activas": Empresa.objects.filter(suscripcion_activa=True).count(),
+        "inactivas": Empresa.objects.filter(suscripcion_activa=False).count(),
         "trials_activos": TrialRegistro.objects.filter(activo=True).count(),
         "trials_expirados": TrialRegistro.objects.filter(activo=False).count(),
-        "nuevas_este_mes": Empresa.objects.filter(fecha_registro__gte=thirty_days_ago).count(),
     }
 
-    # Empresas que vencen pronto (próximos 15 días)
-    expiring_soon = Empresa.objects.filter(
-        estado_suscripcion="activa",
-        fecha_vencimiento_suscripcion__lte=today + timedelta(days=15),
-        fecha_vencimiento_suscripcion__gt=today,
-    ).order_by("fecha_vencimiento_suscripcion")
+    # Empresas que vencen pronto (deshabilitado por campos legacy)
+    expiring_soon = Empresa.objects.none()
 
     # Trials que expiran pronto (próximos 7 días)
     trials_expiring = TrialRegistro.objects.filter(
@@ -55,11 +48,9 @@ def subscription_dashboard(request):
     # Ingresos del mes
     current_month_payments = (
         ComprobantePago.objects.filter(
-            fecha_upload__year=today.year,
-            fecha_upload__month=today.month,
-            aprobado=True,
-        ).aggregate(total=Sum("monto"))["total"]
-        or 0
+            fecha_subida__year=today.year,
+            fecha_subida__month=today.month,
+        ).aggregate(total=Sum("monto"))["total"] or 0
     )
 
     context = {
@@ -84,18 +75,21 @@ def subscription_list(request):
     date_to = request.GET.get("date_to", "")
     trial_filter = request.GET.get("trial", "")
     payment_status = request.GET.get("payment", "")
-    sort_by = request.GET.get("sort", "-fecha_registro")
+    sort_by = request.GET.get("sort", "-fecha_inicio")
 
     # Query base
-    empresas = Empresa.objects.select_related("usuario").prefetch_related("comprobantepago_set")
+    empresas = Empresa.objects.select_related("usuario").prefetch_related("comprobantes")
 
     # Aplicar filtros
-    if status_filter:
-        empresas = empresas.filter(estado_suscripcion=status_filter)
+    if status_filter == "activa":
+        empresas = empresas.filter(suscripcion_activa=True)
+    elif status_filter == "inactiva":
+        empresas = empresas.filter(suscripcion_activa=False)
 
     if search_query:
         empresas = empresas.filter(
-            Q(nombre__icontains=search_query)
+            Q(nombre_taller__icontains=search_query)
+            | Q(empresa__icontains=search_query)
             | Q(usuario__username__icontains=search_query)
             | Q(usuario__email__icontains=search_query)
             | Q(usuario__first_name__icontains=search_query)
@@ -105,14 +99,14 @@ def subscription_list(request):
     if date_from:
         try:
             date_from_parsed = datetime.strptime(date_from, "%Y-%m-%d").date()
-            empresas = empresas.filter(fecha_registro__gte=date_from_parsed)
+            empresas = empresas.filter(fecha_inicio__gte=date_from_parsed)
         except ValueError:
             pass
 
     if date_to:
         try:
             date_to_parsed = datetime.strptime(date_to, "%Y-%m-%d").date()
-            empresas = empresas.filter(fecha_registro__lte=date_to_parsed)
+            empresas = empresas.filter(fecha_inicio__lte=date_to_parsed)
         except ValueError:
             pass
 
@@ -126,22 +120,18 @@ def subscription_list(request):
         empresas = empresas.filter(id__in=trial_ids)
 
     if payment_status == "pending":
-        # Empresas con pagos pendientes
-        pending_payment_ids = ComprobantePago.objects.filter(aprobado=False).values_list(
-            "empresa_id", flat=True
-        )
-        empresas = empresas.filter(id__in=pending_payment_ids)
+        # Empresas con pagos pendientes (filtro deshabilitado - campo aprobado no existe)
+        pending_payment_ids = []  # disabled: legacy values_list block
+        pass
 
     # Ordenamiento
     valid_sort_fields = [
-        "fecha_registro",
-        "-fecha_registro",
-        "nombre",
-        "-nombre",
-        "estado_suscripcion",
-        "-estado_suscripcion",
-        "fecha_vencimiento_suscripcion",
-        "-fecha_vencimiento_suscripcion",
+        "fecha_inicio",
+        "-fecha_inicio",
+        "nombre_taller",
+        "-nombre_taller",
+        "suscripcion_activa",
+        "-suscripcion_activa",
     ]
     if sort_by in valid_sort_fields:
         empresas = empresas.order_by(sort_by)
@@ -154,9 +144,7 @@ def subscription_list(request):
     # Contexto para filtros
     status_choices = [
         ("activa", "Activa"),
-        ("vencida", "Vencida"),
-        ("suspendida", "Suspendida"),
-        ("cancelada", "Cancelada"),
+        ("inactiva", "Inactiva"),
     ]
 
     trial_choices = [
@@ -192,36 +180,44 @@ def subscription_analytics(request):
     # Análisis temporal (últimos 12 meses)
     monthly_data = []
     for i in range(12):
-        month_date = today.replace(day=1) - timedelta(days=30 * i)
-        month_start = month_date.replace(day=1)
-
+        # Calcular fecha del mes de manera más robusta
+        # Restar meses de forma segura
+        target_month = today.month - i
+        target_year = today.year
+        
+        # Ajustar año si el mes es negativo
+        while target_month <= 0:
+            target_month += 12
+            target_year -= 1
+        
+        month_date = today.replace(year=target_year, month=target_month, day=1)
+        month_start = month_date
+        
+        # Calcular fin del mes de manera segura
         if month_date.month == 12:
-            month_end = month_date.replace(year=month_date.year + 1, month=1, day=1) - timedelta(
-                days=1
-            )
+            month_end = month_date.replace(year=month_date.year + 1, month=1, day=1) - timedelta(days=1)
         else:
             month_end = month_date.replace(month=month_date.month + 1, day=1) - timedelta(days=1)
 
         # Nuevas suscripciones
         nuevas = Empresa.objects.filter(
-            fecha_registro__gte=month_start, fecha_registro__lte=month_end
+            fecha_inicio__gte=month_start, fecha_inicio__lte=month_end
         ).count()
 
-        # Cancelaciones
+        # Cancelaciones (empresas inactivas que vencieron en este mes)
+        # Nota: fecha_modificacion no existe, usamos fecha_fin como aproximación
         canceladas = Empresa.objects.filter(
-            estado_suscripcion="cancelada",
-            fecha_modificacion__gte=month_start,
-            fecha_modificacion__lte=month_end,
+            suscripcion_activa=False,
+            fecha_fin__gte=month_start,
+            fecha_fin__lte=month_end,
         ).count()
 
         # Ingresos
         ingresos = (
             ComprobantePago.objects.filter(
-                fecha_upload__gte=month_start,
-                fecha_upload__lte=month_end,
-                aprobado=True,
-            ).aggregate(total=Sum("monto"))["total"]
-            or 0
+                fecha_subida__gte=month_start,
+                fecha_subida__lte=month_end,
+            ).aggregate(total=Sum("monto"))["total"] or 0
         )
 
         monthly_data.append(
@@ -239,16 +235,16 @@ def subscription_analytics(request):
 
     # Análisis de conversión de trials
     total_trials = TrialRegistro.objects.count()
-    trials_convertidos = TrialRegistro.objects.filter(empresa__estado_suscripcion="activa").count()
+    trials_convertidos = TrialRegistro.objects.filter(empresa__suscripcion_activa=True).count()
     conversion_rate = (trials_convertidos / total_trials * 100) if total_trials > 0 else 0
 
     # Análisis de retención
     empresas_activas_30_dias = Empresa.objects.filter(
-        estado_suscripcion="activa", fecha_registro__lte=today - timedelta(days=30)
+        suscripcion_activa=True, fecha_inicio__lte=today - timedelta(days=30)
     ).count()
 
     total_empresas_30_dias = Empresa.objects.filter(
-        fecha_registro__lte=today - timedelta(days=30)
+        fecha_inicio__lte=today - timedelta(days=30)
     ).count()
 
     retention_rate = (
@@ -260,7 +256,7 @@ def subscription_analytics(request):
     # Top empresas por ingresos
     top_empresas = (
         Empresa.objects.annotate(
-            total_pagos=Sum("comprobantepago__monto", filter=Q(comprobantepago__aprobado=True))
+            total_pagos=Sum("comprobantes__monto")
         )
         .filter(total_pagos__isnull=False)
         .order_by("-total_pagos")[:10]
@@ -288,7 +284,7 @@ def subscription_detail(request, empresa_id):
     trial = TrialRegistro.objects.filter(empresa=empresa).first()
 
     # Historial de pagos
-    pagos = ComprobantePago.objects.filter(empresa=empresa).order_by("-fecha_upload")
+    pagos = ComprobantePago.objects.filter(empresa=empresa).order_by("-fecha_subida")
 
     # Estadísticas de uso (esto requeriría modelos adicionales de tracking)
     # Por ahora, datos básicos
@@ -297,8 +293,8 @@ def subscription_detail(request, empresa_id):
         "empresa": empresa,
         "trial": trial,
         "pagos": pagos,
-        "total_pagos": pagos.filter(aprobado=True).aggregate(total=Sum("monto"))["total"] or 0,
-        "pagos_pendientes": pagos.filter(aprobado=False).count(),
+        "total_pagos": pagos.aggregate(total=Sum("monto"))["total"] or 0,
+        "pagos_pendientes": 0,  # Campo aprobado no existe
     }
 
     return render(request, "admin_panel/subscription_detail.html", context)
@@ -315,22 +311,22 @@ def subscription_actions(request, empresa_id):
     action = request.POST.get("action")
 
     if action == "suspend":
-        old_status = empresa.estado_suscripcion
-        empresa.estado_suscripcion = "suspendida"
+        old_status = "activa" if empresa.suscripcion_activa else "inactiva"
+        empresa.suscripcion_activa = False
         empresa.save()
 
         smart_logger.log_subscription_change(
             empresa_id=empresa.id,
             old_status=old_status,
-            new_status="suspendida",
+            new_status="inactiva",
             reason=f"Suspensión manual por admin: {request.user.username}",
         )
 
         return JsonResponse({"success": True, "message": "Empresa suspendida correctamente"})
 
     elif action == "activate":
-        old_status = empresa.estado_suscripcion
-        empresa.estado_suscripcion = "activa"
+        old_status = "activa" if empresa.suscripcion_activa else "inactiva"
+        empresa.suscripcion_activa = True
         empresa.save()
 
         smart_logger.log_subscription_change(
@@ -349,8 +345,8 @@ def subscription_actions(request, empresa_id):
 
         smart_logger.log_subscription_change(
             empresa_id=empresa.id,
-            old_status=empresa.estado_suscripcion,
-            new_status=empresa.estado_suscripcion,
+            old_status="activa" if empresa.suscripcion_activa else "inactiva",
+            new_status="activa" if empresa.suscripcion_activa else "inactiva",
             reason=f"Extensión de {days} días por admin: {request.user.username}",
         )
 
@@ -392,27 +388,28 @@ def export_subscriptions(request):
     # Aplicar filtros si existen
     empresas = Empresa.objects.select_related("usuario").all()
     status_filter = request.GET.get("status")
-    if status_filter:
-        empresas = empresas.filter(estado_suscripcion=status_filter)
+    if status_filter == "activa":
+        empresas = empresas.filter(suscripcion_activa=True)
+    elif status_filter == "inactiva":
+        empresas = empresas.filter(suscripcion_activa=False)
 
     for empresa in empresas:
         trial_activo = TrialRegistro.objects.filter(empresa=empresa, activo=True).exists()
         total_pagos = (
-            empresa.comprobantepago_set.filter(aprobado=True).aggregate(total=Sum("monto"))["total"]
-            or 0
+            empresa.comprobantes.aggregate(total=Sum("monto"))["total"] or 0
         )
 
         writer.writerow(
             [
                 empresa.id,
-                empresa.nombre,
+                empresa.nombre_taller or empresa.empresa or "",
                 empresa.usuario.username,
                 empresa.usuario.email,
-                empresa.estado_suscripcion,
-                empresa.fecha_registro.strftime("%Y-%m-%d"),
+                "Activa" if empresa.suscripcion_activa else "Inactiva",
+                empresa.fecha_inicio.strftime("%Y-%m-%d"),
                 (
-                    empresa.fecha_vencimiento_suscripcion.strftime("%Y-%m-%d")
-                    if empresa.fecha_vencimiento_suscripcion
+                    empresa.fecha_fin.strftime("%Y-%m-%d")
+                    if empresa.fecha_fin
                     else ""
                 ),
                 total_pagos,
@@ -430,13 +427,16 @@ def subscription_api_stats(request):
     today = timezone.now().date()
 
     # Estadísticas por estado
-    stats_by_status = Empresa.objects.values("estado_suscripcion").annotate(count=Count("id"))
+    stats_by_status = [
+        {"suscripcion_activa": True, "count": Empresa.objects.filter(suscripcion_activa=True).count()},
+        {"suscripcion_activa": False, "count": Empresa.objects.filter(suscripcion_activa=False).count()},
+    ]
 
     # Nuevas suscripciones por día (últimos 30 días)
     daily_new = []
     for i in range(30):
         date = today - timedelta(days=i)
-        count = Empresa.objects.filter(fecha_registro=date).count()
+        count = Empresa.objects.filter(fecha_inicio=date).count()
         daily_new.append({"date": date.strftime("%Y-%m-%d"), "count": count})
 
     daily_new.reverse()

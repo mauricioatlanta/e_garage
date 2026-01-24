@@ -14,10 +14,16 @@ DEBUG = False
 # Hosts permitidos para producción
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
 
-# Base de datos para producción (PostgreSQL en Render)
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Base de datos para producción
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+
 if DATABASE_URL:
-    DATABASES = {"default": dj_database_url.config(conn_max_age=600, ssl_require=True)}
+    if DATABASE_URL.startswith("sqlite"):
+        # SQLite: no usar ssl_require (rompe con sslmode)
+        DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
+    else:
+        # Postgres/MySQL/etc: ssl requerido en prod
+        DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)}
 else:
     # Fallback a SQLite si no hay DATABASE_URL
     DATABASES = {
@@ -55,6 +61,12 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
 
 # HTTPS en producción (Render maneja SSL automáticamente)
+# 🔥 IMPRESCINDIBLE: Configuración fija para producción
+# Este header es CRÍTICO cuando Django está detrás de un proxy (Nginx, Cloudflare, etc.)
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+
+# 🔥 IMPRESCINDIBLE: Fijo en True para producción (requiere SECURE_PROXY_SSL_HEADER arriba)
 SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
@@ -130,5 +142,8 @@ SESSION_COOKIE_AGE = 86400  # 24 horas
 SESSION_SAVE_EVERY_REQUEST = True
 
 # Configuración de archivos
-FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
+# Límites de subida de archivos (debe coincidir con client_max_body_size en Nginx)
+# Nginx está configurado para 50MB, Django permite hasta 20MB en memoria
+# Archivos más grandes se guardan en disco temporal automáticamente
+FILE_UPLOAD_MAX_MEMORY_SIZE = 20971520  # 20MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 20971520  # 20MB
