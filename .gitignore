@@ -77,3 +77,6 @@ backups/templates_bak/
 
 # auditoría templates (reportes generados)
 reports/templates_audit/
+
+# legacy templates (copy moved out of loader)
+legacy_templates/
