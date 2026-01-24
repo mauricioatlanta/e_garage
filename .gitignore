@@ -71,4 +71,9 @@ db.sqlite3.*
 
 
 # local safety backups
-*.bak.*
+*.bak
+backups/templates_archive/
+backups/templates_bak/
+
+# auditoría templates (reportes generados)
+reports/templates_audit/
