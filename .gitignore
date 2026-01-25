@@ -62,6 +62,32 @@ diagnostico_*.py
 corregir_*.py
 CREDENCIALES_PRUEBA.md
 eg_cl_demo_20251115.json
+<<<<<<< HEAD
+=======
+
+# Local DB backups
+*.BACKUP.*
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Django / local DBs
+db.sqlite3
+*.sqlite3
+
+# Django collectstatic output (normalmente NO se versiona)
+staticfiles/
+
+# caches / tooling
+.aider.tags.cache.v4/
+
+# backups
+*.BAK_*
+# eGarage local backups (ej. signup.html.bak_20250124_HHmmss)
+*.bak_*
+>>>>>>> 1de6e716 (chore: ignore local .bak_* template backups)
 scripts/deploy_rapido.sh
 
 # Local backups / archives
