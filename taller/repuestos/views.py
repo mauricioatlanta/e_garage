@@ -124,7 +124,7 @@ def buscar_repuestos_ajax(request):
 
         # Renderizar template parcial
         html = render_to_string(
-            "taller/repuestos/tabla_repuestos_ajax.html",
+            "taller/common/repuestos/tabla_repuestos_ajax.html",
             {"repuestos": repuestos, "country": country, "request": request},
         )
 
