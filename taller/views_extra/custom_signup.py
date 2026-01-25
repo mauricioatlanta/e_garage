@@ -76,7 +76,9 @@ class CustomSignupView(SignupView):
         # ✅ Obtener el país: 1) selección del usuario en el formulario, 2) ?from=xx, 3) URL, 4) CL por defecto
         from_param = self.request.GET.get("from", "").upper()
         country_code = (
-            (form.cleaned_data.get("country") or "").upper().strip()  # Prioridad 1: selector de país en el form
+            (form.cleaned_data.get("country") or "")
+            .upper()
+            .strip()  # Prioridad 1: selector de país en el form
             or from_param
             or getattr(form, "country_code", None)
             or CountrySettings.get_country_from_url(self.request.path)
@@ -111,7 +113,7 @@ class CustomSignupView(SignupView):
         requires_email_verification = (
             getattr(settings, "ACCOUNT_EMAIL_VERIFICATION", "mandatory") == "mandatory"
         )
-        
+
         if not requires_email_verification:
             # Login automático para acceso inmediato después de revisar correo
             backend = settings.AUTHENTICATION_BACKENDS[0]

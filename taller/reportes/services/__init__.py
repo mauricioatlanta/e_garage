@@ -15,7 +15,7 @@ from .registration_service import RegistrationService
 
 __all__ = [
     "InventoryService",
-    "DocumentOutputService", 
+    "DocumentOutputService",
     "DashboardService",
     "RegistrationService",
 ]

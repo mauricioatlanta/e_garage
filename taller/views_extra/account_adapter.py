@@ -9,62 +9,63 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
     """
     Adaptador que permite login a superusuarios sin verificación de email
     """
-    
+
     def is_open_for_signup(self, request):
         """Permitir registro"""
         return True
-    
+
     def pre_authenticate(self, request, **credentials):
         """Permitir autenticación a superusuarios sin verificación de email"""
-        login = credentials.get('username') or credentials.get('email') or credentials.get('login')
+        login = credentials.get("username") or credentials.get("email") or credentials.get("login")
         if login:
             from django.contrib.auth import get_user_model
+
             User = get_user_model()
             try:
                 # Buscar usuario por username o email
                 user = User.objects.filter(username=login).first()
                 if not user:
                     user = User.objects.filter(email=login).first()
-                
+
                 # Si es superuser o staff, permitir login sin verificación
                 if user and (user.is_superuser or user.is_staff):
                     # Marcar para saltar verificación
-                    credentials['skip_email_verification'] = True
+                    credentials["skip_email_verification"] = True
                     return credentials
             except Exception:
                 pass
         return credentials
-    
+
     def is_open_for_signup(self, request):
         """Permitir registro"""
         return True
-    
+
     def can_authenticate(self, request, email_address):
         """Permitir autenticación a superusuarios sin verificación"""
         user = email_address.user
         if user and (user.is_superuser or user.is_staff):
             return True
         return super().can_authenticate(request, email_address)
-    
+
     def get_login_redirect_url(self, request):
         """Redirigir admin al admin después del login"""
         # Si el usuario es superuser y viene del admin, redirigir al admin
         if request.user.is_authenticated and (request.user.is_superuser or request.user.is_staff):
-            next_url = request.GET.get('next') or request.POST.get('next')
-            if next_url and '/admin/' in next_url:
+            next_url = request.GET.get("next") or request.POST.get("next")
+            if next_url and "/admin/" in next_url:
                 return next_url
-            elif '/admin/' in request.path:
-                return '/admin/'
+            elif "/admin/" in request.path:
+                return "/admin/"
         # Usar la lógica original de country-aware
         return super().get_login_redirect_url(request)
-    
+
     def is_email_verified(self, request, email_address):
         """Permitir login a superusuarios sin verificación de email"""
         user = email_address.user
         if user and (user.is_superuser or user.is_staff):
             return True
         return super().is_email_verified(request, email_address)
-    
+
     """
     Decide el redirect post-login según el país, respetando ?next=
     y evitando hardcodes. Usa namespaces: usa:dashboard / chile:dashboard

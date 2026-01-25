@@ -138,4 +138,3 @@ def registrar_primer_login_embudo(sender, request, user, **kwargs):
 
         logger = logging.getLogger(__name__)
         logger.warning(f"[Signals] Error registrando primer login en embudo: {e}")
-

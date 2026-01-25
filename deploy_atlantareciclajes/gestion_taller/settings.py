@@ -11,13 +11,16 @@ load_dotenv()
 # ---------- Paths ----------
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+
 # ---------- Seguridad / Env helpers ----------
 def env_bool(key, default=False):
     return os.getenv(key, str(default)).strip().lower() in {"1", "true", "yes", "on"}
 
+
 def env_list(key, default=""):
     raw = os.getenv(key, default)
     return [x.strip() for x in raw.split(",") if x.strip()]
+
 
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 DEBUG = env_bool("DJANGO_DEBUG", True)
@@ -38,7 +41,9 @@ CSRF_USE_SESSIONS = False
 SECURE_HSTS_SECONDS = int(os.getenv("DJANGO_SECURE_HSTS_SECONDS", "0" if DEBUG else "31536000"))
 SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", not DEBUG)
 SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", not DEBUG)
-SECURE_REFERRER_POLICY = os.getenv("DJANGO_SECURE_REFERRER_POLICY", "strict-origin-when-cross-origin")
+SECURE_REFERRER_POLICY = os.getenv(
+    "DJANGO_SECURE_REFERRER_POLICY", "strict-origin-when-cross-origin"
+)
 X_FRAME_OPTIONS = os.getenv("DJANGO_X_FRAME_OPTIONS", "DENY")
 
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
@@ -155,6 +160,7 @@ TEMPLATES = [
 # ---------- DB ----------
 if os.getenv("DATABASE_URL"):
     import dj_database_url
+
     DATABASES = {"default": dj_database_url.parse(os.getenv("DATABASE_URL"), conn_max_age=600)}
 else:
     DB_ENGINE = os.getenv("DB_ENGINE", "sqlite3")

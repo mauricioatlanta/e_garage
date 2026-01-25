@@ -1,10 +1,11 @@
 """
 Script de diagnóstico para verificar por qué el logo no aparece
 """
+
 import os
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from django.contrib.auth.models import User
@@ -27,7 +28,9 @@ for user in users_with_settings[:10]:  # Limitar a 10
             print(f"  Tiene logo: {bool(settings.logo)}")
             if settings.logo:
                 try:
-                    print(f"  Logo path: {settings.logo.path if hasattr(settings.logo, 'path') else 'N/A'}")
+                    print(
+                        f"  Logo path: {settings.logo.path if hasattr(settings.logo, 'path') else 'N/A'}"
+                    )
                     print(f"  Logo URL: {settings.logo.url}")
                     print(f"  Logo name: {settings.logo.name}")
                 except Exception as e:
@@ -40,10 +43,3 @@ for user in users_with_settings[:10]:  # Limitar a 10
 print("\n" + "=" * 60)
 print("FIN DEL DIAGNÓSTICO")
 print("=" * 60)
-
-
-
-
-
-
-

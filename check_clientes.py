@@ -8,7 +8,7 @@ import django
 
 # Configurar Django
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'gestion_taller.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 django.setup()
 
 from taller.models.clientes import Cliente
@@ -34,7 +34,9 @@ if total > 0:
     print("\n👥 Primeros 3 clientes:")
     for cliente in Cliente.objects.all()[:3]:
         empresa_nombre = cliente.empresa.nombre_taller if cliente.empresa else "Sin empresa"
-        print(f"  - ID: {cliente.id}, Nombre: {cliente.nombre} {cliente.apellido or ''}, Empresa: {empresa_nombre}")
+        print(
+            f"  - ID: {cliente.id}, Nombre: {cliente.nombre} {cliente.apellido or ''}, Empresa: {empresa_nombre}"
+        )
 else:
     print("\n⚠️  No hay clientes en la base de datos")
 

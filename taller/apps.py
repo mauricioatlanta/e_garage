@@ -13,6 +13,7 @@ class TallerConfig(AppConfig):
         except ImportError:
             # Si no existe, continuar (no crítico)
             pass
+
     verbose_name = "Gestión de Talleres"
 
     def ready(self):
@@ -20,6 +21,7 @@ class TallerConfig(AppConfig):
         Importar signals cuando la app esté lista
         """
         import taller.signals  # noqa
+
         # Importar signals de memoria para cleanup de archivos
         try:
             import taller.models.signals_memoria  # noqa: F401

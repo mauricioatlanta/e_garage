@@ -59,8 +59,16 @@ class Migration(migrations.Migration):
                 ("ip_address", models.GenericIPAddressField(blank=True, null=True)),
                 ("user_agent", models.TextField(blank=True, null=True)),
                 ("fecha_hora", models.DateTimeField(default=django.utils.timezone.now)),
-                ("datos_antes", models.JSONField(blank=True, help_text="Estado anterior del objeto", null=True)),
-                ("datos_despues", models.JSONField(blank=True, help_text="Estado posterior del objeto", null=True)),
+                (
+                    "datos_antes",
+                    models.JSONField(blank=True, help_text="Estado anterior del objeto", null=True),
+                ),
+                (
+                    "datos_despues",
+                    models.JSONField(
+                        blank=True, help_text="Estado posterior del objeto", null=True
+                    ),
+                ),
                 (
                     "empresa",
                     models.ForeignKey(

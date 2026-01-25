@@ -17,7 +17,8 @@ MEDIA_ROOT = os.getenv("MEDIA_ROOT", "/srv/egarage/media")
 
 # =========================
 # Helpers de entorno
-Environment="DJANGO_SETTINGS_MODULE=gestion_taller.settings_prod"
+Environment = "DJANGO_SETTINGS_MODULE=gestion_taller.settings_prod"
+
 
 def env_str(key: str, default: str = "") -> str:
     v = os.getenv(key, default)
@@ -87,7 +88,9 @@ CSRF_COOKIE_SAMESITE = env_str("DJANGO_CSRF_COOKIE_SAMESITE", "Lax") or "Lax"
 # HSTS (solo cuando SSL redirect está activo)
 # =========================
 SECURE_HSTS_SECONDS = env_int("DJANGO_SECURE_HSTS_SECONDS", 31536000) if SECURE_SSL_REDIRECT else 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", True) if SECURE_SSL_REDIRECT else False
+SECURE_HSTS_INCLUDE_SUBDOMAINS = (
+    env_bool("DJANGO_SECURE_HSTS_INCLUDE_SUBDOMAINS", True) if SECURE_SSL_REDIRECT else False
+)
 SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", True) if SECURE_SSL_REDIRECT else False
 
 
@@ -96,7 +99,10 @@ SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", True) if SECURE_SSL
 # =========================
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = env_str("DJANGO_X_FRAME_OPTIONS", "DENY") or "DENY"
-SECURE_REFERRER_POLICY = env_str("DJANGO_SECURE_REFERRER_POLICY", "strict-origin-when-cross-origin") or "strict-origin-when-cross-origin"
+SECURE_REFERRER_POLICY = (
+    env_str("DJANGO_SECURE_REFERRER_POLICY", "strict-origin-when-cross-origin")
+    or "strict-origin-when-cross-origin"
+)
 
 
 # =========================
@@ -128,7 +134,7 @@ if DB_ENGINE == "postgresql" or DB_ENGINE == "postgres":
             },
         }
     }
-    
+
     # Validar que la contraseña esté configurada
     if not DATABASES["default"]["PASSWORD"]:
         raise RuntimeError(
@@ -145,7 +151,7 @@ else:
             "NAME": env_str("DJANGO_DB_NAME", "/srv/egarage/db.sqlite3"),
         }
     }
-    
+
     # Validación desactivada temporalmente para permitir SQLite durante la migración
     # Cuando migres a PostgreSQL, descomenta estas líneas para forzar PostgreSQL:
     # if DATABASES["default"]["ENGINE"].endswith("sqlite3"):
@@ -185,5 +191,5 @@ DATABASES = {
 #     raise RuntimeError("PostgreSQL es obligatorio")
 
 # Configuración crítica para el SSL que acabas de instalar
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_TRUSTED_ORIGINS = ["https://egarage.cl", "https://www.egarage.cl"]

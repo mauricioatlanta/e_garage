@@ -10,17 +10,17 @@ def get_normalized_country(country_code):
     """
     Toma un código de país y lo devuelve en formato estándar (ej: 'cl' -> 'CL').
     Si no hay código, devuelve el valor por defecto 'CL'.
-    
+
     Esta función normaliza códigos de país a formato estándar ISO 3166-1 alpha-2.
     Convierte variaciones comunes (como "USA", "CHILE", etc.) a su formato estándar.
-    
+
     Args:
         country_code: Código de país en cualquier formato (str, int, None, etc.)
-    
+
     Returns:
         str: Código de país normalizado en formato ISO 3166-1 alpha-2.
              Si el código es None o vacío, retorna 'CL' (Chile) como valor por defecto.
-    
+
     Ejemplos:
         >>> get_normalized_country("USA")
         'US'
@@ -35,15 +35,15 @@ def get_normalized_country(country_code):
     """
     # Manejar valores None o vacíos
     if not country_code:
-        return 'CL'  # País por defecto
-    
+        return "CL"  # País por defecto
+
     # Convertir a string, normalizar y limpiar
     country_code = str(country_code).strip().upper()
-    
+
     # Si después de limpiar está vacío, retornar default
     if not country_code:
-        return 'CL'
-    
+        return "CL"
+
     # Mapeo de códigos comunes a formato estándar ISO 3166-1 alpha-2
     country_map = {
         "US": "US",
@@ -71,9 +71,6 @@ def get_normalized_country(country_code):
         "UY": "UY",
         "URUGUAY": "UY",
     }
-    
+
     # Retornar el código normalizado o el original si no está en el mapeo
     return country_map.get(country_code, country_code)
-
-
-

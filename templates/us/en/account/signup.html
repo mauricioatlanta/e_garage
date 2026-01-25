@@ -501,7 +501,7 @@ body {
             <div class="checkbox-container">
                 {{ form.acepta_terminos }}
                 <label for="id_acepta_terminos" class="checkbox-label">
-                    I accept the <a href="/legal/">terms and conditions</a>
+                    I accept the <a href="{% url 'legal' %}">terms and conditions</a>
                 </label>
             </div>
             {% if form.acepta_terminos.errors %}

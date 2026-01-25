@@ -23,7 +23,9 @@ if DATABASE_URL:
         DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
     else:
         # Postgres/MySQL/etc: ssl requerido en prod
-        DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)}
+        DATABASES = {
+            "default": dj_database_url.parse(DATABASE_URL, conn_max_age=600, ssl_require=True)
+        }
 else:
     # Fallback a SQLite si no hay DATABASE_URL
     DATABASES = {

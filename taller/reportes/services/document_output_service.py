@@ -285,13 +285,14 @@ class DocumentOutputService:
         empresa = documento.empresa
         config = DocumentOutputService._get_empresa_config(empresa, request)
         nombre_empresa = config.get("nombre", empresa.nombre_taller)
-        
+
         # Obtener configuración de empresa (plantilla WhatsApp y datos bancarios)
         company_settings = None
         datos_bancarios = None
         plantilla_whatsapp = None
         try:
             from taller.models.company_settings import CompanySettings
+
             company_settings = CompanySettings.objects.filter(user=empresa.user).first()
             if company_settings:
                 if company_settings.bank_details:
@@ -319,11 +320,11 @@ class DocumentOutputService:
         # Prioridad: URL pública del presupuesto (si tiene UUID) > URL privada del PDF
         public_url = None
         pdf_url = None
-        
+
         if request:
             try:
                 from django.urls import reverse
-                
+
                 # Intentar URL pública primero (si el documento tiene UUID y es un presupuesto)
                 if hasattr(documento, "uuid") and documento.uuid and documento.tipo == "PRES":
                     try:
@@ -333,7 +334,7 @@ class DocumentOutputService:
                         )
                     except Exception:
                         pass
-                
+
                 # URL del PDF (siempre disponible)
                 try:
                     pdf_url = request.build_absolute_uri(
@@ -362,10 +363,10 @@ class DocumentOutputService:
                         vehiculo_display = f"{marca} ({patente})"
                     else:
                         vehiculo_display = patente or "N/A"
-                
+
                 # URL a usar (prioridad: public_url > pdf_url > "")
                 url_display = public_url or pdf_url or ""
-                
+
                 # Reemplazar variables en la plantilla
                 mensaje = plantilla_whatsapp.format(
                     cliente=cliente.nombre,
@@ -384,7 +385,7 @@ class DocumentOutputService:
                     "Usando mensaje por defecto."
                 )
                 mensaje = None  # Forzar uso de mensaje por defecto
-        
+
         if not mensaje:
             # Mensaje por defecto (comportamiento original)
             mensaje_partes = [
@@ -394,13 +395,15 @@ class DocumentOutputService:
                 f"",
                 f"💰 Total: *{total_formateado}*",
             ]
-            
+
             # Agregar información del vehículo si está disponible
             vehiculo = getattr(documento, "vehiculo", None)
             if vehiculo:
-                mensaje_partes.append(f"🚗 Vehículo: {vehiculo.marca} {vehiculo.modelo} ({vehiculo.patente})")
+                mensaje_partes.append(
+                    f"🚗 Vehículo: {vehiculo.marca} {vehiculo.modelo} ({vehiculo.patente})"
+                )
                 mensaje_partes.append("")
-            
+
             # Agregar link público del presupuesto (si está disponible) o PDF
             if public_url:
                 mensaje_partes.append("📄 Puedes revisarlo y aprobarlo aquí:")
@@ -410,13 +413,13 @@ class DocumentOutputService:
                 mensaje_partes.append("📄 Puedes descargarlo aquí:")
                 mensaje_partes.append(pdf_url)
                 mensaje_partes.append("")
-            
+
             # Agregar datos bancarios si están configurados
             if datos_bancarios:
                 mensaje_partes.append("💳 *Datos para transferencia:*")
                 mensaje_partes.append(datos_bancarios)
                 mensaje_partes.append("")
-            
+
             mensaje_partes.append("¡Gracias por confiar en nosotros! 🚗✨")
             mensaje = "\n".join(mensaje_partes)
 
@@ -433,42 +436,42 @@ class DocumentOutputService:
     def generate_whatsapp_link_comprobante(documento, request=None):
         """
         Genera un enlace de WhatsApp para que el cliente envíe el comprobante de pago al taller.
-        
+
         Args:
             documento: Instancia de Documento
             request: HttpRequest (opcional, para generar URL)
-            
+
         Returns:
             str: URL de WhatsApp con mensaje pre-llenado para enviar comprobante al taller
         """
         # Obtener teléfono del TALLER (no del cliente)
         empresa = documento.empresa
         config = DocumentOutputService._get_empresa_config(empresa, request)
-        
+
         # Intentar obtener teléfono del taller desde CompanySettings o Empresa
         telefono = config.get("telefono") or getattr(empresa, "telefono", None)
-        
+
         if not telefono:
             log.warning(
                 f"[DocumentOutputService] Taller {empresa.id} no tiene teléfono registrado para recibir comprobantes"
             )
             return None
-        
+
         # Limpiar teléfono
         telefono_limpio = "".join(filter(str.isdigit, str(telefono)))
         if telefono_limpio.startswith("9") and len(telefono_limpio) == 9:
             telefono_limpio = "56" + telefono_limpio
         elif not telefono_limpio.startswith("56") and len(telefono_limpio) >= 8:
             telefono_limpio = "56" + telefono_limpio
-        
+
         # Obtener datos de la empresa
         nombre_empresa = config.get("nombre", empresa.nombre_taller)
         cliente = documento.cliente
-        
+
         # Obtener tipo y número de documento
         tipo_doc = documento.get_tipo_display() or documento.tipo
         numero_doc = documento.numero_documento or documento.numero or str(documento.id)
-        
+
         # Formatear total según moneda
         currency = DocumentOutputService._get_currency_config(empresa)
         total_formateado = (
@@ -478,7 +481,7 @@ class DocumentOutputService:
         )
         if currency["decimals"] == 0:
             total_formateado = f"{currency['symbol']}{int(documento.total):,}".replace(",", ".")
-        
+
         # Mensaje para enviar comprobante
         mensaje_partes = [
             f"Hola {nombre_empresa}! 👋",
@@ -492,11 +495,13 @@ class DocumentOutputService:
             f"",
             f"Por favor confirmen la recepción del pago. 🙏",
         ]
-        
+
         mensaje = "\n".join(mensaje_partes)
         mensaje_encoded = quote(mensaje)
-        
+
         whatsapp_url = f"https://wa.me/{telefono_limpio}?text={mensaje_encoded}"
-        
-        log.info(f"[DocumentOutputService] Enlace WhatsApp comprobante generado para enviar a {nombre_empresa}")
+
+        log.info(
+            f"[DocumentOutputService] Enlace WhatsApp comprobante generado para enviar a {nombre_empresa}"
+        )
         return whatsapp_url

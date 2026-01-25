@@ -26,7 +26,7 @@ class CountryDetectionMiddleware(MiddlewareMixin):
     # Nota: Django usa códigos con guión bajo para archivos (pt_BR), pero acepta pt-br en LANGUAGES
     COUNTRY_LANGUAGE_MAP = {
         "BR": "pt-br",  # Brasil -> Portugués (Django lo convierte internamente a pt_BR)
-        "US": "en",     # USA -> Inglés
+        "US": "en",  # USA -> Inglés
         # Todos estos usan Español
         "CL": "es",
         "MX": "es",
@@ -81,7 +81,7 @@ class CountryDetectionMiddleware(MiddlewareMixin):
 
         # Activar el idioma para esta request (DEBE hacerse ANTES de LocaleMiddleware)
         activate(lang)
-        
+
         # CRÍTICO: Si hay parámetro GET country, forzar el idioma y sobrescribir cookies
         # Esto previene que LocaleMiddleware use la cookie antigua
         country_param = request.GET.get("country", "").upper().strip()
@@ -90,8 +90,10 @@ class CountryDetectionMiddleware(MiddlewareMixin):
             activate(lang)
             # Establecer en request para que otros middlewares lo respeten
             request.LANGUAGE_CODE = lang
-            print(f"[CountryDetectionMiddleware] GET param detected - Forcing language: {lang} for country: {country}")
-        
+            print(
+                f"[CountryDetectionMiddleware] GET param detected - Forcing language: {lang} for country: {country}"
+            )
+
         # Debug logging
         print(f"[CountryDetectionMiddleware] Detected country: {country}, Language: {lang}")
 
@@ -136,4 +138,3 @@ class CountryDetectionMiddleware(MiddlewareMixin):
             pass
 
         return None
-

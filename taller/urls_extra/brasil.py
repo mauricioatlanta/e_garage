@@ -22,23 +22,21 @@ class BrasilPTTemplateView(TemplateView):
         request.LANGUAGE_CODE = "pt-br"
         return super().dispatch(request, *args, **kwargs)
 
+
 urlpatterns = [
     # /br/ → /br/pt/bienvenida/
     path("", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
-
     # --- PORTUGUÉS (principal) ---
     path(
         "pt/bienvenida/",
         BrasilPTTemplateView.as_view(),
         name="bienvenida_pt",
     ),
-
     path(
         "pt/accounts/signup/",
         lambda r: signup_redirect(r, "br"),
         name="signup_pt",
     ),
-
     # --- ESPAÑOL (legacy) → redirige a PT ---
     path("es/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
     path("es/bienvenida/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),

@@ -131,6 +131,7 @@ def crear_cliente(request, *args, **kwargs):
     log.info("FBV shim: crear_cliente")
 
     from taller.utils.empresa import get_or_create_empresa
+
     # Asegurar que la empresa existe (la crea si falta)
     get_or_create_empresa(request)
     # La vista CBV obtendrá request.user.empresa automáticamente
@@ -168,7 +169,9 @@ def cliente_delete(request, pk=None, cliente_id=None):
 
     empresa = get_active_empresa(request)
     if not empresa:
-        messages.warning(request, "Tu usuario no tiene empresa activa. Crea o asigna una empresa primero.")
+        messages.warning(
+            request, "Tu usuario no tiene empresa activa. Crea o asigna una empresa primero."
+        )
         return redirect("taller:dashboard")
 
     cliente = get_object_or_404(Cliente, pk=client_id, empresa=empresa)

@@ -7,11 +7,13 @@ def fix_is_trial_defaults(apps, schema_editor):
     """Actualiza todas las empresas que tengan is_trial NULL a False"""
     with connection.cursor() as cursor:
         # En SQLite, actualizamos las filas donde is_trial sea NULL
-        cursor.execute("""
+        cursor.execute(
+            """
             UPDATE taller_empresa 
             SET is_trial = 0 
             WHERE is_trial IS NULL
-        """)
+        """
+        )
         updated = cursor.rowcount
         if updated > 0:
             print(f"Actualizadas {updated} empresas con is_trial=NULL a False")

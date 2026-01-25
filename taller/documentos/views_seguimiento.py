@@ -37,9 +37,9 @@ def seguimiento_publico(request, token):
     documento = seguimiento.documento
 
     # Obtener evidencias compartibles
-    evidencias = EvidenciaDocumento.objects.filter(
-        documento=documento, compartible=True
-    ).order_by("-created_at")
+    evidencias = EvidenciaDocumento.objects.filter(documento=documento, compartible=True).order_by(
+        "-created_at"
+    )
 
     # Calcular totales
     from decimal import Decimal
@@ -92,9 +92,7 @@ def gestionar_memoria_documento(request, documento_id):
     """
     # Multi-tenant: forzar empresa del usuario
     empresa = request.user.empresa
-    documento = get_object_or_404(
-        Documento.objects.filter(empresa=empresa), id=documento_id
-    )
+    documento = get_object_or_404(Documento.objects.filter(empresa=empresa), id=documento_id)
 
     # Verificar permisos
     es_staff = is_staff_member(request.user)
@@ -102,11 +100,13 @@ def gestionar_memoria_documento(request, documento_id):
     # Multi-tenant: todas las queries filtran por empresa
     # Obtener notas (filtrar por solo_staff si es técnico)
     if es_staff:
-        notas = NotaInterna.objects.filter(documento=documento, empresa=empresa).order_by("-created_at")
-    else:
-        notas = NotaInterna.objects.filter(documento=documento, empresa=empresa, solo_staff=False).order_by(
+        notas = NotaInterna.objects.filter(documento=documento, empresa=empresa).order_by(
             "-created_at"
         )
+    else:
+        notas = NotaInterna.objects.filter(
+            documento=documento, empresa=empresa, solo_staff=False
+        ).order_by("-created_at")
 
     # Obtener etiquetas asignadas (filtrar por solo_staff si es técnico)
     if es_staff:
@@ -122,12 +122,12 @@ def gestionar_memoria_documento(request, documento_id):
     if es_staff:
         etiquetas_disponibles = EtiquetaInterna.objects.filter(empresa=empresa)
     else:
-        etiquetas_disponibles = EtiquetaInterna.objects.filter(
-            empresa=empresa, solo_staff=False
-        )
+        etiquetas_disponibles = EtiquetaInterna.objects.filter(empresa=empresa, solo_staff=False)
 
     # Obtener evidencias (multi-tenant: filtrar por empresa)
-    evidencias = EvidenciaDocumento.objects.filter(documento=documento, empresa=empresa).order_by("-created_at")
+    evidencias = EvidenciaDocumento.objects.filter(documento=documento, empresa=empresa).order_by(
+        "-created_at"
+    )
     fotos_count = evidencias.filter(tipo="FOTO").count()
     videos_count = evidencias.filter(tipo="VIDEO").count()
 
@@ -160,9 +160,7 @@ def crear_seguimiento_publico(request, documento_id):
     """
     # Multi-tenant: forzar empresa del usuario
     empresa = request.user.empresa
-    documento = get_object_or_404(
-        Documento.objects.filter(empresa=empresa), id=documento_id
-    )
+    documento = get_object_or_404(Documento.objects.filter(empresa=empresa), id=documento_id)
 
     # Multi-tenant: empresa forzada (nunca confiar en POST)
     seguimiento, created = SeguimientoPublico.objects.get_or_create(

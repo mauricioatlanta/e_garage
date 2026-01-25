@@ -501,7 +501,7 @@ body {
             <div class="checkbox-container">
                 {{ form.acepta_terminos }}
                 <label for="id_acepta_terminos" class="checkbox-label">
-                    Acepto los <a href="/legal/">términos y condiciones</a>
+                    Acepto los <a href="{% url 'legal' %}">términos y condiciones</a>
                 </label>
             </div>
             {% if form.acepta_terminos.errors %}
@@ -522,7 +522,7 @@ body {
         <!-- Link a Login -->
         <div class="login-link">
             <span class="login-text">¿Ya tienes una cuenta?</span>
-            <a href="/cl/es/accounts/login/">Iniciar sesión</a>
+            <a href="/mx/es/accounts/login/">Iniciar sesión</a>
         </div>
     </div>
 </div>

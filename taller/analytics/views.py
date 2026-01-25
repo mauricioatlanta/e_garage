@@ -37,6 +37,7 @@ def dashboard_ai_view(request):
     if not hasattr(request.user, "empresa") or not request.user.empresa:
         from django.http import HttpResponseNotFound
         from django.shortcuts import render
+
         return render(
             request,
             "error.html",
@@ -66,6 +67,7 @@ def dashboard_ai_view(request):
     except Exception as e:
         # Manejar errores del motor de reportes
         from django.shortcuts import render
+
         return render(
             request,
             "error.html",

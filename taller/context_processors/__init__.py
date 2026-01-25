@@ -151,6 +151,7 @@ def company_branding(request):
             # Capturar OperationalError y otros errores de DB (ej: columna 'rubros' no existe)
             # Esto puede ocurrir si faltan migraciones en la base de datos
             import logging
+
             logger = logging.getLogger(__name__)
             logger.debug(f"Error obteniendo ConfiguracionEmpresa (posible migración faltante): {e}")
             pass

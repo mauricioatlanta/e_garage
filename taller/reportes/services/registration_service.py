@@ -238,7 +238,9 @@ class RegistrationService:
             elif plan_type in ["basic", "premium", "enterprise", "mensual", "semestral", "anual"]:
                 fecha_fin = fecha_inicio + timedelta(days=30)
 
-            suscripcion_activa = empresa.suscripcion_activa if hasattr(empresa, 'suscripcion_activa') else True
+            suscripcion_activa = (
+                empresa.suscripcion_activa if hasattr(empresa, "suscripcion_activa") else True
+            )
 
             suscripcion = Suscripcion.objects.create(
                 user=user,
@@ -260,6 +262,7 @@ class RegistrationService:
         # Crear TeamMember
         try:
             from taller.models.team_member import TeamMember
+
             TeamMember.objects.get_or_create(
                 user=user,
                 empresa=empresa,
@@ -273,6 +276,7 @@ class RegistrationService:
         # Registro en embudo
         try:
             from taller.reportes.services.registro_embudo_service import registrar_empresa_creada
+
             registrar_empresa_creada(user)
         except Exception as e:
             log.warning(f"[RegistrationService] Error embudo: {e}")
@@ -291,6 +295,7 @@ class RegistrationService:
         activation_code = get_random_string(12, allowed_chars="0123456789")
         try:
             from taller.models.trial import TrialRegistro
+
             TrialRegistro.objects.create(
                 nombre=user.get_full_name() or user.username,
                 email=user.email,
@@ -306,15 +311,24 @@ class RegistrationService:
         return activation_code
 
     @staticmethod
-    def _send_welcome_email(user, empresa, plan_type, country_code, country_config=None, activation_code=None, skip_verification=False, request=None):
+    def _send_welcome_email(
+        user,
+        empresa,
+        plan_type,
+        country_code,
+        country_config=None,
+        activation_code=None,
+        skip_verification=False,
+        request=None,
+    ):
         if not country_config:
             country_config = get_country_config(country_code)
-        
+
         language = country_config.get("lang", "es")
         from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@egarage.cl")
         subject = f"Bienvenido a eGarage - {empresa.nombre_taller}"
         message = f"Hola {user.first_name}, tu cuenta ha sido creada."
-        
+
         try:
             send_mail(subject, message, from_email, [user.email], fail_silently=False)
         except Exception:

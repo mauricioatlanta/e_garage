@@ -241,8 +241,12 @@ class RegistrationService:
         # Crear empresa
         # ✅ FLUJO "LITE": Si no se proporciona nombre_taller o está vacío, generar uno automáticamente
         # Asegúrate de que la lógica de "nombre por defecto" sea sólida para que nunca falle la creación
-        nombre_taller_raw = company_data.get("nombre_taller", "").strip() if company_data.get("nombre_taller") else ""
-        
+        nombre_taller_raw = (
+            company_data.get("nombre_taller", "").strip()
+            if company_data.get("nombre_taller")
+            else ""
+        )
+
         if not nombre_taller_raw:
             # Generar nombre genérico basado en el nombre del usuario
             # Prioridad: first_name > username > email

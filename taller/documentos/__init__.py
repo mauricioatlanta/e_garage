@@ -10,9 +10,3 @@ Modelos principales:
 - DocumentSequence: Secuencias de numeración
 - LineaDocumento: Modelo legacy (puede no estar en uso)
 """
-
-
-
-
-
-

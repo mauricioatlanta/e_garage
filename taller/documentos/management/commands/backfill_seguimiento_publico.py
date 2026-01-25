@@ -38,9 +38,7 @@ class Command(BaseCommand):
         count = documentos_sin_seguimiento.count()
         created = 0
 
-        self.stdout.write(
-            self.style.SUCCESS(f"🔄 Iniciando backfill de seguimiento público...")
-        )
+        self.stdout.write(self.style.SUCCESS(f"🔄 Iniciando backfill de seguimiento público..."))
         if dry_run:
             self.stdout.write(self.style.WARNING("⚠️  MODO DRY-RUN - No se harán cambios"))
 
@@ -73,9 +71,7 @@ class Command(BaseCommand):
 
         if dry_run:
             self.stdout.write(
-                self.style.WARNING(
-                    f"✅ DRY-RUN completado: {created} seguimientos se crearían"
-                )
+                self.style.WARNING(f"✅ DRY-RUN completado: {created} seguimientos se crearían")
             )
         else:
             self.stdout.write(

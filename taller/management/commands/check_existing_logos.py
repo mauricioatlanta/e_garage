@@ -24,7 +24,9 @@ class Command(BaseCommand):
                 self.stdout.write(f"    ✅ Logo: {cs.logo.url}")
 
         # 2. ConfiguracionEmpresa
-        self.stdout.write(f"\n📊 ConfiguracionEmpresa: {ConfiguracionEmpresa.objects.count()} registros")
+        self.stdout.write(
+            f"\n📊 ConfiguracionEmpresa: {ConfiguracionEmpresa.objects.count()} registros"
+        )
         for conf in ConfiguracionEmpresa.objects.all():
             empresa = conf.empresa
             self.stdout.write(f"  Empresa: {empresa.nombre_taller}, User: {empresa.user.username}")
@@ -40,19 +42,14 @@ class Command(BaseCommand):
         # 3. Empresa directamente
         self.stdout.write(f"\n📊 Empresa (directo): {Empresa.objects.count()} registros")
         for empresa in Empresa.objects.all():
-            if hasattr(empresa, 'logo') and empresa.logo:
+            if hasattr(empresa, "logo") and empresa.logo:
                 try:
                     logo_url = empresa.logo.url
-                    self.stdout.write(f"  Empresa: {empresa.nombre_taller}, User: {empresa.user.username}")
+                    self.stdout.write(
+                        f"  Empresa: {empresa.nombre_taller}, User: {empresa.user.username}"
+                    )
                     self.stdout.write(self.style.SUCCESS(f"    ✅ Logo: {logo_url}"))
                 except Exception as e:
                     pass
 
         self.stdout.write("\n" + "=" * 80)
-
-
-
-
-
-
-

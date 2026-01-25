@@ -29,14 +29,18 @@ class CustomSignupForm(SignupForm):
         max_length=100,
         label="Nombre",
         required=False,  # ✅ Opcional
-        widget=forms.TextInput(attrs={"class": "input-futurista", "placeholder": "Nombre (opcional)"}),
+        widget=forms.TextInput(
+            attrs={"class": "input-futurista", "placeholder": "Nombre (opcional)"}
+        ),
         help_text="Ingresa tu nombre (opcional)",
     )
     last_name = forms.CharField(
         max_length=100,
         label="Apellido",
         required=False,  # ✅ Opcional
-        widget=forms.TextInput(attrs={"class": "input-futurista", "placeholder": "Apellido (opcional)"}),
+        widget=forms.TextInput(
+            attrs={"class": "input-futurista", "placeholder": "Apellido (opcional)"}
+        ),
         help_text="Ingresa tu apellido (opcional)",
     )
     telefono = forms.CharField(
@@ -53,10 +57,7 @@ class CustomSignupForm(SignupForm):
         label="Nombre de tu Taller (Opcional)",
         required=False,  # ✅ FLUJO "LITE": Campo opcional
         widget=forms.TextInput(
-            attrs={
-                "class": "input-futurista",
-                "placeholder": "Ej: Taller San Miguel (Opcional)"
-            }
+            attrs={"class": "input-futurista", "placeholder": "Ej: Taller San Miguel (Opcional)"}
         ),
         help_text="Puedes dejarlo en blanco y configurarlo después en Settings",
     )
@@ -132,7 +133,9 @@ class CustomSignupForm(SignupForm):
         # IMPORTANTE: Allauth requiere username, así que lo generamos automáticamente desde email
         if "username" in self.fields:
             self.fields["username"].required = False
-            self.fields["username"].widget = forms.HiddenInput()  # Ocultar username, se generará desde email
+            self.fields["username"].widget = (
+                forms.HiddenInput()
+            )  # Ocultar username, se generará desde email
         if "password1" in self.fields:
             self.fields["password1"].widget.attrs.update(
                 {"class": "input-futurista", "placeholder": "••••••••"}
@@ -195,7 +198,7 @@ class CustomSignupForm(SignupForm):
         - Valida formato internacional (+<codigo><numero>)
         - Longitud entre 8 y 15 dígitos después del +
         - Resultado: siempre formato E.164 (+<código><número>)
-        
+
         Ejemplos:
         - CL: "9 1234 5678" → "+56912345678"
         - US: "3055551234" → "+13055551234"
@@ -250,71 +253,78 @@ class CustomSignupForm(SignupForm):
         """
         ✅ Generar username automáticamente desde email si no se proporciona.
         Incluye manejo de colisiones: si el username generado ya existe, agrega sufijo aleatorio.
-        
+
         Esto es necesario porque Allauth puede requerir username aunque ACCOUNT_AUTHENTICATION_METHOD = "email".
         """
         from django.contrib.auth import get_user_model
+
         User = get_user_model()
         import random
         import string
-        
-        username = self.cleaned_data.get("username", "").strip() if self.cleaned_data.get("username") else ""
-        
+
+        username = (
+            self.cleaned_data.get("username", "").strip()
+            if self.cleaned_data.get("username")
+            else ""
+        )
+
         # Si no se proporciona username, generar desde email
         if not username:
-            email = self.cleaned_data.get("email", "").strip() if self.cleaned_data.get("email") else ""
+            email = (
+                self.cleaned_data.get("email", "").strip() if self.cleaned_data.get("email") else ""
+            )
             if email:
                 # Usar email como username (Allauth lo soporta cuando ACCOUNT_AUTHENTICATION_METHOD = "email")
                 username = email
             else:
                 # Si tampoco hay email aún, generar uno temporal (esto no debería pasar)
                 username = f"user_{int(time.time())}"
-        
+
         # ✅ Manejo de colisiones: si el username ya existe, agregar sufijo aleatorio
         original_username = username
         max_attempts = 10
         attempt = 0
-        
+
         while attempt < max_attempts:
             try:
                 # Verificar si el username ya existe (excepto si estamos editando el mismo usuario)
                 if not User.objects.filter(username=username).exists():
                     break  # Username disponible, salir del loop
-                
+
                 # Generar sufijo aleatorio (4 caracteres alfanuméricos)
-                suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=4))
-                
+                suffix = "".join(random.choices(string.ascii_lowercase + string.digits, k=4))
+
                 # Intentar con sufijo: si es email, insertar antes del @, si no, al final
-                if '@' in original_username:
-                    local_part, domain = original_username.split('@', 1)
+                if "@" in original_username:
+                    local_part, domain = original_username.split("@", 1)
                     username = f"{local_part}_{suffix}@{domain}"
                 else:
                     username = f"{original_username}_{suffix}"
-                
+
                 attempt += 1
             except Exception:
                 # Si hay error, usar timestamp como fallback
                 username = f"user_{int(time.time())}_{random.randint(1000, 9999)}"
                 break
-        
+
         return username
 
     def clean(self):
         """
         ✅ GARANTIZAR PAÍS AUTOMÁTICAMENTE (Núcleo del Plan B)
-        
+
         Esto hace que aunque el template no envíe country, aunque el usuario use VPN,
         aunque falte ?from=xx, SIEMPRE haya país válido.
-        
+
         IMPORTANTE: Este método se ejecuta DESPUÉS de clean_telefono y otros clean_*,
         por lo que tiene acceso a cleaned_data después de todas las validaciones.
         """
         cleaned_data = super().clean()
-        
+
         # Si cleaned_data está vacío (formulario inválido), retornar sin modificar
         if not cleaned_data:
             return cleaned_data
-        
+
         # Detectar país con prioridad:
         # 1) cleaned_data.get("country") (si viene del formulario o HiddenInput)
         # 2) self.country_code (detectado en __init__ desde ?from=xx o URL)
@@ -323,10 +333,10 @@ class CustomSignupForm(SignupForm):
         country = (
             cleaned_data.get("country")
             or self.country_code
-            or (hasattr(self, 'initial') and self.initial.get("country"))
+            or (hasattr(self, "initial") and self.initial.get("country"))
             or "CL"
         )
-        
+
         # Normalizar a mayúsculas y validar que sea un código de país válido
         if country:
             country = str(country).upper().strip()
@@ -335,15 +345,16 @@ class CustomSignupForm(SignupForm):
             if country not in valid_countries:
                 # ✅ Manejo robusto: Loggear el error pero no fallar el formulario
                 import logging
+
                 logger = logging.getLogger(__name__)
                 logger.warning(f"País desconocido '{country}' en signup, usando fallback 'CL'")
                 country = "CL"  # Fallback a CL si no es válido
         else:
             country = "CL"
-        
+
         # ✅ Asegurar que country esté en cleaned_data (siempre hay un valor válido)
         cleaned_data["country"] = country
-        
+
         return cleaned_data
 
     def save(self, request):
@@ -363,7 +374,9 @@ class CustomSignupForm(SignupForm):
         data = self.cleaned_data
 
         # ✅ Actualizar nombres en User (opcionales, usar valores por defecto si están vacíos)
-        user.first_name = data.get("first_name", "").strip() or "Usuario"  # Valor por defecto si está vacío
+        user.first_name = (
+            data.get("first_name", "").strip() or "Usuario"
+        )  # Valor por defecto si está vacío
         user.last_name = data.get("last_name", "").strip() or ""  # Opcional
         user.save()
 
@@ -371,7 +384,9 @@ class CustomSignupForm(SignupForm):
         from_param = request.GET.get("from", "").upper()
         raw = (data.get("country") or "").strip().upper()
         country_code = (
-            raw if raw else None  # Prioridad 1: selector de país en el form
+            raw
+            if raw
+            else None  # Prioridad 1: selector de país en el form
             or from_param
             or self.country_code
             or getattr(request, "country_code", None)
@@ -393,8 +408,10 @@ class CustomSignupForm(SignupForm):
         trial_ends_at = None
 
         # ✅ Si el usuario no puso nombre, el servicio creará uno genérico
-        nombre_taller_usuario = data.get("nombre_taller", "").strip() if data.get("nombre_taller") else ""
-        
+        nombre_taller_usuario = (
+            data.get("nombre_taller", "").strip() if data.get("nombre_taller") else ""
+        )
+
         # ✅ Telefono opcional - usar valor normalizado o vacío
         telefono_usuario = data.get("telefono", "").strip() if data.get("telefono") else ""
 

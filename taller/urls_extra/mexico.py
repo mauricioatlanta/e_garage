@@ -44,7 +44,9 @@ urlpatterns = [
     # /mx/es/login/ → /mx/es/accounts/login/ (preserva ?next=, etc.)
     path(
         "login/",
-        lambda r: redirect("/mx/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET.urlencode() else "")),
+        lambda r: redirect(
+            "/mx/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET.urlencode() else "")
+        ),
         name="login_mexico_redirect",
     ),
     # Signup México - redirect a signup universal con parámetro from=mx

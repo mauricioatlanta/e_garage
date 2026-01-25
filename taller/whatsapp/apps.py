@@ -2,6 +2,7 @@
 AppConfig para taller.whatsapp
 Define el label como 'whatsapp' para compatibilidad con comandos Django
 """
+
 from django.apps import AppConfig
 
 

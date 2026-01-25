@@ -50,7 +50,8 @@ def subscription_dashboard(request):
         ComprobantePago.objects.filter(
             fecha_subida__year=today.year,
             fecha_subida__month=today.month,
-        ).aggregate(total=Sum("monto"))["total"] or 0
+        ).aggregate(total=Sum("monto"))["total"]
+        or 0
     )
 
     context = {
@@ -184,18 +185,20 @@ def subscription_analytics(request):
         # Restar meses de forma segura
         target_month = today.month - i
         target_year = today.year
-        
+
         # Ajustar año si el mes es negativo
         while target_month <= 0:
             target_month += 12
             target_year -= 1
-        
+
         month_date = today.replace(year=target_year, month=target_month, day=1)
         month_start = month_date
-        
+
         # Calcular fin del mes de manera segura
         if month_date.month == 12:
-            month_end = month_date.replace(year=month_date.year + 1, month=1, day=1) - timedelta(days=1)
+            month_end = month_date.replace(year=month_date.year + 1, month=1, day=1) - timedelta(
+                days=1
+            )
         else:
             month_end = month_date.replace(month=month_date.month + 1, day=1) - timedelta(days=1)
 
@@ -217,7 +220,8 @@ def subscription_analytics(request):
             ComprobantePago.objects.filter(
                 fecha_subida__gte=month_start,
                 fecha_subida__lte=month_end,
-            ).aggregate(total=Sum("monto"))["total"] or 0
+            ).aggregate(total=Sum("monto"))["total"]
+            or 0
         )
 
         monthly_data.append(
@@ -255,9 +259,7 @@ def subscription_analytics(request):
 
     # Top empresas por ingresos
     top_empresas = (
-        Empresa.objects.annotate(
-            total_pagos=Sum("comprobantes__monto")
-        )
+        Empresa.objects.annotate(total_pagos=Sum("comprobantes__monto"))
         .filter(total_pagos__isnull=False)
         .order_by("-total_pagos")[:10]
     )
@@ -395,9 +397,7 @@ def export_subscriptions(request):
 
     for empresa in empresas:
         trial_activo = TrialRegistro.objects.filter(empresa=empresa, activo=True).exists()
-        total_pagos = (
-            empresa.comprobantes.aggregate(total=Sum("monto"))["total"] or 0
-        )
+        total_pagos = empresa.comprobantes.aggregate(total=Sum("monto"))["total"] or 0
 
         writer.writerow(
             [
@@ -407,11 +407,7 @@ def export_subscriptions(request):
                 empresa.usuario.email,
                 "Activa" if empresa.suscripcion_activa else "Inactiva",
                 empresa.fecha_inicio.strftime("%Y-%m-%d"),
-                (
-                    empresa.fecha_fin.strftime("%Y-%m-%d")
-                    if empresa.fecha_fin
-                    else ""
-                ),
+                (empresa.fecha_fin.strftime("%Y-%m-%d") if empresa.fecha_fin else ""),
                 total_pagos,
                 "Sí" if trial_activo else "No",
             ]
@@ -428,8 +424,14 @@ def subscription_api_stats(request):
 
     # Estadísticas por estado
     stats_by_status = [
-        {"suscripcion_activa": True, "count": Empresa.objects.filter(suscripcion_activa=True).count()},
-        {"suscripcion_activa": False, "count": Empresa.objects.filter(suscripcion_activa=False).count()},
+        {
+            "suscripcion_activa": True,
+            "count": Empresa.objects.filter(suscripcion_activa=True).count(),
+        },
+        {
+            "suscripcion_activa": False,
+            "count": Empresa.objects.filter(suscripcion_activa=False).count(),
+        },
     ]
 
     # Nuevas suscripciones por día (últimos 30 días)
