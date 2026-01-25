@@ -2,6 +2,7 @@
 Registro de auditoría para notificaciones WhatsApp admin
 Opcional pero útil para debugging y soporte
 """
+
 import logging
 from datetime import datetime
 from typing import Dict, Any, Optional
@@ -21,7 +22,7 @@ def log_whatsapp_admin_attempt(
 ) -> None:
     """
     Registrar intento de envío de WhatsApp admin
-    
+
     Args:
         empresa_id: ID de la empresa
         empresa_nombre: Nombre de la empresa
@@ -41,12 +42,16 @@ def log_whatsapp_admin_attempt(
         "error": error,
         "message_id": message_id,
     }
-    
+
     if success:
-        logger.info(f"[WhatsApp Admin Audit] ✅ {event_type} - Empresa: {empresa_nombre} (ID: {empresa_id}) - Provider: {provider} - Message ID: {message_id}")
+        logger.info(
+            f"[WhatsApp Admin Audit] ✅ {event_type} - Empresa: {empresa_nombre} (ID: {empresa_id}) - Provider: {provider} - Message ID: {message_id}"
+        )
     else:
-        logger.warning(f"[WhatsApp Admin Audit] ❌ {event_type} - Empresa: {empresa_nombre} (ID: {empresa_id}) - Provider: {provider} - Error: {error}")
-    
+        logger.warning(
+            f"[WhatsApp Admin Audit] ❌ {event_type} - Empresa: {empresa_nombre} (ID: {empresa_id}) - Provider: {provider} - Error: {error}"
+        )
+
     # Opcional: Guardar en DB si tienes modelo de auditoría
     # try:
     #     from taller.models.auditoria import LogAuditoria

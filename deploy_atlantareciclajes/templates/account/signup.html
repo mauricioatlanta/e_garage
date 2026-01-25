@@ -540,7 +540,7 @@ body {
             <div class="checkbox-container">
                 {{ form.acepta_terminos }}
                 <label for="id_acepta_terminos" class="checkbox-label">
-                    {% trans "I accept the" %} <a href="/legal/">{% trans "terms and conditions" %}</a>
+                    {% trans "I accept the" %} <a href="{% url 'legal' %}">{% trans "terms and conditions" %}</a>
                 </label>
             </div>
             {% if form.acepta_terminos.errors %}

@@ -1,6 +1,6 @@
 # --- HOTFIX: stubs para compatibilidad con urls.py ---
 # Copiar y pegar este bloque al final de /srv/egarage/taller/analytics/views.py
-# 
+#
 # Comando rápido:
 # sudo nano /srv/egarage/taller/analytics/views.py
 # (ir al final del archivo y pegar esto)

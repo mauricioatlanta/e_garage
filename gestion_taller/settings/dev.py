@@ -14,12 +14,16 @@ ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 if os.getenv("DATABASE_URL"):
     import dj_database_url
     import urllib.parse
+
     # Obtener la URL y verificar si es localhost
     database_url = os.getenv("DATABASE_URL")
     parsed_url = urllib.parse.urlparse(database_url)
-    
+
     # Si el host es localhost, construir configuración manualmente (evita problemas con dj_database_url y SSL)
-    if parsed_url.hostname in ("localhost", "127.0.0.1", "::1", None) or "localhost" in str(parsed_url.hostname or "").lower():
+    if (
+        parsed_url.hostname in ("localhost", "127.0.0.1", "::1", None)
+        or "localhost" in str(parsed_url.hostname or "").lower()
+    ):
         # Extraer credenciales de la URL
         username = parsed_url.username or ""
         password = parsed_url.password or ""
@@ -27,7 +31,7 @@ if os.getenv("DATABASE_URL"):
         hostname = "127.0.0.1"  # Siempre usar IPv4 para localhost
         port = parsed_url.port or 5432
         database = parsed_url.path.lstrip("/") or ""
-        
+
         # Construir configuración manualmente con SSL desactivado
         # IMPORTANTE: psycopg2 requiere que sslmode se pase como parte del DSN o en connect_kwargs
         DATABASES = {
@@ -54,7 +58,7 @@ elif os.getenv("DJANGO_DB_NAME") or os.getenv("DB_NAME"):
     # Forzar IPv4 para evitar problemas con IPv6 y SSL
     if db_host.lower() in ("localhost", "::1"):
         db_host = "127.0.0.1"
-    
+
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",

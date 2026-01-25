@@ -69,8 +69,13 @@ class Command(BaseCommand):
 
         # Documentos
         if hasattr(DocumentoDeleteView, "allowed_roles"):
-            if "Owner" in DocumentoDeleteView.allowed_roles or "Admin" in DocumentoDeleteView.allowed_roles:
-                self.success["permisos"].append("✅ DocumentoDeleteView tiene roles restringidos (Owner/Admin)")
+            if (
+                "Owner" in DocumentoDeleteView.allowed_roles
+                or "Admin" in DocumentoDeleteView.allowed_roles
+            ):
+                self.success["permisos"].append(
+                    "✅ DocumentoDeleteView tiene roles restringidos (Owner/Admin)"
+                )
             else:
                 self.issues["permisos"].append("❌ DocumentoDeleteView no restringe a Owner/Admin")
         else:
@@ -93,7 +98,9 @@ class Command(BaseCommand):
 
         # Servicios
         if hasattr(ServicioDeleteView, "get_queryset"):
-            self.success["permisos"].append("✅ ServicioDeleteView tiene get_queryset (probablemente filtra por empresa)")
+            self.success["permisos"].append(
+                "✅ ServicioDeleteView tiene get_queryset (probablemente filtra por empresa)"
+            )
         else:
             self.warnings["permisos"].append("⚠️ ServicioDeleteView podría no filtrar por empresa")
 
@@ -108,15 +115,21 @@ class Command(BaseCommand):
         if hasattr(DocumentoDeleteView, "get_queryset"):
             qs_code = inspect.getsource(DocumentoDeleteView.get_queryset)
             if "empresa" in qs_code.lower():
-                self.success["multi_tenant"].append("✅ DocumentoDeleteView.get_queryset filtra por empresa")
+                self.success["multi_tenant"].append(
+                    "✅ DocumentoDeleteView.get_queryset filtra por empresa"
+                )
             else:
-                self.issues["multi_tenant"].append("❌ DocumentoDeleteView.get_queryset no filtra por empresa")
+                self.issues["multi_tenant"].append(
+                    "❌ DocumentoDeleteView.get_queryset no filtra por empresa"
+                )
 
         # Verificar UpdateView también
         if hasattr(DocumentoUpdateView, "get_queryset"):
             self.success["multi_tenant"].append("✅ DocumentoUpdateView tiene get_queryset")
         else:
-            self.warnings["multi_tenant"].append("⚠️ DocumentoUpdateView podría no filtrar por empresa")
+            self.warnings["multi_tenant"].append(
+                "⚠️ DocumentoUpdateView podría no filtrar por empresa"
+            )
 
     def auditar_urls(self):
         """Verifica que las URLs estén definidas y sean accesibles"""
@@ -160,12 +173,22 @@ class Command(BaseCommand):
             if full_path.exists():
                 content = full_path.read_text(encoding="utf-8")
                 # Verificar botones de acción
-                has_create = "crear" in content.lower() or "nuevo" in content.lower() or "create" in content.lower()
+                has_create = (
+                    "crear" in content.lower()
+                    or "nuevo" in content.lower()
+                    or "create" in content.lower()
+                )
                 has_edit = "editar" in content.lower() or "edit" in content.lower()
-                has_delete = "eliminar" in content.lower() or "delete" in content.lower() or "borrar" in content.lower()
+                has_delete = (
+                    "eliminar" in content.lower()
+                    or "delete" in content.lower()
+                    or "borrar" in content.lower()
+                )
 
                 if has_create and has_edit and has_delete:
-                    self.success["templates"].append(f"✅ {template_path} tiene botones crear/editar/eliminar")
+                    self.success["templates"].append(
+                        f"✅ {template_path} tiene botones crear/editar/eliminar"
+                    )
                 else:
                     missing = []
                     if not has_create:
@@ -204,7 +227,9 @@ class Command(BaseCommand):
         base_dir = Path(__file__).resolve().parent.parent.parent
         templates_dir = base_dir / "templates"
 
-        archive_dirs = list(templates_dir.rglob("*archive*")) + list(templates_dir.rglob("*deprecated*"))
+        archive_dirs = list(templates_dir.rglob("*archive*")) + list(
+            templates_dir.rglob("*deprecated*")
+        )
         if archive_dirs:
             self.warnings["duplicados"].append(
                 f"⚠️ Se encontraron {len(archive_dirs)} directorios _archive/_deprecated que podrían estar en el árbol de carga"
@@ -303,16 +328,26 @@ class Command(BaseCommand):
         # Recomendaciones
         reporte.append("\n## 💡 Recomendaciones\n")
         if total_issues > 0:
-            reporte.append("1. **Revisar permisos**: Asegurar que todas las vistas de delete/edit tengan RoleRequiredMixin\n")
-            reporte.append("2. **Verificar multi-tenant**: Todas las vistas deben filtrar por empresa en get_queryset\n")
-            reporte.append("3. **Completar templates**: Agregar botones faltantes en templates de lista\n")
+            reporte.append(
+                "1. **Revisar permisos**: Asegurar que todas las vistas de delete/edit tengan RoleRequiredMixin\n"
+            )
+            reporte.append(
+                "2. **Verificar multi-tenant**: Todas las vistas deben filtrar por empresa en get_queryset\n"
+            )
+            reporte.append(
+                "3. **Completar templates**: Agregar botones faltantes en templates de lista\n"
+            )
         if total_warnings > 0:
             reporte.append("4. **Limpiar duplicados**: Revisar directorios _archive/_deprecated\n")
-            reporte.append("5. **Verificar orden de templates**: Asegurar que el orden en TEMPLATES['DIRS'] sea correcto\n")
+            reporte.append(
+                "5. **Verificar orden de templates**: Asegurar que el orden en TEMPLATES['DIRS'] sea correcto\n"
+            )
 
         # Escribir reporte
         output_path = Path(self.output_file)
         output_path.write_text("\n".join(reporte), encoding="utf-8")
 
         self.stdout.write(self.style.SUCCESS(f"\n✅ Reporte generado: {output_path}"))
-        self.stdout.write(f"\n📊 Resumen: {total_success} ✅ | {total_warnings} ⚠️ | {total_issues} ❌")
+        self.stdout.write(
+            f"\n📊 Resumen: {total_success} ✅ | {total_warnings} ⚠️ | {total_issues} ❌"
+        )

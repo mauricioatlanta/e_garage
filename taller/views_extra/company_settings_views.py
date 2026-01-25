@@ -130,10 +130,24 @@ def company_settings_view(request):
                     empresa_form.save()  # <-- aquí se guarda logo en ConfiguracionEmpresa
                     cache.delete(f"company_branding_{request.user.id}")
 
-                    messages.success(request, "✅ Información de empresa guardada exitosamente." if is_spanish else "✅ Company information saved.")
+                    messages.success(
+                        request,
+                        (
+                            "✅ Información de empresa guardada exitosamente."
+                            if is_spanish
+                            else "✅ Company information saved."
+                        ),
+                    )
                     return redirect(request.path)
                 else:
-                    messages.error(request, "❌ Corrige los errores en Información de Empresa." if is_spanish else "❌ Please fix the errors in Company Information.")
+                    messages.error(
+                        request,
+                        (
+                            "❌ Corrige los errores en Información de Empresa."
+                            if is_spanish
+                            else "❌ Please fix the errors in Company Information."
+                        ),
+                    )
             elif section == "financial":
                 if financial_form.is_valid():
                     financial_form.save()

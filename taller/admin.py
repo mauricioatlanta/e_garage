@@ -24,6 +24,7 @@ try:
         SubcategoriaServicio,
         SubcategoriaServicioName,
     )
+
     SERVICIOS_MODELS_AVAILABLE = True
 except ImportError as e:
     # Los modelos de servicios no están disponibles
@@ -36,6 +37,7 @@ except ImportError as e:
     SubcategoriaServicio = None
     SubcategoriaServicioName = None
     import logging
+
     logger = logging.getLogger(__name__)
     logger.warning(f"Modelos de servicios no disponibles: {e}")
 
@@ -63,7 +65,7 @@ class MyAdminSite(AdminSite):
 
     def has_permission(self, request):
         return request.user.is_active and request.user.is_superuser
-    
+
     def login(self, request, extra_context=None):
         """
         Sobrescribir login para usar el login estándar de Django Admin
@@ -76,35 +78,36 @@ class MyAdminSite(AdminSite):
         from django.contrib.auth import login as auth_login
         from django.urls import reverse
         from django.shortcuts import redirect
-        
-        if request.method == 'GET' and self.has_permission(request):
+
+        if request.method == "GET" and self.has_permission(request):
             # Ya está autenticado, redirigir al index
-            index_path = reverse('%s:index' % self.name, current_app=self.name)
+            index_path = reverse("%s:index" % self.name, current_app=self.name)
             return redirect(index_path)
-        
+
         # Usar el formulario de autenticación estándar de Django (NO allauth)
         context = {
-            'title': 'Iniciar sesión',
-            'app_path': request.get_full_path(),
-            'username': request.user.get_username(),
+            "title": "Iniciar sesión",
+            "app_path": request.get_full_path(),
+            "username": request.user.get_username(),
             **(extra_context or {}),
         }
-        
+
         @csrf_protect
         @never_cache
         def login_view(request):
-            if request.method == 'POST':
+            if request.method == "POST":
                 form = AuthenticationForm(request, data=request.POST)
                 if form.is_valid():
                     auth_login(request, form.get_user())
-                    return redirect(reverse('%s:index' % self.name, current_app=self.name))
+                    return redirect(reverse("%s:index" % self.name, current_app=self.name))
             else:
                 form = AuthenticationForm(request)
-            
-            context['form'] = form
+
+            context["form"] = form
             from django.template.response import TemplateResponse
+
             return TemplateResponse(request, self.login_template, context)
-        
+
         return login_view(request)
 
 
@@ -373,11 +376,11 @@ class TecnicoAdmin(admin.ModelAdmin):
 # ✅ Solo registrar si los modelos están disponibles
 
 if SERVICIOS_MODELS_AVAILABLE:
+
     class CategoriaServicioNameInline(admin.TabularInline):
         model = CategoriaServicioName
         extra = 2
         fields = ["language", "label", "aliases", "is_default"]
-
 
     @admin.register(CategoriaServicio, site=admin_site)
     class CategoriaServicioAdmin(admin.ModelAdmin):
@@ -394,12 +397,10 @@ if SERVICIOS_MODELS_AVAILABLE:
         def get_label_en(self, obj):
             return obj.get_label("en")
 
-
     class SubcategoriaServicioNameInline(admin.TabularInline):
         model = SubcategoriaServicioName
         extra = 2
         fields = ["language", "label", "aliases", "is_default"]
-
 
     @admin.register(SubcategoriaServicio, site=admin_site)
     class SubcategoriaServicioAdmin(admin.ModelAdmin):
@@ -423,12 +424,10 @@ if SERVICIOS_MODELS_AVAILABLE:
         def get_label_en(self, obj):
             return obj.get_label("en")
 
-
     class ServicioNameInline(admin.TabularInline):
         model = ServicioName
         extra = 2
         fields = ["language", "label", "aliases", "is_default"]
-
 
     @admin.register(Servicio, site=admin_site)
     class ServicioAdmin(admin.ModelAdmin):
@@ -504,7 +503,9 @@ class ComprobantePagoAdmin(admin.ModelAdmin):
             # - Notificaciones automáticas (Email + WhatsApp)
             comprobante.aprobar(procesado_por=request.user.username)
             count += 1
-        self.message_user(request, f"Se aprobaron {count} comprobantes. Notificaciones enviadas automáticamente.")
+        self.message_user(
+            request, f"Se aprobaron {count} comprobantes. Notificaciones enviadas automáticamente."
+        )
 
     def rechazar_comprobantes(self, request, queryset):
         count = 0

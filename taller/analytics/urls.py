@@ -28,7 +28,11 @@ urlpatterns = [
     # Dashboard principal
     path("", views.dashboard_ai_view, name="dashboard"),
     # Redirect sin trailing slash a con trailing slash
-    path("dashboard", RedirectView.as_view(url="/analytics/dashboard/", permanent=False), name="dashboard_redirect"),
+    path(
+        "dashboard",
+        RedirectView.as_view(url="/analytics/dashboard/", permanent=False),
+        name="dashboard_redirect",
+    ),
     path("dashboard/", views.dashboard_ai_view, name="dashboard_ai"),
     # APIs para gráficas en tiempo real
     path("revenue-api/", views.revenue_analytics_api, name="revenue_api"),

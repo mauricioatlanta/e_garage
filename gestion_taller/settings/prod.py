@@ -9,6 +9,7 @@ from .base import *
 # HELPERS DE ENTORNO
 # =============================================================================
 
+
 def env_list(name: str, default: str | list[str] = "") -> list[str]:
     """Convierte variable de entorno separada por comas en lista."""
     # Si default es una lista, convertirla a string separado por comas
@@ -16,6 +17,7 @@ def env_list(name: str, default: str | list[str] = "") -> list[str]:
         default = ",".join(default)
     raw = os.getenv(name, default) or ""
     return [x.strip() for x in raw.split(",") if x.strip()]
+
 
 # =============================================================================
 # CONFIGURACIÓN DE PRODUCCIÓN

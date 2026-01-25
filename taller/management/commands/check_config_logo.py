@@ -17,11 +17,11 @@ class Command(BaseCommand):
         self.stdout.write("=" * 80)
 
         configs = ConfiguracionEmpresa.objects.all()
-        
+
         if not configs.exists():
             self.stdout.write(self.style.WARNING("\n⚠️  No hay ConfiguracionEmpresa registrados."))
             return
-        
+
         self.stdout.write(f"\n📊 Total de ConfiguracionEmpresa: {configs.count()}\n")
 
         for config in configs:
@@ -34,40 +34,37 @@ class Command(BaseCommand):
             else:
                 self.stdout.write("⚠️  No tiene Empresa asociada")
             self.stdout.write(f"{'='*60}")
-            
+
             if config.logo:
                 self.stdout.write(self.style.SUCCESS(f"✅ Tiene logo configurado"))
                 try:
                     logo_url = config.logo.url
                     self.stdout.write(f"   URL relativa: {logo_url}")
-                    
+
                     # Verificar archivo físico
-                    if hasattr(config.logo, 'path'):
+                    if hasattr(config.logo, "path"):
                         logo_path = config.logo.path
                         self.stdout.write(f"   Ruta física: {logo_path}")
                         if os.path.exists(logo_path):
                             file_size = os.path.getsize(logo_path) / 1024
-                            self.stdout.write(self.style.SUCCESS(f"   ✅ Archivo existe ({file_size:.2f} KB)"))
+                            self.stdout.write(
+                                self.style.SUCCESS(f"   ✅ Archivo existe ({file_size:.2f} KB)")
+                            )
                         else:
-                            self.stdout.write(self.style.ERROR("   ❌ Archivo NO existe físicamente"))
-                    
+                            self.stdout.write(
+                                self.style.ERROR("   ❌ Archivo NO existe físicamente")
+                            )
+
                     # Simular URL absoluta
-                    if logo_url and not logo_url.startswith(('http://', 'https://')):
+                    if logo_url and not logo_url.startswith(("http://", "https://")):
                         absolute_url = f"https://www.egarage.cl{logo_url}"
                         self.stdout.write(f"   URL absoluta (simulada): {absolute_url}")
                 except Exception as e:
                     self.stdout.write(self.style.ERROR(f"   ❌ Error obteniendo URL: {e}"))
             else:
                 self.stdout.write(self.style.WARNING("❌ NO tiene logo configurado"))
-        
+
         self.stdout.write("\n" + "=" * 80)
         self.stdout.write(self.style.SUCCESS("✅ DIAGNÓSTICO COMPLETADO"))
         self.stdout.write("=" * 80)
         self.stdout.write("\n")
-
-
-
-
-
-
-

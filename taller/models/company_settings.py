@@ -247,8 +247,9 @@ class CompanySettings(models.Model):
         """Redimensiona el logo si excede las dimensiones máximas y optimiza el tamaño"""
         try:
             import os
+
             logo_path = self.logo.path
-            
+
             # Verificar si el archivo ya existe y tiene tamaño razonable (cache)
             if os.path.exists(logo_path):
                 file_size = os.path.getsize(logo_path)
@@ -256,7 +257,7 @@ class CompanySettings(models.Model):
                 # Si es muy grande (> 5MB), necesita optimización
                 if file_size < 1024:
                     return  # Ya optimizado, skip
-            
+
             img = Image.open(logo_path)
             original_size = (img.width, img.height)
 
@@ -264,7 +265,9 @@ class CompanySettings(models.Model):
             max_size = 800
             if img.height <= max_size and img.width <= max_size and img.mode == "RGB":
                 # Ya está optimizado, solo verificar formato
-                if not logo_path.lower().endswith('.jpg') and not logo_path.lower().endswith('.jpeg'):
+                if not logo_path.lower().endswith(".jpg") and not logo_path.lower().endswith(
+                    ".jpeg"
+                ):
                     # Convertir a JPEG si no lo es
                     img = img.convert("RGB")
                     img.save(logo_path, "JPEG", quality=90, optimize=True)

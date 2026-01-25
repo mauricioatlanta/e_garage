@@ -11,10 +11,10 @@ MILES_TO_KM = 1.609344
 def miles_to_km(mi: int | float | None) -> int | None:
     """
     Convierte millas a kilómetros.
-    
+
     Args:
         mi: Valor en millas (puede ser int, float o None)
-        
+
     Returns:
         int: Valor en kilómetros redondeado, o None si el input es None/0
     """
@@ -26,20 +26,13 @@ def miles_to_km(mi: int | float | None) -> int | None:
 def km_to_miles(km: int | float | None) -> int | None:
     """
     Convierte kilómetros a millas.
-    
+
     Args:
         km: Valor en kilómetros (puede ser int, float o None)
-        
+
     Returns:
         int: Valor en millas redondeado, o None si el input es None/0
     """
     if km is None or km == 0:
         return None
     return int(round((km or 0) / MILES_TO_KM))
-
-
-
-
-
-
-

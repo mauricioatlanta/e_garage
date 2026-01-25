@@ -14,7 +14,11 @@ class EmpresaMiddleware:
                 request.empresa = request.user.empresa
 
                 # Verificar si la suscripción está vencida
-                if request.empresa and request.empresa.debe_bloquear and not self.is_exempt_url(request.path):
+                if (
+                    request.empresa
+                    and request.empresa.debe_bloquear
+                    and not self.is_exempt_url(request.path)
+                ):
                     return redirect("suspension")
 
             except Exception:  # O Empresa.DoesNotExist

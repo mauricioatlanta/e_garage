@@ -180,6 +180,7 @@ class DocumentOutputService:
 
         # Datos para el template
         from django.conf import settings
+
         context = {
             "doc": documento,
             "empresa": empresa,
@@ -197,7 +198,9 @@ class DocumentOutputService:
             "fecha_formateada": documento.fecha_emision.strftime("%d/%m/%Y"),
             # Variables de soporte centralizadas
             "support_email": getattr(settings, "SUPPORT_EMAIL", "support@egarage.cl"),
-            "support_whatsapp_display": getattr(settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683"),
+            "support_whatsapp_display": getattr(
+                settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683"
+            ),
             "support_whatsapp_wa_me": getattr(settings, "SUPPORT_WHATSAPP_WA_ME", "56953574683"),
         }
 

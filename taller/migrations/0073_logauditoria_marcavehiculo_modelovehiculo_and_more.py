@@ -28,7 +28,10 @@ class Migration(migrations.Migration):
                         (
                             "id",
                             models.BigAutoField(
-                                auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                                auto_created=True,
+                                primary_key=True,
+                                serialize=False,
+                                verbose_name="ID",
                             ),
                         ),
                         (
@@ -69,7 +72,9 @@ class Migration(migrations.Migration):
                         ("fecha_hora", models.DateTimeField(default=django.utils.timezone.now)),
                         (
                             "datos_antes",
-                            models.JSONField(blank=True, help_text="Estado anterior del objeto", null=True),
+                            models.JSONField(
+                                blank=True, help_text="Estado anterior del objeto", null=True
+                            ),
                         ),
                         (
                             "datos_despues",

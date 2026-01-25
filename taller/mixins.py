@@ -141,18 +141,18 @@ class CountryLangTemplateMixin:
 def safe_next_url(url, allowed_hosts=None):
     """
     Valida si una URL es segura para redirección.
-    
+
     Esta función verifica que la URL:
     - Tenga un esquema permitido (http, https)
     - El host esté en la lista de hosts permitidos
-    
+
     Args:
         url: URL a validar (str)
         allowed_hosts: Lista de hosts permitidos (None usa ALLOWED_HOSTS de settings)
-    
+
     Returns:
         str: La URL si es segura, None en caso contrario
-    
+
     Ejemplo:
         >>> from taller.mixins import safe_next_url
         >>> safe_next_url('/dashboard/')
@@ -162,13 +162,13 @@ def safe_next_url(url, allowed_hosts=None):
     """
     if not url:
         return None
-    
+
     # Si la URL es relativa (empieza con /), es segura
-    if url.startswith('/'):
+    if url.startswith("/"):
         return url
-    
+
     # Para URLs absolutas, validar con Django
     if url_has_allowed_host_and_scheme(url, allowed_hosts=allowed_hosts):
         return url
-    
+
     return None

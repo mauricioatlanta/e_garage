@@ -5,7 +5,7 @@ Script de diagnóstico para verificar el estado del logo en CompanySettings
 import os
 import django
 
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'e_garage.settings')
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "e_garage.settings")
 django.setup()
 
 from django.contrib.auth.models import User
@@ -22,23 +22,24 @@ if not users_with_settings.exists():
     print("\n❌ No se encontraron usuarios con CompanySettings")
 else:
     print(f"\n✅ Se encontraron {users_with_settings.count()} usuario(s) con CompanySettings\n")
-    
+
     for user in users_with_settings:
         print(f"Usuario: {user.username} (ID: {user.id})")
         try:
-            cs = CompanySettings.objects.filter(user=user).order_by('-updated_at').first()
+            cs = CompanySettings.objects.filter(user=user).order_by("-updated_at").first()
             if cs:
                 print(f"  - CompanySettings ID: {cs.id}")
                 print(f"  - Nombre empresa: {cs.company_name}")
                 print(f"  - Tiene logo: {bool(cs.logo)}")
-                
+
                 if cs.logo:
                     print(f"  - Logo name: {cs.logo.name}")
                     try:
                         print(f"  - Logo URL: {cs.logo.url}")
                         # Verificar si el archivo existe
-                        if hasattr(cs.logo, 'path'):
+                        if hasattr(cs.logo, "path"):
                             import os
+
                             if os.path.exists(cs.logo.path):
                                 print(f"  - ✅ Archivo existe físicamente: {cs.logo.path}")
                             else:
@@ -58,4 +59,3 @@ else:
 print("\n" + "=" * 60)
 print("FIN DEL DIAGNÓSTICO")
 print("=" * 60)
-

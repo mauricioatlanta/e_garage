@@ -123,15 +123,13 @@ class Empresa(models.Model):
     #       para evitar múltiples campos similares. Es un campo genérico de "aviso temprano"
     notificacion_5_dias = models.BooleanField(
         default=False,
-        help_text="Indica si se envió notificación temprana (7 o 3 días antes del vencimiento). Reutilizado para ambos intervalos."
+        help_text="Indica si se envió notificación temprana (7 o 3 días antes del vencimiento). Reutilizado para ambos intervalos.",
     )
     notificacion_1_dia = models.BooleanField(
-        default=False,
-        help_text="Indica si se envió notificación a 1 día antes del vencimiento."
+        default=False, help_text="Indica si se envió notificación a 1 día antes del vencimiento."
     )
     notificacion_vencido = models.BooleanField(
-        default=False,
-        help_text="Indica si se envió notificación cuando la suscripción ya venció."
+        default=False, help_text="Indica si se envió notificación cuando la suscripción ya venció."
     )
     # Opcional: timestamps de notificación (descomentar si se necesita auditoría)
     # notificado_5_dias_en = models.DateTimeField(null=True, blank=True)
@@ -277,7 +275,7 @@ class Empresa(models.Model):
     def marcar_pago_recibido(self, monto=None, plan=None, enviar_notificacion=True):
         """
         Marcar pago como recibido y extender suscripción por 30 días
-        
+
         Args:
             monto: Monto del pago (opcional)
             plan: Plan de suscripción (opcional)
@@ -292,15 +290,15 @@ class Empresa(models.Model):
             and plan_anterior != plan
             and plan_anterior != "trial"
         )
-        
+
         if monto is not None:
             self.valor_mensual = Decimal(str(monto))
         if plan:
             self.plan = plan
-        
+
         # Extender suscripción (sin notificación aquí, la enviaremos después)
         self.extender_suscripcion(30, enviar_notificacion=False)
-        
+
         # Enviar notificaciones automáticas si se solicita
         if enviar_notificacion:
             try:
@@ -309,10 +307,10 @@ class Empresa(models.Model):
                     notificar_nueva_suscripcion,
                     notificar_renovacion_exitosa,
                 )
-                
+
                 monto_notificacion = monto if monto is not None else self.valor_mensual
                 plan_notificacion = plan if plan else self.plan
-                
+
                 if es_nueva_suscripcion:
                     # A. NUEVA SUSCRIPCIÓN
                     notificar_nueva_suscripcion(
@@ -322,6 +320,7 @@ class Empresa(models.Model):
                         es_nueva_empresa=es_nueva_suscripcion,
                     )
                     import logging
+
                     logger = logging.getLogger(__name__)
                     logger.info(f"✅ Notificación de nueva suscripción enviada a {self.user.email}")
                 elif es_cambio_plan:
@@ -334,6 +333,7 @@ class Empresa(models.Model):
                         fecha_inicio=self.fecha_inicio,
                     )
                     import logging
+
                     logger = logging.getLogger(__name__)
                     logger.info(f"✅ Notificación de cambio de plan enviada a {self.user.email}")
                 else:
@@ -345,10 +345,14 @@ class Empresa(models.Model):
                         dias_renovados=30,
                     )
                     import logging
+
                     logger = logging.getLogger(__name__)
-                    logger.info(f"✅ Notificación de renovación exitosa enviada a {self.user.email}")
+                    logger.info(
+                        f"✅ Notificación de renovación exitosa enviada a {self.user.email}"
+                    )
             except Exception as e:
                 import logging
+
                 logger = logging.getLogger(__name__)
                 logger.error(f"⚠️ Error al enviar notificación en marcar_pago_recibido: {str(e)}")
                 # No fallar si la notificación falla

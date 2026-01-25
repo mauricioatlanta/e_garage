@@ -4,6 +4,7 @@ from django.conf import settings
 
 register = template.Library()
 
+
 @register.simple_tag
 def whatsapp_url(phone=None, text=""):
     """
@@ -18,6 +19,7 @@ def whatsapp_url(phone=None, text=""):
     if msg:
         return f"https://wa.me/{phone}?text={msg}"
     return f"https://wa.me/{phone}"
+
 
 @register.filter
 def only_digits(value):
@@ -54,7 +56,11 @@ def whatsapp_document_link(context, document=None, text=None):
     try:
         if document is not None:
             # intenta varios nombres típicos
-            num = getattr(document, "numero", None) or getattr(document, "numero_documento", None) or getattr(document, "folio", None)
+            num = (
+                getattr(document, "numero", None)
+                or getattr(document, "numero_documento", None)
+                or getattr(document, "folio", None)
+            )
             if num:
                 text += f" N° {num}."
             # link al detalle si existe id/pk

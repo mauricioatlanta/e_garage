@@ -56,9 +56,10 @@ class Command(BaseCommand):
                 self.stdout.write("[DRY-RUN] Se crearía empresa maestra")
             else:
                 from django.contrib.auth.models import User
+
                 user_sistema, _ = User.objects.get_or_create(
                     username="sistema_catalogo_maestro",
-                    defaults={"email": "sistema@egarage.com", "is_active": False}
+                    defaults={"email": "sistema@egarage.com", "is_active": False},
                 )
                 empresa_maestra = Empresa.objects.create(
                     id=MASTER_ID,
@@ -67,7 +68,11 @@ class Command(BaseCommand):
                     empresa="Sistema eGarage",
                     pais="CL",
                 )
-                self.stdout.write(self.style.SUCCESS(f"[OK] Empresa maestra creada: {empresa_maestra.nombre_taller}"))
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"[OK] Empresa maestra creada: {empresa_maestra.nombre_taller}"
+                    )
+                )
 
         # Configuración de países e idiomas
         paises_config = {
@@ -86,28 +91,85 @@ class Command(BaseCommand):
         # Mapeo de categorías por país
         categorias_config = {
             "mantenimiento": {
-                "CL": {"label": "Mantenimiento Periódico", "aliases": ["mantenimiento", "preventivo", "servicio periódico"]},
-                "MX": {"label": "Mantenimiento Periódico", "aliases": ["mantenimiento", "preventivo", "servicio periódico"]},
-                "AR": {"label": "Mantenimiento Periódico", "aliases": ["mantenimiento", "preventivo", "service"]},
-                "UY": {"label": "Mantenimiento Periódico", "aliases": ["mantenimiento", "preventivo"]},
-                "CO": {"label": "Mantenimiento Periódico", "aliases": ["mantenimiento", "preventivo"]},
-                "EC": {"label": "Mantenimiento Periódico", "aliases": ["mantenimiento", "preventivo"]},
-                "PE": {"label": "Mantenimiento Periódico", "aliases": ["mantenimiento", "preventivo"]},
-                "VE": {"label": "Mantenimiento Periódico", "aliases": ["mantenimiento", "preventivo"]},
-                "US": {"label": "Preventive Maintenance", "aliases": ["maintenance", "preventive", "periodic service"]},
-                "BR": {"label": "Manutenção Periódica", "aliases": ["manutenção", "preventivo", "serviço periódico"]},
+                "CL": {
+                    "label": "Mantenimiento Periódico",
+                    "aliases": ["mantenimiento", "preventivo", "servicio periódico"],
+                },
+                "MX": {
+                    "label": "Mantenimiento Periódico",
+                    "aliases": ["mantenimiento", "preventivo", "servicio periódico"],
+                },
+                "AR": {
+                    "label": "Mantenimiento Periódico",
+                    "aliases": ["mantenimiento", "preventivo", "service"],
+                },
+                "UY": {
+                    "label": "Mantenimiento Periódico",
+                    "aliases": ["mantenimiento", "preventivo"],
+                },
+                "CO": {
+                    "label": "Mantenimiento Periódico",
+                    "aliases": ["mantenimiento", "preventivo"],
+                },
+                "EC": {
+                    "label": "Mantenimiento Periódico",
+                    "aliases": ["mantenimiento", "preventivo"],
+                },
+                "PE": {
+                    "label": "Mantenimiento Periódico",
+                    "aliases": ["mantenimiento", "preventivo"],
+                },
+                "VE": {
+                    "label": "Mantenimiento Periódico",
+                    "aliases": ["mantenimiento", "preventivo"],
+                },
+                "US": {
+                    "label": "Preventive Maintenance",
+                    "aliases": ["maintenance", "preventive", "periodic service"],
+                },
+                "BR": {
+                    "label": "Manutenção Periódica",
+                    "aliases": ["manutenção", "preventivo", "serviço periódico"],
+                },
             },
             "bodyshop": {
-                "CL": {"label": "Desabolladura y Pintura", "aliases": ["pintura", "desabollado", "bodyshop", "chapa"]},
-                "MX": {"label": "Desabolladura y Pintura", "aliases": ["pintura", "desabollado", "bodyshop", "chapa"]},
-                "AR": {"label": "Chapa y Pintura", "aliases": ["chapista", "choque", "bollo", "pintura"]},
+                "CL": {
+                    "label": "Desabolladura y Pintura",
+                    "aliases": ["pintura", "desabollado", "bodyshop", "chapa"],
+                },
+                "MX": {
+                    "label": "Desabolladura y Pintura",
+                    "aliases": ["pintura", "desabollado", "bodyshop", "chapa"],
+                },
+                "AR": {
+                    "label": "Chapa y Pintura",
+                    "aliases": ["chapista", "choque", "bollo", "pintura"],
+                },
                 "UY": {"label": "Chapa y Pintura", "aliases": ["chapeado", "golpe", "pintura"]},
-                "CO": {"label": "Latonería y Pintura", "aliases": ["golpe", "latas", "pintar", "latonería"]},
-                "EC": {"label": "Enderezada y Pintura", "aliases": ["choque", "enderezado", "pintura"]},
-                "PE": {"label": "Desabolladura y Pintura", "aliases": ["pintura", "desabollado", "chapa"]},
-                "VE": {"label": "Desabolladura y Pintura", "aliases": ["pintura", "desabollado", "chapa"]},
-                "US": {"label": "Bodywork & Paint", "aliases": ["paint", "bodywork", "bodyshop", "collision"]},
-                "BR": {"label": "Funilaria e Pintura", "aliases": ["pintura", "funilaria", "bodyshop", "chapa"]},
+                "CO": {
+                    "label": "Latonería y Pintura",
+                    "aliases": ["golpe", "latas", "pintar", "latonería"],
+                },
+                "EC": {
+                    "label": "Enderezada y Pintura",
+                    "aliases": ["choque", "enderezado", "pintura"],
+                },
+                "PE": {
+                    "label": "Desabolladura y Pintura",
+                    "aliases": ["pintura", "desabollado", "chapa"],
+                },
+                "VE": {
+                    "label": "Desabolladura y Pintura",
+                    "aliases": ["pintura", "desabollado", "chapa"],
+                },
+                "US": {
+                    "label": "Bodywork & Paint",
+                    "aliases": ["paint", "bodywork", "bodyshop", "collision"],
+                },
+                "BR": {
+                    "label": "Funilaria e Pintura",
+                    "aliases": ["pintura", "funilaria", "bodyshop", "chapa"],
+                },
             },
             "motor": {
                 "CL": {"label": "Motor y Transmisión", "aliases": ["motor", "transmisión", "caja"]},
@@ -118,32 +180,60 @@ class Command(BaseCommand):
                 "EC": {"label": "Motor y Transmisión", "aliases": ["motor", "transmisión", "caja"]},
                 "PE": {"label": "Motor y Transmisión", "aliases": ["motor", "transmisión", "caja"]},
                 "VE": {"label": "Motor y Transmisión", "aliases": ["motor", "transmisión", "caja"]},
-                "US": {"label": "Engine & Transmission", "aliases": ["engine", "transmission", "gearbox"]},
-                "BR": {"label": "Motor e Transmissão", "aliases": ["motor", "transmissão", "câmbio"]},
+                "US": {
+                    "label": "Engine & Transmission",
+                    "aliases": ["engine", "transmission", "gearbox"],
+                },
+                "BR": {
+                    "label": "Motor e Transmissão",
+                    "aliases": ["motor", "transmissão", "câmbio"],
+                },
             },
             "especialidades": {
-                "CL": {"label": "Servicios Especializados", "aliases": ["especializado", "servicios varios"]},
-                "MX": {"label": "Servicios Especializados", "aliases": ["especializado", "servicios varios"]},
-                "AR": {"label": "Servicios Especializados", "aliases": ["especializado", "servicios varios"]},
+                "CL": {
+                    "label": "Servicios Especializados",
+                    "aliases": ["especializado", "servicios varios"],
+                },
+                "MX": {
+                    "label": "Servicios Especializados",
+                    "aliases": ["especializado", "servicios varios"],
+                },
+                "AR": {
+                    "label": "Servicios Especializados",
+                    "aliases": ["especializado", "servicios varios"],
+                },
                 "UY": {"label": "Servicios Especializados", "aliases": ["especializado"]},
                 "CO": {"label": "Servicios Especializados", "aliases": ["especializado"]},
                 "EC": {"label": "Servicios Especializados", "aliases": ["especializado"]},
                 "PE": {"label": "Servicios Especializados", "aliases": ["especializado"]},
                 "VE": {"label": "Servicios Especializados", "aliases": ["especializado"]},
-                "US": {"label": "Specialized Services", "aliases": ["specialized", "various services"]},
+                "US": {
+                    "label": "Specialized Services",
+                    "aliases": ["specialized", "various services"],
+                },
                 "BR": {"label": "Serviços Especializados", "aliases": ["especializado"]},
             },
         }
 
         # Leer archivo JSON
-        json_full_path = os.path.join(settings.BASE_DIR, json_path) if not os.path.isabs(json_path) else json_path
-        
+        json_full_path = (
+            os.path.join(settings.BASE_DIR, json_path)
+            if not os.path.isabs(json_path)
+            else json_path
+        )
+
         try:
-            with open(json_full_path, 'r', encoding='utf-8') as f:
+            with open(json_full_path, "r", encoding="utf-8") as f:
                 servicios_data = json.load(f)
-            self.stdout.write(self.style.SUCCESS(f"[INFO] Archivo JSON leído: {len(servicios_data)} servicios encontrados"))
+            self.stdout.write(
+                self.style.SUCCESS(
+                    f"[INFO] Archivo JSON leído: {len(servicios_data)} servicios encontrados"
+                )
+            )
         except FileNotFoundError:
-            self.stdout.write(self.style.ERROR(f"[ERROR] No se encontró el archivo {json_full_path}"))
+            self.stdout.write(
+                self.style.ERROR(f"[ERROR] No se encontró el archivo {json_full_path}")
+            )
             return
         except json.JSONDecodeError as e:
             self.stdout.write(self.style.ERROR(f"[ERROR] JSON inválido en {json_full_path}: {e}"))
@@ -160,7 +250,11 @@ class Command(BaseCommand):
             translations = item.get("translations", {})
 
             if not code or not translations:
-                self.stdout.write(self.style.WARNING(f"[WARN] Saltando servicio sin código o traducciones: {item.get('code', 'sin código')}"))
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"[WARN] Saltando servicio sin código o traducciones: {item.get('code', 'sin código')}"
+                    )
+                )
                 continue
 
             # Crear categorías para cada país
@@ -171,7 +265,9 @@ class Command(BaseCommand):
                         if dry_run:
                             # En dry-run, intentamos obtener o simular
                             try:
-                                categoria = CategoriaServicio.objects.get(code=category, country=country)
+                                categoria = CategoriaServicio.objects.get(
+                                    code=category, country=country
+                                )
                             except CategoriaServicio.DoesNotExist:
                                 # Simulamos que existe para dry-run creando un objeto simple
                                 class CategoriaMock:
@@ -179,12 +275,11 @@ class Command(BaseCommand):
                                         self.code = code
                                         self.country = country
                                         self.id = None
+
                                 categoria = CategoriaMock(category, country)
                         else:
                             categoria, created = CategoriaServicio.objects.get_or_create(
-                                code=category,
-                                country=country,
-                                defaults={}
+                                code=category, country=country, defaults={}
                             )
 
                             # Crear nombre de categoría solo si la categoría fue creada o si no existe el nombre
@@ -199,12 +294,16 @@ class Command(BaseCommand):
                                     defaults={
                                         "label": cat_info["label"],
                                         "aliases": cat_info.get("aliases", []),
-                                    }
+                                    },
                                 )
 
                         categorias_por_pais[country] = categoria
                     except Exception as e:
-                        self.stdout.write(self.style.ERROR(f"[ERROR] Error creando categoría {category} para {country}: {e}"))
+                        self.stdout.write(
+                            self.style.ERROR(
+                                f"[ERROR] Error creando categoría {category} para {country}: {e}"
+                            )
+                        )
                         categorias_por_pais[country] = None
 
             # Obtener nombre base (preferir US, luego CL, luego el primero disponible)
@@ -218,20 +317,31 @@ class Command(BaseCommand):
                 nombre_base = translations[first_country].get("label")
 
             if not nombre_base:
-                self.stdout.write(self.style.WARNING(f"[WARN] Saltando servicio {code}: no se encontró nombre base"))
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"[WARN] Saltando servicio {code}: no se encontró nombre base"
+                    )
+                )
                 continue
 
             # Usar la primera categoría disponible como referencia
             primera_categoria = None
             for preferred_country in ["US", "CL"]:
-                if preferred_country in categorias_por_pais and categorias_por_pais[preferred_country]:
+                if (
+                    preferred_country in categorias_por_pais
+                    and categorias_por_pais[preferred_country]
+                ):
                     primera_categoria = categorias_por_pais[preferred_country]
                     break
             if not primera_categoria and categorias_por_pais:
                 primera_categoria = next((c for c in categorias_por_pais.values() if c), None)
 
             if not primera_categoria:
-                self.stdout.write(self.style.WARNING(f"[WARN] No se pudo crear categoría para {category}, saltando servicio {code}"))
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"[WARN] No se pudo crear categoría para {category}, saltando servicio {code}"
+                    )
+                )
                 continue
 
             # Crear o obtener servicio maestro
@@ -244,13 +354,15 @@ class Command(BaseCommand):
                     nombre=nombre_base,
                     empresa_id=MASTER_ID,
                     categoria=primera_categoria,
-                    defaults={}
+                    defaults={},
                 )
 
             if created:
                 servicios_creados += 1
                 if not dry_run:
-                    self.stdout.write(self.style.SUCCESS(f"[OK] Servicio maestro creado: {nombre_base} ({code})"))
+                    self.stdout.write(
+                        self.style.SUCCESS(f"[OK] Servicio maestro creado: {nombre_base} ({code})")
+                    )
             else:
                 servicios_actualizados += 1
 
@@ -293,7 +405,7 @@ class Command(BaseCommand):
                         defaults={
                             "label": label,
                             "aliases": aliases,  # Aliases específicos de la región
-                        }
+                        },
                     )
 
                     if name_created:
@@ -309,9 +421,11 @@ class Command(BaseCommand):
             total_nombres = nombres_creados
 
         self.stdout.write("")
-        self.stdout.write(self.style.SUCCESS("="*70))
-        self.stdout.write(self.style.SUCCESS("[OK] Catálogo maestro cargado desde JSON exitosamente."))
-        self.stdout.write(self.style.SUCCESS("="*70))
+        self.stdout.write(self.style.SUCCESS("=" * 70))
+        self.stdout.write(
+            self.style.SUCCESS("[OK] Catálogo maestro cargado desde JSON exitosamente.")
+        )
+        self.stdout.write(self.style.SUCCESS("=" * 70))
         self.stdout.write(f"[RESUMEN] Resumen:")
         self.stdout.write(f"   - Servicios procesados del JSON: {len(servicios_data)}")
         self.stdout.write(f"   - Servicios creados: {servicios_creados}")
@@ -322,6 +436,9 @@ class Command(BaseCommand):
         self.stdout.write(f"   - Países soportados: {', '.join(paises_config.keys())}")
         self.stdout.write("")
         self.stdout.write(self.style.SUCCESS("[OK] El catálogo está listo para producción."))
-        self.stdout.write(self.style.SUCCESS("   Los usuarios pueden buscar con su jerga local y encontrarán los servicios correctos."))
-        self.stdout.write(self.style.SUCCESS("="*70))
-
+        self.stdout.write(
+            self.style.SUCCESS(
+                "   Los usuarios pueden buscar con su jerga local y encontrarán los servicios correctos."
+            )
+        )
+        self.stdout.write(self.style.SUCCESS("=" * 70))

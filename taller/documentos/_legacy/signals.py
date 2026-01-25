@@ -19,7 +19,7 @@ from taller.models.lineas_documento import (
 )
 
 # Nota: Este signal usa LineaDocumento (legacy) que puede no estar en uso
-# Si el sistema usa LineaRepuesto/LineaServicio/LineaOtroServicio, 
+# Si el sistema usa LineaRepuesto/LineaServicio/LineaOtroServicio,
 # este signal debería adaptarse o desactivarse
 try:
     from .lineas_documento import LineaDocumento
@@ -44,6 +44,7 @@ def _q2(x: Decimal) -> Decimal:
 # Nota: Si el sistema usa LineaRepuesto/LineaServicio/LineaOtroServicio,
 # este signal debería adaptarse o desactivarse completamente
 if LineaDocumento is not None:
+
     @receiver(
         [post_save, post_delete],
         sender=LineaDocumento,

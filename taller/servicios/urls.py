@@ -34,6 +34,12 @@ urlpatterns = [
     path("<int:pk>/eliminar/", views.eliminar_servicio, name="eliminar_servicio"),
     path("otros-servicios/", views.otros_servicios_menu, name="otros_servicios_menu"),
     path("otros-servicios/crear/", views.crear_otro_servicio, name="crear_otro_servicio"),
-    path("otros-servicios/<int:pk>/editar/", views.editar_otro_servicio, name="editar_otro_servicio"),
-    path("otros-servicios/<int:pk>/eliminar/", views.eliminar_otro_servicio, name="eliminar_otro_servicio"),
+    path(
+        "otros-servicios/<int:pk>/editar/", views.editar_otro_servicio, name="editar_otro_servicio"
+    ),
+    path(
+        "otros-servicios/<int:pk>/eliminar/",
+        views.eliminar_otro_servicio,
+        name="eliminar_otro_servicio",
+    ),
 ]

@@ -71,12 +71,14 @@ def autocomplete_servicio(request):
 
     data = []
     for s in qs:
-        data.append({
-            "id": s.pk,
-            "nombre": getattr(s, "nombre", str(s)),
-            "descripcion": getattr(s, "nombre", str(s)),
-            "precio": 0,  # en eGarage el precio del servicio se define en el documento
-        })
+        data.append(
+            {
+                "id": s.pk,
+                "nombre": getattr(s, "nombre", str(s)),
+                "descripcion": getattr(s, "nombre", str(s)),
+                "precio": 0,  # en eGarage el precio del servicio se define en el documento
+            }
+        )
     return JsonResponse(data, safe=False)
 
 
@@ -114,12 +116,14 @@ def autocomplete_repuesto(request):
             or getattr(r, "codigo", None)
             or ""
         )
-        data.append({
-            "id": r.pk,
-            "nombre": nombre,
-            "codigo": codigo,
-            "descripcion": f"{codigo} - {nombre}".strip(" -"),
-        })
+        data.append(
+            {
+                "id": r.pk,
+                "nombre": nombre,
+                "codigo": codigo,
+                "descripcion": f"{codigo} - {nombre}".strip(" -"),
+            }
+        )
     return JsonResponse(data, safe=False)
 
 
@@ -149,13 +153,15 @@ def autocomplete_cliente(request):
 
     results = []
     for c in qs:
-        results.append({
-            "id": c.pk,
-            "text": getattr(c, "nombre", str(c)),
-            "rut": getattr(c, "rut", "") or getattr(c, "ein", ""),
-            "email": getattr(c, "email", ""),
-            "telefono": getattr(c, "telefono", ""),
-        })
+        results.append(
+            {
+                "id": c.pk,
+                "text": getattr(c, "nombre", str(c)),
+                "rut": getattr(c, "rut", "") or getattr(c, "ein", ""),
+                "email": getattr(c, "email", ""),
+                "telefono": getattr(c, "telefono", ""),
+            }
+        )
 
     return JsonResponse({"results": results})
 
@@ -189,15 +195,11 @@ def autocomplete_otro_servicio(request):
 
     data = []
     for x in qs:
-        data.append({
-            "id": x.pk,
-            "nombre": getattr(x, "nombre", str(x)),
-            "empresa_externa": getattr(x, "empresa_externa", ""),
-        })
+        data.append(
+            {
+                "id": x.pk,
+                "nombre": getattr(x, "nombre", str(x)),
+                "empresa_externa": getattr(x, "empresa_externa", ""),
+            }
+        )
     return JsonResponse(data, safe=False)
-
-
-
-
-
-

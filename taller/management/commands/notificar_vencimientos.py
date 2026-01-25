@@ -12,25 +12,25 @@ from taller.utils.email_helper import send_email_with_reply_to
 class Command(BaseCommand):
     """
     Comando para enviar notificaciones de vencimiento de suscripción.
-    
+
     Intervalos de notificación:
     - 7 días antes: Usa campo notificacion_5_dias (reutilizado para "aviso temprano")
     - 3 días antes: Usa campo notificacion_5_dias (mismo campo, evita duplicados)
     - 1 día antes: Usa campo notificacion_1_dia (campo específico)
     - Vencidas (hoy): Usa campo notificacion_vencido (campo específico)
-    
+
     NOTA IMPORTANTE: El campo notificacion_5_dias se reutiliza para 7 y 3 días porque
     el modelo solo tiene 3 campos booleanos. Esta es una decisión de diseño para evitar
     múltiples campos similares. Si se necesita separar, considerar agregar campos específicos.
-    
+
     Optimización de rendimiento:
     - Usa select_related("user") para evitar N+1 queries cuando se accede a empresa.user
     - Filtra empresas activas antes de procesar
-    
+
     Uso:
         python manage.py notificar_vencimientos          # Ejecución normal
         python manage.py notificar_vencimientos --dry-run  # Modo prueba (no envía ni marca)
-    
+
     Ejecutar diariamente con cron:
         0 9 * * * cd /ruta/proyecto && python manage.py notificar_vencimientos
     """
@@ -46,10 +46,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         dry_run = options.get("dry_run", False)
-        
+
         if dry_run:
-            self.stdout.write(self.style.WARNING("[DRY-RUN] Modo de prueba: No se enviaran emails ni se marcaran notificaciones"))
-        
+            self.stdout.write(
+                self.style.WARNING(
+                    "[DRY-RUN] Modo de prueba: No se enviaran emails ni se marcaran notificaciones"
+                )
+            )
+
         self.stdout.write("[INFO] Iniciando verificacion de suscripciones...")
 
         hoy = timezone.now()
@@ -101,12 +105,12 @@ class Command(BaseCommand):
     def enviar_notificacion(self, empresas, dias_restantes, dry_run=False):
         """
         Envía notificación de vencimiento para empresas que vencen en X días.
-        
+
         Args:
             empresas: QuerySet de empresas
             dias_restantes: Número de días restantes hasta vencimiento
             dry_run: Si True, solo simula el envío sin enviar ni marcar
-            
+
         Returns:
             int: Número de notificaciones enviadas/simuladas
         """
@@ -131,17 +135,23 @@ class Command(BaseCommand):
                             )
                         )
                         continue
-                
+
                 # Obtener variables de soporte centralizadas
                 support_email = getattr(settings, "SUPPORT_EMAIL", "support@egarage.cl")
                 support_whatsapp_wa_me = getattr(settings, "SUPPORT_WHATSAPP_WA_ME", "56953574683")
-                support_whatsapp_display = getattr(settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683")
-                
+                support_whatsapp_display = getattr(
+                    settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683"
+                )
+
                 subject = f"[IMPORTANTE] Tu suscripcion a eGarage vence en {dias_restantes} dia{'s' if dias_restantes > 1 else ''}"
-                fecha_venc = empresa.fecha_fin.strftime('%d/%m/%Y') if empresa.fecha_fin else "pronto"
-                plan_display = empresa.get_plan_display() if hasattr(empresa, 'get_plan_display') else 'Activo'
+                fecha_venc = (
+                    empresa.fecha_fin.strftime("%d/%m/%Y") if empresa.fecha_fin else "pronto"
+                )
+                plan_display = (
+                    empresa.get_plan_display() if hasattr(empresa, "get_plan_display") else "Activo"
+                )
                 nombre_usuario = empresa.user.first_name or empresa.user.username
-                
+
                 message = f"""
 Hola {nombre_usuario},
 
@@ -176,7 +186,7 @@ Equipo eGarage
                         recipient_list=[empresa.user.email],
                         fail_silently=False,
                     )
-                    
+
                     # Marcar como notificado para evitar duplicados
                     # NOTA: notificacion_5_dias se usa para avisos tempranos (7 y 3 días)
                     if dias_restantes in [7, 3]:
@@ -185,13 +195,13 @@ Equipo eGarage
                     elif dias_restantes == 1:
                         empresa.notificacion_1_dia = True
                         empresa.save(update_fields=["notificacion_1_dia"])
-                    
+
                     self.stdout.write(
                         self.style.SUCCESS(
                             f"[OK] Email enviado a {empresa.user.email} ({empresa.nombre_taller}) - {dias_restantes} dias restantes"
                         )
                     )
-                
+
                 count += 1
 
             except Exception as e:
@@ -201,15 +211,14 @@ Equipo eGarage
 
         return count
 
-
     def enviar_notificacion_vencido(self, empresas, dry_run=False):
         """
         Envía notificación a empresas cuya suscripción ha vencido hoy.
-        
+
         Args:
             empresas: QuerySet de empresas vencidas
             dry_run: Si True, solo simula el envío sin enviar ni marcar
-            
+
         Returns:
             int: Número de notificaciones enviadas/simuladas
         """
@@ -224,12 +233,14 @@ Equipo eGarage
                         )
                     )
                     continue
-                
+
                 # Obtener variables de soporte centralizadas
                 support_email = getattr(settings, "SUPPORT_EMAIL", "support@egarage.cl")
                 support_whatsapp_wa_me = getattr(settings, "SUPPORT_WHATSAPP_WA_ME", "56953574683")
-                support_whatsapp_display = getattr(settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683")
-                
+                support_whatsapp_display = getattr(
+                    settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683"
+                )
+
                 subject = "[URGENTE] Tu suscripcion a eGarage ha vencido"
                 nombre_usuario = empresa.user.first_name or empresa.user.username
                 message = f"""
@@ -273,17 +284,17 @@ Equipo eGarage
                         recipient_list=[empresa.user.email],
                         fail_silently=False,
                     )
-                    
+
                     # Marcar como notificado para evitar duplicados
                     empresa.notificacion_vencido = True
                     empresa.save(update_fields=["notificacion_vencido"])
-                    
+
                     self.stdout.write(
                         self.style.SUCCESS(
                             f"[OK] Email enviado a {empresa.user.email} ({empresa.nombre_taller}) - SUSCRIPCION VENCIDA"
                         )
                     )
-                
+
                 count += 1
 
             except Exception as e:

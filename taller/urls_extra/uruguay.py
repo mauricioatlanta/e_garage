@@ -95,9 +95,7 @@ urlpatterns = [
     # Login para Uruguay: redirige a /accounts/login/?from=uy (registration/login.html no existe)
     path(
         "login/",
-        lambda r: redirect(
-            "/accounts/login/?from=uy" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/accounts/login/?from=uy" + ("&" + r.GET.urlencode() if r.GET else "")),
         name="account_login",
     ),
     # Signup para Uruguay: redirige a /accounts/signup/?from=uy (preserva ?plan=, etc.)

@@ -9,11 +9,13 @@ try:
     # Importar el módulo (esto ejecuta el código de nivel superior que establece PGSSLMODE)
     import gestion_taller.db_patch
     from gestion_taller.db_patch import patch_postgresql_backend
+
     _PATCH_AVAILABLE = True
 except ImportError:
     # Si el archivo no existe aún, crear función dummy
     def patch_postgresql_backend():
         return False
+
     _PATCH_AVAILABLE = False
 
 from django.core.management.utils import get_random_secret_key
@@ -47,10 +49,15 @@ _db_host = os.getenv("DJANGO_DB_HOST") or os.getenv("DB_HOST", "")
 _is_localhost = False
 if _db_url and ("postgres" in _db_url.lower() or "postgresql" in _db_url.lower()):
     import urllib.parse
+
     try:
         _parsed = urllib.parse.urlparse(_db_url)
         _host = _parsed.hostname or ""
-        if _host.lower() in ("localhost", "127.0.0.1", "::1") or not _host or "localhost" in str(_host).lower():
+        if (
+            _host.lower() in ("localhost", "127.0.0.1", "::1")
+            or not _host
+            or "localhost" in str(_host).lower()
+        ):
             _is_localhost = True
     except Exception:
         pass
@@ -99,7 +106,18 @@ SECRET_KEY = os.getenv("DJANGO_SECRET_KEY", get_random_secret_key())
 # ✅ FIX: usar env_bool (evita errores por "True"/"False")
 DEBUG = env_bool("DJANGO_DEBUG", False)
 
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", ["127.0.0.1", "localhost", "159.223.200.106", "egarage.cl", "www.egarage.cl", "garage.cl", "www.garage.cl"])
+ALLOWED_HOSTS = env_list(
+    "DJANGO_ALLOWED_HOSTS",
+    [
+        "127.0.0.1",
+        "localhost",
+        "159.223.200.106",
+        "egarage.cl",
+        "www.egarage.cl",
+        "garage.cl",
+        "www.garage.cl",
+    ],
+)
 
 # ---------- CSRF / HTTPS ----------
 # 3. Configura los dominios permitidos para evitar errores 403 al loguear
@@ -269,6 +287,7 @@ except ImportError:
             def patched_ready(self):
                 try:
                     from allauth.account.middleware import AccountMiddleware  # noqa: F401
+
                     return original_ready(self)
                 except ImportError:
                     pass
@@ -315,25 +334,27 @@ TEMPLATES = [
 # Base de datos - PostgreSQL si hay DATABASE_URL, SQLite por defecto
 if os.getenv("DATABASE_URL"):
     database_url = os.getenv("DATABASE_URL")
-    
+
     # Si es PostgreSQL y es localhost, agregar sslmode=disable a la URL
     if "postgres" in database_url.lower() or "postgresql" in database_url.lower():
         import urllib.parse
+
         parsed_url = urllib.parse.urlparse(database_url)
-        
+
         # Verificar si es localhost
         hostname = parsed_url.hostname or ""
         is_localhost = hostname.lower() in ("localhost", "127.0.0.1", "::1") or not hostname
-        
+
         if is_localhost:
             # Agregar sslmode=disable a la URL si no está presente
             if "sslmode" not in database_url.lower():
                 separator = "&" if "?" in database_url else "?"
                 database_url = f"{database_url}{separator}sslmode=disable"
-            
+
             # Usar dj_database_url si está disponible, pero forzar sslmode=disable
             try:
                 import dj_database_url
+
                 db_config = dj_database_url.parse(database_url, conn_max_age=600)
                 # Asegurar que OPTIONS tenga sslmode=disable
                 if "OPTIONS" not in db_config:
@@ -350,7 +371,7 @@ if os.getenv("DATABASE_URL"):
                 hostname = "127.0.0.1"  # Forzar IPv4
                 port = parsed_url.port or 5432
                 database = urllib.parse.unquote(parsed_url.path.lstrip("/") or "")
-                
+
                 DATABASES = {
                     "default": {
                         "ENGINE": "django.db.backends.postgresql",
@@ -370,6 +391,7 @@ if os.getenv("DATABASE_URL"):
             # Para hosts remotos, usar dj_database_url normalmente
             try:
                 import dj_database_url
+
                 DATABASES = {"default": dj_database_url.parse(database_url, conn_max_age=600)}
             except ImportError:
                 # Parsear manualmente
@@ -378,7 +400,7 @@ if os.getenv("DATABASE_URL"):
                 hostname = parsed_url.hostname or "127.0.0.1"
                 port = parsed_url.port or 5432
                 database = urllib.parse.unquote(parsed_url.path.lstrip("/") or "")
-                
+
                 DATABASES = {
                     "default": {
                         "ENGINE": "django.db.backends.postgresql",
@@ -394,6 +416,7 @@ if os.getenv("DATABASE_URL"):
         # No es PostgreSQL, usar dj_database_url normalmente
         try:
             import dj_database_url
+
             DATABASES = {"default": dj_database_url.parse(database_url, conn_max_age=600)}
         except ImportError:
             # Fallback a SQLite si no se puede parsear
@@ -405,23 +428,25 @@ if os.getenv("DATABASE_URL"):
             }
 elif os.getenv("DJANGO_DB_NAME") or os.getenv("DB_NAME"):
     # PostgreSQL con configuración desde variables de entorno individuales
-    db_host = os.getenv("DJANGO_DB_HOST") or os.getenv("DB_HOST", "127.0.0.1")  # Default a 127.0.0.1, no localhost
+    db_host = os.getenv("DJANGO_DB_HOST") or os.getenv(
+        "DB_HOST", "127.0.0.1"
+    )  # Default a 127.0.0.1, no localhost
     # CRÍTICO: Forzar IPv4 para localhost (evita problemas con IPv6 y SSL)
     # localhost puede resolverse a ::1 (IPv6) que puede tener problemas con SSL
     # NUNCA usar "localhost" como string, siempre usar "127.0.0.1"
     if db_host.lower() in ("localhost", "::1", "0.0.0.0") or not db_host:
         db_host = "127.0.0.1"
-    
+
     # Determinar si debemos desactivar SSL (para localhost)
     is_localhost = db_host == "127.0.0.1" or db_host.lower() in ("localhost", "127.0.0.1")
-    
+
     # Establecer variable de entorno ANTES de construir la configuración
     # Esto asegura que psycopg2 la use desde el inicio
     if is_localhost:
         os.environ["PGSSLMODE"] = "disable"
         # También establecerlo como variable de entorno de PostgreSQL
         os.environ["PGSSL"] = "0"
-    
+
     # Construir configuración de base de datos
     # CRÍTICO: Siempre usar 127.0.0.1 explícitamente para localhost (nunca "localhost")
     # Esto evita que psycopg2 resuelva a IPv6 (::1) que puede tener problemas con SSL
@@ -433,7 +458,7 @@ elif os.getenv("DJANGO_DB_NAME") or os.getenv("DB_NAME"):
         "HOST": db_host,  # Ya está forzado a 127.0.0.1 si es localhost
         "PORT": os.getenv("DJANGO_DB_PORT") or os.getenv("DB_PORT", "5432"),
     }
-    
+
     # Configurar SSL solo si no es localhost
     # Para localhost, desactivar SSL explícitamente en OPTIONS también
     if is_localhost:
@@ -451,7 +476,7 @@ elif os.getenv("DJANGO_DB_NAME") or os.getenv("DB_NAME"):
             "sslmode": "prefer",  # Preferir SSL pero no requerirlo para hosts remotos
             "client_encoding": "UTF8",
         }
-    
+
     DATABASES = {"default": db_config}
 else:
     # SQLite por defecto
@@ -634,25 +659,25 @@ ADMIN_AUDIT_PHONE = os.getenv("ADMIN_AUDIT_PHONE", "+56963607348")
 if DATABASES.get("default", {}).get("ENGINE") == "django.db.backends.postgresql":
     db_default = DATABASES["default"]
     db_host = db_default.get("HOST", "")
-    
+
     # Si es localhost (127.0.0.1), forzar sslmode=disable en OPTIONS
     if db_host in ("127.0.0.1", "localhost") or not db_host or db_host == "":
         # Forzar HOST a 127.0.0.1 explícitamente (nunca usar "localhost")
         # Esto evita que psycopg2 resuelva a IPv6 (::1)
         db_default["HOST"] = "127.0.0.1"
-        
+
         # Asegurar que OPTIONS existe y tiene sslmode=disable
         if "OPTIONS" not in db_default:
             db_default["OPTIONS"] = {}
-        
+
         # Forzar sslmode=disable explícitamente
         db_default["OPTIONS"]["sslmode"] = "disable"
-        
+
         # También establecer variable de entorno como respaldo
         # Esto se hace ANTES de que psycopg2 sea importado
         os.environ["PGSSLMODE"] = "disable"
         os.environ.setdefault("PGSSL", "0")
-        
+
         # Aplicar monkey patch al backend de PostgreSQL
         # Esto se hace después de que DATABASES está configurado pero ANTES de que Django intente conectarse
         # IMPORTANTE: Aplicar el parche inmediatamente, no esperar a que se cree la conexión
@@ -663,14 +688,21 @@ if DATABASES.get("default", {}).get("ENGINE") == "django.db.backends.postgresql"
                 patch_applied = patch_postgresql_backend()
                 if patch_applied:
                     import logging
+
                     logger = logging.getLogger(__name__)
                     if DEBUG:
                         logger.info("✅ Parche SSL aplicado correctamente para conexiones locales")
                 else:
                     import logging
+
                     logger = logging.getLogger(__name__)
-                    logger.warning("⚠️ No se pudo aplicar parche SSL. Usando configuración OPTIONS estándar.")
+                    logger.warning(
+                        "⚠️ No se pudo aplicar parche SSL. Usando configuración OPTIONS estándar."
+                    )
             except Exception as e:
                 import logging
+
                 logger = logging.getLogger(__name__)
-                logger.warning(f"⚠️ Error al aplicar parche SSL: {e}. Usando configuración OPTIONS estándar.")
+                logger.warning(
+                    f"⚠️ Error al aplicar parche SSL: {e}. Usando configuración OPTIONS estándar."
+                )

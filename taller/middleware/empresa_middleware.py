@@ -25,7 +25,11 @@ class EmpresaMiddleware:
                 request.empresa = getattr(request.user, "empresa", None)
 
                 # Verificar si la suscripción está vencida
-                if request.empresa and getattr(request.empresa, "debe_bloquear", False) and not self.is_exempt_url(request.path):
+                if (
+                    request.empresa
+                    and getattr(request.empresa, "debe_bloquear", False)
+                    and not self.is_exempt_url(request.path)
+                ):
                     return redirect("suspension")
 
             except Exception:
@@ -43,7 +47,7 @@ class EmpresaMiddleware:
             "/accounts/logout/",
             "/accounts/login/",
             "/admin/",
-            "/analytics/",          # dashboard analytics
+            "/analytics/",  # dashboard analytics
             "/static/",
             "/media/",
             "/comprobante-pago/",
@@ -54,7 +58,9 @@ class EmpresaMiddleware:
         # Normaliza /<pais>/<idioma>/... -> /...
         norm = self._strip_country_locale_prefix(path)
 
-        return any(path.startswith(u) for u in exempt_bases) or any(norm.startswith(u) for u in exempt_bases)
+        return any(path.startswith(u) for u in exempt_bases) or any(
+            norm.startswith(u) for u in exempt_bases
+        )
 
     @staticmethod
     def _strip_country_locale_prefix(path: str) -> str:

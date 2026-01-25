@@ -171,15 +171,11 @@ class Command(BaseCommand):
                         self.style.SUCCESS(f"   ✅ Creada marca global: {nombre_normalizado}")
                     )
                 else:
-                    self.stdout.write(
-                        f"   ℹ️  Marca global '{nombre_normalizado}' ya existía"
-                    )
+                    self.stdout.write(f"   ℹ️  Marca global '{nombre_normalizado}' ya existía")
             else:
                 if not existe_global:
                     creadas += 1
-                    self.stdout.write(
-                        f"   [DRY-RUN] Crearía marca global: {nombre_normalizado}"
-                    )
+                    self.stdout.write(f"   [DRY-RUN] Crearía marca global: {nombre_normalizado}")
 
         return creadas
 
@@ -270,9 +266,7 @@ class Command(BaseCommand):
 
             if not marca_global:
                 # Crear marca global si no existe
-                self.stdout.write(
-                    f"\n   🔄 Unificando '{nombre_original}' en marca global..."
-                )
+                self.stdout.write(f"\n   🔄 Unificando '{nombre_original}' en marca global...")
                 if not dry_run:
                     marca_global, created = Marca.objects.get_or_create(
                         country="gl",
@@ -281,15 +275,11 @@ class Command(BaseCommand):
                     )
                     if created:
                         self.stdout.write(
-                            self.style.SUCCESS(
-                                f"      ✅ Creada marca global: {nombre_original}"
-                            )
+                            self.style.SUCCESS(f"      ✅ Creada marca global: {nombre_original}")
                         )
                 else:
                     marca_global = type("obj", (object,), {"id": None, "nombre": nombre_original})()
-                    self.stdout.write(
-                        f"      [DRY-RUN] Crearía marca global: {nombre_original}"
-                    )
+                    self.stdout.write(f"      [DRY-RUN] Crearía marca global: {nombre_original}")
 
             # Actualizar todos los vehículos que usan las marcas regionales
             for marca_regional in marcas_duplicadas:
@@ -301,9 +291,7 @@ class Command(BaseCommand):
                     )
 
                     if not dry_run:
-                        Vehiculo.objects.filter(marca=marca_regional).update(
-                            marca=marca_global
-                        )
+                        Vehiculo.objects.filter(marca=marca_regional).update(marca=marca_global)
 
                 # Eliminar marca regional duplicada
                 self.stdout.write(
@@ -315,4 +303,3 @@ class Command(BaseCommand):
                 unificados += 1
 
         return unificados
-

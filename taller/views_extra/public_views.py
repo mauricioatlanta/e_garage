@@ -20,7 +20,7 @@ def detalle_presupuesto_publico(request, uuid):
     """
     Vista pública para que el cliente vea su presupuesto sin login.
     Protegida por UUID único en la URL.
-    
+
     El context processor 'logo_empresa' automáticamente cargará:
     - LOGO_PERSONALIZADO
     - COLOR_PRIMARIO
@@ -30,18 +30,14 @@ def detalle_presupuesto_publico(request, uuid):
     - COMPANY_BANK
     """
     documento = get_object_or_404(
-        Documento.objects.select_related(
-            "empresa", "cliente", "vehiculo"
-        ).prefetch_related(
-            "lineas_repuesto__repuesto",
-            "lineas_servicio",
-            "lineas_otro_servicio"
+        Documento.objects.select_related("empresa", "cliente", "vehiculo").prefetch_related(
+            "lineas_repuesto__repuesto", "lineas_servicio", "lineas_otro_servicio"
         ),
         uuid=uuid,
         tipo="PRES",  # Solo presupuestos
         estado="EMITIDO",  # Solo documentos emitidos
     )
-    
+
     # Verificar que el documento no esté anulado
     if documento.estado == "ANULADO":
         return render(
@@ -50,29 +46,30 @@ def detalle_presupuesto_publico(request, uuid):
             {"documento": documento},
             status=404,
         )
-    
+
     # Obtener configuración de la empresa para branding
     try:
-        company_settings = CompanySettings.objects.filter(
-            user=documento.empresa.user
-        ).first()
+        company_settings = CompanySettings.objects.filter(user=documento.empresa.user).first()
     except Exception:
         company_settings = None
-    
+
     # Verificar si ya fue aprobado
     ya_aprobado = documento.approved_at is not None
-    
+
     # Generar link de WhatsApp para enviar comprobante de pago
     whatsapp_pago_url = None
-    if documento.cliente.telefono and (documento.estado_pago == "NO_PAGADO" or documento.estado_pago == "PARCIAL"):
+    if documento.cliente.telefono and (
+        documento.estado_pago == "NO_PAGADO" or documento.estado_pago == "PARCIAL"
+    ):
         try:
             from taller.reportes.services.document_output_service import DocumentOutputService
+
             whatsapp_pago_url = DocumentOutputService.generate_whatsapp_link_comprobante(
                 documento, request
             )
         except Exception as e:
             log.debug(f"Error generando link WhatsApp para comprobante: {e}")
-    
+
     context = {
         "documento": documento,
         "company_settings": company_settings,
@@ -81,7 +78,7 @@ def detalle_presupuesto_publico(request, uuid):
         "vehiculo": documento.vehiculo,
         "whatsapp_pago_url": whatsapp_pago_url,
     }
-    
+
     return render(
         request,
         "taller/publico/presupuesto_cliente.html",
@@ -101,7 +98,7 @@ def aprobar_presupuesto(request, uuid):
         tipo="PRES",
         estado="EMITIDO",
     )
-    
+
     # Verificar que no esté ya aprobado
     if documento.approved_at:
         messages.info(
@@ -109,31 +106,31 @@ def aprobar_presupuesto(request, uuid):
             "Este presupuesto ya fue aprobado anteriormente.",
         )
         return redirect("publico:ver_presupuesto", uuid=uuid)
-    
+
     # Guardar aprobación
     documento.approved_at = timezone.now()
     documento.approved_by = f"{documento.cliente.nombre} {documento.cliente.apellido or ''}".strip()
     documento.approved_ip = get_client_ip(request)
     documento.save(update_fields=["approved_at", "approved_by", "approved_ip"])
-    
+
     # Notificar al taller
     try:
         notificar_aprobacion_taller(documento)
     except Exception as e:
         log.error(f"Error notificando aprobación al taller: {e}", exc_info=True)
         # No fallar la aprobación si la notificación falla
-    
+
     messages.success(
         request,
         f"¡Presupuesto aprobado exitosamente! {documento.empresa.nombre_taller} ha sido notificado y comenzará el trabajo.",
     )
-    
+
     return redirect("publico:ver_presupuesto", uuid=uuid)
 
 
 def get_client_ip(request):
     """Obtiene la IP real del cliente"""
-    x_forwarded_for = request.META.get("HTTP_X_FORWARDED_FOR")
+    x_forwarded_for = request.headers.get("x-forwarded-for")
     if x_forwarded_for:
         ip = x_forwarded_for.split(",")[0]
     else:
@@ -148,17 +145,15 @@ def notificar_aprobacion_taller(documento):
     """
     empresa = documento.empresa
     cliente = documento.cliente
-    
+
     # Obtener configuración de notificaciones
     try:
         from taller.models.configuracion_notificacion import ConfiguracionNotificacion
-        
-        config_notif = ConfiguracionNotificacion.objects.filter(
-            empresa=empresa
-        ).first()
+
+        config_notif = ConfiguracionNotificacion.objects.filter(empresa=empresa).first()
     except Exception:
         config_notif = None
-    
+
     # Mensaje de notificación
     mensaje = (
         f"🎉 ¡Presupuesto Aprobado!\n\n"
@@ -168,13 +163,13 @@ def notificar_aprobacion_taller(documento):
         f"Fecha de aprobación: {documento.approved_at.strftime('%d/%m/%Y %H:%M')}\n"
         f"\n¡Es hora de comenzar el trabajo! 🚗✨"
     )
-    
+
     # Enviar email si está configurado
     if config_notif and config_notif.email_activo and empresa.user.email:
         try:
             from django.core.mail import send_mail
             from django.conf import settings
-            
+
             send_mail(
                 subject=f"✅ Presupuesto Aprobado - {documento.numero_documento or documento.numero}",
                 message=mensaje,
@@ -185,16 +180,16 @@ def notificar_aprobacion_taller(documento):
             log.info(f"Email de aprobación enviado a {empresa.user.email}")
         except Exception as e:
             log.error(f"Error enviando email de aprobación: {e}")
-    
+
     # Enviar WhatsApp si está configurado
     if config_notif and config_notif.whatsapp_activo:
         try:
             from taller.utils.notificaciones_suscripcion import enviar_whatsapp_a_numero
-            
+
             telefono_taller = getattr(empresa, "telefono", None) or getattr(
                 config_notif, "whatsapp_numero_business", None
             )
-            
+
             if telefono_taller:
                 enviar_whatsapp_a_numero(
                     telefono=telefono_taller,
@@ -204,11 +199,11 @@ def notificar_aprobacion_taller(documento):
                 log.info(f"WhatsApp de aprobación enviado a {telefono_taller}")
         except Exception as e:
             log.error(f"Error enviando WhatsApp de aprobación: {e}")
-    
+
     # Crear notificación en el sistema (si tienes un modelo de notificaciones)
     try:
         from taller.models.notificacion import Notificacion
-        
+
         Notificacion.objects.create(
             usuario=empresa.user,
             titulo="Presupuesto Aprobado",
@@ -219,4 +214,3 @@ def notificar_aprobacion_taller(documento):
     except Exception:
         # Si no existe el modelo de notificaciones, simplemente ignorar
         pass
-

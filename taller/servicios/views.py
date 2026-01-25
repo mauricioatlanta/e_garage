@@ -774,7 +774,9 @@ def editar_otro_servicio(request, pk):
     from taller.servicios.models import CategoriaServicio, ServicioExterno
     from taller.utils.templates import select_country_lang_template
 
-    servicio = get_object_or_404(ServicioExterno, pk=pk, empresa=getattr(request.user, "empresa", None))
+    servicio = get_object_or_404(
+        ServicioExterno, pk=pk, empresa=getattr(request.user, "empresa", None)
+    )
 
     # Determinar el país basándose en la URL
     country_code = _detectar_pais(request)
@@ -807,7 +809,9 @@ def editar_otro_servicio(request, pk):
             servicio.tiempo_estimado = tiempo_estimado
             servicio.save()
 
-            messages.success(request, f"Servicio externo '{servicio.nombre}' actualizado exitosamente")
+            messages.success(
+                request, f"Servicio externo '{servicio.nombre}' actualizado exitosamente"
+            )
             return redirect("servicios:otros_servicios_menu")
 
         except Exception as e:
@@ -844,7 +848,7 @@ def eliminar_otro_servicio(request, pk):
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
         return redirect("servicios:otros_servicios_menu")
-    
+
     servicio = get_object_or_404(ServicioExterno, pk=pk, empresa=empresa)
     nombre_servicio = servicio.nombre
     servicio.delete()

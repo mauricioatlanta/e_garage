@@ -93,15 +93,11 @@ class NotaInterna(AuditMixin, models.Model):
 
         # Validación de consistencia de empresa
         if self.documento_id and self.documento.empresa_id != self.empresa_id:
-            raise ValidationError(
-                _("El documento debe pertenecer a la misma empresa de la nota")
-            )
+            raise ValidationError(_("El documento debe pertenecer a la misma empresa de la nota"))
         if self.cliente_id and self.cliente.empresa_id != self.empresa_id:
             raise ValidationError(_("El cliente debe pertenecer a la misma empresa de la nota"))
         if self.vehiculo_id and self.vehiculo.empresa_id != self.empresa_id:
-            raise ValidationError(
-                _("El vehículo debe pertenecer a la misma empresa de la nota")
-            )
+            raise ValidationError(_("El vehículo debe pertenecer a la misma empresa de la nota"))
 
     def __str__(self):
         target = self.documento or self.cliente or self.vehiculo
@@ -379,7 +375,9 @@ class SeguimientoPublico(models.Model):
         """Obtiene la URL absoluta del seguimiento público"""
         from django.urls import reverse
 
-        return request.build_absolute_uri(reverse("documentos:seguimiento_publico", args=[self.token]))
+        return request.build_absolute_uri(
+            reverse("documentos:seguimiento_publico", args=[self.token])
+        )
 
     def __str__(self):
         return f"Seguimiento {self.documento.numero_documento} - {self.token[:8]}..."

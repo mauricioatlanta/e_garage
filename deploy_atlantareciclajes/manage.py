@@ -3,6 +3,7 @@ import os
 import sys
 import logging
 
+
 def main():
     # Warning solo en desarrollo
     if os.getenv("EGARAGE_ENV", "dev").lower() != "prod":
@@ -20,6 +21,7 @@ def main():
         ) from exc
 
     execute_from_command_line(sys.argv)
+
 
 if __name__ == "__main__":
     main()

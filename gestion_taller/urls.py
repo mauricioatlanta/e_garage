@@ -264,37 +264,51 @@ urlpatterns = [
     # enlaces de onboarding/bienvenida (ej. /cl/signup/, /ar/signup/) resuelvan en todos los países
     path(
         "cl/signup/",
-        lambda r: redirect("/accounts/signup/?from=cl" + ("&" + r.GET.urlencode() if r.GET else "")),
+        lambda r: redirect(
+            "/accounts/signup/?from=cl" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
         name="signup_redirect_cl",
     ),
     path(
         "ar/signup/",
-        lambda r: redirect("/accounts/signup/?from=ar" + ("&" + r.GET.urlencode() if r.GET else "")),
+        lambda r: redirect(
+            "/accounts/signup/?from=ar" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
         name="signup_redirect_ar",
     ),
     path(
         "ec/signup/",
-        lambda r: redirect("/accounts/signup/?from=ec" + ("&" + r.GET.urlencode() if r.GET else "")),
+        lambda r: redirect(
+            "/accounts/signup/?from=ec" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
         name="signup_redirect_ec",
     ),
     path(
         "co/signup/",
-        lambda r: redirect("/accounts/signup/?from=co" + ("&" + r.GET.urlencode() if r.GET else "")),
+        lambda r: redirect(
+            "/accounts/signup/?from=co" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
         name="signup_redirect_co",
     ),
     path(
         "pe/signup/",
-        lambda r: redirect("/accounts/signup/?from=pe" + ("&" + r.GET.urlencode() if r.GET else "")),
+        lambda r: redirect(
+            "/accounts/signup/?from=pe" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
         name="signup_redirect_pe",
     ),
     path(
         "ve/signup/",
-        lambda r: redirect("/accounts/signup/?from=ve" + ("&" + r.GET.urlencode() if r.GET else "")),
+        lambda r: redirect(
+            "/accounts/signup/?from=ve" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
         name="signup_redirect_ve",
     ),
     path(
         "br/signup/",
-        lambda r: redirect("/accounts/signup/?from=br" + ("&" + r.GET.urlencode() if r.GET else "")),
+        lambda r: redirect(
+            "/accounts/signup/?from=br" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
         name="signup_redirect_br",
     ),
     # Redirects amigables para login
