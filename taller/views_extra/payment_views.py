@@ -41,7 +41,7 @@ def payment_chile(request):
         "referencia": f"eGarage-{request.user.empresa.id}-{plan}",
     }
 
-    return render(request, "suscripcion/pago_chile.html", context)
+    return render(request, "saas/suscripcion/pago_chile.html", context)
 
 
 @login_required
@@ -77,7 +77,7 @@ def payment_mexico(request):
         "referencia": f"eGarage-MX-{request.user.empresa.id}-{plan}",
     }
 
-    return render(request, "suscripcion/pago_mexico.html", context)
+    return render(request, "saas/suscripcion/pago_mexico.html", context)
 
 
 @login_required
@@ -117,7 +117,7 @@ def payment_usa(request):
         "reference": f"eGarage-{request.user.empresa.id}-{plan}",
     }
 
-    return render(request, "suscripcion/pago_usa.html", context)
+    return render(request, "saas/suscripcion/pago_usa.html", context)
 
 
 @login_required
@@ -160,7 +160,7 @@ def subir_comprobante(request):
 
     return render(
         request,
-        "suscripcion/subir_comprobante.html",
+        "saas/suscripcion/subir_comprobante.html",
         {
             "empresa": request.user.empresa,
         },
