@@ -65,6 +65,8 @@ staticfiles/
 
 # backups
 *.BAK_*
+# eGarage local backups (ej. signup.html.bak_20250124_HHmmss)
+*.bak_*
 scripts/deploy_rapido.sh
 # Variantes locales (NO USADA, copias, etc.)
 db.sqlite3.*
