@@ -32,7 +32,7 @@ class SingleUserPerEmpresaMiddleware:
         if request.user.is_authenticated and not self.is_exempt_path(request.path):
             if not self.validate_user_empresa_access(request):
                 logout(request)
-                return render(request, "suscripcion/usuario_existente.html")
+                return render(request, "saas/suscripcion/usuario_existente.html")
 
         response = self.get_response(request)
         return response

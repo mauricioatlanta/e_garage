@@ -56,7 +56,7 @@ def registro(request):
         tipo_registro = request.POST.get("tipo_registro")
 
         if not form.is_valid():
-            return render(request, "suscripcion/registro.html", {"form": form})
+            return render(request, "saas/suscripcion/registro.html", {"form": form})
 
         email = _normaliza_email(form.cleaned_data["email"])
         telefono = form.cleaned_data.get("telefono", "")
@@ -131,7 +131,7 @@ def registro(request):
         except ValueError as e:
             # El servicio maneja validaciones (email duplicado, etc.)
             messages.error(request, str(e))
-            return render(request, "suscripcion/registro.html", {"form": form})
+            return render(request, "saas/suscripcion/registro.html", {"form": form})
         except Exception as e:
             # Error inesperado - el servicio hace rollback automático
             messages.error(
@@ -144,7 +144,7 @@ def registro(request):
 
             logger = logging.getLogger(__name__)
             logger.error(f"[Registro] Error inesperado: {e}", exc_info=True)
-            return render(request, "suscripcion/registro.html", {"form": form})
+            return render(request, "saas/suscripcion/registro.html", {"form": form})
 
             # Para planes pagados, enviar email con instrucciones de pago
             # (Esto se maneja ahora en el RegistrationService)
@@ -152,7 +152,7 @@ def registro(request):
 
     # GET
     form = FormularioRegistro(request=request)
-    return render(request, "suscripcion/registro.html", {"form": form})
+    return render(request, "saas/suscripcion/registro.html", {"form": form})
 
 
 # ⚠️ DEPRECATED: Función de activación con código eliminada
