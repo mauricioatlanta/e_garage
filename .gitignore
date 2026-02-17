@@ -72,3 +72,17 @@ db.sqlite3.*
 
 # local safety backups
 *.bak.*
+
+.env
+.env.*
+venv/
+.venv/
+logs/
+*.log
+*.bak
+*.bak_*
+*.zip
+*.save
+*.save.*
+__pycache__/
+*.pyc
