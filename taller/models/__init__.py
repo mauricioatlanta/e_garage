@@ -23,6 +23,15 @@ from .kilometraje import KilometrajeRegistro
 from .documento import Documento
 from .lineas_documento import LineaServicio, LineaRepuesto, LineaOtroServicio
 
+# Modelos de memoria y seguimiento
+from .memoria_seguimiento import (
+    NotaInterna,
+    EtiquetaInterna,
+    EtiquetaAsignacion,
+    EvidenciaDocumento,
+    SeguimientoPublico,
+)
+
 # Modelos de repuestos
 from .repuesto import Repuesto
 
@@ -32,6 +41,15 @@ from .ubicacion import Estado, Ciudad
 # Modelos de suscripción y pagos
 from .comprobante_pago import ComprobantePago
 from .trial import TrialRegistro
+
+# Modelos legacy / compatibilidad (deben importarse para que Django los registre)
+from .auditoria import LogAuditoria
+from .pago import PagoPendiente
+from .regimen_fiscal import RegimenFiscal
+from .marcas_usa import MarcaVehiculo, ModeloVehiculo
+
+# Modelos de extras de vehículos
+from .extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
 
 __all__ = [
     # Modelos básicos
@@ -50,6 +68,12 @@ __all__ = [
     "LineaServicio",
     "LineaRepuesto",
     "LineaOtroServicio",
+    # Memoria y seguimiento
+    "NotaInterna",
+    "EtiquetaInterna",
+    "EtiquetaAsignacion",
+    "EvidenciaDocumento",
+    "SeguimientoPublico",
     # Repuestos
     "Repuesto",
     # Ubicación
@@ -58,6 +82,16 @@ __all__ = [
     # Suscripción y pagos
     "ComprobantePago",
     "TrialRegistro",
+    # Legacy / compatibilidad
+    "LogAuditoria",
+    "PagoPendiente",
+    "RegimenFiscal",
+    "MarcaVehiculo",
+    "ModeloVehiculo",
+    # Extras de vehículos
+    "CajaVehiculo",
+    "ColorVehiculo",
+    "MotorVehiculo",
 ]
 
 # Intentar importar otros modelos si existen (para compatibilidad)

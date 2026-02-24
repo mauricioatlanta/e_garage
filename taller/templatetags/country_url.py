@@ -1,5 +1,6 @@
 from django import template
 from django.urls import reverse
+from django.urls.exceptions import NoReverseMatch
 
 register = template.Library()
 
@@ -10,9 +11,9 @@ def _country_ns_from_path(path: str) -> str:
     Considera el segmento de idioma si está presente.
     """
     if path.startswith("/us/en/") or path == "/us/en":
-        return "usa_en"
+        return "usa"  # usa_en no existe, usar usa
     elif path.startswith("/us/es/") or path == "/us/es":
-        return "usa_es"
+        return "usa"  # usa_es no existe, usar usa
     elif path.startswith("/us/") or path == "/us":
         return "usa"
     elif path.startswith("/cl/es/") or path == "/cl/es":
@@ -20,6 +21,20 @@ def _country_ns_from_path(path: str) -> str:
     elif path.startswith("/cl/") or path == "/cl":
         return "chile"
     return "chile"
+
+
+def _extract_lang_from_path(path: str) -> str:
+    """
+    Extrae el código de idioma del path si está presente.
+    Retorna 'en' o 'es' si se encuentra, None en caso contrario.
+    """
+    if path.startswith("/us/en/") or path == "/us/en":
+        return "en"
+    elif path.startswith("/us/es/") or path == "/us/es":
+        return "es"
+    elif path.startswith("/cl/es/") or path == "/cl/es":
+        return "es"
+    return None
 
 
 @register.simple_tag(takes_context=True)
@@ -62,7 +77,24 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
     # Convertir args de tuple a lista para evitar problemas con reverse
     args_list = list(args) if args else []
 
-    return reverse(full_name, args=args_list, kwargs=kwargs)
+    # Si estamos en una ruta USA con idioma, intentar pasar lang como parámetro si la URL lo requiere
+    # Primero intentar sin lang, si falla, agregar lang
+    try:
+        return reverse(full_name, args=args_list, kwargs=kwargs)
+    except NoReverseMatch as e:
+        # Si falla con NoReverseMatch y el error menciona 'lang', intentar agregar lang
+        error_msg = str(e).lower()
+        if "lang" in error_msg and request:
+            lang = _extract_lang_from_path(request.path or "/")
+            if lang and "lang" not in kwargs:
+                kwargs_with_lang = {**kwargs, "lang": lang}
+                try:
+                    return reverse(full_name, args=args_list, kwargs=kwargs_with_lang)
+                except NoReverseMatch:
+                    # Si aún falla, re-lanzar el error original
+                    raise e
+        # Si no es un error relacionado con lang, re-lanzar
+        raise
 
 
 @register.simple_tag(takes_context=True)

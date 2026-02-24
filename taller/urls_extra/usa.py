@@ -34,11 +34,21 @@ def usa_login_view(request):
 
 
 def usa_signup_view(request):
-    from allauth.account.views import SignupView
+    from taller.views_extra.custom_signup import CustomSignupView
 
     request.country = "US"
     request.country_code = "US"
-    return SignupView.as_view(template_name="taller/us/en/auth/signup.html")(request)
+    return CustomSignupView.as_view(template_name="taller/us/en/auth/signup.html")(request)
+
+
+def usa_signup_view_es(request):
+    from django.utils.translation import activate
+    from taller.views_extra.custom_signup import CustomSignupView
+
+    request.country = "US"
+    request.country_code = "US"
+    activate("es")
+    return CustomSignupView.as_view(template_name="taller/us/es/auth/signup.html")(request)
 
 
 urlpatterns = [
@@ -94,6 +104,7 @@ urlpatterns = [
     # 3) Auth Allauth para USA (nombres globales a propósito)
     path("login/", usa_login_view, name="account_login"),
     path("signup/", usa_signup_view, name="account_signup"),
+    path("es/signup/", usa_signup_view_es, name="account_signup_es"),
     # 4) Trial y onboarding
     path("activar-trial/", activar_trial, name="activar_trial"),
     path(

@@ -1,1184 +1,885 @@
 {% load i18n static %}
-{% load country_url %}
 <!DOCTYPE html>
-<html lang="{{ LANGUAGE_CODE }}">
+<html lang="es-co">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{% trans "Bienvenido a eGarage Colombia" %}</title>
+  <title>Bienvenido a eGarage Colombia 🇨🇴</title>
 
   <!-- SEO Meta Tags -->
-  <meta name="description" content="{% trans 'Plataforma para talleres: órdenes de trabajo, inventario, portal de clientes, analíticas en Colombia.' %}">
+  <meta name="description" content="Plataforma de gestión para talleres: órdenes de servicio, inventario, portal del cliente y análisis en Colombia.">
   <link rel="canonical" href="{{ request.build_absolute_uri }}">
 
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="{% trans 'eGarage Colombia — Plataforma para Talleres' %}">
-  <meta property="og:description" content="{% trans 'Trabaja más inteligente con documentos digitales, recordatorios y analíticas.' %}">
-  <meta property="og:image" content="{% static 'img/og-cl.png' %}">
+  <meta property="og:title" content="eGarage Colombia — Plataforma para Talleres">
+  <meta property="og:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
+  <meta property="og:image" content="{% static 'img/og-co.png' %}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="eGarage">
 
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="{% trans 'eGarage Colombia — Plataforma para Talleres' %}">
-  <meta name="twitter:description" content="{% trans 'Trabaja más inteligente con documentos digitales, recordatorios y analíticas.' %}">
-  <meta name="twitter:image" content="{% static 'img/og-cl.png' %}">
+  <meta name="twitter:title" content="eGarage Colombia — Plataforma para Talleres">
+  <meta name="twitter:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
+  <meta name="twitter:image" content="{% static 'img/og-co.png' %}">
+  
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
-  <script src="https://cdn.lordicon.com/lordicon.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.globe.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.dots.min.js" defer></script>
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
+  
   <style>
-    /* Definir animate-spin-slow para Tailwind CDN */
-    @keyframes spin {
-      to { transform: rotate(360deg) }
-    }
-    .animate-spin-slow {
-      animation: spin 6s linear infinite;
-    }
-
-    /* Respeta reduce-motion para accesibilidad */
-    @media (prefers-reduced-motion: reduce) {
-      .animate-spin-slow {
-        animation: none !important;
-      }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      /* Fondo estático profesional - Sin animaciones */
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%) !important;
+      background: #000000;
       font-family: 'Exo 2', sans-serif;
       color: #ffffff;
       min-height: 100vh;
       overflow-x: hidden;
+      position: relative;
     }
 
-     /* Tipografías especializadas */
-     .font-futuristic {
-       font-family: 'Orbitron', monospace;
-       letter-spacing: 0.05em;
-     }
+    /* Asegurar que el contenido esté por encima del fondo */
+    body > main,
+    body > section {
+      position: relative;
+      z-index: 1;
+    }
 
-     .font-tech {
-       font-family: 'JetBrains Mono', monospace;
-       letter-spacing: 0.02em;
-     }
+    /* Background animado con colores de Colombia */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(252, 209, 22, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(206, 17, 38, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(0, 56, 147, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #000814 0%, #001d3d 50%, #000814 100%);
+      z-index: -1;
+      animation: bgShift 20s ease-in-out infinite;
+      pointer-events: none;
+    }
 
-     .font-display {
-       font-family: 'Exo 2', sans-serif;
-       font-weight: 300;
-       letter-spacing: 0.03em;
-     }
+    @keyframes bgShift {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.9; }
+    }
 
-     .font-bold-tech {
-       font-family: 'Exo 2', sans-serif;
-       font-weight: 700;
-       letter-spacing: 0.02em;
-     }
+    .font-futuristic {
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 0.05em;
+      font-weight: 700;
+    }
+
+    .font-tech {
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.02em;
+    }
 
     .futuristic-glow {
-      text-shadow: 0 0 30px rgba(34, 211, 238, 0.8);
+      text-shadow: 
+        0 0 20px rgba(252, 209, 22, 0.8),
+        0 0 40px rgba(252, 209, 22, 0.6),
+        0 0 60px rgba(252, 209, 22, 0.4),
+        0 0 80px rgba(206, 17, 38, 0.3);
+      animation: glowPulse 3s ease-in-out infinite;
     }
 
-    .glass-card, .glass {
-      background: linear-gradient(135deg, rgba(34, 211, 238, 0.1) 0%, rgba(96, 165, 250, 0.05) 100%);
-      backdrop-filter: blur(25px);
+    @keyframes glowPulse {
+      0%, 100% {
+        text-shadow: 
+          0 0 20px rgba(252, 209, 22, 0.8),
+          0 0 40px rgba(252, 209, 22, 0.6),
+          0 0 60px rgba(252, 209, 22, 0.4);
+      }
+      50% {
+        text-shadow: 
+          0 0 30px rgba(252, 209, 22, 1),
+          0 0 60px rgba(252, 209, 22, 0.8),
+          0 0 90px rgba(206, 17, 38, 0.6);
+      }
+    }
+
+    .glass-card {
+      background: linear-gradient(
+        135deg, 
+        rgba(252, 209, 22, 0.15) 0%, 
+        rgba(0, 56, 147, 0.1) 50%,
+        rgba(206, 17, 38, 0.08) 100%
+      );
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-radius: 1.5rem;
-      border: 1px solid rgba(34, 211, 238, 0.3);
-      transition: all 0.4s ease;
-      box-shadow:
-        0 8px 32px rgba(34, 211, 238, 0.15),
+      border: 2px solid;
+      border-image: linear-gradient(135deg, 
+        rgba(252, 209, 22, 0.6), 
+        rgba(206, 17, 38, 0.3),
+        rgba(252, 209, 22, 0.6)
+      ) 1;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 4px 16px rgba(252, 209, 22, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
       position: relative;
       overflow: hidden;
     }
 
-    .glass-card::before, .glass::before {
+    .glass-card::before {
       content: '';
       position: absolute;
       top: 0;
       left: -100%;
       width: 100%;
       height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(34, 211, 238, 0.1), transparent);
-      transition: left 0.5s ease;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(252, 209, 22, 0.2),
+        transparent
+      );
+      transition: left 0.5s;
     }
 
-    .glass-card:hover::before, .glass:hover::before {
+    .glass-card:hover::before {
       left: 100%;
     }
 
-    .glass-card:hover, .glass:hover {
-      border-color: rgba(34, 211, 238, 0.8);
-      transform: translateY(-6px) scale(1.02);
-      box-shadow:
-        0 25px 50px rgba(34, 211, 238, 0.3),
-        0 0 0 1px rgba(34, 211, 238, 0.2),
+    .glass-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 10px 30px rgba(252, 209, 22, 0.4),
+        0 0 40px rgba(206, 17, 38, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border-image: linear-gradient(135deg, 
+        rgba(252, 209, 22, 1), 
+        rgba(206, 17, 38, 0.6),
+        rgba(252, 209, 22, 1)
+      ) 1;
     }
 
-    /* Tarjetas especiales con efectos neón */
-    .neon-card {
-      background: linear-gradient(135deg, rgba(34, 211, 238, 0.15) 0%, rgba(96, 165, 250, 0.08) 50%, rgba(167, 139, 250, 0.05) 100%);
-      backdrop-filter: blur(30px);
-      border-radius: 1.5rem;
-      border: 2px solid rgba(34, 211, 238, 0.4);
-      transition: all 0.5s ease;
-      box-shadow:
-        0 10px 40px rgba(34, 211, 238, 0.2),
-        0 0 20px rgba(34, 211, 238, 0.1),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    .btn-primary {
+      background: linear-gradient(135deg, #FCD116 0%, #CE1126 100%);
+      color: #000000;
+      font-weight: 800;
+      padding: 1.2rem 3rem;
+      border-radius: 1.2rem;
+      border: 2px solid rgba(252, 209, 22, 0.8);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 1.1rem;
+      box-shadow: 
+        0 4px 20px rgba(252, 209, 22, 0.4),
+        0 0 40px rgba(206, 17, 38, 0.3);
       position: relative;
       overflow: hidden;
     }
 
-    .neon-card::after {
+    .btn-primary::before {
       content: '';
       position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, #22d3ee, #60a5fa, #a78bfa, #22d3ee);
-      border-radius: 1.5rem;
-      z-index: -1;
-      opacity: 0;
-      transition: opacity 0.5s ease;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
     }
 
-    .neon-card:hover::after {
-      opacity: 0.3;
+    .btn-primary:hover::before {
+      width: 300px;
+      height: 300px;
     }
 
-    .neon-card:hover {
-      border-color: rgba(34, 211, 238, 0.9);
-      transform: translateY(-8px) scale(1.03);
-      box-shadow:
-        0 30px 60px rgba(34, 211, 238, 0.4),
-        0 0 30px rgba(34, 211, 238, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    .btn-primary:hover {
+      transform: scale(1.08) translateY(-2px);
+      box-shadow: 
+        0 8px 40px rgba(252, 209, 22, 0.6),
+        0 0 60px rgba(206, 17, 38, 0.5),
+        0 0 100px rgba(252, 209, 22, 0.3);
+      border-color: rgba(206, 17, 38, 0.8);
     }
 
-    /* Tarjetas de métricas con efecto de pulso */
-    .metric-card {
-      background: linear-gradient(135deg, rgba(34, 211, 238, 0.12) 0%, rgba(96, 165, 250, 0.06) 100%);
-      backdrop-filter: blur(25px);
-      border-radius: 1.5rem;
-      border: 1px solid rgba(34, 211, 238, 0.3);
-      transition: all 0.4s ease;
-      box-shadow:
-        0 8px 32px rgba(34, 211, 238, 0.15),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      position: relative;
-      overflow: hidden;
+    .btn-secondary {
+      background: rgba(252, 209, 22, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #ffffff;
+      font-weight: 700;
+      padding: 1.2rem 3rem;
+      border-radius: 1.2rem;
+      border: 2px solid rgba(252, 209, 22, 0.5);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
     }
 
-    .metric-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: radial-gradient(circle at 50% 50%, rgba(34, 211, 238, 0.1) 0%, transparent 70%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
+    .btn-secondary:hover {
+      background: rgba(252, 209, 22, 0.25);
+      border-color: rgba(252, 209, 22, 0.9);
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 
+        0 8px 30px rgba(252, 209, 22, 0.3),
+        0 0 40px rgba(252, 209, 22, 0.2);
     }
 
-    .metric-card:hover::before {
-      opacity: 1;
-    }
-
-    .metric-card:hover {
-      border-color: rgba(34, 211, 238, 0.7);
-      transform: translateY(-4px);
-      box-shadow:
-        0 20px 40px rgba(34, 211, 238, 0.25),
-        0 0 0 1px rgba(34, 211, 238, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-    }
-
-    .sticky-cta {
-      position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
-      z-index: 50;
+    .hero-section {
+      min-height: 100vh;
       display: flex;
       align-items: center;
-      gap: 0.5rem;
-    }
-
-    @media (max-width: 640px) {
-      .sticky-cta {
-        right: 0.5rem;
-        left: 0.5rem;
-        bottom: 0.5rem;
-        justify-content: center;
-      }
-    }
-
-    .icon-float {
-      transition: transform 0.3s ease;
-      color: #22d3ee;
-      filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.5));
-    }
-
-    .icon-float:hover {
-      transform: scale(1.2);
-      color: #60a5fa;
-      filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.8));
-    }
-
-    /* Grid animada de fondo más visible */
-    .grid-bg {
-      background-image:
-        linear-gradient(rgba(34, 211, 238, 0.15) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(34, 211, 238, 0.15) 1px, transparent 1px);
-      background-size: 40px 40px;
-      animation: grid-move 20s linear infinite;
-    }
-
-    @keyframes grid-move {
-      0% { transform: translate(0, 0); }
-      100% { transform: translate(40px, 40px); }
-    }
-
-    /* Líneas de energía */
-    .energy-lines {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: -1;
-    }
-
-    .energy-line {
-      position: absolute;
-      width: 2px;
-      height: 100px;
-      background: linear-gradient(to bottom, transparent, #22d3ee, transparent);
-      animation: energy-flow 3s linear infinite;
-    }
-
-    @keyframes energy-flow {
-      0% { transform: translateY(-100px); opacity: 0; }
-      50% { opacity: 1; }
-      100% { transform: translateY(100vh); opacity: 0; }
-    }
-
-    /* Partículas flotantes */
-    .particles {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: -1;
-    }
-
-    .particle {
-      position: absolute;
-      width: 4px;
-      height: 4px;
-      background: #22d3ee;
-      border-radius: 50%;
-      animation: particle-float 6s linear infinite;
-    }
-
-    @keyframes particle-float {
-      0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-      10% { opacity: 1; }
-      90% { opacity: 1; }
-      100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-    }
-
-    /* Efecto de escaneo */
-    .scan-line {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(to right, transparent, #22d3ee, transparent);
-      animation: scan 4s linear infinite;
+      justify-content: center;
+      position: relative;
+      padding: 2rem;
       z-index: 1;
     }
 
-    @keyframes scan {
-      0% { transform: translateY(-100vh); }
-      100% { transform: translateY(100vh); }
-    }
-
-    /* Botones con efecto neón */
-    .neon-button {
-      background: linear-gradient(45deg, #22d3ee, #60a5fa);
-      border: 2px solid #22d3ee;
-      box-shadow: 0 0 20px rgba(34, 211, 238, 0.5);
+    .feature-icon {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(135deg, 
+        rgba(252, 209, 22, 0.3) 0%, 
+        rgba(0, 56, 147, 0.2) 50%,
+        rgba(206, 17, 38, 0.2) 100%
+      );
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      margin: 0 auto 1.5rem;
+      border: 2px solid rgba(252, 209, 22, 0.5);
+      box-shadow: 
+        0 8px 32px rgba(252, 209, 22, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
       transition: all 0.3s ease;
     }
 
-    .neon-button:hover {
-      box-shadow: 0 0 30px rgba(34, 211, 238, 0.8);
-      transform: translateY(-2px);
+    .glass-card:hover .feature-icon {
+      transform: scale(1.1) rotateY(360deg);
+      box-shadow: 
+        0 12px 48px rgba(252, 209, 22, 0.4),
+        0 0 40px rgba(206, 17, 38, 0.3);
+      border-color: rgba(252, 209, 22, 0.9);
     }
 
-    /* Títulos con efecto holográfico */
-    .holographic-text {
-      background: linear-gradient(45deg, #22d3ee, #60a5fa, #a78bfa, #22d3ee);
-      background-size: 300% 300%;
+    .stats-number {
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #FCD116 0%, #CE1126 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      animation: holographic 3s ease-in-out infinite;
+      font-family: 'Orbitron', monospace;
+      text-shadow: 0 0 40px rgba(252, 209, 22, 0.5);
+      filter: drop-shadow(0 0 20px rgba(206, 17, 38, 0.3));
+      animation: statsGlow 2s ease-in-out infinite;
     }
 
-    @keyframes holographic {
-      0%, 100% { background-position: 0% 50%; }
-      50% { background-position: 100% 50%; }
+    @keyframes statsGlow {
+      0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(252, 209, 22, 0.4));
+      }
+      50% {
+        filter: drop-shadow(0 0 30px rgba(206, 17, 38, 0.6));
+      }
+    }
+
+    /* Animación de bandeira */
+    @keyframes wave {
+      0%, 100% { 
+        transform: rotate(-5deg) scale(1); 
+      }
+      50% { 
+        transform: rotate(5deg) scale(1.05); 
+      }
+    }
+
+    .flag-animation {
+      animation: wave 2.5s ease-in-out infinite;
+      display: inline-block;
+      filter: drop-shadow(0 0 30px rgba(252, 209, 22, 0.6));
+    }
+
+    /* Grid pattern background mejorado */
+    .grid-bg {
+      background-image: 
+        linear-gradient(rgba(252, 209, 22, 0.08) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(252, 209, 22, 0.08) 2px, transparent 2px),
+        linear-gradient(rgba(252, 209, 22, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(252, 209, 22, 0.03) 1px, transparent 1px);
+      background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+      background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+      position: relative;
+    }
+
+    /* Mejoras de texto */
+    h1, h2, h3 {
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    p, li {
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Contenedor principal con mejor z-index */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Asegurar que el contenido esté visible */
+    main {
+      position: relative;
+      z-index: 10;
+    }
+
+    body > * {
+      position: relative;
+      z-index: 1;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
-  <!-- Header con Login/Registro -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/30">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <!-- Logo -->
-      <div class="flex items-center gap-3">
-        <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="w-8 h-8" style="filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.8));">
-        <span class="text-cyan-400 font-futuristic font-bold text-lg">eGarage</span>
-      </div>
+<body class="grid-bg">
+  <main class="relative z-10">
+  
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container mx-auto max-w-7xl">
+      <div class="text-center" data-aos="fade-up">
+        
+        <!-- Logo -->
+        <div class="mb-8 inline-block">
+          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(252, 209, 22, 0.8));">
+        </div>
 
-      <!-- Navegación -->
-      <nav class="hidden md:flex items-center gap-6">
-        <a href="#pricing" class="text-cyan-300 hover:text-cyan-400 transition-colors font-tech">
-          <span class="lang-en" style="display: none;">Pricing</span><span class="lang-es">Precios</span>
-        </a>
-        <a href="#virtues" class="text-cyan-300 hover:text-cyan-400 transition-colors font-tech">
-          <span class="lang-en" style="display: none;">Features</span><span class="lang-es">Características</span>
-        </a>
-      </nav>
+        <!-- Title -->
+        <h1 class="font-futuristic text-6xl md:text-8xl mb-6 futuristic-glow">
+          eGarage Colombia
+        </h1>
+        
+        <p class="text-2xl md:text-3xl mb-8 font-light" style="color: #e0e0e0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+          La plataforma definitiva para el sector automotriz en Colombia
+        </p>
 
-      <!-- Botones de Acción -->
-      <div class="flex items-center gap-3">
-        <a href="/accounts/login/?country=CO" class="px-4 py-2 text-cyan-400 hover:text-cyan-300 transition-colors font-tech">
-          <span class="lang-en" style="display: none;">Login</span><span class="lang-es">Iniciar sesión</span>
-        </a>
-        <a href="/accounts/signup/?country=CO" class="px-4 py-2 neon-button text-black font-futuristic font-bold rounded-full text-sm">
-          🚀 <span class="lang-en" style="display: none;">Start Free</span><span class="lang-es">Probar Gratis</span>
-        </a>
-        <a href="/co/pricing/" class="px-4 py-2 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white font-futuristic font-bold rounded-full text-sm transition-all">
-          💳 <span class="lang-en" style="display: none;">Subscribe</span><span class="lang-es">Suscribirse</span>
-        </a>
-
-        <!-- Language Selector -->
-        <div class="ml-3">
-          <form id="language-form" action="/i18n/setlang/" method="post" class="inline">
-            {% csrf_token %}
-            <input type="hidden" name="next" value="{{ request.get_full_path }}">
-            <input type="hidden" name="language" id="language-input" value="en">
-            <div class="flex items-center gap-2 bg-black/30 px-3 py-2 rounded-lg border border-cyan-400/30">
-              <button type="button" onclick="submitLanguage('en')" id="lang-en" class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 lang-selector-btn {% if LANGUAGE_CODE == 'en' %}active{% endif %}" style="{% if LANGUAGE_CODE == 'en' %}background: linear-gradient(45deg, #00e6ff, #6366f1); color: white; box-shadow: 0 0 15px rgba(0, 230, 255, 0.5);{% else %}color: #64748b;{% endif %}">
-                🇺🇸
-              </button>
-              <button type="button" onclick="submitLanguage('es')" id="lang-es" class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 lang-selector-btn {% if LANGUAGE_CODE == 'es' %}active{% endif %}" style="{% if LANGUAGE_CODE == 'es' %}background: linear-gradient(45deg, #00e6ff, #6366f1); color: white; box-shadow: 0 0 15px rgba(0, 230, 255, 0.5);{% else %}color: #64748b;{% endif %}">
-                🇪🇸
-              </button>
+        <!-- Tipos de Negocios - Quick Overview -->
+        <div class="mb-16 px-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="glass-card p-6 max-w-5xl mx-auto" style="overflow-x: auto;">
+            <div class="flex flex-wrap gap-3 md:gap-4 justify-center items-center text-center min-w-max md:min-w-0">
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(252, 209, 22, 0.15); color: #FCD116; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(252, 209, 22, 0.3);">
+                <span style="font-size: 1.3rem;">🔧</span>
+                <span class="whitespace-nowrap">Talleres Mecánicos</span>
+              </div>
+              <span style="color: #CE1126; font-size: 1.2rem;" class="hidden md:inline">•</span>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(252, 209, 22, 0.15); color: #FCD116; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(252, 209, 22, 0.3);">
+                <span style="font-size: 1.3rem;">🛞</span>
+                <span class="whitespace-nowrap">Vulcanizaciones</span>
+              </div>
+              <span style="color: #CE1126; font-size: 1.2rem;" class="hidden md:inline">•</span>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(252, 209, 22, 0.15); color: #FCD116; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(252, 209, 22, 0.3);">
+                <span style="font-size: 1.3rem;">⚙️</span>
+                <span class="whitespace-nowrap">Repuestos</span>
+              </div>
+              <span style="color: #CE1126; font-size: 1.2rem;" class="hidden md:inline">•</span>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(252, 209, 22, 0.15); color: #FCD116; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(252, 209, 22, 0.3);">
+                <span style="font-size: 1.3rem;">🔨</span>
+                <span class="whitespace-nowrap">Hojalatería</span>
+              </div>
+              <span style="color: #CE1126; font-size: 1.2rem;" class="hidden md:inline">•</span>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(252, 209, 22, 0.15); color: #FCD116; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(252, 209, 22, 0.3);">
+                <span style="font-size: 1.3rem;">🎨</span>
+                <span class="whitespace-nowrap">Pintura</span>
+              </div>
+              <span style="color: #CE1126; font-size: 1.2rem;" class="hidden lg:inline">•</span>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(252, 209, 22, 0.15); color: #FCD116; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(252, 209, 22, 0.3);">
+                <span style="font-size: 1.3rem;">🔌</span>
+                <span class="whitespace-nowrap">Eléctrica</span>
+              </div>
             </div>
-          </form>
+          </div>
+          <p class="text-center mt-4" style="color: #b0b0b0; font-size: 0.9rem; font-weight: 500;">
+            Y muchos más tipos de negocios automotrices...
+          </p>
+        </div>
+
+        <!-- CTA Buttons -->
+        <div class="flex flex-wrap gap-6 justify-center mb-16">
+          <a href="/co/signup/" class="btn-primary">
+            🚀 Comenzar Gratis
+          </a>
+          <a href="/co/login/" class="btn-secondary">
+            🔐 Ingresar
+          </a>
+          <a href="/co/precios/" class="btn-secondary">
+            💰 Ver Planes
+          </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20" data-aos="fade-up" data-aos-delay="200">
+          <div class="glass-card p-8">
+            <div class="stats-number">600+</div>
+            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Talleres Activos</p>
+          </div>
+          <div class="glass-card p-8">
+            <div class="stats-number">35K+</div>
+            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Órdenes de Servicio</p>
+          </div>
+          <div class="glass-card p-8">
+            <div class="stats-number">$ 6M+</div>
+            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Facturado</p>
+          </div>
         </div>
       </div>
     </div>
-  </header>
+  </section>
 
-  <!-- Fondos animados múltiples - DESACTIVADOS para diseño serio -->
-  <!-- <div id="vanta-globe" class="fixed inset-0 -z-10"></div> -->
-  <!-- <div id="vanta-dots" class="fixed inset-0 -z-20"></div> -->
-  <!-- <div class="grid-bg fixed inset-0 -z-30"></div> -->
+  <!-- Features Section -->
+  <section class="py-20 px-4">
+    <div class="container mx-auto max-w-7xl">
+      
+      <h2 class="font-futuristic text-5xl text-center mb-16 futuristic-glow" data-aos="fade-up">
+        Funcionalidades Poderosas
+      </h2>
 
-  <!-- Líneas de energía - DESACTIVADAS -->
-  <!-- <div class="energy-lines">...</div> -->
-
-  <!-- Partículas flotantes - DESACTIVADAS -->
-  <!-- <div class="particles">...</div> -->
-
-  <!-- Línea de escaneo - DESACTIVADA -->
-  <!-- <div class="scan-line"></div> -->
-
-  <main class="relative z-10">
-    <!-- Hero Section -->
-    <section class="text-center py-24 px-6 relative pt-32" data-aos="fade-up">
-      <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="mx-auto mb-8 w-32 md:w-40" style="filter: drop-shadow(0 0 30px rgba(34, 211, 238, 0.9));">
-
-             <h1 class="text-3xl md:text-6xl font-futuristic font-extrabold tracking-tight
-                  holographic-text mb-6">
-        <span class="lang-en" style="display: none;">The #1 Auto Shop Platform in Colombia</span>
-        <span class="lang-es">La Plataforma #1 para Talleres Mecánicos en Colombia</span>
-       </h1>
-
-             <p class="text-xl text-cyan-300 mb-8 font-tech font-medium">
-        <span class="lang-en" style="display: none;">Trusted by mechanics across Colombia. Real features. Full support. No risk.</span>
-        <span class="lang-es">Confiable para talleres en Bogotá, Medellín, Cali y toda Colombia. Funciones reales. Soporte completo. Sin riesgo.</span>
-       </p>
-
-    </section>
-
-
-    <!-- Sección de Rubros -->
-    <section class="mx-auto max-w-6xl px-4 py-16">
-             <h2 class="text-2xl md:text-4xl font-futuristic font-bold text-cyan-400 mb-8 text-center holographic-text">
-        <span class="lang-en" style="display: none;">Sectors We Empower</span><span class="lang-es">Sectores que Potenciamos en Colombia</span>
-       </h2>
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-                 <!-- Taller Mecánico -->
-         <article class="neon-card p-6" data-aos="fade-up">
-           <div class="text-4xl mb-4">🔧</div>
-           <h3 class="text-lg font-bold-tech text-white mb-3">
-             <span class="lang-en" style="display: none;">Auto Repair Shop</span><span class="lang-es">Taller Mecánico</span>
-           </h3>
-           <p class="text-sm font-tech text-cyan-200">
-             <span class="lang-en" style="display: none;">Work orders, reception checklists, technician times and performance tracking.</span>
-             <span class="lang-es">Órdenes de trabajo, listas de recepción, tiempos de técnico y seguimiento de desempeño. Ideal para talleres en Bogotá, Medellín y toda Colombia.</span>
-           </p>
-         </article>
-         <!-- Vulcanización / Neumáticos -->
-         <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="100">
-           <div class="text-4xl mb-4">🛞</div>
-           <h3 class="text-lg font-bold-tech text-white mb-3">
-             <span class="lang-en" style="display: none;">Tire & Vulcanization</span><span class="lang-es">Neumáticos y Vulcanización</span>
-           </h3>
-           <p class="text-sm font-tech text-cyan-200">
-             <span class="lang-en" style="display: none;">Rotation, balancing, tire set history, stock alerts and quick quotes.</span>
-             <span class="lang-es">Rotación, balanceo, historial de juegos de llantas, alertas de inventario y cotizaciones rápidas. Perfecto para vulcanizadoras colombianas.</span>
-           </p>
-         </article>
-         <!-- Pintura y Hojalatería -->
-         <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="200">
-           <div class="text-4xl mb-4">🎨</div>
-           <h3 class="text-lg font-bold-tech text-white mb-3">
-             <span class="lang-en" style="display: none;">Paint & Body Shop</span><span class="lang-es">Taller de Pintura y Carrocería</span>
-           </h3>
-           <p class="text-sm font-tech text-cyan-200">
-             <span class="lang-en" style="display: none;">Process stages, materials per job, before/after photos and estimates.</span>
-             <span class="lang-es">Etapas de proceso, materiales por trabajo, fotos antes/después y presupuestos.</span>
-           </p>
-         </article>
-         <!-- Casa de Repuestos -->
-         <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="300">
-           <div class="text-4xl mb-4">🧩</div>
-           <h3 class="text-lg font-bold-tech text-white mb-3">
-             <span class="lang-en" style="display: none;">Parts Store</span><span class="lang-es">Repuestería</span>
-           </h3>
-           <p class="text-sm font-tech text-cyan-200">
-             <span class="lang-en" style="display: none;">Catalog, part numbers, margins, sales and digital document integration.</span>
-             <span class="lang-es">Catálogo de repuestos, números de parte, márgenes, ventas e integración de documentos digitales. Esencial para repuesterías colombianas.</span>
-           </p>
-         </article>
-      </div>
-    </section>
-
-    <!-- Virtudes agrupadas -->
-    <section class="max-w-5xl mx-auto py-20 px-4 grid md:grid-cols-3 gap-12" id="virtues">
-             <!-- Gestión -->
-       <div data-aos="fade-right">
-         <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-6 holographic-text"><span class="lang-en" style="display: none;">Management</span><span class="lang-es">Gestión</span></h2>
-        <div class="glass-card p-6 mb-6 flex flex-col items-center">
-          <i class="fas fa-shield-alt text-5xl mb-4 icon-float"></i>
-                     <h3 class="text-2xl font-bold-tech mb-2 text-white"><span class="lang-en" style="display: none;">Warranty Control</span><span class="lang-es">Control de Garantías</span></h3>
-           <p class="text-lg font-tech text-cyan-200"><span class="lang-en" style="display: none;">Track guarantees by time or mileage with alerts and digital records.</span><span class="lang-es">Rastrea garantías por tiempo o kilometraje con alertas y registros digitales.</span></p>
-        </div>
-        <div class="glass-card p-6 flex flex-col items-center">
-          <i class="fas fa-chart-line text-5xl mb-4 icon-float"></i>
-                     <h3 class="text-2xl font-bold-tech mb-2 text-white"><span class="lang-en" style="display: none;">Profit Reports</span><span class="lang-es">Reportes de Rentabilidad</span></h3>
-           <p class="text-lg font-tech text-cyan-200"><span class="lang-en" style="display: none;">Know your earnings from services, parts, or both — in real time.</span><span class="lang-es">Conoce tus ganancias de servicios, repuestos o ambos — en tiempo real.</span></p>
-        </div>
-      </div>
-             <!-- Automatización -->
-       <div data-aos="fade-up">
-         <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-6 holographic-text"><span class="lang-en" style="display: none;">Automation</span><span class="lang-es">Automatización</span></h2>
-        <div class="glass-card p-6 mb-6 flex flex-col items-center">
-          <i class="fas fa-user-cog text-5xl mb-4 icon-float"></i>
-                     <h3 class="text-2xl font-bold-tech mb-2 text-white"><span class="lang-en" style="display: none;">Mechanic Performance</span><span class="lang-es">Desempeño del Mecánico</span></h3>
-           <p class="text-lg font-tech text-cyan-200"><span class="lang-en" style="display: none;">Measure performance, job times and track top performers.</span><span class="lang-es">Mide desempeño, tiempos de trabajo y rastrea a los mejores.</span></p>
-        </div>
-        <div class="glass-card p-6 flex flex-col items-center">
-          <i class="fas fa-boxes text-5xl mb-4 icon-float"></i>
-                     <h3 class="text-2xl font-bold-tech mb-2 text-white"><span class="lang-en" style="display: none;">Inventory Alerts</span><span class="lang-es">Alertas de Inventario</span></h3>
-           <p class="text-lg font-tech text-cyan-200"><span class="lang-en" style="display: none;">Get notified when stock is low or inactive.</span><span class="lang-es">Recibe notificaciones cuando el stock está bajo o inactivo.</span></p>
-        </div>
-      </div>
-             <!-- Cliente -->
-       <div data-aos="fade-left">
-         <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-6 holographic-text"><span class="lang-en" style="display: none;">Client</span><span class="lang-es">Cliente</span></h2>
-        <div class="glass-card p-6 mb-6 flex flex-col items-center">
-          <i class="fas fa-file-signature text-5xl mb-4 icon-float"></i>
-                     <h3 class="text-2xl font-bold-tech mb-2 text-white"><span class="lang-en" style="display: none;">Digital Documents</span><span class="lang-es">Documentos Digitales</span></h3>
-           <p class="text-lg font-tech text-cyan-200"><span class="lang-en" style="display: none;">Paperless work orders, check-ins, diagnostics and receipts.</span><span class="lang-es">Órdenes de trabajo, recepciones, diagnósticos y recibos sin papel.</span></p>
-        </div>
-        <div class="glass-card p-6 flex flex-col items-center">
-          <i class="fas fa-users text-5xl mb-4 icon-float"></i>
-                     <h3 class="text-2xl font-bold-tech mb-2 text-white"><span class="lang-en" style="display: none;">Customer Portal</span><span class="lang-es">Portal del Cliente</span></h3>
-           <p class="text-lg font-tech text-cyan-200"><span class="lang-en" style="display: none;">Clients can view invoices, service history and updates online.</span><span class="lang-es">Los clientes pueden ver facturas, historial de servicios y actualizaciones en línea.</span></p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Layout tipo revista scroll alterno -->
-    <section class="max-w-6xl mx-auto py-20 px-4 flex flex-col gap-24">
-      <div class="flex flex-col md:flex-row items-center gap-12" data-aos="fade-right">
-        <div class="flex-1">
-                     <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text"><span class="lang-en" style="display: none;">All-in-one Dashboard</span><span class="lang-es">Panel Todo-en-Uno</span></h2>
-           <p class="text-lg font-tech text-cyan-200"><span class="lang-en" style="display: none;">Everything you need in one place: jobs, inventory, clients, and more.</span><span class="lang-es">Todo lo que necesitas en un lugar: trabajos, inventario, clientes y más.</span></p>
-        </div>
-        <div class="flex-1 flex justify-center">
-          <i class="fas fa-tachometer-alt text-7xl text-cyan-400 icon-float"></i>
-        </div>
-      </div>
-      <div class="flex flex-col items-center text-center" data-aos="fade-up">
-                 <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text"><span class="lang-en" style="display: none;">Automated Reminders</span><span class="lang-es">Recordatorios Automatizados</span></h2>
-         <i class="fas fa-bell text-6xl text-cyan-400 mb-4 icon-float"></i>
-         <p class="text-lg font-tech text-cyan-200 max-w-2xl"><span class="lang-en" style="display: none;">Never miss a service or follow-up. Automated notifications for you and your clients.</span><span class="lang-es">Nunca pierdas un servicio o seguimiento. Notificaciones automáticas para ti y tus clientes.</span></p>
-      </div>
-      <div class="relative" data-aos="fade-left">
-        <div class="absolute left-0 top-1/2 w-2 h-64 bg-gradient-to-b from-cyan-400 to-blue-500 rounded-full -translate-y-1/2"></div>
-        <div class="ml-12">
-                     <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text"><span class="lang-en" style="display: none;">Timeline of Success</span><span class="lang-es">Línea de Tiempo del Éxito</span></h2>
-          <ul class="space-y-6">
-            <li class="flex items-center gap-4">
-              <span class="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-black font-bold">1</span>
-              <span class="text-lg text-cyan-200"><span class="lang-en" style="display: none;">Register your shop in minutes</span><span class="lang-es">Registra tu taller en minutos</span></span>
-            </li>
-            <li class="flex items-center gap-4">
-              <span class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-black font-bold">2</span>
-              <span class="text-lg text-cyan-200"><span class="lang-en" style="display: none;">Import your clients and inventory</span><span class="lang-es">Importa tus clientes e inventario</span></span>
-            </li>
-            <li class="flex items-center gap-4">
-              <span class="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-black font-bold">3</span>
-              <span class="text-lg text-cyan-200"><span class="lang-en" style="display: none;">Start working smarter, not harder!</span><span class="lang-es">¡Comienza a trabajar más inteligente, no más duro!</span></span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="w-full py-16 flex flex-col items-center justify-center glass-card" data-aos="fade-up">
-                 <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text"><span class="lang-en" style="display: none;">Real-time Analytics</span><span class="lang-es">Analíticas en Tiempo Real</span></h2>
-         <i class="fas fa-chart-pie text-6xl text-cyan-400 mb-4 icon-float"></i>
-         <p class="text-lg font-tech text-cyan-200 max-w-2xl"><span class="lang-en" style="display: none;">Visualize your business growth and make data-driven decisions instantly.</span><span class="lang-es">Visualiza el crecimiento de tu negocio y toma decisiones basadas en datos al instante.</span></p>
-      </div>
-    </section>
-
-    <!-- Precios actualizados sin decimales -->
-    <section id="pricing" class="mx-auto max-w-6xl px-4 py-20">
-             <h2 class="text-2xl md:text-4xl font-futuristic font-bold text-cyan-400 text-center mb-10 holographic-text">
-         Simple Plans, No Fine Print
-       </h2>
-
-      <div class="grid gap-6 md:grid-cols-3">
-        <!-- Mensual -->
-        <div class="neon-card p-8" data-aos="fade-up">
-                     <h3 class="text-white text-xl font-bold-tech mb-4"><span class="lang-en" style="display: none;">Monthly</span><span class="lang-es">Mensual</span></h3>
-           <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$80.000</p>
-           <p class="text-cyan-300 mb-6 font-tech"><span class="lang-en" style="display: none;">per month</span><span class="lang-es">COP por mes</span></p>
-          <ul class="space-y-2 text-cyan-200 text-sm mb-8">
-            <li>✓ Unlimited users</li>
-            <li>✓ Digital documents</li>
-            <li>✓ Bilingual support</li>
-          </ul>
-          <a href="/accounts/signup/?country=CO" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3" aria-label="{% trans 'Start monthly plan' %}">
-            {% trans "Start" %}
-          </a>
-        </div>
-
-        <!-- Semestral -->
-        <div class="neon-card p-8" data-aos="fade-up" data-aos-delay="100" style="border-color: rgba(34, 211, 238, 0.8); box-shadow: 0 0 40px rgba(34, 211, 238, 0.3);">
-          <div class="inline-block text-xs px-3 py-1 rounded-full bg-cyan-400/30 text-cyan-300 border border-cyan-300/50 mb-4">
-            ⭐ Recommended
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Feature 1 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-icon">
+            📋
           </div>
-                     <h3 class="text-white text-xl font-bold-tech mb-4"><span class="lang-en" style="display: none;">Semi-Annual</span><span class="lang-es">Semestral</span></h3>
-           <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$440.000</p>
-           <p class="text-cyan-300 mb-6 font-tech"><span class="lang-en" style="display: none;">every 6 months</span><span class="lang-es">COP cada 6 meses</span></p>
-          <ul class="space-y-2 text-cyan-200 text-sm mb-8">
-            <li>✓ Everything from Monthly plan</li>
-            <li>✓ Automatic reminders</li>
-            <li>✓ Profit reports</li>
-          </ul>
-          <a href="/accounts/signup/?country=CO" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3" aria-label="{% trans 'Choose semi-annual plan' %}">
-            {% trans "Choose Semi-Annual" %}
-          </a>
-        </div>
-
-        <!-- Anual -->
-        <div class="neon-card p-8" data-aos="fade-up" data-aos-delay="200">
-                     <h3 class="text-white text-xl font-bold-tech mb-4"><span class="lang-en" style="display: none;">Annual</span><span class="lang-es">Anual</span></h3>
-           <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$800.000</p>
-           <p class="text-cyan-300 mb-6 font-tech"><span class="lang-en" style="display: none;">per year</span><span class="lang-es">COP por año</span></p>
-          <ul class="space-y-2 text-cyan-200 text-sm mb-8">
-            <li>✓ Everything from Semi-Annual plan</li>
-            <li>✓ Volume discounts</li>
-            <li>✓ Priority support</li>
-          </ul>
-          <a href="/accounts/signup/?country=CO" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-black font-semibold py-3" aria-label="{% trans 'Choose annual plan' %}">
-            {% trans "Choose Annual" %}
-          </a>
-        </div>
-      </div>
-    </section>
-
-    <!-- Testimonios modernos -->
-    <section class="mx-auto max-w-6xl px-4 py-20">
-             <h2 class="text-2xl md:text-4xl font-futuristic font-bold text-cyan-400 text-center mb-10 holographic-text">
-         Real Stories from Real Shops
-       </h2>
-
-      <!-- Métricas arriba -->
-      <div class="grid gap-4 md:grid-cols-3 mb-10">
-        <div class="metric-card p-6 text-center" data-aos="fade-up">
-          <div class="text-3xl font-extrabold text-white mb-2">+38%</div>
-          <div class="text-cyan-200 text-sm"><span class="lang-en" style="display: none;">Higher average revenue</span><span class="lang-es">Mayor ingreso promedio</span></div>
-        </div>
-        <div class="metric-card p-6 text-center" data-aos="fade-up" data-aos-delay="100">
-          <div class="text-3xl font-extrabold text-white mb-2">-27%</div>
-          <div class="text-cyan-200 text-sm"><span class="lang-en" style="display: none;">Less time in reception</span><span class="lang-es">Menos tiempo en recepción</span></div>
-        </div>
-        <div class="metric-card p-6 text-center" data-aos="fade-up" data-aos-delay="200">
-          <div class="text-3xl font-extrabold text-white mb-2">4.9/5</div>
-          <div class="text-cyan-200 text-sm"><span class="lang-en" style="display: none;">Customer satisfaction</span><span class="lang-es">Satisfacción del cliente</span></div>
-        </div>
-      </div>
-
-      <!-- Cards -->
-      <div class="grid gap-6 md:grid-cols-3">
-        <article class="neon-card p-6" data-aos="fade-up">
-          <div class="flex items-center gap-3 mb-4">
-            <img class="h-10 w-10 rounded-full" src="https://dummyimage.com/80x80/1e293b/ffffff&text=CM" alt="">
-                         <div>
-               <div class="text-white font-bold-tech">Taller Mecánico Central</div>
-               <div class="text-cyan-300 text-sm font-tech">Bogotá, Colombia</div>
-             </div>
-          </div>
-          <p class="text-cyan-200">
-            <span class="lang-en" style="display: none;">"This software changed how we work; now everything is tracked and we get paid faster."</span><span class="lang-es">"Este software transformó nuestro taller. Ahora todo está organizado y cobramos más rápido. Los clientes están encantados con los documentos digitales."</span>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Órdenes de Servicio</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Crea, gestiona y rastrea órdenes de servicio digitales con firma electrónica e historial completo.
           </p>
-        </article>
-        <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="100">
-          <div class="flex items-center gap-3 mb-4">
-            <img class="h-10 w-10 rounded-full" src="https://dummyimage.com/80x80/1e293b/ffffff&text=RP" alt="">
-                         <div>
-               <div class="text-white font-bold-tech">Repuestos y Servicios Pro</div>
-               <div class="text-cyan-300 text-sm font-tech">Medellín, Colombia</div>
-             </div>
-          </div>
-          <p class="text-cyan-200">
-            <span class="lang-en" style="display: none;">"Bilingual support and quick migration. Perfect for growing shops."</span><span class="lang-es">"El soporte es excelente y la migración fue muy rápida. Perfecto para talleres que quieren crecer profesionalmente."</span>
-          </p>
-        </article>
-        <article class="neon-card p-6" data-aos="fade-up" data-aos-delay="200">
-          <div class="flex items-center gap-3 mb-4">
-            <img class="h-10 w-10 rounded-full" src="https://dummyimage.com/80x80/1e293b/ffffff&text=SG" alt="">
-                         <div>
-               <div class="text-white font-bold-tech">Taller Express Cali</div>
-               <div class="text-cyan-300 text-sm font-tech">Cali, Colombia</div>
-             </div>
-          </div>
-          <p class="text-cyan-200">
-            <span class="lang-en" style="display: none;">"The free trial convinced us. Now everything is digital and customers notice."</span><span class="lang-es">"La prueba gratuita nos convenció completamente. Ahora todo es digital, nuestros clientes lo notan y nos recomiendan más."</span>
-          </p>
-        </article>
-      </div>
-    </section>
+        </div>
 
-    <!-- CTA Final Supernova -->
-    <section id="cta" class="w-full min-h-[60vh] flex flex-col items-center justify-center py-32 relative" data-aos="zoom-in">
-             <h2 class="text-5xl text-cyan-400 font-futuristic font-bold text-center mb-8 holographic-text">
-         <span class="lang-en" style="display: none;">Ready to upgrade your workshop into a smart force?</span><span class="lang-es">¿Listo para modernizar tu taller y hacerlo más competitivo?</span>
-       </h2>
-      <div class="flex flex-col sm:flex-row gap-4 mt-8">
-        <a href="/accounts/signup/?country=CO" class="px-10 py-4 neon-button text-black text-xl font-bold rounded-2xl">
-          🚀 <span class="lang-en" style="display: none;">Start Free Today</span><span class="lang-es">Comienza Gratis Hoy</span>
-        </a>
-        <a href="/co/pricing/" class="px-10 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-500 hover:to-emerald-500 text-white text-xl font-bold rounded-2xl transition-all shadow-lg hover:shadow-green-500/50">
-          💳 <span class="lang-en" style="display: none;">View Plans</span><span class="lang-es">Ver Planes</span>
-        </a>
-      </div>
-    </section>
+        <!-- Feature 2 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-icon">
+            📊
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Análisis Avanzados</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Dashboards inteligentes con métricas de desempeño, facturación y productividad en tiempo real.
+          </p>
+        </div>
 
-    <footer class="mt-20 text-center text-cyan-300 text-sm pb-10">
-      <p>
-        &copy; 2025 eGarage Colombia. 
-        <span class="lang-en" style="display: none;">Built with AI for mechanics</span><span class="lang-es">Hecho con tecnología de punta para talleres colombianos</span>
+        <!-- Feature 3 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="300">
+          <div class="feature-icon">
+            🚗
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Gestión de Vehículos</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Registro completo de vehículos con historial de mantenimientos, repuestos y servicios realizados.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="400">
+          <div class="feature-icon">
+            👥
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Portal del Cliente</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Tus clientes siguen el estado de los servicios en tiempo real a través de un portal exclusivo.
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="500">
+          <div class="feature-icon">
+            💰
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Cálculo de IVA</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Cálculo automático del Impuesto al Valor Agregado (IVA 19%) para documentos fiscales.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="600">
+          <div class="feature-icon">
+            🔔
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Recordatorios Automáticos</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Notificaciones automáticas para clientes sobre revisiones, cambios de aceite y mantenimientos preventivos.
+          </p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Tipos de Negocios Section -->
+  <section class="py-20 px-4">
+    <div class="container mx-auto max-w-7xl">
+      
+      <h2 class="font-futuristic text-5xl text-center mb-8 futuristic-glow" data-aos="fade-up">
+        Hecho para Todos los Negocios Automotrices
+      </h2>
+      
+      <p class="text-xl text-center mb-16" data-aos="fade-up" data-aos-delay="100" style="color: #d0d0d0; font-weight: 500;">
+        No importa el tipo de servicio automotriz, eGarage es perfecto para ti
       </p>
-    </footer>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Talleres Mecánicos -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-icon">
+            🔧
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Talleres Mecánicos</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Gestión completa de órdenes de servicio, diagnósticos, revisiones y mantenimientos preventivos y correctivos.
+          </p>
+        </div>
+
+        <!-- Vulcanizaciones -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="150">
+          <div class="feature-icon">
+            🛞
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Vulcanizaciones</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Control de neumáticos, rotación, balanceo, alineación y stock de neumáticos nuevos y recauchutados.
+          </p>
+        </div>
+
+        <!-- Repuestos -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-icon">
+            ⚙️
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Lojas de Repuestos</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Gestión de inventario, ventas, catálogo de repuestos, proveedores y control de entrada y salida.
+          </p>
+        </div>
+
+        <!-- Hojalatería -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="250">
+          <div class="feature-icon">
+            🔨
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Hojalatería y Latonería</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Control de reparaciones, abolladuras, soldaduras y restauración de carrocerías y estructuras.
+          </p>
+        </div>
+
+        <!-- Pintura -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="300">
+          <div class="feature-icon">
+            🎨
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Pintura y Detallado</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Gestión de servicios de pintura, pulido, vitrificado y acabados especiales.
+          </p>
+        </div>
+
+        <!-- Centro Automotriz -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="350">
+          <div class="feature-icon">
+            🚗
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Centro Automotriz</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Solución completa para centros que ofrecen múltiples servicios: mecánica, alineación, balanceo y más.
+          </p>
+        </div>
+
+        <!-- Taller de Suspensión -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="400">
+          <div class="feature-icon">
+            ⚡
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Suspensión y Amortiguadores</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Especializado en sistemas de suspensión, amortiguadores, resortes y kits de suspensión.
+          </p>
+        </div>
+
+        <!-- Mecánica Diesel -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="450">
+          <div class="feature-icon">
+            🚛
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Mecánica Diesel</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Gestión especializada para talleres de vehículos pesados, camiones y motores diesel.
+          </p>
+        </div>
+
+        <!-- Eléctrica Automotriz -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="500">
+          <div class="feature-icon">
+            🔌
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Eléctrica Automotriz</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Control de servicios eléctricos, inyección electrónica, batería, alternador y sistemas electrónicos.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Call to Action -->
+      <div class="text-center mt-16" data-aos="fade-up" data-aos-delay="550">
+        <div class="glass-card p-8 inline-block">
+          <h3 class="text-2xl font-bold mb-4" style="color: #CE1126; text-shadow: 0 0 20px rgba(206, 17, 38, 0.4);">
+            ¡Y mucho más!
+          </h3>
+          <p style="color: #d0d0d0; font-size: 1.1rem; font-weight: 500; max-width: 600px; margin: 0 auto;">
+            Sea cual sea tu negocio en el sector automotriz, <span style="color: #FCD116; font-weight: 700;">eGarage se adapta</span> a tus necesidades específicas.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Colombia-specific Section -->
+  <section class="py-20 px-4 bg-gradient-to-b from-transparent to-black">
+    <div class="container mx-auto max-w-5xl text-center">
+      
+      <h2 class="font-futuristic text-5xl mb-8 futuristic-glow" data-aos="fade-up">
+        Hecho para Colombia 🇨🇴
+      </h2>
+      
+      <p class="text-xl mb-12" data-aos="fade-up" data-aos-delay="100" style="color: #d0d0d0; font-weight: 500;">
+        Entendemos las necesidades específicas de los talleres colombianos
+      </p>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+        
+        <div class="glass-card p-6" data-aos="fade-up">
+          <h3 class="text-2xl font-bold mb-4" style="color: #CE1126;">✅ Conformidad Fiscal</h3>
+          <ul class="space-y-2" style="color: #d0d0d0; font-size: 1.05rem;">
+            <li>• Cálculo automático de IVA (19%)</li>
+            <li>• Facturas electrónicas</li>
+            <li>• Control de impuestos</li>
+            <li>• Integración con contabilidad</li>
+          </ul>
+        </div>
+
+        <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="100">
+          <h3 class="text-2xl font-bold mb-4" style="color: #CE1126;">📱 Mobile First</h3>
+          <ul class="space-y-2" style="color: #d0d0d0; font-size: 1.05rem;">
+            <li>• Interfaz optimizada para móviles</li>
+            <li>• Funciona sin conexión</li>
+            <li>• App nativa (próximamente)</li>
+            <li>• Sincronización automática</li>
+          </ul>
+        </div>
+
+        <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="200">
+          <h3 class="text-2xl font-bold mb-4" style="color: #CE1126;">💳 Pagos Locales</h3>
+          <ul class="space-y-2" style="color: #d0d0d0; font-size: 1.05rem;">
+            <li>• Transferencias bancarias</li>
+            <li>• Tarjetas de crédito/débito</li>
+            <li>• PSE integrado</li>
+            <li>• Moneda local (COP)</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Teaser -->
+  <section class="py-20 px-4">
+    <div class="container mx-auto max-w-7xl text-center">
+      
+      <h2 class="font-futuristic text-5xl mb-8 futuristic-glow" data-aos="fade-up">
+        Planes Accesibles
+      </h2>
+      
+      <p class="text-xl mb-12" data-aos="fade-up" data-aos-delay="100" style="color: #d0d0d0; font-weight: 500;">
+        Elige el plan que mejor se adapte a tu negocio
+      </p>
+
+      <!-- Pricing Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        
+        <!-- Plano Mensual -->
+        <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="100">
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Plan Mensual</h3>
+          <div class="mb-6">
+            <div style="color: #FCD116; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
+              $ 80.000
+            </div>
+            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
+              COP por mes
+            </div>
+          </div>
+          <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
+            <li>✓ Órdenes ilimitadas</li>
+            <li>✓ Portal del cliente</li>
+            <li>✓ Inventario</li>
+            <li>✓ Soporte 24/7</li>
+          </ul>
+          <a href="/co/signup/?plan=mensual" class="btn-secondary inline-block w-full">
+            Seleccionar
+          </a>
+        </div>
+
+        <!-- Plano Semestral (DESTACADO) -->
+        <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="200" style="transform: scale(1.05); border: 3px solid rgba(252, 209, 22, 0.8);">
+          <div style="background: linear-gradient(135deg, #FCD116 0%, #CE1126 100%); color: #000; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 800; margin-bottom: 1rem; display: inline-block;">
+            🏆 MÁS POPULAR
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #CE1126;">Plan Semestral</h3>
+          <div class="mb-6">
+            <div style="color: #CE1126; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
+              $ 440.000
+            </div>
+            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
+              COP cada 6 meses
+            </div>
+            <div style="color: #FCD116; font-size: 0.9rem; font-weight: 700; margin-top: 0.5rem;">
+              Ahorra 17%
+            </div>
+          </div>
+          <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
+            <li>✓ Todo del plan mensual</li>
+            <li>✓ Análisis avanzados</li>
+            <li>✓ Multi-sucursales</li>
+            <li>✓ Prioridad en soporte</li>
+          </ul>
+          <a href="/co/signup/?plan=semestral" class="btn-primary inline-block w-full">
+            Seleccionar
+          </a>
+        </div>
+
+        <!-- Plano Anual -->
+        <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="300">
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCD116;">Plan Anual</h3>
+          <div class="mb-6">
+            <div style="color: #FCD116; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
+              $ 800.000
+            </div>
+            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
+              COP por año
+            </div>
+            <div style="color: #FCD116; font-size: 0.9rem; font-weight: 700; margin-top: 0.5rem;">
+              Ahorra 33%
+            </div>
+          </div>
+          <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
+            <li>✓ Todo del plan semestral</li>
+            <li>✓ Capacitación incluida</li>
+            <li>✓ API personalizada</li>
+            <li>✓ Soporte dedicado</li>
+          </ul>
+          <a href="/co/signup/?plan=anual" class="btn-secondary inline-block w-full">
+            Seleccionar
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Trial Banner -->
+      <div class="glass-card p-12 mb-8" data-aos="fade-up" data-aos-delay="400">
+        <h3 class="text-3xl font-bold mb-6" style="color: #CE1126; text-shadow: 0 0 20px rgba(206, 17, 38, 0.4);">🎁 Prueba Gratis por 30 Días</h3>
+        <p class="text-xl mb-8" style="color: #d0d0d0; font-weight: 500;">
+          Sin tarjeta de crédito. Sin compromiso. Cancela cuando quieras.
+        </p>
+        <a href="/co/signup/" class="btn-primary inline-block">
+          🚀 Comenzar Ahora
+        </a>
+      </div>
+
+      <p style="color: #a0a0a0; font-weight: 500;">
+        Más de 600 talleres confían en eGarage para gestionar sus negocios
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 px-4" style="border-top: 2px solid rgba(252, 209, 22, 0.3); background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 100%);">
+    <div class="container mx-auto max-w-7xl">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        
+        <div>
+          <h4 class="font-futuristic text-2xl mb-4" style="color: #FCD116; text-shadow: 0 0 20px rgba(252, 209, 22, 0.4);">eGarage</h4>
+          <p style="color: #b0b0b0; font-weight: 500;">
+            La plataforma definitiva para talleres mecánicos en Colombia.
+          </p>
+        </div>
+
+        <div>
+          <h5 class="font-bold mb-4" style="color: #CE1126;">Producto</h5>
+          <ul class="space-y-2" style="color: #b0b0b0;">
+            <li><a href="/co/precios/" style="transition: color 0.3s;" onmouseover="this.style.color='#FCD116'" onmouseout="this.style.color='#b0b0b0'">Precios</a></li>
+            <li><a href="/co/demo/localizacion/" style="transition: color 0.3s;" onmouseover="this.style.color='#FCD116'" onmouseout="this.style.color='#b0b0b0'">Demo</a></li>
+            <li><a href="/co/documentos/form/" style="transition: color 0.3s;" onmouseover="this.style.color='#FCD116'" onmouseout="this.style.color='#b0b0b0'">Documentos</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h5 class="font-bold mb-4" style="color: #CE1126;">Empresa</h5>
+          <ul class="space-y-2" style="color: #b0b0b0;">
+            <li><a href="/co/sobre/" style="transition: color 0.3s;" onmouseover="this.style.color='#FCD116'" onmouseout="this.style.color='#b0b0b0'">Sobre Nosotros</a></li>
+            <li><a href="/co/contato/" style="transition: color 0.3s;" onmouseover="this.style.color='#FCD116'" onmouseout="this.style.color='#b0b0b0'">Contacto</a></li>
+            <li><a href="/co/soporte/" style="transition: color 0.3s;" onmouseover="this.style.color='#FCD116'" onmouseout="this.style.color='#b0b0b0'">Soporte</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h5 class="font-bold mb-4" style="color: #CE1126;">Legal</h5>
+          <ul class="space-y-2" style="color: #b0b0b0;">
+            <li><a href="/co/privacidad/" style="transition: color 0.3s;" onmouseover="this.style.color='#FCD116'" onmouseout="this.style.color='#b0b0b0'">Privacidad</a></li>
+            <li><a href="/co/termos/" style="transition: color 0.3s;" onmouseover="this.style.color='#FCD116'" onmouseout="this.style.color='#b0b0b0'">Términos</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="text-center pt-8" style="border-top: 1px solid rgba(252, 209, 22, 0.2); color: #808080;">
+        <p>&copy; 2025 eGarage Colombia. Todos los derechos reservados.</p>
+        <p class="mt-2" style="font-size: 1.2rem;">🇨🇴 Hecho con <span style="color: #ff4444;">❤️</span> en Colombia</p>
+      </div>
+    </div>
+  </footer>
+
   </main>
 
-  <!-- Modal para Crear Cliente -->
-  <div id="clienteModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-    <div class="glass-card max-w-2xl w-full p-8 relative">
-      <button onclick="closeClienteModal()" class="absolute top-4 right-4 text-cyan-400 hover:text-cyan-300 text-2xl">
-        ✕
-      </button>
-      <h3 class="text-2xl font-futuristic font-bold text-cyan-400 mb-6">
-        <span class="lang-en" style="display: none;">➕ Add New Client</span><span class="lang-es">➕ Agregar Nuevo Cliente</span>
-      </h3>
-      
-      <form id="form-crear-cliente" class="space-y-4">
-        {% csrf_token %}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              <span class="lang-en" style="display: none;">First Name *</span><span class="lang-es">Nombre *</span>
-            </label>
-            <input type="text" name="nombre" required
-                   class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              <span class="lang-en" style="display: none;">Last Name *</span><span class="lang-es">Apellido *</span>
-            </label>
-            <input type="text" name="apellido" required
-                   class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-          </div>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              <span class="lang-en" style="display: none;">Email</span><span class="lang-es">Correo Electrónico</span>
-            </label>
-            <input type="email" name="email"
-                   class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              <span class="lang-en" style="display: none;">Phone *</span><span class="lang-es">Teléfono *</span>
-            </label>
-            <input type="tel" name="telefono" required
-                   class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">
-            <span class="lang-en" style="display: none;">Address</span><span class="lang-es">Dirección</span>
-          </label>
-          <input type="text" name="direccion"
-                 class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-        </div>
-        
-        <div id="cliente-error-message" class="hidden text-red-400 text-sm p-3 bg-red-900/20 rounded-lg"></div>
-        <div id="cliente-success-message" class="hidden text-green-400 text-sm p-3 bg-green-900/20 rounded-lg"></div>
-        
-        <div class="flex gap-3 pt-4">
-          <button type="button" onclick="closeClienteModal()"
-                  class="flex-1 px-6 py-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition">
-            <span class="lang-en" style="display: none;">Cancel</span><span class="lang-es">Cancelar</span>
-          </button>
-          <button type="submit"
-                  class="flex-1 px-6 py-3 rounded-lg neon-button text-black font-bold transition">
-            <span class="lang-en" style="display: none;">✓ Create Client</span><span class="lang-es">✓ Crear Cliente</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal para Crear Vehículo -->
-  <div id="vehiculoModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
-    <div class="glass-card max-w-2xl w-full p-8 relative max-h-[90vh] overflow-y-auto">
-      <button onclick="closeVehiculoModal()" class="absolute top-4 right-4 text-cyan-400 hover:text-cyan-300 text-2xl">
-        ✕
-      </button>
-      <h3 class="text-2xl font-futuristic font-bold text-cyan-400 mb-6">
-        <span class="lang-en" style="display: none;">🚗 Add New Vehicle</span><span class="lang-es">🚗 Agregar Nuevo Vehículo</span>
-      </h3>
-      
-      <form id="form-crear-vehiculo" class="space-y-4">
-        {% csrf_token %}
-        
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">
-            <span class="lang-en" style="display: none;">Client *</span><span class="lang-es">Cliente *</span>
-          </label>
-          <select name="cliente_id" id="vehiculo-cliente-select" required
-                  class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-            <option value="">
-              <span class="lang-en" style="display: none;">Select a client...</span><span class="lang-es">Seleccione un cliente...</span>
-            </option>
-          </select>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              <span class="lang-en" style="display: none;">Year *</span><span class="lang-es">Año *</span>
-            </label>
-            <select name="anio" id="vehiculo-anio" required
-                    class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-              <option value="">Select year...</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              <span class="lang-en" style="display: none;">License Plate *</span><span class="lang-es">Patente *</span>
-            </label>
-            <input type="text" name="patente" required
-                   class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-          </div>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              <span class="lang-en" style="display: none;">Brand *</span><span class="lang-es">Marca *</span>
-            </label>
-            <select name="marca_id" id="vehiculo-marca" required
-                    class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-              <option value="">
-                <span class="lang-en" style="display: none;">Select brand...</span><span class="lang-es">Seleccione marca...</span>
-              </option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              <span class="lang-en" style="display: none;">Model *</span><span class="lang-es">Modelo *</span>
-            </label>
-            <select name="modelo_id" id="vehiculo-modelo" required
-                    class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-              <option value="">
-                <span class="lang-en" style="display: none;">Select model...</span><span class="lang-es">Seleccione modelo...</span>
-              </option>
-            </select>
-          </div>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-300 mb-2">
-            <span class="lang-en" style="display: none;">VIN</span><span class="lang-es">VIN</span>
-          </label>
-          <input type="text" name="vin"
-                 class="w-full px-4 py-3 rounded-lg bg-black border border-cyan-500/30 text-cyan-200 focus:outline-none focus:ring-2 focus:ring-cyan-400/50">
-        </div>
-        
-        <div id="vehiculo-error-message" class="hidden text-red-400 text-sm p-3 bg-red-900/20 rounded-lg"></div>
-        <div id="vehiculo-success-message" class="hidden text-green-400 text-sm p-3 bg-green-900/20 rounded-lg"></div>
-        
-        <div class="flex gap-3 pt-4">
-          <button type="button" onclick="closeVehiculoModal()"
-                  class="flex-1 px-6 py-3 rounded-lg bg-gray-600 hover:bg-gray-700 text-white font-medium transition">
-            <span class="lang-en" style="display: none;">Cancel</span><span class="lang-es">Cancelar</span>
-          </button>
-          <button type="submit"
-                  class="flex-1 px-6 py-3 rounded-lg neon-button text-black font-bold transition">
-            <span class="lang-en" style="display: none;">✓ Create Vehicle</span><span class="lang-es">✓ Crear Vehículo</span>
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Scripts -->
-  <script defer>
-    // Sistema de idiomas con Django i18n
-    function submitLanguage(lang) {
-      // Actualizar el valor del input
-      document.getElementById('language-input').value = lang;
-      
-      // Enviar el formulario
-      document.getElementById('language-form').submit();
-    }
-    
-    // Función para mostrar/ocultar elementos según idioma
-    function showLanguage(lang) {
-      // Ocultar todos los elementos de idioma primero
-      document.querySelectorAll('.lang-en, .lang-es').forEach(function(element) {
-        element.style.display = 'none';
-      });
-      
-      // Mostrar solo los elementos del idioma seleccionado
-      document.querySelectorAll('.lang-' + lang).forEach(function(element) {
-        // Determinar si es inline o block según el contexto
-        const parent = element.parentElement;
-        const isInlineContext = parent && (
-          parent.tagName === 'A' || 
-          parent.tagName === 'BUTTON' || 
-          parent.tagName === 'SPAN' ||
-          parent.classList.contains('inline') ||
-          parent.style.display === 'inline' ||
-          parent.style.display === 'inline-block'
-        );
-        element.style.display = isInlineContext ? 'inline' : 'block';
-      });
-    }
-    
-    document.addEventListener('DOMContentLoaded', function () {
-      // Por defecto mostrar español para Colombia
-      const currentLang = '{{ LANGUAGE_CODE|default:"es" }}';
-      // Si no hay idioma definido o es español, mostrar español
-      if (!currentLang || currentLang === 'es' || currentLang === '') {
-        showLanguage('es');
-      } else {
-        showLanguage(currentLang);
-      }
-      
-      // Respeta reduce-motion para accesibilidad
-      const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-      if (!reduce) {
-        // Vanta.js Globe
-        if (typeof VANTA !== 'undefined' && VANTA.GLOBE) {
-          VANTA.GLOBE({
-            el: "#vanta-globe",
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0x22d3ee,
-            color2: 0x60a5fa,
-            backgroundColor: 0x0a0a0a,
-            size: 1.00
-          });
-        }
-
-        // Vanta.js Dots
-        if (typeof VANTA !== 'undefined' && VANTA.DOTS) {
-          VANTA.DOTS({
-            el: "#vanta-dots",
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0x22d3ee,
-            color2: 0x60a5fa,
-            backgroundColor: 0x0a0a0a,
-            size: 3.00,
-            spacing: 35.00,
-            showLines: false
-          });
-        }
-      } */
-
-      // AOS.js animaciones scroll
+  <script>
+    // Initialize AOS (Animate On Scroll)
+    document.addEventListener('DOMContentLoaded', function() {
       if (typeof AOS !== 'undefined') {
         AOS.init({
-          duration: 900,
+          duration: 1000,
           once: true,
-          offset: 80,
-          delay: 100,
-          easing: 'ease-in-out-cubic'
+          offset: 100
         });
       }
-
-      console.log('Página cargada completamente');
-    });
-
-    // ==================== MODAL MANAGEMENT ====================
-    function openClienteModal() {
-      document.getElementById('clienteModal').classList.remove('hidden');
-      document.getElementById('form-crear-cliente').reset();
-      document.getElementById('cliente-error-message').classList.add('hidden');
-      document.getElementById('cliente-success-message').classList.add('hidden');
-    }
-
-    function closeClienteModal() {
-      document.getElementById('clienteModal').classList.add('hidden');
-    }
-
-    function openVehiculoModal() {
-      document.getElementById('vehiculoModal').classList.remove('hidden');
-      document.getElementById('form-crear-vehiculo').reset();
-      document.getElementById('vehiculo-error-message').classList.add('hidden');
-      document.getElementById('vehiculo-success-message').classList.add('hidden');
-      loadClientes();
-      loadMarcas();
-      populateYears();
-    }
-
-    function closeVehiculoModal() {
-      document.getElementById('vehiculoModal').classList.add('hidden');
-    }
-
-    // Make functions globally available
-    window.openClienteModal = openClienteModal;
-    window.closeClienteModal = closeClienteModal;
-    window.openVehiculoModal = openVehiculoModal;
-    window.closeVehiculoModal = closeVehiculoModal;
-
-    // ==================== COIENTE FORM ====================
-    document.getElementById('form-crear-cliente').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const formData = new FormData(this);
-      const errorDiv = document.getElementById('cliente-error-message');
-      const successDiv = document.getElementById('cliente-success-message');
-      
-      errorDiv.classList.add('hidden');
-      successDiv.classList.add('hidden');
-      
-      fetch('/co/api/clientes/crear/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          successDiv.textContent = data.message || 'Client created successfully!';
-          successDiv.classList.remove('hidden');
-          
-          setTimeout(() => {
-            closeClienteModal();
-            if (typeof loadClientes === 'function') {
-              loadClientes();
-            }
-          }, 1500);
-        } else {
-          errorDiv.textContent = data.error || 'Error creating client';
-          errorDiv.classList.remove('hidden');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        errorDiv.textContent = 'Connection error. Please try again.';
-        errorDiv.classList.remove('hidden');
-      });
-    });
-
-    // ==================== VEHICULO FORM ====================
-    function populateYears() {
-      const currentYear = new Date().getFullYear();
-      const yearSelect = document.getElementById('vehiculo-anio');
-      yearSelect.innerHTML = '<option value="">Select year...</option>';
-      
-      for (let year = currentYear + 1; year >= 1970; year--) {
-        const option = document.createElement('option');
-        option.value = year;
-        option.textContent = year;
-        yearSelect.appendChild(option);
-      }
-    }
-
-    function loadClientes() {
-      fetch('/co/api/clientes/')
-        .then(response => response.json())
-        .then(data => {
-          const select = document.getElementById('vehiculo-cliente-select');
-          select.innerHTML = '<option value="">Select a client...</option>';
-          
-          data.forEach(cliente => {
-            const option = document.createElement('option');
-            option.value = cliente.id;
-            option.textContent = `${cliente.nombre} ${cliente.apellido}`;
-            select.appendChild(option);
-          });
-        })
-        .catch(error => console.error('Error loading clients:', error));
-    }
-
-    function loadMarcas() {
-      fetch('/co/vehiculos/api/marcas/')
-        .then(response => response.json())
-        .then(data => {
-          const select = document.getElementById('vehiculo-marca');
-          select.innerHTML = '<option value="">Select brand...</option>';
-          
-          data.forEach(marca => {
-            const option = document.createElement('option');
-            option.value = marca.id;
-            option.textContent = marca.nombre;
-            select.appendChild(option);
-          });
-        })
-        .catch(error => console.error('Error loading brands:', error));
-    }
-
-    // Load models when marca and year change
-    document.getElementById('vehiculo-marca').addEventListener('change', loadModelos);
-    document.getElementById('vehiculo-anio').addEventListener('change', loadModelos);
-
-    function loadModelos() {
-      const marcaId = document.getElementById('vehiculo-marca').value;
-      const anio = document.getElementById('vehiculo-anio').value;
-      const modeloSelect = document.getElementById('vehiculo-modelo');
-      
-      modeloSelect.innerHTML = '<option value="">Select model...</option>';
-      
-      if (!marcaId || !anio) return;
-      
-      fetch(`/co/vehiculos/ajax/modelos-por-marca-anio/?marca_id=${marcaId}&anio=${anio}`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.success && data.modelos) {
-            data.modelos.forEach(modelo => {
-              const option = document.createElement('option');
-              option.value = modelo.id;
-              option.textContent = modelo.nombre;
-              modeloSelect.appendChild(option);
-            });
-          }
-        })
-        .catch(error => console.error('Error loading models:', error));
-    }
-
-    document.getElementById('form-crear-vehiculo').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const formData = new FormData(this);
-      const errorDiv = document.getElementById('vehiculo-error-message');
-      const successDiv = document.getElementById('vehiculo-success-message');
-      
-      errorDiv.classList.add('hidden');
-      successDiv.classList.add('hidden');
-      
-      fetch('/co/api/vehiculos/crear/', {
-        method: 'POST',
-        body: formData,
-        headers: {
-          'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          successDiv.textContent = data.message || 'Vehicle created successfully!';
-          successDiv.classList.remove('hidden');
-          
-          setTimeout(() => {
-            closeVehiculoModal();
-          }, 1500);
-        } else {
-          errorDiv.textContent = data.error || 'Error creating vehicle';
-          errorDiv.classList.remove('hidden');
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        errorDiv.textContent = 'Connection error. Please try again.';
-        errorDiv.classList.remove('hidden');
-      });
-    });
-
-    // Close modals when clicking outside
-    document.getElementById('clienteModal').addEventListener('click', function(e) {
-      if (e.target === this) closeClienteModal();
-    });
-
-    document.getElementById('vehiculoModal').addEventListener('click', function(e) {
-      if (e.target === this) closeVehiculoModal();
     });
   </script>
+
 </body>
 </html>

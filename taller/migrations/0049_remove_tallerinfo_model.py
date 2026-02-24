@@ -14,10 +14,10 @@ def migrate_tallerinfo_to_empresa(apps, schema_editor):
     # Contar registros de TallerInfo
     count = TallerInfo.objects.count()
     if count == 0:
-        print("✅ No hay registros de TallerInfo para migrar")
+        print("No hay registros de TallerInfo para migrar")
         return
 
-    print(f"🔄 Migrando {count} registros de TallerInfo a Empresa...")
+    print(f"Migrando {count} registros de TallerInfo a Empresa...")
     migrated = 0
     skipped = 0
 
@@ -44,10 +44,10 @@ def migrate_tallerinfo_to_empresa(apps, schema_editor):
             if updated:
                 empresa.save(update_fields=["nombre_taller", "telefono", "ha_usado_prueba"])
                 migrated += 1
-                print(f"  ✅ Migrado TallerInfo para usuario {taller_info.user.email}")
+                print(f"  Migrado TallerInfo para usuario {taller_info.user.email}")
             else:
                 skipped += 1
-                print(f"  ⏭️  Saltado (datos ya presentes) para usuario {taller_info.user.email}")
+                print(f"  Saltado (datos ya presentes) para usuario {taller_info.user.email}")
 
         except Empresa.DoesNotExist:
             # Si no existe Empresa, crear una nueva con los datos de TallerInfo
@@ -58,16 +58,16 @@ def migrate_tallerinfo_to_empresa(apps, schema_editor):
                 ha_usado_prueba=taller_info.ha_usado_prueba,
             )
             migrated += 1
-            print(f"  ✅ Creada Empresa desde TallerInfo para usuario {taller_info.user.email}")
+            print(f"  Creada Empresa desde TallerInfo para usuario {taller_info.user.email}")
 
-    print(f"✅ Migración completada: {migrated} migrados, {skipped} saltados")
+    print(f"Migracion completada: {migrated} migrados, {skipped} saltados")
 
 
 def reverse_migration(apps, schema_editor):
     """
     Función de reversión (no crea TallerInfo de nuevo, solo documenta)
     """
-    print("⚠️  Reversión: El modelo TallerInfo no se recreará automáticamente")
+    print("Reversion: El modelo TallerInfo no se recreara automaticamente")
 
 
 class Migration(migrations.Migration):

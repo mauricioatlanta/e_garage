@@ -26,6 +26,7 @@ Notas:
 from django.urls import path
 
 from taller.vehiculos import views_fbv as views
+from taller.vehiculos import views_ingreso
 from taller.vehiculos.autocomplete_views import (
     CajaAutocomplete,
     ClienteAutocomplete,
@@ -41,6 +42,9 @@ urlpatterns = [
     # Todas requieren @login_required y filtran por empresa
     path("", views.lista_vehiculos, name="lista_vehiculos"),
     path("crear/", views.crear_vehiculo, name="crear_vehiculo"),
+    # Ingreso de vehículo por foto de patente
+    path("ingreso-foto/", views_ingreso.ingreso_vehiculo_foto, name="ingreso_foto"),
+    path("patente-identificada/", views_ingreso.procesar_patente_identificada, name="patente_identificada"),
     path("<int:vehiculo_id>/", views.ver_vehiculo, name="ver_vehiculo"),
     path("<int:vehiculo_id>/editar/", views.editar_vehiculo, name="editar_vehiculo"),
     path(

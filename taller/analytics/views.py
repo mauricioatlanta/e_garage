@@ -20,6 +20,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_GET
 
 from taller.auth.decorators import login_required_default
 from taller.middleware.rate_limiting import rate_limit
@@ -32,22 +33,47 @@ from .ai_reports import AIReportEngine, ReportExporter
 def dashboard_ai_view(request):
     """Dashboard principal con AI Analytics"""
 
-    # Obtener datos del motor de reportes AI
-    engine = AIReportEngine(request.user.empresa)
-    analytics_data = engine.get_dashboard_data()
+    # Verificar que el usuario tenga una empresa asociada
+    if not hasattr(request.user, "empresa") or not request.user.empresa:
+        from django.http import HttpResponseNotFound
+        from django.shortcuts import render
+        return render(
+            request,
+            "error.html",
+            {
+                "error": "No se encontró una empresa asociada a tu cuenta. Por favor, contacta al administrador.",
+            },
+            status=404,
+        )
 
-    context = {
-        "analytics": analytics_data,
-        "user_country": request.user.empresa.pais,
-        "is_usa": request.user.empresa.pais == "US",
-        "page_title": (
-            "AI Analytics Dashboard"
-            if request.user.empresa.pais == "US"
-            else "Dashboard AI Analytics"
-        ),
-    }
+    try:
+        # Obtener datos del motor de reportes AI
+        engine = AIReportEngine(request.user.empresa)
+        analytics_data = engine.get_dashboard_data()
 
-    return render(request, "analytics/dashboard_ai.html", context)
+        context = {
+            "analytics": analytics_data,
+            "user_country": request.user.empresa.pais,
+            "is_usa": request.user.empresa.pais == "US",
+            "page_title": (
+                "AI Analytics Dashboard"
+                if request.user.empresa.pais == "US"
+                else "Dashboard AI Analytics"
+            ),
+        }
+
+        return render(request, "analytics/dashboard_ai.html", context)
+    except Exception as e:
+        # Manejar errores del motor de reportes
+        from django.shortcuts import render
+        return render(
+            request,
+            "error.html",
+            {
+                "error": f"Error al cargar el dashboard: {str(e)}. Por favor, intenta nuevamente o contacta al soporte.",
+            },
+            status=500,
+        )
 
 
 @login_required
@@ -366,3 +392,9 @@ def suscriptor_dashboard(request, pk):
     # return render(request, 'taller/suscriptor_dashboard.html', {'suscriptor': suscriptor})
     # Ejemplo genérico:
     return render(request, "taller/suscriptor_dashboard.html", {"suscriptor_id": pk})
+
+
+@require_GET
+def revenue_analytics_api(request, *args, **kwargs):
+    # Stub seguro para producción: evita 500 por rutas registradas
+    return JsonResponse({"ok": True, "detail": "revenue_analytics_api stub"}, status=200)

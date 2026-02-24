@@ -5,5 +5,5 @@
 {% load country_url %}
 
 {% block title %}
-  {{ empresa.nombre_taller }} - {% trans "Nuevo documento" %}
+  {{ empresa.nombre_taller|default:"eGarage" }} - {% trans "Crear Documento (Chile)" %}
 {% endblock %}

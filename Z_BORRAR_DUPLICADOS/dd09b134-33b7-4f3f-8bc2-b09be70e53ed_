@@ -1,0 +1,245 @@
+{% extends "taller/documentos/base/base_documento.html" %}
+{% load i18n %}
+
+{% load i18n humanize static %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <!-- Encabezado -->
+  <div class="mb-6 flex items-center justify-between">
+    <div>
+      <h1 class="text-2xl font-semibold text-slate-100">
+        {% trans "Documento" %} #{{ documento.numero|default:documento.id }}
+      </h1>
+      <p class="text-slate-400">
+        {% trans "Tipo" %}: {{ documento.tipo }} ·
+        {% trans "Fecha" %}: {{ documento.fecha_emision }}
+      </p>
+      <p class="text-slate-400">
+        {% trans "Empresa" %}: {{ documento.empresa.nombre }}
+      </p>
+    </div>
+    <div class="text-right">
+      {% if documento.cliente %}
+        <p class="text-slate-300"><span class="font-medium">{% trans "Cliente" %}:</span> {{ documento.cliente.nombre }} {{ documento.cliente.apellido|default:"" }}</p>
+      {% endif %}
+      {% if documento.vehiculo %}
+        <p class="text-slate-300"><span class="font-medium">{% trans "Vehículo" %}:</span>
+          {{ documento.vehiculo.marca.nombre }} {{ documento.vehiculo.modelo.nombre }}
+          {% if documento.vehiculo.patente %} · {{ documento.vehiculo.patente }}{% endif %}
+          {% if documento.vehiculo.vin %} · VIN {{ documento.vehiculo.vin }}{% endif %}
+        </p>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Resumen Totales -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
+    {% comment %} Helper de moneda simple por país {% endcomment %}
+    {% with pais=documento.empresa.pais|default:"CL"|upper %}
+      {% with es_cl=pais == "CL" %}
+        <div class="rounded-2xl border border-cyan-500/30 bg-slate-800/60 p-4">
+          <div class="text-slate-400 text-sm">{% trans "Neto Repuestos" %}</div>
+          <div class="text-slate-100 text-xl font-semibold">
+            {% if es_cl %}
+              ${{ subtotal_repuestos|floatformat:0|intcomma }}
+            {% else %}
+              ${{ subtotal_repuestos|floatformat:2|intcomma }}
+            {% endif %}
+          </div>
+        </div>
+        <div class="rounded-2xl border border-cyan-500/30 bg-slate-800/60 p-4">
+          <div class="text-slate-400 text-sm">{% trans "Neto Servicios" %}</div>
+          <div class="text-slate-100 text-xl font-semibold">
+            {% if es_cl %}
+              ${{ subtotal_servicios|floatformat:0|intcomma }}
+            {% else %}
+              ${{ subtotal_servicios|floatformat:2|intcomma }}
+            {% endif %}
+          </div>
+        </div>
+        <div class="rounded-2xl border border-emerald-500/30 bg-slate-800/60 p-4">
+          <div class="text-slate-400 text-sm">{% trans "Subtotal" %}</div>
+          <div class="text-slate-100 text-xl font-semibold">
+            {% if es_cl %}
+              ${{ subtotal|floatformat:0|intcomma }}
+            {% else %}
+              ${{ subtotal|floatformat:2|intcomma }}
+            {% endif %}
+          </div>
+        </div>
+        <div class="rounded-2xl border border-fuchsia-500/30 bg-slate-800/60 p-4">
+          <div class="text-slate-400 text-sm">
+            {% if es_cl %}{% trans "IVA (solo repuestos)" %}{% else %}{% trans "Impuesto" %}{% endif %}
+          </div>
+          <div class="text-slate-100 text-xl font-semibold">
+            {% if es_cl %}
+              ${{ iva|floatformat:0|intcomma }}
+            {% else %}
+              ${{ iva|floatformat:2|intcomma }}
+            {% endif %}
+          </div>
+        </div>
+        <div class="rounded-2xl border border-indigo-500/30 bg-slate-800/60 p-4">
+          <div class="text-slate-400 text-sm">{% trans "Total" %}</div>
+          <div class="text-slate-100 text-2xl font-bold">
+            {% if es_cl %}
+              ${{ total|floatformat:0|intcomma }}
+            {% else %}
+              ${{ total|floatformat:2|intcomma }}
+            {% endif %}
+          </div>
+        </div>
+      {% endwith %}
+    {% endwith %}
+  </div>
+
+  <!-- Detalle Repuestos -->
+  <div class="mb-8">
+    <h2 class="text-lg font-semibold text-slate-100 mb-3">{% trans "Líneas de Repuestos" %}</h2>
+    <div class="overflow-hidden rounded-xl border border-slate-700">
+      <table class="min-w-full divide-y divide-slate-700">
+        <thead class="bg-slate-800/50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Ítem" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Cantidad" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Precio Unitario" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Descuento" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Subtotal" %}</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800 bg-slate-900/40">
+          {% if lineas_repuesto %}
+            {% for l in lineas_repuesto %}
+              {% with pais=documento.empresa.pais|default:"CL"|upper %}
+              {% with es_cl=pais == "CL" %}
+              <tr>
+                <td class="px-4 py-3 text-slate-200">{{ l.nombre }}</td>
+                <td class="px-4 py-3 text-right text-slate-300">{{ l.cantidad }}</td>
+                <td class="px-4 py-3 text-right text-slate-300">
+                  {% if es_cl %}${{ l.precio_unitario|floatformat:0|intcomma }}{% else %}${{ l.precio_unitario|floatformat:2|intcomma }}{% endif %}
+                </td>
+                <td class="px-4 py-3 text-right text-slate-300">
+                  {% if es_cl %}${{ l.descuento|default_if_none:0|floatformat:0|intcomma }}{% else %}${{ l.descuento|default_if_none:0|floatformat:2|intcomma }}{% endif %}
+                </td>
+                <td class="px-4 py-3 text-right text-slate-100 font-medium">
+                  {% if es_cl %}${{ l.subtotal|floatformat:0|intcomma }}{% else %}${{ l.subtotal|floatformat:2|intcomma }}{% endif %}
+                </td>
+              </tr>
+              {% endwith %}
+              {% endwith %}
+            {% empty %}
+              <tr><td colspan="5" class="px-4 py-4 text-center text-slate-400">{% trans "Sin repuestos" %}</td></tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="5" class="px-4 py-4 text-center text-slate-400">{% trans "Sin repuestos" %}</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Detalle Servicios -->
+  <div class="mb-8">
+    <h2 class="text-lg font-semibold text-slate-100 mb-3">{% trans "Líneas de Servicios" %}</h2>
+    <div class="overflow-hidden rounded-xl border border-slate-700">
+      <table class="min-w-full divide-y divide-slate-700">
+        <thead class="bg-slate-800/50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Servicio" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Cantidad" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Precio Unitario" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Descuento" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Subtotal" %}</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800 bg-slate-900/40">
+          {% if lineas_servicio %}
+            {% for l in lineas_servicio %}
+              {% with pais=documento.empresa.pais|default:"CL"|upper %}
+              {% with es_cl=pais == "CL" %}
+              <tr>
+                <td class="px-4 py-3 text-slate-200">{{ l.nombre }}</td>
+                <td class="px-4 py-3 text-right text-slate-300">{{ l.cantidad }}</td>
+                <td class="px-4 py-3 text-right text-slate-300">
+                  {% if es_cl %}${{ l.precio_unitario|floatformat:0|intcomma }}{% else %}${{ l.precio_unitario|floatformat:2|intcomma }}{% endif %}
+                </td>
+                <td class="px-4 py-3 text-right text-slate-300">
+                  {% if es_cl %}${{ l.descuento|default_if_none:0|floatformat:0|intcomma }}{% else %}${{ l.descuento|default_if_none:0|floatformat:2|intcomma }}{% endif %}
+                </td>
+                <td class="px-4 py-3 text-right text-slate-100 font-medium">
+                  {% if es_cl %}${{ l.subtotal|floatformat:0|intcomma }}{% else %}${{ l.subtotal|floatformat:2|intcomma }}{% endif %}
+                </td>
+              </tr>
+              {% endwith %}
+              {% endwith %}
+            {% empty %}
+              <tr><td colspan="5" class="px-4 py-4 text-center text-slate-400">{% trans "Sin servicios" %}</td></tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="5" class="px-4 py-4 text-center text-slate-400">{% trans "Sin servicios" %}</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Detalle Otros Servicios (si existen) -->
+  {% if lineas_otro_servicio %}
+  <div class="mb-8">
+    <h2 class="text-lg font-semibold text-slate-100 mb-3">{% trans "Otros Servicios" %}</h2>
+    <div class="overflow-hidden rounded-xl border border-slate-700">
+      <table class="min-w-full divide-y divide-slate-700">
+        <thead class="bg-slate-800/50">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Servicio" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Cantidad" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Precio Unitario" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Descuento" %}</th>
+            <th class="px-4 py-3 text-right text-xs font-medium uppercase tracking-wider text-slate-300">{% trans "Subtotal" %}</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-800 bg-slate-900/40">
+          {% for l in lineas_otro_servicio %}
+            {% with pais=documento.empresa.pais|default:"CL"|upper %}
+            {% with es_cl=pais == "CL" %}
+            <tr>
+              <td class="px-4 py-3 text-slate-200">{{ l.nombre }}</td>
+              <td class="px-4 py-3 text-right text-slate-300">{{ l.cantidad }}</td>
+              <td class="px-4 py-3 text-right text-slate-300">
+                {% if es_cl %}${{ l.precio_cliente|floatformat:0|intcomma }}{% else %}${{ l.precio_cliente|floatformat:2|intcomma }}{% endif %}
+              </td>
+              <td class="px-4 py-3 text-right text-slate-300">
+                {% if es_cl %}${{ l.descuento|default_if_none:0|floatformat:0|intcomma }}{% else %}${{ l.descuento|default_if_none:0|floatformat:2|intcomma }}{% endif %}
+              </td>
+              <td class="px-4 py-3 text-right text-slate-100 font-medium">
+                {% if es_cl %}${{ l.subtotal|floatformat:0|intcomma }}{% else %}${{ l.subtotal|floatformat:2|intcomma }}{% endif %}
+              </td>
+            </tr>
+            {% endwith %}
+            {% endwith %}
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Observaciones -->
+  {% if documento.observaciones %}
+    <div class="mb-8 rounded-xl border border-slate-700 bg-slate-900/40 p-4">
+      <h3 class="text-slate-100 font-semibold mb-2">{% trans "Observaciones" %}</h3>
+      <p class="text-slate-300 whitespace-pre-line">{{ documento.observaciones }}</p>
+    </div>
+  {% endif %}
+
+  <!-- Acciones -->
+  <div class="flex gap-3">
+    <a href="{% url 'taller:documentos:lista' %}" class="px-4 py-2 rounded-lg bg-slate-800 text-slate-200 border border-slate-600 hover:bg-slate-700 transition">{% trans "Volver" %}</a>
+    {% if documento.estado == "DRAFT" %}
+      <a href="{% url 'taller:documentos:editar' documento.id %}" class="px-4 py-2 rounded-lg bg-cyan-600 text-white hover:bg-cyan-500 transition">{% trans "Editar" %}</a>
+    {% endif %}
+    <button onclick="window.print()" class="px-4 py-2 rounded-lg bg-emerald-600 text-white hover:bg-emerald-500 transition">{% trans "Imprimir" %}</button>
+  </div>
+</div>
+{% endblock %}

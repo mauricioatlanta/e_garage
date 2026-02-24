@@ -11,17 +11,6 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.AlterField(
-            model_name="cajavehiculo",
-            name="country",
-            field=models.CharField(
-                choices=[("CL", "Chile"), ("US", "Estados Unidos"), ("MX", "México")],
-                db_index=True,
-                default="CL",
-                max_length=2,
-                verbose_name="País",
-            ),
-        ),
-        migrations.AlterField(
             model_name="categoriaservicio",
             name="country",
             field=models.CharField(
@@ -71,17 +60,6 @@ class Migration(migrations.Migration):
                 default="CL",
                 max_length=2,
                 null=True,
-                verbose_name="País",
-            ),
-        ),
-        migrations.AlterField(
-            model_name="colorvehiculo",
-            name="country",
-            field=models.CharField(
-                choices=[("CL", "Chile"), ("US", "Estados Unidos"), ("MX", "México")],
-                db_index=True,
-                default="CL",
-                max_length=2,
                 verbose_name="País",
             ),
         ),
@@ -160,17 +138,6 @@ class Migration(migrations.Migration):
             name="country",
             field=models.CharField(
                 choices=[("CL", "Chile"), ("US", "Estados Unidos"), ("MX", "México")],
-                default="CL",
-                max_length=2,
-                verbose_name="País",
-            ),
-        ),
-        migrations.AlterField(
-            model_name="motorvehiculo",
-            name="country",
-            field=models.CharField(
-                choices=[("CL", "Chile"), ("US", "Estados Unidos"), ("MX", "México")],
-                db_index=True,
                 default="CL",
                 max_length=2,
                 verbose_name="País",

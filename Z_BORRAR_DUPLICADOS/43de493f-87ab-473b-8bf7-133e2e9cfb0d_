@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+{% load country_url %}
+{% load i18n static %}
+
+{% block content %}
+<!-- 🟣 MARCADOR MORADO: TEMPLATE VEHICULOS VEHICULO_LIST_AI.HTML -->
+<div style="position: fixed; top: 10px; right: 10px; z-index: 99999; background: purple; color: white; padding: 10px; border-radius: 5px; font-weight: bold;">🟣 VEHICULOS AI</div>
+<style>
+/* Estilos profesionales y sobrios */
+.vehicle-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vehicle-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive grid adjustments */
+@media (max-width: 640px) {
+  .vehicle-card {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* Desactivar efectos Matrix heredados */
+.ai-matrix-bg, .matrix-rain, .neural-network,
+.hex-float, .data-stream, .hologram-flicker {
+  display: none !important;
+}
+
+/* Ocultar elementos con animaciones Matrix */
+*[class*="matrix"], *[class*="Matrix"],
+*[class*="ai-"], *[class*="neural"] {
+  animation: none !important;
+}
+</style>
+
+<div class="min-h-screen bg-gradient-to-br from-[#0f172a] via-[#1e293b] to-[#334155] p-6">
+
+<!-- Header Profesional -->
+<div class="mb-8">
+  <div class="bg-gradient-to-r from-slate-900/90 to-zinc-900/90 backdrop-blur-sm border border-slate-600/40 rounded-xl p-6">
+    <div class="flex items-center justify-between">
+      <div class="flex items-center space-x-4">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-600/80 to-slate-600/80 flex items-center justify-center shadow-lg">
+          <span class="text-white text-xl">🚗</span>
+        </div>
+        <div>
+          <h1 class="text-3xl font-bold text-white">{% trans "Vehículos" %}</h1>
+          <p class="text-slate-400 text-sm">{% trans "Sistema de gestión vehicular profesional" %}</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <div class="flex items-center space-x-2 text-xs text-slate-300">
+          <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+          <span>{% trans "Sistema activo" %}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Búsqueda Profesional -->
+<div class="mb-6">
+  <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-600/40 rounded-lg overflow-hidden">
+    <form method="get" class="flex">
+      <input type="search"
+             name="q"
+             value="{{ request.GET.q }}"
+             placeholder="{% trans 'Buscar por patente, cliente, marca o modelo...' %}"
+             class="flex-1 px-4 py-3 bg-transparent text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+      <button type="submit" class="px-6 py-3 bg-gradient-to-r from-indigo-600/90 to-slate-600/90 hover:from-indigo-500/90 hover:to-slate-500/90 text-white font-semibold transition-all">
+        {% trans "Buscar" %}
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Botón Agregar Vehículo -->
+<div class="mb-6 text-center">
+  <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/crear/{% else %}/cl/vehiculos/crear/{% endif %}" class="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-indigo-700/90 to-slate-700/90 hover:from-indigo-600/90 hover:to-slate-600/90 text-white font-semibold rounded-lg transition-all shadow-lg border border-indigo-500/40">
+    <span class="text-lg">➕</span>
+    <span>{% trans "Agregar Vehículo" %}</span>
+  </a>
+</div>
+
+<!-- Grid de Vehículos Compacto -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4" id="vehiclesContainer">
+  {% for vehiculo in vehiculos %}
+  <div class="vehicle-card bg-slate-900/60 backdrop-blur-sm border border-slate-600/50 rounded-lg hover:border-indigo-400/30 transition-all duration-200 h-40">
+    <!-- Header con patente -->
+    <div class="p-3 border-b border-slate-700/30 flex items-center justify-between">
+      <div class="flex items-center space-x-2">
+        <div class="w-6 h-6 rounded-md bg-gradient-to-br from-indigo-600/30 to-slate-600/30 border border-indigo-400/30 flex items-center justify-center">
+          <span class="text-indigo-300 text-xs">🏷️</span>
+        </div>
+        <div>
+          <p class="text-indigo-300 font-mono font-bold text-sm">{{ vehiculo.patente|default:vehiculo.vin|default:"-"|truncatechars:8 }}</p>
+          <p class="text-slate-500 text-xs">ID: #{{ vehiculo.pk }}</p>
+        </div>
+      </div>
+      <div class="w-2 h-2 bg-indigo-400 rounded-full animate-pulse"></div>
+    </div>
+
+    <!-- Contenido -->
+    <div class="p-3 space-y-1.5 flex-1">
+      <!-- Cliente -->
+      <div class="space-y-0.5">
+        <p class="text-xs text-slate-500 uppercase tracking-wider">{% trans "Propietario" %}</p>
+        <p class="text-slate-200 font-medium text-sm truncate">
+          {% if vehiculo.cliente.nombre or vehiculo.cliente.apellido %}
+            {{ vehiculo.cliente.nombre|default:"" }} {{ vehiculo.cliente.apellido|default:"" }}
+          {% else %}
+            -
+          {% endif %}
+        </p>
+      </div>
+
+      <!-- Marca y Modelo -->
+      <div class="grid grid-cols-2 gap-2">
+        <div class="space-y-0.5">
+          <p class="text-xs text-slate-500 uppercase tracking-wider">{% trans "Marca" %}</p>
+          <p class="text-slate-300 font-semibold text-xs truncate">{{ vehiculo.marca.nombre|default:"-" }}</p>
+        </div>
+        <div class="space-y-0.5">
+          <p class="text-xs text-slate-500 uppercase tracking-wider">{% trans "Modelo" %}</p>
+          <p class="text-slate-300 font-semibold text-xs truncate">{{ vehiculo.modelo.nombre|default:"-" }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="p-2 border-t border-slate-700/30 flex justify-between space-x-1">
+      <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.pk }}/{% else %}/cl/vehiculos/{{ vehiculo.pk }}/{% endif %}"
+         class="flex-1 px-2 py-1.5 rounded-md bg-gradient-to-r from-indigo-600/20 to-slate-600/20 border border-indigo-400/40 text-indigo-300 hover:from-indigo-500/30 hover:to-slate-500/30 transition-all text-xs font-medium text-center">
+        <span class="flex items-center justify-center space-x-1">
+          <span>👁️</span>
+          <span>{% trans "Ver" %}</span>
+        </span>
+      </a>
+      <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{{ vehiculo.pk }}/editar/{% else %}/cl/vehiculos/{{ vehiculo.pk }}/editar/{% endif %}"
+         class="flex-1 px-2 py-1.5 rounded-md bg-gradient-to-r from-slate-600/20 to-zinc-600/20 border border-slate-400/40 text-slate-300 hover:from-slate-500/30 hover:to-zinc-500/30 transition-all text-xs font-medium text-center">
+        <span class="flex items-center justify-center space-x-1">
+          <span>⚙️</span>
+          <span>{% trans "Editar" %}</span>
+        </span>
+      </a>
+    </div>
+  </div>
+  {% empty %}
+  <div class="col-span-full">
+    <div class="bg-slate-900/60 backdrop-blur-sm border border-slate-600/30 rounded-xl p-8 text-center">
+      <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-gradient-to-br from-slate-500/20 to-zinc-600/20 border border-slate-400/30 flex items-center justify-center text-2xl">
+        🚗
+      </div>
+      <h3 class="text-lg font-bold text-slate-300 mb-2">{% trans "No hay vehículos registrados" %}</h3>
+      <p class="text-slate-500 text-sm">{% trans "Comienza agregando tu primer vehículo al sistema" %}</p>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+
+</div>
+
+<!-- JavaScript simple para búsqueda -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.querySelector('input[name="q"]');
+    const vehicleCards = document.querySelectorAll('.vehicle-card');
+
+    if (searchInput) {
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase().trim();
+
+            vehicleCards.forEach(card => {
+                const content = card.textContent.toLowerCase();
+                if (searchTerm === '' || content.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+</script>
+
+{% endblock %}

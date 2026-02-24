@@ -1,4 +1,6 @@
-# Python
+# Python / venv
+venv/
+.venv/
 __pycache__/
 *.py[cod]
 *.pyo
@@ -8,9 +10,41 @@ __pycache__/
 node_modules/
 package-lock.json
 
+# Env / backups
+.env
+.env.*
+*.env
+*.bak_*
+*.backup_*
+*.BAK_*
+
+# Logs
+logs/*.log
+logs/*.log.*
+logs/**/*.log
+*.log
+
+# Deploy / backups / zips
+_deploy_atlantareciclajes_BACKUP_*/
+*_BACKUP_*/
+*.zip
+*.zip.backup_*
+templates_completo.zip
+templates/copy.zip
+
+# Health reports / artifacts
+logs/health_report_*.json
+tools/reports/
+tools/maintenance/
+
 # Django / DB local
 db.sqlite3
 *.sqlite3
+db.sqlite3.*
+
+# Django collectstatic / media
+staticfiles/
+media/
 
 # Test / tooling caches
 .pytest_cache/
@@ -20,63 +54,23 @@ db.sqlite3
 htmlcov/
 playwright-report/
 test-results/
+.aider.tags.cache.v4/
 
-# Env
-.env
-*.env
-
-# Uploads (Django MEDIA)
-media/
-
-# Static files (generated)
-staticfiles/
-
-# OS
-Thumbs.db
-Desktop.ini
-.DS_Store
-
-# Scripts locales diagnostico
+# Scripts locales / sensibles
 verificar_*.py
 diagnostico_*.py
 corregir_*.py
-
-# Sensibles / demo local
 CREDENCIALES_PRUEBA.md
 eg_cl_demo_20251115.json
-
-# Local DB backups
-*.BACKUP.*
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-
-# Django / local DBs
-db.sqlite3
-*.sqlite3
-
-# Django collectstatic output (normalmente NO se versiona)
-staticfiles/
-
-# caches / tooling
-.aider.tags.cache.v4/
-
-# backups
-*.BAK_*
 scripts/deploy_rapido.sh
-# Variantes locales (NO USADA, copias, etc.)
-db.sqlite3.*
 
-
-# local safety backups
-*.bak
+# Local backups / archives
 backups/templates_archive/
 backups/templates_bak/
-
-# auditoría templates (reportes generados)
 reports/templates_audit/
-
-# legacy templates (copy moved out of loader)
 legacy_templates/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+Desktop.ini

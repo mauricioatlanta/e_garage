@@ -1,0 +1,88 @@
+{% load i18n %}
+<section id="otros-servicios" class="card w-full">
+  <div class="card-header">
+    <h3 class="card-title">{% trans "Otros Servicios (externos)" %}</h3>
+  </div>
+  <div class="card-body">
+    <table class="table w-full text-sm align-middle" data-table="otros-servicios">
+      <thead>
+        <tr>
+          <th class="w-3/12">{% trans "Nombre del servicio" %}</th>
+          <th class="w-3/12">{% trans "Compañía" %}</th>
+          <th class="w-2/12 text-right">{% trans "Valor Taller" %}</th>
+          <th class="w-2/12 text-right">{% trans "Valor Cliente" %}</th>
+          <th class="w-2/12 text-right">{% trans "Ganancia" %}</th>
+          <th class="w-1/12 text-center">{% trans "Acciones" %}</th>
+        </tr>
+      </thead>
+      <tbody data-rows>
+        {# Render server-side rows si existen (modo editar) #}
+        {% for linea in lineas_otro_servicio %}
+        <tr data-row>
+          <td><input name="otros_servicios-{{ forloop.counter0 }}-nombre" value="{{ linea.nombre }}" class="input w-full" /></td>
+          <td><input name="otros_servicios-{{ forloop.counter0 }}-empresa_externa" value="{{ linea.empresa_externa }}" class="input w-full" /></td>
+          <td><input name="otros_servicios-{{ forloop.counter0 }}-costo_interno" value="{{ linea.costo_interno }}" class="input w-full text-right" inputmode="decimal" /></td>
+          <td><input name="otros_servicios-{{ forloop.counter0 }}-precio_cliente" value="{{ linea.precio_cliente }}" class="input w-full text-right" inputmode="decimal" /></td>
+          <td class="text-right" data-ganancia>{{ linea.ganancia|default:0 }}</td>
+          <td class="text-center">
+            <button type="button" class="btn btn-danger" data-remove-row>&times;</button>
+          </td>
+        </tr>
+        {% empty %}
+        {# sin filas iniciales #}
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="mt-3 flex gap-2">
+      <button type="button" class="btn btn-primary" data-add-otro-servicio>{% trans "Agregar otro servicio" %}</button>
+    </div>
+  </div>
+</section>
+
+<script>
+(function(){
+  const wrap = document.currentScript.closest('#otros-servicios');
+  if (!wrap) return;
+
+  const tbody = wrap.querySelector('[data-rows]');
+  function fmt(n){ return (Number(n)||0).toFixed(2); }
+
+  function recalc(row){
+    const ci = row.querySelector('[name$="-costo_interno"]')?.value || 0;
+    const pc = row.querySelector('[name$="-precio_cliente"]')?.value || 0;
+    row.querySelector('[data-ganancia]').textContent = fmt(pc - ci);
+    document.dispatchEvent(new CustomEvent('otros-servicios:changed'));
+  }
+
+  wrap.addEventListener('input', (e)=>{
+    const row = e.target.closest('[data-row]');
+    if (row) recalc(row);
+  });
+
+  wrap.addEventListener('click', (e)=>{
+    if (e.target.matches('[data-remove-row]')){
+      e.target.closest('[data-row]').remove();
+      document.dispatchEvent(new CustomEvent('otros-servicios:changed'));
+    }
+    if (e.target.matches('[data-add-otro-servicio]')){
+      const idx = tbody.querySelectorAll('[data-row]').length;
+      const tr = document.createElement('tr');
+      tr.setAttribute('data-row','');
+      tr.innerHTML = `
+        <td><input name="otros_servicios-${idx}-nombre" class="input w-full" /></td>
+        <td><input name="otros_servicios-${idx}-empresa_externa" class="input w-full" /></td>
+        <td><input name="otros_servicios-${idx}-costo_interno" class="input w-full text-right" inputmode="decimal" /></td>
+        <td><input name="otros_servicios-${idx}-precio_cliente" class="input w-full text-right" inputmode="decimal" /></td>
+        <td class="text-right" data-ganancia>0.00</td>
+        <td class="text-center"><button type="button" class="btn btn-danger" data-remove-row>&times;</button></td>
+      `;
+      tbody.appendChild(tr);
+      document.dispatchEvent(new CustomEvent('otros-servicios:changed'));
+    }
+  });
+
+  // Recalcular filas existentes al cargar
+  tbody.querySelectorAll('[data-row]').forEach(recalc);
+})();
+</script>

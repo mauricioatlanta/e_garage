@@ -1,0 +1,114 @@
+{% load i18n %}
+{% load static %}
+{% load widget_tweaks %}
+<!-- EGARAGE_LOGIN_FORM_V1 -->
+<div class="login-container">
+  <div class="glass-card">
+
+    <div class="logo-section">
+      <div class="logo-container">
+        <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="logo">
+      </div>
+      {% with c=country|default:request.country|default:"EG" %}
+      {% if c == 'CO' or request.path|slice:":4" == '/co/' %}
+        <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
+      {% elif c == 'EC' or request.path|slice:":4" == '/ec/' %}
+        <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
+      {% elif c == 'PE' or request.path|slice:":4" == '/pe/' %}
+        <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
+      {% elif c == 'VE' or request.path|slice:":4" == '/ve/' %}
+        <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
+      {% elif c == 'BR' or request.path|slice:":4" == '/br/' %}
+        <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
+      {% elif c == 'MX' or request.path|slice:":4" == '/mx/' %}
+        <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
+      {% elif c == 'US' or request.path|slice:":4" == '/us/' %}
+        <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
+      {% elif c == 'UY' or request.path|slice:":4" == '/uy/' %}
+        <div class="country-badge font-futuristic">🇺🇾 URUGUAY</div>
+      {% elif c == 'AR' or request.path|slice:":4" == '/ar/' %}
+        <div class="country-badge font-futuristic">🇦🇷 ARGENTINA</div>
+      {% elif c == 'EG' %}
+        <div class="country-badge font-futuristic">eGarage</div>
+      {% else %}
+        <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
+      {% endif %}
+      {% endwith %}
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">
+        {% for error in form.non_field_errors %}
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    {% if messages %}
+      {% for message in messages %}
+        {% with message_str=message|stringformat:"s" %}
+          {% if "Successfully signed in" not in message_str and "You have signed out" not in message_str and "Professional Automotive Management System" not in message_str and "Ha iniciado sesión exitosamente" not in message_str and "Ha cerrado sesión" not in message_str and "iniciado sesión exitosamente" not in message_str and "cerrado sesión" not in message_str and "Información de empresa guardada exitosamente" not in message_str %}
+            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">{{ message }}</div>
+          {% endif %}
+        {% endwith %}
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" action="">
+      {% csrf_token %}
+      {% if "next" in request.GET %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+
+      <div class="form-group">
+        <label class="form-label font-futuristic" for="{{ form.login.id_for_label }}">{% trans "Email or Username" %}</label>
+        {{ form.login|add_class:"form-input"|attr:"placeholder:Enter your credentials"|attr:"autocomplete:email" }}
+        {% for error in form.login.errors %}
+          <div class="error-message">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="form-group">
+        <label class="form-label font-futuristic" for="{{ form.password.id_for_label }}">{% trans "Password" %}</label>
+        {{ form.password|add_class:"form-input"|attr:"placeholder:Enter your secure password"|attr:"type:password"|attr:"autocomplete:current-password" }}
+        {% for error in form.password.errors %}
+          <div class="error-message">
+            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+            {{ error }}
+          </div>
+        {% endfor %}
+      </div>
+
+      {% if form.remember %}
+        <div class="remember-me">
+          {{ form.remember }}
+          <label for="{{ form.remember.id_for_label }}">{% trans "Keep me signed in" %}</label>
+        </div>
+      {% endif %}
+
+      <button type="submit" class="login-button">
+        <span class="relative z-10">
+          <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/></svg>
+          {% trans "Access System" %}
+        </span>
+      </button>
+    </form>
+
+    <div class="forgot-password">
+      <a href="{% url 'account_reset_password' %}" class="font-futuristic">
+        <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+        {% trans "Reset password" %}
+      </a>
+    </div>
+
+    <div class="signup-section">
+      <div class="signup-text">{% trans "New to eGarage?" %}</div>
+      <a href="{% url 'account_signup' %}" class="signup-link font-futuristic">{% trans "Create your account" %} →</a>
+    </div>
+
+  </div>
+</div>

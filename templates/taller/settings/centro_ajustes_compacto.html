@@ -111,6 +111,7 @@
         font-size: 1.4rem;
         background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
         -webkit-background-clip: text;
+        background-clip: text;
         -webkit-text-fill-color: transparent;
     }
 
@@ -350,6 +351,32 @@
                 <i class="fas fa-chevron-down"></i>
             </span>
         </button>
+
+        <button type="button"
+                class="section-button"
+                data-section="suscripcion"
+                onclick="openSettingsSection('suscripcion')">
+            <span>
+                <i class="fas fa-credit-card"></i>
+                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SUSCRIPCIÓN{% else %}SUBSCRIPTION{% endif %}
+            </span>
+            <span class="arrow">
+                <i class="fas fa-chevron-down"></i>
+            </span>
+        </button>
+
+        <button type="button"
+                class="section-button"
+                data-section="seguridad"
+                onclick="openSettingsSection('seguridad')">
+            <span>
+                <i class="fas fa-shield-alt"></i>
+                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SEGURIDAD{% else %}SECURITY{% endif %}
+            </span>
+            <span class="arrow">
+                <i class="fas fa-chevron-down"></i>
+            </span>
+        </button>
     </div>
 
     <!-- MENSAJE INICIAL -->
@@ -363,7 +390,7 @@
 
         <!-- PROFILE -->
         <div id="section-profile" class="settings-section">
-            <form method="post" enctype="multipart/form-data">
+            <form method="POST" enctype="multipart/form-data">
                 {% csrf_token %}
                 <input type="hidden" name="section" value="profile">
 
@@ -388,9 +415,22 @@
                     </div>
 
                     <div class="col-md-4">
-                        <label class="form-label">{{ profile_form.logo.label }}</label>
-                        {{ profile_form.logo }}
-                        {{ profile_form.logo.errors }}
+                        <label class="form-label">{{ empresa_form.logo.label }}</label>
+                        
+                        {% if config_empresa.logo %}
+                            <div class="mb-3" style="margin-bottom: 1rem;">
+                                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Logo actual:{% else %}Current logo:{% endif %}</p>
+                                <img src="{{ config_empresa.logo.url }}" 
+                                     alt="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Logo actual{% else %}Current logo{% endif %}" 
+                                     style="max-width: 200px; max-height: 150px; object-fit: contain; border: 1px solid rgba(0,255,255,.3); border-radius: 8px; padding: 0.5rem; background: rgba(17, 21, 40, 0.5);">
+                            </div>
+                        {% endif %}
+                        
+                        {{ empresa_form.logo }}
+                        <small class="form-text" style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Formatos: PNG, JPG, JPEG, SVG, WEBP (máx. 10MB){% else %}Formats: PNG, JPG, JPEG, SVG, WEBP (max. 10MB){% endif %}
+                        </small>
+                        {{ empresa_form.logo.errors }}
                     </div>
                 </div>
 
@@ -409,21 +449,6 @@
                         <label class="form-label">{{ profile_form.website.label }}</label>
                         {{ profile_form.website }}
                         {{ profile_form.website.errors }}
-                    </div>
-                </div>
-
-                <div class="row g-3 mt-3">
-                    <div class="col-md-6">
-{% if request.user.empresa.pais != "US" %}<!-- HIDE_US_TAX_FIELDS -->
-                        <label class="form-label">{{ profile_form.tax_id.label }}</label>
-                        {{ profile_form.tax_id }}
-                        {{ profile_form.tax_id.errors }}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ profile_form.business_license.label }}</label>
-                        {{ profile_form.business_license }}
-                        {{ profile_form.business_license.errors }}
-{% endif %}<!-- /HIDE_US_TAX_FIELDS -->
                     </div>
                 </div>
 
@@ -621,6 +646,66 @@
                     <i class="fas fa-info-circle me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}No hay empleados registrados. Agrega uno usando el formulario arriba.{% else %}No employees registered. Add one using the form above.{% endif %}
                 </p>
             {% endif %}
+        </div>
+
+        <!-- SUSCRIPCIÓN -->
+        <div id="section-suscripcion" class="settings-section">
+            <div class="settings-section-header">
+                <i class="fas fa-credit-card"></i>
+                <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Plan &amp; Suscripción eGarage{% else %}Plan &amp; eGarage Subscription{% endif %}</h3>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                            Información de tu plan actual, ciclo de cobro y estado de la suscripción.
+                        {% else %}
+                            Information about your current plan, billing cycle and subscription status.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-start">
+                {% if request.path|slice:":4" == "/cl/" %}
+                    <a href="/cl/es/suscripcion/pago/" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                {% elif request.path|slice:":4" == "/us/" %}
+                    <a href="/us/en/pricing/" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                {% else %}
+                    <a href="#" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                {% endif %}
+                    <i class="fas fa-external-link-alt"></i>
+                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ver mi plan{% else %}View my plan{% endif %}
+                </a>
+            </div>
+        </div>
+
+        <!-- SEGURIDAD -->
+        <div id="section-seguridad" class="settings-section">
+            <div class="settings-section-header">
+                <i class="fas fa-shield-alt"></i>
+                <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Accesos &amp; Seguridad{% else %}Access &amp; Security{% endif %}</h3>
+            </div>
+
+            <div class="row g-3">
+                <div class="col-12">
+                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                            Contraseñas, recuperación de acceso y reglas básicas de seguridad de cuenta.
+                        {% else %}
+                            Passwords, account recovery and basic account security rules.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-start">
+                <a href="{% url 'account_change_password' %}" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-external-link-alt"></i>
+                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Gestionar seguridad{% else %}Manage security{% endif %}
+                </a>
+            </div>
         </div>
 
     </div>

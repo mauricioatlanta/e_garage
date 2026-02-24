@@ -19,7 +19,6 @@ omit =
     */paso*.py
     # Additional patterns for better coverage hygiene
     */urls_extra/*
-    */urls_modules/*
     */urls_new.py
     */min_urls.py
     */context_processors.py
@@ -62,7 +61,6 @@ omit =
     */reportes_urls.py
     */taller_urls.py
     */taller_urls_extra/*
-    */taller_urls_modules/*
     */taller_views_extra/*
     */taller_views/*
     */taller_analytics/*

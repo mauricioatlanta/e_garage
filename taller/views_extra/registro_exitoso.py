@@ -3,7 +3,6 @@ Vista de registro exitoso - muestra mensaje después del registro
 """
 
 from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
 
 from taller.config.country_settings import CountrySettings
 from taller.utils.country_config import get_country_config

@@ -1,0 +1,45 @@
+{% extends "taller/common/base_auth.html" %}
+{% load i18n static %}
+
+{% block title %}eGarage — {% trans "Cambiar contraseña" %}{% endblock %}
+
+{% block content %}
+<section class="eg-card eg-glow">
+  <header class="eg-card-head">
+    <div class="eg-logo">eGarage</div>
+    <h1 class="eg-h1">{% trans "Cambiar contraseña" %}</h1>
+    <p class="eg-sub">{% trans "Ingresa tu nueva contraseña." %}</p>
+  </header>
+
+  {% if form %}
+    <form method="post" class="eg-form" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      {# Render genérico de campos para formulario de cambio de contraseña #}
+      {% for field in form %}
+        <label class="eg-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+        <div class="eg-input-wrap {% if field.errors %}eg-has-error{% endif %}">
+          {{ field }}
+        </div>
+        {% for err in field.errors %}
+          <div class="eg-error">{{ err }}</div>
+        {% endfor %}
+      {% endfor %}
+
+      <button class="eg-btn eg-btn-primary" type="submit">{% trans "Cambiar contraseña" %}</button>
+    </form>
+  {% else %}
+    <div class="eg-row eg-center-content">
+      <div class="eg-error">{% trans "El enlace de restablecimiento no es válido o ha expirado." %}</div>
+    </div>
+  {% endif %}
+
+  <div class="eg-divider"><span>{% trans "o" %}</span></div>
+
+  <div class="eg-row eg-between">
+    <span class="eg-muted">{% trans "¿Ya tienes acceso?" %}</span>
+    <a class="eg-btn eg-btn-ghost" href="{% url 'account_login' %}">{% trans "Iniciar sesión" %}</a>
+  </div>
+</section>
+{% endblock %}

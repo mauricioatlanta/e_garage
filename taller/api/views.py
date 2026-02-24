@@ -7,6 +7,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.db import models
 from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 from django.utils import timezone
 from django.views.decorators.http import require_GET, require_POST
 
@@ -889,6 +890,160 @@ def api_crear_vehiculo_onboarding(request):
 
 
 @login_required
+@require_POST
+def api_procesar_foto_patente(request):
+    """
+    API endpoint para procesar foto de patente y buscar/crear vehículo.
+    
+    POST /api/vehiculos/procesar-foto-patente/
+    Body: FormData con 'foto' (archivo de imagen)
+    
+    Returns JSON:
+    {
+        "success": true,
+        "patente": "ABCD12",
+        "vehiculo": {
+            "id": 123,
+            "patente": "ABCD12",
+            "marca": "Toyota",
+            "modelo": "Corolla",
+            "cliente": {
+                "id": 456,
+                "nombre": "Juan Pérez"
+            }
+        },
+        "existe": true,
+        "mensaje": "Vehículo encontrado"
+    }
+    """
+    from whatsapp.services.ocr import OCRProcessor
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
+    empresa = _get_empresa(request)
+    if not empresa:
+        return JsonResponse({
+            'success': False,
+            'error': 'No tienes una empresa asignada'
+        }, status=400)
+    
+    # Verificar que se subió un archivo
+    if 'foto' not in request.FILES:
+        return JsonResponse({
+            'success': False,
+            'error': 'No se recibió ninguna imagen'
+        }, status=400)
+    
+    imagen = request.FILES['foto']
+    
+    # Validar tipo de archivo
+    if not imagen.content_type.startswith('image/'):
+        return JsonResponse({
+            'success': False,
+            'error': 'El archivo debe ser una imagen'
+        }, status=400)
+    
+    # Leer bytes de la imagen
+    try:
+        image_bytes = imagen.read()
+        if len(image_bytes) == 0:
+            return JsonResponse({
+                'success': False,
+                'error': 'La imagen está vacía'
+            }, status=400)
+    except Exception as e:
+        logger.error(f"Error leyendo imagen: {e}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Error procesando la imagen'
+        }, status=500)
+    
+    # Procesar OCR con validación de confianza
+    ocr_processor = OCRProcessor(confidence_threshold=0.6)
+    ocr_result = ocr_processor.extract_plate(image_bytes, return_full_result=True)
+    
+    if not ocr_result or not ocr_result.get('plate'):
+        error_msg = 'No se pudo detectar la patente en la imagen. Por favor, intenta con una foto más clara.'
+        if ocr_result and ocr_result.get('candidates'):
+            # Hay candidatos pero ninguno válido
+            error_msg += f"\nTextos detectados: {', '.join([c['plate'] for c in ocr_result['candidates'][:3]])}"
+        return JsonResponse({
+            'success': False,
+            'error': error_msg
+        }, status=400)
+    
+    patente = ocr_result['plate']
+    confidence = ocr_result['confidence']
+    needs_manual_confirm = ocr_result['needs_manual_confirm']
+    candidates = ocr_result.get('candidates', [])
+    
+    # Si la confianza es baja, retornar candidatos para confirmación manual
+    if needs_manual_confirm:
+        return JsonResponse({
+            'success': True,
+            'patente': patente,
+            'confidence': confidence,
+            'needs_manual_confirm': True,
+            'candidates': [
+                {
+                    'plate': c['plate'],
+                    'confidence': c['confidence'],
+                    'country': c.get('country', 'UNKNOWN')
+                }
+                for c in candidates[:5]  # Máximo 5 candidatos
+            ],
+            'mensaje': f'Confianza baja ({confidence:.0%}). Por favor, confirma la patente correcta:'
+        })
+    
+    # Buscar vehículo por patente en la empresa
+    try:
+        vehiculo = Vehiculo.objects.filter(
+            empresa=empresa,
+            patente__iexact=patente
+        ).select_related('cliente', 'marca', 'modelo').first()
+        
+        if vehiculo:
+            # Vehículo encontrado
+            cliente = vehiculo.cliente
+            return JsonResponse({
+                'success': True,
+                'patente': patente,
+                'vehiculo': {
+                    'id': vehiculo.id,
+                    'patente': vehiculo.patente,
+                    'marca': vehiculo.get_marca_display(),
+                    'modelo': vehiculo.get_modelo_display(),
+                    'anio': vehiculo.anio,
+                    'cliente': {
+                        'id': cliente.id,
+                        'nombre': cliente.nombre,
+                        'apellido': cliente.apellido or '',
+                        'telefono': cliente.telefono or '',
+                    }
+                },
+                'existe': True,
+                'mensaje': 'Vehículo encontrado en la base de datos'
+            })
+        else:
+            # Vehículo no encontrado - retornar patente para crear nuevo
+            return JsonResponse({
+                'success': True,
+                'patente': patente,
+                'vehiculo': None,
+                'existe': False,
+                'mensaje': f'Patente {patente} no encontrada. ¿Deseas crear un nuevo vehículo?'
+            })
+            
+    except Exception as e:
+        logger.error(f"Error buscando vehículo: {e}")
+        return JsonResponse({
+            'success': False,
+            'error': 'Error buscando vehículo en la base de datos'
+        }, status=500)
+
+
+@login_required
 @require_GET
 def api_listar_clientes(request):
     """
@@ -919,3 +1074,111 @@ def api_listar_clientes(request):
 
     except Exception as e:
         return JsonResponse([], safe=False)
+
+
+@login_required
+@require_POST
+def api_completar_datos_facturacion(request, cliente_id):
+    """
+    API para completar datos de facturación de un cliente.
+    
+    Se usa cuando el mecánico intenta facturar y el cliente no tiene
+    todos los datos requeridos. Abre un pop-up rápido para completar:
+    - tax_id (identificador tributario)
+    - giro (actividad económica)
+    - billing_address (dirección)
+    
+    POST /us/api/clientes/<id>/completar-facturacion/ o /cl/api/clientes/<id>/completar-facturacion/
+    """
+    import logging
+    
+    logger = logging.getLogger(__name__)
+    
+    try:
+        empresa = _get_empresa(request)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "No empresa found"}, status=400)
+        
+        # Obtener el cliente
+        cliente = get_object_or_404(Cliente, id=cliente_id, empresa=empresa)
+        
+        # Usar el formulario BillingDataForm
+        from taller.clientes.forms_unified import BillingDataForm
+        
+        form = BillingDataForm(request.POST, instance=cliente, empresa=empresa)
+        
+        if form.is_valid():
+            cliente = form.save()
+            
+            # Verificar que ahora está listo para facturar
+            is_ready = cliente.is_billing_ready()
+            missing = cliente.get_missing_billing_fields()
+            
+            return JsonResponse({
+                "success": True,
+                "message": "Datos de facturación completados exitosamente",
+                "cliente": {
+                    "id": cliente.id,
+                    "nombre": cliente.nombre,
+                    "is_billing_ready": is_ready,
+                    "profile_status": cliente.get_profile_status(),
+                },
+                "missing_fields": missing if not is_ready else [],
+            })
+        else:
+            # Retornar errores del formulario
+            errors = {}
+            for field, field_errors in form.errors.items():
+                errors[field] = [str(e) for e in field_errors]
+            
+            return JsonResponse({
+                "success": False,
+                "error": "Error al completar datos de facturación",
+                "form_errors": errors,
+            }, status=400)
+            
+    except Exception as e:
+        logger.error(f"Error en api_completar_datos_facturacion: {e}")
+        return JsonResponse({
+            "success": False,
+            "error": f"Error al completar datos: {str(e)}"
+        }, status=500)
+
+
+@login_required
+@require_GET
+def api_verificar_facturacion_cliente(request, cliente_id):
+    """
+    API para verificar si un cliente está listo para facturar.
+    
+    Retorna el estado del perfil y los campos faltantes.
+    
+    GET /us/api/clientes/<id>/verificar-facturacion/ o /cl/api/clientes/<id>/verificar-facturacion/
+    """
+    try:
+        empresa = _get_empresa(request)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "No empresa found"}, status=400)
+        
+        cliente = get_object_or_404(Cliente, id=cliente_id, empresa=empresa)
+        
+        profile_status = cliente.get_profile_status()
+        is_ready = cliente.is_billing_ready()
+        missing = cliente.get_missing_billing_fields()
+        
+        return JsonResponse({
+            "success": True,
+            "cliente": {
+                "id": cliente.id,
+                "nombre": cliente.nombre,
+                "is_billing_ready": is_ready,
+                "profile_status": profile_status,
+            },
+            "missing_fields": missing,
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            "success": False,
+            "error": f"Error al verificar cliente: {str(e)}"
+        }, status=500)

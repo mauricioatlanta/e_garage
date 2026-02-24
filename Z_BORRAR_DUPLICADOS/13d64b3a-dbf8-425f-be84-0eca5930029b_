@@ -1,0 +1,222 @@
+{% extends "base.html" %}
+{% load country_url %}
+{% load i18n static %}
+
+{% block title %}{% if language == 'en' %}Add New Service{% else %}Agregar Nuevo Servicio{% endif %} - eGarage{% endblock %}
+
+{% block content %}
+{% csrf_token %}
+
+<div class="max-w-4xl mx-auto">
+    <!-- Header -->
+    <div class="mb-6">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h1 class="text-3xl font-bold space-text mb-2">
+                    {% if language == 'en' %}
+                        ➕ Add New Service
+                    {% else %}
+                        ➕ Agregar Nuevo Servicio
+                    {% endif %}
+                </h1>
+                <p class="space-text-muted">
+                    {% if language == 'en' %}
+                        Add a custom service to your catalog
+                    {% else %}
+                        Agrega un servicio personalizado a tu catálogo
+                    {% endif %}
+                </p>
+            </div>
+            <a href="{% country_url 'servicios:servicios_menu' %}" 
+               class="space-button bg-gray-600/20 border-gray-500/40 space-text">
+                {% if language == 'en' %}← Back{% else %}← Volver{% endif %}
+            </a>
+        </div>
+    </div>
+
+    <!-- Form -->
+    <div class="space-glow">
+        <div class="space-card p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                {% if form.non_field_errors %}
+                <div class="bg-red-900/20 border border-red-500/40 rounded-lg p-4 mb-4">
+                    <ul class="text-red-300 text-sm">
+                        {% for error in form.non_field_errors %}
+                        <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+                <!-- Service Name (Primary) -->
+                <div class="space-y-2">
+                    <label for="{{ form.nombre.id_for_label }}" class="block text-cyan-400 font-semibold">
+                        {% if language == 'en' %}
+                            Service Name <span class="text-red-400">*</span>
+                        {% else %}
+                            Nombre del Servicio <span class="text-red-400">*</span>
+                        {% endif %}
+                    </label>
+                    <input type="text" 
+                           name="{{ form.nombre.name }}" 
+                           id="{{ form.nombre.id_for_label }}"
+                           value="{{ form.nombre.value|default:'' }}"
+                           required
+                           class="space-input w-full {% if form.nombre.errors %}border-red-500{% endif %}"
+                           placeholder="{% if language == 'en' %}e.g., Custom Engine Tune-up{% else %}Ej: Afinamiento Personalizado{% endif %}">
+                    {% if form.nombre.errors %}
+                    <div class="text-red-400 text-sm mt-1">
+                        {{ form.nombre.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Bilingual Names (Optional) -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label for="{{ form.nombre_es.id_for_label }}" class="block text-cyan-400 font-semibold">
+                            {% if language == 'en' %}
+                                Name (Spanish)
+                            {% else %}
+                                Nombre (Español)
+                            {% endif %}
+                        </label>
+                        <input type="text" 
+                               name="{{ form.nombre_es.name }}" 
+                               id="{{ form.nombre_es.id_for_label }}"
+                               value="{{ form.nombre_es.value|default:'' }}"
+                               class="space-input w-full {% if form.nombre_es.errors %}border-red-500{% endif %}"
+                               placeholder="{% if language == 'en' %}Spanish translation{% else %}Traducción en español{% endif %}">
+                        {% if form.nombre_es.errors %}
+                        <div class="text-red-400 text-sm mt-1">
+                            {{ form.nombre_es.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="{{ form.nombre_en.id_for_label }}" class="block text-cyan-400 font-semibold">
+                            {% if language == 'en' %}
+                                Name (English)
+                            {% else %}
+                                Nombre (Inglés)
+                            {% endif %}
+                        </label>
+                        <input type="text" 
+                               name="{{ form.nombre_en.name }}" 
+                               id="{{ form.nombre_en.id_for_label }}"
+                               value="{{ form.nombre_en.value|default:'' }}"
+                               class="space-input w-full {% if form.nombre_en.errors %}border-red-500{% endif %}"
+                               placeholder="{% if language == 'en' %}English translation{% else %}Traducción en inglés{% endif %}">
+                        {% if form.nombre_en.errors %}
+                        <div class="text-red-400 text-sm mt-1">
+                            {{ form.nombre_en.errors.0 }}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Subcategory -->
+                <div class="space-y-2">
+                    <label for="{{ form.subcategoria.id_for_label }}" class="block text-cyan-400 font-semibold">
+                        {% if language == 'en' %}
+                            Subcategory <span class="text-red-400">*</span>
+                        {% else %}
+                            Subcategoría <span class="text-red-400">*</span>
+                        {% endif %}
+                    </label>
+                    <select name="{{ form.subcategoria.name }}" 
+                            id="{{ form.subcategoria.id_for_label }}"
+                            required
+                            class="space-input w-full {% if form.subcategoria.errors %}border-red-500{% endif %}">
+                        <option value="">{% if language == 'en' %}Select a subcategory...{% else %}Selecciona una subcategoría...{% endif %}</option>
+                        {% for subcat in form.subcategoria.field.queryset %}
+                        <option value="{{ subcat.id }}" 
+                                {% if form.subcategoria.value == subcat.id %}selected{% endif %}
+                                data-categoria="{{ subcat.categoria.code }}">
+                            {{ subcat.get_label|default:subcat.code }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.subcategoria.errors %}
+                    <div class="text-red-400 text-sm mt-1">
+                        {{ form.subcategoria.errors.0 }}
+                    </div>
+                    {% endif %}
+                    <p class="text-xs space-text-muted mt-1">
+                        {% if language == 'en' %}
+                            Select the subcategory that best fits this service
+                        {% else %}
+                            Selecciona la subcategoría que mejor se ajuste a este servicio
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Service Type -->
+                <div class="space-y-2">
+                    <label for="{{ form.tipo.id_for_label }}" class="block text-cyan-400 font-semibold">
+                        {% if language == 'en' %}
+                            Service Type
+                        {% else %}
+                            Tipo de Servicio
+                        {% endif %}
+                    </label>
+                    <select name="{{ form.tipo.name }}" 
+                            id="{{ form.tipo.id_for_label }}"
+                            class="space-input w-full {% if form.tipo.errors %}border-red-500{% endif %}">
+                        {% for value, label in form.tipo.field.choices %}
+                        <option value="{{ value }}" {% if form.tipo.value == value %}selected{% endif %}>
+                            {{ label }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                    {% if form.tipo.errors %}
+                    <div class="text-red-400 text-sm mt-1">
+                        {{ form.tipo.errors.0 }}
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Submit Buttons -->
+                <div class="flex items-center justify-end gap-4 pt-4 border-t border-cyan-400/20">
+                    <a href="{% country_url 'servicios:servicios_menu' %}" 
+                       class="space-button bg-gray-600/20 border-gray-500/40 space-text">
+                        {% if language == 'en' %}Cancel{% else %}Cancelar{% endif %}
+                    </a>
+                    <button type="submit" 
+                            class="space-button bg-gradient-to-r from-cyan-500 to-lime-500 hover:from-cyan-600 hover:to-lime-600 text-white font-semibold">
+                        {% if language == 'en' %}
+                            ✅ Create Service
+                        {% else %}
+                            ✅ Crear Servicio
+                        {% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-fill translations if only one name is provided
+    const nombreInput = document.getElementById('{{ form.nombre.id_for_label }}');
+    const nombreEsInput = document.getElementById('{{ form.nombre_es.id_for_label }}');
+    const nombreEnInput = document.getElementById('{{ form.nombre_en.id_for_label }}');
+    
+    nombreInput.addEventListener('blur', function() {
+        if (nombreInput.value && !nombreEsInput.value && !nombreEnInput.value) {
+            // If main name is filled but translations are empty, copy to both
+            nombreEsInput.value = nombreInput.value;
+            nombreEnInput.value = nombreInput.value;
+        }
+    });
+});
+</script>
+{% endblock %}
+

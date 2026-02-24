@@ -569,12 +569,7 @@ select[name="country"] {
 
 <div class="signup-container">
     <div class="glass-card">
-        <!-- Logo -->
-        <div class="logo-section">
-            <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
-        </div>
-
-        <h2 class="signup-title">{% trans "Create Your Account" %}</h2>
+        <h2 class="signup-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Crea Tu Cuenta{% else %}{% trans "Create Your Account" %}{% endif %}</h2>
 
         <!-- Mensajes -->
         {% if messages %}
@@ -597,46 +592,20 @@ select[name="country"] {
         <form method="POST" id="signup-form">
             {% csrf_token %}
 
-            <!-- SECCIÓN 1: Datos Personales -->
+            <!-- Campo oculto username (se genera automáticamente) -->
+            {% if form.username %}
+                {{ form.username }}
+            {% endif %}
+
+            <!-- SECCIÓN 1: Datos de Registro (Solo campos obligatorios) -->
             <div class="form-section">
-                <h3 class="section-title">{% trans "Personal Information" %}</h3>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {% if form.first_name %}
-                    <div class="form-group">
-                        <label class="form-label">{{ form.first_name.label }} *</label>
-                        {{ form.first_name }}
-                        {% if form.first_name.errors %}
-                        <div class="error-message">{{ form.first_name.errors }}</div>
-                        {% endif %}
-                        {% if form.first_name.help_text %}
-                        <div class="help-text">{{ form.first_name.help_text }}</div>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-
-                    {% if form.last_name %}
-                    <div class="form-group">
-                        <label class="form-label">{{ form.last_name.label }} *</label>
-                        {{ form.last_name }}
-                        {% if form.last_name.errors %}
-                        <div class="error-message">{{ form.last_name.errors }}</div>
-                        {% endif %}
-                        {% if form.last_name.help_text %}
-                        <div class="help-text">{{ form.last_name.help_text }}</div>
-                        {% endif %}
-                    </div>
-                    {% endif %}
-                </div>
+                <h3 class="section-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Datos de Registro{% else %}{% trans "Registration Data" %}{% endif %}</h3>
 
                 <div class="form-group">
-                    <label class="form-label">{{ form.telefono.label }} *</label>
-                    {{ form.telefono }}
-                    {% if form.telefono.errors %}
-                    <div class="error-message">{{ form.telefono.errors }}</div>
-                    {% endif %}
-                    {% if form.telefono.help_text %}
-                    <div class="help-text">{{ form.telefono.help_text }}</div>
+                    <label class="form-label">{{ form.country.label }}</label>
+                    {{ form.country }}
+                    {% if form.country.errors %}
+                    <div class="error-message">{{ form.country.errors }}</div>
                     {% endif %}
                 </div>
 
@@ -650,134 +619,168 @@ select[name="country"] {
                     <div class="help-text">{{ form.email.help_text }}</div>
                     {% endif %}
                 </div>
+
+                <div class="form-group">
+                    <label class="form-label">{{ form.telefono.label }} *</label>
+                    {{ form.telefono }}
+                    <div id="telefono-error" class="error-message" style="display: none;"></div>
+                    {% if form.telefono.errors %}
+                    <div class="error-message">{{ form.telefono.errors }}</div>
+                    {% endif %}
+                    {% if form.telefono.help_text %}
+                    <div class="help-text">{{ form.telefono.help_text }}</div>
+                    {% endif %}
+                </div>
             </div>
 
             <!-- SECCIÓN 2: Contraseña -->
             <div class="form-section">
-                <h3 class="section-title">{% trans "Security" %}</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="form-group">
-                        <label class="form-label">{% trans "Password" %} *</label>
+                <h3 class="section-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Seguridad{% else %}{% trans "Security" %}{% endif %}</h3>
+                <div class="form-group">
+                    <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Contraseña{% else %}{% trans "Password" %}{% endif %} *</label>
+                    <div style="position: relative;">
                         {{ form.password1 }}
-                        {% if form.password1.help_text %}
-                        <div class="help-text">{{ form.password1.help_text }}</div>
-                        {% endif %}
-                        {% if form.password1.errors %}
-                        <div class="error-message">{{ form.password1.errors }}</div>
-                        {% endif %}
+                        <button type="button" class="password-toggle" onclick="togglePassword('id_password1')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 8px;">👁️</button>
                     </div>
+                    {% if form.password1.help_text %}
+                    <div class="help-text">{{ form.password1.help_text }}</div>
+                    {% endif %}
+                    {% if form.password1.errors %}
+                    <div class="error-message">{{ form.password1.errors }}</div>
+                    {% endif %}
+                </div>
 
-                    <div class="form-group">
-                        <label class="form-label">{% trans "Confirm Password" %} *</label>
+                <div class="form-group">
+                    <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Confirmar Contraseña{% else %}{% trans "Confirm Password" %}{% endif %} *</label>
+                    <div style="position: relative;">
                         {{ form.password2 }}
-                        {% if form.password2.errors %}
-                        <div class="error-message">{{ form.password2.errors }}</div>
-                        {% endif %}
+                        <button type="button" class="password-toggle" onclick="togglePassword('id_password2')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 8px;">👁️</button>
                     </div>
+                    {% if form.password2.errors %}
+                    <div class="error-message">{{ form.password2.errors }}</div>
+                    {% endif %}
                 </div>
             </div>
 
             <!-- SECCIÓN 3: Selección de Plan -->
             <div class="form-section">
-                <h3 class="section-title">{% trans "Select Your Plan" %}</h3>
+                <h3 class="section-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Selecciona Tu Plan{% else %}{% trans "Select Your Plan" %}{% endif %}</h3>
 
                 <!-- Pricing Cards -->
                 <div class="pricing-grid">
                     <!-- Trial -->
                     <div class="plan-card" data-plan="trial" onclick="selectPlan('trial')">
-                        <div class="plan-badge">{% trans "FREE" %}</div>
-                        <div class="plan-name">Trial</div>
+                        <div class="plan-badge">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}GRATIS{% else %}{% trans "FREE" %}{% endif %}</div>
+                        <div class="plan-name">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Prueba{% else %}Trial{% endif %}</div>
                         <div class="plan-price">$0</div>
-                        <div class="plan-period">30 {% trans "days" %}</div>
+                        <div class="plan-period">30 {% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}días{% else %}{% trans "days" %}{% endif %}</div>
                         <ul class="plan-features">
-                            <li>{% trans "Full access" %}</li>
-                            <li>{% trans "No credit card" %}</li>
-                            <li>{% trans "Cancel anytime" %}</li>
+                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Acceso completo{% else %}{% trans "Full access" %}{% endif %}</li>
+                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Sin tarjeta de crédito{% else %}{% trans "No credit card" %}{% endif %}</li>
+                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Cancela cuando quieras{% else %}{% trans "Cancel anytime" %}{% endif %}</li>
                         </ul>
                     </div>
 
                     <!-- Mensual -->
                     <div class="plan-card" data-plan="mensual" onclick="selectPlan('mensual')">
-                        <div class="plan-name">{% trans "Monthly" %}</div>
+                        <div class="plan-name">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Mensual{% else %}{% trans "Monthly" %}{% endif %}</div>
                         <div class="plan-price">
                             <span class="price-cl">$20.000</span>
                             <span class="price-us" style="display:none;">$20</span>
+                            <span class="price-ar" style="display:none;">$29.100</span>
                             <span class="price-br" style="display:none;">R$ 100</span>
                             <span class="price-ve" style="display:none;">Bs. 730</span>
                             <span class="price-pe" style="display:none;">S/ 70</span>
                             <span class="price-co" style="display:none;">$80.000</span>
                             <span class="price-ec" style="display:none;">$20</span>
+                            <span class="price-uy" style="display:none;">$ 800</span>
+                            <span class="price-mx" style="display:none;">$350</span>
                         </div>
                         <div class="plan-period">
                             <span class="period-cl">/ mes</span>
                             <span class="period-us" style="display:none;">/ month</span>
+                            <span class="period-ar" style="display:none;">ARS / mes</span>
                             <span class="period-br" style="display:none;">/ mês</span>
                             <span class="period-ve" style="display:none;">/ mes</span>
                             <span class="period-pe" style="display:none;">/ mes</span>
                             <span class="period-co" style="display:none;">COP / mes</span>
                             <span class="period-ec" style="display:none;">USD / mes</span>
+                            <span class="period-uy" style="display:none;">UYU / mes</span>
+                            <span class="period-mx" style="display:none;">MXN / mes</span>
                         </div>
                         <ul class="plan-features">
-                            <li>{% trans "Unlimited users" %}</li>
-                            <li>{% trans "All features" %}</li>
+                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Usuarios ilimitados{% else %}{% trans "Unlimited users" %}{% endif %}</li>
+                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Todas las funcionalidades{% else %}{% trans "All features" %}{% endif %}</li>
                         </ul>
                     </div>
 
                     <!-- Semestral -->
                     <div class="plan-card recommended" data-plan="semestral" onclick="selectPlan('semestral')">
-                        <div class="plan-badge gold">⭐ {% trans "BEST VALUE" %}</div>
-                        <div class="plan-name">{% trans "Semi-Annual" %}</div>
+                        <div class="plan-badge gold">⭐ {% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}MEJOR VALOR{% else %}{% trans "BEST VALUE" %}{% endif %}</div>
+                        <div class="plan-name">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Semestral{% else %}{% trans "Semi-Annual" %}{% endif %}</div>
                         <div class="plan-price">
-                            <span class="price-cl">$100.000</span>
+                            <span class="price-cl">$110.000</span>
                             <span class="price-us" style="display:none;">$110</span>
+                            <span class="price-ar" style="display:none;">$160.050</span>
                             <span class="price-br" style="display:none;">R$ 500</span>
                             <span class="price-ve" style="display:none;">Bs. 3,650</span>
                             <span class="price-pe" style="display:none;">S/ 350</span>
                             <span class="price-co" style="display:none;">$440.000</span>
                             <span class="price-ec" style="display:none;">$110</span>
+                            <span class="price-uy" style="display:none;">$ 4.400</span>
+                            <span class="price-mx" style="display:none;">$1,925</span>
                         </div>
                         <div class="plan-period">
                             <span class="period-cl">/ 6 meses</span>
                             <span class="period-us" style="display:none;">/ 6 months</span>
+                            <span class="period-ar" style="display:none;">ARS / 6 meses</span>
                             <span class="period-br" style="display:none;">/ 6 meses</span>
                             <span class="period-ve" style="display:none;">/ 6 meses</span>
                             <span class="period-pe" style="display:none;">/ 6 meses</span>
                             <span class="period-co" style="display:none;">COP / 6 meses</span>
                             <span class="period-ec" style="display:none;">USD / 6 meses</span>
+                            <span class="period-uy" style="display:none;">UYU / 6 meses</span>
+                            <span class="period-mx" style="display:none;">MXN / 6 meses</span>
                         </div>
-                        <div class="plan-savings">{% trans "Save" %} 17%</div>
+                        <div class="plan-savings">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Ahorra{% else %}{% trans "Save" %}{% endif %} 17%</div>
                         <ul class="plan-features">
-                            <li>{% trans "Everything in Monthly" %}</li>
-                            <li>{% trans "Priority support" %}</li>
+                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Todo del plan Mensual{% else %}{% trans "Everything in Monthly" %}{% endif %}</li>
+                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Soporte priorizado{% else %}{% trans "Priority support" %}{% endif %}</li>
                         </ul>
                     </div>
 
                     <!-- Anual -->
                     <div class="plan-card" data-plan="anual" onclick="selectPlan('anual')">
-                        <div class="plan-badge gold">💎 {% trans "BEST PRICE" %}</div>
-                        <div class="plan-name">{% trans "Annual" %}</div>
+                        <div class="plan-badge gold">💎 {% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}MEJOR PRECIO{% else %}{% trans "BEST PRICE" %}{% endif %}</div>
+                        <div class="plan-name">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Anual{% else %}{% trans "Annual" %}{% endif %}</div>
                         <div class="plan-price">
                             <span class="price-cl">$200.000</span>
                             <span class="price-us" style="display:none;">$200</span>
+                            <span class="price-ar" style="display:none;">$291.000</span>
                             <span class="price-br" style="display:none;">R$ 1.000</span>
                             <span class="price-ve" style="display:none;">Bs. 7,300</span>
                             <span class="price-pe" style="display:none;">S/ 700</span>
                             <span class="price-co" style="display:none;">$800.000</span>
                             <span class="price-ec" style="display:none;">$200</span>
+                            <span class="price-uy" style="display:none;">$ 8.000</span>
+                            <span class="price-mx" style="display:none;">$3,500</span>
                         </div>
                         <div class="plan-period">
                             <span class="period-cl">/ año</span>
                             <span class="period-us" style="display:none;">/ year</span>
+                            <span class="period-ar" style="display:none;">ARS / año</span>
                             <span class="period-br" style="display:none;">/ ano</span>
                             <span class="period-ve" style="display:none;">/ año</span>
                             <span class="period-pe" style="display:none;">/ año</span>
                             <span class="period-co" style="display:none;">COP / año</span>
                             <span class="period-ec" style="display:none;">USD / año</span>
+                            <span class="period-uy" style="display:none;">UYU / año</span>
+                            <span class="period-mx" style="display:none;">MXN / año</span>
                         </div>
-                        <div class="plan-savings">{% trans "Save" %} 33%</div>
+                        <div class="plan-savings">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Ahorra{% else %}{% trans "Save" %}{% endif %} 33%</div>
                         <ul class="plan-features">
-                            <li>{% trans "Everything in Semi-Annual" %}</li>
-                            <li>{% trans "Best value" %}</li>
+                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Todo del plan Semestral{% else %}{% trans "Everything in Semi-Annual" %}{% endif %}</li>
+                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Mejor valor{% else %}{% trans "Best value" %}{% endif %}</li>
                         </ul>
                     </div>
                 </div>
@@ -795,14 +798,14 @@ select[name="country"] {
 
             <!-- Botón Submit -->
             <button type="submit" class="signup-button">
-                {% trans "CREATE ACCOUNT" %}
+                {% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}CREAR CUENTA{% else %}{% trans "CREATE ACCOUNT" %}{% endif %}
             </button>
         </form>
 
         <!-- Link a Login -->
         <div class="login-link">
-            <span class="login-text">{% trans "Already have an account?" %}</span>
-            <a href="/accounts/login/">{% trans "Sign in" %}</a>
+            <span class="login-text">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}¿Ya tienes una cuenta?{% else %}{% trans "Already have an account?" %}{% endif %}</span>
+            <a href="/accounts/login/">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Iniciar sesión{% else %}{% trans "Sign in" %}{% endif %}</a>
         </div>
     </div>
 </div>
@@ -832,7 +835,7 @@ document.addEventListener('DOMContentLoaded', function() {
 // Actualizar precios según país
 function updatePlanPrices(country) {
     // Ocultar todos los precios primero
-    document.querySelectorAll('.price-cl, .period-cl, .price-us, .period-us, .price-br, .period-br, .price-ve, .period-ve, .price-pe, .period-pe, .price-co, .period-co, .price-ec, .period-ec').forEach(el => {
+    document.querySelectorAll('.price-cl, .period-cl, .price-us, .period-us, .price-ar, .period-ar, .price-br, .period-br, .price-ve, .period-ve, .price-pe, .period-pe, .price-co, .period-co, .price-ec, .period-ec, .price-uy, .period-uy, .price-mx, .period-mx').forEach(el => {
         el.style.display = 'none';
     });
 
@@ -843,6 +846,11 @@ function updatePlanPrices(country) {
         });
     } else if (country === 'US') {
         document.querySelectorAll('.price-us, .period-us').forEach(el => {
+            el.style.display = 'inline';
+        });
+    } else if (country === 'AR') {
+        // Argentina: precios en ARS al dólar oficial ($1.455) — $20→$29.100, $110→$160.050, $200→$291.000
+        document.querySelectorAll('.price-ar, .period-ar').forEach(el => {
             el.style.display = 'inline';
         });
     } else if (country === 'BR') {
@@ -865,9 +873,13 @@ function updatePlanPrices(country) {
         document.querySelectorAll('.price-ec, .period-ec').forEach(el => {
             el.style.display = 'inline';
         });
+    } else if (country === 'UY') {
+        document.querySelectorAll('.price-uy, .period-uy').forEach(el => {
+            el.style.display = 'inline';
+        });
     } else if (country === 'MX') {
-        // México usa USD por ahora
-        document.querySelectorAll('.price-us, .period-us').forEach(el => {
+        // México: MXN equivalente a USD (~17.5) — $20→$350, $110→$1,925, $200→$3,500
+        document.querySelectorAll('.price-mx, .period-mx').forEach(el => {
             el.style.display = 'inline';
         });
     }
@@ -899,23 +911,29 @@ if (planInput) {
 
 // Inicializar con país por defecto
 window.addEventListener('load', function() {
-    // Detectar país desde la URL
+    // Detectar país desde la URL: ?from=uy, ?country=xx o path
     const path = window.location.pathname;
     const urlParams = new URLSearchParams(window.location.search);
     const countryParam = urlParams.get('country');
-    
-    if (countryParam) {
-        updatePlanPrices(countryParam.toUpperCase());
+    const fromParam = urlParams.get('from');
+    const country = (countryParam || fromParam || '').toUpperCase();
+
+    if (country) {
+        updatePlanPrices(country);
     } else if (path.includes('/ve/')) {
         updatePlanPrices('VE');
     } else if (path.includes('/br/')) {
         updatePlanPrices('BR');
+    } else if (path.includes('/ar/')) {
+        updatePlanPrices('AR');
     } else if (path.includes('/pe/')) {
         updatePlanPrices('PE');
     } else if (path.includes('/us/')) {
         updatePlanPrices('US');
     } else if (path.includes('/cl/')) {
         updatePlanPrices('CL');
+    } else if (path.includes('/uy/')) {
+        updatePlanPrices('UY');
     } else if (path.includes('/co/')) {
         updatePlanPrices('CO');
     } else if (path.includes('/ec/')) {
@@ -923,6 +941,139 @@ window.addEventListener('load', function() {
     } else if (path.includes('/mx/')) {
         updatePlanPrices('MX');
     }
+    
+    // ✅ Actualizar precios al cambiar el país
+    const countrySelect = document.getElementById('id_country');
+    if (countrySelect) {
+        countrySelect.addEventListener('change', function() {
+            updatePlanPrices(this.value || 'CL');
+        });
+    }
+
+    // ✅ Validación de teléfono en tiempo real
+    const telefonoInput = document.getElementById('id_telefono');
+    const telefonoError = document.getElementById('telefono-error');
+    
+    if (telefonoInput) {
+        telefonoInput.addEventListener('blur', validatePhone);
+        telefonoInput.addEventListener('input', function() {
+            // Limpiar error mientras escribe
+            if (telefonoError) {
+                telefonoError.style.display = 'none';
+                telefonoError.textContent = '';
+            }
+        });
+    }
+});
+
+// ✅ Función para validar teléfono en frontend
+function validatePhone() {
+    const telefonoInput = document.getElementById('id_telefono');
+    const telefonoError = document.getElementById('telefono-error');
+    
+    if (!telefonoInput || !telefonoError) return;
+    
+    let telefono = telefonoInput.value.trim();
+    
+    if (!telefono) {
+        telefonoError.textContent = 'El teléfono es obligatorio';
+        telefonoError.style.display = 'block';
+        return false;
+    }
+    
+    // Normalizar: quitar espacios, guiones, paréntesis
+    let telefonoNormalizado = telefono.replace(/\s+/g, '').replace(/-/g, '').replace(/[()]/g, '');
+    
+    // Si no empieza con +, asumir que es número local (agregar validación básica)
+    if (!telefonoNormalizado.startsWith('+')) {
+        // Contar solo dígitos
+        const digitos = telefonoNormalizado.replace(/\D/g, '');
+        
+        // Validar longitud mínima (ej: 8 dígitos para número local)
+        if (digitos.length < 8) {
+            telefonoError.textContent = 'El número de teléfono es demasiado corto. Usa formato internacional (+código número)';
+            telefonoError.style.display = 'block';
+            return false;
+        }
+        
+        if (digitos.length > 15) {
+            telefonoError.textContent = 'El número de teléfono es demasiado largo';
+            telefonoError.style.display = 'block';
+            return false;
+        }
+    } else {
+        // Si tiene +, validar que después del + solo haya dígitos
+        const numeroSinPrefijo = telefonoNormalizado.substring(1);
+        const digitos = numeroSinPrefijo.replace(/\D/g, '');
+        
+        if (digitos.length < 8) {
+            telefonoError.textContent = 'El número después del código de país es demasiado corto (mínimo 8 dígitos)';
+            telefonoError.style.display = 'block';
+            return false;
+        }
+        
+        if (digitos.length > 15) {
+            telefonoError.textContent = 'El número de teléfono es demasiado largo (máximo 15 dígitos después del +)';
+            telefonoError.style.display = 'block';
+            return false;
+        }
+        
+        // Validar que después del + solo haya dígitos
+        if (!/^\+\d+$/.test(telefonoNormalizado)) {
+            telefonoError.textContent = 'El formato no es válido. Usa: +código número (solo números después del +)';
+            telefonoError.style.display = 'block';
+            return false;
+        }
+    }
+    
+    // Si pasó todas las validaciones, ocultar error
+    telefonoError.style.display = 'none';
+    return true;
+}
+
+// ✅ Función para mostrar/ocultar contraseña
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const button = event.target;
+    
+    if (!input) return;
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        button.textContent = '🙈';
+    } else {
+        input.type = 'password';
+        button.textContent = '👁️';
+    }
+}
+
+// ✅ Validar formulario antes de enviar
+document.getElementById('signup-form')?.addEventListener('submit', function(e) {
+    if (!validatePhone()) {
+        e.preventDefault();
+        const telefonoInput = document.getElementById('id_telefono');
+        if (telefonoInput) {
+            telefonoInput.focus();
+        }
+        return false;
+    }
 });
 </script>
+
+<style>
+/* ✅ Estilos para el botón de mostrar/ocultar contraseña */
+.password-toggle {
+    z-index: 10;
+    transition: color 0.3s;
+}
+
+.password-toggle:hover {
+    color: #22d3ee !important;
+}
+
+/* ✅ Asegurar que los inputs de contraseña tengan padding-right para el botón */
+#id_password1, #id_password2 {
+    padding-right: 50px !important;
+}
+</style>
 {% endblock %}

@@ -1,0 +1,256 @@
+{% extends 'base.html' %}
+{% load static i18n country_url %}
+
+{% block title %}{% trans "Company Configuration" %} - eGarage{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --neon-cyan: #00ffff;
+        --neon-purple: #b026ff;
+        --dark-card: #151932;
+        --text-primary: #ffffff;
+        --text-secondary: #a0aec0;
+    }
+
+    body {
+        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
+        background-attachment: fixed;
+        color: var(--text-primary);
+    }
+
+    .config-container {
+        max-width: 900px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+    }
+
+    .config-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .config-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 0.5rem;
+    }
+
+    .config-card {
+        background: rgba(21, 25, 50, 0.88);
+        border-radius: 20px;
+        border: 1px solid rgba(0,255,255,.25);
+        box-shadow: 0 10px 35px rgba(0,0,0,.45);
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        color: var(--neon-cyan);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 0.8rem;
+        background: rgba(0, 0, 0, 0.4);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 8px;
+        color: var(--text-primary);
+        font-size: 1rem;
+    }
+
+    .form-group input:focus,
+    .form-group textarea:focus {
+        outline: none;
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    }
+
+    .form-group textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .logo-upload {
+        margin-top: 1rem;
+    }
+
+    .logo-preview {
+        margin-top: 1rem;
+        max-width: 200px;
+        max-height: 200px;
+        border-radius: 8px;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+    }
+
+    .btn-submit {
+        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+        color: #000;
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 10px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: transform 0.2s, box-shadow 0.2s;
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .btn-submit:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 255, 255, 0.4);
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .stat-card {
+        background: rgba(0, 255, 255, 0.1);
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 12px;
+        padding: 1rem;
+        text-align: center;
+    }
+
+    .stat-card .stat-value {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--neon-cyan);
+    }
+
+    .stat-card .stat-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-top: 0.5rem;
+    }
+
+    .back-link {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .back-link a {
+        color: var(--neon-cyan);
+        text-decoration: none;
+        padding: 0.8rem 1.5rem;
+        border: 1px solid rgba(0, 255, 255, 0.3);
+        border-radius: 8px;
+        display: inline-block;
+        transition: all 0.2s;
+    }
+
+    .back-link a:hover {
+        background: rgba(0, 255, 255, 0.1);
+        border-color: var(--neon-cyan);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="config-container">
+    <div class="config-header">
+        <h1>⚙️ {% trans "Company Configuration" %}</h1>
+        <p style="color: var(--text-secondary);">{% trans "Manage your company information and settings" %}</p>
+    </div>
+
+    <div class="config-card">
+        <h2 style="color: var(--text-primary); margin-bottom: 1.5rem;">{% trans "Company Information" %}</h2>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label for="nombre_taller">{% trans "Workshop Name" %}: *</label>
+                <input type="text" id="nombre_taller" name="nombre_taller" 
+                       value="{{ empresa.nombre_taller|default:'' }}" required>
+            </div>
+
+            <div class="form-group">
+                <label for="empresa_nombre">{% trans "Company Name" %}:</label>
+                <input type="text" id="empresa_nombre" name="empresa_nombre" 
+                       value="{{ empresa.empresa|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">{% trans "Phone" %}:</label>
+                <input type="text" id="telefono" name="telefono" 
+                       value="{{ empresa.telefono|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="email">{% trans "Email" %}:</label>
+                <input type="email" id="email" name="email" 
+                       value="{{ empresa.email|default:'' }}">
+            </div>
+
+            <div class="form-group">
+                <label for="direccion">{% trans "Address" %}:</label>
+                <textarea id="direccion" name="direccion" rows="3">{{ empresa.direccion|default:'' }}</textarea>
+            </div>
+
+            <div class="form-group logo-upload">
+                <label for="logo">{% trans "Logo" %}:</label>
+                <input type="file" id="logo" name="logo" accept="image/*">
+                {% if empresa.logo %}
+                <div style="margin-top: 1rem;">
+                    <p style="color: var(--text-secondary); margin-bottom: 0.5rem;">{% trans "Current Logo" %}:</p>
+                    <img src="{{ empresa.logo.url }}" alt="Logo" class="logo-preview">
+                </div>
+                {% endif %}
+            </div>
+
+            <button type="submit" name="actualizar_empresa" class="btn-submit">
+                💾 {% trans "Save Configuration" %}
+            </button>
+        </form>
+    </div>
+
+    {% if stats %}
+    <div class="config-card">
+        <h2 style="color: var(--text-primary); margin-bottom: 1.5rem;">{% trans "Statistics" %}</h2>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.tecnicos_total|default:0 }}</div>
+                <div class="stat-label">{% trans "Total Technicians" %}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.tecnicos_activos|default:0 }}</div>
+                <div class="stat-label">{% trans "Active Technicians" %}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.tecnicos_inactivos|default:0 }}</div>
+                <div class="stat-label">{% trans "Inactive Technicians" %}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">{{ stats.documentos_total|default:0 }}</div>
+                <div class="stat-label">{% trans "Total Documents" %}</div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="back-link">
+        <a href="{% country_url 'centro_operaciones' app_namespace='direct' %}">
+            ← {% trans "Back to Dashboard" %}
+        </a>
+    </div>
+</div>
+{% endblock %}
+

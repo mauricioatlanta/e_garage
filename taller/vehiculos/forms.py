@@ -25,10 +25,11 @@ class VehiculoForm(forms.ModelForm):
     )
 
     # Campo cliente explícitamente definido con autocomplete
+    # La URL se configurará dinámicamente en __init__ según el país
     cliente = forms.ModelChoiceField(
         queryset=Cliente.objects.none(),  # Se configurará en __init__
         widget=autocomplete.ModelSelect2(
-            url="taller:vehiculos:cliente_autocomplete",
+            url="chile:vehiculos:cliente_autocomplete",  # Default para Chile, se ajustará en __init__
             attrs={
                 "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
                 "data-placeholder": "Buscar cliente por nombre, email o teléfono...",
@@ -107,44 +108,73 @@ class VehiculoForm(forms.ModelForm):
 
                 # Actualizar la URL del widget
                 try:
+                    # Extraer lang del path si está presente (ej: /us/en/... o /us/es/...)
+                    lang = None
+                    path_parts = path.strip("/").split("/")
+                    if len(path_parts) >= 2 and path_parts[1] in ["en", "es"]:
+                        lang = path_parts[1]
+                    
                     # Intentar generar la URL absoluta con reverse para asegurar que tenga el prefijo correcto
                     try:
-                        absolute_url = reverse(autocomplete_url)
-                        log.info(f"[VehiculoForm] URL generada por reverse: {absolute_url}")
+                        # No pasar lang como kwarg ya que el URL pattern no lo acepta
+                        # El reverse usará automáticamente el namespace correcto basado en el contexto
+                        from django.urls import NoReverseMatch
+                        try:
+                            absolute_url = reverse(autocomplete_url)
+                            log.info(f"[VehiculoForm] URL generada por reverse: {absolute_url}")
 
-                        # Verificar si la URL ya tiene el prefijo correcto
-                        expected_prefix = (
-                            "/us/"
-                            if path.startswith("/us/")
-                            else "/cl/" if path.startswith("/cl/") else None
-                        )
+                            # Verificar si la URL ya tiene el prefijo correcto
+                            expected_prefix = (
+                                "/us/"
+                                if path.startswith("/us/")
+                                else "/cl/" if path.startswith("/cl/") else None
+                            )
 
-                        if expected_prefix and not absolute_url.startswith(expected_prefix):
-                            # Si falta el prefijo, agregarlo
-                            if absolute_url.startswith("/"):
-                                absolute_url = expected_prefix.rstrip("/") + absolute_url
+                            if expected_prefix and not absolute_url.startswith(expected_prefix):
+                                # Si falta el prefijo, agregarlo
+                                if absolute_url.startswith("/"):
+                                    absolute_url = expected_prefix.rstrip("/") + absolute_url
+                                else:
+                                    absolute_url = expected_prefix.rstrip("/") + "/" + absolute_url
+                                log.info(
+                                    f"[VehiculoForm] Prefijo agregado, URL corregida: {absolute_url}"
+                                )
+
+                            # Usar la URL absoluta en el atributo data-ajax--url como fallback
+                            if hasattr(self.fields["cliente"].widget, "attrs"):
+                                self.fields["cliente"].widget.attrs["data-ajax--url"] = absolute_url
+                                log.info(
+                                    f"[VehiculoForm] ✅ URL absoluta configurada en data-ajax--url: {absolute_url}"
+                                )
+                            
+                            # Si tenemos lang, usar la URL absoluta directamente en widget.url
+                            # para evitar que DAL intente hacer reverse sin el parámetro lang
+                            if lang:
+                                self.fields["cliente"].widget.url = absolute_url
+                                log.info(
+                                    f"[VehiculoForm] ✅ URL absoluta configurada en widget.url (con lang={lang}): {absolute_url}"
+                                )
                             else:
-                                absolute_url = expected_prefix.rstrip("/") + "/" + absolute_url
-                            log.info(
-                                f"[VehiculoForm] Prefijo agregado, URL corregida: {absolute_url}"
+                                # Sin lang, usar el namespace normal
+                                self.fields["cliente"].widget.url = autocomplete_url
+                                log.info(
+                                    f"[VehiculoForm] ✅ URL de autocomplete cliente actualizada: {autocomplete_url}"
+                                )
+                        except NoReverseMatch as e:
+                            log.warning(
+                                f"[VehiculoForm] NoReverseMatch al generar URL: {e}, usando namespace directamente: {autocomplete_url}"
                             )
-
-                        # Usar la URL absoluta en el atributo data-ajax--url como fallback
-                        if hasattr(self.fields["cliente"].widget, "attrs"):
-                            self.fields["cliente"].widget.attrs["data-ajax--url"] = absolute_url
-                            log.info(
-                                f"[VehiculoForm] ✅ URL absoluta configurada en data-ajax--url: {absolute_url}"
-                            )
+                            # Si falla el reverse, usar el namespace directamente
+                            self.fields["cliente"].widget.url = autocomplete_url
                     except Exception as reverse_error:
-                        log.warning(
-                            f"[VehiculoForm] No se pudo generar URL absoluta: {reverse_error}, usando namespace: {autocomplete_url}"
+                        log.error(
+                            f"[VehiculoForm] Error inesperado al generar URL: {reverse_error}, usando namespace: {autocomplete_url}"
                         )
-
-                    # También establecer el namespace para que DAL lo use
-                    self.fields["cliente"].widget.url = autocomplete_url
-                    log.info(
-                        f"[VehiculoForm] ✅ URL de autocomplete cliente actualizada: {autocomplete_url}"
-                    )
+                        # Si falla el reverse, usar el namespace (puede fallar si requiere lang)
+                        self.fields["cliente"].widget.url = autocomplete_url
+                        log.info(
+                            f"[VehiculoForm] ✅ URL de autocomplete cliente actualizada (fallback): {autocomplete_url}"
+                        )
                 except Exception as e:
                     log.error(f"[VehiculoForm] ❌ Error al actualizar URL de autocomplete: {e}")
 
@@ -167,6 +197,9 @@ class VehiculoForm(forms.ModelForm):
         else:
             log.info(f"[VehiculoForm] Configurando campos LATAM para país: {pais}")
             self._configurar_campos_latam(pais)
+
+        # Configurar URLs de autocomplete para motor y caja si existen
+        self._configurar_urls_autocomplete_motor_caja()
 
         # Debug: verificar que el campo marca se haya creado correctamente
         if "marca" in self.fields:
@@ -218,6 +251,82 @@ class VehiculoForm(forms.ModelForm):
 
         if self.instance and getattr(self.instance, "color_id", None):
             self.fields["color"].initial = str(self.instance.color_id)
+
+    def _configurar_urls_autocomplete_motor_caja(self):
+        """Configurar URLs de autocomplete para motor y caja con soporte para lang"""
+        import logging
+        from django.urls import reverse
+
+        log = logging.getLogger(__name__)
+
+        if not self.request:
+            return
+
+        path = (self.request.path or "").lower()
+        
+        # Extraer lang del path si está presente (ej: /us/en/... o /us/es/...)
+        lang = None
+        path_parts = path.strip("/").split("/")
+        if len(path_parts) >= 2 and path_parts[1] in ["en", "es"]:
+            lang = path_parts[1]
+
+        # Determinar namespace base según el país
+        if path.startswith("/us/"):
+            autocomplete_ns = "usa:vehiculos"
+        elif path.startswith("/cl/"):
+            autocomplete_ns = "chile:vehiculos"
+        elif path.startswith("/mx/"):
+            autocomplete_ns = "mexico:vehiculos"
+        else:
+            autocomplete_ns = "taller:vehiculos"
+
+        # Configurar motor
+        # Verificar si el campo existe y si el widget es de tipo autocomplete sin acceder a url
+        # Usar isinstance para verificar el tipo sin acceder a propiedades
+        if "motor" in self.fields and isinstance(self.fields["motor"].widget, autocomplete.ModelSelect2):
+            motor_url_name = f"{autocomplete_ns}:motor-autocomplete"
+            try:
+                # No pasar lang como kwarg ya que el URL pattern no lo acepta
+                absolute_url = reverse(motor_url_name)
+                
+                if lang:
+                    # Usar _url directamente para evitar que DAL intente hacer reverse
+                    self.fields["motor"].widget._url = absolute_url
+                    log.info(f"[VehiculoForm] ✅ URL absoluta configurada para motor (con lang={lang}): {absolute_url}")
+                else:
+                    self.fields["motor"].widget._url = motor_url_name
+                    log.info(f"[VehiculoForm] ✅ URL de autocomplete motor actualizada: {motor_url_name}")
+            except Exception as e:
+                log.warning(f"[VehiculoForm] No se pudo generar URL absoluta para motor: {e}, usando namespace: {motor_url_name}")
+                # Intentar usar el namespace directamente (puede fallar si requiere lang)
+                try:
+                    self.fields["motor"].widget._url = motor_url_name
+                except Exception:
+                    pass
+
+        # Configurar caja
+        # Verificar si el campo existe y si el widget es de tipo autocomplete sin acceder a url
+        # Usar isinstance para verificar el tipo sin acceder a propiedades
+        if "caja" in self.fields and isinstance(self.fields["caja"].widget, autocomplete.ModelSelect2):
+            caja_url_name = f"{autocomplete_ns}:caja-autocomplete"
+            try:
+                # No pasar lang como kwarg ya que el URL pattern no lo acepta
+                absolute_url = reverse(caja_url_name)
+                
+                if lang:
+                    # Usar _url directamente para evitar que DAL intente hacer reverse
+                    self.fields["caja"].widget._url = absolute_url
+                    log.info(f"[VehiculoForm] ✅ URL absoluta configurada para caja (con lang={lang}): {absolute_url}")
+                else:
+                    self.fields["caja"].widget._url = caja_url_name
+                    log.info(f"[VehiculoForm] ✅ URL de autocomplete caja actualizada: {caja_url_name}")
+            except Exception as e:
+                log.warning(f"[VehiculoForm] No se pudo generar URL absoluta para caja: {e}, usando namespace: {caja_url_name}")
+                # Intentar usar el namespace directamente (puede fallar si requiere lang)
+                try:
+                    self.fields["caja"].widget._url = caja_url_name
+                except Exception:
+                    pass
 
     def _configurar_campos_usa(self):
         """Configurar campos específicos para usuarios de USA"""
@@ -655,7 +764,10 @@ class VehiculoForm(forms.ModelForm):
                 self.fields["modelo"].initial = str(self.data.get("modelo"))
 
             # Cargar motores y cajas del modelo inicial
-            modelo_actual = self.instance.modelo
+            # Inicializar modelo_actual de forma segura
+            modelo_actual = None
+            if self.instance and hasattr(self.instance, 'modelo'):
+                modelo_actual = getattr(self.instance, 'modelo', None)
 
             # Si estamos en POST (con errores), usar el modelo del POST
             if self.data and "modelo" in self.data:
@@ -665,7 +777,7 @@ class VehiculoForm(forms.ModelForm):
                         from taller.models.modelo import Modelo
 
                         modelo_actual = Modelo.objects.get(pk=modelo_id_post)
-                except:
+                except Exception:
                     pass
 
             if modelo_actual:

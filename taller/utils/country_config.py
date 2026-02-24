@@ -16,6 +16,8 @@ Uso:
 
 from decimal import Decimal
 
+from django.conf import settings
+
 # Configuración completa por país
 COUNTRY_SETTINGS = {
     "CL": {
@@ -163,8 +165,8 @@ COUNTRY_SETTINGS = {
     },
 }
 
-# País por defecto
-DEFAULT_COUNTRY = "CL"
+# País por defecto: desde settings (EGARAGE_DEFAULT_COUNTRY) para una sola fuente de verdad
+DEFAULT_COUNTRY = getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl").upper()
 
 
 def get_country_config(country_code):

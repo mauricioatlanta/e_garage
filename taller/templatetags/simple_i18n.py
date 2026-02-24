@@ -36,7 +36,11 @@ def trans(context, text):
         return text
 
     # Obtener idioma de la sesión o parámetro URL
-    lang = request.GET.get("lang") or request.session.get("language", "es")
+    # Verificar que request.session existe antes de acceder
+    if hasattr(request, "session"):
+        lang = request.GET.get("lang") or request.session.get("language", "es")
+    else:
+        lang = request.GET.get("lang") or "es"
 
     # Si es español o no hay traducción, devolver texto original
     if lang == "es" or lang not in TRANSLATIONS:

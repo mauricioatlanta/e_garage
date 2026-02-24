@@ -1,4 +1,5 @@
 from allauth.account.views import LoginView
+from django.conf import settings
 from django.utils.translation import get_language
 
 
@@ -23,14 +24,45 @@ class CountryAwareLoginView(LoginView):
         request.session["preferred_country"] = country
 
     def _detect_country(self, request):
+        # /accounts/login/ sin país en path: limpiar sesión para no arrastrar UY/otro, pero
+        # SÍ respetar ?country=, ?from=, next, referer. Solo si no hay pistas → default CL.
+        path_raw = (request.path or "").rstrip("/")
+        if path_raw == "/accounts/login":
+            request.session.pop("preferred_country", None)
+
         next_url = request.GET.get("next", "") or ""
         country_param = (request.GET.get("country", "") or "").upper()
+        from_param = (request.GET.get("from", "") or "").upper()
+
+        # Detectar desde parámetro ?from= (ej. /accounts/login/?from=co)
+        if from_param in ["US", "USA"]:
+            return "US"
+        if from_param in ["UY", "URUGUAY"]:
+            return "UY"
+        if from_param in ["AR", "ARGENTINA"]:
+            return "AR"
+        if from_param in ["CO", "COLOMBIA"]:
+            return "CO"
+        if from_param in ["EC", "ECUADOR"]:
+            return "EC"
+        if from_param in ["PE", "PERU", "PERÚ"]:
+            return "PE"
+        if from_param in ["VE", "VENEZUELA"]:
+            return "VE"
+        if from_param in ["BR", "BRASIL", "BRAZIL"]:
+            return "BR"
+        if from_param in ["MX", "MEXICO"]:
+            return "MX"
 
         # Detectar desde next URL
         if next_url.startswith("/us/"):
             return "US"
         if next_url.startswith("/cl/"):
             return "CL"
+        if next_url.startswith("/uy/"):
+            return "UY"
+        if next_url.startswith("/ar/"):
+            return "AR"
         if next_url.startswith("/mx/"):
             return "MX"
         if next_url.startswith("/co/"):
@@ -61,6 +93,10 @@ class CountryAwareLoginView(LoginView):
             return "VE"
         if country_param in ["BR", "BRASIL", "BRAZIL"]:
             return "BR"
+        if country_param in ["UY", "URUGUAY"]:
+            return "UY"
+        if country_param in ["AR", "ARGENTINA"]:
+            return "AR"
 
         # Detectar desde sesión guardada
         saved = (request.session.get("preferred_country") or "").upper()
@@ -80,6 +116,10 @@ class CountryAwareLoginView(LoginView):
             return "VE"
         if saved in ["BR", "BRASIL", "BRAZIL"]:
             return "BR"
+        if saved in ["UY", "URUGUAY"]:
+            return "UY"
+        if saved in ["AR", "ARGENTINA"]:
+            return "AR"
 
         # Detectar desde referer
         referer = request.headers.get("referer", "")
@@ -99,6 +139,10 @@ class CountryAwareLoginView(LoginView):
             return "VE"
         if "/br/" in referer or "/brasil/" in referer or "/brazil/" in referer:
             return "BR"
+        if "/uy/" in referer or "/uruguay/" in referer:
+            return "UY"
+        if "/ar/" in referer or "/argentina/" in referer:
+            return "AR"
 
         # Detectar desde usuario autenticado
         if request.user.is_authenticated:
@@ -127,8 +171,13 @@ class CountryAwareLoginView(LoginView):
             return "VE"
         if path.startswith("/br/") or path == "/br":
             return "BR"
+        if path.startswith("/uy/") or path == "/uy":
+            return "UY"
+        if path.startswith("/ar/") or path == "/ar":
+            return "AR"
 
-        return "CL"
+        # Fallback: país por defecto de settings (Chile, no Uruguay)
+        return getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl").upper()
 
     # ------------------------------------------------------------------ #
     # Overrides de LoginView
@@ -138,23 +187,29 @@ class CountryAwareLoginView(LoginView):
         lang = get_language() or "es"
 
         if country == "US":
-            if lang == "es":
-                return ["cl/es/account/login.html"]
+            return ["account/login.html"]  # misma gráfica; labels EN vía {% if country == 'US' %}
+        if country == "UY":
+            return ["uy/es/account/login.html"]
+        if country == "MX" and lang == "en":
             return ["us/en/account/login.html"]
-        if country == "MX":
-            if lang == "en":
-                return ["us/en/account/login.html"]
-            return ["taller/mx/es/account/login.html"]
+        # Venezuela: template propio ve/es/account/login.html
+        if country == "VE":
+            return ["ve/es/account/login.html"]
+        # MX, CL, AR, CO, EC, PE: base_login + _login_form (reutilizable, misma gráfica)
+        if country in ("MX", "CL", "AR", "CO", "EC", "PE"):
+            return ["account/login.html"]
 
         if lang == "en":
             return ["us/en/account/login.html"]
-        return ["cl/es/account/login.html"]
+        return ["account/login.html"]
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["country"] = getattr(self.request, "country", "CL")
         context["LANGUAGE_CODE"] = get_language() or "es"
         context["debug"] = True
+        # Ocultar starfield del base; el login usa su propio fondo (Vanta/grid)
+        context["enable_space_bg"] = 0
         return context
 
 

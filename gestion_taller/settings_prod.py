@@ -5,9 +5,20 @@ from pathlib import Path
 from .settings import *  # noqa: F401,F403
 
 
+# =============================================================================
+# STATIC / MEDIA
+# =============================================================================
+STATIC_URL = "/static/"
+STATIC_ROOT = os.getenv("STATIC_ROOT", "/srv/egarage/staticfiles")
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = os.getenv("MEDIA_ROOT", "/srv/egarage/media")
+
+
 # =========================
 # Helpers de entorno
-# =========================
+Environment="DJANGO_SETTINGS_MODULE=gestion_taller.settings_prod"
+
 def env_str(key: str, default: str = "") -> str:
     v = os.getenv(key, default)
     return (v or "").strip()
@@ -25,15 +36,9 @@ def env_int(key: str, default: int = 0) -> int:
         return int(default)
 
 
-def env_list(key: str, default: str = "") -> list[str]:
-    # acepta separador por coma o salto de línea
-    raw = env_str(key, default).replace("\n", ",")
-    items = []
-    for x in raw.split(","):
-        x = x.strip()
-        if x:
-            items.append(x)
-    return items
+def env_list(name: str, default: str = "") -> list[str]:
+    raw = os.getenv(name, default) or ""
+    return [x.strip() for x in raw.split(",") if x.strip()]
 
 
 # =========================
@@ -59,9 +64,14 @@ CSRF_TRUSTED_ORIGINS = env_list(
 # =========================
 # HTTPS detrás de proxy (PythonAnywhere)
 # =========================
+# 🔥 IMPRESCINDIBLE: Configuración fija para producción (no controlada por env)
+# Este header es CRÍTICO cuando Django está detrás de un proxy (Nginx, Cloudflare, etc.)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = env_bool("DJANGO_USE_X_FORWARDED_HOST", True)
 
+# 🔥 IMPRESCINDIBLE: Fijo en True para producción (requiere SECURE_PROXY_SSL_HEADER arriba)
+# ⚠️ TEMPORAL: Si aún no tienes certificado SSL instalado, cambia esto a False
+# o configura DJANGO_SECURE_SSL_REDIRECT=false en .env
 SECURE_SSL_REDIRECT = env_bool("DJANGO_SECURE_SSL_REDIRECT", True)
 SESSION_COOKIE_SECURE = env_bool("DJANGO_SESSION_COOKIE_SECURE", True)
 CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", True)
@@ -90,19 +100,59 @@ SECURE_REFERRER_POLICY = env_str("DJANGO_SECURE_REFERRER_POLICY", "strict-origin
 
 
 # =========================
-# DB: SQLite shared + “airbag” de ruta
+# DB: Configuración unificada para DigitalOcean
 # =========================
-if DATABASES["default"]["ENGINE"].endswith("sqlite3"):
-    REQUIRED_DB = "/home/atlantareciclajes/apps/egarage/shared/db/db.sqlite3"
-    DATABASES["default"]["NAME"] = env_str("DJANGO_DB_PATH", REQUIRED_DB)
+# Permite usar SQLite temporalmente o PostgreSQL según variables de entorno
+# Para migrar a PostgreSQL, configura estas variables en .env:
+#   DJANGO_DB_ENGINE=postgresql
+#   DJANGO_DB_NAME=egarage_db
+#   DJANGO_DB_USER=egarage
+#   DJANGO_DB_PASSWORD=tu_password
+#   DJANGO_DB_HOST=127.0.0.1
+#   DJANGO_DB_PORT=5432
 
-    # Airbag: en producción NO permitas apuntar a otra DB por accidente
-    # (si quieres desactivarlo temporalmente: DJANGO_ENFORCE_PROD_DB_PATH=False)
-    if env_bool("DJANGO_ENFORCE_PROD_DB_PATH", True):
-        current = str(Path(DATABASES["default"]["NAME"]).resolve())
-        required = str(Path(REQUIRED_DB).resolve())
-        if current != required:
-            raise RuntimeError(f"PROD DB PATH inválido. Esperado: {required} | Actual: {current}")
+DB_ENGINE = env_str("DJANGO_DB_ENGINE", "sqlite3").lower()
+
+if DB_ENGINE == "postgresql" or DB_ENGINE == "postgres":
+    # PostgreSQL - Configuración para producción
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.postgresql",
+            "NAME": env_str("DJANGO_DB_NAME", "egarage_db"),
+            "USER": env_str("DJANGO_DB_USER", "egarage"),
+            "PASSWORD": env_str("DJANGO_DB_PASSWORD"),
+            "HOST": env_str("DJANGO_DB_HOST", "127.0.0.1"),
+            "PORT": env_str("DJANGO_DB_PORT", "5432"),
+            "OPTIONS": {
+                "connect_timeout": 10,
+            },
+        }
+    }
+    
+    # Validar que la contraseña esté configurada
+    if not DATABASES["default"]["PASSWORD"]:
+        raise RuntimeError(
+            "DJANGO_DB_PASSWORD debe estar configurado cuando se usa PostgreSQL. "
+            "Configúralo en tu archivo .env o variables de entorno."
+        )
+else:
+    # SQLite - Temporal para migración a DigitalOcean
+    # ⚠️ ADVERTENCIA: SQLite no es recomendado para producción con múltiples workers
+    # Usa esto solo durante la migración inicial
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": env_str("DJANGO_DB_NAME", "/srv/egarage/db.sqlite3"),
+        }
+    }
+    
+    # Validación desactivada temporalmente para permitir SQLite durante la migración
+    # Cuando migres a PostgreSQL, descomenta estas líneas para forzar PostgreSQL:
+    # if DATABASES["default"]["ENGINE"].endswith("sqlite3"):
+    #     raise RuntimeError(
+    #         "SQLite NO está permitido en producción. "
+    #         "Configura DJANGO_DB_ENGINE=postgresql en tu archivo .env"
+    #     )
 
 
 # =========================
@@ -114,3 +164,26 @@ TEMPLATES[0]["DIRS"] = [str(_base_dir / "templates")]
 
 # Seguridad extra: evita que alguien meta rutas raras por accidente
 TEMPLATES[0]["DIRS"] = [str(Path(p).resolve()) for p in TEMPLATES[0]["DIRS"]]
+
+# --- FIX FINAL DIGITALOCEAN ---
+DEBUG = False
+
+# Corregir rutas que tienen "/app/" de más
+STATIC_ROOT = "/srv/egarage/staticfiles"
+MEDIA_ROOT = "/srv/egarage/media"
+
+# Forzar la base de datos a la ruta real de tu servidor
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "/srv/egarage/db.sqlite3",
+    }
+}
+
+# Deshabilitar el bloqueo de SQLite
+# if DATABASES["default"]["ENGINE"].endswith("sqlite3"):
+#     raise RuntimeError("PostgreSQL es obligatorio")
+
+# Configuración crítica para el SSL que acabas de instalar
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = ["https://egarage.cl", "https://www.egarage.cl"]

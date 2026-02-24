@@ -1,0 +1,782 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="container mx-auto py-10 px-2 md:px-8">
+  <!-- Contenedor de partículas flotantes -->
+  <div class="floating-particles">
+    <div class="particle" style="top: 10%; left: 5%; animation-delay: 0s;"></div>
+    <div class="particle" style="top: 20%; left: 85%; animation-delay: 1s;"></div>
+    <div class="particle" style="top: 40%; left: 15%; animation-delay: 2s;"></div>
+    <div class="particle" style="top: 60%; left: 80%; animation-delay: 3s;"></div>
+    <div class="particle" style="top: 80%; left: 10%; animation-delay: 4s;"></div>
+    <div class="particle" style="top: 30%; left: 90%; animation-delay: 5s;"></div>
+  </div>
+
+  <h1 class="text-5xl font-extrabold text-center mb-8 ai-text" style="font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif; letter-spacing: 4px; text-shadow: 0 0 30px #00ffff, 0 0 60px #ff00ff;">
+    🤖 SISTEMA DE INTELIGENCIA ARTIFICIAL<br>
+    <span style="font-size: 0.8em; margin-top: 10px; display: block;">ANÁLISIS PREDICTIVO DE REPUESTOS</span>
+  </h1>
+  <div class="flex flex-wrap justify-center gap-4 mb-8">
+    <button class="enfoque-btn" data-enfoque="ventas">Top Ventas</button>
+    <button class="enfoque-btn" data-enfoque="margen">Mayor Margen</button>
+    <button class="enfoque-btn" data-enfoque="stock">Bajo Stock</button>
+    <button class="enfoque-btn" data-enfoque="historico">Histórico Mensual</button>
+    <button class="enfoque-btn" data-enfoque="nunca">Nunca Vendidos</button>
+  </div>
+
+  <div id="panel-ventas" class="enfoque-panel">
+    <h2 class="text-xl font-bold mb-2 text-center">Top 10 Repuestos Más Vendidos</h2>
+    <table class="w-full text-sm mb-4 futuristic-table">
+      <thead><tr><th>Partnumber</th><th>Nombre</th><th>Cantidad Total</th><th>Ingresos</th></tr></thead>
+      <tbody>
+        {% for r in top_repuestos %}
+        <tr>
+          <td>{{ r.codigo }}</td>
+          <td>{{ r.nombre }}</td>
+          <td class="ai-highlight">{{ r.cantidad_total }}</td>
+          <td>${{ r.ingresos|floatformat:0|intcomma }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No hay datos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="panel-margen" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Repuestos con Mayor Margen de Ganancia</h2>
+    <table class="w-full text-sm mb-4 futuristic-table">
+      <thead><tr><th>Partnumber</th><th>Nombre</th><th>Margen (%)</th><th>Ingresos</th></tr></thead>
+      <tbody>
+        {% for r in top_margen %}
+        <tr>
+          <td>{{ r.codigo }}</td>
+          <td>{{ r.nombre }}</td>
+          <td class="ai-highlight">{{ r.margen|floatformat:2 }}%</td>
+          <td>${{ r.ingresos|floatformat:0|intcomma }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No hay datos.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="panel-stock" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Repuestos con Bajo Stock (Alerta)</h2>
+    <table class="w-full text-sm mb-4 futuristic-table">
+      <thead><tr><th>Partnumber</th><th>Nombre</th><th>Stock Actual</th></tr></thead>
+      <tbody>
+        {% for r in bajo_stock %}
+        <tr>
+          <td>{{ r.codigo }}</td>
+          <td>{{ r.nombre }}</td>
+          <td class="ai-highlight">{{ r.stock }}</td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No hay repuestos con bajo stock.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div id="panel-historico" class="enfoque-panel holographic-container" style="display:none; padding: 30px; margin: 20px 0;">
+    <h2 class="text-2xl font-bold mb-6 text-center ai-text" style="margin-bottom: 20px;">
+      🔮 HISTÓRICO DE VENTAS MENSUALES - ANÁLISIS IA
+    </h2>
+    <div style="position: relative; height: 400px;">
+      <canvas id="ventasMensualesChart" height="400" style="width: 100% !important; height: 100% !important;"></canvas>
+    </div>
+    <div class="text-center mt-4">
+      <p class="text-cyan-300 text-sm" style="font-family: 'Orbitron';">
+        💡 <strong>IA PREDICTIVA:</strong> Análisis de tendencias y patrones de ventas
+      </p>
+    </div>
+  </div>
+
+  <div id="panel-nunca" class="enfoque-panel" style="display:none;">
+    <h2 class="text-xl font-bold mb-2 text-center">Repuestos Nunca Vendidos</h2>
+    <ul class="list-disc pl-8">
+      {% for r in nunca_vendidos %}
+        <li>{{ r.codigo }} - {{ r.nombre }}</li>
+      {% empty %}
+        <li>Todos los repuestos han sido vendidos al menos una vez.</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <div class="resumen-economico mt-12">
+    <h2 class="text-2xl font-bold text-center text-white mb-6">📊 Resumen Económico Global</h2>
+    <div class="resumen-grid">
+      <div class="resumen-card">
+        <p class="resumen-label">Total Precio Compra</p>
+        <p class="resumen-value negativo">${{ total_precio_compra|floatformat:0|intcomma }}</p>
+      </div>
+      <div class="resumen-card">
+        <p class="resumen-label">Total Precio Venta</p>
+        <p class="resumen-value positivo">${{ total_precio_venta|floatformat:0|intcomma }}</p>
+      </div>
+      <div class="resumen-card">
+        <p class="resumen-label">Ganancia / Pérdida</p>
+        <p class="resumen-value">
+          {% if ganancia_total >= 0 %}
+            <span class="text-green-300">▲ ${{ ganancia_total|floatformat:0|intcomma }}</span>
+          {% else %}
+            <span class="text-red-400">▼ ${{ ganancia_total|floatformat:0|intcomma }}</span>
+          {% endif %}
+        </p>
+        <small class="text-xs text-cyan-200 block mt-2">(Precio Venta - Precio Compra)</small>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+  .enfoque-btn {
+    background: linear-gradient(90deg, #ffd700 0%, #d90429 100%);
+    color: #111;
+    font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+    font-weight: bold;
+    border: none;
+    border-radius: 1.5rem;
+    padding: 0.7rem 2.2rem;
+    font-size: 1.1rem;
+    box-shadow: 0 0 16px #ffd70099, 0 0 0 2px #d90429;
+    transition: background 0.2s, box-shadow 0.2s, color 0.2s;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+  }
+  .enfoque-btn:hover, .enfoque-btn.active {
+    background: linear-gradient(90deg, #d90429 0%, #ffd700 100%);
+    color: #ffd700;
+    box-shadow: 0 0 32px #d90429cc, 0 0 0 2px #ffd700;
+  }
+  .futuristic-table {
+    background: rgba(20,0,0,0.85);
+    border-radius: 1.5rem;
+    box-shadow: 0 0 32px #d90429cc, 0 0 0 2px #ffd700;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+  }
+  .futuristic-table th, .futuristic-table td {
+    border-bottom: 1px solid #ffd70033;
+    padding: 0.5rem 1rem;
+    color: #fff;
+    text-shadow: 0 0 4px #000, 0 0 2px #ffd700;
+  }
+  .futuristic-table th {
+    color: #ffd700;
+    font-size: 1.1rem;
+    background: #181830;
+    border-top: 2px solid #ffd700;
+  }
+  .ai-highlight { color: #d90429; font-weight: bold; }
+
+  /* Efectos holográficos y de IA */
+  .holographic-container {
+    position: relative;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+    border: 2px solid #00ffff;
+    border-radius: 20px;
+    box-shadow:
+      0 0 30px rgba(0, 255, 255, 0.5),
+      inset 0 0 30px rgba(0, 255, 255, 0.1);
+    overflow: hidden;
+  }
+
+  .holographic-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(0, 255, 255, 0.2),
+      transparent);
+    animation: holographic-sweep 3s ease-in-out infinite;
+  }
+
+  @keyframes holographic-sweep {
+    0% { left: -100%; }
+    50% { left: 100%; }
+    100% { left: 100%; }
+  }
+
+  /* Canvas con efectos de IA */
+  #ventasMensualesChart {
+    border: 3px solid #00ffff;
+    border-radius: 15px;
+    background: linear-gradient(45deg,
+      rgba(0, 0, 0, 0.8),
+      rgba(0, 255, 255, 0.1),
+      rgba(0, 0, 0, 0.8));
+    box-shadow:
+      0 0 40px rgba(0, 255, 255, 0.6),
+      inset 0 0 40px rgba(0, 255, 255, 0.1);
+    position: relative;
+    z-index: 10;
+  }
+
+  /* Efectos de partículas flotantes */
+  .floating-particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: #00ffff;
+    border-radius: 50%;
+    animation: float-particle 6s ease-in-out infinite;
+    box-shadow: 0 0 10px #00ffff;
+  }
+
+  @keyframes float-particle {
+    0%, 100% {
+      transform: translateY(0px) scale(1);
+      opacity: 0.3;
+    }
+    50% {
+      transform: translateY(-20px) scale(1.5);
+      opacity: 1;
+    }
+  }
+
+  /* Botones con efectos de IA */
+  .enfoque-btn.active {
+    background: linear-gradient(90deg, #00ffff 0%, #ff00ff 50%, #ffff00 100%);
+    color: #000;
+    box-shadow:
+      0 0 30px rgba(0, 255, 255, 0.8),
+      0 0 60px rgba(255, 0, 255, 0.6),
+      0 0 90px rgba(255, 255, 0, 0.4);
+    transform: scale(1.05);
+    animation: ai-pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes ai-pulse {
+    0%, 100% {
+      box-shadow:
+        0 0 30px rgba(0, 255, 255, 0.8),
+        0 0 60px rgba(255, 0, 255, 0.6),
+        0 0 90px rgba(255, 255, 0, 0.4);
+    }
+    50% {
+      box-shadow:
+        0 0 40px rgba(0, 255, 255, 1),
+        0 0 80px rgba(255, 0, 255, 0.8),
+        0 0 120px rgba(255, 255, 0, 0.6);
+    }
+  }
+
+  /* Tabla con efectos holográficos */
+  .futuristic-table {
+    background: rgba(0, 0, 0, 0.7);
+    border: 2px solid #00ffff;
+    border-radius: 15px;
+    box-shadow:
+      0 0 30px rgba(0, 255, 255, 0.3),
+      inset 0 0 30px rgba(0, 255, 255, 0.1);
+  }
+
+  .futuristic-table th {
+    background: linear-gradient(90deg, #00ffff, #ff00ff);
+    color: #000;
+    font-weight: 900;
+    text-shadow: none;
+    border-bottom: 3px solid #00ffff;
+  }
+
+  .futuristic-table td {
+    border-bottom: 1px solid rgba(0, 255, 255, 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .futuristic-table tr:hover td {
+    background: rgba(0, 255, 255, 0.1);
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff;
+  }
+
+  /* Efectos de texto con IA */
+  .ai-text {
+    background: linear-gradient(45deg, #00ffff, #ff00ff, #ffff00, #00ff00);
+    background-size: 400% 400%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: ai-gradient 3s ease infinite;
+  }
+
+  /* Forzar nombre de la empresa en blanco */
+  .company-title {
+    color: #ffffff !important;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(0, 255, 255, 0.3);
+  }
+
+  .resumen-economico {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.2);
+  }
+  .resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .resumen-card {
+    background: rgba(10, 10, 30, 0.9);
+    border: 1px solid rgba(0, 255, 255, 0.2);
+    border-radius: 16px;
+    padding: 18px;
+    text-align: center;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+  }
+  .resumen-label {
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .resumen-value {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: #ffffff;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  }
+
+  @keyframes ai-gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Paneles de enfoque
+  document.querySelectorAll('.enfoque-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('.enfoque-btn').forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+      document.querySelectorAll('.enfoque-panel').forEach(p => p.style.display = 'none');
+      document.getElementById('panel-' + this.dataset.enfoque).style.display = '';
+      if(this.dataset.enfoque === 'historico') {
+        setTimeout(renderFuturisticChart, 100);
+      }
+    });
+  });
+  // Mostrar por defecto el panel de ventas
+  document.querySelector('.enfoque-btn[data-enfoque="ventas"]').classList.add('active');
+  // Gráfica futurista con IA y efectos holográficos 3D
+  function renderFuturisticChart() {
+    const ventasMensuales = {{ ventas_mensuales|safe }};
+    const ctx = document.getElementById('ventasMensualesChart').getContext('2d');
+    if(window.ventasChart) window.ventasChart.destroy();
+
+    // Crear gradiente dinámico para el fondo
+    const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+    gradient.addColorStop(0, 'rgba(0, 255, 255, 0.8)');
+    gradient.addColorStop(0.5, 'rgba(138, 43, 226, 0.6)');
+    gradient.addColorStop(1, 'rgba(255, 20, 147, 0.4)');
+
+    // Crear gradiente para la línea principal
+    const lineGradient = ctx.createLinearGradient(0, 0, 400, 0);
+    lineGradient.addColorStop(0, '#00ffff');
+    lineGradient.addColorStop(0.25, '#ff00ff');
+    lineGradient.addColorStop(0.5, '#ffff00');
+    lineGradient.addColorStop(0.75, '#00ff00');
+    lineGradient.addColorStop(1, '#ff0080');
+
+    window.ventasChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ventasMensuales.labels,
+        datasets: [{
+          label: '🔮 IA PREDICTIVA - Ventas de Repuestos',
+          data: ventasMensuales.data,
+          borderColor: lineGradient,
+          backgroundColor: gradient,
+          borderWidth: 6,
+          pointBackgroundColor: '#00ffff',
+          pointBorderColor: '#ffffff',
+          pointRadius: 10,
+          pointHoverRadius: 16,
+          pointBorderWidth: 3,
+          tension: 0.6,
+          fill: true,
+          shadowOffsetX: 0,
+          shadowOffsetY: 0,
+          shadowBlur: 40,
+          shadowColor: '#00ffff',
+          // Efectos de IA
+          pointStyle: 'circle',
+          pointHoverBackgroundColor: '#ff00ff',
+          pointHoverBorderColor: '#00ffff',
+          // Línea con patrón de IA
+          borderDash: [15, 5, 3, 5],
+          borderJoinStyle: 'round',
+          borderCapStyle: 'round',
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              color: '#00ffff',
+              font: {
+                size: 16,
+                family: 'Orbitron',
+                weight: 'bold'
+              },
+              usePointStyle: true,
+              pointStyle: 'circle'
+            }
+          },
+          title: {
+            display: true,
+            text: '🤖 SISTEMA DE INTELIGENCIA ARTIFICIAL - ANÁLISIS PREDICTIVO',
+            color: '#00ffff',
+            font: {
+              size: 24,
+              family: 'Orbitron',
+              weight: '900'
+            },
+            padding: 20
+          },
+          tooltip: {
+            backgroundColor: 'rgba(0, 0, 0, 0.9)',
+            titleColor: '#00ffff',
+            bodyColor: '#ffffff',
+            borderColor: '#00ffff',
+            borderWidth: 2,
+            cornerRadius: 10,
+            displayColors: false,
+            callbacks: {
+              title: function(context) {
+                return '📅 ' + context[0].label;
+              },
+              label: function(context) {
+                return '🚀 Ventas: $' + context.parsed.y.toLocaleString();
+              }
+            }
+          }
+        },
+        scales: {
+          x: {
+            grid: {
+              color: 'rgba(0, 255, 255, 0.3)',
+              lineWidth: 2,
+              drawBorder: true,
+              borderColor: '#00ffff'
+            },
+            ticks: {
+              color: '#00ffff',
+              font: {
+                family: 'Orbitron',
+                size: 14,
+                weight: 'bold'
+              },
+              padding: 10
+            },
+            border: {
+              color: '#00ffff',
+              width: 3
+            }
+          },
+          y: {
+            grid: {
+              color: 'rgba(0, 255, 255, 0.3)',
+              lineWidth: 2,
+              drawBorder: true,
+              borderColor: '#00ffff'
+            },
+            beginAtZero: true,
+            ticks: {
+              color: '#00ffff',
+              font: {
+                family: 'Orbitron',
+                size: 14,
+                weight: 'bold'
+              },
+              padding: 10,
+              callback: function(value) {
+                return '$' + value.toLocaleString();
+              }
+            },
+            border: {
+              color: '#00ffff',
+              width: 3
+            }
+          }
+        },
+        elements: {
+          line: {
+            borderJoinStyle: 'round',
+            borderCapStyle: 'round',
+          },
+          point: {
+            hoverRadius: 16,
+            hoverBorderWidth: 4,
+            hoverBorderColor: '#ff00ff'
+          }
+        },
+        layout: {
+          padding: 40
+        },
+        animation: {
+          duration: 2500,
+          easing: 'easeInOutQuart',
+          onProgress: function(animation) {
+            // Efecto de partículas durante la animación
+            if (animation.currentStep === animation.numSteps) {
+              createHolographicParticles();
+            }
+          }
+        },
+        interaction: {
+          intersect: false,
+          mode: 'index'
+        },
+        // Efectos de IA
+        plugins: {
+          decimation: {
+            enabled: true,
+            algorithm: 'min-max'
+          }
+        }
+      }
+    });
+
+      // Agregar efectos holográficos adicionales
+  addHolographicEffects();
+
+  // Efectos de IA adicionales
+  addAIEffects();
+}
+
+  // Función para crear partículas holográficas
+  function createHolographicParticles() {
+    const canvas = document.getElementById('ventasMensualesChart');
+    const particles = [];
+
+    for (let i = 0; i < 20; i++) {
+      const particle = {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        vx: (Math.random() - 0.5) * 2,
+        vy: (Math.random() - 0.5) * 2,
+        life: 1,
+        decay: 0.02
+      };
+      particles.push(particle);
+    }
+
+    // Animar partículas
+    function animateParticles() {
+      const ctx = canvas.getContext('2d');
+      ctx.save();
+
+      particles.forEach((particle, index) => {
+        particle.x += particle.vx;
+        particle.y += particle.vy;
+        particle.life -= particle.decay;
+
+        if (particle.life <= 0) {
+          particles.splice(index, 1);
+        } else {
+          ctx.globalAlpha = particle.life;
+          ctx.fillStyle = '#00ffff';
+          ctx.shadowColor = '#00ffff';
+          ctx.shadowBlur = 10;
+          ctx.beginPath();
+          ctx.arc(particle.x, particle.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      ctx.restore();
+
+      if (particles.length > 0) {
+        requestAnimationFrame(animateParticles);
+      }
+    }
+
+    animateParticles();
+  }
+
+  // Función para agregar efectos holográficos
+  function addHolographicEffects() {
+    const canvas = document.getElementById('ventasMensualesChart');
+    const ctx = canvas.getContext('2d');
+
+    // Efecto de escaneo holográfico
+    let scanLine = 0;
+    function drawScanLine() {
+      ctx.save();
+      ctx.strokeStyle = '#00ffff';
+      ctx.lineWidth = 2;
+      ctx.shadowColor = '#00ffff';
+      ctx.shadowBlur = 20;
+      ctx.setLineDash([10, 5]);
+
+      ctx.beginPath();
+      ctx.moveTo(0, scanLine);
+      ctx.lineTo(canvas.width, scanLine);
+      ctx.stroke();
+
+      ctx.restore();
+
+      scanLine += 2;
+      if (scanLine > canvas.height) {
+        scanLine = 0;
+      }
+
+      setTimeout(drawScanLine, 100);
+    }
+
+    drawScanLine();
+  }
+
+  // Función para agregar efectos de IA
+  function addAIEffects() {
+    const canvas = document.getElementById('ventasMensualesChart');
+
+    // Efecto de conexiones neuronales
+    function drawNeuralConnections() {
+      const ctx = canvas.getContext('2d');
+      const points = [];
+
+      // Crear puntos de conexión
+      for (let i = 0; i < 8; i++) {
+        points.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          connections: []
+        });
+      }
+
+      // Conectar puntos
+      points.forEach((point, i) => {
+        const numConnections = Math.floor(Math.random() * 3) + 1;
+        for (let j = 0; j < numConnections; j++) {
+          const targetIndex = (i + j + 1) % points.length;
+          point.connections.push(targetIndex);
+        }
+      });
+
+      // Dibujar conexiones
+      function animateConnections() {
+        ctx.save();
+        ctx.strokeStyle = '#00ffff';
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.6;
+        ctx.shadowColor = '#00ffff';
+        ctx.shadowBlur = 5;
+
+        points.forEach((point, i) => {
+          point.connections.forEach(targetIndex => {
+            const target = points[targetIndex];
+            ctx.beginPath();
+            ctx.moveTo(point.x, point.y);
+            ctx.lineTo(target.x, target.y);
+            ctx.stroke();
+          });
+        });
+
+        ctx.restore();
+
+        // Mover puntos ligeramente
+        points.forEach(point => {
+          point.x += (Math.random() - 0.5) * 2;
+          point.y += (Math.random() - 0.5) * 2;
+
+          // Mantener dentro del canvas
+          point.x = Math.max(0, Math.min(canvas.width, point.x));
+          point.y = Math.max(0, Math.min(canvas.height, point.y));
+        });
+
+        requestAnimationFrame(animateConnections);
+      }
+
+      animateConnections();
+    }
+
+    // Iniciar efectos de IA
+    setTimeout(drawNeuralConnections, 1000);
+
+    // Efecto de datos fluyendo
+    function drawDataFlow() {
+      const ctx = canvas.getContext('2d');
+      let flowY = 0;
+
+      function animateFlow() {
+        ctx.save();
+        ctx.strokeStyle = '#ff00ff';
+        ctx.lineWidth = 2;
+        ctx.globalAlpha = 0.7;
+        ctx.setLineDash([20, 10]);
+        ctx.shadowColor = '#ff00ff';
+        ctx.shadowBlur = 15;
+
+        ctx.beginPath();
+        ctx.moveTo(0, flowY);
+        ctx.lineTo(canvas.width, flowY);
+        ctx.stroke();
+
+        ctx.restore();
+
+        flowY += 3;
+        if (flowY > canvas.height) {
+          flowY = 0;
+        }
+
+        setTimeout(animateFlow, 200);
+      }
+
+      animateFlow();
+    }
+
+    setTimeout(drawDataFlow, 2000);
+  }
+
+  // Inicialización del sistema de IA
+  document.addEventListener('DOMContentLoaded', function() {
+    console.log('🤖 SISTEMA DE IA INICIADO');
+    console.log('🔮 MÓDULO DE ANÁLISIS PREDICTIVO ACTIVO');
+    console.log('📊 GRÁFICAS HOLOGRÁFICAS 3D CARGADAS');
+
+    // Crear partículas adicionales dinámicamente
+    setInterval(() => {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.top = Math.random() * 100 + '%';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 6 + 's';
+      document.querySelector('.floating-particles').appendChild(particle);
+
+      // Remover partícula después de la animación
+      setTimeout(() => {
+        if (particle.parentNode) {
+          particle.parentNode.removeChild(particle);
+        }
+      }, 6000);
+    }, 3000);
+  });
+</script>
+{% endblock %}

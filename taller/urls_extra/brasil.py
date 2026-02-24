@@ -1,52 +1,45 @@
 """
 URLs específicas para Brasil 🇧🇷
-Patrón: /br/es/ seguido de las rutas específicas
-Usa TemplateView para no depender de vistas Python especiales
-Nota: Brasil puede usar 'pt-br' en el futuro, pero por ahora usamos 'es' para consistencia
+Patrón base: /br/
+Brasil: SOLO portugués (pt).
+Compatibilidad: /br/es/... redirige a /br/pt/...
 """
 
 from django.urls import path
+from django.utils import translation
 from django.views.generic import RedirectView, TemplateView
+
+from taller.views_extra.signup_redirects import signup_redirect
 
 app_name = "taller_brasil"
 
+
+class BrasilPTTemplateView(TemplateView):
+    template_name = "br/pt/onboarding/bienvenida.html"
+
+    def dispatch(self, request, *args, **kwargs):
+        translation.activate("pt-br")
+        request.LANGUAGE_CODE = "pt-br"
+        return super().dispatch(request, *args, **kwargs)
+
 urlpatterns = [
-    # Redirigir raíz a bienvenida
-    path("", RedirectView.as_view(url="/br/es/bienvenida/", permanent=False), name="brasil_home"),
-    # Dashboard principal de Brasil
+    # /br/ → /br/pt/bienvenida/
+    path("", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
+
+    # --- PORTUGUÉS (principal) ---
     path(
-        "dashboard/",
-        TemplateView.as_view(template_name="br/es/dashboard/centro_operaciones_espacial.html"),
-        name="dashboard_brasil",
+        "pt/bienvenida/",
+        BrasilPTTemplateView.as_view(),
+        name="bienvenida_pt",
     ),
-    # Página de bienvenida / onboarding Brasil
+
     path(
-        "bienvenida/",
-        TemplateView.as_view(template_name="br/es/onboarding/bienvenida.html"),
-        name="bienvenida_brasil",
+        "pt/accounts/signup/",
+        lambda r: signup_redirect(r, "br"),
+        name="signup_pt",
     ),
-    # Página de pago de suscripción Brasil (cuando esté lista)
-    path(
-        "suscripcion/pago/",
-        TemplateView.as_view(template_name="br/es/suscripcion/pago.html"),
-        name="pago_suscripcion_brasil",
-    ),
-    # Login Brasil (opcional, si quieres una vista visual distinta de allauth)
-    path(
-        "accounts/login/",
-        TemplateView.as_view(template_name="br/es/account/login.html"),
-        name="account_login_brasil",
-    ),
-    # Signup Brasil (si tienes template específico)
-    path(
-        "accounts/signup/",
-        TemplateView.as_view(template_name="br/es/account/signup.html"),
-        name="account_signup_brasil",
-    ),
-    # Lista de clientes Brasil
-    path(
-        "clientes/",
-        TemplateView.as_view(template_name="br/es/clientes/lista_clientes.html"),
-        name="lista_clientes_brasil",
-    ),
+
+    # --- ESPAÑOL (legacy) → redirige a PT ---
+    path("es/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
+    path("es/bienvenida/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
 ]

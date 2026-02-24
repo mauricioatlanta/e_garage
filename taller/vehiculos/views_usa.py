@@ -33,7 +33,7 @@ def lista_vehiculos(request):
 
 
 @login_required
-def crear_vehiculo(request):
+def crear_vehiculo(request, lang=None, *args, **kwargs):
     """Crear vehículo para USA."""
     empresa = getattr(request.user, "empresa", None)
 

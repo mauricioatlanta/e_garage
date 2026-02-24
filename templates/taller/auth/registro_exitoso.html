@@ -8,24 +8,35 @@
   <div class="relative z-10 w-full max-w-md">
     <div class="bg-gradient-to-br from-[#0d1117cc] via-[#1a2233cc] to-[#0d1117cc] rounded-2xl shadow-2xl p-10 border-2 border-cyan-400/40 backdrop-blur-xl">
       <div class="flex flex-col items-center mb-6">
-        <img src="{% static 'img/TallerPro_logo.png' %}" alt="eGarage Logo" class="h-16 mb-3 drop-shadow-lg animate-pulse">
-        <h1 class="text-3xl md:text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-yellow-300 mb-2 tracking-tight futuristic-glow">
-          {% trans "Tu registro en eGarage fue exitoso." %}
+        <div class="mb-4">
+          <svg class="w-20 h-20 mx-auto text-green-400 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <img src="{% static 'img/TallerPro_logo.png' %}" alt="eGarage Logo" class="h-16 mb-3 drop-shadow-lg">
+        <h1 class="text-3xl md:text-4xl font-extrabold text-center text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-fuchsia-400 to-yellow-300 mb-4 tracking-tight futuristic-glow">
+          {% trans "¡Registro exitoso!" %}
         </h1>
+        <p class="text-xl md:text-2xl text-center text-cyan-200 font-semibold mb-6 px-4">
+          {% trans "Estás a segundos de tener el mejor centro de operaciones del mundo." %}
+        </p>
       </div>
       
-      <div class="text-cyan-100 text-center text-lg mb-4 space-y-3">
-        <p>
-          {% trans "Te enviamos un correo a" %} <strong class="text-cyan-300">{{ email }}</strong>.
-        </p>
-        <p>
-          {% trans "Revisa tu bandeja de entrada y también Spam." %}
-        </p>
-        <p class="text-yellow-300 font-semibold">
-          {% trans "Debes confirmar tu correo para poder ingresar a eGarage." %}
-        </p>
+      <div class="text-cyan-100 text-center text-lg mb-6 space-y-4">
+        <div class="bg-cyan-900/30 rounded-lg p-4 border border-cyan-500/30">
+          <p class="mb-2">
+            <i class="fas fa-envelope text-yellow-300 mr-2"></i>
+            {% trans "Revisa tu correo" %} <strong class="text-cyan-300">{{ email }}</strong> {% trans "para las instrucciones de acceso." %}
+          </p>
+          <p class="text-sm text-cyan-200/80 mt-2">
+            <i class="fas fa-info-circle text-blue-300 mr-1"></i>
+            {% trans "No olvides revisar también tu carpeta de Spam o Correo no deseado." %}
+          </p>
+        </div>
+        
         {% if country_config %}
         <p class="text-sm text-cyan-200/70">
+          <i class="fas fa-globe mr-1"></i>
           {% trans "País:" %} {{ country_config.name_es|default:country_code }}
         </p>
         {% endif %}

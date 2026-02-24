@@ -10,10 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name="modelovehiculo",
-            name="marca",
-        ),
         migrations.AlterUniqueTogether(
             name="modelovehiculo",
             unique_together=None,

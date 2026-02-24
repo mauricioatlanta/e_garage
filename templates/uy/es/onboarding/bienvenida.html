@@ -1,702 +1,885 @@
-{% load static %}
+{% load i18n static %}
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es-uy">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-<<<<<<< HEAD
-  <title>eGarage Chile - La Plataforma #1 para Talleres Automotrices</title>
+  <title>Bienvenido a eGarage Uruguay 🇺🇾</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Plataforma de gestión para talleres: órdenes de servicio, inventario, portal del cliente y análisis en Uruguay.">
+  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+
+  <!-- Open Graph Meta Tags -->
+  <meta property="og:title" content="eGarage Uruguay — Plataforma para Talleres">
+  <meta property="og:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
+  <meta property="og:image" content="{% static 'img/og-uy.png' %}">
+  <meta property="og:url" content="{{ request.build_absolute_uri }}">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="eGarage">
+
+  <!-- Twitter Card Meta Tags -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="eGarage Uruguay — Plataforma para Talleres">
+  <meta name="twitter:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
+  <meta name="twitter:image" content="{% static 'img/og-uy.png' %}">
   
-  <!-- SEO -->
-  <meta name="description" content="Sistema profesional de gestión para talleres mecánicos, vulcanizaciones, repuestos y autolavados en Chile. Órdenes de trabajo digitales, inventario y facturación con IVA.">
-=======
-  <title>eGarage Uruguay - La Plataforma #1 para Talleres Automotrices</title>
-  
-  <!-- SEO -->
-  <meta name="description" content="Sistema profesional de gestión para talleres mecánicos, vulcanizaciones, repuestos y autolavados en Uruguay. Órdenes de trabajo digitales, inventario y facturación.">
->>>>>>> wip/2025-12-12_pre_pull
-  
-  <!-- Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
   <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
-  
-  <!-- Scripts -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js" defer></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.globe.min.js" defer></script>
   <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
   
   <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
     body {
-<<<<<<< HEAD
-      background: #0a0a0a;
-=======
-      /* Fondo estático profesional - Sin animaciones */
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%) !important;
->>>>>>> wip/2025-12-12_pre_pull
+      background: #000000;
       font-family: 'Exo 2', sans-serif;
       color: #ffffff;
       min-height: 100vh;
       overflow-x: hidden;
+      position: relative;
     }
 
-    .font-futuristic { font-family: 'Orbitron', monospace; letter-spacing: 0.05em; }
-    .font-tech { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.02em; }
-    .font-bold-tech { font-family: 'Exo 2', sans-serif; font-weight: 700; letter-spacing: 0.02em; }
+    /* Asegurar que el contenido esté por encima del fondo */
+    body > main,
+    body > section {
+      position: relative;
+      z-index: 1;
+    }
 
-<<<<<<< HEAD
-    /* Grid background */
-    .grid-bg {
+    /* Background animado con colores de Uruguay */
+    body::before {
+      content: '';
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background-image: 
-        linear-gradient(rgba(0, 245, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 245, 255, 0.03) 1px, transparent 1px);
-      background-size: 50px 50px;
-      z-index: 1;
+      background: 
+        radial-gradient(circle at 20% 30%, rgba(0, 56, 168, 0.15) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(252, 221, 9, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
+        linear-gradient(135deg, #000814 0%, #001d3d 50%, #000814 100%);
+      z-index: -1;
+      animation: bgShift 20s ease-in-out infinite;
       pointer-events: none;
     }
 
-    /* Scan line */
-    .scan-line {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 2px;
-      background: linear-gradient(90deg, transparent, rgba(0, 245, 255, 0.8), transparent);
-      animation: scan 4s linear infinite;
-      z-index: 3;
-      pointer-events: none;
+    @keyframes bgShift {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.9; }
     }
 
-    @keyframes scan {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(100vh); }
-    }
-=======
-    /* Grid background - DESACTIVADO para diseño serio */
-    /* .grid-bg { ... } */
-
-    /* Scan line - DESACTIVADO para diseño serio */
-    /* .scan-line { ... } */
-    /* @keyframes scan { ... } */
->>>>>>> wip/2025-12-12_pre_pull
-
-    /* Sticky CTA */
-    .sticky-cta {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      z-index: 40;
-      animation: pulse-cta 2s infinite;
-    }
-
-    @keyframes pulse-cta {
-      0%, 100% { transform: scale(1); }
-      50% { transform: scale(1.05); }
-    }
-
-    /* Botón neón calipso */
-    .neon-button {
-      background: linear-gradient(135deg, #00f5ff 0%, #00d4ff 100%);
-      color: #001218;
-      padding: 12px 32px;
-      border-radius: 999px;
+    .font-futuristic {
+      font-family: 'Orbitron', monospace;
+      letter-spacing: 0.05em;
       font-weight: 700;
-      border: none;
-      box-shadow: 0 0 25px rgba(0, 245, 255, 0.5);
-      transition: all 0.3s ease;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-block;
     }
 
-    .neon-button:hover {
-      box-shadow: 0 0 35px rgba(0, 245, 255, 0.8);
-      transform: translateY(-2px);
-      color: #001218;
-      text-decoration: none;
+    .font-tech {
+      font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 0.02em;
     }
 
-    /* Glass card */
+    .futuristic-glow {
+      text-shadow: 
+        0 0 20px rgba(0, 56, 168, 0.8),
+        0 0 40px rgba(0, 56, 168, 0.6),
+        0 0 60px rgba(0, 56, 168, 0.4),
+        0 0 80px rgba(252, 221, 9, 0.3);
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% {
+        text-shadow: 
+          0 0 20px rgba(0, 56, 168, 0.8),
+          0 0 40px rgba(0, 56, 168, 0.6),
+          0 0 60px rgba(0, 56, 168, 0.4);
+      }
+      50% {
+        text-shadow: 
+          0 0 30px rgba(0, 56, 168, 1),
+          0 0 60px rgba(0, 56, 168, 0.8),
+          0 0 90px rgba(252, 221, 9, 0.6);
+      }
+    }
+
     .glass-card {
-      background: linear-gradient(135deg, rgba(0, 245, 255, 0.1) 0%, rgba(0, 212, 255, 0.05) 100%);
-      backdrop-filter: blur(25px);
+      background: linear-gradient(
+        135deg, 
+        rgba(0, 56, 168, 0.15) 0%, 
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(252, 221, 9, 0.08) 100%
+      );
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
       border-radius: 1.5rem;
-      border: 1px solid rgba(0, 245, 255, 0.3);
-      box-shadow: 0 8px 32px rgba(0, 245, 255, 0.15);
+      border: 2px solid;
+      border-image: linear-gradient(135deg, 
+        rgba(0, 56, 168, 0.6), 
+        rgba(252, 221, 9, 0.3),
+        rgba(0, 56, 168, 0.6)
+      ) 1;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 4px 16px rgba(0, 56, 168, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
       position: relative;
       overflow: hidden;
     }
 
-    /* Neon card */
-    .neon-card {
-      background: linear-gradient(135deg, rgba(0, 245, 255, 0.08) 0%, rgba(0, 212, 255, 0.08) 100%);
-      border: 1px solid rgba(0, 245, 255, 0.3);
-      border-radius: 1rem;
-      padding: 1.5rem;
-      transition: all 0.3s;
+    .glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(0, 56, 168, 0.2),
+        transparent
+      );
+      transition: left 0.5s;
     }
 
-    .neon-card:hover {
-      border-color: #00f5ff;
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(0, 245, 255, 0.3);
+    .glass-card:hover::before {
+      left: 100%;
     }
 
-    /* Icon float animation */
-    .icon-float {
-      animation: float-icon 3s ease-in-out infinite;
+    .glass-card:hover {
+      transform: translateY(-10px) scale(1.02);
+      box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.4),
+        0 10px 30px rgba(0, 56, 168, 0.4),
+        0 0 40px rgba(252, 221, 9, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      border-image: linear-gradient(135deg, 
+        rgba(0, 56, 168, 1), 
+        rgba(252, 221, 9, 0.6),
+        rgba(0, 56, 168, 1)
+      ) 1;
     }
 
-    @keyframes float-icon {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-10px); }
+    .btn-primary {
+      background: linear-gradient(135deg, #0038A8 0%, #FCDD09 100%);
+      color: #000000;
+      font-weight: 800;
+      padding: 1.2rem 3rem;
+      border-radius: 1.2rem;
+      border: 2px solid rgba(0, 56, 168, 0.8);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 1.1rem;
+      box-shadow: 
+        0 4px 20px rgba(0, 56, 168, 0.4),
+        0 0 40px rgba(252, 221, 9, 0.3);
+      position: relative;
+      overflow: hidden;
     }
 
-    /* Holographic text */
-    .holographic-text {
-      background: linear-gradient(135deg, #00f5ff, #00d4ff, #fff);
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.3);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-primary:hover::before {
+      width: 300px;
+      height: 300px;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.08) translateY(-2px);
+      box-shadow: 
+        0 8px 40px rgba(0, 56, 168, 0.6),
+        0 0 60px rgba(252, 221, 9, 0.5),
+        0 0 100px rgba(0, 56, 168, 0.3);
+      border-color: rgba(252, 221, 9, 0.8);
+    }
+
+    .btn-secondary {
+      background: rgba(0, 56, 168, 0.1);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #ffffff;
+      font-weight: 700;
+      padding: 1.2rem 3rem;
+      border-radius: 1.2rem;
+      border: 2px solid rgba(0, 56, 168, 0.5);
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 1rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(0, 56, 168, 0.25);
+      border-color: rgba(0, 56, 168, 0.9);
+      transform: scale(1.05) translateY(-2px);
+      box-shadow: 
+        0 8px 30px rgba(0, 56, 168, 0.3),
+        0 0 40px rgba(0, 56, 168, 0.2);
+    }
+
+    .hero-section {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      padding: 2rem;
+      z-index: 1;
+    }
+
+    .feature-icon {
+      width: 90px;
+      height: 90px;
+      background: linear-gradient(135deg, 
+        rgba(0, 56, 168, 0.3) 0%, 
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(252, 221, 9, 0.2) 100%
+      );
+      backdrop-filter: blur(10px);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.8rem;
+      margin: 0 auto 1.5rem;
+      border: 2px solid rgba(0, 56, 168, 0.5);
+      box-shadow: 
+        0 8px 32px rgba(0, 56, 168, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all 0.3s ease;
+    }
+
+    .glass-card:hover .feature-icon {
+      transform: scale(1.1) rotateY(360deg);
+      box-shadow: 
+        0 12px 48px rgba(0, 56, 168, 0.4),
+        0 0 40px rgba(252, 221, 9, 0.3);
+      border-color: rgba(0, 56, 168, 0.9);
+    }
+
+    .stats-number {
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(135deg, #0038A8 0%, #FCDD09 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      text-shadow: 0 0 20px rgba(0, 245, 255, 0.5);
+      font-family: 'Orbitron', monospace;
+      text-shadow: 0 0 40px rgba(0, 56, 168, 0.5);
+      filter: drop-shadow(0 0 20px rgba(252, 221, 9, 0.3));
+      animation: statsGlow 2s ease-in-out infinite;
     }
 
-    /* Metric card */
-    .metric-card {
-      background: rgba(0, 0, 0, 0.6);
-      border: 1px solid rgba(0, 245, 255, 0.3);
-      border-radius: 1rem;
-      transition: all 0.3s;
+    @keyframes statsGlow {
+      0%, 100% {
+        filter: drop-shadow(0 0 20px rgba(0, 56, 168, 0.4));
+      }
+      50% {
+        filter: drop-shadow(0 0 30px rgba(252, 221, 9, 0.6));
+      }
     }
 
-    .metric-card:hover {
-      border-color: #00f5ff;
-      box-shadow: 0 8px 24px rgba(0, 245, 255, 0.3);
+    /* Animación de bandeira */
+    @keyframes wave {
+      0%, 100% { 
+        transform: rotate(-5deg) scale(1); 
+      }
+      50% { 
+        transform: rotate(5deg) scale(1.05); 
+      }
+    }
+
+    .flag-animation {
+      animation: wave 2.5s ease-in-out infinite;
+      display: inline-block;
+      filter: drop-shadow(0 0 30px rgba(0, 56, 168, 0.6));
+    }
+
+    /* Grid pattern background mejorado */
+    .grid-bg {
+      background-image: 
+        linear-gradient(rgba(0, 56, 168, 0.08) 2px, transparent 2px),
+        linear-gradient(90deg, rgba(0, 56, 168, 0.08) 2px, transparent 2px),
+        linear-gradient(rgba(0, 56, 168, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 56, 168, 0.03) 1px, transparent 1px);
+      background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
+      background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
+      position: relative;
+    }
+
+    /* Mejoras de texto */
+    h1, h2, h3 {
+      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    p, li {
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    /* Contenedor principal con mejor z-index */
+    section {
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Asegurar que el contenido esté visible */
+    main {
+      position: relative;
+      z-index: 10;
+    }
+
+    body > * {
+      position: relative;
+      z-index: 1;
     }
   </style>
 </head>
-<body>
-<<<<<<< HEAD
-  <!-- Vanta.js background -->
-  <div id="vanta-globe" class="fixed inset-0 -z-10"></div>
+<body class="grid-bg">
+  <main class="relative z-10">
   
-  <!-- Grid background -->
-  <div class="grid-bg"></div>
-  
-  <!-- Scan line -->
-  <div class="scan-line"></div>
-=======
-  <!-- Fondos animados - DESACTIVADOS para diseño serio -->
-  <!-- <div id="vanta-globe" class="fixed inset-0 -z-10"></div> -->
-  <!-- <div class="grid-bg"></div> -->
-  <!-- <div class="scan-line"></div> -->
->>>>>>> wip/2025-12-12_pre_pull
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container mx-auto max-w-7xl">
+      <div class="text-center" data-aos="fade-up">
+        
+        <!-- Logo -->
+        <div class="mb-8 inline-block">
+          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 56, 168, 0.8));">
+        </div>
 
-  <!-- Header -->
-  <header class="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-sm border-b border-cyan-400/30">
-    <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-      <!-- Logo -->
-      <div class="flex items-center gap-3">
-        <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="h-10 w-auto logo-header" style="filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.6));">
-        <span class="text-cyan-400 font-futuristic font-bold text-xl">eGarage</span>
-      </div>
+        <!-- Title -->
+        <h1 class="font-futuristic text-6xl md:text-8xl mb-6 futuristic-glow">
+          eGarage Uruguay
+        </h1>
+        
+        <p class="text-2xl md:text-3xl mb-8 font-light" style="color: #e0e0e0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+          La plataforma definitiva para el sector automotriz en Uruguay
+        </p>
 
-      <!-- Navegación -->
-      <nav class="hidden md:flex items-center gap-6">
-<<<<<<< HEAD
-        <a href="#precios" class="text-cyan-300 hover:text-cyan-200 transition-colors font-tech">Precios</a>
-=======
-        <a href="/uy/es/precios/" class="text-cyan-300 hover:text-cyan-200 transition-colors font-tech">PLANES</a>
->>>>>>> wip/2025-12-12_pre_pull
-        <a href="#funcionalidades" class="text-cyan-300 hover:text-cyan-200 transition-colors font-tech">Funcionalidades</a>
-      </nav>
+        <!-- Tipos de Negocios - Quick Overview -->
+        <div class="mb-16 px-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="glass-card p-6 max-w-5xl mx-auto" style="overflow-x: auto;">
+            <div class="flex flex-wrap gap-3 md:gap-4 justify-center items-center text-center min-w-max md:min-w-0">
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 56, 168, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 56, 168, 0.3);">
+                <span style="font-size: 1.3rem;">🔧</span>
+                <span class="whitespace-nowrap">Talleres Mecánicos</span>
+              </div>
+              <span style="color: #FCDD09; font-size: 1.2rem;" class="hidden md:inline">•</span>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 56, 168, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 56, 168, 0.3);">
+                <span style="font-size: 1.3rem;">🛞</span>
+                <span class="whitespace-nowrap">Vulcanizaciones</span>
+              </div>
+              <span style="color: #FCDD09; font-size: 1.2rem;" class="hidden md:inline">•</span>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 56, 168, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 56, 168, 0.3);">
+                <span style="font-size: 1.3rem;">⚙️</span>
+                <span class="whitespace-nowrap">Repuestos</span>
+              </div>
+              <span style="color: #FCDD09; font-size: 1.2rem;" class="hidden md:inline">•</span>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 56, 168, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 56, 168, 0.3);">
+                <span style="font-size: 1.3rem;">🔨</span>
+                <span class="whitespace-nowrap">Hojalatería</span>
+              </div>
+              <span style="color: #FCDD09; font-size: 1.2rem;" class="hidden md:inline">•</span>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 56, 168, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 56, 168, 0.3);">
+                <span style="font-size: 1.3rem;">🎨</span>
+                <span class="whitespace-nowrap">Pintura</span>
+              </div>
+              <span style="color: #FCDD09; font-size: 1.2rem;" class="hidden lg:inline">•</span>
+              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 56, 168, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 56, 168, 0.3);">
+                <span style="font-size: 1.3rem;">🔌</span>
+                <span class="whitespace-nowrap">Eléctrica</span>
+              </div>
+            </div>
+          </div>
+          <p class="text-center mt-4" style="color: #b0b0b0; font-size: 0.9rem; font-weight: 500;">
+            Y muchos más tipos de negocios automotrices...
+          </p>
+        </div>
 
-      <!-- Botones -->
-      <div class="flex items-center gap-3">
-<<<<<<< HEAD
-        <a href="/accounts/login/?country=CL" class="px-4 py-2 text-cyan-300 hover:text-cyan-200 transition-colors font-tech">Iniciar Sesión</a>
-        <a href="/accounts/signup/?from=cl" class="px-4 py-2 neon-button text-white font-futuristic font-bold rounded-full text-sm">🚀 Probar Gratis</a>
-=======
-        <a href="/accounts/login/?country=UY" class="px-4 py-2 text-cyan-300 hover:text-cyan-200 transition-colors font-tech">Iniciar Sesión</a>
-        <a href="/accounts/signup/?from=uy" class="px-4 py-2 neon-button text-white font-futuristic font-bold rounded-full text-sm">🚀 Probar Gratis</a>
->>>>>>> wip/2025-12-12_pre_pull
+        <!-- CTA Buttons -->
+        <div class="flex flex-wrap gap-6 justify-center mb-16">
+          <a href="/uy/signup/" class="btn-primary">
+            🚀 Comenzar Gratis
+          </a>
+          <a href="/uy/login/" class="btn-secondary">
+            🔐 Ingresar
+          </a>
+          <a href="/uy/precios/" class="btn-secondary">
+            💰 Ver Planes
+          </a>
+        </div>
+
+        <!-- Quick Stats -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20" data-aos="fade-up" data-aos-delay="200">
+          <div class="glass-card p-8">
+            <div class="stats-number">500+</div>
+            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Talleres Activos</p>
+          </div>
+          <div class="glass-card p-8">
+            <div class="stats-number">28K+</div>
+            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Órdenes de Servicio</p>
+          </div>
+          <div class="glass-card p-8">
+            <div class="stats-number">$ 4.5M+</div>
+            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Facturado</p>
+          </div>
+        </div>
       </div>
     </div>
-  </header>
+  </section>
 
+  <!-- Features Section -->
+  <section class="py-20 px-4">
+    <div class="container mx-auto max-w-7xl">
+      
+      <h2 class="font-futuristic text-5xl text-center mb-16 futuristic-glow" data-aos="fade-up">
+        Funcionalidades Poderosas
+      </h2>
 
-  <main class="relative z-10">
-    <!-- Hero Section -->
-    <section class="text-center py-24 px-6 relative pt-32" data-aos="fade-up">
-      <div class="mb-8 flex justify-center">
-        <div class="relative">
-          <!-- Halo de fondo sutil -->
-          <div class="absolute inset-0 bg-gradient-to-r from-cyan-400/30 to-blue-500/30 rounded-full blur-3xl opacity-60 animate-pulse"></div>
-          <!-- Logo principal -->
-          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="relative mx-auto w-56 md:w-72 h-auto object-contain logo-hero" style="filter: drop-shadow(0 0 30px rgba(0, 245, 255, 0.8)); position: relative; z-index: 1;">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Feature 1 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-icon">
+            📋
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Órdenes de Servicio</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Crea, gestiona y rastrea órdenes de servicio digitales con firma electrónica e historial completo.
+          </p>
         </div>
+
+        <!-- Feature 2 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-icon">
+            📊
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Análisis Avanzados</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Dashboards inteligentes con métricas de desempeño, facturación y productividad en tiempo real.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="300">
+          <div class="feature-icon">
+            🚗
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Gestión de Vehículos</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Registro completo de vehículos con historial de mantenimientos, repuestos y servicios realizados.
+          </p>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="400">
+          <div class="feature-icon">
+            👥
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Portal del Cliente</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Tus clientes siguen el estado de los servicios en tiempo real a través de un portal exclusivo.
+          </p>
+        </div>
+
+        <!-- Feature 5 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="500">
+          <div class="feature-icon">
+            💰
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Cálculo de IVA</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Cálculo automático del Impuesto al Valor Agregado (IVA 22%) para documentos fiscales.
+          </p>
+        </div>
+
+        <!-- Feature 6 -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="600">
+          <div class="feature-icon">
+            🔔
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Recordatorios Automáticos</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Notificaciones automáticas para clientes sobre revisiones, cambios de aceite y mantenimientos preventivos.
+          </p>
+        </div>
+
       </div>
+    </div>
+  </section>
 
-      <h1 class="text-3xl md:text-6xl font-futuristic font-extrabold tracking-tight holographic-text mb-6">
-<<<<<<< HEAD
-        La Plataforma #1 para Talleres en Chile
-      </h1>
-
-      <p class="text-xl text-cyan-200 mb-8 font-tech font-medium">
-        Confiable para mecánicos en todo Chile. Funciones reales. Soporte en español. Sin riesgo.
-=======
-        La Plataforma #1 para Talleres en Uruguay
-      </h1>
-
-      <p class="text-xl text-cyan-200 mb-8 font-tech font-medium">
-        Confiable para mecánicos en todo Uruguay. Funciones reales. Soporte en español. Sin riesgo.
->>>>>>> wip/2025-12-12_pre_pull
+  <!-- Tipos de Negocios Section -->
+  <section class="py-20 px-4">
+    <div class="container mx-auto max-w-7xl">
+      
+      <h2 class="font-futuristic text-5xl text-center mb-8 futuristic-glow" data-aos="fade-up">
+        Hecho para Todos los Negocios Automotrices
+      </h2>
+      
+      <p class="text-xl text-center mb-16" data-aos="fade-up" data-aos-delay="100" style="color: #d0d0d0; font-weight: 500;">
+        No importa el tipo de servicio automotriz, eGarage es perfecto para ti
       </p>
 
-    </section>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        
+        <!-- Talleres Mecánicos -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="100">
+          <div class="feature-icon">
+            🔧
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Talleres Mecánicos</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Gestión completa de órdenes de servicio, diagnósticos, revisiones y mantenimientos preventivos y correctivos.
+          </p>
+        </div>
 
-    <!-- Sectores que Potenciamos -->
-    <section class="mx-auto max-w-6xl px-4 py-16">
-      <h2 class="text-2xl md:text-4xl font-futuristic font-bold text-cyan-400 mb-8 text-center holographic-text">
-        Sectores que Potenciamos
-      </h2>
-      <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <!-- Taller Mecánico -->
-        <article class="neon-card" data-aos="fade-up">
-          <div class="text-4xl mb-4">🔧</div>
-          <h3 class="text-lg font-bold-tech text-white mb-3">Taller Mecánico</h3>
-          <p class="text-sm font-tech text-cyan-100">
-            Órdenes de trabajo, listas de recepción, tiempos de técnico y seguimiento de desempeño.
+        <!-- Vulcanizaciones -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="150">
+          <div class="feature-icon">
+            🛞
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Vulcanizaciones</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Control de neumáticos, rotación, balanceo, alineación y stock de neumáticos nuevos y recauchutados.
           </p>
-        </article>
-        
-        <!-- Vulcanización -->
-        <article class="neon-card" data-aos="fade-up" data-aos-delay="100">
-          <div class="text-4xl mb-4">🛞</div>
-          <h3 class="text-lg font-bold-tech text-white mb-3">Neumáticos y Vulcanización</h3>
-          <p class="text-sm font-tech text-cyan-100">
-            Rotación, balanceo, historial de juegos, alertas de stock y cotizaciones rápidas.
-          </p>
-        </article>
-        
-        <!-- Hojalatería y Pintura -->
-        <article class="neon-card" data-aos="fade-up" data-aos-delay="200">
-          <div class="text-4xl mb-4">🎨</div>
-          <h3 class="text-lg font-bold-tech text-white mb-3">Hojalatería y Pintura</h3>
-          <p class="text-sm font-tech text-cyan-100">
-            Etapas de proceso, materiales por trabajo, fotos antes/después y presupuestos.
-          </p>
-        </article>
-        
+        </div>
+
         <!-- Repuestos -->
-        <article class="neon-card" data-aos="fade-up" data-aos-delay="300">
-          <div class="text-4xl mb-4">🧩</div>
-          <h3 class="text-lg font-bold-tech text-white mb-3">Casa de Repuestos</h3>
-          <p class="text-sm font-tech text-cyan-100">
-            Catálogo, códigos de parte, márgenes, ventas e integración de documentos digitales.
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="200">
+          <div class="feature-icon">
+            ⚙️
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Tiendas de Repuestos</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Gestión de inventario, ventas, catálogo de repuestos, proveedores y control de entrada y salida.
           </p>
-        </article>
-      </div>
-    </section>
+        </div>
 
-    <!-- Virtudes Agrupadas -->
-    <section class="max-w-5xl mx-auto py-20 px-4 grid md:grid-cols-3 gap-12" id="funcionalidades">
-      <!-- Gestión -->
-      <div data-aos="fade-right">
-        <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-6 holographic-text">Gestión</h2>
-        <div class="glass-card p-6 mb-6 flex flex-col items-center">
-          <i class="fas fa-shield-alt text-5xl mb-4 icon-float text-cyan-400"></i>
-          <h3 class="text-2xl font-bold-tech mb-2 text-white">Control de Garantías</h3>
-          <p class="text-lg font-tech text-cyan-100">Rastrea garantías por tiempo o kilometraje con alertas y registros digitales.</p>
-        </div>
-        <div class="glass-card p-6 flex flex-col items-center">
-          <i class="fas fa-chart-line text-5xl mb-4 icon-float text-blue-500"></i>
-          <h3 class="text-2xl font-bold-tech mb-2 text-white">Reportes de Rentabilidad</h3>
-          <p class="text-lg font-tech text-cyan-100">Conoce tus ganancias de servicios, repuestos o ambos — en tiempo real.</p>
-        </div>
-      </div>
-      
-      <!-- Automatización -->
-      <div data-aos="fade-up">
-        <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-6 holographic-text">Automatización</h2>
-        <div class="glass-card p-6 mb-6 flex flex-col items-center">
-          <i class="fas fa-user-cog text-5xl mb-4 icon-float text-cyan-400"></i>
-          <h3 class="text-2xl font-bold-tech mb-2 text-white">Desempeño del Mecánico</h3>
-          <p class="text-lg font-tech text-cyan-100">Mide desempeño, tiempos de trabajo y rastrea a los mejores técnicos.</p>
-        </div>
-        <div class="glass-card p-6 flex flex-col items-center">
-          <i class="fas fa-boxes text-5xl mb-4 icon-float text-blue-500"></i>
-          <h3 class="text-2xl font-bold-tech mb-2 text-white">Alertas de Inventario</h3>
-          <p class="text-lg font-tech text-cyan-100">Recibe notificaciones cuando el stock está bajo o inactivo.</p>
-        </div>
-      </div>
-      
-      <!-- Cliente -->
-      <div data-aos="fade-left">
-        <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-6 holographic-text">Cliente</h2>
-        <div class="glass-card p-6 mb-6 flex flex-col items-center">
-          <i class="fas fa-file-signature text-5xl mb-4 icon-float text-cyan-400"></i>
-          <h3 class="text-2xl font-bold-tech mb-2 text-white">Documentos Digitales</h3>
-          <p class="text-lg font-tech text-cyan-100">Órdenes de trabajo, recepciones, diagnósticos y recibos sin papel.</p>
-        </div>
-        <div class="glass-card p-6 flex flex-col items-center">
-          <i class="fas fa-users text-5xl mb-4 icon-float text-blue-500"></i>
-          <h3 class="text-2xl font-bold-tech mb-2 text-white">Portal del Cliente</h3>
-          <p class="text-lg font-tech text-cyan-100">Los clientes pueden ver facturas, historial de servicios y actualizaciones en línea.</p>
-        </div>
-      </div>
-    </section>
-
-    <!-- Features Alternados -->
-    <section class="max-w-6xl mx-auto py-20 px-4 flex flex-col gap-24">
-      <div class="flex flex-col md:flex-row items-center gap-12" data-aos="fade-right">
-        <div class="flex-1">
-          <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text">Panel Todo-en-Uno</h2>
-          <p class="text-lg font-tech text-cyan-100">Todo lo que necesitas en un lugar: trabajos, inventario, clientes y más.</p>
-        </div>
-        <div class="flex-1 flex justify-center">
-          <i class="fas fa-tachometer-alt text-7xl text-cyan-400 icon-float"></i>
-        </div>
-      </div>
-      
-      <div class="flex flex-col items-center text-center" data-aos="fade-up">
-        <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text">Recordatorios Automatizados</h2>
-        <i class="fas fa-bell text-6xl text-cyan-400 mb-4 icon-float"></i>
-        <p class="text-lg font-tech text-cyan-100 max-w-2xl">Nunca pierdas un servicio o seguimiento. Notificaciones automáticas para ti y tus clientes.</p>
-      </div>
-      
-      <div class="relative" data-aos="fade-left">
-        <div class="absolute left-0 top-1/2 w-2 h-64 bg-gradient-to-b from-cyan-400 to-blue-700 rounded-full -translate-y-1/2"></div>
-        <div class="ml-12">
-          <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text">Línea de Tiempo del Éxito</h2>
-          <ul class="space-y-6">
-            <li class="flex items-center gap-4">
-              <span class="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-white font-bold">1</span>
-              <span class="text-lg text-cyan-100">Registra tu taller en minutos</span>
-            </li>
-            <li class="flex items-center gap-4">
-              <span class="w-8 h-8 rounded-full bg-blue-700 flex items-center justify-center text-white font-bold">2</span>
-              <span class="text-lg text-cyan-100">Importa tus clientes e inventario</span>
-            </li>
-            <li class="flex items-center gap-4">
-              <span class="w-8 h-8 rounded-full bg-cyan-400 flex items-center justify-center text-white font-bold">3</span>
-              <span class="text-lg text-cyan-100">¡Comienza a trabajar más inteligente, no más duro!</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      
-      <div class="w-full py-16 flex flex-col items-center justify-center glass-card" data-aos="fade-up">
-        <h2 class="text-4xl font-futuristic font-bold text-cyan-400 mb-4 holographic-text">Analíticas en Tiempo Real</h2>
-        <i class="fas fa-chart-pie text-6xl text-cyan-400 mb-4 icon-float"></i>
-        <p class="text-lg font-tech text-cyan-100 max-w-2xl">Visualiza el crecimiento de tu negocio y toma decisiones basadas en datos al instante.</p>
-      </div>
-    </section>
-
-    <!-- Pricing Section -->
-    <section id="precios" class="mx-auto max-w-6xl px-4 py-20">
-      <div class="text-center mb-12">
-        <h2 class="text-4xl font-futuristic font-bold text-cyan-400 holographic-text mb-4">Planes Simples, Sin Letra Chica</h2>
-        <p class="text-xl text-cyan-200 font-tech">Transparente. Sin costos ocultos. Elige lo que se adapte a tu taller.</p>
-      </div>
-
-      <div class="grid md:grid-cols-4 gap-6">
-        <!-- Trial -->
-        <div class="neon-card p-8" data-aos="fade-up">
-          <div class="inline-block bg-green-500 text-white px-3 py-1 rounded-full text-xs font-bold mb-4">
-            🎁 GRATIS
+        <!-- Hojalatería -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="250">
+          <div class="feature-icon">
+            🔨
           </div>
-          <h3 class="text-white text-xl font-bold-tech mb-4">Prueba</h3>
-          <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$0</p>
-          <p class="text-cyan-200 mb-6 font-tech">30 días</p>
-          <ul class="space-y-2 text-cyan-100 text-sm mb-8">
-            <li>✓ Acceso completo</li>
-            <li>✓ Sin tarjeta de crédito</li>
-            <li>✓ Cancela cuando quieras</li>
-          </ul>
-<<<<<<< HEAD
-          <a href="/accounts/signup/?from=cl" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-white font-semibold py-3">
-=======
-          <a href="/accounts/signup/?from=uy" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-white font-semibold py-3">
->>>>>>> wip/2025-12-12_pre_pull
-            Comenzar
-          </a>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Hojalatería y Latonería</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Control de reparaciones, abolladuras, soldaduras y restauración de carrocerías y estructuras.
+          </p>
         </div>
 
-        <!-- Mensual -->
-        <div class="neon-card p-8" data-aos="fade-up" data-aos-delay="100">
-          <h3 class="text-white text-xl font-bold-tech mb-4">Mensual</h3>
-<<<<<<< HEAD
-          <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$20.000</p>
-          <p class="text-cyan-200 mb-6 font-tech">por mes</p>
-=======
-          <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$20</p>
-          <p class="text-cyan-200 mb-6 font-tech">USD por mes</p>
->>>>>>> wip/2025-12-12_pre_pull
-          <ul class="space-y-2 text-cyan-100 text-sm mb-8">
-            <li>✓ Todo de Prueba</li>
-            <li>✓ Usuarios ilimitados</li>
-            <li>✓ Soporte bilingüe</li>
-          </ul>
-<<<<<<< HEAD
-          <a href="/accounts/signup/?from=cl" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-white font-semibold py-3">
-=======
-          <a href="/accounts/signup/?from=uy" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-white font-semibold py-3">
->>>>>>> wip/2025-12-12_pre_pull
-            Elegir Mensual
-          </a>
-        </div>
-
-        <!-- Semestral -->
-        <div class="neon-card p-8 border-2 border-yellow-500 relative" data-aos="fade-up" data-aos-delay="200">
-          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-500 text-black px-4 py-1 rounded-full text-xs font-bold">
-            ⭐ Recomendado
+        <!-- Pintura -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="300">
+          <div class="feature-icon">
+            🎨
           </div>
-          <h3 class="text-white text-xl font-bold-tech mb-4">Semestral</h3>
-<<<<<<< HEAD
-          <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$100.000</p>
-          <p class="text-cyan-200 mb-6 font-tech">cada 6 meses</p>
-=======
-          <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$110</p>
-          <p class="text-cyan-200 mb-6 font-tech">USD cada 6 meses</p>
->>>>>>> wip/2025-12-12_pre_pull
-          <p class="text-yellow-400 font-bold text-sm mb-4">¡Ahorra 17%!</p>
-          <ul class="space-y-2 text-cyan-100 text-sm mb-8">
-            <li>✓ Todo del plan Mensual</li>
-            <li>✓ Recordatorios automáticos</li>
-            <li>✓ Reportes de rentabilidad</li>
-          </ul>
-<<<<<<< HEAD
-          <a href="/accounts/signup/?from=cl" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-white font-semibold py-3">
-=======
-          <a href="/accounts/signup/?from=uy" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-white font-semibold py-3">
->>>>>>> wip/2025-12-12_pre_pull
-            Elegir Semestral
-          </a>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Pintura y Detallado</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Gestión de servicios de pintura, pulido, vitrificado y acabados especiales.
+          </p>
         </div>
 
-        <!-- Anual -->
-        <div class="neon-card p-8" data-aos="fade-up" data-aos-delay="300">
-          <div class="inline-block bg-purple-500 text-white px-3 py-1 rounded-full text-xs font-bold mb-4">
-            💎 Mejor Precio
+        <!-- Centro Automotriz -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="350">
+          <div class="feature-icon">
+            🚗
           </div>
-          <h3 class="text-white text-xl font-bold-tech mb-4">Anual</h3>
-<<<<<<< HEAD
-          <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$200.000</p>
-          <p class="text-cyan-200 mb-6 font-tech">por año</p>
-=======
-          <p class="text-4xl font-futuristic font-extrabold text-white mb-2">$200</p>
-          <p class="text-cyan-200 mb-6 font-tech">USD por año</p>
->>>>>>> wip/2025-12-12_pre_pull
-          <p class="text-purple-400 font-bold text-sm mb-4">¡Ahorra 17%!</p>
-          <ul class="space-y-2 text-cyan-100 text-sm mb-8">
-            <li>✓ Todo del plan Semestral</li>
-            <li>✓ Descuentos por volumen</li>
-            <li>✓ Soporte prioritario</li>
-          </ul>
-<<<<<<< HEAD
-          <a href="/accounts/signup/?from=cl" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-white font-semibold py-3">
-=======
-          <a href="/accounts/signup/?from=uy" class="inline-flex items-center justify-center w-full rounded-xl neon-button text-white font-semibold py-3">
->>>>>>> wip/2025-12-12_pre_pull
-            Elegir Anual
-          </a>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Centro Automotriz</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Solución completa para centros que ofrecen múltiples servicios: mecánica, alineación, balanceo y más.
+          </p>
+        </div>
+
+        <!-- Taller de Suspensión -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="400">
+          <div class="feature-icon">
+            ⚡
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Suspensión y Amortiguadores</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Especializado en sistemas de suspensión, amortiguadores, resortes y kits de suspensión.
+          </p>
+        </div>
+
+        <!-- Mecánica Diesel -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="450">
+          <div class="feature-icon">
+            🚛
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Mecánica Diesel</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Gestión especializada para talleres de vehículos pesados, camiones y motores diesel.
+          </p>
+        </div>
+
+        <!-- Eléctrica Automotriz -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="500">
+          <div class="feature-icon">
+            🔌
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Eléctrica Automotriz</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Control de servicios eléctricos, inyección electrónica, batería, alternador y sistemas electrónicos.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Call to Action -->
+      <div class="text-center mt-16" data-aos="fade-up" data-aos-delay="550">
+        <div class="glass-card p-8 inline-block">
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCDD09; text-shadow: 0 0 20px rgba(252, 221, 9, 0.4);">
+            ¡Y mucho más!
+          </h3>
+          <p style="color: #d0d0d0; font-size: 1.1rem; font-weight: 500; max-width: 600px; margin: 0 auto;">
+            Sea cual sea tu negocio en el sector automotriz, <span style="color: #4A90E2; font-weight: 700;">eGarage se adapta</span> a tus necesidades específicas.
+          </p>
         </div>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Métricas de Éxito -->
-    <section class="mx-auto max-w-6xl px-4 py-16">
-      <h2 class="text-3xl md:text-4xl font-futuristic font-bold text-center text-cyan-400 mb-12 holographic-text">
-        Resultados Reales
+  <!-- Uruguay-specific Section -->
+  <section class="py-20 px-4 bg-gradient-to-b from-transparent to-black">
+    <div class="container mx-auto max-w-5xl text-center">
+      
+      <h2 class="font-futuristic text-5xl mb-8 futuristic-glow" data-aos="fade-up">
+        Hecho para Uruguay 🇺🇾
       </h2>
       
-      <div class="grid md:grid-cols-3 gap-8">
-        <div class="metric-card p-6 text-center" data-aos="fade-up">
-          <div class="text-3xl font-extrabold text-white mb-2">+42%</div>
-          <div class="text-cyan-100 text-sm">Mayor ingreso promedio</div>
-        </div>
-        <div class="metric-card p-6 text-center" data-aos="fade-up" data-aos-delay="100">
-          <div class="text-3xl font-extrabold text-white mb-2">-30%</div>
-          <div class="text-cyan-100 text-sm">Menos tiempo en recepción</div>
-        </div>
-        <div class="metric-card p-6 text-center" data-aos="fade-up" data-aos-delay="200">
-          <div class="text-3xl font-extrabold text-white mb-2">4.8/5</div>
-          <div class="text-cyan-100 text-sm">Satisfacción del cliente</div>
-        </div>
-      </div>
-    </section>
-
-<<<<<<< HEAD
-    <!-- Testimonios Chilenos -->
-=======
-    <!-- Testimonios Uruguayos -->
->>>>>>> wip/2025-12-12_pre_pull
-    <section class="mx-auto max-w-6xl px-4 py-16">
-      <h2 class="text-3xl md:text-4xl font-futuristic font-bold text-center text-cyan-400 mb-12 holographic-text">
-        Lo que Dicen Nuestros Clientes
-      </h2>
-
-      <div class="grid md:grid-cols-3 gap-8">
-        <article class="glass-card p-8" data-aos="fade-up">
-          <div class="flex gap-2 mb-4">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-700 flex items-center justify-center text-white font-bold text-xl">
-<<<<<<< HEAD
-              DC
-            </div>
-            <div>
-              <div class="font-bold text-white">Don Carlos</div>
-              <div class="text-sm text-cyan-200">Santiago, Chile • Taller Mecánico</div>
-=======
-              FM
-            </div>
-            <div>
-              <div class="font-bold text-white">Fernando Martínez</div>
-              <div class="text-sm text-cyan-200">Montevideo, Uruguay • Taller Mecánico</div>
->>>>>>> wip/2025-12-12_pre_pull
-            </div>
-          </div>
-          <p class="text-cyan-100">
-            "Este software cambió cómo trabajamos; ahora todo se rastrea y cobramos más rápido. Los clientes valoran la profesionalidad."
-          </p>
-        </article>
-
-        <article class="glass-card p-8" data-aos="fade-up" data-aos-delay="100">
-          <div class="flex gap-2 mb-4">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-blue-700 to-cyan-400 flex items-center justify-center text-white font-bold text-xl">
-<<<<<<< HEAD
-              MG
-            </div>
-            <div>
-              <div class="font-bold text-white">Miguel G.</div>
-              <div class="text-sm text-cyan-200">Valparaíso, Chile • Vulcanización</div>
-=======
-              AS
-            </div>
-            <div>
-              <div class="font-bold text-white">Ana Silva</div>
-              <div class="text-sm text-cyan-200">Punta del Este, Uruguay • Vulcanización</div>
->>>>>>> wip/2025-12-12_pre_pull
-            </div>
-          </div>
-          <p class="text-cyan-100">
-            "El control de stock y las alertas nos ahorraron muchas horas. Perfecto para talleres en crecimiento."
-          </p>
-        </article>
-
-        <article class="glass-card p-8" data-aos="fade-up" data-aos-delay="200">
-          <div class="flex gap-2 mb-4">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-700 flex items-center justify-center text-white font-bold text-xl">
-<<<<<<< HEAD
-              PR
-            </div>
-            <div>
-              <div class="font-bold text-white">Patricia R.</div>
-              <div class="text-sm text-cyan-200">Concepción, Chile • Repuestos</div>
-=======
-              RG
-            </div>
-            <div>
-              <div class="font-bold text-white">Roberto González</div>
-              <div class="text-sm text-cyan-200">Maldonado, Uruguay • Repuestos</div>
->>>>>>> wip/2025-12-12_pre_pull
-            </div>
-          </div>
-          <p class="text-cyan-100">
-            "La prueba gratuita nos convenció. Ahora todo es digital y los clientes lo notan. Muy recomendable."
-          </p>
-        </article>
-      </div>
-    </section>
-
-    <!-- CTA Final -->
-    <section id="cta" class="w-full min-h-[60vh] flex flex-col items-center justify-center py-32 relative" data-aos="zoom-in">
-      <h2 class="text-5xl text-cyan-400 font-futuristic font-bold text-center mb-8 holographic-text">
-        ¿Listo para Transformar tu Taller en una Fuerza Inteligente?
-      </h2>
-      <div class="flex flex-col sm:flex-row gap-4 mt-8">
-<<<<<<< HEAD
-        <a href="/accounts/signup/?from=cl" class="px-10 py-4 neon-button text-white text-xl font-bold rounded-2xl">
-=======
-        <a href="/accounts/signup/?from=uy" class="px-10 py-4 neon-button text-white text-xl font-bold rounded-2xl">
->>>>>>> wip/2025-12-12_pre_pull
-          🚀 Comenzar Gratis Hoy
-        </a>
-        <a href="#precios" class="px-10 py-4 bg-gradient-to-r from-blue-700 to-blue-900 hover:from-blue-600 hover:to-blue-800 text-white text-xl font-bold rounded-2xl transition-all shadow-lg hover:shadow-blue-500/50">
-          💳 Ver Planes
-        </a>
-      </div>
-    </section>
-
-    <footer class="mt-20 text-center text-cyan-200 text-sm pb-10">
-      <p>
-<<<<<<< HEAD
-        &copy; 2025 eGarage Chile - Tecnología de vanguardia para la industria automotriz. Todos los derechos reservados. ® Marca registrada.
-=======
-        &copy; 2025 eGarage Uruguay - Tecnología de vanguardia para la industria automotriz. Todos los derechos reservados. ® Marca registrada.
->>>>>>> wip/2025-12-12_pre_pull
+      <p class="text-xl mb-12" data-aos="fade-up" data-aos-delay="100" style="color: #d0d0d0; font-weight: 500;">
+        Entendemos las necesidades específicas de los talleres uruguayos
       </p>
-    </footer>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+        
+        <div class="glass-card p-6" data-aos="fade-up">
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCDD09;">✅ Conformidad Fiscal</h3>
+          <ul class="space-y-2" style="color: #d0d0d0; font-size: 1.05rem;">
+            <li>• Cálculo automático de IVA (22%)</li>
+            <li>• Facturas electrónicas</li>
+            <li>• Control de impuestos</li>
+            <li>• Integración con contabilidad</li>
+          </ul>
+        </div>
+
+        <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="100">
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCDD09;">📱 Mobile First</h3>
+          <ul class="space-y-2" style="color: #d0d0d0; font-size: 1.05rem;">
+            <li>• Interfaz optimizada para móviles</li>
+            <li>• Funciona sin conexión</li>
+            <li>• App nativa (próximamente)</li>
+            <li>• Sincronización automática</li>
+          </ul>
+        </div>
+
+        <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="200">
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCDD09;">💳 Pagos Locales</h3>
+          <ul class="space-y-2" style="color: #d0d0d0; font-size: 1.05rem;">
+            <li>• Transferencias bancarias</li>
+            <li>• Tarjetas de crédito/débito</li>
+            <li>• Redpagos integrado</li>
+            <li>• Moneda local (UYU)</li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Teaser -->
+  <section class="py-20 px-4">
+    <div class="container mx-auto max-w-7xl text-center">
+      
+      <h2 class="font-futuristic text-5xl mb-8 futuristic-glow" data-aos="fade-up">
+        Planes Accesibles
+      </h2>
+      
+      <p class="text-xl mb-12" data-aos="fade-up" data-aos-delay="100" style="color: #d0d0d0; font-weight: 500;">
+        Elige el plan que mejor se adapte a tu negocio
+      </p>
+
+      <!-- Pricing Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+        
+        <!-- Plano Mensual -->
+        <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="100">
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Plan Mensual</h3>
+          <div class="mb-6">
+            <div style="color: #4A90E2; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
+              $ 800
+            </div>
+            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
+              UYU por mes
+            </div>
+          </div>
+          <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
+            <li>✓ Órdenes ilimitadas</li>
+            <li>✓ Portal del cliente</li>
+            <li>✓ Inventario</li>
+            <li>✓ Soporte 24/7</li>
+          </ul>
+          <a href="/uy/signup/?plan=mensual" class="btn-secondary inline-block w-full">
+            Seleccionar
+          </a>
+        </div>
+
+        <!-- Plano Semestral (DESTACADO) -->
+        <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="200" style="transform: scale(1.05); border: 3px solid rgba(0, 56, 168, 0.8);">
+          <div style="background: linear-gradient(135deg, #0038A8 0%, #FCDD09 100%); color: #000; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 800; margin-bottom: 1rem; display: inline-block;">
+            🏆 MÁS POPULAR
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FCDD09;">Plan Semestral</h3>
+          <div class="mb-6">
+            <div style="color: #FCDD09; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
+              $ 4.400
+            </div>
+            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
+              UYU cada 6 meses
+            </div>
+            <div style="color: #4A90E2; font-size: 0.9rem; font-weight: 700; margin-top: 0.5rem;">
+              Ahorra 17%
+            </div>
+          </div>
+          <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
+            <li>✓ Todo del plan mensual</li>
+            <li>✓ Análisis avanzados</li>
+            <li>✓ Multi-sucursales</li>
+            <li>✓ Prioridad en soporte</li>
+          </ul>
+          <a href="/uy/signup/?plan=semestral" class="btn-primary inline-block w-full">
+            Seleccionar
+          </a>
+        </div>
+
+        <!-- Plano Anual -->
+        <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="300">
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Plan Anual</h3>
+          <div class="mb-6">
+            <div style="color: #4A90E2; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
+              $ 8.000
+            </div>
+            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
+              UYU por año
+            </div>
+            <div style="color: #4A90E2; font-size: 0.9rem; font-weight: 700; margin-top: 0.5rem;">
+              Ahorra 33%
+            </div>
+          </div>
+          <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
+            <li>✓ Todo del plan semestral</li>
+            <li>✓ Capacitación incluida</li>
+            <li>✓ API personalizada</li>
+            <li>✓ Soporte dedicado</li>
+          </ul>
+          <a href="/uy/signup/?plan=anual" class="btn-secondary inline-block w-full">
+            Seleccionar
+          </a>
+        </div>
+
+      </div>
+
+      <!-- Trial Banner -->
+      <div class="glass-card p-12 mb-8" data-aos="fade-up" data-aos-delay="400">
+        <h3 class="text-3xl font-bold mb-6" style="color: #FCDD09; text-shadow: 0 0 20px rgba(252, 221, 9, 0.4);">🎁 Prueba Gratis por 30 Días</h3>
+        <p class="text-xl mb-8" style="color: #d0d0d0; font-weight: 500;">
+          Sin tarjeta de crédito. Sin compromiso. Cancela cuando quieras.
+        </p>
+        <a href="/uy/signup/" class="btn-primary inline-block">
+          🚀 Comenzar Ahora
+        </a>
+      </div>
+
+      <p style="color: #a0a0a0; font-weight: 500;">
+        Más de 500 talleres confían en eGarage para gestionar sus negocios
+      </p>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="py-12 px-4" style="border-top: 2px solid rgba(0, 56, 168, 0.3); background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 100%);">
+    <div class="container mx-auto max-w-7xl">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+        
+        <div>
+          <h4 class="font-futuristic text-2xl mb-4" style="color: #4A90E2; text-shadow: 0 0 20px rgba(74, 144, 226, 0.4);">eGarage</h4>
+          <p style="color: #b0b0b0; font-weight: 500;">
+            La plataforma definitiva para talleres mecánicos en Uruguay.
+          </p>
+        </div>
+
+        <div>
+          <h5 class="font-bold mb-4" style="color: #FCDD09;">Producto</h5>
+          <ul class="space-y-2" style="color: #b0b0b0;">
+            <li><a href="/uy/precios/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Precios</a></li>
+            <li><a href="/uy/demo/localizacion/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Demo</a></li>
+            <li><a href="/uy/documentos/form/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Documentos</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h5 class="font-bold mb-4" style="color: #FCDD09;">Empresa</h5>
+          <ul class="space-y-2" style="color: #b0b0b0;">
+            <li><a href="/uy/sobre/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Sobre Nosotros</a></li>
+            <li><a href="/uy/contacto/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Contacto</a></li>
+            <li><a href="/uy/soporte/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Soporte</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h5 class="font-bold mb-4" style="color: #FCDD09;">Legal</h5>
+          <ul class="space-y-2" style="color: #b0b0b0;">
+            <li><a href="/uy/privacidad/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Privacidad</a></li>
+            <li><a href="/uy/terminos/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Términos</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <div class="text-center pt-8" style="border-top: 1px solid rgba(0, 56, 168, 0.2); color: #808080;">
+        <p>&copy; 2025 eGarage Uruguay. Todos los derechos reservados.</p>
+        <p class="mt-2" style="font-size: 1.2rem;">🇺🇾 Hecho con <span style="color: #ff4444;">❤️</span> en Uruguay</p>
+      </div>
+    </div>
+  </footer>
+
   </main>
 
-  <!-- Scripts -->
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      // Logo fallback
-      const fallbackLogo = "{% static 'img/TallerPro_logo.png' %}";
-      document.querySelectorAll('.logo-header, .logo-hero').forEach(function(img) {
-        img.addEventListener('error', function() {
-          this.onerror = null;
-          this.src = fallbackLogo;
-        });
-      });
-
-      // Initialize AOS
+    // Initialize AOS (Animate On Scroll)
+    document.addEventListener('DOMContentLoaded', function() {
       if (typeof AOS !== 'undefined') {
         AOS.init({
-          duration: 800,
+          duration: 1000,
           once: true,
           offset: 100
         });
       }
-
-<<<<<<< HEAD
-      // Initialize Vanta.js Globe
-      if (typeof VANTA !== 'undefined' && VANTA.GLOBE) {
-=======
-      // Vanta.js Globe - DESACTIVADO para diseño serio
-      /* if (typeof VANTA !== 'undefined' && VANTA.GLOBE) {
->>>>>>> wip/2025-12-12_pre_pull
-        VANTA.GLOBE({
-          el: "#vanta-globe",
-          mouseControls: true,
-          touchControls: true,
-          gyroControls: false,
-          minHeight: 200.00,
-          minWidth: 200.00,
-          scale: 1.00,
-          scaleMobile: 1.00,
-          color: 0x00f5ff,
-          color2: 0x00d4ff,
-          backgroundColor: 0x0a0a0a,
-          points: 12.00,
-          maxDistance: 20.00,
-        });
-<<<<<<< HEAD
-      }
-=======
-      } */
->>>>>>> wip/2025-12-12_pre_pull
     });
   </script>
+
 </body>
 </html>
-

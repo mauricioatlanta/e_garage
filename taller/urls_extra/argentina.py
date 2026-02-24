@@ -90,6 +90,16 @@ urlpatterns = [
         TemplateView.as_view(template_name="ar/es/onboarding/bienvenida.html"),
         name="bienvenida_argentina_alt",
     ),
+    # Allauth bajo /ar/ y /ar/es/ para que /ar/es/accounts/login/ etc. funcionen
+    path("accounts/", include("allauth.urls")),
+    # Signup corto /ar/signup/ y /ar/es/signup/ -> /accounts/signup/?from=ar (preserva ?plan=, etc.)
+    path(
+        "signup/",
+        lambda r: redirect(
+            "/accounts/signup/?from=ar" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
+        name="account_signup_ar",
+    ),
     # Login para suscriptores de Argentina
     path(
         "login/",

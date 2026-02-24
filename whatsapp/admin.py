@@ -92,15 +92,14 @@ try:
     # No registrar automáticamente aquí, se hará en apps.py ready()
 
 except ImportError as e:
-    # Los modelos no se pueden importar, no registrar
+    # Los modelos no se pueden importar (esperado si la app no está desplegada en este servidor)
     import logging
 
     logger = logging.getLogger(__name__)
-    # Solo loggear en modo DEBUG para no saturar logs en producción
     import django.conf
 
     if django.conf.settings.DEBUG:
-        logger.warning(f"No se pudieron importar los modelos de WhatsApp: {e}")
+        logger.debug("WhatsApp admin no registrado (modelos no disponibles): %s", e)
 
     # Función dummy para evitar errores
     def register_whatsapp_admin():

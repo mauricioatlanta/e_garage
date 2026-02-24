@@ -1,0 +1,184 @@
+{% extends "taller/documentos/base/base_documento.html" %}
+{% load i18n %}
+
+{% load static %}
+
+{% block title %}
+  {% if country == "US" %}Document{% else %}Documento{% endif %} #{{ obj.id }}
+{% endblock %}
+
+{% block extra_head %}
+  {% include "taller/documentos/base/includes/theme_print.html" %}
+{% endblock %}
+
+{% block content %}
+{% load eg_money %}
+
+<!-- HEADER: aparecerá en todas las páginas -->
+<div class="pdf-header">
+    <div class="row">
+        <div>
+            <strong>{{ empresa_nombre|default:"Mi Empresa" }}</strong>
+            {% if obj.numero %} · <span class="muted">#{{ obj.numero }}</span>{% endif %}
+            {% if obj.tipo %} · <span class="muted">{{ obj.get_tipo_display|default:obj.tipo }}</span>{% endif %}
+        </div>
+        <div>
+            <span class="muted">Fecha emisión:</span>
+            <strong>{{ obj.fecha_emision|date:"d/m/Y" }}</strong>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER: numeración -->
+<div class="pdf-footer">
+    <div class="row">
+        <div class="muted">© {{ empresa_nombre|default:"Mi Empresa" }}</div>
+        <div>Página <span class="page"></span> de <span class="pages"></span></div>
+    </div>
+</div>
+
+<!-- CONTENIDO DEL DOCUMENTO -->
+<main>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            {# Mapea el valor inicial desde el objeto #}
+            {% with tipo_init=obj.tipo|default:"OT" %}
+            <div id="doc-shell" class="doc-shell theme-{{ tipo_init|lower }}">
+
+                <div class="flex items-center justify-between mb-4">
+                    <div class="space-x-2">
+                        <span id="doc-chip" class="doc-chip chip-{{ tipo_init|lower }}">
+                            {% if tipo_init == "OT" %}🔧 OT{% elif tipo_init == "PRES" %}📋 PRES{% else %}🧾 REC{% endif %}
+                        </span>
+                        <span class="text-xs text-gray-500">#{{ obj.id }}</span>
+                    </div>
+                    <div class="text-xs text-gray-400">
+                        {{ empresa_nombre|default:"Mi Empresa" }} • {{ empresa_moneda|default:"CLP" }}
+                    </div>
+                </div>
+
+                <!-- Información del documento -->
+                <div class="grid sm:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            {% if country == "US" %}Type{% else %}Tipo{% endif %}
+                        </label>
+                        <div class="text-sm">{{ obj.get_tipo_display }}</div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            {% if country == "US" %}Number{% else %}Número{% endif %}
+                        </label>
+                        <div class="text-sm">{{ obj.numero|default:"-" }}</div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            {% if country == "US" %}Date{% else %}Fecha{% endif %}
+                        </label>
+                        <div class="text-sm">{{ obj.fecha_emision|date:"d/m/Y" }}</div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            {% if country == "US" %}Technician{% else %}Técnico{% endif %}
+                        </label>
+                        <div class="text-sm">{{ obj.tecnico_responsable|default:"-" }}</div>
+                    </div>
+                </div>
+
+                <!-- Información de cliente y vehículo -->
+                <div class="grid sm:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            {% if country == "US" %}Customer{% else %}Cliente{% endif %}
+                        </label>
+                        <div class="text-sm">
+                            {% if obj.cliente %}
+                                {{ obj.cliente.nombre }}
+                                {% if obj.cliente.tax_id %}<br><small class="text-gray-500">{{ obj.cliente.tax_id }}</small>{% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            {% if country == "US" %}Vehicle{% else %}Vehículo{% endif %}
+                        </label>
+                        <div class="text-sm">
+                            {% if obj.vehiculo %}
+                                {{ obj.vehiculo.patente }}
+                                {% if obj.vehiculo.vin %}<br><small class="text-gray-500">{{ obj.vehiculo.vin }}</small>{% endif %}
+                            {% else %}
+                                -
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div class="grid sm:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            {% if country == "US" %}Mileage{% else %}Kilometraje{% endif %}
+                        </label>
+                        <div class="text-sm">{{ obj.kilometraje|default:"-" }}</div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium mb-1">
+                            {% if country == "US" %}Status{% else %}Estado{% endif %}
+                        </label>
+                        <div class="text-sm">
+                            {% if obj.pagado %}
+                                {% if country == "US" %}Paid{% else %}Pagado{% endif %} ✅
+                            {% else %}
+                                {% if country == "US" %}Pending{% else %}Pendiente{% endif %} ⏳
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                {% if obj.observaciones %}
+                <div class="mb-6">
+                    <label class="block text-sm font-medium mb-1">
+                        {% if country == "US" %}Observations{% else %}Observaciones{% endif %}
+                    </label>
+                    <div class="text-sm bg-gray-50 p-3 rounded border">
+                        {{ obj.observaciones|linebreaks }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Información de la empresa -->
+                <div class="border-t pt-4 text-xs text-gray-500">
+                    <div class="flex justify-between">
+                        <div>
+                            {{ empresa_nombre|default:"Mi Empresa" }}
+                            {% if empresa_direccion %}<br>{{ empresa_direccion }}{% endif %}
+                        </div>
+                        <div>
+                            {% now "d/m/Y H:i" %}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            {% endwith %}
+        </div>
+    </div>
+</div>
+
+<!-- Bloque de totales y forma de pago -->
+{% include "taller/documentos/base/includes/pdf_totals_payment.html" %}
+
+<!-- Bloque de firmas y sello -->
+{% include "taller/documentos/base/includes/pdf_signatures.html" %}
+
+</main>
+{% endblock %}

@@ -5,7 +5,7 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
     dependencies = [
-        ("taller", "0007_add_vehiculo_empresa_cliente_index"),
+        ("taller", "0007_create_logauditoria_table"),
     ]
 
     operations = [

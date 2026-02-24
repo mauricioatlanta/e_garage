@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Documento No Disponible{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8 flex items-center justify-center">
+  <div class="container mx-auto px-4 max-w-2xl">
+    <div class="bg-white rounded-xl shadow-lg p-8 text-center">
+      <div class="mb-6">
+        <i class="fas fa-exclamation-triangle text-yellow-500 text-6xl"></i>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-800 mb-4">Documento No Disponible</h1>
+      <p class="text-gray-600 mb-6">
+        Este documento ha sido anulado o no está disponible para visualización.
+      </p>
+      <p class="text-sm text-gray-500">
+        Si crees que esto es un error, por favor contacta al taller.
+      </p>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+
+
+

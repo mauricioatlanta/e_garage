@@ -19,6 +19,7 @@ class VerificarSuscripcionMiddleware:
         "/soporte/",
         "/help/",
         "/admin/",  # Admin siempre accesible
+        "/analytics/",  # Analytics dashboard - requiere login pero no suscripción activa
         "/static/",
         "/media/",
         "/favicon.ico",

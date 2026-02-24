@@ -1,0 +1,105 @@
+{% extends "taller/common/documentos/editar_documento_nuevo.html" %}
+
+
+{# ── Títulos del header/encabezados (EN) ── #}
+{% block documento_header %}Document Management{% endblock %}
+{% block documento_subtitle %}Document Form{% endblock %}
+
+{# ── Encabezado del card de edición ── #}
+{% block form_header_title %}✏️ Edit Document{% endblock %}
+{% block form_header_subtitle %}
+  Editing: {{ object.numero_documento|default:"New Document" }} - {{ object.get_tipo_display|default:"Work Order" }}
+{% endblock %}
+
+{# ── Tarjetas de KPIs del header ── #}
+{% block form_header_totals %}
+  <div class="p-3 bg-blue-900/50 border border-blue-400 rounded">
+    <p class="text-blue-200 text-sm"><strong>💰 Document Total:</strong><br>${{ total|floatformat:0|default:"0" }}</p>
+  </div>
+  <div class="p-3 bg-green-900/50 border border-green-400 rounded">
+    <p class="text-green-200 text-sm"><strong>🔧 Parts:</strong><br>${{ subtotal_repuestos|floatformat:0|default:"0" }} ({{ repuestos|length|default:"0" }} items)</p>
+  </div>
+  <div class="p-3 bg-purple-900/50 border border-purple-400 rounded">
+    <p class="text-purple-200 text-sm"><strong>📊 Status:</strong><br>{{ object.get_estado_pago_display|default:"Not Paid" }} - {{ object.get_estado_display|default:"Draft" }}</p>
+  </div>
+{% endblock %}
+
+{# ── Labels de campos (usa los del form ya en EN) ── #}
+{% block field_label_tipo %}Document Type{% endblock %}
+{% block field_label_estado_pago %}Payment Status{% endblock %}
+{% block field_label_numero %}Number{% endblock %}
+{% block field_label_cliente %}Customer{% endblock %}
+{% block field_label_vehicle %}Vehicle{% endblock %}
+{% block field_label_tech %}Assigned Technician{% endblock %}
+{% block field_label_issue_date %}Issue Date{% endblock %}
+{% block field_label_mileage %}Mileage{% endblock %}
+{% block field_label_notes %}Observations{% endblock %}
+
+{# ── Secciones (EN) ── #}
+{% block card_repuestos_title %}🔧 Spare Parts{% endblock %}
+{% block card_repuestos_add_button %}➕ Add{% endblock %}
+
+{% block card_servicios_title %}⚙️ Services{% endblock %}
+{% block card_servicios_add_button %}➕ Add{% endblock %}
+
+{% block card_otros_servicios_title %}🏢 Other Services{% endblock %}
+{% block card_otros_servicios_add_button %}➕ Add{% endblock %}
+{% block otros_headers %}
+  <div class="otros-headers mb-2" style="display: none;">
+    <div class="flex flex-wrap gap-4 items-end">
+      <div class="flex-1 min-w-[200px]"><label class="block text-cyan-200 text-sm mb-1">Service</label></div>
+      <div class="flex-1 min-w-[150px]"><label class="block text-cyan-200 text-sm mb-1">External Company</label></div>
+      <div class="w-24"><label class="block text-cyan-200 text-sm mb-1">Shop Price</label></div>
+      <div class="w-24"><label class="block text-cyan-200 text-sm mb-1">Customer Price</label></div>
+      <div class="w-32"><label class="block text-cyan-200 text-sm mb-1">Subtotal <span class="text-xs text-gray-400">(Customer Price)</span></label></div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block card_totales_title %}💰 Totals Summary{% endblock %}
+{% block totales_labels %}
+  <div>
+    <p class="text-gray-400 text-sm">Parts</p>
+    <p class="text-lg font-semibold text-cyan-300" id="t_rep">${{ subtotal_repuestos|floatformat:0|default:"0" }}</p>
+  </div>
+  <div>
+    <p class="text-gray-400 text-sm">Services</p>
+    <p class="text-lg font-semibold text-cyan-300" id="t_serv">${{ subtotal_servicios|floatformat:0|default:"0" }}</p>
+  </div>
+  <div>
+    <p class="text-gray-400 text-sm">Other</p>
+    <p class="text-lg font-semibold text-cyan-300" id="t_otros">${{ subtotal_otros_servicios|floatformat:0|default:"0" }}</p>
+  </div>
+  <div>
+    <p class="text-gray-400 text-sm">Tax</p>
+    <p class="text-lg font-semibold text-yellow-400" id="t_iva">${{ iva|floatformat:0|default:"0" }}</p>
+  </div>
+  <div>
+    <p class="text-gray-400 text-sm">Total</p>
+    <p class="text-2xl font-bold text-green-400" id="t_total">${{ total|floatformat:0|default:"0" }}</p>
+  </div>
+{% endblock %}
+
+{# ── Acciones y namespaces de US ── #}
+{% block documento_actions %}
+  <div class="form-actions">
+    <button type="submit" class="btn-primary" form="document-form">💾 Save Changes</button>
+    <a href="{% url 'documentos_us_en:lista_documentos' %}" class="btn-secondary">← Cancel</a>
+  </div>
+{% endblock %}
+
+{# ── Placeholders y textos del buscador de clientes ── #}
+{% block cliente_search_placeholder %}Type to search customers...{% endblock %}
+{% block cliente_email_fallback %}No email{% endblock %}
+{% block cliente_phone_fallback %}No phone{% endblock %}
+
+{# ── JS mensajes (EN) ── #}
+{% block js_strings %}
+<script>
+  window.__STRINGS__ = {
+    selectClientFirst: "Please select a customer before continuing.",
+    noServicesFound: "No services found",
+    addOtherServiceClick: "Click add other service",
+  };
+</script>
+{% endblock %}

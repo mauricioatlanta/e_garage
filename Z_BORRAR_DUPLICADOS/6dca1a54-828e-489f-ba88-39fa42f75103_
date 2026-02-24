@@ -1,0 +1,429 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+
+<!-- 🟠 CRUZ NARANJA - TEMPLATE OTROS SERVICIOS -->
+<div style="position: fixed; top: 10px; left: 10px; width: 50px; height: 50px; background-color: #ff8800; z-index: 9999; border: 3px solid #000; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;">OTROS</div>
+
+{% block title %}{{ empresa.nombre_taller }} - Otros Servicios{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 🎨 Estilo futurista para otros servicios */
+:root {
+    --cyber-blue: #00ffff;
+    --cyber-green: #00ff88;
+    --cyber-purple: #8000ff;
+    --cyber-red: #ff0044;
+    --cyber-gold: #ffd700;
+    --cyber-orange: #ff8800;
+    --dark-bg: #0a0a0a;
+    --card-bg: rgba(16, 20, 24, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.cyber-container {
+    background: var(--card-bg);
+    border: 1px solid var(--cyber-orange);
+    border-radius: 15px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px rgba(255, 136, 0, 0.1);
+}
+
+.service-card {
+    background: linear-gradient(145deg, var(--glass-bg), rgba(255, 136, 0, 0.05));
+    border: 1px solid var(--cyber-orange);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.service-card:hover {
+    border-color: var(--cyber-green);
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    transform: translateY(-5px);
+    color: inherit;
+    text-decoration: none;
+}
+
+.service-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 136, 0, 0.1), transparent);
+    transition: left 0.5s;
+}
+
+.service-card:hover::before {
+    left: 100%;
+}
+
+.service-icon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    display: block;
+}
+
+.service-title {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--cyber-orange);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 10px var(--cyber-orange);
+}
+
+.service-description {
+    color: #b0b8c1;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.section-title {
+    color: var(--cyber-orange);
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 2rem;
+    text-shadow: 0 0 10px var(--cyber-orange);
+    text-align: center;
+}
+
+.header-section {
+    background: var(--card-bg);
+    border: 1px solid var(--cyber-orange);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.header-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--cyber-orange);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 15px var(--cyber-orange);
+}
+
+.header-subtitle {
+    color: #b0b8c1;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.header-info {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.back-button {
+    background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green));
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 2rem;
+}
+
+.back-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    color: #000;
+    text-decoration: none;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto p-6">
+
+    <!-- 🏢 Cabecera de Otros Servicios -->
+    <div class="header-section">
+        <h1 class="header-title">
+            🛠️ {{ pais_emoji }} Otros Servicios
+        </h1>
+        <p class="header-subtitle">{{ empresa.nombre_taller }} - Servicios Externos y Complementarios</p>
+        <p class="header-info">Usuario: {{ user.username }} | {{ empresa.get_pais_display }} | {{ fecha_hoy|date:"l, d F Y" }}</p>
+    </div>
+
+    <!-- 🔙 Botón de Regreso -->
+    <a href="{% url 'chile:centro_operaciones' %}" class="back-button">
+        ← Volver al Centro de Operaciones
+    </a>
+
+    <!-- 🛠️ Servicios Disponibles -->
+    <div class="cyber-container p-6">
+        <h2 class="section-title">🚀 Servicios Externos Disponibles</h2>
+
+        <div class="nav-grid">
+
+            <!-- Servicio de Grúa -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🚛</span>
+                <div class="service-title">Servicio de Grúa</div>
+                <div class="service-description">
+                    Transporte de vehículos averiados o accidentados.
+                    Disponible 24/7 con cobertura nacional.
+                </div>
+            </a>
+
+            <!-- Servicio de Taxi -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🚕</span>
+                <div class="service-title">Servicio de Taxi</div>
+                <div class="service-description">
+                    Transporte de clientes mientras su vehículo está en reparación.
+                    Tarifas preferenciales para clientes del taller.
+                </div>
+            </a>
+
+            <!-- Servicio de Renta de Vehículos -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🚗</span>
+                <div class="service-title">Renta de Vehículos</div>
+                <div class="service-description">
+                    Vehículos de reemplazo durante reparaciones extensas.
+                    Flota moderna y segura disponible.
+                </div>
+            </a>
+
+            <!-- Servicio de Seguro -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🛡️</span>
+                <div class="service-title">Gestión de Seguros</div>
+                <div class="service-description">
+                    Asesoría en seguros vehiculares y gestión de siniestros.
+                    Convenios con las principales aseguradoras.
+                </div>
+            </a>
+
+            <!-- Servicio de ITV/Revisión Técnica -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🔍</span>
+                <div class="service-title">ITV/Revisión Técnica</div>
+                <div class="service-description">
+                    Gestión de revisiones técnicas obligatorias.
+                    Agendamiento y acompañamiento al proceso.
+                </div>
+            </a>
+
+            <!-- Servicio de Permisos -->
+            <a href="#" class="service-card">
+                <span class="service-icon">📋</span>
+                <div class="service-title">Gestión de Permisos</div>
+                <div class="service-description">
+                    Trámites de permisos de circulación, transferencias y otros documentos.
+                    Gestión completa de papeles del vehículo.
+                </div>
+            </a>
+
+            <!-- Servicio de Lavado -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🧽</span>
+                <div class="service-title">Lavado y Detallado</div>
+                <div class="service-description">
+                    Servicio de lavado profesional y detallado de vehículos.
+                    Incluye encerado y tratamiento de interiores.
+                </div>
+            </a>
+
+            <!-- Servicio de GPS -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🛰️</span>
+                <div class="service-title">Instalación de GPS</div>
+                <div class="service-description">
+                    Instalación y configuración de sistemas de rastreo GPS.
+                    Monitoreo 24/7 y alertas de seguridad.
+                </div>
+            </a>
+
+            <!-- Servicio de Audio -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🔊</span>
+                <div class="service-title">Sistemas de Audio</div>
+                <div class="service-description">
+                    Instalación de sistemas de audio, altavoces y amplificadores.
+                    Personalización completa del sonido.
+                </div>
+            </a>
+
+            <!-- Servicio de Alarma -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🚨</span>
+                <div class="service-title">Sistemas de Alarma</div>
+                <div class="service-description">
+                    Instalación de alarmas vehiculares y sistemas de seguridad.
+                    Protección avanzada contra robos.
+                </div>
+            </a>
+
+            <!-- Servicio de Neumáticos -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🛞</span>
+                <div class="service-title">Venta de Neumáticos</div>
+                <div class="service-description">
+                    Venta e instalación de neumáticos de todas las marcas.
+                    Balanceado y alineación incluidos.
+                </div>
+            </a>
+
+            <!-- Servicio de Baterías -->
+            <a href="#" class="service-card">
+                <span class="service-icon">🔋</span>
+                <div class="service-title">Venta de Baterías</div>
+                <div class="service-description">
+                    Venta e instalación de baterías para todo tipo de vehículos.
+                    Garantía extendida y servicio de instalación.
+                </div>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- 📞 Información de Contacto -->
+    <div class="cyber-container p-6 mt-6">
+        <h3 class="section-title">📞 Contacto y Reservas</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div class="text-center">
+                <div class="text-3xl mb-2">📱</div>
+                <div class="font-semibold text-cyan-400">WhatsApp</div>
+                <div class="text-sm text-gray-400">+56 9 XXXX XXXX</div>
+                <div class="text-xs text-gray-500">Disponible 24/7</div>
+            </div>
+
+            <div class="text-center">
+                <div class="text-3xl mb-2">📞</div>
+                <div class="font-semibold text-cyan-400">Teléfono</div>
+                <div class="text-sm text-gray-400">+56 32 XXXX XXX</div>
+                <div class="text-xs text-gray-500">Lunes a Viernes 8:00-18:00</div>
+            </div>
+
+            <div class="text-center">
+                <div class="text-3xl mb-2">📧</div>
+                <div class="font-semibold text-cyan-400">Email</div>
+                <div class="text-sm text-gray-400">servicios@{{ empresa.nombre_taller|lower|slugify }}.cl</div>
+                <div class="text-xs text-gray-500">Respuesta en 24 horas</div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ⚠️ Nota Importante -->
+    <div class="cyber-container p-6 mt-6" style="border-color: var(--cyber-gold);">
+        <h3 class="section-title" style="color: var(--cyber-gold);">⚠️ Información Importante</h3>
+        <div class="space-y-3">
+            <div class="flex items-start">
+                <span class="text-yellow-400 mr-2">•</span>
+                <span class="text-sm">Todos los servicios externos están sujetos a disponibilidad y tarifas vigentes.</span>
+            </div>
+            <div class="flex items-start">
+                <span class="text-yellow-400 mr-2">•</span>
+                <span class="text-sm">Las reservas deben realizarse con al menos 24 horas de anticipación.</span>
+            </div>
+            <div class="flex items-start">
+                <span class="text-yellow-400 mr-2">•</span>
+                <span class="text-sm">Los precios pueden variar según la temporada y disponibilidad.</span>
+            </div>
+            <div class="flex items-start">
+                <span class="text-yellow-400 mr-2">•</span>
+                <span class="text-sm">Consulte con nuestro personal para obtener cotizaciones personalizadas.</span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- JavaScript para animaciones -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Animación de hover en las tarjetas
+    const serviceCards = document.querySelectorAll('.service-card');
+    serviceCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-8px) scale(1.02)';
+        });
+
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0) scale(1)';
+        });
+    });
+
+    // Efecto de typing en el título
+    const title = document.querySelector('.header-title');
+    if (title) {
+        const text = title.textContent;
+        title.textContent = '';
+        let i = 0;
+        const typeWriter = () => {
+            if (i < text.length) {
+                title.textContent += text.charAt(i);
+                i++;
+                setTimeout(typeWriter, 100);
+            }
+        };
+        setTimeout(typeWriter, 500);
+    }
+
+    // Animación de contadores (si los hay)
+    function animateCounters() {
+        const counters = document.querySelectorAll('.counter');
+        counters.forEach(counter => {
+            const target = parseInt(counter.textContent);
+            if (target > 0) {
+                let current = 0;
+                const increment = target / 30;
+                const timer = setInterval(() => {
+                    current += increment;
+                    if (current >= target) {
+                        current = target;
+                        clearInterval(timer);
+                    }
+                    counter.textContent = Math.floor(current);
+                }, 50);
+            }
+        });
+    }
+
+    // Ejecutar animaciones
+    animateCounters();
+});
+</script>
+{% endblock %}

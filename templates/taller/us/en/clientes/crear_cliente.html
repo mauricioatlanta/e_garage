@@ -323,6 +323,7 @@ h1 {
   <div class="form-card">
     <form method="post" id="client-form">
       {% csrf_token %}
+      <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
 
       {% if form.errors %}
         <div class="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">

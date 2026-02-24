@@ -1,0 +1,25 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <style>
+    body { font-size: 11px; color: #111827; margin: 0 8px; }
+    .row { display: flex; justify-content: space-between; align-items: center; }
+    .muted { color: #475569; }
+    .bar { border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div class="row bar">
+    <div>
+      <strong>{{ empresa_nombre|default:"Mi Empresa" }}</strong>
+      {% if obj.numero %} · <span class="muted">#{{ obj.numero }}</span>{% endif %}
+      {% if obj.tipo %} · <span class="muted">{{ obj.get_tipo_display|default:obj.tipo }}</span>{% endif %}
+    </div>
+    <div>
+      <span class="muted">Fecha emisión:</span>
+      <strong>{{ obj.fecha_emision|date:"d/m/Y" }}</strong>
+    </div>
+  </div>
+</body>
+</html>

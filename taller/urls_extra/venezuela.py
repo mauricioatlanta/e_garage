@@ -8,6 +8,8 @@ from django.urls import path
 from django.views.generic import RedirectView, TemplateView
 
 from taller.vehiculos import views_country_aware as views_vehiculos
+from taller.views.country_aware_auth import country_aware_login
+from taller.views_extra.signup_redirects import signup_redirect
 
 app_name = "taller_venezuela"
 
@@ -34,16 +36,16 @@ urlpatterns = [
         TemplateView.as_view(template_name="ve/es/suscripcion/pago.html"),
         name="pago_suscripcion_venezuela",
     ),
-    # Login Venezuela (opcional, si quieres una vista visual distinta de allauth)
+    # Login Venezuela: country_aware_login usa template ve/es/account/login.html y procesa el form
     path(
         "accounts/login/",
-        TemplateView.as_view(template_name="ve/es/account/login.html"),
-        name="account_login_venezuela",
+        country_aware_login,
+        name="account_login",
     ),
-    # Signup Venezuela (si tienes template específico)
+    # Signup Venezuela - redirect a signup universal con parámetro from=ve
     path(
         "accounts/signup/",
-        TemplateView.as_view(template_name="ve/es/account/signup.html"),
+        lambda r: signup_redirect(r, "ve"),
         name="account_signup_venezuela",
     ),
     # Lista de clientes Venezuela

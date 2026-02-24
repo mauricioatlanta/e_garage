@@ -7,6 +7,8 @@ Usa TemplateView para no depender de vistas Python especiales
 from django.urls import path
 from django.views.generic import RedirectView, TemplateView
 
+from taller.views_extra.signup_redirects import signup_redirect
+
 app_name = "taller_peru"
 
 urlpatterns = [
@@ -36,10 +38,10 @@ urlpatterns = [
         TemplateView.as_view(template_name="pe/es/account/login.html"),
         name="account_login_peru",
     ),
-    # Signup Perú (si tienes template específico)
+    # Signup Perú - redirect a signup universal con parámetro from=pe
     path(
         "accounts/signup/",
-        TemplateView.as_view(template_name="pe/es/account/signup.html"),
+        lambda r: signup_redirect(r, "pe"),
         name="account_signup_peru",
     ),
     # Lista de clientes Perú

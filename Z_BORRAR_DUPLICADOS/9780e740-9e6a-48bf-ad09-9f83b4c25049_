@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activar Cuenta de Prueba - eGarage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .neon-glow {
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff, 0 0 30px #00ffff;
+        }
+        .futuristic-form {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(0, 100, 255, 0.1));
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+        }
+        .cta-btn-premium {
+            background: linear-gradient(135deg, #00ffff, #0080ff);
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .cta-btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 255, 255, 0.3);
+        }
+        .input-field {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+            color: white;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+        .input-field:focus {
+            outline: none;
+            border-color: #00ffff;
+            box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+        }
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+        .success-message {
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.2), rgba(0, 200, 0, 0.2));
+            border: 1px solid rgba(0, 255, 0, 0.5);
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+        .error-message {
+            background: linear-gradient(135deg, rgba(255, 0, 0, 0.2), rgba(200, 0, 0, 0.2));
+            border: 1px solid rgba(255, 0, 0, 0.5);
+            color: #ff0000;
+            padding: 1rem;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 flex items-center justify-center p-4">
+    <div class="max-w-md mx-auto w-full">
+        <!-- Logo eGarage -->
+        <div class="text-center mb-8">
+            <div class="text-6xl font-bold text-cyan-400 neon-glow mb-2">eGarage</div>
+            <div class="text-lg text-gray-300">Workshop Management System</div>
+        </div>
+
+        <!-- Formulario de Activación -->
+        <div class="futuristic-form">
+            <h2 class="text-3xl font-extrabold mb-6 text-center text-white neon-glow tracking-widest">
+                🚀 Activar Cuenta de Prueba
+            </h2>
+
+            <p class="text-gray-300 text-center mb-6">
+                Ingresa tu email y el código de activación que recibiste para activar tu cuenta de prueba gratuita de 30 días.
+            </p>
+
+            <!-- Mensajes de éxito/error -->
+            {% if mensaje %}
+                <div class="success-message">
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-2">✅</span>
+                        <span class="font-semibold">{{ mensaje }}</span>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if error %}
+                <div class="error-message">
+                    <div class="flex items-center">
+                        <span class="text-2xl mr-2">❌</span>
+                        <span class="font-semibold">{{ error }}</span>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Formulario -->
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+
+                <div>
+                    <label for="email" class="block text-sm font-medium text-gray-300 mb-2">
+                        📧 Email
+                    </label>
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        class="input-field"
+                        placeholder="tu@email.com"
+                        required
+                        value="{{ request.POST.email|default:'' }}"
+                    >
+                </div>
+
+                <div>
+                    <label for="codigo" class="block text-sm font-medium text-gray-300 mb-2">
+                        🔑 Código de Activación
+                    </label>
+                    <input
+                        type="text"
+                        id="codigo"
+                        name="codigo"
+                        class="input-field"
+                        placeholder="123456"
+                        required
+                        maxlength="6"
+                        pattern="[0-9]{6}"
+                        value="{{ request.POST.codigo|default:'' }}"
+                    >
+                </div>
+
+                <button type="submit" class="cta-btn-premium w-full mt-6">
+                    🚀 Activar Cuenta
+                </button>
+            </form>
+
+            <!-- Información adicional -->
+            <div class="mt-6 text-center text-sm text-gray-400">
+                <p>¿No recibiste el código? Revisa tu carpeta de spam o contacta soporte.</p>
+                <p class="mt-2">Tu cuenta de prueba será válida por 30 días.</p>
+            </div>
+        </div>
+
+        <!-- Enlaces de ayuda -->
+        <div class="text-center mt-6">
+            <a href="/us/" class="text-cyan-400 hover:text-cyan-300 transition-colors">
+                ← Volver al inicio
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Auto-focus en el primer campo
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailField = document.getElementById('email');
+            if (emailField && !emailField.value) {
+                emailField.focus();
+            }
+        });
+
+        // Validación del código (solo números)
+        document.getElementById('codigo').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/[^0-9]/g, '');
+        });
+    </script>
+</body>
+</html>

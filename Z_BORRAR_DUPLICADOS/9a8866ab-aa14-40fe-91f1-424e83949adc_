@@ -1,0 +1,1048 @@
+
+{% extends 'base.html' %}
+{% load country_url %}
+{% load widget_tweaks %}
+
+{% block content %}
+<style>
+/* Futuristic background and animations */
+body {
+  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 25%, #16213e 50%, #0f3460 100%);
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: 'Orbitron', 'Share Tech Mono', 'Segoe UI', Arial, sans-serif;
+}
+
+/* Enhanced animated background */
+.cyber-bg {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: -2;
+  background:
+    radial-gradient(circle at 20% 20%, rgba(0, 255, 231, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(30, 144, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 40% 60%, rgba(138, 43, 226, 0.1) 0%, transparent 50%);
+  animation: cyber-pulse 4s ease-in-out infinite alternate;
+}
+
+/* Animated grid pattern */
+.cyber-grid {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: -1;
+  background-image:
+    linear-gradient(rgba(0, 255, 231, 0.1) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 255, 231, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+  animation: grid-move 20s linear infinite;
+}
+
+@keyframes cyber-pulse {
+  0% { opacity: 0.5; transform: scale(1); }
+  100% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes grid-move {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(50px, 50px); }
+}
+
+/* Floating particles */
+.particles {
+  position: fixed;
+  top: 0; left: 0; width: 100vw; height: 100vh;
+  z-index: -1;
+}
+
+.particle {
+  position: absolute;
+  width: 2px; height: 2px;
+  background: #00ffe7;
+  border-radius: 50%;
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  50% { transform: translateY(-100px) rotate(180deg); }
+}
+
+/* Main form container */
+.cyber-form {
+  background: linear-gradient(135deg, rgba(10, 25, 47, 0.95) 0%, rgba(20, 30, 60, 0.95) 100%);
+  border-radius: 2rem;
+  box-shadow:
+    0 0 60px 15px rgba(0, 255, 231, 0.3),
+    0 0 0 2px rgba(0, 255, 231, 0.5),
+    inset 0 0 50px rgba(0, 255, 231, 0.1);
+  padding: 3rem;
+  margin: 2rem auto;
+  color: #e0f2f1;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 231, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.cyber-form::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(45deg, transparent 49%, rgba(0, 255, 231, 0.1) 50%, transparent 51%);
+  animation: scan-line 3s ease-in-out infinite;
+}
+
+@keyframes scan-line {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Enhanced form labels */
+.cyber-label {
+  color: #00ffe7 !important;
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(0, 255, 231, 0.8);
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+  display: block;
+  position: relative;
+}
+
+.cyber-label::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; left: 0;
+  width: 30px; height: 2px;
+  background: linear-gradient(90deg, #00ffe7, transparent);
+}
+
+/* Enhanced form inputs */
+input.cyber-input,
+select.cyber-input,
+textarea.cyber-input {
+  background: linear-gradient(135deg, rgba(26, 35, 53, 0.9) 0%, rgba(15, 20, 35, 0.9) 100%) !important;
+  color: #e0f2f1 !important;
+  border: 2px solid rgba(0, 255, 231, 0.6) !important;
+  border-radius: 0.8rem !important;
+  font-family: 'Share Tech Mono', 'Orbitron', monospace !important;
+  font-size: 1.1rem !important;
+  padding: 0.8rem 1rem !important;
+  box-shadow:
+    0 0 15px rgba(0, 255, 231, 0.3),
+    inset 0 0 10px rgba(0, 255, 231, 0.1) !important;
+  transition: all 0.3s ease;
+  width: 100% !important;
+}
+
+input.cyber-input:focus,
+select.cyber-input:focus,
+textarea.cyber-input:focus {
+  outline: none !important;
+  border-color: #00ffe7 !important;
+  box-shadow:
+    0 0 25px rgba(0, 255, 231, 0.5),
+    inset 0 0 15px rgba(0, 255, 231, 0.2) !important;
+  transform: scale(1.02);
+}
+
+input.cyber-input::placeholder,
+textarea.cyber-input::placeholder {
+  color: rgba(224, 242, 241, 0.6) !important;
+  font-style: italic;
+}
+
+/* Estilos específicos para select y opciones */
+select.cyber-input option {
+  background: #1a2332 !important;
+  color: #e0f2f1 !important;
+  padding: 0.5rem !important;
+  font-family: 'Share Tech Mono', 'Orbitron', monospace !important;
+}
+
+select.cyber-input option:hover {
+  background: #00ffe7 !important;
+  color: #0a0a0a !important;
+}
+
+select.cyber-input option:checked {
+  background: #00ffe7 !important;
+  color: #0a0a0a !important;
+  font-weight: bold !important;
+}
+
+/* Estilos para el dropdown del select */
+select.cyber-input {
+  background: linear-gradient(135deg, rgba(26, 35, 53, 0.9) 0%, rgba(15, 20, 35, 0.9) 100%) !important;
+  color: #e0f2f1 !important;
+  border: 2px solid rgba(0, 255, 231, 0.6) !important;
+  border-radius: 0.8rem !important;
+  font-family: 'Share Tech Mono', 'Orbitron', monospace !important;
+  font-size: 1.1rem !important;
+  padding: 0.8rem 1rem !important;
+  box-shadow:
+    0 0 15px rgba(0, 255, 231, 0.3),
+    inset 0 0 10px rgba(0, 255, 231, 0.1) !important;
+  transition: all 0.3s ease;
+  width: 100% !important;
+}
+
+select.cyber-input:focus {
+  outline: none !important;
+  border-color: #00ffe7 !important;
+  box-shadow:
+    0 0 25px rgba(0, 255, 231, 0.5),
+    inset 0 0 15px rgba(0, 255, 231, 0.2) !important;
+  transform: scale(1.02);
+}
+
+/* Estilos para futuristic-input (para compatibilidad) */
+input.futuristic-input,
+select.futuristic-input,
+textarea.futuristic-input {
+  background: linear-gradient(135deg, rgba(26, 35, 53, 0.9) 0%, rgba(15, 20, 35, 0.9) 100%) !important;
+  color: #e0f2f1 !important;
+  border: 2px solid rgba(0, 255, 231, 0.6) !important;
+  border-radius: 0.8rem !important;
+  font-family: 'Share Tech Mono', 'Orbitron', monospace !important;
+  font-size: 1.1rem !important;
+  padding: 0.8rem 1rem !important;
+  box-shadow:
+    0 0 15px rgba(0, 255, 231, 0.3),
+    inset 0 0 10px rgba(0, 255, 231, 0.1) !important;
+  transition: all 0.3s ease;
+  width: 100% !important;
+}
+
+select.futuristic-input option {
+  background: #1a2332 !important;
+  color: #e0f2f1 !important;
+  padding: 0.5rem !important;
+  font-family: 'Share Tech Mono', 'Orbitron', monospace !important;
+}
+
+select.futuristic-input option:hover {
+  background: #00ffe7 !important;
+  color: #0a0a0a !important;
+}
+
+select.futuristic-input option:checked {
+  background: #00ffe7 !important;
+  color: #0a0a0a !important;
+  font-weight: bold !important;
+}
+
+input.futuristic-input:focus,
+select.futuristic-input:focus,
+textarea.futuristic-input:focus {
+  outline: none !important;
+  border-color: #00ffe7 !important;
+  box-shadow:
+    0 0 25px rgba(0, 255, 231, 0.5),
+    inset 0 0 15px rgba(0, 255, 231, 0.2) !important;
+  transform: scale(1.02);
+}
+
+/* Enhanced buttons */
+.cyber-btn {
+  background: linear-gradient(135deg, #00ffe7 0%, #1e90ff 50%, #8a2be2 100%);
+  color: #0a0a0a;
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 1.3rem;
+  font-weight: bold;
+  border-radius: 1.2rem;
+  box-shadow:
+    0 0 30px rgba(0, 255, 231, 0.6),
+    0 5px 15px rgba(0, 0, 0, 0.3);
+  padding: 1rem 3rem;
+  transition: all 0.3s ease;
+  border: none;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Botón pequeño para agregar ciudad */
+.cyber-btn-small {
+  background: linear-gradient(135deg, #00ffe7 0%, #1e90ff 100%);
+  color: #0a0a0a;
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border-radius: 0.6rem;
+  box-shadow: 0 0 15px rgba(0, 255, 231, 0.4);
+  padding: 0.5rem 1rem;
+  transition: all 0.3s ease;
+  border: none;
+  min-width: auto;
+}
+
+.cyber-btn-small:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(0, 255, 231, 0.6);
+}
+
+.cyber-btn-small:disabled {
+  background: #666;
+  color: #999;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+.cyber-btn-small:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.cyber-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.5s;
+}
+
+.cyber-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+  box-shadow:
+    0 0 40px rgba(0, 255, 231, 0.8),
+    0 10px 25px rgba(0, 0, 0, 0.4);
+}
+
+.cyber-btn:hover::before {
+  left: 100%;
+}
+
+/* Enhanced title */
+.cyber-title {
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 3.5rem;
+  color: #00ffe7;
+  text-align: center;
+  margin-bottom: 3rem;
+  text-shadow:
+    0 0 20px rgba(0, 255, 231, 0.8),
+    0 0 40px rgba(0, 255, 231, 0.6),
+    0 0 2px #fff;
+  letter-spacing: 0.3em;
+  animation: title-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes title-glow {
+  0% { text-shadow: 0 0 20px rgba(0, 255, 231, 0.8), 0 0 40px rgba(0, 255, 231, 0.6), 0 0 2px #fff; }
+  100% { text-shadow: 0 0 30px rgba(0, 255, 231, 1), 0 0 60px rgba(0, 255, 231, 0.8), 0 0 5px #fff; }
+}
+
+/* Error styling */
+.error-panel {
+  background: rgba(139, 0, 0, 0.2);
+  border: 2px solid rgba(255, 69, 0, 0.8);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 0 20px rgba(255, 69, 0, 0.3);
+}
+
+/* Field containers */
+.field-container {
+  position: relative;
+  margin-bottom: 1.5rem;
+}
+
+.field-container::before {
+  content: '';
+  position: absolute;
+  top: -1px; left: -1px; right: -1px; bottom: -1px;
+  background: linear-gradient(45deg, rgba(0, 255, 231, 0.2), rgba(30, 144, 255, 0.2), rgba(138, 43, 226, 0.2));
+  border-radius: 0.8rem;
+  z-index: -1;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.field-container:hover::before {
+  opacity: 1;
+}
+
+/* Flag styling */
+.country-flag {
+  width: 50px;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 0 15px rgba(0, 255, 231, 0.5);
+  border: 2px solid rgba(0, 255, 231, 0.6);
+}
+
+/* Debug info styling */
+.debug-info {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 255, 231, 0.3);
+  border-radius: 8px;
+  padding: 8px;
+  margin-bottom: 1rem;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.8rem;
+  color: rgba(0, 255, 231, 0.7);
+}
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+<!-- Enhanced Background Elements -->
+<div class="cyber-bg"></div>
+<div class="cyber-grid"></div>
+<div class="particles" id="particles"></div>
+
+<div class="max-w-5xl mx-auto cyber-form">
+  <!-- Country Info -->
+  <div class="debug-info">
+    <span style="color: rgba(255, 255, 255, 0.5);">[DEBUG pais: {{ pais_usuario|default:"N/A" }}]</span>
+    {% if pais_usuario == 'US' %}
+      <img src="https://flagcdn.com/us.svg" alt="USA" class="country-flag inline ml-2">
+    {% elif pais_usuario == 'CL' %}
+      <img src="https://flagcdn.com/cl.svg" alt="Chile" class="country-flag inline ml-2">
+    {% endif %}
+  </div>
+
+  <h1 class="cyber-title">🚀 CREAR CLIENTE ESPACIAL</h1>
+
+  <form class="space-y-8" method="post">
+    {% csrf_token %}
+
+    {% if form.errors %}
+      <div class="error-panel">
+        <h3 class="text-red-300 font-bold mb-3 text-lg">⚠️ Errores en el formulario:</h3>
+        {% for field, errors in form.errors.items %}
+          <div class="mb-3">
+            <strong class="text-red-200">{{ field }}:</strong>
+            {% for error in errors %}
+              <div class="text-red-100 ml-4">• {{ error }}</div>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Nombre -->
+      <div class="field-container">
+        <label class="cyber-label" for="id_nombre">👤 Nombre:</label>
+        {{ form.nombre|add_class:'cyber-input' }}
+      </div>
+
+      <!-- Apellido -->
+      <div class="field-container">
+        <label class="cyber-label" for="id_apellido">👥 Apellido:</label>
+        {{ form.apellido|add_class:'cyber-input' }}
+      </div>
+
+      <!-- Email -->
+      <div class="field-container">
+        <label class="cyber-label" for="id_email">📧 Correo electrónico:</label>
+        {{ form.email|add_class:'cyber-input' }}
+      </div>
+
+      <!-- Teléfono -->
+      <div class="field-container">
+        <label class="cyber-label" for="id_telefono">📱 Teléfono:</label>
+        {{ form.telefono|add_class:'cyber-input' }}
+      </div>
+
+      <!-- Dirección (ANTES de región y ciudad) -->
+      <div class="field-container md:col-span-2">
+        <label class="cyber-label" for="id_direccion">🏠 Dirección:</label>
+        {{ form.direccion|add_class:'cyber-input' }}
+      </div>
+
+      {% if form.pais == 'US' %}
+        <!-- Estados Unidos -->
+        <div class="field-container">
+          <label class="cyber-label" for="id_estado_usa">🗺️ State:</label>
+          {{ form.estado_usa|add_class:'cyber-input' }}
+        </div>
+        <div class="field-container">
+          <label class="cyber-label" for="id_ciudad_usa">🏙️ City:</label>
+          {{ form.ciudad_usa|add_class:'cyber-input' }}
+        </div>
+        <div class="field-container">
+          <label class="cyber-label" for="id_zipcode">📮 Zip Code:</label>
+          {{ form.zipcode|add_class:'cyber-input' }}
+        </div>
+      {% else %}
+        <!-- Chile -->
+        <div class="field-container">
+          <label class="cyber-label" for="id_region">🗺️ Región:</label>
+          {{ form.region|add_class:'cyber-input' }}
+        </div>
+        <div class="field-container">
+          <label class="cyber-label" for="id_ciudad">🏙️ Ciudad:</label>
+          <div class="flex items-center gap-2">
+            {{ form.ciudad|add_class:'cyber-input flex-grow' }}
+            <button type="button" id="btn-agregar-ciudad" class="cyber-btn-small">
+              ➕ Nueva
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal para agregar ciudad -->
+        <div id="modal-agregar-ciudad" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-60 hidden">
+          <div class="cyber-form w-full max-w-md relative border-2 border-cyan-400">
+            <button type="button" id="cerrar-modal-ciudad" class="absolute top-2 right-3 text-cyan-300 text-2xl font-bold hover:text-cyan-100">&times;</button>
+            <h2 class="cyber-title text-2xl mb-4">Agregar Nueva Ciudad</h2>
+            <form id="form-nueva-ciudad" class="space-y-4">
+              <div>
+                <label class="cyber-label" for="input-nombre-ciudad">Nombre de la ciudad:</label>
+                <input type="text" id="input-nombre-ciudad" class="cyber-input w-full" maxlength="100" required autocomplete="off">
+              </div>
+              <div id="error-ciudad" class="text-red-400 text-sm font-bold"></div>
+              <div class="flex justify-end gap-2 pt-2">
+                <button type="button" id="cancelar-ciudad" class="cyber-btn" style="background: #666; color: #ccc;">Cancelar</button>
+                <button type="submit" class="cyber-btn">Agregar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="text-center pt-8">
+      <button class="cyber-btn" type="submit">
+        🚀 GUARDAR CLIENTE
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- Enhanced JavaScript for cities loading -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Create floating particles
+  createParticles();
+
+  // Handle Chile regions/cities
+  const regionSelect = document.getElementById('id_region');
+  const ciudadSelect = document.getElementById('id_ciudad');
+  const btnAgregarCiudad = document.getElementById('btn-agregar-ciudad');
+  const modalCiudad = document.getElementById('modal-agregar-ciudad');
+  const cerrarModalCiudad = document.getElementById('cerrar-modal-ciudad');
+  const cancelarCiudad = document.getElementById('cancelar-ciudad');
+  const formNuevaCiudad = document.getElementById('form-nueva-ciudad');
+  const inputNombreCiudad = document.getElementById('input-nombre-ciudad');
+  const errorCiudad = document.getElementById('error-ciudad');
+
+  if(regionSelect && ciudadSelect) {
+    function cargarCiudades(regionId, selectedCiudadId = null) {
+      console.log('🌍 Cargando ciudades para región:', regionId);
+
+      // Clear cities and show loading
+      ciudadSelect.innerHTML = '<option value="">⏳ Cargando ciudades...</option>';
+      ciudadSelect.disabled = true;
+
+      if(regionId) {
+        fetch(`{% country_url 'clientes:obtener_ciudades' %}?region_id=${regionId}`)
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.json();
+          })
+          .then(data => {
+            console.log('🏙️ Ciudades recibidas:', data);
+            ciudadSelect.innerHTML = '<option value="">--- Seleccionar Ciudad ---</option>';
+
+            if(data.length === 0) {
+              ciudadSelect.innerHTML = '<option value="">❌ No hay ciudades disponibles</option>';
+            } else {
+              data.forEach(function(ciudad) {
+                const option = document.createElement('option');
+                option.value = ciudad.id;
+                option.textContent = ciudad.nombre;
+                if (selectedCiudadId && ciudad.id == selectedCiudadId) {
+                  option.selected = true;
+                }
+                ciudadSelect.appendChild(option);
+              });
+            }
+            ciudadSelect.disabled = false;
+          })
+          .catch(error => {
+            console.error('❌ Error al cargar ciudades:', error);
+            ciudadSelect.innerHTML = '<option value="">❌ Error al cargar ciudades</option>';
+            ciudadSelect.disabled = false;
+          });
+      } else {
+        ciudadSelect.innerHTML = '<option value="">--- Primero selecciona una región ---</option>';
+        ciudadSelect.disabled = false;
+      }
+    }
+
+    // Load cities if region is already selected
+    if(regionSelect.value) {
+      cargarCiudades(regionSelect.value, ciudadSelect.getAttribute('data-selected'));
+    }
+
+    // Handle region change
+    regionSelect.addEventListener('change', function() {
+      cargarCiudades(this.value);
+    });
+    // Al cambiar región, deshabilitar botón de agregar ciudad si no hay región
+    regionSelect.addEventListener('change', function() {
+      if (btnAgregarCiudad) {
+        btnAgregarCiudad.disabled = !this.value;
+      }
+    });
+    if (btnAgregarCiudad) {
+      btnAgregarCiudad.disabled = !regionSelect.value;
+    }
+  }
+
+  // Lógica para mostrar/ocultar modal de ciudad
+  if (btnAgregarCiudad && modalCiudad) {
+    btnAgregarCiudad.addEventListener('click', function() {
+      if (!regionSelect.value) {
+        alert('Primero selecciona una región.');
+        return;
+      }
+      inputNombreCiudad.value = '';
+      errorCiudad.textContent = '';
+      modalCiudad.classList.remove('hidden');
+      inputNombreCiudad.focus();
+    });
+  }
+  if (cerrarModalCiudad) {
+    cerrarModalCiudad.addEventListener('click', function() {
+      modalCiudad.classList.add('hidden');
+    });
+  }
+  if (cancelarCiudad) {
+    cancelarCiudad.addEventListener('click', function(e) {
+      e.preventDefault();
+      modalCiudad.classList.add('hidden');
+    });
+  }
+
+  // Enviar AJAX para agregar ciudad
+  if (formNuevaCiudad) {
+    formNuevaCiudad.addEventListener('submit', function(e) {
+      e.preventDefault();
+      errorCiudad.textContent = '';
+      const nombre = inputNombreCiudad.value.trim();
+      const regionId = regionSelect.value;
+      if (!nombre) {
+        errorCiudad.textContent = 'El nombre de la ciudad es requerido.';
+        return;
+      }
+      if (!regionId) {
+        errorCiudad.textContent = 'Primero selecciona una región.';
+        return;
+      }
+      fetch("{% country_url 'clientes:agregar_ciudad' %}", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({ nombre: nombre, region_id: regionId })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Agregar la nueva ciudad al select y seleccionarla
+          const option = document.createElement('option');
+          option.value = data.ciudad.id;
+          option.textContent = data.ciudad.nombre;
+          option.selected = true;
+          ciudadSelect.appendChild(option);
+          ciudadSelect.value = data.ciudad.id;
+          modalCiudad.classList.add('hidden');
+        } else {
+          errorCiudad.textContent = data.error || 'Error al agregar ciudad.';
+        }
+      })
+      .catch(() => {
+        errorCiudad.textContent = 'Error de red o del servidor.';
+      });
+    });
+  }
+
+  // Handle USA states/cities
+  {% if pais_usuario == 'US' %}
+  const estadoSelect = document.getElementById('id_estado_usa');
+  const ciudadUsaSelect = document.getElementById('id_ciudad_usa');
+
+  if(estadoSelect && ciudadUsaSelect) {
+    function cargarCiudadesUsa(estadoId, selectedCiudadId = null) {
+      console.log('🇺🇸 Cargando ciudades USA para estado:', estadoId);
+
+      ciudadUsaSelect.innerHTML = '<option value="">⏳ Loading cities...</option>';
+      ciudadUsaSelect.disabled = true;
+
+      if(estadoId) {
+        fetch(`{% country_url 'clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
+          .then(response => response.json())
+          .then(data => {
+            console.log('🏙️ Ciudades USA recibidas:', data);
+            ciudadUsaSelect.innerHTML = '<option value="">--- Select City ---</option>';
+
+            if(data.length === 0) {
+              ciudadUsaSelect.innerHTML = '<option value="">❌ No cities available</option>';
+            } else {
+              data.forEach(function(ciudad) {
+                const option = document.createElement('option');
+                option.value = ciudad.id;
+                option.textContent = ciudad.nombre;
+                if (selectedCiudadId && ciudad.id == selectedCiudadId) {
+                  option.selected = true;
+                }
+                ciudadUsaSelect.appendChild(option);
+              });
+            }
+            ciudadUsaSelect.disabled = false;
+          })
+          .catch(error => {
+            console.error('❌ Error loading USA cities:', error);
+            ciudadUsaSelect.innerHTML = '<option value="">❌ Error loading cities</option>';
+            ciudadUsaSelect.disabled = false;
+          });
+      } else {
+        ciudadUsaSelect.innerHTML = '<option value="">--- First select a state ---</option>';
+        ciudadUsaSelect.disabled = false;
+      }
+    }
+
+    if(estadoSelect.value) {
+      cargarCiudadesUsa(estadoSelect.value, ciudadUsaSelect.getAttribute('data-selected'));
+    }
+
+    estadoSelect.addEventListener('change', function() {
+      cargarCiudadesUsa(this.value);
+    });
+  }
+  {% endif %}
+});
+
+function createParticles() {
+  const particlesContainer = document.getElementById('particles');
+  const particleCount = 50;
+
+  for(let i = 0; i < particleCount; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDelay = Math.random() * 6 + 's';
+    particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+    particlesContainer.appendChild(particle);
+  }
+}
+</script>
+{% endblock %}
+}
+.futuristic-btn {
+  background: linear-gradient(90deg, #00ffe7 0%, #1e90ff 100%);
+  color: #181f2a;
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 1.2rem;
+  font-weight: bold;
+  border-radius: 1rem;
+  box-shadow: 0 0 20px #00ffe7a0;
+  padding: 0.8rem 2.5rem;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.futuristic-btn:hover {
+  transform: scale(1.08);
+  box-shadow: 0 0 40px #00ffe7a0;
+}
+.futuristic-title {
+  font-family: 'Orbitron', 'Share Tech Mono', Arial, sans-serif;
+  font-size: 3rem;
+  color: #00ffe7;
+  text-align: center;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 20px #00ffe7a0, 0 0 2px #fff;
+  letter-spacing: 0.2em;
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<div class="futuristic-bg"></div>
+<div class="max-w-4xl mx-auto futuristic-form">
+  <div style="margin-bottom:8px;">
+    <span style="color:gray; font-size:12px;">[DEBUG pais: {{ form.pais }}]</span>
+    {% if form.pais == 'US' %}
+      <img src="https://flagcdn.com/us.svg" alt="USA" style="width:40px; display:inline; vertical-align:middle; margin-right:8px;">
+    {% elif form.pais == 'CL' %}
+      <img src="https://flagcdn.com/cl.svg" alt="Chile" style="width:40px; display:inline; vertical-align:middle; margin-right:8px;">
+    {% endif %}
+  </div>
+  <h1 class="futuristic-title">🪐 Crear Cliente Espacial</h1>
+  <form class="space-y-6" method="post">
+    {% csrf_token %}
+
+    {% if form.errors %}
+      <div class="bg-red-900 border border-red-500 rounded p-4 mb-4">
+        <h3 class="text-red-300 font-bold mb-2">⚠️ Errores en el formulario:</h3>
+        {% for field, errors in form.errors.items %}
+          <div class="mb-2">
+            <strong class="text-red-200">{{ field }}:</strong>
+            {% for error in errors %}
+              <span class="text-red-100">{{ error }}</span>
+            {% endfor %}
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <label class="futuristic-label mb-2" for="id_nombre">Nombre:</label>
+        {{ form.nombre|add_class:'futuristic-input' }}
+      </div>
+      <div>
+  </script>
+        <label class="futuristic-label mb-2" for="id_apellido">Apellido:</label>
+        {{ form.apellido|add_class:'futuristic-input' }}
+      </div>
+      <div>
+        <label class="futuristic-label mb-2" for="id_telefono">Teléfono:</label>
+        {{ form.telefono|add_class:'futuristic-input' }}
+      </div>
+      <div>
+        <label class="futuristic-label mb-2" for="id_direccion">Dirección:</label>
+        {{ form.direccion|add_class:'futuristic-input' }}
+      </div>
+      <div>
+        <label class="futuristic-label mb-2" for="id_email">Correo electrónico:</label>
+        {{ form.email|add_class:'futuristic-input' }}
+      </div>
+      {% if form.pais == 'US' %}
+        <div>
+          <label class="futuristic-label mb-2" for="id_estado_usa">State:</label>
+          {{ form.estado_usa|add_class:'futuristic-input' }}
+        </div>
+        <div>
+          <label class="futuristic-label mb-2" for="id_ciudad_usa">City:</label>
+          {{ form.ciudad_usa|add_class:'futuristic-input' }}
+        </div>
+        <div>
+          <label class="futuristic-label mb-2" for="id_zipcode">Zip Code:</label>
+          {{ form.zipcode|add_class:'futuristic-input' }}
+        </div>
+      {% else %}
+        <div>
+          <label class="futuristic-label mb-2" for="id_region">Región:</label>
+          {{ form.region|add_class:'futuristic-input' }}
+        </div>
+        <div>
+          <label class="futuristic-label mb-2" for="id_ciudad">Ciudad:</label>
+          {{ form.ciudad|add_class:'futuristic-input' }}
+        </div>
+      {% endif %}
+        {% if form.pais == 'US' %}
+          <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            const estadoSelect = document.getElementById('id_estado_usa');
+            const ciudadUsaSelect = document.getElementById('id_ciudad_usa');
+            if(estadoSelect && ciudadUsaSelect) {
+              function cargarCiudadesUsa(estadoId, selectedCiudadId = null) {
+                ciudadUsaSelect.innerHTML = '<option value="">---------</option>';
+                if(estadoId) {
+                  console.log('Solicitando ciudades USA para estado:', estadoId);
+                  fetch(`{% country_url 'clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                      console.log('Ciudades USA recibidas:', data);
+                      if(data.length === 0) {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'No hay ciudades para este estado';
+                        ciudadUsaSelect.appendChild(option);
+                      } else {
+                        data.forEach(function(ciudad) {
+                          const option = document.createElement('option');
+                          option.value = ciudad.id;
+                          option.textContent = ciudad.nombre;
+                          if (selectedCiudadId && ciudad.id == selectedCiudadId) {
+                            option.selected = true;
+                          }
+                          ciudadUsaSelect.appendChild(option);
+                        });
+                      }
+                    })
+                    .catch(err => {
+                      console.error('Error al cargar ciudades USA:', err);
+                    });
+                }
+              }
+              if(estadoSelect.value) {
+                cargarCiudadesUsa(estadoSelect.value, ciudadUsaSelect.getAttribute('data-selected'));
+              }
+              estadoSelect.addEventListener('change', function() {
+                cargarCiudadesUsa(this.value);
+              });
+            }
+          });
+          </script>
+        {% endif %}
+    </div>
+    <div class="text-center pt-6">
+      <button class="futuristic-btn" type="submit">
+        🚀 Guardar Cliente
+      </button>
+    </div>
+  </form>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const regionSelect = document.getElementById('id_region');
+  const ciudadSelect = document.getElementById('id_ciudad');
+  if(regionSelect && ciudadSelect) {
+    function cargarCiudades(regionId, selectedCiudadId = null) {
+      ciudadSelect.innerHTML = '<option value="">---------</option>';
+      if(regionId) {
+        fetch(`{% country_url 'clientes:obtener_ciudades' %}?region_id=${regionId}`)
+          .then(response => response.json())
+          .then(data => {
+            data.forEach(function(ciudad) {
+              const option = document.createElement('option');
+              option.value = ciudad.id;
+              option.textContent = ciudad.nombre;
+              if (selectedCiudadId && ciudad.id == selectedCiudadId) {
+                option.selected = true;
+              }
+              ciudadSelect.appendChild(option);
+            });
+          });
+      }
+    }
+    if(regionSelect.value) {
+      cargarCiudades(regionSelect.value, ciudadSelect.getAttribute('data-selected'));
+    }
+    regionSelect.addEventListener('change', function() {
+      cargarCiudades(this.value);
+    });
+  }
+});
+
+// Modal para agregar nueva ciudad
+document.addEventListener('DOMContentLoaded', function() {
+  const btnAgregarCiudad = document.getElementById('btn-agregar-ciudad');
+  const modal = document.getElementById('modal-nueva-ciudad');
+  const btnCerrarModal = document.getElementById('btn-cerrar-modal');
+  const btnCancelarModal = document.getElementById('btn-cancelar-modal');
+  const formNuevaCiudad = document.getElementById('form-nueva-ciudad');
+  const inputNombreCiudad = document.getElementById('input-nombre-ciudad');
+
+  if (btnAgregarCiudad) {
+    btnAgregarCiudad.addEventListener('click', function() {
+      const regionSelect = document.querySelector('select[name="region"]');
+      if (!regionSelect.value) {
+        alert('Primero debes seleccionar una región');
+        return;
+      }
+      modal.classList.remove('hidden');
+      inputNombreCiudad.focus();
+    });
+  }
+
+  if (btnCerrarModal) {
+    btnCerrarModal.addEventListener('click', function() {
+      modal.classList.add('hidden');
+      inputNombreCiudad.value = '';
+    });
+  }
+
+  if (btnCancelarModal) {
+    btnCancelarModal.addEventListener('click', function() {
+      modal.classList.add('hidden');
+      inputNombreCiudad.value = '';
+    });
+  }
+
+  if (formNuevaCiudad) {
+    formNuevaCiudad.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const nombreCiudad = inputNombreCiudad.value.trim();
+      const regionSelect = document.querySelector('select[name="region"]');
+      const regionId = regionSelect.value;
+
+      if (!nombreCiudad) {
+        alert('Por favor ingresa el nombre de la ciudad');
+        return;
+      }
+
+      // Enviar solicitud AJAX para crear nueva ciudad
+      fetch('{% url "agregar_ciudad" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({
+          nombre: nombreCiudad,
+          region_id: regionId
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Agregar la nueva ciudad al select
+          const ciudadSelect = document.querySelector('select[name="ciudad"]');
+          const option = document.createElement('option');
+          option.value = data.ciudad.id;
+          option.textContent = data.ciudad.nombre;
+          option.selected = true;
+          ciudadSelect.appendChild(option);
+
+          // Cerrar modal
+          modal.classList.add('hidden');
+          inputNombreCiudad.value = '';
+
+          // Mostrar mensaje de éxito
+          alert('Ciudad agregada exitosamente');
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Error al agregar la ciudad');
+      });
+    });
+  }
+});
+</script>
+
+<!-- Modal para agregar nueva ciudad -->
+<div id="modal-nueva-ciudad" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+  <div class="cyber-card max-w-md w-full mx-4">
+    <div class="flex justify-between items-center mb-4">
+      <h3 class="text-xl font-bold text-cyan-400">➕ Agregar Nueva Ciudad</h3>
+      <button id="btn-cerrar-modal" class="text-gray-400 hover:text-white">✕</button>
+    </div>
+
+    <form id="form-nueva-ciudad">
+      <div class="mb-4">
+        <label for="input-nombre-ciudad" class="cyber-label">🏙️ Nombre de la Ciudad:</label>
+        <input type="text" id="input-nombre-ciudad" class="cyber-input w-full" placeholder="Ingresa el nombre de la ciudad" required>
+      </div>
+
+      <div class="flex gap-2 justify-end">
+        <button type="button" id="btn-cancelar-modal" class="cyber-button-secondary px-4 py-2">
+          Cancelar
+        </button>
+        <button type="submit" class="cyber-button px-4 py-2">
+          ➕ Agregar Ciudad
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

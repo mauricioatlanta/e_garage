@@ -4,12 +4,9 @@
 <!-- Orden correcto: jQuery → jQuery UI → Select2 → DAL → eGarage -->
 
 {# Vendor (orden importa) #}
-<script src="{% static 'vendor/jquery/jquery-3.6.0.min.js' %}"></script>
+{# jQuery ya viene de base.html - NO duplicar aquí #}
 <script src="{% static 'vendor/dist/js/jquery-ui.min.js' %}"></script>
-<script src="{% static 'vendor/dist/js/select2.min.js' %}"></script>
-
-{# DAL init único #}
-<script src="{% static 'autocomplete_light_custom/autocomplete.init.js' %}"></script>
+{# Select2 y DAL se cargan desde base.html via form.media - NO duplicar aquí #}
 
 {# Bundle canónico eGarage #}
 <script src="{% static 'taller/common/js/documentos_form.js' %}"></script>

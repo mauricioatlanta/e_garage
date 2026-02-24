@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="relative bg-gradient-to-br from-[#0f2027] via-[#2c5364] to-[#232526] min-h-[90vh] flex flex-col justify-center items-center overflow-hidden">
+  <div class="absolute inset-0 z-0 animate-pulse-slow">
+    <svg width="100%" height="100%" class="opacity-30 blur-xl">
+      <defs>
+        <radialGradient id="g1" cx="50%" cy="50%" r="80%">
+          <stop offset="0%" stop-color="#00fff0"/>
+          <stop offset="100%" stop-color="#232526"/>
+        </radialGradient>
+      </defs>
+      <circle cx="60%" cy="40%" r="400" fill="url(#g1)"/>
+      <circle cx="20%" cy="80%" r="200" fill="#00fff0" fill-opacity="0.2"/>
+      <circle cx="80%" cy="70%" r="150" fill="#00fff0" fill-opacity="0.1"/>
+    </svg>
+  </div>
+  <div class="relative z-10 text-center py-20 px-4 max-w-2xl">
+    <img src="/static/img/e-garage-logo-usa.png" alt="E-Garage USA Logo" class="mx-auto mb-8 w-48 h-48 drop-shadow-2xl animate-pulse" style="filter: drop-shadow(0 0 30px #00fff0);">
+    <h1 class="text-5xl md:text-6xl font-extrabold text-cyan-300 drop-shadow-lg mb-6 tracking-tight animate-fade-in">Welcome to E-Garage USA</h1>
+    <p class="text-xl md:text-2xl text-white/90 mb-8 animate-fade-in delay-200">Boost your workshop with <span class="text-cyan-400 font-bold">E-Garage USA</span>: AI-powered, cloud-based, and designed for real growth.</p>
+    <a href="/accounts/signup/" class="inline-block px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-700 text-white text-xl font-bold rounded-2xl shadow-lg hover:scale-105 transition-transform animate-fade-in delay-400">Try 30 Days Free</a>
+  </div>
+</section>
+
+<section class="py-16 bg-[#181c25] text-center">
+  <h2 class="text-3xl md:text-4xl font-bold text-cyan-200 mb-8">Why choose eGarage?</h2>
+  <div class="flex flex-wrap justify-center gap-8 max-w-5xl mx-auto">
+    <div class="bg-[#232b36] rounded-2xl p-8 w-80 shadow-lg border border-cyan-700/30 hover:scale-105 transition-transform">
+      <span class="text-5xl text-cyan-400 mb-4 block">🤖</span>
+      <h3 class="text-xl font-bold mb-2">AI Smart Assistant</h3>
+      <p>Automate tasks, get insights, and optimize your business with artificial intelligence.</p>
+    </div>
+    <div class="bg-[#232b36] rounded-2xl p-8 w-80 shadow-lg border border-cyan-700/30 hover:scale-105 transition-transform">
+      <span class="text-5xl text-blue-400 mb-4 block">☁️</span>
+      <h3 class="text-xl font-bold mb-2">100% Cloud-Based</h3>
+      <p>Access your workshop from anywhere, anytime, on any device. No installations needed.</p>
+    </div>
+    <div class="bg-[#232b36] rounded-2xl p-8 w-80 shadow-lg border border-cyan-700/30 hover:scale-105 transition-transform">
+      <span class="text-5xl text-lime-400 mb-4 block">📈</span>
+      <h3 class="text-xl font-bold mb-2">Real-Time Analytics</h3>
+      <p>Visualize your sales, inventory, and performance with beautiful dashboards and reports.</p>
+    </div>
+    <div class="bg-[#232b36] rounded-2xl p-8 w-80 shadow-lg border border-cyan-700/30 hover:scale-105 transition-transform">
+      <span class="text-5xl text-pink-400 mb-4 block">🔒</span>
+      <h3 class="text-xl font-bold mb-2">Secure & Reliable</h3>
+      <p>Enterprise-grade security, daily backups, and 99.9% uptime. Your data is always safe.</p>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-gradient-to-br from-[#232526] to-[#0f2027] text-center">
+  <h2 class="text-3xl md:text-4xl font-bold text-cyan-200 mb-8">What do real workshops say?</h2>
+  <div class="flex flex-wrap justify-center gap-8 max-w-5xl mx-auto">
+    <div class="bg-[#232b36] rounded-2xl p-8 w-96 shadow-xl border border-cyan-700/30">
+      <p class="text-lg italic mb-4">"eGarage transformed our business. We save hours every week and our clients love the new experience!"</p>
+      <div class="flex items-center justify-center gap-3">
+        <span class="text-2xl">⭐️⭐️⭐️⭐️⭐️</span>
+        <span class="text-cyan-300 font-bold">AutoPro Miami</span>
+      </div>
+    </div>
+    <div class="bg-[#232b36] rounded-2xl p-8 w-96 shadow-xl border border-cyan-700/30">
+      <p class="text-lg italic mb-4">"The AI assistant is a game changer. Inventory, billing, and reminders are now effortless."</p>
+      <div class="flex items-center justify-center gap-3">
+        <span class="text-2xl">⭐️⭐️⭐️⭐️⭐️</span>
+        <span class="text-cyan-300 font-bold">FastFix Garage</span>
+      </div>
+    </div>
+    <div class="bg-[#232b36] rounded-2xl p-8 w-96 shadow-xl border border-cyan-700/30">
+      <p class="text-lg italic mb-4">"We grew our revenue 30% in 6 months. The analytics and support are top notch."</p>
+      <div class="flex items-center justify-center gap-3">
+        <span class="text-2xl">⭐️⭐️⭐️⭐️⭐️</span>
+        <span class="text-cyan-300 font-bold">NYC AutoWorks</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="py-16 bg-[#181c25] text-center">
+  <h2 class="text-3xl md:text-4xl font-bold text-cyan-200 mb-8">Plans & Subscription</h2>
+  <div class="flex flex-wrap justify-center gap-8 max-w-4xl mx-auto">
+    <div class="bg-gradient-to-br from-cyan-500 to-blue-700 rounded-2xl p-10 w-80 shadow-2xl text-white border-4 border-cyan-300/30">
+      <h3 class="text-2xl font-bold mb-2">Free Trial</h3>
+      <p class="mb-4">Try all features for 30 days. No credit card required.</p>
+      <span class="text-4xl font-extrabold">$0</span>
+      <a href="/accounts/signup/" class="block mt-6 px-6 py-3 bg-white text-cyan-700 font-bold rounded-xl hover:bg-cyan-100 transition">Start Now</a>
+    </div>
+    <div class="bg-[#232b36] rounded-2xl p-10 w-80 shadow-2xl text-white border-4 border-cyan-700/30">
+      <h3 class="text-2xl font-bold mb-2">1 Month</h3>
+      <p class="mb-4">Full access, unlimited users, support included.</p>
+      <span class="text-4xl font-extrabold">$20.00 USD<span class="text-lg font-normal">/mo</span></span>
+      <a href="/accounts/signup/" class="block mt-6 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition">Subscribe</a>
+    </div>
+    <div class="bg-[#232b36] rounded-2xl p-10 w-80 shadow-2xl text-white border-4 border-cyan-700/30">
+      <h3 class="text-2xl font-bold mb-2">6 Months</h3>
+      <p class="mb-4">Save more, priority support, analytics included.</p>
+      <span class="text-4xl font-extrabold">$110.00 USD<span class="text-lg font-normal">/6mo</span></span>
+      <a href="/accounts/signup/" class="block mt-6 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition">Subscribe</a>
+    </div>
+    <div class="bg-[#232b36] rounded-2xl p-10 w-80 shadow-2xl text-white border-4 border-cyan-700/30">
+      <h3 class="text-2xl font-bold mb-2">1 Year</h3>
+      <p class="mb-4">Best value, all features, premium support.</p>
+      <span class="text-4xl font-extrabold">$200.00 USD<span class="text-lg font-normal">/year</span></span>
+      <a href="/accounts/signup/" class="block mt-6 px-6 py-3 bg-cyan-600 text-white font-bold rounded-xl hover:bg-cyan-700 transition">Subscribe</a>
+    </div>
+  </div>
+  <p class="mt-8 text-cyan-300">Need a custom plan? <a href="mailto:support@egarage.com" class="underline hover:text-cyan-100">Contact us</a></p>
+</section>
+
+<section class="py-10 bg-[#0d1117] text-center">
+  <h2 class="text-2xl md:text-3xl font-bold text-cyan-200 mb-4">Ready to revolutionize your workshop?</h2>
+  <a href="/accounts/signup/" class="inline-block px-10 py-4 bg-gradient-to-r from-cyan-500 to-blue-700 text-white text-xl font-bold rounded-2xl shadow-lg hover:scale-105 transition-transform">Get Started Now</a>
+</section>
+{% endblock %}

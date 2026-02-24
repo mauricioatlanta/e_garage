@@ -218,6 +218,9 @@ body {
   <div class="form-card">
     <form method="post">
       {% csrf_token %}
+      {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -371,46 +374,93 @@ document.addEventListener('DOMContentLoaded', function() {
     const modeloSelect = document.getElementById('id_modelo');
     const anioSelect = document.getElementById('id_anio');
 
-    // Función para cargar marcas vía AJAX si el campo está vacío
-    function cargarMarcas() {
-        if (!marcaSelect) return;
-        
-        // Verificar si el campo tiene opciones (más allá de la opción vacía)
-        const hasOptions = marcaSelect.options.length > 1 || 
-                          (marcaSelect.options.length === 1 && marcaSelect.options[0].value !== '');
-        
-        if (!hasOptions) {
-            console.log('Campo marca vacío, cargando marcas vía AJAX...');
-            marcaSelect.innerHTML = '<option value="">Cargando marcas...</option>';
-            
-            fetch(urlMarcas)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error(`HTTP error! status: ${response.status}`);
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    marcaSelect.innerHTML = '<option value="">---------</option>';
-                    
-                    if (Array.isArray(data) && data.length > 0) {
-                        data.forEach(marca => {
-                            const option = document.createElement('option');
-                            option.value = marca.id;
-                            option.textContent = marca.nombre;
-                            marcaSelect.appendChild(option);
-                        });
-                        console.log(`Marcas cargadas: ${data.length}`);
-                    } else {
-                        console.warn('No se encontraron marcas');
-                        marcaSelect.innerHTML = '<option value="">No hay marcas disponibles</option>';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al cargar marcas:', error);
-                    marcaSelect.innerHTML = '<option value="">Error al cargar marcas</option>';
-                });
+    // Función para cargar marcas vía AJAX (siempre ejecuta, incluso si hay opciones)
+    function cargarMarcas(forceReload = false) {
+        if (!marcaSelect) {
+            console.error('❌ Campo marca (id_marca) no encontrado en el DOM');
+            return;
         }
+        
+        // Verificar si ya tiene opciones válidas (más que solo la opción vacía)
+        const hasValidOptions = marcaSelect.options.length > 1 || 
+                               (marcaSelect.options.length === 1 && marcaSelect.options[0].value !== '');
+        
+        // Si ya tiene opciones válidas y no se fuerza la recarga, no hacer nada
+        if (hasValidOptions && !forceReload) {
+            console.log('ℹ️ Campo marca ya tiene opciones, omitiendo carga:', {
+                optionsCount: marcaSelect.options.length,
+                firstOption: marcaSelect.options[0] ? marcaSelect.options[0].text : 'N/A'
+            });
+            return;
+        }
+        
+        console.log('🔄 Cargando marcas desde:', urlMarcas);
+        console.log('📋 Estado actual del campo marca:', {
+            optionsCount: marcaSelect.options.length,
+            hasValue: marcaSelect.value,
+            options: Array.from(marcaSelect.options).map(opt => ({value: opt.value, text: opt.text}))
+        });
+        
+        // Guardar el valor actual si existe
+        const valorActual = marcaSelect.value;
+        
+        // Mostrar loading
+        marcaSelect.innerHTML = '<option value="">Cargando marcas...</option>';
+        marcaSelect.disabled = true;
+        
+        fetch(urlMarcas)
+            .then(response => {
+                console.log('📡 Respuesta del servidor:', {
+                    status: response.status,
+                    statusText: response.statusText,
+                    ok: response.ok,
+                    url: urlMarcas
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('✅ Datos recibidos:', data);
+                
+                // Limpiar opciones
+                marcaSelect.innerHTML = '<option value="">---------</option>';
+                
+                if (Array.isArray(data) && data.length > 0) {
+                    data.forEach(marca => {
+                        const option = document.createElement('option');
+                        option.value = marca.id;
+                        option.textContent = marca.nombre;
+                        marcaSelect.appendChild(option);
+                    });
+                    
+                    // Restaurar el valor anterior si existía
+                    if (valorActual) {
+                        marcaSelect.value = valorActual;
+                    }
+                    
+                    console.log(`✅ Marcas cargadas exitosamente: ${data.length} marcas`);
+                } else {
+                    console.warn('⚠️ No se encontraron marcas en la respuesta. Verificar que existan marcas en la base de datos para el país correspondiente.');
+                    marcaSelect.innerHTML = '<option value="">No hay marcas disponibles</option>';
+                }
+                
+                marcaSelect.disabled = false;
+            })
+            .catch(error => {
+                console.error('❌ Error al cargar marcas:', error);
+                marcaSelect.innerHTML = '<option value="">Error al cargar marcas</option>';
+                marcaSelect.disabled = false;
+                
+                // Mostrar mensaje de error más detallado
+                console.error('Detalles del error:', {
+                    message: error.message,
+                    url: urlMarcas,
+                    stack: error.stack
+                });
+            });
     }
 
     if (marcaSelect && modeloSelect) {
@@ -636,8 +686,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Cargar marcas al inicio si están vacías
-        cargarMarcas();
+        // SIEMPRE cargar marcas al inicio (fuerza recarga si el campo está vacío o solo tiene opción por defecto)
+        console.log('🚀 Iniciando carga de marcas...');
+        // Forzar recarga si el campo tiene menos de 2 opciones (solo la opción vacía)
+        const shouldForceReload = marcaSelect.options.length <= 1;
+        cargarMarcas(shouldForceReload);
 
         // Cargar modelos iniciales si ya hay una marca seleccionada
         if (marcaSelect.value) {
@@ -651,8 +704,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     } else {
         // Si no se encontraron los campos, intentar cargar marcas de todos modos
+        console.log('⚠️ Campos marca/modelo no encontrados, intentando cargar marcas de todos modos...');
         cargarMarcas();
     }
+    
+    // Fallback: intentar cargar marcas después de un pequeño delay por si el campo se carga dinámicamente
+    setTimeout(function() {
+        const marcaSelectDelayed = document.getElementById('id_marca');
+        if (marcaSelectDelayed && (marcaSelectDelayed.options.length <= 1 || marcaSelectDelayed.options[0].value === '')) {
+            console.log('🔄 Reintentando carga de marcas (fallback)...');
+            cargarMarcas();
+        }
+    }, 500);
 
     // Manejar campo de color
     const colorSelect = document.getElementById('id_color');

@@ -4,10 +4,13 @@ Patrón: /mx/es/ seguido de las rutas específicas
 Usa TemplateView para no depender de vistas Python especiales
 """
 
+from django.shortcuts import redirect
 from django.urls import path
 from django.views.generic import RedirectView, TemplateView
 
 from taller.vehiculos import views_country_aware as views_vehiculos
+from taller.views.country_aware_auth import country_aware_login
+from taller.views_extra.signup_redirects import signup_redirect
 
 app_name = "taller_mexico"
 
@@ -32,16 +35,22 @@ urlpatterns = [
         TemplateView.as_view(template_name="mx/es/suscripcion/pago.html"),
         name="pago_suscripcion_mexico",
     ),
-    # Login México (opcional, si quieres una vista visual distinta de allauth)
+    # Login México — usa country_aware_login y cl/es/account/login.html (badge/back con MX)
     path(
         "accounts/login/",
-        TemplateView.as_view(template_name="mx/es/account/login.html"),
+        country_aware_login,
         name="account_login_mexico",
     ),
-    # Signup México (si tienes template específico)
+    # /mx/es/login/ → /mx/es/accounts/login/ (preserva ?next=, etc.)
+    path(
+        "login/",
+        lambda r: redirect("/mx/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET.urlencode() else "")),
+        name="login_mexico_redirect",
+    ),
+    # Signup México - redirect a signup universal con parámetro from=mx
     path(
         "accounts/signup/",
-        TemplateView.as_view(template_name="mx/es/account/signup.html"),
+        lambda r: signup_redirect(r, "mx"),
         name="account_signup_mexico",
     ),
     # *** Primera vista real de módulo: lista de clientes México ***

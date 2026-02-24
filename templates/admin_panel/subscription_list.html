@@ -1,0 +1,121 @@
+{% extends 'base_admin.html' %}
+{% load humanize %}
+
+{% block title %}Lista de Suscripciones - eGarage Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">📋 Lista de Suscripciones</h1>
+        <a href="{% url 'admin_monitoring:export_subscriptions' %}?{{ request.GET.urlencode }}" class="btn btn-success">
+            📥 Exportar CSV
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row">
+                <div class="col-md-3 mb-2">
+                    <input type="text" name="search" class="form-control" placeholder="Buscar taller, empresa o email..." value="{{ current_filters.search }}">
+                </div>
+                <div class="col-md-2 mb-2">
+                    <select name="status" class="form-control">
+                        <option value="">Todos los estados</option>
+                        {% for val, label in status_choices %}
+                            <option value="{{ val }}" {% if current_filters.status == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <select name="trial" class="form-control">
+                        <option value="">Todos los trials</option>
+                        {% for val, label in trial_choices %}
+                            <option value="{{ val }}" {% if current_filters.trial == val %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2 mb-2">
+                    <input type="date" name="date_from" class="form-control" placeholder="Desde" value="{{ current_filters.date_from }}">
+                </div>
+                <div class="col-md-2 mb-2">
+                    <input type="date" name="date_to" class="form-control" placeholder="Hasta" value="{{ current_filters.date_to }}">
+                </div>
+                <div class="col-md-1 mb-2">
+                    <button type="submit" class="btn btn-primary btn-block">Filtrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <span class="text-muted">Total: {{ total_count|intcomma }} empresas</span>
+                <a href="{% url 'admin_monitoring:subscription_dashboard' %}" class="btn btn-sm btn-outline-secondary">← Volver al Dashboard</a>
+            </div>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-items-center mb-0">
+                <thead class="thead-light">
+                    <tr>
+                        <th>Taller / Empresa</th>
+                        <th>Usuario</th>
+                        <th>Estado</th>
+                        <th>Fecha Inicio</th>
+                        <th>Fecha Fin</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for empresa in page_obj %}
+                    <tr>
+                        <td>
+                            <strong>{{ empresa.nombre_taller|default:empresa.empresa }}</strong>
+                        </td>
+                        <td>{{ empresa.usuario.email }}</td>
+                        <td>
+                            {% if empresa.suscripcion_activa %}
+                                <span class="badge badge-success">Activa</span>
+                            {% else %}
+                                <span class="badge badge-danger">Inactiva</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ empresa.fecha_inicio|date:"d/m/Y" }}</td>
+                        <td>{{ empresa.fecha_fin|date:"d/m/Y"|default:"-" }}</td>
+                        <td>
+                            <a href="{% url 'admin_monitoring:subscription_detail' empresa.id %}" class="btn btn-sm btn-info">Ver detalle</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4">No se encontraron empresas con los filtros aplicados.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        {% if page_obj.has_other_pages %}
+        <div class="card-footer py-4">
+            <nav>
+                <ul class="pagination justify-content-center mb-0">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}&{{ request.GET.urlencode|cut:'page=' }}">Anterior</a>
+                        </li>
+                    {% endif %}
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}&{{ request.GET.urlencode|cut:'page=' }}">Siguiente</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

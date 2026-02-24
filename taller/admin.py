@@ -13,14 +13,31 @@ from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.precio_suscripcion import PrecioSuscripcion
 from taller.models.tecnico import Tecnico
-from taller.servicios.models import (
-    CategoriaServicio,
-    CategoriaServicioName,
-    Servicio,
-    ServicioName,
-    SubcategoriaServicio,
-    SubcategoriaServicioName,
-)
+
+# ✅ Importar modelos de servicios de forma segura (puede fallar si no están disponibles)
+try:
+    from taller.servicios.models import (
+        CategoriaServicio,
+        CategoriaServicioName,
+        Servicio,
+        ServicioName,
+        SubcategoriaServicio,
+        SubcategoriaServicioName,
+    )
+    SERVICIOS_MODELS_AVAILABLE = True
+except ImportError as e:
+    # Los modelos de servicios no están disponibles
+    SERVICIOS_MODELS_AVAILABLE = False
+    # Crear clases dummy para evitar errores de referencia
+    CategoriaServicio = None
+    CategoriaServicioName = None
+    Servicio = None
+    ServicioName = None
+    SubcategoriaServicio = None
+    SubcategoriaServicioName = None
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.warning(f"Modelos de servicios no disponibles: {e}")
 
 from .models import ConfiguracionEmpresa
 
@@ -41,9 +58,54 @@ class MyAdminSite(AdminSite):
     site_header = "Panel de Administración de eGarage"
     site_title = "eGarage Admin"
     index_title = "Bienvenido al administrador"
+    login_template = "admin/login.html"  # Usar template del admin de Django
+    login_form = None  # Usar formulario por defecto del admin (NO allauth)
 
     def has_permission(self, request):
         return request.user.is_active and request.user.is_superuser
+    
+    def login(self, request, extra_context=None):
+        """
+        Sobrescribir login para usar el login estándar de Django Admin
+        en lugar de allauth
+        """
+        from django.contrib.auth.views import LoginView
+        from django.contrib.auth.forms import AuthenticationForm
+        from django.views.decorators.csrf import csrf_protect
+        from django.views.decorators.cache import never_cache
+        from django.contrib.auth import login as auth_login
+        from django.urls import reverse
+        from django.shortcuts import redirect
+        
+        if request.method == 'GET' and self.has_permission(request):
+            # Ya está autenticado, redirigir al index
+            index_path = reverse('%s:index' % self.name, current_app=self.name)
+            return redirect(index_path)
+        
+        # Usar el formulario de autenticación estándar de Django (NO allauth)
+        context = {
+            'title': 'Iniciar sesión',
+            'app_path': request.get_full_path(),
+            'username': request.user.get_username(),
+            **(extra_context or {}),
+        }
+        
+        @csrf_protect
+        @never_cache
+        def login_view(request):
+            if request.method == 'POST':
+                form = AuthenticationForm(request, data=request.POST)
+                if form.is_valid():
+                    auth_login(request, form.get_user())
+                    return redirect(reverse('%s:index' % self.name, current_app=self.name))
+            else:
+                form = AuthenticationForm(request)
+            
+            context['form'] = form
+            from django.template.response import TemplateResponse
+            return TemplateResponse(request, self.login_template, context)
+        
+        return login_view(request)
 
 
 admin_site = MyAdminSite(name="myadmin")
@@ -308,74 +370,75 @@ class TecnicoAdmin(admin.ModelAdmin):
 
 
 # === ADMINISTRACIÓN DE SERVICIOS MULTILENGUAJE ===
+# ✅ Solo registrar si los modelos están disponibles
+
+if SERVICIOS_MODELS_AVAILABLE:
+    class CategoriaServicioNameInline(admin.TabularInline):
+        model = CategoriaServicioName
+        extra = 2
+        fields = ["language", "label", "aliases", "is_default"]
 
 
-class CategoriaServicioNameInline(admin.TabularInline):
-    model = CategoriaServicioName
-    extra = 2
-    fields = ["language", "label", "aliases", "is_default"]
+    @admin.register(CategoriaServicio, site=admin_site)
+    class CategoriaServicioAdmin(admin.ModelAdmin):
+        list_display = ("id", "code", "country", "get_label_es", "get_label_en")
+        list_filter = ("country",)
+        search_fields = ("code", "names__label")
+        inlines = [CategoriaServicioNameInline]
+
+        @admin.display(description="Nombre (ES)")
+        def get_label_es(self, obj):
+            return obj.get_label("es")
+
+        @admin.display(description="Nombre (EN)")
+        def get_label_en(self, obj):
+            return obj.get_label("en")
 
 
-@admin.register(CategoriaServicio, site=admin_site)
-class CategoriaServicioAdmin(admin.ModelAdmin):
-    list_display = ("id", "code", "country", "get_label_es", "get_label_en")
-    list_filter = ("country",)
-    search_fields = ("code", "names__label")
-    inlines = [CategoriaServicioNameInline]
-
-    @admin.display(description="Nombre (ES)")
-    def get_label_es(self, obj):
-        return obj.get_label("es")
-
-    @admin.display(description="Nombre (EN)")
-    def get_label_en(self, obj):
-        return obj.get_label("en")
+    class SubcategoriaServicioNameInline(admin.TabularInline):
+        model = SubcategoriaServicioName
+        extra = 2
+        fields = ["language", "label", "aliases", "is_default"]
 
 
-class SubcategoriaServicioNameInline(admin.TabularInline):
-    model = SubcategoriaServicioName
-    extra = 2
-    fields = ["language", "label", "aliases", "is_default"]
+    @admin.register(SubcategoriaServicio, site=admin_site)
+    class SubcategoriaServicioAdmin(admin.ModelAdmin):
+        list_display = (
+            "id",
+            "code",
+            "country",
+            "categoria",
+            "get_label_es",
+            "get_label_en",
+        )
+        list_filter = ("country", "categoria")
+        search_fields = ("code", "names__label")
+        inlines = [SubcategoriaServicioNameInline]
+
+        @admin.display(description="Nombre (ES)")
+        def get_label_es(self, obj):
+            return obj.get_label("es")
+
+        @admin.display(description="Nombre (EN)")
+        def get_label_en(self, obj):
+            return obj.get_label("en")
 
 
-@admin.register(SubcategoriaServicio, site=admin_site)
-class SubcategoriaServicioAdmin(admin.ModelAdmin):
-    list_display = (
-        "id",
-        "code",
-        "country",
-        "categoria",
-        "get_label_es",
-        "get_label_en",
-    )
-    list_filter = ("country", "categoria")
-    search_fields = ("code", "names__label")
-    inlines = [SubcategoriaServicioNameInline]
-
-    @admin.display(description="Nombre (ES)")
-    def get_label_es(self, obj):
-        return obj.get_label("es")
-
-    @admin.display(description="Nombre (EN)")
-    def get_label_en(self, obj):
-        return obj.get_label("en")
+    class ServicioNameInline(admin.TabularInline):
+        model = ServicioName
+        extra = 2
+        fields = ["language", "label", "aliases", "is_default"]
 
 
-class ServicioNameInline(admin.TabularInline):
-    model = ServicioName
-    extra = 2
-    fields = ["language", "label", "aliases", "is_default"]
-
-
-@admin.register(Servicio, site=admin_site)
-class ServicioAdmin(admin.ModelAdmin):
-    list_display = ("id", "nombre", "categoria", "subcategoria")
-    list_filter = ("categoria", "subcategoria")
-    search_fields = ("nombre",)
-    autocomplete_fields = ("categoria", "subcategoria")
-    ordering = ("nombre", "id")
-    list_editable = ()
-    inlines = [ServicioNameInline]
+    @admin.register(Servicio, site=admin_site)
+    class ServicioAdmin(admin.ModelAdmin):
+        list_display = ("id", "nombre", "categoria", "subcategoria")
+        list_filter = ("categoria", "subcategoria")
+        search_fields = ("nombre",)
+        autocomplete_fields = ("categoria", "subcategoria")
+        ordering = ("nombre", "id")
+        list_editable = ()
+        inlines = [ServicioNameInline]
 
 
 @admin.register(ComprobantePago, site=admin_site)
@@ -435,15 +498,13 @@ class ComprobantePagoAdmin(admin.ModelAdmin):
     def aprobar_comprobantes(self, request, queryset):
         count = 0
         for comprobante in queryset.filter(estado="pendiente"):
-            comprobante.estado = "aprobado"
-            comprobante.fecha_procesado = timezone.now()
-            comprobante.procesado_por = request.user.username
-            comprobante.save()
-
-            # Extender suscripción
-            comprobante.empresa.marcar_pago_recibido(monto=comprobante.monto)
+            # Usar el método aprobar() que incluye:
+            # - Extensión de suscripción
+            # - Actualización de plan
+            # - Notificaciones automáticas (Email + WhatsApp)
+            comprobante.aprobar(procesado_por=request.user.username)
             count += 1
-        self.message_user(request, f"Se aprobaron {count} comprobantes.")
+        self.message_user(request, f"Se aprobaron {count} comprobantes. Notificaciones enviadas automáticamente.")
 
     def rechazar_comprobantes(self, request, queryset):
         count = 0
@@ -653,3 +714,10 @@ class ConfigEmpresaAdmin(admin.ModelAdmin):
 
     def has_view_permission(self, request, obj=None):
         return request.user.is_staff
+
+
+# Importar admin de memoria (se auto-registran con @admin.register)
+try:
+    from taller.admin_memoria import *  # noqa: F403, F401
+except ImportError:
+    pass  # Admin de memoria no disponible aún

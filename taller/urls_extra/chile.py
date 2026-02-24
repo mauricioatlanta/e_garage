@@ -2,6 +2,7 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 import logging
 from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 
 from taller.views_extra.views import dashboard_suscripciones
 from taller.views_extra.company_settings_views import company_settings_view
@@ -41,6 +42,16 @@ urlpatterns = [
         "bienvenida/",
         TemplateView.as_view(template_name="cl/es/onboarding/bienvenida.html"),
         name="bienvenida_chile_alt",
+    ),
+    # Allauth bajo /cl/es/ para que /cl/es/accounts/login/ etc. funcionen
+    path("accounts/", include("allauth.urls")),
+    # Signup corto /cl/es/signup/ -> /accounts/signup/?from=cl (preserva ?plan=, etc.)
+    path(
+        "signup/",
+        lambda r: redirect(
+            "/accounts/signup/?from=cl" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
+        name="account_signup_cl_es",
     ),
     # Login para suscriptores de Chile (redirige al login global, pero aquí puedes poner una vista personalizada si lo deseas)
     path(

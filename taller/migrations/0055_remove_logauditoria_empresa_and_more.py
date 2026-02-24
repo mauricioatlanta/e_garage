@@ -53,38 +53,6 @@ class Migration(migrations.Migration):
             model_name="marca",
             name="taller_marc_country_11600f_idx",
         ),
-        migrations.RemoveField(
-            model_name="companysettings",
-            name="bank_details",
-        ),
-        migrations.RemoveField(
-            model_name="companysettings",
-            name="facebook_url",
-        ),
-        migrations.RemoveField(
-            model_name="companysettings",
-            name="instagram_user",
-        ),
-        migrations.RemoveField(
-            model_name="companysettings",
-            name="logo_url",
-        ),
-        migrations.RemoveField(
-            model_name="companysettings",
-            name="terms_conditions",
-        ),
-        # Actualizar solo el estado para is_trial (la columna puede no existir en BD)
-        migrations.SeparateDatabaseAndState(
-            database_operations=[
-                # No hacer nada en la base de datos
-            ],
-            state_operations=[
-                migrations.RemoveField(
-                    model_name="empresa",
-                    name="is_trial",
-                ),
-            ],
-        ),
         migrations.AddField(
             model_name="companysettings",
             name="apply_tax_by_default",
@@ -207,51 +175,15 @@ class Migration(migrations.Migration):
             unique_together={("country", "nombre")},
         ),
         migrations.AddIndex(
-            model_name="cajavehiculo",
-            index=models.Index(fields=["country", "nombre"], name="taller_caja_country_a3676a_idx"),
-        ),
-        migrations.AddIndex(
-            model_name="colorvehiculo",
-            index=models.Index(fields=["country", "nombre"], name="taller_colo_country_10c7a9_idx"),
-        ),
-        migrations.AddIndex(
             model_name="detalledocumento",
             index=models.Index(
                 fields=["documento", "tipo_item"], name="taller_deta_documen_4182dd_idx"
             ),
         ),
         migrations.AddIndex(
-            model_name="motorvehiculo",
-            index=models.Index(fields=["country", "nombre"], name="taller_moto_country_9036cb_idx"),
-        ),
-        migrations.AddIndex(
             model_name="vehiculo",
             index=models.Index(
                 fields=["empresa", "cliente"], name="taller_vehi_empresa_c1d9c5_idx"
-            ),
-        ),
-        migrations.AddConstraint(
-            model_name="cajavehiculo",
-            constraint=models.UniqueConstraint(
-                django.db.models.functions.text.Lower("nombre"),
-                models.F("country"),
-                name="uniq_caja_country_lowernombre",
-            ),
-        ),
-        migrations.AddConstraint(
-            model_name="colorvehiculo",
-            constraint=models.UniqueConstraint(
-                django.db.models.functions.text.Lower("nombre"),
-                models.F("country"),
-                name="uniq_color_country_lowernombre",
-            ),
-        ),
-        migrations.AddConstraint(
-            model_name="motorvehiculo",
-            constraint=models.UniqueConstraint(
-                django.db.models.functions.text.Lower("nombre"),
-                models.F("country"),
-                name="uniq_motor_country_lowernombre",
             ),
         ),
     ]

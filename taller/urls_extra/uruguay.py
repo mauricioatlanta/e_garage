@@ -90,11 +90,23 @@ urlpatterns = [
         TemplateView.as_view(template_name="uy/es/onboarding/bienvenida.html"),
         name="bienvenida_uruguay_alt",
     ),
-    # Login para suscriptores de Uruguay
+    # Allauth bajo /uy/ y /uy/es/ para que /uy/es/accounts/login/ etc. funcionen
+    path("accounts/", include("allauth.urls")),
+    # Login para Uruguay: redirige a /accounts/login/?from=uy (registration/login.html no existe)
     path(
         "login/",
-        TemplateView.as_view(template_name="registration/login.html"),
+        lambda r: redirect(
+            "/accounts/login/?from=uy" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
         name="account_login",
+    ),
+    # Signup para Uruguay: redirige a /accounts/signup/?from=uy (preserva ?plan=, etc.)
+    path(
+        "signup/",
+        lambda r: redirect(
+            "/accounts/signup/?from=uy" + ("&" + r.GET.urlencode() if r.GET else "")
+        ),
+        name="account_signup_uy",
     ),
     # Activación de trial para Uruguay
     path("activar-trial/", activar_trial, name="activar_trial"),

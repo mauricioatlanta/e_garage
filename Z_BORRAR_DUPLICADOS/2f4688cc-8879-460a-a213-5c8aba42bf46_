@@ -1,0 +1,16 @@
+
+{% extends 'taller/base_inicio.html' %}
+{% block content %}
+<div class="max-w-xl mx-auto mt-20 p-6 translucent-card shadow-md rounded-lg text-center animate__animated animate__zoomIn">
+<div class="text-red-600 text-5xl mb-4">⚠️</div>
+<h1 class="text-xl font-bold mb-4">¿Estás seguro de eliminar la categoría "<span class="text-red-500">{{ categoria.nombre }}</span>"?</h1>
+<p class="mb-6 text-gray-600">Esta acción es permanente y no se puede deshacer.</p>
+<form method="post">
+    {% csrf_token %}
+    <div class="flex justify-center gap-6">
+<a class="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400" href="{% url 'tabla_categorias' %}">Cancelar</a>
+<button class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 btn-futuristic" type="submit">🗑️ Eliminar</button>
+</div>
+</form>
+</div>
+{% endblock %}

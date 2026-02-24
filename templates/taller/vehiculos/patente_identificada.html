@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load country_url %}
+
+{% block title %}Patente Identificada | {{ empresa.nombre_taller }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --cyber-blue: #00ffff;
+        --cyber-green: #00ff88;
+        --cyber-purple: #8000ff;
+        --cyber-gold: #ffd700;
+        --dark-bg: #0a0a0a;
+        --card-bg: rgba(16, 20, 24, 0.95);
+    }
+
+    body {
+        background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+        color: #ffffff;
+        font-family: 'Inter', 'Segoe UI', sans-serif;
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .container-main {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .cyber-card {
+        background: var(--card-bg);
+        border: 2px solid var(--cyber-blue);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 8px 32px rgba(0, 255, 255, 0.2);
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .success-badge {
+        background: linear-gradient(145deg, var(--cyber-green), var(--cyber-blue));
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        display: inline-block;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+        text-align: center;
+        width: 100%;
+    }
+
+    .patente-display {
+        font-size: 3rem;
+        font-weight: bold;
+        color: var(--cyber-gold);
+        text-align: center;
+        letter-spacing: 0.2em;
+        margin: 1.5rem 0;
+        text-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+    }
+
+    .info-card {
+        background: rgba(0, 255, 255, 0.05);
+        border: 1px solid var(--cyber-blue);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin: 1rem 0;
+    }
+
+    .info-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+    }
+
+    .info-row:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        color: #999;
+        font-weight: 500;
+    }
+
+    .info-value {
+        color: var(--cyber-blue);
+        font-weight: bold;
+    }
+
+    .btn-group {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-cyber {
+        background: linear-gradient(145deg, var(--cyber-blue), var(--cyber-purple));
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 10px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        flex: 1;
+        min-width: 200px;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-cyber:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 20px rgba(0, 255, 255, 0.4);
+    }
+
+    .btn-cyber-secondary {
+        background: rgba(128, 128, 128, 0.3);
+        color: white;
+        border: 1px solid rgba(128, 128, 128, 0.5);
+    }
+
+    .btn-cyber-secondary:hover {
+        background: rgba(128, 128, 128, 0.5);
+    }
+
+    .btn-cyber-success {
+        background: linear-gradient(145deg, var(--cyber-green), var(--cyber-blue));
+    }
+
+    .alert-warning {
+        background: rgba(255, 215, 0, 0.1);
+        border: 2px solid var(--cyber-gold);
+        color: var(--cyber-gold);
+        padding: 1rem;
+        border-radius: 10px;
+        margin: 1.5rem 0;
+        text-align: center;
+    }
+
+    .spinner {
+        display: none;
+        text-align: center;
+        margin: 1rem 0;
+    }
+
+    .spinner.active {
+        display: block;
+    }
+
+    @media (max-width: 768px) {
+        .patente-display {
+            font-size: 2rem;
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .btn-cyber {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-main">
+    <div class="cyber-card">
+        <div class="success-badge">
+            ✅ Patente Identificada Correctamente
+        </div>
+
+        <div class="patente-display">{{ patente }}</div>
+
+        {% if vehiculo %}
+            <!-- Vehículo encontrado -->
+            <div class="info-card">
+                <h3 style="color: var(--cyber-green); margin-bottom: 1rem; text-align: center;">
+                    📋 Vehículo Encontrado en Base de Datos
+                </h3>
+                <div class="info-row">
+                    <span class="info-label">Cliente:</span>
+                    <span class="info-value">{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido|default:"" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Teléfono:</span>
+                    <span class="info-value">{{ vehiculo.cliente.telefono|default:"No registrado" }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Marca:</span>
+                    <span class="info-value">{{ vehiculo.get_marca_display }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Modelo:</span>
+                    <span class="info-value">{{ vehiculo.get_modelo_display }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Año:</span>
+                    <span class="info-value">{{ vehiculo.anio }}</span>
+                </div>
+            </div>
+
+            <div class="btn-group">
+                <a href="{% country_url 'documentos:documento_crear' %}?vehiculo_id={{ vehiculo.id }}&cliente_id={{ vehiculo.cliente.id }}" 
+                   class="btn-cyber btn-cyber-success">
+                    🛠️ Crear Orden de Trabajo
+                </a>
+                <a href="{% country_url 'documentos:documento_crear' %}?vehiculo_id={{ vehiculo.id }}&cliente_id={{ vehiculo.cliente.id }}&tipo=PRES" 
+                   class="btn-cyber">
+                    📄 Crear Presupuesto
+                </a>
+                <a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.id %}" 
+                   class="btn-cyber btn-cyber-secondary">
+                    👁️ Ver Detalle Vehículo
+                </a>
+            </div>
+        {% else %}
+            <!-- Vehículo NO encontrado -->
+            <div class="alert-warning">
+                ⚠️ Esta patente no está registrada en tu base de datos.
+            </div>
+
+            <p style="text-align: center; color: #ccc; margin: 1.5rem 0;">
+                ¿Deseas crear un nuevo vehículo con esta patente?
+            </p>
+
+            <div class="btn-group">
+                <a href="{% country_url 'vehiculos:crear_vehiculo' %}?patente={{ patente }}" 
+                   class="btn-cyber btn-cyber-success">
+                    ➕ Crear Nuevo Vehículo
+                </a>
+                <a href="{% country_url 'vehiculos:ingreso_foto' %}" 
+                   class="btn-cyber btn-cyber-secondary">
+                    📷 Intentar Otra Foto
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <div style="text-align: center;">
+        <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="btn-cyber btn-cyber-secondary" style="max-width: 300px;">
+            ← Volver a Lista de Vehículos
+        </a>
+    </div>
+</div>
+{% endblock %}

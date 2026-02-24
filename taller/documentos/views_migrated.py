@@ -869,6 +869,43 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
 
         print(f"DEBUG: subtotal: {subtotal}, iva: {iva}, total: {total}")
 
+        # Obtener memoria y evidencias
+        from taller.models.memoria_seguimiento import (
+            EvidenciaDocumento,
+            NotaInterna,
+            EtiquetaAsignacion,
+            SeguimientoPublico,
+        )
+        from taller.auth.decorators_role import is_staff_member
+
+        es_staff = is_staff_member(self.request.user)
+
+        # Obtener notas (filtrar por solo_staff si es técnico)
+        if es_staff:
+            notas = NotaInterna.objects.filter(documento=documento).order_by("-created_at")
+        else:
+            notas = NotaInterna.objects.filter(documento=documento, solo_staff=False).order_by(
+                "-created_at"
+            )
+
+        # Obtener etiquetas asignadas (filtrar por solo_staff si es técnico)
+        if es_staff:
+            etiquetas_asignadas = EtiquetaAsignacion.objects.filter(
+                documento=documento
+            ).select_related("etiqueta")
+        else:
+            etiquetas_asignadas = EtiquetaAsignacion.objects.filter(
+                documento=documento, etiqueta__solo_staff=False
+            ).select_related("etiqueta")
+
+        # Obtener evidencias
+        evidencias = EvidenciaDocumento.objects.filter(documento=documento).order_by("-created_at")
+        fotos_count = evidencias.filter(tipo="FOTO").count()
+        videos_count = evidencias.filter(tipo="VIDEO").count()
+
+        # Obtener seguimiento público si existe
+        seguimiento_publico = getattr(documento, "seguimiento_publico", None)
+
         context.update(
             {
                 "lineas_repuesto": repuestos,
@@ -883,6 +920,16 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
                 "subtotal": subtotal,
                 "iva": iva,
                 "total": total,
+                # Memoria y evidencias
+                "notas": notas,
+                "etiquetas_asignadas": etiquetas_asignadas,
+                "evidencias": evidencias,
+                "fotos_count": fotos_count,
+                "videos_count": videos_count,
+                "puede_agregar_foto": fotos_count < 4,
+                "puede_agregar_video": videos_count < 1,
+                "seguimiento_publico": seguimiento_publico,
+                "es_staff": es_staff,
             }
         )
         return context

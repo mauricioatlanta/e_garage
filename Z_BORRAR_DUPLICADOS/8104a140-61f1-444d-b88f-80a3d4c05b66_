@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% load country_url %}
+{% load i18n static %}
+
+{% block content %}
+<div class="p-4">
+  <h1 class="text-2xl font-bold mb-4">{% trans "Parts & Inventory" %}</h1>
+
+  <div class="mb-4">
+    <form method="get" class="flex gap-2">
+      <input type="search" name="q" value="{{ request.GET.q }}"
+             placeholder="{% trans 'Search parts...' %}"
+             class="px-3 py-2 border rounded-md flex-1">
+      <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+        {% trans "Search" %}
+      </button>
+    </form>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm bg-white rounded-lg shadow">
+      <thead class="bg-gray-50">
+        <tr class="text-left border-b">
+          <th class="py-3 px-4 font-medium">{% trans "Part Number" %}</th>
+          <th class="py-3 px-4 font-medium">{% trans "Name" %}</th>
+          <th class="py-3 px-4 font-medium">{% trans "Category" %}</th>
+          <th class="py-3 px-4 font-medium">{% trans "Stock" %}</th>
+          <th class="py-3 px-4 font-medium">{% trans "Sale Price" %}</th>
+          <th class="py-3 px-4 font-medium">{% trans "Actions" %}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for repuesto in object_list %}
+        <tr class="border-b hover:bg-gray-50">
+          <td class="py-3 px-4">{{ repuesto.part_number|default:"-" }}</td>
+          <td class="py-3 px-4 font-medium">{{ repuesto.nombre }}</td>
+          <td class="py-3 px-4">{{ repuesto.categoria.nombre|default:"-" }}</td>
+          <td class="py-3 px-4">{{ repuesto.cantidad_stock|default:"-" }}</td>
+          <td class="py-3 px-4">
+            {% if repuesto.precio_venta %}
+              ${{ repuesto.precio_venta|floatformat:2 }}
+            {% else %}
+              -
+            {% endif %}
+          </td>
+          <td class="py-3 px-4">
+            <a href="{% url 'taller:repuestos:ver_repuesto' repuesto.pk %}"
+               class="text-blue-600 hover:text-blue-800 mr-2">{% trans "View" %}</a>
+            <a href="{% url 'taller:repuestos:editar_repuesto' repuesto.pk %}"
+               class="text-green-600 hover:text-green-800">{% trans "Edit" %}</a>
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="6" class="py-8 px-4 text-center text-gray-500">
+            {% trans "No parts registered" %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  {% if is_paginated %}
+  <div class="mt-6 flex justify-center">
+    <nav class="flex items-center space-x-2">
+      {% if page_obj.has_previous %}
+        <a href="?page=1{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+           class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{% trans "First" %}</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+           class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{% trans "Previous" %}</a>
+      {% endif %}
+
+      <span class="px-3 py-2">
+        {% trans "Page" %} {{ page_obj.number }} {% trans "of" %} {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+           class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{% trans "Next" %}</a>
+        <a href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.q %}&q={{ request.GET.q }}{% endif %}"
+           class="px-3 py-2 bg-gray-200 rounded hover:bg-gray-300">{% trans "Last" %}</a>
+      {% endif %}
+    </nav>
+  </div>
+  {% endif %}
+
+  <!-- Add part button -->
+  <div class="mt-6">
+    <a href="{% country_url 'repuestos:crear_repuesto' %}"
+       class="inline-block px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">
+      {% trans "Add Part" %}
+    </a>
+  </div>
+</div>
+{% endblock %}

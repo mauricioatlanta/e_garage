@@ -1,0 +1,1379 @@
+{% extends "base.html" %}
+{% load country_url %}
+{% load i18n static widget_tweaks %}
+{% load static %}
+
+{% block content %}
+<!-- Fondo animado -->
+<div class="fixed inset-0 overflow-hidden pointer-events-none">
+  <div class="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#0d1117] to-[#0f172a]"></div>
+  <!-- Partículas animadas -->
+  <div class="absolute top-16 left-12 w-2 h-2 bg-cyan-400 rounded-full animate-ping opacity-20"></div>
+  <div class="absolute top-1/3 right-20 w-1 h-1 bg-fuchsia-400 rounded-full animate-pulse opacity-30"></div>
+  <div class="absolute bottom-24 left-1/4 w-1.5 h-1.5 bg-lime-400 rounded-full animate-bounce opacity-25"></div>
+  <div class="absolute top-2/3 left-1/5 w-1 h-1 bg-emerald-400 rounded-full animate-ping opacity-20"></div>
+  <div class="absolute bottom-1/2 right-1/3 w-2 h-2 bg-purple-400 rounded-full animate-pulse opacity-15"></div>
+  <!-- Líneas de matriz animadas -->
+  <div class="absolute inset-0 opacity-5">
+    <div class="w-full h-px bg-gradient-to-r from-transparent via-cyan-500 to-transparent animate-pulse"></div>
+    <div class="w-px h-full bg-gradient-to-b from-transparent via-fuchsia-500 to-transparent animate-pulse absolute left-1/3"></div>
+    <div class="w-px h-full bg-gradient-to-b from-transparent via-lime-500 to-transparent animate-pulse absolute right-1/4"></div>
+  </div>
+</div>
+
+<div class="relative min-h-screen p-4 sm:p-6">
+  <!-- Header compacto -->
+  <div class="relative mb-6">
+    <div class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-cyan-500 via-fuchsia-500 to-lime-400 opacity-20 blur-xl animate-pulse"></div>
+    <div class="relative rounded-2xl border border-cyan-400/30 bg-gradient-to-r from-[#0d1117]/90 to-[#111827]/90 backdrop-blur-sm p-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-green-600 flex items-center justify-center text-xl shadow-lg ring-2 ring-emerald-400/40">➕</div>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-emerald-300 via-lime-300 to-green-400">
+              {% trans "Crear Vehículo" %}
+            </h1>
+            <p class="text-gray-400 text-xs mt-0.5">{% trans "Registro vehicular" %}</p>
+          </div>
+        </div>
+
+        <a href="{% url 'chile:taller:vehiculos:lista_vehiculos' %}"
+           class="inline-flex items-center space-x-2 px-4 py-2 rounded-xl bg-gradient-to-r from-gray-600/20 to-gray-500/20 border border-gray-400/40 text-gray-300 hover:from-gray-500/30 hover:to-gray-400/30 hover:text-gray-200 transition-all duration-300">
+          <span>⟲</span>
+          <span class="hidden sm:inline">{% trans "Volver" %}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Layout de dos columnas como libro abierto -->
+  <div class="max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+
+      <!-- COLUMNA IZQUIERDA: Búsqueda de Cliente -->
+      <div class="space-y-6">
+        <!-- Información del Cliente -->
+        <div class="relative">
+          <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-cyan-500/20 via-blue-500/20 to-purple-500/20 blur-xl"></div>
+          <div class="relative rounded-xl border border-cyan-400/30 bg-gradient-to-r from-[#0d1117]/90 to-[#111827]/90 backdrop-blur-sm p-6">
+            <div class="flex items-center space-x-3 mb-4">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/30 to-blue-500/30 border border-cyan-400/40 flex items-center justify-center">
+                <span class="text-cyan-300 text-sm">👤</span>
+              </div>
+              <h2 class="text-lg font-bold text-cyan-300">{% trans "Información del Cliente" %}</h2>
+            </div>
+
+            <div class="space-y-4">
+              <div>
+                <label for="busqueda-cliente" class="block text-sm font-medium text-gray-300 mb-2">
+                  {% trans "Cliente" %} *
+                </label>
+                <div class="relative">
+                  <!-- Campo de búsqueda de cliente -->
+                  <input type="text"
+                         id="busqueda-cliente"
+                         placeholder="🔍 Escribe el nombre del cliente para buscar..."
+                         class="w-full px-4 py-3 pl-10 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-cyan-500/30 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400"
+                         autocomplete="off">
+
+                  <!-- Icono de búsqueda -->
+                  <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-cyan-400">
+                    🔍
+                  </div>
+
+                  <!-- Loading spinner -->
+                  <div id="loading-cliente" class="hidden absolute right-3 top-1/2 transform -translate-y-1/2">
+                    <div class="w-4 h-4 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin"></div>
+                  </div>
+
+                  <!-- Lista de sugerencias -->
+                  <div id="sugerencias-clientes" class="absolute top-full left-0 right-0 mt-1 hidden" style="z-index: 9999;">
+                    <div class="bg-gradient-to-r from-[#0d1117] to-[#111827] border border-cyan-400/40 rounded-lg shadow-2xl shadow-cyan-500/20 max-h-60 overflow-y-auto">
+                      <!-- Las sugerencias se cargarán aquí -->
+                    </div>
+                  </div>
+
+                  <!-- Cliente seleccionado -->
+                  <div id="cliente-seleccionado" class="hidden mt-2 p-3 rounded-lg bg-gradient-to-r from-cyan-600/20 to-blue-600/20 border border-cyan-400/40">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/30 to-blue-500/30 border border-cyan-400/40 flex items-center justify-center">
+                          <span class="text-cyan-300 text-sm">👤</span>
+                        </div>
+                        <div>
+                          <p class="text-cyan-200 font-medium" id="cliente-nombre"></p>
+                          <p class="text-gray-400 text-xs" id="cliente-info"></p>
+                        </div>
+                      </div>
+                      <button type="button"
+                              id="limpiar-cliente"
+                              class="text-gray-400 hover:text-red-400 transition-colors">
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                {% if form.cliente.errors %}
+                  <div class="mt-1 text-xs text-red-400">
+                    {{ form.cliente.errors.0 }}
+                  </div>
+                {% endif %}
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <!-- Información adicional del cliente (oculta con widget estándar) -->
+        <div id="info-cliente-adicional" class="relative hidden">
+          <!-- Esta sección está oculta porque usamos el widget estándar de autocompletado -->
+        </div>
+      </div>
+
+      <!-- COLUMNA DERECHA: Formulario del Vehículo -->
+      <div class="space-y-6">
+        <form method="post" class="space-y-6">
+          {% csrf_token %}
+
+          <!-- Información del Vehículo -->
+          <div class="relative">
+            <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-emerald-500/20 via-lime-500/20 to-green-500/20 blur-xl"></div>
+            <div class="relative rounded-xl border border-emerald-400/30 bg-gradient-to-r from-[#0d1117]/90 to-[#111827]/90 backdrop-blur-sm p-6">
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-500/30 to-green-500/30 border border-emerald-400/40 flex items-center justify-center">
+              <span class="text-emerald-300 text-sm">🚗</span>
+            </div>
+            <h2 class="text-lg font-bold text-white">{% trans "Datos del Vehículo" %}</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label for="{{ form.anio.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                {% trans "Año" %} *
+              </label>
+              {{ form.anio|add_class:"w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-emerald-500/30 text-emerald-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400" }}
+              {% if form.anio.errors %}
+                <div class="mt-1 text-xs text-red-400">
+                  {{ form.anio.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div>
+              <label for="{{ form.marca.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                {% trans "Marca" %} *
+              </label>
+              <select name="marca" id="id_marca" required class="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-emerald-500/30 text-emerald-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400">
+                <option value="">Seleccionar marca...</option>
+                <!-- Las opciones se cargarán dinámicamente -->
+                <option value="add_new" style="background-color: #4B5563; color: white; font-style: italic;">➕ Agregar nueva marca...</option>
+              </select>
+              <div id="form-crear-marca" class="hidden mt-2 p-3 bg-emerald-900/20 border border-emerald-500/30 rounded-lg">
+                <input type="text" id="nuevo-marca" placeholder="Nombre de la nueva marca..." class="w-full px-3 py-2 rounded bg-emerald-800/50 border border-emerald-500/30 text-emerald-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50">
+                <div class="flex gap-2 mt-2">
+                  <button type="button" id="btn-guardar-marca" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm">Guardar</button>
+                  <button type="button" id="btn-cancelar-marca" class="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm">Cancelar</button>
+                </div>
+              </div>
+              {% if form.marca.errors %}
+                <div class="mt-1 text-xs text-red-400">
+                  {{ form.marca.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div>
+              <label for="{{ form.modelo.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                {% trans "Modelo" %} *
+              </label>
+              <select name="modelo" id="id_modelo" required class="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-emerald-500/30 text-emerald-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400">
+                <option value="">Seleccionar modelo...</option>
+                <!-- Las opciones se cargarán dinámicamente -->
+                <option value="add_new" style="background-color: #4B5563; color: white; font-style: italic;">➕ Agregar nuevo modelo...</option>
+              </select>
+              <div id="form-crear-modelo" class="hidden mt-2 p-3 bg-emerald-900/20 border border-emerald-500/30 rounded-lg">
+                <input type="text" id="nuevo-modelo" placeholder="Nombre del nuevo modelo..." class="w-full px-3 py-2 rounded bg-emerald-800/50 border border-emerald-500/30 text-emerald-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50">
+                <div class="flex gap-2 mt-2">
+                  <button type="button" id="btn-guardar-modelo" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm">Guardar</button>
+                  <button type="button" id="btn-cancelar-modelo" class="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm">Cancelar</button>
+                </div>
+              </div>
+              {% if form.modelo.errors %}
+                <div class="mt-1 text-xs text-red-400">
+                  {{ form.modelo.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Segunda fila con patente y color -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+            <div>
+              <label for="{{ form.patente.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+                {% trans "Patente" %}
+              </label>
+              {{ form.patente|add_class:"w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-emerald-500/30 text-emerald-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400" }}
+              {% if form.patente.errors %}
+                <div class="mt-1 text-xs text-red-400">
+                  {{ form.patente.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+
+            <div>
+              <label for="id_color" class="block text-sm font-medium text-gray-300 mb-2">
+                {% trans "Color" %}
+              </label>
+              <select name="color" id="id_color" class="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-emerald-500/30 text-emerald-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400">
+                <option value="">Seleccionar color...</option>
+                <option value="1" style="background-color: #000000; color: white;">🖤 Negro</option>
+                <option value="2" style="background-color: #FFFFFF; color: black;">⚪ Blanco</option>
+                <option value="3" style="background-color: #FF0000; color: white;">🔴 Rojo</option>
+                <option value="4" style="background-color: #0000FF; color: white;">🔵 Azul</option>
+                <option value="5" style="background-color: #00FF00; color: black;">🟢 Verde</option>
+                <option value="6" style="background-color: #FFFF00; color: black;">🟡 Amarillo</option>
+                <option value="7" style="background-color: #808080; color: white;">⚫ Gris</option>
+                <option value="add_new" style="background-color: #4B5563; color: white; font-style: italic;">➕ Agregar nuevo color...</option>
+              </select>
+              <div id="form-crear-color" class="hidden mt-2 p-3 bg-emerald-900/20 border border-emerald-500/30 rounded-lg">
+                <input type="text" id="nuevo-color" placeholder="Nombre del nuevo color..." class="w-full px-3 py-2 rounded bg-emerald-800/50 border border-emerald-500/30 text-emerald-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/50">
+                <div class="flex gap-2 mt-2">
+                  <button type="button" id="btn-guardar-color" class="px-3 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-sm">Guardar</button>
+                  <button type="button" id="btn-cancelar-color" class="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm">Cancelar</button>
+                </div>
+              </div>
+              {% if form.color.errors %}
+                <div class="mt-1 text-xs text-red-400">
+                  {{ form.color.errors.0 }}
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información Técnica -->
+      <div class="relative">
+        <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-fuchsia-500/20 via-purple-500/20 to-pink-500/20 blur-xl"></div>
+        <div class="relative rounded-xl border border-fuchsia-400/30 bg-gradient-to-r from-[#0d1117]/90 to-[#111827]/90 backdrop-blur-sm p-6">
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-fuchsia-500/30 to-purple-500/30 border border-fuchsia-400/40 flex items-center justify-center">
+              <span class="text-fuchsia-300 text-sm">⚙️</span>
+            </div>
+            <h2 class="text-lg font-bold text-fuchsia-300">{% trans "Información Técnica" %}</h2>
+          </div>
+
+          <!-- VIN - Fila individual -->
+          <div class="mb-4">
+            <label for="{{ form.vin.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+              {% trans "VIN" %}
+            </label>
+            {{ form.vin|add_class:"w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-fuchsia-500/30 text-fuchsia-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50 focus:border-fuchsia-400" }}
+            {% if form.vin.errors %}
+              <div class="mt-1 text-xs text-red-400">
+                {{ form.vin.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Motor - Fila individual -->
+          <div class="mb-4">
+            <label for="id_motor" class="block text-sm font-medium text-gray-300 mb-2">
+              {% trans "Motor" %}
+            </label>
+            <select name="motor" id="id_motor" class="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-fuchsia-500/30 text-fuchsia-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50 focus:border-fuchsia-400">
+              <option value="">Seleccionar motor...</option>
+              <option value="add_new" style="background-color: #4B5563; color: white; font-style: italic;">➕ Agregar nuevo motor...</option>
+            </select>
+            <div id="form-crear-motor" class="hidden mt-2 p-3 bg-fuchsia-900/20 border border-fuchsia-500/30 rounded-lg">
+              <input type="text" id="nuevo-motor" placeholder="Nombre del nuevo motor..." class="w-full px-3 py-2 rounded bg-fuchsia-800/50 border border-fuchsia-500/30 text-fuchsia-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50">
+              <div class="flex gap-2 mt-2">
+                <button type="button" id="btn-guardar-motor" class="px-3 py-1 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded text-sm">Guardar</button>
+                <button type="button" id="btn-cancelar-motor" class="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm">Cancelar</button>
+              </div>
+            </div>
+            {% if form.motor.errors %}
+              <div class="mt-1 text-xs text-red-400">
+                {{ form.motor.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Caja - Fila individual -->
+          <div class="mb-4">
+            <label for="id_caja" class="block text-sm font-medium text-gray-300 mb-2">
+              {% trans "Caja" %}
+            </label>
+            <select name="caja" id="id_caja" class="w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-fuchsia-500/30 text-fuchsia-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50 focus:border-fuchsia-400">
+              <option value="">Seleccionar caja...</option>
+              <option value="add_new" style="background-color: #4B5563; color: white; font-style: italic;">➕ Agregar nueva caja...</option>
+            </select>
+            <div id="form-crear-caja" class="hidden mt-2 p-3 bg-fuchsia-900/20 border border-fuchsia-500/30 rounded-lg">
+              <input type="text" id="nuevo-caja" placeholder="Nombre de la nueva caja..." class="w-full px-3 py-2 rounded bg-fuchsia-800/50 border border-fuchsia-500/30 text-fuchsia-200 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50">
+              <div class="flex gap-2 mt-2">
+                <button type="button" id="btn-guardar-caja" class="px-3 py-1 bg-fuchsia-600 hover:bg-fuchsia-700 text-white rounded text-sm">Guardar</button>
+                <button type="button" id="btn-cancelar-caja" class="px-3 py-1 bg-gray-600 hover:bg-gray-700 text-white rounded text-sm">Cancelar</button>
+              </div>
+            </div>
+            {% if form.caja.errors %}
+              <div class="mt-1 text-xs text-red-400">
+                {{ form.caja.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+
+          <!-- Kilometraje - Fila individual -->
+          <div class="mb-4">
+            <label for="{{ form.kilometraje.id_for_label }}" class="block text-sm font-medium text-gray-300 mb-2">
+              {% trans "Kilometraje" %}
+            </label>
+            {{ form.kilometraje|add_class:"w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-fuchsia-500/30 text-fuchsia-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-400/50 focus:border-fuchsia-400" }}
+            {% if form.kilometraje.errors %}
+              <div class="mt-1 text-xs text-red-400">
+                {{ form.kilometraje.errors.0 }}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Observaciones -->
+      {% if form.observaciones %}
+      <div class="relative">
+        <div class="absolute -inset-1 rounded-xl bg-gradient-to-r from-orange-500/20 via-yellow-500/20 to-amber-500/20 blur-xl"></div>
+        <div class="relative rounded-xl border border-orange-400/30 bg-gradient-to-r from-[#0d1117]/90 to-[#111827]/90 backdrop-blur-sm p-6">
+          <div class="flex items-center space-x-3 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-orange-500/30 to-amber-500/30 border border-orange-400/40 flex items-center justify-center">
+              <span class="text-orange-300 text-sm">📝</span>
+            </div>
+            <h2 class="text-lg font-bold text-orange-300">{% trans "Observaciones" %}</h2>
+          </div>
+
+          {{ form.observaciones|add_class:"w-full px-4 py-3 rounded-lg bg-gradient-to-r from-[#0a0a0a]/80 to-[#111827]/80 border border-orange-500/30 text-orange-200 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-orange-400/50 focus:border-orange-400 resize-none" }}
+          {% if form.observaciones.errors %}
+            <div class="mt-1 text-xs text-red-400">
+              {{ form.observaciones.errors.0 }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+          <!-- Botones de acción -->
+          <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'chile:taller:vehiculos:lista_vehiculos' %}"
+               class="group flex-1 inline-flex items-center justify-center space-x-2 px-8 py-4 rounded-xl border border-gray-500/40 bg-gradient-to-r from-gray-600/20 to-gray-400/10 hover:from-gray-500/30 hover:to-gray-300/20 text-gray-200 font-semibold transition-all shadow hover:shadow-gray-500/20">
+              <span class="text-lg">⟲</span>
+              <span>{% trans "Cancelar" %}</span>
+            </a>
+
+            <button type="submit"
+                    class="group flex-1 relative inline-flex items-center justify-center space-x-2 px-8 py-4 rounded-xl bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:via-lime-500 hover:to-green-500 text-white font-bold shadow-lg shadow-emerald-800/40 transition-all duration-300 border border-emerald-400/40">
+              <span class="text-lg">💾</span>
+              <span>{% trans "Crear Vehículo" %}</span>
+              <div class="absolute -inset-px rounded-xl ring-2 ring-emerald-400/40 animate-pulse opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer del formulario -->
+  <div class="mt-8 text-center">
+    <div class="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-gradient-to-r from-gray-800/50 to-gray-700/50 border border-gray-600/30 text-gray-400 text-xs">
+      <div class="w-2 h-2 bg-emerald-400 rounded-full animate-pulse"></div>
+      <span>{% trans "Formulario de registro vehicular" %}</span>
+      <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Estilos adicionales -->
+<style>
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes matrix-rain {
+  0% { transform: translateY(-100vh); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { transform: translateY(100vh); opacity: 0; }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* Mejoras para selects */
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300ffe7' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+}
+
+/* Placeholder mejorado */
+input::placeholder, textarea::placeholder {
+  color: #6b7280 !important;
+  opacity: 0.7;
+}
+
+/* Focus states mejorados */
+input:focus, select:focus, textarea:focus {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1), 0 0 20px rgba(34, 197, 94, 0.2);
+}
+
+/* Estilos para sugerencias de clientes */
+#sugerencias-clientes .sugerencia-item {
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(0, 255, 231, 0.2);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#sugerencias-clientes .sugerencia-item:hover {
+  background: linear-gradient(90deg, rgba(0, 255, 231, 0.1) 0%, rgba(26, 41, 128, 0.2) 100%);
+  border-left: 3px solid #00ffe7;
+}
+
+#sugerencias-clientes .sugerencia-item:last-child {
+  border-bottom: none;
+}
+
+.sugerencia-nombre {
+  color: #000000;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.sugerencia-info {
+  color: #9ca3af;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+/* Estilos para el layout de dos columnas */
+@media (min-width: 1024px) {
+  .grid-cols-1.lg\\:grid-cols-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+}
+
+/* Asegurar que las sugerencias estén siempre visibles */
+#sugerencias-clientes {
+  position: absolute;
+  z-index: 9999;
+  width: 100%;
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+/* Estilos para información adicional del cliente */
+#info-cliente-adicional {
+  transition: all 0.3s ease;
+}
+
+#info-cliente-adicional.hidden {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+#info-cliente-adicional:not(.hidden) {
+  opacity: 1;
+  transform: translateY(0);
+}
+</style>
+
+<!-- JavaScript simplificado (autocompletado manejado por django-autocomplete-light) -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // =================== BÚSQUEDA INTELIGENTE DE CLIENTES ===================
+    const busquedaCliente = document.getElementById('busqueda-cliente');
+    const sugerenciasContainer = document.getElementById('sugerencias-clientes');
+    const loadingCliente = document.getElementById('loading-cliente');
+    const clienteSeleccionado = document.getElementById('cliente-seleccionado');
+    const clienteNombre = document.getElementById('cliente-nombre');
+    const clienteInfo = document.getElementById('cliente-info');
+    const limpiarCliente = document.getElementById('limpiar-cliente');
+    const clienteInput = document.querySelector('input[name="cliente"]');
+
+    let timeoutId;
+    let clienteActual = null;
+
+    function buscarClientes(query) {
+        if (query.length < 2) {
+            sugerenciasContainer.classList.add('hidden');
+            return;
+        }
+
+        loadingCliente.classList.remove('hidden');
+
+        // Simular búsqueda con datos de prueba
+        setTimeout(() => {
+            loadingCliente.classList.add('hidden');
+            const clientesSimulados = [
+                {id: 9, nombre: 'Fernando Zampedri', email: 'fernando@example.com', telefono: '+56912345678'},
+                {id: 10, nombre: 'María González', email: 'maria@example.com', telefono: '+56987654321'},
+                {id: 11, nombre: 'Carlos Silva', email: 'carlos@example.com', telefono: '+56911223344'}
+            ].filter(c => c.nombre.toLowerCase().includes(query.toLowerCase()));
+
+            mostrarSugerencias(clientesSimulados);
+        }, 300);
+    }
+
+    function mostrarSugerencias(clientes) {
+        if (clientes.length === 0) {
+            sugerenciasContainer.innerHTML = `
+                <div class="bg-gradient-to-r from-[#0d1117] to-[#111827] border border-cyan-400/40 rounded-lg shadow-2xl shadow-cyan-500/20">
+                    <div class="p-4 text-center text-gray-400">
+                        <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-gradient-to-br from-gray-500/20 to-gray-600/20 border border-gray-400/30 flex items-center justify-center">
+                            🔍
+                        </div>
+                        <p class="text-sm">No se encontraron clientes</p>
+                        <p class="text-xs mt-1">Intenta con otro término de búsqueda</p>
+                    </div>
+                </div>
+            `;
+            sugerenciasContainer.classList.remove('hidden');
+            return;
+        }
+
+        const sugerenciasHTML = clientes.map(cliente => `
+            <div class="sugerencia-item" data-cliente-id="${cliente.id}" data-cliente-nombre="${cliente.nombre}" data-cliente-info="${cliente.email || ''} ${cliente.telefono || ''}">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/30 to-blue-500/30 border border-cyan-400/40 flex items-center justify-center">
+                        <span class="text-cyan-300 text-sm">👤</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="sugerencia-nombre">${cliente.nombre}</div>
+                        <div class="sugerencia-info">
+                            ${cliente.email ? `📧 ${cliente.email}` : ''}
+                            ${cliente.telefono ? `📱 ${cliente.telefono}` : ''}
+                        </div>
+                    </div>
+                    <div class="text-cyan-400 text-xs font-mono">#${cliente.id}</div>
+                </div>
+            </div>
+        `).join('');
+
+        sugerenciasContainer.innerHTML = `
+            <div class="bg-gradient-to-r from-[#0d1117] to-[#111827] border border-cyan-400/40 rounded-lg shadow-2xl shadow-cyan-500/20 max-h-60 overflow-y-auto">
+                ${sugerenciasHTML}
+            </div>
+        `;
+
+        sugerenciasContainer.classList.remove('hidden');
+
+        // Agregar eventos de click
+        document.querySelectorAll('.sugerencia-item').forEach(item => {
+            item.addEventListener('click', function() {
+                seleccionarCliente(
+                    this.dataset.clienteId,
+                    this.dataset.clienteNombre,
+                    this.dataset.clienteInfo
+                );
+            });
+        });
+    }
+
+    function seleccionarCliente(id, nombre, info) {
+        clienteActual = {id, nombre, info};
+
+        if (clienteInput) {
+            clienteInput.value = id;
+        }
+
+        busquedaCliente.value = '';
+        clienteNombre.textContent = nombre;
+        clienteInfo.textContent = info;
+        clienteSeleccionado.classList.remove('hidden');
+        sugerenciasContainer.classList.add('hidden');
+
+        // Efecto visual
+        clienteSeleccionado.style.transform = 'scale(0.95)';
+        clienteSeleccionado.style.transition = 'transform 0.2s ease';
+        setTimeout(() => {
+            clienteSeleccionado.style.transform = 'scale(1)';
+        }, 100);
+    }
+
+    function limpiarSeleccion() {
+        clienteActual = null;
+        if (clienteInput) {
+            clienteInput.value = '';
+        }
+        busquedaCliente.value = '';
+        clienteSeleccionado.classList.add('hidden');
+        sugerenciasContainer.classList.add('hidden');
+        busquedaCliente.focus();
+    }
+
+    // Event listeners
+    if (busquedaCliente) {
+        busquedaCliente.addEventListener('input', function() {
+            clearTimeout(timeoutId);
+            const query = this.value.trim();
+
+            if (query.length === 0) {
+                sugerenciasContainer.classList.add('hidden');
+                return;
+            }
+
+            timeoutId = setTimeout(() => {
+                buscarClientes(query);
+            }, 300);
+        });
+
+        busquedaCliente.addEventListener('focus', function() {
+            if (this.value.trim().length >= 2) {
+                buscarClientes(this.value.trim());
+            }
+        });
+    }
+
+    document.addEventListener('click', function(e) {
+        if (busquedaCliente && !busquedaCliente.contains(e.target) && !sugerenciasContainer.contains(e.target)) {
+            sugerenciasContainer.classList.add('hidden');
+        }
+    });
+
+    if (limpiarCliente) {
+        limpiarCliente.addEventListener('click', limpiarSeleccion);
+    }
+
+    console.log('Formulario de vehículos cargado correctamente');
+
+    // =================== GESTIÓN DE MARCAS Y MODELOS ===================
+    const marcaSelect = document.getElementById('id_marca');
+    const modeloSelect = document.getElementById('id_modelo');
+    const motorSelect = document.getElementById('id_motor');
+    const cajaSelect = document.getElementById('id_caja');
+
+    if (marcaSelect && modeloSelect) {
+        marcaSelect.addEventListener('change', function() {
+            const marcaId = this.value;
+            console.log('Marca seleccionada:', marcaId);
+
+            if (marcaId) {
+                // Limpiar modelos
+                modeloSelect.innerHTML = '<option value="">Cargando modelos...</option>';
+
+                // Llamada AJAX real
+                fetch(`/cl/es/vehiculos/autocomplete/modelo/?marca=${marcaId}&q=`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/json',
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Respuesta modelos:', data);
+                    modeloSelect.innerHTML = '<option value="">Seleccionar modelo...</option>';
+
+                    if (data.results && data.results.length > 0) {
+                        data.results.forEach(modelo => {
+                            const option = document.createElement('option');
+                            option.value = modelo.id;
+                            option.textContent = modelo.text;
+                            modeloSelect.appendChild(option);
+                        });
+                        console.log(`Cargados ${data.results.length} modelos`);
+                    } else {
+                        const option = document.createElement('option');
+                        option.value = '';
+                        option.textContent = 'No hay modelos disponibles';
+                        modeloSelect.appendChild(option);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error cargando modelos:', error);
+                    modeloSelect.innerHTML = '<option value="">Error cargando modelos</option>';
+                });
+            } else {
+                modeloSelect.innerHTML = '<option value="">Seleccionar modelo...</option>';
+            }
+        });
+    }
+
+    // =================== FILTRADO DE MOTOR Y CAJA POR MODELO ===================
+    // Esperar a que el DOM esté completamente cargado
+    document.addEventListener('DOMContentLoaded', function() {
+        const modeloSelect = document.getElementById('id_modelo');
+        const motorSelect = document.getElementById('id_motor');
+        const cajaSelect = document.getElementById('id_caja');
+
+        console.log('🔥 INICIANDO FILTRADO - Elementos encontrados:');
+        console.log('Modelo:', modeloSelect);
+        console.log('Motor:', motorSelect);
+        console.log('Caja:', cajaSelect);
+
+        if (modeloSelect && motorSelect && cajaSelect) {
+            modeloSelect.addEventListener('change', function() {
+                const modeloId = this.value;
+                console.log('🔥 MODELO SELECCIONADO:', modeloId);
+
+                if (modeloId) {
+                    // Limpiar campos
+                    motorSelect.innerHTML = '<option value="">Cargando motores...</option>';
+                    cajaSelect.innerHTML = '<option value="">Cargando cajas...</option>';
+
+                    // Cargar motores
+                    fetch(`/cl/es/vehiculos/autocomplete/motor/?modelo=${modeloId}&q=`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Motores recibidos:', data);
+                            motorSelect.innerHTML = '<option value="">Seleccionar motor...</option>';
+                            if (data.results) {
+                                data.results.forEach(motor => {
+                                    const option = document.createElement('option');
+                                    option.value = motor.id;
+                                    option.textContent = motor.text;
+                                    motorSelect.appendChild(option);
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error motores:', error);
+                            motorSelect.innerHTML = '<option value="">Error</option>';
+                        });
+
+                    // Cargar cajas
+                    fetch(`/cl/es/vehiculos/autocomplete/caja/?modelo=${modeloId}&q=`)
+                        .then(response => response.json())
+                        .then(data => {
+                            console.log('Cajas recibidas:', data);
+                            cajaSelect.innerHTML = '<option value="">Seleccionar caja...</option>';
+                            if (data.results) {
+                                data.results.forEach(caja => {
+                                    const option = document.createElement('option');
+                                    option.value = caja.id;
+                                    option.textContent = caja.text;
+                                    cajaSelect.appendChild(option);
+                                });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error cajas:', error);
+                            cajaSelect.innerHTML = '<option value="">Error</option>';
+                        });
+                } else {
+                    motorSelect.innerHTML = '<option value="">Seleccionar motor...</option>';
+                    cajaSelect.innerHTML = '<option value="">Seleccionar caja...</option>';
+                }
+            });
+        }
+    });
+
+    // =================== CREAR NUEVOS MOTORES Y CAJAS ===================
+    // Manejar creación de nuevos motores
+    document.addEventListener('DOMContentLoaded', function() {
+        const btnCrearMotor = document.getElementById('btn-crear-motor');
+        const formCrearMotor = document.getElementById('form-crear-motor');
+        const nuevoMotor = document.getElementById('nuevo-motor');
+        const btnGuardarMotor = document.getElementById('btn-guardar-motor');
+        const btnCancelarMotor = document.getElementById('btn-cancelar-motor');
+        const motorSelect = document.getElementById('id_motor');
+        const modeloSelect = document.getElementById('id_modelo');
+
+        if (motorSelect && formCrearMotor) {
+            motorSelect.addEventListener('change', function() {
+                if (this.value === 'add_new') {
+                    if (!modeloSelect.value) {
+                        alert('Primero selecciona un modelo');
+                        this.value = '';
+                        return;
+                    }
+                    formCrearMotor.classList.remove('hidden');
+                    nuevoMotor.focus();
+                    this.value = ''; // Resetear el select
+                }
+            });
+
+            btnCancelarMotor.addEventListener('click', function() {
+                formCrearMotor.classList.add('hidden');
+                nuevoMotor.value = '';
+            });
+
+            btnGuardarMotor.addEventListener('click', function() {
+                const nombreMotor = nuevoMotor.value.trim();
+                if (!nombreMotor) {
+                    alert('Ingresa el nombre del motor');
+                    return;
+                }
+
+                // Crear nuevo motor via AJAX
+                fetch('/cl/es/vehiculos/crear-motor/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        nombre: nombreMotor,
+                        modelo_id: modeloSelect.value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Agregar el nuevo motor al select
+                        const option = document.createElement('option');
+                        option.value = data.motor_id;
+                        option.textContent = nombreMotor;
+                        option.selected = true;
+                        motorSelect.appendChild(option);
+
+                        // Limpiar y ocultar formulario
+                        nuevoMotor.value = '';
+                        formCrearMotor.classList.add('hidden');
+
+                        console.log('Motor creado:', nombreMotor);
+                    } else {
+                        alert('Error al crear el motor: ' + (data.error || 'Error desconocido'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al crear el motor');
+                });
+            });
+        }
+
+        // Manejar creación de nuevas cajas
+        const btnCrearCaja = document.getElementById('btn-crear-caja');
+        const formCrearCaja = document.getElementById('form-crear-caja');
+        const nuevoCaja = document.getElementById('nuevo-caja');
+        const btnGuardarCaja = document.getElementById('btn-guardar-caja');
+        const btnCancelarCaja = document.getElementById('btn-cancelar-caja');
+        const cajaSelect = document.getElementById('id_caja');
+
+        if (cajaSelect && formCrearCaja) {
+            cajaSelect.addEventListener('change', function() {
+                if (this.value === 'add_new') {
+                    if (!modeloSelect.value) {
+                        alert('Primero selecciona un modelo');
+                        this.value = '';
+                        return;
+                    }
+                    formCrearCaja.classList.remove('hidden');
+                    nuevoCaja.focus();
+                    this.value = ''; // Resetear el select
+                }
+            });
+
+            btnCancelarCaja.addEventListener('click', function() {
+                formCrearCaja.classList.add('hidden');
+                nuevoCaja.value = '';
+            });
+
+            btnGuardarCaja.addEventListener('click', function() {
+                const nombreCaja = nuevoCaja.value.trim();
+                if (!nombreCaja) {
+                    alert('Ingresa el nombre de la caja');
+                    return;
+                }
+
+                // Crear nueva caja via AJAX
+                fetch('/cl/es/vehiculos/crear-caja/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        nombre: nombreCaja,
+                        modelo_id: modeloSelect.value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Agregar la nueva caja al select
+                        const option = document.createElement('option');
+                        option.value = data.caja_id;
+                        option.textContent = nombreCaja;
+                        option.selected = true;
+                        cajaSelect.appendChild(option);
+
+                        // Limpiar y ocultar formulario
+                        nuevoCaja.value = '';
+                        formCrearCaja.classList.add('hidden');
+
+                        console.log('Caja creada:', nombreCaja);
+                    } else {
+                        alert('Error al crear la caja: ' + (data.error || 'Error desconocido'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al crear la caja');
+                });
+            });
+        }
+    });
+
+    // =================== CREAR NUEVOS COLORES ===================
+    document.addEventListener('DOMContentLoaded', function() {
+        const colorSelect = document.getElementById('id_color');
+        const formCrearColor = document.getElementById('form-crear-color');
+        const nuevoColor = document.getElementById('nuevo-color');
+        const btnGuardarColor = document.getElementById('btn-guardar-color');
+        const btnCancelarColor = document.getElementById('btn-cancelar-color');
+
+        if (colorSelect && formCrearColor) {
+            colorSelect.addEventListener('change', function() {
+                if (this.value === 'add_new') {
+                    formCrearColor.classList.remove('hidden');
+                    nuevoColor.focus();
+                    this.value = ''; // Resetear el select
+                }
+            });
+
+            btnCancelarColor.addEventListener('click', function() {
+                formCrearColor.classList.add('hidden');
+                nuevoColor.value = '';
+            });
+
+            btnGuardarColor.addEventListener('click', function() {
+                const nombreColor = nuevoColor.value.trim();
+                if (!nombreColor) {
+                    alert('Ingresa el nombre del color');
+                    return;
+                }
+
+                // Crear nuevo color via AJAX
+                fetch('/cl/es/vehiculos/crear-color/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        nombre: nombreColor
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Agregar el nuevo color al select
+                        const option = document.createElement('option');
+                        option.value = data.color_id;
+                        option.textContent = nombreColor;
+                        option.selected = true;
+                        colorSelect.appendChild(option);
+
+                        // Limpiar y ocultar formulario
+                        nuevoColor.value = '';
+                        formCrearColor.classList.add('hidden');
+
+                        console.log('Color creado:', nombreColor);
+                    } else {
+                        alert('Error al crear el color: ' + (data.error || 'Error desconocido'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al crear el color');
+                });
+            });
+        }
+    });
+
+    // =================== CREAR NUEVAS MARCAS ===================
+    document.addEventListener('DOMContentLoaded', function() {
+        const marcaSelect = document.getElementById('id_marca');
+        const formCrearMarca = document.getElementById('form-crear-marca');
+        const nuevoMarca = document.getElementById('nuevo-marca');
+        const btnGuardarMarca = document.getElementById('btn-guardar-marca');
+        const btnCancelarMarca = document.getElementById('btn-cancelar-marca');
+
+        if (marcaSelect && formCrearMarca) {
+            marcaSelect.addEventListener('change', function() {
+                if (this.value === 'add_new') {
+                    formCrearMarca.classList.remove('hidden');
+                    nuevoMarca.focus();
+                    this.value = ''; // Resetear el select
+                }
+            });
+
+            btnCancelarMarca.addEventListener('click', function() {
+                formCrearMarca.classList.add('hidden');
+                nuevoMarca.value = '';
+            });
+
+            btnGuardarMarca.addEventListener('click', function() {
+                const nombreMarca = nuevoMarca.value.trim();
+                if (!nombreMarca) {
+                    alert('Ingresa el nombre de la marca');
+                    return;
+                }
+
+                // Crear nueva marca via AJAX
+                fetch('/cl/es/vehiculos/crear-marca/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        nombre: nombreMarca
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Agregar la nueva marca al select
+                        const option = document.createElement('option');
+                        option.value = data.marca_id;
+                        option.textContent = nombreMarca;
+                        option.selected = true;
+                        marcaSelect.appendChild(option);
+
+                        // Limpiar y ocultar formulario
+                        nuevoMarca.value = '';
+                        formCrearMarca.classList.add('hidden');
+
+                        console.log('Marca creada:', nombreMarca);
+                    } else {
+                        alert('Error al crear la marca: ' + (data.error || 'Error desconocido'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al crear la marca');
+                });
+            });
+        }
+    });
+
+    // =================== CREAR NUEVOS MODELOS ===================
+    document.addEventListener('DOMContentLoaded', function() {
+        const modeloSelect = document.getElementById('id_modelo');
+        const formCrearModelo = document.getElementById('form-crear-modelo');
+        const nuevoModelo = document.getElementById('nuevo-modelo');
+        const btnGuardarModelo = document.getElementById('btn-guardar-modelo');
+        const btnCancelarModelo = document.getElementById('btn-cancelar-modelo');
+        const marcaSelect = document.getElementById('id_marca');
+
+        if (modeloSelect && formCrearModelo) {
+            modeloSelect.addEventListener('change', function() {
+                if (this.value === 'add_new') {
+                    if (!marcaSelect.value) {
+                        alert('Primero selecciona una marca');
+                        this.value = '';
+                        return;
+                    }
+                    formCrearModelo.classList.remove('hidden');
+                    nuevoModelo.focus();
+                    this.value = ''; // Resetear el select
+                }
+            });
+
+            btnCancelarModelo.addEventListener('click', function() {
+                formCrearModelo.classList.add('hidden');
+                nuevoModelo.value = '';
+            });
+
+            btnGuardarModelo.addEventListener('click', function() {
+                const nombreModelo = nuevoModelo.value.trim();
+                if (!nombreModelo) {
+                    alert('Ingresa el nombre del modelo');
+                    return;
+                }
+
+                // Crear nuevo modelo via AJAX
+                fetch('/cl/es/vehiculos/crear-modelo/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: JSON.stringify({
+                        nombre: nombreModelo,
+                        marca_id: marcaSelect.value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Agregar el nuevo modelo al select
+                        const option = document.createElement('option');
+                        option.value = data.modelo_id;
+                        option.textContent = nombreModelo;
+                        option.selected = true;
+                        modeloSelect.appendChild(option);
+
+                        // Limpiar y ocultar formulario
+                        nuevoModelo.value = '';
+                        formCrearModelo.classList.add('hidden');
+
+                        console.log('Modelo creado:', nombreModelo);
+                    } else {
+                        alert('Error al crear el modelo: ' + (data.error || 'Error desconocido'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error al crear el modelo');
+                });
+            });
+        }
+    });
+
+    // Función para buscar clientes
+    function buscarClientes(query) {
+        if (query.length < 2) {
+            sugerenciasContainer.classList.add('hidden');
+            return;
+        }
+
+        loadingCliente.classList.remove('hidden');
+
+        // Simular llamada AJAX - reemplazar con endpoint real
+        fetch(`{% country_url 'clientes:ajax_buscar_clientes' %}?q=${encodeURIComponent(query)}`, {
+            method: 'GET',
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingCliente.classList.add('hidden');
+            // Formatear los datos para mostrar nombre completo
+            const clientesFormateados = data.map(cliente => ({
+                id: cliente.id,
+                nombre: `${cliente.nombre} ${cliente.apellido}`.trim(),
+                email: cliente.email,
+                telefono: cliente.telefono
+            }));
+            mostrarSugerencias(clientesFormateados);
+        })
+        .catch(error => {
+            console.error('Error en búsqueda:', error);
+            loadingCliente.classList.add('hidden');
+            // Fallback - mostrar datos simulados
+            const clientesSimulados = [
+                {id: 1, nombre: 'Juan Pérez', email: 'juan@example.com', telefono: '+56912345678'},
+                {id: 2, nombre: 'María González', email: 'maria@example.com', telefono: '+56987654321'},
+                {id: 3, nombre: 'Carlos Silva', email: 'carlos@example.com', telefono: '+56911223344'}
+            ].filter(c => c.nombre.toLowerCase().includes(query.toLowerCase()));
+
+            mostrarSugerencias(clientesSimulados);
+        });
+    }
+
+    // Función para mostrar sugerencias
+    function mostrarSugerencias(clientes) {
+        if (clientes.length === 0) {
+            sugerenciasContainer.innerHTML = `
+                <div class="bg-gradient-to-r from-[#0d1117] to-[#111827] border border-cyan-400/40 rounded-lg shadow-2xl shadow-cyan-500/20">
+                    <div class="p-4 text-center text-gray-400">
+                        <div class="w-12 h-12 mx-auto mb-2 rounded-full bg-gradient-to-br from-gray-500/20 to-gray-600/20 border border-gray-400/30 flex items-center justify-center">
+                            🔍
+                        </div>
+                        <p class="text-sm">{% trans 'No se encontraron clientes' %}</p>
+                        <p class="text-xs mt-1">{% trans 'Intenta con otro término de búsqueda' %}</p>
+                    </div>
+                </div>
+            `;
+            sugerenciasContainer.classList.remove('hidden');
+            return;
+        }
+
+        const sugerenciasHTML = clientes.map(cliente => `
+            <div class="sugerencia-item" data-cliente-id="${cliente.id}" data-cliente-nombre="${cliente.nombre}" data-cliente-info="${cliente.email || ''} ${cliente.telefono || ''}">
+                <div class="flex items-center space-x-3">
+                    <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500/30 to-blue-500/30 border border-cyan-400/40 flex items-center justify-center">
+                        <span class="text-cyan-300 text-sm">👤</span>
+                    </div>
+                    <div class="flex-1">
+                        <div class="sugerencia-nombre">${cliente.nombre}</div>
+                        <div class="sugerencia-info">
+                            ${cliente.email ? `📧 ${cliente.email}` : ''}
+                            ${cliente.telefono ? `📱 ${cliente.telefono}` : ''}
+                        </div>
+                    </div>
+                    <div class="text-cyan-400 text-xs font-mono">#${cliente.id}</div>
+                </div>
+            </div>
+        `).join('');
+
+        sugerenciasContainer.innerHTML = `
+            <div class="bg-gradient-to-r from-[#0d1117] to-[#111827] border border-cyan-400/40 rounded-lg shadow-2xl shadow-cyan-500/20 max-h-60 overflow-y-auto">
+                ${sugerenciasHTML}
+            </div>
+        `;
+
+        sugerenciasContainer.classList.remove('hidden');
+
+        // Agregar eventos de click a las sugerencias
+        document.querySelectorAll('.sugerencia-item').forEach(item => {
+            item.addEventListener('click', function() {
+                seleccionarCliente(
+                    this.dataset.clienteId,
+                    this.dataset.clienteNombre,
+                    this.dataset.clienteInfo
+                );
+            });
+        });
+    }
+
+    // Función para seleccionar un cliente
+    function seleccionarCliente(id, nombre, info) {
+        clienteActual = {id, nombre, info};
+
+        // Establecer el valor en el select oculto
+        if (clienteInput) {
+            console.log('Estableciendo valor del cliente:', id, 'en campo:', clienteInput);
+            clienteInput.value = id;
+            console.log('Valor después de establecer:', clienteInput.value);
+        } else {
+            console.error('No se encontró el campo cliente input');
+        }
+
+        // Actualizar la visualización
+        busquedaCliente.value = '';
+        clienteNombre.textContent = nombre;
+        clienteInfo.textContent = info;
+        clienteSeleccionado.classList.remove('hidden');
+        sugerenciasContainer.classList.add('hidden');
+
+        // Mostrar información adicional del cliente
+        mostrarInfoClienteAdicional(id, nombre, info);
+
+        // Efecto visual de confirmación
+        clienteSeleccionado.style.transform = 'scale(0.95)';
+        clienteSeleccionado.style.transition = 'transform 0.2s ease';
+        setTimeout(() => {
+            clienteSeleccionado.style.transform = 'scale(1)';
+        }, 100);
+    }
+
+    // Función para mostrar información adicional del cliente
+    function mostrarInfoClienteAdicional(id, nombre, info) {
+        const infoAdicional = document.getElementById('info-cliente-adicional');
+        const clienteDetalles = document.getElementById('cliente-detalles');
+
+        if (infoAdicional && clienteDetalles) {
+            // Simular datos del cliente (en una implementación real, harías una petición AJAX)
+            const detallesHTML = `
+                <div class="grid grid-cols-1 gap-3">
+                    <div class="flex justify-between items-center p-2 rounded-lg bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-blue-400/20">
+                        <span class="text-blue-300 font-medium">📧 Email:</span>
+                        <span class="text-gray-300">${info.split(' ')[0] || 'No disponible'}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 rounded-lg bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-blue-400/20">
+                        <span class="text-blue-300 font-medium">📱 Teléfono:</span>
+                        <span class="text-gray-300">${info.split(' ')[1] || 'No disponible'}</span>
+                    </div>
+                    <div class="flex justify-between items-center p-2 rounded-lg bg-gradient-to-r from-blue-600/10 to-indigo-600/10 border border-blue-400/20">
+                        <span class="text-blue-300 font-medium">🆔 ID Cliente:</span>
+                        <span class="text-gray-300 font-mono">#${id}</span>
+                    </div>
+                </div>
+            `;
+
+            clienteDetalles.innerHTML = detallesHTML;
+            infoAdicional.classList.remove('hidden');
+        }
+    }
+
+    // Función para limpiar selección
+    function limpiarSeleccion() {
+        clienteActual = null;
+        if (clienteInput) {
+            clienteInput.value = '';
+        }
+        busquedaCliente.value = '';
+        clienteSeleccionado.classList.add('hidden');
+        sugerenciasContainer.classList.add('hidden');
+
+        // Ocultar información adicional del cliente
+        const infoAdicional = document.getElementById('info-cliente-adicional');
+        if (infoAdicional) {
+            infoAdicional.classList.add('hidden');
+        }
+
+        busquedaCliente.focus();
+    }
+
+    // Event listeners
+    busquedaCliente.addEventListener('input', function() {
+        clearTimeout(timeoutId);
+        const query = this.value.trim();
+
+        if (query.length === 0) {
+            sugerenciasContainer.classList.add('hidden');
+            return;
+        }
+
+        // Debounce para evitar demasiadas peticiones
+        timeoutId = setTimeout(() => {
+            buscarClientes(query);
+        }, 300);
+    });
+
+    busquedaCliente.addEventListener('focus', function() {
+        if (this.value.trim().length >= 2) {
+            buscarClientes(this.value.trim());
+        }
+    });
+
+    // Cerrar sugerencias al hacer click fuera
+    document.addEventListener('click', function(e) {
+        if (!busquedaCliente.contains(e.target) && !sugerenciasContainer.contains(e.target)) {
+            sugerenciasContainer.classList.add('hidden');
+        }
+    });
+
+    // Limpiar selección
+    limpiarCliente.addEventListener('click', limpiarSeleccion);
+
+    // Navegación con teclado
+    busquedaCliente.addEventListener('keydown', function(e) {
+        const sugerencias = document.querySelectorAll('.sugerencia-item');
+        const currentActive = document.querySelector('.sugerencia-item.active');
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            if (currentActive) {
+                currentActive.classList.remove('active');
+                const next = currentActive.nextElementSibling;
+                if (next) next.classList.add('active');
+                else sugerencias[0]?.classList.add('active');
+            } else {
+                sugerencias[0]?.classList.add('active');
+            }
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            if (currentActive) {
+                currentActive.classList.remove('active');
+                const prev = currentActive.previousElementSibling;
+                if (prev) prev.classList.add('active');
+                else sugerencias[sugerencias.length - 1]?.classList.add('active');
+            } else {
+                sugerencias[sugerencias.length - 1]?.classList.add('active');
+            }
+        } else if (e.key === 'Enter') {
+            e.preventDefault();
+            if (currentActive) {
+                currentActive.click();
+            }
+        } else if (e.key === 'Escape') {
+            sugerenciasContainer.classList.add('hidden');
+        }
+    });
+});
+</script>
+
+
+{% endblock %}

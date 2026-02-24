@@ -1,0 +1,7 @@
+{# Plantilla mínima para cargar los JS y CSS de DAL y Select2 #}
+<link href="/static/autocomplete_light/vendor/select2/dist/css/select2.min.css" rel="stylesheet" />
+<script src="/static/autocomplete_light/vendor/select2/dist/js/select2.full.min.js"></script>
+<script src="/static/autocomplete_light/jquery.init.js"></script>
+<script src="/static/autocomplete_light/autocomplete_light.js"></script>
+<script src="/static/autocomplete_light/select2.js"></script>
+<script src="/static/autocomplete_light/init.js"></script>

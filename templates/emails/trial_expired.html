@@ -141,10 +141,9 @@
         </div>
 
         <div class="footer">
-            <p>📞 <strong>¿Necesitas ayuda?</strong> Escríbenos a {{ support_email }}</p>
-            <p>💬 WhatsApp: +1-800-EGARAGE</p>
-            <p>© {{ today.year }} eGarage - Llevando tu taller al siguiente nivel</p>
-            <p><small>No pierdas esta oportunidad. Tu cuenta puede reactivarse en cualquier momento.</small></p>
+            <p><a href="mailto:{{ support_email }}" style="color: #22d3ee; text-decoration: none;">{{ support_email }}</a></p>
+            <p><strong>WhatsApp:</strong> <a href="https://wa.me/{{ support_whatsapp_wa_me }}?text=Hola,%20necesito%20ayuda%20con%20mi%20cuenta%20eGarage" target="_blank" rel="noopener noreferrer" style="color: #10b981; text-decoration: none;">{{ support_whatsapp_display }}</a></p>
+            <p>© {{ today.year }} eGarage</p>
         </div>
     </div>
 </body>

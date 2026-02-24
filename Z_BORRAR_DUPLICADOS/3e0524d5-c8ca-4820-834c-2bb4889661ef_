@@ -1,0 +1,35 @@
+/* Campos de formulario futuristas */
+input, select, textarea {
+  background: rgba(30, 41, 59, 0.85) !important; /* gris oscuro translúcido */
+  color: #e0faff !important; /* celeste claro */
+  border: 1px solid #00eaff !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+  width: 100% !important;
+  font-size: 0.95rem !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #8caab5 !important; /* más claro para distinguir del texto */
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none !important;
+  border-color: #00f7ff !important;
+  box-shadow: 0 0 10px #00f7ff !important;
+}
+
+/* Forzar en todos los elementos de formulario */
+.form-control, .form-select, .input, .select {
+  background: rgba(30, 41, 59, 0.85) !important;
+  color: #e0faff !important;
+  border: 1px solid #00eaff !important;
+  border-radius: 8px !important;
+  padding: 8px 12px !important;
+}
+
+.form-control:focus, .form-select:focus, .input:focus, .select:focus {
+  outline: none !important;
+  border-color: #00f7ff !important;
+  box-shadow: 0 0 10px #00f7ff !important;
+}
