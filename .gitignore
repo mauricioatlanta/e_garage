@@ -117,3 +117,6 @@ db.sqlite3.backup_*
 _backup_*/
 _ARCHIVE_OUTSIDE_REPO/
 
+
+# --- Cleanup/temporary folders ---
+Z_BORRAR_DUPLICADOS/
