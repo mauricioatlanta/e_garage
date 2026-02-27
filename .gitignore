@@ -120,3 +120,9 @@ _ARCHIVE_OUTSIDE_REPO/
 
 # --- Cleanup/temporary folders ---
 Z_BORRAR_DUPLICADOS/
+
+# --- Backups / legacy artifacts ---
+_backup/
+backup_static_cleanup/
+*.zip
+
