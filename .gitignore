@@ -126,3 +126,8 @@ _backup/
 backup_static_cleanup/
 *.zip
 
+
+# --- Collected static files (STATIC_ROOT) ---
+static/
+staticfiles/
+
