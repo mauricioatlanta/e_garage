@@ -1,0 +1,83 @@
+.galaxy-bg {
+  background: url('../img/galaxy.png') no-repeat center center fixed;
+  background-size: cover;
+  min-height: 100vh;
+}
+
+.translucent-card {
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 1rem;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 32px rgba(0, 0, 0, 0.3);
+}
+
+.btn-futuristic {
+  background: linear-gradient(135deg, #00f2fe 0%, #4facfe 100%);
+  color: black;
+  padding: 0.75rem 2rem;
+  font-weight: bold;
+  border-radius: 9999px;
+  text-decoration: none;
+  transition: transform 0.3s ease;
+}
+
+.btn-futuristic:hover {
+  transform: scale(1.05);
+}
+
+/* --- Toast notifications (SaaS premium, neon) --- */
+#egarage-toast-container {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: min(380px, calc(100vw - 40px));
+  pointer-events: none;
+}
+
+.toast-notification {
+  position: relative;
+  color: #fff;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  line-height: 1.4;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.35);
+  animation: toast-fade-out 4s forwards;
+  pointer-events: auto;
+}
+
+.toast-notification.toast-success {
+  background: linear-gradient(90deg, #00f5ff, #7b2ff7);
+  box-shadow: 0 0 15px rgba(0, 245, 255, 0.5), 0 0 25px rgba(123, 47, 247, 0.3);
+}
+
+.toast-notification.toast-error {
+  background: linear-gradient(90deg, #ff3366, #7b2ff7);
+  box-shadow: 0 0 15px rgba(255, 51, 102, 0.5), 0 0 25px rgba(123, 47, 247, 0.3);
+}
+
+.toast-notification.toast-warning {
+  background: linear-gradient(90deg, #ffaa00, #ff6600);
+  box-shadow: 0 0 15px rgba(255, 170, 0, 0.5);
+}
+
+.toast-notification.toast-info {
+  background: linear-gradient(90deg, #00d4ff, #4facfe);
+  box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+}
+
+.toast-notification.toast-danger {
+  background: linear-gradient(90deg, #ff3366, #7b2ff7);
+  box-shadow: 0 0 15px rgba(255, 51, 102, 0.5), 0 0 25px rgba(123, 47, 247, 0.3);
+}
+
+@keyframes toast-fade-out {
+  0% { opacity: 1; transform: translateX(0); }
+  80% { opacity: 1; transform: translateX(0); }
+  100% { opacity: 0; transform: translateX(20px); }
+}
