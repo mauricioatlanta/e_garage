@@ -84,3 +84,8 @@ Desktop.ini
 static/manifest.json
 static/service-worker.js
 static/css/galaxy_theme.css
+
+# --- Environment files (DO NOT COMMIT) ---
+.env.prod
+.env.systemd
+.env.*
