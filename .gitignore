@@ -131,3 +131,8 @@ backup_static_cleanup/
 static/
 staticfiles/
 
+
+# --- Allow source static inside app (NOT collected static root) ---
+!taller/static/
+!taller/static/**
+
