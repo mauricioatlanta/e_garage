@@ -46,6 +46,11 @@ db.sqlite3.*
 staticfiles/
 media/
 
+# static/ como fuente pero sin PWA ahí
+static/manifest.json
+static/service-worker.js
+static/css/galaxy_theme.css
+
 # Test / tooling caches
 .pytest_cache/
 .mypy_cache/
@@ -62,32 +67,6 @@ diagnostico_*.py
 corregir_*.py
 CREDENCIALES_PRUEBA.md
 eg_cl_demo_20251115.json
-<<<<<<< HEAD
-=======
-
-# Local DB backups
-*.BACKUP.*
-
-# Python
-__pycache__/
-*.pyc
-*.pyo
-
-# Django / local DBs
-db.sqlite3
-*.sqlite3
-
-# Django collectstatic output (normalmente NO se versiona)
-staticfiles/
-
-# caches / tooling
-.aider.tags.cache.v4/
-
-# backups
-*.BAK_*
-# eGarage local backups (ej. signup.html.bak_20250124_HHmmss)
-*.bak_*
->>>>>>> 1de6e716 (chore: ignore local .bak_* template backups)
 scripts/deploy_rapido.sh
 
 # Local backups / archives
@@ -101,38 +80,7 @@ legacy_templates/
 Thumbs.db
 Desktop.ini
 
-# --- Runtime / server artifacts ---
-*.swp
-*.swo
-*.log
-logs/
-db.sqlite3
-db.sqlite3.backup_*
-*.sqlite3.backup_*
-*.sqlite3-journal
-
-# Backups sueltos
-*.bak
-*.bak_*
-_backup_*/
-_ARCHIVE_OUTSIDE_REPO/
-
-
-# --- Cleanup/temporary folders ---
-Z_BORRAR_DUPLICADOS/
-
-# --- Backups / legacy artifacts ---
-_backup/
-backup_static_cleanup/
-*.zip
-
-
-# --- Collected static files (STATIC_ROOT) ---
-static/
-staticfiles/
-
-
-# --- Allow source static inside app (NOT collected static root) ---
-!taller/static/
-!taller/static/**
-
+# static/ como fuente pero sin PWA ahi
+static/manifest.json
+static/service-worker.js
+static/css/galaxy_theme.css
