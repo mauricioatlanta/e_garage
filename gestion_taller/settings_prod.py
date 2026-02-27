@@ -7,6 +7,13 @@ from django.core.exceptions import ImproperlyConfigured
 
 from .settings import *  # noqa: F401,F403
 
+# --- load /srv/egarage/.env.prod into os.environ (for manage.py CLI) ---
+try:
+    from dotenv import load_dotenv
+    load_dotenv('/srv/egarage/.env.prod', override=False)
+except Exception:
+    pass
+
 # =============================================================================
 # SECRET_KEY (obligatorio en producción - evita W009)
 # =============================================================================
