@@ -17,7 +17,12 @@ fi
 
 if [[ -f "$ENV_FILE" ]]; then
   set -a
-  source "$ENV_FILE"
+  while IFS= read -r line; do
+    [[ -z "$line" || "$line" =~ ^[[:space:]]*# ]] && continue
+    if [[ "$line" =~ ^[A-Za-z_][A-Za-z0-9_]*= ]]; then
+      export "$line"
+    fi
+  done < "$ENV_FILE"
   set +a
 else
   echo "Aviso: no existe $ENV_FILE (variables de prod no cargadas)" >&2

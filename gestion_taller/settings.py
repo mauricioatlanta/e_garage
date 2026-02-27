@@ -1,6 +1,22 @@
 import os
+import sys
 import logging
 from pathlib import Path
+
+# ---------- CRÍTICO: Configurar encoding UTF-8 ANTES de cualquier otra cosa ----------
+# Windows: forzar UTF-8 en stdout/stderr para evitar UnicodeEncodeError con emojis
+if os.name == "nt":  # Windows
+    os.environ.setdefault("PYTHONUTF8", "1")
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+    if hasattr(sys.stderr, "reconfigure"):
+        try:
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
 
 # ---------- CRÍTICO: Importar parche de base de datos ANTES de cualquier otra cosa ----------
 # Esto debe ejecutarse ANTES de cargar dotenv o importar Django
@@ -187,7 +203,7 @@ ACCOUNT_FORMS = {
     "signup": "taller.forms.custom_signup.CustomSignupForm",
 }
 
-LOGIN_URL = "/cl/accounts/login/"
+LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/logout-redirect/"
 
@@ -234,9 +250,15 @@ INSTALLED_APPS = [
     "django.contrib.sites",
 ]
 
-# Agregar marketplace condicionalmente si el feature flag está habilitado
+# Agregar marketplace condicionalmente si el feature flag está habilitado Y el módulo existe
+# (evita ModuleNotFoundError en servidores donde marketplace no está desplegado)
+# Comprobamos marketplace.apps para asegurar que existe la app completa, no solo un módulo homónimo
 if EGARAGE_ENABLE_MARKETPLACE:
-    INSTALLED_APPS.append("marketplace.apps.MarketplaceConfig")
+    try:
+        import marketplace.apps  # noqa: F401
+        INSTALLED_APPS.append("marketplace.apps.MarketplaceConfig")
+    except (ImportError, ModuleNotFoundError):
+        pass
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = ["bootstrap5"]
 CRISPY_TEMPLATE_PACK = "bootstrap5"
@@ -254,12 +276,13 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    "taller.middleware.force_accounts_to_cl.ForceAccountsToCLMiddleware",
-    "django.middleware.locale.LocaleMiddleware",
+    # "taller.middleware.force_accounts_to_cl.ForceAccountsToCLMiddleware",  # DESHABILITADO - Módulo no existe en repo (rompía prod 502)
     "taller.middleware.fix_allowed_hosts.FixAllowedHostsMiddleware",  # FIX: Forzar ALLOWED_HOSTS antes de CommonMiddleware
     "django.middleware.common.CommonMiddleware",
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "taller.middleware.login_country_fix.FixLoginCountryRedirectMiddleware",
     "taller.middleware.rate_limiting.RateLimitMiddleware",
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
     "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
@@ -331,9 +354,30 @@ TEMPLATES = [
 ]
 
 # ---------- DB ----------
-# Base de datos - PostgreSQL si hay DATABASE_URL, SQLite por defecto
-if os.getenv("DATABASE_URL"):
-    database_url = os.getenv("DATABASE_URL")
+# Base de datos: SQLite si DATABASE_URL es sqlite://..., PostgreSQL si postgres://..., SQLite por defecto
+# Orden: 1) DATABASE_URL sqlite → SQLite explícito  2) DATABASE_URL postgres → Postgres  3) DB_NAME+password → Postgres  4) fallback SQLite
+_database_url = (os.getenv("DATABASE_URL") or "").strip()
+
+if _database_url and _database_url.lower().startswith("sqlite"):
+    # SQLite explícito: no depender de dj_database_url; soportar sqlite:///path y sqlite:////absolute/path
+    import urllib.parse
+
+    _parsed = urllib.parse.urlparse(_database_url)
+    _path = (_parsed.path or "").strip()
+    if _path.startswith("//"):
+        _path = "/" + _path.lstrip("/")
+    if not _path:
+        _path = str(BASE_DIR / "data" / "db.sqlite3")
+    elif not os.path.isabs(_path):
+        _path = str(BASE_DIR / _path.lstrip("/"))
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": _path,
+        }
+    }
+elif _database_url:
+    database_url = _database_url
 
     # Si es PostgreSQL y es localhost, agregar sslmode=disable a la URL
     if "postgres" in database_url.lower() or "postgresql" in database_url.lower():
@@ -426,8 +470,10 @@ if os.getenv("DATABASE_URL"):
                     "NAME": BASE_DIR / "db.sqlite3",
                 }
             }
-elif os.getenv("DJANGO_DB_NAME") or os.getenv("DB_NAME"):
-    # PostgreSQL con configuración desde variables de entorno individuales
+elif (os.getenv("DJANGO_DB_NAME") or os.getenv("DB_NAME")) and (
+    os.getenv("DJANGO_DB_PASSWORD") or os.getenv("DB_PASSWORD")
+):
+    # PostgreSQL solo si hay DB_NAME Y contraseña (evita "fe_sendauth: no password supplied")
     db_host = os.getenv("DJANGO_DB_HOST") or os.getenv(
         "DB_HOST", "127.0.0.1"
     )  # Default a 127.0.0.1, no localhost
@@ -479,11 +525,27 @@ elif os.getenv("DJANGO_DB_NAME") or os.getenv("DB_NAME"):
 
     DATABASES = {"default": db_config}
 else:
-    # SQLite por defecto
+    # SQLite por defecto (sin DATABASE_URL o sin Postgres con contraseña)
+    _sqlite_name = os.getenv("SQLITE_PATH", str(BASE_DIR / "data" / "db.sqlite3"))
+    if not os.path.isabs(_sqlite_name):
+        _sqlite_name = str(BASE_DIR / _sqlite_name.lstrip("/"))
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",  # Ruta relativa al proyecto
+            "NAME": _sqlite_name,
+        }
+    }
+
+# ---------- Safeguard: nunca usar PostgreSQL sin contraseña (evita fe_sendauth) ----------
+_db_default = DATABASES.get("default", {})
+if _db_default.get("ENGINE") == "django.db.backends.postgresql" and not _db_default.get("PASSWORD"):
+    _sqlite_fallback = os.getenv("SQLITE_PATH", str(BASE_DIR / "data" / "db.sqlite3"))
+    if not os.path.isabs(_sqlite_fallback):
+        _sqlite_fallback = str(BASE_DIR / _sqlite_fallback.lstrip("/"))
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": _sqlite_fallback,
         }
     }
 
@@ -568,7 +630,7 @@ EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
 EMAIL_HOST_USER = SUPPORT_EMAIL
 DEFAULT_FROM_EMAIL = f"eGarage <{SUPPORT_EMAIL}>"
-EMAIL_TIMEOUT = 30
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))  # evita cuelgue SMTP / worker timeout
 
 _email_pwd = os.getenv("EMAIL_HOST_PASSWORD")
 if _email_pwd:
@@ -623,15 +685,59 @@ if SENTRY_DSN and not DEBUG:
         logger.error(f"❌ Failed to initialize Sentry: {e}")
 
 # ---------- Logging básico ----------
+# Windows: Configurar encoding UTF-8 para evitar errores con emojis
+if os.name == "nt":  # Windows
+    # Asegurar que stdout/stderr usen UTF-8
+    if hasattr(sys.stdout, "reconfigure"):
+        try:
+            sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+    if hasattr(sys.stderr, "reconfigure"):
+        try:
+            sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "handlers": {"console": {"class": "logging.StreamHandler"}},
+    "formatters": {
+        "default": {
+            "format": "%(levelname)s %(asctime)s %(name)s %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "stream": sys.stderr,
+            "formatter": "default",
+        }
+    },
     "root": {"handlers": ["console"], "level": "INFO" if not DEBUG else "DEBUG"},
     "loggers": {
         "django.security.DisallowedHost": {
             "handlers": ["console"],
             "level": "ERROR",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "django.utils.autoreload": {
+            "handlers": ["console"],
+            "level": "WARNING",
+            "propagate": False,
+        },
+        "taller": {
+            "handlers": ["console"],
+            "level": "INFO",
+        },
+        "watchdog.observers": {
+            "handlers": ["console"],
+            "level": "WARNING",
             "propagate": False,
         },
     },

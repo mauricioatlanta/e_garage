@@ -53,6 +53,8 @@ SECURE_SSL_REDIRECT = True
 # Cookies seguras
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
 
@@ -72,31 +74,58 @@ SECURE_HSTS_PRELOAD = True
 
 # =========================
 # Database (PROD)
-# Prefer DATABASE_URL if provided (e.g. sqlite), else fallback to Postgres env defaults
+# 1) DATABASE_URL sqlite → SQLite  2) DATABASE_URL postgres + password → Postgres  3) Else → SQLite (evita fe_sendauth sin password)
 # =========================
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "")
+DATABASE_URL = (os.getenv("DATABASE_URL") or "").strip()
 
-if DATABASE_URL.startswith("sqlite:"):
-    # sqlite:////absolute/path.db
-    db_path = DATABASE_URL.replace("sqlite:///", "/", 1)
+if DATABASE_URL.startswith("sqlite"):
+    # sqlite:///path o sqlite:////absolute/path
+    import urllib.parse
+
+    _u = urllib.parse.urlparse(DATABASE_URL)
+    db_path = (_u.path or "").strip()
+    if db_path.startswith("//"):
+        db_path = "/" + db_path.lstrip("/")
+    if not db_path or not os.path.isabs(db_path):
+        db_path = str(BASE_DIR / (db_path or "data/db.sqlite3"))
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": db_path,
         }
     }
-else:
+elif (
+    DATABASE_URL
+    and ("postgres" in DATABASE_URL.lower())
+    and (os.getenv("DB_PASSWORD") or os.getenv("DJANGO_DB_PASSWORD"))
+):
+    # PostgreSQL solo si hay URL Y contraseña (evita "no password supplied")
+    import dj_database_url
+
+    DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
+elif os.getenv("DB_PASSWORD") or os.getenv("DJANGO_DB_PASSWORD"):
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": os.getenv("DB_NAME", "egarage_prod"),
             "USER": os.getenv("DB_USER", "egarage_user"),
-            "PASSWORD": os.getenv("DB_PASSWORD", ""),
+            "PASSWORD": os.getenv("DB_PASSWORD") or os.getenv("DJANGO_DB_PASSWORD"),
             "HOST": os.getenv("DB_HOST", "127.0.0.1"),
             "PORT": os.getenv("DB_PORT", "5432"),
             "OPTIONS": {"sslmode": os.getenv("DB_SSLMODE", "disable")},
+        }
+    }
+else:
+    # Sin DATABASE_URL o sin contraseña Postgres → SQLite (evita intentar Postgres y fallar)
+    _sqlite_path = os.getenv("SQLITE_PATH", "/srv/egarage/data/db.sqlite3")
+    if not os.path.isabs(_sqlite_path):
+        _sqlite_path = str(BASE_DIR / _sqlite_path.lstrip("/"))
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": _sqlite_path,
         }
     }
 
@@ -192,6 +221,8 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
 EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@egarage.cl")
+# Email: evita que se cuelgue y mate el worker (Gunicorn timeout)
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))  # segundos
 
 # =============================================================================
 # ARCHIVOS ESTÁTICOS

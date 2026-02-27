@@ -83,6 +83,14 @@ from taller.views_extra.registro_exitoso import registro_exitoso
 from taller.views_extra.signup_redirects import signup_redirect
 from taller.views_health import health_check, health_simple
 
+try:
+    from taller.views_extra.compat_redirects import compat_settings_redirect
+except ModuleNotFoundError:
+    # Fallback si el módulo no está desplegado (ej. deploy incompleto)
+    def compat_settings_redirect(request):
+        from django.http import HttpResponseRedirect
+        return HttpResponseRedirect("/cl/es/settings/#financial")
+
 # Importar vista de suscripción bloqueada
 from taller.views_extra.suscripcion import registro, suscripcion_bloqueada
 from taller.views_extra.admin_suscriptores import (
@@ -92,17 +100,22 @@ from taller.views_extra.admin_suscriptores import (
     actualizar_telefono_ajax,
 )
 
-# Forzar importación del admin de WhatsApp para que se registre
-# Capturamos cualquier excepción para que no rompa el admin si hay problemas
+# Forzar importación del admin de WhatsApp (app top-level whatsapp) solo si está desplegado
+# Evita el warning "No se pudieron importar los modelos de WhatsApp" cuando la app no existe en el servidor
 try:
+    import whatsapp.models  # noqa: F401 — comprobar que la app completa existe
     import whatsapp.admin  # noqa: F401
-except Exception:
-    # Silenciosamente ignorar errores de importación para no romper el admin
+except (ImportError, ModuleNotFoundError):
     pass
 
 # Importar vistas de trial
 from taller.views_extra.views_trial import registro_trial
 from taller.views_extra.views_trial_activate import activar_trial
+from taller.views_extra.views_suscripciones import (
+    precios,
+    subir_comprobante,
+    suspension,
+)
 
 # gestion_taller/urls.py — archivo raíz de URLs con migración a países
 
@@ -145,6 +158,7 @@ def redirect_to_home(request):
 def redirect_qs(to):
     def view(request, **kwargs):
         params = request.GET.copy()
+        params.pop("country", None)  # país en path, no en GET
         # Si hay kwargs (por ejemplo, uidb36, key), formatear la URL
         url = to.format(**kwargs) if kwargs else to
         if params:
@@ -227,6 +241,10 @@ urlpatterns = [
     path("activar/", activar_trial, name="activar_trial_short"),
     # URL de registro general
     path("registro/", registro, name="registro"),
+    # Suspensión por suscripción vencida (bloqueo desde middleware)
+    path("suspension/", suspension, name="suspension"),
+    path("comprobante-pago/", subir_comprobante, name="subir_comprobante"),
+    path("precios/", precios, name="precios"),
     # Contacto de ventas
     path(
         "contacto-ventas/",
@@ -253,7 +271,7 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # Wrappers country-aware para login y signup
     path("cl/accounts/login/", country_aware_login, name="account_login_cl"),
-    path("us/accounts/login/", redirect_qs("/accounts/login/")),
+    path("us/accounts/login/", country_aware_login, name="account_login_us"),
     path("co/accounts/login/", country_aware_login, name="account_login_co"),
     path("ec/accounts/login/", country_aware_login, name="account_login_ec"),
     path("pe/accounts/login/", country_aware_login, name="account_login_pe"),
@@ -380,23 +398,29 @@ urlpatterns = [
         TemplateView.as_view(template_name="legal.html"),
         name="legal",
     ),
-    # 🇦🇷 Argentina (usa rutas tipo Chile)
-    path(
-        "ar/",
-        include(("taller.urls_extra.argentina", "argentina"), namespace="argentina"),
-    ),
     # 🇺🇾 Uruguay (usa rutas tipo Chile)
     path(
         "uy/",
         include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
     ),
-    # 🇺🇸 USA - Unificado (contiene en/ y es/ dentro)
-    # Nota: taller.urls_extra.usa ya incluye rutas con prefijos en/ y es/ internamente
+    # 🇺🇸 USA - Montes reales para /us/en/ y /us/es/ (ANTES de us/ y de RedirectViews)
+    path(
+        "us/en/",
+        include(("taller.urls", "taller"), namespace="us_en"),
+    ),
+    path(
+        "us/es/",
+        include(("taller.urls", "taller"), namespace="us_es"),
+    ),
+    # 🇺🇸 USA - Accounts (Allauth) para login/reset/signup bajo /us/en/ y /us/es/
+    path("us/en/accounts/", include("allauth.urls")),
+    path("us/es/accounts/", include("allauth.urls")),
+    # 🇺🇸 USA - Unificado (contiene rutas raíz /us/ sin prefijo de idioma)
     path(
         "us/",
         include(("taller.urls_extra.usa", "usa"), namespace="usa"),
     ),
-    # 🇨🇱 Chile - Español
+    # 🇨🇱 Chile - Español (settings resuelve vía include: chile:company_settings → /cl/es/settings/)
     path(
         "cl/es/",
         include(("taller.urls_extra.chile", "chile"), namespace="chile"),
@@ -430,11 +454,6 @@ urlpatterns = [
     path(
         "br/",
         include(("taller.urls_extra.brasil", "brasil"), namespace="brasil"),
-    ),
-    # 🇦🇷 Argentina - Español
-    path(
-        "ar/es/",
-        include(("taller.urls_extra.argentina", "argentina"), namespace="argentina_es"),
     ),
     # 🇺🇾 Uruguay - Español
     path(
@@ -540,6 +559,9 @@ urlpatterns = [
     # ),
     # Si agregas más combinaciones, repite este patrón: un solo include por prefijo.
     # path("taller/", include(("taller.urls", "taller"), namespace="taller")),  # ELIMINADO: URLs sin prefijo de país
+    # Compatibilidad: /compat/settings/ → redirect limpio a /cl/es/settings/#financial
+    # (evita que el middleware de país mande al login; ruta específica ANTES del include)
+    path("compat/settings/", compat_settings_redirect, name="compat_settings_redirect"),
     # Compatibilidad: reexponer namespace 'taller' para widgets antiguos (DAL, etc.)
     path(
         "compat/",
@@ -560,7 +582,7 @@ urlpatterns = [
     # Comentado temporalmente si el módulo no existe en el servidor
     # path(
     #     "publico/",
-    #     include(("taller.urls_modules.publico_urls", "publico"), namespace="publico"),
+    #     include(("taller.urls_extra.publico_urls", "publico"), namespace="publico"),
     # ),
     # Redirección de documentos sin país a Chile por defecto
     path(
@@ -652,7 +674,7 @@ urlpatterns = [
     # Redirect para URLs antiguas de taller/settings
     path(
         "taller/settings/",
-        RedirectView.as_view(url="/cl/configuracion/", permanent=False),
+        RedirectView.as_view(url="/cl/es/settings/", permanent=False),
         name="taller_settings_redirect_legacy",
     ),
     # Redirect para URLs antiguas de taller/centro-operaciones-espacial
@@ -670,7 +692,7 @@ urlpatterns = [
     # Redirect específico para USA
     path(
         "us/taller/settings/",
-        RedirectView.as_view(url="/us/configuracion/", permanent=False),
+        RedirectView.as_view(url="/us/settings/", permanent=False),
         name="usa_taller_settings_redirect",
     ),
     # Diagnóstico temporal (REMOVER EN PRODUCCIÓN)
@@ -718,18 +740,34 @@ urlpatterns = [
     ),
 ]
 
-# Marketplace (deshabilitado si no está instalado)
-# Para habilitar: instalar app marketplace y su urls.py
-# Luego descomentar y configurar EGARAGE_ENABLE_MARKETPLACE en settings
-# if getattr(settings, "EGARAGE_ENABLE_MARKETPLACE", False):
-#     try:
-#         urlpatterns += [
-#             path("marketplace/", include(("marketplace.urls", "marketplace"), namespace="marketplace")),
-#         ]
-#     except (ImportError, ModuleNotFoundError):
-#         # Silenciosamente ignorar si marketplace no está instalado
-#         pass
-# (por ahora se omite para evitar crash en migrate)
+# Marketplace: solo se agregan URLs si el módulo existe (evita ModuleNotFoundError en servidor)
+if getattr(settings, "EGARAGE_ENABLE_MARKETPLACE", False):
+    try:
+        urlpatterns += [
+            path("marketplace/", include(("marketplace.urls", "marketplace"), namespace="marketplace")),
+        ]
+    except (ImportError, ModuleNotFoundError):
+        pass
+
+# 🇦🇷 Argentina - URLs protegidas con try/except para que un error no tumbe toda la app
+try:
+    urlpatterns += [
+        path(
+            "ar/",
+            include(("taller.urls_extra.argentina", "argentina"), namespace="argentina"),
+        ),
+        path(
+            "ar/es/",
+            include(("taller.urls_extra.argentina", "argentina"), namespace="argentina_es"),
+        ),
+    ]
+except Exception as e:
+    import logging
+
+    logger = logging.getLogger(__name__)
+    logger.error(f"Error al cargar URLs de Argentina: {e}", exc_info=True)
+    # Continuar sin las URLs de Argentina para que el resto de la app funcione
+    pass
 
 if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

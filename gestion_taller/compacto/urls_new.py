@@ -46,6 +46,7 @@ def redirect_to_home(request):
 def redirect_qs(to):
     def view(request, **kwargs):
         params = request.GET.copy()
+        params.pop("country", None)  # país en path, no en GET
         # Si hay kwargs (por ejemplo, uidb36, key), formatear la URL
         url = to.format(**kwargs) if kwargs else to
         if params:

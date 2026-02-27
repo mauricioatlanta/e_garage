@@ -127,9 +127,9 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
-    # LocaleMiddleware debe ir DESPUÉS de SessionMiddleware
-    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
+    # LocaleMiddleware después de Session y Common (content-language consistente con prefijo /us/en/)
+    "django.middleware.locale.LocaleMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     # País/empresa (provee request.empresa / request.empresa.pais)
@@ -265,6 +265,7 @@ EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", True)
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
 EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "subscription@egarage.cl")
 DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "eGarage <subscription@egarage.cl>")
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "10"))  # evita cuelgue SMTP / worker timeout
 
 # En dev, evita KeyError; en prod exige la var.
 _email_pwd = os.getenv("EMAIL_PASSWORD")

@@ -31,6 +31,13 @@ from taller.views_extra.views_trial import registro_trial
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.views_health import health_check, health_simple
 
+try:
+    from taller.views_extra.compat_redirects import compat_settings_redirect
+except ModuleNotFoundError:
+    def compat_settings_redirect(request):
+        from django.http import HttpResponseRedirect
+        return HttpResponseRedirect("/cl/es/settings/#financial")
+
 # gestion_taller/urls.py — archivo raíz de URLs con migración a países
 
 
@@ -62,6 +69,7 @@ def redirect_to_home(request):
 def redirect_qs(to):
     def view(request, **kwargs):
         params = request.GET.copy()
+        params.pop("country", None)  # país en path, no en GET
         # Si hay kwargs (por ejemplo, uidb36, key), formatear la URL
         url = to.format(**kwargs) if kwargs else to
         if params:
@@ -309,6 +317,8 @@ urlpatterns = [
     # ),
     # Si agregas más combinaciones, repite este patrón: un solo include por prefijo.
     # path("taller/", include(("taller.urls", "taller"), namespace="taller")),  # ELIMINADO: URLs sin prefijo de país
+    # Compatibilidad: /compat/settings/ → redirect limpio a /cl/es/settings/#financial
+    path("compat/settings/", compat_settings_redirect, name="compat_settings_redirect"),
     # Compatibilidad: reexponer namespace 'taller' para widgets antiguos (DAL, etc.)
     path(
         "compat/",
@@ -370,7 +380,7 @@ urlpatterns = [
     # Redirect para URLs antiguas de taller/settings
     path(
         "taller/settings/",
-        RedirectView.as_view(url="/cl/configuracion/", permanent=False),
+        RedirectView.as_view(url="/cl/es/settings/", permanent=False),
         name="taller_settings_redirect_legacy",
     ),
     # Redirect para URLs antiguas de taller/centro-operaciones-espacial
@@ -388,7 +398,7 @@ urlpatterns = [
     # Redirect específico para USA
     path(
         "us/taller/settings/",
-        RedirectView.as_view(url="/us/configuracion/", permanent=False),
+        RedirectView.as_view(url="/us/settings/", permanent=False),
         name="usa_taller_settings_redirect",
     ),
     # Suscripción bloqueada - disponible globalmente

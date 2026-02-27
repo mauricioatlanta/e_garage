@@ -164,23 +164,96 @@ class ClienteDetailView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
 
 class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
-    def get_success_url(self):
-        from django.urls import reverse
+    SESSION_NEXT_KEY = "clientes_create_next"
 
-        # Obtener el país de la empresa del usuario
+    def dispatch(self, request, *args, **kwargs):
+        # Asegurar que la empresa existe (antes lo hacía el FBV shim)
+        from taller.utils.empresa import get_or_create_empresa
+
+        get_or_create_empresa(request)
+        # Si viene next en GET, guardarlo en sesión (fallback robusto si el hidden falta o se pierde)
+        next_url = (request.GET.get("next") or "").strip()
+        if next_url:
+            request.session[self.SESSION_NEXT_KEY] = next_url
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_success_url(self):
+        from urllib.parse import unquote
+
+        from django.urls import reverse
+        from django.utils.http import url_has_allowed_host_and_scheme
+
+        # 1) POST, 2) GET, 3) SESSION (fallback robusto si el template no envió el hidden)
+        raw_next = (
+            self.request.POST.get("next")
+            or self.request.GET.get("next")
+            or self.request.session.pop(self.SESSION_NEXT_KEY, "")
+        ).strip()
+        if raw_next:
+            # Por si quedó doble-encoded o similar
+            next_url = unquote(raw_next).strip()
+
+            # Normalizar "us/..." -> "/us/..."
+            if next_url and not next_url.startswith(("http://", "https://", "/")):
+                next_url = "/" + next_url
+
+            # Validar: permitir relativo seguro o absoluto del mismo host
+            url_to_check = (
+                self.request.build_absolute_uri(next_url)
+                if next_url.startswith("/")
+                else next_url
+            )
+            if url_has_allowed_host_and_scheme(
+                url=url_to_check,
+                allowed_hosts={self.request.get_host()},
+                require_https=self.request.is_secure(),
+            ):
+                # Devolver ruta relativa para redirect (sin origin)
+                if next_url.startswith("/"):
+                    return next_url
+                # Si era absoluta del mismo host, devolver path
+                from urllib.parse import urlparse
+
+                return urlparse(next_url).path or next_url
+
+        # Fallback: lista de clientes según país
         empresa = getattr(self.request.user, "empresa", None)
         if empresa and empresa.pais == "US":
-            # Usuario de USA: redirigir a namespace de USA
             return reverse("usa:taller:clientes:lista_clientes")
-        else:
-            # Usuario de Chile o fallback: redirigir a namespace de Chile
-            return reverse("chile:taller:clientes:lista_clientes")
+        return reverse("chile:taller:clientes:lista_clientes")
 
     def form_valid(self, form):
+        from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+
         from django.db import IntegrityError
+        from django.shortcuts import redirect
 
         try:
-            return super().form_valid(form)
+            self.object = form.save()
+            next_url = self.get_success_url()
+            # Si volvemos al documento, agregar prefill_cliente para autoseleccionar
+            if next_url and "documentos" in next_url:
+                parsed = urlparse(next_url)
+                params = parse_qs(parsed.query, keep_blank_values=True)
+                params["prefill_cliente"] = [str(self.object.pk)]
+
+                # ✅ Enviar datos completos para no depender de AJAX
+                nombre = ""
+                try:
+                    nombre = (getattr(self.object, "nombre_completo", None) or "").strip()
+                except Exception:
+                    nombre = ""
+
+                if not nombre:
+                    nombre = f"{(getattr(self.object, 'nombre', '') or '').strip()} {(getattr(self.object, 'apellido', '') or '').strip()}".strip()
+
+                params["prefill_cliente_nombre"] = [nombre or str(self.object)]
+                params["prefill_cliente_email"] = [getattr(self.object, "email", "") or ""]
+                params["prefill_cliente_telefono"] = [getattr(self.object, "telefono", "") or ""]
+
+                new_query = urlencode(params, doseq=True)
+                next_url = urlunparse(parsed._replace(query=new_query))
+            return redirect(next_url)
         except IntegrityError as e:
             if "taller_cliente.empresa_id, taller_cliente.email" in str(e):
                 form.add_error("email", "Ya existe un cliente con este email para esta empresa.")
@@ -208,6 +281,8 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         empresa = getattr(self.request.user, "empresa", None)
         context["empresa"] = empresa
         context["empresa_actual"] = empresa
+        # Pasar next para que el template lo incluya en el hidden y el POST redirija de vuelta (ej. al formulario de documento)
+        context["next"] = self.request.GET.get("next", "").strip() or None
 
         # Asegurar que el país esté disponible para el template
         pais = None
