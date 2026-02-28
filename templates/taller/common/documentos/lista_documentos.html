@@ -470,10 +470,28 @@
     color: #fff;
   }
 
+  /* Color por tipo de documento (anti-confusión): usa data-tipo en .documento-card */
+  .documento-card[data-tipo="FAC"] {
+    --doc-accent: #00ffff;
+    --doc-accent-rgb: 0, 255, 255;
+  }
+  .documento-card[data-tipo="PRES"] {
+    --doc-accent: #ffd700;
+    --doc-accent-rgb: 255, 215, 0;
+  }
+  .documento-card[data-tipo="OT"] {
+    --doc-accent: #00ff88;
+    --doc-accent-rgb: 0, 255, 136;
+  }
+  .documento-card:not([data-tipo]) {
+    --doc-accent: #00fff7;
+    --doc-accent-rgb: 0, 255, 247;
+  }
+
   .documento-total {
     margin-top: 1rem;
     padding-top: 1rem;
-    border-top: 1px solid rgba(0, 230, 208, 0.2);
+    border-top: 1px solid rgba(var(--doc-accent-rgb, 0, 230, 208), 0.2);
     position: relative;
     z-index: 1;
   }
@@ -490,8 +508,8 @@
     font-family: 'Orbitron', sans-serif;
     font-size: 1.5rem;
     font-weight: 900;
-    color: #00fff7;
-    text-shadow: 0 0 15px rgba(0, 255, 247, 0.6);
+    color: var(--doc-accent, #00fff7);
+    text-shadow: 0 0 15px rgba(var(--doc-accent-rgb, 0, 255, 247), 0.6);
   }
 
   .documento-acciones {
@@ -1185,7 +1203,7 @@
                   <span>→ FAC</span>
                 </a>
                 {% endif %}
-                <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="accion-btn danger" onclick="return confirm('{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Are you sure you want to delete this document?{% else %}¿Estás seguro de eliminar este documento?{% endif %}');">
+                <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="accion-btn danger">
                   <i class="fas fa-trash"></i>
                   <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Delete{% else %}Eliminar{% endif %}</span>
                 </a>

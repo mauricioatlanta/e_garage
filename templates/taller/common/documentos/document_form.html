@@ -5,6 +5,13 @@
 {% load country_url %}
 
 <style>
+/* ==================== COLOR POR TIPO DE DOCUMENTO (evitar confusión) ==================== */
+:root[data-doc-type="FAC"] { --doc-accent: #00ff9f; --doc-accent-rgb: 0, 255, 159; }
+:root[data-doc-type="PRES"] { --doc-accent: #ffb020; --doc-accent-rgb: 255, 176, 32; }
+:root[data-doc-type="OT"] { --doc-accent: #a855f7; --doc-accent-rgb: 168, 85, 247; }
+:root[data-doc-type="BOL"] { --doc-accent: #3b82f6; --doc-accent-rgb: 59, 130, 246; }
+:root:not([data-doc-type]) { --doc-accent: #00f2fe; --doc-accent-rgb: 0, 242, 254; }
+
 /* ==================== ESTILOS OPTIMIZADOS - SIN !important ==================== */
 /* Usando colores personalizados de Tailwind config (neon-cyan, cyber-dark, etc.) */
 
@@ -135,6 +142,19 @@ label.text-cyan-300 {
 .btn-primary:hover, button[type="submit"]:hover {
   box-shadow: 0 0 16px rgba(0, 242, 254, 0.6);
   transform: translateY(-1px);
+}
+
+/* ==================== BARRA DE ACCIONES FIXED (MÓVIL) - safe-area ==================== */
+@media (pointer: coarse) {
+  .eg-doc-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 60;
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    backdrop-filter: blur(10px);
+  }
 }
 
 /* ==================== CLASES REUTILIZABLES PARA BOTONES ==================== */
@@ -407,6 +427,13 @@ input:disabled, select:disabled, textarea:disabled {
   box-shadow: 
     0 0 10px rgba(34, 211, 238, 0.4),
     0 0 0 2px rgba(34, 211, 238, 0.25);
+}
+
+/* Tabs ítems - tab activo visible */
+.eg-tab[aria-selected="true"] {
+  background-color: rgba(34, 211, 238, 0.15);
+  border-color: rgba(34, 211, 238, 0.5);
+  color: #22d3ee;
 }
 </style>
 
@@ -683,41 +710,98 @@ function submitLanguageDoc(lang) {
 {# ✅ Manejo robusto de company_country con múltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-        <form method="post" id="document-form" class="max-w-7xl mx-auto"
+        <form method="post" id="document-form" novalidate class="max-w-7xl mx-auto pb-28 sm:pb-0"
               data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
-              data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
+              data-url-next-number="{{ document_api_base|default:'' }}api/obtener-numero-documento/"
+              data-sales-tax-rate="{{ sales_tax_rate|default:0 }}"
               data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
               data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' app_namespace='' %}"
-              data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
-              data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
+              data-url-repuesto-by-code="{{ document_api_base|default:'' }}api/repuesto-by-code/"
+              data-url-repuesto-search="{{ document_api_base|default:'' }}api/buscar-repuestos/"
               data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
               data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
               data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}">
           {% csrf_token %}
 
-  <!-- System messages - Design System -->
-  {% if messages %}
-    {% for message in messages %}
-      {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Ha iniciado sesión exitosamente" not in message|stringformat:"s" and "Ha cerrado sesión" not in message|stringformat:"s" and "iniciado sesión exitosamente" not in message|stringformat:"s" and "cerrado sesión" not in message|stringformat:"s" and "Logo actualizado exitosamente" not in message|stringformat:"s" and "Tema y colores guardados exitosamente" not in message|stringformat:"s" and "Logo subido exitosamente" not in message|stringformat:"s" and "actualizada exitosamente" not in message|stringformat:"s" %}
-        {% if message.tags == 'success' %}
-        <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">✅</span>
-          <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
+  {# ====== HEADER MÓVIL estilo imagen 2 (sin duplicar campos) ====== #}
+  <div class="sm:hidden mb-4">
+    <div class="flex items-center justify-between gap-3">
+      <button type="button" id="docMobileMenuBtn"
+        class="w-12 h-12 rounded-2xl bg-black/40 border border-cyan-400/20 backdrop-blur flex items-center justify-center text-white z-[90]"
+        aria-label="{% trans 'Open menu' %}">
+        ☰
+      </button>
+
+      <div class="flex-1 text-center">
+        <div class="text-3xl font-extrabold text-cyan-300 drop-shadow-[0_0_20px_rgba(34,211,238,.35)]">
+          {% if es_edicion %}{% trans "Editar Documento" %}{% else %}{% trans "Crear Documento" %}{% endif %}
         </div>
-        {% elif message.tags == 'error' %}
-        <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">❌</span>
-          <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
+        <div class="text-sm text-slate-300">
+          {% if es_edicion %}#{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}{% trans "Nuevo" %}{% endif %}
         </div>
-        {% else %}
-        <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">ℹ️</span>
-          <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
-        </div>
-        {% endif %}
-      {% endif %}
-    {% endfor %}
-  {% endif %}
+      </div>
+
+      <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="w-12 h-12 rounded-2xl bg-black/40 border border-cyan-400/20 backdrop-blur flex items-center justify-center text-white" aria-label="{% trans 'Other Services' %}">
+        🌐
+      </a>
+    </div>
+  </div>
+
+  {# ====== DRAWER MÓVIL (solo navegación) ====== #}
+  <div id="docMobileMenuOverlay" class="hidden sm:hidden fixed inset-0 z-[80] bg-black/60"></div>
+  <aside id="docMobileMenuDrawer"
+    class="sm:hidden fixed top-0 left-0 h-full w-[82%] max-w-sm z-[85]
+           -translate-x-full transition-transform duration-200
+           bg-slate-950/90 backdrop-blur border-r border-cyan-400/20">
+    <div class="p-4 flex items-center justify-between">
+      <div class="text-cyan-200 font-semibold">{% trans "Menú" %}</div>
+      <button id="docMobileMenuClose" type="button"
+        class="px-3 py-2 rounded-xl bg-black/30 border border-cyan-400/20 text-white">✕</button>
+    </div>
+    <nav class="p-4 space-y-2">
+      <a class="block rounded-2xl px-4 py-4 bg-black/30 border border-cyan-400/15 text-slate-100"
+         href="{% country_url 'documentos:lista_documentos' %}">📄 {% trans "Documentos" %}</a>
+      <a class="block rounded-2xl px-4 py-4 bg-black/30 border border-cyan-400/15 text-slate-100"
+         href="{% country_url 'clientes:lista_clientes' %}">👥 {% trans "Clientes" %}</a>
+      <a class="block rounded-2xl px-4 py-4 bg-black/30 border border-cyan-400/15 text-slate-100"
+         href="{% country_url 'vehiculos:lista_vehiculos' %}">🚗 {% trans "Vehículos" %}</a>
+      <a class="block rounded-2xl px-4 py-4 bg-black/30 border border-cyan-400/15 text-slate-100"
+         href="{% country_url 'repuestos:lista_repuestos' %}">🔧 {% trans "Repuestos" %}</a>
+      <a class="block rounded-2xl px-4 py-4 bg-black/30 border border-cyan-400/15 text-slate-100"
+         href="{% country_url 'servicios:servicios_menu' %}">🛠️ {% trans "Servicios" %}</a>
+      <a class="block rounded-2xl px-4 py-4 bg-black/30 border border-cyan-400/15 text-slate-100"
+         href="{% country_url 'servicios:otros_servicios_menu' %}">🌐 {% trans "Other Services" %}</a>
+    </nav>
+  </aside>
+
+  <script>
+  (function () {
+    const btn = document.getElementById("docMobileMenuBtn");
+    const overlay = document.getElementById("docMobileMenuOverlay");
+    const drawer = document.getElementById("docMobileMenuDrawer");
+    const close = document.getElementById("docMobileMenuClose");
+
+    if (!btn || !overlay || !drawer) return;
+
+    const openMenu = () => {
+      overlay.classList.remove("hidden");
+      drawer.classList.remove("-translate-x-full");
+      document.body.classList.add("overflow-hidden");
+    };
+
+    const closeMenu = () => {
+      overlay.classList.add("hidden");
+      drawer.classList.add("-translate-x-full");
+      document.body.classList.remove("overflow-hidden");
+    };
+
+    btn.addEventListener("click", openMenu);
+    overlay.addEventListener("click", closeMenu);
+    close?.addEventListener("click", closeMenu);
+  })();
+  </script>
+
+  {# Mensajes del sistema: toast flotante en base (galaxy_theme) #}
 
   <!-- Validation errors - Design System -->
   {% if form.errors %}
@@ -730,110 +814,195 @@ function submitLanguageDoc(lang) {
     </div>
   {% endif %}
 
-  <!-- Document shell with dynamic theme -->
+  {# ================================
+     LAYOUT MASTER (PC + MÓVIL)
+     - NO DUPLICA IDs
+     ================================ #}
   <div id="doc-shell" class="rounded-2xl p-4 sm:p-6 theme-ot border-2 shadow-lg">
 
-    <!-- Document header -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+  {# ====== GRID PC + Stack móvil (mismo HTML) ====== #}
+  <div class="grid grid-cols-1 sm:grid-cols-12 gap-4 sm:gap-6">
 
-      <!-- Columna 1: FECHA primero + TIPO + NÚMERO -->
-      <div class="space-y-3 sm:space-y-4">
-                <label for="id_fecha_emision" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Issue Date" %}</label>
-                <input id="id_fecha_emision" type="date" name="fecha_emision" class="form-control w-full text-base"
-                       value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
+    {# LEFT (PC: 8 cols / móvil: stack) #}
+    <div class="sm:col-span-8 space-y-4 sm:space-y-6">
 
-        <label for="id_tipo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Document Type" %}</label>
-        {{ form.tipo }}
-
-        <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{{ ui_labels.document_number }}</label>
-        <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-2 sm:py-3 text-sm sm:text-base" id="id_numero">
-          {% if es_edicion and documento.numero_documento %}{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}{% trans "Will be generated automatically" %}{% endif %}
-        </div>
-      </div>
-
-      <!-- Columna 2: Cliente/Vehículo -->
-      <div class="space-y-3 sm:space-y-4">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-          <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Client" %}</label>
-          <button type="button" id="btn-nuevo-cliente" class="btn-green-gradient">
-            ➕ {% trans "New Client" %}
-          </button>
-        </div>
-        <div class="relative">
-          <input type="text" id="cliente-busqueda" class="form-control w-full"
-                 placeholder="{% trans 'Type to search clients...' %}"
-                 autocomplete="off"
-                 oninput="window.handleClienteInput?.(this.value)"
-                 onfocus="window.handleClienteFocus?.(this.value)"
-                 onkeydown="return window.handleClienteKeydown?.(event)">
-          <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+      {# ---------- CARD: Cliente + Vehículo (Bloques 1 y 2) ---------- #}
+      <section class="rounded-2xl bg-slate-900/60 border border-slate-700/80 p-4 sm:p-6 shadow-lg">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-9 h-9 rounded-xl bg-cyan-500/10 border border-cyan-400/20 flex items-center justify-center">✦</div>
+          <div class="text-lg sm:text-xl font-semibold text-cyan-300">{% trans "Cliente y Vehículo" %}</div>
         </div>
 
-        <select id="id_cliente" name="cliente" class="form-select w-full hidden">
-          <option value="">{% trans "Select client..." %}</option>
-        </select>
-
-        <!-- Selected client information -->
-        <div id="cliente-info" class="hidden p-3 bg-cyan-900/20 border border-cyan-400 rounded-lg">
-          <div class="text-cyan-200">
-            <strong id="cliente-nombre"></strong><br>
-            <span id="cliente-email"></span><br>
-            <span id="cliente-telefono"></span>
+        <div class="space-y-4">
+          {# ----- BLOQUE 1: Cliente ----- #}
+          <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+            <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Client" %}</label>
+            <button type="button" id="btn-nuevo-cliente" class="btn-green-gradient">
+              ➕ {% trans "New Client" %}
+            </button>
           </div>
-        </div>
 
-        {% if ui_config.show_vehicle %}
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-          <label for="id_vehiculo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Vehicle" %}</label>
-          <button type="button" id="btn-nuevo-vehiculo" class="btn-green-gradient">
-            ➕ {% trans "New" %}
-          </button>
-        </div>
-        {{ form.vehiculo }}
-        {% endif %}
-      </div>
-
-      <!-- Columna 3: Técnico + Payment Status + Kilometraje -->
-      <div class="space-y-3 sm:space-y-4">
-        {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
-        <label for="id_tecnico_responsable" class="block text-cyan-200 font-semibold text-sm sm:text-base">
-          {{ current_label }}
-        </label>
-        {{ form.tecnico_responsable }}
-        {% endwith %}
-
-        <label for="id_payment_status" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Payment Status" %}</label>
-        {{ form.payment_status }}
-
-        {% if ui_config.show_kilometraje %}
-        <div class="flex flex-col gap-2">
-          <label for="{{ form.kilometraje.id_for_label }}" class="block text-cyan-200 font-semibold text-sm sm:text-base">
-            {% trans "Mileage" %} 
-            {% get_current_language as lang %}
-            {% if lang == 'es' %}(km){% else %}(mi){% endif %}
-          </label>
           <div class="relative">
-            {{ form.kilometraje }}
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-300 font-semibold pointer-events-none">
-              {% get_current_language as lang %}
-              {% if lang == 'es' %}km{% else %}mi{% endif %}
-            </span>
+            <input type="text" id="cliente-busqueda" class="form-control w-full"
+                   placeholder="{% trans 'Type to search clients...' %}"
+                   autocomplete="off"
+                   oninput="window.handleClienteInput?.(this.value)"
+                   onfocus="window.handleClienteFocus?.(this.value)"
+                   onkeydown="return window.handleClienteKeydown?.(event)">
+            <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
           </div>
-          {% if form.kilometraje.errors %}
-            <div class="text-red-400 text-xs italic mt-1 bg-red-900/20 p-2 rounded border border-red-500/50">
-              {{ form.kilometraje.errors.0 }}
+
+          <select id="id_cliente" name="cliente" class="form-select w-full hidden">
+            <option value="">{% trans "Select client..." %}</option>
+          </select>
+
+          <div id="cliente-info" class="hidden p-3 bg-cyan-900/20 border border-cyan-400 rounded-lg">
+            <div class="text-cyan-200">
+              <strong id="cliente-nombre"></strong><br>
+              <span id="cliente-email"></span><br>
+              <span id="cliente-telefono"></span>
             </div>
+          </div>
+
+          {# ----- BLOQUE 2: Vehículo (sin </div> extra) ----- #}
+          {% if ui_config.show_vehicle %}
+          <div id="vehicle-section" class="document-mode-field">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
+              <label for="id_vehiculo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Vehicle" %}</label>
+              <button type="button" id="btn-nuevo-vehiculo" class="btn-green-gradient">
+                ➕ {% trans "New" %}
+              </button>
+            </div>
+            {{ form.vehiculo }}
+          </div>
           {% endif %}
         </div>
-        {% endif %}
-      </div>
-    </div>
+      </section>
 
-    <!-- Dynamic sections -->
-    <div class="space-y-4 sm:space-y-6">
-      <div class="seccion-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
-        <h3 class="text-lg sm:text-xl font-semibold text-cyan-300 mb-4 flex items-center gap-2">🔧 {% trans "Parts & Services" %}</h3>
-        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
+      {# ---------- CARD: Datos del Documento (compacto + ordenado) ---------- #}
+      <section class="rounded-2xl bg-slate-900/60 border border-slate-700/80 p-4 sm:p-6 shadow-lg">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-9 h-9 rounded-xl bg-orange-500/10 border border-orange-400/20 flex items-center justify-center">📦</div>
+          <div class="text-lg sm:text-xl font-semibold text-cyan-300">{% trans "Datos del Documento" %}</div>
+        </div>
+
+        <!-- ===== DATOS DEL DOCUMENTO (compacto + ordenado) ===== -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+
+          <!-- Columna A: Fecha + Tipo + Modo + Número -->
+          <div class="space-y-4">
+
+            <div>
+              <label for="id_fecha_emision" class="block text-cyan-200 font-semibold text-sm sm:text-base">
+                {% trans "Issue Date" %}
+              </label>
+              <input id="id_fecha_emision" type="date" name="fecha_emision"
+                     class="form-control w-full text-base"
+                     value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
+            </div>
+
+            <div>
+              <label for="id_tipo" class="block text-cyan-200 font-semibold text-sm sm:text-base">
+                {% trans "Document Type" %}
+              </label>
+              {{ form.tipo }}
+            </div>
+
+            {% if company_country == 'US' or request.path|slice:":4" == '/us/' %}
+              <div>
+                <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Mode" %}</label>
+                <div class="flex flex-wrap gap-3">
+                  <label class="flex items-center cursor-pointer">
+                    <input type="radio" name="context" value="workshop" checked class="mr-2 accent-cyan-400" id="context_workshop">
+                    <span>{% trans "Workshop" %}</span>
+                  </label>
+                  <label class="flex items-center cursor-pointer">
+                    <input type="radio" name="context" value="parts" class="mr-2 accent-cyan-400" id="context_parts">
+                    <span>{% trans "Parts" %}</span>
+                  </label>
+                </div>
+              </div>
+            {% else %}
+              <input type="hidden" name="context" value="workshop">
+            {% endif %}
+
+            <div>
+              <label class="block text-cyan-200 font-semibold text-sm sm:text-base">
+                {{ ui_labels.document_number }}
+              </label>
+              <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-2 sm:py-3 text-sm sm:text-base"
+                   id="id_numero">
+                {% if es_edicion and documento.numero_documento %}
+                  {{ documento.numero_documento|default:documento.numero|default:documento.id }}
+                {% else %}
+                  {% trans "Will be generated automatically" %}
+                {% endif %}
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Columna B: Técnico + Payment Status + Kilometraje -->
+          <div class="space-y-4">
+
+            <div id="technician-section" class="document-mode-field">
+              {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+                <label for="id_tecnico_responsable" class="block text-cyan-200 font-semibold text-sm sm:text-base">
+                  {{ current_label }}
+                </label>
+                {{ form.tecnico_responsable }}
+              {% endwith %}
+            </div>
+
+            <div>
+              <label for="id_payment_status" class="block text-cyan-200 font-semibold text-sm sm:text-base">
+                {% trans "Payment Status" %}
+              </label>
+              {{ form.payment_status }}
+            </div>
+
+            {% if ui_config.show_kilometraje %}
+              <div>
+                <label for="{{ form.kilometraje.id_for_label }}" class="block text-cyan-200 font-semibold text-sm sm:text-base">
+                  {{ form.kilometraje.label }}
+                </label>
+                {{ form.kilometraje }}
+                {% if form.kilometraje.errors %}
+                  <div class="text-red-400 text-sm mt-1">{{ form.kilometraje.errors.0 }}</div>
+                {% endif %}
+              </div>
+            {% endif %}
+
+          </div>
+
+        </div>
+      </section>
+
+      {# ---------- CARD: Ítems con Tabs horizontales (PC y móvil) ---------- #}
+      <section class="rounded-2xl bg-slate-900/60 border border-slate-700/80 p-4 sm:p-6 shadow-lg">
+        <div class="flex items-center gap-2 mb-4">
+          <div class="w-9 h-9 rounded-xl bg-emerald-500/10 border border-emerald-400/20 flex items-center justify-center">🧾</div>
+          <div class="text-lg sm:text-xl font-semibold text-cyan-300">{% trans "Ítems" %}</div>
+        </div>
+
+        {# Tabs horizontales #}
+        <div class="flex gap-2 p-2 rounded-2xl bg-black/30 border border-cyan-400/15">
+          {% if ui_config.show_repuestos %}
+          <button type="button" class="eg-tab flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-xl border border-transparent text-slate-200"
+                  data-eg-tab="tab-repuestos" aria-selected="true">🔧 {% trans "Repuestos" %}</button>
+          {% endif %}
+          {% if ui_config.show_services %}
+          <button type="button" class="eg-tab flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-xl border border-transparent text-slate-200"
+                  data-eg-tab="tab-servicios" aria-selected="false">🛠️ {% trans "Servicios" %}</button>
+          {% endif %}
+          {% if ui_config.show_otros_servicios %}
+          <button type="button" class="eg-tab flex-1 sm:flex-none px-3 sm:px-4 py-2 rounded-xl border border-transparent text-slate-200"
+                  data-eg-tab="tab-otros" aria-selected="false">🌐 {% trans "Otros" %}</button>
+          {% endif %}
+        </div>
+
+        {# Botones de agregar #}
+        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-4">
           {% if ui_config.show_repuestos %}
           <button type="button" id="add-repuesto" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addRepuestoRow()">+ {% trans "Add Part" %}</button>
           {% endif %}
@@ -843,134 +1012,170 @@ function submitLanguageDoc(lang) {
           {% if ui_config.show_otros_servicios %}
           <button type="button" id="add-otro" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addOtroRow()">+ {% trans "Add Other Services" %}</button>
           {% endif %}
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto text-center">
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="hidden sm:inline-flex btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto text-center">
             🌐 {% trans "Go to Other Services" %}
           </a>
         </div>
 
-        <!-- Parts container -->
-        {% if ui_config.show_repuestos %}
-        <div id="repuestos-container" class="space-y-4">
-          <!-- Dynamic parts will be added here -->
-        </div>
-        {% endif %}
+        {# Panels (SIN DUPLICAR IDs) #}
+        <div class="mt-4 space-y-4">
+          {% if ui_config.show_repuestos %}
+          <div data-eg-panel="tab-repuestos">
+            <div id="repuestos-container" class="space-y-4">
+              <!-- Dynamic parts will be added here -->
+            </div>
+          </div>
+          {% endif %}
 
-        <!-- Services container -->
-        {% if ui_config.show_services %}
-        <div id="servicios-container" class="space-y-4">
-          <!-- Dynamic services will be added here -->
-        </div>
-        {% endif %}
+          {% if ui_config.show_services %}
+          <div data-eg-panel="tab-servicios" class="hidden">
+            <div id="servicios-container" class="space-y-4">
+              <!-- Dynamic services will be added here -->
+            </div>
+          </div>
+          {% endif %}
 
-        <!-- Other services container -->
-        {% if ui_config.show_otros_servicios %}
-        <div id="otros-container" class="space-y-4">
-          <!-- Dynamic other services will be added here -->
+          {% if ui_config.show_otros_servicios %}
+          <div data-eg-panel="tab-otros" class="hidden">
+            <div id="otros-container" class="space-y-4">
+              <!-- Dynamic other services will be added here -->
+            </div>
+          </div>
+          {% endif %}
         </div>
-        {% endif %}
-      </div>
+      </section>
 
-      <!-- Observations -->
-      <div class="observaciones-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
+      {# ---------- CARD: Observations ---------- #}
+      <section class="rounded-2xl bg-slate-900/60 border border-slate-700/80 p-4 sm:p-6 shadow-lg">
         <label for="id_observaciones" class="block text-cyan-200 font-semibold text-sm sm:text-base mb-3">{% trans "Observations" %}</label>
         {{ form.observaciones }}
+      </section>
+
+    </div>
+
+    {# RIGHT (PC: totales sticky + acciones). En móvil cae debajo normal. #}
+    <div class="sm:col-span-4 space-y-4 sm:space-y-6">
+      <div class="sm:sticky sm:top-6 space-y-4 sm:space-y-6">
+
+        {# ----- BLOQUE 4: Totales ----- #}
+        <div class="totales-section rounded-2xl bg-slate-900/60 border border-slate-700/80 p-4 sm:p-6 shadow-lg">
+          <h3 class="text-xl sm:text-2xl font-bold text-cyan-300 mb-4 sm:mb-6 text-center">
+            💰 {% trans "Totals Summary" %}
+          </h3>
+
+          {% if ui_config.tax_lines|length > 0 %}
+          <div class="mb-6 flex justify-center">
+            <label class="flex items-center text-cyan-200 bg-cyan-900/40 px-4 py-2 rounded-lg border border-cyan-400/50 cursor-pointer hover:bg-cyan-900/60 transition-all">
+              <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2 w-5 h-5 accent-cyan-400 cursor-pointer" onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
+              <span class="font-semibold">{% trans "Apply all taxes" %}</span>
+            </label>
+          </div>
+          {% endif %}
+
+          <div class="grid grid-cols-1 gap-4 mb-6">
+            {% if ui_config.show_repuestos %}
+            <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+              <div class="flex justify-between items-center">
+                <span class="text-cyan-200 text-sm font-semibold">{% trans "Parts Subtotal" %}</span>
+                <span id="t_repuestos" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
+              </div>
+            </div>
+            {% endif %}
+            {% if ui_config.show_services %}
+            <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+              <div class="flex justify-between items-center">
+                <span class="text-cyan-200 text-sm font-semibold">{% trans "Services Subtotal" %}</span>
+                <span id="t_servicios" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
+              </div>
+            </div>
+            {% endif %}
+            {% if ui_config.show_otros_servicios %}
+            <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
+              <div class="flex justify-between items-center">
+                <span class="text-cyan-200 text-sm font-semibold">{% trans "Other Services Subtotal" %}</span>
+                <span id="t_otros" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
+              </div>
+            </div>
+            {% endif %}
+            {% for tax_line in ui_config.tax_lines %}
+            <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30 tax-line" data-tax-id="{{ tax_line.id }}">
+              <div class="flex justify-between items-center">
+                <label class="flex items-center text-cyan-200 text-sm font-semibold cursor-pointer">
+                  <input type="checkbox" id="include_{{ tax_line.id }}" checked class="mr-2 w-4 h-4 accent-cyan-400 cursor-pointer tax-checkbox" data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
+                  <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
+                </label>
+                <span id="t_{{ tax_line.id }}" class="text-cyan-300 font-bold text-lg calculated-field" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+          <div class="bg-gradient-to-r from-cyan-600/30 to-blue-600/30 rounded-lg p-5 border-2 border-cyan-400 shadow-xl">
+            <div class="flex justify-between items-center">
+              <span class="text-white font-bold text-xl">{% trans "Grand Total" %}</span>
+              <span id="t_total" class="text-white font-bold text-2xl calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
+            </div>
+          </div>
+        </div>
+
+        {# Acciones PC #}
+        <div class="hidden sm:block rounded-2xl bg-slate-900/60 border border-slate-700/80 p-4 shadow-lg">
+          <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+              <a href="{% country_url 'documentos:lista_documentos' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">← {% trans "Back" %}</a>
+              <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="hidden sm:inline-flex w-full sm:w-auto items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">
+                🌐 {% trans "Go to Other Services" %}
+              </a>
+            </div>
+            <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">💾 {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{{ ui_labels.create_button }}{% endif %}</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <!-- Totals Section - Mejorada y reorganizada -->
-    <div class="totales-section mt-6 sm:mt-8 pt-4 sm:pt-6 border-t-2 border-cyan-500/30">
-      <div class="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 rounded-2xl p-4 sm:p-6 border border-cyan-400/50 shadow-lg">
-        <h3 class="text-xl sm:text-2xl font-bold text-cyan-300 mb-4 sm:mb-6 text-center">
-          💰 {% trans "Totals Summary" %}
-        </h3>
-        
-        {# Checkbox global de aplicar impuestos - Controla todos los checkboxes de tax_lines #}
-        {% if ui_config.tax_lines|length > 0 %}
-        <div class="mb-6 flex justify-center">
-          <label class="flex items-center text-cyan-200 bg-cyan-900/40 px-4 py-2 rounded-lg border border-cyan-400/50 cursor-pointer hover:bg-cyan-900/60 transition-all">
-            <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2 w-5 h-5 accent-cyan-400 cursor-pointer" onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
-            <span class="font-semibold">{% trans "Apply all taxes" %}</span>
-          </label>
-        </div>
-        {% endif %}
+  </div>
 
-        <!-- Totals Grid - Estructura Dinámica Modular -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <!-- Parts Subtotal -->
-          {% if ui_config.show_repuestos %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
-            <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% trans "Parts Subtotal" %}</span>
-              <span id="t_repuestos" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
-            </div>
-          </div>
-          {% endif %}
-          
-          <!-- Services Subtotal -->
-          {% if ui_config.show_services %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
-            <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% trans "Services Subtotal" %}</span>
-              <span id="t_servicios" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
-            </div>
-          </div>
-          {% endif %}
-          
-          <!-- Other Services Subtotal -->
-          {% if ui_config.show_otros_servicios %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
-            <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% trans "Other Services Subtotal" %}</span>
-              <span id="t_otros" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
-            </div>
-          </div>
-          {% endif %}
-          
-          {# Líneas de Impuestos Dinámicas - El template NO sabe qué es IVA o Sales Tax #}
-          {% for tax_line in ui_config.tax_lines %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30 tax-line" data-tax-id="{{ tax_line.id }}">
-            <div class="flex justify-between items-center">
-              <label class="flex items-center text-cyan-200 text-sm font-semibold cursor-pointer">
-                <input type="checkbox" 
-                       id="include_{{ tax_line.id }}" 
-                       checked 
-                       class="mr-2 w-4 h-4 accent-cyan-400 cursor-pointer tax-checkbox"
-                       data-tax-id="{{ tax_line.id }}"
-                       data-tax-rate="{{ tax_line.rate }}">
-                <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
-              </label>
-              <span id="t_{{ tax_line.id }}" class="text-cyan-300 font-bold text-lg calculated-field" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
-            </div>
-          </div>
-          {% endfor %}
-        </div>
+  <script>
+  (function(){
+    const tabs = document.querySelectorAll("[data-eg-tab]");
+    const panels = document.querySelectorAll("[data-eg-panel]");
+    if (!tabs.length) return;
 
-        <!-- Grand Total -->
-        <div class="bg-gradient-to-r from-cyan-600/30 to-blue-600/30 rounded-lg p-5 border-2 border-cyan-400 shadow-xl">
-          <div class="flex justify-between items-center">
-            <span class="text-white font-bold text-xl">{% trans "Grand Total" %}</span>
-            <span id="t_total" class="text-white font-bold text-2xl calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
-          </div>
-        </div>
-      </div>
-    </div>
+    const first = tabs[0]?.dataset.egTab;
 
-    <!-- Action buttons - Design System -->
-    <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-        <a href="{% country_url 'documentos:lista_documentos' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">← {% trans "Back" %}</a>
-        <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">
-          🌐 {% trans "Go to Other Services" %}
-        </a>
-      </div>
-      <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">💾 {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{{ ui_labels.create_button }}{% endif %}</button>
-    </div>
+    function activate(name){
+      tabs.forEach(t => t.setAttribute("aria-selected", t.dataset.egTab === name ? "true" : "false"));
+      panels.forEach(p => p.classList.toggle("hidden", p.dataset.egPanel !== name));
+    }
+
+    tabs.forEach(t => t.addEventListener("click", () => activate(t.dataset.egTab)));
+    if (first) activate(first);
+  })();
+  </script>
   </div>
 
   <!-- Hidden inputs para serializar filas dinámicas -->
   <input type="hidden" name="repuestos_json" id="id_repuestos_json">
   <input type="hidden" name="servicios_json" id="id_servicios_json">
   <input type="hidden" name="otros_json" id="id_otros_json">
+
+  {# --- Sticky action bar (mobile) - sticky evita saltos con teclado/visualViewport en iOS --- #}
+  <div class="eg-doc-actions sm:hidden fixed bottom-0 left-0 right-0 z-[60] w-full bg-slate-950/95 backdrop-blur border-t border-cyan-700/30 px-3 pt-2 pb-3">
+    <div class="flex gap-2">
+      <a href="{% country_url 'documentos:lista_documentos' %}"
+         class="flex-1 inline-flex items-center justify-center px-3 py-3 text-sm font-semibold rounded-xl bg-slate-800/60 border border-slate-600/50 text-slate-200">
+        ← {% trans "Back" %}
+      </a>
+      <button type="submit"
+              class="flex-[2] inline-flex items-center justify-center px-4 py-3 text-sm font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg focus:outline-none focus:ring-2 focus:ring-cyan-400/60">
+        💾 {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{{ ui_labels.create_button }}{% endif %}
+      </button>
+    </div>
+  </div>
+
+  {# Spacer para que el contenido no quede tapado por la barra #}
+  <div class="sm:hidden h-24"></div>
 </form>
 
 {{ clientes_prefetch|json_script:"prefetchClientes" }}
@@ -985,8 +1190,11 @@ function submitLanguageDoc(lang) {
 {% endblock documento_content %}
 
 {% block extra_js %}
+{# 1) jQuery SIEMPRE antes de DAL/autocomplete_light/Select2 (evita "jQuery is not defined") #}
+<script src="{% static 'vendor/jquery/jquery-3.6.0.min.js' %}?v=3.6.0"></script>
+<script>if (typeof window.jQuery !== 'undefined') { window.$ = window.jQuery; }</script>
 {{ block.super }}
-<script src="{% static 'marketplace_tooltip.js' %}"></script>
+<script src="{% static 'marketplace_tooltip.js' %}?v=2.1.5"></script>
 <script>
 function initDocumentFormScript(){
   // Evita doble inicialización
@@ -1005,9 +1213,10 @@ function initDocumentFormScript(){
 
   async function egFetch(url, opts={}){
     const defaults = {
-      credentials: 'same-origin',
+      credentials: 'include',
       headers: {
         'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json',
         'X-CSRFToken': CSRF,
       }
     };
@@ -1027,14 +1236,15 @@ function initDocumentFormScript(){
     EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
   }
   (function(){
-    // Leer endpoints desde data-* attributes del formulario
+    // Leer endpoints y sales tax desde data-* attributes del formulario
     const FORM = document.getElementById('document-form');
     if (FORM) {
       EG.cfg.URL_NEXT_NUMBER        = EG.cfg.URL_NEXT_NUMBER        || FORM.dataset.urlNextNumber;
+      EG.cfg.salesTax               = parseFloat(FORM.dataset.salesTaxRate || '0') || 0;
       EG.cfg.URL_CLIENT_SEARCH      = EG.cfg.URL_CLIENT_SEARCH      || FORM.dataset.urlClientSearch;
       EG.cfg.URL_VEHICULOS_BY_CLI   = EG.cfg.URL_VEHICULOS_BY_CLI   || FORM.dataset.urlVehiculosByCli;
       EG.cfg.URL_REPUESTO_BY_CODE   = EG.cfg.URL_REPUESTO_BY_CODE   || FORM.dataset.urlRepuestoByCode;
-      EG.cfg.URL_REPUESTO_SEARCH   = EG.cfg.URL_REPUESTO_SEARCH   || FORM.dataset.urlRepuestoSearch;
+      EG.cfg.URL_REPUESTO_SEARCH    = EG.cfg.URL_REPUESTO_SEARCH    || FORM.dataset.urlRepuestoSearch;
       EG.cfg.URL_REPUESTO_CREATE   = EG.cfg.URL_REPUESTO_CREATE   || FORM.dataset.urlRepuestoCreate;
       EG.cfg.URL_SERVICE_SEARCH     = EG.cfg.URL_SERVICE_SEARCH     || FORM.dataset.urlServiceSearch;
       EG.cfg.URL_OUTSOURCED_SERVICES= EG.cfg.URL_OUTSOURCED_SERVICES|| FORM.dataset.urlOutsourcedServices;
@@ -1067,10 +1277,59 @@ function initDocumentFormScript(){
     } else {
       EG.cfg.taxLines = [];
     }
+    // Corregir URL si el backend devolvió /us/api/ o /cl/api/ en vez de .../documentos/api/
+    var u = EG.cfg.URL_NEXT_NUMBER || '';
+    if (u.indexOf('/api/') !== -1 && u.indexOf('/documentos/') === -1) {
+      EG.cfg.URL_NEXT_NUMBER = u.replace(/(\/us|\/cl)(\/api\/)/, '$1/documentos/api/');
+      EG.cfg.URL_REPUESTO_SEARCH = (EG.cfg.URL_REPUESTO_SEARCH || '').replace(/(\/us|\/cl)(\/api\/)/, '$1/documentos/api/');
+      EG.cfg.URL_REPUESTO_BY_CODE = (EG.cfg.URL_REPUESTO_BY_CODE || '').replace(/(\/us|\/cl)(\/api\/)/, '$1/documentos/api/');
+    }
   })();
 
   // Exponer seguro
   window.EG = EG;
+
+  // === HELPERS: móvil / DAL / Select2 (evitar reflow/scroll en touch) ===
+  const EG_IS_TOUCH = window.matchMedia?.("(pointer: coarse)")?.matches ?? false;
+
+  function isSelect2Active(el) {
+    const $ = window.jQuery;
+    if (!el) return false;
+    if ($ && $(el).data("select2")) return true;
+    if (el.getAttribute?.("aria-hidden") === "true" && el.nextElementSibling?.classList?.contains("select2")) return true;
+    return false;
+  }
+
+  function withoutAutoFocus(fn) {
+    if (!EG_IS_TOUCH) return fn();
+    let locked = true;
+    const onFocus = (e) => {
+      if (!locked) return;
+      const t = e.target;
+      if (!t) return;
+      if (t.closest?.(".select2") || ["INPUT", "SELECT", "TEXTAREA"].includes(t.tagName)) {
+        t.blur?.();
+      }
+    };
+    window.addEventListener("focusin", onFocus, true);
+    try {
+      return fn();
+    } finally {
+      locked = false;
+      window.removeEventListener("focusin", onFocus, true);
+    }
+  }
+
+  function setSelectValueQuiet(selectEl, value) {
+    if (!selectEl) return;
+    const $ = window.jQuery;
+    if ($ && isSelect2Active(selectEl)) {
+      $(selectEl).val(value || null).trigger("change.select2");
+    } else {
+      selectEl.value = value || "";
+      selectEl.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
 
 // ===============
 // CONFIG ENDPOINTS - Evitar redeclaración
@@ -1158,6 +1417,11 @@ const I18N = {
   type_to_search_services: "{% trans 'Type to search services...' %}",
   type_to_search_parts: "{% trans 'Type to search parts...' %}",
   type_to_search_external: "{% trans 'Type to search external services...' %}",
+  source_customer: "{% trans 'Customer supplied' %}",
+  source_stock: "{% trans 'In stock' %}",
+  source_sourced: "{% trans 'Sourced' %}",
+  customer_part_desc: "{% trans 'Description' %}",
+  customer_part_notes: "{% trans 'Notes' %}",
   no_parts: "{% trans 'No parts found' %}",
   no_external_services: "{% trans 'No external services found' %}",
   external_company: "{% trans 'External Company' %}",
@@ -1196,6 +1460,11 @@ if (COUNTRY_REF === 'CL') {
     type_to_search_services: "Escribe para buscar servicios…",
     type_to_search_parts: "Escribe para buscar repuestos…",
     type_to_search_external: "Escribe para buscar servicios externos…",
+    source_customer: "Customer supplied",
+    source_stock: "In stock",
+    source_sourced: "Sourced",
+    customer_part_desc: "Description",
+    customer_part_notes: "Notes",
     client_price: "Precio al cliente",
     shop_price: "Costo al taller",
     external_company: "Empresa externa",
@@ -1310,23 +1579,32 @@ $('#document-form').appendChild(numeroHidden);
 function applyTheme(tipo) {
   shell.classList.remove('theme-ot','theme-fac','theme-pres');
   shell.classList.add(tipo==='FAC' ? 'theme-fac' : (tipo==='PRES' ? 'theme-pres' : 'theme-ot'));
+  if (document.documentElement) document.documentElement.dataset.docType = tipo || '';
 }
 
 async function updateDocumentNumber(){
           if (!selTipo) return;
           const tipo = selTipo.value;
           if (!tipo) return;
+          const url = (EG.cfg.URL_NEXT_NUMBER || '').replace(/\/$/, '') + `?tipo=${encodeURIComponent(tipo)}`;
+          const docNumberInput = document.getElementById('id_numero');
           try{
-            const r = await EG.fetch(`${EG.cfg.URL_NEXT_NUMBER}?tipo=${encodeURIComponent(tipo)}`);
+            const r = await fetch(url, {
+              method: 'GET',
+              headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' },
+              credentials: 'same-origin',
+            });
             if(!r.ok) throw new Error(`HTTP ${r.status}`);
             const data = await r.json();
-            const next = data.number || data.numero || data.next || 'Auto-generated';
-            setText(numeroView, next);
-            numeroHidden.value = next;
+            const next = data.numero_documento || data.numero || data.number || data.next || '';
+            setText(numeroView, next || '{% trans "Will be generated automatically" %}');
+            numeroHidden.value = next || '';
+            if (docNumberInput) docNumberInput.value = next || '';
           }catch(err){
-            console.error('❌ Error next-number:', err);
-            setText(numeroView, '— error —');
+            console.error('❌ No se pudo obtener número:', err);
+            setText(numeroView, '{% trans "Will be generated automatically" %}');
             numeroHidden.value = '';
+            if (docNumberInput) docNumberInput.value = '';
           }
         }
 
@@ -1421,39 +1699,58 @@ function renderResultadosClientes(lista){
   clienteResultados.classList.remove('hidden');
 }
 
-async function seleccionarCliente({id, nombre, email, telefono}){
+async function seleccionarCliente({ id, nombre, email, telefono }) {
   console.log(`👤 Cliente seleccionado: ${nombre} (ID: ${id})`);
-  
+
   getClienteElements();
+
   if (clienteResultados) clienteResultados.classList.add('hidden');
   if (clienteBusqueda) clienteBusqueda.value = nombre;
-  if (clienteSelect){ // mantener el valor para POST si backend lo requiere
+
+  // Mantener el valor para POST (aunque el select esté hidden)
+  if (clienteSelect) {
     clienteSelect.innerHTML = `<option value="${id}" selected>${nombre}</option>`;
+    clienteSelect.value = String(id);
     clienteSelect.classList.add('hidden');
+    // Si algún código escucha cambios del select:
+    clienteSelect.dispatchEvent(new Event('change', { bubbles: true }));
   }
+
   if (cliNombre) cliNombre.textContent = nombre;
   if (cliEmail)  cliEmail.textContent  = email || '—';
   if (cliFono)   cliFono.textContent   = telefono || '—';
   if (clienteInfoBox) clienteInfoBox.classList.remove('hidden');
-  
-  // ⚡ IMPORTANTE: Cargar vehículos del cliente seleccionado
+
   console.log(`🔄 Iniciando carga de vehículos para cliente ${id}...`);
-  
-  // Verificar si hay un vehículo a preseleccionar (desde URL o documentoData)
+
+  // URL params
   const urlParams = new URLSearchParams(window.location.search);
-  const newVehiculoId = urlParams.get('new_vehiculo_id');
-  const prefillVehiculoId = (typeof documentoData !== 'undefined' && documentoData.prefillVehiculoId) 
-    ? documentoData.prefillVehiculoId 
-    : null;
-  const vehiculoIdToSelect = newVehiculoId || prefillVehiculoId || null;
-  
-  await cargarVehiculosPorCliente(id, vehiculoIdToSelect);
+  const newVehiculoId = urlParams.get('new_vehiculo_id') || urlParams.get('new_vehiculo') || null;
+  const prefillVehiculoIdFromUrl = urlParams.get('prefill_vehiculo') || null;
+
+  // documentoData seguro (SOLO desde window)
+  const prefillVehiculoIdFromDoc = window.documentoData?.prefillVehiculoId || null;
+
+  // Prioridad: newVehiculoId > prefillVehiculo(url) > prefillVehiculo(doc)
+  const vehiculoIdToSelect = newVehiculoId || prefillVehiculoIdFromUrl || prefillVehiculoIdFromDoc || null;
+
+  await withoutAutoFocus(() => cargarVehiculosPorCliente(id, vehiculoIdToSelect));
 }
 
 async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
   getClienteElements();
   if (!vehiculoSelect) {
     console.warn('⚠️ Elemento #id_vehiculo no encontrado');
+    return;
+  }
+
+  // Si #id_vehiculo está controlado por DAL/Select2, NO rellenar manualmente.
+  // DAL ya filtra por forward=["cliente"]. Evita reflow/scroll en móvil.
+  if (isSelect2Active(vehiculoSelect)) {
+    setSelectValueQuiet(vehiculoSelect, null);
+    if (vehiculoIdToSelect) {
+      setSelectValueQuiet(vehiculoSelect, String(vehiculoIdToSelect));
+    }
     return;
   }
 
@@ -1466,11 +1763,17 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
   console.log(`🚗 Cargando vehículos para cliente ID: ${clienteId}${vehiculoIdToSelect ? ` (preseleccionar: ${vehiculoIdToSelect})` : ''}`);
 
   const alreadyHasOptions = vehiculoSelect.options && vehiculoSelect.options.length > 1;
-  if (alreadyHasOptions && vehiculoSelect.dataset.source === 'form') {
-    console.log('ℹ️ Ya tiene opciones desde el formulario, omitiendo carga');
-    // Aún así, intentar preseleccionar si se especificó
+  const currentLoadedCliente = vehiculoSelect.dataset.clienteId || null;
+
+  // SOLO omitir si: source === 'form' Y el cliente cargado es el mismo que pedimos
+  if (
+    alreadyHasOptions &&
+    vehiculoSelect.dataset.source === 'form' &&
+    String(currentLoadedCliente) === String(clienteId)
+  ) {
+    console.log('ℹ️ Opciones del formulario coinciden con el cliente actual, omitiendo carga');
     if (vehiculoIdToSelect) {
-      setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
+      preseleccionarVehiculo(vehiculoIdToSelect);
     }
     return;
   }
@@ -1485,10 +1788,11 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
     const options = localMatches.map((v)=> `<option value="${v.id}">${v.label || v.text || ''}</option>`).join('');
     vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
     vehiculoSelect.dataset.source = 'prefetch';
+    vehiculoSelect.dataset.clienteId = String(clienteId);
     vehiculoSelect.disabled = false;
     // Preseleccionar vehículo si se especificó
     if (vehiculoIdToSelect) {
-      setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
+      preseleccionarVehiculo(vehiculoIdToSelect);
     }
     return; // Salir temprano si encontramos en prefetch
   }
@@ -1519,6 +1823,7 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
       console.log('ℹ️ No se encontraron vehículos');
       vehiculoSelect.innerHTML = `<option value="">${I18N.no_vehicles || 'No hay vehículos'}</option>`;
       vehiculoSelect.dataset.source = 'empty';
+      vehiculoSelect.dataset.clienteId = String(clienteId);
     } else {
       const options = items.map(v => {
         const id = v.id ?? v.pk;
@@ -1527,11 +1832,12 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
       }).join('');
       vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
       vehiculoSelect.dataset.source = 'fetch';
+      vehiculoSelect.dataset.clienteId = String(clienteId);
       console.log(`✅ ${items.length} vehículos cargados exitosamente`);
       
       // Preseleccionar vehículo si se especificó
       if (vehiculoIdToSelect) {
-        setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
+        preseleccionarVehiculo(vehiculoIdToSelect);
       }
     }
   }catch(err){
@@ -1539,43 +1845,60 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
     console.error('Stack:', err.stack);
     vehiculoSelect.innerHTML = `<option value="">${I18N.error_loading_vehicles || 'Error al cargar vehículos'}</option>`;
     vehiculoSelect.dataset.source = 'error';
+    vehiculoSelect.dataset.clienteId = String(clienteId);
   }finally{
     vehiculoSelect.disabled = false;
   }
 }
 
-// Función auxiliar para preseleccionar un vehículo
+// Función auxiliar para preseleccionar un vehículo (Select2-safe, sin saltos en móvil)
 function preseleccionarVehiculo(vehiculoId) {
   getClienteElements();
   if (!vehiculoSelect) {
     console.warn('⚠️ Elemento #id_vehiculo no encontrado para preselección');
     return;
   }
-  
+
   const vehiculoIdStr = String(vehiculoId);
   console.log(`🎯 Intentando preseleccionar vehículo ID: ${vehiculoIdStr}`);
-  
-  // Verificar si el vehículo existe en las opciones
-  const option = Array.from(vehiculoSelect.options).find(opt => String(opt.value) === vehiculoIdStr);
-  
-  if (option) {
-    vehiculoSelect.value = vehiculoIdStr;
-    vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-    console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado exitosamente`);
-  } else {
-    console.warn(`⚠️ Vehículo ${vehiculoIdStr} no encontrado en las opciones disponibles`);
-    // Intentar nuevamente después de un breve delay (por si los vehículos aún se están cargando)
-    setTimeout(() => {
-      const retryOption = Array.from(vehiculoSelect.options).find(opt => String(opt.value) === vehiculoIdStr);
-      if (retryOption) {
-        vehiculoSelect.value = vehiculoIdStr;
-        vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-        console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado en reintento`);
-      } else {
-        console.error(`❌ No se pudo preseleccionar vehículo ${vehiculoIdStr} después del reintento`);
-      }
-    }, 500);
-  }
+
+  const doSelect = () => {
+    // Si Select2/DAL está activo, setear valor "quiet"
+    if (isSelect2Active(vehiculoSelect)) {
+      setSelectValueQuiet(vehiculoSelect, vehiculoIdStr);
+      console.log(`✅ (Select2) Vehículo ${vehiculoIdStr} seteado (quiet)`);
+      return true;
+    }
+
+    // Si es select normal, verificar opción
+    const option = Array.from(vehiculoSelect.options).find(
+      (opt) => String(opt.value) === vehiculoIdStr
+    );
+
+    if (option) {
+      vehiculoSelect.value = vehiculoIdStr;
+      vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
+      console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado exitosamente`);
+      return true;
+    }
+
+    console.warn(`⚠️ Vehículo ${vehiculoIdStr} no encontrado en opciones`);
+    return false;
+  };
+
+  // En móvil protegemos contra focus accidental
+  const run = () => withoutAutoFocus(() => doSelect());
+
+  // Primer intento
+  if (run()) return;
+
+  // Reintento único y más corto: suficiente para prefetch/fetch sin causar saltos
+  setTimeout(() => {
+    const ok = run();
+    if (!ok) {
+      console.error(`❌ No se pudo preseleccionar vehículo ${vehiculoIdStr} (reintento único)`);
+    }
+  }, 150);
 }
 
 // ===============
@@ -1645,6 +1968,9 @@ document.querySelectorAll('.tax-checkbox').forEach(checkbox => {
   checkbox.addEventListener('change', recalcTotales);
 });
 
+// Recalcular totales (incl. IVA/tax) tras carga por si taxLines se inicializó después
+setTimeout(function(){ if (typeof window.recalcTotales === 'function') window.recalcTotales(); }, 150);
+
 // ===============
 // FILAS DINÁMICAS
 // ===============
@@ -1658,50 +1984,64 @@ window.addRepuestoRow = function addRepuestoRow(){
     return;
   }
   const row = document.createElement('div');
-  row.className = 'dynamic-element';
+  row.className = 'dynamic-element js-part-row';
   row.innerHTML = `
-    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
-      <div class="w-full sm:w-28 relative">
+    <div class="grid grid-cols-12 gap-2 sm:gap-3 items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
+      <div class="col-span-4 sm:col-span-2 relative">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.code}</label>
         <input type="text" class="rep-codigo form-control w-full text-base" placeholder="${I18N.code}" autocomplete="off">
         <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-id">
       </div>
-      <div class="description-field rep-search-container w-full sm:flex-1 sm:min-w-80 relative">
+      <div class="col-span-12 sm:col-span-5 description-field rep-search-container relative">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.name}</label>
         <input type="text" class="rep-search form-control w-full text-base" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
         <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-nombre">
-        <button type="button" class="rep-create-btn absolute top-8 sm:top-8 right-2 px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white text-xs sm:text-sm font-semibold border border-purple-300/40 shadow-sm transition-all">➕</button>
+        <button type="button" class="rep-create-btn absolute top-8 right-2 px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white text-xs sm:text-sm font-semibold border border-purple-300/40 shadow-sm transition-all">➕</button>
       </div>
-      <div class="w-full sm:w-16">
+      <div class="col-span-3 sm:col-span-1">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.qty}</label>
-        <input type="number" class="rep-cantidad form-control w-full text-base" min="1" max="999" value="1">
+        <input type="number" class="rep-cantidad form-control w-full text-center text-base" min="1" max="999" value="1" data-numeric="1" inputmode="decimal">
       </div>
-      <div class="w-full sm:w-28">
+      <div class="col-span-4 sm:col-span-2">
+        <label class="block text-cyan-200 text-sm mb-1">{% trans "Source" %}</label>
+        <select class="rep-source-type form-select w-full text-base">
+          <option value="IN_STOCK">${I18N.source_stock}</option>
+          <option value="CUSTOMER_SUPPLIED">${I18N.source_customer}</option>
+          <option value="SOURCED">${I18N.source_sourced}</option>
+        </select>
+      </div>
+      <div class="rep-customer-fields col-span-12 hidden">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.customer_part_desc}</label>
+        <input type="text" class="rep-customer-desc form-control w-full text-base" placeholder="${I18N.customer_part_desc}">
+        <label class="block text-cyan-200 text-sm mb-1 mt-2">${I18N.customer_part_notes}</label>
+        <input type="text" class="rep-customer-notes form-control w-full text-base" placeholder="${I18N.customer_part_notes}">
+      </div>
+      <div class="col-span-4 sm:col-span-2">
         <label class="block text-cyan-200 text-sm mb-1 flex items-center gap-1">
           <span>${I18N.sale_price}</span>
           <button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>
         </label>
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="rep-precio-venta form-control w-full text-base pl-6" placeholder="0">
+          <input type="text" class="rep-precio-venta form-control w-full text-base pl-6" placeholder="0" data-numeric="1" inputmode="decimal">
         </div>
       </div>
-      <div class="w-full sm:w-28 cost-price-container hidden">
+      <div class="col-span-4 sm:col-span-2 cost-price-container hidden">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.cost_price}</label>
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="rep-precio-compra form-control w-full text-base pl-6" placeholder="0">
+          <input type="text" class="rep-precio-compra form-control w-full text-base pl-6" placeholder="0" data-numeric="1" inputmode="decimal">
         </div>
       </div>
-      <div class="w-full sm:w-28">
+      <div class="col-span-4 sm:col-span-2">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
         <input type="hidden" class="rep-subtotal" value="0">
         <div class="rep-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
       </div>
-      <div class="w-full sm:w-12">
-        <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+      <div class="col-span-12 sm:col-span-1 flex sm:justify-center">
+        <button type="button" class="btn-secondary w-full sm:w-auto py-2 px-3 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
       </div>
     </div>`;
   container.appendChild(row);
@@ -1724,6 +2064,24 @@ function setupRepuestoRow(row){
 
   let timer = null;
   let codeTimer = null;
+
+  const sourceSelect = row.querySelector('.rep-source-type');
+  const customerFields = row.querySelector('.rep-customer-fields');
+  const descInput = row.querySelector('.rep-customer-desc');
+  function toggleSourceType() {
+    const st = sourceSelect?.value || 'IN_STOCK';
+    const isCustomer = st === 'CUSTOMER_SUPPLIED';
+    if (customerFields) customerFields.classList.toggle('hidden', !isCustomer);
+    if (inpPV) {
+      inpPV.readOnly = isCustomer;
+      inpPV.value = isCustomer ? '0' : (inpPV.value || '');
+    }
+    const discEl = row.querySelector('.rep-descuento');
+    if (discEl) { discEl.readOnly = isCustomer; if (isCustomer) discEl.value = '0'; }
+    recalc();
+  }
+  sourceSelect?.addEventListener('change', toggleSourceType);
+  toggleSourceType();
 
   const btnCreate = row.querySelector('.rep-create-btn');
   btnCreate?.addEventListener('click', ()=>{
@@ -1816,7 +2174,7 @@ function setupRepuestoRow(row){
       const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const data = await r.json();
-      const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
+      const items = await (Array.isArray(data) ? data : (data.repuestos || data.results || data.items || []));
       if (items.length) renderResultadosRepuestos(items);
     }catch(err){
       console.error('❌ buscarRepuestos', err);
@@ -1840,7 +2198,7 @@ function setupRepuestoRow(row){
       const div = document.createElement('div');
       div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
       div.setAttribute('role', 'option');
-      const codigo = item.codigo || item.code || '';
+      const codigo = item.codigo || item.part_number || item.code || '';
       const nombre = item.nombre || item.text || '';
       const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
       const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
@@ -1911,10 +2269,10 @@ function setupRepuestoRow(row){
       const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const data = await r.json();
-      const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
+      const items = await (Array.isArray(data) ? data : (data.repuestos || data.results || data.items || []));
       // Filtrar por código que empiece con la búsqueda
       const filteredItems = items.filter(item => {
-        const codigo = (item.codigo || item.code || '').toLowerCase();
+        const codigo = (item.codigo || item.part_number || item.code || '').toLowerCase();
         return codigo.startsWith(q.toLowerCase());
       });
       if (filteredItems.length) renderResultadosCodigo(filteredItems);
@@ -1940,7 +2298,7 @@ function setupRepuestoRow(row){
       const div = document.createElement('div');
       div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
       div.setAttribute('role', 'option');
-      const codigo = item.codigo || item.code || '';
+      const codigo = item.codigo || item.part_number || item.code || '';
       const nombre = item.nombre || item.text || '';
       const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
       const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
@@ -2072,7 +2430,7 @@ window.addServicioRow = function addServicioRow(){
     return;
   }
   const row = document.createElement('div');
-  row.className = 'dynamic-element';
+  row.className = 'dynamic-element js-service-row';
   row.innerHTML = `
     <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
       <div class="description-field srv-input-container w-full sm:flex-1 sm:min-w-96 relative">
@@ -2085,7 +2443,7 @@ window.addServicioRow = function addServicioRow(){
         <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="serv-precio form-control w-full text-base pl-6" placeholder="0">
+          <input type="text" class="serv-precio form-control w-full text-base pl-6" placeholder="0" data-numeric="1" inputmode="decimal">
         </div>
       </div>
       <div class="w-full sm:w-28">
@@ -2248,7 +2606,7 @@ window.addOtroRow = function addOtroRow(){
     return;
   }
   const row = document.createElement('div');
-  row.className = 'dynamic-element';
+  row.className = 'dynamic-element js-otro-row';
   row.innerHTML = `
     <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
       <div class="description-field otr-search-container w-full sm:flex-1 sm:min-w-60 relative">
@@ -2265,14 +2623,14 @@ window.addOtroRow = function addOtroRow(){
         <label class="block text-cyan-200 text-sm mb-1">${I18N.shop_price}</label>
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="otr-precio-taller form-control w-full text-base pl-6" placeholder="0">
+          <input type="text" class="otr-precio-taller form-control w-full text-base pl-6" placeholder="0" data-numeric="1" inputmode="decimal">
         </div>
       </div>
       <div class="w-full sm:w-24">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="otr-precio form-control w-full text-base pl-6" placeholder="0">
+          <input type="text" class="otr-precio form-control w-full text-base pl-6" placeholder="0" data-numeric="1" inputmode="decimal">
         </div>
       </div>
       <div class="w-full sm:w-24">
@@ -2443,45 +2801,92 @@ function setupOtroRow(row){
 }
 
 // ===============
+// CONTEXT MODE (Workshop / Parts) - Toggle vehicle & technician
+// ===============
+function toggleContextMode() {
+  const parts = document.querySelector('input[name="context"][value="parts"]');
+  const vehicleSec = document.getElementById('vehicle-section');
+  const techSec = document.getElementById('technician-section');
+  if (!parts || (!vehicleSec && !techSec)) return;
+  const isParts = parts.checked;
+  if (vehicleSec) vehicleSec.style.display = isParts ? 'none' : '';
+  if (techSec) techSec.style.display = isParts ? 'none' : '';
+}
+document.querySelectorAll('input[name="context"]').forEach(r => {
+  r.addEventListener('change', toggleContextMode);
+});
+toggleContextMode();
+
+// ===============
 // EVENTOS
 // ===============
-selTipo?.addEventListener('change', () => { applyTheme(selTipo.value); updateDocumentNumber(); });
+const idTipoEl = document.getElementById('id_tipo');
+if (idTipoEl) {
+  idTipoEl.addEventListener('change', function() { applyTheme(this.value); updateDocumentNumber(); });
+  applyTheme(idTipoEl.value || 'OT');
+}
 
         // Event listeners de búsqueda de clientes se mueven a DOMContentLoaded
 // Event listeners de click en resultados se mueven a initDocumentForm
 
 // INIT
-// Serializar filas dinámicas antes de enviar
+// Serializar filas dinámicas antes de enviar (selectores robustos por contenedor)
 function serializeRows(){
   console.log('🔍 Serializando filas dinámicas...');
 
-  const rep = $$('#repuestos-container .dynamic-element').map(row=>({
-    id:        $('.rep-id', row)?.value?.trim() || '',
-    codigo:    $('.rep-codigo', row)?.value?.trim() || '',
-    nombre:    $('.rep-nombre', row)?.value?.trim() || '',
-    cantidad:  Number($('.rep-cantidad', row)?.value || 0),
-    precio:    parseNumericInput($('.rep-precio-venta', row)?.value || 0),
-    descuento: Number($('.rep-descuento', row)?.value || 0),
-  }));
-  const serv = $$('#servicios-container .dynamic-element').map(row=>({
-    servicio_id: $('.srv-id', row)?.value || '',
-    precio:      parseNumericInput($('.serv-precio', row)?.value || 0),
-  }));
-  const otros = $$('#otros-container .dynamic-element').map(row=>({
-    servicio_id:   $('.otr-servicio-id', row)?.value || '',
-    nombre:        $('.otr-search', row)?.value?.trim() || '',
-    empresa_ext:   $('.otr-empresa', row)?.value?.trim() || '',
-    precio_taller: parseNumericInput($('.otr-precio-taller', row)?.value || 0),
-    precio:        parseNumericInput($('.otr-precio', row)?.value || 0),
-  }));
+  const partsContainer = document.getElementById('repuestos-container');
+  const servicesContainer = document.getElementById('servicios-container');
+  const otrosContainer = document.getElementById('otros-container');
+
+  const partRows = partsContainer ? Array.from(partsContainer.querySelectorAll('.js-part-row')) : [];
+  const rep = partRows.map(row=>{
+    const q = (sel) => (row.querySelector(sel) || {}).value;
+    const st = (row.querySelector('.rep-source-type') || {}).value || 'IN_STOCK';
+    const isCustomer = st === 'CUSTOMER_SUPPLIED';
+    return {
+      id:        (q('.rep-id') || '').trim(),
+      codigo:    (q('.rep-codigo') || '').trim(),
+      nombre:    (q('.rep-nombre') || (q('.rep-customer-desc') || '')).trim(),
+      cantidad:  Number(q('.rep-cantidad') || 0),
+      precio:    isCustomer ? 0 : parseNumericInput(q('.rep-precio-venta') || 0),
+      descuento: isCustomer ? 0 : Number(q('.rep-descuento') || 0),
+      source_type: st,
+      customer_part_description: (q('.rep-customer-desc') || '').trim() || null,
+      customer_part_notes: (q('.rep-customer-notes') || '').trim() || null,
+    };
+  });
+
+  const serviceRows = servicesContainer ? Array.from(servicesContainer.querySelectorAll('.js-service-row')) : [];
+  const serv = serviceRows.map(row=>{
+    const q = (sel) => (row.querySelector(sel) || {}).value;
+    return {
+      servicio_id: q('.srv-id') || '',
+      precio:      parseNumericInput(q('.serv-precio') || 0),
+    };
+  });
+
+  const otrosRows = otrosContainer ? Array.from(otrosContainer.querySelectorAll('.js-otro-row')) : [];
+  const otros = otrosRows.map(row=>{
+    const q = (sel) => (row.querySelector(sel) || {}).value;
+    return {
+      servicio_id:   q('.otr-servicio-id') || '',
+      nombre:        (q('.otr-search') || '').trim(),
+      empresa_ext:   (q('.otr-empresa') || '').trim(),
+      precio_taller: parseNumericInput(q('.otr-precio-taller') || 0),
+      precio:        parseNumericInput(q('.otr-precio') || 0),
+    };
+  });
 
   console.log('📦 Repuestos encontrados:', rep.length, rep);
   console.log('🔧 Servicios encontrados:', serv.length, serv);
   console.log('🌐 Otros servicios encontrados:', otros.length, otros);
 
-  $('#id_repuestos_json').value = JSON.stringify(rep);
-  $('#id_servicios_json').value = JSON.stringify(serv);
-  $('#id_otros_json').value     = JSON.stringify(otros);
+  const repInput = document.getElementById('id_repuestos_json');
+  const servInput = document.getElementById('id_servicios_json');
+  const otrosInput = document.getElementById('id_otros_json');
+  if (repInput) repInput.value = JSON.stringify(rep);
+  if (servInput) servInput.value = JSON.stringify(serv);
+  if (otrosInput) otrosInput.value = JSON.stringify(otros);
 
   console.log('💾 JSON guardado');
 }
@@ -2492,6 +2897,12 @@ function submitDocumentForm(){
   serializeRows();
   form.submit();
 }
+
+  // Asegurar que al enviar el formulario (botón Submit) se serialicen las filas dinámicas
+  (function(){
+    const form = document.getElementById('document-form');
+    if (form) form.addEventListener('submit', function(){ serializeRows(); }, false);
+  })();
 
   serializeRows();
 
@@ -2603,8 +3014,8 @@ function submitDocumentForm(){
   setupClienteSearchHandlers();
   // Cargar datos existentes si estamos editando
   {% if es_edicion %}
-  // Inicializar campos básicos del formulario ANTES de aplicar tema
-  const documentoData = {
+  // Inicializar campos básicos del formulario ANTES de aplicar tema (window para acceso global)
+  window.documentoData = {
     tipo: '{{ documento.tipo|default:form.tipo.value|default:"" }}',
     clienteId: '{{ cliente_info.id|default:"" }}',
     clienteNombre: '{{ cliente_info.nombre|default:""|escapejs }}',
@@ -2616,7 +3027,8 @@ function submitDocumentForm(){
     paymentStatus: '{{ documento.payment_status|default:"pending" }}',
     numero: '{{ documento.numero_documento|default:documento.numero|default:"" }}'
   };
-  
+  const documentoData = window.documentoData;
+
   console.log('📄 Inicializando documento para edición:', documentoData);
   
   // Establecer tipo de documento PRIMERO
@@ -2772,61 +3184,49 @@ function submitDocumentForm(){
   clienteBusqueda?.addEventListener('focus', (event)=> window.handleClienteFocus(event.target.value));
   clienteBusqueda?.addEventListener('keydown', (event)=> window.handleClienteKeydown(event));
   
-  // El botón "Nuevo Cliente" - Solución directa sin bloqueos
+  // El botón "Nuevo Cliente" - Estilos y efectos visuales
   const btnNuevoCliente = document.getElementById('btn-nuevo-cliente');
   if (btnNuevoCliente) {
     // Forzar estilos VERDE BRILLANTE (estilo WhatsApp) - Muy visible
-    // Usar clase CSS en lugar de estilos inline con !important
-    // La clase btn-green-gradient ya está definida en el CSS
     btnNuevoCliente.classList.add('btn-green-gradient');
     
-    // Asegurar href
-    if (!btnNuevoCliente.getAttribute('href') || btnNuevoCliente.getAttribute('href') === '#' || btnNuevoCliente.getAttribute('href') === '') {
-      const nextUrl = encodeURIComponent(window.location.pathname);
-      const pathParts = window.location.pathname.split('/').filter(p => p);
-      const country = pathParts[0] || 'cl';
-      const lang = pathParts[1] || 'es';
-      btnNuevoCliente.setAttribute('href', `/${country}/${lang}/clientes/crear/?next=${nextUrl}`);
-    }
-    
-    // Eliminar TODOS los listeners previos clonando el elemento
-    const newBtn = btnNuevoCliente.cloneNode(true);
-    btnNuevoCliente.parentNode.replaceChild(newBtn, btnNuevoCliente);
-    
-    // Asegurar href en el nuevo botón
-    if (!newBtn.getAttribute('href') || newBtn.getAttribute('href') === '#' || newBtn.getAttribute('href') === '') {
-      const nextUrl = encodeURIComponent(window.location.pathname);
-      const pathParts = window.location.pathname.split('/').filter(p => p);
-      const country = pathParts[0] || 'cl';
-      const lang = pathParts[1] || 'es';
-      newBtn.setAttribute('href', `/${country}/${lang}/clientes/crear/?next=${nextUrl}`);
-    }
-    
     // Añadir efectos hover
-    newBtn.addEventListener('mouseenter', function() {
+    btnNuevoCliente.addEventListener('mouseenter', function() {
       this.style.transform = 'scale(1.05)';
       this.style.boxShadow = '0 0 35px rgba(34, 197, 94, 1), 0 6px 20px rgba(0, 0, 0, 0.4)';
     });
     
-    newBtn.addEventListener('mouseleave', function() {
+    btnNuevoCliente.addEventListener('mouseleave', function() {
       this.style.transform = 'scale(1)';
       this.style.boxShadow = '0 0 25px rgba(34, 197, 94, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3)';
     });
     
-    // Listener simple que NO use preventDefault - permite navegación nativa
-    newBtn.addEventListener('click', function(e) {
-      const href = this.getAttribute('href');
-      if (href && href !== '#' && href !== '') {
-        console.log('🚀 Navegando a:', href);
-        // NO usar preventDefault - dejar que el navegador maneje la navegación
-        window.location.href = href;
-      }
-    }, false);
-    
-    console.log('✅ Botón Nuevo Cliente configurado (VERDE BRILLANTE):', newBtn.getAttribute('href'));
+    console.log('✅ Botón Nuevo Cliente configurado (VERDE BRILLANTE)');
     console.log('🎨 Color aplicado: VERDE #22c55e con resplandor');
   } else {
     console.error('❌ Botón btn-nuevo-cliente NO encontrado en el DOM');
+  }
+  
+  // El botón "Nuevo Vehículo" - Estilos y efectos visuales
+  const btnNuevoVehiculo = document.getElementById('btn-nuevo-vehiculo');
+  if (btnNuevoVehiculo) {
+    // Forzar estilos VERDE BRILLANTE
+    btnNuevoVehiculo.classList.add('btn-green-gradient');
+    
+    // Añadir efectos hover
+    btnNuevoVehiculo.addEventListener('mouseenter', function() {
+      this.style.transform = 'scale(1.05)';
+      this.style.boxShadow = '0 0 35px rgba(34, 197, 94, 1), 0 6px 20px rgba(0, 0, 0, 0.4)';
+    });
+    
+    btnNuevoVehiculo.addEventListener('mouseleave', function() {
+      this.style.transform = 'scale(1)';
+      this.style.boxShadow = '0 0 25px rgba(34, 197, 94, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3)';
+    });
+    
+    console.log('✅ Botón Nuevo Vehículo configurado (VERDE BRILLANTE)');
+  } else {
+    console.log('ℹ️ Botón btn-nuevo-vehiculo no encontrado (puede estar oculto por ui_config)');
   }
   
   console.log('📄 Document form inicializado', EG.cfg);
@@ -2847,13 +3247,34 @@ document.addEventListener('click', function(e) {
         e.preventDefault();
         e.stopPropagation();
         
-        // 1. Extraer país e idioma de la URL actual (ej: /cl/es/...)
-        const pathParts = window.location.pathname.split('/').filter(function(p) { return p && p.length > 0; });
-        const country = pathParts[0] || 'cl';
-        const lang = (pathParts[1] === 'es' || pathParts[1] === 'en') ? pathParts[1] : 'es';
+        // 1. Extraer país e idioma de la URL actual de forma robusta
+        const currentPath = window.location.pathname;
+        let country = 'cl';
+        let lang = 'es';
+        
+        // Detectar país desde el inicio de la URL
+        if (currentPath.indexOf('/us/') === 0) {
+            country = 'us';
+            lang = 'en';
+        } else if (currentPath.indexOf('/cl/') === 0) {
+            country = 'cl';
+            lang = 'es';
+        } else {
+            // Fallback: intentar extraer de pathParts
+            const pathParts = currentPath.split('/').filter(function(p) { return p && p.length > 0; });
+            country = pathParts[0] || 'cl';
+            
+            // Si el segundo segmento es 'es' o 'en', usarlo; si no, usar default según país
+            if (pathParts[1] === 'es' || pathParts[1] === 'en') {
+                lang = pathParts[1];
+            } else {
+                // Default según país
+                lang = (country === 'us') ? 'en' : 'es';
+            }
+        }
 
         // 2. Preparar el retorno (next) para volver al formulario actual
-        const nextUrl = encodeURIComponent(window.location.pathname);
+        const nextUrl = encodeURIComponent(currentPath);
         let destUrl = "";
 
         if (btnCliente) {
