@@ -3,9 +3,6 @@
 {% load static %}
 {% load humanize %}
 
-<!-- 🟡 CRUZ AMARILLA - TEMPLATE DASHBOARD NORMAL -->
-<div style="position: fixed; top: 10px; left: 10px; width: 50px; height: 50px; background-color: #ffff00; z-index: 9999; border: 3px solid #000; display: flex; align-items: center; justify-content: center; color: black; font-weight: bold; font-size: 12px;">DASH</div>
-
 {% block title %}{{ empresa.nombre_taller }} - Centro de Operaciones{% endblock %}
 
 {% block extra_css %}
@@ -313,12 +310,12 @@ body {
 
         <!-- Facturación -->
         <div class="kpi-card">
-            <div class="kpi-value">{{ moneda }}{{ facturacion_hoy|floatformat:0|intcomma }}</div>
+            <div class="kpi-value">{{ moneda }}{{ facturacion_servicios_hoy|floatformat:0|intcomma }}</div>
             <div class="kpi-label">Ventas Hoy</div>
         </div>
 
         <div class="kpi-card">
-            <div class="kpi-value">{{ moneda }}{{ facturacion_mes|floatformat:0|intcomma }}</div>
+            <div class="kpi-value">{{ moneda }}{{ facturacion_mes_total|floatformat:0|intcomma }}</div>
             <div class="kpi-label">Ventas Mes</div>
         </div>
 
@@ -335,17 +332,49 @@ body {
         </div>
     </div>
 
-    <!-- 🚀 Acción Principal: Ingreso de Vehículo -->
-    <div class="cyber-container p-6 mb-6 action-primary-card">
-        <div class="action-primary-icon">📸</div>
-        <h2 class="action-primary-title">Ingreso de Vehículo al Taller</h2>
-        <p class="action-primary-subtitle">Identifica rápidamente un vehículo tomando una foto de la patente</p>
-        <a href="{% country_url 'vehiculos:ingreso_foto' %}" class="action-primary-button">
-            📸 Iniciar Ingreso por Foto
+    <!-- CARD: Centro de Ingreso Vehicular -->
+    <div class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl backdrop-blur-xl transition hover:bg-white/10 mb-6">
+      <div class="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-500/10 blur-3xl"></div>
+      <div class="absolute -left-24 -bottom-24 h-56 w-56 rounded-full bg-indigo-500/10 blur-3xl"></div>
+
+      <div class="flex items-start justify-between gap-4 relative z-10">
+        <div>
+          <div class="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-200">
+            🚗 Ingreso inteligente
+          </div>
+
+          <h3 class="mt-3 text-xl font-extrabold tracking-tight text-white">
+            Centro de Ingreso Vehicular
+          </h3>
+
+          <p class="mt-2 text-sm leading-relaxed text-white/70">
+            Identifica por patente, cliente, QR o foto. Realiza inspección 360° y deja registro con protección legal integrada.
+          </p>
+
+          <div class="mt-4 flex flex-wrap gap-2 text-xs text-white/60">
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">OCR</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Búsqueda inteligente</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Inspección 360°</span>
+            <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Firma digital</span>
+          </div>
+        </div>
+
+        <div class="hidden sm:flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-2xl text-white/80">
+          ⚡
+        </div>
+      </div>
+
+      <div class="mt-6 relative z-10">
+        <a href="{% country_url 'taller:ingreso_centro' app_namespace='direct' %}"
+           class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-500/90 px-4 py-3 text-sm font-bold text-black shadow-lg shadow-cyan-500/20 transition hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300/60">
+          🚀 Recibir Vehículo Ahora
+          <span class="opacity-70">→</span>
         </a>
-        <p class="text-sm text-gray-400 mt-4" style="position: relative; z-index: 1;">
-            Reconocimiento automático mediante OCR • Crea orden de trabajo en segundos
+
+        <p class="mt-2 text-center text-xs text-white/50">
+          Diseñado para manos con guantes • 3 toques • rápido y sin errores
         </p>
+      </div>
     </div>
 
     <!-- 📈 Estado Operativo -->
@@ -417,9 +446,6 @@ body {
                     <div class="font-semibold">{{ servicio.nombre }}</div>
                     <div class="text-sm text-gray-400">{{ servicio.cantidad }} servicios</div>
                 </div>
-                <div class="text-right">
-                    <div class="text-lg font-bold text-green-400">{{ moneda }}{{ servicio.ingresos|floatformat:0|intcomma }}</div>
-                </div>
             </div>
             {% empty %}
             <div class="text-center text-gray-400 py-4">No hay datos de servicios</div>
@@ -429,14 +455,14 @@ body {
         <!-- Top Técnicos -->
         <div class="cyber-container p-6">
             <h3 class="section-title">👨‍🔧 Técnicos Más Productivos</h3>
-            {% for tecnico in tecnicos_productivos %}
+            {% for item in tecnicos_productivos %}
             <div class="ranking-item">
                 <div>
-                    <div class="font-semibold">{{ tecnico.nombre }}</div>
-                    <div class="text-sm text-gray-400">{{ tecnico.docs_realizados }} documentos</div>
+                    <div class="font-semibold">{% if item.tecnico %}{{ item.tecnico.nombre }}{% else %}—{% endif %}</div>
+                    <div class="text-sm text-gray-400">{{ item.docs_realizados }} documentos</div>
                 </div>
                 <div class="text-right">
-                    <div class="text-lg font-bold text-green-400">{{ moneda }}{{ tecnico.ingresos_generados|floatformat:0|intcomma|default:"0" }}</div>
+                    <div class="text-lg font-bold text-green-400">{{ moneda }}{{ item.ingresos_generados|floatformat:0|intcomma|default:"0" }}</div>
                 </div>
             </div>
             {% empty %}
@@ -510,13 +536,13 @@ body {
                 <div class="text-sm text-gray-400">Flota de vehículos</div>
             </a>
 
-            <a href="{% country_url 'vehiculos:ingreso_foto' %}" class="nav-card">
-                <div class="text-3xl mb-2">📸</div>
-                <div class="font-semibold">Ingreso por Foto</div>
-                <div class="text-sm text-gray-400">Identificar patente</div>
+            <a href="{% country_url 'taller:ingreso_centro' app_namespace='direct' %}" class="nav-card">
+                <div class="text-3xl mb-2">🚗</div>
+                <div class="font-semibold">Centro de Ingreso</div>
+                <div class="text-sm text-gray-400">Recibir vehículo</div>
             </a>
 
-            <a href="{% country_url 'configuracion' %}" class="nav-card">
+            <a href="{% country_url 'company_settings' app_namespace='direct' %}" class="nav-card">
                 <div class="text-3xl mb-2">⚙️</div>
                 <div class="font-semibold">Configuración</div>
                 <div class="text-sm text-gray-400">Ajustes del taller</div>
@@ -530,87 +556,13 @@ body {
         </div>
     </div>
 
-    <!-- 📊 Gráfico de Tendencias -->
+    <!-- 📊 Gráficos (próximamente) -->
     <div class="cyber-container p-6 mt-6">
         <h3 class="section-title">📊 Tendencias de Facturación</h3>
-        <div class="chart-container">
-            <canvas id="chartTendencias"></canvas>
+        <div class="chart-container flex items-center justify-center text-gray-400">
+            Gráficos próximamente
         </div>
     </div>
 
 </div>
-
-<!-- JavaScript para gráficos y animaciones -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-
-    // Animación de contadores
-    function animateCounters() {
-        const counters = document.querySelectorAll('.kpi-value');
-        counters.forEach(counter => {
-            const target = parseInt(counter.textContent.replace(/[^\d]/g, ''));
-            if (target > 0) {
-                let current = 0;
-                const increment = target / 30;
-                const timer = setInterval(() => {
-                    current += increment;
-                    if (current >= target) {
-                        current = target;
-                        clearInterval(timer);
-                    }
-                    counter.textContent = counter.textContent.replace(/\d+/, Math.floor(current));
-                }, 50);
-            }
-        });
-    }
-
-    // Ejecutar animaciones
-    animateCounters();
-
-    // Gráfico de tendencias
-    const ctx = document.getElementById('chartTendencias');
-    if (ctx && window.Chart) {
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'],
-                datasets: [{
-                    label: 'Facturación',
-                    data: [120000, 190000, 300000, 250000, 220000, 350000],
-                    borderColor: '#00ffff',
-                    backgroundColor: 'rgba(0, 255, 255, 0.1)',
-                    tension: 0.4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: '#ffffff'
-                        }
-                    }
-                },
-                scales: {
-                    x: {
-                        ticks: { color: '#ffffff' },
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                    },
-                    y: {
-                        ticks: { color: '#ffffff' },
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
-                    }
-                }
-            }
-        });
-    }
-
-    // Actualización automática cada 5 minutos
-    setInterval(() => {
-        location.reload();
-    }, 300000);
-});
-</script>
 {% endblock %}
