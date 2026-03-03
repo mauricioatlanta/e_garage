@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load humanize %}
+{% load country_url %}
+
+{% block title %}{{ empresa.nombre_taller|default:"eGarage" }} - Inicio{% endblock %}
+
+{% block extra_css %}
+<style>
+.page-mobile-home { padding-bottom: 5rem; }
+.page-mobile-home .header-compact { padding: 1rem; }
+.page-mobile-home .kpi-card { border-radius: 12px; padding: 1rem; text-align: center; }
+.page-mobile-home .kpi-value { font-size: 1.5rem; font-weight: 700; }
+.page-mobile-home .mision-item { padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 0.5rem; }
+.bottom-nav { position: fixed; bottom: 0; left: 0; right: 0; height: 56px; background: rgba(10,14,39,0.98); border-top: 1px solid rgba(0,212,255,0.2); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+.bottom-nav a { display: flex; flex-direction: column; align-items: center; padding: 0.5rem; color: #b0e0ff; text-decoration: none; font-size: 0.7rem; }
+.bottom-nav a.active { color: var(--company-primary, #00ffff); }
+.bottom-nav .icon { font-size: 1.25rem; margin-bottom: 0.15rem; }
+.sheet-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1100; display: none; }
+.sheet-overlay.open { display: block; }
+.sheet-panel { position: fixed; bottom: 0; left: 0; right: 0; background: #0e1320; border-radius: 1rem 1rem 0 0; padding: 1.5rem; max-height: 70vh; overflow-y: auto; z-index: 1101; transform: translateY(100%); transition: transform 0.3s ease; }
+.sheet-overlay.open .sheet-panel { transform: translateY(0); }
+.sheet-panel .btn-sheet { display: block; width: 100%; padding: 1rem; margin-bottom: 0.75rem; border-radius: 12px; text-align: center; font-weight: 600; text-decoration: none; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="page-mobile-home max-w-4xl mx-auto px-4">
+    <header class="header-compact flex items-center justify-between">
+        <div>
+            <h1 class="text-lg font-bold text-white">{{ empresa.nombre_taller|default:"Mi Taller" }}</h1>
+            <p class="text-sm text-gray-400">Hola, {{ request.user.get_full_name|default:request.user.username }}</p>
+        </div>
+    </header>
+
+    <section class="my-4">
+        <button type="button" class="new-doc-cta w-full py-4 rounded-xl font-bold text-lg text-black transition shadow-lg"
+                style="background: linear-gradient(135deg, var(--company-primary, #00ffff), #00ff88);"
+                data-open-sheet="new-doc-sheet">
+            + Crear Documento
+        </button>
+    </section>
+
+    <section class="grid grid-cols-3 gap-3 mb-6">
+        <div class="kpi-card bg-white/5 border border-cyan-500/30">
+            <div class="kpi-value text-cyan-400">{{ moneda }}{{ ventas_mes|floatformat:0|intcomma }}</div>
+            <div class="text-xs text-gray-400 uppercase">Ventas mes</div>
+        </div>
+        <div class="kpi-card bg-white/5 border border-cyan-500/30">
+            <div class="kpi-value text-cyan-400">{{ moneda }}{{ iva_mes|floatformat:0|intcomma }}</div>
+            <div class="text-xs text-gray-400 uppercase">IVA mes</div>
+        </div>
+        <div class="kpi-card bg-white/5 border border-cyan-500/30">
+            <div class="kpi-value text-cyan-400">{{ pendientes_hoy }}</div>
+            <div class="text-xs text-gray-400 uppercase">Pendientes hoy</div>
+        </div>
+    </section>
+
+    <section class="mb-6">
+        <h2 class="text-base font-semibold text-cyan-400 mb-3">Misiones de hoy</h2>
+        <div class="space-y-2">
+            <a href="{{ nav_url_documentos|default:'#' }}" class="mision-item block bg-white/5 border border-white/10 rounded-lg">
+                <span class="font-medium">OT en progreso</span>
+                <span class="float-right font-bold text-cyan-400">{{ ot_en_progreso }}</span>
+            </a>
+            <a href="{{ nav_url_documentos|default:'#' }}" class="mision-item block bg-white/5 border border-white/10 rounded-lg">
+                <span class="font-medium">Por cobrar (facturas mes)</span>
+                <span class="float-right font-bold text-cyan-400">{{ por_cobrar }}</span>
+            </a>
+            <a href="{{ nav_url_documentos|default:'#' }}" class="mision-item block bg-white/5 border border-white/10 rounded-lg">
+                <span class="font-medium">Presupuestos pendientes</span>
+                <span class="float-right font-bold text-cyan-400">{{ pendientes_hoy }}</span>
+            </a>
+        </div>
+    </section>
+
+    {% if ot_list %}
+    <section class="mb-6">
+        <h2 class="text-base font-semibold text-cyan-400 mb-2">Órdenes de trabajo</h2>
+        <ul class="space-y-2">
+            {% for doc in ot_list|slice:":5" %}
+            <li class="py-2 border-b border-white/10 text-sm">
+                <span class="text-gray-300">#{{ doc.numero|default:doc.id }}</span>
+                {% if doc.cliente %}<span class="text-gray-400"> — {{ doc.cliente.nombre }}</span>{% endif %}
+            </li>
+            {% endfor %}
+        </ul>
+    </section>
+    {% endif %}
+</div>
+
+{% include "taller/common/partials/bottom_nav_mobile.html" with url_dashboard=nav_url_dashboard url_documentos=nav_url_documentos url_ai_lab=nav_url_ai_lab url_centro=nav_url_centro_operaciones url_crear=nav_url_crear_documento %}
+{% include "taller/common/partials/new_doc_sheet.html" with url_crear=nav_url_crear_documento %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function() {
+    var openBtn = document.querySelector('[data-open-sheet="new-doc-sheet"]');
+    var overlay = document.getElementById('new-doc-sheet-overlay');
+    var panel = document.getElementById('new-doc-sheet-panel');
+    if (openBtn && overlay && panel) {
+        openBtn.addEventListener('click', function() { overlay.classList.add('open'); });
+        overlay.addEventListener('click', function(e) { if (e.target === overlay) overlay.classList.remove('open'); });
+    }
+})();
+</script>
+{% endblock %}

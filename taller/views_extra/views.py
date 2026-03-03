@@ -36,30 +36,149 @@ def enviar_email_reset_manual(request):
     return HttpResponse("Correo enviado manualmente (HTML)")
 
 
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
+from taller.auth.country_login_required import country_login_required
 
-@login_required
+
+@country_login_required
 def dashboard(request):
     """
-    Dashboard principal - Redirige al Centro de Operaciones empresarial
-    para una mejor experiencia del usuario
+    Dashboard principal. Chile: Home Operativo Mobile (Menú 1).
+    USA/otros: redirige al Centro de Operaciones correspondiente.
     """
-    # Redirigir automáticamente al nuevo dashboard empresarial
     from django.shortcuts import redirect
+    from django.template.response import TemplateResponse
+    from django.utils import timezone
+    from django.utils.translation import get_language
 
-    # Detectar país desde la URL para usar el namespace correcto
     path = request.path
     if path.startswith("/cl/"):
-        # Chile - usar namespace chile
-        return redirect("chile:centro_operaciones")
+        # Chile: render Home Operativo Mobile (no redirección)
+        return _dashboard_home_operativo_chile(request)
     elif path.startswith("/us/"):
-        # USA - usar namespace usa
         return redirect("usa:centro_operaciones_espacial")
     else:
-        # Fallback - usar namespace taller
         return redirect("taller:centro_operaciones")
+
+
+def _dashboard_home_operativo_chile(request):
+    """Vista Home Operativo Mobile para Chile: KPIs y misiones del día."""
+    from datetime import date
+    from decimal import Decimal
+
+    from django.contrib import messages
+    from django.db.models import DecimalField, ExpressionWrapper, F, Sum, Value
+    from django.db.models.functions import Coalesce
+    from django.shortcuts import redirect
+    from django.template import TemplateDoesNotExist
+    from django.template.loader import get_template
+    from django.template.response import TemplateResponse
+    from django.utils.translation import get_language
+
+    from taller.models.documento import Documento
+    from taller.models.lineas_documento import LineaRepuesto, LineaServicio
+    from taller.utils.templates import select_country_lang_template
+
+    try:
+        empresa = request.user.empresa
+    except Exception:
+        messages.error(request, "Selecciona o crea tu empresa para continuar.")
+        return redirect("chile:configuracion")
+
+    hoy = timezone.localdate()
+    inicio_mes = date(hoy.year, hoy.month, 1)
+    zero_dec = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2))
+    subtotal_expr = ExpressionWrapper(
+        F("precio_unitario") * F("cantidad"),
+        output_field=DecimalField(max_digits=14, decimal_places=2),
+    )
+
+    # Ventas mes (facturación FAC del mes: servicios + repuestos)
+    base_mes_srv = LineaServicio.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__gte=inicio_mes,
+        documento__tipo="FAC",
+    )
+    base_mes_rep = LineaRepuesto.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__gte=inicio_mes,
+        documento__tipo="FAC",
+    )
+    ventas_mes = (
+        base_mes_srv.aggregate(t=Coalesce(Sum(subtotal_expr), zero_dec))["t"]
+        + base_mes_rep.aggregate(t=Coalesce(Sum(subtotal_expr), zero_dec))["t"]
+    ) or Decimal("0")
+
+    # IVA mes (CL: 19% sobre repuestos)
+    total_rep_mes = base_mes_rep.aggregate(t=Coalesce(Sum(subtotal_expr), zero_dec))[
+        "t"
+    ] or Decimal("0")
+    iva_mes = (
+        (total_rep_mes * Decimal("0.19")).quantize(Decimal("0.01"))
+        if empresa.pais == "CL"
+        else Decimal("0")
+    )
+
+    # Pendientes hoy: presupuestos abiertos (simplificado)
+    pendientes_hoy = Documento.objects.filter(empresa=empresa, tipo="PRES").count()
+    ot_en_progreso = Documento.objects.filter(empresa=empresa, tipo="OT").count()
+    # Por cobrar: facturas del mes (como indicador; sin estado de cobro real)
+    por_cobrar = Documento.objects.filter(
+        empresa=empresa, tipo="FAC", fecha_emision__gte=inicio_mes
+    ).count()
+
+    # Misiones del día: listas simples para el template
+    ot_list = (
+        Documento.objects.filter(empresa=empresa, tipo="OT")
+        .select_related("cliente", "vehiculo")
+        .order_by("-fecha_emision")[:10]
+    )
+    pres_list = (
+        Documento.objects.filter(empresa=empresa, tipo="PRES")
+        .select_related("cliente", "vehiculo")
+        .order_by("-fecha_emision")[:10]
+    )
+
+    from django.urls import reverse
+
+    context = {
+        "empresa": empresa,
+        "ventas_mes": ventas_mes,
+        "iva_mes": iva_mes,
+        "pendientes_hoy": pendientes_hoy,
+        "ot_en_progreso": ot_en_progreso,
+        "por_cobrar": por_cobrar,
+        "moneda": getattr(empresa, "simbolo_moneda", "$"),
+        "ot_list": ot_list,
+        "pres_list": pres_list,
+        "fecha_hoy": hoy,
+        "nav_url_dashboard": reverse("chile:dashboard"),
+        "nav_url_documentos": reverse("chile:lista_documentos_cl"),
+        "nav_url_ai_lab": reverse("chile:ai_lab"),
+        "nav_url_centro_operaciones": reverse("chile:centro_operaciones"),
+        "nav_url_crear_documento": reverse("chile:crear_documento_cl"),
+    }
+
+    # Override Chile: cl/es/dashboard/home_operativo.html; fallback común
+    if getattr(empresa, "pais", "").upper() == "CL":
+        try:
+            get_template("cl/es/dashboard/home_operativo.html")
+            template_name = "cl/es/dashboard/home_operativo.html"
+        except TemplateDoesNotExist:
+            template_name = "taller/common/dashboard/home_operativo_mobile.html"
+    else:
+        template_name = select_country_lang_template(
+            "dashboard/home_operativo_mobile.html",
+            getattr(empresa, "pais", "cl").lower(),
+            get_language(),
+        )
+        try:
+            get_template(template_name)
+        except TemplateDoesNotExist:
+            template_name = "taller/common/dashboard/home_operativo_mobile.html"
+
+    return TemplateResponse(request, template_name, context)
 
 
 from django.contrib.auth.decorators import login_required

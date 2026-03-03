@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 import logging
 from django.http import HttpResponseRedirect
@@ -12,6 +13,7 @@ from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones_espacial,
 )
 from taller.views_extra.views import dashboard
+from taller.views_extra.ai_lab import ai_lab_dashboard
 from taller.views_extra.views_configuracion import (
     configuracion_empresa,
     configuracion_tecnicos,
@@ -32,8 +34,21 @@ urlpatterns = [
     # URLs principales de taller (configuración, settings, etc.)
     # Incluir las rutas específicas que necesitamos
     path("dashboard/", dashboard, name="dashboard"),
+    path("lab/", ai_lab_dashboard, name="ai_lab"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
-    path("configuracion/", configuracion_empresa, name="configuracion"),  # Configuración empresa
+    path("settings/", company_settings_view, name="company_settings"),  # ⚙️ Centro de Ajustes
+    # Alias público: redirige al Settings Center (evita 403)
+    path(
+        "configuracion/",
+        RedirectView.as_view(pattern_name="chile:company_settings", permanent=False),
+        name="configuracion",
+    ),
+    # Configuración real (dueño)
+    path(
+        "configuracion/empresa/",
+        configuracion_empresa,
+        name="configuracion_empresa",
+    ),
     path(
         "configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"
     ),  # Configuración técnicos
@@ -165,6 +180,8 @@ urlpatterns = [
         "autocomplete/",
         include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),
     ),
+    # Centro de Ingreso Pro (kiosk recepción)
+    path("ops/", include(("taller.ops.urls", "ops"), namespace="ops")),
     # Crear nuevos motores, cajas y colores (usando views_create_parts)
     # path('vehiculos/crear-motor/', crear_motor, name='crear_motor'),  # ❌ Desactivado - usar vehiculos:crear_motor
     # path('vehiculos/crear-caja/', crear_caja, name='crear_caja'),    # ❌ Desactivado - usar vehiculos:crear_caja

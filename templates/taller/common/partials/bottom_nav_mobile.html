@@ -1,0 +1,25 @@
+{% comment %}
+Bottom navigation mobile. Expects: url_dashboard, url_documentos, url_ai_lab, url_centro, url_crear
+{% endcomment %}
+<nav class="bottom-nav" aria-label="Navegación principal">
+    <a href="{{ url_dashboard|default:'#' }}" class="{% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" aria-label="Inicio">
+        <span class="icon">🏠</span>
+        <span>Inicio</span>
+    </a>
+    <a href="#" class="new-doc-cta" data-open-sheet="new-doc-sheet" aria-label="Nuevo documento">
+        <span class="icon">➕</span>
+        <span>Nuevo</span>
+    </a>
+    <a href="{{ url_documentos|default:'#' }}" aria-label="Documentos">
+        <span class="icon">📄</span>
+        <span>Documentos</span>
+    </a>
+    <a href="{{ url_ai_lab|default:'#' }}" aria-label="IA">
+        <span class="icon">🤖</span>
+        <span>IA</span>
+    </a>
+    <a href="{{ url_centro|default:'#' }}" aria-label="Reportes">
+        <span class="icon">📊</span>
+        <span>Reportes</span>
+    </a>
+</nav>

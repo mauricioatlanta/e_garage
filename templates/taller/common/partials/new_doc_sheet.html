@@ -1,0 +1,28 @@
+{% comment %}
+Bottom sheet para elegir tipo de documento (Presupuesto / OT / Factura).
+Requiere: url_crear (base para nuevo documento). Los tipos se pasan por query ?tipo=PRES|OT|FAC
+{% endcomment %}
+<div id="new-doc-sheet-overlay" class="sheet-overlay" aria-hidden="true">
+    <div id="new-doc-sheet-panel" class="sheet-panel" role="dialog" aria-label="Crear documento">
+        <h3 class="text-lg font-semibold text-white mb-4">Crear documento</h3>
+        <a href="{{ url_crear|default:'#' }}?tipo=PRES" class="btn-sheet bg-cyan-500/20 border border-cyan-400/40 text-cyan-200">Presupuesto</a>
+        <a href="{{ url_crear|default:'#' }}?tipo=OT" class="btn-sheet bg-cyan-500/20 border border-cyan-400/40 text-cyan-200">Orden de trabajo</a>
+        <a href="{{ url_crear|default:'#' }}?tipo=FAC" class="btn-sheet bg-cyan-500/20 border border-cyan-400/40 text-cyan-200">Factura</a>
+        <button type="button" class="mt-4 w-full py-2 rounded-lg border border-white/20 text-gray-400" onclick="document.getElementById('new-doc-sheet-overlay').classList.remove('open')">Cerrar</button>
+    </div>
+</div>
+<script>
+(function() {
+    var overlay = document.getElementById('new-doc-sheet-overlay');
+    if (!overlay) return;
+    document.querySelectorAll('.new-doc-cta').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            if (btn.getAttribute('href') === '#') e.preventDefault();
+            overlay.classList.add('open');
+        });
+    });
+    overlay.addEventListener('click', function(e) {
+        if (e.target === overlay) overlay.classList.remove('open');
+    });
+})();
+</script>
