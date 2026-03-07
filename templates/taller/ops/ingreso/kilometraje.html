@@ -1,0 +1,34 @@
+{% extends "taller/ops/ingreso/base_ingreso.html" %}
+{% load i18n %}
+{% load country_url %}
+{% block title %}{% trans "Kilometraje" %} | {% trans "Ingreso" %}{% endblock %}
+{% block content %}
+<div class="ingreso-wrap">
+  <div class="container py-4">
+    {% include "taller/ops/ingreso/_stepper.html" with step=2 %}
+    {% include "taller/ops/ingreso/_vehiculo_card.html" %}
+    <h2 class="text-center mb-4 mt-4" style="font-family: Orbitron; color: var(--ops-cyan);">{% trans "Paso 2/5 – Kilometraje" %}</h2>
+
+    {% if ultimo_km is not None %}
+    <div class="ingreso-warning text-center">
+      {% blocktrans with km=ultimo_km %}Último km registrado: {{ km }}{% endblocktrans %}
+    </div>
+    {% endif %}
+
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="glass-panel">
+          <form method="post" action="{% country_url 'ops:ops_ingreso_kilometraje' vehiculo_id=vehiculo.pk app_namespace='direct' %}" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-flex gap-2 justify-content-end mt-3">
+              <a href="{% country_url 'ops:ops_ingreso_patente' app_namespace='direct' %}" class="btn btn-outline-light">{% trans "Volver" %}</a>
+              <button type="submit" class="btn-ingreso btn-ingreso-primary">{% trans "Continuar" %}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

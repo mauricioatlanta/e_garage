@@ -2,6 +2,8 @@ import logging
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
+from django.urls import reverse
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from core.views import TenantViewMixin
@@ -76,8 +78,20 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
         kwargs["request"] = self.request
         return kwargs
 
+    def get_initial(self):
+        initial = super().get_initial()
+        prefill = (self.request.GET.get("prefill_cliente") or "").strip()
+        if prefill.isdigit():
+            initial["cliente"] = int(prefill)
+        return initial
+
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
+
+        prefill = (self.request.GET.get("prefill_cliente") or "").strip()
+        if prefill.isdigit():
+            form.fields["cliente"].initial = int(prefill)
+            form.instance.cliente_id = int(prefill)
 
         # Detectar país y agregar campos USA si es necesario
         empresa = getattr(self.request, "empresa", getattr(self.request.user, "empresa", None))
@@ -88,13 +102,71 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
 
         return form
 
+    def _get_next_url(self):
+        """Obtiene la URL de redirección desde POST, GET o sesión (igual que ClienteCreateView)."""
+        from urllib.parse import unquote
+
+        raw_next = (self.request.POST.get("next") or self.request.GET.get("next") or "").strip()
+        if not raw_next:
+            return None
+        next_url = unquote(raw_next).strip()
+        if next_url and not next_url.startswith(("http://", "https://", "/")):
+            next_url = "/" + next_url
+        url_to_check = (
+            self.request.build_absolute_uri(next_url) if next_url.startswith("/") else next_url
+        )
+        if url_has_allowed_host_and_scheme(
+            url=url_to_check,
+            allowed_hosts={self.request.get_host()},
+            require_https=self.request.is_secure(),
+        ):
+            return next_url if next_url.startswith("/") else url_to_check
+        return None
+
+    def get_success_url(self):
+        next_url = self._get_next_url()
+        if next_url:
+            return next_url
+        empresa = getattr(self.request.user, "empresa", None)
+        if empresa and getattr(empresa, "pais", None) == "US":
+            return reverse("usa:taller:vehiculos:lista_vehiculos")
+        return reverse("chile:taller:vehiculos:lista_vehiculos")
+
     def form_valid(self, form):
+        from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
+
+        from django.shortcuts import redirect
+
         # Asignar empresa automáticamente (TenantScoped)
-        # Asignar empresa usando getattr para evitar warnings de tipo estático
         empresa_req = getattr(self.request, "empresa", None)
         if empresa_req:
             form.instance.empresa = empresa_req
-        return super().form_valid(form)
+
+        self.object = form.save()
+        next_url = self.get_success_url()
+
+        # Si volvemos al documento, agregar new_vehiculo_id y prefill_cliente
+        if next_url and "documentos" in next_url:
+            parsed = urlparse(next_url)
+            params = parse_qs(parsed.query, keep_blank_values=True)
+            params["new_vehiculo_id"] = [str(self.object.pk)]
+            if self.object.cliente_id:
+                c = getattr(self.object, "cliente", None)
+                params["prefill_cliente"] = [str(self.object.cliente_id)]
+                if c:
+                    nombre = getattr(c, "nombre_completo", None) or ""
+                    if not nombre:
+                        nombre = f"{(getattr(c, 'nombre', '') or '').strip()} {(getattr(c, 'apellido', '') or '').strip()}".strip()
+                    params["prefill_cliente_nombre"] = [nombre or str(c)]
+                    params["prefill_cliente_email"] = [getattr(c, "email", "") or ""]
+                    params["prefill_cliente_telefono"] = [getattr(c, "telefono", "") or ""]
+                else:
+                    params["prefill_cliente_nombre"] = [str(self.object.cliente_id)]
+            new_query = urlencode(params, doseq=True)
+            next_url = urlunparse(parsed._replace(query=new_query))
+            return redirect(next_url)
+
+        return redirect(next_url)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
@@ -122,6 +194,7 @@ class VehiculoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
             country = "CL"
 
         ctx["country"] = country
+        ctx["next"] = self.request.GET.get("next", "").strip() or None
         ctx["SHOW_DEBUG"] = True  # Para mostrar [DEBUG country: ...] en el template
         ctx["debug_empresa_pais"] = (
             f"empresa={getattr(empresa,'id',None)} pais={country} usuario={self.request.user.username}"

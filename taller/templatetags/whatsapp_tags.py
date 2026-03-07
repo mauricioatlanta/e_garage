@@ -1,6 +1,8 @@
 from urllib.parse import quote
+
 from django import template
 from django.conf import settings
+from django.utils.encoding import force_str
 
 register = template.Library()
 
@@ -48,9 +50,8 @@ def whatsapp_document_link(context, document=None, text=None):
     # Número WhatsApp configurable (si existe)
     phone = getattr(settings, "WHATSAPP_DEFAULT_PHONE", "") or ""
 
-    # Mensaje
-    if not text:
-        text = "Hola, te comparto tu documento."
+    # Mensaje (force_str convierte lazy translations, SafeString, etc.)
+    text = force_str(text or "Hola, te comparto tu documento.")
 
     # Si tenemos document y tiene algún campo usable, lo agregamos
     try:
@@ -71,7 +72,10 @@ def whatsapp_document_link(context, document=None, text=None):
     except Exception:
         pass
 
-    msg = quote(text)
+    text = force_str(text or "")
+    if not text:
+        return ""
+    msg = quote(text, safe="")
     if phone:
         return f"https://wa.me/{phone}?text={msg}"
     return f"https://wa.me/?text={msg}"

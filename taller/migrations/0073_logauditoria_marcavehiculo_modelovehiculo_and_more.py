@@ -350,9 +350,16 @@ class Migration(migrations.Migration):
             model_name="companysettings",
             name="terms_conditions",
         ),
-        migrations.RemoveField(
-            model_name="empresa",
-            name="is_trial",
+        # Solo estado: quitar is_trial del modelo en Django; no tocar la BD (en test/SQLite
+        # la columna puede no existir; en prod puede quedarse hasta un DROP explícito).
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.RemoveField(
+                    model_name="empresa",
+                    name="is_trial",
+                ),
+            ],
         ),
         migrations.AddField(
             model_name="cajavehiculo",

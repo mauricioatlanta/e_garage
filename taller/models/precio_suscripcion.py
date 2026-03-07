@@ -109,10 +109,11 @@ class PrecioSuscripcion(models.Model):
 
     # --- Helpers de presentación / negocio ---
     def precio_formateado(self) -> str:
+        """Formato USA: $1,250.25 (coma miles, 2 decimales, sin espacio tras $)."""
         if self.pais == self.Pais.US:
-            return f"${self.precio:,.2f} USD"
+            return f"${self.precio:,.2f}"
         if self.pais == self.Pais.MX:
-            return f"${self.precio:,.2f} MXN"
+            return f"${self.precio:,.2f}"
         return f"${self.precio:,.0f} CLP"
 
     def caracteristicas_list(self, lang="en"):

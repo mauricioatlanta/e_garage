@@ -38,7 +38,19 @@ def company_branding(request):
     }
 
     if empresa:
-        conf = ConfiguracionEmpresa.objects.filter(empresa=empresa).first()
+        # Intentar obtener ConfiguracionEmpresa con manejo de errores
+        # Esto puede fallar si hay problemas de DB, migraciones faltantes, etc.
+        conf = None
+        try:
+            conf = ConfiguracionEmpresa.objects.filter(empresa=empresa).first()
+        except Exception as e:
+            # Capturar cualquier error de DB (OperationalError, tabla no existe, etc.)
+            # Esto puede ocurrir si faltan migraciones o hay problemas de conexión
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.debug(f"Error obteniendo ConfiguracionEmpresa en company_branding: {e}")
+            # Continuar sin conf, usando valores por defecto de la empresa
 
         # Nombre y datos generales siempre deben reflejar la empresa real,
         # aunque no exista registro en ConfiguracionEmpresa.

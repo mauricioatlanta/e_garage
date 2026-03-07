@@ -1,0 +1,577 @@
+{% load static currency_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if es_usa %}Pricing Plans{% elif es_brasil %}Planos de Preços{% elif es_venezuela or es_peru %}Planes de Precios{% else %}Planes de Precios{% endif %} - eGarage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            /* Fondo estático profesional - sin animaciones */
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 50%, #1e293b 100%);
+            font-family: 'Exo 2', sans-serif;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Tipografía futurista */
+        .font-futuristic {
+            font-family: 'Orbitron', monospace;
+            letter-spacing: 0.05em;
+        }
+
+        /* Grid animada de fondo - DESACTIVADA para diseño serio */
+        /* .tech-grid { ... } */
+
+        /* Partículas flotantes - DESACTIVADAS */
+        /* .particles { ... } */
+
+        /* Líneas de energía - DESACTIVADAS */
+        /* .energy-lines { ... } */
+
+        /* Glass morphism simplificado - diseño serio */
+        .glass-card {
+            background: rgba(30, 41, 59, 0.8); /* Slate oscuro sólido */
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            border: 1px solid rgba(148, 163, 184, 0.2);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .glass-card:hover {
+            border-color: rgba(148, 163, 184, 0.4);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Tarjeta premium con efecto especial */
+        .premium-card {
+            background: linear-gradient(135deg, rgba(0, 230, 255, 0.2) 0%, rgba(139, 92, 246, 0.15) 50%, rgba(236, 72, 153, 0.1) 100%);
+            border: 2px solid rgba(0, 230, 255, 0.5);
+            position: relative;
+        }
+
+        .premium-card::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            background: linear-gradient(45deg, #00e6ff, #8b5cf6, #ec4899, #00e6ff);
+            border-radius: 2rem;
+            z-index: -1;
+            opacity: 0;
+            animation: premium-pulse 3s ease-in-out infinite;
+            filter: blur(10px);
+        }
+
+        @keyframes premium-pulse {
+            0%, 100% { opacity: 0.3; transform: scale(0.98); }
+            50% { opacity: 0.6; transform: scale(1.02); }
+        }
+
+        /* Texto con efecto holográfico */
+        .holographic-text {
+            background: linear-gradient(45deg, #00e6ff, #6366f1, #8b5cf6, #00e6ff);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: holographic 4s ease-in-out infinite;
+            text-shadow: 0 0 30px rgba(0, 230, 255, 0.5);
+        }
+
+        @keyframes holographic {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        /* Efecto de glow en íconos */
+        .icon-glow {
+            filter: drop-shadow(0 0 15px currentColor);
+            transition: all 0.3s ease;
+        }
+
+        .icon-glow:hover {
+            filter: drop-shadow(0 0 25px currentColor);
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        /* Botones futuristas */
+        .futuristic-button {
+            background: linear-gradient(45deg, #00e6ff, #6366f1);
+            border: 2px solid #00e6ff;
+            box-shadow: 0 0 20px rgba(0, 230, 255, 0.5);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .futuristic-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .futuristic-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .futuristic-button:hover {
+            box-shadow: 0 0 40px rgba(0, 230, 255, 0.8);
+            transform: translateY(-2px);
+            border-color: #8b5cf6;
+        }
+
+        /* Badge premium */
+        .premium-badge {
+            background: linear-gradient(135deg, #f59e0b, #ef4444);
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.6);
+            animation: badge-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes badge-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(239, 68, 68, 0.9); }
+        }
+
+        /* Efectos de entrada */
+        .fade-in-up {
+            animation: fadeInUp 0.8s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Delays para animaciones escalonadas */
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+        .delay-500 { animation-delay: 0.5s; }
+
+        /* Feature card hover effect */
+        .feature-card {
+            background: rgba(0, 230, 255, 0.05);
+            border: 1px solid rgba(0, 230, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            background: rgba(0, 230, 255, 0.1);
+            border-color: rgba(0, 230, 255, 0.5);
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 230, 255, 0.2);
+        }
+
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #1a1a2e;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #00e6ff, #6366f1);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #6366f1, #8b5cf6);
+        }
+
+        /* Botones de idioma */
+        .lang-btn {
+            color: #9ca3af;
+            transition: all 0.3s ease;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(45deg, #00e6ff, #6366f1);
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 230, 255, 0.5);
+        }
+
+        .lang-btn:hover {
+            color: #00e6ff;
+        }
+    </style>
+</head>
+<body>
+    <!-- Grid de fondo - DESACTIVADO para diseño serio -->
+    <!-- <div class="tech-grid"></div> -->
+
+    <!-- Partículas flotantes - DESACTIVADAS para diseño serio -->
+    <!-- <div class="particles">...</div> -->
+
+    <!-- Líneas de energía - DESACTIVADAS para diseño serio -->
+    <!-- <div class="energy-lines">...</div> -->
+
+    <!-- Contenido principal -->
+    <div class="relative z-10 container mx-auto px-4 py-16">
+        <!-- Header con Logo -->
+        <div class="text-center mb-20 fade-in-up">
+            <!-- Logo y Language Selector -->
+            <div class="flex items-center justify-center mb-8 relative">
+                <!-- Logo -->
+                <div class="flex items-center justify-center">
+                    <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-24 md:h-32 w-auto" style="filter: drop-shadow(0 0 30px rgba(0, 230, 255, 0.8));">
+                {% if pais_usuario %}
+                        <span class="ml-4 px-4 py-2 glass-card text-cyan-300 text-sm font-bold">
+                        {% if es_usa %}🇺🇸 USA{% elif es_brasil %}🇧🇷 Brasil{% elif es_venezuela %}🇻🇪 Venezuela{% elif es_peru %}🇵🇪 Perú{% elif es_mexico %}🇲🇽 México{% else %}🇨🇱 Chile{% endif %}
+                    </span>
+                {% endif %}
+            </div>
+
+                <!-- Language Selector (Top Right) -->
+                {% if not es_brasil and not es_venezuela and not es_peru and not es_mexico %}
+                <div class="absolute top-0 right-0">
+                    <div class="flex items-center gap-2 glass-card px-3 py-2">
+                        <button onclick="setLanguage('en')" id="btn-en" class="px-3 py-1 rounded-lg text-sm font-bold transition-all duration-300 lang-btn">
+                            🇺🇸 EN
+                        </button>
+                        <button onclick="setLanguage('es')" id="btn-es" class="px-3 py-1 rounded-lg text-sm font-bold transition-all duration-300 lang-btn">
+                            🇪🇸 ES
+                        </button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Título Principal -->
+            <h1 class="text-4xl md:text-6xl font-futuristic font-bold text-center mb-6 holographic-text">
+                <span class="lang-en">Pricing Plans</span>
+                <span class="lang-es" style="display: none;">Planes de Precios</span>
+            </h1>
+
+            <!-- Descripción -->
+            <p class="text-xl md:text-2xl text-cyan-100 max-w-3xl mx-auto leading-relaxed">
+                <span class="lang-en">
+                    Choose the perfect plan for your automotive workshop and power your business with
+                    <span class="text-cyan-400 font-bold">cutting-edge AI technology</span>
+                </span>
+                <span class="lang-es" style="display: none;">
+                    Elige el plan perfecto para tu taller automotriz y potencia tu negocio con
+                    <span class="text-cyan-400 font-bold">tecnología de vanguardia con IA</span>
+                </span>
+            </p>
+        </div>
+
+        <!-- Planes de Precios -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-7xl mx-auto mb-20">
+            {% for plan_key, plan in planes.items %}
+            <div class="glass-card {% if plan_key == 'premium' or plan_key == 'semestral' %}premium-card{% endif %} p-8 fade-in-up delay-{{ forloop.counter }}00">
+                {% if plan_key == 'premium' or plan_key == 'semestral' %}
+                <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
+                    <span class="premium-badge text-white px-6 py-2 rounded-full text-sm font-futuristic font-bold">
+                        <span class="lang-en">⭐ MOST POPULAR</span>
+                        <span class="lang-es" style="display: none;">⭐ MÁS POPULAR</span>
+                    </span>
+                </div>
+                {% endif %}
+
+                <!-- Icono del plan -->
+                <div class="text-center mb-6">
+                    <div class="inline-block">
+                        {% if plan_key == 'mensual' %}
+                            <i class="fas fa-rocket text-6xl text-blue-400 icon-glow"></i>
+                        {% elif plan_key == 'semestral' or plan_key == 'premium' %}
+                            <i class="fas fa-crown text-6xl text-yellow-400 icon-glow"></i>
+                        {% else %}
+                            <i class="fas fa-gem text-6xl text-purple-400 icon-glow"></i>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Nombre del plan -->
+                <h3 class="text-3xl font-futuristic font-bold text-center mb-4 text-cyan-300">
+                    <span class="lang-en">{{ plan.nombre_en|default:plan.nombre }}</span>
+                    <span class="lang-es" style="display: none;">{{ plan.nombre_es|default:plan.nombre }}</span>
+                </h3>
+
+                <!-- Precio (USA: $1,250.25; otros países según moneda) -->
+                <div class="text-center mb-6">
+                    <div class="text-3xl md:text-4xl font-futuristic font-extrabold holographic-text mb-2">
+                            {% if plan.precio_formateado %}
+                                {{ plan.precio_formateado }}{% if es_usa %} USD{% endif %}
+                            {% else %}
+                                {% if es_usa %}{% format_currency plan.precio %} USD{% else %}{{ moneda_simbolo }} {{ plan.precio|floatformat:0 }}{% endif %}
+                            {% endif %}
+                    </div>
+                    <p class="text-cyan-200 text-sm font-medium">
+                        <span class="lang-en">
+                            {% if plan_key == 'prueba' %}
+                                for 30 days
+                            {% elif plan_key == 'mensual' %}
+                                per month
+                            {% elif plan_key == 'cinco_meses' or 'semestral' in plan_key or 'premium' in plan_key %}
+                                per 5 months
+                            {% elif 'anual' in plan_key %}
+                                per year
+                            {% else %}
+                                per period
+                            {% endif %}
+                        </span>
+                        <span class="lang-es" style="display: none;">
+                            {% if plan_key == 'prueba' %}
+                                por 30 días
+                            {% elif plan_key == 'mensual' %}
+                                por mes
+                            {% elif plan_key == 'cinco_meses' or 'semestral' in plan_key %}
+                                por 5 meses
+                            {% elif 'anual' in plan_key %}
+                                por año
+                            {% else %}
+                                por periodo
+                            {% endif %}
+                        </span>
+                    </p>
+
+                    <!-- Badge de ahorro -->
+                    {% if plan.ahorro %}
+                    <div class="mt-2">
+                        <span class="inline-block px-4 py-1 bg-green-500/20 border border-green-400 text-green-300 rounded-full text-xs font-bold">
+                            💰 
+                            <span class="lang-en">Save {{ plan.ahorro }}</span>
+                            <span class="lang-es" style="display: none;">Ahorra {{ plan.ahorro }}</span>
+                        </span>
+                    </div>
+                    {% elif 'semestral' in plan_key or 'premium' in plan_key %}
+                    <div class="mt-2">
+                        <span class="inline-block px-4 py-1 bg-green-500/20 border border-green-400 text-green-300 rounded-full text-xs font-bold">
+                            <span class="lang-en">💰 Save 17%</span>
+                            <span class="lang-es" style="display: none;">💰 Ahorra 17%</span>
+                        </span>
+                    </div>
+                    {% elif 'anual' in plan_key %}
+                    <div class="mt-2">
+                        <span class="inline-block px-4 py-1 bg-green-500/20 border border-green-400 text-green-300 rounded-full text-xs font-bold">
+                            <span class="lang-en">💰 Save 33%</span>
+                            <span class="lang-es" style="display: none;">💰 Ahorra 33%</span>
+                        </span>
+                    </div>
+                    {% endif %}
+                    </div>
+
+                <!-- Características -->
+                <ul class="space-y-4 mb-8">
+                    {% for caracteristica in plan.caracteristicas_en|default:plan.caracteristicas %}
+                    <li class="flex items-start lang-en">
+                        <i class="fas fa-check-circle text-green-400 text-xl mr-3 mt-1 icon-glow"></i>
+                        <span class="text-cyan-100">{{ caracteristica }}</span>
+                    </li>
+                    {% endfor %}
+                    {% for caracteristica in plan.caracteristicas_es|default:plan.caracteristicas %}
+                    <li class="flex items-start lang-es" style="display: none;">
+                        <i class="fas fa-check-circle text-green-400 text-xl mr-3 mt-1 icon-glow"></i>
+                        <span class="text-cyan-100">{{ caracteristica }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+                <!-- Botón -->
+                <div class="text-center">
+                    <a href="{{ whatsapp_contacto }}&text=Hi, I want to hire the {{ plan.nombre_en|default:plan.nombre }}"
+                       target="_blank"
+                       class="futuristic-button inline-flex items-center justify-center w-full text-white font-futuristic font-bold py-4 px-6 rounded-xl transition-all duration-300 relative z-10">
+                        <i class="fab fa-whatsapp mr-2 text-xl"></i>
+                        <span class="relative z-10 lang-en">Contact Sales</span>
+                        <span class="relative z-10 lang-es" style="display: none;">Contratar Plan</span>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Características principales -->
+        <div class="max-w-6xl mx-auto mb-20 fade-in-up delay-400">
+            <h2 class="text-4xl md:text-5xl font-futuristic font-bold text-center mb-12 holographic-text">
+                <span class="lang-en">Why Choose eGarage AI?</span>
+                <span class="lang-es" style="display: none;">¿Por qué elegir eGarage AI?</span>
+            </h2>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="feature-card p-8 rounded-2xl text-center">
+                    <div class="mb-6">
+                        <i class="fas fa-brain text-6xl text-cyan-400 icon-glow"></i>
+                    </div>
+                    <h3 class="text-2xl font-futuristic font-bold text-cyan-300 mb-4">
+                        <span class="lang-en">Advanced AI</span>
+                        <span class="lang-es" style="display: none;">IA Avanzada</span>
+                    </h3>
+                    <p class="text-cyan-100 leading-relaxed">
+                        <span class="lang-en">Automatic diagnostics and intelligent suggestions to improve your service</span>
+                        <span class="lang-es" style="display: none;">Diagnósticos automáticos y sugerencias inteligentes para mejorar tu servicio</span>
+                    </p>
+                        </div>
+
+                <div class="feature-card p-8 rounded-2xl text-center">
+                    <div class="mb-6">
+                        <i class="fas fa-clock text-6xl text-green-400 icon-glow"></i>
+                    </div>
+                    <h3 class="text-2xl font-futuristic font-bold text-cyan-300 mb-4">
+                        <span class="lang-en">Time Saving</span>
+                        <span class="lang-es" style="display: none;">Ahorro de Tiempo</span>
+                    </h3>
+                    <p class="text-cyan-100 leading-relaxed">
+                        <span class="lang-en">Automate repetitive processes and focus on what really matters</span>
+                        <span class="lang-es" style="display: none;">Automatiza procesos repetitivos y enfócate en lo que realmente importa</span>
+                    </p>
+                        </div>
+
+                <div class="feature-card p-8 rounded-2xl text-center">
+                    <div class="mb-6">
+                        <i class="fas fa-chart-line text-6xl text-purple-400 icon-glow"></i>
+                    </div>
+                    <h3 class="text-2xl font-futuristic font-bold text-cyan-300 mb-4">
+                        <span class="lang-en">Business Growth</span>
+                        <span class="lang-es" style="display: none;">Crecimiento</span>
+                    </h3>
+                    <p class="text-cyan-100 leading-relaxed">
+                        <span class="lang-en">Detailed reports to make informed decisions and grow your business</span>
+                        <span class="lang-es" style="display: none;">Reportes detallados para tomar decisiones informadas y hacer crecer tu negocio</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Garantía -->
+        <div class="max-w-3xl mx-auto mb-20 fade-in-up delay-500">
+            <div class="glass-card p-12 text-center border-2 border-cyan-400/50">
+                <i class="fas fa-shield-alt text-7xl text-cyan-400 mb-6 icon-glow"></i>
+                <h3 class="text-3xl font-futuristic font-bold mb-4 text-cyan-300">
+                    <span class="lang-en">30-Day Money-Back Guarantee</span>
+                    <span class="lang-es" style="display: none;">Garantía de 30 días</span>
+                </h3>
+                <p class="text-xl text-cyan-100 leading-relaxed">
+                    <span class="lang-en">
+                        Try any plan risk-free. If you're not completely satisfied, we'll refund your money with no questions asked.
+                    </span>
+                    <span class="lang-es" style="display: none;">
+                        Prueba cualquier plan sin riesgo. Si no estás completamente satisfecho, te devolvemos tu dinero sin preguntas.
+                    </span>
+                </p>
+            </div>
+        </div>
+
+        <!-- CTA Final -->
+        <div class="text-center mb-12">
+            <a href="{% if es_usa %}/us/{% else %}/cl/{% endif %}"
+               class="inline-flex items-center px-12 py-5 futuristic-button text-white font-futuristic font-bold text-xl rounded-2xl">
+                <i class="fas fa-arrow-left mr-3"></i>
+                <span class="relative z-10 lang-en">Back to Home</span>
+                <span class="relative z-10 lang-es" style="display: none;">Volver al Inicio</span>
+            </a>
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center text-cyan-300 pt-8 border-t border-cyan-800/30">
+            <p class="mb-2">
+                &copy; 2025 eGarage AI.
+                <span class="lang-en">All rights reserved.</span>
+                <span class="lang-es" style="display: none;">Todos los derechos reservados.</span>
+            </p>
+            <p class="text-cyan-400">
+                <span class="lang-en">Questions?</span>
+                <span class="lang-es" style="display: none;">¿Tienes preguntas?</span>
+                <a href="{{ whatsapp_contacto }}" target="_blank" class="text-cyan-300 hover:text-cyan-100 font-bold transition-colors">
+                    <span class="lang-en">Contact us on WhatsApp</span>
+                    <span class="lang-es" style="display: none;">Contáctanos por WhatsApp</span>
+                </a>
+            </p>
+        </div>
+    </div>
+
+    <script>
+        // Sistema de idiomas
+        let currentLang = 'en'; // Por defecto inglés
+
+        function setLanguage(lang) {
+            currentLang = lang;
+
+            // Ocultar todos los elementos de idioma
+            document.querySelectorAll('.lang-en, .lang-es').forEach(el => {
+                el.style.display = 'none';
+            });
+
+            // Mostrar elementos del idioma seleccionado
+            document.querySelectorAll(`.lang-${lang}`).forEach(el => {
+                if (el.tagName === 'SPAN') {
+                    el.style.display = 'inline';
+                } else if (el.tagName === 'LI') {
+                    el.style.display = 'flex';
+                } else {
+                    el.style.display = 'block';
+                }
+            });
+
+            // Actualizar botones activos
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.getElementById(`btn-${lang}`).classList.add('active');
+
+            // Guardar preferencia
+            localStorage.setItem('preferredLang', lang);
+        }
+
+        // Animación suave al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cargar idioma guardado o usar idioma por defecto según país
+            let defaultLang = 'en';
+            {% if es_brasil or es_venezuela or es_chile or es_peru or es_mexico %}
+            defaultLang = 'es';
+            {% endif %}
+            const savedLang = localStorage.getItem('preferredLang') || defaultLang;
+            setLanguage(savedLang);
+
+            // Animaciones de entrada
+            const cards = document.querySelectorAll('.fade-in-up');
+            cards.forEach((card, index) => {
+                setTimeout(() => {
+                    card.style.opacity = '1';
+                }, index * 100);
+            });
+        });
+
+        // Efecto parallax en las partículas al mover el mouse
+        document.addEventListener('mousemove', (e) => {
+            const particles = document.querySelectorAll('.particle');
+            const x = e.clientX / window.innerWidth;
+            const y = e.clientY / window.innerHeight;
+
+            particles.forEach((particle, i) => {
+                const speed = (i + 1) * 0.5;
+                const newX = (x - 0.5) * speed * 20;
+                const newY = (y - 0.5) * speed * 20;
+                particle.style.transform = `translate(${newX}px, ${newY}px)`;
+            });
+        });
+    </script>
+</body>
+</html>

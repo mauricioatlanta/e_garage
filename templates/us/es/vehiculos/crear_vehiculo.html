@@ -18,8 +18,7 @@
 
 {% block page_extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-{# Select2 CSS se carga desde base.html via form.media.css - También lo agregamos aquí para asegurar que se cargue #}
-{% if form %}{{ form.media.css }}{% endif %}
+{# Select2/DAL CSS: base.html ya carga form.media.css en <head> - NO duplicar aquí (evita "DAL select2 already registered") #}
 <style>
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
@@ -402,14 +401,48 @@ input:focus {
 
 {% block panel_content %}
 <div class="form-card max-w-4xl mx-auto">
-    <form method="post" id="vehicle-form">
+    {% if messages %}
+    <div class="mb-4 space-y-2">
+      {% for message in messages %}
+      <div class="p-4 rounded-lg border {% if message.tags == 'error' %}border-red-500/50 bg-red-500/10 text-red-400{% elif message.tags == 'success' %}border-emerald-500/50 bg-emerald-500/10 text-emerald-400{% else %}border-amber-500/50 bg-amber-500/10 text-amber-400{% endif %} text-sm font-medium">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if form.non_field_errors %}
+    <div class="mb-4 p-4 rounded-lg border border-red-500/50 bg-red-500/10">
+      {% for err in form.non_field_errors %}
+      <p class="text-red-400 text-sm font-medium">{{ err }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <form method="post" id="vehicle-form" data-country-prefix="us" data-lang-prefix="es"
+          data-prefill-cliente="{{ prefill_cliente|default:'' }}"
+          data-prefill-cliente-nombre="{{ prefill_cliente_nombre|default:'' }}"
+          data-prefill-modelo-id="{{ prefill_modelo_id|default:'' }}"
+          data-prefill-modelo-nombre="{{ prefill_modelo_nombre|default:'' }}"
+          data-prefill-marca="{{ prefill_marca_val|default:'' }}"
+          data-ep-clientes="{% country_url 'vehiculos:api_busqueda_clientes' app_namespace='direct' %}"
+          data-ep-crear-cliente="{% country_url 'clientes:crear_cliente' app_namespace='direct' %}">
       {% csrf_token %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      {% if cliente_id %}<input type="hidden" name="cliente_id" value="{{ cliente_id }}">{% endif %}
+      {% if prefill_cliente %}<input type="hidden" name="prefill_cliente" value="{{ prefill_cliente }}">{% endif %}
+      {% if prefill_cliente_nombre %}<input type="hidden" name="prefill_cliente_nombre" value="{{ prefill_cliente_nombre }}">{% endif %}
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
         <div class="form-group space-y-3 sm:space-y-4">
           <label for="{{ form.cliente.id_for_label }}" class="text-sm sm:text-base">{% trans "Cliente" %}</label>
-          {{ form.cliente }}
+          <div id="cliente-container" class="flex flex-col gap-2">
+            {{ form.cliente }}
+            <a href="{% country_url 'clientes:crear_cliente' %}?next={{ request.get_full_path|urlencode }}"
+               class="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 rounded px-2 py-1 w-fit"
+               id="link-crear-cliente">
+              <span aria-hidden="true">➕</span>
+              <span>{% trans "Crear cliente nuevo" %}</span>
+            </a>
+          </div>
+          <p class="text-xs text-gray-400 mt-1">{% trans "Búsqueda en tiempo real: escribe nombre, apellido, email o teléfono." %}</p>
           {% if form.cliente.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
           {% endif %}
@@ -567,12 +600,81 @@ input:focus {
 
 {% block page_extra_js %}
 
+{# URLs country-aware para APIs (resuelven /us/en/ o /us/es/ según path actual) #}
+{% country_url 'vehiculos:modelos_por_marca_api' app_namespace='direct' as url_modelos_api %}
+{% country_url 'vehiculos:api_modelos_usa' app_namespace='direct' as url_modelos_usa %}
+{% country_url 'vehiculos:ajax_agregar_marca' app_namespace='direct' as url_agregar_marca %}
+{% country_url 'vehiculos:ajax_agregar_motor' app_namespace='direct' as url_agregar_motor %}
+{% country_url 'vehiculos:ajax_agregar_caja' app_namespace='direct' as url_agregar_caja %}
+{% country_url 'vehiculos:ajax_agregar_modelo' app_namespace='direct' as url_agregar_modelo %}
+{% country_url 'vehiculos:ajax_motores_por_modelo' app_namespace='direct' as url_motores_por_modelo %}
+{% country_url 'vehiculos:ajax_cajas_por_modelo' app_namespace='direct' as url_cajas_por_modelo %}
+
 {# form.media ya se carga en base.html (CSS en head, JS al final del body) - NO duplicar aquí #}
 
 <script>
 // Cache buster: 2024-12-19 - Versión actualizada - Inicialización mejorada de Select2/DAL
-// Definir countryPrefix globalmente
-const countryPrefix = '/us/';
+// countryPrefix incluye idioma (ej: /us/en/ o /us/es/) para DAL/autocomplete
+(function(){
+  const parts = window.location.pathname.split('/').filter(Boolean);
+  const country = parts[0] || 'us';
+  const lang = (parts[1] && parts[1].length === 2) ? parts[1] : null;
+  window.countryPrefix = '/' + country + '/' + (lang ? (lang + '/') : '');
+})();
+const countryPrefix = window.countryPrefix;
+
+// Prefill cliente desde URL (prefill_cliente=79): inyectar opción en Select2/DAL
+(function () {
+  function runPrefill() {
+    const form = document.getElementById("vehicle-form");
+    const raw = (form && form.getAttribute("data-prefill-cliente")) || (new URLSearchParams(window.location.search).get("prefill_cliente") || "";
+    const prefillId = (raw + "").trim();
+    if (!prefillId) return;
+
+    const el = document.getElementById("id_cliente");
+    if (!el) return;
+
+    if (!window.jQuery) {
+      el.value = prefillId;
+      return;
+    }
+
+    const $el = window.jQuery(el);
+    const currentVal = ($el.val() || "").toString().trim();
+    if (currentVal) return;
+
+    const labelFromBackend = (form && form.getAttribute("data-prefill-cliente-nombre")) || "";
+    const label = (labelFromBackend && labelFromBackend.trim()) ? labelFromBackend.trim() : null;
+
+    function applyOption(optionLabel) {
+      const option = new Option(optionLabel || prefillId, prefillId, true, true);
+      $el.append(option).trigger("change");
+    }
+
+    if (label) {
+      applyOption(label);
+      return;
+    }
+
+    var prefix = (typeof window.countryPrefix === "string" && window.countryPrefix) ? window.countryPrefix.replace(/\/$/, "") : "/us/es";
+    var url = prefix + "/ajax/clientes/buscar/?id=" + encodeURIComponent(prefillId);
+    fetch(url, { credentials: "same-origin" })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var optionLabel = (data.results && data.results[0] && data.results[0].text) ? data.results[0].text : prefillId;
+        applyOption(optionLabel);
+      })
+      .catch(function () {
+        applyOption(prefillId);
+      });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { setTimeout(runPrefill, 400); });
+  } else {
+    setTimeout(runPrefill, 400);
+  }
+})();
 
 // --- INICIALIZACIÓN DE SELECT2 Y DAL ---
 window.clienteSelect2Init = { attempted: false, success: false };
@@ -652,19 +754,21 @@ function initializeClienteSelect2() {
                 aplicarEstilosSelect2();
             } else {
                 console.warn('⚠️ Select2 no se inicializó automáticamente, intentando fallback manual');
-                // Fallback manual solo si DAL no funcionó
+                // Fallback: usar API de búsqueda de clientes (vehiculos/api/clientes/?q=) si está disponible
                 try {
-                    // Verificar URL antes de inicializar
-                    const finalUrl = clienteField.attr('data-autocomplete-light-url') || 
+                    const form = document.getElementById('vehicle-form');
+                    const apiClientes = form && form.getAttribute('data-ep-clientes');
+                    const finalUrl = (apiClientes && apiClientes.trim()) || 
+                                    clienteField.attr('data-autocomplete-light-url') || 
                                     clienteField.attr('data-ajax--url') ||
                                     countryPrefix + 'vehiculos/autocomplete/cliente/';
                     console.log('🔗 URL final antes de inicializar Select2:', finalUrl);
                     
                     clienteField.select2({ 
-                        placeholder: 'Escribe para buscar clientes por nombre, email o teléfono...', 
+                        placeholder: 'Escribe para buscar clientes por nombre, apellido, email o teléfono...', 
                         allowClear: true, 
                         width: '100%',
-                        minimumInputLength: 1,
+                        minimumInputLength: 0,
                         language: {
                             inputTooShort: function() {
                                 return 'Escribe al menos 1 carácter para buscar...';
@@ -681,38 +785,34 @@ function initializeClienteSelect2() {
                             dataType: 'json',
                             delay: 250,
                             data: function (params) {
-                                return {
-                                    q: params.term, // término de búsqueda
-                                    page: params.page || 1
-                                };
+                                return { q: (params.term || '').trim() };
                             },
                             processResults: function (data, params) {
+                                // API api_busqueda_clientes devuelve array [{id, nombre, apellido, email, telefono}]
+                                if (Array.isArray(data)) {
+                                    return {
+                                        results: data.map(function(item) {
+                                            var text = [item.nombre, item.apellido].filter(Boolean).join(' ');
+                                            if (item.email) text += ' – ' + item.email;
+                                            if (item.telefono) text += ' (' + item.telefono + ')';
+                                            return { id: item.id, text: text || String(item.id) };
+                                        })
+                                    };
+                                }
                                 // DAL devuelve {results: [{id, text}, ...]}
                                 if (data.results && Array.isArray(data.results)) {
                                     return {
                                         results: data.results,
-                                        pagination: {
-                                            more: data.pagination && data.pagination.more || false
-                                        }
+                                        pagination: data.pagination ? { more: data.pagination.more } : {}
                                     };
                                 }
-                                // Si es un array directo
-                                if (Array.isArray(data)) {
-                                    return {
-                                        results: data.map(item => ({
-                                            id: item.id || item.pk,
-                                            text: item.text || item.nombre || String(item)
-                                        }))
-                                    };
-                                }
-                                console.warn('⚠️ Formato de respuesta no reconocido:', data);
                                 return {results: []};
                             },
                             cache: true
                         }
                     });
                     window.clienteSelect2Init.success = true;
-                    console.log('✅ Select2 inicializado manualmente');
+                    console.log('✅ Select2 inicializado manualmente (búsqueda en tiempo real)');
                     aplicarEstilosSelect2();
                 } catch (e) {
                     console.error('❌ Error al inicializar Select2 manualmente:', e);
@@ -805,14 +905,15 @@ $(document).ready(function() {
 
 // --- LÓGICA DE CARGA DE MODELOS (AJAX) ---
 document.addEventListener('DOMContentLoaded', function() {
-    // 1. URLs generadas por Django (Fuente de verdad)
-    const urlModelosApi = "{% url 'usa_es:vehiculos:modelos_por_marca_api' %}";
-    const urlAgregarMarca = "{% url 'usa_es:vehiculos:ajax_agregar_marca' %}";
-    const urlAgregarMotor = "{% url 'usa_es:vehiculos:ajax_agregar_motor' %}";
-    const urlAgregarCaja = "{% url 'usa_es:vehiculos:ajax_agregar_caja' %}";
-    const urlAgregarModelo = "{% url 'usa_es:vehiculos:ajax_agregar_modelo' %}";
-    const urlMotoresPorModelo = "{% url 'usa_es:vehiculos:ajax_motores_por_modelo' %}";
-    const urlCajasPorModelo = "{% url 'usa_es:vehiculos:ajax_cajas_por_modelo' %}";
+    // 1. URLs country-aware (resuelven /us/en/ o /us/es/ según path actual)
+    const urlModelosApi = "{{ url_modelos_api|default:'' }}";
+    const urlModelosUsa = "{{ url_modelos_usa|default:'' }}";
+    const urlAgregarMarca = "{{ url_agregar_marca|default:'' }}";
+    const urlAgregarMotor = "{{ url_agregar_motor|default:'' }}";
+    const urlAgregarCaja = "{{ url_agregar_caja|default:'' }}";
+    const urlAgregarModelo = "{{ url_agregar_modelo|default:'' }}";
+    const urlMotoresPorModelo = "{{ url_motores_por_modelo|default:'' }}";
+    const urlCajasPorModelo = "{{ url_cajas_por_modelo|default:'' }}";
     
     // 2. Referencias al DOM
     const marcaSelect = document.getElementById('id_marca');
@@ -843,11 +944,17 @@ document.addEventListener('DOMContentLoaded', function() {
         loadingOption.text = 'Cargando modelos...';
         modeloSelect.add(loadingOption);
 
-        // Construir URL
-        let url = `${urlModelosApi}?marca_id=${marcaId}`;
-        if (anio) url += `&anio=${anio}`;
+        // USA puede usar catálogo (marca = texto como "Toyota") o modelo Marca (marca_id numérico)
+        const isMarcaId = /^\d+$/.test(String(marcaId).trim());
+        let url;
+        if (isMarcaId) {
+            url = `${urlModelosApi}?marca_id=${encodeURIComponent(marcaId)}`;
+            if (anio) url += `&anio=${anio}`;
+        } else {
+            url = `${urlModelosUsa}?marca=${encodeURIComponent(marcaId)}`;
+        }
 
-        console.log('📡 Fetching:', url);
+        console.log('📡 Fetching:', url, isMarcaId ? '(marca_id)' : '(marca nombre)');
 
         fetch(url, {
             method: 'GET',
@@ -1406,6 +1513,64 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+{# Rehidratación: cuando el form vuelve por error (patente/VIN duplicado, etc), recargar modelos y reseleccionar #}
+{# USA: marca puede ser string (catálogo "Fiat") → api/modelos-usa/ | numérico → api/modelos-por-marca/ #}
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  const formEl = document.getElementById("vehicle-form");
+  const marcaEl = document.getElementById("id_marca");
+  const modeloEl = document.getElementById("id_modelo");
+  const anioEl = document.getElementById("id_anio");
+
+  if (!formEl || !marcaEl || !modeloEl) return;
+
+  let selectedMarca = (marcaEl.value || "").trim();
+  let selectedModelo = (modeloEl.value || "").trim();
+  const selectedAnio = anioEl ? (anioEl.value || "").trim() : "";
+  if (!selectedMarca && formEl.dataset.prefillMarca) selectedMarca = (formEl.dataset.prefillMarca || "").trim();
+  if (!selectedModelo && formEl.dataset.prefillModeloId) selectedModelo = (formEl.dataset.prefillModeloId || "").trim();
+
+  if (!selectedMarca || !selectedModelo) return;
+
+  const countryPrefix = (formEl.dataset.countryPrefix || "us").trim();
+  const langPrefix = (formEl.dataset.langPrefix || "es").trim();
+  const base = `/${countryPrefix}/${langPrefix}/vehiculos`;
+
+  const isMarcaId = /^\d+$/.test(selectedMarca);
+  const url = isMarcaId
+    ? `${base}/api/modelos-por-marca/?marca_id=${encodeURIComponent(selectedMarca)}` + (selectedAnio ? `&anio=${encodeURIComponent(selectedAnio)}` : "")
+    : `${base}/api/modelos-usa/?marca=${encodeURIComponent(selectedMarca)}`;
+
+  try {
+    const resp = await fetch(url, { credentials: "same-origin" });
+    const data = await resp.json();
+
+    modeloEl.innerHTML = "";
+    let found = false;
+
+    (data || []).forEach(item => {
+      const opt = document.createElement("option");
+      opt.value = item.id;
+      opt.textContent = item.nombre || String(item.id);
+      if (String(item.id) === String(selectedModelo)) {
+        opt.selected = true;
+        found = true;
+      }
+      modeloEl.appendChild(opt);
+    });
+
+    if (!found) {
+      const opt = document.createElement("option");
+      opt.value = selectedModelo;
+      opt.textContent = "(Selección anterior)";
+      opt.selected = true;
+      modeloEl.appendChild(opt);
+    }
+  } catch (e) {
+    console.error("Rehidratar modelos falló:", e);
+  }
+});
+</script>
 
 {# form.media es CRÍTICO para que DAL inicialice Select2 correctamente #}
 <script>
@@ -1541,6 +1706,5 @@ $(document).ready(function() {
     setTimeout(initializeDAL, 500);
 })();
 </script>
-{# JS de form.media (DAL/Select2) - Asegurar que se cargue #}
-{% if form %}{{ form.media.js }}{% endif %}
+{# DAL/Select2 JS: base.html ya carga form.media.js al final del body - NO duplicar aquí (evita "DAL select2 already registered") #}
 {% endblock %}

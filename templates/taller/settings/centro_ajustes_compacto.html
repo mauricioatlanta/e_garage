@@ -1,748 +1,750 @@
-{% extends 'base.html' %}
-{% load static i18n %}
+    {% extends 'base.html' %}
+    {% load static i18n %}
 
-{% block title %}⚙️ Settings Center - eGarage{% endblock %}
+    {% block title %}⚙️ Settings Center - eGarage{% endblock %}
 
-{% block extra_css %}
-<style>
-    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
-    
-    :root {
-        --neon-cyan: #00ffff;
-        --neon-purple: #b026ff;
-        --neon-pink: #ff00ff;
-        --dark-card: #151932;
-        --text-primary: #ffffff;
-        --text-secondary: #a0aec0;
-    }
+    {% block extra_css %}
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+        
+        :root {
+            --neon-cyan: #00ffff;
+            --neon-purple: #b026ff;
+            --neon-pink: #ff00ff;
+            --dark-card: #151932;
+            --text-primary: #ffffff;
+            --text-secondary: #a0aec0;
+        }
 
-    body {
-        background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
-        background-attachment: fixed;
-        font-family: 'Rajdhani', sans-serif;
-        color: var(--text-primary);
-    }
+        body {
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
+            background-attachment: fixed;
+            font-family: 'Rajdhani', sans-serif;
+            color: var(--text-primary);
+        }
 
-    .settings-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 2rem 1rem 4rem;
-    }
-
-    .section-buttons-row {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-        gap: 1rem;
-        margin-bottom: 2rem;
-    }
-
-    .section-button {
-        border-radius: 16px;
-        padding: 1.3rem 1.5rem;
-        background: linear-gradient(145deg, #151932, #1f2442);
-        border: 1px solid rgba(0, 255, 255, 0.25);
-        color: var(--text-primary);
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .06em;
-        font-size: .95rem;
-        cursor: pointer;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        transition: all .25s ease;
-        box-shadow: 0 0 18px rgba(0, 255, 255, .12);
-    }
-
-    .section-button span {
-        display: flex;
-        align-items: center;
-        gap: .6rem;
-    }
-
-    .section-button i {
-        font-size: 1.2rem;
-        color: var(--neon-cyan);
-    }
-
-    .section-button .arrow {
-        transition: transform .25s ease;
-    }
-
-    .section-button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 25px rgba(0, 255, 255, .4);
-        border-color: var(--neon-cyan);
-    }
-
-    .section-button.active {
-        background: linear-gradient(135deg, rgba(0,255,255,.18), rgba(176,38,255,.18));
-        border-color: var(--neon-cyan);
-    }
-
-    .section-button.active .arrow {
-        transform: rotate(180deg);
-    }
-
-    /* Card de sección (solo una visible) */
-    .settings-section-wrapper {
-        margin-top: 1rem;
-    }
-
-    .settings-section {
-        background: rgba(21, 25, 50, 0.88);
-        border-radius: 20px;
-        border: 1px solid rgba(0,255,255,.25);
-        box-shadow: 0 10px 35px rgba(0,0,0,.45);
-        padding: 2rem 2.2rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .settings-section-header {
-        display: flex;
-        align-items: center;
-        gap: .8rem;
-        margin-bottom: 1.5rem;
-        padding-bottom: .9rem;
-        border-bottom: 1px solid rgba(0,255,255,.25);
-    }
-
-    .settings-section-header i {
-        font-size: 1.4rem;
-        background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-    }
-
-    .settings-section-header h3 {
-        margin: 0;
-        font-size: 1.2rem;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-        font-family: 'Orbitron', sans-serif;
-    }
-
-    .form-label {
-        font-weight: 600;
-        text-transform: uppercase;
-        letter-spacing: .04em;
-        font-size: .85rem;
-        color: var(--text-secondary);
-        margin-bottom: .45rem;
-    }
-
-    .form-control,
-    .form-select,
-    textarea.form-control {
-        background: #111528;
-        border-radius: 10px;
-        border: 1px solid rgba(0,255,255,.3);
-        color: var(--text-primary);
-        padding: .7rem 1rem;
-        font-size: .95rem;
-    }
-
-    .form-control:focus,
-    .form-select:focus {
-        border-color: var(--neon-cyan);
-        box-shadow: 0 0 0 .15rem rgba(0,255,255,.35);
-        outline: none;
-    }
-
-    .form-control-color {
-        width: 100%;
-        height: 48px;
-        cursor: pointer;
-        padding: 0;
-    }
-
-    .btn-save {
-        margin-top: 1rem;
-        padding: .9rem 1.8rem;
-        border-radius: 999px;
-        background: linear-gradient(135deg, rgba(0,255,255,.25), rgba(176,38,255,.25));
-        border: 1px solid var(--neon-cyan);
-        color: #fff;
-        font-weight: 700;
-        text-transform: uppercase;
-        letter-spacing: .08em;
-        font-size: .85rem;
-        box-shadow: 0 0 22px rgba(0,255,255,.35);
-        transition: all .25s ease;
-        cursor: pointer;
-    }
-
-    .btn-save:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 30px rgba(0,255,255,.6);
-    }
-
-    /* Invisible por defecto */
-    .settings-section { display: none; }
-    .settings-section.active { display: block; }
-
-    #settings-placeholder {
-        margin-top: 3rem;
-        text-align: center;
-        color: var(--text-secondary);
-    }
-
-    #settings-placeholder i {
-        font-size: 2rem;
-        color: var(--neon-cyan);
-        margin-bottom: .5rem;
-    }
-
-    /* Ocultar mensajes del sistema */
-    .alert-settings, .settings-header {
-        display: none !important;
-    }
-
-    /* Responsive */
-    @media (max-width: 768px) {
         .settings-container {
-            padding: 1rem 0.75rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem 4rem;
         }
 
         .section-buttons-row {
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .section-button {
-            padding: 1rem 1.25rem;
-            min-height: 44px;
-            font-size: 0.85rem;
+            border-radius: 16px;
+            padding: 1.3rem 1.5rem;
+            background: linear-gradient(145deg, #151932, #1f2442);
+            border: 1px solid rgba(0, 255, 255, 0.25);
+            color: var(--text-primary);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .06em;
+            font-size: .95rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: all .25s ease;
+            box-shadow: 0 0 18px rgba(0, 255, 255, .12);
+        }
+
+        .section-button span {
+            display: flex;
+            align-items: center;
+            gap: .6rem;
+        }
+
+        .section-button i {
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+        }
+
+        .section-button .arrow {
+            transition: transform .25s ease;
+        }
+
+        .section-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(0, 255, 255, .4);
+            border-color: var(--neon-cyan);
+        }
+
+        .section-button.active {
+            background: linear-gradient(135deg, rgba(0,255,255,.18), rgba(176,38,255,.18));
+            border-color: var(--neon-cyan);
+        }
+
+        .section-button.active .arrow {
+            transform: rotate(180deg);
+        }
+
+        /* Card de sección (solo una visible) */
+        .settings-section-wrapper {
+            margin-top: 1rem;
         }
 
         .settings-section {
-            padding: 1.5rem 1rem;
+            background: rgba(21, 25, 50, 0.88);
+            border-radius: 20px;
+            border: 1px solid rgba(0,255,255,.25);
+            box-shadow: 0 10px 35px rgba(0,0,0,.45);
+            padding: 2rem 2.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .settings-section-header {
+            display: flex;
+            align-items: center;
+            gap: .8rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: .9rem;
+            border-bottom: 1px solid rgba(0,255,255,.25);
+        }
+
+        .settings-section-header i {
+            font-size: 1.4rem;
+            background: linear-gradient(135deg, var(--neon-cyan), var(--neon-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .settings-section-header h3 {
-            font-size: 1.1rem;
+            margin: 0;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        .form-label {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            font-size: .85rem;
+            color: var(--text-secondary);
+            margin-bottom: .45rem;
         }
 
         .form-control,
         .form-select,
         textarea.form-control {
-            padding: 0.875rem;
-            min-height: 44px;
-            font-size: 16px; /* Evita zoom en iOS */
+            background: #111528;
+            border-radius: 10px;
+            border: 1px solid rgba(0,255,255,.3);
+            color: var(--text-primary);
+            padding: .7rem 1rem;
+            font-size: .95rem;
+        }
+
+        .form-control:focus,
+        .form-select:focus {
+            border-color: var(--neon-cyan);
+            box-shadow: 0 0 0 .15rem rgba(0,255,255,.35);
+            outline: none;
+        }
+
+        .form-control-color {
+            width: 100%;
+            height: 48px;
+            cursor: pointer;
+            padding: 0;
         }
 
         .btn-save {
-            width: 100%;
-            padding: 1rem;
-            min-height: 44px;
+            margin-top: 1rem;
+            padding: .9rem 1.8rem;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(0,255,255,.25), rgba(176,38,255,.25));
+            border: 1px solid var(--neon-cyan);
+            color: #fff;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            font-size: .85rem;
+            box-shadow: 0 0 22px rgba(0,255,255,.35);
+            transition: all .25s ease;
+            cursor: pointer;
         }
 
-        .tecnico-card {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 1rem;
-            padding: 1rem;
-        }
-    }
-
-    @media (max-width: 480px) {
-        .settings-container {
-            padding: 0.75rem 0.5rem;
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px rgba(0,255,255,.6);
         }
 
-        h1.mb-3 {
-            font-size: 1rem !important;
+        /* Invisible por defecto */
+        .settings-section { display: none; }
+        .settings-section.active { display: block; }
+
+        #settings-placeholder {
+            margin-top: 3rem;
+            text-align: center;
+            color: var(--text-secondary);
         }
 
-        .section-button {
-            padding: 0.875rem 1rem;
-            font-size: 0.8rem;
+        #settings-placeholder i {
+            font-size: 2rem;
+            color: var(--neon-cyan);
+            margin-bottom: .5rem;
         }
 
-        .settings-section {
-            padding: 1rem 0.75rem;
+        /* Ocultar mensajes del sistema */
+        .alert-settings, .settings-header {
+            display: none !important;
         }
 
-        .settings-section-header h3 {
-            font-size: 1rem;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .settings-container {
+                padding: 1rem 0.75rem;
+            }
+
+            .section-buttons-row {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .section-button {
+                padding: 1rem 1.25rem;
+                min-height: 44px;
+                font-size: 0.85rem;
+            }
+
+            .settings-section {
+                padding: 1.5rem 1rem;
+            }
+
+            .settings-section-header h3 {
+                font-size: 1.1rem;
+            }
+
+            .form-control,
+            .form-select,
+            textarea.form-control {
+                padding: 0.875rem;
+                min-height: 44px;
+                font-size: 16px; /* Evita zoom en iOS */
+            }
+
+            .btn-save {
+                width: 100%;
+                padding: 1rem;
+                min-height: 44px;
+            }
+
+            .tecnico-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+                padding: 1rem;
+            }
         }
 
-        .form-label {
-            font-size: 0.8rem;
+        @media (max-width: 480px) {
+            .settings-container {
+                padding: 0.75rem 0.5rem;
+            }
+
+            h1.mb-3 {
+                font-size: 1rem !important;
+            }
+
+            .section-button {
+                padding: 0.875rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .settings-section {
+                padding: 1rem 0.75rem;
+            }
+
+            .settings-section-header h3 {
+                font-size: 1rem;
+            }
+
+            .form-label {
+                font-size: 0.8rem;
+            }
         }
-    }
 
-</style>
-{% endblock %}
+    </style>
+    {% endblock %}
 
-{% block content %}
-<div class="settings-container">
-    <h1 class="mb-3" style="font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: .18em; font-size: 1.2rem;">
-        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}⚙️ Centro de Ajustes{% else %}⚙️ Settings Center{% endif %}
-    </h1>
-    <p class="mb-4" style="color: var(--text-secondary);">
-        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Elige qué quieres editar. Solo se muestra una sección a la vez.{% else %}Choose what you want to edit. Only one section is shown at a time.{% endif %}
-    </p>
+    {% block content %}
+    <div class="settings-container">
+        <h1 class="mb-3" style="font-family: 'Orbitron', sans-serif; text-transform: uppercase; letter-spacing: .18em; font-size: 1.2rem;">
+            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}⚙️ Centro de Ajustes{% else %}⚙️ Settings Center{% endif %}
+        </h1>
+        <p class="mb-4" style="color: var(--text-secondary);">
+            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Elige qué quieres editar. Solo se muestra una sección a la vez.{% else %}Choose what you want to edit. Only one section is shown at a time.{% endif %}
+        </p>
 
-    <!-- BOTONES DE NAVEGACIÓN (solo esto visible al principio) -->
-    <div class="section-buttons-row">
-        <button type="button"
-                class="section-button"
-                data-section="profile"
-                onclick="openSettingsSection('profile')">
-            <span>
-                <i class="fas fa-building"></i>
-                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}INFORMACIÓN DE EMPRESA{% else %}COMPANY INFORMATION{% endif %}
-            </span>
-            <span class="arrow">
-                <i class="fas fa-chevron-down"></i>
-            </span>
-        </button>
-
-        <button type="button"
-                class="section-button"
-                data-section="financial"
-                onclick="openSettingsSection('financial')">
-            <span>
-                <i class="fas fa-receipt"></i>
-                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}IMPUESTOS Y FINANZAS{% else %}TAXES & FINANCE{% endif %}
-            </span>
-            <span class="arrow">
-                <i class="fas fa-chevron-down"></i>
-            </span>
-        </button>
-
-        <button type="button"
-                class="section-button"
-                data-section="theme"
-                onclick="openSettingsSection('theme')">
-            <span>
-                <i class="fas fa-palette"></i>
-                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}TEMA Y COLORES{% else %}THEME & COLORS{% endif %}
-            </span>
-            <span class="arrow">
-                <i class="fas fa-chevron-down"></i>
-            </span>
-        </button>
-
-        <button type="button"
-                class="section-button"
-                data-section="modules"
-                onclick="openSettingsSection('modules')">
-            <span>
-                <i class="fas fa-industry"></i>
-                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}RUBRO Y MÓDULOS{% else %}INDUSTRY & MODULES{% endif %}
-            </span>
-            <span class="arrow">
-                <i class="fas fa-chevron-down"></i>
-            </span>
-        </button>
-
-        <button type="button"
-                class="section-button"
-                data-section="employees"
-                onclick="openSettingsSection('employees')">
-            <span>
-                <i class="fas fa-users"></i>
-                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}GESTIÓN DE EMPLEADOS{% else %}EMPLOYEE MANAGEMENT{% endif %}
-            </span>
-            <span class="arrow">
-                <i class="fas fa-chevron-down"></i>
-            </span>
-        </button>
-
-        <button type="button"
-                class="section-button"
-                data-section="suscripcion"
-                onclick="openSettingsSection('suscripcion')">
-            <span>
-                <i class="fas fa-credit-card"></i>
-                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SUSCRIPCIÓN{% else %}SUBSCRIPTION{% endif %}
-            </span>
-            <span class="arrow">
-                <i class="fas fa-chevron-down"></i>
-            </span>
-        </button>
-
-        <button type="button"
-                class="section-button"
-                data-section="seguridad"
-                onclick="openSettingsSection('seguridad')">
-            <span>
-                <i class="fas fa-shield-alt"></i>
-                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SEGURIDAD{% else %}SECURITY{% endif %}
-            </span>
-            <span class="arrow">
-                <i class="fas fa-chevron-down"></i>
-            </span>
-        </button>
-    </div>
-
-    <!-- MENSAJE INICIAL -->
-    <div id="settings-placeholder">
-        <i class="fas fa-hand-pointer"></i>
-        <p class="mt-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Selecciona una sección para comenzar a editar tu configuración.{% else %}Select a section to start editing your settings.{% endif %}</p>
-    </div>
-
-    <!-- CONTENEDOR DE SECCIÓN (solo UNA visible) -->
-    <div class="settings-section-wrapper">
-
-        <!-- PROFILE -->
-        <div id="section-profile" class="settings-section">
-            <form method="POST" enctype="multipart/form-data">
-                {% csrf_token %}
-                <input type="hidden" name="section" value="profile">
-
-                <div class="settings-section-header">
+        <!-- BOTONES DE NAVEGACIÓN (solo esto visible al principio) -->
+        <div class="section-buttons-row">
+            <button type="button"
+                    class="section-button"
+                    data-section="profile"
+                    onclick="openSettingsSection('profile')">
+                <span>
                     <i class="fas fa-building"></i>
-                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Información de Empresa{% else %}Company Information{% endif %}</h3>
-                </div>
+                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}INFORMACIÓN DE EMPRESA{% else %}COMPANY INFORMATION{% endif %}
+                </span>
+                <span class="arrow">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </button>
 
-                <div class="row g-3">
-                    <div class="col-md-8">
-                        <label class="form-label">{{ profile_form.company_name.label }}</label>
-                        {{ profile_form.company_name }}
-                        {{ profile_form.company_name.errors }}
-
-                        <label class="form-label mt-3">{{ profile_form.tagline.label }}</label>
-                        {{ profile_form.tagline }}
-                        {{ profile_form.tagline.errors }}
-
-                        <label class="form-label mt-3">{{ profile_form.address.label }}</label>
-                        {{ profile_form.address }}
-                        {{ profile_form.address.errors }}
-                    </div>
-
-                    <div class="col-md-4">
-                        <label class="form-label">{{ empresa_form.logo.label }}</label>
-                        
-                        {% if config_empresa.logo %}
-                            <div class="mb-3" style="margin-bottom: 1rem;">
-                                <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Logo actual:{% else %}Current logo:{% endif %}</p>
-                                <img src="{{ config_empresa.logo.url }}" 
-                                     alt="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Logo actual{% else %}Current logo{% endif %}" 
-                                     style="max-width: 200px; max-height: 150px; object-fit: contain; border: 1px solid rgba(0,255,255,.3); border-radius: 8px; padding: 0.5rem; background: rgba(17, 21, 40, 0.5);">
-                            </div>
-                        {% endif %}
-                        
-                        {{ empresa_form.logo }}
-                        <small class="form-text" style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">
-                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Formatos: PNG, JPG, JPEG, SVG, WEBP (máx. 10MB){% else %}Formats: PNG, JPG, JPEG, SVG, WEBP (max. 10MB){% endif %}
-                        </small>
-                        {{ empresa_form.logo.errors }}
-                    </div>
-                </div>
-
-                <div class="row g-3 mt-3">
-                    <div class="col-md-4">
-                        <label class="form-label">{{ profile_form.phone.label }}</label>
-                        {{ profile_form.phone }}
-                        {{ profile_form.phone.errors }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">{{ profile_form.email.label }}</label>
-                        {{ profile_form.email }}
-                        {{ profile_form.email.errors }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">{{ profile_form.website.label }}</label>
-                        {{ profile_form.website }}
-                        {{ profile_form.website.errors }}
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-save">
-                        <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar información{% else %}Save company info{% endif %}
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- FINANCIAL -->
-        <div id="section-financial" class="settings-section">
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="section" value="financial">
-
-                <div class="settings-section-header">
+            <button type="button"
+                    class="section-button"
+                    data-section="financial"
+                    onclick="openSettingsSection('financial')">
+                <span>
                     <i class="fas fa-receipt"></i>
-                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Impuestos y Finanzas{% else %}Taxes & Finance{% endif %}</h3>
-                </div>
+                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}IMPUESTOS Y FINANZAS{% else %}TAXES & FINANCE{% endif %}
+                </span>
+                <span class="arrow">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </button>
 
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">{{ financial_form.currency.label }}</label>
-                        {{ financial_form.currency }}
-                        {{ financial_form.currency.errors }}
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">{{ financial_form.tax_rate.label }}</label>
-                        {{ financial_form.tax_rate }}
-                        {{ financial_form.tax_rate.errors }}
-                    </div>
-                    <div class="col-md-4 d-flex align-items-center">
-                        <div class="form-check mt-3">
-                            {{ financial_form.apply_tax_by_default }}
-                            <label class="form-check-label">
-                                {{ financial_form.apply_tax_by_default.label }}
-                            </label>
-                            {{ financial_form.apply_tax_by_default.errors }}
-                        </div>
-                    </div>
-                </div>
-
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-save">
-                        <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar configuración fiscal{% else %}Save financial settings{% endif %}
-                    </button>
-                </div>
-            </form>
-        </div>
-
-        <!-- THEME -->
-        <div id="section-theme" class="settings-section">
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="section" value="theme">
-
-                <div class="settings-section-header">
+            <button type="button"
+                    class="section-button"
+                    data-section="theme"
+                    onclick="openSettingsSection('theme')">
+                <span>
                     <i class="fas fa-palette"></i>
-                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tema y Colores{% else %}Theme & Colors{% endif %}</h3>
-                </div>
+                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}TEMA Y COLORES{% else %}THEME & COLORS{% endif %}
+                </span>
+                <span class="arrow">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </button>
 
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label class="form-label">{{ theme_form.primary_color.label }}</label>
-                        {{ theme_form.primary_color }}
-                        {{ theme_form.primary_color.errors }}
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">{{ theme_form.secondary_color.label }}</label>
-                        {{ theme_form.secondary_color }}
-                        {{ theme_form.secondary_color.errors }}
-                    </div>
-                </div>
+            <button type="button"
+                    class="section-button"
+                    data-section="modules"
+                    onclick="openSettingsSection('modules')">
+                <span>
+                    <i class="fas fa-industry"></i>
+                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}RUBRO Y MÓDULOS{% else %}INDUSTRY & MODULES{% endif %}
+                </span>
+                <span class="arrow">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </button>
 
-                <div class="row g-3 mt-3">
-                    <div class="col-md-12">
-                        <div class="form-check">
-                            {{ theme_form.separate_by_technician }}
-                            <label class="form-check-label">
-                                {{ theme_form.separate_by_technician.label }}
-                            </label>
-                            {{ theme_form.separate_by_technician.errors }}
-                        </div>
-                    </div>
-                </div>
+            <button type="button"
+                    class="section-button"
+                    data-section="employees"
+                    onclick="openSettingsSection('employees')">
+                <span>
+                    <i class="fas fa-users"></i>
+                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}GESTIÓN DE EMPLEADOS{% else %}EMPLOYEE MANAGEMENT{% endif %}
+                </span>
+                <span class="arrow">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </button>
 
-                <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-save">
-                        <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar tema{% else %}Save theme{% endif %}
-                    </button>
-                </div>
-            </form>
+            <button type="button"
+                    class="section-button"
+                    data-section="suscripcion"
+                    onclick="openSettingsSection('suscripcion')">
+                <span>
+                    <i class="fas fa-credit-card"></i>
+                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SUSCRIPCIÓN{% else %}SUBSCRIPTION{% endif %}
+                </span>
+                <span class="arrow">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </button>
+
+            <button type="button"
+                    class="section-button"
+                    data-section="seguridad"
+                    onclick="openSettingsSection('seguridad')">
+                <span>
+                    <i class="fas fa-shield-alt"></i>
+                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SEGURIDAD{% else %}SECURITY{% endif %}
+                </span>
+                <span class="arrow">
+                    <i class="fas fa-chevron-down"></i>
+                </span>
+            </button>
         </div>
 
-        <!-- MODULES -->
-        <div id="section-modules" class="settings-section">
-            <form method="post">
-                {% csrf_token %}
-                <input type="hidden" name="section" value="modules">
+        <!-- MENSAJE INICIAL -->
+        <div id="settings-placeholder">
+            <i class="fas fa-hand-pointer"></i>
+            <p class="mt-2">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Selecciona una sección para comenzar a editar tu configuración.{% else %}Select a section to start editing your settings.{% endif %}</p>
+        </div>
 
+        <!-- CONTENEDOR DE SECCIÓN (solo UNA visible) -->
+        <div class="settings-section-wrapper">
+
+            <!-- PROFILE -->
+            <div id="section-profile" class="settings-section">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <input type="hidden" name="section" value="profile">
+
+                    <div class="settings-section-header">
+                        <i class="fas fa-building"></i>
+                        <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Información de Empresa{% else %}Company Information{% endif %}</h3>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">{{ profile_form.company_name.label }}</label>
+                            {{ profile_form.company_name }}
+                            {{ profile_form.company_name.errors }}
+
+                            <label class="form-label mt-3">{{ profile_form.tagline.label }}</label>
+                            {{ profile_form.tagline }}
+                            {{ profile_form.tagline.errors }}
+
+                            <label class="form-label mt-3">{{ profile_form.address.label }}</label>
+                            {{ profile_form.address }}
+                            {{ profile_form.address.errors }}
+                        </div>
+
+                        <div class="col-md-4">
+                            <label class="form-label">{{ empresa_form.logo.label }}</label>
+                            
+                            {% if config_empresa.logo %}
+                                <div class="mb-3" style="margin-bottom: 1rem;">
+                                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Logo actual:{% else %}Current logo:{% endif %}</p>
+                                    <img src="{{ config_empresa.logo.url }}" 
+                                        alt="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Logo actual{% else %}Current logo{% endif %}" 
+                                        style="max-width: 200px; max-height: 150px; object-fit: contain; border: 1px solid rgba(0,255,255,.3); border-radius: 8px; padding: 0.5rem; background: rgba(17, 21, 40, 0.5);">
+                                </div>
+                            {% endif %}
+                            
+                            {{ empresa_form.logo }}
+                            <small class="form-text" style="color: var(--text-secondary); display: block; margin-top: 0.5rem;">
+                                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Formatos: PNG, JPG, JPEG, SVG, WEBP (máx. 10MB){% else %}Formats: PNG, JPG, JPEG, SVG, WEBP (max. 10MB){% endif %}
+                            </small>
+                            {{ empresa_form.logo.errors }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-4">
+                            <label class="form-label">{{ profile_form.phone.label }}</label>
+                            {{ profile_form.phone }}
+                            {{ profile_form.phone.errors }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{{ profile_form.email.label }}</label>
+                            {{ profile_form.email }}
+                            {{ profile_form.email.errors }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{{ profile_form.website.label }}</label>
+                            {{ profile_form.website }}
+                            {{ profile_form.website.errors }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-save">
+                            <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar información{% else %}Save company info{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- FINANCIAL -->
+            <div id="section-financial" class="settings-section">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="section" value="financial">
+
+                    <div class="settings-section-header">
+                        <i class="fas fa-receipt"></i>
+                        <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Impuestos y Finanzas{% else %}Taxes & Finance{% endif %}</h3>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">{{ financial_form.currency.label }}</label>
+                            {{ financial_form.currency }}
+                            {{ financial_form.currency.errors }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{{ financial_form.tax_rate.label }}</label>
+                            {{ financial_form.tax_rate }}
+                            {{ financial_form.tax_rate.errors }}
+                        </div>
+                        <div class="col-md-4 d-flex align-items-center">
+                            <div class="form-check mt-3">
+                                {{ financial_form.apply_tax_by_default }}
+                                <label class="form-check-label">
+                                    {{ financial_form.apply_tax_by_default.label }}
+                                </label>
+                                {{ financial_form.apply_tax_by_default.errors }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-save">
+                            <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar configuración fiscal{% else %}Save financial settings{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- THEME -->
+            <div id="section-theme" class="settings-section">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="section" value="theme">
+
+                    <div class="settings-section-header">
+                        <i class="fas fa-palette"></i>
+                        <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tema y Colores{% else %}Theme & Colors{% endif %}</h3>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">{{ theme_form.primary_color.label }}</label>
+                            {{ theme_form.primary_color }}
+                            {{ theme_form.primary_color.errors }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">{{ theme_form.secondary_color.label }}</label>
+                            {{ theme_form.secondary_color }}
+                            {{ theme_form.secondary_color.errors }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-3">
+                        <div class="col-md-12">
+                            <div class="form-check">
+                                {{ theme_form.separate_by_technician }}
+                                <label class="form-check-label">
+                                    {{ theme_form.separate_by_technician.label }}
+                                </label>
+                                {{ theme_form.separate_by_technician.errors }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end">
+                        <button type="submit" class="btn btn-save">
+                            <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar tema{% else %}Save theme{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- MODULES -->
+            <div id="section-modules" class="settings-section">
+                <form method="post">
+                    {% csrf_token %}
+                    <input type="hidden" name="section" value="modules">
+
+                    <div class="settings-section-header">
+                        <i class="fas fa-industry"></i>
+                        <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Rubro y módulos del documento{% else %}Industry & document modules{% endif %}</h3>
+                    </div>
+
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">{{ rubro_form.rubros.label }}</label>
+                            <div class="row g-3 mt-2">
+                                {% for checkbox in rubro_form.rubros %}
+                                    <div class="col-md-4 col-lg-3">
+                                        <div class="form-check">
+                                            {{ checkbox.tag }}
+                                            <label for="{{ checkbox.id_for_label }}" class="form-check-label text-secondary">
+                                                {{ checkbox.choice_label }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if rubro_form.rubros.errors %}
+                                <div class="text-danger mt-2">{{ rubro_form.rubros.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end mt-4">
+                        <button type="submit" class="btn btn-save">
+                            <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar rubro y módulos{% else %}Save industry & modules{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- EMPLOYEES -->
+            <div id="section-employees" class="settings-section">
                 <div class="settings-section-header">
-                    <i class="fas fa-industry"></i>
-                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Rubro y módulos del documento{% else %}Industry & document modules{% endif %}</h3>
+                    <i class="fas fa-users"></i>
+                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Gestión de Empleados{% else %}Employee Management{% endif %}</h3>
+                </div>
+
+                <!-- Formulario para crear técnico -->
+                <form method="post" class="mb-4">
+                    {% csrf_token %}
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Nombre Completo *{% else %}Full Name *{% endif %}</label>
+                            <input type="text" name="nombre" class="form-control" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Teléfono{% else %}Phone{% endif %}</label>
+                            <input type="text" name="telefono" class="form-control">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dirección{% else %}Address{% endif %}</label>
+                            <input type="text" name="direccion" class="form-control">
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end mt-3">
+                        <button type="submit" name="crear_tecnico" class="btn btn-save">
+                            <i class="fas fa-plus me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Agregar Empleado{% else %}Add Employee{% endif %}
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Lista de técnicos -->
+                {% if tecnicos %}
+                    <h5 class="mb-3" style="color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                        <i class="fas fa-list me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Empleados Registrados ({{ tecnicos|length }}){% else %}Registered Employees ({{ tecnicos|length }}){% endif %}
+                    </h5>
+                    {% for tecnico in tecnicos %}
+                        <div style="background: rgba(10, 14, 39, 0.6); border: 1px solid rgba(0, 255, 255, 0.2); border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
+                            <div>
+                                <h5 style="margin: 0; color: var(--text-primary);">{{ tecnico.nombre }}</h5>
+                                {% if tecnico.telefono %}<p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);"><i class="fas fa-phone"></i> {{ tecnico.telefono }}</p>{% endif %}
+                                {% if tecnico.direccion %}<p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);"><i class="fas fa-map-marker-alt"></i> {{ tecnico.direccion }}</p>{% endif %}
+                            </div>
+                            <form method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="toggle_tecnico" value="{{ tecnico.id }}">
+                                <button type="submit" class="btn btn-save" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+                                    {% if tecnico.activo %}
+                                        <i class="fas fa-ban me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Desactivar{% else %}Deactivate{% endif %}
+                                    {% else %}
+                                        <i class="fas fa-check me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Activar{% else %}Activate{% endif %}
+                                    {% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">
+                        <i class="fas fa-info-circle me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}No hay empleados registrados. Agrega uno usando el formulario arriba.{% else %}No employees registered. Add one using the form above.{% endif %}
+                    </p>
+                {% endif %}
+            </div>
+
+            <!-- SUSCRIPCIÓN -->
+            <div id="section-suscripcion" class="settings-section">
+                <div class="settings-section-header">
+                    <i class="fas fa-credit-card"></i>
+                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Plan &amp; Suscripción eGarage{% else %}Plan &amp; eGarage Subscription{% endif %}</h3>
                 </div>
 
                 <div class="row g-3">
                     <div class="col-12">
-                        <label class="form-label">{{ rubro_form.rubros.label }}</label>
-                        <div class="row g-3 mt-2">
-                            {% for checkbox in rubro_form.rubros %}
-                                <div class="col-md-4 col-lg-3">
-                                    <div class="form-check">
-                                        {{ checkbox.tag }}
-                                        <label for="{{ checkbox.id_for_label }}" class="form-check-label text-secondary">
-                                            {{ checkbox.choice_label }}
-                                        </label>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                        {% if rubro_form.rubros.errors %}
-                            <div class="text-danger mt-2">{{ rubro_form.rubros.errors }}</div>
-                        {% endif %}
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                                Información de tu plan actual, ciclo de cobro y estado de la suscripción.
+                            {% else %}
+                                Information about your current plan, billing cycle and subscription status.
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
 
-                <div class="d-flex justify-content-end mt-4">
-                    <button type="submit" class="btn btn-save">
-                        <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar rubro y módulos{% else %}Save industry & modules{% endif %}
+                <div class="d-flex justify-content-start">
+                    {% if request.path|slice:":4" == "/cl/" %}
+                        <a href="/cl/es/suscripcion/pago/" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    {% elif request.path|slice:":4" == "/us/" %}
+                        <a href="/us/en/pricing/" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                    {% else %}
+                        <button type="button" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem; border: none; background: inherit; cursor: pointer;" onclick="alert('{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Función no disponible{% else %}Function not available{% endif %}');">
+                    {% endif %}
+                        <i class="fas fa-external-link-alt"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ver mi plan{% else %}View my plan{% endif %}
+                    {% if request.path|slice:":4" == "/cl/" or request.path|slice:":4" == "/us/" %}
+                    </a>
+                    {% else %}
                     </button>
+                    {% endif %}
                 </div>
-            </form>
-        </div>
-
-        <!-- EMPLOYEES -->
-        <div id="section-employees" class="settings-section">
-            <div class="settings-section-header">
-                <i class="fas fa-users"></i>
-                <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Gestión de Empleados{% else %}Employee Management{% endif %}</h3>
             </div>
 
-            <!-- Formulario para crear técnico -->
-            <form method="post" class="mb-4">
-                {% csrf_token %}
+            <!-- SEGURIDAD -->
+            <div id="section-seguridad" class="settings-section">
+                <div class="settings-section-header">
+                    <i class="fas fa-shield-alt"></i>
+                    <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Accesos &amp; Seguridad{% else %}Access &amp; Security{% endif %}</h3>
+                </div>
+
                 <div class="row g-3">
-                    <div class="col-md-4">
-                        <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Nombre Completo *{% else %}Full Name *{% endif %}</label>
-                        <input type="text" name="nombre" class="form-control" required>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Teléfono{% else %}Phone{% endif %}</label>
-                        <input type="text" name="telefono" class="form-control">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dirección{% else %}Address{% endif %}</label>
-                        <input type="text" name="direccion" class="form-control">
+                    <div class="col-12">
+                        <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                                Contraseñas, recuperación de acceso y reglas básicas de seguridad de cuenta.
+                            {% else %}
+                                Passwords, account recovery and basic account security rules.
+                            {% endif %}
+                        </p>
                     </div>
                 </div>
-                <div class="d-flex justify-content-end mt-3">
-                    <button type="submit" name="crear_tecnico" class="btn btn-save">
-                        <i class="fas fa-plus me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Agregar Empleado{% else %}Add Employee{% endif %}
-                    </button>
-                </div>
-            </form>
 
-            <!-- Lista de técnicos -->
-            {% if tecnicos %}
-                <h5 class="mb-3" style="color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
-                    <i class="fas fa-list me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Empleados Registrados ({{ tecnicos|length }}){% else %}Registered Employees ({{ tecnicos|length }}){% endif %}
-                </h5>
-                {% for tecnico in tecnicos %}
-                    <div style="background: rgba(10, 14, 39, 0.6); border: 1px solid rgba(0, 255, 255, 0.2); border-radius: 15px; padding: 1.5rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h5 style="margin: 0; color: var(--text-primary);">{{ tecnico.nombre }}</h5>
-                            {% if tecnico.telefono %}<p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);"><i class="fas fa-phone"></i> {{ tecnico.telefono }}</p>{% endif %}
-                            {% if tecnico.direccion %}<p style="margin: 0.5rem 0 0 0; color: var(--text-secondary);"><i class="fas fa-map-marker-alt"></i> {{ tecnico.direccion }}</p>{% endif %}
-                        </div>
-                        <form method="post" style="display: inline;">
-                            {% csrf_token %}
-                            <input type="hidden" name="toggle_tecnico" value="{{ tecnico.id }}">
-                            <button type="submit" class="btn btn-save" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
-                                {% if tecnico.activo %}
-                                    <i class="fas fa-ban me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Desactivar{% else %}Deactivate{% endif %}
-                                {% else %}
-                                    <i class="fas fa-check me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Activar{% else %}Activate{% endif %}
-                                {% endif %}
-                            </button>
-                        </form>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p style="color: var(--text-secondary); text-align: center; padding: 2rem;">
-                    <i class="fas fa-info-circle me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}No hay empleados registrados. Agrega uno usando el formulario arriba.{% else %}No employees registered. Add one using the form above.{% endif %}
-                </p>
-            {% endif %}
+                <div class="d-flex justify-content-start">
+                    <a href="{% url 'account_change_password' %}" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-external-link-alt"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Gestionar seguridad{% else %}Manage security{% endif %}
+                    </a>
+                </div>
+            </div>
+
         </div>
-
-        <!-- SUSCRIPCIÓN -->
-        <div id="section-suscripcion" class="settings-section">
-            <div class="settings-section-header">
-                <i class="fas fa-credit-card"></i>
-                <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Plan &amp; Suscripción eGarage{% else %}Plan &amp; eGarage Subscription{% endif %}</h3>
-            </div>
-
-            <div class="row g-3">
-                <div class="col-12">
-                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
-                            Información de tu plan actual, ciclo de cobro y estado de la suscripción.
-                        {% else %}
-                            Information about your current plan, billing cycle and subscription status.
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-start">
-                {% if request.path|slice:":4" == "/cl/" %}
-                    <a href="/cl/es/suscripcion/pago/" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                {% elif request.path|slice:":4" == "/us/" %}
-                    <a href="/us/en/pricing/" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                {% else %}
-                    <a href="#" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                {% endif %}
-                    <i class="fas fa-external-link-alt"></i>
-                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ver mi plan{% else %}View my plan{% endif %}
-                </a>
-            </div>
-        </div>
-
-        <!-- SEGURIDAD -->
-        <div id="section-seguridad" class="settings-section">
-            <div class="settings-section-header">
-                <i class="fas fa-shield-alt"></i>
-                <h3>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Accesos &amp; Seguridad{% else %}Access &amp; Security{% endif %}</h3>
-            </div>
-
-            <div class="row g-3">
-                <div class="col-12">
-                    <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">
-                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
-                            Contraseñas, recuperación de acceso y reglas básicas de seguridad de cuenta.
-                        {% else %}
-                            Passwords, account recovery and basic account security rules.
-                        {% endif %}
-                    </p>
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-start">
-                <a href="{% url 'account_change_password' %}" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
-                    <i class="fas fa-external-link-alt"></i>
-                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Gestionar seguridad{% else %}Manage security{% endif %}
-                </a>
-            </div>
-        </div>
-
     </div>
-</div>
-{% endblock %}
+    {% endblock %}
 
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Función para abrir sección
-    window.openSettingsSection = function(sectionName) {
-        // Ocultar placeholder
+    {% block extra_js %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      window.openSettingsSection = function (sectionName) {
         const placeholder = document.getElementById("settings-placeholder");
         if (placeholder) placeholder.style.display = "none";
 
-        // Desactivar todos los botones
-        document.querySelectorAll(".section-button").forEach(btn => {
-            btn.classList.remove("active");
-        });
-
-        // Activar el botón actual
+        document.querySelectorAll(".section-button").forEach(btn => btn.classList.remove("active"));
         const activeBtn = document.querySelector(`.section-button[data-section="${sectionName}"]`);
         if (activeBtn) activeBtn.classList.add("active");
 
-        // Ocultar todas las secciones
-        document.querySelectorAll(".settings-section").forEach(sec => {
-            sec.classList.remove("active");
-        });
+        document.querySelectorAll(".settings-section").forEach(sec => sec.classList.remove("active"));
 
-        // Mostrar solo la sección seleccionada
         const target = document.getElementById(`section-${sectionName}`);
         if (target) {
-            target.classList.add("active");
-            target.scrollIntoView({ behavior: "smooth", block: "start" });
+          target.classList.add("active");
+
+          // Scroll solo en móvil y solo si quedó fuera de vista
+          if (window.matchMedia("(max-width: 768px)").matches) {
+            setTimeout(() => {
+              const r = target.getBoundingClientRect();
+              const pad = 12;
+              const out = r.top < pad || r.bottom > (window.innerHeight - pad);
+              if (out) target.scrollIntoView({ behavior: "smooth", block: "start" });
+            }, 50);
+          }
         }
-    };
-});
-</script>
+      };
+    });
+    </script>
 {% endblock %}
 

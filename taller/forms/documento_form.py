@@ -48,11 +48,22 @@ class DocumentoForm(forms.ModelForm):
         required=False,
     )
 
+    # Campo context: workshop / parts / mixed (para numeración y modo Parts)
+    context = forms.CharField(
+        widget=forms.HiddenInput(),
+        required=False,
+        initial="workshop",
+    )
+
     # Campos JSON para filas dinámicas
     repuestos_json = forms.CharField(widget=forms.HiddenInput(), required=False)
     servicios_json = forms.CharField(widget=forms.HiddenInput(), required=False)
     otros_json = forms.CharField(widget=forms.HiddenInput(), required=False)
-    payment_status = forms.CharField(required=False)
+    payment_status = forms.ChoiceField(
+        choices=[],
+        widget=forms.Select(attrs={"class": "form-select"}),
+        required=False,
+    )
     apply_vat = forms.BooleanField(required=False)
 
     # Campo de kilometraje que NO se guarda en el modelo Documento
@@ -77,6 +88,7 @@ class DocumentoForm(forms.ModelForm):
             "millas",
             "observaciones",
             "pagado",
+            "payment_status",
             "metodo_pago",
             "ult4",
             "monto_pagado",
@@ -96,6 +108,7 @@ class DocumentoForm(forms.ModelForm):
         self.user = kwargs.pop("user", None)
         self.empresa = kwargs.pop("empresa", None)
         self.country = kwargs.pop("country", "CL")
+        self.request = kwargs.pop("request", None)
 
         # Si no se pasó empresa, intentar obtenerla del usuario
         if not self.empresa and self.user:
@@ -114,6 +127,19 @@ class DocumentoForm(forms.ModelForm):
         if self.empresa:
             self.fields["cliente"].queryset = Cliente.objects.filter(empresa=self.empresa)
             self.fields["vehiculo"].queryset = Vehiculo.objects.filter(empresa=self.empresa)
+
+            # Prefill vehículo: asegurar que esté en el queryset (evita "not a valid choice" en POST)
+            prefill_vehiculo = ""
+            if self.request:
+                prefill_vehiculo = (
+                    self.request.GET.get("prefill_vehiculo")
+                    or self.request.GET.get("new_vehiculo_id")
+                    or ""
+                ).strip()
+            if prefill_vehiculo and str(prefill_vehiculo).isdigit():
+                self.fields["vehiculo"].queryset = self.fields[
+                    "vehiculo"
+                ].queryset | Vehiculo.objects.filter(empresa=self.empresa, pk=prefill_vehiculo)
             self.fields["tecnico_responsable"].queryset = self.empresa.tecnicos.all()
 
         # Configurar labels según el país
@@ -121,6 +147,10 @@ class DocumentoForm(forms.ModelForm):
 
         # Configurar choices dinámicos
         self._configure_dynamic_choices()
+
+        # Payment status: choices del modelo para que el template muestre select
+        if "payment_status" in self.fields:
+            self.fields["payment_status"].choices = Documento.PAYMENT_STATUS
 
         # Configurar widgets con IDs únicos para JavaScript
         self._configure_widget_ids()
@@ -246,6 +276,18 @@ class DocumentoForm(forms.ModelForm):
         # NOTA: 'numero' se autogenera en el modelo, NO es requerido en el form
         required_fields = ["tipo", "fecha_emision", "cliente"]
 
+        # Modo Parts: vehiculo y tecnico no requeridos
+        context_val = (
+            (self.data.get("context") if self.data else None)
+            or getattr(self.instance, "context", None)
+            or "workshop"
+        )
+        if str(context_val).lower() == "parts":
+            pass  # vehiculo y tecnico no requeridos (ya son required=False por defecto)
+        else:
+            # Workshop: tecnico opcional, vehiculo opcional (depende de config)
+            pass
+
         # Marcar todos los campos como no requeridos por defecto
         for field_name in self.fields:
             self.fields[field_name].required = False
@@ -254,6 +296,13 @@ class DocumentoForm(forms.ModelForm):
         for field_name in required_fields:
             if field_name in self.fields:
                 self.fields[field_name].required = True
+
+        # Modo Parts: vehiculo y tecnico nunca requeridos
+        if str(context_val).lower() == "parts":
+            if "vehiculo" in self.fields:
+                self.fields["vehiculo"].required = False
+            if "tecnico_responsable" in self.fields:
+                self.fields["tecnico_responsable"].required = False
 
         # El campo número es opcional: si está vacío se autogenera
         if "numero" in self.fields:
@@ -277,19 +326,26 @@ class DocumentoForm(forms.ModelForm):
             }
         )
 
-        # Si hay una instancia con vehículo, mostrar el kilometraje actual como placeholder
+        # Placeholder por país (solo visual)
+        attrs = dict(self.fields["kilometraje_ingreso"].widget.attrs)
         if self.instance and self.instance.pk and self.instance.vehiculo:
             try:
                 kilometraje_actual = self.instance.vehiculo.kilometraje_actual
                 if kilometraje_actual:
-                    self.fields["kilometraje_ingreso"].widget.attrs[
-                        "placeholder"
-                    ] = f"Kilometraje actual: {kilometraje_actual} km"
+                    if self.country == "US":
+                        attrs["placeholder"] = f"Current: {kilometraje_actual} mi"
+                    else:
+                        attrs["placeholder"] = f"Kilometraje actual: {kilometraje_actual} km"
             except Exception:
                 pass
 
-        # En USA, el label puede ser "Mileage" o "Current Mileage"
-        # Ya se configuró en _configure_labels_by_country
+        if "placeholder" not in attrs:
+            if self.country == "US":
+                attrs["placeholder"] = "Miles"
+            else:
+                attrs["placeholder"] = "Kilometraje actual (km)"
+
+        self.fields["kilometraje_ingreso"].widget.attrs.update(attrs)
 
     def clean(self):
         """Validaciones robustas multi-tenant"""
@@ -322,15 +378,25 @@ class DocumentoForm(forms.ModelForm):
                 # Advertencia, no error - permitir crear sin kilometraje si es necesario
                 pass
         elif self.country == "US":
-            # En USA, al menos uno de kilometraje_ingreso o millas debe tener valor si hay vehículo
+            # En USA: requiere odómetro (miles) si hay vehículo
             vehiculo = cleaned_data.get("vehiculo")
             if vehiculo:
-                kilometraje = cleaned_data.get("kilometraje_ingreso")
+                odometro = cleaned_data.get("kilometraje_ingreso")
                 millas = cleaned_data.get("millas")
-                if not kilometraje and not millas:
+
+                # Compatibilidad legacy: algunos templates/JS envían "kilometraje"
+                if not odometro:
+                    odometro = cleaned_data.get("kilometraje") or self.data.get("kilometraje")
+
+                # Regla: en USA aceptamos odometro o millas (si todavía existe el campo millas)
+                if not odometro and not millas:
                     raise forms.ValidationError(
                         "Debe especificar al menos kilometraje o millas cuando hay un vehículo."
                     )
+
+                # Normalización: si viene odometro, lo dejamos en kilometraje_ingreso
+                if odometro and not cleaned_data.get("kilometraje_ingreso"):
+                    cleaned_data["kilometraje_ingreso"] = odometro
 
         return cleaned_data
 
@@ -344,6 +410,12 @@ class DocumentoForm(forms.ModelForm):
         # Extraer kilometraje_ingreso antes de guardar (no es campo del modelo)
         # Lo guardamos en una variable de instancia para usarlo después
         kilometraje_ingreso = self.cleaned_data.get("kilometraje_ingreso")
+
+        # Compatibilidad legacy: algunos templates/JS envían "kilometraje"
+        if kilometraje_ingreso is None:
+            kilometraje_ingreso = self.cleaned_data.get("kilometraje") or self.data.get(
+                "kilometraje"
+            )
 
         # Guardar el documento (kilometraje_ingreso no está en fields del Meta,
         # así que Django lo ignorará automáticamente)
@@ -390,8 +462,16 @@ class DocumentoForm(forms.ModelForm):
         )
 
     def _process_json_data(self, documento):
-        """Procesa los datos JSON y crea las líneas del documento"""
+        """Procesa los datos JSON y crea las líneas del documento.
+        En edición (documento.pk existe), borra líneas existentes antes de crear las nuevas.
+        """
         import json
+
+        # En edición: borrar líneas previas para evitar duplicados
+        if documento.pk:
+            documento.lineas_repuesto.all().delete()
+            documento.lineas_servicio.all().delete()
+            documento.lineas_otro_servicio.all().delete()
 
         # Procesar repuestos
         repuestos_data = self.cleaned_data.get("repuestos_json", "[]")
@@ -399,16 +479,44 @@ class DocumentoForm(forms.ModelForm):
             try:
                 repuestos = json.loads(repuestos_data)
                 for rep_data in repuestos:
-                    if rep_data.get("codigo") or rep_data.get("nombre"):
+                    has_content = (
+                        rep_data.get("codigo")
+                        or rep_data.get("nombre")
+                        or (
+                            rep_data.get("source_type") == "CUSTOMER_SUPPLIED"
+                            and rep_data.get("customer_part_description")
+                        )
+                    )
+                    if has_content:
                         from taller.models.lineas_documento import LineaRepuesto
 
+                        st = (rep_data.get("source_type") or "IN_STOCK").upper()
+                        if st not in ("CUSTOMER_SUPPLIED", "IN_STOCK", "SOURCED"):
+                            st = "IN_STOCK"
+                        precio = 0 if st == "CUSTOMER_SUPPLIED" else rep_data.get("precio", 0)
+                        cod = rep_data.get("codigo") or ""
+                        nom = (
+                            rep_data.get("nombre")
+                            or (
+                                rep_data.get("customer_part_description")
+                                if st == "CUSTOMER_SUPPLIED"
+                                else ""
+                            )
+                            or ""
+                        )
                         LineaRepuesto.objects.create(
                             documento=documento,
-                            codigo=rep_data.get("codigo", ""),
-                            nombre=rep_data.get("nombre", ""),
+                            codigo=cod or "CUST",
+                            nombre=nom or "Customer part",
                             cantidad=rep_data.get("cantidad", 1),
-                            precio_unitario=rep_data.get("precio", 0),
-                            descuento=rep_data.get("descuento", 0),
+                            precio_unitario=precio,
+                            descuento=(
+                                0 if st == "CUSTOMER_SUPPLIED" else rep_data.get("descuento", 0)
+                            ),
+                            source_type=st,
+                            customer_part_description=rep_data.get("customer_part_description")
+                            or None,
+                            customer_part_notes=rep_data.get("customer_part_notes") or None,
                         )
             except (json.JSONDecodeError, ValueError):
                 pass  # Ignorar datos JSON inválidos
@@ -419,15 +527,38 @@ class DocumentoForm(forms.ModelForm):
             try:
                 servicios = json.loads(servicios_data)
                 for serv_data in servicios:
-                    if serv_data.get("servicio_id"):
-                        from taller.models.lineas_documento import LineaServicio
+                    sid = serv_data.get("servicio_id")
+                    if not sid:
+                        continue
+                    nombre = serv_data.get("nombre") or ""
+                    if not nombre:
+                        # Obtener nombre del Servicio o Service cuando no viene en JSON
+                        try:
+                            from taller.servicios.models import Servicio
 
-                        LineaServicio.objects.create(
-                            documento=documento,
-                            servicio_id=serv_data.get("servicio_id"),
-                            cantidad=1,  # forzamos 1 (sin cantidad en UI)
-                            precio_unitario=serv_data.get("precio", 0),
-                        )
+                            s = Servicio.objects.filter(pk=sid).first()
+                            if s:
+                                nombre = getattr(s, "nombre", "") or str(s)
+                            else:
+                                from taller.models.catalogo_servicios import Service
+
+                                svc = Service.objects.filter(pk=sid).first()
+                                nombre = (
+                                    getattr(svc, "service_code", "") or str(svc)
+                                    if svc
+                                    else "Servicio"
+                                )
+                        except Exception:
+                            nombre = "Servicio"
+                    from taller.models.lineas_documento import LineaServicio
+
+                    LineaServicio.objects.create(
+                        documento=documento,
+                        servicio_id=sid,
+                        nombre=nombre or "Servicio",
+                        cantidad=1,  # forzamos 1 (sin cantidad en UI)
+                        precio_unitario=serv_data.get("precio", 0),
+                    )
             except (json.JSONDecodeError, ValueError):
                 pass  # Ignorar datos JSON inválidos
 

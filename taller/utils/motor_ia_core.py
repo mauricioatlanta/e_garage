@@ -21,9 +21,8 @@ NOTA: Este archivo será ofuscado/compilado con PyArmor antes del despliegue.
 """
 
 import random
+from collections import defaultdict
 from datetime import timedelta
-
-import pandas as pd
 
 from django.utils import timezone
 
@@ -43,147 +42,216 @@ class MotorIACore:
         self.umbral_declive = umbral_declive
 
     def preparar_datos_servicios(self, documentos):
-        """Convierte documentos Django a DataFrame para análisis"""
+        """Convierte documentos Django a lista de dicts para análisis (sin pandas).
+        Usa fecha_emision y lineas_servicio según estándar de KPIs del proyecto.
+        """
+
+        def _nombre_cliente(doc):
+            if not doc.cliente:
+                return "Sin cliente"
+            nom = (doc.cliente.nombre or "").strip()
+            ape = (getattr(doc.cliente, "apellido", None) or "").strip()
+            return f"{nom} {ape}".strip() or "Sin cliente"
+
         datos = []
 
         for doc in documentos:
-            for servicio in doc.serviciosdocumento_set.all():
+            fecha = getattr(doc, "fecha_emision", None) or getattr(doc, "fecha", None)
+            if not fecha:
+                continue
+            lineas = getattr(doc, "lineas_servicio", None)
+            if not lineas:
+                continue
+            for ls in lineas.all():
+                precio = float(ls.precio_unitario or 0)
+                cantidad = int(ls.cantidad or 0)
+                descuento = float(ls.descuento or 0) / 100.0
+                total = precio * cantidad * (1 - descuento)
                 datos.append(
                     {
-                        "fecha": doc.fecha,
-                        "servicio": servicio.descripcion,
-                        "precio": float(servicio.precio_unitario),
-                        "cantidad": servicio.cantidad,
-                        "total": float(servicio.precio_unitario) * servicio.cantidad,
-                        "mes": doc.fecha.month,
-                        "año": doc.fecha.year,
-                        "cliente": doc.cliente.nombre if doc.cliente else "Sin cliente",
+                        "fecha": fecha,
+                        "servicio": (ls.nombre or "").strip() or "Servicio",
+                        "precio": precio,
+                        "cantidad": cantidad,
+                        "total": total,
+                        "mes": fecha.month,
+                        "año": fecha.year,
+                        "cliente": _nombre_cliente(doc),
                     }
                 )
 
+        return datos
+
+    def detectar_servicios_crecimiento(self, datos):
+        """Detecta servicios con tendencia de crecimiento (sin pandas).
+        `datos` = lista de dicts generada por preparar_datos_servicios().
+        """
         if not datos:
-            return pd.DataFrame()
-
-        df = pd.DataFrame(datos)
-        df["fecha"] = pd.to_datetime(df["fecha"])
-        return df
-
-    def detectar_servicios_crecimiento(self, df):
-        """Detecta servicios con tendencia de crecimiento"""
-        if df.empty:
             return []
 
-        # Agrupar por servicio y mes
-        servicios_mes = (
-            df.groupby(["servicio", df["fecha"].dt.to_period("M")])["total"].sum().reset_index()
-        )
-        servicios_mes["fecha"] = servicios_mes["fecha"].dt.to_timestamp()
+        # 1) Agregar total por (servicio, año, mes)
+        totales = defaultdict(float)  # key: (servicio, año, mes) -> total
+        for r in datos:
+            servicio = r.get("servicio") or "Servicio"
+            año = int(r.get("año"))
+            mes = int(r.get("mes"))
+            total = float(r.get("total") or 0)
+            totales[(servicio, año, mes)] += total
+
+        # 2) Construir series por servicio (ordenadas por año/mes)
+        series = defaultdict(list)  # servicio -> [(año, mes, total_mes), ...]
+        for (servicio, año, mes), total_mes in totales.items():
+            series[servicio].append((año, mes, total_mes))
+
+        for servicio in series:
+            series[servicio].sort(key=lambda x: (x[0], x[1]))  # orden cronológico
 
         servicios_crecimiento = []
 
-        for servicio in df["servicio"].unique():
-            data_servicio = servicios_mes[servicios_mes["servicio"] == servicio].sort_values(
-                "fecha"
-            )
+        # 3) Evaluar últimos 3 meses por servicio
+        for servicio, puntos in series.items():
+            if len(puntos) < 3:
+                continue
 
-            if len(data_servicio) >= 3:
-                # Calcular tendencia de últimos 3 meses
-                ultimos_3 = data_servicio.tail(3)["total"].values
-                if len(ultimos_3) >= 3:
-                    crecimiento = ((ultimos_3[-1] - ultimos_3[0]) / ultimos_3[0]) * 100
+            ultimos_3 = puntos[-3:]  # [(año, mes, total), ...]
+            t0 = float(ultimos_3[0][2])
+            t2 = float(ultimos_3[-1][2])
 
-                    if crecimiento > self.umbral_crecimiento:
-                        servicios_crecimiento.append(
-                            {
-                                "servicio": servicio,
-                                "crecimiento": round(crecimiento, 1),
-                                "ingresos_ultimo_mes": round(ultimos_3[-1], 0),
-                                "prediccion": round(ultimos_3[-1] * (1 + crecimiento / 100), 0),
-                                "recomendacion": self._generar_recomendacion_crecimiento(
-                                    servicio, crecimiento
-                                ),
-                            }
-                        )
+            # Evitar división por cero / ruido
+            if t0 <= 0:
+                continue
+
+            crecimiento = ((t2 - t0) / t0) * 100.0
+
+            if crecimiento > self.umbral_crecimiento:
+                servicios_crecimiento.append(
+                    {
+                        "servicio": servicio,
+                        "crecimiento": round(crecimiento, 1),
+                        "ingresos_ultimo_mes": round(t2, 0),
+                        "prediccion": round(t2 * (1 + crecimiento / 100.0), 0),
+                        "recomendacion": self._generar_recomendacion_crecimiento(
+                            servicio, crecimiento
+                        ),
+                    }
+                )
 
         return sorted(servicios_crecimiento, key=lambda x: x["crecimiento"], reverse=True)[:5]
 
-    def detectar_servicios_declive(self, df):
-        """Detecta servicios en declive que podrían eliminarse"""
-        if df.empty:
+    def detectar_servicios_declive(self, datos):
+        """Detecta servicios en declive que podrían eliminarse (sin pandas)."""
+        if not datos:
             return []
 
-        servicios_mes = (
-            df.groupby(["servicio", df["fecha"].dt.to_period("M")])["total"].sum().reset_index()
-        )
-        servicios_mes["fecha"] = servicios_mes["fecha"].dt.to_timestamp()
+        # Total por (servicio, año, mes)
+        totales = defaultdict(float)
+        for r in datos:
+            servicio = r.get("servicio") or "Servicio"
+            año = int(r.get("año"))
+            mes = int(r.get("mes"))
+            total = float(r.get("total") or 0)
+            totales[(servicio, año, mes)] += total
+
+        # Serie por servicio
+        series = defaultdict(list)
+        for (servicio, año, mes), total_mes in totales.items():
+            series[servicio].append((año, mes, total_mes))
+        for servicio in series:
+            series[servicio].sort(key=lambda x: (x[0], x[1]))
 
         servicios_declive = []
 
-        for servicio in df["servicio"].unique():
-            data_servicio = servicios_mes[servicios_mes["servicio"] == servicio].sort_values(
-                "fecha"
-            )
+        for servicio, puntos in series.items():
+            if len(puntos) < 3:
+                continue
 
-            if len(data_servicio) >= 3:
-                ultimos_3 = data_servicio.tail(3)["total"].values
-                if len(ultimos_3) >= 3 and ultimos_3[0] > 0:
-                    declive = ((ultimos_3[-1] - ultimos_3[0]) / ultimos_3[0]) * 100
+            ultimos_3 = puntos[-3:]
+            t0 = float(ultimos_3[0][2])
+            t2 = float(ultimos_3[-1][2])
 
-                    if declive < self.umbral_declive:
-                        servicios_declive.append(
-                            {
-                                "servicio": servicio,
-                                "declive": round(abs(declive), 1),
-                                "ingresos_perdidos": round(ultimos_3[0] - ultimos_3[-1], 0),
-                                "accion_recomendada": self._generar_accion_declive(
-                                    servicio, declive
-                                ),
-                            }
-                        )
+            # Bugfix: si t0 <= 0, no se puede calcular % declive
+            if t0 <= 0:
+                continue
+
+            declive = ((t2 - t0) / t0) * 100.0  # negativo = cae
+
+            if declive < self.umbral_declive:
+                servicios_declive.append(
+                    {
+                        "servicio": servicio,
+                        "declive": round(abs(declive), 1),
+                        "ingresos_perdidos": round(t0 - t2, 0),
+                        "accion_recomendada": self._generar_accion_declive(servicio, declive),
+                    }
+                )
 
         return sorted(servicios_declive, key=lambda x: x["declive"], reverse=True)[:5]
 
-    def analizar_estacionalidad(self, df):
-        """Analiza patrones estacionales de servicios"""
-        if df.empty:
+    def analizar_estacionalidad(self, datos):
+        """Analiza patrones estacionales de servicios (sin pandas)."""
+        if not datos:
             return self._generar_estacionalidad_demo()
 
-        estacionalidad = df.groupby(["servicio", "mes"])["total"].sum().reset_index()
-
-        # Definir estaciones
         estaciones = {
-            "Verano": [12, 1, 2],
-            "Otoño": [3, 4, 5],
-            "Invierno": [6, 7, 8],
-            "Primavera": [9, 10, 11],
+            "Verano": {12, 1, 2},
+            "Otoño": {3, 4, 5},
+            "Invierno": {6, 7, 8},
+            "Primavera": {9, 10, 11},
         }
 
-        def obtener_estacion(mes):
+        def obtener_estacion(mes: int) -> str:
             for estacion, meses in estaciones.items():
                 if mes in meses:
                     return estacion
             return "Verano"
 
-        estacionalidad["estacion"] = estacionalidad["mes"].apply(obtener_estacion)
-        estacional_por_servicio = (
-            estacionalidad.groupby(["servicio", "estacion"])["total"].sum().reset_index()
-        )
+        # total por (servicio, mes) y luego por (servicio, estacion)
+        total_por_servicio_mes = defaultdict(float)
+        for r in datos:
+            servicio = r.get("servicio") or "Servicio"
+            mes = int(r.get("mes"))
+            total = float(r.get("total") or 0)
+            total_por_servicio_mes[(servicio, mes)] += total
+
+        total_por_servicio_estacion = defaultdict(float)
+        for (servicio, mes), total_mes in total_por_servicio_mes.items():
+            estacion = obtener_estacion(mes)
+            total_por_servicio_estacion[(servicio, estacion)] += total_mes
+
+        # lista de servicios (similar a df["servicio"].unique()[:6])
+        servicios_unicos = []
+        seen = set()
+        for r in datos:
+            s = r.get("servicio") or "Servicio"
+            if s not in seen:
+                seen.add(s)
+                servicios_unicos.append(s)
+        servicios_unicos = servicios_unicos[:6]
 
         resultados = []
-        for servicio in df["servicio"].unique()[:6]:
-            data_servicio = estacional_por_servicio[estacional_por_servicio["servicio"] == servicio]
-            if not data_servicio.empty:
-                mejor_estacion = data_servicio.loc[data_servicio["total"].idxmax()]
-                resultados.append(
-                    {
-                        "servicio": servicio,
-                        "mejor_estacion": mejor_estacion["estacion"],
-                        "ingresos_estacion": round(mejor_estacion["total"], 0),
-                        "recomendacion_estacional": self._generar_recomendacion_estacional(
-                            servicio, mejor_estacion["estacion"]
-                        ),
-                    }
-                )
+        for servicio in servicios_unicos:
+            # encontrar mejor estación
+            best_estacion = None
+            best_total = None
+            for estacion in ("Verano", "Otoño", "Invierno", "Primavera"):
+                t = float(total_por_servicio_estacion.get((servicio, estacion), 0.0))
+                if best_total is None or t > best_total:
+                    best_total = t
+                    best_estacion = estacion
+
+            if best_estacion is None:
+                continue
+
+            resultados.append(
+                {
+                    "servicio": servicio,
+                    "mejor_estacion": best_estacion,
+                    "ingresos_estacion": round(best_total or 0.0, 0),
+                    "recomendacion_estacional": self._generar_recomendacion_estacional(
+                        servicio, best_estacion
+                    ),
+                }
+            )
 
         return resultados
 
@@ -237,7 +305,7 @@ class MotorIACore:
 
         return servicios_mercado
 
-    def generar_recomendaciones_ia(self, df):
+    def generar_recomendaciones_ia(self, datos):
         """Genera recomendaciones avanzadas de IA"""
         recomendaciones = [
             {
@@ -284,29 +352,57 @@ class MotorIACore:
 
         return recomendaciones
 
-    def predecir_ingresos(self, df):
-        """Predice ingresos de próximos meses"""
-        if df.empty:
+    def _add_months(self, dt, months):
+        """Helper simple sin dependencias externas: suma meses calendario a una fecha."""
+        y = dt.year + (dt.month - 1 + months) // 12
+        m = (dt.month - 1 + months) % 12 + 1
+        d = min(dt.day, 28)  # evita problemas con 29/30/31
+        return dt.replace(year=y, month=m, day=d)
+
+    def predecir_ingresos(self, datos):
+        """Predice ingresos de próximos meses (sin pandas, más estable)."""
+        if not datos:
             return self._generar_prediccion_demo()
 
-        # Agrupar por mes
-        ingresos_mes = df.groupby(df["fecha"].dt.to_period("M"))["total"].sum()
+        totales = defaultdict(float)
+        for r in datos:
+            año = int(r.get("año"))
+            mes = int(r.get("mes"))
+            total = float(r.get("total") or 0)
+            totales[(año, mes)] += total
 
-        if len(ingresos_mes) < 3:
+        serie = sorted(
+            [{"año": y, "mes": m, "total": t} for (y, m), t in totales.items()],
+            key=lambda x: (x["año"], x["mes"]),
+        )
+
+        if len(serie) < 3:
             return self._generar_prediccion_demo()
 
-        # Calcular tendencia simple
-        valores = ingresos_mes.values
+        # usar últimos 6 meses si hay
+        ventana = serie[-6:]
+        valores = [x["total"] for x in ventana]
+
+        # tendencia simple: últimos 3 vs 3 anteriores (si existen)
+        trend = 0.0
+        if len(valores) >= 6:
+            prev = sum(valores[:3]) / 3.0
+            last = sum(valores[-3:]) / 3.0
+            if prev > 0:
+                trend = (last - prev) / prev  # ej: 0.12 = +12%
+
         promedio = sum(valores) / len(valores)
 
-        # Generar predicciones
         predicciones = []
         fecha_base = self.fecha_actual
 
-        for i in range(1, 4):  # Próximos 3 meses
-            fecha_pred = fecha_base + timedelta(days=30 * i)
-            # Simulación con algo de variabilidad
-            factor_crecimiento = 1 + (random.uniform(-0.1, 0.15))
+        for i in range(1, 4):  # próximos 3 meses
+            fecha_pred = self._add_months(fecha_base, i)
+
+            # crecimiento basado en trend + ruido acotado
+            ruido = random.uniform(-0.05, 0.08)
+            factor_crecimiento = max(0.75, 1 + trend + ruido)
+
             ingreso_pred = promedio * factor_crecimiento
 
             predicciones.append(
@@ -321,7 +417,7 @@ class MotorIACore:
 
         return predicciones
 
-    def generar_alertas_criticas(self, df):
+    def generar_alertas_criticas(self, datos):
         """Genera alertas críticas del sistema"""
         alertas = [
             {
@@ -349,7 +445,7 @@ class MotorIACore:
 
         return alertas
 
-    def generar_insights_ai(self, df):
+    def generar_insights_ai(self, datos):
         """Genera insights automáticos de IA"""
         insights = [
             "📈 Los martes son 23% más rentables que los lunes",
@@ -398,10 +494,10 @@ class MotorIACore:
             ],
             "estacionalidad": self._generar_estacionalidad_demo(),
             "comparativa_mercado": self.generar_comparativa_mercado(),
-            "recomendaciones_ia": self.generar_recomendaciones_ia(pd.DataFrame()),
+            "recomendaciones_ia": self.generar_recomendaciones_ia([]),
             "predicciones_ingresos": self._generar_prediccion_demo(),
-            "alertas_criticas": self.generar_alertas_criticas(pd.DataFrame()),
-            "insights_ai": self.generar_insights_ai(pd.DataFrame()),
+            "alertas_criticas": self.generar_alertas_criticas([]),
+            "insights_ai": self.generar_insights_ai([]),
         }
 
     def _generar_estacionalidad_demo(self):

@@ -74,7 +74,12 @@ body { background: #0a0a0a; font-family: 'Inter', sans-serif; color: #fff; min-h
 
             <div class="form-group">
                 <label for="id_country" class="form-label">{{ form.country.label }}</label>
-                {{ form.country|add_class:'form-control' }}
+                {% if form.country_locked %}
+                    <div class="country-display form-control" style="background: rgba(0,0,0,0.5); color: #22d3ee;">{{ form.country_display_value }}</div>
+                    {{ form.country }}
+                {% else %}
+                    {{ form.country|add_class:'form-control' }}
+                {% endif %}
                 {% if form.country.errors %}<div class="error-message">{{ form.country.errors }}</div>{% endif %}
             </div>
 

@@ -24,17 +24,39 @@ class CountryAwareLoginView(LoginView):
         request.session["preferred_country"] = country
 
     def _detect_country(self, request):
-        # /accounts/login/ sin país en path: limpiar sesión para no arrastrar UY/otro, pero
-        # SÍ respetar ?country=, ?from=, next, referer. Solo si no hay pistas → default CL.
+        # Regla: país en path ✅, no depender de country= en GET.
         path_raw = (request.path or "").rstrip("/")
         if path_raw == "/accounts/login":
             request.session.pop("preferred_country", None)
+
+        # 1. Detectar desde path primero (/us/accounts/login/ -> US)
+        path = (request.path or "").lower()
+        if path.startswith("/us/") or path == "/us":
+            return "US"
+        if path.startswith("/mx/") or path == "/mx":
+            return "MX"
+        if path.startswith("/cl/") or path == "/cl":
+            return "CL"
+        if path.startswith("/co/") or path == "/co":
+            return "CO"
+        if path.startswith("/ec/") or path == "/ec":
+            return "EC"
+        if path.startswith("/pe/") or path == "/pe":
+            return "PE"
+        if path.startswith("/ve/") or path == "/ve":
+            return "VE"
+        if path.startswith("/br/") or path == "/br":
+            return "BR"
+        if path.startswith("/uy/") or path == "/uy":
+            return "UY"
+        if path.startswith("/ar/") or path == "/ar":
+            return "AR"
 
         next_url = request.GET.get("next", "") or ""
         country_param = (request.GET.get("country", "") or "").upper()
         from_param = (request.GET.get("from", "") or "").upper()
 
-        # Detectar desde parámetro ?from= (ej. /accounts/login/?from=co)
+        # 2. Detectar desde parámetro ?from= (ej. /accounts/login/?from=co)
         if from_param in ["US", "USA"]:
             return "US"
         if from_param in ["UY", "URUGUAY"]:
@@ -76,7 +98,7 @@ class CountryAwareLoginView(LoginView):
         if next_url.startswith("/br/"):
             return "BR"
 
-        # Detectar desde parámetro country (prioridad alta)
+        # 3. Detectar desde parámetro country (solo fallback; preferir path)
         if country_param in ["US", "USA"]:
             return "US"
         if country_param in ["CL", "CHILE"]:
@@ -98,7 +120,7 @@ class CountryAwareLoginView(LoginView):
         if country_param in ["AR", "ARGENTINA"]:
             return "AR"
 
-        # Detectar desde sesión guardada
+        # 4. Detectar desde sesión guardada
         saved = (request.session.get("preferred_country") or "").upper()
         if saved in ["US", "USA"]:
             return "US"
@@ -121,7 +143,7 @@ class CountryAwareLoginView(LoginView):
         if saved in ["AR", "ARGENTINA"]:
             return "AR"
 
-        # Detectar desde referer
+        # 5. Detectar desde referer
         referer = request.headers.get("referer", "")
         if "/us/" in referer or "/usa/" in referer:
             return "US"
@@ -144,7 +166,7 @@ class CountryAwareLoginView(LoginView):
         if "/ar/" in referer or "/argentina/" in referer:
             return "AR"
 
-        # Detectar desde usuario autenticado
+        # 6. Detectar desde usuario autenticado
         if request.user.is_authenticated:
             empresa_country = getattr(getattr(request.user, "empresa", None), "pais", None)
             if empresa_country:
@@ -153,30 +175,7 @@ class CountryAwareLoginView(LoginView):
             if perfil_country:
                 return perfil_country.upper()
 
-        # Detectar desde path
-        path = (request.path or "").lower()
-        if path.startswith("/us/") or path == "/us":
-            return "US"
-        if path.startswith("/mx/") or path == "/mx":
-            return "MX"
-        if path.startswith("/cl/") or path == "/cl":
-            return "CL"
-        if path.startswith("/co/") or path == "/co":
-            return "CO"
-        if path.startswith("/ec/") or path == "/ec":
-            return "EC"
-        if path.startswith("/pe/") or path == "/pe":
-            return "PE"
-        if path.startswith("/ve/") or path == "/ve":
-            return "VE"
-        if path.startswith("/br/") or path == "/br":
-            return "BR"
-        if path.startswith("/uy/") or path == "/uy":
-            return "UY"
-        if path.startswith("/ar/") or path == "/ar":
-            return "AR"
-
-        # Fallback: país por defecto de settings (Chile, no Uruguay)
+        # 7. Fallback: país por defecto de settings (Chile, no Uruguay)
         return getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl").upper()
 
     # ------------------------------------------------------------------ #

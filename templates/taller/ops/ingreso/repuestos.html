@@ -1,0 +1,71 @@
+{% extends "taller/ops/ingreso/base_ingreso.html" %}
+{% load i18n %}
+{% load country_url %}
+{% load static %}
+{% block title %}{% trans "Repuestos" %} | {% trans "Ingreso" %}{% endblock %}
+{% block content %}
+<div class="ingreso-wrap">
+  <div class="container py-4">
+    {% include "taller/ops/ingreso/_stepper.html" with step=5 %}
+    <h2 class="text-center mb-4" style="font-family: Orbitron; color: var(--ops-cyan);">{% trans "Paso 5/5 – Repuestos" %}</h2>
+
+    <ul class="nav nav-tabs mb-4 justify-content-center" id="repuestos-tabs">
+      <li class="nav-item">
+        <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-manual">{% trans "Manual" %}</button>
+      </li>
+      <li class="nav-item">
+        <button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-imagen">{% trans "Por imagen" %}</button>
+      </li>
+    </ul>
+
+    <div class="tab-content">
+      <div class="tab-pane fade show active" id="tab-manual">
+        <div class="glass-panel mb-4">
+          <label class="form-label">{% trans "Buscar repuesto" %}</label>
+          <div class="input-group mb-2">
+            <input type="text" class="form-control ingreso-input" id="repuesto-q" placeholder="{% trans 'Código o nombre' %}">
+            <button type="button" class="btn-ingreso" id="btn-buscar-repuesto">{% trans "Buscar" %}</button>
+          </div>
+          <div id="repuesto-results" class="list-group mb-3"></div>
+          <hr>
+          <label class="form-label">{% trans "O agregar libre" %}</label>
+          <input type="text" class="form-control ingreso-input mb-2" id="repuesto-codigo" placeholder="{% trans 'Código' %}">
+          <input type="text" class="form-control ingreso-input mb-2" id="repuesto-nombre" placeholder="{% trans 'Nombre' %}">
+          <input type="number" class="form-control ingreso-input mb-2" id="repuesto-cantidad" value="1" min="1">
+          <input type="number" class="form-control ingreso-input mb-2" id="repuesto-precio" placeholder="{% trans 'P. unit.' %}" step="0.01">
+          <button type="button" class="btn-ingreso btn-ingreso-primary" id="btn-add-repuesto-libre">{% trans "Agregar línea" %}</button>
+        </div>
+      </div>
+      <div class="tab-pane fade" id="tab-imagen">
+        <div class="glass-panel mb-4">
+          <input type="file" id="input-ocr-repuesto" accept="image/*" class="form-control ingreso-input mb-2">
+          <button type="button" class="btn-ingreso" id="btn-ocr-repuesto">{% trans "Extraer códigos (OCR)" %}</button>
+          <div id="ocr-repuesto-candidates" class="mt-3"></div>
+        </div>
+      </div>
+    </div>
+
+    {% include "taller/ops/ingreso/_repuestos_table.html" %}
+
+    <div class="text-center mt-4">
+      <a href="{% country_url 'ops:ops_ingreso_repuestos' documento_id=documento.pk app_namespace='direct' %}" class="btn-ingreso btn-ingreso-primary">{% trans "Refrescar" %}</a>
+      <a href="{% if request.path|slice:':4' == '/us/' %}/us/documentos/{% else %}/cl/documentos/{% endif %}" class="btn btn-outline-light ms-2">{% trans "Ir a documentos" %}</a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'ops/ingreso/ingreso.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  RepuestosIngreso.init({
+    documentoId: {{ documento.pk }},
+    addRepuestoUrl: "{% country_url 'ops:api_add_repuesto' documento_id=documento.pk app_namespace='direct' %}".replace(/&amp;/g, '&'),
+    buscarRepuestoUrl: "{% country_url 'ops:api_buscar_repuesto' app_namespace='direct' %}".replace(/&amp;/g, '&'),
+    ocrRepuestoUrl: "{% country_url 'ops:api_ocr_repuesto' app_namespace='direct' %}".replace(/&amp;/g, '&'),
+    csrfToken: "{{ csrf_token }}"
+  });
+});
+</script>
+{% endblock %}

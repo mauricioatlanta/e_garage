@@ -1,6 +1,16 @@
 """
 Sistema de Rate Limiting para login y vistas sensibles
 Previene ataques de fuerza bruta y protege contra spam
+
+Métodos permitidos en rutas protegidas: GET, POST, HEAD, OPTIONS (HEAD/OPTIONS para
+health checks y CORS preflight sin rechazos).
+
+Este middleware NUNCA devuelve 403: cuando se excede el límite devuelve 429 (Too Many
+Requests) con errors/rate_limit.html. Si ves 403 en login, la causa es otra (p. ej. otra
+vista/middleware o que el POST vaya a una ruta que no sea la del formulario).
+
+Prueba canónica (GET login debe ser 200):
+  curl -kI https://egarage.cl/us/login/ | head -n 12
 """
 
 import time
@@ -288,10 +298,18 @@ class RateLimitMiddleware:
     def __init__(self, get_response):
         self.get_response = get_response
 
-        # Rutas que requieren rate limiting automático
+        # Rutas que requieren rate limiting automático (incl. login con prefijo país)
         self.protected_paths = [
             "/accounts/login/",
             "/account/login/",
+            "/us/login/",
+            "/us/accounts/login/",
+            "/us/en/accounts/login/",
+            "/us/es/accounts/login/",
+            "/cl/login/",
+            "/cl/accounts/login/",
+            "/cl/es/accounts/login/",
+            "/cl/en/accounts/login/",
             "/registration/login/",
             "/accounts/password/reset/",
             "/accounts/signup/",
@@ -317,7 +335,7 @@ class RateLimitMiddleware:
         # Verificar si es una ruta de IA (requiere protección más estricta)
         is_ia_path = any(path.startswith(ia_path) for ia_path in self.ia_protected_paths)
 
-        if (should_protect or is_ia_path) and (request.method == "POST" or request.method == "GET"):
+        if (should_protect or is_ia_path) and request.method in ("GET", "POST", "HEAD", "OPTIONS"):
             ip = get_client_ip(request)
 
             # Determinar tipo de acción

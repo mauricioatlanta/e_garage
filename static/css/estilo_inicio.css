@@ -12,7 +12,7 @@
 }
 
 .overlay {
-  background-image: url('/static/img/tech_background.svg');
+  background-image: url('../img/tech_background.svg');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;

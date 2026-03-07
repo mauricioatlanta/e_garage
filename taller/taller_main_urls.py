@@ -1,6 +1,7 @@
 import logging
 
 from django.urls import include, path
+from django.views.generic import RedirectView
 
 # Configuración de logging para este módulo
 logger = logging.getLogger(__name__)
@@ -114,7 +115,18 @@ urlpatterns = [
     path("renovar-empresa/<int:empresa_id>/", renovar_empresa, name="renovar_empresa"),
     path("suscripcion-bloqueada/", suscripcion_bloqueada, name="suscripcion_bloqueada"),
     path("debug-autocomplete/", debug_cliente_autocomplete, name="debug_autocomplete"),
-    path("configuracion/", configuracion_empresa, name="configuracion"),
+    # Alias público: siempre manda al Settings Center
+    path(
+        "configuracion/",
+        RedirectView.as_view(pattern_name="taller:company_settings", permanent=False),
+        name="configuracion",
+    ),
+    # Configuración real (dueño)
+    path(
+        "configuracion/empresa/",
+        configuracion_empresa,
+        name="configuracion_empresa",
+    ),
     path("configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"),
     # === CONFIGURACIÓN DE EMPRESA Y BRANDING ===
     path("settings/", company_settings_view, name="company_settings"),
@@ -233,7 +245,7 @@ us_patterns = [
     path(
         "admin-monitoring/",
         include(
-            ("taller.urls_modules.admin_monitoring", "admin_monitoring"),
+            ("taller.urls_extra.admin_monitoring", "admin_monitoring"),
             namespace="admin_monitoring",
         ),
     ),

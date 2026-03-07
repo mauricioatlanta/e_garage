@@ -25,7 +25,7 @@ def reverse_migration(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ("taller", "0060_companysettings_whatsapp_template_notainterna_tipo"),
+        ("taller", "0069_db_align_configuracionempresa_usa_servicios"),
     ]
 
     operations = [

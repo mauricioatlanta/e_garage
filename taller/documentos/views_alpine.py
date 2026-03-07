@@ -36,8 +36,10 @@ def crear_documento_alpine(request):
         messages.error(request, "Usuario sin empresa asociada.")
         return redirect("dashboard")
 
-    # 2. Obtener configuración de impuestos según empresa
-    country = empresa.pais or "CL"
+    # 2. Obtener país: prefijo URL primero (/us/ → US), luego empresa
+    from taller.utils import get_country_from_request
+
+    country = get_country_from_request(request, default=empresa.pais or "CL")
 
     # Determinar tasa de impuesto según país
     if country == "CL":

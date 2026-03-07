@@ -14,26 +14,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        # Actualizar solo el estado de Django para LogAuditoria sin tocar la BD
-        # (la tabla no existe físicamente)
-        migrations.SeparateDatabaseAndState(
-            database_operations=[
-                # No hacer nada en la base de datos ya que la tabla no existe
-            ],
-            state_operations=[
-                migrations.RemoveField(
-                    model_name="logauditoria",
-                    name="empresa",
-                ),
-                migrations.RemoveField(
-                    model_name="logauditoria",
-                    name="usuario",
-                ),
-                migrations.DeleteModel(
-                    name="LogAuditoria",
-                ),
-            ],
-        ),
         migrations.DeleteModel(
             name="RegimenFiscal",
         ),

@@ -1,0 +1,351 @@
+{% extends "taller/common/base.html" %}
+{% load static %}
+{% load country_url %}
+{% load i18n %}
+
+{% block title %}{{ empresa.nombre_taller }} - {% trans "Centro de Trabajo" %}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ═══════════════════════════════════════════════════════════════
+   WORKSPACE FUTURISTA — Diseño cyber, alto contraste, moderno
+   ═══════════════════════════════════════════════════════════════ */
+.ws-root {
+  --ws-cyan: #00f2fe;
+  --ws-magenta: #e040fb;
+  --ws-electric: #00d4ff;
+  --ws-surface: rgba(8, 12, 24, 0.85);
+  --ws-surface-hover: rgba(16, 24, 48, 0.9);
+  --ws-border: rgba(0, 242, 254, 0.35);
+  --ws-glow: rgba(0, 242, 254, 0.25);
+  --ws-text: #f0f9ff;
+  --ws-muted: #94a3b8;
+  --ws-success: #22d3ee;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* Fondo con grid sutil */
+.ws-wrap {
+  position: relative;
+  min-height: 60vh;
+  padding: 1.5rem 0;
+}
+
+.ws-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 242, 254, 0.03) 0%, transparent 50%),
+    linear-gradient(90deg, rgba(224, 64, 251, 0.02) 0%, transparent 50%),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 40px,
+      rgba(0, 242, 254, 0.03) 40px,
+      rgba(0, 242, 254, 0.03) 41px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 40px,
+      rgba(224, 64, 251, 0.02) 40px,
+      rgba(224, 64, 251, 0.02) 41px
+    );
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ws-content { position: relative; z-index: 1; }
+
+/* Encabezado */
+.ws-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.ws-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--ws-text);
+  letter-spacing: -0.02em;
+  text-shadow: 0 0 20px rgba(0, 242, 254, 0.3);
+}
+
+.ws-subtitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  background: linear-gradient(90deg, var(--ws-cyan), var(--ws-magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-top: 0.25rem;
+}
+
+.ws-meta {
+  font-size: 0.85rem;
+  color: var(--ws-muted);
+  text-align: right;
+}
+
+.ws-meta strong { color: var(--ws-text); }
+
+/* Card principal de búsqueda */
+.ws-hero {
+  background: var(--ws-surface);
+  border: 1px solid var(--ws-border);
+  border-radius: 16px;
+  padding: 2rem;
+  backdrop-filter: blur(12px);
+  box-shadow:
+    0 0 40px rgba(0, 242, 254, 0.08),
+    0 4px 24px rgba(0, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.ws-hero:hover {
+  border-color: rgba(0, 242, 254, 0.5);
+  box-shadow:
+    0 0 60px rgba(0, 242, 254, 0.12),
+    0 4px 24px rgba(0, 0, 0, 0.4);
+}
+
+.ws-hero-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ws-text);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.ws-hero-title i {
+  color: var(--ws-cyan);
+  filter: drop-shadow(0 0 6px var(--ws-glow));
+}
+
+/* Form búsqueda */
+.ws-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+@media (min-width: 640px) {
+  .ws-form {
+    flex-direction: row;
+    align-items: stretch;
+  }
+}
+
+.ws-input {
+  flex: 1;
+  min-width: 0;
+  padding: 1rem 1.25rem;
+  font-size: 1.125rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  color: var(--ws-text);
+  background: rgba(0, 0, 0, 0.5);
+  border: 2px solid var(--ws-border);
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.25s ease;
+}
+
+.ws-input::placeholder {
+  color: var(--ws-muted);
+  opacity: 0.8;
+}
+
+.ws-input:focus {
+  border-color: var(--ws-cyan);
+  box-shadow: 0 0 0 3px rgba(0, 242, 254, 0.2), 0 0 20px rgba(0, 242, 254, 0.15);
+}
+
+.ws-btn-search {
+  padding: 1rem 2rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0a0e17;
+  background: linear-gradient(135deg, var(--ws-cyan) 0%, var(--ws-electric) 100%);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px rgba(0, 242, 254, 0.4);
+  transition: all 0.25s ease;
+}
+
+.ws-btn-search:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 28px rgba(0, 242, 254, 0.5);
+}
+
+.ws-btn-search:active { transform: translateY(0); }
+
+/* Acciones rápidas */
+.ws-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+.ws-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--ws-text);
+  background: var(--ws-surface);
+  border: 1px solid var(--ws-border);
+  border-radius: 10px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.ws-action:hover {
+  background: var(--ws-surface-hover);
+  border-color: var(--ws-cyan);
+  color: var(--ws-cyan);
+  box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
+}
+
+.ws-action i {
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+/* Sección vehículos recientes */
+.ws-recent {
+  margin-top: 2.5rem;
+}
+
+.ws-recent-title {
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--ws-muted);
+  margin-bottom: 1rem;
+}
+
+.ws-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 640px) {
+  .ws-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
+  .ws-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+.ws-card {
+  display: block;
+  padding: 1rem 1.25rem;
+  background: var(--ws-surface);
+  border: 1px solid var(--ws-border);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.25s ease;
+}
+
+.ws-card:hover {
+  background: var(--ws-surface-hover);
+  border-color: var(--ws-cyan);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 242, 254, 0.12);
+}
+
+.ws-card-plate {
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--ws-cyan);
+  text-shadow: 0 0 10px rgba(0, 242, 254, 0.4);
+}
+
+.ws-card-desc {
+  font-size: 0.85rem;
+  color: var(--ws-muted);
+  margin-top: 0.25rem;
+}
+</style>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<section class="ws-root ws-wrap">
+  <div class="ws-content container">
+    <header class="ws-header">
+      <div>
+        <h1 class="ws-title">{{ empresa.nombre_taller }}</h1>
+        <p class="ws-subtitle">{% trans "Centro de Trabajo" %} / {% trans "Recepción Vehicular" %}</p>
+      </div>
+      <div class="ws-meta">
+        <span>{{ fecha_hoy|date:"d/m/Y" }}</span>
+        {% if user.get_full_name %}<br><strong>{{ user.get_full_name }}</strong>{% endif %}
+      </div>
+    </header>
+
+    <div class="ws-hero">
+      <h2 class="ws-hero-title">
+        <i class="fas fa-search"></i>
+        {% trans "Buscar vehículo por patente" %}
+      </h2>
+      <form action="{{ url_buscar }}" method="get" class="ws-form">
+        <input
+          type="text"
+          name="patente"
+          placeholder="ABC123"
+          autocomplete="off"
+          autofocus
+          class="ws-input"
+        />
+        <button type="submit" class="ws-btn-search">
+          <i class="fas fa-arrow-right me-2"></i>{% trans "Buscar" %}
+        </button>
+      </form>
+    </div>
+
+    <div class="ws-actions">
+      <a href="{{ url_crear_vehiculo }}" class="ws-action"><i class="fas fa-plus"></i> {% trans "Crear vehículo nuevo" %}</a>
+      <a href="{{ url_lista_clientes }}" class="ws-action"><i class="fas fa-users"></i> {% trans "Clientes" %}</a>
+      <a href="{{ url_lista_vehiculos }}" class="ws-action"><i class="fas fa-car"></i> {% trans "Vehículos" %}</a>
+      <a href="{{ url_lista_documentos }}" class="ws-action"><i class="fas fa-file-invoice"></i> {% trans "Documentos" %}</a>
+      <a href="{{ url_centro_operaciones }}" class="ws-action"><i class="fas fa-rocket"></i> {% trans "Centro de Operaciones" %}</a>
+      <a href="{{ url_settings }}" class="ws-action"><i class="fas fa-cog"></i> {% trans "Ajustes" %}</a>
+    </div>
+
+    {% if vehiculos_con_url %}
+    <div class="ws-recent">
+      <h3 class="ws-recent-title">{% trans "Vehículos recientes" %}</h3>
+      <div class="ws-grid">
+        {% for item in vehiculos_con_url %}
+        <a href="{{ item.url_historial }}" class="ws-card">
+          <span class="ws-card-plate">{{ item.vehiculo.patente }}</span>
+          <span class="ws-card-desc">{{ item.vehiculo.get_marca_display }} {{ item.vehiculo.get_modelo_display }}{% if item.vehiculo.anio %} {{ item.vehiculo.anio }}{% endif %}</span>
+        </a>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

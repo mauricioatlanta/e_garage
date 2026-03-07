@@ -45,10 +45,8 @@ class AIReportEngine:
         from taller.models.repuesto import Repuesto
         from taller.models.vehiculo import Vehiculo
 
-        # Métricas base por país
-        documentos = Documento.objects.filter(
-            empresa=self.empresa, fecha_creacion__gte=fecha_inicio
-        )
+        # Métricas base por país (Documento usa created_at, no fecha_creacion)
+        documentos = Documento.objects.filter(empresa=self.empresa, created_at__gte=fecha_inicio)
 
         vehiculos = Vehiculo.objects.filter(empresa=self.empresa)
         clientes = Cliente.objects.filter(empresa=self.empresa)
@@ -110,16 +108,16 @@ class AIReportEngine:
         """Calcula crecimiento porcentual"""
         now = timezone.now()
         current_month = (
-            queryset.filter(
-                fecha_creacion__month=now.month, fecha_creacion__year=now.year
-            ).aggregate(Sum(field))[f"{field}__sum"]
+            queryset.filter(created_at__month=now.month, created_at__year=now.year).aggregate(
+                Sum(field)
+            )[f"{field}__sum"]
             or 0
         )
 
         previous_month = (
             queryset.filter(
-                fecha_creacion__month=(now.month - 1) if now.month > 1 else 12,
-                fecha_creacion__year=now.year if now.month > 1 else now.year - 1,
+                created_at__month=(now.month - 1) if now.month > 1 else 12,
+                created_at__year=now.year if now.month > 1 else now.year - 1,
             ).aggregate(Sum(field))[f"{field}__sum"]
             or 0
         )
@@ -135,7 +133,7 @@ class AIReportEngine:
         for i in range(dias):
             fecha = timezone.now() - timedelta(days=dias - i)
             valor = (
-                queryset.filter(fecha_creacion__date=fecha.date()).aggregate(Sum(field))[
+                queryset.filter(created_at__date=fecha.date()).aggregate(Sum(field))[
                     f"{field}__sum"
                 ]
                 or 0
@@ -231,7 +229,7 @@ class AIReportEngine:
         for i in range(dias):
             fecha = timezone.now() - timedelta(days=dias - i)
             documentos_dia = Documento.objects.filter(
-                empresa=self.empresa, fecha_creacion__date=fecha.date()
+                empresa=self.empresa, created_at__date=fecha.date()
             )
 
             total = documentos_dia.aggregate(Sum("total"))["total__sum"] or 0
@@ -315,8 +313,8 @@ class AIReportEngine:
             for day in range(7):  # 0=Monday, 6=Sunday
                 docs = Documento.objects.filter(
                     empresa=self.empresa,
-                    fecha_creacion__hour=hour,
-                    fecha_creacion__week_day=day + 1,  # Django uses 1=Sunday
+                    created_at__hour=hour,
+                    created_at__week_day=day + 1,  # Django uses 1=Sunday
                 ).count()
 
                 heatmap[f"{day}-{hour}"] = docs
@@ -330,7 +328,7 @@ class AIReportEngine:
         # Simulación de predicción basada en datos históricos
         recent_docs = Documento.objects.filter(
             empresa=self.empresa,
-            fecha_creacion__gte=timezone.now() - timedelta(days=90),
+            created_at__gte=timezone.now() - timedelta(days=90),
         )
 
         avg_weekly = recent_docs.count() / 12  # 12 semanas aproximadamente

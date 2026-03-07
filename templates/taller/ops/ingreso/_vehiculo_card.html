@@ -1,0 +1,11 @@
+{% load i18n %}
+<div class="vehiculo-card glass-panel">
+  <div class="vehiculo-card-header">
+    <span class="vehiculo-patente">{{ vehiculo.patente }}</span>
+    <span class="vehiculo-marca">{{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}</span>
+  </div>
+  <div class="vehiculo-card-body">
+    <p class="vehiculo-cliente">{% trans "Cliente" %}: <strong>{{ vehiculo.cliente }}</strong></p>
+    {% if vehiculo.anio %}<p class="vehiculo-anio">{% trans "Año" %}: {{ vehiculo.anio }}</p>{% endif %}
+  </div>
+</div>

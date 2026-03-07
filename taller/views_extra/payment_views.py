@@ -1,9 +1,17 @@
 from decimal import Decimal
 
 from django.contrib import messages
+from taller.utils.us_localization import USDCurrencyMixin
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils import timezone
+
+# TODO: Si vas a usar pagos por país, crear estos templates:
+#   - templates/saas/suscripcion/pago_chile.html
+#   - templates/saas/suscripcion/pago_mexico.html
+#   - templates/saas/suscripcion/pago_usa.html
+#   - templates/saas/suscripcion/subir_comprobante.html
+# Si no los usas todavía, las vistas devolverán TemplateDoesNotExist al visitar sus URLs.
 
 
 @login_required
@@ -95,7 +103,9 @@ def payment_usa(request):
         "anual": {"valor": "200.00", "dias": 365, "nombre": "Annual"},
     }
 
-    plan_info = precios.get(plan, precios["mensual"])
+    plan_info = dict(precios.get(plan, precios["mensual"]))
+    # Formato USA: $1,250.25 (coma miles, 2 decimales)
+    plan_info["valor_display"] = USDCurrencyMixin.format_usd(Decimal(str(plan_info["valor"])))
 
     # Datos PayPal
     paypal_config = {
@@ -117,7 +127,7 @@ def payment_usa(request):
         "reference": f"eGarage-{request.user.empresa.id}-{plan}",
     }
 
-    return render(request, "saas/suscripcion/pago_usa.html", context)
+    return render(request, "us/en/suscripcion/pago.html", context)
 
 
 @login_required

@@ -1,0 +1,25 @@
+{% load i18n %}
+<nav class="ingreso-stepper" aria-label="{% trans 'Progreso de ingreso' %}">
+  <ol class="stepper-list">
+    <li class="stepper-item {% if step >= 1 %}active{% endif %} {% if step > 1 %}done{% endif %}">
+      <span class="stepper-num">1</span>
+      <span class="stepper-label">{% trans "Patente" %}</span>
+    </li>
+    <li class="stepper-item {% if step >= 2 %}active{% endif %} {% if step > 2 %}done{% endif %}">
+      <span class="stepper-num">2</span>
+      <span class="stepper-label">{% trans "Kilometraje" %}</span>
+    </li>
+    <li class="stepper-item {% if step >= 3 %}active{% endif %} {% if step > 3 %}done{% endif %}">
+      <span class="stepper-num">3</span>
+      <span class="stepper-label">{% trans "Documento" %}</span>
+    </li>
+    <li class="stepper-item {% if step >= 4 %}active{% endif %} {% if step > 4 %}done{% endif %}">
+      <span class="stepper-num">4</span>
+      <span class="stepper-label">{% trans "Checklist" %}</span>
+    </li>
+    <li class="stepper-item {% if step >= 5 %}active{% endif %} {% if step > 5 %}done{% endif %}">
+      <span class="stepper-num">5</span>
+      <span class="stepper-label">{% trans "Repuestos" %}</span>
+    </li>
+  </ol>
+</nav>

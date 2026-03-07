@@ -1,0 +1,42 @@
+{% extends "taller/ops/ingreso/base_ingreso.html" %}
+{% load i18n %}
+{% load country_url %}
+{% block title %}{% trans "Patente" %} | {% trans "Ingreso" %}{% endblock %}
+{% block content %}
+<div class="ingreso-wrap">
+  <div class="container py-4">
+    {% include "taller/ops/ingreso/_stepper.html" with step=1 %}
+    <h2 class="text-center mb-4" style="font-family: Orbitron; color: var(--ops-cyan);">{% trans "Ingrese patente" %}</h2>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="glass-panel">
+          <form method="post" action="{% country_url 'ops:ops_ingreso_patente' app_namespace='direct' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-flex gap-2 justify-content-end mt-3">
+              <a href="{% country_url 'ops:ops_ingreso_home' app_namespace='direct' %}" class="btn btn-outline-light">{% trans "Volver" %}</a>
+              <button type="submit" class="btn-ingreso btn-ingreso-primary">{% trans "Buscar" %}</button>
+            </div>
+          </form>
+        </div>
+
+        {% if patente and not vehiculo and crear_form %}
+        <div class="glass-panel mt-4 border-warning">
+          <h4 class="text-warning">{% trans "Vehículo no encontrado" %}</h4>
+          <p class="text-white-50">{% trans "Cree el vehículo para continuar." %}</p>
+          <form method="post" action="{% country_url 'ops:ops_ingreso_vehiculo_crear' app_namespace='direct' %}?patente={{ patente }}">
+            {% csrf_token %}
+            {{ crear_form.as_p }}
+            <p class="small">
+              <a href="{% if request.path|slice:':4' == '/us/' %}/us/clientes/crear/?next=/us/ops/ingreso/vehiculo/crear/?patente={{ patente }}{% else %}/cl/es/clientes/crear/?next=/cl/es/ops/ingreso/vehiculo/crear/?patente={{ patente }}{% endif %}">{% trans "Crear cliente" %}</a>
+            </p>
+            <button type="submit" class="btn-ingreso btn-ingreso-primary">{% trans "Crear ahora" %}</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

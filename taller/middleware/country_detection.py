@@ -1,17 +1,14 @@
 """
 Middleware para detectar y configurar el país e idioma basado en:
-1. Query parameter (country=CL, country=US, etc.)
-2. URL path (/cl/, /us/, etc.)
-3. Sesión guardada
-4. Usuario autenticado/empresa
-5. Valor por defecto
-
-También activa el idioma correspondiente al país detectado.
+Regla: país en path ✅, país en GET ❌ (no añadir country= al querystring).
+Orden: 1) URL path (/cl/, /us/, etc.), 2) Sesión, 3) Usuario/empresa,
+4) Query country= solo como fallback, 5) Valor por defecto.
+Activa el idioma correspondiente al país detectado.
 """
 
 from django.utils.deprecation import MiddlewareMixin
 from django.utils.translation import activate
-from taller.utils import get_normalized_country
+from taller.utils.country import get_normalized_country
 
 
 class CountryDetectionMiddleware(MiddlewareMixin):
@@ -45,24 +42,24 @@ class CountryDetectionMiddleware(MiddlewareMixin):
         """
         country = None
 
-        # 1. Query parameter (prioridad más alta)
-        country_param = request.GET.get("country", "").upper().strip()
-        if country_param:
-            country = get_normalized_country(country_param)
+        # 1. URL path primero (país en path, no en GET)
+        country = self._get_country_from_url(request.path)
 
-        # 2. URL path (/cl/, /us/, etc.)
-        if not country:
-            country = self._get_country_from_url(request.path)
-
-        # 3. Sesión guardada
+        # 2. Sesión guardada
         if not country:
             saved_country = request.session.get("preferred_country", "").upper().strip()
             if saved_country:
                 country = get_normalized_country(saved_country)
 
-        # 4. Usuario autenticado/empresa
+        # 3. Usuario autenticado/empresa
         if not country and hasattr(request, "user") and request.user.is_authenticated:
             country = self._get_country_from_user(request.user)
+
+        # 4. Query parameter solo como fallback (no fomentar country= en URLs)
+        if not country:
+            country_param = request.GET.get("country", "").upper().strip()
+            if country_param:
+                country = get_normalized_country(country_param)
 
         # 5. Valor por defecto
         if not country:
@@ -81,21 +78,6 @@ class CountryDetectionMiddleware(MiddlewareMixin):
 
         # Activar el idioma para esta request (DEBE hacerse ANTES de LocaleMiddleware)
         activate(lang)
-
-        # CRÍTICO: Si hay parámetro GET country, forzar el idioma y sobrescribir cookies
-        # Esto previene que LocaleMiddleware use la cookie antigua
-        country_param = request.GET.get("country", "").upper().strip()
-        if country_param:
-            # Forzar activación del idioma correcto
-            activate(lang)
-            # Establecer en request para que otros middlewares lo respeten
-            request.LANGUAGE_CODE = lang
-            print(
-                f"[CountryDetectionMiddleware] GET param detected - Forcing language: {lang} for country: {country}"
-            )
-
-        # Debug logging
-        print(f"[CountryDetectionMiddleware] Detected country: {country}, Language: {lang}")
 
         return None
 

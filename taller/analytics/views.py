@@ -65,17 +65,24 @@ def dashboard_ai_view(request):
 
         return render(request, "analytics/dashboard_ai.html", context)
     except Exception as e:
-        # Manejar errores del motor de reportes
+        # Manejar errores del motor de reportes (evitar 500 si error.html no existe)
+        from django.http import HttpResponse
         from django.shortcuts import render
 
-        return render(
-            request,
-            "error.html",
-            {
-                "error": f"Error al cargar el dashboard: {str(e)}. Por favor, intenta nuevamente o contacta al soporte.",
-            },
-            status=500,
-        )
+        error_msg = f"Error al cargar el dashboard: {str(e)}. Por favor, intenta nuevamente o contacta al soporte."
+        try:
+            return render(
+                request,
+                "error.html",
+                {"error": error_msg},
+                status=500,
+            )
+        except Exception:
+            return HttpResponse(
+                f"<h1>Error del sistema</h1><p>{error_msg}</p>",
+                status=500,
+                content_type="text/html; charset=utf-8",
+            )
 
 
 @login_required

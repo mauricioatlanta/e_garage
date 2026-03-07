@@ -1,9 +1,7 @@
-from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect
 from django.urls import reverse
 
 
-@login_required
 def logout_redirect_view(request):
     """
     Vista personalizada de logout que redirige al país correcto.

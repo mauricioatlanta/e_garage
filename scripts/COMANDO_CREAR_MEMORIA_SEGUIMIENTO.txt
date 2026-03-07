@@ -1,0 +1,102 @@
+# ==========================================
+# COPIAR Y PEGAR ESTE COMANDO COMPLETO EN EL SERVIDOR
+# ==========================================
+
+sudo bash -c 'cat > /srv/egarage/taller/models/memoria_seguimiento.py << "PYTHON_EOF"
+"""
+Modelos para Memoria Interna + Evidencias + Seguimiento Público
+"""
+
+import secrets
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+from taller.models.mixins import AuditMixin
+
+
+class NotaInterna(AuditMixin, models.Model):
+    empresa = models.ForeignKey("taller.Empresa", on_delete=models.CASCADE, related_name="notas_internas", db_index=True)
+    documento = models.ForeignKey("taller.Documento", on_delete=models.CASCADE, related_name="notas_internas", null=True, blank=True, db_index=True)
+    cliente = models.ForeignKey("taller.Cliente", on_delete=models.CASCADE, related_name="notas_internas", null=True, blank=True, db_index=True)
+    vehiculo = models.ForeignKey("taller.Vehiculo", on_delete=models.CASCADE, related_name="notas_internas", null=True, blank=True, db_index=True)
+    contenido = models.TextField(help_text=_("Contenido de la nota interna"))
+    TIPO_CHOICES = [("ALERTA", _("Alerta")), ("PREFERENCIA", _("Preferencia"))]
+    tipo = models.CharField(max_length=12, choices=TIPO_CHOICES, default="PREFERENCIA", db_index=True)
+    solo_staff = models.BooleanField(default=True, help_text=_("Si es True, solo visible para staff"))
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    class Meta:
+        verbose_name = _("Nota Interna")
+        verbose_name_plural = _("Notas Internas")
+        ordering = ["-created_at"]
+    def clean(self):
+        super().clean()
+        count = sum([bool(self.documento_id), bool(self.cliente_id), bool(self.vehiculo_id)])
+        if count != 1:
+            raise ValidationError(_("Debe especificar exactamente uno de: documento, cliente o vehículo"))
+    def __str__(self):
+        target = self.documento or self.cliente or self.vehiculo
+        return f"Nota #{self.id} - {target}"
+
+
+class EtiquetaInterna(AuditMixin, models.Model):
+    empresa = models.ForeignKey("taller.Empresa", on_delete=models.CASCADE, related_name="etiquetas_internas", db_index=True)
+    nombre = models.CharField(max_length=50)
+    color = models.CharField(max_length=7, default="#3B82F6")
+    solo_staff = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        verbose_name = _("Etiqueta Interna")
+        constraints = [models.UniqueConstraint(fields=["empresa", "nombre"], name="uq_etiqueta_interna_empresa_nombre")]
+    def __str__(self):
+        return f"{self.nombre} ({self.empresa.nombre_taller})"
+
+
+class EtiquetaAsignacion(models.Model):
+    empresa = models.ForeignKey("taller.Empresa", on_delete=models.CASCADE, related_name="etiqueta_asignaciones", db_index=True)
+    etiqueta = models.ForeignKey(EtiquetaInterna, on_delete=models.CASCADE, related_name="asignaciones", db_index=True)
+    documento = models.ForeignKey("taller.Documento", on_delete=models.CASCADE, related_name="etiqueta_asignaciones", null=True, blank=True, db_index=True)
+    cliente = models.ForeignKey("taller.Cliente", on_delete=models.CASCADE, related_name="etiqueta_asignaciones", null=True, blank=True, db_index=True)
+    vehiculo = models.ForeignKey("taller.Vehiculo", on_delete=models.CASCADE, related_name="etiqueta_asignaciones", null=True, blank=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    class Meta:
+        verbose_name = _("Asignación de Etiqueta")
+    def __str__(self):
+        target = self.documento or self.cliente or self.vehiculo
+        return f"{self.etiqueta.nombre} → {target}"
+
+
+class EvidenciaDocumento(AuditMixin, models.Model):
+    TIPO_CHOICES = [("FOTO", _("Foto")), ("VIDEO", _("Video"))]
+    empresa = models.ForeignKey("taller.Empresa", on_delete=models.CASCADE, related_name="evidencias_documento", db_index=True)
+    documento = models.ForeignKey("taller.Documento", on_delete=models.CASCADE, related_name="evidencias", db_index=True)
+    tipo = models.CharField(max_length=5, choices=TIPO_CHOICES, db_index=True)
+    archivo = models.FileField(upload_to="evidencias_documentos/%Y/%m/")
+    descripcion = models.TextField(blank=True, null=True)
+    compartible = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True, db_index=True)
+    class Meta:
+        verbose_name = _("Evidencia de Documento")
+        ordering = ["-created_at"]
+    def __str__(self):
+        return f"{self.get_tipo_display()} - {self.documento.numero_documento}"
+
+
+class SeguimientoPublico(models.Model):
+    empresa = models.ForeignKey("taller.Empresa", on_delete=models.CASCADE, related_name="seguimientos_publicos", db_index=True)
+    documento = models.OneToOneField("taller.Documento", on_delete=models.CASCADE, related_name="seguimiento_publico", db_index=True)
+    token = models.CharField(max_length=64, unique=True, db_index=True)
+    activo = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    class Meta:
+        verbose_name = _("Seguimiento Público")
+    def save(self, *args, **kwargs):
+        if not self.token:
+            self.token = secrets.token_urlsafe(32)
+        super().save(*args, **kwargs)
+    def __str__(self):
+        return f"Seguimiento {self.documento.numero_documento} - {self.token[:8]}..."
+PYTHON_EOF
+chown egarage:www-data /srv/egarage/taller/models/memoria_seguimiento.py
+chmod 644 /srv/egarage/taller/models/memoria_seguimiento.py
+echo "✅ Archivo creado"'

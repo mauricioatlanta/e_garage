@@ -3,7 +3,7 @@ from django.urls import path
 # Import actualizado al módulo unificado de clientes
 from taller.clientes.views import eliminar_cliente
 from taller.documentos.views import eliminar_documento
-from taller.viewsautocomplete.views import eliminar_vehiculo  # legacy
+from taller.vehiculos.views_fbv import eliminar_vehiculo
 
 urlpatterns = [
     # Mantiene cliente_id por compatibilidad; la vista acepta cliente_id o pk

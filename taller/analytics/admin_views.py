@@ -161,6 +161,10 @@ def dashboard_admin(request):
     return render(request, "analytics/dashboard_admin.html", context)
 
 
+# Alias para compatibilidad con código que importa el nombre antiguo (p. ej. admin_suscriptores en servidor)
+dashboard_suscriptores_admin = dashboard_admin
+
+
 @login_required_default
 @user_passes_test(es_staff_o_admin)
 def api_admin_charts(request):

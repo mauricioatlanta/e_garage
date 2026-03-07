@@ -3,6 +3,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
 
@@ -57,7 +58,7 @@ def dashboard(request):
         # Chile: render Home Operativo Mobile (no redirección)
         return _dashboard_home_operativo_chile(request)
     elif path.startswith("/us/"):
-        return redirect("usa:centro_operaciones_espacial")
+        return redirect("usa:centro_operaciones")
     else:
         return redirect("taller:centro_operaciones")
 
@@ -65,6 +66,8 @@ def dashboard(request):
 def _dashboard_home_operativo_chile(request):
     """Vista Home Operativo Mobile para Chile: KPIs y misiones del día."""
     from datetime import date
+
+    from django.utils import timezone
     from decimal import Decimal
 
     from django.contrib import messages

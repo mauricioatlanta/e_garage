@@ -615,7 +615,7 @@ body {
                 {{ company_name|default:empresa.nombre_taller }}
             </h1>
             <p class="text-cyan-200 mt-1 text-lg">
-                {{ company_tagline|default:empresa.lema|default:_("Control total para tu flota estelar") }}
+                {{ company_tagline|default:_("Control total para tu flota estelar") }}
             </p>
         </div>
     </div>
@@ -655,6 +655,50 @@ body {
                 <div class="text-3xl mb-2">👨‍�</div>
                 <div class="font-semibold console-text">PERSONAL TÉCNICO</div>
                 <div class="text-sm text-gray-400 console-text">Análisis individual</div>
+            </a>
+
+            <!-- CARD: Centro de Ingreso Vehicular -->
+            <a href="{% country_url 'taller:ingreso_centro' app_namespace='direct' %}" class="group relative overflow-hidden rounded-2xl border border-white/10 bg-white/5 p-6 shadow-xl backdrop-blur-xl transition hover:bg-white/10">
+              <div class="absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-500/10 blur-3xl"></div>
+              <div class="absolute -left-24 -bottom-24 h-56 w-56 rounded-full bg-indigo-500/10 blur-3xl"></div>
+
+              <div class="flex items-start justify-between gap-4 relative z-10">
+                <div>
+                  <div class="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-semibold text-cyan-200">
+                    🚗 Ingreso inteligente
+                  </div>
+
+                  <h3 class="mt-3 text-xl font-extrabold tracking-tight text-white">
+                    Centro de Ingreso Vehicular
+                  </h3>
+
+                  <p class="mt-2 text-sm leading-relaxed text-white/70">
+                    Identifica por patente, cliente, QR o foto. Realiza inspección 360° y deja registro con protección legal integrada.
+                  </p>
+
+                  <div class="mt-4 flex flex-wrap gap-2 text-xs text-white/60">
+                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">OCR</span>
+                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Búsqueda inteligente</span>
+                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Inspección 360°</span>
+                    <span class="rounded-full border border-white/10 bg-white/5 px-3 py-1">Firma digital</span>
+                  </div>
+                </div>
+
+                <div class="hidden sm:flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-2xl text-white/80">
+                  ⚡
+                </div>
+              </div>
+
+              <div class="mt-6 relative z-10">
+                <span class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-cyan-500/90 px-4 py-3 text-sm font-bold text-black shadow-lg shadow-cyan-500/20">
+                  🚀 Recibir Vehículo Ahora
+                  <span class="opacity-70">→</span>
+                </span>
+
+                <p class="mt-2 text-center text-xs text-white/50">
+                  Diseñado para manos con guantes • 3 toques • rápido y sin errores
+                </p>
+              </div>
             </a>
 
             <a href="{% if request.path|slice:':3' == '/us' %}/us/documentos/{% else %}{% country_url 'documentos:lista_documentos' %}{% endif %}" class="command-panel modern-panel">
@@ -708,7 +752,7 @@ body {
             </a>
 
 
-                        <a href="{% if request.path|slice:':3' == '/us' %}/us/settings/{% else %}{% country_url 'configuracion' %}{% endif %}" class="command-panel modern-panel" style="border: 5px solid #00ff00 !important; background: rgba(0, 255, 0, 0.2) !important;">
+                        <a href="{% if request.path|slice:':4' == '/us/' %}/us/settings/{% else %}{% country_url 'company_settings' app_namespace='direct' %}{% endif %}" class="command-panel modern-panel">
                 <div class="modern-icon-container">
                     <div class="main-icon">⚙️</div>
                     <div class="secondary-icon">💎</div>
@@ -716,7 +760,6 @@ body {
                 <div class="modern-title">NÚCLEO SISTEMA</div>
                 <div class="modern-subtitle">Centro Ajustes</div>
                 <div class="modern-description">Configuración avanzada</div>
-                <div style="color: #00ff00; font-weight: bold; font-size: 12px; margin-top: 5px;">CONDITIONAL URL: {% if request.path|slice:':3' == '/us' %}/us/settings/{% else %}{% country_url 'configuracion' %}{% endif %}</div>
             </a>
         </div>
     </div>

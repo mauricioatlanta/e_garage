@@ -34,7 +34,7 @@ urlpatterns = [
     path(
         "admin-monitoring/",
         include(
-            ("taller.urls_modules.admin_monitoring", "admin_monitoring"),
+            ("taller.urls_extra.admin_monitoring", "admin_monitoring"),
             namespace="admin_monitoring",
         ),
     ),

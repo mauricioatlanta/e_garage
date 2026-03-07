@@ -16,29 +16,10 @@ from taller.models.repuesto import Repuesto
 
 
 def _get_country(request, default="CL"):
-    empresa = getattr(request.user, "empresa", None)
-    raw = getattr(empresa, "pais", None)
+    """País desde path primero (/us/ → US), luego request.country, empresa."""
+    from taller.utils import get_country_from_request
 
-    if not raw:
-        raw = getattr(request, "country", None)
-
-    if not raw:
-        p = (request.path or "").lower()
-        if p.startswith("/us/"):
-            raw = "US"
-        elif p.startswith("/cl/"):
-            raw = "CL"
-        elif p.startswith("/mx/"):
-            raw = "MX"
-
-    c = str(raw or default).strip().upper()
-    if c in ("US", "USA"):
-        return "US"
-    if c in ("MX", "MEX"):
-        return "MX"
-    if c in ("BR", "BRA"):
-        return "BR"
-    return "CL"
+    return get_country_from_request(request, default=default)
 
 
 def _compat_canonical_redirect(request, view_subpath: str, country: str | None = None):
@@ -91,6 +72,7 @@ class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewM
                 | models.Q(nombre__icontains=q)
                 | models.Q(categoria__nombre__icontains=q)
             )
+        qs = qs.order_by("nombre", "id")
         self.filtered_queryset = qs
         return qs
 

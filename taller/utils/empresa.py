@@ -28,14 +28,18 @@ def get_or_create_empresa(request):
                 pass
         raise PermissionDenied("Debes iniciar sesión para ver este reporte.")
 
-    # 3) Intentar relación directa
-    empresa = getattr(user, "empresa", None)
-    if empresa is not None:
-        return empresa
-
-    # 4) Buscar por FK y crear si no existe
+    # 3) Intentar relación directa (OneToOne reverse puede lanzar DoesNotExist si no hay Empresa)
+    from django.core.exceptions import ObjectDoesNotExist
     from taller.models.empresa import Empresa
 
+    try:
+        empresa = getattr(user, "empresa", None)
+        if empresa is not None:
+            return empresa
+    except (Empresa.DoesNotExist, ObjectDoesNotExist):
+        pass
+
+    # 4) Buscar por FK y crear si no existe
     empresa = Empresa.objects.filter(user=user).first()
     if empresa:
         return empresa
@@ -47,6 +51,7 @@ def get_or_create_empresa(request):
             "direccion": "N/A",
             "telefono": "N/A",
             "email": getattr(user, "email", "demo@ejemplo.com"),
+            "is_trial": True,
         },
     )
     return empresa
@@ -75,3 +80,33 @@ def get_active_empresa(request):
 
     # Fallback estable
     return Empresa.objects.filter(user=request.user).order_by("id").first()
+
+
+def ensure_empresa_matches_url_country(request, url_country: str) -> None:
+    """
+    Alinea session empresa_id con el país de la URL para evitar 403/redirect
+    cuando el usuario entra a /us/en/... pero su empresa activa es CL.
+
+    Lógica:
+      - Si empresa actual (session o user.empresa) tiene pais == url_country → OK
+      - Si no, buscar empresa del usuario con pais=url_country y setear session
+      - Superuser: si el usuario no tiene empresa en ese país, usar primera disponible
+    """
+    if not request.user.is_authenticated or not url_country:
+        return
+
+    url_country = (url_country or "").strip().upper()
+    if url_country not in ("US", "CL", "MX"):
+        return
+
+    emp = get_active_empresa(request)
+    if emp and (getattr(emp, "pais", None) or "").strip().upper() == url_country:
+        return
+
+    emp2 = Empresa.objects.filter(user=request.user, pais=url_country).first()
+    if not emp2 and request.user.is_superuser:
+        emp2 = Empresa.objects.filter(pais=url_country).first()
+
+    if emp2:
+        request.session["empresa_id"] = emp2.id
+        request.session.modified = True

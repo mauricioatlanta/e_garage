@@ -1,0 +1,28 @@
+{% extends "taller/ops/ingreso/base_ingreso.html" %}
+{% load i18n %}
+{% load country_url %}
+{% block title %}{% trans "Documento" %} | {% trans "Ingreso" %}{% endblock %}
+{% block content %}
+<div class="ingreso-wrap">
+  <div class="container py-4">
+    {% include "taller/ops/ingreso/_stepper.html" with step=3 %}
+    {% include "taller/ops/ingreso/_vehiculo_card.html" %}
+    <h2 class="text-center mb-4 mt-4" style="font-family: Orbitron; color: var(--ops-cyan);">{% trans "Paso 3/5 – Motivo y tipo de documento" %}</h2>
+
+    <div class="row justify-content-center">
+      <div class="col-lg-6">
+        <div class="glass-panel">
+          <form method="post" action="{% country_url 'ops:ops_ingreso_documento' vehiculo_id=vehiculo.pk app_namespace='direct' %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-flex gap-2 justify-content-end mt-3">
+              <a href="{% country_url 'ops:ops_ingreso_kilometraje' vehiculo_id=vehiculo.pk app_namespace='direct' %}" class="btn btn-outline-light">{% trans "Volver" %}</a>
+              <button type="submit" class="btn-ingreso btn-ingreso-primary">{% trans "Crear documento" %}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -10,19 +10,19 @@ from .views import (
     ajax_buscar_clientes,
     cliente_delete,
     clientes_stats,
-    crear_cliente,
     editar_cliente,
     lista_clientes,
     obtener_ciudades,
     obtener_ciudades_usa,
     ver_cliente,
 )
+from .views_cbv import ClienteCreateView
 
 app_name = "clientes"
 
 urlpatterns = [
     path("", lista_clientes, name="lista_clientes"),
-    path("crear/", crear_cliente, name="crear_cliente"),
+    path("crear/", ClienteCreateView.as_view(), name="crear_cliente"),
     path("editar/<int:pk>/", editar_cliente, name="editar_cliente"),
     # Usamos cliente_id como nombre de parámetro para compatibilidad con
     # versiones antiguas (gestion_taller) que esperan ese kwarg.

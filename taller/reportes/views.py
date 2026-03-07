@@ -45,8 +45,10 @@ from taller.models.lineas_documento import (
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 from taller.utils.empresa import get_or_create_empresa
-from taller.utils.motor_ia import MotorDiagnosticoIA
 from taller.reportes.kilometraje_reportes import ReporteKilometraje
+
+# MotorDiagnosticoIA: import lazy dentro de diagnostico_ia para evitar que una
+# dependencia opcional (ej. pandas) tumbe todo el módulo de reportes en producción
 
 # from taller.utils import get_or_create_empresa  # Eliminado: usamos la función local
 
@@ -862,8 +864,36 @@ def diagnostico_ia(request):
     """
     🧠 Diagnóstico por IA - Análisis Predictivo Avanzado
     Motor de inteligencia artificial para optimización de talleres automotrices
-    Protegido con rate limiting estricto
+    Protegido con rate limiting estricto.
+
+    Si faltan dependencias opcionales (pandas, etc.), la feature se deshabilita
+    sin tumbar el resto del módulo de reportes.
     """
+    # Lazy import: evita que una dependencia faltante (pandas, core compilado) tumbe todo el sitio
+    ia_error = ""
+    try:
+        from taller.utils.motor_ia import MotorDiagnosticoIA
+    except Exception as e:
+        MotorDiagnosticoIA = None
+        ia_error = str(e)
+
+    if MotorDiagnosticoIA is None:
+        contexto = {
+            "ia_disponible": False,
+            "ia_error": ia_error,
+            "servicios_crecimiento": [],
+            "servicios_declive": [],
+            "estacionalidad": [],
+            "comparativa_mercado": [],
+            "recomendaciones_ia": [],
+            "predicciones_ingresos": [],
+            "alertas_criticas": [],
+            "insights_ai": [],
+            "total_documentos": 0,
+            "fecha_analisis": date.today().strftime("%d/%m/%Y"),
+        }
+        return render(request, "taller/reportes/diagnostico_ia.html", contexto, status=503)
+
     # 🔒 FILTRO CRÍTICO POR EMPRESA (siempre autenticado y robusto)
     empresa = get_or_create_empresa(request)
 
@@ -883,6 +913,7 @@ def diagnostico_ia(request):
 
     # Preparar contexto para template
     contexto = {
+        "ia_disponible": True,
         "servicios_crecimiento": resultados["servicios_crecimiento"],
         "servicios_declive": resultados["servicios_declive"],
         "estacionalidad": resultados["estacionalidad"],
@@ -1159,6 +1190,25 @@ def reportes_mecanicos(request):
         except Tecnico.DoesNotExist:
             pass
 
+    # Servicios más frecuentes en el período (para métrica "Servicios Activos" y sección IA)
+    lineas_servicio_periodo = LineaServicio.objects.filter(documento__in=documentos_qs)
+    servicios_frecuentes_qs = (
+        lineas_servicio_periodo.values("servicio__nombre")
+        .annotate(
+            cantidad=Count("id"),
+            total_ingresos=Sum(F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100)),
+        )
+        .order_by("-cantidad")[:20]
+    )
+    servicios_frecuentes = [
+        {
+            "nombre": x["servicio__nombre"] or "Sin nombre",
+            "cantidad": x["cantidad"],
+            "total_ingresos": x["total_ingresos"] or 0,
+        }
+        for x in servicios_frecuentes_qs
+    ]
+
     # Preparar contexto
     context = {
         "documentos": documentos_qs,
@@ -1179,6 +1229,12 @@ def reportes_mecanicos(request):
         "total_servicios_tecnico": total_servicios_tecnico,
         "promedio_diario_tecnico": promedio_diario_tecnico,
         "eficiencia_tecnico": eficiencia_tecnico,
+        "servicios_frecuentes": servicios_frecuentes,
+        "ia_insights": {
+            "predicciones": [],
+            "alertas": [],
+            "sugerencias": [],
+        },
     }
 
     return render(request, "taller/reportes/reportes_mecanicos.html", context)
@@ -1213,6 +1269,76 @@ def api_repuestos_chart_data(request):
     """API para datos de gráficos de repuestos"""
 
     return JsonResponse({"data": [], "labels": []})
+
+
+@login_required_default
+def reporte_ventas_por_contexto(request):
+    """
+    Reporte simple: ventas servicios vs repuestos vendidos vs customer-supplied count.
+    Agrupación por context (workshop/parts/mixed) y tipo de línea.
+    """
+    empresa = get_or_create_empresa(request)
+    hoy = date.today()
+    fecha_desde = request.GET.get("fecha_desde") or (hoy - timedelta(days=30)).strftime("%Y-%m-%d")
+    fecha_hasta = request.GET.get("fecha_hasta") or hoy.strftime("%Y-%m-%d")
+    fd = parse_date(fecha_desde) or hoy - timedelta(days=30)
+    fh = parse_date(fecha_hasta) or hoy
+
+    docs = Documento.objects.filter(
+        empresa=empresa,
+        fecha_emision__range=[fd, fh],
+        tipo="FAC",
+        estado="EMITIDO",
+    )
+
+    ventas_servicios = docs.aggregate(
+        total=Coalesce(Sum("neto_servicios"), Value(Decimal("0")), output_field=DecimalField())
+    )["total"] or Decimal("0")
+
+    rep_vendidos = LineaRepuesto.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__range=[fd, fh],
+        documento__tipo="FAC",
+        documento__estado="EMITIDO",
+    ).exclude(source_type="CUSTOMER_SUPPLIED").aggregate(
+        total=Coalesce(
+            Sum(
+                ExpressionWrapper(F("cantidad") * F("precio_unitario"), output_field=DecimalField())
+            ),
+            Value(Decimal("0")),
+            output_field=DecimalField(),
+        )
+    )[
+        "total"
+    ] or Decimal(
+        "0"
+    )
+
+    customer_supplied_count = LineaRepuesto.objects.filter(
+        documento__empresa=empresa,
+        documento__fecha_emision__range=[fd, fh],
+        documento__tipo="FAC",
+        source_type="CUSTOMER_SUPPLIED",
+    ).count()
+
+    docs_fac = docs
+    docs_with_services = docs_fac.filter(neto_servicios__gt=0)
+    docs_with_rep_sold = (
+        docs_fac.filter(lineas_repuesto__isnull=False)
+        .exclude(lineas_repuesto__source_type="CUSTOMER_SUPPLIED")
+        .distinct()
+    )
+    mixed_count = docs_with_services.filter(id__in=docs_with_rep_sold.values("id")).count()
+
+    context = {
+        "ventas_servicios": ventas_servicios,
+        "repuestos_vendidos": rep_vendidos,
+        "customer_supplied_count": customer_supplied_count,
+        "mixed_count": mixed_count,
+        "fecha_desde": fd,
+        "fecha_hasta": fh,
+    }
+    return render(request, "taller/reportes/ventas_por_contexto.html", context)
 
 
 @login_required_default

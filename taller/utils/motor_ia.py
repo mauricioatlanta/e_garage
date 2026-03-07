@@ -17,53 +17,66 @@ Chile Software Registration Pending
 
 from django.utils import timezone
 
-# Importar el core (en producción será el archivo compilado/ofuscado)
+# Importar el core (en producción será el archivo compilado/ofuscado).
+# Si falla (pandas, motor_ia_core_compiled inexistente, etc.), el módulo exporta
+# MotorDiagnosticoIA = None para que la vista pueda desactivar IA sin romper el sitio.
+MotorIACore = None
+MotorDiagnosticoIA = None
+
 try:
-    # Intentar importar el core compilado primero (para producción)
-    from .motor_ia_core_compiled import MotorIACore
-except ImportError:
-    # Fallback al código fuente (solo para desarrollo)
-    from .motor_ia_core import MotorIACore
+    try:
+        from .motor_ia_core_compiled import MotorIACore
+    except ImportError:
+        from .motor_ia_core import MotorIACore
+except Exception:
+    MotorIACore = None
 
 
-class MotorDiagnosticoIA:
-    """
-    Wrapper público del motor de IA
-    Mantiene la interfaz original mientras delega al core protegido
-    """
+def _motor_ia_class():
+    """Clase del motor solo si el core está disponible (evita 500 al cargar URLConf)."""
+    if MotorIACore is None:
+        return None
 
-    def __init__(self):
-        self.fecha_actual = timezone.now()
-        self.meses_analisis = 12
-        self.umbral_crecimiento = 15
-        self.umbral_declive = -20
+    class MotorDiagnosticoIA:
+        """
+        Wrapper público del motor de IA
+        Mantiene la interfaz original mientras delega al core protegido
+        """
 
-        # Inicializar el core protegido
-        self._core = MotorIACore(
-            fecha_actual=self.fecha_actual,
-            meses_analisis=self.meses_analisis,
-            umbral_crecimiento=self.umbral_crecimiento,
-            umbral_declive=self.umbral_declive,
-        )
+        def __init__(self):
+            self.fecha_actual = timezone.now()
+            self.meses_analisis = 12
+            self.umbral_crecimiento = 15
+            self.umbral_declive = -20
 
-    def analizar_servicios_completo(self, documentos):
-        """Análisis completo de servicios con IA predictiva"""
-        # Preparar datos usando el core
-        df_servicios = self._core.preparar_datos_servicios(documentos)
+            self._core = MotorIACore(
+                fecha_actual=self.fecha_actual,
+                meses_analisis=self.meses_analisis,
+                umbral_crecimiento=self.umbral_crecimiento,
+                umbral_declive=self.umbral_declive,
+            )
 
-        if df_servicios.empty:
-            return self._core.generar_datos_demo()
+        def analizar_servicios_completo(self, documentos):
+            """Análisis completo de servicios con IA predictiva (sin pandas)."""
+            datos_servicios = self._core.preparar_datos_servicios(documentos)
 
-        # Delegar análisis al core protegido
-        resultados = {
-            "servicios_crecimiento": self._core.detectar_servicios_crecimiento(df_servicios),
-            "servicios_declive": self._core.detectar_servicios_declive(df_servicios),
-            "estacionalidad": self._core.analizar_estacionalidad(df_servicios),
-            "comparativa_mercado": self._core.generar_comparativa_mercado(),
-            "recomendaciones_ia": self._core.generar_recomendaciones_ia(df_servicios),
-            "predicciones_ingresos": self._core.predecir_ingresos(df_servicios),
-            "alertas_criticas": self._core.generar_alertas_criticas(df_servicios),
-            "insights_ai": self._core.generar_insights_ai(df_servicios),
-        }
+            if not datos_servicios:
+                return self._core.generar_datos_demo()
 
-        return resultados
+            resultados = {
+                "servicios_crecimiento": self._core.detectar_servicios_crecimiento(datos_servicios),
+                "servicios_declive": self._core.detectar_servicios_declive(datos_servicios),
+                "estacionalidad": self._core.analizar_estacionalidad(datos_servicios),
+                "comparativa_mercado": self._core.generar_comparativa_mercado(),
+                "recomendaciones_ia": self._core.generar_recomendaciones_ia(datos_servicios),
+                "predicciones_ingresos": self._core.predecir_ingresos(datos_servicios),
+                "alertas_criticas": self._core.generar_alertas_criticas(datos_servicios),
+                "insights_ai": self._core.generar_insights_ai(datos_servicios),
+            }
+            return resultados
+
+    return MotorDiagnosticoIA
+
+
+if MotorIACore is not None:
+    MotorDiagnosticoIA = _motor_ia_class()

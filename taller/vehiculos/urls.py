@@ -26,7 +26,6 @@ Notas:
 from django.urls import path
 
 from taller.vehiculos import views_fbv as views
-from taller.vehiculos import views_ingreso
 from taller.vehiculos.autocomplete_views import (
     CajaAutocomplete,
     ClienteAutocomplete,
@@ -35,6 +34,21 @@ from taller.vehiculos.autocomplete_views import (
 
 app_name = "vehiculos"
 
+
+def ingreso_vehiculo_foto_lazy(request, *args, **kwargs):
+    """Wrapper: import diferido para no cargar views_ingreso/WhatsApp/OCR al importar URLs."""
+    from taller.vehiculos.views_ingreso import ingreso_vehiculo_foto
+
+    return ingreso_vehiculo_foto(request, *args, **kwargs)
+
+
+def procesar_patente_identificada_lazy(request, *args, **kwargs):
+    """Wrapper: import diferido para no cargar views_ingreso/WhatsApp/OCR al importar URLs."""
+    from taller.vehiculos.views_ingreso import procesar_patente_identificada
+
+    return procesar_patente_identificada(request, *args, **kwargs)
+
+
 urlpatterns = [
     # =========================
     # CRUD Principales
@@ -42,11 +56,11 @@ urlpatterns = [
     # Todas requieren @login_required y filtran por empresa
     path("", views.lista_vehiculos, name="lista_vehiculos"),
     path("crear/", views.crear_vehiculo, name="crear_vehiculo"),
-    # Ingreso de vehículo por foto de patente
-    path("ingreso-foto/", views_ingreso.ingreso_vehiculo_foto, name="ingreso_foto"),
+    # Ingreso de vehículo por foto de patente (lazy: no carga WhatsApp/OCR al importar URLs)
+    path("ingreso-foto/", ingreso_vehiculo_foto_lazy, name="ingreso_foto"),
     path(
         "patente-identificada/",
-        views_ingreso.procesar_patente_identificada,
+        procesar_patente_identificada_lazy,
         name="patente_identificada",
     ),
     path("<int:vehiculo_id>/", views.ver_vehiculo, name="ver_vehiculo"),

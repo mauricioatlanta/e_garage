@@ -1,5 +1,6 @@
 # Views específicas para USA - usan templates localizados
 import logging
+from urllib.parse import unquote, parse_qs, urlencode, urlparse, urlunparse
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -7,6 +8,7 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template import TemplateDoesNotExist
 from django.template.loader import get_template
+from django.utils.http import url_has_allowed_host_and_scheme
 
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
@@ -70,8 +72,27 @@ def crear_vehiculo(request, lang=None, *args, **kwargs):
 
     log.info(f"[crear_vehiculo] Template final seleccionado: {template}")
 
+    prefill = (
+        request.GET.get("prefill_cliente")
+        or request.GET.get("cliente_id")
+        or request.POST.get("prefill_cliente")
+        or request.POST.get("cliente_id")
+        or ""
+    ).strip()
+    prefill_cliente_nombre = None
+
     if request.method == "POST":
-        form = VehiculoForm(request.POST, user=request.user, request=request)
+        prefill_cliente = (
+            request.POST.get("prefill_cliente")
+            or request.POST.get("cliente_id")
+            or request.GET.get("prefill_cliente")
+            or request.GET.get("cliente_id")
+            or ""
+        ).strip()
+        post = request.POST.copy()
+        if prefill_cliente.isdigit() and not post.get("cliente"):
+            post["cliente"] = prefill_cliente
+        form = VehiculoForm(post, user=request.user, request=request)
 
         if form.is_valid():
             try:
@@ -91,6 +112,38 @@ def crear_vehiculo(request, lang=None, *args, **kwargs):
                         )
 
                     messages.success(request, success_msg)
+                    # next viene URL-encoded desde JS (encodeURIComponent). Decodificar 1 vez.
+                    next_url = (
+                        request.POST.get("next") or request.GET.get("next", "") or ""
+                    ).strip()
+                    next_url = unquote(next_url)
+                    # Validación segura (misma host / relativa)
+                    if next_url and url_has_allowed_host_and_scheme(
+                        next_url, allowed_hosts={request.get_host()}
+                    ):
+                        if "documentos" in next_url:
+                            parsed = urlparse(next_url)
+                            params = parse_qs(parsed.query, keep_blank_values=True)
+                            params["prefill_vehiculo"] = [str(vehiculo.pk)]
+                            params["new_vehiculo_id"] = [str(vehiculo.pk)]  # legacy
+                            if vehiculo.cliente_id:
+                                c = vehiculo.cliente
+                                params["prefill_cliente"] = [str(vehiculo.cliente_id)]
+                                nombre = (
+                                    getattr(c, "nombre_completo", None)
+                                    or f"{(getattr(c, 'nombre', '') or '').strip()} {(getattr(c, 'apellido', '') or '').strip()}".strip()
+                                    or str(c)
+                                )
+                                params["prefill_cliente_nombre"] = [nombre]
+                                params["prefill_cliente_email"] = [getattr(c, "email", "") or ""]
+                                params["prefill_cliente_telefono"] = [
+                                    getattr(c, "telefono", "") or ""
+                                ]
+                            next_url = urlunparse(
+                                parsed._replace(query=urlencode(params, doseq=True))
+                            )
+                        log.info(f"[crear_vehiculo] next_url(decoded)={next_url}")
+                        return redirect(next_url)
                     return redirect("vehiculos_usa:lista_vehiculos")
             except Exception as e:
                 log.error(f"Error creating vehicle: {e}")
@@ -98,18 +151,70 @@ def crear_vehiculo(request, lang=None, *args, **kwargs):
         else:
             messages.error(request, error_msg)
     else:
-        form = VehiculoForm(user=request.user, request=request)
+        prefill_cliente = (
+            (request.GET.get("prefill_cliente") or request.GET.get("cliente_id")) or ""
+        ).strip()
+        initial = {}
+        if prefill_cliente.isdigit():
+            cliente_obj = Cliente.objects.filter(empresa=empresa, pk=int(prefill_cliente)).first()
+            if cliente_obj:
+                initial["cliente"] = cliente_obj
+        form = VehiculoForm(
+            initial=initial,
+            user=request.user,
+            request=request,
+        )
+        # Prefill cliente nombre para label en front (Select2/DAL)
+        if prefill.isdigit():
+            try:
+                cliente = Cliente.objects.filter(empresa=empresa, pk=int(prefill)).first()
+                prefill_cliente_nombre = (
+                    (
+                        getattr(cliente, "nombre_completo", None)
+                        or (
+                            f"{(getattr(cliente, 'nombre', '') or '').strip()} {(getattr(cliente, 'apellido', '') or '').strip()}".strip()
+                            if cliente
+                            else ""
+                        )
+                        or (str(cliente) if cliente else prefill)
+                    )
+                    if cliente
+                    else prefill
+                )
+            except (ValueError, TypeError):
+                prefill_cliente_nombre = prefill
 
     # Obtener clientes filtrados por empresa
     clientes = Cliente.objects.filter(empresa=empresa)[:500]
 
+    next_val = request.GET.get("next") or (
+        request.POST.get("next") if request.method == "POST" else ""
+    )
+    prefill_cliente_val = prefill or None
+    prefill_modelo_id = prefill_modelo_nombre = prefill_marca_val = None
+    if request.method == "POST" and not form.is_valid():
+        prefill_modelo_id = (request.POST.get("modelo") or "").strip()
+        prefill_marca_val = (request.POST.get("marca") or "").strip()
+        if prefill_modelo_id:
+            prefill_modelo_nombre = prefill_modelo_id
     ctx = {
         "form": form,
         "country": "US",
         "empresa": empresa,
         "clientes": clientes,
-        "lang": lang,  # Agregar lang al contexto para debug
-        "template_path": template,  # Agregar template_path para debug
+        "lang": lang,
+        "template_path": template,
+        "next": next_val.strip() or None,
+        "cliente_id": request.GET.get("cliente_id")
+        or (request.POST.get("cliente_id") if request.method == "POST" else "").strip()
+        or None,
+        "prefill_cliente": prefill_cliente_val,
+        "prefill_cliente_nombre": prefill_cliente_nombre
+        or (request.POST.get("prefill_cliente_nombre") or "").strip()
+        or None,
+        "prefill_modelo_id": prefill_modelo_id,
+        "prefill_modelo_nombre": prefill_modelo_nombre,
+        "prefill_marca_val": prefill_marca_val,
     }
 
     log.info(f"[crear_vehiculo] Renderizando template: {template} con lang: {lang}")

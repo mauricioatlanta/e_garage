@@ -319,7 +319,7 @@ body {
             {% endif %}
 
             <!-- Formulario -->
-            <form method="POST" action="{% url 'venezuela:account_login' %}">
+            <form method="POST" action="{{ request.get_full_path }}">
                 {% csrf_token %}
                 {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 

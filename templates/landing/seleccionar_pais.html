@@ -367,43 +367,43 @@
             <!-- Countries Grid - Ordenados alfabéticamente -->
             <div class="countries-grid">
                 <!-- Argentina -->
-                <a href="/ar/es/bienvenida/" class="country-btn country-argentina" style="background-image: url('https://flagcdn.com/w320/ar.png');">
+                <a href="/ar/es/bienvenida/" class="country-btn country-argentina" data-country="AR" style="background-image: url('https://flagcdn.com/w320/ar.png');">
                     <span class="country-name">Argentina</span>
                 </a>
                 <!-- Brasil -->
-                <a href="/br/es/bienvenida/" class="country-btn country-brasil" style="background-image: url('https://flagcdn.com/w320/br.png');">
+                <a href="/br/es/bienvenida/" class="country-btn country-brasil" data-country="BR" style="background-image: url('https://flagcdn.com/w320/br.png');">
                     <span class="country-name">Brasil</span>
                 </a>
                 <!-- Chile -->
-                <a href="/cl/es/bienvenida/" class="country-btn country-chile" style="background-image: url('https://flagcdn.com/w320/cl.png');">
+                <a href="{% url 'chile:bienvenida_chile_alt' %}" class="country-btn country-chile" data-country="CL" style="background-image: url('https://flagcdn.com/w320/cl.png');">
                     <span class="country-name">Chile</span>
                 </a>
                 <!-- Colombia -->
-                <a href="/co/es/bienvenida/" class="country-btn country-colombia" style="background-image: url('https://flagcdn.com/w320/co.png');">
+                <a href="/co/es/bienvenida/" class="country-btn country-colombia" data-country="CO" style="background-image: url('https://flagcdn.com/w320/co.png');">
                     <span class="country-name">Colombia</span>
                 </a>
                 <!-- Ecuador -->
-                <a href="/ec/es/bienvenida/" class="country-btn country-ecuador" style="background-image: url('https://flagcdn.com/w320/ec.png');">
+                <a href="/ec/es/bienvenida/" class="country-btn country-ecuador" data-country="EC" style="background-image: url('https://flagcdn.com/w320/ec.png');">
                     <span class="country-name">Ecuador</span>
                 </a>
                 <!-- México -->
-                <a href="/mx/es/bienvenida/" class="country-btn country-mexico" style="background-image: url('https://flagcdn.com/w320/mx.png');">
+                <a href="/mx/es/bienvenida/" class="country-btn country-mexico" data-country="MX" style="background-image: url('https://flagcdn.com/w320/mx.png');">
                     <span class="country-name">México</span>
                 </a>
                 <!-- Perú -->
-                <a href="/pe/es/bienvenida/" class="country-btn country-peru" style="background-image: url('https://flagcdn.com/w320/pe.png');">
+                <a href="/pe/es/bienvenida/" class="country-btn country-peru" data-country="PE" style="background-image: url('https://flagcdn.com/w320/pe.png');">
                     <span class="country-name">Perú</span>
                 </a>
-                <!-- USA -->
-                <a href="/us/en/bienvenida/" class="country-btn country-usa" style="background-image: url('https://flagcdn.com/w320/us.png');">
+                <!-- USA: debe ir a /us/en/bienvenida/ (no a Chile /cl/) -->
+                <a href="{% url 'us_en_bienvenida' %}" class="country-btn country-usa" data-country="US" style="background-image: url('https://flagcdn.com/w320/us.png');">
                     <span class="country-name">USA</span>
                 </a>
                 <!-- Uruguay -->
-                <a href="/uy/es/bienvenida/" class="country-btn country-uruguay" style="background-image: url('https://flagcdn.com/w320/uy.png');">
+                <a href="/uy/es/bienvenida/" class="country-btn country-uruguay" data-country="UY" style="background-image: url('https://flagcdn.com/w320/uy.png');">
                     <span class="country-name">Uruguay</span>
                 </a>
                 <!-- Venezuela -->
-                <a href="/ve/es/bienvenida/" class="country-btn country-venezuela" style="background-image: url('https://flagcdn.com/w320/ve.png');">
+                <a href="/ve/es/bienvenida/" class="country-btn country-venezuela" data-country="VE" style="background-image: url('https://flagcdn.com/w320/ve.png');">
                     <span class="country-name">Venezuela</span>
                 </a>
             </div>

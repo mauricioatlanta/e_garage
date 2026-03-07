@@ -176,17 +176,10 @@
                         </select>
                     </div>
 
-                    {% if country == 'us' %}
                     <div class="form-group">
-                        <label class="form-label">Mileage</label>
-                        <input type="number" name="millas" class="form-control" placeholder="0">
+                        <label class="form-label" for="id_kilometraje_ingreso">{% if country == 'us' %}Current Mileage{% else %}Kilometraje{% endif %}</label>
+                        <input id="id_kilometraje_ingreso" type="number" name="kilometraje_ingreso" min="0" class="form-control" placeholder="{% if country == 'us' %}Miles{% else %}Kilometraje actual (km){% endif %}">
                     </div>
-                    {% else %}
-                    <div class="form-group">
-                        <label class="form-label">Mileage</label>
-                        <input type="number" name="kilometraje" class="form-control" placeholder="0">
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>

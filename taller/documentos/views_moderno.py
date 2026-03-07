@@ -7,7 +7,7 @@ import re
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.db.models import DecimalField, ExpressionWrapper, F, Q
+from django.db.models import DecimalField, ExpressionWrapper, F, Q, Sum
 from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils.timezone import now
@@ -17,58 +17,83 @@ from django.views.decorators.http import require_GET
 logger = logging.getLogger(__name__)
 
 
-# Helper para obtener el parámetro country del request
-def _country_from_request(request):
-    return getattr(request, "country_code", None) or getattr(request, "country", None) or "us"
+# Helper: país desde path primero (/us/ → US), luego request.country, empresa, default
+def _country_from_request(request, default="CL"):
+    from taller.utils import get_country_from_request
+
+    return get_country_from_request(request, default=default)
 
 
-# API para búsqueda en tiempo real de repuestos
-@csrf_exempt
+# API para búsqueda en tiempo real de repuestos (por código o nombre)
+@login_required
 @require_GET
 def api_buscar_repuestos(request):
-    query = request.GET.get("q", "").strip()
+    try:
+        query = request.GET.get("q", "").strip()
+        if len(query) < 2:
+            return JsonResponse({"repuestos": []})
 
-    # Obtener país desde la URL
-    country = _country_from_request(request)
-    if not country:
-        path = request.path
-        if path.startswith("/cl/"):
-            country = "cl"
-        elif path.startswith("/us/"):
-            country = "us"
-        else:
-            country = "cl"
-
-    # Obtener empresa del usuario autenticado o usar una demo para testing
-    empresa = None
-    if request.user.is_authenticated and hasattr(request.user, "empresa"):
-        empresa = request.user.empresa
-    else:
-        # Para testing sin autenticación, usar empresa demo basada en el país
-        if country.lower() == "us":
-            empresa = Empresa.objects.filter(pais="US").first()
-        else:
-            empresa = Empresa.objects.filter(pais="CL").first()
-
+        empresa = getattr(request.user, "empresa", None)
         if not empresa:
             return JsonResponse({"repuestos": []})
 
-    if len(query) < 2:
+        from taller.models.empresa import Empresa
+        from taller.models.repuesto import Repuesto
+
+        repuestos = (
+            Repuesto.objects.filter(empresa=empresa)
+            .filter(Q(nombre__icontains=query) | Q(part_number__icontains=query))
+            .values(
+                "id",
+                "part_number",
+                "nombre",
+                "precio_compra",
+                "precio_venta",
+                "cantidad_stock",
+                "proveedor",
+            )[:20]
+        )
+        return JsonResponse({"repuestos": list(repuestos)})
+    except Exception as e:
+        logger.exception("api_buscar_repuestos: %s", e)
         return JsonResponse({"repuestos": []})
-    repuestos = (
-        Repuesto.objects.filter(empresa=empresa)
-        .filter(Q(nombre__icontains=query) | Q(part_number__icontains=query))
-        .values(
-            "id",
-            "part_number",
-            "nombre",
-            "precio_compra",
-            "precio_venta",
-            "cantidad_stock",
-            "proveedor",
-        )[:20]
-    )
-    return JsonResponse({"repuestos": list(repuestos)})
+
+
+@login_required
+@require_GET
+def api_repuesto_by_code(request):
+    """API para obtener un repuesto por código (part_number)."""
+    try:
+        code = (request.GET.get("code") or "").strip()
+        if not code:
+            return JsonResponse({"error": "Código requerido"}, status=400)
+
+        empresa = getattr(request.user, "empresa", None)
+        if not empresa:
+            return JsonResponse({"error": "No hay empresa"}, status=400)
+
+        from taller.models.repuesto import Repuesto
+
+        r = (
+            Repuesto.objects.filter(empresa=empresa, part_number__iexact=code)
+            .order_by("-id")
+            .first()
+        )
+        if not r:
+            return JsonResponse({"error": "Repuesto no encontrado"}, status=404)
+
+        data = {
+            "id": r.pk,
+            "codigo": r.part_number or "",
+            "nombre": getattr(r, "nombre", ""),
+            "precio_compra": float(getattr(r, "precio_compra", 0) or 0),
+            "precio_venta_sugerido": float(getattr(r, "precio_venta", 0) or 0),
+            "stock": getattr(r, "cantidad_stock", 0) or 0,
+        }
+        return JsonResponse(data)
+    except Exception as e:
+        logger.exception("api_repuesto_by_code: %s", e)
+        return JsonResponse({"error": "Error del servidor"}, status=500)
 
 
 from taller.models.clientes import Cliente
@@ -276,8 +301,12 @@ def procesar_documento_moderno(request, empresa):
             tecnico_responsable=tecnico,
             vehiculo=vehiculo,
             estado=estado,
-            country=empresa.pais,
-            moneda="USD" if empresa.pais == "US" else "CLP",
+            country=_country_from_request(request, default=empresa.pais or "CL"),
+            moneda=(
+                "USD"
+                if _country_from_request(request, default=empresa.pais or "CL") == "US"
+                else "CLP"
+            ),
             # Asignar millas/odómetro si el modelo lo tiene
             **(
                 {"kilometraje": kilometraje}
@@ -702,11 +731,11 @@ def api_buscar_servicios_internos(request):
         return JsonResponse({"error": str(e)}, status=500)
 
 
-@csrf_exempt
+@login_required
+@require_GET
 def api_obtener_numero_documento(request):
-    # Obtener el país desde la URL
+    """API para obtener el próximo número de documento según el tipo. Cualquier usuario del taller (no solo staff)."""
     _country_from_request(request)  # Solo para logging y side-effects existentes
-    """API para obtener el próximo número de documento según el tipo"""
     if request.method != "GET":
         return JsonResponse({"error": "Método no permitido"}, status=405)
 
@@ -726,17 +755,12 @@ def api_obtener_numero_documento(request):
         return JsonResponse({"error": "Tipo de documento requerido"}, status=400)
 
     try:
-        # Obtener empresa del usuario o una por defecto para testing
-        if request.user.is_authenticated and hasattr(request.user, "empresa"):
-            empresa = request.user.empresa
-        else:
-            # Para testing sin autenticación, usar la empresa demo USA
-            empresa = Empresa.objects.filter(nombre_taller="USA Test Garage").first()
-            if not empresa:
-                # Si no existe la empresa demo, usar cualquier empresa USA
-                empresa = Empresa.objects.filter(pais="US").first()
-                if not empresa:
-                    return JsonResponse({"error": "No hay empresa configurada"}, status=400)
+        # Usuario ya autenticado por @login_required; no exigir staff
+        empresa = getattr(request.user, "empresa_actual", None) or getattr(
+            request.user, "empresa", None
+        )
+        if not empresa:
+            return JsonResponse({"error": "Usuario sin empresa asignada"}, status=403)
 
         # Mapear códigos de tipo a nombres completos para prefijos
         tipo_mapping = {
@@ -767,7 +791,7 @@ def api_obtener_numero_documento(request):
                 return None
 
             # Intentar extraer los dígitos finales (soporta formatos como OT-001)
-            match = re.search(r"(\\d+)$", text)
+            match = re.search(r"(\d+)$", text)
             if match:
                 try:
                     return int(match.group(1))
@@ -818,6 +842,7 @@ def api_obtener_numero_documento(request):
         return JsonResponse(
             {
                 "numero": numero_formateado,
+                "numero_documento": numero_formateado,
                 "tipo": tipo_documento,
                 "secuencia": proximo_numero,
             }
@@ -851,8 +876,6 @@ def _to_decimal_pct(txt: str) -> Decimal | None:
 @transaction.atomic
 def documento_form(request, pk=None):
     """Vista unificada para crear y editar documentos"""
-
-    from django.db.models import Sum
 
     from taller.documentos.forms import DocumentoForm
 
@@ -930,17 +953,16 @@ def documento_form(request, pk=None):
             )  # Documento + lógica del form (kilometraje→vehiculo.millas, pagado, etc.)
 
             # ------------------------
-            # Recalcular netos desde líneas (campos 'subtotal' existentes)
+            # Recalcular netos desde líneas (expresiones DB, sin campo subtotal)
             # ------------------------
-            neto_rep = doc.lineas_repuesto.aggregate(s=Sum("subtotal"))["s"] or Decimal("0")
-            neto_serv = doc.lineas_servicio.aggregate(s=Sum("subtotal"))["s"] or Decimal("0")
+            neto_rep = doc.lineas_repuesto.aggregate(s=Sum(LineaRepuesto.subtotal_expr()))[
+                "s"
+            ] or Decimal("0")
+            neto_serv = doc.lineas_servicio.aggregate(s=Sum(LineaServicio.subtotal_expr()))[
+                "s"
+            ] or Decimal("0")
             neto_otros = doc.lineas_otro_servicio.aggregate(
-                s=Sum(
-                    ExpressionWrapper(
-                        F("precio_cliente") * F("cantidad"),
-                        output_field=DecimalField(max_digits=12, decimal_places=2),
-                    )
-                )
+                s=Sum(LineaOtroServicio.subtotal_expr())
             )["s"] or Decimal("0")
 
             # ------------------------
@@ -973,7 +995,7 @@ def documento_form(request, pk=None):
             # Persistir totales
             doc.neto_repuestos = neto_rep
             doc.neto_servicios = neto_serv
-            doc.neto_otros = neto_otros
+            doc.neto_otros_servicios = neto_otros
             doc.tax_rate_applied = tax_rate
             doc.tax_amount = tax_amount
             doc.total = total
@@ -981,7 +1003,7 @@ def documento_form(request, pk=None):
                 update_fields=[
                     "neto_repuestos",
                     "neto_servicios",
-                    "neto_otros",
+                    "neto_otros_servicios",
                     "tax_rate_applied",
                     "tax_amount",
                     "total",

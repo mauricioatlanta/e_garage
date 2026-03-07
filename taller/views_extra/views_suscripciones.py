@@ -11,7 +11,7 @@ from taller.models.empresa import Empresa
 def suspension(request):
     """Vista de suspensión por suscripción vencida"""
     if not request.user.is_authenticated:
-        return redirect("login")
+        return redirect("account_login")
 
     try:
         empresa = request.user.empresa
@@ -39,7 +39,7 @@ def suspension(request):
         },
     }
 
-    return render(request, "suspension/suspension.html", context)
+    return render(request, "taller/suspension/suspension.html", context)
 
 
 @login_required
@@ -71,7 +71,7 @@ def subir_comprobante(request):
         "empresa": empresa,
     }
 
-    return render(request, "suspension/subir_comprobante.html", context)
+    return render(request, "taller/suspension/subir_comprobante.html", context)
 
 
 @login_required
@@ -227,6 +227,9 @@ def precios(request):
                     ],
                 },
             }
+            # Formato USA: $1,250.25 (coma miles, 2 decimales)
+            for p in planes.values():
+                p["precio_formateado"] = f"${p['precio']:,.2f}"
         elif pais_usuario == "BR":
             # Precios Brasil en reales
             caracteristicas_brasil = [
@@ -485,4 +488,4 @@ def precios(request):
         "es_mexico": pais_usuario == "MX",
     }
 
-    return render(request, "suspension/precios.html", context)
+    return render(request, "taller/suspension/precios.html", context)

@@ -6,7 +6,7 @@
 {% load i18n %}
 
 {% block page_title %}{{ ui_labels.document_center }}{% endblock %}
-{% block page_subtitle %}{{ empresa.nombre_taller }} - {{ ui_labels.document_center }}{% endblock %}
+{% block page_subtitle %}{% if empresa %}{{ empresa.nombre_taller }}{% else %}eGarage{% endif %} - {{ ui_labels.document_center }}{% endblock %}
 {% block page_icon %}📄{% endblock %}
 
 {% block page_extra_css %}

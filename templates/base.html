@@ -4,6 +4,7 @@
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
+  {# jQuery se carga UNA vez al final del body, antes de extra_js y form.media #}
   <meta charset="UTF-8">
   <title>
     {% block title %}
@@ -15,6 +16,9 @@
     {% endblock %}
   </title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  {# --- Scroll restoration manual (evita saltos en PWA/móvil) --- #}
+  <script>if ('scrollRestoration' in history) history.scrollRestoration = 'manual';</script>
   
   {# --- PWA Configuration --- #}
   <meta name="theme-color" content="#0a0e27">
@@ -39,14 +43,32 @@
   {# --- CSS principales SIEMPRE cargan --- #}
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <link rel="stylesheet" href="{% static 'css/galaxy_theme.css' %}">
 
   {# --- Starfield SOLO controla su CSS --- #}
   {% if enable_space_bg|default:1 %}
     <link rel="stylesheet" href="{% static 'css/starfield.css' %}">
   {% endif %}
 
-  {# --- Branding variables --- #}
+  {# --- Branding variables + fondo base (evita páginas en blanco) --- #}
   <style>
+    /* Fondo oscuro por defecto: si starfield no carga o enable_space_bg=0, la página sigue con tema oscuro */
+    body {
+      background-color: #0a0e27;
+      background-image: linear-gradient(135deg, #0a0e27 0%, #0f172a 50%, #0a0e27 100%);
+      color: #e2e8f0;
+    }
+    main {
+      background: transparent;
+      color: inherit;
+    }
+    /* Fix móvil: evitar scroll automático / saltos al teclado */
+    html { scroll-behavior: auto; }
+    @media (max-width: 768px) {
+      html { scroll-behavior: auto !important; -webkit-overflow-scrolling: touch; }
+      body { overscroll-behavior-y: contain; touch-action: pan-y; }
+      input:focus, textarea:focus, select:focus { scroll-margin: 0 !important; }
+    }
     /* Prioridad: COLOR_PRIMARIO desde logo_empresa > company_color desde company_branding > default */
     :root{
       --company-primary: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }};
@@ -686,129 +708,37 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  {# --- ANTI-SCROLL AUTOMÁTICO PARA MÓVILES --- #}
+  {# --- FIX SEGURO PARA SCROLL EN MÓVILES (sin monkey patching) --- #}
+  {# 🚫 En /documentos/form/ desactivado: evita rebote al tocar "Guardar" en móvil/PWA #}
   <script>
-  (function() {
-    // Detectar si es móvil
-    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
-    
-    if (!isMobile) {
-      console.log('✅ Desktop detectado - sin restricciones de scroll');
-      return; // En desktop, no aplicar restricciones
-    }
+  (function () {
+    const isMobile = () => window.matchMedia("(max-width: 768px)").matches;
 
-    console.log('📱 Móvil detectado - activando protección anti-scroll automático');
+    const path = window.location.pathname || "";
+    const disableOnPaths = [
+      "/documentos/form",
+      "/documentos/form/",
+      "/us/documentos/form",
+      "/us/documentos/form/",
+      "/cl/es/documentos/form",
+      "/cl/es/documentos/form/",
+    ];
+    if (disableOnPaths.some(p => path.startsWith(p))) return;
 
-    // Flag para detectar interacción real del usuario
-    let isUserInteraction = false;
-    let scrollLock = false;
-    let initialScrollPos = 0;
+    document.addEventListener("focusin", (e) => {
+      const el = e.target;
+      if (!isMobile()) return;
+      if (!el.matches("input,textarea,select")) return;
 
-    // Marcar interacción del usuario en eventos táctiles y de mouse
-    ['touchstart', 'touchmove', 'mousedown', 'wheel', 'scroll'].forEach(function(event) {
-      document.addEventListener(event, function() {
-        isUserInteraction = true;
-        setTimeout(function() { isUserInteraction = false; }, 100);
-      }, { passive: true, capture: true });
-    });
-
-    // Función para restaurar posición de scroll
-    function preventAutoScroll() {
-      if (scrollLock && !isUserInteraction) {
-        window.scrollTo(0, initialScrollPos);
-        document.documentElement.scrollTop = initialScrollPos;
-        document.body.scrollTop = initialScrollPos;
-      }
-    }
-
-    // Interceptar window.scrollTo
-    const origScrollTo = window.scrollTo;
-    window.scrollTo = function(x, y) {
-      if (isMobile && !isUserInteraction && scrollLock) {
-        console.log('🚫 Bloqueado: scrollTo(' + x + ',' + y + ') sin interacción del usuario');
-        return; // Bloquear scroll automático
-      }
-      return origScrollTo.call(window, x, y);
-    };
-
-    // Interceptar scrollIntoView
-    const origScrollIntoView = Element.prototype.scrollIntoView;
-    Element.prototype.scrollIntoView = function() {
-      if (isMobile && !isUserInteraction && scrollLock) {
-        console.log('🚫 Bloqueado: scrollIntoView en', this.tagName, this.id || this.className);
-        return; // Bloquear scrollIntoView automático
-      }
-      return origScrollIntoView.apply(this, arguments);
-    };
-
-    // Interceptar window.scroll
-    const origScroll = window.scroll;
-    window.scroll = function(x, y) {
-      if (isMobile && !isUserInteraction && scrollLock) {
-        console.log('🚫 Bloqueado: scroll(' + x + ',' + y + ') sin interacción del usuario');
-        return;
-      }
-      return origScroll.call(window, x, y);
-    };
-
-    // Modificar focus para no hacer scroll en móviles
-    const origFocus = HTMLElement.prototype.focus;
-    HTMLElement.prototype.focus = function(options) {
-      if (isMobile) {
-        // En móviles, focus sin scroll
-        const newOptions = Object.assign({}, options, { preventScroll: true });
-        return origFocus.call(this, newOptions);
-      }
-      return origFocus.call(this, options);
-    };
-
-    // Activar protección al cargar la página
-    document.addEventListener('DOMContentLoaded', function() {
-      initialScrollPos = window.pageYOffset || document.documentElement.scrollTop || 0;
-      scrollLock = true;
-      
-      // Mantener lock por 3 segundos después de carga
-      setTimeout(function() {
-        scrollLock = false;
-        console.log('✅ Protección anti-scroll desactivada - página cargada');
-      }, 3000);
-
-      // Prevenir scroll en focus de inputs
-      document.addEventListener('focusin', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
-          if (!isUserInteraction) {
-            const scrollBefore = window.pageYOffset || document.documentElement.scrollTop || 0;
-            setTimeout(function() {
-              const scrollAfter = window.pageYOffset || document.documentElement.scrollTop || 0;
-              if (Math.abs(scrollAfter - scrollBefore) > 3) {
-                window.scrollTo(0, scrollBefore);
-                document.documentElement.scrollTop = scrollBefore;
-                document.body.scrollTop = scrollBefore;
-              }
-            }, 0);
-          }
-        }
-      }, true);
-    });
-
-    // Prevenir scroll al abrir/cerrar teclado virtual
-    let lastHeight = window.innerHeight;
-    window.addEventListener('resize', function() {
-      const currentHeight = window.innerHeight;
-      if (Math.abs(currentHeight - lastHeight) > 100) {
-        // Cambio grande = probablemente teclado virtual
-        setTimeout(preventAutoScroll, 50);
-      }
-      lastHeight = currentHeight;
-    });
-
-    console.log('✅ Protección anti-scroll activada para móvil');
+      setTimeout(() => {
+        const r = el.getBoundingClientRect();
+        const pad = 12;
+        const out = r.top < pad || r.bottom > (window.innerHeight - pad);
+        if (out) el.scrollIntoView({ block: "nearest", behavior: "auto" });
+      }, 250);
+    }, { passive: true });
   })();
   </script>
-
-  {# --- jQuery (solo una vez, necesario para DAL) --- #}
-  {# jQuery se carga aquí una sola vez. DAL oficial (form.media) cargará Select2 y autocomplete_light después #}
-  <script src="{% static 'vendor/jquery/jquery-3.6.0.min.js' %}"></script>
 
   {% block extra_head %}{% endblock %}
   {% block extra_css %}{% endblock %}
@@ -816,7 +746,7 @@
   {% if form %}{{ form.media.css }}{% endif %}
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body class="min-h-[100dvh] min-h-screen flex flex-col overflow-x-hidden">
 
 
   {# --- Fondo estelar SOLO su HTML cuando flag activo --- #}
@@ -888,26 +818,30 @@
       {# Para Chile: siempre español. Para USA: verifica LANGUAGE_CODE (es/en). Si es español, muestra textos en español #}
       <!-- Fila 1: AJUSTES, CENTRO, CLIENTES, DOCUMENTOS, EXTRA -->
       <div class="flex items-center justify-center gap-3 flex-wrap max-w-7xl w-full px-4">
-        <!-- AJUSTES -->
-        <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
+        <!-- AJUSTES: ruta explícita por país para que el botón siempre lleve a la template de ajustes -->
+        {% if request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}
+          <a href="/us/settings/" class="nav-button-standard">
+        {% else %}
+          <a href="/cl/es/settings/" class="nav-button-standard">
+        {% endif %}
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">⚙️</span>
           <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}AJUSTES{% else %}SETTINGS{% endif %}</span>
         </a>
 
         <!-- CENTRO -->
-        <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
+        <a href="{% if request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/centro-operaciones/{% else %}{% country_url 'centro_operaciones' app_namespace='direct' %}{% endif %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚀</span>
           <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}CENTRO{% else %}CENTER{% endif %}</span>
         </a>
 
         <!-- CLIENTES -->
-        <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
+        <a href="{% if request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/clientes/{% else %}{% country_url 'clientes:lista_clientes' %}{% endif %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">👥</span>
           <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}CLIENTES{% else %}CLIENTS{% endif %}</span>
         </a>
 
         <!-- DOCUMENTOS -->
-        <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
+        <a href="{% if request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/documentos/{% else %}{% country_url 'documentos:lista_documentos' %}{% endif %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">📄</span>
           <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}DOCUMENTOS{% else %}INVOICED{% endif %}</span>
         </a>
@@ -922,36 +856,28 @@
       <!-- Fila 2: REPUESTOS, REPORTES, SERVICIOS, VEHÍCULOS, SALIR -->
       <div class="flex items-center justify-center gap-3 flex-wrap max-w-7xl w-full px-4">
         <!-- REPUESTOS -->
-        <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
+        <a href="{% if request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/repuestos/{% else %}{% country_url 'repuestos:lista_repuestos' %}{% endif %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🔧</span>
           <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}REPUESTOS{% else %}PARTS{% endif %}</span>
         </a>
 
         <!-- REPORTES -->
-        <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
+        <a href="{% if request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/reportes/{% else %}{% country_url 'reportes:reportes_dashboard' %}{% endif %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">📊</span>
           <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}REPORTES{% else %}REPORTS{% endif %}</span>
         </a>
 
         <!-- SERVICIOS -->
-        <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
+        <a href="{% if request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/servicios/{% else %}{% country_url 'servicios:servicios_menu' %}{% endif %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🛠️</span>
           <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}SERVICIOS{% else %}SERVICES{% endif %}</span>
         </a>
 
         <!-- VEHÍCULOS -->
-        {% country_url 'vehiculos:lista_vehiculos' as vehiculos_url %}
-        {% if vehiculos_url %}
-        <a href="{{ vehiculos_url }}" class="nav-button-standard">
+        <a href="{% if request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/vehiculos/{% else %}{% country_url 'vehiculos:lista_vehiculos' %}{% endif %}" class="nav-button-standard">
           <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚗</span>
           <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
         </a>
-        {% else %}
-        <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
-          <span class="nav-icon" style="font-size: 1.5rem; margin-bottom: 0.3rem;">🚗</span>
-          <span class="nav-text" style="display: block !important; visibility: visible !important; opacity: 1 !important; font-family: 'Orbitron', monospace !important; font-size: 0.85rem !important; font-weight: 900 !important; color: #00ffff !important; text-shadow: 0 0 12px rgba(0,255,255,1) !important; text-transform: uppercase !important; letter-spacing: 1px !important; margin-top: 0.3rem !important;">{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' or request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}VEHÍCULOS{% else %}VEHICLES{% endif %}</span>
-        </a>
-        {% endif %}
 
         <!-- SALIR -->
         <form action="{% url 'account_logout' %}" method="post" class="inline-block">
@@ -964,14 +890,16 @@
       </div>
 
     {% else %}
-      <!-- Login button for non-authenticated users -->
+      <!-- Login button for non-authenticated users (namespace dinámico: usa/chile según ruta) -->
       <div class="flex items-center justify-center">
-        <a href="{% url 'account_login' %}" class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg hover:bg-[#0f172a] transition-all duration-300 text-cyan-300 hover:text-white">
+        {% with ns=request.resolver_match.namespace|default:'chile' %}
+        <a href="{% url ns|add:':account_login' %}" class="nav-button flex items-center gap-2 px-4 py-2 bg-[#0a0f1a] border border-cyan-400 rounded-lg hover:bg-[#0f172a] transition-all duration-300 text-cyan-300 hover:text-white">
         <div class="w-4 h-4 bg-cyan-400 rounded-sm flex items-center justify-center">
           <div class="w-2 h-2 bg-white rounded-full"></div>
         </div>
         <span class="font-medium text-sm">INICIAR SESIÓN</span>
       </a>
+        {% endwith %}
     {% endif %}
     </div>
   </div>
@@ -987,12 +915,14 @@
   {% if '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
   <footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
     <div class="container mx-auto px-4 text-center">
-      {% if company_settings.address or company_settings.phone or company_settings.email %}
+      {% if company_settings %}
+        {% if company_settings.address or company_settings.phone or company_settings.email %}
         <span class="text-xs text-gray-400 block">
           {% if company_settings.address %}{{ company_settings.address }} {% endif %}
           {% if company_settings.phone %}• {{ company_settings.phone }} {% endif %}
           {% if company_settings.email %}• {{ company_settings.email }}{% endif %}
         </span>
+        {% endif %}
       {% endif %}
       <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm flex-wrap">
         <span class="font-medium">eGarage</span>
@@ -1039,10 +969,15 @@
   {# Descomenta la siguiente línea para diagnosticar problemas #}
   {# <script src="{% static 'js/pwa-install-debug.js' %}"></script> #}
 
-  {# --- JS extra + Starfield JS si aplica --- #}
-  {% block extra_js %}{% endblock %}
-  {# JS de form.media (DAL/Select2) - se carga aquí si hay formulario #}
+  {# --- 1) jQuery SIEMPRE primero (Select2/DAL y cualquier $ dependen de él) --- #}
+  <script src="{% static 'vendor/jquery/jquery-3.6.0.min.js' %}?v=3.6.0-real-20260227"></script>
+  <script>if (typeof window.jQuery !== 'undefined') { window.$ = window.jQuery; }</script>
+
+  {# --- 2) DAL / form.media.js (Select2 y autocomplete) ANTES de extra_js --- #}
   {% if form %}{{ form.media.js }}{% endif %}
+
+  {# --- 3) Scripts extra de cada template (marca→modelo, etc.) --- #}
+  {% block extra_js %}{% endblock %}
   {# TEMP: desactivar starfield para probar scroll en móviles #}
   {# {% if enable_space_bg|default:1 and enable_space_bg != 2 %}
     <script src="{% static 'js/starfield.js' %}"></script>
@@ -1066,9 +1001,13 @@
       return confirm(message);
     }
 
-    // Service Worker Registration para PWA
+    // Service Worker Registration para PWA (no registrar en panel/admin para evitar cache de HTML dinámico)
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
+        const path = location.pathname || '';
+        if (path.includes('/vehiculos/') || path.includes('/documentos/') || path.includes('/panel/') || path.includes('/clientes/') || /^\/(us|cl)\//.test(path)) {
+          return; // No registrar SW en rutas de panel
+        }
         navigator.serviceWorker.register('{% static "service-worker.js" %}')
           .then(function(registration) {
             console.log('✅ Service Worker registrado exitosamente:', registration.scope);

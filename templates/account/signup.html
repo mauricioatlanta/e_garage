@@ -603,7 +603,12 @@ select[name="country"] {
 
                 <div class="form-group">
                     <label class="form-label">{{ form.country.label }}</label>
-                    {{ form.country }}
+                    {% if form.country_locked %}
+                        <div class="country-display" style="padding: 12px 16px; color: #22d3ee; background: rgba(0,0,0,0.4); border: 2px solid rgba(34,211,238,0.4); border-radius: 8px;">{{ form.country_display_value }}</div>
+                        {{ form.country }}
+                    {% else %}
+                        {{ form.country }}
+                    {% endif %}
                     {% if form.country.errors %}
                     <div class="error-message">{{ form.country.errors }}</div>
                     {% endif %}

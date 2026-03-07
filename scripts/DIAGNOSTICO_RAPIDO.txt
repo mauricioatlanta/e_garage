@@ -1,0 +1,29 @@
+# ==========================================
+# DIAGNÓSTICO RÁPIDO 502 - Copiar y Pegar en el Servidor
+# ==========================================
+
+# Ejecutar estos comandos uno por uno:
+
+# 1. Buscar servicios
+systemctl list-units --all | grep -E "(gunicorn|egarage|python)"
+
+# 2. Buscar procesos Gunicorn
+ps aux | grep gunicorn | grep -v grep
+
+# 3. Ver configuración de Nginx (MUY IMPORTANTE - ver a dónde apunta)
+cat /etc/nginx/sites-enabled/* | grep -A 10 "location /"
+
+# 4. Buscar dónde está el código de la aplicación
+find /opt /var/www /srv /home -name "manage.py" -type f 2>/dev/null
+
+# 5. Ver logs de error de Nginx
+tail -30 /var/log/nginx/error.log | grep -i "502\|connect\|upstream"
+
+# 6. Buscar sockets
+find /opt /var/www /srv /tmp -name "*.sock" -type s 2>/dev/null
+
+# 7. Ver puertos TCP
+ss -tuln | grep -E ":(8000|8001|8002) "
+
+# 8. Ver todos los servicios systemd
+systemctl list-units --type=service --all | head -30

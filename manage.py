@@ -1,12 +1,32 @@
 #!/usr/bin/env python
 import os
 import sys
+import io
 import logging
+
+# Windows: forzar UTF-8 en stdout/stderr ANTES de cargar Django.
+# Evita UnicodeEncodeError (ej. emoji ✅) al escribir en cp1252.
+if os.name == "nt":
+    os.environ.setdefault("PYTHONUTF8", "1")
+    try:
+        # Reconfigurar stdout y stderr con UTF-8 y manejo de errores
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+        sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+    except (AttributeError, ValueError):
+        # Si reconfigure no está disponible (Python < 3.7), usar TextIOWrapper
+        try:
+            sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
+            sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
+        except Exception:
+            pass
+    except Exception:
+        pass
 
 
 def main():
-    # Warning solo en desarrollo
-    if os.getenv("EGARAGE_ENV", "dev").lower() != "prod":
+    # Warning solo en desarrollo (no en producción)
+    ENV = (os.getenv("DJANGO_ENV") or os.getenv("ENV") or "").lower()
+    if ENV not in ("prod", "production"):
         logging.warning("Modo de desarrollo activado. Asegúrate de no usar esto en producción.")
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")

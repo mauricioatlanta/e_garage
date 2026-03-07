@@ -32,11 +32,10 @@ def _get_empresa(request):
 
 
 def _get_country(request, default="CL"):
-    """País a partir de la empresa (CL/US)."""
-    emp = _get_empresa(request)
-    if not emp:
-        return default
-    return (getattr(emp, "pais", default) or default).upper()
+    """País desde path primero (/us/ → US), luego request.country, empresa."""
+    from taller.utils import get_country_from_request
+
+    return get_country_from_request(request, default=default)
 
 
 def _parse_int(value):
@@ -916,7 +915,6 @@ def api_procesar_foto_patente(request):
         "mensaje": "Vehículo encontrado"
     }
     """
-    from whatsapp.services.ocr import OCRProcessor
     import logging
 
     logger = logging.getLogger(__name__)
@@ -948,7 +946,15 @@ def api_procesar_foto_patente(request):
         logger.error(f"Error leyendo imagen: {e}")
         return JsonResponse({"success": False, "error": "Error procesando la imagen"}, status=500)
 
-    # Procesar OCR con validación de confianza
+    # Procesar OCR (import perezoso: no carga WhatsApp/OCR al cargar api.views)
+    try:
+        from whatsapp.services.ocr import OCRProcessor
+    except Exception as e:
+        logger.warning("OCR no disponible: %s", e)
+        return JsonResponse(
+            {"success": False, "error": "OCR no disponible en este servidor"},
+            status=503,
+        )
     ocr_processor = OCRProcessor(confidence_threshold=0.6)
     ocr_result = ocr_processor.extract_plate(image_bytes, return_full_result=True)
 

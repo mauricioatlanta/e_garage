@@ -14,14 +14,7 @@
         --ai-glow: #00ffff;
         --neural-bg: #0a0a0f;
         --matrix-green: #39ff14;
-                      <select name="tecnico_id" id="tecnico_id" class="filter-input w-full">
-                        <option value="todos" {% if mecanico_seleccionado == 'todos' %}selected{% endif %}>📊 Todos los técnicos</option>
-                        {% for mecanico in todos_mecanicos %}
-                            <option value="{{ mecanico.id }}" {% if mecanico_seleccionado == mecanico.id|stringformat:"s" %}selected{% endif %}>
-                                🔧 {{ mecanico.nombre }}
-                            </option>
-                        {% endfor %}
-                    </select>cyber-purple: #b347d9;
+        --cyber-purple: #b347d9;
         --hologram-blue: #00d4ff;
         --quantum-orange: #ff6b35;
         --neon-pink: #ff1493;
@@ -1328,9 +1321,6 @@
                         {% empty %}
                             <option value="">No hay técnicos disponibles</option>
                         {% endfor %}
-                        <!-- Debug: Agregar opciones estáticas para verificar -->
-                        <option value="test1">Test Técnico 1</option>
-                        <option value="test2">Test Técnico 2</option>
                     </select>
                 </div>
                 <div>

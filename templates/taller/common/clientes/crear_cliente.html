@@ -374,7 +374,7 @@ h1 {
   <div class="form-card">
     <form method="post" id="client-form" enctype="multipart/form-data">
       {% csrf_token %}
-      <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
+      <input type="hidden" name="next" value="{{ request.GET.next|default:request.POST.next|default:'' }}">
 
       {% if form.errors %}
         <div class="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">

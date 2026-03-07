@@ -20,6 +20,10 @@ from taller.configuracion.rubros_logic import (
 from taller.models.documento import Documento
 from taller.models.tecnico import Tecnico
 from taller.documentos.forms import DocumentoForm
+from taller.documentos.views_migrated import (
+    build_document_list_queryset,
+    enrich_documentos_with_totals,
+)
 
 
 def _tecnicos_queryset_for_empresa(empresa, roles_permitidos=None):
@@ -53,12 +57,10 @@ def documentos_listar(request, country_code="cl", lang_code="es"):
         messages.error(request, "Usuario sin empresa asignada")
         return redirect("/")
 
-    # Filtrar documentos por empresa del usuario
-    documentos = (
-        Documento.objects.filter(empresa=empresa)
-        .select_related("cliente", "vehiculo", "tecnico_responsable", "empresa")
-        .order_by("-fecha_emision", "-id")
-    )
+    # Queryset con anotaciones de totales para que no se muestren $0 cuando el total en BD no está actualizado
+    documentos_qs = build_document_list_queryset(empresa, request)
+    documentos = list(documentos_qs)
+    enrich_documentos_with_totals(documentos)
 
     # Usar select_template con fallback a common
     template = select_template(
@@ -68,14 +70,30 @@ def documentos_listar(request, country_code="cl", lang_code="es"):
         ]
     )
 
+    country = (getattr(empresa, "pais", None) or country_code or "CL").upper().lower()
+    # KPIs mínimos para que el template común no falle (lista completa en DocumentoListView)
+    estadisticas = {
+        "total": len(documentos),
+        "total_monto": None,
+        "emitidos": 0,
+        "borradores": 0,
+        "hoy": 0,
+        "pendientes_pago": 0,
+        "presupuestos_pendientes": 0,
+        "ots_sin_cerrar": 0,
+        "ultimos_30_dias": 0,
+    }
+
     return render(
         request,
         template.template.name,
         {
             "documentos": documentos,
+            "country": country,
             "country_code": country_code,
             "lang_code": lang_code,
             "empresa": empresa,
+            "estadisticas": estadisticas,
         },
     )
 
@@ -95,8 +113,12 @@ def documento_crear(request, country_code="cl", lang_code="es"):
         return redirect("/")
 
     config = getattr(empresa, "config", None)
-    # Obtener país desde empresa o country_code
-    country = getattr(empresa, "pais", country_code.upper() if country_code else "CL")
+    # País desde path (country_code en URL) primero, luego empresa
+    from taller.utils import get_country_from_request
+
+    country = get_country_from_request(
+        request, default=getattr(empresa, "pais", country_code.upper() if country_code else "CL")
+    )
     responsable_label = get_responsable_label(config)
     roles_permitidos = get_roles_permitidos(config)
     ui_config = get_ui_config(config)
@@ -185,7 +207,27 @@ def documento_crear(request, country_code="cl", lang_code="es"):
         else:
             messages.error(request, "Por favor corrige los errores en el formulario")
     else:
-        form = DocumentoForm(user=request.user, empresa=empresa, country=country)
+        # Precargar vehículo si viene ?vehiculo_id=X (desde Centro de Trabajo)
+        initial = {}
+        vehiculo_id = request.GET.get("vehiculo_id", "").strip()
+        if vehiculo_id and vehiculo_id.isdigit():
+            from taller.models.vehiculos import Vehiculo
+
+            vehiculo = (
+                Vehiculo.objects.filter(empresa=empresa, pk=int(vehiculo_id))
+                .select_related("cliente")
+                .first()
+            )
+            if vehiculo:
+                initial["vehiculo"] = vehiculo
+                initial["cliente"] = vehiculo.cliente
+
+        form = DocumentoForm(
+            initial=initial if initial else None,
+            user=request.user,
+            empresa=empresa,
+            country=country,
+        )
         if "tecnico_responsable" in form.fields:
             form.fields["tecnico_responsable"].label = responsable_label
             form.fields["tecnico_responsable"].queryset = tecnicos_qs

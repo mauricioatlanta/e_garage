@@ -63,6 +63,11 @@ urlpatterns = [
         views.reportes_otros_servicios_fecha,
         name="reportes_otros_servicios_fecha",
     ),
+    path(
+        "ventas-por-contexto/",
+        views.reporte_ventas_por_contexto,
+        name="reporte_ventas_por_contexto",
+    ),
     # === REPORTES DE KILOMETRAJE ===
     path(
         "kilometraje/recordatorios/",

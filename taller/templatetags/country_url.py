@@ -9,11 +9,13 @@ def _country_ns_from_path(path: str) -> str:
     """
     Devuelve el namespace del país según el prefijo de la ruta actual.
     Considera el segmento de idioma si está presente.
+    /us/en/ -> us_en, /us/es/ -> us_es (para que APIs apunten a /us/en/ o /us/es/)
+    /us/ sin idioma -> usa
     """
     if path.startswith("/us/en/") or path == "/us/en":
-        return "usa"  # usa_en no existe, usar usa
+        return "us_en"
     elif path.startswith("/us/es/") or path == "/us/es":
-        return "usa"  # usa_es no existe, usar usa
+        return "us_es"
     elif path.startswith("/us/") or path == "/us":
         return "usa"
     elif path.startswith("/cl/es/") or path == "/cl/es":
@@ -82,6 +84,25 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
     try:
         return reverse(full_name, args=args_list, kwargs=kwargs)
     except NoReverseMatch as e:
+        # Si falla y no es "direct", intentar la URL directa (sin app_namespace)
+        # us_en/us_es incluyen taller.urls que tiene vehiculos directamente, no usa:taller:vehiculos
+        if app_namespace != "direct":
+            try:
+                direct_name = f"{country_ns}:{view_path}"
+                return reverse(direct_name, args=args_list, kwargs=kwargs)
+            except NoReverseMatch:
+                pass
+        # company_settings en us_en/us_es está bajo taller, no en la raíz: intentar taller:company_settings
+        if app_namespace == "direct" and view_path == "company_settings":
+            try:
+                return reverse(
+                    f"{country_ns}:taller:{view_path}",
+                    args=args_list,
+                    kwargs=kwargs,
+                )
+            except NoReverseMatch:
+                pass
+
         # Si falla con NoReverseMatch y el error menciona 'lang', intentar agregar lang
         error_msg = str(e).lower()
         if "lang" in error_msg and request:
@@ -91,10 +112,11 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
                 try:
                     return reverse(full_name, args=args_list, kwargs=kwargs_with_lang)
                 except NoReverseMatch:
-                    # Si aún falla, re-lanzar el error original
-                    raise e
-        # Si no es un error relacionado con lang, re-lanzar
-        raise
+                    # Si aún falla, retornar cadena vacía en lugar de lanzar excepción
+                    return ""
+        # Si no es un error relacionado con lang, retornar cadena vacía en lugar de lanzar excepción
+        # Esto permite que los templates usen fallbacks
+        return ""
 
 
 @register.simple_tag(takes_context=True)
@@ -106,4 +128,16 @@ def country_url_direct(context, view_path, *args, app_namespace="taller", **kwar
     Ejemplo:
       <a href="{% country_url_direct 'clientes:lista_clientes' %}">Clientes</a>
     """
-    return country_url(context, view_path, app_namespace, *args, **kwargs)
+    return country_url(context, view_path, *args, app_namespace=app_namespace, **kwargs)
+
+
+@register.simple_tag(takes_context=True)
+def safe_logout_url(context):
+    """
+    URL de logout (allauth). No lanza: si reverse falla retorna /accounts/logout/.
+    Evita 500 en base cuando el urlconf no expone account_logout.
+    """
+    try:
+        return reverse("account_logout")
+    except NoReverseMatch:
+        return "/accounts/logout/"

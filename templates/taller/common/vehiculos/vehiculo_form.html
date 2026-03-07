@@ -1099,9 +1099,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-{# Cargar form.media para inicializar Select2/DAL #}
-{% if form.media %}
-{{ form.media }}
-{% endif %}
+{# form.media ya se carga en base.html (CSS en head, JS al final del body) - NO duplicar aquí (evita DAL select2 already registered) #}
 
 {% endblock %}

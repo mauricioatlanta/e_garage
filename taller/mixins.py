@@ -34,11 +34,13 @@ class CountryLangTemplateMixin:
             # Fallback a template estándar si no hay request
             return [f"taller/{base_template}"]
 
-        empresa = (
-            getattr(request.user, "empresa", None)
-            if hasattr(request, "user") and request.user.is_authenticated
-            else None
-        )
+        empresa = None
+        if hasattr(request, "user") and request.user.is_authenticated:
+            try:
+                empresa = request.user.empresa
+            except Exception:
+                # Usuario sin empresa (ej. staff) o Empresa.DoesNotExist
+                empresa = None
 
         # Determinar país: prioridad URL path > request.country > empresa.pais > CL
         # Primero intentar desde el prefijo del path
@@ -103,12 +105,13 @@ class CountryLangTemplateMixin:
         if not self.base_template_name:
             raise ValueError("base_template_name debe estar definido en la vista")
 
-        # Obtener datos de país e idioma
-        empresa = (
-            getattr(request.user, "empresa", None)
-            if hasattr(request, "user") and request.user.is_authenticated
-            else None
-        )
+        # Obtener datos de país e idioma (evitar crash si usuario no tiene empresa)
+        empresa = None
+        if hasattr(request, "user") and request.user.is_authenticated:
+            try:
+                empresa = request.user.empresa
+            except Exception:
+                empresa = None
 
         # Determinar país: prioridad URL path > request.country > empresa.pais > CL
         path = (getattr(request, "path_info", "") or request.path or "").lower()

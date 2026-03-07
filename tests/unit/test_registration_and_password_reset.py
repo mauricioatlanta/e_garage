@@ -123,7 +123,7 @@ class TestRegistrationProcess:
         )
 
         empresa = result["empresa"]
-        assert empresa.is_trial is True
+        assert empresa.is_trial_active is True
         assert empresa.trial_started_at is not None
         assert empresa.trial_ends_at is not None
 
@@ -253,6 +253,7 @@ class TestPasswordResetProcess:
             # Si falla, verificar que al menos la estructura está ahí
             from django.urls import resolve
             from django.test import RequestFactory
+
             factory = RequestFactory()
             request = factory.get("/accounts/password/reset/")
             # Si llegamos aquí sin error, la estructura básica está
@@ -330,4 +331,3 @@ class TestRegistrationIntegration:
         if empresas.exists():
             empresa = empresas.first()
             assert empresa.nombre_taller is not None
-

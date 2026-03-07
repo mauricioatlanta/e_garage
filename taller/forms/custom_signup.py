@@ -1,3 +1,4 @@
+import logging
 import time
 
 from allauth.account.forms import SignupForm
@@ -7,6 +8,8 @@ from taller.config.country_settings import CountrySettings
 from taller.services.registration_service import RegistrationService
 from taller.services.registro_embudo_service import registrar_signup
 from taller.utils.country_config import get_country_config
+
+logger = logging.getLogger(__name__)
 
 
 class CustomSignupForm(SignupForm):
@@ -61,7 +64,8 @@ class CustomSignupForm(SignupForm):
         ),
         help_text="Puedes dejarlo en blanco y configurarlo después en Settings",
     )
-    # ✅ PAÍS: Selector visible para que el usuario elija su país en todos los signups
+    # País: en rutas /us/, /cl/, /br/ → fijo desde URL (no editable).
+    # En rutas genéricas → selector visible para elegir país.
     COUNTRY_CHOICES = [
         ("", "--- Seleccione país / Select country ---"),
         ("US", "United States"),
@@ -83,11 +87,51 @@ class CustomSignupForm(SignupForm):
     )
 
     def __init__(self, *args, **kwargs):
-        # Extraer country_code y default_phone_prefix si se pasan
+        # Extraer country_code, default_phone_prefix y request
         self.country_code = kwargs.pop("country_code", None)
         self.default_phone_prefix = kwargs.pop("default_phone_prefix", None)
+        request = kwargs.pop("request", None)
+        if request is None and args and hasattr(args[0], "path"):
+            request = args[0]
 
         super().__init__(*args, **kwargs)
+
+        # BLINDAR PAÍS DESDE URL: si la ruta tiene país (/us/, /cl/, /br/), es la única fuente de verdad
+        country_from_url = None
+        if request:
+            country_from_url = (
+                CountrySettings.get_country_from_url(request.path)
+                or (request.GET.get("from", "") or "").strip().upper()
+            )
+            if not country_from_url:
+                country_from_url = None
+            elif CountrySettings.is_country_valid(country_from_url):
+                country_from_url = country_from_url.upper()
+
+        if country_from_url:
+            self.country_from_url = country_from_url
+            self.country_code = country_from_url
+            self.country_locked = True
+            config = CountrySettings.get_country_config(country_from_url)
+            self.country_display_value = (
+                config.get("name_es")
+                or config.get("name_en")
+                or config.get("name")
+                or country_from_url
+            )
+            if "country" in self.fields:
+                self.fields["country"].widget = forms.HiddenInput()
+                self.fields["country"].initial = country_from_url
+        else:
+            self.country_from_url = None
+            self.country_locked = False
+            self.country_display_value = None
+            # Sin ruta país: usar ?from=xx o request.country_code (NO fallback a CL)
+            if request and not self.country_code:
+                from_param = (request.GET.get("from", "") or "").strip().upper()
+                self.country_code = from_param or getattr(request, "country_code", None)
+                if self.country_code:
+                    self.country_code = self.country_code.upper()
 
         # Sobrescribir first_name si Allauth lo tiene (asegurar que use nuestro campo personalizado)
         # Nuestro campo first_name ya está definido arriba, así que sobrescribirá el de Allauth
@@ -145,29 +189,8 @@ class CustomSignupForm(SignupForm):
                 {"class": "input-futurista", "placeholder": "••••••••"}
             )
 
-        # ✅ DETECTAR PAÍS AUTOMÁTICAMENTE desde request (?from=xx) o URL
-        # El request puede venir en kwargs o en args[0] si se pasa como primer argumento posicional
-        request = None
-        if "request" in kwargs:
-            request = kwargs["request"]
-        elif args and hasattr(args[0], "path"):
-            request = args[0]
-
-        if request and not self.country_code:
-            # Prioridad: 1) parámetro ?from=xx, 2) URL path, 3) request.country_code, 4) CL por defecto
-            from_param = request.GET.get("from", "").upper()
-            if from_param:
-                self.country_code = from_param
-            else:
-                self.country_code = (
-                    CountrySettings.get_country_from_url(request.path)
-                    or getattr(request, "country_code", None)
-                    or "CL"
-                )
-            self.country_code = self.country_code.upper()
-
-        # ✅ Preseleccionar país en el selector (desde ?from=xx o URL)
-        if self.country_code and "country" in self.fields:
+        # Preseleccionar país en el selector (solo cuando no está bloqueado por URL)
+        if not self.country_locked and self.country_code and "country" in self.fields:
             self.fields["country"].initial = self.country_code
 
         # Obtener configuración del país y prefijo telefónico
@@ -311,50 +334,43 @@ class CustomSignupForm(SignupForm):
 
     def clean(self):
         """
-        ✅ GARANTIZAR PAÍS AUTOMÁTICAMENTE (Núcleo del Plan B)
+        País según URL o selección del usuario. Sin fallback silencioso a CL.
 
-        Esto hace que aunque el template no envíe country, aunque el usuario use VPN,
-        aunque falte ?from=xx, SIEMPRE haya país válido.
-
-        IMPORTANTE: Este método se ejecuta DESPUÉS de clean_telefono y otros clean_*,
-        por lo que tiene acceso a cleaned_data después de todas las validaciones.
+        - Si country_from_url: usar ese país (única fuente de verdad).
+        - Si no: requiere país del formulario; si falta, error claro.
         """
         cleaned_data = super().clean()
 
-        # Si cleaned_data está vacío (formulario inválido), retornar sin modificar
         if not cleaned_data:
             return cleaned_data
 
-        # Detectar país con prioridad:
-        # 1) cleaned_data.get("country") (si viene del formulario o HiddenInput)
-        # 2) self.country_code (detectado en __init__ desde ?from=xx o URL)
-        # 3) self.initial.get("country") (si se estableció inicial)
-        # 4) CL por defecto
-        country = (
-            cleaned_data.get("country")
-            or self.country_code
-            or (hasattr(self, "initial") and self.initial.get("country"))
-            or "CL"
-        )
+        country = None
 
-        # Normalizar a mayúsculas y validar que sea un código de país válido
-        if country:
-            country = str(country).upper().strip()
-            # Validar que sea uno de los países soportados
-            valid_countries = ["US", "AR", "CL", "MX", "PE", "CO", "EC", "BR", "VE", "UY"]
-            if country not in valid_countries:
-                # ✅ Manejo robusto: Loggear el error pero no fallar el formulario
-                import logging
-
-                logger = logging.getLogger(__name__)
-                logger.warning(f"País desconocido '{country}' en signup, usando fallback 'CL'")
-                country = "CL"  # Fallback a CL si no es válido
+        # En rutas país: la URL es la única fuente de verdad
+        if getattr(self, "country_from_url", None):
+            country = self.country_from_url
         else:
-            country = "CL"
+            # Signup sin ruta país: debe venir del formulario (selector)
+            country = (cleaned_data.get("country") or "").strip().upper() or (
+                self.initial.get("country") if hasattr(self, "initial") else None
+            )
+            if country:
+                country = str(country).upper().strip()
 
-        # ✅ Asegurar que country esté en cleaned_data (siempre hay un valor válido)
-        cleaned_data["country"] = country
+        if not country:
+            logger.warning(
+                "[CustomSignupForm] No se pudo determinar país: "
+                "sin ruta país, sin ?from= y sin selección en formulario"
+            )
+            raise forms.ValidationError("Debe seleccionar un país / Please select a country")
 
+        if not CountrySettings.is_country_valid(country):
+            logger.warning(f"[CustomSignupForm] País no válido en signup: '{country}'")
+            raise forms.ValidationError(
+                "País no válido. Seleccione uno de la lista / Invalid country. Please select from the list."
+            )
+
+        cleaned_data["country"] = country.upper()
         return cleaned_data
 
     def save(self, request):
@@ -380,20 +396,17 @@ class CustomSignupForm(SignupForm):
         user.last_name = data.get("last_name", "").strip() or ""  # Opcional
         user.save()
 
-        # 3. ✅ Detectar país: 1) selección del usuario en el formulario, 2) ?from=xx, 3) URL, 4) CL por defecto
-        from_param = request.GET.get("from", "").upper()
-        raw = (data.get("country") or "").strip().upper()
-        country_code = (
-            raw
-            if raw
-            else None  # Prioridad 1: selector de país en el form
-            or from_param
-            or self.country_code
-            or getattr(request, "country_code", None)
-            or CountrySettings.get_country_from_url(request.path)
-            or "CL"
-        )
-        country_code = (country_code or "CL").upper()
+        # 3. País: viene de clean() (garantizado). Prioridad: URL > formulario. Sin fallback a CL.
+        country_code = (data.get("country") or "").strip().upper()
+        if not country_code:
+            logger.error(
+                "[CustomSignupForm] save() llamado sin country en cleaned_data. "
+                "No se creará empresa."
+            )
+            raise ValueError(
+                "No se pudo determinar el país. No se creará la empresa. "
+                "Por favor, registre desde la ruta correcta (/us/, /cl/, etc.) o seleccione un país."
+            )
 
         # ✅ Obtener configuración del país usando sistema centralizado
         config = get_country_config(country_code)

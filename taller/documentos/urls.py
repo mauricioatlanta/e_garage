@@ -14,6 +14,7 @@ from .views_migrated import DocumentoListView
 from .views_migrated import DocumentoUpdateView as MigratedUpdateView
 from .api_repuestos import buscar_repuestos_api  # ✅ API de autocomplete para Alpine.js
 from . import views_seguimiento  # ✅ Vistas de seguimiento y memoria
+from taller.servicios import views as servicios_views  # API otros servicios
 
 # Comentado temporalmente - módulo no existe
 # sys.path.append(
@@ -65,16 +66,32 @@ urlpatterns = [
         views_moderno.api_buscar_repuestos,
         name="api_buscar_repuestos",
     ),
+    path(
+        "api/repuesto-by-code/",
+        views_moderno.api_repuesto_by_code,
+        name="api_repuesto_by_code",
+    ),
     # ✅ API de autocomplete para Alpine.js (devuelve array simple)
     path(
         "api/repuestos/buscar/",
         buscar_repuestos_api,
         name="api_repuestos_buscar",
     ),
+    # Alias que usa el formulario de documentos: /documentos/api/repuestos/?q=...
+    path(
+        "api/repuestos/",
+        views_moderno.api_buscar_repuestos,
+        name="api_repuestos_root",
+    ),
     path(
         "api/buscar-servicios/",
         api_servicios.api_buscar_servicios,
         name="api_buscar_servicios",
+    ),
+    path(
+        "api/buscar-otros-servicios/",
+        servicios_views.buscar_otros_servicios_api,
+        name="api_buscar_otros_servicios",
     ),
     path(
         "ajax/servicios/buscar/",

@@ -1,0 +1,24 @@
+# ==========================================
+# SOLUCIÓN INMEDIATA 502 - Ejecutar en el servidor
+# ==========================================
+
+# 1. Ver estado detallado del servicio que está fallando
+sudo systemctl status egarage-gunicorn.service
+
+# 2. Ver logs de error del servicio
+sudo journalctl -u egarage-gunicorn.service -n 50 --no-pager
+
+# 3. Ver configuración del servicio
+sudo systemctl cat egarage-gunicorn.service
+
+# 4. Verificar si el puerto 8001 está en uso
+ss -tuln | grep 8001
+
+# 5. Ver logs de error de Nginx
+sudo tail -30 /var/log/nginx/error.log
+
+# 6. Verificar que el código existe en /srv/egarage
+ls -la /srv/egarage/manage.py
+
+# 7. Ver si hay un virtualenv
+ls -la /srv/egarage/venv/bin/gunicorn

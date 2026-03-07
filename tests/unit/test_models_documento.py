@@ -10,6 +10,7 @@ from django.test import TestCase
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
+from taller.models.lineas_documento import LineaServicio
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 
@@ -253,3 +254,35 @@ class DocumentoModelTest(TestCase):
         # Verificar que __str__ no lanza excepción
         str_repr = str(doc)
         self.assertIsInstance(str_repr, str)
+
+    def test_signals_documento_total_updated_on_linea_servicio(self):
+        """
+        Smoke test: al crear una LineaServicio, el signal debe recalcular
+        Documento.total (signals_documento registrados en apps.ready).
+        Si este test falla, revisar que taller.apps.TallerConfig.ready()
+        importe taller.models.signals_documento.
+        """
+        doc = Documento.objects.create(
+            empresa=self.empresa,
+            cliente=self.cliente,
+            vehiculo=self.vehiculo,
+            tipo="OT",
+            estado="EMITIDO",
+        )
+        doc.refresh_from_db()
+        before = doc.total
+
+        LineaServicio.objects.create(
+            documento=doc,
+            nombre="TEST SIGNALS",
+            cantidad=1,
+            precio_unitario=Decimal("100"),
+            descuento=Decimal("0"),
+        )
+
+        doc.refresh_from_db()
+        self.assertGreater(
+            doc.total,
+            before,
+            "Documento.total debe aumentar al crear LineaServicio (signals_documento).",
+        )

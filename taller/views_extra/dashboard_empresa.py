@@ -1,13 +1,16 @@
+import logging
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 
 from django.contrib import messages
+
+logger = logging.getLogger(__name__)
 from django.db.models import Count, DecimalField, ExpressionWrapper, F, Q, Sum, Value
 from django.db.models.functions import Coalesce
 from django.shortcuts import redirect
 from django.utils import timezone
 
-from taller.auth.decorators import login_required_default
+from taller.auth.decorators import country_login_required
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, LineaServicio
@@ -34,7 +37,7 @@ def total_repuestos(qs_base):
     return qs_base.aggregate(total=Coalesce(Sum(SUBTOTAL_EXPR), ZERO_DEC))["total"]
 
 
-@login_required_default
+@country_login_required
 def dashboard_centro_operaciones(request):
     """
     🏢 Dashboard empresarial - Centro de Operaciones
@@ -344,13 +347,27 @@ def dashboard_centro_operaciones(request):
     return TemplateResponse(request, template_name, context)
 
 
-@login_required_default
+@country_login_required
 def dashboard_centro_operaciones_espacial(request):
     """
     Dashboard especializado con estética espacial futurista
     Usa exactamente la misma lógica de datos que dashboard_centro_operaciones
     Solo cambia el template al final para usar el diseño espacial
     """
+    try:
+        return _dashboard_centro_operaciones_espacial_impl(request)
+    except Exception as e:
+        logger.exception(
+            "Error en dashboard_centro_operaciones_espacial path=%s user=%s: %s",
+            getattr(request, "path", "?"),
+            getattr(getattr(request, "user", None), "id", "anon"),
+            e,
+        )
+        raise
+
+
+def _dashboard_centro_operaciones_espacial_impl(request):
+    """Implementación de dashboard espacial (para capturar excepciones con contexto)."""
     # El idioma ya está establecido por LanguagePolicyMiddleware
     # No forzar ningún idioma aquí, respetar la preferencia del usuario
 
@@ -817,18 +834,20 @@ def dashboard_centro_operaciones_espacial(request):
         pass
 
     # Usar template resolution unificado
+    from django.template import TemplateDoesNotExist
+    from django.template.loader import get_template
     from django.template.response import TemplateResponse
     from django.utils.translation import get_language
     from taller.utils.templates import select_country_lang_template
 
     # Seleccionar template espacial
-    # Para USA, siempre usar el template de USA (soporta inglés y español)
-    if hasattr(empresa, "pais") and empresa.pais == "US":
-        template_name = "taller/us/en/dashboard/centro_operaciones_espacial.html"
-        context["use_usa_base"] = True
-    elif request.path.startswith("/us/"):
-        # Para rutas /us/, siempre usar template de USA (tiene traducciones)
-        template_name = "taller/us/en/dashboard/centro_operaciones_espacial.html"
+    # Para USA: taller/us/en/ NO existe, usar taller/us/es/ o taller/common/
+    if (hasattr(empresa, "pais") and empresa.pais == "US") or request.path.startswith("/us/"):
+        template_name = select_country_lang_template(
+            "dashboard/centro_operaciones_espacial.html",
+            "us",
+            get_language(),
+        )
         context["use_usa_base"] = True
     else:
         template_name = select_country_lang_template(
@@ -836,5 +855,11 @@ def dashboard_centro_operaciones_espacial(request):
             getattr(empresa, "pais", "cl").lower(),
             get_language(),
         )
+
+    # Fallback explícito si el template no existe (p. ej. deploy incompleto)
+    try:
+        get_template(template_name)
+    except TemplateDoesNotExist:
+        template_name = "taller/common/dashboard/centro_operaciones_espacial.html"
 
     return TemplateResponse(request, template_name, context)

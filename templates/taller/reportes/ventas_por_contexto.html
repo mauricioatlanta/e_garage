@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load humanize %}
+{% load i18n %}
+
+{% block title %}{% trans "Sales by Context" %} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h2 class="mb-4">{% trans "Sales by Context" %}</h2>
+  <p class="text-muted">{% trans "Period" %}: {{ fecha_desde|date:"Y-m-d" }} — {{ fecha_hasta|date:"Y-m-d" }}</p>
+
+  <div class="row g-4 mb-4">
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-primary">
+        <div class="card-body">
+          <h6 class="text-muted">{% trans "Services Sales" %}</h6>
+          <h4 class="text-primary">${{ ventas_servicios|floatformat:0|intcomma }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-success">
+        <div class="card-body">
+          <h6 class="text-muted">{% trans "Parts Sold" %}</h6>
+          <h4 class="text-success">${{ repuestos_vendidos|floatformat:0|intcomma }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-info">
+        <div class="card-body">
+          <h6 class="text-muted">{% trans "Customer Supplied (count)" %}</h6>
+          <h4 class="text-info">{{ customer_supplied_count }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6 col-lg-3">
+      <div class="card border-warning">
+        <div class="card-body">
+          <h6 class="text-muted">{% trans "Mixed Documents" %}</h6>
+          <h4 class="text-warning">{{ mixed_count }}</h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <form method="get" class="d-flex gap-2 align-items-end flex-wrap">
+    <div>
+      <label for="fecha_desde" class="form-label">{% trans "From" %}</label>
+      <input type="date" name="fecha_desde" id="fecha_desde" value="{{ fecha_desde|date:'Y-m-d' }}" class="form-control">
+    </div>
+    <div>
+      <label for="fecha_hasta" class="form-label">{% trans "To" %}</label>
+      <input type="date" name="fecha_hasta" id="fecha_hasta" value="{{ fecha_hasta|date:'Y-m-d' }}" class="form-control">
+    </div>
+    <button type="submit" class="btn btn-primary">{% trans "Update" %}</button>
+  </form>
+</div>
+{% endblock %}

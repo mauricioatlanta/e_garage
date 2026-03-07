@@ -1,7 +1,7 @@
 // Service Worker para eGarage PWA
-// Versión: 2.1.2 - Actualización con prompt de instalación PWA
-const CACHE_NAME = 'egarage-v2.1.2';
-const RUNTIME_CACHE = 'egarage-runtime-v2.1.2';
+// Versión: 2.1.5 - Invalidar caché para jQuery/Select2/documentos (fix 403 y tax)
+const CACHE_NAME = 'egarage-v2.1.5';
+const RUNTIME_CACHE = 'egarage-runtime-v2.1.5';
 
 // Archivos estáticos críticos para cachear
 const STATIC_CACHE_URLS = [

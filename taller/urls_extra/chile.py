@@ -12,6 +12,11 @@ from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones,
     dashboard_centro_operaciones_espacial,
 )
+from taller.views_extra.centro_trabajo import (
+    centro_trabajo,
+    centro_trabajo_buscar,
+    vehiculo_historial,
+)
 from taller.views_extra.views import dashboard
 from taller.views_extra.ai_lab import ai_lab_dashboard
 from taller.views_extra.views_configuracion import (
@@ -32,7 +37,11 @@ urlpatterns = [
     # Vista de inicio para /cl/es/ - redirige a la página principal de Chile
     path("", lambda request: HttpResponseRedirect("/cl/"), name="chile_home"),
     # URLs principales de taller (configuración, settings, etc.)
-    # Incluir las rutas específicas que necesitamos
+    # Centro de Trabajo / Recepción Vehicular (nueva home post-login)
+    path("workspace/", centro_trabajo, name="centro_trabajo"),
+    path("workspace/buscar/", centro_trabajo_buscar, name="centro_trabajo_buscar"),
+    path("vehiculos/<int:vehiculo_id>/historial/", vehiculo_historial, name="vehiculo_historial"),
+    # Dashboard / Centro de Operaciones (métricas, reportes)
     path("dashboard/", dashboard, name="dashboard"),
     path("lab/", ai_lab_dashboard, name="ai_lab"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
@@ -180,8 +189,8 @@ urlpatterns = [
         "autocomplete/",
         include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),
     ),
-    # Centro de Ingreso Pro (kiosk recepción)
-    path("ops/", include(("taller.ops.urls", "ops"), namespace="ops")),
+    # Centro de Ingreso Pro (kiosk recepción) — solo si existe el módulo taller.ops
+    # path("ops/", include(("taller.ops.urls", "ops"), namespace="ops")),
     # Crear nuevos motores, cajas y colores (usando views_create_parts)
     # path('vehiculos/crear-motor/', crear_motor, name='crear_motor'),  # ❌ Desactivado - usar vehiculos:crear_motor
     # path('vehiculos/crear-caja/', crear_caja, name='crear_caja'),    # ❌ Desactivado - usar vehiculos:crear_caja

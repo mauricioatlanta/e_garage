@@ -1,0 +1,76 @@
+{% extends "taller/common/base.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}{{ vehiculo.patente }} - {{ empresa.nombre_taller }}{% endblock %}
+
+{% block content %}
+<section class="mx-auto max-w-5xl px-4 py-8">
+  {# Botón volver #}
+  <div class="mb-6">
+    <a href="{{ url_centro_trabajo }}" class="text-sm text-white/60 hover:text-emerald-400">← {% trans "Centro de Trabajo" %}</a>
+  </div>
+
+  {# Ficha principal del vehículo #}
+  <div class="mb-8 rounded-2xl border border-emerald-500/40 bg-gray-900/80 p-6 shadow-xl backdrop-blur-sm">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+      <div>
+        <h1 class="text-2xl font-bold text-white">
+          {{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}{% if vehiculo.anio %} {{ vehiculo.anio }}{% endif %}
+        </h1>
+        <div class="mt-3 flex flex-wrap gap-2 text-sm">
+          <span class="rounded-lg border border-emerald-500/40 bg-emerald-500/20 px-3 py-1 font-mono font-bold text-emerald-400">{{ vehiculo.patente }}</span>
+          <span class="text-white/70">{{ vehiculo.cliente.nombre }}</span>
+          {% if vehiculo.vin %}<span class="text-white/50">VIN: {{ vehiculo.vin }}</span>{% endif %}
+          {% if vehiculo.color %}<span class="text-white/50">{% trans "Color" %}: {{ vehiculo.color }}</span>{% endif %}
+          {% if vehiculo.motor %}<span class="text-white/50">{% trans "Motor" %}: {{ vehiculo.motor }}</span>{% endif %}
+          {% if vehiculo.caja %}<span class="text-white/50">{% trans "Caja" %}: {{ vehiculo.caja }}</span>{% endif %}
+        </div>
+        <p class="mt-2 text-xs text-white/50">
+          {% trans "Total de ingresos" %}: {{ documentos|length }}
+        </p>
+      </div>
+      <div>
+        <a href="{{ crear_documento_url }}" class="inline-block rounded-xl bg-emerald-500 px-6 py-3 font-bold text-black hover:bg-emerald-400">
+          {% trans "Ingresar nuevo servicio" %}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  {# Historial en cards #}
+  <h2 class="mb-4 text-lg font-bold text-white">{% trans "Historial de ingresos" %}</h2>
+  <div class="space-y-4">
+    {% for doc in documentos %}
+    <div class="rounded-xl border border-white/10 bg-white/5 p-5 transition hover:border-emerald-500/30">
+      <div class="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <div class="font-bold text-white">{{ doc.get_tipo_display|default:doc.tipo }} • {{ doc.fecha_emision|date:"d/m/Y" }}</div>
+          {% if doc.numero %}<span class="text-sm text-white/60">#{{ doc.numero }}</span>{% endif %}
+          <span class="ml-2 rounded px-2 py-0.5 text-xs {% if doc.estado == 'EMITIDO' %}bg-emerald-500/30 text-emerald-300{% elif doc.estado == 'BORRADOR' %}bg-amber-500/30 text-amber-300{% else %}bg-white/10 text-white/70{% endif %}">{{ doc.estado|default:"—" }}</span>
+        </div>
+        <a href="{{ doc._url_ver }}" class="rounded-lg border border-emerald-500/50 px-4 py-2 text-sm font-medium text-emerald-400 hover:bg-emerald-500/20">
+          {% trans "Ver documento" %}
+        </a>
+      </div>
+      {% if doc.tecnico_responsable %}<p class="mt-1 text-xs text-white/50">{% trans "Técnico" %}: {{ doc.tecnico_responsable.nombre }}</p>{% endif %}
+      <div class="mt-3 flex flex-wrap gap-4 text-sm text-white/70">
+        {% if doc._servicios_resumen %}
+        <span>{% trans "Servicios" %}: {{ doc._servicios_resumen|join:", " }}{% if doc._servicios_extra %} +{{ doc._servicios_extra }} {% trans "más" %}{% endif %}</span>
+        {% endif %}
+        {% if doc._repuestos_resumen %}
+        <span>{% trans "Repuestos" %}: {{ doc._repuestos_resumen|join:", " }}{% if doc._repuestos_extra %} +{{ doc._repuestos_extra }} {% trans "más" %}{% endif %}</span>
+        {% endif %}
+      </div>
+      {% if doc._total_doc %}
+      <p class="mt-2 text-sm font-medium text-emerald-400">{{ doc._total_doc|floatformat:0 }} {{ empresa.simbolo_moneda|default:"$" }}</p>
+      {% endif %}
+    </div>
+    {% empty %}
+    <div class="rounded-xl border border-white/10 bg-white/5 px-6 py-10 text-center text-white/60">
+      {% trans "Este vehículo aún no tiene historial de documentos." %}
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

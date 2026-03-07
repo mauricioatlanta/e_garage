@@ -80,6 +80,13 @@ class ConfiguracionEmpresa(models.Model):
         verbose_name="Tasa de Impuesto",
         help_text="IVA/Sales tax %",
     )
+    sales_tax_rate = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal("0.00"),
+        verbose_name="Sales tax % (USA)",
+        help_text="Porcentaje de sales tax para documentos USA (ej: 7.00). Editable en Ajustes.",
+    )
     aplicar_impuesto_por_defecto = models.BooleanField(
         default=False,
         verbose_name="Aplicar impuesto por defecto",
@@ -216,11 +223,13 @@ class ConfiguracionEmpresa(models.Model):
                 'kilometraje': bool,
             }
         """
+        usa_vehiculos = getattr(self, "usa_vehiculos", True)
+        usa_kilometraje = getattr(self, "usa_kilometraje", None)
         secciones = {
             "repuestos": True,
             "servicios": getattr(self, "usa_servicios", True),
             "otros_servicios": getattr(self, "usa_otros_servicios", False),
-            "kilometraje": getattr(self, "usa_kilometraje", False),
+            "kilometraje": usa_kilometraje if usa_kilometraje is not None else usa_vehiculos,
         }
 
         # Ajustes según rubro
@@ -229,6 +238,17 @@ class ConfiguracionEmpresa(models.Model):
             secciones["servicios"] = False
             secciones["otros_servicios"] = False
             secciones["kilometraje"] = False
+        elif self.rubro_principal in (
+            "WORKSHOP",
+            "WORKSHOP_MOTO",
+            "WORKSHOP_HEAVY",
+            "BODYSHOP",
+            "ELECTRIC",
+            "FLEET",
+            "MIXED",
+        ):
+            # Talleres mecánicos: mostrar kilometraje/millas
+            secciones["kilometraje"] = True
         elif self.rubro_principal == "TIRE":
             # Vulcanización: servicios y repuestos, con kilometraje
             secciones["repuestos"] = True
@@ -259,6 +279,7 @@ class ConfiguracionEmpresa(models.Model):
     def get_ui_config(self):
         """
         Retorna configuración de UI para el formulario de documentos.
+        tax_lines se añade en la vista según país (USA: sales_tax_rate).
         """
         secciones = self.get_secciones_visibles()
         return {

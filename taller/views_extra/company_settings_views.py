@@ -1,14 +1,17 @@
+import logging
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
 from django.shortcuts import redirect, render
+from django.urls import reverse
 
 from taller.forms.company_settings_forms import (
     CompanyProfileForm,
     FinancialSettingsForm,
     ThemeSettingsForm,
 )
-from taller.forms.configuracion_empresa_form import ConfiguracionEmpresaForm
+from taller.forms.configuracion_empresa import ConfiguracionEmpresaForm
 from taller.forms.configuracion_forms import ConfiguracionRubroForm
 from taller.models import Tecnico
 from taller.models.company_settings import CompanySettings
@@ -16,27 +19,86 @@ from taller.models.configuracion import ConfiguracionEmpresa
 from taller.utils.empresa import get_or_create_empresa
 from taller.utils.pais_utils import get_configuracion_pais
 
+logger = logging.getLogger(__name__)
+
+
+def _redirect_on_settings_error(request):
+    """Redirige al centro de operaciones simple dentro del contexto del país (no a la raíz)."""
+    path = request.path or ""
+    if "/us/" in path or path.startswith("/us"):
+        try:
+            return redirect(reverse("usa:centro_operaciones"))
+        except Exception:
+            return redirect("/us/centro-operaciones/")
+    elif "/cl/" in path or path.startswith("/cl"):
+        try:
+            return redirect(reverse("chile:centro_operaciones"))
+        except Exception:
+            return redirect("/cl/es/centro-operaciones/")
+    try:
+        return redirect(reverse("chile:centro_operaciones"))
+    except Exception:
+        return redirect("/cl/es/centro-operaciones/")
+
 
 @login_required(login_url=None)
 def company_settings_view(request):
-    empresa = get_or_create_empresa(request)
-    config_empresa, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
+    try:
+        empresa = get_or_create_empresa(request)
+    except Exception as e:
+        logger.exception(
+            "company_settings: error en get_or_create_empresa (usuario=%s)",
+            getattr(request.user, "pk", None),
+        )
+        raise  # DEBUG: quitar redirect para ver el error real
+
+    try:
+        config_empresa, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
+    except Exception as e:
+        logger.exception(
+            "company_settings: error en ConfiguracionEmpresa (empresa_id=%s)",
+            getattr(empresa, "pk", None),
+        )
+        raise  # DEBUG: quitar redirect para ver el error real
 
     # Obtener o crear configuración
     try:
         config = CompanySettings.objects.get(user=request.user)
     except CompanySettings.DoesNotExist:
-        country_config = get_configuracion_pais(empresa)
-        config = CompanySettings.objects.create(
-            user=request.user,
-            company_name=empresa.nombre_taller or "Mi Empresa",
-            tagline="",
-            primary_color="#0d6efd",
-            secondary_color="#6c757d",
-            currency=country_config.get("moneda", "CLP"),
+        try:
+            try:
+                country_config = get_configuracion_pais(empresa)
+                currency = country_config.get("currency") or country_config.get("moneda", "CLP")
+            except Exception:
+                currency = "USD" if ("/us/" in (request.path or "")) else "CLP"
+            config = CompanySettings.objects.create(
+                user=request.user,
+                company_name=empresa.nombre_taller or "Mi Empresa",
+                tagline="",
+                primary_color="#0d6efd",
+                secondary_color="#6c757d",
+                currency=currency,
+            )
+        except Exception as e:
+            logger.exception(
+                "company_settings: error al crear CompanySettings (user_id=%s)",
+                getattr(request.user, "pk", None),
+            )
+            # Reintentar get por si se creó en paralelo (race)
+            try:
+                config = CompanySettings.objects.get(user=request.user)
+            except CompanySettings.DoesNotExist:
+                raise  # DEBUG: quitar redirect para ver el error real
+    except Exception as e:
+        logger.exception(
+            "company_settings: redirect por error al obtener CompanySettings (user_id=%s)",
+            getattr(request.user, "pk", None),
         )
+        return _redirect_on_settings_error(request)
 
-    is_spanish = empresa.pais in {"CL", "MX", "PE", "VE", "BR"}
+    # Asegurar que empresa.pais tenga un valor por defecto
+    empresa_pais = getattr(empresa, "pais", "CL") or "CL"
+    is_spanish = empresa_pais in {"CL", "MX", "PE", "VE", "BR"}
 
     if request.method == "POST":
         # Manejar creación de técnico
@@ -199,21 +261,32 @@ def company_settings_view(request):
                         messages.error(request, "❌ Please fix the errors in Industry & Modules.")
     else:
         # GET request - crear formularios limpios
-        profile_form = CompanyProfileForm(instance=config)
-        empresa_form = ConfiguracionEmpresaForm(instance=config_empresa)
-        financial_form = FinancialSettingsForm(instance=config)
-        theme_form = ThemeSettingsForm(instance=config)
-        rubro_form = ConfiguracionRubroForm(instance=config_empresa, request=request)
+        try:
+            profile_form = CompanyProfileForm(instance=config)
+            empresa_form = ConfiguracionEmpresaForm(instance=config_empresa)
+            financial_form = FinancialSettingsForm(instance=config)
+            theme_form = ThemeSettingsForm(instance=config)
+            rubro_form = ConfiguracionRubroForm(instance=config_empresa, request=request)
+        except Exception as e:
+            logger.exception("company_settings: error al inicializar formularios")
+            raise  # DEBUG: quitar redirect para ver el error real
 
     # Obtener técnicos
-    tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("nombre")
+    try:
+        tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("nombre")
+    except Exception as e:
+        # Si hay error al obtener técnicos, usar lista vacía
+        tecnicos = []
+        logger.warning("Error al obtener técnicos: %s", e)
 
-    # Preparar contexto
+    # Preparar contexto (company_settings para base.html footer y otros)
     context = {
         "tecnicos": tecnicos,
         "config": config,
         "config_empresa": config_empresa,
         "empresa": empresa,
+        "empresa_pais": empresa_pais,
+        "company_settings": config,  # base.html usa company_settings en footer
         "profile_form": profile_form,
         "empresa_form": empresa_form,
         "financial_form": financial_form,
@@ -221,6 +294,10 @@ def company_settings_view(request):
         "rubro_form": rubro_form,
     }
 
-    # Usar template compacto
-    template_name = "taller/settings/centro_ajustes_compacto.html"
-    return render(request, template_name, context)
+    # Usar template principal
+    template_name = "taller/settings/centro_ajustes.html"
+    try:
+        return render(request, template_name, context)
+    except Exception as e:
+        logger.exception("company_settings: error al renderizar centro_ajustes.html")
+        raise  # DEBUG: quitar redirect para ver el error real

@@ -3,6 +3,7 @@
 {% load country_url %}
 {% load static %}
 {% load i18n %}
+<!-- TEMPLATE: us/en/vehiculos/crear_vehiculo.html -->
 
 {% block page_title %}{% trans "Create Vehicle" %}{% endblock %}
 {% block page_subtitle %}{% trans "Add a new vehicle to the system" %}{% endblock %}
@@ -18,8 +19,7 @@
 
 {% block page_extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-{# Select2 CSS se carga desde base.html via form.media.css - También lo agregamos aquí para asegurar que se cargue #}
-{% if form %}{{ form.media.css }}{% endif %}
+{# Select2/DAL CSS: base.html ya carga form.media.css en <head> - NO duplicar aquí (evita "DAL select2 already registered") #}
 <style>
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
@@ -352,18 +352,77 @@ input:focus {
 {% endblock %}
 
 {% block panel_content %}
+{# Endpoints para JS: en US EN usamos us_en explícito (country_url genera /us/ sin idioma → 403). #}
+<div id="vehiculos-endpoints" style="display:none;"
+     data-ep-modelos="{% url 'us_en:vehiculos:modelos_por_marca_api' %}"
+     data-ep-modelos-usa="{% url 'us_en:vehiculos:api_modelos_usa' %}"
+     data-ep-clientes="{% url 'us_en:vehiculos:api_busqueda_clientes' %}"
+     data-ep-crear-cliente="{% url 'us_en:clientes:crear_cliente' %}"
+     data-ep-agregar-motor="{% url 'us_en:vehiculos:ajax_agregar_motor' %}"
+     data-ep-agregar-caja="{% url 'us_en:vehiculos:ajax_agregar_caja' %}"
+     data-ep-motores="{% url 'us_en:vehiculos:ajax_motores_por_modelo' %}"
+     data-ep-cajas="{% url 'us_en:vehiculos:ajax_cajas_por_modelo' %}"
+     data-ep-prefill-cliente="{% url 'us_en:vehiculos:api_busqueda_clientes' %}"></div>
 <div class="form-card max-w-4xl mx-auto">
-    <form method="post" id="vehicle-form">
+    {% if messages %}
+    <div class="mb-4 space-y-2">
+      {% for message in messages %}
+      <div class="p-4 rounded-lg border {% if message.tags == 'error' %}border-red-500/50 bg-red-500/10 text-red-400{% elif message.tags == 'success' %}border-emerald-500/50 bg-emerald-500/10 text-emerald-400{% else %}border-amber-500/50 bg-amber-500/10 text-amber-400{% endif %} text-sm font-medium">{{ message }}</div>
+      {% endfor %}
+    </div>
+    {% endif %}
+    {% if form.non_field_errors %}
+    <div class="mb-4 p-4 rounded-lg border border-red-500/50 bg-red-500/10">
+      {% for err in form.non_field_errors %}
+      <p class="text-red-400 text-sm font-medium">{{ err }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+    <form method="post" id="vehicle-form" data-country-prefix="{{ country|lower }}" data-lang-prefix="en"
+          data-prefill-cliente="{{ prefill_cliente|default:'' }}"
+          data-prefill-cliente-nombre="{{ prefill_cliente_nombre|default:'' }}"
+          data-prefill-modelo-id="{{ prefill_modelo_id|default:'' }}"
+          data-prefill-modelo-nombre="{{ prefill_modelo_nombre|default:'' }}"
+          data-prefill-marca="{{ prefill_marca_val|default:'' }}"
+          data-ep-clientes="{% url 'us_en:vehiculos:api_busqueda_clientes' %}"
+          data-ep-crear-cliente="{% url 'us_en:clientes:crear_cliente' %}">
       {% csrf_token %}
-      <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      {% if cliente_id %}<input type="hidden" name="cliente_id" value="{{ cliente_id }}">{% endif %}
+      {% if prefill_cliente %}<input type="hidden" name="prefill_cliente" value="{{ prefill_cliente }}">{% endif %}
+      {% if prefill_cliente %}<input type="hidden" name="cliente" value="{{ prefill_cliente }}">{% endif %}
+      {% if prefill_cliente_nombre %}<input type="hidden" name="prefill_cliente_nombre" value="{{ prefill_cliente_nombre }}">{% endif %}
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-        <div class="form-group">
+        <div class="form-group flex flex-col gap-2" id="cliente-container">
           <label for="{{ form.cliente.id_for_label }}">Customer</label>
-          {{ form.cliente }}
-          {% if form.cliente.errors %}
-            <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
+
+          {% if prefill_cliente %}
+            <div class="p-3 rounded-xl border border-cyan-500/20 bg-black/20">
+              <p class="text-xs text-slate-400">Preselected customer (from document)</p>
+              <p class="font-semibold text-cyan-200">
+                {{ prefill_cliente_nombre|default:"Customer #" }}{% if not prefill_cliente_nombre %}{{ prefill_cliente }}{% endif %}
+              </p>
+              <p class="text-xs text-slate-400 mt-1">You don't need to search again.</p>
+            </div>
+            {# Mantener el field en el DOM por si JS lo necesita, pero oculto #}
+            <div class="hidden">
+              {{ form.cliente }}
+            </div>
+          {% else %}
+            {{ form.cliente }}
+            <a href="{% country_url 'clientes:crear_cliente' %}?next={{ request.get_full_path|urlencode }}"
+               class="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 rounded px-2 py-1 w-fit"
+               id="link-crear-cliente">
+              <span aria-hidden="true">➕</span>
+              <span>Add new customer</span>
+            </a>
+            {% if form.cliente.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.cliente.errors.0 }}</div>
+            {% endif %}
+            <p class="text-xs text-slate-400 mt-1" id="cliente-hint">Real-time search: type name, email or phone to find registered customers.</p>
+            <p class="text-xs text-cyan-300/80 mt-0.5 hidden" id="cliente-focus-hint" aria-live="polite">Start typing to see results.</p>
           {% endif %}
         </div>
 
@@ -486,80 +545,224 @@ input:focus {
 {% endblock %}
 
 {% block page_extra_js %}
-
+{# DAL/Select2 JS: base.html ya carga form.media.js al final del body - NO duplicar aquí (evita "DAL select2 already registered") #}
 <script>
-// Definir countryPrefix globalmente
-const countryPrefix = '/us/';
+// Endpoints: TODO viene de data-* (vehiculos-endpoints). NO construir URLs en JS.
+(function(){
+  const ep = document.getElementById('vehiculos-endpoints');
+  window.vehiculosEndpoints = ep ? ep.dataset : {};
+})();
+// Evitar ReferenceError "autocompleteUrl is not defined" (TDZ): usar window, no const global
+(function(){
+  const el = document.getElementById('vehiculos-endpoints');
+  window.autocompleteUrl = (el && (el.dataset.epClientes || el.dataset.epModelos)) || '';
+})();
+
+// Prefill cliente desde URL (prefill_cliente=79): inyectar opción en Select2/DAL
+(function () {
+  function runPrefill() {
+    const form = document.getElementById("vehicle-form");
+    const params = new URLSearchParams(window.location.search);
+    const raw = (form && form.getAttribute("data-prefill-cliente")) || params.get("prefill_cliente") || params.get("cliente_id") || "";
+    const prefillId = (raw + "").trim();
+    if (!prefillId) return;
+
+    const el = document.getElementById("id_cliente");
+    if (!el) return;
+
+    if (!window.jQuery) {
+      el.value = prefillId;
+      return;
+    }
+
+    const $el = window.jQuery(el);
+    const currentVal = ($el.val() || "").toString().trim();
+    if (currentVal) return;
+
+    const labelFromBackend = (form && form.getAttribute("data-prefill-cliente-nombre")) || "";
+    const label = (labelFromBackend && labelFromBackend.trim()) ? labelFromBackend.trim() : null;
+
+    function applyOption(optionLabel) {
+      const option = new Option(optionLabel || prefillId, prefillId, true, true);
+      $el.append(option).trigger("change");
+    }
+
+    if (label) {
+      applyOption(label);
+      return;
+    }
+
+    var ep = window.vehiculosEndpoints || {};
+    var baseUrl = (ep.epPrefillCliente || ep.epClientes || (form && form.getAttribute('data-ep-clientes'))) || '';
+    var url = baseUrl ? (baseUrl + (baseUrl.includes('?') ? '&' : '?') + 'id=' + encodeURIComponent(prefillId)) : '';
+    if (!url) {
+      applyOption(prefillId);
+      return;
+    }
+    fetch(url, { credentials: "same-origin" })
+      .then(function (r) { return r.json(); })
+      .then(function (data) {
+        var optionLabel = (data.results && data.results[0] && data.results[0].text) ? data.results[0].text : prefillId;
+        applyOption(optionLabel);
+      })
+      .catch(function () {
+        applyOption(prefillId);
+      });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { setTimeout(runPrefill, 400); });
+  } else {
+    setTimeout(runPrefill, 400);
+  }
+})();
+
+// Fallback: si Select2 queda vacío, setear id_cliente con prefill_cliente o cliente_id de la URL
+(function () {
+  const url = new URL(window.location.href);
+  const prefill = (url.searchParams.get("prefill_cliente") || url.searchParams.get("cliente_id") || "").trim();
+  if (!prefill) return;
+
+  const el = document.getElementById("id_cliente");
+  if (!el) return;
+
+  function applyFallback() {
+    if ((el.value || "").toString().trim()) return;
+    el.value = prefill;
+    if (window.jQuery && window.jQuery.fn && window.jQuery.fn.select2) {
+      window.jQuery(el).trigger("change");
+    } else {
+      el.dispatchEvent(new Event("change", { bubbles: true }));
+    }
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", function () { setTimeout(applyFallback, 600); });
+  } else {
+    setTimeout(applyFallback, 600);
+  }
+})();
 
 // Verificar inicialización de Select2 después de que form.media haya cargado
 // form.media carga los scripts de DAL que inicializan Select2 automáticamente
 $(document).ready(function() {
-    // Función para verificar y aplicar estilos a Select2
+    // Función para verificar y aplicar estilos a Select2 (usa window.autocompleteUrl, sin TDZ)
     function checkAndStyleSelect2() {
+        const autocompleteUrl = (window.autocompleteUrl || '').trim();
+        if (!autocompleteUrl) {
+            console.warn('[Select2] autocompleteUrl missing; skipping style check');
+            // NO retornar: igual aplica estilos/hints aunque falte autocompleteUrl
+        }
         // Aplicar estilos a los contenedores de Select2
         $('.select2-container').each(function() {
             $(this).css('width', '100%');
         });
         
+        // Hint al foco: "Start typing to see results"
+        (function() {
+            var hint = document.getElementById('cliente-focus-hint');
+            var general = document.getElementById('cliente-hint');
+            var container = document.getElementById('cliente-container');
+            if (!hint || !container) return;
+            function showFocusHint() {
+                if (general) general.classList.add('hidden');
+                hint.classList.remove('hidden');
+            }
+            function hideFocusHint() {
+                hint.classList.add('hidden');
+                if (general) general.classList.remove('hidden');
+            }
+            container.addEventListener('focusin', showFocusHint);
+            container.addEventListener('focusout', function(e) {
+                if (!container.contains(e.relatedTarget)) hideFocusHint();
+            });
+        })();
+
         // Debug: verificar que el campo cliente esté inicializado
         const clienteField = $('#id_cliente');
         if (clienteField.length) {
             const isInitialized = clienteField.hasClass('select2-hidden-accessible');
-            let autocompleteUrl = clienteField.attr('data-autocomplete-light-url');
+            const ep = window.vehiculosEndpoints || {};
+            const apiClientesUrl = (ep.epClientes || '').trim() || (document.getElementById('vehicle-form') && document.getElementById('vehicle-form').getAttribute('data-ep-clientes')) || '';
             
             console.log('✅ Cliente field found');
             console.log('Select2 initialized:', isInitialized);
-            console.log('Autocomplete URL (original):', autocompleteUrl);
-            console.log('Country prefix:', countryPrefix);
+            console.log('API clientes URL (desde data-ep-clientes):', apiClientesUrl);
             
-            // 🔧 FIX: asegurar que la URL del autocomplete tenga el prefijo del país (/us/, /cl/, etc.)
-            if (autocompleteUrl) {
-                const originalUrl = autocompleteUrl;
-                // Si la URL NO empieza con el prefijo de país, lo agregamos
-                if (!autocompleteUrl.startsWith(countryPrefix)) {
-                    // Remover cualquier slash inicial y agregar el prefijo de país
-                    const nuevaUrl = countryPrefix + autocompleteUrl.replace(/^\/+/, '');
-                    console.log('🔧 Corrigiendo URL autocomplete cliente:', originalUrl, '→', nuevaUrl);
-                    clienteField.attr('data-autocomplete-light-url', nuevaUrl);
-                    autocompleteUrl = nuevaUrl; // Actualizar la variable para el resto del código
-                    
-                    // Si ya estaba inicializado, forzamos re-inicialización de DAL
+            // Si DAL generó URL relativa, sobrescribir con URL correcta
+            if (apiClientesUrl) {
+                const currentUrl = clienteField.attr('data-autocomplete-light-url') || '';
+                if (currentUrl && currentUrl !== apiClientesUrl && !currentUrl.startsWith('/')) {
+                    clienteField.attr('data-autocomplete-light-url', apiClientesUrl);
                     if (clienteField.hasClass('select2-hidden-accessible')) {
-                        console.log('🔄 Re-inicializando DAL para cliente field con nueva URL...');
                         clienteField.removeClass('select2-hidden-accessible');
-                        // Disparar el evento que DAL escucha
                         $(document).trigger('autocompleteLightInitialize');
                     }
-                } else {
-                    console.log('✅ URL del autocomplete ya tiene el prefijo de país correcto');
                 }
             }
             
-            console.log('Autocomplete URL (final):', autocompleteUrl);
-            console.log('Field HTML:', clienteField[0].outerHTML.substring(0, 200));
-            
-            // Si Select2 no está inicializado, intentar inicialización manual
-            if (!isInitialized) {
-                console.warn('⚠️ Select2 not initialized for cliente field. Attempting manual initialization...');
-                
-                // Verificar que las dependencias estén disponibles
-                if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
-                    // Intentar inicialización manual si DAL no lo hizo
-                    if (autocompleteUrl && typeof yl !== 'undefined' && typeof yl.registerFunction === 'function') {
-                        // DAL debería inicializarlo, pero si no, esperar un poco más
-                        console.log('DAL y Select2 disponibles, esperando inicialización automática...');
-                    } else {
-                        console.error('⚠️ Faltan dependencias: Select2 plugin o DAL no disponibles');
-                        console.error('jQuery disponible:', typeof $ !== 'undefined');
-                        console.error('Select2 disponible:', typeof $.fn.select2 !== 'undefined');
-                        console.error('DAL (yl) disponible:', typeof yl !== 'undefined');
-                    }
-                } else {
-                    console.error('⚠️ jQuery o Select2 no están disponibles');
+            // Si Select2 no está inicializado, intentar ahora o más tarde (form.media puede cargar después)
+            function initClienteSelect2WithApi() {
+                if (!clienteField.length || clienteField.hasClass('select2-hidden-accessible')) return;
+                if (typeof $ === 'undefined' || typeof $.fn.select2 === 'undefined') return;
+                const url = apiClientesUrl;
+                if (!url) return;
+                try {
+                    clienteField.select2({
+                        placeholder: 'Type to search by name, email or phone...',
+                        allowClear: true,
+                        width: '100%',
+                        minimumInputLength: 0,
+                        ajax: {
+                            url: url,
+                            dataType: 'json',
+                            delay: 250,
+                            data: function(params) { return { q: (params.term || '').trim() }; },
+                            processResults: function(data) {
+                                if (Array.isArray(data)) {
+                                    return {
+                                        results: data.map(function(item) {
+                                            var text = [item.nombre, item.apellido].filter(Boolean).join(' ');
+                                            if (item.email) text += ' – ' + item.email;
+                                            if (item.telefono) text += ' (' + item.telefono + ')';
+                                            return { id: item.id, text: text || String(item.id) };
+                                        })
+                                    };
+                                }
+                                if (data.results && Array.isArray(data.results)) {
+                                    return { results: data.results, pagination: data.pagination ? { more: data.pagination.more } : {} };
+                                }
+                                return { results: [] };
+                            },
+                            cache: true
+                        }
+                    });
+                    console.log('✅ Cliente Select2 initialized with real-time search (API)');
+                } catch (e) {
+                    console.error('❌ Error initializing cliente Select2:', e);
                 }
-            } else if (!autocompleteUrl) {
-                console.warn('⚠️ Cliente field initialized but missing data-autocomplete-light-url attribute');
-            } else {
+            }
+            if (!isInitialized) {
+                if (typeof $ !== 'undefined' && typeof $.fn.select2 !== 'undefined') {
+                    initClienteSelect2WithApi();
+                } else {
+                    window.addEventListener('load', function() {
+                        setTimeout(initClienteSelect2WithApi, 600);
+                        setTimeout(initClienteSelect2WithApi, 2000);
+                    });
+                }
+            }
+            if (!isInitialized && typeof $ !== 'undefined' && typeof $.fn.select2 === 'undefined') {
+                window.addEventListener('load', function() { setTimeout(initClienteSelect2WithApi, 2000); });
+            }
+            if (!clienteField.hasClass('select2-hidden-accessible')) {
+                window.addEventListener('load', function() { setTimeout(initClienteSelect2WithApi, 2500); });
+            }
+            // ✅ Ya no usamos "autocompleteUrl" (era legacy y no existe)
+            // Tomamos el endpoint real desde dataset: apiClientesUrl
+            if (!apiClientesUrl) {
+                console.warn('⚠️ Falta endpoint de clientes (data-ep-clientes). No se puede hacer fallback API.');
+            } else if (isInitialized) {
                 console.log('✅ Cliente field properly initialized with autocomplete');
             }
         } else {
@@ -579,44 +782,14 @@ $(document).ready(function() {
             }
         }
         
-        // Verificar y corregir campos de motor y caja
+        // Motor y caja: DAL usa URLs desde form.media (ya correctas si request tiene country). No sobrescribir.
         const motorField = $('#id_motor');
         const cajaField = $('#id_caja');
-        
-        // 🔧 FIX: Corregir URL del autocomplete para motor
         if (motorField.length) {
-            let motorUrl = motorField.attr('data-autocomplete-light-url');
             console.log('✅ Motor field found, Select2:', motorField.hasClass('select2-hidden-accessible'));
-            console.log('Motor autocomplete URL (original):', motorUrl);
-            
-            if (motorUrl && !motorUrl.startsWith(countryPrefix)) {
-                const nuevaUrlMotor = countryPrefix + motorUrl.replace(/^\/+/, '');
-                console.log('🔧 Corrigiendo URL autocomplete motor:', motorUrl, '→', nuevaUrlMotor);
-                motorField.attr('data-autocomplete-light-url', nuevaUrlMotor);
-                
-                if (motorField.hasClass('select2-hidden-accessible')) {
-                    motorField.removeClass('select2-hidden-accessible');
-                    $(document).trigger('autocompleteLightInitialize');
-                }
-            }
         }
-        
-        // 🔧 FIX: Corregir URL del autocomplete para caja
         if (cajaField.length) {
-            let cajaUrl = cajaField.attr('data-autocomplete-light-url');
             console.log('✅ Caja field found, Select2:', cajaField.hasClass('select2-hidden-accessible'));
-            console.log('Caja autocomplete URL (original):', cajaUrl);
-            
-            if (cajaUrl && !cajaUrl.startsWith(countryPrefix)) {
-                const nuevaUrlCaja = countryPrefix + cajaUrl.replace(/^\/+/, '');
-                console.log('🔧 Corrigiendo URL autocomplete caja:', cajaUrl, '→', nuevaUrlCaja);
-                cajaField.attr('data-autocomplete-light-url', nuevaUrlCaja);
-                
-                if (cajaField.hasClass('select2-hidden-accessible')) {
-                    cajaField.removeClass('select2-hidden-accessible');
-                    $(document).trigger('autocompleteLightInitialize');
-                }
-            }
         }
     }
     
@@ -630,20 +803,21 @@ $(document).ready(function() {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
-    // URLs para endpoints AJAX
-    const urlAgregarMotor = "{% country_url 'vehiculos:ajax_agregar_motor' %}";
-    const urlAgregarCaja = "{% country_url 'vehiculos:ajax_agregar_caja' %}";
-    const urlModelosPorMarca = "{% country_url 'vehiculos:ajax_modelos_por_marca' %}";
-    const urlModelosPorMarcaApi = "{% country_url 'vehiculos:modelos_por_marca_api' %}";
-    const urlMotoresPorModelo = "{% country_url 'vehiculos:ajax_motores_por_modelo' %}";
-    const urlCajasPorModelo = "{% country_url 'vehiculos:ajax_cajas_por_modelo' %}";
-    const urlMarcas = "{% country_url 'vehiculos:api_marcas' %}";
+    // Regla: todo endpoint viene de data-* (vehiculos-endpoints). NO construir URLs en JS.
+    const ep = window.vehiculosEndpoints || {};
+    const urlAgregarMotor = (ep.epAgregarMotor || '').trim();
+    const urlAgregarCaja = (ep.epAgregarCaja || '').trim();
+    const urlModelosPorMarcaApi = (ep.epModelos || '').trim();
+    const urlModelosUsa = (ep.epModelosUsa || '').trim();
+    const urlMotoresPorModelo = (ep.epMotores || '').trim();
+    const urlCajasPorModelo = (ep.epCajas || '').trim();
 
     const marcaSelect = document.getElementById('id_marca');
     const modeloSelect = document.getElementById('id_modelo');
     const anioSelect = document.getElementById('id_anio');
 
     // Función para cargar modelos por marca y año
+    // USA puede usar catálogo (marca = texto como "Toyota") o modelo Marca (marca_id numérico)
     function cargarModelos(marcaId, anio = null, modeloSeleccionado = null) {
         if (!modeloSelect) return;
         
@@ -655,15 +829,26 @@ document.addEventListener('DOMContentLoaded', function() {
             loadingOption.textContent = 'Loading models...';
             modeloSelect.appendChild(loadingOption);
 
-            let url = `${urlModelosPorMarcaApi}?marca_id=${marcaId}`;
-            if (anio) {
-                url += `&anio=${anio}`;
+            const isMarcaId = /^\d+$/.test(String(marcaId).trim());
+            let url;
+            if (isMarcaId) {
+                url = `${urlModelosPorMarcaApi}?marca_id=${encodeURIComponent(marcaId)}`;
+                if (anio) url += `&anio=${anio}`;
+            } else {
+                url = `${urlModelosUsa}?marca=${encodeURIComponent(marcaId)}`;
             }
 
-            console.log('Loading models for marca_id:', marcaId, 'anio:', anio);
+            console.log('Loading models for marca:', marcaId, isMarcaId ? '(id)' : '(name)', 'anio:', anio);
             console.log('URL:', url);
             
-            fetch(url)
+            fetch(url, {
+              method: 'GET',
+              credentials: 'same-origin',
+              headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json',
+              }
+            })
                 .then(response => {
                     console.log('Response status:', response.status, response.statusText);
                     if (!response.ok) {
@@ -679,6 +864,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (data.length === 0) {
                             console.warn('No models found for marca_id:', marcaId);
                             modeloSelect.innerHTML = '<option value="">No models available for this brand</option>';
+                            if (window.jQuery && jQuery('#id_modelo').length) jQuery('#id_modelo').trigger('change');
                         } else {
                             console.log(`✅ Found ${data.length} models`);
                             data.forEach(modelo => {
@@ -692,7 +878,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
                                 modeloSelect.appendChild(option);
                             });
-                            
+                            // Si modelo usa Select2, disparar change para refrescar UI visible
+                            if (window.jQuery && jQuery('#id_modelo').length) {
+                                jQuery('#id_modelo').trigger('change');
+                            }
                             // Si hay un modelo seleccionado, cargar sus motores y cajas
                             if (modeloSeleccionado) {
                                 cargarMotoresYCajas(modeloSeleccionado);
@@ -701,11 +890,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else {
                         console.error('Data is not an array:', data);
                         modeloSelect.innerHTML = '<option value="">Error: incorrect data format</option>';
+                        if (window.jQuery && jQuery('#id_modelo').length) jQuery('#id_modelo').trigger('change');
                     }
                 })
                 .catch(error => {
                     console.error('Error loading models:', error);
                     modeloSelect.innerHTML = '<option value="">Error loading models. Check console for details.</option>';
+                    if (window.jQuery && jQuery('#id_modelo').length) jQuery('#id_modelo').trigger('change');
                 });
         }
     }
@@ -1060,6 +1251,77 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+{# Rehidratación: cuando el form vuelve por error (patente/VIN duplicado, etc), recargar modelos y reseleccionar #}
+{# USA: marca puede ser string (catálogo "Fiat") → api/modelos-usa/ | numérico → api/modelos-por-marca/ #}
+<script>
+document.addEventListener("DOMContentLoaded", async function () {
+  const formEl = document.getElementById("vehicle-form");
+  const marcaEl = document.getElementById("id_marca");
+  const modeloEl = document.getElementById("id_modelo");
+  const anioEl = document.getElementById("id_anio");
+
+  if (!formEl || !marcaEl || !modeloEl) return;
+
+  let selectedMarca = (marcaEl.value || "").trim();
+  let selectedModelo = (modeloEl.value || "").trim();
+  const selectedAnio = anioEl ? (anioEl.value || "").trim() : "";
+  // Fallback: usar data-prefill cuando el select está vacío (form con errores)
+  if (!selectedMarca && formEl.dataset.prefillMarca) selectedMarca = (formEl.dataset.prefillMarca || "").trim();
+  if (!selectedModelo && formEl.dataset.prefillModeloId) selectedModelo = (formEl.dataset.prefillModeloId || "").trim();
+
+  if (!selectedMarca || !selectedModelo) return;
+
+  const ep = window.vehiculosEndpoints || {};
+  const urlModelos = (ep.epModelos || "").trim();
+  const urlModelosUsa = (ep.epModelosUsa || "").trim();
+  if (!urlModelos && !urlModelosUsa) return;
+
+  const isMarcaId = /^\d+$/.test(selectedMarca);
+  const url = isMarcaId
+    ? urlModelos + (urlModelos.includes("?") ? "&" : "?") + "marca_id=" + encodeURIComponent(selectedMarca) + (selectedAnio ? "&anio=" + encodeURIComponent(selectedAnio) : "")
+    : urlModelosUsa + (urlModelosUsa.includes("?") ? "&" : "?") + "marca=" + encodeURIComponent(selectedMarca);
+
+  try {
+    const resp = await fetch(url, {
+      method: 'GET',
+      credentials: 'same-origin',
+      headers: {
+        'X-Requested-With': 'XMLHttpRequest',
+        'Accept': 'application/json',
+      }
+    });
+    const data = await resp.json();
+
+    modeloEl.innerHTML = "";
+    let found = false;
+
+    (data || []).forEach(item => {
+      const opt = document.createElement("option");
+      opt.value = item.id;
+      opt.textContent = item.nombre || String(item.id);
+      if (String(item.id) === String(selectedModelo)) {
+        opt.selected = true;
+        found = true;
+      }
+      modeloEl.appendChild(opt);
+    });
+
+    if (!found) {
+      const opt = document.createElement("option");
+      opt.value = selectedModelo;
+      opt.textContent = "(Previously selected)";
+      opt.selected = true;
+      modeloEl.appendChild(opt);
+    }
+    // Si modelo usa Select2, disparar change para refrescar UI visible
+    if (window.jQuery && jQuery(modeloEl).length) {
+      jQuery(modeloEl).trigger('change');
+    }
+  } catch (e) {
+    console.error("Rehidratar modelos falló:", e);
+  }
+});
+</script>
 
 {# form.media ya se carga en base.html (CSS en head, JS al final del body) - NO duplicar aquí #}
 {# Solución: Prevenir doble registro pero permitir inicialización correcta #}
@@ -1133,17 +1395,24 @@ $(document).ready(function() {
 <script>
 // Esperar a que form.media cargue y forzar inicialización de DAL si es necesario
 (function() {
+    var dalRetries = 0;
+    var dalMaxRetries = 50;  // ~5 segundos, evita spam infinito en consola
+
     function initializeDAL() {
+        if (dalRetries >= dalMaxRetries) {
+            return;
+        }
+        dalRetries++;
         // Verificar que DAL y Select2 estén disponibles
         if (typeof yl === 'undefined' || typeof yl.autocomplete === 'undefined') {
-            console.log('[DAL] Esperando que DAL se cargue...');
+            if (dalRetries <= 2) console.log('[DAL] Esperando que DAL se cargue...');
             setTimeout(initializeDAL, 100);
             return;
         }
         
         // Verificar que Select2 esté disponible
         if (typeof $ === 'undefined' || typeof $.fn.select2 === 'undefined') {
-            console.log('[DAL] Esperando que Select2 se cargue...');
+            if (dalRetries <= 2) console.log('[DAL] Esperando que Select2 se cargue...');
             setTimeout(initializeDAL, 100);
             return;
         }
@@ -1197,6 +1466,4 @@ $(document).ready(function() {
     setTimeout(initializeDAL, 2000);
 })();
 </script>
-{# JS de form.media (DAL/Select2) - Asegurar que se cargue #}
-{% if form %}{{ form.media.js }}{% endif %}
 {% endblock %}

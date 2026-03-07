@@ -8,59 +8,10 @@
 {% block extra_head %}{% endblock %}
 
 {% block back_button %}
-{% with back_country=country|default:"CL" %}
-{% if back_country == 'US' %}
-    <a href="/us/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'UY' %}
-    <a href="/uy/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'AR' %}
-    <a href="/ar/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'MX' %}
-    <a href="/mx/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'CO' %}
-    <a href="/co/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'EC' %}
-    <a href="/ec/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'PE' %}
-    <a href="/pe/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'VE' %}
-    <a href="/ve/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'BR' %}
-    <a href="/br/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% else %}
-    <a href="/cl/es/bienvenida/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>Volver</span>
-    </a>
-{% endif %}
-{% endwith %}
+<a href="{% if request.country == 'US' %}/us/{{ request.LANGUAGE_CODE|default:'en' }}/bienvenida/{% elif request.country == 'CL' %}/cl/es/bienvenida/{% else %}/{% endif %}" class="back-button font-futuristic">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    <span>{% trans "Back" %}</span>
+</a>
 {% endblock %}
 
 {% block content %}
@@ -71,30 +22,9 @@
             <div class="logo-container">
                 <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="logo">
             </div>
-            {# Badge de país: usa country del contexto (la vista ya pone empresa.pais si usuario logueado) #}
-            {% with badge_country=country|default:"CL" %}
-            {% if badge_country == 'US' %}
-                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-            {% elif badge_country == 'UY' %}
-                <div class="country-badge font-futuristic">🇺🇾 URUGUAY</div>
-            {% elif badge_country == 'AR' %}
-                <div class="country-badge font-futuristic">🇦🇷 ARGENTINA</div>
-            {% elif badge_country == 'MX' %}
-                <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-            {% elif badge_country == 'CO' %}
-                <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-            {% elif badge_country == 'EC' %}
-                <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-            {% elif badge_country == 'PE' %}
-                <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-            {% elif badge_country == 'VE' %}
-                <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-            {% elif badge_country == 'BR' %}
-                <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-            {% else %}
-                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-            {% endif %}
-            {% endwith %}
+            <div class="country-badge font-futuristic">
+                {% if request.country == 'US' %}🇺🇸 USA{% elif request.country == 'CL' %}🇨🇱 CHILE{% else %}🌍 GLOBAL{% endif %}
+            </div>
         </div>
 
         <!-- Mensajes de error generales -->
@@ -115,7 +45,7 @@
         {% if messages %}
             {% for message in messages %}
                 {% with message_str=message|stringformat:"s" %}
-                    {% if "Successfully signed in" not in message_str and "You have signed out" not in message_str and "Professional Automotive Management System" not in message_str and "Ha iniciado sesión exitosamente" not in message_str and "Ha cerrado sesión" not in message_str and "iniciado sesión exitosamente" not in message_str and "cerrado sesión" not in message_str and "Información de empresa guardada exitosamente" not in message_str %}
+                    {% if "Successfully signed in" not in message_str and "You have signed out" not in message_str and "Professional Automotive Management System" not in message_str and "Ha iniciado sesión exitosamente" not in message_str and "Ha cerrado sesión" not in message_str and "iniciado sesión exitosamente" not in message_str and "cerrado sesión" not in message_str and "Información de empresa guardada exitosamente" not in message_str and "Selecciona o crea tu empresa" not in message_str %}
                         <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
                             {{ message }}
                         </div>
@@ -125,7 +55,7 @@
         {% endif %}
 
         <!-- Formulario -->
-        <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
+        <form method="POST" action="{{ request.get_full_path }}" class="space-y-6">
             {% csrf_token %}
             {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
@@ -201,7 +131,7 @@
         <!-- Sign Up -->
         <div class="signup-section">
             <div class="signup-text">{% if country == 'US' %}{% trans "New to eGarage?" %}{% else %}¿Nuevo en eGarage?{% endif %}</div>
-            <a href="{% url 'account_signup' %}?from={{ country|default:'CL'|lower }}" class="signup-link font-futuristic">
+            <a href="{% url 'account_signup' %}?from={{ request.country_code|default:'CL'|lower }}" class="signup-link font-futuristic">
                 {% if country == 'US' %}{% trans "Create your account" %}{% else %}Crea tu cuenta{% endif %} →
             </a>
         </div>

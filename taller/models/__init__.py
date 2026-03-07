@@ -18,6 +18,8 @@ from .marca import Marca
 
 # Modelos de kilometraje
 from .kilometraje import KilometrajeRegistro
+from .registro_kilometraje import RegistroKilometraje
+from .checklist_ingreso import ChecklistIngreso
 
 # Modelos de documentos
 from .documento import Documento
@@ -42,11 +44,21 @@ from .ubicacion import Estado, Ciudad
 from .comprobante_pago import ComprobantePago
 from .trial import TrialRegistro
 
-# Modelos legacy / compatibilidad (deben importarse para que Django los registre)
+# Modelos legacy / compatibilidad (import opcional por si faltan en algún deploy)
 from .auditoria import LogAuditoria
-from .pago import PagoPendiente
-from .regimen_fiscal import RegimenFiscal
-from .marcas_usa import MarcaVehiculo, ModeloVehiculo
+
+try:
+    from .pago import PagoPendiente
+except ImportError:
+    PagoPendiente = None
+try:
+    from .regimen_fiscal import RegimenFiscal
+except ImportError:
+    RegimenFiscal = None
+try:
+    from .marcas_usa import MarcaVehiculo, ModeloVehiculo
+except ImportError:
+    MarcaVehiculo = ModeloVehiculo = None
 
 # Modelos de extras de vehículos
 from .extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
@@ -63,6 +75,8 @@ __all__ = [
     "Marca",
     # Kilometraje
     "KilometrajeRegistro",
+    "RegistroKilometraje",
+    "ChecklistIngreso",
     # Documentos
     "Documento",
     "LineaServicio",
@@ -93,6 +107,10 @@ __all__ = [
     "ColorVehiculo",
     "MotorVehiculo",
 ]
+# Quitar del __all__ los que no se importaron (módulo faltante en servidor)
+for _name in ("PagoPendiente", "RegimenFiscal", "MarcaVehiculo", "ModeloVehiculo"):
+    if _name in __all__ and globals().get(_name) is None:
+        __all__.remove(_name)
 
 # Intentar importar otros modelos si existen (para compatibilidad)
 try:

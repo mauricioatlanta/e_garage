@@ -1,0 +1,25 @@
+{% load i18n %}
+<table class="repuestos-table glass-panel">
+  <thead>
+    <tr>
+      <th>{% trans "Código" %}</th>
+      <th>{% trans "Nombre" %}</th>
+      <th>{% trans "Cant." %}</th>
+      <th>{% trans "P. unit." %}</th>
+      <th>{% trans "Subtotal" %}</th>
+    </tr>
+  </thead>
+  <tbody id="repuestos-tbody">
+    {% for linea in lineas %}
+    <tr>
+      <td>{{ linea.codigo }}</td>
+      <td>{{ linea.nombre }}</td>
+      <td>{{ linea.cantidad }}</td>
+      <td>{{ linea.precio_unitario }}</td>
+      <td>{{ linea.subtotal }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="5" class="text-center">{% trans "Sin repuestos agregados" %}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>

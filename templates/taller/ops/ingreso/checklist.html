@@ -1,0 +1,92 @@
+{% extends "taller/ops/ingreso/base_ingreso.html" %}
+{% load i18n %}
+{% load country_url %}
+{% load static %}
+{% block title %}{% trans "Checklist" %} | {% trans "Ingreso" %}{% endblock %}
+{% block content %}
+<div class="ingreso-wrap">
+  <div class="container py-4">
+    {% include "taller/ops/ingreso/_stepper.html" with step=4 %}
+    <h2 class="text-center mb-4" style="font-family: Orbitron; color: var(--ops-cyan);">{% trans "Paso 4/5 – Checklist de recepción" %}</h2>
+
+    <div class="row">
+      <div class="col-lg-6">
+        <div class="glass-panel mb-4">
+          <form method="post" action="{% country_url 'ops:ops_ingreso_checklist' documento_id=documento.pk app_namespace='direct' %}" enctype="multipart/form-data" id="form-checklist">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="d-flex gap-2 justify-content-end mt-3">
+              <a href="{% country_url 'ops:ops_ingreso_documento' vehiculo_id=documento.vehiculo_id app_namespace='direct' %}" class="btn btn-outline-light">{% trans "Volver" %}</a>
+              <button type="submit" class="btn-ingreso btn-ingreso-primary">{% trans "Continuar" %}</button>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="glass-panel">
+          <h5 class="mb-3">{% trans "Daños (tap en zonas)" %}</h5>
+          <div id="svg-danos-container" class="position-relative" style="max-width: 280px; margin: 0 auto;">
+            <svg id="svg-auto" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg" style="width: 100%; height: auto;">
+              <rect id="zone-front_left" data-zone="front_left" x="10" y="35" width="35" height="30" fill="rgba(0,212,255,0.2)" stroke="var(--ops-cyan)" stroke-width="1" class="damage-zone"/>
+              <rect id="zone-front_right" data-zone="front_right" x="155" y="35" width="35" height="30" fill="rgba(0,212,255,0.2)" stroke="var(--ops-cyan)" stroke-width="1" class="damage-zone"/>
+              <rect id="zone-rear_left" data-zone="rear_left" x="10" y="35" width="35" height="30" fill="rgba(0,212,255,0.2)" stroke="var(--ops-cyan)" stroke-width="1" class="damage-zone" transform="translate(0,0)"/>
+              <rect id="zone-rear_right" data-zone="rear_right" x="155" y="35" width="35" height="30" fill="rgba(0,212,255,0.2)" stroke="var(--ops-cyan)" stroke-width="1" class="damage-zone"/>
+              <rect id="zone-left" data-zone="left" x="45" y="30" width="30" height="40" fill="rgba(0,212,255,0.2)" stroke="var(--ops-cyan)" stroke-width="1" class="damage-zone"/>
+              <rect id="zone-right" data-zone="right" x="125" y="30" width="30" height="40" fill="rgba(0,212,255,0.2)" stroke="var(--ops-cyan)" stroke-width="1" class="damage-zone"/>
+              <rect id="zone-roof" data-zone="roof" x="75" y="5" width="50" height="25" fill="rgba(0,212,255,0.2)" stroke="var(--ops-cyan)" stroke-width="1" class="damage-zone"/>
+            </svg>
+            <div id="danos-marks"></div>
+          </div>
+          <input type="hidden" name="danos_json" id="danos-json" value="">
+          <p class="small text-white-50 mt-2">{% trans "Toque una zona para agregar marca de daño." %}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-dano" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-panel">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">{% trans "Tipo de daño" %}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="dano-zone-current" value="">
+        <label class="form-label">{% trans "Tipo" %}</label>
+        <select id="dano-type" class="form-select ingreso-input">
+          <option value="rayon">{% trans "Rayón" %}</option>
+          <option value="golpe">{% trans "Golpe" %}</option>
+          <option value="trizadura">{% trans "Trizadura" %}</option>
+          <option value="faltante">{% trans "Faltante" %}</option>
+        </select>
+        <label class="form-label mt-2">{% trans "Nota" %}</label>
+        <input type="text" id="dano-note" class="form-control ingreso-input" placeholder="">
+        <label class="form-label mt-2">{% trans "Severidad (1-3)" %}</label>
+        <input type="number" id="dano-severity" class="form-control ingreso-input" min="1" max="3" value="1">
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn-ingreso" id="btn-dano-save">{% trans "Guardar marca" %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ danos_json|json_script:"danos-json-data" }}
+<script src="{% static 'ops/ingreso/ingreso.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var dataEl = document.getElementById('danos-json-data');
+  var danosJson = dataEl ? JSON.parse(dataEl.textContent || '{}') : {};
+  ChecklistIngreso.init({
+    documentoId: {{ documento.pk }},
+    saveUrl: "{% country_url 'ops:api_checklist_save' documento_id=documento.pk app_namespace='direct' %}".replace(/&amp;/g, '&'),
+    csrfToken: "{{ csrf_token }}",
+    danosJson: danosJson
+  });
+});
+</script>
+{% endblock %}

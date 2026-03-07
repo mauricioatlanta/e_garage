@@ -1,9 +1,8 @@
-﻿import ast, pathlib
+import ast, pathlib
 
 FILES = [
     "taller/analytics/funcionalidades_adicionales.py",
     "taller/vehiculos/api_helpers.py",
-    "taller/viewsautocomplete/views_main.py",
     "wsgi_production.py",
     "deploy_pythonanywhere/wsgi_production.py",
 ]

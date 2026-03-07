@@ -533,7 +533,7 @@ body {
         <!-- Mensajes de éxito (filtrados) -->
         {% if messages %}
             {% for message in messages %}
-                {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Professional Automotive Management System" not in message|stringformat:"s" %}
+                {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Professional Automotive Management System" not in message|stringformat:"s" and "Selecciona o crea tu empresa" not in message|stringformat:"s" %}
                     <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
                         {{ message }}
                     </div>
@@ -542,7 +542,7 @@ body {
         {% endif %}
 
         <!-- Formulario -->
-        <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
+        <form method="POST" action="{{ request.get_full_path }}" class="space-y-6">
             {% csrf_token %}
             {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 

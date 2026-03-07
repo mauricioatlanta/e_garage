@@ -29,7 +29,9 @@ def signup_redirect(request, country_code: str):
     # Normalizar código de país a minúsculas
     country_code_lower = country_code.lower()
     base = f"/accounts/signup/?from={country_code_lower}"
-    # Preservar ?plan=, etc. para que los enlaces de bienvenida/onboarding funcionen
-    if request.GET:
-        base += "&" + request.GET.urlencode()
+    # Preservar ?plan=, next=, etc.; no propagar country= (país en path, no en GET)
+    params = request.GET.copy()
+    params.pop("country", None)
+    if params:
+        base += "&" + params.urlencode()
     return redirect(base)

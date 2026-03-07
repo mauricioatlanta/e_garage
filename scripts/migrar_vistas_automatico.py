@@ -118,8 +118,6 @@ class TemplateViewMigrator:
         # Archivos de vistas a revisar
         view_files = [
             "taller/documentos/views_moderno.py",
-            "taller/viewsautocomplete/views_main.py",
-            "taller/viewsautocomplete/views.py",
             "taller/views_extra/configuracion.py",
             "taller/taller_main_urls.py",
         ]

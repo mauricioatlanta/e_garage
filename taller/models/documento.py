@@ -25,6 +25,18 @@ class Documento(AuditMixin, models.Model):
         on_delete=models.SET_NULL,
         related_name="documentos_responsables",
     )
+    CONTEXT_CHOICES = [
+        ("workshop", _("Workshop")),
+        ("parts", _("Parts")),
+        ("mixed", _("Mixed")),
+    ]
+    context = models.CharField(
+        max_length=16,
+        choices=CONTEXT_CHOICES,
+        default="workshop",
+        db_index=True,
+        help_text=_("Workshop=OT/servicios, Parts=repuestos sin vehículo, Mixed=factura con ambos"),
+    )
     tipo = models.CharField(
         max_length=4,
         choices=[
@@ -103,8 +115,18 @@ class Documento(AuditMixin, models.Model):
         default=Decimal("0.00"),
     )
 
-    # Opcional: estado de pago
-    payment_status = models.CharField(max_length=20, blank=True, default="pending")
+    # Opcional: estado de pago (choices para select en formulario)
+    PAYMENT_STATUS = [
+        ("unpaid", _("Unpaid")),
+        ("pending", _("Pending")),
+        ("partial", _("Partial")),
+        ("paid", _("Paid")),
+        ("refunded", _("Refunded")),
+        ("canceled", _("Canceled")),
+    ]
+    payment_status = models.CharField(
+        max_length=20, choices=PAYMENT_STATUS, blank=True, default="pending"
+    )
 
     created_at = models.DateTimeField(default=timezone.now)
 
@@ -263,6 +285,46 @@ class Documento(AuditMixin, models.Model):
         total = qs.aggregate(s=Sum(expr)).get("s") or Decimal("0")
         return Decimal(total)
 
+    def parts_subtotal(self):
+        """Subtotal de líneas de repuesto (fuente de verdad para totales)."""
+        return self._sum_repuesto()
+
+    def services_subtotal(self):
+        """Subtotal de líneas de servicio."""
+        return self._sum_servicio()
+
+    def doc_tax_amount(self):
+        """
+        Monto de impuesto según país: USA usa sales_tax_rate sobre (parts+services);
+        otros países usan tasa sobre repuestos (recompute_totals).
+        """
+        from taller.models.configuracion import ConfiguracionEmpresa
+
+        parts = self.parts_subtotal()
+        services = self.services_subtotal()
+        pais = getattr(self.empresa, "pais", "CL").upper()
+        if pais == "US":
+            config = getattr(self.empresa, "config", None)
+            if not config:
+                try:
+                    config = ConfiguracionEmpresa.objects.filter(empresa=self.empresa).first()
+                except Exception:
+                    config = None
+            rate = Decimal("0")
+            if config and getattr(config, "sales_tax_rate", None) is not None:
+                rate = Decimal(str(config.sales_tax_rate)) / Decimal("100")
+            base = parts + services
+            return (base * rate).quantize(Decimal("0.01"))
+        return getattr(self, "tax_amount", Decimal("0")) or Decimal("0")
+
+    def grand_total(self):
+        """Parts + services + tax (y otros si aplica)."""
+        parts = self.parts_subtotal()
+        services = self.services_subtotal()
+        otros = self._sum_otro_servicio()
+        tax = self.doc_tax_amount()
+        return self._q(parts + services + otros + tax)
+
     def _sum_otro_servicio(self):
         # Calcula cantidad * precio_cliente
         qs = getattr(self, "lineas_otro_servicio", None)
@@ -283,7 +345,23 @@ class Documento(AuditMixin, models.Model):
         - El tax/IVA se aplica SOLO sobre repuestos en todos los países
         - Si apply_vat=True: aplica el tax_rate_applied sobre repuestos
         - Si apply_vat=False: no aplica impuesto
+        - Si factura tiene servicios + repuestos → context = "mixed"
         """
+        # Regla: factura con servicios y repuestos → context mixed; solo FAC, no PRES
+        if self.pk and self.tipo == "FAC":
+            has_serv = self.lineas_servicio.exists() if hasattr(self, "lineas_servicio") else False
+            has_rep = self.lineas_repuesto.exists() if hasattr(self, "lineas_repuesto") else False
+
+            if has_serv and has_rep:
+                self.context = "mixed"
+            else:
+                # Si antes era mixed y ahora ya no mezcla, degradar contexto
+                if getattr(self, "context", None) == "mixed":
+                    if has_rep and not has_serv:
+                        self.context = "parts"
+                    elif has_serv and not has_rep:
+                        self.context = "workshop"
+
         rep = self._sum_repuesto()
         srv = self._sum_servicio()
         osrv = self._sum_otro_servicio()
@@ -296,24 +374,32 @@ class Documento(AuditMixin, models.Model):
         desc = getattr(self, "descuento", Decimal("0")) or Decimal("0")
         desc = self._q(desc)
 
-        # Tasa
-        rate = self._resolve_tax_rate()  # ej. 19.0 o 0.0
-        # Base imponible por país usando configuración centralizada
-        from taller.utils.country_config import get_config_from_documento
+        # Tasa y base imponible por país
+        from taller.models.configuracion import ConfiguracionEmpresa
 
-        config = get_config_from_documento(self)
         pais = getattr(self.empresa, "pais", "CL").upper()
 
-        # Regla: Tax/IVA SOLO sobre repuestos en todos los países
-        # Si apply_vat=True, aplicar impuesto solo a repuestos
-        # Si apply_vat=False, no aplicar impuesto
-        if getattr(self, "apply_vat", True):
-            tax_base = rep  # Tax solo a repuestos (no servicios)
+        if pais == "US":
+            # USA: sales_tax sobre (repuestos + servicios) si apply_vat
+            config = (
+                getattr(self.empresa, "config", None)
+                or ConfiguracionEmpresa.objects.filter(empresa=self.empresa).first()
+            )
+            rate_pct = Decimal("0")
+            if config and getattr(config, "sales_tax_rate", None) is not None:
+                rate_pct = Decimal(str(config.sales_tax_rate))
+            rate = rate_pct / Decimal("100")
+            tax_base = (rep + srv) if getattr(self, "apply_vat", True) else Decimal("0")
+            tax_amount = (tax_base * rate).quantize(Decimal("0.01"))
+            rate = rate_pct  # para asignar tax_rate_applied en %
         else:
-            tax_base = Decimal("0")  # Sin impuesto
-
-        tax_amount = tax_base * rate / Decimal("100.0")
-        tax_amount = self._q(tax_amount)
+            rate = self._resolve_tax_rate()
+            if getattr(self, "apply_vat", True):
+                tax_base = rep
+            else:
+                tax_base = Decimal("0")
+            tax_amount = tax_base * rate / Decimal("100.0")
+            tax_amount = self._q(tax_amount)
 
         subtotal_general = rep + srv + osrv
         total = subtotal_general - desc + tax_amount
@@ -328,20 +414,25 @@ class Documento(AuditMixin, models.Model):
         self.total = total
 
         if persist:
-            self.save(
-                update_fields=[
-                    "neto_repuestos",
-                    "neto_servicios",
-                    "neto_otros_servicios",
-                    "tax_rate_applied",
-                    "tax_amount",
-                    "total",
-                ]
-            )
+            update_fields = [
+                "neto_repuestos",
+                "neto_servicios",
+                "neto_otros_servicios",
+                "tax_rate_applied",
+                "tax_amount",
+                "total",
+            ]
+            if hasattr(self, "context"):
+                update_fields.append("context")
+            self.save(update_fields=update_fields)
 
     def clean(self):
         super().clean()
         empresa_id = getattr(self, "empresa_id", None)
+
+        # Regla: OT siempre es workshop
+        if self.tipo == "OT":
+            self.context = "workshop"
 
         # Técnico pertenece a la empresa
         tecnico = getattr(self, "tecnico_responsable", None)
@@ -430,29 +521,65 @@ class Documento(AuditMixin, models.Model):
             # Si no es numérico, devolver el número tal cual con prefijo
             return f"{prefijo}{self.numero}"
 
+    @classmethod
+    def get_next_number(cls, empresa, tipo="OT", context="workshop"):
+        """
+        Devuelve el próximo número de documento (preview, no consume secuencia).
+        Para asignar al form initial en GET. Al guardar, generar_numero_documento() usará DocumentSequence.
+        """
+        tipo = (tipo or "OT").upper()
+        qs = (
+            cls.objects.filter(empresa=empresa, tipo=tipo)
+            .exclude(numero__isnull=True)
+            .exclude(numero__exact="")
+        )
+        max_seq = 0
+        for num in qs.values_list("numero", flat=True).iterator():
+            if not num:
+                continue
+            try:
+                # Formato "WO-001" o "OT001"
+                if "-" in str(num):
+                    part = str(num).split("-")[-1]
+                else:
+                    part = "".join(c for c in str(num) if c.isdigit())
+                n = int(part) if part else 0
+                if n > max_seq:
+                    max_seq = n
+            except (ValueError, TypeError):
+                continue
+        next_n = max_seq + 1
+        pais = getattr(empresa, "pais", "CL").upper()
+        if pais == "US":
+            prefijos = {"OT": "WO", "PRES": "E", "FAC": "I"}
+        else:
+            prefijos = {"OT": "OT", "PRES": "E", "FAC": "F"}
+        prefix = prefijos.get(tipo, tipo[:2])
+        return f"{prefix}-{next_n:03d}"
+
     def generar_numero_documento(self):
-        """Genera el próximo número secuencial para el tipo de documento"""
+        """Genera el próximo número secuencial usando DocumentSequence por serie (context)."""
         if self.numero:
             return self.numero
 
-        # Buscar el último número para este tipo de documento en esta empresa
-        ultimo_doc = (
-            Documento.objects.filter(empresa=self.empresa, tipo=self.tipo)
-            .order_by("-numero")
-            .first()
-        )
+        from taller.models.sequence import DocumentSequence
 
-        if ultimo_doc and ultimo_doc.numero:
-            # Convertir el número a entero, sumar 1, y volver a string
-            try:
-                numero_anterior = int(ultimo_doc.numero)
-                self.numero = str(numero_anterior + 1)
-            except (ValueError, TypeError):
-                # Si no se puede convertir a entero, empezar desde 1
-                self.numero = "1"
-        else:
-            self.numero = "1"
+        # Determinar serie por context
+        ctx = getattr(self, "context", "workshop") or "workshop"
+        serie_map = {"workshop": "WORKSHOP", "parts": "PARTS", "mixed": "MIXED"}
+        serie = serie_map.get(ctx, "WORKSHOP")
 
+        # Prefijos USA-friendly por serie
+        PREFIXES = {
+            "WORKSHOP": {"OT": "WO", "PRES": "WQ", "FAC": "WI"},
+            "PARTS": {"PRES": "PQ", "FAC": "PI"},
+            "MIXED": {"FAC": "MI"},
+        }
+        prefixes = PREFIXES.get(serie, PREFIXES["WORKSHOP"])
+        prefix = prefixes.get(self.tipo, self.tipo[:2] if self.tipo else "XX")
+
+        n = DocumentSequence.next(self.empresa, self.tipo)
+        self.numero = f"{prefix}{n:05d}"
         return self.numero
 
     def save(self, *args, **kwargs):
@@ -509,37 +636,33 @@ class Documento(AuditMixin, models.Model):
     def recalcular_totales(self, save=True):
         """
         Recalcula sumas usando ORM:
-        - Repuestos: Sum(cantidad*precio_unitario - descuento)
-        - Servicios: Sum(cantidad*precio_unitario - descuento)
-        - Otros:     Sum(precio_cliente * cantidad)
+        - Repuestos: Sum(subtotal_expr) con descuento en %
+        - Servicios: Sum(subtotal_expr) con descuento en %
+        - Otros:     Sum(cantidad * precio_cliente)
         - IVA:       solo sobre repuestos (CL 19%, US 0)
         """
-        pais = getattr(self.empresa, "pais", "CL")
+        from taller.models.lineas_documento import (
+            LineaOtroServicio,
+            LineaRepuesto,
+            LineaServicio,
+        )
 
-        # Expresiones por tipo
-        rep_expr = ExpressionWrapper(
-            (F("cantidad") * F("precio_unitario")) - Coalesce(F("descuento"), Value(0)),
-            output_field=DecimalField(max_digits=14, decimal_places=2),
-        )
-        serv_expr = ExpressionWrapper(
-            (F("cantidad") * F("precio_unitario")) - Coalesce(F("descuento"), Value(0)),
-            output_field=DecimalField(max_digits=14, decimal_places=2),
-        )
-        otros_expr = ExpressionWrapper(
-            (F("cantidad") * F("precio_cliente")),
-            output_field=DecimalField(max_digits=14, decimal_places=2),
-        )
+        pais = getattr(self.empresa, "pais", "CL")
 
         zero_decimal = Value(
             Decimal("0"),
             output_field=DecimalField(max_digits=14, decimal_places=2),
         )
 
-        rep = self.lineas_repuesto.aggregate(total=Coalesce(Sum(rep_expr), zero_decimal))["total"]
-        srv = self.lineas_servicio.aggregate(total=Coalesce(Sum(serv_expr), zero_decimal))["total"]
-        otr = self.lineas_otro_servicio.aggregate(total=Coalesce(Sum(otros_expr), zero_decimal))[
-            "total"
-        ]
+        rep = self.lineas_repuesto.aggregate(
+            total=Coalesce(Sum(LineaRepuesto.subtotal_expr()), zero_decimal)
+        )["total"]
+        srv = self.lineas_servicio.aggregate(
+            total=Coalesce(Sum(LineaServicio.subtotal_expr()), zero_decimal)
+        )["total"]
+        otr = self.lineas_otro_servicio.aggregate(
+            total=Coalesce(Sum(LineaOtroServicio.subtotal_expr()), zero_decimal)
+        )["total"]
 
         rep = Decimal(rep or 0)
         srv = Decimal(srv or 0)

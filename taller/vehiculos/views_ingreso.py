@@ -15,7 +15,6 @@ from taller.models.clientes import Cliente
 from taller.models.empresa import Empresa
 from taller.models.vehiculos import Vehiculo
 from taller.utils.pais_utils import get_configuracion_pais
-from whatsapp.services.ocr import OCRProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -110,7 +109,15 @@ def api_procesar_foto_patente(request):
         logger.error(f"Error leyendo imagen: {e}")
         return JsonResponse({"success": False, "error": "Error procesando la imagen"}, status=500)
 
-    # Procesar OCR
+    # Procesar OCR (import perezoso: no carga WhatsApp/OCR al importar el módulo)
+    try:
+        from whatsapp.services.ocr import OCRProcessor
+    except Exception as e:
+        logger.warning("OCR no disponible: %s", e)
+        return JsonResponse(
+            {"success": False, "error": "OCR no disponible en este servidor"},
+            status=503,
+        )
     ocr_processor = OCRProcessor()
     patente = ocr_processor.extract_plate(image_bytes)
 

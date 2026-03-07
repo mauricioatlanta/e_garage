@@ -86,12 +86,15 @@ def format_currency(context, amount):
             # Solo parte entera - cambiar comas por puntos
             formatted_number = number_str.replace(",", ".")
     elif config["thousand_sep"] == "," and config["decimal_sep"] == ".":
-        # Formato inglés/US: 1,234,567.89 (Python ya hace esto correctamente)
+        # Formato inglés/US: 1,234,567.89 → "$1,250.25" (sin espacio entre símbolo y número)
         formatted_number = number_str
     else:
         # Usar formato por defecto
         formatted_number = number_str
 
+    # USA/MX: formato "$1,250.25" (sin espacio); resto: "symbol number"
+    if country in ("US", "MX"):
+        return f"{config['symbol']}{formatted_number}"
     return f"{config['symbol']} {formatted_number}"
 
 
@@ -120,12 +123,14 @@ def currency(value, country_code="CL"):
     }
 
     symbol = symbols.get(country_code.upper(), "$")
+    cc = country_code.upper()
 
     try:
         amount = float(value or 0)
-        if country_code.upper() in ["CL", "CO"]:
+        if cc in ["CL", "CO"]:
             return f"{symbol} {int(amount):,}".replace(",", ".")
-        else:
-            return f"{symbol} {amount:,.2f}"
+        if cc in ["US", "MX"]:
+            return f"{symbol}{amount:,.2f}"  # USA: $1,250.25
+        return f"{symbol} {amount:,.2f}"
     except (ValueError, TypeError):
-        return f"{symbol} 0"
+        return f"{symbol}0.00" if cc in ("US", "MX") else f"{symbol} 0"

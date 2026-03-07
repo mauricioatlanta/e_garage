@@ -13,7 +13,7 @@
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="eGarage USA — Plataforma para Talleres">
   <meta property="og:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
-  <meta property="og:image" content="{% static 'img/og-us.png' %}">
+  <meta property="og:image" content="{% static 'images/egarage_icon_512x512.png' %}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="eGarage">
@@ -22,7 +22,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="eGarage USA — Plataforma para Talleres">
   <meta name="twitter:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
-  <meta name="twitter:image" content="{% static 'img/og-us.png' %}">
+  <meta name="twitter:image" content="{% static 'images/egarage_icon_512x512.png' %}">
   
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
@@ -411,7 +411,7 @@
   <!-- Hero Section -->
   <section class="hero-section">
     <div class="container mx-auto max-w-7xl">
-      <div class="text-center" data-aos="fade-up">
+      <div class="text-center relative z-40 pointer-events-auto" data-aos="fade-up">
         
         <!-- Logo -->
         <div class="mb-8 inline-block">
@@ -468,14 +468,14 @@
         </div>
 
         <!-- CTA Buttons -->
-        <div class="flex flex-wrap gap-6 justify-center mb-16">
+        <div class="flex flex-wrap gap-6 justify-center mb-16 relative z-50 pointer-events-auto">
           <a href="/us/signup/" class="btn-primary">
             🚀 Comenzar Gratis
           </a>
           <a href="/us/login/" class="btn-secondary">
             🔐 Ingresar
           </a>
-          <a href="/us/precios/" class="btn-secondary">
+          <a href="/us/pricing/" class="btn-secondary">
             💰 Ver Planes
           </a>
         </div>
@@ -776,10 +776,10 @@
           <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Plan Mensual</h3>
           <div class="mb-6">
             <div style="color: #4A90E2; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
-              $ 20
-            </div>
-            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
-              USD por mes
+$20.00
+              </div>
+              <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
+                USD por mes
             </div>
           </div>
           <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
@@ -801,10 +801,10 @@
           <h3 class="text-2xl font-bold mb-4" style="color: #BF0A30;">Plan Semestral</h3>
           <div class="mb-6">
             <div style="color: #BF0A30; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
-              $ 110
-            </div>
-            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
-              USD cada 6 meses
+$110.00
+              </div>
+              <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
+                USD cada 6 meses
             </div>
             <div style="color: #4A90E2; font-size: 0.9rem; font-weight: 700; margin-top: 0.5rem;">
               Ahorra 17%
@@ -826,10 +826,10 @@
           <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Plan Anual</h3>
           <div class="mb-6">
             <div style="color: #4A90E2; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
-              $ 200
-            </div>
-            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
-              USD por año
+$200.00
+              </div>
+              <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
+                USD por año
             </div>
             <div style="color: #4A90E2; font-size: 0.9rem; font-weight: 700; margin-top: 0.5rem;">
               Ahorra 33%

@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% load static %}
+{% load i18n %}
+{% block extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ops-cyan: #00d4ff;
+  --ops-gold: #ffd700;
+  --ops-glass: rgba(255,255,255,0.06);
+  --ops-border: rgba(0,212,255,0.4);
+  --ops-blur: 12px;
+}
+body { font-family: 'Rajdhani', 'Segoe UI', sans-serif; }
+.ingreso-wrap {
+  min-height: 80vh;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #0a0a0f 0%, #1a1a2e 50%, #16213e 100%);
+  color: #fff;
+}
+.glass-panel {
+  background: var(--ops-glass);
+  backdrop-filter: blur(var(--ops-blur));
+  border: 1px solid var(--ops-border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 0 20px rgba(0,212,255,0.15);
+}
+.ingreso-stepper {
+  margin-bottom: 2rem;
+}
+.stepper-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.stepper-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.3s ease;
+}
+.stepper-item.active {
+  border-color: var(--ops-cyan);
+  box-shadow: 0 0 15px rgba(0,212,255,0.4);
+}
+.stepper-item.done {
+  border-color: #00ff88;
+  background: rgba(0,255,136,0.1);
+}
+.stepper-num { font-weight: 700; font-family: Orbitron, monospace; }
+.btn-ingreso {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 1.5rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 12px;
+  border: 2px solid var(--ops-cyan);
+  background: rgba(0,212,255,0.15);
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-height: 52px;
+  min-width: 160px;
+}
+.btn-ingreso:hover {
+  background: rgba(0,212,255,0.3);
+  box-shadow: 0 0 20px rgba(0,212,255,0.5);
+  color: #fff;
+}
+.btn-ingreso-primary {
+  border-color: var(--ops-gold);
+  background: rgba(255,215,0,0.2);
+}
+.btn-ingreso-primary:hover { box-shadow: 0 0 20px rgba(255,215,0,0.5); }
+.ingreso-warning {
+  background: rgba(255,180,0,0.15);
+  border: 1px solid rgba(255,180,0,0.6);
+  border-radius: 12px;
+  padding: 1rem;
+  margin: 1rem 0;
+  color: #ffd700;
+}
+.form-control.ingreso-input {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--ops-border);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  font-size: 1.1rem;
+}
+.form-control.ingreso-input:focus {
+  border-color: var(--ops-cyan);
+  box-shadow: 0 0 0 3px rgba(0,212,255,0.2);
+}
+</style>
+{% endblock %}

@@ -70,6 +70,7 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
             "email_contacto",
             "moneda",
             "tasa_impuesto",
+            "sales_tax_rate",
             "aplicar_impuesto_por_defecto",
             "dividir_por_tecnico",
             "brand_color",
@@ -112,6 +113,15 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
                     "max": "100",
                 }
             ),
+            "sales_tax_rate": forms.NumberInput(
+                attrs={
+                    "class": "form-control",
+                    "step": "0.01",
+                    "min": "0",
+                    "max": "100",
+                    "placeholder": "0 (USA: ej. 7)",
+                }
+            ),
             "aplicar_impuesto_por_defecto": forms.CheckboxInput(
                 attrs={"class": "form-check-input"}
             ),
@@ -128,6 +138,7 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
         # Hacer que los campos con valores por defecto no sean requeridos
         self.fields["moneda"].required = False
         self.fields["tasa_impuesto"].required = False
+        self.fields["sales_tax_rate"].required = False
         self.fields["aplicar_impuesto_por_defecto"].required = False
         self.fields["dividir_por_tecnico"].required = False
         self.fields["brand_color"].required = False

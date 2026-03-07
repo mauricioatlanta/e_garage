@@ -4,9 +4,10 @@ import logging
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
+from django.views.decorators.http import require_GET
 from django.views.decorators.csrf import csrf_exempt
 
 from taller.models.empresa import Empresa
@@ -138,3 +139,99 @@ def buscar_repuestos_ajax(request):
 
         log.error(f"Traceback: {traceback.format_exc()}")
         return JsonResponse({"error": "Error interno del servidor"}, status=500)
+
+
+# --- Vistas AJAX de repuestos (repuesto_info, etc.) ---
+
+
+@login_required
+@require_GET
+def repuesto_info(request):
+    """
+    AJAX: devuelve JSON con datos de un repuesto por id.
+    Filtrado por empresa del usuario (multi-tenant).
+    """
+    try:
+        repuesto_id = request.GET.get("id") or request.GET.get("pk")
+        if not repuesto_id:
+            return JsonResponse({"error": "Falta id o pk"}, status=400)
+
+        empresa = getattr(request.user, "empresa", None)
+        if not empresa:
+            return JsonResponse({"error": "Usuario sin empresa"}, status=403)
+
+        repuesto = get_object_or_404(Repuesto, pk=repuesto_id, empresa=empresa)
+        return JsonResponse(
+            {
+                "id": repuesto.id,
+                "part_number": repuesto.part_number or "",
+                "nombre": repuesto.nombre or "",
+                "precio_compra": str(repuesto.precio_compra or 0),
+                "precio_venta": str(repuesto.precio_venta or 0),
+                "cantidad_stock": repuesto.cantidad_stock or 0,
+                "proveedor": repuesto.proveedor or "",
+                "categoria": repuesto.categoria.nombre if repuesto.categoria else "",
+            }
+        )
+    except ValueError:
+        return JsonResponse({"error": "id inválido"}, status=400)
+
+
+@login_required
+@require_GET
+def exportar_excel_repuestos(request):
+    """
+    Exporta el listado de repuestos de la empresa a Excel (.xlsx).
+    Filtrado por empresa del usuario (multi-tenant).
+    """
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Alignment, Font
+    except ImportError:
+        return JsonResponse(
+            {"error": "openpyxl no instalado. Ejecuta: pip install openpyxl"},
+            status=501,
+        )
+
+    empresa = getattr(request.user, "empresa", None)
+    if not empresa:
+        return JsonResponse({"error": "Usuario sin empresa"}, status=403)
+
+    qs = Repuesto.objects.filter(empresa=empresa).select_related("categoria").order_by("nombre")
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Repuestos"
+
+    headers = ["Código", "Nombre", "Categoría", "P. compra", "P. venta", "Stock", "Proveedor"]
+    font_bold = Font(bold=True)
+    for col, h in enumerate(headers, 1):
+        c = ws.cell(row=1, column=col, value=h)
+        c.font = font_bold
+        c.alignment = Alignment(horizontal="center")
+
+    for row, r in enumerate(qs, 2):
+        ws.cell(row=row, column=1, value=r.part_number or "")
+        ws.cell(row=row, column=2, value=r.nombre or "")
+        ws.cell(row=row, column=3, value=r.categoria.nombre if r.categoria else "")
+        ws.cell(row=row, column=4, value=float(r.precio_compra or 0))
+        ws.cell(row=row, column=5, value=float(r.precio_venta or 0))
+        ws.cell(row=row, column=6, value=r.cantidad_stock or 0)
+        ws.cell(row=row, column=7, value=r.proveedor or "")
+
+    from io import BytesIO
+    from datetime import datetime
+
+    buf = BytesIO()
+    wb.save(buf)
+    buf.seek(0)
+    filename = (
+        f"repuestos_{empresa.nombre_taller or 'taller'}_{datetime.now().strftime('%Y%m%d')}.xlsx"
+    )
+    filename = "".join(c if c.isalnum() or c in "._-" else "_" for c in filename)
+
+    resp = HttpResponse(
+        buf.getvalue(),
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+    resp["Content-Disposition"] = f'attachment; filename="{filename}"'
+    return resp

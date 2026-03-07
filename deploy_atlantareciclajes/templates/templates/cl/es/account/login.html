@@ -412,7 +412,7 @@ body {
 </div>
 
 <!-- Botón de regreso -->
-<a href="{% if request.path|slice:':4' == '/cl/' or request.country == 'CL' or request.GET.country == 'CL' %}/cl/es/bienvenida/{% elif request.path|slice:':4' == '/us/' or request.country == 'US' %}/us/{% elif request.path|slice:':4' == '/mx/' or request.country == 'MX' %}/mx/{% elif request.path|slice:':4' == '/co/' or request.country == 'CO' %}/co/{% elif request.path|slice:':4' == '/ec/' or request.country == 'EC' %}/ec/{% elif request.path|slice:':4' == '/pe/' or request.country == 'PE' %}/pe/{% elif request.path|slice:':4' == '/ve/' or request.country == 'VE' %}/ve/{% elif request.path|slice:':4' == '/br/' or request.country == 'BR' %}/br/{% else %}/cl/es/bienvenida/{% endif %}" class="back-button font-futuristic">
+<a href="{% if request.path|slice:':4' == '/cl/' %}/cl/es/bienvenida/{% elif request.path|slice:':4' == '/us/' %}/us/{{ request.LANGUAGE_CODE|default:'en' }}/bienvenida/{% elif request.path|slice:':4' == '/mx/' %}/mx/{% elif request.path|slice:':4' == '/co/' %}/co/{% elif request.path|slice:':4' == '/ec/' %}/ec/{% elif request.path|slice:':4' == '/pe/' %}/pe/{% elif request.path|slice:':4' == '/ve/' %}/ve/{% elif request.path|slice:':4' == '/br/' %}/br/{% else %}/{% endif %}" class="back-button font-futuristic">
     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
     </svg>
@@ -426,85 +426,25 @@ body {
             <div class="logo-container">
                 <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="logo">
             </div>
-            {% comment %}Detectar país del usuario o desde URL{% endcomment %}
-            {% if request.user.is_authenticated and request.user.empresa %}
-                {% with detected_country=request.user.empresa.pais %}
-                    {% if detected_country == 'CL' %}
-                        <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-                    {% elif detected_country == 'US' %}
-                        <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-                    {% elif detected_country == 'MX' %}
-                        <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-                    {% elif detected_country == 'CO' %}
-                        <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-                    {% elif detected_country == 'EC' %}
-                        <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-                    {% elif detected_country == 'PE' %}
-                        <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-                    {% elif detected_country == 'VE' %}
-                        <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-                    {% elif detected_country == 'BR' %}
-                        <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-                    {% endif %}
-                {% endwith %}
-            {% elif request.GET.country == 'CO' %}
-                <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-            {% elif request.GET.country == 'EC' %}
-                <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-            {% elif request.GET.country == 'MX' %}
+            {% comment %}País por path (100% confiable, no depende de request.country){% endcomment %}
+            {% if request.path|slice:':4' == '/us/' %}
+                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
+            {% elif request.path|slice:':4' == '/cl/' %}
+                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
+            {% elif request.path|slice:':4' == '/mx/' %}
                 <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-            {% elif request.GET.country == 'US' %}
-                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-            {% elif request.GET.country == 'CL' %}
-                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-            {% elif request.GET.country == 'PE' %}
-                <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-            {% elif request.GET.country == 'VE' %}
-                <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-            {% elif request.GET.country == 'BR' %}
-                <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-            {% elif request.country %}
-                {% if request.country == 'CL' %}
-                    <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-                {% elif request.country == 'US' %}
-                    <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-                {% elif request.country == 'MX' %}
-                    <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-                {% elif request.country == 'CO' %}
-                    <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-                {% elif request.country == 'EC' %}
-                    <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-                {% elif request.country == 'PE' %}
-                    <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-                {% elif request.country == 'VE' %}
-                    <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-                {% elif request.country == 'BR' %}
-                    <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-                {% endif %}
-            {% elif request.path|slice:":4" == '/co/' %}
+            {% elif request.path|slice:':4' == '/co/' %}
                 <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-            {% elif request.path|slice:":4" == '/ec/' %}
+            {% elif request.path|slice:':4' == '/ec/' %}
                 <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-            {% elif request.path|slice:":4" == '/us/' %}
-                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-            {% elif request.path|slice:":4" == '/cl/' %}
-                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-            {% elif request.path|slice:":4" == '/mx/' %}
-                <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-            {% elif request.path|slice:":4" == '/pe/' %}
+            {% elif request.path|slice:':4' == '/pe/' %}
                 <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-            {% elif request.path|slice:":4" == '/ve/' %}
+            {% elif request.path|slice:':4' == '/ve/' %}
                 <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-            {% elif request.path|slice:":4" == '/br/' %}
+            {% elif request.path|slice:':4' == '/br/' %}
                 <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-            {% elif request.GET.country == 'CO' %}
-                <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-            {% elif request.GET.country == 'EC' %}
-                <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-            {% elif request.GET.country == 'US' %}
-                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-            {% elif request.GET.country == 'CL' %}
-                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
+            {% else %}
+                <div class="country-badge font-futuristic">🌎 eGARAGE</div>
             {% endif %}
         </div>
 

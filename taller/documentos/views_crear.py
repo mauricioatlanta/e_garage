@@ -32,12 +32,17 @@ def build_context(request, form=None, rep_fs=None, serv_fs=None, otro_fs=None):
     """
     Usar SIEMPRE este builder en GET y en POST inválido para evitar
     'context' incompleto que deje el template 'en blanco'.
+    País desde path primero (/us/ → US), luego empresa.
     """
+    from taller.utils import get_country_from_request
+
     try:
         empresa = request.user.empresa
-        country = getattr(empresa, "pais", "CL") if empresa else "CL"
+        country = get_country_from_request(
+            request, default=getattr(empresa, "pais", "CL") if empresa else "CL"
+        )
     except AttributeError:
-        country = "CL"
+        country = get_country_from_request(request, default="CL")
 
     ctx = {
         "form": form or DocumentoForm(user=request.user),
@@ -134,10 +139,20 @@ def crear_documento(request):
                         doc.numero = f"{pref}{n:03d}"
                         logger.debug(f"Número generado: {doc.numero}")
 
-                    # Configurar campos automáticos
-                    doc.country = getattr(empresa, "pais", "CL")
+                    # Configurar campos automáticos: país desde path primero (/us/ → US)
+                    from taller.utils import get_country_from_request
+
+                    doc_country = get_country_from_request(
+                        request, default=getattr(empresa, "pais", "CL")
+                    )
+                    doc.country = doc_country
                     doc.moneda = (
-                        getattr(getattr(empresa, "configuracion", None), "moneda", "CLP") or "CLP"
+                        "USD"
+                        if doc_country == "US"
+                        else (
+                            getattr(getattr(empresa, "configuracion", None), "moneda", "CLP")
+                            or "CLP"
+                        )
                     )
                     if not doc.estado:
                         doc.estado = "EMITIDO"  # default seguro

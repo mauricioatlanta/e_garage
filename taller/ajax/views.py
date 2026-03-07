@@ -73,6 +73,22 @@ def _respuesta_vacia(status=200):
 @login_required
 @require_GET
 def buscar_clientes(request):
+    # Soporte prefill: ?id=79 devuelve un único resultado para inyectar en Select2
+    prefill_id = (request.GET.get("id") or "").strip()
+    if prefill_id.isdigit():
+        empresa = _empresa_desde_request(request)
+        if not empresa:
+            return _respuesta_vacia()
+        try:
+            cliente = Cliente.objects.filter(empresa=empresa, pk=int(prefill_id)).first()
+            if cliente:
+                return JsonResponse(
+                    {"results": [{"id": cliente.id, "text": _label_cliente(cliente)}]}
+                )
+        except (ValueError, TypeError):
+            pass
+        return _respuesta_vacia()
+
     termino = (request.GET.get("q") or "").strip()
     if len(termino) < 2:
         return _respuesta_vacia()

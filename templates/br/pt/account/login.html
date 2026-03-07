@@ -526,7 +526,7 @@ body {
         {% if messages %}
             {% for message in messages %}
                 {% with message_str=message|stringformat:"s" %}
-                    {% if "Successfully signed in" not in message_str and "You have signed out" not in message_str and "Professional Automotive Management System" not in message_str and "Ha iniciado sesión exitosamente" not in message_str and "Ha cerrado sesión" not in message_str and "iniciado sesión exitosamente" not in message_str and "cerrado sesión" not in message_str and "Información de empresa guardada exitosamente" not in message_str %}
+                    {% if "Successfully signed in" not in message_str and "You have signed out" not in message_str and "Professional Automotive Management System" not in message_str and "Ha iniciado sesión exitosamente" not in message_str and "Ha cerrado sesión" not in message_str and "iniciado sesión exitosamente" not in message_str and "cerrado sesión" not in message_str and "Información de empresa guardada exitosamente" not in message_str and "Selecciona o crea tu empresa" not in message_str %}
                         <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
                             {{ message }}
                         </div>
@@ -536,7 +536,7 @@ body {
         {% endif %}
 
         <!-- Formulario -->
-        <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
+        <form method="POST" action="{{ request.get_full_path }}" class="space-y-6">
             {% csrf_token %}
             {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 

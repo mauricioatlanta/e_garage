@@ -95,8 +95,11 @@ def api_next_number(request):
     if tipo not in allowed:
         return _json_ok({"numero": "Se generará automáticamente"}, 200)
 
+    serie = (request.GET.get("serie") or request.GET.get("context") or "WORKSHOP").upper()
+    if serie not in ("WORKSHOP", "PARTS", "MIXED"):
+        serie = "WORKSHOP"
     seq, _ = DocumentSequence.objects.get_or_create(
-        empresa=request.user.empresa, tipo=tipo, defaults={"current": 0}
+        empresa=request.user.empresa, tipo=tipo, serie=serie, defaults={"current": 0}
     )
     next_num = (seq.current or 0) + 1
     numero = f"{allowed[tipo]}{next_num:03d}"
@@ -196,31 +199,23 @@ def api_create(request):
     if getattr(veh, "cliente_id", None) and veh.cliente_id != cli.id:
         return _json_ok({"error": "vehiculo_cliente_mismatch"}, 400)
 
-    # Crear Documento
+    # Crear Documento (context para numeración por serie)
+    ctx = (payload.get("context") or "workshop").lower()
     doc_kwargs = dict(
         empresa=emp,
         tipo=tipo,
         fecha_emision=payload["fecha_emision"],  # ISO yyyy-mm-dd
+        context=ctx if ctx in ("workshop", "parts", "mixed") else "workshop",
     )
     doc_fields = {f.name for f in Documento._meta.fields}
     if "cliente" in doc_fields:
         doc_kwargs["cliente"] = cli
     if "vehiculo" in doc_fields:
         doc_kwargs["vehiculo"] = veh
+    if "context" not in doc_fields:
+        doc_kwargs.pop("context", None)
 
     doc = Documento.objects.create(**doc_kwargs)
-
-    # (Opcional recomendado) Reservar y asignar correlativo aquí de manera segura
-    # si tu Documento tiene un campo 'numero'
-    if "numero" in doc_fields:
-        seq = DocumentSequence.objects.select_for_update().get_or_create(
-            empresa=emp, tipo=tipo, defaults={"current": 0}
-        )[0]
-        seq.current = (seq.current or 0) + 1
-        seq.save(update_fields=["current"])
-        prefix = {"OT": "OT", "PRES": "P", "REC": "R"}[tipo]
-        doc.numero = f"{prefix}{seq.current:03d}"
-        doc.save(update_fields=["numero"])
 
     # Técnico responsable (si aplica)
     tecnico_obj = None

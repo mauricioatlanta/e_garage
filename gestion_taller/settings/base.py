@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     "dal_select2",
     "crispy_forms",
     "crispy_bootstrap5",
-    "taller",
+    "taller.apps.TallerConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,8 +44,16 @@ INSTALLED_APPS = [
     "django.contrib.sites",
     "rest_framework",
     "ubicacion.apps.UbicacionConfig",
-    "marketplace.apps.MarketplaceConfig",
 ]
+
+# Marketplace: opcional; solo se agrega si el módulo existe (evita crash si no está desplegado)
+# Comprobamos marketplace.apps para asegurar que existe la app completa
+try:
+    import marketplace.apps  # noqa: F401
+
+    INSTALLED_APPS.append("marketplace.apps.MarketplaceConfig")
+except (ImportError, ModuleNotFoundError):
+    pass
 
 # Middleware común - ORDEN RECOMENDADO POR DJANGO
 MIDDLEWARE = [
@@ -53,25 +61,31 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     # 2. Sesiones (antes de autenticación)
     "django.contrib.sessions.middleware.SessionMiddleware",
-    # 2b. Redirigir /accounts/login/ → /cl/accounts/login/ (evita UY por sesión)
+    # 2b. Login country-aware: /accounts/login/?next=... → /<cc>/accounts/login/?next=... (cc desde next o from)
     "taller.middleware.force_accounts_to_cl.ForceAccountsToCLMiddleware",
-    # 3. Localización (antes de CommonMiddleware)
-    "django.middleware.locale.LocaleMiddleware",
-    # 4. Common (después de sesiones y locale)
+    # 3. Common (antes de Locale para que el orden sea Session -> Common -> Locale)
     "django.middleware.common.CommonMiddleware",
+    # 4. Localización (después de Session y Common; evita que cookie/sesión gane sobre prefijo /us/en/)
+    "django.middleware.locale.LocaleMiddleware",
     # 5. CSRF (antes de autenticación)
     "django.middleware.csrf.CsrfViewMiddleware",
     # 6. Autenticación
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # 6b. Reescribe redirect a /accounts/login/ → /<cc>/accounts/login/ o /<cc>/<lang>/accounts/login/
+    "taller.middleware.login_country_fix.FixLoginCountryRedirectMiddleware",
     # 7. Mensajes (después de autenticación)
     "django.contrib.messages.middleware.MessageMiddleware",
     # 8. Clickjacking (después de mensajes)
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # 9. Allauth (después de autenticación) - Agregado dinámicamente si existe
     # 10. Middlewares personalizados (orden específico)
+    # País desde path PRIMERO (no desde host): /us/ → US, /cl/ → CL. request.country para vistas.
+    "taller.middleware.country_detection.CountryDetectionMiddleware",
     # "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.force_home_test.ForceHomeTestMiddleware",  # DESHABILITADO - Ya verificamos que funciona
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
+    # Coherencia URL/empresa: si usuario tiene empresa y está en /cl/ o /us/, el país debe coincidir; si no, redirige.
+    "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
     # "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.country_context.CountryContextMiddleware",  # DESHABILITADO - Causa bucles infinitos con /es/
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
@@ -183,7 +197,9 @@ AUTHENTICATION_BACKENDS = (
     "django.contrib.auth.backends.ModelBackend",
     "allauth.account.auth_backends.AuthenticationBackend",
 )
-LOGIN_REDIRECT_URL = "/login/"
+LOGIN_REDIRECT_URL = (
+    "/"  # Home/dashboard; "/login/" causaba bucle (redirige al formulario de login)
+)
 ACCOUNT_LOGOUT_REDIRECT_URL = "/login/"
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_EMAIL_VERIFICATION = "none"
@@ -206,8 +222,8 @@ ACCOUNT_FORMS = {
     "login": "taller.forms.custom_login.CustomLoginForm",
 }
 
-# Login default: ruta con país para que @login_required lleve a Chile por defecto
-LOGIN_URL = "/cl/accounts/login/"
+# Login default: ruta sin país fijo (evita que @login_required mande siempre a Chile)
+LOGIN_URL = "/accounts/login/"
 
 # ---------- eGarage país e idioma por defecto ----------
 # Si alguien entra por /accounts/login/ (ruta sin país), el fallback es Chile, no Uruguay.
@@ -216,6 +232,12 @@ EGARAGE_DEFAULT_COUNTRY = os.getenv("EGARAGE_DEFAULT_COUNTRY", "cl")
 EGARAGE_DEFAULT_LANG = os.getenv("EGARAGE_DEFAULT_LANG", "es")
 # Alias para middleware/context que usan getattr(settings, "DEFAULT_COUNTRY", "CL")
 DEFAULT_COUNTRY = EGARAGE_DEFAULT_COUNTRY.upper()
+
+# Países con prefijo de URL activos (SimpleCountryRedirectMiddleware y URLs country-aware).
+# Escalar LATAM: añadir "MX", "CO", "AR", etc. cuando corresponda.
+EGARAGE_ACTIVE_COUNTRIES = ("CL", "US")
+# Idioma por defecto por país (US → en; resto LATAM → es). Clave = código país en mayúsculas.
+EGARAGE_COUNTRY_DEFAULT_LANG = {"US": "en", "CL": "es"}
 
 # Adaptador personalizado para redirección según país
 ACCOUNT_ADAPTER = "taller.views_extra.account_adapter.CountryAwareAccountAdapter"
@@ -229,6 +251,8 @@ EMAIL_USE_TLS = False
 EMAIL_HOST_USER = "subscription@egarage.cl"
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD", "laila2013-")
 DEFAULT_FROM_EMAIL = "eGarage <subscription@egarage.cl>"
+# Email: evita que se cuelgue y mate el worker (Gunicorn timeout)
+EMAIL_TIMEOUT = int(os.environ.get("EMAIL_TIMEOUT", "10"))  # segundos
 
 # Logging útil (errores reales)
 if SAFE_MODE:

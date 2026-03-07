@@ -1,3 +1,4 @@
+<!-- TEMPLATE: CL/ES VEHICULOS CREAR v20260228 -->
 {% extends 'base.html' %}
 {% load country_url %}
 {% load static %}
@@ -178,25 +179,26 @@
     <div class="max-w-4xl mx-auto">
       <!-- Endpoints para el formulario jerárquico -->
       <div id="vehiculos-endpoints"
-           data-ep-modelos="{% country_url 'vehiculos:modelos_por_marca_api' %}"
-           data-ep-motores="{% country_url 'vehiculos:ajax_motores_por_modelo' %}"
-           data-ep-cajas="{% country_url 'vehiculos:ajax_cajas_por_modelo' %}"
-           data-ep-agregar-marca="{% country_url 'vehiculos:ajax_agregar_marca' %}"
-           data-ep-agregar-modelo="{% country_url 'vehiculos:ajax_agregar_modelo' %}"
-           data-ep-agregar-motor="{% country_url 'vehiculos:ajax_agregar_motor' %}"
-           data-ep-agregar-caja="{% country_url 'vehiculos:ajax_agregar_caja' %}"
-           data-ep-agregar-color="{% country_url 'vehiculos:ajax_agregar_color' %}"
+           data-ep-modelos="{% country_url 'vehiculos:modelos_por_marca_api' app_namespace='direct' %}"
+           data-ep-motores="{% country_url 'vehiculos:ajax_motores_por_modelo' app_namespace='direct' %}"
+           data-ep-cajas="{% country_url 'vehiculos:ajax_cajas_por_modelo' app_namespace='direct' %}"
+           data-ep-agregar-marca="{% country_url 'vehiculos:ajax_agregar_marca' app_namespace='direct' %}"
+           data-ep-agregar-modelo="{% country_url 'vehiculos:ajax_agregar_modelo' app_namespace='direct' %}"
+           data-ep-agregar-motor="{% country_url 'vehiculos:ajax_agregar_motor' app_namespace='direct' %}"
+           data-ep-agregar-caja="{% country_url 'vehiculos:ajax_agregar_caja' app_namespace='direct' %}"
+           data-ep-agregar-color="{% country_url 'vehiculos:ajax_agregar_color' app_namespace='direct' %}"
+           data-ep-clientes="{% country_url 'vehiculos:api_busqueda_clientes' app_namespace='direct' %}"
            style="display: none;"></div>
 
       <form id="form-crear-vehiculo"
             method="post"
             action="{% country_url 'vehiculos:crear_vehiculo' %}"
+            data-country-prefix="{{ country|lower }}"
+            data-lang-prefix="{% if country == 'US' %}en{% else %}es{% endif %}"
             class="space-y-6">
         {% csrf_token %}
-        
-        <!-- Hidden inputs para preservar cliente_id y next en POST -->
-        <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
-        <input type="hidden" name="cliente_id" value="{% firstof cliente_id request.GET.cliente_id '' %}">
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+        {% if cliente_id %}<input type="hidden" name="cliente_id" value="{{ cliente_id }}">{% endif %}
 
         <!-- Información del cliente -->
         <div class="relative group">
@@ -211,13 +213,20 @@
               <label for="id_cliente" class="block text-sm font-medium text-gray-300 mb-2">
                 Cliente *
               </label>
-              <div id="cliente-container" class="relative">
+              <div id="cliente-container" class="relative flex flex-col gap-2">
                 {% render_field form.cliente class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400" %}
+                <a href="{% country_url 'clientes:crear_cliente' %}?next={{ request.path|urlencode }}"
+                   class="inline-flex items-center gap-2 text-sm text-cyan-400 hover:text-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400/50 rounded px-2 py-1 w-fit"
+                   id="link-crear-cliente">
+                  <span aria-hidden="true">➕</span>
+                  <span>Crear cliente nuevo</span>
+                </a>
               </div>
               {% if form.cliente.errors %}
                 <div class="mt-1 text-xs text-red-400">{{ form.cliente.errors }}</div>
               {% endif %}
-              <div class="mt-1 text-xs text-gray-400">Escribe para buscar clientes por nombre, email o teléfono...</div>
+              <p class="mt-1 text-xs text-gray-400" id="cliente-hint">Búsqueda en tiempo real: escribe nombre, apellido, email o teléfono para ver clientes registrados.</p>
+              <p class="mt-0.5 text-xs text-cyan-300/80 hidden" id="cliente-focus-hint" aria-live="polite">Comienza a escribir para ver resultados.</p>
             </div>
           </div>
         </div>
@@ -1018,6 +1027,28 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Hint al foco: "Comienza a escribir para ver resultados"
+    (function() {
+      var hint = document.getElementById('cliente-focus-hint');
+      var general = document.getElementById('cliente-hint');
+      if (!hint) return;
+      function showFocusHint() {
+        if (general) general.classList.add('hidden');
+        hint.classList.remove('hidden');
+      }
+      function hideFocusHint() {
+        hint.classList.add('hidden');
+        if (general) general.classList.remove('hidden');
+      }
+      var container = document.getElementById('cliente-container');
+      if (container) {
+        container.addEventListener('focusin', showFocusHint);
+        container.addEventListener('focusout', function(e) {
+          if (!container.contains(e.relatedTarget)) hideFocusHint();
+        });
+      }
+    })();
+
     // Inicialización de Select2 para campos del formulario
     jQuery('#id_anio').select2({ 
       placeholder: "Selecciona año...",
@@ -1073,6 +1104,10 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   async function cargarModelos() {
+    // Parche: No ejecutar lógica USA fuera de /us/ (evita 403 por fetch a /us/ en CL)
+    if (modelosUrl && modelosUrl.indexOf('/us/') !== -1 && !window.location.pathname.startsWith('/us/')) {
+      return;
+    }
     // Obtener el valor directamente del elemento justo al iniciar la función
     // Esto asegura que obtenemos el valor correcto incluso si Select2 está en proceso de actualización
     const marcaId = jQuery('#id_marca').val();
@@ -1557,9 +1592,71 @@ jQuery(document).ready(function($) {
 {{ block.super }}
 {# form.media ya se carga en base.html (CSS en head, JS al final del body) - NO duplicar aquí #}
 <script>
-// Inicialización mejorada de Select2/DAL para el campo cliente en Chile
+// Fallback: búsqueda de clientes en tiempo real vía API (si DAL no inicializó el campo)
+(function initClienteSearchFallback() {
+  var form = document.getElementById('form-crear-vehiculo');
+  var endpoints = document.getElementById('vehiculos-endpoints');
+  var apiClientes = endpoints && endpoints.dataset && endpoints.dataset.epClientes;
+  if (!apiClientes) {
+    var pathParts = (window.location.pathname || '/cl/es/').replace(/^\/+|\/+$/g, '').split('/');
+    var prefix = '/' + (pathParts[0] || 'cl') + '/' + (pathParts[1] || 'es') + '/';
+    apiClientes = prefix + 'vehiculos/api/clientes/';
+  }
+  var clienteSelect = document.getElementById('id_cliente');
+  if (!clienteSelect || clienteSelect.tagName !== 'SELECT') return;
+  function applyAjaxSelect2() {
+    if (typeof jQuery === 'undefined' || !jQuery.fn.select2) return;
+    var $el = jQuery(clienteSelect);
+    if ($el.hasClass('select2-hidden-accessible')) return;
+    $el.select2({
+      placeholder: 'Escribe para buscar cliente por nombre, apellido, email o teléfono…',
+      allowClear: true,
+      width: '100%',
+      minimumInputLength: 1,
+      language: {
+        inputTooShort: function() { return 'Escribe al menos 1 carácter…'; },
+        noResults: function() { return 'No se encontraron clientes'; },
+        searching: function() { return 'Buscando…'; }
+      },
+      ajax: {
+        url: apiClientes,
+        dataType: 'json',
+        delay: 250,
+        data: function(params) { return { q: params.term || '' }; },
+        processResults: function(data) {
+          if (!Array.isArray(data)) return { results: [] };
+          return {
+            results: data.map(function(c) {
+              var text = [c.nombre, c.apellido].filter(Boolean).join(' ');
+              if (c.email) text += ' – ' + c.email;
+              if (c.telefono) text += ' (' + c.telefono + ')';
+              return { id: c.id, text: text || String(c.id) };
+            })
+          };
+        },
+        cache: true
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(applyAjaxSelect2, 800);
+      setTimeout(applyAjaxSelect2, 2000);
+    });
+  } else {
+    setTimeout(applyAjaxSelect2, 800);
+    setTimeout(applyAjaxSelect2, 2000);
+  }
+})();
+
+// Inicialización mejorada de Select2/DAL para el campo cliente (country-aware)
+// Routing real: /cl/es/vehiculos/autocomplete/cliente/ y /us/en/vehiculos/autocomplete/cliente/
 (function() {
-  const countryPrefix = '/cl/';
+  const formEl = document.getElementById('form-crear-vehiculo');
+  const countryFromForm = formEl && formEl.dataset && formEl.dataset.countryPrefix;
+  const langFromForm = formEl && formEl.dataset && formEl.dataset.langPrefix;
+  const countryPrefix = countryFromForm ? '/' + countryFromForm + '/' : '/cl/';
+  const langSegment = (langFromForm === 'en' || langFromForm === 'es') ? langFromForm : 'es';
   let initAttempted = false;
   
   function initializeClienteSelect2() {
@@ -1602,8 +1699,8 @@ jQuery(document).ready(function($) {
         console.log('✅ URL de autocomplete correcta:', autocompleteUrl);
       }
     } else {
-      // Establecer URL por defecto
-      const defaultUrl = countryPrefix + 'vehiculos/autocomplete/cliente/';
+      // Establecer URL por defecto según país del formulario (cl o us)
+      const defaultUrl = '/' + (formEl && formEl.dataset.countryPrefix ? formEl.dataset.countryPrefix : 'cl') + '/' + langSegment + '/vehiculos/autocomplete/cliente/';
       clienteField.setAttribute('data-autocomplete-light-url', defaultUrl);
       clienteField.setAttribute('data-ajax--url', defaultUrl);
       console.log('🔧 URL de autocomplete establecida por defecto:', defaultUrl);

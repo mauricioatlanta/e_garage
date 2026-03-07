@@ -1,9 +1,30 @@
 # gestion_taller/settings_prod.py
 import os
+import sys
 from pathlib import Path
+
+from django.core.exceptions import ImproperlyConfigured
 
 from .settings import *  # noqa: F401,F403
 
+# =============================================================================
+# SECRET_KEY (obligatorio en producción - evita W009)
+# =============================================================================
+# Leer SECRET_KEY o DJANGO_SECRET_KEY desde .env.prod (EnvironmentFile en systemd).
+# Sin esto, Django usa fallback inseguro y check --deploy reporta W009.
+# Al ejecutar "manage.py test" se permite clave temporal para no depender de .env.prod.
+_SECRET = os.getenv("SECRET_KEY") or os.getenv("DJANGO_SECRET_KEY")
+if not _SECRET or _SECRET.strip() == "":
+    if "test" in sys.argv:
+        from django.core.management.utils import get_random_secret_key
+
+        SECRET_KEY = get_random_secret_key()
+    else:
+        raise ImproperlyConfigured(
+            "En producción defina SECRET_KEY o DJANGO_SECRET_KEY en .env.prod (o en el unit de gunicorn)."
+        )
+else:
+    SECRET_KEY = _SECRET.strip()
 
 # =============================================================================
 # STATIC / MEDIA
@@ -53,13 +74,17 @@ DEBUG = env_bool("DJANGO_DEBUG", False)
 # =========================
 ALLOWED_HOSTS = env_list(
     "DJANGO_ALLOWED_HOSTS",
-    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,.pythonanywhere.com,localhost,127.0.0.1",
+    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,.pythonanywhere.com,localhost,127.0.0.1,159.223.200.106",
 )
 
-CSRF_TRUSTED_ORIGINS = env_list(
+# Django no soporta wildcards en CSRF_TRUSTED_ORIGINS; filtrar * para evitar 403 CSRF
+_csrf_origins_raw = env_list(
     "DJANGO_CSRF_TRUSTED_ORIGINS",
-    "https://egarage.cl,https://www.egarage.cl,https://atlantareciclajes.cl,https://www.atlantareciclajes.cl,https://*.pythonanywhere.com",
+    "https://egarage.cl,https://www.egarage.cl,https://atlantareciclajes.cl,https://www.atlantareciclajes.cl",
 )
+CSRF_TRUSTED_ORIGINS = [o for o in _csrf_origins_raw if "*" not in o]
+if not any("egarage.cl" in o for o in CSRF_TRUSTED_ORIGINS):
+    CSRF_TRUSTED_ORIGINS.extend(["https://egarage.cl", "https://www.egarage.cl"])
 
 
 # =========================
@@ -80,8 +105,8 @@ CSRF_COOKIE_SECURE = env_bool("DJANGO_CSRF_COOKIE_SECURE", True)
 # Recomendado en producción (evita robo de cookie por JS)
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False  # normalmente False para formularios estándar
-SESSION_COOKIE_SAMESITE = env_str("DJANGO_SESSION_COOKIE_SAMESITE", "Lax") or "Lax"
-CSRF_COOKIE_SAMESITE = env_str("DJANGO_CSRF_COOKIE_SAMESITE", "Lax") or "Lax"
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
 
 
 # =========================
@@ -95,6 +120,37 @@ SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", True) if SECURE_SSL
 
 
 # =========================
+# LOGGING: solo consola en producción (evita PermissionError en /srv/egarage/logs/)
+# =========================
+# Si no se fuerza aquí, un settings que herede file/error_file puede hacer fallar
+# a los workers de Gunicorn si el usuario no tiene permiso de escritura en logs/.
+import sys
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "default": {
+            "format": "%(levelname)s %(asctime)s %(name)s %(message)s",
+        },
+    },
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "stream": sys.stderr,
+            "formatter": "default",
+        },
+    },
+    "root": {"handlers": ["console"], "level": "INFO"},
+    "loggers": {
+        "django": {"handlers": ["console"], "level": "INFO", "propagate": False},
+        "django.request": {"handlers": ["console"], "level": "ERROR", "propagate": False},
+        "django.security": {"handlers": ["console"], "level": "WARNING", "propagate": False},
+        "taller": {"handlers": ["console"], "level": "INFO", "propagate": False},
+    },
+}
+
+# =========================
 # Security headers
 # =========================
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -106,21 +162,34 @@ SECURE_REFERRER_POLICY = (
 
 
 # =========================
-# DB: Configuración unificada para DigitalOcean
+# DB: DATABASE_URL tiene prioridad (evita Postgres con ruta SQLite)
 # =========================
-# Permite usar SQLite temporalmente o PostgreSQL según variables de entorno
-# Para migrar a PostgreSQL, configura estas variables en .env:
-#   DJANGO_DB_ENGINE=postgresql
-#   DJANGO_DB_NAME=egarage_db
-#   DJANGO_DB_USER=egarage
-#   DJANGO_DB_PASSWORD=tu_password
-#   DJANGO_DB_HOST=127.0.0.1
-#   DJANGO_DB_PORT=5432
+# 1) Si DATABASE_URL es sqlite → siempre SQLite (ignora DJANGO_DB_ENGINE/DJANGO_DB_NAME)
+# 2) Si quieres Postgres: DJANGO_DB_ENGINE=postgresql Y DJANGO_DB_PASSWORD obligatorio
+# 3) Si no → SQLite en /srv/egarage/data/db.sqlite3
 
-DB_ENGINE = env_str("DJANGO_DB_ENGINE", "sqlite3").lower()
+_database_url = (os.getenv("DATABASE_URL") or "").strip()
 
-if DB_ENGINE == "postgresql" or DB_ENGINE == "postgres":
-    # PostgreSQL - Configuración para producción
+if _database_url.lower().startswith("sqlite"):
+    # DATABASE_URL=sqlite:////srv/egarage/data/db.sqlite3 → usar SQLite (nunca Postgres)
+    import urllib.parse
+
+    _u = urllib.parse.urlparse(_database_url)
+    _path = (_u.path or "").strip()
+    if _path.startswith("//"):
+        _path = "/" + _path.lstrip("/")
+    if not _path or not os.path.isabs(_path):
+        _path = str(BASE_DIR / (_path or "data/db.sqlite3"))
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": _path,
+        }
+    }
+elif env_str("DJANGO_DB_ENGINE", "sqlite3").lower() in ("postgresql", "postgres") and env_str(
+    "DJANGO_DB_PASSWORD"
+):
+    # PostgreSQL solo con contraseña (evita fe_sendauth: no password supplied)
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql",
@@ -129,36 +198,20 @@ if DB_ENGINE == "postgresql" or DB_ENGINE == "postgres":
             "PASSWORD": env_str("DJANGO_DB_PASSWORD"),
             "HOST": env_str("DJANGO_DB_HOST", "127.0.0.1"),
             "PORT": env_str("DJANGO_DB_PORT", "5432"),
-            "OPTIONS": {
-                "connect_timeout": 10,
-            },
+            "OPTIONS": {"connect_timeout": 10},
         }
     }
-
-    # Validar que la contraseña esté configurada
-    if not DATABASES["default"]["PASSWORD"]:
-        raise RuntimeError(
-            "DJANGO_DB_PASSWORD debe estar configurado cuando se usa PostgreSQL. "
-            "Configúralo en tu archivo .env o variables de entorno."
-        )
 else:
-    # SQLite - Temporal para migración a DigitalOcean
-    # ⚠️ ADVERTENCIA: SQLite no es recomendado para producción con múltiples workers
-    # Usa esto solo durante la migración inicial
+    # SQLite por defecto (sin DATABASE_URL sqlite y sin Postgres con password)
+    _sqlite_name = env_str("SQLITE_PATH", "/srv/egarage/data/db.sqlite3")
+    if not os.path.isabs(_sqlite_name):
+        _sqlite_name = str(BASE_DIR / _sqlite_name.lstrip("/"))
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
-            "NAME": env_str("DJANGO_DB_NAME", "/srv/egarage/db.sqlite3"),
+            "NAME": _sqlite_name,
         }
     }
-
-    # Validación desactivada temporalmente para permitir SQLite durante la migración
-    # Cuando migres a PostgreSQL, descomenta estas líneas para forzar PostgreSQL:
-    # if DATABASES["default"]["ENGINE"].endswith("sqlite3"):
-    #     raise RuntimeError(
-    #         "SQLite NO está permitido en producción. "
-    #         "Configura DJANGO_DB_ENGINE=postgresql en tu archivo .env"
-    #     )
 
 
 # =========================
@@ -174,22 +227,63 @@ TEMPLATES[0]["DIRS"] = [str(Path(p).resolve()) for p in TEMPLATES[0]["DIRS"]]
 # --- FIX FINAL DIGITALOCEAN ---
 DEBUG = False
 
+# 🔥 CRÍTICO: ALLOWED_HOSTS debe estar explícitamente definido aquí
+# para evitar Error 400 (Bad Request) cuando las variables de entorno no se cargan correctamente
+# Incluye IP del servidor (159.223.200.106) para acceso directo y health checks
+ALLOWED_HOSTS = [
+    "egarage.cl",
+    "www.egarage.cl",
+    "atlantareciclajes.cl",
+    "www.atlantareciclajes.cl",
+    "127.0.0.1",
+    "localhost",
+    "159.223.200.106",
+]
+
 # Corregir rutas que tienen "/app/" de más
 STATIC_ROOT = "/srv/egarage/staticfiles"
 MEDIA_ROOT = "/srv/egarage/media"
 
-# Forzar la base de datos a la ruta real de tu servidor
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": "/srv/egarage/db.sqlite3",
-    }
-}
+# 🔥 CRÍTICO: Asegurar que Django encuentre los templates
+# Incluye tanto la carpeta raíz como la carpeta de la app (por si acaso)
+_base_dir = BASE_DIR if isinstance(BASE_DIR, Path) else Path(str(BASE_DIR))
+TEMPLATES[0]["DIRS"] = [
+    str(_base_dir / "templates"),
+    str(_base_dir / "taller" / "templates"),  # Por si hay templates dentro de la app
+]
+# Seguridad extra: normalizar rutas
+TEMPLATES[0]["DIRS"] = [str(Path(p).resolve()) for p in TEMPLATES[0]["DIRS"] if Path(p).exists()]
 
-# Deshabilitar el bloqueo de SQLite
-# if DATABASES["default"]["ENGINE"].endswith("sqlite3"):
-#     raise RuntimeError("PostgreSQL es obligatorio")
+# DB ya definido arriba (DATABASE_URL sqlite → SQLite; Postgres con password → Postgres; sino → SQLite)
 
 # Configuración crítica para el SSL que acabas de instalar
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_TRUSTED_ORIGINS = ["https://egarage.cl", "https://www.egarage.cl"]
+
+# ==========================================
+# AUTH FIX (Multi-country login neutral)
+# ==========================================
+LOGIN_URL = "/accounts/login/"
+
+# ==========================================
+# Allauth: email + username explícito (prod)
+# ==========================================
+ACCOUNT_AUTHENTICATION_METHOD = "username_email"
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = True
+ACCOUNT_EMAIL_VERIFICATION = "none"  # o "optional" si quieres
+
+# ForceAccountsToCLMiddleware ya viene de settings/base.py; no reinserir aquí (evita duplicado).
+
+# =============================================================================
+# Forzar valores finales (evitar que env o herencia los rompan)
+# =============================================================================
+# 1. Forzar que collectstatic exista
+if "django.contrib.staticfiles" not in INSTALLED_APPS:
+    INSTALLED_APPS.append("django.contrib.staticfiles")
+
+# 2. Permitir la IP y el dominio (Evitar DisallowedHost)
+ALLOWED_HOSTS = ["egarage.cl", "www.egarage.cl", "159.223.200.106", "localhost", "127.0.0.1"]
+
+# 3. NO MORIR por el logo faltante
+WHITENOISE_MANIFEST_STRICT = False

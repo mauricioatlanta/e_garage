@@ -6,9 +6,6 @@ import io
 from datetime import datetime
 from decimal import Decimal
 
-import pandas as pd
-from openpyxl.styles import Alignment, Font, PatternFill
-
 from django.apps import apps
 from django.conf import settings
 from django.http import HttpResponse
@@ -272,6 +269,13 @@ class ReportesExcelExporter:
 
     def exportar_rentabilidad_mensual(self):
         """Exporta reporte de rentabilidad mensual a Excel"""
+        try:
+            import pandas as pd
+        except ImportError:
+            raise RuntimeError(
+                "Export a Excel requiere 'pandas'. Instálalo con: pip install pandas"
+            )
+
         from taller.models.documento import Documento
 
         # Filtrar documentos
@@ -329,7 +333,9 @@ class ReportesExcelExporter:
             workbook = writer.book
             worksheet = writer.sheets["Rentabilidad"]
 
-            # Estilos
+            # Estilos (import lazy para no tumbar la app si falta openpyxl)
+            from openpyxl.styles import Alignment, Font, PatternFill
+
             header_font = Font(bold=True, color="FFFFFF")
             header_fill = PatternFill(start_color="007bff", end_color="007bff", fill_type="solid")
 

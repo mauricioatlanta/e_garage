@@ -5,8 +5,9 @@ import logging
 
 
 def main():
-    # Warning solo en desarrollo
-    if os.getenv("EGARAGE_ENV", "dev").lower() != "prod":
+    # Warning solo en desarrollo (no en producción)
+    ENV = (os.getenv("DJANGO_ENV") or os.getenv("ENV") or "").lower()
+    if ENV not in ("prod", "production"):
         logging.warning("Modo de desarrollo activado. Asegúrate de no usar esto en producción.")
 
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")

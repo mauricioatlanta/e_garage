@@ -5,6 +5,8 @@ from taller.utils.empresa import get_active_empresa
 
 
 def company_header(request):
+    if not getattr(request, "user", None) or not request.user.is_authenticated:
+        return {}
     empresa = get_active_empresa(request)
     if not empresa:
         return {}

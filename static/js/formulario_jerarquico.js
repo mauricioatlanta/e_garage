@@ -47,10 +47,9 @@ $(function () {
   }
 
   const basePrefix = detectBasePrefix();
-
-  const modelosUrl = getDatasetValue("epModelos", "modelosUrl") || `${basePrefix}ajax/modelos-por-marca-anio/`;
-  const motoresUrl = getDatasetValue("epMotores", "motoresUrl") || `${basePrefix}ajax/motores-por-modelo/`;
-  const cajasUrl = getDatasetValue("epCajas", "cajasUrl") || `${basePrefix}ajax/cajas-por-modelo/`;
+  const modelosUrl = getDatasetValue("epModelos", "modelosUrl") || (console.warn("[formulario_jerarquico] ⚠️ data-ep-modelos faltante. Agregar #vehiculos-endpoints con data-ep-modelos desde country_url."), basePrefix + "ajax/modelos-por-marca-anio/");
+  const motoresUrl = getDatasetValue("epMotores", "motoresUrl") || basePrefix + "ajax/motores-por-modelo/";
+  const cajasUrl = getDatasetValue("epCajas", "cajasUrl") || basePrefix + "ajax/cajas-por-modelo/";
 
   // Cuando cambia marca o año → cargar modelos
   $marca.add($anio).on("change", function () {

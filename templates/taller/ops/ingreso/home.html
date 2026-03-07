@@ -1,0 +1,76 @@
+{% extends "taller/ops/ingreso/base_ingreso.html" %}
+{% load i18n %}
+{% load country_url %}
+{% block title %}{% trans "Ingreso de Vehículo" %} | {{ empresa.nombre_taller }}{% endblock %}
+{% block content %}
+<div class="ingreso-wrap">
+  <div class="container py-4">
+    <h1 class="text-center mb-4" style="font-family: Orbitron; color: var(--ops-cyan);">{% trans "Centro de Ingreso Pro" %}</h1>
+    <p class="text-center text-white-50 mb-5">{% trans "Recepción inteligente con evidencia" %}</p>
+
+    <div class="row justify-content-center g-4">
+      <div class="col-md-4">
+        <div class="glass-panel text-center p-4 h-100">
+          <div class="mb-3" style="font-size: 3rem;">📸</div>
+          <h3 class="h5 mb-3">{% trans "Escanear patente" %}</h3>
+          {% if ocr_available %}
+          <button type="button" class="btn-ingreso w-100" id="btn-ocr-patente" data-bs-toggle="modal" data-bs-target="#modal-ocr">
+            {% trans "Escanear" %}
+          </button>
+          <input type="file" id="input-ocr-patente" accept="image/*" capture="environment" class="d-none">
+          {% else %}
+          <p class="text-warning small">{% trans "OCR no disponible" %}</p>
+          <p class="text-white-50 small">{% trans "Usa ingreso manual" %}</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="glass-panel text-center p-4 h-100">
+          <div class="mb-3" style="font-size: 3rem;">⌨️</div>
+          <h3 class="h5 mb-3">{% trans "Escribir patente" %}</h3>
+          <form method="get" action="{% country_url 'ops:ops_ingreso_patente' app_namespace='direct' %}" id="form-patente-manual">
+            <input type="hidden" name="patente" id="input-patente-manual" value="">
+          </form>
+          <input type="text" class="form-control ingreso-input mb-3" id="patente-manual" placeholder="ABCD12" maxlength="20" autocomplete="off">
+          <button type="button" class="btn-ingreso btn-ingreso-primary w-100" id="btn-manual-patente">{% trans "Continuar" %}</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center mt-5">
+      <a href="{% if request.path|slice:':4' == '/us/' %}/us/centro-operaciones/{% else %}/cl/es/centro-operaciones/{% endif %}" class="btn btn-outline-light">{% trans "Volver al Centro de Operaciones" %}</a>
+    </div>
+  </div>
+</div>
+
+<input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+{% if ocr_available %}
+<div class="modal fade" id="modal-ocr" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content glass-panel border border-cyan">
+      <div class="modal-header border-0">
+        <h5 class="modal-title">{% trans "Candidatos de patente" %}</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body" id="ocr-candidates"></div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn-ingreso" data-bs-dismiss="modal">{% trans "Cerrar" %}</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+window.INGRESO_OCR_PATENTE_URL = "{% country_url 'ops:api_ocr_patente' app_namespace='direct' %}";
+window.INGRESO_PATENTE_URL = "{% country_url 'ops:ops_ingreso_patente' app_namespace='direct' %}";
+</script>
+<script src="{% static 'ops/ingreso/ingreso.js' %}"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  IngresoHome.init({ ocrAvailable: {{ ocr_available|yesno:"true,false" }} });
+});
+</script>
+{% endblock %}

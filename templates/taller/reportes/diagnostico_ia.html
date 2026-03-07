@@ -465,6 +465,23 @@
 </nav>
 
 <div class="ai-grid">
+  {% if not ia_disponible %}
+  <!-- Módulo IA deshabilitado: dependencia faltante (ej. pandas) -->
+  <div class="ai-header" style="grid-column: 1 / -1;">
+    <h1 class="ai-title">DIAGNÓSTICO IA</h1>
+    <p class="ai-subtitle">Módulo temporalmente deshabilitado</p>
+    <div class="ai-panel mt-4" style="max-width: 600px; margin-left: auto; margin-right: auto;">
+      <p class="text-cyan-300 mb-4">
+        El análisis predictivo requiere dependencias opcionales que no están instaladas en este entorno.
+        Los demás reportes siguen funcionando con normalidad.
+      </p>
+      {% if ia_error %}
+      <p class="text-sm text-amber-400 font-mono break-all">{{ ia_error }}</p>
+      {% endif %}
+      <p class="text-sm text-gray-500 mt-4">Contacte al administrador para habilitar el módulo IA.</p>
+    </div>
+  </div>
+  {% else %}
   <!-- Header principal -->
   <div class="ai-header">
     <h1 class="ai-title">DIAGNÓSTICO IA</h1>
@@ -618,6 +635,7 @@
       🤖 Análisis generado por IA en tiempo real
     </div>
   </div>
+  {% endif %}
 </div>
 
 <script>

@@ -499,7 +499,7 @@ body {
             {% endif %}
 
             <!-- Formulario de login -->
-            <form method="POST" action="{% url 'peru:account_login' %}">
+            <form method="POST" action="{{ request.get_full_path }}">
                 {% csrf_token %}
 
                 <!-- Usuario o Email -->

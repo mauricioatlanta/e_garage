@@ -648,7 +648,8 @@ input[name*="precio_compra"] {
 }
 
 /* Campos de kilometraje */
-input[name="kilometraje"] {
+input[name="kilometraje"],
+input[name="kilometraje_ingreso"] {
     background: rgba(20, 20, 40, 0.95) !important;
     border: 2px solid var(--cyber-purple) !important;
     border-radius: 12px !important;
@@ -661,7 +662,8 @@ input[name="kilometraje"] {
     box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
 }
 
-input[name="kilometraje"]:focus {
+input[name="kilometraje"]:focus,
+input[name="kilometraje_ingreso"]:focus {
     outline: none !important;
     border-color: var(--cyber-green) !important;
     box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
@@ -1003,16 +1005,7 @@ select[name="vehiculo"]:hover:not(:focus),
         <p class="header-info">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}User: {{ user.username }}{% else %}Usuario: {{ user.username }}{% endif %} | {{ empresa.get_pais_display }} | {{ fecha_hoy|date:"l, d F Y" }}</p>
     </div>
 
-    <!-- Mensajes del sistema -->
-    {% if messages %}
-        {% for message in messages %}
-            {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Ha iniciado sesión exitosamente" not in message|stringformat:"s" and "Ha cerrado sesión" not in message|stringformat:"s" and "iniciado sesión exitosamente" not in message|stringformat:"s" and "cerrado sesión" not in message|stringformat:"s" and "Logo actualizado exitosamente" not in message|stringformat:"s" and "Tema y colores guardados exitosamente" not in message|stringformat:"s" and "Logo subido exitosamente" not in message|stringformat:"s" and "actualizada exitosamente" not in message|stringformat:"s" %}
-                <div class="{% if message.tags == 'error' %}error-message{% elif message.tags == 'success' %}success-message{% else %}info-message{% endif %}">
-                    {{ message }}
-                </div>
-            {% endif %}
-        {% endfor %}
-    {% endif %}
+    {# Mensajes: toast flotante en layout base (sin bloques verdes) #}
 
     <!-- Contenido del documento -->
     {% block documento_content %}
@@ -1130,9 +1123,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
-
-<!-- Django Autocomplete Light -->
-{{ form.media }}
+{# jQuery + form.media se cargan una sola vez al final en base.html (evita duplicados y "jQuery is not defined") #}
 {% endblock %}
 
 
