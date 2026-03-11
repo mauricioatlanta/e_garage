@@ -13,7 +13,6 @@ from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones_espacial,
 )
 from taller.views_extra.views import dashboard
-from taller.views_extra.views_configuracion import configuracion_empresa
 from taller.views.dashboard_bi import DashboardHomeView
 
 app_name = "taller"
@@ -77,6 +76,8 @@ urlpatterns = [
     # Centro de Trabajo / Workspace (canonical /us/en/workspace/ y /us/es/workspace/)
     path("workspace/", centro_trabajo, name="centro_trabajo"),
     path("workspace/buscar/", centro_trabajo_buscar, name="centro_trabajo_buscar"),
+    # Desarmaduría: mapa interactivo, plantillas, piezas
+    path("desarme/", include(("taller.urls_desarme", "desarme"), namespace="desarme")),
     # Centro de Ingreso Vehicular
     path("ingreso/", ingreso_centro, name="ingreso_centro"),
     path("ingreso/buscar/", ingreso_buscar, name="ingreso_buscar"),
@@ -89,7 +90,7 @@ urlpatterns = [
     # Configuración real (dueño)
     path(
         "configuracion/empresa/",
-        configuracion_empresa,
+        RedirectView.as_view(pattern_name="taller:company_settings", permanent=False),
         name="configuracion_empresa",
     ),
     # Rutas principales de taller (dashboard, settings, etc.)

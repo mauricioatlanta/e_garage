@@ -1,0 +1,23 @@
+{% load i18n %}
+<footer class="desarme-footer">
+  <div class="footer-resumen-piezas">
+    <span>{% trans "Total" %}: <strong id="footer-total">{{ total_piezas }}</strong></span>
+    <span id="resumen-disponibles">{% trans "Disponibles" %}: {{ piece_summary.disponible }}</span>
+    <span id="resumen-danadas">{% trans "Dañadas" %}: {{ piece_summary.dañado }}</span>
+    <span id="resumen-scrap">Scrap: {{ piece_summary.scrap }}</span>
+    <span id="resumen-vendidas">{% trans "Vendidas" %}: {{ piece_summary.vendido }}</span>
+    <span id="resumen-reservadas">{% trans "Reservadas" %}: {{ piece_summary.reservada }}</span>
+  </div>
+  <div class="footer-finanzas">
+    <span class="text-muted small">{% trans "Ingresos repuestos" %}: </span><span id="footer-ingresos">${{ kpis.ingresos_totales|floatformat:0 }}</span>
+    <span class="text-muted small ms-2">{% trans "Chatarra" %}: </span><span id="footer-chatarra">${{ kpis.ingreso_final_chatarra|floatformat:0 }}</span>
+    <span class="text-muted small ms-2">{% trans "Utilidad" %}: </span><span id="footer-utilidad">${{ kpis.utilidad_total|floatformat:0 }}</span>
+  </div>
+  <div class="footer-progreso">
+    <small class="text-muted">{% trans "Inspección" %}: </small>
+    <span id="progreso-texto">{{ piezas_revisadas }} / {{ total_piezas }}</span>
+    <div class="progreso-bar" id="progreso-bar">
+      <div id="progreso-fill" class="progreso-fill" style="width:{{ progreso_pct }}%"></div>
+    </div>
+  </div>
+</footer>

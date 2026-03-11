@@ -1,0 +1,50 @@
+# =============================================================================
+# Ejemplo completo: servicio systemd para Gunicorn (eGarage) — producción estable
+# =============================================================================
+# Forma estándar en Linux: systemd carga .env.prod → Gunicorn recibe todas las
+# variables (SECRET_KEY, RESEND_API_KEY, DB, etc.) → Django no lanza
+# ImproperlyConfigured por variables faltantes.
+#
+# Optimizado para muchos talleres conectados:
+#   workers 4 + threads 2 = más requests concurrentes
+#   timeout 60 = evita procesos colgados
+#   max-requests + jitter = reinicio periódico de workers (evita memory leaks)
+#   logs en /var/log/gunicorn = diagnóstico de errores 500
+#
+# Uso en el servidor:
+#   1. Crear carpeta de logs: sudo mkdir -p /var/log/gunicorn
+#      sudo chown -R root:www-data /var/log/gunicorn && sudo chmod -R 775 /var/log/gunicorn
+#   2. sudo cp scripts/gunicorn.service.d/gunicorn.service.example /etc/systemd/system/gunicorn.service
+#   3. sudo systemctl daemon-reload && sudo systemctl restart gunicorn
+#
+# Ver errores en vivo: tail -f /var/log/gunicorn/error.log
+# =============================================================================
+
+[Unit]
+Description=gunicorn daemon eGarage
+After=network.target
+
+[Service]
+User=root
+Group=www-data
+WorkingDirectory=/srv/egarage
+
+EnvironmentFile=/srv/egarage/.env.prod
+Environment="DJANGO_SETTINGS_MODULE=gestion_taller.settings_prod"
+Environment="PYTHONPATH=/srv/egarage"
+
+ExecStart=/srv/egarage/venv/bin/gunicorn \
+    --workers 4 \
+    --threads 2 \
+    --timeout 60 \
+    --max-requests 1000 \
+    --max-requests-jitter 50 \
+    --bind unix:/run/gunicorn/gunicorn.sock \
+    --access-logfile /var/log/gunicorn/access.log \
+    --error-logfile /var/log/gunicorn/error.log \
+    gestion_taller.wsgi:application
+
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

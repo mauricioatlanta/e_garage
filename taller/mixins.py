@@ -1,3 +1,5 @@
+from django.template import TemplateDoesNotExist
+from django.template.loader import get_template
 from django.template.response import TemplateResponse
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.utils.translation import get_language
@@ -34,12 +36,13 @@ class CountryLangTemplateMixin:
             # Fallback a template estándar si no hay request
             return [f"taller/{base_template}"]
 
-        empresa = None
-        if hasattr(request, "user") and request.user.is_authenticated:
+        # Priorizar request.empresa (p. ej. setea ClienteCreateView en dispatch) para no tocar user.empresa
+        # y evitar 500 si la tabla Empresa tiene columnas faltantes (ej. is_trial)
+        empresa = getattr(request, "empresa", None)
+        if empresa is None and hasattr(request, "user") and request.user.is_authenticated:
             try:
                 empresa = request.user.empresa
             except Exception:
-                # Usuario sin empresa (ej. staff) o Empresa.DoesNotExist
                 empresa = None
 
         # Determinar país: prioridad URL path > request.country > empresa.pais > CL
@@ -105,9 +108,9 @@ class CountryLangTemplateMixin:
         if not self.base_template_name:
             raise ValueError("base_template_name debe estar definido en la vista")
 
-        # Obtener datos de país e idioma (evitar crash si usuario no tiene empresa)
-        empresa = None
-        if hasattr(request, "user") and request.user.is_authenticated:
+        # Priorizar request.empresa para no tocar user.empresa (evita 500 si falta columna is_trial, etc.)
+        empresa = getattr(request, "empresa", None)
+        if empresa is None and hasattr(request, "user") and request.user.is_authenticated:
             try:
                 empresa = request.user.empresa
             except Exception:
@@ -124,18 +127,33 @@ class CountryLangTemplateMixin:
             country = prefix.upper()
         elif hasattr(request, "country") and request.country:
             country = request.country
-        elif empresa and hasattr(empresa, "pais") and empresa.pais:
-            country = empresa.pais
+        elif empresa and hasattr(empresa, "pais"):
+            try:
+                country = empresa.pais or "CL"
+            except Exception:
+                country = "CL"
         else:
             country = "CL"  # default
 
         lang = get_language() or "es"
 
-        # Seleccionar template apropiado
+        # Seleccionar template que exista (evitar 500 si select_country_lang_template devuelve path inexistente)
+        template_name = None
         try:
             template_name = select_country_lang_template(self.base_template_name, country, lang)
-        except Exception:
-            # Fallback a template base si hay problemas
+            get_template(template_name)
+        except (Exception, TemplateDoesNotExist):
+            for fallback in [
+                f"taller/common/{self.base_template_name}",
+                f"taller/{self.base_template_name}",
+            ]:
+                try:
+                    get_template(fallback)
+                    template_name = fallback
+                    break
+                except TemplateDoesNotExist:
+                    continue
+        if not template_name:
             template_name = f"taller/common/{self.base_template_name}"
 
         return self.response_class(request=request, template=template_name, context=context)

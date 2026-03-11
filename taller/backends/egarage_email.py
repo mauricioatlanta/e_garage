@@ -26,7 +26,11 @@ class EgarageEmailBackend(DjangoSMTPBackend):
 
         # Errores SMTP / red típicos
         except (smtplib.SMTPAuthenticationError, smtplib.SMTPException, OSError) as e:
-            logger.exception("SMTP error (return 0, no 500): %s", e)
+            logger.warning(
+                "SMTP falló (no se envió correo). Revisar EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD: %s",
+                e,
+                exc_info=True,
+            )
             return 0
 
         # SystemExit no hereda de Exception (viene de gunicorn handle_abort)

@@ -94,6 +94,29 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
             return True
         return super().is_email_verified(request, email_address)
 
+    def send_mail(self, template_prefix, email, context):
+        """
+        Envuelve el envío en try/except para evitar 500 en password reset y otros flujos.
+        Si falla (template, SMTP, etc.), se registra y no se propaga.
+        """
+        try:
+            sent = super().send_mail(template_prefix, email, context)
+            if sent == 0:
+                logger.warning(
+                    "PASSWORD RESET / EMAIL: No se envió ningún correo (backend devolvió 0). "
+                    "Revisar SMTP (EMAIL_HOST, EMAIL_HOST_USER, EMAIL_HOST_PASSWORD) y logs del backend. to=%s",
+                    email,
+                )
+            return sent
+        except Exception as e:
+            logger.exception(
+                "Error enviando email (template=%s, to=%s): %s. No se propaga para evitar 500.",
+                template_prefix,
+                email,
+                e,
+            )
+            return 0
+
     COUNTRY_MAP = {
         "US": {"ns": "usa", "lang": "en", "default_url_name": "centro_trabajo"},
         "CL": {"ns": "chile", "lang": "es", "default_url_name": "centro_trabajo"},

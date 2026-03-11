@@ -1,0 +1,168 @@
+{% extends "taller/common/base.html" %}
+{% load static %}
+
+{% block title %}Mapa de Desarme - Demo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'taller/desarme/vehicle-map.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="desarme-demo min-h-screen bg-slate-950 text-slate-100">
+  <div class="max-w-7xl mx-auto px-4 py-6">
+
+    <!-- A. Header compacto -->
+    <header class="desarme-header mb-6">
+      <div class="flex flex-wrap gap-3 mb-3">
+        <div class="kpi-card">
+          <div class="kpi-label">Vehículo</div>
+          <div class="kpi-value">Toyota Corolla 2015</div>
+          <span class="text-slate-500 text-sm">ABC-123 · 12/01/2025</span>
+        </div>
+        <div class="kpi-card kpi-neutro">
+          <div class="kpi-label">Costo total</div>
+          <div class="kpi-value">$1.400.000</div>
+        </div>
+        <div class="kpi-card kpi-neutro">
+          <div class="kpi-label">Recuperado</div>
+          <div class="kpi-value">$850.000</div>
+        </div>
+        <div class="kpi-card kpi-negativo">
+          <div class="kpi-label">Resultado</div>
+          <div class="kpi-value">-$550.000</div>
+        </div>
+        <div class="kpi-card kpi-neutro">
+          <div class="kpi-label">Recuperación</div>
+          <div class="kpi-value">61%</div>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <a href="#" class="btn-action">Volver</a>
+        <a href="#" class="btn-action-outline">Ver piezas</a>
+        <a href="#" class="btn-action-outline">Aplicar plantilla</a>
+        <a href="#" class="btn-action-outline btn-danger">Cerrar vehículo</a>
+      </div>
+    </header>
+
+    <!-- B. Zona central -->
+    <main class="desarme-main grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-6">
+      <!-- Columna izquierda -->
+      <section class="map-panel rounded-2xl border border-slate-700/50 bg-slate-900/60 backdrop-blur p-5 shadow-xl">
+        <div class="view-tabs flex gap-1 mb-4">
+          <button type="button" class="view-tab active" data-view="frontal">Frontal</button>
+          <button type="button" class="view-tab" data-view="lateral_izq">Lateral izquierda</button>
+        </div>
+
+        <div class="piece-legend flex flex-wrap gap-4 mb-4 text-sm text-slate-400">
+          <span class="flex items-center gap-1.5"><span class="dot dot-unreviewed"></span> No revisada</span>
+          <span class="flex items-center gap-1.5"><span class="dot dot-available"></span> Disponible</span>
+          <span class="flex items-center gap-1.5"><span class="dot dot-damaged"></span> Dañada</span>
+          <span class="flex items-center gap-1.5"><span class="dot dot-scrap"></span> Scrap</span>
+          <span class="flex items-center gap-1.5"><span class="dot dot-reserved"></span> Reservada</span>
+          <span class="flex items-center gap-1.5"><span class="dot dot-sold"></span> Vendida</span>
+        </div>
+
+        <div class="mapa-wrapper rounded-xl bg-slate-800/50 border border-slate-700/50 p-4">
+          <p class="text-slate-500 text-sm mb-3">Clic en una zona para inspeccionar</p>
+          <div class="mapa-vista active" data-view="frontal">
+            {% include "taller/desarme/svg/_vehicle_front.html" %}
+          </div>
+          <div class="mapa-vista hidden" data-view="lateral_izq">
+            {% include "taller/desarme/svg/_vehicle_left.html" %}
+          </div>
+        </div>
+      </section>
+
+      <!-- Columna derecha - panel lateral -->
+      <aside id="piece-drawer" class="drawer-panel rounded-2xl border border-slate-700/50 bg-slate-900/80 backdrop-blur overflow-hidden shadow-xl h-fit lg:sticky lg:top-4">
+        <div id="drawer-empty" class="drawer-empty p-8 text-center text-slate-500">
+          <svg class="w-16 h-16 mx-auto mb-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+          <p class="font-medium">Selecciona una pieza del mapa</p>
+          <p class="text-sm mt-1">Haz clic en una zona para ver detalles</p>
+        </div>
+        <div id="drawer-content" class="drawer-content hidden p-5">
+          <div class="flex justify-between items-start mb-4">
+            <h3 class="text-lg font-semibold text-cyan-400" id="drawer-piece-name">—</h3>
+            <button type="button" class="btn-close-drawer text-slate-500 hover:text-slate-300" aria-label="Cerrar">×</button>
+          </div>
+          <p class="text-slate-500 text-sm mb-4"><span id="drawer-zone">—</span> · <span id="drawer-view">—</span></p>
+
+          <div class="mb-4">
+            <label class="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-2">Estado</label>
+            <div class="status-pills flex flex-wrap gap-2">
+              <button type="button" class="status-pill" data-status="">No revisada</button>
+              <button type="button" class="status-pill" data-status="available">Disponible</button>
+              <button type="button" class="status-pill" data-status="damaged">Dañada</button>
+              <button type="button" class="status-pill" data-status="scrap">Scrap</button>
+              <button type="button" class="status-pill" data-status="reserved">Reservada</button>
+              <button type="button" class="status-pill" data-status="sold">Vendida</button>
+            </div>
+          </div>
+
+          <div class="space-y-3 mb-4">
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Precio venta</label>
+              <input type="text" id="drawer-price" class="input-desarme w-full" placeholder="0">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Stock</label>
+              <input type="number" id="drawer-stock" class="input-desarme w-full" value="1" min="0">
+            </div>
+            <div>
+              <label class="block text-xs text-slate-400 mb-1">Observación</label>
+              <textarea id="drawer-note" class="input-desarme w-full" rows="2" placeholder="Buen estado, abolladura menor..."></textarea>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button type="button" class="btn-primary flex-1">Guardar</button>
+            <button type="button" class="btn-outline">Guardar y siguiente</button>
+            <button type="button" class="btn-scrap">Marcar scrap</button>
+          </div>
+        </div>
+      </aside>
+    </main>
+
+    <!-- C. Footer -->
+    <footer class="desarme-footer mt-6 rounded-xl border border-slate-700/50 bg-slate-900/60 backdrop-blur p-4">
+      <div class="flex flex-wrap items-center gap-6">
+        <div class="flex flex-wrap gap-4 text-sm">
+          <span id="footer-total">Total: 0</span>
+          <span id="footer-disponibles">Disponibles: 0</span>
+          <span id="footer-danadas">Dañadas: 0</span>
+          <span id="footer-scrap">Scrap: 0</span>
+          <span id="footer-vendidas">Vendidas: 0</span>
+          <span id="footer-reservadas">Reservadas: 0</span>
+        </div>
+        <div class="ml-auto flex items-center gap-4">
+          <span class="text-slate-500 text-sm">Inspección:</span>
+          <span id="progreso-texto">0 / 0</span>
+          <div class="w-24 h-1.5 bg-slate-700 rounded-full overflow-hidden">
+            <div id="progreso-fill" class="h-full bg-cyan-500 transition-all duration-300" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
+</div>
+
+<!-- Tooltip -->
+<div id="zone-tooltip" class="zone-tooltip" role="tooltip" aria-hidden="true"></div>
+
+<script>
+window.DESARME_MOCK = true;
+window.DESARME_CONFIG = {
+  useMock: true,
+  piecesByZone: {
+    front_left_headlight: { piece_name: "Foco delantero izquierdo", status: "available", price: 75000, stock: 1, note: "Buen estado" },
+    left_front_door: { piece_name: "Puerta delantera izquierda", status: "damaged", price: 120000, stock: 1, note: "Abolladura menor" },
+    hood: { piece_name: "Capot", status: "available", price: 95000, stock: 1, note: "" },
+    grille: { piece_name: "Parrilla", status: "sold", price: 45000, stock: 0, note: "" },
+    left_mirror: { piece_name: "Espejo izquierdo", status: "reserved", price: 35000, stock: 1, note: "Con indicador" },
+  },
+  repuestos: []
+};
+</script>
+<script src="{% static 'js/desarme/vehicle-map.js' %}"></script>
+<script src="{% static 'js/desarme/piece-drawer.js' %}"></script>
+{% endblock %}

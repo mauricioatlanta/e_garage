@@ -1118,8 +1118,11 @@ class DocumentoCreateView(
         return context
 
     def get_initial(self):
-        """Número inicial por tipo y prefill de cliente desde request.GET."""
+        """Número inicial por tipo, fecha hoy al crear, y prefill de cliente desde request.GET."""
         initial = super().get_initial()
+        from django.utils import timezone
+
+        initial["fecha_emision"] = timezone.now().date()
         empresa = getattr(self.request.user, "empresa", None)
         if empresa:
             tipo = self.request.GET.get("tipo") or "OT"
@@ -1169,6 +1172,9 @@ class DocumentoCreateView(
         ctx = self.request.POST.get("context", "workshop")
         if ctx in ("workshop", "parts", "mixed"):
             form.instance.context = ctx
+        if ctx == "parts":
+            form.instance.vehiculo = None
+            form.instance.kilometraje = None
 
         # Número: si viene vacío desde POST (JS falló o no envió), generar en backend
         numero = (
@@ -1705,6 +1711,10 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         return self.render_country_lang(self.request, context)
 
     def form_valid(self, form):
+        ctx = self.request.POST.get("context", "workshop")
+        if ctx == "parts":
+            form.instance.vehiculo = None
+            form.instance.kilometraje = None
         # DocumentoForm.save() ya llama _process_json_data para líneas (repuestos_json, etc.)
         # NO procesar_items_dinamicos: el template usa JSON, no rep-0-codigo. Ver DocumentoCreateView.
         response = super().form_valid(form)

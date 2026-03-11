@@ -26,6 +26,7 @@ from taller.views_extra.views_configuracion import (
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.views_extra.views_suscripciones import precios
 from taller.documentos import views_country_aware as views_documentos
+from taller.views.country_aware_auth import country_aware_login
 
 # Configuración de logging para este módulo
 logger = logging.getLogger(__name__)
@@ -67,8 +68,20 @@ urlpatterns = [
         TemplateView.as_view(template_name="cl/es/onboarding/bienvenida.html"),
         name="bienvenida_chile_alt",
     ),
-    # Allauth bajo /cl/es/ para que /cl/es/accounts/login/ etc. funcionen
-    path("accounts/", include("allauth.urls")),
+    # Redirect /cl/es/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
+    # EXCEPCIÓN: accounts/login/ se SIRVE aquí (no redirect) para evitar ERR_TOO_MANY_REDIRECTS.
+    # Redirect a /cl/accounts/login/ provocaba bucle: FixLoginCountryRedirectMiddleware
+    # reescribía Location /cl/accounts/login/ → /cl/es/accounts/login/ en la respuesta.
+    path("accounts/login/", country_aware_login),
+    path(
+        "accounts/", lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))
+    ),
+    path(
+        "accounts/<path:rest>",
+        lambda r, rest: redirect(
+            "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
+        ),
+    ),
     # Signup corto /cl/es/signup/ -> /accounts/signup/?from=cl (preserva ?plan=, etc.)
     path(
         "signup/",

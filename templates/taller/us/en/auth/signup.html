@@ -132,6 +132,7 @@ body { background: #0a0a0a; font-family: 'Inter', sans-serif; color: #fff; min-h
             </div>
             {% endif %}
 
+            <p class="help-text" style="margin-bottom: 12px;">{% trans "Password must be at least 8 characters, include one uppercase letter, one number and one symbol (e.g. ! @ # ?)." %}</p>
             <div class="form-group">
                 <label for="id_password1" class="form-label">{% trans "Password" %} *</label>
                 {{ form.password1|add_class:'form-control'|attr:'placeholder:••••••••' }}

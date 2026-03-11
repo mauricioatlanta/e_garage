@@ -400,6 +400,10 @@ input:focus {
 {% endblock %}
 
 {% block panel_content %}
+{# Endpoints para JS (flujo año → marca → modelo USA) #}
+<div id="vehiculos-endpoints" style="display:none;"
+     data-ep-marcas-por-anio="{% if url_api_marcas_por_anio %}{{ url_api_marcas_por_anio }}{% else %}{% url 'us_es:vehiculos:api_marcas_por_anio' %}{% endif %}"
+     data-ep-modelos-por-marca-anio-usa="{% if url_api_modelos_por_marca_anio_usa %}{{ url_api_modelos_por_marca_anio_usa }}{% else %}{% url 'us_es:vehiculos:api_modelos_por_marca_anio_usa' %}{% endif %}"></div>
 <div class="form-card max-w-4xl mx-auto">
     {% if messages %}
     <div class="mb-4 space-y-2">
@@ -428,6 +432,15 @@ input:focus {
       {% if cliente_id %}<input type="hidden" name="cliente_id" value="{{ cliente_id }}">{% endif %}
       {% if prefill_cliente %}<input type="hidden" name="prefill_cliente" value="{{ prefill_cliente }}">{% endif %}
       {% if prefill_cliente_nombre %}<input type="hidden" name="prefill_cliente_nombre" value="{{ prefill_cliente_nombre }}">{% endif %}
+
+      {% if form.tipo_uso %}
+      <div class="form-group mb-4 p-3 rounded-xl border border-cyan-500/20 bg-black/20">
+        <label for="{{ form.tipo_uso.id_for_label }}" class="text-sm sm:text-base">{% trans "Tipo de vehículo" %}</label>
+        {{ form.tipo_uso }}
+        <p class="text-xs text-slate-400 mt-1">{% trans "Seleccione 'Vehículo para desarme' para vehículos que serán desarmados para repuestos." %}</p>
+        {% if form.tipo_uso.errors %}<div class="text-red-400 text-sm mt-1">{{ form.tipo_uso.errors.0 }}</div>{% endif %}
+      </div>
+      {% endif %}
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
@@ -474,49 +487,61 @@ input:focus {
 
         <div class="form-group space-y-3 sm:space-y-4">
           <label for="{{ form.marca.id_for_label }}" class="text-sm sm:text-base">{% trans "Marca" %}</label>
-          <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start">
-            <div class="flex-1 w-full">{{ form.marca }}</div>
-            <button type="button" 
-                    id="btn-add-marca" 
-                    class="btn-futuristic py-2 px-4 text-sm sm:text-base w-full sm:w-auto" 
-                    style="margin: 0; white-space: nowrap; flex-shrink: 0;"
-                    title="{% trans 'Agregar nueva marca' %}">
-              ➕ {% trans "Agregar" %}
-            </button>
-          </div>
+          <div class="flex-1 w-full">{{ form.marca }}</div>
           {% if form.marca.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.marca.errors.0 }}</div>
           {% endif %}
-          <div id="marca-nuevo-container" style="display: none;" class="mt-2">
-            <input type="text"
-                   name="nuevo_marca"
-                   id="marca_nuevo"
-                   placeholder="{% trans 'Ingresa el nombre de la nueva marca' %}"
-                   class="form-control">
+          <div class="mt-2">
+            <button
+              type="button"
+              id="btn-add-marca"
+              class="text-sm text-emerald-300 hover:text-emerald-200 underline"
+            >
+              ¿No encuentras la marca? Escríbela manualmente
+            </button>
+          </div>
+          <div id="marca-nuevo-container" class="mt-3 hidden">
+            <label class="block text-sm text-emerald-200 mb-2">
+              Nueva marca
+            </label>
+            <input
+              type="text"
+              name="nuevo_marca"
+              id="id_nuevo_marca"
+              value="{% if form.data.nuevo_marca %}{{ form.data.nuevo_marca }}{% endif %}"
+              class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200"
+              placeholder="Escribe la marca"
+            />
           </div>
         </div>
 
         <div class="form-group space-y-3 sm:space-y-4">
           <label for="{{ form.modelo.id_for_label }}" class="text-sm sm:text-base">{% trans "Modelo" %}</label>
-          <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start">
-            <div class="flex-1 w-full">{{ form.modelo }}</div>
-            <button type="button" 
-                    id="btn-add-modelo" 
-                    class="btn-futuristic py-2 px-4 text-sm sm:text-base w-full sm:w-auto" 
-                    style="margin: 0; white-space: nowrap; flex-shrink: 0;"
-                    title="{% trans 'Agregar nuevo modelo' %}">
-              ➕ {% trans "Agregar" %}
-            </button>
-          </div>
+          <div class="flex-1 w-full">{{ form.modelo }}</div>
           {% if form.modelo.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
           {% endif %}
-          <div id="modelo-nuevo-container" style="display: none;" class="mt-2">
-            <input type="text"
-                   name="nuevo_modelo"
-                   id="modelo_nuevo"
-                   placeholder="{% trans 'Ingresa el nombre del nuevo modelo' %}"
-                   class="form-control">
+          <div class="mt-2">
+            <button
+              type="button"
+              id="btn-add-modelo"
+              class="text-sm text-emerald-300 hover:text-emerald-200 underline"
+            >
+              ¿No encuentras el modelo? Escríbelo manualmente
+            </button>
+          </div>
+          <div id="modelo-nuevo-container" class="mt-3 hidden">
+            <label class="block text-sm text-emerald-200 mb-2">
+              Nuevo modelo
+            </label>
+            <input
+              type="text"
+              name="nuevo_modelo"
+              id="id_nuevo_modelo"
+              value="{% if form.data.nuevo_modelo %}{{ form.data.nuevo_modelo }}{% endif %}"
+              class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200"
+              placeholder="Escribe el modelo"
+            />
           </div>
         </div>
 
@@ -905,6 +930,9 @@ $(document).ready(function() {
 
 // --- LÓGICA DE CARGA DE MODELOS (AJAX) ---
 document.addEventListener('DOMContentLoaded', function() {
+    const endpointsEl = document.getElementById('vehiculos-endpoints');
+    const usaFlujoNuevo = endpointsEl && (endpointsEl.dataset.epMarcasPorAnio || endpointsEl.dataset.epModelosPorMarcaAnioUsa);
+
     // 1. URLs country-aware (resuelven /us/en/ o /us/es/ según path actual)
     const urlModelosApi = "{{ url_modelos_api|default:'' }}";
     const urlModelosUsa = "{{ url_modelos_usa|default:'' }}";
@@ -921,12 +949,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const anioSelect = document.getElementById('id_anio');
     const btnAddMarca = document.getElementById('btn-add-marca');
     const marcaNuevoContainer = document.getElementById('marca-nuevo-container');
-    const marcaNuevoInput = document.getElementById('marca_nuevo');
+    const marcaNuevoInput = document.getElementById('id_nuevo_marca') || document.getElementById('marca_nuevo');
     const btnAddModelo = document.getElementById('btn-add-modelo');
     const modeloNuevoContainer = document.getElementById('modelo-nuevo-container');
-    const modeloNuevoInput = document.getElementById('modelo_nuevo');
+    const modeloNuevoInput = document.getElementById('id_nuevo_modelo') || document.getElementById('modelo_nuevo');
 
-    // 3. Función Principal: Cargar Modelos
+    // 3. Función Principal: Cargar Modelos (legacy / motor-caja)
     function cargarModelos(marcaId, anio = null, modeloSeleccionado = null) {
         if (!modeloSelect) return;
         
@@ -1065,16 +1093,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // 4. DETECTORES DE EVENTOS (LO QUE FALTABA) 🚀
-    if (marcaSelect) {
-        // Evento estándar (funciona para select normal y Select2 básico)
+    // 4. DETECTORES DE EVENTOS (solo si no usamos flujo USA año→marca→modelo)
+    if (!usaFlujoNuevo && marcaSelect) {
         marcaSelect.addEventListener('change', function() {
             const marcaId = this.value;
             const anio = anioSelect ? anioSelect.value : null;
             cargarModelos(marcaId, anio);
         });
-
-        // Evento específico de jQuery para Select2 (mayor compatibilidad)
         $(marcaSelect).on('select2:select', function(e) {
             const marcaId = e.params.data.id;
             const anio = anioSelect ? anioSelect.value : null;
@@ -1082,23 +1107,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Opcional: Recargar si cambia el año
-    if (anioSelect) {
+    if (!usaFlujoNuevo && anioSelect) {
         anioSelect.addEventListener('change', function() {
-            const marcaId = marcaSelect.value;
+            const marcaId = marcaSelect ? marcaSelect.value : null;
             if (marcaId) {
-                cargarModelos(marcaId, this.value, modeloSelect.value);
+                cargarModelos(marcaId, this.value, modeloSelect ? modeloSelect.value : null);
             }
         });
     }
 
-    // 5. Carga inicial (por si hay error de validación y el form se recarga con datos)
-    if (marcaSelect && marcaSelect.value) {
+    // 5. Carga inicial (solo flujo legacy)
+    if (!usaFlujoNuevo && marcaSelect && marcaSelect.value) {
         const marcaId = marcaSelect.value;
         const anio = anioSelect ? anioSelect.value : null;
-        const modeloActual = modeloSelect.value; 
-        if (!modeloSelect.options.length || modeloSelect.options.length <= 1) {
-             cargarModelos(marcaId, anio, modeloActual);
+        const modeloActual = modeloSelect ? modeloSelect.value : null;
+        if (modeloSelect && (!modeloSelect.options.length || modeloSelect.options.length <= 1)) {
+            cargarModelos(marcaId, anio, modeloActual);
         }
     }
 
@@ -1324,9 +1348,10 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // --- MANEJO DE BOTONES "AGREGAR NUEVO" ---
-    // Manejar campo de marca - Agregar nueva marca
-    if (btnAddMarca && marcaNuevoContainer && marcaNuevoInput) {
+    // --- MANEJO DE BOTONES "AGREGAR NUEVO" (solo si no usamos flujo USA con manual en select) ---
+    if (usaFlujoNuevo) {
+        // Los botones marca/modelo y manual se manejan en el script de flujo USA más abajo
+    } else if (btnAddMarca && marcaNuevoContainer && marcaNuevoInput) {
         btnAddMarca.addEventListener('click', function() {
             const isHidden = marcaNuevoContainer.style.display === 'none' || marcaNuevoContainer.style.display === '';
             marcaNuevoContainer.style.display = isHidden ? 'block' : 'none';
@@ -1413,14 +1438,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Manejar campo de modelo - Agregar nuevo modelo
-    if (btnAddModelo && modeloNuevoContainer && modeloNuevoInput) {
+    // Manejar campo de modelo - Agregar nuevo modelo (solo flujo legacy)
+    else if (btnAddModelo && modeloNuevoContainer && modeloNuevoInput) {
         btnAddModelo.addEventListener('click', function() {
             if (!marcaSelect || !marcaSelect.value) {
                 alert('Por favor selecciona una marca primero');
                 return;
             }
-            const isHidden = modeloNuevoContainer.style.display === 'none';
+            const isHidden = modeloNuevoContainer.style.display === 'none' || modeloNuevoContainer.classList.contains('hidden');
             modeloNuevoContainer.style.display = isHidden ? 'block' : 'none';
             if (isHidden) {
                 modeloNuevoInput.required = true;
@@ -1510,6 +1535,145 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+});
+
+// --- FLUJO USA: Año → Marca → Modelo (español) ---
+document.addEventListener("DOMContentLoaded", function () {
+  const endpoints = document.getElementById("vehiculos-endpoints");
+  if (!endpoints || (!endpoints.dataset.epMarcasPorAnio && !endpoints.dataset.epModelosPorMarcaAnioUsa)) return;
+
+  const urlMarcas = endpoints.dataset.epMarcasPorAnio;
+  const urlModelos = endpoints.dataset.epModelosPorMarcaAnioUsa;
+  const anio = document.getElementById("id_anio");
+  const marca = document.getElementById("id_marca");
+  const modelo = document.getElementById("id_modelo");
+  const btnMarca = document.getElementById("btn-add-marca");
+  const btnModelo = document.getElementById("btn-add-modelo");
+  const marcaManual = document.getElementById("marca-nuevo-container");
+  const modeloManual = document.getElementById("modelo-nuevo-container");
+  const MANUAL = "__nuevo__";
+
+  function limpiarSelect(select, texto) {
+    if (!select) return;
+    select.innerHTML = "";
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = texto;
+    select.appendChild(opt);
+  }
+
+  function agregarManual(select, texto) {
+    if (!select) return;
+    const opt = document.createElement("option");
+    opt.value = MANUAL;
+    opt.textContent = texto;
+    select.appendChild(opt);
+  }
+
+  async function cargarMarcas(anioVal) {
+    if (!marca || !urlMarcas) return;
+    limpiarSelect(marca, "Cargando marcas...");
+    try {
+      const r = await fetch(`${urlMarcas}?anio=${encodeURIComponent(anioVal)}`, {
+        credentials: "same-origin",
+        headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" }
+      });
+      const data = await r.json();
+      limpiarSelect(marca, "Seleccione marca");
+      (data || []).forEach(function (m) {
+        const opt = document.createElement("option");
+        opt.value = m.id;
+        opt.textContent = m.nombre;
+        marca.appendChild(opt);
+      });
+      agregarManual(marca, "Otra / ingresar manualmente");
+      if (modelo) limpiarSelect(modelo, "Seleccione modelo");
+    } catch (e) {
+      limpiarSelect(marca, "Error al cargar");
+    }
+  }
+
+  async function cargarModelos(marcaVal, anioVal) {
+    if (!modelo || !urlModelos) return;
+    limpiarSelect(modelo, "Cargando modelos...");
+    try {
+      const r = await fetch(`${urlModelos}?marca=${encodeURIComponent(marcaVal)}&anio=${encodeURIComponent(anioVal)}`, {
+        credentials: "same-origin",
+        headers: { "X-Requested-With": "XMLHttpRequest", "Accept": "application/json" }
+      });
+      const data = await r.json();
+      limpiarSelect(modelo, "Seleccione modelo");
+      (data || []).forEach(function (m) {
+        const opt = document.createElement("option");
+        opt.value = m.id;
+        opt.textContent = m.nombre;
+        modelo.appendChild(opt);
+      });
+      agregarManual(modelo, "Otro / ingresar manualmente");
+    } catch (e) {
+      limpiarSelect(modelo, "Error al cargar");
+    }
+  }
+
+  if (anio) {
+    anio.addEventListener("change", function () {
+      const a = this.value;
+      if (!a) return;
+      cargarMarcas(a);
+    });
+  }
+
+  if (marca) {
+    marca.addEventListener("change", function () {
+      if (this.value === MANUAL) {
+        if (marcaManual) marcaManual.classList.remove("hidden");
+        return;
+      }
+      if (marcaManual) marcaManual.classList.add("hidden");
+      const a = anio ? anio.value : "";
+      const m = this.value;
+      if (m && a) cargarModelos(m, a);
+    });
+  }
+
+  if (modelo) {
+    modelo.addEventListener("change", function () {
+      if (modeloManual) {
+        if (this.value === MANUAL) modeloManual.classList.remove("hidden");
+        else modeloManual.classList.add("hidden");
+      }
+    });
+  }
+
+  if (btnMarca) {
+    btnMarca.addEventListener("click", function () {
+      if (marca) marca.value = MANUAL;
+      if (marcaManual) marcaManual.classList.remove("hidden");
+    });
+  }
+
+  if (btnModelo) {
+    btnModelo.addEventListener("click", function () {
+      if (modelo) modelo.value = MANUAL;
+      if (modeloManual) modeloManual.classList.remove("hidden");
+    });
+  }
+
+  // Inicialización al cargar (edición o formulario con errores)
+  (async function init() {
+    const a = anio ? anio.value : "";
+    if (!a) return;
+    const initialMarca = marca ? (marca.value || "").trim() : "";
+    const initialModelo = modelo ? (modelo.value || "").trim() : "";
+    await cargarMarcas(a);
+    if (initialMarca && initialMarca !== MANUAL) {
+      if (marca) marca.value = initialMarca;
+      await cargarModelos(initialMarca, a);
+      if (initialModelo && modelo) modelo.value = initialModelo;
+    }
+    if (marcaManual) marcaManual.classList.toggle("hidden", !marca || marca.value !== MANUAL);
+    if (modeloManual) modeloManual.classList.toggle("hidden", !modelo || modelo.value !== MANUAL);
+  })();
 });
 </script>
 

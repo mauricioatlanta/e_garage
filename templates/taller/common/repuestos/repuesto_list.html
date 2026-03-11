@@ -130,6 +130,13 @@
 {% endblock %}
 
 {% block page_stats %}
+{% if vehiculo_origen_filter %}
+<div class="mb-3 p-3 rounded-lg bg-amber-900/30 border border-amber-500/40 text-sm">
+  <span class="text-amber-200">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Filtered by vehicle:{% else %}Filtrado por vehículo:{% endif %}</span>
+  <strong class="text-white">{{ vehiculo_origen_filter.get_marca_display }} {{ vehiculo_origen_filter.get_modelo_display }}{% if vehiculo_origen_filter.patente %} ({{ vehiculo_origen_filter.patente }}){% endif %}</strong>
+  <a href="{% country_url 'repuestos:lista_repuestos' %}" class="ml-2 text-cyan-400 hover:underline">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Show all{% else %}Ver todos{% endif %}</a>
+</div>
+{% endif %}
 <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
   <div class="flex items-center gap-2 bg-black/40 border border-cyan-400/30 rounded-lg p-3">
     <span class="text-cyan-300">📦</span>

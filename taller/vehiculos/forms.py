@@ -37,7 +37,7 @@ class VehiculoForm(forms.ModelForm):
                 "data-allow-clear": "true",
             },
         ),
-        required=True,
+        required=False,
         label="Cliente",
     )
 
@@ -70,6 +70,14 @@ class VehiculoForm(forms.ModelForm):
             else:
                 # Si no hay empresa, usar queryset vacío (el autocomplete lo manejará)
                 self.fields["cliente"].queryset = Cliente.objects.none()
+            # Para vehículo de desarme, cliente es opcional; para cliente es obligatorio
+            if "tipo_uso" in self.fields:
+                tipo = (
+                    (self.data.get("tipo_uso") if self.data else None)
+                    or self.initial.get("tipo_uso")
+                    or "cliente"
+                )
+                self.fields["cliente"].required = tipo != "desarme"
 
             # Asegurar que el widget tenga la URL correcta del autocomplete según el país
             # Si tenemos request, ajustar la URL según el namespace del país
@@ -357,236 +365,48 @@ class VehiculoForm(forms.ModelForm):
                     pass
 
     def _configurar_campos_usa(self):
-        """Configurar campos específicos para usuarios de USA"""
+        """Configurar campos específicos para usuarios de USA."""
         from taller.models.marca import Marca
+        from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
         import logging
 
         log = logging.getLogger(__name__)
-
-        empresa = getattr(self.user, "empresa", None)
 
         # Eliminar el campo marca si ya existe (del Meta) para reemplazarlo
         if "marca" in self.fields:
             log.info("[VehiculoForm._configurar_campos_usa] Eliminando campo marca existente")
             del self.fields["marca"]
 
-        # Campo marca para USA - Usar CatalogoModeloAuto como fuente principal
-        try:
-            from taller.models.catalogo import CatalogoModeloAuto
+        # Marca: ahora se carga dinámicamente por año vía JS
+        self.fields["marca"] = forms.ChoiceField(
+            choices=[("", "Select year first")],
+            required=False,
+            label="Brand",
+            widget=forms.Select(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "data-requires-year": "1",
+                }
+            ),
+        )
 
-            log.info("[VehiculoForm._configurar_campos_usa] Intentando obtener marcas del catálogo")
-            # Obtener marcas únicas del catálogo
-            marcas_catalogo = CatalogoModeloAuto.get_marcas_activas()
-
-            # Convertir a lista para verificar si hay resultados (ValuesListQuerySet no tiene .exists())
-            try:
-                marcas_list = list(marcas_catalogo[:500])  # Limitar a 500 para performance
-                log.info(
-                    f"[VehiculoForm._configurar_campos_usa] Marcas en catálogo: {len(marcas_list)}"
-                )
-            except Exception as e:
-                log.error(
-                    f"[VehiculoForm._configurar_campos_usa] Error al obtener marcas del catálogo: {e}"
-                )
-                marcas_list = []
-
-            if marcas_list:
-                log.info(
-                    f"[VehiculoForm._configurar_campos_usa] Usando catálogo como fuente ({len(marcas_list)} marcas)"
-                )
-                # Usar catálogo como fuente principal
-                marcas_choices = [("", "Select a brand")] + [
-                    (marca, marca) for marca in marcas_list
-                ]
-
-                self.fields["marca"] = forms.ChoiceField(
-                    choices=marcas_choices,
-                    required=True,
-                    label="Brand",
-                    widget=forms.Select(
-                        attrs={
-                            "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
-                        }
-                    ),
-                )
-            else:
-                # Fallback: usar modelo Marca si el catálogo está vacío
-                log.info(
-                    "[VehiculoForm._configurar_campos_usa] Catálogo vacío, usando fallback al modelo Marca"
-                )
-
-                # ✅ CRÍTICO: Evaluar el queryset COMPLETO inmediatamente como lista
-                marcas_usa = Marca.objects.filter(country="US").order_by("nombre")
-                total_marcas = marcas_usa.count()
-                log.info(
-                    f"[VehiculoForm._configurar_campos_usa] Marcas en modelo Marca (country='US'): {total_marcas}"
-                )
-
-                # ✅ Convertir el queryset completo a lista ANTES de crear el campo
-                marcas_list = list(marcas_usa)
-                log.info(
-                    f"[VehiculoForm._configurar_campos_usa] Marcas convertidas a lista: {len(marcas_list)} marcas"
-                )
-
-                if len(marcas_list) > 0:
-                    log.info(
-                        f"[VehiculoForm._configurar_campos_usa] Primeras 5 marcas: {[m.nombre for m in marcas_list[:5]]}"
-                    )
-
-                    # ✅ Crear choices con la lista ya materializada
-                    marcas_choices = [("", "Select a brand")]
-                    for marca in marcas_list:
-                        # ✅ VALIDACIÓN: Asegurar que la marca tenga nombre válido y no sea solo un número
-                        marca_nombre = marca.nombre.strip() if marca.nombre else ""
-                        marca_id_str = str(marca.pk).strip()
-
-                        # Validar que el nombre no sea solo un número (posible error de datos)
-                        if marca_nombre and marca_id_str and not marca_nombre.isdigit():
-                            marcas_choices.append((marca_id_str, marca_nombre))
-                        else:
-                            log.warning(
-                                f"[VehiculoForm._configurar_campos_usa] ⚠️ Marca con ID {marca.pk} tiene nombre inválido '{marca_nombre}' (es solo número o vacío), omitiendo"
-                            )
-
-                    log.info(
-                        f"[VehiculoForm._configurar_campos_usa] Choices creadas: {len(marcas_choices)} opciones"
-                    )
-                    log.info(
-                        f"[VehiculoForm._configurar_campos_usa] Primera choice: {marcas_choices[0]}, Segunda: {marcas_choices[1] if len(marcas_choices) > 1 else 'N/A'}"
-                    )
-
-                    # ✅ Usar tupla para forzar materialización completa
-                    marcas_choices_tuple = tuple(marcas_choices)
-
-                    self.fields["marca"] = forms.ChoiceField(
-                        choices=marcas_choices_tuple,
-                        required=True,
-                        label="Brand",
-                        widget=forms.Select(
-                            attrs={
-                                "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
-                            }
-                        ),
-                    )
-
-                    # ✅ Verificación final inmediata
-                    final_choices = list(self.fields["marca"].choices)
-                    log.info(
-                        f"[VehiculoForm._configurar_campos_usa] ✅ Campo creado - Verificación final: {len(final_choices)} opciones"
-                    )
-                    if len(final_choices) > 1:
-                        log.info(
-                            f"[VehiculoForm._configurar_campos_usa] Primeras 3 choices verificadas: {final_choices[:3]}"
-                        )
-                    else:
-                        log.error(
-                            f"[VehiculoForm._configurar_campos_usa] ❌ ERROR CRÍTICO: Campo solo tiene {len(final_choices)} opción después de crear!"
-                        )
-                        log.error(
-                            f"[VehiculoForm._configurar_campos_usa] Choices que intentamos asignar: {marcas_choices[:3]}"
-                        )
-                        # Forzar reasignación directa
-                        self.fields["marca"].choices = marcas_choices_tuple
-                        log.info(
-                            f"[VehiculoForm._configurar_campos_usa] Reasignadas choices forzadamente"
-                        )
-                else:
-                    # No hay marcas ni en catálogo ni en modelo Marca - crear campo vacío con mensaje
-                    log.error(
-                        "[VehiculoForm._configurar_campos_usa] ❌ No hay marcas disponibles en catálogo ni en modelo Marca"
-                    )
-                    log.error(
-                        "[VehiculoForm._configurar_campos_usa] 💡 Ejecutar: python manage.py cargar_marcas_usa"
-                    )
-                    self.fields["marca"] = forms.ChoiceField(
-                        choices=[
-                            ("", "No brands available - Run: python manage.py cargar_marcas_usa")
-                        ],
-                        required=True,
-                        label="Brand",
-                        widget=forms.Select(
-                            attrs={
-                                "class": "w-full px-4 py-3 rounded-lg bg-black border border-red-500/30 text-red-200 focus:outline-none focus:ring-2 focus:ring-red-400/50 focus:border-red-400"
-                            }
-                        ),
-                    )
-        except ImportError:
-            # Si CatalogoModeloAuto no existe, usar modelo Marca
-            log.info(
-                "[VehiculoForm._configurar_campos_usa] CatalogoModeloAuto no existe, usando modelo Marca"
-            )
-            marcas_usa = Marca.objects.filter(country="US").order_by("nombre")
-            total_import = marcas_usa.count()
-            log.info(
-                f"[VehiculoForm._configurar_campos_usa] Marcas en modelo Marca (ImportError): {total_import}"
-            )
-
-            if marcas_usa.exists():
-                # Convertir a ChoiceField con choices estáticas
-                marcas_choices = [("", "Select a brand")]
-                for m in marcas_usa:
-                    # ✅ VALIDACIÓN: Asegurar que la marca tenga nombre válido y no sea solo un número
-                    marca_nombre = m.nombre.strip() if m.nombre else ""
-                    marca_id_str = str(m.pk).strip()
-
-                    # Validar que el nombre no sea solo un número (posible error de datos)
-                    if marca_nombre and marca_id_str and not marca_nombre.isdigit():
-                        marcas_choices.append((marca_id_str, marca_nombre))
-                    else:
-                        log.warning(
-                            f"[VehiculoForm._configurar_campos_usa] ⚠️ Marca con ID {m.pk} tiene nombre inválido '{marca_nombre}', omitiendo"
-                        )
-                self.fields["marca"] = forms.ChoiceField(
-                    choices=marcas_choices,
-                    required=True,
-                    label="Brand",
-                    widget=forms.Select(
-                        attrs={
-                            "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
-                        }
-                    ),
-                )
-                log.info(
-                    f"[VehiculoForm._configurar_campos_usa] ✅ Campo marca creado como ChoiceField con {len(marcas_choices)-1} marcas"
-                )
-            else:
-                # No hay marcas disponibles
-                log.error(
-                    "[VehiculoForm._configurar_campos_usa] ❌ No hay marcas disponibles (ImportError fallback)"
-                )
-                log.error(
-                    "[VehiculoForm._configurar_campos_usa] 💡 Ejecutar: python manage.py cargar_marcas_usa"
-                )
-                self.fields["marca"] = forms.ChoiceField(
-                    choices=[("", "No brands available - Run: python manage.py cargar_marcas_usa")],
-                    required=True,
-                    label="Brand",
-                    widget=forms.Select(
-                        attrs={
-                            "class": "w-full px-4 py-3 rounded-lg bg-black border border-red-500/30 text-red-200 focus:outline-none focus:ring-2 focus:ring-red-400/50 focus:border-red-400"
-                        }
-                    ),
-                )
-
-        # Campo modelo para USA (se carga dinámicamente via JavaScript)
-        # ✅ Usar CharField con widget Select para evitar validación de queryset estático
+        # Modelo: se carga dinámicamente por marca + año vía JS
         self.fields["modelo"] = forms.CharField(
-            required=True,
+            required=False,
             label="Model",
             widget=forms.Select(
-                choices=[("", "Select brand and year first")],
+                choices=[("", "Select brand first")],
                 attrs={
-                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "data-requires-brand": "1",
                 },
             ),
         )
 
-        # Campos motor y caja con autocomplete y soporte de tags (creación al vuelo)
-        from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
-
         # Detectar país para filtrar queryset
         empresa = getattr(self.user, "empresa", None)
         pais = (getattr(empresa, "pais", None) or "US").strip().upper()
+
         if self.request:
             path = (self.request.path or "").lower()
             if path.startswith("/us/"):
@@ -642,13 +462,11 @@ class VehiculoForm(forms.ModelForm):
             ),
         )
 
-        # Configurar valores iniciales si estamos editando
+        # Configurar valores iniciales si estamos editando o repoblando POST
         self._configurar_valores_iniciales_usa()
 
-        # ✅ Asegurar que todos los campos básicos tengan sus valores iniciales
-        # Esto es necesario porque al reconfigurar campos, Django puede perder los valores iniciales
+        # Restaurar valores iniciales de campos básicos si estamos editando
         if self.instance and self.instance.pk:
-            # Restaurar valores iniciales de campos básicos que podrían haberse perdido
             if hasattr(self.instance, "patente"):
                 self.fields["patente"].initial = self.instance.patente
             if hasattr(self.instance, "vin"):
@@ -658,9 +476,7 @@ class VehiculoForm(forms.ModelForm):
             if hasattr(self.instance, "millas") and self.instance.millas is not None:
                 self.fields["millas"].initial = self.instance.millas
             if hasattr(self.instance, "cliente_id") and self.instance.cliente_id:
-                # Para campos con autocomplete, asegurar que el cliente esté en el queryset
                 if self.instance.cliente_id not in [c.pk for c in self.fields["cliente"].queryset]:
-                    # Agregar el cliente actual al queryset si no está
                     from taller.models.clientes import Cliente
 
                     cliente_actual = Cliente.objects.filter(pk=self.instance.cliente_id).first()
@@ -765,162 +581,147 @@ class VehiculoForm(forms.ModelForm):
         )
 
     def _configurar_valores_iniciales_usa(self):
-        """Configurar valores iniciales para usuarios de USA"""
+        """Configurar valores iniciales para usuarios de USA."""
+        from taller.models.marca import Marca
+        from taller.models.modelo import Modelo
+        from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
+
         if self.instance and self.instance.pk:
-            # Establecer marca inicial
-            if self.instance.marca_id:
-                self.fields["marca"].initial = self.instance.marca_id
+            # Año inicial
+            if getattr(self.instance, "anio", None):
+                self.fields["anio"].initial = str(self.instance.anio)
 
-                # ✅ Cargar modelos de la marca inicial en el widget
-                from taller.models.modelo import Modelo
+            # Marca inicial
+            marca_inicial = None
+            if getattr(self.instance, "marca_id", None):
+                marca_inicial = self.instance.marca.nombre
+            elif getattr(self.instance, "marca_texto", None):
+                marca_inicial = self.instance.marca_texto
 
-                modelos_iniciales = Modelo.objects.filter(
-                    marca_id=self.instance.marca_id, country="US"
-                ).order_by("nombre")
+            # Modelo inicial
+            modelo_inicial = None
+            if getattr(self.instance, "modelo_id", None):
+                modelo_inicial = self.instance.modelo.nombre
+            elif getattr(self.instance, "modelo_texto", None):
+                modelo_inicial = self.instance.modelo_texto
 
-                modelos_choices = [("", "Select brand and year first")]
-                for modelo in modelos_iniciales:
-                    modelos_choices.append((str(modelo.pk), str(modelo)))
+            # Poblar marca si estamos editando
+            if marca_inicial:
+                self.fields["marca"].choices = [
+                    ("", "Select year first"),
+                    (marca_inicial, marca_inicial),
+                    (NEW_SENTINEL, "Other / Enter manually"),
+                ]
+                self.fields["marca"].initial = marca_inicial
 
-                self.fields["modelo"].widget.choices = modelos_choices
+            # Poblar modelo si estamos editando
+            if modelo_inicial:
+                self.fields["modelo"].widget.choices = [
+                    ("", "Select brand first"),
+                    (modelo_inicial, modelo_inicial),
+                    (NEW_SENTINEL, "Other / Enter manually"),
+                ]
+                self.fields["modelo"].initial = modelo_inicial
 
-                if getattr(self.instance, "modelo_id", None):
-                    self.fields["modelo"].initial = str(self.instance.modelo_id)
+            # Si hay POST, priorizar lo enviado
+            if self.data:
+                marca_post = (self.data.get("marca") or "").strip()
+                modelo_post = (self.data.get("modelo") or "").strip()
 
-            # Si hay POST, respeta el modelo enviado
-            if self.data and "modelo" in self.data and self.data.get("modelo"):
-                self.fields["modelo"].initial = str(self.data.get("modelo"))
+                if marca_post:
+                    marca_choices = [("", "Select year first")]
+                    if marca_post not in [c[0] for c in marca_choices]:
+                        marca_choices.append((marca_post, marca_post))
+                    marca_choices.append((NEW_SENTINEL, "Other / Enter manually"))
+                    self.fields["marca"].choices = marca_choices
+                    self.fields["marca"].initial = marca_post
 
-            # Cargar motores y cajas del modelo inicial
-            # Inicializar modelo_actual de forma segura
+                if modelo_post:
+                    modelo_choices = [("", "Select brand first")]
+                    if modelo_post not in [c[0] for c in modelo_choices]:
+                        modelo_choices.append((modelo_post, modelo_post))
+                    modelo_choices.append((NEW_SENTINEL, "Other / Enter manually"))
+                    self.fields["modelo"].widget.choices = modelo_choices
+                    self.fields["modelo"].initial = modelo_post
+
+            # Cargar motores y cajas del modelo actual si existe
             modelo_actual = None
+
             if self.instance and hasattr(self.instance, "modelo"):
                 modelo_actual = getattr(self.instance, "modelo", None)
 
-            # Si estamos en POST (con errores), usar el modelo del POST
             if self.data and "modelo" in self.data:
-                try:
-                    modelo_id_post = self.data.get("modelo")
-                    if modelo_id_post:
-                        from taller.models.modelo import Modelo
-
-                        modelo_actual = Modelo.objects.get(pk=modelo_id_post)
-                except Exception:
-                    pass
+                modelo_post = (self.data.get("modelo") or "").strip()
+                if modelo_post.isdigit():
+                    try:
+                        modelo_actual = Modelo.objects.get(pk=int(modelo_post))
+                    except Exception:
+                        pass
 
             if modelo_actual:
-                # Cargar motores del modelo
                 motores_modelo = MotorVehiculo.objects.filter(modelos=modelo_actual).order_by(
                     "nombre"
                 )
-
-                # ✅ Incluir motor actual si existe, aunque no esté asociado al modelo
-                # Esto asegura que el valor actual se muestre al editar
                 if self.instance and self.instance.motor_id:
-                    # Usar union para incluir el motor actual
                     motores_modelo = MotorVehiculo.objects.filter(
                         Q(modelos=modelo_actual) | Q(pk=self.instance.motor_id)
                     ).order_by("nombre")
-
-                # ✅ Actualizar queryset del campo (ModelChoiceField con autocomplete)
-                # El widget autocomplete maneja la creación de nuevos items via data-tags
                 self.fields["motor"].queryset = motores_modelo
 
-                # Cargar cajas del modelo
                 cajas_modelo = CajaVehiculo.objects.filter(modelos=modelo_actual).order_by("nombre")
-
-                # ✅ Incluir caja actual si existe, aunque no esté asociada al modelo
-                # Esto asegura que el valor actual se muestre al editar
                 if self.instance and self.instance.caja_id:
-                    # Usar union para incluir la caja actual
                     cajas_modelo = CajaVehiculo.objects.filter(
                         Q(modelos=modelo_actual) | Q(pk=self.instance.caja_id)
                     ).order_by("nombre")
-
-                # ✅ Actualizar queryset del campo (ModelChoiceField con autocomplete)
-                # El widget autocomplete maneja la creación de nuevos items via data-tags
                 self.fields["caja"].queryset = cajas_modelo
             else:
-                # Si no hay modelo, asegurar que el motor y caja actuales estén en el queryset
                 if self.instance and self.instance.motor_id:
-                    # Incluir solo el motor actual si no hay modelo
                     self.fields["motor"].queryset = MotorVehiculo.objects.filter(
-                        Q(pk=self.instance.motor_id)
+                        pk=self.instance.motor_id
                     )
                 if self.instance and self.instance.caja_id:
-                    # Incluir solo la caja actual si no hay modelo
                     self.fields["caja"].queryset = CajaVehiculo.objects.filter(
-                        Q(pk=self.instance.caja_id)
+                        pk=self.instance.caja_id
                     )
 
-            # Establecer motor inicial
             motor_initial = None
             if self.instance.motor_id:
                 motor_initial = str(self.instance.motor_id)
             elif self.data and "motor" in self.data:
                 motor_initial = self.data.get("motor")
-
             if motor_initial:
                 self.fields["motor"].initial = motor_initial
 
-            # Establecer caja inicial
             caja_initial = None
             if self.instance.caja_id:
                 caja_initial = str(self.instance.caja_id)
             elif self.data and "caja" in self.data:
                 caja_initial = self.data.get("caja")
-
             if caja_initial:
                 self.fields["caja"].initial = caja_initial
 
         else:
-            # Crear vehículo: si hay POST (errores de validación), repoblar modelo para que se muestre
-            if self.data and ("modelo" in self.data or "marca" in self.data):
+            # Crear vehículo: si hay POST con errores, repoblar selects
+            if self.data:
+                anio_val = (self.data.get("anio") or "").strip()
                 marca_val = (self.data.get("marca") or "").strip()
-                modelo_id_post = (self.data.get("modelo") or "").strip()
+                modelo_val = (self.data.get("modelo") or "").strip()
 
-                # USA puede usar CatalogoModeloAuto (marca = string "Fiat") o Marca/Modelo (IDs numéricos)
-                modelos_choices = [("", "Select brand and year first")]
+                # Marca
+                if marca_val:
+                    marca_choices = [("", "Select year first")]
+                    marca_choices.append((marca_val, marca_val))
+                    marca_choices.append((NEW_SENTINEL, "Other / Enter manually"))
+                    self.fields["marca"].choices = marca_choices
+                    self.fields["marca"].initial = marca_val
 
-                if marca_val and marca_val.isdigit():
-                    # Marca es ID numérico → modelos desde tabla Modelo
-                    marca_id = int(marca_val)
-                    try:
-                        from taller.models.modelo import Modelo
-
-                        modelos_iniciales = Modelo.objects.filter(
-                            marca_id=marca_id, country="US"
-                        ).order_by("nombre")
-                        for m in modelos_iniciales:
-                            modelos_choices.append((str(m.pk), str(m)))
-                        self.fields["modelo"].widget.choices = modelos_choices
-                        if modelo_id_post and modelo_id_post.isdigit():
-                            m_obj = Modelo.objects.filter(
-                                pk=int(modelo_id_post),
-                                marca_id=marca_id,
-                                country="US",
-                            ).first()
-                            if m_obj:
-                                self.fields["modelo"].initial = modelo_id_post
-                    except (ValueError, TypeError):
-                        pass
-                elif marca_val:
-                    # Marca es string (CatalogoModeloAuto, ej: "Fiat") → modelos desde catálogo
-                    try:
-                        from taller.models.catalogo import CatalogoModeloAuto
-
-                        modelos_nombres = list(CatalogoModeloAuto.get_modelos_por_marca(marca_val))[
-                            :200
-                        ]
-                        for nom in modelos_nombres:
-                            modelos_choices.append((str(nom), str(nom)))
-                        self.fields["modelo"].widget.choices = modelos_choices
-                        if modelo_id_post and any(
-                            str(n) == modelo_id_post for n in modelos_nombres
-                        ):
-                            self.fields["modelo"].initial = modelo_id_post
-                    except (ImportError, AttributeError, TypeError):
-                        pass
+                # Modelo
+                if modelo_val:
+                    modelo_choices = [("", "Select brand first")]
+                    modelo_choices.append((modelo_val, modelo_val))
+                    modelo_choices.append((NEW_SENTINEL, "Other / Enter manually"))
+                    self.fields["modelo"].widget.choices = modelo_choices
+                    self.fields["modelo"].initial = modelo_val
 
     def clean(self):
         cleaned_data = super().clean()
@@ -1060,15 +861,21 @@ class VehiculoForm(forms.ModelForm):
         if not modelo:
             self.add_error("modelo", "Debe seleccionar un modelo")
 
+        # Desarme: fecha de ingreso obligatoria cuando tipo_uso es desarme
+        tipo_uso = (cleaned_data.get("tipo_uso") or "").strip() or "cliente"
+        if tipo_uso == "desarme" and not cleaned_data.get("fecha_ingreso_desarme"):
+            self.add_error(
+                "fecha_ingreso_desarme",
+                "Para vehículos de desarme debe indicar la fecha de ingreso.",
+            )
+
         return cleaned_data
 
     def clean_marca(self):
-        """Convertir ID/nombre de marca a instancia"""
+        """Convertir ID/nombre de marca a instancia."""
         empresa = getattr(self.user, "empresa", None)
-        # Detectar país: primero de empresa, luego de request.path
         pais = (getattr(empresa, "pais", None) or "CL").strip().upper()
 
-        # Si tenemos request, usar detección robusta del path
         if self.request:
             path = (self.request.path or "").lower()
             if path.startswith("/us/"):
@@ -1079,76 +886,96 @@ class VehiculoForm(forms.ModelForm):
                 pais = "MX"
 
         val = self.cleaned_data.get("marca")
-
-        if not val:
-            raise forms.ValidationError("Debe seleccionar una marca")
-
         from taller.models.marca import Marca
 
-        # En USA, puede ser ID de marca (número) o nombre de marca (del catálogo)
+        # USA: acepta string del catálogo, ID legacy o manual
         if pais == "US":
-            # Si ya es instancia (ModelChoiceField), retornarla
+            nuevo_marca = (
+                (self.data or {}).get("nuevo_marca")
+                or (self.data or {}).get("marca_nuevo")
+                or (self.data or {}).get("nuevo_marca_texto")
+                or ""
+            ).strip()
+
+            if val == NEW_SENTINEL:
+                if not nuevo_marca:
+                    raise forms.ValidationError("Enter a brand or select one from the list.")
+                obj, _ = Marca.objects.get_or_create(
+                    nombre=nuevo_marca,
+                    country="US",
+                    defaults={"nombre": nuevo_marca, "country": "US"},
+                )
+                return obj
+
+            if not val and nuevo_marca:
+                obj, _ = Marca.objects.get_or_create(
+                    nombre=nuevo_marca,
+                    country="US",
+                    defaults={"nombre": nuevo_marca, "country": "US"},
+                )
+                return obj
+
+            if not val:
+                raise forms.ValidationError("Select a brand or enter one manually.")
+
             if isinstance(val, Marca):
                 return val
 
-            # Intentar primero como ID numérico (caso más común)
             if isinstance(val, str):
-                try:
-                    marca_id = int(val)
-                    # Es un ID numérico, obtener la marca por ID
+                val = val.strip()
+
+                # Intentar como ID numérico legacy
+                if val.isdigit():
                     try:
-                        marca_obj = Marca.objects.get(pk=marca_id, country="US")
-                        return marca_obj
+                        return Marca.objects.get(pk=int(val), country="US")
                     except Marca.DoesNotExist:
-                        raise forms.ValidationError(
-                            f"Marca con ID {marca_id} no encontrada para USA"
-                        )
-                except (ValueError, TypeError):
-                    # No es un número, tratar como nombre de marca del catálogo
-                    marca_obj, _ = Marca.objects.get_or_create(
-                        nombre=val, country="US", defaults={"nombre": val}
-                    )
-                    return marca_obj
-            elif isinstance(val, int):
-                # Es un entero directamente
+                        raise forms.ValidationError(f"Brand with ID {val} not found for USA.")
+
+                # String de catálogo
+                obj, _ = Marca.objects.get_or_create(
+                    nombre=val,
+                    country="US",
+                    defaults={"nombre": val, "country": "US"},
+                )
+                return obj
+
+            if isinstance(val, int):
                 try:
-                    marca_obj = Marca.objects.get(pk=val, country="US")
-                    return marca_obj
+                    return Marca.objects.get(pk=val, country="US")
                 except Marca.DoesNotExist:
-                    raise forms.ValidationError(f"Marca con ID {val} no encontrada para USA")
+                    raise forms.ValidationError(f"Brand with ID {val} not found for USA.")
 
-            # Fallback: tratar como string
-            marca_obj, _ = Marca.objects.get_or_create(
-                nombre=str(val), country="US", defaults={"nombre": str(val)}
+            obj, _ = Marca.objects.get_or_create(
+                nombre=str(val).strip(),
+                country="US",
+                defaults={"nombre": str(val).strip(), "country": "US"},
             )
-            return marca_obj
+            return obj
 
-        # En Chile/México, convertir ID a instancia
+        # Chile/México/LATAM: comportamiento actual
+        if not val:
+            raise forms.ValidationError("Debe seleccionar una marca")
+
         try:
-            # Intentar como ID primero
             if isinstance(val, str):
                 try:
                     marca_id = int(val)
-                    obj = Marca.objects.get(pk=marca_id, country=pais)
-                    return obj
+                    return Marca.objects.get(pk=marca_id, country=pais)
                 except (ValueError, TypeError):
                     pass
             elif isinstance(val, int):
-                obj = Marca.objects.get(pk=val, country=pais)
-                return obj
+                return Marca.objects.get(pk=val, country=pais)
 
-            # Si no es un ID, intentar como nombre
-            obj = Marca.objects.get(nombre=val, country=pais)
-            return obj
+            return Marca.objects.get(nombre=val, country=pais)
+
         except Marca.DoesNotExist:
             raise forms.ValidationError(f"Marca no válida para {pais}")
 
     def clean_modelo(self):
-        """Convertir ID de modelo a instancia (para USA y Chile)"""
+        """Convertir ID/nombre de modelo a instancia."""
         empresa = getattr(self.user, "empresa", None)
         pais = (getattr(empresa, "pais", None) or "CL").strip().upper()
 
-        # Si tenemos request, usar detección robusta del path
         if self.request:
             path = (self.request.path or "").lower()
             if path.startswith("/us/"):
@@ -1159,158 +986,114 @@ class VehiculoForm(forms.ModelForm):
                 pais = "MX"
 
         val = self.cleaned_data.get("modelo")
-
-        if not val:
-            raise forms.ValidationError("Debe seleccionar un modelo")
-
         from taller.models.modelo import Modelo
+        from taller.models.marca import Marca
         import logging
 
         log = logging.getLogger(__name__)
 
-        # ✅ Para USA y Chile: convertir ID (string) a instancia
-        try:
-            # Si val ya es una instancia (edge case), devolverla
+        # USA: acepta string del catálogo, ID legacy o manual
+        if pais == "US":
+            nuevo_modelo = (
+                (self.data or {}).get("nuevo_modelo")
+                or (self.data or {}).get("modelo_nuevo")
+                or (self.data or {}).get("nuevo_modelo_texto")
+                or ""
+            ).strip()
+
+            marca = self.cleaned_data.get("marca")
+
+            if val == NEW_SENTINEL:
+                if not nuevo_modelo:
+                    raise forms.ValidationError("Enter a model or select one from the list.")
+                if not marca or not isinstance(marca, Marca):
+                    raise forms.ValidationError("Select or enter a brand first.")
+                obj, _ = Modelo.objects.get_or_create(
+                    marca=marca,
+                    nombre=nuevo_modelo,
+                    country="US",
+                    defaults={"nombre": nuevo_modelo, "marca": marca, "country": "US"},
+                )
+                return obj
+
+            if not val and nuevo_modelo:
+                if not marca or not isinstance(marca, Marca):
+                    raise forms.ValidationError("Select or enter a brand first.")
+                obj, _ = Modelo.objects.get_or_create(
+                    marca=marca,
+                    nombre=nuevo_modelo,
+                    country="US",
+                    defaults={"nombre": nuevo_modelo, "marca": marca, "country": "US"},
+                )
+                return obj
+
+            if not val:
+                raise forms.ValidationError("Select a model or enter one manually.")
+
             if isinstance(val, Modelo):
                 return val
 
-            # Convertir ID a instancia
+            # ID numérico legacy
+            if isinstance(val, str):
+                val = val.strip()
+                if val.isdigit():
+                    try:
+                        obj = Modelo.objects.select_related("marca").get(pk=int(val), country="US")
+                        if marca and isinstance(marca, Marca) and obj.marca_id != marca.id:
+                            raise forms.ValidationError(
+                                f"The model '{obj.nombre}' does not belong to the selected brand '{marca.nombre}'."
+                            )
+                        return obj
+                    except Modelo.DoesNotExist:
+                        raise forms.ValidationError(f"Model with ID {val} not found for USA.")
+
+                # String de catálogo
+                if not marca or not isinstance(marca, Marca):
+                    raise forms.ValidationError("Select or enter a brand first.")
+
+                obj, _ = Modelo.objects.get_or_create(
+                    marca=marca,
+                    nombre=val,
+                    country="US",
+                    defaults={"nombre": val, "marca": marca, "country": "US"},
+                )
+                return obj
+
+            if isinstance(val, int):
+                try:
+                    obj = Modelo.objects.select_related("marca").get(pk=val, country="US")
+                    if marca and isinstance(marca, Marca) and obj.marca_id != marca.id:
+                        raise forms.ValidationError(
+                            f"The model '{obj.nombre}' does not belong to the selected brand '{marca.nombre}'."
+                        )
+                    return obj
+                except Modelo.DoesNotExist:
+                    raise forms.ValidationError(f"Model with ID {val} not found for USA.")
+
+            log.error(f"[clean_modelo] Invalid USA model value: {val!r}")
+            raise forms.ValidationError("Invalid model value.")
+
+        # Chile/México/LATAM: comportamiento actual
+        if not val:
+            raise forms.ValidationError("Debe seleccionar un modelo")
+
+        try:
+            if isinstance(val, Modelo):
+                return val
+
             modelo_id = int(val)
 
-            # ✅ Obtener modelo con select_related para optimizar y asegurar relación
-            try:
-                obj = Modelo.objects.select_related("marca").get(pk=modelo_id, country=pais)
-            except Modelo.DoesNotExist:
-                log.error(
-                    f"[clean_modelo] Modelo con ID {modelo_id} no encontrado para país {pais}"
-                )
-                raise forms.ValidationError(f"Modelo con ID {modelo_id} no válido para {pais}")
+            obj = Modelo.objects.select_related("marca").get(pk=modelo_id, country=pais)
 
-            # Verificar coherencia con la marca elegida
-            # ✅ CRÍTICO: clean_marca() se ejecuta ANTES que clean_modelo()
-            # Por lo tanto, marca DEBERÍA estar en cleaned_data como instancia
             marca = self.cleaned_data.get("marca")
-
-            # ✅ Si marca no está en cleaned_data o no es una instancia, obtenerla del POST
-            if not marca or not isinstance(marca, Marca):
-                log.warning(
-                    f"[clean_modelo] ⚠️ Marca no está en cleaned_data como instancia. "
-                    f"Tipo: {type(marca)}, Valor: {marca}"
-                )
-
-                if self.data:
-                    marca_raw = self.data.get("marca")
-                    if marca_raw:
-                        try:
-                            from taller.models.marca import Marca
-
-                            marca_id_from_post = int(marca_raw)
-                            marca = Marca.objects.filter(
-                                pk=marca_id_from_post, country=pais
-                            ).first()
-                            if marca:
-                                log.info(
-                                    f"[clean_modelo] ✅ Marca obtenida del POST: {marca.nombre} (ID={marca.id}), "
-                                    f"country={marca.country}"
-                                )
-                                # ✅ CRÍTICO: Guardar en cleaned_data como instancia
-                                self.cleaned_data["marca"] = marca
-                            else:
-                                log.error(
-                                    f"[clean_modelo] ❌ Marca con ID {marca_id_from_post} no encontrada para país {pais}"
-                                )
-                        except (ValueError, TypeError) as e:
-                            log.error(
-                                f"[clean_modelo] ❌ Error al obtener marca del POST: {e}, valor={marca_raw}"
-                            )
-                else:
-                    log.error(f"[clean_modelo] ❌ No hay data disponible para obtener marca")
-
-            # ✅ Si tenemos marca como instancia, validar coherencia
             if marca and isinstance(marca, Marca):
-                # Si marca es instancia, comparar IDs
-                marca_id = marca.id if hasattr(marca, "id") else None
-                if marca_id and hasattr(obj, "marca_id"):
-                    # ✅ Obtener marca del modelo usando select_related (ya cargado)
-                    modelo_marca_id = obj.marca_id
-                    modelo_marca = obj.marca  # Ya está cargado por select_related
-
-                    # ✅ CRÍTICO: Verificar que ambos IDs sean enteros y compararlos correctamente
-                    try:
-                        marca_id_int = int(marca_id)
-                        modelo_marca_id_int = int(modelo_marca_id)
-                    except (ValueError, TypeError) as e:
-                        log.error(
-                            f"[clean_modelo] Error al convertir IDs a enteros: {e}, marca_id={marca_id}, modelo_marca_id={modelo_marca_id}"
-                        )
-                        raise forms.ValidationError(
-                            "Error interno al validar marca y modelo. Por favor, intente nuevamente."
-                        )
-
-                    log.info(
-                        f"[clean_modelo] Comparando: marca.id={marca_id_int} vs modelo.marca_id={modelo_marca_id_int} "
-                        f"(marca: {marca.nombre}, modelo: {obj.nombre})"
+                if obj.marca_id != marca.id:
+                    raise forms.ValidationError(
+                        f"El modelo '{obj.nombre}' no pertenece a la marca '{marca.nombre}' seleccionada."
                     )
 
-                    # ✅ CRÍTICO: Verificar coherencia pero NO lanzar error aquí
-                    # La validación final se hará en clean() después de que ambos campos estén procesados
-                    if modelo_marca_id_int == marca_id_int:
-                        log.info(
-                            f"[clean_modelo] ✅ Coherencia verificada: modelo '{obj.nombre}' (ID={obj.pk}, marca_id={modelo_marca_id_int}) "
-                            f"pertenece a marca '{marca.nombre}' (ID={marca_id_int})"
-                        )
-                        # NO hacer nada más, la validación pasó
-                    else:
-                        # ✅ DIAGNÓSTICO DETALLADO: Log información completa para debugging
-                        log.error(
-                            f"[clean_modelo] ❌ Error de coherencia marca-modelo:\n"
-                            f"   - Marca seleccionada: ID={marca_id_int} (tipo: {type(marca_id_int)}), Nombre='{marca.nombre}', Country='{getattr(marca, 'country', 'N/A')}'\n"
-                            f"   - Modelo seleccionado: ID={obj.pk}, Nombre='{obj.nombre}', Country='{obj.country}'\n"
-                            f"   - Modelo.marca_id={modelo_marca_id_int} (tipo: {type(modelo_marca_id_int)})\n"
-                            f"   - Marca real del modelo: ID={modelo_marca.id}, Nombre='{modelo_marca.nombre}', Country='{modelo_marca.country}'\n"
-                            f"   - Comparación: {modelo_marca_id_int} != {marca_id_int}"
-                        )
-
-                        # ✅ VERIFICAR EN BD DIRECTAMENTE
-                        modelo_verificacion = Modelo.objects.select_related("marca").get(pk=obj.pk)
-                        log.error(
-                            f"[clean_modelo] Verificación directa BD: modelo.marca_id={modelo_verificacion.marca_id}, "
-                            f"marca.id={marca_id_int}, ¿coinciden? {modelo_verificacion.marca_id == marca_id_int}"
-                        )
-
-                        # ✅ NO LANZAR ERROR AQUÍ - Dejar que clean() lo haga después de procesar ambos campos
-                        # Esto evita problemas de orden de ejecución
-                        log.warning(
-                            f"[clean_modelo] ⚠️ Coherencia fallida, pero NO lanzando error aquí. "
-                            f"La validación final se hará en clean()"
-                        )
-
-                        # ✅ VERIFICAR SI HAY MÚLTIPLES MODELOS CON EL MISMO NOMBRE
-                        modelos_mismo_nombre = Modelo.objects.filter(
-                            nombre=obj.nombre, country=pais
-                        ).select_related("marca")
-
-                        if modelos_mismo_nombre.count() > 1:
-                            log.warning(
-                                f"[clean_modelo] ⚠️ Hay {modelos_mismo_nombre.count()} modelos con nombre '{obj.nombre}' para país {pais}:"
-                            )
-                            for m in modelos_mismo_nombre:
-                                log.warning(
-                                    f"   - ID={m.pk}, Marca='{m.marca.nombre}' (ID={m.marca.id})"
-                                )
-
-                        raise forms.ValidationError(
-                            f"El modelo '{obj.nombre}' no pertenece a la marca '{marca.nombre}' seleccionada. "
-                            f"El modelo pertenece a la marca '{modelo_marca.nombre}'. "
-                            f"Por favor, seleccione el modelo correcto para la marca '{marca.nombre}'."
-                        )
-            else:
-                log.warning(
-                    f"[clean_modelo] ⚠️ No se pudo obtener marca para validación. "
-                    f"La validación se realizará en clean()"
-                )
-
             return obj
+
         except (ValueError, TypeError) as e:
             log.error(f"[clean_modelo] Error al convertir ID de modelo: {e}, valor recibido: {val}")
             raise forms.ValidationError("ID de modelo no válido")
@@ -1429,6 +1212,7 @@ class VehiculoForm(forms.ModelForm):
     class Meta:
         model = Vehiculo
         fields = [
+            "tipo_uso",
             "cliente",
             "anio",
             "marca",
@@ -1438,6 +1222,17 @@ class VehiculoForm(forms.ModelForm):
             "color",
             "motor",
             "caja",
+            # Campos desarmaduría (solo obligatorio fecha_ingreso_desarme cuando tipo_uso=desarme)
+            "fecha_ingreso_desarme",
+            "proveedor_nombre",
+            "proveedor_rut",
+            "proveedor_telefono",
+            "precio_compra",
+            "costo_transporte",
+            "costo_grua",
+            "costo_papeles",
+            "otros_costos_base",
+            "observaciones_desarme",
         ]
         widgets = {
             "patente": forms.TextInput(
@@ -1448,6 +1243,68 @@ class VehiculoForm(forms.ModelForm):
             "vin": forms.TextInput(
                 attrs={
                     "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                }
+            ),
+            "fecha_ingreso_desarme": forms.DateInput(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "type": "date",
+                }
+            ),
+            "observaciones_desarme": forms.Textarea(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "rows": 2,
+                }
+            ),
+            "proveedor_nombre": forms.TextInput(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                }
+            ),
+            "proveedor_rut": forms.TextInput(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                }
+            ),
+            "proveedor_telefono": forms.TextInput(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                }
+            ),
+            "precio_compra": forms.NumberInput(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "step": "0.01",
+                    "min": "0",
+                }
+            ),
+            "costo_transporte": forms.NumberInput(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "step": "0.01",
+                    "min": "0",
+                }
+            ),
+            "costo_grua": forms.NumberInput(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "step": "0.01",
+                    "min": "0",
+                }
+            ),
+            "costo_papeles": forms.NumberInput(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "step": "0.01",
+                    "min": "0",
+                }
+            ),
+            "otros_costos_base": forms.NumberInput(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "step": "0.01",
+                    "min": "0",
                 }
             ),
         }

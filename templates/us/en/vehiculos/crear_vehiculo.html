@@ -352,17 +352,19 @@ input:focus {
 {% endblock %}
 
 {% block panel_content %}
-{# Endpoints para JS: en US EN usamos us_en explícito (country_url genera /us/ sin idioma → 403). #}
+{# Endpoints para JS: usar URLs del contexto (vista las pasa con namespace correcto) para evitar 403/404. #}
 <div id="vehiculos-endpoints" style="display:none;"
-     data-ep-modelos="{% url 'us_en:vehiculos:modelos_por_marca_api' %}"
-     data-ep-modelos-usa="{% url 'us_en:vehiculos:api_modelos_usa' %}"
-     data-ep-clientes="{% url 'us_en:vehiculos:api_busqueda_clientes' %}"
+     data-ep-modelos="{% if url_modelos_por_marca_api %}{{ url_modelos_por_marca_api }}{% else %}{% url 'us_en:vehiculos:modelos_por_marca_api' %}{% endif %}"
+     data-ep-modelos-usa="{% if url_api_modelos_usa %}{{ url_api_modelos_usa }}{% else %}{% url 'us_en:vehiculos:api_modelos_usa' %}{% endif %}"
+     data-ep-marcas-por-anio="{% if url_api_marcas_por_anio %}{{ url_api_marcas_por_anio }}{% else %}{% url 'us_en:vehiculos:api_marcas_por_anio' %}{% endif %}"
+     data-ep-modelos-por-marca-anio-usa="{% if url_api_modelos_por_marca_anio_usa %}{{ url_api_modelos_por_marca_anio_usa }}{% else %}{% url 'us_en:vehiculos:api_modelos_por_marca_anio_usa' %}{% endif %}"
+     data-ep-clientes="{% if url_api_clientes %}{{ url_api_clientes }}{% else %}{% url 'us_en:vehiculos:api_busqueda_clientes' %}{% endif %}"
      data-ep-crear-cliente="{% url 'us_en:clientes:crear_cliente' %}"
-     data-ep-agregar-motor="{% url 'us_en:vehiculos:ajax_agregar_motor' %}"
-     data-ep-agregar-caja="{% url 'us_en:vehiculos:ajax_agregar_caja' %}"
-     data-ep-motores="{% url 'us_en:vehiculos:ajax_motores_por_modelo' %}"
-     data-ep-cajas="{% url 'us_en:vehiculos:ajax_cajas_por_modelo' %}"
-     data-ep-prefill-cliente="{% url 'us_en:vehiculos:api_busqueda_clientes' %}"></div>
+     data-ep-agregar-motor="{% if url_ajax_agregar_motor %}{{ url_ajax_agregar_motor }}{% else %}{% url 'us_en:vehiculos:ajax_agregar_motor' %}{% endif %}"
+     data-ep-agregar-caja="{% if url_ajax_agregar_caja %}{{ url_ajax_agregar_caja }}{% else %}{% url 'us_en:vehiculos:ajax_agregar_caja' %}{% endif %}"
+     data-ep-motores="{% if url_ajax_motores %}{{ url_ajax_motores }}{% else %}{% url 'us_en:vehiculos:ajax_motores_por_modelo' %}{% endif %}"
+     data-ep-cajas="{% if url_ajax_cajas %}{{ url_ajax_cajas }}{% else %}{% url 'us_en:vehiculos:ajax_cajas_por_modelo' %}{% endif %}"
+     data-ep-prefill-cliente="{% if url_api_clientes %}{{ url_api_clientes }}{% else %}{% url 'us_en:vehiculos:api_busqueda_clientes' %}{% endif %}"></div>
 <div class="form-card max-w-4xl mx-auto">
     {% if messages %}
     <div class="mb-4 space-y-2">
@@ -384,14 +386,22 @@ input:focus {
           data-prefill-modelo-id="{{ prefill_modelo_id|default:'' }}"
           data-prefill-modelo-nombre="{{ prefill_modelo_nombre|default:'' }}"
           data-prefill-marca="{{ prefill_marca_val|default:'' }}"
-          data-ep-clientes="{% url 'us_en:vehiculos:api_busqueda_clientes' %}"
-          data-ep-crear-cliente="{% url 'us_en:clientes:crear_cliente' %}">
+          data-ep-clientes="{% if url_api_clientes %}{{ url_api_clientes }}{% else %}{% url 'us_en:vehiculos:api_busqueda_clientes' %}{% endif %}"
+          data-ep-crear-cliente="{% url 'us_en:clientes:crear_cliente' %}"
+          data-ep-autocomplete-cliente="{% if url_autocomplete_cliente %}{{ url_autocomplete_cliente }}{% else %}{% url 'us_en:vehiculos:cliente_autocomplete' %}{% endif %}">
       {% csrf_token %}
       {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
       {% if cliente_id %}<input type="hidden" name="cliente_id" value="{{ cliente_id }}">{% endif %}
       {% if prefill_cliente %}<input type="hidden" name="prefill_cliente" value="{{ prefill_cliente }}">{% endif %}
       {% if prefill_cliente %}<input type="hidden" name="cliente" value="{{ prefill_cliente }}">{% endif %}
       {% if prefill_cliente_nombre %}<input type="hidden" name="prefill_cliente_nombre" value="{{ prefill_cliente_nombre }}">{% endif %}
+
+      <div class="form-group mb-4 p-3 rounded-xl border border-cyan-500/20 bg-black/20">
+        <label for="{{ form.tipo_uso.id_for_label }}">{% trans "Vehicle type" %}</label>
+        {{ form.tipo_uso }}
+        <p class="text-xs text-slate-400 mt-1">{% trans "Choose 'Dismantling vehicle' for vehicles that will be dismantled for parts." %}</p>
+        {% if form.tipo_uso.errors %}<div class="text-red-400 text-sm mt-1">{{ form.tipo_uso.errors.0 }}</div>{% endif %}
+      </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 
@@ -456,6 +466,28 @@ input:focus {
           {% if form.marca.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.marca.errors.0 }}</div>
           {% endif %}
+          <div class="mt-2">
+            <button
+              type="button"
+              id="btn-add-marca"
+              class="text-sm text-emerald-300 hover:text-emerald-200 underline"
+            >
+              Can't find the brand? Enter it manually
+            </button>
+          </div>
+          <div id="marca-nuevo-container" class="mt-3 hidden">
+            <label for="id_nuevo_marca" class="block text-sm font-medium text-emerald-200 mb-2">
+              New brand
+            </label>
+            <input
+              type="text"
+              name="nuevo_marca"
+              id="id_nuevo_marca"
+              value="{% if form.data.nuevo_marca %}{{ form.data.nuevo_marca }}{% endif %}"
+              class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+              placeholder="Enter brand manually"
+            />
+          </div>
         </div>
 
         <div class="form-group">
@@ -464,6 +496,28 @@ input:focus {
           {% if form.modelo.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
           {% endif %}
+          <div class="mt-2">
+            <button
+              type="button"
+              id="btn-add-modelo"
+              class="text-sm text-emerald-300 hover:text-emerald-200 underline"
+            >
+              Can't find the model? Enter it manually
+            </button>
+          </div>
+          <div id="modelo-nuevo-container" class="mt-3 hidden">
+            <label for="id_nuevo_modelo" class="block text-sm font-medium text-emerald-200 mb-2">
+              New model
+            </label>
+            <input
+              type="text"
+              name="nuevo_modelo"
+              id="id_nuevo_modelo"
+              value="{% if form.data.nuevo_modelo %}{{ form.data.nuevo_modelo }}{% endif %}"
+              class="w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+              placeholder="Enter model manually"
+            />
+          </div>
         </div>
 
         <div class="form-group">
@@ -804,6 +858,7 @@ $(document).ready(function() {
 
 document.addEventListener('DOMContentLoaded', function() {
     // Regla: todo endpoint viene de data-* (vehiculos-endpoints). NO construir URLs en JS.
+    const endpoints = document.getElementById('vehiculos-endpoints');
     const ep = window.vehiculosEndpoints || {};
     const urlAgregarMotor = (ep.epAgregarMotor || '').trim();
     const urlAgregarCaja = (ep.epAgregarCaja || '').trim();
@@ -812,11 +867,196 @@ document.addEventListener('DOMContentLoaded', function() {
     const urlMotoresPorModelo = (ep.epMotores || '').trim();
     const urlCajasPorModelo = (ep.epCajas || '').trim();
 
+    const urlMarcasPorAnio = (endpoints && endpoints.dataset.epMarcasPorAnio) ? endpoints.dataset.epMarcasPorAnio.trim() : '';
+    const urlModelosPorMarcaAnioUsa = (endpoints && endpoints.dataset.epModelosPorMarcaAnioUsa) ? endpoints.dataset.epModelosPorMarcaAnioUsa.trim() : '';
+
     const marcaSelect = document.getElementById('id_marca');
     const modeloSelect = document.getElementById('id_modelo');
     const anioSelect = document.getElementById('id_anio');
 
-    // Función para cargar modelos por marca y año
+    const btnAddMarca = document.getElementById('btn-add-marca');
+    const btnAddModelo = document.getElementById('btn-add-modelo');
+    const marcaNuevoContainer = document.getElementById('marca-nuevo-container');
+    const modeloNuevoContainer = document.getElementById('modelo-nuevo-container');
+    const nuevoMarcaInput = document.getElementById('id_nuevo_marca');
+    const nuevoModeloInput = document.getElementById('id_nuevo_modelo');
+
+    const MANUAL_VALUE = '__nuevo__';
+
+    function resetSelect(select, placeholder) {
+        if (!select) return;
+        select.innerHTML = '';
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = placeholder || '---------';
+        select.appendChild(opt);
+    }
+
+    function appendManualOption(select, label) {
+        if (!select) return;
+        const opt = document.createElement('option');
+        opt.value = MANUAL_VALUE;
+        opt.textContent = label || 'Other / Enter manually';
+        select.appendChild(opt);
+    }
+
+    function fillSelect(select, items, placeholder, manualLabel, selectedValue) {
+        if (!select) return;
+        resetSelect(select, placeholder);
+        (items || []).forEach(function(item) {
+            const opt = document.createElement('option');
+            opt.value = item.id;
+            opt.textContent = item.nombre;
+            if (selectedValue && String(item.id) === String(selectedValue)) {
+                opt.selected = true;
+            }
+            select.appendChild(opt);
+        });
+        appendManualOption(select, manualLabel || 'Other / Enter manually');
+    }
+
+    async function cargarMarcasPorAnio(anio, selectedMarca) {
+        if (marcaSelect) resetSelect(marcaSelect, 'Loading brands...');
+        if (modeloSelect) resetSelect(modeloSelect, 'Select brand first');
+        if (marcaNuevoContainer) marcaNuevoContainer.classList.add('hidden');
+        if (modeloNuevoContainer) modeloNuevoContainer.classList.add('hidden');
+        if (nuevoMarcaInput) nuevoMarcaInput.value = '';
+        if (nuevoModeloInput) nuevoModeloInput.value = '';
+
+        if (!anio || !urlMarcasPorAnio) {
+            if (marcaSelect) resetSelect(marcaSelect, 'Select year first');
+            return;
+        }
+
+        try {
+            var resp = await fetch(urlMarcasPorAnio + '?anio=' + encodeURIComponent(anio), {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin'
+            });
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            var data = await resp.json();
+            fillSelect(marcaSelect, Array.isArray(data) ? data : [], 'Select a brand', 'Other / Enter manually', selectedMarca || '');
+        } catch (err) {
+            console.error('Error loading brands by year:', err);
+            if (marcaSelect) {
+                resetSelect(marcaSelect, 'Select a brand');
+                appendManualOption(marcaSelect, 'Other / Enter manually');
+            }
+        }
+    }
+
+    async function cargarModelosPorMarcaYAnio(marca, anio, selectedModelo) {
+        if (modeloSelect) resetSelect(modeloSelect, 'Loading models...');
+        if (modeloNuevoContainer) modeloNuevoContainer.classList.add('hidden');
+        if (nuevoModeloInput) nuevoModeloInput.value = '';
+
+        if (!marca || !anio || !urlModelosPorMarcaAnioUsa) {
+            if (modeloSelect) resetSelect(modeloSelect, 'Select brand first');
+            return;
+        }
+
+        try {
+            var url = urlModelosPorMarcaAnioUsa + '?marca=' + encodeURIComponent(marca) + '&anio=' + encodeURIComponent(anio);
+            var resp = await fetch(url, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                credentials: 'same-origin'
+            });
+            if (!resp.ok) throw new Error('HTTP ' + resp.status);
+            var data = await resp.json();
+            fillSelect(modeloSelect, Array.isArray(data) ? data : [], 'Select a model', 'Other / Enter manually', selectedModelo || '');
+        } catch (err) {
+            console.error('Error loading models by make and year:', err);
+            if (modeloSelect) {
+                resetSelect(modeloSelect, 'Select a model');
+                appendManualOption(modeloSelect, 'Other / Enter manually');
+            }
+        }
+    }
+
+    function toggleMarcaManual() {
+        if (!marcaSelect || !marcaNuevoContainer) return;
+        var show = marcaSelect.value === MANUAL_VALUE;
+        marcaNuevoContainer.classList.toggle('hidden', !show);
+        if (!show && nuevoMarcaInput) nuevoMarcaInput.value = '';
+    }
+
+    function toggleModeloManual() {
+        if (!modeloSelect || !modeloNuevoContainer) return;
+        var show = modeloSelect.value === MANUAL_VALUE;
+        modeloNuevoContainer.classList.toggle('hidden', !show);
+        if (!show && nuevoModeloInput) nuevoModeloInput.value = '';
+    }
+
+    if (anioSelect) {
+        anioSelect.addEventListener('change', function() {
+            var anio = (this.value || '').trim();
+            cargarMarcasPorAnio(anio);
+            if (modeloSelect) resetSelect(modeloSelect, 'Select brand first');
+        });
+    }
+
+    if (marcaSelect) {
+        marcaSelect.addEventListener('change', function() {
+            toggleMarcaManual();
+            var marca = (this.value || '').trim();
+            var anio = anioSelect ? (anioSelect.value || '').trim() : '';
+            if (marca && marca !== MANUAL_VALUE && anio) {
+                cargarModelosPorMarcaYAnio(marca, anio);
+            } else {
+                if (modeloSelect) {
+                    resetSelect(modeloSelect, 'Select brand first');
+                    appendManualOption(modeloSelect, 'Other / Enter manually');
+                }
+            }
+        });
+    }
+
+    if (modeloSelect) {
+        modeloSelect.addEventListener('change', function() {
+            toggleModeloManual();
+            if (this.value && this.value !== MANUAL_VALUE) {
+                cargarMotoresYCajas(this.value);
+            }
+        });
+    }
+
+    if (btnAddMarca) {
+        btnAddMarca.addEventListener('click', function() {
+            if (!marcaSelect) return;
+            if (![].slice.call(marcaSelect.options).some(function(o) { return o.value === MANUAL_VALUE; })) {
+                appendManualOption(marcaSelect, 'Other / Enter manually');
+            }
+            marcaSelect.value = MANUAL_VALUE;
+            toggleMarcaManual();
+        });
+    }
+
+    if (btnAddModelo) {
+        btnAddModelo.addEventListener('click', function() {
+            if (!modeloSelect) return;
+            if (![].slice.call(modeloSelect.options).some(function(o) { return o.value === MANUAL_VALUE; })) {
+                appendManualOption(modeloSelect, 'Other / Enter manually');
+            }
+            modeloSelect.value = MANUAL_VALUE;
+            toggleModeloManual();
+        });
+    }
+
+    (async function inicializarFlujoUsa() {
+        var anioInicial = anioSelect ? (anioSelect.value || '').trim() : '';
+        var marcaInicial = marcaSelect ? (marcaSelect.value || '').trim() : '';
+        var modeloInicial = modeloSelect ? (modeloSelect.value || '').trim() : '';
+        if (anioInicial && urlMarcasPorAnio) {
+            await cargarMarcasPorAnio(anioInicial, marcaInicial);
+            if (marcaInicial && marcaInicial !== MANUAL_VALUE) {
+                await cargarModelosPorMarcaYAnio(marcaInicial, anioInicial, modeloInicial);
+            }
+        }
+        toggleMarcaManual();
+        toggleModeloManual();
+    })();
+
+    // Función legacy para cargar modelos por marca y año (usada por motor/caja y rehidratación)
     // USA puede usar catálogo (marca = texto como "Toyota") o modelo Marca (marca_id numérico)
     function cargarModelos(marcaId, anio = null, modeloSeleccionado = null) {
         if (!modeloSelect) return;
@@ -971,82 +1211,6 @@ document.addEventListener('DOMContentLoaded', function() {
             return anioSelect.value;
         }
         return null;
-    }
-
-    function recargarModelos() {
-        if (!marcaSelect || !modeloSelect) return;
-        
-        const marcaId = marcaSelect.value;
-        const anio = obtenerAnio();
-        const modeloActual = modeloSelect.value;
-        cargarModelos(marcaId, anio, modeloActual);
-        
-        // Limpiar campos de motor y caja (son Select2, así que usamos jQuery)
-        const motorSelect = $('#id_motor');
-        const cajaSelect = $('#id_caja');
-        if (motorSelect.length) {
-            if (motorSelect.hasClass('select2-hidden-accessible')) {
-                motorSelect.val(null).trigger('change');
-            } else {
-                motorSelect.val('');
-            }
-        }
-        if (cajaSelect.length) {
-            if (cajaSelect.hasClass('select2-hidden-accessible')) {
-                cajaSelect.val(null).trigger('change');
-            } else {
-                cajaSelect.val('');
-            }
-        }
-    }
-
-    if (marcaSelect) {
-        marcaSelect.addEventListener('change', function() {
-            recargarModelos();
-        });
-    }
-
-    if (anioSelect) {
-        anioSelect.addEventListener('change', function() {
-            if (marcaSelect && marcaSelect.value) {
-                recargarModelos();
-            }
-        });
-    }
-
-    if (modeloSelect) {
-        modeloSelect.addEventListener('change', function() {
-            if (this.value) {
-                cargarMotoresYCajas(this.value);
-            } else {
-                // Limpiar campos de motor y caja
-                const motorSelect = $('#id_motor');
-                const cajaSelect = $('#id_caja');
-                if (motorSelect.length) {
-                    if (motorSelect.hasClass('select2-hidden-accessible')) {
-                        motorSelect.val(null).trigger('change');
-                    } else {
-                        motorSelect.val('');
-                    }
-                }
-                if (cajaSelect.length) {
-                    if (cajaSelect.hasClass('select2-hidden-accessible')) {
-                        cajaSelect.val(null).trigger('change');
-                    } else {
-                        cajaSelect.val('');
-                    }
-                }
-            }
-        });
-    }
-
-    if (marcaSelect && marcaSelect.value) {
-        const anio = obtenerAnio();
-        cargarModelos(marcaSelect.value, anio, modeloSelect ? modeloSelect.value : null);
-    }
-
-    if (modeloSelect && modeloSelect.value) {
-        cargarMotoresYCajas(modeloSelect.value);
     }
 
     // Manejar campo de color

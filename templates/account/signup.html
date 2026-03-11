@@ -641,6 +641,13 @@ select[name="country"] {
             <!-- SECCIÓN 2: Contraseña -->
             <div class="form-section">
                 <h3 class="section-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Seguridad{% else %}{% trans "Security" %}{% endif %}</h3>
+                <p class="help-text" style="margin-bottom: 16px;">
+                    {% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}
+                    La contraseña debe tener al menos 8 caracteres, una mayúscula, un número y un símbolo (ej: ! @ # ?).
+                    {% else %}
+                    {% trans "Password must be at least 8 characters, include one uppercase letter, one number and one symbol (e.g. ! @ # ?)." %}
+                    {% endif %}
+                </p>
                 <div class="form-group">
                     <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Contraseña{% else %}{% trans "Password" %}{% endif %} *</label>
                     <div style="position: relative;">

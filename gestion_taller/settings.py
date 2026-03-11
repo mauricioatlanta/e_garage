@@ -189,10 +189,9 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 
-ACCOUNT_AUTHENTICATION_METHOD = "email"
-ACCOUNT_USERNAME_REQUIRED = False
+# Limpieza: ACCOUNT_AUTHENTICATION_METHOD, ACCOUNT_EMAIL_REQUIRED, ACCOUNT_USERNAME_REQUIRED
+# retirados; auth por país usa vistas propias (ej. USA) y /accounts/ usa defaults de allauth.
 ACCOUNT_EMAIL_VERIFICATION = os.getenv("ACCOUNT_EMAIL_VERIFICATION", "mandatory")
-ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
@@ -219,6 +218,10 @@ DEFAULT_COUNTRY = "CL"
 # Marketplace feature flag - deshabilitado por defecto
 # Activar cuando el módulo esté completamente listo
 EGARAGE_ENABLE_MARKETPLACE = env_bool("EGARAGE_ENABLE_MARKETPLACE", False)
+
+# OCR feature flag - deshabilitado por defecto
+# Permite habilitar OCR (EasyOCR) solo en entornos donde se haya instalado explícitamente
+EGARAGE_ENABLE_OCR = env_bool("EGARAGE_ENABLE_OCR", False)
 
 # ---------- Apps ----------
 INSTALLED_APPS = [
@@ -247,6 +250,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "anymail",
     "django.contrib.sites",
 ]
 

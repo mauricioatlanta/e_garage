@@ -1,0 +1,21 @@
+{% load i18n %}
+<footer class="desarme-footer">
+  <div class="footer-resumen-piezas">
+    <span id="resumen-disponibles">—</span>
+    <span id="resumen-danadas">—</span>
+    <span id="resumen-scrap">—</span>
+    <span id="resumen-vendidas">—</span>
+    <span id="resumen-reservadas">—</span>
+  </div>
+  <div class="footer-finanzas">
+    <span class="text-muted small">{% trans "Ingresos repuestos" %}: </span><span id="footer-ingresos">${{ ingresos_totales|floatformat:0 }}</span>
+    <span class="text-muted small ms-2">{% trans "Chatarra" %}: </span><span id="footer-chatarra">${{ ingreso_final_chatarra|default:0|floatformat:0 }}</span>
+  </div>
+  <div class="footer-progreso">
+    <small class="text-muted">{% trans "Inspección" %}: </small>
+    <span id="progreso-texto">0 / 0</span>
+    <div class="progreso-bar" id="progreso-bar">
+      <div id="progreso-fill" class="progreso-fill"></div>
+    </div>
+  </div>
+</footer>

@@ -269,6 +269,17 @@ def lista_vehiculos(request):
     # Detectar país e idioma desde la URL
     country, lang = _get_country_from_path(request.path)
 
+    # Namespace para enlaces a desarme (mapa de piezas)
+    try:
+        ns = request.resolver_match.namespace
+        if isinstance(ns, (list, tuple)) and ns:
+            prefix = ns[0]
+        else:
+            prefix = ns or "chile"
+        desarme_map_url_name = f"{prefix}:desarme:mapa_piezas"
+    except Exception:
+        desarme_map_url_name = "chile:desarme:mapa_piezas"
+
     # Usar select_template con fallback a common
     template_obj = select_template(
         [
@@ -283,6 +294,7 @@ def lista_vehiculos(request):
         {
             "vehiculos": vehiculos,
             "empresa": empresa,
+            "desarme_map_url_name": desarme_map_url_name,
         },
     )
 
@@ -482,6 +494,35 @@ def crear_vehiculo(request, *args, **kwargs):
         "prefill_modelo_nombre": prefill_modelo_nombre,
         "prefill_marca_val": prefill_marca_val,
     }
+
+    # URLs explícitas para US EN/US ES (evitar 403 y que autocomplete/marca/modelo no carguen)
+    if country == "US":
+        ns = "us_en" if lang == "en" else "us_es"
+        try:
+            ctx["url_api_clientes"] = reverse(f"{ns}:vehiculos:api_busqueda_clientes")
+            ctx["url_autocomplete_cliente"] = reverse(f"{ns}:vehiculos:cliente_autocomplete")
+            ctx["url_api_modelos_usa"] = reverse(f"{ns}:vehiculos:api_modelos_usa")
+            ctx["url_modelos_por_marca_api"] = reverse(f"{ns}:vehiculos:modelos_por_marca_api")
+            ctx["url_ajax_motores"] = reverse(f"{ns}:vehiculos:ajax_motores_por_modelo")
+            ctx["url_ajax_cajas"] = reverse(f"{ns}:vehiculos:ajax_cajas_por_modelo")
+            ctx["url_ajax_agregar_motor"] = reverse(f"{ns}:vehiculos:ajax_agregar_motor")
+            ctx["url_ajax_agregar_caja"] = reverse(f"{ns}:vehiculos:ajax_agregar_caja")
+            ctx["url_api_marcas_por_anio"] = reverse(f"{ns}:vehiculos:api_marcas_por_anio")
+            ctx["url_api_modelos_por_marca_anio_usa"] = reverse(
+                f"{ns}:vehiculos:api_modelos_por_marca_anio_usa"
+            )
+        except NoReverseMatch as e:
+            log.warning("[crear_vehiculo] NoReverseMatch al construir URLs US: %s", e)
+            ctx["url_api_clientes"] = ""
+            ctx["url_autocomplete_cliente"] = ""
+            ctx["url_api_modelos_usa"] = ""
+            ctx["url_modelos_por_marca_api"] = ""
+            ctx["url_ajax_motores"] = ""
+            ctx["url_ajax_cajas"] = ""
+            ctx["url_ajax_agregar_motor"] = ""
+            ctx["url_ajax_agregar_caja"] = ""
+            ctx["url_api_marcas_por_anio"] = ""
+            ctx["url_api_modelos_por_marca_anio_usa"] = ""
 
     try:
         return render(request, template_name, ctx)
@@ -705,6 +746,67 @@ def api_modelos_usa(request):
             return JsonResponse([], safe=False)
     except Exception as e:
         log.error(f"Error en api_modelos_usa: {e}")
+        return JsonResponse([], safe=False)
+
+
+@require_GET
+@login_required
+def api_marcas_por_anio(request):
+    """
+    Devuelve marcas disponibles para un año específico.
+    Solo aplica para USA.
+    """
+    if _get_country(request) != "US":
+        return JsonResponse([], safe=False)
+
+    anio_str = request.GET.get("anio", "").strip()
+
+    if not anio_str:
+        return JsonResponse([], safe=False)
+
+    try:
+        anio = int(anio_str)
+    except ValueError:
+        return JsonResponse([], safe=False)
+
+    try:
+        marcas = list(CatalogoModeloAuto.get_marcas_por_anio(anio))[:200]
+        data = [{"id": m, "nombre": m} for m in marcas]
+        return JsonResponse(data, safe=False)
+
+    except Exception as e:
+        log.error(f"api_marcas_por_anio error: {e}")
+        return JsonResponse([], safe=False)
+
+
+@require_GET
+@login_required
+def api_modelos_por_marca_anio_usa(request):
+    """
+    Devuelve modelos para una marca y año específico.
+    """
+    if _get_country(request) != "US":
+        return JsonResponse([], safe=False)
+
+    marca = request.GET.get("marca", "").strip()
+    anio_str = request.GET.get("anio", "").strip()
+
+    if not marca or not anio_str:
+        return JsonResponse([], safe=False)
+
+    try:
+        anio = int(anio_str)
+    except ValueError:
+        return JsonResponse([], safe=False)
+
+    try:
+        modelos = list(CatalogoModeloAuto.get_modelos_por_marca_anio(marca, anio))[:200]
+
+        data = [{"id": m, "nombre": m} for m in modelos]
+        return JsonResponse(data, safe=False)
+
+    except Exception as e:
+        log.error(f"api_modelos_por_marca_anio_usa error: {e}")
         return JsonResponse([], safe=False)
 
 

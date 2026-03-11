@@ -16,6 +16,7 @@ class VerificarSuscripcionMiddleware:
     EXEMPT_URLS = [
         "/accounts/logout/",
         "/accounts/signup/",
+        "/accounts/password/",  # reset, change, etc.
         "/billing/",
         "/soporte/",
         "/help/",

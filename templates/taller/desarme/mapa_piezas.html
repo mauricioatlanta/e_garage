@@ -1,0 +1,77 @@
+{% extends "taller/common/base.html" %}
+{% load static i18n l10n country_url %}
+
+{% block title %}{% trans "Ficha visual de desarme" %} - {{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'taller/desarme/vehicle-map.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="desarme-map-page container py-3">
+  {% include "taller/desarme/partials/_header_desarme.html" %}
+
+  <main class="desarme-main-grid">
+    <section class="vehicle-map-panel">
+      <div class="piece-legend">
+        <span><span class="dot" style="background:#9ca3af"></span> {% trans "No revisada" %}</span>
+        <span><span class="dot" style="background:#22c55e"></span> {% trans "Disponible" %}</span>
+        <span><span class="dot" style="background:#ef4444"></span> {% trans "Dañada" %}</span>
+        <span><span class="dot" style="background:#1f2937"></span> Scrap</span>
+        <span><span class="dot" style="background:#3b82f6"></span> {% trans "Vendida" %}</span>
+        <span><span class="dot" style="background:#eab308"></span> {% trans "Reservada" %}</span>
+      </div>
+
+      <div class="view-tabs">
+        <button type="button" class="btn btn-outline-secondary btn-view active" data-vista="frontal">{% trans "Frontal" %}</button>
+        <button type="button" class="btn btn-outline-secondary btn-view" data-vista="lateral_izq">{% trans "Lateral izq" %}</button>
+      </div>
+
+      <div class="mapa-container">
+        <p class="text-muted small mb-2">{% trans "Clic en una zona para crear o editar la pieza." %}</p>
+        <div class="mapa-vista active" data-vista="frontal">
+          {% include "taller/desarme/svg/_vehicle_front.html" %}
+        </div>
+        <div class="mapa-vista" data-vista="lateral_izq">
+          {% include "taller/desarme/svg/_vehicle_left.html" %}
+        </div>
+      </div>
+    </section>
+
+    <aside id="piece-drawer" class="piece-drawer-panel" data-can-edit="{{ can_edit|yesno:'true,false' }}">
+      {% include "taller/desarme/partials/_piece_drawer_desarme.html" %}
+    </aside>
+  </main>
+
+  {% include "taller/desarme/partials/_footer_desarme.html" %}
+</div>
+
+<div id="toast-desarme" class="toast-desarme" role="status" aria-live="polite"></div>
+
+{{ pieces_by_zone_json|json_script:"pieces-by-zone" }}
+{{ kpis_json|json_script:"kpis-data" }}
+{{ piece_summary_json|json_script:"piece-summary-data" }}
+
+<script>
+(function() {
+  var piecesEl = document.getElementById('pieces-by-zone');
+  var kpisEl = document.getElementById('kpis-data');
+  var summaryEl = document.getElementById('piece-summary-data');
+  var pieces = piecesEl && piecesEl.textContent ? JSON.parse(piecesEl.textContent) : {};
+  var kpis = kpisEl && kpisEl.textContent ? JSON.parse(kpisEl.textContent) : {};
+  var summary = summaryEl && summaryEl.textContent ? JSON.parse(summaryEl.textContent) : {};
+  window.DESARME_CONFIG = {
+    piecesByZone: pieces,
+    kpis: kpis,
+    pieceSummary: summary,
+    apiPiezaUrl: "{{ api_pieza_url|escapejs }}",
+    resumenUrl: "{{ resumen_url|escapejs }}",
+    canEdit: {{ can_edit|yesno:"true,false" }},
+    csrf: document.querySelector('[name=csrfmiddlewaretoken]') ? document.querySelector('[name=csrfmiddlewaretoken]').value : "{{ csrf_token }}",
+  };
+})();
+</script>
+<script src="{% static 'js/desarme/vehicle-map.js' %}"></script>
+<script src="{% static 'js/desarme/piece-drawer.js' %}"></script>
+<script src="{% static 'js/desarme/desarme-summary.js' %}"></script>
+{% endblock %}

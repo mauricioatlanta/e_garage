@@ -1,0 +1,45 @@
+{% load i18n %}
+<div class="piece-drawer-content">
+  <button type="button" class="btn-close btn-close-white btn-close-panel d-md-none" aria-label="Cerrar" data-action="close-drawer"></button>
+  <div class="piece-drawer-placeholder text-muted small py-4" id="drawer-placeholder">
+    {% trans "Clic en una zona del mapa para inspeccionar la pieza." %}
+  </div>
+  <div id="piece-drawer-form" class="d-none">
+  <h5 class="drawer-title mb-3 pt-2">{% trans "Pieza" %}</h5>
+  <form id="form-pieza">
+    {% csrf_token %}
+    <input type="hidden" id="pieza-zona" name="zona">
+    <input type="hidden" id="pieza-vista" name="vista">
+    <input type="hidden" id="pieza-id" name="id">
+    <div class="mb-3">
+      <label class="form-label">{% trans "Nombre" %}</label>
+      <input type="text" class="form-control form-control-desarme" id="pieza-nombre" name="nombre" required {% if not can_edit %}readonly{% endif %}>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">{% trans "Estado" %}</label>
+      <div class="estado-pills" id="estado-pills">
+        <button type="button" class="btn btn-sm btn-outline-success" data-estado="disponible">{% trans "Disponible" %}</button>
+        <button type="button" class="btn btn-sm btn-outline-danger" data-estado="dañado">{% trans "Dañada" %}</button>
+        <button type="button" class="btn btn-sm btn-outline-dark" data-estado="scrap">Scrap</button>
+        <button type="button" class="btn btn-sm btn-outline-primary" data-estado="vendido">{% trans "Vendida" %}</button>
+        <button type="button" class="btn btn-sm btn-outline-warning" data-estado="reservada">{% trans "Reservada" %}</button>
+      </div>
+      <input type="hidden" id="pieza-estado" name="estado_pieza" value="disponible">
+    </div>
+    <div class="mb-3">
+      <label class="form-label">{% trans "Precio venta" %}</label>
+      <input type="text" class="form-control form-control-desarme" id="pieza-precio" name="precio_venta" placeholder="0" {% if not can_edit %}readonly{% endif %}>
+    </div>
+    <div class="mb-3">
+      <label class="form-label">{% trans "Observación" %}</label>
+      <textarea class="form-control form-control-desarme" id="pieza-observaciones" name="observaciones" rows="2" placeholder="abolladura menor, sin espejo..." {% if not can_edit %}readonly{% endif %}></textarea>
+    </div>
+    {% if can_edit %}
+    <div class="drawer-actions d-flex gap-2">
+      <button type="submit" class="btn btn-primary flex-grow-1" data-submit-mode="save">{% trans "Guardar" %}</button>
+      <button type="button" class="btn btn-outline-primary" data-submit-mode="save-next">{% trans "Guardar y siguiente" %}</button>
+    </div>
+    {% endif %}
+  </form>
+  </div>
+</div>

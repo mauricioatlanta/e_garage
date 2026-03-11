@@ -31,6 +31,7 @@ class InventoryService:
     - Los Presupuestos (PRES) NUNCA mueven stock
     - Las Órdenes de Trabajo (OT) y Facturas (FAC) SÍ mueven stock
     - Solo se procesan líneas con repuesto vinculado (repuesto_id no nulo)
+    - Solo repuestos con tipo_origen in (stock, desarme) mueven inventario; tipo_origen=direct no descuenta stock
     - Usa F() expressions para evitar race conditions
     """
 
@@ -63,8 +64,14 @@ class InventoryService:
             )
             return {"procesado": False, "razon": "Tipo de documento no mueve stock"}
 
-        # Solo procesar líneas que tienen un repuesto vinculado (no las manuales)
-        lineas = documento.lineas_repuesto.filter(repuesto__isnull=False).select_related("repuesto")
+        # Solo procesar líneas con repuesto vinculado que controlan stock
+        # Excluye tipo_origen direct/directo y controlar_stock=False
+        lineas = (
+            documento.lineas_repuesto.filter(repuesto__isnull=False)
+            .exclude(repuesto__tipo_origen__in=("direct", "directo"))
+            .exclude(repuesto__controlar_stock=False)
+            .select_related("repuesto")
+        )
 
         if not lineas.exists():
             log.debug(
@@ -168,8 +175,13 @@ class InventoryService:
         if documento.tipo in InventoryService.TIPOS_SIN_STOCK:
             return errores
 
-        # Solo validar líneas con repuesto vinculado
-        lineas = documento.lineas_repuesto.filter(repuesto__isnull=False).select_related("repuesto")
+        # Solo validar stock en repuestos que controlan inventario
+        lineas = (
+            documento.lineas_repuesto.filter(repuesto__isnull=False)
+            .exclude(repuesto__tipo_origen__in=("direct", "directo"))
+            .exclude(repuesto__controlar_stock=False)
+            .select_related("repuesto")
+        )
 
         for linea in lineas:
             repuesto = linea.repuesto

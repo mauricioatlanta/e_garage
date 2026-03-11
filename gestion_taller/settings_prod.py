@@ -5,6 +5,14 @@ from pathlib import Path
 
 from django.core.exceptions import ImproperlyConfigured
 
+# Cargar .env.prod para que manage.py shell / test / comandos manuales tengan las variables
+# (Gunicorn ya las recibe por EnvironmentFile en systemd; aquí no pisa)
+_env_prod = Path(__file__).resolve().parent.parent / ".env.prod"
+if _env_prod.exists():
+    from dotenv import load_dotenv
+
+    load_dotenv(_env_prod, override=False)
+
 from .settings import *  # noqa: F401,F403
 
 # =============================================================================
@@ -14,8 +22,9 @@ from .settings import *  # noqa: F401,F403
 # Sin esto, Django usa fallback inseguro y check --deploy reporta W009.
 # Al ejecutar "manage.py test" se permite clave temporal para no depender de .env.prod.
 _SECRET = os.getenv("SECRET_KEY") or os.getenv("DJANGO_SECRET_KEY")
+_allow_temp_secret = "test" in sys.argv or "test_password_reset_email" in sys.argv
 if not _SECRET or _SECRET.strip() == "":
-    if "test" in sys.argv:
+    if _allow_temp_secret:
         from django.core.management.utils import get_random_secret_key
 
         SECRET_KEY = get_random_secret_key()
@@ -266,11 +275,8 @@ CSRF_TRUSTED_ORIGINS = ["https://egarage.cl", "https://www.egarage.cl"]
 LOGIN_URL = "/accounts/login/"
 
 # ==========================================
-# Allauth: email + username explícito (prod)
+# Allauth (limpieza: ACCOUNT_*_REQUIRED / AUTHENTICATION_METHOD retirados)
 # ==========================================
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
 ACCOUNT_EMAIL_VERIFICATION = "none"  # o "optional" si quieres
 
 # ForceAccountsToCLMiddleware ya viene de settings/base.py; no reinserir aquí (evita duplicado).
@@ -287,3 +293,18 @@ ALLOWED_HOSTS = ["egarage.cl", "www.egarage.cl", "159.223.200.106", "localhost",
 
 # 3. NO MORIR por el logo faltante
 WHITENOISE_MANIFEST_STRICT = False
+
+# =============================================================================
+# EMAIL: producción vía Resend
+# =============================================================================
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+
+ANYMAIL = {
+    "RESEND_API_KEY": os.getenv("RESEND_API_KEY", ""),
+}
+
+DEFAULT_FROM_EMAIL = os.getenv(
+    "DEFAULT_FROM_EMAIL",
+    "eGarage <no-reply@egarage.cl>",
+)
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", "support@egarage.cl")

@@ -1,6 +1,7 @@
 # Middleware que añade la empresa al request según el usuario logueado
 from __future__ import annotations
 
+from django.db.utils import OperationalError
 from django.shortcuts import redirect
 
 from taller.utils.login_exempt import is_login_exempt_path
@@ -25,7 +26,8 @@ class EmpresaMiddleware:
 
         if getattr(request, "user", None) is not None and request.user.is_authenticated:
             try:
-                # Asumiendo relación OneToOne/ForeignKey desde User -> Empresa
+                # Asumiendo relación OneToOne/ForeignKey desde User -> Empresa.
+                # OperationalError (ej. columna is_trial faltante) no debe devolver 500.
                 request.empresa = getattr(request.user, "empresa", None)
                 request.company = request.empresa
                 request.country = (
@@ -40,9 +42,11 @@ class EmpresaMiddleware:
                 ):
                     return redirect("suspension")
 
-            except Exception:
-                # Evita romper todo el request por un edge case.
+            except (Exception, OperationalError):
+                # Evita 500 por DB desactualizada (ej. is_trial faltante) u otros edge cases.
                 request.empresa = None
+                request.company = None
+                request.country = None
 
         return self.get_response(request)
 

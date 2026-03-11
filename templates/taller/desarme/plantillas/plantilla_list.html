@@ -1,0 +1,31 @@
+{% extends "taller/common/base.html" %}
+{% load static i18n country_url %}
+
+{% block title %}{% trans "Plantillas de desarme" %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2>{% trans "Plantillas de desarme" %}</h2>
+    <a href="{% country_url 'desarme:plantilla_create' %}" class="btn btn-primary">{% trans "Nueva plantilla" %}</a>
+  </div>
+  <div class="row g-3">
+    {% for p in plantillas %}
+    <div class="col-md-6 col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ p.nombre }}</h5>
+          {% if p.empresa_id %}<span class="badge bg-secondary">Empresa</span>{% else %}<span class="badge bg-info">Global</span>{% endif %}
+          <p class="card-text text-muted small">{{ p.descripcion|truncatewords:12 }}</p>
+          <p class="small">{{ p.num_piezas }} piezas</p>
+          <a href="{% country_url 'desarme:plantilla_detail' pk=p.pk %}" class="btn btn-sm btn-outline-primary">Ver</a>
+          {% if p.empresa_id %}<a href="{% country_url 'desarme:plantilla_edit' pk=p.pk %}" class="btn btn-sm btn-outline-secondary">Editar</a>{% endif %}
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="col-12 alert alert-info">No hay plantillas. Ejecute: python manage.py seed_plantillas_desarme</div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

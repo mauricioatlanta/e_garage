@@ -130,11 +130,15 @@ class ClienteForm(forms.ModelForm):
         }
 
     def __init__(self, *args, **kwargs):
+        # Permitir que la vista fuerce el país (por ejemplo, usando el prefijo de la URL /us/, /br/, etc.)
+        pais_forzado = kwargs.pop("pais", None)
         self.empresa = kwargs.pop("empresa", None)  # Almacenar empresa
         super().__init__(*args, **kwargs)
 
-        # Agregar atributo pais para el template
-        if self.empresa and hasattr(self.empresa, "pais"):
+        # Agregar atributo pais para el template y la lógica de estados/ciudades
+        if pais_forzado:
+            self.pais = pais_forzado
+        elif self.empresa and hasattr(self.empresa, "pais"):
             self.pais = self.empresa.pais
         else:
             self.pais = "CL"  # Default a Chile

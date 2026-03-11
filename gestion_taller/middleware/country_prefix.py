@@ -8,18 +8,32 @@ from taller.utils.empresa import get_or_create_empresa
 logger = logging.getLogger(__name__)
 
 
+EXCLUDED_PREFIXES = (
+    "/accounts/",
+    "/admin/",
+    "/static/",
+    "/media/",
+    "/api/",
+)
+
+
 class EnforceCountryPrefixMiddleware:
     """
     Middleware que asegura que el prefijo de URL coincida con el país de la empresa del usuario.
 
     Si un usuario de Chile navega por /us/, lo redirige a /cl/, y viceversa.
     Esto evita confusiones en formularios y endpoints AJAX.
+    No interfiere con allauth, admin, static, media ni API.
     """
 
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
+        for prefix in EXCLUDED_PREFIXES:
+            if request.path.startswith(prefix):
+                return self.get_response(request)
+
         try:
             # Solo aplicar para usuarios autenticados
             if request.user.is_authenticated:

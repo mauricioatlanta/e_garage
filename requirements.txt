@@ -49,6 +49,9 @@ pytest>=7.4.0
 pytest-django>=4.5.0
 pytest-cov>=4.1.0
 
+# Email (Resend vía API)
+django-anymail[resend]>=10.0
+
 # Seguridad
 django-cors-headers>=4.2.0  # Si necesitas CORS para API
 

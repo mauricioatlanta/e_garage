@@ -72,6 +72,22 @@ class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewM
                 | models.Q(nombre__icontains=q)
                 | models.Q(categoria__nombre__icontains=q)
             )
+        # Filtro por vehículo origen (desarme): solo si el parámetro es válido y el vehículo es de la empresa
+        vo = (self.request.GET.get("vehiculo_origen") or "").strip()
+        self.vehiculo_origen_filter = None
+        if vo:
+            try:
+                pk = int(vo)
+                from taller.models import Vehiculo
+
+                empresa = getattr(self.request.user, "empresa", None)
+                if empresa:
+                    vehiculo = Vehiculo.objects.filter(pk=pk, empresa=empresa).first()
+                    if vehiculo:
+                        qs = qs.filter(vehiculo_origen_id=pk)
+                        self.vehiculo_origen_filter = vehiculo
+            except (ValueError, TypeError):
+                pass
         qs = qs.order_by("nombre", "id")
         self.filtered_queryset = qs
         return qs
@@ -139,6 +155,7 @@ class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewM
 
         context["total_value"] = sql_total
         context["low_stock_count"] = qs.filter(cantidad_stock__lt=5).count()
+        context["vehiculo_origen_filter"] = getattr(self, "vehiculo_origen_filter", None)
         return context
 
 

@@ -1,0 +1,95 @@
+{% extends "taller/common/base.html" %}
+{% load static i18n l10n country_url %}
+
+{% block title %}{% trans "Dashboard financiero" %} - {{ vehiculo.get_marca_display }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'taller/desarme/vehicle-map.css' %}">
+<style>
+.dash-card{background:rgba(30,41,59,0.7);border:1px solid rgba(51,65,85,0.6);border-radius:12px;padding:1rem 1.25rem;}
+.dash-card .dash-label{font-size:0.7rem;text-transform:uppercase;letter-spacing:0.08em;color:#94a3b8;}
+.dash-card .dash-value{font-size:1.25rem;font-weight:700;color:#f1f5f9;}
+.dash-card.utilidad-positiva .dash-value{color:#22c55e;}
+.dash-card.utilidad-negativa .dash-value{color:#f87171;}
+.recovery-bar{height:10px;background:#1e293b;border-radius:5px;overflow:hidden;}
+.recovery-fill{height:100%;border-radius:5px;}
+.recovery-fill.over{background:#22c55e;}
+.recovery-fill.under{background:#f59e0b;}
+.piece-pill{display:inline-block;padding:0.25rem 0.6rem;border-radius:9999px;font-size:0.8rem;margin:0.15rem;}
+.piece-pill.disp{background:rgba(34,197,94,0.2);color:#4ade80;}
+.piece-pill.vendido{background:rgba(59,130,246,0.2);color:#60a5fa;}
+.piece-pill.danado{background:rgba(239,68,68,0.2);color:#f87171;}
+.piece-pill.scrap{background:rgba(100,116,139,0.3);color:#94a3b8;}
+.piece-pill.pendiente{background:rgba(148,163,184,0.2);color:#cbd5e1;}
+.piece-pill.reservada{background:rgba(234,179,8,0.2);color:#facc15;}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <header class="d-flex flex-wrap justify-content-between align-items-start gap-3 mb-4">
+    <div>
+      <nav aria-label="breadcrumb" class="mb-2"><ol class="breadcrumb mb-0"><li class="breadcrumb-item"><a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.pk %}">{{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}</a></li><li class="breadcrumb-item active">{% trans "Dashboard financiero" %}</li></ol></nav>
+      <h2 class="h4 mb-1 text-light">{{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}{% if vehiculo.anio %} {{ vehiculo.anio }}{% endif %}</h2>
+      <p class="text-muted small mb-0">{{ vehiculo.patente|default:vehiculo.vin|default:"—" }}{% if vehiculo.fecha_ingreso_desarme %} | {% trans "Ingreso" %} {{ vehiculo.fecha_ingreso_desarme|date:"d/m/Y" }}{% endif %}</p>
+      {% if cerrado %}<span class="badge bg-secondary mt-2">{% trans "Cerrado" %}</span>{% else %}<span class="badge bg-success mt-2">{% trans "Activo" %}</span>{% endif %}
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.pk %}" class="btn btn-sm btn-outline-light">{% trans "Volver" %}</a>
+      <a href="{% country_url 'desarme:mapa_piezas' pk=vehiculo.pk %}" class="btn btn-sm btn-outline-info">{% trans "Mapa" %}</a>
+      <a href="{% country_url 'repuestos:lista_repuestos' %}?vehiculo_origen={{ vehiculo.pk }}" class="btn btn-sm btn-outline-info">{% trans "Piezas" %}</a>
+      {% if can_edit %}<a href="{% country_url 'desarme:cerrar_vehiculo' pk=vehiculo.pk %}" class="btn btn-sm btn-outline-danger">{% trans "Cerrar vehículo" %}</a>{% endif %}
+    </div>
+  </header>
+
+  <section class="row g-3 mb-4">
+    <div class="col-6 col-md-4 col-lg-2"><div class="dash-card"><div class="dash-label">{% trans "Costo total" %}</div><div class="dash-value">${{ kpis.costo_total }}</div></div></div>
+    <div class="col-6 col-md-4 col-lg-2"><div class="dash-card"><div class="dash-label">{% trans "Ingresos piezas" %}</div><div class="dash-value">${{ kpis.ingresos_repuestos }}</div></div></div>
+    <div class="col-6 col-md-4 col-lg-2"><div class="dash-card"><div class="dash-label">{% trans "Chatarra" %}</div><div class="dash-value">${{ kpis.ingreso_final_chatarra }}</div></div></div>
+    <div class="col-6 col-md-4 col-lg-2"><div class="dash-card"><div class="dash-label">{% trans "Ingresos totales" %}</div><div class="dash-value">${{ kpis.ingresos_totales }}</div></div></div>
+    <div class="col-6 col-md-4 col-lg-2"><div class="dash-card {% if kpis.ya_supero_costo %}utilidad-positiva{% else %}utilidad-negativa{% endif %}"><div class="dash-label">{% trans "Utilidad" %}</div><div class="dash-value">${{ kpis.utilidad_total }}</div></div></div>
+    <div class="col-6 col-md-4 col-lg-2"><div class="dash-card"><div class="dash-label">{% trans "Recuperación" %}</div><div class="dash-value">{{ kpis.porcentaje_recuperacion }}%</div></div></div>
+  </section>
+
+  <div class="recovery-bar mb-2" style="max-width:400px"><div class="recovery-fill {% if kpis.ya_supero_costo %}over{% else %}under{% endif %}" style="width:{% if kpis.porcentaje_recuperacion > 100 %}100{% else %}{{ kpis.porcentaje_recuperacion }}{% endif %}%"></div></div>
+  <p class="text-muted small mb-4">{% if kpis.ya_supero_costo %}{% trans "Este vehículo ya superó su costo total." %}{% else %}{% blocktrans with faltante=kpis.faltante_por_recuperar %}Faltan ${{ faltante }} para recuperar la inversión.{% endblocktrans %}{% endif %}</p>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm bg-dark"><div class="card-header bg-transparent border-secondary"><h6 class="mb-0">{% trans "Costos base" %}</h6></div><div class="card-body small">
+        <div class="d-flex justify-content-between py-1"><span class="text-muted">{% trans "Precio compra" %}</span><span>${{ vehiculo.precio_compra|floatformat:0 }}</span></div>
+        <div class="d-flex justify-content-between py-1"><span class="text-muted">{% trans "Transporte" %}</span><span>${{ vehiculo.costo_transporte|floatformat:0 }}</span></div>
+        <div class="d-flex justify-content-between py-1"><span class="text-muted">{% trans "Grúa" %}</span><span>${{ vehiculo.costo_grua|floatformat:0 }}</span></div>
+        <div class="d-flex justify-content-between py-1"><span class="text-muted">{% trans "Papeles" %}</span><span>${{ vehiculo.costo_papeles|floatformat:0 }}</span></div>
+        <div class="d-flex justify-content-between py-1"><span class="text-muted">{% trans "Otros base" %}</span><span>${{ vehiculo.otros_costos_base|floatformat:0 }}</span></div>
+      </div></div>
+      <div class="card border-0 shadow-sm bg-dark mt-3"><div class="card-header bg-transparent border-secondary"><h6 class="mb-0">{% trans "Costos adicionales" %}</h6></div><div class="card-body p-0">
+        {% if costos_adicionales %}<ul class="list-group list-group-flush">{% for c in costos_adicionales %}<li class="list-group-item d-flex justify-content-between bg-dark border-secondary"><span>{{ c.get_tipo_costo_display }} {{ c.descripcion|default:"" }}</span><span>${{ c.monto|floatformat:0 }}</span></li>{% endfor %}</ul>{% else %}<p class="text-muted small p-3 mb-0">{% trans "Sin costos adicionales." %}</p>{% endif %}
+      </div></div>
+    </div>
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm bg-dark"><div class="card-header bg-transparent border-secondary"><h6 class="mb-0">{% trans "Resumen de piezas" %}</h6></div><div class="card-body">
+        <div class="d-flex flex-wrap gap-1">
+          <span class="piece-pill disp">{% trans "Disponibles" %} {{ piece_summary.disponible }}</span>
+          <span class="piece-pill vendido">{% trans "Vendidas" %} {{ piece_summary.vendido }}</span>
+          <span class="piece-pill danado">{% trans "Dañadas" %} {{ piece_summary.danado }}</span>
+          <span class="piece-pill scrap">Scrap {{ piece_summary.scrap }}</span>
+          <span class="piece-pill reservada">{% trans "Reservadas" %} {{ piece_summary.reservada }}</span>
+          <span class="piece-pill pendiente">{% trans "Pendientes" %} {{ piece_summary.pendientes }}</span>
+        </div>
+        <p class="text-muted small mt-2 mb-0">{% trans "Total" %}: {{ piece_summary.total }} {% trans "piezas" %}</p>
+      </div></div>
+      <div class="card border-0 shadow-sm bg-dark mt-3"><div class="card-header bg-transparent border-secondary"><h6 class="mb-0">{% trans "Últimas ventas" %}</h6></div><div class="card-body p-0">
+        {% if last_sales %}<ul class="list-group list-group-flush">{% for s in last_sales %}<li class="list-group-item d-flex justify-content-between bg-dark border-secondary small"><span>{{ s.repuesto_nombre|truncatewords:5 }} x{{ s.cantidad }}</span><span>${{ s.subtotal }}</span></li>{% endfor %}</ul>{% else %}<p class="text-muted small p-3 mb-0">{% trans "Aún no hay ventas de piezas de este vehículo." %}</p>{% endif %}
+      </div></div>
+    </div>
+  </div>
+
+  {% if cerrado and vehiculo.fecha_cierre_desarme %}
+  <div class="card border-0 shadow-sm bg-dark mt-4"><div class="card-header bg-transparent border-secondary"><h6 class="mb-0">{% trans "Cierre final" %}</h6></div><div class="card-body">
+    <div class="row small"><div class="col-md-3"><span class="text-muted">{% trans "Fecha cierre" %}</span><br>{{ vehiculo.fecha_cierre_desarme|date:"d/m/Y" }}</div><div class="col-md-3"><span class="text-muted">{% trans "Peso final" %}</span><br>{{ vehiculo.peso_final_kg|floatformat:2 }} kg</div><div class="col-md-3"><span class="text-muted">{% trans "Valor/kg" %}</span><br>${{ vehiculo.valor_final_por_kg|floatformat:2 }}</div><div class="col-md-3"><span class="text-muted">{% trans "Ingreso chatarra" %}</span><br><strong>${{ vehiculo.ingreso_final_chatarra|floatformat:0 }}</strong></div></div>
+    {% if vehiculo.observaciones_desarme %}<p class="text-muted small mt-2 mb-0">{{ vehiculo.observaciones_desarme }}</p>{% endif %}
+  </div></div>
+  {% endif %}
+</div>
+{% endblock %}

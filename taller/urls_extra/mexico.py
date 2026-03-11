@@ -55,6 +55,16 @@ urlpatterns = [
         lambda r: signup_redirect(r, "mx"),
         name="account_signup_mexico",
     ),
+    # Redirect resto de accounts/* → /accounts/* (password reset, logout, etc.)
+    path(
+        "accounts/", lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))
+    ),
+    path(
+        "accounts/<path:rest>",
+        lambda r, rest: redirect(
+            "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
+        ),
+    ),
     # *** Primera vista real de módulo: lista de clientes México ***
     path(
         "clientes/",

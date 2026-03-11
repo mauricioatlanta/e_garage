@@ -59,7 +59,7 @@
 
     <form method="post" action="">
       {% csrf_token %}
-      {% if "next" in request.GET %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+      {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
       <div class="form-group">
         <label class="form-label font-futuristic" for="{{ form.login.id_for_label }}">{% trans "Email or Username" %}</label>

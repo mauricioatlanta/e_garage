@@ -24,12 +24,17 @@ if os.name == "nt":
 
 
 def main():
-    # Warning solo en desarrollo (no en producción)
+    # Usar settings_prod en producción (consistencia con Gunicorn); settings en desarrollo
     ENV = (os.getenv("DJANGO_ENV") or os.getenv("ENV") or "").lower()
+    default_settings = (
+        "gestion_taller.settings_prod"
+        if ENV in ("prod", "production")
+        else "gestion_taller.settings"
+    )
     if ENV not in ("prod", "production"):
         logging.warning("Modo de desarrollo activado. Asegúrate de no usar esto en producción.")
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", default_settings)
 
     try:
         from django.core.management import execute_from_command_line

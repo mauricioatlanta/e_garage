@@ -5,6 +5,7 @@ Brasil: SOLO portugués (pt).
 Compatibilidad: /br/es/... redirige a /br/pt/...
 """
 
+from django.shortcuts import redirect
 from django.urls import path
 from django.utils import translation
 from django.views.generic import RedirectView, TemplateView
@@ -36,6 +37,17 @@ urlpatterns = [
         "pt/accounts/signup/",
         lambda r: signup_redirect(r, "br"),
         name="signup_pt",
+    ),
+    # Redirect /br/pt/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
+    path(
+        "pt/accounts/",
+        lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else "")),
+    ),
+    path(
+        "pt/accounts/<path:rest>",
+        lambda r, rest: redirect(
+            "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
+        ),
     ),
     # --- ESPAÑOL (legacy) → redirige a PT ---
     path("es/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),

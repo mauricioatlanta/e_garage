@@ -12,6 +12,7 @@ from taller.models.documento import Documento
 from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.precio_suscripcion import PrecioSuscripcion
+from taller.models.plantilla_desarme import PlantillaDesarme, PlantillaPieza
 from taller.models.tecnico import Tecnico
 
 # ✅ Importar modelos de servicios de forma segura (puede fallar si no están disponibles)
@@ -370,6 +371,35 @@ class TecnicoAdmin(admin.ModelAdmin):
     list_filter = ("empresa",)
     search_fields = ("nombre",)
     list_editable = ()
+
+
+# === PLANTILLAS DE DESARME ===
+class PlantillaPiezaInline(admin.TabularInline):
+    model = PlantillaPieza
+    extra = 1
+    fields = ["nombre_pieza", "orden", "codigo_base", "activo", "lado", "zona_mapa", "vista_mapa"]
+    ordering = ["orden", "id"]
+
+
+@admin.register(PlantillaDesarme, site=admin_site)
+class PlantillaDesarmeAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "empresa", "activa", "num_piezas_display")
+    list_filter = ("activa", "empresa")
+    search_fields = ("nombre", "descripcion")
+    inlines = [PlantillaPiezaInline]
+    ordering = ("nombre",)
+
+    @admin.display(description="Piezas")
+    def num_piezas_display(self, obj):
+        return obj.piezas.filter(activo=True).count()
+
+
+@admin.register(PlantillaPieza, site=admin_site)
+class PlantillaPiezaAdmin(admin.ModelAdmin):
+    list_display = ("nombre_pieza", "plantilla", "orden", "activo", "zona_mapa")
+    list_filter = ("plantilla", "activo")
+    search_fields = ("nombre_pieza", "zona_mapa")
+    ordering = ("plantilla", "orden", "id")
 
 
 # === ADMINISTRACIÓN DE SERVICIOS MULTILENGUAJE ===

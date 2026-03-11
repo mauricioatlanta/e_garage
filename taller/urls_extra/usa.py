@@ -28,7 +28,7 @@ from taller.views_extra.futuristic_company_settings_views import (
     futuristic_company_settings_view,
 )
 from taller.views_extra.views import dashboard
-from taller.views_extra.views_configuracion import configuracion_empresa, configuracion_tecnicos
+from taller.views_extra.views_configuracion import configuracion_tecnicos
 from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.documentos import views_country_aware as views_documentos
@@ -270,11 +270,21 @@ urlpatterns = [
         RedirectView.as_view(url="/us/settings/", permanent=False),
         name="configuracion",
     ),
-    # Configuración real (dueño)
+    # Legacy configuracion/empresa/ → redirige a settings (evita 403 de la vista antigua)
     path(
         "configuracion/empresa/",
-        configuracion_empresa,
+        RedirectView.as_view(pattern_name="usa:company_settings", permanent=False),
         name="configuracion_empresa",
+    ),
+    path(
+        "en/configuracion/empresa/",
+        RedirectView.as_view(pattern_name="us_en:company_settings", permanent=False),
+        name="configuracion_empresa_en",
+    ),
+    path(
+        "es/configuracion/empresa/",
+        RedirectView.as_view(pattern_name="us_es:company_settings", permanent=False),
+        name="configuracion_empresa_es",
     ),
     path("configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"),
     path("settings/", company_settings_view, name="company_settings"),

@@ -60,13 +60,11 @@ AUTHENTICATION_BACKENDS = (
     "allauth.account.auth_backends.AuthenticationBackend",
 )
 
-# Allauth correcto
-ACCOUNT_AUTHENTICATION_METHOD = "username_email"  # <- en vez de ACCOUNT_LOGIN_METHODS
+# Allauth (limpieza: ACCOUNT_AUTHENTICATION_METHOD / ACCOUNT_EMAIL_REQUIRED retirados)
 ACCOUNT_EMAIL_VERIFICATION = os.getenv(
     "ACCOUNT_EMAIL_VERIFICATION",
     "mandatory",  # 🔒 Siempre obligatorio
 )
-ACCOUNT_EMAIL_REQUIRED = True  # 🔒 Email es REQUERIDO
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True  # Confirmar email con un solo clic
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 ACCOUNT_RATE_LIMITS = {"confirm_email": "1/m"}

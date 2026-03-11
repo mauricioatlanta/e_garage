@@ -34,7 +34,7 @@
     </div>
 
     <!-- Action Buttons -->
-    <div class="flex space-x-1">
+    <div class="flex space-x-1 flex-wrap gap-1">
       <a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.pk app_namespace='' %}"
          class="interactive-btn flex-1 text-center">
         <svg class="w-3 h-3 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -50,6 +50,13 @@
         </svg>
         {% trans "Edit" %}
       </a>
+      {% if vehiculo.tipo_uso == 'desarme' and desarme_map_url_name %}
+      <a href="{% url desarme_map_url_name vehiculo.pk %}"
+         class="interactive-btn flex-1 text-center" title="{% trans 'Mapa de piezas / Desarme' %}">
+        <span aria-hidden="true">🗺️</span>
+        {% trans "Desarme" %}
+      </a>
+      {% endif %}
     </div>
   </div>
   {% endfor %}

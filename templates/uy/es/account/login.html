@@ -544,7 +544,7 @@ body {
         <!-- Formulario -->
         <form method="POST" action="{{ request.get_full_path }}" class="space-y-6">
             {% csrf_token %}
-            {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+            {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
             <!-- Email/Usuario -->
             <div class="form-group">

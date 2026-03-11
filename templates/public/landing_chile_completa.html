@@ -125,7 +125,7 @@
       <a href="#ventajas" class="hidden md:inline-block text-slate-300 hover:text-white px-4 py-2 rounded-lg transition">
         Ventajas
       </a>
-      <a href="/cl/es/accounts/login/" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-xl font-semibold transition">
+      <a href="{% url 'account_login' %}" class="bg-slate-700 hover:bg-slate-600 text-white px-6 py-2 rounded-xl font-semibold transition">
         Iniciar Sesión
       </a>
     </div>
@@ -639,7 +639,7 @@
             <span>Usuarios ilimitados</span>
           </li>
         </ul>
-        <a href="/cl/es/accounts/signup/" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
+        <a href="{% url 'account_signup' %}?from=cl" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
           Probar Ahora
         </a>
       </div>
@@ -670,7 +670,7 @@
             <span>Cancelar cuando quieras</span>
           </li>
         </ul>
-        <a href="/cl/es/accounts/signup/" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
+        <a href="{% url 'account_signup' %}?from=cl" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
           Elegir Mensual
         </a>
       </div>
@@ -704,7 +704,7 @@
             <span>Ahorro ~17%</span>
           </li>
         </ul>
-        <a href="/cl/es/accounts/signup/" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
+        <a href="{% url 'account_signup' %}?from=cl" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
           Elegir Semestral
         </a>
       </div>
@@ -735,7 +735,7 @@
             <span>Máximo ahorro</span>
           </li>
         </ul>
-        <a href="/cl/es/accounts/signup/" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
+        <a href="{% url 'account_signup' %}?from=cl" class="w-full block text-center rounded-xl bg-emerald-500 text-slate-900 font-bold px-6 py-4 hover:bg-emerald-400 transition eg-glow-button">
           Elegir Anual
         </a>
       </div>

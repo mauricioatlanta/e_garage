@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load i18n %}
 {% load custom_filters %}
 {% load country_url %}
 
@@ -220,6 +221,77 @@ body {
       {% csrf_token %}
       {% if next %}
       <input type="hidden" name="next" value="{{ next }}">
+      {% endif %}
+
+      {% if form.tipo_uso %}
+      <div class="form-group mb-4 p-3 rounded-xl border border-cyan-500/20 bg-black/20">
+        <label for="{{ form.tipo_uso.id_for_label }}">{% trans "Tipo de vehículo" %}</label>
+        {{ form.tipo_uso }}
+        <p class="text-xs text-slate-400 mt-1">{% trans "Seleccione 'Vehículo para desarme' para ingresar un vehículo al módulo de desarmaduría." %}</p>
+        {% if form.tipo_uso.errors %}<div class="text-red-400 text-sm mt-1">{{ form.tipo_uso.errors.0 }}</div>{% endif %}
+      </div>
+      {% endif %}
+
+      {% if form.fecha_ingreso_desarme %}
+      <div id="desarme-fields-section" class="form-group mb-4 p-4 rounded-xl border border-amber-500/30 bg-black/30" style="display: none;">
+        <h3 class="text-cyan-400 font-semibold text-sm uppercase tracking-wide mb-3">{% trans "Datos de desarmaduría" %}</h3>
+        <p class="text-xs text-slate-400 mb-3">{% trans "Complete al menos la fecha de ingreso. Los costos y proveedor son opcionales." %}</p>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="form-group">
+            <label for="{{ form.fecha_ingreso_desarme.id_for_label }}">{% trans "Fecha de ingreso" %} *</label>
+            {{ form.fecha_ingreso_desarme }}
+            {% if form.fecha_ingreso_desarme.errors %}<div class="text-red-400 text-sm mt-1">{{ form.fecha_ingreso_desarme.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.proveedor_nombre.id_for_label }}">{% trans "Proveedor (nombre)" %}</label>
+            {{ form.proveedor_nombre }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.proveedor_rut.id_for_label }}">{% trans "RUT / ID proveedor" %}</label>
+            {{ form.proveedor_rut }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.proveedor_telefono.id_for_label }}">{% trans "Teléfono proveedor" %}</label>
+            {{ form.proveedor_telefono }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.precio_compra.id_for_label }}">{% trans "Precio compra" %}</label>
+            {{ form.precio_compra }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.costo_transporte.id_for_label }}">{% trans "Costo transporte" %}</label>
+            {{ form.costo_transporte }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.costo_grua.id_for_label }}">{% trans "Costo grúa" %}</label>
+            {{ form.costo_grua }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.costo_papeles.id_for_label }}">{% trans "Costo papeles" %}</label>
+            {{ form.costo_papeles }}
+          </div>
+          <div class="form-group">
+            <label for="{{ form.otros_costos_base.id_for_label }}">{% trans "Otros costos base" %}</label>
+            {{ form.otros_costos_base }}
+          </div>
+          <div class="form-group md:col-span-2">
+            <label for="{{ form.observaciones_desarme.id_for_label }}">{% trans "Observaciones desarme" %}</label>
+            {{ form.observaciones_desarme }}
+          </div>
+        </div>
+      </div>
+      <script>
+      (function() {
+        var sel = document.querySelector('select[name="tipo_uso"]');
+        var section = document.getElementById('desarme-fields-section');
+        if (!sel || !section) return;
+        function toggle() {
+          section.style.display = (sel.value === 'desarme') ? 'block' : 'none';
+        }
+        sel.addEventListener('change', toggle);
+        toggle();
+      })();
+      </script>
       {% endif %}
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">

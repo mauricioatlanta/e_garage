@@ -16,6 +16,7 @@ from taller.forms.configuracion_forms import ConfiguracionRubroForm
 from taller.models import Tecnico
 from taller.models.company_settings import CompanySettings
 from taller.models.configuracion import ConfiguracionEmpresa
+from taller.context_processors.company_header import invalidate_company_header_cache
 from taller.utils.empresa import get_or_create_empresa
 from taller.utils.pais_utils import get_configuracion_pais
 
@@ -178,19 +179,44 @@ def company_settings_view(request):
                 request.POST or None,
                 request.FILES or None,
                 instance=config_empresa,
+                request=request,
             )
             financial_form = FinancialSettingsForm(request.POST or None, instance=config)
             theme_form = ThemeSettingsForm(request.POST or None, instance=config)
 
             # Validar y guardar según la sección
             if section == "profile":
-                ok_profile = profile_form.is_valid()
-                ok_empresa = empresa_form.is_valid()
-
-                if ok_profile and ok_empresa:
+                # Solo validar el formulario de CompanySettings (nombre, lema, dirección, etc.).
+                # NO usar empresa_form.is_valid() aquí: el POST solo trae campos de profile_form
+                # y empresa_form tiene otros nombres (nombre_publico, direccion...); guardarlo
+                # sobrescribiría ConfiguracionEmpresa con valores vacíos.
+                if profile_form.is_valid():
                     profile_form.save()
-                    empresa_form.save()  # <-- aquí se guarda logo en ConfiguracionEmpresa
+                    # Logo: si se subió uno nuevo, guardarlo en ConfiguracionEmpresa (sin tocar el resto)
+                    logo_file = request.FILES.get("logo")
+                    if logo_file:
+                        from taller.forms.configuracion_empresa import MAX_LOGO_MB
+
+                        if logo_file.size <= MAX_LOGO_MB * 1024 * 1024:
+                            config_empresa.logo = logo_file
+                            config_empresa.save(update_fields=["logo"])
+                        else:
+                            messages.warning(
+                                request,
+                                (
+                                    ("Logo no guardado: tamaño máximo %s MB." % MAX_LOGO_MB)
+                                    if is_spanish
+                                    else ("Logo not saved: max size %s MB." % MAX_LOGO_MB)
+                                ),
+                            )
+                    # Sincronizar nombre y lema a ConfiguracionEmpresa para el header
+                    config_empresa.nombre_publico = (
+                        getattr(config, "company_name", "") or ""
+                    ).strip()
+                    config_empresa.tagline = (getattr(config, "tagline", "") or "").strip()
+                    config_empresa.save(update_fields=["nombre_publico", "tagline"])
                     cache.delete(f"company_branding_{request.user.id}")
+                    invalidate_company_header_cache(empresa.id)
 
                     messages.success(
                         request,
@@ -201,15 +227,17 @@ def company_settings_view(request):
                         ),
                     )
                     return redirect(request.path)
-                else:
-                    messages.error(
-                        request,
-                        (
-                            "❌ Corrige los errores en Información de Empresa."
-                            if is_spanish
-                            else "❌ Please fix the errors in Company Information."
-                        ),
-                    )
+
+                messages.error(
+                    request,
+                    (
+                        "❌ Corrige los errores en Información de Empresa."
+                        if is_spanish
+                        else "❌ Please fix the errors in Company Information."
+                    ),
+                )
+                if profile_form.errors:
+                    logger.debug("company_settings profile errors: %s", profile_form.errors)
             elif section == "financial":
                 if financial_form.is_valid():
                     financial_form.save()
@@ -230,8 +258,8 @@ def company_settings_view(request):
             elif section == "theme":
                 if theme_form.is_valid():
                     theme_form.save()
-                    cache_key = f"company_branding_{request.user.id}"
-                    cache.delete(cache_key)
+                    cache.delete(f"company_branding_{request.user.id}")
+                    invalidate_company_header_cache(empresa.id)
                     if is_spanish:
                         messages.success(request, "✅ Tema y colores guardados exitosamente.")
                     else:
@@ -263,7 +291,10 @@ def company_settings_view(request):
         # GET request - crear formularios limpios
         try:
             profile_form = CompanyProfileForm(instance=config)
-            empresa_form = ConfiguracionEmpresaForm(instance=config_empresa)
+            empresa_form = ConfiguracionEmpresaForm(
+                instance=config_empresa,
+                request=request,
+            )
             financial_form = FinancialSettingsForm(instance=config)
             theme_form = ThemeSettingsForm(instance=config)
             rubro_form = ConfiguracionRubroForm(instance=config_empresa, request=request)

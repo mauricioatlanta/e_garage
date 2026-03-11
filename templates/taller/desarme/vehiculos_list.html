@@ -1,0 +1,106 @@
+{% extends "taller/common/base.html" %}
+{% load i18n country_url static %}
+
+{% block title %}{% trans "Vehículos de desarme" %}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'taller/desarme/kanban.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h1 class="h4 text-light mb-1">{% trans "Tablero de desarmaduría" %}</h1>
+      <p class="text-muted small mb-0">
+        {% trans "Vehículos organizados por estado del desarme." %}
+      </p>
+    </div>
+    <div>
+      <a href="{% country_url 'desarme:crear_vehiculo_desarme' %}" class="btn btn-sm btn-success">
+        <span class="me-1">➕</span> {% trans "Ingresar vehículo de desarme" %}
+      </a>
+    </div>
+  </div>
+
+  <form method="get" class="mb-3">
+    <div class="input-group input-group-sm" style="max-width: 360px;">
+      <input type="text" name="q" value="{{ q|default_if_none:'' }}"
+             class="form-control bg-dark text-light border-secondary"
+             placeholder="{% trans 'Buscar por patente, VIN, marca o modelo…' %}">
+      <button class="btn btn-outline-info" type="submit">{% trans "Buscar" %}</button>
+    </div>
+  </form>
+
+  {% if total_vehiculos > 0 %}
+  {# Resumen: total y por estado #}
+  <div class="d-flex flex-wrap gap-2 mb-3 small">
+    <span class="badge bg-secondary">{% trans "Total" %}: {{ total_vehiculos }}</span>
+    {% for estado_key, estado_label, vehiculos in columnas_kanban %}
+      <span class="badge bg-dark border border-secondary">{{ estado_label }}: {{ vehiculos|length }}</span>
+    {% endfor %}
+  </div>
+
+  <div class="kanban-desarme row g-2 g-md-3">
+    {% for estado_key, estado_label, vehiculos in columnas_kanban %}
+    <div class="col-12 col-lg kanban-col">
+      <div class="kanban-column bg-dark rounded border border-secondary p-2 h-100">
+        <div class="kanban-col-header d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary">
+          <span class="fw-bold text-light small">{{ estado_label }}</span>
+          <span class="badge bg-secondary">{{ vehiculos|length }}</span>
+        </div>
+        <div class="kanban-cards">
+          {% for v in vehiculos %}
+          <div class="card kanban-card bg-dark border border-secondary mb-2">
+            <div class="card-body p-2">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <strong class="text-light small">{{ v.patente|default:v.vin|default:"—" }}</strong>
+                <span class="badge badge-estado badge-{{ estado_key }}">{{ estado_label }}</span>
+              </div>
+              <div class="text-muted small mb-1">
+                {{ v.get_marca_display }} {{ v.get_modelo_display }}{% if v.anio %} ({{ v.anio }}){% endif %}
+              </div>
+              <div class="text-muted small mb-2">
+                {% if v.fecha_ingreso_desarme %}
+                  {{ v.fecha_ingreso_desarme|date:"d/m/Y" }}
+                {% else %}
+                  <span class="opacity-50">—</span>
+                {% endif %}
+              </div>
+              <div class="border-top border-secondary pt-1 mt-1 small">
+                <div class="text-info">{% trans "Costo" %}: ${{ v.kanban_costo_total|floatformat:0|default:"0" }}</div>
+                <div class="text-success">{% trans "Ingresos" %}: ${{ v.kanban_ingresos_total|floatformat:0|default:"0" }}</div>
+                <div class="{% if v.kanban_utilidad_total >= 0 %}text-success{% else %}text-danger{% endif %} fw-medium">
+                  {% trans "Utilidad" %}: ${{ v.kanban_utilidad_total|floatformat:0|default:"0" }}
+                </div>
+              </div>
+              <div class="d-flex flex-wrap gap-1 mt-2">
+                <a href="{% country_url 'desarme:mapa_piezas' pk=v.pk %}" class="btn btn-sm btn-outline-info py-0 px-1" title="{% trans 'Mapa de piezas' %}">🗺</a>
+                <a href="{% country_url 'desarme:dashboard_financiero' pk=v.pk %}" class="btn btn-sm btn-outline-secondary py-0 px-1" title="{% trans 'Dashboard financiero' %}">📊</a>
+                <a href="{% country_url 'repuestos:lista_repuestos' %}?vehiculo_origen={{ v.pk }}" class="btn btn-sm btn-outline-primary py-0 px-1" title="{% trans 'Ver piezas' %}">🔧</a>
+                {% if v.estado_desarme|default:'' != 'cerrado' %}
+                <a href="{% country_url 'desarme:cerrar_vehiculo' pk=v.pk %}" class="btn btn-sm btn-outline-danger py-0 px-1" title="{% trans 'Cerrar vehículo' %}">🔒</a>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% empty %}
+          <div class="kanban-empty text-muted small text-center py-3 px-2 rounded">
+            {% trans "Sin vehículos" %}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-info">
+    {% trans "Aún no tienes vehículos de desarme registrados." %}
+    <a href="{% country_url 'desarme:crear_vehiculo_desarme' %}" class="alert-link">
+      {% trans "Ingresar vehículo de desarme" %}
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -90,8 +90,16 @@ urlpatterns = [
         TemplateView.as_view(template_name="uy/es/onboarding/bienvenida.html"),
         name="bienvenida_uruguay_alt",
     ),
-    # Allauth bajo /uy/ y /uy/es/ para que /uy/es/accounts/login/ etc. funcionen
-    path("accounts/", include("allauth.urls")),
+    # Redirect /uy/accounts/* y /uy/es/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
+    path(
+        "accounts/", lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))
+    ),
+    path(
+        "accounts/<path:rest>",
+        lambda r, rest: redirect(
+            "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
+        ),
+    ),
     # Login para Uruguay: redirige a /accounts/login/?from=uy (registration/login.html no existe)
     path(
         "login/",

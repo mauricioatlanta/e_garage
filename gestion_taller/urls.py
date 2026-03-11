@@ -171,6 +171,17 @@ def redirect_qs(to):
     return view
 
 
+def redirect_us_accounts_to_base(request):
+    """Redirige /us/en/accounts/ o /us/es/accounts/ a /accounts/ (allauth único)."""
+    return redirect("/accounts/" + ("?" + request.GET.urlencode() if request.GET else ""))
+
+
+def redirect_us_accounts_with_path(request, rest):
+    """Redirige /us/en/accounts/<rest> o /us/es/accounts/<rest> a /accounts/<rest>."""
+    base = f"/accounts/{rest.rstrip('/')}"
+    return redirect(base + ("?" + request.GET.urlencode() if request.GET else ""))
+
+
 def redirect_cl_to_es(request, path=None):
     """Redirect /cl/... to /cl/es/... preserving the rest of the path"""
     if path:
@@ -272,8 +283,8 @@ urlpatterns = [
     path("us/auth/registro-exitoso/", registro_exitoso, name="registro_exitoso_us"),
     # Allauth para el resto de funcionalidades (excluyendo signup que ya está arriba)
     path("accounts/", include("allauth.urls")),
-    # Wrappers country-aware para login y signup
-    path("cl/accounts/login/", redirect_qs("/accounts/login/"), name="account_login_cl"),
+    # Wrappers country-aware para login y signup (servir directamente evita ERR_TOO_MANY_REDIRECTS)
+    path("cl/accounts/login/", country_aware_login, name="account_login_cl"),
     # path("us/accounts/login/", redirect_qs("/us/login/"), name="account_login_us"),  # USA login real: path("us/", include(usa)) → usa:account_login en /us/login/
     path("co/accounts/login/", country_aware_login, name="account_login_co"),
     path("ec/accounts/login/", country_aware_login, name="account_login_ec"),
@@ -332,7 +343,7 @@ urlpatterns = [
         ),
         name="signup_redirect_br",
     ),
-    # Redirects amigables para login
+    # Redirects amigables para login (cl/accounts/login/ sirve country_aware_login directamente)
     path("cl/login/", redirect_qs("/cl/accounts/login/")),
     path("cl/es/login/", redirect_qs("/cl/accounts/login/")),
     # us/login/ lo resuelve path("us/", include(usa)) → usa_login_view (render directo)
@@ -406,10 +417,11 @@ urlpatterns = [
         "uy/",
         include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
     ),
-    # 🇺🇸 USA - Accounts (Allauth) DEBE ir ANTES que us/en/ y us/es/ para que
-    # /us/es/accounts/login/ y /us/en/accounts/login/ resuelvan a allauth y no a taller.urls (evita 403/404).
-    path("us/en/accounts/", include("allauth.urls")),
-    path("us/es/accounts/", include("allauth.urls")),
+    # 🇺🇸 USA - Redirects de /us/en/accounts/ y /us/es/accounts/ a /accounts/ (allauth montado solo una vez)
+    path("us/en/accounts/", redirect_us_accounts_to_base),
+    path("us/en/accounts/<path:rest>", redirect_us_accounts_with_path),
+    path("us/es/accounts/", redirect_us_accounts_to_base),
+    path("us/es/accounts/<path:rest>", redirect_us_accounts_with_path),
     # 🇺🇸 USA - Bienvenida explícita ANTES de us/en/ y us/es/ (evita 502: taller.urls no tiene bienvenida/)
     path("us/en/bienvenida/", bienvenida_usa_en, name="us_en_bienvenida"),
     path("us/es/bienvenida/", bienvenida_usa_es, name="us_es_bienvenida"),

@@ -9,7 +9,7 @@ Django obtenga el callable correcto.
 
 from django.core.cache import cache
 
-from .company_header import company_header  # ✅ NUEVO - Información de contacto
+from .company_header import company_header, invalidate_company_header_cache
 from .support_context import support_context  # ✅ Información de soporte centralizada
 
 # Traer la función existente definida en submódulo independiente
@@ -88,9 +88,8 @@ def _brand_result(brand):
 def company_branding(request):
     """
     Context processor unificado de branding.
-    Retorna objeto BRAND con todas las propiedades de marca.
-    Usa empresa del request (middleware) o del usuario.
-    Nunca debe lanzar: ante cualquier error retorna defaults para evitar 500.
+    Prioriza la empresa activa del request y su ConfiguracionEmpresa.
+    Nunca debe lanzar excepciones.
     """
     import logging
 
@@ -110,84 +109,128 @@ def company_branding(request):
 
     user = getattr(request, "user", None)
 
-    # Si estamos en la página raíz o de selección de país, siempre usar "eGarage"
     if request.path == "/" or request.path == "" or "seleccionar_pais" in request.path:
         brand = _default_brand_dict(settings)
         brand["name"] = "eGarage"
         return _brand_result(brand)
 
-    # Defaults del sistema
     brand = _default_brand_dict(settings)
 
-    # Si no hay usuario autenticado, retornar defaults
     if not user or not user.is_authenticated or isinstance(user, AnonymousUser):
         return _brand_result(brand)
 
     try:
-        # Buscar empresa del usuario
-        empresa = getattr(request, "empresa_actual", None)
+        # 1. Tomar primero la empresa activa inyectada por middleware
+        empresa = (
+            getattr(request, "empresa", None)
+            or getattr(request, "empresa_actual", None)
+            or getattr(request, "current_empresa", None)
+        )
+
+        # 2. Fallbacks solo si no hay empresa en request
         if not empresa:
             try:
                 empresa = Empresa.objects.get(user=user)
-            except Empresa.DoesNotExist:
+            except Exception:
                 try:
                     empresa = Empresa.objects.filter(usuario=user).first()
                 except Exception:
-                    pass
+                    empresa = None
+
+        logger.debug(
+            "company_branding: user_id=%s empresa_id=%s path=%s",
+            getattr(user, "id", None),
+            getattr(empresa, "id", None),
+            getattr(request, "path", ""),
+        )
+
+        # CompanySettings es la fuente principal para nombre/logo/lema (lo que el usuario edita en Ajustes)
+        company_settings = None
+        try:
+            company_settings = CompanySettings.objects.filter(user=user).first()
+        except Exception as e:
+            logger.debug("company_branding: error leyendo CompanySettings: %s", e)
+
+        if company_settings:
+            if getattr(company_settings, "company_name", "").strip():
+                brand["name"] = company_settings.company_name.strip()
+            if getattr(company_settings, "tagline", "").strip():
+                brand["tagline"] = company_settings.tagline.strip()
+            if getattr(company_settings, "logo", None):
+                try:
+                    brand["logo_url"] = company_settings.logo.url
+                except Exception as e:
+                    logger.debug("company_branding: error company_settings.logo.url: %s", e)
+            if getattr(company_settings, "primary_color", "").strip():
+                brand["primary_color"] = company_settings.primary_color.strip()
+            if getattr(company_settings, "secondary_color", "").strip():
+                brand["secondary_color"] = company_settings.secondary_color.strip()
 
         if empresa:
-            # 1. PRIORIDAD MÁXIMA: CompanySettings (tabla nueva)
-            try:
-                company_settings = CompanySettings.objects.get(user=user)
-                if company_settings.logo:
-                    brand["logo_url"] = company_settings.logo.url
-                if hasattr(company_settings, "company_name") and company_settings.company_name:
-                    brand["name"] = company_settings.company_name
-                if hasattr(company_settings, "tagline") and company_settings.tagline:
-                    brand["tagline"] = company_settings.tagline
-                if hasattr(company_settings, "primary_color") and company_settings.primary_color:
-                    brand["primary_color"] = company_settings.primary_color
-                if (
-                    hasattr(company_settings, "secondary_color")
-                    and company_settings.secondary_color
-                ):
-                    brand["secondary_color"] = company_settings.secondary_color
-            except CompanySettings.DoesNotExist:
-                pass
-
-            # 2. SEGUNDA PRIORIDAD: ConfiguracionEmpresa (si no hay CompanySettings)
+            # ConfiguracionEmpresa: rellenar solo lo que no vino de CompanySettings
             try:
                 conf = ConfiguracionEmpresa.objects.get(empresa=empresa)
-                if conf.logo and not brand["logo_url"]:
-                    brand["logo_url"] = conf.logo.url
-                if hasattr(conf, "nombre_publico") and conf.nombre_publico:
-                    brand["name"] = conf.nombre_publico
-                if hasattr(conf, "tagline") and conf.tagline:
-                    brand["tagline"] = conf.tagline
-                if hasattr(conf, "brand_color") and conf.brand_color:
-                    brand["primary_color"] = conf.brand_color
-                if hasattr(conf, "moneda") and conf.moneda:
-                    brand["currency"] = conf.moneda
-                if hasattr(conf, "pais") and conf.pais:
-                    brand["country"] = conf.pais
-            except ConfiguracionEmpresa.DoesNotExist:
-                pass
-            except Exception as e:
-                logger.debug("ConfiguracionEmpresa (posible migración faltante): %s", e)
 
-            # 3. TERCERA PRIORIDAD: Empresa directamente (fallback)
-            if not brand["logo_url"] and hasattr(empresa, "logo") and empresa.logo:
-                brand["logo_url"] = empresa.logo.url
-            if brand["name"] == getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"):
-                brand["name"] = getattr(empresa, "nombre_taller", brand["name"])
-            if hasattr(empresa, "pais") and empresa.pais:
-                brand["country"] = (
-                    empresa.pais.lower() if isinstance(empresa.pais, str) else empresa.pais
+                if not brand.get("logo_url") and conf.logo:
+                    try:
+                        brand["logo_url"] = conf.logo.url
+                    except Exception as e:
+                        logger.debug("company_branding: error conf.logo.url: %s", e)
+
+                if (
+                    not brand.get("name")
+                    or brand["name"] == getattr(settings, "DEFAULT_BRAND_NAME", "eGarage")
+                ) and getattr(conf, "nombre_publico", ""):
+                    brand["name"] = conf.nombre_publico
+
+                if not brand.get("tagline") and getattr(conf, "tagline", ""):
+                    brand["tagline"] = conf.tagline
+
+                if not brand.get("primary_color") and getattr(conf, "brand_color", ""):
+                    brand["primary_color"] = conf.brand_color
+
+                if getattr(conf, "moneda", ""):
+                    brand["currency"] = conf.moneda
+
+            except ConfiguracionEmpresa.DoesNotExist:
+                logger.debug(
+                    "company_branding: no existe ConfiguracionEmpresa para empresa_id=%s",
+                    getattr(empresa, "id", None),
                 )
+            except Exception as e:
+                logger.warning("company_branding: error leyendo ConfiguracionEmpresa: %s", e)
+
+            # Empresa directamente: fallbacks cuando no hay CompanySettings ni ConfiguracionEmpresa
+            if not brand["logo_url"] and hasattr(empresa, "logo") and empresa.logo:
+                try:
+                    brand["logo_url"] = empresa.logo.url
+                except Exception as e:
+                    logger.debug("company_branding: error empresa.logo.url: %s", e)
+
+            if not brand.get("name") or brand["name"] == getattr(
+                settings, "DEFAULT_BRAND_NAME", "eGarage"
+            ):
+                brand["name"] = (
+                    getattr(empresa, "nombre_taller", "")
+                    or getattr(empresa, "empresa", "")
+                    or brand["name"]
+                )
+
+            if hasattr(empresa, "pais") and empresa.pais:
+                brand["country"] = empresa.pais
+
             if hasattr(empresa, "moneda") and empresa.moneda:
                 brand["currency"] = empresa.moneda
 
+        logger.debug(
+            "company_branding final: empresa_id=%s logo_url=%s name=%s",
+            getattr(empresa, "id", None) if empresa else None,
+            brand.get("logo_url"),
+            brand.get("name"),
+        )
+
         return _brand_result(brand)
+
     except Exception as e:
         logger.warning("company_branding: error inesperado, usando defaults: %s", e)
         return _brand_result(_default_brand_dict(settings))
@@ -223,8 +266,9 @@ __all__ = [
     "company_branding",
     "company_country",
     "company_context",
-    "company_header",  # ✅ NUEVO - Información de contacto
-    "support_context",  # ✅ Información de soporte centralizada
+    "company_header",
+    "invalidate_company_header_cache",
+    "support_context",
     "invalidate_company_cache",
     "ui_namespaces",
 ]

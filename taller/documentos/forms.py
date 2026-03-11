@@ -129,9 +129,15 @@ class DocumentoForm(forms.ModelForm):
                     Tecnico,  # importar aquí para mantener este archivo limpio de modelos no usados
                 )
 
-                self.fields["tecnico_responsable"].queryset = Tecnico.objects.filter(
-                    empresa=empresa
-                )
+                # Regla 3.4: solo personal activo de la empresa; incluir actual si existe (edición)
+                qs_tec = Tecnico.objects.filter(empresa=empresa, activo=True)
+                if getattr(self.instance, "tecnico_responsable_id", None):
+                    qs_tec = qs_tec | Tecnico.objects.filter(
+                        pk=self.instance.tecnico_responsable_id, empresa=empresa
+                    )
+                self.fields["tecnico_responsable"].queryset = qs_tec.distinct()
+                # Regla 3.1: responsable obligatorio para trazabilidad y métricas
+                self.fields["tecnico_responsable"].required = True
 
             # Cliente: si hay instance o POST, incluye el seleccionado
             qs_cli = Cliente.objects.filter(empresa=empresa)
@@ -164,7 +170,7 @@ class DocumentoForm(forms.ModelForm):
 
                 self.fields["tecnico_responsable"].queryset = Tecnico.objects.none()
 
-    # Validación multi-tenant y coherencia cliente↔vehículo
+    # Reglas 2.5: validación obligatoria cliente ↔ vehículo ↔ empresa (integridad del documento)
     def clean(self):
         cleaned = super().clean()
         empresa = self.empresa or (getattr(self.user, "empresa", None))
@@ -179,6 +185,13 @@ class DocumentoForm(forms.ModelForm):
 
         if cliente and vehiculo and vehiculo.cliente_id != cliente.id:
             raise ValidationError("El vehículo seleccionado no pertenece al cliente.")
+
+        # Regla 3.1: responsable obligatorio (trazabilidad, KPIs, reportes)
+        tecnico = cleaned.get("tecnico_responsable")
+        if not tecnico:
+            raise ValidationError(
+                {"tecnico_responsable": "Debe seleccionar un responsable (técnico o vendedor)."}
+            )
 
         return cleaned
 

@@ -207,12 +207,23 @@ def documento_crear(request, country_code="cl", lang_code="es"):
         else:
             messages.error(request, "Por favor corrige los errores en el formulario")
     else:
-        # Precargar vehículo si viene ?vehiculo_id=X (desde Centro de Trabajo)
+        # Precargar desde retorno de "crear cliente" / "crear vehículo" (flujo document_form)
+        # Acepta: vehiculo_id (centro trabajo), prefill_cliente/cliente_created, new_vehiculo_id/vehiculo_created
         initial = {}
-        vehiculo_id = request.GET.get("vehiculo_id", "").strip()
-        if vehiculo_id and vehiculo_id.isdigit():
-            from taller.models.vehiculos import Vehiculo
+        from taller.models.vehiculos import Vehiculo
+        from taller.models.clientes import Cliente
 
+        vehiculo_id = (
+            request.GET.get("vehiculo_id")
+            or request.GET.get("new_vehiculo_id")
+            or request.GET.get("vehiculo_created")
+            or ""
+        ).strip()
+        prefill_cliente_id = (
+            request.GET.get("prefill_cliente") or request.GET.get("cliente_created") or ""
+        ).strip()
+
+        if vehiculo_id and vehiculo_id.isdigit():
             vehiculo = (
                 Vehiculo.objects.filter(empresa=empresa, pk=int(vehiculo_id))
                 .select_related("cliente")
@@ -221,6 +232,24 @@ def documento_crear(request, country_code="cl", lang_code="es"):
             if vehiculo:
                 initial["vehiculo"] = vehiculo
                 initial["cliente"] = vehiculo.cliente
+        elif prefill_cliente_id and prefill_cliente_id.isdigit():
+            cliente = Cliente.objects.filter(empresa=empresa, pk=int(prefill_cliente_id)).first()
+            if cliente:
+                initial["cliente"] = cliente
+            new_vid = (
+                request.GET.get("new_vehiculo_id") or request.GET.get("vehiculo_created") or ""
+            ).strip()
+            if new_vid and new_vid.isdigit():
+                vehiculo = (
+                    Vehiculo.objects.filter(
+                        empresa=empresa, pk=int(new_vid), cliente_id=int(prefill_cliente_id)
+                    )
+                    .select_related("cliente")
+                    .first()
+                )
+                if vehiculo:
+                    initial["vehiculo"] = vehiculo
+                    initial["cliente"] = vehiculo.cliente
 
         form = DocumentoForm(
             initial=initial if initial else None,
@@ -259,6 +288,30 @@ def documento_crear(request, country_code="cl", lang_code="es"):
     # Obtener técnicos para el template
     tecnicos = tecnicos_qs
 
+    # Contexto de prefill para rehidratar UI al volver de crear cliente/vehículo
+    prefill_cliente_id = (
+        request.GET.get("prefill_cliente") or request.GET.get("cliente_created") or ""
+    ).strip()
+    prefill_vehiculo_id = (
+        request.GET.get("new_vehiculo_id") or request.GET.get("vehiculo_created") or ""
+    ).strip()
+    prefill_cliente_nombre = request.GET.get("prefill_cliente_nombre", "").strip()
+    prefill_cliente_email = request.GET.get("prefill_cliente_email", "").strip()
+    prefill_cliente_telefono = request.GET.get("prefill_cliente_telefono", "").strip()
+    if prefill_cliente_id and not prefill_cliente_nombre:
+        try:
+            c = Cliente.objects.filter(empresa=empresa, pk=int(prefill_cliente_id)).first()
+            if c:
+                prefill_cliente_nombre = (
+                    getattr(c, "nombre_completo", None)
+                    or f"{(getattr(c, 'nombre', '') or '').strip()} {(getattr(c, 'apellido', '') or '').strip()}".strip()
+                    or str(c)
+                )
+                prefill_cliente_email = getattr(c, "email", "") or ""
+                prefill_cliente_telefono = getattr(c, "telefono", "") or ""
+        except (ValueError, TypeError):
+            pass
+
     context = {
         "form": form,
         "titulo_pagina": "Crear documento",
@@ -272,6 +325,11 @@ def documento_crear(request, country_code="cl", lang_code="es"):
         "company_country": country,
         "responsable_label": responsable_label,
         "ui_config": ui_config,
+        "prefill_cliente_id": prefill_cliente_id or "",
+        "prefill_cliente_nombre": prefill_cliente_nombre,
+        "prefill_cliente_email": prefill_cliente_email,
+        "prefill_cliente_telefono": prefill_cliente_telefono,
+        "prefill_vehiculo_id": prefill_vehiculo_id or "",
     }
 
     return render(request, template.template.name, context)

@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 200" class="mapa-vehiculo-svg w-full h-auto">
+  <defs>
+    <filter id="glow-zone-left">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .zone { fill: #9ca3af; stroke: #64748b; stroke-width: 1; cursor: pointer; transition: all 0.2s ease; }
+      .zone:hover { filter: drop-shadow(0 0 6px rgba(34,211,238,0.6)); stroke: #22d3ee; }
+      .zone.selected { stroke: #22d3ee; stroke-width: 2; }
+      .zone.status-unreviewed { fill: #94a3b8; }
+      .zone.status-available { fill: #22c55e; }
+      .zone.status-damaged { fill: #ef4444; }
+      .zone.status-scrap { fill: #1e293b; }
+      .zone.status-reserved { fill: #eab308; }
+      .zone.status-sold { fill: #3b82f6; }
+    </style>
+  </defs>
+  <rect x="20" y="55" width="380" height="85" rx="10" fill="#1e293b" stroke="#334155"/>
+  <!-- Espejo izquierdo -->
+  <rect x="125" y="42" width="22" height="18" class="zone" id="left_mirror" data-zone="left_mirror" data-piece-name="Espejo izquierdo" data-view="lateral_izq" data-side="left" data-category="carroceria"/>
+  <!-- Tapabarro delantero izq -->
+  <rect x="25" y="62" width="28" height="70" class="zone" id="left_front_fender" data-zone="left_front_fender" data-piece-name="Tapabarro delantero izquierdo" data-view="lateral_izq" data-side="left" data-category="carroceria"/>
+  <!-- Capot lateral -->
+  <rect x="55" y="62" width="75" height="72" class="zone" id="hood_lt" data-zone="hood" data-piece-name="Capot" data-view="lateral_izq" data-side="left" data-category="carroceria"/>
+  <!-- Puerta delantera izq -->
+  <rect x="135" y="62" width="75" height="72" class="zone" id="left_front_door" data-zone="left_front_door" data-piece-name="Puerta delantera izquierda" data-view="lateral_izq" data-side="left" data-category="carroceria"/>
+  <!-- Vidrio delantero izq -->
+  <rect x="142" y="66" width="60" height="22" class="zone" id="left_front_window" data-zone="left_front_window" data-piece-name="Vidrio delantero izquierdo" data-view="lateral_izq" data-side="left" data-category="carroceria"/>
+  <!-- Puerta trasera izq -->
+  <rect x="215" y="62" width="75" height="72" class="zone" id="left_rear_door" data-zone="left_rear_door" data-piece-name="Puerta trasera izquierda" data-view="lateral_izq" data-side="left" data-category="carroceria"/>
+  <!-- Vidrio trasero izq -->
+  <rect x="222" y="66" width="60" height="22" class="zone" id="left_rear_window" data-zone="left_rear_window" data-piece-name="Vidrio trasero izquierdo" data-view="lateral_izq" data-side="left" data-category="carroceria"/>
+  <!-- Maleta -->
+  <rect x="295" y="62" width="95" height="72" class="zone" id="trunk" data-zone="trunk" data-piece-name="Maleta" data-view="lateral_izq" data-side="" data-category="carroceria"/>
+  <!-- Tapabarro trasero izq -->
+  <rect x="368" y="62" width="25" height="70" class="zone" id="left_rear_fender" data-zone="left_rear_fender" data-piece-name="Tapabarro trasero izquierdo" data-view="lateral_izq" data-side="left" data-category="carroceria"/>
+  <!-- Parachoques (bordes) -->
+  <rect x="22" y="72" width="8" height="50" class="zone" id="front_bumper_lt" data-zone="front_bumper" data-piece-name="Parachoques delantero" data-view="lateral_izq" data-side="" data-category="carroceria"/>
+  <rect x="388" y="72" width="10" height="50" class="zone" id="rear_bumper_lt" data-zone="rear_bumper" data-piece-name="Parachoques trasero" data-view="lateral_izq" data-side="" data-category="carroceria"/>
+  <!-- Focos laterales -->
+  <rect x="50" y="75" width="15" height="18" class="zone" id="left_headlight_lt" data-zone="left_headlight" data-piece-name="Foco delantero izquierdo" data-view="lateral_izq" data-side="left" data-category="electricidad"/>
+  <rect x="352" y="75" width="15" height="18" class="zone" id="left_taillight" data-zone="left_taillight" data-piece-name="Foco trasero izquierdo" data-view="lateral_izq" data-side="left" data-category="electricidad"/>
+  <!-- Llantas -->
+  <circle cx="95" cy="152" r="18" class="zone" id="left_front_wheel" data-zone="left_front_wheel" data-piece-name="Llanta delantera izquierda" data-view="lateral_izq" data-side="left" data-category="ruedas"/>
+  <circle cx="325" cy="152" r="18" class="zone" id="left_rear_wheel" data-zone="left_rear_wheel" data-piece-name="Llanta trasera izquierda" data-view="lateral_izq" data-side="left" data-category="ruedas"/>
+</svg>

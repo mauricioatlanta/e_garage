@@ -1,0 +1,69 @@
+{% extends "taller/common/base.html" %}
+{% load static i18n country_url %}
+
+{% block title %}{% trans "Aplicar plantilla" %} - {{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.pk %}">{{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}</a></li>
+      <li class="breadcrumb-item active">{% trans "Aplicar plantilla" %}</li>
+    </ol>
+  </nav>
+
+  <h2 class="mb-4">
+    <i class="fas fa-magic text-primary me-2"></i>
+    {% trans "Aplicar plantilla de piezas" %}
+  </h2>
+
+  <p class="text-muted mb-4">
+    {% trans "Seleccione una plantilla para generar las piezas de este vehículo de desarme. Las piezas quedarán pendientes de inspección en el mapa interactivo." %}
+  </p>
+
+  {% if plantillas %}
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-body">
+      <form method="post" action="">
+        {% csrf_token %}
+        <div class="mb-3">
+          <label for="id_plantilla" class="form-label">{% trans "Plantilla" %}</label>
+          {{ form.plantilla }}
+          {% if form.plantilla.errors %}
+          <div class="invalid-feedback d-block">{{ form.plantilla.errors.0 }}</div>
+          {% endif %}
+        </div>
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-check me-1"></i> {% trans "Aplicar plantilla" %}
+          </button>
+          <a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.pk %}" class="btn btn-outline-secondary">
+            {% trans "Cancelar" %}
+          </a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <h6 class="text-muted">{% trans "Plantillas disponibles" %}</h6>
+    <ul class="list-group list-group-flush">
+      {% for p in plantillas %}
+      <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+        {{ p.nombre }}
+        <span class="badge bg-light text-dark">{{ p._num_piezas }} piezas</span>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% else %}
+  <div class="alert alert-warning">
+    <i class="fas fa-exclamation-triangle me-2"></i>
+    {% trans "No hay plantillas disponibles. Ejecute " %}
+    <code>python manage.py seed_plantillas_desarme</code>
+    {% trans "o cree una plantilla desde el listado." %}
+  </div>
+  <a href="{% country_url 'desarme:plantilla_list' %}" class="btn btn-outline-primary">{% trans "Ir a plantillas" %}</a>
+  {% endif %}
+</div>
+{% endblock %}

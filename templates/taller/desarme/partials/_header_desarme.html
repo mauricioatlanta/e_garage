@@ -1,0 +1,39 @@
+{% load i18n %}
+{% load country_url %}
+<header class="desarme-header mb-4">
+  <div class="header-kpis d-flex flex-wrap gap-3 mb-3">
+    <div class="kpi-card">
+      <div class="kpi-label">{% trans "Vehículo" %}</div>
+      <div class="kpi-value">{{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}{% if vehiculo.anio %} {{ vehiculo.anio }}{% endif %}</div>
+      <small class="text-muted">{{ vehiculo.patente|default:vehiculo.vin|default:"—" }} {% if vehiculo.fecha_ingreso_desarme %}| {{ vehiculo.fecha_ingreso_desarme|date:"d/m/Y" }}{% endif %}</small>
+    </div>
+    <div class="kpi-card kpi-neutro" id="kpi-costo">
+      <div class="kpi-label">{% trans "Costo total" %}</div>
+      <div class="kpi-value">$<span id="kpi-costo-val">{{ kpis.costo_total|default:"0" }}</span></div>
+    </div>
+    <div class="kpi-card kpi-neutro" id="kpi-recuperado">
+      <div class="kpi-label">{% trans "Recuperado" %}</div>
+      <div class="kpi-value">$<span id="kpi-recuperado-val">{{ kpis.ingresos_totales|default:"0" }}</span></div>
+    </div>
+    <div class="kpi-card" id="kpi-resultado">
+      <div class="kpi-label">{% trans "Resultado" %}</div>
+      <div class="kpi-value">$<span id="kpi-resultado-val">{{ kpis.utilidad_total|default:"0" }}</span></div>
+    </div>
+    <div class="kpi-card kpi-neutro" id="kpi-recuperacion">
+      <div class="kpi-label">{% trans "Recuperación" %}</div>
+      <div class="kpi-value"><span id="kpi-recuperacion-val">{{ kpis.porcentaje_recuperacion|default:0 }}</span>%</div>
+    </div>
+  </div>
+  <div class="header-actions d-flex flex-wrap gap-2">
+    {% if can_edit %}
+    <a href="{% country_url 'desarme:aplicar_plantilla' pk=vehiculo.pk %}" class="btn btn-sm btn-primary">{% trans "Aplicar plantilla" %}</a>
+    {% endif %}
+    <a href="{% country_url 'desarme:dashboard_financiero' pk=vehiculo.pk %}" class="btn btn-sm btn-outline-info">{% trans "Dashboard" %}</a>
+    <a href="{% country_url 'desarme:plantilla_list' %}" class="btn btn-sm btn-outline-secondary">{% trans "Plantillas" %}</a>
+    <a href="{% country_url 'repuestos:lista_repuestos' %}?vehiculo_origen={{ vehiculo.pk }}" class="btn btn-sm btn-outline-secondary">{% trans "Ver piezas" %}</a>
+    {% if can_edit %}
+      <a href="{% country_url 'desarme:cerrar_vehiculo' pk=vehiculo.pk %}" class="btn btn-sm btn-outline-danger">{% trans "Cerrar vehículo" %}</a>
+    {% endif %}
+    <a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.pk %}" class="btn btn-sm btn-outline-light">{% trans "Volver" %}</a>
+  </div>
+</header>

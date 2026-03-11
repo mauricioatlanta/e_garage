@@ -39,13 +39,27 @@ class CountryMiddleware(MiddlewareMixin):
         return None
 
     def _get_country_from_url(self, request):
-        """Extrae el país del prefijo de idioma en la URL"""
-        path = request.path_info
+        """Extrae el país del prefijo de la URL (/us/, /cl/, etc.) o del idioma legacy (/en/, /es/)."""
+        path = request.path_info or ""
         if path.startswith("/"):
-            path_parts = path.split("/")
-            if len(path_parts) > 1:
-                lang_code = path_parts[1]
-                return self.COUNTRY_MAP.get(lang_code)
+            path_parts = [p for p in path.split("/") if p]
+            if path_parts:
+                first = path_parts[0].lower()
+                # Prefijo de país (ej. /us/en/..., /cl/es/...)
+                country_from_prefix = {
+                    "us": "US",
+                    "cl": "CL",
+                    "mx": "MX",
+                    "pe": "PE",
+                    "co": "CO",
+                    "ec": "EC",
+                    "ve": "VE",
+                    "br": "BR",
+                }.get(first)
+                if country_from_prefix:
+                    return country_from_prefix
+                # Legacy: primer segmento como idioma (ej. /en/ → US, /es/ → CL)
+                return self.COUNTRY_MAP.get(first)
         return None
 
     def _get_country_from_user(self, user):

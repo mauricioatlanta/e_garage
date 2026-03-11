@@ -434,12 +434,14 @@ class Documento(AuditMixin, models.Model):
         if self.tipo == "OT":
             self.context = "workshop"
 
-        # Técnico pertenece a la empresa
+        # Regla 3.4: técnico/vendedor pertenece a la empresa y está activo
         tecnico = getattr(self, "tecnico_responsable", None)
         if tecnico and empresa_id and tecnico.empresa_id != empresa_id:
             raise ValidationError(
                 "El técnico responsable debe pertenecer a la misma empresa del documento."
             )
+        if tecnico and not getattr(tecnico, "activo", True):
+            raise ValidationError("El responsable asignado debe estar activo.")
 
         # Millas solo en USA
         if self.millas is not None and self.country != "US":

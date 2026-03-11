@@ -44,14 +44,28 @@ def _get_country_default_lang():
     return getattr(settings, "EGARAGE_COUNTRY_DEFAULT_LANG", {"US": "en", "CL": "es"})
 
 
+EXCLUDED_PREFIXES = (
+    "/accounts/",
+    "/admin/",
+    "/static/",
+    "/media/",
+    "/api/",
+)
+
+
 class SimpleCountryRedirectMiddleware(MiddlewareMixin):
     """
     Fuente de verdad = prefijo de URL. La empresa activa debe coincidir con ese país.
     Si no coincide: redirige a la URL correcta del país de la empresa.
     Usa settings.EGARAGE_ACTIVE_COUNTRIES y EGARAGE_COUNTRY_DEFAULT_LANG (escalable LATAM).
+    No interfiere con allauth, admin, static, media ni API.
     """
 
     def process_request(self, request):
+        for prefix in EXCLUDED_PREFIXES:
+            if request.path.startswith(prefix):
+                return None
+
         # No redirigir mutaciones (evita perder body POST, convertir a GET, romper CSRF)
         if request.method not in ("GET", "HEAD"):
             return None
@@ -104,7 +118,6 @@ class SimpleCountryRedirectMiddleware(MiddlewareMixin):
         rest = _path_after_country_lang(request.path, url_country.lower())
 
         # Never redirect login/signup paths: /us/login/, /us/accounts/login/, etc.
-        # Redirecting to /us/en/login/ can 404 or cause ERR_TOO_MANY_REDIRECTS.
         rest_lower = (rest or "").lower()
         if (
             "/login" in rest_lower
@@ -112,6 +125,11 @@ class SimpleCountryRedirectMiddleware(MiddlewareMixin):
             or "/signup" in rest_lower
             or "/accounts/signup" in rest_lower
         ):
+            return None
+
+        # No redirigir páginas de bienvenida: el usuario eligió explícitamente un país
+        # en el selector (ej. Chile) y debe ver /cl/es/bienvenida/, no /us/en/bienvenida/
+        if "/bienvenida" in rest_lower or rest_lower.strip("/") == "bienvenida":
             return None
 
         if url_country != user_country:

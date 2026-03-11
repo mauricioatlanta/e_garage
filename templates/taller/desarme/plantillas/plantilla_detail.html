@@ -1,0 +1,48 @@
+{% extends "taller/common/base.html" %}
+{% load static i18n country_url %}
+
+{% block title %}{{ plantilla.nombre }} - {% trans "Plantilla de desarme" %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% country_url 'desarme:plantilla_list' %}">{% trans "Plantillas" %}</a></li>
+      <li class="breadcrumb-item active">{{ plantilla.nombre }}</li>
+    </ol>
+  </nav>
+
+  <div class="d-flex justify-content-between align-items-start mb-4">
+    <div>
+      <h2 class="mb-1">{{ plantilla.nombre }}
+        {% if es_global %}<span class="badge bg-info">{% trans "Global" %}</span>{% else %}<span class="badge bg-secondary">{% trans "Empresa" %}</span>{% endif %}
+        {% if not plantilla.activa %}<span class="badge bg-warning text-dark">{% trans "Inactiva" %}</span>{% endif %}
+      </h2>
+      {% if plantilla.descripcion %}<p class="text-muted mb-0">{{ plantilla.descripcion }}</p>{% endif %}
+    </div>
+    {% if plantilla.empresa_id %}
+    <a href="{% country_url 'desarme:plantilla_edit' pk=plantilla.pk %}" class="btn btn-outline-primary">{% trans "Editar" %}</a>
+    {% endif %}
+  </div>
+
+  <div class="card shadow-sm border-0 rounded-3">
+    <div class="card-header bg-light">
+      <h5 class="mb-0">{% trans "Checklist de piezas" %} ({{ piezas|length }})</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if piezas %}
+      <ul class="list-group list-group-flush">
+        {% for pieza in piezas %}
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <span><strong>{{ forloop.counter }}.</strong> {{ pieza.nombre_pieza }}{% if pieza.zona_mapa %} <code class="ms-2 small">{{ pieza.zona_mapa }}</code>{% endif %}</span>
+          {% if pieza.lado %}<span class="badge bg-light text-dark">{{ pieza.lado }}</span>{% endif %}
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <div class="p-4 text-center text-muted">{% trans "Esta plantilla no tiene piezas activas." %}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

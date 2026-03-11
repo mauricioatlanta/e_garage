@@ -15,6 +15,7 @@ from .team_member import TeamMember
 from .clientes import Cliente
 from .vehiculos import Vehiculo
 from .marca import Marca
+from .catalogo import CatalogoModeloAuto
 
 # Modelos de kilometraje
 from .kilometraje import KilometrajeRegistro
@@ -36,6 +37,8 @@ from .memoria_seguimiento import (
 
 # Modelos de repuestos
 from .repuesto import Repuesto
+from .costo_vehiculo_desarme import CostoVehiculoDesarme
+from .plantilla_desarme import PlantillaDesarme, PlantillaPieza
 
 # Modelos de ubicación
 from .ubicacion import Estado, Ciudad
@@ -73,6 +76,7 @@ __all__ = [
     "Cliente",
     "Vehiculo",
     "Marca",
+    "CatalogoModeloAuto",
     # Kilometraje
     "KilometrajeRegistro",
     "RegistroKilometraje",
@@ -88,8 +92,11 @@ __all__ = [
     "EtiquetaAsignacion",
     "EvidenciaDocumento",
     "SeguimientoPublico",
-    # Repuestos
+    # Repuestos y desarmaduría
     "Repuesto",
+    "CostoVehiculoDesarme",
+    "PlantillaDesarme",
+    "PlantillaPieza",
     # Ubicación
     "Estado",
     "Ciudad",

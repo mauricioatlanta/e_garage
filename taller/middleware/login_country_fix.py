@@ -49,6 +49,8 @@ class FixLoginCountryRedirectMiddleware:
     Si Django redirige a /accounts/login/ (sin prefijo), reescribe el Location
     a /<cc>/accounts/login/ o /<cc>/<lang>/accounts/login/ usando el path del request
     o el parámetro next=, para que el redirect sea country-aware desde el primer 302.
+    DESHABILITADO para /accounts/*: allauth debe generar siempre /accounts/* sin prefijo
+    de país; el contexto de país se maneja por sesión, middleware y country_aware_login.
     """
 
     def __init__(self, get_response):
@@ -87,6 +89,11 @@ class FixLoginCountryRedirectMiddleware:
 
         location = response.get("Location", "")
         if not location:
+            return response
+
+        # No reescribir /accounts/*: allauth debe generar siempre /accounts/* sin prefijo
+        # de país para evitar loops, 500 y pérdida de contexto en password reset
+        if location.startswith("/accounts/"):
             return response
 
         # Derivar cc (y opcionalmente lang) del path del request o del next= en Location

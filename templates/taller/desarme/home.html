@@ -1,0 +1,108 @@
+{% extends "taller/common/base.html" %}
+{% load i18n country_url %}
+
+{% block title %}{% trans "Centro de Desarme" %}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="mb-4">
+    <h1 class="h3 text-light mb-1">
+      {% if country == 'US' or request.path|slice:':3' == '/us' %}
+        Disassembly Center
+      {% else %}
+        Centro de Desarme
+      {% endif %}
+    </h1>
+    <p class="text-muted small mb-0">
+      {% if country == 'US' or request.path|slice:':3' == '/us' %}
+        Manage teardown vehicles, parts and financial results in one place.
+      {% else %}
+        Gestiona vehículos de desarme, sus piezas y resultados financieros desde un solo lugar.
+      {% endif %}
+    </p>
+  </div>
+
+  <div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark border-success h-100">
+        <div class="card-body py-3">
+          <div class="text-muted small mb-1">{% trans "Vehículos de desarme" %}</div>
+          <div class="h4 mb-0">{{ total_vehiculos_desarme|default:"0" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark border-info h-100">
+        <div class="card-body py-3">
+          <div class="text-muted small mb-1">{% trans "Vehículos cerrados" %}</div>
+          <div class="h4 mb-0">{{ total_vehiculos_cerrados|default:"0" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark border-primary h-100">
+        <div class="card-body py-3">
+          <div class="text-muted small mb-1">{% trans "Piezas de desarme" %}</div>
+          <div class="h4 mb-0">{{ total_repuestos_desarme|default:"0" }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-md-3">
+      <div class="card bg-dark border-secondary h-100">
+        <div class="card-body py-3">
+          <div class="text-muted small mb-1">{% trans "Estados de desarme" %}</div>
+          <div class="small mb-0">
+            {% if estados_desarme_counts %}
+              {% for e in estados_desarme_counts %}
+                <div>
+                  <span class="text-muted">{{ e.estado_desarme|default:"—" }}:</span>
+                  <span class="text-light fw-semibold">{{ e.cantidad }}</span>
+                </div>
+              {% endfor %}
+            {% else %}
+              <span class="text-muted">{% trans "Sin vehículos aún." %}</span>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <div class="col-md-4">
+      <a href="{% country_url 'desarme:crear_vehiculo_desarme' %}"
+         class="btn w-100 btn-lg btn-success mb-3">
+        <span class="me-1">➕</span>
+        {% if country == 'US' or request.path|slice:':3' == '/us' %}
+          New teardown vehicle
+        {% else %}
+          Ingresar vehículo de desarme
+        {% endif %}
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="{% country_url 'desarme:vehiculos_list' %}"
+         class="btn w-100 btn-lg btn-outline-info mb-3">
+        <span class="me-1">🚗</span>
+        {% if country == 'US' or request.path|slice:':3' == '/us' %}
+          Teardown vehicles
+        {% else %}
+          Vehículos de desarme
+        {% endif %}
+      </a>
+    </div>
+    <div class="col-md-4">
+      <a href="{% country_url 'desarme:plantilla_list' %}"
+         class="btn w-100 btn-lg btn-outline-secondary mb-3">
+        <span class="me-1">🧩</span>
+        {% if country == 'US' or request.path|slice:':3' == '/us' %}
+          Disassembly templates
+        {% else %}
+          Plantillas de desarme
+        {% endif %}
+      </a>
+    </div>
+  </div>
+</div>
+{% endblock %}
+

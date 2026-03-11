@@ -57,9 +57,9 @@
       --company-secondary: {{ BRAND.secondary_color|default:'#6c757d' }};
     }
     .company-header {
-      background: linear-gradient(135deg,#1f2937 0%,#374151 50%,#1f2937 100%);
-      border-bottom: 4px solid var(--company-primary);
-      box-shadow: 0 10px 30px rgba(0,0,0,.3);
+      background: #111827;
+      border-bottom: 1px solid #1f2937;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
     }
     .company-logo {
       max-height: 80px;
@@ -72,207 +72,55 @@
     }
     .company-title {
       color: var(--company-primary);
-      text-shadow: 0 0 20px var(--company-primary),0 0 40px var(--company-primary);
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: 1px;
+      font-size: 1.5rem;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
     .company-tagline {
-      color: #b3e5fc;
-      font-size: 1.1rem;
+      color: #94a3b8;
+      font-size: 0.9rem;
       font-weight: 500;
       margin-top: 2px;
-      letter-spacing: 1px;
+      letter-spacing: 0.5px;
     }
-    /* Estilo cinematográfico futurista para botones de navegación */
+    /* Navegación limpia, sin glow — contraste nítido */
     .nav-button-standard {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.65rem 1.3rem;
-      background: linear-gradient(135deg, rgba(5, 15, 30, 0.95) 0%, rgba(10, 20, 35, 0.95) 100%);
-      border: 1px solid rgba(0, 212, 255, 0.3);
-      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 6px;
       text-decoration: none;
-      color: #b0e0ff;
+      color: #e2e8f0;
       font-weight: 600;
-      font-size: 0.875rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      position: relative;
-      overflow: visible;
+      font-size: 0.8125rem;
+      letter-spacing: 0.02em;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
       white-space: nowrap;
-      isolation: isolate;
-    }
-
-    /* Borde eléctrico azul calipso que se mueve alrededor */
-    .nav-button-standard::before {
-      content: '';
-      position: absolute;
-      top: -2px;
-      left: -2px;
-      right: -2px;
-      bottom: -2px;
-      background: linear-gradient(45deg, 
-        transparent 30%, 
-        rgba(0, 212, 255, 0.8) 50%, 
-        transparent 70%);
-      border-radius: 10px;
-      z-index: -1;
-      opacity: 0.6;
-      animation: electric-border 3s linear infinite;
-      background-size: 200% 200%;
-    }
-
-    /* Efecto de brillo que se desplaza sobre el botón */
-    .nav-button-standard::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(0, 212, 255, 0.15) 30%,
-        rgba(0, 255, 255, 0.25) 50%,
-        rgba(0, 212, 255, 0.15) 70%,
-        transparent 100%);
-      border-radius: 8px;
-      animation: shine-sweep 4s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    @keyframes electric-border {
-      0% {
-        background-position: 0% 0%;
-        opacity: 0.6;
-      }
-      25% {
-        background-position: 100% 0%;
-        opacity: 0.8;
-      }
-      50% {
-        background-position: 100% 100%;
-        opacity: 0.6;
-      }
-      75% {
-        background-position: 0% 100%;
-        opacity: 0.8;
-      }
-      100% {
-        background-position: 0% 0%;
-        opacity: 0.6;
-      }
-    }
-
-    @keyframes shine-sweep {
-      0% {
-        left: -100%;
-        opacity: 0;
-      }
-      50% {
-        opacity: 1;
-      }
-      100% {
-        left: 100%;
-        opacity: 0;
-      }
     }
 
     .nav-button-standard:hover {
-      transform: translateY(-2px);
-      border-color: rgba(0, 212, 255, 0.8);
-      color: #ffffff;
-      background: linear-gradient(135deg, rgba(10, 25, 45, 0.98) 0%, rgba(15, 35, 55, 0.98) 100%);
-      box-shadow:
-        0 0 20px rgba(0, 212, 255, 0.4),
-        0 0 40px rgba(0, 212, 255, 0.3),
-        0 0 60px rgba(0, 212, 255, 0.2),
-        inset 0 1px 0 rgba(0, 255, 255, 0.3);
-    }
-
-    .nav-button-standard:hover::before {
-      opacity: 1;
-      animation-duration: 1.5s;
-    }
-
-    .nav-button-standard:hover::after {
-      animation-duration: 2s;
-    }
-
-    .nav-button-standard:active {
-      transform: translateY(0);
+      border-color: #22d3ee;
+      color: #fff;
+      background: #1e293b;
     }
 
     .nav-button-standard .nav-icon {
-      font-size: 1rem;
-      filter: drop-shadow(0 0 3px rgba(0, 212, 255, 0.6));
-      transition: filter 0.3s ease;
-      position: relative;
-      z-index: 1;
+      font-size: 0.9rem;
+      opacity: 0.9;
     }
 
-    .nav-button-standard:hover .nav-icon {
-      filter: drop-shadow(0 0 6px rgba(0, 255, 255, 1));
-    }
-
-    .nav-button-standard span:last-child {
-      position: relative;
-      z-index: 1;
-      text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
-    }
-
-    .nav-button-standard:hover span:last-child {
-      text-shadow: 0 0 12px rgba(0, 255, 255, 0.8);
-    }
-
-    /* Estilo para botón de salir (rojo eléctrico) */
     .nav-button-standard.logout-btn {
-      border-color: rgba(239, 68, 68, 0.3);
-      color: #ffb3b3;
-    }
-
-    .nav-button-standard.logout-btn::before {
-      background: linear-gradient(45deg, 
-        transparent 30%, 
-        rgba(239, 68, 68, 0.8) 50%, 
-        transparent 70%);
-    }
-
-    .nav-button-standard.logout-btn::after {
-      background: linear-gradient(90deg, 
-        transparent 0%, 
-        rgba(239, 68, 68, 0.15) 30%,
-        rgba(255, 100, 100, 0.25) 50%,
-        rgba(239, 68, 68, 0.15) 70%,
-        transparent 100%);
+      border-color: #374151;
+      color: #fca5a5;
     }
 
     .nav-button-standard.logout-btn:hover {
-      border-color: rgba(239, 68, 68, 0.8);
-      box-shadow:
-        0 0 20px rgba(239, 68, 68, 0.4),
-        0 0 40px rgba(239, 68, 68, 0.3),
-        0 0 60px rgba(239, 68, 68, 0.2),
-        inset 0 1px 0 rgba(255, 150, 150, 0.3);
-    }
-
-    .nav-button-standard.logout-btn .nav-icon {
-      filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.6));
-    }
-
-    .nav-button-standard.logout-btn:hover .nav-icon {
-      filter: drop-shadow(0 0 6px rgba(255, 100, 100, 1));
-    }
-
-    .nav-button-standard.logout-btn span:last-child {
-      text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
-    }
-
-    .nav-button-standard.logout-btn:hover span:last-child {
-      text-shadow: 0 0 12px rgba(255, 100, 100, 0.8);
+      border-color: #ef4444;
+      color: #fecaca;
+      background: #1f2937;
     }
     .main-navigation {
       display: flex;
@@ -363,6 +211,8 @@
       <div class="d-flex align-items-center gap-4">
         {% if company_logo_url %}
           <img src="{{ company_logo_url }}" alt="Logo" class="company-logo">
+        {% elif COMPANY_LOGO %}
+          <img src="{{ COMPANY_LOGO }}" alt="Logo" class="company-logo">
         {% endif %}
         <div>
           <div class="company-title">{{ company_name|default:"eGarage" }}</div>
@@ -418,6 +268,11 @@
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Parts{% else %}Repuestos{% endif %}</span>
     </a>
 
+    <a href="{% country_url 'desarme:home' %}" class="nav-button-standard">
+      <span class="nav-icon">🔩</span>
+      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Disassembly{% else %}Desarme{% endif %}</span>
+    </a>
+
     <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
       <span class="nav-icon">📊</span>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Reports{% else %}Reportes{% endif %}</span>
@@ -431,6 +286,11 @@
     <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
       <span class="nav-icon">🚗</span>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Vehicles{% else %}Vehículos{% endif %}</span>
+    </a>
+
+    <a href="{% country_url 'vehiculos:crear_vehiculo' %}" class="nav-button-standard">
+      <span class="nav-icon">➕</span>
+      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Create vehicle{% else %}Crear vehículo nuevo{% endif %}</span>
     </a>
 
     <form action="{% safe_logout_url %}" method="post" style="display: inline;">

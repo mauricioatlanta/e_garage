@@ -106,6 +106,18 @@ urlpatterns = [
     # Modelos USA desde catálogo (legacy - mantener solo si DAL lo usa)
     # Considera deprecar si ajax_modelos_por_marca_anio cubre el caso
     path("api/modelos-usa/", views.api_modelos_usa, name="api_modelos_usa"),
+    # Marcas por año (USA, catálogo con anio_desde/anio_hasta)
+    path(
+        "api/marcas-por-anio/",
+        views.api_marcas_por_anio,
+        name="api_marcas_por_anio",
+    ),
+    # Modelos por marca y año (USA)
+    path(
+        "api/modelos-por-marca-anio-usa/",
+        views.api_modelos_por_marca_anio_usa,
+        name="api_modelos_por_marca_anio_usa",
+    ),
     # =========================
     # AJAX Dinámico (GET)
     # =========================

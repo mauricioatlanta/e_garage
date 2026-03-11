@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" class="mapa-vehiculo-svg">
+  <defs>
+    <style>
+      .zona-map { fill: #9ca3af; stroke: #374151; stroke-width: 1; cursor: pointer; transition: fill 0.2s, filter 0.2s; }
+      .zona-map:hover { fill: #6b7280; filter: drop-shadow(0 0 4px rgba(0,212,255,0.5)); }
+      .zona-map.estado-disponible { fill: #22c55e; }
+      .zona-map.estado-dañado { fill: #ef4444; }
+      .zona-map.estado-scrap { fill: #1f2937; }
+      .zona-map.estado-vendido { fill: #3b82f6; }
+      .zona-map.estado-reservada { fill: #eab308; }
+    </style>
+  </defs>
+  <rect x="50" y="60" width="300" height="120" rx="12" fill="#e5e7eb" stroke="#9ca3af"/>
+  <rect x="110" y="70" width="180" height="50" class="zona-map" data-zona="hood" data-nombre="Capot" data-vista="frontal"/>
+  <rect x="70" y="130" width="80" height="40" class="zona-map" data-zona="front_bumper_left" data-nombre="Parachoques delantero izq" data-vista="frontal"/>
+  <rect x="250" y="130" width="80" height="40" class="zona-map" data-zona="front_bumper_right" data-nombre="Parachoques delantero der" data-vista="frontal"/>
+  <rect x="95" y="85" width="45" height="25" class="zona-map" data-zona="left_headlight" data-nombre="Foco izquierdo" data-vista="frontal"/>
+  <rect x="260" y="85" width="45" height="25" class="zona-map" data-zona="right_headlight" data-nombre="Foco derecho" data-vista="frontal"/>
+  <rect x="155" y="88" width="90" height="20" class="zona-map" data-zona="grille" data-nombre="Parrilla" data-vista="frontal"/>
+  <rect x="175" y="128" width="50" height="35" class="zona-map" data-zona="radiator" data-nombre="Radiador" data-vista="frontal"/>
+  <circle cx="120" cy="150" r="18" fill="#6b7280"/>
+  <circle cx="280" cy="150" r="18" fill="#6b7280"/>
+</svg>

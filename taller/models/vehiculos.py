@@ -1,6 +1,8 @@
+from decimal import Decimal
+
 from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
+from django.db.models import Q, Sum
 from django.urls import reverse
 
 from core.models import TenantScoped
@@ -28,8 +30,28 @@ class VehiculoQuerySet(models.QuerySet):
 
 
 class Vehiculo(TenantScoped):
-    # empresa viene de TenantScoped (inicialmente nullable en migración)
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    """Vehículo de cliente o vehículo para desarme (tipo_uso)."""
+
+    TIPO_USO_CHOICES = [
+        ("cliente", "Vehículo de cliente"),
+        ("desarme", "Vehículo para desarme"),
+    ]
+    ESTADO_DESARME_CHOICES = [
+        ("ingresado", "Ingresado"),
+        ("en_desarme", "En desarme"),
+        ("con_piezas", "Con piezas disponibles"),
+        ("agotado", "Agotado"),
+        ("cerrado", "Cerrado"),
+    ]
+
+    # empresa viene de TenantScoped
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        help_text="Cliente dueño (solo vehículos de cliente; desarme suele ser null)",
+    )
 
     # Campo marca flexible: puede ser ForeignKey a Marca (Chile) o CharField (USA catálogo global)
     marca = models.ForeignKey(
@@ -61,13 +83,58 @@ class Vehiculo(TenantScoped):
         help_text="Modelo como texto (para USA catálogo global)",
     )
 
-    patente = models.CharField(max_length=20, db_index=True)
-    anio = models.PositiveIntegerField(verbose_name="Año")
+    patente = models.CharField(max_length=20, db_index=True, blank=True, default="")
+    anio = models.PositiveIntegerField(verbose_name="Año", null=True, blank=True)
     color = models.ForeignKey(ColorVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
     vin = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     motor = models.ForeignKey(MotorVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
     caja = models.ForeignKey(CajaVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
     millas = models.PositiveIntegerField(blank=True, null=True, verbose_name="Millas/Kilometraje")
+
+    # --- Desarmaduría (tipo_uso=desarme) ---
+    tipo_uso = models.CharField(
+        max_length=20,
+        choices=TIPO_USO_CHOICES,
+        default="cliente",
+        db_index=True,
+    )
+    estado_desarme = models.CharField(
+        max_length=20,
+        choices=ESTADO_DESARME_CHOICES,
+        blank=True,
+        default="",
+        db_index=True,
+    )
+    activo_operacional = models.BooleanField(
+        default=True,
+        help_text="False cuando está cerrado; mantiene historial",
+    )
+    fecha_ingreso_desarme = models.DateField(null=True, blank=True)
+    fecha_cierre_desarme = models.DateField(null=True, blank=True)
+    proveedor_nombre = models.CharField(max_length=255, blank=True, default="")
+    proveedor_rut = models.CharField(max_length=50, blank=True, default="")
+    proveedor_telefono = models.CharField(max_length=50, blank=True, default="")
+    precio_compra = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal("0"), null=True, blank=True
+    )
+    costo_transporte = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal("0"), null=True, blank=True
+    )
+    costo_grua = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal("0"), null=True, blank=True
+    )
+    costo_papeles = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal("0"), null=True, blank=True
+    )
+    otros_costos_base = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal("0"), null=True, blank=True
+    )
+    peso_final_kg = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    valor_final_por_kg = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    ingreso_final_chatarra = models.DecimalField(
+        max_digits=14, decimal_places=2, default=Decimal("0"), null=True, blank=True
+    )
+    observaciones_desarme = models.TextField(blank=True, default="")
 
     objects = VehiculoQuerySet.as_manager()
 
@@ -117,7 +184,24 @@ class Vehiculo(TenantScoped):
         """Validaciones de coherencia para evitar datos inconsistentes"""
         super().clean()
 
-        # 1) Empresa coherente con cliente
+        # Desarme: limpiar estado si no es desarme; exigir fecha ingreso si es desarme
+        if self.tipo_uso != "desarme":
+            self.estado_desarme = ""
+        elif self.tipo_uso == "desarme":
+            if not self.fecha_ingreso_desarme:
+                raise ValidationError(
+                    {
+                        "fecha_ingreso_desarme": "Debe indicar la fecha de ingreso del vehículo para desarme."
+                    }
+                )
+
+        # Vehículo de cliente requiere cliente
+        if self.tipo_uso == "cliente" and not self.cliente_id:
+            raise ValidationError(
+                {"cliente": "El vehículo de cliente debe tener un cliente asignado."}
+            )
+
+        # 1) Empresa coherente con cliente (si tiene cliente)
         if self.empresa_id and self.cliente_id and self.cliente.empresa_id != self.empresa_id:
             raise ValidationError(
                 "El cliente del vehículo debe pertenecer a la misma empresa del vehículo."
@@ -126,8 +210,7 @@ class Vehiculo(TenantScoped):
         # 2) Reglas de país por empresa (siempre deberíamos tener empresa con TenantScoped)
         pais = getattr(getattr(self, "empresa", None), "pais", None)
 
-        # En USA normalmente la patente es menos fiable que el VIN: acepta patente vacía,
-        # pero exige al menos un identificador (VIN o patente) en cualquier país.
+        # Exige al menos un identificador (VIN o patente) en cualquier país.
         if not (self.vin or self.patente):
             raise ValidationError("Debe registrar al menos VIN o Patente.")
 
@@ -315,11 +398,105 @@ class Vehiculo(TenantScoped):
             ),
         }
 
+    # --- Métricas desarmaduría (tipo_uso=desarme) ---
+
+    @property
+    def costo_total_base(self):
+        """Suma de costos base del vehículo de desarme."""
+        return (
+            (self.precio_compra or Decimal("0"))
+            + (self.costo_transporte or Decimal("0"))
+            + (self.costo_grua or Decimal("0"))
+            + (self.costo_papeles or Decimal("0"))
+            + (self.otros_costos_base or Decimal("0"))
+        )
+
+    @property
+    def costos_adicionales_total(self):
+        """Suma de costos adicionales (CostoVehiculoDesarme)."""
+        total = self.costos_desarme.aggregate(total=Sum("monto"))["total"]
+        return total or Decimal("0")
+
+    @property
+    def costo_total_desarme(self):
+        """Costo total = base + adicionales."""
+        return self.costo_total_base + self.costos_adicionales_total
+
+    @property
+    def ingresos_repuestos_total(self):
+        """Ingresos por venta de piezas de este vehículo (documentos emitidos)."""
+        from django.db.models import DecimalField, ExpressionWrapper, F, Value
+        from django.db.models.functions import Coalesce
+
+        from taller.models import LineaRepuesto
+
+        total = LineaRepuesto.objects.filter(
+            repuesto__vehiculo_origen=self,
+            documento__estado="EMITIDO",
+        ).aggregate(
+            total=Sum(
+                ExpressionWrapper(
+                    F("cantidad")
+                    * F("precio_unitario")
+                    * (1 - Coalesce(F("descuento"), Value(0)) / 100),
+                    output_field=DecimalField(max_digits=14, decimal_places=2),
+                )
+            )
+        )[
+            "total"
+        ]
+        return total or Decimal("0")
+
+    @property
+    def ingresos_totales(self):
+        """Ingresos por piezas + ingreso final chatarra."""
+        return self.ingresos_repuestos_total + (self.ingreso_final_chatarra or Decimal("0"))
+
+    @property
+    def utilidad_total(self):
+        """Utilidad = ingresos - costo total."""
+        return self.ingresos_totales - self.costo_total_desarme
+
+    @property
+    def porcentaje_recuperacion(self):
+        """Porcentaje de recuperación respecto al costo total."""
+        costo = self.costo_total_desarme
+        if not costo:
+            return Decimal("0")
+        return (self.ingresos_totales / costo) * Decimal("100")
+
+    def cerrar_desarme(self, fecha_cierre, peso_kg, valor_por_kg):
+        """
+        Cierra el vehículo de desarme: registra chatarra final, actualiza estado.
+        No elimina; solo desactiva operacionalmente.
+        """
+        self.fecha_cierre_desarme = fecha_cierre
+        self.peso_final_kg = peso_kg
+        self.valor_final_por_kg = valor_por_kg
+        self.ingreso_final_chatarra = (peso_kg or Decimal("0")) * (valor_por_kg or Decimal("0"))
+        self.estado_desarme = "cerrado"
+        self.activo_operacional = False
+        self.save(
+            update_fields=[
+                "fecha_cierre_desarme",
+                "peso_final_kg",
+                "valor_final_por_kg",
+                "ingreso_final_chatarra",
+                "estado_desarme",
+                "activo_operacional",
+            ]
+        )
+
     class Meta(TenantScoped.Meta):
         ordering = ["marca", "modelo", "patente"]
         verbose_name = "Vehículo"
         constraints = [
-            models.UniqueConstraint(fields=["empresa", "patente"], name="uq_empresa_patente"),
+            # Unicidad por (empresa, patente) solo cuando patente está informada; permite múltiples vehículos con patente vacía (ej. desarme).
+            models.UniqueConstraint(
+                fields=["empresa", "patente"],
+                condition=Q(patente__isnull=False) & ~Q(patente=""),
+                name="uq_empresa_patente",
+            ),
             models.UniqueConstraint(
                 fields=["empresa", "vin"],
                 condition=Q(vin__isnull=False) & ~Q(vin=""),

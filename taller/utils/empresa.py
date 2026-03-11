@@ -28,33 +28,53 @@ def get_or_create_empresa(request):
                 pass
         raise PermissionDenied("Debes iniciar sesión para ver este reporte.")
 
-    # 3) Intentar relación directa (OneToOne reverse puede lanzar DoesNotExist si no hay Empresa)
-    from django.core.exceptions import ObjectDoesNotExist
+    # 3) Obtener empresa por FK (evitar user.empresa: dispara SELECT con todas las columnas).
+    # Usar defer("is_trial") para no fallar si la columna no existe (migración pendiente).
+    from django.db.utils import OperationalError
     from taller.models.empresa import Empresa
 
+    empresa = None
     try:
-        empresa = getattr(user, "empresa", None)
-        if empresa is not None:
-            return empresa
-    except (Empresa.DoesNotExist, ObjectDoesNotExist):
-        pass
+        empresa = Empresa.objects.filter(user=user).defer("is_trial").first()
+    except OperationalError as e:
+        err_msg = str(e).lower()
+        if "is_trial" in str(e) or "no such column" in err_msg:
+            try:
+                empresa = Empresa.objects.filter(user=user).first()
+            except OperationalError:
+                raise PermissionDenied(
+                    "Base de datos desactualizada. Ejecuta en el servidor: python manage.py migrate"
+                ) from e
+        else:
+            raise
 
-    # 4) Buscar por FK y crear si no existe
-    empresa = Empresa.objects.filter(user=user).first()
     if empresa:
         return empresa
 
-    empresa, _ = Empresa.objects.get_or_create(
-        user=user,
-        defaults={
-            "nombre_taller": f"Taller {getattr(user, 'username', 'Usuario')}",
-            "direccion": "N/A",
-            "telefono": "N/A",
-            "email": getattr(user, "email", "demo@ejemplo.com"),
-            "is_trial": True,
-        },
-    )
-    return empresa
+    # 4) Crear empresa si no existe
+    defaults_with_trial = {
+        "nombre_taller": f"Taller {getattr(user, 'username', 'Usuario')}",
+        "direccion": "N/A",
+        "telefono": "N/A",
+        "email": getattr(user, "email", "demo@ejemplo.com"),
+        "is_trial": True,
+    }
+    defaults_without_trial = {k: v for k, v in defaults_with_trial.items() if k != "is_trial"}
+    try:
+        empresa, _ = Empresa.objects.get_or_create(user=user, defaults=defaults_with_trial)
+        return empresa
+    except OperationalError as e:
+        if "is_trial" in str(e) or "no such column" in str(e).lower():
+            try:
+                empresa, _ = Empresa.objects.get_or_create(
+                    user=user, defaults=defaults_without_trial
+                )
+                return empresa
+            except OperationalError:
+                raise PermissionDenied(
+                    "Base de datos desactualizada. Ejecuta en el servidor: python manage.py migrate"
+                ) from e
+        raise
 
 
 from taller.models import Empresa

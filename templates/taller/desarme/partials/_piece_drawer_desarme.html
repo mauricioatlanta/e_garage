@@ -1,0 +1,51 @@
+{% load i18n %}
+<div class="piece-drawer-content">
+  <button type="button" class="btn-close btn-close-white btn-close-panel d-md-none" aria-label="Cerrar" data-action="close-drawer"></button>
+  <div class="piece-drawer-placeholder text-muted small py-4" id="drawer-placeholder">
+    Clic en una zona del mapa para inspeccionar la pieza.
+  </div>
+  <div id="piece-drawer-form" class="d-none">
+    <h5 class="drawer-title mb-3 pt-2">Pieza</h5>
+    <form id="form-pieza">
+      {% csrf_token %}
+      <input type="hidden" id="pieza-zona" name="zone">
+      <input type="hidden" id="pieza-vista" name="view">
+      <div class="mb-3">
+        <label class="form-label">Nombre</label>
+        <input type="text" class="form-control form-control-desarme" id="pieza-nombre" name="nombre" required {% if not can_edit %}readonly{% endif %}>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Estado</label>
+        <div class="estado-pills" id="estado-pills">
+          <button type="button" class="btn btn-sm btn-outline-secondary" data-estado="" data-status="unreviewed">No revisada</button>
+          <button type="button" class="btn btn-sm btn-outline-success" data-estado="disponible" data-status="available">Disponible</button>
+          <button type="button" class="btn btn-sm btn-outline-danger" data-estado="dañado" data-status="damaged">Dañada</button>
+          <button type="button" class="btn btn-sm btn-outline-dark" data-estado="scrap" data-status="scrap">Scrap</button>
+          <button type="button" class="btn btn-sm btn-outline-primary" data-estado="vendido" data-status="sold">Vendida</button>
+          <button type="button" class="btn btn-sm btn-outline-warning" data-estado="reservada" data-status="reserved">Reservada</button>
+        </div>
+        <input type="hidden" id="pieza-estado" name="estado_pieza" value="">
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Precio venta</label>
+        <input type="text" class="form-control form-control-desarme" id="pieza-precio" name="precio_venta" placeholder="0" {% if not can_edit %}readonly{% endif %}>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Stock</label>
+        <input type="number" class="form-control form-control-desarme" id="pieza-stock" name="stock" value="1" min="0" {% if not can_edit %}readonly{% endif %}>
+      </div>
+      <div class="mb-3">
+        <label class="form-label">Observación</label>
+        <textarea class="form-control form-control-desarme" id="pieza-observaciones" name="observacion_estado" rows="2" placeholder="abolladura menor, sin espejo..." {% if not can_edit %}readonly{% endif %}></textarea>
+      </div>
+      {% if can_edit %}
+      <div class="drawer-actions d-flex flex-wrap gap-2">
+        <button type="submit" class="btn btn-primary flex-grow-1" data-submit-mode="save">Guardar</button>
+        <button type="button" class="btn btn-outline-primary" data-submit-mode="save-next">Guardar y siguiente</button>
+        <button type="button" class="btn btn-outline-dark btn-sm" data-action="marcar-scrap">Marcar scrap</button>
+        <a href="#" id="link-ver-ficha" class="btn btn-outline-secondary btn-sm">Ver ficha completa</a>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+</div>

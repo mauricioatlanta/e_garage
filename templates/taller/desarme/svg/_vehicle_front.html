@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 220" class="mapa-vehiculo-svg w-full h-auto">
+  <defs>
+    <filter id="glow-zone">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <style>
+      .zone { fill: #9ca3af; stroke: #64748b; stroke-width: 1; cursor: pointer; transition: all 0.2s ease; }
+      .zone:hover { filter: drop-shadow(0 0 6px rgba(34,211,238,0.6)); stroke: #22d3ee; }
+      .zone.selected { stroke: #22d3ee; stroke-width: 2; }
+      .zone.status-unreviewed { fill: #94a3b8; }
+      .zone.status-available { fill: #22c55e; }
+      .zone.status-damaged { fill: #ef4444; }
+      .zone.status-scrap { fill: #1e293b; }
+      .zone.status-reserved { fill: #eab308; }
+      .zone.status-sold { fill: #3b82f6; }
+    </style>
+  </defs>
+  <rect x="40" y="50" width="340" height="130" rx="14" fill="#1e293b" stroke="#334155"/>
+  <!-- Capot -->
+  <rect x="100" y="62" width="220" height="55" class="zone" id="hood" data-zone="hood" data-piece-name="Capot" data-view="frontal" data-side="" data-category="carroceria"/>
+  <!-- Parrilla -->
+  <rect x="155" y="82" width="110" height="22" class="zone" id="grille" data-zone="grille" data-piece-name="Parrilla" data-view="frontal" data-side="" data-category="carroceria"/>
+  <!-- Focos -->
+  <rect x="100" y="80" width="45" height="28" class="zone" id="front_left_headlight" data-zone="front_left_headlight" data-piece-name="Foco delantero izquierdo" data-view="frontal" data-side="left" data-category="electricidad"/>
+  <rect x="275" y="80" width="45" height="28" class="zone" id="front_right_headlight" data-zone="front_right_headlight" data-piece-name="Foco delantero derecho" data-view="frontal" data-side="right" data-category="electricidad"/>
+  <!-- Neblineros -->
+  <rect x="100" y="112" width="32" height="14" class="zone" id="front_left_fog" data-zone="front_left_fog" data-piece-name="Neblinero izquierdo" data-view="frontal" data-side="left" data-category="electricidad"/>
+  <rect x="288" y="112" width="32" height="14" class="zone" id="front_right_fog" data-zone="front_right_fog" data-piece-name="Neblinero derecho" data-view="frontal" data-side="right" data-category="electricidad"/>
+  <!-- Parachoques delantero -->
+  <rect x="60" y="125" width="90" height="45" class="zone" id="front_bumper_left" data-zone="front_bumper" data-piece-name="Parachoques delantero" data-view="frontal" data-side="left" data-category="carroceria"/>
+  <rect x="270" y="125" width="90" height="45" class="zone" id="front_bumper_right" data-zone="front_bumper" data-piece-name="Parachoques delantero" data-view="frontal" data-side="right" data-category="carroceria"/>
+  <circle cx="130" cy="168" r="16" fill="#475569"/>
+  <circle cx="290" cy="168" r="16" fill="#475569"/>
+</svg>

@@ -1,0 +1,39 @@
+{% load i18n country_url %}
+<header class="desarme-header">
+  <div class="header-kpis">
+    <div class="kpi-card">
+      <div class="kpi-label">{% trans "Vehículo" %}</div>
+      <div class="kpi-value">{{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}{% if vehiculo.anio %} {{ vehiculo.anio }}{% endif %}</div>
+      <small class="text-muted">{{ vehiculo.patente|default:vehiculo.vin|default:"—" }} {% if vehiculo.fecha_ingreso_desarme %}| {{ vehiculo.fecha_ingreso_desarme|date:"d/m/Y" }}{% endif %}</small>
+    </div>
+    <div class="kpi-card kpi-neutro">
+      <div class="kpi-label">{% trans "Costo total" %}</div>
+      <div class="kpi-value">${{ costo_total|floatformat:0 }}</div>
+    </div>
+    <div class="kpi-card kpi-neutro">
+      <div class="kpi-label">{% trans "Recuperado" %}</div>
+      <div class="kpi-value">${{ ingresos_totales|floatformat:0 }}</div>
+    </div>
+    <div class="kpi-card {% if utilidad_total >= 0 %}kpi-positivo{% else %}kpi-negativo{% endif %}">
+      <div class="kpi-label">{% trans "Resultado" %}</div>
+      <div class="kpi-value">${{ utilidad_total|floatformat:0 }}</div>
+    </div>
+    <div class="kpi-card kpi-neutro">
+      <div class="kpi-label">{% trans "Recuperación" %}</div>
+      <div class="kpi-value">{{ porcentaje_recuperacion }}%</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    {% if can_edit %}
+      {% if not template_applied %}
+        <a href="#" class="btn btn-sm btn-warning btn-aplicar-plantilla">{% trans "Aplicar plantilla" %}</a>
+      {% endif %}
+      <a href="#" class="btn btn-sm btn-outline-secondary">{% trans "Agregar costo" %}</a>
+    {% endif %}
+    <a href="{% country_url 'repuestos:lista_repuestos' %}?vehiculo_origen={{ vehiculo.pk }}" class="btn btn-sm btn-outline-secondary">{% trans "Ver piezas" %}</a>
+    {% if can_edit %}
+      <a href="#" class="btn btn-sm btn-outline-danger">{% trans "Cerrar vehículo" %}</a>
+    {% endif %}
+    <a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.pk %}" class="btn btn-sm btn-outline-light">{% trans "Volver" %}</a>
+  </div>
+</header>

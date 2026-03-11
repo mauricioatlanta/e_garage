@@ -165,10 +165,19 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
     SESSION_NEXT_KEY = "clientes_create_next"
 
     def dispatch(self, request, *args, **kwargs):
-        # Asegurar que la empresa existe (antes lo hacía el FBV shim)
-        from taller.utils.empresa import get_or_create_empresa
+        # Asegurar que la empresa existe y dejarla en request para no tocar user.empresa (evita 500 si falta columna is_trial)
+        try:
+            from taller.utils.empresa import get_or_create_empresa
 
-        get_or_create_empresa(request)
+            request.empresa = get_or_create_empresa(request)
+        except Exception as e:
+            # PermissionDenied → dejar que suba; OperationalError u otro → evitar 500
+            from django.core.exceptions import PermissionDenied
+            from django.db.utils import OperationalError
+
+            if isinstance(e, PermissionDenied):
+                raise
+            request.empresa = None
         # Si viene next en GET, guardarlo en sesión (fallback robusto si el hidden falta o se pierde)
         next_url = (request.GET.get("next") or "").strip()
         if next_url:
@@ -212,11 +221,15 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
                 return urlparse(next_url).path or next_url
 
-        # Fallback: lista de clientes según país
-        empresa = getattr(self.request.user, "empresa", None)
-        if empresa and empresa.pais == "US":
-            return reverse("usa:taller:clientes:lista_clientes")
-        return reverse("chile:taller:clientes:lista_clientes")
+        # Fallback: lista de clientes según prefijo de la URL (namespaces correctos sin "taller")
+        path = (getattr(self.request, "path_info", "") or self.request.path or "").lower()
+        if "/us/en/" in path or path == "/us/en":
+            return reverse("us_en:clientes:lista_clientes")
+        if "/us/es/" in path or path == "/us/es":
+            return reverse("us_es:clientes:lista_clientes")
+        if "/us/" in path:
+            return reverse("usa:clientes:lista_clientes")
+        return reverse("chile:clientes:lista_clientes")
 
     def form_valid(self, form):
         from urllib.parse import parse_qs, urlencode, urlparse, urlunparse
@@ -267,33 +280,82 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = getattr(self.request, "empresa", None)
         if empresa:
             kwargs["empresa"] = empresa
+
+        # País desde URL primero (ej. /us/en/clientes/crear/ → US), para que
+        # el formulario muestre estado/ciudad aunque la empresa sea de otro país.
+        try:
+            from taller.config.country_settings import CountrySettings
+
+            pais_from_url = CountrySettings.get_country_from_url(
+                getattr(self.request, "path_info", "") or self.request.path or ""
+            )
+        except Exception:
+            pais_from_url = None
+
+        if pais_from_url:
+            kwargs["pais"] = (
+                pais_from_url.upper() if isinstance(pais_from_url, str) else pais_from_url
+            )
+        else:
+            path = (getattr(self.request, "path_info", "") or self.request.path or "").lower()
+            parts = [p for p in path.split("/") if p]
+            prefix = parts[0] if parts else ""
+            if prefix in {"us", "cl", "mx", "pe", "co", "ec", "ve", "br"}:
+                kwargs["pais"] = prefix.upper()
+            elif empresa and hasattr(empresa, "pais") and getattr(empresa, "pais", None):
+                kwargs["pais"] = empresa.pais
+
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = getattr(self.request, "empresa", None)
         context["empresa"] = empresa
         context["empresa_actual"] = empresa
         # Pasar next para que el template lo incluya en el hidden y el POST redirija de vuelta (ej. al formulario de documento)
         context["next"] = self.request.GET.get("next", "").strip() or None
 
-        # Asegurar que el país esté disponible para el template
-        pais = None
-        if empresa and hasattr(empresa, "pais"):
-            pais = empresa.pais
+        # País para el template: priorizar URL (ej. /us/en/ → US) para coincidir con el template.
+        try:
+            from taller.config.country_settings import CountrySettings
+
+            pais = CountrySettings.get_country_from_url(
+                getattr(self.request, "path_info", "") or self.request.path or ""
+            )
+            if pais and isinstance(pais, str):
+                pais = pais.upper()
+        except Exception:
+            pais = None
+
+        if not pais:
+            path = (getattr(self.request, "path_info", "") or self.request.path or "").lower()
+            parts = [p for p in path.split("/") if p]
+            prefix = parts[0] if parts else ""
+            if prefix in {"us", "cl", "mx", "pe", "co", "ec", "ve", "br"}:
+                pais = prefix.upper()
+            elif empresa and hasattr(empresa, "pais"):
+                try:
+                    pais = empresa.pais
+                except Exception:
+                    pais = None
+            else:
+                pais = None
         context["pais_usuario"] = pais
         context["usa_estado_ciudad"] = pais in {"US", "BR", "VE", "PE", "MX"}
 
-        # Agregar colores disponibles al contexto
-        from taller.models.color_cliente import ColorCliente
+        # Agregar colores disponibles al contexto (defensivo por columnas faltantes en BD)
+        try:
+            from taller.models.color_cliente import ColorCliente
 
-        if pais:
-            context["colores_disponibles"] = ColorCliente.get_colores_para_pais(pais)
-        else:
-            context["colores_disponibles"] = ColorCliente.objects.filter(activo=True)
+            if pais:
+                context["colores_disponibles"] = ColorCliente.get_colores_para_pais(pais)
+            else:
+                context["colores_disponibles"] = ColorCliente.objects.filter(activo=True)
+        except Exception:
+            context["colores_disponibles"] = []
 
         # También asegurar que el formulario tenga la información del país
         if "form" in context:
@@ -351,4 +413,11 @@ class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
     def get_success_url(self):
         from django.urls import reverse
 
-        return reverse("chile:taller:clientes:lista_clientes")
+        path = (getattr(self.request, "path_info", "") or self.request.path or "").lower()
+        if "/us/en/" in path or path == "/us/en":
+            return reverse("us_en:clientes:lista_clientes")
+        if "/us/es/" in path or path == "/us/es":
+            return reverse("us_es:clientes:lista_clientes")
+        if "/us/" in path:
+            return reverse("usa:clientes:lista_clientes")
+        return reverse("chile:clientes:lista_clientes")

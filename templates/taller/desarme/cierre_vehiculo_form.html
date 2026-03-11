@@ -1,0 +1,38 @@
+{% extends "taller/common/base.html" %}
+{% load static i18n country_url %}
+
+{% block title %}{% trans "Cerrar vehículo" %} - {{ vehiculo.get_marca_display }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <nav aria-label="breadcrumb" class="mb-3">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.pk %}">{{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}</a></li>
+      <li class="breadcrumb-item"><a href="{% country_url 'desarme:dashboard_financiero' pk=vehiculo.pk %}">{% trans "Dashboard" %}</a></li>
+      <li class="breadcrumb-item active">{% trans "Cerrar vehículo" %}</li>
+    </ol>
+  </nav>
+
+  <h2 class="h4 mb-4">{% trans "Cerrar vehículo de desarme" %}</h2>
+  <p class="text-muted mb-4">{% trans "Al cerrar se registrará el ingreso por venta de remanente/chatarra y el vehículo quedará en modo solo lectura." %}</p>
+
+  <div class="card shadow-sm border-0 bg-dark" style="max-width: 480px;">
+    <div class="card-body">
+      <form method="post" action="">
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="mb-3">
+          <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+          {{ field }}
+          {% if field.errors %}<div class="invalid-feedback d-block">{{ field.errors.0 }}</div>{% endif %}
+        </div>
+        {% endfor %}
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-danger">{% trans "Cerrar vehículo" %}</button>
+          <a href="{% country_url 'desarme:dashboard_financiero' pk=vehiculo.pk %}" class="btn btn-outline-secondary">{% trans "Cancelar" %}</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

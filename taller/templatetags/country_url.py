@@ -59,7 +59,10 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
         country_ns = _country_ns_from_path(request.path or "/")
 
     # view_path puede ser "clientes:lista_clientes" o "lista_clientes"
-    if ":" in view_path:
+    # us_en/us_es incluyen taller.urls directamente; no tienen "taller" en el medio
+    if country_ns in ("us_en", "us_es"):
+        full_name = f"{country_ns}:{view_path}"
+    elif ":" in view_path:
         # Si ya tiene namespace (ej: vehiculos:lista_vehiculos), agregar el país y app_namespace
         if app_namespace == "direct" or app_namespace == "":
             # Para URLs definidas directamente en el namespace del país (ej: usa:ajax:vehiculos_por_cliente)

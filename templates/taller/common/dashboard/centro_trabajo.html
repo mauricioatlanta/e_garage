@@ -192,42 +192,6 @@
 
 .ws-btn-search:active { transform: translateY(0); }
 
-/* Acciones rápidas */
-.ws-actions {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1.5rem;
-}
-
-.ws-action {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.6rem 1rem;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--ws-text);
-  background: var(--ws-surface);
-  border: 1px solid var(--ws-border);
-  border-radius: 10px;
-  text-decoration: none;
-  transition: all 0.2s ease;
-}
-
-.ws-action:hover {
-  background: var(--ws-surface-hover);
-  border-color: var(--ws-cyan);
-  color: var(--ws-cyan);
-  box-shadow: 0 0 20px rgba(0, 242, 254, 0.15);
-}
-
-.ws-action i {
-  font-size: 0.9em;
-  opacity: 0.9;
-}
-
 /* Sección vehículos recientes */
 .ws-recent {
   margin-top: 2.5rem;
@@ -322,15 +286,6 @@
           <i class="fas fa-arrow-right me-2"></i>{% trans "Buscar" %}
         </button>
       </form>
-    </div>
-
-    <div class="ws-actions">
-      <a href="{{ url_crear_vehiculo }}" class="ws-action"><i class="fas fa-plus"></i> {% trans "Crear vehículo nuevo" %}</a>
-      <a href="{{ url_lista_clientes }}" class="ws-action"><i class="fas fa-users"></i> {% trans "Clientes" %}</a>
-      <a href="{{ url_lista_vehiculos }}" class="ws-action"><i class="fas fa-car"></i> {% trans "Vehículos" %}</a>
-      <a href="{{ url_lista_documentos }}" class="ws-action"><i class="fas fa-file-invoice"></i> {% trans "Documentos" %}</a>
-      <a href="{{ url_centro_operaciones }}" class="ws-action"><i class="fas fa-rocket"></i> {% trans "Centro de Operaciones" %}</a>
-      <a href="{{ url_settings }}" class="ws-action"><i class="fas fa-cog"></i> {% trans "Ajustes" %}</a>
     </div>
 
     {% if vehiculos_con_url %}
