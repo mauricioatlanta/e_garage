@@ -15,9 +15,12 @@ from .team_member import TeamMember
 from .clientes import Cliente
 from .vehiculos import Vehiculo
 from .marca import Marca
+from .catalogo import CatalogoModeloAuto
 
 # Modelos de kilometraje
 from .kilometraje import KilometrajeRegistro
+from .registro_kilometraje import RegistroKilometraje
+from .checklist_ingreso import ChecklistIngreso
 
 # Modelos de documentos
 from .documento import Documento
@@ -34,6 +37,8 @@ from .memoria_seguimiento import (
 
 # Modelos de repuestos
 from .repuesto import Repuesto
+from .costo_vehiculo_desarme import CostoVehiculoDesarme
+from .plantilla_desarme import PlantillaDesarme, PlantillaPieza
 
 # Modelos de ubicación
 from .ubicacion import Estado, Ciudad
@@ -42,11 +47,21 @@ from .ubicacion import Estado, Ciudad
 from .comprobante_pago import ComprobantePago
 from .trial import TrialRegistro
 
-# Modelos legacy / compatibilidad (deben importarse para que Django los registre)
+# Modelos legacy / compatibilidad (import opcional por si faltan en algún deploy)
 from .auditoria import LogAuditoria
-from .pago import PagoPendiente
-from .regimen_fiscal import RegimenFiscal
-from .marcas_usa import MarcaVehiculo, ModeloVehiculo
+
+try:
+    from .pago import PagoPendiente
+except ImportError:
+    PagoPendiente = None
+try:
+    from .regimen_fiscal import RegimenFiscal
+except ImportError:
+    RegimenFiscal = None
+try:
+    from .marcas_usa import MarcaVehiculo, ModeloVehiculo
+except ImportError:
+    MarcaVehiculo = ModeloVehiculo = None
 
 # Modelos de extras de vehículos
 from .extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
@@ -61,8 +76,11 @@ __all__ = [
     "Cliente",
     "Vehiculo",
     "Marca",
+    "CatalogoModeloAuto",
     # Kilometraje
     "KilometrajeRegistro",
+    "RegistroKilometraje",
+    "ChecklistIngreso",
     # Documentos
     "Documento",
     "LineaServicio",
@@ -74,8 +92,11 @@ __all__ = [
     "EtiquetaAsignacion",
     "EvidenciaDocumento",
     "SeguimientoPublico",
-    # Repuestos
+    # Repuestos y desarmaduría
     "Repuesto",
+    "CostoVehiculoDesarme",
+    "PlantillaDesarme",
+    "PlantillaPieza",
     # Ubicación
     "Estado",
     "Ciudad",
@@ -93,6 +114,10 @@ __all__ = [
     "ColorVehiculo",
     "MotorVehiculo",
 ]
+# Quitar del __all__ los que no se importaron (módulo faltante en servidor)
+for _name in ("PagoPendiente", "RegimenFiscal", "MarcaVehiculo", "ModeloVehiculo"):
+    if _name in __all__ and globals().get(_name) is None:
+        __all__.remove(_name)
 
 # Intentar importar otros modelos si existen (para compatibilidad)
 try:
