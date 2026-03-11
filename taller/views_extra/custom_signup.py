@@ -26,24 +26,24 @@ class CustomSignupView(SignupView):
     template_name = "account/signup.html"
 
     def get_form_kwargs(self):
-        """Pasa country_code y default_phone_prefix al formulario"""
+        """Pasa request, country_code y default_phone_prefix al formulario"""
         kwargs = super().get_form_kwargs()
 
-        # ✅ Detectar país con prioridad: 1) parámetro ?from=xx, 2) URL path, 3) request.country_code, 4) CL por defecto
-        from_param = self.request.GET.get("from", "").upper()
+        # País: URL tiene prioridad (en /us/, /cl/ → fijo). Sin fallback silencioso a CL.
+        from_param = (self.request.GET.get("from", "") or "").strip().upper()
         current_country = (
-            from_param  # Prioridad 1: parámetro ?from=xx
-            or CountrySettings.get_country_from_url(self.request.path)  # Prioridad 2: URL path
-            or getattr(self.request, "country_code", None)  # Prioridad 3: request.country_code
-            or "CL"  # Prioridad 4: CL por defecto
+            CountrySettings.get_country_from_url(self.request.path)
+            or from_param
+            or getattr(self.request, "country_code", None)
         )
-        current_country = current_country.upper()
+        if current_country:
+            current_country = current_country.upper()
 
-        # Obtener configuración del país
-        country_config = get_country_config(current_country)
+        # Obtener configuración del país (para prefijo teléfono; puede ser None si sin ruta país)
+        country_config = get_country_config(current_country) if current_country else {}
         default_phone_prefix = country_config.get("phone_prefix", "+56")
 
-        # Pasar al formulario
+        kwargs["request"] = self.request
         kwargs["country_code"] = current_country
         kwargs["default_phone_prefix"] = default_phone_prefix
 
@@ -54,17 +54,16 @@ class CustomSignupView(SignupView):
         context["page_title"] = "Create Account - eGarage"
         context["is_universal_signup"] = True
 
-        # Pasar el país actual al template: prioridad ?from=xx, path, request.country_code, CL
-        from_param = self.request.GET.get("from", "").upper()
+        # País para contexto: URL, ?from=, request. Sin fallback a CL.
+        from_param = (self.request.GET.get("from", "") or "").strip().upper()
         current_country = (
-            from_param
-            or CountrySettings.get_country_from_url(self.request.path)
+            CountrySettings.get_country_from_url(self.request.path)
+            or from_param
             or getattr(self.request, "country_code", None)
-            or "CL"
         )
-        current_country = current_country.upper() if current_country else "CL"
+        current_country = current_country.upper() if current_country else None
         context["current_country"] = current_country
-        context["country_config"] = get_country_config(current_country)
+        context["country_config"] = get_country_config(current_country) if current_country else {}
 
         return context
 
@@ -73,19 +72,14 @@ class CustomSignupView(SignupView):
         Allauth maneja la creación del usuario y el envío de emails.
         El formulario (CustomSignupForm.save()) crea la empresa usando RegistrationService.
         """
-        # ✅ Obtener el país: 1) selección del usuario en el formulario, 2) ?from=xx, 3) URL, 4) CL por defecto
-        from_param = self.request.GET.get("from", "").upper()
-        country_code = (
-            (form.cleaned_data.get("country") or "")
-            .upper()
-            .strip()  # Prioridad 1: selector de país en el form
-            or from_param
-            or getattr(form, "country_code", None)
-            or CountrySettings.get_country_from_url(self.request.path)
-            or getattr(self.request, "country_code", None)
-            or "CL"
-        )
-        country_code = (country_code or "CL").upper()
+        # País: viene de form.cleaned_data (garantizado por clean(), sin fallback CL)
+        country_code = (form.cleaned_data.get("country") or "").strip().upper()
+        if not country_code:
+            messages.error(
+                self.request,
+                "No se pudo determinar el país. Por favor, use la ruta correcta (/us/, /cl/, etc.) o seleccione un país.",
+            )
+            return self.form_invalid(form)
 
         # ✅ Configurar idioma usando country_config
         country_config = get_country_config(country_code)
@@ -135,13 +129,11 @@ class CustomSignupView(SignupView):
         )
 
     def form_invalid(self, form):
-        # Mantener el idioma seleccionado en caso de error usando country_config
-        country_code = (
-            CountrySettings.get_country_from_url(self.request.path)
-            or getattr(self.request, "country_code", None)
-            or "CL"
+        # Idioma para mostrar errores: URL, request, o español por defecto (solo para UI)
+        country_code = CountrySettings.get_country_from_url(self.request.path) or getattr(
+            self.request, "country_code", None
         )
-        country_config = get_country_config(country_code)
+        country_config = get_country_config(country_code) if country_code else {"lang": "es"}
         language = country_config.get("lang", "es")
         activate(language)
         return super().form_invalid(form)

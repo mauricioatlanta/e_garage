@@ -1,21 +1,99 @@
 """
-Redirige /accounts/login/ → /cl/accounts/login/ para que el login sin país
-use siempre Chile por defecto y no dependa de sesión (p. ej. preferred_country=UY).
+Login country-aware: /accounts/login/ (sin prefijo) → /<cc>/accounts/login/ o /<cc>/<lang>/accounts/login/.
+
+- Opción A: next=/us/centro-operaciones-espacial/ → /us/accounts/login/?next=...
+- Opción B: next=/us/en/... → /us/en/accounts/login/?next=...; next=/us/es/... → /us/es/accounts/login/?next=...
+  Igual para /cl/es/... → /cl/es/accounts/login/.
 
 Debe ir después de SessionMiddleware.
 """
 
 from django.shortcuts import redirect
 
+# Códigos de país de 2 letras soportados en path (/us/, /cl/, ...)
+_PATH_COUNTRY_CODES = ("us", "cl", "mx", "co", "ec", "pe", "ve", "br", "uy", "ar")
+# Idiomas en path para login país+idioma (Opción B)
+_PATH_LANGS = ("en", "es")
+# Idioma por defecto por país (evita redirigir a /cc/accounts/login/ que hace redirect de vuelta → loop)
+_DEFAULT_LANG_BY_CC = {
+    "us": "en",
+    "cl": "es",
+    "mx": "es",
+    "co": "es",
+    "ec": "es",
+    "pe": "es",
+    "ve": "es",
+    "br": "pt",
+    "uy": "es",
+    "ar": "es",
+}
+
+
+def _country_from_login_request(request):
+    """
+    Determina el país para /accounts/login/ sin prefijo.
+    Orden: next (path del next) → from= → sesión (us/usa) → default CL.
+    No forzar siempre CL: si la sesión indica USA, enviar a /us/.../accounts/login/.
+    """
+    next_url = (request.GET.get("next") or "").strip()
+    if next_url.startswith("/") and len(next_url) >= 4 and next_url[3] == "/":
+        cc = next_url[1:3].lower()
+        if cc in _PATH_COUNTRY_CODES:
+            return cc
+
+    from_param = (request.GET.get("from") or "").strip().lower()
+    if from_param in _PATH_COUNTRY_CODES:
+        return from_param
+    if from_param in ("usa",):
+        return "us"
+
+    session_country = (request.session.get("country") or "").strip().lower()
+    if session_country in ("us", "usa"):
+        return "us"
+    if session_country in ("cl",):
+        return "cl"
+
+    return "cl"
+
+
+def _login_path_with_lang(cc: str, next_url: str) -> str:
+    """
+    Devuelve la ruta que SIRVE el login (/<cc>/<lang>/accounts/login/), no la que redirige.
+    /cl/accounts/login/ en la app redirige a /accounts/login/ → loop. Por eso usamos siempre
+    /cc/lang/accounts/login/ (p. ej. /cl/es/accounts/login/) que allauth sirve bajo cl/es/.
+    """
+    next_url = (next_url or "").strip()
+    default_lang = _DEFAULT_LANG_BY_CC.get(cc, "es")
+    if not next_url.startswith("/") or len(next_url) < 6:
+        return f"/{cc}/{default_lang}/accounts/login/"
+    # next = "/us/en/..." o "/cl/es/..." → parts[0]=cc, parts[1]=lang
+    parts = next_url.lstrip("/").split("/")
+    if len(parts) >= 2 and parts[0] == cc and parts[1] in _PATH_LANGS:
+        return f"/{cc}/{parts[1]}/accounts/login/"
+    return f"/{cc}/{default_lang}/accounts/login/"
+
 
 class ForceAccountsToCLMiddleware:
+    """
+    Redirige /accounts/login/ → /<cc>/<lang>/accounts/login/ (ruta que SIRVE el login) solo para GET/HEAD.
+    No redirige a /cc/accounts/login/ porque esa ruta redirige de vuelta a /accounts/login/ → ERR_TOO_MANY_REDIRECTS.
+    IMPORTANTÍSIMO: NO tocar POST, porque rompe el login real.
+    """
+
     def __init__(self, get_response):
         self.get_response = get_response
 
     def __call__(self, request):
-        if request.path.rstrip("/") == "/accounts/login":
-            url = "/cl/accounts/login/"
-            if request.GET:
-                url = f"{url}?{request.GET.urlencode()}"
+        path = request.path.rstrip("/")
+
+        # Solo redirigir navegación (GET/HEAD). Nunca POST.
+        if request.method in ("GET", "HEAD") and path == "/accounts/login":
+            cc = _country_from_login_request(request)
+            next_url = (request.GET.get("next") or "").strip()
+            login_path = _login_path_with_lang(cc, next_url)
+            # Preservar next=, from=, etc.; no propagar country=
+            params = request.GET.copy()
+            params.pop("country", None)
+            url = f"{login_path}?{params.urlencode()}" if params else login_path
             return redirect(url)
         return self.get_response(request)

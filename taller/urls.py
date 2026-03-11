@@ -1,12 +1,18 @@
 from django.urls import include, path
+from django.views.generic import RedirectView
 
+from taller.views_ingreso import (
+    ingreso_buscar,
+    ingreso_centro,
+    panel_ingreso_vehiculo,
+)
+from taller.views_extra.centro_trabajo import centro_trabajo, centro_trabajo_buscar
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones,
     dashboard_centro_operaciones_espacial,
 )
 from taller.views_extra.views import dashboard
-from taller.views_extra.views_configuracion import configuracion_empresa
 from taller.views.dashboard_bi import DashboardHomeView
 
 app_name = "taller"
@@ -16,6 +22,12 @@ urlpatterns = [
     path("equipo/", include(("taller.team.urls", "team"), namespace="team")),
     path("clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")),
     # CORREGIDO: Usar vista unificada country-aware en lugar de urls_chile
+    # panel-ingreso debe ir ANTES del include vehiculos para que coincida
+    path(
+        "vehiculos/<int:pk>/panel-ingreso/",
+        panel_ingreso_vehiculo,
+        name="panel_ingreso",
+    ),
     path(
         "vehiculos/",
         include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos"),
@@ -34,7 +46,7 @@ urlpatterns = [
     path(
         "admin-monitoring/",
         include(
-            ("taller.urls_modules.admin_monitoring", "admin_monitoring"),
+            ("taller.urls_extra.admin_monitoring", "admin_monitoring"),
             namespace="admin_monitoring",
         ),
     ),
@@ -61,7 +73,26 @@ urlpatterns = [
         dashboard_centro_operaciones_espacial,
         name="centro_operaciones_espacial",
     ),
-    path("configuracion/", configuracion_empresa, name="configuracion"),  # Configuración empresa
+    # Centro de Trabajo / Workspace (canonical /us/en/workspace/ y /us/es/workspace/)
+    path("workspace/", centro_trabajo, name="centro_trabajo"),
+    path("workspace/buscar/", centro_trabajo_buscar, name="centro_trabajo_buscar"),
+    # Desarmaduría: mapa interactivo, plantillas, piezas
+    path("desarme/", include(("taller.urls_desarme", "desarme"), namespace="desarme")),
+    # Centro de Ingreso Vehicular
+    path("ingreso/", ingreso_centro, name="ingreso_centro"),
+    path("ingreso/buscar/", ingreso_buscar, name="ingreso_buscar"),
+    # Alias público: redirige al Settings Center
+    path(
+        "configuracion/",
+        RedirectView.as_view(pattern_name="taller:company_settings", permanent=False),
+        name="configuracion",
+    ),
+    # Configuración real (dueño)
+    path(
+        "configuracion/empresa/",
+        RedirectView.as_view(pattern_name="taller:company_settings", permanent=False),
+        name="configuracion_empresa",
+    ),
     # Rutas principales de taller (dashboard, settings, etc.)
     # path('', include('taller.taller_main_urls')),  # Eliminado para evitar conflicto de namespace
     # Puedes agregar aquí otras rutas globales si es necesario

@@ -4,10 +4,11 @@ Garantiza que request.empresa esté siempre disponible y correcto.
 """
 
 import logging
-from django.core.exceptions import PermissionDenied
+
 from django.shortcuts import redirect
 
 from taller.models import Empresa
+from taller.utils.login_exempt import is_login_exempt_path
 
 logger = logging.getLogger(__name__)
 
@@ -106,9 +107,10 @@ class TenantIsolationMiddleware:
         return response
 
     def is_public_url(self, path):
-        """URLs públicas que no requieren autenticación"""
+        """URLs públicas que no requieren autenticación (login vía helper común)"""
+        if is_login_exempt_path(path):
+            return True
         public_urls = [
-            "/accounts/login/",
             "/accounts/signup/",
             "/accounts/logout/",
             "/accounts/password/",

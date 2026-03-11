@@ -1,4 +1,5 @@
 from django.urls import path, include
+from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 import logging
 from django.http import HttpResponseRedirect
@@ -11,7 +12,13 @@ from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones,
     dashboard_centro_operaciones_espacial,
 )
+from taller.views_extra.centro_trabajo import (
+    centro_trabajo,
+    centro_trabajo_buscar,
+    vehiculo_historial,
+)
 from taller.views_extra.views import dashboard
+from taller.views_extra.ai_lab import ai_lab_dashboard
 from taller.views_extra.views_configuracion import (
     configuracion_empresa,
     configuracion_tecnicos,
@@ -19,6 +26,7 @@ from taller.views_extra.views_configuracion import (
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.views_extra.views_suscripciones import precios
 from taller.documentos import views_country_aware as views_documentos
+from taller.views.country_aware_auth import country_aware_login
 
 # Configuración de logging para este módulo
 logger = logging.getLogger(__name__)
@@ -30,10 +38,27 @@ urlpatterns = [
     # Vista de inicio para /cl/es/ - redirige a la página principal de Chile
     path("", lambda request: HttpResponseRedirect("/cl/"), name="chile_home"),
     # URLs principales de taller (configuración, settings, etc.)
-    # Incluir las rutas específicas que necesitamos
+    # Centro de Trabajo / Recepción Vehicular (nueva home post-login)
+    path("workspace/", centro_trabajo, name="centro_trabajo"),
+    path("workspace/buscar/", centro_trabajo_buscar, name="centro_trabajo_buscar"),
+    path("vehiculos/<int:vehiculo_id>/historial/", vehiculo_historial, name="vehiculo_historial"),
+    # Dashboard / Centro de Operaciones (métricas, reportes)
     path("dashboard/", dashboard, name="dashboard"),
+    path("lab/", ai_lab_dashboard, name="ai_lab"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
-    path("configuracion/", configuracion_empresa, name="configuracion"),  # Configuración empresa
+    path("settings/", company_settings_view, name="company_settings"),  # ⚙️ Centro de Ajustes
+    # Alias público: redirige al Settings Center (evita 403)
+    path(
+        "configuracion/",
+        RedirectView.as_view(pattern_name="chile:company_settings", permanent=False),
+        name="configuracion",
+    ),
+    # Configuración real (dueño)
+    path(
+        "configuracion/empresa/",
+        configuracion_empresa,
+        name="configuracion_empresa",
+    ),
     path(
         "configuracion/tecnicos/", configuracion_tecnicos, name="configuracion_tecnicos"
     ),  # Configuración técnicos
@@ -43,8 +68,20 @@ urlpatterns = [
         TemplateView.as_view(template_name="cl/es/onboarding/bienvenida.html"),
         name="bienvenida_chile_alt",
     ),
-    # Allauth bajo /cl/es/ para que /cl/es/accounts/login/ etc. funcionen
-    path("accounts/", include("allauth.urls")),
+    # Redirect /cl/es/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
+    # EXCEPCIÓN: accounts/login/ se SIRVE aquí (no redirect) para evitar ERR_TOO_MANY_REDIRECTS.
+    # Redirect a /cl/accounts/login/ provocaba bucle: FixLoginCountryRedirectMiddleware
+    # reescribía Location /cl/accounts/login/ → /cl/es/accounts/login/ en la respuesta.
+    path("accounts/login/", country_aware_login),
+    path(
+        "accounts/", lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))
+    ),
+    path(
+        "accounts/<path:rest>",
+        lambda r, rest: redirect(
+            "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
+        ),
+    ),
     # Signup corto /cl/es/signup/ -> /accounts/signup/?from=cl (preserva ?plan=, etc.)
     path(
         "signup/",
@@ -165,6 +202,8 @@ urlpatterns = [
         "autocomplete/",
         include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),
     ),
+    # Centro de Ingreso Pro (kiosk recepción) — solo si existe el módulo taller.ops
+    # path("ops/", include(("taller.ops.urls", "ops"), namespace="ops")),
     # Crear nuevos motores, cajas y colores (usando views_create_parts)
     # path('vehiculos/crear-motor/', crear_motor, name='crear_motor'),  # ❌ Desactivado - usar vehiculos:crear_motor
     # path('vehiculos/crear-caja/', crear_caja, name='crear_caja'),    # ❌ Desactivado - usar vehiculos:crear_caja

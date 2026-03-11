@@ -1,7 +1,10 @@
 # Middleware que añade la empresa al request según el usuario logueado
 from __future__ import annotations
 
+from django.db.utils import OperationalError
 from django.shortcuts import redirect
+
+from taller.utils.login_exempt import is_login_exempt_path
 
 
 class EmpresaMiddleware:
@@ -18,11 +21,18 @@ class EmpresaMiddleware:
 
     def __call__(self, request):
         request.empresa = None
+        request.company = None
+        request.country = None
 
         if getattr(request, "user", None) is not None and request.user.is_authenticated:
             try:
-                # Asumiendo relación OneToOne/ForeignKey desde User -> Empresa
+                # Asumiendo relación OneToOne/ForeignKey desde User -> Empresa.
+                # OperationalError (ej. columna is_trial faltante) no debe devolver 500.
                 request.empresa = getattr(request.user, "empresa", None)
+                request.company = request.empresa
+                request.country = (
+                    getattr(request.empresa, "pais", None) if request.empresa else None
+                )
 
                 # Verificar si la suscripción está vencida
                 if (
@@ -32,32 +42,31 @@ class EmpresaMiddleware:
                 ):
                     return redirect("suspension")
 
-            except Exception:
-                # Evita romper todo el request por un edge case.
+            except (Exception, OperationalError):
+                # Evita 500 por DB desactualizada (ej. is_trial faltante) u otros edge cases.
                 request.empresa = None
+                request.company = None
+                request.country = None
 
         return self.get_response(request)
 
     def is_exempt_url(self, path: str) -> bool:
-        """URLs que no requieren suscripción activa"""
+        """URLs que no requieren suscripción activa (login vía helper común)"""
+        if is_login_exempt_path(path):
+            return True
 
-        # Rutas base (sin prefijos /cl/es/ o /us/en/ etc.)
         exempt_bases = [
             "/suspension/",
             "/accounts/logout/",
-            "/accounts/login/",
             "/admin/",
-            "/analytics/",  # dashboard analytics
+            "/analytics/",
             "/static/",
             "/media/",
             "/comprobante-pago/",
             "/robots.txt",
             "/favicon.ico",
         ]
-
-        # Normaliza /<pais>/<idioma>/... -> /...
         norm = self._strip_country_locale_prefix(path)
-
         return any(path.startswith(u) for u in exempt_bases) or any(
             norm.startswith(u) for u in exempt_bases
         )

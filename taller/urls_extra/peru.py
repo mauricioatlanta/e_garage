@@ -4,6 +4,7 @@ Patrón: /pe/es/ seguido de las rutas específicas
 Usa TemplateView para no depender de vistas Python especiales
 """
 
+from django.shortcuts import redirect
 from django.urls import path
 from django.views.generic import RedirectView, TemplateView
 
@@ -43,6 +44,16 @@ urlpatterns = [
         "accounts/signup/",
         lambda r: signup_redirect(r, "pe"),
         name="account_signup_peru",
+    ),
+    # Redirect resto de accounts/* → /accounts/* (password reset, logout, etc.)
+    path(
+        "accounts/", lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))
+    ),
+    path(
+        "accounts/<path:rest>",
+        lambda r, rest: redirect(
+            "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
+        ),
     ),
     # Lista de clientes Perú
     path(

@@ -287,7 +287,7 @@ def signup_complete(request):
                         elif pais == "VE":
                             return redirect("/ve/es/dashboard/")
                         else:
-                            return redirect("/us/en/centro-operaciones-espacial/")
+                            return redirect("/us/centro-operaciones/")
                     else:
                         # Planes pagados: a página de pago
                         if pais == "BR":

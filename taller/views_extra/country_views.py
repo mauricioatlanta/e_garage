@@ -188,9 +188,9 @@ def dashboard_cl_view(request):
             from django.shortcuts import redirect
 
             if hasattr(request.user, "pais") and request.user.pais == "US":
-                return redirect("/us/centro-operaciones-espacial/")
+                return redirect("/us/centro-operaciones/")
             else:
-                return redirect("/cl/centro-operaciones-espacial/")
+                return redirect("/cl/es/centro-operaciones/")
         except:
             # Si no tiene empresa, crear una básica
             from taller.models.empresa import Empresa
@@ -202,9 +202,9 @@ def dashboard_cl_view(request):
             from django.shortcuts import redirect
 
             if hasattr(request.user, "pais") and request.user.pais == "US":
-                return redirect("/us/centro-operaciones-espacial/")
+                return redirect("/us/centro-operaciones/")
             else:
-                return redirect("/cl/centro-operaciones-espacial/")
+                return redirect("/cl/es/centro-operaciones/")
 
     # Si no está autenticado, mostrar página de bienvenida
     planes = [

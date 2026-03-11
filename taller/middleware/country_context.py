@@ -210,6 +210,7 @@ class CountryContextMiddleware(MiddlewareMixin):
         Detecta país desde configuración del usuario/empresa.
 
         Jerarquía:
+          0. Empresa activa en sesión (empresa_id)
           1. user.empresa.pais
           2. user.perfil.pais
         """
@@ -218,6 +219,20 @@ class CountryContextMiddleware(MiddlewareMixin):
             return None
 
         try:
+            # 0) Prioridad: empresa activa en sesión
+            empresa_id = request.session.get("empresa_id")
+            if empresa_id:
+                try:
+                    from taller.models import Empresa
+
+                    emp = Empresa.objects.filter(id=empresa_id).only("id", "pais").first()
+                    if emp and getattr(emp, "pais", None):
+                        pais = (emp.pais or "").strip().upper()
+                        if pais in (COUNTRY_CL, COUNTRY_US):
+                            return pais
+                except Exception:
+                    pass
+
             # Empresa tiene prioridad
             if hasattr(u, "empresa") and hasattr(u.empresa, "pais"):
                 pais = (u.empresa.pais or "").strip().upper()

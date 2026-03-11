@@ -42,11 +42,25 @@ class CountryLanguageMiddleware(MiddlewareMixin):
         user_country = None
         if hasattr(request, "user") and request.user.is_authenticated:
             try:
-                if hasattr(request.user, "empresa") and request.user.empresa:
-                    user_country = request.user.empresa.pais
-                elif hasattr(request.user, "perfilusuario") and request.user.perfilusuario:
-                    user_country = request.user.perfilusuario.pais
-            except:
+                # Prioridad: empresa activa en sesión
+                empresa_id = request.session.get("empresa_id")
+                if empresa_id:
+                    try:
+                        from taller.models import Empresa
+
+                        emp = Empresa.objects.filter(id=empresa_id).only("id", "pais").first()
+                        if emp:
+                            user_country = emp.pais
+                    except Exception:
+                        pass
+
+                # Fallback a user.empresa y perfilusuario
+                if user_country is None:
+                    if hasattr(request.user, "empresa") and request.user.empresa:
+                        user_country = request.user.empresa.pais
+                    elif hasattr(request.user, "perfilusuario") and request.user.perfilusuario:
+                        user_country = request.user.perfilusuario.pais
+            except Exception:
                 pass
 
         # Priorizar el país del usuario sobre la URL

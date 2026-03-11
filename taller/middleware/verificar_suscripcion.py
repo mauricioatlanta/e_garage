@@ -1,6 +1,8 @@
 from django.contrib import messages
 from django.shortcuts import redirect
 
+from taller.utils.login_exempt import is_login_exempt_path
+
 
 class VerificarSuscripcionMiddleware:
     """
@@ -10,11 +12,11 @@ class VerificarSuscripcionMiddleware:
     Redirige a una página de renovación/billing con mensaje informativo.
     """
 
-    # Rutas que están exentas del bloqueo (siempre accesibles)
+    # Rutas exentas (login vía helper común is_login_exempt_path)
     EXEMPT_URLS = [
         "/accounts/logout/",
-        "/accounts/login/",
         "/accounts/signup/",
+        "/accounts/password/",  # reset, change, etc.
         "/billing/",
         "/soporte/",
         "/help/",
@@ -23,6 +25,9 @@ class VerificarSuscripcionMiddleware:
         "/static/",
         "/media/",
         "/favicon.ico",
+        # APIs de documentos (GET): evitar redirect para que el formulario cargue número/repuestos
+        "/us/documentos/api/",
+        "/cl/documentos/api/",
     ]
 
     # Rutas que requieren suscripción activa pero muestran mensaje en lugar de bloquear
@@ -62,8 +67,16 @@ class VerificarSuscripcionMiddleware:
         return self.get_response(request)
 
     def _is_exempt_url(self, path):
-        """Verifica si la URL está en la lista de exenciones"""
-        return any(path.startswith(url) for url in self.EXEMPT_URLS)
+        """Verifica si la URL está en la lista de exenciones (login vía helper común)"""
+        if (path or "").rstrip("/") == "":
+            return True  # Raíz: landing selector de país
+        if is_login_exempt_path(path):
+            return True
+        if any(path.startswith(url) for url in self.EXEMPT_URLS):
+            return True
+        if "/documentos/api/" in path:
+            return True
+        return False
 
     def _is_warning_url(self, path):
         """Verifica si la URL requiere advertencia pero no bloqueo"""
