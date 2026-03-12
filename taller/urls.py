@@ -6,7 +6,9 @@ from taller.views_ingreso import (
     ingreso_centro,
     panel_ingreso_vehiculo,
 )
-from taller.views_extra.centro_trabajo import centro_trabajo, centro_trabajo_buscar
+
+centro_trabajo = ingreso_centro
+centro_trabajo_buscar = ingreso_buscar
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones,
