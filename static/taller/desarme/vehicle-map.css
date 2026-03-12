@@ -1,0 +1,279 @@
+/**
+ * Mapa Interactivo de Desarme - Estilos premium
+ * Dark-tech, acentos cyan, glass/blur
+ */
+
+/* Demo layout */
+.desarme-demo {
+  background: linear-gradient(180deg, #0f172a 0%, #020617 100%);
+}
+
+/* Header KPIs */
+.desarme-header .kpi-card {
+  min-width: 140px;
+  padding: 0.75rem 1rem;
+  background: rgba(30, 41, 59, 0.7);
+  border: 1px solid rgba(51, 65, 85, 0.6);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  transition: border-color 0.2s, transform 0.15s;
+}
+.desarme-header .kpi-card:hover {
+  border-color: rgba(34, 211, 238, 0.3);
+}
+.desarme-header .kpi-label {
+  font-size: 0.65rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+.desarme-header .kpi-value {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #f1f5f9;
+}
+.desarme-header .kpi-neutro .kpi-value { color: #22d3ee; }
+.desarme-header .kpi-positivo .kpi-value { color: #22c55e; }
+.desarme-header .kpi-negativo .kpi-value { color: #f87171; }
+
+.desarme-header .btn-action {
+  padding: 0.4rem 0.9rem;
+  background: rgba(34, 211, 238, 0.15);
+  border: 1px solid #22d3ee;
+  color: #22d3ee;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+.desarme-header .btn-action:hover {
+  background: rgba(34, 211, 238, 0.25);
+  color: #e0f2fe;
+}
+.desarme-header .btn-action-outline {
+  padding: 0.4rem 0.9rem;
+  background: transparent;
+  border: 1px solid #475569;
+  color: #94a3b8;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+.desarme-header .btn-action-outline:hover {
+  border-color: #64748b;
+  color: #e2e8f0;
+}
+.desarme-header .btn-action-outline.btn-danger:hover {
+  border-color: #f87171;
+  color: #fca5a5;
+}
+
+/* Mapa vistas */
+.mapa-vista.hidden {
+  display: none !important;
+}
+.mapa-vista.active {
+  display: block;
+}
+
+/* View tabs */
+.view-tab {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: 1px solid #334155;
+  color: #94a3b8;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.view-tab:hover {
+  border-color: #475569;
+  color: #e2e8f0;
+}
+.view-tab.active {
+  background: rgba(34, 211, 238, 0.12);
+  border-color: #22d3ee;
+  color: #22d3ee;
+}
+
+/* Legend dots */
+.dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.dot-unreviewed { background: #94a3b8; }
+.dot-available { background: #22c55e; }
+.dot-damaged { background: #ef4444; }
+.dot-scrap { background: #1e293b; border: 1px solid #475569; }
+.dot-reserved { background: #eab308; }
+.dot-sold { background: #3b82f6; }
+
+/* Drawer panel */
+.drawer-panel {
+  min-height: 320px;
+}
+.drawer-empty {
+  transition: opacity 0.2s;
+}
+.drawer-content {
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+
+.input-desarme {
+  padding: 0.5rem 0.75rem;
+  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #f1f5f9;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+.input-desarme:focus {
+  outline: none;
+  border-color: #22d3ee;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.2);
+}
+.input-desarme::placeholder {
+  color: #64748b;
+}
+
+.status-pill {
+  padding: 0.35rem 0.65rem;
+  background: transparent;
+  border: 1px solid #475569;
+  color: #94a3b8;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.status-pill:hover {
+  border-color: #64748b;
+  color: #e2e8f0;
+}
+.status-pill.active {
+  background: rgba(34, 211, 238, 0.15);
+  border-color: #22d3ee;
+  color: #22d3ee;
+}
+.status-pill[data-status="available"].active { border-color: #22c55e; color: #22c55e; }
+.status-pill[data-status="damaged"].active { border-color: #ef4444; color: #f87171; }
+.status-pill[data-status="scrap"].active { border-color: #64748b; color: #94a3b8; }
+.status-pill[data-status="reserved"].active { border-color: #eab308; color: #facc15; }
+.status-pill[data-status="sold"].active { border-color: #3b82f6; color: #60a5fa; }
+
+.btn-primary {
+  padding: 0.5rem 1rem;
+  background: #22d3ee;
+  border: none;
+  color: #0f172a;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-primary:hover {
+  background: #67e8f9;
+}
+.btn-outline {
+  padding: 0.5rem 0.9rem;
+  background: transparent;
+  border: 1px solid #22d3ee;
+  color: #22d3ee;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-outline:hover {
+  background: rgba(34, 211, 238, 0.1);
+}
+.btn-scrap {
+  padding: 0.5rem 0.9rem;
+  background: transparent;
+  border: 1px solid #64748b;
+  color: #94a3b8;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-scrap:hover {
+  border-color: #f87171;
+  color: #fca5a5;
+}
+
+.btn-close-drawer {
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+  background: none;
+  border: none;
+}
+
+/* Tooltip */
+.zone-tooltip {
+  position: fixed;
+  z-index: 9999;
+  padding: 0.5rem 0.75rem;
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid #334155;
+  border-radius: 8px;
+  color: #f1f5f9;
+  font-size: 0.85rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.15s, transform 0.15s;
+  max-width: 220px;
+}
+.zone-tooltip.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.zone-tooltip .tooltip-name { font-weight: 600; color: #22d3ee; }
+.zone-tooltip .tooltip-status { font-size: 0.75rem; color: #94a3b8; margin-top: 2px; }
+
+/* Estado pills (mapa desarme real) */
+#estado-pills .btn.active {
+  border-width: 2px;
+  font-weight: 600;
+}
+#estado-pills .btn[data-status="available"].active { border-color: #22c55e; color: #22c55e; }
+#estado-pills .btn[data-status="damaged"].active { border-color: #ef4444; color: #ef4444; }
+#estado-pills .btn[data-status="scrap"].active { border-color: #64748b; color: #94a3b8; }
+#estado-pills .btn[data-status="sold"].active { border-color: #3b82f6; color: #60a5fa; }
+#estado-pills .btn[data-status="reserved"].active { border-color: #eab308; color: #eab308; }
+#estado-pills .btn[data-status="unreviewed"].active { border-color: #94a3b8; color: #94a3b8; }
+
+/* Toast desarme */
+.toast-desarme {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  z-index: 9999;
+  opacity: 0;
+  transform: translateY(1rem);
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
+}
+.toast-desarme.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.toast-desarme.toast-success { background: #22c55e; color: #fff; }
+.toast-desarme.toast-error { background: #ef4444; color: #fff; }
+.toast-desarme.toast-info { background: #3b82f6; color: #fff; }
