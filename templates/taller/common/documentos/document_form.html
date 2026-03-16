@@ -5,136 +5,106 @@
 {% load country_url %}
 
 <style>
-/* ==================== ESTILOS OPTIMIZADOS - SIN !important ==================== */
-/* Usando colores personalizados de Tailwind config (neon-cyan, cyber-dark, etc.) */
+/* ==================== DOCUMENT FORM — PRO UI: proporciones, jerarquía, layout ==================== */
+/* Regla global dentro del workspace: inputs compactos, bordes sutiles, sin glow por defecto */
 
-/* Campos de formulario - Diseño limpio y profesional */
-.form-control, .form-select, input[type="text"], input[type="number"], input[type="date"], input[type="email"], input[type="tel"], textarea, select {
-  background-color: rgba(5, 5, 20, 0.98);
-  border: 1px solid #00f2fe;
-  color: #ffffff;
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 16px;
-  font-weight: 500;
-  font-family: 'Montserrat', 'Segoe UI', 'Arial', sans-serif;
-  transition: all 0.2s ease;
-  box-shadow: 0 0 8px rgba(0, 242, 254, 0.2), inset 0 1px 3px rgba(0, 0, 0, 0.3);
-  letter-spacing: 0.2px;
+#doc-shell {
+  --doc-input-h: 34px;
+  --doc-input-pad: 6px 10px;
+  --doc-input-fs: 14px;
+  --doc-border: 1px solid rgba(71, 85, 105, 0.6);
+  --doc-border-focus: 1px solid rgba(100, 116, 139, 0.9);
+  --doc-bg-input: rgba(30, 41, 59, 0.7);
 }
 
-/* Focus state - Neón solo cuando está activo (UX mejorada) */
-.form-control:focus, .form-select:focus, input[type="text"]:focus, input[type="number"]:focus, input[type="date"]:focus, input[type="email"]:focus, input[type="tel"]:focus, textarea:focus, select:focus {
-  background-color: rgba(10, 10, 30, 1);
-  border-color: #00ffff;
-  border-width: 1px;
-  box-shadow: 0 0 12px rgba(0, 255, 255, 0.5), inset 0 1px 3px rgba(0, 0, 0, 0.3), 0 0 0 2px rgba(0, 255, 255, 0.15);
-  outline: none;
-  color: #ffffff;
+/* 1. INPUTS COMPACTOS (34px, 6px 10px, 14px) */
+#doc-shell input:not([type="checkbox"]):not([type="radio"]),
+#doc-shell select,
+#doc-shell textarea,
+#doc-shell .form-control,
+#doc-shell .form-select {
+  min-height: var(--doc-input-h) !important;
+  height: auto !important;
+  padding: var(--doc-input-pad) !important;
+  font-size: var(--doc-input-fs) !important;
+  background: var(--doc-bg-input) !important;
+  border: var(--doc-border) !important;
+  border-radius: 6px !important;
+  color: #e2e8f0 !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease;
+}
+#doc-shell input:focus,
+#doc-shell select:focus,
+#doc-shell textarea:focus {
+  outline: none !important;
+  border: var(--doc-border-focus) !important;
+  box-shadow: 0 0 0 2px rgba(71, 85, 105, 0.25) !important;
+}
+#doc-shell label { font-size: 12px; margin-bottom: 4px; color: #94a3b8; }
+
+/* Observaciones: compactas pero editables */
+#doc-shell textarea[name="observaciones"],
+#doc-shell #id_observaciones {
+  min-height: 64px !important;
+  max-height: 120px !important;
+  resize: vertical !important;
 }
 
-/* Placeholders - Legibles pero sutiles */
-.form-control::placeholder, input::placeholder, textarea::placeholder {
-  color: rgba(150, 200, 255, 0.5);
-  opacity: 1;
-  font-weight: 400;
-  font-style: italic;
+/* 2. JERARQUÍA: secciones bien separadas (1 Header, 2 Client/Vehicle, 3 Parts/Services, 4 Totals) */
+.doc-shell-workspace > .doc-console-header { margin-bottom: 1rem; }
+.doc-shell-workspace > .grid { margin-bottom: 0.5rem; }
+.doc-shell-workspace .doc-smart-card,
+.doc-shell-workspace .totales-cockpit {
+  border: var(--doc-border);
+  box-shadow: none;
 }
 
-/* Opciones de select - Contraste adecuado */
-select option {
-  background-color: #000000;
-  color: #ffffff;
-  padding: 12px;
-  font-weight: 500;
-  font-size: 15px;
+/* Layout horizontal: 2 columnas desde 768px (md) */
+.doc-shell-workspace .grid.grid-cols-1.md\:grid-cols-2 {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .doc-shell-workspace .grid.grid-cols-1.md\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-select option:hover, select option:checked {
-  background-color: #00f2fe;
-  color: #000000;
-}
+.doc-form-compact { max-width: 100%; width: 100%; }
 
-/* Checkboxes - Tamaño adecuado, neón solo en focus/checked */
-input[type="checkbox"] {
-  background-color: rgba(5, 5, 20, 0.98);
-  border: 1px solid #00f2fe;
-  border-radius: 4px;
-  width: 20px;
-  height: 20px;
-  accent-color: #00f2fe;
+/* Placeholders y selects: sutiles */
+#doc-shell input::placeholder,
+#doc-shell textarea::placeholder { color: #64748b; }
+#doc-shell select option { background: #1e293b; color: #e2e8f0; }
+#doc-shell input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: #64748b;
   cursor: pointer;
-  box-shadow: 0 0 4px rgba(0, 242, 254, 0.2);
-  transition: all 0.2s ease;
 }
 
-input[type="checkbox"]:checked {
-  background-color: #00f2fe;
-  box-shadow: 0 0 8px rgba(0, 242, 254, 0.5);
-  border-color: #ffffff;
+/* Subtotales y dropdowns: compactos, sin glow */
+#doc-shell .subtotal-field {
+  min-height: var(--doc-input-h); padding: var(--doc-input-pad);
+  font-size: 13px; font-weight: 600; text-align: right;
+  background: var(--doc-bg-input); border: var(--doc-border); border-radius: 6px;
 }
-
-/* Campos de subtotal - Legibles sin exceso */
-.subtotal-field {
-  background-color: rgba(5, 5, 20, 0.98);
-  border: 1px solid #00f2fe;
-  color: #ffffff;
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-weight: 600;
-  font-size: 16px;
+#doc-shell .cliente-item {
+  padding: 8px 10px; font-size: 13px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.4);
 }
+#doc-shell .cliente-item:hover { background: rgba(51, 65, 85, 0.5); cursor: pointer; }
 
-/* Dropdowns de resultados - Interacción clara */
-.cliente-item, .srv-dropdown {
-  background-color: rgba(5, 5, 20, 0.98);
-  border: 1px solid rgba(0, 242, 254, 0.4);
-  color: #ffffff;
-  padding: 12px;
-  transition: all 0.2s ease;
-  font-weight: 500;
-}
-
-.cliente-item:hover {
-  background-color: rgba(0, 242, 254, 0.2);
-  border-color: #00ffff;
-  cursor: pointer;
-  transform: translateX(2px);
-  box-shadow: 0 0 8px rgba(0, 242, 254, 0.4);
-}
-
-/* Labels - Title Case en lugar de UPPERCASE (menos fatiga visual) */
-label {
-  color: #a0d2ff;
-  font-weight: 600;
-  font-size: 14px;
-  letter-spacing: 0.3px;
-  text-transform: none;
-  margin-bottom: 6px;
-  display: block;
-}
-
-/* Labels importantes (como títulos de sección) pueden usar neón */
-label.text-cyan-200,
-label.text-cyan-300 {
-  color: #00d4e6;
-}
-
-/* Botones - Neón solo en CTA principal */
-.btn-primary, button[type="submit"] {
-  background: linear-gradient(135deg, #7f00ff, #00f2fe);
-  color: #ffffff;
-  font-weight: 700;
-  font-size: 16px;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
-  box-shadow: 0 0 12px rgba(0, 242, 254, 0.4);
-  border: 1px solid #00f2fe;
-  transition: all 0.2s ease;
-}
-
-.btn-primary:hover, button[type="submit"]:hover {
-  box-shadow: 0 0 16px rgba(0, 242, 254, 0.6);
-  transform: translateY(-1px);
+/* Botones: compactos */
+#doc-shell button:not(.totales-cockpit-save),
+#doc-shell .btn-secondary,
+#doc-shell .btn-cyan-gradient,
+#doc-shell .btn-green-gradient {
+  min-height: var(--doc-input-h) !important;
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  border: var(--doc-border) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
 }
 
 /* ==================== CLASES REUTILIZABLES PARA BOTONES ==================== */
@@ -189,6 +159,24 @@ label.text-cyan-300 {
   background: linear-gradient(to right, #10b981, #16a34a);
   border-color: rgba(34, 211, 238, 0.8);
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Themes for document types - doc-shell border/shadow */
+.theme-ot {
+  border-color: #00f2fe !important;
+  box-shadow: 0 0 32px 4px #00f2fe99, 0 0 0 1px #00f2fe !important;
+}
+.theme-fac {
+  border-color: #ff6b6b !important;
+  box-shadow: 0 0 32px 4px #ff6b6b99, 0 0 0 1px #ff6b6b !important;
+}
+.theme-pres {
+  border-color: #4ecdc4 !important;
+  box-shadow: 0 0 32px 4px #4ecdc499, 0 0 0 1px #4ecdc4 !important;
+}
+.theme-pts {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 32px 4px #f59e0b99, 0 0 0 1px #f59e0b !important;
 }
 
 @media (min-width: 640px) {
@@ -307,13 +295,14 @@ input:disabled, select:disabled, textarea:disabled {
     gap: 0.875rem;
   }
   
-  .description-field input,
-  .rep-search-container input,
-  .srv-input-container input,
-  .otr-search-container input {
-    padding: 12px 14px;
-    font-size: 15px;
-  }
+}
+
+#doc-shell .description-field input,
+#doc-shell .rep-search-container input,
+#doc-shell .srv-input-container input {
+  min-height: var(--doc-input-h) !important;
+  padding: var(--doc-input-pad) !important;
+  font-size: var(--doc-input-fs) !important;
 }
 
 /* Better spacing for labels in description fields */
@@ -407,6 +396,519 @@ input:disabled, select:disabled, textarea:disabled {
   box-shadow: 
     0 0 10px rgba(34, 211, 238, 0.4),
     0 0 0 2px rgba(34, 211, 238, 0.25);
+}
+
+/* ==================== FICHAS POR TÓPICOS - VISTA COMPACTA ==================== */
+.doc-ficha {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border: 1px solid rgba(0, 242, 254, 0.35);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 242, 254, 0.06);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.doc-ficha:hover {
+  border-color: rgba(0, 242, 254, 0.5);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35), 0 0 24px rgba(0, 242, 254, 0.1);
+}
+.doc-ficha-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #67e8f9;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+}
+.doc-ficha-body { padding: 0; }
+
+/* Fila documento + cliente: ancho al contenido, CERO espacio gigante */
+.doc-shell-compact .doc-fichas-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  width: max-content;
+  max-width: 100%;
+}
+.doc-shell-compact .doc-fichas-row .doc-ficha {
+  width: max-content;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.doc-shell-compact .doc-fichas-row .doc-ficha:first-child { max-width: 320px; }
+.doc-shell-compact .doc-fichas-row .doc-ficha:last-child { max-width: 480px; }
+/* Ficha Document: etiqueta | campo 160px fijo */
+.doc-fichas-row .doc-ficha:first-child .doc-ficha-body {
+  display: grid;
+  grid-template-columns: auto 160px;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+}
+.doc-fichas-row .doc-ficha:first-child .doc-ficha-body label { grid-column: 1; }
+.doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-control,
+.doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-select,
+.doc-fichas-row .doc-ficha:first-child .doc-ficha-body #id_numero { grid-column: 2; width: 160px !important; max-width: 160px !important; box-sizing: border-box !important; }
+/* Ficha Client & Vehicle: dos columnas (Cliente | Vehículo) como en referencia */
+.doc-ficha-body-two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem;
+  align-items: start;
+}
+.doc-ficha-body-two-cols .doc-client-info-full { grid-column: 1 / -1; }
+.doc-field-inline { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+.doc-field-with-btn { display: flex; align-items: center; gap: 0.35rem; min-width: 0; }
+.doc-field-with-btn .relative { flex: 1; min-width: 0; }
+.doc-field-with-btn select { flex: 1; min-width: 0; }
+@media (max-width: 600px) {
+  .doc-ficha-body-two-cols { grid-template-columns: 1fr; }
+}
+/* Anchos fijos en esta ficha */
+.doc-fichas-row .doc-ficha-client-vehicle #cliente-busqueda { width: 100% !important; max-width: 200px !important; }
+.doc-fichas-row .doc-ficha-client-vehicle .relative { width: 100% !important; max-width: 200px !important; }
+.doc-fichas-row .doc-ficha-client-vehicle #id_vehiculo { width: 100% !important; max-width: 220px !important; }
+.doc-fichas-row .doc-ficha:last-child .doc-ficha-body #cliente-busqueda { width: 100% !important; max-width: 200px !important; }
+.doc-fichas-row .doc-ficha:last-child .doc-ficha-body #id_vehiculo { width: 100% !important; max-width: 220px !important; }
+.doc-fichas-row .doc-ficha:last-child .doc-ficha-body .relative { width: 100% !important; max-width: 200px !important; }
+@media (max-width: 768px) {
+  .doc-shell-compact .doc-fichas-row {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+}
+
+/* Fila de Repuestos | Servicios en horizontal (2 cols cuando hay ambos) */
+.doc-parts-services-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.doc-parts-services-row .doc-ficha:only-child {
+  grid-column: 1 / -1;
+}
+@media (max-width: 900px) {
+  .doc-parts-services-row {
+    grid-template-columns: 1fr;
+  }
+}
+.doc-ficha-parts, .doc-ficha-services {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+}
+.doc-ficha-parts .doc-ficha-body, .doc-ficha-services .doc-ficha-body {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 280px;
+}
+#repuestos-container, #servicios-container {
+  padding: 0.25rem 0;
+}
+#otros-container {
+  padding: 0.25rem 0;
+}
+.doc-ficha-otros {
+  margin-bottom: 0.75rem;
+}
+.doc-ficha-otros .doc-ficha-body { max-height: 200px; overflow-y: auto; }
+
+/* Botones de acción dentro de cada ficha */
+.doc-ficha .ficha-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+.doc-ficha .ficha-actions .btn-secondary, .doc-ficha .ficha-actions .btn-green-gradient {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+}
+
+/* Campos compactos dentro de fichas (evitar que queden enormes) */
+#doc-shell .doc-ficha .form-control,
+#doc-shell .doc-ficha .form-select,
+#doc-shell .doc-ficha input[type="text"],
+#doc-shell .doc-ficha input[type="number"],
+#doc-shell .doc-ficha input[type="date"],
+#doc-shell .doc-ficha select {
+  padding: 5px 8px;
+  font-size: 13px;
+  min-height: 32px;
+}
+#doc-shell .doc-ficha label {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+#doc-shell .doc-ficha .observaciones-card textarea {
+  min-height: 32px;
+  max-height: 64px;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+/* Ancho tipo ~20 caracteres en fichas Document y Client & Vehicle (no cajas gigantes) */
+#doc-shell .doc-fichas-row .doc-ficha .form-control,
+#doc-shell .doc-fichas-row .doc-ficha .form-select,
+#doc-shell .doc-fichas-row .doc-ficha input[type="text"],
+#doc-shell .doc-fichas-row .doc-ficha input[type="date"],
+#doc-shell .doc-fichas-row .doc-ficha select,
+#doc-shell .doc-fichas-row .doc-ficha #id_numero {
+  width: 22ch;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+/* Búsqueda de cliente un poco más ancha para leer "Type to search..." */
+#doc-shell .doc-fichas-row #cliente-busqueda {
+  width: 26ch;
+  max-width: 100%;
+}
+/* Select de vehículo (puede tener patente + modelo) */
+#doc-shell .doc-fichas-row #id_vehiculo {
+  width: 28ch;
+  max-width: 100%;
+}
+
+/* Ficha Operación: campos también ~20 caracteres */
+#doc-shell .doc-ficha-operation .form-control,
+#doc-shell .doc-ficha-operation .form-select,
+#doc-shell .doc-ficha-operation input[type="text"],
+#doc-shell .doc-ficha-operation input[type="number"],
+#doc-shell .doc-ficha-operation select {
+  width: 22ch;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+#doc-shell .doc-ficha-operation .observaciones-card {
+  max-width: 100%;
+}
+#doc-shell .doc-ficha-operation .observaciones-card textarea {
+  width: 100%;
+  max-width: 42ch;
+}
+
+/* Pie de boleta: detalle del cobro ordenado (estilo boleta convencional) */
+.receipt-totals {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  border-radius: 10px;
+  padding: 12px 16px;
+  max-width: 360px;
+  margin-left: auto;
+}
+.receipt-totals-apply-tax {
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(0, 242, 254, 0.25);
+}
+.receipt-totals-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.receipt-totals-table tbody tr {
+  border-bottom: 1px solid rgba(0, 242, 254, 0.12);
+}
+.receipt-totals-table tbody tr:last-child {
+  border-bottom: none;
+}
+.receipt-label {
+  padding: 4px 0;
+  color: #94a3b8;
+  font-weight: 500;
+  text-align: left;
+  vertical-align: middle;
+}
+.receipt-value {
+  padding: 4px 0;
+  text-align: right;
+  color: #e2e8f0;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.receipt-total-row {
+  border-top: 2px solid rgba(0, 242, 254, 0.4) !important;
+  margin-top: 4px;
+}
+.receipt-total-row .receipt-total-label {
+  padding-top: 8px;
+  font-weight: 700;
+  color: #f1f5f9;
+  font-size: 14px;
+}
+.receipt-total-row .receipt-total-value {
+  padding-top: 8px;
+  font-weight: 700;
+  color: #67e8f9;
+  font-size: 15px;
+}
+
+/* Errores de validación compactos */
+.doc-form-validation-errors {
+  background: rgba(127, 29, 29, 0.25);
+  border: 1px solid rgba(248, 113, 113, 0.5);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.doc-form-validation-title {
+  color: #fca5a5;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.doc-form-validation-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #fecaca;
+  line-height: 1.4;
+}
+.doc-form-validation-list li { margin-bottom: 2px; }
+.doc-form-validation-list li:last-child { margin-bottom: 0; }
+
+/* ==================== CABECERA TIPO CONSOLA PREMIUM ==================== */
+.doc-console-header {
+  background: rgba(15, 23, 42, 0.9);
+  border: var(--doc-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 0;
+}
+.doc-console-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #94a3b8;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.doc-console-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  font-size: 13px;
+}
+.doc-console-row2 {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(71, 85, 105, 0.4);
+  font-size: 12px;
+}
+.doc-console-row2 label { margin-bottom: 0; margin-right: 2px; }
+.doc-console-inv {
+  font-family: ui-monospace, monospace;
+  font-weight: 700;
+  color: #94a3b8;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+.doc-console-meta {
+  color: rgba(148, 163, 184, 0.95);
+  font-size: 12px;
+}
+.doc-console-payment { font-weight: 600; }
+.doc-console-payment.pending,
+.doc-console-payment.doc-console-payment-pending { color: #fbbf24; }
+.doc-console-payment.paid,
+.doc-console-payment.doc-console-payment-paid { color: #34d399; }
+.doc-console-payment.partial,
+.doc-console-payment.doc-console-payment-partial { color: #38bdf8; }
+.doc-console-header select {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: inherit;
+  min-width: 100px;
+}
+.doc-console-header select:focus { outline: none; border-color: rgba(6, 182, 212, 0.5); }
+#payment-status-badge select { color: inherit; font-weight: 600; cursor: pointer; }
+
+/* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÍCULO ==================== */
+.doc-smart-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: var(--doc-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.doc-smart-card h3 {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.doc-smart-summary {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(71, 85, 105, 0.4);
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.45;
+}
+.doc-smart-summary .name { font-weight: 600; color: #e2e8f0; }
+.doc-smart-summary .detail { color: #64748b; }
+.doc-smart-summary .meta { font-size: 11px; color: #475569; margin-top: 2px; }
+.doc-smart-card textarea {
+  min-height: 64px;
+  background: var(--doc-bg-input);
+  border: var(--doc-border);
+  border-radius: 6px;
+  padding: var(--doc-input-pad);
+  font-size: var(--doc-input-fs);
+  color: #e2e8f0;
+  resize: vertical;
+}
+.doc-smart-card textarea:focus {
+  outline: none;
+  border: var(--doc-border-focus);
+  box-shadow: 0 0 0 2px rgba(71, 85, 105, 0.2);
+}
+
+/* ==================== PANEL TOTALES (jerarquía clara, sin glow) ==================== */
+.totales-cockpit {
+  background: rgba(15, 23, 42, 0.7);
+  border: var(--doc-border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  box-shadow: none;
+}
+.totales-cockpit-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #94a3b8;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+.totales-cockpit .cockpit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.35);
+}
+.totales-cockpit .cockpit-row:last-of-type { border-bottom: none; }
+.totales-cockpit .cockpit-label { color: #94a3b8; }
+.totales-cockpit .cockpit-value { font-weight: 600; color: #e2e8f0; white-space: nowrap; }
+.totales-cockpit-divider {
+  height: 1px;
+  background: rgba(71, 85, 105, 0.6);
+  margin: 10px 0 12px 0;
+}
+.totales-cockpit-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0 16px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #10b981;
+}
+.totales-cockpit-save {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  background: #059669;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.totales-cockpit-save:hover { background: #047857; }
+
+/* ==================== TABLA REAL: Code | Part name | Qty | Price | Total | [x] ==================== */
+.doc-pos-section { margin-bottom: 0.75rem; }
+.doc-pos-header {
+  display: grid;
+  gap: 6px 8px;
+  padding: 6px 8px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+  align-items: center;
+}
+#repuestos-container .doc-pos-header { grid-template-columns: 70px 1fr 50px 70px 70px 36px; }
+.doc-pos-header-services { grid-template-columns: 1fr 50px 70px 70px 36px; }
+/* Repuestos: 6 celdas visibles (code, name, qty, price, subtotal, remove); cost hidden */
+#repuestos-container .dynamic-element > div {
+  display: grid !important;
+  grid-template-columns: 70px 1fr 50px 70px 70px 36px;
+  gap: 6px 8px;
+  padding: 6px 8px !important;
+  align-items: center;
+  min-height: 36px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+#repuestos-container .dynamic-element input,
+#repuestos-container .dynamic-element .form-control,
+#repuestos-container .dynamic-element .rep-subtotal-view {
+  min-height: 28px !important;
+  padding: 4px 6px !important;
+  font-size: 13px !important;
+}
+#repuestos-container .dynamic-element .rep-search-container,
+#repuestos-container .dynamic-element .description-field { min-width: 0; }
+#repuestos-container .dynamic-element label { display: none !important; }
+/* Servicios: 5 celdas (name, qty, price, subtotal, remove) */
+#servicios-container .dynamic-element > div {
+  display: grid !important;
+  grid-template-columns: 1fr 50px 70px 70px 36px;
+  gap: 6px 8px;
+  padding: 6px 8px !important;
+  align-items: center;
+  min-height: 36px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+#servicios-container .dynamic-element input,
+#servicios-container .dynamic-element .form-control {
+  min-height: 28px !important;
+  padding: 4px 6px !important;
+  font-size: 13px !important;
+}
+#servicios-container .dynamic-element label { display: none !important; }
+#otros-container .dynamic-element > div {
+  padding: 6px 8px !important;
+  min-height: 34px;
+  margin-bottom: 4px;
+  border: var(--doc-border);
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.06);
+}
+#otros-container .dynamic-element input { min-height: 28px !important; padding: 4px 6px !important; font-size: 13px !important; }
+@media (max-width: 768px) {
+  .doc-pos-header { display: none !important; }
+  #repuestos-container .dynamic-element > div,
+  #servicios-container .dynamic-element > div {
+    grid-template-columns: 1fr !important;
+    padding: 10px !important;
+  }
+  #repuestos-container .dynamic-element label,
+  #servicios-container .dynamic-element label { display: block !important; }
 }
 </style>
 
@@ -683,8 +1185,9 @@ function submitLanguageDoc(lang) {
 {# ✅ Manejo robusto de company_country con múltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-        <form method="post" id="document-form" class="max-w-7xl mx-auto"
+        <form method="post" id="document-form" class="doc-form-compact mx-auto"
               data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
+              data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
               data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
               data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
               data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' app_namespace='' %}"
@@ -692,13 +1195,15 @@ function submitLanguageDoc(lang) {
               data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
               data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
               data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
-              data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}">
+              data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}"
+              data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
           {% csrf_token %}
 
-  <!-- System messages - Design System -->
+  <!-- System messages - Design System (no mostrar mensajes de otras secciones: login, clientes eliminados, etc.) -->
   {% if messages %}
     {% for message in messages %}
-      {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Ha iniciado sesión exitosamente" not in message|stringformat:"s" and "Ha cerrado sesión" not in message|stringformat:"s" and "iniciado sesión exitosamente" not in message|stringformat:"s" and "cerrado sesión" not in message|stringformat:"s" and "Logo actualizado exitosamente" not in message|stringformat:"s" and "Tema y colores guardados exitosamente" not in message|stringformat:"s" and "Logo subido exitosamente" not in message|stringformat:"s" and "actualizada exitosamente" not in message|stringformat:"s" %}
+      {% with msg_text=message|stringformat:"s" %}
+      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesión exitosamente" not in msg_text and "Ha cerrado sesión" not in msg_text and "iniciado sesión exitosamente" not in msg_text and "cerrado sesión" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
         {% if message.tags == 'success' %}
         <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
           <span class="text-2xl flex-shrink-0">✅</span>
@@ -716,254 +1221,202 @@ function submitLanguageDoc(lang) {
         </div>
         {% endif %}
       {% endif %}
+      {% endwith %}
     {% endfor %}
   {% endif %}
 
-  <!-- Validation errors - Design System -->
+  <!-- Validation errors - compacto y legible -->
   {% if form.errors %}
-    <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-start gap-3">
-      <span class="text-2xl flex-shrink-0">❌</span>
-      <div class="flex-1">
-        <p class="text-sm sm:text-base text-red-200 font-semibold mb-1">{% trans "Validation errors" %}:</p>
-        <div class="text-sm text-red-300">{{ form.errors }}</div>
-      </div>
+    <div class="doc-form-validation-errors">
+      <p class="doc-form-validation-title">{% trans "Validation errors" %}</p>
+      <ul class="doc-form-validation-list">
+        {% for field, errors in form.errors.items %}
+          {% for msg in errors %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
     </div>
   {% endif %}
 
-  <!-- Document shell with dynamic theme -->
-  <div id="doc-shell" class="rounded-2xl p-4 sm:p-6 theme-ot border-2 shadow-lg">
+  <!-- Document workspace — cabecera consola | tarjetas cliente/vehículo | repuestos/servicios POS | observaciones | totales cockpit -->
+  <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
 
-    <!-- Document header -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
-
-      <!-- Columna 1: FECHA primero + TIPO + NÚMERO -->
-      <div class="space-y-3 sm:space-y-4">
-                <label for="id_fecha_emision" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Issue Date" %}</label>
-                <input id="id_fecha_emision" type="date" name="fecha_emision" class="form-control w-full text-base"
-                       value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
-
-        <label for="id_tipo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Document Type" %}</label>
-        {{ form.tipo }}
-
-        <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{{ ui_labels.document_number }}</label>
-        <div class="form-control w-full bg-gray-800 text-cyan-300 font-mono text-center py-2 sm:py-3 text-sm sm:text-base" id="id_numero">
-          {% if es_edicion and documento.numero_documento %}{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}{% trans "Will be generated automatically" %}{% endif %}
-        </div>
+    <!-- 1. CABECERA COMPACTA — fila 1: INV | Fecha | Mecánico | Pago | fila 2: Tipo | Operación -->
+    <div class="doc-console-header">
+      <div class="doc-console-title">{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</div>
+      <div class="doc-console-line doc-console-row1">
+        <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
+          {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}—{% endif %}
+        </span>
+        <label for="id_fecha_emision" class="sr-only">{% trans "Date" %}</label>
+        <input id="id_fecha_emision" type="date" name="fecha_emision" class="doc-console-meta bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
+               value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}" style="max-width: 130px;">
+        {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+        <label id="tecnico-label" for="id_tecnico_responsable" class="sr-only" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
+        <span class="doc-console-meta" style="min-width: 110px;">{{ form.tecnico_responsable }}</span>
+        {% endwith %}
+        <span id="payment-status-badge" class="doc-console-payment doc-console-payment-pending">{{ form.payment_status }}</span>
       </div>
+      <div class="doc-console-line doc-console-row2">
+        <label for="id_tipo" class="doc-console-meta text-xs">{% trans "Document Type" %}</label>
+        {{ form.tipo }}
+        <label for="doc_mode" class="doc-console-meta text-xs">{% trans "Operation" %}</label>
+        <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300" style="min-width: 100px;">
+          <option value="services">{% trans "Services" %}</option>
+          <option value="parts">{% trans "Part sale only" %}</option>
+        </select>
+      </div>
+    </div>
 
-      <!-- Columna 2: Cliente/Vehículo -->
-      <div class="space-y-3 sm:space-y-4">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-          <label class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Client" %}</label>
-          <button type="button" id="btn-nuevo-cliente" class="btn-green-gradient">
-            ➕ {% trans "New Client" %}
-          </button>
-        </div>
+    <!-- 2. CLIENT | VEHICLE (layout horizontal en md+) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="doc-smart-card doc-ficha-client-vehicle">
+        <h3>{% trans "CLIENT" %}</h3>
         <div class="relative">
-          <input type="text" id="cliente-busqueda" class="form-control w-full"
-                 placeholder="{% trans 'Type to search clients...' %}"
+          <input type="text" id="cliente-busqueda" class="w-full bg-slate-800 p-2 rounded border border-slate-600 text-white text-sm"
+                 placeholder="{% trans 'Search client' %}"
                  autocomplete="off"
                  oninput="window.handleClienteInput?.(this.value)"
                  onfocus="window.handleClienteFocus?.(this.value)"
                  onkeydown="return window.handleClienteKeydown?.(event)">
-          <div id="cliente-resultados" class="absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+          <div id="cliente-resultados" class="absolute z-50 w-full bg-slate-800 border border-slate-600 rounded shadow-lg hidden max-h-48 overflow-y-auto text-sm mt-1"></div>
         </div>
-
-        <select id="id_cliente" name="cliente" class="form-select w-full hidden">
+        <button type="button" id="btn-nuevo-cliente" class="mt-2 text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white">+ {% trans "New client" %}</button>
+        <select id="id_cliente" name="cliente" class="hidden">
           <option value="">{% trans "Select client..." %}</option>
         </select>
-
-        <!-- Selected client information -->
-        <div id="cliente-info" class="hidden p-3 bg-cyan-900/20 border border-cyan-400 rounded-lg">
-          <div class="text-cyan-200">
-            <strong id="cliente-nombre"></strong><br>
-            <span id="cliente-email"></span><br>
-            <span id="cliente-telefono"></span>
-          </div>
+        <div id="cliente-info" class="doc-smart-summary hidden">
+          <div class="name" id="cliente-nombre"></div>
+          <div class="detail" id="cliente-telefono"></div>
+          <div class="detail" id="cliente-email"></div>
+          <div class="meta" id="cliente-ultima-visita"></div>
         </div>
-
-        {% if ui_config.show_vehicle %}
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 sm:gap-0">
-          <label for="id_vehiculo" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Vehicle" %}</label>
-          <button type="button" id="btn-nuevo-vehiculo" class="btn-green-gradient">
-            ➕ {% trans "New" %}
-          </button>
-        </div>
-        {{ form.vehiculo }}
-        {% endif %}
       </div>
-
-      <!-- Columna 3: Técnico + Payment Status + Kilometraje -->
-      <div class="space-y-3 sm:space-y-4">
-        {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
-        <label for="id_tecnico_responsable" class="block text-cyan-200 font-semibold text-sm sm:text-base">
-          {{ current_label }}
-        </label>
-        {{ form.tecnico_responsable }}
-        {% endwith %}
-
-        <label for="id_payment_status" class="block text-cyan-200 font-semibold text-sm sm:text-base">{% trans "Payment Status" %}</label>
-        {{ form.payment_status }}
-
-        {% if ui_config.show_kilometraje %}
-        <div class="flex flex-col gap-2">
-          <label for="{{ form.kilometraje.id_for_label }}" class="block text-cyan-200 font-semibold text-sm sm:text-base">
-            {% trans "Mileage" %} 
-            {% get_current_language as lang %}
-            {% if lang == 'es' %}(km){% else %}(mi){% endif %}
-          </label>
-          <div class="relative">
-            {{ form.kilometraje }}
-            <span class="absolute right-3 top-1/2 -translate-y-1/2 text-cyan-300 font-semibold pointer-events-none">
-              {% get_current_language as lang %}
-              {% if lang == 'es' %}km{% else %}mi{% endif %}
-            </span>
+      <div class="doc-smart-card" id="vehicle-section">
+        <h3>{% trans "VEHICLE" %}</h3>
+        {% if ui_config.show_vehicle %}
+        <div class="tipo-dependent-vehicle">
+          <div class="doc-field-with-btn flex gap-2">
+            <div class="flex-1">{{ form.vehiculo }}</div>
+            <button type="button" id="btn-nuevo-vehiculo" class="text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white flex-shrink-0">+</button>
           </div>
-          {% if form.kilometraje.errors %}
-            <div class="text-red-400 text-xs italic mt-1 bg-red-900/20 p-2 rounded border border-red-500/50">
-              {{ form.kilometraje.errors.0 }}
-            </div>
-          {% endif %}
         </div>
         {% endif %}
+        {% if 'kilometraje_ingreso' in form.fields %}
+        <div id="miles-section" class="tipo-dependent-miles flex flex-wrap items-center gap-2 mt-2">
+          <span class="text-xs text-slate-400">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% trans "Mileage" %}{% endif %}</span>
+          <div class="flex-1 min-w-0 max-w-[7rem]">{{ form.kilometraje_ingreso }}</div>
+          <span class="text-xs text-slate-500">{% get_current_language as lang %}{% if lang == 'es' %}km{% else %}mi{% endif %}</span>
+        </div>
+        {% if form.kilometraje_ingreso.errors %}
+        <div class="text-red-400 text-xs">{{ form.kilometraje_ingreso.errors.0 }}</div>
+        {% endif %}
+        {% endif %}
+        <div id="vehiculo-info" class="doc-smart-summary hidden">
+          <div class="name" id="vehiculo-marca-modelo"></div>
+          <div class="detail" id="vehiculo-ano-vin"></div>
+          <div class="detail" id="vehiculo-mileage"></div>
+          <div class="meta" id="vehiculo-ultima-entrada"></div>
+        </div>
       </div>
     </div>
 
-    <!-- Dynamic sections -->
-    <div class="space-y-4 sm:space-y-6">
-      <div class="seccion-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
-        <h3 class="text-lg sm:text-xl font-semibold text-cyan-300 mb-4 flex items-center gap-2">🔧 {% trans "Parts & Services" %}</h3>
-        <div class="flex flex-col sm:flex-row gap-3 sm:gap-4 mb-6">
-          {% if ui_config.show_repuestos %}
-          <button type="button" id="add-repuesto" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addRepuestoRow()">+ {% trans "Add Part" %}</button>
-          {% endif %}
-          {% if ui_config.show_services %}
-          <button type="button" id="add-servicio" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addServicioRow()">+ {% trans "Add Service" %}</button>
-          {% endif %}
-          {% if ui_config.show_otros_servicios %}
-          <button type="button" id="add-otro" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto" onclick="addOtroRow()">+ {% trans "Add Other Services" %}</button>
-          {% endif %}
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="btn-secondary py-2 px-4 text-sm sm:text-base w-full sm:w-auto text-center">
-            🌐 {% trans "Go to Other Services" %}
-          </a>
+    <!-- 3. PARTS | SERVICES (tabla compacta) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {% if ui_config.show_repuestos %}
+      <div class="doc-smart-card doc-ficha-parts doc-pos-section">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
+          <div class="flex gap-1">
+            <button type="button" id="add-repuesto" class="text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white" onclick="addRepuestoRow()">+ {% trans "ADD" %}</button>
+            <button type="button" id="add-used-parts" class="text-xs bg-amber-600 hover:bg-amber-500 px-2 py-1 rounded text-white" onclick="openUsedPartsModal()">🧩 {% trans "Used" %}</button>
+          </div>
         </div>
-
-        <!-- Parts container -->
-        {% if ui_config.show_repuestos %}
-        <div id="repuestos-container" class="space-y-4">
-          <!-- Dynamic parts will be added here -->
+        <div class="doc-pos-header hidden sm:grid">
+          <span>{% trans "Code" %}</span><span>{% trans "Part name" %}</span><span>{% trans "Qty" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
         </div>
-        {% endif %}
-
-        <!-- Services container -->
-        {% if ui_config.show_services %}
-        <div id="servicios-container" class="space-y-4">
-          <!-- Dynamic services will be added here -->
+        <div id="repuestos-container" class="space-y-2 min-h-[80px]">
+          <!-- Dynamic parts rows -->
         </div>
-        {% endif %}
-
-        <!-- Other services container -->
-        {% if ui_config.show_otros_servicios %}
-        <div id="otros-container" class="space-y-4">
-          <!-- Dynamic other services will be added here -->
-        </div>
-        {% endif %}
       </div>
+      {% endif %}
+      {% if ui_config.show_services %}
+      <div class="doc-smart-card doc-ficha-services doc-pos-section">
+        <div class="flex justify-between items-center mb-3">
+          <h3 class="!mb-0">{% trans "SERVICES" %} / {% trans "OTHER SERVICES" %}</h3>
+          <button type="button" id="add-servicio" class="text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white" onclick="addServicioRow()">+ {% trans "ADD" %}</button>
+        </div>
+        <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
+          <span>{% trans "Service" %}</span><span>{% trans "Qty" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+        </div>
+        <div id="servicios-container" class="space-y-2 min-h-[80px]">
+          <!-- Dynamic services rows -->
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% if ui_config.show_otros_servicios %}
+    <div class="doc-smart-card doc-ficha-otros doc-pos-section">
+      <div class="flex justify-between items-center mb-2">
+        <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
+        <div class="flex gap-1">
+          <button type="button" id="add-otro" class="text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white" onclick="addOtroRow()">+ {% trans "ADD" %}</button>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="text-xs bg-slate-600 hover:bg-slate-500 px-2 py-1 rounded text-white">🌐</a>
+        </div>
+      </div>
+      <div id="otros-container" class="space-y-2 min-h-[60px]">
+        <!-- Dynamic other services rows -->
+      </div>
+    </div>
+    {% endif %}
 
-      <!-- Observations -->
-      <div class="observaciones-card bg-slate-900/60 border border-slate-700/80 rounded-2xl p-4 sm:p-6 shadow-lg">
-        <label for="id_observaciones" class="block text-cyan-200 font-semibold text-sm sm:text-base mb-3">{% trans "Observations" %}</label>
+    <!-- 4. NOTES | TOTALES (panel claro) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="doc-smart-card order-2 md:order-1">
+        <h3>{% trans "NOTES" %}</h3>
         {{ form.observaciones }}
       </div>
-    </div>
-
-    <!-- Totals Section - Mejorada y reorganizada -->
-    <div class="totales-section mt-6 sm:mt-8 pt-4 sm:pt-6 border-t-2 border-cyan-500/30">
-      <div class="bg-gradient-to-r from-cyan-900/30 to-blue-900/30 rounded-2xl p-4 sm:p-6 border border-cyan-400/50 shadow-lg">
-        <h3 class="text-xl sm:text-2xl font-bold text-cyan-300 mb-4 sm:mb-6 text-center">
-          💰 {% trans "Totals Summary" %}
-        </h3>
-        
-        {# Checkbox global de aplicar impuestos - Controla todos los checkboxes de tax_lines #}
+      <div class="totales-cockpit order-1 md:order-2 totales-panel">
+        <h3 class="totales-cockpit-title">{% trans "DOCUMENT TOTALS" %}</h3>
         {% if ui_config.tax_lines|length > 0 %}
-        <div class="mb-6 flex justify-center">
-          <label class="flex items-center text-cyan-200 bg-cyan-900/40 px-4 py-2 rounded-lg border border-cyan-400/50 cursor-pointer hover:bg-cyan-900/60 transition-all">
-            <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-2 w-5 h-5 accent-cyan-400 cursor-pointer" onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
-            <span class="font-semibold">{% trans "Apply all taxes" %}</span>
+        <div class="cockpit-row" style="border-bottom: none; padding-bottom: 4px;">
+          <label class="cockpit-label inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-1.5 w-3.5 h-3.5 accent-cyan-400" onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
+            <span>{% trans "Apply all taxes" %}</span>
           </label>
+          <span></span>
         </div>
         {% endif %}
-
-        <!-- Totals Grid - Estructura Dinámica Modular -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-          <!-- Parts Subtotal -->
-          {% if ui_config.show_repuestos %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
-            <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% trans "Parts Subtotal" %}</span>
-              <span id="t_repuestos" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
-            </div>
-          </div>
-          {% endif %}
-          
-          <!-- Services Subtotal -->
-          {% if ui_config.show_services %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
-            <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% trans "Services Subtotal" %}</span>
-              <span id="t_servicios" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
-            </div>
-          </div>
-          {% endif %}
-          
-          <!-- Other Services Subtotal -->
-          {% if ui_config.show_otros_servicios %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30">
-            <div class="flex justify-between items-center">
-              <span class="text-cyan-200 text-sm font-semibold">{% trans "Other Services Subtotal" %}</span>
-              <span id="t_otros" class="text-cyan-300 font-bold text-lg calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
-            </div>
-          </div>
-          {% endif %}
-          
-          {# Líneas de Impuestos Dinámicas - El template NO sabe qué es IVA o Sales Tax #}
-          {% for tax_line in ui_config.tax_lines %}
-          <div class="bg-black/40 rounded-lg p-4 border border-cyan-400/30 tax-line" data-tax-id="{{ tax_line.id }}">
-            <div class="flex justify-between items-center">
-              <label class="flex items-center text-cyan-200 text-sm font-semibold cursor-pointer">
-                <input type="checkbox" 
-                       id="include_{{ tax_line.id }}" 
-                       checked 
-                       class="mr-2 w-4 h-4 accent-cyan-400 cursor-pointer tax-checkbox"
-                       data-tax-id="{{ tax_line.id }}"
-                       data-tax-rate="{{ tax_line.rate }}">
-                <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
-              </label>
-              <span id="t_{{ tax_line.id }}" class="text-cyan-300 font-bold text-lg calculated-field" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
-            </div>
-          </div>
-          {% endfor %}
+        <div class="cockpit-row"><span class="cockpit-label">{% trans "Parts" %}</span><span id="t_repuestos" class="cockpit-value calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></div>
+        {% if ui_config.show_services %}
+        <div class="cockpit-row"><span class="cockpit-label">{% trans "Services" %}</span><span id="t_servicios" class="cockpit-value calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></div>
+        {% endif %}
+        {% if ui_config.show_otros_servicios %}
+        <div class="cockpit-row"><span class="cockpit-label">{% trans "Other" %}</span><span id="t_otros" class="cockpit-value calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></div>
+        {% endif %}
+        {% for tax_line in ui_config.tax_lines %}
+        <div class="cockpit-row tax-line" data-tax-id="{{ tax_line.id }}">
+          <label class="cockpit-label inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="include_{{ tax_line.id }}" checked class="mr-1 w-3 h-3 accent-cyan-400 tax-checkbox" data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
+            <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
+          </label>
+          <span id="t_{{ tax_line.id }}" class="cockpit-value calculated-field" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
         </div>
-
-        <!-- Grand Total -->
-        <div class="bg-gradient-to-r from-cyan-600/30 to-blue-600/30 rounded-lg p-5 border-2 border-cyan-400 shadow-xl">
-          <div class="flex justify-between items-center">
-            <span class="text-white font-bold text-xl">{% trans "Grand Total" %}</span>
-            <span id="t_total" class="text-white font-bold text-2xl calculated-field readonly-total" data-calculated="true">{{ ui_config.currency_symbol|default:"$" }}0</span>
-          </div>
+        {% endfor %}
+        <div class="totales-cockpit-divider"></div>
+        <div class="totales-cockpit-total">
+          <span>{% trans "TOTAL" %}</span>
+          <span id="t_total" class="calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
+        </div>
+        <button type="submit" class="totales-cockpit-save">
+          {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
+        </button>
+        <div class="flex gap-2 mt-3">
+          <a href="{% country_url 'documentos:lista_documentos' %}" class="flex-1 text-center text-xs py-2 rounded bg-slate-700 hover:bg-slate-600 text-slate-200">← {% trans "Back" %}</a>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="text-xs py-2 px-3 rounded bg-slate-700 hover:bg-slate-600 text-slate-200">🌐</a>
         </div>
       </div>
-    </div>
-
-    <!-- Action buttons - Design System -->
-    <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 sm:gap-4 mt-6 sm:mt-8">
-      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-        <a href="{% country_url 'documentos:lista_documentos' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">← {% trans "Back" %}</a>
-        <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-slate-800/60 hover:bg-slate-700/60 border border-slate-600/50 text-slate-200 hover:text-white transition-all focus:outline-none focus:ring-2 focus:ring-slate-400/60 focus:ring-offset-2 focus:ring-offset-slate-900 text-center">
-          🌐 {% trans "Go to Other Services" %}
-        </a>
-      </div>
-      <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 text-sm sm:text-base font-semibold rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 text-white shadow-lg hover:shadow-xl transition-all focus:outline-none focus:ring-2 focus:ring-cyan-400/60 focus:ring-offset-2 focus:ring-offset-slate-900">💾 {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{{ ui_labels.create_button }}{% endif %}</button>
     </div>
   </div>
 
@@ -972,6 +1425,20 @@ function submitLanguageDoc(lang) {
   <input type="hidden" name="servicios_json" id="id_servicios_json">
   <input type="hidden" name="otros_json" id="id_otros_json">
 </form>
+
+<!-- Modal Used Parts (piezas de desarme) -->
+<div id="modal-used-parts" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/70" onclick="closeUsedPartsModal()"></div>
+  <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
+    <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
+      <h3 class="text-lg font-bold text-amber-300 mb-3">🧩 {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
+      <input type="search" id="used-parts-search" placeholder="{% trans 'Search by code or name...' %}" class="form-control w-full mb-4" autocomplete="off">
+      <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
+      <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">{% trans "Type at least 2 characters to search" %}</p>
+      <button type="button" onclick="closeUsedPartsModal()" class="mt-4 btn-secondary">{% trans "Close" %}</button>
+    </div>
+  </div>
+</div>
 
 {{ clientes_prefetch|json_script:"prefetchClientes" }}
 {{ vehiculos_prefetch|json_script:"prefetchVehiculos" }}
@@ -995,6 +1462,23 @@ function initDocumentFormScript(){
   }
   const EG = (window.EG = window.EG || {});
   EG._docFormInit = true;
+  // Observations mínimo
+  const obs = document.getElementById('id_observaciones');
+  if (obs) { obs.setAttribute('rows', '2'); }
+
+  // Cabecera consola: badge estado de pago (semáforo)
+  function updatePaymentStatusBadge() {
+    const sel = document.getElementById('id_payment_status');
+    const badge = document.getElementById('payment-status-badge');
+    if (!badge || !sel) return;
+    badge.classList.remove('doc-console-payment-paid', 'doc-console-payment-pending', 'doc-console-payment-partial');
+    const v = (sel.value || '').toUpperCase();
+    if (v === 'PAGADO' || v === 'PAID') badge.classList.add('doc-console-payment-paid');
+    else if (v === 'PARCIAL' || v === 'PARTIAL') badge.classList.add('doc-console-payment-partial');
+    else badge.classList.add('doc-console-payment-pending');
+  }
+  updatePaymentStatusBadge();
+  document.getElementById('id_payment_status')?.addEventListener('change', updatePaymentStatusBadge);
 
   // === CSRF ===
   function getCookie(name) {
@@ -1023,8 +1507,13 @@ function initDocumentFormScript(){
   // === CONFIG: no pisa si ya existe ===
   EG.cfg = EG.cfg || {};
   if (!EG.cfg.country) {
-    const path = (location.pathname || '').toLowerCase();
-    EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
+    const FORM = document.getElementById('document-form');
+    if (FORM && FORM.dataset.countryCode) {
+      EG.cfg.country = String(FORM.dataset.countryCode).toUpperCase();
+    } else {
+      const path = (location.pathname || '').toLowerCase();
+      EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
+    }
   }
   (function(){
     // Leer endpoints desde data-* attributes del formulario
@@ -1038,6 +1527,7 @@ function initDocumentFormScript(){
       EG.cfg.URL_REPUESTO_CREATE   = EG.cfg.URL_REPUESTO_CREATE   || FORM.dataset.urlRepuestoCreate;
       EG.cfg.URL_SERVICE_SEARCH     = EG.cfg.URL_SERVICE_SEARCH     || FORM.dataset.urlServiceSearch;
       EG.cfg.URL_OUTSOURCED_SERVICES= EG.cfg.URL_OUTSOURCED_SERVICES|| FORM.dataset.urlOutsourcedServices;
+      EG.cfg.URL_USED_PARTS        = EG.cfg.URL_USED_PARTS        || FORM.dataset.urlUsedParts;
     }
     // Fallback a path-based si no hay data-* (legacy)
     if (!EG.cfg.URL_NEXT_NUMBER && FORM) {
@@ -1050,6 +1540,7 @@ function initDocumentFormScript(){
       EG.cfg.URL_REPUESTO_SEARCH = FORM.dataset.urlRepuestoSearch || `${base}/api/repuestos/`;
       EG.cfg.URL_SERVICE_SEARCH   = FORM.dataset.urlServiceSearch || `${base}/api/servicios/`;
       EG.cfg.URL_OUTSOURCED_SERVICES = FORM.dataset.urlOutsourcedServices || `${base}/api/otros-servicios/`;
+      EG.cfg.URL_USED_PARTS = FORM.dataset.urlUsedParts || `${base}/api/piezas-desarme/`;
     }
     // Sales tax configurable (ej.: desde CompanySettings) - Legacy, mantener por compatibilidad
     EG.cfg.salesTax = typeof EG.cfg.salesTax === 'number' ? EG.cfg.salesTax : 0.08;
@@ -1078,11 +1569,20 @@ function initDocumentFormScript(){
 window.EG = window.EG || {};
 EG.cfg = EG.cfg || {};
 if (!EG.cfg.country) {
-  const path = (location.pathname || '').toLowerCase();
-  EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
+  const formEl = document.getElementById('document-form');
+  if (formEl && formEl.dataset.countryCode) {
+    EG.cfg.country = String(formEl.dataset.countryCode).toUpperCase();
+  } else {
+    const path = (location.pathname || '').toLowerCase();
+    EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
+  }
 }
 EG.COUNTRY = EG.COUNTRY || (EG.cfg.country || 'CL');
 const COUNTRY_REF = (EG.COUNTRY || 'CL').toUpperCase(); // usa COUNTRY_REF en lugar de COUNTRY
+
+// Preselección desde URL (vuelta desde "crear vehículo" con cliente_id y vehiculo_id)
+window.__PRESELECT_CLIENTE_ID__ = "{{ cliente_preselect_id|default:''|escapejs }}";
+window.__PRESELECT_VEHICULO_ID__ = "{{ vehiculo_preselect_id|default:''|escapejs }}";
 
 // ==== PREFETCH & HELPERS ====
 (function(){
@@ -1299,17 +1799,43 @@ function money(n){
 // ===============
 // THEME + NÚMERO
 // ===============
-const shell   = $('#doc-shell');
-const selTipo = $('#id_tipo');
-const numeroView = $('#id_numero');
-const numeroHidden = document.createElement('input'); // guarda para POST
+const shell   = document.getElementById('doc-shell');
+const selTipo = document.getElementById('id_tipo');
+const selMode = document.getElementById('doc_mode');
+const numeroView = document.getElementById('id_numero');
+const numeroHidden = document.createElement('input');
 numeroHidden.type = 'hidden';
 numeroHidden.name = 'numero_documento';
-$('#document-form').appendChild(numeroHidden);
+const docForm = document.getElementById('document-form');
+if (docForm) docForm.appendChild(numeroHidden);
 
 function applyTheme(tipo) {
-  shell.classList.remove('theme-ot','theme-fac','theme-pres');
-  shell.classList.add(tipo==='FAC' ? 'theme-fac' : (tipo==='PRES' ? 'theme-pres' : 'theme-ot'));
+  if (!shell) return;
+  shell.classList.remove('theme-ot','theme-fac','theme-pres','theme-pts');
+  const themeClass = tipo==='FAC' ? 'theme-fac' : tipo==='PRES' ? 'theme-pres' : tipo==='PTS' ? 'theme-pts' : 'theme-ot';
+  shell.classList.add(themeClass);
+}
+
+function applyTipoDependentUI(tipo) {
+  // Legacy no-op: mantenido por compatibilidad con llamadas antiguas
+}
+
+function applyModeDependentUI() {
+  const mode = selMode ? selMode.value : 'services';
+  const isParts = mode === 'parts';
+
+  const vehicleSection = document.getElementById('vehicle-section');
+  const milesSection   = document.getElementById('miles-section');
+  const tecnicoLabel   = document.getElementById('tecnico-label');
+
+  if (vehicleSection) vehicleSection.style.display = isParts ? 'none' : '';
+  if (milesSection)   milesSection.style.display   = isParts ? 'none' : '';
+
+  if (tecnicoLabel) {
+    tecnicoLabel.textContent = isParts
+      ? (tecnicoLabel.dataset.labelPts || 'Salesperson')
+      : (tecnicoLabel.dataset.labelDefault || '');
+  }
 }
 
 async function updateDocumentNumber(){
@@ -1375,6 +1901,11 @@ async function buscarClientes(q){
 function renderResultadosClientes(lista){
   getClienteElements();
   if (!clienteResultados) return;
+  // Si ya hay un cliente seleccionado, no mostrar el mensaje "No clients found"
+  if (clienteSelect && clienteSelect.value) {
+    clienteResultados.classList.add('hidden');
+    return;
+  }
   clienteResultados.innerHTML = '';
   if (!lista.length){
     const empty = document.createElement('div');
@@ -1432,20 +1963,25 @@ async function seleccionarCliente({id, nombre, email, telefono}){
     clienteSelect.classList.add('hidden');
   }
   if (cliNombre) cliNombre.textContent = nombre;
-  if (cliEmail)  cliEmail.textContent  = email || '—';
-  if (cliFono)   cliFono.textContent   = telefono || '—';
+  if (cliEmail)  cliEmail.textContent  = email ? `📧 ${email}` : '—';
+  if (cliFono)   cliFono.textContent   = telefono ? `📞 ${telefono}` : '—';
+  const ultimaVisitaEl = document.getElementById('cliente-ultima-visita');
+  if (ultimaVisitaEl) ultimaVisitaEl.textContent = ''; // API puede llenar después
   if (clienteInfoBox) clienteInfoBox.classList.remove('hidden');
   
   // ⚡ IMPORTANTE: Cargar vehículos del cliente seleccionado
   console.log(`🔄 Iniciando carga de vehículos para cliente ${id}...`);
   
-  // Verificar si hay un vehículo a preseleccionar (desde URL o documentoData)
+  // Verificar si hay un vehículo a preseleccionar (desde URL, documentoData o preselect del backend)
   const urlParams = new URLSearchParams(window.location.search);
-  const newVehiculoId = urlParams.get('new_vehiculo_id');
-  const prefillVehiculoId = (typeof documentoData !== 'undefined' && documentoData.prefillVehiculoId) 
-    ? documentoData.prefillVehiculoId 
+  const newVehiculoId = urlParams.get('vehiculo_id') || urlParams.get('new_vehiculo_id');
+  const prefillVehiculoId = (typeof documentoData !== 'undefined' && documentoData.prefillVehiculoId)
+    ? documentoData.prefillVehiculoId
     : null;
-  const vehiculoIdToSelect = newVehiculoId || prefillVehiculoId || null;
+  const preselectVehiculoId = (typeof window.__PRESELECT_VEHICULO_ID__ !== 'undefined' && window.__PRESELECT_VEHICULO_ID__)
+    ? window.__PRESELECT_VEHICULO_ID__
+    : null;
+  const vehiculoIdToSelect = newVehiculoId || prefillVehiculoId || preselectVehiculoId || null;
   
   await cargarVehiculosPorCliente(id, vehiculoIdToSelect);
 }
@@ -1657,46 +2193,49 @@ window.addRepuestoRow = function addRepuestoRow(){
     console.error('❌ Contenedor de repuestos no encontrado');
     return;
   }
+  const isFirstRow = !container.querySelector('.dynamic-element');
+  const lbl = (text) => isFirstRow ? `<label class="block text-cyan-200 text-sm mb-1">${text}</label>` : '';
+  const lblFlex = (content) => isFirstRow ? `<label class="block text-cyan-200 text-sm mb-1 flex items-center gap-1">${content}</label>` : '';
   const row = document.createElement('div');
   row.className = 'dynamic-element';
   row.innerHTML = `
     <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
       <div class="w-full sm:w-28 relative">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.code}</label>
+        ${lbl(I18N.code)}
         <input type="text" class="rep-codigo form-control w-full text-base" placeholder="${I18N.code}" autocomplete="off">
         <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-id">
+        <input type="hidden" class="rep-origen" value="STOCK_BODEGA">
+        <input type="hidden" class="rep-pieza-desarme-id">
+        <input type="hidden" class="rep-costo-linea">
       </div>
       <div class="description-field rep-search-container w-full sm:flex-1 sm:min-w-80 relative">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.name}</label>
+        ${lbl(I18N.name)}
         <input type="text" class="rep-search form-control w-full text-base" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
         <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-nombre">
         <button type="button" class="rep-create-btn absolute top-8 sm:top-8 right-2 px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white text-xs sm:text-sm font-semibold border border-purple-300/40 shadow-sm transition-all">➕</button>
       </div>
       <div class="w-full sm:w-16">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.qty}</label>
+        ${lbl(I18N.qty)}
         <input type="number" class="rep-cantidad form-control w-full text-base" min="1" max="999" value="1">
       </div>
       <div class="w-full sm:w-28">
-        <label class="block text-cyan-200 text-sm mb-1 flex items-center gap-1">
-          <span>${I18N.sale_price}</span>
-          <button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>
-        </label>
+        ${lblFlex(`<span>${I18N.sale_price}</span><button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>`)}
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
           <input type="text" class="rep-precio-venta form-control w-full text-base pl-6" placeholder="0">
         </div>
       </div>
       <div class="w-full sm:w-28 cost-price-container hidden">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.cost_price}</label>
+        ${lbl(I18N.cost_price)}
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
           <input type="text" class="rep-precio-compra form-control w-full text-base pl-6" placeholder="0">
         </div>
       </div>
       <div class="w-full sm:w-28">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
+        ${lbl(I18N.subtotal)}
         <input type="hidden" class="rep-subtotal" value="0">
         <div class="rep-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
       </div>
@@ -1708,6 +2247,111 @@ window.addRepuestoRow = function addRepuestoRow(){
   setupRepuestoRow(row);
   return row;
 }
+
+// Used Parts (piezas de desarme) modal
+window.openUsedPartsModal = function openUsedPartsModal(){
+  const modal = document.getElementById('modal-used-parts');
+  const search = document.getElementById('used-parts-search');
+  const results = document.getElementById('used-parts-results');
+  const empty = document.getElementById('used-parts-empty');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  results.innerHTML = '';
+  empty.classList.remove('hidden');
+  if (search) {
+    search.value = '';
+    search.focus();
+  }
+};
+
+window.closeUsedPartsModal = function closeUsedPartsModal(){
+  const modal = document.getElementById('modal-used-parts');
+  if (modal) modal.classList.add('hidden');
+};
+
+(function initUsedPartsModal(){
+  const search = document.getElementById('used-parts-search');
+  const results = document.getElementById('used-parts-results');
+  const empty = document.getElementById('used-parts-empty');
+  let searchTimer;
+
+  function money(val) {
+    try { return (Number(val) || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); } catch (e) { return String(val); }
+  }
+
+  async function searchUsedParts(q){
+    if (!results || !empty) return;
+    if (!q || q.length < 2){
+      results.innerHTML = '';
+      empty.textContent = (typeof I18N !== 'undefined' && I18N.type_to_search_parts) ? I18N.type_to_search_parts.replace('repuestos', 'código o nombre') : '{% trans "Type at least 2 characters to search" %}';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+    results.innerHTML = '<div class="text-cyan-300 py-2">{% trans "Searching..." %}</div>';
+    const url = (EG.cfg && EG.cfg.URL_USED_PARTS) || '/api/piezas-desarme/';
+    try {
+      const r = await (EG.fetch || fetch)(url + '?q=' + encodeURIComponent(q));
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const data = await r.json();
+      const items = Array.isArray(data) ? data : (data.results || []);
+      if (items.length === 0){
+        results.innerHTML = '<div class="text-gray-400 py-2">{% trans "No used parts found" %}</div>';
+        return;
+      }
+      results.innerHTML = '';
+      items.forEach(function(item){
+        const div = document.createElement('div');
+        div.className = 'px-3 py-2 hover:bg-amber-900/40 cursor-pointer border-b border-amber-500/20 last:border-b-0 rounded';
+        div.dataset.id = item.id || '';
+        div.dataset.codigo = item.codigo || '';
+        div.dataset.nombre = item.nombre || '';
+        div.dataset.precio = item.precio || item.precio_venta_sugerido || 0;
+        div.dataset.cantidad = item.cantidad || 1;
+        const v = item.vehiculo_origen ? ' • ' + item.vehiculo_origen : '';
+        div.innerHTML = '<div class="text-cyan-200 font-semibold text-sm">' + (item.codigo ? item.codigo + ' • ' : '') + (item.nombre || '') + '</div><div class="text-xs text-gray-400">' + money(item.precio || 0) + ' • {% trans "Stock" %}: ' + (item.cantidad || 0) + v + '</div>';
+        div.addEventListener('click', function(){
+          selectUsedPart(item);
+        });
+        results.appendChild(div);
+      });
+    } catch (err) {
+      console.error('Used parts search:', err);
+      results.innerHTML = '<div class="text-red-400 py-2">{% trans "Server error" %}</div>';
+    }
+  }
+
+  function selectUsedPart(item){
+    const container = document.getElementById('repuestos-container');
+    if (!container || typeof window.addRepuestoRow !== 'function') return;
+    const row = window.addRepuestoRow();
+    if (row && typeof row.__applyRepData === 'function'){
+      row.__applyRepData({
+        id: '',
+        codigo: item.codigo || '',
+        nombre: item.nombre || '',
+        precio: item.precio || item.precio_venta_sugerido || 0,
+        cantidad: item.cantidad || 1,
+        descuento: 0,
+        origen_repuesto: 'DESARME',
+        pieza_desarme_id: item.id || '',
+        costo_linea: item.costo_asignado != null ? item.costo_asignado : 0
+      });
+    }
+    closeUsedPartsModal();
+  }
+
+  if (search) {
+    search.addEventListener('input', function(){
+      clearTimeout(searchTimer);
+      const q = search.value.trim();
+      searchTimer = setTimeout(function(){ searchUsedParts(q); }, 300);
+    });
+    search.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') closeUsedPartsModal();
+    });
+  }
+})();
 
 function setupRepuestoRow(row){
   const searchInput = $('.rep-search', row);
@@ -1756,6 +2400,10 @@ function setupRepuestoRow(row){
     }
   }
 
+  const repOrigen = row.querySelector('.rep-origen');
+  const repPiezaDesarmeId = row.querySelector('.rep-pieza-desarme-id');
+  const repCostoLinea = row.querySelector('.rep-costo-linea');
+
   function applyPartData(item){
     if (!item) return;
     if (idHidden) idHidden.value = item.id || '';
@@ -1770,32 +2418,34 @@ function setupRepuestoRow(row){
       inpPC.value = precio > 0 ? formatNumberInput(precio) : '';
     }
     if (searchInput) {
-      // Solo mostrar el nombre del repuesto, sin el código
       searchInput.value = item.nombre || '';
     }
+    if (repOrigen) repOrigen.value = 'STOCK_BODEGA';
+    if (repPiezaDesarmeId) repPiezaDesarmeId.value = '';
+    if (repCostoLinea) repCostoLinea.value = '';
     recalc();
   }
   
-  // Exponer función para aplicar datos desde fuera
   row.__applyRepData = function(data) {
     if (!data) return;
-    // Aplicar datos básicos
     applyPartData({
       id: data.id || '',
       codigo: data.codigo || '',
       nombre: data.nombre || '',
       precio_venta: data.precio || 0,
     });
-    // Aplicar cantidad y descuento
     if (qEl && data.cantidad) {
       qEl.value = data.cantidad;
       qEl.dispatchEvent(new Event('input'));
     }
-    if (row.querySelector('.rep-descuento') && data.descuento) {
+    if (row.querySelector('.rep-descuento') && data.descuento !== undefined) {
       const descInput = row.querySelector('.rep-descuento');
       descInput.value = data.descuento;
       descInput.dispatchEvent(new Event('input'));
     }
+    if (repOrigen && data.origen_repuesto) repOrigen.value = data.origen_repuesto;
+    if (repPiezaDesarmeId && data.pieza_desarme_id !== undefined) repPiezaDesarmeId.value = String(data.pieza_desarme_id || '');
+    if (repCostoLinea && data.costo_linea !== undefined) repCostoLinea.value = String(data.costo_linea ?? '');
     recalc();
   };
 
@@ -2445,7 +3095,24 @@ function setupOtroRow(row){
 // ===============
 // EVENTOS
 // ===============
-selTipo?.addEventListener('change', () => { applyTheme(selTipo.value); updateDocumentNumber(); });
+if (selTipo) {
+  selTipo.addEventListener('change', () => {
+    const t = selTipo.value;
+    applyTheme(t);
+    updateDocumentNumber();
+  });
+  // Aplicar tema y UI según tipo al cargar
+  const t0 = selTipo.value || 'OT';
+  applyTheme(t0);
+}
+
+if (selMode) {
+  selMode.addEventListener('change', () => {
+    applyModeDependentUI();
+  });
+  // Aplicar modo inicial (services por defecto)
+  applyModeDependentUI();
+}
 
         // Event listeners de búsqueda de clientes se mueven a DOMContentLoaded
 // Event listeners de click en resultados se mueven a initDocumentForm
@@ -2462,6 +3129,9 @@ function serializeRows(){
     cantidad:  Number($('.rep-cantidad', row)?.value || 0),
     precio:    parseNumericInput($('.rep-precio-venta', row)?.value || 0),
     descuento: Number($('.rep-descuento', row)?.value || 0),
+    origen_repuesto: $('.rep-origen', row)?.value?.trim() || 'STOCK_BODEGA',
+    pieza_desarme_id: $('.rep-pieza-desarme-id', row)?.value?.trim() || '',
+    costo_linea: parseNumericInput($('.rep-costo-linea', row)?.value || 0),
   }));
   const serv = $$('#servicios-container .dynamic-element').map(row=>({
     servicio_id: $('.srv-id', row)?.value || '',
@@ -2601,6 +3271,37 @@ function submitDocumentForm(){
   }
 
   setupClienteSearchHandlers();
+  getClienteElements();
+  if (clienteSelect && clienteSelect.value) {
+    clienteSelect.dataset.source = 'form';
+  }
+  if (vehiculoSelect && vehiculoSelect.value) {
+    vehiculoSelect.dataset.source = 'form';
+  }
+
+  // Tarjeta vehículo: mostrar resumen al seleccionar
+  function updateVehiculoCard() {
+    const sel = document.getElementById('id_vehiculo');
+    const box = document.getElementById('vehiculo-info');
+    const marcaModelo = document.getElementById('vehiculo-marca-modelo');
+    const anoVin = document.getElementById('vehiculo-ano-vin');
+    const mileage = document.getElementById('vehiculo-mileage');
+    const ultimaEntrada = document.getElementById('vehiculo-ultima-entrada');
+    if (!box || !sel) return;
+    const opt = sel.options[sel.selectedIndex];
+    const text = opt ? opt.textContent.trim() : '';
+    if (!sel.value || !text) {
+      box.classList.add('hidden');
+      return;
+    }
+    if (marcaModelo) marcaModelo.textContent = text;
+    if (anoVin) anoVin.textContent = '';
+    if (mileage) mileage.textContent = '';
+    if (ultimaEntrada) ultimaEntrada.textContent = '';
+    box.classList.remove('hidden');
+  }
+  vehiculoSelect?.addEventListener('change', updateVehiculoCard);
+  updateVehiculoCard();
   // Cargar datos existentes si estamos editando
   {% if es_edicion %}
   // Inicializar campos básicos del formulario ANTES de aplicar tema
@@ -2624,12 +3325,12 @@ function submitDocumentForm(){
     const tipoSelect = document.getElementById('id_tipo');
     if (tipoSelect) {
       tipoSelect.value = documentoData.tipo;
-      if (typeof applyTheme === 'function') {
-        applyTheme(documentoData.tipo);
-      }
+      const t = documentoData.tipo;
+      if (typeof applyTheme === 'function') applyTheme(t);
     }
   } else {
-    applyTheme(selTipo?.value || 'OT');
+    const t = selTipo?.value || 'OT';
+    applyTheme(t);
   }
   
   // Establecer número de documento
@@ -2710,6 +3411,9 @@ function submitDocumentForm(){
               cantidad: rep.cantidad || 1,
               precio: rep.precio || 0,
               descuento: rep.descuento || 0,
+              origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
+              pieza_desarme_id: rep.pieza_desarme_id != null ? String(rep.pieza_desarme_id) : '',
+              costo_linea: rep.costo_linea != null ? rep.costo_linea : 0,
             });
           }
         }
@@ -2762,8 +3466,23 @@ function submitDocumentForm(){
   }, 200);
   {% else %}
   // Si no es edición, aplicar tema y actualizar número normalmente
-  applyTheme(selTipo?.value || 'OT');
+  const t0 = selTipo?.value || 'OT';
+  applyTheme(t0);
+  if (typeof applyModeDependentUI === 'function') applyModeDependentUI();
   updateDocumentNumber();
+  // Preselección cliente/vehículo (vuelta desde "crear vehículo" con cliente_id y vehiculo_id en URL)
+  {% if cliente_preselect_id %}
+  if (typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__ && typeof seleccionarCliente === 'function') {
+    setTimeout(() => {
+      seleccionarCliente({
+        id: window.__PRESELECT_CLIENTE_ID__,
+        nombre: "{{ cliente_preselect_nombre|default:''|escapejs }}",
+        email: "{{ cliente_preselect_email|default:''|escapejs }}",
+        telefono: "{{ cliente_preselect_telefono|default:''|escapejs }}"
+      });
+    }, 100);
+  }
+  {% endif %}
   {% endif %}
   
   serializeRows();
