@@ -52,7 +52,16 @@ class DocumentoForm(forms.ModelForm):
     repuestos_json = forms.CharField(widget=forms.HiddenInput(), required=False)
     servicios_json = forms.CharField(widget=forms.HiddenInput(), required=False)
     otros_json = forms.CharField(widget=forms.HiddenInput(), required=False)
-    payment_status = forms.CharField(required=False)
+    payment_status = forms.ChoiceField(
+        required=False,
+        widget=forms.Select(attrs={"class": "form-control form-select w-full text-base"}),
+        choices=[
+            ("pending", "Pendiente"),
+            ("paid", "Pagado"),
+            ("partial", "Parcial"),
+            ("canceled", "Anulado"),
+        ],
+    )
     apply_vat = forms.BooleanField(required=False)
 
     # Campo de kilometraje que NO se guarda en el modelo Documento
@@ -77,6 +86,7 @@ class DocumentoForm(forms.ModelForm):
             "millas",
             "observaciones",
             "pagado",
+            "payment_status",
             "metodo_pago",
             "ult4",
             "monto_pagado",
@@ -110,10 +120,12 @@ class DocumentoForm(forms.ModelForm):
         self.fields["cliente"].widget.url = f"{_ns(self.country)}:cliente"
         self.fields["vehiculo"].widget.url = f"{_ns(self.country)}:vehiculo"
 
-        # Configurar querysets filtrados por empresa
+        # Configurar querysets filtrados por empresa (vehículo solo tipo CLIENTE para documentos)
         if self.empresa:
             self.fields["cliente"].queryset = Cliente.objects.filter(empresa=self.empresa)
-            self.fields["vehiculo"].queryset = Vehiculo.objects.filter(empresa=self.empresa)
+            self.fields["vehiculo"].queryset = Vehiculo.objects.filter(
+                empresa=self.empresa, tipo_uso=Vehiculo.TIPO_USO_CLIENTE
+            )
             self.fields["tecnico_responsable"].queryset = self.empresa.tecnicos.all()
 
         # Configurar labels según el país
@@ -164,6 +176,7 @@ class DocumentoForm(forms.ModelForm):
                 "fecha_pago": "Payment Date",
                 "nota_pago": "Payment Notes",
                 "descuento": "Discount",
+                "payment_status": "Payment Status",
             }
         else:  # CL (Chile)
             labels = {
@@ -182,6 +195,7 @@ class DocumentoForm(forms.ModelForm):
                 "fecha_pago": "Fecha de Pago",
                 "nota_pago": "Nota de Pago",
                 "descuento": "Descuento",
+                "payment_status": "Estado de Pago",
             }
 
         for field_name, label in labels.items():
@@ -193,10 +207,15 @@ class DocumentoForm(forms.ModelForm):
         if self.country == "US":
             self.fields["tipo"].choices = [
                 ("OT", "Work Order"),
-                ("PRES", "Estimate"),
-                ("FAC", "Invoice/Receipt"),  # Cambiado de "REC" a "FAC"
+                ("PRES", "Estimate"),           # Estimate
+                ("FAC", "Invoice/Receipt"),     # Invoice
             ]
-
+            self.fields["payment_status"].choices = [
+                ("pending", "Pending"),
+                ("paid", "Paid"),
+                ("partial", "Partial"),
+                ("canceled", "Canceled"),
+            ]
             # Millas solo en USA
             if "millas" in self.fields:
                 self.fields["millas"].required = False
@@ -205,9 +224,14 @@ class DocumentoForm(forms.ModelForm):
             self.fields["tipo"].choices = [
                 ("OT", "Orden de Trabajo"),
                 ("PRES", "Presupuesto"),
-                ("FAC", "Factura/Boleta"),  # Cambiado de "REC" a "FAC"
+                ("FAC", "Factura/Boleta"),  # Factura/Boleta
             ]
-
+            self.fields["payment_status"].choices = [
+                ("pending", "Pendiente"),
+                ("paid", "Pagado"),
+                ("partial", "Parcial"),
+                ("canceled", "Anulado"),
+            ]
             # Kilometraje en Chile, millas no aplica
             if "millas" in self.fields:
                 self.fields["millas"].widget = forms.HiddenInput()
@@ -234,6 +258,7 @@ class DocumentoForm(forms.ModelForm):
             "fecha_pago": "id_fecha_pago",
             "nota_pago": "id_nota_pago",
             "descuento": "id_descuento",
+            "payment_status": "id_payment_status",
         }
 
         for field_name, widget_id in widget_ids.items():
@@ -305,8 +330,13 @@ class DocumentoForm(forms.ModelForm):
         if vehiculo and self.empresa and vehiculo.empresa != self.empresa:
             raise forms.ValidationError("El vehículo seleccionado no pertenece a tu empresa.")
 
-        # Validar que vehículo pertenece al cliente
-        if vehiculo and cliente and vehiculo.cliente != cliente:
+        # Validar que vehículo pertenece al cliente (solo si el vehículo tiene cliente; tipo CLIENTE siempre lo tiene)
+        if (
+            vehiculo
+            and cliente
+            and getattr(vehiculo, "cliente_id", None) is not None
+            and vehiculo.cliente_id != cliente.id
+        ):
             raise forms.ValidationError("El vehículo seleccionado no pertenece al cliente.")
 
         # Validaciones específicas por país
@@ -322,11 +352,12 @@ class DocumentoForm(forms.ModelForm):
                 # Advertencia, no error - permitir crear sin kilometraje si es necesario
                 pass
         elif self.country == "US":
-            # En USA, al menos uno de kilometraje_ingreso o millas debe tener valor si hay vehículo
+            # En USA, si existe el campo millas usarlo como alternativa;
+            # si no existe en el formulario renderizado, validar solo kilometraje_ingreso.
             vehiculo = cleaned_data.get("vehiculo")
             if vehiculo:
                 kilometraje = cleaned_data.get("kilometraje_ingreso")
-                millas = cleaned_data.get("millas")
+                millas = cleaned_data.get("millas") if "millas" in self.fields else None
                 if not kilometraje and not millas:
                     raise forms.ValidationError(
                         "Debe especificar al menos kilometraje o millas cuando hay un vehículo."
@@ -393,25 +424,46 @@ class DocumentoForm(forms.ModelForm):
         """Procesa los datos JSON y crea las líneas del documento"""
         import json
 
-        # Procesar repuestos
+        from taller.models.lineas_documento import (
+            LineaRepuesto,
+            ORIGEN_DESARME,
+            ORIGEN_STOCK_BODEGA,
+        )
+
         repuestos_data = self.cleaned_data.get("repuestos_json", "[]")
         if repuestos_data:
             try:
                 repuestos = json.loads(repuestos_data)
                 for rep_data in repuestos:
-                    if rep_data.get("codigo") or rep_data.get("nombre"):
-                        from taller.models.lineas_documento import LineaRepuesto
-
-                        LineaRepuesto.objects.create(
-                            documento=documento,
-                            codigo=rep_data.get("codigo", ""),
-                            nombre=rep_data.get("nombre", ""),
-                            cantidad=rep_data.get("cantidad", 1),
-                            precio_unitario=rep_data.get("precio", 0),
-                            descuento=rep_data.get("descuento", 0),
-                        )
+                    if not (rep_data.get("codigo") or rep_data.get("nombre")):
+                        continue
+                    origen = rep_data.get("origen_repuesto") or ORIGEN_STOCK_BODEGA
+                    is_desarme = origen == ORIGEN_DESARME and rep_data.get("pieza_desarme_id")
+                    kwargs = {
+                        "documento": documento,
+                        "codigo": rep_data.get("codigo", ""),
+                        "nombre": rep_data.get("nombre", ""),
+                        "cantidad": rep_data.get("cantidad", 1),
+                        "precio_unitario": rep_data.get("precio", 0),
+                        "descuento": rep_data.get("descuento", 0),
+                        "origen_repuesto": origen,
+                    }
+                    if is_desarme:
+                        pd_id = rep_data.get("pieza_desarme_id")
+                        kwargs["pieza_desarme_id"] = int(pd_id) if pd_id else None
+                        kwargs["repuesto_id"] = None
+                        kwargs["part_id"] = None
+                        costo = rep_data.get("costo_linea")
+                        if costo is not None:
+                            kwargs["costo_linea"] = costo
+                    else:
+                        kwargs["pieza_desarme_id"] = None
+                        rep_id = rep_data.get("id")
+                        if rep_id not in (None, ""):
+                            kwargs["repuesto_id"] = int(rep_id)
+                    LineaRepuesto.objects.create(**kwargs)
             except (json.JSONDecodeError, ValueError):
-                pass  # Ignorar datos JSON inválidos
+                pass
 
         # Procesar servicios (SIN cantidad: forzamos cantidad=1)
         servicios_data = self.cleaned_data.get("servicios_json", "[]")
