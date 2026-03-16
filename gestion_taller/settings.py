@@ -187,7 +187,7 @@ ACCOUNT_FORMS = {
     "signup": "taller.forms.custom_signup.CustomSignupForm",
 }
 
-LOGIN_URL = "/cl/accounts/login/"
+LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/logout-redirect/"
 
@@ -323,6 +323,7 @@ TEMPLATES = [
                 "taller.context_processors.company_country",
                 "taller.context_processors.company_header",
                 "taller.context_processors.country_config.country_context",
+                "taller.context_processors.feature_flags.country_features",
                 "taller.context_processors.ui_labels.ui_labels_context",
                 "taller.context_processors.support_context",
             ],

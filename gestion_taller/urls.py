@@ -1,3 +1,4 @@
+from pathlib import Path
 from urllib.parse import urlencode
 
 from django.conf import settings
@@ -83,6 +84,33 @@ from taller.views_extra.logout_redirect_view import logout_redirect_view
 from taller.views_extra.registro_exitoso import registro_exitoso
 from taller.views_extra.signup_redirects import signup_redirect
 from taller.views_health import health_check, health_simple
+
+
+def service_worker_view(request):
+    """Sirve service-worker.js desde raíz para scope / (control de toda la app)."""
+    from django.conf import settings
+    from django.http import HttpResponse, HttpResponseNotFound
+
+    base = getattr(settings, "STATIC_ROOT", None)
+    if base:
+        base = base if isinstance(base, Path) else Path(str(base))
+        path = base / "service-worker.js"
+    else:
+        path = None
+    if not path or not path.exists():
+        dirs = getattr(settings, "STATICFILES_DIRS", [])
+        base_dir = getattr(settings, "BASE_DIR", Path(__file__).resolve().parent.parent)
+        base_dir = base_dir if isinstance(base_dir, Path) else Path(str(base_dir))
+        static_dir = dirs[0] if dirs else base_dir / "static"
+        static_dir = static_dir if isinstance(static_dir, Path) else Path(str(static_dir))
+        path = static_dir / "service-worker.js"
+    if not path.exists():
+        return HttpResponseNotFound()
+    content = path.read_text(encoding="utf-8")
+    response = HttpResponse(content, content_type="application/javascript")
+    response["Cache-Control"] = "no-cache, no-store, must-revalidate"
+    return response
+
 
 try:
     from taller.views_extra.compat_redirects import compat_settings_redirect
@@ -217,7 +245,31 @@ def country_aware_clientes_redirect(request):
     return redirect("/cl/es/clientes/")
 
 
+def country_aware_workspace_redirect(request, subpath=""):
+    """Redirect /workspace/ to country workspace. USA → /us/en/workspace/, Chile → /cl/es/workspace/."""
+    if request.user.is_authenticated:
+        try:
+            if hasattr(request.user, "empresa") and request.user.empresa:
+                pais = (getattr(request.user.empresa, "pais", None) or "").strip().upper()
+                if pais == "US":
+                    return redirect(f"/us/en/workspace/{subpath}".rstrip("/") + "/")
+                if pais == "CL":
+                    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
+        except Exception:
+            pass
+    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
+
+
 urlpatterns = [
+    # Service Worker desde raíz (scope / para control de toda la app)
+    path("service-worker.js", service_worker_view),
+    # Root /workspace/ → country-aware redirect (early so it's always found)
+    path("workspace/", country_aware_workspace_redirect, name="workspace_redirect_root"),
+    path(
+        "workspace/buscar/",
+        lambda r: country_aware_workspace_redirect(r, "buscar"),
+        name="workspace_buscar_redirect_root",
+    ),
     path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
     # Portal del Cliente
     path("portal/", include("taller.portal.urls")),
@@ -431,6 +483,7 @@ urlpatterns = [
         RedirectView.as_view(url="/us/en/centro-operaciones/", permanent=False),
         name="us_centro_operaciones_redirect",
     ),
+    # Root /workspace/ is registered at the top of urlpatterns
     # 🇺🇸 USA - /us/workspace/ → /us/en/workspace/ (canonical con idioma; evita loop con SimpleCountryRedirectMiddleware)
     path(
         "us/workspace/",
@@ -442,6 +495,13 @@ urlpatterns = [
         RedirectView.as_view(url="/us/en/workspace/buscar/", permanent=False),
         name="us_workspace_buscar_redirect",
     ),
+    # 🇺🇸 USA - Desarme explícito para /us/en/desarme/ (ANTES se montaba con namespace us_en_desarme,
+    # lo que rompe helpers que esperan us_en:desarme:...; ahora se deja solo el include normal en
+    # `taller.urls` bajo el namespace us_en)
+    # path(
+    #     "us/en/desarme/",
+    #     include(("taller.urls_desarme", "desarme"), namespace="us_en_desarme"),
+    # ),
     # 🇺🇸 USA - Montes reales para /us/en/ y /us/es/ (ANTES de us/ y de RedirectViews)
     path(
         "us/en/",

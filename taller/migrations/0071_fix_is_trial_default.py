@@ -3,24 +3,68 @@
 from django.db import migrations, connection
 
 
-def fix_is_trial_defaults(apps, schema_editor):
-    """Actualiza todas las empresas que tengan is_trial NULL a False"""
-    with connection.cursor() as cursor:
-        # En SQLite, actualizamos las filas donde is_trial sea NULL
-        cursor.execute(
-            """
-            UPDATE taller_empresa 
-            SET is_trial = 0 
-            WHERE is_trial IS NULL
+def _sqlite_has_column(cursor, table_name, column_name):
+    cursor.execute(f"PRAGMA table_info({table_name})")
+    cols = [row[1] for row in cursor.fetchall()]
+    return column_name in cols
+
+
+def _postgres_has_column(cursor, table_name, column_name):
+    cursor.execute(
         """
-        )
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name = %s AND column_name = %s
+        LIMIT 1
+        """,
+        [table_name, column_name],
+    )
+    return cursor.fetchone() is not None
+
+
+def fix_is_trial_defaults(apps, schema_editor):
+    """Actualiza empresas con is_trial NULL a False solo si la columna existe."""
+    vendor = connection.vendor
+
+    with connection.cursor() as cursor:
+        if vendor == "sqlite":
+            has_column = _sqlite_has_column(cursor, "taller_empresa", "is_trial")
+        elif vendor == "postgresql":
+            has_column = _postgres_has_column(cursor, "taller_empresa", "is_trial")
+        else:
+            # Fallback conservador: intentar introspección estilo SQLite y, si falla, no tocar nada
+            try:
+                has_column = _sqlite_has_column(cursor, "taller_empresa", "is_trial")
+            except Exception:
+                has_column = False
+
+        if not has_column:
+            print("Saltando 0071_fix_is_trial_default: columna taller_empresa.is_trial no existe aún")
+            return
+
+        if vendor == "sqlite":
+            cursor.execute(
+                """
+                UPDATE taller_empresa
+                SET is_trial = 0
+                WHERE is_trial IS NULL
+                """
+            )
+        else:
+            cursor.execute(
+                """
+                UPDATE taller_empresa
+                SET is_trial = FALSE
+                WHERE is_trial IS NULL
+                """
+            )
+
         updated = cursor.rowcount
-        if updated > 0:
+        if updated and updated > 0:
             print(f"Actualizadas {updated} empresas con is_trial=NULL a False")
 
 
 def reverse_migration(apps, schema_editor):
-    """No revertimos - es una corrección de datos"""
     pass
 
 

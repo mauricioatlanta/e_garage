@@ -150,7 +150,7 @@ def usa_login_view(request):
             resp = render(
                 request,
                 template_name,
-                {"form": _usa_login_form(request), "error": "Credenciales inválidas"},
+                {"form": _usa_login_form(request), "error": "Credenciales inválidas", "country": "US"},
             )
             resp["Cache-Control"] = "no-store, no-cache, max-age=0, must-revalidate"
             resp["Pragma"] = "no-cache"
@@ -186,7 +186,7 @@ def usa_login_view(request):
     resp = render(
         request,
         template_name,
-        {"form": _usa_login_form(request)},
+        {"form": _usa_login_form(request), "country": "US"},
         status=200,
     )
     # Evitar cache: página de login no debe cachearse (token CSRF debe ser siempre fresco)

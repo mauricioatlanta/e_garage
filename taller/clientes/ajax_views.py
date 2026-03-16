@@ -25,11 +25,13 @@ def ajax_crear_estado_usa(request):
             {"success": False, "error": "State name and code are required"}, status=400
         )
 
-    # Obtener país del usuario/empresa
+    # Obtener país del usuario/empresa (OneToOne inversa puede lanzar DoesNotExist)
+    from taller.utils.empresa import get_user_empresa_safe
     pais = "US"  # Default
-    if hasattr(request.user, "empresa") and request.user.empresa:
-        pais = request.user.empresa.pais
-    elif hasattr(request, "empresa") and request.empresa:
+    empresa = get_user_empresa_safe(request.user)
+    if empresa:
+        pais = getattr(empresa, "pais", pais) or pais
+    elif getattr(request, "empresa", None):
         pais = request.empresa.pais
     elif hasattr(request, "country"):
         pais = request.country

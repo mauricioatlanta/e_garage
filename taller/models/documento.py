@@ -31,6 +31,7 @@ class Documento(AuditMixin, models.Model):
             ("OT", _("Orden de Trabajo")),
             ("PRES", _("Presupuesto")),
             ("FAC", _("Factura/Boleta")),
+            ("PTS", _("Part Sale")),  # Venta de repuestos/piezas (sin vehículo)
             # ("REC", _("Recibo/Boleta (LEGACY)")),  # Legacy, no mostrar en forms
             # ("BOL", _("Boleta (LEGACY)")),   # Legacy, no mostrar en forms
         ],
@@ -369,8 +370,11 @@ class Documento(AuditMixin, models.Model):
                     "El vehículo seleccionado no pertenece a la empresa del documento."
                 )
 
-            # El vehículo debe pertenecer al cliente del documento
-            if hasattr(self.vehiculo, "cliente_id") and self.vehiculo.cliente_id != self.cliente_id:
+            # El vehículo debe pertenecer al cliente del documento (solo si tiene cliente; desarme no aplica aquí)
+            if (
+                getattr(self.vehiculo, "cliente_id", None) is not None
+                and self.vehiculo.cliente_id != self.cliente_id
+            ):
                 raise ValidationError(
                     "El vehículo seleccionado no pertenece al cliente del documento."
                 )
@@ -408,6 +412,7 @@ class Documento(AuditMixin, models.Model):
             "PRES": "E",  # Estimado
             "OT": "OT",  # Orden de Trabajo
             "FAC": "F",  # Factura
+            "PTS": "PS",  # Part Sale / Venta de repuestos
             "BOL": "B",  # Boleta
         }
 
@@ -416,6 +421,7 @@ class Documento(AuditMixin, models.Model):
             "PRES": "E",  # Estimate
             "OT": "WO",  # Work Order
             "FAC": "I",  # Invoice
+            "PTS": "PS",  # Part Sale
             "BOL": "I",  # Invoice (no hay boletas en USA)
         }
 

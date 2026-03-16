@@ -1,0 +1,1144 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load humanize %}
+<!-- 🚨🚨🚨 TEMPLATE BASE DOCUMENTO 🚨🚨🚨 -->
+
+
+{% block title %}{{ empresa.nombre_taller }} - {% block documento_title %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document{% else %}Documento{% endif %}{% endblock %}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* 🎨 Estilo futurista para formularios de documentos */
+:root {
+    --cyber-blue: #00ffff;
+    --cyber-green: #00ff88;
+    --cyber-purple: #8000ff;
+    --cyber-red: #ff0044;
+    --cyber-gold: #ffd700;
+    --cyber-orange: #ff8800;
+    --dark-bg: #0a0a0a;
+    --card-bg: rgba(16, 20, 24, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.cyber-container {
+    background: var(--card-bg);
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+}
+
+.form-section {
+    background: var(--card-bg);
+    border: 1px solid var(--cyber-purple);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    color: var(--cyber-blue);
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    color: #ffffff !important;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    display: block;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* 🎯 ESTILOS PARA ETIQUETAS - MEJOR CONTRASTE */
+label,
+.form-label,
+.form-group label,
+.form-check-label {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Estilos para etiquetas de campos específicos */
+#document-form label,
+#document-form .form-label {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* 🎨 ESTILOS UNIFICADOS - SOBRIOS: menos altura, sin glow permanente */
+.form-input,
+.form-select,
+.form-textarea,
+.form-control,
+input[type="text"],
+input[type="date"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+select,
+textarea,
+input {
+    background: rgba(15, 15, 35, 0.98) !important;
+    border: 1px solid rgba(128, 0, 255, 0.4) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    color: #ffffff !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    width: 100% !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    min-height: 36px !important;
+    line-height: 1.35 !important;
+    box-shadow: none !important;
+}
+
+/* 🎯 FORZAR ESTILOS NEGROS PARA TODOS LOS INPUTS - SIN EXCEPCIONES */
+*[type="text"],
+*[type="date"],
+*[type="number"],
+*[type="email"],
+*[type="tel"],
+*[type="password"],
+*[type="search"],
+*[type="url"],
+*[type="hidden"],
+select,
+textarea,
+input,
+.form-control,
+.form-select,
+.form-input,
+.form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* 🎯 ESPECÍFICO PARA CAMPOS DAL (Django Autocomplete Light) */
+.select2-container .select2-selection--single,
+.select2-container .select2-selection--multiple,
+.select2-dropdown {
+    background: rgba(15, 15, 35, 0.98) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    color: #ffffff !important;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered,
+.select2-container .select2-selection--multiple .select2-selection__choice {
+    color: #ffffff !important;
+}
+
+.select2-results__option {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+}
+
+.select2-results__option--highlighted {
+    background: rgba(0, 255, 136, 0.3) !important;
+    color: #ffffff !important;
+}
+
+/* 🎯 ESTILOS ADICIONALES PARA ASEGURAR FONDO NEGRO EN TODOS LOS CAMPOS */
+/* Forzar estilos en todos los elementos del formulario */
+form input,
+form select,
+form textarea,
+form .form-control,
+form .form-select,
+form .form-input,
+form .form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para campos específicos del formulario de documentos */
+#document-form input,
+#document-form select,
+#document-form textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para tablas y elementos adicionales */
+.table input,
+.table select,
+.table textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para elementos de Bootstrap que puedan interferir */
+.form-control,
+.form-select,
+.form-input,
+.form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para elementos de Django forms */
+.django-form input,
+.django-form select,
+.django-form textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Glow solo en focus, estética cyber sobria */
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus,
+.form-control:focus,
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: rgba(0, 255, 136, 0.7) !important;
+    box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.15) !important;
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+}
+
+/* Estilos específicos para campos readonly */
+.form-input[readonly],
+.form-control[readonly],
+input[readonly] {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border-color: var(--cyber-blue) !important;
+    color: var(--cyber-blue) !important;
+    cursor: not-allowed !important;
+}
+
+/* Estilos para campos deshabilitados */
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled,
+.form-control:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background: rgba(15, 15, 25, 0.95) !important;
+    border-color: #444 !important;
+    color: #888 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+/* Placeholder styling */
+.form-input::placeholder,
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+    font-style: italic !important;
+}
+
+/* Select options styling - Mejorado para mejor contraste */
+select option {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    padding: 12px 16px !important;
+    font-weight: 500 !important;
+    border: none !important;
+}
+
+select option:hover {
+    background: rgba(0, 255, 136, 0.2) !important;
+    color: #ffffff !important;
+}
+
+select option:checked {
+    background: rgba(0, 255, 136, 0.3) !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+}
+
+/* Hover sutil, sin glow */
+.form-input:hover:not(:focus):not(:disabled),
+.form-select:hover:not(:focus):not(:disabled),
+.form-textarea:hover:not(:focus):not(:disabled),
+.form-control:hover:not(:focus):not(:disabled),
+input:hover:not(:focus):not(:disabled),
+select:hover:not(:focus):not(:disabled),
+textarea:hover:not(:focus):not(:disabled) {
+    border-color: rgba(0, 255, 255, 0.5) !important;
+}
+
+/* 🎯 ESTILOS ESPECÍFICOS PARA CAMPOS DEL FORMULARIO DE DOCUMENTOS */
+/* Campo de número (readonly) */
+#id_numero {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border: 1px solid rgba(0, 255, 255, 0.35) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    color: var(--cyber-blue) !important;
+    font-family: 'Courier New', monospace !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    cursor: not-allowed !important;
+    min-height: 36px !important;
+}
+
+/* Campos de búsqueda AJAX */
+#cliente-busqueda,
+.rep-codigo,
+.serv-search,
+.otr-search {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+#cliente-busqueda:focus,
+.rep-codigo:focus,
+.serv-search:focus,
+.otr-search:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de información del cliente */
+#cliente-info {
+    background: rgba(0, 255, 255, 0.08) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1) !important;
+}
+
+/* Campos de repuestos */
+.rep-nombre,
+.rep-precio-compra,
+.rep-precio-venta,
+.rep-cantidad,
+.serv-precio,
+.otr-precio,
+.otr-precio-taller {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+.rep-nombre:focus,
+.rep-precio-compra:focus,
+.rep-precio-venta:focus,
+.rep-cantidad:focus,
+.serv-precio:focus,
+.otr-precio:focus,
+.otr-precio-taller:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos readonly de repuestos */
+.rep-nombre,
+.rep-precio-compra {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border-color: var(--cyber-blue) !important;
+    color: var(--cyber-blue) !important;
+    cursor: not-allowed !important;
+}
+
+/* Campos de empresa externa */
+input[name*="empresa_externa"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="empresa_externa"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de observaciones */
+textarea[name="observaciones"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    min-height: 120px !important;
+    resize: vertical !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+textarea[name="observaciones"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Checkbox de IVA */
+input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    accent-color: var(--cyber-green) !important;
+    cursor: pointer !important;
+}
+
+/* Checkbox específico para "Excluir IVA" */
+#id_exclude_vat {
+    accent-color: var(--cyber-orange) !important;
+}
+
+/* Labels de checkboxes IVA */
+label[for="id_apply_vat"],
+label[for="id_exclude_vat"] {
+    color: #b0b8c1 !important;
+    font-size: 0.9rem !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+label[for="id_apply_vat"]:hover,
+label[for="id_exclude_vat"]:hover {
+    color: var(--cyber-blue) !important;
+    text-shadow: 0 0 8px var(--cyber-blue) !important;
+}
+
+/* Dropdowns de resultados */
+#cliente-resultados,
+.serv-resultados,
+.otr-resultados,
+.repuesto-dropdown {
+    background: rgba(20, 20, 40, 0.98) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    backdrop-filter: blur(15px) !important;
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3) !important;
+}
+
+/* Items de dropdown */
+.cliente-item,
+.servicio-item,
+.repuesto-suggestion {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease !important;
+}
+
+.cliente-item:hover,
+.servicio-item:hover,
+.repuesto-suggestion:hover {
+    background: rgba(0, 255, 255, 0.1) !important;
+    border-color: var(--cyber-blue) !important;
+}
+
+/* 🎯 CAMPOS DE TOTALES Y ELEMENTOS ESPECIALES */
+/* Campos de subtotal (readonly) */
+.subtotal-field,
+.rep-subtotal-view,
+.serv-subtotal-view,
+.otr-subtotal-view {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border: 1px solid rgba(0, 255, 255, 0.35) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    color: var(--cyber-blue) !important;
+    font-family: 'Courier New', monospace !important;
+    font-weight: bold !important;
+    text-align: right !important;
+    cursor: not-allowed !important;
+    min-height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+}
+
+/* Campos de descuento */
+input[name*="descuento"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="descuento"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de cantidad */
+input[name*="cantidad"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="cantidad"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio unitario */
+input[name*="precio_unitario"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="precio_unitario"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio cliente */
+input[name*="precio_cliente"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="precio_cliente"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio taller */
+input[name*="precio_taller"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="precio_taller"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio compra */
+input[name*="precio_compra"] {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: var(--cyber-blue) !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    cursor: not-allowed !important;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1) !important;
+}
+
+/* Campos de kilometraje */
+input[name="kilometraje"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name="kilometraje"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de fecha de emisión */
+input[name="fecha_emision"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name="fecha_emision"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de técnico responsable */
+select[name="tecnico_responsable"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+select[name="tecnico_responsable"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de tipo de documento */
+select[name="tipo"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+select[name="tipo"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campo de estado de pago */
+select[name="estado_pago"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+select[name="estado_pago"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Estilos específicos para opciones de estado de pago */
+select[name="estado_pago"] option[value="NO_PAGADO"] {
+    color: var(--cyber-orange) !important;
+}
+
+select[name="estado_pago"] option[value="PAGADO"] {
+    color: var(--cyber-green) !important;
+}
+
+select[name="estado_pago"] option[value="PARCIAL"] {
+    color: var(--cyber-blue) !important;
+}
+
+/* Campos de cliente y vehículo - Estilos mejorados con mayor especificidad */
+select[name="cliente"],
+select[name="vehiculo"],
+#id_cliente,
+#id_vehiculo,
+.form-select[name="cliente"],
+.form-select[name="vehiculo"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+    min-height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+select[name="cliente"]:focus,
+select[name="vehiculo"]:focus,
+#id_cliente:focus,
+#id_vehiculo:focus,
+.form-select[name="cliente"]:focus,
+.form-select[name="vehiculo"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+select[name="cliente"]:hover:not(:focus),
+select[name="vehiculo"]:hover:not(:focus),
+#id_cliente:hover:not(:focus),
+#id_vehiculo:hover:not(:focus),
+.form-select[name="cliente"]:hover:not(:focus),
+.form-select[name="vehiculo"]:hover:not(:focus) {
+    border-color: var(--cyber-blue) !important;
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.15) !important;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green));
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    color: #000;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, var(--cyber-purple), var(--cyber-orange));
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(128, 0, 255, 0.5);
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, var(--cyber-red), #ff6666);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 0, 68, 0.5);
+    color: #fff;
+    text-decoration: none;
+}
+
+.header-section {
+    background: var(--card-bg);
+    border: 1px solid var(--cyber-blue);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.header-section.header-compact {
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(0,255,255,0.06) 0%, rgba(128,0,255,0.04) 100%);
+}
+
+.header-badge {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--cyber-blue);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.header-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--cyber-blue);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 15px var(--cyber-blue);
+}
+
+.header-subtitle {
+    color: #b0b8c1;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.header-info {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.error-message {
+    background: rgba(255, 0, 68, 0.1);
+    border: 1px solid var(--cyber-red);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--cyber-red);
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid var(--cyber-green);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--cyber-green);
+    margin-bottom: 1rem;
+}
+
+.info-message {
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid var(--cyber-blue);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--cyber-blue);
+    margin-bottom: 1rem;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--cyber-blue);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-3 py-2 sm:px-4 sm:py-3">
+
+    <!-- Cabecera compacta -->
+    <div class="header-section header-compact">
+        <span class="header-badge">{% block documento_header %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document{% else %}Documento{% endif %}{% endblock %}</span>
+    </div>
+
+    <!-- Mensajes del sistema (sin informativos tipo "creado exitosamente") -->
+    {% if messages %}
+        {% for message in messages %}
+            {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Ha iniciado sesión exitosamente" not in message|stringformat:"s" and "Ha cerrado sesión" not in message|stringformat:"s" and "iniciado sesión exitosamente" not in message|stringformat:"s" and "cerrado sesión" not in message|stringformat:"s" and "Logo actualizado exitosamente" not in message|stringformat:"s" and "Tema y colores guardados exitosamente" not in message|stringformat:"s" and "Logo subido exitosamente" not in message|stringformat:"s" and "actualizada exitosamente" not in message|stringformat:"s" and "creado exitosamente" not in message|stringformat:"s" and "creado." not in message|stringformat:"s" %}
+                <div class="{% if message.tags == 'error' %}error-message{% elif message.tags == 'success' %}success-message{% else %}info-message{% endif %}">
+                    {{ message }}
+                </div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    <!-- Contenido del documento -->
+    {% block documento_content %}
+    <div class="cyber-container p-6">
+        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+        <h2 class="section-title">📋 Document Information</h2>
+        <p>This is the base template for documents. Specific content should be defined in the 'documento_content' block.</p>
+        {% else %}
+        <h2 class="section-title">📋 Información del Documento</h2>
+        <p>Este es el template base para documentos. El contenido específico debe ser definido en el bloque 'documento_content'.</p>
+        {% endif %}
+    </div>
+    {% endblock %}
+
+    <!-- Acciones del formulario -->
+    {% block documento_actions %}
+    <div class="form-actions">
+        <button type="submit" class="btn-primary" form="document-form">
+            💾 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Save Document{% else %}Guardar Documento{% endif %}
+        </button>
+        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+          <a href="{% url 'documentos_us_en:lista_documentos' %}" class="btn-secondary">← Back to List</a>
+          {% if documento %}
+            <a href="{% url 'documentos_us_en:ver_documento' documento.id %}" class="btn-secondary">👁️ View Document</a>
+          {% endif %}
+        {% else %}
+          <a href="{% url 'documentos_cl_es:lista_documentos' %}" class="btn-secondary">← Volver a la Lista</a>
+          {% if documento %}
+            <a href="{% url 'documentos_cl_es:ver_documento' documento.id %}" class="btn-secondary">👁️ Ver Documento</a>
+          {% endif %}
+        {% endif %}
+    </div>
+    {% endblock %}
+
+</div>
+
+<!-- JavaScript para funcionalidades -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Cabecera compacta: sin animación typing
+
+    // Validación de formularios
+    const form = document.getElementById('document-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // DEBUG: Log todos los campos del formulario
+            console.log('🔍 DEBUG: Campos del formulario antes del envío:');
+            const formData = new FormData(this);
+            for (let [key, value] of formData.entries()) {
+                console.log(`  ${key}: ${value}`);
+            }
+
+            // Validar que se haya seleccionado un cliente
+            const clienteHidden = document.getElementById('id_cliente');
+
+            console.log('🔍 DEBUG: Cliente hidden value:', clienteHidden?.value);
+
+            if (!clienteHidden || !clienteHidden.value) {
+                e.preventDefault();
+                {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
+                  alert('Please select a customer before continuing.');
+                {% else %}
+                  alert('Por favor seleccione un cliente antes de continuar.');
+                {% endif %}
+                return false;
+            }
+
+            // Actualizar campos ocultos antes de enviar
+            if (typeof window.recalcTotales === 'function') {
+                window.recalcTotales();
+            }
+
+            // Agregar clase de loading
+            this.classList.add('loading');
+
+            // Aquí se pueden agregar validaciones adicionales
+            console.log('✅ Enviando formulario...');
+        });
+    }
+
+    // Auto-save functionality (opcional)
+    const inputs = document.querySelectorAll('.form-input, .form-select, .form-textarea');
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Aquí se puede implementar auto-save
+            console.log('Campo modificado:', this.name);
+        });
+    });
+
+    // Animaciones de hover en botones
+    const buttons = document.querySelectorAll('.btn-primary, .btn-secondary, .btn-danger');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+        });
+
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+});
+</script>
+
+{# DAL/Select2: se carga UNA SOLA VEZ en base.html (form_media_once). NO incluir {{ form.media }} aquí: provoca "select2 has already been registered". #}
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

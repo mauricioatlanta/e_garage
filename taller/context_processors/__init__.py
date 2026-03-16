@@ -19,11 +19,12 @@ from .namespaces import ui_namespaces  # útil para otros settings
 
 def company_context(request):
     """Context processor para datos de empresa y configuración estática."""
-    empresa = (
-        getattr(request.user, "empresa", None)
-        if hasattr(request, "user") and request.user.is_authenticated
-        else None
-    )
+    empresa = None
+    if hasattr(request, "user") and getattr(request.user, "is_authenticated", False):
+        try:
+            empresa = getattr(request.user, "empresa", None)
+        except Exception:
+            empresa = None
     country = getattr(empresa, "pais", "CL") if empresa else "CL"
     company_settings = getattr(empresa, "configuracion", None) if empresa else None
     return {

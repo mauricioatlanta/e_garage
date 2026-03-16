@@ -9,7 +9,6 @@ import logging
 from ..models import WhatsAppSession
 from .meta import MetaWhatsAppClient
 from .nlp import NLPProcessor
-from .ocr import OCRProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +30,7 @@ class WhatsAppFlowManager:
         self.session = session
         self.meta_client = meta_client
         self.nlp = NLPProcessor()
-        self.ocr = OCRProcessor()
+        self.ocr = None  # OCR deshabilitado
     
     def process_message(self, from_phone: str, message_type: str, content: Any) -> bool:
         """
@@ -120,6 +119,12 @@ class WhatsAppFlowManager:
                 )
                 return False
             
+            if not self.ocr:
+                self.meta_client.send_text_message(
+                    from_phone,
+                    "❌ OCR deshabilitado temporalmente. Por favor, ingresa la patente manualmente."
+                )
+                return False
             # Procesar OCR
             patente = self.ocr.extract_plate(image_bytes)
             if not patente:

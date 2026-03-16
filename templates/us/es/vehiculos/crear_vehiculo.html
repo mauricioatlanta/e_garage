@@ -18,8 +18,7 @@
 
 {% block page_extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-{# Select2 CSS se carga desde base.html via form.media.css - También lo agregamos aquí para asegurar que se cargue #}
-{% if form %}{{ form.media.css }}{% endif %}
+{# Select2/DAL: form.media se carga UNA SOLA VEZ en base.html (form.media.css en head, form.media.js al final). NO duplicar aquí. #}
 <style>
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
@@ -488,6 +487,14 @@ input:focus {
         </div>
 
         <div class="form-group space-y-3 sm:space-y-4">
+          <label for="{{ form.tipo_carroceria.id_for_label }}" class="text-sm sm:text-base">{% trans "Tipo de carrocería / Estilo" %}</label>
+          {{ form.tipo_carroceria }}
+          {% if form.tipo_carroceria.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.tipo_carroceria.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group space-y-3 sm:space-y-4">
           <label for="{{ form.color.id_for_label }}" class="text-sm sm:text-base">{% trans "Color" %}</label>
           {{ form.color }}
           {% if form.color.errors %}
@@ -571,8 +578,9 @@ input:focus {
 
 <script>
 // Cache buster: 2024-12-19 - Versión actualizada - Inicialización mejorada de Select2/DAL
-// Definir countryPrefix globalmente
-const countryPrefix = '/us/';
+// URLs para autocomplete cliente (DAL/fallback)
+const urlClienteAutocomplete = "{% url 'us_es:vehiculos:cliente_autocomplete' %}";
+const countryPrefix = '/us/es/';
 
 // --- INICIALIZACIÓN DE SELECT2 Y DAL ---
 window.clienteSelect2Init = { attempted: false, success: false };
@@ -600,10 +608,11 @@ function initializeClienteSelect2() {
         widgetType: clienteField.attr('class')
     });
     
-    // Si ya está inicializado, marcar como exitoso y salir
+    // Si ya está inicializado, marcar como exitoso, sincronizar valor del form y salir
     if (clienteField.hasClass('select2-hidden-accessible')) {
         window.clienteSelect2Init.success = true;
         console.log('✅ Select2 ya está inicializado por DAL');
+        syncClienteSelect2FromForm();
         aplicarEstilosSelect2();
         return;
     }
@@ -627,11 +636,9 @@ function initializeClienteSelect2() {
             console.log('✅ URL de autocomplete ya tiene prefijo correcto:', autocompleteUrl);
         }
     } else {
-        // Si no hay URL, establecerla manualmente
-        const defaultUrl = countryPrefix + 'vehiculos/autocomplete/cliente/';
-        clienteField.attr('data-autocomplete-light-url', defaultUrl);
-        clienteField.attr('data-ajax--url', defaultUrl);
-        console.log('🔧 URL de autocomplete establecida por defecto:', defaultUrl);
+        clienteField.attr('data-autocomplete-light-url', urlClienteAutocomplete);
+        clienteField.attr('data-ajax--url', urlClienteAutocomplete);
+        console.log('🔧 URL de autocomplete establecida:', urlClienteAutocomplete);
     }
     
     // Intentar inicialización solo si tenemos las dependencias
@@ -649,6 +656,7 @@ function initializeClienteSelect2() {
             if (clienteField.hasClass('select2-hidden-accessible')) {
                 window.clienteSelect2Init.success = true;
                 console.log('✅ Select2 inicializado correctamente por DAL');
+                syncClienteSelect2FromForm();
                 aplicarEstilosSelect2();
             } else {
                 console.warn('⚠️ Select2 no se inicializó automáticamente, intentando fallback manual');
@@ -657,7 +665,7 @@ function initializeClienteSelect2() {
                     // Verificar URL antes de inicializar
                     const finalUrl = clienteField.attr('data-autocomplete-light-url') || 
                                     clienteField.attr('data-ajax--url') ||
-                                    countryPrefix + 'vehiculos/autocomplete/cliente/';
+                                    urlClienteAutocomplete;
                     console.log('🔗 URL final antes de inicializar Select2:', finalUrl);
                     
                     clienteField.select2({ 
@@ -713,6 +721,7 @@ function initializeClienteSelect2() {
                     });
                     window.clienteSelect2Init.success = true;
                     console.log('✅ Select2 inicializado manualmente');
+                    syncClienteSelect2FromForm();
                     aplicarEstilosSelect2();
                 } catch (e) {
                     console.error('❌ Error al inicializar Select2 manualmente:', e);
@@ -763,7 +772,26 @@ function aplicarEstilosSelect2() {
     });
 }
 
+// Sincronizar el widget Select2/DAL del cliente con el valor ya seleccionado por el backend (ej. cliente_id en URL)
+function syncClienteSelect2FromForm() {
+    const clienteSelect = document.getElementById('id_cliente');
+    if (!clienteSelect || !clienteSelect.value) return;
+    clienteSelect.dataset.source = 'form';
+    if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
+        jQuery(clienteSelect).val(clienteSelect.value).trigger('change');
+    }
+}
+
 $(document).ready(function() {
+    // Marcar y sincronizar cliente si ya viene preseleccionado desde el backend (flujo desde documento)
+    const clienteSelectEl = document.getElementById('id_cliente');
+    if (clienteSelectEl && clienteSelectEl.value) {
+        clienteSelectEl.dataset.source = 'form';
+    }
+    // Sincronizar widget con valor preseleccionado por si DAL/Select2 ya está listo o se inicializa después
+    setTimeout(syncClienteSelect2FromForm, 100);
+    setTimeout(syncClienteSelect2FromForm, 800);
+    setTimeout(syncClienteSelect2FromForm, 1500);
     // Esperar a que form.media se cargue completamente antes de inicializar
     // Usar múltiples intentos para asegurar que funcione
     setTimeout(initializeClienteSelect2, 500);
@@ -787,6 +815,7 @@ $(document).ready(function() {
         if (clienteField.length && clienteField.hasClass('select2-hidden-accessible') && !window.clienteSelect2Init.success) {
             window.clienteSelect2Init.success = true;
             console.log('✅ Select2 detectado por MutationObserver');
+            syncClienteSelect2FromForm();
             aplicarEstilosSelect2();
         }
     });
@@ -806,13 +835,13 @@ $(document).ready(function() {
 // --- LÓGICA DE CARGA DE MODELOS (AJAX) ---
 document.addEventListener('DOMContentLoaded', function() {
     // 1. URLs generadas por Django (Fuente de verdad)
-    const urlModelosApi = "{% url 'usa_es:vehiculos:modelos_por_marca_api' %}";
-    const urlAgregarMarca = "{% url 'usa_es:vehiculos:ajax_agregar_marca' %}";
-    const urlAgregarMotor = "{% url 'usa_es:vehiculos:ajax_agregar_motor' %}";
-    const urlAgregarCaja = "{% url 'usa_es:vehiculos:ajax_agregar_caja' %}";
-    const urlAgregarModelo = "{% url 'usa_es:vehiculos:ajax_agregar_modelo' %}";
-    const urlMotoresPorModelo = "{% url 'usa_es:vehiculos:ajax_motores_por_modelo' %}";
-    const urlCajasPorModelo = "{% url 'usa_es:vehiculos:ajax_cajas_por_modelo' %}";
+    const urlModelosApi = "{% url 'us_es:vehiculos:modelos_por_marca_api' %}";
+    const urlAgregarMarca = "{% url 'us_es:vehiculos:ajax_agregar_marca' %}";
+    const urlAgregarMotor = "{% url 'us_es:vehiculos:ajax_agregar_motor' %}";
+    const urlAgregarCaja = "{% url 'us_es:vehiculos:ajax_agregar_caja' %}";
+    const urlAgregarModelo = "{% url 'us_es:vehiculos:ajax_agregar_modelo' %}";
+    const urlMotoresPorModelo = "{% url 'us_es:vehiculos:ajax_motores_por_modelo' %}";
+    const urlCajasPorModelo = "{% url 'us_es:vehiculos:ajax_cajas_por_modelo' %}";
     
     // 2. Referencias al DOM
     const marcaSelect = document.getElementById('id_marca');
@@ -1537,10 +1566,8 @@ $(document).ready(function() {
         }, 1500); // Esperar un poco más para que Select2 se inicialice completamente
     }
     
-    // Esperar a que form.media se cargue (ya se cargó antes)
+    // form.media.js se carga una sola vez en base.html (al final del body)
     setTimeout(initializeDAL, 500);
 })();
 </script>
-{# JS de form.media (DAL/Select2) - Asegurar que se cargue #}
-{% if form %}{{ form.media.js }}{% endif %}
 {% endblock %}

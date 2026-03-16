@@ -10,6 +10,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.models.clientes import Cliente
+from taller.templatetags.country_url import _country_ns_from_path
 from taller.utils.empresa import get_active_empresa
 
 
@@ -69,11 +70,13 @@ def obtener_ciudades(request):
     - Para usuarios de Venezuela: ciudades de estados venezolanos
     - Para usuarios de Perú: ciudades de departamentos peruanos
     """
-    # Detectar país del usuario
+    # Detectar país del usuario (OneToOne inversa puede lanzar DoesNotExist)
     pais_usuario = "CL"  # Por defecto Chile
     if hasattr(request, "user") and request.user.is_authenticated:
-        if hasattr(request.user, "empresa") and hasattr(request.user.empresa, "pais"):
-            pais_usuario = request.user.empresa.pais
+        from taller.utils.empresa import get_user_empresa_safe
+        empresa = get_user_empresa_safe(request.user)
+        if empresa and getattr(empresa, "pais", None):
+            pais_usuario = empresa.pais
 
     if pais_usuario in ["US", "BR", "VE", "PE", "MX"]:
         # Usuarios de USA, Brasil, Venezuela, Perú: usar modelo Estado/Ciudad unificado
@@ -180,7 +183,14 @@ def cliente_delete(request, pk=None, cliente_id=None):
         try:
             cliente.delete()
             messages.success(request, f"Cliente {cliente.nombre} eliminado exitosamente.")
-            return redirect("chile:taller:clientes:lista_clientes")
+            path = (request.path or "/").strip()
+            country_ns = _country_ns_from_path(path)
+            if country_ns == "usa":
+                return redirect("usa:clientes:lista_clientes")
+            if country_ns in ("us_en", "us_es"):
+                # Bajo us_en/us_es las rutas están en us_XX:taller:clientes:...
+                return redirect(f"{country_ns}:taller:clientes:lista_clientes")
+            return redirect("chile:clientes:lista_clientes")
         except ProtectedError as e:
             # Obtener los objetos protegidos
             protected_objects = e.args[1]
@@ -201,18 +211,19 @@ def cliente_delete(request, pk=None, cliente_id=None):
             messages.error(request, mensaje)
             return render(
                 request,
-                "taller/clientes/confirmar_eliminacion.html",
+                "taller/common/clientes/confirmar_eliminacion.html",
                 {"cliente": cliente},
             )
         except Exception as e:
+            logging.exception("Error inesperado en cliente_delete")
             messages.error(request, f"Error inesperado al eliminar el cliente: {str(e)}")
             return render(
                 request,
-                "taller/clientes/confirmar_eliminacion.html",
+                "taller/common/clientes/confirmar_eliminacion.html",
                 {"cliente": cliente},
             )
 
-    return render(request, "taller/clientes/confirmar_eliminacion.html", {"cliente": cliente})
+    return render(request, "taller/common/clientes/confirmar_eliminacion.html", {"cliente": cliente})
 
 
 def clientes_stats(request):

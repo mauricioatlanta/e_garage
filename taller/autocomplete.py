@@ -22,7 +22,10 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Vehiculo.objects.none()
-        qs = Vehiculo.objects.filter(empresa=self.request.user.empresa)
+        # Solo vehículos de cliente (para documentos)
+        qs = Vehiculo.objects.filter(
+            empresa=self.request.user.empresa, tipo_uso=Vehiculo.TIPO_USO_CLIENTE
+        )
         # Filtro por cliente desde forward
         cli_id = self.forwarded.get("cliente")
         if cli_id:

@@ -31,9 +31,6 @@ def panel_ingreso_vehiculo(request, pk, *args, **kwargs):
         try:
             return redirect(ruta, vehiculo_id=vehiculo.pk)
         except Exception:
-            try:
-                return redirect(ruta, pk=vehiculo.pk)
-            except Exception:
-                continue
+            continue
 
     return redirect("/")

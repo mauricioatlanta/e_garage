@@ -8,6 +8,7 @@ from decimal import Decimal, InvalidOperation
 
 from django import forms
 from django.contrib.auth.decorators import login_required
+from django.contrib.messages import get_messages
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from django.utils.decorators import method_decorator
@@ -31,7 +32,9 @@ from django.db.models import (
     When,
 )
 from django.db.models.functions import Coalesce
+from django.core.exceptions import ObjectDoesNotExist
 
+from taller.config.feature_flags import get_country_features
 from taller.forms.documento_form import DocumentoForm
 from taller.mixins import CountryLangTemplateMixin
 from taller.models import Documento, Tecnico
@@ -50,6 +53,103 @@ LANGUAGE_BY_COUNTRY = {
     "US": "en",
     "BR": "pt",
 }
+
+
+def _get_empresa_safe(request):
+    """Obtiene la empresa del usuario sin lanzar DoesNotExist (OneToOne reverse)."""
+    user = getattr(request, "user", None)
+    if not user or not getattr(user, "is_authenticated", False):
+        return None
+    try:
+        return user.empresa
+    except (AttributeError, ObjectDoesNotExist, Exception):
+        return None
+
+
+def _ensure_ui_config_tax_and_currency(request, ui_config, empresa):
+    """
+    Asegura que ui_config tenga tax_lines y currency para el pie del formulario.
+    Siempre regenera tax_lines según el país actual para no mezclar impuestos de
+    distintos países (p. ej. IVA + Sales Tax).
+    """
+    path = (getattr(request, "path", "") or "").lower()
+    path_country = "CL"
+    if path.startswith("/us/"):
+        path_country = "US"
+    elif path.startswith("/mx/"):
+        path_country = "MX"
+    elif path.startswith("/pe/"):
+        path_country = "PE"
+    elif path.startswith("/ve/"):
+        path_country = "VE"
+    elif path.startswith("/br/"):
+        path_country = "BR"
+    # Path primero (alineado con CountryLangTemplateMixin) para consistencia template/contexto
+    resolved_country = (
+        path_country
+        or getattr(request, "company_country", None)
+        or (getattr(empresa, "pais", None) if empresa else None)
+        or "CL"
+    )
+    country_code = str(resolved_country).upper() if resolved_country else "CL"
+    features = get_country_features(country_code)
+    ui_config = dict(ui_config) if ui_config else {}
+
+    # Siempre regenerar tax_lines según el país actual (no reutilizar los existentes)
+    try:
+        from taller.documentos.utils.tax_calculator import TaxCalculator
+
+        config_dict = {}
+        if empresa and getattr(empresa, "config", None):
+            c = empresa.config
+            for name in ("iva", "iva_porcentaje", "sales_tax", "tax_rate", "tasa_iva"):
+                if hasattr(c, name):
+                    val = getattr(c, name)
+                    if val is not None and val != "":
+                        config_dict[name] = val
+        calc = TaxCalculator(country_code=country_code, config=config_dict)
+        tax_ui = calc.get_tax_config_for_ui()
+        tax_lines = tax_ui.get("tax_lines", [])
+        ui_config["tax_lines"] = tax_lines
+        if tax_ui.get("currency_symbol"):
+            ui_config["currency_symbol"] = tax_ui["currency_symbol"]
+        if tax_ui.get("currency_code"):
+            ui_config["currency_code"] = tax_ui["currency_code"]
+    except Exception:
+        pass
+    if not ui_config.get("tax_lines"):
+        rate_default = features.get("tax_default_rate", 0)
+        applies = "repuestos" if features.get("apply_tax_to_parts", True) else "all"
+        tax_id = "sales_tax" if features.get("tax_mode") == "sales_tax" else "iva"
+        ui_config["tax_lines"] = [
+            {
+                "id": tax_id,
+                "label": features.get("tax_label", "Tax"),
+                "rate": str(int(rate_default)) if rate_default == int(rate_default) else str(rate_default),
+                "applies_to": applies,
+            }
+        ]
+    if "currency_symbol" not in ui_config:
+        ui_config["currency_symbol"] = features.get("currency_symbol", "$")
+    if "currency_code" not in ui_config:
+        ui_config["currency_code"] = features.get("currency_code", "CLP")
+    return ui_config
+
+
+class _EmptyMessagesStorage:
+    """Storage vacío para que la request no muestre mensajes acumulados de otras vistas."""
+
+    def __iter__(self):
+        return iter([])
+
+    def update(self, response):
+        """Requerido por MessageMiddleware.process_response; no hace nada."""
+        return []
+
+
+def _clear_messages_for_request(request):
+    """Vacía los mensajes de la request para esta respuesta (evita mostrar alertas de desarme, idioma, etc.)."""
+    request._messages = _EmptyMessagesStorage()
 
 
 def _reverse_with_request(request, view_name, kwargs=None):
@@ -191,12 +291,17 @@ class DocumentoLineItemsMixin:
                 continue
             cantidad = _to_int(data.get("cantidad"), default=1)
             precio_unitario = _to_decimal(data.get("precio_unitario"), Decimal("0"))
+            repuesto_id = data.get("repuesto_id")
+            part_id = data.get("part_id")
             linea = LineaRepuesto(
                 documento=documento,
                 codigo=codigo or nombre,
                 nombre=nombre or codigo,
                 cantidad=cantidad,
                 precio_unitario=precio_unitario,
+                repuesto_id=repuesto_id or None,
+                part_id=part_id or None,
+                origen_repuesto="STOCK_BODEGA" if (repuesto_id or part_id) else "EXTERNO",
             )
             linea.save()
 
@@ -255,20 +360,21 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
     paginate_by = 20
 
     def get_template_names(self):
-        """Forzar template específico para US/EN"""
+        """Template para US/EN con fallbacks (ruta correcta en proyecto: us/en/ o taller/)."""
         if self.request.path.startswith("/us/"):
-            template_name = "taller/us/en/documentos/lista_documentos.html"
-            print(f"[DEBUG] DocumentoListView - Using US/EN template: {template_name}")
-            return [template_name]
-        else:
-            template_names = super().get_template_names()
-            print(f"[DEBUG] DocumentoListView - Using default templates: {template_names}")
-            return template_names
+            return [
+                "taller/us/en/documentos/lista_documentos.html",
+                "us/en/documentos/lista_documentos.html",
+                "taller/common/documentos/lista_documentos.html",
+            ]
+        return super().get_template_names()
 
     def get_queryset(self):
         """Filtrar documentos por empresa del usuario con filtros funcionales"""
+        empresa = _get_empresa_safe(self.request)
+        if not empresa:
+            return Documento.objects.none()
         try:
-            empresa = self.request.user.empresa
             base_queryset = (
                 Documento.objects.filter(empresa=empresa)
                 .select_related("cliente", "vehiculo", "tecnico_responsable")
@@ -405,12 +511,13 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             )
 
             return qs
-        except AttributeError:
+        except Exception:
             return Documento.objects.none()
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["country"] = getattr(self.request.user.empresa, "pais", "cl").lower()
+        empresa = _get_empresa_safe(self.request)
+        context["country"] = (getattr(empresa, "pais", None) or "cl").lower() if empresa else ("us" if (self.request.path or "").startswith("/us") else "cl")
 
         # Asignar los valores calculados a las propiedades que el template espera
         documentos = context.get("documentos", [])
@@ -456,9 +563,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
         # === KPIs Y ESTADÍSTICAS CALCULADAS ===
         # Usar un queryset separado SIN annotations para las estadísticas
         # IMPORTANTE: Crear un queryset completamente nuevo sin ninguna annotation previa
-        empresa = self.request.user.empresa
-        # Usar .all() para asegurar que no hay annotations previas
-        stats_qs = Documento.objects.filter(empresa=empresa)
+        stats_qs = Documento.objects.filter(empresa=empresa) if empresa else Documento.objects.none()
 
         # Aplicar los mismos filtros que en get_queryset para que los KPIs reflejen los filtros activos
         cliente_search = self.request.GET.get("cliente", "").strip()
@@ -574,6 +679,49 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
     form_class = DocumentoForm
     base_template_name = "documentos/document_form.html"
 
+    def get(self, request, *args, **kwargs):
+        """Al abrir el formulario (GET), vaciar mensajes de otras secciones para no mostrar alertas ajenas (desarme, idioma, etc.)."""
+        _clear_messages_for_request(request)
+        return super().get(request, *args, **kwargs)
+
+    def get_initial(self):
+        """Preselección desde URL (vuelta desde 'crear vehículo' con cliente_id y vehiculo_id).
+        Vista real de /us/documentos/form/ (DocumentoCreateView)."""
+        initial = super().get_initial() or {}
+        request = self.request
+        try:
+            empresa = getattr(request.user, "empresa", None)
+        except Exception:
+            empresa = None
+        if not empresa:
+            return initial
+        cliente_id_raw = (request.GET.get("cliente_id") or request.GET.get("cliente") or "").strip()
+        vehiculo_id_raw = (request.GET.get("vehiculo_id") or request.GET.get("vehiculo") or "").strip()
+        cliente_obj = None
+        vehiculo_obj = None
+        if cliente_id_raw:
+            try:
+                cliente_obj = Cliente.objects.filter(
+                    pk=int(cliente_id_raw), empresa=empresa
+                ).first()
+                if cliente_obj:
+                    initial["cliente"] = cliente_obj.pk
+            except (ValueError, TypeError):
+                pass
+        if vehiculo_id_raw:
+            try:
+                vehiculo_obj = Vehiculo.objects.filter(
+                    pk=int(vehiculo_id_raw), empresa=empresa
+                ).first()
+                if vehiculo_obj and (
+                    cliente_obj is None
+                    or getattr(vehiculo_obj, "cliente_id", None) == cliente_obj.pk
+                ):
+                    initial["vehiculo"] = vehiculo_obj.pk
+            except (ValueError, TypeError):
+                pass
+        return initial
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         empresa = self.request.user.empresa
@@ -594,13 +742,14 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         elif path.startswith("/br/"):
             path_country = "BR"
 
-        company_country = (
-            getattr(self.request, "company_country", None)
+        # Path primero (alineado con CountryLangTemplateMixin): template y contexto usan el mismo país
+        resolved_country = (
+            path_country
+            or getattr(self.request, "company_country", None)
             or getattr(empresa, "pais", None)
-            or path_country
+            or "CL"
         )
-
-        country_code = str(company_country).upper() if company_country else "CL"
+        country_code = str(resolved_country).upper() if resolved_country else "CL"
         language = LANGUAGE_BY_COUNTRY.get(country_code, "es")
 
         context.update(
@@ -608,7 +757,8 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 "mecanicos": mecanicos,
                 "tecnicos": mecanicos,  # Alias para compatibilidad con templates
                 "es_edicion": False,
-                "company_country": company_country,
+                "company_country": resolved_country,
+                "country_code": country_code,
                 "today": timezone.now().date(),  # Agregar fecha actual
                 "template_name": self.get_template_names()[0],
                 "pais_emoji": "🇺🇸" if self.request.path.startswith("/us/") else "🇨🇱",
@@ -752,6 +902,49 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 "show_vehicle": True,
             }
 
+        # Asegurar tax_lines y currency para el pie (opción Tax y montos Repuestos/Servicios/Otros/Tax)
+        ui_config = _ensure_ui_config_tax_and_currency(self.request, ui_config, empresa)
+
+        # Preselección cliente/vehículo desde GET (vuelta desde crear vehículo). Siempre exponer claves.
+        cliente_preselect_id = ""
+        vehiculo_preselect_id = ""
+        cliente_preselect_nombre = ""
+        cliente_preselect_email = ""
+        cliente_preselect_telefono = ""
+        if self.request.method == "GET" and empresa:
+            cliente_id_raw = (
+                self.request.GET.get("cliente_id") or self.request.GET.get("cliente") or ""
+            ).strip()
+            vehiculo_id_raw = (
+                self.request.GET.get("vehiculo_id") or self.request.GET.get("vehiculo") or ""
+            ).strip()
+            _cliente_obj = None
+            _vehiculo_obj = None
+            if cliente_id_raw:
+                try:
+                    _cliente_obj = Cliente.objects.filter(
+                        pk=int(cliente_id_raw), empresa=empresa
+                    ).first()
+                    if _cliente_obj:
+                        cliente_preselect_id = _cliente_obj.pk
+                        cliente_preselect_nombre = ((_cliente_obj.nombre or "") + " " + (getattr(_cliente_obj, "apellido", "") or "")).strip()
+                        cliente_preselect_email = getattr(_cliente_obj, "email", "") or ""
+                        cliente_preselect_telefono = getattr(_cliente_obj, "telefono", "") or ""
+                except (ValueError, TypeError):
+                    pass
+            if vehiculo_id_raw:
+                try:
+                    _vehiculo_obj = Vehiculo.objects.filter(
+                        pk=int(vehiculo_id_raw), empresa=empresa
+                    ).first()
+                    if _vehiculo_obj and (
+                        _cliente_obj is None
+                        or getattr(_vehiculo_obj, "cliente_id", None) == (_cliente_obj.pk if _cliente_obj else None)
+                    ):
+                        vehiculo_preselect_id = _vehiculo_obj.pk
+                except (ValueError, TypeError):
+                    pass
+
         context.update(
             {
                 "clientes_prefetch": clientes_prefetch,
@@ -760,16 +953,23 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 "servicios_prefetch": servicios_prefetch,
                 "otros_servicios_prefetch": otros_servicios_prefetch,
                 "ui_config": ui_config,  # ✅ Agregar ui_config al contexto
+                "cliente_preselect_id": cliente_preselect_id if cliente_preselect_id != "" else "",
+                "vehiculo_preselect_id": vehiculo_preselect_id if vehiculo_preselect_id != "" else "",
+                "cliente_preselect_nombre": cliente_preselect_nombre or "",
+                "cliente_preselect_email": cliente_preselect_email or "",
+                "cliente_preselect_telefono": cliente_preselect_telefono or "",
             }
         )
         return context
 
     def get_form_kwargs(self):
-        """Obtener argumentos para el formulario"""
+        """Obtener argumentos para el formulario. Incluir initial explícito para preselección."""
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         kwargs["empresa"] = getattr(self.request.user, "empresa", None)
         kwargs["country"] = "US" if self.request.path.startswith("/us/") else "CL"
+        if self.request.method == "GET":
+            kwargs.setdefault("initial", self.get_initial())
         return kwargs
 
     def get_success_url(self):
@@ -790,11 +990,12 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
 
         form.instance.empresa = self.request.user.empresa
 
-        # Guardar el documento primero
+        # Guardar el documento; las líneas se crean desde repuestos_json en DocumentoForm.save()
         response = super().form_valid(form)
 
-        # Procesar items dinámicos después de guardar
-        self.procesar_items_dinamicos(form.instance, clear_existing=True)
+        # No llamar procesar_items_dinamicos: el formulario usa JSON (repuestos_json)
+        # y ya crea las líneas en _process_json_data(); procesar_items_dinamicos
+        # espera POST con prefijos rep-* y borraría las líneas recién creadas.
 
         # Agregar mensaje de éxito
         from django.contrib import messages
@@ -827,7 +1028,10 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
 
     def get_queryset(self):
         """Asegurar que solo se vean documentos de la empresa"""
-        return Documento.objects.filter(empresa=self.request.user.empresa)
+        empresa = _get_empresa_safe(self.request)
+        if not empresa:
+            return Documento.objects.none()
+        return Documento.objects.filter(empresa=empresa)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -946,6 +1150,11 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
     form_class = DocumentoForm
     base_template_name = "documentos/document_form.html"  # Usar el mismo template que CreateView
 
+    def get(self, request, *args, **kwargs):
+        """Al abrir el formulario (GET), vaciar mensajes de otras secciones."""
+        _clear_messages_for_request(request)
+        return super().get(request, *args, **kwargs)
+
     def get_queryset(self):
         """Asegurar que solo se editen documentos de la empresa"""
         if not self.request.user.is_authenticated:
@@ -1037,7 +1246,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
 
         # Obtener líneas del documento para edición
         servicios = documento.lineas_servicio.all().select_related("servicio")
-        repuestos = documento.lineas_repuesto.all().select_related("repuesto")
+        repuestos = documento.lineas_repuesto.all().select_related("repuesto", "pieza_desarme")
         otros_servicios = documento.lineas_otro_servicio.all()
 
         # Calcular subtotales
@@ -1068,11 +1277,14 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         elif path.startswith("/br/"):
             path_country = "BR"
 
-        company_country = (
-            getattr(self.request, "company_country", None)
+        # Path primero (alineado con CountryLangTemplateMixin): template y contexto usan el mismo país
+        resolved_country = (
+            path_country
+            or getattr(self.request, "company_country", None)
             or getattr(empresa, "pais", None)
-            or path_country
+            or "CL"
         )
+        country_code = str(resolved_country).upper() if resolved_country else "CL"
 
         cliente = getattr(documento, "cliente", None)
         vehiculo = getattr(documento, "vehiculo", None)
@@ -1098,6 +1310,9 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
                 "show_vehicle": True,
             }
 
+        # Asegurar tax_lines y currency para el pie (opción Tax y montos Repuestos/Servicios/Otros/Tax)
+        ui_config = _ensure_ui_config_tax_and_currency(self.request, ui_config, empresa)
+
         # Serializar datos para JavaScript
         repuestos_json = []
         for rep in repuestos:
@@ -1110,6 +1325,9 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
                     "cantidad": float(rep.cantidad or 0),
                     "precio": float(rep.precio_unitario or 0),
                     "descuento": float(getattr(rep, "descuento", 0) or 0),
+                    "origen_repuesto": getattr(rep, "origen_repuesto", None) or "STOCK_BODEGA",
+                    "pieza_desarme_id": rep.pieza_desarme_id if getattr(rep, "pieza_desarme_id", None) else None,
+                    "costo_linea": float(getattr(rep, "costo_linea", 0) or 0),
                 }
             )
 
@@ -1157,7 +1375,8 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
                 "mecanicos": mecanicos,
                 "tecnicos": mecanicos,  # Alias para compatibilidad con templates
                 "es_edicion": True,
-                "company_country": company_country,
+                "company_country": resolved_country,
+                "country_code": country_code,
                 "empresa": empresa,  # Agregar empresa al contexto para que esté disponible en el template
                 "ui_config": ui_config,
                 "kilometraje": getattr(documento, "kilometraje_vehiculo", None)
@@ -1237,8 +1456,15 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         return self.render_country_lang(self.request, context)
 
     def form_valid(self, form):
+        # En edición, borrar líneas existentes antes de guardar para que
+        # DocumentoForm.save() las recree desde repuestos_json (evita duplicados).
+        # No usar procesar_items_dinamicos: el formulario usa JSON, no POST con prefijos rep-*.
+        if self.object.pk:
+            self.object.lineas_repuesto.all().delete()
+            self.object.lineas_servicio.all().delete()
+            self.object.lineas_otro_servicio.all().delete()
+
         response = super().form_valid(form)
-        self.procesar_items_dinamicos(self.object, clear_existing=True)
 
         from django.contrib import messages
 
@@ -1267,9 +1493,20 @@ class DocumentoDeleteView(CountryLangTemplateMixin, RoleRequiredMixin, DeleteVie
     allowed_roles = ["Owner", "Admin"]
     permission_denied_message = "Solo el dueño y administradores pueden eliminar documentos."
 
+    def get_template_names(self):
+        """Template para US con fallbacks (us/en, us/es, common)."""
+        if self.request.path.startswith("/us/"):
+            return [
+                "taller/us/en/documentos/confirmar_eliminar.html",
+                "us/en/documentos/confirmar_eliminar.html",
+                "us/es/documentos/confirmar_eliminar.html",
+                "taller/common/documentos/confirmar_eliminar.html",
+            ]
+        return super().get_template_names()
+
     def get_queryset(self):
         """🔒 MULTI-TENANT: Asegurar que solo se eliminen documentos de la empresa"""
-        return Documento.objects.filter(empresa=self.request.user.empresa)
-
-    def render_to_response(self, context, **response_kwargs):
-        return self.render_country_lang(self.request, context)
+        empresa = _get_empresa_safe(self.request)
+        if not empresa:
+            return Documento.objects.none()
+        return Documento.objects.filter(empresa=empresa)

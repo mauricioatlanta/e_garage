@@ -34,6 +34,9 @@ from .memoria_seguimiento import (
 
 # Modelos de repuestos
 from .repuesto import Repuesto
+from .pieza_desarme import PiezaDesarme, PiezaDesarmeName, PrecioHistoricoPieza
+from .vehiculo_desarme import VehiculoDesarme
+from .vendedor_desarme import VendedorDesarme
 
 # Modelos de ubicación
 from .ubicacion import Estado, Ciudad
@@ -76,6 +79,11 @@ __all__ = [
     "SeguimientoPublico",
     # Repuestos
     "Repuesto",
+    "PiezaDesarme",
+    "PiezaDesarmeName",
+    "PrecioHistoricoPieza",
+    "VehiculoDesarme",
+    "VendedorDesarme",
     # Ubicación
     "Estado",
     "Ciudad",

@@ -9,6 +9,7 @@
 
 import json
 import logging
+from urllib.parse import urlencode, urlparse, parse_qsl, urlunparse
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -178,6 +179,19 @@ def has_field(model_cls, field_name: str) -> bool:
         return False
 
 
+def _append_query_params(url, **params):
+    """Append or overwrite query params on a URL safely. Skips None and empty string."""
+    if not url or not url.strip():
+        return url
+    parsed = urlparse(url)
+    current = dict(parse_qsl(parsed.query, keep_blank_values=True))
+    for k, v in params.items():
+        if v is not None and v != "":
+            current[k] = str(v)
+    new_query = urlencode(current)
+    return urlunparse(parsed._replace(query=new_query))
+
+
 def _safe_redirect(request, *candidates):
     """Intenta redirigir por nombre; cae al primero válido."""
     from django.urls import NoReverseMatch, reverse
@@ -257,6 +271,16 @@ def _compat_canonical_redirect(request, view_subpath: str, country: str | None =
 # ---------------------------
 # Vistas principales
 # ---------------------------
+def _get_empresa_safe(user):
+    """Obtiene la empresa del usuario sin lanzar DoesNotExist (OneToOne reverse)."""
+    if not user or not getattr(user, "is_authenticated", False):
+        return None
+    try:
+        return user.empresa
+    except Exception:
+        return None
+
+
 @login_required
 def lista_vehiculos(request):
     """Lista vehículos de la empresa del usuario."""
@@ -264,7 +288,7 @@ def lista_vehiculos(request):
     if compat_redirect:
         return compat_redirect
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = _get_empresa_safe(request.user)
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
         return redirect("/")
@@ -278,10 +302,11 @@ def lista_vehiculos(request):
     # Detectar país e idioma desde la URL
     country, lang = _get_country_from_path(request.path)
 
-    # Usar select_template con fallback a common
+    # Usar select_template con fallbacks (varias rutas por si el proyecto usa us/en o taller/us/en)
     template_obj = select_template(
         [
             f"{country}/{lang}/vehiculos/lista_vehiculos.html",
+            f"taller/{country}/{lang}/vehiculos/lista_vehiculos.html",
             "taller/common/vehiculos/vehiculo_list.html",
         ]
     )
@@ -304,8 +329,11 @@ def crear_vehiculo(request, *args, **kwargs):
     if compat_redirect:
         return compat_redirect
 
-    empresa = getattr(request.user, "empresa", None)
+    empresa = _get_empresa_safe(request.user)
     country = _get_country(request)
+    cliente_id = (
+        request.GET.get("cliente_id") or request.GET.get("cliente") or ""
+    ).strip()
 
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
@@ -319,12 +347,33 @@ def crear_vehiculo(request, *args, **kwargs):
                 with transaction.atomic():
                     vehiculo = form.save(commit=False)
                     vehiculo.empresa = empresa
+                    # Flujo desde documento: marca/modelo pueden venir vacíos (required=False)
+                    if not form.cleaned_data.get("marca"):
+                        vehiculo.marca_id = None
+                    if not form.cleaned_data.get("modelo"):
+                        vehiculo.modelo_id = None
                     vehiculo.save()
 
                     messages.success(
                         request,
                         f"Vehículo {vehiculo.patente or 'sin patente'} creado exitosamente",
                     )
+                    next_url = (
+                        request.POST.get("next") or request.GET.get("next") or ""
+                    ).strip()
+                    if next_url:
+                        cliente_id = (
+                            getattr(vehiculo, "cliente_id", None)
+                            or request.POST.get("cliente")
+                            or request.GET.get("cliente_id")
+                            or request.GET.get("cliente")
+                        )
+                        redirect_url = _append_query_params(
+                            next_url,
+                            cliente_id=cliente_id,
+                            vehiculo_id=vehiculo.id,
+                        )
+                        return redirect(redirect_url)
                     return _safe_redirect(
                         request,
                         f"{country.lower()}:taller:vehiculos:lista_vehiculos",
@@ -351,20 +400,32 @@ def crear_vehiculo(request, *args, **kwargs):
         else:
             messages.error(request, "Por favor corrige los errores en el formulario")
     else:
-        # Pre-llenar patente desde URL params (ej: /vehiculos/crear/?patente=ABCD12)
+        # Pre-llenar patente y cliente desde URL params (ej: desde documento con ?next=...&cliente_id=...)
         initial_data = {}
-        patente_from_url = request.GET.get('patente', '').strip().upper()
+        patente_from_url = request.GET.get("patente", "").strip().upper()
         if patente_from_url:
-            initial_data['patente'] = patente_from_url
-        
+            initial_data["patente"] = patente_from_url
+        if cliente_id:
+            initial_data["cliente"] = cliente_id
+
         form = VehiculoForm(user=request.user, request=request, initial=initial_data)
 
+    if request.method == "POST":
+        cliente_id = (
+            request.POST.get("cliente")
+            or request.GET.get("cliente_id")
+            or request.GET.get("cliente")
+            or ""
+        )
+    next_val = request.GET.get("next") or request.POST.get("next") or ""
     # Contexto para el template
     ctx = {
         "form": form,
         "country": country,
         "empresa": empresa,
-        "patente_detectada": request.GET.get('patente', '').strip().upper() or None,
+        "patente_detectada": request.GET.get("patente", "").strip().upper() or None,
+        "next": next_val,
+        "cliente_id": cliente_id or "",
     }
 
     template_name = _vehicle_template("crear", country)
@@ -978,30 +1039,27 @@ def ajax_agregar_modelo(request):
 @require_POST
 @login_required
 def ajax_agregar_motor(request):
-    """Agregar nuevo motor via AJAX."""
+    """Agregar nuevo motor via AJAX. modelo_id opcional (desarme puede crear sin modelo)."""
     try:
         data = json.loads(request.body)
         nombre = data.get("nombre", "").strip()
         modelo_id = data.get("modelo_id")
 
-        if not nombre or not modelo_id:
+        if not nombre:
             return JsonResponse(
-                {"success": False, "error": "Nombre y modelo requeridos"}, status=400
+                {"success": False, "error": "Nombre requerido"}, status=400
             )
 
         country = _get_country(request)
-        empresa = getattr(request.user, "empresa", None)
 
-        # Validar que modelo pertenece al país
-        modelo = get_object_or_404(Modelo, id=modelo_id, country=country)
-
-        # Crear motor con country (y empresa si aplica)
+        # Crear motor con country
         kwargs = {"nombre": nombre, "country": country}
-        # if hasattr(MotorVehiculo, "empresa") and empresa:
-        #     kwargs["empresa"] = empresa
-
         motor, created = MotorVehiculo.objects.get_or_create(**kwargs)
-        motor.modelos.add(modelo)
+        # Asociar a modelo si se proporciona
+        if modelo_id:
+            modelo = Modelo.objects.filter(id=modelo_id, country=country).first()
+            if modelo:
+                motor.modelos.add(modelo)
 
         return JsonResponse(
             {
@@ -1018,30 +1076,27 @@ def ajax_agregar_motor(request):
 @require_POST
 @login_required
 def ajax_agregar_caja(request):
-    """Agregar nueva caja via AJAX."""
+    """Agregar nueva caja via AJAX. modelo_id opcional (desarme puede crear sin modelo)."""
     try:
         data = json.loads(request.body)
         nombre = data.get("nombre", "").strip()
         modelo_id = data.get("modelo_id")
 
-        if not nombre or not modelo_id:
+        if not nombre:
             return JsonResponse(
-                {"success": False, "error": "Nombre y modelo requeridos"}, status=400
+                {"success": False, "error": "Nombre requerido"}, status=400
             )
 
         country = _get_country(request)
-        empresa = getattr(request.user, "empresa", None)
 
-        # Validar que modelo pertenece al país
-        modelo = get_object_or_404(Modelo, id=modelo_id, country=country)
-
-        # Crear caja con country (y empresa si aplica)
+        # Crear caja con country
         kwargs = {"nombre": nombre, "country": country}
-        # if hasattr(CajaVehiculo, "empresa") and empresa:
-        #     kwargs["empresa"] = empresa
-
         caja, created = CajaVehiculo.objects.get_or_create(**kwargs)
-        caja.modelos.add(modelo)
+        # Asociar a modelo si se proporciona
+        if modelo_id:
+            modelo = Modelo.objects.filter(id=modelo_id, country=country).first()
+            if modelo:
+                caja.modelos.add(modelo)
 
         return JsonResponse(
             {

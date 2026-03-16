@@ -350,9 +350,14 @@ class Migration(migrations.Migration):
             model_name="companysettings",
             name="terms_conditions",
         ),
-        migrations.RemoveField(
-            model_name="empresa",
-            name="is_trial",
+        migrations.SeparateDatabaseAndState(
+            database_operations=[],
+            state_operations=[
+                migrations.RemoveField(
+                    model_name="empresa",
+                    name="is_trial",
+                ),
+            ],
         ),
         migrations.AddField(
             model_name="cajavehiculo",

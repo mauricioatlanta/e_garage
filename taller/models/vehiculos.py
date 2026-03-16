@@ -28,8 +28,27 @@ class VehiculoQuerySet(models.QuerySet):
 
 
 class Vehiculo(TenantScoped):
-    # empresa viene de TenantScoped (inicialmente nullable en migración)
-    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE)
+    TIPO_USO_CLIENTE = "CLIENTE"
+    TIPO_USO_DESARME = "DESARME"
+    TIPO_USO_CHOICES = [
+        (TIPO_USO_CLIENTE, "Cliente"),
+        (TIPO_USO_DESARME, "Desarme"),
+    ]
+
+    # Nullable cuando tipo_uso == DESARME
+    cliente = models.ForeignKey(
+        Cliente,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        help_text="Obligatorio si tipo_uso=CLIENTE; debe ser NULL si tipo_uso=DESARME.",
+    )
+    tipo_uso = models.CharField(
+        max_length=20,
+        choices=TIPO_USO_CHOICES,
+        default=TIPO_USO_CLIENTE,
+        db_index=True,
+    )
 
     # Campo marca flexible: puede ser ForeignKey a Marca (Chile) o CharField (USA catálogo global)
     marca = models.ForeignKey(
@@ -67,7 +86,69 @@ class Vehiculo(TenantScoped):
     vin = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     motor = models.ForeignKey(MotorVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
     caja = models.ForeignKey(CajaVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
+    tipo_carroceria = models.CharField(
+        max_length=80,
+        blank=True,
+        null=True,
+        verbose_name="Tipo de carrocería",
+        help_text="Ej: Sedan, SUV, Pickup, Hatchback, Coupe, etc.",
+    )
     millas = models.PositiveIntegerField(blank=True, null=True, verbose_name="Millas/Kilometraje")
+
+    # Campos solo relevantes para tipo_uso == DESARME
+    costo_adquisicion = models.DecimalField(
+        max_digits=12, decimal_places=2, null=True, blank=True
+    )
+    fecha_ingreso_desarme = models.DateField(null=True, blank=True)
+    estado_desarme = models.CharField(max_length=20, null=True, blank=True)
+    ubicacion_fisica = models.CharField(
+        max_length=120,
+        null=True,
+        blank=True,
+        help_text="Ubicación en la yarda (ej: fila 3, posición 12)",
+    )
+    fecha_baja_desarme = models.DateField(null=True, blank=True)
+    observaciones_desarme = models.TextField(blank=True, null=True)
+    # Vendedor estructurado (evita duplicados, permite reportes)
+    vendedor_desarme = models.ForeignKey(
+        "taller.VendedorDesarme",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vehiculos",
+        verbose_name="Vendedor / comprado a",
+    )
+    # Datos del vendedor legacy (deprecar: usar vendedor_desarme)
+    lugar_compra = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+        verbose_name="Dónde se compró",
+        help_text="Lugar o procedencia donde se adquirió el vehículo",
+    )
+    vendedor_direccion = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        verbose_name="Dirección del vendedor",
+    )
+    vendedor_telefono = models.CharField(
+        max_length=40,
+        blank=True,
+        null=True,
+        verbose_name="Teléfono del vendedor",
+    )
+    vendedor_email = models.EmailField(
+        blank=True,
+        null=True,
+        verbose_name="Email del vendedor",
+    )
+    vendedor_id_imagen = models.ImageField(
+        upload_to="desarme_vendedor_id/%Y/%m/",
+        blank=True,
+        null=True,
+        verbose_name="Imagen I.D. del vendedor",
+    )
 
     objects = VehiculoQuerySet.as_manager()
 
@@ -117,13 +198,25 @@ class Vehiculo(TenantScoped):
         """Validaciones de coherencia para evitar datos inconsistentes"""
         super().clean()
 
-        # 1) Empresa coherente con cliente
+        # 1) Regla cliente ↔ tipo_uso
+        if self.tipo_uso == self.TIPO_USO_CLIENTE:
+            if not self.cliente_id:
+                raise ValidationError(
+                    "Si el vehículo es de cliente, debe tener un cliente asignado."
+                )
+        elif self.tipo_uso == self.TIPO_USO_DESARME:
+            if self.cliente_id is not None:
+                raise ValidationError(
+                    "Un vehículo de desarme no debe tener cliente asignado."
+                )
+
+        # 2) Empresa coherente con cliente (solo si hay cliente)
         if self.empresa_id and self.cliente_id and self.cliente.empresa_id != self.empresa_id:
             raise ValidationError(
                 "El cliente del vehículo debe pertenecer a la misma empresa del vehículo."
             )
 
-        # 2) Reglas de país por empresa (siempre deberíamos tener empresa con TenantScoped)
+        # 3) Reglas de país por empresa (siempre deberíamos tener empresa con TenantScoped)
         pais = getattr(getattr(self, "empresa", None), "pais", None)
 
         # En USA normalmente la patente es menos fiable que el VIN: acepta patente vacía,
@@ -143,7 +236,7 @@ class Vehiculo(TenantScoped):
             #     raise ValidationError("En USA use marca_texto/modelo_texto (no FK).")
             pass
 
-        # 4) Coherencia motor/caja con empresa (y con modelo si corresponde)
+        # 5) Coherencia motor/caja con empresa (y con modelo si corresponde)
         if (
             self.motor_id
             and hasattr(self.motor, "empresa_id")
@@ -330,9 +423,8 @@ class Vehiculo(TenantScoped):
             models.Index(fields=["empresa"]),
             models.Index(fields=["empresa", "patente"]),
             models.Index(fields=["empresa", "vin"]),
-            models.Index(
-                fields=["empresa", "cliente"]
-            ),  # ✅ CRÍTICO: Para endpoint vehiculos-por-cliente
-            models.Index(fields=["marca_texto"]),  # Índice para búsquedas por marca texto
-            models.Index(fields=["modelo_texto"]),  # Índice para búsquedas por modelo texto
+            models.Index(fields=["empresa", "cliente"]),
+            models.Index(fields=["empresa", "tipo_uso"]),
+            models.Index(fields=["marca_texto"]),
+            models.Index(fields=["modelo_texto"]),
         ]

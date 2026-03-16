@@ -7,7 +7,7 @@ from django.db.models.functions import Coalesce
 from django.shortcuts import redirect
 from django.utils import timezone
 
-from taller.auth.decorators import login_required_default
+from taller.auth.decorators import country_login_required
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, LineaServicio
@@ -34,7 +34,7 @@ def total_repuestos(qs_base):
     return qs_base.aggregate(total=Coalesce(Sum(SUBTOTAL_EXPR), ZERO_DEC))["total"]
 
 
-@login_required_default
+@country_login_required
 def dashboard_centro_operaciones(request):
     """
     🏢 Dashboard empresarial - Centro de Operaciones
@@ -344,7 +344,7 @@ def dashboard_centro_operaciones(request):
     return TemplateResponse(request, template_name, context)
 
 
-@login_required_default
+@country_login_required
 def dashboard_centro_operaciones_espacial(request):
     """
     Dashboard especializado con estética espacial futurista

@@ -18,8 +18,7 @@
 
 {% block page_extra_css %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-{# Select2 CSS se carga desde base.html via form.media.css - También lo agregamos aquí para asegurar que se cargue #}
-{% if form %}{{ form.media.css }}{% endif %}
+{# Select2/DAL: form.media se carga UNA SOLA VEZ en base.html (form.media.css en head, form.media.js al final). NO duplicar aquí. #}
 <style>
 @keyframes gradientShift {
   0% { background-position: 0% 50%; }
@@ -408,6 +407,14 @@ input:focus {
         </div>
 
         <div class="form-group">
+          <label for="{{ form.tipo_carroceria.id_for_label }}">Body Type / Style</label>
+          {{ form.tipo_carroceria }}
+          {% if form.tipo_carroceria.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.tipo_carroceria.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group">
           <label for="{{ form.color.id_for_label }}">Color</label>
           {{ form.color }}
           {% if form.color.errors %}
@@ -491,9 +498,28 @@ input:focus {
 // Definir countryPrefix globalmente
 const countryPrefix = '/us/';
 
+// Sincronizar el widget Select2/DAL del cliente con el valor ya seleccionado por el backend (ej. cliente_id en URL)
+function syncClienteSelect2FromForm() {
+    const clienteSelect = document.getElementById('id_cliente');
+    if (!clienteSelect || !clienteSelect.value) return;
+    clienteSelect.dataset.source = 'form';
+    if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
+        jQuery(clienteSelect).val(clienteSelect.value).trigger('change');
+    }
+}
+
 // Verificar inicialización de Select2 después de que form.media haya cargado
 // form.media carga los scripts de DAL que inicializan Select2 automáticamente
 $(document).ready(function() {
+    // Marcar y sincronizar cliente si ya viene preseleccionado desde el backend (flujo desde documento)
+    const clienteSelectEl = document.getElementById('id_cliente');
+    if (clienteSelectEl && clienteSelectEl.value) {
+        clienteSelectEl.dataset.source = 'form';
+    }
+    setTimeout(syncClienteSelect2FromForm, 100);
+    setTimeout(syncClienteSelect2FromForm, 800);
+    setTimeout(syncClienteSelect2FromForm, 1500);
+
     // Función para verificar y aplicar estilos a Select2
     function checkAndStyleSelect2() {
         // Aplicar estilos a los contenedores de Select2
@@ -504,6 +530,7 @@ $(document).ready(function() {
         // Debug: verificar que el campo cliente esté inicializado
         const clienteField = $('#id_cliente');
         if (clienteField.length) {
+            syncClienteSelect2FromForm();
             const isInitialized = clienteField.hasClass('select2-hidden-accessible');
             let autocompleteUrl = clienteField.attr('data-autocomplete-light-url');
             
@@ -1192,11 +1219,9 @@ $(document).ready(function() {
         setTimeout(initializeDAL, 500);
     }
     
-    // También intentar después de más tiempo por si form.media carga de forma asíncrona
+    // form.media.js se carga una sola vez en base.html (al final del body)
     setTimeout(initializeDAL, 1000);
     setTimeout(initializeDAL, 2000);
 })();
 </script>
-{# JS de form.media (DAL/Select2) - Asegurar que se cargue #}
-{% if form %}{{ form.media.js }}{% endif %}
 {% endblock %}

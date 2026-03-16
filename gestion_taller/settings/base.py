@@ -206,8 +206,8 @@ ACCOUNT_FORMS = {
     "login": "taller.forms.custom_login.CustomLoginForm",
 }
 
-# Login default: ruta con país para que @login_required lleve a Chile por defecto
-LOGIN_URL = "/cl/accounts/login/"
+# Login default: ruta neutra; /accounts/login/ aplica lógica country-aware internamente
+LOGIN_URL = "/accounts/login/"
 
 # ---------- eGarage país e idioma por defecto ----------
 # Si alguien entra por /accounts/login/ (ruta sin país), el fallback es Chile, no Uruguay.

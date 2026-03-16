@@ -18,9 +18,10 @@ def select_country_lang_template(base_path: str, country: str, lang: str, fallba
         2. taller/{country}/{lang}/common/{base_path}
         3. taller/{country}/{fallback_lang}/{base_path}
         4. taller/{country}/{fallback_lang}/common/{base_path}
-        5. taller/cl/{lang}/{base_path}
-        6. taller/cl/{lang}/common/{base_path}
-        7. taller/common/{base_path}
+        5. taller/{country}/{base_path}  (ej. taller/us/documentos/... para USA)
+        6. taller/cl/{lang}/{base_path}
+        7. taller/cl/{lang}/common/{base_path}
+        8. taller/common/{base_path}
     """
     country = (country or "CL").lower()
     lang = (lang or fallback_lang).lower()
@@ -30,6 +31,7 @@ def select_country_lang_template(base_path: str, country: str, lang: str, fallba
         f"taller/{country}/{lang}/common/{base_path}",
         f"taller/{country}/{fallback_lang}/{base_path}",
         f"taller/{country}/{fallback_lang}/common/{base_path}",
+        f"taller/{country}/{base_path}",
         f"taller/cl/{lang}/{base_path}",
         f"taller/cl/{lang}/common/{base_path}",
         f"taller/common/{base_path}",

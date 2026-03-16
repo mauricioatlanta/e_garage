@@ -57,7 +57,7 @@ class DocumentoForm(forms.ModelForm):
                 self.fields["tipo"].choices = [
                     ("OT", "Work Order"),
                     ("PRES", "Estimate"),
-                    ("REC", "Receipt/Invoice"),
+                    ("FAC", "Invoice/Receipt"),
                 ]
             if "cliente" in self.fields:
                 self.fields["cliente"].label = "Customer"
@@ -86,7 +86,7 @@ class DocumentoForm(forms.ModelForm):
                 self.fields["tipo"].choices = [
                     ("OT", "Orden de Trabajo"),
                     ("PRES", "Presupuesto"),
-                    ("REC", "Recibo/Boleta"),
+                    ("FAC", "Factura/Boleta"),
                 ]
             if "cliente" in self.fields:
                 self.fields["cliente"].label = "Cliente"
@@ -112,7 +112,8 @@ class DocumentoForm(forms.ModelForm):
 
         # Asegurar IDs únicos para JavaScript
         self.fields["tipo"].widget.attrs.setdefault("id", "id_tipo")
-        self.fields["numero_documento"].widget.attrs.setdefault("id", "id_numero_documento")
+        if "numero" in self.fields:
+            self.fields["numero"].widget.attrs.setdefault("id", "id_numero")
         self.fields["fecha_emision"].widget.attrs.setdefault("id", "id_fecha_emision")
         self.fields["cliente"].widget.attrs.setdefault("id", "id_cliente")
         self.fields["vehiculo"].widget.attrs.setdefault("id", "id_vehiculo")
@@ -133,9 +134,13 @@ class DocumentoForm(forms.ModelForm):
                     empresa=empresa
                 )
 
-            # Cliente: si hay instance o POST, incluye el seleccionado
+            # Cliente: si hay instance, POST o initial (ej. vuelta desde crear vehículo), incluye el seleccionado
             qs_cli = Cliente.objects.filter(empresa=empresa)
-            cliente_id = self.data.get("cliente") or getattr(self.instance, "cliente_id", None)
+            cliente_id = (
+                self.data.get("cliente")
+                or getattr(self.instance, "cliente_id", None)
+                or (self.initial.get("cliente") if self.initial else None)
+            )
             if cliente_id:
                 try:
                     qs_cli = qs_cli | Cliente.objects.filter(pk=int(cliente_id), empresa=empresa)
@@ -143,17 +148,36 @@ class DocumentoForm(forms.ModelForm):
                     pass
             self.fields["cliente"].queryset = qs_cli.distinct()
 
-            # Vehículo: filtra por empresa y, si hay cliente (POST/instance), por cliente
-            qs_veh = Vehiculo.objects.filter(empresa=empresa)
+            # Vehículo: solo tipo CLIENTE (documento es para vehículo del cliente); filtra por empresa y opcionalmente por cliente
+            qs_veh = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_CLIENTE)
+            vehiculo_id = (
+                self.data.get("vehiculo")
+                or getattr(self.instance, "vehiculo_id", None)
+                or (self.initial.get("vehiculo") if self.initial else None)
+            )
             if cliente_id:
                 try:
                     qs_veh = qs_veh.filter(cliente_id=int(cliente_id))
                 except (ValueError, TypeError):
                     qs_veh = Vehiculo.objects.none()
+            elif vehiculo_id:
+                # Sin cliente pero sí vehiculo en initial/instance: incluir ese vehículo para renderizar
+                try:
+                    qs_veh = qs_veh | Vehiculo.objects.filter(
+                        pk=int(vehiculo_id),
+                        empresa=empresa,
+                        tipo_uso=Vehiculo.TIPO_USO_CLIENTE,
+                    )
+                except (ValueError, TypeError):
+                    pass
             else:
                 # si venía un vehiculo en instance, inclúyelo para renderizar
                 if getattr(self.instance, "vehiculo_id", None):
-                    qs_veh = Vehiculo.objects.filter(pk=self.instance.vehiculo_id, empresa=empresa)
+                    qs_veh = Vehiculo.objects.filter(
+                        pk=self.instance.vehiculo_id,
+                        empresa=empresa,
+                        tipo_uso=Vehiculo.TIPO_USO_CLIENTE,
+                    )
             self.fields["vehiculo"].queryset = qs_veh.distinct()
         else:
             # sin empresa -> nada visible
@@ -177,7 +201,12 @@ class DocumentoForm(forms.ModelForm):
         if empresa and vehiculo and vehiculo.empresa_id != empresa.id:
             raise ValidationError("El vehículo no pertenece a tu empresa.")
 
-        if cliente and vehiculo and vehiculo.cliente_id != cliente.id:
+        if (
+            cliente
+            and vehiculo
+            and getattr(vehiculo, "cliente_id", None) is not None
+            and vehiculo.cliente_id != cliente.id
+        ):
             raise ValidationError("El vehículo seleccionado no pertenece al cliente.")
 
         return cleaned

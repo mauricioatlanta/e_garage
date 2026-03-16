@@ -1,9 +1,9 @@
 // Service Worker para eGarage PWA
-// Versión: 2.1.2 - Actualización con prompt de instalación PWA
-const CACHE_NAME = 'egarage-v2.1.2';
-const RUNTIME_CACHE = 'egarage-runtime-v2.1.2';
+// Versión: 2.1.3 - Sin precache de CDN (solo recursos locales)
+const CACHE_NAME = 'egarage-v2.1.3';
+const RUNTIME_CACHE = 'egarage-runtime-v2.1.3';
 
-// Archivos estáticos críticos para cachear
+// Archivos estáticos locales para precache (solo recursos de tu dominio)
 const STATIC_CACHE_URLS = [
   '/',
   '/static/css/dashboard.css',
@@ -17,9 +17,7 @@ const STATIC_CACHE_URLS = [
   '/static/images/egarage_default_logo.svg',
   '/static/images/egarage_icon_192x192.png',
   '/static/images/egarage_icon_512x512.png',
-  '/static/manifest.json',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css',
-  'https://code.jquery.com/jquery-3.6.4.min.js'
+  '/static/manifest.json'
 ];
 
 // Estrategia de caché: Cache First para estáticos, Network First para dinámicos

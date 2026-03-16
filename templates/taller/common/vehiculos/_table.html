@@ -9,11 +9,11 @@
     <div class="flex items-center justify-between mb-2">
       <div class="flex items-center space-x-2">
         <div class="w-6 h-6 rounded-md bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-          <span class="text-white text-xs font-bold">{{ vehiculo.marca.nombre|default:"?"|first }}</span>
+          <span class="text-white text-xs font-bold">{{ vehiculo.get_marca_display|default:"?"|first }}</span>
         </div>
         <div>
           <h3 class="text-white font-bold text-sm">{{ vehiculo.patente|default:vehiculo.vin|default:"-" }}</h3>
-          <p class="text-cyan-400 text-xs font-medium">{{ vehiculo.marca.nombre|default:"-" }} {{ vehiculo.modelo.nombre|default:"" }}</p>
+          <p class="text-cyan-400 text-xs font-medium">{{ vehiculo.get_marca_display|default:"-" }} {{ vehiculo.get_modelo_display|default:"" }}</p>
         </div>
       </div>
       <div class="status-indicator status-active"></div>
@@ -23,7 +23,7 @@
     <div class="space-y-1 mb-3">
       <div class="flex justify-between text-xs">
         <span class="text-gray-400">{% trans "Owner" %}:</span>
-        <span class="text-white font-medium">{{ vehiculo.cliente.nombre|default:"-" }} {{ vehiculo.cliente.apellido|default:"" }}</span>
+        <span class="text-white font-medium">{% if vehiculo.cliente %}{{ vehiculo.cliente.nombre|default:"" }} {{ vehiculo.cliente.apellido|default:"" }}{% else %}—{% endif %}</span>
       </div>
       {% if vehiculo.anio %}
       <div class="flex justify-between text-xs">

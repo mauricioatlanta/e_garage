@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block title %}{% trans "Workspace" %} - eGarage{% endblock %}
+
+{% block content %}
+{% with base=workspace_base_url|default:"/cl/es" %}
+<div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+  <section class="bg-slate-900/70 border border-cyan-500/40 rounded-2xl p-6 shadow-xl backdrop-blur">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-cyan-300 tracking-wide">
+          {% trans "Workshop Workspace" %}
+        </h1>
+        <p class="mt-2 text-slate-300">
+          {% trans "Central place to receive vehicles, review open work and jump into your daily operations." %}
+        </p>
+      </div>
+      <div class="text-right space-y-2">
+        {% if empresa %}
+        <div class="text-sm text-slate-400">
+          {% trans "Workshop" %}:
+          <span class="font-semibold text-cyan-200">{{ empresa.nombre_taller|default:empresa.nombre|default:empresa }}</span>
+        </div>
+        {% endif %}
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800/80 border border-cyan-500/40 text-xs text-cyan-200">
+          <span>⚙️</span>
+          <span>{% trans "Optimized for daily operations" %}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="group bg-slate-900/70 border border-cyan-500/30 rounded-2xl p-5 hover:border-cyan-400 hover:shadow-cyan-500/30 transition-all">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold text-cyan-200 flex items-center gap-2">🚗 {% trans "Vehicles in workshop" %}</h2>
+      </div>
+      <p class="text-sm text-slate-300 mb-4">{% trans "Review and manage all vehicles currently in process at your workshop." %}</p>
+      <span class="inline-flex items-center text-sm text-cyan-300 group-hover:text-cyan-100">{% trans "Go to vehicles" %} →</span>
+    </a>
+    <a href="{{ base }}/documentos/" class="group bg-slate-900/70 border border-cyan-500/30 rounded-2xl p-5 hover:border-cyan-400 hover:shadow-cyan-500/30 transition-all">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold text-cyan-200 flex items-center gap-2">📄 {% trans "Open documents" %}</h2>
+      </div>
+      <p class="text-sm text-slate-300 mb-4">{% trans "Access budgets, work orders and invoices associated with vehicles in your workshop." %}</p>
+      <span class="inline-flex items-center text-sm text-cyan-300 group-hover:text-cyan-100">{% trans "Go to documents" %} →</span>
+    </a>
+    <a href="{% country_url 'desarme:lista_vehiculos' %}" class="group bg-slate-900/70 border border-cyan-500/30 rounded-2xl p-5 hover:border-cyan-400 hover:shadow-cyan-500/30 transition-all">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="text-lg font-semibold text-cyan-200 flex items-center gap-2">🧩 {% trans "Disassembly yard" %}</h2>
+      </div>
+      <p class="text-sm text-slate-300 mb-4">{% trans "Quick access to vehicles and parts in the disassembly module." %}</p>
+      <span class="inline-flex items-center text-sm text-cyan-300 group-hover:text-cyan-100">{% trans "Go to disassembly" %} →</span>
+    </a>
+  </section>
+</div>
+{% endwith %}
+{% endblock %}

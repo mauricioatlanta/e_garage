@@ -314,6 +314,55 @@ msgstr "CERRAR SESIÓN"
 msgid "EXTRA"
 msgstr "EXTRA"
 
+# Nav bar (respects language switch)
+msgid "Settings"
+msgstr "Ajustes"
+
+msgid "Center"
+msgstr "Centro"
+
+msgid "Clients"
+msgstr "Clientes"
+
+msgid "Documents"
+msgstr "Documentos"
+
+msgid "Extra"
+msgstr "Extra"
+
+msgid "Parts"
+msgstr "Repuestos"
+
+msgid "Reports"
+msgstr "Reportes"
+
+msgid "Services"
+msgstr "Servicios"
+
+msgid "Disassembly"
+msgstr "Desarme"
+
+msgid "Vehicles"
+msgstr "Vehículos"
+
+msgid "Logout"
+msgstr "Salir"
+
+msgid "Used Parts"
+msgstr "Piezas Usadas"
+
+msgid "from disassembly yard"
+msgstr "de yarda de desarme"
+
+msgid "Search by code or name..."
+msgstr "Buscar por código o nombre..."
+
+msgid "No used parts found"
+msgstr "No se encontraron piezas usadas"
+
+msgid "Stock"
+msgstr "Stock"
+
 msgid "MISSION COMMAND PANEL"
 msgstr "PANEL DE COMANDO DE MISIÓN"
 
@@ -394,3 +443,9 @@ msgstr "Sin datos de técnicos"
 
 msgid "ALERTS & OPPORTUNITIES"
 msgstr "ALERTAS Y OPORTUNIDADES"
+
+msgid "Salesperson"
+msgstr "Vendedor"
+
+msgid "Part Sale"
+msgstr "Venta de Repuestos"

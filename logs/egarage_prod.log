@@ -148,3 +148,32 @@ WARNING 2026-01-21 09:22:28,812 ocr 16472 9688 EasyOCR no est� instalado. Ejecut
 INFO 2026-01-21 09:23:51,584 autoreload 16472 9688 E:\projecto\e_garage\taller\views_extra\views_configuracion.py changed, reloading.
 INFO 2026-01-21 09:23:53,623 autoreload 13316 6896 Watching for file changes with StatReloader
 WARNING 2026-01-21 09:23:55,302 ocr 13316 6896 EasyOCR no est� instalado. Ejecuta: pip install easyocr opencv-python-headless
+test
+WARNING 2026-03-12 01:00:01,965 ocr 626431 140358825517184 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:01:22,534 ocr 626429 140358825517184 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-03-12 01:04:29,537 views 626429 140358825517184 FBV shim: ver_servicio
+WARNING 2026-03-12 01:05:39,495 ocr 626430 140358825517184 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:06:20,815 ocr 626545 133180452008064 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:06:45,067 ocr 626546 133180452008064 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:07:08,273 ocr 626547 133180452008064 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:08:14,218 ocr 626599 133938039672960 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:08:14,943 ocr 626601 133938039672960 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:10:31,260 ocr 626652 138610731102336 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:10:54,553 ocr 626653 138610731102336 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:10:56,357 ocr 626654 138610731102336 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:15:52,479 ocr 626912 126094948262016 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:16:10,838 ocr 626910 126094948262016 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:22:21,758 ocr 627035 123728504795264 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:25:27,204 ocr 627109 135953109278848 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:25:30,978 ocr 627107 135953109278848 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:26:30,378 ocr 627182 138843329978496 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:34:33,179 ocr 627588 127920180813952 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 01:35:44,801 ocr 627587 127920180813952 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+INFO 2026-03-12 02:40:25,664 views 627588 127920180813952 FBV shim: ver_servicio
+INFO 2026-03-12 03:27:53,018 views 627587 127920180813952 FBV shim: ver_servicio
+INFO 2026-03-12 08:54:51,749 views 627587 127920180813952 FBV shim: editar_servicio
+WARNING 2026-03-12 09:24:27,831 ocr 633924 129935381950592 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+WARNING 2026-03-12 09:27:24,705 ocr 633923 129935381950592 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless
+ERROR 2026-03-12 09:27:31,658 account_adapter 633924 129935381950592 LOGIN IP NOT FOUND | path=/cl/es/accounts/login/ host=www.egarage.cl meta_keys=['HTTP_ACCEPT', 'HTTP_HOST', 'HTTP_USER_AGENT', 'HTTP_X_FORWARDED_PROTO', 'PATH_INFO', 'QUERY_STRING', 'RAW_URI', 'REMOTE_ADDR', 'REQUEST_METHOD', 'SCRIPT_NAME', 'SERVER_NAME', 'SERVER_PORT', 'SERVER_PROTOCOL', 'SERVER_SOFTWARE', 'gunicorn.socket', 'wsgi.early_hints', 'wsgi.errors', 'wsgi.file_wrapper', 'wsgi.input', 'wsgi.input_terminated', 'wsgi.multiprocess', 'wsgi.multithread', 'wsgi.run_once', 'wsgi.url_scheme', 'wsgi.version']
+ERROR 2026-03-12 09:29:30,533 account_adapter 633924 129935381950592 LOGIN IP NOT FOUND | path=/cl/es/accounts/login/ host=www.egarage.cl meta_keys=['HTTP_ACCEPT', 'HTTP_HOST', 'HTTP_USER_AGENT', 'HTTP_X_FORWARDED_HOST', 'HTTP_X_FORWARDED_PROTO', 'PATH_INFO', 'QUERY_STRING', 'RAW_URI', 'REMOTE_ADDR', 'REQUEST_METHOD', 'SCRIPT_NAME', 'SERVER_NAME', 'SERVER_PORT', 'SERVER_PROTOCOL', 'SERVER_SOFTWARE', 'gunicorn.socket', 'wsgi.early_hints', 'wsgi.errors', 'wsgi.file_wrapper', 'wsgi.input', 'wsgi.input_terminated', 'wsgi.multiprocess', 'wsgi.multithread', 'wsgi.run_once', 'wsgi.url_scheme', 'wsgi.version']
+WARNING 2026-03-12 09:53:54,804 ocr 634779 128447332667520 EasyOCR no está instalado. Ejecuta: pip install easyocr opencv-python-headless

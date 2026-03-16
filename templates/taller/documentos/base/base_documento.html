@@ -29,10 +29,9 @@ body {
 
 .cyber-container {
     background: var(--card-bg);
-    border: 1px solid var(--cyber-blue);
-    border-radius: 15px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 8px 32px rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
 }
 
 .form-section {
@@ -45,10 +44,9 @@ body {
 
 .section-title {
     color: var(--cyber-blue);
-    font-size: 1.5rem;
+    font-size: 1.25rem;
     font-weight: bold;
-    margin-bottom: 1.5rem;
-    text-shadow: 0 0 10px var(--cyber-blue);
+    margin-bottom: 1rem;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -87,7 +85,7 @@ label,
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
 }
 
-/* 🎨 ESTILOS UNIFICADOS PARA TODOS LOS CAMPOS DE FORMULARIO - MEJORADO PARA MEJOR CONTRASTE */
+/* 🎨 ESTILOS UNIFICADOS - SOBRIOS: menos altura, sin glow permanente */
 .form-input,
 .form-select,
 .form-textarea,
@@ -104,18 +102,17 @@ select,
 textarea,
 input {
     background: rgba(15, 15, 35, 0.98) !important;
-    border: 2px solid var(--cyber-purple) !important;
-    border-radius: 12px !important;
-    padding: 14px 18px !important;
+    border: 1px solid rgba(128, 0, 255, 0.4) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
     color: #ffffff !important;
-    font-size: 1rem !important;
+    font-size: 0.9rem !important;
     font-weight: 500 !important;
     width: 100% !important;
-    transition: all 0.3s ease !important;
-    backdrop-filter: blur(10px) !important;
-    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.15) !important;
-    min-height: 48px !important;
-    line-height: 1.4 !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    min-height: 36px !important;
+    line-height: 1.35 !important;
+    box-shadow: none !important;
 }
 
 /* 🎯 FORZAR ESTILOS NEGROS PARA TODOS LOS INPUTS - SIN EXCEPCIONES */
@@ -215,6 +212,7 @@ form .form-textarea {
     border: 2px solid var(--cyber-purple) !important;
 }
 
+/* Glow solo en focus, estética cyber sobria */
 .form-input:focus,
 .form-select:focus,
 .form-textarea:focus,
@@ -227,10 +225,9 @@ input[type="tel"]:focus,
 select:focus,
 textarea:focus {
     outline: none !important;
-    border-color: var(--cyber-green) !important;
-    box-shadow: 0 0 25px rgba(0, 255, 136, 0.6) !important;
-    background: rgba(0, 255, 136, 0.12) !important;
-    transform: translateY(-1px) !important;
+    border-color: rgba(0, 255, 136, 0.7) !important;
+    box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.15) !important;
+    background: rgba(15, 15, 35, 0.98) !important;
     color: #ffffff !important;
 }
 
@@ -288,7 +285,7 @@ select option:checked {
     font-weight: bold !important;
 }
 
-/* Hover effects */
+/* Hover sutil, sin glow */
 .form-input:hover:not(:focus):not(:disabled),
 .form-select:hover:not(:focus):not(:disabled),
 .form-textarea:hover:not(:focus):not(:disabled),
@@ -296,23 +293,22 @@ select option:checked {
 input:hover:not(:focus):not(:disabled),
 select:hover:not(:focus):not(:disabled),
 textarea:hover:not(:focus):not(:disabled) {
-    border-color: var(--cyber-blue) !important;
-    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.15) !important;
+    border-color: rgba(0, 255, 255, 0.5) !important;
 }
 
 /* 🎯 ESTILOS ESPECÍFICOS PARA CAMPOS DEL FORMULARIO DE DOCUMENTOS */
 /* Campo de número (readonly) */
 #id_numero {
     background: rgba(30, 30, 50, 0.95) !important;
-    border: 2px solid var(--cyber-blue) !important;
-    border-radius: 12px !important;
-    padding: 14px 18px !important;
+    border: 1px solid rgba(0, 255, 255, 0.35) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
     color: var(--cyber-blue) !important;
     font-family: 'Courier New', monospace !important;
     font-weight: bold !important;
     text-align: center !important;
     cursor: not-allowed !important;
-    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1) !important;
+    min-height: 36px !important;
 }
 
 /* Campos de búsqueda AJAX */
@@ -509,16 +505,15 @@ label[for="id_exclude_vat"]:hover {
 .serv-subtotal-view,
 .otr-subtotal-view {
     background: rgba(30, 30, 50, 0.95) !important;
-    border: 2px solid var(--cyber-blue) !important;
-    border-radius: 12px !important;
-    padding: 14px 18px !important;
+    border: 1px solid rgba(0, 255, 255, 0.35) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
     color: var(--cyber-blue) !important;
     font-family: 'Courier New', monospace !important;
     font-weight: bold !important;
     text-align: right !important;
     cursor: not-allowed !important;
-    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1) !important;
-    min-height: 48px !important;
+    min-height: 36px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: flex-end !important;
@@ -890,6 +885,21 @@ select[name="vehiculo"]:hover:not(:focus),
     text-align: center;
 }
 
+.header-section.header-compact {
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(0,255,255,0.06) 0%, rgba(128,0,255,0.04) 100%);
+}
+
+.header-badge {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--cyber-blue);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
 .header-title {
     font-size: 2.5rem;
     font-weight: bold;
@@ -992,21 +1002,17 @@ select[name="vehiculo"]:hover:not(:focus),
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto p-6">
+<div class="max-w-5xl mx-auto px-3 py-2 sm:px-4 sm:py-3">
 
-    <!-- 🏢 Cabecera del Documento -->
-    <div class="header-section">
-        <h1 class="header-title">
-            📄 {{ pais_emoji }} {% block documento_header %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Management{% else %}Gestión de Documento{% endif %}{% endblock %}
-        </h1>
-        <p class="header-subtitle">{{ empresa.nombre_taller }} - {% block documento_subtitle %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Form{% else %}Formulario de Documento{% endif %}{% endblock %}</p>
-        <p class="header-info">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}User: {{ user.username }}{% else %}Usuario: {{ user.username }}{% endif %} | {{ empresa.get_pais_display }} | {{ fecha_hoy|date:"l, d F Y" }}</p>
+    <!-- Cabecera compacta -->
+    <div class="header-section header-compact">
+        <span class="header-badge">{% block documento_header %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document{% else %}Documento{% endif %}{% endblock %}</span>
     </div>
 
-    <!-- Mensajes del sistema -->
+    <!-- Mensajes del sistema (sin informativos tipo "creado exitosamente") -->
     {% if messages %}
         {% for message in messages %}
-            {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Ha iniciado sesión exitosamente" not in message|stringformat:"s" and "Ha cerrado sesión" not in message|stringformat:"s" and "iniciado sesión exitosamente" not in message|stringformat:"s" and "cerrado sesión" not in message|stringformat:"s" and "Logo actualizado exitosamente" not in message|stringformat:"s" and "Tema y colores guardados exitosamente" not in message|stringformat:"s" and "Logo subido exitosamente" not in message|stringformat:"s" and "actualizada exitosamente" not in message|stringformat:"s" %}
+            {% if "Successfully signed in" not in message|stringformat:"s" and "You have signed out" not in message|stringformat:"s" and "Ha iniciado sesión exitosamente" not in message|stringformat:"s" and "Ha cerrado sesión" not in message|stringformat:"s" and "iniciado sesión exitosamente" not in message|stringformat:"s" and "cerrado sesión" not in message|stringformat:"s" and "Logo actualizado exitosamente" not in message|stringformat:"s" and "Tema y colores guardados exitosamente" not in message|stringformat:"s" and "Logo subido exitosamente" not in message|stringformat:"s" and "actualizada exitosamente" not in message|stringformat:"s" and "creado exitosamente" not in message|stringformat:"s" and "creado." not in message|stringformat:"s" %}
                 <div class="{% if message.tags == 'error' %}error-message{% elif message.tags == 'success' %}success-message{% else %}info-message{% endif %}">
                     {{ message }}
                 </div>
@@ -1053,21 +1059,7 @@ select[name="vehiculo"]:hover:not(:focus),
 <script>
 document.addEventListener('DOMContentLoaded', function() {
 
-    // Efecto de typing en el título
-    const title = document.querySelector('.header-title');
-    if (title) {
-        const text = title.textContent;
-        title.textContent = '';
-        let i = 0;
-        const typeWriter = () => {
-            if (i < text.length) {
-                title.textContent += text.charAt(i);
-                i++;
-                setTimeout(typeWriter, 100);
-            }
-        };
-        setTimeout(typeWriter, 500);
-    }
+    // Cabecera compacta: sin animación typing
 
     // Validación de formularios
     const form = document.getElementById('document-form');
@@ -1131,8 +1123,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Django Autocomplete Light -->
-{{ form.media }}
+{# DAL/Select2: se carga UNA SOLA VEZ en base.html (form_media_once). NO incluir {# DAL/Select2 se carga una sola vez en base.html mediante form_media_once #} aquí: provoca "select2 has already been registered". #}
 {% endblock %}
 
 

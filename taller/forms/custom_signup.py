@@ -83,7 +83,8 @@ class CustomSignupForm(SignupForm):
     )
 
     def __init__(self, *args, **kwargs):
-        # Extraer country_code y default_phone_prefix si se pasan
+        # Extraer kwargs personalizados ANTES de super()
+        request = kwargs.pop("request", None)
         self.country_code = kwargs.pop("country_code", None)
         self.default_phone_prefix = kwargs.pop("default_phone_prefix", None)
 
@@ -146,11 +147,8 @@ class CustomSignupForm(SignupForm):
             )
 
         # ✅ DETECTAR PAÍS AUTOMÁTICAMENTE desde request (?from=xx) o URL
-        # El request puede venir en kwargs o en args[0] si se pasa como primer argumento posicional
-        request = None
-        if "request" in kwargs:
-            request = kwargs["request"]
-        elif args and hasattr(args[0], "path"):
+        # Si aún no tenemos request, intentar obtenerlo del primer argumento posicional
+        if request is None and args and hasattr(args[0], "path"):
             request = args[0]
 
         if request and not self.country_code:

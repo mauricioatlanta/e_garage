@@ -1098,10 +1098,6 @@ document.addEventListener('DOMContentLoaded', function() {
     {% endif %}
 });
 </script>
-
-{# Cargar form.media para inicializar Select2/DAL #}
-{% if form.media %}
-{{ form.media }}
-{% endif %}
+{# form.media (DAL/Select2) se carga UNA SOLA VEZ en base.html (CSS en head, JS al final). NO duplicar aquí. #}
 
 {% endblock %}

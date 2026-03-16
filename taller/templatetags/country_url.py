@@ -8,14 +8,17 @@ register = template.Library()
 def _country_ns_from_path(path: str) -> str:
     """
     Devuelve el namespace del país según el prefijo de la ruta actual.
-    Considera el segmento de idioma si está presente.
     """
     if path.startswith("/us/en/") or path == "/us/en":
-        return "usa"  # usa_en no existe, usar usa
+        return "us_en"
     elif path.startswith("/us/es/") or path == "/us/es":
-        return "usa"  # usa_es no existe, usar usa
+        return "us_es"
     elif path.startswith("/us/") or path == "/us":
         return "usa"
+    elif path.startswith("/uy/es/") or path == "/uy/es":
+        return "uruguay_es"
+    elif path.startswith("/uy/") or path == "/uy":
+        return "uruguay"
     elif path.startswith("/cl/es/") or path == "/cl/es":
         return "chile"
     elif path.startswith("/cl/") or path == "/cl":
@@ -26,13 +29,14 @@ def _country_ns_from_path(path: str) -> str:
 def _extract_lang_from_path(path: str) -> str:
     """
     Extrae el código de idioma del path si está presente.
-    Retorna 'en' o 'es' si se encuentra, None en caso contrario.
     """
     if path.startswith("/us/en/") or path == "/us/en":
         return "en"
     elif path.startswith("/us/es/") or path == "/us/es":
         return "es"
     elif path.startswith("/cl/es/") or path == "/cl/es":
+        return "es"
+    elif path.startswith("/uy/es/") or path == "/uy/es":
         return "es"
     return None
 
@@ -56,34 +60,51 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
     else:
         country_ns = _country_ns_from_path(request.path or "/")
 
-    # view_path puede ser "clientes:lista_clientes" o "lista_clientes"
-    if ":" in view_path:
-        # Si ya tiene namespace (ej: vehiculos:lista_vehiculos), agregar el país y app_namespace
-        if app_namespace == "direct" or app_namespace == "":
-            # Para URLs definidas directamente en el namespace del país (ej: usa:ajax:vehiculos_por_cliente)
-            full_name = f"{country_ns}:{view_path}"
+    # usa y chile montan clientes/vehiculos/documentos directamente (usa:clientes:..., chile:clientes:...)
+    # us_en y us_es: en algunos deploys no existe sub-namespace "taller" dentro de us_es/us_en,
+    # así que intentamos primero con taller y si falla (NoReverseMatch) sin taller.
+    if country_ns in ("us_en", "us_es"):
+        full_name = f"{country_ns}:taller:{view_path}"
+    elif country_ns == "usa":
+        # Caso especial: las URLs de desarme bajo /us/ viven en usa:taller:desarme:...
+        if view_path.startswith("desarme:"):
+            full_name = f"{country_ns}:taller:{view_path}"
         else:
-            # URLs definidas en sub-namespaces (ej: usa:taller:documentos:lista)
-            full_name = f"{country_ns}:{app_namespace}:{view_path}"
+            full_name = f"{country_ns}:{view_path}"
+    elif country_ns in ("chile", "uruguay", "uruguay_es"):
+        if view_path.startswith("desarme:"):
+            full_name = f"{country_ns}:taller:{view_path}"
+        else:
+            full_name = f"{country_ns}:{view_path}"
     else:
-        # Sin subnamespace
-        if app_namespace == "direct":
-            # Para URLs definidas directamente en el namespace del país (ej: usa:futuristic_company_settings)
-            full_name = f"{country_ns}:{view_path}"
+        # view_path puede ser "clientes:lista_clientes" o "lista_clientes"
+        if ":" in view_path:
+            if app_namespace == "direct" or app_namespace == "":
+                full_name = f"{country_ns}:{view_path}"
+            else:
+                full_name = f"{country_ns}:{app_namespace}:{view_path}"
         else:
-            # URLs definidas en sub-namespaces (ej: usa:taller:company_settings)
-            full_name = f"{country_ns}:{app_namespace}:{view_path}"
+            if app_namespace == "direct":
+                full_name = f"{country_ns}:{view_path}"
+            else:
+                full_name = f"{country_ns}:{app_namespace}:{view_path}"
 
     # Convertir args de tuple a lista para evitar problemas con reverse
     args_list = list(args) if args else []
 
-    # Si estamos en una ruta USA con idioma, intentar pasar lang como parámetro si la URL lo requiere
-    # Primero intentar sin lang, si falla, agregar lang
+    # Si estamos en us_en/us_es y falla (p. ej. desarme está en us_es:desarme:*, no en us_es:taller:desarme:*),
+    # reintentar sin sub-namespace taller. No depender del texto del error para mayor robustez.
     try:
         return reverse(full_name, args=args_list, kwargs=kwargs)
     except NoReverseMatch as e:
-        # Si falla con NoReverseMatch y el error menciona 'lang', intentar agregar lang
         error_msg = str(e).lower()
+        if country_ns in ("us_en", "us_es"):
+            full_name_fallback = f"{country_ns}:{view_path}"
+            try:
+                return reverse(full_name_fallback, args=args_list, kwargs=kwargs)
+            except NoReverseMatch:
+                pass
+        # Si falla con NoReverseMatch y el error menciona 'lang', intentar agregar lang
         if "lang" in error_msg and request:
             lang = _extract_lang_from_path(request.path or "/")
             if lang and "lang" not in kwargs:
@@ -91,9 +112,7 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
                 try:
                     return reverse(full_name, args=args_list, kwargs=kwargs_with_lang)
                 except NoReverseMatch:
-                    # Si aún falla, re-lanzar el error original
-                    raise e
-        # Si no es un error relacionado con lang, re-lanzar
+                    pass
         raise
 
 

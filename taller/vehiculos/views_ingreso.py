@@ -15,7 +15,6 @@ from taller.models.clientes import Cliente
 from taller.models.empresa import Empresa
 from taller.models.vehiculos import Vehiculo
 from taller.utils.pais_utils import get_configuracion_pais
-from whatsapp.services.ocr import OCRProcessor
 
 logger = logging.getLogger(__name__)
 
@@ -110,68 +109,11 @@ def api_procesar_foto_patente(request):
         logger.error(f"Error leyendo imagen: {e}")
         return JsonResponse({"success": False, "error": "Error procesando la imagen"}, status=500)
 
-    # Procesar OCR
-    ocr_processor = OCRProcessor()
-    patente = ocr_processor.extract_plate(image_bytes)
-
-    if not patente:
-        return JsonResponse(
-            {
-                "success": False,
-                "error": "No se pudo detectar la patente en la imagen. Por favor, intenta con una foto más clara.",
-            },
-            status=400,
-        )
-
-    # Buscar vehículo por patente en la empresa
-    try:
-        vehiculo = (
-            Vehiculo.objects.filter(empresa=empresa, patente__iexact=patente)
-            .select_related("cliente", "marca", "modelo")
-            .first()
-        )
-
-        if vehiculo:
-            # Vehículo encontrado
-            cliente = vehiculo.cliente
-            return JsonResponse(
-                {
-                    "success": True,
-                    "patente": patente,
-                    "vehiculo": {
-                        "id": vehiculo.id,
-                        "patente": vehiculo.patente,
-                        "marca": vehiculo.get_marca_display(),
-                        "modelo": vehiculo.get_modelo_display(),
-                        "anio": vehiculo.anio,
-                        "cliente": {
-                            "id": cliente.id,
-                            "nombre": cliente.nombre,
-                            "apellido": cliente.apellido or "",
-                            "telefono": cliente.telefono or "",
-                        },
-                    },
-                    "existe": True,
-                    "mensaje": "Vehículo encontrado en la base de datos",
-                }
-            )
-        else:
-            # Vehículo no encontrado - retornar patente para crear nuevo
-            return JsonResponse(
-                {
-                    "success": True,
-                    "patente": patente,
-                    "vehiculo": None,
-                    "existe": False,
-                    "mensaje": f"Patente {patente} no encontrada. ¿Deseas crear un nuevo vehículo?",
-                }
-            )
-
-    except Exception as e:
-        logger.error(f"Error buscando vehículo: {e}")
-        return JsonResponse(
-            {"success": False, "error": "Error buscando vehículo en la base de datos"}, status=500
-        )
+    # OCR deshabilitado temporalmente
+    return JsonResponse(
+        {"success": False, "error": "OCR deshabilitado temporalmente en este servidor"},
+        status=503,
+    )
 
 
 @login_required
@@ -229,7 +171,7 @@ def procesar_patente_identificada(request):
 
             if vehiculo:
                 context["vehiculo"] = vehiculo
-                context["cliente"] = vehiculo.cliente
+                context["cliente"] = vehiculo.cliente  # None si es vehículo de desarme
         except Exception as e:
             logger.error(f"Error cargando vehículo: {e}")
 

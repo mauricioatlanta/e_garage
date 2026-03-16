@@ -1,0 +1,240 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+
+{% block page_title %}{% trans "Desarme" %} – {% trans "Vehículos" %}{% endblock %}
+{% block page_subtitle %}{% trans "Vehículos para desarme (yarda)" %}{% endblock %}
+{% block page_icon %}🔧{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .vehicle-card {
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 10px;
+    padding: 12px;
+    transition: all 0.3s ease;
+  }
+  .vehicle-card:hover {
+    border-color: rgba(168, 85, 247, 0.6);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  }
+  .vehicles-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+  }
+  .interactive-btn {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(236, 72, 153, 0.2));
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: #c084fc;
+    font-size: 12px;
+    transition: all 0.3s ease;
+  }
+  .interactive-btn:hover {
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.4), rgba(236, 72, 153, 0.4));
+    color: #d8b4fe;
+  }
+  .desarme-search, .desarme-filters {
+    background: rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    border-radius: 10px;
+    padding: 12px 16px;
+  }
+  .desarme-search input {
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(168, 85, 247, 0.3);
+    border-radius: 8px;
+    padding: 8px 12px;
+    color: #e0e7ff;
+    width: 100%;
+    max-width: 280px;
+  }
+  .desarme-search input:focus {
+    outline: none;
+    border-color: rgba(168, 85, 247, 0.6);
+  }
+  .badge-piezas {
+    background: rgba(34, 197, 94, 0.25);
+    color: #86efac;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 9999px;
+  }
+  .ganancia-vehiculo {
+    font-weight: 600;
+    font-size: 13px;
+  }
+  .ganancia-vehiculo.negativa {
+    color: #f87171;
+  }
+  .ganancia-vehiculo.positiva {
+    color: #60a5fa;
+  }
+</style>
+{% endblock %}
+
+{% block page_stats %}
+<div class="desarme-nav-module flex flex-wrap gap-2 mt-4">
+  <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">{% trans "Dashboard" %}</a>
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">🚗 {% trans "Vehículos" %}</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 {% trans "Piezas" %}</a>
+</div>
+{% endblock %}
+
+{% block main_actions %}
+<a href="{% country_url 'desarme:crear_vehiculo' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-sm font-semibold border border-emerald-400/40">
+  <span>➕</span>
+  <span>{% trans "Nuevo vehículo desarme" %}</span>
+</a>
+<a href="{% country_url 'desarme:lista_piezas' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600/80 hover:bg-cyan-500 text-white text-sm font-semibold border border-cyan-400/40">
+  <span>📦</span>
+  <span>{% trans "Piezas" %}</span>
+</a>
+<a href="{% country_url 'desarme:index' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600/80 hover:bg-purple-500 text-white text-sm font-semibold border border-purple-400/40">
+  <span>📊</span>
+  <span>{% trans "Dashboard" %}</span>
+</a>
+{% endblock %}
+
+{% block search_bar %}
+<div class="desarme-search mb-4">
+  <form method="get" action="" class="flex flex-wrap items-center gap-3">
+    <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Buscar por patente, VIN, marca, modelo...' %}" aria-label="{% trans 'Buscar' %}">
+    <select name="estado" class="bg-black/50 border border-cyan-400/30 rounded-lg px-3 py-2 text-cyan-200 text-sm">
+      <option value="">{% trans "Todos los estados" %}</option>
+      {% for e in estados %}
+      <option value="{{ e }}" {% if estado_filtro == e %}selected{% endif %}>{{ e }}</option>
+      {% endfor %}
+    </select>
+    <button type="submit" class="interactive-btn px-4 py-2">{% trans "Buscar" %}</button>
+    {% if q or estado_filtro %}
+    <a href="{% country_url 'desarme:lista_vehiculos' %}" class="text-gray-400 hover:text-cyan-300 text-sm">{% trans "Limpiar" %}</a>
+    {% endif %}
+  </form>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+<div id="desarme-vehiculos-results">
+{% if vehiculos %}
+<div class="vehicles-grid">
+  {% for v in vehiculos %}
+  <div class="vehicle-card">
+    <div class="flex items-center justify-between mb-2">
+      <div>
+        <h3 class="text-white font-bold text-sm">{{ v.patente|default:v.vin|default:"—" }}</h3>
+        <p class="text-cyan-400 text-xs">{{ v.get_marca_display|default:"-" }} {{ v.get_modelo_display|default:"" }} · {{ v.anio|default:"—" }}</p>
+      </div>
+      <span class="badge-piezas" title="{% trans 'Piezas registradas' %}">{{ v.piezas_count }} {% trans "piezas" %}</span>
+    </div>
+    <div class="space-y-1 mb-2 text-xs text-gray-400">
+      {% if v.estado_desarme %}<span>{{ v.estado_desarme }}</span>{% endif %}
+      {% if v.ubicacion_fisica %}<span> · {{ v.ubicacion_fisica }}</span>{% endif %}
+    </div>
+    <div class="mb-3">
+      <span class="ganancia-vehiculo {% if v.ganancia >= 0 %}positiva{% else %}negativa{% endif %}" title="{% trans 'Ingresos por piezas vendidas menos costo del vehículo' %}">
+        {% trans "Ganancia" %}: ${{ v.ganancia|floatformat:2 }}
+      </span>
+    </div>
+    <div class="flex flex-wrap gap-1">
+      <a href="{% country_url 'desarme:ver_vehiculo' v.pk %}" class="interactive-btn">{% trans "Ver" %}</a>
+      <a href="{% country_url 'desarme:editar_vehiculo' v.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
+      <a href="{% country_url 'desarme:inventario_vehiculo' v.pk %}" class="interactive-btn font-medium">📦 {% trans "Inventario" %}</a>
+      <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ v.pk }}" class="interactive-btn font-medium">➕ {% trans "Nueva pieza" %}</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="rounded-xl border border-cyan-400/30 bg-black/30 p-8 text-center text-gray-400">
+  <p class="mb-4">{% if q or estado_filtro %}{% trans "No hay resultados con los filtros aplicados." %}{% else %}{% trans "No hay vehículos de desarme." %}{% endif %}</p>
+  {% if q or estado_filtro %}
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "Ver todos" %}</a>
+  {% else %}
+  <a href="{% country_url 'desarme:crear_vehiculo' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "Crear el primero" %}</a>
+  {% endif %}
+</div>
+{% endif %}
+</div>
+{% endblock %}
+
+{% block page_extra_js %}
+<script>
+(function() {
+  var form = document.querySelector('.desarme-search form');
+  var searchInput = form ? form.querySelector('input[name="q"]') : null;
+  var estadoSelect = form ? form.querySelector('select[name="estado"]') : null;
+  var resultsEl = document.getElementById('desarme-vehiculos-results');
+  if (!form || !resultsEl) return;
+
+  var debounceMs = 350;
+  var debounceTimer = null;
+
+  function buildSearchUrl() {
+    var q = searchInput ? (searchInput.value || '').trim() : '';
+    var estado = estadoSelect ? (estadoSelect.value || '').trim() : '';
+    var path = window.location.pathname;
+    var params = [];
+    if (q) params.push('q=' + encodeURIComponent(q));
+    if (estado) params.push('estado=' + encodeURIComponent(estado));
+    params.push('partial=1');
+    return path + (path.indexOf('?') >= 0 ? '&' : '?') + params.join('&');
+  }
+
+  function updateResults() {
+    var url = buildSearchUrl();
+    var q = searchInput ? (searchInput.value || '').trim() : '';
+    var estado = estadoSelect ? (estadoSelect.value || '').trim() : '';
+    resultsEl.setAttribute('aria-busy', 'true');
+    fetch(url, {
+      method: 'GET',
+      headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(function(r) { return r.text(); })
+    .then(function(html) {
+      resultsEl.innerHTML = html;
+      resultsEl.removeAttribute('aria-busy');
+      var newUrl = window.location.pathname;
+      var parts = [];
+      if (q) parts.push('q=' + encodeURIComponent(q));
+      if (estado) parts.push('estado=' + encodeURIComponent(estado));
+      if (parts.length) newUrl += '?' + parts.join('&');
+      if (window.history && window.history.replaceState) {
+        window.history.replaceState(null, '', newUrl);
+      }
+    })
+    .catch(function() {
+      resultsEl.removeAttribute('aria-busy');
+    });
+  }
+
+  function onSearchChange() {
+    if (debounceTimer) clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(updateResults, debounceMs);
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener('input', onSearchChange);
+    searchInput.addEventListener('keyup', function(e) {
+      if (e.key === 'Enter') {
+        if (debounceTimer) clearTimeout(debounceTimer);
+        updateResults();
+      }
+    });
+  }
+  if (estadoSelect) {
+    estadoSelect.addEventListener('change', function() {
+      if (debounceTimer) clearTimeout(debounceTimer);
+      updateResults();
+    });
+  }
+})();
+</script>
+{% endblock %}

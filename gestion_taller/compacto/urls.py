@@ -106,7 +106,29 @@ def country_aware_clientes_redirect(request):
     return redirect("/cl/es/clientes/")
 
 
+def country_aware_workspace_redirect(request, subpath=""):
+    """Redirect /workspace/ to country workspace. USA → /us/en/workspace/, Chile → /cl/es/workspace/."""
+    if request.user.is_authenticated:
+        try:
+            if hasattr(request.user, "empresa") and request.user.empresa:
+                pais = (getattr(request.user.empresa, "pais", None) or "").strip().upper()
+                if pais == "US":
+                    return redirect(f"/us/en/workspace/{subpath}".rstrip("/") + "/")
+                if pais == "CL":
+                    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
+        except Exception:
+            pass
+    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
+
+
 urlpatterns = [
+    # Root /workspace/ → country-aware redirect
+    path("workspace/", country_aware_workspace_redirect, name="workspace_redirect_root"),
+    path(
+        "workspace/buscar/",
+        lambda r: country_aware_workspace_redirect(r, "buscar"),
+        name="workspace_buscar_redirect_root",
+    ),
     path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
     # Página de inicio - Selector de país
     path("", TemplateView.as_view(template_name="public/selector_pais.html"), name="home"),

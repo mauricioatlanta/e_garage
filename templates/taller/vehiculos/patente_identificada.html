@@ -184,6 +184,7 @@
                 <h3 style="color: var(--cyber-green); margin-bottom: 1rem; text-align: center;">
                     📋 Vehículo Encontrado en Base de Datos
                 </h3>
+                {% if vehiculo.cliente %}
                 <div class="info-row">
                     <span class="info-label">Cliente:</span>
                     <span class="info-value">{{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido|default:"" }}</span>
@@ -192,6 +193,12 @@
                     <span class="info-label">Teléfono:</span>
                     <span class="info-value">{{ vehiculo.cliente.telefono|default:"No registrado" }}</span>
                 </div>
+                {% else %}
+                <div class="info-row">
+                    <span class="info-label">Cliente:</span>
+                    <span class="info-value">Vehículo de desarme</span>
+                </div>
+                {% endif %}
                 <div class="info-row">
                     <span class="info-label">Marca:</span>
                     <span class="info-value">{{ vehiculo.get_marca_display }}</span>
@@ -207,6 +214,7 @@
             </div>
 
             <div class="btn-group">
+                {% if vehiculo.cliente %}
                 <a href="{% country_url 'documentos:documento_crear' %}?vehiculo_id={{ vehiculo.id }}&cliente_id={{ vehiculo.cliente.id }}" 
                    class="btn-cyber btn-cyber-success">
                     🛠️ Crear Orden de Trabajo
@@ -215,6 +223,7 @@
                    class="btn-cyber">
                     📄 Crear Presupuesto
                 </a>
+                {% endif %}
                 <a href="{% country_url 'vehiculos:ver_vehiculo' vehiculo.id %}" 
                    class="btn-cyber btn-cyber-secondary">
                     👁️ Ver Detalle Vehículo

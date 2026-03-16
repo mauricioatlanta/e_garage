@@ -123,7 +123,11 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
         if not empresa:
             return Vehiculo.objects.none()
 
-        qs = Vehiculo.objects.select_related("cliente", "marca", "modelo").filter(empresa=empresa)
+        # Solo vehículos de cliente (para documentos); desarme no aparece en selector
+        qs = (
+            Vehiculo.objects.select_related("cliente", "marca", "modelo")
+            .filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_CLIENTE)
+        )
 
         # Soporta forward de DAL y querystring plano
         cliente_id = self.forwarded.get("cliente") or self.request.GET.get("cliente")
