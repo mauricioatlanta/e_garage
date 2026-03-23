@@ -1,10 +1,8 @@
 """
-Signals legacy de LineaDocumento desactivadas.
+Signals legacy de LineaDocumento desactivados.
 
-La capa operativa actual usa:
-- LineaRepuesto
-- LineaServicio
-- LineaOtroServicio
-
-No registrar receivers aquí.
+Motivo:
+- LineaDocumento es un modelo legacy no gestionado (managed=False).
+- La capa operativa actual usa LineaRepuesto, LineaServicio y LineaOtroServicio.
+- Mantener este archivo sin receivers evita recálculos sobre una tabla inexistente.
 """

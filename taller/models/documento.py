@@ -403,6 +403,10 @@ class Documento(AuditMixin, models.Model):
         if not self.numero:
             return None
 
+        # Recibo/Invoice (correlativo PRO): REC-000001, INV-000001
+        if self.numero.startswith(("REC-", "INV-")):
+            return self.numero
+
         # Si el número ya tiene prefijo (como "F001", "OT002"), devolverlo tal cual
         if self.numero.startswith(("F", "OT", "P", "E", "WO", "I")):
             return self.numero

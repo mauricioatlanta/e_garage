@@ -59,8 +59,7 @@ class ColorVehiculo(models.Model):
         ]
 
     def __str__(self):
-        # Muestra país para debugging multi-tenant
-        return f"{self.nombre} ({self.country})"
+        return self.nombre
 
     @classmethod
     def scoped(cls, country="CL", empresa=None):
@@ -183,7 +182,7 @@ class MotorVehiculo(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.nombre} ({self.country})"
+        return self.nombre
 
     @classmethod
     def scoped(cls, country="CL", empresa=None):
@@ -236,7 +235,7 @@ class CajaVehiculo(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.nombre} ({self.country})"
+        return self.nombre
 
     @classmethod
     def scoped(cls, country="CL", empresa=None):

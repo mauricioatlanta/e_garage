@@ -14,6 +14,7 @@ from django.db.models.functions import Coalesce, TruncMonth
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.translation import get_language
 from django.views.decorators.http import require_GET, require_POST
 
 from taller.models.empresa import Empresa
@@ -26,10 +27,12 @@ from taller.models.pieza_desarme import (
     ESTADO_RESERVADA,
     ESTADO_PIEZA_CHOICES,
     PiezaDesarme,
+    PiezaDesarmeCompanyLabel,
 )
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
 from taller.models.vehiculos import Vehiculo
 from taller.models.vendedor_desarme import VendedorDesarme
+from taller.documentos.views_migrated import _reverse_with_request
 from .forms import PiezaDesarmeForm, VehiculoDesarmeForm
 from .services import generar_inventario_vehiculo
 
@@ -271,6 +274,8 @@ def index(request):
         request,
         "taller/desarme/dashboard.html",
         {
+            # Chrome del sitio (base.html) + panel interno más densos; solo esta URL.
+            "eg_desarme_dashboard_compact": True,
             "empresa": empresa,
             "total_vehiculos": total_vehiculos,
             "total_piezas": total_piezas,
@@ -417,12 +422,15 @@ def ver_vehiculo(request, pk):
         empresa=empresa,
         tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
-    piezas = vehiculo.piezas_desarme.filter(activo=True).order_by("codigo")
-    piezas_activas_count = piezas.count()
+    piezas = list(vehiculo.piezas_desarme.filter(activo=True).prefetch_related("names", "company_labels").order_by("codigo"))
+    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
+    for p in piezas:
+        p.display_nombre = p.get_display_label(empresa=empresa, language=lang)
+    piezas_activas_count = len(piezas)
     piezas_vendidas_count = vehiculo.piezas_desarme.filter(estado_pieza=ESTADO_VENDIDA).count()
-    disponibles = piezas.filter(estado_pieza=ESTADO_DISPONIBLE).count()
-    danadas = piezas.filter(estado_pieza=ESTADO_DANADA).count()
-    faltantes = piezas.filter(estado_pieza=ESTADO_FALTANTE).count()
+    disponibles = sum(1 for p in piezas if p.estado_pieza == ESTADO_DISPONIBLE)
+    danadas = sum(1 for p in piezas if p.estado_pieza == ESTADO_DANADA)
+    faltantes = sum(1 for p in piezas if p.estado_pieza == ESTADO_FALTANTE)
     valor_potencial = sum(
         (p.precio_venta_sugerido or Decimal("0")) * p.cantidad
         for p in piezas
@@ -622,7 +630,11 @@ def inventario_vehiculo(request, pk):
         empresa=empresa,
         tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
-    piezas = vehiculo.piezas_desarme.filter(activo=True).order_by("zona", "codigo")
+    piezas = (
+        vehiculo.piezas_desarme.filter(activo=True)
+        .prefetch_related("names", "company_labels")
+        .order_by("zona", "codigo")
+    )
     total_piezas = piezas.count()
     disponibles = piezas.filter(estado_pieza=ESTADO_DISPONIBLE).count()
     danadas = piezas.filter(estado_pieza=ESTADO_DANADA).count()
@@ -632,6 +644,29 @@ def inventario_vehiculo(request, pk):
         for p in piezas
         if p.estado_pieza in (ESTADO_DISPONIBLE, ESTADO_RESERVADA)
     )
+
+    # JSON para Alpine.js (inventario V2 ultra) — nombre visible por empresa/idioma + términos búsqueda
+    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
+    items_list = []
+    for p in piezas:
+        items_list.append({
+            "id": p.pk,
+            "nombre": p.get_display_label(empresa=empresa, language=lang),
+            "search_terms": p.get_search_terms(empresa=empresa, language=lang),
+            "sku": p.codigo or "",
+            "categoria": p.zona or "General",
+            "ubicacion": getattr(p, "ubicacion_fisica", None) or "",
+            "precio": float(p.precio_venta_sugerido or 0),
+            "stock": p.cantidad,
+            "vehiculo": str(vehiculo),
+            "imagen": "",
+            "vendible": (
+                p.activo
+                and p.cantidad > 0
+                and p.estado_pieza in (ESTADO_DISPONIBLE, ESTADO_RESERVADA)
+            ),
+        })
+    piezas_json = json.dumps(items_list, ensure_ascii=False)
 
     return render(
         request,
@@ -645,8 +680,116 @@ def inventario_vehiculo(request, pk):
             "danadas": danadas,
             "faltantes": faltantes,
             "valor_potencial": valor_potencial,
+            "piezas_json": piezas_json,
         },
     )
+
+
+@login_required
+@require_POST
+def iniciar_venta_desde_inventario(request, pk):
+    """
+    Inicia una venta desde el inventario de desarme, guardando un prefill de repuestos
+    en sesión y redirigiendo al formulario moderno de documentos.
+    """
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    vehiculo = get_object_or_404(
+        Vehiculo,
+        pk=pk,
+        empresa=empresa,
+        tipo_uso=Vehiculo.TIPO_USO_DESARME,
+    )
+
+    pieza_ids = request.POST.getlist("pieza_ids") or []
+    pieza_ids_int = []
+    for raw_id in pieza_ids:
+        try:
+            pieza_ids_int.append(int(raw_id))
+        except (TypeError, ValueError):
+            continue
+
+    if not pieza_ids_int:
+        messages.warning(request, "No se seleccionaron piezas válidas para la venta.")
+        return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/inventario/"))
+
+    valid_estados = {ESTADO_DISPONIBLE, ESTADO_RESERVADA}
+    piezas_qs = PiezaDesarme.objects.filter(
+        pk__in=pieza_ids_int,
+        empresa=empresa,
+        vehiculo=vehiculo,
+        activo=True,
+        estado_pieza__in=valid_estados,
+        cantidad__gt=0,
+    ).prefetch_related("names", "company_labels")
+
+    piezas_by_id = {p.pk: p for p in piezas_qs}
+    repuestos_prefill = []
+    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
+
+    for pieza_id in pieza_ids_int:
+        pieza = piezas_by_id.get(pieza_id)
+        if not pieza:
+            continue
+
+        raw_cantidad = request.POST.get(f"cantidad_{pieza_id}", "").strip() or "1"
+        try:
+            cantidad_solicitada = int(raw_cantidad)
+        except (TypeError, ValueError):
+            cantidad_solicitada = 0
+
+        if cantidad_solicitada <= 0:
+            continue
+
+        if cantidad_solicitada > pieza.cantidad:
+            cantidad_solicitada = pieza.cantidad
+
+        try:
+            precio_venta = float(pieza.precio_venta_sugerido or 0)
+        except (TypeError, ValueError):
+            precio_venta = 0.0
+
+        try:
+            costo_linea = float(pieza.costo_asignado or 0)
+        except (TypeError, ValueError):
+            costo_linea = 0.0
+        repuestos_prefill.append(
+            {
+                "codigo": pieza.codigo or "",
+                "nombre": pieza.get_display_label(empresa=empresa, language=lang) or pieza.nombre or "",
+                "cantidad": cantidad_solicitada,
+                "precio": precio_venta,
+                "descuento": 0,
+                "origen_repuesto": ORIGEN_DESARME,
+                "pieza_desarme_id": pieza.id,
+                "costo_linea": costo_linea,
+                "vehiculo_origen_label": str(pieza.vehiculo),
+            }
+        )
+
+    if not repuestos_prefill:
+        messages.warning(
+            request,
+            "Las piezas seleccionadas no son vendibles o no tienen stock disponible.",
+        )
+        return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/inventario/"))
+
+    request.session["desarme_repuestos_prefill"] = repuestos_prefill
+    request.session["desarme_origen_label"] = str(vehiculo)
+
+    try:
+        doc_url = _reverse_with_request(request, "documento_crear")
+    except Exception:
+        # Fallback conservador al path clásico manteniendo prefijo país/idioma
+        path = (request.path or "").lower()
+        if path.startswith("/us/"):
+            doc_url = "/us/en/documentos/form/"
+        else:
+            doc_url = "/cl/es/documentos/form/"
+
+    return redirect(doc_url)
 
 
 @login_required
@@ -685,9 +828,16 @@ def scanner_vehiculo(request, pk):
         tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
-    piezas = list(
-        vehiculo.piezas_desarme.filter(activo=True).order_by("zona", "codigo")
-    )
+    # Compatibilidad defensiva: en algunos deploys el related_name `piezas_desarme`
+    # puede no estar disponible (migración parcial / código antiguo). Evitar 500.
+    try:
+        piezas_qs = vehiculo.piezas_desarme.filter(activo=True).prefetch_related("names", "company_labels")  # type: ignore[attr-defined]
+    except Exception:
+        piezas_qs = PiezaDesarme.objects.filter(vehiculo=vehiculo, activo=True, empresa=empresa).prefetch_related("names", "company_labels")
+    piezas = list(piezas_qs.order_by("zona", "codigo"))
+    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
+    for p in piezas:
+        p.display_nombre = p.get_display_label(empresa=empresa, language=lang)
 
     # Stats
     total = len(piezas)
@@ -778,6 +928,50 @@ def api_pieza_actualizar_precio(request, pk):
     pieza.precio_venta_sugerido = precio
     pieza.save(update_fields=["precio_venta_sugerido"])
     return JsonResponse({"success": True, "precio": str(precio)})
+
+
+@login_required
+@require_POST
+def api_pieza_label_empresa_guardar(request, pk):
+    """
+    Crea o actualiza el nombre visible por empresa/idioma para una pieza de desarme.
+    Body JSON: { "language": "en", "label": "Valve Cover", "aliases": ["rocker cover"] }
+    Solo piezas de la empresa del usuario. Upsert sobre PiezaDesarmeCompanyLabel.
+    """
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return JsonResponse({"success": False, "error": "Sin empresa"}, status=403)
+
+    pieza = get_object_or_404(PiezaDesarme, pk=pk, empresa=empresa)
+    try:
+        data = json.loads(request.body) if request.body else {}
+    except json.JSONDecodeError:
+        return JsonResponse({"success": False, "error": "JSON inválido"}, status=400)
+
+    language = (data.get("language") or "es").strip()[:2].lower()
+    if language not in ("es", "en", "pt"):
+        language = "es"
+    label = (data.get("label") or "").strip()[:255]
+    if not label:
+        return JsonResponse({"success": False, "error": "label es obligatorio"}, status=400)
+
+    raw_aliases = data.get("aliases")
+    if not isinstance(raw_aliases, list):
+        raw_aliases = []
+    aliases = [str(a).strip() for a in raw_aliases if a is not None and str(a).strip()][:50]
+
+    obj, created = PiezaDesarmeCompanyLabel.objects.update_or_create(
+        empresa=empresa,
+        pieza_desarme=pieza,
+        language=language,
+        defaults={"label": label, "aliases": aliases, "is_preferred": True},
+    )
+    return JsonResponse({
+        "success": True,
+        "label": obj.label,
+        "language": obj.language,
+        "aliases": obj.aliases,
+    })
 
 
 @login_required

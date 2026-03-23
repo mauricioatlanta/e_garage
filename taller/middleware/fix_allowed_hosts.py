@@ -1,42 +1,36 @@
 """
-Middleware para forzar ALLOWED_HOSTS correcto
-Se ejecuta antes de CommonMiddleware para evitar errores de DisallowedHost
+Middleware opcional que une hosts mínimos a ALLOWED_HOSTS.
+
+NO está en la cadena MIDDLEWARE por defecto. La fuente de verdad debe ser
+la configuración de entorno: DJANGO_ALLOWED_HOSTS en .env.prod (o variable
+de entorno), incluyendo la IP del servidor si se permite acceso directo por IP.
+Si se rehabilita, va antes de CommonMiddleware.
 """
 
 
 class FixAllowedHostsMiddleware:
     """
-    Middleware que fuerza ALLOWED_HOSTS antes de que CommonMiddleware valide el host.
+    Middleware que asegura que ALLOWED_HOSTS incluya siempre los hosts mínimos
+    (IP del servidor, dominios principales, localhost) sin sobrescribir el resto.
     Debe estar ANTES de django.middleware.common.CommonMiddleware en MIDDLEWARE.
     """
 
+    REQUIRED_HOSTS = frozenset({
+        "127.0.0.1",
+        "localhost",
+        "159.223.200.106",
+        "egarage.cl",
+        "www.egarage.cl",
+    })
+
     def __init__(self, get_response):
         self.get_response = get_response
-        # Forzar ALLOWED_HOSTS al inicializar el middleware
         from django.conf import settings
 
-        correct_hosts = [
-            "127.0.0.1",
-            "localhost",
-            "159.223.200.106",
-            "egarage.cl",
-            "www.egarage.cl",
-        ]
-        if settings.ALLOWED_HOSTS == ["*"] or "egarage.cl" not in settings.ALLOWED_HOSTS:
-            settings.ALLOWED_HOSTS = correct_hosts
+        settings.ALLOWED_HOSTS = list(set(settings.ALLOWED_HOSTS) | self.REQUIRED_HOSTS)
 
     def __call__(self, request):
-        # También verificar en cada request por si acaso
         from django.conf import settings
 
-        if "egarage.cl" not in settings.ALLOWED_HOSTS:
-            settings.ALLOWED_HOSTS = [
-                "127.0.0.1",
-                "localhost",
-                "159.223.200.106",
-                "egarage.cl",
-                "www.egarage.cl",
-            ]
-
-        response = self.get_response(request)
-        return response
+        settings.ALLOWED_HOSTS = list(set(settings.ALLOWED_HOSTS) | self.REQUIRED_HOSTS)
+        return self.get_response(request)

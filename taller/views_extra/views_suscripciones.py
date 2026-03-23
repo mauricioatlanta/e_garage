@@ -39,7 +39,7 @@ def suspension(request):
         },
     }
 
-    return render(request, "taller/suspension/suspension.html", context)
+    return render(request, "suspension/suspension.html", context)
 
 
 @login_required
@@ -71,7 +71,7 @@ def subir_comprobante(request):
         "empresa": empresa,
     }
 
-    return render(request, "taller/suspension/subir_comprobante.html", context)
+    return render(request, "suspension/subir_comprobante.html", context)
 
 
 @login_required
@@ -488,4 +488,4 @@ def precios(request):
         "es_mexico": pais_usuario == "MX",
     }
 
-    return render(request, "taller/suspension/precios.html", context)
+    return render(request, "suspension/precios.html", context)

@@ -236,7 +236,7 @@ class DocumentoPDFExporter:
             return pdf_file
         except Exception as e:  # pragma: no cover - optional dependency
             # Dejar que el llamador decida cómo manejar la ausencia de weasyprint
-            raise ImportError(f"WeasyPrint no está disponible: {e}")
+            raise ImportError(f"WeasyPrint is not available: {e}. Install with: pip install weasyprint")
 
     def generar_response_pdf(self):
         """Genera una respuesta HTTP con el PDF"""
@@ -245,7 +245,7 @@ class DocumentoPDFExporter:
         except ImportError as e:
             # Devolver un 500 informativo para evitar que el servidor explote en startup
             return HttpResponse(
-                f"PDF generation not available: {e}", status=500, content_type="text/plain"
+                f"PDF generation not available: {e}", status=500, content_type="text/plain; charset=utf-8"
             )
 
         response = HttpResponse(pdf_file, content_type="application/pdf")

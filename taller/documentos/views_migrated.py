@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
+from django.utils.translation import get_language
 from django.utils.decorators import method_decorator
 from django.views.generic import (
     CreateView,
@@ -726,6 +727,19 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         context = super().get_context_data(**kwargs)
         empresa = self.request.user.empresa
 
+        # Prefill desde flujo de desarme (solo creación, prioridad menor que edición)
+        if not context.get("es_edicion"):
+            session_prefill = self.request.session.get("desarme_repuestos_prefill")
+            session_label = self.request.session.get("desarme_origen_label")
+            repuestos_json_actual = context.get("repuestos_json")
+            if not repuestos_json_actual and session_prefill:
+                context["repuestos_json"] = session_prefill
+                if session_label:
+                    context["desarme_origen_label"] = session_label
+            # Consumir siempre una sola vez
+            self.request.session.pop("desarme_repuestos_prefill", None)
+            self.request.session.pop("desarme_origen_label", None)
+
         # Cargar mecánicos activos del taller
         mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
 
@@ -968,6 +982,10 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         kwargs["user"] = self.request.user
         kwargs["empresa"] = getattr(self.request.user, "empresa", None)
         kwargs["country"] = "US" if self.request.path.startswith("/us/") else "CL"
+        # Idioma efectivo para labels/choices (no inferir de país)
+        kwargs["language"] = (
+            getattr(self.request, "LANGUAGE_CODE", None) or get_language() or "es"
+        )
         if self.request.method == "GET":
             kwargs.setdefault("initial", self.get_initial())
         return kwargs
@@ -1412,6 +1430,10 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         else:
             country = "US" if self.request.path.startswith("/us/") else "CL"
         kwargs["country"] = country
+        # Idioma efectivo para labels/choices (no inferir de país)
+        kwargs["language"] = (
+            getattr(self.request, "LANGUAGE_CODE", None) or get_language() or "es"
+        )
 
         return kwargs
 

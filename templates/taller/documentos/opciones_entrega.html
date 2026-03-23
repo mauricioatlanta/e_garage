@@ -185,7 +185,7 @@
             <h5 class="text-primary mb-3">Información del Documento</h5>
             <div class="row">
                 <div class="col-md-6">
-                    <p><strong>Empresa:</strong> {{ empresa.nombre }}</p>
+                    <p><strong>Empresa:</strong> {{ company_name|default:empresa.nombre_taller|default:empresa.empresa|default:"eGarage" }}</p>
                     <p><strong>Cliente:</strong> {{ cliente.nombre }}</p>
                     {% if cliente.rut %}
                     <p><strong>RUT:</strong> {{ cliente.rut }}</p>

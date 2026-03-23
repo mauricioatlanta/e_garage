@@ -2,6 +2,7 @@ from dal import autocomplete
 
 from django import forms
 from django.core.exceptions import ValidationError
+from django.utils.translation import get_language
 
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
@@ -40,18 +41,22 @@ class DocumentoForm(forms.ModelForm):
         self.user = kwargs.pop("user", None)
         self.empresa = kwargs.pop("empresa", None)
         self.country = kwargs.pop("country", "CL")
+        lang = kwargs.pop("language", None)
+        self.language = (lang or get_language() or "").split("-")[0] or (
+            "en" if (self.country or "").upper() == "US" else "es"
+        )
         super().__init__(*args, **kwargs)
 
         # Resolver empresa segura
         empresa = self.empresa or (getattr(self.user, "empresa", None))
 
-        # Normaliza namespace de país para URLs DAL
+        # Normaliza namespace de país para URLs DAL (por país, no idioma)
         ns = "usa_autocomplete" if (self.country or "").upper() == "US" else "cl_autocomplete"
         self.fields["cliente"].widget.url = f"{ns}:cliente"
         self.fields["vehiculo"].widget.url = f"{ns}:vehiculo"
 
-        # Labels y choices según país (solo si el campo existe en el form)
-        if self.country.upper() == "US":
+        # Labels y choices según idioma (no país)
+        if self.language == "en":
             if "tipo" in self.fields:
                 self.fields["tipo"].label = "Document Type"
                 self.fields["tipo"].choices = [
@@ -80,7 +85,7 @@ class DocumentoForm(forms.ModelForm):
             # Placeholders
             self.fields["cliente"].widget.attrs["data-placeholder"] = "🔍 Search customer..."
             self.fields["vehiculo"].widget.attrs["data-placeholder"] = "🔍 Search vehicle..."
-        else:
+        elif self.language == "es":
             if "tipo" in self.fields:
                 self.fields["tipo"].label = "Tipo de Documento"
                 self.fields["tipo"].choices = [
@@ -107,6 +112,35 @@ class DocumentoForm(forms.ModelForm):
             if "numero" in self.fields:
                 self.fields["numero"].label = "Número"
             # Placeholders
+            self.fields["cliente"].widget.attrs["data-placeholder"] = "🔍 Buscar cliente..."
+            self.fields["vehiculo"].widget.attrs["data-placeholder"] = "🔍 Buscar vehículo..."
+        else:
+            # Fallback a español para pt u otros idiomas
+            if "tipo" in self.fields:
+                self.fields["tipo"].label = "Tipo de Documento"
+                self.fields["tipo"].choices = [
+                    ("OT", "Orden de Trabajo"),
+                    ("PRES", "Presupuesto"),
+                    ("FAC", "Factura/Boleta"),
+                ]
+            if "cliente" in self.fields:
+                self.fields["cliente"].label = "Cliente"
+            if "vehiculo" in self.fields:
+                self.fields["vehiculo"].label = "Vehículo"
+            if "tecnico_responsable" in self.fields:
+                self.fields["tecnico_responsable"].label = "Técnico Responsable"
+            if "fecha_emision" in self.fields:
+                self.fields["fecha_emision"].label = "Fecha de Emisión"
+            if "kilometraje" in self.fields:
+                self.fields["kilometraje"].label = "Kilometraje"
+            if "observaciones" in self.fields:
+                self.fields["observaciones"].label = "Observaciones"
+            if "estado_pago" in self.fields:
+                self.fields["estado_pago"].label = "Estado de Pago"
+            if "pagado" in self.fields:
+                self.fields["pagado"].label = "Pagado"
+            if "numero" in self.fields:
+                self.fields["numero"].label = "Número"
             self.fields["cliente"].widget.attrs["data-placeholder"] = "🔍 Buscar cliente..."
             self.fields["vehiculo"].widget.attrs["data-placeholder"] = "🔍 Buscar vehículo..."
 

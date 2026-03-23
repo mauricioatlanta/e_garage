@@ -824,11 +824,11 @@ def dashboard_centro_operaciones_espacial(request):
     # Seleccionar template espacial
     # Para USA, siempre usar el template de USA (soporta inglés y español)
     if hasattr(empresa, "pais") and empresa.pais == "US":
-        template_name = "taller/us/en/dashboard/centro_operaciones_espacial.html"
+        template_name = "us/en/dashboard/centro_operaciones_espacial.html"
         context["use_usa_base"] = True
     elif request.path.startswith("/us/"):
         # Para rutas /us/, siempre usar template de USA (tiene traducciones)
-        template_name = "taller/us/en/dashboard/centro_operaciones_espacial.html"
+        template_name = "us/en/dashboard/centro_operaciones_espacial.html"
         context["use_usa_base"] = True
     else:
         template_name = select_country_lang_template(

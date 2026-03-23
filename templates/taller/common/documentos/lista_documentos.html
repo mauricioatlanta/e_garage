@@ -1181,7 +1181,7 @@
                   <span>→ FAC</span>
                 </a>
                 {% endif %}
-                <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="accion-btn danger" onclick="return confirm('{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Are you sure you want to delete this document?{% else %}¿Estás seguro de eliminar este documento?{% endif %}');">
+                <a href="{% country_url 'documentos:eliminar_documento' documento.id %}" class="accion-btn danger">
                   <i class="fas fa-trash"></i>
                   <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Delete{% else %}Eliminar{% endif %}</span>
                 </a>

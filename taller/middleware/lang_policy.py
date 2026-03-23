@@ -6,6 +6,11 @@ ALLOWED_BY_COUNTRY = {
     "MX": ("es",),  # México español
     "CO": ("es",),  # Colombia español
     "EC": ("es",),  # Ecuador español
+    "VE": ("es",),  # Venezuela español
+    "UY": ("es",),  # Uruguay español
+    "AR": ("es",),  # Argentina español
+    "PE": ("es",),  # Perú español
+    "BR": ("pt-br",),  # Brasil portugués
 }
 
 DEFAULT_BY_COUNTRY = {
@@ -14,6 +19,11 @@ DEFAULT_BY_COUNTRY = {
     "MX": "es",
     "CO": "es",
     "EC": "es",
+    "VE": "es",
+    "UY": "es",
+    "AR": "es",
+    "PE": "es",
+    "BR": "pt-br",
 }
 
 # Django i18n usa esta clave por defecto
@@ -45,16 +55,14 @@ class LanguagePolicyMiddleware:
 
             # Si aún no hay país, detectar desde URL directamente
             if not pais:
-                if request.path.startswith("/us/"):
-                    pais = "US"
-                elif request.path.startswith("/cl/"):
-                    pais = "CL"
-                elif request.path.startswith("/mx/"):
-                    pais = "MX"
-                elif request.path.startswith("/co/"):
-                    pais = "CO"
-                elif request.path.startswith("/ec/"):
-                    pais = "EC"
+                segmentos = request.path.strip("/").split("/")
+                if segmentos:
+                    posible_pais = segmentos[0].upper()
+                    if posible_pais in DEFAULT_BY_COUNTRY:
+                        pais = posible_pais
+
+            # Asegurar que pais esté en mayúsculas
+            pais = pais.upper() if pais else None
 
             # SOLUCIÓN SIMPLE: Solo para USA, respetar preferencia de sesión
             if pais == "US":
@@ -73,13 +81,13 @@ class LanguagePolicyMiddleware:
                     session_lang = request.session.get(DJANGO_LANGUAGE_SESSION_KEY)
 
                     # Si hay idioma en sesión y es válido para USA, usarlo
-                    if session_lang in ["en", "es"]:
+                    if session_lang in ALLOWED_BY_COUNTRY["US"]:
                         lang = session_lang
                         print(f"[DEBUG] USA - Usando idioma de sesión: {lang}")
                     else:
                         # Verificar si hay idioma en cookie (LocaleMiddleware lo puede leer)
                         cookie_lang = request.COOKIES.get("django_language")
-                        if cookie_lang in ["en", "es"]:
+                        if cookie_lang in ALLOWED_BY_COUNTRY["US"]:
                             lang = cookie_lang
                             # Guardar en sesión para consistencia
                             request.session[DJANGO_LANGUAGE_SESSION_KEY] = lang
@@ -87,7 +95,7 @@ class LanguagePolicyMiddleware:
                                 f"[DEBUG] USA - Usando idioma de cookie y guardando en sesión: {lang}"
                             )
                         else:
-                            lang = "en"  # Default para USA
+                            lang = DEFAULT_BY_COUNTRY["US"]
                             print(f"[DEBUG] USA - Sin preferencia, usando default: {lang}")
             else:
                 # Para otros países, usar default

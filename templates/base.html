@@ -419,6 +419,107 @@
         color: #00d4ff !important;
       }
     }
+
+    /* Desarme dashboard: chrome operativo compacto (body.eg-desarme-dashboard-compact) */
+    .eg-desarme-dashboard-compact header.company-header {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-bottom-width: 2px;
+      box-shadow: 0 4px 18px rgba(0, 212, 255, 0.12), inset 0 1px 0 rgba(0, 255, 255, 0.08);
+    }
+    .eg-desarme-dashboard-compact header.company-header > .flex.items-center {
+      flex: 1;
+      min-width: 0;
+      gap: 0.65rem !important;
+      align-items: center !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header .company-logo {
+      height: 64px !important;
+      max-height: 68px !important;
+      width: auto !important;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45) !important;
+      filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.45)) !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header .company-logo:hover {
+      transform: none;
+      filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.55)) !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header h1 {
+      font-size: 1.05rem !important;
+      line-height: 1.2 !important;
+      letter-spacing: 0.06em !important;
+      font-weight: 800 !important;
+      text-shadow: 0 0 12px rgba(0, 255, 255, 0.45), 0 1px 6px rgba(0, 0, 0, 0.85) !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header .company-tagline {
+      font-size: 0.7rem !important;
+      font-weight: 500 !important;
+      margin-top: 0.1rem !important;
+      opacity: 0.85;
+      text-shadow: 0 0 6px rgba(0, 255, 255, 0.35) !important;
+    }
+    @media (max-width: 640px) {
+      .eg-desarme-dashboard-compact header.company-header .company-tagline {
+        display: none;
+      }
+      .eg-desarme-dashboard-compact header.company-header h1 {
+        font-size: 0.95rem !important;
+      }
+      .eg-desarme-dashboard-compact header.company-header .company-logo {
+        height: 52px !important;
+        max-height: 56px !important;
+      }
+    }
+    .eg-desarme-dashboard-compact #main-navigation {
+      margin-top: 0.25rem;
+      margin-bottom: 0.15rem;
+      padding-bottom: 0.15rem;
+      gap: 0.35rem;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      max-width: 100%;
+    }
+    .eg-desarme-dashboard-compact #main-navigation > div {
+      display: contents;
+    }
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard,
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard.logout-btn {
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-height: 34px !important;
+      padding: 0.28rem 0.55rem !important;
+      border-radius: 6px;
+      gap: 0.3rem !important;
+      box-shadow: 0 1px 4px rgba(0, 212, 255, 0.1);
+    }
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard .nav-icon {
+      font-size: 0.95rem !important;
+      margin-bottom: 0 !important;
+    }
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard .nav-text,
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard span:last-child {
+      display: inline !important;
+      margin-top: 0 !important;
+      font-size: 0.62rem !important;
+    }
+    @media (max-width: 768px) {
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard,
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard.logout-btn {
+        min-height: 36px !important;
+        padding: 0.26rem 0.45rem !important;
+        flex: 0 1 auto;
+      }
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard .nav-text,
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard span:last-child {
+        font-size: 0.58rem !important;
+      }
+    }
   </style>
 
   {# --- Font Awesome --- #}
@@ -559,7 +660,7 @@
   {% if form %}{% form_media_once form 'css' %}{% endif %}
 </head>
 
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %} eg-desarme-dashboard-compact{% endif %}">
 
 
   {# --- Fondo estelar SOLO su HTML cuando flag activo --- #}
@@ -575,9 +676,13 @@
 
   {# --- Header --- #}
   {% if '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
+  {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}
+  <header class="company-header flex flex-row items-center justify-between gap-2 p-2">
+  {% else %}
   <header class="company-header flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 p-4 sm:p-6">
+  {% endif %}
     <!-- Logo y nombre de la empresa -->
-    <div class="flex items-center gap-4 sm:gap-6">
+    <div class="flex items-center {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}gap-2 sm:gap-3{% else %}gap-4 sm:gap-6{% endif %}">
       {% if LOGO_PERSONALIZADO or company_logo_url or COMPANY_LOGO %}
         {# Logo personalizado de la empresa del suscriptor - Prioridad: LOGO_PERSONALIZADO > company_logo_url > COMPANY_LOGO #}
         <img src="{% if LOGO_PERSONALIZADO %}{{ LOGO_PERSONALIZADO }}{% elif company_logo_url %}{{ company_logo_url }}{% else %}{{ COMPANY_LOGO }}{% endif %}" 
@@ -587,7 +692,7 @@
       {% endif %}
 
       <div class="flex flex-col">
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,255,255,0.8)]" style="font-family: 'Orbitron', 'Arial Black', monospace; letter-spacing: 2px;">
+        <h1 class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-lg sm:text-xl md:text-2xl{% else %}text-3xl sm:text-4xl md:text-5xl{% endif %} font-black bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,255,255,0.8)]" style="font-family: 'Orbitron', 'Arial Black', monospace; letter-spacing: 2px;">
           {% if request.path == '/' or request.path == '' or 'seleccionar_pais' in request.path %}
             eGarage
           {% else %}
@@ -603,19 +708,19 @@
           {% endif %}
         </h1>
         {% if TAGLINE_PERSONALIZADO %}
-          <span class="text-lg sm:text-xl text-cyan-200 font-semibold mt-1 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ TAGLINE_PERSONALIZADO }}</span>
+          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ TAGLINE_PERSONALIZADO }}</span>
         {% elif company_tagline %}
-          <span class="text-lg sm:text-xl text-cyan-200 font-semibold mt-1 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ company_tagline }}</span>
+          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ company_tagline }}</span>
         {% elif COMPANY_TAGLINE %}
-          <span class="text-lg sm:text-xl text-cyan-200 font-semibold mt-1 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ COMPANY_TAGLINE }}</span>
+          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ COMPANY_TAGLINE }}</span>
         {% else %}
-          <span class="text-lg sm:text-xl text-cyan-200 font-semibold mt-1 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{% trans "the best in town" %}</span>
+          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{% trans "the best in town" %}</span>
         {% endif %}
       </div>
     </div>
 
     <!-- Selector de idioma -->
-    <div class="flex items-center gap-2 sm:gap-3">
+    <div class="flex items-center {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}gap-1 sm:gap-2{% else %}gap-2 sm:gap-3{% endif %}">
       <!-- Selector de idioma: Solo mostrar para USA, no para Chile -->
       {% if request.path|slice:':3' != '/cl' %}
         {% include 'taller/includes/lang_switcher_cinematic.html' %}
@@ -626,7 +731,7 @@
 
   {# --- Navegación principal - DOS FILAS --- #}
   {% if '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
-  <div id="main-navigation" class="flex flex-col items-center justify-center mt-3 gap-2">
+  <div id="main-navigation" class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}flex flex-row flex-wrap items-center justify-center mt-1 gap-1{% else %}flex flex-col items-center justify-center mt-3 gap-2{% endif %}">
     {% if request.user.is_authenticated %}
       {# Fila 1: Settings, Center, Clients, Documents, Extra #}
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">

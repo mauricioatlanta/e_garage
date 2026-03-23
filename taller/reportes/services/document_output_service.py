@@ -43,7 +43,7 @@ class DocumentOutputService:
             except ImportError:
                 DocumentOutputService._weasyprint_available = False
                 log.warning(
-                    "[DocumentOutputService] WeasyPrint no está disponible. Instala con: pip install weasyprint"
+                    "[DocumentOutputService] WeasyPrint not available. Install with: pip install weasyprint"
                 )
         return DocumentOutputService._weasyprint_available
 
@@ -163,7 +163,7 @@ class DocumentOutputService:
         """
         if not DocumentOutputService._check_weasyprint():
             raise ImportError(
-                "WeasyPrint no está disponible. " "Instala con: pip install weasyprint"
+                "WeasyPrint is not available. Install with: pip install weasyprint"
             )
 
         empresa = documento.empresa

@@ -1,5 +1,15 @@
-{# templates/us/en/documentos/crear_documento.html #}
-{% extends "taller/common/documentos/document_form.html" %}
+{#
+  LEGACY / fallback — templates/us/en/documentos/crear_documento.html
+
+  La CBV migrada (DocumentoCreateView) usa base_template_name = "documentos/document_form.html"
+  y Django resuelve primero taller/us/en/documentos/document_form.html (cadena oficial).
+
+  Este archivo sigue existiendo por select_template / rutas country-aware que prueban
+  us/en/documentos/crear_documento.html. DEBE extender la misma capa USA que el mixin.
+
+  Documentación: docs/DOCUMENTOS_USA_TEMPLATE_CHAIN.md
+#}
+{% extends "taller/us/documentos/document_form.html" %}
 {% load i18n %}
 {% load static %}
 {% load country_url %}

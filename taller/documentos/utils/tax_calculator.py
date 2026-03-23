@@ -36,6 +36,9 @@ class TaxCalculator:
         "AR": {
             "iva": Decimal("0.21"),  # 21% IVA en Argentina
         },
+        "VE": {
+            "iva": Decimal("0.16"),  # 16% IVA en Venezuela
+        },
     }
 
     def __init__(self, country_code: Optional[str] = None, config: Optional[Dict] = None):
@@ -142,6 +145,20 @@ class TaxCalculator:
                 )
             )
 
+        elif self.country_code == "VE":
+            # Venezuela: IVA 16% sobre repuestos
+            iva_rate = self.tax_rates.get("iva", Decimal("0.16"))
+            iva_amount = subtotal_repuestos * iva_rate
+            tax_lines.append(
+                TaxLine(
+                    id="iva",
+                    label="IVA",
+                    rate=iva_rate * 100,
+                    amount=iva_amount,
+                    applies_to="repuestos",
+                )
+            )
+
         return tax_lines
 
     def calculate_total(
@@ -205,6 +222,15 @@ class TaxCalculator:
                     "applies_to": "repuestos",
                 }
             )
+        elif self.country_code == "VE":
+            tax_lines_config.append(
+                {
+                    "id": "iva",
+                    "label": "IVA",
+                    "rate": "16",
+                    "applies_to": "repuestos",
+                }
+            )
 
         return {
             "tax_lines": tax_lines_config,
@@ -218,6 +244,7 @@ class TaxCalculator:
             "CL": "CLP",
             "US": "USD",
             "AR": "ARS",
+            "VE": "USD",
         }
         return currency_map.get(self.country_code, "USD")
 
@@ -227,5 +254,6 @@ class TaxCalculator:
             "CL": "$",
             "US": "$",
             "AR": "$",
+            "VE": "$",
         }
         return symbol_map.get(self.country_code, "$")

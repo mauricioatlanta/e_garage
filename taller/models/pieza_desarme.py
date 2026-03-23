@@ -127,6 +127,106 @@ class PiezaDesarme(TenantScoped):
     zona = models.CharField(max_length=50, null=True, blank=True)
     posicion = models.CharField(max_length=50, null=True, blank=True)
 
+    def get_label(self, language="es"):
+        """
+        Nombre localizado (Fase 2 canónico). Usa PiezaDesarmeName si existe; si no, fallback a nombre.
+        Mantenido por compatibilidad; preferir get_display_label(empresa, language) para UI.
+        """
+        return (self.get_catalog_label(language=language) or self.nombre) or ""
+
+    def get_catalog_label(self, language="es"):
+        """
+        Nombre canónico global por idioma (PiezaDesarmeName).
+        Orden: default del idioma solicitado → cualquier del idioma → en → es → self.nombre.
+        Devuelve string limpio, nunca None.
+        """
+        if not hasattr(self, "names"):
+            return (self.nombre or "").strip()
+        lang = (language or "es")[:2].lower()
+        for try_lang in [lang, "en", "es"]:
+            try:
+                default = self.names.get(language=try_lang, is_default=True)
+                if default and default.label:
+                    return default.label.strip()
+            except self.names.model.DoesNotExist:
+                pass
+            rec = self.names.filter(language=try_lang).first()
+            if rec and rec.label:
+                return rec.label.strip()
+        return (self.nombre or "").strip()
+
+    def get_company_label(self, empresa, language="es"):
+        """
+        Nombre visible preferido por empresa e idioma (PiezaDesarmeCompanyLabel).
+        Si no existe registro para esa empresa+idioma, devuelve None.
+        """
+        if empresa is None:
+            return None
+        if not hasattr(self, "company_labels"):
+            return None
+        lang = (language or "es")[:2].lower()
+        rec = self.company_labels.filter(empresa=empresa, language=lang).first()
+        if rec and rec.label:
+            return rec.label.strip()
+        return None
+
+    def get_display_label(self, empresa=None, language="es"):
+        """
+        Nombre único para mostrar en UI: prioridad company label → catalog label → self.nombre.
+        """
+        company = self.get_company_label(empresa=empresa, language=language)
+        if company is not None:
+            return company
+        return self.get_catalog_label(language=language) or (self.nombre or "").strip() or ""
+
+    def get_search_terms(self, empresa=None, language="es"):
+        """
+        Lista deduplicada de términos para búsqueda: display label, aliases, catalog, código, nombre.
+        """
+        seen = set()
+        result = []
+        lang = (language or "es")[:2].lower()
+
+        def add(s):
+            if s is None or not isinstance(s, str):
+                return
+            t = s.strip()
+            if t and t.lower() not in seen:
+                seen.add(t.lower())
+                result.append(t)
+
+        add(self.get_display_label(empresa=empresa, language=language))
+        add(self.nombre)
+        if self.codigo:
+            add(self.codigo)
+
+        if hasattr(self, "company_labels"):
+            rec = self.company_labels.filter(empresa=empresa, language=lang).first()
+            if rec:
+                add(rec.label)
+                for a in (rec.aliases or []):
+                    if isinstance(a, str):
+                        add(a)
+
+        if hasattr(self, "names"):
+            for name_rec in self.names.filter(language=lang):
+                add(name_rec.label)
+                for a in (name_rec.aliases or []):
+                    if isinstance(a, str):
+                        add(a)
+            for name_rec in self.names.filter(language="en"):
+                add(name_rec.label)
+                for a in (name_rec.aliases or []):
+                    if isinstance(a, str):
+                        add(a)
+            for name_rec in self.names.filter(language="es"):
+                add(name_rec.label)
+                for a in (name_rec.aliases or []):
+                    if isinstance(a, str):
+                        add(a)
+
+        return result
+
     def clean(self):
         super().clean()
         if not self.vehiculo_id:
@@ -170,19 +270,26 @@ class PiezaDesarme(TenantScoped):
         return f"{self.nombre} ({self.codigo}) x{self.cantidad} — {self.vehiculo}"
 
 
+# Idiomas para nombres canónicos (alineado con servicios)
+PIEZA_DESARME_LANGUAGE_CHOICES = [
+    ("es", "Español"),
+    ("en", "English"),
+    ("pt", "Português"),
+]
+
+
 class PiezaDesarmeName(models.Model):
-    LANGUAGE_CHOICES = [
-        ("es", "Español"),
-        ("en", "English"),
-        ("pt", "Português"),
-    ]
+    """
+    Nombres localizados y aliases para piezas de desarme (modelo canónico Fase 2).
+    Permite búsqueda por slang/sinónimos y múltiples idiomas.
+    """
 
     pieza_desarme = models.ForeignKey(
         PiezaDesarme,
         on_delete=models.CASCADE,
         related_name="names",
     )
-    language = models.CharField(max_length=2, choices=LANGUAGE_CHOICES)
+    language = models.CharField(max_length=2, choices=PIEZA_DESARME_LANGUAGE_CHOICES)
     label = models.CharField(max_length=255, help_text="Nombre canónico en este idioma")
     aliases = models.JSONField(
         default=list,
@@ -199,13 +306,60 @@ class PiezaDesarmeName(models.Model):
         verbose_name_plural = "Nombres de piezas desarme"
         constraints = [
             models.UniqueConstraint(
-                fields=("pieza_desarme", "language", "is_default"),
+                fields=["pieza_desarme", "language", "is_default"],
                 name="uq_pieza_desarme_name_pieza_lang_default",
-            ),
+            )
         ]
 
     def __str__(self):
-        return f"{self.pieza_desarme_id} [{self.language}] {self.label}"
+        return f"{self.label} ({self.language})"
+
+
+class PiezaDesarmeCompanyLabel(models.Model):
+    """
+    Nombre visible preferido por empresa e idioma para una pieza de desarme.
+    Permite que cada empresa defina cómo mostrar el nombre de la pieza en su idioma.
+    """
+
+    empresa = models.ForeignKey(
+        "taller.Empresa",
+        on_delete=models.CASCADE,
+        related_name="pieza_labels",
+    )
+    pieza_desarme = models.ForeignKey(
+        PiezaDesarme,
+        on_delete=models.CASCADE,
+        related_name="company_labels",
+    )
+    language = models.CharField(
+        max_length=2,
+        choices=PIEZA_DESARME_LANGUAGE_CHOICES,
+    )
+    label = models.CharField(max_length=255, help_text="Nombre visible para esta empresa e idioma")
+    aliases = models.JSONField(
+        default=list,
+        blank=True,
+        help_text="Lista de sinónimos/slang para búsqueda",
+    )
+    is_preferred = models.BooleanField(
+        default=True,
+        help_text="Si es el nombre preferido para mostrar en este idioma",
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = "Nombre de pieza desarme por empresa"
+        verbose_name_plural = "Nombres de piezas desarme por empresa"
+        constraints = [
+            models.UniqueConstraint(
+                fields=["empresa", "pieza_desarme", "language"],
+                name="uq_pieza_desarme_company_label_empresa_pieza_lang",
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.label} ({self.language}) — {self.empresa_id}"
 
 
 # Tipos de evento para historial de precios (v4)

@@ -1,5 +1,9 @@
-{# templates/us/en/documentos/editar_documento.html #}
-{% extends "taller/common/documentos/document_form.html" %}
+{#
+  LEGACY / fallback — templates/us/en/documentos/editar_documento.html
+  DocumentoUpdateView resuelve documentos/document_form.html → taller/us/en|es/... primero.
+  Mantener extends a la capa USA. docs/DOCUMENTOS_USA_TEMPLATE_CHAIN.md
+#}
+{% extends "taller/us/documentos/document_form.html" %}
 {% load i18n %}
 {% load static %}
 {% load country_url %}

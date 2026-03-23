@@ -22,6 +22,7 @@ from .kilometraje import KilometrajeRegistro
 # Modelos de documentos
 from .documento import Documento
 from .lineas_documento import LineaServicio, LineaRepuesto, LineaOtroServicio
+from .correlativo import CorrelativoDocumento
 
 # Modelos de memoria y seguimiento
 from .memoria_seguimiento import (
@@ -34,7 +35,12 @@ from .memoria_seguimiento import (
 
 # Modelos de repuestos
 from .repuesto import Repuesto
-from .pieza_desarme import PiezaDesarme, PiezaDesarmeName, PrecioHistoricoPieza
+from .pieza_desarme import (
+    PiezaDesarme,
+    PiezaDesarmeName,
+    PiezaDesarmeCompanyLabel,
+    PrecioHistoricoPieza,
+)
 from .vehiculo_desarme import VehiculoDesarme
 from .vendedor_desarme import VendedorDesarme
 
@@ -71,6 +77,7 @@ __all__ = [
     "LineaServicio",
     "LineaRepuesto",
     "LineaOtroServicio",
+    "CorrelativoDocumento",
     # Memoria y seguimiento
     "NotaInterna",
     "EtiquetaInterna",
@@ -81,6 +88,7 @@ __all__ = [
     "Repuesto",
     "PiezaDesarme",
     "PiezaDesarmeName",
+    "PiezaDesarmeCompanyLabel",
     "PrecioHistoricoPieza",
     "VehiculoDesarme",
     "VendedorDesarme",

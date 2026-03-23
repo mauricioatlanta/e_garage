@@ -165,6 +165,11 @@ def usa_login_view(request):
         # Login OK
         dj_login(request, user)
 
+        # No arrastrar flashes viejos (ni duplicar “signed in”) al workspace
+        from django.contrib.messages import get_messages
+
+        list(get_messages(request))
+
         from django.utils.http import url_has_allowed_host_and_scheme
 
         next_url = (request.POST.get("next") or request.GET.get("next") or "").strip()

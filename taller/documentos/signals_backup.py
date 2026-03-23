@@ -1,4 +1,4 @@
 """
 Archivo legacy desactivado.
-No usar.
+No usar: la capa operativa actual no utiliza LineaDocumento.
 """

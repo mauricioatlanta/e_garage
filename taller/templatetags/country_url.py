@@ -26,6 +26,31 @@ def _country_ns_from_path(path: str) -> str:
     return "chile"
 
 
+def _country_ns_from_empresa(empresa) -> str:
+    """
+    Devuelve el namespace del país según la empresa del documento (empresa.pais),
+    para que los enlaces públicos (PDF, QR, etc.) sean coherentes con el país de la
+    empresa y no con la ruta por la que entró el usuario.
+
+    Empresa US → /us/... (us_es por defecto)
+    Empresa CL → /cl/... (chile)
+    Empresa UY → /uy/... (uruguay)
+    """
+    if not empresa:
+        return "chile"
+    pais = (getattr(empresa, "pais", None) or "").upper()
+    country = (getattr(empresa, "country", None) or "").upper()
+    if pais == "US" or country == "US":
+        return "us_es"
+    if pais == "UY" or country == "UY":
+        return "uruguay"
+    if pais == "CL" or country == "CL":
+        return "chile"
+    if pais == "MX" or country == "MX":
+        return "chile"  # MX sin namespace propio, fallback
+    return "chile"
+
+
 def _extract_lang_from_path(path: str) -> str:
     """
     Extrae el código de idioma del path si está presente.

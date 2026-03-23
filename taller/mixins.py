@@ -34,61 +34,37 @@ class CountryLangTemplateMixin:
             # Fallback a template estándar si no hay request
             return [f"taller/{base_template}"]
 
-        empresa = (
-            getattr(request.user, "empresa", None)
-            if hasattr(request, "user") and request.user.is_authenticated
-            else None
-        )
+        # Empresa de forma segura (OneToOne reverse puede lanzar ObjectDoesNotExist)
+        empresa = None
+        if hasattr(request, "user") and getattr(request.user, "is_authenticated", False):
+            try:
+                empresa = request.user.empresa
+            except Exception:
+                empresa = None
 
         # Determinar país: prioridad URL path > request.country > empresa.pais > CL
-        # Primero intentar desde el prefijo del path
         path = (getattr(request, "path_info", "") or request.path or "").lower()
-        parts = [
-            p for p in path.split("/") if p
-        ]  # "/us/documentos/form/" -> ["us","documentos","form"]
-
+        parts = [p for p in path.split("/") if p]
         prefix = parts[0] if parts else ""
         if prefix in {"us", "cl", "mx", "pe", "co", "ec", "ve", "br"}:
             country = prefix.upper()
         elif hasattr(request, "country") and request.country:
             country = request.country
-        elif empresa and hasattr(empresa, "pais") and empresa.pais:
+        elif empresa and getattr(empresa, "pais", None):
             country = empresa.pais
         else:
-            country = "CL"  # default
+            country = "CL"
 
-        # Use the language set by LanguagePolicyMiddleware
         lang = getattr(request, "LANGUAGE_CODE", None) or get_language() or "es"
 
-        # Debug logging
-        print(
-            f"[DEBUG] CountryLangTemplateMixin: base_template={base_template}, country={country}, lang={lang}"
-        )
-        print(
-            f"[DEBUG] User: {request.user.username if request.user.is_authenticated else 'Anonymous'}"
-        )
-        print(f"[DEBUG] Empresa: {empresa.nombre_taller if empresa else 'None'}")
-        print(
-            f"[DEBUG] Empresa.pais: {getattr(empresa, 'pais', 'NO_ATTR') if empresa else 'NO_EMPRESA'}"
-        )
-        print(f"[DEBUG] Request.path: {request.path}")
-        print(f"[DEBUG] Request.country: {getattr(request, 'country', 'NO_ATTR')}")
-        print(f"[DEBUG] Request.company: {getattr(request, 'company', 'NO_ATTR')}")
-
-        # Seleccionar template apropiado
         try:
             template_name = select_country_lang_template(base_template, country, lang)
-            print(f"[DEBUG] Selected template: {template_name}")
             return [template_name]
-        except Exception as e:
-            print(f"[DEBUG] Template selection error: {e}")
-            # Fallback a template base si hay problemas
-            fallback_templates = [
+        except Exception:
+            return [
                 f"taller/common/{base_template}",
                 f"taller/{base_template}",
             ]
-            print(f"[DEBUG] Using fallback templates: {fallback_templates}")
-            return fallback_templates
 
     def render_country_lang(self, request, context):
         """
@@ -103,12 +79,13 @@ class CountryLangTemplateMixin:
         if not self.base_template_name:
             raise ValueError("base_template_name debe estar definido en la vista")
 
-        # Obtener datos de país e idioma
-        empresa = (
-            getattr(request.user, "empresa", None)
-            if hasattr(request, "user") and request.user.is_authenticated
-            else None
-        )
+        # Empresa de forma segura (OneToOne reverse puede lanzar ObjectDoesNotExist)
+        empresa = None
+        if hasattr(request, "user") and getattr(request.user, "is_authenticated", False):
+            try:
+                empresa = request.user.empresa
+            except Exception:
+                empresa = None
 
         # Determinar país: prioridad URL path > request.country > empresa.pais > CL
         path = (getattr(request, "path_info", "") or request.path or "").lower()

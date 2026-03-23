@@ -5,7 +5,14 @@ from taller.models.vehiculos import Vehiculo
 
 
 def ingreso_centro(request, *args, **kwargs):
-    return redirect("/workspace/")
+    # Evitar loops: nunca redirigir a la ruta canónica /workspace/
+    path = (request.path or "").lower()
+    if path.startswith("/us/"):
+        return redirect("/us/dashboard/")
+    if path.startswith("/cl/"):
+        return redirect("/cl/es/dashboard/")
+    # Fallback seguro para /workspace/ y otros casos
+    return redirect("/cl/es/dashboard/")
 
 
 def ingreso_buscar(request, *args, **kwargs):

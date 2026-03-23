@@ -449,3 +449,154 @@ msgstr "Vendedor"
 
 msgid "Part Sale"
 msgstr "Venta de Repuestos"
+
+msgid "Advanced vehicle management system"
+msgstr "Sistema avanzado de gestión de vehículos"
+
+# Document form - formulario de documentos
+msgid "CREATE DOCUMENT"
+msgstr "CREAR DOCUMENTO"
+
+msgid "EDIT DOCUMENT"
+msgstr "EDITAR DOCUMENTO"
+
+msgid "Save Document"
+msgstr "Guardar Documento"
+
+msgid "Back"
+msgstr "Volver"
+
+msgid "Back to List"
+msgstr "Volver a la Lista"
+
+msgid "Document"
+msgstr "Documento"
+
+msgid "Document No."
+msgstr "Documento N°"
+
+msgid "Document Type"
+msgstr "Tipo de Documento"
+
+msgid "Will be generated automatically"
+msgstr "Se generará automáticamente"
+
+msgid "Document Management"
+msgstr "Gestión de Documento"
+
+msgid "Document Form"
+msgstr "Formulario de Documento"
+
+msgid "Document Information"
+msgstr "Información del Documento"
+
+msgid "This is the base template for documents. Specific content should be defined in the 'documento_content' block."
+msgstr "Este es el template base para documentos. El contenido específico debe ser definido en el bloque 'documento_content'."
+
+msgid "View Document"
+msgstr "Ver Documento"
+
+msgid "User"
+msgstr "Usuario"
+
+msgid "Please select a customer before continuing."
+msgstr "Por favor seleccione un cliente antes de continuar."
+
+msgid "Validation errors"
+msgstr "Errores de validación"
+
+msgid "Date"
+msgstr "Fecha"
+
+msgid "Payment Status"
+msgstr "Estado de Pago"
+
+msgid "Operation"
+msgstr "Operación"
+
+msgid "Part sale only"
+msgstr "Solo venta de repuestos"
+
+msgid "CLIENT"
+msgstr "CLIENTE"
+
+msgid "New client"
+msgstr "Nuevo cliente"
+
+msgid "Select client..."
+msgstr "Seleccionar cliente..."
+
+msgid "VEHICLE"
+msgstr "VEHÍCULO"
+
+msgid "Kilometraje"
+msgstr "Kilometraje"
+
+msgid "Mileage"
+msgstr "Kilometraje"
+
+msgid "USED PARTS"
+msgstr "PIEZAS USADAS"
+
+msgid "ADD"
+msgstr "AGREGAR"
+
+msgid "Used"
+msgstr "Usado"
+
+msgid "Code"
+msgstr "Código"
+
+msgid "Part name"
+msgstr "Nombre de repuesto"
+
+msgid "Qty"
+msgstr "Cant."
+
+msgid "Price"
+msgstr "Precio"
+
+msgid "Total"
+msgstr "Total"
+
+msgid "OTHER SERVICES"
+msgstr "OTROS SERVICIOS"
+
+msgid "NOTES"
+msgstr "NOTAS"
+
+msgid "DOCUMENT TOTALS"
+msgstr "TOTALES DEL DOCUMENTO"
+
+msgid "Apply all taxes"
+msgstr "Aplicar todos los impuestos"
+
+msgid "Other"
+msgstr "Otros"
+
+msgid "TOTAL"
+msgstr "TOTAL"
+
+msgid "Search client"
+msgstr "Buscar cliente"
+
+msgid "Type at least 2 characters to search"
+msgstr "Escriba al menos 2 caracteres para buscar"
+
+msgid "Close"
+msgstr "Cerrar"
+
+msgid "Searching..."
+msgstr "Buscando..."
+
+msgid "Server error"
+msgstr "Error del servidor"
+
+msgid "Document paid"
+msgstr "Documento pagado"
+
+msgid "Document Type is required"
+msgstr "El tipo de documento es obligatorio"
+
+msgid "Service"
+msgstr "Servicio"

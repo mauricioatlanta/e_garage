@@ -6,10 +6,12 @@ Implementa la lógica de "The Fulfillment Loop" - el cliente recibe su comproban
 """
 
 import logging
+from pathlib import Path
 from urllib.parse import quote
 
 from django.conf import settings
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django.utils.text import slugify
 
 log = logging.getLogger(__name__)
@@ -42,7 +44,7 @@ class DocumentOutputService:
             except ImportError:
                 DocumentOutputService._weasyprint_available = False
                 log.warning(
-                    "[DocumentOutputService] WeasyPrint no está disponible. Instala con: pip install weasyprint"
+                    "[DocumentOutputService] WeasyPrint not available. Install with: pip install weasyprint"
                 )
         return DocumentOutputService._weasyprint_available
 
@@ -162,7 +164,7 @@ class DocumentOutputService:
         """
         if not DocumentOutputService._check_weasyprint():
             raise ImportError(
-                "WeasyPrint no está disponible. " "Instala con: pip install weasyprint"
+                "WeasyPrint is not available. Install with: pip install weasyprint"
             )
 
         empresa = documento.empresa
@@ -178,51 +180,68 @@ class DocumentOutputService:
         lineas_servicio = list(documento.lineas_servicio.all())
         lineas_otro_servicio = list(documento.lineas_otro_servicio.all())
 
-        # Datos para el template
-        from django.conf import settings
+        # Etiqueta del documento (Invoice / Recibo)
+        tipo = (getattr(documento, "tipo", "") or "").lower()
+        numero = (getattr(documento, "numero", "") or "").strip().upper()
+        if tipo == "invoice" or numero.startswith("INV-") or (getattr(documento, "tipo", "") or "") == "PTS":
+            document_label = "Invoice"
+        else:
+            document_label = "Recibo"
 
+        # Subtotal y total (compatibles con documento_profesional.html)
+        subtotal = getattr(documento, "neto_repuestos", None) or getattr(documento, "subtotal", None)
+        total = getattr(documento, "total", None)
+        if subtotal is None:
+            subtotal = sum(getattr(x, "subtotal", 0) or 0 for x in lineas_repuesto)
+        if total is None:
+            total = subtotal
+
+        # Logo URL absoluta para WeasyPrint
+        logo_url = None
+        if config.get("logo") and request:
+            try:
+                logo_url = request.build_absolute_uri(config["logo"].url)
+            except Exception:
+                pass
+
+        # Contexto para taller/documentos/pdf/documento_profesional.html (cabecera suscriptor)
         context = {
-            "doc": documento,
+            "documento": documento,
             "empresa": empresa,
+            "company_name": config.get("nombre") or getattr(empresa, "nombre_taller", "") or getattr(empresa, "empresa", ""),
+            "company_tagline": config.get("tagline", ""),
+            "company_address": config.get("direccion", ""),
+            "company_phone": config.get("telefono", ""),
+            "company_email": config.get("email", ""),
+            "company_website": config.get("website", ""),
             "cliente": cliente,
             "vehiculo": vehiculo,
             "lineas_repuesto": lineas_repuesto,
-            "lineas_servicio": lineas_servicio,
-            "lineas_otro_servicio": lineas_otro_servicio,
-            "config": config,
-            "currency": currency,
-            # Helpers para formato
-            "MONEDA_SYMBOL": currency["symbol"],
-            "MONEDA_CODE": currency["code"],
-            # Fecha formateada según país
-            "fecha_formateada": documento.fecha_emision.strftime("%d/%m/%Y"),
-            # Variables de soporte centralizadas
-            "support_email": getattr(settings, "SUPPORT_EMAIL", "support@egarage.cl"),
-            "support_whatsapp_display": getattr(
-                settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683"
-            ),
-            "support_whatsapp_wa_me": getattr(settings, "SUPPORT_WHATSAPP_WA_ME", "56953574683"),
+            "subtotal": subtotal,
+            "total": total,
+            "document_label": document_label,
+            "logo_url": logo_url,
+            "generated_at": timezone.localtime(),
+            "pdf_mode": True,
+            "public_url": None,
+            "qr_data_uri": None,
         }
 
-        # Renderizar HTML
-        # Usamos un template específico para impresión (limpio, optimizado para PDF)
+        # Renderizar HTML con template que incluye cabecera (nombre, dirección, lema, teléfono, email, web, logo)
         try:
             html_string = render_to_string(
-                "taller/documentos/pdf/invoice_template.html", context, request=request
+                "taller/documentos/pdf/documento_profesional.html", context, request=request
             )
         except Exception as e:
             log.error(f"[DocumentOutputService] Error renderizando template: {e}", exc_info=True)
             raise
 
-        # Generar PDF con WeasyPrint
+        # Generar PDF con WeasyPrint (misma hoja de estilos que desarme/views_pdf)
         try:
-            from weasyprint import HTML
+            from weasyprint import CSS, HTML
             from weasyprint.text.fonts import FontConfiguration
 
-            # Configuración de fuentes
             font_config = FontConfiguration()
-
-            # Base URL para cargar imágenes/logos (vital para servidores)
             base_url = None
             if request:
                 try:
@@ -232,12 +251,16 @@ class DocumentOutputService:
             elif hasattr(settings, "BASE_URL"):
                 base_url = settings.BASE_URL
             else:
-                # Fallback: usar MEDIA_URL si está disponible
                 base_url = getattr(settings, "MEDIA_URL", None)
 
-            # Crear objeto HTML y generar PDF
+            stylesheets = []
+            base_dir = getattr(settings, "BASE_DIR", Path(__file__).resolve().parent.parent.parent)
+            css_path = Path(base_dir) / "static" / "css" / "documentos" / "pdf_documento_profesional.css"
+            if css_path.exists():
+                stylesheets.append(CSS(filename=str(css_path)))
+
             html = HTML(string=html_string, base_url=base_url)
-            pdf_bytes = html.write_pdf(font_config=font_config)
+            pdf_bytes = html.write_pdf(font_config=font_config, stylesheets=stylesheets)
 
             # Generar nombre de archivo
             nombre_cliente = slugify(cliente.nombre) if cliente else "cliente"

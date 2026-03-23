@@ -113,10 +113,16 @@
 .zona-btn:hover { border-color: var(--ds-cyan); color: var(--ds-cyan); background: rgba(6, 182, 212, 0.08); }
 
 /* Botones estado y precio */
-.btn-estado { padding: 6px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 600; transition: all 0.15s; }
+.btn-estado { padding: 6px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; transition: all 0.15s; }
+.btn-estado {
+  color: #ffffff !important;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.9);
+}
 .btn-estado.active { box-shadow: 0 0 12px currentColor; }
-.precio-edit { background: rgba(0,0,0,0.5); border: 1px dashed rgba(255,255,255,0.25); border-radius: 8px; padding: 6px 12px; color: white; font-size: 1rem; }
-.precio-edit:focus { outline: none; border-color: var(--ds-cyan); box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2); }
+.btn-estado:focus { outline: none; box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.35), 0 0 12px rgba(6, 182, 212, 0.25); }
+.precio-edit { background: rgba(15, 23, 42, 0.95); border: 1px solid rgba(6, 182, 212, 0.5); border-radius: 8px; padding: 6px 12px; color: #f1f5f9; font-size: 1rem; }
+.precio-edit:focus { outline: none; border-color: var(--ds-cyan); box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2); color: #ffffff; }
+.scanner-search-input::placeholder { color: #94a3b8; }
 
 /* Filtros rápidos */
 .filter-chip { padding: 8px 16px; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; border: 1px solid; cursor: pointer; transition: all 0.2s; }
@@ -192,6 +198,8 @@
   var p = window.location.pathname;
   var idx = p.indexOf('/vehiculos/');
   window.SCANNER_API_BASE = idx >= 0 ? p.substring(0, idx) : p.replace(/\/scanner\/?$/, '').replace(/\/vehiculos\/\d+/, '');
+  window.EGARAGE_CURRENCY_LOCALE = (p && p.indexOf('/us/') === 0) ? 'en-US' : 'es-CL';
+  window.EGARAGE_CURRENCY_DECIMALS = (p && p.indexOf('/us/') === 0) ? 2 : 0;
 })();
 </script>
 <div id="scanner-app" class="scanner-wrap space-y-6" data-csrf="{{ csrf_token }}">
@@ -231,7 +239,13 @@
       <div class="stat-lab text-slate-400">{% trans "FALTANTES" %}</div>
     </div>
     <div class="glass-panel stat-card stat-lime">
-      <div class="stat-val text-lime-400" id="stat-valor">${{ valor_potencial|floatformat:0|intcomma }}</div>
+      <div class="stat-val text-lime-400" id="stat-valor">
+        {% if request.path|slice:":4" == "/us/" %}
+          ${{ valor_potencial|floatformat:2|intcomma }}
+        {% else %}
+          ${{ valor_potencial|floatformat:0|intcomma }}
+        {% endif %}
+      </div>
       <div class="stat-lab text-lime-400/90">{% trans "VALOR POTENCIAL" %}</div>
     </div>
     <div class="glass-panel stat-card stat-amber" id="stat-sin-precio-wrap" style="{% if not sin_precio or sin_precio == 0 %}display: none;{% endif %}">
@@ -258,7 +272,13 @@
     <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
       <div>
         <div class="text-xs uppercase tracking-wider text-slate-400 mb-1">{% trans "Valor potencial" %}</div>
-        <div class="commercial-val text-lime-400" id="commercial-valor">${{ valor_potencial|floatformat:0|intcomma }}</div>
+        <div class="commercial-val text-lime-400" id="commercial-valor">
+          {% if request.path|slice:":4" == "/us/" %}
+            ${{ valor_potencial|floatformat:2|intcomma }}
+          {% else %}
+            ${{ valor_potencial|floatformat:0|intcomma }}
+          {% endif %}
+        </div>
       </div>
       <div>
         <div class="text-xs uppercase tracking-wider text-slate-400 mb-1">{% trans "Valor perdido (daño)" %}</div>
@@ -322,7 +342,8 @@
     <div class="flex-1 min-w-[200px] max-w-md">
       <label class="block text-xs uppercase tracking-widest text-slate-400 mb-1">{% trans "Buscar" %}</label>
       <input type="text" id="scanner-search" placeholder="{% trans 'Nombre, código...' %}"
-             class="w-full bg-black/40 border border-cyan-400/30 rounded-xl px-4 py-2.5 text-white placeholder-slate-500 focus:outline-none focus:border-cyan-400"
+             class="w-full rounded-xl px-4 py-2.5 focus:outline-none focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/30 scanner-search-input"
+             style="background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(6, 182, 212, 0.45); color: #f1f5f9;"
              autocomplete="off">
     </div>
   </div>
@@ -340,29 +361,30 @@
     </span>
   </div>
 
-  {# —— G. Inventario por zona (cards premium) —— #}
-  <section id="inventario-piezas">
-    {% for zona, piezas_list in zonas_con_piezas %}
-    <div id="zona-{{ zona|slugify }}" class="mb-10 piece-zona" data-zona="{{ zona|slugify }}">
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
-        <h2 class="ds-font text-xl text-cyan-300 flex items-center gap-2">
-          <span>{{ zona }}</span>
-          <span class="text-slate-500 text-sm font-normal">{{ piezas_list|length }} {% trans "piezas" %}</span>
-        </h2>
-        <div class="flex flex-wrap gap-2 items-center">
-          <span class="text-xs text-slate-500 uppercase tracking-wider">{% trans "Toda la zona" %}:</span>
-          <button type="button" class="btn-bulk-zone border border-emerald-400/40 text-emerald-300 bg-emerald-400/10 bulk-zona-estado" data-zona-id="zona-{{ zona|slugify }}" data-estado="DISPONIBLE">{% trans "Disponible" %}</button>
-          <button type="button" class="btn-bulk-zone border border-rose-400/40 text-rose-300 bg-rose-400/10 bulk-zona-estado" data-zona-id="zona-{{ zona|slugify }}" data-estado="DANADA">{% trans "Dañada" %}</button>
-          <button type="button" class="btn-bulk-zone border border-slate-400/40 text-slate-300 bg-slate-400/10 bulk-zona-estado" data-zona-id="zona-{{ zona|slugify }}" data-estado="FALTANTE">{% trans "Faltante" %}</button>
-          <span class="text-slate-600 mx-1">|</span>
-          <button type="button" class="btn-bulk-zone border border-lime-400/40 text-lime-300 bg-lime-400/10 bulk-zona-precio" data-zona-id="zona-{{ zona|slugify }}" data-factor="1.1">+10%</button>
-          <button type="button" class="btn-bulk-zone border border-amber-400/40 text-amber-300 bg-amber-400/10 bulk-zona-precio" data-zona-id="zona-{{ zona|slugify }}" data-factor="0.9">−10%</button>
+  {# —— G. Inventario por zona (cards premium) + selección para venta —— #}
+  <form method="post" action="{% country_url 'desarme:iniciar_venta_desde_inventario' vehiculo.pk %}">
+    {% csrf_token %}
+    <section id="inventario-piezas">
+      {% for zona, piezas_list in zonas_con_piezas %}
+      <div id="zona-{{ zona|slugify }}" class="mb-10 piece-zona" data-zona="{{ zona|slugify }}">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <h2 class="ds-font text-xl text-cyan-300 flex items-center gap-2">
+            <span>{{ zona }}</span>
+            <span class="text-slate-500 text-sm font-normal">{{ piezas_list|length }} {% trans "piezas" %}</span>
+          </h2>
+          <div class="flex flex-wrap gap-2 items-center">
+            <span class="text-xs text-slate-500 uppercase tracking-wider">{% trans "Toda la zona" %}:</span>
+            <button type="button" class="btn-bulk-zone border border-emerald-400/40 text-emerald-300 bg-emerald-400/10 bulk-zona-estado" data-zona-id="zona-{{ zona|slugify }}" data-estado="DISPONIBLE">{% trans "Disponible" %}</button>
+            <button type="button" class="btn-bulk-zone border border-rose-400/40 text-rose-300 bg-rose-400/10 bulk-zona-estado" data-zona-id="zona-{{ zona|slugify }}" data-estado="DANADA">{% trans "Dañada" %}</button>
+            <button type="button" class="btn-bulk-zone border border-slate-400/40 text-slate-300 bg-slate-400/10 bulk-zona-estado" data-zona-id="zona-{{ zona|slugify }}" data-estado="FALTANTE">{% trans "Faltante" %}</button>
+            <span class="text-slate-600 mx-1">|</span>
+            <button type="button" class="btn-bulk-zone border border-lime-400/40 text-lime-300 bg-lime-400/10 bulk-zona-precio" data-zona-id="zona-{{ zona|slugify }}" data-factor="1.1">+10%</button>
+            <button type="button" class="btn-bulk-zone border border-amber-400/40 text-amber-300 bg-amber-400/10 bulk-zona-precio" data-zona-id="zona-{{ zona|slugify }}" data-factor="0.9">−10%</button>
+          </div>
         </div>
-      </div>
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 piece-grid" data-zona="{{ zona }}">
-        {% for p in piezas_list %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 piece-grid" data-zona="{{ zona }}">
+          {% for p in piezas_list %}
         {% with estado=p.estado_pieza %}
-        {% with sin_precio_piece=not p.precio_venta_sugerido or p.precio_venta_sugerido == 0 %}
         <article class="piece-card piece-item
           {% if estado == 'DISPONIBLE' %}glow-disponible
           {% elif estado == 'DANADA' %}glow-danada
@@ -370,23 +392,32 @@
           {% elif estado == 'RESERVADA' %}glow-reservada
           {% elif estado == 'VENDIDA' %}glow-vendida
           {% else %}glow-faltante{% endif %}
-          {% if sin_precio_piece and estado == 'DISPONIBLE' or sin_precio_piece and estado == 'RESERVADA' %}piece-sin-precio{% endif %}"
+          {% if not p.precio_venta_sugerido and estado == 'DISPONIBLE' or not p.precio_venta_sugerido and estado == 'RESERVADA' %}piece-sin-precio{% endif %}"
                  data-pieza-id="{{ p.pk }}"
                  data-estado="{{ estado }}"
-                 data-nombre="{{ p.nombre|lower }}"
+                 data-nombre="{{ p.display_nombre|default:p.nombre|lower }}"
                  data-codigo="{{ p.codigo|lower }}"
-                 data-precio="{{ p.precio_venta_sugerido|floatformat:0|default:0 }}"
-                 data-sin-precio="{% if sin_precio_piece %}1{% else %}0{% endif %}"
+                 data-precio="{% if request.path|slice:':4' == '/us/' %}{{ p.precio_venta_sugerido|floatformat:2|default:0 }}{% else %}{{ p.precio_venta_sugerido|floatformat:0|default:0 }}{% endif %}"
+                 data-sin-precio="{% if not p.precio_venta_sugerido %}1{% else %}0{% endif %}"
                  data-cantidad="{{ p.cantidad|default:1 }}">
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
                 <span class="text-xs uppercase tracking-wider text-slate-400">{% trans "Pieza" %}</span>
-                {% if sin_precio_piece and estado == 'DISPONIBLE' or sin_precio_piece and estado == 'RESERVADA' %}
+                {% if p.activo and p.cantidad > 0 %}
+                  {% if p.estado_pieza == 'DISPONIBLE' or p.estado_pieza == 'RESERVADA' %}
+                <span class="inline-flex items-center gap-1 text-[11px] text-emerald-300 bg-emerald-900/40 border border-emerald-400/50 rounded-full px-2 py-0.5">
+                  <input type="checkbox" name="pieza_ids" value="{{ p.pk }}" class="w-3 h-3 align-middle">
+                  <span>{% trans "Vender" %}</span>
+                  <input type="number" name="cantidad_{{ p.pk }}" value="1" min="1" max="{{ p.cantidad }}" class="w-14 ml-1 text-[11px] bg-slate-950/80 border border-emerald-500/50 rounded px-1 py-0.5 text-emerald-100">
+                </span>
+                  {% endif %}
+                {% endif %}
+                {% if not p.precio_venta_sugerido and estado == 'DISPONIBLE' or not p.precio_venta_sugerido and estado == 'RESERVADA' %}
                 <span class="badge-sin-precio">{% trans "Sin precio" %}</span>
                 {% endif %}
               </div>
-              <h3 class="mt-1 text-lg font-semibold text-white truncate piece-name">{{ p.nombre }}</h3>
+              <h3 class="mt-1 text-lg font-semibold text-white truncate piece-name">{{ p.display_nombre|default:p.nombre }}</h3>
               <div class="mt-1 text-sm text-slate-400">{% trans "Categoría" %}: {{ p.zona|default:"—" }}</div>
               {% if p.codigo %}<div class="mt-0.5 text-xs font-mono text-slate-500">{{ p.codigo }}</div>{% endif %}
             </div>
@@ -404,13 +435,19 @@
           <div class="mt-4 rounded-xl border border-white/10 bg-slate-950/40 p-3">
             <div class="text-xs uppercase tracking-wider text-slate-400">{% trans "Precio" %} — {% trans "clic para editar" %}</div>
             <div class="mt-2 flex items-center justify-between gap-2">
-              <span class="piece-price-display text-xl font-semibold text-white">${{ p.precio_venta_sugerido|floatformat:0|default:"0"|intcomma }}</span>
+              <span class="piece-price-display text-xl font-semibold text-white">
+                {% if request.path|slice:":4" == "/us/" %}
+                  ${{ p.precio_venta_sugerido|floatformat:2|default:"0"|intcomma }}
+                {% else %}
+                  ${{ p.precio_venta_sugerido|floatformat:0|default:"0"|intcomma }}
+                {% endif %}
+              </span>
               <button type="button" class="piece-edit-price rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-sm text-slate-300 hover:bg-white/10 transition">
                 ✎ {% trans "Editar" %}
               </button>
             </div>
             <div class="piece-price-edit hidden mt-2">
-              <input type="number" class="precio-edit w-full piece-price-input" value="{{ p.precio_venta_sugerido|floatformat:0|default:0 }}" min="0" step="1" data-pieza-id="{{ p.pk }}">
+              <input type="number" class="precio-edit w-full piece-price-input" value="{% if request.path|slice:':4' == '/us/' %}{{ p.precio_venta_sugerido|floatformat:2|default:0 }}{% else %}{{ p.precio_venta_sugerido|floatformat:0|default:0 }}{% endif %}" min="0" step="{% if request.path|slice:':4' == '/us/' %}0.01{% else %}1{% endif %}" data-pieza-id="{{ p.pk }}">
               <button type="button" class="piece-save-price mt-2 text-cyan-400 text-sm font-medium hover:underline">{% trans "Guardar" %}</button>
             </div>
           </div>
@@ -422,12 +459,17 @@
           </div>
         </article>
         {% endwith %}
-        {% endwith %}
         {% endfor %}
+        </div>
       </div>
+      {% endfor %}
+    </section>
+    <div class="glass-panel p-4 mt-4 flex justify-end">
+      <button type="submit" class="px-5 py-2.5 rounded-xl bg-emerald-500/90 hover:bg-emerald-400 text-white font-semibold text-sm shadow-lg shadow-emerald-500/30 transition">
+        {% trans "Crear venta con seleccionadas" %}
+      </button>
     </div>
-    {% endfor %}
-  </section>
+  </form>
 
   {% else %}
   {# —— J. Estado vacío —— #}
@@ -462,6 +504,16 @@
   var csrfToken = getCsrf();
 
   var currentZonaFilter = '';
+  var moneyLocale = window.EGARAGE_CURRENCY_LOCALE || 'es-CL';
+  var moneyDecimals = (typeof window.EGARAGE_CURRENCY_DECIMALS === 'number') ? window.EGARAGE_CURRENCY_DECIMALS : 0;
+  function fmtMoney(n) {
+    var num = Number(n || 0);
+    try {
+      return '$' + num.toLocaleString(moneyLocale, { minimumFractionDigits: moneyDecimals, maximumFractionDigits: moneyDecimals });
+    } catch (e) {
+      return '$' + num.toFixed(moneyDecimals);
+    }
+  }
 
   function showToast(msg, isError) {
     var el = document.getElementById('scanner-toast');
@@ -502,7 +554,7 @@
     var top5 = topPiezas.slice(0, 5);
     var pct = total ? Math.round((revisadas / total) * 100) : 0;
     var elPerdido = document.getElementById('commercial-perdido-dano');
-    if (elPerdido) elPerdido.textContent = '$' + Math.round(valorPerdidoDanadas).toLocaleString('es-CL');
+    if (elPerdido) elPerdido.textContent = fmtMoney(valorPerdidoDanadas);
     var elTotal = document.getElementById('stat-total');
     var elDisp = document.getElementById('stat-disponibles');
     var elDan = document.getElementById('stat-danadas');
@@ -515,7 +567,7 @@
     if (elDisp) elDisp.textContent = disponibles;
     if (elDan) elDan.textContent = danadas;
     if (elFalt) elFalt.textContent = faltantes;
-    if (elValor) elValor.textContent = '$' + Math.round(valorPotencial).toLocaleString('es-CL');
+    if (elValor) elValor.textContent = fmtMoney(valorPotencial);
     if (elSinP) elSinP.textContent = sinPrecio;
     if (wrapSinP) { wrapSinP.style.display = sinPrecio > 0 ? '' : 'none'; }
     if (filterSinP) { filterSinP.style.display = sinPrecio > 0 ? '' : 'none'; }
@@ -526,12 +578,12 @@
     var comValor = document.getElementById('commercial-valor');
     var comSinP = document.getElementById('commercial-sin-precio');
     var comTop5 = document.getElementById('commercial-top5');
-    if (comValor) comValor.textContent = '$' + Math.round(valorPotencial).toLocaleString('es-CL');
+    if (comValor) comValor.textContent = fmtMoney(valorPotencial);
     if (comSinP) comSinP.textContent = sinPrecio;
     if (comTop5) {
       if (top5.length === 0) comTop5.innerHTML = '<span class="text-slate-500 text-xs">—</span>';
       else comTop5.innerHTML = top5.map(function(t) {
-        return '<div class="top-item">' + (t.nombre ? t.nombre.substring(0, 22) + (t.nombre.length > 22 ? '…' : '') : '') + ' <span class="text-lime-400">$' + Math.round(t.precio).toLocaleString('es-CL') + '</span></div>';
+        return '<div class="top-item">' + (t.nombre ? t.nombre.substring(0, 22) + (t.nombre.length > 22 ? '…' : '') : '') + ' <span class="text-lime-400">' + fmtMoney(t.precio) + '</span></div>';
       }).join('');
     }
   }
@@ -602,7 +654,7 @@
             var display = card.querySelector('.piece-price-display');
             var inputWrap = card.querySelector('.piece-price-edit');
             var editWrap = card.querySelector('.piece-edit-price') && card.querySelector('.piece-edit-price').closest('.mt-2');
-            if (display) display.textContent = '$' + parseFloat(precio).toLocaleString('es-CL');
+            if (display) display.textContent = fmtMoney(precio);
             if (card.dataset) { card.dataset.precio = String(precio); card.dataset.sinPrecio = parseFloat(precio) > 0 ? '0' : '1'; }
             if (inputWrap) inputWrap.classList.add('hidden');
             if (editWrap) editWrap.classList.remove('hidden');
@@ -823,7 +875,7 @@
                 card.dataset.precio = String(nuevo);
                 card.dataset.sinPrecio = nuevo > 0 ? '0' : '1';
                 var display = card.querySelector('.piece-price-display');
-                if (display) display.textContent = '$' + nuevo.toLocaleString('es-CL');
+                if (display) display.textContent = fmtMoney(nuevo);
                 var input = card.querySelector('.piece-price-input');
                 if (input) input.value = nuevo;
                 card.classList.toggle('piece-sin-precio', nuevo === 0 && (card.dataset.estado === 'DISPONIBLE' || card.dataset.estado === 'RESERVADA'));

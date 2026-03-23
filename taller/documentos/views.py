@@ -1087,7 +1087,7 @@ def exportar_documento_pdf(request, documento_id):
         return exporter.generar_response_pdf()
     except ImportError as exc:
         err_msg = f"PDF generation not available: {exc}"
-        return HttpResponse(err_msg, status=500, content_type="text/plain")
+        return HttpResponse(err_msg, status=500, content_type="text/plain; charset=utf-8")
 
 
 def enviar_por_whatsapp(request, documento_id):

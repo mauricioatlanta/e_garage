@@ -50,6 +50,12 @@ def crear_documento_alpine(request):
         except (AttributeError, Exception):
             tasa = Decimal("0.0")
 
+    # Defaults para que el contexto exista siempre (GET o POST inválido)
+    repuestos_json = "[]"
+    servicios_json = "[]"
+    otros_json = "[]"
+    desarme_origen_label = ""
+
     if request.method == "POST":
         # Crear formulario con datos POST
         form = DocumentoForm(request.POST, user=request.user, country=country)
@@ -89,12 +95,17 @@ def crear_documento_alpine(request):
                         cantidad = int(item.get("cantidad", 1) or 1)
                         precio_unitario = Decimal(str(item.get("precio", 0) or 0))
                         descuento = Decimal(str(item.get("descuento", 0) or 0))
-                        repuesto_id = item.get(
-                            "repuesto_id"
-                        )  # ✅ ID del repuesto si fue seleccionado del autocomplete
+                        repuesto_id = item.get("repuesto_id") or item.get("id")
+                        pieza_desarme_id = item.get("pieza_desarme_id")
+                        origen_repuesto_raw = item.get("origen_repuesto")
+                        origen_repuesto = origen_repuesto_raw or "STOCK_BODEGA"
+                        # Robustez: si hay pieza_desarme_id pero no viene origen, asumimos DESARME.
+                        if pieza_desarme_id not in (None, "") and not origen_repuesto_raw:
+                            origen_repuesto = "DESARME"
+                        costo_linea = item.get("costo_linea")
 
-                        # Crear línea de repuesto
-                        # Si viene repuesto_id, vincular con inventario (permite descontar stock)
+                        # Crear línea de repuesto con contrato moderno
+                        # (DESARME: pieza_desarme_id/costo_linea; STOCK/EXTERNO: repuesto_id).
                         linea = LineaRepuesto(
                             documento=doc,
                             codigo=codigo,
@@ -102,15 +113,28 @@ def crear_documento_alpine(request):
                             cantidad=cantidad,
                             precio_unitario=precio_unitario,
                             descuento=descuento,
+                            origen_repuesto=origen_repuesto,
                         )
 
-                        # ✅ Vincular con repuesto si fue seleccionado del autocomplete
-                        if repuesto_id:
+                        if origen_repuesto == "DESARME" and pieza_desarme_id:
+                            try:
+                                linea.pieza_desarme_id = int(pieza_desarme_id)
+                            except (TypeError, ValueError):
+                                linea.pieza_desarme_id = None
+                            linea.repuesto = None
+                            if costo_linea not in (None, ""):
+                                try:
+                                    linea.costo_linea = Decimal(str(costo_linea))
+                                except Exception:
+                                    pass
+                        elif repuesto_id:
                             try:
                                 # Validar que el repuesto pertenece a la empresa (multi-tenant)
                                 from taller.models.repuesto import Repuesto
 
-                                repuesto = Repuesto.objects.get(id=repuesto_id, empresa=empresa)
+                                repuesto = Repuesto.objects.get(
+                                    id=repuesto_id, empresa=empresa
+                                )
                                 linea.repuesto = repuesto
                                 # Si no viene código, usar el del repuesto
                                 if not codigo and repuesto.part_number:
@@ -182,8 +206,14 @@ def crear_documento_alpine(request):
             # Formulario inválido
             messages.error(request, "Por favor corrige los errores en el formulario.")
     else:
-        # GET: Mostrar formulario vacío
         form = DocumentoForm(user=request.user, country=country)
+        # GET: cargar prefill desde desarme (si existe en sesión)
+        prefill_repuestos = request.session.pop("desarme_repuestos_prefill", None) or []
+        prefill_origen = request.session.pop("desarme_origen_label", "") or ""
+        repuestos_json = json.dumps(prefill_repuestos)
+        servicios_json = "[]"
+        otros_json = "[]"
+        desarme_origen_label = prefill_origen
 
     # Obtener company_country con fallbacks robustos
     company_country = (
@@ -198,8 +228,10 @@ def crear_documento_alpine(request):
     context = {
         "form": form,
         "tasa_impuesto": float(tasa),  # Pasar como float para JavaScript
-        "repuestos_json": "[]",  # Vacío si es nuevo documento
-        "servicios_json": "[]",
+        "repuestos_json": repuestos_json,
+        "servicios_json": servicios_json,
+        "otros_json": otros_json,
+        "desarme_origen_label": desarme_origen_label,
         "company_country": company_country,  # ✅ Asegurar que company_country esté disponible
     }
 
@@ -267,7 +299,14 @@ def editar_documento_alpine(request, documento_id):
                         cantidad = int(item.get("cantidad", 1) or 1)
                         precio_unitario = Decimal(str(item.get("precio", 0) or 0))
                         descuento = Decimal(str(item.get("descuento", 0) or 0))
-                        repuesto_id = item.get("repuesto_id")
+                        repuesto_id = item.get("repuesto_id") or item.get("id")
+                        pieza_desarme_id = item.get("pieza_desarme_id")
+                        origen_repuesto_raw = item.get("origen_repuesto")
+                        origen_repuesto = origen_repuesto_raw or "STOCK_BODEGA"
+                        # Robustez: si hay pieza_desarme_id pero no viene origen, asumimos DESARME.
+                        if pieza_desarme_id not in (None, "") and not origen_repuesto_raw:
+                            origen_repuesto = "DESARME"
+                        costo_linea = item.get("costo_linea")
 
                         linea = LineaRepuesto(
                             documento=doc,
@@ -276,14 +315,27 @@ def editar_documento_alpine(request, documento_id):
                             cantidad=cantidad,
                             precio_unitario=precio_unitario,
                             descuento=descuento,
+                            origen_repuesto=origen_repuesto,
                         )
 
-                        # ✅ Vincular con repuesto si fue seleccionado del autocomplete
-                        if repuesto_id:
+                        if origen_repuesto == "DESARME" and pieza_desarme_id:
+                            try:
+                                linea.pieza_desarme_id = int(pieza_desarme_id)
+                            except (TypeError, ValueError):
+                                linea.pieza_desarme_id = None
+                            linea.repuesto = None
+                            if costo_linea not in (None, ""):
+                                try:
+                                    linea.costo_linea = Decimal(str(costo_linea))
+                                except Exception:
+                                    pass
+                        elif repuesto_id:
                             try:
                                 from taller.models.repuesto import Repuesto
 
-                                repuesto = Repuesto.objects.get(id=repuesto_id, empresa=empresa)
+                                repuesto = Repuesto.objects.get(
+                                    id=repuesto_id, empresa=empresa
+                                )
                                 linea.repuesto = repuesto
                                 if not codigo and repuesto.part_number:
                                     linea.codigo = repuesto.part_number
@@ -350,6 +402,13 @@ def editar_documento_alpine(request, documento_id):
                     "repuesto_id": (
                         linea.repuesto_id if linea.repuesto else None
                     ),  # ✅ Incluir ID del repuesto
+                    "origen_repuesto": linea.origen_repuesto,
+                    "pieza_desarme_id": linea.pieza_desarme_id,
+                    "costo_linea": (
+                        float(linea.costo_linea)
+                        if linea.costo_linea is not None
+                        else None
+                    ),
                     "codigo": linea.codigo
                     or (linea.repuesto.part_number if linea.repuesto else ""),
                     "nombre": linea.nombre or "",

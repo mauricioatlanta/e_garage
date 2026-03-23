@@ -51,9 +51,11 @@ DEBUG = env_bool("DJANGO_DEBUG", False)
 # =========================
 # Hosts / CSRF
 # =========================
+# Fuente de verdad: DJANGO_ALLOWED_HOSTS en .env.prod (o variable de entorno).
+# Para acceso directo por IP debe incluir la IP del servidor (ej. 159.223.200.106).
 ALLOWED_HOSTS = env_list(
     "DJANGO_ALLOWED_HOSTS",
-    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,.pythonanywhere.com,localhost,127.0.0.1",
+    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,.pythonanywhere.com,localhost,127.0.0.1,159.223.200.106",
 )
 
 CSRF_TRUSTED_ORIGINS = env_list(
@@ -103,6 +105,21 @@ SECURE_REFERRER_POLICY = (
     env_str("DJANGO_SECURE_REFERRER_POLICY", "strict-origin-when-cross-origin")
     or "strict-origin-when-cross-origin"
 )
+
+
+# =========================
+# Email (envío de documentos, notificaciones)
+# =========================
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "noreply@tudominio.com")
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+EMAIL_HOST = env_str("EMAIL_HOST", "")
+EMAIL_PORT = env_int("EMAIL_PORT", 587)
+EMAIL_HOST_USER = env_str("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = env_str("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
+EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", False)
 
 
 # =========================

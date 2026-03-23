@@ -14,6 +14,7 @@ from urllib.parse import urlencode, urlparse, parse_qsl, urlunparse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db import models, transaction
+from django.db.models.deletion import ProtectedError
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import select_template
@@ -283,7 +284,7 @@ def _get_empresa_safe(user):
 
 @login_required
 def lista_vehiculos(request):
-    """Lista vehículos de la empresa del usuario."""
+    """Lista vehículos de la empresa del usuario para flujo taller/cliente."""
     compat_redirect = _compat_canonical_redirect(request, "vehiculos:lista_vehiculos")
     if compat_redirect:
         return compat_redirect
@@ -294,7 +295,10 @@ def lista_vehiculos(request):
         return redirect("/")
 
     vehiculos = (
-        Vehiculo.objects.filter(empresa=empresa)
+        Vehiculo.objects.filter(
+            empresa=empresa,
+            tipo_uso=Vehiculo.TIPO_USO_CLIENTE,
+        )
         .select_related("cliente", "marca", "modelo", "motor", "caja", "color")
         .order_by("-id")
     )
@@ -527,6 +531,12 @@ def eliminar_vehiculo(request, vehiculo_id):
             patente = vehiculo.patente or "sin patente"
             vehiculo.delete()
             messages.success(request, f"Vehículo {patente} eliminado exitosamente")
+        except ProtectedError:
+            # Caso específico: vehículos protegidos por piezas de desarme u otras FKs en PROTECT
+            messages.error(
+                request,
+                "No se puede eliminar este vehículo porque tiene dependencias protegidas (por ejemplo, piezas de desarme asociadas).",
+            )
         except Exception as e:
             log.error(f"Error eliminando vehículo: {e}")
             messages.error(request, f"Error al eliminar vehículo: {str(e)}")
@@ -539,7 +549,11 @@ def eliminar_vehiculo(request, vehiculo_id):
             "usa:taller:vehiculos:lista_vehiculos",
         )
 
-    return render(request, "taller/vehiculos/eliminar_vehiculo.html", {"vehiculo": vehiculo})
+    return render(
+        request,
+        "taller/common/vehiculos/confirmar_eliminacion_vehiculo.html",
+        {"vehiculo": vehiculo},
+    )
 
 
 # ---------------------------

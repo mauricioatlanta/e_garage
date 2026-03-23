@@ -63,7 +63,10 @@
   <a href="{% country_url 'desarme:scanner_vehiculo' vehiculo.pk %}" class="btn-action btn-scanner">
     📡 {% trans "Abrir escáner de inventario" %}
   </a>
-  <a href="{% country_url 'desarme:inventario_vehiculo' vehiculo.pk %}" class="btn-action btn-action-cyan">
+  <a href="{% country_url 'desarme:inventario_inteligente' vehiculo.pk %}" class="btn-action btn-action-cyan">
+    📦 {% trans "Inventario inteligente" %}
+  </a>
+  <a href="{% country_url 'desarme:inventario_vehiculo' vehiculo.pk %}" class="btn-action btn-action-outline">
     📋 {% trans "Ver inventario clásico" %}
   </a>
   <a href="{% country_url 'desarme:editar_vehiculo' vehiculo.pk %}" class="btn-action btn-action-cyan">
@@ -104,7 +107,13 @@
   </div>
   {% endif %}
   <div class="glass-panel resumen-card">
-    <div class="valor text-lime-400">${{ valor_potencial|floatformat:0|intcomma }}</div>
+    <div class="valor text-lime-400">
+      {% if request.path|slice:":4" == "/us/" %}
+        ${{ valor_potencial|floatformat:2|intcomma }}
+      {% else %}
+        ${{ valor_potencial|floatformat:0|intcomma }}
+      {% endif %}
+    </div>
     <div class="etiqueta">{% trans "Valor potencial" %}</div>
   </div>
 </div>
@@ -145,8 +154,14 @@
         {% for p in piezas %}
         <tr>
           <td class="px-4 py-2.5 font-mono text-xs text-slate-400">{{ p.codigo }}</td>
-          <td class="px-4 py-2.5 text-white">{{ p.nombre }}</td>
-          <td class="px-4 py-2.5 text-right font-medium">${{ p.precio_venta_sugerido|floatformat:0|default:"—"|intcomma }}</td>
+          <td class="px-4 py-2.5 text-white">{{ p.display_nombre|default:p.nombre }}</td>
+          <td class="px-4 py-2.5 text-right font-medium">
+            {% if request.path|slice:":4" == "/us/" %}
+              ${{ p.precio_venta_sugerido|floatformat:2|default:"—"|intcomma }}
+            {% else %}
+              ${{ p.precio_venta_sugerido|floatformat:0|default:"—"|intcomma }}
+            {% endif %}
+          </td>
           <td class="px-4 py-2.5 text-center">
             <span class="badge-estado
               {% if p.estado_pieza == 'DISPONIBLE' %}badge-disponible

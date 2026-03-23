@@ -1,0 +1,125 @@
+/* Inventario Inteligente — módulo desarme */
+
+.inventario-shell {
+  position: relative;
+  background: radial-gradient(
+    circle at top,
+    rgba(8, 47, 73, 0.85),
+    #020617 35%,
+    #01030a 100%
+  );
+}
+
+.inventario-shell__bg {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  opacity: 0.2;
+  background-image: linear-gradient(
+      rgba(34, 211, 238, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.inventario-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.inventario-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.inventario-scroll::-webkit-scrollbar-thumb {
+  background: rgba(34, 211, 238, 0.25);
+  border-radius: 999px;
+}
+
+.inventario-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(34, 211, 238, 0.45);
+}
+
+.inventario-shell input,
+.inventario-shell select,
+.inventario-shell textarea {
+  background-color: rgba(7, 16, 28, 0.95);
+  color: #e5e7eb;
+  border-color: rgba(34, 211, 238, 0.25);
+}
+
+.inventario-shell input::placeholder,
+.inventario-shell textarea::placeholder {
+  color: #64748b;
+}
+
+.inventario-shell input:-webkit-autofill,
+.inventario-shell input:-webkit-autofill:hover,
+.inventario-shell input:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0px 1000px rgba(7, 16, 28, 0.95) inset;
+  -webkit-text-fill-color: #e5e7eb;
+}
+
+[x-cloak] {
+  display: none !important;
+}
+
+.inventario-drawer-shadow {
+  box-shadow: -20px 0 50px rgba(0, 0, 0, 0.45);
+}
+
+/* Tarjeta agotada: color notorio para diferenciar de las que tienen stock */
+.inventario-card--out {
+  --out-tint: rgba(190, 18, 60, 0.12);
+  box-shadow: inset 0 0 0 1px rgba(251, 113, 133, 0.15);
+}
+.inventario-card--out::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    transparent 0%,
+    var(--out-tint) 50%,
+    transparent 100%
+  );
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0.6;
+}
+
+/* Tiles compactos — selección neon */
+.inventario-tile {
+  will-change: transform;
+}
+
+.inventario-tile--selected {
+  z-index: 1;
+}
+
+.inventario-tile--muted {
+  filter: saturate(0.85);
+}
+
+.inv-search-mark {
+  margin: 0;
+  padding: 0 0.12em;
+  border-radius: 0.2em;
+  background: rgba(34, 211, 238, 0.28);
+  color: #ecfeff;
+  font-weight: 800;
+}
+
+.inv-spotlight-input::placeholder {
+  letter-spacing: 0.02em;
+}
+
+.inventario-toolbar-sticky {
+  /* Evita que el blur recorte hijos */
+  isolation: isolate;
+}
+
+.inventario-sale-dock :disabled {
+  cursor: not-allowed;
+}

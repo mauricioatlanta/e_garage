@@ -256,7 +256,6 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "taller.middleware.force_accounts_to_cl.ForceAccountsToCLMiddleware",
     "django.middleware.locale.LocaleMiddleware",
-    "taller.middleware.fix_allowed_hosts.FixAllowedHostsMiddleware",  # FIX: Forzar ALLOWED_HOSTS antes de CommonMiddleware
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -322,6 +321,7 @@ TEMPLATES = [
                 "taller.context_processors.company_branding",
                 "taller.context_processors.company_country",
                 "taller.context_processors.company_header",
+                "taller.context_processors.panel_chrome.us_authenticated_compact_chrome",
                 "taller.context_processors.country_config.country_context",
                 "taller.context_processors.feature_flags.country_features",
                 "taller.context_processors.ui_labels.ui_labels_context",

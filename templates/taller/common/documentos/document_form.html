@@ -735,6 +735,107 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-console-header select:focus { outline: none; border-color: rgba(6, 182, 212, 0.5); }
 #payment-status-badge select { color: inherit; font-weight: 600; cursor: pointer; }
 
+.doc-invoice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.doc-invoice-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(2,6,23,.42), rgba(15,23,42,.28));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+.doc-console-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.doc-console-control {
+  width: 100%;
+}
+.doc-console-title {
+  font-size: .78rem;
+  letter-spacing: .24em;
+  color: #7dd3fc;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+.doc-console-meta {
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.doc-console-inv {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: rgba(2,6,23,.88);
+  border: 1px solid rgba(56,189,248,.24);
+  color: #f8fafc;
+  font-size: 1rem;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+.doc-console-header {
+  background:
+    radial-gradient(circle at top right, rgba(34,211,238,.10), transparent 32%),
+    linear-gradient(145deg, rgba(6,10,18,.98), rgba(15,23,42,.94));
+  border: 1px solid rgba(148,163,184,.22);
+  border-radius: 18px;
+  padding: 22px 24px;
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 26px rgba(34,211,238,.06);
+}
+.doc-console-header input,
+.doc-console-header select,
+.doc-console-control select {
+  width: 100%;
+  min-height: 46px !important;
+  border-radius: 12px !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  background: rgba(15,23,42,.82) !important;
+  border: 1px solid rgba(100,116,139,.55) !important;
+  color: #f8fafc !important;
+  box-sizing: border-box;
+}
+.doc-console-header input:focus,
+.doc-console-header select:focus,
+.doc-console-control select:focus {
+  border-color: rgba(34,211,238,.7) !important;
+  box-shadow: 0 0 0 3px rgba(34,211,238,.12) !important;
+}
+#doc-shell #id_tecnico_responsable,
+#doc-shell #id_payment_status,
+#doc-shell #id_tipo,
+#doc-shell #doc_mode {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 900px) {
+  .doc-invoice-grid {
+    grid-template-columns: 1fr;
+  }
+  .doc-console-header {
+    padding: 18px;
+    border-radius: 16px;
+  }
+}
+
 /* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÍCULO ==================== */
 .doc-smart-card {
   background: rgba(15, 23, 42, 0.6);
@@ -948,7 +1049,7 @@ input:disabled, select:disabled, textarea:disabled {
         </div>
       </form>
       
-      <label class="flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
+      <label class="doc-paid-toggle flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
         {{ form.pagado }}
         {% trans "Document paid" %}
       </label>
@@ -1245,27 +1346,49 @@ function submitLanguageDoc(lang) {
     <!-- 1. CABECERA COMPACTA — fila 1: INV | Fecha | Mecánico | Pago | fila 2: Tipo | Operación -->
     <div class="doc-console-header">
       <div class="doc-console-title">{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</div>
-      <div class="doc-console-line doc-console-row1">
-        <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
-          {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}—{% endif %}
-        </span>
-        <label for="id_fecha_emision" class="sr-only">{% trans "Date" %}</label>
-        <input id="id_fecha_emision" type="date" name="fecha_emision" class="doc-console-meta bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
-               value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}" style="max-width: 130px;">
-        {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
-        <label id="tecnico-label" for="id_tecnico_responsable" class="sr-only" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
-        <span class="doc-console-meta" style="min-width: 110px;">{{ form.tecnico_responsable }}</span>
-        {% endwith %}
-        <span id="payment-status-badge" class="doc-console-payment doc-console-payment-pending">{{ form.payment_status }}</span>
-      </div>
-      <div class="doc-console-line doc-console-row2">
-        <label for="id_tipo" class="doc-console-meta text-xs">{% trans "Document Type" %}</label>
-        {{ form.tipo }}
-        <label for="doc_mode" class="doc-console-meta text-xs">{% trans "Operation" %}</label>
-        <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300" style="min-width: 100px;">
-          <option value="services">{% trans "Services" %}</option>
-          <option value="parts">{% trans "Part sale only" %}</option>
-        </select>
+
+      <div class="doc-invoice-grid">
+        <div class="doc-invoice-panel">
+          <div class="doc-console-field doc-console-field--invoice">
+            <span class="doc-console-meta">{% trans "Document No." %}</span>
+            <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
+              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}—{% endif %}
+            </span>
+          </div>
+
+          <div class="doc-console-field">
+            <label for="id_fecha_emision" class="doc-console-meta">{% trans "Date" %}</label>
+            <input id="id_fecha_emision" type="date" name="fecha_emision" class="bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
+                   value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
+          </div>
+
+          <div class="doc-console-field">
+            <label for="id_tipo" class="doc-console-meta">{% trans "Document Type" %}</label>
+            {{ form.tipo }}
+          </div>
+        </div>
+
+        <div class="doc-invoice-panel">
+          {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+          <div class="doc-console-field">
+            <label id="tecnico-label" for="id_tecnico_responsable" class="doc-console-meta" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
+            <div class="doc-console-control">{{ form.tecnico_responsable }}</div>
+          </div>
+          {% endwith %}
+
+          <div class="doc-console-field">
+            <label for="id_payment_status" class="doc-console-meta">{% trans "Payment Status" %}</label>
+            <div id="payment-status-badge" class="doc-console-control doc-console-payment doc-console-payment-pending">{{ form.payment_status }}</div>
+          </div>
+
+          <div class="doc-console-field">
+            <label for="doc_mode" class="doc-console-meta">{% trans "Operation" %}</label>
+            <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300">
+              <option value="services">{% trans "Services" %}</option>
+              <option value="parts">{% trans "Part sale only" %}</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1327,7 +1450,15 @@ function submitLanguageDoc(lang) {
       {% if ui_config.show_repuestos %}
       <div class="doc-smart-card doc-ficha-parts doc-pos-section">
         <div class="flex justify-between items-center mb-3">
-          <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
+          <div class="flex flex-col gap-1">
+            <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
+            {% if desarme_origen_label %}
+            <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
+              <span>🧩</span>
+              <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
+            </div>
+            {% endif %}
+          </div>
           <div class="flex gap-1">
             <button type="button" id="add-repuesto" class="text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white" onclick="addRepuestoRow()">+ {% trans "ADD" %}</button>
             <button type="button" id="add-used-parts" class="text-xs bg-amber-600 hover:bg-amber-500 px-2 py-1 rounded text-white" onclick="openUsedPartsModal()">🧩 {% trans "Used" %}</button>
@@ -1379,35 +1510,76 @@ function submitLanguageDoc(lang) {
       </div>
       <div class="totales-cockpit order-1 md:order-2 totales-panel">
         <h3 class="totales-cockpit-title">{% trans "DOCUMENT TOTALS" %}</h3>
-        {% if ui_config.tax_lines|length > 0 %}
-        <div class="cockpit-row" style="border-bottom: none; padding-bottom: 4px;">
-          <label class="cockpit-label inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-1.5 w-3.5 h-3.5 accent-cyan-400" onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
-            <span>{% trans "Apply all taxes" %}</span>
-          </label>
-          <span></span>
-        </div>
-        {% endif %}
-        <div class="cockpit-row"><span class="cockpit-label">{% trans "Parts" %}</span><span id="t_repuestos" class="cockpit-value calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></div>
-        {% if ui_config.show_services %}
-        <div class="cockpit-row"><span class="cockpit-label">{% trans "Services" %}</span><span id="t_servicios" class="cockpit-value calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></div>
-        {% endif %}
-        {% if ui_config.show_otros_servicios %}
-        <div class="cockpit-row"><span class="cockpit-label">{% trans "Other" %}</span><span id="t_otros" class="cockpit-value calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></div>
-        {% endif %}
-        {% for tax_line in ui_config.tax_lines %}
-        <div class="cockpit-row tax-line" data-tax-id="{{ tax_line.id }}">
-          <label class="cockpit-label inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="include_{{ tax_line.id }}" checked class="mr-1 w-3 h-3 accent-cyan-400 tax-checkbox" data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
-            <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
-          </label>
-          <span id="t_{{ tax_line.id }}" class="cockpit-value calculated-field" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
-        </div>
-        {% endfor %}
-        <div class="totales-cockpit-divider"></div>
-        <div class="totales-cockpit-total">
-          <span>{% trans "TOTAL" %}</span>
-          <span id="t_total" class="calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
+        <div class="receipt-totals">
+          {% if ui_config.tax_lines|length > 0 %}
+          <div class="receipt-totals-apply-tax">
+            <label class="cockpit-label inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-1.5 w-3.5 h-3.5 accent-cyan-400"
+                     onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
+              <span>{% trans "Apply all taxes" %}</span>
+            </label>
+          </div>
+          {% endif %}
+
+          <table class="receipt-totals-table">
+            <tbody>
+              <tr>
+                <td class="receipt-label">{% trans "Parts" %}</td>
+                <td class="receipt-value">
+                  <span id="t_repuestos" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% if ui_config.show_services %}
+              <tr>
+                <td class="receipt-label">{% trans "Services" %}</td>
+                <td class="receipt-value">
+                  <span id="t_servicios" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endif %}
+              {% if ui_config.show_otros_servicios %}
+              <tr>
+                <td class="receipt-label">{% trans "Other" %}</td>
+                <td class="receipt-value">
+                  <span id="t_otros" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endif %}
+
+              {% for tax_line in ui_config.tax_lines %}
+              <tr class="tax-line" data-tax-id="{{ tax_line.id }}">
+                <td class="receipt-label">
+                  <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="include_{{ tax_line.id }}" checked
+                           class="mr-1 w-3 h-3 accent-cyan-400 tax-checkbox"
+                           data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
+                    <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
+                  </label>
+                </td>
+                <td class="receipt-value">
+                  <span id="t_{{ tax_line.id }}" class="calculated-field" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+
+              <tr class="receipt-total-row">
+                <td class="receipt-total-label">{% trans "TOTAL" %}</td>
+                <td class="receipt-total-value">
+                  <span id="t_total" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <button type="submit" class="totales-cockpit-save">
           {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
@@ -2210,7 +2382,12 @@ window.addRepuestoRow = function addRepuestoRow(){
         <input type="hidden" class="rep-costo-linea">
       </div>
       <div class="description-field rep-search-container w-full sm:flex-1 sm:min-w-80 relative">
-        ${lbl(I18N.name)}
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <span>${isFirstRow ? I18N.name : ''}</span>
+          <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase tracking-wide">
+            Usado / Desarme
+          </span>
+        </div>
         <input type="text" class="rep-search form-control w-full text-base" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
         <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-nombre">
@@ -2365,6 +2542,7 @@ function setupRepuestoRow(row){
   const qEl         = $('.rep-cantidad', row);
   const sub         = $('.rep-subtotal', row);
   const view        = $('.rep-subtotal-view', row);
+  const desarmeBadge = row.querySelector('.rep-desarme-badge');
 
   let timer = null;
   let codeTimer = null;
@@ -2423,6 +2601,7 @@ function setupRepuestoRow(row){
     if (repOrigen) repOrigen.value = 'STOCK_BODEGA';
     if (repPiezaDesarmeId) repPiezaDesarmeId.value = '';
     if (repCostoLinea) repCostoLinea.value = '';
+    if (desarmeBadge) desarmeBadge.classList.add('hidden');
     recalc();
   }
   
@@ -2446,6 +2625,12 @@ function setupRepuestoRow(row){
     if (repOrigen && data.origen_repuesto) repOrigen.value = data.origen_repuesto;
     if (repPiezaDesarmeId && data.pieza_desarme_id !== undefined) repPiezaDesarmeId.value = String(data.pieza_desarme_id || '');
     if (repCostoLinea && data.costo_linea !== undefined) repCostoLinea.value = String(data.costo_linea ?? '');
+    if (desarmeBadge) {
+      const isDesarme =
+        (data.origen_repuesto && data.origen_repuesto === 'DESARME') ||
+        (data.pieza_desarme_id !== undefined && data.pieza_desarme_id !== null && String(data.pieza_desarme_id) !== '');
+      desarmeBadge.classList.toggle('hidden', !isDesarme);
+    }
     recalc();
   };
 
@@ -3386,18 +3571,40 @@ function submitDocumentForm(){
       }
     }, 100);
   }
-  
+
+  {% else %}
+  // Si no es edición, aplicar tema y actualizar número normalmente
+  const t0 = selTipo?.value || 'OT';
+  applyTheme(t0);
+  if (typeof applyModeDependentUI === 'function') applyModeDependentUI();
+  updateDocumentNumber();
+  // Preselección cliente/vehículo (vuelta desde "crear vehículo" con cliente_id y vehiculo_id en URL)
+  {% if cliente_preselect_id %}
+  if (typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__ && typeof seleccionarCliente === 'function') {
+    setTimeout(() => {
+      seleccionarCliente({
+        id: window.__PRESELECT_CLIENTE_ID__,
+        nombre: "{{ cliente_preselect_nombre|default:''|escapejs }}",
+        email: "{{ cliente_preselect_email|default:''|escapejs }}",
+        telefono: "{{ cliente_preselect_telefono|default:''|escapejs }}"
+      });
+    }, 100);
+  }
+  {% endif %}
+  {% endif %}
+
+  // Hidratar líneas (edición y creación con prefill)
   const repuestosData = {{ repuestos_json|safe|default:"[]" }};
   const serviciosData = {{ servicios_json|safe|default:"[]" }};
   const otrosData = {{ otros_json|safe|default:"[]" }};
-  
-  console.log('📦 Cargando datos existentes para edición:', {
-    repuestos: repuestosData.length,
-    servicios: serviciosData.length,
-    otros: otrosData.length
+
+  console.log('📦 Cargando datos iniciales del formulario:', {
+    repuestos: (repuestosData || []).length,
+    servicios: (serviciosData || []).length,
+    otros: (otrosData || []).length
   });
-  
-  // Cargar repuestos con delay para asegurar que las funciones estén disponibles
+
+  // Cargar líneas con delay para asegurar que las funciones estén disponibles
   setTimeout(() => {
     if (repuestosData && repuestosData.length > 0) {
       repuestosData.forEach(rep => {
@@ -3419,8 +3626,7 @@ function submitDocumentForm(){
         }
       });
     }
-    
-    // Cargar servicios
+
     if (serviciosData && serviciosData.length > 0) {
       serviciosData.forEach(serv => {
         if (typeof window.addServicioRow === 'function') {
@@ -3437,8 +3643,7 @@ function submitDocumentForm(){
         }
       });
     }
-    
-    // Cargar otros servicios
+
     if (otrosData && otrosData.length > 0) {
       otrosData.forEach(otro => {
         if (typeof window.addOtroRow === 'function') {
@@ -3456,34 +3661,13 @@ function submitDocumentForm(){
         }
       });
     }
-    
-    // Recalcular totales después de cargar todos los datos
+
+    // Recalcular y serializar después de hidratar todos los datos
     setTimeout(() => {
-      if (typeof window.recalcTotales === 'function') {
-        window.recalcTotales();
-      }
+      if (typeof window.recalcTotales === 'function') window.recalcTotales();
+      if (typeof window.serializeRows === 'function') window.serializeRows();
     }, 300);
-  }, 200);
-  {% else %}
-  // Si no es edición, aplicar tema y actualizar número normalmente
-  const t0 = selTipo?.value || 'OT';
-  applyTheme(t0);
-  if (typeof applyModeDependentUI === 'function') applyModeDependentUI();
-  updateDocumentNumber();
-  // Preselección cliente/vehículo (vuelta desde "crear vehículo" con cliente_id y vehiculo_id en URL)
-  {% if cliente_preselect_id %}
-  if (typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__ && typeof seleccionarCliente === 'function') {
-    setTimeout(() => {
-      seleccionarCliente({
-        id: window.__PRESELECT_CLIENTE_ID__,
-        nombre: "{{ cliente_preselect_nombre|default:''|escapejs }}",
-        email: "{{ cliente_preselect_email|default:''|escapejs }}",
-        telefono: "{{ cliente_preselect_telefono|default:''|escapejs }}"
-      });
-    }, 100);
-  }
-  {% endif %}
-  {% endif %}
+  }, 150);
   
   serializeRows();
 

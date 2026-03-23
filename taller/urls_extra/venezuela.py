@@ -5,7 +5,7 @@ Usa TemplateView para no depender de vistas Python especiales
 """
 
 from django.shortcuts import redirect
-from django.urls import path
+from django.urls import include, path
 from django.views.generic import RedirectView, TemplateView
 
 from taller.vehiculos import views_country_aware as views_vehiculos
@@ -65,6 +65,8 @@ urlpatterns = [
         TemplateView.as_view(template_name="ve/es/clientes/lista_clientes.html"),
         name="lista_clientes_venezuela",
     ),
+    # Dashboard de suscriptor
+    path("", include("taller.analytics.urls_suscriptor")),
     # =========================
     # Vehículos Venezuela
     # =========================
@@ -96,4 +98,51 @@ urlpatterns = [
         {"country_code": "ve", "lang_code": "es"},
         name="detalle_vehiculo_ve",
     ),
+    # =========================
+    # Módulos principales del sistema
+    # =========================
+    path(
+        "documentos/",
+        include(("taller.documentos.urls", "documentos"), namespace="documentos"),
+    ),
+    # Alias operativo: compatibilidad con validaciones legacy
+    path(
+        "documentos/lista/",
+        RedirectView.as_view(url="/ve/es/documentos/", permanent=False),
+        name="documentos_lista_alias_ve",
+    ),
+    path(
+        "desarme/",
+        include(("taller.urls_desarme", "desarme"), namespace="desarme"),
+    ),
+    path(
+        "repuestos/",
+        include(("taller.repuestos.urls", "repuestos"), namespace="repuestos"),
+    ),
+    path(
+        "servicios/",
+        include(("taller.servicios.urls", "servicios"), namespace="servicios"),
+    ),
+    path(
+        "reportes/",
+        include(("taller.reportes.urls", "reportes"), namespace="reportes"),
+    ),
+    # Alias operativo: compatibilidad con dashboard-inteligencia-operativa legacy
+    path(
+        "reportes/dashboard-inteligencia-operativa/",
+        RedirectView.as_view(url="/ve/es/reportes/inteligencia/", permanent=False),
+        name="reportes_inteligencia_alias_ve",
+    ),
+    path(
+        "tecnicos/",
+        include(("taller.tecnicos.urls", "tecnicos"), namespace="tecnicos"),
+    ),
+    path(
+        "autocomplete/",
+        include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),
+    ),
+    path("ajax/", include(("taller.ajax.urls", "ajax"), namespace="ajax")),
+    path("api/", include(("taller.api.urls", "api"), namespace="api")),
+    # Núcleo taller (al final para no opacar rutas específicas)
+    path("", include(("taller.urls", "taller"), namespace="taller")),
 ]

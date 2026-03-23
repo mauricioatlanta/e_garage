@@ -1,0 +1,374 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load country_url %}
+{% load humanize %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Confirmar" %} {{ tipo_doc_label }}{% endblock %}
+{% block page_subtitle %}{% trans "Elige cliente, revisa líneas y confirma" %} · {{ vehiculo }}{% endblock %}
+{% block page_icon %}📋{% endblock %}
+
+{% block main_actions %}
+<div class="flex flex-wrap gap-3">
+  <a href="{% country_url 'desarme:inventario_inteligente' vehiculo.pk %}" class="btn-action btn-action-outline">← {% trans "Volver al inventario" %}</a>
+  <a href="{% country_url 'desarme:ver_vehiculo' vehiculo.pk %}" class="btn-action btn-action-cyan">🔧 {% trans "Vehículo" %}</a>
+  <button type="button" onclick="window.print()" class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/15">
+    🖨 {% trans "Imprimir resumen" %}
+  </button>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800&family=Rajdhani:wght@400;600;700&display=swap');
+
+  /* Futuristic/tech theme + high-contrast fields */
+  .desarme-confirm-shell {
+    --fx-cyan: rgba(34, 211, 238, 0.95);
+    --fx-cyan-dim: rgba(34, 211, 238, 0.22);
+    --fx-border: rgba(148, 163, 184, 0.18);
+    --fx-border-2: rgba(34, 211, 238, 0.20);
+    --fx-bg-0: rgba(2, 6, 23, 0.92);
+    --fx-bg-1: rgba(15, 23, 42, 0.72);
+    --fx-bg-2: rgba(0, 0, 0, 0.35);
+  }
+
+  .desarme-confirm-shell h2 {
+    font-family: 'Orbitron', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    letter-spacing: 0.02em;
+  }
+
+  .desarme-confirm-shell,
+  .desarme-confirm-shell p,
+  .desarme-confirm-shell label,
+  .desarme-confirm-shell input,
+  .desarme-confirm-shell select,
+  .desarme-confirm-shell textarea {
+    font-family: 'Rajdhani', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  }
+
+  /* Make Django form fields look “console grade” */
+  .desarme-confirm-shell form select,
+  .desarme-confirm-shell form input:not([type="checkbox"]):not([type="radio"]),
+  .desarme-confirm-shell form textarea {
+    width: 100%;
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.82), rgba(2, 6, 23, 0.62)) !important;
+    border: 1px solid rgba(34, 211, 238, 0.28) !important;
+    color: #e2e8f0 !important;
+    border-radius: 14px;
+    padding: 10px 12px;
+    outline: none;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  }
+  .desarme-confirm-shell form textarea { min-height: 76px !important; resize: vertical; }
+  .desarme-confirm-shell form ::placeholder { color: rgba(148, 163, 184, 0.95) !important; }
+
+  /* Force contrast for problematic fields */
+  .desarme-confirm-shell #id_cliente,
+  .desarme-confirm-shell #id_observaciones,
+  .desarme-confirm-shell #id_cliente_nombre,
+  .desarme-confirm-shell #id_cliente_rut,
+  .desarme-confirm-shell #id_cliente_telefono,
+  .desarme-confirm-shell #id_cliente_email,
+  .desarme-confirm-shell #id_cliente_direccion {
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.88), rgba(2, 6, 23, 0.68)) !important;
+    color: #f8fafc !important;
+    border-color: rgba(34, 211, 238, 0.35) !important;
+  }
+
+  .desarme-confirm-shell form select:focus,
+  .desarme-confirm-shell form input:focus,
+  .desarme-confirm-shell form textarea:focus {
+    border-color: rgba(34, 211, 238, 0.65) !important;
+    box-shadow:
+      0 0 0 3px rgba(34, 211, 238, 0.14),
+      0 0 26px rgba(34, 211, 238, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    background: linear-gradient(180deg, rgba(2, 6, 23, 0.94), rgba(2, 6, 23, 0.68)) !important;
+  }
+  .desarme-confirm-shell form select option { background: #050b1a; color: #e2e8f0; }
+
+  /* Compact view: reduce whitespace + tighter typography */
+  .desarme-confirm-shell .fx-compact-card { padding: 14px 14px !important; }
+  .desarme-confirm-shell .fx-compact-title { font-size: 0.95rem !important; }
+  .desarme-confirm-shell .fx-compact-subtitle { font-size: 12px !important; }
+  .desarme-confirm-shell .fx-compact-gap { gap: 12px !important; }
+  .desarme-confirm-shell .fx-compact-space { margin-top: 10px !important; }
+
+  /* Table: more futuristic */
+  .desarme-confirm-shell .fx-table thead {
+    background: linear-gradient(90deg, rgba(34, 211, 238, 0.10), rgba(99, 102, 241, 0.08));
+  }
+  .desarme-confirm-shell .fx-table th {
+    font-family: 'Orbitron', system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+  .desarme-confirm-shell .fx-row {
+    background: radial-gradient(circle at top, rgba(15, 23, 42, 0.55), rgba(2, 6, 23, 0.35));
+  }
+  .desarme-confirm-shell .fx-row:hover {
+    background: radial-gradient(circle at top, rgba(34, 211, 238, 0.09), rgba(2, 6, 23, 0.38));
+  }
+
+  /* Buttons: crisp glow, high contrast */
+  .desarme-confirm-shell .fx-primary {
+    background: linear-gradient(90deg, rgba(34, 211, 238, 0.95), rgba(59, 130, 246, 0.95));
+    color: #020617;
+    box-shadow: 0 12px 40px rgba(34, 211, 238, 0.12);
+  }
+  .desarme-confirm-shell .fx-primary:hover {
+    box-shadow: 0 14px 52px rgba(34, 211, 238, 0.18);
+    transform: translateY(-1px);
+  }
+</style>
+
+<div class="desarme-confirm-shell min-h-screen rounded-2xl border border-cyan-400/20 bg-[radial-gradient(circle_at_top,rgba(8,47,73,0.85),#020617_35%,#01030a_100%)] text-white">
+  <div class="mx-auto max-w-6xl px-3 py-4">
+    <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_340px] gap-4 fx-compact-gap">
+      <section class="space-y-4">
+        <div class="fx-compact-card rounded-3xl border border-cyan-400/20 bg-slate-900/70 backdrop-blur-xl">
+          <div class="inline-flex rounded-full px-3 py-1 text-[10px] uppercase tracking-[0.24em] {% if empresa.pais == 'US' %}border border-blue-400/20 bg-blue-400/10 text-blue-200{% else %}border border-cyan-400/20 bg-cyan-400/10 text-cyan-200{% endif %}">
+            {{ tipo_doc_label }}
+          </div>
+          <h2 class="fx-compact-title mt-2 font-black text-white">{% trans "Datos de la venta" %}</h2>
+
+          {% if form.non_field_errors %}
+            <div class="mt-4 rounded-2xl border border-rose-400/20 bg-rose-400/10 p-4 text-sm text-rose-200">
+              {{ form.non_field_errors }}
+            </div>
+          {% endif %}
+
+          <form method="post" action="{% country_url 'desarme:finalizar_venta_desde_inventario' vehiculo.pk %}" class="mt-3 space-y-3">
+            {% csrf_token %}
+            <input type="hidden" name="crear_cliente_rapido" id="id_crear_cliente_rapido" value="0">
+
+            <div class="rounded-2xl border border-white/10 bg-black/20 p-4">
+              <div class="flex items-center justify-between gap-3">
+                <div>
+                  <div class="text-sm font-semibold text-white">{% trans "Cliente existente" %}</div>
+                  <div class="fx-compact-subtitle text-slate-300">{% trans "Selecciona un cliente ya creado en la empresa." %}</div>
+                </div>
+
+                <button
+                  type="button"
+                  id="toggle-cliente-rapido"
+                  class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-cyan-200 transition hover:bg-cyan-400/15"
+                >
+                  {% trans "Cliente rápido" %}
+                </button>
+              </div>
+
+              <div class="mt-4">
+                {{ form.cliente }}
+                {% if form.cliente.errors %}
+                  <div class="mt-1 text-sm text-rose-300">{{ form.cliente.errors }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div id="cliente-rapido-box" class="hidden rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-4">
+              <div class="mb-3">
+                <div class="text-sm font-semibold text-white">{% trans "Nuevo cliente rápido" %}</div>
+                <div class="text-xs text-slate-300">{% trans "Completa lo mínimo y sigue con la venta." %}</div>
+              </div>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="md:col-span-2">
+                  <label class="mb-2 block text-sm font-semibold text-slate-300">{{ form.cliente_nombre.label }}</label>
+                  {{ form.cliente_nombre }}
+                  {% if form.cliente_nombre.errors %}
+                    <div class="mt-1 text-sm text-rose-300">{{ form.cliente_nombre.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label class="mb-2 block text-sm font-semibold text-slate-300">{{ form.cliente_rut.label }}</label>
+                  {{ form.cliente_rut }}
+                  {% if form.cliente_rut.errors %}
+                    <div class="mt-1 text-sm text-rose-300">{{ form.cliente_rut.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label class="mb-2 block text-sm font-semibold text-slate-300">{{ form.cliente_telefono.label }}</label>
+                  {{ form.cliente_telefono }}
+                  {% if form.cliente_telefono.errors %}
+                    <div class="mt-1 text-sm text-rose-300">{{ form.cliente_telefono.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label class="mb-2 block text-sm font-semibold text-slate-300">{{ form.cliente_email.label }}</label>
+                  {{ form.cliente_email }}
+                  {% if form.cliente_email.errors %}
+                    <div class="mt-1 text-sm text-rose-300">{{ form.cliente_email.errors }}</div>
+                  {% endif %}
+                </div>
+
+                <div>
+                  <label class="mb-2 block text-sm font-semibold text-slate-300">{{ form.cliente_direccion.label }}</label>
+                  {{ form.cliente_direccion }}
+                  {% if form.cliente_direccion.errors %}
+                    <div class="mt-1 text-sm text-rose-300">{{ form.cliente_direccion.errors }}</div>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <label class="mb-2 block text-sm font-semibold text-slate-300">{{ form.observaciones.label }}</label>
+              {{ form.observaciones }}
+              {% if form.observaciones.errors %}
+                <div class="mt-1 text-sm text-rose-300">{{ form.observaciones.errors }}</div>
+              {% endif %}
+            </div>
+
+            <div class="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4 text-sm text-amber-100">
+              {% trans "Al confirmar, se crearán las líneas de venta y se descontará stock automáticamente." %}
+            </div>
+
+            <button type="submit" class="fx-primary w-full rounded-2xl px-4 py-3 text-sm font-black uppercase tracking-[0.16em] transition">
+              {% trans "Confirmar y crear venta" %}
+            </button>
+          </form>
+        </div>
+
+        <div class="fx-compact-card rounded-3xl border border-cyan-400/20 bg-slate-900/70 backdrop-blur-xl">
+          <h2 class="fx-compact-title font-black text-white">{% trans "Líneas seleccionadas" %}</h2>
+
+          <div class="fx-compact-space overflow-hidden rounded-2xl border border-cyan-400/15">
+            <div class="overflow-x-auto">
+              <table class="fx-table min-w-full text-sm">
+                <thead class="text-slate-200">
+                  <tr>
+                    <th class="px-4 py-3 text-left">{% trans "Repuesto" %}</th>
+                    <th class="px-4 py-3 text-left">{% trans "Stock actual" %}</th>
+                    <th class="px-4 py-3 text-left">{% trans "Cantidad" %}</th>
+                    <th class="px-4 py-3 text-left">{% trans "Precio venta" %}</th>
+                    <th class="px-4 py-3 text-left">{% trans "Total línea" %}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10">
+                  {% for item in resumen.items %}
+                  <tr class="fx-row">
+                    <td class="px-4 py-3">
+                      <div class="font-semibold text-white">{{ item.display_nombre|default:item.repuesto.nombre }}</div>
+                      <div class="text-xs text-slate-500">{{ item.repuesto.codigo|default:item.repuesto.id }}</div>
+                    </td>
+                    <td class="px-4 py-3 text-slate-300">{{ item.stock_actual }}</td>
+                    <td class="px-4 py-3 text-slate-300">{{ item.cantidad }}</td>
+                    <td class="px-4 py-3 text-cyan-300">
+                      {% if request.path|slice:":4" == "/us/" %}
+                        ${{ item.precio_venta|floatformat:2|intcomma }}
+                      {% else %}
+                        ${{ item.precio_venta|floatformat:0|intcomma }}
+                      {% endif %}
+                    </td>
+                    <td class="px-4 py-3 font-bold text-emerald-300">
+                      {% if request.path|slice:":4" == "/us/" %}
+                        ${{ item.linea_total|floatformat:2|intcomma }}
+                      {% else %}
+                        ${{ item.linea_total|floatformat:0|intcomma }}
+                      {% endif %}
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <aside>
+        <div class="sticky top-6 rounded-3xl border border-cyan-400/20 bg-slate-900/70 p-5 backdrop-blur-xl">
+          <h2 class="text-lg font-black text-white">{% trans "Resumen" %}</h2>
+
+          <div class="mt-4 space-y-3 rounded-2xl border border-white/10 bg-black/20 p-4">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">{% trans "Items" %}</span>
+              <span class="font-bold text-white">{{ resumen.total_items }}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">{% trans "Unidades" %}</span>
+              <span class="font-bold text-white">{{ resumen.total_unidades }}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-slate-400">{% trans "Subtotal" %}</span>
+              <span class="font-black text-cyan-300">
+                {% if request.path|slice:":4" == "/us/" %}
+                  ${{ resumen.subtotal|floatformat:2|intcomma }}
+                {% else %}
+                  ${{ resumen.subtotal|floatformat:0|intcomma }}
+                {% endif %}
+              </span>
+            </div>
+          </div>
+
+          <div class="mt-4 rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-4 text-sm text-cyan-200">
+            {% trans "El número del documento se generará automáticamente al confirmar." %}
+          </div>
+
+          <div class="mt-4 rounded-2xl border border-white/10 bg-black/20 p-4 text-sm text-slate-400">
+            {% trans "Vehículo asociado:" %}
+            <div class="mt-1 font-semibold text-white">{{ vehiculo }}</div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  const toggleBtn = document.getElementById("toggle-cliente-rapido");
+  const box = document.getElementById("cliente-rapido-box");
+  const hiddenInput = document.getElementById("id_crear_cliente_rapido");
+  const clienteNombre = document.getElementById("id_cliente_nombre");
+
+  if (!toggleBtn || !box || !hiddenInput) return;
+
+  function openQuickClient() {
+    box.classList.remove("hidden");
+    hiddenInput.value = "1";
+    if (clienteNombre) clienteNombre.focus();
+  }
+
+  function closeQuickClient() {
+    box.classList.add("hidden");
+    hiddenInput.value = "0";
+  }
+
+  toggleBtn.addEventListener("click", function () {
+    if (box.classList.contains("hidden")) {
+      openQuickClient();
+    } else {
+      closeQuickClient();
+    }
+  });
+
+  const hasQuickClientData = [
+    "id_cliente_nombre",
+    "id_cliente_rut",
+    "id_cliente_telefono",
+    "id_cliente_email",
+    "id_cliente_direccion"
+  ].some(function (id) {
+    const el = document.getElementById(id);
+    return el && el.value && el.value.trim() !== "";
+  });
+
+  if (hasQuickClientData) {
+    openQuickClient();
+  }
+})();
+</script>
+
+<script>
+try {
+  localStorage.removeItem("inventario-inteligente-vehiculo-{{ vehiculo.id }}");
+} catch (e) {}
+</script>
+{% endblock %}

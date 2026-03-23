@@ -1,0 +1,53 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load static %}
+{% load country_url %}
+{% load i18n %}
+
+{% block page_title %}{% trans "Inventario inteligente" %} – {{ vehiculo.patente|default:vehiculo.vin|default:vehiculo.id }}{% endblock %}
+{% block page_subtitle %}{% trans "Terminal de venta · busca, filtra y vende" %}{% endblock %}
+{% block page_icon %}📦{% endblock %}
+
+{% block page_extra_css %}
+<link rel="stylesheet" href="{% static 'css/desarme/inventario_inteligente.css' %}">
+{% endblock %}
+
+{% block main_actions %}
+<a href="{% country_url 'desarme:inventario_vehiculo' vehiculo.pk %}" class="btn-action btn-action-outline">← {% trans "Inventario clásico" %}</a>
+<a href="{% country_url 'desarme:ver_vehiculo' vehiculo.pk %}" class="btn-action btn-action-cyan">🔧 {% trans "Vehículo" %}</a>
+{% endblock %}
+
+{% block panel_content %}
+<script>
+  window.INVENTARIO_EDIT_URL_PATTERN = "{% country_url 'desarme:editar_pieza' 0 %}";
+</script>
+<div
+  x-data='inventarioInteligente({
+    items: JSON.parse("{{ repuestos_json|escapejs }}"),
+    storageKey: "inventario-inteligente-vehiculo-{{ vehiculo.pk }}",
+    isStaff: {{ request.user.is_staff|yesno:"true,false" }}
+  })'
+  x-init="init()"
+  x-cloak
+  class="inventario-shell min-h-screen text-white rounded-2xl border border-cyan-400/20"
+>
+  <div class="inventario-shell__bg"></div>
+
+  <div class="relative mx-auto max-w-[1700px] px-3 sm:px-4 lg:px-6 py-4 sm:py-5 pb-36 lg:pb-40">
+    {% include "taller/desarme/partials/_inventario_toolbar.html" %}
+
+    <div class="grid grid-cols-1 gap-5">
+      <div>
+        {% include "taller/desarme/partials/_inventario_grid.html" %}
+      </div>
+    </div>
+  </div>
+
+  {% include "taller/desarme/partials/_inventario_drawer.html" %}
+  {% include "taller/desarme/partials/_inventario_mobile_bar.html" %}
+</div>
+{% endblock %}
+
+{% block page_extra_js %}
+<script src="{% static 'js/desarme/inventario_inteligente.js' %}?v=20260319-2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js"></script>
+{% endblock %}

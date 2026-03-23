@@ -40,6 +40,9 @@ gunicorn>=21.2.0
 Pillow>=10.0.0  # Para manejo de imágenes (logos, fotos)
 python-dateutil>=2.8.2
 
+# PDF (exportar documentos / reportes)
+weasyprint>=62.0  # HTML/CSS to PDF para /documentos/<id>/exportar_pdf/. En Linux: apt install libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0
+
 # Testing (Desarrollo)
 pytest>=7.4.0
 pytest-django>=4.5.0

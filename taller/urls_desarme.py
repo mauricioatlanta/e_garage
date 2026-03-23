@@ -26,6 +26,12 @@ def _desarme_fallback_unavailable(request):
 
 try:
     from taller.desarme import views
+    from taller.desarme.views_inventario import (
+        confirmar_venta_desde_inventario,
+        crear_venta_desde_inventario,
+        finalizar_venta_desde_inventario,
+        inventario_inteligente,
+    )
 
     app_name = "desarme"
     urlpatterns = [
@@ -39,8 +45,14 @@ try:
         path("vehiculos/<int:pk>/generar-inventario/", views.generar_inventario_view, name="generar_inventario"),
         path("vehiculos/<int:pk>/editar/", views.editar_vehiculo, name="editar_vehiculo"),
         path("vehiculos/<int:pk>/inventario/", views.inventario_vehiculo, name="inventario_vehiculo"),
+        path("vehiculos/<int:pk>/inventario-inteligente/", inventario_inteligente, name="inventario_inteligente"),
+        path("vehiculos/<int:pk>/vender/", views.iniciar_venta_desde_inventario, name="iniciar_venta_desde_inventario"),
+        path("vehiculos/<int:pk>/crear-venta-desde-inventario/", crear_venta_desde_inventario, name="crear_venta_desde_inventario"),
+        path("vehiculos/<int:pk>/confirmar-venta-desde-inventario/", confirmar_venta_desde_inventario, name="confirmar_venta_desde_inventario"),
+        path("vehiculos/<int:pk>/finalizar-venta-desde-inventario/", finalizar_venta_desde_inventario, name="finalizar_venta_desde_inventario"),
         path("api/piezas/<int:pk>/estado/", views.api_pieza_actualizar_estado, name="api_pieza_estado"),
         path("api/piezas/<int:pk>/precio/", views.api_pieza_actualizar_precio, name="api_pieza_precio"),
+        path("api/piezas/<int:pk>/label-empresa/", views.api_pieza_label_empresa_guardar, name="api_pieza_label_empresa_guardar"),
         path("api/piezas/bulk-estado/", views.api_piezas_bulk_estado, name="api_piezas_bulk_estado"),
         path("api/piezas/bulk-precio/", views.api_piezas_bulk_precio, name="api_piezas_bulk_precio"),
         path("piezas/", views.lista_piezas, name="lista_piezas"),
