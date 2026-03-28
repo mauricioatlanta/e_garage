@@ -61,7 +61,7 @@ def resend_signup_confirmation(request):
         request,
         "Si el correo existe en el sistema, enviamos un nuevo enlace de confirmacion.",
     )
-    return redirect(f"/{country.lower()}/{lang}/accounts/signup/")
+    return redirect("/accounts/confirm-email/")
 
 
 def _post_confirmation_redirect(user):
@@ -88,7 +88,7 @@ def confirm_email_and_login(request, key):
 
     if confirmation is None:
         messages.error(request, "El enlace de confirmacion es invalido o ya fue usado.")
-        return redirect("/accounts/login/")
+        return redirect("/accounts/confirm-email/invalid/")
 
     email_address = confirmation.email_address
     confirmation.confirm(request)
@@ -100,4 +100,4 @@ def confirm_email_and_login(request, key):
         return redirect(_post_confirmation_redirect(user))
 
     messages.error(request, "No fue posible iniciar sesion tras confirmar tu correo.")
-    return redirect("/accounts/login/")
+    return redirect("/accounts/confirm-email/")

@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Enlace invalido" %} | eGarage{% endblock %}
+
+{% block content %}
+<section class="container mx-auto max-w-2xl px-4 py-12">
+  <div class="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+    <h1 class="mb-3 text-2xl font-bold text-slate-900">
+      {% trans "Este enlace ya no es valido" %}
+    </h1>
+    <p class="mb-6 text-slate-600">
+      {% trans "El enlace puede haber expirado o ya fue usado. Puedes reenviar un nuevo correo de confirmacion." %}
+    </p>
+
+    {% if email %}
+      <div class="mb-6 rounded-lg bg-slate-50 p-4 text-sm text-slate-700">
+        <strong>{% trans "Correo:" %}</strong> {{ email }}
+      </div>
+    {% endif %}
+
+    <div class="space-y-3">
+      <form method="post" action="{% url 'account_resend_signup_confirmation' %}">
+        {% csrf_token %}
+        <input type="hidden" name="email" value="{{ email|default:'' }}">
+        <input type="hidden" name="country" value="{{ country|default:'CL' }}">
+        <input type="hidden" name="lang" value="{{ language_code|default:'es' }}">
+        <button type="submit" class="w-full rounded-lg bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700">
+          {% trans "Reenviar correo" %}
+        </button>
+      </form>
+
+      <a href="{{ signup_url }}" class="block w-full rounded-lg border border-slate-300 px-4 py-3 text-center font-semibold text-slate-800 hover:bg-slate-50">
+        {% trans "Cambiar correo" %}
+      </a>
+
+      <a href="{{ login_url }}" class="block text-center text-sm text-slate-500 hover:text-slate-700">
+        {% trans "Volver a iniciar sesion" %}
+      </a>
+    </div>
+  </div>
+</section>
+{% endblock %}

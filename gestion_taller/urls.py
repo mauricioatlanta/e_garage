@@ -87,6 +87,10 @@ from taller.views_extra.signup_email_verification import (
     confirm_email_and_login,
     resend_signup_confirmation,
 )
+from taller.views_extra.confirm_email_pending import (
+    confirm_email_pending_view,
+    confirm_email_invalid_view,
+)
 from taller.views_extra.signup_redirects import signup_redirect
 from taller.views_extra.pwa import dynamic_manifest, dynamic_service_worker
 from taller.views_health import health_check, health_simple
@@ -334,6 +338,16 @@ urlpatterns = [
         "accounts/resend-confirmation/",
         resend_signup_confirmation,
         name="account_resend_signup_confirmation",
+    ),
+    path(
+        "accounts/confirm-email/",
+        confirm_email_pending_view,
+        name="account_confirm_email_pending",
+    ),
+    path(
+        "accounts/confirm-email/invalid/",
+        confirm_email_invalid_view,
+        name="account_confirm_email_invalid",
     ),
     path(
         "accounts/confirm-email/<str:key>/",

@@ -132,20 +132,7 @@ class CustomSignupView(SignupView):
         self.request.session["pending_signup_lang"] = lang_path
         self.request.session.modified = True
 
-        login_url = f"/{country_path}/{lang_path}/accounts/login/"
-        signup_url = f"/{country_path}/{lang_path}/accounts/signup/?email={user.email}"
-        return render(
-            self.request,
-            "account/signup_email_pending.html",
-            {
-                "email": user.email,
-                "country_code": country_code,
-                "language_code": lang_path,
-                "country_config": country_config,
-                "login_url": login_url,
-                "signup_url": signup_url,
-            },
-        )
+        return redirect("/accounts/confirm-email/")
 
     def form_invalid(self, form):
         loc = getattr(self.request, "eg_us_public_signup_lang", None)
