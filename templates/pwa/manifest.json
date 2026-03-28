@@ -1,0 +1,132 @@
+{
+  "background_color": "{{ background_color }}",
+  "categories": [
+    "business",
+    "productivity",
+    "utilities"
+  ],
+  "description": "{{ description }}",
+  "dir": "ltr",
+  "display": "standalone",
+  "icons": [
+    {
+      "purpose": "any maskable",
+      "sizes": "72x72",
+      "src": "/static/images/egarage_icon_72x72.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any maskable",
+      "sizes": "96x96",
+      "src": "/static/images/egarage_icon_96x96.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any maskable",
+      "sizes": "128x128",
+      "src": "/static/images/egarage_icon_128x128.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any maskable",
+      "sizes": "144x144",
+      "src": "/static/images/egarage_icon_144x144.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any maskable",
+      "sizes": "152x152",
+      "src": "/static/images/egarage_icon_152x152.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any maskable",
+      "sizes": "192x192",
+      "src": "/static/images/egarage_icon_192x192.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any maskable",
+      "sizes": "384x384",
+      "src": "/static/images/egarage_icon_384x384.png",
+      "type": "image/png"
+    },
+    {
+      "purpose": "any maskable",
+      "sizes": "512x512",
+      "src": "/static/images/egarage_icon_512x512.png",
+      "type": "image/png"
+    }
+  ],
+  "id": "/egarage-pwa",
+  "lang": "{{ lang }}",
+  "name": "{{ name }}",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "scope": "/",
+  "screenshots": [
+    {
+      "form_factor": "narrow",
+      "sizes": "540x720",
+      "src": "/static/images/screenshot-mobile.png",
+      "type": "image/png"
+    },
+    {
+      "form_factor": "wide",
+      "sizes": "1280x720",
+      "src": "/static/images/screenshot-desktop.png",
+      "type": "image/png"
+    }
+  ],
+  "share_target": {
+    "action": "/share/",
+    "enctype": "multipart/form-data",
+    "method": "POST",
+    "params": {
+      "text": "text",
+      "title": "title",
+      "url": "url"
+    }
+  },
+  "short_name": "{{ short_name }}",
+  "shortcuts": [
+    {
+      "description": "Acceso r\u00e1pido al panel principal",
+      "icons": [
+        {
+          "sizes": "96x96",
+          "src": "/static/images/egarage_icon_96x96.png"
+        }
+      ],
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "url": "{{ start_url }}"
+    },
+    {
+      "description": "Gestionar documentos",
+      "icons": [
+        {
+          "sizes": "96x96",
+          "src": "/static/images/egarage_icon_96x96.png"
+        }
+      ],
+      "name": "Documentos",
+      "short_name": "Docs",
+      "url": "{{ start_url }}documentos/"
+    },
+    {
+      "description": "Gestionar clientes",
+      "icons": [
+        {
+          "sizes": "96x96",
+          "src": "/static/images/egarage_icon_96x96.png"
+        }
+      ],
+      "name": "Clientes",
+      "short_name": "Clientes",
+      "url": "{{ start_url }}clientes/"
+    }
+  ],
+  "start_url": "{{ start_url }}",
+  "theme_color": "{{ theme_color }}"
+}

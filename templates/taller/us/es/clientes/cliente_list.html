@@ -746,9 +746,8 @@
         <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="btn-action">
           <i class="fas fa-edit"></i> Editar
         </a>
-        <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
-           class="btn-action delete"
-           onclick="return confirm('¿Eliminar cliente {{ cliente.nombre }} {{ cliente.apellido }}?')">
+        <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}"
+           class="btn-action delete">
           <i class="fas fa-trash"></i> Eliminar
         </a>
       </div>
@@ -796,10 +795,9 @@
               <a href="{% country_url 'clientes:editar_cliente' cliente.pk %}" class="btn-action" style="padding: 0.25rem 0.5rem;">
                 <i class="fas fa-edit"></i>
               </a>
-              <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
-                 class="btn-action delete" 
-                 style="padding: 0.25rem 0.5rem;"
-                 onclick="return confirm('¿Eliminar cliente {{ cliente.nombre }} {{ cliente.apellido }}?')">
+              <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}"
+                 class="btn-action delete"
+                 style="padding: 0.25rem 0.5rem;">
                 <i class="fas fa-trash"></i>
               </a>
             </div>

@@ -5,6 +5,7 @@ from django.db.utils import OperationalError
 from django.shortcuts import redirect
 
 from taller.utils.login_exempt import is_login_exempt_path
+from taller.utils.empresa import get_user_empresa_safe
 
 
 class EmpresaMiddleware:
@@ -28,7 +29,8 @@ class EmpresaMiddleware:
             try:
                 # Asumiendo relación OneToOne/ForeignKey desde User -> Empresa.
                 # OperationalError (ej. columna is_trial faltante) no debe devolver 500.
-                request.empresa = getattr(request.user, "empresa", None)
+                # No usar getattr(user, "empresa", None): sin fila relacionada lanza RelatedObjectDoesNotExist.
+                request.empresa = get_user_empresa_safe(request.user)
                 request.company = request.empresa
                 request.country = (
                     getattr(request.empresa, "pais", None) if request.empresa else None
@@ -67,6 +69,9 @@ class EmpresaMiddleware:
             "/favicon.ico",
         ]
         norm = self._strip_country_locale_prefix(path)
+        # /cl/es/settings/ → /settings — permitir centro de ajustes aunque suscripción esté vencida
+        if norm.startswith("/settings"):
+            return True
         return any(path.startswith(u) for u in exempt_bases) or any(
             norm.startswith(u) for u in exempt_bases
         )

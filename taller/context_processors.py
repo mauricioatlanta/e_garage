@@ -19,9 +19,15 @@ def company_branding(request):
         and getattr(request, "user", None)
         and not isinstance(request.user, AnonymousUser)
     ):
-        empresa = getattr(getattr(request.user, "perfil", None), "empresa", None) or getattr(
-            request.user, "empresa", None
-        )
+        try:
+            perfil = getattr(request.user, "perfil", None)
+            if perfil is not None:
+                empresa = getattr(perfil, "empresa", None)
+            if empresa is None:
+                empresa = getattr(request.user, "empresa", None)
+        except Exception:
+            # Usuario sin empresa (OneToOne reverse lanza DoesNotExist)
+            empresa = None
 
     brand = {
         "logo_url": getattr(

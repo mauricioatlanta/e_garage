@@ -150,7 +150,11 @@ def usa_login_view(request):
             resp = render(
                 request,
                 template_name,
-                {"form": _usa_login_form(request), "error": "Credenciales inválidas"},
+                {
+                    "form": _usa_login_form(request),
+                    "error": "Credenciales inválidas",
+                    "country": "US",
+                },
             )
             resp["Cache-Control"] = "no-store, no-cache, max-age=0, must-revalidate"
             resp["Pragma"] = "no-cache"
@@ -164,6 +168,11 @@ def usa_login_view(request):
 
         # Login OK
         dj_login(request, user)
+
+        # No arrastrar flashes viejos (ni duplicar “signed in”) al workspace
+        from django.contrib.messages import get_messages
+
+        list(get_messages(request))
 
         from django.utils.http import url_has_allowed_host_and_scheme
 
@@ -186,7 +195,7 @@ def usa_login_view(request):
     resp = render(
         request,
         template_name,
-        {"form": _usa_login_form(request)},
+        {"form": _usa_login_form(request), "country": "US"},
         status=200,
     )
     # Evitar cache: página de login no debe cachearse (token CSRF debe ser siempre fresco)
@@ -203,20 +212,30 @@ def usa_login_view(request):
 
 
 def usa_signup_view(request):
+    from django.utils.translation import activate
+
     from taller.views_extra.custom_signup import CustomSignupView
 
     request.country = "US"
     request.country_code = "US"
+    request.eg_us_public_signup_lang = "en"
+    activate("en")
+    request.session["django_language"] = "en"
+    request.session.modified = True
     return CustomSignupView.as_view(template_name="taller/us/en/auth/signup.html")(request)
 
 
 def usa_signup_view_es(request):
     from django.utils.translation import activate
+
     from taller.views_extra.custom_signup import CustomSignupView
 
     request.country = "US"
     request.country_code = "US"
+    request.eg_us_public_signup_lang = "es"
     activate("es")
+    request.session["django_language"] = "es"
+    request.session.modified = True
     return CustomSignupView.as_view(template_name="taller/us/es/auth/signup.html")(request)
 
 
@@ -295,9 +314,6 @@ urlpatterns = [
     ),
     # 3) Auth Allauth para USA (nombres globales a propósito)
     path("login/", usa_login_view, name="account_login"),
-    path(
-        "accounts/login/", usa_login_view, name="account_login_alt"
-    ),  # atajo /us/accounts/login/ → misma vista
     path("signup/", usa_signup_view, name="account_signup"),
     path("es/signup/", usa_signup_view_es, name="account_signup_es"),
     # 4) Trial y onboarding

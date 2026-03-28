@@ -1,10 +1,12 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load humanize %}
+{% load i18n %}
+{% load country_url %}
 <!-- 🚨🚨🚨 TEMPLATE BASE DOCUMENTO 🚨🚨🚨 -->
 
 
-{% block title %}{{ empresa.nombre_taller }} - {% block documento_title %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document{% else %}Documento{% endif %}{% endblock %}{% endblock %}
+{% block title %}{{ empresa.nombre_taller }} - {% block documento_title %}{% trans "Document" %}{% endblock %}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -998,10 +1000,10 @@ select[name="vehiculo"]:hover:not(:focus),
     <!--
     <div class="header-section" style="display: none;">
         <h1 class="header-title">
-            📄 {{ pais_emoji }} {% block documento_header %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Management{% else %}Gestión de Documento{% endif %}{% endblock %}
+            📄 {{ pais_emoji }} {% block documento_header %}{% trans "Document Management" %}{% endblock %}
         </h1>
-        <p class="header-subtitle">{{ empresa.nombre_taller }} - {% block documento_subtitle %}{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Document Form{% else %}Formulario de Documento{% endif %}{% endblock %}</p>
-        <p class="header-info">{% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}User: {{ user.username }}{% else %}Usuario: {{ user.username }}{% endif %} | {{ empresa.get_pais_display }} | {{ fecha_hoy|date:"l, d F Y" }}</p>
+        <p class="header-subtitle">{{ empresa.nombre_taller }} - {% block documento_subtitle %}{% trans "Document Form" %}{% endblock %}</p>
+        <p class="header-info">{% trans "User" %}: {{ user.username }} | {{ empresa.get_pais_display }} | {{ fecha_hoy|date:"l, d F Y" }}</p>
     </div>
     -->
 
@@ -1019,13 +1021,8 @@ select[name="vehiculo"]:hover:not(:focus),
     <!-- Contenido del documento -->
     {% block documento_content %}
     <div class="cyber-container p-6">
-        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
-        <h2 class="section-title">📋 Document Information</h2>
-        <p>This is the base template for documents. Specific content should be defined in the 'documento_content' block.</p>
-        {% else %}
-        <h2 class="section-title">📋 Información del Documento</h2>
-        <p>Este es el template base para documentos. El contenido específico debe ser definido en el bloque 'documento_content'.</p>
-        {% endif %}
+        <h2 class="section-title">📋 {% trans "Document Information" %}</h2>
+        <p>{% trans "This is the base template for documents. Specific content should be defined in the 'documento_content' block." %}</p>
     </div>
     {% endblock %}
 
@@ -1033,18 +1030,11 @@ select[name="vehiculo"]:hover:not(:focus),
     {% block documento_actions %}
     <div class="form-actions">
         <button type="submit" class="btn-primary" form="document-form">
-            💾 {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}Save Document{% else %}Guardar Documento{% endif %}
+            💾 {% trans "Save Document" %}
         </button>
-        {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
-          <a href="{% url 'documentos_us_en:lista_documentos' %}" class="btn-secondary">← Back to List</a>
-          {% if documento %}
-            <a href="{% url 'documentos_us_en:ver_documento' documento.id %}" class="btn-secondary">👁️ View Document</a>
-          {% endif %}
-        {% else %}
-          <a href="{% url 'documentos_cl_es:lista_documentos' %}" class="btn-secondary">← Volver a la Lista</a>
-          {% if documento %}
-            <a href="{% url 'documentos_cl_es:ver_documento' documento.id %}" class="btn-secondary">👁️ Ver Documento</a>
-          {% endif %}
+        <a href="{% country_url 'documentos:lista_documentos' %}" class="btn-secondary">← {% trans "Back to List" %}</a>
+        {% if documento %}
+          <a href="{% country_url 'documentos:ver_documento' pk=documento.id %}" class="btn-secondary">👁️ {% trans "View Document" %}</a>
         {% endif %}
     </div>
     {% endblock %}
@@ -1089,11 +1079,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!clienteHidden || !clienteHidden.value) {
                 e.preventDefault();
-                {% if LANGUAGE_CODE == 'en' or request.path|slice:':3' == '/us' %}
-                  alert('Please select a customer before continuing.');
-                {% else %}
-                  alert('Por favor seleccione un cliente antes de continuar.');
-                {% endif %}
+                  alert('{% trans "Please select a customer before continuing." %}');
                 return false;
             }
 
@@ -1133,6 +1119,5 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-<!-- Django Autocomplete Light -->
-{{ form.media }}
+{# DAL/Select2: se carga UNA SOLA VEZ en base.html (form_media_once). NO incluir {{ form.media }} aquí: provoca "select2 has already been registered". #}
 {% endblock %}

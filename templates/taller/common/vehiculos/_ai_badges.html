@@ -1,6 +1,6 @@
 <!-- AI/Professional Badges -->
 {% load i18n %}
-{% if empresa.flags.ai_tools_enabled or empresa.plan in "pro,enterprise" %}
+{% if empresa.flags.ai_tools_enabled or empresa.plan == "premium" or empresa.plan == "enterprise" %}
 <div class="ai-badges mb-4">
   <div class="flex flex-wrap gap-2">
     <span class="px-3 py-1 rounded-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white text-xs font-semibold">

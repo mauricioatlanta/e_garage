@@ -47,15 +47,7 @@
       </div>
     {% endif %}
 
-    {% if messages %}
-      {% for message in messages %}
-        {% with message_str=message|stringformat:"s" %}
-          {% if "Successfully signed in" not in message_str and "You have signed out" not in message_str and "Professional Automotive Management System" not in message_str and "Ha iniciado sesión exitosamente" not in message_str and "Ha cerrado sesión" not in message_str and "iniciado sesión exitosamente" not in message_str and "cerrado sesión" not in message_str and "Información de empresa guardada exitosamente" not in message_str %}
-            <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">{{ message }}</div>
-          {% endif %}
-        {% endwith %}
-      {% endfor %}
-    {% endif %}
+    {# Mensajes residuales no se muestran en login (middleware los descarta en GET). #}
 
     <form method="post" action="">
       {% csrf_token %}

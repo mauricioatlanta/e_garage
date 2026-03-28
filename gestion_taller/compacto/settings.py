@@ -79,6 +79,8 @@ ACCOUNT_FORMS = {
 LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"  # <- Enviar a home o dashboard country-aware
 ACCOUNT_LOGOUT_REDIRECT_URL = "/logout-redirect/"
+# Permitir logout por GET: evita 403 CSRF al visitar /accounts/logout/ directamente
+ACCOUNT_LOGOUT_ON_GET = True
 
 # ---------- Apps ----------
 INSTALLED_APPS = [
@@ -206,6 +208,8 @@ TEMPLATES = [
                 "taller.context_processors.company_context",
                 "taller.context_processors.company_branding",
                 "taller.context_processors.company_header",
+                "taller.context_processors.panel_chrome.us_authenticated_compact_chrome",
+                "taller.context_processors.panel_chrome.us_signup_slim_header",
             ],
         },
     },
@@ -258,7 +262,7 @@ ACCOUNT_SESSION_REMEMBER = True
 # (Django usa SESSION_COOKIE_AGE; no necesitas ACCOUNT_SESSION_COOKIE_AGE)
 
 # ---------- Email ----------
-EMAIL_BACKEND = "taller.backends.egarage_email.EgarageEmailBackend"
+EMAIL_BACKEND = "taller.backends.resend_backend.ResendEmailBackend"
 EMAIL_HOST = os.getenv("EMAIL_HOST", "srv24.cpanelhost.cl")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "465"))
 EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", True)

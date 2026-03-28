@@ -133,6 +133,13 @@ class ClienteForm(forms.ModelForm):
         self.empresa = kwargs.pop("empresa", None)  # Almacenar empresa
         super().__init__(*args, **kwargs)
 
+        # Solo nombre, apellido y teléfono son obligatorios (el modelo permite blank en apellido/teléfono).
+        self.fields["nombre"].required = True
+        self.fields["apellido"].required = True
+        self.fields["telefono"].required = True
+        self.fields["email"].required = False
+        self.fields["direccion"].required = False
+
         # Agregar atributo pais para el template
         if self.empresa and hasattr(self.empresa, "pais"):
             self.pais = self.empresa.pais

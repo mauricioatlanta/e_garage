@@ -7,7 +7,7 @@ from ..models.empresa import Empresa
 
 @login_required
 def editar_empresa(request):
-    empresa, created = Empresa.objects.get_or_create(usuario=request.user)
+    empresa, created = Empresa.objects.get_or_create(user=request.user)
     if request.method == "POST":
         form = EmpresaForm(request.POST, request.FILES, instance=empresa)
         if form.is_valid():

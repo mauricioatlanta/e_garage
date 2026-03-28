@@ -115,66 +115,24 @@ CACHES = {
 # =============================================================================
 # LOGGING
 # =============================================================================
-
+# Solo consola: en VPS el usuario del servicio suele no poder escribir en
+# BASE_DIR/logs; Gunicorn ya envía stdout a journald.
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
-            "style": "{",
-        },
-        "simple": {
-            "format": "{levelname} {message}",
-            "style": "{",
-        },
-    },
     "handlers": {
-        "file": {
-            "level": "INFO",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(BASE_DIR, "logs", "egarage_prod.log"),
-            "maxBytes": 1024 * 1024 * 15,  # 15MB
-            "backupCount": 10,
-            "formatter": "verbose",
-        },
-        "error_file": {
-            "level": "ERROR",
-            "class": "logging.handlers.RotatingFileHandler",
-            "filename": os.path.join(BASE_DIR, "logs", "egarage_errors.log"),
-            "maxBytes": 1024 * 1024 * 15,  # 15MB
-            "backupCount": 10,
-            "formatter": "verbose",
-        },
         "console": {
-            "level": "WARNING",
             "class": "logging.StreamHandler",
-            "formatter": "simple",
         },
     },
     "root": {
-        "handlers": ["console", "file"],
+        "handlers": ["console"],
         "level": "INFO",
     },
     "loggers": {
-        "django": {
-            "handlers": ["file", "error_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "taller": {
-            "handlers": ["file", "error_file"],
-            "level": "INFO",
-            "propagate": False,
-        },
-        "django.request": {
-            "handlers": ["error_file"],
+        "django.security.DisallowedHost": {
+            "handlers": ["console"],
             "level": "ERROR",
-            "propagate": False,
-        },
-        "django.security": {
-            "handlers": ["error_file"],
-            "level": "WARNING",
             "propagate": False,
         },
     },
@@ -184,14 +142,11 @@ LOGGING = {
 # EMAIL
 # =============================================================================
 
-# Configuración de email para producción
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@egarage.cl")
+# Configuracion de email para produccion por API HTTPS (Resend)
+EMAIL_BACKEND = "taller.email_backends.resend_backend.ResendEmailBackend"
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "support@egarage.cl")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", "support@egarage.cl")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 
 # =============================================================================
 # ARCHIVOS ESTÁTICOS

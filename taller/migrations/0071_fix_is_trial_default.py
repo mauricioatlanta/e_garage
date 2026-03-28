@@ -3,17 +3,45 @@
 from django.db import migrations, connection
 
 
-def fix_is_trial_defaults(apps, schema_editor):
-    """Actualiza todas las empresas que tengan is_trial NULL a False"""
-    with connection.cursor() as cursor:
-        # En SQLite, actualizamos las filas donde is_trial sea NULL
+def _column_exists(cursor, table, column):
+    """Comprueba si la columna existe en la tabla (SQLite o PostgreSQL)."""
+    vendor = connection.vendor
+    if vendor == "sqlite":
+        cursor.execute(f"PRAGMA table_info({table})")
+        return any(row[1] == column for row in cursor.fetchall())
+    if vendor == "postgresql":
         cursor.execute(
             """
-            UPDATE taller_empresa 
-            SET is_trial = 0 
-            WHERE is_trial IS NULL
-        """
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name = %s AND column_name = %s
+            """,
+            [table, column],
         )
+        return cursor.fetchone() is not None
+    return False
+
+
+def fix_is_trial_defaults(apps, schema_editor):
+    """Actualiza todas las empresas que tengan is_trial NULL a False. Solo si la columna existe."""
+    with connection.cursor() as cursor:
+        if not _column_exists(cursor, "taller_empresa", "is_trial"):
+            return
+        if connection.vendor == "sqlite":
+            cursor.execute(
+                """
+                UPDATE taller_empresa
+                SET is_trial = 0
+                WHERE is_trial IS NULL
+                """
+            )
+        else:
+            cursor.execute(
+                """
+                UPDATE taller_empresa
+                SET is_trial = FALSE
+                WHERE is_trial IS NULL
+                """
+            )
         updated = cursor.rowcount
         if updated > 0:
             print(f"Actualizadas {updated} empresas con is_trial=NULL a False")

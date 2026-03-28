@@ -7,7 +7,7 @@ from django.db.models.functions import Coalesce
 from django.shortcuts import redirect
 from django.utils import timezone
 
-from taller.auth.decorators import login_required_default
+from taller.auth.decorators import country_login_required
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, LineaServicio
@@ -34,7 +34,7 @@ def total_repuestos(qs_base):
     return qs_base.aggregate(total=Coalesce(Sum(SUBTOTAL_EXPR), ZERO_DEC))["total"]
 
 
-@login_required_default
+@country_login_required
 def dashboard_centro_operaciones(request):
     """
     🏢 Dashboard empresarial - Centro de Operaciones
@@ -54,8 +54,11 @@ def dashboard_centro_operaciones(request):
         elif "/cl/" in request.path:
             return redirect("chile:configuracion")
         else:
-            # Fallback al namespace global
-            return redirect("configuracion")
+            # Fallback al namespace global o a un path seguro
+            try:
+                return redirect("taller:configuracion")
+            except:
+                return redirect("/configuracion/")
 
     # 📅 Fechas de referencia
     hoy = timezone.localdate()
@@ -286,6 +289,22 @@ def dashboard_centro_operaciones(request):
     # 🎯 MÉTRICAS DE EFICIENCIA
     eficiencia_conversion = (facturas_mes / max(presupuestos_mes + facturas_mes, 1)) * 100
 
+    # 📋 CHECKLIST DE ONBOARDING
+    checklist_onboarding = {
+        "empresa_configurada": bool(
+            empresa.nombre_taller
+            and empresa.pais
+            and empresa.moneda
+            and hasattr(empresa, "config")
+            and empresa.config.tasa_impuesto is not None
+        ),
+        "tecnico_creado": tecnicos_activos > 0,
+        "cliente_creado": clientes_activos > 0,
+        "vehiculo_creado": vehiculos_registrados > 0,
+        "documento_creado": total_documentos > 0,
+    }
+    checklist_completo = all(checklist_onboarding.values())
+
     context = {
         # Información de empresa
         "empresa": empresa,
@@ -324,6 +343,9 @@ def dashboard_centro_operaciones(request):
         "proyeccion_facturacion": proyeccion_facturacion,
         "ticket_promedio": ticket_promedio,
         "eficiencia_conversion": eficiencia_conversion,
+        # Checklist de onboarding
+        "checklist_onboarding": checklist_onboarding,
+        "checklist_completo": checklist_completo,
         # Fechas
         "fecha_hoy": hoy,
         "mes_actual": hoy.strftime("%B %Y"),
@@ -344,7 +366,7 @@ def dashboard_centro_operaciones(request):
     return TemplateResponse(request, template_name, context)
 
 
-@login_required_default
+@country_login_required
 def dashboard_centro_operaciones_espacial(request):
     """
     Dashboard especializado con estética espacial futurista
@@ -364,7 +386,10 @@ def dashboard_centro_operaciones_espacial(request):
         elif "/cl/" in request.path:
             return redirect("chile:configuracion")
         else:
-            return redirect("configuracion")
+            try:
+                return redirect("taller:configuracion")
+            except:
+                return redirect("/configuracion/")
 
     # 📅 Fechas de referencia (MISMA LÓGICA QUE dashboard_centro_operaciones)
     hoy = timezone.localdate()
@@ -824,11 +849,11 @@ def dashboard_centro_operaciones_espacial(request):
     # Seleccionar template espacial
     # Para USA, siempre usar el template de USA (soporta inglés y español)
     if hasattr(empresa, "pais") and empresa.pais == "US":
-        template_name = "taller/us/en/dashboard/centro_operaciones_espacial.html"
+        template_name = "us/en/dashboard/centro_operaciones_espacial.html"
         context["use_usa_base"] = True
     elif request.path.startswith("/us/"):
         # Para rutas /us/, siempre usar template de USA (tiene traducciones)
-        template_name = "taller/us/en/dashboard/centro_operaciones_espacial.html"
+        template_name = "us/en/dashboard/centro_operaciones_espacial.html"
         context["use_usa_base"] = True
     else:
         template_name = select_country_lang_template(

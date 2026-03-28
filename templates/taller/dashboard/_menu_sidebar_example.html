@@ -5,7 +5,7 @@ Para usar, incluye este archivo en tu base.html o sidebar principal:
 {% include 'taller/dashboard/_menu_sidebar_example.html' %}
 {% endcomment %}
 
-{% load role_tags %}
+{% load role_tags country_url %}
 
 <nav class="sidebar">
     <!-- Menú para todos los usuarios logueados -->
@@ -41,7 +41,7 @@ Para usar, incluye este archivo en tu base.html o sidebar principal:
                 </a>
             </li>
             <li>
-                <a href="{% url 'repuestos:lista_repuestos' %}">
+                <a href="{% country_url 'taller:repuestos:lista_repuestos' %}">
                     🧩 Repuestos
                 </a>
             </li>
@@ -70,7 +70,7 @@ Para usar, incluye este archivo en tu base.html o sidebar principal:
                 </a>
             </li>
             <li>
-                <a href="{% url 'repuestos:lista_repuestos' %}">
+                <a href="{% country_url 'taller:repuestos:lista_repuestos' %}">
                     📦 Inventario
                 </a>
             </li>

@@ -1,6 +1,6 @@
-
 {% extends 'base.html' %}
 {% load widget_tweaks %}
+{% load country_url %}
 
 {% block content %}
 <style>
@@ -289,6 +289,7 @@ textarea.cyber-input::placeholder {
 
   <form class="space-y-8" method="post">
     {% csrf_token %}
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
     {% if form.errors %}
       <div class="error-panel">
@@ -389,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ciudadSelect.disabled = true;
 
       if(regionId) {
-        fetch(`{% url 'taller:clientes:obtener_ciudades' %}?region_id=${regionId}`)
+        fetch(`{% country_url 'clientes:obtener_ciudades' %}?region_id=${regionId}`)
           .then(response => {
             if (!response.ok) {
               throw new Error('Network response was not ok');
@@ -450,7 +451,7 @@ document.addEventListener('DOMContentLoaded', function() {
       ciudadUsaSelect.disabled = true;
 
       if(estadoId) {
-        fetch(`{% url 'taller:clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
+        fetch(`{% country_url 'clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
           .then(response => response.json())
           .then(data => {
             console.log('🏙️ Ciudades USA recibidas:', data);
@@ -548,6 +549,7 @@ function createParticles() {
   <h1 class="futuristic-title">🪐 Crear Cliente Espacial</h1>
   <form class="space-y-6" method="post">
     {% csrf_token %}
+    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
     {% if form.errors %}
       <div class="bg-red-900 border border-red-500 rounded p-4 mb-4">
@@ -618,7 +620,7 @@ function createParticles() {
                 ciudadUsaSelect.innerHTML = '<option value="">---------</option>';
                 if(estadoId) {
                   console.log('Solicitando ciudades USA para estado:', estadoId);
-                  fetch(`{% url 'taller:clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
+                  fetch(`{% country_url 'clientes:obtener_ciudades_usa' %}?estado_id=${estadoId}`)
                     .then(response => response.json())
                     .then(data => {
                       console.log('Ciudades USA recibidas:', data);
@@ -670,7 +672,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function cargarCiudades(regionId, selectedCiudadId = null) {
       ciudadSelect.innerHTML = '<option value="">---------</option>';
       if(regionId) {
-        fetch(`{% url 'taller:clientes:obtener_ciudades' %}?region_id=${regionId}`)
+        fetch(`{% country_url 'clientes:obtener_ciudades' %}?region_id=${regionId}`)
           .then(response => response.json())
           .then(data => {
             data.forEach(function(ciudad) {

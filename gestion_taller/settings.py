@@ -179,6 +179,7 @@ ACCOUNT_EMAIL_VERIFICATION = os.getenv("ACCOUNT_EMAIL_VERIFICATION", "mandatory"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_UNIQUE_EMAIL = True
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 ACCOUNT_RATE_LIMITS = {"confirm_email": "1/m"}
 
@@ -187,9 +188,11 @@ ACCOUNT_FORMS = {
     "signup": "taller.forms.custom_signup.CustomSignupForm",
 }
 
-LOGIN_URL = "/cl/accounts/login/"
+LOGIN_URL = "/accounts/login/"
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/logout-redirect/"
+# Permitir logout por GET: evita 403 CSRF al visitar /accounts/logout/ directamente
+ACCOUNT_LOGOUT_ON_GET = True
 
 # ---------- eGarage país e idioma por defecto ----------
 # Si alguien entra por /accounts/login/ (ruta sin país), el fallback es Chile, no Uruguay.
@@ -256,12 +259,12 @@ MIDDLEWARE = [
     "django.contrib.sessions.middleware.SessionMiddleware",
     "taller.middleware.force_accounts_to_cl.ForceAccountsToCLMiddleware",
     "django.middleware.locale.LocaleMiddleware",
-    "taller.middleware.fix_allowed_hosts.FixAllowedHostsMiddleware",  # FIX: Forzar ALLOWED_HOSTS antes de CommonMiddleware
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "taller.middleware.rate_limiting.RateLimitMiddleware",
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
+    "taller.middleware.onboarding_middleware.OnboardingMiddleware",
     "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
     "taller.middleware.lang_policy.LanguagePolicyMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
@@ -322,9 +325,13 @@ TEMPLATES = [
                 "taller.context_processors.company_branding",
                 "taller.context_processors.company_country",
                 "taller.context_processors.company_header",
+                "taller.context_processors.panel_chrome.us_authenticated_compact_chrome",
+                "taller.context_processors.panel_chrome.us_signup_slim_header",
                 "taller.context_processors.country_config.country_context",
+                "taller.context_processors.feature_flags.country_features",
                 "taller.context_processors.ui_labels.ui_labels_context",
                 "taller.context_processors.support_context",
+                "taller.context_processors.ayuda_contextual.ayuda_contextual",
             ],
         },
     },
@@ -513,8 +520,6 @@ if not DEBUG:
         "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
         "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
     }
-    # Mantener compatibilidad con Django < 5
-    STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
     WHITENOISE_USE_FINDERS = True
     WHITENOISE_AUTOREFRESH = False
 else:
@@ -523,8 +528,7 @@ else:
         "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
         "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"},
     }
-    # Mantener compatibilidad con Django < 5
-    STATICFILES_STORAGE = "django.contrib.staticfiles.storage.StaticFilesStorage"
+# Django 5+: no definir STATICFILES_STORAGE si ya existe STORAGES["staticfiles"] (mutuamente excluyentes).
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 APPEND_SLASH = True

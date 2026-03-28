@@ -19,6 +19,8 @@ from taller.configuracion.rubros_logic import (
 )
 from taller.models.documento import Documento
 from taller.models.tecnico import Tecnico
+from taller.models.clientes import Cliente
+from taller.models.vehiculos import Vehiculo
 from taller.documentos.forms import DocumentoForm
 
 
@@ -101,6 +103,8 @@ def documento_crear(request, country_code="cl", lang_code="es"):
     roles_permitidos = get_roles_permitidos(config)
     ui_config = get_ui_config(config)
     tecnicos_qs = _tecnicos_queryset_for_empresa(empresa, roles_permitidos)
+    cliente_obj = None
+    vehiculo_obj = None
 
     if request.method == "POST":
         form = DocumentoForm(request.POST, user=request.user, empresa=empresa, country=country)
@@ -185,7 +189,45 @@ def documento_crear(request, country_code="cl", lang_code="es"):
         else:
             messages.error(request, "Por favor corrige los errores en el formulario")
     else:
-        form = DocumentoForm(user=request.user, empresa=empresa, country=country)
+        # Preselección desde URL (ej. vuelta desde "crear vehículo" con cliente_id y vehiculo_id)
+        initial = {}
+        cliente_obj = None
+        vehiculo_obj = None
+        cliente_id_raw = request.GET.get("cliente_id", "").strip()
+        vehiculo_id_raw = request.GET.get("vehiculo_id", "").strip()
+
+        if cliente_id_raw:
+            try:
+                cliente_obj = Cliente.objects.filter(
+                    pk=int(cliente_id_raw), empresa=empresa
+                ).first()
+                if cliente_obj:
+                    initial["cliente"] = cliente_obj.pk
+            except (ValueError, TypeError):
+                pass
+        if vehiculo_id_raw:
+            try:
+                vehiculo_obj = Vehiculo.objects.filter(
+                    pk=int(vehiculo_id_raw), empresa=empresa
+                ).first()
+                if vehiculo_obj:
+                    # Solo preseleccionar si pertenece al cliente (si hay cliente)
+                    if (
+                        cliente_obj is None
+                        or getattr(vehiculo_obj, "cliente_id", None) == cliente_obj.pk
+                    ):
+                        initial["vehiculo"] = vehiculo_obj.pk
+                    else:
+                        vehiculo_obj = None  # No preseleccionar vehículo de otro cliente
+            except (ValueError, TypeError):
+                pass
+
+        form = DocumentoForm(
+            user=request.user,
+            empresa=empresa,
+            country=country,
+            initial=initial if initial else None,
+        )
         if "tecnico_responsable" in form.fields:
             form.fields["tecnico_responsable"].label = responsable_label
             form.fields["tecnico_responsable"].queryset = tecnicos_qs
@@ -217,6 +259,12 @@ def documento_crear(request, country_code="cl", lang_code="es"):
     # Obtener técnicos para el template
     tecnicos = tecnicos_qs
 
+    cliente_preselect_id = cliente_obj.pk if cliente_obj else ""
+    vehiculo_preselect_id = vehiculo_obj.pk if vehiculo_obj else ""
+    cliente_preselect_nombre = (cliente_obj.nombre or "") if cliente_obj else ""
+    if cliente_obj and getattr(cliente_obj, "apellido", None):
+        cliente_preselect_nombre = f"{cliente_preselect_nombre} {cliente_obj.apellido}".strip()
+
     context = {
         "form": form,
         "titulo_pagina": "Crear documento",
@@ -230,6 +278,13 @@ def documento_crear(request, country_code="cl", lang_code="es"):
         "company_country": country,
         "responsable_label": responsable_label,
         "ui_config": ui_config,
+        "cliente_preselect_id": cliente_preselect_id,
+        "vehiculo_preselect_id": vehiculo_preselect_id,
+        "cliente_preselect_nombre": cliente_preselect_nombre or "",
+        "cliente_preselect_email": getattr(cliente_obj, "email", "") or "" if cliente_obj else "",
+        "cliente_preselect_telefono": (
+            getattr(cliente_obj, "telefono", "") or "" if cliente_obj else ""
+        ),
     }
 
     return render(request, template.template.name, context)
@@ -350,6 +405,11 @@ def documento_editar(request, pk, country_code="cl", lang_code="es"):
         "company_country": country,
         "responsable_label": responsable_label,
         "ui_config": ui_config,
+        "cliente_preselect_id": "",
+        "vehiculo_preselect_id": "",
+        "cliente_preselect_nombre": "",
+        "cliente_preselect_email": "",
+        "cliente_preselect_telefono": "",
     }
 
     return render(request, template.template.name, context)

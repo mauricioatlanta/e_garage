@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.core.cache import cache
 
 from taller.models import ConfiguracionEmpresa
@@ -13,7 +15,10 @@ def company_header(request):
     data = cache.get(cache_key)
     if not data:
         try:
-            cfg, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
+            cfg, _ = ConfiguracionEmpresa.objects.get_or_create(
+                empresa=empresa,
+                defaults={"sales_tax_rate": Decimal("0")},
+            )
             data = {
                 "COMPANY_ID": empresa.id,
                 "COMPANY_NAME": cfg.nombre_publico or getattr(empresa, "nombre", "eGarage"),

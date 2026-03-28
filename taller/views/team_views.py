@@ -18,7 +18,6 @@ from django.core.mail import EmailMultiAlternatives
 from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect
 from django.template.loader import render_to_string
-from django.urls import reverse_lazy
 from django.utils.html import strip_tags
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 
@@ -26,8 +25,16 @@ from taller.auth.decorators_role import RoleRequiredMixin
 from taller.forms.team_forms import TeamMemberForm, TeamMemberDeactivateForm
 from taller.models.team_member import TeamMember
 from taller.models.empresa import Empresa
+from taller.templatetags.country_url import reverse_country_url
 
 log = logging.getLogger(__name__)
+
+
+class TeamListSuccessUrlMixin:
+    """Lista de equipo vive bajo namespace país (p. ej. chile:taller:team:), no 'team:' aislado."""
+
+    def get_success_url(self):
+        return reverse_country_url(self.request, "team:team_list")
 
 
 class TeamListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
@@ -88,7 +95,7 @@ class TeamListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
         return context
 
 
-class TeamCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
+class TeamCreateView(TeamListSuccessUrlMixin, LoginRequiredMixin, RoleRequiredMixin, CreateView):
     """
     Crear nuevo miembro del equipo.
 
@@ -97,7 +104,6 @@ class TeamCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
 
     form_class = TeamMemberForm
     template_name = "taller/team/team_form.html"
-    success_url = reverse_lazy("team:team_list")
     allowed_roles = ["Owner"]
     permission_denied_message = "Solo el dueño puede crear nuevos miembros del equipo."
 
@@ -152,7 +158,7 @@ class TeamCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
             messages.error(self.request, f"❌ Error al crear miembro del equipo: {str(e)}")
             return self.form_invalid(form)
 
-        return redirect(self.success_url)
+        return redirect(self.get_success_url())
 
     def enviar_email_bienvenida(self, team_member, password):
         """
@@ -232,7 +238,7 @@ class TeamCreateView(LoginRequiredMixin, RoleRequiredMixin, CreateView):
             raise  # Re-raise para que el caller sepa que falló
 
 
-class TeamUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
+class TeamUpdateView(TeamListSuccessUrlMixin, LoginRequiredMixin, RoleRequiredMixin, UpdateView):
     """
     Editar miembro del equipo existente.
 
@@ -242,7 +248,6 @@ class TeamUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
     model = TeamMember
     form_class = TeamMemberForm
     template_name = "taller/team/team_form.html"
-    success_url = reverse_lazy("team:team_list")
     allowed_roles = ["Owner"]
     permission_denied_message = "Solo el dueño puede editar miembros del equipo."
 
@@ -281,10 +286,10 @@ class TeamUpdateView(LoginRequiredMixin, RoleRequiredMixin, UpdateView):
             messages.error(self.request, f"❌ Error al actualizar miembro del equipo: {str(e)}")
             return self.form_invalid(form)
 
-        return redirect(self.success_url)
+        return redirect(self.get_success_url())
 
 
-class TeamDeleteView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
+class TeamDeleteView(TeamListSuccessUrlMixin, LoginRequiredMixin, RoleRequiredMixin, DeleteView):
     """
     Desactivar (soft delete) miembro del equipo.
 
@@ -295,7 +300,6 @@ class TeamDeleteView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
 
     model = TeamMember
     template_name = "taller/team/team_confirm_delete.html"
-    success_url = reverse_lazy("team:team_list")
     allowed_roles = ["Owner"]
     permission_denied_message = "Solo el dueño puede desactivar miembros del equipo."
 
@@ -314,7 +318,7 @@ class TeamDeleteView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
         # No permitir desactivar al Owner (usuario principal)
         if team_member.user == team_member.empresa.user:
             messages.error(request, "❌ No se puede desactivar al dueño del taller.")
-            return redirect(self.success_url)
+            return redirect(self.get_success_url())
 
         try:
             with transaction.atomic():
@@ -334,10 +338,12 @@ class TeamDeleteView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
             log.error(f"[TeamManagement] Error desactivando miembro del equipo: {e}", exc_info=True)
             messages.error(request, f"❌ Error al desactivar miembro del equipo: {str(e)}")
 
-        return redirect(self.success_url)
+        return redirect(self.get_success_url())
 
 
-class TeamReactivateView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
+class TeamReactivateView(
+    TeamListSuccessUrlMixin, LoginRequiredMixin, RoleRequiredMixin, DeleteView
+):
     """
     Reactivar miembro del equipo desactivado.
 
@@ -345,7 +351,6 @@ class TeamReactivateView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
     """
 
     model = TeamMember
-    success_url = reverse_lazy("team:team_list")
     allowed_roles = ["Owner"]
     permission_denied_message = "Solo el dueño puede reactivar miembros del equipo."
 
@@ -379,4 +384,4 @@ class TeamReactivateView(LoginRequiredMixin, RoleRequiredMixin, DeleteView):
             log.error(f"[TeamManagement] Error reactivando miembro del equipo: {e}", exc_info=True)
             messages.error(request, f"❌ Error al reactivar miembro del equipo: {str(e)}")
 
-        return redirect(self.success_url)
+        return redirect(self.get_success_url())

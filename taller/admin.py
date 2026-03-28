@@ -11,6 +11,7 @@ from taller.models.comprobante_pago import ComprobantePago
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario
+from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
 from taller.models.precio_suscripcion import PrecioSuscripcion
 from taller.models.tecnico import Tecnico
 
@@ -370,6 +371,39 @@ class TecnicoAdmin(admin.ModelAdmin):
     list_filter = ("empresa",)
     search_fields = ("nombre",)
     list_editable = ()
+
+
+@admin.register(PiezaDesarme, site=admin_site)
+class PiezaDesarmeAdmin(admin.ModelAdmin):
+    list_display = (
+        "codigo",
+        "nombre",
+        "vehiculo",
+        "cantidad",
+        "estado_pieza",
+        "activo",
+        "empresa",
+    )
+    list_filter = ("empresa", "estado_pieza", "activo")
+    search_fields = ("codigo", "nombre")
+    list_select_related = ("vehiculo", "empresa")
+    raw_id_fields = ("vehiculo", "repuesto", "part")
+    ordering = ("-created_at",)
+
+
+@admin.register(PiezaDesarmeCompanyLabel, site=admin_site)
+class PiezaDesarmeCompanyLabelAdmin(admin.ModelAdmin):
+    list_display = ("empresa", "pieza_desarme", "language", "label", "is_preferred", "updated_at")
+    list_filter = ("empresa", "language")
+    search_fields = (
+        "empresa__nombre_taller",
+        "pieza_desarme__codigo",
+        "pieza_desarme__nombre",
+        "label",
+    )
+    list_select_related = ("empresa", "pieza_desarme")
+    raw_id_fields = ("empresa", "pieza_desarme")
+    ordering = ("-updated_at",)
 
 
 # === ADMINISTRACIÓN DE SERVICIOS MULTILENGUAJE ===

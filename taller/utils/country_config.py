@@ -169,6 +169,34 @@ COUNTRY_SETTINGS = {
 DEFAULT_COUNTRY = getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl").upper()
 
 
+def build_bienvenida_url(country_code, request=None):
+    """
+    Construye URL de bienvenida con formato /{country}/{lang}/bienvenida/
+
+    El sistema usa URLs con idioma explícito; CountrySettings.build_url no lo incluye.
+    Usar SIEMPRE esta función para URLs de bienvenida, nunca build_url con "bienvenida/".
+
+    Args:
+        country_code: Código de país (CL, US, MX, etc.)
+        request: HttpRequest opcional para URL absoluta
+
+    Returns:
+        str: /cl/es/bienvenida/, /us/en/bienvenida/, etc.
+    """
+    country_code = (country_code or "CL").upper()
+    config = get_country_config(country_code)
+    lang = config.get("lang", "es")
+    if lang == "pt-br":
+        lang = "pt"
+    path = f"/{country_code.lower()}/{lang}/bienvenida/"
+    if request:
+        try:
+            return request.build_absolute_uri(path)
+        except Exception:
+            pass
+    return path
+
+
 def get_country_config(country_code):
     """
     Obtiene configuración completa de un país.

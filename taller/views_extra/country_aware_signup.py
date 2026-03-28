@@ -77,15 +77,15 @@ class CountryAwareSignupView:
                 activate("en")
                 request.session["django_language"] = "en"
                 # Redirigir a signup con template de USA
-                return redirect(f"/us/en/accounts/signup/?from=us")
+                return redirect("/us/en/accounts/signup/")
             elif country == "MX":
                 activate("es")
                 request.session["django_language"] = "es"
-                return redirect(f"/mx/es/accounts/signup/?from=mx")
+                return redirect("/mx/es/accounts/signup/")
             else:  # CL u otros países en español
                 activate("es")
                 request.session["django_language"] = "es"
-                return redirect(f"/cl/es/accounts/signup/?from=cl")
+                return redirect("/cl/es/accounts/signup/")
 
         return view
 

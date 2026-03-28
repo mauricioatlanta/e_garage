@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load i18n humanize %}
+
+{% block title %}Pago suscripción — {{ empresa.nombre_taller|default:"eGarage" }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 py-8">
+  <div class="rounded-2xl border-2 border-cyan-500/40 bg-slate-900/90 shadow-[0_0_40px_rgba(34,211,238,0.15)] overflow-hidden">
+    <div class="bg-gradient-to-r from-cyan-900/80 to-slate-900 px-6 py-5 border-b border-cyan-500/30">
+      <h1 class="text-2xl font-bold text-cyan-200 tracking-tight">Pago por transferencia (Chile)</h1>
+      <p class="text-cyan-100/80 text-sm mt-1">{{ empresa.nombre_taller }}</p>
+    </div>
+    <div class="p-6 space-y-6 text-gray-100">
+      <section class="rounded-xl bg-slate-800/60 border border-cyan-500/20 p-4">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-cyan-300 mb-3">Plan seleccionado</h2>
+        <p class="text-lg font-bold text-white">{{ plan_info.nombre }}</p>
+        <p class="text-2xl font-black text-cyan-300 mt-2">${{ monto_pagar|intcomma }} <span class="text-sm font-normal text-gray-400">CLP</span></p>
+        <p class="text-xs text-gray-400 mt-2">Referencia obligatoria en la transferencia: <code class="bg-slate-950 px-2 py-1 rounded text-cyan-200">{{ referencia }}</code></p>
+      </section>
+
+      <section class="rounded-xl bg-white text-slate-900 p-5 border border-cyan-600/30 shadow-inner">
+        <h2 class="text-sm font-semibold uppercase tracking-wide text-cyan-800 mb-4">Datos para transferir</h2>
+        <dl class="space-y-3 text-sm">
+          <div class="flex justify-between gap-4 border-b border-slate-200 pb-2">
+            <dt class="text-slate-600">Banco</dt>
+            <dd class="font-semibold text-right">{{ datos_banco.banco }}</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-slate-200 pb-2">
+            <dt class="text-slate-600">Tipo de cuenta</dt>
+            <dd class="font-semibold text-right">{{ datos_banco.tipo_cuenta }}</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-slate-200 pb-2">
+            <dt class="text-slate-600">Titular</dt>
+            <dd class="font-semibold text-right">{{ datos_banco.titular }}</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-slate-200 pb-2">
+            <dt class="text-slate-600">RUT</dt>
+            <dd class="font-mono font-semibold text-right">{{ datos_banco.rut }}</dd>
+          </div>
+          <div class="flex justify-between gap-4 border-b border-slate-200 pb-2">
+            <dt class="text-slate-600">Número de cuenta</dt>
+            <dd class="font-mono font-semibold text-right">{{ datos_banco.numero_cuenta }}</dd>
+          </div>
+          <div class="flex justify-between gap-4">
+            <dt class="text-slate-600">Confirmación</dt>
+            <dd class="font-semibold text-right break-all">{{ datos_banco.email_confirmacion }}</dd>
+          </div>
+        </dl>
+      </section>
+
+      <p class="text-sm text-gray-400">
+        Después de transferir, sube tu comprobante para acelerar la activación de tu plan.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="{% url 'subir_comprobante' %}"
+           class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-cyan-600 hover:bg-cyan-500 text-white font-semibold text-sm transition-colors">
+          Subir comprobante
+        </a>
+        <a href="{% url 'chile:dashboard' %}"
+           class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg border border-cyan-500/50 text-cyan-200 hover:bg-cyan-950/50 text-sm font-medium transition-colors">
+          Volver al panel
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

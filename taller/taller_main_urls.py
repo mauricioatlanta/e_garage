@@ -9,6 +9,15 @@ from django.views.generic import TemplateView
 
 from taller.views_extra.bienvenida_usa import bienvenida_usa
 from taller.views_extra.landing_chile import landing_chile
+from taller.views_extra.us_views import (
+    api_calcular_impuestos_usa,
+    api_ciudades_por_estado,
+    api_estados_usa,
+    api_marcas_vehiculos_usa,
+    api_modelos_por_marca,
+    api_traducir_servicios,
+    cambiar_idioma,
+)
 
 from . import ajax_views  # Importar vistas AJAX para formularios jerárquicos
 from .taller_views import (
@@ -31,6 +40,12 @@ from .views_extra.views import dashboard
 from .views_extra.views_configuracion import (
     configuracion_empresa,
     configuracion_tecnicos,
+)
+from .views.onboarding_views import (
+    onboarding_wizard,
+    onboarding_guardar_paso,
+    onboarding_agregar_tecnico,
+    onboarding_preview_documento,
 )
 
 app_name = "taller"
@@ -187,21 +202,16 @@ from taller.views_extra.demo_publico import (
 )
 
 # URLs USA
-from taller.views_extra.us_views import (
-    USLocalizationView,
-    api_calcular_impuestos_usa,
-    api_ciudades_por_estado,
-    api_estados_usa,
-    api_marcas_vehiculos_usa,
-    api_modelos_por_marca,
-    api_traducir_servicios,
-    cambiar_idioma,
-    demo_atlanta_personalization,
+from taller.views.onboarding_views import (
+    onboarding_agregar_tecnico,
+    onboarding_guardar_paso,
+    onboarding_preview_documento,
+    onboarding_wizard,
 )
 
 us_patterns = [
-    path("demo-usa/", USLocalizationView.as_view(), name="demo_usa"),
-    path("demo-atlanta/", demo_atlanta_personalization, name="demo_atlanta"),
+    # path("demo-usa/", USLocalizationView.as_view(), name="demo_usa"),  # TODO: Importar USLocalizationView
+    # path("demo-atlanta/", demo_atlanta_personalization, name="demo_atlanta"),  # TODO: Importar demo_atlanta_personalization
     path("demo/atlanta/", demo_atlanta_publico, name="demo_atlanta_publico"),
     path("demo/atlanta/quote/", demo_cotizacion_ajax, name="demo_atlanta_quote"),
     path(
@@ -247,6 +257,18 @@ us_patterns = [
         "ajax/load-motores-cajas/",
         ajax_views.load_motores_cajas,
         name="ajax_load_motores_cajas",
+    ),
+    # === ONBOARDING WIZARD ===
+    path("onboarding/", onboarding_wizard, name="onboarding_wizard"),
+    path("onboarding/<str:step>/", onboarding_wizard, name="onboarding_step"),
+    path("onboarding/guardar/<int:paso>/", onboarding_guardar_paso, name="onboarding_guardar_paso"),
+    path(
+        "onboarding/agregar-tecnico/", onboarding_agregar_tecnico, name="onboarding_agregar_tecnico"
+    ),
+    path(
+        "onboarding/preview-documento/",
+        onboarding_preview_documento,
+        name="onboarding_preview_documento",
     ),
 ]
 

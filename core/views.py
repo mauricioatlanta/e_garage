@@ -1,5 +1,10 @@
 from django.core.exceptions import PermissionDenied
 
+try:
+    from taller.utils.empresa import get_user_empresa_safe
+except ImportError:
+    get_user_empresa_safe = None
+
 
 class TenantViewMixin:
     select_related_fields: tuple[str, ...] = ()
@@ -11,7 +16,11 @@ class TenantViewMixin:
         if not self.request.user.is_authenticated:
             return self.model.objects.none()
 
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = (
+            get_user_empresa_safe(self.request.user)
+            if get_user_empresa_safe
+            else getattr(self.request.user, "empresa", None)
+        )
         if not empresa:
             return self.model.objects.none()
 
@@ -42,7 +51,11 @@ class TenantViewMixin:
 
     def form_valid(self, form):
         # BLINDAJE MULTI-TENANT: SIEMPRE asignar empresa del usuario
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = (
+            get_user_empresa_safe(self.request.user)
+            if get_user_empresa_safe
+            else getattr(self.request.user, "empresa", None)
+        )
         if not empresa:
             raise PermissionDenied("Usuario sin empresa asignada")
 

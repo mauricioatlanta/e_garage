@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.forms.repuesto import RepuestoForm
 from taller.models.repuesto import Repuesto
+from taller.templatetags.country_url import reverse_country_url
 
 
 @login_required
@@ -20,7 +21,7 @@ def crear_repuesto(request):
             repuesto = form.save(commit=False)
             repuesto.user = request.user
             repuesto.save()
-            return redirect("repuestos:lista_repuestos")
+            return redirect(reverse_country_url(request, "repuestos:lista_repuestos"))
     else:
         form = RepuestoForm()
     return render(request, "repuestos/crear_repuesto.html", {"form": form})

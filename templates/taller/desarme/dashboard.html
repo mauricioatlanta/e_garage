@@ -1,0 +1,327 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+{% load humanize %}
+
+{% block page_title %}{% trans "Desarme" %} – {% trans "Centro de Operaciones" %}{% endblock %}
+{% block page_subtitle %}{% trans "Yarda de desarmaduría · Gestión de vehículos y piezas" %}{% endblock %}
+{% block page_icon %}🧩{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  /* Navegación módulo: barra compacta, una sola franja con wrap */
+  .desarme-nav {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+    margin-bottom: 0.5rem;
+    margin-top: 0.35rem;
+    padding-top: 0.35rem;
+    border-top: 1px solid rgba(34, 211, 238, 0.12);
+  }
+  .desarme-nav a {
+    padding: 0.28rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1.2;
+    background: rgba(168, 85, 247, 0.18);
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    color: #d8b4fe;
+    text-decoration: none;
+    transition: border-color 0.15s, background 0.15s, color 0.15s;
+  }
+  .desarme-nav a:hover {
+    background: rgba(168, 85, 247, 0.32);
+    color: #f5e1ff;
+    border-color: rgba(168, 85, 247, 0.55);
+  }
+  .desarme-nav a.active {
+    background: linear-gradient(135deg, #6d28d9, #9333ea);
+    border-color: rgba(192, 132, 252, 0.6);
+    color: #fff;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 0.5rem;
+  }
+  .kpi-card {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(168, 85, 247, 0.28);
+    border-radius: 10px;
+    padding: 0.55rem 0.5rem;
+    text-align: center;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .kpi-card:hover {
+    border-color: rgba(168, 85, 247, 0.5);
+    box-shadow: 0 2px 14px rgba(168, 85, 247, 0.12);
+  }
+  .kpi-value {
+    font-size: 1.35rem;
+    font-weight: 800;
+    color: #c084fc;
+    line-height: 1.15;
+  }
+  .kpi-label {
+    font-size: 0.65rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 0.15rem;
+  }
+  .chart-box {
+    background: rgba(0, 0, 0, 0.28);
+    border: 1px solid rgba(168, 85, 247, 0.22);
+    border-radius: 10px;
+    padding: 0.65rem 0.75rem;
+    margin-bottom: 0.5rem;
+  }
+  .chart-box h3 {
+    font-size: 0.8rem;
+    color: #c084fc;
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+  }
+  .chart-box .chart-canvas-wrap {
+    position: relative;
+    height: 130px;
+    max-height: 140px;
+  }
+  .chart-box canvas {
+    max-height: 140px;
+  }
+  .desarme-table {
+    width: 100%;
+    font-size: 0.8125rem;
+  }
+  .desarme-table th {
+    text-align: left;
+    padding: 0.35rem 0.5rem;
+    color: #94a3b8;
+    font-weight: 500;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .desarme-table td {
+    padding: 0.35rem 0.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .desarme-table tr:hover td {
+    background: rgba(168, 85, 247, 0.05);
+  }
+  .desarme-table a {
+    color: #67e8f9;
+  }
+  .desarme-table a:hover {
+    text-decoration: underline;
+  }
+  .badge-mini {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 9999px;
+  }
+  .badge-mini.disp { background: rgba(34, 197, 94, 0.3); color: #86efac; }
+  .badge-mini.rese { background: rgba(234, 179, 8, 0.3); color: #fde047; }
+  .badge-mini.vend { background: rgba(59, 130, 246, 0.3); color: #93c5fd; }
+  .badge-mini.dana { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
+  .badge-mini.scra { background: rgba(107, 114, 128, 0.4); color: #d1d5db; }
+  .section-title {
+    font-size: 0.85rem;
+    color: #e2e8f0;
+    margin-bottom: 0.45rem;
+    margin-top: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    font-weight: 600;
+  }
+  .empty-chart {
+    color: #64748b;
+    font-size: 0.8rem;
+    padding: 1rem;
+    text-align: center;
+  }
+  .desarme-dash-subtitle {
+    display: block;
+  }
+  @media (max-width: 480px) {
+    .desarme-dash-subtitle {
+      display: none;
+    }
+  }
+  .desarme-dash-actions a {
+    padding-top: 0.35rem;
+    padding-bottom: 0.35rem;
+    font-size: 0.75rem;
+  }
+</style>
+{% endblock %}
+
+{% block main_actions %}
+<div class="desarme-dash-actions flex flex-wrap gap-1.5">
+  <a href="{% country_url 'desarme:crear_vehiculo' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-xs font-semibold">
+    ➕ {% trans "Nuevo vehículo" %}
+  </a>
+  <a href="{% country_url 'desarme:crear_pieza' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-cyan-600/85 hover:bg-cyan-500 text-white text-xs font-semibold">
+    📦 {% trans "Nueva pieza" %}
+  </a>
+</div>
+{% endblock %}
+
+{% block page_stats %}
+<div class="desarme-nav">
+  <a href="{% country_url 'desarme:index' %}" class="active">{% trans "Dashboard" %}</a>
+  <a href="{% country_url 'desarme:lista_vehiculos' %}">🚗 {% trans "Vehículos" %}</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}">📦 {% trans "Piezas" %}</a>
+</div>
+<div class="kpi-grid">
+  <div class="kpi-card"><div class="kpi-value">{{ total_vehiculos }}</div><div class="kpi-label">{% trans "Vehículos" %}</div></div>
+  <div class="kpi-card"><div class="kpi-value">{{ total_piezas }}</div><div class="kpi-label">{% trans "Piezas" %}</div></div>
+  <div class="kpi-card"><div class="kpi-value">{{ piezas_activas }}</div><div class="kpi-label">{% trans "Activas" %}</div></div>
+  <div class="kpi-card"><div class="kpi-value">
+    {% if request.path|slice:":4" == "/us/" %}
+      ${{ inventario_valor|floatformat:2|intcomma }}
+    {% else %}
+      ${{ inventario_valor|floatformat:0|intcomma }}
+    {% endif %}
+  </div><div class="kpi-label">{% trans "Inventario" %}</div></div>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
+  <div>
+    <div class="chart-box">
+      <h3>📊 {% trans "Piezas por estado" %}</h3>
+      {% if chart_piezas_estado %}
+      <div class="chart-canvas-wrap">
+        <canvas id="chartPiezasEstado"></canvas>
+      </div>
+      {% else %}
+      <div class="empty-chart">{% trans "Sin datos para graficar" %}</div>
+      {% endif %}
+    </div>
+  </div>
+  <div>
+    <div class="chart-box">
+      <h3>📈 {% trans "Vehículos por mes (ingresos)" %}</h3>
+      {% if chart_vehiculos_mes %}
+      <div class="chart-canvas-wrap">
+        <canvas id="chartVehiculosMes"></canvas>
+      </div>
+      {% else %}
+      <div class="empty-chart">{% trans "Sin ingresos en los últimos 6 meses" %}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="section-title">📋 {% trans "Actividad reciente" %}</div>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
+  <div class="chart-box">
+    <h3>🚗 {% trans "Últimos vehículos" %}</h3>
+    {% if ultimos_vehiculos %}
+    <table class="desarme-table">
+      <thead><tr><th>{% trans "Patente/VIN" %}</th><th>{% trans "Marca/Modelo" %}</th><th>{% trans "Piezas" %}</th><th></th></tr></thead>
+      <tbody>
+      {% for v in ultimos_vehiculos %}
+      <tr>
+        <td><strong>{{ v.patente|default:v.vin|default:"—" }}</strong></td>
+        <td>{{ v.get_marca_display|default:"-" }} {{ v.get_modelo_display|default:"" }}</td>
+        <td>{{ v.piezas_count }}</td>
+        <td>
+          <a href="{% country_url 'desarme:ver_vehiculo' v.pk %}">{% trans "Ver" %}</a> ·
+          <a href="{% country_url 'desarme:inventario_vehiculo' v.pk %}">📦</a>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% country_url 'desarme:lista_vehiculos' %}" class="text-cyan-400 hover:text-cyan-300 text-xs mt-1.5 inline-block">{% trans "Ver todos" %} →</a>
+    {% else %}
+    <div class="empty-chart">{% trans "No hay vehículos" %}</div>
+    <a href="{% country_url 'desarme:crear_vehiculo' %}" class="text-cyan-400 hover:text-cyan-300 text-xs">{% trans "Crear el primero" %}</a>
+    {% endif %}
+  </div>
+  <div class="chart-box">
+    <h3>📦 {% trans "Últimas piezas" %}</h3>
+    {% if ultimas_piezas %}
+    <table class="desarme-table">
+      <thead><tr><th>{% trans "Código" %}</th><th>{% trans "Nombre" %}</th><th>{% trans "Estado" %}</th><th></th></tr></thead>
+      <tbody>
+      {% for p in ultimas_piezas %}
+      <tr>
+        <td><strong>{{ p.codigo }}</strong></td>
+        <td>{{ p.nombre|truncatechars:25 }}</td>
+        <td><span class="badge-mini {{ p.estado_pieza|lower|slice:":4" }}">{{ p.get_estado_pieza_display }}</span></td>
+        <td><a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ p.vehiculo_id }}">{{ p.vehiculo.patente|default:p.vehiculo.vin|default:"" }}</a></td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <a href="{% country_url 'desarme:lista_piezas' %}" class="text-cyan-400 hover:text-cyan-300 text-xs mt-1.5 inline-block">{% trans "Ver todas" %} →</a>
+    {% else %}
+    <div class="empty-chart">{% trans "No hay piezas registradas" %}</div>
+    <a href="{% country_url 'desarme:crear_pieza' %}" class="text-cyan-400 hover:text-cyan-300 text-xs">{% trans "Registrar la primera" %}</a>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+
+{% block page_extra_js %}
+{% if chart_piezas_estado or chart_vehiculos_mes %}
+{{ chart_piezas_estado|json_script:"chartPiezasData" }}
+{{ chart_vehiculos_mes|json_script:"chartVehiculosData" }}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const colorsRgba = ['rgba(34, 197, 94, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(107, 114, 128, 0.8)'];
+
+  var elPie = document.getElementById('chartPiezasData');
+  if (elPie) {
+    var data = JSON.parse(elPie.textContent);
+    var ctxPie = document.getElementById('chartPiezasEstado');
+    if (ctxPie && data && data.length > 0) {
+      new Chart(ctxPie, {
+        type: 'doughnut',
+        data: {
+          labels: data.map(function(d) { return d.label; }),
+          datasets: [{ data: data.map(function(d) { return d.count; }), backgroundColor: colorsRgba, borderColor: '#1e293b', borderWidth: 2 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
+        }
+      });
+    }
+  }
+
+  var elBar = document.getElementById('chartVehiculosData');
+  if (elBar) {
+    var dataBar = JSON.parse(elBar.textContent);
+    var ctxBar = document.getElementById('chartVehiculosMes');
+    if (ctxBar && dataBar && dataBar.length > 0) {
+      new Chart(ctxBar, {
+        type: 'bar',
+        data: {
+          labels: dataBar.map(function(d) { return d.mes; }),
+          datasets: [{ label: 'Vehículos', data: dataBar.map(function(d) { return d.count; }), backgroundColor: 'rgba(168, 85, 247, 0.7)', borderColor: '#a855f7', borderWidth: 1 }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: { y: { beginAtZero: true, ticks: { color: '#94a3b8', font: { size: 10 } } }, x: { ticks: { color: '#94a3b8', font: { size: 9 }, maxRotation: 45 } } },
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+  }
+});
+</script>
+{% endif %}
+{% endblock %}

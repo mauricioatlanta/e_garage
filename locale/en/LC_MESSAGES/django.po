@@ -80,6 +80,12 @@ msgstr "Satisfacción de clientes"
 msgid "Language"
 msgstr "Idioma"
 
+msgid "Agregar nuevo color..."
+msgstr "Add new color..."
+
+msgid "Add new body type..."
+msgstr "Add new body type..."
+
 msgid "Start Now"
 msgstr "Start Now"
 
@@ -154,3 +160,82 @@ msgstr "Soporte bilingüe y migración rápida. Ideal para talleres que crecen."
 
 msgid "The free trial convinced us. Now everything is digital and customers notice."
 msgstr "La prueba gratis nos convenció. Hoy todo es digital y los clientes lo notan."
+
+# Desarme / disassembly (USA i18n)
+msgid "Vehículos para desarme (yarda)"
+msgstr "Disassembly vehicles (yard)"
+
+msgid "Nuevo vehículo desarme"
+msgstr "New disassembly vehicle"
+
+msgid "Todos los estados"
+msgstr "All statuses"
+
+msgid "Vehículos"
+msgstr "Vehicles"
+
+msgid "Piezas"
+msgstr "Parts"
+
+msgid "Inventario"
+msgstr "Inventory"
+
+msgid "Ver"
+msgstr "View"
+
+msgid "Editar"
+msgstr "Edit"
+
+msgid "Buscar"
+msgstr "Search"
+
+msgid "Limpiar"
+msgstr "Clear"
+
+msgid "Ganancia"
+msgstr "Profit"
+
+msgid "En yarda"
+msgstr "In yard"
+
+msgid "piezas"
+msgstr "parts"
+
+msgid "Piezas registradas"
+msgstr "Registered parts"
+
+msgid "No hay vehículos de desarme."
+msgstr "No disassembly vehicles yet."
+
+msgid "No hay resultados con los filtros aplicados."
+msgstr "No results match the selected filters."
+
+msgid "Crear el primero"
+msgstr "Create the first one"
+
+msgid "Ver todos"
+msgstr "View all"
+
+msgid "Buscar por patente, VIN, marca, modelo..."
+msgstr "Search by plate, VIN, make, model..."
+
+msgid "Dashboard"
+msgstr "Dashboard"
+
+msgid "---------"
+msgstr "---------"
+
+msgid "In process"
+msgstr "In process"
+
+msgid "Completed"
+msgstr "Completed"
+
+msgid "Sold"
+msgstr "Sold"
+
+msgid "Disposed"
+msgstr "Disposed"
+
+msgid "Auto-saved"
+msgstr "Auto-saved"

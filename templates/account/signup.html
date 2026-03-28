@@ -43,6 +43,7 @@ body {
     max-width: 900px;
     margin: 40px auto;
     padding: 20px;
+    color-scheme: dark;
 }
 
 .glass-card {
@@ -147,9 +148,11 @@ form textarea {
     padding: 14px 16px;
     font-size: 15px;
     font-family: 'Inter', sans-serif;
-    color: #ffffff !important;
-    background: rgba(0, 0, 0, 0.7) !important;
-    background-color: rgba(0, 0, 0, 0.7) !important;
+    color: #f1f5f9 !important;
+    -webkit-text-fill-color: #f1f5f9 !important;
+    caret-color: #22d3ee;
+    background: #0f172a !important;
+    background-color: #0f172a !important;
     border: 2px solid rgba(34, 211, 238, 0.5) !important;
     border-radius: 10px;
     transition: all 0.3s;
@@ -177,8 +180,8 @@ form select:focus,
 form textarea:focus {
     outline: none !important;
     border-color: #22d3ee !important;
-    background: rgba(0, 0, 0, 0.9) !important;
-    background-color: rgba(0, 0, 0, 0.9) !important;
+    background: #020617 !important;
+    background-color: #020617 !important;
     box-shadow: 0 0 25px rgba(34, 211, 238, 0.6), inset 0 0 10px rgba(34, 211, 238, 0.1) !important;
     transform: translateY(-1px);
 }
@@ -222,9 +225,9 @@ select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus,
 select:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px rgba(0, 0, 0, 0.7) inset !important;
-    -webkit-text-fill-color: #ffffff !important;
-    background-color: rgba(0, 0, 0, 0.7) !important;
+    -webkit-box-shadow: 0 0 0 30px #0f172a inset !important;
+    -webkit-text-fill-color: #f1f5f9 !important;
+    background-color: #0f172a !important;
     border-color: rgba(34, 211, 238, 0.5) !important;
 }
 
@@ -435,9 +438,11 @@ form textarea,
 .glass-card input,
 .glass-card select,
 .glass-card textarea {
-    background: rgba(0, 0, 0, 0.7) !important;
-    background-color: rgba(0, 0, 0, 0.7) !important;
-    color: #ffffff !important;
+    background: #0f172a !important;
+    background-color: #0f172a !important;
+    color: #f1f5f9 !important;
+    -webkit-text-fill-color: #f1f5f9 !important;
+    caret-color: #22d3ee;
     border: 2px solid rgba(34, 211, 238, 0.5) !important;
 }
 
@@ -450,8 +455,8 @@ form textarea:focus,
 .glass-card input:focus,
 .glass-card select:focus,
 .glass-card textarea:focus {
-    background: rgba(0, 0, 0, 0.9) !important;
-    background-color: rgba(0, 0, 0, 0.9) !important;
+    background: #020617 !important;
+    background-color: #020617 !important;
     border-color: #22d3ee !important;
     box-shadow: 0 0 25px rgba(34, 211, 238, 0.6), inset 0 0 10px rgba(34, 211, 238, 0.1) !important;
 }
@@ -460,31 +465,6 @@ form textarea:focus,
 .form-label {
     text-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
     font-weight: 700;
-}
-
-/* Estilos para mensajes de éxito/error */
-.messages {
-    margin-bottom: 24px;
-}
-
-.alert {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 12px;
-    font-weight: 500;
-}
-
-.alert-success {
-    background: rgba(34, 211, 238, 0.15);
-    color: #22d3ee;
-    border-left: 4px solid #22d3ee;
-}
-
-.alert-error,
-.alert-danger {
-    background: rgba(248, 113, 113, 0.15);
-    color: #f87171;
-    border-left: 4px solid #f87171;
 }
 
 /* Mejorar contraste de las tarjetas de planes */
@@ -514,8 +494,9 @@ textarea,
 #signup-form input,
 #signup-form select,
 #signup-form textarea {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
+    color: #f1f5f9 !important;
+    -webkit-text-fill-color: #f1f5f9 !important;
+    caret-color: #22d3ee;
     font-weight: 500;
 }
 
@@ -541,9 +522,11 @@ select[name="country"] {
     background-repeat: no-repeat !important;
     background-position: right 16px center !important;
     background-size: 12px !important;
+    background-color: #0f172a !important;
     padding-right: 40px !important;
     cursor: pointer;
-    color: #ffffff !important;
+    color: #f1f5f9 !important;
+    -webkit-text-fill-color: #f1f5f9 !important;
 }
 
 @media (max-width: 768px) {
@@ -571,24 +554,6 @@ select[name="country"] {
     <div class="glass-card">
         <h2 class="signup-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Crea Tu Cuenta{% else %}{% trans "Create Your Account" %}{% endif %}</h2>
 
-        <!-- Mensajes -->
-        {% if messages %}
-        <div class="messages">
-            {% for message in messages %}
-            <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-        
-        <!-- Errores generales del formulario -->
-        {% if form.non_field_errors %}
-        <div class="messages">
-            {% for error in form.non_field_errors %}
-            <div class="alert alert-error">{{ error }}</div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
         <form method="POST" id="signup-form">
             {% csrf_token %}
 
@@ -604,17 +569,11 @@ select[name="country"] {
                 <div class="form-group">
                     <label class="form-label">{{ form.country.label }}</label>
                     {{ form.country }}
-                    {% if form.country.errors %}
-                    <div class="error-message">{{ form.country.errors }}</div>
-                    {% endif %}
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">{{ form.email.label }} *</label>
                     {{ form.email }}
-                    {% if form.email.errors %}
-                    <div class="error-message">{{ form.email.errors }}</div>
-                    {% endif %}
                     {% if form.email.help_text %}
                     <div class="help-text">{{ form.email.help_text }}</div>
                     {% endif %}
@@ -624,9 +583,6 @@ select[name="country"] {
                     <label class="form-label">{{ form.telefono.label }} *</label>
                     {{ form.telefono }}
                     <div id="telefono-error" class="error-message" style="display: none;"></div>
-                    {% if form.telefono.errors %}
-                    <div class="error-message">{{ form.telefono.errors }}</div>
-                    {% endif %}
                     {% if form.telefono.help_text %}
                     <div class="help-text">{{ form.telefono.help_text }}</div>
                     {% endif %}
@@ -645,9 +601,6 @@ select[name="country"] {
                     {% if form.password1.help_text %}
                     <div class="help-text">{{ form.password1.help_text }}</div>
                     {% endif %}
-                    {% if form.password1.errors %}
-                    <div class="error-message">{{ form.password1.errors }}</div>
-                    {% endif %}
                 </div>
 
                 <div class="form-group">
@@ -656,9 +609,6 @@ select[name="country"] {
                         {{ form.password2 }}
                         <button type="button" class="password-toggle" onclick="togglePassword('id_password2')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 8px;">👁️</button>
                     </div>
-                    {% if form.password2.errors %}
-                    <div class="error-message">{{ form.password2.errors }}</div>
-                    {% endif %}
                 </div>
             </div>
 
@@ -789,12 +739,6 @@ select[name="country"] {
                 <input type="hidden" name="plan" id="id_plan" value="trial">
             </div>
 
-
-
-            <!-- Errores generales -->
-            {% if form.non_field_errors %}
-            <div class="error-message">{{ form.non_field_errors }}</div>
-            {% endif %}
 
             <!-- Botón Submit -->
             <button type="submit" class="signup-button">

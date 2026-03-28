@@ -5,12 +5,23 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
 from django.utils import timezone
 
+from taller.models.empresa import Empresa
+
 
 @login_required
 def payment_chile(request):
     """
     Página de pago para Chile - Transferencia Bancaria
     """
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        messages.error(
+            request,
+            "No hay una empresa asociada a tu cuenta. Completa el registro o contacta soporte.",
+        )
+        return redirect("chile:dashboard")
+
     plan = request.GET.get("plan", "mensual")
 
     # Configuración de precios
@@ -33,12 +44,12 @@ def payment_chile(request):
     }
 
     context = {
-        "empresa": request.user.empresa,
+        "empresa": empresa,
         "plan": plan,
         "plan_info": plan_info,
         "datos_banco": datos_banco,
         "monto_pagar": plan_info["valor"],
-        "referencia": f"eGarage-{request.user.empresa.id}-{plan}",
+        "referencia": f"eGarage-{empresa.id}-{plan}",
     }
 
     return render(request, "saas/suscripcion/pago_chile.html", context)
@@ -49,6 +60,15 @@ def payment_mexico(request):
     """
     Página de pago para México - Transferencia Bancaria
     """
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        messages.error(
+            request,
+            "No hay una empresa asociada a tu cuenta. Completa el registro o contacta soporte.",
+        )
+        return redirect("mexico:dashboard_mexico")
+
     plan = request.GET.get("plan", "mensual")
 
     precios = {
@@ -69,12 +89,12 @@ def payment_mexico(request):
     }
 
     context = {
-        "empresa": request.user.empresa,
+        "empresa": empresa,
         "plan": plan,
         "plan_info": plan_info,
         "datos_banco": datos_banco,
         "monto_pagar": plan_info["valor"],
-        "referencia": f"eGarage-MX-{request.user.empresa.id}-{plan}",
+        "referencia": f"eGarage-MX-{empresa.id}-{plan}",
     }
 
     return render(request, "saas/suscripcion/pago_mexico.html", context)
@@ -85,6 +105,15 @@ def payment_usa(request):
     """
     Página de pago para USA - PayPal
     """
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
+        messages.error(
+            request,
+            "No hay una empresa asociada a tu cuenta. Completa el registro o contacta soporte.",
+        )
+        return redirect("usa:dashboard")
+
     plan = request.GET.get("plan", "mensual")
     amount = request.GET.get("amount", "20")
 
@@ -109,12 +138,12 @@ def payment_usa(request):
     }
 
     context = {
-        "empresa": request.user.empresa,
+        "empresa": empresa,
         "plan": plan,
         "plan_info": plan_info,
         "paypal_config": paypal_config,
         "amount": plan_info["valor"],
-        "reference": f"eGarage-{request.user.empresa.id}-{plan}",
+        "reference": f"eGarage-{empresa.id}-{plan}",
     }
 
     return render(request, "saas/suscripcion/pago_usa.html", context)

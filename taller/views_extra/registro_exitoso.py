@@ -5,7 +5,7 @@ Vista de registro exitoso - muestra mensaje después del registro
 from django.shortcuts import render
 
 from taller.config.country_settings import CountrySettings
-from taller.utils.country_config import get_country_config
+from taller.utils.country_config import build_bienvenida_url, get_country_config
 
 
 def registro_exitoso(request):
@@ -32,11 +32,8 @@ def registro_exitoso(request):
     # Obtener configuración del país
     country_config = get_country_config(country_code)
 
-    # Construir URL de bienvenida del país
-    bienvenida_url = CountrySettings.build_url(country_code, "bienvenida/", request=request)
-    # Si no existe bienvenida específica, usar la landing
-    if not bienvenida_url or bienvenida_url.endswith("/bienvenida/"):
-        bienvenida_url = CountrySettings.build_url(country_code, "", request=request)
+    # URL de bienvenida con idioma: /cl/es/bienvenida/, /us/en/bienvenida/, etc.
+    bienvenida_url = build_bienvenida_url(country_code, request)
 
     context = {
         "email": email,

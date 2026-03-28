@@ -1,0 +1,411 @@
+/**
+ * USA document form (/us/.../documentos/form/) — chrome futurista.
+ * Compactación pensada en horizontal (columna más angosta), NO aplastar altura de campos.
+ * Totales al pie alineados (tabular nums).
+ * Activa con clase en <html>: .eg-us-doc-form-futurist
+ */
+
+html.eg-us-doc-form-futurist {
+  --eg-neon: #22d3ee;
+  --eg-neon-soft: rgba(34, 211, 238, 0.45);
+  --eg-grid: rgba(34, 211, 238, 0.06);
+}
+
+/* Shell: vidrio + rejilla tech — misma “altura” de campo que document_form base (~34px) */
+html.eg-us-doc-form-futurist #doc-shell {
+  --doc-input-h: 34px;
+  --doc-input-pad: 6px 10px;
+  --doc-input-fs: 14px;
+  /* Columna más angosta en escritorio (compact horizontal) */
+  max-width: min(52rem, 96vw) !important;
+  --doc-border: 1px solid rgba(34, 211, 238, 0.28);
+  --doc-border-focus: 1px solid rgba(34, 211, 238, 0.75);
+  --doc-bg-input: rgba(8, 18, 32, 0.88);
+  position: relative;
+  padding: 0.75rem !important;
+  gap: 0.5rem !important;
+  border-radius: 12px !important;
+  background:
+    linear-gradient(155deg, rgba(6, 12, 24, 0.97) 0%, rgba(12, 22, 40, 0.94) 45%, rgba(4, 10, 22, 0.98) 100%),
+    repeating-linear-gradient(0deg, var(--eg-grid) 0 1px, transparent 1px 24px),
+    repeating-linear-gradient(90deg, var(--eg-grid) 0 1px, transparent 1px 24px) !important;
+  border: 1px solid var(--eg-neon-soft) !important;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.35),
+    0 0 48px rgba(34, 211, 238, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    120deg,
+    transparent 40%,
+    rgba(34, 211, 238, 0.04) 50%,
+    transparent 60%
+  );
+  animation: eg-us-doc-scan 8s ease-in-out infinite;
+}
+
+@keyframes eg-us-doc-scan {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 0.9; }
+}
+
+/* Tipografía tech */
+html.eg-us-doc-form-futurist #doc-shell,
+html.eg-us-doc-form-futurist #doc-shell input,
+html.eg-us-doc-form-futurist #doc-shell select,
+html.eg-us-doc-form-futurist #doc-shell textarea {
+  font-family: "Exo 2", "Segoe UI", system-ui, sans-serif;
+}
+
+html.eg-us-doc-form-futurist #doc-shell .doc-console-title,
+html.eg-us-doc-form-futurist #doc-shell .doc-smart-card h3,
+html.eg-us-doc-form-futurist #doc-shell .totales-cockpit-title {
+  font-family: "Orbitron", "Exo 2", sans-serif !important;
+  letter-spacing: 0.12em !important;
+  color: #7dd3fc !important;
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.25);
+}
+
+/* Cabecera consola más densa */
+html.eg-us-doc-form-futurist #doc-shell .doc-console-header {
+  padding: 6px 10px !important;
+  background: rgba(4, 12, 24, 0.85) !important;
+  border: 1px solid rgba(34, 211, 238, 0.22) !important;
+  border-radius: 10px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-console-title {
+  font-size: 0.7rem !important;
+  margin-bottom: 6px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-console-line {
+  gap: 8px 12px !important;
+  font-size: 12px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-console-row2 {
+  margin-top: 6px !important;
+  padding-top: 6px !important;
+  font-size: 12px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-console-inv {
+  font-size: 12px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-console-header select {
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  min-height: 28px !important;
+  min-width: 88px !important;
+}
+
+/* Fecha en cabecera */
+html.eg-us-doc-form-futurist #doc-shell #id_fecha_emision {
+  max-width: 130px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  min-height: 28px !important;
+}
+
+/* Tarjetas */
+html.eg-us-doc-form-futurist #doc-shell .doc-smart-card {
+  padding: 8px 10px !important;
+  border-radius: 10px !important;
+  background: rgba(6, 14, 28, 0.82) !important;
+  border: 1px solid rgba(34, 211, 238, 0.2) !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-smart-card h3 {
+  font-size: 0.75rem !important;
+  margin-bottom: 8px !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell #cliente-busqueda {
+  padding: 6px 10px !important;
+  font-size: 13px !important;
+  min-height: 28px !important;
+  border-radius: 6px !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell label {
+  font-size: 12px !important;
+  margin-bottom: 4px !important;
+}
+
+/* Botones + en tarjetas (altura táctil razonable, no micro) */
+html.eg-us-doc-form-futurist #doc-shell .doc-smart-card button,
+html.eg-us-doc-form-futurist #doc-shell .doc-smart-card a.text-xs {
+  padding: 5px 10px !important;
+  font-size: 12px !important;
+  min-height: 28px !important;
+  border-radius: 6px !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell .doc-smart-summary {
+  margin-top: 8px !important;
+  padding-top: 8px !important;
+  font-size: 12px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-smart-summary .name {
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-smart-summary .detail,
+html.eg-us-doc-form-futurist #doc-shell .doc-smart-summary .meta {
+  font-size: 12px !important;
+}
+
+/* Filas POS */
+html.eg-us-doc-form-futurist #doc-shell #repuestos-container .dynamic-element > div,
+html.eg-us-doc-form-futurist #doc-shell #servicios-container .dynamic-element > div {
+  min-height: 30px !important;
+  padding: 6px 8px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell #repuestos-container .dynamic-element input,
+html.eg-us-doc-form-futurist #doc-shell #servicios-container .dynamic-element input,
+html.eg-us-doc-form-futurist #doc-shell #repuestos-container .dynamic-element .form-control,
+html.eg-us-doc-form-futurist #doc-shell #servicios-container .dynamic-element .form-control {
+  min-height: 28px !important;
+  padding: 4px 8px !important;
+  font-size: 13px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-pos-header {
+  padding: 6px 8px 8px !important;
+  font-size: 11px !important;
+}
+
+/* Sobrescribir reglas base “cyber” gruesas en inputs de línea */
+html.eg-us-doc-form-futurist #doc-shell .rep-nombre,
+html.eg-us-doc-form-futurist #doc-shell .serv-precio,
+html.eg-us-doc-form-futurist #doc-shell .otr-precio {
+  padding: 3px 8px !important;
+  font-size: 12px !important;
+  border-radius: 6px !important;
+  border-width: 1px !important;
+}
+
+/* ========== TOTALES / PIE — alineación clara ========== */
+html.eg-us-doc-form-futurist #doc-shell .totales-cockpit.totales-panel {
+  padding: 10px 12px !important;
+  background: rgba(4, 10, 22, 0.92) !important;
+  border: 1px solid rgba(34, 211, 238, 0.35) !important;
+  border-radius: 10px !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.03),
+    0 0 24px rgba(34, 211, 238, 0.06) !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell .totales-cockpit-title {
+  margin-bottom: 8px !important;
+  padding-bottom: 6px !important;
+  border-bottom: 1px solid rgba(34, 211, 238, 0.2) !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell .receipt-totals {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+  background: rgba(2, 8, 18, 0.75) !important;
+  border: 1px solid rgba(34, 211, 238, 0.18) !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell .receipt-totals-table {
+  table-layout: fixed !important;
+  width: 100% !important;
+  font-size: 11px !important;
+  border-collapse: collapse !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell .receipt-totals-table tbody tr {
+  border-bottom-color: rgba(34, 211, 238, 0.1) !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell .receipt-totals-table .receipt-label,
+html.eg-us-doc-form-futurist #doc-shell .receipt-totals-table td:first-child {
+  width: 56% !important;
+  padding: 2px 8px 2px 0 !important;
+  vertical-align: middle !important;
+  text-align: left !important;
+  color: #94a3b8 !important;
+  font-weight: 500 !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell .receipt-totals-table .receipt-value,
+html.eg-us-doc-form-futurist #doc-shell .receipt-totals-table td:last-child {
+  width: 44% !important;
+  padding: 2px 0 2px 8px !important;
+  text-align: right !important;
+  vertical-align: middle !important;
+  font-variant-numeric: tabular-nums !important;
+  font-family: "Share Tech Mono", "Consolas", ui-monospace, monospace !important;
+  font-weight: 600 !important;
+  color: #e0f2fe !important;
+  letter-spacing: 0.02em !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell .receipt-total-row {
+  border-top: 1px solid rgba(34, 211, 238, 0.35) !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .receipt-total-row .receipt-total-label {
+  padding-top: 6px !important;
+  font-size: 12px !important;
+  font-family: "Orbitron", sans-serif !important;
+  letter-spacing: 0.08em !important;
+  color: #bae6fd !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .receipt-total-row .receipt-total-value {
+  padding-top: 6px !important;
+  font-size: 14px !important;
+  color: #5eead4 !important;
+  text-shadow: 0 0 16px rgba(94, 234, 212, 0.35);
+}
+
+html.eg-us-doc-form-futurist #doc-shell .totales-cockpit-save {
+  margin-top: 10px !important;
+  padding: 8px 12px !important;
+  font-size: 12px !important;
+  font-family: "Orbitron", sans-serif !important;
+  letter-spacing: 0.06em !important;
+  border-radius: 8px !important;
+  background: linear-gradient(135deg, #0d9488 0%, #059669 50%, #047857 100%) !important;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.25) !important;
+}
+
+html.eg-us-doc-form-futurist #doc-shell .totales-cockpit .flex.gap-2.mt-3 a {
+  padding: 6px 8px !important;
+  font-size: 10px !important;
+}
+
+/* Checkbox impuestos compactos */
+html.eg-us-doc-form-futurist #doc-shell .receipt-totals-apply-tax {
+  font-size: 10px !important;
+  padding-bottom: 4px !important;
+}
+
+/* ========== Cabecera de página (título / idioma / “Document paid”) — legible; compacto ≠ microscopio ========== */
+html.eg-us-doc-form-futurist main .mb-6.px-4,
+html.eg-us-doc-form-futurist main div.mb-6[class*="px-4"] {
+  margin-bottom: 1rem !important;
+  padding: 0.75rem 1rem !important;
+}
+html.eg-us-doc-form-futurist main .mb-6 h1 {
+  font-size: clamp(1.125rem, 2.2vw, 1.5rem) !important;
+  line-height: 1.25 !important;
+  margin-bottom: 0.35rem !important;
+}
+html.eg-us-doc-form-futurist main .mb-6 p.text-sm,
+html.eg-us-doc-form-futurist main .mb-6 p {
+  font-size: 0.875rem !important;
+  line-height: 1.35 !important;
+}
+html.eg-us-doc-form-futurist main #language-form-doc .flex.items-center {
+  padding: 0.5rem 0.75rem !important;
+  gap: 0.5rem !important;
+}
+html.eg-us-doc-form-futurist main #language-form-doc button {
+  padding: 0.35rem 0.65rem !important;
+  font-size: 0.8125rem !important;
+}
+html.eg-us-doc-form-futurist main .doc-paid-toggle {
+  padding: 0.5rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  gap: 0.5rem !important;
+}
+html.eg-us-doc-form-futurist main .doc-paid-toggle input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+}
+
+/* Consola: selects alineados a altura de campo (sin segunda pasada que los aplaste) */
+html.eg-us-doc-form-futurist #doc-shell #id_tipo,
+html.eg-us-doc-form-futurist #doc-shell #doc_mode,
+html.eg-us-doc-form-futurist #doc-shell #id_tecnico_responsable,
+html.eg-us-doc-form-futurist #doc-shell #payment-status-badge select {
+  min-height: 28px !important;
+  padding: 4px 8px !important;
+  font-size: 12px !important;
+  line-height: 1.3 !important;
+  min-width: 88px !important;
+  max-width: 100%;
+}
+html.eg-us-doc-form-futurist #doc-shell #payment-status-badge select {
+  font-weight: 600 !important;
+}
+
+/* DAL/Select2 — altura acorde al resto del formulario */
+html.eg-us-doc-form-futurist #doc-shell .select2-container {
+  font-size: 13px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .select2-container .select2-selection--single {
+  min-height: 28px !important;
+  height: auto !important;
+  padding: 4px 6px !important;
+  border-radius: 6px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .select2-container--default .select2-selection--single .select2-selection__rendered {
+  line-height: 1.35 !important;
+  padding-left: 6px !important;
+  padding-right: 22px !important;
+  font-size: 13px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 20px !important;
+  top: 50% !important;
+  transform: translateY(-50%);
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-field-with-btn {
+  gap: 6px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell .doc-field-with-btn .flex-1 {
+  min-width: 0 !important;
+}
+
+/* Kilometraje */
+html.eg-us-doc-form-futurist #doc-shell #miles-section {
+  margin-top: 6px !important;
+  gap: 6px !important;
+}
+html.eg-us-doc-form-futurist #doc-shell #miles-section .text-xs {
+  font-size: 0.75rem !important;
+}
+html.eg-us-doc-form-futurist #doc-shell #miles-section input,
+html.eg-us-doc-form-futurist #doc-shell #miles-section .form-control,
+html.eg-us-doc-form-futurist #doc-shell #miles-section select {
+  min-height: 28px !important;
+  padding: 4px 8px !important;
+  font-size: 13px !important;
+  max-width: 7rem !important;
+}
+
+/* Resultados autocompletado cliente */
+html.eg-us-doc-form-futurist #doc-shell #cliente-resultados {
+  font-size: 12px !important;
+  max-height: 11rem !important;
+}
+html.eg-us-doc-form-futurist #doc-shell #cliente-resultados .cliente-item {
+  padding: 6px 8px !important;
+  font-size: 12px !important;
+}
+
+/* Grid cliente/vehículo: un poco más junto en vertical, sin tocar altura de inputs */
+html.eg-us-doc-form-futurist #doc-shell .grid.gap-4 {
+  gap: 0.75rem !important;
+}
+html.eg-us-doc-form-futurist .doc-shell-workspace > .doc-console-header {
+  margin-bottom: 0.65rem !important;
+}
+
+/* Notas */
+html.eg-us-doc-form-futurist #doc-shell textarea[name="observaciones"],
+html.eg-us-doc-form-futurist #doc-shell #id_observaciones {
+  min-height: 72px !important;
+  max-height: 140px !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+}

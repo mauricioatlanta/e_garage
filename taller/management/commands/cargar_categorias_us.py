@@ -9,9 +9,14 @@ from taller.servicios.models import (
 
 
 class Command(BaseCommand):
-    help = "Carga categorías y subcategorías básicas para USA (inglés)"
+    help = "(DEPRECADO) Use cargar_catalogo_maestro. Carga categorías y subcategorías básicas para USA (inglés)."
 
     def handle(self, *args, **options):
+        self.stdout.write(
+            self.style.WARNING(
+                "DEPRECADO: cargar_categorias_us. Use: python manage.py cargar_catalogo_maestro"
+            )
+        )
         country = "US"
         language = "en"
 

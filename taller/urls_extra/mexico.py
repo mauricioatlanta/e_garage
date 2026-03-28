@@ -39,7 +39,7 @@ urlpatterns = [
     path(
         "accounts/login/",
         country_aware_login,
-        name="account_login_mexico",
+        name="account_login",
     ),
     # /mx/es/login/ → /mx/es/accounts/login/ (preserva ?next=, etc.)
     path(
@@ -53,7 +53,7 @@ urlpatterns = [
     path(
         "accounts/signup/",
         lambda r: signup_redirect(r, "mx"),
-        name="account_signup_mexico",
+        name="account_signup",
     ),
     # Redirect resto de accounts/* → /accounts/* (password reset, logout, etc.)
     path(

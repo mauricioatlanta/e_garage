@@ -9,6 +9,7 @@ from core.views import TenantViewMixin
 from taller.mixins import CountryLangTemplateMixin
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
+from taller.utils.empresa import get_user_empresa_safe
 
 
 class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView):
@@ -41,7 +42,7 @@ class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMi
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_user_empresa_safe(self.request.user)
 
         if not empresa:
             return context
@@ -107,32 +108,41 @@ class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMi
             clientes_activos = 0
 
         # Datos para gráfico de clientes nuevos por mes (últimos 6 meses)
+        # Usar siempre día 1 para evitar ValueError (ej. 31 de nov no existe)
         from datetime import datetime
 
         datos_grafico = []
-        for i in range(6):
-            mes_fecha = hoy.replace(day=1) - timedelta(days=30 * i)
-            if mes_fecha.month == 1:
-                mes_anterior = mes_fecha.replace(year=mes_fecha.year - 1, month=12)
-            else:
-                mes_anterior = mes_fecha.replace(month=mes_fecha.month - 1)
+        mes_cursor = hoy.replace(day=1)
 
-            # Convertir a datetime para comparar con created_at
-            inicio_mes_dt = datetime.combine(mes_anterior, datetime.min.time())
-            fin_mes_dt = datetime.combine(mes_fecha + timedelta(days=32), datetime.min.time())
+        for i in range(6):
+            inicio_mes = mes_cursor
+
+            if inicio_mes.month == 12:
+                siguiente_mes = inicio_mes.replace(year=inicio_mes.year + 1, month=1, day=1)
+            else:
+                siguiente_mes = inicio_mes.replace(month=inicio_mes.month + 1, day=1)
+
+            inicio_mes_dt = datetime.combine(inicio_mes, datetime.min.time())
+            fin_mes_dt = datetime.combine(siguiente_mes, datetime.min.time())
 
             clientes_mes = base_qs.filter(
-                created_at__gte=inicio_mes_dt, created_at__lt=fin_mes_dt
+                created_at__gte=inicio_mes_dt,
+                created_at__lt=fin_mes_dt,
             ).count()
 
             datos_grafico.append(
                 {
-                    "mes": mes_fecha.strftime("%b %Y"),
+                    "mes": inicio_mes.strftime("%b %Y"),
                     "cantidad": clientes_mes,
                 }
             )
 
-        datos_grafico.reverse()  # Ordenar cronológicamente
+            if mes_cursor.month == 1:
+                mes_cursor = mes_cursor.replace(year=mes_cursor.year - 1, month=12, day=1)
+            else:
+                mes_cursor = mes_cursor.replace(month=mes_cursor.month - 1, day=1)
+
+        datos_grafico.reverse()  # Ordenar cronológicamente (más antiguo primero)
 
         context.update(
             {
@@ -165,16 +175,30 @@ class ClienteDetailView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
 class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
     def get_success_url(self):
+        from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
+
         from django.urls import reverse
 
-        # Obtener el país de la empresa del usuario
-        empresa = getattr(self.request.user, "empresa", None)
+        # Flujo "crear cliente desde documento": usar ?next= para volver al formulario
+        next_url = (self.request.POST.get("next") or self.request.GET.get("next") or "").strip()
+        if next_url:
+            from taller.mixins import safe_next_url
+
+            safe = safe_next_url(next_url)
+            if safe:
+                # Añadir cliente_id para preselección en document form
+                parsed = urlparse(safe)
+                params = dict(parse_qsl(parsed.query, keep_blank_values=True))
+                if self.object and getattr(self.object, "pk", None):
+                    params["cliente_id"] = str(self.object.pk)
+                new_query = urlencode(params)
+                return urlunparse(parsed._replace(query=new_query))
+
+        # Obtener el país de la empresa del usuario (usa/chile montan clientes sin "taller")
+        empresa = get_user_empresa_safe(self.request.user)
         if empresa and empresa.pais == "US":
-            # Usuario de USA: redirigir a namespace de USA
-            return reverse("usa:taller:clientes:lista_clientes")
-        else:
-            # Usuario de Chile o fallback: redirigir a namespace de Chile
-            return reverse("chile:taller:clientes:lista_clientes")
+            return reverse("usa:clientes:lista_clientes")
+        return reverse("chile:clientes:lista_clientes")
 
     def form_valid(self, form):
         from django.db import IntegrityError
@@ -198,16 +222,19 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_user_empresa_safe(self.request.user)
         if empresa:
             kwargs["empresa"] = empresa
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_user_empresa_safe(self.request.user)
         context["empresa"] = empresa
         context["empresa_actual"] = empresa
+
+        # Pasar next para el hidden del form (flujo desde documento/form)
+        context["next"] = self.request.GET.get("next") or self.request.POST.get("next") or ""
 
         # Asegurar que el país esté disponible para el template
         pais = None
@@ -246,14 +273,14 @@ class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_user_empresa_safe(self.request.user)
         if empresa:
             kwargs["empresa"] = empresa
         return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = getattr(self.request.user, "empresa", None)
+        empresa = get_user_empresa_safe(self.request.user)
         context["empresa"] = empresa
         context["empresa_actual"] = empresa
 

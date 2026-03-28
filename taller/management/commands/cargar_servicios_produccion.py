@@ -17,9 +17,14 @@ from taller.servicios.models import (
 
 
 class Command(BaseCommand):
-    help = "Carga categorías, subcategorías y servicios básicos para Chile (español) y USA (inglés) para todas las empresas"
+    help = "(DEPRECADO) Use cargar_catalogo_maestro. Carga categorías, subcategorías y servicios básicos para todas las empresas."
 
     def handle(self, *args, **options):
+        self.stdout.write(
+            self.style.WARNING(
+                "DEPRECADO: cargar_servicios_produccion. Use: python manage.py cargar_catalogo_maestro"
+            )
+        )
         # Datos completos de servicios
         categorias = [
             {
@@ -341,7 +346,7 @@ class Command(BaseCommand):
                                         # Si hay error de integridad, continuar
                                         self.stdout.write(
                                             self.style.WARNING(
-                                                f"  ⚠️ Error al crear servicio '{serv[label_key]}' para {empresa.nombre}: {str(e)[:100]}"
+                                                f"  ⚠️ Error al crear servicio '{serv[label_key]}' para {empresa.nombre_taller or empresa.empresa or f'Empresa {empresa.id}'}: {str(e)[:100]}"
                                             )
                                         )
                                         continue
@@ -423,4 +428,5 @@ class Command(BaseCommand):
         # Mostrar servicios por empresa
         for empresa in empresas:
             servicios_count = Servicio.objects.filter(empresa=empresa).count()
-            self.stdout.write(f"   {empresa.nombre} ({empresa.pais}): {servicios_count} servicios")
+            nombre_empresa = empresa.nombre_taller or empresa.empresa or f"Empresa {empresa.id}"
+            self.stdout.write(f"   {nombre_empresa} ({empresa.pais}): {servicios_count} servicios")

@@ -26,6 +26,23 @@ SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 
+_cookie_domain = (os.environ.get("DJANGO_COOKIE_DOMAIN") or "").strip()
+if not _cookie_domain:
+    for _origin in CSRF_TRUSTED_ORIGINS or []:
+        _origin = (_origin or "").strip()
+        if not _origin or "://" not in _origin:
+            continue
+        _host = _origin.split("://", 1)[1].split("/", 1)[0].strip()
+        _host = _host.replace("*.", "").strip()
+        if _host.startswith("www."):
+            _host = _host[4:]
+        if _host:
+            _cookie_domain = "." + _host.lstrip(".")
+            break
+if _cookie_domain:
+    CSRF_COOKIE_DOMAIN = _cookie_domain
+    SESSION_COOKIE_DOMAIN = _cookie_domain
+
 # Overrides para desarrollo local si se fuerza DEBUG
 if DEBUG:
     SECURE_SSL_REDIRECT = False

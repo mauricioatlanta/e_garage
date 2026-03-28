@@ -1,0 +1,116 @@
+{% extends "onboarding/base.html" %}
+
+{% block step_content %}
+<h3 class="h4 mb-4">Paso 3: ¡Todo Listo!</h3>
+<p class="text-muted mb-4">Revisa la configuración y comienza a usar eGarage</p>
+
+<!-- Checklist de verificación -->
+<div class="card mb-4 onb-card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-check-circle"></i> Verificación Final</h5>
+    </div>
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Empresa Configurada</h6>
+                <ul class="list-unstyled">
+                    <li><i class="fas fa-check text-success"></i> Nombre: {{ empresa.nombre_taller }}</li>
+                    <li><i class="fas fa-check text-success"></i> País: {{ empresa.get_pais_display }}</li>
+                    <li><i class="fas fa-check text-success"></i> Moneda: {{ empresa.moneda }}</li>
+                    <li><i class="fas fa-check text-success"></i> Impuesto: {% if empresa.config.tasa_impuesto %}{{ empresa.config.tasa_impuesto }}%{% else %}0%{% endif %}</li>
+                </ul>
+            </div>
+            <div class="col-md-6">
+                <h6>Equipo Registrado</h6>
+                <ul class="list-unstyled">
+                    {% if tecnicos %}
+                        {% for tecnico in tecnicos %}
+                        <li><i class="fas fa-check text-success"></i> {{ tecnico.nombre }}{% if tecnico.especialidad %} ({{ tecnico.especialidad }}){% endif %}</li>
+                        {% endfor %}
+                    {% else %}
+                        <li><i class="fas fa-times text-danger"></i> No hay técnicos registrados</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Preview del documento -->
+<div class="card mb-4 onb-card">
+    <div class="card-header">
+        <h5 class="mb-0"><i class="fas fa-file-alt"></i> Preview de Documento Real</h5>
+    </div>
+    <div class="card-body">
+        <div id="documentoPreview" class="preview-documento-real onb-preview-frame">
+            <div class="text-center py-4">
+                <div class="spinner-border text-primary" role="status"></div>
+                <p class="mt-2">Generando vista previa...</p>
+            </div>
+        </div>
+        <button type="button" class="btn btn-outline-primary btn-sm mt-2" onclick="actualizarPreview()">
+            <i class="fas fa-sync"></i> Actualizar Preview
+        </button>
+    </div>
+</div>
+
+<div class="alert alert-success onb-card">
+    <h6><i class="fas fa-rocket"></i> ¡Estás listo para comenzar!</h6>
+    <p class="mb-0">Una vez que finalices, podrás acceder al dashboard completo y comenzar a crear tus primeros documentos.</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+function actualizarPreview() {
+    const previewDiv = document.getElementById('documentoPreview');
+    previewDiv.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Generando vista previa real...</p></div>';
+
+    fetch('/onboarding/preview-documento/', {
+        headers: {
+            'Accept': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success && data.html) {
+            previewDiv.innerHTML = data.html;
+            
+            // Inyectar estilos básicos para el PDF si es necesario (ya que es un partial)
+            if (!document.getElementById('pdf-preview-styles')) {
+                const style = document.createElement('style');
+                style.id = 'pdf-preview-styles';
+                style.innerHTML = `
+                    .preview-documento-real { font-family: 'Inter', sans-serif; }
+                    .doc-header { display: flex; justify-content: space-between; margin-bottom: 20px; }
+                    .doc-logo { max-height: 60px; }
+                    .doc-title { font-size: 24px; color: #333; margin: 0; }
+                    .lines-table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+                    .lines-table th { border-bottom: 2px solid #eee; text-align: left; padding: 8px; }
+                    .lines-table td { border-bottom: 1px solid #eee; padding: 8px; }
+                    .totals-wrap { display: flex; justify-content: flex-end; }
+                    .totals-card { width: 200px; }
+                    .totals-row { display: flex; justify-content: space-between; padding: 4px 0; }
+                    .totals-row--grand { font-weight: bold; border-top: 1px solid #333; margin-top: 4px; }
+                `;
+                document.head.appendChild(style);
+            }
+        } else {
+            previewDiv.innerHTML = '<div class="alert alert-danger">Error al cargar la vista previa real.</div>';
+        }
+    })
+    .catch(error => {
+        previewDiv.innerHTML = '<div class="alert alert-danger">Error de conexión al generar preview.</div>';
+        console.error('Error:', error);
+    });
+}
+
+// Cargar preview al inicio
+document.addEventListener('DOMContentLoaded', actualizarPreview);
+document.addEventListener('DOMContentLoaded', function() {
+    actualizarPreview();
+});
+</script>
+{% endblock %}

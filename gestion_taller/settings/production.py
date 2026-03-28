@@ -130,14 +130,11 @@ LOGGING = {
     },
 }
 
-# Configuración de email para producción (opcional)
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
-EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
-EMAIL_USE_TLS = True
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "noreply@egarage.com")
+# Configuracion de email para produccion por API HTTPS (Resend)
+EMAIL_BACKEND = "taller.email_backends.resend_backend.ResendEmailBackend"
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "support@egarage.cl")
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", "support@egarage.cl")
+RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
 
 # Configuración de sesiones
 SESSION_COOKIE_AGE = 86400  # 24 horas

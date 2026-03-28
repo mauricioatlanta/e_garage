@@ -402,7 +402,7 @@ class TestTeamManagementAccess(RBACSegregationBaseTest):
         self.client.force_login(self.user_owner)
 
         try:
-            url = reverse("team:team_create")
+            url = reverse("chile:taller:team:team_create")
             response = self.client.get(url)
             # Owner debería poder acceder (200)
             self.assertEqual(
@@ -431,7 +431,7 @@ class TestTeamManagementAccess(RBACSegregationBaseTest):
         self.client.force_login(self.user_admin)
 
         try:
-            url = reverse("team:team_create")
+            url = reverse("chile:taller:team:team_create")
             response = self.client.get(url)
             # Admin NO debería poder acceder (403)
             self.assertEqual(
@@ -459,7 +459,7 @@ class TestTeamManagementAccess(RBACSegregationBaseTest):
         self.client.force_login(self.user_vendedor)
 
         try:
-            url = reverse("team:team_create")
+            url = reverse("chile:taller:team:team_create")
             response = self.client.get(url)
             # Vendedor NO debería poder acceder (403)
             self.assertEqual(
@@ -487,7 +487,7 @@ class TestTeamManagementAccess(RBACSegregationBaseTest):
         self.client.force_login(self.user_tecnico)
 
         try:
-            url = reverse("team:team_create")
+            url = reverse("chile:taller:team:team_create")
             response = self.client.get(url)
             # Técnico NO debería poder acceder (403)
             self.assertEqual(

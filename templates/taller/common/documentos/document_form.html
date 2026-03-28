@@ -108,6 +108,38 @@
 }
 
 /* ==================== CLASES REUTILIZABLES PARA BOTONES ==================== */
+/* Botones de acciones de documento: mobile-safe, label siempre visible */
+.doc-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.doc-action-btn .doc-action-label {
+  display: inline;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .doc-action-btn {
+    min-height: 42px;
+    padding: 0.55rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .doc-action-btn .doc-action-label {
+    display: inline !important;
+    font-size: 0.9rem;
+  }
+}
+
 /* Botón con gradiente cian (para botones principales) - Sin !important */
 .btn-cyan-gradient {
   display: inline-flex;
@@ -735,6 +767,107 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-console-header select:focus { outline: none; border-color: rgba(6, 182, 212, 0.5); }
 #payment-status-badge select { color: inherit; font-weight: 600; cursor: pointer; }
 
+.doc-invoice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.doc-invoice-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(2,6,23,.42), rgba(15,23,42,.28));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+.doc-console-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.doc-console-control {
+  width: 100%;
+}
+.doc-console-title {
+  font-size: .78rem;
+  letter-spacing: .24em;
+  color: #7dd3fc;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+.doc-console-meta {
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.doc-console-inv {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: rgba(2,6,23,.88);
+  border: 1px solid rgba(56,189,248,.24);
+  color: #f8fafc;
+  font-size: 1rem;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+.doc-console-header {
+  background:
+    radial-gradient(circle at top right, rgba(34,211,238,.10), transparent 32%),
+    linear-gradient(145deg, rgba(6,10,18,.98), rgba(15,23,42,.94));
+  border: 1px solid rgba(148,163,184,.22);
+  border-radius: 18px;
+  padding: 22px 24px;
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 26px rgba(34,211,238,.06);
+}
+.doc-console-header input,
+.doc-console-header select,
+.doc-console-control select {
+  width: 100%;
+  min-height: 46px !important;
+  border-radius: 12px !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  background: rgba(15,23,42,.82) !important;
+  border: 1px solid rgba(100,116,139,.55) !important;
+  color: #f8fafc !important;
+  box-sizing: border-box;
+}
+.doc-console-header input:focus,
+.doc-console-header select:focus,
+.doc-console-control select:focus {
+  border-color: rgba(34,211,238,.7) !important;
+  box-shadow: 0 0 0 3px rgba(34,211,238,.12) !important;
+}
+#doc-shell #id_tecnico_responsable,
+#doc-shell #id_payment_status,
+#doc-shell #id_tipo,
+#doc-shell #doc_mode {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 900px) {
+  .doc-invoice-grid {
+    grid-template-columns: 1fr;
+  }
+  .doc-console-header {
+    padding: 18px;
+    border-radius: 16px;
+  }
+}
+
 /* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÍCULO ==================== */
 .doc-smart-card {
   background: rgba(15, 23, 42, 0.6);
@@ -832,11 +965,36 @@ input:disabled, select:disabled, textarea:disabled {
 }
 .totales-cockpit-save:hover { background: #047857; }
 
-/* ==================== TABLA REAL: Code | Part name | Qty | Price | Total | [x] ==================== */
+/* ==================== BOTÓN UNIFICADO .btn-add ==================== */
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0891b2;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid rgba(8, 145, 178, 0.5);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-add:hover { background: #0e7490; border-color: rgba(8, 145, 178, 0.8); }
+.btn-add:focus { outline: none; box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.4); }
+
+/* ==================== TABLA REAL: Grid 12 cols - Code | Part name | Qty | Price | Total | [x] ==================== */
 .doc-pos-section { margin-bottom: 0.75rem; }
+/* Alinear títulos y botones de acción en secciones partes/servicios/otros */
+.doc-ficha-parts .flex.justify-between,
+.doc-ficha-services .flex.justify-between,
+.doc-ficha-otros .flex.justify-between {
+  align-items: center;
+}
 .doc-pos-header {
   display: grid;
-  gap: 6px 8px;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
   padding: 6px 8px 8px;
   font-size: 10px;
   font-weight: 700;
@@ -846,16 +1004,27 @@ input:disabled, select:disabled, textarea:disabled {
   border-bottom: 1px solid rgba(71, 85, 105, 0.5);
   align-items: center;
 }
-#repuestos-container .doc-pos-header { grid-template-columns: 70px 1fr 50px 70px 70px 36px; }
-.doc-pos-header-services { grid-template-columns: 1fr 50px 70px 70px 36px; }
-/* Repuestos: 6 celdas visibles (code, name, qty, price, subtotal, remove); cost hidden */
-#repuestos-container .dynamic-element > div {
-  display: grid !important;
-  grid-template-columns: 70px 1fr 50px 70px 70px 36px;
-  gap: 6px 8px;
-  padding: 6px 8px !important;
-  align-items: center;
-  min-height: 36px;
+#repuestos-container .doc-pos-header > span:nth-child(1){ grid-column: span 2; }
+#repuestos-container .doc-pos-header > span:nth-child(2){ grid-column: span 4; }
+#repuestos-container .doc-pos-header > span:nth-child(3){ grid-column: span 1; }
+#repuestos-container .doc-pos-header > span:nth-child(4){ grid-column: span 2; }
+#repuestos-container .doc-pos-header > span:nth-child(5){ grid-column: span 2; }
+#repuestos-container .doc-pos-header > span:nth-child(6){ grid-column: span 1; }
+.doc-pos-header-services > span:nth-child(1){ grid-column: span 7; }
+.doc-pos-header-services > span:nth-child(2){ grid-column: span 2; }
+.doc-pos-header-services > span:nth-child(3){ grid-column: span 2; }
+.doc-pos-header-services > span:nth-child(4){ grid-column: span 1; }
+.doc-pos-header-otros > span:nth-child(1){ grid-column: span 3; }
+.doc-pos-header-otros > span:nth-child(2){ grid-column: span 3; }
+.doc-pos-header-otros > span:nth-child(3){ grid-column: span 2; }
+.doc-pos-header-otros > span:nth-child(4){ grid-column: span 2; }
+.doc-pos-header-otros > span:nth-child(5){ grid-column: span 1; }
+.doc-pos-header-otros > span:nth-child(6){ grid-column: span 1; }
+/* Filas dinámicas: usan grid grid-cols-12 del HTML, no override */
+#repuestos-container .dynamic-element .doc-row-grid,
+#servicios-container .dynamic-element .doc-row-grid,
+#otros-container .dynamic-element .doc-row-grid {
+  min-height: 40px;
   border-bottom: 1px solid rgba(71, 85, 105, 0.3);
   background: rgba(0, 0, 0, 0.08);
   border-radius: 4px;
@@ -863,52 +1032,36 @@ input:disabled, select:disabled, textarea:disabled {
 }
 #repuestos-container .dynamic-element input,
 #repuestos-container .dynamic-element .form-control,
-#repuestos-container .dynamic-element .rep-subtotal-view {
-  min-height: 28px !important;
-  padding: 4px 6px !important;
+#repuestos-container .dynamic-element .rep-subtotal-view,
+#servicios-container .dynamic-element input,
+#servicios-container .dynamic-element .form-control,
+#otros-container .dynamic-element input,
+#otros-container .dynamic-element .form-control {
+  min-height: 36px !important;
+  height: 2.5rem !important;
+  padding: 4px 8px !important;
   font-size: 13px !important;
 }
 #repuestos-container .dynamic-element .rep-search-container,
-#repuestos-container .dynamic-element .description-field { min-width: 0; }
-#repuestos-container .dynamic-element label { display: none !important; }
-/* Servicios: 5 celdas (name, qty, price, subtotal, remove) */
-#servicios-container .dynamic-element > div {
-  display: grid !important;
-  grid-template-columns: 1fr 50px 70px 70px 36px;
-  gap: 6px 8px;
-  padding: 6px 8px !important;
-  align-items: center;
-  min-height: 36px;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 4px;
-  margin-bottom: 4px;
-}
-#servicios-container .dynamic-element input,
-#servicios-container .dynamic-element .form-control {
-  min-height: 28px !important;
-  padding: 4px 6px !important;
-  font-size: 13px !important;
-}
-#servicios-container .dynamic-element label { display: none !important; }
-#otros-container .dynamic-element > div {
-  padding: 6px 8px !important;
-  min-height: 34px;
-  margin-bottom: 4px;
-  border: var(--doc-border);
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.06);
-}
-#otros-container .dynamic-element input { min-height: 28px !important; padding: 4px 6px !important; font-size: 13px !important; }
+#repuestos-container .dynamic-element .description-field,
+#servicios-container .dynamic-element .srv-input-container,
+#servicios-container .dynamic-element .description-field,
+#otros-container .dynamic-element .otr-search-container,
+#otros-container .dynamic-element .description-field { min-width: 0; }
+#repuestos-container .dynamic-element label,
+#servicios-container .dynamic-element label,
+#otros-container .dynamic-element label { display: none !important; }
 @media (max-width: 768px) {
   .doc-pos-header { display: none !important; }
-  #repuestos-container .dynamic-element > div,
-  #servicios-container .dynamic-element > div {
+  #repuestos-container .dynamic-element .doc-row-grid,
+  #servicios-container .dynamic-element .doc-row-grid,
+  #otros-container .dynamic-element .doc-row-grid {
     grid-template-columns: 1fr !important;
     padding: 10px !important;
   }
   #repuestos-container .dynamic-element label,
-  #servicios-container .dynamic-element label { display: block !important; }
+  #servicios-container .dynamic-element label,
+  #otros-container .dynamic-element label { display: block !important; }
 }
 </style>
 
@@ -948,7 +1101,7 @@ input:disabled, select:disabled, textarea:disabled {
         </div>
       </form>
       
-      <label class="flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
+      <label class="doc-paid-toggle flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
         {{ form.pagado }}
         {% trans "Document paid" %}
       </label>
@@ -959,17 +1112,22 @@ input:disabled, select:disabled, textarea:disabled {
 {% endwith %}
 
 <script>
+// Única fuente de verdad para ?next= al ir a crear cliente/vehículo (pathname + querystring)
+window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
+  return encodeURIComponent(window.location.pathname + (window.location.search || ''));
+};
+
 // Funciones para abrir modales de cliente y vehículo - Disponibles inmediatamente
 (function() {
   'use strict';
   
   function openClienteModal() {
     try {
-      const currentPath = window.location.pathname || '/cl/documentos/form/';
-      const nextUrl = encodeURIComponent(currentPath);
+      const pathBase = window.location.pathname || '/cl/documentos/form/';
+      const nextUrl = window.egEncodeDocumentFormNext();
       
-      // Parsear el path: /cl/documentos/form/ -> ['cl', 'documentos', 'form']
-      const pathParts = currentPath.split('/').filter(function(p) { return p && p.length > 0; });
+      // Parsear el path: /cl/documentos/form/ -> ['cl', 'documentos', 'form'] (sin search)
+      const pathParts = pathBase.split('/').filter(function(p) { return p && p.length > 0; });
       
       // Detectar país e idioma desde el path
       let countryPrefix = 'cl';
@@ -993,8 +1151,8 @@ input:disabled, select:disabled, textarea:disabled {
 
   function openVehiculoModal() {
     try {
-      const currentPath = window.location.pathname || '/cl/documentos/form/';
-      const nextUrl = encodeURIComponent(currentPath);
+      const pathOnly = window.location.pathname || '/cl/documentos/form/';
+      const nextUrl = window.egEncodeDocumentFormNext();
       
       // Obtener el cliente seleccionado
       // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
@@ -1031,10 +1189,10 @@ input:disabled, select:disabled, textarea:disabled {
       let countryPrefix = 'cl';
       let langPrefix = 'es';
       
-      if (currentPath.indexOf('/cl/') === 0) {
+      if (pathOnly.indexOf('/cl/') === 0) {
         countryPrefix = 'cl';
         langPrefix = 'es';
-      } else if (currentPath.indexOf('/us/') === 0) {
+      } else if (pathOnly.indexOf('/us/') === 0) {
         countryPrefix = 'us';
         langPrefix = 'en';
       }
@@ -1085,8 +1243,8 @@ function handleNuevoVehiculoClick(event) {
     }
     
     // Fallback: construir URL manualmente
-    const currentPath = window.location.pathname || '/cl/documentos/form/';
-    const nextUrl = encodeURIComponent(currentPath);
+    const pathOnly = window.location.pathname || '/cl/documentos/form/';
+    const nextUrl = window.egEncodeDocumentFormNext();
     
     // Obtener el cliente seleccionado
     // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
@@ -1144,10 +1302,10 @@ function handleNuevoVehiculoClick(event) {
     let countryPrefix = 'cl';
     let langPrefix = 'es';
     
-    if (currentPath.indexOf('/cl/') === 0) {
+    if (pathOnly.indexOf('/cl/') === 0) {
       countryPrefix = 'cl';
       langPrefix = 'es';
-    } else if (currentPath.indexOf('/us/') === 0) {
+    } else if (pathOnly.indexOf('/us/') === 0) {
       countryPrefix = 'us';
       langPrefix = 'en';
     }
@@ -1187,6 +1345,7 @@ function submitLanguageDoc(lang) {
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
         <form method="post" id="document-form" class="doc-form-compact mx-auto"
               data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
+              data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
               data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
               data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
               data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
@@ -1194,7 +1353,9 @@ function submitLanguageDoc(lang) {
               data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
               data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
               data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
+              data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
               data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
+              data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
               data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}"
               data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
           {% csrf_token %}
@@ -1244,28 +1405,53 @@ function submitLanguageDoc(lang) {
 
     <!-- 1. CABECERA COMPACTA — fila 1: INV | Fecha | Mecánico | Pago | fila 2: Tipo | Operación -->
     <div class="doc-console-header">
-      <div class="doc-console-title">{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</div>
-      <div class="doc-console-line doc-console-row1">
-        <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
-          {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}—{% endif %}
-        </span>
-        <label for="id_fecha_emision" class="sr-only">{% trans "Date" %}</label>
-        <input id="id_fecha_emision" type="date" name="fecha_emision" class="doc-console-meta bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
-               value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}" style="max-width: 130px;">
-        {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
-        <label id="tecnico-label" for="id_tecnico_responsable" class="sr-only" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
-        <span class="doc-console-meta" style="min-width: 110px;">{{ form.tecnico_responsable }}</span>
-        {% endwith %}
-        <span id="payment-status-badge" class="doc-console-payment doc-console-payment-pending">{{ form.payment_status }}</span>
+      <div class="doc-console-title flex flex-wrap items-center gap-2">
+        <span>{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</span>
+        <span id="draft-indicator" class="hidden text-[10px] sm:text-xs font-medium text-emerald-300/95 bg-emerald-950/60 border border-emerald-500/35 rounded px-2 py-0.5" role="status" aria-live="polite">{% trans "Auto-saved" %}</span>
       </div>
-      <div class="doc-console-line doc-console-row2">
-        <label for="id_tipo" class="doc-console-meta text-xs">{% trans "Document Type" %}</label>
-        {{ form.tipo }}
-        <label for="doc_mode" class="doc-console-meta text-xs">{% trans "Operation" %}</label>
-        <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300" style="min-width: 100px;">
-          <option value="services">{% trans "Services" %}</option>
-          <option value="parts">{% trans "Part sale only" %}</option>
-        </select>
+
+      <div class="doc-invoice-grid">
+        <div class="doc-invoice-panel">
+          <div class="doc-console-field doc-console-field--invoice">
+            <span class="doc-console-meta">{% trans "Document No." %}</span>
+            <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
+              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}—{% endif %}
+            </span>
+          </div>
+
+          <div class="doc-console-field">
+            <label for="id_fecha_emision" class="doc-console-meta">{% trans "Date" %}</label>
+            <input id="id_fecha_emision" type="date" name="fecha_emision" class="bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
+                   value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
+          </div>
+
+          <div class="doc-console-field">
+            <label for="id_tipo" class="doc-console-meta">{% trans "Document Type" %}</label>
+            {{ form.tipo }}
+          </div>
+        </div>
+
+        <div class="doc-invoice-panel">
+          {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+          <div class="doc-console-field">
+            <label id="tecnico-label" for="id_tecnico_responsable" class="doc-console-meta" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
+            <div class="doc-console-control">{{ form.tecnico_responsable }}</div>
+          </div>
+          {% endwith %}
+
+          <div class="doc-console-field">
+            <label for="id_payment_status" class="doc-console-meta">{% trans "Payment Status" %}</label>
+            <div id="payment-status-badge" class="doc-console-control doc-console-payment doc-console-payment-pending">{{ form.payment_status }}</div>
+          </div>
+
+          <div class="doc-console-field">
+            <label for="doc_mode" class="doc-console-meta">{% trans "Operation" %}</label>
+            <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300">
+              <option value="services">{% trans "Services" %}</option>
+              <option value="parts">{% trans "Part sale only" %}</option>
+            </select>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -1282,7 +1468,13 @@ function submitLanguageDoc(lang) {
                  onkeydown="return window.handleClienteKeydown?.(event)">
           <div id="cliente-resultados" class="absolute z-50 w-full bg-slate-800 border border-slate-600 rounded shadow-lg hidden max-h-48 overflow-y-auto text-sm mt-1"></div>
         </div>
-        <button type="button" id="btn-nuevo-cliente" class="mt-2 text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white">+ {% trans "New client" %}</button>
+        <a id="btn-nuevo-cliente"
+           href="{% country_url 'clientes:crear_cliente' %}"
+           data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
+           class="doc-action-btn mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold no-underline shadow-sm whitespace-nowrap">
+          <span aria-hidden="true">➕</span>
+          <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
+        </a>
         <select id="id_cliente" name="cliente" class="hidden">
           <option value="">{% trans "Select client..." %}</option>
         </select>
@@ -1299,7 +1491,10 @@ function submitLanguageDoc(lang) {
         <div class="tipo-dependent-vehicle">
           <div class="doc-field-with-btn flex gap-2">
             <div class="flex-1">{{ form.vehiculo }}</div>
-            <button type="button" id="btn-nuevo-vehiculo" class="text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white flex-shrink-0">+</button>
+            <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
+              <span aria-hidden="true">➕</span>
+              <span class="doc-action-label text-white font-semibold">Nuevo vehículo</span>
+            </button>
           </div>
         </div>
         {% endif %}
@@ -1326,11 +1521,19 @@ function submitLanguageDoc(lang) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       {% if ui_config.show_repuestos %}
       <div class="doc-smart-card doc-ficha-parts doc-pos-section">
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
-          <div class="flex gap-1">
-            <button type="button" id="add-repuesto" class="text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white" onclick="addRepuestoRow()">+ {% trans "ADD" %}</button>
-            <button type="button" id="add-used-parts" class="text-xs bg-amber-600 hover:bg-amber-500 px-2 py-1 rounded text-white" onclick="openUsedPartsModal()">🧩 {% trans "Used" %}</button>
+        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
+          <div class="flex flex-col gap-1 min-w-0 flex-1">
+            <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
+            {% if desarme_origen_label %}
+            <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
+              <span>🧩</span>
+              <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
+            </div>
+            {% endif %}
+          </div>
+          <div class="flex gap-1 flex-shrink-0 items-center">
+            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addRepuestoRow()"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="openUsedPartsModal()"><span aria-hidden="true">🧩</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
           </div>
         </div>
         <div class="doc-pos-header hidden sm:grid">
@@ -1343,30 +1546,37 @@ function submitLanguageDoc(lang) {
       {% endif %}
       {% if ui_config.show_services %}
       <div class="doc-smart-card doc-ficha-services doc-pos-section">
-        <div class="flex justify-between items-center mb-3">
-          <h3 class="!mb-0">{% trans "SERVICES" %} / {% trans "OTHER SERVICES" %}</h3>
-          <button type="button" id="add-servicio" class="text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white" onclick="addServicioRow()">+ {% trans "ADD" %}</button>
+        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
+          <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
+          <div class="flex gap-1 flex-shrink-0 items-center">
+            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addServicioRow()"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+          </div>
         </div>
         <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
-          <span>{% trans "Service" %}</span><span>{% trans "Qty" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+          <span>{% trans "Service" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
         </div>
         <div id="servicios-container" class="space-y-2 min-h-[80px]">
-          <!-- Dynamic services rows -->
+          <!-- Dynamic services rows: click + ADD, then type to search -->
+          <p id="servicios-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add to add services, then type to search." %}</p>
         </div>
       </div>
       {% endif %}
     </div>
     {% if ui_config.show_otros_servicios %}
-    <div class="doc-smart-card doc-ficha-otros doc-pos-section">
-      <div class="flex justify-between items-center mb-2">
+    <div class="doc-smart-card doc-ficha-otros doc-pos-section mt-4">
+      <div class="flex flex-wrap items-center gap-2 mb-3 min-h-[2rem]">
         <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
-        <div class="flex gap-1">
-          <button type="button" id="add-otro" class="text-xs bg-cyan-600 hover:bg-cyan-500 px-2 py-1 rounded text-white" onclick="addOtroRow()">+ {% trans "ADD" %}</button>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="text-xs bg-slate-600 hover:bg-slate-500 px-2 py-1 rounded text-white">🌐</a>
+        <div class="flex gap-1 flex-shrink-0 items-center">
+          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addOtroRow()"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">🌐</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
         </div>
       </div>
+      <div class="doc-pos-header doc-pos-header-otros hidden sm:grid">
+        <span>{% trans "Service" %}</span><span>{% trans "External Company" %}</span><span>{% trans "Shop Price" %}</span><span>{% trans "Client Price" %}</span><span>{% trans "Total" %}</span><span></span>
+      </div>
       <div id="otros-container" class="space-y-2 min-h-[60px]">
-        <!-- Dynamic other services rows -->
+        <!-- Dynamic other services rows (external/outsourced) -->
+        <p id="otros-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add for external/outsourced services." %}</p>
       </div>
     </div>
     {% endif %}
@@ -1379,42 +1589,83 @@ function submitLanguageDoc(lang) {
       </div>
       <div class="totales-cockpit order-1 md:order-2 totales-panel">
         <h3 class="totales-cockpit-title">{% trans "DOCUMENT TOTALS" %}</h3>
-        {% if ui_config.tax_lines|length > 0 %}
-        <div class="cockpit-row" style="border-bottom: none; padding-bottom: 4px;">
-          <label class="cockpit-label inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-1.5 w-3.5 h-3.5 accent-cyan-400" onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
-            <span>{% trans "Apply all taxes" %}</span>
-          </label>
-          <span></span>
-        </div>
-        {% endif %}
-        <div class="cockpit-row"><span class="cockpit-label">{% trans "Parts" %}</span><span id="t_repuestos" class="cockpit-value calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></div>
-        {% if ui_config.show_services %}
-        <div class="cockpit-row"><span class="cockpit-label">{% trans "Services" %}</span><span id="t_servicios" class="cockpit-value calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></div>
-        {% endif %}
-        {% if ui_config.show_otros_servicios %}
-        <div class="cockpit-row"><span class="cockpit-label">{% trans "Other" %}</span><span id="t_otros" class="cockpit-value calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></div>
-        {% endif %}
-        {% for tax_line in ui_config.tax_lines %}
-        <div class="cockpit-row tax-line" data-tax-id="{{ tax_line.id }}">
-          <label class="cockpit-label inline-flex items-center cursor-pointer">
-            <input type="checkbox" id="include_{{ tax_line.id }}" checked class="mr-1 w-3 h-3 accent-cyan-400 tax-checkbox" data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
-            <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
-          </label>
-          <span id="t_{{ tax_line.id }}" class="cockpit-value calculated-field" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
-        </div>
-        {% endfor %}
-        <div class="totales-cockpit-divider"></div>
-        <div class="totales-cockpit-total">
-          <span>{% trans "TOTAL" %}</span>
-          <span id="t_total" class="calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
+        <div class="receipt-totals">
+          {% if ui_config.tax_lines|length > 0 %}
+          <div class="receipt-totals-apply-tax">
+            <label class="cockpit-label inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-1.5 w-3.5 h-3.5 accent-cyan-400"
+                     onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
+              <span>{% trans "Apply all taxes" %}</span>
+            </label>
+          </div>
+          {% endif %}
+
+          <table class="receipt-totals-table">
+            <tbody>
+              <tr>
+                <td class="receipt-label">{% trans "Parts" %}</td>
+                <td class="receipt-value">
+                  <span id="t_repuestos" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% if ui_config.show_services %}
+              <tr>
+                <td class="receipt-label">{% trans "Services" %}</td>
+                <td class="receipt-value">
+                  <span id="t_servicios" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endif %}
+              {% if ui_config.show_otros_servicios %}
+              <tr>
+                <td class="receipt-label">{% trans "Other" %}</td>
+                <td class="receipt-value">
+                  <span id="t_otros" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endif %}
+
+              {% for tax_line in ui_config.tax_lines %}
+              <tr class="tax-line" data-tax-id="{{ tax_line.id }}">
+                <td class="receipt-label">
+                  <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="include_{{ tax_line.id }}" checked
+                           class="mr-1 w-3 h-3 accent-cyan-400 tax-checkbox"
+                           data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
+                    <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
+                  </label>
+                </td>
+                <td class="receipt-value">
+                  <span id="t_{{ tax_line.id }}" class="calculated-field" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+
+              <tr class="receipt-total-row">
+                <td class="receipt-total-label">{% trans "TOTAL" %}</td>
+                <td class="receipt-total-value">
+                  <span id="t_total" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
         <button type="submit" class="totales-cockpit-save">
           {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
         </button>
         <div class="flex gap-2 mt-3">
-          <a href="{% country_url 'documentos:lista_documentos' %}" class="flex-1 text-center text-xs py-2 rounded bg-slate-700 hover:bg-slate-600 text-slate-200">← {% trans "Back" %}</a>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="text-xs py-2 px-3 rounded bg-slate-700 hover:bg-slate-600 text-slate-200">🌐</a>
+          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">←</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">🌐</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
         </div>
       </div>
     </div>
@@ -1455,6 +1706,12 @@ function submitLanguageDoc(lang) {
 {{ block.super }}
 <script src="{% static 'marketplace_tooltip.js' %}"></script>
 <script>
+// Asegurar que egEncodeDocumentFormNext exista antes de initDocumentFormScript (puede no estar si el script de documento_content no se ejecutó)
+if (typeof window.egEncodeDocumentFormNext !== 'function') {
+  window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
+    return encodeURIComponent(window.location.pathname + (window.location.search || ''));
+  };
+}
 function initDocumentFormScript(){
   // Evita doble inicialización
   if (window.EG && window.EG._docFormInit) {
@@ -1525,7 +1782,9 @@ function initDocumentFormScript(){
       EG.cfg.URL_REPUESTO_BY_CODE   = EG.cfg.URL_REPUESTO_BY_CODE   || FORM.dataset.urlRepuestoByCode;
       EG.cfg.URL_REPUESTO_SEARCH   = EG.cfg.URL_REPUESTO_SEARCH   || FORM.dataset.urlRepuestoSearch;
       EG.cfg.URL_REPUESTO_CREATE   = EG.cfg.URL_REPUESTO_CREATE   || FORM.dataset.urlRepuestoCreate;
+      EG.cfg.URL_REPUESTO_CREATE_WINDOW = EG.cfg.URL_REPUESTO_CREATE_WINDOW || FORM.dataset.urlRepuestoCreatePage;
       EG.cfg.URL_SERVICE_SEARCH     = EG.cfg.URL_SERVICE_SEARCH     || FORM.dataset.urlServiceSearch;
+      EG.cfg.URL_SERVICE_CREATE     = EG.cfg.URL_SERVICE_CREATE     || FORM.dataset.urlServiceCreate;
       EG.cfg.URL_OUTSOURCED_SERVICES= EG.cfg.URL_OUTSOURCED_SERVICES|| FORM.dataset.urlOutsourcedServices;
       EG.cfg.URL_USED_PARTS        = EG.cfg.URL_USED_PARTS        || FORM.dataset.urlUsedParts;
     }
@@ -1539,6 +1798,7 @@ function initDocumentFormScript(){
       EG.cfg.URL_REPUESTO_BY_CODE = FORM.dataset.urlRepuestoByCode || `${base}/api/repuestos/by-code`;
       EG.cfg.URL_REPUESTO_SEARCH = FORM.dataset.urlRepuestoSearch || `${base}/api/repuestos/`;
       EG.cfg.URL_SERVICE_SEARCH   = FORM.dataset.urlServiceSearch || `${base}/api/servicios/`;
+      EG.cfg.URL_SERVICE_CREATE   = FORM.dataset.urlServiceCreate || `${base}/servicios/crear/`;
       EG.cfg.URL_OUTSOURCED_SERVICES = FORM.dataset.urlOutsourcedServices || `${base}/api/otros-servicios/`;
       EG.cfg.URL_USED_PARTS = FORM.dataset.urlUsedParts || `${base}/api/piezas-desarme/`;
     }
@@ -1662,6 +1922,7 @@ const I18N = {
   no_external_services: "{% trans 'No external services found' %}",
   external_company: "{% trans 'External Company' %}",
   create_part: "{% trans 'Create Part' %}",
+  create_service: "{% trans 'Create Service' %}",
   part_number_required: "{% trans 'Part number is required' %}",
   part_name_required: "{% trans 'Part name is required' %}",
   part_created: "{% trans 'Part created successfully' %}",
@@ -1700,6 +1961,7 @@ if (COUNTRY_REF === 'CL') {
     shop_price: "Costo al taller",
     external_company: "Empresa externa",
     create_part: "Crear repuesto",
+    create_service: "Crear servicio",
     part_number_required: "El código del repuesto es obligatorio",
     part_name_required: "El nombre del repuesto es obligatorio",
     part_created: "Repuesto creado correctamente",
@@ -2172,6 +2434,7 @@ function recalcTotales(){
           // Calcular y mostrar total general
           const grandTotal = rep + serv + otros + totalTaxes;
           setText('#t_total', money(grandTotal));
+          if (typeof scheduleDocumentDraftSave === 'function') scheduleDocumentDraftSave();
         }
 window.recalcTotales = recalcTotales;
 
@@ -2187,7 +2450,7 @@ document.querySelectorAll('.tax-checkbox').forEach(checkbox => {
 // IDs de botones en tu HTML: #add-repuesto, #add-servicio, #add-otro
 // Los event listeners se registran en DOMContentLoaded
 
-window.addRepuestoRow = function addRepuestoRow(){
+window.addRepuestoRow = function addRepuestoRow(presetRowId){
   const container = document.getElementById('repuestos-container');
   if (!container) {
     console.error('❌ Contenedor de repuestos no encontrado');
@@ -2198,55 +2461,105 @@ window.addRepuestoRow = function addRepuestoRow(){
   const lblFlex = (content) => isFirstRow ? `<label class="block text-cyan-200 text-sm mb-1 flex items-center gap-1">${content}</label>` : '';
   const row = document.createElement('div');
   row.className = 'dynamic-element';
+  const rowId = (presetRowId && String(presetRowId).trim())
+    ? String(presetRowId).trim()
+    : `rep_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+  row.dataset.rowId = rowId;
   row.innerHTML = `
-    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
-      <div class="w-full sm:w-28 relative">
+    <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="${rowId}">
+      <div class="col-span-2 sm:col-span-2 relative min-w-0">
         ${lbl(I18N.code)}
-        <input type="text" class="rep-codigo form-control w-full text-base" placeholder="${I18N.code}" autocomplete="off">
+        <input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="${I18N.code}" autocomplete="off">
         <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-id">
         <input type="hidden" class="rep-origen" value="STOCK_BODEGA">
         <input type="hidden" class="rep-pieza-desarme-id">
         <input type="hidden" class="rep-costo-linea">
       </div>
-      <div class="description-field rep-search-container w-full sm:flex-1 sm:min-w-80 relative">
-        ${lbl(I18N.name)}
-        <input type="text" class="rep-search form-control w-full text-base" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
+      <div class="col-span-4 sm:col-span-4 description-field rep-search-container relative min-w-0">
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <span>${isFirstRow ? I18N.name : ''}</span>
+          <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase tracking-wide">
+            Usado / Desarme
+          </span>
+        </div>
+        <div class="flex gap-1">
+          <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
+          <button type="button" class="rep-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_part}">＋</button>
+        </div>
         <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-nombre">
-        <button type="button" class="rep-create-btn absolute top-8 sm:top-8 right-2 px-3 py-2 rounded-md bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-500 hover:to-fuchsia-500 text-white text-xs sm:text-sm font-semibold border border-purple-300/40 shadow-sm transition-all">➕</button>
       </div>
-      <div class="w-full sm:w-16">
+      <div class="col-span-1 sm:col-span-1 min-w-0">
         ${lbl(I18N.qty)}
-        <input type="number" class="rep-cantidad form-control w-full text-base" min="1" max="999" value="1">
+        <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" max="999" value="1">
       </div>
-      <div class="w-full sm:w-28">
+      <div class="col-span-2 sm:col-span-2 min-w-0">
         ${lblFlex(`<span>${I18N.sale_price}</span><button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>`)}
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="rep-precio-venta form-control w-full text-base pl-6" placeholder="0">
+          <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6" placeholder="0">
         </div>
       </div>
-      <div class="w-full sm:w-28 cost-price-container hidden">
+      <div class="col-span-1 sm:col-span-1 cost-price-container hidden min-w-0">
         ${lbl(I18N.cost_price)}
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="rep-precio-compra form-control w-full text-base pl-6" placeholder="0">
+          <input type="text" class="rep-precio-compra form-control w-full h-10 text-sm pl-6" placeholder="0">
         </div>
       </div>
-      <div class="w-full sm:w-28">
+      <div class="col-span-1 sm:col-span-1 min-w-0">
         ${lbl(I18N.subtotal)}
         <input type="hidden" class="rep-subtotal" value="0">
-        <div class="rep-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
+        <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
       </div>
-      <div class="w-full sm:w-12">
-        <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+      <div class="col-span-1 sm:col-span-1">
+        <button type="button" class="btn-add w-full h-10" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
       </div>
     </div>`;
   container.appendChild(row);
   setupRepuestoRow(row);
   return row;
-}
+};
+
+window.restoreCreatedRepuestoFromReturn = function restoreCreatedRepuestoFromReturn() {
+  const url = new URL(window.location.href);
+  const repId = url.searchParams.get('created_repuesto_id');
+  if (!repId) return;
+
+  const targetRow = url.searchParams.get('target_row');
+  const nombre = url.searchParams.get('created_repuesto_nombre') || '';
+  const codigo = url.searchParams.get('created_repuesto_codigo') || '';
+  const precioVenta = parseFloat(url.searchParams.get('created_repuesto_precio_venta') || '0');
+  const precioCompra = parseFloat(url.searchParams.get('created_repuesto_precio_compra') || '0');
+
+  let row = null;
+  if (targetRow) {
+    const el = document.querySelector('[data-row-id="' + String(targetRow).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"]');
+    row = el ? el.closest('.dynamic-element') : null;
+  }
+  if (!row && typeof window.addRepuestoRow === 'function') {
+    row = window.addRepuestoRow();
+  }
+  if (row && typeof row.__applyRepData === 'function') {
+    row.__applyRepData({
+      id: repId,
+      nombre,
+      codigo,
+      precio_venta: precioVenta,
+      precio_compra: precioCompra,
+    });
+  }
+
+  url.searchParams.delete('created_repuesto_id');
+  url.searchParams.delete('created_repuesto_nombre');
+  url.searchParams.delete('created_repuesto_codigo');
+  url.searchParams.delete('created_repuesto_precio_venta');
+  url.searchParams.delete('created_repuesto_precio_compra');
+  url.searchParams.delete('target_row');
+  const qs = url.searchParams.toString();
+  window.history.replaceState({}, '', url.pathname + (qs ? '?' + qs : ''));
+};
 
 // Used Parts (piezas de desarme) modal
 window.openUsedPartsModal = function openUsedPartsModal(){
@@ -2365,6 +2678,7 @@ function setupRepuestoRow(row){
   const qEl         = $('.rep-cantidad', row);
   const sub         = $('.rep-subtotal', row);
   const view        = $('.rep-subtotal-view', row);
+  const desarmeBadge = row.querySelector('.rep-desarme-badge');
 
   let timer = null;
   let codeTimer = null;
@@ -2372,14 +2686,23 @@ function setupRepuestoRow(row){
   const btnCreate = row.querySelector('.rep-create-btn');
   btnCreate?.addEventListener('click', ()=>{
     currentRepuestoRow = row;
-    const searchValue = (searchInput?.value || '').split('•')[0].trim();
-    const data = {
-      part_number: inpCode?.value?.trim() || searchValue,
-      nombre: inpName?.value?.trim() || '',
-      precio_compra: inpPC?.value || '',
-      precio_venta: inpPV?.value || '',
-    };
-    openRepuestoModal(data);
+    const nombre = (searchInput?.value || '').split('•')[0].trim() || (inpName?.value || '').trim();
+    const codigo = (inpCode?.value || '').trim();
+    const rowId = row.dataset.rowId || '';
+    const createBase = (typeof EG !== 'undefined' && EG.cfg && EG.cfg.URL_REPUESTO_CREATE_WINDOW)
+      ? EG.cfg.URL_REPUESTO_CREATE_WINDOW
+      : '';
+    if (!createBase) {
+      console.error('URL_REPUESTO_CREATE_WINDOW no configurada (data-url-repuesto-create-page)');
+      return;
+    }
+    const next = window.location.pathname + window.location.search;
+    const createUrl = new URL(createBase, window.location.origin);
+    createUrl.searchParams.set('next', next);
+    createUrl.searchParams.set('target_row', rowId);
+    if (nombre) createUrl.searchParams.set('prefill_nombre', nombre);
+    if (codigo) createUrl.searchParams.set('prefill_code', codigo);
+    window.location.href = createUrl.toString();
   });
 
           async function fetchByCode(code){
@@ -2423,16 +2746,21 @@ function setupRepuestoRow(row){
     if (repOrigen) repOrigen.value = 'STOCK_BODEGA';
     if (repPiezaDesarmeId) repPiezaDesarmeId.value = '';
     if (repCostoLinea) repCostoLinea.value = '';
+    if (desarmeBadge) desarmeBadge.classList.add('hidden');
     recalc();
   }
   
   row.__applyRepData = function(data) {
     if (!data) return;
+    const pv = data.precio_venta !== undefined && data.precio_venta !== null
+      ? data.precio_venta
+      : (data.precio || 0);
     applyPartData({
       id: data.id || '',
       codigo: data.codigo || '',
       nombre: data.nombre || '',
-      precio_venta: data.precio || 0,
+      precio_venta: pv,
+      precio_compra: data.precio_compra,
     });
     if (qEl && data.cantidad) {
       qEl.value = data.cantidad;
@@ -2446,6 +2774,12 @@ function setupRepuestoRow(row){
     if (repOrigen && data.origen_repuesto) repOrigen.value = data.origen_repuesto;
     if (repPiezaDesarmeId && data.pieza_desarme_id !== undefined) repPiezaDesarmeId.value = String(data.pieza_desarme_id || '');
     if (repCostoLinea && data.costo_linea !== undefined) repCostoLinea.value = String(data.costo_linea ?? '');
+    if (desarmeBadge) {
+      const isDesarme =
+        (data.origen_repuesto && data.origen_repuesto === 'DESARME') ||
+        (data.pieza_desarme_id !== undefined && data.pieza_desarme_id !== null && String(data.pieza_desarme_id) !== '');
+      desarmeBadge.classList.toggle('hidden', !isDesarme);
+    }
     recalc();
   };
 
@@ -2724,30 +3058,34 @@ window.addServicioRow = function addServicioRow(){
   const row = document.createElement('div');
   row.className = 'dynamic-element';
   row.innerHTML = `
-    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
-      <div class="description-field srv-input-container w-full sm:flex-1 sm:min-w-96 relative">
+    <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20">
+      <div class="col-span-7 sm:col-span-7 description-field srv-input-container relative min-w-0">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
-        <input type="text" class="srv-input form-control w-full text-base" placeholder="${I18N.type_to_search_services}" autocomplete="off">
+        <div class="flex gap-1">
+          <input type="text" class="srv-input form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_services}" autocomplete="off">
+          <button type="button" class="srv-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_service}">＋</button>
+        </div>
         <div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto top-full mt-1"></div>
         <input type="hidden" class="srv-id">
       </div>
-      <div class="w-full sm:w-28">
+      <div class="col-span-2 sm:col-span-2 min-w-0">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="serv-precio form-control w-full text-base pl-6" placeholder="0">
+          <input type="text" class="serv-precio form-control w-full h-10 text-sm pl-6" placeholder="0">
         </div>
       </div>
-      <div class="w-full sm:w-28">
+      <div class="col-span-2 sm:col-span-2 min-w-0">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
         <input type="hidden" class="serv-subtotal" value="0">
-        <div class="serv-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
+        <div class="serv-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
       </div>
-      <div class="w-full sm:w-12">
-        <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+      <div class="col-span-1 sm:col-span-1">
+        <button type="button" class="btn-add w-full h-10" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('servicios-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#servicios-container .dynamic-element'));">✕</button>
       </div>
     </div>`;
   container.appendChild(row);
+  container.querySelector('#servicios-empty-hint')?.classList.add('hidden');
   setupServicioRow(row);
   return row;
 }
@@ -2873,6 +3211,12 @@ function setupServicioRow(row){
 
   pEl?.addEventListener('input', recalc);
 
+  const btnCreateSrv = row.querySelector('.srv-create-btn');
+  btnCreateSrv?.addEventListener('click', ()=>{
+    const url = (EG.cfg && EG.cfg.URL_SERVICE_CREATE) || '';
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+  });
+
   row.__applyServicioData = function(item){
     if (!item) return;
     if (idHid) idHid.value = item.id || '';
@@ -2900,41 +3244,42 @@ window.addOtroRow = function addOtroRow(){
   const row = document.createElement('div');
   row.className = 'dynamic-element';
   row.innerHTML = `
-    <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 items-stretch sm:items-end border border-cyan-400/30 rounded-lg p-3 sm:p-4 bg-black/20">
-      <div class="description-field otr-search-container w-full sm:flex-1 sm:min-w-60 relative">
+    <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20">
+      <div class="col-span-3 sm:col-span-3 description-field otr-search-container relative min-w-0">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
-        <input type="text" class="otr-search form-control w-full text-base" placeholder="${I18N.type_to_search_external}" autocomplete="off">
+        <input type="text" class="otr-search form-control w-full h-10 text-sm" placeholder="${I18N.type_to_search_external}" autocomplete="off">
         <div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="otr-servicio-id">
       </div>
-      <div class="flex-1 w-full sm:min-w-48">
+      <div class="col-span-3 sm:col-span-3 min-w-0">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.external_company}</label>
-        <input type="text" class="otr-empresa form-control w-full text-base">
+        <input type="text" class="otr-empresa form-control w-full h-10 text-sm">
       </div>
-      <div class="w-full sm:w-24">
+      <div class="col-span-2 sm:col-span-2 min-w-0">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.shop_price}</label>
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="otr-precio-taller form-control w-full text-base pl-6" placeholder="0">
+          <input type="text" class="otr-precio-taller form-control w-full h-10 text-sm pl-6" placeholder="0">
         </div>
       </div>
-      <div class="w-full sm:w-24">
+      <div class="col-span-2 sm:col-span-2 min-w-0">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="otr-precio form-control w-full text-base pl-6" placeholder="0">
+          <input type="text" class="otr-precio form-control w-full h-10 text-sm pl-6" placeholder="0">
         </div>
       </div>
-      <div class="w-full sm:w-24">
+      <div class="col-span-1 sm:col-span-1 min-w-0">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
         <input type="hidden" class="otr-subtotal" value="0">
-        <div class="otr-subtotal-view subtotal-field w-full text-right font-bold form-control text-base">$0</div>
+        <div class="otr-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
       </div>
-      <div class="w-full sm:w-16">
-        <button type="button" class="btn-secondary w-full py-2 px-4 text-sm sm:text-base" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+      <div class="col-span-1 sm:col-span-1">
+        <button type="button" class="btn-add w-full h-10" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('otros-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#otros-container .dynamic-element'));">✕</button>
       </div>
     </div>`;
   container.appendChild(row);
+  container.querySelector('#otros-empty-hint')?.classList.add('hidden');
   setupOtroRow(row);
   return row;
 }
@@ -3155,6 +3500,284 @@ function serializeRows(){
 
   console.log('💾 JSON guardado');
 }
+
+// ===============
+// BORRADOR LOCAL (localStorage) — retorno desde crear cliente / vehículo / repuesto
+// ===============
+const DOC_DRAFT_VERSION = 1;
+const DOC_DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+let __docDraftSaveTimer = null;
+
+function getDocumentFormDraftKey() {
+  const form = document.getElementById('document-form');
+  if (!form) return null;
+  const mode = form.dataset.mode || 'create';
+  const docId = (form.dataset.documentId || '').trim() || 'new';
+  const path = (window.location.pathname || '').replace(/\/$/, '') || '/';
+  return `doc_draft_v${DOC_DRAFT_VERSION}:${path}:${mode}:${docId}`;
+}
+
+function showDraftSavedIndicator() {
+  const el = document.getElementById('draft-indicator');
+  if (!el) return;
+  el.classList.remove('hidden');
+  clearTimeout(showDraftSavedIndicator._t);
+  showDraftSavedIndicator._t = setTimeout(() => el.classList.add('hidden'), 1600);
+}
+
+function collectDocumentDraftPayload() {
+  const form = document.getElementById('document-form');
+  if (!form || window.__DOC_DRAFT_RESTORING__) return null;
+
+  getClienteElements();
+  const rep = $$('#repuestos-container .dynamic-element').map((row) => ({
+    rowId: row.dataset.rowId || '',
+    id: $('.rep-id', row)?.value?.trim() || '',
+    codigo: $('.rep-codigo', row)?.value?.trim() || '',
+    nombre: $('.rep-nombre', row)?.value?.trim() || '',
+    nombre_input: $('.rep-search', row)?.value?.trim() || '',
+    cantidad: Number($('.rep-cantidad', row)?.value || 0) || 1,
+    precio_venta: parseNumericInput($('.rep-precio-venta', row)?.value || 0),
+    precio_compra: parseNumericInput($('.rep-precio-compra', row)?.value || 0),
+    descuento: Number($('.rep-descuento', row)?.value || 0) || 0,
+    origen_repuesto: $('.rep-origen', row)?.value?.trim() || 'STOCK_BODEGA',
+    pieza_desarme_id: $('.rep-pieza-desarme-id', row)?.value?.trim() || '',
+    costo_linea: parseNumericInput($('.rep-costo-linea', row)?.value || 0),
+  }));
+  const serv = $$('#servicios-container .dynamic-element').map((row) => ({
+    servicio_id: $('.srv-id', row)?.value?.trim() || '',
+    nombre: $('.srv-input', row)?.value?.trim() || '',
+    precio: parseNumericInput($('.serv-precio', row)?.value || 0),
+  }));
+  const otros = $$('#otros-container .dynamic-element').map((row) => ({
+    servicio_id: $('.otr-servicio-id', row)?.value?.trim() || '',
+    nombre: $('.otr-search', row)?.value?.trim() || '',
+    empresa_ext: $('.otr-empresa', row)?.value?.trim() || '',
+    precio_taller: parseNumericInput($('.otr-precio-taller', row)?.value || 0),
+    precio: parseNumericInput($('.otr-precio', row)?.value || 0),
+  }));
+
+  const kmEl = form.querySelector('[name="kilometraje_ingreso"]');
+
+  const draft = {
+    v: DOC_DRAFT_VERSION,
+    savedAt: Date.now(),
+    path: (window.location.pathname || '').replace(/\/$/, '') || '/',
+    mode: form.dataset.mode || 'create',
+    documentId: (form.dataset.documentId || '').trim() || null,
+    tipo: document.getElementById('id_tipo')?.value || '',
+    fecha_emision: document.getElementById('id_fecha_emision')?.value || '',
+    doc_mode: document.getElementById('doc_mode')?.value || '',
+    payment_status: document.getElementById('id_payment_status')?.value || '',
+    observaciones: document.getElementById('id_observaciones')?.value || '',
+    kilometraje_ingreso: kmEl ? (kmEl.value || '') : '',
+    apply_all_taxes: (() => {
+      const v = document.getElementById('id_apply_vat');
+      return v ? !!v.checked : null;
+    })(),
+    tax_line_checks: (window.EG?.cfg?.taxLines || []).map((tl) => ({
+      id: String(tl.id),
+      checked: !!document.getElementById(`include_${tl.id}`)?.checked,
+    })),
+    cliente_id: document.getElementById('id_cliente')?.value || '',
+    cliente_nombre: document.getElementById('cliente-busqueda')?.value || '',
+    cliente_email: (cliEmail?.textContent || '').replace(/^📧\s*/, '').trim().replace(/^—$/, ''),
+    cliente_telefono: (cliFono?.textContent || '').replace(/^📞\s*/, '').trim().replace(/^—$/, ''),
+    vehiculo_id: document.getElementById('id_vehiculo')?.value || '',
+    repuestos: rep,
+    servicios: serv,
+    otros: otros,
+  };
+  return draft;
+}
+
+function saveDocumentDraftNow() {
+  const key = getDocumentFormDraftKey();
+  if (!key) return;
+  try {
+    const payload = collectDocumentDraftPayload();
+    if (!payload) return;
+    localStorage.setItem(key, JSON.stringify(payload));
+    showDraftSavedIndicator();
+  } catch (e) {
+    console.warn('doc draft save failed', e);
+  }
+}
+
+function scheduleDocumentDraftSave() {
+  if (window.__DOC_DRAFT_RESTORING__) return;
+  clearTimeout(__docDraftSaveTimer);
+  __docDraftSaveTimer = setTimeout(saveDocumentDraftNow, 480);
+}
+
+function loadDocumentDraftParsed() {
+  const key = getDocumentFormDraftKey();
+  if (!key) return null;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data || data.v !== DOC_DRAFT_VERSION || !data.savedAt) return null;
+    if (Date.now() - Number(data.savedAt) > DOC_DRAFT_TTL_MS) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    if (data.path && data.path !== (window.location.pathname || '').replace(/\/$/, '')) return null;
+    const form = document.getElementById('document-form');
+    if (form && data.mode && data.mode !== (form.dataset.mode || 'create')) return null;
+    const did = (form?.dataset.documentId || '').trim() || null;
+    if (did && data.documentId && String(data.documentId) !== String(did)) return null;
+    if (did && !data.documentId) return null;
+    if (!did && data.documentId) return null;
+    return data;
+  } catch (e) {
+    console.warn('doc draft load failed', e);
+    return null;
+  }
+}
+
+function clearDynamicPosRows() {
+  document.querySelectorAll('#repuestos-container .dynamic-element').forEach((el) => el.remove());
+  document.querySelectorAll('#servicios-container .dynamic-element').forEach((el) => el.remove());
+  document.querySelectorAll('#otros-container .dynamic-element').forEach((el) => el.remove());
+  document.getElementById('servicios-empty-hint')?.classList.remove('hidden');
+}
+
+function clearDocumentFormDraftStorage() {
+  const key = getDocumentFormDraftKey();
+  if (key) {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+}
+
+async function restoreDocumentDraftAfterHydrate(opts) {
+  const hasServerLines = !!(opts && opts.hasServerLines);
+  const draft = loadDocumentDraftParsed();
+  if (!draft) return;
+
+  window.__DOC_DRAFT_RESTORING__ = true;
+  try {
+    const draftHasLines =
+      ((draft.repuestos && draft.repuestos.length) || 0) > 0 ||
+      ((draft.servicios && draft.servicios.length) || 0) > 0 ||
+      ((draft.otros && draft.otros.length) || 0) > 0;
+
+    if (document.getElementById('id_tipo') && draft.tipo) {
+      document.getElementById('id_tipo').value = draft.tipo;
+      document.getElementById('id_tipo').dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    if (document.getElementById('id_fecha_emision') && draft.fecha_emision) {
+      document.getElementById('id_fecha_emision').value = draft.fecha_emision;
+    }
+    if (document.getElementById('doc_mode') && draft.doc_mode) {
+      document.getElementById('doc_mode').value = draft.doc_mode;
+      document.getElementById('doc_mode').dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    const pay = document.getElementById('id_payment_status');
+    if (pay && draft.payment_status) {
+      pay.value = draft.payment_status;
+      pay.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    const applyVat = document.getElementById('id_apply_vat');
+    if (applyVat && draft.apply_all_taxes !== undefined && draft.apply_all_taxes !== null) {
+      applyVat.checked = !!draft.apply_all_taxes;
+    }
+    (draft.tax_line_checks || []).forEach((tc) => {
+      const tel = document.getElementById(`include_${tc.id}`);
+      if (tel) tel.checked = !!tc.checked;
+    });
+    const obs = document.getElementById('id_observaciones');
+    if (obs && typeof draft.observaciones === 'string') obs.value = draft.observaciones;
+    const kmEl = document.getElementById('document-form')?.querySelector('[name="kilometraje_ingreso"]');
+    if (kmEl && typeof draft.kilometraje_ingreso === 'string') kmEl.value = draft.kilometraje_ingreso;
+
+    if (draftHasLines || !hasServerLines) {
+      clearDynamicPosRows();
+      (draft.repuestos || []).forEach((rep) => {
+        if (typeof window.addRepuestoRow !== 'function') return;
+        const row = window.addRepuestoRow(rep.rowId || null);
+        if (row && row.__applyRepData) {
+          row.__applyRepData({
+            id: rep.id || '',
+            nombre: rep.nombre || rep.nombre_input || '',
+            codigo: rep.codigo || '',
+            cantidad: rep.cantidad || 1,
+            precio_venta: rep.precio_venta != null ? rep.precio_venta : 0,
+            precio_compra: rep.precio_compra != null ? rep.precio_compra : undefined,
+            descuento: rep.descuento != null ? rep.descuento : 0,
+            origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
+            pieza_desarme_id: rep.pieza_desarme_id || '',
+            costo_linea: rep.costo_linea != null ? rep.costo_linea : 0,
+          });
+        }
+      });
+      (draft.servicios || []).forEach((s) => {
+        if (typeof window.addServicioRow !== 'function') return;
+        const row = window.addServicioRow();
+        if (row && row.__applyServData) {
+          row.__applyServData({
+            id: s.servicio_id || '',
+            nombre: s.nombre || '',
+            precio: s.precio || 0,
+          });
+        }
+      });
+      (draft.otros || []).forEach((o) => {
+        if (typeof window.addOtroRow !== 'function') return;
+        const row = window.addOtroRow();
+        if (row && row.__applyOtroData) {
+          row.__applyOtroData({
+            id: o.servicio_id || '',
+            nombre: o.nombre || '',
+            empresa: o.empresa_ext || '',
+            empresa_ext: o.empresa_ext || '',
+            precio_cliente: o.precio || 0,
+            precio_taller: o.precio_taller || 0,
+          });
+        }
+      });
+    }
+
+    const qsPre = new URLSearchParams(window.location.search || '');
+    const urlClientePre =
+      qsPre.get('cliente_id') || qsPre.get('new_cliente_id') || qsPre.get('cliente');
+    const urlVehiculoPre = qsPre.get('vehiculo_id') || qsPre.get('new_vehiculo_id');
+    const tplClientePre =
+      typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__
+        ? String(window.__PRESELECT_CLIENTE_ID__)
+        : '';
+    const tplVehiculoPre =
+      typeof window.__PRESELECT_VEHICULO_ID__ !== 'undefined' && window.__PRESELECT_VEHICULO_ID__
+        ? String(window.__PRESELECT_VEHICULO_ID__)
+        : '';
+    const skipDraftCliente = !!(urlClientePre || tplClientePre);
+    const skipDraftVehiculo = !!(urlVehiculoPre || tplVehiculoPre);
+
+    if (draft.cliente_id && typeof seleccionarCliente === 'function' && !skipDraftCliente) {
+      await seleccionarCliente({
+        id: draft.cliente_id,
+        nombre: draft.cliente_nombre || ('Cliente #' + draft.cliente_id),
+        email: draft.cliente_email || '',
+        telefono: draft.cliente_telefono || '',
+      });
+      if (draft.vehiculo_id && !skipDraftVehiculo && typeof preseleccionarVehiculo === 'function') {
+        setTimeout(() => preseleccionarVehiculo(draft.vehiculo_id), 250);
+      }
+    } else if (draft.vehiculo_id && document.getElementById('id_vehiculo') && !skipDraftCliente && !skipDraftVehiculo) {
+      const vs = document.getElementById('id_vehiculo');
+      vs.value = draft.vehiculo_id;
+      vs.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  } finally {
+    window.__DOC_DRAFT_RESTORING__ = false;
+    if (typeof serializeRows === 'function') serializeRows();
+  }
+}
+window.restoreDocumentDraftAfterHydrate = restoreDocumentDraftAfterHydrate;
 
 function submitDocumentForm(){
   const form = document.getElementById('document-form');
@@ -3386,18 +4009,40 @@ function submitDocumentForm(){
       }
     }, 100);
   }
-  
+
+  {% else %}
+  // Si no es edición, aplicar tema y actualizar número normalmente
+  const t0 = selTipo?.value || 'OT';
+  applyTheme(t0);
+  if (typeof applyModeDependentUI === 'function') applyModeDependentUI();
+  updateDocumentNumber();
+  // Preselección cliente/vehículo (vuelta desde "crear vehículo" con cliente_id y vehiculo_id en URL)
+  {% if cliente_preselect_id %}
+  if (typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__ && typeof seleccionarCliente === 'function') {
+    setTimeout(() => {
+      seleccionarCliente({
+        id: window.__PRESELECT_CLIENTE_ID__,
+        nombre: "{{ cliente_preselect_nombre|default:''|escapejs }}",
+        email: "{{ cliente_preselect_email|default:''|escapejs }}",
+        telefono: "{{ cliente_preselect_telefono|default:''|escapejs }}"
+      });
+    }, 100);
+  }
+  {% endif %}
+  {% endif %}
+
+  // Hidratar líneas (edición y creación con prefill)
   const repuestosData = {{ repuestos_json|safe|default:"[]" }};
   const serviciosData = {{ servicios_json|safe|default:"[]" }};
   const otrosData = {{ otros_json|safe|default:"[]" }};
-  
-  console.log('📦 Cargando datos existentes para edición:', {
-    repuestos: repuestosData.length,
-    servicios: serviciosData.length,
-    otros: otrosData.length
+
+  console.log('📦 Cargando datos iniciales del formulario:', {
+    repuestos: (repuestosData || []).length,
+    servicios: (serviciosData || []).length,
+    otros: (otrosData || []).length
   });
-  
-  // Cargar repuestos con delay para asegurar que las funciones estén disponibles
+
+  // Cargar líneas con delay para asegurar que las funciones estén disponibles
   setTimeout(() => {
     if (repuestosData && repuestosData.length > 0) {
       repuestosData.forEach(rep => {
@@ -3419,8 +4064,7 @@ function submitDocumentForm(){
         }
       });
     }
-    
-    // Cargar servicios
+
     if (serviciosData && serviciosData.length > 0) {
       serviciosData.forEach(serv => {
         if (typeof window.addServicioRow === 'function') {
@@ -3437,8 +4081,7 @@ function submitDocumentForm(){
         }
       });
     }
-    
-    // Cargar otros servicios
+
     if (otrosData && otrosData.length > 0) {
       otrosData.forEach(otro => {
         if (typeof window.addOtroRow === 'function') {
@@ -3456,96 +4099,50 @@ function submitDocumentForm(){
         }
       });
     }
-    
-    // Recalcular totales después de cargar todos los datos
-    setTimeout(() => {
-      if (typeof window.recalcTotales === 'function') {
-        window.recalcTotales();
+
+    // Recalcular y serializar después de hidratar todos los datos
+    const hasServerLines =
+      ((repuestosData || []).length > 0 ||
+        (serviciosData || []).length > 0 ||
+        (otrosData || []).length > 0);
+    setTimeout(async () => {
+      if (typeof restoreDocumentDraftAfterHydrate === 'function') {
+        await restoreDocumentDraftAfterHydrate({ hasServerLines });
       }
+      if (typeof window.restoreCreatedRepuestoFromReturn === 'function') {
+        window.restoreCreatedRepuestoFromReturn();
+      }
+      if (typeof window.recalcTotales === 'function') window.recalcTotales();
+      if (typeof window.serializeRows === 'function') window.serializeRows();
     }, 300);
-  }, 200);
-  {% else %}
-  // Si no es edición, aplicar tema y actualizar número normalmente
-  const t0 = selTipo?.value || 'OT';
-  applyTheme(t0);
-  if (typeof applyModeDependentUI === 'function') applyModeDependentUI();
-  updateDocumentNumber();
-  // Preselección cliente/vehículo (vuelta desde "crear vehículo" con cliente_id y vehiculo_id en URL)
-  {% if cliente_preselect_id %}
-  if (typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__ && typeof seleccionarCliente === 'function') {
-    setTimeout(() => {
-      seleccionarCliente({
-        id: window.__PRESELECT_CLIENTE_ID__,
-        nombre: "{{ cliente_preselect_nombre|default:''|escapejs }}",
-        email: "{{ cliente_preselect_email|default:''|escapejs }}",
-        telefono: "{{ cliente_preselect_telefono|default:''|escapejs }}"
-      });
-    }, 100);
-  }
-  {% endif %}
-  {% endif %}
+  }, 150);
   
   serializeRows();
+
+  const docFormDraft = document.getElementById('document-form');
+  docFormDraft?.addEventListener('input', scheduleDocumentDraftSave);
+  docFormDraft?.addEventListener('change', scheduleDocumentDraftSave);
+  docFormDraft?.addEventListener('submit', () => {
+    clearDocumentFormDraftStorage();
+  });
 
   clienteBusqueda?.addEventListener('input', (event)=> window.handleClienteInput(event.target.value));
   clienteBusqueda?.addEventListener('focus', (event)=> window.handleClienteFocus(event.target.value));
   clienteBusqueda?.addEventListener('keydown', (event)=> window.handleClienteKeydown(event));
   
-  // El botón "Nuevo Cliente" - Solución directa sin bloqueos
+  // El botón "Nuevo Cliente" - usar URL del servidor (country_url) + ?next= para retorno
   const btnNuevoCliente = document.getElementById('btn-nuevo-cliente');
   if (btnNuevoCliente) {
-    // Forzar estilos VERDE BRILLANTE (estilo WhatsApp) - Muy visible
-    // Usar clase CSS en lugar de estilos inline con !important
-    // La clase btn-green-gradient ya está definida en el CSS
     btnNuevoCliente.classList.add('btn-green-gradient');
-    
-    // Asegurar href
-    if (!btnNuevoCliente.getAttribute('href') || btnNuevoCliente.getAttribute('href') === '#' || btnNuevoCliente.getAttribute('href') === '') {
-      const nextUrl = encodeURIComponent(window.location.pathname);
-      const pathParts = window.location.pathname.split('/').filter(p => p);
-      const country = pathParts[0] || 'cl';
-      const lang = pathParts[1] || 'es';
-      btnNuevoCliente.setAttribute('href', `/${country}/${lang}/clientes/crear/?next=${nextUrl}`);
+    const baseUrl = btnNuevoCliente.getAttribute('data-url-crear-cliente') || btnNuevoCliente.getAttribute('href') || '';
+    if (baseUrl && baseUrl !== '#') {
+      const nextUrl = (typeof window.egEncodeDocumentFormNext === 'function')
+        ? window.egEncodeDocumentFormNext()
+        : encodeURIComponent(window.location.pathname + (window.location.search || ''));
+      const sep = baseUrl.indexOf('?') >= 0 ? '&' : '?';
+      btnNuevoCliente.setAttribute('href', baseUrl + sep + 'next=' + nextUrl);
     }
-    
-    // Eliminar TODOS los listeners previos clonando el elemento
-    const newBtn = btnNuevoCliente.cloneNode(true);
-    btnNuevoCliente.parentNode.replaceChild(newBtn, btnNuevoCliente);
-    
-    // Asegurar href en el nuevo botón
-    if (!newBtn.getAttribute('href') || newBtn.getAttribute('href') === '#' || newBtn.getAttribute('href') === '') {
-      const nextUrl = encodeURIComponent(window.location.pathname);
-      const pathParts = window.location.pathname.split('/').filter(p => p);
-      const country = pathParts[0] || 'cl';
-      const lang = pathParts[1] || 'es';
-      newBtn.setAttribute('href', `/${country}/${lang}/clientes/crear/?next=${nextUrl}`);
-    }
-    
-    // Añadir efectos hover
-    newBtn.addEventListener('mouseenter', function() {
-      this.style.transform = 'scale(1.05)';
-      this.style.boxShadow = '0 0 35px rgba(34, 197, 94, 1), 0 6px 20px rgba(0, 0, 0, 0.4)';
-    });
-    
-    newBtn.addEventListener('mouseleave', function() {
-      this.style.transform = 'scale(1)';
-      this.style.boxShadow = '0 0 25px rgba(34, 197, 94, 0.8), 0 4px 15px rgba(0, 0, 0, 0.3)';
-    });
-    
-    // Listener simple que NO use preventDefault - permite navegación nativa
-    newBtn.addEventListener('click', function(e) {
-      const href = this.getAttribute('href');
-      if (href && href !== '#' && href !== '') {
-        console.log('🚀 Navegando a:', href);
-        // NO usar preventDefault - dejar que el navegador maneje la navegación
-        window.location.href = href;
-      }
-    }, false);
-    
-    console.log('✅ Botón Nuevo Cliente configurado (VERDE BRILLANTE):', newBtn.getAttribute('href'));
-    console.log('🎨 Color aplicado: VERDE #22c55e con resplandor');
-  } else {
-    console.error('❌ Botón btn-nuevo-cliente NO encontrado en el DOM');
+    console.log('✅ Botón Nuevo Cliente configurado:', btnNuevoCliente.getAttribute('href'));
   }
   
   console.log('📄 Document form inicializado', EG.cfg);
@@ -3563,40 +4160,46 @@ document.addEventListener('click', function(e) {
     const btnVehiculo = e.target.closest('#btn-nuevo-vehiculo');
     
     if (btnCliente || btnVehiculo) {
-        e.preventDefault();
-        e.stopPropagation();
-        
-        // 1. Extraer país e idioma de la URL actual (ej: /cl/es/...)
-        const pathParts = window.location.pathname.split('/').filter(function(p) { return p && p.length > 0; });
-        const country = pathParts[0] || 'cl';
-        const lang = (pathParts[1] === 'es' || pathParts[1] === 'en') ? pathParts[1] : 'es';
-
-        // 2. Preparar el retorno (next) para volver al formulario actual
-        const nextUrl = encodeURIComponent(window.location.pathname);
+        var nextUrl = '';
+        if (typeof window.egEncodeDocumentFormNext === 'function') {
+            nextUrl = window.egEncodeDocumentFormNext();
+        } else {
+            nextUrl = encodeURIComponent(window.location.pathname + (window.location.search || ''));
+        }
         let destUrl = "";
 
         if (btnCliente) {
-            // URL correcta según URLconf: /cl/es/clientes/crear/
+            // Preferir href generado por el servidor (country_url) con ?next= ya añadido en init
+            const href = btnCliente.getAttribute('href');
+            if (href && href !== '#' && href !== '') {
+                e.preventDefault();
+                window.location.href = href;
+                return;
+            }
+            // Fallback manual si no hay href
+            const pathParts = window.location.pathname.split('/').filter(function(p) { return p && p.length > 0; });
+            const country = pathParts[0] || 'cl';
+            const lang = (pathParts[1] === 'es' || pathParts[1] === 'en') ? pathParts[1] : 'es';
             destUrl = '/' + country + '/' + lang + '/clientes/crear/?next=' + nextUrl;
-        } else {
-            // URL correcta según URLconf: /cl/es/vehiculos/crear/
-            // Capturamos el cliente_id desde Select2/DAL
+        } else if (btnVehiculo) {
+            const pathParts = window.location.pathname.split('/').filter(function(p) { return p && p.length > 0; });
+            const country = pathParts[0] || 'cl';
+            const lang = (pathParts[1] === 'es' || pathParts[1] === 'en') ? pathParts[1] : 'es';
             let clienteId = '';
             if (window.jQuery) {
                 const $clienteSelect = jQuery('#id_cliente');
-                if ($clienteSelect.length) {
-                    clienteId = $clienteSelect.val() || '';
-                }
+                if ($clienteSelect.length) clienteId = $clienteSelect.val() || '';
             }
             destUrl = '/' + country + '/' + lang + '/vehiculos/crear/?next=' + nextUrl;
-            
-            if (clienteId) {
-                destUrl += '&cliente_id=' + encodeURIComponent(clienteId);
-            }
+            if (clienteId) destUrl += '&cliente_id=' + encodeURIComponent(clienteId);
         }
 
-        console.log("🚀 Redirigiendo a ruta validada:", destUrl);
-        window.location.href = destUrl;
+        if (destUrl) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("🚀 Redirigiendo a ruta validada:", destUrl);
+            window.location.href = destUrl;
+        }
     }
 });
 

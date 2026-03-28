@@ -3,6 +3,8 @@ from collections import defaultdict
 from django.db.models import Q
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+
+from taller.templatetags.country_url import reverse_country_url
 from django.utils.translation import get_language
 from django.views.decorators.http import require_POST
 
@@ -707,7 +709,7 @@ def crear_otro_servicio(request):
             empresa = getattr(request.user, "empresa", None)
             if not empresa:
                 messages.error(request, "Usuario no tiene empresa asociada")
-                return redirect("servicios:otros_servicios_menu")
+                return redirect(reverse_country_url(request, "servicios:otros_servicios_menu"))
 
             # Obtener datos del formulario
             nombre = request.POST.get("nombre")
@@ -721,7 +723,7 @@ def crear_otro_servicio(request):
             # Validaciones básicas
             if not all([nombre, empresa_externa, categoria_id, costo_taller, precio_cliente]):
                 messages.error(request, "Todos los campos requeridos deben ser completados")
-                return redirect("servicios:otros_servicios_menu")
+                return redirect(reverse_country_url(request, "servicios:otros_servicios_menu"))
 
             # Crear servicio externo
             categoria = CategoriaServicio.objects.get(id=categoria_id)
@@ -742,7 +744,7 @@ def crear_otro_servicio(request):
         except Exception as e:
             messages.error(request, f"Error al crear servicio externo: {str(e)}")
 
-        return redirect("taller:servicios:otros_servicios_menu")
+        return redirect(reverse_country_url(request, "servicios:otros_servicios_menu"))
 
     # GET: Mostrar formulario
     categorias = CategoriaServicio.objects.filter(country=country_code)
@@ -796,7 +798,9 @@ def editar_otro_servicio(request, pk):
             # Validaciones básicas
             if not all([nombre, empresa_externa, categoria_id, costo_taller, precio_cliente]):
                 messages.error(request, "Todos los campos requeridos deben ser completados")
-                return redirect("servicios:editar_otro_servicio", pk=pk)
+                return redirect(
+                    reverse_country_url(request, "servicios:editar_otro_servicio", pk=pk)
+                )
 
             # Actualizar servicio externo
             categoria = CategoriaServicio.objects.get(id=categoria_id)
@@ -812,7 +816,7 @@ def editar_otro_servicio(request, pk):
             messages.success(
                 request, f"Servicio externo '{servicio.nombre}' actualizado exitosamente"
             )
-            return redirect("servicios:otros_servicios_menu")
+            return redirect(reverse_country_url(request, "servicios:otros_servicios_menu"))
 
         except Exception as e:
             messages.error(request, f"Error al actualizar servicio externo: {str(e)}")
@@ -847,14 +851,14 @@ def eliminar_otro_servicio(request, pk):
     empresa = getattr(request.user, "empresa", None)
     if not empresa:
         messages.error(request, "Usuario sin empresa asignada")
-        return redirect("servicios:otros_servicios_menu")
+        return redirect(reverse_country_url(request, "servicios:otros_servicios_menu"))
 
     servicio = get_object_or_404(ServicioExterno, pk=pk, empresa=empresa)
     nombre_servicio = servicio.nombre
     servicio.delete()
 
     messages.success(request, f"Servicio externo '{nombre_servicio}' eliminado exitosamente")
-    return redirect("servicios:otros_servicios_menu")
+    return redirect(reverse_country_url(request, "servicios:otros_servicios_menu"))
 
 
 import logging

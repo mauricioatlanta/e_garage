@@ -302,7 +302,10 @@ def requires_address_v2(view_func):
                 request,
                 "Esta funcionalidad requiere activar Address v2 en la configuración de la empresa.",
             )
-            return redirect("configuracion")
+            try:
+                return redirect("taller:configuracion")
+            except:
+                return redirect("/configuracion/")
 
         return view_func(request, *args, **kwargs)
 

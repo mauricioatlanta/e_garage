@@ -3,6 +3,7 @@ from django.core.exceptions import ValidationError
 from django.forms.widgets import ClearableFileInput
 
 from taller.models import ConfiguracionEmpresa
+from taller.utils.country_config import get_country_config
 
 MAX_LOGO_MB = 5
 ALLOWED_IMAGE_MIMES = {"image/png", "image/jpeg", "image/webp", "image/gif"}
@@ -31,27 +32,35 @@ class ConfiguracionEmpresaForm(forms.ModelForm):
         request = kwargs.pop("request", None)
         super().__init__(*args, **kwargs)
 
-        # Detectar el país basado en la URL o contexto
+        # Detectar país y aplicar defaults usando una sola fuente (country_config)
+        country_code = None
         if request:
-            # Si la URL contiene /us/, es USA
-            if "/us/" in request.path:
-                # Para USA, solo mostrar USD
-                self.fields["moneda"].widget = forms.Select(
-                    choices=[("USD", "USD - Dólares Americanos")]
-                )
-                self.fields["moneda"].initial = "USD"
-                # Para USA, tasa de impuesto por defecto 0.00 (sin sales tax)
-                if not self.instance.pk:  # Solo si es nueva configuración
-                    self.fields["tasa_impuesto"].initial = 0.00
-            else:
-                # Para Chile, solo mostrar CLP
-                self.fields["moneda"].widget = forms.Select(
-                    choices=[("CLP", "CLP - Pesos Chilenos")]
-                )
-                self.fields["moneda"].initial = "CLP"
-                # Para Chile, tasa de impuesto por defecto 19.00 (IVA)
-                if not self.instance.pk:  # Solo si es nueva configuración
-                    self.fields["tasa_impuesto"].initial = 19.00
+            try:
+                from taller.utils.empresa import get_active_empresa
+
+                empresa = get_active_empresa(request)
+                if empresa:
+                    country_code = getattr(empresa, "pais", None)
+            except Exception:
+                pass
+
+            if not country_code:
+                path = (getattr(request, "path", "") or "").lower()
+                if path.startswith("/us/"):
+                    country_code = "US"
+                elif path.startswith("/cl/"):
+                    country_code = "CL"
+
+        config = get_country_config(country_code)
+        currency = config.get("currency")
+        tax_rate = config.get("tax_rate", 0.0)
+
+        if currency:
+            self.fields["moneda"].widget = forms.Select(choices=[(currency, currency)])
+            self.fields["moneda"].initial = currency
+
+        if not self.instance.pk:
+            self.fields["tasa_impuesto"].initial = tax_rate
 
     def clean_logo(self):
         logo = self.cleaned_data.get("logo")

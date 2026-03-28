@@ -80,6 +80,14 @@ class ConfiguracionEmpresa(models.Model):
         verbose_name="Tasa de Impuesto",
         help_text="IVA/Sales tax %",
     )
+    # NOT NULL en BD en varios entornos; default evita fallos en get_or_create sin kwargs extra.
+    sales_tax_rate = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        default=Decimal("0"),
+        verbose_name="Sales tax rate (%)",
+        help_text="Tasa de impuesto a ventas (porcentaje); complementa tasa_impuesto donde aplica.",
+    )
     aplicar_impuesto_por_defecto = models.BooleanField(
         default=False,
         verbose_name="Aplicar impuesto por defecto",

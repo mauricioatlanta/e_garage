@@ -22,6 +22,7 @@ class LineaDocumento(TenantScoped):
     subtotal = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))
 
     class Meta:
+        managed = False
         indexes = [
             Index(fields=["empresa", "item_type"]),
             Index(fields=["empresa", "documento"]),

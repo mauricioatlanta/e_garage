@@ -71,7 +71,8 @@ def whatsapp_document_link(context, document=None, text=None):
     except Exception:
         pass
 
-    msg = quote(text)
+    text = "" if text is None else str(text)
+    msg = quote(text, safe="")
     if phone:
         return f"https://wa.me/{phone}?text={msg}"
     return f"https://wa.me/?text={msg}"

@@ -499,7 +499,7 @@ h1 {
           {% endif %}
           {% if not form.region.field.queryset.exists %}
             <div class="helptext" style="color: #ff6b6b;">
-              ⚠️ {% trans "No hay regiones disponibles. Por favor contacte al soporte." %}
+              ⚠️ {% trans "No hay regiones cargadas. El administrador debe ejecutar: python manage.py cargar_regiones_ciudades" %}
             </div>
           {% endif %}
         </div>

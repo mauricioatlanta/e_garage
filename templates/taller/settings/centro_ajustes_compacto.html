@@ -124,6 +124,8 @@
     }
 
     .form-label {
+        display: block;
+        width: 100%;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: .04em;
@@ -135,6 +137,10 @@
     .form-control,
     .form-select,
     textarea.form-control {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
         background: #111528;
         border-radius: 10px;
         border: 1px solid rgba(0,255,255,.3);
@@ -701,7 +707,8 @@
             </div>
 
             <div class="d-flex justify-content-start">
-                <a href="{% url 'account_change_password' %}" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
+                {# Ruta estable de allauth (evita NoReverseMatch si cambia el name en la versión) #}
+                <a href="/accounts/password/change/" class="btn btn-save" style="text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;">
                     <i class="fas fa-external-link-alt"></i>
                     {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Gestionar seguridad{% else %}Manage security{% endif %}
                 </a>

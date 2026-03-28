@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.forms import ServicioForm
+from taller.templatetags.country_url import reverse_country_url
 from taller.models.lineas_documento import LineaServicio
 from taller.models.perfil_usuario import PerfilUsuario
 
@@ -25,7 +26,7 @@ def crear_servicio(request):
             servicio = form.save(commit=False)
             servicio.empresa = perfil.empresa
             servicio.save()
-            return redirect("servicios:lista_servicios")
+            return redirect(reverse_country_url(request, "servicios:servicios_menu"))
     else:
         form = ServicioForm()
     return render(request, "servicios/crear_servicio.html", {"form": form})

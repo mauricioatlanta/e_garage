@@ -52,9 +52,11 @@ class CountryAwareLoginView(LoginView):
         if path.startswith("/ar/") or path == "/ar":
             return "AR"
 
-        next_url = request.GET.get("next", "") or ""
-        country_param = (request.GET.get("country", "") or "").upper()
-        from_param = (request.GET.get("from", "") or "").upper()
+        next_url = (request.GET.get("next", "") or request.POST.get("next", "") or "").strip()
+        country_param = (
+            request.GET.get("country", "") or request.POST.get("country", "") or ""
+        ).upper()
+        from_param = (request.GET.get("from", "") or request.POST.get("from", "") or "").upper()
 
         # 2. Detectar desde parámetro ?from= (ej. /accounts/login/?from=co)
         if from_param in ["US", "USA"]:

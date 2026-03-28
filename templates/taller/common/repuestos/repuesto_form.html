@@ -216,9 +216,17 @@ select option {
           {% endif %}
         </button>
 
-        <a href="{% country_url 'repuestos:lista_repuestos' %}" class="inline-flex items-center px-4 py-2 border border-cyan-400/60 rounded-lg shadow-sm text-sm font-medium text-white bg-black/60 hover:bg-cyan-900/30 transition-all duration-200">
+        {% if repuesto_document_cancel_url %}
+        <a href="{{ repuesto_document_cancel_url }}"
+           class="inline-flex items-center px-4 py-2 border border-cyan-400/60 rounded-lg shadow-sm text-sm font-medium text-white bg-black/60 hover:bg-cyan-900/30 transition-all duration-200">
+          ← Volver al documento
+        </a>
+        {% else %}
+        <a href="{% country_url 'repuestos:lista_repuestos' %}"
+           class="inline-flex items-center px-4 py-2 border border-cyan-400/60 rounded-lg shadow-sm text-sm font-medium text-white bg-black/60 hover:bg-cyan-900/30 transition-all duration-200">
           ← Volver a la lista
         </a>
+        {% endif %}
       </div>
     </form>
   </div>

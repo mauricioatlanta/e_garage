@@ -640,8 +640,7 @@ tbody tr:hover::before {
                             </a>
                             <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
                                class="btn-icon-only btn-delete w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center" 
-                               title="{% trans 'Purge' %}" 
-                               onclick="return confirmarEliminacion('{{ cliente.nombre }} {{ cliente.apellido }}')">
+                               title="{% trans 'Purge' %}">
                                 <i class="fas fa-trash-alt text-sm sm:text-xs"></i>
                             </a>
                         </div>
@@ -736,7 +735,6 @@ tbody tr:hover::before {
                 <span class="btn-futuristic-text">{% trans "Edit" %}</span>
             </a>
             <a href="{% country_url 'clientes:eliminar_cliente' cliente_id=cliente.pk %}" 
-               onclick="return confirmarEliminacion('{{ cliente.nombre }} {{ cliente.apellido }}')"
                class="btn-futuristic btn-futuristic-delete">
                 <span class="btn-futuristic-icon">🗑️</span>
                 <span class="btn-futuristic-text">{% trans "Delete" %}</span>
@@ -763,10 +761,6 @@ tbody tr:hover::before {
 
 {% block page_extra_js %}
 <script>
-function confirmarEliminacion(nombre) {
-    return confirm(`⚠️ {% trans "SYSTEM ALERT: PURGE PROTOCOL" %}\n\n{% trans "Target" %}: ${nombre}\n\n{% trans "Confirm permanent deletion?" %}`);
-}
-
 (function() {
     const elements = {
         input: document.getElementById('search-input'),

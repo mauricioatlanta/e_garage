@@ -15,12 +15,21 @@
 <body>
 <div id="vanta-bg" style="position:fixed;width:100%;height:100%;top:0;left:0;z-index:0;background:#0a0a0a;background-image:linear-gradient(rgba(34,211,238,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.06) 1px, transparent 1px);background-size:24px 24px;"></div>
 <div class="grid-bg"></div>
-{% block back_button %}
-<a href="{% if country == 'US' or request.country == 'US' %}/us/{% elif country == 'UY' or request.country == 'UY' %}/uy/{% elif country == 'AR' or request.country == 'AR' %}/ar/{% elif country == 'CO' or request.country == 'CO' %}/co/es/{% elif country == 'EC' or request.country == 'EC' %}/ec/es/{% elif country == 'PE' or request.country == 'PE' %}/pe/es/{% elif country == 'VE' or request.country == 'VE' %}/ve/es/{% elif country == 'MX' or request.country == 'MX' %}/mx/es/{% elif country == 'BR' or request.country == 'BR' %}/br/{% elif country == 'CL' or request.country == 'CL' %}/cl/{% else %}/{% endif %}" class="back-button font-futuristic">
-  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-  <span>{% trans "Back" %}</span>
-</a>
-{% endblock %}
+<header class="login-top-header">
+  <div class="login-top-nav">
+    {% block back_button %}
+    <a href="{% if country == 'US' or request.country == 'US' %}/us/{% elif country == 'UY' or request.country == 'UY' %}/uy/{% elif country == 'AR' or request.country == 'AR' %}/ar/{% elif country == 'CO' or request.country == 'CO' %}/co/es/{% elif country == 'EC' or request.country == 'EC' %}/ec/es/{% elif country == 'PE' or request.country == 'PE' %}/pe/es/{% elif country == 'VE' or request.country == 'VE' %}/ve/es/{% elif country == 'MX' or request.country == 'MX' %}/mx/es/{% elif country == 'BR' or request.country == 'BR' %}/br/{% elif country == 'CL' or request.country == 'CL' %}/cl/{% else %}/{% endif %}" class="nav-button-standard font-futuristic">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      <span>{% trans "Back" %}</span>
+    </a>
+    {% endblock %}
+  </div>
+  <div class="login-top-actions">
+    {% if country == 'US' or request.country == 'US' or request.path|slice:':4' == '/us/' %}
+      {% include 'taller/includes/lang_switcher_cinematic.html' %}
+    {% endif %}
+  </div>
+</header>
 {% block content %}{% endblock %}
 <script>
 (function initVanta(){
@@ -55,6 +64,25 @@ body {
   background-size: 50px 50px; z-index: 1; pointer-events: none;
 }
 .login-container { position: relative; z-index: 10; width: 100%; max-width: 500px; padding: 20px; }
+.login-top-header {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+.login-top-nav,
+.login-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: auto;
+}
 .glass-card {
   background: linear-gradient(135deg, rgba(0,230,255,0.1) 0%, rgba(99,102,241,0.05) 100%);
   backdrop-filter: blur(30px); border-radius: 2rem; border: 2px solid rgba(0,230,255,0.3);
@@ -77,11 +105,22 @@ body {
 .form-group { margin-bottom: 1.5rem; }
 .form-label { display: block; font-size: 0.875rem; font-weight: 700; color: #00e6ff; margin-bottom: 0.5rem; letter-spacing: 0.05em; text-transform: uppercase; }
 .form-input {
-  width: 100%; padding: 1rem; font-size: 1rem; color: #ffffff; background: rgba(0,0,0,0.4);
-  border: 2px solid rgba(0,230,255,0.3); border-radius: 0.75rem; transition: all 0.3s ease;
+  width: 100%; padding: 1rem; font-size: 1rem; color: #f1f5f9;
+  background: rgba(15, 23, 42, 0.9); border: 2px solid rgba(0,230,255,0.4);
+  border-radius: 0.75rem; transition: all 0.3s ease;
+  color-scheme: dark;
 }
-.form-input:focus { outline: none; border-color: #00e6ff; background: rgba(0,0,0,0.6); box-shadow: 0 0 20px rgba(0,230,255,0.4); }
-.form-input::placeholder { color: #64748b; }
+.form-input:focus { outline: none; border-color: #00e6ff; background: rgba(15, 23, 42, 0.95); box-shadow: 0 0 20px rgba(0,230,255,0.4); color: #ffffff; }
+.form-input::placeholder { color: #94a3b8; }
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f1f5f9;
+  caret-color: #f1f5f9;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(15, 23, 42, 0.95) inset;
+  box-shadow: 0 0 0px 1000px rgba(15, 23, 42, 0.95) inset;
+  border: 2px solid rgba(0,230,255,0.55);
+}
 .error-message { color: #ef4444; font-size: 0.8125rem; margin-top: 0.5rem; font-weight: 500; display: flex; align-items: center; gap: 0.25rem; }
 .remember-me { display: flex; align-items: center; margin-bottom: 1.5rem; }
 .remember-me input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; cursor: pointer; accent-color: #00e6ff; border: 2px solid rgba(0,230,255,0.5); border-radius: 4px; }
@@ -105,17 +144,18 @@ body {
 .alert { padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 500; border: 1px solid; }
 .alert-error { background: rgba(239,68,68,0.1); color: #ef4444; border-color: #ef4444; }
 .alert-success { background: rgba(0,230,255,0.1); color: #00e6ff; border-color: #00e6ff; }
-.back-button {
-  position: absolute; top: 1.5rem; left: 1.5rem; z-index: 20; display: flex; align-items: center; gap: 0.5rem;
+.nav-button-standard {
+  display: flex; align-items: center; gap: 0.5rem;
   padding: 0.75rem 1.25rem; background: rgba(0,230,255,0.1); border: 1px solid rgba(0,230,255,0.3);
   border-radius: 0.75rem; color: #00e6ff; text-decoration: none; font-size: 0.875rem; font-weight: 600;
   transition: all 0.3s ease; backdrop-filter: blur(10px);
 }
-.back-button:hover { background: rgba(0,230,255,0.2); border-color: #00e6ff; box-shadow: 0 0 20px rgba(0,230,255,0.4); transform: translateX(-3px); }
+.nav-button-standard:hover { background: rgba(0,230,255,0.2); border-color: #00e6ff; box-shadow: 0 0 20px rgba(0,230,255,0.4); transform: translateX(-3px); }
 @media (max-width: 640px) {
   .glass-card { padding: 2rem 1.5rem; }
   .logo { height: 80px; }
-  .back-button { top: 1rem; left: 1rem; padding: 0.5rem 1rem; font-size: 0.8125rem; }
+  .login-top-header { top: 0.65rem; left: 0.65rem; right: 0.65rem; }
+  .nav-button-standard { padding: 0.5rem 0.8rem; font-size: 0.8125rem; }
 }
 </style>
 </body>

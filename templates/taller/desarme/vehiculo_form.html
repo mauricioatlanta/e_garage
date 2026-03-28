@@ -1,0 +1,511 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+
+{% block page_title %}{% trans "Desarme" %} – {{ titulo|default:"Vehículo" }}{% endblock %}
+{% block page_subtitle %}{% trans "Alta/edición de vehículo para desarme" %}{% endblock %}
+{% block page_icon %}🔧{% endblock %}
+
+{% block page_extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ds-cyan: #06b6d4; --ds-radius: 16px; --ds-radius-sm: 12px; }
+  .glass-panel-desarme {
+    background: rgba(0, 0, 0, 0.45);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(6, 182, 212, 0.28);
+    border-radius: var(--ds-radius);
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+  }
+  .input-desarme, .form-desarme input, .form-desarme select, .form-desarme textarea {
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid rgba(6, 182, 212, 0.35);
+    border-radius: var(--ds-radius-sm);
+    padding: 6px 10px;
+    color: #e0e7ff;
+    width: 100%;
+    font-size: 0.85rem;
+  }
+  .form-desarme input:focus, .form-desarme select:focus, .form-desarme textarea:focus {
+    outline: none;
+    border-color: var(--ds-cyan);
+    box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
+  }
+  .form-desarme input[type="date"] {
+    cursor: pointer;
+    min-height: 28px;
+  }
+  .form-desarme input[type="date"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.8;
+  }
+  .form-desarme input[type="file"] {
+    font-size: 0.75rem;
+    padding: 2px 4px;
+  }
+  .form-group { margin-bottom: 0.35rem; }
+  .form-group label { display: block; font-size: 0.72rem; font-weight: 500; color: var(--ds-cyan); margin-bottom: 0; }
+  .form-group-with-add { display: flex; gap: 0.25rem; align-items: stretch; }
+  .form-group-with-add select, .form-group-with-add .input-wrap { flex: 1; min-width: 0; }
+  /* Asegurar visibilidad de selects e inputs (override force_fields / appearance:none) */
+  .form-desarme select,
+  .form-desarme input[type="text"],
+  .form-desarme input[type="email"],
+  .form-desarme input[type="number"],
+  .form-desarme .input-wrap select,
+  #modal-nuevo-vendedor input {
+    min-height: 28px !important;
+    display: block !important;
+  }
+  .form-desarme select,
+  .form-desarme .input-wrap select {
+    -webkit-appearance: menulist !important;
+    appearance: menulist !important;
+    padding-right: 1.5rem !important;
+  }
+  .btn-add-desarme { flex-shrink: 0; padding: 2px 6px; font-size: 0.7rem; border-radius: 4px; border: 1px solid rgba(0,255,255,0.5); background: rgba(0,255,255,0.1); color: #67e8f9; cursor: pointer; white-space: nowrap; }
+  .btn-add-desarme:hover { background: rgba(0,255,255,0.25); }
+  .form-row { display: grid; gap: 0.35rem 0.6rem; align-items: end; }
+  .form-row-5 { grid-template-columns: repeat(5, 1fr); }
+  .form-row-4 { grid-template-columns: repeat(4, 1fr); }
+  .form-row-3 { grid-template-columns: repeat(3, 1fr); }
+  .form-row-2 { grid-template-columns: repeat(2, 1fr); }
+  .form-row-1 { grid-template-columns: 1fr; }
+  .form-col-span-2 { grid-column: span 2; }
+  .form-col-span-3 { grid-column: span 3; }
+  @media (max-width: 768px) { .form-row-5, .form-row-4, .form-row-3 { grid-template-columns: repeat(2, 1fr); } .form-col-span-2, .form-col-span-3 { grid-column: span 1; } }
+  @media (max-width: 480px) { .form-row-5, .form-row-4, .form-row-3, .form-row-2 { grid-template-columns: 1fr; } }
+  /* Layout simétrico: dos columnas en PC, una en móvil */
+  .form-desarme-wrapper { max-width: 100%; margin-left: auto; margin-right: auto; }
+  @media (min-width: 1024px) {
+    .form-desarme-wrapper { max-width: 56rem; }
+    .form-desarme-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem 2rem; align-items: start; }
+    .form-desarme-col-full { grid-column: 1 / -1; }
+  }
+  @media (min-width: 1280px) {
+    .form-desarme-wrapper { max-width: 64rem; }
+  }
+  @media (max-width: 1023px) {
+    .form-desarme-grid { display: flex; flex-direction: column; gap: 0; }
+  }
+</style>
+{% endblock %}
+
+{% block main_actions %}
+<a href="{% country_url 'desarme:lista_vehiculos' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-500 text-gray-300 hover:bg-gray-700 text-sm">
+  ← {% trans "Listado" %}
+</a>
+{% endblock %}
+
+{% block panel_content %}
+<div class="form-desarme-wrapper">
+  <div class="glass-panel-desarme p-4 lg:p-5 form-desarme">
+    <form method="post" action="" enctype="multipart/form-data">
+      {% csrf_token %}
+
+      <div class="form-desarme-grid">
+        <!-- Sección 1: Identificación del vehículo -->
+        <div class="space-y-0.5 form-desarme-col-full">
+          <p class="text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-1" style="font-family: 'Orbitron', monospace;">{% trans "Identificación" %}</p>
+          <div class="form-row form-row-5" style="margin-bottom: 0.5rem;">
+            <div class="form-group">
+              <label for="id_patente">{% trans "Patente" %}</label>
+              {{ form.patente }}
+              {% if form.patente.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.patente.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+              <label for="id_vin">VIN</label>
+              {{ form.vin }}
+              {% if form.vin.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.vin.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+              <label>{% trans "Año" %}</label>
+              <div class="flex gap-1 items-center">
+                {{ form.anio }}
+                <button type="button" id="btn-agregar-anio" class="px-1.5 py-1 rounded border border-cyan-400/50 text-cyan-300 hover:bg-cyan-400/20 text-xs shrink-0">+</button>
+              </div>
+              <div id="anio-otro-container" class="mt-0.5" style="display: none;">
+                <input type="number" name="anio_otro" id="id_anio_otro" min="1900" max="2100" placeholder="1965" class="input-desarme w-full">
+              </div>
+              {% if form.anio.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.anio.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+              <label for="id_marca">{% trans "Marca" %}</label>
+              <div class="form-group-with-add">
+                <div class="input-wrap">{{ form.marca }}</div>
+                <button type="button" class="btn-add-desarme" data-add="marca" title="{% trans 'Agregar' %}">+</button>
+              </div>
+              {% if form.marca.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.marca.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+              <label for="id_modelo">{% trans "Modelo" %}</label>
+              <div class="form-group-with-add">
+                <div class="input-wrap">{{ form.modelo }}</div>
+                <button type="button" class="btn-add-desarme" data-add="modelo" title="{% trans 'Agregar' %}">+</button>
+              </div>
+              {% if form.modelo.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.modelo.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección 2: Especificaciones técnicas + Ubicación -->
+        <div class="space-y-0.5">
+          <p class="text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-1" style="font-family: 'Orbitron', monospace;">{% trans "Especificaciones" %}</p>
+          <div class="form-row form-row-2" style="margin-bottom: 0.5rem;">
+            <div class="form-group">
+              <label for="id_motor">{% trans "Motor" %}</label>
+              <div class="form-group-with-add">
+                <div class="input-wrap">{{ form.motor }}</div>
+                <button type="button" class="btn-add-desarme" data-add="motor" title="{% trans 'Agregar' %}">+</button>
+              </div>
+              {% if form.motor.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.motor.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+              <label for="id_caja">{% trans "Caja" %}</label>
+              <div class="form-group-with-add">
+                <div class="input-wrap">{{ form.caja }}</div>
+                <button type="button" class="btn-add-desarme" data-add="caja" title="{% trans 'Agregar' %}">+</button>
+              </div>
+              {% if form.caja.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.caja.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+              <label for="id_color">{% trans "Color" %}</label>
+              <div class="form-group-with-add">
+                <div class="input-wrap">{{ form.color }}</div>
+                <button type="button" class="btn-add-desarme" data-add="color" title="{% trans 'Agregar' %}">+</button>
+              </div>
+              {% if form.color.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.color.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group">
+              <label for="id_tipo_carroceria">{% trans "Carrocería" %}</label>
+              <div class="form-group-with-add">
+                <div class="input-wrap">{{ form.tipo_carroceria }}</div>
+                <button type="button" class="btn-add-desarme" data-add="carroceria" title="{% trans 'Agregar' %}">+</button>
+              </div>
+              <div id="tipo-carroceria-otro-wrap" style="display:none;" class="mt-0.5">
+                {{ form.tipo_carroceria_otro }}
+              </div>
+              {% if form.tipo_carroceria.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.tipo_carroceria.errors.0 }}</p>{% endif %}
+              {% if form.tipo_carroceria_otro.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.tipo_carroceria_otro.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+          <div class="form-row form-row-1">
+            <div class="form-group">
+              <label for="id_ubicacion_fisica">{% trans "Ubicación física" %}</label>
+              {{ form.ubicacion_fisica }}
+              {% if form.ubicacion_fisica.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.ubicacion_fisica.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección 3: Operación (compra, estado, gastos) -->
+        <div class="space-y-0.5">
+          <p class="text-cyan-400 text-xs font-semibold uppercase tracking-wider mb-1" style="font-family: 'Orbitron', monospace;">{% trans "Operación" %}</p>
+          <div class="form-row form-row-3" style="margin-bottom: 0.5rem;">
+            <div class="form-group"><label for="id_fecha_ingreso_desarme">{% trans "Fecha" %}</label>{{ form.fecha_ingreso_desarme }}{% if form.fecha_ingreso_desarme.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.fecha_ingreso_desarme.errors.0 }}</p>{% endif %}</div>
+            <div class="form-group form-col-span-2">
+              <label for="id_vendedor_desarme">{% trans "Comprado a" %}</label>
+              <div class="form-group-with-add">
+                <div class="input-wrap">{{ form.vendedor_desarme }}</div>
+                <button type="button" id="btn-nuevo-vendedor" class="btn-add-desarme" title="{% trans 'Nuevo vendedor' %}">
+                  {% trans "+ Nuevo" %}
+                </button>
+              </div>
+              <div id="modal-nuevo-vendedor" style="display:none; font-size: 0.75rem; margin-top: 0.5rem; padding: 0.5rem; border: 1px solid rgba(0,255,255,0.3); border-radius: 6px; background: rgba(0,0,0,0.5);">
+                <p class="text-cyan-300 text-xs font-medium mb-1">{% trans "Nuevo vendedor" %}</p>
+                <div class="form-row form-row-2 space-y-0.5">
+                  <div class="form-group"><label>{% trans "Nombre" %} *</label><input type="text" id="nv-nombre" class="input-desarme" placeholder="Juan Pérez"></div>
+                  <div class="form-group"><label>{% trans "Teléfono" %}</label><input type="text" id="nv-telefono" class="input-desarme" placeholder="+1 555 123 4567"></div>
+                  <div class="form-group"><label>{% trans "Email" %}</label><input type="email" id="nv-email" class="input-desarme" placeholder="vendedor@mail.com"></div>
+                  <div class="form-group"><label>{% trans "Dirección" %}</label><input type="text" id="nv-direccion" class="input-desarme"></div>
+                  <div class="form-group form-col-span-2"><label>{% trans "Lugar compra" %}</label><input type="text" id="nv-lugar" class="input-desarme" placeholder="Auction, yard, etc."></div>
+                </div>
+                <div class="flex gap-2 mt-1">
+                  <button type="button" id="btn-vendedor-crear" class="px-2 py-1 rounded bg-emerald-600/80 text-white text-xs">{% trans "Crear" %}</button>
+                  <button type="button" id="btn-vendedor-cancelar" class="px-2 py-1 rounded border border-cyan-400/50 text-cyan-300 text-xs">{% trans "Cancelar" %}</button>
+                </div>
+              </div>
+              {% if form.vendedor_desarme.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.vendedor_desarme.errors.0 }}</p>{% endif %}
+            </div>
+            <div class="form-group"><label for="id_estado_desarme">{% trans "Estado desarme" %}</label>{{ form.estado_desarme }}{% if form.estado_desarme.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.estado_desarme.errors.0 }}</p>{% endif %}</div>
+          </div>
+          <div class="form-row form-row-3" style="margin-bottom: 0.5rem;">
+            <div class="form-group"><label for="id_costo_adquisicion">{% trans "Costo adq." %}</label>{{ form.costo_adquisicion }}{% if form.costo_adquisicion.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.costo_adquisicion.errors.0 }}</p>{% endif %}</div>
+            <div class="form-group"><label for="id_transporte_grua">{% trans "Transporte/Grúa" %}</label>{{ form.transporte_grua }}{% if form.transporte_grua.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.transporte_grua.errors.0 }}</p>{% endif %}</div>
+            <div class="form-group"><label for="id_otros_gastos">{% trans "Otros gastos" %}</label>{{ form.otros_gastos }}{% if form.otros_gastos.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.otros_gastos.errors.0 }}</p>{% endif %}</div>
+          </div>
+          <div class="form-row form-row-1">
+            <div class="form-group">
+              <label for="id_observaciones_desarme">{% trans "Observaciones" %}</label>
+              {{ form.observaciones_desarme }}
+              {% if form.observaciones_desarme.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.observaciones_desarme.errors.0 }}</p>{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones de acción -->
+        <div class="form-desarme-col-full border-t border-cyan-400/20 pt-4 mt-1">
+          <div class="flex gap-2">
+            <button type="submit" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold shadow-lg shadow-emerald-500/20">
+              {% trans "Guardar" %}
+            </button>
+            <a href="{% if vehiculo %}{% country_url 'desarme:ver_vehiculo' vehiculo.pk %}{% else %}{% country_url 'desarme:lista_vehiculos' %}{% endif %}"
+               class="px-4 py-2 rounded-xl border border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20 text-sm font-medium">
+              {% trans "Cancelar" %}
+            </a>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+// Comprado a: Nuevo vendedor (selector estructurado con anti-duplicado)
+(function() {
+  const urlBuscar = "{% country_url 'desarme:api_vendedores_buscar' %}";
+  const urlCrear = "{% country_url 'desarme:api_vendedor_crear' %}";
+  const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+  const select = document.getElementById('id_vendedor_desarme');
+  const modal = document.getElementById('modal-nuevo-vendedor');
+  const btnNuevo = document.getElementById('btn-nuevo-vendedor');
+  const btnCrear = document.getElementById('btn-vendedor-crear');
+  const btnCancel = document.getElementById('btn-vendedor-cancelar');
+
+  function addVendedorOption(id, nombre) {
+    if (!select) return;
+    const opt = document.createElement('option');
+    opt.value = id;
+    opt.textContent = nombre;
+    select.appendChild(opt);
+    select.value = id;
+  }
+
+  btnNuevo?.addEventListener('click', function() {
+    modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+    if (modal.style.display === 'block') document.getElementById('nv-nombre')?.focus();
+  });
+  btnCancel?.addEventListener('click', function() {
+    modal.style.display = 'none';
+    ['nv-nombre','nv-telefono','nv-email','nv-direccion','nv-lugar'].forEach(function(id) {
+      const e = document.getElementById(id);
+      if (e) e.value = '';
+    });
+  });
+
+  btnCrear?.addEventListener('click', function() {
+    const nombre = (document.getElementById('nv-nombre')?.value || '').trim();
+    if (!nombre) { alert('Nombre requerido'); return; }
+    const payload = {
+      nombre: nombre,
+      telefono: (document.getElementById('nv-telefono')?.value || '').trim() || null,
+      email: (document.getElementById('nv-email')?.value || '').trim() || null,
+      direccion: (document.getElementById('nv-direccion')?.value || '').trim() || null,
+      lugar_compra: (document.getElementById('nv-lugar')?.value || '').trim() || null,
+    };
+    btnCrear.disabled = true;
+    fetch(urlCrear, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrf, 'X-Requested-With': 'XMLHttpRequest' },
+      body: JSON.stringify(payload)
+    })
+    .then(function(r) { return r.json(); })
+    .then(function(data) {
+      if (data.success && data.vendedor) {
+        addVendedorOption(data.vendedor.id, data.vendedor.nombre);
+        modal.style.display = 'none';
+        ['nv-nombre','nv-telefono','nv-email','nv-direccion','nv-lugar'].forEach(function(id) {
+          const e = document.getElementById(id);
+          if (e) e.value = '';
+        });
+      } else {
+        alert(data.error || 'Error');
+      }
+    })
+    .catch(function() { alert('Error de conexión'); })
+    .finally(function() { btnCrear.disabled = false; });
+  });
+})();
+
+// Botón Agregar año
+document.getElementById('btn-agregar-anio')?.addEventListener('click', function() {
+  var c = document.getElementById('anio-otro-container');
+  if (c) {
+    var wasHidden = c.style.display === 'none';
+    c.style.display = wasHidden ? 'flex' : 'none';
+    if (wasHidden) {
+      document.getElementById('id_anio_otro')?.focus();
+    } else {
+      var inp = document.getElementById('id_anio_otro');
+      if (inp) inp.value = '';
+    }
+  }
+});
+
+// Filtrar modelos por marca seleccionada
+(function() {
+  const urlModelos = "{% country_url 'vehiculos:modelos_por_marca_api' %}";
+  const marcaSelect = document.getElementById('id_marca');
+  const modeloSelect = document.getElementById('id_modelo');
+  const anioSelect = document.getElementById('id_anio');
+
+  if (!marcaSelect || !modeloSelect) return;
+
+  function cargarModelos(restoreModeloId) {
+    const marcaId = marcaSelect.value;
+    const prevModelo = restoreModeloId || modeloSelect.value;
+    modeloSelect.innerHTML = '<option value="">---------</option>';
+    modeloSelect.disabled = true;
+
+    if (!marcaId) {
+      modeloSelect.disabled = false;
+      return;
+    }
+
+    let url = urlModelos + '?marca_id=' + encodeURIComponent(marcaId);
+    if (anioSelect && anioSelect.value) {
+      url += '&anio=' + encodeURIComponent(anioSelect.value);
+    }
+
+    fetch(url, {
+      method: 'GET',
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json' }
+    })
+    .then(function(r) { return r.ok ? r.json() : []; })
+    .then(function(data) {
+      const items = Array.isArray(data) ? data : (data.results || []);
+      items.forEach(function(m) {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.textContent = m.nombre || m.text || m.label || m.value || '';
+        if (String(m.id) === String(prevModelo)) opt.selected = true;
+        modeloSelect.appendChild(opt);
+      });
+    })
+    .catch(function() {})
+    .finally(function() { modeloSelect.disabled = false; });
+  }
+
+  marcaSelect.addEventListener('change', function() {
+    cargarModelos();
+  });
+  if (anioSelect) {
+    anioSelect.addEventListener('change', function() {
+      if (marcaSelect.value) cargarModelos(modeloSelect.value);
+    });
+  }
+  // Estado inicial: si no hay marca, vaciar modelo; si hay marca, cargar modelos (conservar selección en edición)
+  if (!marcaSelect.value) {
+    modeloSelect.innerHTML = '<option value="">---------</option>';
+  } else {
+    cargarModelos(modeloSelect.value);
+  }
+})();
+
+// Mostrar input "otro" cuando carrocería = "otro"
+(function() {
+  const sel = document.getElementById('id_tipo_carroceria');
+  const wrap = document.getElementById('tipo-carroceria-otro-wrap');
+  if (!sel || !wrap) return;
+  function toggle() {
+    wrap.style.display = (sel.value === 'otro') ? 'block' : 'none';
+  }
+  sel.addEventListener('change', toggle);
+  toggle();
+})();
+
+// Agregar registro vía AJAX (marca, modelo, motor, caja, color, carrocería)
+(function() {
+  const urls = {
+    marca: "{% country_url 'vehiculos:ajax_agregar_marca' %}",
+    modelo: "{% country_url 'vehiculos:ajax_agregar_modelo' %}",
+    motor: "{% country_url 'vehiculos:ajax_agregar_motor' %}",
+    caja: "{% country_url 'vehiculos:ajax_agregar_caja' %}",
+    color: "{% country_url 'vehiculos:ajax_agregar_color' %}"
+  };
+  const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+
+  function postJson(url, body) {
+    return fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': csrf,
+        'X-Requested-With': 'XMLHttpRequest'
+      },
+      body: JSON.stringify(body)
+    }).then(r => r.json());
+  }
+
+  function addOption(selectId, value, text) {
+    const sel = document.getElementById(selectId);
+    if (!sel) return;
+    const opt = document.createElement('option');
+    opt.value = value;
+    opt.textContent = text;
+    sel.appendChild(opt);
+    sel.value = value;
+  }
+
+  document.querySelectorAll('.btn-add-desarme[data-add]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      const tipo = btn.getAttribute('data-add');
+      const marcaSel = document.getElementById('id_marca');
+      const modeloSel = document.getElementById('id_modelo');
+
+      let promptMsg = '';
+      let payload = {};
+
+      if (tipo === 'marca') {
+        promptMsg = 'Nombre de la nueva marca:';
+      } else if (tipo === 'modelo') {
+        const marcaId = marcaSel?.value;
+        if (!marcaId) { alert('Seleccione primero una marca.'); return; }
+        promptMsg = 'Nombre del nuevo modelo:';
+        payload.marca_id = marcaId;
+      } else if (tipo === 'motor') {
+        promptMsg = 'Nombre del nuevo motor:';
+        if (modeloSel?.value) payload.modelo_id = modeloSel.value;
+      } else if (tipo === 'caja') {
+        promptMsg = 'Nombre de la nueva caja:';
+        if (modeloSel?.value) payload.modelo_id = modeloSel.value;
+      } else if (tipo === 'color') {
+        promptMsg = 'Nombre del nuevo color:';
+      } else if (tipo === 'carroceria') {
+        const nombre = window.prompt('Nombre del tipo de carrocería (ej: Limousine):');
+        if (!nombre || !nombre.trim()) return;
+        const sel = document.getElementById('id_tipo_carroceria');
+        if (sel) {
+          addOption('id_tipo_carroceria', nombre.trim(), nombre.trim());
+        }
+        return;
+      }
+
+      if (!urls[tipo]) return;
+      const nombre = window.prompt(promptMsg);
+      if (!nombre || !nombre.trim()) return;
+      payload.nombre = nombre.trim();
+
+      btn.disabled = true;
+      postJson(urls[tipo], payload)
+        .then(function(data) {
+          if (data.success) {
+            const field = data.marca || data.modelo || data.motor || data.caja || data.color;
+            const id = String(field.id);
+            const nom = field.nombre;
+            const map = { marca: 'id_marca', modelo: 'id_modelo', motor: 'id_motor', caja: 'id_caja', color: 'id_color' };
+            addOption(map[tipo], id, nom);
+            if (tipo === 'modelo' && data.modelo) {
+              if (modeloSel) modeloSel.value = id;
+            }
+          } else {
+            alert(data.error || 'Error al agregar');
+          }
+        })
+        .catch(function() { alert('Error de conexión'); })
+        .finally(function() { btn.disabled = false; });
+    });
+  });
+})();
+</script>
+{% endblock %}

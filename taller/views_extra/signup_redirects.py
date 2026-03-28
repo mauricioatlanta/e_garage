@@ -2,10 +2,8 @@
 Redirect universal para signup por país.
 
 Este módulo proporciona una función de redirect centralizada que redirige
-todas las rutas de signup por país (/xx/es/accounts/signup/) a la ruta
-unificada /accounts/signup/ con un parámetro ?from=xx para indicar el país.
-
-Esto simplifica el mantenimiento y evita duplicar templates por país.
+las rutas cortas de signup por país (/xx/accounts/signup/) a la ruta completa
+con país + idioma (/{pais}/{lang}/accounts/signup/).
 """
 
 from django.shortcuts import redirect
@@ -13,25 +11,27 @@ from django.shortcuts import redirect
 
 def signup_redirect(request, country_code: str):
     """
-    Redirige a /accounts/signup/ con el parámetro from=country_code.
+    Redirige al signup country-aware con país + idioma en el path.
 
     Args:
         request: El objeto request de Django
         country_code: Código del país (ej: "br", "co", "cl", "us")
 
     Returns:
-        HttpResponseRedirect a /accounts/signup/?from=country_code
+        HttpResponseRedirect a /{country}/{lang}/accounts/signup/
 
     Ejemplo:
-        >>> signup_redirect(request, "br")
-        # Redirige a: /accounts/signup/?from=br
+        >>> signup_redirect(request, "us")
+        # Redirige a: /us/en/accounts/signup/
     """
     # Normalizar código de país a minúsculas
     country_code_lower = country_code.lower()
-    base = f"/accounts/signup/?from={country_code_lower}"
-    # Preservar ?plan=, next=, etc.; no propagar country= (país en path, no en GET)
+    lang = "en" if country_code_lower == "us" else "es"
+    base = f"/{country_code_lower}/{lang}/accounts/signup/"
+    # Preservar ?plan=, next=, etc.; no propagar country/from (país en path)
     params = request.GET.copy()
     params.pop("country", None)
+    params.pop("from", None)
     if params:
-        base += "&" + params.urlencode()
+        base += "?" + params.urlencode()
     return redirect(base)

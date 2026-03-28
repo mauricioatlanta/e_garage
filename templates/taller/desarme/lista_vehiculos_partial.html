@@ -1,0 +1,41 @@
+{% load i18n %}
+{% load country_url %}
+{% if vehiculos %}
+<div class="vehicles-grid">
+  {% for v in vehiculos %}
+  <div class="vehicle-card">
+    <div class="flex items-center justify-between mb-2">
+      <div>
+        <h3 class="text-white font-bold text-sm">{{ v.patente|default:v.vin|default:"—" }}</h3>
+        <p class="text-cyan-400 text-xs">{{ v.get_marca_display|default:"-" }} {{ v.get_modelo_display|default:"" }} · {{ v.anio|default:"—" }}</p>
+      </div>
+      <span class="badge-piezas" title="{% trans 'Piezas registradas' %}">{{ v.piezas_count }} {% trans "piezas" %}</span>
+    </div>
+    <div class="space-y-1 mb-2 text-xs text-gray-400">
+      {% if v.estado_desarme %}<span>{{ v.estado_desarme }}</span>{% endif %}
+      {% if v.ubicacion_fisica %}<span> · {{ v.ubicacion_fisica }}</span>{% endif %}
+    </div>
+    <div class="mb-3">
+      <span class="ganancia-vehiculo {% if v.ganancia >= 0 %}positiva{% else %}negativa{% endif %}" title="{% trans 'Ingresos por piezas vendidas menos costo del vehículo' %}">
+        {% trans "Ganancia" %}: ${{ v.ganancia|floatformat:2 }}
+      </span>
+    </div>
+    <div class="flex flex-wrap gap-1">
+      <a href="{% country_url 'desarme:ver_vehiculo' v.pk %}" class="interactive-btn">{% trans "Ver" %}</a>
+      <a href="{% country_url 'desarme:editar_vehiculo' v.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
+      <a href="{% country_url 'desarme:inventario_vehiculo' v.pk %}" class="interactive-btn font-medium">📦 {% trans "Inventario" %}</a>
+      <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ v.pk }}" class="interactive-btn font-medium">➕ {% trans "Nueva pieza" %}</a>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="rounded-xl border border-cyan-400/30 bg-black/30 p-8 text-center text-gray-400">
+  <p class="mb-4">{% if q or estado_filtro %}{% trans "No hay resultados con los filtros aplicados." %}{% else %}{% trans "No hay vehículos de desarme." %}{% endif %}</p>
+  {% if q or estado_filtro %}
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "Ver todos" %}</a>
+  {% else %}
+  <a href="{% country_url 'desarme:crear_vehiculo' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "Crear el primero" %}</a>
+  {% endif %}
+</div>
+{% endif %}

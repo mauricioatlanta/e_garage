@@ -2,6 +2,7 @@
 from dal import autocomplete
 
 from django import forms
+from django.utils.translation import get_language
 
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
@@ -106,6 +107,12 @@ class DocumentoForm(forms.ModelForm):
         self.user = kwargs.pop("user", None)
         self.empresa = kwargs.pop("empresa", None)
         self.country = kwargs.pop("country", "CL")
+        # Idioma para labels/choices: define textos visibles (es/en/pt)
+        # Si no se pasa, usa get_language() o fallback por país (retrocompat)
+        lang = kwargs.pop("language", None)
+        self.language = (lang or get_language() or "").split("-")[0] or (
+            "en" if (self.country or "").upper() == "US" else "es"
+        )
 
         # Si no se pasó empresa, intentar obtenerla del usuario
         if not self.empresa and self.user:
@@ -128,10 +135,10 @@ class DocumentoForm(forms.ModelForm):
             )
             self.fields["tecnico_responsable"].queryset = self.empresa.tecnicos.all()
 
-        # Configurar labels según el país
-        self._configure_labels_by_country()
+        # Configurar labels según idioma (no país)
+        self._configure_labels_by_language()
 
-        # Configurar choices dinámicos
+        # Configurar choices dinámicos (labels por idioma; visibilidad millas por país)
         self._configure_dynamic_choices()
 
         # Configurar widgets con IDs únicos para JavaScript
@@ -143,8 +150,8 @@ class DocumentoForm(forms.ModelForm):
         # Configurar campo kilometraje_ingreso dinámicamente
         self._configure_kilometraje_ingreso()
 
-    def _configure_labels_by_country(self):
-        """Configura labels dinámicos según el país y rubro de la empresa"""
+    def _configure_labels_by_language(self):
+        """Configura labels dinámicos según idioma (no país). País solo para rubro técnico."""
         # Obtener configuración de la empresa para determinar rubro
         responsable_label = "Técnico Responsable"  # Default
         if self.empresa:
@@ -155,7 +162,7 @@ class DocumentoForm(forms.ModelForm):
             except Exception:
                 pass  # Si no hay config, usar default
 
-        if self.country == "US":
+        if self.language == "en":
             labels = {
                 "tipo": "Document Type",
                 "cliente": "Customer",
@@ -203,12 +210,13 @@ class DocumentoForm(forms.ModelForm):
                 self.fields[field_name].label = label
 
     def _configure_dynamic_choices(self):
-        """Configura choices dinámicos según el país"""
-        if self.country == "US":
+        """Configura choices dinámicos: labels por idioma; visibilidad millas por país."""
+        # Labels de choices según idioma
+        if self.language == "en":
             self.fields["tipo"].choices = [
                 ("OT", "Work Order"),
-                ("PRES", "Estimate"),  # Estimate
-                ("FAC", "Invoice/Receipt"),  # Invoice
+                ("PRES", "Estimate"),
+                ("FAC", "Invoice/Receipt"),
             ]
             self.fields["payment_status"].choices = [
                 ("pending", "Pending"),
@@ -216,15 +224,11 @@ class DocumentoForm(forms.ModelForm):
                 ("partial", "Partial"),
                 ("canceled", "Canceled"),
             ]
-            # Millas solo en USA
-            if "millas" in self.fields:
-                self.fields["millas"].required = False
-                self.fields["kilometraje"].required = False
-        else:  # CL (Chile)
+        else:
             self.fields["tipo"].choices = [
                 ("OT", "Orden de Trabajo"),
                 ("PRES", "Presupuesto"),
-                ("FAC", "Factura/Boleta"),  # Factura/Boleta
+                ("FAC", "Factura/Boleta"),
             ]
             self.fields["payment_status"].choices = [
                 ("pending", "Pendiente"),
@@ -232,8 +236,12 @@ class DocumentoForm(forms.ModelForm):
                 ("partial", "Parcial"),
                 ("canceled", "Anulado"),
             ]
-            # Kilometraje en Chile, millas no aplica
-            if "millas" in self.fields:
+        # Visibilidad de millas por país (US muestra millas; CL/otros la ocultan)
+        if "millas" in self.fields:
+            if (self.country or "").upper() == "US":
+                self.fields["millas"].required = False
+                self.fields["kilometraje"].required = False
+            else:
                 self.fields["millas"].widget = forms.HiddenInput()
                 self.fields["millas"].required = False
 
@@ -314,7 +322,7 @@ class DocumentoForm(forms.ModelForm):
                 pass
 
         # En USA, el label puede ser "Mileage" o "Current Mileage"
-        # Ya se configuró en _configure_labels_by_country
+        # Ya se configuró en _configure_labels_by_language
 
     def clean(self):
         """Validaciones robustas multi-tenant"""
@@ -383,6 +391,9 @@ class DocumentoForm(forms.ModelForm):
         if commit:
             # Procesar datos JSON solo si el documento se guardó
             self._process_json_data(documento)
+
+            # Recalcular totales del documento tras crear las líneas
+            documento.recompute_totals(persist=True)
 
             # Crear registro de kilometraje si se proporcionó y hay vehículo
             if kilometraje_ingreso is not None and documento.vehiculo:

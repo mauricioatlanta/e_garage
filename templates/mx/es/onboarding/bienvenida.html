@@ -1,4 +1,4 @@
-{% load i18n static %}
+{% load i18n static country_url %}
 <!DOCTYPE html>
 <html lang="es-mx">
 <head>
@@ -388,8 +388,8 @@
         </div>
 
         <div class="flex flex-wrap gap-6 justify-center mb-16">
-          <a href="/mx/es/accounts/signup/" class="btn-primary">🚀 Comenzar Gratis</a>
-          <a href="/mx/es/accounts/login/" class="btn-secondary">🔐 Ingresar</a>
+          <a href="{% country_url 'account_signup' %}" class="btn-primary">🚀 Comenzar Gratis</a>
+          <a href="{% country_url 'account_login' %}" class="btn-secondary">🔐 Ingresar</a>
           <a href="#precios" class="btn-secondary">💰 Ver Planes</a>
         </div>
 
@@ -604,7 +604,7 @@
             <li>✓ Inventario</li>
             <li>✓ Soporte 24/7</li>
           </ul>
-          <a href="/mx/es/accounts/signup/?plan=mensual" class="btn-secondary inline-block w-full">Seleccionar</a>
+          <a href="{% country_url 'account_signup' %}?plan=mensual" class="btn-secondary inline-block w-full">Seleccionar</a>
         </div>
 
         <!-- Plan Semestral (MÁS POPULAR) -->
@@ -633,7 +633,7 @@
             <li>✓ Multi-sucursales</li>
             <li>✓ Prioridad en soporte</li>
           </ul>
-          <a href="/mx/es/accounts/signup/?plan=semestral" class="btn-primary inline-block w-full">Seleccionar</a>
+          <a href="{% country_url 'account_signup' %}?plan=semestral" class="btn-primary inline-block w-full">Seleccionar</a>
         </div>
 
         <!-- Plan Anual -->
@@ -659,7 +659,7 @@
             <li>✓ API personalizada</li>
             <li>✓ Soporte dedicado</li>
           </ul>
-          <a href="/mx/es/accounts/signup/?plan=anual" class="btn-secondary inline-block w-full">Seleccionar</a>
+          <a href="{% country_url 'account_signup' %}?plan=anual" class="btn-secondary inline-block w-full">Seleccionar</a>
         </div>
 
       </div>
@@ -695,8 +695,8 @@
         <div>
           <h5 class="font-bold mb-4" style="color: #FFFFFF;">Cuenta</h5>
           <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/mx/es/accounts/login/" style="transition: color 0.3s;" onmouseover="this.style.color='#006847'" onmouseout="this.style.color='#b0b0b0'">Ingresar</a></li>
-            <li><a href="/mx/es/accounts/signup/" style="transition: color 0.3s;" onmouseover="this.style.color='#006847'" onmouseout="this.style.color='#b0b0b0'">Registrarse</a></li>
+            <li><a href="{% country_url 'account_login' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#006847'" onmouseout="this.style.color='#b0b0b0'">Ingresar</a></li>
+            <li><a href="{% country_url 'account_signup' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#006847'" onmouseout="this.style.color='#b0b0b0'">Registrarse</a></li>
           </ul>
         </div>
         <div>

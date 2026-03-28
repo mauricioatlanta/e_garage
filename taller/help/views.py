@@ -3,10 +3,14 @@ Vistas del Centro de Ayuda
 """
 
 from django.db.models import Q
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.views.generic import ListView, DetailView
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 from taller.models.help import HelpArticle, HelpCategory
+from .configs import FAQS, PASOS_RECOMENDADOS, PANEL_AYUDA_CONFIG
 
 
 class HelpHomeView(ListView):
@@ -94,7 +98,51 @@ def help_buscar(request):
     context = {
         "query": query,
         "resultados": resultados,
-        "total": resultados.count() if query else 0,
     }
-
     return render(request, "help/buscar.html", context)
+
+
+@api_view(["GET"])
+def help_contextual(request):
+    """
+    Retorna contenido de ayuda contextual basado en el contexto (módulo) enviado
+    """
+    contexto = request.GET.get("contexto", "general").lower()
+
+    # Obtener FAQS y Pasos del config
+    from .configs import FAQS, PASOS_RECOMENDADOS
+
+    faqs = FAQS.get(contexto, FAQS.get("general", []))
+    pasos = PASOS_RECOMENDADOS.get(contexto, [])
+
+    return Response({"contexto": contexto, "faqs": faqs, "pasos": pasos, "success": True})
+
+
+# API Views para contenido estático/extensible
+@api_view(["GET"])
+def api_faqs(request, modulo=None):
+    """API para obtener FAQs por módulo o todas"""
+    if modulo:
+        faqs = FAQS.get(modulo, [])
+    else:
+        # Todas las FAQs agrupadas por módulo
+        faqs = FAQS
+
+    return Response({"faqs": faqs, "modulo": modulo})
+
+
+@api_view(["GET"])
+def api_pasos_recomendados(request, modulo=None):
+    """API para obtener pasos recomendados por módulo"""
+    if modulo:
+        pasos = PASOS_RECOMENDADOS.get(modulo, [])
+    else:
+        pasos = PASOS_RECOMENDADOS
+
+    return Response({"pasos": pasos, "modulo": modulo})
+
+
+@api_view(["GET"])
+def api_panel_ayuda_config(request):
+    """API para configuración del panel de ayuda"""
+    return Response(PANEL_AYUDA_CONFIG)

@@ -11,9 +11,14 @@ from taller.servicios.models import (
 
 
 class Command(BaseCommand):
-    help = "Carga categorías, subcategorías y servicios para Chile (español) y USA (inglés)"
+    help = "(DEPRECADO) Use cargar_catalogo_maestro. Carga categorías, subcategorías y servicios para Chile (español) y USA (inglés)."
 
     def handle(self, *args, **options):
+        self.stdout.write(
+            self.style.WARNING(
+                "DEPRECADO: cargar_servicios. Use: python manage.py cargar_catalogo_maestro"
+            )
+        )
         # --- Definición de datos ---
         categorias = [
             {

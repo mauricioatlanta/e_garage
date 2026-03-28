@@ -1,9 +1,9 @@
 from datetime import date
 
 from dal import autocomplete
-from django.db.models import Q
-
 from django import forms
+from django.db.models import Q
+from django.utils.translation import gettext_lazy as _
 
 from taller.models import Vehiculo
 from taller.models.clientes import Cliente
@@ -11,6 +11,25 @@ from taller.models.extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehi
 
 # Sentinel global para "Agregar nuevo"
 NEW_SENTINEL = "__nuevo__"
+
+# Opciones de tipo de carrocería (traducibles)
+CARROCERIA_CHOICES_BASE = [
+    ("", "---------"),
+    ("sedan", _("Sedan")),
+    ("suv", "SUV"),
+    ("pickup", _("Pickup")),
+    ("hatchback", _("Hatchback")),
+    ("coupe", _("Coupe")),
+    ("station_wagon", _("Station Wagon")),
+    ("van", _("Van")),
+    ("minivan", _("Minivan")),
+    ("convertible", _("Convertible")),
+    ("crossover", _("Crossover")),
+    ("compacto", _("Compact")),
+    ("utilitario", _("Utility")),
+    ("camion", _("Truck")),
+    ("otro", _("Other")),
+]
 
 
 class VehiculoForm(forms.ModelForm):
@@ -80,9 +99,12 @@ class VehiculoForm(forms.ModelForm):
 
                 log = logging.getLogger(__name__)
 
-                # Determinar el namespace correcto según el país
-                if path.startswith("/us/"):
-                    # Para USA, usar el namespace usa:vehiculos:cliente_autocomplete
+                # Determinar el namespace correcto según el país y ruta
+                if path.startswith("/us/es/"):
+                    autocomplete_url = "us_es:vehiculos:cliente_autocomplete"
+                elif path.startswith("/us/en/"):
+                    autocomplete_url = "us_en:vehiculos:cliente_autocomplete"
+                elif path.startswith("/us/"):
                     autocomplete_url = "usa:vehiculos:cliente_autocomplete"
                     log.info(
                         f"[VehiculoForm] Configurando URL de autocomplete cliente para USA: {autocomplete_url}"
@@ -113,22 +135,28 @@ class VehiculoForm(forms.ModelForm):
                     path_parts = path.strip("/").split("/")
                     if len(path_parts) >= 2 and path_parts[1] in ["en", "es"]:
                         lang = path_parts[1]
-                    
+
                     # Intentar generar la URL absoluta con reverse para asegurar que tenga el prefijo correcto
                     try:
                         # No pasar lang como kwarg ya que el URL pattern no lo acepta
                         # El reverse usará automáticamente el namespace correcto basado en el contexto
                         from django.urls import NoReverseMatch
+
                         try:
                             absolute_url = reverse(autocomplete_url)
                             log.info(f"[VehiculoForm] URL generada por reverse: {absolute_url}")
 
-                            # Verificar si la URL ya tiene el prefijo correcto
-                            expected_prefix = (
-                                "/us/"
-                                if path.startswith("/us/")
-                                else "/cl/" if path.startswith("/cl/") else None
-                            )
+                            # Verificar si la URL tiene el prefijo correcto
+                            if path.startswith("/us/es/"):
+                                expected_prefix = "/us/es/"
+                            elif path.startswith("/us/en/"):
+                                expected_prefix = "/us/en/"
+                            elif path.startswith("/us/"):
+                                expected_prefix = "/us/"
+                            elif path.startswith("/cl/"):
+                                expected_prefix = "/cl/"
+                            else:
+                                expected_prefix = None
 
                             if expected_prefix and not absolute_url.startswith(expected_prefix):
                                 # Si falta el prefijo, agregarlo
@@ -146,7 +174,7 @@ class VehiculoForm(forms.ModelForm):
                                 log.info(
                                     f"[VehiculoForm] ✅ URL absoluta configurada en data-ajax--url: {absolute_url}"
                                 )
-                            
+
                             # Si tenemos lang, usar la URL absoluta directamente en widget.url
                             # para evitar que DAL intente hacer reverse sin el parámetro lang
                             if lang:
@@ -180,6 +208,9 @@ class VehiculoForm(forms.ModelForm):
 
         # Configurar campo color
         self._configurar_color(pais)
+
+        # Configurar tipo de carrocería (lista + opción agregar)
+        self._configurar_tipo_carroceria(pais)
 
         # Debug: Log del país detectado
         import logging
@@ -225,6 +256,15 @@ class VehiculoForm(forms.ModelForm):
                 f"[VehiculoForm] ❌ Campo marca NO encontrado después de configuración (país: {pais})"
             )
 
+        # Flujo "crear vehículo desde documento": si viene next en GET/POST, permitir guardar sin marca/modelo
+        # para que el redirect con cliente_id y vehiculo_id funcione; el usuario puede editar después.
+        if self.request and (self.request.GET.get("next") or self.request.POST.get("next")):
+            if "marca" in self.fields:
+                self.fields["marca"].required = False
+            if "modelo" in self.fields:
+                self.fields["modelo"].required = False
+            log.info("[VehiculoForm] Flujo desde documento (next): marca y modelo no requeridos")
+
     def _configurar_color(self, pais):
         """Configurar campo color basado en el país y empresa"""
         empresa = getattr(self.user, "empresa", None)
@@ -236,7 +276,7 @@ class VehiculoForm(forms.ModelForm):
         colores_choices = [("", "---------")]
         for color in qs:
             colores_choices.append((str(color.id), color.nombre))
-        colores_choices.append(("__nuevo__", "Agregar nuevo color..."))
+        colores_choices.append(("__nuevo__", _("Agregar nuevo color...")))
 
         self.fields["color"] = forms.ChoiceField(
             choices=colores_choices,
@@ -252,6 +292,29 @@ class VehiculoForm(forms.ModelForm):
         if self.instance and getattr(self.instance, "color_id", None):
             self.fields["color"].initial = str(self.instance.color_id)
 
+    def _configurar_tipo_carroceria(self, pais):
+        """Configurar campo tipo_carroceria con lista de opciones + agregar nuevo"""
+        choices = list(CARROCERIA_CHOICES_BASE) + [("__nuevo__", _("Add new body type..."))]
+        label = "Body Type / Style" if pais == "US" else _("Tipo de carrocería / Estilo")
+        self.fields["tipo_carroceria"] = forms.ChoiceField(
+            choices=choices,
+            required=False,
+            label=label,
+            widget=forms.Select(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                }
+            ),
+        )
+        if self.instance and getattr(self.instance, "tipo_carroceria", None):
+            val = (self.instance.tipo_carroceria or "").strip()
+            if val and val not in [c[0] for c in choices]:
+                # Valor existente no está en la lista (ej. custom) → agregar como opción
+                self.fields["tipo_carroceria"].choices = (
+                    list(choices[:-1]) + [(val, val)] + [choices[-1]]
+                )
+            self.fields["tipo_carroceria"].initial = val or ""
+
     def _configurar_urls_autocomplete_motor_caja(self):
         """Configurar URLs de autocomplete para motor y caja con soporte para lang"""
         import logging
@@ -263,7 +326,7 @@ class VehiculoForm(forms.ModelForm):
             return
 
         path = (self.request.path or "").lower()
-        
+
         # Extraer lang del path si está presente (ej: /us/en/... o /us/es/...)
         lang = None
         path_parts = path.strip("/").split("/")
@@ -283,21 +346,29 @@ class VehiculoForm(forms.ModelForm):
         # Configurar motor
         # Verificar si el campo existe y si el widget es de tipo autocomplete sin acceder a url
         # Usar isinstance para verificar el tipo sin acceder a propiedades
-        if "motor" in self.fields and isinstance(self.fields["motor"].widget, autocomplete.ModelSelect2):
+        if "motor" in self.fields and isinstance(
+            self.fields["motor"].widget, autocomplete.ModelSelect2
+        ):
             motor_url_name = f"{autocomplete_ns}:motor-autocomplete"
             try:
                 # No pasar lang como kwarg ya que el URL pattern no lo acepta
                 absolute_url = reverse(motor_url_name)
-                
+
                 if lang:
                     # Usar _url directamente para evitar que DAL intente hacer reverse
                     self.fields["motor"].widget._url = absolute_url
-                    log.info(f"[VehiculoForm] ✅ URL absoluta configurada para motor (con lang={lang}): {absolute_url}")
+                    log.info(
+                        f"[VehiculoForm] ✅ URL absoluta configurada para motor (con lang={lang}): {absolute_url}"
+                    )
                 else:
                     self.fields["motor"].widget._url = motor_url_name
-                    log.info(f"[VehiculoForm] ✅ URL de autocomplete motor actualizada: {motor_url_name}")
+                    log.info(
+                        f"[VehiculoForm] ✅ URL de autocomplete motor actualizada: {motor_url_name}"
+                    )
             except Exception as e:
-                log.warning(f"[VehiculoForm] No se pudo generar URL absoluta para motor: {e}, usando namespace: {motor_url_name}")
+                log.warning(
+                    f"[VehiculoForm] No se pudo generar URL absoluta para motor: {e}, usando namespace: {motor_url_name}"
+                )
                 # Intentar usar el namespace directamente (puede fallar si requiere lang)
                 try:
                     self.fields["motor"].widget._url = motor_url_name
@@ -307,21 +378,29 @@ class VehiculoForm(forms.ModelForm):
         # Configurar caja
         # Verificar si el campo existe y si el widget es de tipo autocomplete sin acceder a url
         # Usar isinstance para verificar el tipo sin acceder a propiedades
-        if "caja" in self.fields and isinstance(self.fields["caja"].widget, autocomplete.ModelSelect2):
+        if "caja" in self.fields and isinstance(
+            self.fields["caja"].widget, autocomplete.ModelSelect2
+        ):
             caja_url_name = f"{autocomplete_ns}:caja-autocomplete"
             try:
                 # No pasar lang como kwarg ya que el URL pattern no lo acepta
                 absolute_url = reverse(caja_url_name)
-                
+
                 if lang:
                     # Usar _url directamente para evitar que DAL intente hacer reverse
                     self.fields["caja"].widget._url = absolute_url
-                    log.info(f"[VehiculoForm] ✅ URL absoluta configurada para caja (con lang={lang}): {absolute_url}")
+                    log.info(
+                        f"[VehiculoForm] ✅ URL absoluta configurada para caja (con lang={lang}): {absolute_url}"
+                    )
                 else:
                     self.fields["caja"].widget._url = caja_url_name
-                    log.info(f"[VehiculoForm] ✅ URL de autocomplete caja actualizada: {caja_url_name}")
+                    log.info(
+                        f"[VehiculoForm] ✅ URL de autocomplete caja actualizada: {caja_url_name}"
+                    )
             except Exception as e:
-                log.warning(f"[VehiculoForm] No se pudo generar URL absoluta para caja: {e}, usando namespace: {caja_url_name}")
+                log.warning(
+                    f"[VehiculoForm] No se pudo generar URL absoluta para caja: {e}, usando namespace: {caja_url_name}"
+                )
                 # Intentar usar el namespace directamente (puede fallar si requiere lang)
                 try:
                     self.fields["caja"].widget._url = caja_url_name
@@ -342,37 +421,39 @@ class VehiculoForm(forms.ModelForm):
             log.info("[VehiculoForm._configurar_campos_usa] Eliminando campo marca existente")
             del self.fields["marca"]
 
-        # Campo marca para USA - Usar CatalogoModeloAuto como fuente principal
+        # Campo marca para USA - PRIORIZAR Marca (IDs) sobre Catalogo para que
+        # modelos_por_marca_api funcione (requiere marca_id numérico)
         try:
-            from taller.models.catalogo import CatalogoModeloAuto
+            # 1) Intentar modelo Marca primero (IDs → modelos cargan correctamente)
+            marcas_usa = Marca.objects.filter(country="US").order_by("nombre")
+            total_marcas = marcas_usa.count()
+            log.info(
+                f"[VehiculoForm._configurar_campos_usa] Marcas en modelo Marca (country='US'): {total_marcas}"
+            )
 
-            log.info("[VehiculoForm._configurar_campos_usa] Intentando obtener marcas del catálogo")
-            # Obtener marcas únicas del catálogo
-            marcas_catalogo = CatalogoModeloAuto.get_marcas_activas()
-
-            # Convertir a lista para verificar si hay resultados (ValuesListQuerySet no tiene .exists())
-            try:
-                marcas_list = list(marcas_catalogo[:500])  # Limitar a 500 para performance
+            if total_marcas > 0:
+                marcas_list = list(marcas_usa[:500])
                 log.info(
-                    f"[VehiculoForm._configurar_campos_usa] Marcas en catálogo: {len(marcas_list)}"
+                    f"[VehiculoForm._configurar_campos_usa] Usando modelo Marca ({len(marcas_list)} marcas con IDs)"
                 )
-            except Exception as e:
-                log.error(
-                    f"[VehiculoForm._configurar_campos_usa] Error al obtener marcas del catálogo: {e}"
-                )
-                marcas_list = []
-
-            if marcas_list:
                 log.info(
-                    f"[VehiculoForm._configurar_campos_usa] Usando catálogo como fuente ({len(marcas_list)} marcas)"
+                    f"[VehiculoForm._configurar_campos_usa] Primeras 5 marcas: {[m.nombre for m in marcas_list[:5]]}"
                 )
-                # Usar catálogo como fuente principal
-                marcas_choices = [("", "Select a brand")] + [
-                    (marca, marca) for marca in marcas_list
-                ]
 
+                marcas_choices = [("", "Select a brand")]
+                for marca in marcas_list:
+                    marca_nombre = marca.nombre.strip() if marca.nombre else ""
+                    marca_id_str = str(marca.pk).strip()
+                    if marca_nombre and marca_id_str and not marca_nombre.isdigit():
+                        marcas_choices.append((marca_id_str, marca_nombre))
+                    else:
+                        log.warning(
+                            f"[VehiculoForm._configurar_campos_usa] ⚠️ Marca ID {marca.pk} omitida (nombre inválido)"
+                        )
+
+                marcas_choices_tuple = tuple(marcas_choices)
                 self.fields["marca"] = forms.ChoiceField(
-                    choices=marcas_choices,
+                    choices=marcas_choices_tuple,
                     required=True,
                     label="Brand",
                     widget=forms.Select(
@@ -381,104 +462,43 @@ class VehiculoForm(forms.ModelForm):
                         }
                     ),
                 )
+                log.info(
+                    f"[VehiculoForm._configurar_campos_usa] ✅ Campo marca con {len(marcas_choices)-1} opciones (IDs)"
+                )
             else:
-                # Fallback: usar modelo Marca si el catálogo está vacío
-                log.info(
-                    "[VehiculoForm._configurar_campos_usa] Catálogo vacío, usando fallback al modelo Marca"
-                )
+                # Fallback: CatalogoModeloAuto (strings) - modelos no cargarán vía API
+                try:
+                    from taller.models.catalogo import CatalogoModeloAuto
 
-                # ✅ CRÍTICO: Evaluar el queryset COMPLETO inmediatamente como lista
-                marcas_usa = Marca.objects.filter(country="US").order_by("nombre")
-                total_marcas = marcas_usa.count()
-                log.info(
-                    f"[VehiculoForm._configurar_campos_usa] Marcas en modelo Marca (country='US'): {total_marcas}"
-                )
-
-                # ✅ Convertir el queryset completo a lista ANTES de crear el campo
-                marcas_list = list(marcas_usa)
-                log.info(
-                    f"[VehiculoForm._configurar_campos_usa] Marcas convertidas a lista: {len(marcas_list)} marcas"
-                )
-
-                if len(marcas_list) > 0:
+                    marcas_catalogo = list(CatalogoModeloAuto.get_marcas_activas()[:500])
+                except (ImportError, Exception):
+                    marcas_catalogo = []
+                if marcas_catalogo:
                     log.info(
-                        f"[VehiculoForm._configurar_campos_usa] Primeras 5 marcas: {[m.nombre for m in marcas_list[:5]]}"
+                        "[VehiculoForm._configurar_campos_usa] Usando catálogo (modelos requerirán agregar manual)"
                     )
-
-                    # ✅ Crear choices con la lista ya materializada
-                    marcas_choices = [("", "Select a brand")]
-                    for marca in marcas_list:
-                        # ✅ VALIDACIÓN: Asegurar que la marca tenga nombre válido y no sea solo un número
-                        marca_nombre = marca.nombre.strip() if marca.nombre else ""
-                        marca_id_str = str(marca.pk).strip()
-
-                        # Validar que el nombre no sea solo un número (posible error de datos)
-                        if marca_nombre and marca_id_str and not marca_nombre.isdigit():
-                            marcas_choices.append((marca_id_str, marca_nombre))
-                        else:
-                            log.warning(
-                                f"[VehiculoForm._configurar_campos_usa] ⚠️ Marca con ID {marca.pk} tiene nombre inválido '{marca_nombre}' (es solo número o vacío), omitiendo"
-                            )
-
-                    log.info(
-                        f"[VehiculoForm._configurar_campos_usa] Choices creadas: {len(marcas_choices)} opciones"
-                    )
-                    log.info(
-                        f"[VehiculoForm._configurar_campos_usa] Primera choice: {marcas_choices[0]}, Segunda: {marcas_choices[1] if len(marcas_choices) > 1 else 'N/A'}"
-                    )
-
-                    # ✅ Usar tupla para forzar materialización completa
-                    marcas_choices_tuple = tuple(marcas_choices)
-
+                    marcas_choices = [("", "Select a brand")] + [(m, m) for m in marcas_catalogo]
                     self.fields["marca"] = forms.ChoiceField(
-                        choices=marcas_choices_tuple,
+                        choices=marcas_choices,
                         required=True,
                         label="Brand",
                         widget=forms.Select(
                             attrs={
-                                "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                                "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200"
                             }
                         ),
                     )
-
-                    # ✅ Verificación final inmediata
-                    final_choices = list(self.fields["marca"].choices)
-                    log.info(
-                        f"[VehiculoForm._configurar_campos_usa] ✅ Campo creado - Verificación final: {len(final_choices)} opciones"
-                    )
-                    if len(final_choices) > 1:
-                        log.info(
-                            f"[VehiculoForm._configurar_campos_usa] Primeras 3 choices verificadas: {final_choices[:3]}"
-                        )
-                    else:
-                        log.error(
-                            f"[VehiculoForm._configurar_campos_usa] ❌ ERROR CRÍTICO: Campo solo tiene {len(final_choices)} opción después de crear!"
-                        )
-                        log.error(
-                            f"[VehiculoForm._configurar_campos_usa] Choices que intentamos asignar: {marcas_choices[:3]}"
-                        )
-                        # Forzar reasignación directa
-                        self.fields["marca"].choices = marcas_choices_tuple
-                        log.info(
-                            f"[VehiculoForm._configurar_campos_usa] Reasignadas choices forzadamente"
-                        )
                 else:
-                    # No hay marcas ni en catálogo ni en modelo Marca - crear campo vacío con mensaje
-                    log.error(
-                        "[VehiculoForm._configurar_campos_usa] ❌ No hay marcas disponibles en catálogo ni en modelo Marca"
-                    )
                     log.error(
                         "[VehiculoForm._configurar_campos_usa] 💡 Ejecutar: python manage.py cargar_marcas_usa"
                     )
                     self.fields["marca"] = forms.ChoiceField(
-                        choices=[
-                            ("", "No brands available - Run: python manage.py cargar_marcas_usa")
-                        ],
+                        choices=[("", "No brands - Run: python manage.py cargar_marcas_usa")],
                         required=True,
                         label="Brand",
                         widget=forms.Select(
                             attrs={
-                                "class": "w-full px-4 py-3 rounded-lg bg-black border border-red-500/30 text-red-200 focus:outline-none focus:ring-2 focus:ring-red-400/50 focus:border-red-400"
+                                "class": "w-full px-4 py-3 rounded-lg bg-black border border-red-500/30 text-red-200"
                             }
                         ),
                     )
@@ -614,6 +634,8 @@ class VehiculoForm(forms.ModelForm):
             ),
         )
 
+        self._filtrar_motor_caja_por_modelo(pais)
+
         # Configurar valores iniciales si estamos editando
         self._configurar_valores_iniciales_usa()
 
@@ -736,6 +758,73 @@ class VehiculoForm(forms.ModelForm):
             ),
         )
 
+        self._filtrar_motor_caja_por_modelo(pais)
+
+    def _filtrar_motor_caja_por_modelo(self, pais):
+        """Filtra querysets de motor y caja por modelo (creación y edición). No depende de self.instance.pk."""
+        from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
+        from taller.models.modelo import Modelo
+
+        modelo_actual = None
+        if self.data and self.data.get("modelo"):
+            try:
+                modelo_actual = Modelo.objects.get(pk=self.data.get("modelo"), country=pais)
+            except Exception:
+                modelo_actual = None
+        elif self.instance and self.instance.pk and getattr(self.instance, "modelo_id", None):
+            modelo_actual = self.instance.modelo
+
+        if "motor" not in self.fields or "caja" not in self.fields:
+            return
+
+        if modelo_actual:
+            self.fields["motor"].queryset = (
+                MotorVehiculo.objects.filter(country=pais, modelos=modelo_actual)
+                .distinct()
+                .order_by("nombre")
+            )
+            self.fields["caja"].queryset = (
+                CajaVehiculo.objects.filter(country=pais, modelos=modelo_actual)
+                .distinct()
+                .order_by("nombre")
+            )
+            if self.instance and self.instance.pk:
+                if self.instance.motor_id:
+                    self.fields["motor"].queryset = (
+                        MotorVehiculo.objects.filter(
+                            Q(country=pais, modelos=modelo_actual) | Q(pk=self.instance.motor_id)
+                        )
+                        .distinct()
+                        .order_by("nombre")
+                    )
+                if self.instance.caja_id:
+                    self.fields["caja"].queryset = (
+                        CajaVehiculo.objects.filter(
+                            Q(country=pais, modelos=modelo_actual) | Q(pk=self.instance.caja_id)
+                        )
+                        .distinct()
+                        .order_by("nombre")
+                    )
+        else:
+            if self.instance and self.instance.pk:
+                if self.instance.motor_id:
+                    self.fields["motor"].queryset = MotorVehiculo.objects.filter(
+                        pk=self.instance.motor_id
+                    )
+                else:
+                    self.fields["motor"].queryset = MotorVehiculo.objects.filter(
+                        country=pais
+                    ).none()
+                if self.instance.caja_id:
+                    self.fields["caja"].queryset = CajaVehiculo.objects.filter(
+                        pk=self.instance.caja_id
+                    )
+                else:
+                    self.fields["caja"].queryset = CajaVehiculo.objects.filter(country=pais).none()
+            else:
+                self.fields["motor"].queryset = MotorVehiculo.objects.filter(country=pais).none()
+                self.fields["caja"].queryset = CajaVehiculo.objects.filter(country=pais).none()
+
     def _configurar_valores_iniciales_usa(self):
         """Configurar valores iniciales para usuarios de USA"""
         if self.instance and self.instance.pk:
@@ -762,68 +851,6 @@ class VehiculoForm(forms.ModelForm):
             # Si hay POST, respeta el modelo enviado
             if self.data and "modelo" in self.data and self.data.get("modelo"):
                 self.fields["modelo"].initial = str(self.data.get("modelo"))
-
-            # Cargar motores y cajas del modelo inicial
-            # Inicializar modelo_actual de forma segura
-            modelo_actual = None
-            if self.instance and hasattr(self.instance, 'modelo'):
-                modelo_actual = getattr(self.instance, 'modelo', None)
-
-            # Si estamos en POST (con errores), usar el modelo del POST
-            if self.data and "modelo" in self.data:
-                try:
-                    modelo_id_post = self.data.get("modelo")
-                    if modelo_id_post:
-                        from taller.models.modelo import Modelo
-
-                        modelo_actual = Modelo.objects.get(pk=modelo_id_post)
-                except Exception:
-                    pass
-
-            if modelo_actual:
-                # Cargar motores del modelo
-                motores_modelo = MotorVehiculo.objects.filter(modelos=modelo_actual).order_by(
-                    "nombre"
-                )
-
-                # ✅ Incluir motor actual si existe, aunque no esté asociado al modelo
-                # Esto asegura que el valor actual se muestre al editar
-                if self.instance and self.instance.motor_id:
-                    # Usar union para incluir el motor actual
-                    motores_modelo = MotorVehiculo.objects.filter(
-                        Q(modelos=modelo_actual) | Q(pk=self.instance.motor_id)
-                    ).order_by("nombre")
-
-                # ✅ Actualizar queryset del campo (ModelChoiceField con autocomplete)
-                # El widget autocomplete maneja la creación de nuevos items via data-tags
-                self.fields["motor"].queryset = motores_modelo
-
-                # Cargar cajas del modelo
-                cajas_modelo = CajaVehiculo.objects.filter(modelos=modelo_actual).order_by("nombre")
-
-                # ✅ Incluir caja actual si existe, aunque no esté asociada al modelo
-                # Esto asegura que el valor actual se muestre al editar
-                if self.instance and self.instance.caja_id:
-                    # Usar union para incluir la caja actual
-                    cajas_modelo = CajaVehiculo.objects.filter(
-                        Q(modelos=modelo_actual) | Q(pk=self.instance.caja_id)
-                    ).order_by("nombre")
-
-                # ✅ Actualizar queryset del campo (ModelChoiceField con autocomplete)
-                # El widget autocomplete maneja la creación de nuevos items via data-tags
-                self.fields["caja"].queryset = cajas_modelo
-            else:
-                # Si no hay modelo, asegurar que el motor y caja actuales estén en el queryset
-                if self.instance and self.instance.motor_id:
-                    # Incluir solo el motor actual si no hay modelo
-                    self.fields["motor"].queryset = MotorVehiculo.objects.filter(
-                        Q(pk=self.instance.motor_id)
-                    )
-                if self.instance and self.instance.caja_id:
-                    # Incluir solo la caja actual si no hay modelo
-                    self.fields["caja"].queryset = CajaVehiculo.objects.filter(
-                        Q(pk=self.instance.caja_id)
-                    )
 
             # Establecer motor inicial
             motor_initial = None
@@ -1003,6 +1030,13 @@ class VehiculoForm(forms.ModelForm):
 
         val = self.cleaned_data.get("marca")
 
+        # Flujo desde documento (next): permitir guardar sin marca
+        if (
+            not val
+            and self.request
+            and (self.request.GET.get("next") or self.request.POST.get("next"))
+        ):
+            return None
         if not val:
             raise forms.ValidationError("Debe seleccionar una marca")
 
@@ -1083,6 +1117,13 @@ class VehiculoForm(forms.ModelForm):
 
         val = self.cleaned_data.get("modelo")
 
+        # Flujo desde documento (next): permitir guardar sin modelo
+        if (
+            not val
+            and self.request
+            and (self.request.GET.get("next") or self.request.POST.get("next"))
+        ):
+            return None
         if not val:
             raise forms.ValidationError("Debe seleccionar un modelo")
 
@@ -1241,6 +1282,14 @@ class VehiculoForm(forms.ModelForm):
             log.error(f"[clean_modelo] Modelo con ID {val} no encontrado para país {pais}")
             raise forms.ValidationError(f"Modelo no válido para {pais}")
 
+    def clean_tipo_carroceria(self):
+        """Manejar tipo_carroceria con opción de agregar nuevo"""
+        val = self.cleaned_data.get("tipo_carroceria")
+        if val == NEW_SENTINEL:
+            self._tipo_carroceria_nuevo = True
+            return ""
+        return val or ""
+
     def clean_color(self):
         """Manejar color con opción de crear nuevo"""
         color_id = self.cleaned_data.get("color")
@@ -1300,6 +1349,16 @@ class VehiculoForm(forms.ModelForm):
 
         modelo = self.cleaned_data.get("modelo")
 
+        # Tipo carrocería (custom)
+        if (
+            getattr(self, "_tipo_carroceria_nuevo", False)
+            and request
+            and request.POST.get("nuevo_tipo_carroceria")
+        ):
+            vehiculo.tipo_carroceria = (
+                request.POST.get("nuevo_tipo_carroceria") or ""
+            ).strip() or None
+
         # Color
         if getattr(self, "_color_nuevo", False) and request and request.POST.get("nuevo_color"):
             kwargs = {"nombre": request.POST["nuevo_color"]}
@@ -1351,6 +1410,7 @@ class VehiculoForm(forms.ModelForm):
             "color",
             "motor",
             "caja",
+            "tipo_carroceria",
         ]
         widgets = {
             "patente": forms.TextInput(
@@ -1361,6 +1421,12 @@ class VehiculoForm(forms.ModelForm):
             "vin": forms.TextInput(
                 attrs={
                     "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                }
+            ),
+            "tipo_carroceria": forms.TextInput(
+                attrs={
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "placeholder": "Ej: Sedan, SUV, Pickup, Hatchback, Coupe",
                 }
             ),
         }

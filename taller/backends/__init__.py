@@ -1,1 +1,1 @@
-# Backend de email personalizado para eGarage
+# Backends de email/autenticacion para eGarage

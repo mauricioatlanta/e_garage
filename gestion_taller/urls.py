@@ -1,3 +1,4 @@
+from pathlib import Path
 from urllib.parse import urlencode
 
 from django.conf import settings
@@ -70,6 +71,7 @@ def admin_login_method(request, extra_context=None):
 admin.site.login = admin_login_method
 admin.site.login_template = "admin/login.html"
 
+from django.http import HttpResponseNotFound
 from django.urls import include, path, re_path
 from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
@@ -81,8 +83,14 @@ from taller.views_extra.bienvenida_usa import bienvenida_usa_en, bienvenida_usa_
 from taller.views_extra.login_redirector import login_redirector
 from taller.views_extra.logout_redirect_view import logout_redirect_view
 from taller.views_extra.registro_exitoso import registro_exitoso
+from taller.views_extra.signup_email_verification import (
+    confirm_email_and_login,
+    resend_signup_confirmation,
+)
 from taller.views_extra.signup_redirects import signup_redirect
+from taller.views_extra.pwa import dynamic_manifest, dynamic_service_worker
 from taller.views_health import health_check, health_simple
+
 
 try:
     from taller.views_extra.compat_redirects import compat_settings_redirect
@@ -98,9 +106,11 @@ except ModuleNotFoundError:
 from taller.views_extra.suscripcion import registro, suscripcion_bloqueada
 from taller.views_extra.admin_suscriptores import (
     admin_suscriptores,
-    extender_suscripcion_ajax,
-    detalle_suscriptor,
     actualizar_telefono_ajax,
+    desactivar_suscripcion_ajax,
+    detalle_suscriptor,
+    eliminar_suscriptor_ajax,
+    extender_suscripcion_ajax,
 )
 
 # Forzar importación del admin de WhatsApp (app top-level whatsapp) solo si está desplegado
@@ -171,15 +181,18 @@ def redirect_qs(to):
     return view
 
 
-def redirect_us_accounts_to_base(request):
-    """Redirige /us/en/accounts/ o /us/es/accounts/ a /accounts/ (allauth único)."""
-    return redirect("/accounts/" + ("?" + request.GET.urlencode() if request.GET else ""))
+def redirect_login_canonical(cc: str, lang: str):
+    """Redirige rutas legacy de login a la ruta canónica por país/idioma."""
 
+    def view(request, **kwargs):
+        params = request.GET.copy()
+        params.pop("country", None)
+        url = f"/{cc}/{lang}/accounts/login/"
+        if params:
+            url = f"{url}?{urlencode(params, doseq=True)}"
+        return redirect(url)
 
-def redirect_us_accounts_with_path(request, rest):
-    """Redirige /us/en/accounts/<rest> o /us/es/accounts/<rest> a /accounts/<rest>."""
-    base = f"/accounts/{rest.rstrip('/')}"
-    return redirect(base + ("?" + request.GET.urlencode() if request.GET else ""))
+    return view
 
 
 def redirect_cl_to_es(request, path=None):
@@ -217,7 +230,36 @@ def country_aware_clientes_redirect(request):
     return redirect("/cl/es/clientes/")
 
 
+def country_aware_workspace_redirect(request, subpath=""):
+    """Redirect /workspace/ to country workspace. USA → /us/en/workspace/, Chile → /cl/es/workspace/."""
+    if request.user.is_authenticated:
+        try:
+            if hasattr(request.user, "empresa") and request.user.empresa:
+                pais = (getattr(request.user.empresa, "pais", None) or "").strip().upper()
+                if pais == "US":
+                    return redirect(f"/us/en/workspace/{subpath}".rstrip("/") + "/")
+                if pais == "CL":
+                    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
+        except Exception:
+            pass
+    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
+
+
 urlpatterns = [
+    # PWA Dinámicas (manifest y service worker por país e idioma)
+    path("<str:pais>/<str:idioma>/manifest.json", dynamic_manifest, name="pwa_manifest"),
+    path(
+        "<str:pais>/<str:idioma>/service-worker.js",
+        dynamic_service_worker,
+        name="pwa_service_worker",
+    ),
+    # Root /workspace/ → country-aware redirect (early so it's always found)
+    path("workspace/", country_aware_workspace_redirect, name="workspace_redirect_root"),
+    path(
+        "workspace/buscar/",
+        lambda r: country_aware_workspace_redirect(r, "buscar"),
+        name="workspace_buscar_redirect_root",
+    ),
     path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
     # Portal del Cliente
     path("portal/", include("taller.portal.urls")),
@@ -232,6 +274,16 @@ urlpatterns = [
         "admin/suscriptores/<int:empresa_id>/extender/",
         extender_suscripcion_ajax,
         name="admin_extender_suscripcion",
+    ),
+    path(
+        "admin/suscriptores/<int:empresa_id>/desactivar/",
+        desactivar_suscripcion_ajax,
+        name="admin_desactivar_suscripcion",
+    ),
+    path(
+        "admin/suscriptores/<int:empresa_id>/eliminar/",
+        eliminar_suscriptor_ajax,
+        name="admin_eliminar_suscriptor",
     ),
     path(
         "admin/suscriptores/<int:empresa_id>/actualizar-telefono/",
@@ -277,75 +329,77 @@ urlpatterns = [
     path("accounts/login/", country_aware_login, name="account_login"),
     # Signup personalizado con CustomSignupView (ANTES de allauth.urls para que tenga prioridad)
     path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
+    # Reenvio de confirmacion despues del signup (sin autenticar usuario)
+    path(
+        "accounts/resend-confirmation/",
+        resend_signup_confirmation,
+        name="account_resend_signup_confirmation",
+    ),
+    path(
+        "accounts/confirm-email/<str:key>/",
+        confirm_email_and_login,
+        name="account_confirm_email_country_aware",
+    ),
     # Registro exitoso (con prefijos de país)
     path("auth/registro-exitoso/", registro_exitoso, name="registro_exitoso"),
     path("cl/auth/registro-exitoso/", registro_exitoso, name="registro_exitoso_cl"),
     path("us/auth/registro-exitoso/", registro_exitoso, name="registro_exitoso_us"),
     # Allauth para el resto de funcionalidades (excluyendo signup que ya está arriba)
     path("accounts/", include("allauth.urls")),
-    # Wrappers country-aware para login y signup (servir directamente evita ERR_TOO_MANY_REDIRECTS)
-    path("cl/accounts/login/", country_aware_login, name="account_login_cl"),
-    # path("us/accounts/login/", redirect_qs("/us/login/"), name="account_login_us"),  # USA login real: path("us/", include(usa)) → usa:account_login en /us/login/
+    # Confirmacion country-aware -> canonical allauth global.
+    path(
+        "cl/es/accounts/confirm-email/<str:key>/",
+        redirect_qs("/accounts/confirm-email/{key}/"),
+        name="account_confirm_email_cl_es",
+    ),
+    # Wrappers country-aware para login y signup
+    # Canonicalizamos Chile a /cl/es/accounts/login/ para evitar CSRF por mismatch de URL.
+    path("cl/accounts/login/", redirect_login_canonical("cl", "es"), name="account_login_cl"),
     path("co/accounts/login/", country_aware_login, name="account_login_co"),
     path("ec/accounts/login/", country_aware_login, name="account_login_ec"),
     path("pe/accounts/login/", country_aware_login, name="account_login_pe"),
-    # Signup CL y US - redirect a signup universal con parámetro from
+    # Signup CL y US - redirect a signup country-aware con país + idioma
     path("cl/accounts/signup/", lambda r: signup_redirect(r, "cl"), name="account_signup_cl"),
-    path("us/accounts/signup/", lambda r: signup_redirect(r, "us"), name="account_signup_us"),
-    # Redirecciones /xx/signup/ -> /accounts/signup/?from=xx (preserva ?plan=, etc.) para que los
+    # Redirecciones /xx/signup/ -> /{xx}/{lang}/accounts/signup/ (preserva ?plan=, etc.) para que los
     # enlaces de onboarding/bienvenida (ej. /cl/signup/, /ar/signup/) resuelvan en todos los países
     path(
         "cl/signup/",
-        lambda r: redirect(
-            "/accounts/signup/?from=cl" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/cl/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_cl",
     ),
     path(
         "ar/signup/",
-        lambda r: redirect(
-            "/accounts/signup/?from=ar" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/ar/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_ar",
     ),
     path(
         "ec/signup/",
-        lambda r: redirect(
-            "/accounts/signup/?from=ec" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/ec/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_ec",
     ),
     path(
         "co/signup/",
-        lambda r: redirect(
-            "/accounts/signup/?from=co" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/co/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_co",
     ),
     path(
         "pe/signup/",
-        lambda r: redirect(
-            "/accounts/signup/?from=pe" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/pe/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_pe",
     ),
     path(
         "ve/signup/",
-        lambda r: redirect(
-            "/accounts/signup/?from=ve" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/ve/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_ve",
     ),
     path(
         "br/signup/",
-        lambda r: redirect(
-            "/accounts/signup/?from=br" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/br/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="signup_redirect_br",
     ),
-    # Redirects amigables para login (cl/accounts/login/ sirve country_aware_login directamente)
-    path("cl/login/", redirect_qs("/cl/accounts/login/")),
-    path("cl/es/login/", redirect_qs("/cl/accounts/login/")),
+    # Redirects amigables para login (siempre llevar a login canónico con idioma)
+    path("cl/login/", redirect_login_canonical("cl", "es")),
+    path("cl/es/login/", redirect_login_canonical("cl", "es")),
     # us/login/ lo resuelve path("us/", include(usa)) → usa_login_view (render directo)
     path("co/login/", redirect_qs("/co/accounts/login/")),
     path("co/es/login/", redirect_qs("/co/accounts/login/")),
@@ -357,45 +411,8 @@ urlpatterns = [
     path("ve/es/login/", redirect_qs("/ve/es/accounts/login/")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
-    path("us/accounts/logout/", redirect_qs("/accounts/logout/")),
     # Password reset (solicitud + enviado + confirm + completo)
-    path("cl/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
-    path("us/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
-    path(
-        "cl/accounts/password/reset/done/",
-        redirect_qs("/accounts/password/reset/done/"),
-    ),
-    path(
-        "us/accounts/password/reset/done/",
-        redirect_qs("/accounts/password/reset/done/"),
-    ),
-    path(
-        "cl/accounts/password/reset/key/<uidb36>/<key>/",
-        redirect_qs("/accounts/password/reset/key/{uidb36}/{key}/"),
-    ),
-    path(
-        "us/accounts/password/reset/key/<uidb36>/<key>/",
-        redirect_qs("/accounts/password/reset/key/{uidb36}/{key}/"),
-    ),
-    path(
-        "cl/accounts/password/reset/key/done/",
-        redirect_qs("/accounts/password/reset/key/done/"),
-    ),
-    path(
-        "us/accounts/password/reset/key/done/",
-        redirect_qs("/accounts/password/reset/key/done/"),
-    ),
-    # Password change
-    path("cl/accounts/password/change/", redirect_qs("/accounts/password/change/")),
-    path("us/accounts/password/change/", redirect_qs("/accounts/password/change/")),
-    path(
-        "cl/accounts/password/change/done/",
-        redirect_qs("/accounts/password/change/done/"),
-    ),
-    path(
-        "us/accounts/password/change/done/",
-        redirect_qs("/accounts/password/change/done/"),
-    ),
+    # Chile: rutas reales en taller.urls_extra.chile bajo /cl/es/accounts/password/* (no redirect a /accounts/).
     path("i18n/", include("django.conf.urls.i18n")),  # Selector de idioma
     path(
         "jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"
@@ -412,16 +429,21 @@ urlpatterns = [
         TemplateView.as_view(template_name="legal.html"),
         name="legal",
     ),
+    # 🇺🇾 Uruguay - Español (antes de /uy/ para resolver /uy/es/... sin depender del orden de prueba)
+    path(
+        "uy/es/",
+        include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay_es"),
+    ),
     # 🇺🇾 Uruguay (usa rutas tipo Chile)
     path(
         "uy/",
         include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
     ),
-    # 🇺🇸 USA - Redirects de /us/en/accounts/ y /us/es/accounts/ a /accounts/ (allauth montado solo una vez)
-    path("us/en/accounts/", redirect_us_accounts_to_base),
-    path("us/en/accounts/<path:rest>", redirect_us_accounts_with_path),
-    path("us/es/accounts/", redirect_us_accounts_to_base),
-    path("us/es/accounts/<path:rest>", redirect_us_accounts_with_path),
+    # 🇺🇸 USA - Bloqueo de rutas legacy /us/en/accounts/ y /us/es/accounts/
+    path("us/en/accounts/", lambda r: HttpResponseNotFound()),
+    path("us/en/accounts/<path:rest>", lambda r, rest: HttpResponseNotFound()),
+    path("us/es/accounts/", lambda r: HttpResponseNotFound()),
+    path("us/es/accounts/<path:rest>", lambda r, rest: HttpResponseNotFound()),
     # 🇺🇸 USA - Bienvenida explícita ANTES de us/en/ y us/es/ (evita 502: taller.urls no tiene bienvenida/)
     path("us/en/bienvenida/", bienvenida_usa_en, name="us_en_bienvenida"),
     path("us/es/bienvenida/", bienvenida_usa_es, name="us_es_bienvenida"),
@@ -431,6 +453,7 @@ urlpatterns = [
         RedirectView.as_view(url="/us/en/centro-operaciones/", permanent=False),
         name="us_centro_operaciones_redirect",
     ),
+    # Root /workspace/ is registered at the top of urlpatterns
     # 🇺🇸 USA - /us/workspace/ → /us/en/workspace/ (canonical con idioma; evita loop con SimpleCountryRedirectMiddleware)
     path(
         "us/workspace/",
@@ -442,6 +465,13 @@ urlpatterns = [
         RedirectView.as_view(url="/us/en/workspace/buscar/", permanent=False),
         name="us_workspace_buscar_redirect",
     ),
+    # 🇺🇸 USA - Desarme explícito para /us/en/desarme/ (ANTES se montaba con namespace us_en_desarme,
+    # lo que rompe helpers que esperan us_en:desarme:...; ahora se deja solo el include normal en
+    # `taller.urls` bajo el namespace us_en)
+    # path(
+    #     "us/en/desarme/",
+    #     include(("taller.urls_desarme", "desarme"), namespace="us_en_desarme"),
+    # ),
     # 🇺🇸 USA - Montes reales para /us/en/ y /us/es/ (ANTES de us/ y de RedirectViews)
     path(
         "us/en/",
@@ -490,11 +520,6 @@ urlpatterns = [
     path(
         "br/",
         include(("taller.urls_extra.brasil", "brasil"), namespace="brasil"),
-    ),
-    # 🇺🇾 Uruguay - Español
-    path(
-        "uy/es/",
-        include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay_es"),
     ),
     # Chile - Specific routes before general redirect
     path(
@@ -554,6 +579,11 @@ urlpatterns = [
         name="cl_servicios_redirect",
     ),
     path(
+        "cl/precios/",
+        RedirectView.as_view(url="/cl/es/precios/", permanent=False),
+        name="cl_precios_redirect",
+    ),
+    path(
         "cl/configuracion/",
         RedirectView.as_view(url="/cl/es/configuracion/", permanent=False),
         name="cl_configuracion_redirect",
@@ -601,7 +631,7 @@ urlpatterns = [
     # Compatibilidad: reexponer namespace 'taller' para widgets antiguos (DAL, etc.)
     path(
         "compat/",
-        include(("taller.urls", "taller"), namespace="taller"),
+        include(("taller.urls", "taller"), namespace="taller_compat"),
     ),
     # Analytics global (sin prefijo de país)
     path("analytics/", include(("taller.analytics.urls", "analytics"), namespace="analytics")),
@@ -774,6 +804,7 @@ urlpatterns = [
             url="/us/en/documentos/api/obtener-numero-documento/", permanent=False
         ),
     ),
+    path("", include(("taller.taller_main_urls", "taller"), namespace="taller")),
 ]
 
 # Marketplace: solo se agregan URLs si el módulo existe (evita ModuleNotFoundError en servidor)

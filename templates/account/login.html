@@ -97,36 +97,10 @@
             {% endwith %}
         </div>
 
-        <!-- Mensajes de error generales -->
-        {% if form.non_field_errors %}
-        <div class="alert alert-error">
-            {% for error in form.non_field_errors %}
-                <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                    {{ error }}
-                </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        <!-- Mensajes de éxito (filtrados) -->
-        {% if messages %}
-            {% for message in messages %}
-                {% with message_str=message|stringformat:"s" %}
-                    {% if "Successfully signed in" not in message_str and "You have signed out" not in message_str and "Professional Automotive Management System" not in message_str and "Ha iniciado sesión exitosamente" not in message_str and "Ha cerrado sesión" not in message_str and "iniciado sesión exitosamente" not in message_str and "cerrado sesión" not in message_str and "Información de empresa guardada exitosamente" not in message_str %}
-                        <div class="alert {% if message.tags == 'error' %}alert-error{% else %}alert-success{% endif %}">
-                            {{ message }}
-                        </div>
-                    {% endif %}
-                {% endwith %}
-            {% endfor %}
-        {% endif %}
-
         <!-- Formulario -->
         <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
             {% csrf_token %}
+            <input type="hidden" name="country" value="{{ country|default:"CL" }}">
             {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
             <!-- Email/Usuario -->
@@ -139,14 +113,6 @@
                 {% else %}
                     {{ form.login|add_class:"form-input"|attr:"placeholder:Ingresa tus credenciales"|attr:"autocomplete:email" }}
                 {% endif %}
-                {% if form.login.errors %}
-                <div class="error-message">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                    {% for error in form.login.errors %}{{ error }}{% endfor %}
-                </div>
-                {% endif %}
             </div>
 
             <!-- Contraseña -->
@@ -158,14 +124,6 @@
                     {{ form.password|add_class:"form-input"|attr:"placeholder:Enter your secure password"|attr:"type:password"|attr:"autocomplete:current-password" }}
                 {% else %}
                     {{ form.password|add_class:"form-input"|attr:"placeholder:Ingresa tu contraseña segura"|attr:"type:password"|attr:"autocomplete:current-password" }}
-                {% endif %}
-                {% if form.password.errors %}
-                <div class="error-message">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                    {% for error in form.password.errors %}{{ error }}{% endfor %}
-                </div>
                 {% endif %}
             </div>
 

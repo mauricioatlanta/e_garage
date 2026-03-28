@@ -238,7 +238,7 @@
             </div>
             <div class="info-item">
                 <div class="info-label">Cliente</div>
-                <div class="info-value">{{ historial_data.vehiculo.cliente.nombre }}</div>
+                <div class="info-value">{% if historial_data.vehiculo.cliente %}{{ historial_data.vehiculo.cliente.nombre }}{% else %}—{% endif %}</div>
             </div>
             {% if historial_data.vehiculo.vin %}
             <div class="info-item">

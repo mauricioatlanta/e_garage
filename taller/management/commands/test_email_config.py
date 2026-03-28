@@ -65,11 +65,10 @@ class Command(BaseCommand):
         )
         self.stdout.write("")
 
-        # 3. Verificar backend personalizado
-        if settings.EMAIL_BACKEND == "taller.backends.egarage_email.EgarageEmailBackend":
-            self.stdout.write(self.style.WARNING("BACKEND PERSONALIZADO:"))
-            self.stdout.write("  [OK] Usando EgarageEmailBackend")
-            self.stdout.write("  [AVISO] Este backend lanza EmailBackendError si falla el envio")
+        # 3. Verificar backend de Resend
+        if settings.EMAIL_BACKEND == "taller.backends.resend_backend.ResendEmailBackend":
+            self.stdout.write(self.style.WARNING("BACKEND DE EMAIL:"))
+            self.stdout.write("  [OK] Usando ResendEmailBackend")
             self.stdout.write("")
 
         # 4. Intentar enviar correo de prueba

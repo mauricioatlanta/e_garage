@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
@@ -20,7 +22,10 @@ from taller.utils.pais_utils import get_configuracion_pais
 @login_required(login_url=None)
 def company_settings_view(request):
     empresa = get_or_create_empresa(request)
-    config_empresa, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
+    config_empresa, _ = ConfiguracionEmpresa.objects.get_or_create(
+        empresa=empresa,
+        defaults={"sales_tax_rate": Decimal("0")},
+    )
 
     # Obtener o crear configuración
     try:

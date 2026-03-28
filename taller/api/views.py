@@ -14,6 +14,7 @@ from django.views.decorators.http import require_GET, require_POST
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
+from taller.models.pieza_desarme import ESTADO_DISPONIBLE, ESTADO_RESERVADA, PiezaDesarme
 from taller.models.repuesto import Repuesto
 from taller.models.tienda import Tienda
 from taller.models.vehiculos import Vehiculo
@@ -471,6 +472,49 @@ def buscar_repuestos_api(request):
 
 
 @login_required
+@require_GET
+def buscar_piezas_desarme_api(request):
+    """API para buscar piezas de desarme disponibles (used parts) para agregar al documento."""
+    empresa = _get_empresa(request)
+    if not empresa:
+        return JsonResponse({"results": []})
+
+    q = (request.GET.get("q") or "").strip()
+    qs = (
+        PiezaDesarme.objects.filter(empresa=empresa, activo=True)
+        .filter(estado_pieza__in=[ESTADO_DISPONIBLE, ESTADO_RESERVADA])
+        .filter(models.Q(cantidad__gt=0))
+        .select_related("vehiculo")
+    )
+
+    if len(q) >= 2:
+        qs = qs.filter(models.Q(codigo__icontains=q) | models.Q(nombre__icontains=q))
+
+    paginated = _paginate(qs.order_by("codigo"), request)
+    data = []
+    for p in paginated["queryset"]:
+        precio = float(p.precio_venta_sugerido or 0) or float(p.costo_asignado or 0)
+        vehiculo_info = ""
+        if p.vehiculo:
+            vehiculo_info = (
+                getattr(p.vehiculo, "patente", "") or getattr(p.vehiculo, "vin", "") or ""
+            )
+        data.append(
+            {
+                "id": p.pk,
+                "codigo": p.codigo or "",
+                "nombre": p.nombre or "",
+                "precio": precio,
+                "precio_venta_sugerido": precio,
+                "cantidad": p.cantidad,
+                "vehiculo_origen": vehiculo_info,
+                "costo_asignado": float(p.costo_asignado or 0),
+            }
+        )
+    return JsonResponse({"results": data, "pagination": paginated["pagination"]})
+
+
+@login_required
 @require_POST
 def crear_repuesto_api(request):
     empresa = _get_empresa(request)
@@ -916,7 +960,6 @@ def api_procesar_foto_patente(request):
         "mensaje": "Vehículo encontrado"
     }
     """
-    from whatsapp.services.ocr import OCRProcessor
     import logging
 
     logger = logging.getLogger(__name__)
@@ -948,91 +991,11 @@ def api_procesar_foto_patente(request):
         logger.error(f"Error leyendo imagen: {e}")
         return JsonResponse({"success": False, "error": "Error procesando la imagen"}, status=500)
 
-    # Procesar OCR con validación de confianza
-    ocr_processor = OCRProcessor(confidence_threshold=0.6)
-    ocr_result = ocr_processor.extract_plate(image_bytes, return_full_result=True)
-
-    if not ocr_result or not ocr_result.get("plate"):
-        error_msg = "No se pudo detectar la patente en la imagen. Por favor, intenta con una foto más clara."
-        if ocr_result and ocr_result.get("candidates"):
-            # Hay candidatos pero ninguno válido
-            error_msg += f"\nTextos detectados: {', '.join([c['plate'] for c in ocr_result['candidates'][:3]])}"
-        return JsonResponse({"success": False, "error": error_msg}, status=400)
-
-    patente = ocr_result["plate"]
-    confidence = ocr_result["confidence"]
-    needs_manual_confirm = ocr_result["needs_manual_confirm"]
-    candidates = ocr_result.get("candidates", [])
-
-    # Si la confianza es baja, retornar candidatos para confirmación manual
-    if needs_manual_confirm:
-        return JsonResponse(
-            {
-                "success": True,
-                "patente": patente,
-                "confidence": confidence,
-                "needs_manual_confirm": True,
-                "candidates": [
-                    {
-                        "plate": c["plate"],
-                        "confidence": c["confidence"],
-                        "country": c.get("country", "UNKNOWN"),
-                    }
-                    for c in candidates[:5]  # Máximo 5 candidatos
-                ],
-                "mensaje": f"Confianza baja ({confidence:.0%}). Por favor, confirma la patente correcta:",
-            }
-        )
-
-    # Buscar vehículo por patente en la empresa
-    try:
-        vehiculo = (
-            Vehiculo.objects.filter(empresa=empresa, patente__iexact=patente)
-            .select_related("cliente", "marca", "modelo")
-            .first()
-        )
-
-        if vehiculo:
-            # Vehículo encontrado
-            cliente = vehiculo.cliente
-            return JsonResponse(
-                {
-                    "success": True,
-                    "patente": patente,
-                    "vehiculo": {
-                        "id": vehiculo.id,
-                        "patente": vehiculo.patente,
-                        "marca": vehiculo.get_marca_display(),
-                        "modelo": vehiculo.get_modelo_display(),
-                        "anio": vehiculo.anio,
-                        "cliente": {
-                            "id": cliente.id,
-                            "nombre": cliente.nombre,
-                            "apellido": cliente.apellido or "",
-                            "telefono": cliente.telefono or "",
-                        },
-                    },
-                    "existe": True,
-                    "mensaje": "Vehículo encontrado en la base de datos",
-                }
-            )
-        else:
-            # Vehículo no encontrado - retornar patente para crear nuevo
-            return JsonResponse(
-                {
-                    "success": True,
-                    "patente": patente,
-                    "vehiculo": None,
-                    "existe": False,
-                    "mensaje": f"Patente {patente} no encontrada. ¿Deseas crear un nuevo vehículo?",
-                }
-            )
-
-    except Exception as e:
-        logger.error(f"Error buscando vehículo: {e}")
-        return JsonResponse(
-            {"success": False, "error": "Error buscando vehículo en la base de datos"}, status=500
-        )
+    # OCR deshabilitado temporalmente
+    return JsonResponse(
+        {"success": False, "error": "OCR deshabilitado temporalmente en este servidor"},
+        status=503,
+    )
 
 
 @login_required

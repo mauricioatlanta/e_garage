@@ -3,6 +3,28 @@ URLs específicas para Uruguay (español)
 Prefijo: /uy/es/
 """
 
+import logging
+
+from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import redirect, render
+from django.template import loader, TemplateDoesNotExist
+from django.urls import include, path
+
+from taller.views_extra.views import dashboard_suscripciones
+from taller.views_extra.company_settings_views import company_settings_view
+from taller.views_extra.dashboard_empresa import (
+    dashboard_centro_operaciones,
+    dashboard_centro_operaciones_espacial,
+)
+from taller.views_extra.views import dashboard
+from taller.views_extra.views_configuracion import (
+    configuracion_empresa,
+    configuracion_tecnicos,
+)
+from taller.views_extra.views_trial_activate import activar_trial
+from taller.documentos import views_country_aware as views_documentos
+from taller.views_extra.custom_signup import CustomSignupView
+
 
 def _render_first_existing(request, candidates, context=None):
     context = context or {}
@@ -12,18 +34,7 @@ def _render_first_existing(request, candidates, context=None):
             return render(request, tname, context)
         except TemplateDoesNotExist:
             continue
-    from django.http import HttpResponse
-
     return HttpResponse("Template de bienvenida no encontrado.", status=500)
-
-
-import logging
-
-from django.http import HttpResponseRedirect
-from django.urls import include, path
-from django.shortcuts import redirect, render
-from django.template import loader, TemplateDoesNotExist
-from django.views.generic import TemplateView
 
 
 def uruguay_home(request):
@@ -41,19 +52,18 @@ def uruguay_home(request):
     )
 
 
-from taller.views_extra.views import dashboard_suscripciones
-from taller.views_extra.company_settings_views import company_settings_view
-from taller.views_extra.dashboard_empresa import (
-    dashboard_centro_operaciones,
-    dashboard_centro_operaciones_espacial,
-)
-from taller.views_extra.views import dashboard
-from taller.views_extra.views_configuracion import (
-    configuracion_empresa,
-    configuracion_tecnicos,
-)
-from taller.views_extra.views_trial_activate import activar_trial
-from taller.documentos import views_country_aware as views_documentos
+def uruguay_bienvenida_page(request):
+    """Misma cadena de plantillas que uruguay_home; evita 500 si falta solo uy/es/…"""
+    return _render_first_existing(
+        request,
+        [
+            "uy/es/onboarding/bienvenida.html",
+            "uy/onboarding/bienvenida.html",
+            "onboarding/bienvenida_uruguay.html",
+            "onboarding/bienvenida.html",
+        ],
+    )
+
 
 # Configuración de logging para este módulo
 logger = logging.getLogger(__name__)
@@ -81,16 +91,17 @@ urlpatterns = [
     # Página de bienvenida para Uruguay
     path(
         "egarage/",
-        TemplateView.as_view(template_name="uy/es/onboarding/bienvenida.html"),
+        uruguay_bienvenida_page,
         name="bienvenida_uruguay",
     ),
     # Página de bienvenida alternativa (ruta estándar)
     path(
         "bienvenida/",
-        TemplateView.as_view(template_name="uy/es/onboarding/bienvenida.html"),
+        uruguay_bienvenida_page,
         name="bienvenida_uruguay_alt",
     ),
     # Redirect /uy/accounts/* y /uy/es/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
+    path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
     path(
         "accounts/", lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))
     ),
@@ -106,12 +117,10 @@ urlpatterns = [
         lambda r: redirect("/accounts/login/?from=uy" + ("&" + r.GET.urlencode() if r.GET else "")),
         name="account_login",
     ),
-    # Signup para Uruguay: redirige a /accounts/signup/?from=uy (preserva ?plan=, etc.)
+    # Signup para Uruguay: redirige a /uy/es/accounts/signup/ (preserva ?plan=, etc.)
     path(
         "signup/",
-        lambda r: redirect(
-            "/accounts/signup/?from=uy" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/uy/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_signup_uy",
     ),
     # Activación de trial para Uruguay

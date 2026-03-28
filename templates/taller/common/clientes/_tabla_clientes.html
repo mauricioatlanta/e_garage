@@ -28,8 +28,7 @@
     <a href="{{ url_ver_cliente|default:'#' }}" class="btn-small view-btn" title="Ver cliente">👁️ Ver</a>
     <a href="{{ url_editar_cliente|default:'#' }}" class="btn-small edit-btn" title="Editar cliente">✏️ Editar</a>
     <a href="{{ url_eliminar_cliente|default:'#' }}"
-       class="btn-small delete-btn"
-       onclick="return confirmarEliminacion('{{ cliente.nombre }}{% if cliente.apellido %} {{ cliente.apellido }}{% endif %}')">🗑️ Eliminar</a>
+       class="btn-small delete-btn">🗑️ Eliminar</a>
   </div>
       </td>
     </tr>

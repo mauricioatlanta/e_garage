@@ -1,4 +1,4 @@
-from django.urls import path, include
+from django.urls import path, include, re_path
 from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 import logging
@@ -24,9 +24,21 @@ from taller.views_extra.views_configuracion import (
     configuracion_tecnicos,
 )
 from taller.views_extra.views_trial_activate import activar_trial
+from taller.views_extra.payment_views import payment_chile
 from taller.views_extra.views_suscripciones import precios
 from taller.documentos import views_country_aware as views_documentos
+from allauth.account.views import (
+    password_change,
+    password_reset_done,
+    password_reset_from_key_done,
+    password_set,
+)
 from taller.views.country_aware_auth import country_aware_login
+from taller.views_extra.chile_password_reset import (
+    ChilePasswordResetFromKeyView,
+    ChilePasswordResetView,
+)
+from taller.views_extra.custom_signup import CustomSignupView
 
 # Configuración de logging para este módulo
 logger = logging.getLogger(__name__)
@@ -68,26 +80,37 @@ urlpatterns = [
         TemplateView.as_view(template_name="cl/es/onboarding/bienvenida.html"),
         name="bienvenida_chile_alt",
     ),
-    # Redirect /cl/es/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
-    # EXCEPCIÓN: accounts/login/ se SIRVE aquí (no redirect) para evitar ERR_TOO_MANY_REDIRECTS.
-    # Redirect a /cl/accounts/login/ provocaba bucle: FixLoginCountryRedirectMiddleware
-    # reescribía Location /cl/accounts/login/ → /cl/es/accounts/login/ en la respuesta.
+    # Login y password (allauth) bajo /cl/es/accounts/ para conservar país e idioma.
+    # EXCEPCIÓN histórica: accounts/login/ aquí (no redirect) para evitar ERR_TOO_MANY_REDIRECTS.
     path("accounts/login/", country_aware_login),
+    # Misma superficie que allauth bajo /accounts/, sin 302 a /accounts/... (se pierde país/idioma).
     path(
-        "accounts/", lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))
+        "accounts/password/reset/",
+        ChilePasswordResetView.as_view(),
+        name="account_reset_password",
     ),
     path(
-        "accounts/<path:rest>",
-        lambda r, rest: redirect(
-            "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
-        ),
+        "accounts/password/reset/key/done/",
+        password_reset_from_key_done,
+        name="account_reset_password_from_key_done",
     ),
-    # Signup corto /cl/es/signup/ -> /accounts/signup/?from=cl (preserva ?plan=, etc.)
+    re_path(
+        r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
+        ChilePasswordResetFromKeyView.as_view(),
+        name="account_reset_password_from_key",
+    ),
+    path(
+        "accounts/password/reset/done/",
+        password_reset_done,
+        name="account_reset_password_done",
+    ),
+    path("accounts/password/change/", password_change, name="account_change_password"),
+    path("accounts/password/set/", password_set, name="account_set_password"),
+    path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
+    # Signup corto /cl/es/signup/ -> /cl/es/accounts/signup/ (preserva ?plan=, etc.)
     path(
         "signup/",
-        lambda r: redirect(
-            "/accounts/signup/?from=cl" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/cl/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_signup_cl_es",
     ),
     # Login para suscriptores de Chile (redirige al login global, pero aquí puedes poner una vista personalizada si lo deseas)
@@ -100,6 +123,8 @@ urlpatterns = [
     path("activar-trial/", activar_trial, name="activar_trial"),
     # Precios y planes para Chile
     path("precios/", precios, name="precios"),
+    # Pago por transferencia (post-registro / renovación)
+    path("suscripcion/pago/", payment_chile, name="pago_suscripcion_chile"),
     # Registro para Chile (español por defecto)
     path(
         "registro/",

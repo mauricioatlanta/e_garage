@@ -72,6 +72,7 @@ MIDDLEWARE = [
     # "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.force_home_test.ForceHomeTestMiddleware",  # DESHABILITADO - Ya verificamos que funciona
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
+    "taller.middleware.onboarding_middleware.OnboardingMiddleware",
     # "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.country_context.CountryContextMiddleware",  # DESHABILITADO - Causa bucles infinitos con /es/
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
@@ -135,6 +136,8 @@ TEMPLATES = [
                 "taller.context_processors.company_context",
                 "taller.context_processors.company_branding",
                 "taller.context_processors.company_header",
+                "taller.context_processors.panel_chrome.us_authenticated_compact_chrome",
+                "taller.context_processors.panel_chrome.us_signup_slim_header",
                 "taller.context_processors.ui_labels.ui_labels_context",
             ],
         },
@@ -185,9 +188,12 @@ AUTHENTICATION_BACKENDS = (
 )
 LOGIN_REDIRECT_URL = "/login/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/login/"
+# Permitir logout por GET: evita 403 CSRF al visitar /accounts/logout/ directamente
+ACCOUNT_LOGOUT_ON_GET = True
 ACCOUNT_LOGIN_METHODS = {"username", "email"}
-ACCOUNT_EMAIL_VERIFICATION = "none"
+ACCOUNT_EMAIL_VERIFICATION = os.getenv("ACCOUNT_EMAIL_VERIFICATION", "mandatory")
 ACCOUNT_CONFIRM_EMAIL_ON_GET = True
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = True
 ACCOUNT_EMAIL_CONFIRMATION_EXPIRE_DAYS = 2
 ACCOUNT_RATE_LIMITS = {
     "confirm_email": "1/m",
@@ -206,8 +212,8 @@ ACCOUNT_FORMS = {
     "login": "taller.forms.custom_login.CustomLoginForm",
 }
 
-# Login default: ruta con país para que @login_required lleve a Chile por defecto
-LOGIN_URL = "/cl/accounts/login/"
+# Login default: ruta neutra; /accounts/login/ aplica lógica country-aware internamente
+LOGIN_URL = "/accounts/login/"
 
 # ---------- eGarage país e idioma por defecto ----------
 # Si alguien entra por /accounts/login/ (ruta sin país), el fallback es Chile, no Uruguay.
@@ -220,15 +226,15 @@ DEFAULT_COUNTRY = EGARAGE_DEFAULT_COUNTRY.upper()
 # Adaptador personalizado para redirección según país
 ACCOUNT_ADAPTER = "taller.views_extra.account_adapter.CountryAwareAccountAdapter"
 
-# Email backend - Usando backend personalizado para evitar errores SMTP
-EMAIL_BACKEND = "taller.backends.egarage_email.EgarageEmailBackend"
+# Email backend único: Resend (evita mezcla con backend legacy en imports tempranos)
+EMAIL_BACKEND = "taller.backends.resend_backend.ResendEmailBackend"
 EMAIL_HOST = "srv24.cpanelhost.cl"
 EMAIL_PORT = 465
 EMAIL_USE_SSL = True
 EMAIL_USE_TLS = False
-EMAIL_HOST_USER = "subscription@egarage.cl"
+EMAIL_HOST_USER = "support@egarage.cl"
 EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD", "laila2013-")
-DEFAULT_FROM_EMAIL = "eGarage <subscription@egarage.cl>"
+DEFAULT_FROM_EMAIL = "eGarage <support@egarage.cl>"
 
 # Logging útil (errores reales)
 if SAFE_MODE:

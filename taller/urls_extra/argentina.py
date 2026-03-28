@@ -54,6 +54,7 @@ from taller.views_extra.views_configuracion import (
 )
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.documentos import views_country_aware as views_documentos
+from taller.views_extra.custom_signup import CustomSignupView
 
 # Configuración de logging para este módulo
 logger = logging.getLogger(__name__)
@@ -91,6 +92,7 @@ urlpatterns = [
         name="bienvenida_argentina_alt",
     ),
     # Redirect /ar/accounts/* y /ar/es/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
+    path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
     path(
         "accounts/", lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))
     ),
@@ -100,12 +102,10 @@ urlpatterns = [
             "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
         ),
     ),
-    # Signup corto /ar/signup/ y /ar/es/signup/ -> /accounts/signup/?from=ar (preserva ?plan=, etc.)
+    # Signup corto /ar/signup/ y /ar/es/signup/ -> /ar/es/accounts/signup/ (preserva ?plan=, etc.)
     path(
         "signup/",
-        lambda r: redirect(
-            "/accounts/signup/?from=ar" + ("&" + r.GET.urlencode() if r.GET else "")
-        ),
+        lambda r: redirect("/ar/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_signup_ar",
     ),
     # Login para suscriptores de Argentina

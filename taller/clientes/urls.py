@@ -23,6 +23,7 @@ app_name = "clientes"
 urlpatterns = [
     path("", lista_clientes, name="lista_clientes"),
     path("crear/", crear_cliente, name="crear_cliente"),
+    path("crear/", crear_cliente, name="cliente_crear"),
     path("editar/<int:pk>/", editar_cliente, name="editar_cliente"),
     # Usamos cliente_id como nombre de parámetro para compatibilidad con
     # versiones antiguas (gestion_taller) que esperan ese kwarg.

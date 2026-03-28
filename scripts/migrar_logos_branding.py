@@ -40,6 +40,7 @@ def migrar_logos_empresa_a_configuracion():
                 defaults={
                     "nombre_publico": empresa.nombre_taller,
                     "moneda": "USD" if empresa.pais == "US" else "CLP",
+                    "sales_tax_rate": 0,
                 },
             )
 

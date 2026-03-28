@@ -10,7 +10,7 @@ from taller.models.empresa import Empresa
 def configuracion(request):
     """Vista para configurar los datos de la empresa/taller y datos personales"""
     # Obtener o crear la empresa del usuario actual
-    empresa, created = Empresa.objects.get_or_create(usuario=request.user)
+    empresa, created = Empresa.objects.get_or_create(user=request.user)
 
     # Inicializar formularios
     empresa_form = EmpresaForm(instance=empresa)
@@ -45,7 +45,10 @@ def configuracion(request):
             if empresa_form.is_valid():
                 empresa_form.save()
                 messages.success(request, "✅ Datos de la empresa actualizados correctamente!")
-                return redirect("configuracion")
+                try:
+                    return redirect("taller:configuracion")
+                except:
+                    return redirect("configuracion")
             else:
                 messages.error(
                     request,
@@ -64,7 +67,10 @@ def configuracion(request):
                 user.save()
 
                 messages.success(request, "✅ Datos personales actualizados correctamente!")
-                return redirect("configuracion")
+                try:
+                    return redirect("taller:configuracion")
+                except:
+                    return redirect("configuracion")
             else:
                 messages.error(
                     request,
@@ -85,7 +91,7 @@ def configuracion(request):
 
     template_name = select_country_lang_template(
         "configuracion.html",
-        getattr(request.user.empresa, "pais", "cl").lower(),
+        getattr(empresa, "pais", "cl").lower(),
         get_language(),
     )
 

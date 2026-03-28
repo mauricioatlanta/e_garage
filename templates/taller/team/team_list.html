@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load country_url %}
 {% load role_tags %}
 
 {% block title %}Gestión de Equipo - eGarage{% endblock %}
@@ -15,7 +16,7 @@
         </div>
         {% if request.user|has_role:'Owner' %}
         <div class="mt-4 sm:mt-0 sm:ml-16 sm:flex-none">
-            <a href="{% url 'team:team_create' %}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto">
+            <a href="{% country_url 'team:team_create' %}" class="inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 sm:w-auto">
                 <i class="fas fa-user-plus mr-2"></i> + Agregar Miembro
             </a>
         </div>
@@ -163,17 +164,17 @@
                                 <td class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6">
                                     {% if miembro.user != owner %}
                                         <!-- Acciones Owner -->
-                                        <a href="{% url 'team:team_update' miembro.pk %}" class="text-indigo-600 hover:text-indigo-900 mr-4">
+                                        <a href="{% country_url 'team:team_update' miembro.pk %}" class="text-indigo-600 hover:text-indigo-900 mr-4">
                                             <i class="fas fa-edit"></i> Editar
                                         </a>
                                         
                                         {% if miembro.is_active %}
-                                            <a href="{% url 'team:team_delete' miembro.pk %}" class="text-red-600 hover:text-red-900" 
+                                            <a href="{% country_url 'team:team_delete' miembro.pk %}" class="text-red-600 hover:text-red-900" 
                                                onclick="return confirm('¿Estás seguro de desactivar a {{ miembro.user.get_full_name|default:miembro.user.email }}?');">
                                                 <i class="fas fa-user-slash"></i> Desactivar
                                             </a>
                                         {% else %}
-                                            <a href="{% url 'team:team_reactivate' miembro.pk %}" class="text-green-600 hover:text-green-900"
+                                            <a href="{% country_url 'team:team_reactivate' miembro.pk %}" class="text-green-600 hover:text-green-900"
                                                onclick="return confirm('¿Reactivar a {{ miembro.user.get_full_name|default:miembro.user.email }}?');">
                                                 <i class="fas fa-user-check"></i> Reactivar
                                             </a>
@@ -190,7 +191,7 @@
                                     <i class="fas fa-users fa-3x mb-4 text-gray-300"></i>
                                     <p class="text-sm">No hay miembros del equipo registrados.</p>
                                     {% if request.user|has_role:'Owner' %}
-                                    <a href="{% url 'team:team_create' %}" class="mt-4 inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700">
+                                    <a href="{% country_url 'team:team_create' %}" class="mt-4 inline-flex items-center justify-center rounded-md border border-transparent bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700">
                                         <i class="fas fa-user-plus mr-2"></i> Agregar Primer Miembro
                                     </a>
                                     {% endif %}

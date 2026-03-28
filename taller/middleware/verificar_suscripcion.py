@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.shortcuts import redirect
 
 from taller.utils.login_exempt import is_login_exempt_path
+from taller.utils.empresa import get_user_empresa_safe
 
 
 class VerificarSuscripcionMiddleware:
@@ -36,6 +37,7 @@ class VerificarSuscripcionMiddleware:
         "/vehiculos/",
         "/clientes/",
         "/reportes/",
+        "/settings/",  # /cl/es/settings/, /us/en/settings/, etc.
     ]
 
     def __init__(self, get_response):
@@ -80,11 +82,22 @@ class VerificarSuscripcionMiddleware:
 
     def _is_warning_url(self, path):
         """Verifica si la URL requiere advertencia pero no bloqueo"""
-        return any(path.startswith(url) for url in self.WARNING_URLS)
+        if any(path.startswith(url) for url in self.WARNING_URLS):
+            return True
+        # Prefijos país/idioma: /cl/es/settings/ → resto /settings/
+        parts = path.strip("/").split("/")
+        if len(parts) >= 3 and len(parts[0]) == 2 and len(parts[1]) == 2:
+            tail = "/" + "/".join(parts[2:])
+            if tail.startswith("/settings/") or tail.rstrip("/") == "/settings":
+                return True
+        return False
 
     def _get_billing_url(self, request):
         """Obtiene la URL de billing apropiada según el país"""
-        empresa = getattr(request.user, "empresa", None)
+        # Nunca usar getattr(user, "empresa", None): el descriptor OneToOne lanza si no hay empresa.
+        empresa = get_user_empresa_safe(request.user)
+        if empresa is None:
+            empresa = getattr(request, "empresa", None)
 
         if empresa and empresa.pais == "US":
             # URL para USA

@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import redirect
+from django.http import HttpResponseNotFound
 from django.urls import include, path
 from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
@@ -106,7 +107,29 @@ def country_aware_clientes_redirect(request):
     return redirect("/cl/es/clientes/")
 
 
+def country_aware_workspace_redirect(request, subpath=""):
+    """Redirect /workspace/ to country workspace. USA → /us/en/workspace/, Chile → /cl/es/workspace/."""
+    if request.user.is_authenticated:
+        try:
+            if hasattr(request.user, "empresa") and request.user.empresa:
+                pais = (getattr(request.user.empresa, "pais", None) or "").strip().upper()
+                if pais == "US":
+                    return redirect(f"/us/en/workspace/{subpath}".rstrip("/") + "/")
+                if pais == "CL":
+                    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
+        except Exception:
+            pass
+    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
+
+
 urlpatterns = [
+    # Root /workspace/ → country-aware redirect
+    path("workspace/", country_aware_workspace_redirect, name="workspace_redirect_root"),
+    path(
+        "workspace/buscar/",
+        lambda r: country_aware_workspace_redirect(r, "buscar"),
+        name="workspace_buscar_redirect_root",
+    ),
     path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
     # Página de inicio - Selector de país
     path("", TemplateView.as_view(template_name="public/selector_pais.html"), name="home"),
@@ -148,25 +171,16 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # Wrappers country-aware para login y signup
     path("cl/accounts/login/", redirect_qs("/accounts/login/")),
-    path("us/accounts/login/", redirect_qs("/accounts/login/")),
-    path("cl/accounts/signup/", redirect_qs("/accounts/signup/")),
-    path("us/accounts/signup/", redirect_qs("/accounts/signup/")),
+    path("cl/accounts/signup/", redirect_qs("/cl/es/accounts/signup/")),
     # Redirects amigables para login
     path("cl/login/", redirect_qs("/cl/accounts/login/")),
     path("cl/es/login/", redirect_qs("/cl/accounts/login/")),
-    path("us/login/", redirect_qs("/us/accounts/login/")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
-    path("us/accounts/logout/", redirect_qs("/accounts/logout/")),
     # Password reset (solicitud + enviado + confirm + completo)
     path("cl/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
-    path("us/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
     path(
         "cl/accounts/password/reset/done/",
-        redirect_qs("/accounts/password/reset/done/"),
-    ),
-    path(
-        "us/accounts/password/reset/done/",
         redirect_qs("/accounts/password/reset/done/"),
     ),
     path(
@@ -174,26 +188,13 @@ urlpatterns = [
         redirect_qs("/accounts/password/reset/key/{uidb36}/{key}/"),
     ),
     path(
-        "us/accounts/password/reset/key/<uidb36>/<key>/",
-        redirect_qs("/accounts/password/reset/key/{uidb36}/{key}/"),
-    ),
-    path(
         "cl/accounts/password/reset/key/done/",
-        redirect_qs("/accounts/password/reset/key/done/"),
-    ),
-    path(
-        "us/accounts/password/reset/key/done/",
         redirect_qs("/accounts/password/reset/key/done/"),
     ),
     # Password change
     path("cl/accounts/password/change/", redirect_qs("/accounts/password/change/")),
-    path("us/accounts/password/change/", redirect_qs("/accounts/password/change/")),
     path(
         "cl/accounts/password/change/done/",
-        redirect_qs("/accounts/password/change/done/"),
-    ),
-    path(
-        "us/accounts/password/change/done/",
         redirect_qs("/accounts/password/change/done/"),
     ),
     path("i18n/", include("django.conf.urls.i18n")),  # Selector de idioma
@@ -207,6 +208,11 @@ urlpatterns = [
         TemplateView.as_view(template_name="changelog.html"),
         name="changelog",
     ),
+    # 🇺🇸 USA - Bloqueo de rutas legacy /us/en/accounts/ y /us/es/accounts/
+    path("us/en/accounts/", lambda r: HttpResponseNotFound()),
+    path("us/en/accounts/<path:rest>", lambda r, rest: HttpResponseNotFound()),
+    path("us/es/accounts/", lambda r: HttpResponseNotFound()),
+    path("us/es/accounts/<path:rest>", lambda r, rest: HttpResponseNotFound()),
     # 🇺🇸 USA - Unificado (inglés y español)
     path(
         "us/",
@@ -278,6 +284,11 @@ urlpatterns = [
         "cl/servicios/",
         RedirectView.as_view(url="/cl/es/servicios/", permanent=False),
         name="cl_servicios_redirect",
+    ),
+    path(
+        "cl/precios/",
+        RedirectView.as_view(url="/cl/es/precios/", permanent=False),
+        name="cl_precios_redirect",
     ),
     path(
         "cl/configuracion/",

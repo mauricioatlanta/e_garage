@@ -1,18 +1,47 @@
 import json
-import os
+from pathlib import Path
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
 from taller.models.ubicacion import Ciudad, Estado
 
+FILENAME = "estados_ciudades_usa.json"
+
+
+def _find_usa_json():
+    """Busca el JSON en varias ubicaciones (proyecto, utils hermano, data)."""
+    base = Path(settings.BASE_DIR)
+    candidates = [
+        base / "utils" / FILENAME,
+        base / "data" / FILENAME,
+        base.parent / "utils" / FILENAME,
+        Path(__file__).resolve().parent.parent.parent.parent / "utils" / FILENAME,
+        Path(__file__).resolve().parent / ".." / ".." / ".." / "utils" / FILENAME,
+    ]
+    for p in candidates:
+        try:
+            p = p.resolve()
+            if p.is_file():
+                return p
+        except (OSError, RuntimeError):
+            continue
+    return None
+
 
 class Command(BaseCommand):
-    help = "Carga los estados y ciudades de USA desde el JSON."
+    help = "Carga los estados y ciudades de USA desde el JSON (utils/ o data/)."
 
     def handle(self, *args, **options):
-        json_path = os.path.join(
-            os.path.dirname(__file__), "../../../utils/estados_ciudades_usa.json"
-        )
+        json_path = _find_usa_json()
+        if not json_path or not json_path.is_file():
+            self.stdout.write(
+                self.style.ERROR(
+                    f"No se encontró {FILENAME}. Colócalo en utils/ o data/ del proyecto."
+                )
+            )
+            return
+        self.stdout.write(f"Usando: {json_path}")
         with open(json_path, encoding="utf-8") as f:
             data = json.load(f)
 
@@ -95,8 +124,8 @@ class Command(BaseCommand):
                     estado.nombre = estado_nombre
                     estado.save()
 
-        # Crear ciudades si no existen
-        estados_dict = {e.nombre: e for e in Estado.objects.all()}
+        # Crear ciudades si no existen (solo estados US para evitar colisiones de nombre)
+        estados_dict = {e.nombre: e for e in Estado.objects.filter(pais="US")}
         ciudades_objs = []
         for estado_nombre, ciudades in data.items():
             if estado_nombre in estados_dict:

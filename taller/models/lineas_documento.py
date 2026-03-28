@@ -220,8 +220,19 @@ class LineaOtroServicio(models.Model):
         return f"{self.nombre} - {self.empresa_externa} (x{self.cantidad})"
 
 
+# Origen del repuesto en la línea (para inventario y rentabilidad)
+ORIGEN_EXTERNO = "EXTERNO"
+ORIGEN_STOCK_BODEGA = "STOCK_BODEGA"
+ORIGEN_DESARME = "DESARME"
+ORIGEN_REPUESTO_CHOICES = [
+    (ORIGEN_EXTERNO, "Externo"),
+    (ORIGEN_STOCK_BODEGA, "Stock bodega"),
+    (ORIGEN_DESARME, "Desarme"),
+]
+
+
 class LineaRepuesto(models.Model):
-    """Línea de repuesto con validaciones de país"""
+    """Línea de repuesto con validaciones de país y origen (bodega/desarme/externo)."""
 
     documento = models.ForeignKey(
         "taller.Documento", on_delete=models.CASCADE, related_name="lineas_repuesto"
@@ -234,9 +245,8 @@ class LineaRepuesto(models.Model):
         help_text="[LEGACY] Repuesto del catálogo antiguo",
     )
 
-    # === NUEVO: FK opcional a catálogo con I18N ===
     part = models.ForeignKey(
-        "taller.Part",  # ✅ String reference (actualmente en taller, mover a repuestos en Release 2.0)
+        "taller.Part",
         null=True,
         blank=True,
         on_delete=models.SET_NULL,
@@ -268,9 +278,29 @@ class LineaRepuesto(models.Model):
         help_text="Técnico responsable de esta línea (si no se especifica, hereda del documento)",
     )
 
+    origen_repuesto = models.CharField(
+        max_length=20,
+        choices=ORIGEN_REPUESTO_CHOICES,
+        default=ORIGEN_STOCK_BODEGA,
+        db_index=True,
+    )
+    pieza_desarme = models.ForeignKey(
+        "taller.PiezaDesarme",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="lineas_repuesto",
+    )
+    costo_linea = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="Costo para rentabilidad (EXTERNO: costo compra; DESARME: puede venir de PiezaDesarme).",
+    )
+
     def clean(self):
         """Validaciones de consistencia para LineaRepuesto"""
-        # Solo validar country si el documento existe y el repuesto tiene field country
         if (
             hasattr(self, "documento")
             and self.documento
@@ -282,6 +312,46 @@ class LineaRepuesto(models.Model):
                 self.repuesto,
                 "Repuesto de otro país no puede usarse en este documento",
             )
+        if self.origen_repuesto == ORIGEN_DESARME:
+            if not self.pieza_desarme_id:
+                raise ValidationError(
+                    {"pieza_desarme": "Origen Desarme requiere seleccionar una pieza de desarme."}
+                )
+            if (
+                hasattr(self, "documento")
+                and self.documento_id
+                and self.pieza_desarme.empresa_id != self.documento.empresa_id
+            ):
+                raise ValidationError(
+                    "La pieza de desarme debe pertenecer a la misma empresa del documento."
+                )
+            if not getattr(self.pieza_desarme, "activo", True):
+                raise ValidationError("La pieza de desarme no está disponible (inactiva).")
+            if self.pieza_desarme.cantidad < self.cantidad:
+                raise ValidationError(
+                    f"Stock insuficiente en pieza de desarme. Disponible: {self.pieza_desarme.cantidad}"
+                )
+        elif self.origen_repuesto == ORIGEN_STOCK_BODEGA:
+            if not (self.repuesto_id or self.part_id):
+                raise ValidationError("Origen Stock bodega requiere repuesto o part.")
+            if hasattr(self, "documento") and self.documento_id:
+                doc_empresa_id = getattr(self.documento, "empresa_id", None)
+                if doc_empresa_id is not None:
+                    if (
+                        self.repuesto_id
+                        and getattr(self.repuesto, "empresa_id", None) != doc_empresa_id
+                    ):
+                        raise ValidationError(
+                            "El repuesto debe pertenecer a la misma empresa del documento."
+                        )
+                    if (
+                        self.part_id
+                        and getattr(self.part, "empresa_id", None) is not None
+                        and self.part.empresa_id != doc_empresa_id
+                    ):
+                        raise ValidationError(
+                            "El part del catálogo debe ser de la misma empresa del documento o catálogo global."
+                        )
 
     def save(self, *args, **kwargs):
         """Llamar validaciones antes de guardar"""

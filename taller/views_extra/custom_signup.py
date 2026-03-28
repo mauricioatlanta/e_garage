@@ -1,14 +1,37 @@
 from allauth.account.views import SignupView
+from allauth.account.adapter import get_adapter
+from allauth.account.models import EmailAddress, EmailConfirmationHMAC
 
-from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import login
 from django.shortcuts import redirect, render
 from django.utils.translation import activate
 
 from taller.config.country_settings import CountrySettings
 from taller.forms.custom_signup import CustomSignupForm
 from taller.utils.country_config import get_country_config
+
+
+def _send_confirmation_compat(request, user, signup=True, email=None):
+    """
+    Envia confirmacion compatible con versiones antiguas/nuevas de allauth.
+    Evita depender de allauth.account.utils.send_email_confirmation.
+    """
+    target_email = (email or getattr(user, "email", "") or "").strip()
+    if not target_email:
+        return
+
+    email_address = EmailAddress.objects.filter(user=user, email__iexact=target_email).first()
+    if email_address is None:
+        email_address = EmailAddress.objects.create(
+            user=user,
+            email=target_email,
+            verified=False,
+            primary=True,
+        )
+
+    confirmation = EmailConfirmationHMAC(email_address)
+    adapter = get_adapter(request)
+    adapter.send_confirmation_mail(request, confirmation, signup=signup)
 
 
 class CustomSignupView(SignupView):
@@ -67,6 +90,13 @@ class CustomSignupView(SignupView):
 
         return context
 
+    def get_initial(self):
+        initial = super().get_initial()
+        email = (self.request.GET.get("email", "") or "").strip()
+        if email:
+            initial["email"] = email
+        return initial
+
     def form_valid(self, form):
         """
         Allauth maneja la creación del usuario y el envío de emails.
@@ -92,48 +122,43 @@ class CustomSignupView(SignupView):
         # Guardar el usuario (Allauth maneja el envío de email si ACCOUNT_EMAIL_VERIFICATION = "mandatory")
         # CustomSignupForm.save() crea la empresa automáticamente
         user = form.save(self.request)
+        _send_confirmation_compat(self.request, user, signup=True)
 
-        # Obtener nombre del taller desde la empresa del usuario
-        nombre_taller = "tu taller"
-        try:
-            if hasattr(user, "empresa") and user.empresa:
-                nombre_taller = user.empresa.nombre_taller
-        except Exception:
-            # Si no hay empresa aún, usar un valor por defecto
-            pass
+        # Guardar contexto del signup para pantalla intermedia y reenvío de confirmación.
+        country_path = country_code.lower()
+        lang_path = "en" if country_code == "US" else "es"
+        self.request.session["pending_signup_email"] = user.email
+        self.request.session["pending_signup_country"] = country_code
+        self.request.session["pending_signup_lang"] = lang_path
+        self.request.session.modified = True
 
-        # Si NO se requiere verificación de email, hacer login automático
-        # para que el usuario pueda acceder directamente después de revisar el correo
-        requires_email_verification = (
-            getattr(settings, "ACCOUNT_EMAIL_VERIFICATION", "mandatory") == "mandatory"
-        )
-
-        if not requires_email_verification:
-            # Login automático para acceso inmediato después de revisar correo
-            backend = settings.AUTHENTICATION_BACKENDS[0]
-            user.backend = backend
-            login(self.request, user, backend=backend)
-
-        # ✅ Renderizar directamente la página de registro exitoso (Thank You Page)
-        # Esto genera expectativa y confianza antes de mostrar el dashboard vacío
-        # y evita el Error 500 al intentar redirigir a URLs que pueden no existir
+        login_url = f"/{country_path}/{lang_path}/accounts/login/"
+        signup_url = f"/{country_path}/{lang_path}/accounts/signup/?email={user.email}"
         return render(
             self.request,
-            "taller/registro_exitoso.html",
+            "account/signup_email_pending.html",
             {
                 "email": user.email,
-                "nombre_taller": nombre_taller,
                 "country_code": country_code,
+                "language_code": lang_path,
                 "country_config": country_config,
+                "login_url": login_url,
+                "signup_url": signup_url,
             },
         )
 
     def form_invalid(self, form):
-        # Idioma para mostrar errores: URL, request, o español por defecto (solo para UI)
-        country_code = CountrySettings.get_country_from_url(self.request.path) or getattr(
-            self.request, "country_code", None
-        )
-        country_config = get_country_config(country_code) if country_code else {"lang": "es"}
-        language = country_config.get("lang", "es")
-        activate(language)
+        loc = getattr(self.request, "eg_us_public_signup_lang", None)
+        path = (self.request.path or "").rstrip("/") or "/"
+        if loc == "en" or (loc is None and path == "/us/signup"):
+            activate("en")
+        elif loc == "es" or (loc is None and path == "/us/es/signup"):
+            activate("es")
+        else:
+            country_code = CountrySettings.get_country_from_url(self.request.path) or getattr(
+                self.request, "country_code", None
+            )
+            country_config = get_country_config(country_code) if country_code else {"lang": "es"}
+            language = country_config.get("lang", "es")
+            activate(language)
         return super().form_invalid(form)

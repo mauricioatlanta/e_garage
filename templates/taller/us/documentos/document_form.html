@@ -1,1 +1,13 @@
 {% extends "taller/common/documentos/document_form.html" %}
+{% load static %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;500;600;700&family=Orbitron:wght@500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/documentos/us_document_form_futurist.css' %}?v=3">
+<script>
+  document.documentElement.classList.add('eg-us-doc-form-futurist');
+</script>
+{% endblock %}

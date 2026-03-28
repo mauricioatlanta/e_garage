@@ -1,0 +1,9 @@
+Hola {{ cliente.nombre }},
+
+Adjuntamos tu {{ document_label }} {{ documento.numero_documento|default:documento.id }}.
+
+También puedes verlo en línea aquí:
+{{ public_url }}
+
+Saludos,
+{{ company_name|default:empresa.nombre_taller|default:empresa.empresa|default:"eGarage" }}

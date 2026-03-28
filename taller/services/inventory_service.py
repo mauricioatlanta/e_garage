@@ -2,22 +2,29 @@
 Servicio de gestión de inventario (Inventory Service)
 
 Maneja la lógica de movimientos de stock asegurando integridad.
-Implementa las reglas de negocio:
-- Los Presupuestos (PRES) NUNCA mueven stock
-- Las Órdenes de Trabajo (OT) y Facturas (FAC) SÍ mueven stock
-- Las ediciones deben calcular diferencia correctamente
-- Las anulaciones deben devolver el stock
+Reglas:
+- Presupuestos (PRES) NUNCA mueven stock
+- OT y FAC SÍ mueven stock según origen_repuesto:
+  - STOCK_BODEGA: descontar/reponer en Repuesto
+  - DESARME: descontar/reponer en PiezaDesarme (al llegar a 0: estado_pieza=VENDIDA, activo=False)
+  - EXTERNO: no mover inventario
+- Reversión al anular documento.
 """
 
 import logging
-from decimal import Decimal
 from typing import List, Optional
 
 from django.db import transaction
 from django.db.models import F
 
 from taller.models.documento import Documento
-from taller.models.lineas_documento import LineaRepuesto
+from taller.models.lineas_documento import (
+    LineaRepuesto,
+    ORIGEN_DESARME,
+    ORIGEN_EXTERNO,
+    ORIGEN_STOCK_BODEGA,
+)
+from taller.models.pieza_desarme import PiezaDesarme, ESTADO_DISPONIBLE, ESTADO_VENDIDA
 from taller.models.repuesto import Repuesto
 
 log = logging.getLogger(__name__)
@@ -27,18 +34,14 @@ class InventoryService:
     """
     Maneja la lógica de movimientos de stock asegurando integridad.
 
-    Reglas de Negocio:
-    - Los Presupuestos (PRES) NUNCA mueven stock
-    - Las Órdenes de Trabajo (OT) y Facturas (FAC) SÍ mueven stock
-    - Solo se procesan líneas con repuesto vinculado (repuesto_id no nulo)
-    - Usa F() expressions para evitar race conditions
+    Reglas por origen_repuesto:
+    - STOCK_BODEGA: Repuesto (lógica actual)
+    - DESARME: PiezaDesarme
+    - EXTERNO: no mover inventario
     """
 
-    # Tipos de documento que NO mueven stock
-    TIPOS_SIN_STOCK = ["PRES"]  # Presupuestos
-
-    # Tipos de documento que SÍ mueven stock
-    TIPOS_CON_STOCK = ["OT", "FAC"]  # Orden de Trabajo, Factura/Boleta
+    TIPOS_SIN_STOCK = ["PRES"]
+    TIPOS_CON_STOCK = ["OT", "FAC"]
 
     @staticmethod
     @transaction.atomic
@@ -56,92 +59,79 @@ class InventoryService:
         Returns:
             dict: Resultado del procesamiento con estadísticas
         """
-        # Regla de Negocio: Los Presupuestos NUNCA mueven stock
         if documento.tipo in InventoryService.TIPOS_SIN_STOCK:
             log.debug(
                 f"[InventoryService] Documento {documento.numero} es tipo {documento.tipo}, no mueve stock"
             )
             return {"procesado": False, "razon": "Tipo de documento no mueve stock"}
 
-        # Solo procesar líneas que tienen un repuesto vinculado (no las manuales)
-        lineas = documento.lineas_repuesto.filter(repuesto__isnull=False).select_related("repuesto")
-
-        if not lineas.exists():
+        lineas = documento.lineas_repuesto.select_related("repuesto", "pieza_desarme").all()
+        lineas_con_movimiento = [
+            ln
+            for ln in lineas
+            if (ln.origen_repuesto == ORIGEN_STOCK_BODEGA and ln.repuesto_id)
+            or (ln.origen_repuesto == ORIGEN_DESARME and ln.pieza_desarme_id)
+        ]
+        if not lineas_con_movimiento:
             log.debug(
-                f"[InventoryService] Documento {documento.numero} no tiene líneas con repuesto vinculado"
+                f"[InventoryService] Documento {documento.numero} no tiene líneas que muevan inventario"
             )
-            return {"procesado": False, "razon": "No hay líneas con repuesto vinculado"}
+            return {"procesado": False, "razon": "No hay líneas con stock bodega o desarme"}
 
         multiplier = -1 if accion == "descontar" else 1 if accion == "reponer" else 0
-
-        # Para ajustar (ediciones), calcular diferencia
-        if accion == "ajustar" and cantidades_anteriores:
-            multiplier = 1  # Usaremos diferencia directa
-
         log.info(
             f"📦 Inventario: Procesando {accion} para Doc {documento.numero} (Tipo: {documento.tipo})"
         )
-
-        resultados = []
         movimientos = []
 
-        for linea in lineas:
-            repuesto = linea.repuesto
-
-            # Determinar cantidad a mover según acción
+        for linea in lineas_con_movimiento:
             if accion == "ajustar" and cantidades_anteriores:
-                # Edición: calcular diferencia
                 cantidad_anterior = cantidades_anteriores.get(linea.id, 0)
                 diferencia = linea.cantidad - cantidad_anterior
-
                 if diferencia == 0:
-                    continue  # No hay cambio, saltar
-
-                cantidad_actualizar = -diferencia  # Negativo para descontar, positivo para reponer
+                    continue
+                cantidad_actualizar = -diferencia
             else:
-                # Creación o anulación: usar cantidad de la línea con multiplicador
                 cantidad_actualizar = -linea.cantidad if multiplier < 0 else linea.cantidad
 
-            # Obtener stock anterior ANTES de actualizar (para logging)
-            stock_anterior = repuesto.cantidad_stock
-
-            # Actualizar stock en la base de datos (atómico)
-            # Usar F() expression para evitar race conditions
-            filas_actualizadas = Repuesto.objects.filter(
-                id=repuesto.id,
-                empresa=documento.empresa,  # 🔒 Multi-tenant: asegurar empresa correcta
-            ).update(cantidad_stock=F("cantidad_stock") + cantidad_actualizar)
-
-            # Verificar que se actualizó correctamente
-            if filas_actualizadas == 0:
-                log.warning(
-                    f"[InventoryService] No se actualizó stock para repuesto {repuesto.id} (puede no existir o no pertenecer a la empresa)"
+            if linea.origen_repuesto == ORIGEN_STOCK_BODEGA and linea.repuesto_id:
+                stock_anterior = linea.repuesto.cantidad_stock
+                filas = Repuesto.objects.filter(
+                    id=linea.repuesto.id, empresa=documento.empresa
+                ).update(cantidad_stock=F("cantidad_stock") + cantidad_actualizar)
+                if filas == 0:
+                    log.warning(
+                        f"[InventoryService] No se actualizó stock para repuesto {linea.repuesto.id}"
+                    )
+                    continue
+                linea.repuesto.refresh_from_db()
+                movimientos.append(
+                    {
+                        "origen": ORIGEN_STOCK_BODEGA,
+                        "repuesto_id": linea.repuesto.id,
+                        "repuesto_nombre": linea.repuesto.nombre,
+                        "cantidad": abs(cantidad_actualizar),
+                        "accion": "descontado" if cantidad_actualizar < 0 else "repuesto",
+                        "stock_anterior": stock_anterior,
+                        "stock_actual": linea.repuesto.cantidad_stock,
+                    }
                 )
-                continue
-
-            # Refrescar desde BD para obtener stock actualizado DESPUÉS de la actualización
-            repuesto.refresh_from_db()
-
-            cantidad_movida = abs(cantidad_actualizar)
-            accion_real = "descontado" if cantidad_actualizar < 0 else "repuesto"
-
-            movimientos.append(
-                {
-                    "repuesto_id": repuesto.id,
-                    "repuesto_nombre": repuesto.nombre,
-                    "cantidad": cantidad_movida,
-                    "accion": accion_real,
-                    "stock_anterior": stock_anterior,
-                    "stock_actual": repuesto.cantidad_stock,
-                }
-            )
-
-            log.info(
-                f"  ✅ {repuesto.nombre}: "
-                f"{accion_real.capitalize()} "
-                f"{cantidad_movida} unidades. "
-                f"Stock: {stock_anterior} → {repuesto.cantidad_stock}"
-            )
+                log.info(f"  ✅ BODEGA {linea.repuesto.nombre}: {abs(cantidad_actualizar)} u.")
+            elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
+                InventoryService._actualizar_stock_desarme(linea.pieza_desarme, cantidad_actualizar)
+                movimientos.append(
+                    {
+                        "origen": ORIGEN_DESARME,
+                        "pieza_desarme_id": linea.pieza_desarme.id,
+                        "nombre": linea.pieza_desarme.nombre,
+                        "cantidad": abs(cantidad_actualizar),
+                        "accion": "descontado" if cantidad_actualizar < 0 else "repuesto",
+                    }
+                )
+                log.info(
+                    f"  ✅ DESARME {linea.pieza_desarme.nombre}: {abs(cantidad_actualizar)} u."
+                )
+            # EXTERNO: no mover inventario
 
         return {
             "procesado": True,
@@ -152,42 +142,34 @@ class InventoryService:
     @staticmethod
     def validar_stock_disponible(documento: Documento) -> List[str]:
         """
-        Valida que hay stock suficiente para todos los repuestos del documento.
-
-        Útil antes de cambiar estado a 'EMITIDO'.
-
-        Args:
-            documento: Documento a validar
-
-        Returns:
-            List[str]: Lista de errores (vacía si todo está bien)
+        Valida que hay stock suficiente para todas las líneas que mueven inventario
+        (STOCK_BODEGA → Repuesto; DESARME → PiezaDesarme). EXTERNO no se valida.
         """
         errores = []
-
-        # Presupuestos no necesitan validación de stock
         if documento.tipo in InventoryService.TIPOS_SIN_STOCK:
             return errores
 
-        # Solo validar líneas con repuesto vinculado
-        lineas = documento.lineas_repuesto.filter(repuesto__isnull=False).select_related("repuesto")
-
+        lineas = documento.lineas_repuesto.select_related("repuesto", "pieza_desarme")
         for linea in lineas:
-            repuesto = linea.repuesto
-
-            # Validar que el repuesto pertenece a la misma empresa (multi-tenant)
-            if repuesto.empresa_id != documento.empresa_id:
-                errores.append(f"⚠️ Repuesto '{repuesto.nombre}' no pertenece a tu empresa.")
+            if linea.origen_repuesto == ORIGEN_EXTERNO:
                 continue
-
-            stock_disponible = repuesto.cantidad_stock
-            cantidad_requerida = linea.cantidad
-
-            if stock_disponible < cantidad_requerida:
-                errores.append(
-                    f"❌ Stock insuficiente para '{repuesto.nombre}'. "
-                    f"Requerido: {cantidad_requerida}, Disponible: {stock_disponible}"
-                )
-
+            if linea.origen_repuesto == ORIGEN_STOCK_BODEGA and linea.repuesto_id:
+                if linea.repuesto.empresa_id != documento.empresa_id:
+                    errores.append(
+                        f"⚠️ Repuesto '{linea.repuesto.nombre}' no pertenece a tu empresa."
+                    )
+                    continue
+                if linea.repuesto.cantidad_stock < linea.cantidad:
+                    errores.append(
+                        f"❌ Stock insuficiente para '{linea.repuesto.nombre}'. "
+                        f"Requerido: {linea.cantidad}, Disponible: {linea.repuesto.cantidad_stock}"
+                    )
+            elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
+                if not linea.pieza_desarme.activo or linea.pieza_desarme.cantidad < linea.cantidad:
+                    errores.append(
+                        f"❌ Stock insuficiente en pieza de desarme '{linea.pieza_desarme.nombre}'. "
+                        f"Requerido: {linea.cantidad}, Disponible: {linea.pieza_desarme.cantidad}"
+                    )
         return errores
 
     @staticmethod
@@ -223,104 +205,106 @@ class InventoryService:
     def procesar_edicion(documento_anterior: Documento, documento_nuevo: Documento):
         """
         Procesa cambios de stock cuando se edita un documento emitido.
-
-        Maneja:
-        - Cambios de cantidad: ajusta diferencia
-        - Líneas agregadas: descuenta nueva cantidad
-        - Líneas eliminadas: repone cantidad eliminada
-
-        Args:
-            documento_anterior: Versión anterior del documento
-            documento_nuevo: Versión nueva del documento
+        Por origen: STOCK_BODEGA (Repuesto) y DESARME (PiezaDesarme); EXTERNO no mueve.
         """
-        # Solo procesar si el documento estaba emitido
         if documento_anterior.estado != "EMITIDO":
-            log.debug(
-                f"[InventoryService] Documento {documento_anterior.numero} no estaba emitido, no hay stock que ajustar"
-            )
+            log.debug(f"[InventoryService] Documento {documento_anterior.numero} no estaba emitido")
             return
-
-        # Si el nuevo documento ya no está emitido, devolver todo el stock
         if documento_nuevo.estado != "EMITIDO":
             InventoryService.procesar_movimiento_stock(documento_anterior, "reponer")
             return
 
-        # Construir mapa de cantidades anteriores
-        cantidades_anteriores = {
-            linea.id: linea.cantidad
-            for linea in documento_anterior.lineas_repuesto.filter(repuesto__isnull=False)
-        }
-
-        # Construir mapa de cantidades nuevas
-        cantidades_nuevas = {
-            linea.repuesto_id: linea.cantidad
-            for linea in documento_nuevo.lineas_repuesto.filter(repuesto__isnull=False)
-        }
-
-        # Procesar cada línea nueva
-        for linea in documento_nuevo.lineas_repuesto.filter(repuesto__isnull=False):
-            repuesto_id = linea.repuesto_id
-            cantidad_nueva = linea.cantidad
-
-            # Buscar línea anterior con mismo repuesto
-            linea_anterior = documento_anterior.lineas_repuesto.filter(
-                repuesto_id=repuesto_id
-            ).first()
-
-            if linea_anterior:
-                # Línea existente: calcular diferencia
-                cantidad_anterior = linea_anterior.cantidad
-                diferencia = cantidad_nueva - cantidad_anterior
-
-                if diferencia > 0:
-                    # Aumentó cantidad: descontar diferencia
-                    log.info(
-                        f"[InventoryService] Línea editada: {linea.repuesto.nombre} {cantidad_anterior} → {cantidad_nueva} (+{diferencia})"
-                    )
-                    InventoryService._actualizar_stock(linea.repuesto, -diferencia)
-                elif diferencia < 0:
-                    # Disminuyó cantidad: reponer diferencia
-                    log.info(
-                        f"[InventoryService] Línea editada: {linea.repuesto.nombre} {cantidad_anterior} → {cantidad_nueva} ({diferencia})"
-                    )
-                    InventoryService._actualizar_stock(linea.repuesto, abs(diferencia))
-                # Si diferencia == 0, no hacer nada
+        for linea in documento_nuevo.lineas_repuesto.select_related("repuesto", "pieza_desarme"):
+            if linea.origen_repuesto == ORIGEN_EXTERNO:
+                continue
+            ant = (
+                documento_anterior.lineas_repuesto.filter(id=linea.id)
+                .select_related("repuesto", "pieza_desarme")
+                .first()
+            )
+            if ant:
+                cant_ant, rep_id_ant, pieza_id_ant, orig_ant = (
+                    ant.cantidad,
+                    ant.repuesto_id,
+                    ant.pieza_desarme_id,
+                    ant.origen_repuesto,
+                )
+                if (
+                    orig_ant != linea.origen_repuesto
+                    or rep_id_ant != linea.repuesto_id
+                    or pieza_id_ant != linea.pieza_desarme_id
+                ):
+                    # Origen o referencia cambiaron: reponer anterior y descontar nuevo
+                    if orig_ant == ORIGEN_STOCK_BODEGA and rep_id_ant:
+                        InventoryService._actualizar_stock(ant.repuesto, cant_ant)
+                    elif orig_ant == ORIGEN_DESARME and pieza_id_ant:
+                        InventoryService._actualizar_stock_desarme(ant.pieza_desarme, cant_ant)
+                    if linea.origen_repuesto == ORIGEN_STOCK_BODEGA and linea.repuesto_id:
+                        InventoryService._actualizar_stock(linea.repuesto, -linea.cantidad)
+                    elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
+                        InventoryService._actualizar_stock_desarme(
+                            linea.pieza_desarme, -linea.cantidad
+                        )
+                else:
+                    diff = linea.cantidad - cant_ant
+                    if diff == 0:
+                        continue
+                    if linea.origen_repuesto == ORIGEN_STOCK_BODEGA and linea.repuesto_id:
+                        InventoryService._actualizar_stock(linea.repuesto, -diff)
+                    elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
+                        InventoryService._actualizar_stock_desarme(linea.pieza_desarme, -diff)
             else:
-                # Nueva línea: descontar cantidad nueva
-                log.info(
-                    f"[InventoryService] Nueva línea agregada: {linea.repuesto.nombre} x{cantidad_nueva}"
-                )
-                InventoryService._actualizar_stock(linea.repuesto, -cantidad_nueva)
+                if linea.origen_repuesto == ORIGEN_STOCK_BODEGA and linea.repuesto_id:
+                    InventoryService._actualizar_stock(linea.repuesto, -linea.cantidad)
+                elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
+                    InventoryService._actualizar_stock_desarme(linea.pieza_desarme, -linea.cantidad)
 
-        # Procesar líneas eliminadas: reponer stock
-        for linea_anterior in documento_anterior.lineas_repuesto.filter(repuesto__isnull=False):
-            # Verificar si la línea ya no existe en el documento nuevo
-            existe_nueva = documento_nuevo.lineas_repuesto.filter(
-                repuesto_id=linea_anterior.repuesto_id, id=linea_anterior.id  # Mismo ID
-            ).exists()
-
-            if not existe_nueva:
-                # Línea eliminada: reponer stock
-                log.info(
-                    f"[InventoryService] Línea eliminada: {linea_anterior.repuesto.nombre} x{linea_anterior.cantidad}"
-                )
-                InventoryService._actualizar_stock(linea_anterior.repuesto, linea_anterior.cantidad)
+        for linea_anterior in documento_anterior.lineas_repuesto.select_related(
+            "repuesto", "pieza_desarme"
+        ):
+            if not documento_nuevo.lineas_repuesto.filter(id=linea_anterior.id).exists():
+                if (
+                    linea_anterior.origen_repuesto == ORIGEN_STOCK_BODEGA
+                    and linea_anterior.repuesto_id
+                ):
+                    InventoryService._actualizar_stock(
+                        linea_anterior.repuesto, linea_anterior.cantidad
+                    )
+                elif (
+                    linea_anterior.origen_repuesto == ORIGEN_DESARME
+                    and linea_anterior.pieza_desarme_id
+                ):
+                    InventoryService._actualizar_stock_desarme(
+                        linea_anterior.pieza_desarme, linea_anterior.cantidad
+                    )
 
     @staticmethod
     @transaction.atomic
     def _actualizar_stock(repuesto: Repuesto, cantidad: int):
-        """
-        Actualiza stock de un repuesto usando F() expression (atómico).
-
-        Args:
-            repuesto: Repuesto a actualizar
-            cantidad: Cantidad a agregar (positivo) o descontar (negativo)
-
-        Example:
-            _actualizar_stock(repuesto, -5)  # Descontar 5 unidades
-            _actualizar_stock(repuesto, 3)   # Agregar 3 unidades
-        """
+        """Actualiza stock de un repuesto (STOCK_BODEGA). cantidad: + reponer, - descontar."""
         Repuesto.objects.filter(id=repuesto.id).update(
             cantidad_stock=F("cantidad_stock") + cantidad
         )
         repuesto.refresh_from_db()
+
+    @staticmethod
+    @transaction.atomic
+    def _actualizar_stock_desarme(pieza: "PiezaDesarme", cantidad: int):
+        """
+        Actualiza cantidad de PiezaDesarme. cantidad: + reponer, - descontar.
+        Cuando cantidad llega a 0: estado_pieza=VENDIDA, activo=False.
+        Cuando se repone y pasa de 0 a >0: estado_pieza=DISPONIBLE, activo=True.
+        """
+        PiezaDesarme.objects.filter(id=pieza.id).update(cantidad=F("cantidad") + cantidad)
+        pieza.refresh_from_db()
+        if pieza.cantidad <= 0:
+            PiezaDesarme.objects.filter(id=pieza.id).update(
+                estado_pieza=ESTADO_VENDIDA, activo=False
+            )
+            pieza.refresh_from_db()
+        elif pieza.estado_pieza == ESTADO_VENDIDA and pieza.cantidad > 0:
+            # Reposición: volver a disponible
+            PiezaDesarme.objects.filter(id=pieza.id).update(
+                estado_pieza=ESTADO_DISPONIBLE, activo=True
+            )
+            pieza.refresh_from_db()

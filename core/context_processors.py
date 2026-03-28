@@ -5,6 +5,7 @@ Context processors para e_garage
 import time
 
 from django.conf import settings
+from taller.utils.empresa import get_user_empresa_safe
 
 
 def static_version(request):
@@ -18,11 +19,12 @@ def empresa_info(request):
     """
     Agrega información de la empresa del usuario autenticado
     """
-    if request.user.is_authenticated and hasattr(request.user, "empresa"):
+    empresa = get_user_empresa_safe(getattr(request, "user", None))
+    if empresa:
         return {
-            "user_empresa": request.user.empresa,
-            "country": request.user.empresa.pais if request.user.empresa else "CL",
-            "company_settings": getattr(request.user.empresa, "configuracion", None),
+            "user_empresa": empresa,
+            "country": getattr(empresa, "pais", "CL") or "CL",
+            "company_settings": getattr(empresa, "configuracion", None),
         }
     return {
         "user_empresa": None,

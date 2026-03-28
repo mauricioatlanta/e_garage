@@ -2,7 +2,14 @@
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 from .settings import *  # noqa: F401,F403
+
+# Cargar .env.prod de forma explícita para entornos que no exportan variables
+_env_prod_path = Path(__file__).resolve().parent.parent / ".env.prod"
+if _env_prod_path.exists():
+    load_dotenv(_env_prod_path, override=True)
 
 
 # =============================================================================
@@ -51,9 +58,11 @@ DEBUG = env_bool("DJANGO_DEBUG", False)
 # =========================
 # Hosts / CSRF
 # =========================
+# Fuente de verdad: DJANGO_ALLOWED_HOSTS en .env.prod (o variable de entorno).
+# Para acceso directo por IP debe incluir la IP del servidor (ej. 159.223.200.106).
 ALLOWED_HOSTS = env_list(
     "DJANGO_ALLOWED_HOSTS",
-    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,.pythonanywhere.com,localhost,127.0.0.1",
+    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,.pythonanywhere.com,localhost,127.0.0.1,159.223.200.106",
 )
 
 CSRF_TRUSTED_ORIGINS = env_list(
@@ -83,6 +92,23 @@ CSRF_COOKIE_HTTPONLY = False  # normalmente False para formularios estándar
 SESSION_COOKIE_SAMESITE = env_str("DJANGO_SESSION_COOKIE_SAMESITE", "Lax") or "Lax"
 CSRF_COOKIE_SAMESITE = env_str("DJANGO_CSRF_COOKIE_SAMESITE", "Lax") or "Lax"
 
+_cookie_domain = env_str("DJANGO_COOKIE_DOMAIN", "")
+if not _cookie_domain:
+    for _origin in CSRF_TRUSTED_ORIGINS or []:
+        _origin = (_origin or "").strip()
+        if not _origin or "://" not in _origin:
+            continue
+        _host = _origin.split("://", 1)[1].split("/", 1)[0].strip()
+        _host = _host.replace("*.", "").strip()
+        if _host.startswith("www."):
+            _host = _host[4:]
+        if _host:
+            _cookie_domain = "." + _host.lstrip(".")
+            break
+if _cookie_domain:
+    CSRF_COOKIE_DOMAIN = _cookie_domain
+    SESSION_COOKIE_DOMAIN = _cookie_domain
+
 
 # =========================
 # HSTS (solo cuando SSL redirect está activo)
@@ -103,6 +129,29 @@ SECURE_REFERRER_POLICY = (
     env_str("DJANGO_SECURE_REFERRER_POLICY", "strict-origin-when-cross-origin")
     or "strict-origin-when-cross-origin"
 )
+
+
+# =========================
+# Email
+# =========================
+# Backend real por API HTTPS (Resend), sin dependencia de SMTP.
+EMAIL_BACKEND = "taller.email_backends.resend_backend.ResendEmailBackend"
+
+DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl")
+SERVER_EMAIL = env_str("SERVER_EMAIL", "support@egarage.cl")
+SUPPORT_EMAIL = env_str("SUPPORT_EMAIL", "support@egarage.cl")
+
+EMAIL_TIMEOUT = env_int("EMAIL_TIMEOUT", 30)
+
+# Gmail API OAuth
+GMAIL_CREDENTIALS_FILE = env_str("GMAIL_CREDENTIALS_FILE", "/srv/egarage/gmail_credentials.json")
+GMAIL_TOKEN_FILE = env_str("GMAIL_TOKEN_FILE", "/srv/egarage/gmail_token.json")
+GMAIL_USER_ID = env_str("GMAIL_USER_ID", "me")
+RESEND_API_KEY = env_str("RESEND_API_KEY", "")
+
+# Verificación de correo en producción (allauth); por defecto obligatoria.
+ACCOUNT_EMAIL_VERIFICATION = env_str("ACCOUNT_EMAIL_VERIFICATION", "mandatory")
+ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = env_bool("ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION", True)
 
 
 # =========================
@@ -193,3 +242,56 @@ DATABASES = {
 # Configuración crítica para el SSL que acabas de instalar
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_TRUSTED_ORIGINS = ["https://egarage.cl", "https://www.egarage.cl"]
+
+
+# ===== FIX IDIOMA USA/CHILE EN PRODUCCION =====
+# Django LocaleMiddleware solo no interpreta /us/en/... en esta arquitectura.
+# Reinsertamos el middleware que fuerza idioma por prefijo país/idioma.
+if "taller.middleware.lang_policy.LanguagePolicyMiddleware" not in MIDDLEWARE:
+    try:
+        idx = MIDDLEWARE.index("taller.middleware.empresa_middleware.EmpresaMiddleware")
+        MIDDLEWARE.insert(idx, "taller.middleware.lang_policy.LanguagePolicyMiddleware")
+    except ValueError:
+        MIDDLEWARE.append("taller.middleware.lang_policy.LanguagePolicyMiddleware")
+
+# =============================================================================
+# Staticfiles: solo backends que existen SIEMPRE en el paquete desplegado.
+# NO usar taller.storage.LenientCompressedManifestStaticFilesStorage aquí hasta
+# que taller/storage.py esté garantizado en el servidor; si no, InvalidStorageError
+# y cualquier {% static %} en plantillas → 500 (ej. /uy/es/bienvenida/).
+# Tras cada deploy: python manage.py collectstatic --noinput
+# =============================================================================
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+}
+# Django 5+: STORAGES y STATICFILES_STORAGE son mutuamente excluyentes (heredado de settings.py).
+globals().pop("STATICFILES_STORAGE", None)
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = False
+
+# =============================================================================
+# Logging: solo consola (journald / stdout de Gunicorn).
+# Evita FileHandler bajo /srv/egarage/logs sin permisos y el error
+# "Unable to configure handler 'file'" si loggers referencian handlers inexistentes.
+# =============================================================================
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "INFO",
+    },
+    "loggers": {
+        "django.security.DisallowedHost": {
+            "handlers": ["console"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+    },
+}

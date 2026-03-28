@@ -4,6 +4,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.shortcuts import redirect
+from django.http import HttpResponseNotFound
 from django.urls import include, path
 from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
@@ -75,24 +76,15 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     # Wrappers country-aware para login y signup
     path("cl/accounts/login/", redirect_qs("/accounts/login/")),
-    path("us/accounts/login/", redirect_qs("/accounts/login/")),
-    path("cl/accounts/signup/", redirect_qs("/accounts/signup/")),
-    path("us/accounts/signup/", redirect_qs("/accounts/signup/")),
+    path("cl/accounts/signup/", redirect_qs("/cl/es/accounts/signup/")),
     # Redirects amigables para login
     path("cl/login/", redirect_qs("/cl/accounts/login/")),
-    path("us/login/", redirect_qs("/us/accounts/login/")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
-    path("us/accounts/logout/", redirect_qs("/accounts/logout/")),
     # Password reset (solicitud + enviado + confirm + completo)
     path("cl/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
-    path("us/accounts/password/reset/", redirect_qs("/accounts/password/reset/")),
     path(
         "cl/accounts/password/reset/done/",
-        redirect_qs("/accounts/password/reset/done/"),
-    ),
-    path(
-        "us/accounts/password/reset/done/",
         redirect_qs("/accounts/password/reset/done/"),
     ),
     path(
@@ -100,26 +92,13 @@ urlpatterns = [
         redirect_qs("/accounts/password/reset/key/{uidb36}/{key}/"),
     ),
     path(
-        "us/accounts/password/reset/key/<uidb36>/<key>/",
-        redirect_qs("/accounts/password/reset/key/{uidb36}/{key}/"),
-    ),
-    path(
         "cl/accounts/password/reset/key/done/",
-        redirect_qs("/accounts/password/reset/key/done/"),
-    ),
-    path(
-        "us/accounts/password/reset/key/done/",
         redirect_qs("/accounts/password/reset/key/done/"),
     ),
     # Password change
     path("cl/accounts/password/change/", redirect_qs("/accounts/password/change/")),
-    path("us/accounts/password/change/", redirect_qs("/accounts/password/change/")),
     path(
         "cl/accounts/password/change/done/",
-        redirect_qs("/accounts/password/change/done/"),
-    ),
-    path(
-        "us/accounts/password/change/done/",
         redirect_qs("/accounts/password/change/done/"),
     ),
     path("i18n/", include("django.conf.urls.i18n")),  # Selector de idioma
@@ -131,8 +110,12 @@ urlpatterns = [
         TemplateView.as_view(template_name="changelog.html"),
         name="changelog",
     ),
+    # 🇺🇸 USA - Bloqueo de rutas legacy /us/en/accounts/ y /us/es/accounts/
+    path("us/en/accounts/", lambda r: HttpResponseNotFound()),
+    path("us/en/accounts/<path:rest>", lambda r, rest: HttpResponseNotFound()),
+    path("us/es/accounts/", lambda r: HttpResponseNotFound()),
+    path("us/es/accounts/<path:rest>", lambda r, rest: HttpResponseNotFound()),
     path("cl/", include("taller.urls_extra.chile")),
-    path(),
     path("us/", include("taller.urls_extra.usa")),
     path("taller/", include(("taller.urls", "taller"), namespace="taller")),
     # APIs globales (sin prefijo de país)

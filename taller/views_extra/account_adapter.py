@@ -2,7 +2,12 @@
 import logging
 
 from allauth.account.adapter import DefaultAccountAdapter
+from django.conf import settings
+from urllib.parse import quote
+
+from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
+from allauth.utils import build_absolute_uri
 from django.utils.translation import activate
 
 logger = logging.getLogger(__name__)
@@ -13,6 +18,17 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
     Adaptador que permite login a superusuarios sin verificacion de email
     y gestiona redirecciones por pais para el proyecto e_garage.
     """
+
+    def add_message(self, request, level, *args, **kwargs):
+        """
+        No encolar mensajes de sesión iniciada/cerrada: suelen amontonarse con otros
+        flashes y molestan en login / primer pantallazo del workspace.
+        """
+        first = args[0] if args else None
+        mt = str(first or "").replace("\\", "/").lower()
+        if "logged_in" in mt or "logged_out" in mt:
+            return
+        return super().add_message(request, level, *args, **kwargs)
 
     def get_client_ip(self, request) -> str:
         """
@@ -64,40 +80,94 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
     def is_open_for_signup(self, request):
         return True
 
-    def pre_authenticate(self, request, **credentials):
-        login = credentials.get("username") or credentials.get("email") or credentials.get("login")
-        if login:
-            from django.contrib.auth import get_user_model
-
-            User = get_user_model()
-            try:
-                user = User.objects.filter(username=login).first()
-                if not user:
-                    user = User.objects.filter(email=login).first()
-
-                if user and (user.is_superuser or user.is_staff):
-                    credentials["skip_email_verification"] = True
-                    return credentials
-            except Exception:
-                pass
-        return credentials
-
     def can_authenticate(self, request, email_address):
-        user = email_address.user
+        user = getattr(email_address, "user", None)
         if user and (user.is_superuser or user.is_staff):
             return True
         return super().can_authenticate(request, email_address)
 
     def is_email_verified(self, request, email_address):
-        user = email_address.user
+        user = getattr(email_address, "user", None)
         if user and (user.is_superuser or user.is_staff):
             return True
         return super().is_email_verified(request, email_address)
 
+    def get_reset_password_from_key_url(self, key):
+        """
+        Si el usuario pidió reset desde /cl/es/accounts/password/reset/, el enlace del mail
+        debe apuntar a la misma jerarquía (no a /accounts/... sin país/idioma).
+        """
+        req = getattr(self, "request", None)
+        path = (req.path or "") if req else ""
+        if path.startswith("/cl/es/"):
+            p = reverse(
+                "chile:account_reset_password_from_key",
+                kwargs={"uidb36": "UID", "key": "KEY"},
+            )
+            p = p.replace("UID-KEY", quote(key, safe=""))
+            return build_absolute_uri(req, p)
+        return super().get_reset_password_from_key_url(key)
+
+    def get_password_change_redirect_url(self, request):
+        if (request.path or "").startswith("/cl/es/"):
+            return reverse("chile:account_change_password")
+        return super().get_password_change_redirect_url(request)
+
+    def _country_lang_from_request_or_user(self, request=None, user=None):
+        country = None
+        if user is not None:
+            empresa = getattr(user, "empresa", None)
+            country = self._normalize_country(getattr(empresa, "pais", None)) if empresa else None
+        if not country and request is not None:
+            path = (request.path or "").lower()
+            if path.startswith("/us/"):
+                country = "US"
+            elif path.startswith("/cl/"):
+                country = "CL"
+            if not country:
+                session_country = self._normalize_country(
+                    request.session.get("pending_signup_country")
+                    or request.session.get("country")
+                    or request.GET.get("country")
+                )
+                country = session_country
+        if not country:
+            country = "CL"
+        lang = "en" if country == "US" else "es"
+        return country, lang
+
+    def get_email_confirmation_url(self, request, emailconfirmation):
+        """
+        Genera enlace de confirmacion con contexto de pais/idioma para no perder routing.
+        """
+        user = getattr(getattr(emailconfirmation, "email_address", None), "user", None)
+        country, lang = self._country_lang_from_request_or_user(request=request, user=user)
+        path = f"/{country.lower()}/{lang}/accounts/confirm-email/{emailconfirmation.key}/"
+        return build_absolute_uri(request, path)
+
+    def send_confirmation_mail(self, request, emailconfirmation, signup):
+        """
+        Fuerza activate_url country-aware en el email de confirmacion.
+        """
+        activate_url = self.get_email_confirmation_url(request, emailconfirmation)
+        ctx = {
+            "user": emailconfirmation.email_address.user,
+            "activate_url": activate_url,
+            "current_site": get_current_site(request),
+            "key": emailconfirmation.key,
+            "request": request,
+            "email": emailconfirmation.email_address.email,
+        }
+        if signup:
+            template = "account/email/email_confirmation_signup"
+        else:
+            template = "account/email/email_confirmation"
+        self.send_mail(template, emailconfirmation.email_address.email, ctx)
+
     def send_mail(self, template_prefix, email, context):
         """
-        Envuelve el envío en try/except para evitar 500 en password reset y otros flujos.
-        Si falla (template, SMTP, etc.), se registra y no se propaga.
+        En producción no se silencian errores SMTP:
+        se registran y se propagan para que el monitoreo detecte el fallo real.
         """
         try:
             sent = super().send_mail(template_prefix, email, context)
@@ -110,12 +180,22 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
             return sent
         except Exception as e:
             logger.exception(
-                "Error enviando email (template=%s, to=%s): %s. No se propaga para evitar 500.",
+                "Error enviando email (template=%s, to=%s): %s.",
                 template_prefix,
                 email,
                 e,
             )
-            return 0
+            suppress_errors = getattr(
+                settings,
+                "ACCOUNT_ADAPTER_SUPPRESS_EMAIL_ERRORS",
+                False,
+            )
+            if suppress_errors:
+                logger.error(
+                    "ACCOUNT_ADAPTER_SUPPRESS_EMAIL_ERRORS=True: se suprime excepción de email."
+                )
+                return 0
+            raise
 
     COUNTRY_MAP = {
         "US": {"ns": "usa", "lang": "en", "default_url_name": "centro_trabajo"},
@@ -228,24 +308,13 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
                 else:
                     return next_url
 
-            # Prioridad: (1) URL actual (2) sesión (3) empresa/perfil (4) request.country (5) GET (6) CL.
-            # Así /us/login/ o /us/... siempre mantiene US y nunca cae en fallback Chile por defecto.
+            # Prioridad: (1) empresa/perfil si autenticado (2) URL actual (3) sesión (4) request.country (5) GET (6) CL.
+            # USA subscriber usando /cl/accounts/login/ debe ir a /us/en/workspace/, no Chile.
             country = None
             path = (request.path or "").lower()
 
-            if path.startswith("/us/"):
-                country = "US"
-            elif path.startswith("/cl/"):
-                country = "CL"
-
-            if not country:
-                session_country = (request.session.get("country") or "").strip().upper()
-                if session_country in ("US", "USA"):
-                    country = "US"
-                elif session_country in ("CL",):
-                    country = "CL"
-
-            if not country and request.user.is_authenticated:
+            # PRIORIDAD 1: Usuario autenticado - país de su empresa (USA subscriber → USA workspace)
+            if request.user.is_authenticated:
                 empresa = getattr(request.user, "empresa", None)
                 country = (
                     self._normalize_country(getattr(empresa, "pais", None)) if empresa else None
@@ -256,9 +325,25 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
                         self._normalize_country(getattr(perfil, "pais", None)) if perfil else None
                     )
 
+            # PRIORIDAD 2: Path actual (/us/login/ → US)
+            if not country and path.startswith("/us/"):
+                country = "US"
+            elif not country and path.startswith("/cl/"):
+                country = "CL"
+
+            # PRIORIDAD 3: Sesión
+            if not country:
+                session_country = (request.session.get("country") or "").strip().upper()
+                if session_country in ("US", "USA"):
+                    country = "US"
+                elif session_country in ("CL",):
+                    country = "CL"
+
+            # PRIORIDAD 4: request.country (middleware)
             if not country:
                 country = self._normalize_country(getattr(request, "country", None))
 
+            # PRIORIDAD 5: GET country
             if not country:
                 country = self._normalize_country(request.GET.get("country"))
 

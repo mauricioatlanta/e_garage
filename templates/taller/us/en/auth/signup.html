@@ -3,7 +3,7 @@
 {% load i18n %}
 {% load widget_tweaks %}
 
-{% block title %}{% trans "Create Account" %} - eGarage{% endblock %}
+{% block title %}Create Account - eGarage{% endblock %}
 
 {% block extra_head %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,7 +13,23 @@
 <style>
 body { background: #0a0a0a; font-family: 'Inter', sans-serif; color: #fff; min-height: 100vh; overflow-x: hidden; }
 .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px); background-size: 50px 50px; z-index: 1; }
-.signup-container { position: relative; z-index: 10; max-width: 520px; margin: 40px auto; padding: 20px; }
+.signup-container { position: relative; z-index: 10; max-width: 900px; margin: 40px auto; padding: 20px; }
+.form-section { margin-bottom: 32px; }
+.section-title { font-size: 18px; font-weight: 700; color: #22d3ee; margin-bottom: 20px; font-family: 'Orbitron', monospace; padding-bottom: 12px; border-bottom: 2px solid rgba(34, 211, 238, 0.3); }
+.pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 20px; }
+.plan-card { background: rgba(0, 0, 0, 0.6); border: 2px solid rgba(34, 211, 238, 0.2); border-radius: 16px; padding: 20px; text-align: center; transition: all 0.3s; cursor: pointer; position: relative; }
+.plan-card:hover { border-color: #22d3ee; transform: translateY(-4px); box-shadow: 0 8px 24px rgba(34, 211, 238, 0.3); }
+.plan-card.selected { border-color: #22d3ee; background: rgba(34, 211, 238, 0.1); box-shadow: 0 0 30px rgba(34, 211, 238, 0.4); }
+.plan-card.recommended { border-color: #fbbf24; }
+.plan-badge { display: inline-block; background: linear-gradient(135deg, #22d3ee, #3b82f6); color: #000; padding: 4px 12px; border-radius: 12px; font-size: 11px; font-weight: 700; margin-bottom: 12px; }
+.plan-badge.gold { background: linear-gradient(135deg, #fbbf24, #f59e0b); }
+.plan-name { font-size: 18px; font-weight: 700; color: #fff; margin-bottom: 12px; font-family: 'Orbitron', monospace; }
+.plan-price { font-size: 28px; font-weight: 900; color: #22d3ee; margin-bottom: 4px; font-family: 'Orbitron', monospace; }
+.plan-period { font-size: 12px; color: #94a3b8; margin-bottom: 12px; }
+.plan-savings { background: rgba(34, 211, 238, 0.15); color: #22d3ee; padding: 4px 12px; border-radius: 8px; font-size: 12px; font-weight: 600; display: inline-block; margin-bottom: 8px; }
+.plan-features { list-style: none; padding: 0; margin-top: 16px; font-size: 13px; color: #94a3b8; text-align: left; }
+.plan-features li { margin-bottom: 8px; padding-left: 20px; position: relative; }
+.plan-features li::before { content: '✓'; position: absolute; left: 0; color: #22d3ee; font-weight: 700; }
 .glass-card { background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(26, 34, 62, 0.9) 100%); backdrop-filter: blur(25px); border-radius: 24px; border: 2px solid rgba(34, 211, 238, 0.4); box-shadow: 0 8px 32px rgba(34, 211, 238, 0.2); padding: 48px 40px; }
 .logo-section { text-align: center; margin-bottom: 24px; }
 .logo { width: 70px; height: 70px; margin-bottom: 12px; filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.6)); }
@@ -33,11 +49,12 @@ body { background: #0a0a0a; font-family: 'Inter', sans-serif; color: #fff; min-h
 .login-link a:hover { text-decoration: underline; }
 .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; }
 .alert-error, .alert-danger { background: rgba(248, 113, 113, 0.15); color: #f87171; border-left: 4px solid #f87171; }
-@media (max-width: 768px) { .glass-card { padding: 32px 24px; } }
+@media (max-width: 768px) { .glass-card { padding: 32px 24px; } .pricing-grid { grid-template-columns: 1fr; } }
 </style>
 {% endblock %}
 
 {% block content %}
+{% language 'en' %}
 <div id="vanta-bg" style="position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0;"></div>
 <div class="grid-bg"></div>
 
@@ -45,12 +62,13 @@ body { background: #0a0a0a; font-family: 'Inter', sans-serif; color: #fff; min-h
     <div class="glass-card">
         <div class="logo-section">
             <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="logo" onerror="this.style.display='none'">
+            {% if not eg_us_signup_slim_header|default:False %}
             <div class="brand-name">eGarage</div>
+            {% endif %}
             <div class="subtitle">Professional Automotive Management</div>
-            <p class="subtitle" style="margin-top:8px;"><a href="/us/es/signup/" style="color:#94a3b8;">Español</a></p>
         </div>
 
-        <h2 class="signup-title">{% trans "Create Your Account" %}</h2>
+        <h2 class="signup-title">Create your account</h2>
 
         {% if messages %}
         <div class="messages">
@@ -67,94 +85,161 @@ body { background: #0a0a0a; font-family: 'Inter', sans-serif; color: #fff; min-h
         <form method="POST" id="signup-form">
             {% csrf_token %}
 
-            <input type="hidden" name="plan" id="id_plan" value="trial">
             {% if redirect_field_value %}
             <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">
             {% endif %}
 
             <div class="form-group">
-                <label for="id_country" class="form-label">{{ form.country.label }}</label>
+                <label for="id_country" class="form-label">Country</label>
                 {{ form.country|add_class:'form-control' }}
                 {% if form.country.errors %}<div class="error-message">{{ form.country.errors }}</div>{% endif %}
             </div>
 
-            {% if form.username %}
+            {% if form.username and not form.username.is_hidden %}
             <div class="form-group">
-                <label for="id_username" class="form-label">{{ form.username.label }}</label>
+                <label for="id_username" class="form-label">Username</label>
                 {{ form.username|add_class:'form-control'|attr:'placeholder:Username' }}
                 {% if form.username.errors %}<div class="error-message">{{ form.username.errors }}</div>{% endif %}
             </div>
+            {% elif form.username %}
+                {{ form.username }}
             {% endif %}
 
             <div class="form-group">
-                <label for="id_email" class="form-label">{{ form.email.label }} *</label>
-                {{ form.email|add_class:'form-control'|attr:'placeholder:your@email.com' }}
+                <label for="id_email" class="form-label">Email *</label>
+                {{ form.email|add_class:'form-control'|attr:'placeholder:you@example.com' }}
                 {% if form.email.help_text %}<div class="help-text">{{ form.email.help_text }}</div>{% endif %}
                 {% if form.email.errors %}<div class="error-message">{{ form.email.errors }}</div>{% endif %}
             </div>
 
             {% if form.telefono %}
             <div class="form-group">
-                <label for="id_telefono" class="form-label">{{ form.telefono.label }} *</label>
-                {{ form.telefono|add_class:'form-control'|attr:'placeholder:+1 234 567 8900' }}
-                {% if form.telefono.help_text %}<div class="help-text">{{ form.telefono.help_text }}</div>{% endif %}
+                <label for="id_telefono" class="form-label">Mobile (WhatsApp) *</label>
+                {{ form.telefono|add_class:'form-control'|attr:'placeholder:+1 555 123 4567' }}
+                <div class="help-text">Include country code (E.164 format)</div>
                 {% if form.telefono.errors %}<div class="error-message">{{ form.telefono.errors }}</div>{% endif %}
             </div>
             {% endif %}
 
             {% if form.first_name %}
             <div class="form-group">
-                <label for="id_first_name" class="form-label">{{ form.first_name.label }}</label>
-                {{ form.first_name|add_class:'form-control' }}
+                <label for="id_first_name" class="form-label">First name</label>
+                {{ form.first_name|add_class:'form-control'|attr:'placeholder:Optional' }}
                 {% if form.first_name.errors %}<div class="error-message">{{ form.first_name.errors }}</div>{% endif %}
             </div>
             {% endif %}
 
             {% if form.last_name %}
             <div class="form-group">
-                <label for="id_last_name" class="form-label">{{ form.last_name.label }}</label>
-                {{ form.last_name|add_class:'form-control' }}
+                <label for="id_last_name" class="form-label">Last name</label>
+                {{ form.last_name|add_class:'form-control'|attr:'placeholder:Optional' }}
                 {% if form.last_name.errors %}<div class="error-message">{{ form.last_name.errors }}</div>{% endif %}
             </div>
             {% endif %}
 
             {% if form.nombre_taller %}
             <div class="form-group">
-                <label for="id_nombre_taller" class="form-label">{{ form.nombre_taller.label }}</label>
-                {{ form.nombre_taller|add_class:'form-control' }}
-                {% if form.nombre_taller.help_text %}<div class="help-text">{{ form.nombre_taller.help_text }}</div>{% endif %}
+                <label for="id_nombre_taller" class="form-label">Workshop name (optional)</label>
+                {{ form.nombre_taller|add_class:'form-control'|attr:'placeholder:e.g. Main Street Auto' }}
+                <div class="help-text">You can set this later in Settings</div>
                 {% if form.nombre_taller.errors %}<div class="error-message">{{ form.nombre_taller.errors }}</div>{% endif %}
             </div>
             {% endif %}
 
             <div class="form-group">
-                <label for="id_password1" class="form-label">{% trans "Password" %} *</label>
+                <label for="id_password1" class="form-label">Password *</label>
                 {{ form.password1|add_class:'form-control'|attr:'placeholder:••••••••' }}
                 {% if form.password1.help_text %}<div class="help-text">{{ form.password1.help_text }}</div>{% endif %}
                 {% if form.password1.errors %}<div class="error-message">{{ form.password1.errors }}</div>{% endif %}
             </div>
 
             <div class="form-group">
-                <label for="id_password2" class="form-label">{% trans "Confirm Password" %} *</label>
+                <label for="id_password2" class="form-label">Confirm password *</label>
                 {{ form.password2|add_class:'form-control'|attr:'placeholder:••••••••' }}
                 {% if form.password2.errors %}<div class="error-message">{{ form.password2.errors }}</div>{% endif %}
             </div>
 
-            <button type="submit" class="signup-button">{% trans "CREATE ACCOUNT" %}</button>
+            <!-- Plan Selection -->
+            <div class="form-section">
+                <h3 class="section-title">Select your plan</h3>
+                <div class="pricing-grid">
+                    <div class="plan-card selected" data-plan="trial" onclick="selectPlan('trial')">
+                        <div class="plan-badge">FREE</div>
+                        <div class="plan-name">Trial</div>
+                        <div class="plan-price">$0</div>
+                        <div class="plan-period">30 days</div>
+                        <ul class="plan-features">
+                            <li>Full access</li>
+                            <li>No credit card</li>
+                            <li>Cancel anytime</li>
+                        </ul>
+                    </div>
+                    <div class="plan-card" data-plan="mensual" onclick="selectPlan('mensual')">
+                        <div class="plan-name">Monthly</div>
+                        <div class="plan-price"><span class="price-us">$20</span><span class="price-cl" style="display:none;">$20.000</span><span class="price-ar" style="display:none;">$29.100</span><span class="price-br" style="display:none;">R$ 100</span><span class="price-ve" style="display:none;">Bs. 730</span><span class="price-pe" style="display:none;">S/ 70</span><span class="price-co" style="display:none;">$80.000</span><span class="price-ec" style="display:none;">$20</span><span class="price-uy" style="display:none;">$ 800</span><span class="price-mx" style="display:none;">$350</span></div>
+                        <div class="plan-period"><span class="period-us">/ month</span><span class="period-cl" style="display:none;">/ mes</span><span class="period-ar" style="display:none;">ARS / mes</span><span class="period-br" style="display:none;">/ mês</span><span class="period-ve" style="display:none;">/ mes</span><span class="period-pe" style="display:none;">/ mes</span><span class="period-co" style="display:none;">COP / mes</span><span class="period-ec" style="display:none;">USD / mes</span><span class="period-uy" style="display:none;">UYU / mes</span><span class="period-mx" style="display:none;">MXN / mes</span></div>
+                        <ul class="plan-features">
+                            <li>Unlimited users</li>
+                            <li>All features</li>
+                        </ul>
+                    </div>
+                    <div class="plan-card recommended" data-plan="semestral" onclick="selectPlan('semestral')">
+                        <div class="plan-badge gold">⭐ BEST VALUE</div>
+                        <div class="plan-name">Semi-annual</div>
+                        <div class="plan-price"><span class="price-us">$110</span><span class="price-cl" style="display:none;">$110.000</span><span class="price-ar" style="display:none;">$160.050</span><span class="price-br" style="display:none;">R$ 500</span><span class="price-ve" style="display:none;">Bs. 3,650</span><span class="price-pe" style="display:none;">S/ 350</span><span class="price-co" style="display:none;">$440.000</span><span class="price-ec" style="display:none;">$110</span><span class="price-uy" style="display:none;">$ 4.400</span><span class="price-mx" style="display:none;">$1,925</span></div>
+                        <div class="plan-period"><span class="period-us">/ 6 months</span><span class="period-cl" style="display:none;">/ 6 meses</span><span class="period-ar" style="display:none;">ARS / 6 meses</span><span class="period-br" style="display:none;">/ 6 meses</span><span class="period-ve" style="display:none;">/ 6 meses</span><span class="period-pe" style="display:none;">/ 6 meses</span><span class="period-co" style="display:none;">COP / 6 meses</span><span class="period-ec" style="display:none;">USD / 6 meses</span><span class="period-uy" style="display:none;">UYU / 6 meses</span><span class="period-mx" style="display:none;">MXN / 6 meses</span></div>
+                        <div class="plan-savings">Save 17%</div>
+                        <ul class="plan-features">
+                            <li>Everything in Monthly</li>
+                            <li>Priority support</li>
+                        </ul>
+                    </div>
+                    <div class="plan-card" data-plan="anual" onclick="selectPlan('anual')">
+                        <div class="plan-badge gold">💎 BEST PRICE</div>
+                        <div class="plan-name">Annual</div>
+                        <div class="plan-price"><span class="price-us">$200</span><span class="price-cl" style="display:none;">$200.000</span><span class="price-ar" style="display:none;">$291.000</span><span class="price-br" style="display:none;">R$ 1.000</span><span class="price-ve" style="display:none;">Bs. 7,300</span><span class="price-pe" style="display:none;">S/ 700</span><span class="price-co" style="display:none;">$800.000</span><span class="price-ec" style="display:none;">$200</span><span class="price-uy" style="display:none;">$ 8.000</span><span class="price-mx" style="display:none;">$3,500</span></div>
+                        <div class="plan-period"><span class="period-us">/ year</span><span class="period-cl" style="display:none;">/ año</span><span class="period-ar" style="display:none;">ARS / año</span><span class="period-br" style="display:none;">/ ano</span><span class="period-ve" style="display:none;">/ año</span><span class="period-pe" style="display:none;">/ año</span><span class="period-co" style="display:none;">COP / año</span><span class="period-ec" style="display:none;">USD / año</span><span class="period-uy" style="display:none;">UYU / año</span><span class="period-mx" style="display:none;">MXN / año</span></div>
+                        <div class="plan-savings">Save 33%</div>
+                        <ul class="plan-features">
+                            <li>Everything in Semi-Annual</li>
+                            <li>Best value</li>
+                        </ul>
+                    </div>
+                </div>
+                <input type="hidden" name="plan" id="id_plan" value="trial">
+            </div>
+
+            <button type="submit" class="signup-button">Create account</button>
         </form>
 
         <div class="login-link">
-            <span class="login-text">{% trans "Already have an account?" %}</span>
-            <a href="{% url 'usa:account_login' %}">{% trans "Sign in" %}</a>
+            <span class="login-text">Already have an account?</span>
+            <a href="{% url 'usa:account_login' %}">Sign in</a>
         </div>
     </div>
 </div>
 
 <script>
+function updatePlanPrices(country) {
+    document.querySelectorAll('.price-cl, .period-cl, .price-us, .period-us, .price-ar, .period-ar, .price-br, .period-br, .price-ve, .period-ve, .price-pe, .period-pe, .price-co, .period-co, .price-ec, .period-ec, .price-uy, .period-uy, .price-mx, .period-mx').forEach(function(el) { el.style.display = 'none'; });
+    var map = {CL:['price-cl','period-cl'], US:['price-us','period-us'], AR:['price-ar','period-ar'], BR:['price-br','period-br'], VE:['price-ve','period-ve'], PE:['price-pe','period-pe'], CO:['price-co','period-co'], EC:['price-ec','period-ec'], UY:['price-uy','period-uy'], MX:['price-mx','period-mx']};
+    var keys = map[country] || map['US'];
+    if (keys) keys.forEach(function(k) { document.querySelectorAll('.'+k).forEach(function(el) { el.style.display = 'inline'; }); });
+}
+function selectPlan(planName) {
+    document.getElementById('id_plan').value = planName;
+    document.querySelectorAll('.plan-card').forEach(function(c) { c.classList.remove('selected'); });
+    var sel = document.querySelector('[data-plan="'+planName+'"]');
+    if (sel) sel.classList.add('selected');
+}
 document.addEventListener('DOMContentLoaded', function() {
     if (typeof VANTA !== 'undefined' && VANTA.NET) {
         VANTA.NET({ el: "#vanta-bg", mouseControls: true, touchControls: true, gyroControls: false, minHeight: 200, minWidth: 200, scale: 1, color: 0x22d3ee, backgroundColor: 0x0a0a0a, points: 8, maxDistance: 20, spacing: 18 });
     }
+    updatePlanPrices('US');
+    var countrySelect = document.getElementById('id_country');
+    if (countrySelect) countrySelect.addEventListener('change', function() { updatePlanPrices(this.value || 'US'); });
 });
 </script>
+{% endlanguage %}
 {% endblock %}

@@ -10,8 +10,10 @@ Este módulo contiene servicios reutilizables para:
 
 from .dashboard_service import DashboardService
 from .document_output_service import DocumentOutputService
-from .inventory_service import InventoryService
 from .registration_service import RegistrationService
+
+# Una sola implementación: taller/services/inventory_service.py
+from taller.services.inventory_service import InventoryService
 
 __all__ = [
     "InventoryService",

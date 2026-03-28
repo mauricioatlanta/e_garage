@@ -83,7 +83,8 @@ class CustomSignupForm(SignupForm):
     )
 
     def __init__(self, *args, **kwargs):
-        # Extraer country_code y default_phone_prefix si se pasan
+        # Extraer kwargs personalizados ANTES de super()
+        request = kwargs.pop("request", None)
         self.country_code = kwargs.pop("country_code", None)
         self.default_phone_prefix = kwargs.pop("default_phone_prefix", None)
 
@@ -146,11 +147,8 @@ class CustomSignupForm(SignupForm):
             )
 
         # ✅ DETECTAR PAÍS AUTOMÁTICAMENTE desde request (?from=xx) o URL
-        # El request puede venir en kwargs o en args[0] si se pasa como primer argumento posicional
-        request = None
-        if "request" in kwargs:
-            request = kwargs["request"]
-        elif args and hasattr(args[0], "path"):
+        # Si aún no tenemos request, intentar obtenerlo del primer argumento posicional
+        if request is None and args and hasattr(args[0], "path"):
             request = args[0]
 
         if request and not self.country_code:
@@ -187,6 +185,49 @@ class CustomSignupForm(SignupForm):
             self.fields["telefono"].widget.attrs["placeholder"] = placeholder
             # Opcional: establecer initial con prefijo
             # self.fields["telefono"].initial = self.default_phone_prefix + " "
+
+        if request and getattr(request, "eg_us_public_signup_lang", None) == "en":
+            self._apply_us_public_signup_english()
+        elif request:
+            signup_path = (request.path or "").rstrip("/") or "/"
+            if signup_path == "/us/signup":
+                self._apply_us_public_signup_english()
+
+    def _apply_us_public_signup_english(self):
+        """Etiquetas en inglés para /us/signup/ (formulario con strings en español por defecto)."""
+        if "country" in self.fields:
+            self.fields["country"].label = "Country"
+            ch = list(self.fields["country"].choices)
+            if ch:
+                ch[0] = ("", "Select country")
+            self.fields["country"].choices = ch
+        if "first_name" in self.fields:
+            self.fields["first_name"].label = "First name"
+            self.fields["first_name"].help_text = "Optional"
+            self.fields["first_name"].widget.attrs["placeholder"] = "First name (optional)"
+        if "last_name" in self.fields:
+            self.fields["last_name"].label = "Last name"
+            self.fields["last_name"].help_text = "Optional"
+            self.fields["last_name"].widget.attrs["placeholder"] = "Last name (optional)"
+        if "telefono" in self.fields:
+            self.fields["telefono"].label = "Mobile (WhatsApp)"
+            self.fields["telefono"].help_text = "Mobile number with country code (E.164 format)"
+        if "nombre_taller" in self.fields:
+            self.fields["nombre_taller"].label = "Workshop name (optional)"
+            self.fields["nombre_taller"].help_text = (
+                "You can leave this blank and set it later in Settings"
+            )
+            self.fields["nombre_taller"].widget.attrs[
+                "placeholder"
+            ] = "e.g. Main Street Auto (optional)"
+        if "password1" in self.fields:
+            self.fields["password1"].label = "Password"
+        if "password2" in self.fields:
+            self.fields["password2"].label = "Confirm password"
+        if "email" in self.fields:
+            self.fields["email"].widget.attrs["placeholder"] = "you@example.com"
+        if "telefono" in self.fields:
+            self.fields["telefono"].widget.attrs["placeholder"] = "+1 555 123 4567"
 
     def clean_telefono(self):
         """
@@ -246,6 +287,13 @@ class CustomSignupForm(SignupForm):
             raise forms.ValidationError("El número de teléfono es demasiado corto")
         if len(numero_sin_prefijo) > 15:
             raise forms.ValidationError("El número de teléfono es demasiado largo")
+
+        from taller.models.empresa import Empresa
+
+        if Empresa.objects.filter(telefono=telefono_normalizado).exists():
+            raise forms.ValidationError(
+                "Ya existe una cuenta con este teléfono. ¿Deseas iniciar sesión?"
+            )
 
         return telefono_normalizado
 
@@ -415,6 +463,11 @@ class CustomSignupForm(SignupForm):
         # ✅ Telefono opcional - usar valor normalizado o vacío
         telefono_usuario = data.get("telefono", "").strip() if data.get("telefono") else ""
 
+        # ✅ Plan seleccionado por el usuario (trial, mensual, semestral, anual)
+        plan_type = (request.POST.get("plan", "") or "trial").strip().lower()
+        if plan_type not in ("trial", "mensual", "semestral", "anual"):
+            plan_type = "trial"
+
         try:
             result = RegistrationService.create_company_for_user(
                 user=user,
@@ -424,7 +477,7 @@ class CustomSignupForm(SignupForm):
                     "pais": country_code,
                     "telefono": telefono_usuario,  # ✅ Ya normalizado por clean_telefono (puede ser vacío)
                 },
-                plan_type="trial",  # Allauth suele ser registro trial/gratuito
+                plan_type=plan_type,  # Plan elegido por el usuario en el formulario
                 assign_role="Owner",
                 request=request,
             )

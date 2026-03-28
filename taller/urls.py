@@ -14,6 +14,7 @@ from taller.views_extra.dashboard_empresa import (
     dashboard_centro_operaciones,
     dashboard_centro_operaciones_espacial,
 )
+from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views import dashboard
 from taller.views.dashboard_bi import DashboardHomeView
 
@@ -69,6 +70,8 @@ urlpatterns = [
     # === RUTAS PRINCIPALES PARA COMPATIBILIDAD ===
     path("dashboard/", dashboard, name="dashboard"),  # Dashboard principal
     path("dashboard/bi/", DashboardHomeView.as_view(), name="dashboard_bi"),  # Dashboard de BI
+    path("pricing/", precios, name="pricing"),
+    path("precios/", precios, name="precios"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
     path(
         "centro-operaciones-espacial/",
@@ -101,6 +104,8 @@ urlpatterns = [
     path("ajax/", include(("taller.ajax.urls", "ajax"), namespace="ajax")),
     # Company settings
     path("settings/", company_settings_view, name="company_settings"),
+    # Centro de Ayuda
+    path("help/", include(("taller.help.urls", "help"), namespace="help")),
     # URLs de autocomplete para los formularios (movidas a URLs específicas de país)
     # path(
     #     "autocomplete/",

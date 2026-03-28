@@ -39,7 +39,7 @@
           </div>
           {% endif %}
         </div>
-        <form method="post" class="mt-10" onsubmit="return window.confirm('{% if LANGUAGE_CODE == 'es' %}¿Confirmas la eliminación permanente?{% else %}Confirm permanent deletion?{% endif %}');">
+        <form method="post" class="mt-10">
           {% csrf_token %}
           <div class="flex flex-col sm:flex-row gap-4">
             {% country_url 'clientes:lista_clientes' as url_lista %}

@@ -252,6 +252,53 @@
       z-index: 1;
     }
 
+    @media (max-width: 640px) {
+      .hero-section {
+        padding: 1rem;
+        align-items: flex-start;
+      }
+
+      .eg-hero-logo {
+        height: 4.5rem !important;
+      }
+
+      .eg-hero-title {
+        font-size: 3.2rem !important;
+        line-height: 1.05 !important;
+      }
+
+      .eg-hero-subtitle {
+        font-size: 1.1rem !important;
+        margin-bottom: 1rem !important;
+      }
+
+      .eg-biz-overview {
+        margin-bottom: 1.25rem !important;
+      }
+
+      .eg-cta {
+        position: sticky;
+        bottom: 0.75rem;
+        z-index: 30;
+        padding: 0.75rem;
+        margin-bottom: 0 !important;
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(0, 57, 166, 0.35);
+        border-radius: 1.25rem;
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
+      }
+
+      .eg-cta a {
+        padding: 0.95rem 1.25rem !important;
+        font-size: 0.95rem !important;
+      }
+
+      .eg-stats {
+        display: none;
+      }
+    }
+
     .feature-icon {
       width: 90px;
       height: 90px;
@@ -369,20 +416,20 @@
         
         <!-- Logo -->
         <div class="mb-8 inline-block">
-          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 57, 166, 0.8));">
+          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="eg-hero-logo h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 57, 166, 0.8));">
         </div>
 
         <!-- Title -->
-        <h1 class="font-futuristic text-6xl md:text-8xl mb-6 futuristic-glow">
+        <h1 class="eg-hero-title font-futuristic text-6xl md:text-8xl mb-6 futuristic-glow">
           eGarage Chile
         </h1>
         
-        <p class="text-2xl md:text-3xl mb-8 font-light" style="color: #e0e0e0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+        <p class="eg-hero-subtitle text-2xl md:text-3xl mb-8 font-light" style="color: #e0e0e0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
           La plataforma definitiva para el sector automotriz en Chile
         </p>
 
         <!-- Tipos de Negocios - Quick Overview -->
-        <div class="mb-16 px-4" data-aos="fade-up" data-aos-delay="100">
+        <div class="eg-biz-overview mb-16 px-4" data-aos="fade-up" data-aos-delay="100">
           <div class="glass-card p-6 max-w-5xl mx-auto" style="overflow-x: auto;">
             <div class="flex flex-wrap gap-3 md:gap-4 justify-center items-center text-center min-w-max md:min-w-0">
               <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 57, 166, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 57, 166, 0.3);">
@@ -422,20 +469,20 @@
         </div>
 
         <!-- CTA Buttons -->
-        <div class="flex flex-wrap gap-6 justify-center mb-16">
+        <div class="eg-cta flex flex-wrap gap-6 justify-center mb-16">
           <a href="/cl/signup/" class="btn-primary">
             🚀 Comenzar Gratis
           </a>
           <a href="/cl/login/" class="btn-secondary">
             🔐 Ingresar
           </a>
-          <a href="/cl/precios/" class="btn-secondary">
+          <a href="/cl/es/precios/" class="btn-secondary">
             💰 Ver Planes
           </a>
         </div>
 
         <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20" data-aos="fade-up" data-aos-delay="200">
+        <div class="eg-stats grid grid-cols-1 md:grid-cols-3 gap-8 mt-20" data-aos="fade-up" data-aos-delay="200">
           <div class="glass-card p-8">
             <div class="stats-number">700+</div>
             <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Talleres Activos</p>
@@ -834,7 +881,7 @@
         <div>
           <h5 class="font-bold mb-4" style="color: #D52B1E;">Producto</h5>
           <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/cl/precios/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Precios</a></li>
+            <li><a href="/cl/es/precios/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Precios</a></li>
             <li><a href="/cl/demo/localizacion/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Demo</a></li>
             <li><a href="/cl/documentos/form/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Documentos</a></li>
           </ul>

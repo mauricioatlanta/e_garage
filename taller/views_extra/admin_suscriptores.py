@@ -27,6 +27,73 @@ from taller.utils.country_config import COUNTRY_SETTINGS
 
 logger = logging.getLogger(__name__)
 
+# Ordenación lista suscriptores (?ord=…)
+_ALLOWED_ORD = frozenset(
+    {
+        "empresa",
+        "-empresa",
+        "pais",
+        "-pais",
+        "plan",
+        "-plan",
+        "estado",
+        "-estado",
+        "dias",
+        "-dias",
+    }
+)
+
+
+def _next_ord_value(current: str, field: str) -> str:
+    """Alterna asc / desc al pulsar el mismo encabezado."""
+    if current == field:
+        return f"-{field}"
+    if current == f"-{field}":
+        return field
+    return field
+
+
+def _sort_querystring(request, new_ord: str) -> str:
+    q = request.GET.copy()
+    q["ord"] = new_ord
+    q.pop("page", None)
+    return "?" + q.urlencode()
+
+
+def _estado_sort_rank(empresa: Empresa) -> int:
+    return {"vencida": 0, "critico": 1, "advertencia": 2, "activa": 3}.get(
+        empresa.estado_suscripcion, 9
+    )
+
+
+def _apply_empresas_sort(empresas_list: list, ord_param: str) -> None:
+    """Ordena in-place la lista de empresas (ya materializada)."""
+    if ord_param == "empresa":
+        empresas_list.sort(key=lambda e: (e.nombre_taller or "").lower())
+    elif ord_param == "-empresa":
+        empresas_list.sort(key=lambda e: (e.nombre_taller or "").lower(), reverse=True)
+    elif ord_param == "pais":
+        empresas_list.sort(key=lambda e: (e.pais or "").upper())
+    elif ord_param == "-pais":
+        empresas_list.sort(key=lambda e: (e.pais or "").upper(), reverse=True)
+    elif ord_param == "plan":
+        empresas_list.sort(key=lambda e: (e.plan or "").lower())
+    elif ord_param == "-plan":
+        empresas_list.sort(key=lambda e: (e.plan or "").lower(), reverse=True)
+    elif ord_param == "estado":
+        empresas_list.sort(key=_estado_sort_rank)
+    elif ord_param == "-estado":
+        empresas_list.sort(key=_estado_sort_rank, reverse=True)
+    elif ord_param == "dias":
+        empresas_list.sort(key=lambda e: e.dias_restantes if e.dias_restantes is not None else -1)
+    elif ord_param == "-dias":
+        empresas_list.sort(
+            key=lambda e: e.dias_restantes if e.dias_restantes is not None else -1,
+            reverse=True,
+        )
+    else:
+        empresas_list.sort(key=lambda e: e.dias_restantes if e.dias_restantes is not None else 0)
+
 
 @staff_member_required
 def admin_suscriptores(request):
@@ -44,6 +111,10 @@ def admin_suscriptores(request):
         status_filter = request.GET.get("status", "")
         dias_filter = request.GET.get("dias", "")
         search_query = request.GET.get("search", "")
+        ord_raw = (request.GET.get("ord") or "").strip()
+        ord_param = ord_raw if ord_raw in _ALLOWED_ORD else ""
+        # Tras "Eliminar" en panel: user.is_active=False (baja lógica). Por defecto no listar esas filas.
+        incluir_bajas = request.GET.get("incluir_bajas") == "1"
 
         # Obtener todas las empresas con sus usuarios y suscripciones
         # Suscripcion está relacionada con User, no directamente con Empresa
@@ -52,10 +123,14 @@ def admin_suscriptores(request):
             empresas = Empresa.objects.select_related("user", "user__suscripcion").filter(
                 user__isnull=False
             )
+            if not incluir_bajas:
+                empresas = empresas.filter(user__is_active=True)
         except Exception as e:
             logger.error(f"Error al obtener empresas: {e}", exc_info=True)
             # Si hay error con select_related, intentar sin él
             empresas = Empresa.objects.filter(user__isnull=False)
+            if not incluir_bajas:
+                empresas = empresas.filter(user__is_active=True)
 
         # Aplicar filtros
         if pais_filter:
@@ -100,34 +175,46 @@ def admin_suscriptores(request):
             # Vencido: debe_bloquear = True
             empresas_list = [e for e in empresas_list if e.estado_suscripcion == "vencida"]
 
-        # Ordenar por días restantes (menos días primero)
-        empresas = sorted(
-            empresas_list, key=lambda e: e.dias_restantes if e.dias_restantes is not None else 0
-        )
+        _apply_empresas_sort(empresas_list, ord_param)
+        empresas = empresas_list
+
+        sort_href = {
+            field: _sort_querystring(request, _next_ord_value(ord_param, field))
+            for field in ("empresa", "pais", "plan", "estado")
+        }
 
         # Paginación
         paginator = Paginator(empresas, 25)  # 25 por página (empresas ya es una lista ordenada)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
 
-        # Estadísticas generales
-        total_empresas = Empresa.objects.count()
-        empresas_activas = Empresa.objects.filter(suscripcion_activa=True).count()
-        empresas_vencidas = Empresa.objects.filter(suscripcion_activa=False).count()
+        # Estadísticas generales (mismo alcance que el listado: usuarios activos salvo ?incluir_bajas=1)
+        _stats_base = Empresa.objects.filter(user__isnull=False)
+        if not incluir_bajas:
+            _stats_base = _stats_base.filter(user__is_active=True)
+        total_empresas = _stats_base.count()
+        empresas_activas = _stats_base.filter(suscripcion_activa=True).count()
+        empresas_vencidas = _stats_base.filter(suscripcion_activa=False).count()
 
         # Estadísticas por país
         stats_por_pais = {}
         for codigo, config in COUNTRY_SETTINGS.items():
+            q_pais = Empresa.objects.filter(pais=codigo, user__isnull=False)
+            if not incluir_bajas:
+                q_pais = q_pais.filter(user__is_active=True)
             stats_por_pais[codigo] = {
                 "nombre": config.get("name", codigo),
-                "total": Empresa.objects.filter(pais=codigo).count(),
-                "activas": Empresa.objects.filter(pais=codigo, suscripcion_activa=True).count(),
-                "vencidas": Empresa.objects.filter(pais=codigo, suscripcion_activa=False).count(),
+                "total": q_pais.count(),
+                "activas": q_pais.filter(suscripcion_activa=True).count(),
+                "vencidas": q_pais.filter(suscripcion_activa=False).count(),
             }
 
-        # Empresas críticas (menos de 5 días) - solo empresas con usuario
+        # Empresas críticas (menos de 5 días) - solo empresas con usuario activo en panel
         empresas_criticas = []
-        for e in Empresa.objects.filter(user__isnull=False):
+        _crit_qs = Empresa.objects.filter(user__isnull=False)
+        if not incluir_bajas:
+            _crit_qs = _crit_qs.filter(user__is_active=True)
+        for e in _crit_qs:
             try:
                 dias = e.dias_restantes
                 if dias is not None and 0 < dias < 5:
@@ -142,6 +229,9 @@ def admin_suscriptores(request):
             "status_filter": status_filter,
             "dias_filter": dias_filter,
             "search_query": search_query,
+            "ord": ord_param,
+            "sort_href": sort_href,
+            "incluir_bajas": incluir_bajas,
             "paises": COUNTRY_SETTINGS,
             "stats_por_pais": stats_por_pais,
             "total_empresas": total_empresas,
@@ -332,4 +422,98 @@ def actualizar_telefono_ajax(request, empresa_id):
         logger.error(f"Error actualizando teléfono: {e}", exc_info=True)
         return JsonResponse(
             {"success": False, "error": f"Error al actualizar teléfono: {str(e)}"}, status=500
+        )
+
+
+@staff_member_required
+@require_http_methods(["POST"])
+def desactivar_suscripcion_ajax(request, empresa_id):
+    """
+    Desactiva la suscripción comercial (empresa.suscripcion_activa=False).
+    No elimina usuario ni datos; el acceso puede quedar bloqueado por middleware.
+    """
+    empresa = get_object_or_404(Empresa.objects.select_related("user"), id=empresa_id)
+
+    try:
+        empresa.suscripcion_activa = False
+        empresa.save(update_fields=["suscripcion_activa"])
+
+        try:
+            suscripcion = empresa.user.suscripcion
+            if suscripcion:
+                suscripcion.activa = False
+                suscripcion.save(update_fields=["activa"])
+        except Suscripcion.DoesNotExist:
+            pass
+        except Exception as ex:
+            logger.warning(
+                "Suscripción no actualizada al desactivar empresa %s: %s", empresa_id, ex
+            )
+
+        logger.info(
+            "Admin %s desactivó suscripción empresa_id=%s (%s)",
+            getattr(request.user, "pk", None),
+            empresa_id,
+            empresa.nombre_taller,
+        )
+        return JsonResponse(
+            {
+                "success": True,
+                "message": "Suscripción desactivada correctamente.",
+            }
+        )
+    except Exception as e:
+        logger.error("Error desactivando suscripción %s: %s", empresa_id, e, exc_info=True)
+        return JsonResponse(
+            {"success": False, "error": f"No se pudo desactivar: {str(e)}"},
+            status=500,
+        )
+
+
+@staff_member_required
+@require_http_methods(["POST"])
+def eliminar_suscriptor_ajax(request, empresa_id):
+    """
+    Baja lógica: desactiva el usuario (is_active=False) y la suscripción.
+    No borra filas de Empresa/User (evita pérdida de datos y efectos en cascada no deseados).
+    """
+    empresa = get_object_or_404(Empresa.objects.select_related("user"), id=empresa_id)
+    user = empresa.user
+
+    try:
+        user.is_active = False
+        user.save(update_fields=["is_active"])
+
+        empresa.suscripcion_activa = False
+        empresa.save(update_fields=["suscripcion_activa"])
+
+        try:
+            suscripcion = user.suscripcion
+            if suscripcion:
+                suscripcion.activa = False
+                suscripcion.save(update_fields=["activa"])
+        except Suscripcion.DoesNotExist:
+            pass
+        except Exception as ex:
+            logger.warning(
+                "Suscripción no actualizada al dar de baja empresa %s: %s", empresa_id, ex
+            )
+
+        logger.warning(
+            "Admin %s dio de baja lógica usuario empresa_id=%s email=%s",
+            getattr(request.user, "pk", None),
+            empresa_id,
+            getattr(user, "email", ""),
+        )
+        return JsonResponse(
+            {
+                "success": True,
+                "message": "Usuario desactivado y suscripción cerrada (baja lógica).",
+            }
+        )
+    except Exception as e:
+        logger.error("Error en baja lógica suscriptor %s: %s", empresa_id, e, exc_info=True)
+        return JsonResponse(
+            {"success": False, "error": f"No se pudo completar la baja: {str(e)}"},
+            status=500,
         )

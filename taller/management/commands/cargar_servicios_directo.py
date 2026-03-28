@@ -29,7 +29,8 @@ from taller.servicios.models import (
 
 
 def cargar_servicios():
-    """Carga servicios básicos para todas las empresas"""
+    """Carga servicios básicos para todas las empresas. DEPRECADO: use cargar_catalogo_maestro."""
+    print("DEPRECADO: cargar_servicios_directo. Use: python manage.py cargar_catalogo_maestro")
     categorias = [
         {
             "code": "motor",

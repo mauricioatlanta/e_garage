@@ -15,6 +15,21 @@ from .views_migrated import DocumentoUpdateView as MigratedUpdateView
 from .api_repuestos import buscar_repuestos_api  # ✅ API de autocomplete para Alpine.js
 from . import views_seguimiento  # ✅ Vistas de seguimiento y memoria
 
+try:
+    from taller.desarme.views_pdf import (
+        compartir_documento_whatsapp,
+        descargar_documento_pdf,
+        enviar_documento_email,
+        imprimir_documento,
+        ver_documento_publico,
+    )
+except ImportError:
+    descargar_documento_pdf = None
+    imprimir_documento = None
+    ver_documento_publico = None
+    compartir_documento_whatsapp = None
+    enviar_documento_email = None
+
 # Comentado temporalmente - módulo no existe
 # sys.path.append(
 #     os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -130,6 +145,27 @@ urlpatterns = [
         views_inventory.validar_stock_documento,
         name="validar_stock_documento",
     ),
+    # Panel documento (imprimir, PDF, WhatsApp, email, público) — rutas antes de pk/pdf para prioridad
+]
+if descargar_documento_pdf is not None:
+    urlpatterns.extend(
+        [
+            path(
+                "<int:documento_id>/pdf/", descargar_documento_pdf, name="descargar_documento_pdf"
+            ),
+            path("<int:documento_id>/imprimir/", imprimir_documento, name="imprimir_documento"),
+            path(
+                "<int:documento_id>/whatsapp/",
+                compartir_documento_whatsapp,
+                name="compartir_documento_whatsapp",
+            ),
+            path(
+                "<int:documento_id>/email/", enviar_documento_email, name="enviar_documento_email"
+            ),
+            path("p/<str:token>/", ver_documento_publico, name="ver_documento_publico"),
+        ]
+    )
+urlpatterns += [
     # Generación y descarga de PDFs
     path("<int:pk>/pdf/", views_pdf.descargar_pdf_documento, name="descargar_pdf"),
     path(
@@ -171,6 +207,4 @@ urlpatterns = [
         views_seguimiento.crear_seguimiento_publico,
         name="crear_seguimiento_publico",
     ),
-    # Endpoint de diagnóstico
-    # path("lista-debug/", lista_debug, name="lista_debug"),  # Función no existe
 ]

@@ -1,5 +1,6 @@
 import logging
 from decimal import Decimal
+from urllib.parse import urlencode
 
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
@@ -69,12 +70,30 @@ def _compat_canonical_redirect(request, view_subpath: str, country: str | None =
     return None
 
 
+def _repuesto_document_cancel_url(request) -> str | None:
+    """
+    URL para volver al documento cuando se abrió crear/editar con ?next=...&target_row=...
+    Reaplica target_row en la query del documento para que la fila siga identificable.
+    """
+    next_url = (request.GET.get("next") or "").strip()
+    if not next_url.startswith("/") or next_url.startswith("//"):
+        return None
+    target_row = (request.GET.get("target_row") or "").strip()
+    if target_row:
+        sep = "&" if "?" in next_url else "?"
+        return f"{next_url}{sep}{urlencode({'target_row': target_row})}"
+    return next_url
+
+
 class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView):
     model = Repuesto
     select_related_fields = ("categoria",)
     paginate_by = 50
     ordering = ("nombre", "id")
-    template_name = "repuestos/repuesto_list.html"
+    template_name = "taller/common/repuestos/repuesto_list.html"
+
+    def get_template_names(self):
+        return ["taller/common/repuestos/repuesto_list.html", "repuestos/repuesto_list.html"]
 
     def dispatch(self, request, *args, **kwargs):
         compat_redirect = _compat_canonical_redirect(request, "repuestos:lista_repuestos")
@@ -182,6 +201,42 @@ class RepuestoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
         kwargs["user"] = self.request.user
         return kwargs
 
+    def get_initial(self):
+        initial = super().get_initial()
+        if self.request.GET.get("prefill_nombre"):
+            initial["nombre"] = self.request.GET.get("prefill_nombre")
+        if self.request.GET.get("prefill_code"):
+            initial["part_number"] = self.request.GET.get("prefill_code")
+        return initial
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        next_url = self.request.GET.get("next")
+        target_row = self.request.GET.get("target_row")
+
+        if next_url:
+            params = {
+                "created_repuesto_id": self.object.pk,
+                "created_repuesto_nombre": self.object.nombre or "",
+                "created_repuesto_codigo": getattr(self.object, "part_number", "") or "",
+                "created_repuesto_precio_venta": str(getattr(self.object, "precio_venta", 0) or 0),
+                "created_repuesto_precio_compra": str(
+                    getattr(self.object, "precio_compra", 0) or 0
+                ),
+            }
+            if target_row:
+                params["target_row"] = target_row
+
+            sep = "&" if "?" in next_url else "?"
+            return redirect(f"{next_url}{sep}{urlencode(params)}")
+
+        return response
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["repuesto_document_cancel_url"] = _repuesto_document_cancel_url(self.request)
+        return ctx
+
     def get_template_names(self):
         return ["taller/common/repuestos/repuesto_form.html", "taller/repuestos/repuesto_form.html"]
 
@@ -196,6 +251,11 @@ class RepuestoUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         return kwargs
+
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        ctx["repuesto_document_cancel_url"] = _repuesto_document_cancel_url(self.request)
+        return ctx
 
     def get_template_names(self):
         return ["taller/common/repuestos/repuesto_form.html", "taller/repuestos/repuesto_form.html"]

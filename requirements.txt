@@ -23,6 +23,13 @@ django-autocomplete-light>=3.9.7
 
 # Variables de Entorno
 python-dotenv>=1.0.0
+requests>=2.32.0
+
+# Gmail API (envío por HTTPS, sin SMTP)
+google-api-python-client
+google-auth
+google-auth-oauthlib
+google-auth-httplib2
 
 # Archivos Estáticos en Producción
 whitenoise>=6.5.0
@@ -40,9 +47,8 @@ gunicorn>=21.2.0
 Pillow>=10.0.0  # Para manejo de imágenes (logos, fotos)
 python-dateutil>=2.8.2
 
-# OCR para reconocimiento de patentes (EasyOCR - Open Source)
-easyocr>=1.7.0  # OCR con Deep Learning
-opencv-python-headless>=4.8.0  # Procesamiento de imágenes (sin GUI)
+# PDF (exportar documentos / reportes)
+weasyprint>=62.0  # HTML/CSS to PDF para /documentos/<id>/exportar_pdf/. En Linux: apt install libpango-1.0-0 libpangocairo-1.0-0 libgdk-pixbuf2.0-0
 
 # Testing (Desarrollo)
 pytest>=7.4.0

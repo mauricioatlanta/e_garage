@@ -14,8 +14,13 @@ def suspension(request):
         return redirect("account_login")
 
     try:
-        empresa = request.user.empresa
-    except Empresa.DoesNotExist:
+        from taller.utils.empresa import get_user_empresa_safe
+
+        empresa = get_user_empresa_safe(request.user)
+        if not empresa:
+            messages.error(request, "No se encontró información de empresa")
+            return redirect("taller:dashboard")
+    except Exception:
         messages.error(request, "No se encontró información de empresa")
         return redirect("taller:dashboard")
 
@@ -39,15 +44,20 @@ def suspension(request):
         },
     }
 
-    return render(request, "taller/suspension/suspension.html", context)
+    return render(request, "suspension/suspension.html", context)
 
 
 @login_required
 def subir_comprobante(request):
     """Vista para subir comprobante de pago"""
     try:
-        empresa = request.user.empresa
-    except Empresa.DoesNotExist:
+        from taller.utils.empresa import get_user_empresa_safe
+
+        empresa = get_user_empresa_safe(request.user)
+        if not empresa:
+            messages.error(request, "No se encontró información de empresa")
+            return redirect("taller:dashboard")
+    except Exception:
         messages.error(request, "No se encontró información de empresa")
         return redirect("taller:dashboard")
 
@@ -71,7 +81,7 @@ def subir_comprobante(request):
         "empresa": empresa,
     }
 
-    return render(request, "taller/suspension/subir_comprobante.html", context)
+    return render(request, "suspension/subir_comprobante.html", context)
 
 
 @login_required
@@ -95,6 +105,13 @@ def estado_suscripcion(request):
 def precios(request):
     """Vista pública con información de precios diferenciada por país"""
     from taller.models.precio_suscripcion import PrecioSuscripcion
+
+    def format_clp(value):
+        """Formato CLP: $20.000 (sin decimales)."""
+        try:
+            return f"${int(float(value)):,}".replace(",", ".")
+        except (TypeError, ValueError):
+            return "$0"
 
     # Detectar país del usuario desde la URL o empresa
     pais_usuario = "US"  # Default USA para la ruta /us/pricing/
@@ -393,22 +410,48 @@ def precios(request):
             ]
 
             planes = {
+                "prueba": {
+                    "nombre": "Prueba 30 días",
+                    "nombre_en": "30-Day Free Trial",
+                    "nombre_es": "Prueba 30 días",
+                    "precio": 0,
+                    "moneda": "CLP",
+                    "precio_formateado": format_clp(0),
+                    "caracteristicas": [
+                        "Acceso completo a todos los módulos por 30 días",
+                        "Sin tarjeta de crédito",
+                        "Soporte de onboarding inicial",
+                    ],
+                    "caracteristicas_en": [
+                        "Full access to all modules for 30 days",
+                        "No credit card required",
+                        "Initial onboarding support",
+                    ],
+                    "caracteristicas_es": [
+                        "Acceso completo a todos los módulos por 30 días",
+                        "Sin tarjeta de crédito",
+                        "Soporte de onboarding inicial",
+                    ],
+                },
                 "mensual": {
                     "nombre": "Plan Mensual",
                     "precio": 20000,
                     "moneda": "CLP",
+                    "precio_formateado": format_clp(20000),
                     "caracteristicas": caracteristicas_chile,
                 },
                 "semestral": {
                     "nombre": "Plan Semestral",
                     "precio": 100000,
                     "moneda": "CLP",
+                    "precio_formateado": format_clp(100000),
                     "caracteristicas": caracteristicas_chile,
                 },
                 "anual": {
                     "nombre": "Plan Anual",
                     "precio": 200000,
                     "moneda": "CLP",
+                    "precio_formateado": format_clp(200000),
                     "caracteristicas": caracteristicas_chile,
                 },
             }
@@ -439,7 +482,40 @@ def precios(request):
                 "caracteristicas": precio.caracteristicas_list(lang=lang),
                 "caracteristicas_en": precio.caracteristicas_list(lang="en"),
                 "caracteristicas_es": precio.caracteristicas_list(lang="es"),
-                "precio_formateado": precio.precio_formateado(),
+                "precio_formateado": (
+                    format_clp(precio.precio)
+                    if pais_usuario == "CL"
+                    else precio.precio_formateado()
+                ),
+            }
+
+        # Chile: asegurar plan gratis aunque la grilla venga de BD.
+        if pais_usuario == "CL" and "prueba" not in planes:
+            planes = {
+                "prueba": {
+                    "nombre": "Prueba 30 días",
+                    "nombre_en": "30-Day Free Trial",
+                    "nombre_es": "Prueba 30 días",
+                    "precio": 0,
+                    "moneda": "CLP",
+                    "precio_formateado": format_clp(0),
+                    "caracteristicas": [
+                        "Acceso completo a todos los módulos por 30 días",
+                        "Sin tarjeta de crédito",
+                        "Soporte de onboarding inicial",
+                    ],
+                    "caracteristicas_en": [
+                        "Full access to all modules for 30 days",
+                        "No credit card required",
+                        "Initial onboarding support",
+                    ],
+                    "caracteristicas_es": [
+                        "Acceso completo a todos los módulos por 30 días",
+                        "Sin tarjeta de crédito",
+                        "Soporte de onboarding inicial",
+                    ],
+                },
+                **planes,
             }
 
     # Información de contacto según el país
@@ -488,4 +564,4 @@ def precios(request):
         "es_mexico": pais_usuario == "MX",
     }
 
-    return render(request, "taller/suspension/precios.html", context)
+    return render(request, "suspension/precios.html", context)

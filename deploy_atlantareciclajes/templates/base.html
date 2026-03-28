@@ -13,7 +13,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="eGarage">
-  <link rel="manifest" href="{% static 'manifest.json' %}">
+  <link rel="manifest" href="/{{ country_code|lower|default:'cl' }}/{{ lang_code|lower|default:'es' }}/manifest.json">
   <link rel="apple-touch-icon" href="{% static 'images/egarage_default_logo.png' %}">
 
   {# --- Catálogo i18n --- #}

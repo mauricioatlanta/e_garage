@@ -13,6 +13,8 @@ from django.conf import settings
 from django.http import HttpResponseRedirect
 from django.utils.deprecation import MiddlewareMixin
 
+from taller.utils.empresa import get_user_empresa_safe
+
 log = logging.getLogger(__name__)
 
 # Idiomas reconocidos en el path (es, en)
@@ -86,9 +88,9 @@ class SimpleCountryRedirectMiddleware(MiddlewareMixin):
 
         # 1) Fallbacks
         if not empresa:
-            empresa = getattr(request, "empresa", None) or getattr(
-                getattr(request, "user", None), "empresa", None
-            )
+            empresa = getattr(request, "empresa", None)
+            if not empresa:
+                empresa = get_user_empresa_safe(getattr(request, "user", None))
 
         if not empresa:
             return None

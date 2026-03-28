@@ -1,0 +1,428 @@
+{% extends "base.html" %}
+
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}Onboarding - {{ empresa.nombre_taller }}{% endblock %}
+
+{% block extra_head %}
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;600;700&display=swap');
+
+:root {
+    --neon-cyan: #00ffff;
+    --neon-purple: #b026ff;
+    --neon-pink: #ff00ff;
+    --dark-bg: #0a0e27;
+    --dark-card: #151932;
+    --dark-border: #1e2447;
+    --text-primary: #ffffff;
+    --text-secondary: #a0aec0;
+}
+
+.onboarding-page {
+    background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0f1629 100%);
+    background-attachment: fixed;
+    font-family: 'Rajdhani', sans-serif;
+    color: var(--text-primary);
+    min-height: calc(100vh - 60px);
+    position: relative;
+    overflow-x: hidden;
+}
+
+.onboarding-page::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(0, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.onboarding-container {
+    max-width: 860px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2;
+}
+
+.onboarding-progress {
+    background: rgba(21, 25, 50, 0.70);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 255, 255, 0.20);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 18px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.progress-bar {
+    height: 8px;
+    background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+}
+
+.step-indicator {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.step-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(10, 14, 39, 0.6);
+    color: var(--text-secondary);
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.step-circle.active {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(176, 38, 255, 0.2) 100%);
+    border: 1px solid var(--neon-cyan);
+    color: var(--text-primary);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.25);
+}
+
+.step-circle.completed {
+    background: rgba(0, 255, 255, 0.10);
+    border: 1px solid rgba(0, 255, 255, 0.35);
+    color: var(--neon-cyan);
+}
+
+.step-card {
+    background: rgba(21, 25, 50, 0.70);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 255, 255, 0.20);
+    border-radius: 18px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    padding: 18px;
+    margin-bottom: 18px;
+}
+
+.step-card h3,
+.step-card h4,
+.step-card h5,
+.step-card h6 {
+    color: var(--text-primary);
+}
+
+.step-card p,
+.step-card .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+.onb-control {
+    background: rgba(10, 14, 39, 0.6) !important;
+    border: 1px solid rgba(0, 255, 255, 0.3) !important;
+    color: var(--text-primary) !important;
+    border-radius: 10px !important;
+    padding: 0.875rem 1.25rem !important;
+    font-family: 'Rajdhani', sans-serif !important;
+}
+
+.onb-control::placeholder {
+    color: rgba(160, 174, 192, 0.5) !important;
+}
+
+.onb-control:focus {
+    background: rgba(10, 14, 39, 0.8) !important;
+    border-color: var(--neon-cyan) !important;
+    box-shadow: 0 0 0 0.2rem rgba(0, 255, 255, 0.25), 0 0 20px rgba(0, 255, 255, 0.3) !important;
+}
+
+.onb-label {
+    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-family: 'Rajdhani', sans-serif;
+}
+
+.btn-onboarding {
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.2) 0%, rgba(176, 38, 255, 0.2) 100%);
+    border: 2px solid var(--neon-cyan);
+    border-radius: 12px;
+    padding: 1rem 2.5rem;
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 1.05rem;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-family: 'Rajdhani', sans-serif;
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+}
+
+.btn-onboarding:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(0, 255, 255, 0.5), 0 0 40px rgba(176, 38, 255, 0.4);
+    border-color: var(--neon-purple);
+    background: linear-gradient(135deg, rgba(0, 255, 255, 0.3) 0%, rgba(176, 38, 255, 0.3) 100%);
+}
+
+.onb-btn-secondary {
+    border-radius: 12px;
+    border: 2px solid rgba(160, 174, 192, 0.3) !important;
+    color: var(--text-secondary) !important;
+    background: rgba(160, 174, 192, 0.1) !important;
+    font-weight: 600;
+}
+
+.onb-btn-secondary:hover {
+    background: rgba(160, 174, 192, 0.2) !important;
+    border-color: rgba(160, 174, 192, 0.5) !important;
+    color: var(--text-primary) !important;
+    transform: translateY(-2px);
+}
+
+.onb-card {
+    background: rgba(21, 25, 50, 0.7) !important;
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 255, 255, 0.2) !important;
+    border-radius: 16px !important;
+    overflow: hidden;
+}
+
+.onb-card .card-header {
+    background: rgba(21, 25, 50, 0.6) !important;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.15) !important;
+    color: var(--text-primary);
+}
+
+.onb-preview-frame {
+    max-height: 420px;
+    overflow-y: auto;
+    background: #ffffff;
+    color: #0b1020;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    padding: 12px;
+    border-radius: 12px;
+}
+
+@media (max-width: 480px) {
+    .step-card {
+        padding: 14px;
+    }
+
+    .step-circle {
+        width: 34px;
+        height: 34px;
+        font-size: 13px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-5 onboarding-page" data-onboarding-step="{{ paso_actual }}">
+    <div class="onboarding-container">
+        <!-- Header -->
+        <div class="text-center mb-4">
+            <h1 class="h2 text-primary mb-2" style="font-family: 'Orbitron', sans-serif; letter-spacing: 1px; text-transform: uppercase;">
+                Configuración Inicial
+            </h1>
+            <p class="text-muted">Completa estos pasos para empezar a usar eGarage</p>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="onboarding-progress">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <span class="text-muted">Progreso</span>
+                <span class="fw-bold">{{ progreso|floatformat:0 }}%</span>
+            </div>
+            <div class="progress" style="height: 8px;">
+                <div class="progress-bar" data-progress="{{ progreso }}"></div>
+            </div>
+
+            <!-- Step Indicators -->
+            <div class="step-indicator">
+                <div class="step-circle {% if paso_actual >= 1 %}active{% endif %} {% if paso_actual > 1 %}completed{% endif %}">1</div>
+                <div class="step-circle {% if paso_actual >= 2 %}active{% endif %} {% if paso_actual > 2 %}completed{% endif %}">2</div>
+                <div class="step-circle {% if paso_actual >= 3 %}active{% endif %} {% if paso_actual > 3 %}completed{% endif %}">3</div>
+            </div>
+        </div>
+
+        <!-- Step Content -->
+        <div class="step-card">
+            {% block step_content %}{% endblock %}
+        </div>
+
+        <!-- Navigation -->
+        <div class="d-flex justify-content-between">
+            {% if paso_actual > 1 %}
+            <button type="button" class="btn onb-btn-secondary" onclick="irAPasoAnterior()">
+                ← Anterior
+            </button>
+            {% else %}
+            <div></div>
+            {% endif %}
+
+            <div>
+                {% if paso_actual < 3 %}
+                <button type="button" class="btn btn-onboarding" onclick="guardarYSiguiente()">
+                    Siguiente →
+                </button>
+                {% else %}
+                <button type="button" class="btn btn-success btn-onboarding" onclick="finalizarOnboarding()">
+                    ¡Comenzar a usar eGarage!
+                </button>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Modal -->
+<div class="modal fade" id="loadingModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-body text-center p-4">
+                <div class="spinner-border text-primary mb-3" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+                <h5>Guardando...</h5>
+                <p class="text-muted mb-0">Por favor espera un momento</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentStep = Number(document.querySelector('[data-onboarding-step]')?.dataset?.onboardingStep || 1);
+
+document.addEventListener('DOMContentLoaded', function () {
+    const bar = document.querySelector('.onboarding-progress .progress-bar');
+    const p = Number(bar?.dataset?.progress || 0);
+    if (bar) {
+        bar.style.width = `${p}%`;
+    }
+});
+
+function irAPasoAnterior() {
+    const prev = Math.max(1, currentStep - 1);
+    irAPaso(prev);
+}
+
+function mostrarLoading() {
+    // Check if jQuery/Bootstrap modal is available
+    if (typeof $ !== 'undefined' && typeof $.fn.modal !== 'undefined') {
+        $('#loadingModal').modal('show');
+    }
+}
+
+function ocultarLoading() {
+    if (typeof $ !== 'undefined' && typeof $.fn.modal !== 'undefined') {
+        $('#loadingModal').modal('hide');
+    }
+}
+
+function irAPaso(paso) {
+    const stepMap = {
+        1: 'identidad',
+        2: 'fiscal',
+        3: 'finalizar'
+    };
+
+    const stepName = stepMap[paso];
+    if (stepName) {
+        window.location.href = `/onboarding/${stepName}/`;
+    } else {
+        window.location.href = `/onboarding/`;
+    }
+}
+
+function guardarYSiguiente() {
+    mostrarLoading();
+
+    const form = document.querySelector('form');
+    let formData;
+    
+    if (form) {
+        formData = new FormData(form);
+    } else {
+        formData = new FormData();
+    }
+    
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
+    formData.append('csrfmiddlewaretoken', csrfToken);
+
+    fetch(`/onboarding/guardar/${currentStep}/`, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': csrfToken
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        ocultarLoading();
+
+        if (data.success) {
+            if (data.next_step_url) {
+                window.location.href = data.next_step_url;
+            } else if (data.next_step) {
+                irAPaso(data.next_step);
+            }
+        } else {
+            // Mostrar errores
+            if (data.errors) {
+                let errorMsg = 'Por favor corrige los errores:\n';
+                for (let field in data.errors) {
+                    errorMsg += `- ${field}: ${data.errors[field].join(', ')}\n`;
+                }
+                alert(errorMsg);
+            } else {
+                alert(data.message || 'Error al guardar');
+            }
+        }
+    })
+    .catch(error => {
+        ocultarLoading();
+        alert('Error de conexión. Inténtalo de nuevo.');
+        console.error('Error:', error);
+    });
+}
+
+function finalizarOnboarding() {
+    mostrarLoading();
+
+    fetch(`/onboarding/guardar/${currentStep}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        ocultarLoading();
+
+        if (data.success && data.completed) {
+            // Redirigir al dashboard
+            window.location.href = data.redirect_url;
+        } else {
+            alert(data.message || 'Error al finalizar');
+        }
+    })
+    .catch(error => {
+        ocultarLoading();
+        alert('Error de conexión. Inténtalo de nuevo.');
+        console.error('Error:', error);
+    });
+}
+</script>
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "onboarding/base.html" %}
+
+{% block step_content %}
+<h3 class="h4 mb-4">Paso 4: Configura tu Equipo</h3>
+<p class="text-muted mb-4">Agrega al menos un técnico o vendedor para comenzar</p>
+
+<!-- Lista de técnicos existentes -->
+<div id="tecnicosList" class="mb-4">
+    <h5>Técnicos Registrados</h5>
+    {% for tecnico in tecnicos %}
+    <div class="tecnico-item">
+        <div>
+            <strong>{{ tecnico.nombre }}</strong>
+            {% if tecnico.especialidad %} - {{ tecnico.especialidad }}{% endif %}
+        </div>
+        <span class="badge bg-success">Registrado</span>
+    </div>
+    {% empty %}
+    <p class="text-muted">Aún no has registrado técnicos.</p>
+    {% endfor %}
+</div>
+
+<!-- Formulario para agregar técnico -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">Agregar Técnico</h5>
+    </div>
+    <div class="card-body">
+        <form id="tecnicoForm">
+            {% csrf_token %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="id_nombre" class="form-label">Nombre Completo *</label>
+                        <input type="text" class="form-control" id="id_nombre" name="nombre" required>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="id_especialidad" class="form-label">Especialidad</label>
+                        <select class="form-select" id="id_especialidad" name="especialidad">
+                            <option value="">General</option>
+                            <option value="Mecánico">Mecánico</option>
+                            <option value="Electricista">Electricista</option>
+                            <option value="Pintor">Pintor</option>
+                            <option value="Carrocería">Carrocería</option>
+                            <option value="Vendedor">Vendedor</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="id_telefono" class="form-label">Teléfono</label>
+                        <input type="tel" class="form-control" id="id_telefono" name="telefono">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="id_email" name="email">
+                    </div>
+                </div>
+            </div>
+            <button type="button" class="btn btn-primary" onclick="agregarTecnico()">
+                <i class="fas fa-plus"></i> Agregar Técnico
+            </button>
+        </form>
+    </div>
+</div>
+
+<div class="alert alert-warning">
+    <h6><i class="fas fa-exclamation-triangle"></i> Requerido</h6>
+    <p class="mb-0">Debes tener al menos un técnico registrado para poder continuar con la configuración.</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script>
+function agregarTecnico() {
+    const form = document.getElementById('tecnicoForm');
+    const formData = new FormData(form);
+
+    mostrarLoading();
+
+    fetch('/onboarding/agregar-tecnico/', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        ocultarLoading();
+
+        if (data.success) {
+            // Limpiar formulario
+            form.reset();
+
+            // Agregar técnico a la lista
+            const tecnicosList = document.getElementById('tecnicosList');
+            const newTecnico = document.createElement('div');
+            newTecnico.className = 'tecnico-item';
+            newTecnico.innerHTML = `
+                <div>
+                    <strong>${data.tecnico.nombre}</strong>
+                    ${data.tecnico.especialidad ? ' - ' + data.tecnico.especialidad : ''}
+                </div>
+                <span class="badge bg-success">Registrado</span>
+            `;
+            tecnicosList.appendChild(newTecnico);
+
+            // Mostrar mensaje de éxito
+            alert(data.message);
+        } else {
+            alert(data.message || 'Error al agregar técnico');
+        }
+    })
+    .catch(error => {
+        ocultarLoading();
+        alert('Error de conexión. Inténtalo de nuevo.');
+        console.error('Error:', error);
+    });
+}
+</script>
+{% endblock %}

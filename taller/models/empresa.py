@@ -136,6 +136,20 @@ class Empresa(models.Model):
     # notificado_1_dia_en = models.DateTimeField(null=True, blank=True)
     # notificado_vencido_en = models.DateTimeField(null=True, blank=True)
 
+    # Campos de onboarding
+    onboarding_completado = models.BooleanField(
+        default=False, help_text="Indica si el usuario ha completado el proceso de onboarding"
+    )
+    onboarding_step = models.PositiveIntegerField(
+        default=1, help_text="Paso actual del proceso de onboarding (1-5)"
+    )
+    onboarding_started_at = models.DateTimeField(
+        null=True, blank=True, help_text="Fecha y hora en que comenzó el onboarding"
+    )
+    onboarding_completed_at = models.DateTimeField(
+        null=True, blank=True, help_text="Fecha y hora en que se completó el onboarding"
+    )
+
     def __str__(self):
         return self.nombre_taller
 

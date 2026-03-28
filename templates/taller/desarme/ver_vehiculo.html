@@ -1,0 +1,194 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+{% load humanize %}
+
+{% block page_title %}{% trans "Desarme" %} – {{ vehiculo.patente|default:vehiculo.vin|default:vehiculo.id }}{% endblock %}
+{% block page_subtitle %}{% trans "Centro operativo del vehículo" %}{% endblock %}
+{% block page_icon %}🔧{% endblock %}
+
+{% block page_extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ds-cyan: #06b6d4;
+  --ds-radius: 16px;
+  --ds-radius-sm: 12px;
+}
+.ds-font { font-family: 'Orbitron', monospace; }
+.glass-panel {
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(6, 182, 212, 0.28);
+  border-radius: var(--ds-radius);
+  box-shadow: 0 0 20px rgba(6, 182, 212, 0.12);
+}
+.resumen-card {
+  padding: 14px 18px;
+  text-align: center;
+  border-radius: var(--ds-radius-sm);
+  border: 1px solid rgba(6, 182, 212, 0.28);
+  background: rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.resumen-card:hover { transform: translateY(-2px); box-shadow: 0 0 18px rgba(6, 182, 212, 0.18); }
+.resumen-card .valor { font-family: 'Orbitron', monospace; font-size: 1.35rem; font-weight: 700; color: var(--ds-cyan); }
+.resumen-card .etiqueta { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.12em; margin-top: 4px; }
+.btn-scanner { background: linear-gradient(135deg, rgba(6, 182, 212, 0.9), rgba(16, 185, 129, 0.8)); color: white; border: 1px solid rgba(255,255,255,0.2); font-weight: 700; padding: 12px 20px; box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); transition: all 0.2s; }
+.btn-scanner:hover { filter: brightness(1.1); color: white; box-shadow: 0 0 28px rgba(6, 182, 212, 0.4); }
+.btn-action { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--ds-radius-sm); font-weight: 600; font-size: 14px; transition: all 0.2s; }
+.btn-action-cyan { background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.5); }
+.btn-action-cyan:hover { background: rgba(6, 182, 212, 0.35); color: #a5f3fc; }
+.btn-action-outline { background: transparent; color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); }
+.btn-action-outline:hover { background: rgba(148, 163, 184, 0.15); color: #e2e8f0; }
+.badge-estado { padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
+.badge-disponible { border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; background: rgba(16, 185, 129, 0.1); }
+.badge-danada { border: 1px solid rgba(244, 63, 94, 0.5); color: #f43f5e; background: rgba(244, 63, 94, 0.1); }
+.badge-faltante { border: 1px solid rgba(100, 116, 139, 0.5); color: #94a3b8; background: rgba(100, 116, 139, 0.1); }
+.badge-reservada { border: 1px solid rgba(245, 158, 11, 0.5); color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
+.badge-vendida { border: 1px solid rgba(59, 130, 246, 0.5); color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
+.tabla-piezas thead th { font-family: 'Orbitron', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ds-cyan); }
+.tabla-piezas tbody tr { border-bottom: 1px solid rgba(6, 182, 212, 0.08); transition: background 0.15s; }
+.tabla-piezas tbody tr:hover { background: rgba(6, 182, 212, 0.04); }
+@media (max-width: 640px) {
+  .resumen-card .valor { font-size: 1.15rem; }
+  .resumen-card { padding: 10px 12px; }
+}
+</style>
+{% endblock %}
+
+{% block main_actions %}
+<div class="flex flex-wrap gap-3">
+  <a href="{% country_url 'desarme:scanner_vehiculo' vehiculo.pk %}" class="btn-action btn-scanner">
+    📡 {% trans "Abrir escáner de inventario" %}
+  </a>
+  <a href="{% country_url 'desarme:inventario_inteligente' vehiculo.pk %}" class="btn-action btn-action-cyan">
+    📦 {% trans "Inventario inteligente" %}
+  </a>
+  <a href="{% country_url 'desarme:inventario_vehiculo' vehiculo.pk %}" class="btn-action btn-action-outline">
+    📋 {% trans "Ver inventario clásico" %}
+  </a>
+  <a href="{% country_url 'desarme:editar_vehiculo' vehiculo.pk %}" class="btn-action btn-action-cyan">
+    ✏️ {% trans "Editar vehículo" %}
+  </a>
+  <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-outline">
+    ➕ {% trans "Nueva pieza manual" %}
+  </a>
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="btn-action btn-action-outline">
+    ← {% trans "Listado" %}
+  </a>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+{# Resumen operativo: métricas del vehículo #}
+<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
+  <div class="glass-panel resumen-card">
+    <div class="valor">{{ piezas_activas_count }}</div>
+    <div class="etiqueta">{% trans "Piezas activas" %}</div>
+  </div>
+  <div class="glass-panel resumen-card">
+    <div class="valor text-emerald-400">{{ disponibles }}</div>
+    <div class="etiqueta">{% trans "Disponibles" %}</div>
+  </div>
+  <div class="glass-panel resumen-card">
+    <div class="valor text-rose-400">{{ danadas }}</div>
+    <div class="etiqueta">{% trans "Dañadas" %}</div>
+  </div>
+  <div class="glass-panel resumen-card">
+    <div class="valor text-slate-400">{{ faltantes }}</div>
+    <div class="etiqueta">{% trans "Faltantes" %}</div>
+  </div>
+  {% if piezas_vendidas_count %}
+  <div class="glass-panel resumen-card">
+    <div class="valor text-blue-400">{{ piezas_vendidas_count }}</div>
+    <div class="etiqueta">{% trans "Vendidas" %}</div>
+  </div>
+  {% endif %}
+  <div class="glass-panel resumen-card">
+    <div class="valor text-lime-400">
+      {% if request.path|slice:":4" == "/us/" %}
+        ${{ valor_potencial|floatformat:2|intcomma }}
+      {% else %}
+        ${{ valor_potencial|floatformat:0|intcomma }}
+      {% endif %}
+    </div>
+    <div class="etiqueta">{% trans "Valor potencial" %}</div>
+  </div>
+</div>
+
+{# Header detalle vehículo #}
+<div class="glass-panel p-6 mb-6">
+  <h2 class="ds-font text-xl text-cyan-300 mb-4">{{ vehiculo.patente|default:vehiculo.vin|default:vehiculo.id }} — {{ vehiculo.get_marca_display|default:"" }} {{ vehiculo.get_modelo_display|default:"" }}</h2>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+    <div><span class="text-slate-400">{% trans "Año" %}:</span> <span class="text-white">{{ vehiculo.anio|default:"—" }}</span></div>
+    <div><span class="text-slate-400">{% trans "VIN" %}:</span> <span class="text-white font-mono text-xs">{{ vehiculo.vin|default:"—" }}</span></div>
+    <div><span class="text-slate-400">{% trans "Estado" %}:</span> <span class="text-white">{{ vehiculo.estado_desarme|default:"—" }}</span></div>
+    <div><span class="text-slate-400">{% trans "Ubicación" %}:</span> <span class="text-white">{{ vehiculo.ubicacion_fisica|default:"—" }}</span></div>
+    <div><span class="text-slate-400">{% trans "Ingreso" %}:</span> <span class="text-white">{{ vehiculo.fecha_ingreso_desarme|default:"—" }}</span></div>
+    <div><span class="text-slate-400">{% trans "Costo adq." %}:</span> <span class="text-white">{{ vehiculo.costo_adquisicion|default:"—" }}</span></div>
+  </div>
+  {% if vehiculo.observaciones_desarme %}
+  <p class="mt-4 text-slate-400 text-sm border-t border-cyan-400/10 pt-4">{{ vehiculo.observaciones_desarme }}</p>
+  {% endif %}
+</div>
+
+{# Piezas: tabla premium o resumen #}
+<h3 class="ds-font text-lg text-cyan-300 mb-3">{% trans "Piezas" %} ({{ piezas.count }})</h3>
+<p class="text-slate-500 text-sm mb-4">{% trans "Recomendado: usar el escáner para revisar y valorizar piezas." %}</p>
+{% if piezas %}
+<div class="glass-panel overflow-hidden rounded-2xl">
+  <div class="overflow-x-auto">
+    <table class="min-w-full text-sm tabla-piezas">
+      <thead class="bg-black/50">
+        <tr>
+          <th class="px-4 py-3 text-left">{% trans "Código" %}</th>
+          <th class="px-4 py-3 text-left">{% trans "Nombre" %}</th>
+          <th class="px-4 py-3 text-right">{% trans "Precio sug." %}</th>
+          <th class="px-4 py-3 text-center">{% trans "Estado" %}</th>
+          <th class="px-4 py-3"></th>
+        </tr>
+      </thead>
+      <tbody class="text-slate-300">
+        {% for p in piezas %}
+        <tr>
+          <td class="px-4 py-2.5 font-mono text-xs text-slate-400">{{ p.codigo }}</td>
+          <td class="px-4 py-2.5 text-white">{{ p.display_nombre|default:p.nombre }}</td>
+          <td class="px-4 py-2.5 text-right font-medium">
+            {% if request.path|slice:":4" == "/us/" %}
+              ${{ p.precio_venta_sugerido|floatformat:2|default:"—"|intcomma }}
+            {% else %}
+              ${{ p.precio_venta_sugerido|floatformat:0|default:"—"|intcomma }}
+            {% endif %}
+          </td>
+          <td class="px-4 py-2.5 text-center">
+            <span class="badge-estado
+              {% if p.estado_pieza == 'DISPONIBLE' %}badge-disponible
+              {% elif p.estado_pieza == 'DANADA' %}badge-danada
+              {% elif p.estado_pieza == 'FALTANTE' %}badge-faltante
+              {% elif p.estado_pieza == 'RESERVADA' %}badge-reservada
+              {% elif p.estado_pieza == 'VENDIDA' %}badge-vendida
+              {% else %}badge-faltante{% endif %}">
+              {{ p.get_estado_pieza_display|default:p.estado_pieza }}
+            </span>
+          </td>
+          <td class="px-4 py-2.5">
+            <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="text-cyan-400 hover:text-cyan-300 text-xs font-medium">{% trans "Editar" %}</a>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% else %}
+<div class="glass-panel p-8 text-center text-slate-400">
+  <p>{% trans "Sin piezas registradas." %}</p>
+  <div class="mt-4 flex flex-wrap justify-center gap-3">
+    <a href="{% country_url 'desarme:generar_inventario' vehiculo.pk %}" class="btn-action btn-scanner">📡 {% trans "Generar inventario" %}</a>
+    <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-cyan">➕ {% trans "Agregar pieza" %}</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
