@@ -7,6 +7,7 @@ from taller.models.configuracion import ConfiguracionEmpresa
 class OnboardingIdentidadForm(forms.ModelForm):
     """Paso 1: Identidad de la empresa"""
 
+    nombre_taller = forms.CharField(required=False, label=_("Nombre del Taller"))
     lema = forms.CharField(required=False, label=_("Lema"))
 
     class Meta:
@@ -37,6 +38,10 @@ class OnboardingIdentidadForm(forms.ModelForm):
                 pass
 
     def save(self, commit=True):
+        nombre_taller = (self.cleaned_data.get("nombre_taller") or "").strip()
+        if not nombre_taller and self.instance and getattr(self.instance, "pk", None):
+            self.cleaned_data["nombre_taller"] = self.instance.nombre_taller
+
         empresa = super().save(commit=commit)
         lema = (self.cleaned_data.get("lema") or "").strip()
         if commit:

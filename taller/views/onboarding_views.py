@@ -50,9 +50,12 @@ def onboarding_wizard(request, step=None):
         except:
             return redirect("/configuracion/")
 
-    # Si ya completó el onboarding, redirigir al dashboard
+    # Si ya completó el onboarding, redirigir a Ajustes
     if getattr(empresa, "onboarding_completado", False):
-        return redirect("taller:dashboard")
+        return redirect("taller:company_settings")
+
+    if step == "identidad" and getattr(empresa, "onboarding_step", 1) > 1:
+        return redirect("taller:company_settings")
 
     # Mapear nombres de pasos a números (wizard simplificado)
     step_map = {

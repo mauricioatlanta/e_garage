@@ -10,9 +10,9 @@
     <div class="row">
         <div class="col-md-6">
             <div class="mb-3">
-                <label for="id_nombre_taller" class="form-label onb-label">Nombre del Taller *</label>
+                <label for="id_nombre_taller" class="form-label onb-label">Nombre del Taller</label>
                 <input type="text" class="form-control onb-control" id="id_nombre_taller" name="nombre_taller"
-                       value="{{ empresa.nombre_taller }}" required>
+                       value="{{ empresa.nombre_taller }}">
             </div>
 
         </div>
@@ -22,26 +22,6 @@
                 <label for="id_lema" class="form-label onb-label">Lema</label>
                 <input type="text" class="form-control onb-control" id="id_lema" name="lema"
                        value="{{ form.lema.value|default:'' }}">
-            </div>
-
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-md-6">
-            <div></div>
-        </div>
-
-        <div class="col-md-6">
-            <div class="mb-3">
-                <label for="id_zona_horaria" class="form-label onb-label">Zona Horaria</label>
-                <select class="form-select onb-control" id="id_zona_horaria" name="zona_horaria">
-                    {% for tz_value, tz_label in empresa.TIMEZONE_CHOICES %}
-                    <option value="{{ tz_value }}" {% if empresa.zona_horaria == tz_value %}selected{% endif %}>
-                        {{ tz_label }}
-                    </option>
-                    {% endfor %}
-                </select>
             </div>
 
         </div>
