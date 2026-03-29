@@ -24,6 +24,7 @@ from django.views.decorators.http import require_GET
 
 from taller.auth.decorators import login_required_default
 from taller.middleware.rate_limiting import rate_limit
+from taller.services.empresa_service import get_empresa_safe
 
 from .ai_reports import AIReportEngine, ReportExporter
 
@@ -34,7 +35,8 @@ def dashboard_ai_view(request):
     """Dashboard principal con AI Analytics"""
 
     # Verificar que el usuario tenga una empresa asociada
-    if not hasattr(request.user, "empresa") or not request.user.empresa:
+    empresa = get_empresa_safe(request)
+    if not empresa:
         from django.http import HttpResponseNotFound
         from django.shortcuts import render
 
@@ -49,17 +51,15 @@ def dashboard_ai_view(request):
 
     try:
         # Obtener datos del motor de reportes AI
-        engine = AIReportEngine(request.user.empresa)
+        engine = AIReportEngine(empresa)
         analytics_data = engine.get_dashboard_data()
 
         context = {
             "analytics": analytics_data,
-            "user_country": request.user.empresa.pais,
-            "is_usa": request.user.empresa.pais == "US",
+            "user_country": empresa.pais,
+            "is_usa": empresa.pais == "US",
             "page_title": (
-                "AI Analytics Dashboard"
-                if request.user.empresa.pais == "US"
-                else "Dashboard AI Analytics"
+                "AI Analytics Dashboard" if empresa.pais == "US" else "Dashboard AI Analytics"
             ),
         }
 
@@ -84,7 +84,10 @@ def revenue_analytics_api(request):
     """API para gráficas de ingresos en tiempo real"""
 
     periodo = int(request.GET.get("periodo", 30))
-    engine = AIReportEngine(request.user.empresa)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
+    engine = AIReportEngine(empresa)
 
     data = {
         "revenue_timeline": engine._get_revenue_timeline(periodo),
@@ -101,7 +104,10 @@ def revenue_analytics_api(request):
 def vehicle_analytics_api(request):
     """API para analytics de vehículos"""
 
-    engine = AIReportEngine(request.user.empresa)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
+    engine = AIReportEngine(empresa)
 
     data = {
         "distribution": engine._get_vehicle_distribution(),
@@ -117,7 +123,10 @@ def vehicle_analytics_api(request):
 def clientes_analytics_api(request):
     """API para analytics de clientes"""
 
-    engine = AIReportEngine(request.user.empresa)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
+    engine = AIReportEngine(empresa)
 
     data = {
         "distribution": engine._get_clientes_distribution(),
@@ -134,7 +143,10 @@ def clientes_analytics_api(request):
 def predictive_analytics_api(request):
     """API para predicciones con IA - Protegida con rate limiting estricto"""
 
-    engine = AIReportEngine(request.user.empresa)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
+    engine = AIReportEngine(empresa)
 
     data = {
         "predictions": engine._get_predictive_data(),
@@ -161,7 +173,12 @@ class AIInsightView(View):
             insight_type = data.get("type")
             timeframe = data.get("timeframe", 30)
 
-            engine = AIReportEngine(request.user.empresa)
+            empresa = get_empresa_safe(request)
+            if not empresa:
+                return JsonResponse(
+                    {"status": "error", "message": "Usuario sin empresa asociada"}, status=400
+                )
+            engine = AIReportEngine(empresa)
 
             if insight_type == "financial":
                 insights = self._generate_financial_insights(engine, timeframe)
@@ -341,7 +358,10 @@ def export_report_view(request):
     formato = request.GET.get("format", "json")
     periodo = int(request.GET.get("periodo", 30))
 
-    exporter = ReportExporter(request.user.empresa)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
+    exporter = ReportExporter(empresa)
     report_data = exporter.export_financial_report(periodo)
 
     if formato == "json":
@@ -358,7 +378,10 @@ def export_report_view(request):
 def real_time_metrics_api(request):
     """API para métricas en tiempo real"""
 
-    engine = AIReportEngine(request.user.empresa)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
+    engine = AIReportEngine(empresa)
 
     # Métricas en tiempo real
 

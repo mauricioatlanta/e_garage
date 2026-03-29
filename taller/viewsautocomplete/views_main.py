@@ -10,15 +10,16 @@ from taller.models.clientes import Cliente
 from taller.models.modelo import Modelo  # Modelo estándar de vehículos
 from taller.models.region_ciudad import TallerCiudad, TallerRegion  # noqa: F401
 from taller.vehiculos.forms import VehiculoForm
+from taller.services.empresa_service import get_empresa_safe
 
 
 def lista_clientes(request):
     q = request.GET.get("q", "").strip()
     # BLINDAJE MULTI-TENANT: Filtrar por empresa del usuario
-    if hasattr(request.user, "empresa"):
-        clientes = Cliente.objects.filter(empresa=request.user.empresa)
-    else:
-        clientes = Cliente.objects.none()
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return redirect("/")
+    clientes = Cliente.objects.filter(empresa=empresa)
 
     if q:
         clientes = clientes.filter(nombre__icontains=q) | clientes.filter(apellido__icontains=q)
@@ -35,7 +36,7 @@ def lista_clientes(request):
 
     template_name = select_country_lang_template(
         "clientes/lista_clientes.html",
-        getattr(request.user.empresa, "pais", "cl").lower(),
+        getattr(empresa, "pais", "cl").lower(),
         get_language(),
     )
 
@@ -51,14 +52,17 @@ def lista_clientes(request):
 
 
 def crear_cliente(request):
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return redirect("/")
     if request.method == "POST":
-        form = ClienteForm(request.POST, empresa=request.user.empresa)
+        form = ClienteForm(request.POST, empresa=empresa)
         if form.is_valid():
             form.save()
             messages.success(request, "✅ Cliente creado exitosamente.")
             return redirect("taller:clientes:lista_clientes")
     else:
-        form = ClienteForm(empresa=request.user.empresa)
+        form = ClienteForm(empresa=empresa)
 
     # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
@@ -83,14 +87,17 @@ def obtener_ciudades(request):
 
 def editar_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return redirect("/")
     if request.method == "POST":
-        form = ClienteForm(request.POST, instance=cliente, empresa=request.user.empresa)
+        form = ClienteForm(request.POST, instance=cliente, empresa=empresa)
         if form.is_valid():
             form.save()
             messages.success(request, "✅ Cliente actualizado exitosamente.")
             return redirect("taller:clientes:lista_clientes")
     else:
-        form = ClienteForm(instance=cliente, empresa=request.user.empresa)
+        form = ClienteForm(instance=cliente, empresa=empresa)
 
     # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
@@ -100,7 +107,7 @@ def editar_cliente(request, pk):
 
     template_name = select_country_lang_template(
         "clientes/editar_cliente.html",
-        getattr(request.user.empresa, "pais", "cl").lower(),
+        getattr(empresa, "pais", "cl").lower(),
         get_language(),
     )
 
@@ -128,6 +135,9 @@ def editar_cliente(request, pk):
 
 def ver_cliente(request, pk):
     cliente = get_object_or_404(Cliente, pk=pk)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return redirect("/")
     # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
     from django.utils.translation import get_language
@@ -136,7 +146,7 @@ def ver_cliente(request, pk):
 
     template_name = select_country_lang_template(
         "clientes/ver_cliente.html",
-        getattr(request.user.empresa, "pais", "cl").lower(),
+        getattr(empresa, "pais", "cl").lower(),
         get_language(),
     )
 
@@ -164,6 +174,9 @@ def obtener_modelos_por_marca(request):
 
 def test_autocomplete_minimal(request):
     form = VehiculoForm(user=request.user)
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return redirect("/")
     # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
     from django.utils.translation import get_language
@@ -172,7 +185,7 @@ def test_autocomplete_minimal(request):
 
     template_name = select_country_lang_template(
         "vehiculos/test_autocomplete_minimal.html",
-        getattr(request.user.empresa, "pais", "cl").lower(),
+        getattr(empresa, "pais", "cl").lower(),
         get_language(),
     )
 

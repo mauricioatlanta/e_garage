@@ -19,6 +19,8 @@ from taller.views_extra.us_views import (
     cambiar_idioma,
 )
 
+from taller.services.empresa_service import get_empresa_safe
+
 from . import ajax_views  # Importar vistas AJAX para formularios jerárquicos
 from .taller_views import (
     dashboard_suscripciones,
@@ -76,9 +78,12 @@ def diagnostico_ia_temp(request):
 
     from taller.utils.templates import select_country_lang_template
 
+    empresa = get_empresa_safe(request)
+    pais = (getattr(empresa, "pais", None) or "cl").lower() if empresa else "cl"
+
     template_name = select_country_lang_template(
         "reportes/diagnostico_ia.html",
-        getattr(request.user.empresa, "pais", "cl").lower(),
+        pais,
         get_language(),
     )
 

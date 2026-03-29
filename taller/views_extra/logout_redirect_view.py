@@ -1,6 +1,8 @@
 from django.shortcuts import redirect
 from django.urls import reverse
 
+from taller.services.empresa_service import get_empresa_safe
+
 
 def logout_redirect_view(request):
     """
@@ -14,8 +16,9 @@ def logout_redirect_view(request):
     if request.user.is_authenticated:
         try:
             # Buscar en empresa (prioridad más alta)
-            if hasattr(request.user, "empresa") and hasattr(request.user.empresa, "pais"):
-                country = request.user.empresa.pais
+            empresa = get_empresa_safe(request)
+            if empresa and hasattr(empresa, "pais"):
+                country = empresa.pais
             # Buscar en perfil
             elif hasattr(request.user, "perfil") and hasattr(request.user.perfil, "pais"):
                 country = request.user.perfil.pais

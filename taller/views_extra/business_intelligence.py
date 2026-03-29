@@ -15,25 +15,14 @@ from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto as RepuestoDocumento
 from taller.models.lineas_documento import LineaServicio as LineaServicio
 from taller.models.tecnico import Tecnico
+from taller.services.empresa_service import get_empresa_safe
 
 
 @login_required_default
 def dashboard_business_intelligence(request):
     """Dashboard principal de inteligencia de negocio"""
-    try:
-        # Obtener empresa directamente del usuario
-        empresa = request.user.empresa
-
-        if not empresa:
-            return render(
-                request,
-                "error.html",
-                {
-                    "error": "Tu usuario no tiene una empresa asociada. Por favor, contacta al administrador."
-                },
-            )
-
-    except AttributeError:
+    empresa = get_empresa_safe(request)
+    if not empresa:
         return render(
             request,
             "error.html",
@@ -249,7 +238,9 @@ def get_resumen_general(empresa, fecha_inicio, fecha_fin):
 def api_servicios_ranking(request):
     """API para obtener ranking de servicios en formato JSON"""
     try:
-        empresa = request.user.empresa
+        empresa = get_empresa_safe(request)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "Empresa no encontrada"})
 
         fecha_fin = timezone.now().date()
         fecha_inicio = fecha_fin - timedelta(days=30)
@@ -270,7 +261,9 @@ def api_servicios_ranking(request):
 def api_repuestos_utilidad(request):
     """API para obtener utilidades de repuestos en formato JSON"""
     try:
-        empresa = request.user.empresa
+        empresa = get_empresa_safe(request)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "Empresa no encontrada"})
 
         fecha_fin = timezone.now().date()
         fecha_inicio = fecha_fin - timedelta(days=30)
@@ -291,7 +284,9 @@ def api_repuestos_utilidad(request):
 def api_tecnicos_stats(request):
     """API para obtener estadísticas de técnicos en formato JSON"""
     try:
-        empresa = request.user.empresa
+        empresa = get_empresa_safe(request)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "Empresa no encontrada"})
 
         fecha_fin = timezone.now().date()
         fecha_inicio = fecha_fin - timedelta(days=30)

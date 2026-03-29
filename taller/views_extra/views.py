@@ -183,6 +183,7 @@ from django.shortcuts import get_object_or_404
 from django.utils.timezone import now
 
 from taller.models.suscripcion import Suscripcion
+from taller.services.empresa_service import get_empresa_safe
 
 
 # Vista protegida con métricas de suscripciones
@@ -196,8 +197,11 @@ def dashboard_suscripciones(request):
     else:
         # Usuario normal solo ve suscripciones relacionadas con su empresa
         try:
-            empresa = request.user.empresa
-            suscripciones = Suscripcion.objects.filter(empresa=empresa)  # 🔒 FILTRO EMPRESA
+            empresa = get_empresa_safe(request)
+            if not empresa:
+                suscripciones = Suscripcion.objects.none()
+            else:
+                suscripciones = Suscripcion.objects.filter(empresa=empresa)  # 🔒 FILTRO EMPRESA
         except:
             suscripciones = Suscripcion.objects.none()
 

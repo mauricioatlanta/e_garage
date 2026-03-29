@@ -16,6 +16,8 @@ from django.views.decorators.http import require_GET
 
 logger = logging.getLogger(__name__)
 
+from taller.services.empresa_service import get_empresa_safe
+
 
 # Helper para obtener el parámetro country del request
 def _country_from_request(request):
@@ -41,8 +43,8 @@ def api_buscar_repuestos(request):
 
     # Obtener empresa del usuario autenticado o usar una demo para testing
     empresa = None
-    if request.user.is_authenticated and hasattr(request.user, "empresa"):
-        empresa = request.user.empresa
+    if request.user.is_authenticated:
+        empresa = get_empresa_safe(request)
     else:
         # Para testing sin autenticación, usar empresa demo basada en el país
         if country.lower() == "us":
@@ -104,13 +106,9 @@ def crear_documento_moderno(request):
             country = "cl"  # fallback por defecto
 
     # Obtener empresa del usuario
-    try:
-        empresa = request.user.empresa
-    except AttributeError:
-        empresa, created = Empresa.objects.get_or_create(
-            user=request.user,
-            defaults={"nombre_taller": f"Taller de {request.user.username}"},
-        )
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return redirect("/")
 
     # Debug mode: mostrar template de debug
     if request.GET.get("debug") == "1":
@@ -222,13 +220,9 @@ def obtener_datos_formulario(empresa):
 def procesar_documento_moderno_wrapper(request):
     """Wrapper para procesar documento que obtiene la empresa"""
     # Obtener empresa del usuario
-    try:
-        empresa = request.user.empresa
-    except AttributeError:
-        empresa, created = Empresa.objects.get_or_create(
-            user=request.user,
-            defaults={"nombre_taller": f"Taller de {request.user.username}"},
-        )
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return redirect("/")
 
     return procesar_documento_moderno(request, empresa)
 
@@ -621,8 +615,8 @@ def api_vehiculos_cliente(request):
     try:
         # Obtener empresa del usuario autenticado o usar una demo para testing
         empresa = None
-        if request.user.is_authenticated and hasattr(request.user, "empresa"):
-            empresa = request.user.empresa
+        if request.user.is_authenticated:
+            empresa = get_empresa_safe(request)
         else:
             # Para testing sin autenticación, usar empresa demo basada en el país
             if country.lower() == "us":
@@ -677,8 +671,8 @@ def api_buscar_servicios_internos(request):
     """API para buscar servicios internos"""
     try:
         # Obtener empresa del usuario o una por defecto para testing
-        if request.user.is_authenticated and hasattr(request.user, "empresa"):
-            empresa = request.user.empresa
+        if request.user.is_authenticated:
+            empresa = get_empresa_safe(request)
         else:
             # Para testing sin autenticación, usar la empresa demo USA
             empresa = Empresa.objects.filter(nombre_taller="USA Test Garage").first()
@@ -687,6 +681,9 @@ def api_buscar_servicios_internos(request):
                 empresa = Empresa.objects.filter(pais="US").first()
                 if not empresa:
                     return JsonResponse({"error": "No hay empresa configurada"}, status=400)
+
+        if not empresa:
+            return JsonResponse({"error": "No hay empresa configurada"}, status=400)
 
         query = request.GET.get("q", "")
 
@@ -727,8 +724,8 @@ def api_obtener_numero_documento(request):
 
     try:
         # Obtener empresa del usuario o una por defecto para testing
-        if request.user.is_authenticated and hasattr(request.user, "empresa"):
-            empresa = request.user.empresa
+        if request.user.is_authenticated:
+            empresa = get_empresa_safe(request)
         else:
             # Para testing sin autenticación, usar la empresa demo USA
             empresa = Empresa.objects.filter(nombre_taller="USA Test Garage").first()
@@ -737,6 +734,9 @@ def api_obtener_numero_documento(request):
                 empresa = Empresa.objects.filter(pais="US").first()
                 if not empresa:
                     return JsonResponse({"error": "No hay empresa configurada"}, status=400)
+
+        if not empresa:
+            return JsonResponse({"error": "No hay empresa configurada"}, status=400)
 
         # Mapear códigos de tipo a nombres completos para prefijos
         tipo_mapping = {
@@ -857,13 +857,9 @@ def documento_form(request, pk=None):
     from taller.documentos.forms import DocumentoForm
 
     # Obtener empresa del usuario
-    try:
-        empresa = request.user.empresa
-    except AttributeError:
-        empresa, created = Empresa.objects.get_or_create(
-            user=request.user,
-            defaults={"nombre_taller": f"Taller de {request.user.username}"},
-        )
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return redirect("/")
 
     # Obtener el documento si estamos editando
     if pk:
@@ -1068,7 +1064,7 @@ def documento_form(request, pk=None):
 
     template_name = select_country_lang_template(
         "documentos/documento_form.html",
-        getattr(request.user.empresa, "pais", "cl").lower(),
+        getattr(empresa, "pais", "cl").lower(),
         get_language(),
     )
 
@@ -1127,7 +1123,7 @@ def documento_form(request, pk=None):
 
     template_name = select_country_lang_template(
         "documentos/documento_form.html",
-        getattr(request.user.empresa, "pais", "cl").lower(),
+        getattr(empresa, "pais", "cl").lower(),
         get_language(),
     )
 

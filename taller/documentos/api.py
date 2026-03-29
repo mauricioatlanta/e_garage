@@ -15,6 +15,7 @@ from django.views.decorators.http import require_GET, require_POST
 from taller.models.repuesto import Repuesto
 from taller.models.sequence import DocumentSequence
 from taller.models.vehiculos import Vehiculo
+from taller.services.empresa_service import get_empresa_safe
 
 
 def _json_ok(data, status=200):
@@ -45,8 +46,12 @@ def api_vehiculos_por_cliente(request):
     except (TypeError, ValueError):
         return _json_ok([], 200)
 
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return _json_ok([], 200)
+
     qs = (
-        Vehiculo.objects.filter(cliente_id=cid, empresa=request.user.empresa)
+        Vehiculo.objects.filter(cliente_id=cid, empresa=empresa)
         .select_related("marca", "modelo")
         .values(
             "id",
@@ -69,9 +74,12 @@ def api_repuesto_por_codigo(request):
     """API para obtener repuesto por código (scoped a empresa)."""
     code = (request.GET.get("codigo") or "").strip()
     data = {"id": None}
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return _json_ok(data)
     if code:
         try:
-            r = Repuesto.objects.get(empresa=request.user.empresa, part_number__iexact=code)
+            r = Repuesto.objects.get(empresa=empresa, part_number__iexact=code)
             data = {
                 "id": r.id,
                 "nombre": r.nombre,
@@ -95,8 +103,12 @@ def api_next_number(request):
     if tipo not in allowed:
         return _json_ok({"numero": "Se generará automáticamente"}, 200)
 
+    empresa = get_empresa_safe(request)
+    if not empresa:
+        return _json_ok({"numero": "Se generará automáticamente"}, 200)
+
     seq, _ = DocumentSequence.objects.get_or_create(
-        empresa=request.user.empresa, tipo=tipo, defaults={"current": 0}
+        empresa=empresa, tipo=tipo, defaults={"current": 0}
     )
     next_num = (seq.current or 0) + 1
     numero = f"{allowed[tipo]}{next_num:03d}"
@@ -179,7 +191,9 @@ def api_create(request):
     from taller.models.lineas_documento import LineaRepuesto, LineaServicio
     from taller.models.vehiculos import Vehiculo
 
-    emp: Empresa = request.user.empresa
+    emp = get_empresa_safe(request)
+    if not emp:
+        return _json_ok({"error": "empresa_required"}, 400)
 
     # FKs
     try:

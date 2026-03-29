@@ -6,6 +6,7 @@ from django.shortcuts import redirect, render
 from taller.forms.comprobante_form import ComprobantePagoForm
 from taller.models.comprobante_pago import ComprobantePago
 from taller.models.empresa import Empresa
+from taller.services.empresa_service import get_empresa_safe
 
 
 def suspension(request):
@@ -88,7 +89,9 @@ def subir_comprobante(request):
 def estado_suscripcion(request):
     """Vista AJAX para obtener estado de suscripción"""
     try:
-        empresa = request.user.empresa
+        empresa = get_empresa_safe(request)
+        if not empresa:
+            return JsonResponse({"error": "Empresa no encontrada"}, status=404)
         data = {
             "dias_restantes": empresa.dias_restantes,
             "fecha_expiracion": empresa.fecha_expiracion.strftime("%d/%m/%Y"),
@@ -134,8 +137,10 @@ def precios(request):
     elif request.path.startswith("/ec/"):
         pais_usuario = "EC"
     # Override si el usuario está autenticado
-    elif request.user.is_authenticated and hasattr(request.user, "empresa"):
-        pais_usuario = request.user.empresa.pais
+    elif request.user.is_authenticated:
+        empresa = get_empresa_safe(request)
+        if empresa and getattr(empresa, "pais", None):
+            pais_usuario = empresa.pais
     elif request.GET.get("country"):
         pais_usuario = request.GET.get("country").upper()
 

@@ -9,6 +9,7 @@ from django.shortcuts import render, redirect
 from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.tecnico import Tecnico
+from taller.services.empresa_service import get_empresa_safe
 from taller.templatetags.role_tags import is_owner
 
 
@@ -27,9 +28,8 @@ def configuracion_empresa(request):
     """
     Vista principal de configuración del taller
     """
-    try:
-        empresa = request.user.empresa
-    except Empresa.DoesNotExist:
+    empresa = get_empresa_safe(request)
+    if not empresa:
         empresa, created = Empresa.objects.get_or_create(
             user=request.user,
             defaults={
@@ -110,9 +110,8 @@ def configuracion_tecnicos(request):
     """
     Vista para gestionar los técnicos del taller
     """
-    try:
-        empresa = request.user.empresa
-    except Empresa.DoesNotExist:
+    empresa = get_empresa_safe(request)
+    if not empresa:
         # Si no tiene empresa, crear una básica
         empresa, created = Empresa.objects.get_or_create(
             user=request.user,
@@ -290,7 +289,7 @@ def configuracion_tecnicos(request):
                     messages.success(request, f'🗑️ Técnico "{nombre}" eliminado completamente.')
 
         # Redirección dinámica basada en el país del usuario
-        if hasattr(request.user, "empresa") and request.user.empresa.pais == "US":
+        if getattr(empresa, "pais", None) == "US":
             return redirect("usa:configuracion_tecnicos")
         else:
             return redirect("configuracion_tecnicos")
