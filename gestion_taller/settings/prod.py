@@ -166,7 +166,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # si existe /srv/egarage/
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"},
+    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
 }
 
 # Configuración de archivos media para producción

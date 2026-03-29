@@ -16,6 +16,10 @@ class OnboardingMiddleware:
         if not request.user.is_authenticated:
             return self.get_response(request)
 
+        # 🔥 SALTAR ONBOARDING PARA ADMIN/STAFF
+        if request.user.is_superuser or request.user.is_staff:
+            return self.get_response(request)
+
         path = request.path or "/"
 
         default_cc = (getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl") or "cl").strip("/")

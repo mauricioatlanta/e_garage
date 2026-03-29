@@ -75,9 +75,14 @@ def _login_path_with_lang(cc: str, next_url: str) -> str:
 
 class ForceAccountsToCLMiddleware:
     """
-    Redirige /accounts/login/ → /<cc>/<lang>/accounts/login/ (ruta que SIRVE el login) solo para GET/HEAD.
-    No redirige a /cc/accounts/login/ porque esa ruta redirige de vuelta a /accounts/login/ → ERR_TOO_MANY_REDIRECTS.
-    IMPORTANTÍSIMO: NO tocar POST, porque rompe el login real.
+    Redirige TODAS las rutas /accounts/* → /<cc>/<lang>/accounts/* para GET/HEAD.
+    Ejemplos:
+    - /accounts/login/ → /cl/es/accounts/login/
+    - /accounts/password/reset/ → /cl/es/accounts/password/reset/
+    - /accounts/signup/ → /us/en/accounts/signup/
+
+    No redirige a /cc/accounts/* porque esas rutas redirigen de vuelta → ERR_TOO_MANY_REDIRECTS.
+    IMPORTANTÍSIMO: NO tocar POST, porque rompe el login/signup real.
     """
 
     def __init__(self, get_response):
@@ -87,13 +92,27 @@ class ForceAccountsToCLMiddleware:
         path = request.path.rstrip("/")
 
         # Solo redirigir navegación (GET/HEAD). Nunca POST.
-        if request.method in ("GET", "HEAD") and path == "/accounts/login":
-            cc = _country_from_login_request(request)
-            next_url = (request.GET.get("next") or "").strip()
-            login_path = _login_path_with_lang(cc, next_url)
-            # Preservar next=, from=, etc.; no propagar country=
-            params = request.GET.copy()
-            params.pop("country", None)
-            url = f"{login_path}?{params.urlencode()}" if params else login_path
-            return redirect(url)
+        if request.method in ("GET", "HEAD") and path.startswith("/accounts/"):
+            # Verificar que NO tenga ya prefijo de país
+            if not any(path.startswith(f"/{cc}/") for cc in _PATH_COUNTRY_CODES):
+                cc = _country_from_login_request(request)
+                next_url = (request.GET.get("next") or "").strip()
+                default_lang = _DEFAULT_LANG_BY_CC.get(cc, "es")
+
+                # Determinar idioma del next_url si existe
+                lang = default_lang
+                if next_url.startswith("/") and len(next_url) >= 6:
+                    parts = next_url.lstrip("/").split("/")
+                    if len(parts) >= 2 and parts[0] == cc and parts[1] in _PATH_LANGS:
+                        lang = parts[1]
+
+                # Construir nueva ruta: /<cc>/<lang>/accounts/...
+                new_path = f"/{cc}/{lang}{path}"
+
+                # Preservar query params excepto 'country'
+                params = request.GET.copy()
+                params.pop("country", None)
+                url = f"{new_path}?{params.urlencode()}" if params else new_path
+                return redirect(url)
+
         return self.get_response(request)
