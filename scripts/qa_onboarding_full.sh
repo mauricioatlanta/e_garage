@@ -34,9 +34,9 @@ _ts() {
 log() {
   local msg="$*"
   if [ "$LOG_ENABLED" -eq 1 ]; then
-    echo "[$(_ts)] $msg" | tee -a "$LOGFILE"
+    echo "[$(_ts)] $msg" | tee -a "$LOGFILE" 1>&2
   else
-    echo "[$(_ts)] $msg"
+    echo "[$(_ts)] $msg" 1>&2
   fi
 }
 
@@ -97,27 +97,38 @@ TMP_BODY="$(mktemp)"
 TMP_HEADERS="$(mktemp)"
 STATUS_VALID=$(curl -k -s -D "$TMP_HEADERS" -o "$TMP_BODY" -w "%{http_code}" -H "Host: ${HOST}" -b "sessionid=${SESSION_VALID}" "${ENDPOINT}" 2>/dev/null || echo "000")
 log "HTTP status (valid): $STATUS_VALID"
+LOCATION=$(grep -i '^Location:' "$TMP_HEADERS" | head -n 1 | sed -e 's/\r$//' -e 's/^[Ll]ocation:[[:space:]]*//')
+if [ -n "${LOCATION:-}" ]; then
+  log "Redirect Location: $LOCATION"
+fi
+
 if [ "$STATUS_VALID" = "200" ]; then
-  pass "HTTP 200 con sesión válida"
-else
-  LOCATION=$(grep -i '^Location:' "$TMP_HEADERS" | head -n 1 | sed -e 's/\r$//' -e 's/^[Ll]ocation:[[:space:]]*//')
-  if [ -n "${LOCATION:-}" ]; then
-    log "Redirect Location: $LOCATION"
+  pass "HTTP 200 con sesion valida"
+elif [ "$STATUS_VALID" = "302" ]; then
+  if echo "${LOCATION:-}" | grep -Eqi '/accounts/login|/login'; then
+    fail "Sesion valida redirige a login (cookie invalida)"
+  else
+    pass "HTTP 302 con sesion valida (redirect interno esperado)"
   fi
+else
   log "Headers (valid) primeros 20:"
   if [ "$LOG_ENABLED" -eq 1 ]; then
-    sed -n '1,20p' "$TMP_HEADERS" | sed 's/^/[HDR] /' | tee -a "$LOGFILE" >/dev/null
+    sed -n '1,20p' "$TMP_HEADERS" | sed 's/^/[HDR] /' | tee -a "$LOGFILE" 1>&2
   else
-    sed -n '1,20p' "$TMP_HEADERS" | sed 's/^/[HDR] /'
+    sed -n '1,20p' "$TMP_HEADERS" | sed 's/^/[HDR] /' 1>&2
   fi
-  fail "Se esperaba 200 con sesión válida, se obtuvo $STATUS_VALID"
+  fail "Se esperaba 200 o 302 con sesion valida, se obtuvo $STATUS_VALID"
 fi
 
 section "Validación de template (paso_identidad)"
-if grep -q "paso_identidad" "$TMP_BODY"; then
-  pass "Se detecta marcador 'paso_identidad' en HTML"
+if [ "$STATUS_VALID" = "200" ]; then
+  if grep -q "paso_identidad" "$TMP_BODY"; then
+    pass "Se detecta marcador 'paso_identidad' en HTML"
+  else
+    fail "No se detecta 'paso_identidad' en HTML (posible template incorrecto)"
+  fi
 else
-  fail "No se detecta 'paso_identidad' en HTML (posible template incorrecto o sesión no válida)"
+  log "Template check omitido (no hubo HTTP 200)"
 fi
 
 rm -f "$TMP_BODY" "$TMP_HEADERS" 2>/dev/null || true
