@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.shortcuts import redirect
 from django.urls import reverse
 
@@ -17,6 +18,10 @@ class OnboardingMiddleware:
 
         path = request.path or "/"
 
+        default_cc = (getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl") or "cl").strip("/")
+        default_lang = (getattr(settings, "EGARAGE_DEFAULT_LANG", "es") or "es").strip("/")
+        default_prefix = f"/{default_cc}/{default_lang}"
+
         prefix = ""
         try:
             parts = [p for p in path.split("/") if p]
@@ -31,7 +36,9 @@ class OnboardingMiddleware:
             else path.startswith("/onboarding/fiscal")
         ):
             return redirect(
-                f"{prefix}/onboarding/finalizar/" if prefix else "/onboarding/finalizar/"
+                f"{prefix}/onboarding/finalizar/"
+                if prefix
+                else f"{default_prefix}/onboarding/finalizar/"
             )
 
         # 1. EXCLUIR SI ES UNA PETICIÓN AJAX (XHR) O API
@@ -114,7 +121,9 @@ class OnboardingMiddleware:
 
             # Redirigir al paso actual usando la nueva ruta
             return redirect(
-                f"{prefix}/onboarding/{step_name}/" if prefix else f"/onboarding/{step_name}/"
+                f"{prefix}/onboarding/{step_name}/"
+                if prefix
+                else f"{default_prefix}/onboarding/{step_name}/"
             )
 
         return self.get_response(request)
