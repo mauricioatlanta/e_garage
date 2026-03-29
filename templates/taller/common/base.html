@@ -478,7 +478,7 @@
     </a>
     {% endif %}
 
-    <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
+    <a href="{% country_url 'taller:centro_operaciones' %}" class="nav-button-standard">
       <span class="nav-icon">🚀</span>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Center{% else %}Centro{% endif %}</span>
     </a>
