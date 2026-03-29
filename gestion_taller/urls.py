@@ -137,6 +137,17 @@ from taller.views_extra.views_suscripciones import (
 # gestion_taller/urls.py — archivo raíz de URLs con migración a países
 
 
+def redirect_onboarding_default(request, subpath=""):
+    """Canonicaliza /onboarding/* (sin prefijo) a /<cc>/<lang>/onboarding/* preservando querystring."""
+    default_cc = (getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl") or "cl").strip("/")
+    default_lang = (getattr(settings, "EGARAGE_DEFAULT_LANG", "es") or "es").strip("/")
+    base = f"/{default_cc}/{default_lang}/onboarding/"
+    target = base + (subpath.strip("/") + "/" if subpath else "")
+    if request.GET:
+        target = target + "?" + request.GET.urlencode()
+    return redirect(target)
+
+
 def redirect_to_home(request):
     """Redirige a la página principal basada en el país del usuario"""
 
@@ -263,6 +274,15 @@ urlpatterns = [
         "workspace/buscar/",
         lambda r: country_aware_workspace_redirect(r, "buscar"),
         name="workspace_buscar_redirect_root",
+    ),
+    # Canonicalizar onboarding sin prefijo (evita ERR_TOO_MANY_REDIRECTS)
+    path(
+        "onboarding/", lambda r: redirect_onboarding_default(r, ""), name="onboarding_redirect_root"
+    ),
+    path(
+        "onboarding/<path:subpath>",
+        lambda r, subpath: redirect_onboarding_default(r, subpath),
+        name="onboarding_redirect_root_path",
     ),
     path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
     # Portal del Cliente
