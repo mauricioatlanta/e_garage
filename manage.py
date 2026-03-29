@@ -2,9 +2,20 @@
 import os
 import sys
 import logging
+from pathlib import Path
 
 
 def main():
+    # Cargar .env.prod si existe (antes de verificar EGARAGE_ENV)
+    try:
+        from dotenv import load_dotenv
+
+        env_prod_path = Path(__file__).resolve().parent / ".env.prod"
+        if env_prod_path.exists():
+            load_dotenv(env_prod_path, override=True)
+    except ImportError:
+        pass
+
     # Warning solo en desarrollo
     if os.getenv("EGARAGE_ENV", "dev").lower() != "prod":
         logging.warning("Modo de desarrollo activado. Asegúrate de no usar esto en producción.")
