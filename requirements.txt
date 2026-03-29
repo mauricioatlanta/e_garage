@@ -35,7 +35,7 @@ google-auth-httplib2
 whitenoise>=6.5.0
 
 # Base de Datos (SQLite incluido en Python)
-# Para PostgreSQL: psycopg2-binary>=2.9.7
+psycopg2-binary>=2.9.7
 
 # Monitoreo de Errores (Opcional pero recomendado)
 sentry-sdk>=1.32.0
