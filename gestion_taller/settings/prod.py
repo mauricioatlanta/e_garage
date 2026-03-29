@@ -3,6 +3,14 @@ Configuración de producción para eGarage.
 Configuración segura y optimizada para producción.
 """
 
+from pathlib import Path
+from dotenv import load_dotenv
+
+# Cargar .env.prod explícitamente para producción
+_env_prod_path = Path(__file__).resolve().parent.parent.parent / ".env.prod"
+if _env_prod_path.exists():
+    load_dotenv(_env_prod_path, override=True)
+
 from .base import *
 
 # =============================================================================
