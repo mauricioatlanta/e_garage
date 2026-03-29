@@ -58,6 +58,7 @@ class OnboardingMiddleware:
             "/reset/",
             "/reset/done/",
             "/accounts/",
+            "/login/",
             "/help/",
             "/ayuda/",
             "/soporte/",
