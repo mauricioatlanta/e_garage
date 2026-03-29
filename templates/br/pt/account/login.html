@@ -536,7 +536,7 @@ body {
         {% endif %}
 
         <!-- Formulario -->
-        <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
+        <form method="POST" action="{{ request.path }}" class="space-y-6">
             {% csrf_token %}
             {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
