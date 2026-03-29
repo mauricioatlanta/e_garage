@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import ObjectDoesNotExist
+from django.apps import apps
 
 
 def get_user_empresa_safe(user):
@@ -67,9 +68,6 @@ def get_or_create_empresa(request):
     return empresa
 
 
-from taller.models import Empresa
-
-
 def get_active_empresa(request):
     """
     Devuelve la empresa activa:
@@ -89,6 +87,7 @@ def get_active_empresa(request):
 
     empresa = get_user_empresa_safe(request.user)
     if empresa is None:
+        Empresa = apps.get_model("taller", "Empresa")
         empresa = Empresa.objects.filter(user=request.user).order_by("id").first()
         if empresa is None:
             return None
