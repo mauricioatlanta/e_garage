@@ -9,33 +9,4 @@ class Migration(migrations.Migration):
         ("taller", "0095_add_onboarding_fields"),
     ]
 
-    operations = [
-        migrations.AddField(
-            model_name="empresa",
-            name="onboarding_completado",
-            field=models.BooleanField(
-                default=False, help_text="Indica si el proceso de onboarding ha sido completado"
-            ),
-        ),
-        migrations.AddField(
-            model_name="empresa",
-            name="onboarding_step",
-            field=models.PositiveIntegerField(
-                default=1, help_text="Paso actual del proceso de onboarding"
-            ),
-        ),
-        migrations.AddField(
-            model_name="empresa",
-            name="onboarding_started_at",
-            field=models.DateTimeField(
-                blank=True, null=True, help_text="Fecha y hora en que comenzó el onboarding"
-            ),
-        ),
-        migrations.AddField(
-            model_name="empresa",
-            name="onboarding_completed_at",
-            field=models.DateTimeField(
-                blank=True, null=True, help_text="Fecha y hora en que se completó el onboarding"
-            ),
-        ),
-    ]
+    operations = []

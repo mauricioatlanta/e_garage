@@ -76,7 +76,6 @@ MIDDLEWARE = [
     # "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.country_context.CountryContextMiddleware",  # DESHABILITADO - Causa bucles infinitos con /es/
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
-    "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
 
 # AccountMiddleware de allauth: agregar dinámicamente si existe

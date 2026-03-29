@@ -142,7 +142,6 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Suscripción / trial (después de auth + allauth)
-    "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
     # "taller.middleware.trial_middleware.TrialAccessMiddleware",
 ]
 

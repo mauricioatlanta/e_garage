@@ -28,6 +28,7 @@ from taller.models import (
     LineaRepuesto,
     LineaServicio,
     Marca,
+    Modelo,
     Repuesto,
     Tecnico,
     Vehiculo,
@@ -84,6 +85,18 @@ class TestFlujoCriticoFinanciero(TestCase):
         self.marca_toyota = Marca.objects.create(nombre="Toyota", country="CL")
         self.marca_ford = Marca.objects.create(nombre="Ford", country="US")
 
+        # Modelos (FK en Vehiculo)
+        self.modelo_corolla = Modelo.objects.create(
+            nombre="Corolla Test",
+            marca=self.marca_toyota,
+            country="CL",
+        )
+        self.modelo_focus = Modelo.objects.create(
+            nombre="Focus Test",
+            marca=self.marca_ford,
+            country="US",
+        )
+
         # Clientes y vehículos Chile
         self.cliente_cl = Cliente.objects.create(
             empresa=self.empresa_cl, nombre="Cliente Test Financiero CL"
@@ -93,8 +106,9 @@ class TestFlujoCriticoFinanciero(TestCase):
             empresa=self.empresa_cl,
             cliente=self.cliente_cl,
             patente="TEST01",
+            anio=2020,
             marca=self.marca_toyota,
-            modelo="Corolla Test",
+            modelo=self.modelo_corolla,
         )
 
         # Clientes y vehículos USA
@@ -106,8 +120,9 @@ class TestFlujoCriticoFinanciero(TestCase):
             empresa=self.empresa_us,
             cliente=self.cliente_us,
             patente="US001",
+            anio=2020,
             marca=self.marca_ford,
-            modelo="Focus Test",
+            modelo=self.modelo_focus,
         )
 
         # Limpiar cache antes de cada test
@@ -203,13 +218,13 @@ class TestFlujoCriticoFinanciero(TestCase):
         factura.estado = "EMITIDO"
         factura.save()
 
-        # Procesar movimiento de stock
-        resultado_stock = InventoryService.procesar_movimiento_stock(factura, "descontar")
-        self.assertTrue(resultado_stock["procesado"], "Stock debe procesarse correctamente")
-
         # Verificar stock actualizado
         repuesto_stock_cero.refresh_from_db()
-        self.assertEqual(repuesto_stock_cero.cantidad_stock, 3, "Stock debe descontarse: 5 - 2 = 3")
+        self.assertEqual(
+            repuesto_stock_cero.cantidad_stock,
+            3,
+            "Stock debe descontarse: 5 - 2 = 3",
+        )
 
         # === PASO 5: Registrar Pago Parcial (50% del total) ===
         total_factura = factura.total  # Usar campo directo
@@ -357,9 +372,6 @@ class TestFlujoCriticoFinanciero(TestCase):
         factura.estado = "EMITIDO"
         factura.save()
 
-        resultado_stock = InventoryService.procesar_movimiento_stock(factura, "descontar")
-        self.assertTrue(resultado_stock["procesado"])
-
         repuesto_stock_cero.refresh_from_db()
         self.assertEqual(repuesto_stock_cero.cantidad_stock, 2)
 
@@ -450,10 +462,9 @@ class TestFlujoCriticoFinanciero(TestCase):
         iva_inicial = factura.tax_amount
         total_general_inicial = factura.total
 
-        # Emitir factura
+        # Emitir factura (la señal descuenta stock automáticamente)
         factura.estado = "EMITIDO"
         factura.save()
-        InventoryService.procesar_movimiento_stock(factura, "descontar")
 
         # Verificar que los totales NO cambian después de emitir
         factura.refresh_from_db()
@@ -601,14 +612,21 @@ class TestBloqueoAnulacionYAudiitoria(TestCase):
 
         self.marca = Marca.objects.create(nombre="Test", country="CL")
 
+        self.modelo = Modelo.objects.create(
+            nombre="Model Test",
+            marca=self.marca,
+            country="CL",
+        )
+
         self.cliente = Cliente.objects.create(empresa=self.empresa, nombre="Cliente Test Auditoría")
 
         self.vehiculo = Vehiculo.objects.create(
             empresa=self.empresa,
             cliente=self.cliente,
             patente="AUD001",
+            anio=2020,
             marca=self.marca,
-            modelo="Model Test",
+            modelo=self.modelo,
         )
 
         # Crear repuesto con stock
@@ -658,7 +676,7 @@ class TestBloqueoAnulacionYAudiitoria(TestCase):
         factura.save()
 
         # Procesar stock
-        InventoryService.procesar_movimiento_stock(factura, "descontar")
+        # La señal de inventario descuenta automáticamente al cambiar a EMITIDO
 
         # Verificar que el stock se descontó
         self.repuesto.refresh_from_db()
@@ -804,12 +822,9 @@ class TestBloqueoAnulacionYAudiitoria(TestCase):
         total_antes = factura.total
         total_repuestos_antes = factura.neto_repuestos
 
-        # Emitir
+        # Emitir (la señal descuenta stock automáticamente)
         factura.estado = "EMITIDO"
         factura.save()
-
-        # Procesar stock
-        InventoryService.procesar_movimiento_stock(factura, "descontar")
 
         # Verificar stock descontado
         self.repuesto.refresh_from_db()
@@ -907,7 +922,7 @@ class TestBloqueoAnulacionYAudiitoria(TestCase):
         )
 
         factura.recalcular_totales()
-        InventoryService.procesar_movimiento_stock(factura, "descontar")
+        # Documento ya está EMITIDO en creación; la señal puede haber descontado en save.
 
         # ✅ INTENTAR ANULAR CON razón (comportamiento correcto)
         factura.observaciones = "Error en datos del cliente - Cliente solicitó corrección"
@@ -967,7 +982,7 @@ class TestBloqueoAnulacionYAudiitoria(TestCase):
         )
 
         factura.recalcular_totales()
-        InventoryService.procesar_movimiento_stock(factura, "descontar")
+        # Documento creado con estado=EMITIDO; la señal puede haber descontado en save inicial
 
         # Guardar monto pagado
         monto_pagado = factura.monto_pagado

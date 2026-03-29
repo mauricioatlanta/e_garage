@@ -269,7 +269,6 @@ MIDDLEWARE = [
     "taller.middleware.lang_policy.LanguagePolicyMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
 
 # AccountMiddleware de allauth: agregar dinámicamente si existe

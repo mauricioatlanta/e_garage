@@ -19,9 +19,12 @@ from taller.models import (
     LineaRepuesto,
     LineaServicio,
     Marca,
+    Modelo,
     Tecnico,
     Vehiculo,
 )
+
+ORIGEN_EXTERNO = "EXTERNO"
 
 User = get_user_model()
 
@@ -55,6 +58,18 @@ class TestDocumentoBackend(TestCase):
 
         self.marca_ford = Marca.objects.create(nombre="Ford", country="US")
 
+        # Modelos (FK en Vehiculo)
+        self.modelo_corolla = Modelo.objects.create(
+            nombre="Corolla",
+            marca=self.marca_toyota,
+            country="CL",
+        )
+        self.modelo_focus = Modelo.objects.create(
+            nombre="Focus",
+            marca=self.marca_ford,
+            country="US",
+        )
+
         # Cliente y vehículo para Chile
         self.cliente_cl = Cliente.objects.create(empresa=self.empresa_cl, nombre="Cliente A")
 
@@ -62,8 +77,9 @@ class TestDocumentoBackend(TestCase):
             empresa=self.empresa_cl,
             cliente=self.cliente_cl,
             patente="AA1234",
+            anio=2020,
             marca=self.marca_toyota,
-            modelo="Corolla",
+            modelo=self.modelo_corolla,
         )
 
         # Cliente y vehículo para Estados Unidos
@@ -73,8 +89,9 @@ class TestDocumentoBackend(TestCase):
             empresa=self.empresa_us,
             cliente=self.cliente_us,
             patente="BB5678",
+            anio=2020,
             marca=self.marca_ford,
-            modelo="Focus",
+            modelo=self.modelo_focus,
         )
 
     def test_totales_chile_con_iva(self):
@@ -97,6 +114,7 @@ class TestDocumentoBackend(TestCase):
             cantidad=2,
             precio_unitario=Decimal("10000"),
             codigo="FIL001",
+            origen_repuesto=ORIGEN_EXTERNO,
         )
 
         # Servicios (sin IVA)
@@ -142,7 +160,8 @@ class TestDocumentoBackend(TestCase):
             nombre="Brake Pad",
             cantidad=1,
             precio_unitario=Decimal("100"),
-            codigo="BP001",
+            codigo="BRK001",
+            origen_repuesto=ORIGEN_EXTERNO,
         )
 
         # Servicios (sin IVA en US)
@@ -181,6 +200,7 @@ class TestDocumentoBackend(TestCase):
             cantidad=3,
             precio_unitario=Decimal("5000"),
             codigo="FIL002",
+            origen_repuesto=ORIGEN_EXTERNO,
         )
 
         # Línea de servicio
@@ -235,8 +255,8 @@ class TestDocumentoBackend(TestCase):
         )
 
         # Verificar campos de auditoría
-        self.assertEqual(doc.created_by, self.user)
-        self.assertEqual(doc.updated_by, self.user)
+        self.assertEqual(doc.created_by, self.user_cl)
+        self.assertEqual(doc.updated_by, self.user_cl)
         self.assertIsNotNone(doc.created_at)
         self.assertIsNotNone(doc.updated_at)
 
@@ -338,8 +358,9 @@ class TestDocumentoBackend(TestCase):
             nombre="Filtro con descuento",
             cantidad=1,
             precio_unitario=Decimal("10000"),
-            descuento=Decimal("10.00"),  # 10%
+            descuento=Decimal("10"),
             codigo="FIL003",
+            origen_repuesto=ORIGEN_EXTERNO,
         )
 
         doc.recalcular_totales()
@@ -372,6 +393,7 @@ class TestDocumentoBackend(TestCase):
             cantidad=2,
             precio_unitario=Decimal("5000"),
             codigo="FIL004",
+            origen_repuesto=ORIGEN_EXTERNO,
         )
 
         LineaRepuesto.objects.create(
@@ -380,6 +402,7 @@ class TestDocumentoBackend(TestCase):
             cantidad=1,
             precio_unitario=Decimal("8000"),
             codigo="FIL005",
+            origen_repuesto=ORIGEN_EXTERNO,
         )
 
         doc.recalcular_totales()
@@ -407,6 +430,12 @@ class TestDocumentoEdgeCases(TestCase):
         # Marca
         self.marca_test = Marca.objects.create(nombre="Test", country="CL")
 
+        self.modelo_test = Modelo.objects.create(
+            nombre="Model",
+            marca=self.marca_test,
+            country="CL",
+        )
+
         self.tecnico = Tecnico.objects.create(empresa=self.empresa_cl, nombre="Test Tech")
 
         self.cliente = Cliente.objects.create(empresa=self.empresa_cl, nombre="Test Client")
@@ -415,8 +444,9 @@ class TestDocumentoEdgeCases(TestCase):
             empresa=self.empresa_cl,
             cliente=self.cliente,
             patente="TEST01",
+            anio=2020,
             marca=self.marca_test,
-            modelo="Model",
+            modelo=self.modelo_test,
         )
 
     def test_documento_sin_lineas(self):
@@ -428,8 +458,8 @@ class TestDocumentoEdgeCases(TestCase):
             tecnico_responsable=self.tecnico,
             fecha_emision=timezone.now(),
             tipo="OT",
-            created_by=self.user_cl,
-            updated_by=self.user_cl,
+            created_by=self.user,
+            updated_by=self.user,
         )
 
         doc.recalcular_totales()
@@ -450,8 +480,8 @@ class TestDocumentoEdgeCases(TestCase):
             tecnico_responsable=self.tecnico,
             fecha_emision=timezone.now(),
             tipo="OT",
-            created_by=self.user_cl,
-            updated_by=self.user_cl,
+            created_by=self.user,
+            updated_by=self.user,
         )
 
         # Precio con decimales
@@ -461,6 +491,7 @@ class TestDocumentoEdgeCases(TestCase):
             cantidad=1,
             precio_unitario=Decimal("10000.50"),
             codigo="FIL006",
+            origen_repuesto=ORIGEN_EXTERNO,
         )
 
         doc.recalcular_totales()

@@ -94,19 +94,54 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
 
     def get_reset_password_from_key_url(self, key):
         """
-        Si el usuario pidió reset desde /cl/es/accounts/password/reset/, el enlace del mail
-        debe apuntar a la misma jerarquía (no a /accounts/... sin país/idioma).
+        Genera URL de reset con contexto de país/idioma para evitar perder routing.
+        El enlace del mail debe apuntar a la misma jerarquía que usó el usuario.
         """
         req = getattr(self, "request", None)
-        path = (req.path or "") if req else ""
-        if path.startswith("/cl/es/"):
+
+        # Determinar país/idioma desde request o usuario
+        country, lang = self._country_lang_from_request_or_user(request=req)
+
+        # Mapeo de países a namespaces
+        namespace_map = {
+            "CL": "chile",
+            "US": "usa",
+            "MX": "mexico",
+            "AR": "argentina",
+            "UY": "uruguay",
+            "PE": "peru",
+            "CO": "colombia",
+            "EC": "ecuador",
+            "VE": "venezuela",
+        }
+
+        namespace = namespace_map.get(country, "chile")
+
+        try:
+            # Intentar generar URL con namespace del país
             p = reverse(
-                "chile:account_reset_password_from_key",
+                f"{namespace}:account_reset_password_from_key",
                 kwargs={"uidb36": "UID", "key": "KEY"},
             )
             p = p.replace("UID-KEY", quote(key, safe=""))
-            return build_absolute_uri(req, p)
-        return super().get_reset_password_from_key_url(key)
+            url = build_absolute_uri(req, p)
+            logger.info(
+                "PASSWORD RESET URL generada | country=%s lang=%s namespace=%s url=%s",
+                country,
+                lang,
+                namespace,
+                url,
+            )
+            return url
+        except Exception as e:
+            logger.warning(
+                "PASSWORD RESET URL fallback | country=%s namespace=%s error=%s",
+                country,
+                namespace,
+                e,
+            )
+            # Fallback a comportamiento por defecto de Allauth
+            return super().get_reset_password_from_key_url(key)
 
     def get_password_change_redirect_url(self, request):
         if (request.path or "").startswith("/cl/es/"):

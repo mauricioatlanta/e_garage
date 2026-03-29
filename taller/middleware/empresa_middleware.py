@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from django.db.utils import OperationalError
+from django.contrib import messages
 from django.shortcuts import redirect
 
 from taller.utils.login_exempt import is_login_exempt_path
@@ -37,12 +38,29 @@ class EmpresaMiddleware:
                 )
 
                 # Verificar si la suscripción está vencida
-                if (
-                    request.empresa
-                    and getattr(request.empresa, "debe_bloquear", False)
-                    and not self.is_exempt_url(request.path)
-                ):
-                    return redirect("suspension")
+                if request.empresa and not self.is_exempt_url(request.path):
+                    try:
+                        from taller.services.suscripcion_service import (
+                            empresa_tiene_acceso,
+                            motivo_bloqueo_suscripcion,
+                        )
+
+                        # Mantener compatibilidad: solo bloquear si el flag actual lo exige.
+                        # La capa nueva solo centraliza el criterio y el motivo.
+                        if getattr(
+                            request.empresa, "debe_bloquear", False
+                        ) and not empresa_tiene_acceso(request.empresa):
+                            motivo = motivo_bloqueo_suscripcion(request.empresa)
+                            if motivo:
+                                messages.warning(
+                                    request,
+                                    f"⚠️ Acceso restringido: {motivo.replace('_', ' ')}",
+                                )
+                            return redirect("suspension")
+                    except Exception:
+                        # Fallback conservador: mantener comportamiento previo
+                        if getattr(request.empresa, "debe_bloquear", False):
+                            return redirect("suspension")
 
             except (Exception, OperationalError):
                 # Evita 500 por DB desactualizada (ej. is_trial faltante) u otros edge cases.
