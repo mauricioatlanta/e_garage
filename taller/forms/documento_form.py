@@ -7,6 +7,7 @@ from django.utils.translation import get_language
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.vehiculos import Vehiculo
+from taller.services.documento_service import calcular_totales
 
 
 # Helper centralizado para namespaces de autocompletado
@@ -392,8 +393,25 @@ class DocumentoForm(forms.ModelForm):
             # Procesar datos JSON solo si el documento se guardó
             self._process_json_data(documento)
 
-            # Recalcular totales del documento tras crear las líneas
-            documento.recompute_totals(persist=True)
+            totales = calcular_totales(documento)
+            print("DEBUG TOTAL:", totales)
+
+            documento.neto_repuestos = totales["total_repuestos"]
+            documento.neto_servicios = totales["total_servicios"]
+            documento.neto_otros_servicios = totales["total_otros"]
+            documento.tax_rate_applied = totales["iva_rate"] * 100
+            documento.tax_amount = totales["iva"]
+            documento.total = totales["total"]
+            documento.save(
+                update_fields=[
+                    "neto_repuestos",
+                    "neto_servicios",
+                    "neto_otros_servicios",
+                    "tax_rate_applied",
+                    "tax_amount",
+                    "total",
+                ]
+            )
 
             # Crear registro de kilometraje si se proporcionó y hay vehículo
             if kilometraje_ingreso is not None and documento.vehiculo:

@@ -17,6 +17,7 @@ from django.views.decorators.http import require_GET
 logger = logging.getLogger(__name__)
 
 from taller.services.empresa_service import get_empresa_safe
+from taller.services.documento_service import calcular_totales
 
 
 # Helper para obtener el parámetro country del request
@@ -519,48 +520,19 @@ def procesar_documento_moderno(request, empresa):
                 f"[DEBUG] Línea de otro servicio creada: {linea_otro_servicio.id} - {nombre} - ${precio_cliente}"
             )
 
-        # 9) Recalcular totales (IVA solo sobre repuestos en Chile)
-        rep_subtotal = sum(
-            [
-                lr.cantidad
-                * lr.precio_unitario
-                * (Decimal("1.0") - (lr.descuento or Decimal(0)) / Decimal("100"))
-                for lr in documento.lineas_repuesto.all()
-            ]
-        )
-        serv_subtotal = sum(
-            [
-                ls.cantidad
-                * ls.precio_unitario
-                * (Decimal("1.0") - (ls.descuento or Decimal(0)) / Decimal("100"))
-                for ls in documento.lineas_servicio.all()
-            ]
-        )
-        otro_subtotal = sum(
-            [los.precio_cliente * los.cantidad for los in documento.lineas_otro_servicio.all()]
-        )
+        totales = calcular_totales(documento)
+        print("DEBUG TOTAL:", totales)
 
-        # ✅ Calcular IVA usando función centralizada (reemplaza múltiples if/else)
-        tax_amount = Decimal("0.00")
-        tax_rate_applied = Decimal("0.00")
-
-        if incluir_impuesto:
-            from taller.impuestos.engine import calcular_impuesto, get_tax_rate_simple
-
-            # Usar función centralizada para calcular impuesto sobre repuestos
-            tax_amount = calcular_impuesto(rep_subtotal, empresa, applies_to="parts")
-
-            # Obtener la tasa aplicada como porcentaje (para persistir en tax_rate_applied)
-            tax_rate_decimal = get_tax_rate_simple(empresa, applies_to="parts")
-            tax_rate_applied = tax_rate_decimal * Decimal("100")  # Convertir a porcentaje
-
-        total = (rep_subtotal + serv_subtotal + otro_subtotal + tax_amount).quantize(
-            Decimal("0.01")
-        )
+        neto_rep = totales["total_repuestos"]
+        neto_serv = totales["total_servicios"]
+        neto_otros = totales["total_otros"]
+        tax_amount = totales["iva"]
+        tax_rate_applied = totales["iva_rate"] * Decimal("100")
+        total = totales["total"]
 
         # 10) Persistir campos de totales en Documento
-        documento.neto_repuestos = rep_subtotal
-        documento.neto_servicios = serv_subtotal + otro_subtotal
+        documento.neto_repuestos = neto_rep
+        documento.neto_servicios = neto_serv + neto_otros
         documento.tax_rate_applied = tax_rate_applied
         documento.tax_amount = tax_amount
         documento.total = total
@@ -925,46 +897,15 @@ def documento_form(request, pk=None):
                 form.save()
             )  # Documento + lógica del form (kilometraje→vehiculo.millas, pagado, etc.)
 
-            # ------------------------
-            # Recalcular netos desde líneas (campos 'subtotal' existentes)
-            # ------------------------
-            neto_rep = doc.lineas_repuesto.aggregate(s=Sum("subtotal"))["s"] or Decimal("0")
-            neto_serv = doc.lineas_servicio.aggregate(s=Sum("subtotal"))["s"] or Decimal("0")
-            neto_otros = doc.lineas_otro_servicio.aggregate(
-                s=Sum(
-                    ExpressionWrapper(
-                        F("precio_cliente") * F("cantidad"),
-                        output_field=DecimalField(max_digits=12, decimal_places=2),
-                    )
-                )
-            )["s"] or Decimal("0")
+            totales = calcular_totales(doc)
+            print("DEBUG TOTAL:", totales)
 
-            # ------------------------
-            # ✅ Impuestos usando función centralizada
-            # Tax/IVA SOLO sobre repuestos en todos los países
-            # ------------------------
-            apply_sales_tax = bool(
-                request.POST.get("apply_sales_tax")
-                or request.POST.get("apply_vat")
-                or request.POST.get("include_tax")
-            )
-            tax_base = neto_rep if apply_sales_tax else Decimal("0")
-
-            from taller.impuestos.engine import calcular_impuesto, get_tax_rate_simple
-
-            # Si hay tasa personalizada en POST, usarla; si no, usar configuración del tenant
-            rate = _to_decimal_pct((request.POST.get("sales_tax_rate") or "").strip())
-            if rate is not None and rate >= 0:
-                # Usar tasa personalizada enviada en formulario
-                tax_rate_decimal = rate / Decimal("100") if rate > 1 else rate
-                tax_amount = (tax_base * tax_rate_decimal).quantize(Decimal("0.01"))
-                tax_rate = rate if rate > 1 else rate * Decimal("100")
-            else:
-                # Usar función centralizada para obtener tasa del tenant
-                tax_amount = calcular_impuesto(tax_base, empresa, applies_to="parts")
-                tax_rate_decimal = get_tax_rate_simple(empresa, applies_to="parts")
-                tax_rate = tax_rate_decimal * Decimal("100")  # Convertir a porcentaje
-            total = (neto_rep + neto_serv + neto_otros + tax_amount).quantize(Decimal("0.01"))
+            neto_rep = totales["total_repuestos"]
+            neto_serv = totales["total_servicios"]
+            neto_otros = totales["total_otros"]
+            tax_amount = totales["iva"]
+            tax_rate = totales["iva_rate"] * Decimal("100")
+            total = totales["total"]
 
             # Persistir totales
             doc.neto_repuestos = neto_rep

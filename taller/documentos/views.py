@@ -17,6 +17,7 @@ from django.views.decorators.http import require_POST
 
 from taller.models.tecnico import Tecnico
 from taller.services.empresa_service import get_empresa_safe
+from taller.services.documento_service import calcular_totales
 
 
 # API para crear técnicos (SEGURO)
@@ -601,18 +602,15 @@ def ver_documento(request, documento_id):
             f"[DEBUG VER]   - {nombre_otro} ({getattr(otro, 'empresa_externa', '')}): ${precio_otro}"
         )
 
-    from taller.utils.totales import totales_chile
+    totales = calcular_totales(documento)
+    print("DEBUG TOTAL:", totales)
 
-    # Usar el nuevo helper de totales
-    resumen = totales_chile(repuestos, servicios)
-    subtotal_repuestos = resumen["subtotal_repuestos"]
-    subtotal_servicios = resumen["subtotal_servicios"]
-    iva = resumen["iva"]
-    total = resumen["total"]
-    subtotal = subtotal_repuestos + subtotal_servicios
-    subtotal_otros_servicios = sum(
-        getattr(otro, "precio_cliente", Decimal("0.00")) for otro in otros_servicios
-    )
+    subtotal_repuestos = totales["total_repuestos"]
+    subtotal_servicios = totales["total_servicios"]
+    subtotal_otros_servicios = totales["total_otros"]
+    subtotal = totales["subtotal"]
+    iva = totales["iva"]
+    total = totales["total"]
 
     print(
         f"[DEBUG VER] Totales calculados - Repuestos: ${subtotal_repuestos}, Servicios: ${subtotal_servicios}, Otros: ${subtotal_otros_servicios}, IVA: ${iva}, Total: ${total}"
