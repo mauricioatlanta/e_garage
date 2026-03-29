@@ -57,6 +57,9 @@ def onboarding_wizard(request, step=None):
     if step == "identidad" and getattr(empresa, "onboarding_step", 1) > 1:
         return redirect("taller:company_settings")
 
+    if step == "fiscal":
+        return redirect("taller:onboarding_step", step="finalizar")
+
     # Mapear nombres de pasos a números (wizard simplificado)
     step_map = {
         "identidad": 1,
@@ -69,6 +72,14 @@ def onboarding_wizard(request, step=None):
         paso_actual = getattr(empresa, "onboarding_step", 1)
     else:
         paso_actual = step_map.get(step, getattr(empresa, "onboarding_step", 1))
+
+    if paso_actual == 2:
+        config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
+        CompanyDefaultsService.apply_defaults_to_configuracion(config, empresa=empresa, commit=True)
+        if getattr(empresa, "onboarding_step", 1) == 2:
+            empresa.onboarding_step = 3
+            empresa.save(update_fields=["onboarding_step"])
+        return redirect("taller:onboarding_step", step="finalizar")
 
     # SEGURIDAD: No permitir saltar pasos adelante si el anterior no está completo
     if paso_actual > getattr(empresa, "onboarding_step", 1):
@@ -109,9 +120,7 @@ def onboarding_wizard(request, step=None):
     if paso_actual == 1:
         context["form"] = OnboardingIdentidadForm(instance=empresa)
     elif paso_actual == 2:
-        config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
-        context["form"] = OnboardingFiscalForm(instance=config)
-        context["config"] = config
+        return redirect("taller:onboarding_step", step="finalizar")
 
     return render(request, template, context)
 
@@ -144,32 +153,12 @@ def onboarding_guardar_paso(request, paso):
 
                     CompanyDefaultsService.apply_defaults_to_empresa(empresa, commit=True)
 
-                    if empresa.onboarding_step == 1:
-                        empresa.onboarding_step = 2
-                        empresa.save(update_fields=["onboarding_step"])
-                    return JsonResponse(
-                        {
-                            "success": True,
-                            "next_step": 2,
-                            "next_step_url": reverse(
-                                "taller:onboarding_step", kwargs={"step": "fiscal"}
-                            ),
-                            "message": "Información básica guardada correctamente",
-                        }
-                    )
-                return JsonResponse({"success": False, "errors": form.errors})
-
-            elif paso == 2:  # Configuración fiscal
-                config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
-                form = OnboardingFiscalForm(request.POST, instance=config)
-                if form.is_valid():
-                    form.save()
-
+                    config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
                     CompanyDefaultsService.apply_defaults_to_configuracion(
                         config, empresa=empresa, commit=True
                     )
 
-                    if empresa.onboarding_step == 2:
+                    if empresa.onboarding_step == 1:
                         empresa.onboarding_step = 3
                         empresa.save(update_fields=["onboarding_step"])
                     return JsonResponse(
@@ -179,10 +168,29 @@ def onboarding_guardar_paso(request, paso):
                             "next_step_url": reverse(
                                 "taller:onboarding_step", kwargs={"step": "finalizar"}
                             ),
-                            "message": "Configuración fiscal guardada",
+                            "message": "Información básica guardada correctamente",
                         }
                     )
                 return JsonResponse({"success": False, "errors": form.errors})
+
+            elif paso == 2:  # Configuración fiscal (deprecated: se autocompleta por país)
+                config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
+                CompanyDefaultsService.apply_defaults_to_configuracion(
+                    config, empresa=empresa, commit=True
+                )
+                if empresa.onboarding_step == 2:
+                    empresa.onboarding_step = 3
+                    empresa.save(update_fields=["onboarding_step"])
+                return JsonResponse(
+                    {
+                        "success": True,
+                        "next_step": 3,
+                        "next_step_url": reverse(
+                            "taller:onboarding_step", kwargs={"step": "finalizar"}
+                        ),
+                        "message": "Configuración fiscal aplicada automáticamente",
+                    }
+                )
 
             elif paso == 3:  # Finalizar
                 empresa.onboarding_completado = True

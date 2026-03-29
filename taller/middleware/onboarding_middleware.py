@@ -15,11 +15,30 @@ class OnboardingMiddleware:
         if not request.user.is_authenticated:
             return self.get_response(request)
 
+        path = request.path or "/"
+
+        prefix = ""
+        try:
+            parts = [p for p in path.split("/") if p]
+            if len(parts) >= 2:
+                prefix = f"/{parts[0]}/{parts[1]}" if len(parts[1]) == 2 else ""
+        except Exception:
+            prefix = ""
+
+        if (
+            path.startswith(f"{prefix}/onboarding/fiscal")
+            if prefix
+            else path.startswith("/onboarding/fiscal")
+        ):
+            return redirect(
+                f"{prefix}/onboarding/finalizar/" if prefix else "/onboarding/finalizar/"
+            )
+
         # 1. EXCLUIR SI ES UNA PETICIÓN AJAX (XHR) O API
         if (
             request.headers.get("x-requested-with") == "XMLHttpRequest"
-            or request.path.startswith("/api/")
-            or request.path.startswith("/webhooks/")
+            or path.startswith("/api/")
+            or path.startswith("/webhooks/")
         ):
             return self.get_response(request)
 
@@ -43,7 +62,7 @@ class OnboardingMiddleware:
 
         # Verificar si la ruta actual está excluida
         for excluded in excluded_paths:
-            if request.path.startswith(excluded):
+            if path.startswith(excluded) or (prefix and path.startswith(prefix + excluded)):
                 return self.get_response(request)
 
         # Verificar si el usuario tiene empresa activa (Multi-tenant aware)
@@ -55,7 +74,9 @@ class OnboardingMiddleware:
                 raise Exception("No enterprise found")
         except:
             # Si no tiene empresa, redirigir a configuración
-            if not request.path.startswith("/configuracion/"):
+            if not path.startswith("/configuracion/") and not (
+                prefix and path.startswith(f"{prefix}/configuracion/")
+            ):
                 try:
                     return redirect("taller:configuracion")
                 except:
@@ -73,7 +94,9 @@ class OnboardingMiddleware:
             return self.get_response(request)
 
         # Si no está completado, redirigir al onboarding
-        if not request.path.startswith("/onboarding/"):
+        if not path.startswith("/onboarding/") and not (
+            prefix and path.startswith(f"{prefix}/onboarding/")
+        ):
             # Marcar inicio del onboarding si no está marcado
             if not empresa.onboarding_started_at:
                 from django.utils import timezone
@@ -84,12 +107,14 @@ class OnboardingMiddleware:
             # Mapeo de pasos a URLs reales
             step_map = {
                 1: "identidad",
-                2: "fiscal",
+                2: "finalizar",
                 3: "finalizar",
             }
             step_name = step_map.get(getattr(empresa, "onboarding_step", 1), "identidad")
 
             # Redirigir al paso actual usando la nueva ruta
-            return redirect(f"/onboarding/{step_name}/")
+            return redirect(
+                f"{prefix}/onboarding/{step_name}/" if prefix else f"/onboarding/{step_name}/"
+            )
 
         return self.get_response(request)
