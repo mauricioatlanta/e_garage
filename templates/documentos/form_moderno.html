@@ -1,0 +1,42 @@
+{% extends "layout/app_layout.html" %}
+
+{% block page_title %}Nuevo Documento{% endblock %}
+
+{% block app_content %}
+
+<div class="grid grid-cols-3 gap-6">
+
+  <div class="col-span-2 space-y-4">
+
+    <div class="bg-[#111827] p-6 rounded-xl">
+      <h3 class="mb-4">Cliente</h3>
+      <input class="premium-input w-full" placeholder="Buscar cliente"/>
+    </div>
+
+    <div class="bg-[#111827] p-6 rounded-xl">
+      <h3 class="mb-4">Repuestos</h3>
+      <button class="btn-primary">+ Agregar repuesto</button>
+    </div>
+
+  </div>
+
+  <div class="bg-[#111827] p-6 rounded-xl sticky top-6 h-fit">
+
+    <h3 class="mb-4">Resumen</h3>
+
+    <div class="space-y-2 text-sm">
+      <div class="flex justify-between">
+        <span>Subtotal</span>
+        <span>$0</span>
+      </div>
+    </div>
+
+    <button class="btn-primary w-full mt-6">
+      Guardar documento
+    </button>
+
+  </div>
+
+</div>
+
+{% endblock %}

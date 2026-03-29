@@ -40,6 +40,7 @@
   {# --- CSS principales SIEMPRE cargan --- #}
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
+  <link rel="stylesheet" href="{% static 'css/app.css' %}">
 
   {# --- Starfield SOLO controla su CSS --- #}
   {% if enable_space_bg|default:1 %}
@@ -52,6 +53,7 @@
     :root{
       --company-primary: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }};
       --company-secondary: {{ COLOR_SECUNDARIO|default:secondary_color|default:"#0d6efd" }};
+      --accent: {{ branding_color|default:"#06b6d4" }};
       
       /* Variables de Bootstrap para compatibilidad */
       --bs-primary: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }};
@@ -696,7 +698,7 @@
   {% block extra_css %}{% endblock %}
 </head>
 
-<body class="min-h-screen flex flex-col{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %} eg-desarme-dashboard-compact{% endif %}">
+<body class="min-h-screen flex flex-col bg-black text-white{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %} eg-desarme-dashboard-compact{% endif %}">
 
 
   {# --- Fondo estelar SOLO su HTML cuando flag activo --- #}
@@ -881,6 +883,16 @@
     </div>
   </div>
   {% endif %}
+
+   {% if messages %}
+     <div class="fixed top-4 right-4 space-y-2 z-50">
+       {% for message in messages %}
+         <div class="bg-gray-800 text-white px-4 py-3 rounded-lg shadow">
+           {{ message }}
+         </div>
+       {% endfor %}
+     </div>
+   {% endif %}
 
   {# --- CONTENIDO --- #}
   {% block fondo_extra %}{% endblock %}

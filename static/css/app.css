@@ -1,0 +1,32 @@
+body {
+  background: #020617;
+  color: #f8fafc;
+}
+
+.premium-input {
+  background: #0f172a;
+  border: 1px solid #1e293b;
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+}
+
+.btn-primary {
+  background: var(--accent);
+  padding: 12px;
+  border-radius: 10px;
+  color: white;
+}
+
+.nav-item {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 10px;
+  color: #cbd5e1;
+  transition: background-color .15s ease, color .15s ease;
+}
+
+.nav-item:hover {
+  background: rgba(6, 182, 212, 0.08);
+  color: #ffffff;
+}

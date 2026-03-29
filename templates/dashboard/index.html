@@ -1,0 +1,20 @@
+{% extends "layout/app_layout.html" %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block app_content %}
+
+<div class="grid grid-cols-4 gap-6 mb-8">
+
+  {% include "components/ui/kpi_card.html" with title="Ventas" value="$1.200.000" %}
+  {% include "components/ui/kpi_card.html" with title="Servicios" value="32" %}
+  {% include "components/ui/kpi_card.html" with title="Repuestos" value="120" %}
+  {% include "components/ui/kpi_card.html" with title="Clientes" value="54" %}
+
+</div>
+
+<div class="bg-[#111827] border border-[#1e293b] rounded-xl p-6">
+  <h3 class="mb-4 font-semibold">Actividad reciente</h3>
+</div>
+
+{% endblock %}
