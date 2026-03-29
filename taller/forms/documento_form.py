@@ -399,7 +399,7 @@ class DocumentoForm(forms.ModelForm):
             documento.neto_repuestos = totales["total_repuestos"]
             documento.neto_servicios = totales["total_servicios"]
             documento.neto_otros_servicios = totales["total_otros"]
-            documento.tax_rate_applied = totales["iva_rate"] * 100
+            documento.tax_rate_applied = totales["iva_rate"]
             documento.tax_amount = totales["iva"]
             documento.total = totales["total"]
             documento.save(

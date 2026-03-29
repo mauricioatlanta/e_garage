@@ -13,39 +13,41 @@ def _as_decimal(value):
 
 
 def calcular_totales(documento):
-    total_repuestos = Decimal("0")
-    total_servicios = Decimal("0")
-    total_otros = Decimal("0")
+    # Reutilizar la misma lógica/tasa/quantize del modelo Documento
+    # para evitar divergencia con Documento.recompute_totals().
 
-    for lr in getattr(documento, "lineas_repuesto", []).all():
-        cantidad = _as_decimal(getattr(lr, "cantidad", 0))
-        precio = _as_decimal(getattr(lr, "precio_unitario", 0))
-        descuento_pct = _as_decimal(getattr(lr, "descuento", 0))
-        total_repuestos += cantidad * precio * (Decimal("1") - (descuento_pct / Decimal("100")))
+    rep = documento._sum_repuesto()
+    srv = documento._sum_servicio()
+    osrv = documento._sum_otro_servicio()
 
-    for ls in getattr(documento, "lineas_servicio", []).all():
-        cantidad = _as_decimal(getattr(ls, "cantidad", 0))
-        precio = _as_decimal(getattr(ls, "precio_unitario", 0))
-        descuento_pct = _as_decimal(getattr(ls, "descuento", 0))
-        total_servicios += cantidad * precio * (Decimal("1") - (descuento_pct / Decimal("100")))
+    rep = documento._q(rep)
+    srv = documento._q(srv)
+    osrv = documento._q(osrv)
 
-    for los in getattr(documento, "lineas_otro_servicio", []).all():
-        cantidad = _as_decimal(getattr(los, "cantidad", 0))
-        precio_cliente = _as_decimal(getattr(los, "precio_cliente", 0))
-        total_otros += cantidad * precio_cliente
+    desc = getattr(documento, "descuento", Decimal("0")) or Decimal("0")
+    desc = documento._q(desc)
 
-    iva_rate = Decimal("0.19")
-    iva = total_repuestos * iva_rate
+    rate = documento._resolve_tax_rate()  # porcentaje, ej: 19.0
 
-    subtotal = total_repuestos + total_servicios + total_otros
-    total = subtotal + iva
+    if getattr(documento, "apply_vat", True):
+        tax_base = rep
+    else:
+        tax_base = Decimal("0")
+
+    iva = tax_base * rate / Decimal("100.0")
+    iva = documento._q(iva)
+
+    subtotal = rep + srv + osrv
+    total = subtotal - desc + iva
+    total = documento._q(total)
 
     return {
         "subtotal": subtotal,
         "iva": iva,
         "total": total,
-        "total_repuestos": total_repuestos,
-        "total_servicios": total_servicios,
-        "total_otros": total_otros,
-        "iva_rate": iva_rate,
+        "total_repuestos": rep,
+        "total_servicios": srv,
+        "total_otros": osrv,
+        "descuento": desc,
+        "iva_rate": rate,
     }

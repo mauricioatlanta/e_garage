@@ -527,12 +527,13 @@ def procesar_documento_moderno(request, empresa):
         neto_serv = totales["total_servicios"]
         neto_otros = totales["total_otros"]
         tax_amount = totales["iva"]
-        tax_rate_applied = totales["iva_rate"] * Decimal("100")
+        tax_rate_applied = totales["iva_rate"]
         total = totales["total"]
 
         # 10) Persistir campos de totales en Documento
         documento.neto_repuestos = neto_rep
-        documento.neto_servicios = neto_serv + neto_otros
+        documento.neto_servicios = neto_serv
+        documento.neto_otros_servicios = neto_otros
         documento.tax_rate_applied = tax_rate_applied
         documento.tax_amount = tax_amount
         documento.total = total
@@ -540,6 +541,7 @@ def procesar_documento_moderno(request, empresa):
             update_fields=[
                 "neto_repuestos",
                 "neto_servicios",
+                "neto_otros_servicios",
                 "tax_rate_applied",
                 "tax_amount",
                 "total",
@@ -904,13 +906,13 @@ def documento_form(request, pk=None):
             neto_serv = totales["total_servicios"]
             neto_otros = totales["total_otros"]
             tax_amount = totales["iva"]
-            tax_rate = totales["iva_rate"] * Decimal("100")
+            tax_rate = totales["iva_rate"]
             total = totales["total"]
 
             # Persistir totales
             doc.neto_repuestos = neto_rep
             doc.neto_servicios = neto_serv
-            doc.neto_otros = neto_otros
+            doc.neto_otros_servicios = neto_otros
             doc.tax_rate_applied = tax_rate
             doc.tax_amount = tax_amount
             doc.total = total
@@ -918,7 +920,7 @@ def documento_form(request, pk=None):
                 update_fields=[
                     "neto_repuestos",
                     "neto_servicios",
-                    "neto_otros",
+                    "neto_otros_servicios",
                     "tax_rate_applied",
                     "tax_amount",
                     "total",
