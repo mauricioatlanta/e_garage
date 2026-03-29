@@ -30,16 +30,8 @@ class OnboardingMiddleware:
         except Exception:
             prefix = ""
 
-        if (
-            path.startswith(f"{prefix}/onboarding/fiscal")
-            if prefix
-            else path.startswith("/onboarding/fiscal")
-        ):
-            return redirect(
-                f"{prefix}/onboarding/finalizar/"
-                if prefix
-                else f"{default_prefix}/onboarding/finalizar/"
-            )
+        if path.startswith("/onboarding/") and not prefix:
+            return redirect(f"{default_prefix}{path}")
 
         # 1. EXCLUIR SI ES UNA PETICIÓN AJAX (XHR) O API
         if (
