@@ -65,21 +65,37 @@ class OnboardingMiddleware:
             if path.startswith(excluded) or (prefix and path.startswith(prefix + excluded)):
                 return self.get_response(request)
 
+        base_path = path
+        if prefix and path.startswith(prefix):
+            base_path = path[len(prefix) :] or "/"
+
+        protected_paths = (
+            "/dashboard/",
+            "/workspace/",
+            "/settings/",
+            "/centro-operaciones/",
+            "/centro-operaciones-espacial/",
+        )
+
+        is_protected = any(base_path.startswith(p) for p in protected_paths)
+        if not is_protected:
+            return self.get_response(request)
+
         # Verificar si el usuario tiene empresa activa (Multi-tenant aware)
         try:
             from taller.utils.empresa import get_active_empresa
 
             empresa = get_active_empresa(request)
             if not empresa:
-                raise Exception("No enterprise found")
-        except:
-            # Si no tiene empresa, redirigir a configuración
-            if not path.startswith("/configuracion/") and not (
-                prefix and path.startswith(f"{prefix}/configuracion/")
-            ):
+                return self.get_response(request)
+        except Exception:
+            return self.get_response(request)
+
+        if not empresa:
+            if not base_path.startswith("/configuracion/"):
                 try:
                     return redirect("taller:configuracion")
-                except:
+                except Exception:
                     return redirect("/configuracion/")
             return self.get_response(request)
 
