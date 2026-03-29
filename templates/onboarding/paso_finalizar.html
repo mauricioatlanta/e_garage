@@ -58,16 +58,29 @@
     <h6><i class="fas fa-rocket"></i> ¡Estás listo para comenzar!</h6>
     <p class="mb-0">Una vez que finalices, podrás acceder al dashboard completo y comenzar a crear tus primeros documentos.</p>
 </div>
+
+<div class="d-flex gap-2">
+    <button type="button" class="btn btn-primary" onclick="finalizarOnboarding()">
+        <i class="fas fa-check"></i> Finalizar
+    </button>
+</div>
 {% endblock %}
 
 {% block extra_js %}
 {{ block.super }}
 <script>
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+}
+
 function actualizarPreview() {
     const previewDiv = document.getElementById('documentoPreview');
     previewDiv.innerHTML = '<div class="text-center py-4"><div class="spinner-border text-primary" role="status"></div><p class="mt-2">Generando vista previa real...</p></div>';
 
-    fetch('/onboarding/preview-documento/', {
+    fetch('../preview-documento/', {
         headers: {
             'Accept': 'application/json',
             'X-Requested-With': 'XMLHttpRequest'
@@ -104,6 +117,31 @@ function actualizarPreview() {
     .catch(error => {
         previewDiv.innerHTML = '<div class="alert alert-danger">Error de conexión al generar preview.</div>';
         console.error('Error:', error);
+    });
+}
+
+function finalizarOnboarding() {
+    const csrftoken = getCookie('csrftoken');
+    fetch('../guardar/3/', {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-Requested-With': 'XMLHttpRequest',
+            ...(csrftoken ? { 'X-CSRFToken': csrftoken } : {})
+        },
+        body: ''
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data && data.success && data.redirect_url) {
+            window.location.href = data.redirect_url;
+            return;
+        }
+        window.location.reload();
+    })
+    .catch(() => {
+        window.location.reload();
     });
 }
 
