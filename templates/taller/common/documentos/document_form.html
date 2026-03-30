@@ -2263,10 +2263,11 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
 
   console.log(`🚗 Cargando vehículos para cliente ID: ${clienteId}${vehiculoIdToSelect ? ` (preseleccionar: ${vehiculoIdToSelect})` : ''}`);
 
+  const clienteIdStr = String(clienteId);
+  const lastLoadedClienteId = String(vehiculoSelect.dataset.loadedClienteId || '');
   const alreadyHasOptions = vehiculoSelect.options && vehiculoSelect.options.length > 1;
-  if (alreadyHasOptions && vehiculoSelect.dataset.source === 'form') {
-    console.log('ℹ️ Ya tiene opciones desde el formulario, omitiendo carga');
-    // Aún así, intentar preseleccionar si se especificó
+  if (alreadyHasOptions && lastLoadedClienteId === clienteIdStr) {
+    console.log(`ℹ️ Vehículos ya cargados para cliente ${clienteIdStr}, omitiendo nueva petición`);
     if (vehiculoIdToSelect) {
       setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
     }
@@ -2283,12 +2284,12 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
     const options = localMatches.map((v)=> `<option value="${v.id}">${v.label || v.text || ''}</option>`).join('');
     vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
     vehiculoSelect.dataset.source = 'prefetch';
+    vehiculoSelect.dataset.loadedClienteId = clienteIdStr;
     vehiculoSelect.disabled = false;
-    // Preseleccionar vehículo si se especificó
     if (vehiculoIdToSelect) {
       setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
     }
-    return; // Salir temprano si encontramos en prefetch
+    return;
   }
 
   // Si no hay en prefetch, hacer petición AJAX
@@ -2325,6 +2326,7 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
       }).join('');
       vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
       vehiculoSelect.dataset.source = 'fetch';
+      vehiculoSelect.dataset.loadedClienteId = clienteIdStr;
       console.log(`✅ ${items.length} vehículos cargados exitosamente`);
       
       // Preseleccionar vehículo si se especificó
@@ -4129,6 +4131,12 @@ function submitDocumentForm(){
   clienteBusqueda?.addEventListener('input', (event)=> window.handleClienteInput(event.target.value));
   clienteBusqueda?.addEventListener('focus', (event)=> window.handleClienteFocus(event.target.value));
   clienteBusqueda?.addEventListener('keydown', (event)=> window.handleClienteKeydown(event));
+  clienteSelect?.addEventListener('change', function () {
+    const selectedClienteId = this.value;
+    if (!selectedClienteId) return;
+    console.log('🔁 Cliente cambiado en hidden select, cargando vehículos para cliente:', selectedClienteId);
+    cargarVehiculosPorCliente(selectedClienteId);
+  });
   
   // El botón "Nuevo Cliente" - usar URL del servidor (country_url) + ?next= para retorno
   const btnNuevoCliente = document.getElementById('btn-nuevo-cliente');

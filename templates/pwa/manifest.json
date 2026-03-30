@@ -11,50 +11,14 @@
   "icons": [
     {
       "purpose": "any maskable",
-      "sizes": "72x72",
-      "src": "/static/images/egarage_icon_72x72.png",
-      "type": "image/png"
-    },
-    {
-      "purpose": "any maskable",
-      "sizes": "96x96",
-      "src": "/static/images/egarage_icon_96x96.png",
-      "type": "image/png"
-    },
-    {
-      "purpose": "any maskable",
-      "sizes": "128x128",
-      "src": "/static/images/egarage_icon_128x128.png",
-      "type": "image/png"
-    },
-    {
-      "purpose": "any maskable",
-      "sizes": "144x144",
-      "src": "/static/images/egarage_icon_144x144.png",
-      "type": "image/png"
-    },
-    {
-      "purpose": "any maskable",
-      "sizes": "152x152",
-      "src": "/static/images/egarage_icon_152x152.png",
-      "type": "image/png"
-    },
-    {
-      "purpose": "any maskable",
       "sizes": "192x192",
-      "src": "/static/images/egarage_icon_192x192.png",
-      "type": "image/png"
-    },
-    {
-      "purpose": "any maskable",
-      "sizes": "384x384",
-      "src": "/static/images/egarage_icon_384x384.png",
+      "src": "/static/pwa/icons/icon-192x192.png",
       "type": "image/png"
     },
     {
       "purpose": "any maskable",
       "sizes": "512x512",
-      "src": "/static/images/egarage_icon_512x512.png",
+      "src": "/static/pwa/icons/icon-512x512.png",
       "type": "image/png"
     }
   ],
@@ -95,7 +59,7 @@
       "icons": [
         {
           "sizes": "96x96",
-          "src": "/static/images/egarage_icon_96x96.png"
+          "src": "/static/pwa/icons/icon-96x96.png"
         }
       ],
       "name": "Dashboard",
@@ -107,7 +71,7 @@
       "icons": [
         {
           "sizes": "96x96",
-          "src": "/static/images/egarage_icon_96x96.png"
+          "src": "/static/pwa/icons/icon-96x96.png"
         }
       ],
       "name": "Documentos",
@@ -119,7 +83,7 @@
       "icons": [
         {
           "sizes": "96x96",
-          "src": "/static/images/egarage_icon_96x96.png"
+          "src": "/static/pwa/icons/icon-96x96.png"
         }
       ],
       "name": "Clientes",

@@ -16,6 +16,11 @@ urlpatterns = [
         ajax_custom.vehiculos_por_cliente,
         name="vehiculos_por_cliente",
     ),
+    path(
+        "vehiculos/",
+        ajax_custom.vehiculos_por_cliente,
+        name="vehiculos_por_cliente_legacy",
+    ),
     # Rutas de ciudades (desde views_extra/ajax.py)
     path("ciudades-por-region/", views_extra_ajax.ciudades_por_region, name="ciudades_por_region"),
     # Rutas de marcas, modelos, motores y cajas (desde ajax_views.py)
