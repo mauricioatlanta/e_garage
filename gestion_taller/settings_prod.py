@@ -125,10 +125,7 @@ SECURE_HSTS_PRELOAD = env_bool("DJANGO_SECURE_HSTS_PRELOAD", True) if SECURE_SSL
 # =========================
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = env_str("DJANGO_X_FRAME_OPTIONS", "DENY") or "DENY"
-SECURE_REFERRER_POLICY = (
-    env_str("DJANGO_SECURE_REFERRER_POLICY", "strict-origin-when-cross-origin")
-    or "strict-origin-when-cross-origin"
-)
+SECURE_REFERRER_POLICY = env_str("DJANGO_SECURE_REFERRER_POLICY", "same-origin") or "same-origin"
 
 
 # =========================

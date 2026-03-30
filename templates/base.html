@@ -1033,34 +1033,44 @@
     }
 
     // Service Worker Registration para PWA
+    // Desactivado temporalmente para evitar problemas de CSRF en móviles.
+    // if ('serviceWorker' in navigator) {
+    //   window.addEventListener('load', function() {
+    //     navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js', { scope: '/' })
+    //       .then(function(registration) {
+    //         console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+    //         
+    //         // Verificar actualizaciones cada hora
+    //         setInterval(function() {
+    //           registration.update();
+    //         }, 3600000); // 1 hora
+    //         
+    //         // Escuchar actualizaciones del service worker
+    //         registration.addEventListener('updatefound', function() {
+    //           const newWorker = registration.installing;
+    //           newWorker.addEventListener('statechange', function() {
+    //             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+    //               // Hay una nueva versión disponible
+    //               if (confirm('🎉 Nueva versión de eGarage disponible. ¿Deseas actualizar ahora?')) {
+    //                 newWorker.postMessage({ type: 'SKIP_WAITING' });
+    //                 window.location.reload();
+    //               }
+    //             }
+    //           });
+    //         });
+    //       })
+    //       .catch(function(error) {
+    //         console.warn('⚠️ Error al registrar Service Worker:', error);
+    //       });
+    //   });
+    // }
+
+    // Invalidate any existing service workers in the client
     if ('serviceWorker' in navigator) {
-      window.addEventListener('load', function() {
-        navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js', { scope: '/' })
-          .then(function(registration) {
-            console.log('✅ Service Worker registrado exitosamente:', registration.scope);
-            
-            // Verificar actualizaciones cada hora
-            setInterval(function() {
-              registration.update();
-            }, 3600000); // 1 hora
-            
-            // Escuchar actualizaciones del service worker
-            registration.addEventListener('updatefound', function() {
-              const newWorker = registration.installing;
-              newWorker.addEventListener('statechange', function() {
-                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  // Hay una nueva versión disponible
-                  if (confirm('🎉 Nueva versión de eGarage disponible. ¿Deseas actualizar ahora?')) {
-                    newWorker.postMessage({ type: 'SKIP_WAITING' });
-                    window.location.reload();
-                  }
-                }
-              });
-            });
-          })
-          .catch(function(error) {
-            console.warn('⚠️ Error al registrar Service Worker:', error);
-          });
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        for (let registration of registrations) {
+          registration.unregister();
+        }
       });
     }
     
