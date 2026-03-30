@@ -1,0 +1,101 @@
+========================================
+FIX LOGGING NOISE - COMANDOS SERVIDOR
+========================================
+
+PASO 1: Conectar al servidor
+-----------------------------
+ssh root@egarage-server
+cd /srv/egarage
+source venv/bin/activate
+
+
+PASO 2: Backup actual
+--------------------
+mkdir -p backups/middleware_$(date +%Y%m%d_%H%M%S)
+cp taller/middleware/lang_policy.py backups/middleware_$(date +%Y%m%d_%H%M%S)/
+
+
+PASO 3: Actualizar archivos (desde repositorio local)
+-----------------------------------------------------
+# Opción A: Si usas git
+git pull origin main
+
+# Opción B: Copiar manualmente desde tu máquina local
+# En tu máquina Windows:
+scp taller/middleware/lang_policy.py root@egarage-server:/srv/egarage/taller/middleware/
+scp gestion_taller/middleware/bot_filter.py root@egarage-server:/srv/egarage/gestion_taller/middleware/
+
+
+PASO 4: Editar settings_prod.py
+-------------------------------
+nano gestion_taller/settings_prod.py
+
+# Buscar MIDDLEWARE = [ y agregar al inicio:
+MIDDLEWARE = [
+    'gestion_taller.middleware.bot_filter.BotFilterMiddleware',  # ← AGREGAR ESTA LÍNEA
+    'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
+    # ... resto del middleware
+]
+
+# Guardar: Ctrl+O, Enter, Ctrl+X
+
+
+PASO 5: Reiniciar Gunicorn
+--------------------------
+sudo systemctl restart gunicorn
+sudo systemctl status gunicorn
+
+
+PASO 6: Verificar logs limpios
+------------------------------
+# Ver últimos logs
+sudo journalctl -u gunicorn -n 50 --no-pager
+
+# Seguir logs en tiempo real
+sudo journalctl -u gunicorn -f
+
+# Buscar si aún hay DEBUG (no debería haber)
+sudo journalctl -u gunicorn -n 200 --no-pager | grep DEBUG
+
+
+PASO 7: Probar bot filter
+-------------------------
+# Desde tu máquina local, simular bot scan:
+curl https://egarage.cl/wp-includes/wlwmanifest.xml
+
+# En el servidor, verificar que se bloqueó:
+sudo journalctl -u gunicorn -n 10 --no-pager | grep "Bot scan blocked"
+
+
+ROLLBACK (si hay problemas)
+---------------------------
+# Restaurar backup
+cp backups/middleware_FECHA/*.py taller/middleware/
+
+# Comentar BotFilterMiddleware en settings_prod.py
+nano gestion_taller/settings_prod.py
+# Comentar la línea: # 'gestion_taller.middleware.bot_filter.BotFilterMiddleware',
+
+# Reiniciar
+sudo systemctl restart gunicorn
+
+
+VERIFICACIÓN FINAL
+------------------
+✅ No más spam de [DEBUG] en logs
+✅ Bots bloqueados con mensaje "Bot scan blocked"
+✅ Requests legítimos funcionan normal
+✅ Login CL y USA funcionan correctamente
+
+
+ARCHIVOS MODIFICADOS
+--------------------
+1. taller/middleware/lang_policy.py (print → logger.debug)
+2. gestion_taller/middleware/bot_filter.py (NUEVO)
+3. gestion_taller/settings_prod.py (agregar BotFilterMiddleware)
+
+
+DOCUMENTACIÓN COMPLETA
+----------------------
+Ver: docs/FIX_PRODUCTION_LOGGING_NOISE.md
