@@ -1787,6 +1787,26 @@ function initDocumentFormScript(){
       EG.cfg.URL_SERVICE_CREATE     = EG.cfg.URL_SERVICE_CREATE     || FORM.dataset.urlServiceCreate;
       EG.cfg.URL_OUTSOURCED_SERVICES= EG.cfg.URL_OUTSOURCED_SERVICES|| FORM.dataset.urlOutsourcedServices;
       EG.cfg.URL_USED_PARTS        = EG.cfg.URL_USED_PARTS        || FORM.dataset.urlUsedParts;
+
+      // Fix: conectar evento Select2 + fallback change en cliente
+      if (window.jQuery) {
+        jQuery(document).on('select2:select', '#id_cliente', function (e) {
+          const clienteId = e?.params?.data?.id || jQuery(this).val();
+          console.log('🔥 select2:select cliente seleccionado:', clienteId);
+          if (clienteId) {
+            cargarVehiculosPorCliente(clienteId);
+          }
+        });
+      }
+      const clienteSelectFallback = document.getElementById('id_cliente');
+      if (clienteSelectFallback) {
+        clienteSelectFallback.addEventListener('change', function () {
+          console.log('⚡ change fallback cliente seleccionado:', this.value);
+          if (this.value) {
+            cargarVehiculosPorCliente(this.value);
+          }
+        });
+      }
     }
     // Fallback a path-based si no hay data-* (legacy)
     if (!EG.cfg.URL_NEXT_NUMBER && FORM) {
