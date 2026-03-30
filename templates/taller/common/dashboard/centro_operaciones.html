@@ -314,7 +314,7 @@ body {
                 <div class="text-2xl mb-1">{% if checklist_onboarding.cliente_creado %}✅{% else %}👥{% endif %}</div>
                 <div class="text-xs font-bold {% if checklist_onboarding.cliente_creado %}text-green-400{% else %}text-gray-400{% endif %}">Cliente</div>
                 {% if not checklist_onboarding.cliente_creado %}
-                <a href="{% url 'taller:clientes:cliente_crear' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Crear</a>
+                <a href="{% country_url 'taller:clientes:cliente_crear' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Crear</a>
                 {% endif %}
             </div>
             
@@ -323,7 +323,7 @@ body {
                 <div class="text-2xl mb-1">{% if checklist_onboarding.vehiculo_creado %}✅{% else %}🚗{% endif %}</div>
                 <div class="text-xs font-bold {% if checklist_onboarding.vehiculo_creado %}text-green-400{% else %}text-gray-400{% endif %}">Vehículo</div>
                 {% if not checklist_onboarding.vehiculo_creado %}
-                <a href="{% url 'taller:vehiculos:vehiculo_crear' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Registrar</a>
+                <a href="{% country_url 'taller:vehiculos:vehiculo_crear' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Registrar</a>
                 {% endif %}
             </div>
             
@@ -332,7 +332,7 @@ body {
                 <div class="text-2xl mb-1">{% if checklist_onboarding.documento_creado %}✅{% else %}📄{% endif %}</div>
                 <div class="text-xs font-bold {% if checklist_onboarding.documento_creado %}text-green-400{% else %}text-gray-400{% endif %}">Documento</div>
                 {% if not checklist_onboarding.documento_creado %}
-                <a href="{% url 'taller:documentos:documento_crear' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Emitir</a>
+                <a href="{% country_url 'taller:documentos:documento_crear' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Emitir</a>
                 {% endif %}
             </div>
         </div>
