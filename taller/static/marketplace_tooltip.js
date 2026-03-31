@@ -354,12 +354,7 @@
         this.show(inputElement, [], true);
       }
     },
-      } } } } catch(error) {
-        console.error('❌ Error consultando precios del marketplace:', error);
-        // Mostrar mensaje de "no encontrado" en lugar de ocultar
-        this.show(inputElement, [], true);
-      }
-    },
+      ,
 
     /**
      * Obtiene el token CSRF
