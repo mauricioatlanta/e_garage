@@ -15,9 +15,10 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="eGarage">
   <link rel="manifest" href="/{{ country_code|lower|default:'cl' }}/{{ lang_code|lower|default:'es' }}/manifest.json">
-  <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
-  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/egarage_icon_192x192.png' %}">
-  <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/egarage_icon_512x512.png' %}">
+  <link rel="shortcut icon" href="{% static 'images/egarage_default_logo.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/egarage_default_logo.png' %}">
+  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/egarage_default_logo.png' %}">
+  <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/egarage_default_logo.png' %}">
   <link rel="icon" type="image/svg+xml" href="{% static 'images/egarage_default_logo.svg' %}">
   
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">

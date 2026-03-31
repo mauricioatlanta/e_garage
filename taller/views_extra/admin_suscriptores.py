@@ -241,8 +241,8 @@ def admin_suscriptores(request):
             "empresas_activas": empresas_activas,
             "empresas_vencidas": empresas_vencidas,
             "empresas_criticas": empresas_criticas,
-            "country_code": country_code,
-            "lang_code": lang_code,
+            "country_code": "cl",
+            "lang_code": "es",
         }
 
         return render(request, "admin/suscriptores/lista_suscriptores.html", context)
