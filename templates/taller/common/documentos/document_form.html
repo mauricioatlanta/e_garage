@@ -1120,23 +1120,27 @@ window.EG.utils = {
         return m ? decodeURIComponent(m.pop()) : "";
     }
 };
-
 window.EG.state = {
-    clienteId: null,
-    vehiculoId: null,
-    repuestos: [],
-    servicios: [],
-    otros: [],
-    isHydrated: false,
-    isRestoring: false
+    clienteId: null, vehiculoId: null, repuestos: [], servicios: [], otros: [],
+    isHydrated: false, isRestoring: false
 };
-
 window.EG.fetch = async function(url, opts = {}) {
+    const token = window.EG.utils.window.EG.utils.getCookie("csrftoken");
     const headers = {
         "X-Requested-With": "XMLHttpRequest",
-        "X-CSRFToken": window.EG.utils.getCookie("csrftoken"),
+        "X-CSRFToken": token,
         ...(opts.headers || {})
     };
+    return fetch(url, { credentials: "same-origin", ...opts, headers });
+};
+
+
+window.EG = window.EG || {};
+
+
+
+
+
     return fetch(url, { credentials: "same-origin", ...opts, headers });
 };
 
@@ -1743,23 +1747,27 @@ window.EG.utils = {
         return m ? decodeURIComponent(m.pop()) : "";
     }
 };
-
 window.EG.state = {
-    clienteId: null,
-    vehiculoId: null,
-    repuestos: [],
-    servicios: [],
-    otros: [],
-    isHydrated: false,
-    isRestoring: false
+    clienteId: null, vehiculoId: null, repuestos: [], servicios: [], otros: [],
+    isHydrated: false, isRestoring: false
 };
-
 window.EG.fetch = async function(url, opts = {}) {
+    const token = window.EG.utils.window.EG.utils.getCookie("csrftoken");
     const headers = {
         "X-Requested-With": "XMLHttpRequest",
-        "X-CSRFToken": window.EG.utils.getCookie("csrftoken"),
+        "X-CSRFToken": token,
         ...(opts.headers || {})
     };
+    return fetch(url, { credentials: "same-origin", ...opts, headers });
+};
+
+
+window.EG = window.EG || {};
+
+
+
+
+
     return fetch(url, { credentials: "same-origin", ...opts, headers });
 };
 
@@ -1797,24 +1805,9 @@ function initDocumentFormScript(){
 
   // === CSRF ===
   
-  const CSRF = getCookie('csrftoken');
+  const CSRF = window.EG.utils.getCookie('csrftoken');
 
-  async function egFetch(url, opts={}){
-    const defaults = {
-      credentials: 'same-origin',
-      headers: { "X-CSRFToken": getCookie("csrftoken"),
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': CSRF,
-      }
-    };
-    const cfg = {
-      ...defaults,
-      ...opts,
-      headers: { "X-CSRFToken": getCookie("csrftoken"), ...(defaults.headers||{}), ...((opts||{}).headers||{}) }
-    };
-    return fetch(url, cfg);
-  }
-  EG.fetch = egFetch;
+  
 
   // === CONFIG: no pisa si ya existe ===
   EG.cfg = EG.cfg || {};
@@ -4292,6 +4285,7 @@ document.addEventListener('click', function(e) {
 {# "Capa de Inteligencia" - UX MÃ³vil y Blindaje de Campos Calculados #}
 <script src="{% static 'js/document_engine.js' %}"></script>
 {% endblock extra_js %}
+
 
 
 
