@@ -1036,7 +1036,7 @@
     // Desactivado temporalmente para evitar problemas de CSRF en móviles.
     // if ('serviceWorker' in navigator) {
     //   window.addEventListener('load', function() {
-    //     navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js', { scope: '/' })
+    //     navigator.serviceWorker.register('/{{ request.country|default:"cl" }}/{{ LANGUAGE_CODE|default:"es" }}/service-worker.js', { scope: '/' })
     //       .then(function(registration) {
     //         console.log('✅ Service Worker registrado exitosamente:', registration.scope);
     //         
