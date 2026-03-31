@@ -1,4 +1,4 @@
-﻿import json
+import json
 from decimal import Decimal
 
 from django.db import models
@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from django.shortcuts import redirect
 
 
-# Vista wrapper para lista de documentos de Chile sin requerir parÃ¡metro country
+# Vista wrapper para lista de documentos de Chile sin requerir parámetro country
 def lista_documentos_cl(request):
     return redirect("documentos:lista_documentos", country="cl")
 
@@ -20,13 +20,13 @@ from taller.services.empresa_service import get_empresa_safe
 from taller.services.documento_service import calcular_totales
 
 
-# API para crear tÃ©cnicos (SEGURO)
+# API para crear técnicos (SEGURO)
 @login_required
 @require_POST
 def api_crear_tecnico(request):
     """
-    API segura para crear tÃ©cnicos.
-    - Requiere autenticaciÃ³n (@login_required)
+    API segura para crear técnicos.
+    - Requiere autenticación (@login_required)
     - Solo acepta POST (@require_POST)
     - Usa empresa del usuario autenticado (no del cliente)
     """
@@ -100,7 +100,7 @@ def autocomplete_servicio(request):
     if not empresa:
         return JsonResponse([], safe=False)
 
-    # Filtrar servicios por empresa y bÃºsqueda
+    # Filtrar servicios por empresa y búsqueda
     servicios = Servicio.objects.filter(empresa=empresa)
 
     if q:
@@ -128,7 +128,7 @@ def autocomplete_otro_servicio(request):
     if not q:
         return JsonResponse([], safe=False)
 
-    # Buscar en lÃ­neas de otros servicios existentes para sugerir
+    # Buscar en líneas de otros servicios existentes para sugerir
     from taller.models.lineas_documento import LineaOtroServicio
 
     lineas_existentes = (
@@ -180,7 +180,7 @@ def api_crear_servicio(request):
                     "precio": float(getattr(servicio_existente, "precio", 0)),
                     "descripcion": getattr(servicio_existente, "descripcion", ""),
                     "creado": False,
-                    "mensaje": "El servicio ya existÃ­a",
+                    "mensaje": "El servicio ya existía",
                 }
             )
 
@@ -216,14 +216,14 @@ def autocomplete_cliente(request):
     # Obtener empresa del usuario autenticado
     empresa = get_empresa_safe(request)
 
-    # Si no hay empresa, retornar vacÃ­o
+    # Si no hay empresa, retornar vacío
     if not empresa:
         return JsonResponse({"results": []})
 
     # Filtrar clientes por empresa
     clientes = Cliente.objects.filter(empresa=empresa)
 
-    # Si hay tÃ©rmino de bÃºsqueda, filtrar por Ã©l
+    # Si hay término de búsqueda, filtrar por él
     if q:
         clientes = clientes.filter(
             models.Q(nombre__icontains=q)
@@ -232,14 +232,14 @@ def autocomplete_cliente(request):
             | models.Q(telefono__icontains=q)
         )[:20]
     else:
-        # Si no hay tÃ©rmino, mostrar los primeros 20 clientes
+        # Si no hay término, mostrar los primeros 20 clientes
         clientes = clientes[:20]
 
     data = {
         "results": [
             {
                 "id": c.pk,
-                "text": f"{c.nombre} {c.apellido or ''} - {c.telefono or 'Sin telÃ©fono'}",
+                "text": f"{c.nombre} {c.apellido or ''} - {c.telefono or 'Sin teléfono'}",
                 "nombre": c.nombre,
                 "apellido": c.apellido,
                 "email": c.email,
@@ -254,7 +254,7 @@ def autocomplete_cliente(request):
 from taller.models.vehiculos import Vehiculo
 
 
-# Devuelve los vehÃ­culos asociados a un cliente (por cliente_id) con filtrado de empresa
+# Devuelve los vehículos asociados a un cliente (por cliente_id) con filtrado de empresa
 def obtener_vehiculos_por_cliente(request):
     cliente_id = request.GET.get("cliente_id")
     if not cliente_id:
@@ -265,7 +265,7 @@ def obtener_vehiculos_por_cliente(request):
     if not empresa:
         return JsonResponse([], safe=False)
 
-    # Filtrar vehÃ­culos por cliente y empresa
+    # Filtrar vehículos por cliente y empresa
     vehiculos = Vehiculo.objects.filter(cliente_id=cliente_id, cliente__empresa=empresa).values(
         "id", "patente", "marca_id", "modelo_id"
     )
@@ -308,7 +308,7 @@ def editar_documento(request, *args, **kwargs):
 import os
 
 # IMPORTS PESADOS (weasyprint / xhtml2pdf) deben cargarse de forma perezosa
-# porque al importar el mÃ³dulo a nivel de mÃ³dulo pueden fallar dependencias
+# porque al importar el módulo a nivel de módulo pueden fallar dependencias
 # externas (p.ej. pyhanko) y bloquear el arranque del servidor.
 # Se realizan imports locales dentro de las funciones que generan PDFs.
 
@@ -328,11 +328,11 @@ from taller.utils.export_utils import DocumentoPDFExporter
 
 @login_required
 def crear_documento(request):
-    print("[DEBUG CREAR] ========== VERSIÃ“N CORREGIDA - INICIO CREAR DOCUMENTO ==========")
+    print("[DEBUG CREAR] ========== VERSIÓN CORREGIDA - INICIO CREAR DOCUMENTO ==========")
     print(f"[DEBUG CREAR] Usuario: {request.user.username}")
-    print(f"[DEBUG CREAR] MÃ©todo: {request.method}")
+    print(f"[DEBUG CREAR] Método: {request.method}")
 
-    # Obtener empresa del usuario (comÃºn para GET y POST)
+    # Obtener empresa del usuario (común para GET y POST)
     empresa = get_empresa_safe(request)
     if not empresa:
         return redirect("/")
@@ -344,7 +344,7 @@ def crear_documento(request):
         print(f"[DEBUG CREAR] Datos POST recibidos: {list(post_data.keys())}")
         print(f"[DEBUG CREAR] json_items: {post_data.get('json_items')}")
 
-        # Manejar mecÃ¡nico (si es texto, crear mecÃ¡nico nuevo)
+        # Manejar mecánico (si es texto, crear mecánico nuevo)
         mecanico_id = post_data.get("mecanico")
         if mecanico_id and not mecanico_id.isdigit():
             from taller.models.tecnico import Tecnico
@@ -352,26 +352,26 @@ def crear_documento(request):
             mecanico_obj, _ = Tecnico.objects.get_or_create(nombre=mecanico_id, empresa=empresa)
             post_data["mecanico"] = mecanico_obj.pk
             print(
-                f"[DEBUG CREAR] MecÃ¡nico creado/encontrado: {mecanico_obj.nombre} (ID: {mecanico_obj.pk})"
+                f"[DEBUG CREAR] Mecánico creado/encontrado: {mecanico_obj.nombre} (ID: {mecanico_obj.pk})"
             )
 
         form = DocumentoForm(post_data, empresa=empresa, user=request.user)
         if form.is_valid():
-            print("[DEBUG CREAR] Formulario vÃ¡lido")
+            print("[DEBUG CREAR] Formulario válido")
             documento = form.save(commit=False)
             documento.empresa = empresa
 
-            # Generar nÃºmero de documento si no existe
+            # Generar número de documento si no existe
             if not documento.numero_documento:
                 tipo = documento.tipo.lower().replace(" ", "_")
                 count = Documento.objects.filter(tipo=documento.tipo, empresa=empresa).count() + 1
                 documento.numero = count
-                print(f"[DEBUG CREAR] NÃºmero generado: {documento.numero_documento}")
+                print(f"[DEBUG CREAR] Número generado: {documento.numero_documento}")
 
             documento.save()
             form.save_m2m()
 
-            # Procesar Ã­tems desde JSON (repuestos y servicios)
+            # Procesar ítems desde JSON (repuestos y servicios)
             json_items = post_data.get("json_items")
             print(f"[DEBUG CREAR] json_items recibido: {json_items}")
             if json_items is not None and json_items.strip() not in ["", "[]", "null"]:
@@ -398,7 +398,7 @@ def crear_documento(request):
                                 cantidad=int(item.get("cantidad", 1)),
                                 precio_unitario=precio,
                             )
-                            print(f"[DEBUG CREAR] âœ… Repuesto guardado: {nombre} (${precio})")
+                            print(f"[DEBUG CREAR] ✅ Repuesto guardado: {nombre} (${precio})")
 
                         elif tipo == "servicio" and nombre and precio > 0:
                             LineaServicio.objects.create(
@@ -407,10 +407,10 @@ def crear_documento(request):
                                 precio_unitario=precio,
                                 cantidad=int(item.get("cantidad", 1)),
                             )
-                            print(f"[DEBUG CREAR] âœ… Servicio guardado: {nombre} (${precio})")
+                            print(f"[DEBUG CREAR] ✅ Servicio guardado: {nombre} (${precio})")
 
                         elif tipo == "otro_servicio" and nombre and precio > 0:
-                            # Buscar o crear el servicio en el catÃ¡logo por nombre localizado
+                            # Buscar o crear el servicio en el catálogo por nombre localizado
                             from taller.servicios.models import Servicio, ServicioName
 
                             servicio_obj = Servicio.objects.filter(
@@ -433,7 +433,7 @@ def crear_documento(request):
                                     is_default=True,
                                 )
                                 print(
-                                    f"[DEBUG CREAR] âž• Nuevo otro servicio creado en catÃ¡logo: {nombre}"
+                                    f"[DEBUG CREAR] ➕ Nuevo otro servicio creado en catálogo: {nombre}"
                                 )
 
                             LineaOtroServicio.objects.create(
@@ -446,31 +446,31 @@ def crear_documento(request):
                                 observaciones=item.get("observaciones", "").strip(),
                             )
                             print(
-                                f"[DEBUG CREAR] âœ… Otro servicio guardado: {nombre} - {item.get('empresa', '')} (${precio})"
+                                f"[DEBUG CREAR] ✅ Otro servicio guardado: {nombre} - {item.get('empresa', '')} (${precio})"
                             )
 
                         else:
                             print(
-                                f"[DEBUG CREAR] Item ignorado por datos incompletos o invÃ¡lidos: {item}"
+                                f"[DEBUG CREAR] Item ignorado por datos incompletos o inválidos: {item}"
                             )
 
                 except Exception as e:
-                    print(f"âŒ Error procesando json_items: {e}")
+                    print(f"❌ Error procesando json_items: {e}")
                     import traceback
 
                     traceback.print_exc()
             else:
-                print("[DEBUG CREAR] json_items es None o vacÃ­o - no se recibieron items")
+                print("[DEBUG CREAR] json_items es None o vacío - no se recibieron items")
 
-            # Recalcular totales del documento tras crear/modificar lÃ­neas
+            # Recalcular totales del documento tras crear/modificar líneas
             documento.recompute_totals(persist=True)
 
-            # Redirigir al listado de documentos despuÃ©s de crear exitosamente
-            print("[DEBUG CREAR] âœ… DOCUMENTO CREADO EXITOSAMENTE - REDIRIGIENDO AL LISTADO")
+            # Redirigir al listado de documentos después de crear exitosamente
+            print("[DEBUG CREAR] ✅ DOCUMENTO CREADO EXITOSAMENTE - REDIRIGIENDO AL LISTADO")
             return redirect("documentos:lista_documentos")
         else:
-            print(f"[DEBUG CREAR] Formulario invÃ¡lido: {form.errors}")
-            print("[DEBUG CREAR] âŒ DOCUMENTO NO CREADO - ERRORES EN FORMULARIO")
+            print(f"[DEBUG CREAR] Formulario inválido: {form.errors}")
+            print("[DEBUG CREAR] ❌ DOCUMENTO NO CREADO - ERRORES EN FORMULARIO")
 
             # Agregar mensajes de error para mostrar al usuario
             from django.contrib import messages
@@ -479,20 +479,20 @@ def crear_documento(request):
 
             return redirect("documentos:lista_documentos")
     else:
-        # GET: Mostrar formulario vacÃ­o
+        # GET: Mostrar formulario vacío
         from datetime import date
 
         hoy = date.today().strftime("%Y-%m-%d")
         form = DocumentoForm(initial={"fecha": hoy}, empresa=empresa, user=request.user)
 
-    # Cargar mecÃ¡nicos activos del taller
+    # Cargar mecánicos activos del taller
     from taller.models.tecnico import Tecnico
 
     mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
 
-    # ðŸš€ BISTURÃ: Determinar paÃ­s desde la empresa (no desde la URL)
+    # 🚀 BISTURÍ: Determinar país desde la empresa (no desde la URL)
     country = "cl" if (getattr(empresa, "pais", "") or "").upper() == "CL" else "us"
-    print(f"[DEBUG CREAR] PaÃ­s derivado de empresa: {country}")
+    print(f"[DEBUG CREAR] País derivado de empresa: {country}")
 
     # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
@@ -514,14 +514,14 @@ def crear_documento(request):
             "mecanicos": mecanicos,
             "tecnicos": mecanicos,  # Alias para compatibilidad con templates
             "es_edicion": False,
-            "country": country,  # ðŸš€ BISTURÃ: Pasar paÃ­s desde empresa
+            "country": country,  # 🚀 BISTURÍ: Pasar país desde empresa
             "company_country": getattr(request, "company_country", None),  # viene del middleware
         },
     )
 
 
 def _country_from_request(request):
-    """Extrae el paÃ­s desde la URL del request"""
+    """Extrae el país desde la URL del request"""
     path = request.path
     if path.startswith("/cl/"):
         return "CL"
@@ -536,9 +536,9 @@ def ver_documento(request, documento_id):
     print(f"[DEBUG VER] Solicitando documento ID: {documento_id}")
     print(f"[DEBUG VER] Usuario: {request.user.username}")
 
-    # Obtener el paÃ­s desde la URL
+    # Obtener el país desde la URL
     country = _country_from_request(request)
-    print(f"[DEBUG VER] PaÃ­s detectado: {country}")
+    print(f"[DEBUG VER] País detectado: {country}")
 
     # Verificar que el documento pertenece a la empresa del usuario
     empresa = get_empresa_safe(request)
@@ -549,19 +549,17 @@ def ver_documento(request, documento_id):
         raise Http404("Documento no encontrado")
     print(f"[DEBUG VER] Empresa del usuario: {empresa.nombre_taller}")
 
-    # ðŸ”’ SEGURIDAD: Filtrar por empresa desde el inicio para aislamiento multi-tenant
+    # 🔒 SEGURIDAD: Filtrar por empresa desde el inicio para aislamiento multi-tenant
     # Verificar si el documento existe y pertenece a la empresa del usuario
     if not Documento.objects.filter(id=documento_id, empresa=empresa).exists():
         print(
-            f"[DEBUG VER] âŒ Documento {documento_id} NO pertenece a la empresa {empresa.nombre_taller}"
+            f"[DEBUG VER] ❌ Documento {documento_id} NO pertenece a la empresa {empresa.nombre_taller}"
         )
         from django.http import Http404
 
         raise Http404(f"Documento {documento_id} no encontrado")
 
-    print(
-        f"[DEBUG VER] âœ… Documento {documento_id} pertenece a la empresa {empresa.nombre_taller}"
-    )
+    print(f"[DEBUG VER] ✅ Documento {documento_id} pertenece a la empresa {empresa.nombre_taller}")
 
     documento = get_object_or_404(
         Documento.objects.select_related(
@@ -576,7 +574,7 @@ def ver_documento(request, documento_id):
     )
     print(f"[DEBUG VER] Documento encontrado: {documento.numero_documento}")
 
-    # Obtener lÃ­neas del documento usando prefetch
+    # Obtener líneas del documento usando prefetch
     repuestos = documento.lineas_repuesto.all()
     servicios = documento.lineas_servicio.all()
     otros_servicios = documento.lineas_otro_servicio.all()
@@ -660,7 +658,7 @@ def ver_documento(request, documento_id):
 
 @login_required
 def lista_documentos(request):
-    # Obtener el paÃ­s desde la URL
+    # Obtener el país desde la URL
     country = _country_from_request(request)
 
     # Filtrar documentos por empresa del usuario
@@ -675,9 +673,9 @@ def lista_documentos(request):
         Documento.objects.filter(empresa=empresa)
         .select_related(
             "cliente", "vehiculo", "tecnico_responsable", "empresa"
-        )  # OptimizaciÃ³n para FKs
+        )  # Optimización para FKs
         .annotate(
-            # CONTEOS de lÃ­neas (para mostrar en columnas)
+            # CONTEOS de líneas (para mostrar en columnas)
             rep_count=Count("lineas_repuesto", distinct=True),
             serv_count=Count("lineas_servicio", distinct=True),
             otros_count=Count("lineas_otro_servicio", distinct=True),
@@ -759,10 +757,10 @@ def editar_documento(request, documento_id):
     )
 
     if request.method == "POST":
-        print(f"[DEBUG EDICIÃ“N] POST data recibido: {list(request.POST.keys())}")
-        print(f"[DEBUG EDICIÃ“N] json_items: {request.POST.get('json_items')}")
+        print(f"[DEBUG EDICIÓN] POST data recibido: {list(request.POST.keys())}")
+        print(f"[DEBUG EDICIÓN] json_items: {request.POST.get('json_items')}")
 
-        # Procesar mecÃ¡nico nuevo si es necesario (igual que en crear_documento)
+        # Procesar mecánico nuevo si es necesario (igual que en crear_documento)
         post_data = request.POST.copy()
         mecanico_nombre = post_data.get("mecanico")
         if mecanico_nombre and not mecanico_nombre.isdigit():
@@ -772,30 +770,30 @@ def editar_documento(request, documento_id):
             mecanico_obj, _ = Tecnico.objects.get_or_create(nombre=mecanico_nombre, empresa=empresa)
             post_data["mecanico"] = mecanico_obj.pk
             print(
-                f"[DEBUG EDICIÃ“N] MecÃ¡nico creado/encontrado: {mecanico_obj.nombre} (ID: {mecanico_obj.pk})"
+                f"[DEBUG EDICIÓN] Mecánico creado/encontrado: {mecanico_obj.nombre} (ID: {mecanico_obj.pk})"
             )
         elif mecanico_nombre and mecanico_nombre.isdigit():
-            # Si es un ID, mantenerlo como estÃ¡ pero validar que pertenece a la empresa
+            # Si es un ID, mantenerlo como está pero validar que pertenece a la empresa
             try:
                 from taller.models.tecnico import Tecnico
 
                 mecanico_obj = Tecnico.objects.get(
                     pk=int(mecanico_nombre), empresa=empresa
-                )  # ðŸ”’ FILTRO EMPRESA
+                )  # 🔒 FILTRO EMPRESA
                 post_data["mecanico"] = mecanico_obj.pk
             except Tecnico.DoesNotExist:
                 pass
 
         form = DocumentoForm(post_data, instance=documento)
         if form.is_valid():
-            print("[DEBUG EDICIÃ“N] Formulario vÃ¡lido")
+            print("[DEBUG EDICIÓN] Formulario válido")
             documento = form.save()
             json_items = request.POST.get("json_items")
-            print(f"[DEBUG EDICIÃ“N] json_items recibido: {json_items}")
+            print(f"[DEBUG EDICIÓN] json_items recibido: {json_items}")
             if json_items is not None and json_items.strip() not in ["", "[]", "null"]:
                 try:
                     items = json.loads(json_items)
-                    print(f"[DEBUG EDICIÃ“N] Items parseados: {len(items)} items")
+                    print(f"[DEBUG EDICIÓN] Items parseados: {len(items)} items")
                     from taller.models.lineas_documento import (
                         LineaOtroServicio,
                         LineaRepuesto,
@@ -809,10 +807,10 @@ def editar_documento(request, documento_id):
                     documento.lineas_servicio.all().delete()
                     documento.lineas_otro_servicio.all().delete()
                     print(
-                        f"[DEBUG EDICIÃ“N] Eliminados {repuestos_anteriores} repuestos, {servicios_anteriores} servicios y {otros_servicios_anteriores} otros servicios anteriores"
+                        f"[DEBUG EDICIÓN] Eliminados {repuestos_anteriores} repuestos, {servicios_anteriores} servicios y {otros_servicios_anteriores} otros servicios anteriores"
                     )
                     for item in items:
-                        print(f"[DEBUG EDICIÃ“N] Procesando item: {item}")
+                        print(f"[DEBUG EDICIÓN] Procesando item: {item}")
                         tipo = item.get("tipo")
                         nombre = item.get("nombre", "").strip()
                         precio = float(item.get("precio", 0))
@@ -825,7 +823,7 @@ def editar_documento(request, documento_id):
                                 precio_unitario=precio,
                                 descuento=float(item.get("descuento", 0)),
                             )
-                            print(f"[DEBUG EDICIÃ“N] âœ… Repuesto guardado: {nombre} (${precio})")
+                            print(f"[DEBUG EDICIÓN] ✅ Repuesto guardado: {nombre} (${precio})")
                         elif tipo == "servicio" and nombre and precio > 0:
                             LineaServicio.objects.create(
                                 documento=documento,
@@ -835,9 +833,9 @@ def editar_documento(request, documento_id):
                                 cantidad=int(item.get("cantidad", 1)),
                                 descuento=float(item.get("descuento", 0)),
                             )
-                            print(f"[DEBUG EDICIÃ“N] âœ… Servicio guardado: {nombre} (${precio})")
+                            print(f"[DEBUG EDICIÓN] ✅ Servicio guardado: {nombre} (${precio})")
                         elif tipo == "otro_servicio" and nombre and precio > 0:
-                            # Buscar o crear el servicio en el catÃ¡logo por nombre localizado
+                            # Buscar o crear el servicio en el catálogo por nombre localizado
                             from taller.servicios.models import Servicio, ServicioName
 
                             servicio_obj = Servicio.objects.filter(
@@ -859,7 +857,7 @@ def editar_documento(request, documento_id):
                                     is_default=True,
                                 )
                                 print(
-                                    f"[DEBUG EDICIÃ“N] âž• Nuevo otro servicio creado en catÃ¡logo: {nombre}"
+                                    f"[DEBUG EDICIÓN] ➕ Nuevo otro servicio creado en catálogo: {nombre}"
                                 )
                             LineaOtroServicio.objects.create(
                                 documento=documento,
@@ -871,31 +869,31 @@ def editar_documento(request, documento_id):
                                 observaciones=item.get("observaciones", "").strip(),
                             )
                             print(
-                                f"[DEBUG EDICIÃ“N] âœ… Otro servicio guardado: {nombre} - {item.get('empresa', '')} (${precio})"
+                                f"[DEBUG EDICIÓN] ✅ Otro servicio guardado: {nombre} - {item.get('empresa', '')} (${precio})"
                             )
                         else:
                             print(
-                                f"[DEBUG EDICIÃ“N] Item ignorado por datos incompletos o invÃ¡lidos: {item}"
+                                f"[DEBUG EDICIÓN] Item ignorado por datos incompletos o inválidos: {item}"
                             )
                 except Exception as e:
-                    print(f"âŒ Error procesando json_items al editar: {e}")
+                    print(f"❌ Error procesando json_items al editar: {e}")
                     import traceback
 
                     traceback.print_exc()
             else:
-                print("[DEBUG EDICIÃ“N] json_items es None o vacÃ­o - no se recibieron items")
+                print("[DEBUG EDICIÓN] json_items es None o vacío - no se recibieron items")
 
-            # Recalcular totales del documento tras crear/modificar lÃ­neas
+            # Recalcular totales del documento tras crear/modificar líneas
             documento.recompute_totals(persist=True)
 
             return redirect("documentos:editar_documento", documento_id=documento.id)
         else:
-            print(f"[DEBUG EDICIÃ“N] Formulario invÃ¡lido: {form.errors}")
+            print(f"[DEBUG EDICIÓN] Formulario inválido: {form.errors}")
     else:
-        # GET request - crear formulario para ediciÃ³n
+        # GET request - crear formulario para edición
         form = DocumentoForm(instance=documento)
 
-    # Obtener lÃ­neas del documento usando prefetch
+    # Obtener líneas del documento usando prefetch
     servicios = documento.lineas_servicio.all()
     repuestos = documento.lineas_repuesto.all()
     otros_servicios = documento.lineas_otro_servicio.all()
@@ -924,7 +922,7 @@ def editar_documento(request, documento_id):
         getattr(o, "precio_cliente", getattr(o, "precio", 0)) for o in otros_servicios
     )
 
-    # Cargar mecÃ¡nicos activos del taller
+    # Cargar mecánicos activos del taller
     from taller.models.tecnico import Tecnico
 
     mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
@@ -972,12 +970,12 @@ def eliminar_documento(request, documento_id):
         empresa = request.user.empresa
         documento = get_object_or_404(Documento, id=documento_id, empresa=empresa)
     except AttributeError:
-        # Si no tiene empresa asociada, no puede eliminar ningÃºn documento
+        # Si no tiene empresa asociada, no puede eliminar ningún documento
         from django.http import Http404
 
         raise Http404("Documento no encontrado")
 
-    # Solo permitir eliminaciÃ³n si el usuario tiene permisos
+    # Solo permitir eliminación si el usuario tiene permisos
     if request.method == "GET":
         try:
             numero_doc = documento.numero_documento
@@ -1009,7 +1007,7 @@ def editar_detalle_documento(request):
         subtotal = detalle.cantidad * detalle.precio_venta
         return JsonResponse({"valor": valor, "subtotal": int(subtotal)})
 
-    return JsonResponse({"error": "Campo invÃ¡lido"}, status=400)
+    return JsonResponse({"error": "Campo inválido"}, status=400)
 
 
 def total_documento(request, documento_id):
@@ -1027,6 +1025,7 @@ def total_documento(request, documento_id):
 @require_GET
 @login_required
 @csrf_exempt
+@csrf_exempt
 def numero_documento_auto(request):
     # Obtener empresa del usuario
     try:
@@ -1043,10 +1042,10 @@ def numero_documento_auto(request):
     if not tipo:
         return JsonResponse({"error": "Tipo no proporcionado"}, status=400)
 
-    # Filtrar por empresa para generar nÃºmero correcto
+    # Filtrar por empresa para generar número correcto
     count = (
         Documento.objects.filter(tipo_documento=tipo, empresa=empresa).count() + 1
-    )  # ðŸ”’ FILTRO EMPRESA
+    )  # 🔒 FILTRO EMPRESA
     tipo_key = tipo.lower().replace(" ", "_")[:3].upper()
     numero = f"{tipo_key}-{count:05d}"
 
@@ -1057,10 +1056,10 @@ def numero_documento_auto(request):
 def exportar_documento_pdf(request, documento_id):
     """
     Exporta un documento en PDF usando el nuevo template futurista y
-    la utilerÃ­a centralizada DocumentoPDFExporter.
+    la utilería centralizada DocumentoPDFExporter.
     """
     empresa = getattr(request.user, "empresa", None)
-    # ðŸ”’ SEGURIDAD: Filtrar por empresa desde el inicio para aislamiento multi-tenant
+    # 🔒 SEGURIDAD: Filtrar por empresa desde el inicio para aislamiento multi-tenant
     if empresa is not None:
         queryset = Documento.objects.filter(empresa=empresa)
     else:
@@ -1082,7 +1081,7 @@ def enviar_por_whatsapp(request, documento_id):
     # Renderizar PDF y guardar archivo
     template = get_template("taller/documentos/documento_pdf.html")
     html_string = template.render({"documento": documento})
-    # Importar weasyprint de forma perezosa (evita fallos en startup si no estÃ¡ instalado)
+    # Importar weasyprint de forma perezosa (evita fallos en startup si no está instalado)
     try:
         from weasyprint import HTML
     except Exception as e:
@@ -1103,7 +1102,7 @@ def enviar_por_whatsapp(request, documento_id):
     # Preparar mensaje de WhatsApp
     telefono = documento.cliente.telefono.replace("+", "").replace(" ", "")
     url_pdf = request.build_absolute_uri(f"{settings.MEDIA_URL}pdfs/{nombre_archivo}")
-    mensaje = f"Hola {documento.cliente.nombre}, puedes ver tu {documento.tipo} aquÃ­: {url_pdf}"
+    mensaje = f"Hola {documento.cliente.nombre}, puedes ver tu {documento.tipo} aquí: {url_pdf}"
     enlace_whatsapp = f"https://wa.me/56{telefono}?text={mensaje.replace(' ', '%20')}"
 
     return redirect(enlace_whatsapp)
@@ -1125,16 +1124,16 @@ def enviar_documento_whatsapp(request, documento_id):
     except Documento.DoesNotExist:
         return JsonResponse({"success": False, "error": "Documento no encontrado"}, status=404)
 
-    # Verificar que el cliente tenga telÃ©fono
+    # Verificar que el cliente tenga teléfono
     if not documento.cliente.telefono:
         return JsonResponse(
             {
                 "success": False,
-                "error": "El cliente no tiene nÃºmero de telÃ©fono registrado",
+                "error": "El cliente no tiene número de teléfono registrado",
             }
         )
 
-    # Limpiar y validar nÃºmero de telÃ©fono
+    # Limpiar y validar número de teléfono
     telefono = (
         documento.cliente.telefono.replace("+", "")
         .replace(" ", "")
@@ -1148,28 +1147,28 @@ def enviar_documento_whatsapp(request, documento_id):
         return JsonResponse(
             {
                 "success": False,
-                "error": "NÃºmero de telÃ©fono invÃ¡lido. Debe ser un nÃºmero chileno vÃ¡lido",
+                "error": "Número de teléfono inválido. Debe ser un número chileno válido",
             }
         )
 
-    # Formatear nÃºmero para WhatsApp
+    # Formatear número para WhatsApp
     if not telefono.startswith("56"):
         telefono = "56" + telefono
 
     # Crear mensaje personalizado
     mensaje = f"""Hola {documento.cliente.nombre},
 
-Adjunto encontrarÃ¡ el documento del taller.
+Adjunto encontrará el documento del taller.
 
-ðŸ“„ {documento.get_tipo_display()} #{documento.numero_documento}
-ðŸ¢ {documento.empresa.nombre_taller}
-ðŸ“… Fecha: {documento.fecha_emision.strftime('%d/%m/%Y')}
-ðŸ’° Total: ${documento.total_general():,.0f}
+📄 {documento.get_tipo_display()} #{documento.numero_documento}
+🏢 {documento.empresa.nombre_taller}
+📅 Fecha: {documento.fecha_emision.strftime('%d/%m/%Y')}
+💰 Total: ${documento.total_general():,.0f}
 
 Para ver el documento completo, visite:
 {request.build_absolute_uri(f'/cl/documentos/{documento.id}/')}
 
-Â¡Gracias por confiar en nuestros servicios!"""
+¡Gracias por confiar en nuestros servicios!"""
 
     # Crear URL de WhatsApp (codificando el mensaje)
     from urllib.parse import quote
