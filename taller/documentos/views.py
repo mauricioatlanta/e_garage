@@ -994,7 +994,6 @@ def eliminar_documento(request, documento_id):
     return redirect("documentos:lista_documentos", country=empresa.pais.lower())
 
 
-@csrf_exempt
 def editar_detalle_documento(request):
     data = json.loads(request.body)
     detalle = get_object_or_404(DetalleDocumento, id=data["id"])
@@ -1024,7 +1023,6 @@ def total_documento(request, documento_id):
 
 @require_GET
 @login_required
-@csrf_exempt
 @csrf_exempt
 def numero_documento_auto(request):
     # Obtener empresa del usuario
