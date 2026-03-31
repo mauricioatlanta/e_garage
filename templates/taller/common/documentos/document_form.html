@@ -1,11 +1,11 @@
-{% extends "taller/documentos/base/base_documento.html" %}
+﻿{% extends "taller/documentos/base/base_documento.html" %}
 {% load i18n %}
 
 {% load static %}
 {% load country_url %}
 
 <style>
-/* ==================== DOCUMENT FORM — PRO UI: proporciones, jerarquía, layout ==================== */
+/* ==================== DOCUMENT FORM â€” PRO UI: proporciones, jerarquÃ­a, layout ==================== */
 /* Regla global dentro del workspace: inputs compactos, bordes sutiles, sin glow por defecto */
 
 #doc-shell {
@@ -51,7 +51,7 @@
   resize: vertical !important;
 }
 
-/* 2. JERARQUÍA: secciones bien separadas (1 Header, 2 Client/Vehicle, 3 Parts/Services, 4 Totals) */
+/* 2. JERARQUÃA: secciones bien separadas (1 Header, 2 Client/Vehicle, 3 Parts/Services, 4 Totals) */
 .doc-shell-workspace > .doc-console-header { margin-bottom: 1rem; }
 .doc-shell-workspace > .grid { margin-bottom: 0.5rem; }
 .doc-shell-workspace .doc-smart-card,
@@ -140,7 +140,7 @@
   }
 }
 
-/* Botón con gradiente cian (para botones principales) - Sin !important */
+/* BotÃ³n con gradiente cian (para botones principales) - Sin !important */
 .btn-cyan-gradient {
   display: inline-flex;
   align-items: center;
@@ -169,7 +169,7 @@
   box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.4);
 }
 
-/* Botón con gradiente verde (para acciones de agregar) - Sin !important */
+/* BotÃ³n con gradiente verde (para acciones de agregar) - Sin !important */
 .btn-green-gradient {
   display: inline-flex;
   align-items: center;
@@ -227,7 +227,7 @@ input:disabled, select:disabled, textarea:disabled {
   opacity: 0.7;
 }
 
-/* Estilos mejorados para la sección de totales */
+/* Estilos mejorados para la secciÃ³n de totales */
 .totales-section {
   margin-top: 2rem;
   padding-top: 1.5rem;
@@ -255,10 +255,10 @@ input:disabled, select:disabled, textarea:disabled {
   transform: translateY(-1px);
 }
 
-/* Eliminada animación infinite para mejor rendimiento móvil */
-/* El neón solo aparece en hover/focus, no en animación constante */
+/* Eliminada animaciÃ³n infinite para mejor rendimiento mÃ³vil */
+/* El neÃ³n solo aparece en hover/focus, no en animaciÃ³n constante */
 
-/* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÓN ==================== */
+/* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÃ“N ==================== */
 /* Description fields - Better spacing and alignment - Sin !important */
 .description-field {
   flex: 1 1 auto;
@@ -430,7 +430,7 @@ input:disabled, select:disabled, textarea:disabled {
     0 0 0 2px rgba(34, 211, 238, 0.25);
 }
 
-/* ==================== FICHAS POR TÓPICOS - VISTA COMPACTA ==================== */
+/* ==================== FICHAS POR TÃ“PICOS - VISTA COMPACTA ==================== */
 .doc-ficha {
   background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.85) 100%);
   border: 1px solid rgba(0, 242, 254, 0.35);
@@ -485,7 +485,7 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-control,
 .doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-select,
 .doc-fichas-row .doc-ficha:first-child .doc-ficha-body #id_numero { grid-column: 2; width: 160px !important; max-width: 160px !important; box-sizing: border-box !important; }
-/* Ficha Client & Vehicle: dos columnas (Cliente | Vehículo) como en referencia */
+/* Ficha Client & Vehicle: dos columnas (Cliente | VehÃ­culo) como en referencia */
 .doc-ficha-body-two-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -550,7 +550,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 .doc-ficha-otros .doc-ficha-body { max-height: 200px; overflow-y: auto; }
 
-/* Botones de acción dentro de cada ficha */
+/* Botones de acciÃ³n dentro de cada ficha */
 .doc-ficha .ficha-actions {
   display: flex;
   flex-wrap: wrap;
@@ -596,18 +596,18 @@ input:disabled, select:disabled, textarea:disabled {
   min-width: 0;
   box-sizing: border-box;
 }
-/* Búsqueda de cliente un poco más ancha para leer "Type to search..." */
+/* BÃºsqueda de cliente un poco mÃ¡s ancha para leer "Type to search..." */
 #doc-shell .doc-fichas-row #cliente-busqueda {
   width: 26ch;
   max-width: 100%;
 }
-/* Select de vehículo (puede tener patente + modelo) */
+/* Select de vehÃ­culo (puede tener patente + modelo) */
 #doc-shell .doc-fichas-row #id_vehiculo {
   width: 28ch;
   max-width: 100%;
 }
 
-/* Ficha Operación: campos también ~20 caracteres */
+/* Ficha OperaciÃ³n: campos tambiÃ©n ~20 caracteres */
 #doc-shell .doc-ficha-operation .form-control,
 #doc-shell .doc-ficha-operation .form-select,
 #doc-shell .doc-ficha-operation input[type="text"],
@@ -681,7 +681,7 @@ input:disabled, select:disabled, textarea:disabled {
   font-size: 15px;
 }
 
-/* Errores de validación compactos */
+/* Errores de validaciÃ³n compactos */
 .doc-form-validation-errors {
   background: rgba(127, 29, 29, 0.25);
   border: 1px solid rgba(248, 113, 113, 0.5);
@@ -868,7 +868,7 @@ input:disabled, select:disabled, textarea:disabled {
   }
 }
 
-/* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÍCULO ==================== */
+/* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÃCULO ==================== */
 .doc-smart-card {
   background: rgba(15, 23, 42, 0.6);
   border: var(--doc-border);
@@ -910,7 +910,7 @@ input:disabled, select:disabled, textarea:disabled {
   box-shadow: 0 0 0 2px rgba(71, 85, 105, 0.2);
 }
 
-/* ==================== PANEL TOTALES (jerarquía clara, sin glow) ==================== */
+/* ==================== PANEL TOTALES (jerarquÃ­a clara, sin glow) ==================== */
 .totales-cockpit {
   background: rgba(15, 23, 42, 0.7);
   border: var(--doc-border);
@@ -965,7 +965,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 .totales-cockpit-save:hover { background: #047857; }
 
-/* ==================== BOTÓN UNIFICADO .btn-add ==================== */
+/* ==================== BOTÃ“N UNIFICADO .btn-add ==================== */
 .btn-add {
   display: inline-flex;
   align-items: center;
@@ -985,7 +985,7 @@ input:disabled, select:disabled, textarea:disabled {
 
 /* ==================== TABLA REAL: Grid 12 cols - Code | Part name | Qty | Price | Total | [x] ==================== */
 .doc-pos-section { margin-bottom: 0.75rem; }
-/* Alinear títulos y botones de acción en secciones partes/servicios/otros */
+/* Alinear tÃ­tulos y botones de acciÃ³n en secciones partes/servicios/otros */
 .doc-ficha-parts .flex.justify-between,
 .doc-ficha-services .flex.justify-between,
 .doc-ficha-otros .flex.justify-between {
@@ -1020,7 +1020,7 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-pos-header-otros > span:nth-child(4){ grid-column: span 2; }
 .doc-pos-header-otros > span:nth-child(5){ grid-column: span 1; }
 .doc-pos-header-otros > span:nth-child(6){ grid-column: span 1; }
-/* Filas dinámicas: usan grid grid-cols-12 del HTML, no override */
+/* Filas dinÃ¡micas: usan grid grid-cols-12 del HTML, no override */
 #repuestos-container .dynamic-element .doc-row-grid,
 #servicios-container .dynamic-element .doc-row-grid,
 #otros-container .dynamic-element .doc-row-grid {
@@ -1067,15 +1067,15 @@ input:disabled, select:disabled, textarea:disabled {
 
 {% block documento_title %}
 {% load i18n %}
-{# ✅ Manejo robusto de company_country con múltiples fallbacks #}
+{# âœ… Manejo robusto de company_country con mÃºltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-<!-- Header de Página - Design System -->
+<!-- Header de PÃ¡gina - Design System -->
 <div class="mb-6 sm:mb-8 px-4 sm:px-6">
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
     <div class="flex-1">
       <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-        📝 {{ ui_labels.new_document }}
+        ðŸ“ {{ ui_labels.new_document }}
       </h1>
       <p class="text-sm sm:text-base text-slate-300">
         {{ ui_labels.new_document }}
@@ -1091,12 +1091,12 @@ input:disabled, select:disabled, textarea:disabled {
           <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
                   class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
                   {% if LANGUAGE_CODE == 'en' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            🇺🇸 EN
+            ðŸ‡ºðŸ‡¸ EN
           </button>
           <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc"
                   class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'es' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
                   {% if LANGUAGE_CODE == 'es' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            🇪🇸 ES
+            ðŸ‡ªðŸ‡¸ ES
           </button>
         </div>
       </form>
@@ -1112,12 +1112,41 @@ input:disabled, select:disabled, textarea:disabled {
 {% endwith %}
 
 <script>
-// Única fuente de verdad para ?next= al ir a crear cliente/vehículo (pathname + querystring)
+
+window.EG = window.EG || {};
+window.EG.utils = {
+    getCookie: function(name) {
+        const m = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
+        return m ? decodeURIComponent(m.pop()) : "";
+    }
+};
+
+window.EG.state = {
+    clienteId: null,
+    vehiculoId: null,
+    repuestos: [],
+    servicios: [],
+    otros: [],
+    isHydrated: false,
+    isRestoring: false
+};
+
+window.EG.fetch = async function(url, opts = {}) {
+    const headers = {
+        "X-Requested-With": "XMLHttpRequest",
+        "X-CSRFToken": window.EG.utils.getCookie("csrftoken"),
+        ...(opts.headers || {})
+    };
+    return fetch(url, { credentials: "same-origin", ...opts, headers });
+};
+
+ } } return cookieValue; }
+// Ãšnica fuente de verdad para ?next= al ir a crear cliente/vehÃ­culo (pathname + querystring)
 window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
   return encodeURIComponent(window.location.pathname + (window.location.search || ''));
 };
 
-// Funciones para abrir modales de cliente y vehículo - Disponibles inmediatamente
+// Funciones para abrir modales de cliente y vehÃ­culo - Disponibles inmediatamente
 (function() {
   'use strict';
   
@@ -1129,7 +1158,7 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       // Parsear el path: /cl/documentos/form/ -> ['cl', 'documentos', 'form'] (sin search)
       const pathParts = pathBase.split('/').filter(function(p) { return p && p.length > 0; });
       
-      // Detectar país e idioma desde el path
+      // Detectar paÃ­s e idioma desde el path
       let countryPrefix = 'cl';
       let langPrefix = 'es';
       
@@ -1141,11 +1170,11 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       }
       
       const createUrl = '/' + countryPrefix + '/' + langPrefix + '/clientes/crear/?next=' + nextUrl;
-      console.log('🔵 Abriendo modal de cliente:', createUrl);
+      console.log('ðŸ”µ Abriendo modal de cliente:', createUrl);
       window.location.href = createUrl;
     } catch (error) {
-      console.error('❌ Error al abrir modal de cliente:', error);
-      alert('Error al abrir la página de crear cliente. Por favor, intente nuevamente.');
+      console.error('âŒ Error al abrir modal de cliente:', error);
+      alert('Error al abrir la pÃ¡gina de crear cliente. Por favor, intente nuevamente.');
     }
   }
 
@@ -1160,18 +1189,18 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       const clienteSelect = document.getElementById('id_cliente');
       
       if (clienteSelect) {
-        // Intentar obtener el valor desde Select2 si está inicializado
+        // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
         if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
           clienteId = jQuery(clienteSelect).val();
-          console.log('👤 Cliente obtenido desde Select2:', clienteId);
+          console.log('ðŸ‘¤ Cliente obtenido desde Select2:', clienteId);
         } else {
           // Fallback: obtener del campo directamente
           clienteId = clienteSelect.value || null;
-          console.log('👤 Cliente obtenido del campo:', clienteId);
+          console.log('ðŸ‘¤ Cliente obtenido del campo:', clienteId);
         }
       }
       
-      // Si aún no hay valor, intentar desde el campo oculto de Select2
+      // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
       if (!clienteId && window.jQuery) {
         const select2Container = jQuery('#id_cliente').next('.select2-container');
         if (select2Container.length) {
@@ -1179,12 +1208,12 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
           const dataId = select2Selection.attr('data-id');
           if (dataId) {
             clienteId = dataId;
-            console.log('👤 Cliente obtenido desde data-id:', clienteId);
+            console.log('ðŸ‘¤ Cliente obtenido desde data-id:', clienteId);
           }
         }
       }
       
-      // LÓGICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+      // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
       // Si empieza con /us/, usar /us/en/
       let countryPrefix = 'cl';
       let langPrefix = 'es';
@@ -1199,17 +1228,17 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       
       let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
       
-      // Agregar cliente_id si está seleccionado
+      // Agregar cliente_id si estÃ¡ seleccionado
       if (clienteId) {
         createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
-        console.log('👤 Cliente seleccionado:', clienteId);
+        console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
       }
       
-      console.log('🚗 Abriendo modal de vehículo:', createUrl);
+      console.log('ðŸš— Abriendo modal de vehÃ­culo:', createUrl);
       window.location.href = createUrl;
     } catch (error) {
-      console.error('❌ Error al abrir modal de vehículo:', error);
-      alert('Error al abrir la página de crear vehículo. Por favor, intente nuevamente.');
+      console.error('âŒ Error al abrir modal de vehÃ­culo:', error);
+      alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
     }
   }
 
@@ -1217,27 +1246,27 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
   window.openClienteModal = openClienteModal;
   window.openVehiculoModal = openVehiculoModal;
   
-  // Verificar que las funciones estén disponibles
-  console.log('✅ Funciones de modal disponibles:', {
+  // Verificar que las funciones estÃ©n disponibles
+  console.log('âœ… Funciones de modal disponibles:', {
     openClienteModal: typeof window.openClienteModal,
     openVehiculoModal: typeof window.openVehiculoModal
   });
 })();
 
-// Función global para manejar el click del botón de vehículo
-// Esta función se llama directamente desde el onclick del botón como respaldo
+// FunciÃ³n global para manejar el click del botÃ³n de vehÃ­culo
+// Esta funciÃ³n se llama directamente desde el onclick del botÃ³n como respaldo
 function handleNuevoVehiculoClick(event) {
   if (event) {
     event.preventDefault();
     event.stopPropagation();
   }
   
-  console.log('🚗 handleNuevoVehiculoClick llamado');
+  console.log('ðŸš— handleNuevoVehiculoClick llamado');
   
   try {
-    // Intentar usar openVehiculoModal si está disponible
+    // Intentar usar openVehiculoModal si estÃ¡ disponible
     if (window.openVehiculoModal && typeof window.openVehiculoModal === 'function') {
-      console.log('✅ Usando openVehiculoModal desde handleNuevoVehiculoClick');
+      console.log('âœ… Usando openVehiculoModal desde handleNuevoVehiculoClick');
       window.openVehiculoModal();
       return false;
     }
@@ -1251,53 +1280,53 @@ function handleNuevoVehiculoClick(event) {
     let clienteId = null;
     const clienteSelect = document.getElementById('id_cliente');
     
-    console.log('🔍 Buscando cliente seleccionado...');
-    console.log('🔍 Campo cliente encontrado:', !!clienteSelect);
+    console.log('ðŸ” Buscando cliente seleccionado...');
+    console.log('ðŸ” Campo cliente encontrado:', !!clienteSelect);
     
     if (clienteSelect) {
-      console.log('🔍 Valor directo del campo:', clienteSelect.value);
-      console.log('🔍 jQuery disponible:', !!window.jQuery);
+      console.log('ðŸ” Valor directo del campo:', clienteSelect.value);
+      console.log('ðŸ” jQuery disponible:', !!window.jQuery);
       
-      // Intentar obtener el valor desde Select2 si está inicializado
+      // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
       if (window.jQuery) {
         const $clienteSelect = jQuery(clienteSelect);
-        console.log('🔍 Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
+        console.log('ðŸ” Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
         
         if ($clienteSelect.hasClass('select2-hidden-accessible')) {
           clienteId = $clienteSelect.val();
-          console.log('✅ Cliente obtenido desde Select2:', clienteId);
+          console.log('âœ… Cliente obtenido desde Select2:', clienteId);
         } else {
           // Fallback: obtener del campo directamente
           clienteId = clienteSelect.value || null;
-          console.log('✅ Cliente obtenido del campo directamente:', clienteId);
+          console.log('âœ… Cliente obtenido del campo directamente:', clienteId);
         }
       } else {
         // Sin jQuery, obtener del campo directamente
         clienteId = clienteSelect.value || null;
-        console.log('✅ Cliente obtenido del campo (sin jQuery):', clienteId);
+        console.log('âœ… Cliente obtenido del campo (sin jQuery):', clienteId);
       }
     }
     
-    // Si aún no hay valor, intentar desde el campo oculto de Select2
+    // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
     if (!clienteId && window.jQuery) {
-      console.log('🔍 Intentando obtener cliente desde Select2 rendered...');
+      console.log('ðŸ” Intentando obtener cliente desde Select2 rendered...');
       const select2Container = jQuery('#id_cliente').next('.select2-container');
       if (select2Container.length) {
         const select2Selection = select2Container.find('.select2-selection__rendered');
         const select2Text = select2Selection.text();
-        console.log('🔍 Texto en Select2:', select2Text);
+        console.log('ðŸ” Texto en Select2:', select2Text);
         // Intentar obtener el ID desde el atributo data
         const dataId = select2Selection.attr('data-id');
         if (dataId) {
           clienteId = dataId;
-          console.log('✅ Cliente obtenido desde data-id:', clienteId);
+          console.log('âœ… Cliente obtenido desde data-id:', clienteId);
         }
       }
     }
     
-    console.log('🔍 Cliente ID final:', clienteId);
+    console.log('ðŸ” Cliente ID final:', clienteId);
     
-    // LÓGICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+    // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
     // Si empieza con /us/, usar /us/en/
     let countryPrefix = 'cl';
     let langPrefix = 'es';
@@ -1312,23 +1341,23 @@ function handleNuevoVehiculoClick(event) {
     
     let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
     
-    // Agregar cliente_id si está seleccionado
+    // Agregar cliente_id si estÃ¡ seleccionado
     if (clienteId) {
       createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
-      console.log('👤 Cliente seleccionado:', clienteId);
+      console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
     }
     
-    console.log('🚗 Navegando a (desde handleNuevoVehiculoClick):', createUrl);
+    console.log('ðŸš— Navegando a (desde handleNuevoVehiculoClick):', createUrl);
     window.location.href = createUrl;
     return false;
   } catch (error) {
-    console.error('❌ Error en handleNuevoVehiculoClick:', error);
-    alert('Error al abrir la página de crear vehículo. Por favor, intente nuevamente.');
+    console.error('âŒ Error en handleNuevoVehiculoClick:', error);
+    alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
     return false;
   }
 }
 
-// Hacer la función disponible globalmente
+// Hacer la funciÃ³n disponible globalmente
 window.handleNuevoVehiculoClick = handleNuevoVehiculoClick;
 
 function submitLanguageDoc(lang) {
@@ -1340,7 +1369,7 @@ function submitLanguageDoc(lang) {
 
 {% block documento_content %}
 {% load i18n %}
-{# ✅ Manejo robusto de company_country con múltiples fallbacks #}
+{# âœ… Manejo robusto de company_country con mÃºltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
         <form method="post" id="document-form" class="doc-form-compact mx-auto"
@@ -1364,20 +1393,20 @@ function submitLanguageDoc(lang) {
   {% if messages %}
     {% for message in messages %}
       {% with msg_text=message|stringformat:"s" %}
-      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesión exitosamente" not in msg_text and "Ha cerrado sesión" not in msg_text and "iniciado sesión exitosamente" not in msg_text and "cerrado sesión" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
+      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesiÃ³n exitosamente" not in msg_text and "Ha cerrado sesiÃ³n" not in msg_text and "iniciado sesiÃ³n exitosamente" not in msg_text and "cerrado sesiÃ³n" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
         {% if message.tags == 'success' %}
         <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">✅</span>
+          <span class="text-2xl flex-shrink-0">âœ…</span>
           <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
         </div>
         {% elif message.tags == 'error' %}
         <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">❌</span>
+          <span class="text-2xl flex-shrink-0">âŒ</span>
           <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
         </div>
         {% else %}
         <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">ℹ️</span>
+          <span class="text-2xl flex-shrink-0">â„¹ï¸</span>
           <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
         </div>
         {% endif %}
@@ -1400,10 +1429,10 @@ function submitLanguageDoc(lang) {
     </div>
   {% endif %}
 
-  <!-- Document workspace — cabecera consola | tarjetas cliente/vehículo | repuestos/servicios POS | observaciones | totales cockpit -->
+  <!-- Document workspace â€” cabecera consola | tarjetas cliente/vehÃ­culo | repuestos/servicios POS | observaciones | totales cockpit -->
   <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
 
-    <!-- 1. CABECERA COMPACTA — fila 1: INV | Fecha | Mecánico | Pago | fila 2: Tipo | Operación -->
+    <!-- 1. CABECERA COMPACTA â€” fila 1: INV | Fecha | MecÃ¡nico | Pago | fila 2: Tipo | OperaciÃ³n -->
     <div class="doc-console-header">
       <div class="doc-console-title flex flex-wrap items-center gap-2">
         <span>{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</span>
@@ -1415,7 +1444,7 @@ function submitLanguageDoc(lang) {
           <div class="doc-console-field doc-console-field--invoice">
             <span class="doc-console-meta">{% trans "Document No." %}</span>
             <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
-              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}—{% endif %}
+              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}â€”{% endif %}
             </span>
           </div>
 
@@ -1472,7 +1501,7 @@ function submitLanguageDoc(lang) {
            href="{% country_url 'clientes:crear_cliente' %}"
            data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
            class="doc-action-btn mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold no-underline shadow-sm whitespace-nowrap">
-          <span aria-hidden="true">➕</span>
+          <span aria-hidden="true">âž•</span>
           <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
         </a>
         <select id="id_cliente" name="cliente" class="hidden">
@@ -1492,8 +1521,8 @@ function submitLanguageDoc(lang) {
           <div class="doc-field-with-btn flex gap-2">
             <div class="flex-1">{{ form.vehiculo }}</div>
             <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
-              <span aria-hidden="true">➕</span>
-              <span class="doc-action-label text-white font-semibold">Nuevo vehículo</span>
+              <span aria-hidden="true">âž•</span>
+              <span class="doc-action-label text-white font-semibold">Nuevo vehÃ­culo</span>
             </button>
           </div>
         </div>
@@ -1526,14 +1555,14 @@ function submitLanguageDoc(lang) {
             <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
             {% if desarme_origen_label %}
             <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
-              <span>🧩</span>
+              <span>ðŸ§©</span>
               <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
             </div>
             {% endif %}
           </div>
           <div class="flex gap-1 flex-shrink-0 items-center">
-            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addRepuestoRow()"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="openUsedPartsModal()"><span aria-hidden="true">🧩</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
+            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addRepuestoRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="openUsedPartsModal()"><span aria-hidden="true">ðŸ§©</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
           </div>
         </div>
         <div class="doc-pos-header hidden sm:grid">
@@ -1549,7 +1578,7 @@ function submitLanguageDoc(lang) {
         <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
           <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
           <div class="flex gap-1 flex-shrink-0 items-center">
-            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addServicioRow()"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addServicioRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
           </div>
         </div>
         <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
@@ -1567,8 +1596,8 @@ function submitLanguageDoc(lang) {
       <div class="flex flex-wrap items-center gap-2 mb-3 min-h-[2rem]">
         <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
         <div class="flex gap-1 flex-shrink-0 items-center">
-          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addOtroRow()"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">🌐</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
+          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addOtroRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
         </div>
       </div>
       <div class="doc-pos-header doc-pos-header-otros hidden sm:grid">
@@ -1664,14 +1693,14 @@ function submitLanguageDoc(lang) {
           {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
         </button>
         <div class="flex gap-2 mt-3">
-          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">←</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">🌐</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
+          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">â†</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Hidden inputs para serializar filas dinámicas -->
+  <!-- Hidden inputs para serializar filas dinÃ¡micas -->
   <input type="hidden" name="repuestos_json" id="id_repuestos_json">
   <input type="hidden" name="servicios_json" id="id_servicios_json">
   <input type="hidden" name="otros_json" id="id_otros_json">
@@ -1682,7 +1711,7 @@ function submitLanguageDoc(lang) {
   <div class="absolute inset-0 bg-black/70" onclick="closeUsedPartsModal()"></div>
   <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
     <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
-      <h3 class="text-lg font-bold text-amber-300 mb-3">🧩 {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
+      <h3 class="text-lg font-bold text-amber-300 mb-3">ðŸ§© {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
       <input type="search" id="used-parts-search" placeholder="{% trans 'Search by code or name...' %}" class="form-control w-full mb-4" autocomplete="off">
       <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
       <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">{% trans "Type at least 2 characters to search" %}</p>
@@ -1706,24 +1735,53 @@ function submitLanguageDoc(lang) {
 {{ block.super }}
 <script src="{% static 'marketplace_tooltip.js' %}"></script>
 <script>
-// Asegurar que egEncodeDocumentFormNext exista antes de initDocumentFormScript (puede no estar si el script de documento_content no se ejecutó)
+
+window.EG = window.EG || {};
+window.EG.utils = {
+    getCookie: function(name) {
+        const m = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
+        return m ? decodeURIComponent(m.pop()) : "";
+    }
+};
+
+window.EG.state = {
+    clienteId: null,
+    vehiculoId: null,
+    repuestos: [],
+    servicios: [],
+    otros: [],
+    isHydrated: false,
+    isRestoring: false
+};
+
+window.EG.fetch = async function(url, opts = {}) {
+    const headers = {
+        "X-Requested-With": "XMLHttpRequest",
+        "X-CSRFToken": window.EG.utils.getCookie("csrftoken"),
+        ...(opts.headers || {})
+    };
+    return fetch(url, { credentials: "same-origin", ...opts, headers });
+};
+
+ } } return cookieValue; }
+// Asegurar que egEncodeDocumentFormNext exista antes de initDocumentFormScript (puede no estar si el script de documento_content no se ejecutÃ³)
 if (typeof window.egEncodeDocumentFormNext !== 'function') {
   window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
     return encodeURIComponent(window.location.pathname + (window.location.search || ''));
   };
 }
 function initDocumentFormScript(){
-  // Evita doble inicialización
+  // Evita doble inicializaciÃ³n
   if (window.EG && window.EG._docFormInit) {
     return;
   }
   const EG = (window.EG = window.EG || {});
   EG._docFormInit = true;
-  // Observations mínimo
+  // Observations mÃ­nimo
   const obs = document.getElementById('id_observaciones');
   if (obs) { obs.setAttribute('rows', '2'); }
 
-  // Cabecera consola: badge estado de pago (semáforo)
+  // Cabecera consola: badge estado de pago (semÃ¡foro)
   function updatePaymentStatusBadge() {
     const sel = document.getElementById('id_payment_status');
     const badge = document.getElementById('payment-status-badge');
@@ -1738,16 +1796,13 @@ function initDocumentFormScript(){
   document.getElementById('id_payment_status')?.addEventListener('change', updatePaymentStatusBadge);
 
   // === CSRF ===
-  function getCookie(name) {
-    const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-    return m ? m.pop() : '';
-  }
+  
   const CSRF = getCookie('csrftoken');
 
   async function egFetch(url, opts={}){
     const defaults = {
       credentials: 'same-origin',
-      headers: {
+      headers: { "X-CSRFToken": getCookie("csrftoken"),
         'X-Requested-With': 'XMLHttpRequest',
         'X-CSRFToken': CSRF,
       }
@@ -1755,7 +1810,7 @@ function initDocumentFormScript(){
     const cfg = {
       ...defaults,
       ...opts,
-      headers: { ...(defaults.headers||{}), ...((opts||{}).headers||{}) }
+      headers: { "X-CSRFToken": getCookie("csrftoken"), ...(defaults.headers||{}), ...((opts||{}).headers||{}) }
     };
     return fetch(url, cfg);
   }
@@ -1792,7 +1847,7 @@ function initDocumentFormScript(){
       if (window.jQuery) {
         jQuery(document).on('select2:select', '#id_cliente', function (e) {
           const clienteId = e?.params?.data?.id || jQuery(this).val();
-          console.log('🔥 select2:select cliente seleccionado:', clienteId);
+          console.log('ðŸ”¥ select2:select cliente seleccionado:', clienteId);
           if (clienteId) {
             cargarVehiculosPorCliente(clienteId);
           }
@@ -1801,7 +1856,7 @@ function initDocumentFormScript(){
       const clienteSelectFallback = document.getElementById('id_cliente');
       if (clienteSelectFallback) {
         clienteSelectFallback.addEventListener('change', function () {
-          console.log('⚡ change fallback cliente seleccionado:', this.value);
+          console.log('âš¡ change fallback cliente seleccionado:', this.value);
           if (this.value) {
             cargarVehiculosPorCliente(this.value);
           }
@@ -1826,7 +1881,7 @@ function initDocumentFormScript(){
     EG.cfg.salesTax = typeof EG.cfg.salesTax === 'number' ? EG.cfg.salesTax : 0.08;
     
     // Inicializar taxLines desde ui_config (pasado desde el backend)
-    // Esto permite que el JavaScript calcule impuestos dinámicamente sin conocer el país
+    // Esto permite que el JavaScript calcule impuestos dinÃ¡micamente sin conocer el paÃ­s
     const taxLinesScript = document.getElementById('uiConfigTaxLines');
     if (taxLinesScript) {
       try {
@@ -1844,7 +1899,7 @@ function initDocumentFormScript(){
   window.EG = EG;
 
 // ===============
-// CONFIG ENDPOINTS - Evitar redeclaración
+// CONFIG ENDPOINTS - Evitar redeclaraciÃ³n
 // ===============
 window.EG = window.EG || {};
 EG.cfg = EG.cfg || {};
@@ -1860,7 +1915,7 @@ if (!EG.cfg.country) {
 EG.COUNTRY = EG.COUNTRY || (EG.cfg.country || 'CL');
 const COUNTRY_REF = (EG.COUNTRY || 'CL').toUpperCase(); // usa COUNTRY_REF en lugar de COUNTRY
 
-// Preselección desde URL (vuelta desde "crear vehículo" con cliente_id y vehiculo_id)
+// PreselecciÃ³n desde URL (vuelta desde "crear vehÃ­culo" con cliente_id y vehiculo_id)
 window.__PRESELECT_CLIENTE_ID__ = "{{ cliente_preselect_id|default:''|escapejs }}";
 window.__PRESELECT_VEHICULO_ID__ = "{{ vehiculo_preselect_id|default:''|escapejs }}";
 
@@ -1871,7 +1926,7 @@ window.__PRESELECT_VEHICULO_ID__ = "{{ vehiculo_preselect_id|default:''|escapejs
       const el = document.getElementById(id);
       return el ? JSON.parse(el.textContent) : [];
     } catch (err) {
-      console.warn('⚠️ PREFETCH inválido para', id, err);
+      console.warn('âš ï¸ PREFETCH invÃ¡lido para', id, err);
       return [];
     }
   }
@@ -1916,9 +1971,9 @@ window.__PRESELECT_VEHICULO_ID__ = "{{ vehiculo_preselect_id|default:''|escapejs
 // ===============
 const I18N = {
   no_clients: "{% trans 'No clients found' %}",
-  loading_vehicles: "{% trans 'Loading vehicles…' %}",
+  loading_vehicles: "{% trans 'Loading vehiclesâ€¦' %}",
   no_vehicles: "{% trans 'No vehicles registered' %}",
-  select_vehicle: "{% trans 'Select vehicle…' %}",
+  select_vehicle: "{% trans 'Select vehicleâ€¦' %}",
   server_error: "{% trans 'Server error' %}",
   error_loading_vehicles: "{% trans 'Error loading vehicles' %}",
   no_services: "{% trans 'No services found' %}",
@@ -1954,19 +2009,19 @@ const I18N = {
 if (COUNTRY_REF === 'CL') {
   Object.assign(I18N, {
     no_clients: "Sin clientes encontrados",
-    loading_vehicles: "Cargando vehículos…",
-    no_vehicles: "Sin vehículos registrados",
-    select_vehicle: "Selecciona vehículo…",
+    loading_vehicles: "Cargando vehÃ­culosâ€¦",
+    no_vehicles: "Sin vehÃ­culos registrados",
+    select_vehicle: "Selecciona vehÃ­culoâ€¦",
     server_error: "Error del servidor",
-    error_loading_vehicles: "Error cargando vehículos",
+    error_loading_vehicles: "Error cargando vehÃ­culos",
     no_parts: "Sin repuestos coincidentes",
     no_external_services: "Sin servicios externos",
-    select_service: "Selecciona servicio…",
-    issue_date_required: "La fecha de emisión es obligatoria",
+    select_service: "Selecciona servicioâ€¦",
+    issue_date_required: "La fecha de emisiÃ³n es obligatoria",
     document_type_required: "El tipo de documento es obligatorio",
     client_required: "Debes seleccionar un cliente",
-    vehicle_required: "Debes seleccionar un vehículo",
-    code: "Código",
+    vehicle_required: "Debes seleccionar un vehÃ­culo",
+    code: "CÃ³digo",
     name: "Nombre",
     qty: "Cant.",
     cost_price: "Precio compra",
@@ -1974,15 +2029,15 @@ if (COUNTRY_REF === 'CL') {
     discount_pct: "% desc",
     subtotal: "Subtotal",
     service: "Servicio",
-    type_to_search_services: "Escribe para buscar servicios…",
-    type_to_search_parts: "Escribe para buscar repuestos…",
-    type_to_search_external: "Escribe para buscar servicios externos…",
+    type_to_search_services: "Escribe para buscar serviciosâ€¦",
+    type_to_search_parts: "Escribe para buscar repuestosâ€¦",
+    type_to_search_external: "Escribe para buscar servicios externosâ€¦",
     client_price: "Precio al cliente",
     shop_price: "Costo al taller",
     external_company: "Empresa externa",
     create_part: "Crear repuesto",
     create_service: "Crear servicio",
-    part_number_required: "El código del repuesto es obligatorio",
+    part_number_required: "El cÃ³digo del repuesto es obligatorio",
     part_name_required: "El nombre del repuesto es obligatorio",
     part_created: "Repuesto creado correctamente",
     part_exists: "Repuesto existente seleccionado",
@@ -2079,7 +2134,7 @@ function money(n){
 }
 
 // ===============
-// THEME + NÚMERO
+// THEME + NÃšMERO
 // ===============
 const shell   = document.getElementById('doc-shell');
 const selTipo = document.getElementById('id_tipo');
@@ -2132,14 +2187,14 @@ async function updateDocumentNumber(){
             setText(numeroView, next);
             numeroHidden.value = next;
           }catch(err){
-            console.error('❌ Error next-number:', err);
-            setText(numeroView, '— error —');
+            console.error('âŒ Error next-number:', err);
+            setText(numeroView, 'â€” error â€”');
             numeroHidden.value = '';
           }
         }
 
 // ===============
-// CLIENTE + VEHÍCULOS
+// CLIENTE + VEHÃCULOS
 // ===============
 let clienteBusqueda, clienteResultados, clienteSelect, clienteInfoBox, cliNombre, cliEmail, cliFono, vehiculoSelect;
 let searchTimer = null;
@@ -2174,7 +2229,7 @@ async function buscarClientes(q){
             const items = Array.isArray(data) ? data : (data.results || data.items || []);
             renderResultadosClientes(items);
           }catch(err){
-            console.error('❌ buscarClientes:', err);
+            console.error('âŒ buscarClientes:', err);
             clienteResultados.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
             clienteResultados.classList.remove('hidden');
           }
@@ -2219,13 +2274,13 @@ function renderResultadosClientes(lista){
     if (email){
       const em = document.createElement('div');
       em.className = 'text-sm text-gray-300';
-      em.textContent = `📧 ${email}`;
+      em.textContent = `ðŸ“§ ${email}`;
       div.appendChild(em);
     }
     if (fono){
       const ph = document.createElement('div');
       ph.className = 'text-sm text-gray-300';
-      ph.textContent = `📞 ${fono}`;
+      ph.textContent = `ðŸ“ž ${fono}`;
       div.appendChild(ph);
     }
     clienteResultados.appendChild(div);
@@ -2235,7 +2290,7 @@ function renderResultadosClientes(lista){
 }
 
 async function seleccionarCliente({id, nombre, email, telefono}){
-  console.log(`👤 Cliente seleccionado: ${nombre} (ID: ${id})`);
+  console.log(`ðŸ‘¤ Cliente seleccionado: ${nombre} (ID: ${id})`);
   
   getClienteElements();
   if (clienteResultados) clienteResultados.classList.add('hidden');
@@ -2245,16 +2300,16 @@ async function seleccionarCliente({id, nombre, email, telefono}){
     clienteSelect.classList.add('hidden');
   }
   if (cliNombre) cliNombre.textContent = nombre;
-  if (cliEmail)  cliEmail.textContent  = email ? `📧 ${email}` : '—';
-  if (cliFono)   cliFono.textContent   = telefono ? `📞 ${telefono}` : '—';
+  if (cliEmail)  cliEmail.textContent  = email ? `ðŸ“§ ${email}` : 'â€”';
+  if (cliFono)   cliFono.textContent   = telefono ? `ðŸ“ž ${telefono}` : 'â€”';
   const ultimaVisitaEl = document.getElementById('cliente-ultima-visita');
-  if (ultimaVisitaEl) ultimaVisitaEl.textContent = ''; // API puede llenar después
+  if (ultimaVisitaEl) ultimaVisitaEl.textContent = ''; // API puede llenar despuÃ©s
   if (clienteInfoBox) clienteInfoBox.classList.remove('hidden');
   
-  // ⚡ IMPORTANTE: Cargar vehículos del cliente seleccionado
-  console.log(`🔄 Iniciando carga de vehículos para cliente ${id}...`);
+  // âš¡ IMPORTANTE: Cargar vehÃ­culos del cliente seleccionado
+  console.log(`ðŸ”„ Iniciando carga de vehÃ­culos para cliente ${id}...`);
   
-  // Verificar si hay un vehículo a preseleccionar (desde URL, documentoData o preselect del backend)
+  // Verificar si hay un vehÃ­culo a preseleccionar (desde URL, documentoData o preselect del backend)
   const urlParams = new URLSearchParams(window.location.search);
   const newVehiculoId = urlParams.get('vehiculo_id') || urlParams.get('new_vehiculo_id');
   const prefillVehiculoId = (typeof documentoData !== 'undefined' && documentoData.prefillVehiculoId)
@@ -2271,23 +2326,23 @@ async function seleccionarCliente({id, nombre, email, telefono}){
 async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
   getClienteElements();
   if (!vehiculoSelect) {
-    console.warn('⚠️ Elemento #id_vehiculo no encontrado');
+    console.warn('âš ï¸ Elemento #id_vehiculo no encontrado');
     return;
   }
 
   if (!clienteId) {
-    console.warn('⚠️ No se proporcionó clienteId');
+    console.warn('âš ï¸ No se proporcionÃ³ clienteId');
     vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle}</option>`;
     return;
   }
 
-  console.log(`🚗 Cargando vehículos para cliente ID: ${clienteId}${vehiculoIdToSelect ? ` (preseleccionar: ${vehiculoIdToSelect})` : ''}`);
+  console.log(`ðŸš— Cargando vehÃ­culos para cliente ID: ${clienteId}${vehiculoIdToSelect ? ` (preseleccionar: ${vehiculoIdToSelect})` : ''}`);
 
   const clienteIdStr = String(clienteId);
   const lastLoadedClienteId = String(vehiculoSelect.dataset.loadedClienteId || '');
   const alreadyHasOptions = vehiculoSelect.options && vehiculoSelect.options.length > 1;
   if (alreadyHasOptions && lastLoadedClienteId === clienteIdStr) {
-    console.log(`ℹ️ Vehículos ya cargados para cliente ${clienteIdStr}, omitiendo nueva petición`);
+    console.log(`â„¹ï¸ VehÃ­culos ya cargados para cliente ${clienteIdStr}, omitiendo nueva peticiÃ³n`);
     if (vehiculoIdToSelect) {
       setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
     }
@@ -2295,14 +2350,14 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
   }
 
   vehiculoSelect.disabled = true;
-  vehiculoSelect.innerHTML = `<option value="">${I18N.loading_vehicles || 'Cargando vehículos...'}</option>`;
+  vehiculoSelect.innerHTML = `<option value="">${I18N.loading_vehicles || 'Cargando vehÃ­culos...'}</option>`;
 
-  // Intentar primero con prefetch local (más rápido)
+  // Intentar primero con prefetch local (mÃ¡s rÃ¡pido)
   const localMatches = (PREFETCH?.vehiculos || []).filter((v)=> String(v.cliente_id) === String(clienteId));
   if (localMatches.length){
-    console.log(`✅ Encontrados ${localMatches.length} vehículos en prefetch`);
+    console.log(`âœ… Encontrados ${localMatches.length} vehÃ­culos en prefetch`);
     const options = localMatches.map((v)=> `<option value="${v.id}">${v.label || v.text || ''}</option>`).join('');
-    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
+    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehÃ­culo...'}</option>${options}`;
     vehiculoSelect.dataset.source = 'prefetch';
     vehiculoSelect.dataset.loadedClienteId = clienteIdStr;
     vehiculoSelect.disabled = false;
@@ -2312,31 +2367,31 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
     return;
   }
 
-  // Si no hay en prefetch, hacer petición AJAX
+  // Si no hay en prefetch, hacer peticiÃ³n AJAX
   try{
     const urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/ajax/vehiculos-por-cliente/';
     const url = buildEndpoint(urlRaw);
     const fullUrl = `${url}?cliente_id=${encodeURIComponent(clienteId)}`;
     
-    console.log(`📡 Llamando a: ${fullUrl}`);
+    console.log(`ðŸ“¡ Llamando a: ${fullUrl}`);
     
     const r = await EG.fetch(fullUrl);
     
     if(!r.ok) {
       const errorText = await r.text();
-      console.error(`❌ HTTP ${r.status}:`, errorText);
+      console.error(`âŒ HTTP ${r.status}:`, errorText);
       throw new Error(`HTTP ${r.status}: ${errorText}`);
     }
     
     const data = await r.json();
-    console.log('📦 Respuesta recibida:', data);
+    console.log('ðŸ“¦ Respuesta recibida:', data);
     
     const items = Array.isArray(data) ? data : (data.results || data.items || []);
-    console.log(`📋 Procesando ${items.length} vehículos`);
+    console.log(`ðŸ“‹ Procesando ${items.length} vehÃ­culos`);
     
     if (!items.length){
-      console.log('ℹ️ No se encontraron vehículos');
-      vehiculoSelect.innerHTML = `<option value="">${I18N.no_vehicles || 'No hay vehículos'}</option>`;
+      console.log('â„¹ï¸ No se encontraron vehÃ­culos');
+      vehiculoSelect.innerHTML = `<option value="">${I18N.no_vehicles || 'No hay vehÃ­culos'}</option>`;
       vehiculoSelect.dataset.source = 'empty';
     } else {
       const options = items.map(v => {
@@ -2344,55 +2399,55 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
         const label = v.text || v.label || v.patente || `Vehicle #${id}`;
         return `<option value="${id}">${label}</option>`;
       }).join('');
-      vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
+      vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehÃ­culo...'}</option>${options}`;
       vehiculoSelect.dataset.source = 'fetch';
       vehiculoSelect.dataset.loadedClienteId = clienteIdStr;
-      console.log(`✅ ${items.length} vehículos cargados exitosamente`);
+      console.log(`âœ… ${items.length} vehÃ­culos cargados exitosamente`);
       
-      // Preseleccionar vehículo si se especificó
+      // Preseleccionar vehÃ­culo si se especificÃ³
       if (vehiculoIdToSelect) {
         setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
       }
     }
   }catch(err){
-    console.error('❌ Error cargando vehículos:', err);
+    console.error('âŒ Error cargando vehÃ­culos:', err);
     console.error('Stack:', err.stack);
-    vehiculoSelect.innerHTML = `<option value="">${I18N.error_loading_vehicles || 'Error al cargar vehículos'}</option>`;
+    vehiculoSelect.innerHTML = `<option value="">${I18N.error_loading_vehicles || 'Error al cargar vehÃ­culos'}</option>`;
     vehiculoSelect.dataset.source = 'error';
   }finally{
     vehiculoSelect.disabled = false;
   }
 }
 
-// Función auxiliar para preseleccionar un vehículo
+// FunciÃ³n auxiliar para preseleccionar un vehÃ­culo
 function preseleccionarVehiculo(vehiculoId) {
   getClienteElements();
   if (!vehiculoSelect) {
-    console.warn('⚠️ Elemento #id_vehiculo no encontrado para preselección');
+    console.warn('âš ï¸ Elemento #id_vehiculo no encontrado para preselecciÃ³n');
     return;
   }
   
   const vehiculoIdStr = String(vehiculoId);
-  console.log(`🎯 Intentando preseleccionar vehículo ID: ${vehiculoIdStr}`);
+  console.log(`ðŸŽ¯ Intentando preseleccionar vehÃ­culo ID: ${vehiculoIdStr}`);
   
-  // Verificar si el vehículo existe en las opciones
+  // Verificar si el vehÃ­culo existe en las opciones
   const option = Array.from(vehiculoSelect.options).find(opt => String(opt.value) === vehiculoIdStr);
   
   if (option) {
     vehiculoSelect.value = vehiculoIdStr;
     vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-    console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado exitosamente`);
+    console.log(`âœ… VehÃ­culo ${vehiculoIdStr} preseleccionado exitosamente`);
   } else {
-    console.warn(`⚠️ Vehículo ${vehiculoIdStr} no encontrado en las opciones disponibles`);
-    // Intentar nuevamente después de un breve delay (por si los vehículos aún se están cargando)
+    console.warn(`âš ï¸ VehÃ­culo ${vehiculoIdStr} no encontrado en las opciones disponibles`);
+    // Intentar nuevamente despuÃ©s de un breve delay (por si los vehÃ­culos aÃºn se estÃ¡n cargando)
     setTimeout(() => {
       const retryOption = Array.from(vehiculoSelect.options).find(opt => String(opt.value) === vehiculoIdStr);
       if (retryOption) {
         vehiculoSelect.value = vehiculoIdStr;
         vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-        console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado en reintento`);
+        console.log(`âœ… VehÃ­culo ${vehiculoIdStr} preseleccionado en reintento`);
       } else {
-        console.error(`❌ No se pudo preseleccionar vehículo ${vehiculoIdStr} después del reintento`);
+        console.error(`âŒ No se pudo preseleccionar vehÃ­culo ${vehiculoIdStr} despuÃ©s del reintento`);
       }
     }, 500);
   }
@@ -2416,8 +2471,8 @@ function recalcTotales(){
 
           console.log(`Totales: rep=${rep}, serv=${serv}, otros=${otros}`);
 
-          // Calcular impuestos dinámicamente desde ui_config.tax_lines
-          // El JavaScript NO sabe qué es IVA o Sales Tax, solo itera sobre tax_lines
+          // Calcular impuestos dinÃ¡micamente desde ui_config.tax_lines
+          // El JavaScript NO sabe quÃ© es IVA o Sales Tax, solo itera sobre tax_lines
           let totalTaxes = 0;
           const taxLines = window.EG?.cfg?.taxLines || [];
           
@@ -2426,7 +2481,7 @@ function recalcTotales(){
             const isEnabled = checkbox?.checked ?? false;
             
             if (isEnabled) {
-              // Aplicar impuesto según applies_to
+              // Aplicar impuesto segÃºn applies_to
               let baseAmount = 0;
               if (taxLine.applies_to === 'repuestos') {
                 baseAmount = rep;
@@ -2440,10 +2495,10 @@ function recalcTotales(){
               const taxAmount = baseAmount * taxRate;
               totalTaxes += taxAmount;
               
-              // Actualizar display de esta línea de impuesto
+              // Actualizar display de esta lÃ­nea de impuesto
               setText(`#t_${taxLine.id}`, money(taxAmount));
             } else {
-              // Si está deshabilitado, mostrar 0
+              // Si estÃ¡ deshabilitado, mostrar 0
               setText(`#t_${taxLine.id}`, money(0));
             }
           });
@@ -2460,14 +2515,14 @@ function recalcTotales(){
         }
 window.recalcTotales = recalcTotales;
 
-// Agregar event listeners a TODOS los checkboxes de impuestos dinámicamente
-// El JavaScript NO sabe cuántos impuestos hay, los detecta automáticamente
+// Agregar event listeners a TODOS los checkboxes de impuestos dinÃ¡micamente
+// El JavaScript NO sabe cuÃ¡ntos impuestos hay, los detecta automÃ¡ticamente
 document.querySelectorAll('.tax-checkbox').forEach(checkbox => {
   checkbox.addEventListener('change', recalcTotales);
 });
 
 // ===============
-// FILAS DINÁMICAS
+// FILAS DINÃMICAS
 // ===============
 // IDs de botones en tu HTML: #add-repuesto, #add-servicio, #add-otro
 // Los event listeners se registran en DOMContentLoaded
@@ -2475,7 +2530,7 @@ document.querySelectorAll('.tax-checkbox').forEach(checkbox => {
 window.addRepuestoRow = function addRepuestoRow(presetRowId){
   const container = document.getElementById('repuestos-container');
   if (!container) {
-    console.error('❌ Contenedor de repuestos no encontrado');
+    console.error('âŒ Contenedor de repuestos no encontrado');
     return;
   }
   const isFirstRow = !container.querySelector('.dynamic-element');
@@ -2507,7 +2562,7 @@ window.addRepuestoRow = function addRepuestoRow(presetRowId){
         </div>
         <div class="flex gap-1">
           <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
-          <button type="button" class="rep-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_part}">＋</button>
+          <button type="button" class="rep-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_part}">ï¼‹</button>
         </div>
         <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-nombre">
@@ -2517,7 +2572,7 @@ window.addRepuestoRow = function addRepuestoRow(presetRowId){
         <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" max="999" value="1">
       </div>
       <div class="col-span-2 sm:col-span-2 min-w-0">
-        ${lblFlex(`<span>${I18N.sale_price}</span><button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>`)}
+        ${lblFlex(`<span>${I18N.sale_price}</span><button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">ðŸ‘ï¸</button>`)}
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
           <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6" placeholder="0">
@@ -2536,7 +2591,7 @@ window.addRepuestoRow = function addRepuestoRow(presetRowId){
         <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
       </div>
       <div class="col-span-1 sm:col-span-1">
-        <button type="button" class="btn-add w-full h-10" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+        <button type="button" class="btn-add w-full h-10" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">âœ•</button>
       </div>
     </div>`;
   container.appendChild(row);
@@ -2618,7 +2673,7 @@ window.closeUsedPartsModal = function closeUsedPartsModal(){
     if (!results || !empty) return;
     if (!q || q.length < 2){
       results.innerHTML = '';
-      empty.textContent = (typeof I18N !== 'undefined' && I18N.type_to_search_parts) ? I18N.type_to_search_parts.replace('repuestos', 'código o nombre') : '{% trans "Type at least 2 characters to search" %}';
+      empty.textContent = (typeof I18N !== 'undefined' && I18N.type_to_search_parts) ? I18N.type_to_search_parts.replace('repuestos', 'cÃ³digo o nombre') : '{% trans "Type at least 2 characters to search" %}';
       empty.classList.remove('hidden');
       return;
     }
@@ -2643,8 +2698,8 @@ window.closeUsedPartsModal = function closeUsedPartsModal(){
         div.dataset.nombre = item.nombre || '';
         div.dataset.precio = item.precio || item.precio_venta_sugerido || 0;
         div.dataset.cantidad = item.cantidad || 1;
-        const v = item.vehiculo_origen ? ' • ' + item.vehiculo_origen : '';
-        div.innerHTML = '<div class="text-cyan-200 font-semibold text-sm">' + (item.codigo ? item.codigo + ' • ' : '') + (item.nombre || '') + '</div><div class="text-xs text-gray-400">' + money(item.precio || 0) + ' • {% trans "Stock" %}: ' + (item.cantidad || 0) + v + '</div>';
+        const v = item.vehiculo_origen ? ' â€¢ ' + item.vehiculo_origen : '';
+        div.innerHTML = '<div class="text-cyan-200 font-semibold text-sm">' + (item.codigo ? item.codigo + ' â€¢ ' : '') + (item.nombre || '') + '</div><div class="text-xs text-gray-400">' + money(item.precio || 0) + ' â€¢ {% trans "Stock" %}: ' + (item.cantidad || 0) + v + '</div>';
         div.addEventListener('click', function(){
           selectUsedPart(item);
         });
@@ -2708,7 +2763,7 @@ function setupRepuestoRow(row){
   const btnCreate = row.querySelector('.rep-create-btn');
   btnCreate?.addEventListener('click', ()=>{
     currentRepuestoRow = row;
-    const nombre = (searchInput?.value || '').split('•')[0].trim() || (inpName?.value || '').trim();
+    const nombre = (searchInput?.value || '').split('â€¢')[0].trim() || (inpName?.value || '').trim();
     const codigo = (inpCode?.value || '').trim();
     const rowId = row.dataset.rowId || '';
     const createBase = (typeof EG !== 'undefined' && EG.cfg && EG.cfg.URL_REPUESTO_CREATE_WINDOW)
@@ -2825,7 +2880,7 @@ function setupRepuestoRow(row){
       const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
       if (items.length) renderResultadosRepuestos(items);
     }catch(err){
-      console.error('❌ buscarRepuestos', err);
+      console.error('âŒ buscarRepuestos', err);
       if (!localMatches.length) {
         drop.innerHTML = `<div class=\"p-3 text-red-300\">${I18N.server_error}</div>`;
         drop.classList.remove('hidden');
@@ -2856,7 +2911,7 @@ function setupRepuestoRow(row){
       div.dataset.precio = precioVenta;
       div.dataset.cost = precioCompra;
       div.innerHTML = `
-        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo ? `${codigo} • ${nombre}` : nombre}</div>
+        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo ? `${codigo} â€¢ ${nombre}` : nombre}</div>
         <div class="text-xs text-gray-300">${money(precioVenta)}</div>`;
       frag.appendChild(div);
     });
@@ -2899,7 +2954,7 @@ function setupRepuestoRow(row){
     }
   });
 
-  // Búsqueda en tiempo real por código
+  // BÃºsqueda en tiempo real por cÃ³digo
   async function searchByCode(q){
     if (!codeDrop) return;
     if (!q || q.length < 2){
@@ -2918,14 +2973,14 @@ function setupRepuestoRow(row){
       if (!r.ok) throw new Error(`HTTP ${r.status}`);
       const data = await r.json();
       const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
-      // Filtrar por código que empiece con la búsqueda
+      // Filtrar por cÃ³digo que empiece con la bÃºsqueda
       const filteredItems = items.filter(item => {
         const codigo = (item.codigo || item.code || '').toLowerCase();
         return codigo.startsWith(q.toLowerCase());
       });
       if (filteredItems.length) renderResultadosCodigo(filteredItems);
     }catch(err){
-      console.error('❌ buscarPorCodigo', err);
+      console.error('âŒ buscarPorCodigo', err);
       if (!localMatches || !localMatches.length) {
         codeDrop.innerHTML = `<div class="p-3 text-red-300">${I18N.server_error}</div>`;
         codeDrop.classList.remove('hidden');
@@ -2956,7 +3011,7 @@ function setupRepuestoRow(row){
       div.dataset.precio = precioVenta;
       div.dataset.cost = precioCompra;
       div.innerHTML = `
-        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo}${nombre ? ` • ${nombre}` : ''}</div>
+        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo}${nombre ? ` â€¢ ${nombre}` : ''}</div>
         ${precioVenta > 0 ? `<div class="text-xs text-gray-300">${money(precioVenta)}</div>` : ''}`;
       frag.appendChild(div);
     });
@@ -3051,7 +3106,7 @@ function setupRepuestoRow(row){
     }
   });
 
-  // Botón para mostrar/ocultar precio de compra
+  // BotÃ³n para mostrar/ocultar precio de compra
   const toggleCostBtn = row.querySelector('.toggle-cost-price-btn');
   toggleCostBtn?.addEventListener('click', (e)=>{
     e.preventDefault();
@@ -3059,11 +3114,11 @@ function setupRepuestoRow(row){
     const costContainer = row.querySelector('.cost-price-container');
     if (costContainer) {
       costContainer.classList.toggle('hidden');
-      // Cambiar el icono según si está visible o no
+      // Cambiar el icono segÃºn si estÃ¡ visible o no
       if (costContainer.classList.contains('hidden')) {
-        toggleCostBtn.textContent = '👁️';
+        toggleCostBtn.textContent = 'ðŸ‘ï¸';
       } else {
-        toggleCostBtn.textContent = '🙈';
+        toggleCostBtn.textContent = 'ðŸ™ˆ';
       }
     }
   });
@@ -3074,7 +3129,7 @@ function setupRepuestoRow(row){
 window.addServicioRow = function addServicioRow(){
   const container = document.getElementById('servicios-container');
   if (!container) {
-    console.error('❌ Contenedor de servicios no encontrado');
+    console.error('âŒ Contenedor de servicios no encontrado');
     return;
   }
   const row = document.createElement('div');
@@ -3085,7 +3140,7 @@ window.addServicioRow = function addServicioRow(){
         <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
         <div class="flex gap-1">
           <input type="text" class="srv-input form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_services}" autocomplete="off">
-          <button type="button" class="srv-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_service}">＋</button>
+          <button type="button" class="srv-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_service}">ï¼‹</button>
         </div>
         <div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto top-full mt-1"></div>
         <input type="hidden" class="srv-id">
@@ -3103,7 +3158,7 @@ window.addServicioRow = function addServicioRow(){
         <div class="serv-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
       </div>
       <div class="col-span-1 sm:col-span-1">
-        <button type="button" class="btn-add w-full h-10" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('servicios-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#servicios-container .dynamic-element'));">✕</button>
+        <button type="button" class="btn-add w-full h-10" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('servicios-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#servicios-container .dynamic-element'));">âœ•</button>
       </div>
     </div>`;
   container.appendChild(row);
@@ -3129,7 +3184,7 @@ function setupServicioRow(row){
               return;
             }
             
-            // Primero buscar en el prefetch local (más rápido)
+            // Primero buscar en el prefetch local (mÃ¡s rÃ¡pido)
             let localMatches = filterPrefetchItems(PREFETCH.servicios, ['nombre', 'categoria', 'subcategoria'], q, 15);
             if (localMatches.length){
               renderResultados(localMatches);
@@ -3143,7 +3198,7 @@ function setupServicioRow(row){
               const items = Array.isArray(data)
                 ? data
                 : (data.servicios || data.results || []);
-              // Normalizar items usando función centralizada
+              // Normalizar items usando funciÃ³n centralizada
               const normalizedItems = items.map(normalizeServicio);
               if (normalizedItems.length) renderResultados(normalizedItems);
             }catch(err){
@@ -3165,7 +3220,7 @@ function setupServicioRow(row){
       return;
     }
     drop.innerHTML = lista.map(s => {
-      // Normalizar servicio usando función centralizada
+      // Normalizar servicio usando funciÃ³n centralizada
       const servicio = normalizeServicio(s);
       const servicioId = servicio.id || servicio.pk || '';
       const precioBase = Number(servicio.precio_cliente ?? servicio.precio_sugerido ?? servicio.precio ?? 0);
@@ -3173,7 +3228,7 @@ function setupServicioRow(row){
       <div class="srv-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0"
            role="option" tabindex="0" data-id="${servicioId}" data-precio="${precioBase}" data-text="${servicio.nombre || ''}">
         <div class="font-semibold text-cyan-200">${servicio.nombre || ''}</div>
-        ${servicio.categoria ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Categoría' : 'Category'}: ${servicio.categoria}</div>` : ``}
+        ${servicio.categoria ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'CategorÃ­a' : 'Category'}: ${servicio.categoria}</div>` : ``}
         ${precioBase ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Tarifa base' : 'Base'}: ${money(precioBase)}</div>` : ``}
       </div>
     `}).join('');
@@ -3253,14 +3308,14 @@ function setupServicioRow(row){
     recalc();
   };
   
-  // Alias para compatibilidad con el código de carga
+  // Alias para compatibilidad con el cÃ³digo de carga
   row.__applyServData = row.__applyServicioData;
 }
 
 window.addOtroRow = function addOtroRow(){
   const container = document.getElementById('otros-container');
   if (!container) {
-    console.error('❌ Contenedor de otros servicios no encontrado');
+    console.error('âŒ Contenedor de otros servicios no encontrado');
     return;
   }
   const row = document.createElement('div');
@@ -3297,7 +3352,7 @@ window.addOtroRow = function addOtroRow(){
         <div class="otr-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
       </div>
       <div class="col-span-1 sm:col-span-1">
-        <button type="button" class="btn-add w-full h-10" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('otros-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#otros-container .dynamic-element'));">✕</button>
+        <button type="button" class="btn-add w-full h-10" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('otros-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#otros-container .dynamic-element'));">âœ•</button>
       </div>
     </div>`;
   container.appendChild(row);
@@ -3363,7 +3418,7 @@ function setupOtroRow(row){
       const items = await (Array.isArray(data) ? data : (data.otros_servicios || data.results || []));
       if (items.length) renderResultadosOtros(items);
     } catch (err) {
-      console.error('❌ buscarOtrosServicios', err);
+      console.error('âŒ buscarOtrosServicios', err);
       if (!localMatches.length) {
         drop.innerHTML = `<div class=\"p-3 text-red-300\">${I18N.server_error}</div>`;
         drop.classList.remove('hidden');
@@ -3445,7 +3500,7 @@ function setupOtroRow(row){
   precioEl?.addEventListener('input', recalc);
   precioTallerEl?.addEventListener('input', recalc);
 
-  // Exponer función para aplicar datos desde fuera con formato correcto
+  // Exponer funciÃ³n para aplicar datos desde fuera con formato correcto
   row.__applyOtroData = function(data) {
     if (!data) return;
     aplicarDatos({
@@ -3468,7 +3523,7 @@ if (selTipo) {
     applyTheme(t);
     updateDocumentNumber();
   });
-  // Aplicar tema y UI según tipo al cargar
+  // Aplicar tema y UI segÃºn tipo al cargar
   const t0 = selTipo.value || 'OT';
   applyTheme(t0);
 }
@@ -3481,13 +3536,13 @@ if (selMode) {
   applyModeDependentUI();
 }
 
-        // Event listeners de búsqueda de clientes se mueven a DOMContentLoaded
+        // Event listeners de bÃºsqueda de clientes se mueven a DOMContentLoaded
 // Event listeners de click en resultados se mueven a initDocumentForm
 
 // INIT
-// Serializar filas dinámicas antes de enviar
+// Serializar filas dinÃ¡micas antes de enviar
 function serializeRows(){
-  console.log('🔍 Serializando filas dinámicas...');
+  console.log('ðŸ” Serializando filas dinÃ¡micas...');
 
   const rep = $$('#repuestos-container .dynamic-element').map(row=>({
     id:        $('.rep-id', row)?.value?.trim() || '',
@@ -3512,19 +3567,19 @@ function serializeRows(){
     precio:        parseNumericInput($('.otr-precio', row)?.value || 0),
   }));
 
-  console.log('📦 Repuestos encontrados:', rep.length, rep);
-  console.log('🔧 Servicios encontrados:', serv.length, serv);
-  console.log('🌐 Otros servicios encontrados:', otros.length, otros);
+  console.log('ðŸ“¦ Repuestos encontrados:', rep.length, rep);
+  console.log('ðŸ”§ Servicios encontrados:', serv.length, serv);
+  console.log('ðŸŒ Otros servicios encontrados:', otros.length, otros);
 
   $('#id_repuestos_json').value = JSON.stringify(rep);
   $('#id_servicios_json').value = JSON.stringify(serv);
   $('#id_otros_json').value     = JSON.stringify(otros);
 
-  console.log('💾 JSON guardado');
+  console.log('ðŸ’¾ JSON guardado');
 }
 
 // ===============
-// BORRADOR LOCAL (localStorage) — retorno desde crear cliente / vehículo / repuesto
+// BORRADOR LOCAL (localStorage) â€” retorno desde crear cliente / vehÃ­culo / repuesto
 // ===============
 const DOC_DRAFT_VERSION = 1;
 const DOC_DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -3603,8 +3658,8 @@ function collectDocumentDraftPayload() {
     })),
     cliente_id: document.getElementById('id_cliente')?.value || '',
     cliente_nombre: document.getElementById('cliente-busqueda')?.value || '',
-    cliente_email: (cliEmail?.textContent || '').replace(/^📧\s*/, '').trim().replace(/^—$/, ''),
-    cliente_telefono: (cliFono?.textContent || '').replace(/^📞\s*/, '').trim().replace(/^—$/, ''),
+    cliente_email: (cliEmail?.textContent || '').replace(/^ðŸ“§\s*/, '').trim().replace(/^â€”$/, ''),
+    cliente_telefono: (cliFono?.textContent || '').replace(/^ðŸ“ž\s*/, '').trim().replace(/^â€”$/, ''),
     vehiculo_id: document.getElementById('id_vehiculo')?.value || '',
     repuestos: rep,
     servicios: serv,
@@ -3924,7 +3979,7 @@ function submitDocumentForm(){
     vehiculoSelect.dataset.source = 'form';
   }
 
-  // Tarjeta vehículo: mostrar resumen al seleccionar
+  // Tarjeta vehÃ­culo: mostrar resumen al seleccionar
   function updateVehiculoCard() {
     const sel = document.getElementById('id_vehiculo');
     const box = document.getElementById('vehiculo-info');
@@ -3949,7 +4004,7 @@ function submitDocumentForm(){
   updateVehiculoCard();
   // Cargar datos existentes si estamos editando
   {% if es_edicion %}
-  // Inicializar campos básicos del formulario ANTES de aplicar tema
+  // Inicializar campos bÃ¡sicos del formulario ANTES de aplicar tema
   const documentoData = {
     tipo: '{{ documento.tipo|default:form.tipo.value|default:"" }}',
     clienteId: '{{ cliente_info.id|default:"" }}',
@@ -3963,7 +4018,7 @@ function submitDocumentForm(){
     numero: '{{ documento.numero_documento|default:documento.numero|default:"" }}'
   };
   
-  console.log('📄 Inicializando documento para edición:', documentoData);
+  console.log('ðŸ“„ Inicializando documento para ediciÃ³n:', documentoData);
   
   // Establecer tipo de documento PRIMERO
   if (documentoData.tipo) {
@@ -3978,7 +4033,7 @@ function submitDocumentForm(){
     applyTheme(t);
   }
   
-  // Establecer número de documento
+  // Establecer nÃºmero de documento
   if (documentoData.numero) {
     const numView = document.getElementById('id_numero');
     if (numView) {
@@ -3990,7 +4045,7 @@ function submitDocumentForm(){
   
   // Inicializar cliente si existe
   if (documentoData.clienteId && documentoData.clienteNombre) {
-    // Esperar a que la función esté disponible
+    // Esperar a que la funciÃ³n estÃ© disponible
     setTimeout(() => {
       if (typeof seleccionarCliente === 'function') {
         seleccionarCliente({
@@ -4000,19 +4055,19 @@ function submitDocumentForm(){
           telefono: documentoData.clienteTelefono
         });
         
-        // Cargar vehículos del cliente y seleccionar el vehículo inicial
-        // Priorizar prefillVehiculoId (vehículo recién creado) sobre vehiculoId (edición)
+        // Cargar vehÃ­culos del cliente y seleccionar el vehÃ­culo inicial
+        // Priorizar prefillVehiculoId (vehÃ­culo reciÃ©n creado) sobre vehiculoId (ediciÃ³n)
         const vehiculoIdToSelect = documentoData.prefillVehiculoId || documentoData.vehiculoId;
         if (vehiculoIdToSelect) {
-          console.log(`🎯 Vehículo a preseleccionar: ${vehiculoIdToSelect}`);
-          // La función cargarVehiculosPorCliente ahora acepta el ID para preseleccionar
-          // Se llamará automáticamente desde seleccionarCliente con el parámetro
+          console.log(`ðŸŽ¯ VehÃ­culo a preseleccionar: ${vehiculoIdToSelect}`);
+          // La funciÃ³n cargarVehiculosPorCliente ahora acepta el ID para preseleccionar
+          // Se llamarÃ¡ automÃ¡ticamente desde seleccionarCliente con el parÃ¡metro
         }
       }
     }, 100);
   }
   
-  // Establecer técnico responsable
+  // Establecer tÃ©cnico responsable
   if (documentoData.tecnicoId) {
     setTimeout(() => {
       const tecnicoSelect = document.getElementById('id_tecnico_responsable');
@@ -4033,12 +4088,12 @@ function submitDocumentForm(){
   }
 
   {% else %}
-  // Si no es edición, aplicar tema y actualizar número normalmente
+  // Si no es ediciÃ³n, aplicar tema y actualizar nÃºmero normalmente
   const t0 = selTipo?.value || 'OT';
   applyTheme(t0);
   if (typeof applyModeDependentUI === 'function') applyModeDependentUI();
   updateDocumentNumber();
-  // Preselección cliente/vehículo (vuelta desde "crear vehículo" con cliente_id y vehiculo_id en URL)
+  // PreselecciÃ³n cliente/vehÃ­culo (vuelta desde "crear vehÃ­culo" con cliente_id y vehiculo_id en URL)
   {% if cliente_preselect_id %}
   if (typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__ && typeof seleccionarCliente === 'function') {
     setTimeout(() => {
@@ -4053,18 +4108,18 @@ function submitDocumentForm(){
   {% endif %}
   {% endif %}
 
-  // Hidratar líneas (edición y creación con prefill)
+  // Hidratar lÃ­neas (ediciÃ³n y creaciÃ³n con prefill)
   const repuestosData = {{ repuestos_json|safe|default:"[]" }};
   const serviciosData = {{ servicios_json|safe|default:"[]" }};
   const otrosData = {{ otros_json|safe|default:"[]" }};
 
-  console.log('📦 Cargando datos iniciales del formulario:', {
+  console.log('ðŸ“¦ Cargando datos iniciales del formulario:', {
     repuestos: (repuestosData || []).length,
     servicios: (serviciosData || []).length,
     otros: (otrosData || []).length
   });
 
-  // Cargar líneas con delay para asegurar que las funciones estén disponibles
+  // Cargar lÃ­neas con delay para asegurar que las funciones estÃ©n disponibles
   setTimeout(() => {
     if (repuestosData && repuestosData.length > 0) {
       repuestosData.forEach(rep => {
@@ -4122,7 +4177,7 @@ function submitDocumentForm(){
       });
     }
 
-    // Recalcular y serializar después de hidratar todos los datos
+    // Recalcular y serializar despuÃ©s de hidratar todos los datos
     const hasServerLines =
       ((repuestosData || []).length > 0 ||
         (serviciosData || []).length > 0 ||
@@ -4154,11 +4209,11 @@ function submitDocumentForm(){
   clienteSelect?.addEventListener('change', function () {
     const selectedClienteId = this.value;
     if (!selectedClienteId) return;
-    console.log('🔁 Cliente cambiado en hidden select, cargando vehículos para cliente:', selectedClienteId);
+    console.log('ðŸ” Cliente cambiado en hidden select, cargando vehÃ­culos para cliente:', selectedClienteId);
     cargarVehiculosPorCliente(selectedClienteId);
   });
   
-  // El botón "Nuevo Cliente" - usar URL del servidor (country_url) + ?next= para retorno
+  // El botÃ³n "Nuevo Cliente" - usar URL del servidor (country_url) + ?next= para retorno
   const btnNuevoCliente = document.getElementById('btn-nuevo-cliente');
   if (btnNuevoCliente) {
     btnNuevoCliente.classList.add('btn-green-gradient');
@@ -4170,10 +4225,10 @@ function submitDocumentForm(){
       const sep = baseUrl.indexOf('?') >= 0 ? '&' : '?';
       btnNuevoCliente.setAttribute('href', baseUrl + sep + 'next=' + nextUrl);
     }
-    console.log('✅ Botón Nuevo Cliente configurado:', btnNuevoCliente.getAttribute('href'));
+    console.log('âœ… BotÃ³n Nuevo Cliente configurado:', btnNuevoCliente.getAttribute('href'));
   }
   
-  console.log('📄 Document form inicializado', EG.cfg);
+  console.log('ðŸ“„ Document form inicializado', EG.cfg);
 }
 
 if (document.readyState === 'loading') {
@@ -4182,7 +4237,7 @@ if (document.readyState === 'loading') {
   initDocumentFormScript();
 }
 
-// === NAVEGACIÓN BLINDADA eGarage (Corrección 404) ===
+// === NAVEGACIÃ“N BLINDADA eGarage (CorrecciÃ³n 404) ===
 document.addEventListener('click', function(e) {
     const btnCliente = e.target.closest('#btn-nuevo-cliente');
     const btnVehiculo = e.target.closest('#btn-nuevo-vehiculo');
@@ -4197,7 +4252,7 @@ document.addEventListener('click', function(e) {
         let destUrl = "";
 
         if (btnCliente) {
-            // Preferir href generado por el servidor (country_url) con ?next= ya añadido en init
+            // Preferir href generado por el servidor (country_url) con ?next= ya aÃ±adido en init
             const href = btnCliente.getAttribute('href');
             if (href && href !== '#' && href !== '') {
                 e.preventDefault();
@@ -4225,7 +4280,7 @@ document.addEventListener('click', function(e) {
         if (destUrl) {
             e.preventDefault();
             e.stopPropagation();
-            console.log("🚀 Redirigiendo a ruta validada:", destUrl);
+            console.log("ðŸš€ Redirigiendo a ruta validada:", destUrl);
             window.location.href = destUrl;
         }
     }
@@ -4234,6 +4289,11 @@ document.addEventListener('click', function(e) {
 </script>
 
 {# ==================== CARGA DE DOCUMENT ENGINE ==================== #}
-{# "Capa de Inteligencia" - UX Móvil y Blindaje de Campos Calculados #}
+{# "Capa de Inteligencia" - UX MÃ³vil y Blindaje de Campos Calculados #}
 <script src="{% static 'js/document_engine.js' %}"></script>
 {% endblock extra_js %}
+
+
+
+
+
