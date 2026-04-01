@@ -1347,7 +1347,7 @@ function submitLanguageDoc(lang) {
               data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
               data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
               data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
-              data-url-next-number="/cl/es/documentos/api/obtener-numero-documento/"
+              data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
               data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
               data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' app_namespace='' %}"
               data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
