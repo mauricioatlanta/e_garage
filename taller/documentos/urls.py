@@ -61,7 +61,6 @@ urlpatterns = [
         name="procesar_documento",
     ),
     path("<int:pk>/", DocumentoDetailView.as_view(), name="ver_documento_cbv"),
-    path("<int:documento_id>/", views.ver_documento, name="ver_documento"),
     # Exportar PDF
     path(
         "<int:documento_id>/exportar_pdf/",
