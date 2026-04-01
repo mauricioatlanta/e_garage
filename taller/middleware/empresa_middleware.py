@@ -73,6 +73,12 @@ class EmpresaMiddleware:
         # /cl/es/settings/ → /settings — permitir centro de ajustes aunque suscripción esté vencida
         if norm.startswith("/settings"):
             return True
+        # APIs de documentos: el formulario necesita obtener número aunque suscripción esté vencida
+        if "/documentos/api/" in path or norm.startswith("/documentos/api/"):
+            return True
+        # APIs de ajax (buscar clientes, vehículos, repuestos)
+        if "/ajax/" in path or norm.startswith("/ajax/"):
+            return True
         return any(path.startswith(u) for u in exempt_bases) or any(
             norm.startswith(u) for u in exempt_bases
         )
