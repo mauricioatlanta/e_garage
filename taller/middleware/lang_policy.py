@@ -81,11 +81,9 @@ class LanguagePolicyMiddleware:
                 elif request.path.startswith("/us/en/"):
                     lang = "en"
                     request.session[DJANGO_LANGUAGE_SESSION_KEY] = "en"
-                    print(f"[DEBUG] USA - Idioma desde URL /us/en/: {lang}")
                 elif request.path.startswith("/us/es/"):
                     lang = "es"
                     request.session[DJANGO_LANGUAGE_SESSION_KEY] = "es"
-                    print(f"[DEBUG] USA - Idioma desde URL /us/es/: {lang}")
                 else:
                     # Leer idioma de la sesión (LocaleMiddleware ya lo estableció)
                     session_lang = request.session.get(DJANGO_LANGUAGE_SESSION_KEY)
@@ -93,7 +91,6 @@ class LanguagePolicyMiddleware:
                     # Si hay idioma en sesión y es válido para USA, usarlo
                     if session_lang in ALLOWED_BY_COUNTRY["US"]:
                         lang = session_lang
-                        print(f"[DEBUG] USA - Usando idioma de sesión: {lang}")
                     else:
                         # Verificar si hay idioma en cookie (LocaleMiddleware lo puede leer)
                         cookie_lang = request.COOKIES.get("django_language")
@@ -101,26 +98,15 @@ class LanguagePolicyMiddleware:
                             lang = cookie_lang
                             # Guardar en sesión para consistencia
                             request.session[DJANGO_LANGUAGE_SESSION_KEY] = lang
-                            print(
-                                f"[DEBUG] USA - Usando idioma de cookie y guardando en sesión: {lang}"
-                            )
                         else:
                             lang = DEFAULT_BY_COUNTRY["US"]
-                            print(f"[DEBUG] USA - Sin preferencia, usando default: {lang}")
             else:
                 # Para otros países, usar default
                 lang = DEFAULT_BY_COUNTRY.get(pais, "es")
-                print(f"[DEBUG] País {pais} - Usando default: {lang}")
 
             # Activar idioma
             translation.activate(lang)
             request.LANGUAGE_CODE = lang
-
-            print("[DEBUG] ===== LanguagePolicyMiddleware =====")
-            print(f"[DEBUG] País: {pais}")
-            print(f"[DEBUG] Idioma aplicado: {lang}")
-            print(f"[DEBUG] URL: {request.path}")
-            print("[DEBUG] ===========================================")
 
             response = self.get_response(request)
             return response
