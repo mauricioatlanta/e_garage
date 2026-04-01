@@ -16,8 +16,6 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
 from taller.models.tecnico import Tecnico
-from taller.services.empresa_service import get_empresa_safe
-from taller.services.documento_service import calcular_totales
 
 
 # API para crear técnicos (SEGURO)
@@ -38,7 +36,7 @@ def api_crear_tecnico(request):
             return JsonResponse({"error": "Nombre requerido"}, status=400)
 
         # Usar empresa del usuario autenticado (seguridad)
-        empresa = get_empresa_safe(request)
+        empresa = getattr(request.user, "empresa", None)
         if not empresa:
             return JsonResponse({"error": "Usuario sin empresa asociada"}, status=400)
 
@@ -96,7 +94,7 @@ def autocomplete_servicio(request):
     q = request.GET.get("q", "").strip()
 
     # Obtener empresa del usuario
-    empresa = get_empresa_safe(request)
+    empresa = getattr(request.user, "empresa", None)
     if not empresa:
         return JsonResponse([], safe=False)
 
@@ -214,7 +212,9 @@ def autocomplete_cliente(request):
     q = request.GET.get("q", "").strip()
 
     # Obtener empresa del usuario autenticado
-    empresa = get_empresa_safe(request)
+    empresa = None
+    if request.user.is_authenticated and hasattr(request.user, "empresa"):
+        empresa = request.user.empresa
 
     # Si no hay empresa, retornar vacío
     if not empresa:
@@ -261,8 +261,9 @@ def obtener_vehiculos_por_cliente(request):
         return JsonResponse([], safe=False)
 
     # Obtener empresa del usuario autenticado
-    empresa = get_empresa_safe(request)
-    if not empresa:
+    try:
+        empresa = request.user.empresa
+    except AttributeError:
         return JsonResponse([], safe=False)
 
     # Filtrar vehículos por cliente y empresa
@@ -333,10 +334,20 @@ def crear_documento(request):
     print(f"[DEBUG CREAR] Método: {request.method}")
 
     # Obtener empresa del usuario (común para GET y POST)
-    empresa = get_empresa_safe(request)
-    if not empresa:
-        return redirect("/")
-    print(f"[DEBUG CREAR] Empresa obtenida: {empresa.nombre_taller}")
+    try:
+        empresa = request.user.empresa  # related_name desde el modelo Empresa
+        print(f"[DEBUG CREAR] Empresa obtenida: {empresa.nombre_taller}")
+    except AttributeError:
+        # Si no existe la relación, crear/obtener empresa para el usuario
+        from taller.models.empresa import Empresa
+
+        empresa, created = Empresa.objects.get_or_create(
+            user=request.user,
+            defaults={"nombre_taller": f"Taller de {request.user.username}"},
+        )
+        print(
+            f"[DEBUG CREAR] Empresa {'creada' if created else 'encontrada'}: {empresa.nombre_taller}"
+        )
 
     if request.method == "POST":
         print("[DEBUG CREAR] ===== PROCESANDO POST =====")
@@ -541,38 +552,42 @@ def ver_documento(request, documento_id):
     print(f"[DEBUG VER] País detectado: {country}")
 
     # Verificar que el documento pertenece a la empresa del usuario
-    empresa = get_empresa_safe(request)
-    if not empresa:
+    try:
+        empresa = request.user.empresa
+        print(f"[DEBUG VER] Empresa del usuario: {empresa.nombre_taller}")
+
+        # 🔒 SEGURIDAD: Filtrar por empresa desde el inicio para aislamiento multi-tenant
+        # Verificar si el documento existe y pertenece a la empresa del usuario
+        if not Documento.objects.filter(id=documento_id, empresa=empresa).exists():
+            print(
+                f"[DEBUG VER] ❌ Documento {documento_id} NO pertenece a la empresa {empresa.nombre_taller}"
+            )
+            from django.http import Http404
+
+            raise Http404(f"Documento {documento_id} no encontrado")
+
+        print(
+            f"[DEBUG VER] ✅ Documento {documento_id} pertenece a la empresa {empresa.nombre_taller}"
+        )
+
+        documento = get_object_or_404(
+            Documento.objects.select_related(
+                "cliente", "vehiculo", "tecnico_responsable", "empresa"
+            ).prefetch_related(
+                "lineas_repuesto__repuesto",
+                "lineas_servicio__servicio",
+                "lineas_otro_servicio__servicio_externo",
+            ),
+            id=documento_id,
+            empresa=empresa,
+        )
+        print(f"[DEBUG VER] Documento encontrado: {documento.numero_documento}")
+    except AttributeError:
         print("[DEBUG VER] Usuario sin empresa asociada")
+        # Si no tiene empresa asociada, no puede ver ningún documento
         from django.http import Http404
 
         raise Http404("Documento no encontrado")
-    print(f"[DEBUG VER] Empresa del usuario: {empresa.nombre_taller}")
-
-    # 🔒 SEGURIDAD: Filtrar por empresa desde el inicio para aislamiento multi-tenant
-    # Verificar si el documento existe y pertenece a la empresa del usuario
-    if not Documento.objects.filter(id=documento_id, empresa=empresa).exists():
-        print(
-            f"[DEBUG VER] ❌ Documento {documento_id} NO pertenece a la empresa {empresa.nombre_taller}"
-        )
-        from django.http import Http404
-
-        raise Http404(f"Documento {documento_id} no encontrado")
-
-    print(f"[DEBUG VER] ✅ Documento {documento_id} pertenece a la empresa {empresa.nombre_taller}")
-
-    documento = get_object_or_404(
-        Documento.objects.select_related(
-            "cliente", "vehiculo", "tecnico_responsable", "empresa"
-        ).prefetch_related(
-            "lineas_repuesto__repuesto",
-            "lineas_servicio__servicio",
-            "lineas_otro_servicio__servicio_externo",
-        ),
-        id=documento_id,
-        empresa=empresa,
-    )
-    print(f"[DEBUG VER] Documento encontrado: {documento.numero_documento}")
 
     # Obtener líneas del documento usando prefetch
     repuestos = documento.lineas_repuesto.all()
@@ -602,15 +617,18 @@ def ver_documento(request, documento_id):
             f"[DEBUG VER]   - {nombre_otro} ({getattr(otro, 'empresa_externa', '')}): ${precio_otro}"
         )
 
-    totales = calcular_totales(documento)
-    print("DEBUG TOTAL:", totales)
+    from taller.utils.totales import totales_chile
 
-    subtotal_repuestos = totales["total_repuestos"]
-    subtotal_servicios = totales["total_servicios"]
-    subtotal_otros_servicios = totales["total_otros"]
-    subtotal = totales["subtotal"]
-    iva = totales["iva"]
-    total = totales["total"]
+    # Usar el nuevo helper de totales
+    resumen = totales_chile(repuestos, servicios)
+    subtotal_repuestos = resumen["subtotal_repuestos"]
+    subtotal_servicios = resumen["subtotal_servicios"]
+    iva = resumen["iva"]
+    total = resumen["total"]
+    subtotal = subtotal_repuestos + subtotal_servicios
+    subtotal_otros_servicios = sum(
+        getattr(otro, "precio_cliente", Decimal("0.00")) for otro in otros_servicios
+    )
 
     print(
         f"[DEBUG VER] Totales calculados - Repuestos: ${subtotal_repuestos}, Servicios: ${subtotal_servicios}, Otros: ${subtotal_otros_servicios}, IVA: ${iva}, Total: ${total}"
@@ -630,7 +648,7 @@ def ver_documento(request, documento_id):
 
     template_name = select_country_lang_template(
         "documentos/ver_documento_nuevo.html",
-        getattr(empresa, "pais", "cl").lower(),
+        getattr(request.user.empresa, "pais", "cl").lower(),
         get_language(),
     )
 
@@ -662,53 +680,55 @@ def lista_documentos(request):
     country = _country_from_request(request)
 
     # Filtrar documentos por empresa del usuario
-    empresa = get_empresa_safe(request)
-    if not empresa:
-        return redirect("/")
+    try:
+        empresa = request.user.empresa
+        from django.db.models import Count, DecimalField, F, IntegerField, Sum, Value
+        from django.db.models.functions import Coalesce
 
-    from django.db.models import Count, DecimalField, F, IntegerField, Sum, Value
-    from django.db.models.functions import Coalesce
-
-    documentos = (
-        Documento.objects.filter(empresa=empresa)
-        .select_related(
-            "cliente", "vehiculo", "tecnico_responsable", "empresa"
-        )  # Optimización para FKs
-        .annotate(
-            # CONTEOS de líneas (para mostrar en columnas)
-            rep_count=Count("lineas_repuesto", distinct=True),
-            serv_count=Count("lineas_servicio", distinct=True),
-            otros_count=Count("lineas_otro_servicio", distinct=True),
-            # SUMAS monetarias (para totales)
-            sum_rep=Coalesce(
-                Sum(
-                    F("lineas_repuesto__cantidad")
-                    * F("lineas_repuesto__precio_unitario")
-                    * (1 - F("lineas_repuesto__descuento") / 100),
-                    output_field=DecimalField(max_digits=12, decimal_places=2),
+        documentos = (
+            Documento.objects.filter(empresa=empresa)
+            .select_related(
+                "cliente", "vehiculo", "tecnico_responsable", "empresa"
+            )  # Optimización para FKs
+            .annotate(
+                # CONTEOS de líneas (para mostrar en columnas)
+                rep_count=Count("lineas_repuesto", distinct=True),
+                serv_count=Count("lineas_servicio", distinct=True),
+                otros_count=Count("lineas_otro_servicio", distinct=True),
+                # SUMAS monetarias (para totales)
+                sum_rep=Coalesce(
+                    Sum(
+                        F("lineas_repuesto__cantidad")
+                        * F("lineas_repuesto__precio_unitario")
+                        * (1 - F("lineas_repuesto__descuento") / 100),
+                        output_field=DecimalField(max_digits=12, decimal_places=2),
+                    ),
+                    Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
                 ),
-                Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
-            ),
-            sum_serv=Coalesce(
-                Sum(
-                    F("lineas_servicio__cantidad")
-                    * F("lineas_servicio__precio_unitario")
-                    * (1 - F("lineas_servicio__descuento") / 100),
-                    output_field=DecimalField(max_digits=12, decimal_places=2),
+                sum_serv=Coalesce(
+                    Sum(
+                        F("lineas_servicio__cantidad")
+                        * F("lineas_servicio__precio_unitario")
+                        * (1 - F("lineas_servicio__descuento") / 100),
+                        output_field=DecimalField(max_digits=12, decimal_places=2),
+                    ),
+                    Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
                 ),
-                Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
-            ),
-            sum_out=Coalesce(
-                Sum(
-                    F("lineas_otro_servicio__precio_cliente") * F("lineas_otro_servicio__cantidad"),
-                    output_field=DecimalField(max_digits=12, decimal_places=2),
+                sum_out=Coalesce(
+                    Sum(
+                        F("lineas_otro_servicio__precio_cliente")
+                        * F("lineas_otro_servicio__cantidad"),
+                        output_field=DecimalField(max_digits=12, decimal_places=2),
+                    ),
+                    Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
                 ),
-                Value(0, output_field=DecimalField(max_digits=12, decimal_places=2)),
-            ),
+            )
+            .annotate(total_general_anotado=F("sum_rep") + F("sum_serv") + F("sum_out"))
+            .order_by("-fecha_emision", "-id")  # Ordenar por fecha descendente
         )
-        .annotate(total_general_anotado=F("sum_rep") + F("sum_serv") + F("sum_out"))
-        .order_by("-fecha_emision", "-id")  # Ordenar por fecha descendente
-    )
+    except AttributeError:
+        # Si no tiene empresa asociada, no mostrar documentos
+        documentos = Documento.objects.none()
 
     # Calcular totales para el dashboard - SOLO FACTURAS Y BOLETAS
     total_facturas = sum(
@@ -726,7 +746,7 @@ def lista_documentos(request):
 
     template_name = select_country_lang_template(
         "documentos/lista_documentos.html",
-        getattr(empresa, "pais", "cl").lower(),
+        getattr(request.user.empresa, "pais", "cl").lower(),
         get_language(),
     )
 
@@ -745,16 +765,20 @@ def lista_documentos(request):
 @login_required
 def editar_documento(request, documento_id):
     # Verificar que el documento pertenece a la empresa del usuario
-    empresa = get_empresa_safe(request)
-    if not empresa:
-        return redirect("/")
-    documento = get_object_or_404(
-        Documento.objects.select_related(
-            "cliente", "vehiculo", "tecnico_responsable"
-        ).prefetch_related("lineas_repuesto", "lineas_servicio", "lineas_otro_servicio"),
-        id=documento_id,
-        empresa=empresa,
-    )
+    try:
+        empresa = request.user.empresa
+        documento = get_object_or_404(
+            Documento.objects.select_related(
+                "cliente", "vehiculo", "tecnico_responsable"
+            ).prefetch_related("lineas_repuesto", "lineas_servicio", "lineas_otro_servicio"),
+            id=documento_id,
+            empresa=empresa,
+        )
+    except AttributeError:
+        # Si no tiene empresa asociada, no puede editar ningún documento
+        from django.http import Http404
+
+        raise Http404("Documento no encontrado")
 
     if request.method == "POST":
         print(f"[DEBUG EDICIÓN] POST data recibido: {list(request.POST.keys())}")
@@ -994,6 +1018,7 @@ def eliminar_documento(request, documento_id):
     return redirect("documentos:lista_documentos", country=empresa.pais.lower())
 
 
+@csrf_exempt
 def editar_detalle_documento(request):
     data = json.loads(request.body)
     detalle = get_object_or_404(DetalleDocumento, id=data["id"])
@@ -1023,7 +1048,6 @@ def total_documento(request, documento_id):
 
 @require_GET
 @login_required
-@csrf_exempt
 def numero_documento_auto(request):
     # Obtener empresa del usuario
     try:

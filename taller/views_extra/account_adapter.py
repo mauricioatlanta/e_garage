@@ -94,60 +94,19 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
 
     def get_reset_password_from_key_url(self, key):
         """
-        Genera URL de reset con contexto de país/idioma para evitar perder routing.
-        El enlace del mail debe apuntar a la misma jerarquía que usó el usuario.
-
-        IMPORTANTE: allauth pasa el key en formato "uidb36-token", donde:
-        - uidb36: ID del usuario codificado en base36
-        - token: token de seguridad generado por allauth
-
-        CRÍTICO: Este método NUNCA debe hacer fallback al método padre porque
-        genera URLs sin contexto de país (ej: /accounts/signup/ en lugar de /cl/es/accounts/password/reset/key/...)
+        Si el usuario pidió reset desde /cl/es/accounts/password/reset/, el enlace del mail
+        debe apuntar a la misma jerarquía (no a /accounts/... sin país/idioma).
         """
         req = getattr(self, "request", None)
-
-        # Determinar país/idioma desde request o usuario
-        country, lang = self._country_lang_from_request_or_user(request=req)
-
-        # Mapeo de países a prefijos de URL
-        country_prefix = {
-            "CL": "/cl/es",
-            "US": "/us",
-            "MX": "/mx/es",
-            "AR": "/ar/es",
-            "UY": "/uy/es",
-            "PE": "/pe/es",
-            "CO": "/co/es",
-            "EC": "/ec/es",
-            "VE": "/ve/es",
-        }
-
-        prefix = country_prefix.get(country, "/cl/es")
-
-        # Construir la URL manualmente con el prefijo del país
-        # El key ya viene en formato "uidb36-token" desde allauth
-        # La URL debe ser: /cl/es/accounts/password/reset/key/uidb36-token/
-        path = f"{prefix}/accounts/password/reset/key/{key}/"
-
-        # Construir URL absoluta manualmente para evitar dependencias de django.contrib.sites
-        if req:
-            protocol = "https" if req.is_secure() else "http"
-            host = req.get_host()
-            url = f"{protocol}://{host}{path}"
-        else:
-            # Si no hay request, usar el dominio del settings
-            domain = getattr(settings, "SITE_DOMAIN", "egarage.cl")
-            url = f"https://{domain}{path}"
-
-        logger.info(
-            "PASSWORD RESET URL generada | country=%s lang=%s prefix=%s url=%s key_preview=%s",
-            country,
-            lang,
-            prefix,
-            url,
-            key[:20] if key else "None",
-        )
-        return url
+        path = (req.path or "") if req else ""
+        if path.startswith("/cl/es/"):
+            p = reverse(
+                "chile:account_reset_password_from_key",
+                kwargs={"uidb36": "UID", "key": "KEY"},
+            )
+            p = p.replace("UID-KEY", quote(key, safe=""))
+            return build_absolute_uri(req, p)
+        return super().get_reset_password_from_key_url(key)
 
     def get_password_change_redirect_url(self, request):
         if (request.path or "").startswith("/cl/es/"):

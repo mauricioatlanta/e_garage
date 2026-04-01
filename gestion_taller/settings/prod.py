@@ -3,14 +3,6 @@ Configuración de producción para eGarage.
 Configuración segura y optimizada para producción.
 """
 
-from pathlib import Path
-from dotenv import load_dotenv
-
-# Cargar .env.prod explícitamente para producción
-_env_prod_path = Path(__file__).resolve().parent.parent.parent / ".env.prod"
-if _env_prod_path.exists():
-    load_dotenv(_env_prod_path, override=True)
-
 from .base import *
 
 # =============================================================================
@@ -63,14 +55,6 @@ SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = True
-
-# SameSite: requerido para flujos auth normales (evita problemas CSRF en navegación)
-SESSION_COOKIE_SAMESITE = "Lax"
-CSRF_COOKIE_SAMESITE = "Lax"
-
-# Dominios de cookies (permite compartir sesión/CSRF entre www y apex)
-SESSION_COOKIE_DOMAIN = os.getenv("DJANGO_SESSION_COOKIE_DOMAIN", ".egarage.cl")
-CSRF_COOKIE_DOMAIN = os.getenv("DJANGO_CSRF_COOKIE_DOMAIN", ".egarage.cl")
 
 # Headers de seguridad
 SECURE_BROWSER_XSS_FILTER = True
@@ -174,7 +158,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, "static")]  # si existe /srv/egarage/
 
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedStaticFilesStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"},
 }
 
 # Configuración de archivos media para producción

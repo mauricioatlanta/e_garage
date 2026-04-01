@@ -269,6 +269,7 @@ MIDDLEWARE = [
     "taller.middleware.lang_policy.LanguagePolicyMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
 
 # AccountMiddleware de allauth: agregar dinámicamente si existe
@@ -311,16 +312,13 @@ TEMPLATES = [
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
-                "taller.context_processors.country.country_context",
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",
-                "taller.context_processors.country.country_context",
                 "django.contrib.auth.context_processors.auth",
                 "django.template.context_processors.media",
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "taller.context_processors.country.country_context",
                 "taller.context_processors.empresa_contexto",
                 "taller.context_processors.namespaces.ui_namespaces",
                 "taller.context_processors.company_context",

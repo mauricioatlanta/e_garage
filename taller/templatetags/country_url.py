@@ -181,4 +181,4 @@ def country_url_direct(context, view_path, *args, app_namespace="taller", **kwar
     Ejemplo:
       <a href="{% country_url_direct 'clientes:lista_clientes' %}">Clientes</a>
     """
-    return country_url(context, view_path, *args, app_namespace=app_namespace, **kwargs)
+    return country_url(context, view_path, app_namespace, *args, **kwargs)

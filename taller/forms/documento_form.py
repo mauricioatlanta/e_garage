@@ -7,7 +7,6 @@ from django.utils.translation import get_language
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.vehiculos import Vehiculo
-from taller.services.documento_service import calcular_totales
 
 
 # Helper centralizado para namespaces de autocompletado
@@ -96,6 +95,7 @@ class DocumentoForm(forms.ModelForm):
             "fecha_pago",
             "nota_pago",
             "descuento",
+            "apply_vat",
         ]
         # NOTA: kilometraje_ingreso NO está en fields porque no es un campo del modelo
 
@@ -393,25 +393,8 @@ class DocumentoForm(forms.ModelForm):
             # Procesar datos JSON solo si el documento se guardó
             self._process_json_data(documento)
 
-            totales = calcular_totales(documento)
-            print("DEBUG TOTAL:", totales)
-
-            documento.neto_repuestos = totales["total_repuestos"]
-            documento.neto_servicios = totales["total_servicios"]
-            documento.neto_otros_servicios = totales["total_otros"]
-            documento.tax_rate_applied = totales["iva_rate"]
-            documento.tax_amount = totales["iva"]
-            documento.total = totales["total"]
-            documento.save(
-                update_fields=[
-                    "neto_repuestos",
-                    "neto_servicios",
-                    "neto_otros_servicios",
-                    "tax_rate_applied",
-                    "tax_amount",
-                    "total",
-                ]
-            )
+            # Recalcular totales del documento tras crear las líneas
+            documento.recompute_totals(persist=True)
 
             # Crear registro de kilometraje si se proporcionó y hay vehículo
             if kilometraje_ingreso is not None and documento.vehiculo:
@@ -506,6 +489,7 @@ class DocumentoForm(forms.ModelForm):
                         LineaServicio.objects.create(
                             documento=documento,
                             servicio_id=serv_data.get("servicio_id"),
+                            nombre=serv_data.get("nombre", ""),
                             cantidad=1,  # forzamos 1 (sin cantidad en UI)
                             precio_unitario=serv_data.get("precio", 0),
                         )
@@ -524,9 +508,10 @@ class DocumentoForm(forms.ModelForm):
                         LineaOtroServicio.objects.create(
                             documento=documento,
                             servicio_id=otro_data.get("servicio_id"),
+                            nombre=otro_data.get("nombre", ""),
                             empresa_externa=otro_data.get("empresa_ext", ""),
                             cantidad=otro_data.get("cantidad", 1),
-                            precio_taller=otro_data.get("precio_taller", 0),
+                            costo_interno=otro_data.get("precio_taller", 0),
                             precio_cliente=otro_data.get("precio", 0),
                         )
             except (json.JSONDecodeError, ValueError):

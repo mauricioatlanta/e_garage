@@ -228,4 +228,3 @@ __all__ = [
     "invalidate_company_cache",
     "ui_namespaces",
 ]
-# context processors package

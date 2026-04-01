@@ -21,6 +21,7 @@ from django.utils.translation import activate
 from taller.models.empresa import Empresa
 from taller.models.suscripcion import Suscripcion
 from taller.utils.country_config import get_country_config, get_config_from_empresa
+from taller.config.country_settings import CountrySettings
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -504,7 +505,7 @@ www.egarage.cl
     @staticmethod
     def get_dashboard_url_for_country(country_code, request=None):
         """
-        Genera URL del dashboard según país usando country_config.
+        Genera URL del dashboard según país usando CountrySettings.
 
         Args:
             country_code: Código de país ('CL', 'US', 'MX', 'PE', 'CO', 'EC', 'BR', 'VE')
@@ -513,14 +514,19 @@ www.egarage.cl
         Returns:
             str: URL del dashboard
         """
-        country_config = RegistrationService.get_country_config(country_code)
-        prefix = country_config.get("url_prefix", "/cl")
-        url = f"{prefix}/dashboard/"
+        # Usar CountrySettings para construir URL
+        url = CountrySettings.build_url(country_code, "dashboard/", request=request)
 
-        if request:
-            try:
-                url = request.build_absolute_uri(url)
-            except Exception:
-                pass
+        if not url:
+            # Fallback: usar configuración de country_config
+            country_config = RegistrationService.get_country_config(country_code)
+            prefix = country_config.get("url_prefix", "/cl")
+            url = f"{prefix}/dashboard/"
+
+            if request:
+                try:
+                    url = request.build_absolute_uri(url)
+                except Exception:
+                    pass
 
         return url

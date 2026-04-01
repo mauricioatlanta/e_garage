@@ -6,12 +6,6 @@ from taller.views_ingreso import (
     ingreso_centro,
     panel_ingreso_vehiculo,
 )
-from taller.views.onboarding_views import (
-    onboarding_agregar_tecnico,
-    onboarding_guardar_paso,
-    onboarding_preview_documento,
-    onboarding_wizard,
-)
 
 centro_trabajo = ingreso_centro
 centro_trabajo_buscar = ingreso_buscar
@@ -27,23 +21,6 @@ from taller.views.dashboard_bi import DashboardHomeView
 app_name = "taller"
 
 urlpatterns = [
-    path("onboarding/", onboarding_wizard, name="onboarding_wizard"),
-    path("onboarding/<str:step>/", onboarding_wizard, name="onboarding_step"),
-    path(
-        "onboarding/guardar/<int:paso>/",
-        onboarding_guardar_paso,
-        name="onboarding_guardar_paso",
-    ),
-    path(
-        "onboarding/agregar-tecnico/",
-        onboarding_agregar_tecnico,
-        name="onboarding_agregar_tecnico",
-    ),
-    path(
-        "onboarding/preview-documento/",
-        onboarding_preview_documento,
-        name="onboarding_preview_documento",
-    ),
     # ✅ Gestión de Equipo (Team Management)
     path("equipo/", include(("taller.team.urls", "team"), namespace="team")),
     path("clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")),

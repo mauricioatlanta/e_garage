@@ -1027,17 +1027,6 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         return _reverse_with_request(self.request, "lista_documentos")
 
     def form_valid(self, form):
-        print("[DEBUG DocumentoCreateView] form_valid llamado")
-        print(
-            f"[DEBUG DocumentoCreateView] Cliente en form.cleaned_data: {form.cleaned_data.get('cliente', 'NO ENCONTRADO')}"
-        )
-        print(
-            f"[DEBUG DocumentoCreateView] Cliente en form.instance: {getattr(form.instance, 'cliente', 'NO ENCONTRADO')}"
-        )
-        print(
-            f"[DEBUG DocumentoCreateView] CSRF token: {self.request.POST.get('csrfmiddlewaretoken', 'NO ENCONTRADO')}"
-        )
-
         form.instance.empresa = self.request.user.empresa
 
         # Guardar el documento; las líneas se crean desde repuestos_json en DocumentoForm.save()
@@ -1058,9 +1047,6 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         return response
 
     def form_invalid(self, form):
-        print("[DEBUG DocumentoCreateView] form_invalid llamado")
-        print(f"[DEBUG DocumentoCreateView] Errores: {form.errors}")
-        print(f"[DEBUG DocumentoCreateView] Datos POST: {self.request.POST}")
         return super().form_invalid(form)
 
     def render_to_response(self, context, **response_kwargs):

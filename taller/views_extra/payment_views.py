@@ -6,7 +6,6 @@ from django.shortcuts import redirect, render
 from django.utils import timezone
 
 from taller.models.empresa import Empresa
-from taller.services.empresa_service import get_empresa_safe
 
 
 @login_required
@@ -14,8 +13,9 @@ def payment_chile(request):
     """
     Página de pago para Chile - Transferencia Bancaria
     """
-    empresa = get_empresa_safe(request)
-    if not empresa:
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
         messages.error(
             request,
             "No hay una empresa asociada a tu cuenta. Completa el registro o contacta soporte.",
@@ -60,8 +60,9 @@ def payment_mexico(request):
     """
     Página de pago para México - Transferencia Bancaria
     """
-    empresa = get_empresa_safe(request)
-    if not empresa:
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
         messages.error(
             request,
             "No hay una empresa asociada a tu cuenta. Completa el registro o contacta soporte.",
@@ -104,8 +105,9 @@ def payment_usa(request):
     """
     Página de pago para USA - PayPal
     """
-    empresa = get_empresa_safe(request)
-    if not empresa:
+    try:
+        empresa = request.user.empresa
+    except Empresa.DoesNotExist:
         messages.error(
             request,
             "No hay una empresa asociada a tu cuenta. Completa el registro o contacta soporte.",
@@ -159,13 +161,7 @@ def subir_comprobante(request):
 
         if comprobante:
             # Guardar comprobante
-            empresa = get_empresa_safe(request)
-            if not empresa:
-                messages.error(
-                    request,
-                    "No hay una empresa asociada a tu cuenta. Completa el registro o contacta soporte.",
-                )
-                return redirect("/")
+            empresa = request.user.empresa
 
             # Crear registro de pago pendiente
             from taller.models.pago import PagoPendiente
@@ -195,7 +191,7 @@ def subir_comprobante(request):
         request,
         "saas/suscripcion/subir_comprobante.html",
         {
-            "empresa": get_empresa_safe(request),
+            "empresa": request.user.empresa,
         },
     )
 
@@ -210,13 +206,9 @@ def payment_success(request):
         request, "✅ Pago recibido! Tu suscripción será activada en las próximas horas."
     )
 
-    empresa = get_empresa_safe(request)
-    if not empresa:
-        return redirect("/")
-
-    if empresa.pais == "US":
+    if request.user.empresa.pais == "US":
         return redirect("/us/en/dashboard/")
-    elif empresa.pais == "MX":
+    elif request.user.empresa.pais == "MX":
         return redirect("/mx/es/dashboard/")
     else:
         return redirect("/cl/es/dashboard/")
@@ -229,13 +221,9 @@ def payment_cancel(request):
     """
     messages.warning(request, "Pago cancelado. Puedes intentar nuevamente cuando lo desees.")
 
-    empresa = get_empresa_safe(request)
-    if not empresa:
-        return redirect("/")
-
-    if empresa.pais == "US":
+    if request.user.empresa.pais == "US":
         return redirect("/us/en/dashboard/")
-    elif empresa.pais == "MX":
+    elif request.user.empresa.pais == "MX":
         return redirect("/mx/es/dashboard/")
     else:
         return redirect("/cl/es/dashboard/")

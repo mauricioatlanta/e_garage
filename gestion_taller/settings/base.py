@@ -72,10 +72,10 @@ MIDDLEWARE = [
     # "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.force_home_test.ForceHomeTestMiddleware",  # DESHABILITADO - Ya verificamos que funciona
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
-    "taller.middleware.onboarding_middleware.OnboardingMiddleware",
     # "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.country_context.CountryContextMiddleware",  # DESHABILITADO - Causa bucles infinitos con /es/
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
+    "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
 
 # AccountMiddleware de allauth: agregar dinámicamente si existe
@@ -135,7 +135,6 @@ TEMPLATES = [
                 "taller.context_processors.company_context",
                 "taller.context_processors.company_branding",
                 "taller.context_processors.company_header",
-                "taller.context_processors.branding.branding",
                 "taller.context_processors.panel_chrome.us_authenticated_compact_chrome",
                 "taller.context_processors.panel_chrome.us_signup_slim_header",
                 "taller.context_processors.ui_labels.ui_labels_context",

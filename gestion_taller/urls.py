@@ -77,7 +77,6 @@ from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 
 from taller.views.country_aware_auth import country_aware_login
-from taller.services.empresa_service import get_empresa_safe
 from taller.views_extra.custom_signup import CustomSignupView
 from taller.views_extra.lang_switch import set_language_us
 from taller.views_extra.bienvenida_usa import bienvenida_usa_en, bienvenida_usa_es
@@ -87,10 +86,6 @@ from taller.views_extra.registro_exitoso import registro_exitoso
 from taller.views_extra.signup_email_verification import (
     confirm_email_and_login,
     resend_signup_confirmation,
-)
-from taller.views_extra.confirm_email_pending import (
-    confirm_email_pending_view,
-    confirm_email_invalid_view,
 )
 from taller.views_extra.signup_redirects import signup_redirect
 from taller.views_extra.pwa import dynamic_manifest, dynamic_service_worker
@@ -138,33 +133,24 @@ from taller.views_extra.views_suscripciones import (
 # gestion_taller/urls.py — archivo raíz de URLs con migración a países
 
 
-def redirect_onboarding_default(request, subpath=""):
-    """Canonicaliza /onboarding/* (sin prefijo) a /<cc>/<lang>/onboarding/* preservando querystring."""
-    default_cc = (getattr(settings, "EGARAGE_DEFAULT_COUNTRY", "cl") or "cl").strip("/")
-    default_lang = (getattr(settings, "EGARAGE_DEFAULT_LANG", "es") or "es").strip("/")
-    base = f"/{default_cc}/{default_lang}/onboarding/"
-    target = base + (subpath.strip("/") + "/" if subpath else "")
-    if request.GET:
-        target = target + "?" + request.GET.urlencode()
-    return redirect(target)
-
-
 def redirect_to_home(request):
     """Redirige a la página principal basada en el país del usuario"""
 
     # Si el usuario está autenticado, usar el país de su empresa
     if request.user.is_authenticated:
-        empresa = get_empresa_safe(request)
-        if empresa:
-            pais = getattr(empresa, "pais", None)
-            if pais == "CL":
-                return redirect("/cl/")
-            elif pais == "US":
-                return redirect("/us/")
-            elif pais == "AR":
-                return redirect("/ar/")
-            elif pais == "UY":
-                return redirect("/uy/")
+        try:
+            if hasattr(request.user, "empresa") and request.user.empresa:
+                pais = request.user.empresa.pais
+                if pais == "CL":
+                    return redirect("/cl/")
+                elif pais == "US":
+                    return redirect("/us/")
+                elif pais == "AR":
+                    return redirect("/ar/")
+                elif pais == "UY":
+                    return redirect("/uy/")
+        except Exception:
+            pass
 
     # Si hay contexto de país en el request (desde middleware)
     if hasattr(request, "country"):
@@ -231,13 +217,14 @@ def country_aware_clientes_redirect(request):
     """Redirect /cl/clientes/ to the correct country-specific URL based on user's company"""
     # If user is authenticated and has a company, redirect to their country
     if request.user.is_authenticated:
-        empresa = get_empresa_safe(request)
-        if empresa:
-            pais = getattr(empresa, "pais", None)
-            if pais == "US":
-                return redirect("/us/clientes/")
-            elif pais == "CL":
-                return redirect("/cl/es/clientes/")
+        try:
+            if hasattr(request.user, "empresa") and request.user.empresa:
+                if request.user.empresa.pais == "US":
+                    return redirect("/us/clientes/")
+                elif request.user.empresa.pais == "CL":
+                    return redirect("/cl/es/clientes/")
+        except Exception:
+            pass
 
     # Fallback: redirect to Chile (original behavior)
     return redirect("/cl/es/clientes/")
@@ -246,13 +233,15 @@ def country_aware_clientes_redirect(request):
 def country_aware_workspace_redirect(request, subpath=""):
     """Redirect /workspace/ to country workspace. USA → /us/en/workspace/, Chile → /cl/es/workspace/."""
     if request.user.is_authenticated:
-        empresa = get_empresa_safe(request)
-        if empresa:
-            pais = (getattr(empresa, "pais", None) or "").strip().upper()
-            if pais == "US":
-                return redirect(f"/us/en/workspace/{subpath}".rstrip("/") + "/")
-            if pais == "CL":
-                return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
+        try:
+            if hasattr(request.user, "empresa") and request.user.empresa:
+                pais = (getattr(request.user.empresa, "pais", None) or "").strip().upper()
+                if pais == "US":
+                    return redirect(f"/us/en/workspace/{subpath}".rstrip("/") + "/")
+                if pais == "CL":
+                    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
+        except Exception:
+            pass
     return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
 
 
@@ -270,15 +259,6 @@ urlpatterns = [
         "workspace/buscar/",
         lambda r: country_aware_workspace_redirect(r, "buscar"),
         name="workspace_buscar_redirect_root",
-    ),
-    # Canonicalizar onboarding sin prefijo (evita ERR_TOO_MANY_REDIRECTS)
-    path(
-        "onboarding/", lambda r: redirect_onboarding_default(r, ""), name="onboarding_redirect_root"
-    ),
-    path(
-        "onboarding/<path:subpath>",
-        lambda r, subpath: redirect_onboarding_default(r, subpath),
-        name="onboarding_redirect_root_path",
     ),
     path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
     # Portal del Cliente
@@ -354,16 +334,6 @@ urlpatterns = [
         "accounts/resend-confirmation/",
         resend_signup_confirmation,
         name="account_resend_signup_confirmation",
-    ),
-    path(
-        "accounts/confirm-email/",
-        confirm_email_pending_view,
-        name="account_confirm_email_pending",
-    ),
-    path(
-        "accounts/confirm-email/invalid/",
-        confirm_email_invalid_view,
-        name="account_confirm_email_invalid",
     ),
     path(
         "accounts/confirm-email/<str:key>/",

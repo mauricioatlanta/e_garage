@@ -222,9 +222,6 @@ def admin_suscriptores(request):
             except (AttributeError, TypeError, ValueError):
                 continue
 
-        country_code = getattr(request, "country", None) or "cl"
-        lang_code = getattr(request, "LANGUAGE_CODE", None) or "es"
-
         context = {
             "page_obj": page_obj,
             "empresas": page_obj,
@@ -241,8 +238,6 @@ def admin_suscriptores(request):
             "empresas_activas": empresas_activas,
             "empresas_vencidas": empresas_vencidas,
             "empresas_criticas": empresas_criticas,
-            "country_code": "cl",
-            "lang_code": "es",
         }
 
         return render(request, "admin/suscriptores/lista_suscriptores.html", context)

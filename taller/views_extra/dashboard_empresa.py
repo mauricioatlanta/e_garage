@@ -13,7 +13,6 @@ from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
-from taller.services.empresa_service import get_empresa_safe
 
 # --- CONSTANTS ---
 SUBTOTAL_EXPR = ExpressionWrapper(
@@ -44,8 +43,9 @@ def dashboard_centro_operaciones(request):
     """
 
     # 🔒 Obtener empresa del usuario logueado - NO crear silenciosamente
-    empresa = get_empresa_safe(request)
-    if not empresa:
+    try:
+        empresa = request.user.empresa
+    except Exception:
         messages.error(request, "Selecciona o crea tu empresa para continuar.")
 
         # Detectar país y redirigir al namespace correcto
@@ -377,8 +377,9 @@ def dashboard_centro_operaciones_espacial(request):
     # No forzar ningún idioma aquí, respetar la preferencia del usuario
 
     # 🔒 Obtener empresa del usuario logueado - NO crear silenciosamente
-    empresa = get_empresa_safe(request)
-    if not empresa:
+    try:
+        empresa = request.user.empresa
+    except Exception:
         messages.error(request, "Selecciona o crea tu empresa para continuar.")
         if "/us/" in request.path:
             return redirect("usa:configuracion")
