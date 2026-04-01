@@ -514,20 +514,13 @@ MEDIA_ROOT = Path(os.getenv("MEDIA_ROOT", str(BASE_DIR / "media")))
 # ---------- STORAGES (Django 5) ----------
 # Configuración de almacenamiento para archivos estáticos y media
 # IMPORTANTE: STATIC_URL y MEDIA_URL deben estar definidos ANTES de STORAGES
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
 if not DEBUG:
-    # Producción: usar WhiteNoise para staticfiles
-    STORAGES = {
-        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-        "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
-    }
     WHITENOISE_USE_FINDERS = True
-    WHITENOISE_AUTOREFRESH = False
-else:
-    # Desarrollo: usar almacenamiento estándar
-    STORAGES = {
-        "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"},
-    }
+    WHITENOISE_AUTOREFRESH = True
 # Django 5+: no definir STATICFILES_STORAGE si ya existe STORAGES["staticfiles"] (mutuamente excluyentes).
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
