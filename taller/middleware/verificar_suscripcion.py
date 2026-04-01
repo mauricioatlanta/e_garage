@@ -46,6 +46,10 @@ class VerificarSuscripcionMiddleware:
     def __call__(self, request):
         # Solo procesar usuarios autenticados
         if request.user.is_authenticated:
+            # Staff/superuser no deben quedar bloqueados por suscripción de empresa
+            if request.user.is_staff or request.user.is_superuser:
+                return self.get_response(request)
+
             empresa = getattr(request, "empresa", None)
 
             if empresa and empresa.debe_bloquear:

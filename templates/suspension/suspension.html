@@ -29,7 +29,7 @@
                     </div>
                     <div>
                         <i class="fas fa-clock mr-2"></i>
-                        <span>Días transcurridos: {{ empresa.dias_restantes|add:"-1"|default:"0" }}</span>
+                        <span>Días transcurridos: {{ dias_transcurridos_suspension|default:"0" }}</span>
                     </div>
                     <div>
                         <i class="fas fa-tag mr-2"></i>
@@ -216,7 +216,7 @@
         </div>
 
         <div class="text-center">
-            <a href="{% url 'logout' %}" class="text-gray-600 hover:text-gray-800 transition-colors">
+            <a href="{% url 'account_logout' %}" class="text-gray-600 hover:text-gray-800 transition-colors">
                 <i class="fas fa-sign-out-alt mr-2"></i>
                 Cerrar Sesión
             </a>

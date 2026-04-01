@@ -40,6 +40,7 @@ class EmpresaMiddleware:
                 if (
                     request.empresa
                     and getattr(request.empresa, "debe_bloquear", False)
+                    and not (request.user.is_staff or request.user.is_superuser)
                     and not self.is_exempt_url(request.path)
                 ):
                     return redirect("suspension")

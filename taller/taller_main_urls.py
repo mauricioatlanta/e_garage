@@ -176,6 +176,10 @@ urlpatterns = [
         "repuestos/",
         include(("taller.repuestos.urls", "repuestos"), namespace="repuestos"),
     ),
+    path(
+        "documentos/",
+        include(("taller.documentos.urls", "documentos"), namespace="documentos"),
+    ),
     path("reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")),
     path("tecnicos/", include(("taller.tecnicos.urls", "tecnicos"), namespace="tecnicos")),
     path(

@@ -1347,7 +1347,7 @@ function submitLanguageDoc(lang) {
               data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
               data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
               data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
-              data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
+              data-url-next-number="/cl/es/documentos/api/obtener-numero-documento/"
               data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
               data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' app_namespace='' %}"
               data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
@@ -1460,6 +1460,7 @@ function submitLanguageDoc(lang) {
       <div class="doc-smart-card doc-ficha-client-vehicle">
         <h3>{% trans "CLIENT" %}</h3>
         <div class="relative">
+          <label for="cliente-busqueda" class="sr-only">{% trans 'Search client' %}</label>
           <input type="text" id="cliente-busqueda" class="w-full bg-slate-800 p-2 rounded border border-slate-600 text-white text-sm"
                  placeholder="{% trans 'Search client' %}"
                  autocomplete="off"
@@ -1490,7 +1491,10 @@ function submitLanguageDoc(lang) {
         {% if ui_config.show_vehicle %}
         <div class="tipo-dependent-vehicle">
           <div class="doc-field-with-btn flex gap-2">
-            <div class="flex-1">{{ form.vehiculo }}</div>
+            <div class="flex-1">
+              <label for="id_vehiculo" class="sr-only">{% trans 'Vehicle' %}</label>
+              {{ form.vehiculo }}
+            </div>
             <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
               <span aria-hidden="true">➕</span>
               <span class="doc-action-label text-white font-semibold">Nuevo vehículo</span>
@@ -1500,7 +1504,7 @@ function submitLanguageDoc(lang) {
         {% endif %}
         {% if 'kilometraje_ingreso' in form.fields %}
         <div id="miles-section" class="tipo-dependent-miles flex flex-wrap items-center gap-2 mt-2">
-          <span class="text-xs text-slate-400">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% trans "Mileage" %}{% endif %}</span>
+          <label for="id_kilometraje_ingreso" class="text-xs text-slate-400">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% trans "Mileage" %}{% endif %}</label>
           <div class="flex-1 min-w-0 max-w-[7rem]">{{ form.kilometraje_ingreso }}</div>
           <span class="text-xs text-slate-500">{% get_current_language as lang %}{% if lang == 'es' %}km{% else %}mi{% endif %}</span>
         </div>
@@ -1585,6 +1589,7 @@ function submitLanguageDoc(lang) {
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="doc-smart-card order-2 md:order-1">
         <h3>{% trans "NOTES" %}</h3>
+        <label for="id_observaciones" class="sr-only">{% trans "Notes" %}</label>
         {{ form.observaciones }}
       </div>
       <div class="totales-cockpit order-1 md:order-2 totales-panel">
@@ -1923,6 +1928,10 @@ const I18N = {
   external_company: "{% trans 'External Company' %}",
   create_part: "{% trans 'Create Part' %}",
   create_service: "{% trans 'Create Service' %}",
+  remove_row: "{% trans 'Remove row' %}",
+  client_price: "{% trans 'Client Price' %}",
+  shop_price: "{% trans 'Shop Price' %}",
+  toggle_cost_visibility: "{% trans 'Toggle cost price visibility' %}",
   part_number_required: "{% trans 'Part number is required' %}",
   part_name_required: "{% trans 'Part name is required' %}",
   part_created: "{% trans 'Part created successfully' %}",
@@ -1962,6 +1971,10 @@ if (COUNTRY_REF === 'CL') {
     external_company: "Empresa externa",
     create_part: "Crear repuesto",
     create_service: "Crear servicio",
+    remove_row: "Eliminar fila",
+    client_price: "Precio al cliente",
+    shop_price: "Costo al taller",
+    toggle_cost_visibility: "Mostrar/ocultar precio de compra",
     part_number_required: "El código del repuesto es obligatorio",
     part_name_required: "El nombre del repuesto es obligatorio",
     part_created: "Repuesto creado correctamente",
@@ -2469,7 +2482,7 @@ window.addRepuestoRow = function addRepuestoRow(presetRowId){
     <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="${rowId}">
       <div class="col-span-2 sm:col-span-2 relative min-w-0">
         ${lbl(I18N.code)}
-        <input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="${I18N.code}" autocomplete="off">
+        <input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="${I18N.code}" aria-label="${I18N.code}" autocomplete="off">
         <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-id">
         <input type="hidden" class="rep-origen" value="STOCK_BODEGA">
@@ -2484,8 +2497,8 @@ window.addRepuestoRow = function addRepuestoRow(presetRowId){
           </span>
         </div>
         <div class="flex gap-1">
-          <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
-          <button type="button" class="rep-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_part}">＋</button>
+          <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_parts}" aria-label="${I18N.name}" autocomplete="off">
+          <button type="button" class="rep-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_part}" aria-label="${I18N.create_part}">＋</button>
         </div>
         <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="rep-nombre">
@@ -2495,17 +2508,17 @@ window.addRepuestoRow = function addRepuestoRow(presetRowId){
         <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" max="999" value="1">
       </div>
       <div class="col-span-2 sm:col-span-2 min-w-0">
-        ${lblFlex(`<span>${I18N.sale_price}</span><button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>`)}
+        ${lblFlex(`<span>${I18N.sale_price}</span><button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${I18N.toggle_cost_visibility}" aria-label="${I18N.toggle_cost_visibility}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>`)}
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6" placeholder="0">
+          <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6" placeholder="0" aria-label="${I18N.sale_price}">
         </div>
       </div>
       <div class="col-span-1 sm:col-span-1 cost-price-container hidden min-w-0">
         ${lbl(I18N.cost_price)}
         <div class="relative">
           <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="rep-precio-compra form-control w-full h-10 text-sm pl-6" placeholder="0">
+          <input type="text" class="rep-precio-compra form-control w-full h-10 text-sm pl-6" placeholder="0" aria-label="${I18N.cost_price}">
         </div>
       </div>
       <div class="col-span-1 sm:col-span-1 min-w-0">
@@ -2514,7 +2527,7 @@ window.addRepuestoRow = function addRepuestoRow(presetRowId){
         <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
       </div>
       <div class="col-span-1 sm:col-span-1">
-        <button type="button" class="btn-add w-full h-10" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
+        <button type="button" class="btn-add w-full h-10" aria-label="${I18N.remove_row}" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
       </div>
     </div>`;
   container.appendChild(row);
@@ -3062,8 +3075,8 @@ window.addServicioRow = function addServicioRow(){
       <div class="col-span-7 sm:col-span-7 description-field srv-input-container relative min-w-0">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
         <div class="flex gap-1">
-          <input type="text" class="srv-input form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_services}" autocomplete="off">
-          <button type="button" class="srv-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_service}">＋</button>
+          <input type="text" class="srv-input form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_services}" aria-label="${I18N.service}" autocomplete="off">
+          <button type="button" class="srv-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_service}" aria-label="${I18N.create_service}">＋</button>
         </div>
         <div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto top-full mt-1"></div>
         <input type="hidden" class="srv-id">
@@ -3081,7 +3094,7 @@ window.addServicioRow = function addServicioRow(){
         <div class="serv-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
       </div>
       <div class="col-span-1 sm:col-span-1">
-        <button type="button" class="btn-add w-full h-10" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('servicios-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#servicios-container .dynamic-element'));">✕</button>
+        <button type="button" class="btn-add w-full h-10" aria-label="${I18N.remove_row}" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('servicios-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#servicios-container .dynamic-element'));">✕</button>
       </div>
     </div>`;
   container.appendChild(row);
@@ -3247,7 +3260,7 @@ window.addOtroRow = function addOtroRow(){
     <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20">
       <div class="col-span-3 sm:col-span-3 description-field otr-search-container relative min-w-0">
         <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
-        <input type="text" class="otr-search form-control w-full h-10 text-sm" placeholder="${I18N.type_to_search_external}" autocomplete="off">
+        <input type="text" class="otr-search form-control w-full h-10 text-sm" placeholder="${I18N.type_to_search_external}" aria-label="${I18N.service}" autocomplete="off">
         <div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
         <input type="hidden" class="otr-servicio-id">
       </div>
@@ -3275,7 +3288,7 @@ window.addOtroRow = function addOtroRow(){
         <div class="otr-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
       </div>
       <div class="col-span-1 sm:col-span-1">
-        <button type="button" class="btn-add w-full h-10" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('otros-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#otros-container .dynamic-element'));">✕</button>
+        <button type="button" class="btn-add w-full h-10" aria-label="${I18N.remove_row}" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('otros-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#otros-container .dynamic-element'));">✕</button>
       </div>
     </div>`;
   container.appendChild(row);
@@ -4208,4 +4221,8 @@ document.addEventListener('click', function(e) {
 {# ==================== CARGA DE DOCUMENT ENGINE ==================== #}
 {# "Capa de Inteligencia" - UX Móvil y Blindaje de Campos Calculados #}
 <script src="{% static 'js/document_engine.js' %}"></script>
+
+{# === NUEVO: Módulos JavaScript modularizados (descomentar después de verificar) === #}
+<script src="{% static 'js/document-form/index.js' %}"></script>
+
 {% endblock extra_js %}

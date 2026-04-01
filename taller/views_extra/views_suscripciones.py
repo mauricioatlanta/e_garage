@@ -2,6 +2,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
+from django.utils import timezone
 
 from taller.forms.comprobante_form import ComprobantePagoForm
 from taller.models.comprobante_pago import ComprobantePago
@@ -33,9 +34,18 @@ def suspension(request):
         empresa=empresa, estado="pendiente"
     ).order_by("-fecha_subida")
 
+    # Días transcurridos desde vencimiento (evita mostrar valores negativos en UI)
+    dias_transcurridos_suspension = 0
+    try:
+        if empresa.fecha_expiracion:
+            dias_transcurridos_suspension = max(0, (timezone.now() - empresa.fecha_expiracion).days)
+    except Exception:
+        dias_transcurridos_suspension = 0
+
     context = {
         "empresa": empresa,
         "comprobantes_pendientes": comprobantes_pendientes,
+        "dias_transcurridos_suspension": dias_transcurridos_suspension,
         "whatsapp_url": f"https://wa.me/56912345678?text=Hola, necesito renovar mi suscripción de eGarage para {empresa.nombre_taller}",
         "precios": {
             "basic": 15000,
