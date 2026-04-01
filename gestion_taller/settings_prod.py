@@ -246,12 +246,12 @@ if "taller.middleware.lang_policy.LanguagePolicyMiddleware" not in MIDDLEWARE:
 # =============================================================================
 STORAGES = {
     "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
-    "staticfiles": {"BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
 }
 # Django 5+: STORAGES y STATICFILES_STORAGE son mutuamente excluyentes (heredado de settings.py).
 globals().pop("STATICFILES_STORAGE", None)
 WHITENOISE_USE_FINDERS = True
-WHITENOISE_AUTOREFRESH = False
+WHITENOISE_AUTOREFRESH = True
 
 # =============================================================================
 # Logging: solo consola (journald / stdout de Gunicorn).
