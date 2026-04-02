@@ -3,8 +3,8 @@ eGarage - Sistema de Gestión de Talleres Automotrices
 Version Management
 """
 
-__version__ = "2.1.3"
-__version_info__ = (2, 1, 3)
+__version__ = "2.1.4"
+__version_info__ = (2, 1, 4)
 __release_date__ = "2026-04-01"
 
 # Changelog de esta versión

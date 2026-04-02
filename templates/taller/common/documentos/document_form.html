@@ -2297,6 +2297,7 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
     vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
     vehiculoSelect.dataset.source = 'prefetch';
     vehiculoSelect.disabled = false;
+    _reinitVehiculoSelect2();
     // Preseleccionar vehículo si se especificó
     if (vehiculoIdToSelect) {
       setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
@@ -2352,7 +2353,24 @@ async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
     vehiculoSelect.dataset.source = 'error';
   }finally{
     vehiculoSelect.disabled = false;
+    _reinitVehiculoSelect2();
   }
+}
+
+function _reinitVehiculoSelect2() {
+  console.log('🔄 _reinitVehiculoSelect2 llamado, jQuery:', !!window.jQuery, 'select:', !!vehiculoSelect);
+  if (!window.jQuery || !vehiculoSelect) return;
+  const $vs = jQuery(vehiculoSelect);
+  if (!$vs.length) return;
+  const hasS2 = !!$vs.data('select2');
+  console.log('🔄 Select2 inicializado en #id_vehiculo:', hasS2, '| opciones:', vehiculoSelect.options.length);
+  if (hasS2) { $vs.select2('destroy'); }
+  $vs.select2({
+    placeholder: I18N.select_vehicle || 'Selecciona vehículo...',
+    allowClear: true,
+    width: '100%',
+  });
+  console.log('✅ Select2 reinicializado con', vehiculoSelect.options.length, 'opciones');
 }
 
 // Función auxiliar para preseleccionar un vehículo
