@@ -1,0 +1,4292 @@
+﻿{% extends "taller/documentos/base/base_documento.html" %}
+{% load i18n %}
+
+{% load static %}
+{% load country_url %}
+
+<style>
+/* ==================== DOCUMENT FORM â€” PRO UI: proporciones, jerarquÃ­a, layout ==================== */
+/* Regla global dentro del workspace: inputs compactos, bordes sutiles, sin glow por defecto */
+
+#doc-shell {
+  --doc-input-h: 34px;
+  --doc-input-pad: 6px 10px;
+  --doc-input-fs: 14px;
+  --doc-border: 1px solid rgba(71, 85, 105, 0.6);
+  --doc-border-focus: 1px solid rgba(100, 116, 139, 0.9);
+  --doc-bg-input: rgba(30, 41, 59, 0.7);
+}
+
+/* 1. INPUTS COMPACTOS (34px, 6px 10px, 14px) */
+#doc-shell input:not([type="checkbox"]):not([type="radio"]),
+#doc-shell select,
+#doc-shell textarea,
+#doc-shell .form-control,
+#doc-shell .form-select {
+  min-height: var(--doc-input-h) !important;
+  height: auto !important;
+  padding: var(--doc-input-pad) !important;
+  font-size: var(--doc-input-fs) !important;
+  background: var(--doc-bg-input) !important;
+  border: var(--doc-border) !important;
+  border-radius: 6px !important;
+  color: #e2e8f0 !important;
+  box-shadow: none !important;
+  transition: border-color 0.15s ease;
+}
+#doc-shell input:focus,
+#doc-shell select:focus,
+#doc-shell textarea:focus {
+  outline: none !important;
+  border: var(--doc-border-focus) !important;
+  box-shadow: 0 0 0 2px rgba(71, 85, 105, 0.25) !important;
+}
+#doc-shell label { font-size: 12px; margin-bottom: 4px; color: #94a3b8; }
+
+/* Observaciones: compactas pero editables */
+#doc-shell textarea[name="observaciones"],
+#doc-shell #id_observaciones {
+  min-height: 64px !important;
+  max-height: 120px !important;
+  resize: vertical !important;
+}
+
+/* 2. JERARQUÃA: secciones bien separadas (1 Header, 2 Client/Vehicle, 3 Parts/Services, 4 Totals) */
+.doc-shell-workspace > .doc-console-header { margin-bottom: 1rem; }
+.doc-shell-workspace > .grid { margin-bottom: 0.5rem; }
+.doc-shell-workspace .doc-smart-card,
+.doc-shell-workspace .totales-cockpit {
+  border: var(--doc-border);
+  box-shadow: none;
+}
+
+/* Layout horizontal: 2 columnas desde 768px (md) */
+.doc-shell-workspace .grid.grid-cols-1.md\:grid-cols-2 {
+  grid-template-columns: 1fr;
+}
+@media (min-width: 768px) {
+  .doc-shell-workspace .grid.grid-cols-1.md\:grid-cols-2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.doc-form-compact { max-width: 100%; width: 100%; }
+
+/* Placeholders y selects: sutiles */
+#doc-shell input::placeholder,
+#doc-shell textarea::placeholder { color: #64748b; }
+#doc-shell select option { background: #1e293b; color: #e2e8f0; }
+#doc-shell input[type="checkbox"] {
+  width: 16px; height: 16px;
+  accent-color: #64748b;
+  cursor: pointer;
+}
+
+/* Subtotales y dropdowns: compactos, sin glow */
+#doc-shell .subtotal-field {
+  min-height: var(--doc-input-h); padding: var(--doc-input-pad);
+  font-size: 13px; font-weight: 600; text-align: right;
+  background: var(--doc-bg-input); border: var(--doc-border); border-radius: 6px;
+}
+#doc-shell .cliente-item {
+  padding: 8px 10px; font-size: 13px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.4);
+}
+#doc-shell .cliente-item:hover { background: rgba(51, 65, 85, 0.5); cursor: pointer; }
+
+/* Botones: compactos */
+#doc-shell button:not(.totales-cockpit-save),
+#doc-shell .btn-secondary,
+#doc-shell .btn-cyan-gradient,
+#doc-shell .btn-green-gradient {
+  min-height: var(--doc-input-h) !important;
+  padding: 6px 12px !important;
+  font-size: 13px !important;
+  border: var(--doc-border) !important;
+  border-radius: 6px !important;
+  box-shadow: none !important;
+}
+
+/* ==================== CLASES REUTILIZABLES PARA BOTONES ==================== */
+/* Botones de acciones de documento: mobile-safe, label siempre visible */
+.doc-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 40px;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+}
+
+.doc-action-btn .doc-action-label {
+  display: inline;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .doc-action-btn {
+    min-height: 42px;
+    padding: 0.55rem 0.8rem;
+    font-size: 0.9rem;
+  }
+
+  .doc-action-btn .doc-action-label {
+    display: inline !important;
+    font-size: 0.9rem;
+  }
+}
+
+/* BotÃ³n con gradiente cian (para botones principales) - Sin !important */
+.btn-cyan-gradient {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(to right, #06b6d4, #3b82f6);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  border: 1px solid rgba(34, 211, 238, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-cyan-gradient:hover {
+  background: linear-gradient(to right, #22d3ee, #60a5fa);
+  border-color: rgba(34, 211, 238, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.btn-cyan-gradient:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.4);
+}
+
+/* BotÃ³n con gradiente verde (para acciones de agregar) - Sin !important */
+.btn-green-gradient {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(to right, rgba(5, 150, 105, 0.9), rgba(22, 163, 74, 0.9));
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 0.5rem;
+  font-size: 0.875rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  border: 1px solid rgba(34, 211, 238, 0.5);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.btn-green-gradient:hover {
+  background: linear-gradient(to right, #10b981, #16a34a);
+  border-color: rgba(34, 211, 238, 0.8);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+/* Themes for document types - doc-shell border/shadow */
+.theme-ot {
+  border-color: #00f2fe !important;
+  box-shadow: 0 0 32px 4px #00f2fe99, 0 0 0 1px #00f2fe !important;
+}
+.theme-fac {
+  border-color: #ff6b6b !important;
+  box-shadow: 0 0 32px 4px #ff6b6b99, 0 0 0 1px #ff6b6b !important;
+}
+.theme-pres {
+  border-color: #4ecdc4 !important;
+  box-shadow: 0 0 32px 4px #4ecdc499, 0 0 0 1px #4ecdc4 !important;
+}
+.theme-pts {
+  border-color: #f59e0b !important;
+  box-shadow: 0 0 32px 4px #f59e0b99, 0 0 0 1px #f59e0b !important;
+}
+
+@media (min-width: 640px) {
+  .btn-cyan-gradient, .btn-green-gradient {
+    width: auto;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+  }
+}
+
+/* Campos deshabilitados - Claramente visibles */
+input:disabled, select:disabled, textarea:disabled {
+  background-color: rgba(40, 40, 60, 0.6);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+/* Estilos mejorados para la secciÃ³n de totales */
+.totales-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+}
+
+.totales-section .grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .totales-section .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.totales-section .bg-black\/40 {
+  transition: all 0.2s ease;
+}
+
+.totales-section .bg-black\/40:hover {
+  border-color: rgba(0, 242, 254, 0.5);
+  box-shadow: 0 0 8px rgba(0, 242, 254, 0.2);
+  transform: translateY(-1px);
+}
+
+/* Eliminada animaciÃ³n infinite para mejor rendimiento mÃ³vil */
+/* El neÃ³n solo aparece en hover/focus, no en animaciÃ³n constante */
+
+/* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÃ“N ==================== */
+/* Description fields - Better spacing and alignment - Sin !important */
+.description-field {
+  flex: 1 1 auto;
+  min-width: 200px;
+  max-width: 100%;
+  margin-bottom: 0.5rem;
+}
+
+.description-field input {
+  width: 100%;
+}
+
+/* Container for dynamic rows - Better flexbox distribution */
+.dynamic-element > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: flex-end;
+}
+
+/* Specific description field containers */
+.rep-search-container,
+.srv-input-container,
+.otr-search-container {
+  flex: 1 1 auto;
+  min-width: 200px;
+  max-width: 100%;
+  position: relative;
+}
+
+/* Responsive adjustments for description fields */
+@media (max-width: 1024px) {
+  .description-field,
+  .rep-search-container,
+  .srv-input-container,
+  .otr-search-container {
+    min-width: 180px;
+    flex: 1 1 45%;
+  }
+}
+
+@media (max-width: 768px) {
+  .description-field,
+  .rep-search-container,
+  .srv-input-container,
+  .otr-search-container {
+    min-width: 100%;
+    flex: 1 1 100%;
+    margin-bottom: 1rem;
+  }
+  
+  .dynamic-element > div {
+    gap: 1rem;
+  }
+  
+  /* Stack all fields on mobile */
+  .dynamic-element > div > div {
+    width: 100%;
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 640px) {
+  .dynamic-element > div {
+    padding: 0.75rem;
+    gap: 0.875rem;
+  }
+  
+}
+
+#doc-shell .description-field input,
+#doc-shell .rep-search-container input,
+#doc-shell .srv-input-container input {
+  min-height: var(--doc-input-h) !important;
+  padding: var(--doc-input-pad) !important;
+  font-size: var(--doc-input-fs) !important;
+}
+
+/* Better spacing for labels in description fields */
+.description-field label,
+.rep-search-container label,
+.srv-input-container label,
+.otr-search-container label {
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+/* Ensure proper alignment of description fields with other fields */
+.dynamic-element > div > div {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Better gap distribution for field groups */
+@media (min-width: 769px) {
+  .dynamic-element > div {
+    gap: 1rem;
+  }
+}
+
+/* Improved spacing for description fields on larger screens */
+@media (min-width: 1025px) {
+  .rep-search-container {
+    min-width: 320px;
+    flex: 1 1 35%;
+  }
+  
+  .srv-input-container {
+    min-width: 380px;
+    flex: 1 1 40%;
+  }
+  
+  .otr-search-container {
+    min-width: 240px;
+    flex: 1 1 30%;
+  }
+}
+
+/* ==================== BOTONES MODERNOS CON BORDE ILUMINADO ==================== */
+.btn-modern-add {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%);
+  border: 1px solid rgba(34, 211, 238, 0.5);
+  box-shadow: 
+    0 0 8px rgba(34, 211, 238, 0.3),
+    0 0 16px rgba(34, 211, 238, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(4px);
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-modern-add::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.4s;
+}
+
+.btn-modern-add:hover::before {
+  left: 100%;
+}
+
+.btn-modern-add:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 1) 0%, rgba(5, 150, 105, 1) 100%);
+  border-color: rgba(34, 211, 238, 0.8);
+  box-shadow: 
+    0 0 12px rgba(34, 211, 238, 0.5),
+    0 0 24px rgba(34, 211, 238, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.btn-modern-add:active {
+  transform: translateY(0) scale(0.98);
+  box-shadow: 
+    0 0 6px rgba(34, 211, 238, 0.3),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-modern-add:focus {
+  outline: none;
+  box-shadow: 
+    0 0 10px rgba(34, 211, 238, 0.4),
+    0 0 0 2px rgba(34, 211, 238, 0.25);
+}
+
+/* ==================== FICHAS POR TÃ“PICOS - VISTA COMPACTA ==================== */
+.doc-ficha {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.85) 100%);
+  border: 1px solid rgba(0, 242, 254, 0.35);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 242, 254, 0.06);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.doc-ficha:hover {
+  border-color: rgba(0, 242, 254, 0.5);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35), 0 0 24px rgba(0, 242, 254, 0.1);
+}
+.doc-ficha-title {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #67e8f9;
+  margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+}
+.doc-ficha-body { padding: 0; }
+
+/* Fila documento + cliente: ancho al contenido, CERO espacio gigante */
+.doc-shell-compact .doc-fichas-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  width: max-content;
+  max-width: 100%;
+}
+.doc-shell-compact .doc-fichas-row .doc-ficha {
+  width: max-content;
+  max-width: 100%;
+  flex-shrink: 0;
+}
+.doc-shell-compact .doc-fichas-row .doc-ficha:first-child { max-width: 320px; }
+.doc-shell-compact .doc-fichas-row .doc-ficha:last-child { max-width: 480px; }
+/* Ficha Document: etiqueta | campo 160px fijo */
+.doc-fichas-row .doc-ficha:first-child .doc-ficha-body {
+  display: grid;
+  grid-template-columns: auto 160px;
+  gap: 0.35rem 0.75rem;
+  align-items: center;
+}
+.doc-fichas-row .doc-ficha:first-child .doc-ficha-body label { grid-column: 1; }
+.doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-control,
+.doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-select,
+.doc-fichas-row .doc-ficha:first-child .doc-ficha-body #id_numero { grid-column: 2; width: 160px !important; max-width: 160px !important; box-sizing: border-box !important; }
+/* Ficha Client & Vehicle: dos columnas (Cliente | VehÃ­culo) como en referencia */
+.doc-ficha-body-two-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem 1rem;
+  align-items: start;
+}
+.doc-ficha-body-two-cols .doc-client-info-full { grid-column: 1 / -1; }
+.doc-field-inline { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
+.doc-field-with-btn { display: flex; align-items: center; gap: 0.35rem; min-width: 0; }
+.doc-field-with-btn .relative { flex: 1; min-width: 0; }
+.doc-field-with-btn select { flex: 1; min-width: 0; }
+@media (max-width: 600px) {
+  .doc-ficha-body-two-cols { grid-template-columns: 1fr; }
+}
+/* Anchos fijos en esta ficha */
+.doc-fichas-row .doc-ficha-client-vehicle #cliente-busqueda { width: 100% !important; max-width: 200px !important; }
+.doc-fichas-row .doc-ficha-client-vehicle .relative { width: 100% !important; max-width: 200px !important; }
+.doc-fichas-row .doc-ficha-client-vehicle #id_vehiculo { width: 100% !important; max-width: 220px !important; }
+.doc-fichas-row .doc-ficha:last-child .doc-ficha-body #cliente-busqueda { width: 100% !important; max-width: 200px !important; }
+.doc-fichas-row .doc-ficha:last-child .doc-ficha-body #id_vehiculo { width: 100% !important; max-width: 220px !important; }
+.doc-fichas-row .doc-ficha:last-child .doc-ficha-body .relative { width: 100% !important; max-width: 200px !important; }
+@media (max-width: 768px) {
+  .doc-shell-compact .doc-fichas-row {
+    grid-template-columns: 1fr;
+    max-width: 100%;
+  }
+}
+
+/* Fila de Repuestos | Servicios en horizontal (2 cols cuando hay ambos) */
+.doc-parts-services-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+.doc-parts-services-row .doc-ficha:only-child {
+  grid-column: 1 / -1;
+}
+@media (max-width: 900px) {
+  .doc-parts-services-row {
+    grid-template-columns: 1fr;
+  }
+}
+.doc-ficha-parts, .doc-ficha-services {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+}
+.doc-ficha-parts .doc-ficha-body, .doc-ficha-services .doc-ficha-body {
+  flex: 1;
+  overflow-y: auto;
+  max-height: 280px;
+}
+#repuestos-container, #servicios-container {
+  padding: 0.25rem 0;
+}
+#otros-container {
+  padding: 0.25rem 0;
+}
+.doc-ficha-otros {
+  margin-bottom: 0.75rem;
+}
+.doc-ficha-otros .doc-ficha-body { max-height: 200px; overflow-y: auto; }
+
+/* Botones de acciÃ³n dentro de cada ficha */
+.doc-ficha .ficha-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-bottom: 0.5rem;
+}
+.doc-ficha .ficha-actions .btn-secondary, .doc-ficha .ficha-actions .btn-green-gradient {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.7rem;
+}
+
+/* Campos compactos dentro de fichas (evitar que queden enormes) */
+#doc-shell .doc-ficha .form-control,
+#doc-shell .doc-ficha .form-select,
+#doc-shell .doc-ficha input[type="text"],
+#doc-shell .doc-ficha input[type="number"],
+#doc-shell .doc-ficha input[type="date"],
+#doc-shell .doc-ficha select {
+  padding: 5px 8px;
+  font-size: 13px;
+  min-height: 32px;
+}
+#doc-shell .doc-ficha label {
+  font-size: 11px;
+  margin-bottom: 2px;
+}
+#doc-shell .doc-ficha .observaciones-card textarea {
+  min-height: 32px;
+  max-height: 64px;
+  font-size: 12px;
+  padding: 4px 8px;
+}
+
+/* Ancho tipo ~20 caracteres en fichas Document y Client & Vehicle (no cajas gigantes) */
+#doc-shell .doc-fichas-row .doc-ficha .form-control,
+#doc-shell .doc-fichas-row .doc-ficha .form-select,
+#doc-shell .doc-fichas-row .doc-ficha input[type="text"],
+#doc-shell .doc-fichas-row .doc-ficha input[type="date"],
+#doc-shell .doc-fichas-row .doc-ficha select,
+#doc-shell .doc-fichas-row .doc-ficha #id_numero {
+  width: 22ch;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+/* BÃºsqueda de cliente un poco mÃ¡s ancha para leer "Type to search..." */
+#doc-shell .doc-fichas-row #cliente-busqueda {
+  width: 26ch;
+  max-width: 100%;
+}
+/* Select de vehÃ­culo (puede tener patente + modelo) */
+#doc-shell .doc-fichas-row #id_vehiculo {
+  width: 28ch;
+  max-width: 100%;
+}
+
+/* Ficha OperaciÃ³n: campos tambiÃ©n ~20 caracteres */
+#doc-shell .doc-ficha-operation .form-control,
+#doc-shell .doc-ficha-operation .form-select,
+#doc-shell .doc-ficha-operation input[type="text"],
+#doc-shell .doc-ficha-operation input[type="number"],
+#doc-shell .doc-ficha-operation select {
+  width: 22ch;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+#doc-shell .doc-ficha-operation .observaciones-card {
+  max-width: 100%;
+}
+#doc-shell .doc-ficha-operation .observaciones-card textarea {
+  width: 100%;
+  max-width: 42ch;
+}
+
+/* Pie de boleta: detalle del cobro ordenado (estilo boleta convencional) */
+.receipt-totals {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
+  border: 1px solid rgba(0, 242, 254, 0.3);
+  border-radius: 10px;
+  padding: 12px 16px;
+  max-width: 360px;
+  margin-left: auto;
+}
+.receipt-totals-apply-tax {
+  padding-bottom: 6px;
+  border-bottom: 1px dashed rgba(0, 242, 254, 0.25);
+}
+.receipt-totals-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.receipt-totals-table tbody tr {
+  border-bottom: 1px solid rgba(0, 242, 254, 0.12);
+}
+.receipt-totals-table tbody tr:last-child {
+  border-bottom: none;
+}
+.receipt-label {
+  padding: 4px 0;
+  color: #94a3b8;
+  font-weight: 500;
+  text-align: left;
+  vertical-align: middle;
+}
+.receipt-value {
+  padding: 4px 0;
+  text-align: right;
+  color: #e2e8f0;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.receipt-total-row {
+  border-top: 2px solid rgba(0, 242, 254, 0.4) !important;
+  margin-top: 4px;
+}
+.receipt-total-row .receipt-total-label {
+  padding-top: 8px;
+  font-weight: 700;
+  color: #f1f5f9;
+  font-size: 14px;
+}
+.receipt-total-row .receipt-total-value {
+  padding-top: 8px;
+  font-weight: 700;
+  color: #67e8f9;
+  font-size: 15px;
+}
+
+/* Errores de validaciÃ³n compactos */
+.doc-form-validation-errors {
+  background: rgba(127, 29, 29, 0.25);
+  border: 1px solid rgba(248, 113, 113, 0.5);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.doc-form-validation-title {
+  color: #fca5a5;
+  font-weight: 600;
+  margin: 0 0 6px 0;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.doc-form-validation-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #fecaca;
+  line-height: 1.4;
+}
+.doc-form-validation-list li { margin-bottom: 2px; }
+.doc-form-validation-list li:last-child { margin-bottom: 0; }
+
+/* ==================== CABECERA TIPO CONSOLA PREMIUM ==================== */
+.doc-console-header {
+  background: rgba(15, 23, 42, 0.9);
+  border: var(--doc-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin-bottom: 0;
+}
+.doc-console-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  color: #94a3b8;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+.doc-console-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 20px;
+  font-size: 13px;
+}
+.doc-console-row2 {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(71, 85, 105, 0.4);
+  font-size: 12px;
+}
+.doc-console-row2 label { margin-bottom: 0; margin-right: 2px; }
+.doc-console-inv {
+  font-family: ui-monospace, monospace;
+  font-weight: 700;
+  color: #94a3b8;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+}
+.doc-console-meta {
+  color: rgba(148, 163, 184, 0.95);
+  font-size: 12px;
+}
+.doc-console-payment { font-weight: 600; }
+.doc-console-payment.pending,
+.doc-console-payment.doc-console-payment-pending { color: #fbbf24; }
+.doc-console-payment.paid,
+.doc-console-payment.doc-console-payment-paid { color: #34d399; }
+.doc-console-payment.partial,
+.doc-console-payment.doc-console-payment-partial { color: #38bdf8; }
+.doc-console-header select {
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(71, 85, 105, 0.6);
+  border-radius: 6px;
+  padding: 4px 8px;
+  font-size: 12px;
+  color: inherit;
+  min-width: 100px;
+}
+.doc-console-header select:focus { outline: none; border-color: rgba(6, 182, 212, 0.5); }
+#payment-status-badge select { color: inherit; font-weight: 600; cursor: pointer; }
+
+.doc-invoice-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  align-items: start;
+}
+.doc-invoice-panel {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid rgba(148,163,184,.16);
+  border-radius: 14px;
+  background: linear-gradient(145deg, rgba(2,6,23,.42), rgba(15,23,42,.28));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+.doc-console-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+.doc-console-control {
+  width: 100%;
+}
+.doc-console-title {
+  font-size: .78rem;
+  letter-spacing: .24em;
+  color: #7dd3fc;
+  margin-bottom: 18px;
+  text-transform: uppercase;
+}
+.doc-console-meta {
+  color: #cbd5e1;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+}
+.doc-console-inv {
+  display: inline-flex;
+  align-items: center;
+  min-height: 46px;
+  padding: 0 14px;
+  border-radius: 12px;
+  background: rgba(2,6,23,.88);
+  border: 1px solid rgba(56,189,248,.24);
+  color: #f8fafc;
+  font-size: 1rem;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
+}
+.doc-console-header {
+  background:
+    radial-gradient(circle at top right, rgba(34,211,238,.10), transparent 32%),
+    linear-gradient(145deg, rgba(6,10,18,.98), rgba(15,23,42,.94));
+  border: 1px solid rgba(148,163,184,.22);
+  border-radius: 18px;
+  padding: 22px 24px;
+  box-shadow:
+    0 18px 48px rgba(0,0,0,.34),
+    inset 0 1px 0 rgba(255,255,255,.04),
+    0 0 26px rgba(34,211,238,.06);
+}
+.doc-console-header input,
+.doc-console-header select,
+.doc-console-control select {
+  width: 100%;
+  min-height: 46px !important;
+  border-radius: 12px !important;
+  padding: 10px 12px !important;
+  font-size: 14px !important;
+  background: rgba(15,23,42,.82) !important;
+  border: 1px solid rgba(100,116,139,.55) !important;
+  color: #f8fafc !important;
+  box-sizing: border-box;
+}
+.doc-console-header input:focus,
+.doc-console-header select:focus,
+.doc-console-control select:focus {
+  border-color: rgba(34,211,238,.7) !important;
+  box-shadow: 0 0 0 3px rgba(34,211,238,.12) !important;
+}
+#doc-shell #id_tecnico_responsable,
+#doc-shell #id_payment_status,
+#doc-shell #id_tipo,
+#doc-shell #doc_mode {
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+@media (max-width: 900px) {
+  .doc-invoice-grid {
+    grid-template-columns: 1fr;
+  }
+  .doc-console-header {
+    padding: 18px;
+    border-radius: 16px;
+  }
+}
+
+/* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÃCULO ==================== */
+.doc-smart-card {
+  background: rgba(15, 23, 42, 0.6);
+  border: var(--doc-border);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.doc-smart-card h3 {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  color: #94a3b8;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.doc-smart-summary {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(71, 85, 105, 0.4);
+  font-size: 12px;
+  color: #94a3b8;
+  line-height: 1.45;
+}
+.doc-smart-summary .name { font-weight: 600; color: #e2e8f0; }
+.doc-smart-summary .detail { color: #64748b; }
+.doc-smart-summary .meta { font-size: 11px; color: #475569; margin-top: 2px; }
+.doc-smart-card textarea {
+  min-height: 64px;
+  background: var(--doc-bg-input);
+  border: var(--doc-border);
+  border-radius: 6px;
+  padding: var(--doc-input-pad);
+  font-size: var(--doc-input-fs);
+  color: #e2e8f0;
+  resize: vertical;
+}
+.doc-smart-card textarea:focus {
+  outline: none;
+  border: var(--doc-border-focus);
+  box-shadow: 0 0 0 2px rgba(71, 85, 105, 0.2);
+}
+
+/* ==================== PANEL TOTALES (jerarquÃ­a clara, sin glow) ==================== */
+.totales-cockpit {
+  background: rgba(15, 23, 42, 0.7);
+  border: var(--doc-border);
+  border-radius: 8px;
+  padding: 16px 18px;
+  box-shadow: none;
+}
+.totales-cockpit-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: #94a3b8;
+  margin-bottom: 14px;
+  text-transform: uppercase;
+}
+.totales-cockpit .cockpit-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  font-size: 13px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.35);
+}
+.totales-cockpit .cockpit-row:last-of-type { border-bottom: none; }
+.totales-cockpit .cockpit-label { color: #94a3b8; }
+.totales-cockpit .cockpit-value { font-weight: 600; color: #e2e8f0; white-space: nowrap; }
+.totales-cockpit-divider {
+  height: 1px;
+  background: rgba(71, 85, 105, 0.6);
+  margin: 10px 0 12px 0;
+}
+.totales-cockpit-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0 16px 0;
+  font-size: 18px;
+  font-weight: 700;
+  color: #10b981;
+}
+.totales-cockpit-save {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 700;
+  background: #059669;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.totales-cockpit-save:hover { background: #047857; }
+
+/* ==================== BOTÃ“N UNIFICADO .btn-add ==================== */
+.btn-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #0891b2;
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border: 1px solid rgba(8, 145, 178, 0.5);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.btn-add:hover { background: #0e7490; border-color: rgba(8, 145, 178, 0.8); }
+.btn-add:focus { outline: none; box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.4); }
+
+/* ==================== TABLA REAL: Grid 12 cols - Code | Part name | Qty | Price | Total | [x] ==================== */
+.doc-pos-section { margin-bottom: 0.75rem; }
+/* Alinear tÃ­tulos y botones de acciÃ³n en secciones partes/servicios/otros */
+.doc-ficha-parts .flex.justify-between,
+.doc-ficha-services .flex.justify-between,
+.doc-ficha-otros .flex.justify-between {
+  align-items: center;
+}
+.doc-pos-header {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 8px;
+  padding: 6px 8px 8px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #64748b;
+  text-transform: uppercase;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+  align-items: center;
+}
+#repuestos-container .doc-pos-header > span:nth-child(1){ grid-column: span 2; }
+#repuestos-container .doc-pos-header > span:nth-child(2){ grid-column: span 4; }
+#repuestos-container .doc-pos-header > span:nth-child(3){ grid-column: span 1; }
+#repuestos-container .doc-pos-header > span:nth-child(4){ grid-column: span 2; }
+#repuestos-container .doc-pos-header > span:nth-child(5){ grid-column: span 2; }
+#repuestos-container .doc-pos-header > span:nth-child(6){ grid-column: span 1; }
+.doc-pos-header-services > span:nth-child(1){ grid-column: span 7; }
+.doc-pos-header-services > span:nth-child(2){ grid-column: span 2; }
+.doc-pos-header-services > span:nth-child(3){ grid-column: span 2; }
+.doc-pos-header-services > span:nth-child(4){ grid-column: span 1; }
+.doc-pos-header-otros > span:nth-child(1){ grid-column: span 3; }
+.doc-pos-header-otros > span:nth-child(2){ grid-column: span 3; }
+.doc-pos-header-otros > span:nth-child(3){ grid-column: span 2; }
+.doc-pos-header-otros > span:nth-child(4){ grid-column: span 2; }
+.doc-pos-header-otros > span:nth-child(5){ grid-column: span 1; }
+.doc-pos-header-otros > span:nth-child(6){ grid-column: span 1; }
+/* Filas dinÃ¡micas: usan grid grid-cols-12 del HTML, no override */
+#repuestos-container .dynamic-element .doc-row-grid,
+#servicios-container .dynamic-element .doc-row-grid,
+#otros-container .dynamic-element .doc-row-grid {
+  min-height: 40px;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
+  margin-bottom: 4px;
+}
+#repuestos-container .dynamic-element input,
+#repuestos-container .dynamic-element .form-control,
+#repuestos-container .dynamic-element .rep-subtotal-view,
+#servicios-container .dynamic-element input,
+#servicios-container .dynamic-element .form-control,
+#otros-container .dynamic-element input,
+#otros-container .dynamic-element .form-control {
+  min-height: 36px !important;
+  height: 2.5rem !important;
+  padding: 4px 8px !important;
+  font-size: 13px !important;
+}
+#repuestos-container .dynamic-element .rep-search-container,
+#repuestos-container .dynamic-element .description-field,
+#servicios-container .dynamic-element .srv-input-container,
+#servicios-container .dynamic-element .description-field,
+#otros-container .dynamic-element .otr-search-container,
+#otros-container .dynamic-element .description-field { min-width: 0; }
+#repuestos-container .dynamic-element label,
+#servicios-container .dynamic-element label,
+#otros-container .dynamic-element label { display: none !important; }
+@media (max-width: 768px) {
+  .doc-pos-header { display: none !important; }
+  #repuestos-container .dynamic-element .doc-row-grid,
+  #servicios-container .dynamic-element .doc-row-grid,
+  #otros-container .dynamic-element .doc-row-grid {
+    grid-template-columns: 1fr !important;
+    padding: 10px !important;
+  }
+  #repuestos-container .dynamic-element label,
+  #servicios-container .dynamic-element label,
+  #otros-container .dynamic-element label { display: block !important; }
+}
+</style>
+
+{% block documento_title %}
+{% load i18n %}
+{# âœ… Manejo robusto de company_country con mÃºltiples fallbacks #}
+{% with active_country=empresa.pais|default:'CL' %}
+{% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
+<!-- Header de PÃ¡gina - Design System -->
+<div class="mb-6 sm:mb-8 px-4 sm:px-6">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div class="flex-1">
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
+        ðŸ“ {{ ui_labels.new_document }}
+      </h1>
+      <p class="text-sm sm:text-base text-slate-300">
+        {{ ui_labels.new_document }}
+      </p>
+    </div>
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+      <!-- Language Selector -->
+      <form id="language-form-doc" action="/i18n/setlang/" method="post" class="inline">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <input type="hidden" name="language" id="language-input-doc" value="{{ LANGUAGE_CODE|default:'es' }}">
+        <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50" style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+          <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
+                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
+                  {% if LANGUAGE_CODE == 'en' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
+            ðŸ‡ºðŸ‡¸ EN
+          </button>
+          <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc"
+                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'es' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
+                  {% if LANGUAGE_CODE == 'es' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
+            ðŸ‡ªðŸ‡¸ ES
+          </button>
+        </div>
+      </form>
+      
+      <label class="doc-paid-toggle flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
+        {{ form.pagado }}
+        {% trans "Document paid" %}
+      </label>
+    </div>
+  </div>
+</div>
+{% endwith %}
+{% endwith %}
+
+<script>
+
+window.EG = window.EG || {};
+window.EG.utils = {
+    getCookie: function(name) {
+        const m = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
+        return m ? decodeURIComponent(m.pop()) : "";
+    }
+};
+window.EG.state = {
+    clienteId: null, vehiculoId: null, repuestos: [], servicios: [], otros: [],
+    isHydrated: false, isRestoring: false
+};
+window.EG.fetch = async function(url, opts = {}) {
+    const token = window.EG.utils.window.EG.utils.getCookie("csrftoken");
+    const headers = {
+        "X-Requested-With": "XMLHttpRequest",
+        "X-CSRFToken": token,
+        ...(opts.headers || {})
+    };
+    return fetch(url, { credentials: "same-origin", ...opts, headers });
+};
+
+
+window.EG = window.EG || {};
+
+
+
+
+
+    return fetch(url, { credentials: "same-origin", ...opts, headers });
+};
+
+ } } return cookieValue; }
+// Ãšnica fuente de verdad para ?next= al ir a crear cliente/vehÃ­culo (pathname + querystring)
+window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
+  return encodeURIComponent(window.location.pathname + (window.location.search || ''));
+};
+
+// Funciones para abrir modales de cliente y vehÃ­culo - Disponibles inmediatamente
+(function() {
+  'use strict';
+  
+  function openClienteModal() {
+    try {
+      const pathBase = window.location.pathname || '/cl/documentos/form/';
+      const nextUrl = window.egEncodeDocumentFormNext();
+      
+      // Parsear el path: /cl/documentos/form/ -> ['cl', 'documentos', 'form'] (sin search)
+      const pathParts = pathBase.split('/').filter(function(p) { return p && p.length > 0; });
+      
+      // Detectar paÃ­s e idioma desde el path
+      let countryPrefix = 'cl';
+      let langPrefix = 'es';
+      
+      if (pathParts.length > 0) {
+        countryPrefix = pathParts[0];
+        if (pathParts.length > 1 && (pathParts[1] === 'es' || pathParts[1] === 'en')) {
+          langPrefix = pathParts[1];
+        }
+      }
+      
+      const createUrl = '/' + countryPrefix + '/' + langPrefix + '/clientes/crear/?next=' + nextUrl;
+      console.log('ðŸ”µ Abriendo modal de cliente:', createUrl);
+      window.location.href = createUrl;
+    } catch (error) {
+      console.error('âŒ Error al abrir modal de cliente:', error);
+      alert('Error al abrir la pÃ¡gina de crear cliente. Por favor, intente nuevamente.');
+    }
+  }
+
+  function openVehiculoModal() {
+    try {
+      const pathOnly = window.location.pathname || '/cl/documentos/form/';
+      const nextUrl = window.egEncodeDocumentFormNext();
+      
+      // Obtener el cliente seleccionado
+      // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
+      let clienteId = null;
+      const clienteSelect = document.getElementById('id_cliente');
+      
+      if (clienteSelect) {
+        // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
+        if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
+          clienteId = jQuery(clienteSelect).val();
+          console.log('ðŸ‘¤ Cliente obtenido desde Select2:', clienteId);
+        } else {
+          // Fallback: obtener del campo directamente
+          clienteId = clienteSelect.value || null;
+          console.log('ðŸ‘¤ Cliente obtenido del campo:', clienteId);
+        }
+      }
+      
+      // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
+      if (!clienteId && window.jQuery) {
+        const select2Container = jQuery('#id_cliente').next('.select2-container');
+        if (select2Container.length) {
+          const select2Selection = select2Container.find('.select2-selection__rendered');
+          const dataId = select2Selection.attr('data-id');
+          if (dataId) {
+            clienteId = dataId;
+            console.log('ðŸ‘¤ Cliente obtenido desde data-id:', clienteId);
+          }
+        }
+      }
+      
+      // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+      // Si empieza con /us/, usar /us/en/
+      let countryPrefix = 'cl';
+      let langPrefix = 'es';
+      
+      if (pathOnly.indexOf('/cl/') === 0) {
+        countryPrefix = 'cl';
+        langPrefix = 'es';
+      } else if (pathOnly.indexOf('/us/') === 0) {
+        countryPrefix = 'us';
+        langPrefix = 'en';
+      }
+      
+      let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
+      
+      // Agregar cliente_id si estÃ¡ seleccionado
+      if (clienteId) {
+        createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+        console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
+      }
+      
+      console.log('ðŸš— Abriendo modal de vehÃ­culo:', createUrl);
+      window.location.href = createUrl;
+    } catch (error) {
+      console.error('âŒ Error al abrir modal de vehÃ­culo:', error);
+      alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
+    }
+  }
+
+  // Hacer funciones disponibles globalmente inmediatamente
+  window.openClienteModal = openClienteModal;
+  window.openVehiculoModal = openVehiculoModal;
+  
+  // Verificar que las funciones estÃ©n disponibles
+  console.log('âœ… Funciones de modal disponibles:', {
+    openClienteModal: typeof window.openClienteModal,
+    openVehiculoModal: typeof window.openVehiculoModal
+  });
+})();
+
+// FunciÃ³n global para manejar el click del botÃ³n de vehÃ­culo
+// Esta funciÃ³n se llama directamente desde el onclick del botÃ³n como respaldo
+function handleNuevoVehiculoClick(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  
+  console.log('ðŸš— handleNuevoVehiculoClick llamado');
+  
+  try {
+    // Intentar usar openVehiculoModal si estÃ¡ disponible
+    if (window.openVehiculoModal && typeof window.openVehiculoModal === 'function') {
+      console.log('âœ… Usando openVehiculoModal desde handleNuevoVehiculoClick');
+      window.openVehiculoModal();
+      return false;
+    }
+    
+    // Fallback: construir URL manualmente
+    const pathOnly = window.location.pathname || '/cl/documentos/form/';
+    const nextUrl = window.egEncodeDocumentFormNext();
+    
+    // Obtener el cliente seleccionado
+    // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
+    let clienteId = null;
+    const clienteSelect = document.getElementById('id_cliente');
+    
+    console.log('ðŸ” Buscando cliente seleccionado...');
+    console.log('ðŸ” Campo cliente encontrado:', !!clienteSelect);
+    
+    if (clienteSelect) {
+      console.log('ðŸ” Valor directo del campo:', clienteSelect.value);
+      console.log('ðŸ” jQuery disponible:', !!window.jQuery);
+      
+      // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
+      if (window.jQuery) {
+        const $clienteSelect = jQuery(clienteSelect);
+        console.log('ðŸ” Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
+        
+        if ($clienteSelect.hasClass('select2-hidden-accessible')) {
+          clienteId = $clienteSelect.val();
+          console.log('âœ… Cliente obtenido desde Select2:', clienteId);
+        } else {
+          // Fallback: obtener del campo directamente
+          clienteId = clienteSelect.value || null;
+          console.log('âœ… Cliente obtenido del campo directamente:', clienteId);
+        }
+      } else {
+        // Sin jQuery, obtener del campo directamente
+        clienteId = clienteSelect.value || null;
+        console.log('âœ… Cliente obtenido del campo (sin jQuery):', clienteId);
+      }
+    }
+    
+    // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
+    if (!clienteId && window.jQuery) {
+      console.log('ðŸ” Intentando obtener cliente desde Select2 rendered...');
+      const select2Container = jQuery('#id_cliente').next('.select2-container');
+      if (select2Container.length) {
+        const select2Selection = select2Container.find('.select2-selection__rendered');
+        const select2Text = select2Selection.text();
+        console.log('ðŸ” Texto en Select2:', select2Text);
+        // Intentar obtener el ID desde el atributo data
+        const dataId = select2Selection.attr('data-id');
+        if (dataId) {
+          clienteId = dataId;
+          console.log('âœ… Cliente obtenido desde data-id:', clienteId);
+        }
+      }
+    }
+    
+    console.log('ðŸ” Cliente ID final:', clienteId);
+    
+    // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+    // Si empieza con /us/, usar /us/en/
+    let countryPrefix = 'cl';
+    let langPrefix = 'es';
+    
+    if (pathOnly.indexOf('/cl/') === 0) {
+      countryPrefix = 'cl';
+      langPrefix = 'es';
+    } else if (pathOnly.indexOf('/us/') === 0) {
+      countryPrefix = 'us';
+      langPrefix = 'en';
+    }
+    
+    let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
+    
+    // Agregar cliente_id si estÃ¡ seleccionado
+    if (clienteId) {
+      createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+      console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
+    }
+    
+    console.log('ðŸš— Navegando a (desde handleNuevoVehiculoClick):', createUrl);
+    window.location.href = createUrl;
+    return false;
+  } catch (error) {
+    console.error('âŒ Error en handleNuevoVehiculoClick:', error);
+    alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
+    return false;
+  }
+}
+
+// Hacer la funciÃ³n disponible globalmente
+window.handleNuevoVehiculoClick = handleNuevoVehiculoClick;
+
+function submitLanguageDoc(lang) {
+  document.getElementById('language-input-doc').value = lang;
+  document.getElementById('language-form-doc').submit();
+}
+</script>
+{% endblock documento_title %}
+
+{% block documento_content %}
+{% load i18n %}
+{# âœ… Manejo robusto de company_country con mÃºltiples fallbacks #}
+{% with active_country=empresa.pais|default:'CL' %}
+{% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
+        <form method="post" id="document-form" class="doc-form-compact mx-auto"
+              data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
+              data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
+              data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
+              data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
+              data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
+              data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' app_namespace='' %}"
+              data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
+              data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
+              data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
+              data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
+              data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
+              data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
+              data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}"
+              data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
+          {% csrf_token %}
+
+  <!-- System messages - Design System (no mostrar mensajes de otras secciones: login, clientes eliminados, etc.) -->
+  {% if messages %}
+    {% for message in messages %}
+      {% with msg_text=message|stringformat:"s" %}
+      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesiÃ³n exitosamente" not in msg_text and "Ha cerrado sesiÃ³n" not in msg_text and "iniciado sesiÃ³n exitosamente" not in msg_text and "cerrado sesiÃ³n" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
+        {% if message.tags == 'success' %}
+        <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">âœ…</span>
+          <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
+        </div>
+        {% elif message.tags == 'error' %}
+        <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">âŒ</span>
+          <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
+        </div>
+        {% else %}
+        <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">â„¹ï¸</span>
+          <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
+        </div>
+        {% endif %}
+      {% endif %}
+      {% endwith %}
+    {% endfor %}
+  {% endif %}
+
+  <!-- Validation errors - compacto y legible -->
+  {% if form.errors %}
+    <div class="doc-form-validation-errors">
+      <p class="doc-form-validation-title">{% trans "Validation errors" %}</p>
+      <ul class="doc-form-validation-list">
+        {% for field, errors in form.errors.items %}
+          {% for msg in errors %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <!-- Document workspace â€” cabecera consola | tarjetas cliente/vehÃ­culo | repuestos/servicios POS | observaciones | totales cockpit -->
+  <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
+
+    <!-- 1. CABECERA COMPACTA â€” fila 1: INV | Fecha | MecÃ¡nico | Pago | fila 2: Tipo | OperaciÃ³n -->
+    <div class="doc-console-header">
+      <div class="doc-console-title flex flex-wrap items-center gap-2">
+        <span>{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</span>
+        <span id="draft-indicator" class="hidden text-[10px] sm:text-xs font-medium text-emerald-300/95 bg-emerald-950/60 border border-emerald-500/35 rounded px-2 py-0.5" role="status" aria-live="polite">{% trans "Auto-saved" %}</span>
+      </div>
+
+      <div class="doc-invoice-grid">
+        <div class="doc-invoice-panel">
+          <div class="doc-console-field doc-console-field--invoice">
+            <span class="doc-console-meta">{% trans "Document No." %}</span>
+            <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
+              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}â€”{% endif %}
+            </span>
+          </div>
+
+          <div class="doc-console-field">
+            <label for="id_fecha_emision" class="doc-console-meta">{% trans "Date" %}</label>
+            <input id="id_fecha_emision" type="date" name="fecha_emision" class="bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
+                   value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
+          </div>
+
+          <div class="doc-console-field">
+            <label for="id_tipo" class="doc-console-meta">{% trans "Document Type" %}</label>
+            {{ form.tipo }}
+          </div>
+        </div>
+
+        <div class="doc-invoice-panel">
+          {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+          <div class="doc-console-field">
+            <label id="tecnico-label" for="id_tecnico_responsable" class="doc-console-meta" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
+            <div class="doc-console-control">{{ form.tecnico_responsable }}</div>
+          </div>
+          {% endwith %}
+
+          <div class="doc-console-field">
+            <label for="id_payment_status" class="doc-console-meta">{% trans "Payment Status" %}</label>
+            <div id="payment-status-badge" class="doc-console-control doc-console-payment doc-console-payment-pending">{{ form.payment_status }}</div>
+          </div>
+
+          <div class="doc-console-field">
+            <label for="doc_mode" class="doc-console-meta">{% trans "Operation" %}</label>
+            <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300">
+              <option value="services">{% trans "Services" %}</option>
+              <option value="parts">{% trans "Part sale only" %}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CLIENT | VEHICLE (layout horizontal en md+) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="doc-smart-card doc-ficha-client-vehicle">
+        <h3>{% trans "CLIENT" %}</h3>
+        <div class="relative">
+          <input type="text" id="cliente-busqueda" class="w-full bg-slate-800 p-2 rounded border border-slate-600 text-white text-sm"
+                 placeholder="{% trans 'Search client' %}"
+                 autocomplete="off"
+                 oninput="window.handleClienteInput?.(this.value)"
+                 onfocus="window.handleClienteFocus?.(this.value)"
+                 onkeydown="return window.handleClienteKeydown?.(event)">
+          <div id="cliente-resultados" class="absolute z-50 w-full bg-slate-800 border border-slate-600 rounded shadow-lg hidden max-h-48 overflow-y-auto text-sm mt-1"></div>
+        </div>
+        <a id="btn-nuevo-cliente"
+           href="{% country_url 'clientes:crear_cliente' %}"
+           data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
+           class="doc-action-btn mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold no-underline shadow-sm whitespace-nowrap">
+          <span aria-hidden="true">âž•</span>
+          <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
+        </a>
+        <select id="id_cliente" name="cliente" class="hidden">
+          <option value="">{% trans "Select client..." %}</option>
+        </select>
+        <div id="cliente-info" class="doc-smart-summary hidden">
+          <div class="name" id="cliente-nombre"></div>
+          <div class="detail" id="cliente-telefono"></div>
+          <div class="detail" id="cliente-email"></div>
+          <div class="meta" id="cliente-ultima-visita"></div>
+        </div>
+      </div>
+      <div class="doc-smart-card" id="vehicle-section">
+        <h3>{% trans "VEHICLE" %}</h3>
+        {% if ui_config.show_vehicle %}
+        <div class="tipo-dependent-vehicle">
+          <div class="doc-field-with-btn flex gap-2">
+            <div class="flex-1">{{ form.vehiculo }}</div>
+            <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
+              <span aria-hidden="true">âž•</span>
+              <span class="doc-action-label text-white font-semibold">Nuevo vehÃ­culo</span>
+            </button>
+          </div>
+        </div>
+        {% endif %}
+        {% if 'kilometraje_ingreso' in form.fields %}
+        <div id="miles-section" class="tipo-dependent-miles flex flex-wrap items-center gap-2 mt-2">
+          <span class="text-xs text-slate-400">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% trans "Mileage" %}{% endif %}</span>
+          <div class="flex-1 min-w-0 max-w-[7rem]">{{ form.kilometraje_ingreso }}</div>
+          <span class="text-xs text-slate-500">{% get_current_language as lang %}{% if lang == 'es' %}km{% else %}mi{% endif %}</span>
+        </div>
+        {% if form.kilometraje_ingreso.errors %}
+        <div class="text-red-400 text-xs">{{ form.kilometraje_ingreso.errors.0 }}</div>
+        {% endif %}
+        {% endif %}
+        <div id="vehiculo-info" class="doc-smart-summary hidden">
+          <div class="name" id="vehiculo-marca-modelo"></div>
+          <div class="detail" id="vehiculo-ano-vin"></div>
+          <div class="detail" id="vehiculo-mileage"></div>
+          <div class="meta" id="vehiculo-ultima-entrada"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PARTS | SERVICES (tabla compacta) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {% if ui_config.show_repuestos %}
+      <div class="doc-smart-card doc-ficha-parts doc-pos-section">
+        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
+          <div class="flex flex-col gap-1 min-w-0 flex-1">
+            <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
+            {% if desarme_origen_label %}
+            <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
+              <span>ðŸ§©</span>
+              <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
+            </div>
+            {% endif %}
+          </div>
+          <div class="flex gap-1 flex-shrink-0 items-center">
+            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addRepuestoRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="openUsedPartsModal()"><span aria-hidden="true">ðŸ§©</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
+          </div>
+        </div>
+        <div class="doc-pos-header hidden sm:grid">
+          <span>{% trans "Code" %}</span><span>{% trans "Part name" %}</span><span>{% trans "Qty" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+        </div>
+        <div id="repuestos-container" class="space-y-2 min-h-[80px]">
+          <!-- Dynamic parts rows -->
+        </div>
+      </div>
+      {% endif %}
+      {% if ui_config.show_services %}
+      <div class="doc-smart-card doc-ficha-services doc-pos-section">
+        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
+          <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
+          <div class="flex gap-1 flex-shrink-0 items-center">
+            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addServicioRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+          </div>
+        </div>
+        <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
+          <span>{% trans "Service" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+        </div>
+        <div id="servicios-container" class="space-y-2 min-h-[80px]">
+          <!-- Dynamic services rows: click + ADD, then type to search -->
+          <p id="servicios-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add to add services, then type to search." %}</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% if ui_config.show_otros_servicios %}
+    <div class="doc-smart-card doc-ficha-otros doc-pos-section mt-4">
+      <div class="flex flex-wrap items-center gap-2 mb-3 min-h-[2rem]">
+        <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
+        <div class="flex gap-1 flex-shrink-0 items-center">
+          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addOtroRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
+        </div>
+      </div>
+      <div class="doc-pos-header doc-pos-header-otros hidden sm:grid">
+        <span>{% trans "Service" %}</span><span>{% trans "External Company" %}</span><span>{% trans "Shop Price" %}</span><span>{% trans "Client Price" %}</span><span>{% trans "Total" %}</span><span></span>
+      </div>
+      <div id="otros-container" class="space-y-2 min-h-[60px]">
+        <!-- Dynamic other services rows (external/outsourced) -->
+        <p id="otros-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add for external/outsourced services." %}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- 4. NOTES | TOTALES (panel claro) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="doc-smart-card order-2 md:order-1">
+        <h3>{% trans "NOTES" %}</h3>
+        {{ form.observaciones }}
+      </div>
+      <div class="totales-cockpit order-1 md:order-2 totales-panel">
+        <h3 class="totales-cockpit-title">{% trans "DOCUMENT TOTALS" %}</h3>
+        <div class="receipt-totals">
+          {% if ui_config.tax_lines|length > 0 %}
+          <div class="receipt-totals-apply-tax">
+            <label class="cockpit-label inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-1.5 w-3.5 h-3.5 accent-cyan-400"
+                     onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
+              <span>{% trans "Apply all taxes" %}</span>
+            </label>
+          </div>
+          {% endif %}
+
+          <table class="receipt-totals-table">
+            <tbody>
+              <tr>
+                <td class="receipt-label">{% trans "Parts" %}</td>
+                <td class="receipt-value">
+                  <span id="t_repuestos" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% if ui_config.show_services %}
+              <tr>
+                <td class="receipt-label">{% trans "Services" %}</td>
+                <td class="receipt-value">
+                  <span id="t_servicios" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endif %}
+              {% if ui_config.show_otros_servicios %}
+              <tr>
+                <td class="receipt-label">{% trans "Other" %}</td>
+                <td class="receipt-value">
+                  <span id="t_otros" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endif %}
+
+              {% for tax_line in ui_config.tax_lines %}
+              <tr class="tax-line" data-tax-id="{{ tax_line.id }}">
+                <td class="receipt-label">
+                  <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="include_{{ tax_line.id }}" checked
+                           class="mr-1 w-3 h-3 accent-cyan-400 tax-checkbox"
+                           data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
+                    <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
+                  </label>
+                </td>
+                <td class="receipt-value">
+                  <span id="t_{{ tax_line.id }}" class="calculated-field" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+
+              <tr class="receipt-total-row">
+                <td class="receipt-total-label">{% trans "TOTAL" %}</td>
+                <td class="receipt-total-value">
+                  <span id="t_total" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button type="submit" class="totales-cockpit-save">
+          {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
+        </button>
+        <div class="flex gap-2 mt-3">
+          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">â†</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden inputs para serializar filas dinÃ¡micas -->
+  <input type="hidden" name="repuestos_json" id="id_repuestos_json">
+  <input type="hidden" name="servicios_json" id="id_servicios_json">
+  <input type="hidden" name="otros_json" id="id_otros_json">
+</form>
+
+<!-- Modal Used Parts (piezas de desarme) -->
+<div id="modal-used-parts" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/70" onclick="closeUsedPartsModal()"></div>
+  <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
+    <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
+      <h3 class="text-lg font-bold text-amber-300 mb-3">ðŸ§© {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
+      <input type="search" id="used-parts-search" placeholder="{% trans 'Search by code or name...' %}" class="form-control w-full mb-4" autocomplete="off">
+      <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
+      <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">{% trans "Type at least 2 characters to search" %}</p>
+      <button type="button" onclick="closeUsedPartsModal()" class="mt-4 btn-secondary">{% trans "Close" %}</button>
+    </div>
+  </div>
+</div>
+
+{{ clientes_prefetch|json_script:"prefetchClientes" }}
+{{ vehiculos_prefetch|json_script:"prefetchVehiculos" }}
+{{ repuestos_prefetch|json_script:"prefetchRepuestos" }}
+{{ servicios_prefetch|json_script:"prefetchServicios" }}
+{{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
+{{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
+
+{% endwith %}
+{% endwith %}
+{% endblock documento_content %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'marketplace_new.js' %}"></script>
+<script>
+
+window.EG = window.EG || {};
+window.EG.utils = {
+    getCookie: function(name) {
+        const m = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
+        return m ? decodeURIComponent(m.pop()) : "";
+    }
+};
+window.EG.state = {
+    clienteId: null, vehiculoId: null, repuestos: [], servicios: [], otros: [],
+    isHydrated: false, isRestoring: false
+};
+window.EG.fetch = async function(url, opts = {}) {
+    const token = window.EG.utils.window.EG.utils.getCookie("csrftoken");
+    const headers = {
+        "X-Requested-With": "XMLHttpRequest",
+        "X-CSRFToken": token,
+        ...(opts.headers || {})
+    };
+    return fetch(url, { credentials: "same-origin", ...opts, headers });
+};
+
+
+window.EG = window.EG || {};
+
+
+
+
+
+    return fetch(url, { credentials: "same-origin", ...opts, headers });
+};
+
+ } } return cookieValue; }
+// Asegurar que egEncodeDocumentFormNext exista antes de initDocumentFormScript (puede no estar si el script de documento_content no se ejecutÃ³)
+if (typeof window.egEncodeDocumentFormNext !== 'function') {
+  window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
+    return encodeURIComponent(window.location.pathname + (window.location.search || ''));
+  };
+}
+function initDocumentFormScript(){
+  // Evita doble inicializaciÃ³n
+  if (window.EG && window.EG._docFormInit) {
+    return;
+  }
+  const EG = (window.EG = window.EG || {});
+  EG._docFormInit = true;
+  // Observations mÃ­nimo
+  const obs = document.getElementById('id_observaciones');
+  if (obs) { obs.setAttribute('rows', '2'); }
+
+  // Cabecera consola: badge estado de pago (semÃ¡foro)
+  function updatePaymentStatusBadge() {
+    const sel = document.getElementById('id_payment_status');
+    const badge = document.getElementById('payment-status-badge');
+    if (!badge || !sel) return;
+    badge.classList.remove('doc-console-payment-paid', 'doc-console-payment-pending', 'doc-console-payment-partial');
+    const v = (sel.value || '').toUpperCase();
+    if (v === 'PAGADO' || v === 'PAID') badge.classList.add('doc-console-payment-paid');
+    else if (v === 'PARCIAL' || v === 'PARTIAL') badge.classList.add('doc-console-payment-partial');
+    else badge.classList.add('doc-console-payment-pending');
+  }
+  updatePaymentStatusBadge();
+  document.getElementById('id_payment_status')?.addEventListener('change', updatePaymentStatusBadge);
+
+  // === CSRF ===
+  
+  const CSRF = window.EG.utils.getCookie('csrftoken');
+
+  
+
+  // === CONFIG: no pisa si ya existe ===
+  EG.cfg = EG.cfg || {};
+  if (!EG.cfg.country) {
+    const FORM = document.getElementById('document-form');
+    if (FORM && FORM.dataset.countryCode) {
+      EG.cfg.country = String(FORM.dataset.countryCode).toUpperCase();
+    } else {
+      const path = (location.pathname || '').toLowerCase();
+      EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
+    }
+  }
+  (function(){
+    // Leer endpoints desde data-* attributes del formulario
+    const FORM = document.getElementById('document-form');
+    if (FORM) {
+      EG.cfg.URL_NEXT_NUMBER        = EG.cfg.URL_NEXT_NUMBER        || FORM.dataset.urlNextNumber;
+      EG.cfg.URL_CLIENT_SEARCH      = EG.cfg.URL_CLIENT_SEARCH      || FORM.dataset.urlClientSearch;
+      EG.cfg.URL_VEHICULOS_BY_CLI   = EG.cfg.URL_VEHICULOS_BY_CLI   || FORM.dataset.urlVehiculosByCli;
+      EG.cfg.URL_REPUESTO_BY_CODE   = EG.cfg.URL_REPUESTO_BY_CODE   || FORM.dataset.urlRepuestoByCode;
+      EG.cfg.URL_REPUESTO_SEARCH   = EG.cfg.URL_REPUESTO_SEARCH   || FORM.dataset.urlRepuestoSearch;
+      EG.cfg.URL_REPUESTO_CREATE   = EG.cfg.URL_REPUESTO_CREATE   || FORM.dataset.urlRepuestoCreate;
+      EG.cfg.URL_REPUESTO_CREATE_WINDOW = EG.cfg.URL_REPUESTO_CREATE_WINDOW || FORM.dataset.urlRepuestoCreatePage;
+      EG.cfg.URL_SERVICE_SEARCH     = EG.cfg.URL_SERVICE_SEARCH     || FORM.dataset.urlServiceSearch;
+      EG.cfg.URL_SERVICE_CREATE     = EG.cfg.URL_SERVICE_CREATE     || FORM.dataset.urlServiceCreate;
+      EG.cfg.URL_OUTSOURCED_SERVICES= EG.cfg.URL_OUTSOURCED_SERVICES|| FORM.dataset.urlOutsourcedServices;
+      EG.cfg.URL_USED_PARTS        = EG.cfg.URL_USED_PARTS        || FORM.dataset.urlUsedParts;
+
+      // Fix: conectar evento Select2 + fallback change en cliente
+      if (window.jQuery) {
+        jQuery(document).on('select2:select', '#id_cliente', function (e) {
+          const clienteId = e?.params?.data?.id || jQuery(this).val();
+          console.log('ðŸ”¥ select2:select cliente seleccionado:', clienteId);
+          if (clienteId) {
+            cargarVehiculosPorCliente(clienteId);
+          }
+        });
+      }
+      const clienteSelectFallback = document.getElementById('id_cliente');
+      if (clienteSelectFallback) {
+        clienteSelectFallback.addEventListener('change', function () {
+          console.log('âš¡ change fallback cliente seleccionado:', this.value);
+          if (this.value) {
+            cargarVehiculosPorCliente(this.value);
+          }
+        });
+      }
+    }
+    // Fallback a path-based si no hay data-* (legacy)
+    if (!EG.cfg.URL_NEXT_NUMBER && FORM) {
+      const p = location.pathname || '';
+      const base = p.startsWith('/us/') ? '/us' : (p.startsWith('/cl/') ? '/cl' : '');
+      EG.cfg.URL_NEXT_NUMBER      = FORM.dataset.urlNextNumber || `${base}/documentos/api/obtener-numero-documento/`;
+      EG.cfg.URL_CLIENT_SEARCH    = FORM.dataset.urlClientSearch || `${base}/ajax/clientes/buscar/`;
+      EG.cfg.URL_VEHICULOS_BY_CLI = FORM.dataset.urlVehiculosByCli || `${base}/ajax/vehiculos-por-cliente/`;
+      EG.cfg.URL_REPUESTO_BY_CODE = FORM.dataset.urlRepuestoByCode || `${base}/api/repuestos/by-code`;
+      EG.cfg.URL_REPUESTO_SEARCH = FORM.dataset.urlRepuestoSearch || `${base}/api/repuestos/`;
+      EG.cfg.URL_SERVICE_SEARCH   = FORM.dataset.urlServiceSearch || `${base}/api/servicios/`;
+      EG.cfg.URL_SERVICE_CREATE   = FORM.dataset.urlServiceCreate || `${base}/servicios/crear/`;
+      EG.cfg.URL_OUTSOURCED_SERVICES = FORM.dataset.urlOutsourcedServices || `${base}/api/otros-servicios/`;
+      EG.cfg.URL_USED_PARTS = FORM.dataset.urlUsedParts || `${base}/api/piezas-desarme/`;
+    }
+    // Sales tax configurable (ej.: desde CompanySettings) - Legacy, mantener por compatibilidad
+    EG.cfg.salesTax = typeof EG.cfg.salesTax === 'number' ? EG.cfg.salesTax : 0.08;
+    
+    // Inicializar taxLines desde ui_config (pasado desde el backend)
+    // Esto permite que el JavaScript calcule impuestos dinÃ¡micamente sin conocer el paÃ­s
+    const taxLinesScript = document.getElementById('uiConfigTaxLines');
+    if (taxLinesScript) {
+      try {
+        EG.cfg.taxLines = JSON.parse(taxLinesScript.textContent);
+      } catch (e) {
+        console.error('Error parsing taxLines:', e);
+        EG.cfg.taxLines = [];
+      }
+    } else {
+      EG.cfg.taxLines = [];
+    }
+  })();
+
+  // Exponer seguro
+  window.EG = EG;
+
+// ===============
+// CONFIG ENDPOINTS - Evitar redeclaraciÃ³n
+// ===============
+window.EG = window.EG || {};
+EG.cfg = EG.cfg || {};
+if (!EG.cfg.country) {
+  const formEl = document.getElementById('document-form');
+  if (formEl && formEl.dataset.countryCode) {
+    EG.cfg.country = String(formEl.dataset.countryCode).toUpperCase();
+  } else {
+    const path = (location.pathname || '').toLowerCase();
+    EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
+  }
+}
+EG.COUNTRY = EG.COUNTRY || (EG.cfg.country || 'CL');
+const COUNTRY_REF = (EG.COUNTRY || 'CL').toUpperCase(); // usa COUNTRY_REF en lugar de COUNTRY
+
+// PreselecciÃ³n desde URL (vuelta desde "crear vehÃ­culo" con cliente_id y vehiculo_id)
+window.__PRESELECT_CLIENTE_ID__ = "{{ cliente_preselect_id|default:''|escapejs }}";
+window.__PRESELECT_VEHICULO_ID__ = "{{ vehiculo_preselect_id|default:''|escapejs }}";
+
+// ==== PREFETCH & HELPERS ====
+(function(){
+  function safeJSON(id) {
+    try {
+      const el = document.getElementById(id);
+      return el ? JSON.parse(el.textContent) : [];
+    } catch (err) {
+      console.warn('âš ï¸ PREFETCH invÃ¡lido para', id, err);
+      return [];
+    }
+  }
+
+  const global = window;
+  global.PREFETCH = global.PREFETCH || {
+    clientes:  safeJSON('prefetchClientes'),
+    vehiculos: safeJSON('prefetchVehiculos'),
+    repuestos: safeJSON('prefetchRepuestos'),
+    servicios: safeJSON('prefetchServicios'),
+    otros:     safeJSON('prefetchOtrosServicios'),
+  };
+
+  if (typeof global.filterPrefetchItems !== 'function') {
+    global.filterPrefetchItems = function(list, fields, query, limit = 15) {
+      if (!Array.isArray(list) || !fields?.length) return [];
+      const normalize = (value) => (value ?? '')
+        .toString()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/\p{Diacritic}/gu, '');
+      const needle = normalize(query);
+      if (!needle) return [];
+
+      const results = [];
+      for (const item of list) {
+        for (const field of fields) {
+          if (normalize(item?.[field]).includes(needle)) {
+            results.push(item);
+            break;
+          }
+        }
+        if (results.length >= limit) break;
+      }
+      return results;
+    };
+  }
+})();
+
+// ===============
+// I18N DICCIONARIO
+// ===============
+const I18N = {
+  no_clients: "{% trans 'No clients found' %}",
+  loading_vehicles: "{% trans 'Loading vehiclesâ€¦' %}",
+  no_vehicles: "{% trans 'No vehicles registered' %}",
+  select_vehicle: "{% trans 'Select vehicleâ€¦' %}",
+  server_error: "{% trans 'Server error' %}",
+  error_loading_vehicles: "{% trans 'Error loading vehicles' %}",
+  no_services: "{% trans 'No services found' %}",
+  select_service: "{% trans 'Select service...' %}",
+  issue_date_required: "{% trans 'Issue Date is required' %}",
+  document_type_required: "{% trans 'Document Type is required' %}",
+  client_required: "{% trans 'Client is required' %}",
+  vehicle_required: "{% trans 'Vehicle is required' %}",
+  code: "{% trans 'Code' %}",
+  name: "{% trans 'Name' %}",
+  qty: "{% trans 'Qty' %}",
+  cost_price: "{% trans 'Cost Price' %}",
+  sale_price: "{% trans 'Sale Price' %}",
+  discount_pct: "{% trans 'Discount %' %}",
+  subtotal: "{% trans 'Subtotal' %}",
+  service: "{% trans 'Service' %}",
+  type_to_search_services: "{% trans 'Type to search services...' %}",
+  type_to_search_parts: "{% trans 'Type to search parts...' %}",
+  type_to_search_external: "{% trans 'Type to search external services...' %}",
+  no_parts: "{% trans 'No parts found' %}",
+  no_external_services: "{% trans 'No external services found' %}",
+  external_company: "{% trans 'External Company' %}",
+  create_part: "{% trans 'Create Part' %}",
+  create_service: "{% trans 'Create Service' %}",
+  part_number_required: "{% trans 'Part number is required' %}",
+  part_name_required: "{% trans 'Part name is required' %}",
+  part_created: "{% trans 'Part created successfully' %}",
+  part_exists: "{% trans 'Existing part loaded' %}",
+  save: "{% trans 'Save' %}",
+  cancel: "{% trans 'Cancel' %}",
+};
+
+if (COUNTRY_REF === 'CL') {
+  Object.assign(I18N, {
+    no_clients: "Sin clientes encontrados",
+    loading_vehicles: "Cargando vehÃ­culosâ€¦",
+    no_vehicles: "Sin vehÃ­culos registrados",
+    select_vehicle: "Selecciona vehÃ­culoâ€¦",
+    server_error: "Error del servidor",
+    error_loading_vehicles: "Error cargando vehÃ­culos",
+    no_parts: "Sin repuestos coincidentes",
+    no_external_services: "Sin servicios externos",
+    select_service: "Selecciona servicioâ€¦",
+    issue_date_required: "La fecha de emisiÃ³n es obligatoria",
+    document_type_required: "El tipo de documento es obligatorio",
+    client_required: "Debes seleccionar un cliente",
+    vehicle_required: "Debes seleccionar un vehÃ­culo",
+    code: "CÃ³digo",
+    name: "Nombre",
+    qty: "Cant.",
+    cost_price: "Precio compra",
+    sale_price: "Precio venta",
+    discount_pct: "% desc",
+    subtotal: "Subtotal",
+    service: "Servicio",
+    type_to_search_services: "Escribe para buscar serviciosâ€¦",
+    type_to_search_parts: "Escribe para buscar repuestosâ€¦",
+    type_to_search_external: "Escribe para buscar servicios externosâ€¦",
+    client_price: "Precio al cliente",
+    shop_price: "Costo al taller",
+    external_company: "Empresa externa",
+    create_part: "Crear repuesto",
+    create_service: "Crear servicio",
+    part_number_required: "El cÃ³digo del repuesto es obligatorio",
+    part_name_required: "El nombre del repuesto es obligatorio",
+    part_created: "Repuesto creado correctamente",
+    part_exists: "Repuesto existente seleccionado",
+    save: "Guardar",
+    cancel: "Cancelar",
+  });
+}
+
+// ===============
+// HELPERS
+// ===============
+const $ = (sel, ctx=document) => ctx.querySelector(sel);
+const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
+
+function showFieldError(el, msg){
+  const hint = document.createElement('div');
+  hint.className = 'mt-1 text-red-300 text-sm eg-hint';
+  hint.textContent = msg;
+  el.closest('div')?.appendChild(hint);
+  el.classList.add('ring-2','ring-red-500');
+}
+
+function setText(selOrEl, txt) {
+  const el = typeof selOrEl==='string' ? $(selOrEl) : selOrEl;
+  if (el) el.textContent = txt;
+}
+
+/**
+ * Normaliza un servicio para asegurar que siempre tenga 'id' y 'pk'
+ * Esto resuelve inconsistencias entre APIs que devuelven 'id' vs 'pk'
+ */
+function normalizeServicio(servicio) {
+  if (!servicio || typeof servicio !== 'object') return servicio;
+  return {
+    ...servicio,
+    id: servicio.id || servicio.pk || '',
+    pk: servicio.pk || servicio.id || '',
+  };
+}
+
+const MONEY_FORMATS = {
+  US: { locale: 'en-US', currency: 'USD', min: 2, max: 2 },
+  CL: { locale: 'es-CL', currency: 'CLP', min: 0, max: 0 },
+  MX: { locale: 'es-MX', currency: 'MXN', min: 2, max: 2 },
+  PE: { locale: 'es-PE', currency: 'PEN', min: 2, max: 2 },
+  VE: { locale: 'es-VE', currency: 'VES', min: 2, max: 2 },
+  BR: { locale: 'pt-BR', currency: 'BRL', min: 2, max: 2 },
+};
+
+function buildMoneyFormatter(country){
+  const cfg = MONEY_FORMATS[country] || MONEY_FORMATS.CL;
+  return new Intl.NumberFormat(cfg.locale, {
+    style: 'currency',
+    currency: cfg.currency,
+    minimumFractionDigits: cfg.min ?? 2,
+    maximumFractionDigits: cfg.max ?? 2,
+  });
+}
+
+function formatNumberInput(value){
+  const num = Number(value);
+  if (!Number.isFinite(num)) return '';
+  const digits = MONEY_FORMATS[COUNTRY_REF]?.max ?? 2;
+  return num.toFixed(digits);
+}
+
+function parseNumericInput(value){
+  if (value === undefined || value === null) return 0;
+  const num = Number(value.toString().replace(/[^0-9.-]/g, ''));
+  return Number.isFinite(num) ? num : 0;
+}
+
+function buildEndpoint(url){
+  if (!url) return '';
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith('/')) return url;
+  const path = window.location.pathname || '/';
+  const parts = path.split('/').filter(Boolean);
+  if (!parts.length) {
+    return `/${url.replace(/^\//, '')}`;
+  }
+  const countrySegment = parts[0];
+  return `/${countrySegment}/${url.replace(/^\//, '')}`;
+}
+
+let MONEY_FORMATTER = buildMoneyFormatter(COUNTRY_REF);
+
+function money(n){
+  if (!MONEY_FORMATTER) {
+    MONEY_FORMATTER = buildMoneyFormatter(COUNTRY_REF);
+  }
+  const value = Number(n) || 0;
+  return MONEY_FORMATTER.format(value);
+}
+
+// ===============
+// THEME + NÃšMERO
+// ===============
+const shell   = document.getElementById('doc-shell');
+const selTipo = document.getElementById('id_tipo');
+const selMode = document.getElementById('doc_mode');
+const numeroView = document.getElementById('id_numero');
+const numeroHidden = document.createElement('input');
+numeroHidden.type = 'hidden';
+numeroHidden.name = 'numero_documento';
+const docForm = document.getElementById('document-form');
+if (docForm) docForm.appendChild(numeroHidden);
+
+function applyTheme(tipo) {
+  if (!shell) return;
+  shell.classList.remove('theme-ot','theme-fac','theme-pres','theme-pts');
+  const themeClass = tipo==='FAC' ? 'theme-fac' : tipo==='PRES' ? 'theme-pres' : tipo==='PTS' ? 'theme-pts' : 'theme-ot';
+  shell.classList.add(themeClass);
+}
+
+function applyTipoDependentUI(tipo) {
+  // Legacy no-op: mantenido por compatibilidad con llamadas antiguas
+}
+
+function applyModeDependentUI() {
+  const mode = selMode ? selMode.value : 'services';
+  const isParts = mode === 'parts';
+
+  const vehicleSection = document.getElementById('vehicle-section');
+  const milesSection   = document.getElementById('miles-section');
+  const tecnicoLabel   = document.getElementById('tecnico-label');
+
+  if (vehicleSection) vehicleSection.style.display = isParts ? 'none' : '';
+  if (milesSection)   milesSection.style.display   = isParts ? 'none' : '';
+
+  if (tecnicoLabel) {
+    tecnicoLabel.textContent = isParts
+      ? (tecnicoLabel.dataset.labelPts || 'Salesperson')
+      : (tecnicoLabel.dataset.labelDefault || '');
+  }
+}
+
+async function updateDocumentNumber(){
+          if (!selTipo) return;
+          const tipo = selTipo.value;
+          if (!tipo) return;
+          try{
+            const r = await EG.fetch(`${EG.cfg.URL_NEXT_NUMBER}?tipo=${encodeURIComponent(tipo)}`);
+            if(!r.ok) throw new Error(`HTTP ${r.status}`);
+            const data = await r.json();
+            const next = data.number || data.numero || data.next || 'Auto-generated';
+            setText(numeroView, next);
+            numeroHidden.value = next;
+          }catch(err){
+            console.error('âŒ Error next-number:', err);
+            setText(numeroView, 'â€” error â€”');
+            numeroHidden.value = '';
+          }
+        }
+
+// ===============
+// CLIENTE + VEHÃCULOS
+// ===============
+let clienteBusqueda, clienteResultados, clienteSelect, clienteInfoBox, cliNombre, cliEmail, cliFono, vehiculoSelect;
+let searchTimer = null;
+
+function getClienteElements(){
+  if (!clienteBusqueda) clienteBusqueda = document.getElementById('cliente-busqueda');
+  if (!clienteResultados) clienteResultados = document.getElementById('cliente-resultados');
+  if (!clienteSelect) clienteSelect = document.getElementById('id_cliente');
+  if (!clienteInfoBox) clienteInfoBox = document.getElementById('cliente-info');
+  if (!cliNombre) cliNombre = document.getElementById('cliente-nombre');
+  if (!cliEmail) cliEmail = document.getElementById('cliente-email');
+  if (!cliFono) cliFono = document.getElementById('cliente-telefono');
+  if (!vehiculoSelect) vehiculoSelect = document.getElementById('id_vehiculo');
+}
+
+async function buscarClientes(q){
+          getClienteElements();
+          if (!q || q.length < 2){
+            if (clienteResultados) clienteResultados.classList.add('hidden');
+            return;
+          }
+          if (!clienteResultados) return;
+          const localMatches = filterPrefetchItems(PREFETCH.clientes, ['nombre', 'nombre_completo', 'email', 'telefono'], q, 15);
+          if (localMatches.length){
+            renderResultadosClientes(localMatches);
+          }
+          try{
+            const url = buildEndpoint(EG.cfg.URL_CLIENT_SEARCH || '/ajax/clientes/buscar/');
+            const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+            if(!r.ok) throw new Error(`HTTP ${r.status}`);
+            const data = await r.json();
+            const items = Array.isArray(data) ? data : (data.results || data.items || []);
+            renderResultadosClientes(items);
+          }catch(err){
+            console.error('âŒ buscarClientes:', err);
+            clienteResultados.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
+            clienteResultados.classList.remove('hidden');
+          }
+        }
+
+function renderResultadosClientes(lista){
+  getClienteElements();
+  if (!clienteResultados) return;
+  // Si ya hay un cliente seleccionado, no mostrar el mensaje "No clients found"
+  if (clienteSelect && clienteSelect.value) {
+    clienteResultados.classList.add('hidden');
+    return;
+  }
+  clienteResultados.innerHTML = '';
+  if (!lista.length){
+    const empty = document.createElement('div');
+    empty.className = 'p-3 text-gray-300';
+    empty.textContent = I18N.no_clients;
+    clienteResultados.appendChild(empty);
+    clienteResultados.classList.remove('hidden');
+    return;
+  }
+  for (const item of lista){
+    const id = item.id || item.pk || '';
+    const nombre = item.text || item.nombre_completo || item.nombre || item.razon_social || `Client #${id}`;
+    const email = item.email || '';
+    const fono  = item.telefono || item.fono || '';
+    const div = document.createElement('div');
+    div.className = 'cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+    div.setAttribute('role','option');
+    div.tabIndex = 0;
+    div.dataset.id = id;
+    div.dataset.nombre = nombre;
+    div.dataset.email = email;
+    div.dataset.telefono = fono;
+
+    const title = document.createElement('div');
+    title.className = 'font-semibold text-cyan-200';
+    title.textContent = nombre;
+    div.appendChild(title);
+
+    if (email){
+      const em = document.createElement('div');
+      em.className = 'text-sm text-gray-300';
+      em.textContent = `ðŸ“§ ${email}`;
+      div.appendChild(em);
+    }
+    if (fono){
+      const ph = document.createElement('div');
+      ph.className = 'text-sm text-gray-300';
+      ph.textContent = `ðŸ“ž ${fono}`;
+      div.appendChild(ph);
+    }
+    clienteResultados.appendChild(div);
+  }
+  clienteResultados.setAttribute('role','listbox');
+  clienteResultados.classList.remove('hidden');
+}
+
+async function seleccionarCliente({id, nombre, email, telefono}){
+  console.log(`ðŸ‘¤ Cliente seleccionado: ${nombre} (ID: ${id})`);
+  
+  getClienteElements();
+  if (clienteResultados) clienteResultados.classList.add('hidden');
+  if (clienteBusqueda) clienteBusqueda.value = nombre;
+  if (clienteSelect){ // mantener el valor para POST si backend lo requiere
+    clienteSelect.innerHTML = `<option value="${id}" selected>${nombre}</option>`;
+    clienteSelect.classList.add('hidden');
+  }
+  if (cliNombre) cliNombre.textContent = nombre;
+  if (cliEmail)  cliEmail.textContent  = email ? `ðŸ“§ ${email}` : 'â€”';
+  if (cliFono)   cliFono.textContent   = telefono ? `ðŸ“ž ${telefono}` : 'â€”';
+  const ultimaVisitaEl = document.getElementById('cliente-ultima-visita');
+  if (ultimaVisitaEl) ultimaVisitaEl.textContent = ''; // API puede llenar despuÃ©s
+  if (clienteInfoBox) clienteInfoBox.classList.remove('hidden');
+  
+  // âš¡ IMPORTANTE: Cargar vehÃ­culos del cliente seleccionado
+  console.log(`ðŸ”„ Iniciando carga de vehÃ­culos para cliente ${id}...`);
+  
+  // Verificar si hay un vehÃ­culo a preseleccionar (desde URL, documentoData o preselect del backend)
+  const urlParams = new URLSearchParams(window.location.search);
+  const newVehiculoId = urlParams.get('vehiculo_id') || urlParams.get('new_vehiculo_id');
+  const prefillVehiculoId = (typeof documentoData !== 'undefined' && documentoData.prefillVehiculoId)
+    ? documentoData.prefillVehiculoId
+    : null;
+  const preselectVehiculoId = (typeof window.__PRESELECT_VEHICULO_ID__ !== 'undefined' && window.__PRESELECT_VEHICULO_ID__)
+    ? window.__PRESELECT_VEHICULO_ID__
+    : null;
+  const vehiculoIdToSelect = newVehiculoId || prefillVehiculoId || preselectVehiculoId || null;
+  
+  await cargarVehiculosPorCliente(id, vehiculoIdToSelect);
+}
+
+async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
+  getClienteElements();
+  if (!vehiculoSelect) {
+    console.warn('âš ï¸ Elemento #id_vehiculo no encontrado');
+    return;
+  }
+
+  if (!clienteId) {
+    console.warn('âš ï¸ No se proporcionÃ³ clienteId');
+    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle}</option>`;
+    return;
+  }
+
+  console.log(`ðŸš— Cargando vehÃ­culos para cliente ID: ${clienteId}${vehiculoIdToSelect ? ` (preseleccionar: ${vehiculoIdToSelect})` : ''}`);
+
+  const clienteIdStr = String(clienteId);
+  const lastLoadedClienteId = String(vehiculoSelect.dataset.loadedClienteId || '');
+  const alreadyHasOptions = vehiculoSelect.options && vehiculoSelect.options.length > 1;
+  if (alreadyHasOptions && lastLoadedClienteId === clienteIdStr) {
+    console.log(`â„¹ï¸ VehÃ­culos ya cargados para cliente ${clienteIdStr}, omitiendo nueva peticiÃ³n`);
+    if (vehiculoIdToSelect) {
+      setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
+    }
+    return;
+  }
+
+  vehiculoSelect.disabled = true;
+  vehiculoSelect.innerHTML = `<option value="">${I18N.loading_vehicles || 'Cargando vehÃ­culos...'}</option>`;
+
+  // Intentar primero con prefetch local (mÃ¡s rÃ¡pido)
+  const localMatches = (PREFETCH?.vehiculos || []).filter((v)=> String(v.cliente_id) === String(clienteId));
+  if (localMatches.length){
+    console.log(`âœ… Encontrados ${localMatches.length} vehÃ­culos en prefetch`);
+    const options = localMatches.map((v)=> `<option value="${v.id}">${v.label || v.text || ''}</option>`).join('');
+    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehÃ­culo...'}</option>${options}`;
+    vehiculoSelect.dataset.source = 'prefetch';
+    vehiculoSelect.dataset.loadedClienteId = clienteIdStr;
+    vehiculoSelect.disabled = false;
+    if (vehiculoIdToSelect) {
+      setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
+    }
+    return;
+  }
+
+  // Si no hay en prefetch, hacer peticiÃ³n AJAX
+  try{
+    const urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/ajax/vehiculos-por-cliente/';
+    const url = buildEndpoint(urlRaw);
+    const fullUrl = `${url}?cliente_id=${encodeURIComponent(clienteId)}`;
+    
+    console.log(`ðŸ“¡ Llamando a: ${fullUrl}`);
+    
+    const r = await EG.fetch(fullUrl);
+    
+    if(!r.ok) {
+      const errorText = await r.text();
+      console.error(`âŒ HTTP ${r.status}:`, errorText);
+      throw new Error(`HTTP ${r.status}: ${errorText}`);
+    }
+    
+    const data = await r.json();
+    console.log('ðŸ“¦ Respuesta recibida:', data);
+    
+    const items = Array.isArray(data) ? data : (data.results || data.items || []);
+    console.log(`ðŸ“‹ Procesando ${items.length} vehÃ­culos`);
+    
+    if (!items.length){
+      console.log('â„¹ï¸ No se encontraron vehÃ­culos');
+      vehiculoSelect.innerHTML = `<option value="">${I18N.no_vehicles || 'No hay vehÃ­culos'}</option>`;
+      vehiculoSelect.dataset.source = 'empty';
+    } else {
+      const options = items.map(v => {
+        const id = v.id ?? v.pk;
+        const label = v.text || v.label || v.patente || `Vehicle #${id}`;
+        return `<option value="${id}">${label}</option>`;
+      }).join('');
+      vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehÃ­culo...'}</option>${options}`;
+      vehiculoSelect.dataset.source = 'fetch';
+      vehiculoSelect.dataset.loadedClienteId = clienteIdStr;
+      console.log(`âœ… ${items.length} vehÃ­culos cargados exitosamente`);
+      
+      // Preseleccionar vehÃ­culo si se especificÃ³
+      if (vehiculoIdToSelect) {
+        setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
+      }
+    }
+  }catch(err){
+    console.error('âŒ Error cargando vehÃ­culos:', err);
+    console.error('Stack:', err.stack);
+    vehiculoSelect.innerHTML = `<option value="">${I18N.error_loading_vehicles || 'Error al cargar vehÃ­culos'}</option>`;
+    vehiculoSelect.dataset.source = 'error';
+  }finally{
+    vehiculoSelect.disabled = false;
+  }
+}
+
+// FunciÃ³n auxiliar para preseleccionar un vehÃ­culo
+function preseleccionarVehiculo(vehiculoId) {
+  getClienteElements();
+  if (!vehiculoSelect) {
+    console.warn('âš ï¸ Elemento #id_vehiculo no encontrado para preselecciÃ³n');
+    return;
+  }
+  
+  const vehiculoIdStr = String(vehiculoId);
+  console.log(`ðŸŽ¯ Intentando preseleccionar vehÃ­culo ID: ${vehiculoIdStr}`);
+  
+  // Verificar si el vehÃ­culo existe en las opciones
+  const option = Array.from(vehiculoSelect.options).find(opt => String(opt.value) === vehiculoIdStr);
+  
+  if (option) {
+    vehiculoSelect.value = vehiculoIdStr;
+    vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    console.log(`âœ… VehÃ­culo ${vehiculoIdStr} preseleccionado exitosamente`);
+  } else {
+    console.warn(`âš ï¸ VehÃ­culo ${vehiculoIdStr} no encontrado en las opciones disponibles`);
+    // Intentar nuevamente despuÃ©s de un breve delay (por si los vehÃ­culos aÃºn se estÃ¡n cargando)
+    setTimeout(() => {
+      const retryOption = Array.from(vehiculoSelect.options).find(opt => String(opt.value) === vehiculoIdStr);
+      if (retryOption) {
+        vehiculoSelect.value = vehiculoIdStr;
+        vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        console.log(`âœ… VehÃ­culo ${vehiculoIdStr} preseleccionado en reintento`);
+      } else {
+        console.error(`âŒ No se pudo preseleccionar vehÃ­culo ${vehiculoIdStr} despuÃ©s del reintento`);
+      }
+    }, 500);
+  }
+}
+
+// ===============
+// TOTALES
+// ===============
+function sumFromInputs(selector){
+  return $$(selector).reduce((acc, el)=>{
+    const raw = el.tagName==='INPUT' ? el.value : el.textContent;
+    const num = Number((raw||'').toString().replace(/[^0-9.-]/g,''));
+    return acc + (isNaN(num) ? 0 : num);
+  }, 0);
+}
+
+function recalcTotales(){
+          const rep   = sumFromInputs('.rep-subtotal');
+          const serv  = sumFromInputs('.serv-subtotal');
+          const otros = sumFromInputs('.otr-subtotal');
+
+          console.log(`Totales: rep=${rep}, serv=${serv}, otros=${otros}`);
+
+          // Calcular impuestos dinÃ¡micamente desde ui_config.tax_lines
+          // El JavaScript NO sabe quÃ© es IVA o Sales Tax, solo itera sobre tax_lines
+          let totalTaxes = 0;
+          const taxLines = window.EG?.cfg?.taxLines || [];
+          
+          taxLines.forEach(taxLine => {
+            const checkbox = document.getElementById(`include_${taxLine.id}`);
+            const isEnabled = checkbox?.checked ?? false;
+            
+            if (isEnabled) {
+              // Aplicar impuesto segÃºn applies_to
+              let baseAmount = 0;
+              if (taxLine.applies_to === 'repuestos') {
+                baseAmount = rep;
+              } else if (taxLine.applies_to === 'servicios') {
+                baseAmount = serv;
+              } else if (taxLine.applies_to === 'all') {
+                baseAmount = rep + serv + otros;
+              }
+              
+              const taxRate = Number(taxLine.rate) / 100; // Convertir porcentaje a decimal
+              const taxAmount = baseAmount * taxRate;
+              totalTaxes += taxAmount;
+              
+              // Actualizar display de esta lÃ­nea de impuesto
+              setText(`#t_${taxLine.id}`, money(taxAmount));
+            } else {
+              // Si estÃ¡ deshabilitado, mostrar 0
+              setText(`#t_${taxLine.id}`, money(0));
+            }
+          });
+
+          // Actualizar subtotales
+          setText('#t_repuestos', money(rep));
+          setText('#t_servicios', money(serv));
+          setText('#t_otros',     money(otros));
+          
+          // Calcular y mostrar total general
+          const grandTotal = rep + serv + otros + totalTaxes;
+          setText('#t_total', money(grandTotal));
+          if (typeof scheduleDocumentDraftSave === 'function') scheduleDocumentDraftSave();
+        }
+window.recalcTotales = recalcTotales;
+
+// Agregar event listeners a TODOS los checkboxes de impuestos dinÃ¡micamente
+// El JavaScript NO sabe cuÃ¡ntos impuestos hay, los detecta automÃ¡ticamente
+document.querySelectorAll('.tax-checkbox').forEach(checkbox => {
+  checkbox.addEventListener('change', recalcTotales);
+});
+
+// ===============
+// FILAS DINÃMICAS
+// ===============
+// IDs de botones en tu HTML: #add-repuesto, #add-servicio, #add-otro
+// Los event listeners se registran en DOMContentLoaded
+
+window.addRepuestoRow = function addRepuestoRow(presetRowId){
+  const container = document.getElementById('repuestos-container');
+  if (!container) {
+    console.error('âŒ Contenedor de repuestos no encontrado');
+    return;
+  }
+  const isFirstRow = !container.querySelector('.dynamic-element');
+  const lbl = (text) => isFirstRow ? `<label class="block text-cyan-200 text-sm mb-1">${text}</label>` : '';
+  const lblFlex = (content) => isFirstRow ? `<label class="block text-cyan-200 text-sm mb-1 flex items-center gap-1">${content}</label>` : '';
+  const row = document.createElement('div');
+  row.className = 'dynamic-element';
+  const rowId = (presetRowId && String(presetRowId).trim())
+    ? String(presetRowId).trim()
+    : `rep_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+  row.dataset.rowId = rowId;
+  row.innerHTML = `
+    <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="${rowId}">
+      <div class="col-span-2 sm:col-span-2 relative min-w-0">
+        ${lbl(I18N.code)}
+        <input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="${I18N.code}" autocomplete="off">
+        <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        <input type="hidden" class="rep-id">
+        <input type="hidden" class="rep-origen" value="STOCK_BODEGA">
+        <input type="hidden" class="rep-pieza-desarme-id">
+        <input type="hidden" class="rep-costo-linea">
+      </div>
+      <div class="col-span-4 sm:col-span-4 description-field rep-search-container relative min-w-0">
+        <div class="flex items-center justify-between gap-2 mb-1">
+          <span>${isFirstRow ? I18N.name : ''}</span>
+          <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase tracking-wide">
+            Usado / Desarme
+          </span>
+        </div>
+        <div class="flex gap-1">
+          <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_parts}" autocomplete="off">
+          <button type="button" class="rep-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_part}">ï¼‹</button>
+        </div>
+        <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        <input type="hidden" class="rep-nombre">
+      </div>
+      <div class="col-span-1 sm:col-span-1 min-w-0">
+        ${lbl(I18N.qty)}
+        <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" max="999" value="1">
+      </div>
+      <div class="col-span-2 sm:col-span-2 min-w-0">
+        ${lblFlex(`<span>${I18N.sale_price}</span><button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${COUNTRY_REF === 'CL' ? 'Mostrar/ocultar precio de compra' : 'Show/hide cost price'}" style="cursor: pointer; background: none; border: none; padding: 2px;">ðŸ‘ï¸</button>`)}
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6" placeholder="0">
+        </div>
+      </div>
+      <div class="col-span-1 sm:col-span-1 cost-price-container hidden min-w-0">
+        ${lbl(I18N.cost_price)}
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="rep-precio-compra form-control w-full h-10 text-sm pl-6" placeholder="0">
+        </div>
+      </div>
+      <div class="col-span-1 sm:col-span-1 min-w-0">
+        ${lbl(I18N.subtotal)}
+        <input type="hidden" class="rep-subtotal" value="0">
+        <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
+      </div>
+      <div class="col-span-1 sm:col-span-1">
+        <button type="button" class="btn-add w-full h-10" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">âœ•</button>
+      </div>
+    </div>`;
+  container.appendChild(row);
+  setupRepuestoRow(row);
+  return row;
+};
+
+window.restoreCreatedRepuestoFromReturn = function restoreCreatedRepuestoFromReturn() {
+  const url = new URL(window.location.href);
+  const repId = url.searchParams.get('created_repuesto_id');
+  if (!repId) return;
+
+  const targetRow = url.searchParams.get('target_row');
+  const nombre = url.searchParams.get('created_repuesto_nombre') || '';
+  const codigo = url.searchParams.get('created_repuesto_codigo') || '';
+  const precioVenta = parseFloat(url.searchParams.get('created_repuesto_precio_venta') || '0');
+  const precioCompra = parseFloat(url.searchParams.get('created_repuesto_precio_compra') || '0');
+
+  let row = null;
+  if (targetRow) {
+    const el = document.querySelector('[data-row-id="' + String(targetRow).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"]');
+    row = el ? el.closest('.dynamic-element') : null;
+  }
+  if (!row && typeof window.addRepuestoRow === 'function') {
+    row = window.addRepuestoRow();
+  }
+  if (row && typeof row.__applyRepData === 'function') {
+    row.__applyRepData({
+      id: repId,
+      nombre,
+      codigo,
+      precio_venta: precioVenta,
+      precio_compra: precioCompra,
+    });
+  }
+
+  url.searchParams.delete('created_repuesto_id');
+  url.searchParams.delete('created_repuesto_nombre');
+  url.searchParams.delete('created_repuesto_codigo');
+  url.searchParams.delete('created_repuesto_precio_venta');
+  url.searchParams.delete('created_repuesto_precio_compra');
+  url.searchParams.delete('target_row');
+  const qs = url.searchParams.toString();
+  window.history.replaceState({}, '', url.pathname + (qs ? '?' + qs : ''));
+};
+
+// Used Parts (piezas de desarme) modal
+window.openUsedPartsModal = function openUsedPartsModal(){
+  const modal = document.getElementById('modal-used-parts');
+  const search = document.getElementById('used-parts-search');
+  const results = document.getElementById('used-parts-results');
+  const empty = document.getElementById('used-parts-empty');
+  if (!modal) return;
+  modal.classList.remove('hidden');
+  results.innerHTML = '';
+  empty.classList.remove('hidden');
+  if (search) {
+    search.value = '';
+    search.focus();
+  }
+};
+
+window.closeUsedPartsModal = function closeUsedPartsModal(){
+  const modal = document.getElementById('modal-used-parts');
+  if (modal) modal.classList.add('hidden');
+};
+
+(function initUsedPartsModal(){
+  const search = document.getElementById('used-parts-search');
+  const results = document.getElementById('used-parts-results');
+  const empty = document.getElementById('used-parts-empty');
+  let searchTimer;
+
+  function money(val) {
+    try { return (Number(val) || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); } catch (e) { return String(val); }
+  }
+
+  async function searchUsedParts(q){
+    if (!results || !empty) return;
+    if (!q || q.length < 2){
+      results.innerHTML = '';
+      empty.textContent = (typeof I18N !== 'undefined' && I18N.type_to_search_parts) ? I18N.type_to_search_parts.replace('repuestos', 'cÃ³digo o nombre') : '{% trans "Type at least 2 characters to search" %}';
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+    results.innerHTML = '<div class="text-cyan-300 py-2">{% trans "Searching..." %}</div>';
+    const url = (EG.cfg && EG.cfg.URL_USED_PARTS) || '/api/piezas-desarme/';
+    try {
+      const r = await (EG.fetch || fetch)(url + '?q=' + encodeURIComponent(q));
+      if (!r.ok) throw new Error('HTTP ' + r.status);
+      const items = Array.isArray(data) ? data : (data.results || []);
+      if (items.length === 0){
+        results.innerHTML = '<div class="text-gray-400 py-2">{% trans "No used parts found" %}</div>';
+        return;
+      }
+      results.innerHTML = '';
+      items.forEach(function(item){
+        const div = document.createElement('div');
+        div.className = 'px-3 py-2 hover:bg-amber-900/40 cursor-pointer border-b border-amber-500/20 last:border-b-0 rounded';
+        div.dataset.id = item.id || '';
+        div.dataset.codigo = item.codigo || '';
+        div.dataset.nombre = item.nombre || '';
+        div.dataset.precio = item.precio || item.precio_venta_sugerido || 0;
+        div.dataset.cantidad = item.cantidad || 1;
+        const v = item.vehiculo_origen ? ' â€¢ ' + item.vehiculo_origen : '';
+        div.innerHTML = '<div class="text-cyan-200 font-semibold text-sm">' + (item.codigo ? item.codigo + ' â€¢ ' : '') + (item.nombre || '') + '</div><div class="text-xs text-gray-400">' + money(item.precio || 0) + ' â€¢ {% trans "Stock" %}: ' + (item.cantidad || 0) + v + '</div>';
+        div.addEventListener('click', function(){
+          selectUsedPart(item);
+        });
+        results.appendChild(div);
+      });
+    } catch (err) {
+      console.error('Used parts search:', err);
+      results.innerHTML = '<div class="text-red-400 py-2">{% trans "Server error" %}</div>';
+    }
+  }
+
+  function selectUsedPart(item){
+    const container = document.getElementById('repuestos-container');
+    if (!container || typeof window.addRepuestoRow !== 'function') return;
+    const row = window.addRepuestoRow();
+    if (row && typeof row.__applyRepData === 'function'){
+      row.__applyRepData({
+        id: '',
+        codigo: item.codigo || '',
+        nombre: item.nombre || '',
+        precio: item.precio || item.precio_venta_sugerido || 0,
+        cantidad: item.cantidad || 1,
+        descuento: 0,
+        origen_repuesto: 'DESARME',
+        pieza_desarme_id: item.id || '',
+        costo_linea: item.costo_asignado != null ? item.costo_asignado : 0
+      });
+    }
+    closeUsedPartsModal();
+  }
+
+  if (search) {
+    search.addEventListener('input', function(){
+      clearTimeout(searchTimer);
+      const q = search.value.trim();
+      searchTimer = setTimeout(function(){ searchUsedParts(q); }, 300);
+    });
+    search.addEventListener('keydown', function(e){
+      if (e.key === 'Escape') closeUsedPartsModal();
+    });
+  }
+})();
+
+function setupRepuestoRow(row){
+  const searchInput = $('.rep-search', row);
+  const drop        = row.querySelector('.rep-dropdown');
+  const idHidden    = $('.rep-id', row);
+  const inpCode     = $('.rep-codigo', row);
+  const codeDrop    = row.querySelector('.rep-codigo-dropdown');
+  const inpName     = $('.rep-nombre', row);
+  const inpPC       = $('.rep-precio-compra', row);
+  const inpPV       = $('.rep-precio-venta', row);
+  const qEl         = $('.rep-cantidad', row);
+  const sub         = $('.rep-subtotal', row);
+  const view        = $('.rep-subtotal-view', row);
+  const desarmeBadge = row.querySelector('.rep-desarme-badge');
+
+  let timer = null;
+  let codeTimer = null;
+
+  const btnCreate = row.querySelector('.rep-create-btn');
+  btnCreate?.addEventListener('click', ()=>{
+    currentRepuestoRow = row;
+    const nombre = (searchInput?.value || '').split('â€¢')[0].trim() || (inpName?.value || '').trim();
+    const codigo = (inpCode?.value || '').trim();
+    const rowId = row.dataset.rowId || '';
+    const createBase = (typeof EG !== 'undefined' && EG.cfg && EG.cfg.URL_REPUESTO_CREATE_WINDOW)
+      ? EG.cfg.URL_REPUESTO_CREATE_WINDOW
+      : '';
+    if (!createBase) {
+      console.error('URL_REPUESTO_CREATE_WINDOW no configurada (data-url-repuesto-create-page)');
+      return;
+    }
+    const next = window.location.pathname + window.location.search;
+    const createUrl = new URL(createBase, window.location.origin);
+    createUrl.searchParams.set('next', next);
+    createUrl.searchParams.set('target_row', rowId);
+    if (nombre) createUrl.searchParams.set('prefill_nombre', nombre);
+    if (codigo) createUrl.searchParams.set('prefill_code', codigo);
+    window.location.href = createUrl.toString();
+  });
+
+          async function fetchByCode(code){
+            if (!code) return;
+    try {
+              const r = await EG.fetch(`${EG.cfg.URL_REPUESTO_BY_CODE}?code=${encodeURIComponent(code)}`);
+      if (!r.ok) return;
+              const data = await r.json();
+      applyPartData({
+        id: data.id || '',
+        codigo: data.codigo || code,
+        nombre: data.nombre || '',
+        precio_venta: data.precio_venta_sugerido || data.precio_venta || '',
+        precio_compra: data.precio_compra || '',
+      });
+    } catch (err) {
+      console.error('rep fetchByCode', err);
+    }
+  }
+
+  const repOrigen = row.querySelector('.rep-origen');
+  const repPiezaDesarmeId = row.querySelector('.rep-pieza-desarme-id');
+  const repCostoLinea = row.querySelector('.rep-costo-linea');
+
+  function applyPartData(item){
+    if (!item) return;
+    if (idHidden) idHidden.value = item.id || '';
+    if (inpCode) inpCode.value = item.codigo || '';
+    if (inpName) inpName.value = item.nombre || '';
+    if (inpPV && item.precio_venta !== undefined && item.precio_venta !== null) {
+      const precio = parseNumericInput(item.precio_venta);
+      inpPV.value = precio > 0 ? formatNumberInput(precio) : '';
+    }
+    if (inpPC && item.precio_compra !== undefined && item.precio_compra !== null) {
+      const precio = parseNumericInput(item.precio_compra);
+      inpPC.value = precio > 0 ? formatNumberInput(precio) : '';
+    }
+    if (searchInput) {
+      searchInput.value = item.nombre || '';
+    }
+    if (repOrigen) repOrigen.value = 'STOCK_BODEGA';
+    if (repPiezaDesarmeId) repPiezaDesarmeId.value = '';
+    if (repCostoLinea) repCostoLinea.value = '';
+    if (desarmeBadge) desarmeBadge.classList.add('hidden');
+    recalc();
+  }
+  
+  row.__applyRepData = function(data) {
+    if (!data) return;
+    const pv = data.precio_venta !== undefined && data.precio_venta !== null
+      ? data.precio_venta
+      : (data.precio || 0);
+    applyPartData({
+      id: data.id || '',
+      codigo: data.codigo || '',
+      nombre: data.nombre || '',
+      precio_venta: pv,
+      precio_compra: data.precio_compra,
+    });
+    if (qEl && data.cantidad) {
+      qEl.value = data.cantidad;
+      qEl.dispatchEvent(new Event('input'));
+    }
+    if (row.querySelector('.rep-descuento') && data.descuento !== undefined) {
+      const descInput = row.querySelector('.rep-descuento');
+      descInput.value = data.descuento;
+      descInput.dispatchEvent(new Event('input'));
+    }
+    if (repOrigen && data.origen_repuesto) repOrigen.value = data.origen_repuesto;
+    if (repPiezaDesarmeId && data.pieza_desarme_id !== undefined) repPiezaDesarmeId.value = String(data.pieza_desarme_id || '');
+    if (repCostoLinea && data.costo_linea !== undefined) repCostoLinea.value = String(data.costo_linea ?? '');
+    if (desarmeBadge) {
+      const isDesarme =
+        (data.origen_repuesto && data.origen_repuesto === 'DESARME') ||
+        (data.pieza_desarme_id !== undefined && data.pieza_desarme_id !== null && String(data.pieza_desarme_id) !== '');
+      desarmeBadge.classList.toggle('hidden', !isDesarme);
+    }
+    recalc();
+  };
+
+  async function searchRepuestos(q){
+    if (!drop) return;
+    if (!q || q.length < 2){
+      drop.classList.add('hidden');
+      return;
+    }
+
+    const localMatches = filterPrefetchItems(PREFETCH.repuestos, ['codigo', 'nombre'], q, 15);
+    if (localMatches.length){
+      renderResultadosRepuestos(localMatches);
+    }
+
+    try {
+      const url = EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/';
+      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
+      if (items.length) renderResultadosRepuestos(items);
+    }catch(err){
+      console.error('âŒ buscarRepuestos', err);
+      if (!localMatches.length) {
+        drop.innerHTML = `<div class=\"p-3 text-red-300\">${I18N.server_error}</div>`;
+        drop.classList.remove('hidden');
+      }
+    }
+  }
+
+  function renderResultadosRepuestos(lista){
+    if (!drop) return;
+    drop.innerHTML = '';
+    if (!lista.length){
+      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_parts}</div>`;
+      drop.classList.remove('hidden');
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    lista.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      div.setAttribute('role', 'option');
+      const codigo = item.codigo || item.code || '';
+      const nombre = item.nombre || item.text || '';
+      const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
+      const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
+      div.dataset.id = item.id || '';
+      div.dataset.codigo = codigo;
+      div.dataset.nombre = nombre;
+      div.dataset.precio = precioVenta;
+      div.dataset.cost = precioCompra;
+      div.innerHTML = `
+        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo ? `${codigo} â€¢ ${nombre}` : nombre}</div>
+        <div class="text-xs text-gray-300">${money(precioVenta)}</div>`;
+      frag.appendChild(div);
+    });
+    drop.appendChild(frag);
+    drop.setAttribute('role', 'listbox');
+    drop.classList.remove('hidden');
+  }
+
+  function seleccionarRepuesto(el){
+    if (!el) return;
+    applyPartData({
+      id: el.dataset.id,
+      codigo: el.dataset.codigo,
+      nombre: el.dataset.nombre,
+      precio_venta: parseNumericInput(el.dataset.precio),
+      precio_compra: parseNumericInput(el.dataset.cost),
+    });
+    drop?.classList.add('hidden');
+          }
+
+          function recalc(){
+            const q = Number(qEl?.value || 0);
+    const p = parseNumericInput(inpPV?.value || 0);
+    const d = Number(($('.rep-descuento', row)?.value || 0)) || 0;
+            const subtotal = q * p * (1 - (d/100));
+            if (sub)  sub.value = subtotal;
+            if (view) view.textContent = money(subtotal);
+            recalcTotales();
+          }
+
+  searchInput?.addEventListener('input', (e)=>{
+    clearTimeout(timer);
+    const value = e.target.value.trim();
+    timer = setTimeout(()=> searchRepuestos(value), 250);
+  });
+
+  searchInput?.addEventListener('focus', ()=>{
+    if (searchInput.value.trim().length >= 2) {
+      searchRepuestos(searchInput.value.trim());
+    }
+  });
+
+  // BÃºsqueda en tiempo real por cÃ³digo
+  async function searchByCode(q){
+    if (!codeDrop) return;
+    if (!q || q.length < 2){
+      codeDrop.classList.add('hidden');
+      return;
+    }
+
+    const localMatches = filterPrefetchItems(PREFETCH.repuestos, ['codigo'], q, 15);
+    if (localMatches.length){
+      renderResultadosCodigo(localMatches);
+    }
+
+    try {
+      const url = EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/';
+      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
+      // Filtrar por cÃ³digo que empiece con la bÃºsqueda
+      const filteredItems = items.filter(item => {
+        const codigo = (item.codigo || item.code || '').toLowerCase();
+        return codigo.startsWith(q.toLowerCase());
+      });
+      if (filteredItems.length) renderResultadosCodigo(filteredItems);
+    }catch(err){
+      console.error('âŒ buscarPorCodigo', err);
+      if (!localMatches || !localMatches.length) {
+        codeDrop.innerHTML = `<div class="p-3 text-red-300">${I18N.server_error}</div>`;
+        codeDrop.classList.remove('hidden');
+      }
+    }
+  }
+
+  function renderResultadosCodigo(lista){
+    if (!codeDrop) return;
+    codeDrop.innerHTML = '';
+    if (!lista.length){
+      codeDrop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_parts}</div>`;
+      codeDrop.classList.remove('hidden');
+      return;
+    }
+    const frag = document.createDocumentFragment();
+    lista.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      div.setAttribute('role', 'option');
+      const codigo = item.codigo || item.code || '';
+      const nombre = item.nombre || item.text || '';
+      const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
+      const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
+      div.dataset.id = item.id || '';
+      div.dataset.codigo = codigo;
+      div.dataset.nombre = nombre;
+      div.dataset.precio = precioVenta;
+      div.dataset.cost = precioCompra;
+      div.innerHTML = `
+        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo}${nombre ? ` â€¢ ${nombre}` : ''}</div>
+        ${precioVenta > 0 ? `<div class="text-xs text-gray-300">${money(precioVenta)}</div>` : ''}`;
+      frag.appendChild(div);
+    });
+    codeDrop.appendChild(frag);
+    codeDrop.setAttribute('role', 'listbox');
+    codeDrop.classList.remove('hidden');
+  }
+
+  function seleccionarPorCodigo(el){
+    if (!el) return;
+    applyPartData({
+      id: el.dataset.id,
+      codigo: el.dataset.codigo,
+      nombre: el.dataset.nombre,
+      precio_venta: parseNumericInput(el.dataset.precio),
+      precio_compra: parseNumericInput(el.dataset.cost),
+    });
+    codeDrop?.classList.add('hidden');
+  }
+
+  inpCode?.addEventListener('input', (e)=>{
+    clearTimeout(codeTimer);
+    const value = e.target.value.trim();
+    // Debounce mejorado: 400ms para reducir peticiones al servidor
+    codeTimer = setTimeout(()=> {
+      searchByCode(value);
+      // Consultar precios del marketplace si existe la funcionalidad
+      if (window.MarketplaceTooltip && value.length >= 3) {
+        // inpCode puede ser un objeto jQuery o un elemento DOM
+        const inputElement = (inpCode && inpCode.length && inpCode[0]) ? inpCode[0] : 
+                           (typeof inpCode === 'object' && inpCode.nodeType) ? inpCode : null;
+        if (inputElement) {
+          window.MarketplaceTooltip.consultarPrecios(value, inputElement);
+        }
+      }
+    }, 400); // Aumentado de 250ms a 400ms para mejor rendimiento
+  });
+
+  inpCode?.addEventListener('focus', ()=>{
+    if (inpCode.value.trim().length >= 2) {
+      searchByCode(inpCode.value.trim());
+    }
+  });
+
+  inpCode?.addEventListener('change', ()=> {
+    if (inpCode.value.trim().length >= 2) {
+      fetchByCode(inpCode.value.trim());
+    }
+  });
+
+  codeDrop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+    if (!item) return;
+    seleccionarPorCodigo(item);
+  });
+
+  codeDrop?.addEventListener('keydown', (e)=>{
+    const item = e.target.closest('[role="option"]');
+    if (!item) return;
+    if (e.key === 'Enter') {
+      seleccionarPorCodigo(item);
+    }
+  });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) {
+      codeDrop?.classList.add('hidden');
+    }
+  });
+
+  qEl?.addEventListener('input', recalc);
+  inpPV?.addEventListener('input', recalc);
+  $('.rep-descuento', row)?.addEventListener('input', recalc);
+
+  drop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+    if (!item) return;
+    seleccionarRepuesto(item);
+  });
+
+  drop?.addEventListener('keydown', (e)=>{
+    const item = e.target.closest('[role="option"]');
+    if (!item) return;
+    if (e.key === 'Enter') {
+      seleccionarRepuesto(item);
+    }
+  });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) {
+      drop?.classList.add('hidden');
+    }
+  });
+
+  // BotÃ³n para mostrar/ocultar precio de compra
+  const toggleCostBtn = row.querySelector('.toggle-cost-price-btn');
+  toggleCostBtn?.addEventListener('click', (e)=>{
+    e.preventDefault();
+    e.stopPropagation();
+    const costContainer = row.querySelector('.cost-price-container');
+    if (costContainer) {
+      costContainer.classList.toggle('hidden');
+      // Cambiar el icono segÃºn si estÃ¡ visible o no
+      if (costContainer.classList.contains('hidden')) {
+        toggleCostBtn.textContent = 'ðŸ‘ï¸';
+      } else {
+        toggleCostBtn.textContent = 'ðŸ™ˆ';
+      }
+    }
+  });
+
+  row.__applyPartData = applyPartData;
+}
+
+window.addServicioRow = function addServicioRow(){
+  const container = document.getElementById('servicios-container');
+  if (!container) {
+    console.error('âŒ Contenedor de servicios no encontrado');
+    return;
+  }
+  const row = document.createElement('div');
+  row.className = 'dynamic-element';
+  row.innerHTML = `
+    <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20">
+      <div class="col-span-7 sm:col-span-7 description-field srv-input-container relative min-w-0">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
+        <div class="flex gap-1">
+          <input type="text" class="srv-input form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_services}" autocomplete="off">
+          <button type="button" class="srv-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_service}">ï¼‹</button>
+        </div>
+        <div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto top-full mt-1"></div>
+        <input type="hidden" class="srv-id">
+      </div>
+      <div class="col-span-2 sm:col-span-2 min-w-0">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="serv-precio form-control w-full h-10 text-sm pl-6" placeholder="0">
+        </div>
+      </div>
+      <div class="col-span-2 sm:col-span-2 min-w-0">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
+        <input type="hidden" class="serv-subtotal" value="0">
+        <div class="serv-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
+      </div>
+      <div class="col-span-1 sm:col-span-1">
+        <button type="button" class="btn-add w-full h-10" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('servicios-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#servicios-container .dynamic-element'));">âœ•</button>
+      </div>
+    </div>`;
+  container.appendChild(row);
+  container.querySelector('#servicios-empty-hint')?.classList.add('hidden');
+  setupServicioRow(row);
+  return row;
+}
+
+function setupServicioRow(row){
+  const input  = row.querySelector('.srv-input');
+  const drop   = row.querySelector('.srv-dropdown');
+  const idHid  = row.querySelector('.srv-id');
+  const pEl    = row.querySelector('.serv-precio');
+  const sub    = row.querySelector('.serv-subtotal');
+  const view   = row.querySelector('.serv-subtotal-view');
+
+  let timer = null;
+
+          async function searchServicios(q){
+            if (!drop) return;
+            if (!q || q.length < 2){
+              drop.classList.add('hidden');
+              return;
+            }
+            
+            // Primero buscar en el prefetch local (mÃ¡s rÃ¡pido)
+            let localMatches = filterPrefetchItems(PREFETCH.servicios, ['nombre', 'categoria', 'subcategoria'], q, 15);
+            if (localMatches.length){
+              renderResultados(localMatches);
+            }
+            
+            try{
+              const url = `${EG.cfg.URL_SERVICE_SEARCH}?q=${encodeURIComponent(q)}`;
+              const r = await EG.fetch(url);
+              if (!r.ok) throw new Error(`HTTP ${r.status}`);
+              const data = await r.json();
+              const items = Array.isArray(data)
+                ? data
+                : (data.servicios || data.results || []);
+              // Normalizar items usando funciÃ³n centralizada
+              const normalizedItems = items.map(normalizeServicio);
+              if (normalizedItems.length) renderResultados(normalizedItems);
+            }catch(err){
+              console.error('servicios buscar:', err);
+              if (!localMatches || !localMatches.length) {
+                if (drop) {
+                  drop.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
+                  drop.classList.remove('hidden');
+                }
+              }
+            }
+          }
+
+  function renderResultados(lista){
+    if (!drop) return;
+    if (!lista || !lista.length){
+      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_services}</div>`;
+      drop.classList.remove('hidden');
+      return;
+    }
+    drop.innerHTML = lista.map(s => {
+      // Normalizar servicio usando funciÃ³n centralizada
+      const servicio = normalizeServicio(s);
+      const servicioId = servicio.id || servicio.pk || '';
+      const precioBase = Number(servicio.precio_cliente ?? servicio.precio_sugerido ?? servicio.precio ?? 0);
+      return `
+      <div class="srv-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0"
+           role="option" tabindex="0" data-id="${servicioId}" data-precio="${precioBase}" data-text="${servicio.nombre || ''}">
+        <div class="font-semibold text-cyan-200">${servicio.nombre || ''}</div>
+        ${servicio.categoria ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'CategorÃ­a' : 'Category'}: ${servicio.categoria}</div>` : ``}
+        ${precioBase ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Tarifa base' : 'Base'}: ${money(precioBase)}</div>` : ``}
+      </div>
+    `}).join('');
+    drop.setAttribute('role', 'listbox');
+    drop.classList.remove('hidden');
+  }
+
+  function seleccionarServicio(el){
+    const sid   = el.dataset.id;
+    const stext = el.dataset.text || '';
+    const sprice= Number(el.dataset.precio || 0);
+    idHid.value = sid || '';
+    input.value = stext;
+    drop.classList.add('hidden');
+
+    // Si no hay precio ingresado, sugerir el base
+    if ((pEl.value || '').trim() === '' && sprice > 0){
+      pEl.value = formatNumberInput(sprice);
+    }
+    recalc();
+  }
+
+  function recalc(){
+    // SIN cantidad: subtotal == precio
+    const p = Number((pEl?.value || '0').toString().replace(/[^0-9.-]/g,'')) || 0;
+    sub.value = p;
+    view.textContent = money(p);
+    window.recalcTotales();
+  }
+
+  input?.addEventListener('input', (e)=>{
+    clearTimeout(timer);
+    timer = setTimeout(()=> searchServicios(e.target.value.trim()), 250);
+  });
+
+  input?.addEventListener('focus', ()=>{
+    if (input.value.trim().length >= 2) searchServicios(input.value.trim());
+  });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) drop.classList.add('hidden');
+  });
+
+  drop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+    if (!item) return;
+    seleccionarServicio(item);
+  });
+
+  drop?.addEventListener('keydown', (e)=>{
+    const item = e.target.closest('[role="option"]');
+    if (!item) return;
+    if (e.key === 'Enter') {
+      seleccionarServicio(item);
+    }
+  });
+
+  pEl?.addEventListener('input', recalc);
+
+  const btnCreateSrv = row.querySelector('.srv-create-btn');
+  btnCreateSrv?.addEventListener('click', ()=>{
+    const url = (EG.cfg && EG.cfg.URL_SERVICE_CREATE) || '';
+    if (url) window.open(url, '_blank', 'noopener,noreferrer');
+  });
+
+  row.__applyServicioData = function(item){
+    if (!item) return;
+    if (idHid) idHid.value = item.id || '';
+    if (input) input.value = item.nombre || item.text || '';
+    if (pEl && item.precio_cliente !== undefined && item.precio_cliente !== null) {
+      const precio = parseNumericInput(item.precio_cliente);
+      pEl.value = precio > 0 ? formatNumberInput(precio) : '';
+    } else if (pEl && item.precio !== undefined && item.precio !== null) {
+      const precio = parseNumericInput(item.precio);
+      pEl.value = precio > 0 ? formatNumberInput(precio) : '';
+    }
+    recalc();
+  };
+  
+  // Alias para compatibilidad con el cÃ³digo de carga
+  row.__applyServData = row.__applyServicioData;
+}
+
+window.addOtroRow = function addOtroRow(){
+  const container = document.getElementById('otros-container');
+  if (!container) {
+    console.error('âŒ Contenedor de otros servicios no encontrado');
+    return;
+  }
+  const row = document.createElement('div');
+  row.className = 'dynamic-element';
+  row.innerHTML = `
+    <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20">
+      <div class="col-span-3 sm:col-span-3 description-field otr-search-container relative min-w-0">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
+        <input type="text" class="otr-search form-control w-full h-10 text-sm" placeholder="${I18N.type_to_search_external}" autocomplete="off">
+        <div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
+        <input type="hidden" class="otr-servicio-id">
+      </div>
+      <div class="col-span-3 sm:col-span-3 min-w-0">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.external_company}</label>
+        <input type="text" class="otr-empresa form-control w-full h-10 text-sm">
+      </div>
+      <div class="col-span-2 sm:col-span-2 min-w-0">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.shop_price}</label>
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="otr-precio-taller form-control w-full h-10 text-sm pl-6" placeholder="0">
+        </div>
+      </div>
+      <div class="col-span-2 sm:col-span-2 min-w-0">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
+        <div class="relative">
+          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
+          <input type="text" class="otr-precio form-control w-full h-10 text-sm pl-6" placeholder="0">
+        </div>
+      </div>
+      <div class="col-span-1 sm:col-span-1 min-w-0">
+        <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
+        <input type="hidden" class="otr-subtotal" value="0">
+        <div class="otr-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
+      </div>
+      <div class="col-span-1 sm:col-span-1">
+        <button type="button" class="btn-add w-full h-10" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('otros-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#otros-container .dynamic-element'));">âœ•</button>
+      </div>
+    </div>`;
+  container.appendChild(row);
+  container.querySelector('#otros-empty-hint')?.classList.add('hidden');
+  setupOtroRow(row);
+  return row;
+}
+
+function setupOtroRow(row){
+  const searchInput = $('.otr-search', row);
+  const drop        = row.querySelector('.otr-dropdown');
+  const idHidden    = $('.otr-servicio-id', row);
+  const empresaEl   = $('.otr-empresa', row);
+  const precioTallerEl = $('.otr-precio-taller', row);
+  const precioEl    = $('.otr-precio', row);
+  const sub         = $('.otr-subtotal', row);
+  const view        = $('.otr-subtotal-view', row);
+
+  let timer = null;
+
+  function recalc(){
+    const subtotal = parseNumericInput(precioEl?.value || 0);
+    if (sub)  sub.value = subtotal;
+    if (view) view.textContent = money(subtotal);
+    recalcTotales();
+  }
+
+  function aplicarDatos(item){
+  if (!item) return;
+    if (idHidden) idHidden.value = item.id || '';
+    if (searchInput) searchInput.value = item.nombre || '';
+    if (empresaEl && (item.empresa || item.empresa_ext)) {
+      empresaEl.value = item.empresa || item.empresa_ext;
+    }
+    if (precioTallerEl && item.precio_taller !== undefined && item.precio_taller !== null) {
+      const precio = parseNumericInput(item.precio_taller);
+      precioTallerEl.value = precio > 0 ? formatNumberInput(precio) : '';
+    }
+    if (precioEl && item.precio_cliente !== undefined && item.precio_cliente !== null) {
+      const precio = parseNumericInput(item.precio_cliente);
+      precioEl.value = precio > 0 ? formatNumberInput(precio) : '';
+    }
+    recalc();
+  }
+
+  async function searchOtrosServicios(q){
+    if (!drop) return;
+    if (!q || q.length < 2){
+      drop.classList.add('hidden');
+    return;
+  }
+  
+    const localMatches = filterPrefetchItems(PREFETCH.otros, ['nombre', 'empresa', 'empresa_ext'], q, 15);
+    if (localMatches.length){
+      renderResultadosOtros(localMatches);
+    }
+
+    try {
+      const url = EG.cfg.URL_OUTSOURCED_SERVICES || '/cl/api/otros-servicios/';
+      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      const data = await r.json();
+      const items = await (Array.isArray(data) ? data : (data.otros_servicios || data.results || []));
+      if (items.length) renderResultadosOtros(items);
+    } catch (err) {
+      console.error('âŒ buscarOtrosServicios', err);
+      if (!localMatches.length) {
+        drop.innerHTML = `<div class=\"p-3 text-red-300\">${I18N.server_error}</div>`;
+        drop.classList.remove('hidden');
+      }
+    }
+  }
+
+  function renderResultadosOtros(lista){
+    drop.innerHTML = '';
+    if (!lista.length){
+      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_external_services}</div>`;
+      drop.classList.remove('hidden');
+    return;
+  }
+    const frag = document.createDocumentFragment();
+    lista.forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
+      div.setAttribute('role', 'option');
+      div.dataset.id = item.pk || item.id || '';
+      div.dataset.nombre = item.nombre || item.text || '';
+      div.dataset.empresa = item.empresa_externa || item.empresa || '';
+      const precioCliente = Number(item.precio_cliente ?? item.precio ?? 0);
+      const precioTaller = Number(item.costo_taller ?? item.precio_taller ?? 0);
+      div.dataset.precioCliente = precioCliente;
+      div.dataset.precioTaller = precioTaller;
+      div.innerHTML = `
+        <div class="text-cyan-200 font-semibold text-sm truncate">${div.dataset.nombre}</div>
+        <div class="text-xs text-gray-300">${div.dataset.empresa || ''}</div>
+        <div class="text-xs text-gray-500">${money(precioCliente)}</div>`;
+      frag.appendChild(div);
+    });
+    drop.appendChild(frag);
+    drop.setAttribute('role', 'listbox');
+    drop.classList.remove('hidden');
+  }
+
+  function seleccionarOtro(servicio){
+    if (!servicio) return;
+    aplicarDatos({
+      id: servicio.dataset.id,
+      nombre: servicio.dataset.nombre,
+      empresa: servicio.dataset.empresa,
+      empresa_ext: servicio.dataset.empresa,
+      precio_cliente: parseNumericInput(servicio.dataset.precioCliente),
+      precio_taller: parseNumericInput(servicio.dataset.precioTaller),
+    });
+    drop.classList.add('hidden');
+  }
+
+  searchInput?.addEventListener('input', (e)=>{
+    clearTimeout(timer);
+    const value = e.target.value.trim();
+    timer = setTimeout(()=> searchOtrosServicios(value), 250);
+  });
+
+  searchInput?.addEventListener('focus', ()=>{
+    if (searchInput.value.trim().length >= 2) {
+      searchOtrosServicios(searchInput.value.trim());
+    }
+  });
+
+  drop?.addEventListener('click', (e)=>{
+    const item = e.target.closest('.srv-item');
+  if (!item) return;
+    seleccionarOtro(item);
+  });
+
+  drop?.addEventListener('keydown', (e)=>{
+  const item = e.target.closest('[role="option"]');
+  if (!item) return;
+    if (e.key === 'Enter') seleccionarOtro(item);
+  });
+
+  document.addEventListener('click', (e)=>{
+    if (!row.contains(e.target)) drop?.classList.add('hidden');
+  });
+
+  precioEl?.addEventListener('input', recalc);
+  precioTallerEl?.addEventListener('input', recalc);
+
+  // Exponer funciÃ³n para aplicar datos desde fuera con formato correcto
+  row.__applyOtroData = function(data) {
+    if (!data) return;
+    aplicarDatos({
+      id: data.id || data.servicio_id || '',
+      nombre: data.nombre || '',
+      empresa: data.empresa || data.empresa_ext || '',
+      empresa_ext: data.empresa_ext || data.empresa || '',
+      precio_cliente: data.precio_cliente || data.precio || 0,
+      precio_taller: data.precio_taller || 0,
+    });
+  };
+}
+
+// ===============
+// EVENTOS
+// ===============
+if (selTipo) {
+  selTipo.addEventListener('change', () => {
+    const t = selTipo.value;
+    applyTheme(t);
+    updateDocumentNumber();
+  });
+  // Aplicar tema y UI segÃºn tipo al cargar
+  const t0 = selTipo.value || 'OT';
+  applyTheme(t0);
+}
+
+if (selMode) {
+  selMode.addEventListener('change', () => {
+    applyModeDependentUI();
+  });
+  // Aplicar modo inicial (services por defecto)
+  applyModeDependentUI();
+}
+
+        // Event listeners de bÃºsqueda de clientes se mueven a DOMContentLoaded
+// Event listeners de click en resultados se mueven a initDocumentForm
+
+// INIT
+// Serializar filas dinÃ¡micas antes de enviar
+function serializeRows(){
+  console.log('ðŸ” Serializando filas dinÃ¡micas...');
+
+  const rep = $$('#repuestos-container .dynamic-element').map(row=>({
+    id:        $('.rep-id', row)?.value?.trim() || '',
+    codigo:    $('.rep-codigo', row)?.value?.trim() || '',
+    nombre:    $('.rep-nombre', row)?.value?.trim() || '',
+    cantidad:  Number($('.rep-cantidad', row)?.value || 0),
+    precio:    parseNumericInput($('.rep-precio-venta', row)?.value || 0),
+    descuento: Number($('.rep-descuento', row)?.value || 0),
+    origen_repuesto: $('.rep-origen', row)?.value?.trim() || 'STOCK_BODEGA',
+    pieza_desarme_id: $('.rep-pieza-desarme-id', row)?.value?.trim() || '',
+    costo_linea: parseNumericInput($('.rep-costo-linea', row)?.value || 0),
+  }));
+  const serv = $$('#servicios-container .dynamic-element').map(row=>({
+    servicio_id: $('.srv-id', row)?.value || '',
+    precio:      parseNumericInput($('.serv-precio', row)?.value || 0),
+  }));
+  const otros = $$('#otros-container .dynamic-element').map(row=>({
+    servicio_id:   $('.otr-servicio-id', row)?.value || '',
+    nombre:        $('.otr-search', row)?.value?.trim() || '',
+    empresa_ext:   $('.otr-empresa', row)?.value?.trim() || '',
+    precio_taller: parseNumericInput($('.otr-precio-taller', row)?.value || 0),
+    precio:        parseNumericInput($('.otr-precio', row)?.value || 0),
+  }));
+
+  console.log('ðŸ“¦ Repuestos encontrados:', rep.length, rep);
+  console.log('ðŸ”§ Servicios encontrados:', serv.length, serv);
+  console.log('ðŸŒ Otros servicios encontrados:', otros.length, otros);
+
+  $('#id_repuestos_json').value = JSON.stringify(rep);
+  $('#id_servicios_json').value = JSON.stringify(serv);
+  $('#id_otros_json').value     = JSON.stringify(otros);
+
+  console.log('ðŸ’¾ JSON guardado');
+}
+
+// ===============
+// BORRADOR LOCAL (localStorage) â€” retorno desde crear cliente / vehÃ­culo / repuesto
+// ===============
+const DOC_DRAFT_VERSION = 1;
+const DOC_DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+let __docDraftSaveTimer = null;
+
+function getDocumentFormDraftKey() {
+  const form = document.getElementById('document-form');
+  if (!form) return null;
+  const mode = form.dataset.mode || 'create';
+  const docId = (form.dataset.documentId || '').trim() || 'new';
+  const path = (window.location.pathname || '').replace(/\/$/, '') || '/';
+  return `doc_draft_v${DOC_DRAFT_VERSION}:${path}:${mode}:${docId}`;
+}
+
+function showDraftSavedIndicator() {
+  const el = document.getElementById('draft-indicator');
+  if (!el) return;
+  el.classList.remove('hidden');
+  clearTimeout(showDraftSavedIndicator._t);
+  showDraftSavedIndicator._t = setTimeout(() => el.classList.add('hidden'), 1600);
+}
+
+function collectDocumentDraftPayload() {
+  const form = document.getElementById('document-form');
+  if (!form || window.__DOC_DRAFT_RESTORING__) return null;
+
+  getClienteElements();
+  const rep = $$('#repuestos-container .dynamic-element').map((row) => ({
+    rowId: row.dataset.rowId || '',
+    id: $('.rep-id', row)?.value?.trim() || '',
+    codigo: $('.rep-codigo', row)?.value?.trim() || '',
+    nombre: $('.rep-nombre', row)?.value?.trim() || '',
+    nombre_input: $('.rep-search', row)?.value?.trim() || '',
+    cantidad: Number($('.rep-cantidad', row)?.value || 0) || 1,
+    precio_venta: parseNumericInput($('.rep-precio-venta', row)?.value || 0),
+    precio_compra: parseNumericInput($('.rep-precio-compra', row)?.value || 0),
+    descuento: Number($('.rep-descuento', row)?.value || 0) || 0,
+    origen_repuesto: $('.rep-origen', row)?.value?.trim() || 'STOCK_BODEGA',
+    pieza_desarme_id: $('.rep-pieza-desarme-id', row)?.value?.trim() || '',
+    costo_linea: parseNumericInput($('.rep-costo-linea', row)?.value || 0),
+  }));
+  const serv = $$('#servicios-container .dynamic-element').map((row) => ({
+    servicio_id: $('.srv-id', row)?.value?.trim() || '',
+    nombre: $('.srv-input', row)?.value?.trim() || '',
+    precio: parseNumericInput($('.serv-precio', row)?.value || 0),
+  }));
+  const otros = $$('#otros-container .dynamic-element').map((row) => ({
+    servicio_id: $('.otr-servicio-id', row)?.value?.trim() || '',
+    nombre: $('.otr-search', row)?.value?.trim() || '',
+    empresa_ext: $('.otr-empresa', row)?.value?.trim() || '',
+    precio_taller: parseNumericInput($('.otr-precio-taller', row)?.value || 0),
+    precio: parseNumericInput($('.otr-precio', row)?.value || 0),
+  }));
+
+  const kmEl = form.querySelector('[name="kilometraje_ingreso"]');
+
+  const draft = {
+    v: DOC_DRAFT_VERSION,
+    savedAt: Date.now(),
+    path: (window.location.pathname || '').replace(/\/$/, '') || '/',
+    mode: form.dataset.mode || 'create',
+    documentId: (form.dataset.documentId || '').trim() || null,
+    tipo: document.getElementById('id_tipo')?.value || '',
+    fecha_emision: document.getElementById('id_fecha_emision')?.value || '',
+    doc_mode: document.getElementById('doc_mode')?.value || '',
+    payment_status: document.getElementById('id_payment_status')?.value || '',
+    observaciones: document.getElementById('id_observaciones')?.value || '',
+    kilometraje_ingreso: kmEl ? (kmEl.value || '') : '',
+    apply_all_taxes: (() => {
+      const v = document.getElementById('id_apply_vat');
+      return v ? !!v.checked : null;
+    })(),
+    tax_line_checks: (window.EG?.cfg?.taxLines || []).map((tl) => ({
+      id: String(tl.id),
+      checked: !!document.getElementById(`include_${tl.id}`)?.checked,
+    })),
+    cliente_id: document.getElementById('id_cliente')?.value || '',
+    cliente_nombre: document.getElementById('cliente-busqueda')?.value || '',
+    cliente_email: (cliEmail?.textContent || '').replace(/^ðŸ“§\s*/, '').trim().replace(/^â€”$/, ''),
+    cliente_telefono: (cliFono?.textContent || '').replace(/^ðŸ“ž\s*/, '').trim().replace(/^â€”$/, ''),
+    vehiculo_id: document.getElementById('id_vehiculo')?.value || '',
+    repuestos: rep,
+    servicios: serv,
+    otros: otros,
+  };
+  return draft;
+}
+
+function saveDocumentDraftNow() {
+  const key = getDocumentFormDraftKey();
+  if (!key) return;
+  try {
+    const payload = collectDocumentDraftPayload();
+    if (!payload) return;
+    localStorage.setItem(key, JSON.stringify(payload));
+    showDraftSavedIndicator();
+  } catch (e) {
+    console.warn('doc draft save failed', e);
+  }
+}
+
+function scheduleDocumentDraftSave() {
+  if (window.__DOC_DRAFT_RESTORING__) return;
+  clearTimeout(__docDraftSaveTimer);
+  __docDraftSaveTimer = setTimeout(saveDocumentDraftNow, 480);
+}
+
+function loadDocumentDraftParsed() {
+  const key = getDocumentFormDraftKey();
+  if (!key) return null;
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    if (!data || data.v !== DOC_DRAFT_VERSION || !data.savedAt) return null;
+    if (Date.now() - Number(data.savedAt) > DOC_DRAFT_TTL_MS) {
+      localStorage.removeItem(key);
+      return null;
+    }
+    if (data.path && data.path !== (window.location.pathname || '').replace(/\/$/, '')) return null;
+    const form = document.getElementById('document-form');
+    if (form && data.mode && data.mode !== (form.dataset.mode || 'create')) return null;
+    const did = (form?.dataset.documentId || '').trim() || null;
+    if (did && data.documentId && String(data.documentId) !== String(did)) return null;
+    if (did && !data.documentId) return null;
+    if (!did && data.documentId) return null;
+    return data;
+  } catch (e) {
+    console.warn('doc draft load failed', e);
+    return null;
+  }
+}
+
+function clearDynamicPosRows() {
+  document.querySelectorAll('#repuestos-container .dynamic-element').forEach((el) => el.remove());
+  document.querySelectorAll('#servicios-container .dynamic-element').forEach((el) => el.remove());
+  document.querySelectorAll('#otros-container .dynamic-element').forEach((el) => el.remove());
+  document.getElementById('servicios-empty-hint')?.classList.remove('hidden');
+}
+
+function clearDocumentFormDraftStorage() {
+  const key = getDocumentFormDraftKey();
+  if (key) {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      /* ignore */
+    }
+  }
+}
+
+async function restoreDocumentDraftAfterHydrate(opts) {
+  const hasServerLines = !!(opts && opts.hasServerLines);
+  const draft = loadDocumentDraftParsed();
+  if (!draft) return;
+
+  window.__DOC_DRAFT_RESTORING__ = true;
+  try {
+    const draftHasLines =
+      ((draft.repuestos && draft.repuestos.length) || 0) > 0 ||
+      ((draft.servicios && draft.servicios.length) || 0) > 0 ||
+      ((draft.otros && draft.otros.length) || 0) > 0;
+
+    if (document.getElementById('id_tipo') && draft.tipo) {
+      document.getElementById('id_tipo').value = draft.tipo;
+      document.getElementById('id_tipo').dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    if (document.getElementById('id_fecha_emision') && draft.fecha_emision) {
+      document.getElementById('id_fecha_emision').value = draft.fecha_emision;
+    }
+    if (document.getElementById('doc_mode') && draft.doc_mode) {
+      document.getElementById('doc_mode').value = draft.doc_mode;
+      document.getElementById('doc_mode').dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    const pay = document.getElementById('id_payment_status');
+    if (pay && draft.payment_status) {
+      pay.value = draft.payment_status;
+      pay.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    const applyVat = document.getElementById('id_apply_vat');
+    if (applyVat && draft.apply_all_taxes !== undefined && draft.apply_all_taxes !== null) {
+      applyVat.checked = !!draft.apply_all_taxes;
+    }
+    (draft.tax_line_checks || []).forEach((tc) => {
+      const tel = document.getElementById(`include_${tc.id}`);
+      if (tel) tel.checked = !!tc.checked;
+    });
+    const obs = document.getElementById('id_observaciones');
+    if (obs && typeof draft.observaciones === 'string') obs.value = draft.observaciones;
+    const kmEl = document.getElementById('document-form')?.querySelector('[name="kilometraje_ingreso"]');
+    if (kmEl && typeof draft.kilometraje_ingreso === 'string') kmEl.value = draft.kilometraje_ingreso;
+
+    if (draftHasLines || !hasServerLines) {
+      clearDynamicPosRows();
+      (draft.repuestos || []).forEach((rep) => {
+        if (typeof window.addRepuestoRow !== 'function') return;
+        const row = window.addRepuestoRow(rep.rowId || null);
+        if (row && row.__applyRepData) {
+          row.__applyRepData({
+            id: rep.id || '',
+            nombre: rep.nombre || rep.nombre_input || '',
+            codigo: rep.codigo || '',
+            cantidad: rep.cantidad || 1,
+            precio_venta: rep.precio_venta != null ? rep.precio_venta : 0,
+            precio_compra: rep.precio_compra != null ? rep.precio_compra : undefined,
+            descuento: rep.descuento != null ? rep.descuento : 0,
+            origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
+            pieza_desarme_id: rep.pieza_desarme_id || '',
+            costo_linea: rep.costo_linea != null ? rep.costo_linea : 0,
+          });
+        }
+      });
+      (draft.servicios || []).forEach((s) => {
+        if (typeof window.addServicioRow !== 'function') return;
+        const row = window.addServicioRow();
+        if (row && row.__applyServData) {
+          row.__applyServData({
+            id: s.servicio_id || '',
+            nombre: s.nombre || '',
+            precio: s.precio || 0,
+          });
+        }
+      });
+      (draft.otros || []).forEach((o) => {
+        if (typeof window.addOtroRow !== 'function') return;
+        const row = window.addOtroRow();
+        if (row && row.__applyOtroData) {
+          row.__applyOtroData({
+            id: o.servicio_id || '',
+            nombre: o.nombre || '',
+            empresa: o.empresa_ext || '',
+            empresa_ext: o.empresa_ext || '',
+            precio_cliente: o.precio || 0,
+            precio_taller: o.precio_taller || 0,
+          });
+        }
+      });
+    }
+
+    const qsPre = new URLSearchParams(window.location.search || '');
+    const urlClientePre =
+      qsPre.get('cliente_id') || qsPre.get('new_cliente_id') || qsPre.get('cliente');
+    const urlVehiculoPre = qsPre.get('vehiculo_id') || qsPre.get('new_vehiculo_id');
+    const tplClientePre =
+      typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__
+        ? String(window.__PRESELECT_CLIENTE_ID__)
+        : '';
+    const tplVehiculoPre =
+      typeof window.__PRESELECT_VEHICULO_ID__ !== 'undefined' && window.__PRESELECT_VEHICULO_ID__
+        ? String(window.__PRESELECT_VEHICULO_ID__)
+        : '';
+    const skipDraftCliente = !!(urlClientePre || tplClientePre);
+    const skipDraftVehiculo = !!(urlVehiculoPre || tplVehiculoPre);
+
+    if (draft.cliente_id && typeof seleccionarCliente === 'function' && !skipDraftCliente) {
+      await seleccionarCliente({
+        id: draft.cliente_id,
+        nombre: draft.cliente_nombre || ('Cliente #' + draft.cliente_id),
+        email: draft.cliente_email || '',
+        telefono: draft.cliente_telefono || '',
+      });
+      if (draft.vehiculo_id && !skipDraftVehiculo && typeof preseleccionarVehiculo === 'function') {
+        setTimeout(() => preseleccionarVehiculo(draft.vehiculo_id), 250);
+      }
+    } else if (draft.vehiculo_id && document.getElementById('id_vehiculo') && !skipDraftCliente && !skipDraftVehiculo) {
+      const vs = document.getElementById('id_vehiculo');
+      vs.value = draft.vehiculo_id;
+      vs.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  } finally {
+    window.__DOC_DRAFT_RESTORING__ = false;
+    if (typeof serializeRows === 'function') serializeRows();
+  }
+}
+window.restoreDocumentDraftAfterHydrate = restoreDocumentDraftAfterHydrate;
+
+function submitDocumentForm(){
+  const form = document.getElementById('document-form');
+  if (!form) return;
+  serializeRows();
+  form.submit();
+}
+
+  serializeRows();
+
+  function setupClienteSearchHandlers(){
+    getClienteElements();
+
+    window.handleClienteInput = function(value){
+      getClienteElements();
+      const query = (value ?? clienteBusqueda?.value ?? '').trim();
+      clearTimeout(searchTimer);
+      if (query.length < 2){
+        clienteResultados?.classList.add('hidden');
+    return;
+  }
+      searchTimer = setTimeout(()=> buscarClientes(query), 200);
+    };
+
+    window.handleClienteFocus = function(value){
+      getClienteElements();
+      const query = (value ?? clienteBusqueda?.value ?? '').trim();
+      if (query.length >= 2) buscarClientes(query);
+    };
+
+    window.handleClienteKeydown = function(event){
+      getClienteElements();
+      const query = clienteBusqueda?.value?.trim() || '';
+      if (event.key === 'ArrowDown' && query.length >= 2 && (clienteResultados?.classList.contains('hidden') ?? true)){
+        event.preventDefault();
+        buscarClientes(query);
+        return false;
+      }
+
+      if (!clienteResultados || clienteResultados.classList.contains('hidden')){
+        return true;
+      }
+
+      const items = Array.from(clienteResultados.querySelectorAll('.cliente-item'));
+      if (!items.length) return true;
+
+      const active = document.activeElement;
+      const currentIndex = items.findIndex(el => el === active);
+
+      if (event.key === 'ArrowDown'){
+        event.preventDefault();
+        const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % items.length : 0;
+        items[nextIndex].focus();
+        return false;
+      }
+
+      if (event.key === 'ArrowUp'){
+        event.preventDefault();
+        const prevIndex = currentIndex >= 0 ? (currentIndex - 1 + items.length) % items.length : items.length - 1;
+        items[prevIndex].focus();
+        return false;
+      }
+
+      if (event.key === 'Enter'){
+        event.preventDefault();
+        const target = active?.classList.contains('cliente-item') ? active : items[0];
+        if (target){
+          seleccionarCliente({
+            id: target.dataset.id,
+            nombre: target.dataset.nombre,
+            email: target.dataset.email,
+            telefono: target.dataset.telefono,
+          });
+          clienteBusqueda?.focus();
+        }
+        return false;
+      }
+
+      if (event.key === 'Escape'){
+        event.preventDefault();
+        clienteResultados.classList.add('hidden');
+        clienteBusqueda?.focus();
+        return false;
+      }
+
+      return true;
+    };
+
+    clienteResultados?.addEventListener('click', (event)=>{
+      const item = event.target.closest('.cliente-item');
+      if (!item) return;
+      seleccionarCliente({
+        id: item.dataset.id,
+        nombre: item.dataset.nombre,
+        email: item.dataset.email,
+        telefono: item.dataset.telefono,
+      });
+      clienteBusqueda?.focus();
+    });
+
+    clienteResultados?.addEventListener('keydown', (event)=>{
+      if (event.key !== 'Enter') return;
+      const item = event.target.closest('.cliente-item');
+      if (!item) return;
+      event.preventDefault();
+      seleccionarCliente({
+        id: item.dataset.id,
+        nombre: item.dataset.nombre,
+        email: item.dataset.email,
+        telefono: item.dataset.telefono,
+      });
+      clienteBusqueda?.focus();
+    });
+  }
+
+  setupClienteSearchHandlers();
+  getClienteElements();
+  if (clienteSelect && clienteSelect.value) {
+    clienteSelect.dataset.source = 'form';
+  }
+  if (vehiculoSelect && vehiculoSelect.value) {
+    vehiculoSelect.dataset.source = 'form';
+  }
+
+  // Tarjeta vehÃ­culo: mostrar resumen al seleccionar
+  function updateVehiculoCard() {
+    const sel = document.getElementById('id_vehiculo');
+    const box = document.getElementById('vehiculo-info');
+    const marcaModelo = document.getElementById('vehiculo-marca-modelo');
+    const anoVin = document.getElementById('vehiculo-ano-vin');
+    const mileage = document.getElementById('vehiculo-mileage');
+    const ultimaEntrada = document.getElementById('vehiculo-ultima-entrada');
+    if (!box || !sel) return;
+    const opt = sel.options[sel.selectedIndex];
+    const text = opt ? opt.textContent.trim() : '';
+    if (!sel.value || !text) {
+      box.classList.add('hidden');
+      return;
+    }
+    if (marcaModelo) marcaModelo.textContent = text;
+    if (anoVin) anoVin.textContent = '';
+    if (mileage) mileage.textContent = '';
+    if (ultimaEntrada) ultimaEntrada.textContent = '';
+    box.classList.remove('hidden');
+  }
+  vehiculoSelect?.addEventListener('change', updateVehiculoCard);
+  updateVehiculoCard();
+  // Cargar datos existentes si estamos editando
+  {% if es_edicion %}
+  // Inicializar campos bÃ¡sicos del formulario ANTES de aplicar tema
+  const documentoData = {
+    tipo: '{{ documento.tipo|default:form.tipo.value|default:"" }}',
+    clienteId: '{{ cliente_info.id|default:"" }}',
+    clienteNombre: '{{ cliente_info.nombre|default:""|escapejs }}',
+    clienteEmail: '{{ cliente_info.email|default:""|escapejs }}',
+    clienteTelefono: '{{ cliente_info.telefono|default:""|escapejs }}',
+    vehiculoId: '{{ vehiculo_inicial_id|default:"" }}',
+    prefillVehiculoId: '{{ prefill_vehiculo_id|default:"" }}',
+    tecnicoId: '{{ documento.tecnico_responsable_id|default:form.tecnico_responsable.value|default:"" }}',
+    paymentStatus: '{{ documento.payment_status|default:"pending" }}',
+    numero: '{{ documento.numero_documento|default:documento.numero|default:"" }}'
+  };
+  
+  console.log('ðŸ“„ Inicializando documento para ediciÃ³n:', documentoData);
+  
+  // Establecer tipo de documento PRIMERO
+  if (documentoData.tipo) {
+    const tipoSelect = document.getElementById('id_tipo');
+    if (tipoSelect) {
+      tipoSelect.value = documentoData.tipo;
+      const t = documentoData.tipo;
+      if (typeof applyTheme === 'function') applyTheme(t);
+    }
+  } else {
+    const t = selTipo?.value || 'OT';
+    applyTheme(t);
+  }
+  
+  // Establecer nÃºmero de documento
+  if (documentoData.numero) {
+    const numView = document.getElementById('id_numero');
+    if (numView) {
+      numView.textContent = documentoData.numero;
+    }
+  } else {
+    updateDocumentNumber();
+  }
+  
+  // Inicializar cliente si existe
+  if (documentoData.clienteId && documentoData.clienteNombre) {
+    // Esperar a que la funciÃ³n estÃ© disponible
+    setTimeout(() => {
+      if (typeof seleccionarCliente === 'function') {
+        seleccionarCliente({
+          id: documentoData.clienteId,
+          nombre: documentoData.clienteNombre,
+          email: documentoData.clienteEmail,
+          telefono: documentoData.clienteTelefono
+        });
+        
+        // Cargar vehÃ­culos del cliente y seleccionar el vehÃ­culo inicial
+        // Priorizar prefillVehiculoId (vehÃ­culo reciÃ©n creado) sobre vehiculoId (ediciÃ³n)
+        const vehiculoIdToSelect = documentoData.prefillVehiculoId || documentoData.vehiculoId;
+        if (vehiculoIdToSelect) {
+          console.log(`ðŸŽ¯ VehÃ­culo a preseleccionar: ${vehiculoIdToSelect}`);
+          // La funciÃ³n cargarVehiculosPorCliente ahora acepta el ID para preseleccionar
+          // Se llamarÃ¡ automÃ¡ticamente desde seleccionarCliente con el parÃ¡metro
+        }
+      }
+    }, 100);
+  }
+  
+  // Establecer tÃ©cnico responsable
+  if (documentoData.tecnicoId) {
+    setTimeout(() => {
+      const tecnicoSelect = document.getElementById('id_tecnico_responsable');
+      if (tecnicoSelect) {
+        tecnicoSelect.value = documentoData.tecnicoId;
+      }
+    }, 100);
+  }
+  
+  // Establecer estado de pago
+  if (documentoData.paymentStatus) {
+    setTimeout(() => {
+      const paymentSelect = document.getElementById('id_payment_status');
+      if (paymentSelect) {
+        paymentSelect.value = documentoData.paymentStatus;
+      }
+    }, 100);
+  }
+
+  {% else %}
+  // Si no es ediciÃ³n, aplicar tema y actualizar nÃºmero normalmente
+  const t0 = selTipo?.value || 'OT';
+  applyTheme(t0);
+  if (typeof applyModeDependentUI === 'function') applyModeDependentUI();
+  updateDocumentNumber();
+  // PreselecciÃ³n cliente/vehÃ­culo (vuelta desde "crear vehÃ­culo" con cliente_id y vehiculo_id en URL)
+  {% if cliente_preselect_id %}
+  if (typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__ && typeof seleccionarCliente === 'function') {
+    setTimeout(() => {
+      seleccionarCliente({
+        id: window.__PRESELECT_CLIENTE_ID__,
+        nombre: "{{ cliente_preselect_nombre|default:''|escapejs }}",
+        email: "{{ cliente_preselect_email|default:''|escapejs }}",
+        telefono: "{{ cliente_preselect_telefono|default:''|escapejs }}"
+      });
+    }, 100);
+  }
+  {% endif %}
+  {% endif %}
+
+  // Hidratar lÃ­neas (ediciÃ³n y creaciÃ³n con prefill)
+  const repuestosData = {{ repuestos_json|safe|default:"[]" }};
+  const serviciosData = {{ servicios_json|safe|default:"[]" }};
+  const otrosData = {{ otros_json|safe|default:"[]" }};
+
+  console.log('ðŸ“¦ Cargando datos iniciales del formulario:', {
+    repuestos: (repuestosData || []).length,
+    servicios: (serviciosData || []).length,
+    otros: (otrosData || []).length
+  });
+
+  // Cargar lÃ­neas con delay para asegurar que las funciones estÃ©n disponibles
+  setTimeout(() => {
+    if (repuestosData && repuestosData.length > 0) {
+      repuestosData.forEach(rep => {
+        if (typeof window.addRepuestoRow === 'function') {
+          const row = window.addRepuestoRow();
+          if (row && row.__applyRepData) {
+            row.__applyRepData({
+              id: rep.repuesto_id || '',
+              codigo: rep.codigo || '',
+              nombre: rep.nombre || '',
+              cantidad: rep.cantidad || 1,
+              precio: rep.precio || 0,
+              descuento: rep.descuento || 0,
+              origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
+              pieza_desarme_id: rep.pieza_desarme_id != null ? String(rep.pieza_desarme_id) : '',
+              costo_linea: rep.costo_linea != null ? rep.costo_linea : 0,
+            });
+          }
+        }
+      });
+    }
+
+    if (serviciosData && serviciosData.length > 0) {
+      serviciosData.forEach(serv => {
+        if (typeof window.addServicioRow === 'function') {
+          const row = window.addServicioRow();
+          if (row && row.__applyServData) {
+            row.__applyServData({
+              id: serv.servicio_id || '',
+              nombre: serv.nombre || '',
+              cantidad: serv.cantidad || 1,
+              precio: serv.precio || 0,
+              descuento: serv.descuento || 0,
+            });
+          }
+        }
+      });
+    }
+
+    if (otrosData && otrosData.length > 0) {
+      otrosData.forEach(otro => {
+        if (typeof window.addOtroRow === 'function') {
+          const row = window.addOtroRow();
+          if (row && row.__applyOtroData) {
+            row.__applyOtroData({
+              id: otro.servicio_id || '',
+              nombre: otro.nombre || '',
+              empresa: otro.empresa_ext || '',
+              empresa_ext: otro.empresa_ext || '',
+              precio_cliente: otro.precio || 0,
+              precio_taller: otro.precio_taller || 0,
+            });
+          }
+        }
+      });
+    }
+
+    // Recalcular y serializar despuÃ©s de hidratar todos los datos
+    const hasServerLines =
+      ((repuestosData || []).length > 0 ||
+        (serviciosData || []).length > 0 ||
+        (otrosData || []).length > 0);
+    setTimeout(async () => {
+      if (typeof restoreDocumentDraftAfterHydrate === 'function') {
+        await restoreDocumentDraftAfterHydrate({ hasServerLines });
+      }
+      if (typeof window.restoreCreatedRepuestoFromReturn === 'function') {
+        window.restoreCreatedRepuestoFromReturn();
+      }
+      if (typeof window.recalcTotales === 'function') window.recalcTotales();
+      if (typeof window.serializeRows === 'function') window.serializeRows();
+    }, 300);
+  }, 150);
+  
+  serializeRows();
+
+  const docFormDraft = document.getElementById('document-form');
+  docFormDraft?.addEventListener('input', scheduleDocumentDraftSave);
+  docFormDraft?.addEventListener('change', scheduleDocumentDraftSave);
+  docFormDraft?.addEventListener('submit', () => {
+    clearDocumentFormDraftStorage();
+  });
+
+  clienteBusqueda?.addEventListener('input', (event)=> window.handleClienteInput(event.target.value));
+  clienteBusqueda?.addEventListener('focus', (event)=> window.handleClienteFocus(event.target.value));
+  clienteBusqueda?.addEventListener('keydown', (event)=> window.handleClienteKeydown(event));
+  clienteSelect?.addEventListener('change', function () {
+    const selectedClienteId = this.value;
+    if (!selectedClienteId) return;
+    console.log('ðŸ” Cliente cambiado en hidden select, cargando vehÃ­culos para cliente:', selectedClienteId);
+    cargarVehiculosPorCliente(selectedClienteId);
+  });
+  
+  // El botÃ³n "Nuevo Cliente" - usar URL del servidor (country_url) + ?next= para retorno
+  const btnNuevoCliente = document.getElementById('btn-nuevo-cliente');
+  if (btnNuevoCliente) {
+    btnNuevoCliente.classList.add('btn-green-gradient');
+    const baseUrl = btnNuevoCliente.getAttribute('data-url-crear-cliente') || btnNuevoCliente.getAttribute('href') || '';
+    if (baseUrl && baseUrl !== '#') {
+      const nextUrl = (typeof window.egEncodeDocumentFormNext === 'function')
+        ? window.egEncodeDocumentFormNext()
+        : encodeURIComponent(window.location.pathname + (window.location.search || ''));
+      const sep = baseUrl.indexOf('?') >= 0 ? '&' : '?';
+      btnNuevoCliente.setAttribute('href', baseUrl + sep + 'next=' + nextUrl);
+    }
+    console.log('âœ… BotÃ³n Nuevo Cliente configurado:', btnNuevoCliente.getAttribute('href'));
+  }
+  
+  console.log('ðŸ“„ Document form inicializado', EG.cfg);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initDocumentFormScript);
+} else {
+  initDocumentFormScript();
+}
+
+// === NAVEGACIÃ“N BLINDADA eGarage (CorrecciÃ³n 404) ===
+document.addEventListener('click', function(e) {
+    const btnCliente = e.target.closest('#btn-nuevo-cliente');
+    const btnVehiculo = e.target.closest('#btn-nuevo-vehiculo');
+    
+    if (btnCliente || btnVehiculo) {
+        var nextUrl = '';
+        if (typeof window.egEncodeDocumentFormNext === 'function') {
+            nextUrl = window.egEncodeDocumentFormNext();
+        } else {
+            nextUrl = encodeURIComponent(window.location.pathname + (window.location.search || ''));
+        }
+        let destUrl = "";
+
+        if (btnCliente) {
+            // Preferir href generado por el servidor (country_url) con ?next= ya aÃ±adido en init
+            const href = btnCliente.getAttribute('href');
+            if (href && href !== '#' && href !== '') {
+                e.preventDefault();
+                window.location.href = href;
+                return;
+            }
+            // Fallback manual si no hay href
+            const pathParts = window.location.pathname.split('/').filter(function(p) { return p && p.length > 0; });
+            const country = pathParts[0] || 'cl';
+            const lang = (pathParts[1] === 'es' || pathParts[1] === 'en') ? pathParts[1] : 'es';
+            destUrl = '/' + country + '/' + lang + '/clientes/crear/?next=' + nextUrl;
+        } else if (btnVehiculo) {
+            const pathParts = window.location.pathname.split('/').filter(function(p) { return p && p.length > 0; });
+            const country = pathParts[0] || 'cl';
+            const lang = (pathParts[1] === 'es' || pathParts[1] === 'en') ? pathParts[1] : 'es';
+            let clienteId = '';
+            if (window.jQuery) {
+                const $clienteSelect = jQuery('#id_cliente');
+                if ($clienteSelect.length) clienteId = $clienteSelect.val() || '';
+            }
+            destUrl = '/' + country + '/' + lang + '/vehiculos/crear/?next=' + nextUrl;
+            if (clienteId) destUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+        }
+
+        if (destUrl) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log("ðŸš€ Redirigiendo a ruta validada:", destUrl);
+            window.location.href = destUrl;
+        }
+    }
+});
+
+</script>
+
+{# ==================== CARGA DE DOCUMENT ENGINE ==================== #}
+{# "Capa de Inteligencia" - UX MÃ³vil y Blindaje de Campos Calculados #}
+<script src="{% static 'js/document_engine.js' %}"></script>
+{% endblock extra_js %}
+
+
+
+
+
+

@@ -1,0 +1,13 @@
+[0;1;32m●[0m gunicorn.service - gunicorn daemon for egarage
+     Loaded: loaded (]8;;file://egarage-server/etc/systemd/system/gunicorn.service/etc/systemd/system/gunicorn.service]8;;; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+    Drop-In: /etc/systemd/system/gunicorn.service.d
+             └─]8;;file://egarage-server/etc/systemd/system/gunicorn.service.d/override-environment.confoverride-environment.conf]8;;, ]8;;file://egarage-server/etc/systemd/system/gunicorn.service.d/override-execstart.confoverride-execstart.conf]8;;, ]8;;file://egarage-server/etc/systemd/system/gunicorn.service.d/override.confoverride.conf]8;;
+     Active: [0;1;32mactive (running)[0m since Tue 2026-03-31 14:37:55 UTC; 63ms ago
+   Main PID: 1296020 (gunicorn)
+      Tasks: 1 (limit: 1107)
+     Memory: 1.1M (peak: 1.4M)
+        CPU: 10ms
+     CGroup: /system.slice/gunicorn.service
+             └─[0;38;5;245m1296020 /srv/egarage/venv/bin/python /srv/egarage/venv/bin/gunicorn --umask 007 --capture-output --log-level info --access-logfile - --error-logfile - --workers 3 --timeout 60 --max-requests 800 --max-requests-jitter 200 --bind unix:/run/gunicorn/gunicorn.sock gestion_taller.wsgi:application[0m
+
+Mar 31 14:37:55 egarage-server systemd[1]: Started gunicorn.service - gunicorn daemon for egarage.
