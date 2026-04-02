@@ -1024,6 +1024,8 @@ input:disabled, select:disabled, textarea:disabled {
 #repuestos-container .dynamic-element .doc-row-grid,
 #servicios-container .dynamic-element .doc-row-grid,
 #otros-container .dynamic-element .doc-row-grid {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   min-height: 40px;
   border-bottom: 1px solid rgba(71, 85, 105, 0.3);
   background: rgba(0, 0, 0, 0.08);
@@ -4248,6 +4250,9 @@ document.addEventListener('click', function(e) {
 
 {# === FIX PARA APIS - Soluciona errores de JSON === #}
 <script src="{% static 'js/api_fix.js' %}"></script>
+
+{# === FIX AGREGIVO: Forzar select nativo === #}
+<script src="{% static \'js/force_native_select.js\' %}"></script>
 
 {# === NUEVO: Módulos JavaScript modularizados (pendiente collectstatic en prod) === #}
 {# <script src="{% static 'js/document-form/index.js' %}"></script> #}
