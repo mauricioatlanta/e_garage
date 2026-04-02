@@ -1709,7 +1709,7 @@ function submitLanguageDoc(lang) {
 
 {% block extra_js %}
 {{ block.super }}
-<script src="{% static 'marketplace_tooltip.js' %}"></script>
+<script src="{% static 'js/marketplace_tooltip_fixed.js' %}"></script>
 <script>
 // Asegurar que egEncodeDocumentFormNext exista antes de initDocumentFormScript (puede no estar si el script de documento_content no se ejecutó)
 if (typeof window.egEncodeDocumentFormNext !== 'function') {
@@ -4239,6 +4239,9 @@ document.addEventListener('click', function(e) {
 {# ==================== CARGA DE DOCUMENT ENGINE ==================== #}
 {# "Capa de Inteligencia" - UX Móvil y Blindaje de Campos Calculados #}
 <script src="{% static 'js/document_engine.js' %}"></script>
+
+{# === NUESTRO SCRIPT DE FIX PARA VEHÍCULOS Y SELECT2 === #}
+<script src="{% static 'js/fix_vehiculos_select2.js' %}"></script>
 
 {# === NUEVO: Módulos JavaScript modularizados (pendiente collectstatic en prod) === #}
 {# <script src="{% static 'js/document-form/index.js' %}"></script> #}
