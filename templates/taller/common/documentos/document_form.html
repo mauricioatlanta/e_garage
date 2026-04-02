@@ -4243,6 +4243,12 @@ document.addEventListener('click', function(e) {
 {# === NUESTRO SCRIPT DE FIX PARA VEHÍCULOS Y SELECT2 === #}
 <script src="{% static 'js/fix_vehiculos_select2.js' %}"></script>
 
+{# === FIX DE EMERGENCIA - Se ejecuta inmediatamente === #}
+<script src="{% static 'js/emergency_fix_vehiculos.js' %}"></script>
+
+{# === FIX PARA APIS - Soluciona errores de JSON === #}
+<script src="{% static 'js/api_fix.js' %}"></script>
+
 {# === NUEVO: Módulos JavaScript modularizados (pendiente collectstatic en prod) === #}
 {# <script src="{% static 'js/document-form/index.js' %}"></script> #}
 
