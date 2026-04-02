@@ -1495,7 +1495,9 @@ function submitLanguageDoc(lang) {
           <div class="doc-field-with-btn flex gap-2">
             <div class="flex-1">
               <label for="id_vehiculo" class="sr-only">{% trans 'Vehicle' %}</label>
-              {{ form.vehiculo }}
+              <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
+                <option value="">{% trans 'Select vehicle...' %}</option>
+              </select>
             </div>
             <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
               <span aria-hidden="true">➕</span>
