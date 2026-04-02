@@ -423,6 +423,10 @@ urlpatterns = [
         RedirectView.as_view(url="/cl/es/ajax/clientes/buscar/", permanent=False),
     ),
     path(
+        "cl/documentos/ajax/clientes/buscar/",
+        RedirectView.as_view(url="/cl/es/ajax/clientes/buscar/", permanent=False),
+    ),
+    path(
         "cl/ajax/vehiculos-por-cliente/",
         RedirectView.as_view(url="/cl/es/ajax/vehiculos-por-cliente/", permanent=False),
     ),
