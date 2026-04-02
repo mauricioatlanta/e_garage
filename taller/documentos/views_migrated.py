@@ -838,11 +838,15 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 )
 
             vehiculos_qs = (
-                Vehiculo.objects.filter(empresa=empresa)
-                .select_related("cliente", "marca", "modelo")
-                .only("id", "cliente_id", "patente", "vin", "anio", "marca", "modelo")
+                Vehiculo.objects.filter(
+                    empresa=empresa,
+                    tipo_uso=Vehiculo.TIPO_USO_CLIENTE,
+                    cliente_id__isnull=False,
+                )
+                .select_related("marca", "modelo")
+                .order_by("-id")
             )
-            for vehiculo in vehiculos_qs[:50]:
+            for vehiculo in vehiculos_qs[:100]:
                 label = vehiculo.display_label()
                 vehiculos_prefetch.append(
                     {
