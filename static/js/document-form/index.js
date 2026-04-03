@@ -18,6 +18,7 @@
         'cliente',     // Búsqueda de clientes
         'vehiculo',    // Gestión de vehículos
         'repuestos',  // CRUD de repuestos
+        'servicios',   // CRUD de servicios y otros servicios
         'totales',     // Cálculo de totales
         'borrador',    // Auto-guardado
         'ui'           // Temas y modos
@@ -81,6 +82,12 @@
         if (window.EG.vehiculo && window.EG.vehiculo.init) {
             window.EG.vehiculo.init();
         }
+        if (window.EG.repuestos && window.EG.repuestos.init) {
+            window.EG.repuestos.init();
+        }
+        if (window.EG.servicios && window.EG.servicios.init) {
+            window.EG.servicios.init();
+        }
         if (window.EG.totales && window.EG.totales.init) {
             window.EG.totales.init();
         }
@@ -109,7 +116,8 @@
     function setupAddButtons() {
         // Agregar repuesto
         var btnAddRepuesto = document.getElementById('add-repuesto');
-        if (btnAddRepuesto) {
+        if (btnAddRepuesto && !btnAddRepuesto.dataset.egBound) {
+            btnAddRepuesto.dataset.egBound = '1';
             btnAddRepuesto.addEventListener('click', function() {
                 if (window.EG.repuestos && window.EG.repuestos.addRepuestoRow) {
                     window.EG.repuestos.addRepuestoRow();
@@ -117,33 +125,36 @@
             });
         }
 
-                // Agregar servicio propio (usando implementación mínima en template)
-                var btnAddServicio = document.getElementById('add-servicio');
-                if (btnAddServicio) {
-                    btnAddServicio.addEventListener('click', function() {
-                        if (typeof window.addServicioRow === 'function') {
-                            window.addServicioRow();
-                        } else {
-                            console.warn('Función addServicioRow no disponible');
-                        }
-                    });
-                }
-
-                // Agregar otro servicio (usando implementación mínima en template)
-        var btnAddOtro = document.getElementById('add-otro');
-        if (btnAddOtro) {
-            btnAddOtro.addEventListener('click', function() {
-                if (typeof window.addOtroRow === 'function') {
-                    window.addOtroRow();
+        // Agregar servicio propio
+        var btnAddServicio = document.getElementById('add-servicio');
+        if (btnAddServicio && !btnAddServicio.dataset.egBound) {
+            btnAddServicio.dataset.egBound = '1';
+            btnAddServicio.addEventListener('click', function() {
+                if (window.EG.servicios && window.EG.servicios.addServicioRow) {
+                    window.EG.servicios.addServicioRow();
                 } else {
-                    console.warn('Función addOtroRow no disponible');
+                    console.warn('Modulo servicios no disponible');
+                }
+            });
+        }
+
+        // Agregar otro servicio
+        var btnAddOtro = document.getElementById('add-otro');
+        if (btnAddOtro && !btnAddOtro.dataset.egBound) {
+            btnAddOtro.dataset.egBound = '1';
+            btnAddOtro.addEventListener('click', function() {
+                if (window.EG.servicios && window.EG.servicios.addOtroRow) {
+                    window.EG.servicios.addOtroRow();
+                } else {
+                    console.warn('Modulo servicios no disponible para otros servicios');
                 }
             });
         }
 
         // Piezas usadas
         var btnAddUsed = document.getElementById('add-used-parts');
-        if (btnAddUsed) {
+        if (btnAddUsed && !btnAddUsed.dataset.egBound) {
+            btnAddUsed.dataset.egBound = '1';
             btnAddUsed.addEventListener('click', function() {
                 if (window.EG.repuestos && window.EG.repuestos.openUsedPartsModal) {
                     window.EG.repuestos.openUsedPartsModal();

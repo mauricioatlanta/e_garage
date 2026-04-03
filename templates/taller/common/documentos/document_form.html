@@ -4,6 +4,7 @@
 {% load static %}
 {% load country_url %}
 
+{% block extra_css %}
 <style>
 /* ==================== DOCUMENT FORM â€” PRO UI: proporciones, jerarquÃ­a, layout ==================== */
 /* Regla global dentro del workspace: inputs compactos, bordes sutiles, sin glow por defecto */
@@ -1031,9 +1032,14 @@ input:disabled, select:disabled, textarea:disabled {
 #repuestos-container .dynamic-element label,
 #servicios-container .dynamic-element label,
 #otros-container .dynamic-element label { display: none !important; }
+#repuestos-container .dynamic-element {
+  overflow-x: auto;
+}
+#repuestos-container .dynamic-element .doc-row-grid {
+  min-width: 880px;
+}
 @media (max-width: 768px) {
   .doc-pos-header { display: none !important; }
-  #repuestos-container .dynamic-element .doc-row-grid,
   #servicios-container .dynamic-element .doc-row-grid,
   #otros-container .dynamic-element .doc-row-grid {
     grid-template-columns: 1fr !important;
@@ -1044,8 +1050,11 @@ input:disabled, select:disabled, textarea:disabled {
   #otros-container .dynamic-element label { display: block !important; }
 }
 </style>
+{% endblock extra_css %}
 
-{% block documento_title %}
+{% block documento_title %}{{ ui_labels.new_document }}{% endblock documento_title %}
+
+{% block content %}
 {% load i18n %}
 {# âœ… Manejo robusto de company_country con mÃºltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
@@ -1088,8 +1097,366 @@ input:disabled, select:disabled, textarea:disabled {
     </div>
   </div>
 </div>
+        <form method="post" id="document-form" class="doc-form-compact mx-auto"
+              data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
+              data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
+              data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
+              data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
+              data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
+              data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' app_namespace='' %}"
+              data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
+              data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
+              data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
+              data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
+              data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
+              data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
+              data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}"
+              data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
+          {% csrf_token %}
+
+  <!-- System messages - Design System (no mostrar mensajes de otras secciones: login, clientes eliminados, etc.) -->
+  {% if messages %}
+    {% for message in messages %}
+      {% with msg_text=message|stringformat:"s" %}
+      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesiÃ³n exitosamente" not in msg_text and "Ha cerrado sesiÃ³n" not in msg_text and "iniciado sesiÃ³n exitosamente" not in msg_text and "cerrado sesiÃ³n" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
+        {% if message.tags == 'success' %}
+        <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">âœ…</span>
+          <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
+        </div>
+        {% elif message.tags == 'error' %}
+        <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">âŒ</span>
+          <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
+        </div>
+        {% else %}
+        <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
+          <span class="text-2xl flex-shrink-0">â„¹ï¸</span>
+          <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
+        </div>
+        {% endif %}
+      {% endif %}
+      {% endwith %}
+    {% endfor %}
+  {% endif %}
+
+  <!-- Validation errors - compacto y legible -->
+  {% if form.errors %}
+    <div class="doc-form-validation-errors">
+      <p class="doc-form-validation-title">{% trans "Validation errors" %}</p>
+      <ul class="doc-form-validation-list">
+        {% for field, errors in form.errors.items %}
+          {% for msg in errors %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <!-- Document workspace â€” cabecera consola | tarjetas cliente/vehÃ­culo | repuestos/servicios POS | observaciones | totales cockpit -->
+  <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
+
+    <!-- 1. CABECERA COMPACTA â€” fila 1: INV | Fecha | MecÃ¡nico | Pago | fila 2: Tipo | OperaciÃ³n -->
+    <div class="doc-console-header">
+      <div class="doc-console-title flex flex-wrap items-center gap-2">
+        <span>{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</span>
+        <span id="draft-indicator" class="hidden text-[10px] sm:text-xs font-medium text-emerald-300/95 bg-emerald-950/60 border border-emerald-500/35 rounded px-2 py-0.5" role="status" aria-live="polite">{% trans "Auto-saved" %}</span>
+      </div>
+
+      <div class="doc-invoice-grid">
+        <div class="doc-invoice-panel">
+          <div class="doc-console-field doc-console-field--invoice">
+            <span class="doc-console-meta">{% trans "Document No." %}</span>
+            <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
+              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}â€”{% endif %}
+            </span>
+          </div>
+
+          <div class="doc-console-field">
+            <label for="id_fecha_emision" class="doc-console-meta">{% trans "Date" %}</label>
+            <input id="id_fecha_emision" type="date" name="fecha_emision" class="bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
+                   value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
+          </div>
+
+          <div class="doc-console-field">
+            <label for="id_tipo" class="doc-console-meta">{% trans "Document Type" %}</label>
+            {{ form.tipo }}
+          </div>
+        </div>
+
+        <div class="doc-invoice-panel">
+          {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+          <div class="doc-console-field">
+            <label id="tecnico-label" for="id_tecnico_responsable" class="doc-console-meta" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
+            <div class="doc-console-control">{{ form.tecnico_responsable }}</div>
+          </div>
+          {% endwith %}
+
+          <div class="doc-console-field">
+            <label for="id_payment_status" class="doc-console-meta">{% trans "Payment Status" %}</label>
+            <div id="payment-status-badge" class="doc-console-control doc-console-payment doc-console-payment-pending">{{ form.payment_status }}</div>
+          </div>
+
+          <div class="doc-console-field">
+            <label for="doc_mode" class="doc-console-meta">{% trans "Operation" %}</label>
+            <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300">
+              <option value="services">{% trans "Services" %}</option>
+              <option value="parts">{% trans "Part sale only" %}</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CLIENT | VEHICLE (layout horizontal en md+) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="doc-smart-card doc-ficha-client-vehicle">
+        <h3>{% trans "CLIENT" %}</h3>
+        <div class="relative">
+          <label for="cliente-busqueda" class="sr-only">{% trans 'Search client' %}</label>
+          <input type="text" id="cliente-busqueda" class="w-full bg-slate-800 p-2 rounded border border-slate-600 text-white text-sm"
+                 placeholder="{% trans 'Search client' %}"
+                 autocomplete="off"
+                 oninput="window.EG?.cliente?.handleClienteInput?.(this.value)"
+                 onfocus="window.EG?.cliente?.handleClienteFocus?.(this.value)"
+                 onkeydown="return window.EG?.cliente?.handleClienteKeydown?.(event)">
+          <div id="cliente-resultados" class="absolute z-50 w-full bg-slate-800 border border-slate-600 rounded shadow-lg hidden max-h-48 overflow-y-auto text-sm mt-1"></div>
+        </div>
+        <a id="btn-nuevo-cliente"
+           href="{% country_url 'clientes:crear_cliente' %}"
+           data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
+           class="doc-action-btn mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold no-underline shadow-sm whitespace-nowrap">
+          <span aria-hidden="true">âž•</span>
+          <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
+        </a>
+        <select id="id_cliente" name="cliente" class="hidden">
+          <option value="">{% trans "Select client..." %}</option>
+        </select>
+        <div id="cliente-info" class="doc-smart-summary hidden">
+          <div class="name" id="cliente-nombre"></div>
+          <div class="detail" id="cliente-telefono"></div>
+          <div class="detail" id="cliente-email"></div>
+          <div class="meta" id="cliente-ultima-visita"></div>
+        </div>
+      </div>
+      <div class="doc-smart-card" id="vehicle-section">
+        <h3>{% trans "VEHICLE" %}</h3>
+        {% if ui_config.show_vehicle %}
+        <div class="tipo-dependent-vehicle">
+          <div class="doc-field-with-btn flex gap-2">
+            <div class="flex-1">
+              <label for="id_vehiculo" class="sr-only">{% trans 'Vehicle' %}</label>
+              <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
+                <option value="">{% trans 'Select vehicle...' %}</option>
+              </select>
+            </div>
+            <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
+              <span aria-hidden="true">âž•</span>
+              <span class="doc-action-label text-white font-semibold">Nuevo vehÃ­culo</span>
+            </button>
+          </div>
+        </div>
+        {% endif %}
+        {% if 'kilometraje_ingreso' in form.fields %}
+        <div id="miles-section" class="tipo-dependent-miles flex flex-wrap items-center gap-2 mt-2">
+          <label for="id_kilometraje_ingreso" class="text-xs text-slate-400">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% trans "Mileage" %}{% endif %}</label>
+          <div class="flex-1 min-w-0 max-w-[7rem]">{{ form.kilometraje_ingreso }}</div>
+          <span class="text-xs text-slate-500">{% get_current_language as lang %}{% if lang == 'es' %}km{% else %}mi{% endif %}</span>
+        </div>
+        {% if form.kilometraje_ingreso.errors %}
+        <div class="text-red-400 text-xs">{{ form.kilometraje_ingreso.errors.0 }}</div>
+        {% endif %}
+        {% endif %}
+        <div id="vehiculo-info" class="doc-smart-summary hidden">
+          <div class="name" id="vehiculo-marca-modelo"></div>
+          <div class="detail" id="vehiculo-ano-vin"></div>
+          <div class="detail" id="vehiculo-mileage"></div>
+          <div class="meta" id="vehiculo-ultima-entrada"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PARTS | SERVICES (tabla compacta) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {% if ui_config.show_repuestos %}
+      <div class="doc-smart-card doc-ficha-parts doc-pos-section">
+        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
+          <div class="flex flex-col gap-1 min-w-0 flex-1">
+            <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
+            {% if desarme_origen_label %}
+            <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
+              <span>ðŸ§©</span>
+              <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
+            </div>
+            {% endif %}
+          </div>
+          <div class="flex gap-1 flex-shrink-0 items-center">
+            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">ðŸ§©</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
+          </div>
+        </div>
+        <div class="doc-pos-header hidden sm:grid">
+          <span>{% trans "Code" %}</span><span>{% trans "Part name" %}</span><span>{% trans "Qty" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+        </div>
+        <div id="repuestos-container" class="space-y-2 min-h-[80px]">
+          <!-- Dynamic parts rows -->
+        </div>
+      </div>
+      {% endif %}
+      {% if ui_config.show_services %}
+      <div class="doc-smart-card doc-ficha-services doc-pos-section">
+        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
+          <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
+          <div class="flex gap-1 flex-shrink-0 items-center">
+            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+          </div>
+        </div>
+        <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
+          <span>{% trans "Service" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+        </div>
+        <div id="servicios-container" class="space-y-2 min-h-[80px]">
+          <!-- Dynamic services rows: click + ADD, then type to search -->
+          <p id="servicios-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add to add services, then type to search." %}</p>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    {% if ui_config.show_otros_servicios %}
+    <div class="doc-smart-card doc-ficha-otros doc-pos-section mt-4">
+      <div class="flex flex-wrap items-center gap-2 mb-3 min-h-[2rem]">
+        <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
+        <div class="flex gap-1 flex-shrink-0 items-center">
+          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
+        </div>
+      </div>
+      <div class="doc-pos-header doc-pos-header-otros hidden sm:grid">
+        <span>{% trans "Service" %}</span><span>{% trans "External Company" %}</span><span>{% trans "Shop Price" %}</span><span>{% trans "Client Price" %}</span><span>{% trans "Total" %}</span><span></span>
+      </div>
+      <div id="otros-container" class="space-y-2 min-h-[60px]">
+        <!-- Dynamic other services rows (external/outsourced) -->
+        <p id="otros-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add for external/outsourced services." %}</p>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- 4. NOTES | TOTALES (panel claro) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="doc-smart-card order-2 md:order-1">
+        <h3>{% trans "NOTES" %}</h3>
+        <label for="id_observaciones" class="sr-only">{% trans "Notes" %}</label>
+        {{ form.observaciones }}
+      </div>
+      <div class="totales-cockpit order-1 md:order-2 totales-panel">
+        <h3 class="totales-cockpit-title">{% trans "DOCUMENT TOTALS" %}</h3>
+        <div class="receipt-totals">
+          <table class="receipt-totals-table">
+            <tbody>
+              <tr>
+                <td class="receipt-label">{% trans "Parts" %}</td>
+                <td class="receipt-value">
+                  <span id="t_repuestos" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% if ui_config.show_services %}
+              <tr>
+                <td class="receipt-label">{% trans "Services" %}</td>
+                <td class="receipt-value">
+                  <span id="t_servicios" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endif %}
+              {% if ui_config.show_otros_servicios %}
+              <tr>
+                <td class="receipt-label">{% trans "Other" %}</td>
+                <td class="receipt-value">
+                  <span id="t_otros" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endif %}
+
+              {% for tax_line in ui_config.tax_lines %}
+              <tr class="tax-line" data-tax-id="{{ tax_line.id }}">
+                <td class="receipt-label">
+                  <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="include_{{ tax_line.id }}" checked
+                           class="mr-1 w-3 h-3 accent-cyan-400 tax-checkbox"
+                           data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
+                    <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
+                  </label>
+                </td>
+                <td class="receipt-value">
+                  <span id="t_{{ tax_line.id }}" class="calculated-field" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+              {% endfor %}
+
+              <tr class="receipt-total-row">
+                <td class="receipt-total-label">{% trans "TOTAL" %}</td>
+                <td class="receipt-total-value">
+                  <span id="t_total" class="calculated-field readonly-total" data-calculated="true">
+                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button type="submit" class="totales-cockpit-save">
+          {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
+        </button>
+        <div class="flex gap-2 mt-3">
+          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">â†</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden inputs para serializar filas dinÃ¡micas -->
+  <input type="hidden" name="repuestos_json" id="id_repuestos_json">
+  <input type="hidden" name="servicios_json" id="id_servicios_json">
+  <input type="hidden" name="otros_json" id="id_otros_json">
+</form>
+
+<!-- Modal Used Parts (piezas de desarme) -->
+<div id="modal-used-parts" class="fixed inset-0 z-50 hidden">
+  <div id="used-parts-overlay" class="absolute inset-0 bg-black/70"></div>
+  <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
+    <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
+      <h3 class="text-lg font-bold text-amber-300 mb-3">ðŸ§© {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
+      <input type="search" id="used-parts-search" placeholder="{% trans 'Search by code or name...' %}" class="form-control w-full mb-4" autocomplete="off">
+      <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
+      <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">{% trans "Type at least 2 characters to search" %}</p>
+      <button type="button" id="close-used-parts" class="mt-4 btn-secondary">{% trans "Close" %}</button>
+    </div>
+  </div>
+</div>
+
+{{ clientes_prefetch|json_script:"prefetchClientes" }}
+{{ vehiculos_prefetch|json_script:"prefetchVehiculos" }}
+{{ repuestos_prefetch|json_script:"prefetchRepuestos" }}
+{{ servicios_prefetch|json_script:"prefetchServicios" }}
+{{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
+{{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
+
 {% endwith %}
 {% endwith %}
+{% endblock content %}
+
+{% block extra_js %}
+{{ block.super }}
+{# Scripts esenciales #}
+<script src="{% static 'js/marketplace_tooltip_fixed.js' %}"></script>
 
 <script>
 // Ãšnica fuente de verdad para ?next= al ir a crear cliente/vehÃ­culo (pathname + querystring)
@@ -1316,383 +1683,6 @@ function submitLanguageDoc(lang) {
   document.getElementById('language-form-doc').submit();
 }
 </script>
-{% endblock documento_title %}
-
-{% block documento_content %}
-{% load i18n %}
-{# âœ… Manejo robusto de company_country con mÃºltiples fallbacks #}
-{% with active_country=empresa.pais|default:'CL' %}
-{% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-        <form method="post" id="document-form" class="doc-form-compact mx-auto"
-              data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
-              data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
-              data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
-              data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
-              data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
-              data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' app_namespace='' %}"
-              data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
-              data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
-              data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
-              data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
-              data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
-              data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
-              data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}"
-              data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
-          {% csrf_token %}
-
-  <!-- System messages - Design System (no mostrar mensajes de otras secciones: login, clientes eliminados, etc.) -->
-  {% if messages %}
-    {% for message in messages %}
-      {% with msg_text=message|stringformat:"s" %}
-      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesiÃ³n exitosamente" not in msg_text and "Ha cerrado sesiÃ³n" not in msg_text and "iniciado sesiÃ³n exitosamente" not in msg_text and "cerrado sesiÃ³n" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
-        {% if message.tags == 'success' %}
-        <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">âœ…</span>
-          <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
-        </div>
-        {% elif message.tags == 'error' %}
-        <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">âŒ</span>
-          <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
-        </div>
-        {% else %}
-        <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">â„¹ï¸</span>
-          <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
-        </div>
-        {% endif %}
-      {% endif %}
-      {% endwith %}
-    {% endfor %}
-  {% endif %}
-
-  <!-- Validation errors - compacto y legible -->
-  {% if form.errors %}
-    <div class="doc-form-validation-errors">
-      <p class="doc-form-validation-title">{% trans "Validation errors" %}</p>
-      <ul class="doc-form-validation-list">
-        {% for field, errors in form.errors.items %}
-          {% for msg in errors %}
-            <li>{{ msg }}</li>
-          {% endfor %}
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
-
-  <!-- Document workspace â€” cabecera consola | tarjetas cliente/vehÃ­culo | repuestos/servicios POS | observaciones | totales cockpit -->
-  <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
-
-    <!-- 1. CABECERA COMPACTA â€” fila 1: INV | Fecha | MecÃ¡nico | Pago | fila 2: Tipo | OperaciÃ³n -->
-    <div class="doc-console-header">
-      <div class="doc-console-title flex flex-wrap items-center gap-2">
-        <span>{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</span>
-        <span id="draft-indicator" class="hidden text-[10px] sm:text-xs font-medium text-emerald-300/95 bg-emerald-950/60 border border-emerald-500/35 rounded px-2 py-0.5" role="status" aria-live="polite">{% trans "Auto-saved" %}</span>
-      </div>
-
-      <div class="doc-invoice-grid">
-        <div class="doc-invoice-panel">
-          <div class="doc-console-field doc-console-field--invoice">
-            <span class="doc-console-meta">{% trans "Document No." %}</span>
-            <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
-              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}â€”{% endif %}
-            </span>
-          </div>
-
-          <div class="doc-console-field">
-            <label for="id_fecha_emision" class="doc-console-meta">{% trans "Date" %}</label>
-            <input id="id_fecha_emision" type="date" name="fecha_emision" class="bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
-                   value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
-          </div>
-
-          <div class="doc-console-field">
-            <label for="id_tipo" class="doc-console-meta">{% trans "Document Type" %}</label>
-            {{ form.tipo }}
-          </div>
-        </div>
-
-        <div class="doc-invoice-panel">
-          {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
-          <div class="doc-console-field">
-            <label id="tecnico-label" for="id_tecnico_responsable" class="doc-console-meta" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
-            <div class="doc-console-control">{{ form.tecnico_responsable }}</div>
-          </div>
-          {% endwith %}
-
-          <div class="doc-console-field">
-            <label for="id_payment_status" class="doc-console-meta">{% trans "Payment Status" %}</label>
-            <div id="payment-status-badge" class="doc-console-control doc-console-payment doc-console-payment-pending">{{ form.payment_status }}</div>
-          </div>
-
-          <div class="doc-console-field">
-            <label for="doc_mode" class="doc-console-meta">{% trans "Operation" %}</label>
-            <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300">
-              <option value="services">{% trans "Services" %}</option>
-              <option value="parts">{% trans "Part sale only" %}</option>
-            </select>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. CLIENT | VEHICLE (layout horizontal en md+) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="doc-smart-card doc-ficha-client-vehicle">
-        <h3>{% trans "CLIENT" %}</h3>
-        <div class="relative">
-          <label for="cliente-busqueda" class="sr-only">{% trans 'Search client' %}</label>
-          <input type="text" id="cliente-busqueda" class="w-full bg-slate-800 p-2 rounded border border-slate-600 text-white text-sm"
-                 placeholder="{% trans 'Search client' %}"
-                 autocomplete="off"
-                 oninput="window.EG?.cliente?.handleClienteInput?.(this.value)"
-                 onfocus="window.EG?.cliente?.handleClienteFocus?.(this.value)"
-                 onkeydown="return window.EG?.cliente?.handleClienteKeydown?.(event)">
-          <div id="cliente-resultados" class="absolute z-50 w-full bg-slate-800 border border-slate-600 rounded shadow-lg hidden max-h-48 overflow-y-auto text-sm mt-1"></div>
-        </div>
-        <a id="btn-nuevo-cliente"
-           href="{% country_url 'clientes:crear_cliente' %}"
-           data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
-           class="doc-action-btn mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold no-underline shadow-sm whitespace-nowrap">
-          <span aria-hidden="true">âž•</span>
-          <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
-        </a>
-        <select id="id_cliente" name="cliente" class="hidden">
-          <option value="">{% trans "Select client..." %}</option>
-        </select>
-        <div id="cliente-info" class="doc-smart-summary hidden">
-          <div class="name" id="cliente-nombre"></div>
-          <div class="detail" id="cliente-telefono"></div>
-          <div class="detail" id="cliente-email"></div>
-          <div class="meta" id="cliente-ultima-visita"></div>
-        </div>
-      </div>
-      <div class="doc-smart-card" id="vehicle-section">
-        <h3>{% trans "VEHICLE" %}</h3>
-        {% if ui_config.show_vehicle %}
-        <div class="tipo-dependent-vehicle">
-          <div class="doc-field-with-btn flex gap-2">
-            <div class="flex-1">
-              <label for="id_vehiculo" class="sr-only">{% trans 'Vehicle' %}</label>
-              <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
-                <option value="">{% trans 'Select vehicle...' %}</option>
-              </select>
-            </div>
-            <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
-              <span aria-hidden="true">âž•</span>
-              <span class="doc-action-label text-white font-semibold">Nuevo vehÃ­culo</span>
-            </button>
-          </div>
-        </div>
-        {% endif %}
-        {% if 'kilometraje_ingreso' in form.fields %}
-        <div id="miles-section" class="tipo-dependent-miles flex flex-wrap items-center gap-2 mt-2">
-          <label for="id_kilometraje_ingreso" class="text-xs text-slate-400">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% trans "Mileage" %}{% endif %}</label>
-          <div class="flex-1 min-w-0 max-w-[7rem]">{{ form.kilometraje_ingreso }}</div>
-          <span class="text-xs text-slate-500">{% get_current_language as lang %}{% if lang == 'es' %}km{% else %}mi{% endif %}</span>
-        </div>
-        {% if form.kilometraje_ingreso.errors %}
-        <div class="text-red-400 text-xs">{{ form.kilometraje_ingreso.errors.0 }}</div>
-        {% endif %}
-        {% endif %}
-        <div id="vehiculo-info" class="doc-smart-summary hidden">
-          <div class="name" id="vehiculo-marca-modelo"></div>
-          <div class="detail" id="vehiculo-ano-vin"></div>
-          <div class="detail" id="vehiculo-mileage"></div>
-          <div class="meta" id="vehiculo-ultima-entrada"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 3. PARTS | SERVICES (tabla compacta) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      {% if ui_config.show_repuestos %}
-      <div class="doc-smart-card doc-ficha-parts doc-pos-section">
-        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
-          <div class="flex flex-col gap-1 min-w-0 flex-1">
-            <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
-            {% if desarme_origen_label %}
-            <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
-              <span>ðŸ§©</span>
-              <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
-            </div>
-            {% endif %}
-          </div>
-          <div class="flex gap-1 flex-shrink-0 items-center">
-            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addRepuestoRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="openUsedPartsModal()"><span aria-hidden="true">ðŸ§©</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
-          </div>
-        </div>
-        <div class="doc-pos-header hidden sm:grid">
-          <span>{% trans "Code" %}</span><span>{% trans "Part name" %}</span><span>{% trans "Qty" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
-        </div>
-        <div id="repuestos-container" class="space-y-2 min-h-[80px]">
-          <!-- Dynamic parts rows -->
-        </div>
-      </div>
-      {% endif %}
-      {% if ui_config.show_services %}
-      <div class="doc-smart-card doc-ficha-services doc-pos-section">
-        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
-          <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
-          <div class="flex gap-1 flex-shrink-0 items-center">
-            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addServicioRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-          </div>
-        </div>
-        <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
-          <span>{% trans "Service" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
-        </div>
-        <div id="servicios-container" class="space-y-2 min-h-[80px]">
-          <!-- Dynamic services rows: click + ADD, then type to search -->
-          <p id="servicios-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add to add services, then type to search." %}</p>
-        </div>
-      </div>
-      {% endif %}
-    </div>
-    {% if ui_config.show_otros_servicios %}
-    <div class="doc-smart-card doc-ficha-otros doc-pos-section mt-4">
-      <div class="flex flex-wrap items-center gap-2 mb-3 min-h-[2rem]">
-        <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
-        <div class="flex gap-1 flex-shrink-0 items-center">
-          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addOtroRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
-        </div>
-      </div>
-      <div class="doc-pos-header doc-pos-header-otros hidden sm:grid">
-        <span>{% trans "Service" %}</span><span>{% trans "External Company" %}</span><span>{% trans "Shop Price" %}</span><span>{% trans "Client Price" %}</span><span>{% trans "Total" %}</span><span></span>
-      </div>
-      <div id="otros-container" class="space-y-2 min-h-[60px]">
-        <!-- Dynamic other services rows (external/outsourced) -->
-        <p id="otros-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add for external/outsourced services." %}</p>
-      </div>
-    </div>
-    {% endif %}
-
-    <!-- 4. NOTES | TOTALES (panel claro) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="doc-smart-card order-2 md:order-1">
-        <h3>{% trans "NOTES" %}</h3>
-        <label for="id_observaciones" class="sr-only">{% trans "Notes" %}</label>
-        {{ form.observaciones }}
-      </div>
-      <div class="totales-cockpit order-1 md:order-2 totales-panel">
-        <h3 class="totales-cockpit-title">{% trans "DOCUMENT TOTALS" %}</h3>
-        <div class="receipt-totals">
-          {% if ui_config.tax_lines|length > 0 %}
-          <div class="receipt-totals-apply-tax">
-            <label class="cockpit-label inline-flex items-center cursor-pointer">
-              <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-1.5 w-3.5 h-3.5 accent-cyan-400"
-                     onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
-              <span>{% trans "Apply all taxes" %}</span>
-            </label>
-          </div>
-          {% endif %}
-
-          <table class="receipt-totals-table">
-            <tbody>
-              <tr>
-                <td class="receipt-label">{% trans "Parts" %}</td>
-                <td class="receipt-value">
-                  <span id="t_repuestos" class="calculated-field readonly-total" data-calculated="true">
-                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
-                  </span>
-                </td>
-              </tr>
-              {% if ui_config.show_services %}
-              <tr>
-                <td class="receipt-label">{% trans "Services" %}</td>
-                <td class="receipt-value">
-                  <span id="t_servicios" class="calculated-field readonly-total" data-calculated="true">
-                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
-                  </span>
-                </td>
-              </tr>
-              {% endif %}
-              {% if ui_config.show_otros_servicios %}
-              <tr>
-                <td class="receipt-label">{% trans "Other" %}</td>
-                <td class="receipt-value">
-                  <span id="t_otros" class="calculated-field readonly-total" data-calculated="true">
-                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
-                  </span>
-                </td>
-              </tr>
-              {% endif %}
-
-              {% for tax_line in ui_config.tax_lines %}
-              <tr class="tax-line" data-tax-id="{{ tax_line.id }}">
-                <td class="receipt-label">
-                  <label class="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="include_{{ tax_line.id }}" checked
-                           class="mr-1 w-3 h-3 accent-cyan-400 tax-checkbox"
-                           data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
-                    <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
-                  </label>
-                </td>
-                <td class="receipt-value">
-                  <span id="t_{{ tax_line.id }}" class="calculated-field" data-calculated="true">
-                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
-                  </span>
-                </td>
-              </tr>
-              {% endfor %}
-
-              <tr class="receipt-total-row">
-                <td class="receipt-total-label">{% trans "TOTAL" %}</td>
-                <td class="receipt-total-value">
-                  <span id="t_total" class="calculated-field readonly-total" data-calculated="true">
-                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-        <button type="submit" class="totales-cockpit-save">
-          {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
-        </button>
-        <div class="flex gap-2 mt-3">
-          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">â†</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Hidden inputs para serializar filas dinÃ¡micas -->
-  <input type="hidden" name="repuestos_json" id="id_repuestos_json">
-  <input type="hidden" name="servicios_json" id="id_servicios_json">
-  <input type="hidden" name="otros_json" id="id_otros_json">
-</form>
-
-<!-- Modal Used Parts (piezas de desarme) -->
-<div id="modal-used-parts" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black/70" onclick="closeUsedPartsModal()"></div>
-  <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
-    <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
-      <h3 class="text-lg font-bold text-amber-300 mb-3">ðŸ§© {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
-      <input type="search" id="used-parts-search" placeholder="{% trans 'Search by code or name...' %}" class="form-control w-full mb-4" autocomplete="off">
-      <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
-      <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">{% trans "Type at least 2 characters to search" %}</p>
-      <button type="button" onclick="closeUsedPartsModal()" class="mt-4 btn-secondary">{% trans "Close" %}</button>
-    </div>
-  </div>
-</div>
-
-{{ clientes_prefetch|json_script:"prefetchClientes" }}
-{{ vehiculos_prefetch|json_script:"prefetchVehiculos" }}
-{{ repuestos_prefetch|json_script:"prefetchRepuestos" }}
-{{ servicios_prefetch|json_script:"prefetchServicios" }}
-{{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
-{{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
-
-{% endwith %}
-{% endwith %}
-{% endblock documento_content %}
-
-{% block extra_js %}
-{{ block.super }}
-{# Scripts esenciales #}
-<script src="{% static 'js/marketplace_tooltip_fixed.js' %}"></script>
 
 {# FunciÃ³n helper para encode next URL - Mantener por compatibilidad #}
 <script>
@@ -1728,132 +1718,6 @@ document.addEventListener('DOMContentLoaded', function() {
 {# === SISTEMA MODULAR UNIFICADO === #}
 {# Cargar mÃ³dulos JavaScript modularizados #}
 <script src="{% static 'js/document-form/index.js' %}"></script>
-  
-{# Implementación mínima de addServicioRow hasta que se cree el módulo servicios #}
-<script>
-window.addServicioRow = function() {
-    console.warn('Módulo servicios no implementado aún - usando implementación mínima');
-      
-    const container = document.getElementById('servicios-container');
-    if (!container) {
-        console.error('No se encontró servicios-container');
-        return null;
-    }
-      
-    // Ocultar mensaje de vacío
-    const emptyHint = document.getElementById('servicios-empty-hint');
-    if (emptyHint) emptyHint.style.display = 'none';
-      
-    // Crear fila básica
-    const row = document.createElement('div');
-    row.className = 'dynamic-element';
-    row.innerHTML = `
-        <div class="doc-row-grid">
-            <div class="col-span-7">
-                <input type="text" class="form-control" placeholder="Servicio" 
-                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;">
-            </div>
-            <div class="col-span-3">
-                <input type="number" class="form-control" placeholder="Precio" 
-                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;" 
-                       step="0.01" min="0">
-            </div>
-            <div class="col-span-2 flex items-center gap-1">
-                <span class="srv-subtotal-view text-sm text-gray-300">$0</span>
-                <button type="button" class="text-red-400 hover:text-red-300" onclick="this.closest('.dynamic-element').remove()">
-                    ✕
-                </button>
-            </div>
-        </div>
-    `;
-      
-    container.appendChild(row);
-      
-    // Agregar funcionalidad básica de cálculo
-    const priceInput = row.querySelector('input[type="number"]');
-    const subtotalSpan = row.querySelector('.srv-subtotal-view');
-      
-    if (priceInput && subtotalSpan) {
-        priceInput.addEventListener('input', function() {
-            const price = parseFloat(this.value) || 0;
-            subtotalSpan.textContent = '$' + price.toFixed(2);
-              
-            // Disparar evento de recálculo de totales
-            if (window.recalcTotales) {
-                window.recalcTotales();
-            }
-        });
-    }
-      
-    return row;
-  };
-  
-  window.addOtroRow = function() {
-    console.warn('Módulo otros servicios no implementado aún - usando implementación mínima');
-      
-    const container = document.getElementById('otros-container');
-    if (!container) {
-        console.error('No se encontró otros-container');
-        return null;
-    }
-      
-    // Ocultar mensaje de vacío
-    const emptyHint = document.getElementById('otros-empty-hint');
-    if (emptyHint) emptyHint.style.display = 'none';
-      
-    // Crear fila básica
-    const row = document.createElement('div');
-    row.className = 'dynamic-element';
-    row.innerHTML = `
-        <div class="doc-row-grid">
-            <div class="col-span-4">
-                <input type="text" class="form-control" placeholder="Servicio externo" 
-                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;">
-            </div>
-            <div class="col-span-3">
-                <input type="text" class="form-control" placeholder="Empresa" 
-                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;">
-            </div>
-            <div class="col-span-2">
-                <input type="number" class="form-control" placeholder="Precio taller" 
-                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;" 
-                       step="0.01" min="0">
-            </div>
-            <div class="col-span-2">
-                <input type="number" class="form-control" placeholder="Precio cliente" 
-                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;" 
-                       step="0.01" min="0">
-            </div>
-            <div class="col-span-1 flex items-center gap-1">
-                <span class="otr-subtotal-view text-sm text-gray-300">$0</span>
-                <button type="button" class="text-red-400 hover:text-red-300" onclick="this.closest('.dynamic-element').remove()">
-                    ✕
-                </button>
-            </div>
-        </div>
-    `;
-      
-    container.appendChild(row);
-      
-    // Agregar funcionalidad básica de cálculo
-    const clientPriceInput = row.querySelector('input[placeholder="Precio cliente"]');
-    const subtotalSpan = row.querySelector('.otr-subtotal-view');
-      
-    if (clientPriceInput && subtotalSpan) {
-        clientPriceInput.addEventListener('input', function() {
-            const price = parseFloat(this.value) || 0;
-            subtotalSpan.textContent = '$' + price.toFixed(2);
-              
-            // Disparar evento de recálculo de totales
-            if (window.recalcTotales) {
-                window.recalcTotales();
-            }
-        });
-    }
-      
-    return row;
-  };
-  </script>
 
 {% endblock extra_js %}
 

@@ -11,6 +11,19 @@
 
     let currentRepuestoRow = null;
 
+    function toggleRepuestosEmptyHint() {
+        var container = document.getElementById('repuestos-container');
+        if (!container) return;
+        container.classList.toggle('has-rows', !!container.querySelector('.dynamic-element'));
+    }
+
+    function removeRow(row) {
+        if (!row) return;
+        row.remove();
+        toggleRepuestosEmptyHint();
+        if (typeof window.recalcTotales === 'function') window.recalcTotales();
+    }
+
     /**
      * Agrega una nueva fila de repuesto al contenedor
      */
@@ -40,7 +53,7 @@
     function buildRepuestoRowHTML(rowId, isFirstRow) {
         var lbl = isFirstRow ? '<label class="block text-cyan-200 text-sm mb-1">' : '<label class="hidden">';
         var lblEnd = isFirstRow ? '</label>' : '</label>';
-        return '<div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="' + rowId + '">' +
+        return '<div class="doc-row-grid repuesto-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="' + rowId + '">' +
             '<div class="col-span-2 sm:col-span-2 relative min-w-0">' +
             lbl + (EG.I18N.code || 'Code') + lblEnd +
             '<input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="' + (EG.I18N.code || 'Code') + '">' +
@@ -63,7 +76,7 @@
             '<div class="col-span-1 sm:col-span-1 min-w-0"><label class="block text-cyan-200 text-sm mb-1">' + (EG.I18N.subtotal || 'Subtotal') + '</label>' +
             '<input type="hidden" class="rep-subtotal" value="0">' +
             '<div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div></div>' +
-            '<div class="col-span-1 sm:col-span-1"><button type="button" class="btn-add w-full h-10" onclick="var r=this.closest(\'.dynamic-element\');r.remove();if(typeof window.recalcTotales===\'function\')window.recalcTotales();">X</button></div></div>';
+            '<div class="col-span-1 sm:col-span-1"><button type="button" class="btn-add w-full h-10 rep-remove-btn">X</button></div></div>';
     }
 
     function setupRepuestoRow(row) {
@@ -71,6 +84,7 @@
         var drop = row.querySelector('.rep-dropdown');
         var idHidden = row.querySelector('.rep-id');
         var inpCode = row.querySelector('.rep-codigo');
+        var codeDrop = row.querySelector('.rep-codigo-dropdown');
         var inpPV = row.querySelector('.rep-precio-venta');
         var qEl = row.querySelector('.rep-cantidad');
         var sub = row.querySelector('.rep-subtotal');
@@ -78,7 +92,9 @@
         var repOrigen = row.querySelector('.rep-origen');
         var repPiezaDesarmeId = row.querySelector('.rep-pieza-desarme-id');
         var repCostoLinea = row.querySelector('.rep-costo-linea');
+        var repNombre = row.querySelector('.rep-nombre');
         var desarmeBadge = row.querySelector('.rep-desarme-badge');
+        var removeBtn = row.querySelector('.rep-remove-btn');
 
         var timer = null;
 
@@ -110,6 +126,7 @@
             if (idHidden) idHidden.value = item.id || '';
             if (inpCode) inpCode.value = item.codigo || '';
             if (searchInput) searchInput.value = item.nombre || '';
+            if (repNombre) repNombre.value = item.nombre || '';
             if (inpPV && item.precio_venta !== undefined) {
                 var precio = EG.utils.parseNumericInput(item.precio_venta);
                 inpPV.value = precio > 0 ? EG.utils.formatNumberInput(precio) : '';
@@ -143,36 +160,45 @@
             recalc();
         };
 
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                removeRow(row);
+            });
+        }
+
         // Busca repuestos
-        async function searchRepuestos(q) {
-            if (!drop || !q || q.length < 2) {
+        async function searchRepuestos(q, targetDrop) {
+            var activeDrop = targetDrop || drop;
+            if (!activeDrop || !q || q.length < 2) {
                 if (drop) drop.classList.add('hidden');
+                if (codeDrop) codeDrop.classList.add('hidden');
                 return;
             }
             var localMatches = EG.utils.filterPrefetchItems(EG.PREFETCH.repuestos, ['codigo', 'nombre'], q, 15);
-            if (localMatches.length) renderResultadosRepuestos(localMatches);
+            if (localMatches.length) renderResultadosRepuestos(localMatches, activeDrop);
             try {
                 var url = EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/';
                 var r = await EG.utils.egFetch(url + '?q=' + encodeURIComponent(q));
                 if (!r.ok) throw new Error('HTTP ' + r.status);
                 var data = await r.json();
                 var items = Array.isArray(data) ? data : (data.results || data.items || []);
-                if (items.length) renderResultadosRepuestos(items);
+                if (items.length) renderResultadosRepuestos(items, activeDrop);
             } catch (err) {
                 console.error('buscarRepuestos', err);
-                if (!localMatches.length && drop) {
-                    drop.innerHTML = '<div class="p-3 text-red-300">' + (EG.I18N.server_error || 'Error') + '</div>';
-                    drop.classList.remove('hidden');
+                if (!localMatches.length && activeDrop) {
+                    activeDrop.innerHTML = '<div class="p-3 text-red-300">' + (EG.I18N.server_error || 'Error') + '</div>';
+                    activeDrop.classList.remove('hidden');
                 }
             }
         }
 
-        function renderResultadosRepuestos(lista) {
-            if (!drop) return;
-            drop.innerHTML = '';
+        function renderResultadosRepuestos(lista, targetDrop) {
+            var activeDrop = targetDrop || drop;
+            if (!activeDrop) return;
+            activeDrop.innerHTML = '';
             if (!lista.length) {
-                drop.innerHTML = '<div class="p-3 text-gray-300">' + (EG.I18N.no_parts || 'Sin repuestos') + '</div>';
-                drop.classList.remove('hidden');
+                activeDrop.innerHTML = '<div class="p-3 text-gray-300">' + (EG.I18N.no_parts || 'Sin repuestos') + '</div>';
+                activeDrop.classList.remove('hidden');
                 return;
             }
             lista.forEach(function(item) {
@@ -187,10 +213,10 @@
                 div.addEventListener('click', function() {
                     seleccionarRepuesto(div);
                 });
-                drop.appendChild(div);
+                activeDrop.appendChild(div);
             });
-            drop.setAttribute('role', 'listbox');
-            drop.classList.remove('hidden');
+            activeDrop.setAttribute('role', 'listbox');
+            activeDrop.classList.remove('hidden');
         }
 
         function seleccionarRepuesto(el) {
@@ -202,6 +228,7 @@
                 precio_venta: EG.utils.parseNumericInput(el.dataset.precio)
             });
             if (drop) drop.classList.add('hidden');
+            if (codeDrop) codeDrop.classList.add('hidden');
         }
 
         function recalc() {
@@ -217,10 +244,19 @@
         if (searchInput) {
             searchInput.addEventListener('input', function(e) {
                 clearTimeout(timer);
-                timer = setTimeout(function() { searchRepuestos(e.target.value.trim()); }, 250);
+                timer = setTimeout(function() { searchRepuestos(e.target.value.trim(), drop); }, 250);
             });
             searchInput.addEventListener('focus', function() {
-                if (searchInput.value.trim().length >= 2) searchRepuestos(searchInput.value.trim());
+                if (searchInput.value.trim().length >= 2) searchRepuestos(searchInput.value.trim(), drop);
+            });
+        }
+        if (inpCode) {
+            inpCode.addEventListener('input', function(e) {
+                clearTimeout(timer);
+                timer = setTimeout(function() { searchRepuestos(e.target.value.trim(), codeDrop || drop); }, 250);
+            });
+            inpCode.addEventListener('focus', function() {
+                if (inpCode.value.trim().length >= 2) searchRepuestos(inpCode.value.trim(), codeDrop || drop);
             });
         }
         if (drop) {
@@ -229,11 +265,19 @@
                 if (item) seleccionarRepuesto(item);
             });
         }
+        if (codeDrop) {
+            codeDrop.addEventListener('click', function(e) {
+                var item = e.target.closest('.srv-item');
+                if (item) seleccionarRepuesto(item);
+            });
+        }
         document.addEventListener('click', function(e) {
             if (!row.contains(e.target) && drop) drop.classList.add('hidden');
+            if (!row.contains(e.target) && codeDrop) codeDrop.classList.add('hidden');
         });
         if (qEl) qEl.addEventListener('input', recalc);
         if (inpPV) inpPV.addEventListener('input', recalc);
+        toggleRepuestosEmptyHint();
     }
 
     // Modal piezas usadas (desarme)
@@ -247,12 +291,34 @@
         if (modal) modal.classList.add('hidden');
     }
 
+    function init() {
+        document.querySelectorAll('#repuestos-container .dynamic-element').forEach(setupRepuestoRow);
+
+        var modal = document.getElementById('modal-used-parts');
+        if (modal && !modal.dataset.egBound) {
+            modal.dataset.egBound = '1';
+
+            var overlay = document.getElementById('used-parts-overlay');
+            if (overlay) {
+                overlay.addEventListener('click', closeUsedPartsModal);
+            }
+
+            var closeBtn = document.getElementById('close-used-parts');
+            if (closeBtn) {
+                closeBtn.addEventListener('click', closeUsedPartsModal);
+            }
+        }
+
+        toggleRepuestosEmptyHint();
+    }
+
     // Exports
     EG.repuestos = {
         addRepuestoRow: addRepuestoRow,
         setupRepuestoRow: setupRepuestoRow,
         openUsedPartsModal: openUsedPartsModal,
-        closeUsedPartsModal: closeUsedPartsModal
+        closeUsedPartsModal: closeUsedPartsModal,
+        init: init
     };
     window.addRepuestoRow = addRepuestoRow;
     window.openUsedPartsModal = openUsedPartsModal;
