@@ -1,0 +1,16 @@
+{# TEMPLATE CORREGIDO - Sin errores de sintaxis #}
+{% extends "taller/common/documentos/base_documento.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block extra_js %}
+{{ block.super }}
+{# Scripts esenciales #}
+{# <script src="{% static 'js/document_engine.js' %}"></script> #}
+
+{# Nuestros fixes #}
+<script src="{% static 'js/fix_vehiculos_select2.js' %}"></script>
+<script src="{% static 'js/emergency_fix_vehiculos.js' %}"></script>
+<script src="{% static 'js/api_fix.js' %}"></script>
+
+{% endblock %}

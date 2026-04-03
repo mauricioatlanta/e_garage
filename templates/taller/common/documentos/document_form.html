@@ -1,11 +1,11 @@
-{% extends "taller/documentos/base/base_documento.html" %}
+﻿{% extends "taller/documentos/base/base_documento.html" %}
 {% load i18n %}
 
 {% load static %}
 {% load country_url %}
 
 <style>
-/* ==================== DOCUMENT FORM — PRO UI: proporciones, jerarquía, layout ==================== */
+/* ==================== DOCUMENT FORM â€” PRO UI: proporciones, jerarquÃ­a, layout ==================== */
 /* Regla global dentro del workspace: inputs compactos, bordes sutiles, sin glow por defecto */
 
 #doc-shell {
@@ -51,7 +51,7 @@
   resize: vertical !important;
 }
 
-/* 2. JERARQUÍA: secciones bien separadas (1 Header, 2 Client/Vehicle, 3 Parts/Services, 4 Totals) */
+/* 2. JERARQUÃA: secciones bien separadas (1 Header, 2 Client/Vehicle, 3 Parts/Services, 4 Totals) */
 .doc-shell-workspace > .doc-console-header { margin-bottom: 1rem; }
 .doc-shell-workspace > .grid { margin-bottom: 0.5rem; }
 .doc-shell-workspace .doc-smart-card,
@@ -140,7 +140,7 @@
   }
 }
 
-/* Botón con gradiente cian (para botones principales) - Sin !important */
+/* BotÃ³n con gradiente cian (para botones principales) - Sin !important */
 .btn-cyan-gradient {
   display: inline-flex;
   align-items: center;
@@ -169,7 +169,7 @@
   box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.4);
 }
 
-/* Botón con gradiente verde (para acciones de agregar) - Sin !important */
+/* BotÃ³n con gradiente verde (para acciones de agregar) - Sin !important */
 .btn-green-gradient {
   display: inline-flex;
   align-items: center;
@@ -227,7 +227,7 @@ input:disabled, select:disabled, textarea:disabled {
   opacity: 0.7;
 }
 
-/* Estilos mejorados para la sección de totales */
+/* Estilos mejorados para la secciÃ³n de totales */
 .totales-section {
   margin-top: 2rem;
   padding-top: 1.5rem;
@@ -255,10 +255,10 @@ input:disabled, select:disabled, textarea:disabled {
   transform: translateY(-1px);
 }
 
-/* Eliminada animación infinite para mejor rendimiento móvil */
-/* El neón solo aparece en hover/focus, no en animación constante */
+/* Eliminada animaciÃ³n infinite para mejor rendimiento mÃ³vil */
+/* El neÃ³n solo aparece en hover/focus, no en animaciÃ³n constante */
 
-/* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÓN ==================== */
+/* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÃ“N ==================== */
 /* Description fields - Better spacing and alignment - Sin !important */
 .description-field {
   flex: 1 1 auto;
@@ -272,12 +272,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 /* Container for dynamic rows - Better flexbox distribution */
-.dynamic-element > div {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  align-items: flex-end;
-}
+/* .dynamic-element > div eliminado - usando grid en su lugar */
 
 /* Specific description field containers */
 .rep-search-container,
@@ -310,10 +305,6 @@ input:disabled, select:disabled, textarea:disabled {
     margin-bottom: 1rem;
   }
   
-  .dynamic-element > div {
-    gap: 1rem;
-  }
-  
   /* Stack all fields on mobile */
   .dynamic-element > div > div {
     width: 100%;
@@ -321,13 +312,7 @@ input:disabled, select:disabled, textarea:disabled {
   }
 }
 
-@media (max-width: 640px) {
-  .dynamic-element > div {
-    padding: 0.75rem;
-    gap: 0.875rem;
-  }
-  
-}
+
 
 #doc-shell .description-field input,
 #doc-shell .rep-search-container input,
@@ -347,17 +332,10 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 /* Ensure proper alignment of description fields with other fields */
-.dynamic-element > div > div {
-  display: flex;
-  flex-direction: column;
-}
+/* .dynamic-element > div > div eliminado - usando grid en su lugar */
 
 /* Better gap distribution for field groups */
-@media (min-width: 769px) {
-  .dynamic-element > div {
-    gap: 1rem;
-  }
-}
+/* .dynamic-element > div eliminado - usando grid en su lugar */
 
 /* Improved spacing for description fields on larger screens */
 @media (min-width: 1025px) {
@@ -430,7 +408,7 @@ input:disabled, select:disabled, textarea:disabled {
     0 0 0 2px rgba(34, 211, 238, 0.25);
 }
 
-/* ==================== FICHAS POR TÓPICOS - VISTA COMPACTA ==================== */
+/* ==================== FICHAS POR TÃ“PICOS - VISTA COMPACTA ==================== */
 .doc-ficha {
   background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.85) 100%);
   border: 1px solid rgba(0, 242, 254, 0.35);
@@ -485,7 +463,7 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-control,
 .doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-select,
 .doc-fichas-row .doc-ficha:first-child .doc-ficha-body #id_numero { grid-column: 2; width: 160px !important; max-width: 160px !important; box-sizing: border-box !important; }
-/* Ficha Client & Vehicle: dos columnas (Cliente | Vehículo) como en referencia */
+/* Ficha Client & Vehicle: dos columnas (Cliente | VehÃ­culo) como en referencia */
 .doc-ficha-body-two-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -550,7 +528,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 .doc-ficha-otros .doc-ficha-body { max-height: 200px; overflow-y: auto; }
 
-/* Botones de acción dentro de cada ficha */
+/* Botones de acciÃ³n dentro de cada ficha */
 .doc-ficha .ficha-actions {
   display: flex;
   flex-wrap: wrap;
@@ -596,18 +574,18 @@ input:disabled, select:disabled, textarea:disabled {
   min-width: 0;
   box-sizing: border-box;
 }
-/* Búsqueda de cliente un poco más ancha para leer "Type to search..." */
+/* BÃºsqueda de cliente un poco mÃ¡s ancha para leer "Type to search..." */
 #doc-shell .doc-fichas-row #cliente-busqueda {
   width: 26ch;
   max-width: 100%;
 }
-/* Select de vehículo (puede tener patente + modelo) */
+/* Select de vehÃ­culo (puede tener patente + modelo) */
 #doc-shell .doc-fichas-row #id_vehiculo {
   width: 28ch;
   max-width: 100%;
 }
 
-/* Ficha Operación: campos también ~20 caracteres */
+/* Ficha OperaciÃ³n: campos tambiÃ©n ~20 caracteres */
 #doc-shell .doc-ficha-operation .form-control,
 #doc-shell .doc-ficha-operation .form-select,
 #doc-shell .doc-ficha-operation input[type="text"],
@@ -681,7 +659,7 @@ input:disabled, select:disabled, textarea:disabled {
   font-size: 15px;
 }
 
-/* Errores de validación compactos */
+/* Errores de validaciÃ³n compactos */
 .doc-form-validation-errors {
   background: rgba(127, 29, 29, 0.25);
   border: 1px solid rgba(248, 113, 113, 0.5);
@@ -868,7 +846,7 @@ input:disabled, select:disabled, textarea:disabled {
   }
 }
 
-/* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÍCULO ==================== */
+/* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÃCULO ==================== */
 .doc-smart-card {
   background: rgba(15, 23, 42, 0.6);
   border: var(--doc-border);
@@ -910,7 +888,7 @@ input:disabled, select:disabled, textarea:disabled {
   box-shadow: 0 0 0 2px rgba(71, 85, 105, 0.2);
 }
 
-/* ==================== PANEL TOTALES (jerarquía clara, sin glow) ==================== */
+/* ==================== PANEL TOTALES (jerarquÃ­a clara, sin glow) ==================== */
 .totales-cockpit {
   background: rgba(15, 23, 42, 0.7);
   border: var(--doc-border);
@@ -965,7 +943,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 .totales-cockpit-save:hover { background: #047857; }
 
-/* ==================== BOTÓN UNIFICADO .btn-add ==================== */
+/* ==================== BOTÃ“N UNIFICADO .btn-add ==================== */
 .btn-add {
   display: inline-flex;
   align-items: center;
@@ -985,7 +963,7 @@ input:disabled, select:disabled, textarea:disabled {
 
 /* ==================== TABLA REAL: Grid 12 cols - Code | Part name | Qty | Price | Total | [x] ==================== */
 .doc-pos-section { margin-bottom: 0.75rem; }
-/* Alinear títulos y botones de acción en secciones partes/servicios/otros */
+/* Alinear tÃ­tulos y botones de acciÃ³n en secciones partes/servicios/otros */
 .doc-ficha-parts .flex.justify-between,
 .doc-ficha-services .flex.justify-between,
 .doc-ficha-otros .flex.justify-between {
@@ -1020,10 +998,12 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-pos-header-otros > span:nth-child(4){ grid-column: span 2; }
 .doc-pos-header-otros > span:nth-child(5){ grid-column: span 1; }
 .doc-pos-header-otros > span:nth-child(6){ grid-column: span 1; }
-/* Filas dinámicas: usan grid grid-cols-12 del HTML, no override */
+/* Filas dinÃ¡micas: usan grid grid-cols-12 del HTML, no override */
 #repuestos-container .dynamic-element .doc-row-grid,
 #servicios-container .dynamic-element .doc-row-grid,
 #otros-container .dynamic-element .doc-row-grid {
+  display: grid !important;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
   min-height: 40px;
   border-bottom: 1px solid rgba(71, 85, 105, 0.3);
   background: rgba(0, 0, 0, 0.08);
@@ -1067,15 +1047,15 @@ input:disabled, select:disabled, textarea:disabled {
 
 {% block documento_title %}
 {% load i18n %}
-{# ✅ Manejo robusto de company_country con múltiples fallbacks #}
+{# âœ… Manejo robusto de company_country con mÃºltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-<!-- Header de Página - Design System -->
+<!-- Header de PÃ¡gina - Design System -->
 <div class="mb-6 sm:mb-8 px-4 sm:px-6">
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
     <div class="flex-1">
       <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-        📝 {{ ui_labels.new_document }}
+        ðŸ“ {{ ui_labels.new_document }}
       </h1>
       <p class="text-sm sm:text-base text-slate-300">
         {{ ui_labels.new_document }}
@@ -1091,12 +1071,12 @@ input:disabled, select:disabled, textarea:disabled {
           <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
                   class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
                   {% if LANGUAGE_CODE == 'en' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            🇺🇸 EN
+            ðŸ‡ºðŸ‡¸ EN
           </button>
           <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc"
                   class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'es' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
                   {% if LANGUAGE_CODE == 'es' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            🇪🇸 ES
+            ðŸ‡ªðŸ‡¸ ES
           </button>
         </div>
       </form>
@@ -1112,12 +1092,12 @@ input:disabled, select:disabled, textarea:disabled {
 {% endwith %}
 
 <script>
-// Única fuente de verdad para ?next= al ir a crear cliente/vehículo (pathname + querystring)
+// Ãšnica fuente de verdad para ?next= al ir a crear cliente/vehÃ­culo (pathname + querystring)
 window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
   return encodeURIComponent(window.location.pathname + (window.location.search || ''));
 };
 
-// Funciones para abrir modales de cliente y vehículo - Disponibles inmediatamente
+// Funciones para abrir modales de cliente y vehÃ­culo - Disponibles inmediatamente
 (function() {
   'use strict';
   
@@ -1129,7 +1109,7 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       // Parsear el path: /cl/documentos/form/ -> ['cl', 'documentos', 'form'] (sin search)
       const pathParts = pathBase.split('/').filter(function(p) { return p && p.length > 0; });
       
-      // Detectar país e idioma desde el path
+      // Detectar paÃ­s e idioma desde el path
       let countryPrefix = 'cl';
       let langPrefix = 'es';
       
@@ -1141,11 +1121,11 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       }
       
       const createUrl = '/' + countryPrefix + '/' + langPrefix + '/clientes/crear/?next=' + nextUrl;
-      console.log('🔵 Abriendo modal de cliente:', createUrl);
+      console.log('ðŸ”µ Abriendo modal de cliente:', createUrl);
       window.location.href = createUrl;
     } catch (error) {
-      console.error('❌ Error al abrir modal de cliente:', error);
-      alert('Error al abrir la página de crear cliente. Por favor, intente nuevamente.');
+      console.error('âŒ Error al abrir modal de cliente:', error);
+      alert('Error al abrir la pÃ¡gina de crear cliente. Por favor, intente nuevamente.');
     }
   }
 
@@ -1160,18 +1140,18 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       const clienteSelect = document.getElementById('id_cliente');
       
       if (clienteSelect) {
-        // Intentar obtener el valor desde Select2 si está inicializado
+        // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
         if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
           clienteId = jQuery(clienteSelect).val();
-          console.log('👤 Cliente obtenido desde Select2:', clienteId);
+          console.log('ðŸ‘¤ Cliente obtenido desde Select2:', clienteId);
         } else {
           // Fallback: obtener del campo directamente
           clienteId = clienteSelect.value || null;
-          console.log('👤 Cliente obtenido del campo:', clienteId);
+          console.log('ðŸ‘¤ Cliente obtenido del campo:', clienteId);
         }
       }
       
-      // Si aún no hay valor, intentar desde el campo oculto de Select2
+      // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
       if (!clienteId && window.jQuery) {
         const select2Container = jQuery('#id_cliente').next('.select2-container');
         if (select2Container.length) {
@@ -1179,12 +1159,12 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
           const dataId = select2Selection.attr('data-id');
           if (dataId) {
             clienteId = dataId;
-            console.log('👤 Cliente obtenido desde data-id:', clienteId);
+            console.log('ðŸ‘¤ Cliente obtenido desde data-id:', clienteId);
           }
         }
       }
       
-      // LÓGICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+      // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
       // Si empieza con /us/, usar /us/en/
       let countryPrefix = 'cl';
       let langPrefix = 'es';
@@ -1199,17 +1179,17 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       
       let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
       
-      // Agregar cliente_id si está seleccionado
+      // Agregar cliente_id si estÃ¡ seleccionado
       if (clienteId) {
         createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
-        console.log('👤 Cliente seleccionado:', clienteId);
+        console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
       }
       
-      console.log('🚗 Abriendo modal de vehículo:', createUrl);
+      console.log('ðŸš— Abriendo modal de vehÃ­culo:', createUrl);
       window.location.href = createUrl;
     } catch (error) {
-      console.error('❌ Error al abrir modal de vehículo:', error);
-      alert('Error al abrir la página de crear vehículo. Por favor, intente nuevamente.');
+      console.error('âŒ Error al abrir modal de vehÃ­culo:', error);
+      alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
     }
   }
 
@@ -1217,27 +1197,27 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
   window.openClienteModal = openClienteModal;
   window.openVehiculoModal = openVehiculoModal;
   
-  // Verificar que las funciones estén disponibles
-  console.log('✅ Funciones de modal disponibles:', {
+  // Verificar que las funciones estÃ©n disponibles
+  console.log('âœ… Funciones de modal disponibles:', {
     openClienteModal: typeof window.openClienteModal,
     openVehiculoModal: typeof window.openVehiculoModal
   });
 })();
 
-// Función global para manejar el click del botón de vehículo
-// Esta función se llama directamente desde el onclick del botón como respaldo
+// FunciÃ³n global para manejar el click del botÃ³n de vehÃ­culo
+// Esta funciÃ³n se llama directamente desde el onclick del botÃ³n como respaldo
 function handleNuevoVehiculoClick(event) {
   if (event) {
     event.preventDefault();
     event.stopPropagation();
   }
   
-  console.log('🚗 handleNuevoVehiculoClick llamado');
+  console.log('ðŸš— handleNuevoVehiculoClick llamado');
   
   try {
-    // Intentar usar openVehiculoModal si está disponible
+    // Intentar usar openVehiculoModal si estÃ¡ disponible
     if (window.openVehiculoModal && typeof window.openVehiculoModal === 'function') {
-      console.log('✅ Usando openVehiculoModal desde handleNuevoVehiculoClick');
+      console.log('âœ… Usando openVehiculoModal desde handleNuevoVehiculoClick');
       window.openVehiculoModal();
       return false;
     }
@@ -1251,53 +1231,53 @@ function handleNuevoVehiculoClick(event) {
     let clienteId = null;
     const clienteSelect = document.getElementById('id_cliente');
     
-    console.log('🔍 Buscando cliente seleccionado...');
-    console.log('🔍 Campo cliente encontrado:', !!clienteSelect);
+    console.log('ðŸ” Buscando cliente seleccionado...');
+    console.log('ðŸ” Campo cliente encontrado:', !!clienteSelect);
     
     if (clienteSelect) {
-      console.log('🔍 Valor directo del campo:', clienteSelect.value);
-      console.log('🔍 jQuery disponible:', !!window.jQuery);
+      console.log('ðŸ” Valor directo del campo:', clienteSelect.value);
+      console.log('ðŸ” jQuery disponible:', !!window.jQuery);
       
-      // Intentar obtener el valor desde Select2 si está inicializado
+      // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
       if (window.jQuery) {
         const $clienteSelect = jQuery(clienteSelect);
-        console.log('🔍 Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
+        console.log('ðŸ” Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
         
         if ($clienteSelect.hasClass('select2-hidden-accessible')) {
           clienteId = $clienteSelect.val();
-          console.log('✅ Cliente obtenido desde Select2:', clienteId);
+          console.log('âœ… Cliente obtenido desde Select2:', clienteId);
         } else {
           // Fallback: obtener del campo directamente
           clienteId = clienteSelect.value || null;
-          console.log('✅ Cliente obtenido del campo directamente:', clienteId);
+          console.log('âœ… Cliente obtenido del campo directamente:', clienteId);
         }
       } else {
         // Sin jQuery, obtener del campo directamente
         clienteId = clienteSelect.value || null;
-        console.log('✅ Cliente obtenido del campo (sin jQuery):', clienteId);
+        console.log('âœ… Cliente obtenido del campo (sin jQuery):', clienteId);
       }
     }
     
-    // Si aún no hay valor, intentar desde el campo oculto de Select2
+    // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
     if (!clienteId && window.jQuery) {
-      console.log('🔍 Intentando obtener cliente desde Select2 rendered...');
+      console.log('ðŸ” Intentando obtener cliente desde Select2 rendered...');
       const select2Container = jQuery('#id_cliente').next('.select2-container');
       if (select2Container.length) {
         const select2Selection = select2Container.find('.select2-selection__rendered');
         const select2Text = select2Selection.text();
-        console.log('🔍 Texto en Select2:', select2Text);
+        console.log('ðŸ” Texto en Select2:', select2Text);
         // Intentar obtener el ID desde el atributo data
         const dataId = select2Selection.attr('data-id');
         if (dataId) {
           clienteId = dataId;
-          console.log('✅ Cliente obtenido desde data-id:', clienteId);
+          console.log('âœ… Cliente obtenido desde data-id:', clienteId);
         }
       }
     }
     
-    console.log('🔍 Cliente ID final:', clienteId);
+    console.log('ðŸ” Cliente ID final:', clienteId);
     
-    // LÓGICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+    // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
     // Si empieza con /us/, usar /us/en/
     let countryPrefix = 'cl';
     let langPrefix = 'es';
@@ -1312,23 +1292,23 @@ function handleNuevoVehiculoClick(event) {
     
     let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
     
-    // Agregar cliente_id si está seleccionado
+    // Agregar cliente_id si estÃ¡ seleccionado
     if (clienteId) {
       createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
-      console.log('👤 Cliente seleccionado:', clienteId);
+      console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
     }
     
-    console.log('🚗 Navegando a (desde handleNuevoVehiculoClick):', createUrl);
+    console.log('ðŸš— Navegando a (desde handleNuevoVehiculoClick):', createUrl);
     window.location.href = createUrl;
     return false;
   } catch (error) {
-    console.error('❌ Error en handleNuevoVehiculoClick:', error);
-    alert('Error al abrir la página de crear vehículo. Por favor, intente nuevamente.');
+    console.error('âŒ Error en handleNuevoVehiculoClick:', error);
+    alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
     return false;
   }
 }
 
-// Hacer la función disponible globalmente
+// Hacer la funciÃ³n disponible globalmente
 window.handleNuevoVehiculoClick = handleNuevoVehiculoClick;
 
 function submitLanguageDoc(lang) {
@@ -1340,7 +1320,7 @@ function submitLanguageDoc(lang) {
 
 {% block documento_content %}
 {% load i18n %}
-{# ✅ Manejo robusto de company_country con múltiples fallbacks #}
+{# âœ… Manejo robusto de company_country con mÃºltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
         <form method="post" id="document-form" class="doc-form-compact mx-auto"
@@ -1364,20 +1344,20 @@ function submitLanguageDoc(lang) {
   {% if messages %}
     {% for message in messages %}
       {% with msg_text=message|stringformat:"s" %}
-      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesión exitosamente" not in msg_text and "Ha cerrado sesión" not in msg_text and "iniciado sesión exitosamente" not in msg_text and "cerrado sesión" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
+      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesiÃ³n exitosamente" not in msg_text and "Ha cerrado sesiÃ³n" not in msg_text and "iniciado sesiÃ³n exitosamente" not in msg_text and "cerrado sesiÃ³n" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
         {% if message.tags == 'success' %}
         <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">✅</span>
+          <span class="text-2xl flex-shrink-0">âœ…</span>
           <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
         </div>
         {% elif message.tags == 'error' %}
         <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">❌</span>
+          <span class="text-2xl flex-shrink-0">âŒ</span>
           <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
         </div>
         {% else %}
         <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">ℹ️</span>
+          <span class="text-2xl flex-shrink-0">â„¹ï¸</span>
           <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
         </div>
         {% endif %}
@@ -1400,10 +1380,10 @@ function submitLanguageDoc(lang) {
     </div>
   {% endif %}
 
-  <!-- Document workspace — cabecera consola | tarjetas cliente/vehículo | repuestos/servicios POS | observaciones | totales cockpit -->
+  <!-- Document workspace â€” cabecera consola | tarjetas cliente/vehÃ­culo | repuestos/servicios POS | observaciones | totales cockpit -->
   <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
 
-    <!-- 1. CABECERA COMPACTA — fila 1: INV | Fecha | Mecánico | Pago | fila 2: Tipo | Operación -->
+    <!-- 1. CABECERA COMPACTA â€” fila 1: INV | Fecha | MecÃ¡nico | Pago | fila 2: Tipo | OperaciÃ³n -->
     <div class="doc-console-header">
       <div class="doc-console-title flex flex-wrap items-center gap-2">
         <span>{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</span>
@@ -1415,7 +1395,7 @@ function submitLanguageDoc(lang) {
           <div class="doc-console-field doc-console-field--invoice">
             <span class="doc-console-meta">{% trans "Document No." %}</span>
             <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
-              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}—{% endif %}
+              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}â€”{% endif %}
             </span>
           </div>
 
@@ -1464,16 +1444,16 @@ function submitLanguageDoc(lang) {
           <input type="text" id="cliente-busqueda" class="w-full bg-slate-800 p-2 rounded border border-slate-600 text-white text-sm"
                  placeholder="{% trans 'Search client' %}"
                  autocomplete="off"
-                 oninput="window.handleClienteInput?.(this.value)"
-                 onfocus="window.handleClienteFocus?.(this.value)"
-                 onkeydown="return window.handleClienteKeydown?.(event)">
+                 oninput="window.EG?.cliente?.handleClienteInput?.(this.value)"
+                 onfocus="window.EG?.cliente?.handleClienteFocus?.(this.value)"
+                 onkeydown="return window.EG?.cliente?.handleClienteKeydown?.(event)">
           <div id="cliente-resultados" class="absolute z-50 w-full bg-slate-800 border border-slate-600 rounded shadow-lg hidden max-h-48 overflow-y-auto text-sm mt-1"></div>
         </div>
         <a id="btn-nuevo-cliente"
            href="{% country_url 'clientes:crear_cliente' %}"
            data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
            class="doc-action-btn mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold no-underline shadow-sm whitespace-nowrap">
-          <span aria-hidden="true">➕</span>
+          <span aria-hidden="true">âž•</span>
           <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
         </a>
         <select id="id_cliente" name="cliente" class="hidden">
@@ -1493,11 +1473,13 @@ function submitLanguageDoc(lang) {
           <div class="doc-field-with-btn flex gap-2">
             <div class="flex-1">
               <label for="id_vehiculo" class="sr-only">{% trans 'Vehicle' %}</label>
-              {{ form.vehiculo }}
+              <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
+                <option value="">{% trans 'Select vehicle...' %}</option>
+              </select>
             </div>
             <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
-              <span aria-hidden="true">➕</span>
-              <span class="doc-action-label text-white font-semibold">Nuevo vehículo</span>
+              <span aria-hidden="true">âž•</span>
+              <span class="doc-action-label text-white font-semibold">Nuevo vehÃ­culo</span>
             </button>
           </div>
         </div>
@@ -1530,14 +1512,14 @@ function submitLanguageDoc(lang) {
             <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
             {% if desarme_origen_label %}
             <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
-              <span>🧩</span>
+              <span>ðŸ§©</span>
               <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
             </div>
             {% endif %}
           </div>
           <div class="flex gap-1 flex-shrink-0 items-center">
-            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addRepuestoRow()"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="openUsedPartsModal()"><span aria-hidden="true">🧩</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
+            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addRepuestoRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="openUsedPartsModal()"><span aria-hidden="true">ðŸ§©</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
           </div>
         </div>
         <div class="doc-pos-header hidden sm:grid">
@@ -1553,7 +1535,7 @@ function submitLanguageDoc(lang) {
         <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
           <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
           <div class="flex gap-1 flex-shrink-0 items-center">
-            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addServicioRow()"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addServicioRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
           </div>
         </div>
         <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
@@ -1571,8 +1553,8 @@ function submitLanguageDoc(lang) {
       <div class="flex flex-wrap items-center gap-2 mb-3 min-h-[2rem]">
         <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
         <div class="flex gap-1 flex-shrink-0 items-center">
-          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addOtroRow()"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">🌐</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
+          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addOtroRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
         </div>
       </div>
       <div class="doc-pos-header doc-pos-header-otros hidden sm:grid">
@@ -1669,14 +1651,14 @@ function submitLanguageDoc(lang) {
           {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
         </button>
         <div class="flex gap-2 mt-3">
-          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">←</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">🌐</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
+          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">â†</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Hidden inputs para serializar filas dinámicas -->
+  <!-- Hidden inputs para serializar filas dinÃ¡micas -->
   <input type="hidden" name="repuestos_json" id="id_repuestos_json">
   <input type="hidden" name="servicios_json" id="id_servicios_json">
   <input type="hidden" name="otros_json" id="id_otros_json">
@@ -1687,7 +1669,7 @@ function submitLanguageDoc(lang) {
   <div class="absolute inset-0 bg-black/70" onclick="closeUsedPartsModal()"></div>
   <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
     <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
-      <h3 class="text-lg font-bold text-amber-300 mb-3">🧩 {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
+      <h3 class="text-lg font-bold text-amber-300 mb-3">ðŸ§© {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
       <input type="search" id="used-parts-search" placeholder="{% trans 'Search by code or name...' %}" class="form-control w-full mb-4" autocomplete="off">
       <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
       <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">{% trans "Type at least 2 characters to search" %}</p>
@@ -1709,2520 +1691,169 @@ function submitLanguageDoc(lang) {
 
 {% block extra_js %}
 {{ block.super }}
-<script src="{% static 'marketplace_tooltip.js' %}"></script>
+{# Scripts esenciales #}
+<script src="{% static 'js/marketplace_tooltip_fixed.js' %}"></script>
+
+{# FunciÃ³n helper para encode next URL - Mantener por compatibilidad #}
 <script>
-// Asegurar que egEncodeDocumentFormNext exista antes de initDocumentFormScript (puede no estar si el script de documento_content no se ejecutó)
-if (typeof window.egEncodeDocumentFormNext !== 'function') {
-  window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
+window.egEncodeDocumentFormNext = function() {
     return encodeURIComponent(window.location.pathname + (window.location.search || ''));
-  };
-}
-function initDocumentFormScript(){
-  // Evita doble inicialización
-  if (window.EG && window.EG._docFormInit) {
-    return;
-  }
-  const EG = (window.EG = window.EG || {});
-  EG._docFormInit = true;
-  // Observations mínimo
-  const obs = document.getElementById('id_observaciones');
-  if (obs) { obs.setAttribute('rows', '2'); }
-
-  // Cabecera consola: badge estado de pago (semáforo)
-  function updatePaymentStatusBadge() {
-    const sel = document.getElementById('id_payment_status');
-    const badge = document.getElementById('payment-status-badge');
-    if (!badge || !sel) return;
-    badge.classList.remove('doc-console-payment-paid', 'doc-console-payment-pending', 'doc-console-payment-partial');
-    const v = (sel.value || '').toUpperCase();
-    if (v === 'PAGADO' || v === 'PAID') badge.classList.add('doc-console-payment-paid');
-    else if (v === 'PARCIAL' || v === 'PARTIAL') badge.classList.add('doc-console-payment-partial');
-    else badge.classList.add('doc-console-payment-pending');
-  }
-  updatePaymentStatusBadge();
-  document.getElementById('id_payment_status')?.addEventListener('change', updatePaymentStatusBadge);
-
-  // === CSRF ===
-  function getCookie(name) {
-    const m = document.cookie.match('(^|;)\\s*' + name + '\\s*=\\s*([^;]+)');
-    return m ? m.pop() : '';
-  }
-  const CSRF = getCookie('csrftoken');
-
-  async function egFetch(url, opts={}){
-    const defaults = {
-      credentials: 'same-origin',
-      headers: {
-        'X-Requested-With': 'XMLHttpRequest',
-        'X-CSRFToken': CSRF,
-      }
-    };
-    const cfg = {
-      ...defaults,
-      ...opts,
-      headers: { ...(defaults.headers||{}), ...((opts||{}).headers||{}) }
-    };
-    return fetch(url, cfg);
-  }
-  EG.fetch = egFetch;
-
-  // === CONFIG: no pisa si ya existe ===
-  EG.cfg = EG.cfg || {};
-  if (!EG.cfg.country) {
-    const FORM = document.getElementById('document-form');
-    if (FORM && FORM.dataset.countryCode) {
-      EG.cfg.country = String(FORM.dataset.countryCode).toUpperCase();
-    } else {
-      const path = (location.pathname || '').toLowerCase();
-      EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
-    }
-  }
-  (function(){
-    // Leer endpoints desde data-* attributes del formulario
-    const FORM = document.getElementById('document-form');
-    if (FORM) {
-      EG.cfg.URL_NEXT_NUMBER        = EG.cfg.URL_NEXT_NUMBER        || FORM.dataset.urlNextNumber;
-      EG.cfg.URL_CLIENT_SEARCH      = EG.cfg.URL_CLIENT_SEARCH      || FORM.dataset.urlClientSearch;
-      EG.cfg.URL_VEHICULOS_BY_CLI   = EG.cfg.URL_VEHICULOS_BY_CLI   || FORM.dataset.urlVehiculosByCli;
-      EG.cfg.URL_REPUESTO_BY_CODE   = EG.cfg.URL_REPUESTO_BY_CODE   || FORM.dataset.urlRepuestoByCode;
-      EG.cfg.URL_REPUESTO_SEARCH   = EG.cfg.URL_REPUESTO_SEARCH   || FORM.dataset.urlRepuestoSearch;
-      EG.cfg.URL_REPUESTO_CREATE   = EG.cfg.URL_REPUESTO_CREATE   || FORM.dataset.urlRepuestoCreate;
-      EG.cfg.URL_REPUESTO_CREATE_WINDOW = EG.cfg.URL_REPUESTO_CREATE_WINDOW || FORM.dataset.urlRepuestoCreatePage;
-      EG.cfg.URL_SERVICE_SEARCH     = EG.cfg.URL_SERVICE_SEARCH     || FORM.dataset.urlServiceSearch;
-      EG.cfg.URL_SERVICE_CREATE     = EG.cfg.URL_SERVICE_CREATE     || FORM.dataset.urlServiceCreate;
-      EG.cfg.URL_OUTSOURCED_SERVICES= EG.cfg.URL_OUTSOURCED_SERVICES|| FORM.dataset.urlOutsourcedServices;
-      EG.cfg.URL_USED_PARTS        = EG.cfg.URL_USED_PARTS        || FORM.dataset.urlUsedParts;
-    }
-    // Fallback a path-based si no hay data-* (legacy)
-    if (!EG.cfg.URL_NEXT_NUMBER && FORM) {
-      const p = location.pathname || '';
-      const base = p.startsWith('/us/') ? '/us' : (p.startsWith('/cl/') ? '/cl' : '');
-      EG.cfg.URL_NEXT_NUMBER      = FORM.dataset.urlNextNumber || `${base}/documentos/api/obtener-numero-documento/`;
-      EG.cfg.URL_CLIENT_SEARCH    = FORM.dataset.urlClientSearch || `${base}/ajax/clientes/buscar/`;
-      EG.cfg.URL_VEHICULOS_BY_CLI = FORM.dataset.urlVehiculosByCli || `${base}/ajax/vehiculos-por-cliente/`;
-      EG.cfg.URL_REPUESTO_BY_CODE = FORM.dataset.urlRepuestoByCode || `${base}/api/repuestos/by-code`;
-      EG.cfg.URL_REPUESTO_SEARCH = FORM.dataset.urlRepuestoSearch || `${base}/api/repuestos/`;
-      EG.cfg.URL_SERVICE_SEARCH   = FORM.dataset.urlServiceSearch || `${base}/api/servicios/`;
-      EG.cfg.URL_SERVICE_CREATE   = FORM.dataset.urlServiceCreate || `${base}/servicios/crear/`;
-      EG.cfg.URL_OUTSOURCED_SERVICES = FORM.dataset.urlOutsourcedServices || `${base}/api/otros-servicios/`;
-      EG.cfg.URL_USED_PARTS = FORM.dataset.urlUsedParts || `${base}/api/piezas-desarme/`;
-    }
-    // Sales tax configurable (ej.: desde CompanySettings) - Legacy, mantener por compatibilidad
-    EG.cfg.salesTax = typeof EG.cfg.salesTax === 'number' ? EG.cfg.salesTax : 0.08;
-    
-    // Inicializar taxLines desde ui_config (pasado desde el backend)
-    // Esto permite que el JavaScript calcule impuestos dinámicamente sin conocer el país
-    const taxLinesScript = document.getElementById('uiConfigTaxLines');
-    if (taxLinesScript) {
-      try {
-        EG.cfg.taxLines = JSON.parse(taxLinesScript.textContent);
-      } catch (e) {
-        console.error('Error parsing taxLines:', e);
-        EG.cfg.taxLines = [];
-      }
-    } else {
-      EG.cfg.taxLines = [];
-    }
-  })();
-
-  // Exponer seguro
-  window.EG = EG;
-
-// ===============
-// CONFIG ENDPOINTS - Evitar redeclaración
-// ===============
-window.EG = window.EG || {};
-EG.cfg = EG.cfg || {};
-if (!EG.cfg.country) {
-  const formEl = document.getElementById('document-form');
-  if (formEl && formEl.dataset.countryCode) {
-    EG.cfg.country = String(formEl.dataset.countryCode).toUpperCase();
-  } else {
-    const path = (location.pathname || '').toLowerCase();
-    EG.cfg.country = path.startsWith('/cl/') ? 'CL' : (path.startsWith('/us/') ? 'US' : 'CL');
-  }
-}
-EG.COUNTRY = EG.COUNTRY || (EG.cfg.country || 'CL');
-const COUNTRY_REF = (EG.COUNTRY || 'CL').toUpperCase(); // usa COUNTRY_REF en lugar de COUNTRY
-
-// Preselección desde URL (vuelta desde "crear vehículo" con cliente_id y vehiculo_id)
-window.__PRESELECT_CLIENTE_ID__ = "{{ cliente_preselect_id|default:''|escapejs }}";
-window.__PRESELECT_VEHICULO_ID__ = "{{ vehiculo_preselect_id|default:''|escapejs }}";
-
-// ==== PREFETCH & HELPERS ====
-(function(){
-  function safeJSON(id) {
-    try {
-      const el = document.getElementById(id);
-      return el ? JSON.parse(el.textContent) : [];
-    } catch (err) {
-      console.warn('⚠️ PREFETCH inválido para', id, err);
-      return [];
-    }
-  }
-
-  const global = window;
-  global.PREFETCH = global.PREFETCH || {
-    clientes:  safeJSON('prefetchClientes'),
-    vehiculos: safeJSON('prefetchVehiculos'),
-    repuestos: safeJSON('prefetchRepuestos'),
-    servicios: safeJSON('prefetchServicios'),
-    otros:     safeJSON('prefetchOtrosServicios'),
-  };
-
-  if (typeof global.filterPrefetchItems !== 'function') {
-    global.filterPrefetchItems = function(list, fields, query, limit = 15) {
-      if (!Array.isArray(list) || !fields?.length) return [];
-      const normalize = (value) => (value ?? '')
-        .toString()
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/\p{Diacritic}/gu, '');
-      const needle = normalize(query);
-      if (!needle) return [];
-
-      const results = [];
-      for (const item of list) {
-        for (const field of fields) {
-          if (normalize(item?.[field]).includes(needle)) {
-            results.push(item);
-            break;
-          }
-        }
-        if (results.length >= limit) break;
-      }
-      return results;
-    };
-  }
-})();
-
-// ===============
-// I18N DICCIONARIO
-// ===============
-const I18N = {
-  no_clients: "{% trans 'No clients found' %}",
-  loading_vehicles: "{% trans 'Loading vehicles…' %}",
-  no_vehicles: "{% trans 'No vehicles registered' %}",
-  select_vehicle: "{% trans 'Select vehicle…' %}",
-  server_error: "{% trans 'Server error' %}",
-  error_loading_vehicles: "{% trans 'Error loading vehicles' %}",
-  no_services: "{% trans 'No services found' %}",
-  select_service: "{% trans 'Select service...' %}",
-  issue_date_required: "{% trans 'Issue Date is required' %}",
-  document_type_required: "{% trans 'Document Type is required' %}",
-  client_required: "{% trans 'Client is required' %}",
-  vehicle_required: "{% trans 'Vehicle is required' %}",
-  code: "{% trans 'Code' %}",
-  name: "{% trans 'Name' %}",
-  qty: "{% trans 'Qty' %}",
-  cost_price: "{% trans 'Cost Price' %}",
-  sale_price: "{% trans 'Sale Price' %}",
-  discount_pct: "{% trans 'Discount %' %}",
-  subtotal: "{% trans 'Subtotal' %}",
-  service: "{% trans 'Service' %}",
-  type_to_search_services: "{% trans 'Type to search services...' %}",
-  type_to_search_parts: "{% trans 'Type to search parts...' %}",
-  type_to_search_external: "{% trans 'Type to search external services...' %}",
-  no_parts: "{% trans 'No parts found' %}",
-  no_external_services: "{% trans 'No external services found' %}",
-  external_company: "{% trans 'External Company' %}",
-  create_part: "{% trans 'Create Part' %}",
-  create_service: "{% trans 'Create Service' %}",
-  remove_row: "{% trans 'Remove row' %}",
-  client_price: "{% trans 'Client Price' %}",
-  shop_price: "{% trans 'Shop Price' %}",
-  toggle_cost_visibility: "{% trans 'Toggle cost price visibility' %}",
-  part_number_required: "{% trans 'Part number is required' %}",
-  part_name_required: "{% trans 'Part name is required' %}",
-  part_created: "{% trans 'Part created successfully' %}",
-  part_exists: "{% trans 'Existing part loaded' %}",
-  save: "{% trans 'Save' %}",
-  cancel: "{% trans 'Cancel' %}",
 };
 
-if (COUNTRY_REF === 'CL') {
-  Object.assign(I18N, {
-    no_clients: "Sin clientes encontrados",
-    loading_vehicles: "Cargando vehículos…",
-    no_vehicles: "Sin vehículos registrados",
-    select_vehicle: "Selecciona vehículo…",
-    server_error: "Error del servidor",
-    error_loading_vehicles: "Error cargando vehículos",
-    no_parts: "Sin repuestos coincidentes",
-    no_external_services: "Sin servicios externos",
-    select_service: "Selecciona servicio…",
-    issue_date_required: "La fecha de emisión es obligatoria",
-    document_type_required: "El tipo de documento es obligatorio",
-    client_required: "Debes seleccionar un cliente",
-    vehicle_required: "Debes seleccionar un vehículo",
-    code: "Código",
-    name: "Nombre",
-    qty: "Cant.",
-    cost_price: "Precio compra",
-    sale_price: "Precio venta",
-    discount_pct: "% desc",
-    subtotal: "Subtotal",
-    service: "Servicio",
-    type_to_search_services: "Escribe para buscar servicios…",
-    type_to_search_parts: "Escribe para buscar repuestos…",
-    type_to_search_external: "Escribe para buscar servicios externos…",
-    client_price: "Precio al cliente",
-    shop_price: "Costo al taller",
-    external_company: "Empresa externa",
-    create_part: "Crear repuesto",
-    create_service: "Crear servicio",
-    remove_row: "Eliminar fila",
-    client_price: "Precio al cliente",
-    shop_price: "Costo al taller",
-    toggle_cost_visibility: "Mostrar/ocultar precio de compra",
-    part_number_required: "El código del repuesto es obligatorio",
-    part_name_required: "El nombre del repuesto es obligatorio",
-    part_created: "Repuesto creado correctamente",
-    part_exists: "Repuesto existente seleccionado",
-    save: "Guardar",
-    cancel: "Cancelar",
-  });
-}
-
-// ===============
-// HELPERS
-// ===============
-const $ = (sel, ctx=document) => ctx.querySelector(sel);
-const $$ = (sel, ctx=document) => Array.from(ctx.querySelectorAll(sel));
-
-function showFieldError(el, msg){
-  const hint = document.createElement('div');
-  hint.className = 'mt-1 text-red-300 text-sm eg-hint';
-  hint.textContent = msg;
-  el.closest('div')?.appendChild(hint);
-  el.classList.add('ring-2','ring-red-500');
-}
-
-function setText(selOrEl, txt) {
-  const el = typeof selOrEl==='string' ? $(selOrEl) : selOrEl;
-  if (el) el.textContent = txt;
-}
-
-/**
- * Normaliza un servicio para asegurar que siempre tenga 'id' y 'pk'
- * Esto resuelve inconsistencias entre APIs que devuelven 'id' vs 'pk'
- */
-function normalizeServicio(servicio) {
-  if (!servicio || typeof servicio !== 'object') return servicio;
-  return {
-    ...servicio,
-    id: servicio.id || servicio.pk || '',
-    pk: servicio.pk || servicio.id || '',
-  };
-}
-
-const MONEY_FORMATS = {
-  US: { locale: 'en-US', currency: 'USD', min: 2, max: 2 },
-  CL: { locale: 'es-CL', currency: 'CLP', min: 0, max: 0 },
-  MX: { locale: 'es-MX', currency: 'MXN', min: 2, max: 2 },
-  PE: { locale: 'es-PE', currency: 'PEN', min: 2, max: 2 },
-  VE: { locale: 'es-VE', currency: 'VES', min: 2, max: 2 },
-  BR: { locale: 'pt-BR', currency: 'BRL', min: 2, max: 2 },
-};
-
-function buildMoneyFormatter(country){
-  const cfg = MONEY_FORMATS[country] || MONEY_FORMATS.CL;
-  return new Intl.NumberFormat(cfg.locale, {
-    style: 'currency',
-    currency: cfg.currency,
-    minimumFractionDigits: cfg.min ?? 2,
-    maximumFractionDigits: cfg.max ?? 2,
-  });
-}
-
-function formatNumberInput(value){
-  const num = Number(value);
-  if (!Number.isFinite(num)) return '';
-  const digits = MONEY_FORMATS[COUNTRY_REF]?.max ?? 2;
-  return num.toFixed(digits);
-}
-
-function parseNumericInput(value){
-  if (value === undefined || value === null) return 0;
-  const num = Number(value.toString().replace(/[^0-9.-]/g, ''));
-  return Number.isFinite(num) ? num : 0;
-}
-
-function buildEndpoint(url){
-  if (!url) return '';
-  if (/^https?:\/\//i.test(url)) return url;
-  if (url.startsWith('/')) return url;
-  const path = window.location.pathname || '/';
-  const parts = path.split('/').filter(Boolean);
-  if (!parts.length) {
-    return `/${url.replace(/^\//, '')}`;
-  }
-  const countrySegment = parts[0];
-  return `/${countrySegment}/${url.replace(/^\//, '')}`;
-}
-
-let MONEY_FORMATTER = buildMoneyFormatter(COUNTRY_REF);
-
-function money(n){
-  if (!MONEY_FORMATTER) {
-    MONEY_FORMATTER = buildMoneyFormatter(COUNTRY_REF);
-  }
-  const value = Number(n) || 0;
-  return MONEY_FORMATTER.format(value);
-}
-
-// ===============
-// THEME + NÚMERO
-// ===============
-const shell   = document.getElementById('doc-shell');
-const selTipo = document.getElementById('id_tipo');
-const selMode = document.getElementById('doc_mode');
-const numeroView = document.getElementById('id_numero');
-const numeroHidden = document.createElement('input');
-numeroHidden.type = 'hidden';
-numeroHidden.name = 'numero_documento';
-const docForm = document.getElementById('document-form');
-if (docForm) docForm.appendChild(numeroHidden);
-
-function applyTheme(tipo) {
-  if (!shell) return;
-  shell.classList.remove('theme-ot','theme-fac','theme-pres','theme-pts');
-  const themeClass = tipo==='FAC' ? 'theme-fac' : tipo==='PRES' ? 'theme-pres' : tipo==='PTS' ? 'theme-pts' : 'theme-ot';
-  shell.classList.add(themeClass);
-}
-
-function applyTipoDependentUI(tipo) {
-  // Legacy no-op: mantenido por compatibilidad con llamadas antiguas
-}
-
-function applyModeDependentUI() {
-  const mode = selMode ? selMode.value : 'services';
-  const isParts = mode === 'parts';
-
-  const vehicleSection = document.getElementById('vehicle-section');
-  const milesSection   = document.getElementById('miles-section');
-  const tecnicoLabel   = document.getElementById('tecnico-label');
-
-  if (vehicleSection) vehicleSection.style.display = isParts ? 'none' : '';
-  if (milesSection)   milesSection.style.display   = isParts ? 'none' : '';
-
-  if (tecnicoLabel) {
-    tecnicoLabel.textContent = isParts
-      ? (tecnicoLabel.dataset.labelPts || 'Salesperson')
-      : (tecnicoLabel.dataset.labelDefault || '');
-  }
-}
-
-async function updateDocumentNumber(){
-          if (!selTipo) return;
-          const tipo = selTipo.value;
-          if (!tipo) return;
-          try{
-            const r = await EG.fetch(`${EG.cfg.URL_NEXT_NUMBER}?tipo=${encodeURIComponent(tipo)}`);
-            if(!r.ok) throw new Error(`HTTP ${r.status}`);
-            const data = await r.json();
-            const next = data.number || data.numero || data.next || 'Auto-generated';
-            setText(numeroView, next);
-            numeroHidden.value = next;
-          }catch(err){
-            console.error('❌ Error next-number:', err);
-            setText(numeroView, '— error —');
-            numeroHidden.value = '';
-          }
-        }
-
-// ===============
-// CLIENTE + VEHÍCULOS
-// ===============
-let clienteBusqueda, clienteResultados, clienteSelect, clienteInfoBox, cliNombre, cliEmail, cliFono, vehiculoSelect;
-let searchTimer = null;
-
-function getClienteElements(){
-  if (!clienteBusqueda) clienteBusqueda = document.getElementById('cliente-busqueda');
-  if (!clienteResultados) clienteResultados = document.getElementById('cliente-resultados');
-  if (!clienteSelect) clienteSelect = document.getElementById('id_cliente');
-  if (!clienteInfoBox) clienteInfoBox = document.getElementById('cliente-info');
-  if (!cliNombre) cliNombre = document.getElementById('cliente-nombre');
-  if (!cliEmail) cliEmail = document.getElementById('cliente-email');
-  if (!cliFono) cliFono = document.getElementById('cliente-telefono');
-  if (!vehiculoSelect) vehiculoSelect = document.getElementById('id_vehiculo');
-}
-
-async function buscarClientes(q){
-          getClienteElements();
-          if (!q || q.length < 2){
-            if (clienteResultados) clienteResultados.classList.add('hidden');
-            return;
-          }
-          if (!clienteResultados) return;
-          const localMatches = filterPrefetchItems(PREFETCH.clientes, ['nombre', 'nombre_completo', 'email', 'telefono'], q, 15);
-          if (localMatches.length){
-            renderResultadosClientes(localMatches);
-          }
-          try{
-            const url = buildEndpoint(EG.cfg.URL_CLIENT_SEARCH || '/ajax/clientes/buscar/');
-            const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
-            if(!r.ok) throw new Error(`HTTP ${r.status}`);
-            const data = await r.json();
-            const items = Array.isArray(data) ? data : (data.results || data.items || []);
-            renderResultadosClientes(items);
-          }catch(err){
-            console.error('❌ buscarClientes:', err);
-            clienteResultados.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
-            clienteResultados.classList.remove('hidden');
-          }
-        }
-
-function renderResultadosClientes(lista){
-  getClienteElements();
-  if (!clienteResultados) return;
-  // Si ya hay un cliente seleccionado, no mostrar el mensaje "No clients found"
-  if (clienteSelect && clienteSelect.value) {
-    clienteResultados.classList.add('hidden');
-    return;
-  }
-  clienteResultados.innerHTML = '';
-  if (!lista.length){
-    const empty = document.createElement('div');
-    empty.className = 'p-3 text-gray-300';
-    empty.textContent = I18N.no_clients;
-    clienteResultados.appendChild(empty);
-    clienteResultados.classList.remove('hidden');
-    return;
-  }
-  for (const item of lista){
-    const id = item.id || item.pk || '';
-    const nombre = item.text || item.nombre_completo || item.nombre || item.razon_social || `Client #${id}`;
-    const email = item.email || '';
-    const fono  = item.telefono || item.fono || '';
-    const div = document.createElement('div');
-    div.className = 'cliente-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
-    div.setAttribute('role','option');
-    div.tabIndex = 0;
-    div.dataset.id = id;
-    div.dataset.nombre = nombre;
-    div.dataset.email = email;
-    div.dataset.telefono = fono;
-
-    const title = document.createElement('div');
-    title.className = 'font-semibold text-cyan-200';
-    title.textContent = nombre;
-    div.appendChild(title);
-
-    if (email){
-      const em = document.createElement('div');
-      em.className = 'text-sm text-gray-300';
-      em.textContent = `📧 ${email}`;
-      div.appendChild(em);
-    }
-    if (fono){
-      const ph = document.createElement('div');
-      ph.className = 'text-sm text-gray-300';
-      ph.textContent = `📞 ${fono}`;
-      div.appendChild(ph);
-    }
-    clienteResultados.appendChild(div);
-  }
-  clienteResultados.setAttribute('role','listbox');
-  clienteResultados.classList.remove('hidden');
-}
-
-async function seleccionarCliente({id, nombre, email, telefono}){
-  console.log(`👤 Cliente seleccionado: ${nombre} (ID: ${id})`);
-  
-  getClienteElements();
-  if (clienteResultados) clienteResultados.classList.add('hidden');
-  if (clienteBusqueda) clienteBusqueda.value = nombre;
-  if (clienteSelect){ // mantener el valor para POST si backend lo requiere
-    clienteSelect.innerHTML = `<option value="${id}" selected>${nombre}</option>`;
-    clienteSelect.classList.add('hidden');
-  }
-  if (cliNombre) cliNombre.textContent = nombre;
-  if (cliEmail)  cliEmail.textContent  = email ? `📧 ${email}` : '—';
-  if (cliFono)   cliFono.textContent   = telefono ? `📞 ${telefono}` : '—';
-  const ultimaVisitaEl = document.getElementById('cliente-ultima-visita');
-  if (ultimaVisitaEl) ultimaVisitaEl.textContent = ''; // API puede llenar después
-  if (clienteInfoBox) clienteInfoBox.classList.remove('hidden');
-  
-  // ⚡ IMPORTANTE: Cargar vehículos del cliente seleccionado
-  console.log(`🔄 Iniciando carga de vehículos para cliente ${id}...`);
-  
-  // Verificar si hay un vehículo a preseleccionar (desde URL, documentoData o preselect del backend)
-  const urlParams = new URLSearchParams(window.location.search);
-  const newVehiculoId = urlParams.get('vehiculo_id') || urlParams.get('new_vehiculo_id');
-  const prefillVehiculoId = (typeof documentoData !== 'undefined' && documentoData.prefillVehiculoId)
-    ? documentoData.prefillVehiculoId
-    : null;
-  const preselectVehiculoId = (typeof window.__PRESELECT_VEHICULO_ID__ !== 'undefined' && window.__PRESELECT_VEHICULO_ID__)
-    ? window.__PRESELECT_VEHICULO_ID__
-    : null;
-  const vehiculoIdToSelect = newVehiculoId || prefillVehiculoId || preselectVehiculoId || null;
-  
-  await cargarVehiculosPorCliente(id, vehiculoIdToSelect);
-}
-
-async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null){
-  getClienteElements();
-  if (!vehiculoSelect) {
-    console.warn('⚠️ Elemento #id_vehiculo no encontrado');
-    return;
-  }
-
-  if (!clienteId) {
-    console.warn('⚠️ No se proporcionó clienteId');
-    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle}</option>`;
-    return;
-  }
-
-  console.log(`🚗 Cargando vehículos para cliente ID: ${clienteId}${vehiculoIdToSelect ? ` (preseleccionar: ${vehiculoIdToSelect})` : ''}`);
-
-  const alreadyHasOptions = vehiculoSelect.options && vehiculoSelect.options.length > 1;
-  if (alreadyHasOptions && vehiculoSelect.dataset.source === 'form') {
-    console.log('ℹ️ Ya tiene opciones desde el formulario, omitiendo carga');
-    // Aún así, intentar preseleccionar si se especificó
-    if (vehiculoIdToSelect) {
-      setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
-    }
-    return;
-  }
-
-  vehiculoSelect.disabled = true;
-  vehiculoSelect.innerHTML = `<option value="">${I18N.loading_vehicles || 'Cargando vehículos...'}</option>`;
-
-  // Intentar primero con prefetch local (más rápido)
-  const localMatches = (PREFETCH?.vehiculos || []).filter((v)=> String(v.cliente_id) === String(clienteId));
-  if (localMatches.length){
-    console.log(`✅ Encontrados ${localMatches.length} vehículos en prefetch`);
-    const options = localMatches.map((v)=> `<option value="${v.id}">${v.label || v.text || ''}</option>`).join('');
-    vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
-    vehiculoSelect.dataset.source = 'prefetch';
-    vehiculoSelect.disabled = false;
-    // Preseleccionar vehículo si se especificó
-    if (vehiculoIdToSelect) {
-      setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
-    }
-    return; // Salir temprano si encontramos en prefetch
-  }
-
-  // Si no hay en prefetch, hacer petición AJAX
-  try{
-    const urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/ajax/vehiculos-por-cliente/';
-    const url = buildEndpoint(urlRaw);
-    const fullUrl = `${url}?cliente_id=${encodeURIComponent(clienteId)}`;
-    
-    console.log(`📡 Llamando a: ${fullUrl}`);
-    
-    const r = await EG.fetch(fullUrl);
-    
-    if(!r.ok) {
-      const errorText = await r.text();
-      console.error(`❌ HTTP ${r.status}:`, errorText);
-      throw new Error(`HTTP ${r.status}: ${errorText}`);
-    }
-    
-    const data = await r.json();
-    console.log('📦 Respuesta recibida:', data);
-    
-    const items = Array.isArray(data) ? data : (data.results || data.items || []);
-    console.log(`📋 Procesando ${items.length} vehículos`);
-    
-    if (!items.length){
-      console.log('ℹ️ No se encontraron vehículos');
-      vehiculoSelect.innerHTML = `<option value="">${I18N.no_vehicles || 'No hay vehículos'}</option>`;
-      vehiculoSelect.dataset.source = 'empty';
-    } else {
-      const options = items.map(v => {
-        const id = v.id ?? v.pk;
-        const label = v.text || v.label || v.patente || `Vehicle #${id}`;
-        return `<option value="${id}">${label}</option>`;
-      }).join('');
-      vehiculoSelect.innerHTML = `<option value="">${I18N.select_vehicle || 'Selecciona vehículo...'}</option>${options}`;
-      vehiculoSelect.dataset.source = 'fetch';
-      console.log(`✅ ${items.length} vehículos cargados exitosamente`);
-      
-      // Preseleccionar vehículo si se especificó
-      if (vehiculoIdToSelect) {
-        setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
-      }
-    }
-  }catch(err){
-    console.error('❌ Error cargando vehículos:', err);
-    console.error('Stack:', err.stack);
-    vehiculoSelect.innerHTML = `<option value="">${I18N.error_loading_vehicles || 'Error al cargar vehículos'}</option>`;
-    vehiculoSelect.dataset.source = 'error';
-  }finally{
-    vehiculoSelect.disabled = false;
-  }
-}
-
-// Función auxiliar para preseleccionar un vehículo
-function preseleccionarVehiculo(vehiculoId) {
-  getClienteElements();
-  if (!vehiculoSelect) {
-    console.warn('⚠️ Elemento #id_vehiculo no encontrado para preselección');
-    return;
-  }
-  
-  const vehiculoIdStr = String(vehiculoId);
-  console.log(`🎯 Intentando preseleccionar vehículo ID: ${vehiculoIdStr}`);
-  
-  // Verificar si el vehículo existe en las opciones
-  const option = Array.from(vehiculoSelect.options).find(opt => String(opt.value) === vehiculoIdStr);
-  
-  if (option) {
-    vehiculoSelect.value = vehiculoIdStr;
-    vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-    console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado exitosamente`);
-  } else {
-    console.warn(`⚠️ Vehículo ${vehiculoIdStr} no encontrado en las opciones disponibles`);
-    // Intentar nuevamente después de un breve delay (por si los vehículos aún se están cargando)
-    setTimeout(() => {
-      const retryOption = Array.from(vehiculoSelect.options).find(opt => String(opt.value) === vehiculoIdStr);
-      if (retryOption) {
-        vehiculoSelect.value = vehiculoIdStr;
-        vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-        console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado en reintento`);
-      } else {
-        console.error(`❌ No se pudo preseleccionar vehículo ${vehiculoIdStr} después del reintento`);
-      }
-    }, 500);
-  }
-}
-
-// ===============
-// TOTALES
-// ===============
-function sumFromInputs(selector){
-  return $$(selector).reduce((acc, el)=>{
-    const raw = el.tagName==='INPUT' ? el.value : el.textContent;
-    const num = Number((raw||'').toString().replace(/[^0-9.-]/g,''));
-    return acc + (isNaN(num) ? 0 : num);
-  }, 0);
-}
-
-function recalcTotales(){
-          const rep   = sumFromInputs('.rep-subtotal');
-          const serv  = sumFromInputs('.serv-subtotal');
-          const otros = sumFromInputs('.otr-subtotal');
-
-          console.log(`Totales: rep=${rep}, serv=${serv}, otros=${otros}`);
-
-          // Calcular impuestos dinámicamente desde ui_config.tax_lines
-          // El JavaScript NO sabe qué es IVA o Sales Tax, solo itera sobre tax_lines
-          let totalTaxes = 0;
-          const taxLines = window.EG?.cfg?.taxLines || [];
-          
-          taxLines.forEach(taxLine => {
-            const checkbox = document.getElementById(`include_${taxLine.id}`);
-            const isEnabled = checkbox?.checked ?? false;
-            
-            if (isEnabled) {
-              // Aplicar impuesto según applies_to
-              let baseAmount = 0;
-              if (taxLine.applies_to === 'repuestos') {
-                baseAmount = rep;
-              } else if (taxLine.applies_to === 'servicios') {
-                baseAmount = serv;
-              } else if (taxLine.applies_to === 'all') {
-                baseAmount = rep + serv + otros;
-              }
-              
-              const taxRate = Number(taxLine.rate) / 100; // Convertir porcentaje a decimal
-              const taxAmount = baseAmount * taxRate;
-              totalTaxes += taxAmount;
-              
-              // Actualizar display de esta línea de impuesto
-              setText(`#t_${taxLine.id}`, money(taxAmount));
-            } else {
-              // Si está deshabilitado, mostrar 0
-              setText(`#t_${taxLine.id}`, money(0));
-            }
-          });
-
-          // Actualizar subtotales
-          setText('#t_repuestos', money(rep));
-          setText('#t_servicios', money(serv));
-          setText('#t_otros',     money(otros));
-          
-          // Calcular y mostrar total general
-          const grandTotal = rep + serv + otros + totalTaxes;
-          setText('#t_total', money(grandTotal));
-          if (typeof scheduleDocumentDraftSave === 'function') scheduleDocumentDraftSave();
-        }
-window.recalcTotales = recalcTotales;
-
-// Agregar event listeners a TODOS los checkboxes de impuestos dinámicamente
-// El JavaScript NO sabe cuántos impuestos hay, los detecta automáticamente
-document.querySelectorAll('.tax-checkbox').forEach(checkbox => {
-  checkbox.addEventListener('change', recalcTotales);
-});
-
-// ===============
-// FILAS DINÁMICAS
-// ===============
-// IDs de botones en tu HTML: #add-repuesto, #add-servicio, #add-otro
-// Los event listeners se registran en DOMContentLoaded
-
-window.addRepuestoRow = function addRepuestoRow(presetRowId){
-  const container = document.getElementById('repuestos-container');
-  if (!container) {
-    console.error('❌ Contenedor de repuestos no encontrado');
-    return;
-  }
-  const isFirstRow = !container.querySelector('.dynamic-element');
-  const lbl = (text) => isFirstRow ? `<label class="block text-cyan-200 text-sm mb-1">${text}</label>` : '';
-  const lblFlex = (content) => isFirstRow ? `<label class="block text-cyan-200 text-sm mb-1 flex items-center gap-1">${content}</label>` : '';
-  const row = document.createElement('div');
-  row.className = 'dynamic-element';
-  const rowId = (presetRowId && String(presetRowId).trim())
-    ? String(presetRowId).trim()
-    : `rep_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-  row.dataset.rowId = rowId;
-  row.innerHTML = `
-    <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="${rowId}">
-      <div class="col-span-2 sm:col-span-2 relative min-w-0">
-        ${lbl(I18N.code)}
-        <input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="${I18N.code}" aria-label="${I18N.code}" autocomplete="off">
-        <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
-        <input type="hidden" class="rep-id">
-        <input type="hidden" class="rep-origen" value="STOCK_BODEGA">
-        <input type="hidden" class="rep-pieza-desarme-id">
-        <input type="hidden" class="rep-costo-linea">
-      </div>
-      <div class="col-span-4 sm:col-span-4 description-field rep-search-container relative min-w-0">
-        <div class="flex items-center justify-between gap-2 mb-1">
-          <span>${isFirstRow ? I18N.name : ''}</span>
-          <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase tracking-wide">
-            Usado / Desarme
-          </span>
-        </div>
-        <div class="flex gap-1">
-          <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_parts}" aria-label="${I18N.name}" autocomplete="off">
-          <button type="button" class="rep-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_part}" aria-label="${I18N.create_part}">＋</button>
-        </div>
-        <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
-        <input type="hidden" class="rep-nombre">
-      </div>
-      <div class="col-span-1 sm:col-span-1 min-w-0">
-        ${lbl(I18N.qty)}
-        <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" max="999" value="1">
-      </div>
-      <div class="col-span-2 sm:col-span-2 min-w-0">
-        ${lblFlex(`<span>${I18N.sale_price}</span><button type="button" class="toggle-cost-price-btn text-cyan-400 hover:text-cyan-200 text-xs ml-1" title="${I18N.toggle_cost_visibility}" aria-label="${I18N.toggle_cost_visibility}" style="cursor: pointer; background: none; border: none; padding: 2px;">👁️</button>`)}
-        <div class="relative">
-          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6" placeholder="0" aria-label="${I18N.sale_price}">
-        </div>
-      </div>
-      <div class="col-span-1 sm:col-span-1 cost-price-container hidden min-w-0">
-        ${lbl(I18N.cost_price)}
-        <div class="relative">
-          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="rep-precio-compra form-control w-full h-10 text-sm pl-6" placeholder="0" aria-label="${I18N.cost_price}">
-        </div>
-      </div>
-      <div class="col-span-1 sm:col-span-1 min-w-0">
-        ${lbl(I18N.subtotal)}
-        <input type="hidden" class="rep-subtotal" value="0">
-        <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
-      </div>
-      <div class="col-span-1 sm:col-span-1">
-        <button type="button" class="btn-add w-full h-10" aria-label="${I18N.remove_row}" onclick="this.closest('.dynamic-element').remove(); window.recalcTotales();">✕</button>
-      </div>
-    </div>`;
-  container.appendChild(row);
-  setupRepuestoRow(row);
-  return row;
-};
-
-window.restoreCreatedRepuestoFromReturn = function restoreCreatedRepuestoFromReturn() {
-  const url = new URL(window.location.href);
-  const repId = url.searchParams.get('created_repuesto_id');
-  if (!repId) return;
-
-  const targetRow = url.searchParams.get('target_row');
-  const nombre = url.searchParams.get('created_repuesto_nombre') || '';
-  const codigo = url.searchParams.get('created_repuesto_codigo') || '';
-  const precioVenta = parseFloat(url.searchParams.get('created_repuesto_precio_venta') || '0');
-  const precioCompra = parseFloat(url.searchParams.get('created_repuesto_precio_compra') || '0');
-
-  let row = null;
-  if (targetRow) {
-    const el = document.querySelector('[data-row-id="' + String(targetRow).replace(/\\/g, '\\\\').replace(/"/g, '\\"') + '"]');
-    row = el ? el.closest('.dynamic-element') : null;
-  }
-  if (!row && typeof window.addRepuestoRow === 'function') {
-    row = window.addRepuestoRow();
-  }
-  if (row && typeof row.__applyRepData === 'function') {
-    row.__applyRepData({
-      id: repId,
-      nombre,
-      codigo,
-      precio_venta: precioVenta,
-      precio_compra: precioCompra,
-    });
-  }
-
-  url.searchParams.delete('created_repuesto_id');
-  url.searchParams.delete('created_repuesto_nombre');
-  url.searchParams.delete('created_repuesto_codigo');
-  url.searchParams.delete('created_repuesto_precio_venta');
-  url.searchParams.delete('created_repuesto_precio_compra');
-  url.searchParams.delete('target_row');
-  const qs = url.searchParams.toString();
-  window.history.replaceState({}, '', url.pathname + (qs ? '?' + qs : ''));
-};
-
-// Used Parts (piezas de desarme) modal
-window.openUsedPartsModal = function openUsedPartsModal(){
-  const modal = document.getElementById('modal-used-parts');
-  const search = document.getElementById('used-parts-search');
-  const results = document.getElementById('used-parts-results');
-  const empty = document.getElementById('used-parts-empty');
-  if (!modal) return;
-  modal.classList.remove('hidden');
-  results.innerHTML = '';
-  empty.classList.remove('hidden');
-  if (search) {
-    search.value = '';
-    search.focus();
-  }
-};
-
-window.closeUsedPartsModal = function closeUsedPartsModal(){
-  const modal = document.getElementById('modal-used-parts');
-  if (modal) modal.classList.add('hidden');
-};
-
-(function initUsedPartsModal(){
-  const search = document.getElementById('used-parts-search');
-  const results = document.getElementById('used-parts-results');
-  const empty = document.getElementById('used-parts-empty');
-  let searchTimer;
-
-  function money(val) {
-    try { return (Number(val) || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 2 }); } catch (e) { return String(val); }
-  }
-
-  async function searchUsedParts(q){
-    if (!results || !empty) return;
-    if (!q || q.length < 2){
-      results.innerHTML = '';
-      empty.textContent = (typeof I18N !== 'undefined' && I18N.type_to_search_parts) ? I18N.type_to_search_parts.replace('repuestos', 'código o nombre') : '{% trans "Type at least 2 characters to search" %}';
-      empty.classList.remove('hidden');
-      return;
-    }
-    empty.classList.add('hidden');
-    results.innerHTML = '<div class="text-cyan-300 py-2">{% trans "Searching..." %}</div>';
-    const url = (EG.cfg && EG.cfg.URL_USED_PARTS) || '/api/piezas-desarme/';
-    try {
-      const r = await (EG.fetch || fetch)(url + '?q=' + encodeURIComponent(q));
-      if (!r.ok) throw new Error('HTTP ' + r.status);
-      const data = await r.json();
-      const items = Array.isArray(data) ? data : (data.results || []);
-      if (items.length === 0){
-        results.innerHTML = '<div class="text-gray-400 py-2">{% trans "No used parts found" %}</div>';
-        return;
-      }
-      results.innerHTML = '';
-      items.forEach(function(item){
-        const div = document.createElement('div');
-        div.className = 'px-3 py-2 hover:bg-amber-900/40 cursor-pointer border-b border-amber-500/20 last:border-b-0 rounded';
-        div.dataset.id = item.id || '';
-        div.dataset.codigo = item.codigo || '';
-        div.dataset.nombre = item.nombre || '';
-        div.dataset.precio = item.precio || item.precio_venta_sugerido || 0;
-        div.dataset.cantidad = item.cantidad || 1;
-        const v = item.vehiculo_origen ? ' • ' + item.vehiculo_origen : '';
-        div.innerHTML = '<div class="text-cyan-200 font-semibold text-sm">' + (item.codigo ? item.codigo + ' • ' : '') + (item.nombre || '') + '</div><div class="text-xs text-gray-400">' + money(item.precio || 0) + ' • {% trans "Stock" %}: ' + (item.cantidad || 0) + v + '</div>';
-        div.addEventListener('click', function(){
-          selectUsedPart(item);
-        });
-        results.appendChild(div);
-      });
-    } catch (err) {
-      console.error('Used parts search:', err);
-      results.innerHTML = '<div class="text-red-400 py-2">{% trans "Server error" %}</div>';
-    }
-  }
-
-  function selectUsedPart(item){
-    const container = document.getElementById('repuestos-container');
-    if (!container || typeof window.addRepuestoRow !== 'function') return;
-    const row = window.addRepuestoRow();
-    if (row && typeof row.__applyRepData === 'function'){
-      row.__applyRepData({
-        id: '',
-        codigo: item.codigo || '',
-        nombre: item.nombre || '',
-        precio: item.precio || item.precio_venta_sugerido || 0,
-        cantidad: item.cantidad || 1,
-        descuento: 0,
-        origen_repuesto: 'DESARME',
-        pieza_desarme_id: item.id || '',
-        costo_linea: item.costo_asignado != null ? item.costo_asignado : 0
-      });
-    }
-    closeUsedPartsModal();
-  }
-
-  if (search) {
-    search.addEventListener('input', function(){
-      clearTimeout(searchTimer);
-      const q = search.value.trim();
-      searchTimer = setTimeout(function(){ searchUsedParts(q); }, 300);
-    });
-    search.addEventListener('keydown', function(e){
-      if (e.key === 'Escape') closeUsedPartsModal();
-    });
-  }
-})();
-
-function setupRepuestoRow(row){
-  const searchInput = $('.rep-search', row);
-  const drop        = row.querySelector('.rep-dropdown');
-  const idHidden    = $('.rep-id', row);
-  const inpCode     = $('.rep-codigo', row);
-  const codeDrop    = row.querySelector('.rep-codigo-dropdown');
-  const inpName     = $('.rep-nombre', row);
-  const inpPC       = $('.rep-precio-compra', row);
-  const inpPV       = $('.rep-precio-venta', row);
-  const qEl         = $('.rep-cantidad', row);
-  const sub         = $('.rep-subtotal', row);
-  const view        = $('.rep-subtotal-view', row);
-  const desarmeBadge = row.querySelector('.rep-desarme-badge');
-
-  let timer = null;
-  let codeTimer = null;
-
-  const btnCreate = row.querySelector('.rep-create-btn');
-  btnCreate?.addEventListener('click', ()=>{
-    currentRepuestoRow = row;
-    const nombre = (searchInput?.value || '').split('•')[0].trim() || (inpName?.value || '').trim();
-    const codigo = (inpCode?.value || '').trim();
-    const rowId = row.dataset.rowId || '';
-    const createBase = (typeof EG !== 'undefined' && EG.cfg && EG.cfg.URL_REPUESTO_CREATE_WINDOW)
-      ? EG.cfg.URL_REPUESTO_CREATE_WINDOW
-      : '';
-    if (!createBase) {
-      console.error('URL_REPUESTO_CREATE_WINDOW no configurada (data-url-repuesto-create-page)');
-      return;
-    }
-    const next = window.location.pathname + window.location.search;
-    const createUrl = new URL(createBase, window.location.origin);
-    createUrl.searchParams.set('next', next);
-    createUrl.searchParams.set('target_row', rowId);
-    if (nombre) createUrl.searchParams.set('prefill_nombre', nombre);
-    if (codigo) createUrl.searchParams.set('prefill_code', codigo);
-    window.location.href = createUrl.toString();
-  });
-
-          async function fetchByCode(code){
-            if (!code) return;
-    try {
-              const r = await EG.fetch(`${EG.cfg.URL_REPUESTO_BY_CODE}?code=${encodeURIComponent(code)}`);
-      if (!r.ok) return;
-              const data = await r.json();
-      applyPartData({
-        id: data.id || '',
-        codigo: data.codigo || code,
-        nombre: data.nombre || '',
-        precio_venta: data.precio_venta_sugerido || data.precio_venta || '',
-        precio_compra: data.precio_compra || '',
-      });
-    } catch (err) {
-      console.error('rep fetchByCode', err);
-    }
-  }
-
-  const repOrigen = row.querySelector('.rep-origen');
-  const repPiezaDesarmeId = row.querySelector('.rep-pieza-desarme-id');
-  const repCostoLinea = row.querySelector('.rep-costo-linea');
-
-  function applyPartData(item){
-    if (!item) return;
-    if (idHidden) idHidden.value = item.id || '';
-    if (inpCode) inpCode.value = item.codigo || '';
-    if (inpName) inpName.value = item.nombre || '';
-    if (inpPV && item.precio_venta !== undefined && item.precio_venta !== null) {
-      const precio = parseNumericInput(item.precio_venta);
-      inpPV.value = precio > 0 ? formatNumberInput(precio) : '';
-    }
-    if (inpPC && item.precio_compra !== undefined && item.precio_compra !== null) {
-      const precio = parseNumericInput(item.precio_compra);
-      inpPC.value = precio > 0 ? formatNumberInput(precio) : '';
-    }
-    if (searchInput) {
-      searchInput.value = item.nombre || '';
-    }
-    if (repOrigen) repOrigen.value = 'STOCK_BODEGA';
-    if (repPiezaDesarmeId) repPiezaDesarmeId.value = '';
-    if (repCostoLinea) repCostoLinea.value = '';
-    if (desarmeBadge) desarmeBadge.classList.add('hidden');
-    recalc();
-  }
-  
-  row.__applyRepData = function(data) {
-    if (!data) return;
-    const pv = data.precio_venta !== undefined && data.precio_venta !== null
-      ? data.precio_venta
-      : (data.precio || 0);
-    applyPartData({
-      id: data.id || '',
-      codigo: data.codigo || '',
-      nombre: data.nombre || '',
-      precio_venta: pv,
-      precio_compra: data.precio_compra,
-    });
-    if (qEl && data.cantidad) {
-      qEl.value = data.cantidad;
-      qEl.dispatchEvent(new Event('input'));
-    }
-    if (row.querySelector('.rep-descuento') && data.descuento !== undefined) {
-      const descInput = row.querySelector('.rep-descuento');
-      descInput.value = data.descuento;
-      descInput.dispatchEvent(new Event('input'));
-    }
-    if (repOrigen && data.origen_repuesto) repOrigen.value = data.origen_repuesto;
-    if (repPiezaDesarmeId && data.pieza_desarme_id !== undefined) repPiezaDesarmeId.value = String(data.pieza_desarme_id || '');
-    if (repCostoLinea && data.costo_linea !== undefined) repCostoLinea.value = String(data.costo_linea ?? '');
-    if (desarmeBadge) {
-      const isDesarme =
-        (data.origen_repuesto && data.origen_repuesto === 'DESARME') ||
-        (data.pieza_desarme_id !== undefined && data.pieza_desarme_id !== null && String(data.pieza_desarme_id) !== '');
-      desarmeBadge.classList.toggle('hidden', !isDesarme);
-    }
-    recalc();
-  };
-
-  async function searchRepuestos(q){
-    if (!drop) return;
-    if (!q || q.length < 2){
-      drop.classList.add('hidden');
-      return;
-    }
-
-    const localMatches = filterPrefetchItems(PREFETCH.repuestos, ['codigo', 'nombre'], q, 15);
-    if (localMatches.length){
-      renderResultadosRepuestos(localMatches);
-    }
-
-    try {
-      const url = EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/';
-      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const data = await r.json();
-      const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
-      if (items.length) renderResultadosRepuestos(items);
-    }catch(err){
-      console.error('❌ buscarRepuestos', err);
-      if (!localMatches.length) {
-        drop.innerHTML = `<div class=\"p-3 text-red-300\">${I18N.server_error}</div>`;
-        drop.classList.remove('hidden');
-      }
-    }
-  }
-
-  function renderResultadosRepuestos(lista){
-    if (!drop) return;
-    drop.innerHTML = '';
-    if (!lista.length){
-      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_parts}</div>`;
-      drop.classList.remove('hidden');
-      return;
-    }
-    const frag = document.createDocumentFragment();
-    lista.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
-      div.setAttribute('role', 'option');
-      const codigo = item.codigo || item.code || '';
-      const nombre = item.nombre || item.text || '';
-      const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
-      const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
-      div.dataset.id = item.id || '';
-      div.dataset.codigo = codigo;
-      div.dataset.nombre = nombre;
-      div.dataset.precio = precioVenta;
-      div.dataset.cost = precioCompra;
-      div.innerHTML = `
-        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo ? `${codigo} • ${nombre}` : nombre}</div>
-        <div class="text-xs text-gray-300">${money(precioVenta)}</div>`;
-      frag.appendChild(div);
-    });
-    drop.appendChild(frag);
-    drop.setAttribute('role', 'listbox');
-    drop.classList.remove('hidden');
-  }
-
-  function seleccionarRepuesto(el){
-    if (!el) return;
-    applyPartData({
-      id: el.dataset.id,
-      codigo: el.dataset.codigo,
-      nombre: el.dataset.nombre,
-      precio_venta: parseNumericInput(el.dataset.precio),
-      precio_compra: parseNumericInput(el.dataset.cost),
-    });
-    drop?.classList.add('hidden');
-          }
-
-          function recalc(){
-            const q = Number(qEl?.value || 0);
-    const p = parseNumericInput(inpPV?.value || 0);
-    const d = Number(($('.rep-descuento', row)?.value || 0)) || 0;
-            const subtotal = q * p * (1 - (d/100));
-            if (sub)  sub.value = subtotal;
-            if (view) view.textContent = money(subtotal);
-            recalcTotales();
-          }
-
-  searchInput?.addEventListener('input', (e)=>{
-    clearTimeout(timer);
-    const value = e.target.value.trim();
-    timer = setTimeout(()=> searchRepuestos(value), 250);
-  });
-
-  searchInput?.addEventListener('focus', ()=>{
-    if (searchInput.value.trim().length >= 2) {
-      searchRepuestos(searchInput.value.trim());
-    }
-  });
-
-  // Búsqueda en tiempo real por código
-  async function searchByCode(q){
-    if (!codeDrop) return;
-    if (!q || q.length < 2){
-      codeDrop.classList.add('hidden');
-      return;
-    }
-
-    const localMatches = filterPrefetchItems(PREFETCH.repuestos, ['codigo'], q, 15);
-    if (localMatches.length){
-      renderResultadosCodigo(localMatches);
-    }
-
-    try {
-      const url = EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/';
-      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const data = await r.json();
-      const items = await (Array.isArray(data) ? data : (data.results || data.items || []));
-      // Filtrar por código que empiece con la búsqueda
-      const filteredItems = items.filter(item => {
-        const codigo = (item.codigo || item.code || '').toLowerCase();
-        return codigo.startsWith(q.toLowerCase());
-      });
-      if (filteredItems.length) renderResultadosCodigo(filteredItems);
-    }catch(err){
-      console.error('❌ buscarPorCodigo', err);
-      if (!localMatches || !localMatches.length) {
-        codeDrop.innerHTML = `<div class="p-3 text-red-300">${I18N.server_error}</div>`;
-        codeDrop.classList.remove('hidden');
-      }
-    }
-  }
-
-  function renderResultadosCodigo(lista){
-    if (!codeDrop) return;
-    codeDrop.innerHTML = '';
-    if (!lista.length){
-      codeDrop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_parts}</div>`;
-      codeDrop.classList.remove('hidden');
-      return;
-    }
-    const frag = document.createDocumentFragment();
-    lista.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
-      div.setAttribute('role', 'option');
-      const codigo = item.codigo || item.code || '';
-      const nombre = item.nombre || item.text || '';
-      const precioVenta = Number(item.precio_venta_sugerido ?? item.precio_venta ?? item.precio ?? 0);
-      const precioCompra = Number(item.precio_compra ?? item.costo ?? 0);
-      div.dataset.id = item.id || '';
-      div.dataset.codigo = codigo;
-      div.dataset.nombre = nombre;
-      div.dataset.precio = precioVenta;
-      div.dataset.cost = precioCompra;
-      div.innerHTML = `
-        <div class="text-cyan-200 font-semibold text-sm truncate">${codigo}${nombre ? ` • ${nombre}` : ''}</div>
-        ${precioVenta > 0 ? `<div class="text-xs text-gray-300">${money(precioVenta)}</div>` : ''}`;
-      frag.appendChild(div);
-    });
-    codeDrop.appendChild(frag);
-    codeDrop.setAttribute('role', 'listbox');
-    codeDrop.classList.remove('hidden');
-  }
-
-  function seleccionarPorCodigo(el){
-    if (!el) return;
-    applyPartData({
-      id: el.dataset.id,
-      codigo: el.dataset.codigo,
-      nombre: el.dataset.nombre,
-      precio_venta: parseNumericInput(el.dataset.precio),
-      precio_compra: parseNumericInput(el.dataset.cost),
-    });
-    codeDrop?.classList.add('hidden');
-  }
-
-  inpCode?.addEventListener('input', (e)=>{
-    clearTimeout(codeTimer);
-    const value = e.target.value.trim();
-    // Debounce mejorado: 400ms para reducir peticiones al servidor
-    codeTimer = setTimeout(()=> {
-      searchByCode(value);
-      // Consultar precios del marketplace si existe la funcionalidad
-      if (window.MarketplaceTooltip && value.length >= 3) {
-        // inpCode puede ser un objeto jQuery o un elemento DOM
-        const inputElement = (inpCode && inpCode.length && inpCode[0]) ? inpCode[0] : 
-                           (typeof inpCode === 'object' && inpCode.nodeType) ? inpCode : null;
-        if (inputElement) {
-          window.MarketplaceTooltip.consultarPrecios(value, inputElement);
-        }
-      }
-    }, 400); // Aumentado de 250ms a 400ms para mejor rendimiento
-  });
-
-  inpCode?.addEventListener('focus', ()=>{
-    if (inpCode.value.trim().length >= 2) {
-      searchByCode(inpCode.value.trim());
-    }
-  });
-
-  inpCode?.addEventListener('change', ()=> {
-    if (inpCode.value.trim().length >= 2) {
-      fetchByCode(inpCode.value.trim());
-    }
-  });
-
-  codeDrop?.addEventListener('click', (e)=>{
-    const item = e.target.closest('.srv-item');
-    if (!item) return;
-    seleccionarPorCodigo(item);
-  });
-
-  codeDrop?.addEventListener('keydown', (e)=>{
-    const item = e.target.closest('[role="option"]');
-    if (!item) return;
-    if (e.key === 'Enter') {
-      seleccionarPorCodigo(item);
-    }
-  });
-
-  document.addEventListener('click', (e)=>{
-    if (!row.contains(e.target)) {
-      codeDrop?.classList.add('hidden');
-    }
-  });
-
-  qEl?.addEventListener('input', recalc);
-  inpPV?.addEventListener('input', recalc);
-  $('.rep-descuento', row)?.addEventListener('input', recalc);
-
-  drop?.addEventListener('click', (e)=>{
-    const item = e.target.closest('.srv-item');
-    if (!item) return;
-    seleccionarRepuesto(item);
-  });
-
-  drop?.addEventListener('keydown', (e)=>{
-    const item = e.target.closest('[role="option"]');
-    if (!item) return;
-    if (e.key === 'Enter') {
-      seleccionarRepuesto(item);
-    }
-  });
-
-  document.addEventListener('click', (e)=>{
-    if (!row.contains(e.target)) {
-      drop?.classList.add('hidden');
-    }
-  });
-
-  // Botón para mostrar/ocultar precio de compra
-  const toggleCostBtn = row.querySelector('.toggle-cost-price-btn');
-  toggleCostBtn?.addEventListener('click', (e)=>{
-    e.preventDefault();
-    e.stopPropagation();
-    const costContainer = row.querySelector('.cost-price-container');
-    if (costContainer) {
-      costContainer.classList.toggle('hidden');
-      // Cambiar el icono según si está visible o no
-      if (costContainer.classList.contains('hidden')) {
-        toggleCostBtn.textContent = '👁️';
-      } else {
-        toggleCostBtn.textContent = '🙈';
-      }
-    }
-  });
-
-  row.__applyPartData = applyPartData;
-}
-
-window.addServicioRow = function addServicioRow(){
-  const container = document.getElementById('servicios-container');
-  if (!container) {
-    console.error('❌ Contenedor de servicios no encontrado');
-    return;
-  }
-  const row = document.createElement('div');
-  row.className = 'dynamic-element';
-  row.innerHTML = `
-    <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20">
-      <div class="col-span-7 sm:col-span-7 description-field srv-input-container relative min-w-0">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
-        <div class="flex gap-1">
-          <input type="text" class="srv-input form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="${I18N.type_to_search_services}" aria-label="${I18N.service}" autocomplete="off">
-          <button type="button" class="srv-create-btn btn-add flex-shrink-0 h-10 px-2" title="${I18N.create_service}" aria-label="${I18N.create_service}">＋</button>
-        </div>
-        <div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto top-full mt-1"></div>
-        <input type="hidden" class="srv-id">
-      </div>
-      <div class="col-span-2 sm:col-span-2 min-w-0">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
-        <div class="relative">
-          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="serv-precio form-control w-full h-10 text-sm pl-6" placeholder="0">
-        </div>
-      </div>
-      <div class="col-span-2 sm:col-span-2 min-w-0">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
-        <input type="hidden" class="serv-subtotal" value="0">
-        <div class="serv-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
-      </div>
-      <div class="col-span-1 sm:col-span-1">
-        <button type="button" class="btn-add w-full h-10" aria-label="${I18N.remove_row}" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('servicios-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#servicios-container .dynamic-element'));">✕</button>
-      </div>
-    </div>`;
-  container.appendChild(row);
-  container.querySelector('#servicios-empty-hint')?.classList.add('hidden');
-  setupServicioRow(row);
-  return row;
-}
-
-function setupServicioRow(row){
-  const input  = row.querySelector('.srv-input');
-  const drop   = row.querySelector('.srv-dropdown');
-  const idHid  = row.querySelector('.srv-id');
-  const pEl    = row.querySelector('.serv-precio');
-  const sub    = row.querySelector('.serv-subtotal');
-  const view   = row.querySelector('.serv-subtotal-view');
-
-  let timer = null;
-
-          async function searchServicios(q){
-            if (!drop) return;
-            if (!q || q.length < 2){
-              drop.classList.add('hidden');
-              return;
-            }
-            
-            // Primero buscar en el prefetch local (más rápido)
-            let localMatches = filterPrefetchItems(PREFETCH.servicios, ['nombre', 'categoria', 'subcategoria'], q, 15);
-            if (localMatches.length){
-              renderResultados(localMatches);
-            }
-            
-            try{
-              const url = `${EG.cfg.URL_SERVICE_SEARCH}?q=${encodeURIComponent(q)}`;
-              const r = await EG.fetch(url);
-              if (!r.ok) throw new Error(`HTTP ${r.status}`);
-              const data = await r.json();
-              const items = Array.isArray(data)
-                ? data
-                : (data.servicios || data.results || []);
-              // Normalizar items usando función centralizada
-              const normalizedItems = items.map(normalizeServicio);
-              if (normalizedItems.length) renderResultados(normalizedItems);
-            }catch(err){
-              console.error('servicios buscar:', err);
-              if (!localMatches || !localMatches.length) {
-                if (drop) {
-                  drop.innerHTML = `<div class="p-3 text-red-400">${I18N.server_error}</div>`;
-                  drop.classList.remove('hidden');
-                }
-              }
-            }
-          }
-
-  function renderResultados(lista){
-    if (!drop) return;
-    if (!lista || !lista.length){
-      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_services}</div>`;
-      drop.classList.remove('hidden');
-      return;
-    }
-    drop.innerHTML = lista.map(s => {
-      // Normalizar servicio usando función centralizada
-      const servicio = normalizeServicio(s);
-      const servicioId = servicio.id || servicio.pk || '';
-      const precioBase = Number(servicio.precio_cliente ?? servicio.precio_sugerido ?? servicio.precio ?? 0);
-      return `
-      <div class="srv-item p-3 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0"
-           role="option" tabindex="0" data-id="${servicioId}" data-precio="${precioBase}" data-text="${servicio.nombre || ''}">
-        <div class="font-semibold text-cyan-200">${servicio.nombre || ''}</div>
-        ${servicio.categoria ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Categoría' : 'Category'}: ${servicio.categoria}</div>` : ``}
-        ${precioBase ? `<div class="text-xs text-gray-300 opacity-80">${COUNTRY_REF === 'CL' ? 'Tarifa base' : 'Base'}: ${money(precioBase)}</div>` : ``}
-      </div>
-    `}).join('');
-    drop.setAttribute('role', 'listbox');
-    drop.classList.remove('hidden');
-  }
-
-  function seleccionarServicio(el){
-    const sid   = el.dataset.id;
-    const stext = el.dataset.text || '';
-    const sprice= Number(el.dataset.precio || 0);
-    idHid.value = sid || '';
-    input.value = stext;
-    drop.classList.add('hidden');
-
-    // Si no hay precio ingresado, sugerir el base
-    if ((pEl.value || '').trim() === '' && sprice > 0){
-      pEl.value = formatNumberInput(sprice);
-    }
-    recalc();
-  }
-
-  function recalc(){
-    // SIN cantidad: subtotal == precio
-    const p = Number((pEl?.value || '0').toString().replace(/[^0-9.-]/g,'')) || 0;
-    sub.value = p;
-    view.textContent = money(p);
-    window.recalcTotales();
-  }
-
-  input?.addEventListener('input', (e)=>{
-    clearTimeout(timer);
-    timer = setTimeout(()=> searchServicios(e.target.value.trim()), 250);
-  });
-
-  input?.addEventListener('focus', ()=>{
-    if (input.value.trim().length >= 2) searchServicios(input.value.trim());
-  });
-
-  document.addEventListener('click', (e)=>{
-    if (!row.contains(e.target)) drop.classList.add('hidden');
-  });
-
-  drop?.addEventListener('click', (e)=>{
-    const item = e.target.closest('.srv-item');
-    if (!item) return;
-    seleccionarServicio(item);
-  });
-
-  drop?.addEventListener('keydown', (e)=>{
-    const item = e.target.closest('[role="option"]');
-    if (!item) return;
-    if (e.key === 'Enter') {
-      seleccionarServicio(item);
-    }
-  });
-
-  pEl?.addEventListener('input', recalc);
-
-  const btnCreateSrv = row.querySelector('.srv-create-btn');
-  btnCreateSrv?.addEventListener('click', ()=>{
-    const url = (EG.cfg && EG.cfg.URL_SERVICE_CREATE) || '';
-    if (url) window.open(url, '_blank', 'noopener,noreferrer');
-  });
-
-  row.__applyServicioData = function(item){
-    if (!item) return;
-    if (idHid) idHid.value = item.id || '';
-    if (input) input.value = item.nombre || item.text || '';
-    if (pEl && item.precio_cliente !== undefined && item.precio_cliente !== null) {
-      const precio = parseNumericInput(item.precio_cliente);
-      pEl.value = precio > 0 ? formatNumberInput(precio) : '';
-    } else if (pEl && item.precio !== undefined && item.precio !== null) {
-      const precio = parseNumericInput(item.precio);
-      pEl.value = precio > 0 ? formatNumberInput(precio) : '';
-    }
-    recalc();
-  };
-  
-  // Alias para compatibilidad con el código de carga
-  row.__applyServData = row.__applyServicioData;
-}
-
-window.addOtroRow = function addOtroRow(){
-  const container = document.getElementById('otros-container');
-  if (!container) {
-    console.error('❌ Contenedor de otros servicios no encontrado');
-    return;
-  }
-  const row = document.createElement('div');
-  row.className = 'dynamic-element';
-  row.innerHTML = `
-    <div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20">
-      <div class="col-span-3 sm:col-span-3 description-field otr-search-container relative min-w-0">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.service}</label>
-        <input type="text" class="otr-search form-control w-full h-10 text-sm" placeholder="${I18N.type_to_search_external}" aria-label="${I18N.service}" autocomplete="off">
-        <div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>
-        <input type="hidden" class="otr-servicio-id">
-      </div>
-      <div class="col-span-3 sm:col-span-3 min-w-0">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.external_company}</label>
-        <input type="text" class="otr-empresa form-control w-full h-10 text-sm">
-      </div>
-      <div class="col-span-2 sm:col-span-2 min-w-0">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.shop_price}</label>
-        <div class="relative">
-          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="otr-precio-taller form-control w-full h-10 text-sm pl-6" placeholder="0">
-        </div>
-      </div>
-      <div class="col-span-2 sm:col-span-2 min-w-0">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.client_price}</label>
-        <div class="relative">
-          <span class="absolute left-2 top-1/2 transform -translate-y-1/2 text-cyan-300 font-semibold">$</span>
-          <input type="text" class="otr-precio form-control w-full h-10 text-sm pl-6" placeholder="0">
-        </div>
-      </div>
-      <div class="col-span-1 sm:col-span-1 min-w-0">
-        <label class="block text-cyan-200 text-sm mb-1">${I18N.subtotal}</label>
-        <input type="hidden" class="otr-subtotal" value="0">
-        <div class="otr-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>
-      </div>
-      <div class="col-span-1 sm:col-span-1">
-        <button type="button" class="btn-add w-full h-10" aria-label="${I18N.remove_row}" onclick="const r=this.closest('.dynamic-element');r.remove();window.recalcTotales();document.getElementById('otros-empty-hint')?.classList.toggle('hidden',!!document.querySelector('#otros-container .dynamic-element'));">✕</button>
-      </div>
-    </div>`;
-  container.appendChild(row);
-  container.querySelector('#otros-empty-hint')?.classList.add('hidden');
-  setupOtroRow(row);
-  return row;
-}
-
-function setupOtroRow(row){
-  const searchInput = $('.otr-search', row);
-  const drop        = row.querySelector('.otr-dropdown');
-  const idHidden    = $('.otr-servicio-id', row);
-  const empresaEl   = $('.otr-empresa', row);
-  const precioTallerEl = $('.otr-precio-taller', row);
-  const precioEl    = $('.otr-precio', row);
-  const sub         = $('.otr-subtotal', row);
-  const view        = $('.otr-subtotal-view', row);
-
-  let timer = null;
-
-  function recalc(){
-    const subtotal = parseNumericInput(precioEl?.value || 0);
-    if (sub)  sub.value = subtotal;
-    if (view) view.textContent = money(subtotal);
-    recalcTotales();
-  }
-
-  function aplicarDatos(item){
-  if (!item) return;
-    if (idHidden) idHidden.value = item.id || '';
-    if (searchInput) searchInput.value = item.nombre || '';
-    if (empresaEl && (item.empresa || item.empresa_ext)) {
-      empresaEl.value = item.empresa || item.empresa_ext;
-    }
-    if (precioTallerEl && item.precio_taller !== undefined && item.precio_taller !== null) {
-      const precio = parseNumericInput(item.precio_taller);
-      precioTallerEl.value = precio > 0 ? formatNumberInput(precio) : '';
-    }
-    if (precioEl && item.precio_cliente !== undefined && item.precio_cliente !== null) {
-      const precio = parseNumericInput(item.precio_cliente);
-      precioEl.value = precio > 0 ? formatNumberInput(precio) : '';
-    }
-    recalc();
-  }
-
-  async function searchOtrosServicios(q){
-    if (!drop) return;
-    if (!q || q.length < 2){
-      drop.classList.add('hidden');
-    return;
-  }
-  
-    const localMatches = filterPrefetchItems(PREFETCH.otros, ['nombre', 'empresa', 'empresa_ext'], q, 15);
-    if (localMatches.length){
-      renderResultadosOtros(localMatches);
-    }
-
-    try {
-      const url = EG.cfg.URL_OUTSOURCED_SERVICES || '/cl/api/otros-servicios/';
-      const r = await EG.fetch(`${url}?q=${encodeURIComponent(q)}`);
-      if (!r.ok) throw new Error(`HTTP ${r.status}`);
-      const data = await r.json();
-      const items = await (Array.isArray(data) ? data : (data.otros_servicios || data.results || []));
-      if (items.length) renderResultadosOtros(items);
-    } catch (err) {
-      console.error('❌ buscarOtrosServicios', err);
-      if (!localMatches.length) {
-        drop.innerHTML = `<div class=\"p-3 text-red-300\">${I18N.server_error}</div>`;
-        drop.classList.remove('hidden');
-      }
-    }
-  }
-
-  function renderResultadosOtros(lista){
-    drop.innerHTML = '';
-    if (!lista.length){
-      drop.innerHTML = `<div class="p-3 text-gray-300">${I18N.no_external_services}</div>`;
-      drop.classList.remove('hidden');
-    return;
-  }
-    const frag = document.createDocumentFragment();
-    lista.forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600 last:border-b-0';
-      div.setAttribute('role', 'option');
-      div.dataset.id = item.pk || item.id || '';
-      div.dataset.nombre = item.nombre || item.text || '';
-      div.dataset.empresa = item.empresa_externa || item.empresa || '';
-      const precioCliente = Number(item.precio_cliente ?? item.precio ?? 0);
-      const precioTaller = Number(item.costo_taller ?? item.precio_taller ?? 0);
-      div.dataset.precioCliente = precioCliente;
-      div.dataset.precioTaller = precioTaller;
-      div.innerHTML = `
-        <div class="text-cyan-200 font-semibold text-sm truncate">${div.dataset.nombre}</div>
-        <div class="text-xs text-gray-300">${div.dataset.empresa || ''}</div>
-        <div class="text-xs text-gray-500">${money(precioCliente)}</div>`;
-      frag.appendChild(div);
-    });
-    drop.appendChild(frag);
-    drop.setAttribute('role', 'listbox');
-    drop.classList.remove('hidden');
-  }
-
-  function seleccionarOtro(servicio){
-    if (!servicio) return;
-    aplicarDatos({
-      id: servicio.dataset.id,
-      nombre: servicio.dataset.nombre,
-      empresa: servicio.dataset.empresa,
-      empresa_ext: servicio.dataset.empresa,
-      precio_cliente: parseNumericInput(servicio.dataset.precioCliente),
-      precio_taller: parseNumericInput(servicio.dataset.precioTaller),
-    });
-    drop.classList.add('hidden');
-  }
-
-  searchInput?.addEventListener('input', (e)=>{
-    clearTimeout(timer);
-    const value = e.target.value.trim();
-    timer = setTimeout(()=> searchOtrosServicios(value), 250);
-  });
-
-  searchInput?.addEventListener('focus', ()=>{
-    if (searchInput.value.trim().length >= 2) {
-      searchOtrosServicios(searchInput.value.trim());
-    }
-  });
-
-  drop?.addEventListener('click', (e)=>{
-    const item = e.target.closest('.srv-item');
-  if (!item) return;
-    seleccionarOtro(item);
-  });
-
-  drop?.addEventListener('keydown', (e)=>{
-  const item = e.target.closest('[role="option"]');
-  if (!item) return;
-    if (e.key === 'Enter') seleccionarOtro(item);
-  });
-
-  document.addEventListener('click', (e)=>{
-    if (!row.contains(e.target)) drop?.classList.add('hidden');
-  });
-
-  precioEl?.addEventListener('input', recalc);
-  precioTallerEl?.addEventListener('input', recalc);
-
-  // Exponer función para aplicar datos desde fuera con formato correcto
-  row.__applyOtroData = function(data) {
-    if (!data) return;
-    aplicarDatos({
-      id: data.id || data.servicio_id || '',
-      nombre: data.nombre || '',
-      empresa: data.empresa || data.empresa_ext || '',
-      empresa_ext: data.empresa_ext || data.empresa || '',
-      precio_cliente: data.precio_cliente || data.precio || 0,
-      precio_taller: data.precio_taller || 0,
-    });
-  };
-}
-
-// ===============
-// EVENTOS
-// ===============
-if (selTipo) {
-  selTipo.addEventListener('change', () => {
-    const t = selTipo.value;
-    applyTheme(t);
-    updateDocumentNumber();
-  });
-  // Aplicar tema y UI según tipo al cargar
-  const t0 = selTipo.value || 'OT';
-  applyTheme(t0);
-}
-
-if (selMode) {
-  selMode.addEventListener('change', () => {
-    applyModeDependentUI();
-  });
-  // Aplicar modo inicial (services por defecto)
-  applyModeDependentUI();
-}
-
-        // Event listeners de búsqueda de clientes se mueven a DOMContentLoaded
-// Event listeners de click en resultados se mueven a initDocumentForm
-
-// INIT
-// Serializar filas dinámicas antes de enviar
-function serializeRows(){
-  console.log('🔍 Serializando filas dinámicas...');
-
-  const rep = $$('#repuestos-container .dynamic-element').map(row=>({
-    id:        $('.rep-id', row)?.value?.trim() || '',
-    codigo:    $('.rep-codigo', row)?.value?.trim() || '',
-    nombre:    $('.rep-nombre', row)?.value?.trim() || '',
-    cantidad:  Number($('.rep-cantidad', row)?.value || 0),
-    precio:    parseNumericInput($('.rep-precio-venta', row)?.value || 0),
-    descuento: Number($('.rep-descuento', row)?.value || 0),
-    origen_repuesto: $('.rep-origen', row)?.value?.trim() || 'STOCK_BODEGA',
-    pieza_desarme_id: $('.rep-pieza-desarme-id', row)?.value?.trim() || '',
-    costo_linea: parseNumericInput($('.rep-costo-linea', row)?.value || 0),
-  }));
-  const serv = $$('#servicios-container .dynamic-element').map(row=>({
-    servicio_id: $('.srv-id', row)?.value || '',
-    precio:      parseNumericInput($('.serv-precio', row)?.value || 0),
-  }));
-  const otros = $$('#otros-container .dynamic-element').map(row=>({
-    servicio_id:   $('.otr-servicio-id', row)?.value || '',
-    nombre:        $('.otr-search', row)?.value?.trim() || '',
-    empresa_ext:   $('.otr-empresa', row)?.value?.trim() || '',
-    precio_taller: parseNumericInput($('.otr-precio-taller', row)?.value || 0),
-    precio:        parseNumericInput($('.otr-precio', row)?.value || 0),
-  }));
-
-  console.log('📦 Repuestos encontrados:', rep.length, rep);
-  console.log('🔧 Servicios encontrados:', serv.length, serv);
-  console.log('🌐 Otros servicios encontrados:', otros.length, otros);
-
-  $('#id_repuestos_json').value = JSON.stringify(rep);
-  $('#id_servicios_json').value = JSON.stringify(serv);
-  $('#id_otros_json').value     = JSON.stringify(otros);
-
-  console.log('💾 JSON guardado');
-}
-
-// ===============
-// BORRADOR LOCAL (localStorage) — retorno desde crear cliente / vehículo / repuesto
-// ===============
-const DOC_DRAFT_VERSION = 1;
-const DOC_DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-let __docDraftSaveTimer = null;
-
-function getDocumentFormDraftKey() {
-  const form = document.getElementById('document-form');
-  if (!form) return null;
-  const mode = form.dataset.mode || 'create';
-  const docId = (form.dataset.documentId || '').trim() || 'new';
-  const path = (window.location.pathname || '').replace(/\/$/, '') || '/';
-  return `doc_draft_v${DOC_DRAFT_VERSION}:${path}:${mode}:${docId}`;
-}
-
-function showDraftSavedIndicator() {
-  const el = document.getElementById('draft-indicator');
-  if (!el) return;
-  el.classList.remove('hidden');
-  clearTimeout(showDraftSavedIndicator._t);
-  showDraftSavedIndicator._t = setTimeout(() => el.classList.add('hidden'), 1600);
-}
-
-function collectDocumentDraftPayload() {
-  const form = document.getElementById('document-form');
-  if (!form || window.__DOC_DRAFT_RESTORING__) return null;
-
-  getClienteElements();
-  const rep = $$('#repuestos-container .dynamic-element').map((row) => ({
-    rowId: row.dataset.rowId || '',
-    id: $('.rep-id', row)?.value?.trim() || '',
-    codigo: $('.rep-codigo', row)?.value?.trim() || '',
-    nombre: $('.rep-nombre', row)?.value?.trim() || '',
-    nombre_input: $('.rep-search', row)?.value?.trim() || '',
-    cantidad: Number($('.rep-cantidad', row)?.value || 0) || 1,
-    precio_venta: parseNumericInput($('.rep-precio-venta', row)?.value || 0),
-    precio_compra: parseNumericInput($('.rep-precio-compra', row)?.value || 0),
-    descuento: Number($('.rep-descuento', row)?.value || 0) || 0,
-    origen_repuesto: $('.rep-origen', row)?.value?.trim() || 'STOCK_BODEGA',
-    pieza_desarme_id: $('.rep-pieza-desarme-id', row)?.value?.trim() || '',
-    costo_linea: parseNumericInput($('.rep-costo-linea', row)?.value || 0),
-  }));
-  const serv = $$('#servicios-container .dynamic-element').map((row) => ({
-    servicio_id: $('.srv-id', row)?.value?.trim() || '',
-    nombre: $('.srv-input', row)?.value?.trim() || '',
-    precio: parseNumericInput($('.serv-precio', row)?.value || 0),
-  }));
-  const otros = $$('#otros-container .dynamic-element').map((row) => ({
-    servicio_id: $('.otr-servicio-id', row)?.value?.trim() || '',
-    nombre: $('.otr-search', row)?.value?.trim() || '',
-    empresa_ext: $('.otr-empresa', row)?.value?.trim() || '',
-    precio_taller: parseNumericInput($('.otr-precio-taller', row)?.value || 0),
-    precio: parseNumericInput($('.otr-precio', row)?.value || 0),
-  }));
-
-  const kmEl = form.querySelector('[name="kilometraje_ingreso"]');
-
-  const draft = {
-    v: DOC_DRAFT_VERSION,
-    savedAt: Date.now(),
-    path: (window.location.pathname || '').replace(/\/$/, '') || '/',
-    mode: form.dataset.mode || 'create',
-    documentId: (form.dataset.documentId || '').trim() || null,
-    tipo: document.getElementById('id_tipo')?.value || '',
-    fecha_emision: document.getElementById('id_fecha_emision')?.value || '',
-    doc_mode: document.getElementById('doc_mode')?.value || '',
-    payment_status: document.getElementById('id_payment_status')?.value || '',
-    observaciones: document.getElementById('id_observaciones')?.value || '',
-    kilometraje_ingreso: kmEl ? (kmEl.value || '') : '',
-    apply_all_taxes: (() => {
-      const v = document.getElementById('id_apply_vat');
-      return v ? !!v.checked : null;
-    })(),
-    tax_line_checks: (window.EG?.cfg?.taxLines || []).map((tl) => ({
-      id: String(tl.id),
-      checked: !!document.getElementById(`include_${tl.id}`)?.checked,
-    })),
-    cliente_id: document.getElementById('id_cliente')?.value || '',
-    cliente_nombre: document.getElementById('cliente-busqueda')?.value || '',
-    cliente_email: (cliEmail?.textContent || '').replace(/^📧\s*/, '').trim().replace(/^—$/, ''),
-    cliente_telefono: (cliFono?.textContent || '').replace(/^📞\s*/, '').trim().replace(/^—$/, ''),
-    vehiculo_id: document.getElementById('id_vehiculo')?.value || '',
-    repuestos: rep,
-    servicios: serv,
-    otros: otros,
-  };
-  return draft;
-}
-
-function saveDocumentDraftNow() {
-  const key = getDocumentFormDraftKey();
-  if (!key) return;
-  try {
-    const payload = collectDocumentDraftPayload();
-    if (!payload) return;
-    localStorage.setItem(key, JSON.stringify(payload));
-    showDraftSavedIndicator();
-  } catch (e) {
-    console.warn('doc draft save failed', e);
-  }
-}
-
-function scheduleDocumentDraftSave() {
-  if (window.__DOC_DRAFT_RESTORING__) return;
-  clearTimeout(__docDraftSaveTimer);
-  __docDraftSaveTimer = setTimeout(saveDocumentDraftNow, 480);
-}
-
-function loadDocumentDraftParsed() {
-  const key = getDocumentFormDraftKey();
-  if (!key) return null;
-  try {
-    const raw = localStorage.getItem(key);
-    if (!raw) return null;
-    const data = JSON.parse(raw);
-    if (!data || data.v !== DOC_DRAFT_VERSION || !data.savedAt) return null;
-    if (Date.now() - Number(data.savedAt) > DOC_DRAFT_TTL_MS) {
-      localStorage.removeItem(key);
-      return null;
-    }
-    if (data.path && data.path !== (window.location.pathname || '').replace(/\/$/, '')) return null;
-    const form = document.getElementById('document-form');
-    if (form && data.mode && data.mode !== (form.dataset.mode || 'create')) return null;
-    const did = (form?.dataset.documentId || '').trim() || null;
-    if (did && data.documentId && String(data.documentId) !== String(did)) return null;
-    if (did && !data.documentId) return null;
-    if (!did && data.documentId) return null;
-    return data;
-  } catch (e) {
-    console.warn('doc draft load failed', e);
-    return null;
-  }
-}
-
-function clearDynamicPosRows() {
-  document.querySelectorAll('#repuestos-container .dynamic-element').forEach((el) => el.remove());
-  document.querySelectorAll('#servicios-container .dynamic-element').forEach((el) => el.remove());
-  document.querySelectorAll('#otros-container .dynamic-element').forEach((el) => el.remove());
-  document.getElementById('servicios-empty-hint')?.classList.remove('hidden');
-}
-
-function clearDocumentFormDraftStorage() {
-  const key = getDocumentFormDraftKey();
-  if (key) {
-    try {
-      localStorage.removeItem(key);
-    } catch (e) {
-      /* ignore */
-    }
-  }
-}
-
-async function restoreDocumentDraftAfterHydrate(opts) {
-  const hasServerLines = !!(opts && opts.hasServerLines);
-  const draft = loadDocumentDraftParsed();
-  if (!draft) return;
-
-  window.__DOC_DRAFT_RESTORING__ = true;
-  try {
-    const draftHasLines =
-      ((draft.repuestos && draft.repuestos.length) || 0) > 0 ||
-      ((draft.servicios && draft.servicios.length) || 0) > 0 ||
-      ((draft.otros && draft.otros.length) || 0) > 0;
-
-    if (document.getElementById('id_tipo') && draft.tipo) {
-      document.getElementById('id_tipo').value = draft.tipo;
-      document.getElementById('id_tipo').dispatchEvent(new Event('change', { bubbles: true }));
-    }
-    if (document.getElementById('id_fecha_emision') && draft.fecha_emision) {
-      document.getElementById('id_fecha_emision').value = draft.fecha_emision;
-    }
-    if (document.getElementById('doc_mode') && draft.doc_mode) {
-      document.getElementById('doc_mode').value = draft.doc_mode;
-      document.getElementById('doc_mode').dispatchEvent(new Event('change', { bubbles: true }));
-    }
-    const pay = document.getElementById('id_payment_status');
-    if (pay && draft.payment_status) {
-      pay.value = draft.payment_status;
-      pay.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-    const applyVat = document.getElementById('id_apply_vat');
-    if (applyVat && draft.apply_all_taxes !== undefined && draft.apply_all_taxes !== null) {
-      applyVat.checked = !!draft.apply_all_taxes;
-    }
-    (draft.tax_line_checks || []).forEach((tc) => {
-      const tel = document.getElementById(`include_${tc.id}`);
-      if (tel) tel.checked = !!tc.checked;
-    });
+// InicializaciÃ³n mÃ­nima para compatibilidad
+document.addEventListener('DOMContentLoaded', function() {
+    // Observations mÃ­nimo
     const obs = document.getElementById('id_observaciones');
-    if (obs && typeof draft.observaciones === 'string') obs.value = draft.observaciones;
-    const kmEl = document.getElementById('document-form')?.querySelector('[name="kilometraje_ingreso"]');
-    if (kmEl && typeof draft.kilometraje_ingreso === 'string') kmEl.value = draft.kilometraje_ingreso;
-
-    if (draftHasLines || !hasServerLines) {
-      clearDynamicPosRows();
-      (draft.repuestos || []).forEach((rep) => {
-        if (typeof window.addRepuestoRow !== 'function') return;
-        const row = window.addRepuestoRow(rep.rowId || null);
-        if (row && row.__applyRepData) {
-          row.__applyRepData({
-            id: rep.id || '',
-            nombre: rep.nombre || rep.nombre_input || '',
-            codigo: rep.codigo || '',
-            cantidad: rep.cantidad || 1,
-            precio_venta: rep.precio_venta != null ? rep.precio_venta : 0,
-            precio_compra: rep.precio_compra != null ? rep.precio_compra : undefined,
-            descuento: rep.descuento != null ? rep.descuento : 0,
-            origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
-            pieza_desarme_id: rep.pieza_desarme_id || '',
-            costo_linea: rep.costo_linea != null ? rep.costo_linea : 0,
-          });
-        }
-      });
-      (draft.servicios || []).forEach((s) => {
-        if (typeof window.addServicioRow !== 'function') return;
-        const row = window.addServicioRow();
-        if (row && row.__applyServData) {
-          row.__applyServData({
-            id: s.servicio_id || '',
-            nombre: s.nombre || '',
-            precio: s.precio || 0,
-          });
-        }
-      });
-      (draft.otros || []).forEach((o) => {
-        if (typeof window.addOtroRow !== 'function') return;
-        const row = window.addOtroRow();
-        if (row && row.__applyOtroData) {
-          row.__applyOtroData({
-            id: o.servicio_id || '',
-            nombre: o.nombre || '',
-            empresa: o.empresa_ext || '',
-            empresa_ext: o.empresa_ext || '',
-            precio_cliente: o.precio || 0,
-            precio_taller: o.precio_taller || 0,
-          });
-        }
-      });
-    }
-
-    const qsPre = new URLSearchParams(window.location.search || '');
-    const urlClientePre =
-      qsPre.get('cliente_id') || qsPre.get('new_cliente_id') || qsPre.get('cliente');
-    const urlVehiculoPre = qsPre.get('vehiculo_id') || qsPre.get('new_vehiculo_id');
-    const tplClientePre =
-      typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__
-        ? String(window.__PRESELECT_CLIENTE_ID__)
-        : '';
-    const tplVehiculoPre =
-      typeof window.__PRESELECT_VEHICULO_ID__ !== 'undefined' && window.__PRESELECT_VEHICULO_ID__
-        ? String(window.__PRESELECT_VEHICULO_ID__)
-        : '';
-    const skipDraftCliente = !!(urlClientePre || tplClientePre);
-    const skipDraftVehiculo = !!(urlVehiculoPre || tplVehiculoPre);
-
-    if (draft.cliente_id && typeof seleccionarCliente === 'function' && !skipDraftCliente) {
-      await seleccionarCliente({
-        id: draft.cliente_id,
-        nombre: draft.cliente_nombre || ('Cliente #' + draft.cliente_id),
-        email: draft.cliente_email || '',
-        telefono: draft.cliente_telefono || '',
-      });
-      if (draft.vehiculo_id && !skipDraftVehiculo && typeof preseleccionarVehiculo === 'function') {
-        setTimeout(() => preseleccionarVehiculo(draft.vehiculo_id), 250);
-      }
-    } else if (draft.vehiculo_id && document.getElementById('id_vehiculo') && !skipDraftCliente && !skipDraftVehiculo) {
-      const vs = document.getElementById('id_vehiculo');
-      vs.value = draft.vehiculo_id;
-      vs.dispatchEvent(new Event('change', { bubbles: true }));
-    }
-  } finally {
-    window.__DOC_DRAFT_RESTORING__ = false;
-    if (typeof serializeRows === 'function') serializeRows();
-  }
-}
-window.restoreDocumentDraftAfterHydrate = restoreDocumentDraftAfterHydrate;
-
-function submitDocumentForm(){
-  const form = document.getElementById('document-form');
-  if (!form) return;
-  serializeRows();
-  form.submit();
-}
-
-  serializeRows();
-
-  function setupClienteSearchHandlers(){
-    getClienteElements();
-
-    window.handleClienteInput = function(value){
-      getClienteElements();
-      const query = (value ?? clienteBusqueda?.value ?? '').trim();
-      clearTimeout(searchTimer);
-      if (query.length < 2){
-        clienteResultados?.classList.add('hidden');
-    return;
-  }
-      searchTimer = setTimeout(()=> buscarClientes(query), 200);
-    };
-
-    window.handleClienteFocus = function(value){
-      getClienteElements();
-      const query = (value ?? clienteBusqueda?.value ?? '').trim();
-      if (query.length >= 2) buscarClientes(query);
-    };
-
-    window.handleClienteKeydown = function(event){
-      getClienteElements();
-      const query = clienteBusqueda?.value?.trim() || '';
-      if (event.key === 'ArrowDown' && query.length >= 2 && (clienteResultados?.classList.contains('hidden') ?? true)){
-        event.preventDefault();
-        buscarClientes(query);
-        return false;
-      }
-
-      if (!clienteResultados || clienteResultados.classList.contains('hidden')){
-        return true;
-      }
-
-      const items = Array.from(clienteResultados.querySelectorAll('.cliente-item'));
-      if (!items.length) return true;
-
-      const active = document.activeElement;
-      const currentIndex = items.findIndex(el => el === active);
-
-      if (event.key === 'ArrowDown'){
-        event.preventDefault();
-        const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % items.length : 0;
-        items[nextIndex].focus();
-        return false;
-      }
-
-      if (event.key === 'ArrowUp'){
-        event.preventDefault();
-        const prevIndex = currentIndex >= 0 ? (currentIndex - 1 + items.length) % items.length : items.length - 1;
-        items[prevIndex].focus();
-        return false;
-      }
-
-      if (event.key === 'Enter'){
-        event.preventDefault();
-        const target = active?.classList.contains('cliente-item') ? active : items[0];
-        if (target){
-          seleccionarCliente({
-            id: target.dataset.id,
-            nombre: target.dataset.nombre,
-            email: target.dataset.email,
-            telefono: target.dataset.telefono,
-          });
-          clienteBusqueda?.focus();
-        }
-        return false;
-      }
-
-      if (event.key === 'Escape'){
-        event.preventDefault();
-        clienteResultados.classList.add('hidden');
-        clienteBusqueda?.focus();
-        return false;
-      }
-
-      return true;
-    };
-
-    clienteResultados?.addEventListener('click', (event)=>{
-      const item = event.target.closest('.cliente-item');
-      if (!item) return;
-      seleccionarCliente({
-        id: item.dataset.id,
-        nombre: item.dataset.nombre,
-        email: item.dataset.email,
-        telefono: item.dataset.telefono,
-      });
-      clienteBusqueda?.focus();
-    });
-
-    clienteResultados?.addEventListener('keydown', (event)=>{
-      if (event.key !== 'Enter') return;
-      const item = event.target.closest('.cliente-item');
-      if (!item) return;
-      event.preventDefault();
-      seleccionarCliente({
-        id: item.dataset.id,
-        nombre: item.dataset.nombre,
-        email: item.dataset.email,
-        telefono: item.dataset.telefono,
-      });
-      clienteBusqueda?.focus();
-    });
-  }
-
-  setupClienteSearchHandlers();
-  getClienteElements();
-  if (clienteSelect && clienteSelect.value) {
-    clienteSelect.dataset.source = 'form';
-  }
-  if (vehiculoSelect && vehiculoSelect.value) {
-    vehiculoSelect.dataset.source = 'form';
-  }
-
-  // Tarjeta vehículo: mostrar resumen al seleccionar
-  function updateVehiculoCard() {
-    const sel = document.getElementById('id_vehiculo');
-    const box = document.getElementById('vehiculo-info');
-    const marcaModelo = document.getElementById('vehiculo-marca-modelo');
-    const anoVin = document.getElementById('vehiculo-ano-vin');
-    const mileage = document.getElementById('vehiculo-mileage');
-    const ultimaEntrada = document.getElementById('vehiculo-ultima-entrada');
-    if (!box || !sel) return;
-    const opt = sel.options[sel.selectedIndex];
-    const text = opt ? opt.textContent.trim() : '';
-    if (!sel.value || !text) {
-      box.classList.add('hidden');
-      return;
-    }
-    if (marcaModelo) marcaModelo.textContent = text;
-    if (anoVin) anoVin.textContent = '';
-    if (mileage) mileage.textContent = '';
-    if (ultimaEntrada) ultimaEntrada.textContent = '';
-    box.classList.remove('hidden');
-  }
-  vehiculoSelect?.addEventListener('change', updateVehiculoCard);
-  updateVehiculoCard();
-  // Cargar datos existentes si estamos editando
-  {% if es_edicion %}
-  // Inicializar campos básicos del formulario ANTES de aplicar tema
-  const documentoData = {
-    tipo: '{{ documento.tipo|default:form.tipo.value|default:"" }}',
-    clienteId: '{{ cliente_info.id|default:"" }}',
-    clienteNombre: '{{ cliente_info.nombre|default:""|escapejs }}',
-    clienteEmail: '{{ cliente_info.email|default:""|escapejs }}',
-    clienteTelefono: '{{ cliente_info.telefono|default:""|escapejs }}',
-    vehiculoId: '{{ vehiculo_inicial_id|default:"" }}',
-    prefillVehiculoId: '{{ prefill_vehiculo_id|default:"" }}',
-    tecnicoId: '{{ documento.tecnico_responsable_id|default:form.tecnico_responsable.value|default:"" }}',
-    paymentStatus: '{{ documento.payment_status|default:"pending" }}',
-    numero: '{{ documento.numero_documento|default:documento.numero|default:"" }}'
-  };
-  
-  console.log('📄 Inicializando documento para edición:', documentoData);
-  
-  // Establecer tipo de documento PRIMERO
-  if (documentoData.tipo) {
-    const tipoSelect = document.getElementById('id_tipo');
-    if (tipoSelect) {
-      tipoSelect.value = documentoData.tipo;
-      const t = documentoData.tipo;
-      if (typeof applyTheme === 'function') applyTheme(t);
-    }
-  } else {
-    const t = selTipo?.value || 'OT';
-    applyTheme(t);
-  }
-  
-  // Establecer número de documento
-  if (documentoData.numero) {
-    const numView = document.getElementById('id_numero');
-    if (numView) {
-      numView.textContent = documentoData.numero;
-    }
-  } else {
-    updateDocumentNumber();
-  }
-  
-  // Inicializar cliente si existe
-  if (documentoData.clienteId && documentoData.clienteNombre) {
-    // Esperar a que la función esté disponible
-    setTimeout(() => {
-      if (typeof seleccionarCliente === 'function') {
-        seleccionarCliente({
-          id: documentoData.clienteId,
-          nombre: documentoData.clienteNombre,
-          email: documentoData.clienteEmail,
-          telefono: documentoData.clienteTelefono
-        });
-        
-        // Cargar vehículos del cliente y seleccionar el vehículo inicial
-        // Priorizar prefillVehiculoId (vehículo recién creado) sobre vehiculoId (edición)
-        const vehiculoIdToSelect = documentoData.prefillVehiculoId || documentoData.vehiculoId;
-        if (vehiculoIdToSelect) {
-          console.log(`🎯 Vehículo a preseleccionar: ${vehiculoIdToSelect}`);
-          // La función cargarVehiculosPorCliente ahora acepta el ID para preseleccionar
-          // Se llamará automáticamente desde seleccionarCliente con el parámetro
-        }
-      }
-    }, 100);
-  }
-  
-  // Establecer técnico responsable
-  if (documentoData.tecnicoId) {
-    setTimeout(() => {
-      const tecnicoSelect = document.getElementById('id_tecnico_responsable');
-      if (tecnicoSelect) {
-        tecnicoSelect.value = documentoData.tecnicoId;
-      }
-    }, 100);
-  }
-  
-  // Establecer estado de pago
-  if (documentoData.paymentStatus) {
-    setTimeout(() => {
-      const paymentSelect = document.getElementById('id_payment_status');
-      if (paymentSelect) {
-        paymentSelect.value = documentoData.paymentStatus;
-      }
-    }, 100);
-  }
-
-  {% else %}
-  // Si no es edición, aplicar tema y actualizar número normalmente
-  const t0 = selTipo?.value || 'OT';
-  applyTheme(t0);
-  if (typeof applyModeDependentUI === 'function') applyModeDependentUI();
-  updateDocumentNumber();
-  // Preselección cliente/vehículo (vuelta desde "crear vehículo" con cliente_id y vehiculo_id en URL)
-  {% if cliente_preselect_id %}
-  if (typeof window.__PRESELECT_CLIENTE_ID__ !== 'undefined' && window.__PRESELECT_CLIENTE_ID__ && typeof seleccionarCliente === 'function') {
-    setTimeout(() => {
-      seleccionarCliente({
-        id: window.__PRESELECT_CLIENTE_ID__,
-        nombre: "{{ cliente_preselect_nombre|default:''|escapejs }}",
-        email: "{{ cliente_preselect_email|default:''|escapejs }}",
-        telefono: "{{ cliente_preselect_telefono|default:''|escapejs }}"
-      });
-    }, 100);
-  }
-  {% endif %}
-  {% endif %}
-
-  // Hidratar líneas (edición y creación con prefill)
-  const repuestosData = {{ repuestos_json|safe|default:"[]" }};
-  const serviciosData = {{ servicios_json|safe|default:"[]" }};
-  const otrosData = {{ otros_json|safe|default:"[]" }};
-
-  console.log('📦 Cargando datos iniciales del formulario:', {
-    repuestos: (repuestosData || []).length,
-    servicios: (serviciosData || []).length,
-    otros: (otrosData || []).length
-  });
-
-  // Cargar líneas con delay para asegurar que las funciones estén disponibles
-  setTimeout(() => {
-    if (repuestosData && repuestosData.length > 0) {
-      repuestosData.forEach(rep => {
-        if (typeof window.addRepuestoRow === 'function') {
-          const row = window.addRepuestoRow();
-          if (row && row.__applyRepData) {
-            row.__applyRepData({
-              id: rep.repuesto_id || '',
-              codigo: rep.codigo || '',
-              nombre: rep.nombre || '',
-              cantidad: rep.cantidad || 1,
-              precio: rep.precio || 0,
-              descuento: rep.descuento || 0,
-              origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
-              pieza_desarme_id: rep.pieza_desarme_id != null ? String(rep.pieza_desarme_id) : '',
-              costo_linea: rep.costo_linea != null ? rep.costo_linea : 0,
-            });
-          }
-        }
-      });
-    }
-
-    if (serviciosData && serviciosData.length > 0) {
-      serviciosData.forEach(serv => {
-        if (typeof window.addServicioRow === 'function') {
-          const row = window.addServicioRow();
-          if (row && row.__applyServData) {
-            row.__applyServData({
-              id: serv.servicio_id || '',
-              nombre: serv.nombre || '',
-              cantidad: serv.cantidad || 1,
-              precio: serv.precio || 0,
-              descuento: serv.descuento || 0,
-            });
-          }
-        }
-      });
-    }
-
-    if (otrosData && otrosData.length > 0) {
-      otrosData.forEach(otro => {
-        if (typeof window.addOtroRow === 'function') {
-          const row = window.addOtroRow();
-          if (row && row.__applyOtroData) {
-            row.__applyOtroData({
-              id: otro.servicio_id || '',
-              nombre: otro.nombre || '',
-              empresa: otro.empresa_ext || '',
-              empresa_ext: otro.empresa_ext || '',
-              precio_cliente: otro.precio || 0,
-              precio_taller: otro.precio_taller || 0,
-            });
-          }
-        }
-      });
-    }
-
-    // Recalcular y serializar después de hidratar todos los datos
-    const hasServerLines =
-      ((repuestosData || []).length > 0 ||
-        (serviciosData || []).length > 0 ||
-        (otrosData || []).length > 0);
-    setTimeout(async () => {
-      if (typeof restoreDocumentDraftAfterHydrate === 'function') {
-        await restoreDocumentDraftAfterHydrate({ hasServerLines });
-      }
-      if (typeof window.restoreCreatedRepuestoFromReturn === 'function') {
-        window.restoreCreatedRepuestoFromReturn();
-      }
-      if (typeof window.recalcTotales === 'function') window.recalcTotales();
-      if (typeof window.serializeRows === 'function') window.serializeRows();
-    }, 300);
-  }, 150);
-  
-  serializeRows();
-
-  const docFormDraft = document.getElementById('document-form');
-  docFormDraft?.addEventListener('input', scheduleDocumentDraftSave);
-  docFormDraft?.addEventListener('change', scheduleDocumentDraftSave);
-  docFormDraft?.addEventListener('submit', () => {
-    clearDocumentFormDraftStorage();
-  });
-
-  clienteBusqueda?.addEventListener('input', (event)=> window.handleClienteInput(event.target.value));
-  clienteBusqueda?.addEventListener('focus', (event)=> window.handleClienteFocus(event.target.value));
-  clienteBusqueda?.addEventListener('keydown', (event)=> window.handleClienteKeydown(event));
-  
-  // El botón "Nuevo Cliente" - usar URL del servidor (country_url) + ?next= para retorno
-  const btnNuevoCliente = document.getElementById('btn-nuevo-cliente');
-  if (btnNuevoCliente) {
-    btnNuevoCliente.classList.add('btn-green-gradient');
-    const baseUrl = btnNuevoCliente.getAttribute('data-url-crear-cliente') || btnNuevoCliente.getAttribute('href') || '';
-    if (baseUrl && baseUrl !== '#') {
-      const nextUrl = (typeof window.egEncodeDocumentFormNext === 'function')
-        ? window.egEncodeDocumentFormNext()
-        : encodeURIComponent(window.location.pathname + (window.location.search || ''));
-      const sep = baseUrl.indexOf('?') >= 0 ? '&' : '?';
-      btnNuevoCliente.setAttribute('href', baseUrl + sep + 'next=' + nextUrl);
-    }
-    console.log('✅ Botón Nuevo Cliente configurado:', btnNuevoCliente.getAttribute('href'));
-  }
-  
-  console.log('📄 Document form inicializado', EG.cfg);
-}
-
-if (document.readyState === 'loading') {
-  document.addEventListener('DOMContentLoaded', initDocumentFormScript);
-} else {
-  initDocumentFormScript();
-}
-
-// === NAVEGACIÓN BLINDADA eGarage (Corrección 404) ===
-document.addEventListener('click', function(e) {
-    const btnCliente = e.target.closest('#btn-nuevo-cliente');
-    const btnVehiculo = e.target.closest('#btn-nuevo-vehiculo');
+    if (obs) { obs.setAttribute('rows', '2'); }
     
-    if (btnCliente || btnVehiculo) {
-        var nextUrl = '';
-        if (typeof window.egEncodeDocumentFormNext === 'function') {
-            nextUrl = window.egEncodeDocumentFormNext();
-        } else {
-            nextUrl = encodeURIComponent(window.location.pathname + (window.location.search || ''));
-        }
-        let destUrl = "";
-
-        if (btnCliente) {
-            // Preferir href generado por el servidor (country_url) con ?next= ya añadido en init
-            const href = btnCliente.getAttribute('href');
-            if (href && href !== '#' && href !== '') {
-                e.preventDefault();
-                window.location.href = href;
-                return;
-            }
-            // Fallback manual si no hay href
-            const pathParts = window.location.pathname.split('/').filter(function(p) { return p && p.length > 0; });
-            const country = pathParts[0] || 'cl';
-            const lang = (pathParts[1] === 'es' || pathParts[1] === 'en') ? pathParts[1] : 'es';
-            destUrl = '/' + country + '/' + lang + '/clientes/crear/?next=' + nextUrl;
-        } else if (btnVehiculo) {
-            const pathParts = window.location.pathname.split('/').filter(function(p) { return p && p.length > 0; });
-            const country = pathParts[0] || 'cl';
-            const lang = (pathParts[1] === 'es' || pathParts[1] === 'en') ? pathParts[1] : 'es';
-            let clienteId = '';
-            if (window.jQuery) {
-                const $clienteSelect = jQuery('#id_cliente');
-                if ($clienteSelect.length) clienteId = $clienteSelect.val() || '';
-            }
-            destUrl = '/' + country + '/' + lang + '/vehiculos/crear/?next=' + nextUrl;
-            if (clienteId) destUrl += '&cliente_id=' + encodeURIComponent(clienteId);
-        }
-
-        if (destUrl) {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log("🚀 Redirigiendo a ruta validada:", destUrl);
-            window.location.href = destUrl;
-        }
+    // Cabecera consola: badge estado de pago
+    function updatePaymentStatusBadge() {
+        const sel = document.getElementById('id_payment_status');
+        const badge = document.getElementById('payment-status-badge');
+        if (!badge || !sel) return;
+        badge.classList.remove('doc-console-payment-paid', 'doc-console-payment-pending', 'doc-console-payment-partial');
+        const v = (sel.value || '').toUpperCase();
+        if (v === 'PAGADO' || v === 'PAID') badge.classList.add('doc-console-payment-paid');
+        else if (v === 'PARCIAL' || v === 'PARTIAL') badge.classList.add('doc-console-payment-partial');
+        else badge.classList.add('doc-console-payment-pending');
     }
+    updatePaymentStatusBadge();
+    document.getElementById('id_payment_status')?.addEventListener('change', updatePaymentStatusBadge);
 });
-
 </script>
 
-{# ==================== CARGA DE DOCUMENT ENGINE ==================== #}
-{# "Capa de Inteligencia" - UX Móvil y Blindaje de Campos Calculados #}
-<script src="{% static 'js/document_engine.js' %}"></script>
+{# ❌ DESACTIVAR Document Engine - Sistema legacy #}
+{# <script src="{% static 'js/document_engine.js' %}"></script> #}
 
-{# === NUEVO: Módulos JavaScript modularizados (pendiente collectstatic en prod) === #}
-{# <script src="{% static 'js/document-form/index.js' %}"></script> #}
+{# === SISTEMA MODULAR UNIFICADO === #}
+{# Cargar mÃ³dulos JavaScript modularizados #}
+<script src="{% static 'js/document-form/index.js' %}"></script>
+  
+{# Implementación mínima de addServicioRow hasta que se cree el módulo servicios #}
+<script>
+window.addServicioRow = function() {
+    console.warn('Módulo servicios no implementado aún - usando implementación mínima');
+      
+    const container = document.getElementById('servicios-container');
+    if (!container) {
+        console.error('No se encontró servicios-container');
+        return null;
+    }
+      
+    // Ocultar mensaje de vacío
+    const emptyHint = document.getElementById('servicios-empty-hint');
+    if (emptyHint) emptyHint.style.display = 'none';
+      
+    // Crear fila básica
+    const row = document.createElement('div');
+    row.className = 'dynamic-element';
+    row.innerHTML = `
+        <div class="doc-row-grid">
+            <div class="col-span-7">
+                <input type="text" class="form-control" placeholder="Servicio" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;">
+            </div>
+            <div class="col-span-3">
+                <input type="number" class="form-control" placeholder="Precio" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;" 
+                       step="0.01" min="0">
+            </div>
+            <div class="col-span-2 flex items-center gap-1">
+                <span class="srv-subtotal-view text-sm text-gray-300">$0</span>
+                <button type="button" class="text-red-400 hover:text-red-300" onclick="this.closest('.dynamic-element').remove()">
+                    ✕
+                </button>
+            </div>
+        </div>
+    `;
+      
+    container.appendChild(row);
+      
+    // Agregar funcionalidad básica de cálculo
+    const priceInput = row.querySelector('input[type="number"]');
+    const subtotalSpan = row.querySelector('.srv-subtotal-view');
+      
+    if (priceInput && subtotalSpan) {
+        priceInput.addEventListener('input', function() {
+            const price = parseFloat(this.value) || 0;
+            subtotalSpan.textContent = '$' + price.toFixed(2);
+              
+            // Disparar evento de recálculo de totales
+            if (window.recalcTotales) {
+                window.recalcTotales();
+            }
+        });
+    }
+      
+    return row;
+  };
+  
+  window.addOtroRow = function() {
+    console.warn('Módulo otros servicios no implementado aún - usando implementación mínima');
+      
+    const container = document.getElementById('otros-container');
+    if (!container) {
+        console.error('No se encontró otros-container');
+        return null;
+    }
+      
+    // Ocultar mensaje de vacío
+    const emptyHint = document.getElementById('otros-empty-hint');
+    if (emptyHint) emptyHint.style.display = 'none';
+      
+    // Crear fila básica
+    const row = document.createElement('div');
+    row.className = 'dynamic-element';
+    row.innerHTML = `
+        <div class="doc-row-grid">
+            <div class="col-span-4">
+                <input type="text" class="form-control" placeholder="Servicio externo" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;">
+            </div>
+            <div class="col-span-3">
+                <input type="text" class="form-control" placeholder="Empresa" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;">
+            </div>
+            <div class="col-span-2">
+                <input type="number" class="form-control" placeholder="Precio taller" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;" 
+                       step="0.01" min="0">
+            </div>
+            <div class="col-span-2">
+                <input type="number" class="form-control" placeholder="Precio cliente" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;" 
+                       step="0.01" min="0">
+            </div>
+            <div class="col-span-1 flex items-center gap-1">
+                <span class="otr-subtotal-view text-sm text-gray-300">$0</span>
+                <button type="button" class="text-red-400 hover:text-red-300" onclick="this.closest('.dynamic-element').remove()">
+                    ✕
+                </button>
+            </div>
+        </div>
+    `;
+      
+    container.appendChild(row);
+      
+    // Agregar funcionalidad básica de cálculo
+    const clientPriceInput = row.querySelector('input[placeholder="Precio cliente"]');
+    const subtotalSpan = row.querySelector('.otr-subtotal-view');
+      
+    if (clientPriceInput && subtotalSpan) {
+        clientPriceInput.addEventListener('input', function() {
+            const price = parseFloat(this.value) || 0;
+            subtotalSpan.textContent = '$' + price.toFixed(2);
+              
+            // Disparar evento de recálculo de totales
+            if (window.recalcTotales) {
+                window.recalcTotales();
+            }
+        });
+    }
+      
+    return row;
+  };
+  </script>
 
 {% endblock extra_js %}
+
