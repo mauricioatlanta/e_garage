@@ -19,5 +19,6 @@ else:
         "django.contrib.messages.middleware.MessageMiddleware",
         "django.middleware.clickjacking.XFrameOptionsMiddleware",
         "taller.middleware.empresa_middleware.EmpresaMiddleware",
+        "taller.middleware.country_and_language.CountryAndLanguageMiddleware",
         "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
     ]

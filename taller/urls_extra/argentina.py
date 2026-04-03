@@ -108,12 +108,6 @@ urlpatterns = [
         lambda r: redirect("/ar/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_signup_ar",
     ),
-    # Login para suscriptores de Argentina
-    path(
-        "login/",
-        TemplateView.as_view(template_name="registration/login.html"),
-        name="account_login",
-    ),
     # Activación de trial para Argentina
     path("activar-trial/", activar_trial, name="activar_trial"),
     # Registro para Argentina (español por defecto)

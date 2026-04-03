@@ -227,16 +227,6 @@ SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 CSRF_TRUSTED_ORIGINS = ["https://egarage.cl", "https://www.egarage.cl"]
 
 
-# ===== FIX IDIOMA USA/CHILE EN PRODUCCION =====
-# Django LocaleMiddleware solo no interpreta /us/en/... en esta arquitectura.
-# Reinsertamos el middleware que fuerza idioma por prefijo país/idioma.
-if "taller.middleware.lang_policy.LanguagePolicyMiddleware" not in MIDDLEWARE:
-    try:
-        idx = MIDDLEWARE.index("taller.middleware.empresa_middleware.EmpresaMiddleware")
-        MIDDLEWARE.insert(idx, "taller.middleware.lang_policy.LanguagePolicyMiddleware")
-    except ValueError:
-        MIDDLEWARE.append("taller.middleware.lang_policy.LanguagePolicyMiddleware")
-
 # =============================================================================
 # Staticfiles: solo backends que existen SIEMPRE en el paquete desplegado.
 # NO usar taller.storage.LenientCompressedManifestStaticFilesStorage aquí hasta

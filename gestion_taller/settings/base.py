@@ -53,8 +53,6 @@ MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     # 2. Sesiones (antes de autenticación)
     "django.contrib.sessions.middleware.SessionMiddleware",
-    # 2b. Redirigir /accounts/login/ → /cl/accounts/login/ (evita UY por sesión)
-    "taller.middleware.force_accounts_to_cl.ForceAccountsToCLMiddleware",
     # 3. Localización (antes de CommonMiddleware)
     "django.middleware.locale.LocaleMiddleware",
     # 4. Common (después de sesiones y locale)
@@ -75,6 +73,7 @@ MIDDLEWARE = [
     # "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.country_context.CountryContextMiddleware",  # DESHABILITADO - Causa bucles infinitos con /es/
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
+    "taller.middleware.country_and_language.CountryAndLanguageMiddleware",
     "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
 

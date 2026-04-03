@@ -312,8 +312,8 @@ urlpatterns = [
         company_settings_view,  # Usar la misma vista que /us/settings/
         name="futuristic_company_settings",
     ),
-    # 3) Auth Allauth para USA (nombres globales a propósito)
-    path("login/", usa_login_view, name="account_login"),
+    # 3) Auth Allauth para USA
+    path("accounts/login/", usa_login_view, name="account_login"),
     path("signup/", usa_signup_view, name="account_signup"),
     path("es/signup/", usa_signup_view_es, name="account_signup_es"),
     # 4) Trial y onboarding

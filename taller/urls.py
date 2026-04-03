@@ -17,10 +17,13 @@ from taller.views_extra.dashboard_empresa import (
 from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views import dashboard
 from taller.views.dashboard_bi import DashboardHomeView
+from taller.views.country_aware_auth import country_aware_login
+from taller.views.onboarding_views import onboarding_guardar_paso, onboarding_wizard
 
 app_name = "taller"
 
 urlpatterns = [
+    path("accounts/login/", country_aware_login, name="account_login"),
     # ✅ Gestión de Equipo (Team Management)
     path("equipo/", include(("taller.team.urls", "team"), namespace="team")),
     path("clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")),
@@ -81,6 +84,13 @@ urlpatterns = [
     # Centro de Trabajo / Workspace (canonical /us/en/workspace/ y /us/es/workspace/)
     path("workspace/", centro_trabajo, name="centro_trabajo"),
     path("workspace/buscar/", centro_trabajo_buscar, name="centro_trabajo_buscar"),
+    path("onboarding/", onboarding_wizard, name="onboarding"),
+    path("onboarding/<str:step>/", onboarding_wizard, name="onboarding_step"),
+    path(
+        "onboarding/guardar/<int:paso>/",
+        onboarding_guardar_paso,
+        name="onboarding_guardar_paso",
+    ),
     # Desarmaduría: mapa interactivo, plantillas, piezas
     path("desarme/", include(("taller.urls_desarme", "desarme"), namespace="desarme")),
     # Centro de Ingreso Vehicular

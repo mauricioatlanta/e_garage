@@ -71,7 +71,6 @@ def admin_login_method(request, extra_context=None):
 admin.site.login = admin_login_method
 admin.site.login_template = "admin/login.html"
 
-from django.http import HttpResponseNotFound
 from django.urls import include, path, re_path
 from django.views.generic import RedirectView, TemplateView
 from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
@@ -83,11 +82,11 @@ from taller.views_extra.bienvenida_usa import bienvenida_usa_en, bienvenida_usa_
 from taller.views_extra.login_redirector import login_redirector
 from taller.views_extra.logout_redirect_view import logout_redirect_view
 from taller.views_extra.registro_exitoso import registro_exitoso
+from taller.urls_extra.usa import usa_login_view, usa_signup_view, usa_signup_view_es
 from taller.views_extra.signup_email_verification import (
     confirm_email_and_login,
     resend_signup_confirmation,
 )
-from taller.views_extra.signup_redirects import signup_redirect
 from taller.views_extra.pwa import dynamic_manifest, dynamic_service_worker
 from taller.views_health import health_check, health_simple
 
@@ -181,20 +180,6 @@ def redirect_qs(to):
     return view
 
 
-def redirect_login_canonical(cc: str, lang: str):
-    """Redirige rutas legacy de login a la ruta canónica por país/idioma."""
-
-    def view(request, **kwargs):
-        params = request.GET.copy()
-        params.pop("country", None)
-        url = f"/{cc}/{lang}/accounts/login/"
-        if params:
-            url = f"{url}?{urlencode(params, doseq=True)}"
-        return redirect(url)
-
-    return view
-
-
 def redirect_cl_to_es(request, path=None):
     """Redirect /cl/... to /cl/es/... preserving the rest of the path"""
     if path:
@@ -230,21 +215,6 @@ def country_aware_clientes_redirect(request):
     return redirect("/cl/es/clientes/")
 
 
-def country_aware_workspace_redirect(request, subpath=""):
-    """Redirect /workspace/ to country workspace. USA → /us/en/workspace/, Chile → /cl/es/workspace/."""
-    if request.user.is_authenticated:
-        try:
-            if hasattr(request.user, "empresa") and request.user.empresa:
-                pais = (getattr(request.user.empresa, "pais", None) or "").strip().upper()
-                if pais == "US":
-                    return redirect(f"/us/en/workspace/{subpath}".rstrip("/") + "/")
-                if pais == "CL":
-                    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
-        except Exception:
-            pass
-    return redirect(f"/cl/es/workspace/{subpath}".rstrip("/") + "/")
-
-
 urlpatterns = [
     # PWA Dinámicas (manifest y service worker por país e idioma)
     path("<str:pais>/<str:idioma>/manifest.json", dynamic_manifest, name="pwa_manifest"),
@@ -252,13 +222,6 @@ urlpatterns = [
         "<str:pais>/<str:idioma>/service-worker.js",
         dynamic_service_worker,
         name="pwa_service_worker",
-    ),
-    # Root /workspace/ → country-aware redirect (early so it's always found)
-    path("workspace/", country_aware_workspace_redirect, name="workspace_redirect_root"),
-    path(
-        "workspace/buscar/",
-        lambda r: country_aware_workspace_redirect(r, "buscar"),
-        name="workspace_buscar_redirect_root",
     ),
     path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
     # Portal del Cliente
@@ -325,7 +288,7 @@ urlpatterns = [
         TemplateView.as_view(template_name="taller/bienvenida_chile.html"),
         name="bienvenida_chile",
     ),
-    # Login personalizado con contexto de país
+    # Entry point neutro: el middleware lo canoniza a la ruta país/idioma correspondiente.
     path("accounts/login/", country_aware_login, name="account_login"),
     # Signup personalizado con CustomSignupView (ANTES de allauth.urls para que tenga prioridad)
     path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
@@ -352,63 +315,6 @@ urlpatterns = [
         redirect_qs("/accounts/confirm-email/{key}/"),
         name="account_confirm_email_cl_es",
     ),
-    # Wrappers country-aware para login y signup
-    # Canonicalizamos Chile a /cl/es/accounts/login/ para evitar CSRF por mismatch de URL.
-    path("cl/accounts/login/", redirect_login_canonical("cl", "es"), name="account_login_cl"),
-    path("co/accounts/login/", country_aware_login, name="account_login_co"),
-    path("ec/accounts/login/", country_aware_login, name="account_login_ec"),
-    path("pe/accounts/login/", country_aware_login, name="account_login_pe"),
-    # Signup CL y US - redirect a signup country-aware con país + idioma
-    path("cl/accounts/signup/", lambda r: signup_redirect(r, "cl"), name="account_signup_cl"),
-    # Redirecciones /xx/signup/ -> /{xx}/{lang}/accounts/signup/ (preserva ?plan=, etc.) para que los
-    # enlaces de onboarding/bienvenida (ej. /cl/signup/, /ar/signup/) resuelvan en todos los países
-    path(
-        "cl/signup/",
-        lambda r: redirect("/cl/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
-        name="signup_redirect_cl",
-    ),
-    path(
-        "ar/signup/",
-        lambda r: redirect("/ar/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
-        name="signup_redirect_ar",
-    ),
-    path(
-        "ec/signup/",
-        lambda r: redirect("/ec/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
-        name="signup_redirect_ec",
-    ),
-    path(
-        "co/signup/",
-        lambda r: redirect("/co/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
-        name="signup_redirect_co",
-    ),
-    path(
-        "pe/signup/",
-        lambda r: redirect("/pe/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
-        name="signup_redirect_pe",
-    ),
-    path(
-        "ve/signup/",
-        lambda r: redirect("/ve/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
-        name="signup_redirect_ve",
-    ),
-    path(
-        "br/signup/",
-        lambda r: redirect("/br/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
-        name="signup_redirect_br",
-    ),
-    # Redirects amigables para login (siempre llevar a login canónico con idioma)
-    path("cl/login/", redirect_login_canonical("cl", "es")),
-    path("cl/es/login/", redirect_login_canonical("cl", "es")),
-    # us/login/ lo resuelve path("us/", include(usa)) → usa_login_view (render directo)
-    path("co/login/", redirect_qs("/co/accounts/login/")),
-    path("co/es/login/", redirect_qs("/co/accounts/login/")),
-    path("ec/login/", redirect_qs("/ec/accounts/login/")),
-    path("ec/es/login/", redirect_qs("/ec/accounts/login/")),
-    path("pe/login/", redirect_qs("/pe/accounts/login/"), name="pe_login_redirect"),
-    path("pe/es/login/", redirect_qs("/pe/accounts/login/"), name="pe_es_login_redirect"),
-    path("ve/login/", redirect_qs("/ve/es/accounts/login/")),
-    path("ve/es/login/", redirect_qs("/ve/es/accounts/login/")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
     # Password reset (solicitud + enviado + confirm + completo)
@@ -439,32 +345,34 @@ urlpatterns = [
         "uy/",
         include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
     ),
-    # 🇺🇸 USA - Bloqueo de rutas legacy /us/en/accounts/ y /us/es/accounts/
-    path("us/en/accounts/", lambda r: HttpResponseNotFound()),
-    path("us/en/accounts/<path:rest>", lambda r, rest: HttpResponseNotFound()),
-    path("us/es/accounts/", lambda r: HttpResponseNotFound()),
-    path("us/es/accounts/<path:rest>", lambda r, rest: HttpResponseNotFound()),
+    # 🇺🇸 USA - Surface auth canónica bajo /us/<lang>/accounts/*
+    path("us/en/accounts/login/", usa_login_view, name="us_en_account_login"),
+    path("us/es/accounts/login/", usa_login_view, name="us_es_account_login"),
+    path("us/en/accounts/signup/", usa_signup_view, name="us_en_account_signup"),
+    path("us/es/accounts/signup/", usa_signup_view_es, name="us_es_account_signup"),
+    path(
+        "us/en/accounts/password/reset/",
+        redirect_qs("/accounts/password/reset/"),
+        name="us_en_account_reset_password",
+    ),
+    path(
+        "us/es/accounts/password/reset/",
+        redirect_qs("/accounts/password/reset/"),
+        name="us_es_account_reset_password",
+    ),
+    path(
+        "us/en/accounts/confirm-email/<str:key>/",
+        redirect_qs("/accounts/confirm-email/{key}/"),
+        name="us_en_account_confirm_email",
+    ),
+    path(
+        "us/es/accounts/confirm-email/<str:key>/",
+        redirect_qs("/accounts/confirm-email/{key}/"),
+        name="us_es_account_confirm_email",
+    ),
     # 🇺🇸 USA - Bienvenida explícita ANTES de us/en/ y us/es/ (evita 502: taller.urls no tiene bienvenida/)
     path("us/en/bienvenida/", bienvenida_usa_en, name="us_en_bienvenida"),
     path("us/es/bienvenida/", bienvenida_usa_es, name="us_es_bienvenida"),
-    # 🇺🇸 USA - Redirect /us/centro-operaciones/ → /us/en/centro-operaciones/ (evita ERR_TOO_MANY_REDIRECTS)
-    path(
-        "us/centro-operaciones/",
-        RedirectView.as_view(url="/us/en/centro-operaciones/", permanent=False),
-        name="us_centro_operaciones_redirect",
-    ),
-    # Root /workspace/ is registered at the top of urlpatterns
-    # 🇺🇸 USA - /us/workspace/ → /us/en/workspace/ (canonical con idioma; evita loop con SimpleCountryRedirectMiddleware)
-    path(
-        "us/workspace/",
-        RedirectView.as_view(url="/us/en/workspace/", permanent=False),
-        name="us_workspace_redirect",
-    ),
-    path(
-        "us/workspace/buscar/",
-        RedirectView.as_view(url="/us/en/workspace/buscar/", permanent=False),
-        name="us_workspace_buscar_redirect",
-    ),
     # 🇺🇸 USA - Desarme explícito para /us/en/desarme/ (ANTES se montaba con namespace us_en_desarme,
     # lo que rompe helpers que esperan us_en:desarme:...; ahora se deja solo el include normal en
     # `taller.urls` bajo el namespace us_en)
@@ -592,24 +500,6 @@ urlpatterns = [
         "cl/centro-operaciones-espacial/",
         RedirectView.as_view(url="/cl/es/centro-operaciones-espacial/", permanent=False),
         name="cl_centro_operaciones_redirect",
-    ),
-    # Redirigir /cl/ a /cl/es/bienvenida/
-    path(
-        "cl/",
-        RedirectView.as_view(url="/cl/es/bienvenida/", permanent=False),
-        name="cl_home_welcome",
-    ),
-    # Página de bienvenida para Argentina - /ar/ directamente
-    path(
-        "ar/",
-        TemplateView.as_view(template_name="landing_inicio.html"),
-        name="ar_home_welcome",
-    ),
-    # Página de bienvenida para Uruguay - /uy/ directamente
-    path(
-        "uy/",
-        TemplateView.as_view(template_name="landing_inicio.html"),
-        name="uy_home_welcome",
     ),
     # Redirect cl/ to cl/es/ preserving the rest of the path - DESHABILITADO - Causa bucles infinitos
     # path(

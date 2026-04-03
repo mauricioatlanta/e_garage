@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import login
 from django.shortcuts import redirect
-from django.urls import reverse
 from django.views.decorators.http import require_POST
 
 
@@ -64,20 +63,6 @@ def resend_signup_confirmation(request):
     return redirect(f"/{country.lower()}/{lang}/accounts/signup/")
 
 
-def _post_confirmation_redirect(user):
-    empresa = getattr(user, "empresa", None)
-    country = (getattr(empresa, "pais", None) or "CL").upper()
-    if country == "US":
-        try:
-            return reverse("us_en:centro_trabajo")
-        except Exception:
-            return "/us/en/workspace/"
-    try:
-        return reverse("chile:centro_trabajo")
-    except Exception:
-        return "/cl/es/workspace/"
-
-
 def confirm_email_and_login(request, key):
     """
     Confirma email, autentica al usuario y redirige de forma country-aware.
@@ -97,7 +82,7 @@ def confirm_email_and_login(request, key):
     if user and user.is_active:
         backend = "allauth.account.auth_backends.AuthenticationBackend"
         login(request, user, backend=backend)
-        return redirect(_post_confirmation_redirect(user))
+        return redirect(get_adapter(request).get_login_redirect_url(request))
 
     messages.error(request, "No fue posible iniciar sesion tras confirmar tu correo.")
     return redirect("/accounts/login/")

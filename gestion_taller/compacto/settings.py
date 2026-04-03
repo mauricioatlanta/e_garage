@@ -136,9 +136,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     # País/empresa (provee request.empresa / request.empresa.pais)
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
-    "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
-    # Idioma (nuevo): decide idioma final por país y preferencia usuario
-    "taller.middleware.lang_policy.LanguagePolicyMiddleware",
+    "taller.middleware.country_and_language.CountryAndLanguageMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     # Suscripción / trial (después de auth + allauth)

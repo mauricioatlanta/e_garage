@@ -9,6 +9,14 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from allauth.utils import build_absolute_uri
 from django.utils.translation import activate
+from taller.utils.country_routing import (
+    canonical_prefix,
+    default_lang_for_country,
+    infer_country,
+    infer_country_from_user,
+    normalize_country,
+    parse_country_lang,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -114,27 +122,11 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
         return super().get_password_change_redirect_url(request)
 
     def _country_lang_from_request_or_user(self, request=None, user=None):
-        country = None
-        if user is not None:
-            empresa = getattr(user, "empresa", None)
-            country = self._normalize_country(getattr(empresa, "pais", None)) if empresa else None
+        country = infer_country_from_user(user) if user is not None else None
         if not country and request is not None:
-            path = (request.path or "").lower()
-            if path.startswith("/us/"):
-                country = "US"
-            elif path.startswith("/cl/"):
-                country = "CL"
-            if not country:
-                session_country = self._normalize_country(
-                    request.session.get("pending_signup_country")
-                    or request.session.get("country")
-                    or request.GET.get("country")
-                )
-                country = session_country
-        if not country:
-            country = "CL"
-        lang = "en" if country == "US" else "es"
-        return country, lang
+            country = infer_country(request)
+        country = country or "CL"
+        return country, default_lang_for_country(country)
 
     def get_email_confirmation_url(self, request, emailconfirmation):
         """
@@ -198,19 +190,12 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
             raise
 
     COUNTRY_MAP = {
-        "US": {"ns": "usa", "lang": "en", "default_url_name": "centro_trabajo"},
-        "CL": {"ns": "chile", "lang": "es", "default_url_name": "centro_trabajo"},
+        "US": {"ns": "usa", "lang": "en", "default_url_name": "centro_operaciones"},
+        "CL": {"ns": "chile", "lang": "es", "default_url_name": "centro_operaciones"},
     }
 
     def _normalize_country(self, value):
-        if not value:
-            return None
-        v = str(value).strip().upper()
-        if v in ("US", "USA"):
-            return "US"
-        if v in ("CL", "CHILE"):
-            return "CL"
-        return None
+        return normalize_country(value)
 
     def _reverse_by_country(self, country_code, view_path="centro_operaciones", *args, **kwargs):
         meta = self.COUNTRY_MAP.get(country_code) or self.COUNTRY_MAP["CL"]
@@ -222,68 +207,23 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
 
         return reverse(name, args=args, kwargs=kwargs)
 
+    def _build_login_path(self, country_code: str, request=None) -> str:
+        country = self._normalize_country(country_code) or "CL"
+        path_lang = parse_country_lang(getattr(request, "path", "/")).lang if request else None
+        return f"{canonical_prefix(country, path_lang)}/accounts/login/"
+
+    def get_login_url(self, request, **kwargs):
+        country = infer_country(request)
+        return self._build_login_path(country, request=request)
+
     def get_logout_redirect_url(self, request):
         """
         Redirigir al login correcto según país al cerrar sesión.
         Se llama ANTES del logout, cuando el usuario aún está autenticado.
         Evita que suscriptores USA terminen en /cl/es/accounts/login/.
         """
-        country = None
-        # PRIORIDAD 1: Usuario autenticado (empresa/perfil)
-        if request.user.is_authenticated:
-            try:
-                empresa = getattr(request.user, "empresa", None)
-                if empresa and hasattr(empresa, "pais"):
-                    country = self._normalize_country(empresa.pais)
-                if not country:
-                    perfil = getattr(request.user, "perfil", None)
-                    if perfil and hasattr(perfil, "pais"):
-                        country = self._normalize_country(perfil.pais)
-            except Exception:
-                pass
-        # PRIORIDAD 2: Path actual (/us/en/workspace/ → US)
-        if not country:
-            path = (request.path or "").lower()
-            if path.startswith("/us") or path.startswith("/usa"):
-                country = "US"
-            elif path.startswith("/cl"):
-                country = "CL"
-            elif path.startswith("/mx"):
-                country = "MX"
-        # PRIORIDAD 3: Sesión (antes de que allauth la limpie)
-        if not country:
-            sess = (request.session.get("country") or "").strip().lower()
-            if sess in ("us", "usa"):
-                country = "US"
-            elif sess in ("cl", "chile"):
-                country = "CL"
-            elif sess in ("mx", "mexico"):
-                country = "MX"
-        # PRIORIDAD 4: Referer (path /accounts/logout/ no tiene país; el Referer sí)
-        if not country:
-            ref = (request.headers.get("referer") or "").lower()
-            if "/us" in ref or "/usa" in ref:
-                country = "US"
-            elif "/cl" in ref or "/chile" in ref:
-                country = "CL"
-            elif "/mx" in ref:
-                country = "MX"
-        # Redirigir al login del país
-        if country == "US":
-            try:
-                return reverse("usa:account_login")
-            except Exception:
-                return "/us/en/accounts/login/"
-        if country == "MX":
-            try:
-                return reverse("mexico:account_login")
-            except Exception:
-                return "/mx/es/accounts/login/"
-        # Chile por defecto
-        try:
-            return reverse("chile:account_login")
-        except Exception:
-            return "/cl/es/accounts/login/"
+        country = infer_country(request)
+        return self._build_login_path(country, request=request)
 
     def get_login_redirect_url(self, request):
         try:
@@ -308,47 +248,7 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
                 else:
                     return next_url
 
-            # Prioridad: (1) empresa/perfil si autenticado (2) URL actual (3) sesión (4) request.country (5) GET (6) CL.
-            # USA subscriber usando /cl/accounts/login/ debe ir a /us/en/workspace/, no Chile.
-            country = None
-            path = (request.path or "").lower()
-
-            # PRIORIDAD 1: Usuario autenticado - país de su empresa (USA subscriber → USA workspace)
-            if request.user.is_authenticated:
-                empresa = getattr(request.user, "empresa", None)
-                country = (
-                    self._normalize_country(getattr(empresa, "pais", None)) if empresa else None
-                )
-                if not country:
-                    perfil = getattr(request.user, "perfil", None)
-                    country = (
-                        self._normalize_country(getattr(perfil, "pais", None)) if perfil else None
-                    )
-
-            # PRIORIDAD 2: Path actual (/us/login/ → US)
-            if not country and path.startswith("/us/"):
-                country = "US"
-            elif not country and path.startswith("/cl/"):
-                country = "CL"
-
-            # PRIORIDAD 3: Sesión
-            if not country:
-                session_country = (request.session.get("country") or "").strip().upper()
-                if session_country in ("US", "USA"):
-                    country = "US"
-                elif session_country in ("CL",):
-                    country = "CL"
-
-            # PRIORIDAD 4: request.country (middleware)
-            if not country:
-                country = self._normalize_country(getattr(request, "country", None))
-
-            # PRIORIDAD 5: GET country
-            if not country:
-                country = self._normalize_country(request.GET.get("country"))
-
-            if not country:
-                country = "CL"
+            country = infer_country(request)
 
             if country == "US":
                 meta_us = self.COUNTRY_MAP["US"]
@@ -359,9 +259,9 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
                 except Exception:
                     pass
                 try:
-                    return reverse("us_en:centro_trabajo")
+                    return reverse(f"us_en:{meta_us['default_url_name']}")
                 except Exception:
-                    return "/us/en/workspace/"
+                    return "/us/en/centro-operaciones/"
 
             meta = self.COUNTRY_MAP.get(country, self.COUNTRY_MAP["CL"])
             activate(meta["lang"])
@@ -377,19 +277,19 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
                 return self._reverse_by_country(country, default_view)
             except Exception:
                 if country == "US":
-                    return "/us/en/workspace/"
-                return "/cl/es/workspace/"
+                    return "/us/en/centro-operaciones/"
+                return "/cl/es/centro-operaciones/"
         except Exception:
             # No caer siempre en Chile: usar path/sesión para decidir destino.
             try:
                 path = (request.path or "").lower()
                 if path.startswith("/us/"):
-                    return "/us/en/workspace/"
+                    return "/us/en/centro-operaciones/"
                 if (request.session.get("country") or "").strip().lower() in ("us", "usa"):
-                    return "/us/en/workspace/"
+                    return "/us/en/centro-operaciones/"
             except Exception:
                 pass
             try:
-                return self._reverse_by_country("CL", "centro_trabajo")
+                return self._reverse_by_country("CL", "centro_operaciones")
             except Exception:
-                return "/cl/es/workspace/"
+                return "/cl/es/centro-operaciones/"

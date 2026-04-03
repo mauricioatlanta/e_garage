@@ -2,7 +2,6 @@ from django.urls import path, include, re_path
 from django.views.generic import RedirectView
 from django.views.generic import TemplateView
 import logging
-from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 
 from taller.views_extra.views import dashboard_suscripciones
@@ -27,6 +26,7 @@ from taller.views_extra.views_trial_activate import activar_trial
 from taller.views_extra.payment_views import payment_chile
 from taller.views_extra.views_suscripciones import precios
 from taller.documentos import views_country_aware as views_documentos
+from taller.documentos.views_migrated import DocumentoCreateView
 from allauth.account.views import (
     password_change,
     password_reset_done,
@@ -47,8 +47,12 @@ logger.debug("CARGANDO taller/urls_extra/chile.py")
 app_name = "chile"
 
 urlpatterns = [
-    # Vista de inicio para /cl/es/ - redirige a la página principal de Chile
-    path("", lambda request: HttpResponseRedirect("/cl/"), name="chile_home"),
+    # Vista de inicio canónica para /cl/es/
+    path(
+        "",
+        TemplateView.as_view(template_name="cl/es/onboarding/bienvenida.html"),
+        name="chile_home",
+    ),
     # URLs principales de taller (configuración, settings, etc.)
     # Centro de Trabajo / Recepción Vehicular (nueva home post-login)
     path("workspace/", centro_trabajo, name="centro_trabajo"),
@@ -81,8 +85,7 @@ urlpatterns = [
         name="bienvenida_chile_alt",
     ),
     # Login y password (allauth) bajo /cl/es/accounts/ para conservar país e idioma.
-    # EXCEPCIÓN histórica: accounts/login/ aquí (no redirect) para evitar ERR_TOO_MANY_REDIRECTS.
-    path("accounts/login/", country_aware_login),
+    path("accounts/login/", country_aware_login, name="account_login"),
     # Misma superficie que allauth bajo /accounts/, sin 302 a /accounts/... (se pierde país/idioma).
     path(
         "accounts/password/reset/",
@@ -112,12 +115,6 @@ urlpatterns = [
         "signup/",
         lambda r: redirect("/cl/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_signup_cl_es",
-    ),
-    # Login para suscriptores de Chile (redirige al login global, pero aquí puedes poner una vista personalizada si lo deseas)
-    path(
-        "login/",
-        TemplateView.as_view(template_name="registration/login.html"),
-        name="account_login",
     ),
     # Activación de trial para Chile
     path("activar-trial/", activar_trial, name="activar_trial"),
@@ -162,6 +159,11 @@ urlpatterns = [
     path(
         "vehiculos/",
         include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos"),
+    ),
+    path(
+        "documentos/crear/",
+        DocumentoCreateView.as_view(),
+        name="documento_crear_alias",
     ),
     path(
         "documentos/",
