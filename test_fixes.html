@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Fixes para Vehículos</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 Test de Fixes para Problema de Vehículos</h1>
+        
+        <div class="test-section">
+            <h2>1. Verificar Scripts Cargados</h2>
+            <button onclick="testScripts()">Verificar Scripts</button>
+            <div id="scripts-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>2. Simular Selección de Cliente</h2>
+            <p>Cliente ID: <input type="text" id="cliente-id" value="11" placeholder="ID del cliente"></p>
+            <button onclick="simularSeleccionCliente()">Simular Selección</button>
+            <div id="cliente-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>3. Forzar Carga de Vehículos</h2>
+            <button onclick="forzarCargaVehiculos()">Forzar Carga</button>
+            <div id="vehiculos-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>4. Reparar Select2 Manualmente</h2>
+            <button onclick="repararSelect2()">Reparar Select2</button>
+            <div id="select2-result"></div>
+        </div>
+        
+        <div class="test-section">
+            <h2>5. Diagnóstico Completo</h2>
+            <button onclick="diagnosticoCompleto()">Ejecutar Diagnóstico</button>
+            <pre id="diagnostico-output"></pre>
+        </div>
+        
+        <div class="test-section">
+            <h2>Instrucciones para Probar en el Formulario Real:</h2>
+            <ol>
+                <li>Acceder al formulario de creación de documento</li>
+                <li>Seleccionar un cliente (ej: Mauricio Alvarado ID: 11)</li>
+                <li>Verificar si aparecen los vehículos en el select</li>
+                <li>Si no aparecen, abrir la consola (F12) y ejecutar:
+                    <pre>window.repararSelect2Vehiculos()</pre>
+                </li>
+                <li>O también probar:
+                    <pre>window.forzarCargaVehiculos()</pre>
+                </li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function testScripts() {
+            var result = document.getElementById('scripts-result');
+            var tests = [];
+            
+            // Test 1: jQuery
+            tests.push({
+                name: 'jQuery',
+                status: !!window.jQuery,
+                message: window.jQuery ? '✅ jQuery cargado' : '❌ jQuery NO cargado'
+            });
+            
+            // Test 2: Select2
+            tests.push({
+                name: 'Select2',
+                status: window.jQuery && typeof window.jQuery.fn.select2 === 'function',
+                message: (window.jQuery && typeof window.jQuery.fn.select2 === 'function') ? 
+                    '✅ Select2 disponible' : '❌ Select2 NO disponible'
+            });
+            
+            // Test 3: MarketplaceTooltip
+            tests.push({
+                name: 'MarketplaceTooltip',
+                status: !!window.MarketplaceTooltip,
+                message: window.MarketplaceTooltip ? '✅ MarketplaceTooltip cargado' : '❌ MarketplaceTooltip NO cargado'
+            });
+            
+            // Test 4: Nuestras funciones de fix
+            tests.push({
+                name: 'Funciones de Fix',
+                status: typeof window.repararSelect2Vehiculos === 'function' && 
+                       typeof window.forzarCargaVehiculos === 'function',
+                message: (typeof window.repararSelect2Vehiculos === 'function' && 
+                         typeof window.forzarCargaVehiculos === 'function') ? 
+                    '✅ Funciones de fix disponibles' : '❌ Funciones de fix NO disponibles'
+            });
+            
+            // Mostrar resultados
+            var html = '<ul>';
+            tests.forEach(function(test) {
+                html += '<li class="' + (test.status ? 'success' : 'error') + '">' + test.message + '</li>';
+            });
+            html += '</ul>';
+            result.innerHTML = html;
+        }
+        
+        function simularSeleccionCliente() {
+            var clienteId = document.getElementById('cliente-id').value;
+            var result = document.getElementById('cliente-result');
+            
+            if (!clienteId) {
+                result.innerHTML = '<span class="error">❌ Ingrese un ID de cliente</span>';
+                return;
+            }
+            
+            result.innerHTML = '<span class="success">✅ Simulando selección de cliente ID: ' + clienteId + '</span>';
+            
+            // Buscar el elemento select de cliente
+            var clienteSelect = document.getElementById('id_cliente');
+            if (clienteSelect) {
+                clienteSelect.value = clienteId;
+                clienteSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                result.innerHTML += '<br><span class="success">✅ Select de cliente actualizado</span>';
+            } else {
+                result.innerHTML += '<br><span class="error">❌ No se encontró #id_cliente en la página</span>';
+            }
+        }
+        
+        function forzarCargaVehiculos() {
+            var result = document.getElementById('vehiculos-result');
+            
+            if (typeof window.forzarCargaVehiculos === 'function') {
+                result.innerHTML = '<span class="success">✅ Ejecutando forzarCargaVehiculos()...</span>';
+                window.forzarCargaVehiculos();
+                setTimeout(function() {
+                    var vehiculoSelect = document.getElementById('id_vehiculo');
+                    if (vehiculoSelect) {
+                        var options = vehiculoSelect.options.length;
+                        result.innerHTML += '<br><span class="success">✅ Select de vehículos tiene ' + options + ' opciones</span>';
+                    } else {
+                        result.innerHTML += '<br><span class="error">❌ No se encontró #id_vehiculo</span>';
+                    }
+                }, 1000);
+            } else {
+                result.innerHTML = '<span class="error">❌ Función forzarCargaVehiculos() no disponible</span>';
+            }
+        }
+        
+        function repararSelect2() {
+            var result = document.getElementById('select2-result');
+            
+            if (typeof window.repararSelect2Vehiculos === 'function') {
+                result.innerHTML = '<span class="success">✅ Ejecutando repararSelect2Vehiculos()...</span>';
+                window.repararSelect2Vehiculos();
+                result.innerHTML += '<br><span class="success">✅ Función ejecutada. Verifique el select de vehículos.</span>';
+            } else {
+                result.innerHTML = '<span class="error">❌ Función repararSelect2Vehiculos() no disponible</span>';
+            }
+        }
+        
+        function diagnosticoCompleto() {
+            var output = document.getElementById('diagnostico-output');
+            var log = [];
+            
+            log.push('=== DIAGNÓSTICO COMPLETO ===');
+            log.push('Fecha: ' + new Date().toLocaleString());
+            log.push('');
+            
+            // 1. Elementos del DOM
+            log.push('1. ELEMENTOS DEL DOM:');
+            var elementos = ['id_cliente', 'id_vehiculo', 'cliente-busqueda', 'vehiculo-info'];
+            elementos.forEach(function(id) {
+                var elem = document.getElementById(id);
+                log.push('   ' + id + ': ' + (elem ? 'ENCONTRADO' : 'NO ENCONTRADO'));
+                if (elem && elem.tagName === 'SELECT') {
+                    log.push('     Opciones: ' + elem.options.length);
+                    log.push('     Valor seleccionado: ' + elem.value);
+                }
+            });
+            
+            log.push('');
+            
+            // 2. jQuery y Select2
+            log.push('2. JQUERY Y SELECT2:');
+            log.push('   jQuery: ' + (window.jQuery ? 'DISPONIBLE v' + window.jQuery.fn.jquery : 'NO DISPONIBLE'));
+            if (window.jQuery) {
+                var vehiculoSelect = document.getElementById('id_vehiculo');
+                if (vehiculoSelect) {
+                    var $vs = jQuery(vehiculoSelect);
+                    var hasSelect2 = !!$vs.data('select2');
+                    log.push('   Select2 en #id_vehiculo: ' + (hasSelect2 ? 'INICIALIZADO' : 'NO INICIALIZADO'));
+                }
+            }
+            
+            log.push('');
+            
+            // 3. Funciones disponibles
+            log.push('3. FUNCIONES DISPONIBLES:');
+            var funciones = ['cargarVehiculosPorCliente', 'repararSelect2Vehiculos', 'forzarCargaVehiculos', 'recalcTotales'];
+            funciones.forEach(function(fn) {
+                log.push('   ' + fn + '(): ' + (typeof window[fn] === 'function' ? 'DISPONIBLE' : 'NO DISPONIBLE'));
+            });
+            
+            log.push('');
+            
+            // 4. Prefetch data
+            log.push('4. PREFETCH DATA:');
+            log.push('   PREFETCH: ' + (window.PREFETCH ? 'DISPONIBLE' : 'NO DISPONIBLE'));
+            if (window.PREFETCH) {
+                log.push('   Vehículos en prefetch: ' + (window.PREFETCH.vehiculos ? window.PREFETCH.vehiculos.length : 0));
+                log.push('   Clientes en prefetch: ' + (window.PREFETCH.clientes ? window.PREFETCH.clientes.length : 0));
+            }
+            
+            log.push('');
+            log.push('=== FIN DEL DIAGNÓSTICO ===');
+            
+            output.textContent = log.join('\n');
+        }
+        
+        // Ejecutar test inicial al cargar
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(testScripts, 500);
+        });
+    </script>
+</body>
+</html>

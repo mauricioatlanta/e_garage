@@ -117,22 +117,26 @@
             });
         }
 
-        // Agregar servicio propio
-        var btnAddServicio = document.getElementById('add-servicio');
-        if (btnAddServicio) {
-            btnAddServicio.addEventListener('click', function() {
-                if (window.EG.servicios && window.EG.servicios.addServicioRow) {
-                    window.EG.servicios.addServicioRow();
+                // Agregar servicio propio (usando implementación mínima en template)
+                var btnAddServicio = document.getElementById('add-servicio');
+                if (btnAddServicio) {
+                    btnAddServicio.addEventListener('click', function() {
+                        if (typeof window.addServicioRow === 'function') {
+                            window.addServicioRow();
+                        } else {
+                            console.warn('Función addServicioRow no disponible');
+                        }
+                    });
                 }
-            });
-        }
 
-        // Agregar otro servicio
+                // Agregar otro servicio (usando implementación mínima en template)
         var btnAddOtro = document.getElementById('add-otro');
         if (btnAddOtro) {
             btnAddOtro.addEventListener('click', function() {
-                if (window.EG.otros && window.EG.otros.addOtroRow) {
-                    window.EG.otros.addOtroRow();
+                if (typeof window.addOtroRow === 'function') {
+                    window.addOtroRow();
+                } else {
+                    console.warn('Función addOtroRow no disponible');
                 }
             });
         }

@@ -1,0 +1,12 @@
+name: eGarage AI
+version: 1.0.0
+schema: v1
+
+models:
+  - name: DeepSeek Chat
+    provider: openai
+    model: deepseek-chat
+    apiKey: "sk-8ab5033baa5945bd96c958bd5a243157"
+    apiBase: https://api.deepseek.com
+
+defaultModel: DeepSeek Chat
