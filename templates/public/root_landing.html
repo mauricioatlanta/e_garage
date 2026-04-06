@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<section class="min-h-screen bg-slate-950 text-white">
+  <div class="mx-auto max-w-7xl px-6 py-16">
+    <div class="grid items-center gap-12 lg:grid-cols-2">
+      <div>
+        <span class="inline-flex items-center rounded-full border border-cyan-400/30 px-3 py-1 text-sm text-cyan-300">
+          eGarage · SaaS automotriz multi-país
+        </span>
+
+        <h1 class="mt-6 text-4xl font-black leading-tight lg:text-6xl">
+          Gestiona tu taller, repuestos y operación automotriz desde una sola plataforma.
+        </h1>
+
+        <p class="mt-6 max-w-2xl text-lg text-slate-300">
+          eGarage detectó una ruta sugerida para ti:
+          <strong class="text-white">{{ suggested_url }}</strong>
+        </p>
+
+        <div class="mt-8 flex flex-wrap gap-4">
+          <a href="{% url 'root_autoredirect' %}"
+             class="inline-flex items-center rounded-xl bg-cyan-500 px-6 py-3 font-semibold text-slate-950 transition hover:bg-cyan-400">
+            Continuar automáticamente
+          </a>
+        </div>
+
+        <div class="mt-10 grid gap-4 sm:grid-cols-3">
+          <a href="{% url 'select_region' 'CL' 'es' %}"
+             class="rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10">
+            <div class="text-sm text-slate-400">Chile</div>
+            <div class="mt-2 text-xl font-bold">Español</div>
+            <div class="mt-2 text-cyan-300">/cl/es/</div>
+          </a>
+
+          <a href="{% url 'select_region' 'US' 'en' %}"
+             class="rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10">
+            <div class="text-sm text-slate-400">USA</div>
+            <div class="mt-2 text-xl font-bold">English</div>
+            <div class="mt-2 text-cyan-300">/us/en/</div>
+          </a>
+
+          <a href="{% url 'select_region' 'US' 'es' %}"
+             class="rounded-2xl border border-white/10 bg-white/5 p-5 transition hover:bg-white/10">
+            <div class="text-sm text-slate-400">USA</div>
+            <div class="mt-2 text-xl font-bold">Español</div>
+            <div class="mt-2 text-cyan-300">/us/es/</div>
+          </a>
+        </div>
+      </div>
+
+      <div class="rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl">
+        <div class="text-sm uppercase tracking-[0.2em] text-slate-400">Detección actual</div>
+        <div class="mt-6 space-y-4 text-slate-200">
+          <div><strong>País sugerido:</strong> {{ suggested_country }}</div>
+          <div><strong>Idioma sugerido:</strong> {{ suggested_lang }}</div>
+          <div><strong>Origen:</strong> {{ decision_source }}</div>
+          <div><strong>Ruta destino:</strong> {{ suggested_url }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

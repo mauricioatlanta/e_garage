@@ -72,9 +72,9 @@ class CountryAndLanguageMiddleware:
             canonical_rest if path_match.country else path_match.rest,
         )
 
-        # Compatibilidad para entradas cortas sin resolver por URLConf.
+        # La raíz pública queda disponible para landing comercial + selección inteligente.
         if path in {"/", ""}:
-            return self._with_query(request, f"{canonical_prefix(resolved_country)}/")
+            return None
 
         if path_match.country:
             if request.method in MUTATING_METHODS:

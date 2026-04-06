@@ -89,6 +89,7 @@ from taller.views_extra.signup_email_verification import (
 )
 from taller.views_extra.pwa import dynamic_manifest, dynamic_service_worker
 from taller.views_health import health_check, health_simple
+from taller.views_root import root_landing, root_autoredirect, select_region
 
 
 try:
@@ -216,6 +217,10 @@ def country_aware_clientes_redirect(request):
 
 
 urlpatterns = [
+    path("", root_landing, name="home"),
+    path("go/", root_autoredirect, name="root_autoredirect"),
+    path("select-region/<str:country>/<str:lang>/", select_region, name="select_region"),
+    path("", include("ubicacion.urls")),
     # PWA Dinámicas (manifest y service worker por país e idioma)
     path("<str:pais>/<str:idioma>/manifest.json", dynamic_manifest, name="pwa_manifest"),
     path(
@@ -227,7 +232,11 @@ urlpatterns = [
     # Portal del Cliente
     path("portal/", include("taller.portal.urls")),
     # Página de inicio - Selección de país
-    path("", TemplateView.as_view(template_name="landing/seleccionar_pais.html"), name="home"),
+    path(
+        "landing/seleccionar-pais/",
+        TemplateView.as_view(template_name="landing/seleccionar_pais.html"),
+        name="root_landing_legacy",
+    ),
     # Panel de administración de suscriptores (ANTES de admin.site.urls para que no sea capturado)
     path("admin/suscriptores/", admin_suscriptores, name="admin_suscriptores"),
     path(
