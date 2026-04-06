@@ -18,15 +18,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   {# --- PWA Configuration --- #}
-  <meta name="theme-color" content="#0a0e27">
+  <meta name="theme-color" content="#06b6d4">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="eGarage">
   <link rel="manifest" href="/{{ country_code|lower|default:'cl' }}/{{ lang_code|lower|default:'es' }}/manifest.json">
-  <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
-  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/egarage_icon_192x192.png' %}">
-  <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/egarage_icon_512x512.png' %}">
-  <link rel="icon" type="image/svg+xml" href="{% static 'images/egarage_default_logo.svg' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'img/egarage_logo.png' %}">
+  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'img/icons/icon-192.png' %}">
+  <link rel="icon" type="image/png" sizes="512x512" href="{% static 'img/icons/icon-512.png' %}">
   
   {# --- iOS Password Fix --- #}
   <script src="{% static 'js/ios-password-fix.js' %}?v=2.1.2" defer></script>
@@ -129,6 +129,39 @@
       header .text-gray-400 {
         color: #b0e0ff !important;
         text-shadow: 0 0 10px rgba(176, 224, 255, 0.6) !important;
+      }
+
+      header.company-header {
+        padding: 0.65rem 0.75rem !important;
+        gap: 0.75rem !important;
+      }
+
+      header.company-header > .flex.items-center {
+        gap: 0.65rem !important;
+        align-items: center !important;
+      }
+
+      .company-logo {
+        max-height: 88px !important;
+        max-width: 132px !important;
+        border-radius: 12px !important;
+      }
+
+      header.company-header .company-tagline {
+        font-size: 0.78rem !important;
+        line-height: 1.1 !important;
+        margin-top: 0 !important;
+      }
+
+      #main-navigation {
+        margin-top: 0.5rem !important;
+        gap: 0.4rem !important;
+      }
+
+      #main-navigation .flex.items-center.justify-center {
+        gap: 0.35rem !important;
+        padding-left: 0.35rem !important;
+        padding-right: 0.35rem !important;
       }
     }
 
@@ -384,6 +417,25 @@
     }
 
     @media screen and (max-width: 480px) {
+      header.company-header {
+        padding: 0.5rem 0.6rem !important;
+      }
+
+      header.company-header .company-tagline {
+        display: none !important;
+      }
+
+      .company-logo {
+        max-height: 72px !important;
+        max-width: 108px !important;
+      }
+
+      .company-title {
+        font-size: 1rem !important;
+        line-height: 1.1 !important;
+        letter-spacing: 0.5px !important;
+      }
+
       body #main-navigation .nav-button-standard {
         min-height: 48px !important;
         padding: 0.3rem 0.35rem !important;
@@ -1021,7 +1073,8 @@
     }
 
     // Service Worker Registration para PWA
-    if ('serviceWorker' in navigator) {
+    const egIsLocalDevHost = ['127.0.0.1', 'localhost'].includes(window.location.hostname);
+    if ('serviceWorker' in navigator && !egIsLocalDevHost) {
       window.addEventListener('load', function() {
         navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js', { scope: '/' })
           .then(function(registration) {
@@ -1048,6 +1101,21 @@
           })
           .catch(function(error) {
             console.warn('⚠️ Error al registrar Service Worker:', error);
+          });
+      });
+    } else if ('serviceWorker' in navigator && egIsLocalDevHost) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.getRegistrations()
+          .then(function(registrations) {
+            return Promise.all(registrations.map(function(registration) {
+              return registration.unregister();
+            }));
+          })
+          .then(function() {
+            console.info('[PWA] Service Worker deshabilitado en desarrollo local');
+          })
+          .catch(function(error) {
+            console.warn('[PWA] No se pudo limpiar Service Workers locales:', error);
           });
       });
     }

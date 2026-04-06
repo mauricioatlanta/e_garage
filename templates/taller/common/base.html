@@ -10,15 +10,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   
   {# --- PWA Configuration --- #}
-  <meta name="theme-color" content="#0a0e27">
+  <meta name="theme-color" content="#06b6d4">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="eGarage">
   <link rel="manifest" href="/{{ country_code|lower|default:'cl' }}/{{ lang_code|lower|default:'es' }}/manifest.json">
-  <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
-  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'images/egarage_icon_192x192.png' %}">
-  <link rel="icon" type="image/png" sizes="512x512" href="{% static 'images/egarage_icon_512x512.png' %}">
-  <link rel="icon" type="image/svg+xml" href="{% static 'images/egarage_default_logo.svg' %}">
+  <link rel="apple-touch-icon" href="{% static 'img/apple-touch-icon.png' %}">
+  <link rel="icon" type="image/png" href="{% static 'img/egarage_logo.png' %}">
+  <link rel="icon" type="image/png" sizes="192x192" href="{% static 'img/icons/icon-192.png' %}">
+  <link rel="icon" type="image/png" sizes="512x512" href="{% static 'img/icons/icon-512.png' %}">
   
   <link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
   <link rel="stylesheet" href="{% static 'css/output.css' %}">
@@ -180,6 +180,57 @@
       font-weight: 500;
       margin-top: 2px;
       letter-spacing: 1px;
+    }
+
+    @media (max-width: 768px) {
+      .company-header {
+        padding: 0.65rem 0.75rem !important;
+        gap: 0.75rem !important;
+      }
+
+      .company-logo {
+        max-height: 88px !important;
+        max-width: 132px !important;
+      }
+
+      .company-title {
+        font-size: 1rem !important;
+        line-height: 1.15 !important;
+        margin-bottom: 2px !important;
+      }
+
+      .company-tagline {
+        font-size: 0.78rem !important;
+        line-height: 1.1 !important;
+        margin: 0 !important;
+      }
+
+      .nav-button-standard {
+        min-height: 54px !important;
+        padding: 0.5rem 0.55rem !important;
+        font-size: 0.82rem !important;
+      }
+
+      .nav-button-standard .nav-icon {
+        font-size: 1rem !important;
+      }
+    }
+
+    @media (max-width: 576px) {
+      .company-logo {
+        max-height: 72px !important;
+        max-width: 108px !important;
+      }
+
+      .company-tagline {
+        display: none !important;
+      }
+
+      .nav-button-standard {
+        min-height: 48px !important;
+        padding: 0.42rem 0.45rem !important;
+        font-size: 0.78rem !important;
+      }
     }
     /* Estilo cinematográfico futurista para botones de navegación */
     .nav-button-standard {
