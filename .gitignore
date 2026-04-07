@@ -76,3 +76,26 @@ legacy_templates/
 .DS_Store
 Thumbs.db
 Desktop.ini
+
+# Runtime / debug
+.chrome-runtime/
+.selenium-profile/
+.claude/
+.codex*
+tmp_*
+*.tmp
+*.journal
+*.dmp
+
+# Python
+__pycache__/
+*.pyc
+
+# DB
+db.sqlite3
+*.sqlite3
+*.sqlite3-journal
+
+# OS
+.DS_Store
+Thumbs.db
