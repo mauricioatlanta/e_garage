@@ -262,7 +262,6 @@ input:disabled, select:disabled, textarea:disabled {
 /* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÃ“N ==================== */
 /* Description fields - Better spacing and alignment - Sin !important */
 .description-field {
-  flex: 1 1 auto;
   min-width: 200px;
   max-width: 100%;
   margin-bottom: 0.5rem;
@@ -279,7 +278,6 @@ input:disabled, select:disabled, textarea:disabled {
 .rep-search-container,
 .srv-input-container,
 .otr-search-container {
-  flex: 1 1 auto;
   min-width: 200px;
   max-width: 100%;
   position: relative;
@@ -292,7 +290,6 @@ input:disabled, select:disabled, textarea:disabled {
   .srv-input-container,
   .otr-search-container {
     min-width: 180px;
-    flex: 1 1 45%;
   }
 }
 
@@ -302,14 +299,12 @@ input:disabled, select:disabled, textarea:disabled {
   .srv-input-container,
   .otr-search-container {
     min-width: 100%;
-    flex: 1 1 100%;
     margin-bottom: 1rem;
   }
   
   /* Stack all fields on mobile */
   .dynamic-element > div > div {
     width: 100%;
-    flex: 1 1 100%;
   }
 }
 
@@ -342,17 +337,14 @@ input:disabled, select:disabled, textarea:disabled {
 @media (min-width: 1025px) {
   .rep-search-container {
     min-width: 320px;
-    flex: 1 1 35%;
   }
   
   .srv-input-container {
     min-width: 380px;
-    flex: 1 1 40%;
   }
   
   .otr-search-container {
     min-width: 240px;
-    flex: 1 1 30%;
   }
 }
 
@@ -512,11 +504,12 @@ input:disabled, select:disabled, textarea:disabled {
   min-height: 120px;
   display: flex;
   flex-direction: column;
+  min-width: 0 !important;
 }
 .doc-ficha-parts .doc-ficha-body, .doc-ficha-services .doc-ficha-body {
   flex: 1;
-  overflow-y: auto;
-  max-height: 280px;
+  overflow: visible !important;
+  max-height: none;
 }
 #repuestos-container, #servicios-container {
   padding: 0.25rem 0;
@@ -527,7 +520,7 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-ficha-otros {
   margin-bottom: 0.75rem;
 }
-.doc-ficha-otros .doc-ficha-body { max-height: 200px; overflow-y: auto; }
+.doc-ficha-otros .doc-ficha-body { max-height: none; overflow: visible !important; }
 
 /* Botones de acciÃ³n dentro de cada ficha */
 .doc-ficha .ficha-actions {
@@ -853,6 +846,7 @@ input:disabled, select:disabled, textarea:disabled {
   border: var(--doc-border);
   border-radius: 8px;
   padding: 12px 14px;
+  min-width: 0 !important;
 }
 .doc-smart-card h3 {
   font-size: 0.65rem;
@@ -963,16 +957,22 @@ input:disabled, select:disabled, textarea:disabled {
 .btn-add:focus { outline: none; box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.4); }
 
 /* ==================== TABLA REAL: Grid 12 cols - Code | Part name | Qty | Price | Total | [x] ==================== */
-.doc-pos-section { margin-bottom: 0.75rem; }
+.doc-pos-section { margin-bottom: 0.75rem; overflow: hidden; }
 /* Alinear tÃ­tulos y botones de acciÃ³n en secciones partes/servicios/otros */
 .doc-ficha-parts .flex.justify-between,
 .doc-ficha-services .flex.justify-between,
 .doc-ficha-otros .flex.justify-between {
   align-items: center;
 }
+:root {
+  --doc-col-main: 1.8fr;
+  --doc-col-secondary: 1.2fr;
+  --doc-col-sm: 140px;
+  --doc-col-xs: 80px;
+  --doc-col-action: 44px;
+}
 .doc-pos-header {
   display: grid;
-  grid-template-columns: repeat(12, 1fr);
   gap: 8px;
   padding: 6px 8px 8px;
   font-size: 10px;
@@ -983,33 +983,69 @@ input:disabled, select:disabled, textarea:disabled {
   border-bottom: 1px solid rgba(71, 85, 105, 0.5);
   align-items: center;
 }
-#repuestos-container .doc-pos-header > span:nth-child(1){ grid-column: span 2; }
-#repuestos-container .doc-pos-header > span:nth-child(2){ grid-column: span 4; }
-#repuestos-container .doc-pos-header > span:nth-child(3){ grid-column: span 1; }
-#repuestos-container .doc-pos-header > span:nth-child(4){ grid-column: span 2; }
-#repuestos-container .doc-pos-header > span:nth-child(5){ grid-column: span 2; }
-#repuestos-container .doc-pos-header > span:nth-child(6){ grid-column: span 1; }
-.doc-pos-header-services > span:nth-child(1){ grid-column: span 7; }
-.doc-pos-header-services > span:nth-child(2){ grid-column: span 2; }
-.doc-pos-header-services > span:nth-child(3){ grid-column: span 2; }
-.doc-pos-header-services > span:nth-child(4){ grid-column: span 1; }
-.doc-pos-header-otros > span:nth-child(1){ grid-column: span 3; }
-.doc-pos-header-otros > span:nth-child(2){ grid-column: span 3; }
-.doc-pos-header-otros > span:nth-child(3){ grid-column: span 2; }
-.doc-pos-header-otros > span:nth-child(4){ grid-column: span 2; }
-.doc-pos-header-otros > span:nth-child(5){ grid-column: span 1; }
-.doc-pos-header-otros > span:nth-child(6){ grid-column: span 1; }
 /* Filas dinÃ¡micas: usan grid grid-cols-12 del HTML, no override */
 #repuestos-container .dynamic-element .doc-row-grid,
 #servicios-container .dynamic-element .doc-row-grid,
 #otros-container .dynamic-element .doc-row-grid {
   display: grid !important;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
   min-height: 40px;
   border-bottom: 1px solid rgba(71, 85, 105, 0.3);
   background: rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   margin-bottom: 4px;
+  align-items: center;
+}
+@media (min-width: 769px) {
+  #repuestos-container .doc-pos-header {
+    display: grid !important;
+    grid-template-columns: minmax(100px, 120px) minmax(300px, var(--doc-col-main)) minmax(80px, 96px) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
+    gap: 10px;
+    align-items: center;
+  }
+
+  #repuestos-container .dynamic-element .doc-pos-grid-parts {
+    grid-template-columns: minmax(100px, 120px) minmax(300px, var(--doc-col-main)) minmax(80px, 96px) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .doc-pos-header-services {
+    display: grid !important;
+    grid-template-columns: minmax(300px, var(--doc-col-main)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
+    gap: 10px;
+    align-items: center;
+  }
+
+  #servicios-container .dynamic-element .doc-pos-grid-services {
+    grid-template-columns: minmax(300px, var(--doc-col-main)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .doc-pos-header-otros {
+    display: grid !important;
+    grid-template-columns: minmax(300px, var(--doc-col-main)) minmax(220px, var(--doc-col-secondary)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
+    gap: 10px;
+    align-items: center;
+  }
+
+  #otros-container .dynamic-element .doc-pos-grid-otros {
+    grid-template-columns: minmax(300px, var(--doc-col-main)) minmax(220px, var(--doc-col-secondary)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
+    gap: 10px;
+    align-items: center;
+  }
+}
+.doc-pos-header,
+.doc-pos-header-services,
+.doc-pos-header-otros {
+  display: grid;
+}
+.doc-pos-header > div,
+.doc-pos-header-services > div,
+.doc-pos-header-otros > div {
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
 #repuestos-container .dynamic-element input,
 #repuestos-container .dynamic-element .form-control,
@@ -1018,25 +1054,46 @@ input:disabled, select:disabled, textarea:disabled {
 #servicios-container .dynamic-element .form-control,
 #otros-container .dynamic-element input,
 #otros-container .dynamic-element .form-control {
-  min-height: 36px !important;
-  height: 2.5rem !important;
-  padding: 4px 8px !important;
-  font-size: 13px !important;
+  min-height: 40px !important;
+  height: 2.8rem !important;
+  padding: 6px 10px !important;
+  font-size: 15px !important;
 }
 #repuestos-container .dynamic-element .rep-search-container,
 #repuestos-container .dynamic-element .description-field,
 #servicios-container .dynamic-element .srv-input-container,
 #servicios-container .dynamic-element .description-field,
 #otros-container .dynamic-element .otr-search-container,
-#otros-container .dynamic-element .description-field { min-width: 0; }
+#otros-container .dynamic-element .description-field {
+  min-width: 0;
+  width: 100%;
+}
+#repuestos-container .dynamic-element .rep-search,
+#servicios-container .dynamic-element .srv-input,
+#otros-container .dynamic-element .otr-search {
+  width: 100% !important;
+}
 #repuestos-container .dynamic-element label,
 #servicios-container .dynamic-element label,
 #otros-container .dynamic-element label { display: none !important; }
-#repuestos-container .dynamic-element {
-  overflow-x: auto;
+#repuestos-container .dynamic-element,
+#servicios-container .dynamic-element,
+#otros-container .dynamic-element {
+  position: relative;
 }
-#repuestos-container .dynamic-element .doc-row-grid {
-  min-width: 880px;
+#repuestos-container .dynamic-element {
+  overflow: visible !important;
+}
+#servicios-container .dynamic-element,
+#otros-container .dynamic-element {
+  overflow: visible !important;
+}
+.rep-dropdown,
+.rep-codigo-dropdown,
+.srv-dropdown,
+.otr-dropdown {
+  position: absolute;
+  z-index: 9999 !important;
 }
 @media (max-width: 768px) {
   .doc-pos-header { display: none !important; }
@@ -1050,21 +1107,22 @@ input:disabled, select:disabled, textarea:disabled {
   #otros-container .dynamic-element label { display: block !important; }
 }
 </style>
+<link rel="stylesheet" href="{% static 'css/documentos/document_form.css' %}">
 {% endblock extra_css %}
 
 {% block documento_title %}{{ ui_labels.new_document }}{% endblock documento_title %}
 
 {% block content %}
 {% load i18n %}
-{# âœ… Manejo robusto de company_country con mÃºltiples fallbacks #}
+{# Manejo robusto de company_country con multiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-<!-- Header de PÃ¡gina - Design System -->
+<!-- Header de Pagina - Design System -->
 <div class="mb-6 sm:mb-8 px-4 sm:px-6">
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
     <div class="flex-1">
       <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-        ðŸ“ {{ ui_labels.new_document }}
+        {{ ui_labels.new_document }}
       </h1>
       <p class="text-sm sm:text-base text-slate-300">
         {{ ui_labels.new_document }}
@@ -1080,12 +1138,12 @@ input:disabled, select:disabled, textarea:disabled {
           <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
                   class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
                   {% if LANGUAGE_CODE == 'en' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            ðŸ‡ºðŸ‡¸ EN
+            EN
           </button>
           <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc"
                   class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'es' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
                   {% if LANGUAGE_CODE == 'es' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            ðŸ‡ªðŸ‡¸ ES
+            ES
           </button>
         </div>
       </form>
@@ -1102,15 +1160,15 @@ input:disabled, select:disabled, textarea:disabled {
               data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
               data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
               data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
-              data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
-              data-url-vehiculos-by-cli="{% country_url 'ajax:vehiculos_por_cliente' app_namespace='' %}"
+              data-url-client-search="{% url 'api:buscar_clientes_api' %}"
+              data-url-vehiculos-by-cli="{% url 'api:vehiculos_cliente_api' 0 %}"
               data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
               data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
               data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
               data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
-              data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
+              data-url-service-search="{% country_url 'documentos:api_buscar_servicios' %}"
               data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
-              data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}"
+              data-url-outsourced-services="{% url 'api:buscar_otros_servicios_api' %}"
               data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
           {% csrf_token %}
 
@@ -1118,20 +1176,20 @@ input:disabled, select:disabled, textarea:disabled {
   {% if messages %}
     {% for message in messages %}
       {% with msg_text=message|stringformat:"s" %}
-      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesiÃ³n exitosamente" not in msg_text and "Ha cerrado sesiÃ³n" not in msg_text and "iniciado sesiÃ³n exitosamente" not in msg_text and "cerrado sesiÃ³n" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
+      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesion exitosamente" not in msg_text and "Ha cerrado sesion" not in msg_text and "iniciado sesion exitosamente" not in msg_text and "cerrado sesion" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
         {% if message.tags == 'success' %}
         <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">âœ…</span>
+          <span class="text-2xl flex-shrink-0">&#10003;</span>
           <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
         </div>
         {% elif message.tags == 'error' %}
         <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">âŒ</span>
+          <span class="text-2xl flex-shrink-0">&#10007;</span>
           <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
         </div>
         {% else %}
         <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">â„¹ï¸</span>
+          <span class="text-2xl flex-shrink-0">&#9432;</span>
           <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
         </div>
         {% endif %}
@@ -1154,65 +1212,67 @@ input:disabled, select:disabled, textarea:disabled {
     </div>
   {% endif %}
 
-  <!-- Document workspace â€” cabecera consola | tarjetas cliente/vehÃ­culo | repuestos/servicios POS | observaciones | totales cockpit -->
-  <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
+  <!-- Document workspace - cabecera consola | tarjetas cliente/vehiculo | repuestos/servicios POS | observaciones | totales cockpit -->
+  <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace document-page-shell">
 
-    <!-- 1. CABECERA COMPACTA â€” fila 1: INV | Fecha | MecÃ¡nico | Pago | fila 2: Tipo | OperaciÃ³n -->
-    <div class="doc-console-header">
+    <!-- 1. OPERATION HEADER -->
+    <div class="doc-console-header document-topbar">
       <div class="doc-console-title flex flex-wrap items-center gap-2">
         <span>{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</span>
         <span id="draft-indicator" class="hidden text-[10px] sm:text-xs font-medium text-emerald-300/95 bg-emerald-950/60 border border-emerald-500/35 rounded px-2 py-0.5" role="status" aria-live="polite">{% trans "Auto-saved" %}</span>
       </div>
 
       <div class="doc-invoice-grid">
-        <div class="doc-invoice-panel">
-          <div class="doc-console-field doc-console-field--invoice">
-            <span class="doc-console-meta">{% trans "Document No." %}</span>
-            <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
-              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}â€”{% endif %}
-            </span>
-          </div>
-
-          <div class="doc-console-field">
-            <label for="id_fecha_emision" class="doc-console-meta">{% trans "Date" %}</label>
-            <input id="id_fecha_emision" type="date" name="fecha_emision" class="bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
-                   value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
-          </div>
-
-          <div class="doc-console-field">
-            <label for="id_tipo" class="doc-console-meta">{% trans "Document Type" %}</label>
-            {{ form.tipo }}
-          </div>
+        <div class="doc-console-field">
+          <label for="id_tipo" class="doc-console-meta">{% trans "Document Type" %}</label>
+          {{ form.tipo }}
         </div>
 
-        <div class="doc-invoice-panel">
-          {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
-          <div class="doc-console-field">
-            <label id="tecnico-label" for="id_tecnico_responsable" class="doc-console-meta" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
-            <div class="doc-console-control">{{ form.tecnico_responsable }}</div>
-          </div>
-          {% endwith %}
+        <div class="doc-console-field doc-console-field--invoice">
+          <span class="doc-console-meta">{% trans "Document No." %}</span>
+          <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
+            {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}&mdash;{% endif %}
+          </span>
+        </div>
 
-          <div class="doc-console-field">
-            <label for="id_payment_status" class="doc-console-meta">{% trans "Payment Status" %}</label>
-            <div id="payment-status-badge" class="doc-console-control doc-console-payment doc-console-payment-pending">{{ form.payment_status }}</div>
-          </div>
+        <div class="doc-console-field">
+          <label for="id_fecha_emision" class="doc-console-meta">{% trans "Date" %}</label>
+          <input id="id_fecha_emision" type="date" name="fecha_emision" class="bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
+                 value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
+        </div>
 
-          <div class="doc-console-field">
-            <label for="doc_mode" class="doc-console-meta">{% trans "Operation" %}</label>
-            <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300">
-              <option value="services">{% trans "Services" %}</option>
-              <option value="parts">{% trans "Part sale only" %}</option>
-            </select>
-          </div>
+        {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+        <div class="doc-console-field">
+          <label id="tecnico-label" for="id_tecnico_responsable" class="doc-console-meta" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
+          <div class="doc-console-control">{{ form.tecnico_responsable }}</div>
+        </div>
+        {% endwith %}
+
+        <div class="doc-console-field">
+          <label for="id_payment_status" class="doc-console-meta">{% trans "Status" %}</label>
+          <div id="payment-status-badge" class="doc-console-control doc-console-payment doc-console-payment-pending doc-status-badge">{{ form.payment_status }}</div>
+        </div>
+      </div>
+
+      <div class="document-utility-row">
+        <div class="document-utility-item">
+          <label for="doc_mode" class="doc-console-meta">{% trans "Operation" %}</label>
+          <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300">
+            <option value="services">{% trans "Services" %}</option>
+            <option value="parts">{% trans "Part sale only" %}</option>
+          </select>
         </div>
       </div>
     </div>
+
+    <div class="document-main-grid">
+    <div class="document-left-panel">
 
     <!-- 2. CLIENT | VEHICLE (layout horizontal en md+) -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="doc-smart-card doc-ficha-client-vehicle">
         <h3>{% trans "CLIENT" %}</h3>
+        <p class="document-card-subtitle">{% trans "Quick selection or client creation" %}</p>
         <div class="relative">
           <label for="cliente-busqueda" class="sr-only">{% trans 'Search client' %}</label>
           <input type="text" id="cliente-busqueda" class="w-full bg-slate-800 p-2 rounded border border-slate-600 text-white text-sm"
@@ -1227,13 +1287,13 @@ input:disabled, select:disabled, textarea:disabled {
            href="{% country_url 'clientes:crear_cliente' %}"
            data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
            class="doc-action-btn mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold no-underline shadow-sm whitespace-nowrap">
-          <span aria-hidden="true">âž•</span>
-          <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
+        <span aria-hidden="true">&#x2795;</span>
+        <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
         </a>
         <select id="id_cliente" name="cliente" class="hidden">
           <option value="">{% trans "Select client..." %}</option>
         </select>
-        <div id="cliente-info" class="doc-smart-summary hidden">
+        <div id="cliente-info" class="doc-smart-summary doc-smart-summary-client hidden">
           <div class="name" id="cliente-nombre"></div>
           <div class="detail" id="cliente-telefono"></div>
           <div class="detail" id="cliente-email"></div>
@@ -1242,6 +1302,7 @@ input:disabled, select:disabled, textarea:disabled {
       </div>
       <div class="doc-smart-card" id="vehicle-section">
         <h3>{% trans "VEHICLE" %}</h3>
+        <p class="document-card-subtitle">{% trans "Linked to the selected client" %}</p>
         {% if ui_config.show_vehicle %}
         <div class="tipo-dependent-vehicle">
           <div class="doc-field-with-btn flex gap-2">
@@ -1252,8 +1313,8 @@ input:disabled, select:disabled, textarea:disabled {
               </select>
             </div>
             <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
-              <span aria-hidden="true">âž•</span>
-              <span class="doc-action-label text-white font-semibold">Nuevo vehÃ­culo</span>
+        <span aria-hidden="true">&#x2795;</span>
+        <span class="doc-action-label text-white font-semibold">Nuevo veh&iacute;culo</span>
             </button>
           </div>
         </div>
@@ -1268,7 +1329,7 @@ input:disabled, select:disabled, textarea:disabled {
         <div class="text-red-400 text-xs">{{ form.kilometraje_ingreso.errors.0 }}</div>
         {% endif %}
         {% endif %}
-        <div id="vehiculo-info" class="doc-smart-summary hidden">
+        <div id="vehiculo-info" class="doc-smart-summary doc-smart-summary-vehicle hidden">
           <div class="name" id="vehiculo-marca-modelo"></div>
           <div class="detail" id="vehiculo-ano-vin"></div>
           <div class="detail" id="vehiculo-mileage"></div>
@@ -1277,8 +1338,17 @@ input:disabled, select:disabled, textarea:disabled {
       </div>
     </div>
 
+    <div class="document-detail-card">
+      <h3>{% trans "DOCUMENT DETAIL" %}</h3>
+      <div class="detail-actions-toolbar">
+        {% if ui_config.show_repuestos %}<button type="button" class="detail-toolbar-btn" data-doc-add-target="add-repuesto">{% trans "Add part" %}</button>{% endif %}
+        {% if ui_config.show_services %}<button type="button" class="detail-toolbar-btn" data-doc-add-target="add-servicio">{% trans "Add service" %}</button>{% endif %}
+        {% if ui_config.show_otros_servicios %}<button type="button" class="detail-toolbar-btn" data-doc-add-target="add-otro">{% trans "Add external service" %}</button>{% endif %}
+        {% if ui_config.show_repuestos %}<button type="button" class="detail-toolbar-btn" data-doc-add-target="add-used-parts">{% trans "Used part" %}</button>{% endif %}
+      </div>
+
     <!-- 3. PARTS | SERVICES (tabla compacta) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div class="document-sections-grid">
       {% if ui_config.show_repuestos %}
       <div class="doc-smart-card doc-ficha-parts doc-pos-section">
         <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
@@ -1286,18 +1356,18 @@ input:disabled, select:disabled, textarea:disabled {
             <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
             {% if desarme_origen_label %}
             <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
-              <span>ðŸ§©</span>
+              <span>+</span>
               <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
             </div>
             {% endif %}
           </div>
-          <div class="flex gap-1 flex-shrink-0 items-center">
-            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">ðŸ§©</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
+          <div class="flex gap-1 flex-shrink-0 items-center section-inline-actions">
+<button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+<button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">+</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
           </div>
         </div>
         <div class="doc-pos-header hidden sm:grid">
-          <span>{% trans "Code" %}</span><span>{% trans "Part name" %}</span><span>{% trans "Qty" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+          <div>{% trans "Code" %}</div><div>{% trans "Part name" %}</div><div>{% trans "Qty" %}</div><div>{% trans "Price" %}</div><div>{% trans "Total" %}</div><div></div>
         </div>
         <div id="repuestos-container" class="space-y-2 min-h-[80px]">
           <!-- Dynamic parts rows -->
@@ -1308,12 +1378,12 @@ input:disabled, select:disabled, textarea:disabled {
       <div class="doc-smart-card doc-ficha-services doc-pos-section">
         <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
           <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
-          <div class="flex gap-1 flex-shrink-0 items-center">
-            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+          <div class="flex gap-1 flex-shrink-0 items-center section-inline-actions">
+<button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
           </div>
         </div>
         <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
-          <span>{% trans "Service" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+          <div>{% trans "Service" %}</div><div>{% trans "Price" %}</div><div>{% trans "Total" %}</div><div></div>
         </div>
         <div id="servicios-container" class="space-y-2 min-h-[80px]">
           <!-- Dynamic services rows: click + ADD, then type to search -->
@@ -1326,13 +1396,13 @@ input:disabled, select:disabled, textarea:disabled {
     <div class="doc-smart-card doc-ficha-otros doc-pos-section mt-4">
       <div class="flex flex-wrap items-center gap-2 mb-3 min-h-[2rem]">
         <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
-        <div class="flex gap-1 flex-shrink-0 items-center">
-          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
+        <div class="flex gap-1 flex-shrink-0 items-center section-inline-actions">
+<button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+<span class="doc-action-btn text-sm bg-slate-700 px-3 py-2 rounded-md text-slate-400 whitespace-nowrap cursor-not-allowed" title="{% trans 'External services settings unavailable in this local route map' %}"><span aria-hidden="true">&#9881;</span><span class="doc-action-label text-slate-400 font-semibold">Ajustes</span></span>
         </div>
       </div>
       <div class="doc-pos-header doc-pos-header-otros hidden sm:grid">
-        <span>{% trans "Service" %}</span><span>{% trans "External Company" %}</span><span>{% trans "Shop Price" %}</span><span>{% trans "Client Price" %}</span><span>{% trans "Total" %}</span><span></span>
+        <div>{% trans "Service" %}</div><div>{% trans "External Company" %}</div><div>{% trans "Shop Price" %}</div><div>{% trans "Client Price" %}</div><div>{% trans "Total" %}</div><div></div>
       </div>
       <div id="otros-container" class="space-y-2 min-h-[60px]">
         <!-- Dynamic other services rows (external/outsourced) -->
@@ -1340,15 +1410,19 @@ input:disabled, select:disabled, textarea:disabled {
       </div>
     </div>
     {% endif %}
+    </div>
+    </div>
+    </div>
 
     <!-- 4. NOTES | TOTALES (panel claro) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="doc-smart-card order-2 md:order-1">
+    <div class="document-right-panel">
+      <div class="doc-smart-card">
         <h3>{% trans "NOTES" %}</h3>
+        <p class="document-card-subtitle">{% trans "Internal notes and context for this document" %}</p>
         <label for="id_observaciones" class="sr-only">{% trans "Notes" %}</label>
         {{ form.observaciones }}
       </div>
-      <div class="totales-cockpit order-1 md:order-2 totales-panel">
+      <div class="totales-cockpit totales-panel">
         <h3 class="totales-cockpit-title">{% trans "DOCUMENT TOTALS" %}</h3>
         <div class="receipt-totals">
           <table class="receipt-totals-table">
@@ -1403,7 +1477,7 @@ input:disabled, select:disabled, textarea:disabled {
               <tr class="receipt-total-row">
                 <td class="receipt-total-label">{% trans "TOTAL" %}</td>
                 <td class="receipt-total-value">
-                  <span id="t_total" class="calculated-field readonly-total" data-calculated="true">
+                  <span id="t_total" class="calculated-field readonly-total doc-total-final" data-calculated="true">
                     {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
                   </span>
                 </td>
@@ -1411,18 +1485,23 @@ input:disabled, select:disabled, textarea:disabled {
             </tbody>
           </table>
         </div>
-        <button type="submit" class="totales-cockpit-save">
+      </div>
+      <div class="doc-smart-card document-action-card">
+        <h3>{% trans "ACTIONS" %}</h3>
+        <p class="document-card-subtitle">{% trans "Save or return without leaving the workflow" %}</p>
+        <button type="submit" class="totales-cockpit-save doc-save-btn" data-default-label="{% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans 'Save Document' %}{% endif %}" data-loading-label="{% trans 'Saving...' %}">
           {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
         </button>
         <div class="flex gap-2 mt-3">
-          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">â†</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
+          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">&larr;</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
+          <span class="doc-action-btn text-sm rounded-md bg-slate-700 text-slate-400 cursor-not-allowed"><span aria-hidden="true">&#9881;</span><span class="doc-action-label text-slate-400 font-semibold">Ajustes</span></span>
         </div>
       </div>
     </div>
+    </div>
   </div>
 
-  <!-- Hidden inputs para serializar filas dinÃ¡micas -->
+  <!-- Hidden inputs para serializar filas dinamicas -->
   <input type="hidden" name="repuestos_json" id="id_repuestos_json">
   <input type="hidden" name="servicios_json" id="id_servicios_json">
   <input type="hidden" name="otros_json" id="id_otros_json">
@@ -1433,12 +1512,33 @@ input:disabled, select:disabled, textarea:disabled {
   <div id="used-parts-overlay" class="absolute inset-0 bg-black/70"></div>
   <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
     <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
-      <h3 class="text-lg font-bold text-amber-300 mb-3">ðŸ§© {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
+      <h3 class="text-lg font-bold text-amber-300 mb-3">{% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
       <input type="search" id="used-parts-search" placeholder="{% trans 'Search by code or name...' %}" class="form-control w-full mb-4" autocomplete="off">
       <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
       <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">{% trans "Type at least 2 characters to search" %}</p>
       <button type="button" id="close-used-parts" class="mt-4 btn-secondary">{% trans "Close" %}</button>
     </div>
+  </div>
+</div>
+
+<!-- Modal Crear Cliente -->
+<div id="cliente-create-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 px-4">
+  <div id="cliente-create-backdrop" class="absolute inset-0"></div>
+  <div class="relative z-10 w-full max-w-4xl overflow-hidden rounded-lg border border-slate-700 bg-slate-900 shadow-2xl">
+    <button
+      type="button"
+      id="cliente-create-close"
+      class="absolute right-3 top-3 z-20 rounded-md px-3 py-1 text-sm font-semibold text-white hover:bg-slate-800"
+      aria-label="{% trans 'Close' %}"
+    >
+      &times;
+    </button>
+    <iframe
+      id="cliente-create-frame"
+      class="h-[75vh] min-h-[500px] w-full border-0 bg-white"
+      loading="lazy"
+      title="{% trans 'Create client' %}"
+    ></iframe>
   </div>
 </div>
 
@@ -1459,24 +1559,24 @@ input:disabled, select:disabled, textarea:disabled {
 <script src="{% static 'js/marketplace_tooltip_fixed.js' %}"></script>
 
 <script>
-// Ãšnica fuente de verdad para ?next= al ir a crear cliente/vehÃ­culo (pathname + querystring)
+// Unica fuente de verdad para ?next= al ir a crear cliente/vehiculo (pathname + querystring)
 window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
   return encodeURIComponent(window.location.pathname + (window.location.search || ''));
 };
 
-// Funciones para abrir modales de cliente y vehÃ­culo - Disponibles inmediatamente
+// Funciones para abrir modales de cliente y vehiculo - Disponibles inmediatamente
 (function() {
   'use strict';
   
   function openClienteModal() {
     try {
-      const pathBase = window.location.pathname || '/cl/documentos/form/';
+      const pathBase = window.location.pathname;
       const nextUrl = window.egEncodeDocumentFormNext();
       
-      // Parsear el path: /cl/documentos/form/ -> ['cl', 'documentos', 'form'] (sin search)
+      // Parsear el path actual -> ['cl', 'es', 'documentos', 'form'] (sin search)
       const pathParts = pathBase.split('/').filter(function(p) { return p && p.length > 0; });
       
-      // Detectar paÃ­s e idioma desde el path
+      // Detectar pais e idioma desde el path
       let countryPrefix = 'cl';
       let langPrefix = 'es';
       
@@ -1488,17 +1588,17 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       }
       
       const createUrl = '/' + countryPrefix + '/' + langPrefix + '/clientes/crear/?next=' + nextUrl;
-      console.log('ðŸ”µ Abriendo modal de cliente:', createUrl);
+      console.log('[cliente] Abriendo modal de cliente:', createUrl);
       window.location.href = createUrl;
     } catch (error) {
-      console.error('âŒ Error al abrir modal de cliente:', error);
-      alert('Error al abrir la pÃ¡gina de crear cliente. Por favor, intente nuevamente.');
+      console.error('[cliente] Error al abrir modal de cliente:', error);
+      alert('Error al abrir la pagina de crear cliente. Por favor, intente nuevamente.');
     }
   }
 
   function openVehiculoModal() {
     try {
-      const pathOnly = window.location.pathname || '/cl/documentos/form/';
+      const pathOnly = window.location.pathname;
       const nextUrl = window.egEncodeDocumentFormNext();
       
       // Obtener el cliente seleccionado
@@ -1507,18 +1607,18 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       const clienteSelect = document.getElementById('id_cliente');
       
       if (clienteSelect) {
-        // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
+        // Intentar obtener el valor desde Select2 si esta inicializado
         if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
           clienteId = jQuery(clienteSelect).val();
-          console.log('ðŸ‘¤ Cliente obtenido desde Select2:', clienteId);
+          console.log('[vehiculo] Cliente obtenido desde Select2:', clienteId);
         } else {
           // Fallback: obtener del campo directamente
           clienteId = clienteSelect.value || null;
-          console.log('ðŸ‘¤ Cliente obtenido del campo:', clienteId);
+          console.log('[vehiculo] Cliente obtenido del campo:', clienteId);
         }
       }
       
-      // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
+      // Si aun no hay valor, intentar desde el campo oculto de Select2
       if (!clienteId && window.jQuery) {
         const select2Container = jQuery('#id_cliente').next('.select2-container');
         if (select2Container.length) {
@@ -1526,12 +1626,12 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
           const dataId = select2Selection.attr('data-id');
           if (dataId) {
             clienteId = dataId;
-            console.log('ðŸ‘¤ Cliente obtenido desde data-id:', clienteId);
+            console.log('[vehiculo] Cliente obtenido desde data-id:', clienteId);
           }
         }
       }
       
-      // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+      // LOGICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
       // Si empieza con /us/, usar /us/en/
       let countryPrefix = 'cl';
       let langPrefix = 'es';
@@ -1546,17 +1646,17 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
       
       let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
       
-      // Agregar cliente_id si estÃ¡ seleccionado
+      // Agregar cliente_id si esta seleccionado
       if (clienteId) {
         createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
-        console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
+        console.log('[vehiculo] Cliente seleccionado:', clienteId);
       }
       
-      console.log('ðŸš— Abriendo modal de vehÃ­culo:', createUrl);
+      console.log('[vehiculo] Abriendo modal de vehiculo:', createUrl);
       window.location.href = createUrl;
     } catch (error) {
-      console.error('âŒ Error al abrir modal de vehÃ­culo:', error);
-      alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
+      console.error('[vehiculo] Error al abrir modal de vehiculo:', error);
+      alert('Error al abrir la pagina de crear vehiculo. Por favor, intente nuevamente.');
     }
   }
 
@@ -1564,33 +1664,33 @@ window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
   window.openClienteModal = openClienteModal;
   window.openVehiculoModal = openVehiculoModal;
   
-  // Verificar que las funciones estÃ©n disponibles
-  console.log('âœ… Funciones de modal disponibles:', {
+  // Verificar que las funciones esten disponibles
+  console.log('[modal] Funciones disponibles:', {
     openClienteModal: typeof window.openClienteModal,
     openVehiculoModal: typeof window.openVehiculoModal
   });
 })();
 
-// FunciÃ³n global para manejar el click del botÃ³n de vehÃ­culo
-// Esta funciÃ³n se llama directamente desde el onclick del botÃ³n como respaldo
+// Funcion global para manejar el click del boton de vehiculo
+// Esta funcion se llama directamente desde el onclick del boton como respaldo
 function handleNuevoVehiculoClick(event) {
   if (event) {
     event.preventDefault();
     event.stopPropagation();
   }
   
-  console.log('ðŸš— handleNuevoVehiculoClick llamado');
+  console.log('[vehiculo] handleNuevoVehiculoClick llamado');
   
   try {
-    // Intentar usar openVehiculoModal si estÃ¡ disponible
+    // Intentar usar openVehiculoModal si esta disponible
     if (window.openVehiculoModal && typeof window.openVehiculoModal === 'function') {
-      console.log('âœ… Usando openVehiculoModal desde handleNuevoVehiculoClick');
+      console.log('[vehiculo] Usando openVehiculoModal desde handleNuevoVehiculoClick');
       window.openVehiculoModal();
       return false;
     }
     
     // Fallback: construir URL manualmente
-    const pathOnly = window.location.pathname || '/cl/documentos/form/';
+    const pathOnly = window.location.pathname;
     const nextUrl = window.egEncodeDocumentFormNext();
     
     // Obtener el cliente seleccionado
@@ -1598,53 +1698,53 @@ function handleNuevoVehiculoClick(event) {
     let clienteId = null;
     const clienteSelect = document.getElementById('id_cliente');
     
-    console.log('ðŸ” Buscando cliente seleccionado...');
-    console.log('ðŸ” Campo cliente encontrado:', !!clienteSelect);
+    console.log('[vehiculo] Buscando cliente seleccionado...');
+    console.log('[vehiculo] Campo cliente encontrado:', !!clienteSelect);
     
     if (clienteSelect) {
-      console.log('ðŸ” Valor directo del campo:', clienteSelect.value);
-      console.log('ðŸ” jQuery disponible:', !!window.jQuery);
+      console.log('[vehiculo] Valor directo del campo:', clienteSelect.value);
+      console.log('[vehiculo] jQuery disponible:', !!window.jQuery);
       
-      // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
+      // Intentar obtener el valor desde Select2 si esta inicializado
       if (window.jQuery) {
         const $clienteSelect = jQuery(clienteSelect);
-        console.log('ðŸ” Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
+        console.log('[vehiculo] Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
         
         if ($clienteSelect.hasClass('select2-hidden-accessible')) {
           clienteId = $clienteSelect.val();
-          console.log('âœ… Cliente obtenido desde Select2:', clienteId);
+          console.log('[vehiculo] Cliente obtenido desde Select2:', clienteId);
         } else {
           // Fallback: obtener del campo directamente
           clienteId = clienteSelect.value || null;
-          console.log('âœ… Cliente obtenido del campo directamente:', clienteId);
+          console.log('[vehiculo] Cliente obtenido del campo directamente:', clienteId);
         }
       } else {
         // Sin jQuery, obtener del campo directamente
         clienteId = clienteSelect.value || null;
-        console.log('âœ… Cliente obtenido del campo (sin jQuery):', clienteId);
+        console.log('[vehiculo] Cliente obtenido del campo (sin jQuery):', clienteId);
       }
     }
     
-    // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
+    // Si aun no hay valor, intentar desde el campo oculto de Select2
     if (!clienteId && window.jQuery) {
-      console.log('ðŸ” Intentando obtener cliente desde Select2 rendered...');
+      console.log('[vehiculo] Intentando obtener cliente desde Select2 rendered...');
       const select2Container = jQuery('#id_cliente').next('.select2-container');
       if (select2Container.length) {
         const select2Selection = select2Container.find('.select2-selection__rendered');
         const select2Text = select2Selection.text();
-        console.log('ðŸ” Texto en Select2:', select2Text);
+        console.log('[vehiculo] Texto en Select2:', select2Text);
         // Intentar obtener el ID desde el atributo data
         const dataId = select2Selection.attr('data-id');
         if (dataId) {
           clienteId = dataId;
-          console.log('âœ… Cliente obtenido desde data-id:', clienteId);
+          console.log('[vehiculo] Cliente obtenido desde data-id:', clienteId);
         }
       }
     }
     
-    console.log('ðŸ” Cliente ID final:', clienteId);
+    console.log('[vehiculo] Cliente ID final:', clienteId);
     
-    // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+    // LOGICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
     // Si empieza con /us/, usar /us/en/
     let countryPrefix = 'cl';
     let langPrefix = 'es';
@@ -1659,23 +1759,23 @@ function handleNuevoVehiculoClick(event) {
     
     let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
     
-    // Agregar cliente_id si estÃ¡ seleccionado
+    // Agregar cliente_id si esta seleccionado
     if (clienteId) {
       createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
-      console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
+      console.log('[vehiculo] Cliente seleccionado:', clienteId);
     }
     
-    console.log('ðŸš— Navegando a (desde handleNuevoVehiculoClick):', createUrl);
+    console.log('[vehiculo] Navegando a (desde handleNuevoVehiculoClick):', createUrl);
     window.location.href = createUrl;
     return false;
   } catch (error) {
-    console.error('âŒ Error en handleNuevoVehiculoClick:', error);
-    alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
+    console.error('[vehiculo] Error en handleNuevoVehiculoClick:', error);
+    alert('Error al abrir la pagina de crear vehiculo. Por favor, intente nuevamente.');
     return false;
   }
 }
 
-// Hacer la funciÃ³n disponible globalmente
+// Hacer la funcion disponible globalmente
 window.handleNuevoVehiculoClick = handleNuevoVehiculoClick;
 
 function submitLanguageDoc(lang) {
@@ -1684,15 +1784,15 @@ function submitLanguageDoc(lang) {
 }
 </script>
 
-{# FunciÃ³n helper para encode next URL - Mantener por compatibilidad #}
+{# Funcion helper para encode next URL - Mantener por compatibilidad #}
 <script>
 window.egEncodeDocumentFormNext = function() {
     return encodeURIComponent(window.location.pathname + (window.location.search || ''));
 };
 
-// InicializaciÃ³n mÃ­nima para compatibilidad
+// Inicializacion minima para compatibilidad
 document.addEventListener('DOMContentLoaded', function() {
-    // Observations mÃ­nimo
+    // Observations minimo
     const obs = document.getElementById('id_observaciones');
     if (obs) { obs.setAttribute('rows', '2'); }
     
@@ -1712,12 +1812,19 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
+<script>
+window.__PRESELECT_CLIENTE_ID__ = "{{ cliente_preselect_id|default:''|escapejs }}";
+window.__PRESELECT_CLIENTE_NOMBRE__ = "{{ cliente_preselect_nombre|default:''|escapejs }}";
+window.__PRESELECT_CLIENTE_EMAIL__ = "{{ cliente_preselect_email|default:''|escapejs }}";
+window.__PRESELECT_CLIENTE_TELEFONO__ = "{{ cliente_preselect_telefono|default:''|escapejs }}";
+window.__PRESELECT_VEHICULO_ID__ = "{{ vehiculo_preselect_id|default:''|escapejs }}";
+</script>
+
 {# ❌ DESACTIVAR Document Engine - Sistema legacy #}
 {# <script src="{% static 'js/document_engine.js' %}"></script> #}
 
 {# === SISTEMA MODULAR UNIFICADO === #}
-{# Cargar mÃ³dulos JavaScript modularizados #}
+{# Cargar modulos JavaScript modularizados #}
 <script src="{% static 'js/document-form/index.js' %}"></script>
 
 {% endblock extra_js %}
-
