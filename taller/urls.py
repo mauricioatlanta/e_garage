@@ -19,10 +19,13 @@ from taller.views_extra.views import dashboard
 from taller.views.dashboard_bi import DashboardHomeView
 from taller.views.country_aware_auth import country_aware_login
 from taller.views.onboarding_views import onboarding_guardar_paso, onboarding_wizard
+from taller.views_root_country import country_lang_root_view
 
 app_name = "taller"
 
+
 urlpatterns = [
+    path("", country_lang_root_view, name="root"),
     path("accounts/login/", country_aware_login, name="account_login"),
     # ✅ Gestión de Equipo (Team Management)
     path("equipo/", include(("taller.team.urls", "team"), namespace="team")),

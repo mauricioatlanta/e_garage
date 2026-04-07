@@ -89,7 +89,7 @@ from taller.views_extra.signup_email_verification import (
 )
 from taller.views_extra.pwa import dynamic_manifest, dynamic_service_worker
 from taller.views_health import health_check, health_simple
-from taller.views_root import root_landing, root_autoredirect, select_region
+from taller.views_root import redirect_to_home, root_landing, root_autoredirect, select_region
 
 
 try:
@@ -131,41 +131,6 @@ from taller.views_extra.views_suscripciones import (
 )
 
 # gestion_taller/urls.py — archivo raíz de URLs con migración a países
-
-
-def redirect_to_home(request):
-    """Redirige a la página principal basada en el país del usuario"""
-
-    # Si el usuario está autenticado, usar el país de su empresa
-    if request.user.is_authenticated:
-        try:
-            if hasattr(request.user, "empresa") and request.user.empresa:
-                pais = request.user.empresa.pais
-                if pais == "CL":
-                    return redirect("/cl/")
-                elif pais == "US":
-                    return redirect("/us/")
-                elif pais == "AR":
-                    return redirect("/ar/")
-                elif pais == "UY":
-                    return redirect("/uy/")
-        except Exception:
-            pass
-
-    # Si hay contexto de país en el request (desde middleware)
-    if hasattr(request, "country"):
-        country = request.country
-        if country == "CL":
-            return redirect("/cl/")
-        elif country == "US":
-            return redirect("/us/")
-        elif country == "AR":
-            return redirect("/ar/")
-        elif country == "UY":
-            return redirect("/uy/")
-
-    # Fallback: redirigir a Chile por defecto (cambiar de USA a CL)
-    return redirect("/cl/")
 
 
 def redirect_qs(to):
@@ -220,7 +185,6 @@ urlpatterns = [
     path("", root_landing, name="home"),
     path("go/", root_autoredirect, name="root_autoredirect"),
     path("select-region/<str:country>/<str:lang>/", select_region, name="select_region"),
-    path("", include("ubicacion.urls")),
     # PWA Dinámicas (manifest y service worker por país e idioma)
     path("<str:pais>/<str:idioma>/manifest.json", dynamic_manifest, name="pwa_manifest"),
     path(
@@ -343,6 +307,26 @@ urlpatterns = [
         "legal/",
         TemplateView.as_view(template_name="legal.html"),
         name="legal",
+    ),
+    path(
+        "privacidad/",
+        TemplateView.as_view(template_name="legal.html"),
+        name="privacidad",
+    ),
+    path(
+        "terminos/",
+        TemplateView.as_view(template_name="legal.html"),
+        name="terminos",
+    ),
+    path(
+        "sobre/",
+        TemplateView.as_view(template_name="public/sobre.html"),
+        name="sobre",
+    ),
+    path(
+        "soporte/",
+        TemplateView.as_view(template_name="public/soporte.html"),
+        name="soporte",
     ),
     # 🇺🇾 Uruguay - Español (antes de /uy/ para resolver /uy/es/... sin depender del orden de prueba)
     path(
@@ -552,31 +536,8 @@ urlpatterns = [
     # Redirección de documentos sin país a Chile por defecto
     path(
         "documentos/",
-        RedirectView.as_view(url="/cl/documentos/", permanent=False),
+        RedirectView.as_view(url="/cl/es/documentos/", permanent=False),
         name="documentos_redirect_root",
-    ),
-    # Redirecciones de compatibilidad para URLs antiguas con patrón duplicado
-    path("cl/documentos/cl/", RedirectView.as_view(url="/cl/documentos/", permanent=True)),
-    path("us/documentos/us/", RedirectView.as_view(url="/us/documentos/", permanent=True)),
-    # Redirect de /cl/es/documentos/ a /cl/documentos/ (consistencia con otras rutas)
-    path(
-        "cl/es/documentos/",
-        RedirectView.as_view(url="/cl/documentos/", permanent=False),
-        name="cl_es_documentos_redirect",
-    ),
-    path(
-        "cl/es/documentos/<path:path>",
-        RedirectView.as_view(url="/cl/documentos/%(path)s", permanent=False),
-        name="cl_es_documentos_path_redirect",
-    ),
-    # URLs con prefijo de país específico - NAMESPACES ÚNICOS
-    path(
-        "cl/documentos/",
-        include(("taller.documentos.urls", "documentos_cl_es"), namespace="documentos_cl_es"),
-    ),
-    path(
-        "us/documentos/",
-        include(("taller.documentos.urls", "documentos_us_en"), namespace="documentos_us_en"),
     ),
     # Autocomplete URLs por país
     path(
@@ -707,7 +668,6 @@ urlpatterns = [
             url="/us/en/documentos/api/obtener-numero-documento/", permanent=False
         ),
     ),
-    path("", include(("taller.taller_main_urls", "taller"), namespace="taller")),
 ]
 
 # Marketplace: solo se agregan URLs si el módulo existe (evita ModuleNotFoundError en servidor)
