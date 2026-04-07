@@ -9,6 +9,7 @@ import json
 
 import pytest
 from django.contrib.auth.models import User
+from django.http import Http404
 
 from taller.models.empresa import Empresa
 from taller.models.pieza_desarme import (
@@ -130,12 +131,13 @@ class TestInventarioVehiculoSerializaNombre:
         from taller.desarme.views import inventario_vehiculo
 
         request = RequestFactory().get("/desarme/vehiculos/1/inventario/")
+        request.session = {}
         request.user = user
         request.LANGUAGE_CODE = "es"
         resp = inventario_vehiculo(request, pk=vehiculo_desarme.pk)
         assert resp.status_code == 200
         content = resp.content.decode("utf-8")
-        assert "piezas_json" in content
+        assert "inventarioUltra" in content
         # Nombre visible: en es no hay catalog es, así que usa pieza.nombre
         assert "Tapa de válvulas" in content
 
@@ -228,5 +230,5 @@ class TestApiPiezaLabelEmpresaGuardar:
             content_type="application/json",
         )
         request.user = user
-        resp = api_pieza_label_empresa_guardar(request, pk=otra_pieza.pk)
-        assert resp.status_code == 404
+        with pytest.raises(Http404):
+            api_pieza_label_empresa_guardar(request, pk=otra_pieza.pk)

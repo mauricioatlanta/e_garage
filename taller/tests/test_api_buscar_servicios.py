@@ -25,35 +25,49 @@ class TestApiBuscarServicios(TestCase):
             )
 
         # --- Crear categorías necesarias ---
-        from taller.servicios.models import CategoriaServicio
+        from taller.servicios.models import CategoriaServicio, ServicioName
 
         categoria = CategoriaServicio.objects.create(country="US", code="MAINT")
 
         # --- Crea servicios de la empresa del usuario ---
-        Servicio.objects.create(nombre="Oil Change", empresa=empresa, categoria=categoria)
-        Servicio.objects.create(nombre="Brake Service", empresa=empresa, categoria=categoria)
-        Servicio.objects.create(nombre="Air Filter", empresa=empresa, categoria=categoria)
+        oil = Servicio.objects.create(nombre="Oil Change", empresa=empresa, categoria=categoria)
+        brake = Servicio.objects.create(
+            nombre="Brake Service", empresa=empresa, categoria=categoria
+        )
+        air = Servicio.objects.create(nombre="Air Filter", empresa=empresa, categoria=categoria)
+        ServicioName.objects.create(
+            servicio=oil, language="en", label="Oil Change", is_default=True
+        )
+        ServicioName.objects.create(
+            servicio=brake, language="en", label="Brake Service", is_default=True
+        )
+        ServicioName.objects.create(
+            servicio=air, language="en", label="Air Filter", is_default=True
+        )
 
         # --- Servicio de otra empresa (no debería aparecer) ---
         from taller.models.empresa import Empresa
 
         otra_user = User.objects.create_user(username="otro", password="123")
         otra = Empresa.objects.create(user=otra_user, nombre_taller="Otra", pais="CL", moneda="CLP")
-        Servicio.objects.create(nombre="Tire Change", empresa=otra, categoria=categoria)
+        tire = Servicio.objects.create(nombre="Tire Change", empresa=otra, categoria=categoria)
+        ServicioName.objects.create(
+            servicio=tire, language="en", label="Tire Change", is_default=True
+        )
 
         self.client.force_login(user)
 
-        url = reverse("documentos:ajax_buscar_servicios")
+        url = "/us/en/servicios/api/buscar/"
         resp = self.client.get(url, {"q": "service"})
         self.assertEqual(resp.status_code, 200)
 
         data = resp.json()
-        self.assertIn("results", data)
-        texts = [r["text"].lower() for r in data["results"]]
+        self.assertIn("servicios", data)
+        texts = [r["nombre"].lower() for r in data["servicios"]]
         self.assertTrue(any("brake" in t or "service" in t for t in texts))
         # No debe incluir servicios de otra empresa
         self.assertFalse(any("tire" in t for t in texts))
         # Todos los resultados deben tener id
-        for r in data["results"]:
-            self.assertIn("id", r)
-            self.assertIn("text", r)
+        for r in data["servicios"]:
+            self.assertIn("pk", r)
+            self.assertIn("nombre", r)

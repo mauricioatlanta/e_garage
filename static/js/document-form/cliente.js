@@ -11,6 +11,7 @@
 
     // Elementos del DOM (cacheados)
     let elements = {};
+    let modalMessageBound = false;
 
     /**
      * Obtiene referencias a elementos del DOM
@@ -40,7 +41,35 @@
         if (!elements.ultimaVisitaEl) {
             elements.ultimaVisitaEl = document.getElementById('cliente-ultima-visita');
         }
+        if (!elements.btnNuevoCliente) {
+            elements.btnNuevoCliente = document.getElementById('btn-nuevo-cliente');
+        }
+        if (!elements.modalCliente) {
+            elements.modalCliente = document.getElementById('cliente-create-modal');
+        }
+        if (!elements.modalClienteFrame) {
+            elements.modalClienteFrame = document.getElementById('cliente-create-frame');
+        }
         return elements;
+    }
+
+    function resetClienteUI() {
+        const els = getElements();
+        if (els.clienteBusqueda) els.clienteBusqueda.value = '';
+        if (els.clienteResultados) {
+            els.clienteResultados.innerHTML = '';
+            els.clienteResultados.classList.add('hidden');
+        }
+        if (els.clienteSelect) {
+            els.clienteSelect.innerHTML = '<option value="">' + (EG.I18N.select_client || 'Select client...') + '</option>';
+            els.clienteSelect.value = '';
+            els.clienteSelect.classList.add('hidden');
+        }
+        if (els.cliNombre) els.cliNombre.textContent = '';
+        if (els.cliEmail) els.cliEmail.textContent = '';
+        if (els.cliFono) els.cliFono.textContent = '';
+        if (els.ultimaVisitaEl) els.ultimaVisitaEl.textContent = '';
+        if (els.clienteInfoBox) els.clienteInfoBox.classList.add('hidden');
     }
 
     /**
@@ -174,6 +203,51 @@
         await EG.vehiculo.cargarVehiculosPorCliente(id);
     }
 
+    function closeCreateModal() {
+        const els = getElements();
+        if (!els.modalCliente) return;
+        els.modalCliente.classList.add('hidden');
+        if (els.modalClienteFrame) {
+            els.modalClienteFrame.removeAttribute('src');
+        }
+        document.body.classList.remove('overflow-hidden');
+    }
+
+    function openCreateModal() {
+        const els = getElements();
+        const baseUrl = els.btnNuevoCliente?.dataset.urlCrearCliente || els.btnNuevoCliente?.getAttribute('href');
+        if (!baseUrl || !els.modalCliente || !els.modalClienteFrame) {
+            return;
+        }
+
+        const createUrl = new URL(baseUrl, window.location.origin);
+        createUrl.searchParams.set('next', window.location.pathname + (window.location.search || ''));
+        createUrl.searchParams.set('modal', '1');
+
+        els.modalClienteFrame.src = createUrl.toString();
+        els.modalCliente.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+    }
+
+    function handleCreateModalMessage(event) {
+        if (event.origin !== window.location.origin || !event.data || event.data.type !== 'eg:cliente-created') {
+            return;
+        }
+
+        const cliente = event.data.cliente || {};
+        if (!cliente.id) {
+            return;
+        }
+
+        seleccionarCliente({
+            id: cliente.id,
+            nombre: cliente.nombre || ('Cliente #' + cliente.id),
+            email: cliente.email || '',
+            telefono: cliente.telefono || ''
+        });
+        closeCreateModal();
+    }
+
     /**
      * Manejador de input en búsqueda
      */
@@ -283,18 +357,34 @@
             els.clienteBusqueda?.focus();
         });
 
+        els.btnNuevoCliente?.addEventListener('click', function(event) {
+            event.preventDefault();
+            openCreateModal();
+        });
+
+        document.getElementById('cliente-create-close')?.addEventListener('click', closeCreateModal);
+        document.getElementById('cliente-create-backdrop')?.addEventListener('click', closeCreateModal);
+
+        if (!modalMessageBound) {
+            modalMessageBound = true;
+            window.addEventListener('message', handleCreateModalMessage);
+        }
+
         // Preselección desde URL o template
         const urlParams = new URLSearchParams(window.location.search);
         const preselectClienteId = window.__PRESELECT_CLIENTE_ID__ || urlParams.get('cliente_id');
+        const preselectClienteNombre = window.__PRESELECT_CLIENTE_NOMBRE__ || urlParams.get('cliente_nombre') || '';
+        const preselectClienteEmail = window.__PRESELECT_CLIENTE_EMAIL__ || '';
+        const preselectClienteTelefono = window.__PRESELECT_CLIENTE_TELEFONO__ || '';
 
         if (preselectClienteId && typeof seleccionarCliente === 'function') {
-            const nombre = urlParams.get('cliente_nombre') || `Cliente #${preselectClienteId}`;
+            const nombre = preselectClienteNombre || `Cliente #${preselectClienteId}`;
             setTimeout(() => {
                 seleccionarCliente({
                     id: preselectClienteId,
                     nombre,
-                    email: '',
-                    telefono: ''
+                    email: preselectClienteEmail,
+                    telefono: preselectClienteTelefono
                 });
             }, 100);
         }
@@ -306,6 +396,9 @@
     EG.cliente = {
         buscarClientes,
         seleccionarCliente,
+        resetClienteUI,
+        openCreateModal,
+        closeCreateModal,
         handleClienteInput,
         handleClienteFocus,
         handleClienteKeydown,

@@ -322,8 +322,14 @@ def test_all_countries_with_sample_policies(sample_tax_policies):
             f"user_{country}_{applies_to}", f"{country}@test.com", "password"
         )
         empresa = Empresa.objects.create(user=user, nombre_taller=f"Taller {country}", pais=country)
+        location = None
+        if country == "US":
+            state = Estado.objects.create(
+                nombre="California", codigo="CA", pais="US", sales_tax=7.25
+            )
+            location = Ciudad.objects.create(nombre="Los Angeles", estado=state)
 
-        rate, _ = resolve_tax_rate(empresa, None, applies_to)
+        rate, _ = resolve_tax_rate(empresa, location, applies_to)
 
         assert (
             rate == expected_rate

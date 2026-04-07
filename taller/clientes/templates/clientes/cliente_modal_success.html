@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Cliente creado</title>
+</head>
+<body>
+  <script>
+    (function() {
+      var payload = {
+        type: 'eg:cliente-created',
+        cliente: {
+          id: '{{ cliente.id|escapejs }}',
+          nombre: '{{ cliente.nombre|escapejs }}',
+          email: '{{ cliente.email|escapejs }}',
+          telefono: '{{ cliente.telefono|escapejs }}'
+        },
+        next: '{{ next|escapejs }}'
+      };
+
+      try {
+        if (window.parent && window.parent !== window) {
+          window.parent.postMessage(payload, window.location.origin);
+        }
+      } catch (err) {
+        console.error('No se pudo enviar el cliente al formulario padre.', err);
+      }
+    })();
+  </script>
+  <p>Cliente creado. Puedes cerrar esta ventana.</p>
+</body>
+</html>

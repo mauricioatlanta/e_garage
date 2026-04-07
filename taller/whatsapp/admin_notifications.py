@@ -2,6 +2,7 @@
 Notificaciones WhatsApp para admin de eGarage
 Se disparan cuando hay nueva suscripción o renovación
 """
+
 import logging
 import uuid
 from typing import Optional
@@ -25,10 +26,10 @@ def notify_admin_new_subscription(
 ) -> bool:
     """
     Notificar al admin de eGarage sobre nueva suscripción o renovación
-    
+
     🔒 IDEMPOTENCIA REAL: Basada en idempotency_key único (empresa_id + event_type + ref_id)
     No envía dos veces la misma notificación para el mismo evento.
-    
+
     Args:
         empresa: Instancia de Empresa
         plan: Plan de suscripción (ej: "basico", "premium")
@@ -38,17 +39,17 @@ def notify_admin_new_subscription(
         comprobante_pago_id: ID del ComprobantePago (para idempotencia)
         pago_pendiente_id: ID del PagoPendiente (para idempotencia)
         operation_uuid: UUID de operación (si no hay comprobante/pago)
-        
+
     Returns:
         True si se envió correctamente, False en caso contrario
     """
     try:
         # 🔒 IDEMPOTENCIA REAL: Generar clave única y verificar en DB
         event_type = "nueva_suscripcion" if es_nueva_suscripcion else "renovacion"
-        
+
         try:
             from .models import WhatsAppAdminNotificationLog
-            
+
             # Generar idempotency_key
             idempotency_key = WhatsAppAdminNotificationLog.generate_idempotency_key(
                 empresa_id=empresa.id,
@@ -57,12 +58,12 @@ def notify_admin_new_subscription(
                 pago_pendiente_id=pago_pendiente_id,
                 operation_uuid=operation_uuid,
             )
-            
+
             # Verificar si ya existe notificación con esta clave
             existing = WhatsAppAdminNotificationLog.objects.filter(
                 idempotency_key=idempotency_key
             ).first()
-            
+
             if existing:
                 logger.info(
                     f"⚠️ Notificación WhatsApp admin ya enviada (idempotency_key={idempotency_key}) - "
@@ -72,29 +73,31 @@ def notify_admin_new_subscription(
         except Exception as e:
             # Si falla la verificación de idempotencia, continuar (no romper flujo)
             logger.warning(f"Error verificando idempotencia (continuando): {e}")
-        
+
         # Verificar si las notificaciones están habilitadas
         enabled = getattr(settings, "WHATSAPP_ADMIN_NOTIFICATIONS_ENABLED", False)
         if not enabled:
             logger.debug("WhatsApp admin notifications disabled, skipping")
             return False
-        
+
         # Obtener número de admin desde settings
         admin_number = getattr(settings, "WHATSAPP_ADMIN_NUMBER", None)
         if not admin_number:
             logger.warning("WHATSAPP_ADMIN_NUMBER no configurado, no se puede enviar notificación")
             return False
-        
+
         # Obtener email de soporte para el mensaje
         support_email = getattr(settings, "SUPPORT_EMAIL", "support@egarage.cl")
-        
+
         # Determinar idioma según país
         country = getattr(empresa, "pais", "CL").upper()
         language = "en" if country == "US" else "es"
-        
+
         # Obtener nombre del plan
-        plan_display = dict(empresa.PLAN_CHOICES).get(plan, plan) if hasattr(empresa, "PLAN_CHOICES") else plan
-        
+        plan_display = (
+            dict(empresa.PLAN_CHOICES).get(plan, plan) if hasattr(empresa, "PLAN_CHOICES") else plan
+        )
+
         # Construir mensaje según tipo de evento
         if es_nueva_suscripcion:
             if language == "en":
@@ -159,7 +162,7 @@ def notify_admin_new_subscription(
 📅 Expira: {empresa.fecha_fin.strftime('%d/%m/%Y') if hasattr(empresa, 'fecha_fin') and empresa.fecha_fin else 'N/A'}
 
 📧 Soporte: {support_email}"""
-        
+
         # Obtener provider y enviar
         # 🔒 FAIL-SAFE: Nunca debe romper el flujo principal
         provider_name = "unknown"
@@ -167,9 +170,10 @@ def notify_admin_new_subscription(
             provider = get_whatsapp_provider()
             provider_name = getattr(settings, "WHATSAPP_ADMIN_PROVIDER", "dummy")
             result = provider.send(admin_number, message)
-            
+
             # Registrar en auditoría
             from .audit_log import log_whatsapp_admin_attempt
+
             log_whatsapp_admin_attempt(
                 empresa_id=empresa.id,
                 empresa_nombre=empresa.nombre_taller,
@@ -179,10 +183,12 @@ def notify_admin_new_subscription(
                 error=result.get("error"),
                 message_id=result.get("message_id"),
             )
-            
+
             if result.get("success"):
-                logger.info(f"✅ Notificación WhatsApp admin enviada: {'Nueva suscripción' if es_nueva_suscripcion else 'Renovación'}")
-                
+                logger.info(
+                    f"✅ Notificación WhatsApp admin enviada: {'Nueva suscripción' if es_nueva_suscripcion else 'Renovación'}"
+                )
+
                 # Guardar registro en DB (idempotencia real)
                 _save_notification_record(
                     empresa=empresa,
@@ -196,13 +202,15 @@ def notify_admin_new_subscription(
                     comprobante_pago_id=comprobante_pago_id,
                     pago_pendiente_id=pago_pendiente_id,
                 )
-                
+
                 return True
             else:
                 # Log error pero NO lanzar excepción
-                error_msg = result.get('error', 'Unknown error')
-                logger.warning(f"⚠️ Error enviando notificación WhatsApp admin (no crítico): {error_msg}")
-                
+                error_msg = result.get("error", "Unknown error")
+                logger.warning(
+                    f"⚠️ Error enviando notificación WhatsApp admin (no crítico): {error_msg}"
+                )
+
                 # Guardar registro en DB (idempotencia real)
                 _save_notification_record(
                     empresa=empresa,
@@ -216,16 +224,20 @@ def notify_admin_new_subscription(
                     comprobante_pago_id=comprobante_pago_id,
                     pago_pendiente_id=pago_pendiente_id,
                 )
-                
+
                 return False
         except Exception as e:
             # 🔒 CRÍTICO: Capturar cualquier excepción y no propagarla
             # El proceso de suscripción/pago NO debe fallar por WhatsApp
-            logger.error(f"❌ Excepción en notify_admin_new_subscription (ignorada para no romper flujo): {e}", exc_info=True)
-            
+            logger.error(
+                f"❌ Excepción en notify_admin_new_subscription (ignorada para no romper flujo): {e}",
+                exc_info=True,
+            )
+
             # Registrar en auditoría incluso si hay excepción
             try:
                 from .audit_log import log_whatsapp_admin_attempt
+
                 log_whatsapp_admin_attempt(
                     empresa_id=empresa.id,
                     empresa_nombre=empresa.nombre_taller,
@@ -236,7 +248,7 @@ def notify_admin_new_subscription(
                 )
             except Exception:
                 pass  # No romper si falla el log de auditoría
-            
+
             # Guardar registro en DB (idempotencia real) - usar idempotency_key si está disponible
             try:
                 idempotency_key = WhatsAppAdminNotificationLog.generate_idempotency_key(
@@ -260,8 +272,14 @@ def notify_admin_new_subscription(
                 )
             except Exception:
                 pass  # No romper si falla el guardado
-            
+
             return False
+    except Exception as e:
+        logger.error(
+            f"Excepción inesperada en notify_admin_new_subscription: {e}",
+            exc_info=True,
+        )
+        return False
 
 
 def _save_notification_record(
@@ -279,7 +297,7 @@ def _save_notification_record(
 ) -> None:
     """
     Guardar registro de notificación en DB para idempotencia real
-    
+
     Args:
         empresa: Instancia de Empresa
         event_type: Tipo de evento
@@ -295,7 +313,7 @@ def _save_notification_record(
     """
     try:
         from .models import WhatsAppAdminNotificationLog
-        
+
         with transaction.atomic():
             # Usar get_or_create con idempotency_key para evitar duplicados
             notification, created = WhatsAppAdminNotificationLog.objects.get_or_create(
@@ -313,7 +331,7 @@ def _save_notification_record(
                     "pago_pendiente_id": pago_pendiente_id,
                 },
             )
-            
+
             if not created:
                 # Actualizar registro existente
                 notification.success = success

@@ -65,7 +65,9 @@
             return {
                 servicio_id: (row.querySelector('.srv-id') && row.querySelector('.srv-id').value || '').trim(),
                 nombre: (row.querySelector('.srv-input') && row.querySelector('.srv-input').value || '').trim(),
-                precio: EG.utils.parseNumericInput(row.querySelector('.serv-precio') && row.querySelector('.serv-precio').value || 0)
+                cantidad: Number(row.querySelector('.serv-cantidad') && row.querySelector('.serv-cantidad').value || 0) || 1,
+                precio: EG.utils.parseNumericInput(row.querySelector('.serv-precio') && row.querySelector('.serv-precio').value || 0),
+                descuento: EG.utils.parseNumericInput(row.querySelector('.serv-descuento') && row.querySelector('.serv-descuento').value || 0)
             };
         });
 
@@ -254,6 +256,34 @@
                                 origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
                                 pieza_desarme_id: rep.pieza_desarme_id || '',
                                 costo_linea: rep.costo_linea != null ? rep.costo_linea : 0
+                            });
+                        }
+                    }
+                });
+                (draft.servicios || []).forEach(function(serv) {
+                    if (window.EG && window.EG.servicios && typeof window.EG.servicios.addServicioRow === 'function') {
+                        var row = window.EG.servicios.addServicioRow();
+                        if (row && row.__applyServData) {
+                            row.__applyServData({
+                                servicio_id: serv.servicio_id || '',
+                                nombre: serv.nombre || '',
+                                cantidad: serv.cantidad || 1,
+                                precio: serv.precio != null ? serv.precio : 0,
+                                descuento: serv.descuento != null ? serv.descuento : 0
+                            });
+                        }
+                    }
+                });
+                (draft.otros || []).forEach(function(otro) {
+                    if (window.EG && window.EG.servicios && typeof window.EG.servicios.addOtroServicioRow === 'function') {
+                        var row = window.EG.servicios.addOtroServicioRow();
+                        if (row && row.__applyOtroData) {
+                            row.__applyOtroData({
+                                servicio_id: otro.servicio_id || '',
+                                nombre: otro.nombre || '',
+                                empresa_ext: otro.empresa_ext || '',
+                                precio_taller: otro.precio_taller != null ? otro.precio_taller : 0,
+                                precio: otro.precio != null ? otro.precio : 0
                             });
                         }
                     }

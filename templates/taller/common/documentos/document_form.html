@@ -958,153 +958,13 @@ input:disabled, select:disabled, textarea:disabled {
 
 /* ==================== TABLA REAL: Grid 12 cols - Code | Part name | Qty | Price | Total | [x] ==================== */
 .doc-pos-section { margin-bottom: 0.75rem; overflow: hidden; }
-/* Alinear tÃ­tulos y botones de acciÃ³n en secciones partes/servicios/otros */
-.doc-ficha-parts .flex.justify-between,
-.doc-ficha-services .flex.justify-between,
-.doc-ficha-otros .flex.justify-between {
-  align-items: center;
-}
-:root {
-  --doc-col-main: 1.8fr;
-  --doc-col-secondary: 1.2fr;
-  --doc-col-sm: 140px;
-  --doc-col-xs: 80px;
-  --doc-col-action: 44px;
-}
-.doc-pos-header {
-  display: grid;
-  gap: 8px;
-  padding: 6px 8px 8px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: #64748b;
-  text-transform: uppercase;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.5);
-  align-items: center;
-}
-/* Filas dinÃ¡micas: usan grid grid-cols-12 del HTML, no override */
-#repuestos-container .dynamic-element .doc-row-grid,
-#servicios-container .dynamic-element .doc-row-grid,
-#otros-container .dynamic-element .doc-row-grid {
-  display: grid !important;
-  min-height: 40px;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 4px;
-  margin-bottom: 4px;
-  align-items: center;
-}
-@media (min-width: 769px) {
-  #repuestos-container .doc-pos-header {
-    display: grid !important;
-    grid-template-columns: minmax(100px, 120px) minmax(300px, var(--doc-col-main)) minmax(80px, 96px) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
-    gap: 10px;
-    align-items: center;
-  }
-
-  #repuestos-container .dynamic-element .doc-pos-grid-parts {
-    grid-template-columns: minmax(100px, 120px) minmax(300px, var(--doc-col-main)) minmax(80px, 96px) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .doc-pos-header-services {
-    display: grid !important;
-    grid-template-columns: minmax(300px, var(--doc-col-main)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
-    gap: 10px;
-    align-items: center;
-  }
-
-  #servicios-container .dynamic-element .doc-pos-grid-services {
-    grid-template-columns: minmax(300px, var(--doc-col-main)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
-    gap: 10px;
-    align-items: center;
-  }
-
-  .doc-pos-header-otros {
-    display: grid !important;
-    grid-template-columns: minmax(300px, var(--doc-col-main)) minmax(220px, var(--doc-col-secondary)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
-    gap: 10px;
-    align-items: center;
-  }
-
-  #otros-container .dynamic-element .doc-pos-grid-otros {
-    grid-template-columns: minmax(300px, var(--doc-col-main)) minmax(220px, var(--doc-col-secondary)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) minmax(120px, var(--doc-col-sm)) var(--doc-col-action) !important;
-    gap: 10px;
-    align-items: center;
-  }
-}
-.doc-pos-header,
-.doc-pos-header-services,
-.doc-pos-header-otros {
-  display: grid;
-}
-.doc-pos-header > div,
-.doc-pos-header-services > div,
-.doc-pos-header-otros > div {
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-#repuestos-container .dynamic-element input,
-#repuestos-container .dynamic-element .form-control,
-#repuestos-container .dynamic-element .rep-subtotal-view,
-#servicios-container .dynamic-element input,
-#servicios-container .dynamic-element .form-control,
-#otros-container .dynamic-element input,
-#otros-container .dynamic-element .form-control {
-  min-height: 40px !important;
-  height: 2.8rem !important;
-  padding: 6px 10px !important;
-  font-size: 15px !important;
-}
-#repuestos-container .dynamic-element .rep-search-container,
-#repuestos-container .dynamic-element .description-field,
-#servicios-container .dynamic-element .srv-input-container,
-#servicios-container .dynamic-element .description-field,
-#otros-container .dynamic-element .otr-search-container,
-#otros-container .dynamic-element .description-field {
-  min-width: 0;
-  width: 100%;
-}
-#repuestos-container .dynamic-element .rep-search,
-#servicios-container .dynamic-element .srv-input,
-#otros-container .dynamic-element .otr-search {
-  width: 100% !important;
-}
-#repuestos-container .dynamic-element label,
-#servicios-container .dynamic-element label,
-#otros-container .dynamic-element label { display: none !important; }
-#repuestos-container .dynamic-element,
-#servicios-container .dynamic-element,
-#otros-container .dynamic-element {
-  position: relative;
-}
-#repuestos-container .dynamic-element {
-  overflow: visible !important;
-}
-#servicios-container .dynamic-element,
-#otros-container .dynamic-element {
-  overflow: visible !important;
-}
+/* Sheet layout para repuestos/servicios */
 .rep-dropdown,
 .rep-codigo-dropdown,
 .srv-dropdown,
 .otr-dropdown {
   position: absolute;
   z-index: 9999 !important;
-}
-@media (max-width: 768px) {
-  .doc-pos-header { display: none !important; }
-  #servicios-container .dynamic-element .doc-row-grid,
-  #otros-container .dynamic-element .doc-row-grid {
-    grid-template-columns: 1fr !important;
-    padding: 10px !important;
-  }
-  #repuestos-container .dynamic-element label,
-  #servicios-container .dynamic-element label,
-  #otros-container .dynamic-element label { display: block !important; }
 }
 </style>
 <link rel="stylesheet" href="{% static 'css/documentos/document_form.css' %}">
@@ -1351,62 +1211,131 @@ input:disabled, select:disabled, textarea:disabled {
     <div class="document-sections-grid">
       {% if ui_config.show_repuestos %}
       <div class="doc-smart-card doc-ficha-parts doc-pos-section">
-        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
-          <div class="flex flex-col gap-1 min-w-0 flex-1">
-            <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
+        <div class="doc-sheet-section">
+          <div class="doc-sheet-toolbar">
+            <div class="flex flex-col gap-1 min-w-0 flex-1">
+              <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
             {% if desarme_origen_label %}
-            <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
-              <span>+</span>
-              <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
-            </div>
+              <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
+                <span>+</span>
+                <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
+              </div>
             {% endif %}
+            </div>
+            <div class="doc-sheet-actions">
+              <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+              <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">+</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
+            </div>
           </div>
-          <div class="flex gap-1 flex-shrink-0 items-center section-inline-actions">
-<button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-<button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">+</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
+          <div class="doc-sheet-wrap">
+            <table class="doc-sheet-table doc-sheet-table-repuestos">
+              <colgroup>
+                <col class="doc-col-code">
+                <col class="doc-col-name">
+                <col class="doc-col-qty">
+                <col class="doc-col-money">
+                <col class="doc-col-discount">
+                <col class="doc-col-total">
+                <col class="doc-col-actions">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>{% trans "Code" %}</th>
+                  <th>{% trans "Part name" %}</th>
+                  <th>{% trans "Qty" %}</th>
+                  <th>{% trans "Sale price" %}</th>
+                  <th>{% trans "Discount" %}</th>
+                  <th>{% trans "Subtotal" %}</th>
+                  <th>{% trans "Actions" %}</th>
+                </tr>
+              </thead>
+              <tbody id="repuestos-container" class="doc-sheet-body">
+                <!-- Dynamic parts rows -->
+              </tbody>
+            </table>
           </div>
-        </div>
-        <div class="doc-pos-header hidden sm:grid">
-          <div>{% trans "Code" %}</div><div>{% trans "Part name" %}</div><div>{% trans "Qty" %}</div><div>{% trans "Price" %}</div><div>{% trans "Total" %}</div><div></div>
-        </div>
-        <div id="repuestos-container" class="space-y-2 min-h-[80px]">
-          <!-- Dynamic parts rows -->
         </div>
       </div>
       {% endif %}
       {% if ui_config.show_services %}
       <div class="doc-smart-card doc-ficha-services doc-pos-section">
-        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
-          <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
-          <div class="flex gap-1 flex-shrink-0 items-center section-inline-actions">
-<button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+        <div class="doc-sheet-section">
+          <div class="doc-sheet-toolbar">
+            <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
+            <div class="doc-sheet-actions">
+              <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            </div>
           </div>
-        </div>
-        <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
-          <div>{% trans "Service" %}</div><div>{% trans "Price" %}</div><div>{% trans "Total" %}</div><div></div>
-        </div>
-        <div id="servicios-container" class="space-y-2 min-h-[80px]">
-          <!-- Dynamic services rows: click + ADD, then type to search -->
-          <p id="servicios-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add to add services, then type to search." %}</p>
+          <div class="doc-sheet-wrap">
+            <table class="doc-sheet-table doc-sheet-table-servicios">
+              <colgroup>
+                <col class="doc-col-service">
+                <col class="doc-col-qty">
+                <col class="doc-col-money">
+                <col class="doc-col-discount">
+                <col class="doc-col-total">
+                <col class="doc-col-actions">
+              </colgroup>
+              <thead>
+                <tr>
+                  <th>{% trans "Service" %}</th>
+                  <th>{% trans "Qty" %}</th>
+                  <th>{% trans "Client price" %}</th>
+                  <th>{% trans "Discount" %}</th>
+                  <th>{% trans "Subtotal" %}</th>
+                  <th>{% trans "Actions" %}</th>
+                </tr>
+              </thead>
+              <tbody id="servicios-container" class="doc-sheet-body">
+                <!-- Dynamic services rows: click + ADD, then type to search -->
+                <tr id="servicios-empty-hint" class="doc-sheet-empty-row empty-hint">
+                  <td colspan="6" class="doc-sheet-empty text-xs text-slate-400 py-2">{% trans "Click + Add to add services, then type to search." %}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
       {% endif %}
     </div>
     {% if ui_config.show_otros_servicios %}
     <div class="doc-smart-card doc-ficha-otros doc-pos-section mt-4">
-      <div class="flex flex-wrap items-center gap-2 mb-3 min-h-[2rem]">
-        <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
-        <div class="flex gap-1 flex-shrink-0 items-center section-inline-actions">
-<button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-<span class="doc-action-btn text-sm bg-slate-700 px-3 py-2 rounded-md text-slate-400 whitespace-nowrap cursor-not-allowed" title="{% trans 'External services settings unavailable in this local route map' %}"><span aria-hidden="true">&#9881;</span><span class="doc-action-label text-slate-400 font-semibold">Ajustes</span></span>
+      <div class="doc-sheet-section">
+        <div class="doc-sheet-toolbar">
+          <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
+          <div class="doc-sheet-actions">
+            <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            <span class="doc-action-btn text-sm bg-slate-700 px-3 py-2 rounded-md text-slate-400 whitespace-nowrap cursor-not-allowed" title="{% trans 'External services settings unavailable in this local route map' %}"><span aria-hidden="true">&#9881;</span><span class="doc-action-label text-slate-400 font-semibold">Ajustes</span></span>
+          </div>
         </div>
-      </div>
-      <div class="doc-pos-header doc-pos-header-otros hidden sm:grid">
-        <div>{% trans "Service" %}</div><div>{% trans "External Company" %}</div><div>{% trans "Shop Price" %}</div><div>{% trans "Client Price" %}</div><div>{% trans "Total" %}</div><div></div>
-      </div>
-      <div id="otros-container" class="space-y-2 min-h-[60px]">
-        <!-- Dynamic other services rows (external/outsourced) -->
-        <p id="otros-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add for external/outsourced services." %}</p>
+        <div class="doc-sheet-wrap">
+          <table class="doc-sheet-table doc-sheet-table-otros">
+            <colgroup>
+              <col class="doc-col-service">
+              <col class="doc-col-company">
+              <col class="doc-col-money">
+              <col class="doc-col-money">
+              <col class="doc-col-total">
+              <col class="doc-col-actions">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>{% trans "Service" %}</th>
+                <th>{% trans "External Company" %}</th>
+                <th>{% trans "Shop Price" %}</th>
+                <th>{% trans "Client Price" %}</th>
+                <th>{% trans "Profit" %}</th>
+                <th>{% trans "Actions" %}</th>
+              </tr>
+            </thead>
+            <tbody id="otros-container" class="doc-sheet-body">
+              <!-- Dynamic other services rows (external/outsourced) -->
+              <tr id="otros-empty-hint" class="doc-sheet-empty-row empty-hint">
+                <td colspan="6" class="doc-sheet-empty text-xs text-slate-400 py-2">{% trans "Click + Add for external/outsourced services." %}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
     {% endif %}
@@ -1547,6 +1476,9 @@ input:disabled, select:disabled, textarea:disabled {
 {{ repuestos_prefetch|json_script:"prefetchRepuestos" }}
 {{ servicios_prefetch|json_script:"prefetchServicios" }}
 {{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
+{{ repuestos_json|json_script:"initialRepuestosData" }}
+{{ servicios_json|json_script:"initialServiciosData" }}
+{{ otros_json|json_script:"initialOtrosData" }}
 {{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
 
 {% endwith %}

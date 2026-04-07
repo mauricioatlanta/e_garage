@@ -44,48 +44,47 @@ def configuracion(request):
     created = False
 
     # Procesar formularios
-    if request.method == "POST":
-        if "datos_form" in request.POST:
-            datos_form = DatosPersonalesForm(request.POST, user=request.user)
-            if datos_form.is_valid():
-                request.user.first_name = datos_form.cleaned_data["first_name"]
-                request.user.last_name = datos_form.cleaned_data["last_name"]
-                request.user.email = datos_form.cleaned_data["email"]
-                request.user.save()
-                messages.success(request, "Datos personales actualizados.")
-        elif "empresa_form" in request.POST:
-            empresa_form = EmpresaForm(request.POST, request.FILES, instance=empresa)
-            if empresa_form.is_valid():
-                empresa_form.save()
-                messages.success(request, "Datos de la empresa actualizados.")
-        elif "crear_tecnico_rapido" in request.POST and Tecnico and empresa:
-            nombre = request.POST.get("nombre", "").strip()
-            telefono = request.POST.get("telefono", "").strip()
-            direccion = request.POST.get("direccion", "").strip()
-            if len(nombre) < 2:
-                messages.error(request, "Nombre de técnico demasiado corto.")
-            elif Tecnico.objects.filter(empresa=empresa, nombre__iexact=nombre).exists():
-                messages.error(request, f'Ya existe un técnico llamado "{nombre}".')
-            else:
-                Tecnico.objects.create(
-                    empresa=empresa,
-                    nombre=nombre,
-                    telefono=telefono,
-                    direccion=direccion,
-                )
-                messages.success(request, f'Técnico "{nombre}" creado.')
-        elif "toggle_tecnico" in request.POST and Tecnico and empresa:
-            tec_id = request.POST.get("toggle_tecnico")
-            tec = Tecnico.objects.by_empresa(empresa).filter(id=tec_id).first()
-            if tec:
-                tec.activo = not tec.activo
-                tec.save()
-                messages.success(
-                    request,
-                    f'Técnico "{tec.nombre}" ahora está {"activo" if tec.activo else "inactivo"}.',
-                )
-            else:
-                messages.error(request, "Técnico no encontrado o no pertenece a tu empresa.")
+    if "datos_form" in request.POST:
+        datos_form = DatosPersonalesForm(request.POST, user=request.user)
+        if datos_form.is_valid():
+            request.user.first_name = datos_form.cleaned_data["first_name"]
+            request.user.last_name = datos_form.cleaned_data["last_name"]
+            request.user.email = datos_form.cleaned_data["email"]
+            request.user.save()
+            messages.success(request, "Datos personales actualizados.")
+    elif "empresa_form" in request.POST:
+        empresa_form = EmpresaForm(request.POST, request.FILES, instance=empresa)
+        if empresa_form.is_valid():
+            empresa_form.save()
+            messages.success(request, "Datos de la empresa actualizados.")
+    elif "crear_tecnico_rapido" in request.POST and Tecnico and empresa:
+        nombre = request.POST.get("nombre", "").strip()
+        telefono = request.POST.get("telefono", "").strip()
+        direccion = request.POST.get("direccion", "").strip()
+        if len(nombre) < 2:
+            messages.error(request, "Nombre de técnico demasiado corto.")
+        elif Tecnico.objects.filter(empresa=empresa, nombre__iexact=nombre).exists():
+            messages.error(request, f'Ya existe un técnico llamado "{nombre}".')
+        else:
+            Tecnico.objects.create(
+                empresa=empresa,
+                nombre=nombre,
+                telefono=telefono,
+                direccion=direccion,
+            )
+            messages.success(request, f'Técnico "{nombre}" creado.')
+    elif "toggle_tecnico" in request.POST and Tecnico and empresa:
+        tec_id = request.POST.get("toggle_tecnico")
+        tec = Tecnico.objects.by_empresa(empresa).filter(id=tec_id).first()
+        if tec:
+            tec.activo = not tec.activo
+            tec.save()
+            messages.success(
+                request,
+                f'Técnico "{tec.nombre}" ahora está {"activo" if tec.activo else "inactivo"}.',
+            )
+        else:
+            messages.error(request, "Técnico no encontrado o no pertenece a tu empresa.")
 
     # Técnicos asociados (si el modelo existe)
     tecnicos = []
@@ -116,3 +115,32 @@ def configuracion(request):
         "enable_space_bg": 2,  # modo ligero para esta página
     }
     return render(request, "taller/configuracion.html", context)
+
+
+def crear_documento_test(request):
+    """View simple para probar el formulario de creación de documentos"""
+    from django.http import JsonResponse
+
+    if request.method == "POST":
+        print("=== DATOS RECIBIDOS EN POST ===")
+        print("POST data:", dict(request.POST))
+
+        repuestos_json = request.POST.get("repuestos_json", "[]")
+        servicios_json = request.POST.get("servicios_json", "[]")
+
+        print("\n=== REPUESTOS JSON ===")
+        print(repuestos_json)
+
+        print("\n=== SERVICIOS JSON ===")
+        print(servicios_json)
+
+        return JsonResponse(
+            {
+                "status": "success",
+                "message": "Datos recibidos correctamente",
+                "repuestos": repuestos_json,
+                "servicios": servicios_json,
+            }
+        )
+
+    return render(request, "taller/documentos/create.html")

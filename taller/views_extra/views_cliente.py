@@ -3,6 +3,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.forms.clientes import ClienteForm
 from taller.models.clientes import Cliente
+from taller.utils.redirects import redirect_next
 
 
 @login_required
@@ -19,16 +20,18 @@ def lista_clientes(request):
 
 @login_required
 def crear_cliente(request):
+    next_url = request.POST.get("next") or request.GET.get("next")
+
     if request.method == "POST":
         form = ClienteForm(request.POST)
         if form.is_valid():
             cliente = form.save(commit=False)
             cliente.user = request.user
             cliente.save()
-            return redirect("taller:clientes:lista_clientes")
+            return redirect_next(request, "taller:clientes:lista_clientes")
     else:
         form = ClienteForm()
-    return render(request, "clientes/crear_cliente.html", {"form": form})
+    return render(request, "clientes/crear_cliente.html", {"form": form, "next": next_url})
 
 
 @login_required

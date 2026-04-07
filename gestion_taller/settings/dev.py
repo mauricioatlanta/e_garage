@@ -18,9 +18,12 @@ if os.getenv("DATABASE_URL"):
     # Obtener la URL y verificar si es localhost
     database_url = os.getenv("DATABASE_URL")
     parsed_url = urllib.parse.urlparse(database_url)
+    scheme = (parsed_url.scheme or "").lower()
+    if scheme == "sqlite":
+        DATABASES = {"default": dj_database_url.parse(database_url, conn_max_age=600)}
 
     # Si el host es localhost, construir configuración manualmente (evita problemas con dj_database_url y SSL)
-    if (
+    elif (
         parsed_url.hostname in ("localhost", "127.0.0.1", "::1", None)
         or "localhost" in str(parsed_url.hostname or "").lower()
     ):

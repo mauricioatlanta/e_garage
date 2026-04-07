@@ -15,6 +15,7 @@ app_name = "taller_ecuador"
 urlpatterns = [
     # Redirigir raíz a bienvenida
     path("", RedirectView.as_view(url="/ec/es/bienvenida/", permanent=False), name="ecuador_home"),
+    path("", RedirectView.as_view(url="/ec/es/bienvenida/", permanent=False), name="root"),
     # Dashboard principal de Ecuador
     path(
         "dashboard/",

@@ -17,6 +17,7 @@ app_name = "taller_mexico"
 urlpatterns = [
     # Redirigir raíz a bienvenida
     path("", RedirectView.as_view(url="/mx/es/bienvenida/", permanent=False), name="mexico_home"),
+    path("", RedirectView.as_view(url="/mx/es/bienvenida/", permanent=False), name="root"),
     # Dashboard principal de México
     path(
         "dashboard/",

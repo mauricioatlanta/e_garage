@@ -26,7 +26,8 @@ class BrasilPTTemplateView(TemplateView):
 
 urlpatterns = [
     # /br/ → /br/pt/bienvenida/
-    path("", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
+    path("", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False), name="root"),
+    path("", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False), name="brasil_home"),
     # /br/pt/ → /br/pt/bienvenida/ (entrypoint del funnel BR)
     path("pt/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
     # --- PORTUGUÉS (principal) ---

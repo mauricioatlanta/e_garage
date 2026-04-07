@@ -1,0 +1,374 @@
+{% extends "taller/base.html" %}
+{% load static %}
+
+{% block title %}Crear Documento - Taller{% endblock %}
+
+{% block extra_css %}
+<style>
+    .document-form-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .section-card {
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 24px;
+        margin-bottom: 24px;
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 16px;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #3b82f6;
+    }
+    
+    .table-container {
+        overflow-x: auto;
+    }
+    
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 16px;
+    }
+    
+    .table th {
+        background-color: #f8fafc;
+        padding: 12px 16px;
+        text-align: left;
+        font-weight: 600;
+        color: #475569;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .table td {
+        padding: 12px 16px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+    
+    .table tr:hover {
+        background-color: #f8fafc;
+    }
+    
+    .input-field {
+        width: 100%;
+        padding: 8px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    
+    .input-field:focus {
+        outline: none;
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .btn {
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    
+    .btn-primary {
+        background-color: #3b82f6;
+        color: white;
+        border: none;
+    }
+    
+    .btn-primary:hover {
+        background-color: #2563eb;
+    }
+    
+    .btn-secondary {
+        background-color: #6b7280;
+        color: white;
+        border: none;
+    }
+    
+    .btn-secondary:hover {
+        background-color: #4b5563;
+    }
+    
+    .btn-danger {
+        background-color: #ef4444;
+        color: white;
+        border: none;
+    }
+    
+    .btn-danger:hover {
+        background-color: #dc2626;
+    }
+    
+    .btn-success {
+        background-color: #10b981;
+        color: white;
+        border: none;
+    }
+    
+    .btn-success:hover {
+        background-color: #059669;
+    }
+    
+    .totals-section {
+        background-color: #f0f9ff;
+        border: 1px solid #bae6fd;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    
+    .total-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 0;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .total-row:last-child {
+        border-bottom: none;
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: #1f2937;
+    }
+    
+    .total-label {
+        color: #4b5563;
+    }
+    
+    .total-value {
+        font-weight: 600;
+        color: #1f2937;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        padding-top: 24px;
+        border-top: 1px solid #e2e8f0;
+    }
+    
+    .debug-info {
+        background-color: #fef3c7;
+        border: 1px solid #fbbf24;
+        border-radius: 4px;
+        padding: 12px;
+        margin-top: 16px;
+        font-family: monospace;
+        font-size: 12px;
+        color: #92400e;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="document-form-container">
+    <h1 class="text-2xl font-bold text-gray-800 mb-6">Crear Nuevo Documento</h1>
+    
+    <form id="documento-form" method="post" action="">
+        {% csrf_token %}
+        
+        <!-- Sección: Información básica -->
+        <div class="section-card">
+            <h2 class="section-title">Información del Documento</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Fecha
+                    </label>
+                    <input type="date" name="fecha" class="input-field" 
+                           value="{{ today|date:'Y-m-d' }}" required>
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">
+                        Observaciones
+                    </label>
+                    <textarea name="observaciones" class="input-field" rows="3" 
+                              placeholder="Observaciones adicionales..."></textarea>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Sección: Repuestos -->
+        <div class="section-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="section-title">Repuestos</h2>
+                <button type="button" id="agregar-repuesto-btn" 
+                        class="btn btn-primary">
+                    + Agregar Repuesto
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                            <th>Cantidad</th>
+                            <th>Precio Unitario</th>
+                            <th>Descuento %</th>
+                            <th>IVA %</th>
+                            <th>Subtotal</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="repuestos-container">
+                        <!-- Las filas de repuestos se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="text-sm text-gray-500 mt-2">
+                Total repuestos: <span id="cantidad-repuestos">0</span> items
+            </div>
+        </div>
+        
+        <!-- Sección: Servicios -->
+        <div class="section-card">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="section-title">Servicios</h2>
+                <button type="button" id="agregar-servicio-btn" 
+                        class="btn btn-primary">
+                    + Agregar Servicio
+                </button>
+            </div>
+            
+            <div class="table-container">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Precio</th>
+                            <th>Descuento %</th>
+                            <th>IVA %</th>
+                            <th>Subtotal</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="servicios-container">
+                        <!-- Las filas de servicios se agregarán aquí dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="text-sm text-gray-500 mt-2">
+                Total servicios: <span id="cantidad-servicios">0</span> items
+            </div>
+        </div>
+        
+        <!-- Sección: Totales -->
+        <div class="section-card">
+            <h2 class="section-title">Totales</h2>
+            
+            <div class="totals-section">
+                <div class="total-row">
+                    <span class="total-label">Subtotal Repuestos:</span>
+                    <span id="subtotal-repuestos" class="total-value">$0.00</span>
+                </div>
+                
+                <div class="total-row">
+                    <span class="total-label">Subtotal Servicios:</span>
+                    <span id="subtotal-servicios" class="total-value">$0.00</span>
+                </div>
+                
+                <div class="total-row">
+                    <span class="total-label">Descuento Total:</span>
+                    <span id="descuento-total" class="total-value">$0.00</span>
+                </div>
+                
+                <div class="total-row">
+                    <span class="total-label">IVA Total:</span>
+                    <span id="iva-total" class="total-value">$0.00</span>
+                </div>
+                
+                <div class="total-row">
+                    <span class="total-label">Total General:</span>
+                    <span id="total-general" class="total-value">$0.00</span>
+                </div>
+            </div>
+            
+            <!-- Campo oculto para el total -->
+            <input type="hidden" id="total-hidden" name="total" value="0">
+        </div>
+        
+        <!-- Campos ocultos para datos serializados -->
+        <input type="hidden" name="repuestos_json" id="repuestos-json" value="[]">
+        <input type="hidden" name="servicios_json" id="servicios-json" value="[]">
+        <input type="hidden" name="cliente_id" id="cliente-id" value="">
+        <input type="hidden" name="vehiculo_id" id="vehiculo-id" value="">
+        
+        <!-- Sección: Acciones -->
+        <div class="section-card">
+            <div class="form-actions">
+                <button type="button" id="reset-btn" class="btn btn-secondary">
+                    Reiniciar
+                </button>
+                
+                <button type="button" id="debug-btn" class="btn btn-secondary">
+                    Debug
+                </button>
+                
+                <button type="submit" class="btn btn-success">
+                    Guardar Documento
+                </button>
+            </div>
+        </div>
+        
+        <!-- Sección debug (solo para desarrollo) -->
+        <div class="debug-info">
+            <strong>Debug Info:</strong> Los datos se mostrarán en la consola al enviar el formulario
+        </div>
+    </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script type="module">
+    import DocumentForm from '{% static "js/document-form/index.js" %}';
+    
+    // Inicializar cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Inicializando formulario de documento...');
+        
+        // El formulario se inicializa automáticamente desde index.js
+        // Podemos acceder a él globalmente como window.documentForm
+        
+        // Agregar algunos listeners adicionales si es necesario
+        const form = document.getElementById('documento-form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                console.log('Formulario enviado - verificando datos...');
+                
+                // Mostrar datos en consola antes de enviar
+                if (window.documentForm && window.documentForm.getSerializer) {
+                    const serializer = window.documentForm.getSerializer();
+                    const formData = serializer.serializeForForm();
+                    
+                    console.log('=== DATOS A ENVIAR ===');
+                    console.log('Repuestos JSON:', formData.repuestos_json);
+                    console.log('Servicios JSON:', formData.servicios_json);
+                    console.log('Cliente ID:', formData.cliente_id);
+                    console.log('Vehículo ID:', formData.vehiculo_id);
+                    console.log('Observaciones:', formData.observaciones);
+                    console.log('Fecha:', formData.fecha);
+                    console.log('=====================');
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

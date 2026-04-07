@@ -2,6 +2,7 @@
 
 from django import forms
 from django.forms.widgets import Select
+from django.utils.translation import gettext_lazy as _
 
 from taller.models.clientes import Cliente
 from taller.models.region_ciudad import TallerCiudad, TallerRegion
@@ -54,6 +55,7 @@ class ClienteForm(forms.ModelForm):
     region = forms.ModelChoiceField(
         queryset=TallerRegion.objects.all(),
         required=False,
+        label=_("Regi\u00f3n"),
         widget=forms.Select(
             attrs={
                 "id": "id_region",
@@ -67,6 +69,7 @@ class ClienteForm(forms.ModelForm):
     ciudad = forms.ModelChoiceField(
         queryset=TallerCiudad.objects.none(),
         required=False,
+        label=_("Ciudad"),
         widget=forms.Select(attrs={"id": "id_ciudad", "class": "form-control"}),
         empty_label="Seleccione Ciudad",
     )
@@ -77,6 +80,7 @@ class ClienteForm(forms.ModelForm):
     estado_usa = forms.ModelChoiceField(
         queryset=EstadoUSA.objects.all(),
         required=False,
+        label=_("Estado/Departamento"),
         widget=forms.Select(
             attrs={
                 "id": "id_estado_usa",
@@ -86,14 +90,13 @@ class ClienteForm(forms.ModelForm):
             }
         ),
         empty_label="Seleccione estado o departamento",
-        label="Estado/Departamento",
     )
     ciudad_usa = CiudadChoiceField(
         queryset=CiudadUSA.objects.none(),
         required=False,
+        label=_("Ciudad"),
         widget=forms.Select(attrs={"id": "id_ciudad_usa", "class": "form-control"}),
         empty_label="Seleccione ciudad",
-        label="Ciudad",
     )
     zipcode = forms.CharField(
         required=False,
@@ -115,6 +118,18 @@ class ClienteForm(forms.ModelForm):
             "zipcode",
             "email",
         ]
+        labels = {
+            "nombre": _("Nombre"),
+            "apellido": _("Apellido"),
+            "telefono": _("Teléfono"),
+            "direccion": _("Dirección"),
+            "region": _("Región"),
+            "ciudad": _("Ciudad"),
+            "estado_usa": _("Estado/Departamento"),
+            "ciudad_usa": _("Ciudad"),
+            "zipcode": _("Código Postal"),
+            "email": _("Correo electrónico"),
+        }
         widgets = {
             "nombre": forms.TextInput(attrs={"class": "form-control", "placeholder": "Nombre"}),
             "apellido": forms.TextInput(attrs={"class": "form-control", "placeholder": "Apellido"}),

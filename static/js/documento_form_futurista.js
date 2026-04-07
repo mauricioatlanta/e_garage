@@ -15,6 +15,21 @@ let servicioCounter = 0;
 let otroServicioCounter = 0;
 let currentPaletteTab = 'repuestos';
 
+function getDocumentosBasePath() {
+  const pathname = window.location.pathname || '/';
+  const fullMatch = pathname.match(/^\/([a-z]{2})\/([a-z]{2})\/documentos(?:\/|$)/i);
+  if (fullMatch) {
+    return `/${fullMatch[1].toLowerCase()}/${fullMatch[2].toLowerCase()}/documentos`;
+  }
+
+  const langOnlyMatch = pathname.match(/^\/(es|en|pt)\/documentos(?:\/|$)/i);
+  if (langOnlyMatch) {
+    return `/${langOnlyMatch[1].toLowerCase()}/documentos`;
+  }
+
+  return '/cl/es/documentos';
+}
+
 // UTILIDADES
 function formatCurrency(n) {
   if (country === 'US') {
@@ -97,7 +112,7 @@ function initTipoDocumento() {
 async function searchClientes(q) {
   console.log('🔍 BUSCANDO CLIENTES:', q);
   try {
-    const url = `/cl/documentos/autocomplete/cliente/?q=${encodeURIComponent(q)}`;
+    const url = `${getDocumentosBasePath()}/autocomplete/cliente/?q=${encodeURIComponent(q)}`;
     console.log('📡 URL de búsqueda:', url);
     const response = await fetch(url);
     console.log('📥 Respuesta de API:', response.status, response.statusText);

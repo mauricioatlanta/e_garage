@@ -3,6 +3,7 @@ from datetime import date, timedelta
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import models
 from django.db.models import Count, Q
+from django.http import HttpResponse, JsonResponse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from core.views import TenantViewMixin
@@ -174,6 +175,36 @@ class ClienteDetailView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
 
 class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
+    def _is_ajax_request(self):
+        return (
+            self.request.headers.get("x-requested-with") == "XMLHttpRequest"
+            or self.request.GET.get("ajax") == "1"
+            or self.request.POST.get("ajax") == "1"
+        )
+
+    def _is_modal_request(self):
+        return (
+            self.request.GET.get("modal") or self.request.POST.get("modal") or ""
+        ).strip() == "1"
+
+    def _build_cliente_payload(self):
+        nombre = " ".join(
+            part.strip()
+            for part in [
+                getattr(self.object, "nombre", "") or "",
+                getattr(self.object, "apellido", "") or "",
+            ]
+            if part and part.strip()
+        ).strip()
+        if not nombre:
+            nombre = f"Cliente #{self.object.pk}"
+        return {
+            "id": self.object.pk,
+            "nombre": nombre,
+            "email": getattr(self.object, "email", "") or "",
+            "telefono": getattr(self.object, "telefono", "") or "",
+        }
+
     def get_success_url(self):
         from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
@@ -204,12 +235,57 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         from django.db import IntegrityError
 
         try:
-            return super().form_valid(form)
+            response = super().form_valid(form)
         except IntegrityError as e:
             if "taller_cliente.empresa_id, taller_cliente.email" in str(e):
                 form.add_error("email", "Ya existe un cliente con este email para esta empresa.")
                 return self.form_invalid(form)
             raise
+
+        if self._is_ajax_request():
+            return JsonResponse(
+                {"success": True, "cliente": self._build_cliente_payload()},
+                status=201,
+            )
+
+        if self._is_modal_request():
+            cliente = self._build_cliente_payload()
+            next_url = self.get_success_url()
+            html = f"""<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><title>Cliente creado</title></head>
+<body>
+<script>
+(function() {{
+  var payload = {{
+    type: 'eg:cliente-created',
+    cliente: {{
+      id: '{cliente["id"]}',
+      nombre: {cliente["nombre"]!r},
+      email: {cliente["email"]!r},
+      telefono: {cliente["telefono"]!r}
+    }},
+    next: {next_url!r}
+  }};
+  if (window.parent && window.parent !== window) {{
+    window.parent.postMessage(payload, window.location.origin);
+  }}
+}})();
+</script>
+<p>Cliente creado. Puedes cerrar esta ventana.</p>
+</body>
+</html>"""
+            return HttpResponse(html)
+
+        return response
+
+    def form_invalid(self, form):
+        if self._is_ajax_request():
+            return JsonResponse(
+                {"success": False, "errors": form.errors.get_json_data()},
+                status=400,
+            )
+        return super().form_invalid(form)
 
     model = Cliente
     form_class = None  # Se setea en get_form_class
@@ -235,6 +311,8 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
         # Pasar next para el hidden del form (flujo desde documento/form)
         context["next"] = self.request.GET.get("next") or self.request.POST.get("next") or ""
+        context["modal_mode"] = self._is_modal_request()
+        context["ajax_mode"] = self._is_ajax_request()
 
         # Asegurar que el país esté disponible para el template
         pais = None

@@ -184,8 +184,6 @@ def _reverse_with_request(request, view_name, kwargs=None):
 
     # 2) Intentar con namespaces conocidos de fallback
     fallback_names = [
-        f"documentos_cl_es:{view_name}",
-        f"documentos_us_en:{view_name}",
         f"documentos:{view_name}",
         f"chile:documentos:{view_name}",
         f"usa:documentos:{view_name}",

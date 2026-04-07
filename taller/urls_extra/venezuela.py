@@ -19,6 +19,7 @@ urlpatterns = [
     path(
         "", RedirectView.as_view(url="/ve/es/bienvenida/", permanent=False), name="venezuela_home"
     ),
+    path("", RedirectView.as_view(url="/ve/es/bienvenida/", permanent=False), name="root"),
     # Dashboard principal de Venezuela
     path(
         "dashboard/",
@@ -144,5 +145,4 @@ urlpatterns = [
     path("ajax/", include(("taller.ajax.urls", "ajax"), namespace="ajax")),
     path("api/", include(("taller.api.urls", "api"), namespace="api")),
     # Núcleo taller (al final para no opacar rutas específicas)
-    path("", include(("taller.urls", "taller"), namespace="taller")),
 ]

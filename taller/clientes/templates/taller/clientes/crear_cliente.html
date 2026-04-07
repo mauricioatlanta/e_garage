@@ -290,6 +290,8 @@ textarea.cyber-input::placeholder {
   <form class="space-y-8" method="post">
     {% csrf_token %}
     {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    {% if modal_mode %}<input type="hidden" name="modal" value="1">{% endif %}
+    {% if ajax_mode %}<input type="hidden" name="ajax" value="1">{% endif %}
 
     {% if form.errors %}
       <div class="error-panel">
@@ -550,6 +552,8 @@ function createParticles() {
   <form class="space-y-6" method="post">
     {% csrf_token %}
     {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+    {% if modal_mode %}<input type="hidden" name="modal" value="1">{% endif %}
+    {% if ajax_mode %}<input type="hidden" name="ajax" value="1">{% endif %}
 
     {% if form.errors %}
       <div class="bg-red-900 border border-red-500 rounded p-4 mb-4">

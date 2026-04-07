@@ -610,9 +610,8 @@ class VehiculoForm(forms.ModelForm):
                 url=f"{autocomplete_ns}:motor-autocomplete",
                 attrs={
                     "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
-                    "data-placeholder": "Select or type to create new engine...",
+                    "data-placeholder": "Select engine...",
                     "data-minimum-input-length": 0,
-                    "data-tags": "true",
                 },
                 forward=["modelo"],
             ),
@@ -626,9 +625,8 @@ class VehiculoForm(forms.ModelForm):
                 url=f"{autocomplete_ns}:caja-autocomplete",
                 attrs={
                     "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
-                    "data-placeholder": "Select or type to create new transmission...",
+                    "data-placeholder": "Select transmission...",
                     "data-minimum-input-length": 0,
-                    "data-tags": "true",
                 },
                 forward=["modelo"],
             ),
@@ -698,11 +696,25 @@ class VehiculoForm(forms.ModelForm):
 
         # Campo modelo para país (se carga dinámicamente via JavaScript)
         # ✅ Usar CharField con widget Select para evitar validación de queryset estático
+        modelo_choices = [("", "Selecciona marca y año primero")]
+        # Si hay datos POST con un modelo seleccionado, agregar su opción para que el
+        # widget lo muestre correctamente en caso de re-renderizado por error
+        if self.data and self.data.get("modelo"):
+            try:
+                from taller.models.modelo import Modelo as ModeloModel
+
+                m_id = int(self.data["modelo"])
+                m_obj = ModeloModel.objects.filter(pk=m_id, country=pais).first()
+                if m_obj:
+                    modelo_choices.append((str(m_obj.pk), m_obj.nombre))
+            except (ValueError, TypeError):
+                pass
+
         self.fields["modelo"] = forms.CharField(
             required=True,
             label="Modelo",
             widget=forms.Select(
-                choices=[("", "Selecciona marca y año primero")],
+                choices=modelo_choices,
                 attrs={
                     "class": "w-full px-4 py-2 rounded-xl bg-black/70 text-cyan-200 font-bold focus:outline-none focus:ring-2 focus:ring-cyan-400"
                 },
@@ -734,9 +746,8 @@ class VehiculoForm(forms.ModelForm):
                 url=f"{autocomplete_ns}:motor-autocomplete",
                 attrs={
                     "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
-                    "data-placeholder": "Selecciona o escribe para crear nuevo motor...",
+                    "data-placeholder": "Selecciona un motor...",
                     "data-minimum-input-length": 0,
-                    "data-tags": "true",
                 },
                 forward=["modelo"],
             ),
@@ -750,9 +761,8 @@ class VehiculoForm(forms.ModelForm):
                 url=f"{autocomplete_ns}:caja-autocomplete",
                 attrs={
                     "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
-                    "data-placeholder": "Selecciona o escribe para crear nueva transmisión...",
+                    "data-placeholder": "Selecciona una transmisión...",
                     "data-minimum-input-length": 0,
-                    "data-tags": "true",
                 },
                 forward=["modelo"],
             ),
@@ -765,17 +775,30 @@ class VehiculoForm(forms.ModelForm):
         from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
         from taller.models.modelo import Modelo
 
+        if "motor" not in self.fields or "caja" not in self.fields:
+            return
+
+        # Para vehículos nuevos (sin pk), usar queryset completo por país para que
+        # cualquier motor/caja seleccionado via autocomplete pase la validación.
+        # La asociación M2M se hace en clean_motor/clean_caja.
+        if not (self.instance and self.instance.pk):
+            self.fields["motor"].queryset = MotorVehiculo.objects.filter(country=pais).order_by(
+                "nombre"
+            )
+            self.fields["caja"].queryset = CajaVehiculo.objects.filter(country=pais).order_by(
+                "nombre"
+            )
+            return
+
+        # Para edición: filtrar por modelo actual para mostrar opciones relevantes
         modelo_actual = None
         if self.data and self.data.get("modelo"):
             try:
                 modelo_actual = Modelo.objects.get(pk=self.data.get("modelo"), country=pais)
             except Exception:
                 modelo_actual = None
-        elif self.instance and self.instance.pk and getattr(self.instance, "modelo_id", None):
+        elif getattr(self.instance, "modelo_id", None):
             modelo_actual = self.instance.modelo
-
-        if "motor" not in self.fields or "caja" not in self.fields:
-            return
 
         if modelo_actual:
             self.fields["motor"].queryset = (
@@ -788,41 +811,32 @@ class VehiculoForm(forms.ModelForm):
                 .distinct()
                 .order_by("nombre")
             )
-            if self.instance and self.instance.pk:
-                if self.instance.motor_id:
-                    self.fields["motor"].queryset = (
-                        MotorVehiculo.objects.filter(
-                            Q(country=pais, modelos=modelo_actual) | Q(pk=self.instance.motor_id)
-                        )
-                        .distinct()
-                        .order_by("nombre")
+            if self.instance.motor_id:
+                self.fields["motor"].queryset = (
+                    MotorVehiculo.objects.filter(
+                        Q(country=pais, modelos=modelo_actual) | Q(pk=self.instance.motor_id)
                     )
-                if self.instance.caja_id:
-                    self.fields["caja"].queryset = (
-                        CajaVehiculo.objects.filter(
-                            Q(country=pais, modelos=modelo_actual) | Q(pk=self.instance.caja_id)
-                        )
-                        .distinct()
-                        .order_by("nombre")
+                    .distinct()
+                    .order_by("nombre")
+                )
+            if self.instance.caja_id:
+                self.fields["caja"].queryset = (
+                    CajaVehiculo.objects.filter(
+                        Q(country=pais, modelos=modelo_actual) | Q(pk=self.instance.caja_id)
                     )
+                    .distinct()
+                    .order_by("nombre")
+                )
         else:
-            if self.instance and self.instance.pk:
-                if self.instance.motor_id:
-                    self.fields["motor"].queryset = MotorVehiculo.objects.filter(
-                        pk=self.instance.motor_id
-                    )
-                else:
-                    self.fields["motor"].queryset = MotorVehiculo.objects.filter(
-                        country=pais
-                    ).none()
-                if self.instance.caja_id:
-                    self.fields["caja"].queryset = CajaVehiculo.objects.filter(
-                        pk=self.instance.caja_id
-                    )
-                else:
-                    self.fields["caja"].queryset = CajaVehiculo.objects.filter(country=pais).none()
+            if self.instance.motor_id:
+                self.fields["motor"].queryset = MotorVehiculo.objects.filter(
+                    pk=self.instance.motor_id
+                )
             else:
                 self.fields["motor"].queryset = MotorVehiculo.objects.filter(country=pais).none()
+            if self.instance.caja_id:
+                self.fields["caja"].queryset = CajaVehiculo.objects.filter(pk=self.instance.caja_id)
+            else:
                 self.fields["caja"].queryset = CajaVehiculo.objects.filter(country=pais).none()
 
     def _configurar_valores_iniciales_usa(self):
@@ -1004,10 +1018,10 @@ class VehiculoForm(forms.ModelForm):
                     f"[clean] Modelo no es instancia de Modelo: {type(modelo)}, valor={modelo}"
                 )
 
-        # Validaciones básicas de presencia (ambos países)
-        if not marca:
+        # Validaciones básicas de presencia (solo si clean_marca/clean_modelo no añadieron error ya)
+        if not marca and "marca" not in self.errors:
             self.add_error("marca", "Debe seleccionar una marca")
-        if not modelo:
+        if not modelo and "modelo" not in self.errors:
             self.add_error("modelo", "Debe seleccionar un modelo")
 
         return cleaned_data

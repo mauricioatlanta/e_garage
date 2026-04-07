@@ -10,11 +10,18 @@ from dotenv import load_dotenv
 
 from django.core.management.utils import get_random_secret_key
 
-# Cargar variables de entorno desde .env
-load_dotenv()
-
 # Directorio base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Cargar variables de entorno dando prioridad a .env.local para desarrollo local
+_env_local_path = BASE_DIR / ".env.local"
+_env_path = BASE_DIR / ".env"
+if _env_local_path.exists():
+    load_dotenv(_env_local_path, override=True)
+elif _env_path.exists():
+    load_dotenv(_env_path, override=True)
+else:
+    load_dotenv()
 
 # Modo seguro para diagnóstico
 SAFE_MODE = os.environ.get("EGARAGE_SAFE_MODE") == "1"
@@ -51,6 +58,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     # 1. Seguridad (primero)
     "django.middleware.security.SecurityMiddleware",
+    "gestion_taller.middleware.country_subdomain.CountrySubdomainMiddleware",
     # 2. Sesiones (antes de autenticación)
     "django.contrib.sessions.middleware.SessionMiddleware",
     # 3. Localización (antes de CommonMiddleware)

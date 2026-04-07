@@ -32,9 +32,15 @@ class RBACSegregationBaseTest(TestCase):
     def setUp(self):
         """Configurar empresa única con usuarios de diferentes roles"""
         # === EMPRESA ÚNICA ===
+        self.user_owner = User.objects.create_user(
+            username="owner_test",
+            email="owner@test.com",
+            password="testpass123",
+        )
         self.empresa = Empresa.objects.create(
             nombre_taller="Taller Test RBAC",
             pais="CL",
+            user=self.user_owner,
         )
 
         # === CREAR ROLES (si no existen) ===
@@ -44,11 +50,6 @@ class RBACSegregationBaseTest(TestCase):
         self.tecnico_group, _ = Group.objects.get_or_create(name="Tecnico")
 
         # === USUARIO OWNER ===
-        self.user_owner = User.objects.create_user(
-            username="owner_test",
-            email="owner@test.com",
-            password="testpass123",
-        )
         self.user_owner.empresa = self.empresa
         self.user_owner.groups.add(self.owner_group)
         self.user_owner.save()
@@ -89,7 +90,7 @@ class RBACSegregationBaseTest(TestCase):
             nombre="Cliente Test",
             apellido="RBAC",
             telefono="123456789",
-            email_cliente="cliente@test.com",
+            email="cliente@test.com",
         )
 
         self.vehiculo = Vehiculo.objects.create(

@@ -203,6 +203,18 @@ TEMPLATES[0]["DIRS"] = [str(_base_dir / "templates")]
 # Seguridad extra: evita que alguien meta rutas raras por accidente
 TEMPLATES[0]["DIRS"] = [str(Path(p).resolve()) for p in TEMPLATES[0]["DIRS"]]
 
+# Persistir país/idioma de navegación en cookies canónicas
+_locale_cookie_middleware = "taller.middleware.locale_cookie_middleware.LocaleCookieMiddleware"
+if _locale_cookie_middleware not in MIDDLEWARE:
+    if "django.middleware.locale.LocaleMiddleware" in MIDDLEWARE:
+        _index = MIDDLEWARE.index("django.middleware.locale.LocaleMiddleware") + 1
+        MIDDLEWARE.insert(_index, _locale_cookie_middleware)
+    elif "django.contrib.sessions.middleware.SessionMiddleware" in MIDDLEWARE:
+        _index = MIDDLEWARE.index("django.contrib.sessions.middleware.SessionMiddleware") + 1
+        MIDDLEWARE.insert(_index, _locale_cookie_middleware)
+    else:
+        MIDDLEWARE.insert(0, _locale_cookie_middleware)
+
 # --- FIX FINAL DIGITALOCEAN ---
 DEBUG = False
 

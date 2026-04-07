@@ -10,7 +10,7 @@
 {% block back_button %}
 {% with back_country=country|default:"CL" %}
 {% if back_country == 'US' %}
-    <a href="/us/" class="back-button font-futuristic">
+    <a href="{% url 'us_en:root' %}" class="back-button font-futuristic">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         <span>{% trans "Back" %}</span>
     </a>
@@ -112,7 +112,7 @@
            Solo se muestran errores del formulario (arriba). #}
         {# {% if messages %}{% for message in messages %}...{% endfor %}{% endif %} #}
 
-        <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
+        <form method="POST" action="{% if request.path|slice:':7' == '/us/es/' %}{% url 'us_es_account_login' %}{% else %}{% url 'us_en_account_login' %}{% endif %}" class="space-y-6">
             {% csrf_token %}
             {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
@@ -160,7 +160,7 @@
         </form>
 
         <div class="forgot-password">
-            <a href="{% url 'account_reset_password' %}" class="font-futuristic">
+            <a href="{% if request.path|slice:':7' == '/us/es/' %}{% url 'us_es_account_reset_password' %}{% else %}{% url 'us_en_account_reset_password' %}{% endif %}" class="font-futuristic">
                 <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
@@ -170,7 +170,7 @@
 
         <div class="signup-section">
             <div class="signup-text">{% trans "New to eGarage?" %}</div>
-            <a href="{% url 'account_signup' %}?from={{ country|default:'CL'|lower }}" class="signup-link font-futuristic">
+            <a href="{% if request.path|slice:':7' == '/us/es/' %}{% url 'us_es_account_signup' %}{% else %}{% url 'us_en_account_signup' %}{% endif %}?from={{ country|default:'CL'|lower }}" class="signup-link font-futuristic">
                 {% trans "Create your account" %} →
             </a>
         </div>

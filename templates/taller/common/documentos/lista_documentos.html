@@ -1281,6 +1281,12 @@
 <script>
 // Idioma actual para traducciones JavaScript
 const CURRENT_LANG = '{{ LANGUAGE_CODE|default:request.LANGUAGE_CODE|default:"es" }}';
+const DOCUMENTOS_BASE_PATH = "{% country_url 'documentos:lista_documentos' %}".replace(/\/$/, '');
+
+function buildDocumentosPath(suffix) {
+  const normalizedSuffix = suffix.startsWith('/') ? suffix : `/${suffix}`;
+  return `${DOCUMENTOS_BASE_PATH}${normalizedSuffix}`;
+}
 
 function toggleView(view, element) {
   const cardsView = document.getElementById('vista-cards');
@@ -1338,7 +1344,7 @@ function convertirAOT(presupuestoId) {
     : '¿Convertir este presupuesto a Orden de Trabajo?';
   if (confirm(msg)) {
     // Aquí implementarías la lógica para convertir PRES → OT
-    window.location.href = `/cl/es/documentos/${presupuestoId}/convertir-a-ot/`;
+    window.location.href = buildDocumentosPath(`${presupuestoId}/convertir-a-ot/`);
   }
 }
 
@@ -1348,7 +1354,7 @@ function crearFactura(otId) {
     : '¿Crear factura desde esta Orden de Trabajo?';
   if (confirm(msg)) {
     // Aquí implementarías la lógica para crear FAC desde OT
-    window.location.href = `/cl/es/documentos/${otId}/crear-factura/`;
+    window.location.href = buildDocumentosPath(`${otId}/crear-factura/`);
   }
 }
 
@@ -1367,7 +1373,7 @@ function enviarWhatsApp(documentoId, telefono, nombreCliente) {
   boton.innerHTML = `<i class="fas fa-spinner fa-spin"></i> <span>${sendingText}</span>`;
   boton.disabled = true;
 
-  fetch(`/cl/documentos/${documentoId}/enviar_whatsapp/`, {
+  fetch(buildDocumentosPath(`${documentoId}/enviar_whatsapp/`), {
     method: 'GET',
     headers: {
       'X-Requested-With': 'XMLHttpRequest',

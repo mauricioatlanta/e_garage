@@ -1,5 +1,6 @@
 from decimal import Decimal
 
+from django.conf import settings
 from django.db import models
 
 from taller.configuracion.rubros_responsables import (
@@ -261,6 +262,9 @@ class ConfiguracionEmpresa(models.Model):
             secciones["servicios"] = True
             secciones["otros_servicios"] = False
             secciones["kilometraje"] = True
+
+        if settings.DEBUG:
+            secciones["otros_servicios"] = True
 
         return secciones
 

@@ -1,3 +1,5 @@
+from decimal import Decimal, InvalidOperation
+
 # Formulario unificado y mejorado para Documento
 from dal import autocomplete
 
@@ -102,6 +104,41 @@ class DocumentoForm(forms.ModelForm):
         # Campos obligatorios: solo los esenciales
         # NOTA: 'numero' se autogenera en el modelo, NO es requerido en el form
         required_fields = ["tipo", "fecha_emision", "cliente"]
+
+    @staticmethod
+    def _normalize_decimal(value, default="0", min_value=None, max_value=None):
+        if value in (None, "", "None"):
+            number = Decimal(str(default))
+        elif isinstance(value, Decimal):
+            number = value
+        else:
+            try:
+                number = Decimal(str(value).strip())
+            except (InvalidOperation, TypeError, ValueError):
+                number = Decimal(str(default))
+
+        if min_value is not None and number < min_value:
+            number = min_value
+        if max_value is not None and number > max_value:
+            number = max_value
+        return number
+
+    @classmethod
+    def _normalize_discount_percent(cls, value):
+        return cls._normalize_decimal(
+            value,
+            default="0",
+            min_value=Decimal("0"),
+            max_value=Decimal("100"),
+        )
+
+    @staticmethod
+    def _normalize_positive_int(value, default=1):
+        try:
+            normalized = int(Decimal(str(value if value not in (None, "") else default)))
+        except (InvalidOperation, TypeError, ValueError):
+            normalized = default
+        return max(1, normalized)
 
     def __init__(self, *args, **kwargs):
         # Extraer argumentos personalizados
@@ -325,8 +362,13 @@ class DocumentoForm(forms.ModelForm):
         # En USA, el label puede ser "Mileage" o "Current Mileage"
         # Ya se configuró en _configure_labels_by_language
 
+    def clean_descuento(self):
+        return self._normalize_decimal(self.cleaned_data.get("descuento"), default="0")
+
     def clean(self):
         """Validaciones robustas multi-tenant"""
+        import json
+
         cleaned_data = super().clean()
 
         # Validar que cliente pertenece a la empresa
@@ -372,6 +414,37 @@ class DocumentoForm(forms.ModelForm):
                         "Debe especificar al menos kilometraje o millas cuando hay un vehículo."
                     )
 
+        servicios_data = cleaned_data.get("servicios_json", "[]") or "[]"
+        try:
+            servicios = json.loads(servicios_data)
+        except json.JSONDecodeError:
+            raise forms.ValidationError("El formato de servicios es inv?lido.")
+
+        if not isinstance(servicios, list):
+            raise forms.ValidationError("El formato de servicios es inv?lido.")
+
+        for servicio in servicios:
+            if not isinstance(servicio, dict):
+                raise forms.ValidationError("El formato de servicios es inv?lido.")
+
+            servicio_id = str(servicio.get("servicio_id") or "").strip()
+            nombre = (servicio.get("nombre") or "").strip()
+            precio_raw = servicio.get("precio")
+
+            try:
+                precio = float(precio_raw or 0)
+            except (TypeError, ValueError):
+                precio = 0
+            cantidad = self._normalize_positive_int(servicio.get("cantidad", 1))
+            descuento = self._normalize_discount_percent(servicio.get("descuento", 0))
+
+            if not servicio_id and (nombre or precio > 0):
+                raise forms.ValidationError("Existe un servicio sin seleccionar desde el cat?logo.")
+            if cantidad < 1:
+                raise forms.ValidationError("La cantidad del servicio debe ser al menos 1.")
+            if descuento < 0 or descuento > 100:
+                raise forms.ValidationError("El descuento del servicio debe estar entre 0% y 100%.")
+
         return cleaned_data
 
     def save(self, commit=True):
@@ -387,6 +460,8 @@ class DocumentoForm(forms.ModelForm):
 
         # Guardar el documento (kilometraje_ingreso no está en fields del Meta,
         # así que Django lo ignorará automáticamente)
+        if getattr(self.instance, "descuento", None) in (None, "", "None"):
+            self.instance.descuento = Decimal("0.00")
         documento = super().save(commit=commit)
 
         if commit:
@@ -455,9 +530,9 @@ class DocumentoForm(forms.ModelForm):
                         "documento": documento,
                         "codigo": rep_data.get("codigo", ""),
                         "nombre": rep_data.get("nombre", ""),
-                        "cantidad": rep_data.get("cantidad", 1),
-                        "precio_unitario": rep_data.get("precio", 0),
-                        "descuento": rep_data.get("descuento", 0),
+                        "cantidad": self._normalize_positive_int(rep_data.get("cantidad", 1)),
+                        "precio_unitario": self._normalize_decimal(rep_data.get("precio", 0)),
+                        "descuento": self._normalize_discount_percent(rep_data.get("descuento", 0)),
                         "origen_repuesto": origen,
                     }
                     if is_desarme:
@@ -477,7 +552,7 @@ class DocumentoForm(forms.ModelForm):
             except (json.JSONDecodeError, ValueError):
                 pass
 
-        # Procesar servicios (SIN cantidad: forzamos cantidad=1)
+        # Procesar servicios
         servicios_data = self.cleaned_data.get("servicios_json", "[]")
         if servicios_data:
             try:
@@ -490,8 +565,11 @@ class DocumentoForm(forms.ModelForm):
                             documento=documento,
                             servicio_id=serv_data.get("servicio_id"),
                             nombre=serv_data.get("nombre", ""),
-                            cantidad=1,  # forzamos 1 (sin cantidad en UI)
-                            precio_unitario=serv_data.get("precio", 0),
+                            cantidad=self._normalize_positive_int(serv_data.get("cantidad", 1)),
+                            precio_unitario=self._normalize_decimal(serv_data.get("precio", 0)),
+                            descuento=self._normalize_discount_percent(
+                                serv_data.get("descuento", 0)
+                            ),
                         )
             except (json.JSONDecodeError, ValueError):
                 pass  # Ignorar datos JSON inválidos
@@ -502,17 +580,44 @@ class DocumentoForm(forms.ModelForm):
             try:
                 otros = json.loads(otros_data)
                 for otro_data in otros:
-                    if otro_data.get("servicio_id"):
+                    servicio_id = str(otro_data.get("servicio_id") or "").strip()
+                    nombre = (otro_data.get("nombre") or "").strip()
+                    empresa_ext = (otro_data.get("empresa_ext") or "").strip()
+                    try:
+                        precio_taller = float(otro_data.get("precio_taller") or 0)
+                    except (TypeError, ValueError):
+                        precio_taller = 0
+                    try:
+                        precio_cliente = float(otro_data.get("precio") or 0)
+                    except (TypeError, ValueError):
+                        precio_cliente = 0
+
+                    if not (
+                        servicio_id
+                        or nombre
+                        or empresa_ext
+                        or precio_taller > 0
+                        or precio_cliente > 0
+                    ):
+                        continue
+
+                    if (
+                        servicio_id
+                        or nombre
+                        or empresa_ext
+                        or precio_taller > 0
+                        or precio_cliente > 0
+                    ):
                         from taller.models.lineas_documento import LineaOtroServicio
 
                         LineaOtroServicio.objects.create(
                             documento=documento,
-                            servicio_id=otro_data.get("servicio_id"),
-                            nombre=otro_data.get("nombre", ""),
-                            empresa_externa=otro_data.get("empresa_ext", ""),
+                            servicio_id=servicio_id or None,
+                            nombre=nombre,
+                            empresa_externa=empresa_ext,
                             cantidad=otro_data.get("cantidad", 1),
-                            costo_interno=otro_data.get("precio_taller", 0),
-                            precio_cliente=otro_data.get("precio", 0),
+                            costo_interno=precio_taller,
+                            precio_cliente=precio_cliente,
                         )
             except (json.JSONDecodeError, ValueError):
                 pass  # Ignorar datos JSON inválidos

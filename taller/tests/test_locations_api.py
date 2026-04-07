@@ -21,7 +21,7 @@ class TestLocationsAPI:
 
     def test_locations_requires_country(self, client):
         """Test: country es requerido"""
-        url = "/api/locations"
+        url = "/api/locations/"
         response = client.get(url)
         assert response.status_code == 400
         data = response.json()
@@ -34,7 +34,7 @@ class TestLocationsAPI:
             nombre="Región Metropolitana", codigo="RM", pais="CL", sales_tax=19.00
         )
 
-        url = "/api/locations"
+        url = "/api/locations/"
         response = client.get(url, {"country": "CL"})
 
         assert response.status_code == 200
@@ -53,7 +53,7 @@ class TestLocationsAPI:
         # Crear departamento de prueba
         Estado.objects.create(nombre="Lima", codigo="LIM", pais="PE", sales_tax=18.00)
 
-        url = "/api/locations"
+        url = "/api/locations/"
         response = client.get(url, {"country": "PE"})
 
         assert response.status_code == 200
@@ -68,7 +68,7 @@ class TestLocationsAPI:
         # Crear estado de prueba
         Estado.objects.create(nombre="California", codigo="CA", pais="US", sales_tax=7.25)
 
-        url = "/api/locations"
+        url = "/api/locations/"
         response = client.get(url, {"country": "US"})
 
         assert response.status_code == 200
@@ -83,7 +83,7 @@ class TestLocationsAPI:
 
         Ciudad.objects.create(nombre="Lima", estado=estado, sales_tax_local=0.00)
 
-        url = "/api/locations"
+        url = "/api/locations/"
         response = client.get(url, {"country": "PE", "state": "LIM"})
 
         assert response.status_code == 200
@@ -98,7 +98,7 @@ class TestLocationsAPI:
 
     def test_locations_cities_empty_when_state_not_found(self, client):
         """Test: retorna array vacío si estado no existe"""
-        url = "/api/locations"
+        url = "/api/locations/"
         response = client.get(url, {"country": "PE", "state": "NOEXISTE"})
 
         assert response.status_code == 200
@@ -111,7 +111,7 @@ class TestLocationsAPI:
         # Crear estado
         Estado.objects.create(nombre="Lima", codigo="LIM", pais="PE", sales_tax=18.00)
 
-        url = "/api/locations"
+        url = "/api/locations/"
 
         # Probar con minúsculas
         response1 = client.get(url, {"country": "pe"})
@@ -139,7 +139,7 @@ class TestLocationsAPIMultipleCountries:
                 nombre=f"Estado {country}", codigo=f"{country}1", pais=country, sales_tax=10.00
             )
 
-        url = "/api/locations"
+        url = "/api/locations/"
 
         for country in countries:
             response = client.get(url, {"country": country})
@@ -178,7 +178,7 @@ def sample_location_data(db):
 @pytest.mark.django_db
 def test_locations_with_sample_data(client, sample_location_data):
     """Test: API con datos de muestra completos"""
-    url = "/api/locations"
+    url = "/api/locations/"
 
     # Test Perú
     response = client.get(url, {"country": "PE"})

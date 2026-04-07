@@ -1,0 +1,2930 @@
+﻿
+
+
+
+<!DOCTYPE html>
+<html lang="">
+<head>
+  <meta charset="UTF-8">
+  <title>
+    Taller de admin - 
+
+
+
+
+<!-- Header de PÃ¡gina - Design System -->
+<div class="mb-6 sm:mb-8 px-4 sm:px-6">
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+    <div class="flex-1">
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
+        ðŸ“ Nuevo Documento
+      </h1>
+      <p class="text-sm sm:text-base text-slate-300">
+        Nuevo Documento
+      </p>
+    </div>
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+      <!-- Language Selector -->
+      <form id="language-form-doc" action="/i18n/setlang/" method="post" class="inline">
+        <input type="hidden" name="csrfmiddlewaretoken" value="aCm2Vueg4NfKZI35KJrIfNSqU7CxMkqExXprC5QsL3nx8E67i6Xzn55JukQEbjmn">
+        <input type="hidden" name="next" value="/cl/es/documentos/form/">
+        <input type="hidden" name="language" id="language-input-doc" value="es">
+        <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50" style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
+          <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
+                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 text-gray-400 hover:text-cyan-300"
+                  >
+            ðŸ‡ºðŸ‡¸ EN
+          </button>
+          <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc"
+                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 text-gray-400 hover:text-cyan-300"
+                  >
+            ðŸ‡ªðŸ‡¸ ES
+          </button>
+        </div>
+      </form>
+      
+      <label class="doc-paid-toggle flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
+        <input type="checkbox" name="pagado" id="id_pagado" aria-describedby="id_pagado_helptext">
+        Documento pagado
+      </label>
+    </div>
+  </div>
+</div>
+
+
+
+<script>
+// Ãšnica fuente de verdad para ?next= al ir a crear cliente/vehÃ­culo (pathname + querystring)
+window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
+  return encodeURIComponent(window.location.pathname + (window.location.search || ''));
+};
+
+// Funciones para abrir modales de cliente y vehÃ­culo - Disponibles inmediatamente
+(function() {
+  'use strict';
+  
+  function openClienteModal() {
+    try {
+      const pathBase = window.location.pathname || '/cl/documentos/form/';
+      const nextUrl = window.egEncodeDocumentFormNext();
+      
+      // Parsear el path: /cl/documentos/form/ -> ['cl', 'documentos', 'form'] (sin search)
+      const pathParts = pathBase.split('/').filter(function(p) { return p && p.length > 0; });
+      
+      // Detectar paÃ­s e idioma desde el path
+      let countryPrefix = 'cl';
+      let langPrefix = 'es';
+      
+      if (pathParts.length > 0) {
+        countryPrefix = pathParts[0];
+        if (pathParts.length > 1 && (pathParts[1] === 'es' || pathParts[1] === 'en')) {
+          langPrefix = pathParts[1];
+        }
+      }
+      
+      const createUrl = '/' + countryPrefix + '/' + langPrefix + '/clientes/crear/?next=' + nextUrl;
+      console.log('ðŸ”µ Abriendo modal de cliente:', createUrl);
+      window.location.href = createUrl;
+    } catch (error) {
+      console.error('âŒ Error al abrir modal de cliente:', error);
+      alert('Error al abrir la pÃ¡gina de crear cliente. Por favor, intente nuevamente.');
+    }
+  }
+
+  function openVehiculoModal() {
+    try {
+      const pathOnly = window.location.pathname || '/cl/documentos/form/';
+      const nextUrl = window.egEncodeDocumentFormNext();
+      
+      // Obtener el cliente seleccionado
+      // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
+      let clienteId = null;
+      const clienteSelect = document.getElementById('id_cliente');
+      
+      if (clienteSelect) {
+        // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
+        if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
+          clienteId = jQuery(clienteSelect).val();
+          console.log('ðŸ‘¤ Cliente obtenido desde Select2:', clienteId);
+        } else {
+          // Fallback: obtener del campo directamente
+          clienteId = clienteSelect.value || null;
+          console.log('ðŸ‘¤ Cliente obtenido del campo:', clienteId);
+        }
+      }
+      
+      // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
+      if (!clienteId && window.jQuery) {
+        const select2Container = jQuery('#id_cliente').next('.select2-container');
+        if (select2Container.length) {
+          const select2Selection = select2Container.find('.select2-selection__rendered');
+          const dataId = select2Selection.attr('data-id');
+          if (dataId) {
+            clienteId = dataId;
+            console.log('ðŸ‘¤ Cliente obtenido desde data-id:', clienteId);
+          }
+        }
+      }
+      
+      // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+      // Si empieza con /us/, usar /us/en/
+      let countryPrefix = 'cl';
+      let langPrefix = 'es';
+      
+      if (pathOnly.indexOf('/cl/') === 0) {
+        countryPrefix = 'cl';
+        langPrefix = 'es';
+      } else if (pathOnly.indexOf('/us/') === 0) {
+        countryPrefix = 'us';
+        langPrefix = 'en';
+      }
+      
+      let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
+      
+      // Agregar cliente_id si estÃ¡ seleccionado
+      if (clienteId) {
+        createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+        console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
+      }
+      
+      console.log('ðŸš— Abriendo modal de vehÃ­culo:', createUrl);
+      window.location.href = createUrl;
+    } catch (error) {
+      console.error('âŒ Error al abrir modal de vehÃ­culo:', error);
+      alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
+    }
+  }
+
+  // Hacer funciones disponibles globalmente inmediatamente
+  window.openClienteModal = openClienteModal;
+  window.openVehiculoModal = openVehiculoModal;
+  
+  // Verificar que las funciones estÃ©n disponibles
+  console.log('âœ… Funciones de modal disponibles:', {
+    openClienteModal: typeof window.openClienteModal,
+    openVehiculoModal: typeof window.openVehiculoModal
+  });
+})();
+
+// FunciÃ³n global para manejar el click del botÃ³n de vehÃ­culo
+// Esta funciÃ³n se llama directamente desde el onclick del botÃ³n como respaldo
+function handleNuevoVehiculoClick(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  
+  console.log('ðŸš— handleNuevoVehiculoClick llamado');
+  
+  try {
+    // Intentar usar openVehiculoModal si estÃ¡ disponible
+    if (window.openVehiculoModal && typeof window.openVehiculoModal === 'function') {
+      console.log('âœ… Usando openVehiculoModal desde handleNuevoVehiculoClick');
+      window.openVehiculoModal();
+      return false;
+    }
+    
+    // Fallback: construir URL manualmente
+    const pathOnly = window.location.pathname || '/cl/documentos/form/';
+    const nextUrl = window.egEncodeDocumentFormNext();
+    
+    // Obtener el cliente seleccionado
+    // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
+    let clienteId = null;
+    const clienteSelect = document.getElementById('id_cliente');
+    
+    console.log('ðŸ” Buscando cliente seleccionado...');
+    console.log('ðŸ” Campo cliente encontrado:', !!clienteSelect);
+    
+    if (clienteSelect) {
+      console.log('ðŸ” Valor directo del campo:', clienteSelect.value);
+      console.log('ðŸ” jQuery disponible:', !!window.jQuery);
+      
+      // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
+      if (window.jQuery) {
+        const $clienteSelect = jQuery(clienteSelect);
+        console.log('ðŸ” Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
+        
+        if ($clienteSelect.hasClass('select2-hidden-accessible')) {
+          clienteId = $clienteSelect.val();
+          console.log('âœ… Cliente obtenido desde Select2:', clienteId);
+        } else {
+          // Fallback: obtener del campo directamente
+          clienteId = clienteSelect.value || null;
+          console.log('âœ… Cliente obtenido del campo directamente:', clienteId);
+        }
+      } else {
+        // Sin jQuery, obtener del campo directamente
+        clienteId = clienteSelect.value || null;
+        console.log('âœ… Cliente obtenido del campo (sin jQuery):', clienteId);
+      }
+    }
+    
+    // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
+    if (!clienteId && window.jQuery) {
+      console.log('ðŸ” Intentando obtener cliente desde Select2 rendered...');
+      const select2Container = jQuery('#id_cliente').next('.select2-container');
+      if (select2Container.length) {
+        const select2Selection = select2Container.find('.select2-selection__rendered');
+        const select2Text = select2Selection.text();
+        console.log('ðŸ” Texto en Select2:', select2Text);
+        // Intentar obtener el ID desde el atributo data
+        const dataId = select2Selection.attr('data-id');
+        if (dataId) {
+          clienteId = dataId;
+          console.log('âœ… Cliente obtenido desde data-id:', clienteId);
+        }
+      }
+    }
+    
+    console.log('ðŸ” Cliente ID final:', clienteId);
+    
+    // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+    // Si empieza con /us/, usar /us/en/
+    let countryPrefix = 'cl';
+    let langPrefix = 'es';
+    
+    if (pathOnly.indexOf('/cl/') === 0) {
+      countryPrefix = 'cl';
+      langPrefix = 'es';
+    } else if (pathOnly.indexOf('/us/') === 0) {
+      countryPrefix = 'us';
+      langPrefix = 'en';
+    }
+    
+    let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
+    
+    // Agregar cliente_id si estÃ¡ seleccionado
+    if (clienteId) {
+      createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+      console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
+    }
+    
+    console.log('ðŸš— Navegando a (desde handleNuevoVehiculoClick):', createUrl);
+    window.location.href = createUrl;
+    return false;
+  } catch (error) {
+    console.error('âŒ Error en handleNuevoVehiculoClick:', error);
+    alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
+    return false;
+  }
+}
+
+// Hacer la funciÃ³n disponible globalmente
+window.handleNuevoVehiculoClick = handleNuevoVehiculoClick;
+
+function submitLanguageDoc(lang) {
+  document.getElementById('language-input-doc').value = lang;
+  document.getElementById('language-form-doc').submit();
+}
+</script>
+
+  </title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  
+  <meta name="theme-color" content="#0a0e27">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="eGarage">
+  <link rel="manifest" href="/cl/es/manifest.json">
+  <link rel="apple-touch-icon" href="/static/images/egarage_icon_192x192.png">
+  <link rel="icon" type="image/png" sizes="192x192" href="/static/images/egarage_icon_192x192.png">
+  <link rel="icon" type="image/png" sizes="512x512" href="/static/images/egarage_icon_512x512.png">
+  <link rel="icon" type="image/svg+xml" href="/static/images/egarage_default_logo.svg">
+  
+  
+  <script src="/static/js/ios-password-fix.js?v=2.1.2" defer></script>
+
+  
+  <link rel="stylesheet" href="/static/css/pwa-install-prompt.css?v=2.1.2">
+
+  
+  <script src="/jsi18n/"></script>
+
+  
+  <link rel="stylesheet" href="/static/css/dashboard.css">
+  <link rel="stylesheet" href="/static/css/output.css">
+
+  
+  
+    <link rel="stylesheet" href="/static/css/starfield.css">
+  
+
+  
+  <style>
+    /* Prioridad: COLOR_PRIMARIO desde logo_empresa > company_color desde company_branding > default */
+    :root{
+      --company-primary: #1a202c;
+      --company-secondary: #6c757d;
+      
+      /* Variables de Bootstrap para compatibilidad */
+      --bs-primary: #1a202c;
+      --bs-secondary: #6c757d;
+    }
+    
+    /* Estilos base con colores personalizados */
+    .text-primary,.navbar-brand{color:var(--company-primary)!important}
+    .bg-primary{background-color:var(--company-primary)!important}
+    .btn-primary{
+        background-color:var(--company-primary)!important;
+        border-color:var(--company-primary)!important;
+        /* Mejora legibilidad del texto en botones con colores claros */
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+        color: #ffffff !important;
+    }
+    
+    /* Efectos hover y bordes con transparencia para botones de navegación */
+    .nav-button-standard {
+        border-color: #1a202c4D; /* 4D = 30% opacidad */
+        /* Mejora legibilidad del texto en botones de navegación */
+        text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
+    
+    .nav-button-standard:hover {
+        box-shadow: 0 0 20px #1a202c66; /* 66 = 40% opacidad */
+        border-color: var(--company-primary);
+    }
+    .btn-primary:hover{
+      background-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
+      border-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
+    }
+    .border-primary{border-color:var(--company-primary)!important}
+    .company-logo{max-height:220px;max-width:500px;object-fit:contain;transition:transform 0.3s ease,filter 0.3s ease}
+    .company-logo:hover{transform:scale(1.05);filter:drop-shadow(0 0 25px rgba(0,245,255,0.9))!important}
+    .company-header{
+      background:linear-gradient(135deg,rgba(10,14,39,0.95) 0%,rgba(15,23,52,0.95) 50%,rgba(10,14,39,0.95) 100%);
+      border-bottom:3px solid rgba(0,212,255,0.6);
+      box-shadow:0 10px 40px rgba(0,212,255,0.3),inset 0 1px 0 rgba(0,255,255,0.2);
+      backdrop-filter:blur(10px)
+    }
+    .company-title{
+      font-family:'Orbitron','Arial Black',monospace !important;
+      color:#00ffff !important;
+      text-shadow:
+        0 0 20px rgba(0,255,255,1),
+        0 0 40px rgba(0,212,255,0.8),
+        0 0 60px rgba(0,212,255,0.6),
+        0 2px 10px rgba(0,0,0,0.8) !important;
+      filter:drop-shadow(0 4px 12px rgba(0,212,255,0.5));
+      font-weight:900 !important;
+      letter-spacing:2px !important;
+      animation:title-glow 3s ease-in-out infinite
+    }
+    @keyframes title-glow{
+      0%,100%{text-shadow:0 0 20px rgba(0,255,255,1),0 0 40px rgba(0,212,255,0.8),0 0 60px rgba(0,212,255,0.6),0 2px 10px rgba(0,0,0,0.8)}
+      50%{text-shadow:0 0 30px rgba(0,255,255,1),0 0 60px rgba(0,212,255,1),0 0 90px rgba(0,212,255,0.8),0 2px 10px rgba(0,0,0,0.8)}
+    }
+    
+    /* Fix de contraste para móvil - NOMBRE DE EMPRESA VISIBLE */
+    @media screen and (max-width: 768px) {
+      .company-title {
+        color: #00ffff !important;
+        font-size: 1.5rem !important;
+        text-shadow: 
+          0 0 20px rgba(0, 255, 255, 1),
+          0 0 40px rgba(0, 255, 255, 0.8),
+          0 2px 8px rgba(0, 0, 0, 1) !important;
+        font-weight: 900 !important;
+        -webkit-text-stroke: 1px rgba(0, 255, 255, 0.3);
+      }
+      
+      .company-tagline,
+      header .text-gray-300,
+      header .text-gray-400 {
+        color: #b0e0ff !important;
+        text-shadow: 0 0 10px rgba(176, 224, 255, 0.6) !important;
+      }
+    }
+
+    /* Botones de navegación compactos y elegantes */
+    .nav-button-standard {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.4rem 0.75rem;
+      background: linear-gradient(135deg, rgba(8, 18, 32, 0.96) 0%, rgba(12, 24, 40, 0.96) 100%);
+      border: 1px solid rgba(0, 212, 255, 0.25);
+      border-radius: 6px;
+      text-decoration: none;
+      color: #a8d8ea;
+      font-weight: 500;
+      font-size: 0.75rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: all 0.25s ease;
+      position: relative;
+      overflow: visible;
+      white-space: nowrap;
+      isolation: isolate;
+      box-shadow: 0 1px 4px rgba(0, 212, 255, 0.12);
+    }
+
+    .nav-button-standard::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 6px;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .nav-button-standard::after {
+      content: none;
+    }
+
+    .nav-button-standard:hover {
+      transform: translateY(-1px);
+      border-color: rgba(0, 212, 255, 0.5);
+      color: #e0f7ff;
+      background: linear-gradient(135deg, rgba(12, 28, 48, 0.98) 0%, rgba(18, 38, 60, 0.98) 100%);
+      box-shadow: 0 2px 12px rgba(0, 212, 255, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .nav-button-standard:hover::before {
+      opacity: 0.8;
+    }
+
+    .nav-button-standard:active {
+      transform: translateY(0);
+    }
+
+    .nav-button-standard .nav-icon {
+      font-size: 1rem;
+      line-height: 1;
+      filter: drop-shadow(0 0 2px rgba(0, 212, 255, 0.4));
+      transition: filter 0.2s ease;
+      position: relative;
+      z-index: 1;
+    }
+
+    .nav-button-standard:hover .nav-icon {
+      filter: drop-shadow(0 0 4px rgba(0, 255, 255, 0.7));
+    }
+
+    .nav-button-standard span:last-child,
+    .nav-button-standard .nav-text {
+      position: relative;
+      z-index: 1;
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: #00d4ff;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 6px rgba(0, 212, 255, 0.4);
+      display: inline-block;
+    }
+
+    .nav-button-standard:hover span:last-child,
+    .nav-button-standard:hover .nav-text {
+      color: #7dd3fc;
+      text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
+    }
+
+    /* Estilo para botón de salir (rojo eléctrico) */
+    .nav-button-standard.logout-btn {
+      border-color: rgba(239, 68, 68, 0.3);
+      color: #ffb3b3;
+    }
+
+    .nav-button-standard.logout-btn::before {
+      display: none;
+    }
+
+    .nav-button-standard.logout-btn:hover {
+      border-color: rgba(239, 68, 68, 0.6);
+      box-shadow: 0 2px 12px rgba(239, 68, 68, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .nav-button-standard.logout-btn .nav-icon {
+      filter: drop-shadow(0 0 3px rgba(239, 68, 68, 0.6));
+    }
+
+    .nav-button-standard.logout-btn:hover .nav-icon {
+      filter: drop-shadow(0 0 6px rgba(255, 100, 100, 1));
+    }
+
+    .nav-button-standard.logout-btn span:last-child {
+      text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
+    }
+
+    .nav-button-standard.logout-btn:hover span:last-child {
+      text-shadow: 0 0 12px rgba(255, 100, 100, 0.8);
+    }
+
+    /* Responsive: botones compactos en móviles */
+    @media (max-width: 768px) {
+      .nav-button-standard {
+        padding: 0.35rem 0.5rem;
+        font-size: 0.65rem;
+        gap: 0.2rem;
+        min-width: 0;
+        flex: 1 1 auto;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 52px;
+      }
+
+      .nav-button-standard span:last-child,
+      .nav-button-standard .nav-text {
+        display: block !important;
+        font-family: 'Orbitron', monospace !important;
+        font-weight: 600 !important;
+        font-size: 0.65rem !important;
+        color: #00d4ff !important;
+        text-shadow: 0 0 4px rgba(0, 212, 255, 0.5) !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        white-space: nowrap !important;
+        text-align: center !important;
+        line-height: 1.2 !important;
+        margin-top: 0.15rem !important;
+        letter-spacing: 0.3px !important;
+        text-transform: uppercase !important;
+      }
+
+      .nav-button-standard .nav-icon {
+        font-size: 1.05rem !important;
+        display: block !important;
+        margin-bottom: 0 !important;
+        filter: drop-shadow(0 0 2px rgba(0, 212, 255, 0.5)) !important;
+      }
+
+      #main-navigation .flex.flex-col > div {
+        display: grid !important;
+        grid-template-columns: repeat(auto-fit, minmax(72px, 1fr));
+        gap: 0.4rem;
+        width: 100%;
+        max-width: 100%;
+        padding: 0 0.4rem;
+      }
+
+      #main-navigation .flex.flex-col > div:first-child {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      #main-navigation .flex.flex-col > div:last-child {
+        grid-template-columns: repeat(5, 1fr);
+      }
+
+      @media (max-width: 480px) {
+        #main-navigation .flex.flex-col > div:first-child {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        #main-navigation .flex.flex-col > div:last-child {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .nav-button-standard {
+          padding: 0.3rem 0.35rem;
+          font-size: 0.6rem;
+          gap: 0.15rem;
+          min-height: 48px;
+          border-radius: 5px;
+        }
+
+        .nav-button-standard span:last-child,
+        .nav-button-standard .nav-text {
+          font-size: 0.6rem !important;
+          margin-top: 0.1rem !important;
+        }
+
+        .nav-button-standard .nav-icon {
+          font-size: 0.95rem !important;
+        }
+      }
+
+      @media (min-width: 481px) and (max-width: 640px) {
+        #main-navigation .flex.flex-col > div:first-child {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        #main-navigation .flex.flex-col > div:last-child {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        .nav-button-standard {
+          padding: 0.32rem 0.45rem;
+          min-height: 50px;
+        }
+
+        .nav-button-standard .nav-text {
+          font-size: 0.64rem !important;
+        }
+
+        .nav-button-standard .nav-icon {
+          font-size: 1rem !important;
+        }
+      }
+    }
+
+    @media screen and (max-width: 1024px) {
+      .nav-button-standard {
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+      }
+
+      .nav-button-standard .nav-text,
+      .nav-button-standard span:not(.nav-icon) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.7rem !important;
+        font-weight: 600 !important;
+        color: #00d4ff !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        margin-top: 0.15rem !important;
+      }
+
+      .nav-button-standard .nav-icon {
+        display: block !important;
+        margin-bottom: 0 !important;
+      }
+    }
+
+    @media screen and (max-width: 480px) {
+      body #main-navigation .nav-button-standard {
+        min-height: 48px !important;
+        padding: 0.3rem 0.35rem !important;
+      }
+
+      body #main-navigation .nav-button-standard span.nav-text,
+      body #main-navigation .nav-button-standard span[class="nav-text"],
+      body #main-navigation a.nav-button-standard > span:not(.nav-icon) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        font-size: 0.6rem !important;
+        font-weight: 600 !important;
+        color: #00d4ff !important;
+        margin-top: 0.1rem !important;
+      }
+
+      body #main-navigation .nav-button-standard .nav-icon {
+        font-size: 0.95rem !important;
+      }
+    }
+
+    /* Mobile hardening: labels in quick menu must stay visible */
+    @media screen and (max-width: 768px) {
+      body #main-navigation .nav-button-standard {
+        display: inline-flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 56px !important;
+        padding: 0.42rem 0.45rem !important;
+        gap: 0.2rem !important;
+        overflow: visible !important;
+      }
+
+      body #main-navigation .nav-button-standard .nav-icon {
+        display: block !important;
+        line-height: 1 !important;
+        font-size: 1.05rem !important;
+      }
+
+      body #main-navigation .nav-button-standard .nav-text,
+      body #main-navigation a.nav-button-standard > span:not(.nav-icon),
+      body #main-navigation button.nav-button-standard > span:not(.nav-icon) {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        color: #ffffff !important;
+        font-size: 0.74rem !important;
+        font-weight: 700 !important;
+        line-height: 1.15 !important;
+        text-transform: none !important;
+        text-align: center !important;
+        white-space: nowrap !important;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
+      }
+    }
+
+    @media screen and (min-width: 481px) and (max-width: 768px) {
+      body #main-navigation .nav-button-standard {
+        min-height: 52px !important;
+      }
+
+      body #main-navigation .nav-button-standard span.nav-text,
+      body #main-navigation a.nav-button-standard > span:not(.nav-icon) {
+        display: block !important;
+        font-size: 0.65rem !important;
+        font-weight: 600 !important;
+        color: #00d4ff !important;
+      }
+    }
+
+    /* Desarme dashboard: chrome operativo compacto (body.eg-desarme-dashboard-compact) */
+    .eg-desarme-dashboard-compact header.company-header {
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.5rem 0.75rem;
+      border-bottom-width: 2px;
+      box-shadow: 0 4px 18px rgba(0, 212, 255, 0.12), inset 0 1px 0 rgba(0, 255, 255, 0.08);
+    }
+    .eg-desarme-dashboard-compact header.company-header > .flex.items-center {
+      flex: 1;
+      min-width: 0;
+      gap: 0.65rem !important;
+      align-items: center !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header .company-logo {
+      height: 64px !important;
+      max-height: 68px !important;
+      width: auto !important;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.45) !important;
+      filter: drop-shadow(0 0 8px rgba(0, 245, 255, 0.45)) !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header .company-logo:hover {
+      transform: none;
+      filter: drop-shadow(0 0 10px rgba(0, 245, 255, 0.55)) !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header h1 {
+      font-size: 1.05rem !important;
+      line-height: 1.2 !important;
+      letter-spacing: 0.06em !important;
+      font-weight: 800 !important;
+      text-shadow: 0 0 12px rgba(0, 255, 255, 0.45), 0 1px 6px rgba(0, 0, 0, 0.85) !important;
+    }
+    .eg-desarme-dashboard-compact header.company-header .company-tagline {
+      font-size: 0.7rem !important;
+      font-weight: 500 !important;
+      margin-top: 0.1rem !important;
+      opacity: 0.85;
+      text-shadow: 0 0 6px rgba(0, 255, 255, 0.35) !important;
+    }
+    @media (max-width: 640px) {
+      .eg-desarme-dashboard-compact header.company-header .company-tagline {
+        display: none;
+      }
+      .eg-desarme-dashboard-compact header.company-header h1 {
+        font-size: 0.95rem !important;
+      }
+      .eg-desarme-dashboard-compact header.company-header .company-logo {
+        height: 52px !important;
+        max-height: 56px !important;
+      }
+    }
+    .eg-desarme-dashboard-compact #main-navigation {
+      margin-top: 0.25rem;
+      margin-bottom: 0.15rem;
+      padding-bottom: 0.15rem;
+      gap: 0.35rem;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      max-width: 100%;
+    }
+    .eg-desarme-dashboard-compact #main-navigation > div {
+      display: contents;
+    }
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard,
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard.logout-btn {
+      flex-direction: row !important;
+      align-items: center !important;
+      justify-content: center !important;
+      min-height: 34px !important;
+      padding: 0.28rem 0.55rem !important;
+      border-radius: 6px;
+      gap: 0.3rem !important;
+      box-shadow: 0 1px 4px rgba(0, 212, 255, 0.1);
+    }
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard .nav-icon {
+      font-size: 0.95rem !important;
+      margin-bottom: 0 !important;
+    }
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard .nav-text,
+    .eg-desarme-dashboard-compact #main-navigation .nav-button-standard span:last-child {
+      display: inline !important;
+      margin-top: 0 !important;
+      font-size: 0.62rem !important;
+    }
+    @media (max-width: 768px) {
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard,
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard.logout-btn {
+        min-height: 36px !important;
+        padding: 0.26rem 0.45rem !important;
+        flex: 0 1 auto;
+      }
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard .nav-text,
+      .eg-desarme-dashboard-compact #main-navigation .nav-button-standard span:last-child {
+        font-size: 0.58rem !important;
+      }
+    }
+  </style>
+
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" referrerpolicy="no-referrer" />
+  
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  
+  <script>
+  (function() {
+    // Detectar si es móvil
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    
+    if (!isMobile) {
+      console.log('✅ Desktop detectado - sin restricciones de scroll');
+      return; // En desktop, no aplicar restricciones
+    }
+
+    console.log('📱 Móvil detectado - activando protección anti-scroll automático');
+
+    // Flag para detectar interacción real del usuario
+    let isUserInteraction = false;
+    let scrollLock = false;
+    let initialScrollPos = 0;
+
+    // Marcar interacción del usuario en eventos táctiles y de mouse
+    ['touchstart', 'touchmove', 'mousedown', 'wheel', 'scroll'].forEach(function(event) {
+      document.addEventListener(event, function() {
+        isUserInteraction = true;
+        setTimeout(function() { isUserInteraction = false; }, 100);
+      }, { passive: true, capture: true });
+    });
+
+    // Función para restaurar posición de scroll
+    function preventAutoScroll() {
+      if (scrollLock && !isUserInteraction) {
+        window.scrollTo(0, initialScrollPos);
+        document.documentElement.scrollTop = initialScrollPos;
+        document.body.scrollTop = initialScrollPos;
+      }
+    }
+
+    // Interceptar window.scrollTo
+    const origScrollTo = window.scrollTo;
+    window.scrollTo = function(x, y) {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scrollTo(' + x + ',' + y + ') sin interacción del usuario');
+        return; // Bloquear scroll automático
+      }
+      return origScrollTo.call(window, x, y);
+    };
+
+    // Interceptar scrollIntoView
+    const origScrollIntoView = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = function() {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scrollIntoView en', this.tagName, this.id || this.className);
+        return; // Bloquear scrollIntoView automático
+      }
+      return origScrollIntoView.apply(this, arguments);
+    };
+
+    // Interceptar window.scroll
+    const origScroll = window.scroll;
+    window.scroll = function(x, y) {
+      if (isMobile && !isUserInteraction && scrollLock) {
+        console.log('🚫 Bloqueado: scroll(' + x + ',' + y + ') sin interacción del usuario');
+        return;
+      }
+      return origScroll.call(window, x, y);
+    };
+
+    // Modificar focus para no hacer scroll en móviles
+    const origFocus = HTMLElement.prototype.focus;
+    HTMLElement.prototype.focus = function(options) {
+      if (isMobile) {
+        // En móviles, focus sin scroll
+        const newOptions = Object.assign({}, options, { preventScroll: true });
+        return origFocus.call(this, newOptions);
+      }
+      return origFocus.call(this, options);
+    };
+
+    // Activar protección al cargar la página
+    document.addEventListener('DOMContentLoaded', function() {
+      initialScrollPos = window.pageYOffset || document.documentElement.scrollTop || 0;
+      scrollLock = true;
+      
+      // Mantener lock por 3 segundos después de carga
+      setTimeout(function() {
+        scrollLock = false;
+        console.log('✅ Protección anti-scroll desactivada - página cargada');
+      }, 3000);
+
+      // Prevenir scroll en focus de inputs
+      document.addEventListener('focusin', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+          if (!isUserInteraction) {
+            const scrollBefore = window.pageYOffset || document.documentElement.scrollTop || 0;
+            setTimeout(function() {
+              const scrollAfter = window.pageYOffset || document.documentElement.scrollTop || 0;
+              if (Math.abs(scrollAfter - scrollBefore) > 3) {
+                window.scrollTo(0, scrollBefore);
+                document.documentElement.scrollTop = scrollBefore;
+                document.body.scrollTop = scrollBefore;
+              }
+            }, 0);
+          }
+        }
+      }, true);
+    });
+
+    // Prevenir scroll al abrir/cerrar teclado virtual
+    let lastHeight = window.innerHeight;
+    window.addEventListener('resize', function() {
+      const currentHeight = window.innerHeight;
+      if (Math.abs(currentHeight - lastHeight) > 100) {
+        // Cambio grande = probablemente teclado virtual
+        setTimeout(preventAutoScroll, 50);
+      }
+      lastHeight = currentHeight;
+    });
+
+    console.log('✅ Protección anti-scroll activada para móvil');
+  })();
+  </script>
+
+  
+  
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+  
+  <link href="/static/admin/css/vendor/select2/select2.css" media="screen" rel="stylesheet">
+<link href="/static/admin/css/autocomplete.css" media="screen" rel="stylesheet">
+<link href="/static/autocomplete_light/select2.css" media="screen" rel="stylesheet">
+  
+  
+<style>
+/* 🎨 Estilo futurista para formularios de documentos */
+:root {
+    --cyber-blue: #00ffff;
+    --cyber-green: #00ff88;
+    --cyber-purple: #8000ff;
+    --cyber-red: #ff0044;
+    --cyber-gold: #ffd700;
+    --cyber-orange: #ff8800;
+    --dark-bg: #0a0a0a;
+    --card-bg: rgba(16, 20, 24, 0.95);
+    --glass-bg: rgba(255, 255, 255, 0.05);
+}
+
+body {
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    color: #ffffff;
+    font-family: 'Inter', 'Segoe UI', sans-serif;
+}
+
+.cyber-container {
+    background: var(--card-bg);
+    border: 1px solid rgba(0, 255, 255, 0.25);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+}
+
+.form-section {
+    background: var(--card-bg);
+    border: 1px solid var(--cyber-purple);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+}
+
+.section-title {
+    color: var(--cyber-blue);
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    color: #ffffff !important;
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 0.5rem;
+    display: block;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* 🎯 ESTILOS PARA ETIQUETAS - MEJOR CONTRASTE */
+label,
+.form-label,
+.form-group label,
+.form-check-label {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* Estilos para etiquetas de campos específicos */
+#document-form label,
+#document-form .form-label {
+    color: #ffffff !important;
+    font-weight: bold !important;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8) !important;
+}
+
+/* 🎨 ESTILOS UNIFICADOS - SOBRIOS: menos altura, sin glow permanente */
+.form-input,
+.form-select,
+.form-textarea,
+.form-control,
+input[type="text"],
+input[type="date"],
+input[type="number"],
+input[type="email"],
+input[type="tel"],
+input[type="password"],
+input[type="search"],
+input[type="url"],
+select,
+textarea,
+input {
+    background: rgba(15, 15, 35, 0.98) !important;
+    border: 1px solid rgba(128, 0, 255, 0.4) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    color: #ffffff !important;
+    font-size: 0.9rem !important;
+    font-weight: 500 !important;
+    width: 100% !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease !important;
+    min-height: 36px !important;
+    line-height: 1.35 !important;
+    box-shadow: none !important;
+}
+
+/* 🎯 FORZAR ESTILOS NEGROS PARA TODOS LOS INPUTS - SIN EXCEPCIONES */
+*[type="text"],
+*[type="date"],
+*[type="number"],
+*[type="email"],
+*[type="tel"],
+*[type="password"],
+*[type="search"],
+*[type="url"],
+*[type="hidden"],
+select,
+textarea,
+input,
+.form-control,
+.form-select,
+.form-input,
+.form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* 🎯 ESPECÍFICO PARA CAMPOS DAL (Django Autocomplete Light) */
+.select2-container .select2-selection--single,
+.select2-container .select2-selection--multiple,
+.select2-dropdown {
+    background: rgba(15, 15, 35, 0.98) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    color: #ffffff !important;
+}
+
+.select2-container .select2-selection--single .select2-selection__rendered,
+.select2-container .select2-selection--multiple .select2-selection__choice {
+    color: #ffffff !important;
+}
+
+.select2-results__option {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+}
+
+.select2-results__option--highlighted {
+    background: rgba(0, 255, 136, 0.3) !important;
+    color: #ffffff !important;
+}
+
+/* 🎯 ESTILOS ADICIONALES PARA ASEGURAR FONDO NEGRO EN TODOS LOS CAMPOS */
+/* Forzar estilos en todos los elementos del formulario */
+form input,
+form select,
+form textarea,
+form .form-control,
+form .form-select,
+form .form-input,
+form .form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para campos específicos del formulario de documentos */
+#document-form input,
+#document-form select,
+#document-form textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para tablas y elementos adicionales */
+.table input,
+.table select,
+.table textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para elementos de Bootstrap que puedan interferir */
+.form-control,
+.form-select,
+.form-input,
+.form-textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Estilos para elementos de Django forms */
+.django-form input,
+.django-form select,
+.django-form textarea {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    border: 2px solid var(--cyber-purple) !important;
+}
+
+/* Glow solo en focus, estética cyber sobria */
+.form-input:focus,
+.form-select:focus,
+.form-textarea:focus,
+.form-control:focus,
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+input[type="email"]:focus,
+input[type="tel"]:focus,
+select:focus,
+textarea:focus {
+    outline: none !important;
+    border-color: rgba(0, 255, 136, 0.7) !important;
+    box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.15) !important;
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+}
+
+/* Estilos específicos para campos readonly */
+.form-input[readonly],
+.form-control[readonly],
+input[readonly] {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border-color: var(--cyber-blue) !important;
+    color: var(--cyber-blue) !important;
+    cursor: not-allowed !important;
+}
+
+/* Estilos para campos deshabilitados */
+.form-input:disabled,
+.form-select:disabled,
+.form-textarea:disabled,
+.form-control:disabled,
+input:disabled,
+select:disabled,
+textarea:disabled {
+    background: rgba(15, 15, 25, 0.95) !important;
+    border-color: #444 !important;
+    color: #888 !important;
+    cursor: not-allowed !important;
+    opacity: 0.6 !important;
+}
+
+/* Placeholder styling */
+.form-input::placeholder,
+.form-control::placeholder,
+input::placeholder,
+textarea::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+    font-style: italic !important;
+}
+
+/* Select options styling - Mejorado para mejor contraste */
+select option {
+    background: rgba(15, 15, 35, 0.98) !important;
+    color: #ffffff !important;
+    padding: 12px 16px !important;
+    font-weight: 500 !important;
+    border: none !important;
+}
+
+select option:hover {
+    background: rgba(0, 255, 136, 0.2) !important;
+    color: #ffffff !important;
+}
+
+select option:checked {
+    background: rgba(0, 255, 136, 0.3) !important;
+    color: #ffffff !important;
+    font-weight: bold !important;
+}
+
+/* Hover sutil, sin glow */
+.form-input:hover:not(:focus):not(:disabled),
+.form-select:hover:not(:focus):not(:disabled),
+.form-textarea:hover:not(:focus):not(:disabled),
+.form-control:hover:not(:focus):not(:disabled),
+input:hover:not(:focus):not(:disabled),
+select:hover:not(:focus):not(:disabled),
+textarea:hover:not(:focus):not(:disabled) {
+    border-color: rgba(0, 255, 255, 0.5) !important;
+}
+
+/* 🎯 ESTILOS ESPECÍFICOS PARA CAMPOS DEL FORMULARIO DE DOCUMENTOS */
+/* Campo de número (readonly) */
+#id_numero {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border: 1px solid rgba(0, 255, 255, 0.35) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    color: var(--cyber-blue) !important;
+    font-family: 'Courier New', monospace !important;
+    font-weight: bold !important;
+    text-align: center !important;
+    cursor: not-allowed !important;
+    min-height: 36px !important;
+}
+
+/* Campos de búsqueda AJAX */
+#cliente-busqueda,
+.rep-codigo,
+.serv-search,
+.otr-search {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+#cliente-busqueda:focus,
+.rep-codigo:focus,
+.serv-search:focus,
+.otr-search:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de información del cliente */
+#cliente-info {
+    background: rgba(0, 255, 255, 0.08) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1) !important;
+}
+
+/* Campos de repuestos */
+.rep-nombre,
+.rep-precio-compra,
+.rep-precio-venta,
+.rep-cantidad,
+.serv-precio,
+.otr-precio,
+.otr-precio-taller {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+.rep-nombre:focus,
+.rep-precio-compra:focus,
+.rep-precio-venta:focus,
+.rep-cantidad:focus,
+.serv-precio:focus,
+.otr-precio:focus,
+.otr-precio-taller:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos readonly de repuestos */
+.rep-nombre,
+.rep-precio-compra {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border-color: var(--cyber-blue) !important;
+    color: var(--cyber-blue) !important;
+    cursor: not-allowed !important;
+}
+
+/* Campos de empresa externa */
+input[name*="empresa_externa"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="empresa_externa"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de observaciones */
+textarea[name="observaciones"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    min-height: 120px !important;
+    resize: vertical !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+textarea[name="observaciones"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Checkbox de IVA */
+input[type="checkbox"] {
+    width: 18px !important;
+    height: 18px !important;
+    accent-color: var(--cyber-green) !important;
+    cursor: pointer !important;
+}
+
+/* Checkbox específico para "Excluir IVA" */
+#id_exclude_vat {
+    accent-color: var(--cyber-orange) !important;
+}
+
+/* Labels de checkboxes IVA */
+label[for="id_apply_vat"],
+label[for="id_exclude_vat"] {
+    color: #b0b8c1 !important;
+    font-size: 0.9rem !important;
+    font-weight: bold !important;
+    text-transform: uppercase !important;
+    letter-spacing: 1px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+}
+
+label[for="id_apply_vat"]:hover,
+label[for="id_exclude_vat"]:hover {
+    color: var(--cyber-blue) !important;
+    text-shadow: 0 0 8px var(--cyber-blue) !important;
+}
+
+/* Dropdowns de resultados */
+#cliente-resultados,
+.serv-resultados,
+.otr-resultados,
+.repuesto-dropdown {
+    background: rgba(20, 20, 40, 0.98) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    backdrop-filter: blur(15px) !important;
+    box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3) !important;
+}
+
+/* Items de dropdown */
+.cliente-item,
+.servicio-item,
+.repuesto-suggestion {
+    background: transparent !important;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.2) !important;
+    color: #ffffff !important;
+    transition: all 0.2s ease !important;
+}
+
+.cliente-item:hover,
+.servicio-item:hover,
+.repuesto-suggestion:hover {
+    background: rgba(0, 255, 255, 0.1) !important;
+    border-color: var(--cyber-blue) !important;
+}
+
+/* 🎯 CAMPOS DE TOTALES Y ELEMENTOS ESPECIALES */
+/* Campos de subtotal (readonly) */
+.subtotal-field,
+.rep-subtotal-view,
+.serv-subtotal-view,
+.otr-subtotal-view {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border: 1px solid rgba(0, 255, 255, 0.35) !important;
+    border-radius: 8px !important;
+    padding: 8px 12px !important;
+    color: var(--cyber-blue) !important;
+    font-family: 'Courier New', monospace !important;
+    font-weight: bold !important;
+    text-align: right !important;
+    cursor: not-allowed !important;
+    min-height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+}
+
+/* Campos de descuento */
+input[name*="descuento"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="descuento"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de cantidad */
+input[name*="cantidad"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="cantidad"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio unitario */
+input[name*="precio_unitario"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="precio_unitario"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio cliente */
+input[name*="precio_cliente"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="precio_cliente"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio taller */
+input[name*="precio_taller"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name*="precio_taller"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de precio compra */
+input[name*="precio_compra"] {
+    background: rgba(30, 30, 50, 0.95) !important;
+    border: 2px solid var(--cyber-blue) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: var(--cyber-blue) !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    cursor: not-allowed !important;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.1) !important;
+}
+
+/* Campos de kilometraje */
+input[name="kilometraje"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name="kilometraje"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de fecha de emisión */
+input[name="fecha_emision"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+input[name="fecha_emision"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de técnico responsable */
+select[name="tecnico_responsable"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+select[name="tecnico_responsable"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campos de tipo de documento */
+select[name="tipo"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+select[name="tipo"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Campo de estado de pago */
+select[name="estado_pago"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+}
+
+select[name="estado_pago"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+/* Estilos específicos para opciones de estado de pago */
+select[name="estado_pago"] option[value="NO_PAGADO"] {
+    color: var(--cyber-orange) !important;
+}
+
+select[name="estado_pago"] option[value="PAGADO"] {
+    color: var(--cyber-green) !important;
+}
+
+select[name="estado_pago"] option[value="PARCIAL"] {
+    color: var(--cyber-blue) !important;
+}
+
+/* Campos de cliente y vehículo - Estilos mejorados con mayor especificidad */
+select[name="cliente"],
+select[name="vehiculo"],
+#id_cliente,
+#id_vehiculo,
+.form-select[name="cliente"],
+.form-select[name="vehiculo"] {
+    background: rgba(20, 20, 40, 0.95) !important;
+    border: 2px solid var(--cyber-purple) !important;
+    border-radius: 12px !important;
+    padding: 14px 18px !important;
+    color: #ffffff !important;
+    font-size: 1rem !important;
+    width: 100% !important;
+    transition: all 0.3s ease !important;
+    backdrop-filter: blur(10px) !important;
+    box-shadow: 0 4px 15px rgba(128, 0, 255, 0.1) !important;
+    min-height: 48px !important;
+    display: flex !important;
+    align-items: center !important;
+}
+
+select[name="cliente"]:focus,
+select[name="vehiculo"]:focus,
+#id_cliente:focus,
+#id_vehiculo:focus,
+.form-select[name="cliente"]:focus,
+.form-select[name="vehiculo"]:focus {
+    outline: none !important;
+    border-color: var(--cyber-green) !important;
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4) !important;
+    background: rgba(0, 255, 136, 0.08) !important;
+    transform: translateY(-1px) !important;
+}
+
+select[name="cliente"]:hover:not(:focus),
+select[name="vehiculo"]:hover:not(:focus),
+#id_cliente:hover:not(:focus),
+#id_vehiculo:hover:not(:focus),
+.form-select[name="cliente"]:hover:not(:focus),
+.form-select[name="vehiculo"]:hover:not(:focus) {
+    border-color: var(--cyber-blue) !important;
+    box-shadow: 0 4px 20px rgba(0, 255, 255, 0.15) !important;
+}
+
+.btn-primary {
+    background: linear-gradient(45deg, var(--cyber-blue), var(--cyber-green));
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #000;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    color: #000;
+    text-decoration: none;
+}
+
+.btn-secondary {
+    background: linear-gradient(45deg, var(--cyber-purple), var(--cyber-orange));
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-secondary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(128, 0, 255, 0.5);
+    color: #fff;
+    text-decoration: none;
+}
+
+.btn-danger {
+    background: linear-gradient(45deg, var(--cyber-red), #ff6666);
+    border: none;
+    border-radius: 25px;
+    padding: 12px 24px;
+    color: #fff;
+    font-weight: bold;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.btn-danger:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(255, 0, 68, 0.5);
+    color: #fff;
+    text-decoration: none;
+}
+
+.header-section {
+    background: var(--card-bg);
+    border: 1px solid var(--cyber-blue);
+    border-radius: 15px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.header-section.header-compact {
+    padding: 0.5rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(0,255,255,0.06) 0%, rgba(128,0,255,0.04) 100%);
+}
+
+.header-badge {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--cyber-blue);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.header-title {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--cyber-blue);
+    margin-bottom: 0.5rem;
+    text-shadow: 0 0 15px var(--cyber-blue);
+}
+
+.header-subtitle {
+    color: #b0b8c1;
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+}
+
+.header-info {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+}
+
+.error-message {
+    background: rgba(255, 0, 68, 0.1);
+    border: 1px solid var(--cyber-red);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--cyber-red);
+    margin-bottom: 1rem;
+}
+
+.success-message {
+    background: rgba(0, 255, 136, 0.1);
+    border: 1px solid var(--cyber-green);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--cyber-green);
+    margin-bottom: 1rem;
+}
+
+.info-message {
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid var(--cyber-blue);
+    border-radius: 8px;
+    padding: 1rem;
+    color: var(--cyber-blue);
+    margin-bottom: 1rem;
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.pulse-animation {
+    animation: pulse 2s infinite;
+}
+
+.loading {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+.loading::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--cyber-blue);
+    border-top: 2px solid transparent;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+
+</head>
+
+<body class="min-h-screen flex flex-col">
+
+
+  
+  
+    <div id="bg-starfield" aria-hidden="true">
+      <div class="stars layer1"></div>
+      
+        <div class="stars layer2"></div>
+        <div class="stars layer3"></div>
+      
+    </div>
+  
+
+  
+  
+
+  
+  
+  
+  <header class="company-header flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 p-4 sm:p-6">
+  
+    <!-- Logo y nombre de la empresa -->
+    <div class="flex items-center gap-4 sm:gap-6">
+      
+
+      <div class="flex flex-col">
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,255,255,0.8)]" style="font-family: 'Orbitron', 'Arial Black', monospace; letter-spacing: 2px;">
+          
+            
+              Taller de admin
+            
+          
+        </h1>
+        
+          <span class="company-tagline text-lg sm:text-xl text-cyan-200 font-semibold mt-1 drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">Control total para tu taller</span>
+        
+      </div>
+    </div>
+
+    <!-- Selector de idioma -->
+    <div class="flex items-center gap-2 sm:gap-3">
+      <!-- Selector de idioma: Solo mostrar para USA, no para Chile -->
+      
+    </div>
+  </header>
+  
+
+  
+  
+  <div id="main-navigation" class="flex flex-col items-center justify-center mt-3 gap-2">
+    
+      
+      <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
+        <a href="/cl/es/settings/" class="nav-button-standard">
+          <span class="nav-icon">⚙️</span>
+          <span class="nav-text">Ajustes</span>
+        </a>
+        <a href="/cl/es/centro-operaciones/" class="nav-button-standard">
+          <span class="nav-icon">🚀</span>
+          <span class="nav-text">Centro</span>
+        </a>
+        <a href="/cl/es/clientes/" class="nav-button-standard">
+          <span class="nav-icon">👥</span>
+          <span class="nav-text">Clientes</span>
+        </a>
+        <a href="/cl/es/documentos/" class="nav-button-standard">
+          <span class="nav-icon">📄</span>
+          <span class="nav-text">Documentos</span>
+        </a>
+        <a href="/cl/es/servicios/otros-servicios/" class="nav-button-standard">
+          <span class="nav-icon">⭐</span>
+          <span class="nav-text">Extra</span>
+        </a>
+      </div>
+
+      <!-- Row 2: Parts, Reports, Services, Disassembly, Vehicles, Logout -->
+      <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
+        <a href="/cl/es/repuestos/" class="nav-button-standard">
+          <span class="nav-icon">🔧</span>
+          <span class="nav-text">Repuestos</span>
+        </a>
+        <a href="/cl/es/reportes/" class="nav-button-standard">
+          <span class="nav-icon">📊</span>
+          <span class="nav-text">Reportes</span>
+        </a>
+        <a href="/cl/es/servicios/" class="nav-button-standard">
+          <span class="nav-icon">🛠️</span>
+          <span class="nav-text">Servicios</span>
+        </a>
+        
+        <a href="/cl/es/desarme/" class="nav-button-standard">
+          <span class="nav-icon">🧩</span>
+          <span class="nav-text">Desarme</span>
+        </a>
+        
+        
+        <a href="/cl/es/vehiculos/" class="nav-button-standard">
+          <span class="nav-icon">🚗</span>
+          <span class="nav-text">Vehículos</span>
+        </a>
+        
+        <form action="/accounts/logout/" method="post" class="inline-block">
+          <input type="hidden" name="csrfmiddlewaretoken" value="aCm2Vueg4NfKZI35KJrIfNSqU7CxMkqExXprC5QsL3nx8E67i6Xzn55JukQEbjmn">
+          <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
+            <span class="nav-icon">🚪</span>
+            <span class="nav-text">Salir</span>
+          </button>
+        </form>
+      </div>
+
+    
+    </div>
+  </div>
+  
+
+  
+  
+  <main class="flex-1">
+    
+<div class="max-w-5xl mx-auto px-3 py-2 sm:px-4 sm:py-3">
+
+    <!-- Cabecera compacta -->
+    <div class="header-section header-compact">
+        <span class="header-badge">Documento</span>
+    </div>
+
+    <!-- Mensajes del sistema (sin informativos tipo "creado exitosamente") -->
+    
+        
+    
+
+    <!-- Contenido del documento -->
+    
+
+
+
+
+        <form method="post" id="document-form" class="doc-form-compact mx-auto"
+              data-mode="create"
+              data-document-id=""
+              data-country-code="CL"
+              data-url-next-number="/cl/es/documentos/api/obtener-numero-documento/"
+              data-url-client-search="/cl/es/ajax/clientes/buscar/"
+              data-url-vehiculos-by-cli="/cl/es/ajax/vehiculos-por-cliente/"
+              data-url-repuesto-by-code="/cl/es/api/repuestos/by-code"
+              data-url-repuesto-search="/cl/es/api/repuestos/"
+              data-url-repuesto-create="/cl/es/api/repuestos/crear/"
+              data-url-repuesto-create-page="/cl/es/repuestos/crear/"
+              data-url-service-search="/cl/es/servicios/api/buscar/"
+              data-url-service-create="/cl/es/servicios/crear/"
+              data-url-outsourced-services="/cl/es/servicios/api/otros/buscar/"
+              data-url-used-parts="/cl/es/api/piezas-desarme/">
+          <input type="hidden" name="csrfmiddlewaretoken" value="aCm2Vueg4NfKZI35KJrIfNSqU7CxMkqExXprC5QsL3nx8E67i6Xzn55JukQEbjmn">
+
+  <!-- System messages - Design System (no mostrar mensajes de otras secciones: login, clientes eliminados, etc.) -->
+  
+    
+  
+
+  <!-- Validation errors - compacto y legible -->
+  
+
+  <!-- Document workspace â€” cabecera consola | tarjetas cliente/vehÃ­culo | repuestos/servicios POS | observaciones | totales cockpit -->
+  <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
+
+    <!-- 1. CABECERA COMPACTA â€” fila 1: INV | Fecha | MecÃ¡nico | Pago | fila 2: Tipo | OperaciÃ³n -->
+    <div class="doc-console-header">
+      <div class="doc-console-title flex flex-wrap items-center gap-2">
+        <span>CREAR DOCUMENTO</span>
+        <span id="draft-indicator" class="hidden text-[10px] sm:text-xs font-medium text-emerald-300/95 bg-emerald-950/60 border border-emerald-500/35 rounded px-2 py-0.5" role="status" aria-live="polite">Guardado automático</span>
+      </div>
+
+      <div class="doc-invoice-grid">
+        <div class="doc-invoice-panel">
+          <div class="doc-console-field doc-console-field--invoice">
+            <span class="doc-console-meta">Documento N°</span>
+            <span id="id_numero" class="doc-console-inv" data-placeholder="Se generará automáticamente">
+              â€”
+            </span>
+          </div>
+
+          <div class="doc-console-field">
+            <label for="id_fecha_emision" class="doc-console-meta">Fecha</label>
+            <input id="id_fecha_emision" type="date" name="fecha_emision" class="bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
+                   value="2026-04-03">
+          </div>
+
+          <div class="doc-console-field">
+            <label for="id_tipo" class="doc-console-meta">Tipo de Documento</label>
+            <select name="tipo" id="id_tipo">
+  <option value="OT">Orden de Trabajo</option>
+
+  <option value="PRES">Presupuesto</option>
+
+  <option value="FAC">Factura/Boleta</option>
+
+</select>
+          </div>
+        </div>
+
+        <div class="doc-invoice-panel">
+          
+          <div class="doc-console-field">
+            <label id="tecnico-label" for="id_tecnico_responsable" class="doc-console-meta" data-label-default="Mecánico responsable" data-label-pts="Vendedor">Mecánico responsable</label>
+            <div class="doc-console-control"><select name="tecnico_responsable" id="id_tecnico_responsable">
+  <option value="" selected>---------</option>
+
+</select></div>
+          </div>
+          
+
+          <div class="doc-console-field">
+            <label for="id_payment_status" class="doc-console-meta">Estado de Pago</label>
+            <div id="payment-status-badge" class="doc-console-control doc-console-payment doc-console-payment-pending"><select name="payment_status" class="form-control form-select w-full text-base" id="id_payment_status">
+  <option value="pending">Pendiente</option>
+
+  <option value="paid">Pagado</option>
+
+  <option value="partial">Parcial</option>
+
+  <option value="canceled">Anulado</option>
+
+</select></div>
+          </div>
+
+          <div class="doc-console-field">
+            <label for="doc_mode" class="doc-console-meta">Operación</label>
+            <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300">
+              <option value="services">Servicios</option>
+              <option value="parts">Solo venta de repuestos</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. CLIENT | VEHICLE (layout horizontal en md+) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="doc-smart-card doc-ficha-client-vehicle">
+        <h3>CLIENTE</h3>
+        <div class="relative">
+          <label for="cliente-busqueda" class="sr-only">Buscar cliente</label>
+          <input type="text" id="cliente-busqueda" class="w-full bg-slate-800 p-2 rounded border border-slate-600 text-white text-sm"
+                 placeholder="Buscar cliente"
+                 autocomplete="off"
+                 oninput="window.EG?.cliente?.handleClienteInput?.(this.value)"
+                 onfocus="window.EG?.cliente?.handleClienteFocus?.(this.value)"
+                 onkeydown="return window.EG?.cliente?.handleClienteKeydown?.(event)">
+          <div id="cliente-resultados" class="absolute z-50 w-full bg-slate-800 border border-slate-600 rounded shadow-lg hidden max-h-48 overflow-y-auto text-sm mt-1"></div>
+        </div>
+        <a id="btn-nuevo-cliente"
+           href="/cl/es/clientes/crear/"
+           data-url-crear-cliente="/cl/es/clientes/crear/"
+           class="doc-action-btn mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold no-underline shadow-sm whitespace-nowrap">
+          <span aria-hidden="true">âž•</span>
+          <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
+        </a>
+        <select id="id_cliente" name="cliente" class="hidden">
+          <option value="">Seleccionar cliente...</option>
+        </select>
+        <div id="cliente-info" class="doc-smart-summary hidden">
+          <div class="name" id="cliente-nombre"></div>
+          <div class="detail" id="cliente-telefono"></div>
+          <div class="detail" id="cliente-email"></div>
+          <div class="meta" id="cliente-ultima-visita"></div>
+        </div>
+      </div>
+      <div class="doc-smart-card" id="vehicle-section">
+        <h3>VEHÍCULO</h3>
+        
+        <div class="tipo-dependent-vehicle">
+          <div class="doc-field-with-btn flex gap-2">
+            <div class="flex-1">
+              <label for="id_vehiculo" class="sr-only">Vehicle</label>
+              <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
+                <option value="">Select vehicle...</option>
+              </select>
+            </div>
+            <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
+              <span aria-hidden="true">âž•</span>
+              <span class="doc-action-label text-white font-semibold">Nuevo vehÃ­culo</span>
+            </button>
+          </div>
+        </div>
+        
+        
+        <div id="miles-section" class="tipo-dependent-miles flex flex-wrap items-center gap-2 mt-2">
+          <label for="id_kilometraje_ingreso" class="text-xs text-slate-400">Kilometraje</label>
+          <div class="flex-1 min-w-0 max-w-[7rem]"><input type="number" name="kilometraje_ingreso" min="0" id="id_kilometraje_ingreso" class="form-control" step="1" aria-describedby="id_kilometraje_ingreso_helptext"></div>
+          <span class="text-xs text-slate-500">km</span>
+        </div>
+        
+        
+        <div id="vehiculo-info" class="doc-smart-summary hidden">
+          <div class="name" id="vehiculo-marca-modelo"></div>
+          <div class="detail" id="vehiculo-ano-vin"></div>
+          <div class="detail" id="vehiculo-mileage"></div>
+          <div class="meta" id="vehiculo-ultima-entrada"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. PARTS | SERVICES (tabla compacta) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      
+      <div class="doc-smart-card doc-ficha-parts doc-pos-section">
+        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
+          <div class="flex flex-col gap-1 min-w-0 flex-1">
+            <h3 class="!mb-0">REPUESTOS / PIEZAS USADAS</h3>
+            
+          </div>
+          <div class="flex gap-1 flex-shrink-0 items-center">
+            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addRepuestoRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">AGREGAR</span></button>
+            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="openUsedPartsModal()"><span aria-hidden="true">ðŸ§©</span><span class="doc-action-label text-white font-semibold">Usado</span></button>
+          </div>
+        </div>
+        <div class="doc-pos-header hidden sm:grid">
+          <span>Código</span><span>Nombre de repuesto</span><span>Cant.</span><span>Precio</span><span>Total</span><span></span>
+        </div>
+        <div id="repuestos-container" class="space-y-2 min-h-[80px]">
+          <!-- Dynamic parts rows -->
+        </div>
+      </div>
+      
+      
+      <div class="doc-smart-card doc-ficha-services doc-pos-section">
+        <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
+          <h3 class="!mb-0 flex-1 min-w-0">SERVICIOS</h3>
+          <div class="flex gap-1 flex-shrink-0 items-center">
+            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap" onclick="addServicioRow()"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">AGREGAR</span></button>
+          </div>
+        </div>
+        <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
+          <span>Servicio</span><span>Precio</span><span>Total</span><span></span>
+        </div>
+        <div id="servicios-container" class="space-y-2 min-h-[80px]">
+          <!-- Dynamic services rows: click + ADD, then type to search -->
+          <p id="servicios-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">Haz clic en + Agregar para añadir servicios, luego escribe para buscar.</p>
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- 4. NOTES | TOTALES (panel claro) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div class="doc-smart-card order-2 md:order-1">
+        <h3>NOTAS</h3>
+        <label for="id_observaciones" class="sr-only">Notes</label>
+        <textarea name="observaciones" cols="40" rows="10" id="id_observaciones" aria-describedby="id_observaciones_helptext">
+</textarea>
+      </div>
+      <div class="totales-cockpit order-1 md:order-2 totales-panel">
+        <h3 class="totales-cockpit-title">TOTALES DEL DOCUMENTO</h3>
+        <div class="receipt-totals">
+          
+          <div class="receipt-totals-apply-tax">
+            <label class="cockpit-label inline-flex items-center cursor-pointer">
+              <input type="checkbox" id="id_apply_vat" name="apply_vat" checked class="mr-1.5 w-3.5 h-3.5 accent-cyan-400"
+                     onchange="document.querySelectorAll('.tax-checkbox').forEach(cb => cb.checked = this.checked); if(typeof recalcTotales === 'function') recalcTotales();">
+              <span>Aplicar todos los impuestos</span>
+            </label>
+          </div>
+          
+
+          <table class="receipt-totals-table">
+            <tbody>
+              <tr>
+                <td class="receipt-label">Repuestos</td>
+                <td class="receipt-value">
+                  <span id="t_repuestos" class="calculated-field readonly-total" data-calculated="true">
+                    $0
+                  </span>
+                </td>
+              </tr>
+              
+              <tr>
+                <td class="receipt-label">Servicios</td>
+                <td class="receipt-value">
+                  <span id="t_servicios" class="calculated-field readonly-total" data-calculated="true">
+                    $0
+                  </span>
+                </td>
+              </tr>
+              
+              
+
+              
+              <tr class="tax-line" data-tax-id="iva">
+                <td class="receipt-label">
+                  <label class="inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="include_iva" checked
+                           class="mr-1 w-3 h-3 accent-cyan-400 tax-checkbox"
+                           data-tax-id="iva" data-tax-rate="19">
+                    <span>IVA (19%)</span>
+                  </label>
+                </td>
+                <td class="receipt-value">
+                  <span id="t_iva" class="calculated-field" data-calculated="true">
+                    $0
+                  </span>
+                </td>
+              </tr>
+              
+
+              <tr class="receipt-total-row">
+                <td class="receipt-total-label">TOTAL</td>
+                <td class="receipt-total-value">
+                  <span id="t_total" class="calculated-field readonly-total" data-calculated="true">
+                    $0
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button type="submit" class="totales-cockpit-save">
+          Guardar Documento
+        </button>
+        <div class="flex gap-2 mt-3">
+          <a href="/cl/es/documentos/" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">â†</span><span class="doc-action-label text-slate-200 font-semibold">Volver</span></a>
+          <a href="/cl/es/servicios/otros-servicios/" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Hidden inputs para serializar filas dinÃ¡micas -->
+  <input type="hidden" name="repuestos_json" id="id_repuestos_json">
+  <input type="hidden" name="servicios_json" id="id_servicios_json">
+  <input type="hidden" name="otros_json" id="id_otros_json">
+</form>
+
+<!-- Modal Used Parts (piezas de desarme) -->
+<div id="modal-used-parts" class="fixed inset-0 z-50 hidden">
+  <div class="absolute inset-0 bg-black/70" onclick="closeUsedPartsModal()"></div>
+  <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
+    <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
+      <h3 class="text-lg font-bold text-amber-300 mb-3">ðŸ§© Piezas Usadas (de yarda de desarme)</h3>
+      <input type="search" id="used-parts-search" placeholder="Buscar por código o nombre..." class="form-control w-full mb-4" autocomplete="off">
+      <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
+      <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">Escriba al menos 2 caracteres para buscar</p>
+      <button type="button" onclick="closeUsedPartsModal()" class="mt-4 btn-secondary">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<script id="prefetchClientes" type="application/json">[{"id": 2, "nombre": "damari suez", "nombre_completo": "damari suez", "email": "w@e.ck", "telefono": "+5699999999"}, {"id": 1, "nombre": "mauricio alvarado", "nombre_completo": "mauricio alvarado", "email": "mauricioatlanta@gmail.com", "telefono": "+56963607348"}]</script>
+<script id="prefetchVehiculos" type="application/json">[]</script>
+<script id="prefetchRepuestos" type="application/json">[]</script>
+<script id="prefetchServicios" type="application/json">[]</script>
+<script id="prefetchOtrosServicios" type="application/json">[]</script>
+<script id="uiConfigTaxLines" type="application/json">[{"id": "iva", "label": "IVA", "rate": "19", "applies_to": "repuestos"}]</script>
+
+
+
+
+
+    <!-- Acciones del formulario -->
+    
+    <div class="form-actions">
+        <button type="submit" class="btn-primary" form="document-form">
+            💾 Guardar Documento
+        </button>
+        <a href="/cl/es/documentos/" class="btn-secondary">← Volver a la Lista</a>
+        
+    </div>
+    
+
+</div>
+
+<!-- JavaScript para funcionalidades -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    // Cabecera compacta: sin animación typing
+
+    // Validación de formularios
+    const form = document.getElementById('document-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            // DEBUG: Log todos los campos del formulario
+            console.log('🔍 DEBUG: Campos del formulario antes del envío:');
+            const formData = new FormData(this);
+            for (let [key, value] of formData.entries()) {
+                console.log(`  ${key}: ${value}`);
+            }
+
+            // Validar que se haya seleccionado un cliente
+            const clienteHidden = document.getElementById('id_cliente');
+
+            console.log('🔍 DEBUG: Cliente hidden value:', clienteHidden?.value);
+
+            if (!clienteHidden || !clienteHidden.value) {
+                e.preventDefault();
+                  alert('Por favor seleccione un cliente antes de continuar.');
+                return false;
+            }
+
+            // Actualizar campos ocultos antes de enviar
+            if (typeof window.recalcTotales === 'function') {
+                window.recalcTotales();
+            }
+
+            // Agregar clase de loading
+            this.classList.add('loading');
+
+            // Aquí se pueden agregar validaciones adicionales
+            console.log('✅ Enviando formulario...');
+        });
+    }
+
+    // Auto-save functionality (opcional)
+    const inputs = document.querySelectorAll('.form-input, .form-select, .form-textarea');
+    inputs.forEach(input => {
+        input.addEventListener('change', function() {
+            // Aquí se puede implementar auto-save
+            console.log('Campo modificado:', this.name);
+        });
+    });
+
+    // Animaciones de hover en botones
+    const buttons = document.querySelectorAll('.btn-primary, .btn-secondary, .btn-danger');
+    buttons.forEach(button => {
+        button.addEventListener('mouseenter', function() {
+            this.style.transform = 'scale(1.05)';
+        });
+
+        button.addEventListener('mouseleave', function() {
+            this.style.transform = 'scale(1)';
+        });
+    });
+});
+</script>
+
+
+
+    
+    <!-- ayuda contextual placeholder -->
+
+    
+  </main>
+
+  
+  
+  <footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
+    <div class="container mx-auto px-4 text-center">
+      
+      <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm flex-wrap">
+        <span class="font-medium">eGarage</span>
+        <span aria-hidden="true">•</span>
+        <span>© 2025</span>
+        <span aria-hidden="true">•</span>
+        <a href="mailto:" class="text-cyan-400 hover:underline">
+          
+        </a>
+        <span aria-hidden="true">•</span>
+        <a href="https://wa.me/?text=Hola,%20necesito%20ayuda%20con%20eGarage" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           class="text-green-400 hover:underline flex items-center gap-1">
+          <i class="fab fa-whatsapp"></i>
+          
+        </a>
+        <span aria-hidden="true">•</span>
+        <a href="/legal/" class="text-cyan-400 hover:underline">
+          
+            Términos y Privacidad
+          
+        </a>
+        
+        <span aria-hidden="true">•</span>
+        <a href="/legal/#proteccion-datos-tributarios" class="text-emerald-400 hover:underline text-xs">
+          Datos Tributarios
+        </a>
+        
+        <span aria-hidden="true">•</span>
+        <span class="text-xs text-gray-500">All Rights Reserved</span>
+      </div>
+    </div>
+  </footer>
+  
+
+  
+  
+  <script src="/static/js/pwa-install-prompt.js?v=2.1.4"></script>
+  
+  
+  
+  
+
+  
+  
+  <script>
+  (function(){
+    function isAlreadyRegisteredError(e) {
+      if (!e) return false;
+      var msg = typeof e === 'string' ? e : (e.message || (e.toString && e.toString()) || '');
+      return /already been registered/i.test(String(msg));
+    }
+    function wrapRegisterFn(orig, obj) {
+      return function(name, fn) {
+        try { orig.call(obj, name, fn); } catch (e) {
+          if (!isAlreadyRegisteredError(e)) throw e;
+        }
+      };
+    }
+    var _yl = null;
+    try {
+      if (typeof Proxy === 'undefined') throw new Error('no Proxy');
+      Object.defineProperty(window, 'yl', {
+        configurable: true,
+        get: function() { return _yl; },
+        set: function(v) {
+          if (v && typeof v === 'object' && !v._egDalProxy) {
+            if (typeof v.registerFunction === 'function') {
+              v.registerFunction = wrapRegisterFn(v.registerFunction, v);
+            }
+            v = new Proxy(v, {
+              set: function(t, p, val) {
+                if (p === 'registerFunction' && typeof val === 'function') {
+                  t[p] = wrapRegisterFn(val, t);
+                  return true;
+                }
+                t[p] = val;
+                return true;
+              }
+            });
+            v._egDalProxy = true;
+          }
+          _yl = v;
+        }
+      });
+    } catch (err) {}
+  })();
+  </script>
+  
+  
+  
+
+
+<script src="/static/js/marketplace_tooltip_fixed.js"></script>
+
+
+<script>
+window.egEncodeDocumentFormNext = function() {
+    return encodeURIComponent(window.location.pathname + (window.location.search || ''));
+};
+
+// InicializaciÃ³n mÃ­nima para compatibilidad
+document.addEventListener('DOMContentLoaded', function() {
+    // Observations mÃ­nimo
+    const obs = document.getElementById('id_observaciones');
+    if (obs) { obs.setAttribute('rows', '2'); }
+    
+    // Cabecera consola: badge estado de pago
+    function updatePaymentStatusBadge() {
+        const sel = document.getElementById('id_payment_status');
+        const badge = document.getElementById('payment-status-badge');
+        if (!badge || !sel) return;
+        badge.classList.remove('doc-console-payment-paid', 'doc-console-payment-pending', 'doc-console-payment-partial');
+        const v = (sel.value || '').toUpperCase();
+        if (v === 'PAGADO' || v === 'PAID') badge.classList.add('doc-console-payment-paid');
+        else if (v === 'PARCIAL' || v === 'PARTIAL') badge.classList.add('doc-console-payment-partial');
+        else badge.classList.add('doc-console-payment-pending');
+    }
+    updatePaymentStatusBadge();
+    document.getElementById('id_payment_status')?.addEventListener('change', updatePaymentStatusBadge);
+});
+</script>
+
+
+
+
+
+
+<script src="/static/js/document-form/index.js"></script>
+  
+
+<script>
+window.addServicioRow = function() {
+    console.warn('Módulo servicios no implementado aún - usando implementación mínima');
+      
+    const container = document.getElementById('servicios-container');
+    if (!container) {
+        console.error('No se encontró servicios-container');
+        return null;
+    }
+      
+    // Ocultar mensaje de vacío
+    const emptyHint = document.getElementById('servicios-empty-hint');
+    if (emptyHint) emptyHint.style.display = 'none';
+      
+    // Crear fila básica
+    const row = document.createElement('div');
+    row.className = 'dynamic-element';
+    row.innerHTML = `
+        <div class="doc-row-grid">
+            <div class="col-span-7">
+                <input type="text" class="form-control" placeholder="Servicio" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;">
+            </div>
+            <div class="col-span-3">
+                <input type="number" class="form-control" placeholder="Precio" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;" 
+                       step="0.01" min="0">
+            </div>
+            <div class="col-span-2 flex items-center gap-1">
+                <span class="srv-subtotal-view text-sm text-gray-300">$0</span>
+                <button type="button" class="text-red-400 hover:text-red-300" onclick="this.closest('.dynamic-element').remove()">
+                    ✕
+                </button>
+            </div>
+        </div>
+    `;
+      
+    container.appendChild(row);
+      
+    // Agregar funcionalidad básica de cálculo
+    const priceInput = row.querySelector('input[type="number"]');
+    const subtotalSpan = row.querySelector('.srv-subtotal-view');
+      
+    if (priceInput && subtotalSpan) {
+        priceInput.addEventListener('input', function() {
+            const price = parseFloat(this.value) || 0;
+            subtotalSpan.textContent = '$' + price.toFixed(2);
+              
+            // Disparar evento de recálculo de totales
+            if (window.recalcTotales) {
+                window.recalcTotales();
+            }
+        });
+    }
+      
+    return row;
+  };
+  
+  window.addOtroRow = function() {
+    console.warn('Módulo otros servicios no implementado aún - usando implementación mínima');
+      
+    const container = document.getElementById('otros-container');
+    if (!container) {
+        console.error('No se encontró otros-container');
+        return null;
+    }
+      
+    // Ocultar mensaje de vacío
+    const emptyHint = document.getElementById('otros-empty-hint');
+    if (emptyHint) emptyHint.style.display = 'none';
+      
+    // Crear fila básica
+    const row = document.createElement('div');
+    row.className = 'dynamic-element';
+    row.innerHTML = `
+        <div class="doc-row-grid">
+            <div class="col-span-4">
+                <input type="text" class="form-control" placeholder="Servicio externo" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;">
+            </div>
+            <div class="col-span-3">
+                <input type="text" class="form-control" placeholder="Empresa" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;">
+            </div>
+            <div class="col-span-2">
+                <input type="number" class="form-control" placeholder="Precio taller" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;" 
+                       step="0.01" min="0">
+            </div>
+            <div class="col-span-2">
+                <input type="number" class="form-control" placeholder="Precio cliente" 
+                       style="min-height: 36px; height: 2.5rem; padding: 4px 8px; font-size: 13px;" 
+                       step="0.01" min="0">
+            </div>
+            <div class="col-span-1 flex items-center gap-1">
+                <span class="otr-subtotal-view text-sm text-gray-300">$0</span>
+                <button type="button" class="text-red-400 hover:text-red-300" onclick="this.closest('.dynamic-element').remove()">
+                    ✕
+                </button>
+            </div>
+        </div>
+    `;
+      
+    container.appendChild(row);
+      
+    // Agregar funcionalidad básica de cálculo
+    const clientPriceInput = row.querySelector('input[placeholder="Precio cliente"]');
+    const subtotalSpan = row.querySelector('.otr-subtotal-view');
+      
+    if (clientPriceInput && subtotalSpan) {
+        clientPriceInput.addEventListener('input', function() {
+            const price = parseFloat(this.value) || 0;
+            subtotalSpan.textContent = '$' + price.toFixed(2);
+              
+            // Disparar evento de recálculo de totales
+            if (window.recalcTotales) {
+                window.recalcTotales();
+            }
+        });
+    }
+      
+    return row;
+  };
+  </script>
+
+
+  
+  <script src="/static/admin/js/vendor/select2/select2.full.js"></script>
+<script src="/static/autocomplete_light/autocomplete_light.js"></script>
+<script src="/static/autocomplete_light/select2.js"></script>
+<script src="/static/autocomplete_light/i18n/es.js"></script>
+  
+  {# 
+    <script src="/static/js/starfield.js"></script>
+   #}
+
+  <script>
+    // CSRF helper
+    function getCookie(name){
+      let v=null; if(document.cookie && document.cookie!==''){
+        const cs=document.cookie.split(';');
+        for(let i=0;i<cs.length;i++){
+          const c=cs[i].trim(); if(c.substring(0,name.length+1)===(name+'=')){ v=decodeURIComponent(c.substring(name.length+1)); break; }
+        }
+      } return v;
+    }
+    const csrftoken=getCookie('csrftoken');
+
+    // Confirmación eliminar
+    function confirmarEliminacion(nombreCliente){
+      const message=`⚠️ ¿Está seguro de eliminar a "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.`;
+      return confirm(message);
+    }
+
+    // Service Worker Registration para PWA
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('/cl/es/service-worker.js', { scope: '/' })
+          .then(function(registration) {
+            console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+            
+            // Verificar actualizaciones cada hora
+            setInterval(function() {
+              registration.update();
+            }, 3600000); // 1 hora
+            
+            // Escuchar actualizaciones del service worker
+            registration.addEventListener('updatefound', function() {
+              const newWorker = registration.installing;
+              newWorker.addEventListener('statechange', function() {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  // Hay una nueva versión disponible
+                  if (confirm('🎉 Nueva versión de eGarage disponible. ¿Deseas actualizar ahora?')) {
+                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                    window.location.reload();
+                  }
+                }
+              });
+            });
+          })
+          .catch(function(error) {
+            console.warn('⚠️ Error al registrar Service Worker:', error);
+          });
+      });
+    }
+    
+    // PWA Install Prompt Handler (maneja beforeinstallprompt y iOS)
+    // El script pwa-install-prompt.js se carga después y maneja todo
+  </script>
+
+  <!-- 🆘 Botón de Ayuda Contextual Floating -->
+  
+  <div id="help-fab" class="fixed bottom-6 right-6 z-[9999]">
+    <button onclick="openContextualHelp()" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 focus:outline-none" title="Ayuda Contextual">
+      <span class="text-xl">❓</span>
+    </button>
+  </div>
+
+  <!-- 📋 Modal de Ayuda Contextual -->
+  <div id="help-modal" class="hidden fixed inset-0 z-[10000] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-height-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeContextualHelp()"></div>
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-middle bg-[#101418] border border-cyan-500 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-bold text-cyan-400 glow-text mb-4" id="help-modal-title">
+                🚀 Ayuda de eGarage
+              </h3>
+              <div class="mt-2" id="help-modal-content">
+                <div class="animate-pulse flex space-y-4 flex-col">
+                  <div class="h-4 bg-gray-700 rounded w-3/4"></div>
+                  <div class="h-4 bg-gray-700 rounded"></div>
+                  <div class="h-4 bg-gray-700 rounded w-5/6"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-[#0a0e14] px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button" onclick="closeContextualHelp()" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-cyan-600 text-base font-medium text-white hover:bg-cyan-700 focus:outline-none sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+            Entendido
+          </button>
+          <a href="/cl/help/" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-600 shadow-sm px-4 py-2 bg-transparent text-base font-medium text-gray-300 hover:bg-gray-800 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+            Ver Centro de Ayuda completo
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function openContextualHelp() {
+      const modal = document.getElementById('help-modal');
+      const content = document.getElementById('help-modal-content');
+      modal.classList.remove('hidden');
+      
+      // Determinar contexto basado en la URL
+      let contexto = 'general';
+      const path = window.location.pathname;
+      if (path.includes('clientes')) contexto = 'clientes';
+      else if (path.includes('vehiculos')) contexto = 'vehiculos';
+      else if (path.includes('documentos')) contexto = 'taller';
+      else if (path.includes('dashboard')) contexto = 'general';
+      else if (path.includes('settings')) contexto = 'general';
+      
+      // Cargar contenido
+      fetch(`/cl/help/api/faqs/${contexto}/`)
+        .then(res => res.json())
+        .then(data => {
+          let html = '';
+          if (data.faqs && data.faqs.length > 0) {
+            html += '<h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Preguntas Frecuentes</h4>';
+            data.faqs.slice(0, 3).forEach(faq => {
+              html += `<div class="mb-4">
+                <p class="text-cyan-300 font-semibold text-sm">¿${faq.pregunta}?</p>
+                <p class="text-gray-400 text-sm mt-1">${faq.respuesta}</p>
+              </div>`;
+            });
+          }
+          
+          // Cargar pasos recomendados
+          return fetch(`/cl/help/api/pasos/${contexto}/`).then(res => res.json()).then(stepData => {
+            if (stepData.pasos && stepData.pasos.length > 0) {
+              html += '<hr class="border-gray-800 my-4">';
+              html += '<h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Guía Rápida</h4>';
+              stepData.pasos.slice(0, 1).forEach(guia => {
+                html += `<p class="text-green-400 font-semibold text-sm mb-2">${guia.titulo}:</p>`;
+                html += '<ul class="list-disc list-inside text-gray-400 text-sm space-y-1">';
+                guia.pasos.forEach(paso => {
+                  html += `<li>${paso}</li>`;
+                });
+                html += '</ul>';
+              });
+            }
+            content.innerHTML = html || '<p class="text-gray-400">No hay ayuda específica para esta sección todavía.</p>';
+          });
+        })
+        .catch(err => {
+          content.innerHTML = '<p class="text-red-400">Error al cargar la ayuda. Por favor intenta más tarde.</p>';
+          console.error(err);
+        });
+    }
+
+    function closeContextualHelp() {
+      document.getElementById('help-modal').classList.add('hidden');
+    }
+  </script>
+  
+</body>
+</html>

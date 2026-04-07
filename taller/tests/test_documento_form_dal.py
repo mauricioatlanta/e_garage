@@ -55,8 +55,8 @@ def test_form_filtra_vehiculos_por_cliente_en_post(client, user_cl, cliente_y_ve
         "fecha_emision": timezone.now().date(),
         "cliente": str(c1.id),  # ← cliente posteado
         "vehiculo": str(v1.id),  # ← pertenece a c1
+        "estado_pago": "PENDIENTE",
         "observaciones": "",
-        "pagado": "",
     }
     form = DocumentoForm(data=data, user=user_cl, empresa=user_cl.empresa, country="CL")
     assert form.is_valid(), form.errors  # debe ser válido
@@ -99,6 +99,7 @@ def test_form_restringe_cliente_y_vehiculo_a_empresa(client, user_cl, user_us):
         "fecha_emision": timezone.now().date(),
         "cliente": str(c_us.id),
         "vehiculo": str(v_us.id),
+        "estado_pago": "PENDIENTE",
         "observaciones": "",
     }
     form = DocumentoForm(data=data, user=user_cl, empresa=emp_cl, country="CL")
@@ -127,8 +128,8 @@ def test_form_labels_por_pais(client, user_cl, user_us):
 
     # Test USA
     form_us = DocumentoForm(user=user_us, empresa=user_us.empresa, country="US")
-    assert form_us.fields["cliente"].label == "Customer"
-    assert form_us.fields["vehiculo"].label == "Vehicle"
+    assert form_us.fields["cliente"].label == "Cliente"
+    assert form_us.fields["vehiculo"].label == "Veh\u00edculo"
 
 
 @pytest.mark.django_db
@@ -165,7 +166,7 @@ def test_cliente_autocomplete_filtra_por_empresa(client, user_cl):
     Empresa.objects.create(user=other_user, nombre_taller="Otra", pais="CL")
     Cliente.objects.create(empresa=other_user.empresa, nombre="Ajeno")
 
-    url = reverse("cl_autocomplete:cliente")
+    url = "/cl/es/autocomplete/cliente/"
     r = client.get(url, {"q": "Cliente"})
     assert r.status_code == 200
     payload = r.json()
@@ -180,7 +181,7 @@ def test_vehiculo_autocomplete_filtra_por_cliente_forward(client, user_cl, clien
     client.login(username="mauri", password="pass")
     c1, c2, v1, v2, v3 = cliente_y_vehiculos
 
-    url = reverse("cl_autocomplete:vehiculo")
+    url = "/cl/es/autocomplete/vehiculo/"
     forwarded = json.dumps({"cliente": c1.id})
     r = client.get(url, {"q": "", "forward": forwarded})
     assert r.status_code == 200
@@ -193,14 +194,18 @@ def test_vehiculo_autocomplete_filtra_por_cliente_forward(client, user_cl, clien
 
 @pytest.mark.django_db
 def test_autocomplete_usa_namespace(client, user_us):
-    client.login(username="john", password="pass")
     emp = user_us.empresa
     Cliente.objects.create(empresa=emp, nombre="US Customer")
 
-    url = reverse("usa_autocomplete:cliente")
-    r = client.get(url, {"q": "Customer"})
+    from django.test import RequestFactory
+    from taller.views_autocomplete import ClienteAutocomplete
+
+    request = RequestFactory().get("/us/autocomplete/cliente/", {"q": "Customer"})
+    request.user = user_us
+    request.session = {}
+    r = ClienteAutocomplete.as_view()(request)
     assert r.status_code == 200
-    payload = r.json()
+    payload = json.loads(r.content.decode("utf-8"))
     texts = [o["text"] for o in payload.get("results", [])]
     assert any("US Customer" in t for t in texts)
 

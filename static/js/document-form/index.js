@@ -43,6 +43,117 @@
         });
     }
 
+    function clearDocumentStateForNewForm() {
+        var form = document.getElementById('document-form');
+        if (!form || form.dataset.mode !== 'create') return;
+
+        var params = new URLSearchParams(window.location.search || '');
+        var hasReturnContext = !!(params.get('cliente_id') || params.get('vehiculo_id') || params.get('target_row'));
+        if (hasReturnContext) return;
+
+        try {
+            Object.keys(sessionStorage).forEach(function(key) {
+                if (key.indexOf('doc_') === 0 || key.indexOf('document_') === 0 || key.indexOf('eg_document') === 0) {
+                    sessionStorage.removeItem(key);
+                }
+            });
+        } catch (err) {
+            console.warn('No se pudo limpiar sessionStorage del documento', err);
+        }
+
+        window.EG.documentState = {};
+    }
+
+    function parseJSONScript(id) {
+        var el = document.getElementById(id);
+        if (!el) return [];
+        try {
+            var data = JSON.parse(el.textContent || '[]');
+            return Array.isArray(data) ? data : [];
+        } catch (err) {
+            console.warn('No se pudo parsear ' + id, err);
+            return [];
+        }
+    }
+
+    function getInitialLineData() {
+        return {
+            repuestos: parseJSONScript('initialRepuestosData'),
+            servicios: parseJSONScript('initialServiciosData'),
+            otros: parseJSONScript('initialOtrosData')
+        };
+    }
+
+    function hasAnyLineData(data) {
+        return !!(
+            data &&
+            ((data.repuestos && data.repuestos.length) ||
+            (data.servicios && data.servicios.length) ||
+            (data.otros && data.otros.length))
+        );
+    }
+
+    function clearTableRows(selector) {
+        document.querySelectorAll(selector).forEach(function(row) { row.remove(); });
+    }
+
+    function hydrateInitialRows() {
+        var data = getInitialLineData();
+        if (!hasAnyLineData(data)) return data;
+
+        clearTableRows('#repuestos-container .dynamic-element');
+        clearTableRows('#servicios-container .dynamic-element');
+        clearTableRows('#otros-container .dynamic-element');
+
+        (data.repuestos || []).forEach(function(rep) {
+            if (!window.EG.repuestos || typeof window.EG.repuestos.addRepuestoRow !== 'function') return;
+            var row = window.EG.repuestos.addRepuestoRow(rep.rowId || null);
+            if (row && row.__applyRepData) {
+                row.__applyRepData({
+                    id: rep.repuesto_id || rep.id || '',
+                    codigo: rep.codigo || '',
+                    nombre: rep.nombre || '',
+                    cantidad: rep.cantidad || 1,
+                    precio_venta: rep.precio_venta != null ? rep.precio_venta : rep.precio,
+                    descuento: rep.descuento != null ? rep.descuento : 0,
+                    origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
+                    pieza_desarme_id: rep.pieza_desarme_id || '',
+                    costo_linea: rep.costo_linea != null ? rep.costo_linea : 0
+                });
+            }
+        });
+
+        (data.servicios || []).forEach(function(serv) {
+            if (!window.EG.servicios || typeof window.EG.servicios.addServicioRow !== 'function') return;
+            var row = window.EG.servicios.addServicioRow();
+            if (row && row.__applyServData) {
+                row.__applyServData({
+                    id: serv.servicio_id || serv.id || '',
+                    nombre: serv.nombre || '',
+                    cantidad: serv.cantidad || 1,
+                    precio: serv.precio != null ? serv.precio : 0,
+                    descuento: serv.descuento != null ? serv.descuento : 0
+                });
+            }
+        });
+
+        (data.otros || []).forEach(function(otro) {
+            if (!window.EG.servicios || typeof window.EG.servicios.addOtroServicioRow !== 'function') return;
+            var row = window.EG.servicios.addOtroServicioRow();
+            if (row && row.__applyOtroData) {
+                row.__applyOtroData({
+                    id: otro.servicio_id || otro.id || '',
+                    nombre: otro.nombre || '',
+                    empresa_ext: otro.empresa_ext || otro.empresa || '',
+                    precio_taller: otro.precio_taller != null ? otro.precio_taller : 0,
+                    precio: otro.precio != null ? otro.precio : 0
+                });
+            }
+        });
+
+        return data;
+    }
+
     /**
      * Inicializa todos los módulos en orden
      */
@@ -55,6 +166,8 @@
             console.log('No se encontro el formulario de documento. Omitiendo inicializacion.');
             return;
         }
+
+        clearDocumentStateForNewForm();
 
         // Cargar módulos secuencialmente para asegurar dependencias
         for (var i = 0; i < MODULE_LOAD_ORDER.length; i++) {
@@ -172,8 +285,20 @@
 
         form.addEventListener('submit', function(e) {
             // Serializar filas antes de enviar
+            var serialization = null;
             if (window.serializeRows) {
-                window.serializeRows();
+                serialization = window.serializeRows();
+            }
+
+            var invalidRows = serialization && Array.isArray(serialization.invalidServiceRows)
+                ? serialization.invalidServiceRows
+                : [];
+
+            if (invalidRows.length) {
+                e.preventDefault();
+                window.alert('Debes seleccionar un servicio valido del listado antes de guardar.');
+                var firstInvalidInput = form.querySelector('#servicios-container .dynamic-element.ring-red-500 .srv-input');
+                if (firstInvalidInput) firstInvalidInput.focus();
             }
         });
     }
@@ -182,6 +307,24 @@
      * Restaura borrador al cargar la página
      */
     async function restoreDraftOnLoad() {
+        var form = document.getElementById('document-form');
+        if (!form) return;
+        var params = new URLSearchParams(window.location.search || '');
+        var hasReturnContext = !!(params.get('cliente_id') || params.get('vehiculo_id') || params.get('target_row'));
+
+        if (form.dataset.mode === 'create' && !hasReturnContext) {
+            if (window.EG.cliente && window.EG.cliente.resetClienteUI) {
+                window.EG.cliente.resetClienteUI();
+            }
+            var vehiculoSelect = document.getElementById('id_vehiculo');
+            if (vehiculoSelect) {
+                vehiculoSelect.innerHTML = '<option value="">' + ((window.EG.I18N && window.EG.I18N.select_vehicle) || 'Select vehicle...') + '</option>';
+                vehiculoSelect.value = '';
+            }
+            var vehiculoInfo = document.getElementById('vehiculo-info');
+            if (vehiculoInfo) vehiculoInfo.classList.add('hidden');
+        }
+
         // Esperar a que todo esté cargado
         await new Promise(function(resolve) {
             if (document.readyState === 'complete') {
@@ -193,10 +336,13 @@
             }
         });
 
+        var initialLineData = hydrateInitialRows();
+        var hasServerLines = hasAnyLineData(initialLineData);
+
         // Restaurar borrador
         if (window.restoreDocumentDraftAfterHydrate) {
             try {
-                await window.restoreDocumentDraftAfterHydrate({ hasServerLines: false });
+                await window.restoreDocumentDraftAfterHydrate({ hasServerLines: hasServerLines });
             } catch (err) {
                 console.error('Error restaurando borrador:', err);
             }
@@ -205,6 +351,9 @@
         // Recalcular totales
         if (window.recalcTotales) {
             window.recalcTotales();
+        }
+        if (window.serializeRows) {
+            window.serializeRows();
         }
     }
 

@@ -53,6 +53,11 @@ urlpatterns = [
         TemplateView.as_view(template_name="cl/es/onboarding/bienvenida.html"),
         name="chile_home",
     ),
+    path(
+        "",
+        TemplateView.as_view(template_name="cl/es/onboarding/bienvenida.html"),
+        name="root",
+    ),
     # URLs principales de taller (configuración, settings, etc.)
     # Centro de Trabajo / Recepción Vehicular (nueva home post-login)
     path("workspace/", centro_trabajo, name="centro_trabajo"),

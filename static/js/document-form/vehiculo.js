@@ -93,9 +93,18 @@
 
         // Si no hay en prefetch, hacer petición AJAX
         try {
-            const urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/ajax/vehiculos-por-cliente/';
+            const urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/api/v1/vehiculos/0/';
             const url = EG.config.buildEndpoint(urlRaw);
-            const fullUrl = `${url}?cliente_id=${encodeURIComponent(clienteId)}`;
+            let fullUrl = '';
+
+            if (/\/0\/?$/.test(url)) {
+                fullUrl = url.replace(/\/0\/?$/, `/${encodeURIComponent(clienteId)}/`);
+            } else if (url.indexOf('__CLIENTE_ID__') !== -1) {
+                fullUrl = url.replace('__CLIENTE_ID__', encodeURIComponent(clienteId));
+            } else {
+                const separator = url.indexOf('?') === -1 ? '?' : '&';
+                fullUrl = `${url}${separator}cliente_id=${encodeURIComponent(clienteId)}`;
+            }
 
             console.log(`📡 Llamando a: ${fullUrl}`);
             const r = await EG.utils.egFetch(fullUrl);
@@ -209,18 +218,26 @@
      */
     function openVehiculoModal() {
         try {
-            const pathOnly = window.location.pathname || '/cl/documentos/form/';
+            const pathOnly = window.location.pathname || '/';
             const nextUrl = window.egEncodeDocumentFormNext?.() || encodeURIComponent(pathOnly);
 
             let countryPrefix = 'cl';
             let langPrefix = 'es';
 
-            if (pathOnly.indexOf('/cl/') === 0) {
-                countryPrefix = 'cl';
-                langPrefix = 'es';
-            } else if (pathOnly.indexOf('/us/') === 0) {
-                countryPrefix = 'us';
-                langPrefix = 'en';
+            const pathParts = pathOnly.split('/').filter(function(part) {
+                return part && part.length > 0;
+            });
+
+            if (pathParts.length > 0) {
+                if (['es', 'en', 'pt'].indexOf(pathParts[0]) !== -1) {
+                    langPrefix = pathParts[0];
+                    countryPrefix = langPrefix === 'en' ? 'us' : (langPrefix === 'pt' ? 'br' : 'cl');
+                } else {
+                    countryPrefix = pathParts[0];
+                    if (pathParts.length > 1 && ['es', 'en', 'pt'].indexOf(pathParts[1]) !== -1) {
+                        langPrefix = pathParts[1];
+                    }
+                }
             }
 
             // Obtener cliente seleccionado

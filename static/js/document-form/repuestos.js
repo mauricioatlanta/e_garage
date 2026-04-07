@@ -34,8 +34,7 @@
             return null;
         }
 
-        var isFirstRow = !container.querySelector('.dynamic-element');
-        var row = document.createElement('div');
+        var row = document.createElement('tr');
         row.className = 'dynamic-element';
 
         var rowId = (presetRowId && String(presetRowId).trim())
@@ -43,40 +42,32 @@
             : 'rep_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
 
         row.dataset.rowId = rowId;
-        row.innerHTML = buildRepuestoRowHTML(rowId, isFirstRow);
+        row.innerHTML = buildRepuestoRowHTML(rowId);
 
         container.appendChild(row);
         setupRepuestoRow(row);
         return row;
     }
 
-    function buildRepuestoRowHTML(rowId, isFirstRow) {
-        var lbl = isFirstRow ? '<label class="block text-cyan-200 text-sm mb-1">' : '<label class="hidden">';
-        var lblEnd = isFirstRow ? '</label>' : '</label>';
-        return '<div class="doc-row-grid repuesto-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="' + rowId + '">' +
-            '<div class="col-span-2 sm:col-span-2 relative min-w-0">' +
-            lbl + (EG.I18N.code || 'Code') + lblEnd +
-            '<input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="' + (EG.I18N.code || 'Code') + '">' +
+    function buildRepuestoRowHTML(rowId) {
+        return '<td class="doc-sheet-cell relative min-w-0">' +
+            '<input type="text" class="rep-codigo doc-input form-control text-sm" placeholder="' + (EG.I18N.code || 'Code') + '">' +
             '<div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>' +
             '<input type="hidden" class="rep-id"><input type="hidden" class="rep-origen" value="STOCK_BODEGA">' +
-            '<input type="hidden" class="rep-pieza-desarme-id"><input type="hidden" class="rep-costo-linea"></div>' +
-            '<div class="col-span-4 sm:col-span-4 description-field rep-search-container relative min-w-0">' +
-            '<div class="flex items-center justify-between gap-2 mb-1"><span>' + (isFirstRow ? (EG.I18N.name || 'Name') : '') + '</span>' +
+            '<input type="hidden" class="rep-pieza-desarme-id"><input type="hidden" class="rep-costo-linea"></td>' +
+            '<td class="doc-sheet-cell description-field rep-search-container relative min-w-0 field-main">' +
+            '<div class="flex items-center justify-between gap-2 mb-1"><span class="sr-only">' + (EG.I18N.name || 'Name') + '</span>' +
             '<span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase">Usado</span></div>' +
             '<div class="flex gap-1">' +
-            '<input type="text" class="rep-search form-control w-full h-10 text-sm flex-1" placeholder="' + (EG.I18N.type_to_search_parts || 'Buscar...') + '">' +
-            '<button type="button" class="rep-create-btn btn-add flex-shrink-0 h-10 px-2">+</button></div>' +
+            '<input type="text" class="rep-search doc-input form-control text-sm flex-1" placeholder="' + (EG.I18N.type_to_search_parts || 'Buscar...') + '">' +
+            '<button type="button" class="rep-create-btn btn-row-icon" title="' + (EG.I18N.create_part || 'Create') + '">+</button></div>' +
             '<div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>' +
-            '<input type="hidden" class="rep-nombre"></div>' +
-            '<div class="col-span-1 sm:col-span-1 min-w-0">' + lbl + (EG.I18N.qty || 'Qty') + lblEnd +
-            '<input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" value="1"></div>' +
-            '<div class="col-span-2 sm:col-span-2 min-w-0">' + lbl + (EG.I18N.sale_price || 'Price') + lblEnd +
-            '<div class="relative"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300">$</span>' +
-            '<input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6" placeholder="0"></div></div>' +
-            '<div class="col-span-1 sm:col-span-1 min-w-0"><label class="block text-cyan-200 text-sm mb-1">' + (EG.I18N.subtotal || 'Subtotal') + '</label>' +
-            '<input type="hidden" class="rep-subtotal" value="0">' +
-            '<div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div></div>' +
-            '<div class="col-span-1 sm:col-span-1"><button type="button" class="btn-add w-full h-10 rep-remove-btn">X</button></div></div>';
+            '<input type="hidden" class="rep-nombre"><input type="hidden" class="rep-row-id" value="' + rowId + '"></td>' +
+            '<td class="doc-sheet-cell"><input type="number" class="rep-cantidad doc-input form-control text-sm" min="1" value="1"></td>' +
+            '<td class="doc-sheet-cell doc-sheet-money"><span>$</span><input type="text" class="rep-precio-venta doc-input form-control text-sm" placeholder="0"></td>' +
+            '<td class="doc-sheet-cell"><input type="number" class="rep-descuento doc-input form-control text-sm" min="0" max="100" step="0.01" value="0" placeholder="0-100"></td>' +
+            '<td class="doc-sheet-cell field-total"><input type="hidden" class="rep-subtotal" value="0"><div class="rep-subtotal-view doc-sheet-total">$0</div></td>' +
+            '<td class="doc-sheet-cell doc-sheet-row-actions"><button type="button" class="btn-row-icon btn-row-icon-remove rep-remove-btn doc-row-remove" title="Eliminar">&times;</button></td>';
     }
 
     function setupRepuestoRow(row) {
@@ -86,6 +77,7 @@
         var inpCode = row.querySelector('.rep-codigo');
         var codeDrop = row.querySelector('.rep-codigo-dropdown');
         var inpPV = row.querySelector('.rep-precio-venta');
+        var descEl = row.querySelector('.rep-descuento');
         var qEl = row.querySelector('.rep-cantidad');
         var sub = row.querySelector('.rep-subtotal');
         var view = row.querySelector('.rep-subtotal-view');
@@ -156,6 +148,10 @@
             if (qEl && data.cantidad) {
                 qEl.value = data.cantidad;
                 qEl.dispatchEvent(new Event('input'));
+            }
+            if (descEl && data.descuento !== undefined) {
+                descEl.value = data.descuento;
+                descEl.dispatchEvent(new Event('input'));
             }
             recalc();
         };
@@ -234,7 +230,8 @@
         function recalc() {
             var q = Number(qEl && qEl.value || 0);
             var p = EG.utils.parseNumericInput(inpPV && inpPV.value || 0);
-            var subtotal = q * p;
+            var d = Number(descEl && descEl.value || 0) || 0;
+            var subtotal = q * p * (1 - (d / 100));
             if (sub) sub.value = subtotal;
             if (view) view.textContent = EG.utils.money(subtotal);
             if (typeof window.recalcTotales === 'function') window.recalcTotales();
@@ -277,6 +274,7 @@
         });
         if (qEl) qEl.addEventListener('input', recalc);
         if (inpPV) inpPV.addEventListener('input', recalc);
+        if (descEl) descEl.addEventListener('input', recalc);
         toggleRepuestosEmptyHint();
     }
 

@@ -1,4 +1,4 @@
-{% load i18n static %}
+﻿{% load i18n static country_url %}
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -162,7 +162,26 @@
       ) 1;
     }
 
-    .btn-primary {
+    @media (max-width: 767px) {
+  .glass-card {
+    padding: 0.75rem !important;
+  }
+
+  .glass-card h3 {
+    font-size: 1rem !important;
+    margin-bottom: 0.3rem !important;
+  }
+
+  .glass-card p {
+    font-size: 0.8rem !important;
+    line-height: 1.2 !important;
+  }
+
+  section .grid {
+    gap: 0.75rem !important;
+  }
+}
+.btn-primary {
       background: linear-gradient(135deg, #009c3b 0%, #ffdf00 100%);
       color: #000000;
       font-weight: 800;
@@ -235,18 +254,26 @@
     }
 
     .hero-section {
-      min-height: 100vh;
+      min-height: 40vh;
       display: flex;
       align-items: center;
       justify-content: center;
       position: relative;
-      padding: 2rem;
+      padding: 1rem;
+      overflow: hidden;
       z-index: 1;
     }
 
+    @media (min-width: 768px) {
+      .hero-section {
+        min-height: 100vh;
+        padding: 2rem;
+      }
+    }
+
     .feature-icon {
-      width: 90px;
-      height: 90px;
+      width: 60px;
+      height: 60px;
       background: linear-gradient(135deg, 
         rgba(0, 156, 59, 0.3) 0%, 
         rgba(0, 39, 118, 0.2) 50%,
@@ -257,13 +284,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 2.8rem;
-      margin: 0 auto 1.5rem;
+      font-size: 1.8rem;
+      margin: 0 auto 0.8rem;
       border: 2px solid rgba(0, 156, 59, 0.5);
       box-shadow: 
         0 8px 32px rgba(0, 156, 59, 0.2),
         inset 0 1px 0 rgba(255, 255, 255, 0.1);
       transition: all 0.3s ease;
+    }
+
+    @media (min-width: 768px) {
+      .feature-icon {
+        width: 90px;
+        height: 90px;
+        font-size: 2.8rem;
+        margin: 0 auto 1.5rem;
+      }
     }
 
     .glass-card:hover .feature-icon {
@@ -275,7 +311,7 @@
     }
 
     .stats-number {
-      font-size: 3.5rem;
+      font-size: 2rem;
       font-weight: 900;
       background: linear-gradient(135deg, #00ff5e 0%, #ffdf00 100%);
       -webkit-background-clip: text;
@@ -285,6 +321,32 @@
       text-shadow: 0 0 40px rgba(0, 156, 59, 0.5);
       filter: drop-shadow(0 0 20px rgba(254, 223, 0, 0.3));
       animation: statsGlow 2s ease-in-out infinite;
+    }
+
+    @media (min-width: 768px) {
+      .stats-number {
+        font-size: 3.5rem;
+      }
+    }
+
+    .hero-section h1 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-section p {
+      margin-bottom: 0.5rem;
+    }
+
+    @media (min-width: 768px) {
+      .hero-section h1 {
+        font-size: 3rem;
+        margin-bottom: 1.5rem;
+      }
+
+      .hero-section p {
+        margin-bottom: 1.5rem;
+      }
     }
 
     @keyframes statsGlow {
@@ -348,22 +410,22 @@
       <div class="text-center" data-aos="fade-up">
         
         <!-- Logo -->
-        <div class="mb-8 inline-block">
-          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 156, 59, 0.8));">
+        <div class="mb-4 md:mb-8 inline-block">
+          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-20 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 156, 59, 0.8));">
         </div>
 
         <!-- Title -->
-        <h1 class="font-futuristic text-6xl md:text-8xl mb-6 futuristic-glow">
+        <h1 class="font-futuristic text-4xl md:text-8xl mb-4 md:mb-6 futuristic-glow">
           eGarage Brasil
         </h1>
         
-        <p class="text-2xl md:text-3xl mb-8 font-light" style="color: #e0e0e0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
+        <p class="text-lg md:text-3xl mb-5 md:mb-8 font-light" style="color: #e0e0e0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
           A plataforma definitiva para o setor automotivo no Brasil
         </p>
 
         <!-- Tipos de Negócios - Quick Overview -->
-        <div class="mb-16 px-4" data-aos="fade-up" data-aos-delay="100">
-          <div class="glass-card p-6 max-w-5xl mx-auto" style="overflow-x: auto;">
+        <div class="mb-8 md:mb-16 px-2 md:px-4" data-aos="fade-up" data-aos-delay="100">
+          <div class="glass-card p-4 md:p-6 max-w-5xl mx-auto" style="overflow-x: auto;">
             <div class="flex flex-wrap gap-3 md:gap-4 justify-center items-center text-center min-w-max md:min-w-0">
               <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 156, 59, 0.15); color: #00ff5e; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 156, 59, 0.3);">
                 <span style="font-size: 1.3rem;">🔧</span>
@@ -402,29 +464,29 @@
         </div>
 
         <!-- CTA Buttons -->
-        <div class="flex flex-wrap gap-6 justify-center mb-16">
-          <a href="/br/signup/" class="btn-primary">
+        <div class="flex flex-wrap gap-3 md:gap-6 justify-center mb-8 md:mb-16">
+          <a href="{% country_url 'account_signup' %}" class="btn-primary">
             🚀 Começar Grátis
           </a>
-          <a href="/br/login/" class="btn-secondary">
+          <a href="{% country_url 'account_login' %}" class="btn-secondary">
             🔐 Entrar
           </a>
-          <a href="/br/precos/" class="btn-secondary">
+          <a href="{% country_url 'precios' %}" class="btn-secondary">
             💰 Ver Planos
           </a>
         </div>
 
         <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20" data-aos="fade-up" data-aos-delay="200">
-          <div class="glass-card p-8">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-8 mt-8 md:mt-20" data-aos="fade-up" data-aos-delay="200">
+          <div class="glass-card p-5 md:p-8">
             <div class="stats-number">1000+</div>
             <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Oficinas Ativas</p>
           </div>
-          <div class="glass-card p-8">
+          <div class="glass-card p-5 md:p-8">
             <div class="stats-number">50K+</div>
             <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Ordens de Serviço</p>
           </div>
-          <div class="glass-card p-8">
+          <div class="glass-card p-5 md:p-8">
             <div class="stats-number">R$ 10M+</div>
             <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Faturado</p>
           </div>
@@ -722,7 +784,7 @@
             <li>✓ Inventário</li>
             <li>✓ Suporte 24/7</li>
           </ul>
-          <a href="/br/signup/?plan=mensal" class="btn-secondary inline-block w-full">
+          <a href="{% country_url 'account_signup' %}?plan=mensal" class="btn-secondary inline-block w-full">
             Selecionar
           </a>
         </div>
@@ -750,7 +812,7 @@
             <li>✓ Multi-filiais</li>
             <li>✓ Prioridade no suporte</li>
           </ul>
-          <a href="/br/signup/?plan=semestral" class="btn-primary inline-block w-full">
+          <a href="{% country_url 'account_signup' %}?plan=semestral" class="btn-primary inline-block w-full">
             Selecionar
           </a>
         </div>
@@ -775,7 +837,7 @@
             <li>✓ API personalizada</li>
             <li>✓ Suporte dedicado</li>
           </ul>
-          <a href="/br/signup/?plan=anual" class="btn-secondary inline-block w-full">
+          <a href="{% country_url 'account_signup' %}?plan=anual" class="btn-secondary inline-block w-full">
             Selecionar
           </a>
         </div>
@@ -788,7 +850,7 @@
         <p class="text-xl mb-8" style="color: #d0d0d0; font-weight: 500;">
           Sem cartão de crédito. Sem compromisso. Cancele quando quiser.
         </p>
-        <a href="/br/signup/" class="btn-primary inline-block">
+        <a href="{% country_url 'account_signup' %}" class="btn-primary inline-block">
           🚀 Começar Agora
         </a>
       </div>
@@ -814,26 +876,26 @@
         <div>
           <h5 class="font-bold mb-4" style="color: #ffdf00;">Produto</h5>
           <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/br/precos/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Preços</a></li>
-            <li><a href="/br/demo/localizacao/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Demo</a></li>
-            <li><a href="/br/documentos/form/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Documentos</a></li>
+            <li><a href="{% country_url 'precios' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Preços</a></li>
+            <li><a href="{% country_url 'demo_atlanta_publico' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Demo</a></li>
+            <li><a href="{% country_url 'documentos:documento_crear' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Documentos</a></li>
           </ul>
         </div>
 
         <div>
           <h5 class="font-bold mb-4" style="color: #ffdf00;">Empresa</h5>
           <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/br/sobre/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Sobre Nós</a></li>
-            <li><a href="/br/contato/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Contato</a></li>
-            <li><a href="/br/suporte/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Suporte</a></li>
+            <li><a href="{% url 'sobre' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Sobre Nós</a></li>
+            <li><a href="{% url 'contacto_ventas' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Contato</a></li>
+            <li><a href="{% url 'soporte' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Suporte</a></li>
           </ul>
         </div>
 
         <div>
           <h5 class="font-bold mb-4" style="color: #ffdf00;">Legal</h5>
           <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/br/privacidade/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Privacidade</a></li>
-            <li><a href="/br/termos/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Termos</a></li>
+            <li><a href="{% url 'privacidad' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Privacidade</a></li>
+            <li><a href="{% url 'terminos' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Termos</a></li>
           </ul>
         </div>
 

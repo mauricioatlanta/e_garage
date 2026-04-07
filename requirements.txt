@@ -86,4 +86,4 @@ pyarmor>=8.5.0  # Para ofuscar motor_ia_core.py antes de producción
 
 
 
-
+pre-commit

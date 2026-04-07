@@ -9,7 +9,6 @@ from taller.utils.country_routing import (
     canonicalize_entry_alias,
     default_lang_for_country,
     infer_country,
-    infer_language,
     normalize_country,
     parse_country_lang,
 )
@@ -146,8 +145,6 @@ class CountryAndLanguageMiddleware:
     def _resolved_lang(self, request, country: str, path_lang: str | None = None) -> str:
         if path_lang:
             return canonical_lang_for_country(country, path_lang)
-        if country == "US":
-            return infer_language(request, country, path_lang=path_lang)
         return default_lang_for_country(country)
 
     def _with_query(self, request, url: str) -> str:

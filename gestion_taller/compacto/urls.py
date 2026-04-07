@@ -330,20 +330,8 @@ urlpatterns = [
     # Redirección de documentos sin país a Chile por defecto
     path(
         "documentos/",
-        RedirectView.as_view(url="/cl/documentos/", permanent=False),
+        RedirectView.as_view(url="/cl/es/documentos/", permanent=False),
         name="documentos_redirect_root",
-    ),
-    # Redirecciones de compatibilidad para URLs antiguas con patrón duplicado
-    path("cl/documentos/cl/", RedirectView.as_view(url="/cl/documentos/", permanent=True)),
-    path("us/documentos/us/", RedirectView.as_view(url="/us/documentos/", permanent=True)),
-    # URLs con prefijo de país específico - NAMESPACES ÚNICOS
-    path(
-        "cl/documentos/",
-        include(("taller.documentos.urls", "documentos_cl_es"), namespace="documentos_cl_es"),
-    ),
-    path(
-        "us/documentos/",
-        include(("taller.documentos.urls", "documentos_us_en"), namespace="documentos_us_en"),
     ),
     # Autocomplete URLs por país
     path(

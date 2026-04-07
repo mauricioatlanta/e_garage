@@ -45,6 +45,26 @@ def empresa_usa(user):
     )
 
 
+@pytest.fixture
+def user_usa():
+    """Fixture para crear un usuario de prueba para empresa USA"""
+    return User.objects.create_user(
+        username="testuser_usa", email="test_usa@example.com", password="testpass123"
+    )
+
+
+@pytest.fixture
+def empresa_usa_unica(user_usa):
+    """Fixture para crear una empresa USA con usuario exclusivo"""
+    return Empresa.objects.create(
+        user=user_usa,
+        nombre_taller="USA Garage Test",
+        pais="US",
+        moneda="USD",
+        zona_horaria="America/New_York",
+    )
+
+
 @pytest.mark.django_db
 def test_dias_restantes_ceil(empresa_chile):
     """Test que verifica el cálculo de días restantes con ceil"""
@@ -60,11 +80,12 @@ def test_dias_restantes_ceil(empresa_chile):
 @pytest.mark.django_db
 def test_moneda_por_pais_auto_correccion():
     """Test que verifica la auto-corrección de moneda por país"""
-    user = User.objects.create_user(username="test", password="test")
+    user_usa = User.objects.create_user(username="test_usa", password="test")
+    user_chile = User.objects.create_user(username="test_chile", password="test")
 
     # Test 1: Empresa USA con moneda incorrecta
     empresa_usa = Empresa.objects.create(
-        user=user,
+        user=user_usa,
         nombre_taller="Test USA",
         pais="US",
         moneda="CLP",  # Incorrecto para USA
@@ -74,7 +95,7 @@ def test_moneda_por_pais_auto_correccion():
 
     # Test 2: Empresa Chile con moneda incorrecta
     empresa_chile = Empresa.objects.create(
-        user=user,
+        user=user_chile,
         nombre_taller="Test Chile",
         pais="CL",
         moneda="USD",  # Incorrecto para Chile
@@ -86,11 +107,12 @@ def test_moneda_por_pais_auto_correccion():
 @pytest.mark.django_db
 def test_tz_por_pais_auto_correccion():
     """Test que verifica la auto-corrección de zona horaria por país"""
-    user = User.objects.create_user(username="test2", password="test")
+    user_usa = User.objects.create_user(username="test2_usa", password="test")
+    user_chile = User.objects.create_user(username="test2_chile", password="test")
 
     # Test 1: Empresa USA con TZ de Chile
     empresa_usa = Empresa.objects.create(
-        user=user,
+        user=user_usa,
         nombre_taller="Test USA TZ",
         pais="US",
         zona_horaria="America/Santiago",  # Incorrecto para USA
@@ -100,7 +122,7 @@ def test_tz_por_pais_auto_correccion():
 
     # Test 2: Empresa Chile con TZ de USA
     empresa_chile = Empresa.objects.create(
-        user=user,
+        user=user_chile,
         nombre_taller="Test Chile TZ",
         pais="CL",
         zona_horaria="America/New_York",  # Incorrecto para Chile
@@ -177,7 +199,7 @@ def test_extender_suscripcion(empresa_chile):
 
 
 @pytest.mark.django_db
-def test_formato_moneda(empresa_chile, empresa_usa):
+def test_formato_moneda(empresa_chile, empresa_usa_unica):
     """Test que verifica el formato de moneda por país"""
     # Test Chile
     formato_cl = empresa_chile.formato_moneda
@@ -186,7 +208,7 @@ def test_formato_moneda(empresa_chile, empresa_usa):
     assert formato_cl["decimales"] == 0
 
     # Test USA
-    formato_us = empresa_usa.formato_moneda
+    formato_us = empresa_usa_unica.formato_moneda
     assert formato_us["simbolo"] == "$"
     assert formato_us["codigo"] == "USD"
     assert formato_us["decimales"] == 2
@@ -253,10 +275,10 @@ def test_marcar_pago_recibido(empresa_chile):
 
 
 @pytest.mark.django_db
-def test_timezone_display(empresa_chile, empresa_usa):
+def test_timezone_display(empresa_chile, empresa_usa_unica):
     """Test que verifica el display de zona horaria"""
     assert empresa_chile.timezone_display == "Chile Time (CLT)"
-    assert empresa_usa.timezone_display == "Eastern Time (ET)"
+    assert empresa_usa_unica.timezone_display == "Eastern Time (ET)"
 
 
 @pytest.mark.django_db

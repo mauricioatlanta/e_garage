@@ -65,6 +65,7 @@ app_name = "argentina"
 urlpatterns = [
     # Vista de inicio para /ar/es/ - redirige a la página principal de Argentina
     path("", argentina_home, name="argentina_home"),
+    path("", argentina_home, name="root"),
     # URLs principales de taller (configuración, settings, etc.)
     path("dashboard/", dashboard, name="dashboard"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
@@ -190,7 +191,7 @@ urlpatterns = [
     path("ajax/", include(("taller.ajax.urls", "ajax"), namespace="ajax")),
     # === MÓDULOS PRINCIPALES ===
     # Incluir URLs principales de taller (clientes, vehiculos, repuestos, etc.)
-    path("", include(("taller.urls", "taller"), namespace="taller")),
+    path("", include(("taller.urls", "taller"), namespace="argentina_taller")),
     path(
         "autocomplete/",
         include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),
