@@ -66,6 +66,10 @@ urlpatterns = [
         TemplateView.as_view(template_name="ve/es/clientes/lista_clientes.html"),
         name="lista_clientes_venezuela",
     ),
+    path(
+        "clientes/",
+        include(("taller.urls_clientes", "clientes"), namespace="clientes"),
+    ),
     # Dashboard de suscriptor
     path("", include("taller.analytics.urls_suscriptor")),
     # =========================
@@ -98,6 +102,10 @@ urlpatterns = [
         views_vehiculos.vehiculo_detalle,
         {"country_code": "ve", "lang_code": "es"},
         name="detalle_vehiculo_ve",
+    ),
+    path(
+        "vehiculos/",
+        include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos"),
     ),
     # =========================
     # Módulos principales del sistema

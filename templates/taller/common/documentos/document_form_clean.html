@@ -1,0 +1,558 @@
+﻿{% extends "taller/documentos/base/base_documento.html" %}
+{% load i18n %}
+{% load static %}
+{% load country_url %}
+
+{% block extra_css %}
+<style>
+  .clean-doc-shell{
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+    color: #e5e7eb;
+  }
+
+  .clean-doc-card{
+    background: #0f172a;
+    border: 1px solid #334155;
+    border-radius: 14px;
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+
+  .clean-doc-title{
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: #f8fafc;
+  }
+
+  .clean-grid{
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .clean-field label{
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: #cbd5e1;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+  }
+
+  .clean-field input,
+  .clean-field select,
+  .clean-field textarea,
+  .clean-field .form-control,
+  .clean-field .form-select{
+    width: 100%;
+    min-height: 42px;
+    background: #111827 !important;
+    color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+    border-radius: 10px !important;
+    padding: 10px 12px !important;
+    box-shadow: none !important;
+  }
+
+  .clean-field textarea{
+    min-height: 120px;
+    resize: vertical;
+  }
+
+  .clean-section-title{
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: #f8fafc;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+  }
+
+  .clean-toolbar{
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .clean-btn{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    padding: 0 14px;
+    border-radius: 10px;
+    border: 1px solid #475569;
+    background: #1e293b;
+    color: #f8fafc;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .clean-btn:hover{
+    background: #334155;
+  }
+
+  .clean-btn-primary{
+    background: #0891b2;
+    border-color: #0891b2;
+  }
+
+  .clean-btn-primary:hover{
+    background: #0ea5e9;
+    border-color: #0ea5e9;
+  }
+
+  .clean-table-wrap{
+    overflow-x: auto;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    background: #0b1220;
+  }
+
+  .clean-table{
+    width: 100%;
+    min-width: 980px;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+
+  .clean-table thead th{
+    text-align: left;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #cbd5e1;
+    background: #111827;
+    border-bottom: 1px solid #334155;
+    padding: 12px 10px;
+  }
+
+  .clean-table tbody td{
+    padding: 10px;
+    border-bottom: 1px solid #1f2937;
+    vertical-align: middle;
+    background: #0f172a;
+  }
+
+  .clean-table input,
+  .clean-table select,
+  .clean-table .form-control{
+    width: 100%;
+    min-height: 38px;
+    background: #111827 !important;
+    color: #f8fafc !important;
+    border: 1px solid #475569 !important;
+    border-radius: 8px !important;
+    padding: 8px 10px !important;
+  }
+
+  .clean-money{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .clean-money span{
+    color: #94a3b8;
+    font-weight: 700;
+  }
+
+  .clean-total-box{
+    min-height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 10px;
+    border: 1px solid #334155;
+    border-radius: 8px;
+    background: #111827;
+    color: #f8fafc;
+    font-weight: 700;
+  }
+
+  .clean-empty{
+    color: #94a3b8;
+    text-align: center;
+    padding: 18px !important;
+  }
+
+  .clean-actions{
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+  }
+
+  .clean-icon-btn{
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    border: 1px solid #475569;
+    background: #1e293b;
+    color: #f8fafc;
+    cursor: pointer;
+  }
+
+  .clean-icon-btn:hover{
+    background: #334155;
+  }
+
+  .clean-icon-btn.clean-danger{
+    border-color: #7f1d1d;
+    background: #3f1d1d;
+    color: #fecaca;
+  }
+
+  .clean-totals{
+    max-width: 420px;
+    margin-left: auto;
+  }
+
+  .clean-totals table{
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .clean-totals td{
+    padding: 10px 0;
+    border-bottom: 1px solid #334155;
+  }
+
+  .clean-totals td:last-child{
+    text-align: right;
+    font-weight: 700;
+    color: #f8fafc;
+  }
+
+  .clean-totals .grand td{
+    font-size: 18px;
+    border-bottom: none;
+    padding-top: 14px;
+  }
+
+  .hidden-template-row{
+    display: none;
+  }
+
+  @media (max-width: 900px){
+    .clean-grid{
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  @media (max-width: 640px){
+    .clean-doc-shell{
+      padding: 14px;
+    }
+
+    .clean-grid{
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock extra_css %}
+
+{% block documento_title %}{% if es_edicion %}{% trans "Edit document" %}{% else %}{% trans "Create document" %}{% endif %}{% endblock documento_title %}
+
+{% block content %}
+{% with active_country=empresa.pais|default:'CL' %}
+<div class="clean-doc-shell">
+  <form method="post" id="document-form" class="clean-doc-form"
+        data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
+        data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
+        data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
+        data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
+        data-url-client-search="{% url 'api:buscar_clientes_api' %}"
+        data-url-vehiculos-by-cli="{% url 'api:vehiculos_cliente_api' 0 %}"
+        data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
+        data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
+        data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
+        data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
+        data-url-service-search="{% country_url 'documentos:api_buscar_servicios' %}"
+        data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
+        data-url-outsourced-services="{% url 'api:buscar_otros_servicios_api' %}"
+        data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
+    {% csrf_token %}
+
+    {% if form.errors %}
+    <div class="clean-doc-card" style="border-color:#7f1d1d;background:#2b1111;">
+      <div class="clean-section-title">{% trans "Validation errors" %}</div>
+      <ul>
+        {% for field, errors in form.errors.items %}
+          {% for msg in errors %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <div class="clean-doc-card">
+      <div class="clean-doc-title">{% if es_edicion %}{% trans "Edit document" %}{% else %}{% trans "Create document" %}{% endif %}</div>
+
+      <div class="clean-grid">
+        <div class="clean-field">
+          <label for="id_tipo">{% trans "Document type" %}</label>
+          {{ form.tipo }}
+        </div>
+
+        <div class="clean-field">
+          <label>{% trans "Document No." %}</label>
+          <div class="clean-total-box" id="id_numero">
+            {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}&mdash;{% endif %}
+          </div>
+        </div>
+
+        <div class="clean-field">
+          <label for="id_fecha_emision">{% trans "Issue date" %}</label>
+          {{ form.fecha_emision }}
+        </div>
+
+        <div class="clean-field">
+          <label for="id_estado_pago">{% trans "Payment status" %}</label>
+          {{ form.estado_pago }}
+        </div>
+      </div>
+    </div>
+
+    <div class="clean-doc-card">
+      <div class="clean-section-title">{% trans "Customer and vehicle" %}</div>
+
+      <div class="clean-grid">
+        <div class="clean-field">
+          <label for="cliente-busqueda">{% trans "Client" %}</label>
+          <input type="text" id="cliente-busqueda" class="form-control" autocomplete="off" placeholder="{% trans 'Search client...' %}">
+          {{ form.cliente }}
+        </div>
+
+        <div class="clean-field">
+          <label for="id_vehiculo">{% trans "Vehicle" %}</label>
+          {{ form.vehiculo }}
+        </div>
+
+        <div class="clean-field">
+          <label for="id_tecnico_responsable">{% trans "Responsible technician" %}</label>
+          {{ form.tecnico_responsable }}
+        </div>
+
+        <div class="clean-field">
+          <label for="id_kilometraje">{% trans "Mileage" %}</label>
+          {{ form.kilometraje }}
+        </div>
+      </div>
+    </div>
+
+    {% if ui_config.show_repuestos %}
+    <div class="clean-doc-card">
+      <div class="clean-section-title">{% trans "Parts" %}</div>
+      <div class="clean-toolbar">
+        <button type="button" id="add-repuesto" class="clean-btn clean-btn-primary">{% trans "Add part" %}</button>
+        <button type="button" id="add-used-parts" class="clean-btn">{% trans "Used part" %}</button>
+      </div>
+
+      <div class="clean-table-wrap">
+        <table class="clean-table doc-sheet-table doc-sheet-table-repuestos">
+          <colgroup>
+            <col style="width:140px;">
+            <col>
+            <col style="width:90px;">
+            <col style="width:150px;">
+            <col style="width:110px;">
+            <col style="width:150px;">
+            <col style="width:90px;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>{% trans "Code" %}</th>
+              <th>{% trans "Part name" %}</th>
+              <th>{% trans "Qty" %}</th>
+              <th>{% trans "Sale price" %}</th>
+              <th>{% trans "Discount" %}</th>
+              <th>{% trans "Subtotal" %}</th>
+              <th>{% trans "Actions" %}</th>
+            </tr>
+          </thead>
+          <tbody id="repuestos-container" class="doc-sheet-body">
+            <tr id="repuestos-empty-hint" class="doc-sheet-empty-row empty-hint">
+              <td colspan="7" class="clean-empty">{% trans "Click Add part to insert a new row." %}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if ui_config.show_services %}
+    <div class="clean-doc-card">
+      <div class="clean-section-title">{% trans "Services" %}</div>
+      <div class="clean-toolbar">
+        <button type="button" id="add-servicio" class="clean-btn clean-btn-primary">{% trans "Add service" %}</button>
+      </div>
+
+      <div class="clean-table-wrap">
+        <table class="clean-table doc-sheet-table doc-sheet-table-servicios">
+          <colgroup>
+            <col>
+            <col style="width:90px;">
+            <col style="width:150px;">
+            <col style="width:110px;">
+            <col style="width:150px;">
+            <col style="width:90px;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>{% trans "Service" %}</th>
+              <th>{% trans "Qty" %}</th>
+              <th>{% trans "Client price" %}</th>
+              <th>{% trans "Discount" %}</th>
+              <th>{% trans "Subtotal" %}</th>
+              <th>{% trans "Actions" %}</th>
+            </tr>
+          </thead>
+          <tbody id="servicios-container" class="doc-sheet-body">
+            <tr id="servicios-empty-hint" class="doc-sheet-empty-row empty-hint">
+              <td colspan="6" class="clean-empty">{% trans "Click Add service to insert a new row." %}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    {% if ui_config.show_otros_servicios %}
+    <div class="clean-doc-card">
+      <div class="clean-section-title">{% trans "Other services" %}</div>
+      <div class="clean-toolbar">
+        <button type="button" id="add-otro" class="clean-btn clean-btn-primary">{% trans "Add external service" %}</button>
+      </div>
+
+      <div class="clean-table-wrap">
+        <table class="clean-table doc-sheet-table doc-sheet-table-otros">
+          <colgroup>
+            <col>
+            <col style="width:220px;">
+            <col style="width:150px;">
+            <col style="width:150px;">
+            <col style="width:150px;">
+            <col style="width:90px;">
+          </colgroup>
+          <thead>
+            <tr>
+              <th>{% trans "Service" %}</th>
+              <th>{% trans "External company" %}</th>
+              <th>{% trans "Shop price" %}</th>
+              <th>{% trans "Client price" %}</th>
+              <th>{% trans "Profit" %}</th>
+              <th>{% trans "Actions" %}</th>
+            </tr>
+          </thead>
+          <tbody id="otros-container" class="doc-sheet-body">
+            <tr id="otros-empty-hint" class="doc-sheet-empty-row empty-hint">
+              <td colspan="6" class="clean-empty">{% trans "Click Add external service to insert a new row." %}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    {% endif %}
+
+    <div class="clean-doc-card">
+      <div class="clean-section-title">{% trans "Notes" %}</div>
+      <div class="clean-field">
+        {{ form.observaciones }}
+      </div>
+    </div>
+
+    <div class="clean-doc-card">
+      <div class="clean-section-title">{% trans "Totals" %}</div>
+
+      <div class="clean-totals">
+        <table>
+          <tbody>
+            <tr>
+              <td>{% trans "Parts" %}</td>
+              <td><span id="t_repuestos">$0</span></td>
+            </tr>
+            {% if ui_config.show_services %}
+            <tr>
+              <td>{% trans "Services" %}</td>
+              <td><span id="t_servicios">$0</span></td>
+            </tr>
+            {% endif %}
+            {% if ui_config.show_otros_servicios %}
+            <tr>
+              <td>{% trans "Other" %}</td>
+              <td><span id="t_otros">$0</span></td>
+            </tr>
+            {% endif %}
+            {% for tax_line in ui_config.tax_lines %}
+            <tr class="tax-line" data-tax-id="{{ tax_line.id }}">
+              <td>
+                <label>
+                  <input type="checkbox"
+                         id="include_{{ tax_line.id }}"
+                         class="tax-checkbox"
+                         data-tax-id="{{ tax_line.id }}"
+                         data-tax-rate="{{ tax_line.rate }}"
+                         checked>
+                  {{ tax_line.label }} ({{ tax_line.rate }}%)
+                </label>
+              </td>
+              <td><span id="tax_total_{{ tax_line.id }}">$0</span></td>
+            </tr>
+            {% endfor %}
+            <tr class="grand">
+              <td>{% trans "Grand total" %}</td>
+              <td><span id="t_total">$0</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="clean-toolbar" style="margin-top:16px;justify-content:flex-end;">
+        <a href="{% country_url 'documentos:lista_documentos' %}" class="clean-btn">{% trans "Back" %}</a>
+        <button type="submit" class="clean-btn clean-btn-primary totales-cockpit-save">{% trans "Save document" %}</button>
+      </div>
+    </div>
+
+    <input type="hidden" name="repuestos_json" id="id_repuestos_json">
+    <input type="hidden" name="servicios_json" id="id_servicios_json">
+    <input type="hidden" name="otros_json" id="id_otros_json">
+  </form>
+
+  <div id="modal-used-parts" class="fixed inset-0 z-50 hidden">
+    <div id="used-parts-overlay" class="absolute inset-0 bg-black/70"></div>
+    <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
+      <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
+        <h3 class="text-lg font-bold text-amber-300 mb-3">{% trans "Used Parts" %}</h3>
+        <input type="search" id="used-parts-search" placeholder="{% trans 'Search by code or name...' %}" class="form-control w-full mb-4" autocomplete="off">
+        <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
+        <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">{% trans "Type at least 2 characters to search" %}</p>
+        <button type="button" id="close-used-parts" class="clean-btn">{% trans "Close" %}</button>
+      </div>
+    </div>
+  </div>
+
+  {{ clientes_prefetch|json_script:"prefetchClientes" }}
+  {{ vehiculos_prefetch|json_script:"prefetchVehiculos" }}
+  {{ repuestos_prefetch|json_script:"prefetchRepuestos" }}
+  {{ servicios_prefetch|json_script:"prefetchServicios" }}
+  {{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
+  {{ repuestos_json|json_script:"initialRepuestosData" }}
+  {{ servicios_json|json_script:"initialServiciosData" }}
+  {{ otros_json|json_script:"initialOtrosData" }}
+  {{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
+</div>
+{% endwith %}
+{% endblock content %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="{% static 'js/marketplace_tooltip_fixed.js' %}"></script>
+<script src="{% static 'js/document-form/index.js' %}"></script>
+{% endblock extra_js %}

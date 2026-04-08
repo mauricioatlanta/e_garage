@@ -4,6 +4,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, DeleteView, DetailView, ListView, UpdateView
 
 from core.views import TenantViewMixin
+from taller.common.mixins.return_to_document import ReturnToDocumentMixin
 from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaServicio
 
 
@@ -41,10 +42,11 @@ class ServicioDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
         return ["taller/common/servicios/servicio_detail.html", "servicios/servicio_detail.html"]
 
 
-class ServicioCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
+class ServicioCreateView(ReturnToDocumentMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
     model = Servicio
     template_name = "taller/common/servicios/crear_servicio.html"
     fields = ["nombre", "categoria", "subcategoria"]
+    entity_type = "servicio"
 
     def get_template_names(self):
         return ["taller/common/servicios/crear_servicio.html", "servicios/crear_servicio.html"]
@@ -53,7 +55,32 @@ class ServicioCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
         context = super().get_context_data(**kwargs)
         context["categorias"] = CategoriaServicio.objects.all()
         context["subcategorias"] = SubcategoriaServicio.objects.all()
+        context["return_to"] = self.get_return_to()
+        context["field_target"] = self.get_field_target()
         return context
+
+    def form_valid(self, form):
+        empresa = getattr(self.request, "empresa", getattr(self.request.user, "empresa", None))
+        if empresa and not getattr(form.instance, "empresa_id", None):
+            form.instance.empresa = empresa
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        from django.urls import reverse
+
+        has_return = bool(
+            (
+                self.request.GET.get(self.return_param_name)
+                or self.request.POST.get(self.return_param_name)
+            )
+            or (
+                self.request.GET.get(self.legacy_return_param_name)
+                or self.request.POST.get(self.legacy_return_param_name)
+            )
+        )
+        if has_return:
+            return ReturnToDocumentMixin.get_success_url(self)
+        return reverse("servicios:servicios_menu")
 
 
 class ServicioUpdateView(LoginRequiredMixin, TenantViewMixin, UpdateView):

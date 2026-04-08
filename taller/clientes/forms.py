@@ -4,6 +4,7 @@ from django import forms
 from django.forms.widgets import Select
 from django.utils.translation import gettext_lazy as _
 
+from taller.clientes.constants import STATE_CITY_COUNTRIES
 from taller.models.clientes import Cliente
 from taller.models.region_ciudad import TallerCiudad, TallerRegion
 from taller.models.ubicacion import Ciudad as CiudadUSA
@@ -183,8 +184,7 @@ class ClienteForm(forms.ModelForm):
 
         # USA, Brasil, Venezuela, Perú, Colombia, Ecuador: estado/ciudad/zipcode (usando modelo unificado)
         # Filtrar estados por país de la empresa
-        estados_con_pais = ["US", "BR", "VE", "PE", "MX", "CO", "EC"]
-        if self.pais in estados_con_pais:
+        if self.pais in STATE_CITY_COUNTRIES:
             self.fields["estado_usa"].queryset = EstadoUSA.objects.filter(pais=self.pais).order_by(
                 "nombre"
             )
@@ -220,7 +220,7 @@ class ClienteForm(forms.ModelForm):
             self.pais = pais
 
         # Ocultar campos según el país
-        if self.pais in estados_con_pais:
+        if self.pais in STATE_CITY_COUNTRIES:
             # Países que usan modelo unificado Estado/Ciudad
             print(f"[DEBUG] [ClienteForm] Configurando campos para {self.pais} (Estado/Ciudad)")
             self.fields["region"].widget = forms.HiddenInput()

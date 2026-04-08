@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% load country_url i18n static %}
+
+{% block title %}{% trans "Create External Service" %} - eGarage{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-6">
+    <div class="flex items-start justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-3xl font-bold space-text mb-2">{% trans "Create External Service" %}</h1>
+            <p class="space-text-muted">{% trans "Add a third-party service to your catalog so it can be inserted from the document form." %}</p>
+        </div>
+        <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="space-button bg-gray-600/20 border-gray-500/40 space-text">
+            {% trans "Back" %}
+        </a>
+    </div>
+
+    <div class="space-glow">
+        <div class="space-card p-6">
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                <input type="hidden" name="return_to" value="{% firstof return_to request.GET.return_to request.GET.next '' %}">
+                <input type="hidden" name="field_target" value="{% firstof field_target request.GET.field_target 'otro_servicio' %}">
+                <input type="hidden" name="target_row" value="{% firstof target_row request.GET.target_row '' %}">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="space-y-2 md:col-span-2">
+                        <label for="id_nombre" class="block text-cyan-400 font-semibold">{% trans "Service name" %}</label>
+                        <input id="id_nombre" name="nombre" type="text" required class="space-input w-full" value="{% firstof request.POST.nombre request.GET.prefill_nombre '' %}">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="id_empresa_externa" class="block text-cyan-400 font-semibold">{% trans "External company" %}</label>
+                        <input id="id_empresa_externa" name="empresa_externa" type="text" required class="space-input w-full" value="{{ request.POST.empresa_externa|default:'' }}">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="id_categoria" class="block text-cyan-400 font-semibold">{% trans "Category" %}</label>
+                        <select id="id_categoria" name="categoria" required class="space-input w-full">
+                            <option value="">{% trans "Select category" %}</option>
+                            {% for categoria in categorias %}
+                            <option value="{{ categoria.id }}" {% if request.POST.categoria == categoria.id|stringformat:'s' %}selected{% endif %}>
+                                {{ categoria.get_label }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="id_costo_taller" class="block text-cyan-400 font-semibold">{% trans "Shop price" %}</label>
+                        <input id="id_costo_taller" name="costo_taller" type="number" min="0" step="0.01" required class="space-input w-full" value="{{ request.POST.costo_taller|default:'' }}">
+                    </div>
+
+                    <div class="space-y-2">
+                        <label for="id_precio_cliente" class="block text-cyan-400 font-semibold">{% trans "Client price" %}</label>
+                        <input id="id_precio_cliente" name="precio_cliente" type="number" min="0" step="0.01" required class="space-input w-full" value="{{ request.POST.precio_cliente|default:'' }}">
+                    </div>
+
+                    <div class="space-y-2 md:col-span-2">
+                        <label for="id_tiempo_estimado" class="block text-cyan-400 font-semibold">{% trans "Estimated time" %}</label>
+                        <input id="id_tiempo_estimado" name="tiempo_estimado" type="text" class="space-input w-full" value="{{ request.POST.tiempo_estimado|default:'' }}">
+                    </div>
+
+                    <div class="space-y-2 md:col-span-2">
+                        <label for="id_descripcion" class="block text-cyan-400 font-semibold">{% trans "Description" %}</label>
+                        <textarea id="id_descripcion" name="descripcion" rows="4" class="space-input w-full">{{ request.POST.descripcion|default:'' }}</textarea>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-3 pt-2">
+                    <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="space-button bg-gray-600/20 border-gray-500/40 space-text">
+                        {% trans "Cancel" %}
+                    </a>
+                    <button type="submit" class="space-button">
+                        {% trans "Save external service" %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

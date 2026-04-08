@@ -39,6 +39,9 @@
         <div class="space-card p-6">
             <form method="post" class="space-y-6">
                 {% csrf_token %}
+                <input type="hidden" name="return_to" value="{% firstof return_to request.GET.return_to request.GET.next '' %}">
+                <input type="hidden" name="field_target" value="{% firstof field_target request.GET.field_target 'servicio' %}">
+                <input type="hidden" name="target_row" value="{% firstof target_row request.GET.target_row '' %}">
                 
                 {% if form.non_field_errors %}
                 <div class="bg-red-900/20 border border-red-500/40 rounded-lg p-4 mb-4">
@@ -62,7 +65,7 @@
                     <input type="text" 
                            name="{{ form.nombre.name }}" 
                            id="{{ form.nombre.id_for_label }}"
-                           value="{{ form.nombre.value|default:'' }}"
+                           value="{% firstof form.nombre.value request.GET.prefill_nombre '' %}"
                            required
                            class="space-input w-full {% if form.nombre.errors %}border-red-500{% endif %}"
                            placeholder="{% if language == 'en' %}e.g., Custom Engine Tune-up{% else %}Ej: Afinamiento Personalizado{% endif %}">

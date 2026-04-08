@@ -44,6 +44,9 @@
         EG.cfg.URL_REPUESTO_CREATE_WINDOW = EG.cfg.URL_REPUESTO_CREATE_WINDOW || form.dataset.urlRepuestoCreatePage;
         EG.cfg.URL_SERVICE_SEARCH = EG.cfg.URL_SERVICE_SEARCH || form.dataset.urlServiceSearch;
         EG.cfg.URL_SERVICE_CREATE = EG.cfg.URL_SERVICE_CREATE || form.dataset.urlServiceCreate;
+        EG.cfg.URL_CLIENT_CREATE_PAGE = EG.cfg.URL_CLIENT_CREATE_PAGE || form.dataset.urlClientCreatePage;
+        EG.cfg.URL_VEHICULO_CREATE_PAGE = EG.cfg.URL_VEHICULO_CREATE_PAGE || form.dataset.urlVehiculoCreatePage;
+        EG.cfg.URL_OTRO_SERVICIO_CREATE_PAGE = EG.cfg.URL_OTRO_SERVICIO_CREATE_PAGE || form.dataset.urlOtroServiceCreatePage;
         EG.cfg.URL_OUTSOURCED_SERVICES = EG.cfg.URL_OUTSOURCED_SERVICES || form.dataset.urlOutsourcedServices;
         EG.cfg.URL_USED_PARTS = EG.cfg.URL_USED_PARTS || form.dataset.urlUsedParts;
     }

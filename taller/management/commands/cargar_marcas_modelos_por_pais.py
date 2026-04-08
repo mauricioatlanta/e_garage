@@ -1,8 +1,8 @@
 """
-Management command para cargar marcas y modelos de vehículos por país desde 1970 hasta la fecha.
+Management command para cargar marcas y modelos de vehÃƒÂ­culos por paÃƒÂ­s desde 1970 hasta la fecha.
 
-Este comando carga marcas y modelos específicos comercializados en cada país,
-respetando las diferencias de mercado entre países.
+Este comando carga marcas y modelos especÃƒÂ­ficos comercializados en cada paÃƒÂ­s,
+respetando las diferencias de mercado entre paÃƒÂ­ses.
 
 Uso:
     python manage.py cargar_marcas_modelos_por_pais --country CL
@@ -15,9 +15,19 @@ from django.db import transaction
 
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
+from taller.models.vehiculos import Vehiculo
+
+from ._catalogo_marcas_modelos_latam import (
+    BR_MARCAS_MODELOS,
+    CO_MARCAS_MODELOS,
+    EC_MARCAS_MODELOS,
+    PE_MARCAS_MODELOS,
+    VE_MARCAS_MODELOS,
+)
+from ._catalogo_marcas_modelos_mx import MX_MARCAS_MODELOS
 
 
-# Datos de marcas y modelos por país (desde 1970 hasta 2024)
+# Datos de marcas y modelos por paÃƒÂ­s (desde 1970 hasta 2024)
 MARCAS_MODELOS_POR_PAIS = {
     "CL": {
         # Chile - Marcas y modelos comercializados
@@ -130,7 +140,7 @@ MARCAS_MODELOS_POR_PAIS = {
         ],
         "Renault": ["Kwid", "Sandero", "Logan", "Duster", "Captur", "Koleos", "Oroch"],
         "Peugeot": ["208", "301", "308", "408", "2008", "3008", "5008", "Partner"],
-        "Citroën": ["C3", "C4", "C5", "Berlingo", "C4 Cactus", "C4 Picasso"],
+        "CitroÃƒÂ«n": ["C3", "C4", "C5", "Berlingo", "C4 Cactus", "C4 Picasso"],
         "Fiat": ["Uno", "Palio", "Siena", "Strada", "Toro", "Ducato", "500", "Argo"],
         "Subaru": ["Impreza", "Legacy", "Outback", "Forester", "XV", "Ascent", "BRZ"],
         "Isuzu": ["D-Max", "MU-X", "NPR", "NQR"],
@@ -184,6 +194,7 @@ MARCAS_MODELOS_POR_PAIS = {
             "e-tron GT",
         ],
     },
+    "MX": MX_MARCAS_MODELOS,
     "CO": {
         # Colombia - Marcas y modelos comercializados
         "Chevrolet": [
@@ -328,7 +339,7 @@ MARCAS_MODELOS_POR_PAIS = {
         "Audi": ["A1", "A3", "A4", "A5", "A6", "A7", "A8", "Q2", "Q3", "Q5", "Q7", "Q8"],
     },
     "PE": {
-        # Perú - Marcas y modelos comercializados
+        # PerÃƒÂº - Marcas y modelos comercializados
         "Toyota": [
             "Corolla",
             "Camry",
@@ -692,7 +703,7 @@ MARCAS_MODELOS_POR_PAIS = {
         "Nissan": ["Versa", "Sentra", "Kicks", "Rogue", "Frontier", "X-Trail", "March"],
         "Jeep": ["Renegade", "Compass", "Commander", "Grand Cherokee", "Wrangler"],
         "Peugeot": ["208", "2008", "3008", "5008", "Partner", "Expert"],
-        "Citroën": ["C3", "C4", "C4 Cactus", "C4 Picasso", "Berlingo", "Jumper"],
+        "CitroÃƒÂ«n": ["C3", "C4", "C4 Cactus", "C4 Picasso", "Berlingo", "Jumper"],
         "BMW": [
             "Serie 1",
             "Serie 2",
@@ -859,25 +870,40 @@ MARCAS_MODELOS_POR_PAIS = {
     },
 }
 
+MARCAS_MODELOS_POR_PAIS.update(
+    {
+        "CO": CO_MARCAS_MODELOS,
+        "PE": PE_MARCAS_MODELOS,
+        "EC": EC_MARCAS_MODELOS,
+        "VE": VE_MARCAS_MODELOS,
+        "BR": BR_MARCAS_MODELOS,
+    }
+)
+
 
 class Command(BaseCommand):
-    help = "Carga marcas y modelos de vehículos por país desde 1970 hasta la fecha"
+    help = "Carga marcas y modelos de vehÃƒÂ­culos por paÃƒÂ­s desde 1970 hasta la fecha"
 
     def add_arguments(self, parser):
         parser.add_argument(
             "--country",
             type=str,
-            help="Código de país (CL, US, MX, PE, CO, EC, BR, VE). Si no se especifica, se cargan todos.",
+            help="CÃƒÂ³digo de paÃƒÂ­s (CL, US, MX, PE, CO, EC, BR, VE). Si no se especifica, se cargan todos.",
         )
         parser.add_argument(
             "--all",
             action="store_true",
-            help="Cargar marcas y modelos para todos los países",
+            help="Cargar marcas y modelos para todos los paÃƒÂ­ses",
         )
         parser.add_argument(
             "--dry-run",
             action="store_true",
             help="Simular la carga sin guardar en la base de datos",
+        )
+        parser.add_argument(
+            "--replace",
+            action="store_true",
+            help="Sincronizar el catalogo con el seed y eliminar sobrantes que no esten en uso.",
         )
 
     def handle(self, *args, **options):
@@ -890,7 +916,7 @@ class Command(BaseCommand):
             if country not in MARCAS_MODELOS_POR_PAIS:
                 self.stdout.write(
                     self.style.ERROR(
-                        f"País '{country}' no está soportado. Países disponibles: {', '.join(MARCAS_MODELOS_POR_PAIS.keys())}"
+                        f"PaÃƒÂ­s '{country}' no estÃƒÂ¡ soportado. PaÃƒÂ­ses disponibles: {', '.join(MARCAS_MODELOS_POR_PAIS.keys())}"
                     )
                 )
                 return
@@ -898,34 +924,43 @@ class Command(BaseCommand):
         else:
             self.stdout.write(
                 self.style.ERROR(
-                    "Debe especificar --country <CODIGO> o --all para cargar todos los países"
+                    "Debe especificar --country <CODIGO> o --all para cargar todos los paÃƒÂ­ses"
                 )
             )
             return
 
         dry_run = options["dry_run"]
+        replace = options["replace"]
 
         if dry_run:
-            self.stdout.write(self.style.WARNING("🔍 MODO DRY-RUN: No se guardarán cambios"))
+            self.stdout.write(self.style.WARNING("DRY-RUN: no se guardaran cambios"))
 
         total_marcas_creadas = 0
         total_modelos_creados = 0
 
         for country in countries_to_process:
             self.stdout.write(
-                self.style.SUCCESS(f"\n{'='*60}\nProcesando país: {country}\n{'='*60}")
+                self.style.SUCCESS(f"\n{'='*60}\nProcesando pais: {country}\n{'='*60}")
             )
 
             marcas_modelos = MARCAS_MODELOS_POR_PAIS.get(country, {})
 
             if not marcas_modelos:
-                self.stdout.write(self.style.WARNING(f"No hay datos para el país {country}"))
+                self.stdout.write(self.style.WARNING(f"No hay datos para el pais {country}"))
                 continue
 
             marcas_creadas = 0
             modelos_creados = 0
+            modelos_eliminados = 0
+            marcas_eliminadas = 0
 
             with transaction.atomic():
+                if replace:
+                    stale_models_result = self._delete_stale_models(
+                        country, marcas_modelos, dry_run
+                    )
+                    modelos_eliminados = stale_models_result["deleted"]
+
                 for marca_nombre, modelos_list in marcas_modelos.items():
                     # Crear o obtener marca
                     marca, marca_created = Marca.objects.get_or_create(
@@ -938,7 +973,7 @@ class Command(BaseCommand):
                         marcas_creadas += 1
                         if not dry_run:
                             self.stdout.write(
-                                self.style.SUCCESS(f"  ✅ Marca creada: {marca_nombre}")
+                                self.style.SUCCESS(f"  OK marca creada: {marca_nombre}")
                             )
                         else:
                             self.stdout.write(
@@ -946,7 +981,7 @@ class Command(BaseCommand):
                             )
                     else:
                         self.stdout.write(
-                            self.style.WARNING(f"  ℹ️  Marca ya existe: {marca_nombre}")
+                            self.style.WARNING(f"  INFO marca ya existe: {marca_nombre}")
                         )
 
                     # Crear modelos para esta marca
@@ -968,7 +1003,7 @@ class Command(BaseCommand):
                                 if not dry_run:
                                     self.stdout.write(
                                         self.style.SUCCESS(
-                                            f"    ✅ Modelo creado: {marca_nombre} {modelo_nombre}"
+                                            f"    OK modelo creado: {marca_nombre} {modelo_nombre}"
                                         )
                                     )
                                 else:
@@ -980,21 +1015,27 @@ class Command(BaseCommand):
                         except Exception as e:
                             self.stdout.write(
                                 self.style.ERROR(
-                                    f"    ❌ Error creando modelo {modelo_nombre} para {marca_nombre}: {e}"
+                                    f"    ERROR creando modelo {modelo_nombre} para {marca_nombre}: {e}"
                                 )
                             )
+
+                if replace:
+                    stale_brands_result = self._delete_stale_brands(
+                        country, marcas_modelos, dry_run
+                    )
+                    marcas_eliminadas = stale_brands_result["deleted"]
 
                 if dry_run:
                     transaction.set_rollback(True)
                     self.stdout.write(
                         self.style.WARNING(
-                            f"\n[DRY-RUN] Se habrían creado {marcas_creadas} marcas y {modelos_creados} modelos para {country}"
+                            f"\n[DRY-RUN] Se crearian {marcas_creadas} marcas, {modelos_creados} modelos, se eliminarian {modelos_eliminados} modelos y {marcas_eliminadas} marcas para {country}"
                         )
                     )
                 else:
                     self.stdout.write(
                         self.style.SUCCESS(
-                            f"\n✅ País {country}: {marcas_creadas} marcas y {modelos_creados} modelos creados"
+                            f"\nPais {country}: {marcas_creadas} marcas, {modelos_creados} modelos creados, {modelos_eliminados} modelos y {marcas_eliminadas} marcas eliminados"
                         )
                     )
 
@@ -1003,9 +1044,86 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"\n{'='*60}\n✅ RESUMEN TOTAL\n{'='*60}\n"
+                f"\n{'='*60}\nRESUMEN TOTAL\n{'='*60}\n"
                 f"Marcas creadas: {total_marcas_creadas}\n"
                 f"Modelos creados: {total_modelos_creados}\n"
-                f"Países procesados: {len(countries_to_process)}\n"
+                f"Paises procesados: {len(countries_to_process)}\n"
             )
         )
+
+    def _delete_stale_models(self, country, marcas_modelos, dry_run):
+        desired_models_by_brand = {
+            marca_nombre: set(modelos_list) for marca_nombre, modelos_list in marcas_modelos.items()
+        }
+        deleted = 0
+        skipped = 0
+
+        for modelo in (
+            Modelo.objects.filter(country=country)
+            .select_related("marca")
+            .order_by("marca__nombre", "nombre")
+        ):
+            desired_models = desired_models_by_brand.get(modelo.marca.nombre)
+            if desired_models and modelo.nombre in desired_models:
+                continue
+
+            if Vehiculo.objects.filter(modelo=modelo).exists():
+                skipped += 1
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"    WARNING modelo en uso, no se elimina: {modelo.marca.nombre} {modelo.nombre}"
+                    )
+                )
+                continue
+
+            deleted += 1
+            if dry_run:
+                self.stdout.write(
+                    self.style.WARNING(
+                        f"    [DRY-RUN] Modelo a eliminar: {modelo.marca.nombre} {modelo.nombre}"
+                    )
+                )
+            else:
+                modelo.delete()
+                self.stdout.write(
+                    self.style.SUCCESS(
+                        f"    OK modelo eliminado: {modelo.marca.nombre} {modelo.nombre}"
+                    )
+                )
+
+        if skipped:
+            self.stdout.write(
+                self.style.WARNING(
+                    f"    INFO {skipped} modelo(s) sobrantes quedaron intactos por estar referenciados."
+                )
+            )
+
+        return {"deleted": deleted, "skipped": skipped}
+
+    def _delete_stale_brands(self, country, marcas_modelos, dry_run):
+        desired_brands = set(marcas_modelos.keys())
+        deleted = 0
+
+        for marca in Marca.objects.filter(country=country).order_by("nombre"):
+            if marca.nombre in desired_brands:
+                continue
+
+            if Modelo.objects.filter(marca=marca).exists():
+                continue
+
+            if Vehiculo.objects.filter(marca=marca).exists():
+                self.stdout.write(
+                    self.style.WARNING(f"    WARNING marca en uso, no se elimina: {marca.nombre}")
+                )
+                continue
+
+            deleted += 1
+            if dry_run:
+                self.stdout.write(
+                    self.style.WARNING(f"    [DRY-RUN] Marca a eliminar: {marca.nombre}")
+                )
+            else:
+                marca.delete()
+                self.stdout.write(self.style.SUCCESS(f"    OK marca eliminada: {marca.nombre}"))
+
+        return {"deleted": deleted}

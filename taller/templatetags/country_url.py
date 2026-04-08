@@ -27,6 +27,28 @@ def _country_ns_from_path(path: str) -> str:
         return "mexico"
     elif path.startswith("/mx/") or path == "/mx":
         return "mexico"
+    elif path.startswith("/pe/es/") or path == "/pe/es":
+        return "peru"
+    elif path.startswith("/pe/") or path == "/pe":
+        return "peru"
+    elif path.startswith("/co/es/") or path == "/co/es":
+        return "colombia"
+    elif path.startswith("/co/") or path == "/co":
+        return "colombia"
+    elif path.startswith("/ec/es/") or path == "/ec/es":
+        return "ecuador"
+    elif path.startswith("/ec/") or path == "/ec":
+        return "ecuador"
+    elif path.startswith("/ve/es/") or path == "/ve/es":
+        return "venezuela"
+    elif path.startswith("/ve/") or path == "/ve":
+        return "venezuela"
+    elif path.startswith("/br/pt/") or path == "/br/pt":
+        return "brasil"
+    elif path.startswith("/br/es/") or path == "/br/es":
+        return "brasil"
+    elif path.startswith("/br/") or path == "/br":
+        return "brasil"
     return "chile"
 
 
@@ -52,6 +74,16 @@ def _country_ns_from_empresa(empresa) -> str:
         return "chile"
     if pais == "MX" or country == "MX":
         return "mexico"
+    if pais == "PE" or country == "PE":
+        return "peru"
+    if pais == "CO" or country == "CO":
+        return "colombia"
+    if pais == "EC" or country == "EC":
+        return "ecuador"
+    if pais == "VE" or country == "VE":
+        return "venezuela"
+    if pais == "BR" or country == "BR":
+        return "brasil"
     return "chile"
 
 
@@ -80,6 +112,18 @@ def _extract_lang_from_path(path: str) -> str:
     elif path.startswith("/uy/es/") or path == "/uy/es":
         return "es"
     elif path.startswith("/mx/es/") or path == "/mx/es":
+        return "es"
+    elif path.startswith("/pe/es/") or path == "/pe/es":
+        return "es"
+    elif path.startswith("/co/es/") or path == "/co/es":
+        return "es"
+    elif path.startswith("/ec/es/") or path == "/ec/es":
+        return "es"
+    elif path.startswith("/ve/es/") or path == "/ve/es":
+        return "es"
+    elif path.startswith("/br/pt/") or path == "/br/pt":
+        return "pt"
+    elif path.startswith("/br/es/") or path == "/br/es":
         return "es"
     return None
 
@@ -125,7 +169,17 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
             full_name = f"{country_ns}:taller:{view_path}"
         else:
             full_name = f"{country_ns}:{view_path}"
-    elif country_ns in ("chile", "uruguay", "uruguay_es", "mexico"):
+    elif country_ns in (
+        "chile",
+        "uruguay",
+        "uruguay_es",
+        "mexico",
+        "peru",
+        "colombia",
+        "ecuador",
+        "venezuela",
+        "brasil",
+    ):
         if view_path.startswith("desarme:"):
             full_name = f"{country_ns}:taller:{view_path}"
         elif view_path_for_ns.startswith("taller:"):
@@ -154,12 +208,33 @@ def country_url(context, view_path, *args, app_namespace="taller", **kwargs):
         return reverse(full_name, args=args_list, kwargs=kwargs)
     except NoReverseMatch as e:
         error_msg = str(e).lower()
+        if view_path == "company_settings":
+            try:
+                return reverse("chile:company_settings", args=args_list, kwargs=kwargs)
+            except NoReverseMatch:
+                pass
+        if view_path == "centro_operaciones":
+            try:
+                return reverse("chile:centro_operaciones", args=args_list, kwargs=kwargs)
+            except NoReverseMatch:
+                pass
         if country_ns in ("us_en", "us_es"):
             full_name_fallback = f"{country_ns}:{view_path}"
             try:
                 return reverse(full_name_fallback, args=args_list, kwargs=kwargs)
             except NoReverseMatch:
                 pass
+        if country_ns != "chile":
+            chile_fallbacks = [f"chile:{view_path}"]
+            if ":" in view_path and not view_path.startswith("taller:"):
+                chile_fallbacks.append(f"chile:taller:{view_path}")
+            elif view_path_for_ns.startswith("taller:"):
+                chile_fallbacks.append(f"chile:{view_path_for_ns}")
+            for chile_name in chile_fallbacks:
+                try:
+                    return reverse(chile_name, args=args_list, kwargs=kwargs)
+                except NoReverseMatch:
+                    continue
         # Si falla con NoReverseMatch y el error menciona 'lang', intentar agregar lang
         if "lang" in error_msg and request:
             lang = _extract_lang_from_path(request.path or "/")

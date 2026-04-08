@@ -24,6 +24,7 @@ from django.utils.translation import get_language
 from django.views.decorators.http import require_GET, require_POST
 
 log = logging.getLogger(__name__)
+from taller.common.mixins.return_to_document import build_return_to_document_url
 
 # Modelos centrales
 # Form
@@ -368,16 +369,37 @@ def crear_vehiculo(request, *args, **kwargs):
                         request,
                         f"Vehículo {vehiculo.patente or 'sin patente'} creado exitosamente",
                     )
-                    next_url = (request.POST.get("next") or request.GET.get("next") or "").strip()
-                    if next_url:
+                    return_to = (
+                        request.POST.get("return_to")
+                        or request.GET.get("return_to")
+                        or request.POST.get("next")
+                        or request.GET.get("next")
+                        or ""
+                    ).strip()
+                    if return_to:
                         cliente_id = (
                             getattr(vehiculo, "cliente_id", None)
                             or request.POST.get("cliente")
                             or request.GET.get("cliente_id")
                             or request.GET.get("cliente")
                         )
+                        redirect_url = build_return_to_document_url(
+                            request,
+                            entity_type="vehiculo",
+                            field_target=(
+                                request.POST.get("field_target")
+                                or request.GET.get("field_target")
+                                or "vehiculo"
+                            ),
+                            created_id=vehiculo.id,
+                            created_label=str(
+                                getattr(vehiculo, "patente", "")
+                                or getattr(vehiculo, "vin", "")
+                                or f"Vehículo #{vehiculo.id}"
+                            ),
+                        )
                         redirect_url = _append_query_params(
-                            next_url,
+                            redirect_url,
                             cliente_id=cliente_id,
                             vehiculo_id=vehiculo.id,
                         )

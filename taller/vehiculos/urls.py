@@ -26,6 +26,7 @@ Notas:
 from django.urls import path
 
 from taller.vehiculos import views_fbv as views
+from taller.vehiculos import views_country_proxy as proxy_views
 from taller.vehiculos import views_ingreso
 from taller.vehiculos.autocomplete_views import (
     CajaAutocomplete,
@@ -40,8 +41,8 @@ urlpatterns = [
     # CRUD Principales
     # =========================
     # Todas requieren @login_required y filtran por empresa
-    path("", views.lista_vehiculos, name="lista_vehiculos"),
-    path("crear/", views.crear_vehiculo, name="crear_vehiculo"),
+    path("", proxy_views.lista_vehiculos, name="lista_vehiculos"),
+    path("crear/", proxy_views.crear_vehiculo, name="crear_vehiculo"),
     # Ingreso de vehículo por foto de patente
     path("ingreso-foto/", views_ingreso.ingreso_vehiculo_foto, name="ingreso_foto"),
     path(
@@ -49,11 +50,11 @@ urlpatterns = [
         views_ingreso.procesar_patente_identificada,
         name="patente_identificada",
     ),
-    path("<int:vehiculo_id>/", views.ver_vehiculo, name="ver_vehiculo"),
-    path("<int:vehiculo_id>/editar/", views.editar_vehiculo, name="editar_vehiculo"),
+    path("<int:vehiculo_id>/", proxy_views.ver_vehiculo, name="ver_vehiculo"),
+    path("<int:vehiculo_id>/editar/", proxy_views.editar_vehiculo, name="editar_vehiculo"),
     path(
         "<int:vehiculo_id>/eliminar/",
-        views.eliminar_vehiculo,
+        proxy_views.eliminar_vehiculo,
         name="eliminar_vehiculo",
     ),
     # =========================
@@ -62,11 +63,11 @@ urlpatterns = [
     # Seguridad: @login_required + @require_GET
     # Multi-tenant: Filtran por país y empresa del usuario
     # Marcas disponibles para el país del usuario
-    path("api/marcas/", views.api_marcas, name="api_marcas"),
+    path("api/marcas/", proxy_views.api_marcas, name="api_marcas"),
     # Búsqueda de clientes (solo de la empresa del usuario)
     path(
         "api/clientes/",
-        views.api_busqueda_clientes,
+        proxy_views.api_busqueda_clientes,
         name="api_busqueda_clientes",
     ),
     # Autocompletado de clientes (DAL Select2)
@@ -88,10 +89,10 @@ urlpatterns = [
         name="caja-autocomplete",
     ),
     # Colores disponibles para el país del usuario
-    path("api/colores/", views.api_colores, name="api_colores"),
+    path("api/colores/", proxy_views.api_colores, name="api_colores"),
     # Modelos USA desde catálogo (legacy - mantener solo si DAL lo usa)
     # Considera deprecar si ajax_modelos_por_marca_anio cubre el caso
-    path("api/modelos-usa/", views.api_modelos_usa, name="api_modelos_usa"),
+    path("api/modelos-usa/", proxy_views.api_modelos_usa, name="api_modelos_usa"),
     # =========================
     # AJAX Dinámico (GET)
     # =========================
@@ -100,31 +101,31 @@ urlpatterns = [
     # Modelos por marca (sin año)
     path(
         "ajax/modelos-por-marca/",
-        views.ajax_modelos_por_marca,
+        proxy_views.ajax_modelos_por_marca,
         name="ajax_modelos_por_marca",
     ),
     # Modelos por marca + año (★ PREFERIDO por el frontend)
     path(
         "ajax/modelos-por-marca-anio/",
-        views.ajax_modelos_por_marca_anio,
+        proxy_views.ajax_modelos_por_marca_anio,
         name="ajax_modelos_por_marca_anio",
     ),
     # API para modelos por marca y año (formato JSON simple)
     path(
         "api/modelos-por-marca/",
-        views.modelos_por_marca_api,
+        proxy_views.modelos_por_marca_api,
         name="modelos_por_marca_api",
     ),
     # Motores filtrados por modelo
     path(
         "ajax/motores-por-modelo/",
-        views.ajax_motores_por_modelo,
+        proxy_views.ajax_motores_por_modelo,
         name="ajax_motores_por_modelo",
     ),
     # Cajas filtradas por modelo
     path(
         "ajax/cajas-por-modelo/",
-        views.ajax_cajas_por_modelo,
+        proxy_views.ajax_cajas_por_modelo,
         name="ajax_cajas_por_modelo",
     ),
     # =========================
@@ -136,31 +137,31 @@ urlpatterns = [
     # Agregar nueva marca
     path(
         "ajax/agregar-marca/",
-        views.ajax_agregar_marca,
+        proxy_views.ajax_agregar_marca,
         name="ajax_agregar_marca",
     ),
     # Agregar nuevo modelo
     path(
         "ajax/agregar-modelo/",
-        views.ajax_agregar_modelo,
+        proxy_views.ajax_agregar_modelo,
         name="ajax_agregar_modelo",
     ),
     # Agregar nuevo motor
     path(
         "ajax/agregar-motor/",
-        views.ajax_agregar_motor,
+        proxy_views.ajax_agregar_motor,
         name="ajax_agregar_motor",
     ),
     # Agregar nueva caja
     path(
         "ajax/agregar-caja/",
-        views.ajax_agregar_caja,
+        proxy_views.ajax_agregar_caja,
         name="ajax_agregar_caja",
     ),
     # Agregar nuevo color
     path(
         "ajax/agregar-color/",
-        views.ajax_agregar_color,
+        proxy_views.ajax_agregar_color,
         name="ajax_agregar_color",
     ),
 ]

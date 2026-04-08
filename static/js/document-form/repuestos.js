@@ -65,6 +65,7 @@
             '<input type="hidden" class="rep-nombre"><input type="hidden" class="rep-row-id" value="' + rowId + '"></td>' +
             '<td class="doc-sheet-cell"><input type="number" class="rep-cantidad doc-input form-control text-sm" min="1" value="1"></td>' +
             '<td class="doc-sheet-cell doc-sheet-money"><span>$</span><input type="text" class="rep-precio-venta doc-input form-control text-sm" placeholder="0"></td>' +
+            '<td class="doc-sheet-cell doc-sheet-money cost-column cost-hidden"><span>$</span><input type="text" class="rep-precio-costo doc-input form-control text-sm" placeholder="0"></td>' +
             '<td class="doc-sheet-cell"><input type="number" class="rep-descuento doc-input form-control text-sm" min="0" max="100" step="0.01" value="0" placeholder="0-100"></td>' +
             '<td class="doc-sheet-cell field-total"><input type="hidden" class="rep-subtotal" value="0"><div class="rep-subtotal-view doc-sheet-total">$0</div></td>' +
             '<td class="doc-sheet-cell doc-sheet-row-actions"><button type="button" class="btn-row-icon btn-row-icon-remove rep-remove-btn doc-row-remove" title="Eliminar">&times;</button></td>';
@@ -104,10 +105,14 @@
                 }
                 var next = window.location.pathname + window.location.search;
                 var createUrl = new URL(EG.cfg.URL_REPUESTO_CREATE_WINDOW, window.location.origin);
-                createUrl.searchParams.set('next', next);
+                createUrl.searchParams.set('return_to', next);
+                createUrl.searchParams.set('field_target', 'repuesto');
                 createUrl.searchParams.set('target_row', rowId);
                 if (nombre) createUrl.searchParams.set('prefill_nombre', nombre);
                 if (codigo) createUrl.searchParams.set('prefill_code', codigo);
+                if (window.EG && window.EG.borrador && typeof window.EG.borrador.saveDocumentDraftNow === 'function') {
+                    window.EG.borrador.saveDocumentDraftNow();
+                }
                 window.location.href = createUrl.toString();
             });
         }
@@ -126,6 +131,11 @@
             if (repOrigen) repOrigen.value = item.origen_repuesto || 'STOCK_BODEGA';
             if (repPiezaDesarmeId) repPiezaDesarmeId.value = item.pieza_desarme_id || '';
             if (repCostoLinea) repCostoLinea.value = item.costo_linea || '';
+            var precioCosto = row.querySelector('.rep-precio-costo');
+            if (precioCosto && item.precio_compra !== undefined) {
+                var costo = EG.utils.parseNumericInput(item.precio_compra);
+                precioCosto.value = costo > 0 ? EG.utils.formatNumberInput(costo) : '';
+            }
             if (desarmeBadge) {
                 var isDesarme = item.origen_repuesto === 'DESARME' || item.pieza_desarme_id;
                 desarmeBadge.classList.toggle('hidden', !isDesarme);
@@ -310,9 +320,27 @@
         toggleRepuestosEmptyHint();
     }
 
+    function addRowFromCreatedEntity(entity) {
+        if (!entity || !entity.id) return null;
+        var row = addRepuestoRow(entity.target_row || null);
+        if (row && row.__applyRepData) {
+            row.__applyRepData({
+                id: entity.id,
+                codigo: entity.codigo || '',
+                nombre: entity.nombre || entity.label || ('Repuesto #' + entity.id),
+                precio_venta: entity.precio_venta,
+                precio_compra: entity.precio_compra,
+                cantidad: entity.cantidad || 1,
+                descuento: entity.descuento || 0
+            });
+        }
+        return row;
+    }
+
     // Exports
     EG.repuestos = {
         addRepuestoRow: addRepuestoRow,
+        addRowFromCreatedEntity: addRowFromCreatedEntity,
         setupRepuestoRow: setupRepuestoRow,
         openUsedPartsModal: openUsedPartsModal,
         closeUsedPartsModal: closeUsedPartsModal,

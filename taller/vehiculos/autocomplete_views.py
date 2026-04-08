@@ -167,12 +167,24 @@ def _get_country_from_request(request):
             raw = "CL"
         elif path.startswith("/mx/"):
             raw = "MX"
+        elif path.startswith("/pe/"):
+            raw = "PE"
+        elif path.startswith("/co/"):
+            raw = "CO"
+        elif path.startswith("/ec/"):
+            raw = "EC"
+        elif path.startswith("/ve/"):
+            raw = "VE"
+        elif path.startswith("/br/"):
+            raw = "BR"
 
     country = str(raw or "CL").strip().upper()
     if country in ("US", "USA"):
         return "US"
     if country in ("MX", "MEX"):
         return "MX"
+    if country in {"CL", "PE", "CO", "EC", "VE", "BR"}:
+        return country
     return "CL"
 
 

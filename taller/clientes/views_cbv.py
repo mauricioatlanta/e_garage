@@ -7,6 +7,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from core.views import TenantViewMixin
+from taller.common.mixins.return_to_document import ReturnToDocumentMixin
 from taller.mixins import CountryLangTemplateMixin
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
@@ -174,7 +175,15 @@ class ClienteDetailView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         return self.render_country_lang(self.request, context)
 
 
-class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
+class ClienteCreateView(
+    ReturnToDocumentMixin,
+    CountryLangTemplateMixin,
+    LoginRequiredMixin,
+    TenantViewMixin,
+    CreateView,
+):
+    entity_type = "cliente"
+
     def _is_ajax_request(self):
         return (
             self.request.headers.get("x-requested-with") == "XMLHttpRequest"
@@ -206,30 +215,40 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         }
 
     def get_success_url(self):
-        from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
-
         from django.urls import reverse
 
-        # Flujo "crear cliente desde documento": usar ?next= para volver al formulario
-        next_url = (self.request.POST.get("next") or self.request.GET.get("next") or "").strip()
-        if next_url:
-            from taller.mixins import safe_next_url
-
-            safe = safe_next_url(next_url)
-            if safe:
-                # Añadir cliente_id para preselección en document form
-                parsed = urlparse(safe)
-                params = dict(parse_qsl(parsed.query, keep_blank_values=True))
-                if self.object and getattr(self.object, "pk", None):
-                    params["cliente_id"] = str(self.object.pk)
-                new_query = urlencode(params)
-                return urlunparse(parsed._replace(query=new_query))
+        has_return = bool(
+            (
+                self.request.POST.get(self.return_param_name)
+                or self.request.GET.get(self.return_param_name)
+            )
+            or (
+                self.request.POST.get(self.legacy_return_param_name)
+                or self.request.GET.get(self.legacy_return_param_name)
+            )
+        )
+        if has_return:
+            return ReturnToDocumentMixin.get_success_url(self)
 
         # Obtener el país de la empresa del usuario (usa/chile montan clientes sin "taller")
         empresa = get_user_empresa_safe(self.request.user)
         if empresa and empresa.pais == "US":
             return reverse("usa:clientes:lista_clientes")
         return reverse("chile:clientes:lista_clientes")
+
+    def get_created_label(self, obj):
+        nombre = " ".join(
+            part.strip()
+            for part in [getattr(obj, "nombre", "") or "", getattr(obj, "apellido", "") or ""]
+            if part and part.strip()
+        ).strip()
+        return nombre or super().get_created_label(obj)
+
+    def get_context_redirect_params(self, obj):
+        params = super().get_context_redirect_params(obj)
+        params.setdefault("cliente_id", str(getattr(obj, "pk", "") or ""))
+        params.setdefault("cliente_nombre", self.get_created_label(obj))
+        return params
 
     def form_valid(self, form):
         from django.db import IntegrityError
@@ -311,6 +330,17 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
         # Pasar next para el hidden del form (flujo desde documento/form)
         context["next"] = self.request.GET.get("next") or self.request.POST.get("next") or ""
+        context["return_to"] = (
+            self.request.GET.get(self.return_param_name)
+            or self.request.POST.get(self.return_param_name)
+            or context["next"]
+            or ""
+        )
+        context["field_target"] = (
+            self.request.GET.get(self.field_target_param)
+            or self.request.POST.get(self.field_target_param)
+            or "cliente"
+        )
         context["modal_mode"] = self._is_modal_request()
         context["ajax_mode"] = self._is_ajax_request()
 

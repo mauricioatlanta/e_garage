@@ -162,6 +162,15 @@
     function normalizeServicioItem(item) {
         var normalized = EG.utils.normalizeServicio(item || {}) || {};
         normalized.nombre = normalized.nombre || normalized.text || normalized.name || normalized.descripcion || normalized.label || '';
+        if (normalized.categoria && typeof normalized.categoria === 'object') {
+            normalized.categoria_code = normalized.categoria_code || normalized.categoria.code || '';
+            normalized.categoria = normalized.categoria.nombre || normalized.categoria.label || normalized.categoria.code || '';
+        }
+        if (normalized.subcategoria && typeof normalized.subcategoria === 'object') {
+            normalized.subcategoria_code = normalized.subcategoria_code || normalized.subcategoria.code || '';
+            normalized.subcategoria = normalized.subcategoria.nombre || normalized.subcategoria.label || normalized.subcategoria.code || '';
+        }
+        normalized.codigo = normalized.codigo || normalized.codigo_interno || normalized.categoria_code || '';
         normalized.precio = normalized.precio !== undefined ? normalized.precio :
             (normalized.precio_base !== undefined ? normalized.precio_base :
             (normalized.precio_venta !== undefined ? normalized.precio_venta :
@@ -358,11 +367,14 @@
                         query: query,
                         url: EG.cfg.URL_SERVICE_SEARCH,
                         prefetch: EG.PREFETCH && EG.PREFETCH.servicios,
-                        fields: ['codigo', 'nombre', 'descripcion', 'text'],
+                        fields: ['codigo', 'codigo_interno', 'nombre', 'nombre_raw', 'descripcion', 'text', 'categoria', 'categoria_code', 'subcategoria', 'subcategoria_code'],
                         onResults: function(results) {
                             renderResults(dropdown, results, function(item) {
-                                var meta = item.precio ? EG.utils.money(item.precio) : '';
-                                return buildDropdownItem(item, item.nombre || '', meta);
+                                var meta = [];
+                                if (item.categoria) meta.push(item.categoria);
+                                if (item.subcategoria) meta.push(item.subcategoria);
+                                if (item.precio) meta.push(EG.utils.money(item.precio));
+                                return buildDropdownItem(item, item.nombre || '', meta.join(' | '));
                             });
                             toggleRowOverlay(row, true);
                         },
@@ -408,7 +420,7 @@
         row.innerHTML =
                 '<td class="doc-sheet-cell description-field otr-search-container relative field-main"><input type="text" class="otr-search doc-input form-control text-sm" placeholder="' + (EG.I18N.type_to_search_external || EG.I18N.service || 'Service') + '" autocomplete="off"><div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div><input type="hidden" class="otr-servicio-id"><input type="hidden" class="otr-subtotal" value="0"></td>' +
                 '<td class="doc-sheet-cell"><input type="text" class="otr-empresa doc-input form-control text-sm"></td>' +
-                '<td class="doc-sheet-cell doc-sheet-money"><span>$</span><input type="text" class="otr-precio-taller doc-input form-control text-sm" placeholder="0"></td>' +
+                '<td class="doc-sheet-cell doc-sheet-money cost-column cost-hidden"><span>$</span><input type="text" class="otr-precio-taller doc-input form-control text-sm" placeholder="0"></td>' +
                 '<td class="doc-sheet-cell doc-sheet-money"><span>$</span><input type="text" class="otr-precio doc-input form-control text-sm" placeholder="0"></td>' +
                 '<td class="doc-sheet-cell field-total"><div class="otr-subtotal-view doc-sheet-total">$0</div></td>' +
                 '<td class="doc-sheet-cell doc-sheet-row-actions"><button type="button" class="btn-row-icon btn-row-icon-duplicate otr-duplicate-btn" title="Duplicar">&#10697;</button><button type="button" class="btn-row-icon btn-row-icon-remove otr-remove-btn doc-row-remove" title="Eliminar">&times;</button></td>';
@@ -557,6 +569,36 @@
         toggleEmptyHint('otros-container', 'otros-empty-hint');
     }
 
+    function addServicioFromCreatedEntity(entity) {
+        if (!entity || !entity.id) return null;
+        var row = addServicioRow();
+        if (row && row.__applyServData) {
+            row.__applyServData({
+                id: entity.id,
+                nombre: entity.nombre || entity.label || ('Servicio #' + entity.id),
+                precio: entity.precio || entity.precio_base || 0,
+                cantidad: 1,
+                descuento: 0
+            });
+        }
+        return row;
+    }
+
+    function addOtroServicioFromCreatedEntity(entity) {
+        if (!entity || !entity.id) return null;
+        var row = addOtroServicioRow();
+        if (row && row.__applyOtroData) {
+            row.__applyOtroData({
+                id: entity.id,
+                nombre: entity.nombre || entity.label || ('Servicio externo #' + entity.id),
+                empresa: entity.empresa || entity.empresa_ext || '',
+                precio_taller: entity.precio_taller || entity.shop_price || 0,
+                precio: entity.precio || entity.sale_price || 0
+            });
+        }
+        return row;
+    }
+
     EG.servicios = {
         init: init,
         addServicioRow: addServicioRow,
@@ -564,6 +606,8 @@
         setupServicioRow: setupServicioRow,
         addOtroRow: addOtroServicioRow,
         addOtroServicioRow: addOtroServicioRow,
+        addServicioFromCreatedEntity: addServicioFromCreatedEntity,
+        addOtroServicioFromCreatedEntity: addOtroServicioFromCreatedEntity,
         duplicateOtroRow: duplicateOtroRow,
         setupOtroServicioRow: setupOtroRow,
         setupOtroRow: setupOtroRow,

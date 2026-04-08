@@ -11,6 +11,7 @@ from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from core.views import TenantViewMixin
+from taller.common.mixins.return_to_document import ReturnToDocumentMixin
 from taller.forms.repuesto import RepuestoForm
 from taller.mixins import CountryLangTemplateMixin
 from taller.models.repuesto import Repuesto
@@ -75,7 +76,7 @@ def _repuesto_document_cancel_url(request) -> str | None:
     URL para volver al documento cuando se abrió crear/editar con ?next=...&target_row=...
     Reaplica target_row en la query del documento para que la fila siga identificable.
     """
-    next_url = (request.GET.get("next") or "").strip()
+    next_url = (request.GET.get("return_to") or request.GET.get("next") or "").strip()
     if not next_url.startswith("/") or next_url.startswith("//"):
         return None
     target_row = (request.GET.get("target_row") or "").strip()
@@ -184,11 +185,12 @@ class RepuestoDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
     select_related_fields = ("categoria",)
 
 
-class RepuestoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
+class RepuestoCreateView(ReturnToDocumentMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
     model = Repuesto
     form_class = RepuestoForm
     template_name = "taller/common/repuestos/repuesto_form.html"
     success_url = reverse_lazy("taller:repuestos:lista_repuestos")
+    entity_type = "repuesto"
 
     def dispatch(self, request, *args, **kwargs):
         compat_redirect = _compat_canonical_redirect(request, "repuestos:crear_repuesto")
@@ -210,27 +212,49 @@ class RepuestoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
         return initial
 
     def form_valid(self, form):
-        response = super().form_valid(form)
-        next_url = self.request.GET.get("next")
-        target_row = self.request.GET.get("target_row")
+        from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
-        if next_url:
-            params = {
-                "created_repuesto_id": self.object.pk,
-                "created_repuesto_nombre": self.object.nombre or "",
-                "created_repuesto_codigo": getattr(self.object, "part_number", "") or "",
-                "created_repuesto_precio_venta": str(getattr(self.object, "precio_venta", 0) or 0),
-                "created_repuesto_precio_compra": str(
-                    getattr(self.object, "precio_compra", 0) or 0
-                ),
-            }
+        response = super().form_valid(form)
+        target_row = self.request.GET.get("target_row")
+        has_return = bool(
+            (
+                self.request.GET.get(self.return_param_name)
+                or self.request.POST.get(self.return_param_name)
+            )
+            or (
+                self.request.GET.get(self.legacy_return_param_name)
+                or self.request.POST.get(self.legacy_return_param_name)
+            )
+        )
+        if has_return:
+            base_url = ReturnToDocumentMixin.get_success_url(self)
+            parsed = urlparse(base_url)
+            params = dict(parse_qsl(parsed.query, keep_blank_values=True))
+            params.update(
+                {
+                    "created_repuesto_id": str(self.object.pk),
+                    "created_repuesto_nombre": self.object.nombre or "",
+                    "created_repuesto_codigo": getattr(self.object, "part_number", "") or "",
+                    "created_repuesto_precio_venta": str(
+                        getattr(self.object, "precio_venta", 0) or 0
+                    ),
+                    "created_repuesto_precio_compra": str(
+                        getattr(self.object, "precio_compra", 0) or 0
+                    ),
+                }
+            )
             if target_row:
                 params["target_row"] = target_row
-
-            sep = "&" if "?" in next_url else "?"
-            return redirect(f"{next_url}{sep}{urlencode(params)}")
+            return redirect(urlunparse(parsed._replace(query=urlencode(params))))
 
         return response
+
+    def get_created_label(self, obj):
+        nombre = (getattr(obj, "nombre", "") or "").strip()
+        codigo = (getattr(obj, "part_number", "") or "").strip()
+        if nombre and codigo:
+            return f"{codigo} - {nombre}"
+        return nombre or codigo or super().get_created_label(obj)
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)

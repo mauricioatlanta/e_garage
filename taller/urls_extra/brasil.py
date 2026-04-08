@@ -6,7 +6,7 @@ Compatibilidad: /br/es/... redirige a /br/pt/...
 """
 
 from django.shortcuts import redirect
-from django.urls import path
+from django.urls import include, path
 from django.utils import translation
 from django.views.generic import RedirectView, TemplateView
 
@@ -51,6 +51,14 @@ urlpatterns = [
         lambda r, rest: redirect(
             "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
         ),
+    ),
+    path(
+        "pt/clientes/",
+        include(("taller.urls_clientes", "clientes"), namespace="clientes"),
+    ),
+    path(
+        "pt/vehiculos/",
+        include(("taller.vehiculos.urls", "vehiculos"), namespace="vehiculos"),
     ),
     # --- ESPAÑOL (legacy) → redirige a PT ---
     path("es/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),

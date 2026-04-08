@@ -1,0 +1,726 @@
+﻿{% extends "taller/documentos/base/base_documento.html" %}
+{% load i18n %}
+
+{% load static %}
+{% load country_url %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/documentos/document_form.css' %}">
+{% endblock extra_css %}
+
+{% block documento_title %}{{ ui_labels.new_document }}{% endblock documento_title %}
+
+{% block content %}
+{% load i18n %}
+{# Manejo robusto de company_country con multiples fallbacks #}
+{% with active_country=empresa.pais|default:'CL' %}
+{% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
+<!-- Header de Pagina - ERP compacto -->
+<div class="document-page-toolbar">
+  <div class="document-page-copy">
+    <h1 class="document-page-title">{{ ui_labels.new_document }}</h1>
+  </div>
+  <div class="document-page-tools">
+    <form id="language-form-doc" action="/i18n/setlang/" method="post" class="document-language-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <input type="hidden" name="language" id="language-input-doc" value="{{ LANGUAGE_CODE|default:'es' }}">
+      <div class="document-language-toggle">
+        <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc" class="document-language-btn {% if LANGUAGE_CODE == 'en' %}is-active{% endif %}">EN</button>
+        <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc" class="document-language-btn {% if LANGUAGE_CODE == 'es' %}is-active{% endif %}">ES</button>
+      </div>
+    </form>
+  </div>
+</div>
+<form method="post" id="document-form" class="doc-form-compact"
+      data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
+      data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
+      data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
+      data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
+      data-url-client-search="{% url 'api:buscar_clientes_api' %}"
+      data-url-vehiculos-by-cli="{% url 'api:vehiculos_cliente_api' 0 %}"
+      data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
+      data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
+      data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
+      data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
+      data-url-service-search="{% country_url 'documentos:api_buscar_servicios' %}"
+      data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
+      data-url-client-create-page="{% country_url 'clientes:crear_cliente' %}"
+      data-url-vehiculo-create-page="{% country_url 'vehiculos:crear_vehiculo' %}"
+      data-url-otro-service-create-page="{% country_url 'servicios:crear_otro_servicio' %}"
+      data-url-outsourced-services="{% url 'api:buscar_otros_servicios_api' %}"
+      data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
+  {% csrf_token %}
+
+  {% if messages %}
+    {% for message in messages %}
+      {% with msg_text=message|stringformat:"s" %}
+      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesion exitosamente" not in msg_text and "Ha cerrado sesion" not in msg_text and "iniciado sesion exitosamente" not in msg_text and "cerrado sesion" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
+        {% if message.tags == 'success' %}
+        <div class="doc-system-message is-success">{{ message }}</div>
+        {% elif message.tags == 'error' %}
+        <div class="doc-system-message is-error">{{ message }}</div>
+        {% else %}
+        <div class="doc-system-message is-info">{{ message }}</div>
+        {% endif %}
+      {% endif %}
+      {% endwith %}
+    {% endfor %}
+  {% endif %}
+
+  {% if form.errors %}
+    <div class="doc-form-validation-errors">
+      <p class="doc-form-validation-title">{% trans "Validation errors" %}</p>
+      <ul class="doc-form-validation-list">
+        {% for field, errors in form.errors.items %}
+          {% for msg in errors %}
+            <li>{{ msg }}</li>
+          {% endfor %}
+        {% endfor %}
+      </ul>
+    </div>
+  {% endif %}
+
+  <div id="doc-shell" class="document-page-shell erp-document-shell">
+    <div class="erp-document-sheet">
+      <section class="erp-sheet-section erp-sheet-section--header document-topbar">
+        <div class="erp-sheet-heading">
+          <div class="erp-sheet-title-wrap">
+            <h2 class="erp-sheet-title">{% if es_edicion %}{% trans "Edit document" %}{% else %}{% trans "Create document" %}{% endif %}</h2>
+            <span id="draft-indicator" class="erp-draft-indicator hidden" role="status" aria-live="polite">{% trans "Auto-saved" %}</span>
+          </div>
+        </div>
+        <div class="erp-header-grid">
+          <div class="erp-field">
+            <label for="id_tipo" class="erp-label">{% trans "Document Type" %}</label>
+            {{ form.tipo }}
+          </div>
+          <div class="erp-field erp-field--number">
+            <label class="erp-label">{% trans "Document No." %}</label>
+            <div class="erp-display-cell">
+              <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">{% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}&mdash;{% endif %}</span>
+            </div>
+          </div>
+          <div class="erp-field">
+            <label for="id_fecha_emision" class="erp-label">{% trans "Date" %}</label>
+            <input id="id_fecha_emision" type="date" name="fecha_emision" value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
+          </div>
+          <div class="erp-field">
+            <label for="id_payment_status" class="erp-label">{% trans "Payment status" %}</label>
+            <div class="erp-status-controls">
+              <div id="payment-status-badge" class="erp-payment-select doc-console-payment doc-console-payment-pending doc-status-badge">{{ form.payment_status }}</div>
+              <label class="doc-paid-toggle doc-paid-toggle--inline">
+                {{ form.pagado }}
+                <span>{% trans "Paid" %}</span>
+              </label>
+            </div>
+          </div>
+          <div class="erp-field erp-field--full">
+            <label for="doc_mode" class="erp-label">{% trans "Operation" %}</label>
+            <select id="doc_mode" name="doc_mode">
+              <option value="services">{% trans "Services" %}</option>
+              <option value="parts">{% trans "Part sale only" %}</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <section class="erp-sheet-section erp-sheet-section--party">
+        <div class="erp-section-label">{% trans "Client / Vehicle" %}</div>
+        <div class="erp-party-grid">
+          <div class="erp-field erp-field--full">
+            <label for="cliente-busqueda" class="erp-label">{% trans "Client" %}</label>
+            <div class="erp-input-action">
+              <div class="erp-input-action__field erp-autocomplete-wrap">
+                <input type="text" id="cliente-busqueda" placeholder="{% trans 'Search client' %}" autocomplete="off"
+                       oninput="window.EG?.cliente?.handleClienteInput?.(this.value)"
+                       onfocus="window.EG?.cliente?.handleClienteFocus?.(this.value)"
+                       onkeydown="return window.EG?.cliente?.handleClienteKeydown?.(event)">
+                <div id="cliente-resultados" class="erp-dropdown-panel hidden"></div>
+              </div>
+              <button type="button" id="btn-nuevo-cliente" data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}" data-create-entity="cliente" class="erp-btn erp-btn--secondary erp-btn--attached doc-action-btn">
+                <span aria-hidden="true">+</span>
+                <span class="doc-action-label">{% trans "New client" %}</span>
+              </button>
+            </div>
+            <select id="id_cliente" name="cliente" class="hidden">
+              <option value="">{% trans "Select client..." %}</option>
+            </select>
+          </div>
+
+          {% if ui_config.show_vehicle %}
+          <div id="vehicle-section" class="erp-field erp-field--full">
+            <label for="id_vehiculo" class="erp-label">{% trans "Vehicle" %}</label>
+            <div class="erp-input-action">
+              <div class="erp-input-action__field">
+                <select id="id_vehiculo" name="vehiculo">
+                  <option value="">{% trans 'Select vehicle...' %}</option>
+                </select>
+              </div>
+              <button type="button" id="btn-nuevo-vehiculo" data-create-entity="vehiculo" class="erp-btn erp-btn--secondary erp-btn--attached doc-action-btn">
+                <span aria-hidden="true">+</span>
+                <span class="doc-action-label">{% trans "New vehicle" %}</span>
+              </button>
+            </div>
+          </div>
+          {% endif %}
+
+          {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+          <div class="erp-field">
+            <label id="tecnico-label" for="id_tecnico_responsable" class="erp-label" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
+            {{ form.tecnico_responsable }}
+          </div>
+          {% endwith %}
+
+          {% if 'kilometraje_ingreso' in form.fields %}
+          <div id="miles-section" class="erp-field">
+            <label for="id_kilometraje_ingreso" class="erp-label">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% trans "Mileage" %}{% endif %}</label>
+            <div class="erp-suffix-field">
+              {{ form.kilometraje_ingreso }}
+              <span class="erp-suffix">{% get_current_language as lang %}{% if lang == 'es' %}km{% else %}mi{% endif %}</span>
+            </div>
+            {% if form.kilometraje_ingreso.errors %}
+            <div class="erp-field-error">{{ form.kilometraje_ingreso.errors.0 }}</div>
+            {% endif %}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="erp-context-strip">
+          <div id="cliente-info" class="erp-context-card hidden">
+            <div class="erp-context-title" id="cliente-nombre"></div>
+            <div class="erp-context-meta" id="cliente-telefono"></div>
+            <div class="erp-context-meta" id="cliente-email"></div>
+            <div class="erp-context-meta" id="cliente-ultima-visita"></div>
+          </div>
+          <div id="vehiculo-info" class="erp-context-card hidden">
+            <div class="erp-context-title" id="vehiculo-marca-modelo"></div>
+            <div class="erp-context-meta" id="vehiculo-ano-vin"></div>
+            <div class="erp-context-meta" id="vehiculo-mileage"></div>
+            <div class="erp-context-meta" id="vehiculo-ultima-entrada"></div>
+          </div>
+        </div>
+      </section>
+
+      {% if ui_config.show_repuestos %}
+      <section class="erp-sheet-section doc-pos-section">
+        <div class="erp-section-header">
+          <div class="erp-section-heading">
+            <h3 class="erp-section-title">{% trans "Parts" %}</h3>
+            {% if desarme_origen_label %}
+            <span class="erp-section-note">{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
+            {% endif %}
+          </div>
+          <div class="erp-section-actions">
+            <button type="button" id="add-repuesto" class="erp-btn erp-btn--primary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "Add" %}</span></button>
+            <button type="button" id="btn-nuevo-repuesto" data-create-entity="repuesto" class="erp-btn erp-btn--secondary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "New" %}</span></button>
+            <button type="button" id="toggle-repuesto-cost" class="erp-btn erp-btn--ghost doc-action-btn" title="{% trans 'Show or hide internal shop cost' %}"><span aria-hidden="true">&#128065;</span><span class="doc-action-label">{% trans "Cost" %}</span></button>
+            <button type="button" id="add-used-parts" class="erp-btn erp-btn--warn doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "Used" %}</span></button>
+          </div>
+        </div>
+        <div class="doc-sheet-wrap">
+          <table class="doc-sheet-table doc-sheet-table-repuestos">
+            <colgroup>
+              <col class="doc-col-code">
+              <col class="doc-col-name">
+              <col class="doc-col-qty">
+              <col class="doc-col-money">
+              <col class="doc-col-money doc-col-cost">
+              <col class="doc-col-discount">
+              <col class="doc-col-total">
+              <col class="doc-col-actions">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>{% trans "Code" %}</th>
+                <th>{% trans "Part" %}</th>
+                <th>{% trans "Qty" %}</th>
+                <th>{% trans "Sale Price" %}</th>
+                <th class="cost-column cost-hidden">{% trans "Shop cost" %}</th>
+                <th>{% trans "Discount" %}</th>
+                <th>{% trans "Subtotal" %}</th>
+                <th>{% trans "Actions" %}</th>
+              </tr>
+            </thead>
+            <tbody id="repuestos-container" class="doc-sheet-body">
+              <tr id="repuestos-empty-hint" class="doc-sheet-empty-row empty-hint">
+                <td colspan="8" class="doc-sheet-empty">{% trans "Click Add to insert parts rows." %}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% endif %}
+
+      {% if ui_config.show_services %}
+      <section class="erp-sheet-section doc-pos-section">
+        <div class="erp-section-header">
+          <div class="erp-section-heading">
+            <h3 class="erp-section-title">{% trans "Services" %}</h3>
+          </div>
+          <div class="erp-section-actions">
+            <button type="button" id="add-servicio" class="erp-btn erp-btn--primary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "Add" %}</span></button>
+            <button type="button" id="btn-nuevo-servicio" data-create-entity="servicio" class="erp-btn erp-btn--secondary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "New" %}</span></button>
+          </div>
+        </div>
+        <div class="doc-sheet-wrap">
+          <table class="doc-sheet-table doc-sheet-table-servicios">
+            <colgroup>
+              <col class="doc-col-service">
+              <col class="doc-col-qty">
+              <col class="doc-col-money">
+              <col class="doc-col-discount">
+              <col class="doc-col-total">
+              <col class="doc-col-actions">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>{% trans "Service" %}</th>
+                <th>{% trans "Qty" %}</th>
+                <th>{% trans "Client Price" %}</th>
+                <th>{% trans "Discount" %}</th>
+                <th>{% trans "Subtotal" %}</th>
+                <th>{% trans "Actions" %}</th>
+              </tr>
+            </thead>
+            <tbody id="servicios-container" class="doc-sheet-body">
+              <tr id="servicios-empty-hint" class="doc-sheet-empty-row empty-hint">
+                <td colspan="6" class="doc-sheet-empty">{% trans "Click Add to insert services rows." %}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% endif %}
+
+      {% if ui_config.show_otros_servicios %}
+      <section class="erp-sheet-section doc-pos-section doc-ficha-otros">
+        <div class="erp-section-header">
+          <div class="erp-section-heading">
+            <h3 class="erp-section-title">{% trans "Other Services" %}</h3>
+          </div>
+          <div class="erp-section-actions">
+            <button type="button" id="add-otro" class="erp-btn erp-btn--primary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "Add" %}</span></button>
+            <button type="button" id="btn-nuevo-otro-servicio" data-create-entity="otro_servicio" class="erp-btn erp-btn--secondary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "New" %}</span></button>
+            <button type="button" id="toggle-otro-cost" class="erp-btn erp-btn--ghost doc-action-btn" title="{% trans 'Show or hide internal shop price' %}"><span aria-hidden="true">&#128065;</span><span class="doc-action-label">{% trans "Cost" %}</span></button>
+          </div>
+        </div>
+        <div class="doc-sheet-wrap">
+          <table class="doc-sheet-table doc-sheet-table-otros">
+            <colgroup>
+              <col class="doc-col-service">
+              <col class="doc-col-company">
+              <col class="doc-col-money doc-col-cost">
+              <col class="doc-col-money">
+              <col class="doc-col-total">
+              <col class="doc-col-actions">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>{% trans "Service" %}</th>
+                <th>{% trans "External Company" %}</th>
+                <th class="cost-column cost-hidden">{% trans "Shop Price" %}</th>
+                <th>{% trans "Client Price" %}</th>
+                <th>{% trans "Profit" %}</th>
+                <th>{% trans "Actions" %}</th>
+              </tr>
+            </thead>
+            <tbody id="otros-container" class="doc-sheet-body">
+              <tr id="otros-empty-hint" class="doc-sheet-empty-row empty-hint">
+                <td colspan="6" class="doc-sheet-empty">{% trans "Click Add to insert external services rows." %}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+      {% endif %}
+
+      <section class="erp-sheet-section erp-sheet-section--footer">
+        <div class="erp-footer-grid">
+          <div class="erp-notes-panel">
+            <label for="id_observaciones" class="erp-label">{% trans "Notes" %}</label>
+            {{ form.observaciones }}
+          </div>
+          <div class="erp-summary-panel totales-cockpit">
+            <h3 class="erp-section-title erp-section-title--summary">{% trans "Totals" %}</h3>
+            <div class="receipt-totals">
+              <table class="receipt-totals-table">
+                <tbody>
+                  <tr>
+                    <td class="receipt-label">{% trans "Parts" %}</td>
+                    <td class="receipt-value"><span id="t_repuestos" class="calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
+                  </tr>
+                  {% if ui_config.show_services %}
+                  <tr>
+                    <td class="receipt-label">{% trans "Services" %}</td>
+                    <td class="receipt-value"><span id="t_servicios" class="calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
+                  </tr>
+                  {% endif %}
+                  {% if ui_config.show_otros_servicios %}
+                  <tr>
+                    <td class="receipt-label">{% trans "Other" %}</td>
+                    <td class="receipt-value"><span id="t_otros" class="calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
+                  </tr>
+                  {% endif %}
+
+                  {% for tax_line in ui_config.tax_lines %}
+                  <tr class="tax-line" data-tax-id="{{ tax_line.id }}">
+                    <td class="receipt-label">
+                      <label class="tax-toggle-row">
+                        <input type="checkbox" id="include_{{ tax_line.id }}" checked class="tax-checkbox" data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
+                        <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
+                      </label>
+                    </td>
+                    <td class="receipt-value"><span id="t_{{ tax_line.id }}" class="calculated-field" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
+                  </tr>
+                  {% endfor %}
+
+                  <tr class="receipt-total-row">
+                    <td class="receipt-total-label">{% trans "TOTAL" %}</td>
+                    <td class="receipt-total-value"><span id="t_total" class="calculated-field readonly-total doc-total-final" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="erp-summary-actions">
+              <button type="submit" class="totales-cockpit-save doc-save-btn erp-btn erp-btn--success" data-default-label="{% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans 'Save Document' %}{% endif %}" data-loading-label="{% trans 'Saving...' %}">{% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}</button>
+              <div class="erp-summary-links">
+                <a href="{% country_url 'documentos:lista_documentos' %}" class="erp-btn erp-btn--ghost doc-action-btn"><span aria-hidden="true">&larr;</span><span class="doc-action-label">{% trans "Back" %}</span></a>
+                <span class="erp-btn erp-btn--disabled doc-action-btn"><span aria-hidden="true">&#9881;</span><span class="doc-action-label">Ajustes</span></span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+  <!-- Hidden inputs para serializar filas dinamicas -->
+  <input type="hidden" name="repuestos_json" id="id_repuestos_json">
+  <input type="hidden" name="servicios_json" id="id_servicios_json">
+  <input type="hidden" name="otros_json" id="id_otros_json">
+</form>
+
+<!-- Modal Used Parts (piezas de desarme) -->
+<div id="modal-used-parts" class="fixed inset-0 z-50 hidden">
+  <div id="used-parts-overlay" class="absolute inset-0 bg-black/70"></div>
+  <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
+    <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
+      <h3 class="text-lg font-bold text-amber-300 mb-3">{% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
+      <input type="search" id="used-parts-search" placeholder="{% trans 'Search by code or name...' %}" class="form-control w-full mb-4" autocomplete="off">
+      <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
+      <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">{% trans "Type at least 2 characters to search" %}</p>
+      <button type="button" id="close-used-parts" class="mt-4 btn-secondary">{% trans "Close" %}</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Crear Cliente -->
+<div id="cliente-create-modal" class="fixed inset-0 z-[9999] hidden items-center justify-center bg-black/70 px-4">
+  <div id="cliente-create-backdrop" class="absolute inset-0"></div>
+  <div class="relative z-10 w-full max-w-4xl overflow-hidden rounded-lg border border-slate-700 bg-slate-900 shadow-2xl">
+    <button
+      type="button"
+      id="cliente-create-close"
+      class="absolute right-3 top-3 z-20 rounded-md px-3 py-1 text-sm font-semibold text-white hover:bg-slate-800"
+      aria-label="{% trans 'Close' %}"
+    >
+      &times;
+    </button>
+    <iframe
+      id="cliente-create-frame"
+      class="h-[75vh] min-h-[500px] w-full border-0 bg-white"
+      loading="lazy"
+      title="{% trans 'Create client' %}"
+    ></iframe>
+  </div>
+</div>
+
+{{ clientes_prefetch|json_script:"prefetchClientes" }}
+{{ vehiculos_prefetch|json_script:"prefetchVehiculos" }}
+{{ repuestos_prefetch|json_script:"prefetchRepuestos" }}
+{{ servicios_prefetch|json_script:"prefetchServicios" }}
+{{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
+{{ repuestos_json|json_script:"initialRepuestosData" }}
+{{ servicios_json|json_script:"initialServiciosData" }}
+{{ otros_json|json_script:"initialOtrosData" }}
+{{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
+
+{% endwith %}
+{% endwith %}
+{% endblock content %}
+
+{% block extra_js %}
+{{ block.super }}
+{# Scripts esenciales #}
+<script src="{% static 'js/marketplace_tooltip_fixed.js' %}"></script>
+
+<script>
+// Unica fuente de verdad para ?next= al ir a crear cliente/vehiculo (pathname + querystring)
+window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
+  return encodeURIComponent(window.location.pathname + (window.location.search || ''));
+};
+
+// Funciones para abrir modales de cliente y vehiculo - Disponibles inmediatamente
+(function() {
+  'use strict';
+  
+  function openClienteModal() {
+    try {
+      const pathBase = window.location.pathname;
+      const nextUrl = window.egEncodeDocumentFormNext();
+      
+      // Parsear el path actual -> ['cl', 'es', 'documentos', 'form'] (sin search)
+      const pathParts = pathBase.split('/').filter(function(p) { return p && p.length > 0; });
+      
+      // Detectar pais e idioma desde el path
+      let countryPrefix = 'cl';
+      let langPrefix = 'es';
+      
+      if (pathParts.length > 0) {
+        countryPrefix = pathParts[0];
+        if (pathParts.length > 1 && (pathParts[1] === 'es' || pathParts[1] === 'en')) {
+          langPrefix = pathParts[1];
+        }
+      }
+      
+      const createUrl = '/' + countryPrefix + '/' + langPrefix + '/clientes/crear/?next=' + nextUrl;
+      console.log('[cliente] Abriendo modal de cliente:', createUrl);
+      window.location.href = createUrl;
+    } catch (error) {
+      console.error('[cliente] Error al abrir modal de cliente:', error);
+      alert('Error al abrir la pagina de crear cliente. Por favor, intente nuevamente.');
+    }
+  }
+
+  function openVehiculoModal() {
+    try {
+      const pathOnly = window.location.pathname;
+      const nextUrl = window.egEncodeDocumentFormNext();
+      
+      // Obtener el cliente seleccionado
+      // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
+      let clienteId = null;
+      const clienteSelect = document.getElementById('id_cliente');
+      
+      if (clienteSelect) {
+        // Intentar obtener el valor desde Select2 si esta inicializado
+        if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
+          clienteId = jQuery(clienteSelect).val();
+          console.log('[vehiculo] Cliente obtenido desde Select2:', clienteId);
+        } else {
+          // Fallback: obtener del campo directamente
+          clienteId = clienteSelect.value || null;
+          console.log('[vehiculo] Cliente obtenido del campo:', clienteId);
+        }
+      }
+      
+      // Si aun no hay valor, intentar desde el campo oculto de Select2
+      if (!clienteId && window.jQuery) {
+        const select2Container = jQuery('#id_cliente').next('.select2-container');
+        if (select2Container.length) {
+          const select2Selection = select2Container.find('.select2-selection__rendered');
+          const dataId = select2Selection.attr('data-id');
+          if (dataId) {
+            clienteId = dataId;
+            console.log('[vehiculo] Cliente obtenido desde data-id:', clienteId);
+          }
+        }
+      }
+      
+      // LOGICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+      // Si empieza con /us/, usar /us/en/
+      let countryPrefix = 'cl';
+      let langPrefix = 'es';
+      
+      if (pathOnly.indexOf('/cl/') === 0) {
+        countryPrefix = 'cl';
+        langPrefix = 'es';
+      } else if (pathOnly.indexOf('/us/') === 0) {
+        countryPrefix = 'us';
+        langPrefix = 'en';
+      }
+      
+      let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
+      
+      // Agregar cliente_id si esta seleccionado
+      if (clienteId) {
+        createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+        console.log('[vehiculo] Cliente seleccionado:', clienteId);
+      }
+      
+      console.log('[vehiculo] Abriendo modal de vehiculo:', createUrl);
+      window.location.href = createUrl;
+    } catch (error) {
+      console.error('[vehiculo] Error al abrir modal de vehiculo:', error);
+      alert('Error al abrir la pagina de crear vehiculo. Por favor, intente nuevamente.');
+    }
+  }
+
+  // Hacer funciones disponibles globalmente inmediatamente
+  window.openClienteModal = openClienteModal;
+  window.openVehiculoModal = openVehiculoModal;
+  
+  // Verificar que las funciones esten disponibles
+  console.log('[modal] Funciones disponibles:', {
+    openClienteModal: typeof window.openClienteModal,
+    openVehiculoModal: typeof window.openVehiculoModal
+  });
+})();
+
+// Funcion global para manejar el click del boton de vehiculo
+// Esta funcion se llama directamente desde el onclick del boton como respaldo
+function handleNuevoVehiculoClick(event) {
+  if (event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+  
+  console.log('[vehiculo] handleNuevoVehiculoClick llamado');
+  
+  try {
+    // Intentar usar openVehiculoModal si esta disponible
+    if (window.openVehiculoModal && typeof window.openVehiculoModal === 'function') {
+      console.log('[vehiculo] Usando openVehiculoModal desde handleNuevoVehiculoClick');
+      window.openVehiculoModal();
+      return false;
+    }
+    
+    // Fallback: construir URL manualmente
+    const pathOnly = window.location.pathname;
+    const nextUrl = window.egEncodeDocumentFormNext();
+    
+    // Obtener el cliente seleccionado
+    // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
+    let clienteId = null;
+    const clienteSelect = document.getElementById('id_cliente');
+    
+    console.log('[vehiculo] Buscando cliente seleccionado...');
+    console.log('[vehiculo] Campo cliente encontrado:', !!clienteSelect);
+    
+    if (clienteSelect) {
+      console.log('[vehiculo] Valor directo del campo:', clienteSelect.value);
+      console.log('[vehiculo] jQuery disponible:', !!window.jQuery);
+      
+      // Intentar obtener el valor desde Select2 si esta inicializado
+      if (window.jQuery) {
+        const $clienteSelect = jQuery(clienteSelect);
+        console.log('[vehiculo] Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
+        
+        if ($clienteSelect.hasClass('select2-hidden-accessible')) {
+          clienteId = $clienteSelect.val();
+          console.log('[vehiculo] Cliente obtenido desde Select2:', clienteId);
+        } else {
+          // Fallback: obtener del campo directamente
+          clienteId = clienteSelect.value || null;
+          console.log('[vehiculo] Cliente obtenido del campo directamente:', clienteId);
+        }
+      } else {
+        // Sin jQuery, obtener del campo directamente
+        clienteId = clienteSelect.value || null;
+        console.log('[vehiculo] Cliente obtenido del campo (sin jQuery):', clienteId);
+      }
+    }
+    
+    // Si aun no hay valor, intentar desde el campo oculto de Select2
+    if (!clienteId && window.jQuery) {
+      console.log('[vehiculo] Intentando obtener cliente desde Select2 rendered...');
+      const select2Container = jQuery('#id_cliente').next('.select2-container');
+      if (select2Container.length) {
+        const select2Selection = select2Container.find('.select2-selection__rendered');
+        const select2Text = select2Selection.text();
+        console.log('[vehiculo] Texto en Select2:', select2Text);
+        // Intentar obtener el ID desde el atributo data
+        const dataId = select2Selection.attr('data-id');
+        if (dataId) {
+          clienteId = dataId;
+          console.log('[vehiculo] Cliente obtenido desde data-id:', clienteId);
+        }
+      }
+    }
+    
+    console.log('[vehiculo] Cliente ID final:', clienteId);
+    
+    // LOGICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
+    // Si empieza con /us/, usar /us/en/
+    let countryPrefix = 'cl';
+    let langPrefix = 'es';
+    
+    if (pathOnly.indexOf('/cl/') === 0) {
+      countryPrefix = 'cl';
+      langPrefix = 'es';
+    } else if (pathOnly.indexOf('/us/') === 0) {
+      countryPrefix = 'us';
+      langPrefix = 'en';
+    }
+    
+    let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
+    
+    // Agregar cliente_id si esta seleccionado
+    if (clienteId) {
+      createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+      console.log('[vehiculo] Cliente seleccionado:', clienteId);
+    }
+    
+    console.log('[vehiculo] Navegando a (desde handleNuevoVehiculoClick):', createUrl);
+    window.location.href = createUrl;
+    return false;
+  } catch (error) {
+    console.error('[vehiculo] Error en handleNuevoVehiculoClick:', error);
+    alert('Error al abrir la pagina de crear vehiculo. Por favor, intente nuevamente.');
+    return false;
+  }
+}
+
+// Hacer la funcion disponible globalmente
+window.handleNuevoVehiculoClick = handleNuevoVehiculoClick;
+
+function submitLanguageDoc(lang) {
+  document.getElementById('language-input-doc').value = lang;
+  document.getElementById('language-form-doc').submit();
+}
+</script>
+
+{# Funcion helper para encode next URL - Mantener por compatibilidad #}
+<script>
+window.egEncodeDocumentFormNext = function() {
+    return encodeURIComponent(window.location.pathname + (window.location.search || ''));
+};
+
+// Inicializacion minima para compatibilidad
+document.addEventListener('DOMContentLoaded', function() {
+    // Observations minimo
+    const obs = document.getElementById('id_observaciones');
+    if (obs) { obs.setAttribute('rows', '2'); }
+    
+    // Cabecera consola: badge estado de pago
+    function updatePaymentStatusBadge() {
+        const sel = document.getElementById('id_payment_status');
+        const badge = document.getElementById('payment-status-badge');
+        if (!badge || !sel) return;
+        badge.classList.remove('doc-console-payment-paid', 'doc-console-payment-pending', 'doc-console-payment-partial');
+        const v = (sel.value || '').toUpperCase();
+        if (v === 'PAGADO' || v === 'PAID') badge.classList.add('doc-console-payment-paid');
+        else if (v === 'PARCIAL' || v === 'PARTIAL') badge.classList.add('doc-console-payment-partial');
+        else badge.classList.add('doc-console-payment-pending');
+    }
+    updatePaymentStatusBadge();
+    document.getElementById('id_payment_status')?.addEventListener('change', updatePaymentStatusBadge);
+});
+</script>
+
+<script>
+window.__PRESELECT_CLIENTE_ID__ = "{{ cliente_preselect_id|default:''|escapejs }}";
+window.__PRESELECT_CLIENTE_NOMBRE__ = "{{ cliente_preselect_nombre|default:''|escapejs }}";
+window.__PRESELECT_CLIENTE_EMAIL__ = "{{ cliente_preselect_email|default:''|escapejs }}";
+window.__PRESELECT_CLIENTE_TELEFONO__ = "{{ cliente_preselect_telefono|default:''|escapejs }}";
+window.__PRESELECT_VEHICULO_ID__ = "{{ vehiculo_preselect_id|default:''|escapejs }}";
+</script>
+
+{# âŒ DESACTIVAR Document Engine - Sistema legacy #}
+{# <script src="{% static 'js/document_engine.js' %}"></script> #}
+
+{# === SISTEMA MODULAR UNIFICADO === #}
+{# Cargar modulos JavaScript modularizados #}
+<script src="{% static 'js/document-form/index.js' %}"></script>
+
+{% endblock extra_js %}

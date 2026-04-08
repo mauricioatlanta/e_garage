@@ -1,972 +1,10 @@
-﻿{% extends "taller/documentos/base/base_documento.html" %}
+{% extends "taller/documentos/base/base_documento.html" %}
 {% load i18n %}
 
 {% load static %}
 {% load country_url %}
 
 {% block extra_css %}
-<style>
-/* ==================== DOCUMENT FORM â€” PRO UI: proporciones, jerarquÃ­a, layout ==================== */
-/* Regla global dentro del workspace: inputs compactos, bordes sutiles, sin glow por defecto */
-
-#doc-shell {
-  --doc-input-h: 34px;
-  --doc-input-pad: 6px 10px;
-  --doc-input-fs: 14px;
-  --doc-border: 1px solid rgba(71, 85, 105, 0.6);
-  --doc-border-focus: 1px solid rgba(100, 116, 139, 0.9);
-  --doc-bg-input: rgba(30, 41, 59, 0.7);
-}
-
-/* 1. INPUTS COMPACTOS (34px, 6px 10px, 14px) */
-#doc-shell input:not([type="checkbox"]):not([type="radio"]),
-#doc-shell select,
-#doc-shell textarea,
-#doc-shell .form-control,
-#doc-shell .form-select {
-  min-height: var(--doc-input-h) !important;
-  height: auto !important;
-  padding: var(--doc-input-pad) !important;
-  font-size: var(--doc-input-fs) !important;
-  background: var(--doc-bg-input) !important;
-  border: var(--doc-border) !important;
-  border-radius: 6px !important;
-  color: #e2e8f0 !important;
-  box-shadow: none !important;
-  transition: border-color 0.15s ease;
-}
-#doc-shell input:focus,
-#doc-shell select:focus,
-#doc-shell textarea:focus {
-  outline: none !important;
-  border: var(--doc-border-focus) !important;
-  box-shadow: 0 0 0 2px rgba(71, 85, 105, 0.25) !important;
-}
-#doc-shell label { font-size: 12px; margin-bottom: 4px; color: #94a3b8; }
-
-/* Observaciones: compactas pero editables */
-#doc-shell textarea[name="observaciones"],
-#doc-shell #id_observaciones {
-  min-height: 64px !important;
-  max-height: 120px !important;
-  resize: vertical !important;
-}
-
-/* 2. JERARQUÃA: secciones bien separadas (1 Header, 2 Client/Vehicle, 3 Parts/Services, 4 Totals) */
-.doc-shell-workspace > .doc-console-header { margin-bottom: 1rem; }
-.doc-shell-workspace > .grid { margin-bottom: 0.5rem; }
-.doc-shell-workspace .doc-smart-card,
-.doc-shell-workspace .totales-cockpit {
-  border: var(--doc-border);
-  box-shadow: none;
-}
-
-/* Layout horizontal: 2 columnas desde 768px (md) */
-.doc-shell-workspace .grid.grid-cols-1.md\:grid-cols-2 {
-  grid-template-columns: 1fr;
-}
-@media (min-width: 768px) {
-  .doc-shell-workspace .grid.grid-cols-1.md\:grid-cols-2 {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
-
-.doc-form-compact { max-width: 100%; width: 100%; }
-
-/* Placeholders y selects: sutiles */
-#doc-shell input::placeholder,
-#doc-shell textarea::placeholder { color: #64748b; }
-#doc-shell select option { background: #1e293b; color: #e2e8f0; }
-#doc-shell input[type="checkbox"] {
-  width: 16px; height: 16px;
-  accent-color: #64748b;
-  cursor: pointer;
-}
-
-/* Subtotales y dropdowns: compactos, sin glow */
-#doc-shell .subtotal-field {
-  min-height: var(--doc-input-h); padding: var(--doc-input-pad);
-  font-size: 13px; font-weight: 600; text-align: right;
-  background: var(--doc-bg-input); border: var(--doc-border); border-radius: 6px;
-}
-#doc-shell .cliente-item {
-  padding: 8px 10px; font-size: 13px;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.4);
-}
-#doc-shell .cliente-item:hover { background: rgba(51, 65, 85, 0.5); cursor: pointer; }
-
-/* Botones: compactos */
-#doc-shell button:not(.totales-cockpit-save),
-#doc-shell .btn-secondary,
-#doc-shell .btn-cyan-gradient,
-#doc-shell .btn-green-gradient {
-  min-height: var(--doc-input-h) !important;
-  padding: 6px 12px !important;
-  font-size: 13px !important;
-  border: var(--doc-border) !important;
-  border-radius: 6px !important;
-  box-shadow: none !important;
-}
-
-/* ==================== CLASES REUTILIZABLES PARA BOTONES ==================== */
-/* Botones de acciones de documento: mobile-safe, label siempre visible */
-.doc-action-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 40px;
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.doc-action-btn .doc-action-label {
-  display: inline;
-  font-size: 0.875rem;
-  font-weight: 600;
-}
-
-@media (max-width: 640px) {
-  .doc-action-btn {
-    min-height: 42px;
-    padding: 0.55rem 0.8rem;
-    font-size: 0.9rem;
-  }
-
-  .doc-action-btn .doc-action-label {
-    display: inline !important;
-    font-size: 0.9rem;
-  }
-}
-
-/* BotÃ³n con gradiente cian (para botones principales) - Sin !important */
-.btn-cyan-gradient {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(to right, #06b6d4, #3b82f6);
-  color: #ffffff;
-  font-weight: 600;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  width: 100%;
-  border: 1px solid rgba(34, 211, 238, 0.5);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.btn-cyan-gradient:hover {
-  background: linear-gradient(to right, #22d3ee, #60a5fa);
-  border-color: rgba(34, 211, 238, 0.8);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.btn-cyan-gradient:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.4);
-}
-
-/* BotÃ³n con gradiente verde (para acciones de agregar) - Sin !important */
-.btn-green-gradient {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.375rem;
-  padding: 0.5rem 1rem;
-  background: linear-gradient(to right, rgba(5, 150, 105, 0.9), rgba(22, 163, 74, 0.9));
-  color: #ffffff;
-  font-weight: 600;
-  border-radius: 0.5rem;
-  font-size: 0.875rem;
-  transition: all 0.2s ease;
-  width: 100%;
-  border: 1px solid rgba(34, 211, 238, 0.5);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.btn-green-gradient:hover {
-  background: linear-gradient(to right, #10b981, #16a34a);
-  border-color: rgba(34, 211, 238, 0.8);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-/* Themes for document types - doc-shell border/shadow */
-.theme-ot {
-  border-color: #00f2fe !important;
-  box-shadow: 0 0 32px 4px #00f2fe99, 0 0 0 1px #00f2fe !important;
-}
-.theme-fac {
-  border-color: #ff6b6b !important;
-  box-shadow: 0 0 32px 4px #ff6b6b99, 0 0 0 1px #ff6b6b !important;
-}
-.theme-pres {
-  border-color: #4ecdc4 !important;
-  box-shadow: 0 0 32px 4px #4ecdc499, 0 0 0 1px #4ecdc4 !important;
-}
-.theme-pts {
-  border-color: #f59e0b !important;
-  box-shadow: 0 0 32px 4px #f59e0b99, 0 0 0 1px #f59e0b !important;
-}
-
-@media (min-width: 640px) {
-  .btn-cyan-gradient, .btn-green-gradient {
-    width: auto;
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
-  }
-}
-
-/* Campos deshabilitados - Claramente visibles */
-input:disabled, select:disabled, textarea:disabled {
-  background-color: rgba(40, 40, 60, 0.6);
-  color: rgba(255, 255, 255, 0.5);
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* Estilos mejorados para la secciÃ³n de totales */
-.totales-section {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-}
-
-.totales-section .grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-  gap: 1rem;
-}
-
-@media (max-width: 768px) {
-  .totales-section .grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-.totales-section .bg-black\/40 {
-  transition: all 0.2s ease;
-}
-
-.totales-section .bg-black\/40:hover {
-  border-color: rgba(0, 242, 254, 0.5);
-  box-shadow: 0 0 8px rgba(0, 242, 254, 0.2);
-  transform: translateY(-1px);
-}
-
-/* Eliminada animaciÃ³n infinite para mejor rendimiento mÃ³vil */
-/* El neÃ³n solo aparece en hover/focus, no en animaciÃ³n constante */
-
-/* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÃ“N ==================== */
-/* Description fields - Better spacing and alignment - Sin !important */
-.description-field {
-  min-width: 200px;
-  max-width: 100%;
-  margin-bottom: 0.5rem;
-}
-
-.description-field input {
-  width: 100%;
-}
-
-/* Container for dynamic rows - Better flexbox distribution */
-/* .dynamic-element > div eliminado - usando grid en su lugar */
-
-/* Specific description field containers */
-.rep-search-container,
-.srv-input-container,
-.otr-search-container {
-  min-width: 200px;
-  max-width: 100%;
-  position: relative;
-}
-
-/* Responsive adjustments for description fields */
-@media (max-width: 1024px) {
-  .description-field,
-  .rep-search-container,
-  .srv-input-container,
-  .otr-search-container {
-    min-width: 180px;
-  }
-}
-
-@media (max-width: 768px) {
-  .description-field,
-  .rep-search-container,
-  .srv-input-container,
-  .otr-search-container {
-    min-width: 100%;
-    margin-bottom: 1rem;
-  }
-  
-  /* Stack all fields on mobile */
-  .dynamic-element > div > div {
-    width: 100%;
-  }
-}
-
-
-
-#doc-shell .description-field input,
-#doc-shell .rep-search-container input,
-#doc-shell .srv-input-container input {
-  min-height: var(--doc-input-h) !important;
-  padding: var(--doc-input-pad) !important;
-  font-size: var(--doc-input-fs) !important;
-}
-
-/* Better spacing for labels in description fields */
-.description-field label,
-.rep-search-container label,
-.srv-input-container label,
-.otr-search-container label {
-  margin-bottom: 0.5rem;
-  display: block;
-}
-
-/* Ensure proper alignment of description fields with other fields */
-/* .dynamic-element > div > div eliminado - usando grid en su lugar */
-
-/* Better gap distribution for field groups */
-/* .dynamic-element > div eliminado - usando grid en su lugar */
-
-/* Improved spacing for description fields on larger screens */
-@media (min-width: 1025px) {
-  .rep-search-container {
-    min-width: 320px;
-  }
-  
-  .srv-input-container {
-    min-width: 380px;
-  }
-  
-  .otr-search-container {
-    min-width: 240px;
-  }
-}
-
-/* ==================== BOTONES MODERNOS CON BORDE ILUMINADO ==================== */
-.btn-modern-add {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.9) 100%);
-  border: 1px solid rgba(34, 211, 238, 0.5);
-  box-shadow: 
-    0 0 8px rgba(34, 211, 238, 0.3),
-    0 0 16px rgba(34, 211, 238, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(4px);
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.btn-modern-add::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
-  transition: left 0.4s;
-}
-
-.btn-modern-add:hover::before {
-  left: 100%;
-}
-
-.btn-modern-add:hover {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 1) 0%, rgba(5, 150, 105, 1) 100%);
-  border-color: rgba(34, 211, 238, 0.8);
-  box-shadow: 
-    0 0 12px rgba(34, 211, 238, 0.5),
-    0 0 24px rgba(34, 211, 238, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  transform: translateY(-1px);
-}
-
-.btn-modern-add:active {
-  transform: translateY(0) scale(0.98);
-  box-shadow: 
-    0 0 6px rgba(34, 211, 238, 0.3),
-    inset 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.btn-modern-add:focus {
-  outline: none;
-  box-shadow: 
-    0 0 10px rgba(34, 211, 238, 0.4),
-    0 0 0 2px rgba(34, 211, 238, 0.25);
-}
-
-/* ==================== FICHAS POR TÃ“PICOS - VISTA COMPACTA ==================== */
-.doc-ficha {
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.85) 100%);
-  border: 1px solid rgba(0, 242, 254, 0.35);
-  border-radius: 12px;
-  padding: 0.75rem 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3), 0 0 20px rgba(0, 242, 254, 0.06);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-.doc-ficha:hover {
-  border-color: rgba(0, 242, 254, 0.5);
-  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35), 0 0 24px rgba(0, 242, 254, 0.1);
-}
-.doc-ficha-title {
-  font-size: 0.7rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #67e8f9;
-  margin-bottom: 0.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding-bottom: 0.35rem;
-  border-bottom: 1px solid rgba(0, 242, 254, 0.2);
-}
-.doc-ficha-body { padding: 0; }
-
-/* Fila documento + cliente: ancho al contenido, CERO espacio gigante */
-.doc-shell-compact .doc-fichas-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-  width: max-content;
-  max-width: 100%;
-}
-.doc-shell-compact .doc-fichas-row .doc-ficha {
-  width: max-content;
-  max-width: 100%;
-  flex-shrink: 0;
-}
-.doc-shell-compact .doc-fichas-row .doc-ficha:first-child { max-width: 320px; }
-.doc-shell-compact .doc-fichas-row .doc-ficha:last-child { max-width: 480px; }
-/* Ficha Document: etiqueta | campo 160px fijo */
-.doc-fichas-row .doc-ficha:first-child .doc-ficha-body {
-  display: grid;
-  grid-template-columns: auto 160px;
-  gap: 0.35rem 0.75rem;
-  align-items: center;
-}
-.doc-fichas-row .doc-ficha:first-child .doc-ficha-body label { grid-column: 1; }
-.doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-control,
-.doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-select,
-.doc-fichas-row .doc-ficha:first-child .doc-ficha-body #id_numero { grid-column: 2; width: 160px !important; max-width: 160px !important; box-sizing: border-box !important; }
-/* Ficha Client & Vehicle: dos columnas (Cliente | VehÃ­culo) como en referencia */
-.doc-ficha-body-two-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.5rem 1rem;
-  align-items: start;
-}
-.doc-ficha-body-two-cols .doc-client-info-full { grid-column: 1 / -1; }
-.doc-field-inline { display: flex; flex-direction: column; gap: 0.25rem; min-width: 0; }
-.doc-field-with-btn { display: flex; align-items: center; gap: 0.35rem; min-width: 0; }
-.doc-field-with-btn .relative { flex: 1; min-width: 0; }
-.doc-field-with-btn select { flex: 1; min-width: 0; }
-@media (max-width: 600px) {
-  .doc-ficha-body-two-cols { grid-template-columns: 1fr; }
-}
-/* Anchos fijos en esta ficha */
-.doc-fichas-row .doc-ficha-client-vehicle #cliente-busqueda { width: 100% !important; max-width: 200px !important; }
-.doc-fichas-row .doc-ficha-client-vehicle .relative { width: 100% !important; max-width: 200px !important; }
-.doc-fichas-row .doc-ficha-client-vehicle #id_vehiculo { width: 100% !important; max-width: 220px !important; }
-.doc-fichas-row .doc-ficha:last-child .doc-ficha-body #cliente-busqueda { width: 100% !important; max-width: 200px !important; }
-.doc-fichas-row .doc-ficha:last-child .doc-ficha-body #id_vehiculo { width: 100% !important; max-width: 220px !important; }
-.doc-fichas-row .doc-ficha:last-child .doc-ficha-body .relative { width: 100% !important; max-width: 200px !important; }
-@media (max-width: 768px) {
-  .doc-shell-compact .doc-fichas-row {
-    grid-template-columns: 1fr;
-    max-width: 100%;
-  }
-}
-
-/* Fila de Repuestos | Servicios en horizontal (2 cols cuando hay ambos) */
-.doc-parts-services-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin-bottom: 0.75rem;
-}
-.doc-parts-services-row .doc-ficha:only-child {
-  grid-column: 1 / -1;
-}
-@media (max-width: 900px) {
-  .doc-parts-services-row {
-    grid-template-columns: 1fr;
-  }
-}
-.doc-ficha-parts, .doc-ficha-services {
-  min-height: 120px;
-  display: flex;
-  flex-direction: column;
-  min-width: 0 !important;
-}
-.doc-ficha-parts .doc-ficha-body, .doc-ficha-services .doc-ficha-body {
-  flex: 1;
-  overflow: visible !important;
-  max-height: none;
-}
-#repuestos-container, #servicios-container {
-  padding: 0.25rem 0;
-}
-#otros-container {
-  padding: 0.25rem 0;
-}
-.doc-ficha-otros {
-  margin-bottom: 0.75rem;
-}
-.doc-ficha-otros .doc-ficha-body { max-height: none; overflow: visible !important; }
-
-/* Botones de acciÃ³n dentro de cada ficha */
-.doc-ficha .ficha-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-bottom: 0.5rem;
-}
-.doc-ficha .ficha-actions .btn-secondary, .doc-ficha .ficha-actions .btn-green-gradient {
-  padding: 0.25rem 0.5rem;
-  font-size: 0.7rem;
-}
-
-/* Campos compactos dentro de fichas (evitar que queden enormes) */
-#doc-shell .doc-ficha .form-control,
-#doc-shell .doc-ficha .form-select,
-#doc-shell .doc-ficha input[type="text"],
-#doc-shell .doc-ficha input[type="number"],
-#doc-shell .doc-ficha input[type="date"],
-#doc-shell .doc-ficha select {
-  padding: 5px 8px;
-  font-size: 13px;
-  min-height: 32px;
-}
-#doc-shell .doc-ficha label {
-  font-size: 11px;
-  margin-bottom: 2px;
-}
-#doc-shell .doc-ficha .observaciones-card textarea {
-  min-height: 32px;
-  max-height: 64px;
-  font-size: 12px;
-  padding: 4px 8px;
-}
-
-/* Ancho tipo ~20 caracteres en fichas Document y Client & Vehicle (no cajas gigantes) */
-#doc-shell .doc-fichas-row .doc-ficha .form-control,
-#doc-shell .doc-fichas-row .doc-ficha .form-select,
-#doc-shell .doc-fichas-row .doc-ficha input[type="text"],
-#doc-shell .doc-fichas-row .doc-ficha input[type="date"],
-#doc-shell .doc-fichas-row .doc-ficha select,
-#doc-shell .doc-fichas-row .doc-ficha #id_numero {
-  width: 22ch;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
-/* BÃºsqueda de cliente un poco mÃ¡s ancha para leer "Type to search..." */
-#doc-shell .doc-fichas-row #cliente-busqueda {
-  width: 26ch;
-  max-width: 100%;
-}
-/* Select de vehÃ­culo (puede tener patente + modelo) */
-#doc-shell .doc-fichas-row #id_vehiculo {
-  width: 28ch;
-  max-width: 100%;
-}
-
-/* Ficha OperaciÃ³n: campos tambiÃ©n ~20 caracteres */
-#doc-shell .doc-ficha-operation .form-control,
-#doc-shell .doc-ficha-operation .form-select,
-#doc-shell .doc-ficha-operation input[type="text"],
-#doc-shell .doc-ficha-operation input[type="number"],
-#doc-shell .doc-ficha-operation select {
-  width: 22ch;
-  max-width: 100%;
-  min-width: 0;
-  box-sizing: border-box;
-}
-#doc-shell .doc-ficha-operation .observaciones-card {
-  max-width: 100%;
-}
-#doc-shell .doc-ficha-operation .observaciones-card textarea {
-  width: 100%;
-  max-width: 42ch;
-}
-
-/* Pie de boleta: detalle del cobro ordenado (estilo boleta convencional) */
-.receipt-totals {
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 0.9));
-  border: 1px solid rgba(0, 242, 254, 0.3);
-  border-radius: 10px;
-  padding: 12px 16px;
-  max-width: 360px;
-  margin-left: auto;
-}
-.receipt-totals-apply-tax {
-  padding-bottom: 6px;
-  border-bottom: 1px dashed rgba(0, 242, 254, 0.25);
-}
-.receipt-totals-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-.receipt-totals-table tbody tr {
-  border-bottom: 1px solid rgba(0, 242, 254, 0.12);
-}
-.receipt-totals-table tbody tr:last-child {
-  border-bottom: none;
-}
-.receipt-label {
-  padding: 4px 0;
-  color: #94a3b8;
-  font-weight: 500;
-  text-align: left;
-  vertical-align: middle;
-}
-.receipt-value {
-  padding: 4px 0;
-  text-align: right;
-  color: #e2e8f0;
-  font-weight: 600;
-  white-space: nowrap;
-}
-.receipt-total-row {
-  border-top: 2px solid rgba(0, 242, 254, 0.4) !important;
-  margin-top: 4px;
-}
-.receipt-total-row .receipt-total-label {
-  padding-top: 8px;
-  font-weight: 700;
-  color: #f1f5f9;
-  font-size: 14px;
-}
-.receipt-total-row .receipt-total-value {
-  padding-top: 8px;
-  font-weight: 700;
-  color: #67e8f9;
-  font-size: 15px;
-}
-
-/* Errores de validaciÃ³n compactos */
-.doc-form-validation-errors {
-  background: rgba(127, 29, 29, 0.25);
-  border: 1px solid rgba(248, 113, 113, 0.5);
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-bottom: 12px;
-  font-size: 13px;
-}
-.doc-form-validation-title {
-  color: #fca5a5;
-  font-weight: 600;
-  margin: 0 0 6px 0;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-}
-.doc-form-validation-list {
-  margin: 0;
-  padding-left: 18px;
-  color: #fecaca;
-  line-height: 1.4;
-}
-.doc-form-validation-list li { margin-bottom: 2px; }
-.doc-form-validation-list li:last-child { margin-bottom: 0; }
-
-/* ==================== CABECERA TIPO CONSOLA PREMIUM ==================== */
-.doc-console-header {
-  background: rgba(15, 23, 42, 0.9);
-  border: var(--doc-border);
-  border-radius: 8px;
-  padding: 10px 14px;
-  margin-bottom: 0;
-}
-.doc-console-title {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  color: #94a3b8;
-  margin-bottom: 6px;
-  text-transform: uppercase;
-}
-.doc-console-line {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px 20px;
-  font-size: 13px;
-}
-.doc-console-row2 {
-  margin-top: 8px;
-  padding-top: 8px;
-  border-top: 1px solid rgba(71, 85, 105, 0.4);
-  font-size: 12px;
-}
-.doc-console-row2 label { margin-bottom: 0; margin-right: 2px; }
-.doc-console-inv {
-  font-family: ui-monospace, monospace;
-  font-weight: 700;
-  color: #94a3b8;
-  font-size: 13px;
-  letter-spacing: 0.05em;
-}
-.doc-console-meta {
-  color: rgba(148, 163, 184, 0.95);
-  font-size: 12px;
-}
-.doc-console-payment { font-weight: 600; }
-.doc-console-payment.pending,
-.doc-console-payment.doc-console-payment-pending { color: #fbbf24; }
-.doc-console-payment.paid,
-.doc-console-payment.doc-console-payment-paid { color: #34d399; }
-.doc-console-payment.partial,
-.doc-console-payment.doc-console-payment-partial { color: #38bdf8; }
-.doc-console-header select {
-  background: rgba(30, 41, 59, 0.8);
-  border: 1px solid rgba(71, 85, 105, 0.6);
-  border-radius: 6px;
-  padding: 4px 8px;
-  font-size: 12px;
-  color: inherit;
-  min-width: 100px;
-}
-.doc-console-header select:focus { outline: none; border-color: rgba(6, 182, 212, 0.5); }
-#payment-status-badge select { color: inherit; font-weight: 600; cursor: pointer; }
-
-.doc-invoice-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 18px;
-  align-items: start;
-}
-.doc-invoice-panel {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  padding: 16px;
-  border: 1px solid rgba(148,163,184,.16);
-  border-radius: 14px;
-  background: linear-gradient(145deg, rgba(2,6,23,.42), rgba(15,23,42,.28));
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
-}
-.doc-console-field {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-}
-.doc-console-control {
-  width: 100%;
-}
-.doc-console-title {
-  font-size: .78rem;
-  letter-spacing: .24em;
-  color: #7dd3fc;
-  margin-bottom: 18px;
-  text-transform: uppercase;
-}
-.doc-console-meta {
-  color: #cbd5e1;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: .04em;
-  text-transform: uppercase;
-}
-.doc-console-inv {
-  display: inline-flex;
-  align-items: center;
-  min-height: 46px;
-  padding: 0 14px;
-  border-radius: 12px;
-  background: rgba(2,6,23,.88);
-  border: 1px solid rgba(56,189,248,.24);
-  color: #f8fafc;
-  font-size: 1rem;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.03);
-}
-.doc-console-header {
-  background:
-    radial-gradient(circle at top right, rgba(34,211,238,.10), transparent 32%),
-    linear-gradient(145deg, rgba(6,10,18,.98), rgba(15,23,42,.94));
-  border: 1px solid rgba(148,163,184,.22);
-  border-radius: 18px;
-  padding: 22px 24px;
-  box-shadow:
-    0 18px 48px rgba(0,0,0,.34),
-    inset 0 1px 0 rgba(255,255,255,.04),
-    0 0 26px rgba(34,211,238,.06);
-}
-.doc-console-header input,
-.doc-console-header select,
-.doc-console-control select {
-  width: 100%;
-  min-height: 46px !important;
-  border-radius: 12px !important;
-  padding: 10px 12px !important;
-  font-size: 14px !important;
-  background: rgba(15,23,42,.82) !important;
-  border: 1px solid rgba(100,116,139,.55) !important;
-  color: #f8fafc !important;
-  box-sizing: border-box;
-}
-.doc-console-header input:focus,
-.doc-console-header select:focus,
-.doc-console-control select:focus {
-  border-color: rgba(34,211,238,.7) !important;
-  box-shadow: 0 0 0 3px rgba(34,211,238,.12) !important;
-}
-#doc-shell #id_tecnico_responsable,
-#doc-shell #id_payment_status,
-#doc-shell #id_tipo,
-#doc-shell #doc_mode {
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  box-sizing: border-box;
-}
-@media (max-width: 900px) {
-  .doc-invoice-grid {
-    grid-template-columns: 1fr;
-  }
-  .doc-console-header {
-    padding: 18px;
-    border-radius: 16px;
-  }
-}
-
-/* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÃCULO ==================== */
-.doc-smart-card {
-  background: rgba(15, 23, 42, 0.6);
-  border: var(--doc-border);
-  border-radius: 8px;
-  padding: 12px 14px;
-  min-width: 0 !important;
-}
-.doc-smart-card h3 {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  color: #94a3b8;
-  margin-bottom: 8px;
-  text-transform: uppercase;
-}
-.doc-smart-summary {
-  margin-top: 10px;
-  padding-top: 10px;
-  border-top: 1px solid rgba(71, 85, 105, 0.4);
-  font-size: 12px;
-  color: #94a3b8;
-  line-height: 1.45;
-}
-.doc-smart-summary .name { font-weight: 600; color: #e2e8f0; }
-.doc-smart-summary .detail { color: #64748b; }
-.doc-smart-summary .meta { font-size: 11px; color: #475569; margin-top: 2px; }
-.doc-smart-card textarea {
-  min-height: 64px;
-  background: var(--doc-bg-input);
-  border: var(--doc-border);
-  border-radius: 6px;
-  padding: var(--doc-input-pad);
-  font-size: var(--doc-input-fs);
-  color: #e2e8f0;
-  resize: vertical;
-}
-.doc-smart-card textarea:focus {
-  outline: none;
-  border: var(--doc-border-focus);
-  box-shadow: 0 0 0 2px rgba(71, 85, 105, 0.2);
-}
-
-/* ==================== PANEL TOTALES (jerarquÃ­a clara, sin glow) ==================== */
-.totales-cockpit {
-  background: rgba(15, 23, 42, 0.7);
-  border: var(--doc-border);
-  border-radius: 8px;
-  padding: 16px 18px;
-  box-shadow: none;
-}
-.totales-cockpit-title {
-  font-size: 0.65rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  color: #94a3b8;
-  margin-bottom: 14px;
-  text-transform: uppercase;
-}
-.totales-cockpit .cockpit-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  font-size: 13px;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.35);
-}
-.totales-cockpit .cockpit-row:last-of-type { border-bottom: none; }
-.totales-cockpit .cockpit-label { color: #94a3b8; }
-.totales-cockpit .cockpit-value { font-weight: 600; color: #e2e8f0; white-space: nowrap; }
-.totales-cockpit-divider {
-  height: 1px;
-  background: rgba(71, 85, 105, 0.6);
-  margin: 10px 0 12px 0;
-}
-.totales-cockpit-total {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 0 16px 0;
-  font-size: 18px;
-  font-weight: 700;
-  color: #10b981;
-}
-.totales-cockpit-save {
-  width: 100%;
-  padding: 12px 16px;
-  font-size: 14px;
-  font-weight: 700;
-  background: #059669;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: background 0.15s;
-}
-.totales-cockpit-save:hover { background: #047857; }
-
-/* ==================== BOTÃ“N UNIFICADO .btn-add ==================== */
-.btn-add {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: #0891b2;
-  color: white;
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 600;
-  border: 1px solid rgba(8, 145, 178, 0.5);
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-}
-.btn-add:hover { background: #0e7490; border-color: rgba(8, 145, 178, 0.8); }
-.btn-add:focus { outline: none; box-shadow: 0 0 0 2px rgba(8, 145, 178, 0.4); }
-
-/* ==================== TABLA REAL: Grid 12 cols - Code | Part name | Qty | Price | Total | [x] ==================== */
-.doc-pos-section { margin-bottom: 0.75rem; overflow: hidden; }
-/* Sheet layout para repuestos/servicios */
-.rep-dropdown,
-.rep-codigo-dropdown,
-.srv-dropdown,
-.otr-dropdown {
-  position: absolute;
-  z-index: 9999 !important;
-}
-</style>
 <link rel="stylesheet" href="{% static 'css/documentos/document_form.css' %}">
 {% endblock extra_css %}
 
@@ -977,88 +15,59 @@ input:disabled, select:disabled, textarea:disabled {
 {# Manejo robusto de company_country con multiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-<!-- Header de Pagina - Design System -->
-<div class="mb-6 sm:mb-8 px-4 sm:px-6">
-  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-    <div class="flex-1">
-      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-        {{ ui_labels.new_document }}
-      </h1>
-      <p class="text-sm sm:text-base text-slate-300">
-        {{ ui_labels.new_document }}
-      </p>
-    </div>
-    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
-      <!-- Language Selector -->
-      <form id="language-form-doc" action="/i18n/setlang/" method="post" class="inline">
-        {% csrf_token %}
-        <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <input type="hidden" name="language" id="language-input-doc" value="{{ LANGUAGE_CODE|default:'es' }}">
-        <div class="flex items-center gap-2 bg-black/40 px-3 py-2 rounded-lg border border-cyan-400/50" style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.3);">
-          <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
-                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
-                  {% if LANGUAGE_CODE == 'en' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            EN
-          </button>
-          <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc"
-                  class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'es' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
-                  {% if LANGUAGE_CODE == 'es' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            ES
-          </button>
-        </div>
-      </form>
-      
-      <label class="doc-paid-toggle flex items-center text-cyan-200 font-semibold text-sm sm:text-base px-3 py-2 rounded-lg bg-slate-800/40 border border-slate-600/50 cursor-pointer hover:bg-slate-700/40 transition-all">
-        {{ form.pagado }}
-        {% trans "Document paid" %}
-      </label>
-    </div>
+<!-- Header de Pagina - ERP compacto -->
+<div class="document-page-toolbar">
+  <div class="document-page-copy">
+    <h1 class="document-page-title">{{ ui_labels.new_document }}</h1>
+  </div>
+  <div class="document-page-tools">
+    <form id="language-form-doc" action="/i18n/setlang/" method="post" class="document-language-form">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ request.get_full_path }}">
+      <input type="hidden" name="language" id="language-input-doc" value="{{ LANGUAGE_CODE|default:'es' }}">
+      <div class="document-language-toggle">
+        <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc" class="document-language-btn {% if LANGUAGE_CODE == 'en' %}is-active{% endif %}">EN</button>
+        <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc" class="document-language-btn {% if LANGUAGE_CODE == 'es' %}is-active{% endif %}">ES</button>
+      </div>
+    </form>
   </div>
 </div>
-        <form method="post" id="document-form" class="doc-form-compact mx-auto"
-              data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
-              data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
-              data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
-              data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
-              data-url-client-search="{% url 'api:buscar_clientes_api' %}"
-              data-url-vehiculos-by-cli="{% url 'api:vehiculos_cliente_api' 0 %}"
-              data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
-              data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
-              data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
-              data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
-              data-url-service-search="{% country_url 'documentos:api_buscar_servicios' %}"
-              data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
-              data-url-outsourced-services="{% url 'api:buscar_otros_servicios_api' %}"
-              data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
-          {% csrf_token %}
+<form method="post" id="document-form" class="doc-form-compact"
+      data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
+      data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
+      data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
+      data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
+      data-url-client-search="{% url 'api:buscar_clientes_api' %}"
+      data-url-vehiculos-by-cli="{% url 'api:vehiculos_cliente_api' 0 %}"
+      data-url-repuesto-by-code="{% country_url 'api:repuesto_by_code_api' %}"
+      data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
+      data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
+      data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
+      data-url-service-search="{% country_url 'documentos:api_buscar_servicios' %}"
+      data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
+      data-url-client-create-page="{% country_url 'clientes:crear_cliente' %}"
+      data-url-vehiculo-create-page="{% country_url 'vehiculos:crear_vehiculo' %}"
+      data-url-otro-service-create-page="{% country_url 'servicios:crear_otro_servicio' %}"
+      data-url-outsourced-services="{% url 'api:buscar_otros_servicios_api' %}"
+      data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
+  {% csrf_token %}
 
-  <!-- System messages - Design System (no mostrar mensajes de otras secciones: login, clientes eliminados, etc.) -->
   {% if messages %}
     {% for message in messages %}
       {% with msg_text=message|stringformat:"s" %}
       {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesion exitosamente" not in msg_text and "Ha cerrado sesion" not in msg_text and "iniciado sesion exitosamente" not in msg_text and "cerrado sesion" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
         {% if message.tags == 'success' %}
-        <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">&#10003;</span>
-          <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
-        </div>
+        <div class="doc-system-message is-success">{{ message }}</div>
         {% elif message.tags == 'error' %}
-        <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">&#10007;</span>
-          <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
-        </div>
+        <div class="doc-system-message is-error">{{ message }}</div>
         {% else %}
-        <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">&#9432;</span>
-          <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
-        </div>
+        <div class="doc-system-message is-info">{{ message }}</div>
         {% endif %}
       {% endif %}
       {% endwith %}
     {% endfor %}
   {% endif %}
 
-  <!-- Validation errors - compacto y legible -->
   {% if form.errors %}
     <div class="doc-form-validation-errors">
       <p class="doc-form-validation-title">{% trans "Validation errors" %}</p>
@@ -1072,240 +81,228 @@ input:disabled, select:disabled, textarea:disabled {
     </div>
   {% endif %}
 
-  <!-- Document workspace - cabecera consola | tarjetas cliente/vehiculo | repuestos/servicios POS | observaciones | totales cockpit -->
-  <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace document-page-shell">
-
-    <!-- 1. OPERATION HEADER -->
-    <div class="doc-console-header document-topbar">
-      <div class="doc-console-title flex flex-wrap items-center gap-2">
-        <span>{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</span>
-        <span id="draft-indicator" class="hidden text-[10px] sm:text-xs font-medium text-emerald-300/95 bg-emerald-950/60 border border-emerald-500/35 rounded px-2 py-0.5" role="status" aria-live="polite">{% trans "Auto-saved" %}</span>
-      </div>
-
-      <div class="doc-invoice-grid">
-        <div class="doc-console-field">
-          <label for="id_tipo" class="doc-console-meta">{% trans "Document Type" %}</label>
-          {{ form.tipo }}
-        </div>
-
-        <div class="doc-console-field doc-console-field--invoice">
-          <span class="doc-console-meta">{% trans "Document No." %}</span>
-          <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
-            {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}&mdash;{% endif %}
-          </span>
-        </div>
-
-        <div class="doc-console-field">
-          <label for="id_fecha_emision" class="doc-console-meta">{% trans "Date" %}</label>
-          <input id="id_fecha_emision" type="date" name="fecha_emision" class="bg-slate-800/60 border border-slate-600 rounded px-2 py-1 text-slate-300 text-xs"
-                 value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
-        </div>
-
-        {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
-        <div class="doc-console-field">
-          <label id="tecnico-label" for="id_tecnico_responsable" class="doc-console-meta" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
-          <div class="doc-console-control">{{ form.tecnico_responsable }}</div>
-        </div>
-        {% endwith %}
-
-        <div class="doc-console-field">
-          <label for="id_payment_status" class="doc-console-meta">{% trans "Status" %}</label>
-          <div id="payment-status-badge" class="doc-console-control doc-console-payment doc-console-payment-pending doc-status-badge">{{ form.payment_status }}</div>
-        </div>
-      </div>
-
-      <div class="document-utility-row">
-        <div class="document-utility-item">
-          <label for="doc_mode" class="doc-console-meta">{% trans "Operation" %}</label>
-          <select id="doc_mode" name="doc_mode" class="bg-slate-800/80 border border-slate-600 rounded px-2 py-1 text-xs text-slate-300">
-            <option value="services">{% trans "Services" %}</option>
-            <option value="parts">{% trans "Part sale only" %}</option>
-          </select>
-        </div>
-      </div>
-    </div>
-
-    <div class="document-main-grid">
-    <div class="document-left-panel">
-
-    <!-- 2. CLIENT | VEHICLE (layout horizontal en md+) -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-      <div class="doc-smart-card doc-ficha-client-vehicle">
-        <h3>{% trans "CLIENT" %}</h3>
-        <p class="document-card-subtitle">{% trans "Quick selection or client creation" %}</p>
-        <div class="relative">
-          <label for="cliente-busqueda" class="sr-only">{% trans 'Search client' %}</label>
-          <input type="text" id="cliente-busqueda" class="w-full bg-slate-800 p-2 rounded border border-slate-600 text-white text-sm"
-                 placeholder="{% trans 'Search client' %}"
-                 autocomplete="off"
-                 oninput="window.EG?.cliente?.handleClienteInput?.(this.value)"
-                 onfocus="window.EG?.cliente?.handleClienteFocus?.(this.value)"
-                 onkeydown="return window.EG?.cliente?.handleClienteKeydown?.(event)">
-          <div id="cliente-resultados" class="absolute z-50 w-full bg-slate-800 border border-slate-600 rounded shadow-lg hidden max-h-48 overflow-y-auto text-sm mt-1"></div>
-        </div>
-        <a id="btn-nuevo-cliente"
-           href="{% country_url 'clientes:crear_cliente' %}"
-           data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
-           class="doc-action-btn mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold no-underline shadow-sm whitespace-nowrap">
-        <span aria-hidden="true">&#x2795;</span>
-        <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
-        </a>
-        <select id="id_cliente" name="cliente" class="hidden">
-          <option value="">{% trans "Select client..." %}</option>
-        </select>
-        <div id="cliente-info" class="doc-smart-summary doc-smart-summary-client hidden">
-          <div class="name" id="cliente-nombre"></div>
-          <div class="detail" id="cliente-telefono"></div>
-          <div class="detail" id="cliente-email"></div>
-          <div class="meta" id="cliente-ultima-visita"></div>
-        </div>
-      </div>
-      <div class="doc-smart-card" id="vehicle-section">
-        <h3>{% trans "VEHICLE" %}</h3>
-        <p class="document-card-subtitle">{% trans "Linked to the selected client" %}</p>
-        {% if ui_config.show_vehicle %}
-        <div class="tipo-dependent-vehicle">
-          <div class="doc-field-with-btn flex gap-2">
-            <div class="flex-1">
-              <label for="id_vehiculo" class="sr-only">{% trans 'Vehicle' %}</label>
-              <select id="id_vehiculo" name="vehiculo" class="form-select w-full">
-                <option value="">{% trans 'Select vehicle...' %}</option>
-              </select>
-            </div>
-            <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
-        <span aria-hidden="true">&#x2795;</span>
-        <span class="doc-action-label text-white font-semibold">Nuevo veh&iacute;culo</span>
-            </button>
+  <div id="doc-shell" class="document-page-shell erp-document-shell">
+    <div class="erp-document-sheet">
+      <section class="erp-sheet-section erp-sheet-section--header document-topbar">
+        <div class="erp-sheet-heading">
+          <div class="erp-sheet-title-wrap">
+            <h2 class="erp-sheet-title">{% if es_edicion %}{% trans "Edit document" %}{% else %}{% trans "Create document" %}{% endif %}</h2>
+            <span id="draft-indicator" class="erp-draft-indicator hidden" role="status" aria-live="polite">{% trans "Auto-saved" %}</span>
           </div>
         </div>
-        {% endif %}
-        {% if 'kilometraje_ingreso' in form.fields %}
-        <div id="miles-section" class="tipo-dependent-miles flex flex-wrap items-center gap-2 mt-2">
-          <label for="id_kilometraje_ingreso" class="text-xs text-slate-400">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% trans "Mileage" %}{% endif %}</label>
-          <div class="flex-1 min-w-0 max-w-[7rem]">{{ form.kilometraje_ingreso }}</div>
-          <span class="text-xs text-slate-500">{% get_current_language as lang %}{% if lang == 'es' %}km{% else %}mi{% endif %}</span>
+        <div class="erp-header-grid">
+          <div class="erp-field">
+            <label for="id_tipo" class="erp-label">{% trans "Document Type" %}</label>
+            {{ form.tipo }}
+          </div>
+          <div class="erp-field erp-field--number">
+            <label class="erp-label">{% trans "Document No." %}</label>
+            <div class="erp-display-cell">
+              <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">{% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}&mdash;{% endif %}</span>
+            </div>
+          </div>
+          <div class="erp-field">
+            <label for="id_fecha_emision" class="erp-label">{% trans "Date" %}</label>
+            <input id="id_fecha_emision" type="date" name="fecha_emision" value="{{ form.fecha_emision.value|default_if_none:''|date:'Y-m-d' }}">
+          </div>
+          <div class="erp-field">
+            <label for="id_payment_status" class="erp-label">{% trans "Payment status" %}</label>
+            <div class="erp-status-controls">
+              <div id="payment-status-badge" class="erp-payment-select doc-console-payment doc-console-payment-pending doc-status-badge">{{ form.payment_status }}</div>
+              <label class="doc-paid-toggle doc-paid-toggle--inline">
+                {{ form.pagado }}
+                <span>{% trans "Paid" %}</span>
+              </label>
+            </div>
+          </div>
+          <div class="erp-field erp-field--full">
+            <label for="doc_mode" class="erp-label">{% trans "Operation" %}</label>
+            <select id="doc_mode" name="doc_mode">
+              <option value="services">{% trans "Services" %}</option>
+              <option value="parts">{% trans "Part sale only" %}</option>
+            </select>
+          </div>
         </div>
-        {% if form.kilometraje_ingreso.errors %}
-        <div class="text-red-400 text-xs">{{ form.kilometraje_ingreso.errors.0 }}</div>
-        {% endif %}
-        {% endif %}
-        <div id="vehiculo-info" class="doc-smart-summary doc-smart-summary-vehicle hidden">
-          <div class="name" id="vehiculo-marca-modelo"></div>
-          <div class="detail" id="vehiculo-ano-vin"></div>
-          <div class="detail" id="vehiculo-mileage"></div>
-          <div class="meta" id="vehiculo-ultima-entrada"></div>
-        </div>
-      </div>
-    </div>
+      </section>
 
-    <div class="document-detail-card">
-      <h3>{% trans "DOCUMENT DETAIL" %}</h3>
-      <div class="detail-actions-toolbar">
-        {% if ui_config.show_repuestos %}<button type="button" class="detail-toolbar-btn" data-doc-add-target="add-repuesto">{% trans "Add part" %}</button>{% endif %}
-        {% if ui_config.show_services %}<button type="button" class="detail-toolbar-btn" data-doc-add-target="add-servicio">{% trans "Add service" %}</button>{% endif %}
-        {% if ui_config.show_otros_servicios %}<button type="button" class="detail-toolbar-btn" data-doc-add-target="add-otro">{% trans "Add external service" %}</button>{% endif %}
-        {% if ui_config.show_repuestos %}<button type="button" class="detail-toolbar-btn" data-doc-add-target="add-used-parts">{% trans "Used part" %}</button>{% endif %}
-      </div>
-
-    <!-- 3. PARTS | SERVICES (tabla compacta) -->
-    <div class="document-sections-grid">
-      {% if ui_config.show_repuestos %}
-      <div class="doc-smart-card doc-ficha-parts doc-pos-section">
-        <div class="doc-sheet-section">
-          <div class="doc-sheet-toolbar">
-            <div class="flex flex-col gap-1 min-w-0 flex-1">
-              <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
-            {% if desarme_origen_label %}
-              <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
-                <span>+</span>
-                <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
+      <section class="erp-sheet-section erp-sheet-section--party">
+        <div class="erp-section-label">{% trans "Client / Vehicle" %}</div>
+        <div class="erp-party-grid">
+          <div class="erp-field erp-field--full">
+            <label for="cliente-busqueda" class="erp-label">{% trans "Client" %}</label>
+            <div class="erp-input-action">
+              <div class="erp-input-action__field erp-autocomplete-wrap">
+                <input type="text" id="cliente-busqueda" placeholder="{% trans 'Search client' %}" autocomplete="off"
+                       oninput="window.EG?.cliente?.handleClienteInput?.(this.value)"
+                       onfocus="window.EG?.cliente?.handleClienteFocus?.(this.value)"
+                       onkeydown="return window.EG?.cliente?.handleClienteKeydown?.(event)">
+                <div id="cliente-resultados" class="erp-dropdown-panel hidden"></div>
               </div>
+              <button type="button" id="btn-nuevo-cliente" data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}" data-create-entity="cliente" class="erp-btn erp-btn--secondary erp-btn--attached doc-action-btn">
+                <span aria-hidden="true">+</span>
+                <span class="doc-action-label">{% trans "New client" %}</span>
+              </button>
+            </div>
+            <select id="id_cliente" name="cliente" class="hidden">
+              <option value="">{% trans "Select client..." %}</option>
+            </select>
+          </div>
+
+          {% if ui_config.show_vehicle %}
+          <div id="vehicle-section" class="erp-field erp-field--full">
+            <label for="id_vehiculo" class="erp-label">{% trans "Vehicle" %}</label>
+            <div class="erp-input-action">
+              <div class="erp-input-action__field">
+                <select id="id_vehiculo" name="vehiculo">
+                  <option value="">{% trans 'Select vehicle...' %}</option>
+                </select>
+              </div>
+              <button type="button" id="btn-nuevo-vehiculo" data-create-entity="vehiculo" class="erp-btn erp-btn--secondary erp-btn--attached doc-action-btn">
+                <span aria-hidden="true">+</span>
+                <span class="doc-action-label">{% trans "New vehicle" %}</span>
+              </button>
+            </div>
+          </div>
+          {% endif %}
+
+          {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
+          <div class="erp-field">
+            <label id="tecnico-label" for="id_tecnico_responsable" class="erp-label" data-label-default="{{ current_label }}" data-label-pts="{% trans 'Salesperson' %}">{{ current_label }}</label>
+            {{ form.tecnico_responsable }}
+          </div>
+          {% endwith %}
+
+          {% if 'kilometraje_ingreso' in form.fields %}
+          <div id="miles-section" class="erp-field">
+            <label for="id_kilometraje_ingreso" class="erp-label">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% trans "Mileage" %}{% endif %}</label>
+            <div class="erp-suffix-field">
+              {{ form.kilometraje_ingreso }}
+              <span class="erp-suffix">{% get_current_language as lang %}{% if lang == 'es' %}km{% else %}mi{% endif %}</span>
+            </div>
+            {% if form.kilometraje_ingreso.errors %}
+            <div class="erp-field-error">{{ form.kilometraje_ingreso.errors.0 }}</div>
             {% endif %}
-            </div>
-            <div class="doc-sheet-actions">
-              <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-              <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">+</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
-            </div>
           </div>
-          <div class="doc-sheet-wrap">
-            <table class="doc-sheet-table doc-sheet-table-repuestos">
-              <colgroup>
-                <col class="doc-col-code">
-                <col class="doc-col-name">
-                <col class="doc-col-qty">
-                <col class="doc-col-money">
-                <col class="doc-col-discount">
-                <col class="doc-col-total">
-                <col class="doc-col-actions">
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>{% trans "Code" %}</th>
-                  <th>{% trans "Part name" %}</th>
-                  <th>{% trans "Qty" %}</th>
-                  <th>{% trans "Sale price" %}</th>
-                  <th>{% trans "Discount" %}</th>
-                  <th>{% trans "Subtotal" %}</th>
-                  <th>{% trans "Actions" %}</th>
-                </tr>
-              </thead>
-              <tbody id="repuestos-container" class="doc-sheet-body">
-                <!-- Dynamic parts rows -->
-              </tbody>
-            </table>
+          {% endif %}
+        </div>
+
+        <div class="erp-context-strip">
+          <div id="cliente-info" class="erp-context-card hidden">
+            <div class="erp-context-title" id="cliente-nombre"></div>
+            <div class="erp-context-meta" id="cliente-telefono"></div>
+            <div class="erp-context-meta" id="cliente-email"></div>
+            <div class="erp-context-meta" id="cliente-ultima-visita"></div>
+          </div>
+          <div id="vehiculo-info" class="erp-context-card hidden">
+            <div class="erp-context-title" id="vehiculo-marca-modelo"></div>
+            <div class="erp-context-meta" id="vehiculo-ano-vin"></div>
+            <div class="erp-context-meta" id="vehiculo-mileage"></div>
+            <div class="erp-context-meta" id="vehiculo-ultima-entrada"></div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {% if ui_config.show_repuestos %}
+      <section class="erp-sheet-section doc-pos-section">
+        <div class="erp-section-header">
+          <div class="erp-section-heading">
+            <h3 class="erp-section-title">{% trans "Parts" %}</h3>
+            {% if desarme_origen_label %}
+            <span class="erp-section-note">{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
+            {% endif %}
+          </div>
+          <div class="erp-section-actions">
+            <button type="button" id="add-repuesto" class="erp-btn erp-btn--primary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "Add" %}</span></button>
+            <button type="button" id="btn-nuevo-repuesto" data-create-entity="repuesto" class="erp-btn erp-btn--secondary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "New" %}</span></button>
+            <button type="button" id="toggle-repuesto-cost" class="erp-btn erp-btn--ghost doc-action-btn" title="{% trans 'Show or hide internal shop cost' %}"><span aria-hidden="true">&#128065;</span><span class="doc-action-label">{% trans "Cost" %}</span></button>
+            <button type="button" id="add-used-parts" class="erp-btn erp-btn--warn doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "Used" %}</span></button>
+          </div>
+        </div>
+        <div class="doc-sheet-wrap">
+          <table class="doc-sheet-table doc-sheet-table-repuestos">
+            <colgroup>
+              <col class="doc-col-code">
+              <col class="doc-col-name">
+              <col class="doc-col-qty">
+              <col class="doc-col-money">
+              <col class="doc-col-money doc-col-cost">
+              <col class="doc-col-discount">
+              <col class="doc-col-total">
+              <col class="doc-col-actions">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>{% trans "Code" %}</th>
+                <th>{% trans "Part" %}</th>
+                <th>{% trans "Qty" %}</th>
+                <th>{% trans "Sale Price" %}</th>
+                <th class="cost-column cost-hidden">{% trans "Shop cost" %}</th>
+                <th>{% trans "Discount" %}</th>
+                <th>{% trans "Subtotal" %}</th>
+                <th>{% trans "Actions" %}</th>
+              </tr>
+            </thead>
+            <tbody id="repuestos-container" class="doc-sheet-body">
+              <tr id="repuestos-empty-hint" class="doc-sheet-empty-row empty-hint">
+                <td colspan="8" class="doc-sheet-empty">{% trans "Click Add to insert parts rows." %}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
       {% endif %}
+
       {% if ui_config.show_services %}
-      <div class="doc-smart-card doc-ficha-services doc-pos-section">
-        <div class="doc-sheet-section">
-          <div class="doc-sheet-toolbar">
-            <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
-            <div class="doc-sheet-actions">
-              <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-            </div>
+      <section class="erp-sheet-section doc-pos-section">
+        <div class="erp-section-header">
+          <div class="erp-section-heading">
+            <h3 class="erp-section-title">{% trans "Services" %}</h3>
           </div>
-          <div class="doc-sheet-wrap">
-            <table class="doc-sheet-table doc-sheet-table-servicios">
-              <colgroup>
-                <col class="doc-col-service">
-                <col class="doc-col-qty">
-                <col class="doc-col-money">
-                <col class="doc-col-discount">
-                <col class="doc-col-total">
-                <col class="doc-col-actions">
-              </colgroup>
-              <thead>
-                <tr>
-                  <th>{% trans "Service" %}</th>
-                  <th>{% trans "Qty" %}</th>
-                  <th>{% trans "Client price" %}</th>
-                  <th>{% trans "Discount" %}</th>
-                  <th>{% trans "Subtotal" %}</th>
-                  <th>{% trans "Actions" %}</th>
-                </tr>
-              </thead>
-              <tbody id="servicios-container" class="doc-sheet-body">
-                <!-- Dynamic services rows: click + ADD, then type to search -->
-                <tr id="servicios-empty-hint" class="doc-sheet-empty-row empty-hint">
-                  <td colspan="6" class="doc-sheet-empty text-xs text-slate-400 py-2">{% trans "Click + Add to add services, then type to search." %}</td>
-                </tr>
-              </tbody>
-            </table>
+          <div class="erp-section-actions">
+            <button type="button" id="add-servicio" class="erp-btn erp-btn--primary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "Add" %}</span></button>
+            <button type="button" id="btn-nuevo-servicio" data-create-entity="servicio" class="erp-btn erp-btn--secondary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "New" %}</span></button>
           </div>
         </div>
-      </div>
+        <div class="doc-sheet-wrap">
+          <table class="doc-sheet-table doc-sheet-table-servicios">
+            <colgroup>
+              <col class="doc-col-service">
+              <col class="doc-col-qty">
+              <col class="doc-col-money">
+              <col class="doc-col-discount">
+              <col class="doc-col-total">
+              <col class="doc-col-actions">
+            </colgroup>
+            <thead>
+              <tr>
+                <th>{% trans "Service" %}</th>
+                <th>{% trans "Qty" %}</th>
+                <th>{% trans "Client Price" %}</th>
+                <th>{% trans "Discount" %}</th>
+                <th>{% trans "Subtotal" %}</th>
+                <th>{% trans "Actions" %}</th>
+              </tr>
+            </thead>
+            <tbody id="servicios-container" class="doc-sheet-body">
+              <tr id="servicios-empty-hint" class="doc-sheet-empty-row empty-hint">
+                <td colspan="6" class="doc-sheet-empty">{% trans "Click Add to insert services rows." %}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
       {% endif %}
-    </div>
-    {% if ui_config.show_otros_servicios %}
-    <div class="doc-smart-card doc-ficha-otros doc-pos-section mt-4">
-      <div class="doc-sheet-section">
-        <div class="doc-sheet-toolbar">
-          <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
-          <div class="doc-sheet-actions">
-            <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">&#x2795;</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-            <span class="doc-action-btn text-sm bg-slate-700 px-3 py-2 rounded-md text-slate-400 whitespace-nowrap cursor-not-allowed" title="{% trans 'External services settings unavailable in this local route map' %}"><span aria-hidden="true">&#9881;</span><span class="doc-action-label text-slate-400 font-semibold">Ajustes</span></span>
+
+      {% if ui_config.show_otros_servicios %}
+      <section class="erp-sheet-section doc-pos-section doc-ficha-otros">
+        <div class="erp-section-header">
+          <div class="erp-section-heading">
+            <h3 class="erp-section-title">{% trans "Other Services" %}</h3>
+          </div>
+          <div class="erp-section-actions">
+            <button type="button" id="add-otro" class="erp-btn erp-btn--primary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "Add" %}</span></button>
+            <button type="button" id="btn-nuevo-otro-servicio" data-create-entity="otro_servicio" class="erp-btn erp-btn--secondary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "New" %}</span></button>
+            <button type="button" id="toggle-otro-cost" class="erp-btn erp-btn--ghost doc-action-btn" title="{% trans 'Show or hide internal shop price' %}"><span aria-hidden="true">&#128065;</span><span class="doc-action-label">{% trans "Cost" %}</span></button>
           </div>
         </div>
         <div class="doc-sheet-wrap">
@@ -1313,7 +310,7 @@ input:disabled, select:disabled, textarea:disabled {
             <colgroup>
               <col class="doc-col-service">
               <col class="doc-col-company">
-              <col class="doc-col-money">
+              <col class="doc-col-money doc-col-cost">
               <col class="doc-col-money">
               <col class="doc-col-total">
               <col class="doc-col-actions">
@@ -1322,114 +319,81 @@ input:disabled, select:disabled, textarea:disabled {
               <tr>
                 <th>{% trans "Service" %}</th>
                 <th>{% trans "External Company" %}</th>
-                <th>{% trans "Shop Price" %}</th>
+                <th class="cost-column cost-hidden">{% trans "Shop Price" %}</th>
                 <th>{% trans "Client Price" %}</th>
                 <th>{% trans "Profit" %}</th>
                 <th>{% trans "Actions" %}</th>
               </tr>
             </thead>
             <tbody id="otros-container" class="doc-sheet-body">
-              <!-- Dynamic other services rows (external/outsourced) -->
               <tr id="otros-empty-hint" class="doc-sheet-empty-row empty-hint">
-                <td colspan="6" class="doc-sheet-empty text-xs text-slate-400 py-2">{% trans "Click + Add for external/outsourced services." %}</td>
+                <td colspan="6" class="doc-sheet-empty">{% trans "Click Add to insert external services rows." %}</td>
               </tr>
             </tbody>
           </table>
         </div>
-      </div>
-    </div>
-    {% endif %}
-    </div>
-    </div>
-    </div>
+      </section>
+      {% endif %}
 
-    <!-- 4. NOTES | TOTALES (panel claro) -->
-    <div class="document-right-panel">
-      <div class="doc-smart-card">
-        <h3>{% trans "NOTES" %}</h3>
-        <p class="document-card-subtitle">{% trans "Internal notes and context for this document" %}</p>
-        <label for="id_observaciones" class="sr-only">{% trans "Notes" %}</label>
-        {{ form.observaciones }}
-      </div>
-      <div class="totales-cockpit totales-panel">
-        <h3 class="totales-cockpit-title">{% trans "DOCUMENT TOTALS" %}</h3>
-        <div class="receipt-totals">
-          <table class="receipt-totals-table">
-            <tbody>
-              <tr>
-                <td class="receipt-label">{% trans "Parts" %}</td>
-                <td class="receipt-value">
-                  <span id="t_repuestos" class="calculated-field readonly-total" data-calculated="true">
-                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
-                  </span>
-                </td>
-              </tr>
-              {% if ui_config.show_services %}
-              <tr>
-                <td class="receipt-label">{% trans "Services" %}</td>
-                <td class="receipt-value">
-                  <span id="t_servicios" class="calculated-field readonly-total" data-calculated="true">
-                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
-                  </span>
-                </td>
-              </tr>
-              {% endif %}
-              {% if ui_config.show_otros_servicios %}
-              <tr>
-                <td class="receipt-label">{% trans "Other" %}</td>
-                <td class="receipt-value">
-                  <span id="t_otros" class="calculated-field readonly-total" data-calculated="true">
-                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
-                  </span>
-                </td>
-              </tr>
-              {% endif %}
+      <section class="erp-sheet-section erp-sheet-section--footer">
+        <div class="erp-footer-grid">
+          <div class="erp-notes-panel">
+            <label for="id_observaciones" class="erp-label">{% trans "Notes" %}</label>
+            {{ form.observaciones }}
+          </div>
+          <div class="erp-summary-panel totales-cockpit">
+            <h3 class="erp-section-title erp-section-title--summary">{% trans "Totals" %}</h3>
+            <div class="receipt-totals">
+              <table class="receipt-totals-table">
+                <tbody>
+                  <tr>
+                    <td class="receipt-label">{% trans "Parts" %}</td>
+                    <td class="receipt-value"><span id="t_repuestos" class="calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
+                  </tr>
+                  {% if ui_config.show_services %}
+                  <tr>
+                    <td class="receipt-label">{% trans "Services" %}</td>
+                    <td class="receipt-value"><span id="t_servicios" class="calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
+                  </tr>
+                  {% endif %}
+                  {% if ui_config.show_otros_servicios %}
+                  <tr>
+                    <td class="receipt-label">{% trans "Other" %}</td>
+                    <td class="receipt-value"><span id="t_otros" class="calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
+                  </tr>
+                  {% endif %}
 
-              {% for tax_line in ui_config.tax_lines %}
-              <tr class="tax-line" data-tax-id="{{ tax_line.id }}">
-                <td class="receipt-label">
-                  <label class="inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="include_{{ tax_line.id }}" checked
-                           class="mr-1 w-3 h-3 accent-cyan-400 tax-checkbox"
-                           data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
-                    <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
-                  </label>
-                </td>
-                <td class="receipt-value">
-                  <span id="t_{{ tax_line.id }}" class="calculated-field" data-calculated="true">
-                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
-                  </span>
-                </td>
-              </tr>
-              {% endfor %}
+                  {% for tax_line in ui_config.tax_lines %}
+                  <tr class="tax-line" data-tax-id="{{ tax_line.id }}">
+                    <td class="receipt-label">
+                      <label class="tax-toggle-row">
+                        <input type="checkbox" id="include_{{ tax_line.id }}" checked class="tax-checkbox" data-tax-id="{{ tax_line.id }}" data-tax-rate="{{ tax_line.rate }}">
+                        <span>{{ tax_line.label }} ({{ tax_line.rate }}%)</span>
+                      </label>
+                    </td>
+                    <td class="receipt-value"><span id="t_{{ tax_line.id }}" class="calculated-field" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
+                  </tr>
+                  {% endfor %}
 
-              <tr class="receipt-total-row">
-                <td class="receipt-total-label">{% trans "TOTAL" %}</td>
-                <td class="receipt-total-value">
-                  <span id="t_total" class="calculated-field readonly-total doc-total-final" data-calculated="true">
-                    {% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  <tr class="receipt-total-row">
+                    <td class="receipt-total-label">{% trans "TOTAL" %}</td>
+                    <td class="receipt-total-value"><span id="t_total" class="calculated-field readonly-total doc-total-final" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="erp-summary-actions">
+              <button type="submit" class="totales-cockpit-save doc-save-btn erp-btn erp-btn--success" data-default-label="{% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans 'Save Document' %}{% endif %}" data-loading-label="{% trans 'Saving...' %}">{% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}</button>
+              <div class="erp-summary-links">
+                <a href="{% country_url 'documentos:lista_documentos' %}" class="erp-btn erp-btn--ghost doc-action-btn"><span aria-hidden="true">&larr;</span><span class="doc-action-label">{% trans "Back" %}</span></a>
+                <span class="erp-btn erp-btn--disabled doc-action-btn"><span aria-hidden="true">&#9881;</span><span class="doc-action-label">Ajustes</span></span>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="doc-smart-card document-action-card">
-        <h3>{% trans "ACTIONS" %}</h3>
-        <p class="document-card-subtitle">{% trans "Save or return without leaving the workflow" %}</p>
-        <button type="submit" class="totales-cockpit-save doc-save-btn" data-default-label="{% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans 'Save Document' %}{% endif %}" data-loading-label="{% trans 'Saving...' %}">
-          {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
-        </button>
-        <div class="flex gap-2 mt-3">
-          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">&larr;</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
-          <span class="doc-action-btn text-sm rounded-md bg-slate-700 text-slate-400 cursor-not-allowed"><span aria-hidden="true">&#9881;</span><span class="doc-action-label text-slate-400 font-semibold">Ajustes</span></span>
-        </div>
-      </div>
-    </div>
+      </section>
     </div>
   </div>
-
   <!-- Hidden inputs para serializar filas dinamicas -->
   <input type="hidden" name="repuestos_json" id="id_repuestos_json">
   <input type="hidden" name="servicios_json" id="id_servicios_json">
@@ -1760,3 +724,4 @@ window.__PRESELECT_VEHICULO_ID__ = "{{ vehiculo_preselect_id|default:''|escapejs
 <script src="{% static 'js/document-form/index.js' %}"></script>
 
 {% endblock extra_js %}
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           

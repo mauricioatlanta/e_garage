@@ -63,6 +63,7 @@
 
         var serv = Array.from(document.querySelectorAll('#servicios-container .dynamic-element')).map(function(row) {
             return {
+                rowId: row.dataset.rowId || '',
                 servicio_id: (row.querySelector('.srv-id') && row.querySelector('.srv-id').value || '').trim(),
                 nombre: (row.querySelector('.srv-input') && row.querySelector('.srv-input').value || '').trim(),
                 cantidad: Number(row.querySelector('.serv-cantidad') && row.querySelector('.serv-cantidad').value || 0) || 1,
@@ -73,6 +74,7 @@
 
         var otros = Array.from(document.querySelectorAll('#otros-container .dynamic-element')).map(function(row) {
             return {
+                rowId: row.dataset.rowId || '',
                 servicio_id: (row.querySelector('.otr-servicio-id') && row.querySelector('.otr-servicio-id').value || '').trim(),
                 nombre: (row.querySelector('.otr-search') && row.querySelector('.otr-search').value || '').trim(),
                 empresa_ext: (row.querySelector('.otr-empresa') && row.querySelector('.otr-empresa').value || '').trim(),
@@ -263,6 +265,7 @@
                 (draft.servicios || []).forEach(function(serv) {
                     if (window.EG && window.EG.servicios && typeof window.EG.servicios.addServicioRow === 'function') {
                         var row = window.EG.servicios.addServicioRow();
+                        if (row && serv.rowId) row.dataset.rowId = serv.rowId;
                         if (row && row.__applyServData) {
                             row.__applyServData({
                                 servicio_id: serv.servicio_id || '',
@@ -277,6 +280,7 @@
                 (draft.otros || []).forEach(function(otro) {
                     if (window.EG && window.EG.servicios && typeof window.EG.servicios.addOtroServicioRow === 'function') {
                         var row = window.EG.servicios.addOtroServicioRow();
+                        if (row && otro.rowId) row.dataset.rowId = otro.rowId;
                         if (row && row.__applyOtroData) {
                             row.__applyOtroData({
                                 servicio_id: otro.servicio_id || '',
@@ -292,7 +296,11 @@
 
             // Restaurar cliente si aplica
             var urlParams = new URLSearchParams(window.location.search || '');
-            var skipDraftCliente = !!(urlParams.get('cliente_id') || window.__PRESELECT_CLIENTE_ID__);
+            var skipDraftCliente = !!(
+                urlParams.get('cliente_id') ||
+                window.__PRESELECT_CLIENTE_ID__ ||
+                (urlParams.get('entity_type') === 'cliente' && urlParams.get('created_id'))
+            );
             if (draft.cliente_id && !skipDraftCliente) {
                 if (typeof EG.cliente && EG.cliente.seleccionarCliente) {
                     await EG.cliente.seleccionarCliente({

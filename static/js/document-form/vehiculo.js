@@ -1,7 +1,7 @@
-/**
- * vehiculo.js - Módulo de gestión de vehículos
+﻿/**
+ * vehiculo.js - Modulo de gestion de vehiculos
  * 
- * Extraído del código embebido en document_form.html
+ * Extraido del codigo embebido en document_form.html
  */
 
 (function() {
@@ -43,27 +43,27 @@
     }
 
     /**
-     * Carga vehículos por cliente (desde prefetch o AJAX)
+     * Carga vehiculos por cliente (desde prefetch o AJAX)
      */
     async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null) {
         const els = getElements();
         if (!els.vehiculoSelect) {
-            console.warn('⚠️ Elemento #id_vehiculo no encontrado');
+            console.warn('Elemento #id_vehiculo no encontrado');
             return;
         }
 
         if (!clienteId) {
-            console.warn('⚠️ No se proporcionó clienteId');
+            console.warn('No se proporciono clienteId');
             els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.select_vehicle}</option>`;
             return;
         }
 
-        console.log(`🚗 Cargando vehículos para cliente ID: ${clienteId}${vehiculoIdToSelect ? ` (preseleccionar: ${vehiculoIdToSelect})` : ''}`);
+        console.log(`Cargando vehiculos para cliente ID: ${clienteId}${vehiculoIdToSelect ? ` (preseleccionar: ${vehiculoIdToSelect})` : ''}`);
 
         // Verificar si ya tiene opciones del formulario
         const alreadyHasOptions = els.vehiculoSelect.options && els.vehiculoSelect.options.length > 1;
         if (alreadyHasOptions && els.vehiculoSelect.dataset.source === 'form') {
-            console.log('ℹ️ Ya tiene opciones desde el formulario, omitiendo carga');
+            console.log('Ya tiene opciones desde el formulario, omitiendo carga');
             if (vehiculoIdToSelect) {
                 setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
             }
@@ -71,14 +71,14 @@
         }
 
         els.vehiculoSelect.disabled = true;
-        els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.loading_vehicles || 'Cargando vehículos...'}</option>`;
+        els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.loading_vehicles || 'Cargando vehiculos...'}</option>`;
 
         // Intentar primero con prefetch local
         const localMatches = (EG.PREFETCH?.vehiculos || []).filter(
             (v) => String(v.cliente_id) === String(clienteId)
         );
         if (localMatches.length) {
-            console.log(`✅ Encontrados ${localMatches.length} vehículos en prefetch`);
+            console.log(`Encontrados ${localMatches.length} vehiculos en prefetch`);
             const options = localMatches.map((v) =>
                 `<option value="${v.id}">${v.label || v.text || ''}</option>`
             ).join('');
@@ -91,7 +91,7 @@
             return;
         }
 
-        // Si no hay en prefetch, hacer petición AJAX
+        // Si no hay en prefetch, hacer peticion AJAX
         try {
             const urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/api/v1/vehiculos/0/';
             const url = EG.config.buildEndpoint(urlRaw);
@@ -106,23 +106,23 @@
                 fullUrl = `${url}${separator}cliente_id=${encodeURIComponent(clienteId)}`;
             }
 
-            console.log(`📡 Llamando a: ${fullUrl}`);
+            console.log(`Llamando a: ${fullUrl}`);
             const r = await EG.utils.egFetch(fullUrl);
 
             if (!r.ok) {
                 const errorText = await r.text();
-                console.error(`❌ HTTP ${r.status}:`, errorText);
+                console.error(`HTTP ${r.status}:`, errorText);
                 throw new Error(`HTTP ${r.status}: ${errorText}`);
             }
 
             const data = await r.json();
-            console.log('📦 Respuesta recibida:', data);
+            console.log('Respuesta recibida:', data);
 
             const items = Array.isArray(data) ? data : (data.results || data.items || []);
-            console.log(`📋 Procesando ${items.length} vehículos`);
+            console.log(`Procesando ${items.length} vehiculos`);
 
             if (!items.length) {
-                console.log('ℹ️ No se encontraron vehículos');
+                console.log('No se encontraron vehiculos');
                 els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.no_vehicles}</option>`;
                 els.vehiculoSelect.dataset.source = 'empty';
             } else {
@@ -133,14 +133,14 @@
                 }).join('');
                 els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.select_vehicle}</option>${options}`;
                 els.vehiculoSelect.dataset.source = 'fetch';
-                console.log(`✅ ${items.length} vehículos cargados exitosamente`);
+                console.log(`${items.length} vehiculos cargados exitosamente`);
 
                 if (vehiculoIdToSelect) {
                     setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
                 }
             }
         } catch (err) {
-            console.error('❌ Error cargando vehículos:', err);
+            console.error('Error cargando vehiculos:', err);
             els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.error_loading_vehicles}</option>`;
             els.vehiculoSelect.dataset.source = 'error';
         } finally {
@@ -149,17 +149,17 @@
     }
 
     /**
-     * Preselecciona un vehículo por ID
+     * Preselecciona un vehiculo por ID
      */
     function preseleccionarVehiculo(vehiculoId) {
         const els = getElements();
         if (!els.vehiculoSelect) {
-            console.warn('⚠️ Elemento #id_vehiculo no encontrado para preselección');
+            console.warn('Elemento #id_vehiculo no encontrado para preseleccion');
             return;
         }
 
         const vehiculoIdStr = String(vehiculoId);
-        console.log(`🎯 Intentando preseleccionar vehículo ID: ${vehiculoIdStr}`);
+        console.log(`Intentando preseleccionar vehiculo ID: ${vehiculoIdStr}`);
 
         const option = Array.from(els.vehiculoSelect.options).find(
             (opt) => String(opt.value) === vehiculoIdStr
@@ -168,9 +168,9 @@
         if (option) {
             els.vehiculoSelect.value = vehiculoIdStr;
             els.vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado exitosamente`);
+            console.log(`Vehiculo ${vehiculoIdStr} preseleccionado exitosamente`);
         } else {
-            console.warn(`⚠️ Vehículo ${vehiculoIdStr} no encontrado en las opciones`);
+            console.warn(`Vehiculo ${vehiculoIdStr} no encontrado en las opciones`);
             setTimeout(() => {
                 const retryOption = Array.from(els.vehiculoSelect.options).find(
                     (opt) => String(opt.value) === vehiculoIdStr
@@ -178,16 +178,16 @@
                 if (retryOption) {
                     els.vehiculoSelect.value = vehiculoIdStr;
                     els.vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-                    console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado en reintento`);
+                    console.log(`Vehiculo ${vehiculoIdStr} preseleccionado en reintento`);
                 } else {
-                    console.error(`❌ No se pudo preseleccionar vehículo ${vehiculoIdStr}`);
+                    console.error(`No se pudo preseleccionar vehiculo ${vehiculoIdStr}`);
                 }
             }, 500);
         }
     }
 
     /**
-     * Actualiza la tarjeta de información del vehículo
+     * Actualiza la tarjeta de informacion del vehiculo
      */
     function updateVehiculoCard() {
         const els = getElements();
@@ -212,35 +212,14 @@
             detail: { id: els.vehiculoSelect.value, text }
         }));
     }
-
     /**
-     * Abre modal para crear nuevo vehículo
+     * Abre alta de vehiculo preservando contexto del documento.
      */
     function openVehiculoModal() {
         try {
             const pathOnly = window.location.pathname || '/';
-            const nextUrl = window.egEncodeDocumentFormNext?.() || encodeURIComponent(pathOnly);
+            const baseUrl = EG.cfg.URL_VEHICULO_CREATE_PAGE || '/vehiculos/crear/';
 
-            let countryPrefix = 'cl';
-            let langPrefix = 'es';
-
-            const pathParts = pathOnly.split('/').filter(function(part) {
-                return part && part.length > 0;
-            });
-
-            if (pathParts.length > 0) {
-                if (['es', 'en', 'pt'].indexOf(pathParts[0]) !== -1) {
-                    langPrefix = pathParts[0];
-                    countryPrefix = langPrefix === 'en' ? 'us' : (langPrefix === 'pt' ? 'br' : 'cl');
-                } else {
-                    countryPrefix = pathParts[0];
-                    if (pathParts.length > 1 && ['es', 'en', 'pt'].indexOf(pathParts[1]) !== -1) {
-                        langPrefix = pathParts[1];
-                    }
-                }
-            }
-
-            // Obtener cliente seleccionado
             let clienteId = '';
             const clienteSelect = document.getElementById('id_cliente');
             if (clienteSelect) {
@@ -251,47 +230,71 @@
                 }
             }
 
-            let createUrl = `/${countryPrefix}/${langPrefix}/vehiculos/crear/?next=${nextUrl}`;
-            if (clienteId) {
-                createUrl += `&cliente_id=${encodeURIComponent(clienteId)}`;
+            if (window.EG && window.EG.borrador && typeof window.EG.borrador.saveDocumentDraftNow === 'function') {
+                window.EG.borrador.saveDocumentDraftNow();
             }
 
-            console.log('🚗 Abriendo modal de vehículo:', createUrl);
-            window.location.href = createUrl;
+            var createUrl = new URL(baseUrl, window.location.origin);
+            createUrl.searchParams.set('return_to', pathOnly + (window.location.search || ''));
+            createUrl.searchParams.set('field_target', 'vehiculo');
+            if (clienteId) {
+                createUrl.searchParams.set('cliente_id', clienteId);
+            }
+
+            window.location.href = createUrl.toString();
         } catch (error) {
-            console.error('❌ Error al abrir modal de vehículo:', error);
-            alert('Error al abrir la página de crear vehículo.');
+            console.error('Error al abrir alta de vehiculo:', error);
+            alert('Error al abrir la pagina de crear vehiculo.');
         }
     }
 
+    async function seleccionarVehiculoById(id, label) {
+        const els = getElements();
+        if (!els.vehiculoSelect || !id) return;
+
+        const idStr = String(id);
+        const found = Array.from(els.vehiculoSelect.options).find(function(opt) {
+            return String(opt.value) === idStr;
+        });
+        if (!found) {
+            const option = document.createElement('option');
+            option.value = idStr;
+            option.textContent = label || ('Vehiculo #' + idStr);
+            els.vehiculoSelect.appendChild(option);
+        }
+        els.vehiculoSelect.value = idStr;
+        els.vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    }
     /**
      * Inicializar eventos
      */
     function init() {
         const els = getElements();
 
-        // Evento change en select de vehículo
+        // Evento change en select de vehiculo
         els.vehiculoSelect?.addEventListener('change', updateVehiculoCard);
 
         // Actualizar tarjeta inicialmente
         updateVehiculoCard();
 
-        // Botón nuevo vehículo
+        // Boton nuevo vehiculo
         const btnNuevoVehiculo = document.getElementById('btn-nuevo-vehiculo');
         if (btnNuevoVehiculo) {
             btnNuevoVehiculo.addEventListener('click', openVehiculoModal);
         }
 
-        console.log('🚗 Vehiculo module initialized');
+        console.log('Vehiculo module initialized');
     }
 
     // Exports
     EG.vehiculo = {
         cargarVehiculosPorCliente,
         preseleccionarVehiculo,
+        seleccionarVehiculoById,
         updateVehiculoCard,
         openVehiculoModal,
         init
     };
 
 })();
+

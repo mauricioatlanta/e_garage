@@ -706,6 +706,8 @@ def crear_otro_servicio(request):
 
     if request.method == "POST":
         try:
+            from taller.common.mixins.return_to_document import build_return_to_document_url
+
             empresa = getattr(request.user, "empresa", None)
             if not empresa:
                 messages.error(request, "Usuario no tiene empresa asociada")
@@ -740,6 +742,26 @@ def crear_otro_servicio(request):
             )
 
             messages.success(request, f"Servicio externo '{servicio.nombre}' creado exitosamente")
+            return_to = (
+                request.POST.get("return_to")
+                or request.GET.get("return_to")
+                or request.POST.get("next")
+                or request.GET.get("next")
+                or ""
+            ).strip()
+            if return_to:
+                redirect_url = build_return_to_document_url(
+                    request,
+                    entity_type="otro_servicio",
+                    field_target=(
+                        request.POST.get("field_target")
+                        or request.GET.get("field_target")
+                        or "otro_servicio"
+                    ),
+                    created_id=servicio.id,
+                    created_label=servicio.nombre or f"Servicio externo #{servicio.id}",
+                )
+                return redirect(redirect_url)
 
         except Exception as e:
             messages.error(request, f"Error al crear servicio externo: {str(e)}")

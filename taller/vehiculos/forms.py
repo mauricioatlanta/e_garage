@@ -12,6 +12,100 @@ from taller.models.extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehi
 # Sentinel global para "Agregar nuevo"
 NEW_SENTINEL = "__nuevo__"
 
+PATH_TO_COUNTRY = (
+    ("/us/en/", "US"),
+    ("/us/es/", "US"),
+    ("/us/", "US"),
+    ("/cl/es/", "CL"),
+    ("/cl/", "CL"),
+    ("/mx/es/", "MX"),
+    ("/mx/", "MX"),
+    ("/pe/es/", "PE"),
+    ("/pe/", "PE"),
+    ("/co/es/", "CO"),
+    ("/co/", "CO"),
+    ("/ec/es/", "EC"),
+    ("/ec/", "EC"),
+    ("/ve/es/", "VE"),
+    ("/ve/", "VE"),
+    ("/br/pt/", "BR"),
+    ("/br/es/", "BR"),
+    ("/br/", "BR"),
+)
+
+AUTOCOMPLETE_NAMESPACE_BY_COUNTRY = {
+    "US": "usa:vehiculos",
+    "CL": "chile:vehiculos",
+    "MX": "mexico:vehiculos",
+    "PE": "peru:vehiculos",
+    "CO": "colombia:vehiculos",
+    "EC": "ecuador:vehiculos",
+    "VE": "venezuela:vehiculos",
+    "BR": "brasil:vehiculos",
+}
+
+
+def _detect_country_from_path(path, default="CL"):
+    path_lower = (path or "").lower()
+    for prefix, country_code in PATH_TO_COUNTRY:
+        if path_lower.startswith(prefix):
+            return country_code
+    return (default or "CL").strip().upper()
+
+
+def _detect_lang_from_path(path):
+    path_lower = (path or "").lower()
+    if path_lower.startswith("/us/en/"):
+        return "en"
+    if path_lower.startswith("/us/es/"):
+        return "es"
+    if path_lower.startswith("/br/pt/"):
+        return "pt"
+    if path_lower.startswith("/br/es/"):
+        return "es"
+
+    path_parts = path_lower.strip("/").split("/")
+    if len(path_parts) >= 2 and path_parts[1] in ["en", "es", "pt"]:
+        return path_parts[1]
+
+    country_code = _detect_country_from_path(path, default=None)
+    if country_code == "US":
+        return "en"
+    if country_code == "BR":
+        return "pt"
+    return "es"
+
+
+def _get_autocomplete_namespace(path):
+    path_lower = (path or "").lower()
+    if path_lower.startswith("/us/en/"):
+        return "us_en:vehiculos"
+    if path_lower.startswith("/us/es/"):
+        return "us_es:vehiculos"
+
+    country_code = _detect_country_from_path(path, default=None)
+    return AUTOCOMPLETE_NAMESPACE_BY_COUNTRY.get(country_code, "taller:vehiculos")
+
+
+def _expected_prefix_from_path(path):
+    path_lower = (path or "").lower()
+    if path_lower.startswith("/us/es/"):
+        return "/us/es/"
+    if path_lower.startswith("/us/en/"):
+        return "/us/en/"
+    if path_lower.startswith("/us/"):
+        return "/us/"
+    if path_lower.startswith("/br/pt/"):
+        return "/br/pt/"
+    if path_lower.startswith("/br/es/"):
+        return "/br/es/"
+
+    country_code = _detect_country_from_path(path, default=None)
+    if country_code:
+        return f"/{country_code.lower()}/es/"
+    return None
+
+
 # Opciones de tipo de carrocería (traducibles)
 CARROCERIA_CHOICES_BASE = [
     ("", "---------"),
@@ -72,13 +166,7 @@ class VehiculoForm(forms.ModelForm):
 
         # Si tenemos request, usar detección robusta del path
         if self.request:
-            path = (self.request.path or "").lower()
-            if path.startswith("/us/"):
-                pais = "US"
-            elif path.startswith("/cl/"):
-                pais = "CL"
-            elif path.startswith("/mx/"):
-                pais = "MX"
+            pais = _detect_country_from_path(self.request.path, default=pais)
 
         # Filtrar clientes por empresa
         if "cliente" in self.fields:
@@ -98,6 +186,7 @@ class VehiculoForm(forms.ModelForm):
                 from django.urls import reverse
 
                 log = logging.getLogger(__name__)
+                country_code = _detect_country_from_path(path, default=pais)
 
                 # Determinar el namespace correcto según el país y ruta
                 if path.startswith("/us/es/"):
@@ -121,6 +210,13 @@ class VehiculoForm(forms.ModelForm):
                     log.info(
                         f"[VehiculoForm] Configurando URL de autocomplete cliente para México: {autocomplete_url}"
                     )
+                elif country_code in AUTOCOMPLETE_NAMESPACE_BY_COUNTRY:
+                    autocomplete_url = (
+                        f"{AUTOCOMPLETE_NAMESPACE_BY_COUNTRY[country_code]}:cliente_autocomplete"
+                    )
+                    log.info(
+                        f"[VehiculoForm] Configurando URL de autocomplete cliente para {country_code}: {autocomplete_url}"
+                    )
                 else:
                     # Fallback: usar el namespace genérico
                     autocomplete_url = "taller:vehiculos:cliente_autocomplete"
@@ -131,10 +227,7 @@ class VehiculoForm(forms.ModelForm):
                 # Actualizar la URL del widget
                 try:
                     # Extraer lang del path si está presente (ej: /us/en/... o /us/es/...)
-                    lang = None
-                    path_parts = path.strip("/").split("/")
-                    if len(path_parts) >= 2 and path_parts[1] in ["en", "es"]:
-                        lang = path_parts[1]
+                    lang = _detect_lang_from_path(path)
 
                     # Intentar generar la URL absoluta con reverse para asegurar que tenga el prefijo correcto
                     try:
@@ -147,16 +240,7 @@ class VehiculoForm(forms.ModelForm):
                             log.info(f"[VehiculoForm] URL generada por reverse: {absolute_url}")
 
                             # Verificar si la URL tiene el prefijo correcto
-                            if path.startswith("/us/es/"):
-                                expected_prefix = "/us/es/"
-                            elif path.startswith("/us/en/"):
-                                expected_prefix = "/us/en/"
-                            elif path.startswith("/us/"):
-                                expected_prefix = "/us/"
-                            elif path.startswith("/cl/"):
-                                expected_prefix = "/cl/"
-                            else:
-                                expected_prefix = None
+                            expected_prefix = _expected_prefix_from_path(path)
 
                             if expected_prefix and not absolute_url.startswith(expected_prefix):
                                 # Si falta el prefijo, agregarlo
@@ -328,20 +412,10 @@ class VehiculoForm(forms.ModelForm):
         path = (self.request.path or "").lower()
 
         # Extraer lang del path si está presente (ej: /us/en/... o /us/es/...)
-        lang = None
-        path_parts = path.strip("/").split("/")
-        if len(path_parts) >= 2 and path_parts[1] in ["en", "es"]:
-            lang = path_parts[1]
+        lang = _detect_lang_from_path(path)
 
         # Determinar namespace base según el país
-        if path.startswith("/us/"):
-            autocomplete_ns = "usa:vehiculos"
-        elif path.startswith("/cl/"):
-            autocomplete_ns = "chile:vehiculos"
-        elif path.startswith("/mx/"):
-            autocomplete_ns = "mexico:vehiculos"
-        else:
-            autocomplete_ns = "taller:vehiculos"
+        autocomplete_ns = _get_autocomplete_namespace(path)
 
         # Configurar motor
         # Verificar si el campo existe y si el widget es de tipo autocomplete sin acceder a url
@@ -580,25 +654,11 @@ class VehiculoForm(forms.ModelForm):
         empresa = getattr(self.user, "empresa", None)
         pais = (getattr(empresa, "pais", None) or "US").strip().upper()
         if self.request:
-            path = (self.request.path or "").lower()
-            if path.startswith("/us/"):
-                pais = "US"
-            elif path.startswith("/cl/"):
-                pais = "CL"
-            elif path.startswith("/mx/"):
-                pais = "MX"
+            pais = _detect_country_from_path(self.request.path, default=pais)
 
         # Determinar namespace correcto para autocomplete según el país
         if self.request:
-            path = (self.request.path or "").lower()
-            if path.startswith("/us/"):
-                autocomplete_ns = "usa:vehiculos"
-            elif path.startswith("/cl/"):
-                autocomplete_ns = "chile:vehiculos"
-            elif path.startswith("/mx/"):
-                autocomplete_ns = "mexico:vehiculos"
-            else:
-                autocomplete_ns = "taller:vehiculos"
+            autocomplete_ns = _get_autocomplete_namespace(self.request.path)
         else:
             autocomplete_ns = "taller:vehiculos"
 
@@ -726,15 +786,7 @@ class VehiculoForm(forms.ModelForm):
 
         # Determinar namespace correcto para autocomplete según el país
         if self.request:
-            path = (self.request.path or "").lower()
-            if path.startswith("/us/"):
-                autocomplete_ns = "usa:vehiculos"
-            elif path.startswith("/cl/"):
-                autocomplete_ns = "chile:vehiculos"
-            elif path.startswith("/mx/"):
-                autocomplete_ns = "mexico:vehiculos"
-            else:
-                autocomplete_ns = "taller:vehiculos"
+            autocomplete_ns = _get_autocomplete_namespace(self.request.path)
         else:
             autocomplete_ns = "taller:vehiculos"
 
@@ -898,13 +950,7 @@ class VehiculoForm(forms.ModelForm):
 
         # Si tenemos request, usar detección robusta del path
         if self.request:
-            path = (self.request.path or "").lower()
-            if path.startswith("/us/"):
-                pais = "US"
-            elif path.startswith("/cl/"):
-                pais = "CL"
-            elif path.startswith("/mx/"):
-                pais = "MX"
+            pais = _detect_country_from_path(self.request.path, default=pais)
 
         # Validación multi-tenant: Cliente debe pertenecer a la misma empresa
         cliente = cleaned_data.get("cliente")
@@ -1034,13 +1080,7 @@ class VehiculoForm(forms.ModelForm):
 
         # Si tenemos request, usar detección robusta del path
         if self.request:
-            path = (self.request.path or "").lower()
-            if path.startswith("/us/"):
-                pais = "US"
-            elif path.startswith("/cl/"):
-                pais = "CL"
-            elif path.startswith("/mx/"):
-                pais = "MX"
+            pais = _detect_country_from_path(self.request.path, default=pais)
 
         val = self.cleaned_data.get("marca")
 
@@ -1121,13 +1161,7 @@ class VehiculoForm(forms.ModelForm):
 
         # Si tenemos request, usar detección robusta del path
         if self.request:
-            path = (self.request.path or "").lower()
-            if path.startswith("/us/"):
-                pais = "US"
-            elif path.startswith("/cl/"):
-                pais = "CL"
-            elif path.startswith("/mx/"):
-                pais = "MX"
+            pais = _detect_country_from_path(self.request.path, default=pais)
 
         val = self.cleaned_data.get("modelo")
 

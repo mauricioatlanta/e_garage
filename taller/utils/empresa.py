@@ -59,9 +59,9 @@ def get_or_create_empresa(request):
         user=user,
         defaults={
             "nombre_taller": f"Taller {getattr(user, 'username', 'Usuario')}",
-            "direccion": "N/A",
-            "telefono": "N/A",
-            "email": getattr(user, "email", "demo@ejemplo.com"),
+            "direccion": "",
+            "telefono": "",
+            "email": getattr(user, "email", "") or "",
         },
     )
     return empresa

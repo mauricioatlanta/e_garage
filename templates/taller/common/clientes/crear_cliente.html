@@ -375,6 +375,8 @@ h1 {
     <form method="post" id="client-form" enctype="multipart/form-data">
       {% csrf_token %}
       <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
+      <input type="hidden" name="return_to" value="{% firstof return_to request.GET.return_to request.GET.next '' %}">
+      <input type="hidden" name="field_target" value="{% firstof field_target request.GET.field_target 'cliente' %}">
 
       {% if form.errors %}
         <div class="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">

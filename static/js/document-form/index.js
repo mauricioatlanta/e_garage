@@ -48,7 +48,13 @@
         if (!form || form.dataset.mode !== 'create') return;
 
         var params = new URLSearchParams(window.location.search || '');
-        var hasReturnContext = !!(params.get('cliente_id') || params.get('vehiculo_id') || params.get('target_row'));
+        var hasReturnContext = !!(
+            params.get('cliente_id') ||
+            params.get('vehiculo_id') ||
+            params.get('target_row') ||
+            params.get('created_id') ||
+            params.get('entity_type')
+        );
         if (hasReturnContext) return;
 
         try {
@@ -154,6 +160,284 @@
         return data;
     }
 
+    function getCurrentReturnPath() {
+        return window.location.pathname + (window.location.search || '');
+    }
+
+    function buildEntityCreateUrl(entity) {
+        var form = document.getElementById('document-form');
+        if (!form || !entity) return '';
+
+        var map = {
+            cliente: form.dataset.urlClientCreatePage || '',
+            vehiculo: form.dataset.urlVehiculoCreatePage || '',
+            repuesto: form.dataset.urlRepuestoCreatePage || '',
+            servicio: form.dataset.urlServiceCreate || '',
+            otro_servicio: form.dataset.urlOtroServiceCreatePage || ''
+        };
+        var base = map[entity] || '';
+        if (!base) return '';
+
+        var url = new URL(base, window.location.origin);
+        url.searchParams.set('return_to', getCurrentReturnPath());
+        url.searchParams.set('field_target', entity);
+
+        if (entity === 'vehiculo') {
+            var clienteId = (document.getElementById('id_cliente') && document.getElementById('id_cliente').value) || '';
+            if (clienteId) url.searchParams.set('cliente_id', clienteId);
+        }
+        return url.toString();
+    }
+
+    function buildInlineCreateUrl(entity, row, prefillName) {
+        var targetUrl = buildEntityCreateUrl(entity);
+        if (!targetUrl) return '';
+        var url = new URL(targetUrl, window.location.origin);
+        var rowId = row && row.dataset ? (row.dataset.rowId || '') : '';
+        if (rowId) url.searchParams.set('target_row', rowId);
+        var nombre = (prefillName || '').trim();
+        if (nombre) url.searchParams.set('prefill_nombre', nombre);
+        return url.toString();
+    }
+
+    function navigateToInlineCreate(entity, row, prefillName) {
+        var targetUrl = buildInlineCreateUrl(entity, row, prefillName);
+        if (!targetUrl) return;
+        if (window.EG && window.EG.borrador && typeof window.EG.borrador.saveDocumentDraftNow === 'function') {
+            window.EG.borrador.saveDocumentDraftNow();
+        }
+        window.location.href = targetUrl;
+    }
+
+    function ensureDynamicRowId(row, prefix) {
+        if (!row || !row.dataset) return '';
+        if (!row.dataset.rowId) {
+            row.dataset.rowId = prefix + '_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        }
+        return row.dataset.rowId;
+    }
+
+    function findDynamicRowById(containerId, rowId) {
+        if (!rowId) return null;
+        var container = document.getElementById(containerId);
+        if (!container) return null;
+        return Array.prototype.find.call(container.querySelectorAll('.dynamic-element'), function(row) {
+            return (row.dataset.rowId || '') === String(rowId);
+        }) || null;
+    }
+
+    function decorateInlineCreateCell(row, options) {
+        if (!row) return;
+        ensureDynamicRowId(row, options.prefix);
+        var input = row.querySelector(options.inputSelector);
+        if (!input) return;
+        input.classList.add('doc-input-with-create');
+        if (row.querySelector(options.buttonSelector)) return;
+        var cell = input.closest('td') || input.parentElement;
+        if (!cell) return;
+        var button = document.createElement('button');
+        button.type = 'button';
+        button.className = options.buttonClass + ' btn-row-icon btn-row-icon-create doc-inline-create-btn';
+        button.setAttribute('data-inline-create-entity', options.entity);
+        button.setAttribute('title', options.title);
+        button.setAttribute('aria-label', options.title);
+        button.textContent = '+';
+        cell.appendChild(button);
+    }
+
+    function decorateCatalogCreateButtons() {
+        var isEnglish = (document.documentElement.lang || '').toLowerCase().indexOf('en') === 0;
+        [
+            {
+                id: 'btn-nuevo-repuesto',
+                title: isEnglish ? 'Create part in catalog' : 'Crear repuesto en sistema',
+                label: isEnglish ? 'Catalog' : 'Catálogo'
+            },
+            {
+                id: 'btn-nuevo-servicio',
+                title: isEnglish ? 'Create service in catalog' : 'Crear servicio en sistema',
+                label: isEnglish ? 'Catalog' : 'Catálogo'
+            },
+            {
+                id: 'btn-nuevo-otro-servicio',
+                title: isEnglish ? 'Create external service in catalog' : 'Crear servicio externo en sistema',
+                label: isEnglish ? 'Catalog' : 'Catálogo'
+            }
+        ].forEach(function(config) {
+            var button = document.getElementById(config.id);
+            if (!button) return;
+            button.setAttribute('title', config.title);
+            var label = button.querySelector('.doc-action-label');
+            if (label) label.textContent = config.label;
+        });
+
+        document.querySelectorAll('#repuestos-container .dynamic-element').forEach(function(row) {
+            ensureDynamicRowId(row, 'rep');
+            var repBtn = row.querySelector('.rep-create-btn');
+            if (repBtn) {
+                repBtn.classList.add('btn-row-icon-create');
+                repBtn.setAttribute('title', repBtn.getAttribute('title') || 'Crear repuesto en sistema');
+            }
+        });
+
+        document.querySelectorAll('#servicios-container .dynamic-element').forEach(function(row) {
+            decorateInlineCreateCell(row, {
+                prefix: 'serv',
+                entity: 'servicio',
+                inputSelector: '.srv-input',
+                buttonSelector: '.srv-create-btn',
+                buttonClass: 'srv-create-btn',
+                title: 'Crear servicio en sistema'
+            });
+        });
+
+        document.querySelectorAll('#otros-container .dynamic-element').forEach(function(row) {
+            decorateInlineCreateCell(row, {
+                prefix: 'otr',
+                entity: 'otro_servicio',
+                inputSelector: '.otr-search',
+                buttonSelector: '.otr-create-btn',
+                buttonClass: 'otr-create-btn',
+                title: 'Crear servicio externo en sistema'
+            });
+        });
+    }
+
+    function bindCatalogCreateButtons() {
+        if (document.body.dataset.egCatalogCreateBound) return;
+        document.body.dataset.egCatalogCreateBound = '1';
+
+        decorateCatalogCreateButtons();
+
+        ['repuestos-container', 'servicios-container', 'otros-container'].forEach(function(containerId) {
+            var container = document.getElementById(containerId);
+            if (!container) return;
+            var observer = new MutationObserver(function() {
+                decorateCatalogCreateButtons();
+            });
+            observer.observe(container, { childList: true });
+        });
+
+        document.addEventListener('click', function(event) {
+            var button = event.target.closest('[data-inline-create-entity]');
+            if (!button) return;
+            event.preventDefault();
+            var entity = button.getAttribute('data-inline-create-entity');
+            var row = button.closest('tr');
+            if (!row) return;
+            var input = null;
+            if (entity === 'servicio') input = row.querySelector('.srv-input');
+            if (entity === 'otro_servicio') input = row.querySelector('.otr-search');
+            navigateToInlineCreate(entity, row, input && input.value || '');
+        });
+    }
+
+    function bindCreateEntityButtons() {
+        document.querySelectorAll('[data-create-entity]').forEach(function(btn) {
+            if (btn.dataset.egCreateBound) return;
+            btn.dataset.egCreateBound = '1';
+            btn.addEventListener('click', function(event) {
+                var entity = btn.getAttribute('data-create-entity');
+                // Cliente y vehiculo ya tienen flujo dedicado en sus modulos.
+                if (entity === 'cliente' || entity === 'vehiculo') return;
+                event.preventDefault();
+                var targetUrl = buildEntityCreateUrl(entity);
+                if (!targetUrl) return;
+                if (window.EG && window.EG.borrador && typeof window.EG.borrador.saveDocumentDraftNow === 'function') {
+                    window.EG.borrador.saveDocumentDraftNow();
+                }
+                window.location.href = targetUrl;
+            });
+        });
+    }
+
+    async function processCreatedEntityFromParams() {
+        var params = new URLSearchParams(window.location.search || '');
+        var targetRow = (params.get('target_row') || '').trim();
+
+        // Compatibilidad legacy de repuestos.
+        if (params.get('created_repuesto_id')) {
+            var repEntity = {
+                id: params.get('created_repuesto_id'),
+                nombre: params.get('created_repuesto_nombre') || '',
+                codigo: params.get('created_repuesto_codigo') || '',
+                precio_venta: params.get('created_repuesto_precio_venta') || 0,
+                precio_compra: params.get('created_repuesto_precio_compra') || 0,
+                target_row: params.get('target_row') || ''
+            };
+            if (window.EG.repuestos && typeof window.EG.repuestos.addRowFromCreatedEntity === 'function') {
+                window.EG.repuestos.addRowFromCreatedEntity(repEntity);
+            }
+        }
+
+        var entityType = (params.get('entity_type') || '').trim();
+        var createdId = (params.get('created_id') || '').trim();
+        var createdLabel = (params.get('created_label') || '').trim();
+        var fieldTarget = (params.get('field_target') || '').trim();
+        if (!entityType || !createdId) {
+            return;
+        }
+
+        if (entityType === 'cliente' && window.EG.cliente && typeof window.EG.cliente.seleccionarClienteById === 'function') {
+            await window.EG.cliente.seleccionarClienteById(createdId, createdLabel);
+        } else if (entityType === 'vehiculo' && window.EG.vehiculo && typeof window.EG.vehiculo.seleccionarVehiculoById === 'function') {
+            await window.EG.vehiculo.seleccionarVehiculoById(createdId, createdLabel);
+        } else if (entityType === 'repuesto' && window.EG.repuestos && typeof window.EG.repuestos.addRowFromCreatedEntity === 'function') {
+            window.EG.repuestos.addRowFromCreatedEntity({
+                id: createdId,
+                nombre: createdLabel,
+                target_row: targetRow,
+                precio_venta: params.get('created_repuesto_precio_venta') || 0,
+                precio_compra: params.get('created_repuesto_precio_compra') || 0
+            });
+        } else if (entityType === 'servicio' && window.EG.servicios && typeof window.EG.servicios.addServicioFromCreatedEntity === 'function') {
+            var serviceEntity = {
+                id: createdId,
+                nombre: createdLabel,
+                target_row: targetRow
+            };
+            var targetServiceRow = findDynamicRowById('servicios-container', targetRow);
+            if (targetServiceRow && typeof targetServiceRow.__applyServData === 'function') {
+                targetServiceRow.__applyServData(serviceEntity);
+            } else {
+                window.EG.servicios.addServicioFromCreatedEntity(serviceEntity);
+            }
+        } else if ((entityType === 'otro_servicio' || fieldTarget === 'otro_servicio') && window.EG.servicios && typeof window.EG.servicios.addOtroServicioFromCreatedEntity === 'function') {
+            var otherEntity = {
+                id: createdId,
+                nombre: createdLabel,
+                target_row: targetRow
+            };
+            var targetOtherRow = findDynamicRowById('otros-container', targetRow);
+            if (targetOtherRow && typeof targetOtherRow.__applyOtroData === 'function') {
+                targetOtherRow.__applyOtroData(otherEntity);
+            } else {
+                window.EG.servicios.addOtroServicioFromCreatedEntity(otherEntity);
+            }
+        }
+    }
+
+    function clearReturnParamsFromUrl() {
+        var url = new URL(window.location.href);
+        [
+            'entity_type',
+            'field_target',
+            'created_id',
+            'created_label',
+            'created_repuesto_id',
+            'created_repuesto_nombre',
+            'created_repuesto_codigo',
+            'created_repuesto_precio_venta',
+            'created_repuesto_precio_compra',
+            'target_row',
+            'cliente_id',
+            'vehiculo_id'
+        ].forEach(function(key) {
+            url.searchParams.delete(key);
+        });
+        window.history.replaceState({}, document.title, url.pathname + (url.search ? url.search : ''));
+    }
+
     /**
      * Inicializa todos los módulos en orden
      */
@@ -213,6 +497,8 @@
 
         // Botones de agregar
         setupAddButtons();
+        bindCreateEntityButtons();
+        bindCatalogCreateButtons();
 
         // Serialización antes de submit
         setupFormSubmit();
@@ -310,7 +596,13 @@
         var form = document.getElementById('document-form');
         if (!form) return;
         var params = new URLSearchParams(window.location.search || '');
-        var hasReturnContext = !!(params.get('cliente_id') || params.get('vehiculo_id') || params.get('target_row'));
+        var hasReturnContext = !!(
+            params.get('cliente_id') ||
+            params.get('vehiculo_id') ||
+            params.get('target_row') ||
+            params.get('created_id') ||
+            params.get('entity_type')
+        );
 
         if (form.dataset.mode === 'create' && !hasReturnContext) {
             if (window.EG.cliente && window.EG.cliente.resetClienteUI) {
@@ -355,6 +647,9 @@
         if (window.serializeRows) {
             window.serializeRows();
         }
+
+        await processCreatedEntityFromParams();
+        clearReturnParamsFromUrl();
     }
 
     /**

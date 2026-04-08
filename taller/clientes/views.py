@@ -12,6 +12,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from taller.models.clientes import Cliente
 from taller.templatetags.country_url import _country_ns_from_path
 from taller.utils.empresa import get_active_empresa
+from .constants import STATE_CITY_COUNTRIES
 
 
 def ajax_buscar_clientes(request):
@@ -57,7 +58,20 @@ DEFAULT_ESTADO_TIMEZONES = {
     "VE": "America/Caracas",
     "PE": "America/Lima",
     "MX": "America/Mexico_City",
+    "CO": "America/Bogota",
+    "EC": "America/Guayaquil",
 }
+
+
+def _get_request_country(request):
+    pais_usuario = "CL"
+    if hasattr(request, "user") and request.user.is_authenticated:
+        from taller.utils.empresa import get_user_empresa_safe
+
+        empresa = get_user_empresa_safe(request.user)
+        if empresa and getattr(empresa, "pais", None):
+            pais_usuario = empresa.pais
+    return pais_usuario
 
 
 # Vista unificada que detecta automáticamente el país del usuario
@@ -79,7 +93,7 @@ def obtener_ciudades(request):
         if empresa and getattr(empresa, "pais", None):
             pais_usuario = empresa.pais
 
-    if pais_usuario in ["US", "BR", "VE", "PE", "MX"]:
+    if pais_usuario in STATE_CITY_COUNTRIES:
         # Usuarios de USA, Brasil, Venezuela, Perú: usar modelo Estado/Ciudad unificado
         estado_id = request.GET.get("estado_id")
         if not estado_id:
@@ -107,7 +121,11 @@ def obtener_ciudades_usa(request):
     estado_id = request.GET.get("estado_id")
     if not estado_id:
         return JsonResponse([], safe=False)
-    ciudades = CiudadUSA.objects.filter(estado_id=estado_id).values("id", "nombre")
+    pais_usuario = _get_request_country(request)
+    ciudades = CiudadUSA.objects.filter(estado_id=estado_id)
+    if pais_usuario in STATE_CITY_COUNTRIES:
+        ciudades = ciudades.filter(estado__pais=pais_usuario)
+    ciudades = ciudades.values("id", "nombre")
     return JsonResponse(list(ciudades), safe=False)
 
 

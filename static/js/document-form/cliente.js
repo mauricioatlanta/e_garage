@@ -215,18 +215,29 @@
 
     function openCreateModal() {
         const els = getElements();
-        const baseUrl = els.btnNuevoCliente?.dataset.urlCrearCliente || els.btnNuevoCliente?.getAttribute('href');
-        if (!baseUrl || !els.modalCliente || !els.modalClienteFrame) {
+        const baseUrl = EG.cfg.URL_CLIENT_CREATE_PAGE || els.btnNuevoCliente?.dataset.urlCrearCliente || els.btnNuevoCliente?.getAttribute('href');
+        if (!baseUrl) {
             return;
         }
 
-        const createUrl = new URL(baseUrl, window.location.origin);
-        createUrl.searchParams.set('next', window.location.pathname + (window.location.search || ''));
-        createUrl.searchParams.set('modal', '1');
+        if (window.EG && window.EG.borrador && typeof window.EG.borrador.saveDocumentDraftNow === 'function') {
+            window.EG.borrador.saveDocumentDraftNow();
+        }
 
-        els.modalClienteFrame.src = createUrl.toString();
-        els.modalCliente.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
+        const createUrl = new URL(baseUrl, window.location.origin);
+        createUrl.searchParams.set('return_to', window.location.pathname + (window.location.search || ''));
+        createUrl.searchParams.set('field_target', 'cliente');
+        window.location.href = createUrl.toString();
+    }
+
+    async function seleccionarClienteById(id, label) {
+        if (!id) return;
+        await seleccionarCliente({
+            id: id,
+            nombre: label || ('Cliente #' + id),
+            email: '',
+            telefono: ''
+        });
     }
 
     function handleCreateModalMessage(event) {
@@ -396,6 +407,7 @@
     EG.cliente = {
         buscarClientes,
         seleccionarCliente,
+        seleccionarClienteById,
         resetClienteUI,
         openCreateModal,
         closeCreateModal,

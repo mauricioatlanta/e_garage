@@ -230,6 +230,8 @@
 
         <!-- Hidden inputs para preservar cliente_id y next en POST -->
         <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
+        <input type="hidden" name="return_to" value="{% firstof request.GET.return_to next request.GET.next '' %}">
+        <input type="hidden" name="field_target" value="{% firstof request.GET.field_target 'vehiculo' %}">
         <input type="hidden" name="cliente_id" value="{% firstof cliente_id request.GET.cliente_id '' %}">
 
         <!-- Información del cliente -->
@@ -1729,5 +1731,4 @@ jQuery(document).ready(function($) {
 })();
 </script>
 {% endblock %}
-
 

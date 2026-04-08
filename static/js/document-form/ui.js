@@ -233,6 +233,21 @@
         });
     }
 
+    function bindCostToggles() {
+        function toggleSection(buttonId, tableSelector) {
+            var btn = document.getElementById(buttonId);
+            var table = document.querySelector(tableSelector);
+            if (!btn || !table || btn.dataset.egBound) return;
+            btn.dataset.egBound = '1';
+            btn.addEventListener('click', function() {
+                table.classList.toggle('cost-visible');
+            });
+        }
+
+        toggleSection('toggle-repuesto-cost', '.doc-sheet-table-repuestos');
+        toggleSection('toggle-otro-cost', '.doc-sheet-table-otros');
+    }
+
     /**
      * Inicializar eventos de UI
      */
@@ -278,6 +293,7 @@
         updateVehicleCardState();
         bindSubmitState();
         bindSpreadsheetNavigation();
+        bindCostToggles();
         document.addEventListener('cliente:seleccionado', updateVehicleCardState);
         var clienteSelect = document.getElementById('id_cliente');
         if (clienteSelect) clienteSelect.addEventListener('change', updateVehicleCardState);
