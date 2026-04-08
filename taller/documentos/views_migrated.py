@@ -42,6 +42,7 @@ from taller.models import Documento, Tecnico
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
 from taller.models.repuesto import Repuesto
+from taller.servicios.catalog_sync import ensure_company_seed_services
 from taller.servicios.models import Servicio, ServicioExterno
 from taller.auth.decorators_role import RoleRequiredMixin
 
@@ -819,6 +820,8 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         otros_servicios_prefetch = []
 
         if empresa:
+            ensure_company_seed_services(empresa, country=country_code)
+
             clientes_qs = (
                 Cliente.objects.filter(empresa=empresa)
                 .order_by("nombre", "apellido")
@@ -873,16 +876,23 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 )
 
             servicios_qs = (
-                Servicio.objects.filter(empresa=empresa, names__language=language)
+                Servicio.objects.filter(
+                    empresa=empresa,
+                    activo=True,
+                    categoria__country=country_code,
+                )
                 .select_related("categoria", "subcategoria")
                 .prefetch_related("names", "categoria__names", "subcategoria__names")
                 .distinct()
             )
             for servicio in servicios_qs[:50]:
+                precio_base = float(getattr(servicio, "precio_base", None) or Decimal("0"))
                 servicios_prefetch.append(
                     {
                         "id": servicio.id,
                         "nombre": servicio.get_label(language),
+                        "nombre_raw": servicio.nombre,
+                        "descripcion": servicio.descripcion or "",
                         "categoria": (
                             servicio.categoria.get_label(language) if servicio.categoria else ""
                         ),
@@ -895,9 +905,11 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                         "subcategoria_code": (
                             servicio.subcategoria.code if servicio.subcategoria else ""
                         ),
-                        "precio": 0.0,
-                        "precio_sugerido": 0.0,
-                        "precio_cliente": 0.0,
+                        "codigo_interno": servicio.codigo_interno or "",
+                        "precio": precio_base,
+                        "precio_base": precio_base,
+                        "precio_sugerido": precio_base,
+                        "precio_cliente": precio_base,
                     }
                 )
 
@@ -1186,7 +1198,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
 
     model = Documento
     form_class = DocumentoForm
-    base_template_name = "documentos/document_form.html"  # Usar el mismo template que CreateView
+    base_template_name = "documentos/document_form.html"  # Mismo template operacional de CreateView
 
     def get(self, request, *args, **kwargs):
         """Al abrir el formulario (GET), vaciar mensajes de otras secciones."""

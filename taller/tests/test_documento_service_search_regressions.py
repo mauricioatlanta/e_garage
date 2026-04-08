@@ -1,0 +1,72 @@
+from django.contrib.auth.models import User
+from django.test import TestCase
+
+from taller.models.empresa import Empresa
+from taller.servicios.models import CategoriaServicio, Servicio
+
+
+class TestDocumentoServiceSearchRegressions(TestCase):
+    def test_busqueda_siembra_servicios_para_empresa_sin_catalogo(self):
+        fuente_user = User.objects.create_user(username="fuente_srv", password="123")
+        empresa_fuente = Empresa.objects.create(
+            user=fuente_user,
+            nombre_taller="Fuente CL",
+            pais="CL",
+            moneda="CLP",
+        )
+        destino_user = User.objects.create_user(username="destino_srv", password="123")
+        empresa_destino = Empresa.objects.create(
+            user=destino_user,
+            nombre_taller="Destino CL",
+            pais="CL",
+            moneda="CLP",
+        )
+
+        categoria = CategoriaServicio.objects.create(country="CL", code="MANT")
+        Servicio.objects.create(
+            nombre="Cambio de aceite",
+            empresa=empresa_fuente,
+            categoria=categoria,
+            precio_base=25000,
+            activo=True,
+        )
+
+        self.client.force_login(destino_user)
+        response = self.client.get("/cl/es/documentos/api/buscar-servicios/", {"q": "aceite"})
+
+        self.assertEqual(response.status_code, 200)
+        payload = response.json()
+        self.assertEqual(payload["total"], 1)
+        self.assertEqual(payload["servicios"][0]["nombre"], "Cambio de aceite")
+        self.assertTrue(
+            Servicio.objects.filter(
+                empresa=empresa_destino,
+                nombre="Cambio de aceite",
+                categoria=categoria,
+            ).exists()
+        )
+
+    def test_documento_form_prefetch_no_depende_de_servicio_name(self):
+        user = User.objects.create_user(username="prefetch_srv", password="123")
+        empresa = Empresa.objects.create(
+            user=user,
+            nombre_taller="Prefetch CL",
+            pais="CL",
+            moneda="CLP",
+        )
+        categoria = CategoriaServicio.objects.create(country="CL", code="MANT")
+        Servicio.objects.create(
+            nombre="Revision de frenos",
+            empresa=empresa,
+            categoria=categoria,
+            precio_base=22000,
+            activo=True,
+        )
+
+        self.client.force_login(user)
+        response = self.client.get("/cl/es/documentos/form/")
+
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
+        self.assertIn('id="prefetchServicios"', content)
+        self.assertIn("Revision de frenos", content)

@@ -8,6 +8,7 @@ Endpoints API modernos para servicios con soporte completo de:
 
 import json
 from decimal import Decimal, InvalidOperation
+import unicodedata
 
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
@@ -15,6 +16,7 @@ from django.http import JsonResponse
 from django.views.decorators.http import require_GET, require_POST
 
 from taller.models.configuracion import ConfiguracionEmpresa
+from taller.servicios.catalog_sync import ensure_company_seed_services
 from taller.servicios.models import (
     CategoriaServicio,
     Servicio,
@@ -37,11 +39,20 @@ def _detectar_pais(request):
     path = request.path or ""
     if "/us/" in path.lower():
         return "US"
-    elif "/mx/" in path.lower():
+    if "/mx/" in path.lower():
         return "MX"
-    elif "/br/" in path.lower():
+    if "/br/" in path.lower():
         return "BR"
+    if "/pe/" in path.lower():
+        return "PE"
+    if "/ve/" in path.lower():
+        return "VE"
     return "CL"  # Default
+
+
+def _normalize_search_text(value):
+    text = unicodedata.normalize("NFKD", str(value or ""))
+    return "".join(ch for ch in text if not unicodedata.combining(ch)).lower().strip()
 
 
 @login_required
@@ -69,6 +80,7 @@ def api_buscar_servicios(request):
 
     country = _detectar_pais(request)
     language = COUNTRY_LANGUAGE_MAP.get(country, "es")
+    ensure_company_seed_services(empresa, country=country)
 
     query = (request.GET.get("q") or "").strip()
     categoria_id = request.GET.get("categoria_id")
@@ -80,6 +92,7 @@ def api_buscar_servicios(request):
         Servicio.objects.filter(
             empresa=empresa,
             activo=True,
+            categoria__country=country,
         )
         .select_related("categoria", "subcategoria", "servicio_base")
         .prefetch_related("names", "categoria__names", "subcategoria__names")
@@ -93,17 +106,43 @@ def api_buscar_servicios(request):
             | Q(rubro_efectivo=rubro_empresa)
             | Q(rubro_sugerido__isnull=True)
             | Q(rubro_efectivo__isnull=True)
+            | Q(rubro_sugerido="")
+            | Q(rubro_efectivo="")
         )
 
     # Filtro por texto de búsqueda
     if query:
+        base_qs = servicios_qs
         servicios_qs = servicios_qs.filter(
             Q(nombre__icontains=query)
             | Q(descripcion__icontains=query)
             | Q(codigo_interno__icontains=query)
             | Q(names__label__icontains=query)
             | Q(names__aliases__icontains=query)
+            | Q(categoria__code__icontains=query)
+            | Q(categoria__names__label__icontains=query)
+            | Q(subcategoria__code__icontains=query)
+            | Q(subcategoria__names__label__icontains=query)
         ).distinct()
+        if not servicios_qs.exists():
+            needle = _normalize_search_text(query)
+            matched_ids = []
+            for servicio in base_qs[:200]:
+                haystack = " ".join(
+                    [
+                        servicio.nombre or "",
+                        servicio.descripcion or "",
+                        servicio.codigo_interno or "",
+                        servicio.get_label(language) or "",
+                        servicio.categoria.get_label(language) if servicio.categoria else "",
+                        servicio.categoria.code if servicio.categoria else "",
+                        servicio.subcategoria.get_label(language) if servicio.subcategoria else "",
+                        servicio.subcategoria.code if servicio.subcategoria else "",
+                    ]
+                )
+                if needle and needle in _normalize_search_text(haystack):
+                    matched_ids.append(servicio.id)
+            servicios_qs = base_qs.filter(id__in=matched_ids)
 
     # Filtro por categoría
     if categoria_id:
@@ -132,6 +171,7 @@ def api_buscar_servicios(request):
         servicios_data.append(
             {
                 "id": servicio.id,
+                "pk": servicio.id,
                 "nombre": nombre_localizado,
                 "nombre_raw": servicio.nombre,
                 "descripcion": servicio.descripcion or "",
