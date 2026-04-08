@@ -36,6 +36,7 @@ from django.db.models.functions import Coalesce
 from django.core.exceptions import ObjectDoesNotExist
 
 from taller.config.feature_flags import get_country_features
+from taller.auth.mixins import CountryLoginRequiredMixin
 from taller.forms.documento_form import DocumentoForm
 from taller.mixins import CountryLangTemplateMixin
 from taller.models import Documento, Tecnico
@@ -696,8 +697,12 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
         return self.render_country_lang(self.request, context)
 
 
-@method_decorator(login_required, name="dispatch")
-class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, CreateView):
+class DocumentoCreateView(
+    CountryLoginRequiredMixin,
+    DocumentoLineItemsMixin,
+    CountryLangTemplateMixin,
+    CreateView,
+):
     """Vista para crear documentos"""
 
     model = Documento

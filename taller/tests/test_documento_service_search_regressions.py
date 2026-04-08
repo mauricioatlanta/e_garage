@@ -6,6 +6,15 @@ from taller.servicios.models import CategoriaServicio, Servicio
 
 
 class TestDocumentoServiceSearchRegressions(TestCase):
+    def test_documento_form_redirects_to_country_aware_login_when_anonymous(self):
+        response = self.client.get("/cl/es/documentos/form/", follow=False)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"],
+            "/cl/es/accounts/login/?next=/cl/es/documentos/form/",
+        )
+
     def test_busqueda_siembra_servicios_para_empresa_sin_catalogo(self):
         fuente_user = User.objects.create_user(username="fuente_srv", password="123")
         empresa_fuente = Empresa.objects.create(
