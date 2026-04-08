@@ -2,6 +2,8 @@ from django import template
 from django.urls import reverse
 from django.urls.exceptions import NoReverseMatch
 
+from taller.utils.country_routing import account_path_for_request
+
 register = template.Library()
 
 
@@ -257,3 +259,18 @@ def country_url_direct(context, view_path, *args, app_namespace="taller", **kwar
       <a href="{% country_url_direct 'clientes:lista_clientes' %}">Clientes</a>
     """
     return country_url(context, view_path, app_namespace, *args, **kwargs)
+
+
+@register.simple_tag(takes_context=True)
+def account_path(context, account_view: str = ""):
+    """
+    Devuelve una URL canónica de allauth bajo /<country>/<lang>/accounts/... .
+    Ejemplos:
+      {% account_path 'login' %}
+      {% account_path 'signup' %}
+      {% account_path 'password/reset' %}
+    """
+    request = context.get("request")
+    if not request:
+        return f"/cl/es/accounts/{(account_view or '').strip('/')}/".replace("//", "/")
+    return account_path_for_request(request, account_view)

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load i18n %}
+{% load country_url %}
 
 {% block title %}{% trans "Create Account" %} - eGarage{% endblock %}
 
@@ -749,7 +750,7 @@ select[name="country"] {
         <!-- Link a Login -->
         <div class="login-link">
             <span class="login-text">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}¿Ya tienes una cuenta?{% else %}{% trans "Already have an account?" %}{% endif %}</span>
-            <a href="/accounts/login/">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Iniciar sesión{% else %}{% trans "Sign in" %}{% endif %}</a>
+            <a href="{% account_path 'login' %}">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Iniciar sesión{% else %}{% trans "Sign in" %}{% endif %}</a>
         </div>
     </div>
 </div>

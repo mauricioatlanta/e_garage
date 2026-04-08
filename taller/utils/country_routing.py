@@ -185,3 +185,16 @@ def infer_language(request, country: str | None, path_lang: str | None = None) -
         return active_lang
 
     return default_lang_for_country(country)
+
+
+def account_path_for_request(request, account_path: str) -> str:
+    """
+    Construye una ruta canónica /<country>/<lang>/accounts/... usando
+    request.path, next/from y sesión como fuentes de contexto.
+    """
+    path_match = parse_country_lang(getattr(request, "path", "/"))
+    country = infer_country(request, fallback=path_match.country)
+    lang = infer_language(request, country, path_match.lang)
+    normalized = (account_path or "").strip("/")
+    suffix = f"/{normalized}" if normalized else ""
+    return f"{canonical_prefix(country, lang)}/accounts{suffix}/"

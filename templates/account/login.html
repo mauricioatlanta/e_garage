@@ -2,6 +2,7 @@
 {% load static %}
 {% load widget_tweaks %}
 {% load i18n %}
+{% load country_url %}
 
 {% block title %}{% trans "Sign In" %} - eGarage{% endblock %}
 
@@ -98,7 +99,7 @@
         </div>
 
         <!-- Formulario -->
-        <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
+        <form method="POST" action="{% account_path 'login' %}" class="space-y-6">
             {% csrf_token %}
             <input type="hidden" name="country" value="{{ country|default:"CL" }}">
             {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
@@ -148,7 +149,7 @@
 
         <!-- Forgot Password -->
         <div class="forgot-password">
-            <a href="{% url 'account_reset_password' %}" class="font-futuristic">
+            <a href="{% account_path 'password/reset' %}" class="font-futuristic">
                 <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
                 </svg>
@@ -159,7 +160,7 @@
         <!-- Sign Up -->
         <div class="signup-section">
             <div class="signup-text">{% if country == 'US' %}{% trans "New to eGarage?" %}{% else %}¿Nuevo en eGarage?{% endif %}</div>
-            <a href="{% url 'account_signup' %}?from={{ country|default:'CL'|lower }}" class="signup-link font-futuristic">
+            <a href="{% account_path 'signup' %}" class="signup-link font-futuristic">
                 {% if country == 'US' %}{% trans "Create your account" %}{% else %}Crea tu cuenta{% endif %} →
             </a>
         </div>

@@ -1,6 +1,7 @@
 import re
 
 import pytest
+from allauth.account.models import EmailAddress
 from django.contrib.auth import get_user_model
 from django.core import mail
 
@@ -101,3 +102,44 @@ class TestSignupEmailConfirmationFlow:
 
         reset_us = client.get("/us/accounts/password/reset/")
         assert reset_us.status_code in (301, 302)
+
+    def test_login_form_keeps_country_aware_action(self, client):
+        response = client.get("/cl/es/accounts/login/")
+
+        assert response.status_code == 200
+        content = response.content.decode()
+        assert 'action="/cl/es/accounts/login/"' in content
+        assert 'action="/accounts/login/"' not in content
+
+    def test_verified_login_redirect_stays_inside_country_prefix(self, client):
+        user = User.objects.create_user(
+            username="verified-login@example.com",
+            email="verified-login@example.com",
+            password="StrongPass123!",
+        )
+        EmailAddress.objects.create(
+            user=user,
+            email="verified-login@example.com",
+            verified=True,
+            primary=True,
+        )
+
+        response = client.post(
+            "/cl/es/accounts/login/",
+            {"login": user.email, "password": "StrongPass123!"},
+            follow=False,
+        )
+
+        assert response.status_code in (302, 303)
+        assert response.headers["Location"].startswith("/cl/es/")
+
+    def test_invalid_confirmation_redirects_to_country_aware_login(self, client):
+        session = client.session
+        session["pending_signup_country"] = "US"
+        session["pending_signup_lang"] = "en"
+        session.save()
+
+        response = client.get("/accounts/confirm-email/invalid-key/", follow=False)
+
+        assert response.status_code in (302, 303)
+        assert response.headers["Location"] == "/us/en/accounts/login/"

@@ -6,6 +6,8 @@ from django.contrib.auth import login
 from django.shortcuts import redirect
 from django.views.decorators.http import require_POST
 
+from taller.utils.country_routing import account_path_for_request
+
 
 def _send_confirmation_compat(request, user, signup=False, email=None):
     target_email = (email or getattr(user, "email", "") or "").strip()
@@ -73,7 +75,7 @@ def confirm_email_and_login(request, key):
 
     if confirmation is None:
         messages.error(request, "El enlace de confirmacion es invalido o ya fue usado.")
-        return redirect("/accounts/login/")
+        return redirect(account_path_for_request(request, "login"))
 
     email_address = confirmation.email_address
     confirmation.confirm(request)
@@ -85,4 +87,4 @@ def confirm_email_and_login(request, key):
         return redirect(get_adapter(request).get_login_redirect_url(request))
 
     messages.error(request, "No fue posible iniciar sesion tras confirmar tu correo.")
-    return redirect("/accounts/login/")
+    return redirect(account_path_for_request(request, "login"))
