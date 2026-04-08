@@ -99,3 +99,26 @@ db.sqlite3
 # OS
 .DS_Store
 Thumbs.db
+
+# Runtime / debug
+.chrome-runtime/
+.selenium-profile/
+.claude/
+.codex*
+tmp_*
+*.tmp
+*.journal
+*.dmp
+
+# Python
+__pycache__/
+*.pyc
+
+# DB
+db.sqlite3
+*.sqlite3
+*.sqlite3-journal
+
+# OS
+.DS_Store
+Thumbs.db
