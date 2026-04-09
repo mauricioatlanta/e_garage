@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from django.utils import timezone
+from allauth.account.models import EmailAddress
 
 from taller.models.empresa import Empresa
 from taller.models.suscripcion import Suscripcion
@@ -140,17 +141,22 @@ class Command(BaseCommand):
         updated_companies = 0
         created_subscriptions = 0
         updated_subscriptions = 0
+        created_emails = 0
+        updated_emails = 0
 
         self.stdout.write(self.style.SUCCESS("Sincronizando cuentas demo/test..."))
 
         for spec in specs:
             with transaction.atomic():
                 user, user_created = self._ensure_user(spec)
+                email_address, email_created = self._ensure_email_address(user, spec)
                 empresa, company_created = self._ensure_company(user, spec)
                 suscripcion, subscription_created = self._ensure_subscription(user)
 
                 created_users += int(user_created)
                 updated_users += int(not user_created)
+                created_emails += int(email_created)
+                updated_emails += int(not email_created)
                 created_companies += int(company_created)
                 updated_companies += int(not company_created)
                 created_subscriptions += int(subscription_created)
@@ -158,14 +164,16 @@ class Command(BaseCommand):
 
                 self.stdout.write(
                     f"[OK] {spec.username} | user={'created' if user_created else 'updated'} | "
+                    f"email={'created' if email_created else 'updated'} | "
                     f"empresa={'created' if company_created else 'updated'} | "
                     f"suscripcion={'created' if subscription_created else 'updated'} | "
-                    f"pais={empresa.pais} | email={user.email}"
+                    f"pais={empresa.pais} | email={email_address.email}"
                 )
 
         self.stdout.write("")
         self.stdout.write(self.style.SUCCESS("Resumen"))
         self.stdout.write(f"usuarios: {created_users} creados, {updated_users} actualizados")
+        self.stdout.write(f"emails: {created_emails} creados, {updated_emails} actualizados")
         self.stdout.write(
             f"empresas: {created_companies} creadas, {updated_companies} actualizadas"
         )
@@ -198,6 +206,21 @@ class Command(BaseCommand):
         user.set_password(spec.password)
         user.save()
         return user, created
+
+    def _ensure_email_address(self, user, spec: DemoAccountSpec):
+        EmailAddress.objects.filter(user=user).exclude(email__iexact=spec.email).update(
+            primary=False
+        )
+        email_address, created = EmailAddress.objects.get_or_create(
+            user=user,
+            email=spec.email,
+            defaults={"verified": True, "primary": True},
+        )
+        email_address.email = spec.email
+        email_address.verified = True
+        email_address.primary = True
+        email_address.save()
+        return email_address, created
 
     def _ensure_company(self, user, spec: DemoAccountSpec):
         now = timezone.now()

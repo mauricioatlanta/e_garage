@@ -1,6 +1,8 @@
 import pytest
+from allauth.account.models import EmailAddress
 from django.urls import resolve
 from django.contrib.auth.models import User
+from django.core.management import call_command
 
 from taller.models import Empresa
 
@@ -92,3 +94,24 @@ def test_legacy_us_dashboard_redirects_to_canonical_en(client):
     response = client.get("/us/dashboard/", follow=False)
     assert response.status_code in (301, 302)
     assert response.headers["Location"].rstrip("/") == "/us/en/dashboard"
+
+
+@pytest.mark.django_db
+def test_ensure_demo_accounts_marks_usa_email_verified_and_login_works(client):
+    call_command("ensure_demo_accounts", username=["testuser_usa"])
+
+    user = User.objects.get(username="testuser_usa")
+    email = EmailAddress.objects.get(user=user, email="testuser@usa-garage.com")
+
+    assert email.verified is True
+    assert email.primary is True
+
+    response = client.post(
+        "/us/en/accounts/login/",
+        {"login": "testuser@usa-garage.com", "password": "TestUSA2025!"},
+        follow=False,
+    )
+
+    assert response.status_code in (302, 303)
+    assert response.headers["Location"] != "/accounts/confirm-email/"
+    assert response.headers["Location"].startswith("/us/en/")
