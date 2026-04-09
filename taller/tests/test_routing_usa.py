@@ -35,6 +35,24 @@ def test_us_login_pages_do_not_crash(client):
 
 
 @pytest.mark.django_db
+def test_us_bienvenida_pages_do_not_crash(client):
+    response_en = client.get("/us/en/bienvenida/")
+    response_es = client.get("/us/es/bienvenida/")
+
+    assert response_en.status_code == 200
+    assert response_es.status_code == 200
+
+
+@pytest.mark.django_db
+def test_us_demo_route_is_available_under_country_namespaces(client):
+    response_en = client.get("/us/en/demo/atlanta/")
+    response_es = client.get("/us/es/demo/atlanta/")
+
+    assert response_en.status_code == 200
+    assert response_es.status_code == 200
+
+
+@pytest.mark.django_db
 def test_us_en_root_authenticated_company_ready_redirects_to_workspace(client):
     user = User.objects.create_user(
         username="us-root@example.com",

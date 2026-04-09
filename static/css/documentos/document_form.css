@@ -685,7 +685,6 @@
 }
 
 .doc-sheet-table .rep-cantidad,
-.doc-sheet-table .serv-cantidad,
 .doc-sheet-table .rep-descuento,
 .doc-sheet-table .serv-descuento,
 .doc-sheet-table .rep-precio-venta,
@@ -793,11 +792,10 @@
 .doc-sheet-table-repuestos .doc-col-actions { width: 86px; }
 
 .doc-sheet-table-servicios {
-  min-width: 890px;
+  min-width: 820px;
 }
 
 .doc-sheet-table-servicios .doc-col-service { width: auto; }
-.doc-sheet-table-servicios .doc-col-qty { width: 72px; }
 .doc-sheet-table-servicios .doc-col-money { width: 128px; }
 .doc-sheet-table-servicios .doc-col-discount { width: 92px; }
 .doc-sheet-table-servicios .doc-col-total { width: 128px; }
@@ -1036,5 +1034,3 @@
     justify-content: flex-start;
   }
 }
-
-

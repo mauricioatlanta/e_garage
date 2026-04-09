@@ -27,7 +27,7 @@
 
     function getPrimaryFocusTarget(row) {
         if (!row || !row.querySelector) return null;
-        return row.querySelector('.srv-input, .otr-search, .serv-cantidad, .serv-precio, .serv-descuento, .otr-empresa, .otr-precio, .otr-precio-taller');
+        return row.querySelector('.srv-input, .otr-search, .serv-precio, .serv-descuento, .otr-empresa, .otr-precio, .otr-precio-taller');
     }
 
     function focusRowInput(row) {
@@ -103,7 +103,7 @@
             clone.__applyServData({
                 id: row.querySelector('.srv-id') && row.querySelector('.srv-id').value || '',
                 nombre: row.querySelector('.srv-input') && row.querySelector('.srv-input').value || '',
-                cantidad: row.querySelector('.serv-cantidad') && row.querySelector('.serv-cantidad').value || 1,
+                cantidad: 1,
                 precio: EG.utils.parseNumericInput(row.querySelector('.serv-precio') && row.querySelector('.serv-precio').value || 0),
                 descuento: EG.utils.parseNumericInput(row.querySelector('.serv-descuento') && row.querySelector('.serv-descuento').value || 0)
             });
@@ -252,7 +252,6 @@
                     '<div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>' +
                     '<input type="hidden" class="srv-id">' +
                 '</td>' +
-                '<td class="doc-sheet-cell"><input type="number" class="serv-cantidad doc-input form-control text-sm" min="1" value="1"></td>' +
                 '<td class="doc-sheet-cell doc-sheet-money"><span>$</span><input type="text" class="serv-precio doc-input form-control text-sm" placeholder="0"></td>' +
                 '<td class="doc-sheet-cell"><input type="number" class="serv-descuento doc-input form-control text-sm" min="0" max="100" step="0.01" value="0" placeholder="0-100" title="Descuento %"></td>' +
                 '<td class="doc-sheet-cell field-total"><input type="hidden" class="serv-subtotal" value="0"><div class="serv-subtotal-view doc-sheet-total">$0</div></td>' +
@@ -271,7 +270,6 @@
         row.dataset.egInitServicio = '1';
         var inputEl = row.querySelector('.srv-input');
         var idEl = row.querySelector('.srv-id');
-        var qtyEl = row.querySelector('.serv-cantidad');
         var priceEl = row.querySelector('.serv-precio');
         var discountEl = row.querySelector('.serv-descuento');
         var subtotalEl = row.querySelector('.serv-subtotal');
@@ -292,7 +290,7 @@
             if (!item) return;
             item.id = (idEl && idEl.value || '').trim();
             item.nombre = (inputEl && inputEl.value || '').trim();
-            item.cantidad = Number(qtyEl && qtyEl.value || 0) || 1;
+            item.cantidad = 1;
             item.precio = EG.utils.parseNumericInput(priceEl && priceEl.value || 0);
             item.descuento = EG.utils.parseNumericInput(discountEl && discountEl.value || 0);
             item.subtotal = EG.utils.parseNumericInput(subtotalEl && subtotalEl.value || 0);
@@ -310,7 +308,6 @@
                 priceEl.value = priceValue ? EG.utils.formatNumberInput(priceValue) : '';
                 priceEl.dispatchEvent(new Event('input', { bubbles: true }));
             }
-            if (qtyEl && data && data.cantidad !== undefined) qtyEl.value = data.cantidad || 1;
             if (discountEl && data && data.descuento !== undefined) discountEl.value = data.descuento || 0;
             row.dataset.serviceId = itemId;
             row.dataset.serviceName = itemName;
@@ -321,11 +318,10 @@
         }
 
         function recalcSubtotal() {
-            var quantity = Number(qtyEl && qtyEl.value || 0) || 0;
             var price = EG.utils.parseNumericInput(priceEl && priceEl.value || 0);
             var discount = normalizeDiscountPercent(discountEl && discountEl.value || 0);
             if (discountEl) discountEl.value = discount;
-            var subtotal = Math.max(0, (quantity * price) * (1 - (discount / 100)));
+            var subtotal = Math.max(0, price * (1 - (discount / 100)));
             if (subtotalEl) subtotalEl.value = subtotal;
             if (subtotalViewEl) subtotalViewEl.textContent = EG.utils.money(subtotal);
             syncState();
@@ -336,11 +332,6 @@
             priceEl.dataset.egMoneyBound = '1';
             priceEl.addEventListener('input', recalcSubtotal);
             priceEl.addEventListener('change', recalcSubtotal);
-        }
-        if (qtyEl && !qtyEl.dataset.egQtyBound) {
-            qtyEl.dataset.egQtyBound = '1';
-            qtyEl.addEventListener('input', recalcSubtotal);
-            qtyEl.addEventListener('change', recalcSubtotal);
         }
         if (discountEl && !discountEl.dataset.egDiscountBound) {
             discountEl.dataset.egDiscountBound = '1';

@@ -16,6 +16,11 @@ from taller.views_extra.dashboard_empresa import (
 )
 from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views import dashboard
+from taller.views_extra.demo_publico import (
+    demo_atlanta_publico,
+    demo_cotizacion_ajax,
+    verificar_codigo_atlanta,
+)
 from taller.views.dashboard_bi import DashboardHomeView
 from taller.views.country_aware_auth import country_aware_login
 from taller.views.onboarding_views import onboarding_guardar_paso, onboarding_wizard
@@ -76,6 +81,13 @@ urlpatterns = [
     # === RUTAS PRINCIPALES PARA COMPATIBILIDAD ===
     path("dashboard/", dashboard, name="dashboard"),  # Dashboard principal
     path("dashboard/bi/", DashboardHomeView.as_view(), name="dashboard_bi"),  # Dashboard de BI
+    path("demo/atlanta/", demo_atlanta_publico, name="demo_atlanta_publico"),
+    path("demo/atlanta/quote/", demo_cotizacion_ajax, name="demo_atlanta_quote"),
+    path(
+        "demo/atlanta/verify-code/",
+        verificar_codigo_atlanta,
+        name="demo_atlanta_verify_code",
+    ),
     path("pricing/", precios, name="pricing"),
     path("precios/", precios, name="precios"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),

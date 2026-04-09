@@ -66,7 +66,7 @@
                 rowId: row.dataset.rowId || '',
                 servicio_id: (row.querySelector('.srv-id') && row.querySelector('.srv-id').value || '').trim(),
                 nombre: (row.querySelector('.srv-input') && row.querySelector('.srv-input').value || '').trim(),
-                cantidad: Number(row.querySelector('.serv-cantidad') && row.querySelector('.serv-cantidad').value || 0) || 1,
+                cantidad: 1,
                 precio: EG.utils.parseNumericInput(row.querySelector('.serv-precio') && row.querySelector('.serv-precio').value || 0),
                 descuento: EG.utils.parseNumericInput(row.querySelector('.serv-descuento') && row.querySelector('.serv-descuento').value || 0)
             };

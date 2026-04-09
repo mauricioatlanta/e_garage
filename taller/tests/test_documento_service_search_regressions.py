@@ -1,3 +1,6 @@
+from pathlib import Path
+
+from django.conf import settings
 from django.contrib.auth.models import User
 from django.test import TestCase
 
@@ -79,3 +82,29 @@ class TestDocumentoServiceSearchRegressions(TestCase):
         content = response.content.decode("utf-8")
         self.assertIn('id="prefetchServicios"', content)
         self.assertIn("Revision de frenos", content)
+
+    def test_documento_form_services_table_uses_unique_rows_without_qty_column(self):
+        user = User.objects.create_user(username="unique_srv", password="123")
+        Empresa.objects.create(
+            user=user,
+            nombre_taller="Servicios Unicos CL",
+            pais="CL",
+            moneda="CLP",
+        )
+
+        self.client.force_login(user)
+        response = self.client.get("/cl/es/documentos/form/")
+
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
+        services_block = content.split(
+            '<table class="doc-sheet-table doc-sheet-table-servicios">', 1
+        )[1].split("</table>", 1)[0]
+
+        self.assertNotIn("doc-col-qty", services_block)
+        self.assertIn('colspan="5"', services_block)
+
+        servicios_js = (
+            Path(settings.BASE_DIR) / "static" / "js" / "document-form" / "servicios.js"
+        ).read_text(encoding="utf-8")
+        self.assertNotIn("serv-cantidad", servicios_js)

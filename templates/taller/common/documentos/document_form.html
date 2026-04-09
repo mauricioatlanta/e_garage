@@ -267,7 +267,6 @@
           <table class="doc-sheet-table doc-sheet-table-servicios">
             <colgroup>
               <col class="doc-col-service">
-              <col class="doc-col-qty">
               <col class="doc-col-money">
               <col class="doc-col-discount">
               <col class="doc-col-total">
@@ -276,7 +275,6 @@
             <thead>
               <tr>
                 <th>{% trans "Service" %}</th>
-                <th>{% trans "Qty" %}</th>
                 <th>{% trans "Client Price" %}</th>
                 <th>{% trans "Discount" %}</th>
                 <th>{% trans "Subtotal" %}</th>
@@ -285,7 +283,7 @@
             </thead>
             <tbody id="servicios-container" class="doc-sheet-body">
               <tr id="servicios-empty-hint" class="doc-sheet-empty-row empty-hint">
-                <td colspan="6" class="doc-sheet-empty">{% trans "Click Add to insert services rows." %}</td>
+                <td colspan="5" class="doc-sheet-empty">{% trans "Click Add to insert services rows." %}</td>
               </tr>
             </tbody>
           </table>
