@@ -7,6 +7,7 @@ from django.urls import reverse
     [
         ("chile:root", "/cl/es/"),
         ("chile:chile_home", "/cl/es/"),
+        ("chile:demo_atlanta_publico", "/cl/es/demo/atlanta/"),
         ("uruguay:root", "/uy/"),
         ("uruguay:uruguay_home", "/uy/"),
         ("uruguay_es:root", "/uy/es/"),
@@ -31,3 +32,9 @@ from django.urls import reverse
 )
 def test_country_namespaces_expose_root_alias_and_legacy_name(view_name, expected_path):
     assert reverse(view_name) == expected_path
+
+
+@pytest.mark.django_db
+def test_chile_public_root_renders_without_reverse_errors(client):
+    response = client.get("/cl/es/")
+    assert response.status_code == 200

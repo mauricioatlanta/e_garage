@@ -25,6 +25,7 @@ from taller.views_extra.views_configuracion import (
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.views_extra.payment_views import payment_chile
 from taller.views_extra.views_suscripciones import precios
+from taller.views_extra.demo_publico import demo_atlanta_publico
 from taller.documentos import views_country_aware as views_documentos
 from taller.documentos.views_migrated import DocumentoCreateView
 from allauth.account.views import (
@@ -89,6 +90,7 @@ urlpatterns = [
         TemplateView.as_view(template_name="cl/es/onboarding/bienvenida.html"),
         name="bienvenida_chile_alt",
     ),
+    path("demo/atlanta/", demo_atlanta_publico, name="demo_atlanta_publico"),
     # Login y password (allauth) bajo /cl/es/accounts/ para conservar país e idioma.
     path("accounts/login/", country_aware_login, name="account_login"),
     # Misma superficie que allauth bajo /accounts/, sin 302 a /accounts/... (se pierde país/idioma).
