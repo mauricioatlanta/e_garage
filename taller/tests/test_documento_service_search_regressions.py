@@ -2,8 +2,9 @@ from pathlib import Path
 
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
+from taller.models.configuracion import ConfiguracionEmpresa
 from taller.models.empresa import Empresa
 from taller.servicios.models import CategoriaServicio, Servicio
 
@@ -108,3 +109,127 @@ class TestDocumentoServiceSearchRegressions(TestCase):
             Path(settings.BASE_DIR) / "static" / "js" / "document-form" / "servicios.js"
         ).read_text(encoding="utf-8")
         self.assertNotIn("serv-cantidad", servicios_js)
+
+    @override_settings(DEBUG=False)
+    def test_documento_form_chile_keeps_otros_servicios_with_legacy_flag_disabled(self):
+        user = User.objects.create_user(username="otros_cl_legacy", password="123")
+        empresa = Empresa.objects.create(
+            user=user,
+            nombre_taller="Otros Servicios Chile",
+            pais="CL",
+            moneda="CLP",
+        )
+        ConfiguracionEmpresa.objects.create(
+            empresa=empresa,
+            rubro_principal="WORKSHOP",
+            usa_otros_servicios=False,
+        )
+
+        self.client.force_login(user)
+        response = self.client.get("/cl/es/documentos/form/")
+
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
+        self.assertIn('id="otros-container"', content)
+        self.assertIn('id="prefetchOtrosServicios"', content)
+
+    def test_documento_form_chile_labels_otros_servicios_in_spanish(self):
+        user = User.objects.create_user(username="otros_cl_label", password="123")
+        empresa = Empresa.objects.create(
+            user=user,
+            nombre_taller="Etiquetas Chile",
+            pais="CL",
+            moneda="CLP",
+        )
+        ConfiguracionEmpresa.objects.create(
+            empresa=empresa,
+            rubro_principal="WORKSHOP",
+            usa_otros_servicios=True,
+        )
+
+        self.client.force_login(user)
+        response = self.client.get("/cl/es/documentos/form/")
+
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
+        self.assertIn("Otros Servicios", content)
+        self.assertIn("Empresa externa", content)
+        self.assertIn("Precio taller", content)
+        self.assertIn("Precio cliente", content)
+        self.assertIn("Ganancia", content)
+        self.assertIn("Otros servicios", content)
+
+    @override_settings(DEBUG=False)
+    def test_documento_form_parts_rubro_still_hides_otros_servicios(self):
+        user = User.objects.create_user(username="otros_parts_cl", password="123")
+        empresa = Empresa.objects.create(
+            user=user,
+            nombre_taller="Repuestos Chile",
+            pais="CL",
+            moneda="CLP",
+        )
+        ConfiguracionEmpresa.objects.create(
+            empresa=empresa,
+            rubro_principal="PARTS",
+            usa_otros_servicios=True,
+        )
+
+        self.client.force_login(user)
+        response = self.client.get("/cl/es/documentos/form/")
+
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
+        self.assertNotIn('id="otros-container"', content)
+
+    def test_documento_form_usa_uses_common_template_without_country_override(self):
+        user = User.objects.create_user(username="wide_shell_us", password="123")
+        Empresa.objects.create(
+            user=user,
+            nombre_taller="Wide Shell USA",
+            pais="US",
+            moneda="USD",
+        )
+
+        self.client.force_login(user)
+        response = self.client.get("/us/en/documentos/form/")
+
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode("utf-8")
+        self.assertNotIn("us_document_form_futurist.css", content)
+
+        usa_template = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "taller"
+            / "us"
+            / "documentos"
+            / "document_form.html"
+        ).read_text(encoding="utf-8")
+        usa_en_template = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "taller"
+            / "us"
+            / "en"
+            / "documentos"
+            / "document_form.html"
+        ).read_text(encoding="utf-8")
+        usa_es_template = (
+            Path(settings.BASE_DIR)
+            / "templates"
+            / "taller"
+            / "us"
+            / "es"
+            / "documentos"
+            / "document_form.html"
+        ).read_text(encoding="utf-8")
+
+        expected_extends = '{% extends "taller/common/documentos/document_form.html" %}'
+        self.assertEqual(usa_template.strip(), expected_extends)
+        self.assertEqual(usa_en_template.strip(), expected_extends)
+        self.assertEqual(usa_es_template.strip(), expected_extends)
+
+        common_css = (
+            Path(settings.BASE_DIR) / "static" / "css" / "documentos" / "document_form.css"
+        ).read_text(encoding="utf-8")
+        self.assertIn(".doc-sheet-table-repuestos", common_css)

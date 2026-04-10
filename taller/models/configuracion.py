@@ -1,6 +1,5 @@
 from decimal import Decimal
 
-from django.conf import settings
 from django.db import models
 
 from taller.configuracion.rubros_responsables import (
@@ -225,10 +224,20 @@ class ConfiguracionEmpresa(models.Model):
                 'kilometraje': bool,
             }
         """
+        company_country = (
+            str(getattr(getattr(self, "empresa", None), "pais", "") or "").upper().strip()
+        )
+        otros_servicios_enabled = getattr(self, "usa_otros_servicios", False)
+
+        # Compatibilidad con configuraciones legacy de Chile: el default False
+        # ocultaba la seccion en produccion aunque el flujo historico la usa.
+        if company_country == "CL" and not otros_servicios_enabled:
+            otros_servicios_enabled = True
+
         secciones = {
             "repuestos": True,
             "servicios": getattr(self, "usa_servicios", True),
-            "otros_servicios": getattr(self, "usa_otros_servicios", False),
+            "otros_servicios": otros_servicios_enabled,
             "kilometraje": getattr(self, "usa_kilometraje", False),
         }
 
@@ -262,9 +271,6 @@ class ConfiguracionEmpresa(models.Model):
             secciones["servicios"] = True
             secciones["otros_servicios"] = False
             secciones["kilometraje"] = True
-
-        if settings.DEBUG:
-            secciones["otros_servicios"] = True
 
         return secciones
 

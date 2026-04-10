@@ -5,7 +5,7 @@
 {% load country_url %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/documentos/document_form.css' %}">
+<link rel="stylesheet" href="{% static 'css/documentos/document_form.css' %}?v=20260409a">
 {% endblock extra_css %}
 
 {% block documento_title %}{{ ui_labels.new_document }}{% endblock documento_title %}
@@ -295,7 +295,9 @@
       <section class="erp-sheet-section doc-pos-section doc-ficha-otros">
         <div class="erp-section-header">
           <div class="erp-section-heading">
-            <h3 class="erp-section-title">{% trans "Other Services" %}</h3>
+            <h3 class="erp-section-title">
+              {% if is_cl == 'CL' and LANGUAGE_CODE|default:'es' == 'es' %}Otros Servicios{% else %}{% trans "Other Services" %}{% endif %}
+            </h3>
           </div>
           <div class="erp-section-actions">
             <button type="button" id="add-otro" class="erp-btn erp-btn--primary doc-action-btn"><span aria-hidden="true">+</span><span class="doc-action-label">{% trans "Add" %}</span></button>
@@ -316,16 +318,16 @@
             <thead>
               <tr>
                 <th>{% trans "Service" %}</th>
-                <th>{% trans "External Company" %}</th>
-                <th class="cost-column cost-hidden">{% trans "Shop Price" %}</th>
-                <th>{% trans "Client Price" %}</th>
-                <th>{% trans "Profit" %}</th>
+                <th>{% if is_cl == 'CL' and LANGUAGE_CODE|default:'es' == 'es' %}Empresa externa{% else %}{% trans "External Company" %}{% endif %}</th>
+                <th class="cost-column cost-hidden">{% if is_cl == 'CL' and LANGUAGE_CODE|default:'es' == 'es' %}Precio taller{% else %}{% trans "Shop Price" %}{% endif %}</th>
+                <th>{% if is_cl == 'CL' and LANGUAGE_CODE|default:'es' == 'es' %}Precio cliente{% else %}{% trans "Client Price" %}{% endif %}</th>
+                <th>{% if is_cl == 'CL' and LANGUAGE_CODE|default:'es' == 'es' %}Ganancia{% else %}{% trans "Profit" %}{% endif %}</th>
                 <th>{% trans "Actions" %}</th>
               </tr>
             </thead>
             <tbody id="otros-container" class="doc-sheet-body">
               <tr id="otros-empty-hint" class="doc-sheet-empty-row empty-hint">
-                <td colspan="6" class="doc-sheet-empty">{% trans "Click Add to insert external services rows." %}</td>
+                <td colspan="6" class="doc-sheet-empty">{% if is_cl == 'CL' and LANGUAGE_CODE|default:'es' == 'es' %}Haz clic en Añadir para insertar filas de servicios externos.{% else %}{% trans "Click Add to insert external services rows." %}{% endif %}</td>
               </tr>
             </tbody>
           </table>
@@ -356,7 +358,7 @@
                   {% endif %}
                   {% if ui_config.show_otros_servicios %}
                   <tr>
-                    <td class="receipt-label">{% trans "Other" %}</td>
+                    <td class="receipt-label">{% if is_cl == 'CL' and LANGUAGE_CODE|default:'es' == 'es' %}Otros servicios{% else %}{% trans "Other" %}{% endif %}</td>
                     <td class="receipt-value"><span id="t_otros" class="calculated-field readonly-total" data-calculated="true">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span></td>
                   </tr>
                   {% endif %}
