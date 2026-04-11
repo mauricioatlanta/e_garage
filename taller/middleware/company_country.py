@@ -42,17 +42,29 @@ class CompanyCountryMiddleware(MiddlewareMixin):
 
         request.company = company
 
-        # NO sobrescribir request.country si ya fue establecido por CountryContextMiddleware
-        # El CountryContextMiddleware maneja la lógica de redirección automática
+        # Preserve an existing request.country set by earlier middleware.
         if not hasattr(request, "country"):
-            # Solo establecer país si no fue establecido por middleware anterior
-            if request.path.startswith("/us/"):
-                request.country = "US"
-            elif request.path.startswith("/cl/"):
-                request.country = "CL"
-            else:
-                # PRIORIDAD: País desde empresa del usuario
-                request.country = getattr(company, "pais", None) or "CL"
+            path = request.path or ""
+            request.country = None
+
+            for prefix, country in {
+                "/cl/": "CL",
+                "/us/": "US",
+                "/br/": "BR",
+                "/mx/": "MX",
+                "/ar/": "AR",
+                "/pe/": "PE",
+                "/co/": "CO",
+                "/ec/": "EC",
+                "/ve/": "VE",
+                "/uy/": "UY",
+            }.items():
+                if path.startswith(prefix):
+                    request.country = country
+                    break
+
+            if request.country is None:
+                request.country = (getattr(company, "pais", None) or "CL").upper()
 
         # Debug opcional (remover en producción)
         if hasattr(request, "user") and request.user.is_authenticated:

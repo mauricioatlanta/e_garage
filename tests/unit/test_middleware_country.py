@@ -128,6 +128,19 @@ class CompanyCountryMiddlewareTest(TestCase):
         self.assertEqual(request.country, "CL")
         self.assertIsNone(response)
 
+    def test_middleware_with_brazil_path(self):
+        """Test middleware con ruta Brazil"""
+        request = self.factory.get("/br/dashboard/")
+        request.session = {}
+        request.user = self.user
+
+        # Procesar request
+        response = self.middleware.process_request(request)
+
+        # Verificar que se estableció país Brazil
+        self.assertEqual(request.country, "BR")
+        self.assertIsNone(response)
+
     def test_middleware_with_usa_empresa(self):
         """Test middleware con empresa USA"""
         # Crear empresa USA
@@ -194,6 +207,26 @@ class CompanyCountryMiddlewareTest(TestCase):
         # Verificar que ruta USA tiene prioridad
         self.assertEqual(request.company, empresa_chile)
         self.assertEqual(request.country, "US")  # Ruta tiene prioridad
+        self.assertIsNone(response)
+
+    def test_middleware_with_empresa_brazil_path_priority(self):
+        """Test que ruta Brazil tiene prioridad sobre empresa"""
+        # Crear empresa Chile
+        user_chile = User.objects.create_user(username="testuser6", password="testpass")
+        empresa_chile = Empresa.objects.create(
+            nombre_taller="Chile Garage 2", pais="CL", user=user_chile
+        )
+
+        request = self.factory.get("/br/dashboard/")
+        request.session = {"empresa_id": empresa_chile.id}
+        request.user = self.user
+
+        # Procesar request
+        response = self.middleware.process_request(request)
+
+        # Verificar que ruta Brazil tiene prioridad
+        self.assertEqual(request.company, empresa_chile)
+        self.assertEqual(request.country, "BR")
         self.assertIsNone(response)
 
     def test_middleware_empresa_attributes(self):
