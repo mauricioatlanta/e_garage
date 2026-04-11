@@ -129,9 +129,8 @@ class SimpleCountryRedirectMiddleware(MiddlewareMixin):
         ):
             return None
 
-        # No redirigir páginas de bienvenida: el usuario eligió explícitamente un país
-        # en el selector (ej. Chile) y debe ver /cl/es/bienvenida/, no /us/en/bienvenida/
-        if "/bienvenida" in rest_lower or rest_lower.strip("/") == "bienvenida":
+        # No redirigir paginas de bienvenida: el usuario eligio explicitamente un pais.
+        if "bienvenida" in request.path.lower():
             return None
 
         if url_country != user_country:
