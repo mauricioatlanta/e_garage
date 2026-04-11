@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.urls import reverse
 
 from .core.locale_router import resolve_country_lang
 from .utils.country_routing import default_lang_for_country
@@ -12,6 +13,45 @@ from .views_root_country import country_lang_root_view
 COOKIE_COUNTRY = "eg_country"
 COOKIE_LANG = "eg_lang"
 COOKIE_MAX_AGE = 60 * 60 * 24 * 180
+
+COUNTRY_SELECTOR_CARDS = (
+    {"code": "AR", "name": "Argentina", "flag": "🇦🇷"},
+    {"code": "BR", "name": "Brasil", "flag": "🇧🇷"},
+    {"code": "CL", "name": "Chile", "flag": "🇨🇱"},
+    {"code": "CO", "name": "Colombia", "flag": "🇨🇴"},
+    {"code": "EC", "name": "Ecuador", "flag": "🇪🇨"},
+    {"code": "MX", "name": "México", "flag": "🇲🇽"},
+    {"code": "PE", "name": "Perú", "flag": "🇵🇪"},
+    {"code": "US", "name": "USA", "flag": "🇺🇸"},
+    {"code": "UY", "name": "Uruguay", "flag": "🇺🇾"},
+    {"code": "VE", "name": "Venezuela", "flag": "🇻🇪"},
+)
+
+LANGUAGE_LABELS = {
+    "es": "Español",
+    "en": "English",
+    "pt": "Português",
+}
+
+
+def _build_country_cards(
+    request: HttpRequest, suggested_country: str
+) -> list[dict[str, str | bool]]:
+    cards: list[dict[str, str | bool]] = []
+    for item in COUNTRY_SELECTOR_CARDS:
+        code = item["code"]
+        lang = default_lang_for_country(code)
+        cards.append(
+            {
+                **item,
+                "lang": lang,
+                "lang_label": LANGUAGE_LABELS.get(lang, lang.upper()),
+                "entry_url": reverse("select_region", args=[code, lang]),
+                "direct_url": _localized_target_url(request, code, lang),
+                "is_suggested": code == suggested_country,
+            }
+        )
+    return cards
 
 
 def _localized_target_url(request: HttpRequest, country: str, lang: str) -> str:
@@ -42,14 +82,21 @@ def root_landing(request: HttpRequest) -> HttpResponse:
         cf_country=request.headers.get("cf-ipcountry"),
         accept_language=request.headers.get("accept-language"),
     )
+    country_cards = _build_country_cards(request, decision.country)
+    suggested_card = next(
+        (card for card in country_cards if card["code"] == decision.country),
+        country_cards[0],
+    )
 
     context = {
         "suggested_country": decision.country,
         "suggested_lang": decision.lang,
         "suggested_url": _localized_target_url(request, decision.country, decision.lang),
         "decision_source": decision.source,
+        "country_cards": country_cards,
+        "suggested_card": suggested_card,
     }
-    return render(request, "public/root_landing.html", context)
+    return render(request, "landing/seleccionar_pais.html", context)
 
 
 def root_autoredirect(request: HttpRequest) -> HttpResponse:
