@@ -59,6 +59,14 @@ def _localized_target_url(request: HttpRequest, country: str, lang: str) -> str:
 
 
 def redirect_to_home(request: HttpRequest) -> HttpResponse:
+    path = request.path or "/"
+
+    # FIX: respetar navegacion manual
+    if path.startswith(
+        ("/cl/", "/us/", "/br/", "/mx/", "/ar/", "/pe/", "/co/", "/ec/", "/ve/", "/uy/")
+    ):
+        return redirect(path)
+
     country = (getattr(request, "country_from_host", None) or "").upper()
 
     if not country and request.user.is_authenticated:
