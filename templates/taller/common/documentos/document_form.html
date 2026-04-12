@@ -1,4 +1,4 @@
-﻿{% extends "taller/documentos/base/base_documento.html" %}
+{% extends "taller/documentos/base/base_documento.html" %}
 {% load i18n %}
 
 {% load static %}
@@ -6,7 +6,7 @@
 
 {% block extra_css %}
 <style>
-/* ==================== DOCUMENT FORM â€” PRO UI: proporciones, jerarquÃ­a, layout ==================== */
+/* ==================== DOCUMENT FORM — PRO UI: proporciones, jerarquía, layout ==================== */
 /* Regla global dentro del workspace: inputs compactos, bordes sutiles, sin glow por defecto */
 
 #doc-shell {
@@ -52,7 +52,7 @@
   resize: vertical !important;
 }
 
-/* 2. JERARQUÃA: secciones bien separadas (1 Header, 2 Client/Vehicle, 3 Parts/Services, 4 Totals) */
+/* 2. JERARQUÍA: secciones bien separadas (1 Header, 2 Client/Vehicle, 3 Parts/Services, 4 Totals) */
 .doc-shell-workspace > .doc-console-header { margin-bottom: 1rem; }
 .doc-shell-workspace > .grid { margin-bottom: 0.5rem; }
 .doc-shell-workspace .doc-smart-card,
@@ -141,7 +141,7 @@
   }
 }
 
-/* BotÃ³n con gradiente cian (para botones principales) - Sin !important */
+/* Botón con gradiente cian (para botones principales) - Sin !important */
 .btn-cyan-gradient {
   display: inline-flex;
   align-items: center;
@@ -170,7 +170,7 @@
   box-shadow: 0 0 0 2px rgba(34, 211, 238, 0.4);
 }
 
-/* BotÃ³n con gradiente verde (para acciones de agregar) - Sin !important */
+/* Botón con gradiente verde (para acciones de agregar) - Sin !important */
 .btn-green-gradient {
   display: inline-flex;
   align-items: center;
@@ -228,7 +228,7 @@ input:disabled, select:disabled, textarea:disabled {
   opacity: 0.7;
 }
 
-/* Estilos mejorados para la secciÃ³n de totales */
+/* Estilos mejorados para la sección de totales */
 .totales-section {
   margin-top: 2rem;
   padding-top: 1.5rem;
@@ -256,10 +256,10 @@ input:disabled, select:disabled, textarea:disabled {
   transform: translateY(-1px);
 }
 
-/* Eliminada animaciÃ³n infinite para mejor rendimiento mÃ³vil */
-/* El neÃ³n solo aparece en hover/focus, no en animaciÃ³n constante */
+/* Eliminada animación infinite para mejor rendimiento móvil */
+/* El neón solo aparece en hover/focus, no en animación constante */
 
-/* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÃ“N ==================== */
+/* ==================== ESTILOS PARA CAMPOS DE DESCRIPCIÓN ==================== */
 /* Description fields - Better spacing and alignment - Sin !important */
 .description-field {
   flex: 1 1 auto;
@@ -409,7 +409,7 @@ input:disabled, select:disabled, textarea:disabled {
     0 0 0 2px rgba(34, 211, 238, 0.25);
 }
 
-/* ==================== FICHAS POR TÃ“PICOS - VISTA COMPACTA ==================== */
+/* ==================== FICHAS POR TÓPICOS - VISTA COMPACTA ==================== */
 .doc-ficha {
   background: linear-gradient(145deg, rgba(15, 23, 42, 0.95) 0%, rgba(15, 23, 42, 0.85) 100%);
   border: 1px solid rgba(0, 242, 254, 0.35);
@@ -464,7 +464,7 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-control,
 .doc-fichas-row .doc-ficha:first-child .doc-ficha-body .form-select,
 .doc-fichas-row .doc-ficha:first-child .doc-ficha-body #id_numero { grid-column: 2; width: 160px !important; max-width: 160px !important; box-sizing: border-box !important; }
-/* Ficha Client & Vehicle: dos columnas (Cliente | VehÃ­culo) como en referencia */
+/* Ficha Client & Vehicle: dos columnas (Cliente | Vehículo) como en referencia */
 .doc-ficha-body-two-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -529,7 +529,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 .doc-ficha-otros .doc-ficha-body { max-height: 200px; overflow-y: auto; }
 
-/* Botones de acciÃ³n dentro de cada ficha */
+/* Botones de acción dentro de cada ficha */
 .doc-ficha .ficha-actions {
   display: flex;
   flex-wrap: wrap;
@@ -575,18 +575,18 @@ input:disabled, select:disabled, textarea:disabled {
   min-width: 0;
   box-sizing: border-box;
 }
-/* BÃºsqueda de cliente un poco mÃ¡s ancha para leer "Type to search..." */
+/* Búsqueda de cliente un poco más ancha para leer "Type to search..." */
 #doc-shell .doc-fichas-row #cliente-busqueda {
   width: 26ch;
   max-width: 100%;
 }
-/* Select de vehÃ­culo (puede tener patente + modelo) */
+/* Select de vehículo (puede tener patente + modelo) */
 #doc-shell .doc-fichas-row #id_vehiculo {
   width: 28ch;
   max-width: 100%;
 }
 
-/* Ficha OperaciÃ³n: campos tambiÃ©n ~20 caracteres */
+/* Ficha Operación: campos también ~20 caracteres */
 #doc-shell .doc-ficha-operation .form-control,
 #doc-shell .doc-ficha-operation .form-select,
 #doc-shell .doc-ficha-operation input[type="text"],
@@ -660,7 +660,7 @@ input:disabled, select:disabled, textarea:disabled {
   font-size: 15px;
 }
 
-/* Errores de validaciÃ³n compactos */
+/* Errores de validación compactos */
 .doc-form-validation-errors {
   background: rgba(127, 29, 29, 0.25);
   border: 1px solid rgba(248, 113, 113, 0.5);
@@ -847,7 +847,7 @@ input:disabled, select:disabled, textarea:disabled {
   }
 }
 
-/* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÃCULO ==================== */
+/* ==================== TARJETAS INTELIGENTES CLIENTE / VEHÍCULO ==================== */
 .doc-smart-card {
   background: rgba(15, 23, 42, 0.6);
   border: var(--doc-border);
@@ -889,7 +889,7 @@ input:disabled, select:disabled, textarea:disabled {
   box-shadow: 0 0 0 2px rgba(71, 85, 105, 0.2);
 }
 
-/* ==================== PANEL TOTALES (jerarquÃ­a clara, sin glow) ==================== */
+/* ==================== PANEL TOTALES (jerarquía clara, sin glow) ==================== */
 .totales-cockpit {
   background: rgba(15, 23, 42, 0.7);
   border: var(--doc-border);
@@ -944,7 +944,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 .totales-cockpit-save:hover { background: #047857; }
 
-/* ==================== BOTÃ“N UNIFICADO .btn-add ==================== */
+/* ==================== BOTÓN UNIFICADO .btn-add ==================== */
 .btn-add {
   display: inline-flex;
   align-items: center;
@@ -964,7 +964,7 @@ input:disabled, select:disabled, textarea:disabled {
 
 /* ==================== TABLA REAL: Grid 12 cols - Code | Part name | Qty | Price | Total | [x] ==================== */
 .doc-pos-section { margin-bottom: 0.75rem; }
-/* Alinear tÃ­tulos y botones de acciÃ³n en secciones partes/servicios/otros */
+/* Alinear títulos y botones de acción en secciones partes/servicios/otros */
 .doc-ficha-parts .flex.justify-between,
 .doc-ficha-services .flex.justify-between,
 .doc-ficha-otros .flex.justify-between {
@@ -999,7 +999,7 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-pos-header-otros > span:nth-child(4){ grid-column: span 2; }
 .doc-pos-header-otros > span:nth-child(5){ grid-column: span 1; }
 .doc-pos-header-otros > span:nth-child(6){ grid-column: span 1; }
-/* Filas dinÃ¡micas: usan grid grid-cols-12 del HTML, no override */
+/* Filas dinámicas: usan grid grid-cols-12 del HTML, no override */
 #repuestos-container .dynamic-element .doc-row-grid,
 #servicios-container .dynamic-element .doc-row-grid,
 #otros-container .dynamic-element .doc-row-grid {
@@ -1056,15 +1056,15 @@ input:disabled, select:disabled, textarea:disabled {
 
 {% block content %}
 {% load i18n %}
-{# âœ… Manejo robusto de company_country con mÃºltiples fallbacks #}
+{# ✅ Manejo robusto de company_country con múltiples fallbacks #}
 {% with active_country=empresa.pais|default:'CL' %}
 {% with is_cl=active_country|default:'CL'|upper|default:'CL' %}
-<!-- Header de PÃ¡gina - Design System -->
+<!-- Header de Página - Design System -->
 <div class="mb-6 sm:mb-8 px-4 sm:px-6">
   <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
     <div class="flex-1">
       <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-white mb-2">
-        ðŸ“ {{ ui_labels.new_document }}
+        📝 {{ ui_labels.new_document }}
       </h1>
       <p class="text-sm sm:text-base text-slate-300">
         {{ ui_labels.new_document }}
@@ -1080,12 +1080,12 @@ input:disabled, select:disabled, textarea:disabled {
           <button type="button" onclick="submitLanguageDoc('en')" id="lang-en-doc"
                   class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'en' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
                   {% if LANGUAGE_CODE == 'en' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            ðŸ‡ºðŸ‡¸ EN
+            🇺🇸 EN
           </button>
           <button type="button" onclick="submitLanguageDoc('es')" id="lang-es-doc"
                   class="px-3 py-1 rounded-md text-sm font-bold transition-all duration-300 {% if LANGUAGE_CODE == 'es' %}bg-gradient-to-r from-cyan-500 to-blue-500 text-white{% else %}text-gray-400 hover:text-cyan-300{% endif %}"
                   {% if LANGUAGE_CODE == 'es' %}style="box-shadow: 0 0 10px rgba(0, 242, 254, 0.5);"{% endif %}>
-            ðŸ‡ªðŸ‡¸ ES
+            🇪🇸 ES
           </button>
         </div>
       </form>
@@ -1099,7 +1099,9 @@ input:disabled, select:disabled, textarea:disabled {
 </div>
         <form method="post" id="document-form" class="doc-form-compact mx-auto"
               data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
+              data-form-mode="{{ form_mode|default:'clean' }}"
               data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"
+              data-has-server-line-items="{% if has_server_line_items %}1{% else %}0{% endif %}"
               data-country-code="{{ country_code|default:request.country|default:empresa.pais|default:'CL' }}"
               data-url-next-number="{% country_url 'documentos:api_obtener_numero_documento' %}"
               data-url-client-search="{% country_url 'ajax:buscar_clientes' app_namespace='' %}"
@@ -1118,20 +1120,20 @@ input:disabled, select:disabled, textarea:disabled {
   {% if messages %}
     {% for message in messages %}
       {% with msg_text=message|stringformat:"s" %}
-      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesiÃ³n exitosamente" not in msg_text and "Ha cerrado sesiÃ³n" not in msg_text and "iniciado sesiÃ³n exitosamente" not in msg_text and "cerrado sesiÃ³n" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
+      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesión exitosamente" not in msg_text and "Ha cerrado sesión" not in msg_text and "iniciado sesión exitosamente" not in msg_text and "cerrado sesión" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
         {% if message.tags == 'success' %}
         <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">âœ…</span>
+          <span class="text-2xl flex-shrink-0">✅</span>
           <p class="text-sm sm:text-base text-green-200 flex-1">{{ message }}</p>
         </div>
         {% elif message.tags == 'error' %}
         <div class="bg-red-900/30 border border-red-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">âŒ</span>
+          <span class="text-2xl flex-shrink-0">❌</span>
           <p class="text-sm sm:text-base text-red-200 flex-1">{{ message }}</p>
         </div>
         {% else %}
         <div class="bg-blue-900/30 border border-blue-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
-          <span class="text-2xl flex-shrink-0">â„¹ï¸</span>
+          <span class="text-2xl flex-shrink-0">ℹ️</span>
           <p class="text-sm sm:text-base text-blue-200 flex-1">{{ message }}</p>
         </div>
         {% endif %}
@@ -1154,10 +1156,10 @@ input:disabled, select:disabled, textarea:disabled {
     </div>
   {% endif %}
 
-  <!-- Document workspace â€” cabecera consola | tarjetas cliente/vehÃ­culo | repuestos/servicios POS | observaciones | totales cockpit -->
+  <!-- Document workspace — cabecera consola | tarjetas cliente/vehículo | repuestos/servicios POS | observaciones | totales cockpit -->
   <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
 
-    <!-- 1. CABECERA COMPACTA â€” fila 1: INV | Fecha | MecÃ¡nico | Pago | fila 2: Tipo | OperaciÃ³n -->
+    <!-- 1. CABECERA COMPACTA — fila 1: INV | Fecha | Mecánico | Pago | fila 2: Tipo | Operación -->
     <div class="doc-console-header">
       <div class="doc-console-title flex flex-wrap items-center gap-2">
         <span>{% if es_edicion %}{% trans "EDIT DOCUMENT" %}{% else %}{% trans "CREATE DOCUMENT" %}{% endif %}</span>
@@ -1169,7 +1171,7 @@ input:disabled, select:disabled, textarea:disabled {
           <div class="doc-console-field doc-console-field--invoice">
             <span class="doc-console-meta">{% trans "Document No." %}</span>
             <span id="id_numero" class="doc-console-inv" data-placeholder="{% trans 'Will be generated automatically' %}">
-              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}â€”{% endif %}
+              {% if es_edicion and documento.numero_documento %}INV-{{ documento.numero_documento|default:documento.numero|default:documento.id }}{% else %}—{% endif %}
             </span>
           </div>
 
@@ -1217,6 +1219,7 @@ input:disabled, select:disabled, textarea:disabled {
           <label for="cliente-busqueda" class="sr-only">{% trans 'Search client' %}</label>
           <input type="text" id="cliente-busqueda" class="w-full bg-slate-800 p-2 rounded border border-slate-600 text-white text-sm"
                  placeholder="{% trans 'Search client' %}"
+                 value="{{ cliente_preselect_nombre|default_if_none:'' }}"
                  autocomplete="off"
                  oninput="window.EG?.cliente?.handleClienteInput?.(this.value)"
                  onfocus="window.EG?.cliente?.handleClienteFocus?.(this.value)"
@@ -1224,19 +1227,25 @@ input:disabled, select:disabled, textarea:disabled {
           <div id="cliente-resultados" class="absolute z-50 w-full bg-slate-800 border border-slate-600 rounded shadow-lg hidden max-h-48 overflow-y-auto text-sm mt-1"></div>
         </div>
         <a id="btn-nuevo-cliente"
-           href="{% country_url 'clientes:crear_cliente' %}"
+           href="{% country_url 'clientes:crear_cliente' %}?return_to={{ request.get_full_path|urlencode }}&select_field=cliente"
            data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
+           onclick="if (window.openClienteModal) { event.preventDefault(); window.openClienteModal(); return false; }"
            class="doc-action-btn mt-2 inline-flex items-center gap-2 px-3 py-2 rounded-md bg-cyan-600 hover:bg-cyan-500 text-white font-semibold no-underline shadow-sm whitespace-nowrap">
-          <span aria-hidden="true">âž•</span>
+          <span aria-hidden="true">➕</span>
           <span class="doc-action-label inline text-white font-semibold">Nuevo cliente</span>
         </a>
-        <select id="id_cliente" name="cliente" class="hidden">
-          <option value="">{% trans "Select client..." %}</option>
-        </select>
-        <div id="cliente-info" class="doc-smart-summary hidden">
-          <div class="name" id="cliente-nombre"></div>
-          <div class="detail" id="cliente-telefono"></div>
-          <div class="detail" id="cliente-email"></div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <select id="id_cliente" name="cliente">
+            <option value="">{% trans "Select client..." %}</option>
+            {% if cliente_preselect_id %}
+            <option value="{{ cliente_preselect_id }}" selected>{{ cliente_preselect_nombre|default:cliente_preselect_id }}</option>
+            {% endif %}
+          </select>
+        </div>
+        <div id="cliente-info" class="doc-smart-summary{% if not cliente_preselect_id %} hidden{% endif %}">
+          <div class="name" id="cliente-nombre">{{ cliente_preselect_nombre|default_if_none:'' }}</div>
+          <div class="detail" id="cliente-telefono">{% if cliente_preselect_telefono %}Tel: {{ cliente_preselect_telefono }}{% endif %}</div>
+          <div class="detail" id="cliente-email">{% if cliente_preselect_email %}Email: {{ cliente_preselect_email }}{% endif %}</div>
           <div class="meta" id="cliente-ultima-visita"></div>
         </div>
       </div>
@@ -1251,9 +1260,9 @@ input:disabled, select:disabled, textarea:disabled {
                 <option value="">{% trans 'Select vehicle...' %}</option>
               </select>
             </div>
-            <button type="button" id="btn-nuevo-vehiculo" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
-              <span aria-hidden="true">âž•</span>
-              <span class="doc-action-label text-white font-semibold">Nuevo vehÃ­culo</span>
+            <button type="button" id="btn-nuevo-vehiculo" data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
+              <span aria-hidden="true">➕</span>
+              <span class="doc-action-label text-white font-semibold">Nuevo vehículo</span>
             </button>
           </div>
         </div>
@@ -1286,14 +1295,14 @@ input:disabled, select:disabled, textarea:disabled {
             <h3 class="!mb-0">{% trans "PARTS" %} / {% trans "USED PARTS" %}</h3>
             {% if desarme_origen_label %}
             <div class="text-xs text-amber-300 bg-amber-900/40 border border-amber-500/60 rounded px-2 py-1 inline-flex items-center gap-1">
-              <span>ðŸ§©</span>
+              <span>🧩</span>
               <span>{% trans "Venta iniciada desde desarme" %}: {{ desarme_origen_label }}</span>
             </div>
             {% endif %}
           </div>
           <div class="flex gap-1 flex-shrink-0 items-center">
-            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">ðŸ§©</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
+            <button type="button" id="add-repuesto" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">🧩</span><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
           </div>
         </div>
         <div class="doc-pos-header hidden sm:grid">
@@ -1309,7 +1318,7 @@ input:disabled, select:disabled, textarea:disabled {
         <div class="flex justify-between items-center gap-3 mb-3 min-h-[2rem]">
           <h3 class="!mb-0 flex-1 min-w-0">{% trans "SERVICES" %}</h3>
           <div class="flex gap-1 flex-shrink-0 items-center">
-            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+            <button type="button" id="add-servicio" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
           </div>
         </div>
         <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
@@ -1327,8 +1336,8 @@ input:disabled, select:disabled, textarea:disabled {
       <div class="flex flex-wrap items-center gap-2 mb-3 min-h-[2rem]">
         <h3 class="!mb-0">{% trans "OTHER SERVICES" %}</h3>
         <div class="flex gap-1 flex-shrink-0 items-center">
-          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">âž•</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
+          <button type="button" id="add-otro" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span aria-hidden="true">➕</span><span class="doc-action-label text-white font-semibold">{% trans "ADD" %}</span></button>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span aria-hidden="true">🌐</span><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
         </div>
       </div>
       <div class="doc-pos-header doc-pos-header-otros hidden sm:grid">
@@ -1415,14 +1424,14 @@ input:disabled, select:disabled, textarea:disabled {
           {% if es_edicion %}{{ ui_labels.edit_button }}{% else %}{% trans "Save Document" %}{% endif %}
         </button>
         <div class="flex gap-2 mt-3">
-          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">â†</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
-          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">ðŸŒ</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
+          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn flex-1 justify-center text-center text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">←</span><span class="doc-action-label text-slate-200 font-semibold">{% trans "Back" %}</span></a>
+          <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm rounded-md bg-slate-700 hover:bg-slate-600 text-slate-200 no-underline"><span aria-hidden="true">🌐</span><span class="doc-action-label text-slate-200 font-semibold">Ajustes</span></a>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Hidden inputs para serializar filas dinÃ¡micas -->
+  <!-- Hidden inputs para serializar filas dinámicas -->
   <input type="hidden" name="repuestos_json" id="id_repuestos_json">
   <input type="hidden" name="servicios_json" id="id_servicios_json">
   <input type="hidden" name="otros_json" id="id_otros_json">
@@ -1433,7 +1442,7 @@ input:disabled, select:disabled, textarea:disabled {
   <div id="used-parts-overlay" class="absolute inset-0 bg-black/70"></div>
   <div class="absolute inset-4 sm:inset-10 md:inset-20 flex items-start justify-center overflow-auto">
     <div class="relative bg-slate-900 border border-amber-500/40 rounded-xl shadow-2xl w-full max-w-2xl p-4 sm:p-6">
-      <h3 class="text-lg font-bold text-amber-300 mb-3">ðŸ§© {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
+      <h3 class="text-lg font-bold text-amber-300 mb-3">🧩 {% trans "Used Parts" %} ({% trans "from disassembly yard" %})</h3>
       <input type="search" id="used-parts-search" placeholder="{% trans 'Search by code or name...' %}" class="form-control w-full mb-4" autocomplete="off">
       <div id="used-parts-results" class="max-h-64 overflow-y-auto space-y-1"></div>
       <p id="used-parts-empty" class="text-gray-400 text-sm py-4 hidden">{% trans "Type at least 2 characters to search" %}</p>
@@ -1448,6 +1457,7 @@ input:disabled, select:disabled, textarea:disabled {
 {{ servicios_prefetch|json_script:"prefetchServicios" }}
 {{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
 {{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
+{{ document_form_bootstrap|json_script:"documentFormBootstrap" }}
 
 {% endwith %}
 {% endwith %}
@@ -1458,241 +1468,15 @@ input:disabled, select:disabled, textarea:disabled {
 {# Scripts esenciales #}
 <script src="{% static 'js/marketplace_tooltip_fixed.js' %}"></script>
 
-<script>
-// Ãšnica fuente de verdad para ?next= al ir a crear cliente/vehÃ­culo (pathname + querystring)
-window.egEncodeDocumentFormNext = function egEncodeDocumentFormNext() {
-  return encodeURIComponent(window.location.pathname + (window.location.search || ''));
-};
-
-// Funciones para abrir modales de cliente y vehÃ­culo - Disponibles inmediatamente
-(function() {
-  'use strict';
-  
-  function openClienteModal() {
-    try {
-      const pathBase = window.location.pathname || '/cl/documentos/form/';
-      const nextUrl = window.egEncodeDocumentFormNext();
-      
-      // Parsear el path: /cl/documentos/form/ -> ['cl', 'documentos', 'form'] (sin search)
-      const pathParts = pathBase.split('/').filter(function(p) { return p && p.length > 0; });
-      
-      // Detectar paÃ­s e idioma desde el path
-      let countryPrefix = 'cl';
-      let langPrefix = 'es';
-      
-      if (pathParts.length > 0) {
-        countryPrefix = pathParts[0];
-        if (pathParts.length > 1 && (pathParts[1] === 'es' || pathParts[1] === 'en')) {
-          langPrefix = pathParts[1];
-        }
-      }
-      
-      const createUrl = '/' + countryPrefix + '/' + langPrefix + '/clientes/crear/?next=' + nextUrl;
-      console.log('ðŸ”µ Abriendo modal de cliente:', createUrl);
-      window.location.href = createUrl;
-    } catch (error) {
-      console.error('âŒ Error al abrir modal de cliente:', error);
-      alert('Error al abrir la pÃ¡gina de crear cliente. Por favor, intente nuevamente.');
-    }
-  }
-
-  function openVehiculoModal() {
-    try {
-      const pathOnly = window.location.pathname || '/cl/documentos/form/';
-      const nextUrl = window.egEncodeDocumentFormNext();
-      
-      // Obtener el cliente seleccionado
-      // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
-      let clienteId = null;
-      const clienteSelect = document.getElementById('id_cliente');
-      
-      if (clienteSelect) {
-        // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
-        if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
-          clienteId = jQuery(clienteSelect).val();
-          console.log('ðŸ‘¤ Cliente obtenido desde Select2:', clienteId);
-        } else {
-          // Fallback: obtener del campo directamente
-          clienteId = clienteSelect.value || null;
-          console.log('ðŸ‘¤ Cliente obtenido del campo:', clienteId);
-        }
-      }
-      
-      // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
-      if (!clienteId && window.jQuery) {
-        const select2Container = jQuery('#id_cliente').next('.select2-container');
-        if (select2Container.length) {
-          const select2Selection = select2Container.find('.select2-selection__rendered');
-          const dataId = select2Selection.attr('data-id');
-          if (dataId) {
-            clienteId = dataId;
-            console.log('ðŸ‘¤ Cliente obtenido desde data-id:', clienteId);
-          }
-        }
-      }
-      
-      // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
-      // Si empieza con /us/, usar /us/en/
-      let countryPrefix = 'cl';
-      let langPrefix = 'es';
-      
-      if (pathOnly.indexOf('/cl/') === 0) {
-        countryPrefix = 'cl';
-        langPrefix = 'es';
-      } else if (pathOnly.indexOf('/us/') === 0) {
-        countryPrefix = 'us';
-        langPrefix = 'en';
-      }
-      
-      let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
-      
-      // Agregar cliente_id si estÃ¡ seleccionado
-      if (clienteId) {
-        createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
-        console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
-      }
-      
-      console.log('ðŸš— Abriendo modal de vehÃ­culo:', createUrl);
-      window.location.href = createUrl;
-    } catch (error) {
-      console.error('âŒ Error al abrir modal de vehÃ­culo:', error);
-      alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
-    }
-  }
-
-  // Hacer funciones disponibles globalmente inmediatamente
-  window.openClienteModal = openClienteModal;
-  window.openVehiculoModal = openVehiculoModal;
-  
-  // Verificar que las funciones estÃ©n disponibles
-  console.log('âœ… Funciones de modal disponibles:', {
-    openClienteModal: typeof window.openClienteModal,
-    openVehiculoModal: typeof window.openVehiculoModal
-  });
-})();
-
-// FunciÃ³n global para manejar el click del botÃ³n de vehÃ­culo
-// Esta funciÃ³n se llama directamente desde el onclick del botÃ³n como respaldo
-function handleNuevoVehiculoClick(event) {
-  if (event) {
-    event.preventDefault();
-    event.stopPropagation();
-  }
-  
-  console.log('ðŸš— handleNuevoVehiculoClick llamado');
-  
-  try {
-    // Intentar usar openVehiculoModal si estÃ¡ disponible
-    if (window.openVehiculoModal && typeof window.openVehiculoModal === 'function') {
-      console.log('âœ… Usando openVehiculoModal desde handleNuevoVehiculoClick');
-      window.openVehiculoModal();
-      return false;
-    }
-    
-    // Fallback: construir URL manualmente
-    const pathOnly = window.location.pathname || '/cl/documentos/form/';
-    const nextUrl = window.egEncodeDocumentFormNext();
-    
-    // Obtener el cliente seleccionado
-    // IMPORTANTE: El campo cliente usa Select2/DAL, obtener el valor correctamente
-    let clienteId = null;
-    const clienteSelect = document.getElementById('id_cliente');
-    
-    console.log('ðŸ” Buscando cliente seleccionado...');
-    console.log('ðŸ” Campo cliente encontrado:', !!clienteSelect);
-    
-    if (clienteSelect) {
-      console.log('ðŸ” Valor directo del campo:', clienteSelect.value);
-      console.log('ðŸ” jQuery disponible:', !!window.jQuery);
-      
-      // Intentar obtener el valor desde Select2 si estÃ¡ inicializado
-      if (window.jQuery) {
-        const $clienteSelect = jQuery(clienteSelect);
-        console.log('ðŸ” Select2 inicializado:', $clienteSelect.hasClass('select2-hidden-accessible'));
-        
-        if ($clienteSelect.hasClass('select2-hidden-accessible')) {
-          clienteId = $clienteSelect.val();
-          console.log('âœ… Cliente obtenido desde Select2:', clienteId);
-        } else {
-          // Fallback: obtener del campo directamente
-          clienteId = clienteSelect.value || null;
-          console.log('âœ… Cliente obtenido del campo directamente:', clienteId);
-        }
-      } else {
-        // Sin jQuery, obtener del campo directamente
-        clienteId = clienteSelect.value || null;
-        console.log('âœ… Cliente obtenido del campo (sin jQuery):', clienteId);
-      }
-    }
-    
-    // Si aÃºn no hay valor, intentar desde el campo oculto de Select2
-    if (!clienteId && window.jQuery) {
-      console.log('ðŸ” Intentando obtener cliente desde Select2 rendered...');
-      const select2Container = jQuery('#id_cliente').next('.select2-container');
-      if (select2Container.length) {
-        const select2Selection = select2Container.find('.select2-selection__rendered');
-        const select2Text = select2Selection.text();
-        console.log('ðŸ” Texto en Select2:', select2Text);
-        // Intentar obtener el ID desde el atributo data
-        const dataId = select2Selection.attr('data-id');
-        if (dataId) {
-          clienteId = dataId;
-          console.log('âœ… Cliente obtenido desde data-id:', clienteId);
-        }
-      }
-    }
-    
-    console.log('ðŸ” Cliente ID final:', clienteId);
-    
-    // LÃ“GICA SIMPLE: Si el path empieza con /cl/, usar /cl/es/
-    // Si empieza con /us/, usar /us/en/
-    let countryPrefix = 'cl';
-    let langPrefix = 'es';
-    
-    if (pathOnly.indexOf('/cl/') === 0) {
-      countryPrefix = 'cl';
-      langPrefix = 'es';
-    } else if (pathOnly.indexOf('/us/') === 0) {
-      countryPrefix = 'us';
-      langPrefix = 'en';
-    }
-    
-    let createUrl = '/' + countryPrefix + '/' + langPrefix + '/vehiculos/crear/?next=' + nextUrl;
-    
-    // Agregar cliente_id si estÃ¡ seleccionado
-    if (clienteId) {
-      createUrl += '&cliente_id=' + encodeURIComponent(clienteId);
-      console.log('ðŸ‘¤ Cliente seleccionado:', clienteId);
-    }
-    
-    console.log('ðŸš— Navegando a (desde handleNuevoVehiculoClick):', createUrl);
-    window.location.href = createUrl;
-    return false;
-  } catch (error) {
-    console.error('âŒ Error en handleNuevoVehiculoClick:', error);
-    alert('Error al abrir la pÃ¡gina de crear vehÃ­culo. Por favor, intente nuevamente.');
-    return false;
-  }
-}
-
-// Hacer la funciÃ³n disponible globalmente
-window.handleNuevoVehiculoClick = handleNuevoVehiculoClick;
-
-function submitLanguageDoc(lang) {
-  document.getElementById('language-input-doc').value = lang;
-  document.getElementById('language-form-doc').submit();
-}
-</script>
-
-{# FunciÃ³n helper para encode next URL - Mantener por compatibilidad #}
+{# Función helper para encode next URL - Mantener por compatibilidad #}
 <script>
 window.egEncodeDocumentFormNext = function() {
     return encodeURIComponent(window.location.pathname + (window.location.search || ''));
 };
 
-// InicializaciÃ³n mÃ­nima para compatibilidad
+// Inicialización mínima para compatibilidad
 document.addEventListener('DOMContentLoaded', function() {
-    // Observations mÃ­nimo
+    // Observations mínimo
     const obs = document.getElementById('id_observaciones');
     if (obs) { obs.setAttribute('rows', '2'); }
     
@@ -1712,12 +1496,77 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 
-{# ❌ DESACTIVAR Document Engine - Sistema legacy #}
+{# ? DESACTIVAR Document Engine - Sistema legacy #}
 {# <script src="{% static 'js/document_engine.js' %}"></script> #}
 
 {# === SISTEMA MODULAR UNIFICADO === #}
-{# Cargar mÃ³dulos JavaScript modularizados #}
+{# Cargar módulos JavaScript modularizados #}
+<script>
+(function() {
+  'use strict';
+
+  function buildContextualCreateUrl(baseUrl, params) {
+    const url = new URL(baseUrl, window.location.origin);
+    Object.entries(params || {}).forEach(function(entry) {
+      const key = entry[0];
+      const value = entry[1];
+      if (value === undefined || value === null || value === '') {
+        return;
+      }
+      url.searchParams.set(key, value);
+    });
+    return url.toString();
+  }
+
+  function getDocumentReturnTo() {
+    return window.location.pathname + (window.location.search || '');
+  }
+
+  function getSelectedClienteId() {
+    const clienteSelect = document.getElementById('id_cliente');
+    if (!clienteSelect) {
+      return '';
+    }
+    if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
+      return jQuery(clienteSelect).val() || '';
+    }
+    return clienteSelect.value || '';
+  }
+
+  window.openClienteModal = function openClienteModal() {
+    const trigger = document.getElementById('btn-nuevo-cliente');
+    const baseUrl = trigger && trigger.dataset ? trigger.dataset.urlCrearCliente : '';
+    if (!baseUrl) {
+      return;
+    }
+    window.location.href = buildContextualCreateUrl(baseUrl, {
+      return_to: getDocumentReturnTo(),
+      select_field: 'cliente'
+    });
+  };
+
+  window.openVehiculoModal = function openVehiculoModal() {
+    const trigger = document.getElementById('btn-nuevo-vehiculo');
+    const baseUrl = trigger && trigger.dataset ? trigger.dataset.urlCrearVehiculo : '';
+    if (!baseUrl) {
+      return;
+    }
+    window.location.href = buildContextualCreateUrl(baseUrl, {
+      return_to: getDocumentReturnTo(),
+      select_field: 'vehiculo',
+      cliente_id: getSelectedClienteId()
+    });
+  };
+})();
+</script>
 <script src="{% static 'js/document-form/index.js' %}"></script>
 
 {% endblock extra_js %}
+
+
+
+
+
+
+
 

@@ -13,7 +13,7 @@ VEHICULO_DESARME_PRINCIPALES = [
     "marca",
     "modelo",
     "anio",
-    "costo_adquisicion",
+    "precio_compra",
     "fecha_ingreso_desarme",
     "estado_desarme",
     "ubicacion_fisica",
@@ -52,7 +52,7 @@ class VehiculoDesarmeForm(forms.ModelForm):
         self.empresa = kwargs.pop("empresa", None)
         super().__init__(*args, **kwargs)
         self.fields["vin"].required = False
-        self.fields["costo_adquisicion"].required = False
+        self.fields["precio_compra"].required = False
         self.fields["fecha_ingreso_desarme"].required = False
         self.fields["estado_desarme"].required = False
         self.fields["ubicacion_fisica"].required = False

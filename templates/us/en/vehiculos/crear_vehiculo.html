@@ -355,6 +355,7 @@ input:focus {
     <form method="post" id="vehicle-form">
       {% csrf_token %}
       <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
+      <input type="hidden" name="return_to" value="{% firstof return_to request.GET.return_to request.GET.next '' %}">
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
 

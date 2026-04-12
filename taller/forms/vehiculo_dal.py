@@ -32,9 +32,11 @@ class VehiculoFormDAL(forms.ModelForm):
             self.fields["caja"].queryset = CajaVehiculo.objects.none()
 
         # Prefijo país/idioma para rutas absolutas (evita reverse())
-        prefix = "/cl/es/"
-        if request and request.path.startswith("/us/"):
-            prefix = "/us/"
+        prefix = "/"
+        if request:
+            parts = request.path.strip("/").split("/")
+            if len(parts) >= 2:
+                prefix = f"/{parts[0]}/{parts[1]}/"
 
         # Cliente
         self.fields["cliente"].widget.url = None

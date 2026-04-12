@@ -34,6 +34,10 @@ from taller.models.extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehi
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.vehiculos import Vehiculo  # Modelo Vehiculo principal
+from taller.common.mixins.context_return import (
+    build_context_return_url,
+    get_safe_context_return_url,
+)
 from taller.vehiculos.forms import VehiculoForm
 
 # CBVs "shim"
@@ -368,18 +372,29 @@ def crear_vehiculo(request, *args, **kwargs):
                         request,
                         f"Vehículo {vehiculo.patente or 'sin patente'} creado exitosamente",
                     )
-                    next_url = (request.POST.get("next") or request.GET.get("next") or "").strip()
-                    if next_url:
+                    return_to = get_safe_context_return_url(
+                        request,
+                        request.POST.get("return_to")
+                        or request.GET.get("return_to")
+                        or request.POST.get("next")
+                        or request.GET.get("next")
+                        or "",
+                    )
+                    if return_to:
                         cliente_id = (
                             getattr(vehiculo, "cliente_id", None)
                             or request.POST.get("cliente")
                             or request.GET.get("cliente_id")
                             or request.GET.get("cliente")
                         )
-                        redirect_url = _append_query_params(
-                            next_url,
-                            cliente_id=cliente_id,
-                            vehiculo_id=vehiculo.id,
+                        redirect_url = build_context_return_url(
+                            return_to,
+                            {
+                                "cliente_id": cliente_id,
+                                "vehiculo_id": vehiculo.id,
+                                "created_vehiculo_id": vehiculo.id,
+                                "created_vehiculo_label": vehiculo.display_label(),
+                            },
                         )
                         return redirect(redirect_url)
                     return _safe_redirect(
@@ -426,6 +441,17 @@ def crear_vehiculo(request, *args, **kwargs):
             or ""
         )
     next_val = request.GET.get("next") or request.POST.get("next") or ""
+    return_to_val = (
+        get_safe_context_return_url(
+            request,
+            request.GET.get("return_to")
+            or request.POST.get("return_to")
+            or request.GET.get("next")
+            or request.POST.get("next")
+            or "",
+        )
+        or ""
+    )
     # Contexto para el template
     ctx = {
         "form": form,
@@ -433,6 +459,7 @@ def crear_vehiculo(request, *args, **kwargs):
         "empresa": empresa,
         "patente_detectada": request.GET.get("patente", "").strip().upper() or None,
         "next": next_val,
+        "return_to": return_to_val,
         "cliente_id": cliente_id or "",
     }
 

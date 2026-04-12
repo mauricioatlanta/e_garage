@@ -314,7 +314,7 @@ body {
                 <div class="text-2xl mb-1">{% if checklist_onboarding.cliente_creado %}✅{% else %}👥{% endif %}</div>
                 <div class="text-xs font-bold {% if checklist_onboarding.cliente_creado %}text-green-400{% else %}text-gray-400{% endif %}">Cliente</div>
                 {% if not checklist_onboarding.cliente_creado %}
-                <a href="{% url 'taller:clientes:cliente_crear' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Crear</a>
+                <a href="{% url 'taller:clientes:cliente_crear' %}?next={{ request.get_full_path }}&return_target=documento_cliente" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Crear</a>
                 {% endif %}
             </div>
             
@@ -661,3 +661,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
+

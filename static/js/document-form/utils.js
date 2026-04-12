@@ -8,6 +8,25 @@
     'use strict';
 
     const EG = window.EG = window.EG || {};
+    const ACTIVE_ROW_CONTEXT_KEY = 'eg.documentForm.activeRowContext';
+    const RETURN_CONTEXT_KEYS = [
+        'cliente_id',
+        'vehiculo_id',
+        'created_cliente_id',
+        'created_cliente_label',
+        'created_vehiculo_id',
+        'created_vehiculo_label',
+        'created_repuesto_id',
+        'created_repuesto_label',
+        'created_repuesto_nombre',
+        'created_repuesto_codigo',
+        'created_repuesto_precio_venta',
+        'created_repuesto_precio_compra',
+        'created_servicio_id',
+        'created_servicio_label',
+        'created_servicio_precio',
+        'target_row',
+    ];
 
     // ==================== CSRF & FETCH ====================
 
@@ -169,6 +188,92 @@
         };
     }
 
+    function extractResponseItems(data, preferredKeys = ['results', 'items']) {
+        if (Array.isArray(data)) return data;
+        for (const key of preferredKeys) {
+            if (Array.isArray(data?.[key])) {
+                return data[key];
+            }
+        }
+        return [];
+    }
+
+    function getDocumentReturnTo() {
+        return window.location.pathname + (window.location.search || '');
+    }
+
+    function buildContextualCreateUrl(baseUrl, params = {}) {
+        const url = new URL(baseUrl, window.location.origin);
+        Object.entries(params).forEach(([key, value]) => {
+            if (value === undefined || value === null || value === '') {
+                return;
+            }
+            url.searchParams.set(key, String(value));
+        });
+        return url.toString();
+    }
+
+    function getReturnContextParams() {
+        const search = new URLSearchParams(window.location.search || '');
+        const context = {};
+
+        RETURN_CONTEXT_KEYS.forEach((key) => {
+            const value = search.get(key);
+            if (value !== null) {
+                context[key] = value;
+            }
+        });
+
+        context.hasAny = RETURN_CONTEXT_KEYS.some((key) => search.has(key));
+        return context;
+    }
+
+    function cleanReturnContextParamsFromUrl() {
+        const url = new URL(window.location.href);
+        let changed = false;
+
+        RETURN_CONTEXT_KEYS.forEach((key) => {
+            if (url.searchParams.has(key)) {
+                url.searchParams.delete(key);
+                changed = true;
+            }
+        });
+
+        if (changed) {
+            window.history.replaceState({}, '', url.toString());
+        }
+    }
+
+    function saveActiveRowContext(type, rowId) {
+        if (!type || !rowId) return;
+        try {
+            sessionStorage.setItem(
+                ACTIVE_ROW_CONTEXT_KEY,
+                JSON.stringify({ type: String(type), rowId: String(rowId), savedAt: Date.now() })
+            );
+        } catch (err) {
+            console.warn('No se pudo guardar el contexto de fila activa', err);
+        }
+    }
+
+    function restoreActiveRowContext() {
+        try {
+            const raw = sessionStorage.getItem(ACTIVE_ROW_CONTEXT_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch (err) {
+            console.warn('No se pudo leer el contexto de fila activa', err);
+            return null;
+        }
+    }
+
+    function clearActiveRowContext() {
+        try {
+            sessionStorage.removeItem(ACTIVE_ROW_CONTEXT_KEY);
+        } catch (err) {
+            console.warn('No se pudo limpiar el contexto de fila activa', err);
+        }
+    }
+
     // ==================== INIT ====================
 
     function init() {
@@ -195,6 +300,14 @@
         setText,
         showFieldError,
         normalizeServicio,
+        extractResponseItems,
+        getDocumentReturnTo,
+        buildContextualCreateUrl,
+        getReturnContextParams,
+        cleanReturnContextParamsFromUrl,
+        saveActiveRowContext,
+        restoreActiveRowContext,
+        clearActiveRowContext,
         init
     };
 

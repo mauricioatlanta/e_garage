@@ -11,6 +11,11 @@ from django.urls import NoReverseMatch, reverse, reverse_lazy
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from core.views import TenantViewMixin
+from taller.common.mixins.context_return import (
+    ContextReturnCreateMixin,
+    build_context_return_url,
+    get_safe_context_return_url,
+)
 from taller.forms.repuesto import RepuestoForm
 from taller.mixins import CountryLangTemplateMixin
 from taller.models.repuesto import Repuesto
@@ -75,14 +80,16 @@ def _repuesto_document_cancel_url(request) -> str | None:
     URL para volver al documento cuando se abrió crear/editar con ?next=...&target_row=...
     Reaplica target_row en la query del documento para que la fila siga identificable.
     """
-    next_url = (request.GET.get("next") or "").strip()
-    if not next_url.startswith("/") or next_url.startswith("//"):
+    return_to = get_safe_context_return_url(
+        request,
+        request.GET.get("return_to") or request.GET.get("next") or "",
+    )
+    if not return_to:
         return None
     target_row = (request.GET.get("target_row") or "").strip()
     if target_row:
-        sep = "&" if "?" in next_url else "?"
-        return f"{next_url}{sep}{urlencode({'target_row': target_row})}"
-    return next_url
+        return build_context_return_url(return_to, {"target_row": target_row})
+    return return_to
 
 
 class RepuestoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView):
@@ -184,7 +191,7 @@ class RepuestoDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
     select_related_fields = ("categoria",)
 
 
-class RepuestoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
+class RepuestoCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
     model = Repuesto
     form_class = RepuestoForm
     template_name = "taller/common/repuestos/repuesto_form.html"
@@ -209,32 +216,35 @@ class RepuestoCreateView(LoginRequiredMixin, TenantViewMixin, CreateView):
             initial["part_number"] = self.request.GET.get("prefill_code")
         return initial
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        next_url = self.request.GET.get("next")
-        target_row = self.request.GET.get("target_row")
+    def get_created_object_payload(self):
+        repuesto = getattr(self, "object", None)
+        if not repuesto:
+            return {}
 
-        if next_url:
-            params = {
-                "created_repuesto_id": self.object.pk,
-                "created_repuesto_nombre": self.object.nombre or "",
-                "created_repuesto_codigo": getattr(self.object, "part_number", "") or "",
-                "created_repuesto_precio_venta": str(getattr(self.object, "precio_venta", 0) or 0),
-                "created_repuesto_precio_compra": str(
-                    getattr(self.object, "precio_compra", 0) or 0
-                ),
-            }
-            if target_row:
-                params["target_row"] = target_row
+        part_number = getattr(repuesto, "part_number", "") or ""
+        label = f"{part_number} · {repuesto.nombre}" if part_number else (repuesto.nombre or "")
 
-            sep = "&" if "?" in next_url else "?"
-            return redirect(f"{next_url}{sep}{urlencode(params)}")
+        payload = {
+            "created_repuesto_id": repuesto.pk,
+            "created_repuesto_label": label or f"Repuesto #{repuesto.pk}",
+            "created_repuesto_nombre": repuesto.nombre or "",
+            "created_repuesto_codigo": part_number,
+            "created_repuesto_precio_venta": str(getattr(repuesto, "precio_venta", 0) or 0),
+            "created_repuesto_precio_compra": str(getattr(repuesto, "precio_compra", 0) or 0),
+        }
 
-        return response
+        target_row = (
+            self.request.POST.get("target_row") or self.request.GET.get("target_row") or ""
+        ).strip()
+        if target_row:
+            payload["target_row"] = target_row
+
+        return payload
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
         ctx["repuesto_document_cancel_url"] = _repuesto_document_cancel_url(self.request)
+        ctx["return_to"] = self.get_return_to() or ""
         return ctx
 
     def get_template_names(self):

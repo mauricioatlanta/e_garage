@@ -6,6 +6,7 @@ from django.db.models import Count, Q
 from django.views.generic import CreateView, DetailView, ListView, UpdateView
 
 from core.views import TenantViewMixin
+from taller.common.mixins.context_return import ContextReturnCreateMixin
 from taller.mixins import CountryLangTemplateMixin
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
@@ -173,8 +174,14 @@ class ClienteDetailView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         return self.render_country_lang(self.request, context)
 
 
-class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
-    def get_success_url(self):
+class ClienteCreateView(
+    CountryLangTemplateMixin,
+    ContextReturnCreateMixin,
+    LoginRequiredMixin,
+    TenantViewMixin,
+    CreateView,
+):
+    def get_default_success_url(self):
         from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
         from django.urls import reverse
@@ -199,6 +206,22 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         if empresa and empresa.pais == "US":
             return reverse("usa:clientes:lista_clientes")
         return reverse("chile:clientes:lista_clientes")
+
+    def get_created_object_payload(self):
+        cliente = getattr(self, "object", None)
+        if not cliente:
+            return {}
+
+        label = str(cliente)
+        tax_id = getattr(cliente, "tax_id", "") or ""
+        if tax_id and tax_id not in label:
+            label = f"{label} · {tax_id}"
+
+        return {
+            "cliente_id": cliente.pk,
+            "created_cliente_id": cliente.pk,
+            "created_cliente_label": label,
+        }
 
     def form_valid(self, form):
         from django.db import IntegrityError
@@ -235,6 +258,12 @@ class ClienteCreateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
 
         # Pasar next para el hidden del form (flujo desde documento/form)
         context["next"] = self.request.GET.get("next") or self.request.POST.get("next") or ""
+        context["return_to"] = (
+            self.get_return_to()
+            or self.request.GET.get("return_to")
+            or self.request.POST.get("return_to")
+            or ""
+        )
 
         # Asegurar que el país esté disponible para el template
         pais = None

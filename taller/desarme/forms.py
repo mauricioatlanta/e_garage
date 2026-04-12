@@ -98,7 +98,7 @@ class VehiculoDesarmeForm(forms.ModelForm):
             "caja",
             "color",
             "tipo_carroceria",
-            "costo_adquisicion",
+            "precio_compra",
             "fecha_ingreso_desarme",
             "estado_desarme",
             "ubicacion_fisica",
@@ -211,7 +211,7 @@ class VehiculoDesarmeForm(forms.ModelForm):
                 cls = (field.widget.attrs.get("class") or "").strip()
                 field.widget.attrs["class"] = f"{cls} input-desarme".strip()
         for f in (
-            "costo_adquisicion",
+            "precio_compra",
             "fecha_ingreso_desarme",
             "estado_desarme",
             "ubicacion_fisica",

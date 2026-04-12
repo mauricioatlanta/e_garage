@@ -1,280 +1,335 @@
-/**
- * vehiculo.js - Módulo de gestión de vehículos
- * 
- * Extraído del código embebido en document_form.html
+﻿/**
+ * vehiculo.js - Modulo de gestion de vehiculos
  */
 
 (function() {
     'use strict';
 
-    const EG = window.EG = window.EG || {};
+    var EG = window.EG = window.EG || {};
+    var elements = {};
 
-    // Elementos del DOM
-    let vehiculoSelect;
-    let vehiculoInfoBox;
-    let marcaModeloEl;
-    let anoVinEl;
-    let mileageEl;
-    let ultimaEntradaEl;
-
-    /**
-     * Obtiene referencias a elementos del DOM
-     */
     function getElements() {
-        if (!vehiculoSelect) {
-            vehiculoSelect = document.getElementById('id_vehiculo');
+        if (!elements.vehiculoSelect) {
+            elements.vehiculoSelect = document.getElementById('id_vehiculo');
         }
-        if (!vehiculoInfoBox) {
-            vehiculoInfoBox = document.getElementById('vehiculo-info');
+        if (!elements.vehiculoInfoBox) {
+            elements.vehiculoInfoBox = document.getElementById('vehiculo-info');
         }
-        if (!marcaModeloEl) {
-            marcaModeloEl = document.getElementById('vehiculo-marca-modelo');
+        if (!elements.marcaModeloEl) {
+            elements.marcaModeloEl = document.getElementById('vehiculo-marca-modelo');
         }
-        if (!anoVinEl) {
-            anoVinEl = document.getElementById('vehiculo-ano-vin');
+        if (!elements.anoVinEl) {
+            elements.anoVinEl = document.getElementById('vehiculo-ano-vin');
         }
-        if (!mileageEl) {
-            mileageEl = document.getElementById('vehiculo-mileage');
+        if (!elements.mileageEl) {
+            elements.mileageEl = document.getElementById('vehiculo-mileage');
         }
-        if (!ultimaEntradaEl) {
-            ultimaEntradaEl = document.getElementById('vehiculo-ultima-entrada');
+        if (!elements.ultimaEntradaEl) {
+            elements.ultimaEntradaEl = document.getElementById('vehiculo-ultima-entrada');
         }
-        return { vehiculoSelect, vehiculoInfoBox, marcaModeloEl, anoVinEl, mileageEl, ultimaEntradaEl };
+        return elements;
     }
 
-    /**
-     * Carga vehículos por cliente (desde prefetch o AJAX)
-     */
-    async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect = null) {
-        const els = getElements();
+    function normalizeVehicleItem(item) {
+        var vehicle = item || {};
+        var id = vehicle.id || vehicle.pk || '';
+        var patente = vehicle.patente || vehicle.placa || vehicle.plate || '';
+        var marca = vehicle.marca || vehicle.brand || vehicle.make || '';
+        var modelo = vehicle.modelo || vehicle.model || '';
+        var anio = vehicle.anio || vehicle.year || '';
+        var vin = vehicle.vin || vehicle.chassis || '';
+        var label = vehicle.text
+            || vehicle.label
+            || vehicle.display_label
+            || [patente, marca, modelo].filter(Boolean).join(' - ')
+            || ('Vehiculo #' + id);
+
+        return {
+            id: id ? String(id) : '',
+            label: label,
+            patente: patente,
+            marca: marca,
+            modelo: modelo,
+            anio: anio,
+            vin: vin,
+            mileage: vehicle.kilometraje || vehicle.mileage || '',
+            meta: vehicle.meta || vehicle.ultima_entrada || vehicle.last_visit || '',
+        };
+    }
+
+    function extractVehicleItems(data) {
+        var items = EG.utils.extractResponseItems(data, ['results', 'items', 'vehiculos']);
+        if (!items.length && Array.isArray(data)) {
+            items = data;
+        }
+        return items;
+    }
+
+    function ensureVehicleOption(id, label, rawItem) {
+        var els = getElements();
+        if (!els.vehiculoSelect || !id) {
+            return null;
+        }
+
+        var item = normalizeVehicleItem(rawItem || { id: id, label: label });
+        item.label = label || item.label;
+
+        var option = els.vehiculoSelect.querySelector('option[value="' + id + '"]');
+        if (!option) {
+            option = new Option(item.label || ('Vehiculo #' + id), id, false, false);
+            els.vehiculoSelect.appendChild(option);
+        } else if (item.label) {
+            option.textContent = item.label;
+        }
+
+        option.dataset.label = item.label || '';
+        option.dataset.patente = item.patente || '';
+        option.dataset.marca = item.marca || '';
+        option.dataset.modelo = item.modelo || '';
+        option.dataset.anio = item.anio || '';
+        option.dataset.vin = item.vin || '';
+        option.dataset.mileage = item.mileage || '';
+        option.dataset.meta = item.meta || '';
+        return option;
+    }
+
+    function setVehicleOptions(items, selectedId, preferredLabel) {
+        var els = getElements();
         if (!els.vehiculoSelect) {
-            console.warn('⚠️ Elemento #id_vehiculo no encontrado');
             return;
         }
 
-        if (!clienteId) {
-            console.warn('⚠️ No se proporcionó clienteId');
-            els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.select_vehicle}</option>`;
+        els.vehiculoSelect.innerHTML = '';
+        els.vehiculoSelect.appendChild(new Option(EG.I18N.select_vehicle || 'Select vehicle...', '', false, false));
+
+        (items || []).forEach(function(item) {
+            var normalized = normalizeVehicleItem(item);
+            ensureVehicleOption(normalized.id, normalized.label, normalized);
+        });
+
+        if (selectedId) {
+            ensureVehicleOption(selectedId, preferredLabel || '', { id: selectedId, label: preferredLabel || '' });
+            els.vehiculoSelect.value = String(selectedId);
+        } else {
+            els.vehiculoSelect.value = '';
+        }
+    }
+
+    function resetSelection() {
+        var els = getElements();
+        if (els.vehiculoSelect) {
+            els.vehiculoSelect.innerHTML = '';
+            els.vehiculoSelect.appendChild(new Option(EG.I18N.select_vehicle || 'Select vehicle...', '', false, false));
+            els.vehiculoSelect.value = '';
+            els.vehiculoSelect.dataset.source = 'clean';
+            els.vehiculoSelect.disabled = false;
+        }
+        if (els.marcaModeloEl) els.marcaModeloEl.textContent = '';
+        if (els.anoVinEl) els.anoVinEl.textContent = '';
+        if (els.mileageEl) els.mileageEl.textContent = '';
+        if (els.ultimaEntradaEl) els.ultimaEntradaEl.textContent = '';
+        if (els.vehiculoInfoBox) els.vehiculoInfoBox.classList.add('hidden');
+    }
+
+    function updateVehiculoCard(source) {
+        var els = getElements();
+        if (!els.vehiculoInfoBox || !els.vehiculoSelect) {
             return;
         }
 
-        console.log(`🚗 Cargando vehículos para cliente ID: ${clienteId}${vehiculoIdToSelect ? ` (preseleccionar: ${vehiculoIdToSelect})` : ''}`);
-
-        // Verificar si ya tiene opciones del formulario
-        const alreadyHasOptions = els.vehiculoSelect.options && els.vehiculoSelect.options.length > 1;
-        if (alreadyHasOptions && els.vehiculoSelect.dataset.source === 'form') {
-            console.log('ℹ️ Ya tiene opciones desde el formulario, omitiendo carga');
-            if (vehiculoIdToSelect) {
-                setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
+        var item = null;
+        if (source && typeof source === 'object' && source.id) {
+            item = normalizeVehicleItem(source);
+        } else {
+            var option = els.vehiculoSelect.options[els.vehiculoSelect.selectedIndex];
+            if (!option || !option.value) {
+                els.vehiculoInfoBox.classList.add('hidden');
+                return;
             }
+            item = normalizeVehicleItem({
+                id: option.value,
+                label: option.dataset.label || option.textContent,
+                patente: option.dataset.patente,
+                marca: option.dataset.marca,
+                modelo: option.dataset.modelo,
+                anio: option.dataset.anio,
+                vin: option.dataset.vin,
+                mileage: option.dataset.mileage,
+                meta: option.dataset.meta,
+            });
+        }
+
+        if (!item || !item.id) {
+            els.vehiculoInfoBox.classList.add('hidden');
+            return;
+        }
+
+        if (els.marcaModeloEl) {
+            els.marcaModeloEl.textContent = item.label || [item.patente, item.marca, item.modelo].filter(Boolean).join(' - ');
+        }
+        if (els.anoVinEl) {
+            els.anoVinEl.textContent = [item.anio, item.vin].filter(Boolean).join(' | ');
+        }
+        if (els.mileageEl) {
+            els.mileageEl.textContent = item.mileage || '';
+        }
+        if (els.ultimaEntradaEl) {
+            els.ultimaEntradaEl.textContent = item.meta || '';
+        }
+        els.vehiculoInfoBox.classList.remove('hidden');
+
+        document.dispatchEvent(new CustomEvent('vehiculo:seleccionado', {
+            detail: {
+                id: item.id,
+                text: item.label || '',
+                patente: item.patente || '',
+                marca: item.marca || '',
+                modelo: item.modelo || '',
+            }
+        }));
+    }
+
+    async function cargarVehiculosPorCliente(clienteId, vehiculoIdToSelect, preferredLabel) {
+        var els = getElements();
+        if (!els.vehiculoSelect) {
+            return;
+        }
+
+        var normalizedClienteId = String(clienteId || '').trim();
+        if (!normalizedClienteId) {
+            resetSelection();
             return;
         }
 
         els.vehiculoSelect.disabled = true;
-        els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.loading_vehicles || 'Cargando vehículos...'}</option>`;
+        els.vehiculoSelect.innerHTML = '<option value="">' + (EG.I18N.loading_vehicles || 'Loading vehicles...') + '</option>';
 
-        // Intentar primero con prefetch local
-        const localMatches = (EG.PREFETCH?.vehiculos || []).filter(
-            (v) => String(v.cliente_id) === String(clienteId)
-        );
-        if (localMatches.length) {
-            console.log(`✅ Encontrados ${localMatches.length} vehículos en prefetch`);
-            const options = localMatches.map((v) =>
-                `<option value="${v.id}">${v.label || v.text || ''}</option>`
-            ).join('');
-            els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.select_vehicle}</option>${options}`;
-            els.vehiculoSelect.dataset.source = 'prefetch';
-            els.vehiculoSelect.disabled = false;
-            if (vehiculoIdToSelect) {
-                setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
-            }
-            return;
-        }
-
-        // Si no hay en prefetch, hacer petición AJAX
         try {
-            const urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/ajax/vehiculos-por-cliente/';
-            const url = EG.config.buildEndpoint(urlRaw);
-            const fullUrl = `${url}?cliente_id=${encodeURIComponent(clienteId)}`;
+            var localMatches = ((EG.PREFETCH && EG.PREFETCH.vehiculos) || []).filter(function(item) {
+                return String(item && item.cliente_id) === normalizedClienteId;
+            });
 
-            console.log(`📡 Llamando a: ${fullUrl}`);
-            const r = await EG.utils.egFetch(fullUrl);
-
-            if (!r.ok) {
-                const errorText = await r.text();
-                console.error(`❌ HTTP ${r.status}:`, errorText);
-                throw new Error(`HTTP ${r.status}: ${errorText}`);
+            if (localMatches.length) {
+                setVehicleOptions(localMatches, vehiculoIdToSelect, preferredLabel);
+                els.vehiculoSelect.dataset.source = 'prefetch';
+                els.vehiculoSelect.disabled = false;
+                if (vehiculoIdToSelect) {
+                    preseleccionarVehiculo(vehiculoIdToSelect, preferredLabel);
+                }
+                return;
             }
 
-            const data = await r.json();
-            console.log('📦 Respuesta recibida:', data);
+            var urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/ajax/vehiculos-por-cliente/';
+            var url = EG.config.buildEndpoint(urlRaw);
+            var response = await EG.utils.egFetch(url + '?cliente_id=' + encodeURIComponent(normalizedClienteId));
+            if (!response.ok) {
+                throw new Error('HTTP ' + response.status);
+            }
 
-            const items = Array.isArray(data) ? data : (data.results || data.items || []);
-            console.log(`📋 Procesando ${items.length} vehículos`);
-
+            var data = await response.json();
+            var items = extractVehicleItems(data);
             if (!items.length) {
-                console.log('ℹ️ No se encontraron vehículos');
-                els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.no_vehicles}</option>`;
+                setVehicleOptions([], '', '');
+                els.vehiculoSelect.options[0].textContent = EG.I18N.no_vehicles || 'No vehicles registered';
                 els.vehiculoSelect.dataset.source = 'empty';
-            } else {
-                const options = items.map((v) => {
-                    const id = v.id ?? v.pk;
-                    const label = v.text || v.label || v.patente || `Vehicle #${id}`;
-                    return `<option value="${id}">${label}</option>`;
-                }).join('');
-                els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.select_vehicle}</option>${options}`;
-                els.vehiculoSelect.dataset.source = 'fetch';
-                console.log(`✅ ${items.length} vehículos cargados exitosamente`);
+                return;
+            }
 
-                if (vehiculoIdToSelect) {
-                    setTimeout(() => preseleccionarVehiculo(vehiculoIdToSelect), 100);
-                }
+            setVehicleOptions(items, vehiculoIdToSelect, preferredLabel);
+            els.vehiculoSelect.dataset.source = 'fetch';
+            if (vehiculoIdToSelect) {
+                preseleccionarVehiculo(vehiculoIdToSelect, preferredLabel);
             }
         } catch (err) {
-            console.error('❌ Error cargando vehículos:', err);
-            els.vehiculoSelect.innerHTML = `<option value="">${EG.I18N.error_loading_vehicles}</option>`;
+            console.error('cargarVehiculosPorCliente', err);
+            els.vehiculoSelect.innerHTML = '<option value="">' + (EG.I18N.error_loading_vehicles || 'Error loading vehicles') + '</option>';
             els.vehiculoSelect.dataset.source = 'error';
         } finally {
             els.vehiculoSelect.disabled = false;
         }
     }
 
-    /**
-     * Preselecciona un vehículo por ID
-     */
-    function preseleccionarVehiculo(vehiculoId) {
-        const els = getElements();
-        if (!els.vehiculoSelect) {
-            console.warn('⚠️ Elemento #id_vehiculo no encontrado para preselección');
+    function preseleccionarVehiculo(vehiculoId, label) {
+        var els = getElements();
+        if (!els.vehiculoSelect || !vehiculoId) {
             return;
         }
 
-        const vehiculoIdStr = String(vehiculoId);
-        console.log(`🎯 Intentando preseleccionar vehículo ID: ${vehiculoIdStr}`);
-
-        const option = Array.from(els.vehiculoSelect.options).find(
-            (opt) => String(opt.value) === vehiculoIdStr
-        );
-
-        if (option) {
-            els.vehiculoSelect.value = vehiculoIdStr;
-            els.vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-            console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado exitosamente`);
-        } else {
-            console.warn(`⚠️ Vehículo ${vehiculoIdStr} no encontrado en las opciones`);
-            setTimeout(() => {
-                const retryOption = Array.from(els.vehiculoSelect.options).find(
-                    (opt) => String(opt.value) === vehiculoIdStr
-                );
-                if (retryOption) {
-                    els.vehiculoSelect.value = vehiculoIdStr;
-                    els.vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
-                    console.log(`✅ Vehículo ${vehiculoIdStr} preseleccionado en reintento`);
-                } else {
-                    console.error(`❌ No se pudo preseleccionar vehículo ${vehiculoIdStr}`);
-                }
-            }, 500);
-        }
+        ensureVehicleOption(String(vehiculoId), label || '', { id: vehiculoId, label: label || '' });
+        els.vehiculoSelect.value = String(vehiculoId);
+        els.vehiculoSelect.dispatchEvent(new Event('change', { bubbles: true }));
     }
 
-    /**
-     * Actualiza la tarjeta de información del vehículo
-     */
-    function updateVehiculoCard() {
-        const els = getElements();
-        if (!els.vehiculoInfoBox || !els.vehiculoSelect) return;
-
-        const opt = els.vehiculoSelect.options[els.vehiculoSelect.selectedIndex];
-        const text = opt ? opt.textContent.trim() : '';
-
-        if (!els.vehiculoSelect.value || !text) {
-            els.vehiculoInfoBox.classList.add('hidden');
-            return;
-        }
-
-        if (els.marcaModeloEl) els.marcaModeloEl.textContent = text;
-        if (els.anoVinEl) els.anoVinEl.textContent = '';
-        if (els.mileageEl) els.mileageEl.textContent = '';
-        if (els.ultimaEntradaEl) els.ultimaEntradaEl.textContent = '';
-        els.vehiculoInfoBox.classList.remove('hidden');
-
-        // Emitir evento
-        document.dispatchEvent(new CustomEvent('vehiculo:seleccionado', {
-            detail: { id: els.vehiculoSelect.value, text }
-        }));
+    function getSelectedVehiculoId() {
+        var els = getElements();
+        return els.vehiculoSelect ? (els.vehiculoSelect.value || '') : '';
     }
 
-    /**
-     * Abre modal para crear nuevo vehículo
-     */
     function openVehiculoModal() {
-        try {
-            const pathOnly = window.location.pathname || '/cl/documentos/form/';
-            const nextUrl = window.egEncodeDocumentFormNext?.() || encodeURIComponent(pathOnly);
-
-            let countryPrefix = 'cl';
-            let langPrefix = 'es';
-
-            if (pathOnly.indexOf('/cl/') === 0) {
-                countryPrefix = 'cl';
-                langPrefix = 'es';
-            } else if (pathOnly.indexOf('/us/') === 0) {
-                countryPrefix = 'us';
-                langPrefix = 'en';
-            }
-
-            // Obtener cliente seleccionado
-            let clienteId = '';
-            const clienteSelect = document.getElementById('id_cliente');
-            if (clienteSelect) {
-                if (window.jQuery && jQuery(clienteSelect).hasClass('select2-hidden-accessible')) {
-                    clienteId = jQuery(clienteSelect).val() || '';
-                } else {
-                    clienteId = clienteSelect.value || '';
-                }
-            }
-
-            let createUrl = `/${countryPrefix}/${langPrefix}/vehiculos/crear/?next=${nextUrl}`;
-            if (clienteId) {
-                createUrl += `&cliente_id=${encodeURIComponent(clienteId)}`;
-            }
-
-            console.log('🚗 Abriendo modal de vehículo:', createUrl);
-            window.location.href = createUrl;
-        } catch (error) {
-            console.error('❌ Error al abrir modal de vehículo:', error);
-            alert('Error al abrir la página de crear vehículo.');
+        var trigger = document.getElementById('btn-nuevo-vehiculo');
+        var baseUrl = trigger && trigger.dataset ? trigger.dataset.urlCrearVehiculo : '';
+        if (!baseUrl || !EG.utils || !EG.utils.buildContextualCreateUrl) {
+            return;
         }
+
+        var clienteId = EG.cliente && EG.cliente.getSelectedClienteId ? EG.cliente.getSelectedClienteId() : '';
+        var url = EG.utils.buildContextualCreateUrl(baseUrl, {
+            return_to: EG.utils.getDocumentReturnTo(),
+            select_field: 'vehiculo',
+            cliente_id: clienteId || '',
+        });
+        window.location.href = url;
     }
 
-    /**
-     * Inicializar eventos
-     */
+    async function handleCreatedVehiculoFromReturn(context) {
+        var vehiculoId = context.created_vehiculo_id || context.vehiculo_id || '';
+        if (!vehiculoId) {
+            return;
+        }
+
+        var clienteId = context.cliente_id || (EG.cliente && EG.cliente.getSelectedClienteId ? EG.cliente.getSelectedClienteId() : '');
+        var label = context.created_vehiculo_label || '';
+
+        if (clienteId) {
+            await cargarVehiculosPorCliente(clienteId, vehiculoId, label);
+        }
+
+        preseleccionarVehiculo(vehiculoId, label);
+    }
+
     function init() {
-        const els = getElements();
-
-        // Evento change en select de vehículo
-        els.vehiculoSelect?.addEventListener('change', updateVehiculoCard);
-
-        // Actualizar tarjeta inicialmente
-        updateVehiculoCard();
-
-        // Botón nuevo vehículo
-        const btnNuevoVehiculo = document.getElementById('btn-nuevo-vehiculo');
-        if (btnNuevoVehiculo) {
-            btnNuevoVehiculo.addEventListener('click', openVehiculoModal);
+        var els = getElements();
+        if (!els.vehiculoSelect || els.vehiculoSelect.dataset.egBound) {
+            return;
         }
 
-        console.log('🚗 Vehiculo module initialized');
+        els.vehiculoSelect.dataset.egBound = '1';
+        els.vehiculoSelect.addEventListener('change', function() {
+            updateVehiculoCard();
+        });
+
+        var btnNuevoVehiculo = document.getElementById('btn-nuevo-vehiculo');
+        if (btnNuevoVehiculo && !btnNuevoVehiculo.dataset.egBound) {
+            btnNuevoVehiculo.dataset.egBound = '1';
+            btnNuevoVehiculo.addEventListener('click', function(event) {
+                event.preventDefault();
+                openVehiculoModal();
+            });
+        }
+
+        if (els.vehiculoSelect.value) {
+            updateVehiculoCard();
+        }
     }
 
-    // Exports
     EG.vehiculo = {
-        cargarVehiculosPorCliente,
-        preseleccionarVehiculo,
-        updateVehiculoCard,
-        openVehiculoModal,
-        init
+        cargarVehiculosPorCliente: cargarVehiculosPorCliente,
+        resetSelection: resetSelection,
+        preseleccionarVehiculo: preseleccionarVehiculo,
+        updateVehiculoCard: updateVehiculoCard,
+        getSelectedVehiculoId: getSelectedVehiculoId,
+        openVehiculoModal: openVehiculoModal,
+        handleCreatedVehiculoFromReturn: handleCreatedVehiculoFromReturn,
+        init: init
     };
-
 })();

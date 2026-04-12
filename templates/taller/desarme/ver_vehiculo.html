@@ -127,7 +127,7 @@
     <div><span class="text-slate-400">{% trans "Estado" %}:</span> <span class="text-white">{{ vehiculo.estado_desarme|default:"—" }}</span></div>
     <div><span class="text-slate-400">{% trans "Ubicación" %}:</span> <span class="text-white">{{ vehiculo.ubicacion_fisica|default:"—" }}</span></div>
     <div><span class="text-slate-400">{% trans "Ingreso" %}:</span> <span class="text-white">{{ vehiculo.fecha_ingreso_desarme|default:"—" }}</span></div>
-    <div><span class="text-slate-400">{% trans "Costo adq." %}:</span> <span class="text-white">{{ vehiculo.costo_adquisicion|default:"—" }}</span></div>
+    <div><span class="text-slate-400">{% trans "Costo adq." %}:</span> <span class="text-white">{{ vehiculo.precio_compra|default:"—" }}</span></div>
   </div>
   {% if vehiculo.observaciones_desarme %}
   <p class="mt-4 text-slate-400 text-sm border-t border-cyan-400/10 pt-4">{{ vehiculo.observaciones_desarme }}</p>

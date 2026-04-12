@@ -74,7 +74,7 @@ class Migration(migrations.Migration):
         migrations.RunSQL(
             sql="""
             CREATE TABLE IF NOT EXISTS taller_registroembudosuscriptor (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                id INTEGER PRIMARY KEY ,
                 pais VARCHAR(5) NOT NULL,
                 fecha_registro DATETIME NOT NULL,
                 email_confirmado_at DATETIME NULL,

@@ -27,7 +27,7 @@
                     {% endif %}
                 </p>
             </div>
-            <a href="{% country_url 'servicios:servicios_menu' %}" 
+            <a href="{% if return_to %}{{ return_to }}{% else %}{% country_url 'servicios:servicios_menu' %}{% endif %}" 
                class="space-button bg-gray-600/20 border-gray-500/40 space-text">
                 {% if language == 'en' %}← Back{% else %}← Volver{% endif %}
             </a>
@@ -39,6 +39,8 @@
         <div class="space-card p-6">
             <form method="post" class="space-y-6">
                 {% csrf_token %}
+                <input type="hidden" name="return_to" value="{% firstof return_to request.GET.return_to request.GET.next '' %}">
+                <input type="hidden" name="target_row" value="{% firstof request.GET.target_row request.POST.target_row '' %}">
                 
                 {% if form.non_field_errors %}
                 <div class="bg-red-900/20 border border-red-500/40 rounded-lg p-4 mb-4">
@@ -154,34 +156,33 @@
                     </p>
                 </div>
 
-                <!-- Service Type -->
+                <!-- Base Price -->
                 <div class="space-y-2">
-                    <label for="{{ form.tipo.id_for_label }}" class="block text-cyan-400 font-semibold">
+                    <label for="{{ form.precio_base.id_for_label }}" class="block text-cyan-400 font-semibold">
                         {% if language == 'en' %}
-                            Service Type
+                            Base Price
                         {% else %}
-                            Tipo de Servicio
+                            Precio Base
                         {% endif %}
                     </label>
-                    <select name="{{ form.tipo.name }}" 
-                            id="{{ form.tipo.id_for_label }}"
-                            class="space-input w-full {% if form.tipo.errors %}border-red-500{% endif %}">
-                        {% for value, label in form.tipo.field.choices %}
-                        <option value="{{ value }}" {% if form.tipo.value == value %}selected{% endif %}>
-                            {{ label }}
-                        </option>
-                        {% endfor %}
-                    </select>
-                    {% if form.tipo.errors %}
+                    <input type="number"
+                           step="0.01"
+                           min="0"
+                           name="{{ form.precio_base.name }}"
+                           id="{{ form.precio_base.id_for_label }}"
+                           value="{{ form.precio_base.value|default:'' }}"
+                           class="space-input w-full {% if form.precio_base.errors %}border-red-500{% endif %}"
+                           placeholder="{% if language == 'en' %}Optional{% else %}Opcional{% endif %}">
+                    {% if form.precio_base.errors %}
                     <div class="text-red-400 text-sm mt-1">
-                        {{ form.tipo.errors.0 }}
+                        {{ form.precio_base.errors.0 }}
                     </div>
                     {% endif %}
                 </div>
 
                 <!-- Submit Buttons -->
                 <div class="flex items-center justify-end gap-4 pt-4 border-t border-cyan-400/20">
-                    <a href="{% country_url 'servicios:servicios_menu' %}" 
+                    <a href="{% if return_to %}{{ return_to }}{% else %}{% country_url 'servicios:servicios_menu' %}{% endif %}" 
                        class="space-button bg-gray-600/20 border-gray-500/40 space-text">
                         {% if language == 'en' %}Cancel{% else %}Cancelar{% endif %}
                     </a>
@@ -219,4 +220,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
-

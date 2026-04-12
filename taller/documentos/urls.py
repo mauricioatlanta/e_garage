@@ -8,7 +8,7 @@ from . import views_pdf  # ✅ Vistas de PDF y WhatsApp
 from . import views_export_sii  # ✅ Vistas de exportación SII
 from .redirect_views import redirect_documento_crear, redirect_documento_editar
 from .views_cbv import DocumentoDetailView
-from .views_migrated import DocumentoCreateView, DocumentoDeleteView
+from .views_migrated import DocumentoCreateView, DocumentoDeleteView, DocumentoDuplicateView
 from .views_migrated import DocumentoDetailView as MigratedDetailView
 from .views_migrated import DocumentoListView
 from .views_migrated import DocumentoUpdateView as MigratedUpdateView
@@ -43,6 +43,7 @@ urlpatterns = [
     path("", DocumentoListView.as_view(), name="lista_documentos"),
     # Pantalla unificada - VISTAS MIGRADAS CON TEMPLATE RESOLUTION
     path("form/", DocumentoCreateView.as_view(), name="documento_crear"),
+    path("duplicar/<int:pk>/", DocumentoDuplicateView.as_view(), name="documento_duplicar"),
     path("form/<int:pk>/", MigratedUpdateView.as_view(), name="documento_editar"),
     # Alias adicional para editar (compatibilidad con URL esperada)
     path("editar/<int:pk>/", MigratedUpdateView.as_view(), name="documento_editar_alias"),

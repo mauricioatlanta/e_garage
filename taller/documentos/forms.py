@@ -270,3 +270,9 @@ class DocumentoForm(forms.ModelForm):
 
 
 # LineaDocumentoForm removed - using formsets instead
+
+from taller.forms.documento_form import DocumentoForm as CanonicalDocumentoForm
+
+DocumentoForm = CanonicalDocumentoForm
+
+__all__ = ["DocumentoForm"]

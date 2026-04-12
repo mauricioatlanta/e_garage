@@ -1,21 +1,16 @@
-/**
- * borrador.js - Módulo de auto-guardado y restauración de borradores
- * 
- * Extraído del código embebido en document_form.html
+﻿/**
+ * borrador.js - Modulo de auto-guardado y restauracion de borradores
  */
 
 (function() {
     'use strict';
 
-    const EG = window.EG = window.EG || {};
+    var EG = window.EG = window.EG || {};
 
-    var DOC_DRAFT_VERSION = 1;
-    var DOC_DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 días
-    var __docDraftSaveTimer = null;
+    var DOC_DRAFT_VERSION = 2;
+    var DOC_DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+    var docDraftSaveTimer = null;
 
-    /**
-     * Genera clave única para el borrador
-     */
     function getDocumentFormDraftKey() {
         var form = document.getElementById('document-form');
         if (!form) return null;
@@ -25,9 +20,6 @@
         return 'doc_draft_v' + DOC_DRAFT_VERSION + ':' + path + ':' + mode + ':' + docId;
     }
 
-    /**
-     * Muestra indicador de guardado
-     */
     function showDraftSavedIndicator() {
         var el = document.getElementById('draft-indicator');
         if (!el) return;
@@ -38,14 +30,15 @@
         }, 1600);
     }
 
-    /**
-     * Recolecta datos del formulario para el borrador
-     */
+    function collectRows(selector, mapper) {
+        return Array.from(document.querySelectorAll(selector)).map(mapper);
+    }
+
     function collectDocumentDraftPayload() {
         var form = document.getElementById('document-form');
         if (!form || window.__DOC_DRAFT_RESTORING__) return null;
 
-        var rep = Array.from(document.querySelectorAll('#repuestos-container .dynamic-element')).map(function(row) {
+        var repuestos = collectRows('#repuestos-container .dynamic-element', function(row) {
             return {
                 rowId: row.dataset.rowId || '',
                 id: (row.querySelector('.rep-id') && row.querySelector('.rep-id').value || '').trim(),
@@ -61,16 +54,18 @@
             };
         });
 
-        var serv = Array.from(document.querySelectorAll('#servicios-container .dynamic-element')).map(function(row) {
+        var servicios = collectRows('#servicios-container .dynamic-element', function(row) {
             return {
+                rowId: row.dataset.rowId || '',
                 servicio_id: (row.querySelector('.srv-id') && row.querySelector('.srv-id').value || '').trim(),
                 nombre: (row.querySelector('.srv-input') && row.querySelector('.srv-input').value || '').trim(),
                 precio: EG.utils.parseNumericInput(row.querySelector('.serv-precio') && row.querySelector('.serv-precio').value || 0)
             };
         });
 
-        var otros = Array.from(document.querySelectorAll('#otros-container .dynamic-element')).map(function(row) {
+        var otros = collectRows('#otros-container .dynamic-element', function(row) {
             return {
+                rowId: row.dataset.rowId || '',
                 servicio_id: (row.querySelector('.otr-servicio-id') && row.querySelector('.otr-servicio-id').value || '').trim(),
                 nombre: (row.querySelector('.otr-search') && row.querySelector('.otr-search').value || '').trim(),
                 empresa_ext: (row.querySelector('.otr-empresa') && row.querySelector('.otr-empresa').value || '').trim(),
@@ -83,7 +78,7 @@
         var cliEmail = document.getElementById('cliente-email');
         var cliFono = document.getElementById('cliente-telefono');
 
-        var draft = {
+        return {
             v: DOC_DRAFT_VERSION,
             savedAt: Date.now(),
             path: (window.location.pathname || '').replace(/\/$/, '') || '/',
@@ -107,19 +102,15 @@
             }),
             cliente_id: (document.getElementById('id_cliente') && document.getElementById('id_cliente').value) || '',
             cliente_nombre: (document.getElementById('cliente-busqueda') && document.getElementById('cliente-busqueda').value) || '',
-            cliente_email: (cliEmail && cliEmail.textContent || '').replace(/^📧\s*/, '').trim().replace(/^—$/, ''),
-            cliente_telefono: (cliFono && cliFono.textContent || '').replace(/^📞\s*/, '').trim().replace(/^—$/, ''),
+            cliente_email: (cliEmail && cliEmail.textContent || '').replace(/^Email:\s*/, '').trim().replace(/^[-—]$/, ''),
+            cliente_telefono: (cliFono && cliFono.textContent || '').replace(/^Tel:\s*/, '').trim().replace(/^[-—]$/, ''),
             vehiculo_id: (document.getElementById('id_vehiculo') && document.getElementById('id_vehiculo').value) || '',
-            repuestos: rep,
-            servicios: serv,
+            repuestos: repuestos,
+            servicios: servicios,
             otros: otros
         };
-        return draft;
     }
 
-    /**
-     * Guarda borrador inmediatamente
-     */
     function saveDocumentDraftNow() {
         var key = getDocumentFormDraftKey();
         if (!key) return;
@@ -128,23 +119,17 @@
             if (!payload) return;
             localStorage.setItem(key, JSON.stringify(payload));
             showDraftSavedIndicator();
-        } catch (e) {
-            console.warn('doc draft save failed', e);
+        } catch (err) {
+            console.warn('doc draft save failed', err);
         }
     }
 
-    /**
-     * Programa guardado de borrador (debounced)
-     */
     function scheduleDocumentDraftSave() {
         if (window.__DOC_DRAFT_RESTORING__) return;
-        clearTimeout(__docDraftSaveTimer);
-        __docDraftSaveTimer = setTimeout(saveDocumentDraftNow, 480);
+        clearTimeout(docDraftSaveTimer);
+        docDraftSaveTimer = setTimeout(saveDocumentDraftNow, 480);
     }
 
-    /**
-     * Carga borrador desde localStorage
-     */
     function loadDocumentDraftParsed() {
         var key = getDocumentFormDraftKey();
         if (!key) return null;
@@ -165,38 +150,40 @@
             if (did && !data.documentId) return null;
             if (!did && data.documentId) return null;
             return data;
-        } catch (e) {
-            console.warn('doc draft load failed', e);
+        } catch (err) {
+            console.warn('doc draft load failed', err);
             return null;
         }
     }
 
-    /**
-     * Limpia las filas dinámicas
-     */
     function clearDynamicPosRows() {
         document.querySelectorAll('#repuestos-container .dynamic-element').forEach(function(el) { el.remove(); });
         document.querySelectorAll('#servicios-container .dynamic-element').forEach(function(el) { el.remove(); });
         document.querySelectorAll('#otros-container .dynamic-element').forEach(function(el) { el.remove(); });
-        var hint = document.getElementById('servicios-empty-hint');
-        if (hint) hint.classList.remove('hidden');
+        ['servicios-empty-hint', 'otros-empty-hint'].forEach(function(id) {
+            var hint = document.getElementById(id);
+            if (hint) hint.classList.remove('hidden');
+        });
     }
 
-    /**
-     * Limpia borrador del storage
-     */
     function clearDocumentFormDraftStorage() {
         var key = getDocumentFormDraftKey();
-        if (key) {
-            try {
-                localStorage.removeItem(key);
-            } catch (e) { /* ignore */ }
+        if (!key) return;
+        try {
+            localStorage.removeItem(key);
+        } catch (err) {
+            console.warn('doc draft clear failed', err);
         }
     }
 
-    /**
-     * Restaura borrador después de hidratar
-     */
+    function hasReturnContext(urlParams) {
+        if (window.EG && window.EG.utils && window.EG.utils.getReturnContextParams) {
+            return !!window.EG.utils.getReturnContextParams().hasAny;
+        }
+        var keys = ['cliente_id', 'vehiculo_id', 'created_cliente_id', 'created_vehiculo_id', 'created_repuesto_id', 'created_servicio_id'];
+        return keys.some(function(key) { return urlParams.has(key); });
+    }
+
     async function restoreDocumentDraftAfterHydrate(opts) {
         var hasServerLines = !!(opts && opts.hasServerLines);
         var draft = loadDocumentDraftParsed();
@@ -204,11 +191,10 @@
 
         window.__DOC_DRAFT_RESTORING__ = true;
         try {
-            var draftHasLines = ((draft.repuestos && draft.repuestos.length) || 0) > 0 ||
-                ((draft.servicios && draft.servicios.length) || 0) > 0 ||
-                ((draft.otros && draft.otros.length) || 0) > 0;
+            var draftHasLines = ((draft.repuestos && draft.repuestos.length) || 0) > 0
+                || ((draft.servicios && draft.servicios.length) || 0) > 0
+                || ((draft.otros && draft.otros.length) || 0) > 0;
 
-            // Aplicar campos básicos
             var tipoEl = document.getElementById('id_tipo');
             if (tipoEl && draft.tipo) {
                 tipoEl.value = draft.tipo;
@@ -236,63 +222,88 @@
             });
             var obs = document.getElementById('id_observaciones');
             if (obs && typeof draft.observaciones === 'string') obs.value = draft.observaciones;
+            var kmEl = document.getElementById('id_kilometraje_ingreso');
+            if (kmEl && typeof draft.kilometraje_ingreso === 'string') kmEl.value = draft.kilometraje_ingreso;
 
-            // Restaurar filas si corresponde
             if (draftHasLines || !hasServerLines) {
                 clearDynamicPosRows();
+
                 (draft.repuestos || []).forEach(function(rep) {
-                    if (typeof window.addRepuestoRow === 'function') {
-                        var row = window.addRepuestoRow(rep.rowId || null);
-                        if (row && row.__applyRepData) {
-                            row.__applyRepData({
-                                id: rep.id || '',
-                                nombre: rep.nombre || rep.nombre_input || '',
-                                codigo: rep.codigo || '',
-                                cantidad: rep.cantidad || 1,
-                                precio_venta: rep.precio_venta != null ? rep.precio_venta : 0,
-                                descuento: rep.descuento != null ? rep.descuento : 0,
-                                origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
-                                pieza_desarme_id: rep.pieza_desarme_id || '',
-                                costo_linea: rep.costo_linea != null ? rep.costo_linea : 0
-                            });
-                        }
+                    if (typeof window.addRepuestoRow !== 'function') return;
+                    var row = window.addRepuestoRow(rep.rowId || null);
+                    if (row && row.__applyRepData) {
+                        row.__applyRepData({
+                            id: rep.id || '',
+                            nombre: rep.nombre || rep.nombre_input || '',
+                            codigo: rep.codigo || '',
+                            cantidad: rep.cantidad || 1,
+                            precio_venta: rep.precio_venta != null ? rep.precio_venta : 0,
+                            descuento: rep.descuento != null ? rep.descuento : 0,
+                            origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
+                            pieza_desarme_id: rep.pieza_desarme_id || '',
+                            costo_linea: rep.costo_linea != null ? rep.costo_linea : 0
+                        });
+                    }
+                });
+
+                (draft.servicios || []).forEach(function(serv) {
+                    if (!EG.servicios || !EG.servicios.addServicioRow) return;
+                    var row = EG.servicios.addServicioRow(serv.rowId || null);
+                    if (row && row.__applyServData) {
+                        row.__applyServData({
+                            servicio_id: serv.servicio_id || '',
+                            nombre: serv.nombre || '',
+                            precio: serv.precio != null ? serv.precio : 0
+                        });
+                    }
+                });
+
+                (draft.otros || []).forEach(function(otro) {
+                    if (!EG.servicios || !EG.servicios.addOtroRow) return;
+                    var row = EG.servicios.addOtroRow(otro.rowId || null);
+                    if (row && row.__applyOtroData) {
+                        row.__applyOtroData({
+                            servicio_id: otro.servicio_id || '',
+                            nombre: otro.nombre || '',
+                            empresa_ext: otro.empresa_ext || '',
+                            precio_taller: otro.precio_taller != null ? otro.precio_taller : 0,
+                            precio: otro.precio != null ? otro.precio : 0
+                        });
                     }
                 });
             }
 
-            // Restaurar cliente si aplica
             var urlParams = new URLSearchParams(window.location.search || '');
-            var skipDraftCliente = !!(urlParams.get('cliente_id') || window.__PRESELECT_CLIENTE_ID__);
-            if (draft.cliente_id && !skipDraftCliente) {
-                if (typeof EG.cliente && EG.cliente.seleccionarCliente) {
-                    await EG.cliente.seleccionarCliente({
-                        id: draft.cliente_id,
-                        nombre: draft.cliente_nombre || ('Cliente #' + draft.cliente_id),
-                        email: draft.cliente_email || '',
-                        telefono: draft.cliente_telefono || ''
-                    });
-                }
+            var skipDraftCliente = hasReturnContext(urlParams) || !!window.__PRESELECT_CLIENTE_ID__;
+            if (draft.cliente_id && !skipDraftCliente && EG.cliente && typeof EG.cliente.seleccionarCliente === 'function') {
+                await EG.cliente.seleccionarCliente({
+                    id: draft.cliente_id,
+                    nombre: draft.cliente_nombre || ('Cliente #' + draft.cliente_id),
+                    email: draft.cliente_email || '',
+                    telefono: draft.cliente_telefono || ''
+                }, {
+                    vehiculoId: draft.vehiculo_id || null
+                });
             }
         } finally {
             window.__DOC_DRAFT_RESTORING__ = false;
             if (typeof window.serializeRows === 'function') window.serializeRows();
+            if (typeof window.recalcTotales === 'function') window.recalcTotales();
         }
     }
 
-    /**
-     * Inicializar eventos de borrador
-     */
     function init() {
         var form = document.getElementById('document-form');
-        if (form) {
-            form.addEventListener('input', scheduleDocumentDraftSave);
-            form.addEventListener('change', scheduleDocumentDraftSave);
-            form.addEventListener('submit', clearDocumentFormDraftStorage);
+        if (!form || form.dataset.egDraftBound) {
+            return;
         }
-        console.log('Borrador module initialized');
+
+        form.dataset.egDraftBound = '1';
+        form.addEventListener('input', scheduleDocumentDraftSave);
+        form.addEventListener('change', scheduleDocumentDraftSave);
+        form.addEventListener('submit', clearDocumentFormDraftStorage);
     }
 
-    // Exports
     EG.borrador = {
         getDocumentFormDraftKey: getDocumentFormDraftKey,
         saveDocumentDraftNow: saveDocumentDraftNow,
@@ -302,7 +313,7 @@
         restoreDocumentDraftAfterHydrate: restoreDocumentDraftAfterHydrate,
         init: init
     };
+
     window.scheduleDocumentDraftSave = scheduleDocumentDraftSave;
     window.restoreDocumentDraftAfterHydrate = restoreDocumentDraftAfterHydrate;
-
 })();

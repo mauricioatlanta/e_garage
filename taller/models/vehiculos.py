@@ -96,7 +96,7 @@ class Vehiculo(TenantScoped):
     millas = models.PositiveIntegerField(blank=True, null=True, verbose_name="Millas/Kilometraje")
 
     # Campos solo relevantes para tipo_uso == DESARME
-    costo_adquisicion = models.DecimalField(max_digits=12, decimal_places=2, null=True, blank=True)
+    precio_compra = models.DecimalField(max_digits=14, decimal_places=2, null=True, blank=True)
     fecha_ingreso_desarme = models.DateField(null=True, blank=True)
     estado_desarme = models.CharField(max_length=20, null=True, blank=True)
     ubicacion_fisica = models.CharField(

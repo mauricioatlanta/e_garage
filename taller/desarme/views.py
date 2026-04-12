@@ -315,7 +315,7 @@ def lista_vehiculos(request):
         .annotate(piezas_count=Count("piezas_desarme"))
         .annotate(
             ingresos_ventas=Coalesce(Subquery(ingresos_subq), Decimal("0.00")),
-            costo_vehiculo=Coalesce(F("costo_adquisicion"), Decimal("0.00")),
+            costo_vehiculo=Coalesce(F("precio_compra"), Decimal("0.00")),
         )
         .annotate(ganancia=F("ingresos_ventas") - F("costo_vehiculo"))
         .order_by("-fecha_ingreso_desarme", "-id")

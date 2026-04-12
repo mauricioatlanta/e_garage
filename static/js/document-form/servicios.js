@@ -1,4 +1,4 @@
-/**
+﻿/**
  * servicios.js - Modulo de gestion de servicios y otros servicios
  */
 
@@ -6,6 +6,19 @@
     'use strict';
 
     var EG = window.EG = window.EG || {};
+
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function generateRowId(prefix) {
+        return (prefix || 'srv') + '_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    }
 
     function toggleEmptyHint(containerId, hintId) {
         var container = document.getElementById(containerId);
@@ -17,33 +30,41 @@
     function removeDynamicRow(row, containerId, hintId) {
         if (row) row.remove();
         toggleEmptyHint(containerId, hintId);
-        if (typeof window.recalcTotales === 'function') {
-            window.recalcTotales();
-        }
-    }
-
-    function buildDropdownItem(item, text, meta) {
-        return '<div class="srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600" ' +
-            'data-id="' + (item.id || item.pk || '') + '" ' +
-            'data-name="' + (text || '') + '" ' +
-            'data-price="' + (item.precio || item.precio_venta || item.precio_cliente || 0) + '" ' +
-            'data-company="' + (item.empresa || item.empresa_ext || item.proveedor || '') + '" ' +
-            'data-shop-price="' + (item.precio_taller || item.costo || 0) + '">' +
-            '<div class="text-cyan-200 font-semibold">' + text + '</div>' +
-            (meta ? '<div class="text-xs text-gray-300">' + meta + '</div>' : '') +
-            '</div>';
+        if (typeof window.serializeRows === 'function') window.serializeRows();
+        if (typeof window.recalcTotales === 'function') window.recalcTotales();
     }
 
     function normalizeServicioItem(item) {
         var normalized = EG.utils.normalizeServicio(item || {}) || {};
-        normalized.nombre = normalized.nombre || normalized.name || normalized.descripcion || normalized.label || '';
+        normalized.nombre = normalized.nombre || normalized.name || normalized.descripcion || normalized.label || normalized.text || '';
         normalized.precio = normalized.precio !== undefined ? normalized.precio :
+            (normalized.precio_base !== undefined ? normalized.precio_base :
             (normalized.precio_venta !== undefined ? normalized.precio_venta :
-            (normalized.precio_cliente !== undefined ? normalized.precio_cliente : 0));
+            (normalized.precio_cliente !== undefined ? normalized.precio_cliente : 0)));
         normalized.empresa = normalized.empresa || normalized.empresa_ext || normalized.proveedor || '';
         normalized.precio_taller = normalized.precio_taller !== undefined ? normalized.precio_taller :
             (normalized.costo !== undefined ? normalized.costo : 0);
         return normalized;
+    }
+
+    function extractServicioItems(data) {
+        var items = EG.utils.extractResponseItems(data, ['results', 'items', 'servicios']);
+        if (!items.length && Array.isArray(data)) {
+            items = data;
+        }
+        return items;
+    }
+
+    function buildDropdownItem(item, text, meta) {
+        return '<div class="srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600" '
+            + 'data-id="' + escapeHtml(item.id || item.pk || '') + '" '
+            + 'data-name="' + escapeHtml(text || '') + '" '
+            + 'data-price="' + escapeHtml(item.precio || item.precio_base || item.precio_venta || item.precio_cliente || 0) + '" '
+            + 'data-company="' + escapeHtml(item.empresa || item.empresa_ext || item.proveedor || '') + '" '
+            + 'data-shop-price="' + escapeHtml(item.precio_taller || item.costo || 0) + '">'
+            + '<div class="text-cyan-200 font-semibold">' + escapeHtml(text) + '</div>'
+            + (meta ? '<div class="text-xs text-gray-300">' + escapeHtml(meta) + '</div>' : '')
+            + '</div>';
     }
 
     function bindMoneyField(inputEl, subtotalEl, subtotalViewEl) {
@@ -51,9 +72,8 @@
             var value = EG.utils.parseNumericInput(inputEl && inputEl.value || 0);
             if (subtotalEl) subtotalEl.value = value;
             if (subtotalViewEl) subtotalViewEl.textContent = EG.utils.money(value);
-            if (typeof window.recalcTotales === 'function') {
-                window.recalcTotales();
-            }
+            if (typeof window.serializeRows === 'function') window.serializeRows();
+            if (typeof window.recalcTotales === 'function') window.recalcTotales();
         }
 
         if (inputEl && !inputEl.dataset.egMoneyBound) {
@@ -68,7 +88,7 @@
     function renderResults(dropdown, list, renderer) {
         if (!dropdown) return;
         if (!list.length) {
-            dropdown.innerHTML = '<div class="p-3 text-gray-300">' + (EG.I18N.no_results || 'Sin resultados') + '</div>';
+            dropdown.innerHTML = '<div class="p-3 text-gray-300">' + (EG.I18N.no_services || 'Sin resultados') + '</div>';
             dropdown.classList.remove('hidden');
             return;
         }
@@ -95,8 +115,7 @@
             var response = await EG.utils.egFetch(options.url + '?q=' + encodeURIComponent(options.query));
             if (!response.ok) throw new Error('HTTP ' + response.status);
             var data = await response.json();
-            var items = Array.isArray(data) ? data : (data.results || data.items || []);
-            var normalizedItems = items.map(normalizeServicioItem);
+            var normalizedItems = extractServicioItems(data).map(normalizeServicioItem);
             if (normalizedItems.length || !localResults.length) {
                 options.onResults(normalizedItems);
             }
@@ -108,37 +127,65 @@
         }
     }
 
-    function addServicioRow() {
+    function getServicioRowById(rowId) {
+        return rowId ? document.querySelector('#servicios-container .dynamic-element[data-row-id="' + rowId + '"]') : null;
+    }
+
+    function resolveServicioTargetRowId(context) {
+        if (context && context.target_row) {
+            return String(context.target_row);
+        }
+        var stored = EG.utils.restoreActiveRowContext ? EG.utils.restoreActiveRowContext() : null;
+        if (stored && stored.type === 'servicio' && stored.rowId) {
+            return String(stored.rowId);
+        }
+        return '';
+    }
+
+    function saveServicioRowContext(row) {
+        if (!row || !row.dataset.rowId || !EG.utils.saveActiveRowContext) {
+            return;
+        }
+        EG.utils.saveActiveRowContext('servicio', row.dataset.rowId);
+    }
+
+    function addServicioRow(presetRowId) {
         var container = document.getElementById('servicios-container');
         if (!container) {
             console.error('Contenedor de servicios no encontrado');
             return null;
         }
 
+        var rowId = String((presetRowId || '').trim() || generateRowId('srv'));
         var row = document.createElement('div');
         row.className = 'dynamic-element';
-        row.innerHTML =
-            '<div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20">' +
-                '<div class="col-span-7 sm:col-span-7 description-field srv-input-container relative min-w-0">' +
-                    '<label class="block text-cyan-200 text-sm mb-1">' + (EG.I18N.service || 'Service') + '</label>' +
-                    '<input type="text" class="srv-input form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="' + (EG.I18N.type_to_search_services || EG.I18N.service || 'Service') + '" autocomplete="off">' +
-                    '<div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>' +
-                    '<input type="hidden" class="srv-id">' +
-                '</div>' +
-                '<div class="col-span-2 sm:col-span-2 min-w-0">' +
-                    '<label class="block text-cyan-200 text-sm mb-1">' + (EG.I18N.client_price || 'Price') + '</label>' +
-                    '<div class="relative"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300 font-semibold">$</span>' +
-                    '<input type="text" class="serv-precio form-control w-full h-10 text-sm pl-6" placeholder="0"></div>' +
-                '</div>' +
-                '<div class="col-span-2 sm:col-span-2 min-w-0">' +
-                    '<label class="block text-cyan-200 text-sm mb-1">' + (EG.I18N.subtotal || 'Subtotal') + '</label>' +
-                    '<input type="hidden" class="serv-subtotal" value="0">' +
-                    '<div class="serv-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>' +
-                '</div>' +
-                '<div class="col-span-1 sm:col-span-1">' +
-                    '<button type="button" class="btn-add w-full h-10 srv-remove-btn">X</button>' +
-                '</div>' +
-            '</div>';
+        row.dataset.rowId = rowId;
+        row.innerHTML = ''
+            + '<div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="' + rowId + '">'
+            + '  <div class="col-span-7 sm:col-span-7 description-field srv-input-container relative min-w-0">'
+            + '    <label class="block text-cyan-200 text-sm mb-1">' + escapeHtml(EG.I18N.service || 'Service') + '</label>'
+            + '    <div class="flex gap-1">'
+            + '      <input type="text" class="srv-input form-control w-full h-10 text-sm flex-1 min-w-0" placeholder="' + escapeHtml(EG.I18N.type_to_search_services || EG.I18N.service || 'Service') + '" autocomplete="off">'
+            + '      <button type="button" class="srv-create-btn btn-add flex-shrink-0 h-10 px-2" title="' + escapeHtml(EG.I18N.create_service || 'Create Service') + '">+</button>'
+            + '    </div>'
+            + '    <div class="srv-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
+            + '    <input type="hidden" class="srv-id">'
+            + '  </div>'
+            + '  <div class="col-span-2 sm:col-span-2 min-w-0">'
+            + '    <label class="block text-cyan-200 text-sm mb-1">' + escapeHtml(EG.I18N.client_price || 'Price') + '</label>'
+            + '    <div class="relative"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300 font-semibold">$</span>'
+            + '      <input type="text" class="serv-precio form-control w-full h-10 text-sm pl-6" placeholder="0"></div>'
+            + '  </div>'
+            + '  <div class="col-span-2 sm:col-span-2 min-w-0">'
+            + '    <label class="block text-cyan-200 text-sm mb-1">' + escapeHtml(EG.I18N.subtotal || 'Subtotal') + '</label>'
+            + '    <input type="hidden" class="serv-subtotal" value="0">'
+            + '    <div class="serv-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">' + EG.utils.money(0) + '</div>'
+            + '  </div>'
+            + '  <div class="col-span-1 sm:col-span-1">'
+            + '    <label class="block text-cyan-200 text-sm mb-1">&nbsp;</label>'
+            + '    <button type="button" class="btn-add w-full h-10 srv-remove-btn">X</button>'
+            + '  </div>'
+            + '</div>';
 
         container.appendChild(row);
         setupServicioRow(row);
@@ -156,6 +203,7 @@
         var subtotalEl = row.querySelector('.serv-subtotal');
         var subtotalViewEl = row.querySelector('.serv-subtotal-view');
         var removeBtn = row.querySelector('.srv-remove-btn');
+        var createBtn = row.querySelector('.srv-create-btn');
         var dropdown = row.querySelector('.srv-dropdown');
         var searchTimer = null;
 
@@ -169,9 +217,43 @@
                 priceEl.dispatchEvent(new Event('input', { bubbles: true }));
             }
             if (dropdown) dropdown.classList.add('hidden');
+            saveServicioRowContext(row);
+        }
+
+        function openCreatePage() {
+            if (!EG.cfg.URL_SERVICE_CREATE || !EG.utils || !EG.utils.buildContextualCreateUrl) {
+                console.error('URL_SERVICE_CREATE no configurada');
+                return;
+            }
+
+            var rowId = row.dataset.rowId || generateRowId('srv');
+            row.dataset.rowId = rowId;
+            saveServicioRowContext(row);
+
+            var url = EG.utils.buildContextualCreateUrl(EG.cfg.URL_SERVICE_CREATE, {
+                return_to: EG.utils.getDocumentReturnTo(),
+                select_field: 'servicio',
+                target_row: rowId,
+                prefill_nombre: inputEl ? inputEl.value.trim() : '',
+            });
+            window.location.href = url;
         }
 
         bindMoneyField(priceEl, subtotalEl, subtotalViewEl);
+
+        [row, inputEl, priceEl].forEach(function(node) {
+            if (node) {
+                node.addEventListener('focus', function() { saveServicioRowContext(row); }, true);
+                node.addEventListener('click', function() { saveServicioRowContext(row); });
+            }
+        });
+
+        if (createBtn) {
+            createBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                openCreatePage();
+            });
+        }
 
         if (inputEl) {
             inputEl.addEventListener('input', function() {
@@ -187,11 +269,13 @@
                         query: query,
                         url: EG.cfg.URL_SERVICE_SEARCH,
                         prefetch: EG.PREFETCH && EG.PREFETCH.servicios,
-                        fields: ['codigo', 'nombre', 'descripcion'],
+                        fields: ['codigo', 'nombre', 'descripcion', 'text', 'label'],
                         onResults: function(results) {
                             renderResults(dropdown, results, function(item) {
-                                var meta = item.precio ? EG.utils.money(item.precio) : '';
-                                return buildDropdownItem(item, item.nombre || '', meta);
+                                var metaParts = [];
+                                if (item.categoria) metaParts.push(item.categoria);
+                                if (item.precio) metaParts.push(EG.utils.money(item.precio));
+                                return buildDropdownItem(item, item.nombre || '', metaParts.join(' | '));
                             });
                         }
                     });
@@ -231,14 +315,14 @@
 
         row.__applyServData = function(data) {
             applyItem({
-                id: data && (data.id || data.servicio_id),
+                id: data && (data.servicio_id || data.id),
                 nombre: data && data.nombre,
                 precio: data && data.precio
             });
         };
     }
 
-    function addOtroServicioRow() {
+    function addOtroServicioRow(presetRowId) {
         var container = document.getElementById('otros-container');
         if (!container) {
             console.error('Contenedor de otros servicios no encontrado');
@@ -247,37 +331,39 @@
 
         var row = document.createElement('div');
         row.className = 'dynamic-element';
-        row.innerHTML =
-            '<div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20">' +
-                '<div class="col-span-3 sm:col-span-3 description-field otr-search-container relative min-w-0">' +
-                    '<label class="block text-cyan-200 text-sm mb-1">' + (EG.I18N.service || 'Service') + '</label>' +
-                    '<input type="text" class="otr-search form-control w-full h-10 text-sm" placeholder="' + (EG.I18N.type_to_search_external || EG.I18N.service || 'Service') + '" autocomplete="off">' +
-                    '<div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>' +
-                    '<input type="hidden" class="otr-servicio-id">' +
-                '</div>' +
-                '<div class="col-span-3 sm:col-span-3 min-w-0">' +
-                    '<label class="block text-cyan-200 text-sm mb-1">' + (EG.I18N.external_company || 'External Company') + '</label>' +
-                    '<input type="text" class="otr-empresa form-control w-full h-10 text-sm">' +
-                '</div>' +
-                '<div class="col-span-2 sm:col-span-2 min-w-0">' +
-                    '<label class="block text-cyan-200 text-sm mb-1">' + (EG.I18N.shop_price || 'Shop Price') + '</label>' +
-                    '<div class="relative"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300 font-semibold">$</span>' +
-                    '<input type="text" class="otr-precio-taller form-control w-full h-10 text-sm pl-6" placeholder="0"></div>' +
-                '</div>' +
-                '<div class="col-span-2 sm:col-span-2 min-w-0">' +
-                    '<label class="block text-cyan-200 text-sm mb-1">' + (EG.I18N.client_price || 'Client Price') + '</label>' +
-                    '<div class="relative"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300 font-semibold">$</span>' +
-                    '<input type="text" class="otr-precio form-control w-full h-10 text-sm pl-6" placeholder="0"></div>' +
-                '</div>' +
-                '<div class="col-span-1 sm:col-span-1 min-w-0">' +
-                    '<label class="block text-cyan-200 text-sm mb-1">' + (EG.I18N.subtotal || 'Subtotal') + '</label>' +
-                    '<input type="hidden" class="otr-subtotal" value="0">' +
-                    '<div class="otr-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">$0</div>' +
-                '</div>' +
-                '<div class="col-span-1 sm:col-span-1">' +
-                    '<button type="button" class="btn-add w-full h-10 otr-remove-btn">X</button>' +
-                '</div>' +
-            '</div>';
+        row.dataset.rowId = String((presetRowId || '').trim() || generateRowId('otr'));
+        row.innerHTML = ''
+            + '<div class="doc-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20">'
+            + '  <div class="col-span-3 sm:col-span-3 description-field otr-search-container relative min-w-0">'
+            + '    <label class="block text-cyan-200 text-sm mb-1">' + escapeHtml(EG.I18N.service || 'Service') + '</label>'
+            + '    <input type="text" class="otr-search form-control w-full h-10 text-sm" placeholder="' + escapeHtml(EG.I18N.type_to_search_external || EG.I18N.service || 'Service') + '" autocomplete="off">'
+            + '    <div class="otr-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
+            + '    <input type="hidden" class="otr-servicio-id">'
+            + '  </div>'
+            + '  <div class="col-span-3 sm:col-span-3 min-w-0">'
+            + '    <label class="block text-cyan-200 text-sm mb-1">' + escapeHtml(EG.I18N.external_company || 'External Company') + '</label>'
+            + '    <input type="text" class="otr-empresa form-control w-full h-10 text-sm">'
+            + '  </div>'
+            + '  <div class="col-span-2 sm:col-span-2 min-w-0">'
+            + '    <label class="block text-cyan-200 text-sm mb-1">' + escapeHtml(EG.I18N.shop_price || 'Shop Price') + '</label>'
+            + '    <div class="relative"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300 font-semibold">$</span>'
+            + '      <input type="text" class="otr-precio-taller form-control w-full h-10 text-sm pl-6" placeholder="0"></div>'
+            + '  </div>'
+            + '  <div class="col-span-2 sm:col-span-2 min-w-0">'
+            + '    <label class="block text-cyan-200 text-sm mb-1">' + escapeHtml(EG.I18N.client_price || 'Client Price') + '</label>'
+            + '    <div class="relative"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300 font-semibold">$</span>'
+            + '      <input type="text" class="otr-precio form-control w-full h-10 text-sm pl-6" placeholder="0"></div>'
+            + '  </div>'
+            + '  <div class="col-span-1 sm:col-span-1 min-w-0">'
+            + '    <label class="block text-cyan-200 text-sm mb-1">' + escapeHtml(EG.I18N.subtotal || 'Subtotal') + '</label>'
+            + '    <input type="hidden" class="otr-subtotal" value="0">'
+            + '    <div class="otr-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">' + EG.utils.money(0) + '</div>'
+            + '  </div>'
+            + '  <div class="col-span-1 sm:col-span-1">'
+            + '    <label class="block text-cyan-200 text-sm mb-1">&nbsp;</label>'
+            + '    <button type="button" class="btn-add w-full h-10 otr-remove-btn">X</button>'
+            + '  </div>'
+            + '</div>';
 
         container.appendChild(row);
         setupOtroRow(row);
@@ -391,13 +477,45 @@
 
         row.__applyOtroData = function(data) {
             applyItem({
-                id: data && (data.id || data.servicio_id),
+                id: data && data.servicio_id,
                 nombre: data && data.nombre,
                 empresa: data && (data.empresa || data.empresa_ext),
                 precio_taller: data && data.precio_taller,
                 precio: data && (data.precio !== undefined ? data.precio : data.precio_cliente)
             });
         };
+    }
+
+    function handleCreatedServicioFromReturn(context) {
+        var servicioId = context.created_servicio_id || '';
+        if (!servicioId) {
+            return;
+        }
+
+        var rowId = resolveServicioTargetRowId(context);
+        var row = getServicioRowById(rowId);
+        if (!row) {
+            row = addServicioRow(rowId || null);
+        }
+        if (!row || !row.__applyServData) {
+            return;
+        }
+
+        row.__applyServData({
+            servicio_id: servicioId,
+            nombre: context.created_servicio_label || '',
+            precio: context.created_servicio_precio || 0,
+        });
+
+        if (EG.utils.clearActiveRowContext) {
+            EG.utils.clearActiveRowContext();
+        }
+
+        var focusTarget = row.querySelector('.serv-precio') || row.querySelector('.srv-input');
+        if (focusTarget) {
+            focusTarget.focus();
+            focusTarget.select && focusTarget.select();
+        }
     }
 
     function init() {
@@ -414,6 +532,7 @@
         addOtroRow: addOtroServicioRow,
         setupOtroServicioRow: setupOtroRow,
         setupOtroRow: setupOtroRow,
+        handleCreatedServicioFromReturn: handleCreatedServicioFromReturn,
         init: init
     };
 

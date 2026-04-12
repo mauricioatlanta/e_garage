@@ -102,6 +102,7 @@
         var serv = Array.from(document.querySelectorAll('#servicios-container .dynamic-element')).map(function(row) {
             return {
                 servicio_id: (row.querySelector('.srv-id') && row.querySelector('.srv-id').value || '').trim(),
+                nombre: (row.querySelector('.srv-input') && row.querySelector('.srv-input').value || '').trim(),
                 precio: EG.utils.parseNumericInput(row.querySelector('.serv-precio') && row.querySelector('.serv-precio').value || 0)
             };
         });

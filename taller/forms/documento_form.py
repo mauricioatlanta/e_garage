@@ -483,16 +483,20 @@ class DocumentoForm(forms.ModelForm):
             try:
                 servicios = json.loads(servicios_data)
                 for serv_data in servicios:
-                    if serv_data.get("servicio_id"):
+                    servicio_id = serv_data.get("servicio_id")
+                    nombre = serv_data.get("nombre", "")
+                    if servicio_id or nombre:
                         from taller.models.lineas_documento import LineaServicio
 
-                        LineaServicio.objects.create(
-                            documento=documento,
-                            servicio_id=serv_data.get("servicio_id"),
-                            nombre=serv_data.get("nombre", ""),
-                            cantidad=1,  # forzamos 1 (sin cantidad en UI)
-                            precio_unitario=serv_data.get("precio", 0),
-                        )
+                        kwargs = {
+                            "documento": documento,
+                            "nombre": nombre,
+                            "cantidad": 1,  # forzamos 1 (sin cantidad en UI)
+                            "precio_unitario": serv_data.get("precio", 0),
+                        }
+                        if servicio_id not in (None, ""):
+                            kwargs["servicio_id"] = servicio_id
+                        LineaServicio.objects.create(**kwargs)
             except (json.JSONDecodeError, ValueError):
                 pass  # Ignorar datos JSON inválidos
 
@@ -502,17 +506,21 @@ class DocumentoForm(forms.ModelForm):
             try:
                 otros = json.loads(otros_data)
                 for otro_data in otros:
-                    if otro_data.get("servicio_id"):
+                    servicio_id = otro_data.get("servicio_id")
+                    nombre = otro_data.get("nombre", "")
+                    if servicio_id or nombre:
                         from taller.models.lineas_documento import LineaOtroServicio
 
-                        LineaOtroServicio.objects.create(
-                            documento=documento,
-                            servicio_id=otro_data.get("servicio_id"),
-                            nombre=otro_data.get("nombre", ""),
-                            empresa_externa=otro_data.get("empresa_ext", ""),
-                            cantidad=otro_data.get("cantidad", 1),
-                            costo_interno=otro_data.get("precio_taller", 0),
-                            precio_cliente=otro_data.get("precio", 0),
-                        )
+                        kwargs = {
+                            "documento": documento,
+                            "nombre": nombre,
+                            "empresa_externa": otro_data.get("empresa_ext", ""),
+                            "cantidad": otro_data.get("cantidad", 1),
+                            "costo_interno": otro_data.get("precio_taller", 0),
+                            "precio_cliente": otro_data.get("precio", 0),
+                        }
+                        if servicio_id not in (None, ""):
+                            kwargs["servicio_id"] = servicio_id
+                        LineaOtroServicio.objects.create(**kwargs)
             except (json.JSONDecodeError, ValueError):
                 pass  # Ignorar datos JSON inválidos

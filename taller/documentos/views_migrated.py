@@ -9,6 +9,7 @@ from decimal import Decimal, InvalidOperation
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
+from django.shortcuts import get_object_or_404
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
 from django.utils.translation import get_language
@@ -36,7 +37,16 @@ from django.db.models.functions import Coalesce
 from django.core.exceptions import ObjectDoesNotExist
 
 from taller.config.feature_flags import get_country_features
-from taller.forms.documento_form import DocumentoForm
+from taller.documentos.forms import DocumentoForm
+from taller.documentos.services import (
+    FORM_MODE_EDIT,
+    build_form_bootstrap,
+    build_form_initial_state,
+    build_line_item_payloads,
+    build_prefetch_payloads,
+    has_server_line_items,
+    resolve_form_mode,
+)
 from taller.mixins import CountryLangTemplateMixin
 from taller.models import Documento, Tecnico
 from taller.models.clientes import Cliente
@@ -54,6 +64,52 @@ LANGUAGE_BY_COUNTRY = {
     "US": "en",
     "BR": "pt",
 }
+
+
+def _get_request_country_code(request, empresa=None):
+    path = (getattr(request, "path", "") or "").lower()
+    path_country = "CL"
+    if path.startswith("/us/"):
+        path_country = "US"
+    elif path.startswith("/mx/"):
+        path_country = "MX"
+    elif path.startswith("/pe/"):
+        path_country = "PE"
+    elif path.startswith("/ve/"):
+        path_country = "VE"
+    elif path.startswith("/br/"):
+        path_country = "BR"
+
+    resolved_country = (
+        path_country
+        or getattr(request, "company_country", None)
+        or (getattr(empresa, "pais", None) if empresa else None)
+        or "CL"
+    )
+    return str(resolved_country).upper() if resolved_country else "CL"
+
+
+def _get_document_ui_config(request, empresa):
+    ui_config = {}
+    try:
+        from taller.configuracion.rubros_logic import get_ui_config
+
+        config = getattr(empresa, "config", None)
+        if config:
+            ui_config = get_ui_config(config)
+    except Exception:
+        pass
+
+    if not ui_config:
+        ui_config = {
+            "show_repuestos": True,
+            "show_services": True,
+            "show_otros_servicios": True,
+            "show_kilometraje": True,
+            "show_vehicle": True,
+        }
+
+    return _ensure_ui_config_tax_and_currency(request, ui_config, empresa)
 
 
 def _get_empresa_safe(request):
@@ -710,48 +766,109 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         _clear_messages_for_request(request)
         return super().get(request, *args, **kwargs)
 
+    def get_form_source_document(self):
+        return None
+
+    def get_form_source_draft(self):
+        return None
+
+    def get_form_mode(self):
+        if not hasattr(self, "_document_form_mode"):
+            self._document_form_mode = resolve_form_mode(
+                self.request,
+                source_document=self.get_form_source_document(),
+                source_draft=self.get_form_source_draft(),
+            )
+        return self._document_form_mode
+
+    def get_form_initial_state(self):
+        if not hasattr(self, "_document_form_initial_state"):
+            self._document_form_initial_state = build_form_initial_state(
+                mode=self.get_form_mode(),
+                request=self.request,
+                empresa=getattr(self.request.user, "empresa", None),
+                source_document=self.get_form_source_document(),
+                source_draft=self.get_form_source_draft(),
+                base_initial=super().get_initial() or {},
+            )
+        return self._document_form_initial_state
+
     def get_initial(self):
-        """Preselección desde URL (vuelta desde 'crear vehículo' con cliente_id y vehiculo_id).
-        Vista real de /us/documentos/form/ (DocumentoCreateView)."""
-        initial = super().get_initial() or {}
-        request = self.request
-        try:
-            empresa = getattr(request.user, "empresa", None)
-        except Exception:
-            empresa = None
-        if not empresa:
-            return initial
-        cliente_id_raw = (request.GET.get("cliente_id") or request.GET.get("cliente") or "").strip()
-        vehiculo_id_raw = (
-            request.GET.get("vehiculo_id") or request.GET.get("vehiculo") or ""
-        ).strip()
-        cliente_obj = None
-        vehiculo_obj = None
-        if cliente_id_raw:
-            try:
-                cliente_obj = Cliente.objects.filter(
-                    pk=int(cliente_id_raw), empresa=empresa
-                ).first()
-                if cliente_obj:
-                    initial["cliente"] = cliente_obj.pk
-            except (ValueError, TypeError):
-                pass
-        if vehiculo_id_raw:
-            try:
-                vehiculo_obj = Vehiculo.objects.filter(
-                    pk=int(vehiculo_id_raw), empresa=empresa
-                ).first()
-                if vehiculo_obj and (
-                    cliente_obj is None
-                    or getattr(vehiculo_obj, "cliente_id", None) == cliente_obj.pk
-                ):
-                    initial["vehiculo"] = vehiculo_obj.pk
-            except (ValueError, TypeError):
-                pass
+        initial = self.get_form_initial_state()["initial"]
+
+        cliente_id = self.request.GET.get("cliente_id")
+        if cliente_id:
+            initial["cliente"] = cliente_id
+            initial["cliente_id"] = cliente_id
+
         return initial
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        empresa = self.request.user.empresa
+        form_mode = self.get_form_mode()
+        initial_state = self.get_form_initial_state()
+        source_document = self.get_form_source_document()
+        source_draft = self.get_form_source_draft()
+
+        mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
+        country_code = _get_request_country_code(self.request, empresa)
+        language = LANGUAGE_BY_COUNTRY.get(country_code, "es")
+        ui_config = _get_document_ui_config(self.request, empresa)
+        line_item_payloads = build_line_item_payloads(
+            mode=form_mode,
+            request=self.request,
+            source_document=source_document,
+            source_draft=source_draft,
+        )
+        prefetch_payloads = build_prefetch_payloads(
+            empresa=empresa,
+            language=language,
+            mode=form_mode,
+        )
+        cliente_state = initial_state["cliente"]
+        vehiculo_preselect_id = initial_state["vehiculo_id"]
+        form_bootstrap = build_form_bootstrap(
+            form_mode=form_mode,
+            cliente=cliente_state,
+            vehiculo_id=vehiculo_preselect_id,
+            line_item_payloads=line_item_payloads,
+        )
+
+        context.update(
+            {
+                "mecanicos": mecanicos,
+                "tecnicos": mecanicos,
+                "es_edicion": False,
+                "company_country": country_code,
+                "country_code": country_code,
+                "today": timezone.now().date(),
+                "template_name": self.get_template_names()[0],
+                "pais_emoji": "ðŸ‡ºðŸ‡¸" if self.request.path.startswith("/us/") else "ðŸ‡¨ðŸ‡±",
+                "empresa": empresa,
+                "total": 0,
+                "subtotal_repuestos": 0,
+                "subtotal_servicios": 0,
+                "subtotal_otros_servicios": 0,
+                "iva": 0,
+                "repuestos": [],
+                "debug": True,
+                "form_mode": form_mode,
+                "ui_config": ui_config,
+                "repuestos_json": line_item_payloads["repuestos_json"],
+                "servicios_json": line_item_payloads["servicios_json"],
+                "otros_json": line_item_payloads["otros_json"],
+                "document_form_bootstrap": form_bootstrap,
+                "has_server_line_items": has_server_line_items(line_item_payloads),
+                "cliente_preselect_id": cliente_state["id"] or "",
+                "vehiculo_preselect_id": vehiculo_preselect_id or "",
+                "cliente_preselect_nombre": cliente_state["nombre"] or "",
+                "cliente_preselect_email": cliente_state["email"] or "",
+                "cliente_preselect_telefono": cliente_state["telefono"] or "",
+                **prefetch_payloads,
+            }
+        )
+        return context
         empresa = self.request.user.empresa
 
         # Prefill desde flujo de desarme (solo creación, prioridad menor que edición)
@@ -1019,7 +1136,10 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         kwargs = super().get_form_kwargs()
         kwargs["user"] = self.request.user
         kwargs["empresa"] = getattr(self.request.user, "empresa", None)
-        kwargs["country"] = "US" if self.request.path.startswith("/us/") else "CL"
+        kwargs["country"] = _get_request_country_code(
+            self.request,
+            getattr(self.request.user, "empresa", None),
+        )
         # Idioma efectivo para labels/choices (no inferir de país)
         kwargs["language"] = getattr(self.request, "LANGUAGE_CODE", None) or get_language() or "es"
         if self.request.method == "GET":
@@ -1056,6 +1176,25 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
     def render_to_response(self, context, **response_kwargs):
         """Renderizar usando el template correcto"""
         return super().render_to_response(context, **response_kwargs)
+
+
+@method_decorator(login_required, name="dispatch")
+class DocumentoDuplicateView(DocumentoCreateView):
+    """Vista separada para duplicar un documento existente."""
+
+    def get_form_source_document(self):
+        if not hasattr(self, "_duplicate_source_document"):
+            empresa = _get_empresa_safe(self.request) or getattr(self.request, "empresa", None)
+            queryset = (
+                Documento.objects.filter(empresa=empresa)
+                .select_related("cliente", "vehiculo", "tecnico_responsable")
+                .prefetch_related("lineas_repuesto", "lineas_servicio", "lineas_otro_servicio")
+            )
+            self._duplicate_source_document = get_object_or_404(
+                queryset,
+                pk=self.kwargs["pk"],
+            )
+        return self._duplicate_source_document
 
 
 @method_decorator(login_required, name="dispatch")
@@ -1399,6 +1538,29 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
                 }
             )
 
+        form_mode = FORM_MODE_EDIT
+        line_item_payloads = {
+            "repuestos_json": repuestos_json,
+            "servicios_json": servicios_json,
+            "otros_json": otros_json,
+        }
+        prefetch_payloads = build_prefetch_payloads(
+            empresa=empresa,
+            language=LANGUAGE_BY_COUNTRY.get(country_code, "es"),
+            mode=form_mode,
+        )
+        form_bootstrap = build_form_bootstrap(
+            form_mode=form_mode,
+            cliente={
+                "id": getattr(cliente, "id", "") or "",
+                "nombre": str(cliente) if cliente else "",
+                "email": getattr(cliente, "email", "") if cliente else "",
+                "telefono": getattr(cliente, "telefono", "") if cliente else "",
+            },
+            vehiculo_id=getattr(vehiculo, "id", "") or "",
+            line_item_payloads=line_item_payloads,
+        )
+
         context.update(
             {
                 "documento": documento,
@@ -1421,6 +1583,9 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
                 "country_code": country_code,
                 "empresa": empresa,  # Agregar empresa al contexto para que esté disponible en el template
                 "ui_config": ui_config,
+                "form_mode": form_mode,
+                "document_form_bootstrap": form_bootstrap,
+                "has_server_line_items": has_server_line_items(line_item_payloads),
                 "kilometraje": getattr(documento, "kilometraje_vehiculo", None)
                 or getattr(documento, "kilometraje", None),
                 "cliente_info": {
@@ -1430,6 +1595,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
                     "telefono": getattr(cliente, "telefono", "") if cliente else "",
                 },
                 "vehiculo_inicial_id": getattr(vehiculo, "id", "") or "",
+                **prefetch_payloads,
             }
         )
         return context
@@ -1452,7 +1618,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         if empresa and getattr(empresa, "pais", None):
             country = (empresa.pais or "CL").upper()
         else:
-            country = "US" if self.request.path.startswith("/us/") else "CL"
+            country = _get_request_country_code(self.request, empresa)
         kwargs["country"] = country
         # Idioma efectivo para labels/choices (no inferir de país)
         kwargs["language"] = getattr(self.request, "LANGUAGE_CODE", None) or get_language() or "es"

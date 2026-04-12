@@ -1,120 +1,88 @@
-/**
+﻿/**
  * index.js - Punto de entrada del formulario de documentos
- * 
- * Carga todos los módulos en el orden correcto
  */
 
 (function() {
     'use strict';
 
-    // Crear namespace global
     window.EG = window.EG || {};
 
-    // Orden de carga: config primero, luego utils, luego módulos de negocio
     var MODULE_LOAD_ORDER = [
-        'config',      // Configuración global y URLs
-        'utils',       // Utilidades (fetch, money, etc.)
-        'i18n',        // Traducciones
-        'cliente',     // Búsqueda de clientes
-        'vehiculo',    // Gestión de vehículos
-        'repuestos',  // CRUD de repuestos
-        'servicios',   // CRUD de servicios y otros servicios
-        'totales',     // Cálculo de totales
-        'borrador',    // Auto-guardado
-        'ui'           // Temas y modos
+        'config',
+        'utils',
+        'modules/state',
+        'i18n',
+        'cliente',
+        'vehiculo',
+        'repuestos',
+        'servicios',
+        'totales',
+        'modules/line_items_bootstrap',
+        'borrador',
+        'ui'
     ];
 
-    /**
-     * Carga un módulo desde su archivo
-     */
     function loadModule(moduleName) {
         return new Promise(function(resolve, reject) {
             var script = document.createElement('script');
             script.src = '/static/js/document-form/' + moduleName + '.js';
-            script.onload = function() {
-                console.log('Loaded module: ' + moduleName);
-                resolve();
-            };
-            script.onerror = function(e) {
-                console.error('Failed to load module: ' + moduleName, e);
-                reject(new Error('Failed to load ' + moduleName));
+            script.onload = resolve;
+            script.onerror = function(err) {
+                reject(new Error('Failed to load ' + moduleName + ': ' + err));
             };
             document.head.appendChild(script);
         });
     }
 
-    /**
-     * Inicializa todos los módulos en orden
-     */
     async function initAllModules() {
-        console.log('Inicializando modulo de formulario de documentos...');
-
-        // Verificar que estamos en la página correcta
         var form = document.getElementById('document-form');
         if (!form) {
-            console.log('No se encontro el formulario de documento. Omitiendo inicializacion.');
             return;
         }
 
-        // Cargar módulos secuencialmente para asegurar dependencias
-        for (var i = 0; i < MODULE_LOAD_ORDER.length; i++) {
-            var moduleName = MODULE_LOAD_ORDER[i];
+        for (var i = 0; i < MODULE_LOAD_ORDER.length; i += 1) {
             try {
-                await loadModule(moduleName);
+                await loadModule(MODULE_LOAD_ORDER[i]);
             } catch (err) {
-                console.error('Error cargando modulo ' + moduleName + ':', err);
+                console.error(err);
             }
         }
 
-        // Inicializar módulos que tienen init()
-        if (window.EG.config && window.EG.config.init) {
-            window.EG.config.init();
-        }
-        if (window.EG.utils && window.EG.utils.init) {
-            window.EG.utils.init();
-        }
-        if (window.EG.i18n && window.EG.i18n.init) {
-            window.EG.i18n.init();
-        }
-        if (window.EG.cliente && window.EG.cliente.init) {
-            window.EG.cliente.init();
-        }
-        if (window.EG.vehiculo && window.EG.vehiculo.init) {
-            window.EG.vehiculo.init();
-        }
-        if (window.EG.repuestos && window.EG.repuestos.init) {
-            window.EG.repuestos.init();
-        }
-        if (window.EG.servicios && window.EG.servicios.init) {
-            window.EG.servicios.init();
-        }
-        if (window.EG.totales && window.EG.totales.init) {
-            window.EG.totales.init();
-        }
-        if (window.EG.borrador && window.EG.borrador.init) {
-            window.EG.borrador.init();
-        }
-        if (window.EG.ui && window.EG.ui.init) {
-            window.EG.ui.init();
-        }
+        [
+            'config',
+            'utils',
+            'state',
+            'i18n',
+            'cliente',
+            'vehiculo',
+            'repuestos',
+            'servicios',
+            'totales',
+            'lineItemsBootstrap',
+            'borrador',
+            'ui'
+        ].forEach(function(moduleName) {
+            var module = window.EG[moduleName];
+            if (module && typeof module.init === 'function') {
+                module.init();
+            }
+        });
 
-        // Botones de agregar
         setupAddButtons();
-
-        // Serialización antes de submit
         setupFormSubmit();
+        await restoreDraftOnLoad();
+        await waitForReturnContextModules();
+        await processReturnContext();
 
-        // Restaurar borrador si existe
-        restoreDraftOnLoad();
-
-        console.log('Modulo de formulario de documentos inicializado.');
+        if (window.serializeRows) {
+            window.serializeRows();
+        }
+        if (window.recalcTotales) {
+            window.recalcTotales();
+        }
     }
 
-    /**
-     * Configura botones de agregar
-     */
     function setupAddButtons() {
-        // Agregar repuesto
         var btnAddRepuesto = document.getElementById('add-repuesto');
         if (btnAddRepuesto && !btnAddRepuesto.dataset.egBound) {
             btnAddRepuesto.dataset.egBound = '1';
@@ -125,33 +93,26 @@
             });
         }
 
-        // Agregar servicio propio
         var btnAddServicio = document.getElementById('add-servicio');
         if (btnAddServicio && !btnAddServicio.dataset.egBound) {
             btnAddServicio.dataset.egBound = '1';
             btnAddServicio.addEventListener('click', function() {
                 if (window.EG.servicios && window.EG.servicios.addServicioRow) {
                     window.EG.servicios.addServicioRow();
-                } else {
-                    console.warn('Modulo servicios no disponible');
                 }
             });
         }
 
-        // Agregar otro servicio
         var btnAddOtro = document.getElementById('add-otro');
         if (btnAddOtro && !btnAddOtro.dataset.egBound) {
             btnAddOtro.dataset.egBound = '1';
             btnAddOtro.addEventListener('click', function() {
                 if (window.EG.servicios && window.EG.servicios.addOtroRow) {
                     window.EG.servicios.addOtroRow();
-                } else {
-                    console.warn('Modulo servicios no disponible para otros servicios');
                 }
             });
         }
 
-        // Piezas usadas
         var btnAddUsed = document.getElementById('add-used-parts');
         if (btnAddUsed && !btnAddUsed.dataset.egBound) {
             btnAddUsed.dataset.egBound = '1';
@@ -163,67 +124,118 @@
         }
     }
 
-    /**
-     * Configura serialización antes de submit
-     */
     function setupFormSubmit() {
         var form = document.getElementById('document-form');
-        if (!form) return;
+        if (!form) {
+            return;
+        }
 
-        form.addEventListener('submit', function(e) {
-            // Serializar filas antes de enviar
+        form.addEventListener('submit', function() {
             if (window.serializeRows) {
                 window.serializeRows();
             }
         });
     }
 
-    /**
-     * Restaura borrador al cargar la página
-     */
     async function restoreDraftOnLoad() {
-        // Esperar a que todo esté cargado
+        if (window.EG.state && window.EG.state.isCleanMode && window.EG.state.isCleanMode()) {
+            if (window.EG.lineItemsBootstrap && window.EG.lineItemsBootstrap.clearRows) {
+                window.EG.lineItemsBootstrap.clearRows();
+            }
+            return;
+        }
+
         await new Promise(function(resolve) {
             if (document.readyState === 'complete') {
                 setTimeout(resolve, 100);
-            } else {
-                window.addEventListener('load', function() {
-                    setTimeout(resolve, 100);
-                });
+                return;
             }
+            window.addEventListener('load', function() {
+                setTimeout(resolve, 100);
+            }, { once: true });
         });
 
-        // Restaurar borrador
         if (window.restoreDocumentDraftAfterHydrate) {
             try {
-                await window.restoreDocumentDraftAfterHydrate({ hasServerLines: false });
+                await window.restoreDocumentDraftAfterHydrate({
+                    hasServerLines: !!(
+                        window.EG.state
+                        && window.EG.state.hasServerLineItems
+                        && window.EG.state.hasServerLineItems()
+                    )
+                });
             } catch (err) {
                 console.error('Error restaurando borrador:', err);
             }
         }
+    }
 
-        // Recalcular totales
-        if (window.recalcTotales) {
-            window.recalcTotales();
+    async function waitForModule(name, timeoutMs) {
+        var timeout = typeof timeoutMs === 'number' ? timeoutMs : 500;
+        var start = Date.now();
+
+        while (!window.EG[name]) {
+            if (Date.now() - start > timeout) {
+                return false;
+            }
+            await new Promise(function(resolve) {
+                window.setTimeout(resolve, 10);
+            });
+        }
+
+        return true;
+    }
+
+    async function waitForReturnContextModules() {
+        await waitForModule('cliente');
+        await waitForModule('vehiculo');
+        await waitForModule('repuestos');
+        await waitForModule('servicios');
+    }
+
+    async function processReturnContext() {
+        if (!window.EG.utils || !window.EG.utils.getReturnContextParams) {
+            return;
+        }
+
+        var context = window.EG.utils.getReturnContextParams();
+        if (!context.hasAny) {
+            return;
+        }
+
+        try {
+            if ((context.created_cliente_id || context.cliente_id) && window.EG.cliente && window.EG.cliente.handleCreatedClienteFromReturn) {
+                await window.EG.cliente.handleCreatedClienteFromReturn(context);
+            }
+
+            if ((context.created_vehiculo_id || context.vehiculo_id) && window.EG.vehiculo && window.EG.vehiculo.handleCreatedVehiculoFromReturn) {
+                await window.EG.vehiculo.handleCreatedVehiculoFromReturn(context);
+            }
+
+            if (context.created_repuesto_id && window.EG.repuestos && window.EG.repuestos.handleCreatedRepuestoFromReturn) {
+                window.EG.repuestos.handleCreatedRepuestoFromReturn(context);
+            }
+
+            if (context.created_servicio_id && window.EG.servicios && window.EG.servicios.handleCreatedServicioFromReturn) {
+                window.EG.servicios.handleCreatedServicioFromReturn(context);
+            }
+        } finally {
+            if (window.EG.utils.cleanReturnContextParamsFromUrl) {
+                window.EG.utils.cleanReturnContextParamsFromUrl();
+            }
         }
     }
 
-    /**
-     * Función helper para encode next URL
-     */
     window.egEncodeDocumentFormNext = function() {
         return encodeURIComponent(window.location.pathname + (window.location.search || ''));
     };
 
-    // Inicializar cuando el DOM esté listo
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initAllModules);
     } else {
         initAllModules();
     }
 
-    // Exports
     window.EG.initAllModules = initAllModules;
     window.EG.loadModule = loadModule;
-
 })();

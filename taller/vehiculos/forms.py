@@ -258,7 +258,12 @@ class VehiculoForm(forms.ModelForm):
 
         # Flujo "crear vehículo desde documento": si viene next en GET/POST, permitir guardar sin marca/modelo
         # para que el redirect con cliente_id y vehiculo_id funcione; el usuario puede editar después.
-        if self.request and (self.request.GET.get("next") or self.request.POST.get("next")):
+        if self.request and (
+            self.request.GET.get("return_to")
+            or self.request.POST.get("return_to")
+            or self.request.GET.get("next")
+            or self.request.POST.get("next")
+        ):
             if "marca" in self.fields:
                 self.fields["marca"].required = False
             if "modelo" in self.fields:
@@ -1034,7 +1039,12 @@ class VehiculoForm(forms.ModelForm):
         if (
             not val
             and self.request
-            and (self.request.GET.get("next") or self.request.POST.get("next"))
+            and (
+                self.request.GET.get("return_to")
+                or self.request.POST.get("return_to")
+                or self.request.GET.get("next")
+                or self.request.POST.get("next")
+            )
         ):
             return None
         if not val:
@@ -1121,7 +1131,12 @@ class VehiculoForm(forms.ModelForm):
         if (
             not val
             and self.request
-            and (self.request.GET.get("next") or self.request.POST.get("next"))
+            and (
+                self.request.GET.get("return_to")
+                or self.request.POST.get("return_to")
+                or self.request.GET.get("next")
+                or self.request.POST.get("next")
+            )
         ):
             return None
         if not val:

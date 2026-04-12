@@ -205,6 +205,7 @@
         
         <!-- Hidden inputs para preservar cliente_id y next en POST -->
         <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
+        <input type="hidden" name="return_to" value="{% firstof return_to request.GET.return_to request.GET.next '' %}">
         <input type="hidden" name="cliente_id" value="{% firstof cliente_id request.GET.cliente_id '' %}">
 
         <!-- Información del cliente -->
@@ -559,7 +560,7 @@
 <!-- Scripts auxiliares -->
 <script src="{% static 'js/starfield.js' %}"></script>
 <!-- jQuery, Select2 y DAL se cargan desde base.html y form.media (DAL oficial) - NO duplicar aquí -->
-<script src="{% static 'js/formulario_jerarquico.js' %}?v=5"></script>
+<!-- DESACTIVADO: conflicto con DAL -->
 <script>
 function openAddBrandModal() {
   document.getElementById('addBrandModal').classList.remove('hidden');
@@ -1739,5 +1740,4 @@ jQuery(document).ready(function($) {
 })();
 </script>
 {% endblock %}
-
 

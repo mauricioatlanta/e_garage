@@ -70,7 +70,7 @@ class VehiculoForm(forms.ModelForm):
                 },
             ),
             "motor": ModelSelect2(
-                url="/cl/es/vehiculos/autocomplete/motor/",
+                url="vehiculos:motor-autocomplete",
                 forward=["modelo"],
                 attrs={
                     "data-placeholder": "Motor filtrado por modelo...",
@@ -79,7 +79,7 @@ class VehiculoForm(forms.ModelForm):
                 },
             ),
             "caja": ModelSelect2(
-                url="/cl/es/vehiculos/autocomplete/caja/",
+                url="vehiculos:caja-autocomplete",
                 forward=["modelo"],
                 attrs={
                     "data-placeholder": "Caja filtrada por modelo...",
@@ -88,7 +88,7 @@ class VehiculoForm(forms.ModelForm):
                 },
             ),
             "color": autocomplete.ModelSelect2(
-                url="/cl/es/vehiculos/autocomplete/color/",
+                url="vehiculos:autocomplete_color",
                 attrs={
                     "data-placeholder": "Selecciona o escribe un color...",
                     "data-tags": "true",  # Permite escribir uno nuevo
