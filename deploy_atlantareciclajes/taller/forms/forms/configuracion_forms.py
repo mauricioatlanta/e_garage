@@ -216,7 +216,7 @@ class ConfiguracionRubroForm(forms.ModelForm):
                     try:
                         from taller.utils.empresa import get_or_create_empresa
 
-                        empresa = get_or_create_empresa(request)
+                        empresa = get_user_empresa_safe(request.user)
                         if empresa and hasattr(empresa, "pais"):
                             is_spanish = empresa.pais in {"CL", "MX", "PE", "VE", "BR"}
                             lang_code = "es" if is_spanish else "en"

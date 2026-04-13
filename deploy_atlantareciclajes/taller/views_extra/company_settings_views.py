@@ -17,7 +17,7 @@ from taller.utils.pais_utils import get_configuracion_pais
 
 @login_required(login_url=None)  # usa tu LOGIN_URL global
 def company_settings_view(request):
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # Usar CompanySettings en lugar de ConfiguracionEmpresa
     try:

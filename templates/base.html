@@ -9,7 +9,7 @@
   <title>
     {% block title %}
       {% if request.user.is_authenticated and company_name %}
-        {{ company_name }} | Panel
+        {{ request.empresa.nombre_taller }} | Panel
       {% else %}
         eGarage | Control total
       {% endif %}
@@ -757,7 +757,7 @@
       {% if LOGO_PERSONALIZADO or company_logo_url or COMPANY_LOGO %}
         {# Logo personalizado de la empresa del suscriptor - Prioridad: LOGO_PERSONALIZADO > company_logo_url > COMPANY_LOGO #}
         <img src="{% if LOGO_PERSONALIZADO %}{{ LOGO_PERSONALIZADO }}{% elif company_logo_url %}{{ company_logo_url }}{% else %}{{ COMPANY_LOGO }}{% endif %}" 
-             alt="{% if NOMBRE_EMPRESA_PERSONALIZADO %}{{ NOMBRE_EMPRESA_PERSONALIZADO }}{% elif company_name %}{{ company_name }}{% elif COMPANY_NAME %}{{ COMPANY_NAME }}{% else %}Logo{% endif %}"
+             alt="{% if NOMBRE_EMPRESA_PERSONALIZADO %}{{ NOMBRE_EMPRESA_PERSONALIZADO }}{% elif company_name %}{{ request.empresa.nombre_taller }}{% elif COMPANY_NAME %}{{ COMPANY_NAME }}{% else %}Logo{% endif %}"
              class="company-logo h-24 sm:h-32 w-auto object-contain rounded-lg shadow-2xl border-2 border-opacity-40"
              style="border-color: {{ COLOR_PRIMARIO|default:company_color|default:'#00ffff' }}; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));">
       {% endif %}
@@ -770,7 +770,7 @@
             {% if NOMBRE_EMPRESA_PERSONALIZADO %}
               {{ NOMBRE_EMPRESA_PERSONALIZADO }}
             {% elif company_name %}
-              {{ company_name }}
+              {{ request.empresa.nombre_taller }}
             {% elif COMPANY_NAME %}
               {{ COMPANY_NAME }}
             {% else %}

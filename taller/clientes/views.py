@@ -137,7 +137,7 @@ def crear_cliente(request, *args, **kwargs):
     from taller.utils.empresa import get_or_create_empresa
 
     # Asegurar que la empresa existe (la crea si falta)
-    get_or_create_empresa(request)
+    get_user_empresa_safe(request.user)
     # La vista CBV obtendrá request.user.empresa automáticamente
 
     view = ClienteCreateView.as_view()

@@ -220,7 +220,7 @@ class CountryContextMiddleware(MiddlewareMixin):
 
         try:
             # 0) Prioridad: empresa activa en sesión
-            empresa_id = request.session.get("empresa_id")
+            empresa_id = None
             if empresa_id:
                 try:
                     from taller.models import Empresa

@@ -229,7 +229,7 @@ Redirige a la creación de documento con el vehículo pre-seleccionado.
 - `KilometrajeRegistro` filtrado automáticamente por `ReporteKilometraje(empresa)`
 
 ✅ **Validación en vistas:**
-- `get_or_create_empresa(request)` garantiza empresa válida
+- `get_user_empresa_safe(request.user)` garantiza empresa válida
 - `@login_required_default` garantiza autenticación
 
 ---

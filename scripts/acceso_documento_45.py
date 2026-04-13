@@ -76,7 +76,7 @@ def main():
 
 
 def documentos(request):
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     qs = (
         Documento.objects.filter(empresa=empresa, tipo__in=["FACTURA", "BOLETA"])

@@ -1,5 +1,7 @@
-# Middleware que añade la empresa al request según el usuario logueado
 from __future__ import annotations
+from taller.utils.empresa import get_user_empresa_safe
+
+# Middleware que añade la empresa al request según el usuario logueado
 
 from django.db.utils import OperationalError
 
@@ -19,7 +21,7 @@ class _EmpresaMiddlewareLegacy:
         self.get_response = get_response
 
     def __call__(self, request):
-        request.empresa = None
+        request.empresa = get_user_empresa_safe(request.user)
         request.company = None
         request.country = None
 
@@ -45,7 +47,7 @@ class _EmpresaMiddlewareLegacy:
 
             except (Exception, OperationalError):
                 # Evita 500 por DB desactualizada (ej. is_trial faltante) u otros edge cases.
-                request.empresa = None
+                request.empresa = get_user_empresa_safe(request.user)
                 request.company = None
                 request.country = None
 
@@ -109,7 +111,7 @@ class EmpresaMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        request.empresa = None
+        request.empresa = get_user_empresa_safe(request.user)
         request.company = None
         request.country = None
 
@@ -121,7 +123,7 @@ class EmpresaMiddleware:
                     getattr(request.empresa, "pais", None) if request.empresa else None
                 )
             except (Exception, OperationalError):
-                request.empresa = None
+                request.empresa = get_user_empresa_safe(request.user)
                 request.company = None
                 request.country = None
 

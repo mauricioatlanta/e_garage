@@ -17,7 +17,7 @@ def set_active_company(request, empresa=None):
             empresa = None
 
     if empresa:
-        request.session["empresa_id"] = empresa.id
+        pass  # disabled empresa session
         print(f"✅ Empresa activa establecida: {empresa.nombre_taller} (ID: {empresa.id})")
     else:
         request.session.pop("empresa_id", None)

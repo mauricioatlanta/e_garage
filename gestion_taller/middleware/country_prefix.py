@@ -1,3 +1,5 @@
+from taller.utils.empresa import get_user_empresa_safe
+
 # gestion_taller/middleware/country_prefix.py
 import logging
 
@@ -23,7 +25,7 @@ class EnforceCountryPrefixMiddleware:
         try:
             # Solo aplicar para usuarios autenticados
             if request.user.is_authenticated:
-                empresa = get_or_create_empresa(request)
+                empresa = get_user_empresa_safe(request.user)
                 expected_prefix = (
                     "/cl/" if (getattr(empresa, "pais", "") or "").upper() == "CL" else "/us/"
                 )

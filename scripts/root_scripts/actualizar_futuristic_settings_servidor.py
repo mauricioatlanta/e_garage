@@ -36,7 +36,7 @@ def futuristic_company_settings_view(request):
     Vista futurista para configuración de empresa y gestión de técnicos
     Usa el mismo template que company_settings_view para mantener consistencia
     """
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # Usar CompanySettings en lugar de ConfiguracionEmpresa (igual que company_settings_view)
     try:

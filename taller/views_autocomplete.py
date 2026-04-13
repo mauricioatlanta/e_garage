@@ -32,7 +32,7 @@ def _get_empresa(request):
     try:
         from taller.utils.empresa import get_or_create_empresa
 
-        return get_or_create_empresa(request)
+        return get_user_empresa_safe(request.user)
     except Exception:
         return None
 

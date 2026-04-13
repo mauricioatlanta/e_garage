@@ -18,7 +18,7 @@ from taller.utils.pais_utils import get_configuracion_pais
 
 @login_required(login_url=None)
 def company_settings_view(request):
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
     config_empresa, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
 
     # Obtener o crear configuración

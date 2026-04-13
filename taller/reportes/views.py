@@ -55,7 +55,7 @@ from taller.reportes.kilometraje_reportes import ReporteKilometraje
 # TEMPORALMENTE COMENTADO POR PROBLEMA DE MEMORIA CON OPENPYXL
 # def exportar_mecanicos_excel(request):
 #     """Exporta a Excel el reporte de mecánicos en el rango filtrado"""
-#     empresa = get_or_create_empresa(request)
+#     empresa = get_user_empresa_safe(request.user)
 
 #     # Obtener filtros (igual que en reportes_mecanicos)
 #     fecha_desde = request.GET.get("fecha_desde") or (
@@ -143,7 +143,7 @@ def reporte_repuestos(request):
     from taller.models.repuesto import Repuesto
 
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # Top 10 repuestos más vendidos - FILTRADO POR EMPRESA
     repuesto_ventas = (
@@ -283,7 +283,7 @@ def reporte_repuestos(request):
 @login_required_default
 def reporte_servicios(request):
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     tipos_facturacion = ["FAC", "BOL"]
 
@@ -614,7 +614,7 @@ def dashboard_inteligencia_operativa(request):
     from decimal import InvalidOperation
 
     # 🔒 FILTRO CRÍTICO POR EMPRESA - Usuario autenticado garantizado
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # 📊 Calcular KPIs principales - FILTRADO POR EMPRESA
     facturacion_total = (
@@ -865,7 +865,7 @@ def diagnostico_ia(request):
     Protegido con rate limiting estricto
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA (siempre autenticado y robusto)
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # Obtener documentos para análisis - FILTRADO POR EMPRESA
     documentos = (
@@ -906,7 +906,7 @@ def reportes_mecanicos(request):
     """Vista principal para reportes por mecánico con IA"""
 
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # Guardia para verificar el país de la empresa vs la ruta usada
     path_info = request.path_info
@@ -1256,7 +1256,7 @@ def centro_contable_chile(request):
     from datetime import datetime, timedelta
     from decimal import Decimal
 
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # Manejo de filtros de fecha avanzados
     hoy = date.today()
@@ -1711,7 +1711,7 @@ def recordatorios_mantenimiento(request):
     permitiendo al taller contactar proactivamente a los clientes.
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # Obtener parámetros de configuración desde GET (con valores por defecto)
     servicio_km = int(request.GET.get("servicio_km", 10000))  # Kilometraje del servicio
@@ -1796,7 +1796,7 @@ def historial_mantenimiento_vehiculo(request, vehiculo_id):
     Muestra el historial completo tipo "Libro de Mantenciones Digital"
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # Obtener vehículo (con filtro de empresa)
     try:
@@ -1829,7 +1829,7 @@ def api_historial_vehiculo(request, vehiculo_id):
     Útil para Portal del Cliente y exportaciones.
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     try:
         vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
@@ -1875,7 +1875,7 @@ def exportar_historial_pdf(request, vehiculo_id):
     Genera un PDF del historial completo del vehículo usando WeasyPrint.
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     try:
         vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
@@ -1955,7 +1955,7 @@ def exportar_historial_excel(request, vehiculo_id):
     Genera un archivo Excel del historial completo del vehículo usando openpyxl.
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     try:
         vehiculo = Vehiculo.objects.get(pk=vehiculo_id, empresa=empresa)
@@ -2175,7 +2175,7 @@ def verificar_garantia(request):
     Puede recibir IDs de documentos o buscar automáticamente garantías activas.
     """
     # 🔒 FILTRO CRÍTICO POR EMPRESA
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # Obtener IDs de documentos desde GET
     doc_garantia_id = request.GET.get("doc_garantia_id")

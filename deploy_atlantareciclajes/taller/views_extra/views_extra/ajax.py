@@ -25,7 +25,7 @@ def buscar_clientes(request):
         if not term or len(term) < 2:
             return JsonResponse({"results": []})
 
-        empresa = get_or_create_empresa(request)
+        empresa = get_user_empresa_safe(request.user)
         print(f"🏢 Empresa obtenida: {empresa}")
 
         # 🔒 SEGURIDAD: Solo clientes de esta empresa
@@ -96,7 +96,7 @@ def vehiculos_por_cliente(request):
             print(f"⚠️ ID de cliente inválido: {cliente_id}")
             return JsonResponse({"error": "ID de cliente inválido", "results": []})
 
-        empresa = get_or_create_empresa(request)
+        empresa = get_user_empresa_safe(request.user)
         print(f"🏢 Empresa obtenida: {empresa}")
 
         if not empresa:
@@ -199,7 +199,7 @@ def ciudades_por_region(request):
 
 @login_required
 def vehiculos_por_cliente(request):
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
     # [FIX] BISTURÍ: Aceptar tanto 'cliente' como 'cliente_id'
     cliente_id = request.GET.get("cliente") or request.GET.get("cliente_id")
     if not cliente_id:

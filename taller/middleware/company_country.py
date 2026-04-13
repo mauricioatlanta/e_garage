@@ -22,7 +22,7 @@ class CompanyCountryMiddleware(MiddlewareMixin):
         Empresa = apps.get_model("taller", "Empresa")
 
         company = None
-        company_id = request.session.get("empresa_id")
+        company_id = None
 
         if company_id:
             try:

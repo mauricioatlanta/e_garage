@@ -64,7 +64,7 @@ def vehiculos_por_cliente(request):
         except (ValueError, TypeError):
             return JsonResponse({"error": "ID de cliente inválido", "results": []})
 
-        empresa = get_or_create_empresa(request)
+        empresa = get_user_empresa_safe(request.user)
 
         if not empresa:
             return JsonResponse({"error": "Empresa no encontrada", "results": []})

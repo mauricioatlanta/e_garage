@@ -88,6 +88,7 @@ class CustomLoginForm(LoginForm):
         return cleaned_data
 
     def login(self, request, redirect_url=None):
+        request.session.pop("empresa_id", None)
         """
         Personalizar el login para manejar la funcionalidad "recordar"
         """

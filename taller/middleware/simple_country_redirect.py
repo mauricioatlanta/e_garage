@@ -77,7 +77,7 @@ class SimpleCountryRedirectMiddleware(MiddlewareMixin):
 
         # 0) Preferir empresa activa en sesión
         empresa = None
-        empresa_id = request.session.get("empresa_id")
+        empresa_id = None
         if empresa_id:
             try:
                 from taller.models import Empresa

@@ -2,6 +2,8 @@ from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import ObjectDoesNotExist
 
+from taller.models import Empresa
+
 
 def get_user_empresa_safe(user):
     """
@@ -18,38 +20,25 @@ def get_user_empresa_safe(user):
 
 
 def get_or_create_empresa(request):
-    """Obtiene la Empresa asociada al request de forma robusta.
-
-    - Usa request.empresa si un middleware ya la setea.
-    - Requiere usuario autenticado; opcionalmente usa DEMO_EMPRESA_ID.
-    - Crea una Empresa mínima asociada al usuario si no existe.
-    """
-    # 1) Empresa desde middleware
+    """Obtiene la Empresa asociada al request de forma robusta."""
     emw = getattr(request, "empresa", None)
     if emw is not None:
         return emw
 
     user = getattr(request, "user", None)
 
-    # 2) Usuario autenticado o DEMO
     if not user or not getattr(user, "is_authenticated", False):
         demo_id = getattr(settings, "DEMO_EMPRESA_ID", None)
         if demo_id:
-            from taller.models.empresa import Empresa
-
             try:
                 return Empresa.objects.get(pk=demo_id)
             except Empresa.DoesNotExist:
                 pass
         raise PermissionDenied("Debes iniciar sesión para ver este reporte.")
 
-    # 3) Intentar relación directa (evitar DoesNotExist de la OneToOne inversa)
     empresa = get_user_empresa_safe(user)
     if empresa is not None:
         return empresa
-
-    # 4) Buscar por FK y crear si no existe
-    from taller.models.empresa import Empresa
 
     empresa = Empresa.objects.filter(user=user).first()
     if empresa:
@@ -67,9 +56,6 @@ def get_or_create_empresa(request):
     return empresa
 
 
-from taller.models import Empresa
-
-
 def get_active_empresa(request):
     """
     Devuelve la empresa activa:
@@ -80,13 +66,11 @@ def get_active_empresa(request):
     if not request.user.is_authenticated:
         return None
 
-    empresa_id = request.session.get("empresa_id") or request.GET.get("empresa_id")
+    empresa_id = None or request.GET.get("empresa_id")
     if empresa_id:
         try:
-            # si tu relación es diferente, ajusta el filtro (ej.: owner=request.user)
             return Empresa.objects.get(id=empresa_id, user=request.user)
         except Empresa.DoesNotExist:
             pass
 
-    # Fallback estable
     return Empresa.objects.filter(user=request.user).order_by("id").first()

@@ -192,7 +192,7 @@ Obtiene contexto de garantía para incluir en vistas.
 - `ReporteKilometraje(empresa)` filtra automáticamente
 
 ✅ **Validación en vistas:**
-- `get_or_create_empresa(request)` garantiza empresa válida
+- `get_user_empresa_safe(request.user)` garantiza empresa válida
 - `@login_required_default` garantiza autenticación
 
 ---

@@ -160,7 +160,7 @@ class ConfiguracionRubroForm(forms.ModelForm):
             try:
                 from taller.utils.empresa import get_or_create_empresa
 
-                empresa = get_or_create_empresa(request)
+                empresa = get_user_empresa_safe(request.user)
                 if empresa and hasattr(empresa, "pais") and empresa.pais:
                     country_code = str(empresa.pais).upper().strip()
             except Exception:
@@ -253,7 +253,7 @@ class ConfiguracionServiciosForm(forms.ModelForm):
             try:
                 from taller.utils.empresa import get_or_create_empresa
 
-                empresa = get_or_create_empresa(request)
+                empresa = get_user_empresa_safe(request.user)
                 if empresa and hasattr(empresa, "pais") and empresa.pais:
                     country_code = str(empresa.pais).upper().strip()
             except Exception:

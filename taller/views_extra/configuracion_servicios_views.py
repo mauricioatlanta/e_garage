@@ -24,7 +24,7 @@ def configurar_servicios(request):
     - Ver servicios bloqueados (no relacionados con los rubros seleccionados)
     """
     # Obtener la empresa asociada al usuario autenticado
-    empresa = get_or_create_empresa(request)
+    empresa = get_user_empresa_safe(request.user)
 
     # Obtener o crear la configuración de la empresa
     try:
