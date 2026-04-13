@@ -417,49 +417,6 @@ body {
         {% endif %}
 
         <!-- Formulario -->
-        <form method="POST" action="{{ request.path }}">
-            {% csrf_token %}
-            {% if request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
-
-            <!-- Email/Usuario -->
-            <div class="form-group">
-                <label for="id_login" class="form-label font-tech">
-                    {% trans "Email or Username" %}
-                </label>
-                {{ form.login|add_class:"form-input"|attr:"placeholder:Enter your email" }}
-                {% if form.login.errors %}
-                <div class="error-message">
-                    {% for error in form.login.errors %}{{ error }}{% endfor %}
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Contraseña -->
-            <div class="form-group">
-                <label for="id_password" class="form-label font-tech">
-                    {% trans "Password" %}
-                </label>
-                {{ form.password|add_class:"form-input"|attr:"placeholder:Enter your password"|attr:"type:password" }}
-                {% if form.password.errors %}
-                <div class="error-message">
-                    {% for error in form.password.errors %}{{ error }}{% endfor %}
-                </div>
-                {% endif %}
-            </div>
-
-            <!-- Remember Me -->
-            {% if form.remember %}
-            <div class="remember-me">
-                {{ form.remember }}
-                <label for="id_remember">{% trans "Remember me" %}</label>
-            </div>
-            {% endif %}
-
-            <!-- Botón Submit -->
-            <button type="submit" class="login-button">
-                {% trans "SIGN IN" %}
-            </button>
-        </form>
 
         <!-- Forgot Password -->
         <div class="forgot-password">

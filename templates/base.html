@@ -1076,7 +1076,7 @@
           window.location.reload();
         });
 
-        navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js', { scope: '/' })
+        // // navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js?v=2.2.0?v=2.2.0', { scope: '/' })
           .then(function(registration) {
             console.log('✅ Service Worker registrado exitosamente:', registration.scope);
             
