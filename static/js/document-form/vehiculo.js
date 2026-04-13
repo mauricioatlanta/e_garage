@@ -197,6 +197,7 @@
 
         var normalizedClienteId = String(clienteId || '').trim();
         if (!normalizedClienteId) {
+            console.warn('No hay cliente seleccionado, limpiando vehiculos');
             resetSelection();
             return;
         }
@@ -241,8 +242,8 @@
                 preseleccionarVehiculo(vehiculoIdToSelect, preferredLabel);
             }
         } catch (err) {
-            console.error('cargarVehiculosPorCliente', err);
-            els.vehiculoSelect.innerHTML = '<option value="">' + (EG.I18N.error_loading_vehicles || 'Error loading vehicles') + '</option>';
+            console.error('Error cargando vehiculos', err);
+            els.vehiculoSelect.innerHTML = '<option value="">' + (EG.I18N.no_vehicles || 'Sin vehiculos') + '</option>';
             els.vehiculoSelect.dataset.source = 'error';
         } finally {
             els.vehiculoSelect.disabled = false;

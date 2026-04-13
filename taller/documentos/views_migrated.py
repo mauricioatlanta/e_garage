@@ -22,6 +22,7 @@ from django.views.generic import (
     UpdateView,
 )
 
+from django.db import transaction
 from django.db.models import (
     Case,
     Count,
@@ -34,7 +35,7 @@ from django.db.models import (
     When,
 )
 from django.db.models.functions import Coalesce
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, ValidationError
 
 from taller.config.feature_flags import get_country_features
 from taller.documentos.forms import DocumentoForm
@@ -1153,14 +1154,51 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
     def form_valid(self, form):
         form.instance.empresa = self.request.user.empresa
 
-        # Guardar el documento; las líneas se crean desde repuestos_json en DocumentoForm.save()
-        response = super().form_valid(form)
+        try:
+            with transaction.atomic():
+                response = super().form_valid(form)
+        except ValidationError as exc:
+            if hasattr(exc, "message_dict"):
+                for field, errors in exc.message_dict.items():
+                    target = None if field == "__all__" else field
+                    for error in errors:
+                        form.add_error(target, error)
+            else:
+                form.add_error(None, exc)
+            return self.form_invalid(form)
+
+        from django.contrib import messages
+
+        messages.success(
+            self.request,
+            f"Documento {form.instance.numero_documento} creado exitosamente para {form.instance.cliente.nombre}.",
+        )
+
+        return response
+
+    def form_valid_legacy(self, form):
+        form.instance.empresa = self.request.user.empresa
+        try:
+            with transaction.atomic():
+
+                # Guardar el documento; las líneas se crean desde repuestos_json en DocumentoForm.save()
+                response = super().form_valid(form)
 
         # No llamar procesar_items_dinamicos: el formulario usa JSON (repuestos_json)
         # y ya crea las líneas en _process_json_data(); procesar_items_dinamicos
         # espera POST con prefijos rep-* y borraría las líneas recién creadas.
 
         # Agregar mensaje de éxito
+        except ValidationError as exc:
+            if hasattr(exc, "message_dict"):
+                for field, errors in exc.message_dict.items():
+                    target = None if field == "__all__" else field
+                    for error in errors:
+                        form.add_error(target, error)
+            else:
+                form.add_error(None, exc)
+            return self.form_invalid(form)
+
         from django.contrib import messages
 
         messages.success(
@@ -1666,15 +1704,47 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         return self.render_country_lang(self.request, context)
 
     def form_valid(self, form):
+        form.instance.empresa = self.request.user.empresa
+
+        try:
+            with transaction.atomic():
+                response = super().form_valid(form)
+        except ValidationError as exc:
+            if hasattr(exc, "message_dict"):
+                for field, errors in exc.message_dict.items():
+                    target = None if field == "__all__" else field
+                    for error in errors:
+                        form.add_error(target, error)
+            else:
+                form.add_error(None, exc)
+            return self.form_invalid(form)
+
+        from django.contrib import messages
+
+        messages.success(
+            self.request,
+            f"Documento {self.object.numero_documento} actualizado correctamente.",
+        )
+        return response
+
+    def form_valid_legacy(self, form):
         # En edición, borrar líneas existentes antes de guardar para que
         # DocumentoForm.save() las recree desde repuestos_json (evita duplicados).
         # No usar procesar_items_dinamicos: el formulario usa JSON, no POST con prefijos rep-*.
-        if self.object.pk:
-            self.object.lineas_repuesto.all().delete()
-            self.object.lineas_servicio.all().delete()
-            self.object.lineas_otro_servicio.all().delete()
+        form.instance.empresa = self.request.user.empresa
 
-        response = super().form_valid(form)
+        try:
+            with transaction.atomic():
+                response = super().form_valid(form)
+        except ValidationError as exc:
+            if hasattr(exc, "message_dict"):
+                for field, errors in exc.message_dict.items():
+                    target = None if field == "__all__" else field
+                    for error in errors:
+                        form.add_error(target, error)
+            else:
+                form.add_error(None, exc)
+            return self.form_invalid(form)
 
         from django.contrib import messages
 

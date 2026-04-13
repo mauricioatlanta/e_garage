@@ -264,12 +264,12 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "taller.middleware.rate_limiting.RateLimitMiddleware",
     "taller.middleware.empresa_middleware.EmpresaMiddleware",
+    "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
     "taller.middleware.onboarding_middleware.OnboardingMiddleware",
     "taller.middleware.simple_country_redirect.SimpleCountryRedirectMiddleware",
     "taller.middleware.lang_policy.LanguagePolicyMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "taller.middleware.verificar_suscripcion.VerificarSuscripcionMiddleware",
 ]
 
 # AccountMiddleware de allauth: agregar dinámicamente si existe
@@ -330,6 +330,7 @@ TEMPLATES = [
                 "taller.context_processors.country_config.country_context",
                 "taller.context_processors.feature_flags.country_features",
                 "taller.context_processors.ui_labels.ui_labels_context",
+                "taller.context_processors.subscription_status.subscription_status",
                 "taller.context_processors.support_context",
                 "taller.context_processors.ayuda_contextual.ayuda_contextual",
             ],

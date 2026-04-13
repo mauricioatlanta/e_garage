@@ -1,4 +1,5 @@
 import json
+from decimal import Decimal
 
 import pytest
 
@@ -7,13 +8,14 @@ from django.urls import reverse
 from django.utils import timezone
 
 from taller.models.clientes import Cliente
+from taller.models.documento import Documento
 from taller.models.empresa import Empresa
+from taller.models.lineas_documento import LineaRepuesto
 from taller.models.vehiculos import Vehiculo
 
 
 # ---------- Fixtures simples ----------
 @pytest.fixture
-@pytest.mark.django_db
 def user_cl(db):
     u = User.objects.create_user(username="mauri", password="pass")
     Empresa.objects.create(user=u, nombre_taller="EG Chile", pais="CL")  # moneda CLP por save()
@@ -21,7 +23,6 @@ def user_cl(db):
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def user_us(db):
     u = User.objects.create_user(username="john", password="pass")
     Empresa.objects.create(user=u, nombre_taller="EG USA", pais="US")  # moneda USD por save()
@@ -29,7 +30,6 @@ def user_us(db):
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def cliente_y_vehiculos(user_cl):
     emp = user_cl.empresa
     c1 = Cliente.objects.create(empresa=emp, nombre="Acme Ltda.")
@@ -126,7 +126,7 @@ def test_form_labels_por_pais(client, user_cl, user_us):
     assert form_cl.fields["vehiculo"].label == "Vehículo"
 
     # Test USA
-    form_us = DocumentoForm(user=user_us, empresa=user_us.empresa, country="US")
+    form_us = DocumentoForm(user=user_us, empresa=user_us.empresa, country="US", language="en")
     assert form_us.fields["cliente"].label == "Customer"
     assert form_us.fields["vehiculo"].label == "Vehicle"
 
@@ -221,3 +221,92 @@ def test_form_widget_ids_set_correctly(client, user_cl):
     assert form.fields["kilometraje"].widget.attrs.get("id") == "id_kilometraje"
     assert form.fields["observaciones"].widget.attrs.get("id") == "id_observaciones"
     assert form.fields["pagado"].widget.attrs.get("id") == "id_pagado"
+
+
+@pytest.mark.django_db
+def test_form_rechaza_json_invalido(user_cl, cliente_y_vehiculos):
+    c1, _, v1, _, _ = cliente_y_vehiculos
+
+    from taller.documentos.forms import DocumentoForm
+
+    data = {
+        "tipo": "OT",
+        "fecha_emision": timezone.now().date(),
+        "cliente": str(c1.id),
+        "vehiculo": str(v1.id),
+        "repuestos_json": "{not-json",
+        "servicios_json": "[]",
+        "otros_json": "[]",
+    }
+
+    form = DocumentoForm(data=data, user=user_cl, empresa=user_cl.empresa, country="CL")
+
+    assert not form.is_valid()
+    assert "repuestos_json" in form.errors
+
+
+@pytest.mark.django_db
+def test_form_update_reemplaza_lineas_y_recalcula_totales(user_cl, cliente_y_vehiculos):
+    c1, _, v1, _, _ = cliente_y_vehiculos
+    empresa = user_cl.empresa
+
+    documento = Documento.objects.create(
+        empresa=empresa,
+        cliente=c1,
+        vehiculo=v1,
+        tipo="OT",
+        fecha_emision=timezone.now().date(),
+    )
+    LineaRepuesto.objects.create(
+        documento=documento,
+        nombre="Linea vieja",
+        codigo="OLD-1",
+        cantidad=1,
+        precio_unitario=Decimal("100.00"),
+        descuento=Decimal("0.00"),
+        origen_repuesto="EXTERNO",
+    )
+
+    from taller.documentos.forms import DocumentoForm
+
+    data = {
+        "tipo": "OT",
+        "fecha_emision": timezone.now().date(),
+        "cliente": str(c1.id),
+        "vehiculo": str(v1.id),
+        "apply_vat": "on",
+        "repuestos_json": json.dumps(
+            [
+                {
+                    "codigo": "NEW-1",
+                    "nombre": "Linea nueva",
+                    "cantidad": 2,
+                    "precio": "150",
+                    "descuento": "10",
+                }
+            ]
+        ),
+        "servicios_json": "[]",
+        "otros_json": "[]",
+    }
+
+    form = DocumentoForm(
+        data=data,
+        instance=documento,
+        user=user_cl,
+        empresa=empresa,
+        country="CL",
+    )
+
+    assert form.is_valid(), form.errors
+    saved = form.save()
+    saved.refresh_from_db()
+
+    assert saved.lineas_repuesto.count() == 1
+    linea = saved.lineas_repuesto.get()
+    assert linea.nombre == "Linea nueva"
+    assert linea.codigo == "NEW-1"
+    assert saved.lineas_repuesto.filter(codigo="OLD-1").count() == 0
+    assert saved.neto_repuestos == Decimal("270.00")
+    assert saved.tax_amount == Decimal("51.00")
+    assert saved.total == Decimal("321.00")

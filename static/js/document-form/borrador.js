@@ -9,6 +9,7 @@
 
     var DOC_DRAFT_VERSION = 2;
     var DOC_DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+    var SHOULD_LOAD_DRAFT = false;
     var docDraftSaveTimer = null;
 
     function getDocumentFormDraftKey() {
@@ -131,6 +132,10 @@
     }
 
     function loadDocumentDraftParsed() {
+        if (!SHOULD_LOAD_DRAFT || window.FORCE_NEW_DOCUMENT) {
+            return null;
+        }
+
         var key = getDocumentFormDraftKey();
         if (!key) return null;
         try {
@@ -185,6 +190,10 @@
     }
 
     async function restoreDocumentDraftAfterHydrate(opts) {
+        if (!SHOULD_LOAD_DRAFT || window.FORCE_NEW_DOCUMENT) {
+            return;
+        }
+
         var hasServerLines = !!(opts && opts.hasServerLines);
         var draft = loadDocumentDraftParsed();
         if (!draft) return;

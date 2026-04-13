@@ -1,7 +1,11 @@
+import json
+from decimal import Decimal, InvalidOperation
+
 # Formulario unificado y mejorado para Documento
 from dal import autocomplete
 
 from django import forms
+from django.db import transaction
 from django.utils.translation import get_language
 
 from taller.models.clientes import Cliente
@@ -12,6 +16,80 @@ from taller.models.vehiculos import Vehiculo
 # Helper centralizado para namespaces de autocompletado
 def _ns(country: str) -> str:
     return "usa_autocomplete" if (country or "").upper() == "US" else "cl_autocomplete"
+
+
+def _normalize_numeric_string(value):
+    if value in (None, "", "None"):
+        return ""
+    if isinstance(value, (int, float, Decimal)):
+        return str(value)
+    text = str(value).strip()
+    if not text:
+        return ""
+    text = text.replace(" ", "")
+    comma = text.rfind(",")
+    dot = text.rfind(".")
+    if comma > -1 and dot > -1:
+        if comma > dot:
+            text = text.replace(".", "").replace(",", ".")
+        else:
+            text = text.replace(",", "")
+    elif comma > -1:
+        text = text.replace(".", "").replace(",", ".")
+    else:
+        if text.count(".") > 1:
+            last = text.rfind(".")
+            text = text[:last].replace(".", "") + "." + text[last + 1 :]
+        else:
+            text = text.replace(",", "")
+    return text
+
+
+def _to_decimal(value, default=Decimal("0")):
+    normalized = _normalize_numeric_string(value)
+    if not normalized:
+        return default
+    try:
+        return Decimal(normalized)
+    except (InvalidOperation, TypeError, ValueError):
+        return default
+
+
+def _to_positive_int(value, default=1):
+    try:
+        return max(1, int(_to_decimal(value, Decimal(default))))
+    except (TypeError, ValueError):
+        return default
+
+
+def _to_optional_int(value):
+    if value in (None, "", "None"):
+        return None
+    try:
+        return int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+
+
+def _parse_json_list_field(value):
+    if value in (None, "", "None", "null"):
+        return []
+
+    parsed = value
+    if isinstance(value, str):
+        parsed = json.loads(value)
+
+    if parsed is None:
+        return []
+    if not isinstance(parsed, list):
+        raise ValueError("Expected a JSON list")
+
+    normalized = []
+    for item in parsed:
+        if not isinstance(item, dict):
+            raise ValueError("Each line item must be an object")
+        normalized.append(item)
+    return normalized
 
 
 class DocumentoForm(forms.ModelForm):
@@ -328,6 +406,7 @@ class DocumentoForm(forms.ModelForm):
     def clean(self):
         """Validaciones robustas multi-tenant"""
         cleaned_data = super().clean()
+        self._parsed_line_items = {}
 
         # Validar que cliente pertenece a la empresa
         cliente = cleaned_data.get("cliente")
@@ -372,6 +451,14 @@ class DocumentoForm(forms.ModelForm):
                         "Debe especificar al menos kilometraje o millas cuando hay un vehículo."
                     )
 
+        for field_name in ("repuestos_json", "servicios_json", "otros_json"):
+            try:
+                self._parsed_line_items[field_name] = _parse_json_list_field(
+                    cleaned_data.get(field_name, "[]")
+                )
+            except (TypeError, ValueError, json.JSONDecodeError):
+                self.add_error(field_name, "Formato invalido de lineas del documento.")
+
         return cleaned_data
 
     def save(self, commit=True):
@@ -387,9 +474,17 @@ class DocumentoForm(forms.ModelForm):
 
         # Guardar el documento (kilometraje_ingreso no está en fields del Meta,
         # así que Django lo ignorará automáticamente)
-        documento = super().save(commit=commit)
+        documento = super().save(commit=False)
+        if self.empresa:
+            documento.empresa = self.empresa
 
-        if commit:
+        if not commit:
+            return documento
+
+        with transaction.atomic():
+            documento.save()
+            if hasattr(self, "save_m2m"):
+                self.save_m2m()
             # Procesar datos JSON solo si el documento se guardó
             self._process_json_data(documento)
 
@@ -433,6 +528,143 @@ class DocumentoForm(forms.ModelForm):
         )
 
     def _process_json_data(self, documento):
+        """Procesa los datos JSON y recrea las lineas del documento."""
+        from taller.models.catalogo_servicios import Service
+        from taller.models.lineas_documento import (
+            LineaOtroServicio,
+            LineaRepuesto,
+            LineaServicio,
+            ORIGEN_DESARME,
+            ORIGEN_EXTERNO,
+            ORIGEN_STOCK_BODEGA,
+        )
+        from taller.servicios.models import Servicio
+
+        parsed_line_items = getattr(self, "_parsed_line_items", {})
+        repuestos = parsed_line_items.get("repuestos_json", [])
+        servicios = parsed_line_items.get("servicios_json", [])
+        otros = parsed_line_items.get("otros_json", [])
+
+        # Reemplazar todas las lineas evita arrastre de estado al editar.
+        documento.lineas_repuesto.all().delete()
+        documento.lineas_servicio.all().delete()
+        documento.lineas_otro_servicio.all().delete()
+
+        allowed_origins = {ORIGEN_EXTERNO, ORIGEN_STOCK_BODEGA, ORIGEN_DESARME}
+
+        for rep_data in repuestos:
+            codigo = (rep_data.get("codigo") or "").strip()
+            nombre = (rep_data.get("nombre") or "").strip()
+            repuesto_id = _to_optional_int(rep_data.get("repuesto_id") or rep_data.get("id"))
+            part_id = _to_optional_int(rep_data.get("part_id"))
+
+            if not (codigo or nombre or repuesto_id or part_id):
+                continue
+
+            origen = rep_data.get("origen_repuesto")
+            if not origen:
+                if pieza_desarme_id := _to_optional_int(rep_data.get("pieza_desarme_id")):
+                    origen = ORIGEN_DESARME
+                elif repuesto_id is not None or part_id is not None:
+                    origen = ORIGEN_STOCK_BODEGA
+                else:
+                    origen = ORIGEN_EXTERNO
+            if origen not in allowed_origins:
+                origen = ORIGEN_STOCK_BODEGA
+
+            kwargs = {
+                "documento": documento,
+                "codigo": codigo or nombre or str(repuesto_id or part_id or ""),
+                "nombre": nombre or codigo or "Repuesto",
+                "cantidad": _to_positive_int(rep_data.get("cantidad"), default=1),
+                "precio_unitario": _to_decimal(
+                    rep_data.get("precio", rep_data.get("precio_unitario", 0))
+                ),
+                "descuento": _to_decimal(rep_data.get("descuento", 0)),
+                "origen_repuesto": origen,
+                "tecnico_responsable_id": _to_optional_int(rep_data.get("tecnico_responsable_id")),
+            }
+
+            pieza_desarme_id = _to_optional_int(rep_data.get("pieza_desarme_id"))
+            if origen == ORIGEN_DESARME and pieza_desarme_id:
+                kwargs["pieza_desarme_id"] = pieza_desarme_id
+                kwargs["costo_linea"] = _to_decimal(rep_data.get("costo_linea", 0))
+            else:
+                if repuesto_id is not None:
+                    kwargs["repuesto_id"] = repuesto_id
+                if part_id is not None:
+                    kwargs["part_id"] = part_id
+                costo_linea = rep_data.get("costo_linea")
+                if costo_linea not in (None, "", "None"):
+                    kwargs["costo_linea"] = _to_decimal(costo_linea)
+
+            LineaRepuesto.objects.create(**kwargs)
+
+        for serv_data in servicios:
+            servicio_id = _to_optional_int(serv_data.get("servicio_id"))
+            service_id = _to_optional_int(serv_data.get("service_id"))
+            nombre = (serv_data.get("nombre") or "").strip()
+
+            if not (servicio_id or service_id or nombre):
+                continue
+
+            if not nombre and servicio_id:
+                nombre = (
+                    Servicio.objects.filter(pk=servicio_id).values_list("nombre", flat=True).first()
+                    or ""
+                )
+            if not nombre and service_id:
+                nombre = (
+                    Service.objects.filter(pk=service_id).values_list("code", flat=True).first()
+                    or ""
+                )
+            if not nombre:
+                continue
+
+            LineaServicio.objects.create(
+                documento=documento,
+                servicio_id=servicio_id,
+                service_id=service_id,
+                nombre=nombre,
+                cantidad=1,
+                precio_unitario=_to_decimal(
+                    serv_data.get("precio", serv_data.get("precio_unitario", 0))
+                ),
+                descuento=_to_decimal(serv_data.get("descuento", 0)),
+                tecnico_responsable_id=_to_optional_int(serv_data.get("tecnico_responsable_id")),
+            )
+
+        for otro_data in otros:
+            servicio_id = _to_optional_int(otro_data.get("servicio_id"))
+            nombre = (otro_data.get("nombre") or "").strip()
+
+            if not (servicio_id or nombre):
+                continue
+
+            if not nombre and servicio_id:
+                nombre = (
+                    Servicio.objects.filter(pk=servicio_id).values_list("nombre", flat=True).first()
+                    or ""
+                )
+            if not nombre:
+                continue
+
+            LineaOtroServicio.objects.create(
+                documento=documento,
+                servicio_id=servicio_id,
+                nombre=nombre,
+                empresa_externa=(otro_data.get("empresa_ext") or "").strip(),
+                cantidad=_to_positive_int(otro_data.get("cantidad"), default=1),
+                costo_interno=_to_decimal(
+                    otro_data.get("precio_taller", otro_data.get("costo_interno", 0))
+                ),
+                precio_cliente=_to_decimal(
+                    otro_data.get("precio", otro_data.get("precio_cliente", 0))
+                ),
+                tecnico_responsable_id=_to_optional_int(otro_data.get("tecnico_responsable_id")),
+            )
+
+    def _process_json_data_legacy(self, documento):
         """Procesa los datos JSON y crea las líneas del documento"""
         import json
 

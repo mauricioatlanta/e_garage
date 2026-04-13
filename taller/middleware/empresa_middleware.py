@@ -2,13 +2,11 @@
 from __future__ import annotations
 
 from django.db.utils import OperationalError
-from django.shortcuts import redirect
 
-from taller.utils.login_exempt import is_login_exempt_path
 from taller.utils.empresa import get_user_empresa_safe
 
 
-class EmpresaMiddleware:
+class _EmpresaMiddlewareLegacy:
     """
     Middleware multi-tenant:
     - Inyecta request.empresa desde request.user.empresa (si existe)
@@ -98,3 +96,33 @@ class EmpresaMiddleware:
             # evitar '//' accidental
             return rest.replace("//", "/")
         return path
+
+
+class EmpresaMiddleware:
+    """
+    Middleware multi-tenant:
+    - Inyecta request.empresa desde request.user.empresa (si existe)
+    - No decide acceso comercial; eso queda centralizado en VerificarSuscripcionMiddleware
+    """
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        request.empresa = None
+        request.company = None
+        request.country = None
+
+        if getattr(request, "user", None) is not None and request.user.is_authenticated:
+            try:
+                request.empresa = get_user_empresa_safe(request.user)
+                request.company = request.empresa
+                request.country = (
+                    getattr(request.empresa, "pais", None) if request.empresa else None
+                )
+            except (Exception, OperationalError):
+                request.empresa = None
+                request.company = None
+                request.country = None
+
+        return self.get_response(request)

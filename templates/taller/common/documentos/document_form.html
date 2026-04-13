@@ -1559,7 +1559,10 @@ document.addEventListener('DOMContentLoaded', function() {
   };
 })();
 </script>
-<script src="{% static 'js/document-form/index.js' %}"></script>
+<script>
+window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
+</script>
+<script src="{% static 'js/document-form/index.js' %}?v=2.2.0"></script>
 
 {% endblock extra_js %}
 

@@ -882,6 +882,49 @@
   </div>
   {% endif %}
 
+  {% if request.user.is_authenticated and subscription_state != "active" %}
+  <div class="px-4 mt-4" aria-live="polite">
+    <div class="mx-auto max-w-6xl rounded-2xl border px-4 py-4 shadow-[0_12px_40px_rgba(15,23,42,0.28)] {% if subscription_state == 'blocked' %}border-red-400/60 bg-red-950/80 text-red-50{% else %}border-amber-300/60 bg-amber-950/70 text-amber-50{% endif %}">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          {% if request.LANGUAGE_CODE == 'en' %}
+            <p class="text-[11px] font-semibold uppercase tracking-[0.28em] {% if subscription_state == 'blocked' %}text-red-200{% else %}text-amber-200{% endif %}">Subscription status</p>
+            {% if subscription_state == "grace" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Your subscription expired, but you are still within the grace period.</p>
+              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">You keep full access for now, but renewal is already pending.</p>
+            {% elif subscription_state == "restricted" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Some modules are currently restricted due to an overdue subscription.</p>
+              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">You can keep browsing core records, but critical actions remain blocked until renewal.</p>
+            {% elif subscription_state == "blocked" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Your account is suspended due to an overdue subscription.</p>
+              <p class="mt-1 text-xs sm:text-sm text-red-100/80">Only billing, support and account access remain available until renewal.</p>
+            {% endif %}
+          {% else %}
+            <p class="text-[11px] font-semibold uppercase tracking-[0.28em] {% if subscription_state == 'blocked' %}text-red-200{% else %}text-amber-200{% endif %}">Estado de suscripcion</p>
+            {% if subscription_state == "grace" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Tu suscripcion vencio, pero sigues dentro del periodo de gracia.</p>
+              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">Mantienes acceso completo por ahora, pero la renovacion ya esta pendiente.</p>
+            {% elif subscription_state == "restricted" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Algunos modulos estan restringidos por suscripcion vencida.</p>
+              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">Puedes seguir navegando modulos clave, pero las acciones criticas quedan bloqueadas hasta renovar.</p>
+            {% elif subscription_state == "blocked" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Tu cuenta esta suspendida por falta de pago.</p>
+              <p class="mt-1 text-xs sm:text-sm text-red-100/80">Solo billing, soporte y cuenta siguen disponibles hasta regularizar la suscripcion.</p>
+            {% endif %}
+          {% endif %}
+        </div>
+        <a href="{{ billing_renew_url|default:'/cl/es/suscripcion/pago/' }}" class="{% if subscription_state == 'blocked' %}bg-red-500 hover:bg-red-400 text-white{% else %}bg-amber-300 hover:bg-amber-200 text-slate-950{% endif %} inline-flex min-h-[44px] items-center justify-center rounded-xl px-4 py-2 text-sm font-bold shadow-[0_8px_24px_rgba(15,23,42,0.24)] transition-colors">
+          {% if request.LANGUAGE_CODE == 'en' %}
+            Go to billing
+          {% else %}
+            Ir a facturacion
+          {% endif %}
+        </a>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
   {# --- CONTENIDO --- #}
   {% block fondo_extra %}{% endblock %}
   <main class="flex-1">
@@ -1023,6 +1066,16 @@
     // Service Worker Registration para PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
+        let swRefreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', function() {
+          if (swRefreshing) {
+            return;
+          }
+          swRefreshing = true;
+          console.log('Nueva version del Service Worker activa. Recargando...');
+          window.location.reload();
+        });
+
         navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js', { scope: '/' })
           .then(function(registration) {
             console.log('✅ Service Worker registrado exitosamente:', registration.scope);
@@ -1035,8 +1088,13 @@
             // Escuchar actualizaciones del service worker
             registration.addEventListener('updatefound', function() {
               const newWorker = registration.installing;
+              if (!newWorker) {
+                return;
+              }
               newWorker.addEventListener('statechange', function() {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('Nueva version de eGarage disponible. Se activara automaticamente.');
+                  return;
                   // Hay una nueva versión disponible
                   if (confirm('🎉 Nueva versión de eGarage disponible. ¿Deseas actualizar ahora?')) {
                     newWorker.postMessage({ type: 'SKIP_WAITING' });

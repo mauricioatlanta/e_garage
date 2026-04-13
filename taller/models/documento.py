@@ -216,7 +216,9 @@ class Documento(AuditMixin, models.Model):
         """
         if getattr(self, "tax_rate_applied", None) not in (None, ""):
             try:
-                return Decimal(str(self.tax_rate_applied))
+                current_rate = Decimal(str(self.tax_rate_applied))
+                if current_rate != Decimal("0"):
+                    return current_rate
             except Exception:
                 pass
 
@@ -239,44 +241,34 @@ class Documento(AuditMixin, models.Model):
     def _sum_repuesto(self):
         # Calcula cantidad*precio_unitario - descuento línea
         qs = getattr(self, "lineas_repuesto", None)
-        if not qs:
+        if qs is None:
             return Decimal("0")
-
-        # Calcular subtotal con descuento en porcentaje
-        expr = ExpressionWrapper(
-            F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100),
-            output_field=DecimalField(max_digits=14, decimal_places=2),
-        )
-        total = qs.aggregate(s=Sum(expr)).get("s") or Decimal("0")
-        return Decimal(total)
+        total = Decimal("0")
+        for linea in qs.all():
+            total += Decimal(getattr(linea, "subtotal", Decimal("0")) or Decimal("0"))
+        return total
 
     def _sum_servicio(self):
         # Calcula cantidad*precio_unitario - descuento línea
         qs = getattr(self, "lineas_servicio", None)
-        if not qs:
+        if qs is None:
             return Decimal("0")
-
-        # Calcular subtotal con descuento en porcentaje
-        expr = ExpressionWrapper(
-            F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100),
-            output_field=DecimalField(max_digits=14, decimal_places=2),
-        )
-        total = qs.aggregate(s=Sum(expr)).get("s") or Decimal("0")
-        return Decimal(total)
+        total = Decimal("0")
+        for linea in qs.all():
+            total += Decimal(getattr(linea, "subtotal", Decimal("0")) or Decimal("0"))
+        return total
 
     def _sum_otro_servicio(self):
         # Calcula cantidad * precio_cliente
         qs = getattr(self, "lineas_otro_servicio", None)
-        if not qs:
+        if qs is None:
             return Decimal("0")
 
         # precio_cliente puede ser null → coalesce 0
-        expr = ExpressionWrapper(
-            F("cantidad") * F("precio_cliente"),
-            output_field=DecimalField(max_digits=14, decimal_places=2),
-        )
-        total = qs.aggregate(s=Sum(expr)).get("s") or Decimal("0")
-        return Decimal(total)
+        total = Decimal("0")
+        for linea in qs.all():
+            total += Decimal(getattr(linea, "subtotal", Decimal("0")) or Decimal("0"))
+        return total
 
     def recompute_totals(self, persist=False):
         """
@@ -528,11 +520,21 @@ class Documento(AuditMixin, models.Model):
 
         # Expresiones por tipo
         rep_expr = ExpressionWrapper(
-            (F("cantidad") * F("precio_unitario")) - Coalesce(F("descuento"), Value(0)),
+            F("cantidad")
+            * F("precio_unitario")
+            * (
+                Value(Decimal("1.00"))
+                - (Coalesce(F("descuento"), Value(Decimal("0.00"))) / Value(Decimal("100.00")))
+            ),
             output_field=DecimalField(max_digits=14, decimal_places=2),
         )
         serv_expr = ExpressionWrapper(
-            (F("cantidad") * F("precio_unitario")) - Coalesce(F("descuento"), Value(0)),
+            F("cantidad")
+            * F("precio_unitario")
+            * (
+                Value(Decimal("1.00"))
+                - (Coalesce(F("descuento"), Value(Decimal("0.00"))) / Value(Decimal("100.00")))
+            ),
             output_field=DecimalField(max_digits=14, decimal_places=2),
         )
         otros_expr = ExpressionWrapper(

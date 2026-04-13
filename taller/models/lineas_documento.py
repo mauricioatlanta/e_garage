@@ -79,6 +79,7 @@ class LineaServicio(models.Model):
 
     def clean(self):
         """Validaciones de consistencia para LineaServicio"""
+        doc_empresa_id = getattr(getattr(self, "documento", None), "empresa_id", None)
         # Validar country consistency
         if hasattr(self, "documento") and self.documento and self.servicio:
             ValidacionConsistencia.assert_same_country(
@@ -86,6 +87,28 @@ class LineaServicio(models.Model):
                 self.servicio,
                 "Servicio de otro país no puede usarse en este documento",
             )
+
+        if (
+            doc_empresa_id
+            and self.servicio
+            and getattr(self.servicio, "empresa_id", None) != doc_empresa_id
+        ):
+            raise ValidationError(
+                "El servicio legacy debe pertenecer a la misma empresa del documento."
+            )
+
+        if self.service and doc_empresa_id:
+            service_empresa_id = getattr(self.service, "empresa_id", None)
+            if service_empresa_id is not None and service_empresa_id != doc_empresa_id:
+                raise ValidationError(
+                    "El servicio del catalogo debe ser de la misma empresa del documento o global."
+                )
+
+        if self.tecnico_responsable and doc_empresa_id:
+            if getattr(self.tecnico_responsable, "empresa_id", None) != doc_empresa_id:
+                raise ValidationError(
+                    "El tecnico responsable de la linea debe pertenecer a la empresa del documento."
+                )
 
         # Validar que sea servicio interno
         if hasattr(self, "servicio") and self.servicio:
@@ -165,7 +188,47 @@ class LineaOtroServicio(models.Model):
     )
 
     def clean(self):
-        """Validaciones de consistencia para LineaOtroServicio"""
+        """Validaciones de consistencia para LineaOtroServicio."""
+        doc_empresa_id = getattr(getattr(self, "documento", None), "empresa_id", None)
+
+        if not self.servicio and not self.nombre:
+            raise ValidationError("Debe especificar un servicio o un nombre de servicio")
+
+        if hasattr(self, "documento") and self.documento and self.servicio:
+            ValidacionConsistencia.assert_same_country(
+                self.documento,
+                self.servicio,
+                "Otro servicio de otro pais no puede usarse en este documento",
+            )
+            if doc_empresa_id and getattr(self.servicio, "empresa_id", None) != doc_empresa_id:
+                raise ValidationError(
+                    "El servicio legacy debe pertenecer a la misma empresa del documento."
+                )
+
+        if self.tecnico_responsable and doc_empresa_id:
+            if getattr(self.tecnico_responsable, "empresa_id", None) != doc_empresa_id:
+                raise ValidationError(
+                    "El tecnico responsable de la linea debe pertenecer a la empresa del documento."
+                )
+
+        if self.costo_interno and self.precio_cliente:
+            if self.precio_cliente < self.costo_interno:
+                raise ValidationError("El precio al cliente no puede ser menor al costo interno")
+
+    def _unused_cross_class_clean(self):
+        """Helper legacy sin uso."""
+        doc_empresa_id = getattr(getattr(self, "documento", None), "empresa_id", None)
+
+        if self.tecnico_responsable and doc_empresa_id:
+            if getattr(self.tecnico_responsable, "empresa_id", None) != doc_empresa_id:
+                raise ValidationError(
+                    "El tecnico responsable de la linea debe pertenecer a la empresa del documento."
+                )
+
+        self.clean_legacy()
+
+    def _unused_cross_class_clean_legacy(self):
+        """Helper legacy sin uso."""
         # Validar que al menos un servicio esté configurado o campos manuales
         if not self.servicio and not self.nombre:
             raise ValidationError("Debe especificar un servicio o un nombre de servicio")
@@ -300,6 +363,18 @@ class LineaRepuesto(models.Model):
     )
 
     def clean(self):
+        """Validaciones de consistencia para LineaRepuesto."""
+        doc_empresa_id = getattr(getattr(self, "documento", None), "empresa_id", None)
+
+        if self.tecnico_responsable and doc_empresa_id:
+            if getattr(self.tecnico_responsable, "empresa_id", None) != doc_empresa_id:
+                raise ValidationError(
+                    "El tecnico responsable de la linea debe pertenecer a la empresa del documento."
+                )
+
+        self.clean_legacy()
+
+    def clean_legacy(self):
         """Validaciones de consistencia para LineaRepuesto"""
         if (
             hasattr(self, "documento")

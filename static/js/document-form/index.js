@@ -5,7 +5,140 @@
 (function() {
     'use strict';
 
+    var APP_VERSION = '2.2.0';
+
     window.EG = window.EG || {};
+    window.EG.APP_VERSION = APP_VERSION;
+
+    try {
+        if (window.localStorage && window.localStorage.getItem('app_version') !== APP_VERSION) {
+            console.log('Nueva version detectada, limpiando cache');
+
+            window.localStorage.clear();
+            if (window.sessionStorage) {
+                window.sessionStorage.clear();
+            }
+
+            window.localStorage.setItem('app_version', APP_VERSION);
+        }
+    } catch (err) {
+        console.warn('No se pudo validar la version del frontend:', err);
+    }
+
+    function isNewDocumentPage() {
+        var form = document.getElementById('document-form');
+        var path = (window.location.pathname || '').toLowerCase();
+        var formMode = form && form.dataset ? String(form.dataset.mode || '').toLowerCase() : '';
+
+        return !!window.FORCE_NEW_DOCUMENT
+            || formMode === 'create'
+            || path.indexOf('/documentos/form') !== -1
+            || path.indexOf('/documentos/nuevo') !== -1;
+    }
+
+    function clearDraftStorage(storage) {
+        if (!storage) {
+            return;
+        }
+
+        var keysToRemove = [];
+        try {
+            for (var i = 0; i < storage.length; i += 1) {
+                var key = storage.key(i);
+                if (!key) {
+                    continue;
+                }
+
+                var normalizedKey = String(key).toLowerCase();
+                if (
+                    normalizedKey.indexOf('document') !== -1
+                    || normalizedKey.indexOf('draft') !== -1
+                    || normalizedKey.indexOf('doc_draft') !== -1
+                    || normalizedKey.indexOf('eg.documentform') !== -1
+                ) {
+                    keysToRemove.push(key);
+                }
+            }
+        } catch (err) {
+            console.warn('No se pudo enumerar storage', err);
+        }
+
+        keysToRemove.forEach(function(key) {
+            try {
+                storage.removeItem(key);
+            } catch (err) {
+                console.warn('No se pudo limpiar storage para ' + key, err);
+            }
+        });
+    }
+
+    function clearDynamicVisualState() {
+        document.querySelectorAll('#repuestos-container .dynamic-element').forEach(function(row) {
+            row.remove();
+        });
+        document.querySelectorAll('#servicios-container .dynamic-element').forEach(function(row) {
+            row.remove();
+        });
+        document.querySelectorAll('#otros-container .dynamic-element').forEach(function(row) {
+            row.remove();
+        });
+
+        ['servicios-empty-hint', 'otros-empty-hint'].forEach(function(id) {
+            var hint = document.getElementById(id);
+            if (hint) {
+                hint.classList.remove('hidden');
+            }
+        });
+    }
+
+    // Force clean state on new document screens to avoid stale draft data.
+    (function forceCleanDocument() {
+        try {
+            if (!isNewDocumentPage()) {
+                return;
+            }
+
+            console.log('Limpieza forzada de estado del documento');
+
+            clearDraftStorage(window.localStorage);
+            clearDraftStorage(window.sessionStorage);
+
+            if (window.EG.utils && typeof window.EG.utils.clearActiveRowContext === 'function') {
+                window.EG.utils.clearActiveRowContext();
+            }
+
+            ['id_repuestos_json', 'id_servicios_json', 'id_otros_json'].forEach(function(id) {
+                var input = document.getElementById(id);
+                if (input) {
+                    input.value = '[]';
+                }
+            });
+
+            ['id_cliente', 'id_vehiculo', 'cliente-busqueda', 'id_observaciones', 'id_kilometraje_ingreso'].forEach(function(id) {
+                var field = document.getElementById(id);
+                if (!field) {
+                    return;
+                }
+
+                if (field.tagName === 'SELECT') {
+                    field.value = '';
+                    field.dispatchEvent(new Event('change', { bubbles: true }));
+                    return;
+                }
+
+                field.value = '';
+            });
+
+            if (window.EG.state && typeof window.EG.state.reset === 'function') {
+                window.EG.state.reset();
+            }
+
+            clearDynamicVisualState();
+            window.setTimeout(clearDynamicVisualState, 50);
+        } catch (err) {
+            console.warn('Error limpiando estado del documento:', err);
+        }
+    })();
 
     var MODULE_LOAD_ORDER = [
         'config',
@@ -25,7 +158,7 @@
     function loadModule(moduleName) {
         return new Promise(function(resolve, reject) {
             var script = document.createElement('script');
-            script.src = '/static/js/document-form/' + moduleName + '.js';
+            script.src = '/static/js/document-form/' + moduleName + '.js?v=' + encodeURIComponent(APP_VERSION);
             script.onload = resolve;
             script.onerror = function(err) {
                 reject(new Error('Failed to load ' + moduleName + ': ' + err));
