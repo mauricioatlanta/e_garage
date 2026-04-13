@@ -102,6 +102,11 @@ urlpatterns = [
         name="api_vehiculos_cliente",
     ),
     path(
+        "api/vehiculos-por-cliente/",
+        api.api_vehiculos_por_cliente,
+        name="api_vehiculos_por_cliente",
+    ),
+    path(
         "api/buscar-servicios-internos/",
         views_moderno.api_buscar_servicios_internos,
         name="api_buscar_servicios_internos",

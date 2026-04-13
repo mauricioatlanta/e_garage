@@ -42,19 +42,12 @@ def api_buscar_repuestos(request):
         else:
             country = "cl"
 
-    # Obtener empresa del usuario autenticado o usar una demo para testing
+    # Obtener empresa del usuario autenticado; sin empresa no hay acceso.
     empresa = None
     if request.user.is_authenticated:
         empresa = get_empresa_safe(request)
-    else:
-        # Para testing sin autenticación, usar empresa demo basada en el país
-        if country.lower() == "us":
-            empresa = Empresa.objects.filter(pais="US").first()
-        else:
-            empresa = Empresa.objects.filter(pais="CL").first()
-
-        if not empresa:
-            return JsonResponse({"repuestos": []})
+    if not empresa:
+        return JsonResponse({"error": "Empresa no encontrada"}, status=403)
 
     if len(query) < 2:
         return JsonResponse({"repuestos": []})
@@ -587,20 +580,14 @@ def api_vehiculos_cliente(request):
         return JsonResponse({"vehiculos": []})
 
     try:
-        # Obtener empresa del usuario autenticado o usar una demo para testing
+        # Obtener empresa del usuario autenticado; sin empresa no hay acceso.
         empresa = None
         if request.user.is_authenticated:
             empresa = get_empresa_safe(request)
-        else:
-            # Para testing sin autenticación, usar empresa demo basada en el país
-            if country.lower() == "us":
-                empresa = Empresa.objects.filter(pais="US").first()
-            else:
-                empresa = Empresa.objects.filter(pais="CL").first()
 
-            if not empresa:
-                logger.warning(f"No hay empresa configurada para país {country}")
-                return JsonResponse({"vehiculos": []})
+        if not empresa:
+            logger.warning(f"No hay empresa configurada para pais {country}")
+            return JsonResponse({"error": "Empresa no encontrada"}, status=403)
 
         logger.info(f"Empresa: {empresa.nombre_taller}")
 
@@ -644,20 +631,10 @@ def api_buscar_servicios_internos(request):
     country = _country_from_request(request)
     """API para buscar servicios internos"""
     try:
-        # Obtener empresa del usuario o una por defecto para testing
-        if request.user.is_authenticated:
-            empresa = get_empresa_safe(request)
-        else:
-            # Para testing sin autenticación, usar la empresa demo USA
-            empresa = Empresa.objects.filter(nombre_taller="USA Test Garage").first()
-            if not empresa:
-                # Si no existe la empresa demo, usar cualquier empresa USA
-                empresa = Empresa.objects.filter(pais="US").first()
-                if not empresa:
-                    return JsonResponse({"error": "No hay empresa configurada"}, status=400)
+        empresa = get_empresa_safe(request) if request.user.is_authenticated else None
 
         if not empresa:
-            return JsonResponse({"error": "No hay empresa configurada"}, status=400)
+            return JsonResponse({"error": "Empresa no encontrada"}, status=403)
 
         query = request.GET.get("q", "")
 
@@ -697,20 +674,10 @@ def api_obtener_numero_documento(request):
         return JsonResponse({"error": "Tipo de documento requerido"}, status=400)
 
     try:
-        # Obtener empresa del usuario o una por defecto para testing
-        if request.user.is_authenticated:
-            empresa = get_empresa_safe(request)
-        else:
-            # Para testing sin autenticación, usar la empresa demo USA
-            empresa = Empresa.objects.filter(nombre_taller="USA Test Garage").first()
-            if not empresa:
-                # Si no existe la empresa demo, usar cualquier empresa USA
-                empresa = Empresa.objects.filter(pais="US").first()
-                if not empresa:
-                    return JsonResponse({"error": "No hay empresa configurada"}, status=400)
+        empresa = get_empresa_safe(request) if request.user.is_authenticated else None
 
         if not empresa:
-            return JsonResponse({"error": "No hay empresa configurada"}, status=400)
+            return JsonResponse({"error": "Empresa no encontrada"}, status=403)
 
         # Mapear códigos de tipo a nombres completos para prefijos
         tipo_mapping = {

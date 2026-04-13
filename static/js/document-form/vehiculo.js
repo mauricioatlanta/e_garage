@@ -220,7 +220,16 @@
                 return;
             }
 
-            var urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI || '/ajax/vehiculos-por-cliente/';
+            var urlRaw = EG.cfg.URL_VEHICULOS_BY_CLI;
+            if (!urlRaw && EG.cfg.URL_NEXT_NUMBER) {
+                urlRaw = String(EG.cfg.URL_NEXT_NUMBER).replace(
+                    /api\/obtener-numero-documento\/?$/,
+                    'api/vehiculos-por-cliente/'
+                );
+            }
+            if (!urlRaw) {
+                urlRaw = 'documentos/api/vehiculos-por-cliente/';
+            }
             var url = EG.config.buildEndpoint(urlRaw);
             var response = await EG.utils.egFetch(url + '?cliente_id=' + encodeURIComponent(normalizedClienteId));
             if (!response.ok) {

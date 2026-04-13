@@ -591,7 +591,7 @@ class Empresa(models.Model):
         }
 
     @property
-    def is_trial(self):
+    def is_trial_active(self):
         """Atajo para saber si la empresa está en el plan de prueba"""
         return self.plan == "trial"
 
