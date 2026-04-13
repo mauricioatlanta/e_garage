@@ -40,7 +40,7 @@ def get_or_create_empresa(request):
     if empresa is not None:
         return empresa
 
-    empresa = Empresa.objects.filter(user=user).first()
+    empresa = None
     if empresa:
         return empresa
 

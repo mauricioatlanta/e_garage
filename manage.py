@@ -9,7 +9,13 @@ def main():
     if os.getenv("EGARAGE_ENV", "dev").lower() != "prod":
         logging.warning("Modo de desarrollo activado. Asegúrate de no usar esto en producción.")
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings_prod")
+    # ?? FIX: usar settings segun entorno
+
+
+if os.getenv("DJANGO_SETTINGS_MODULE"):
+    pass
+else:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 
     try:
         from django.core.management import execute_from_command_line

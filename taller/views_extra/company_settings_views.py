@@ -132,6 +132,18 @@ def company_settings_view(request):
 
                 if ok_profile and ok_empresa:
                     profile_form.save()
+
+                    # ?? SYNC EMPRESA (FIX CRITICO)
+                    empresa.nombre_taller = profile_form.cleaned_data.get(
+                        "company_name", empresa.nombre_taller
+                    )
+                    empresa.save(update_fields=["nombre_taller"])
+
+                    # ?? SYNC EMPRESA (FIX CRITICO)
+                    empresa.nombre_taller = profile_form.cleaned_data.get(
+                        "company_name", empresa.nombre_taller
+                    )
+                    empresa.save(update_fields=["nombre_taller"])
                     empresa_form.save()  # <-- aquí se guarda logo en ConfiguracionEmpresa
                     cache.delete(f"company_branding_{request.user.id}")
 

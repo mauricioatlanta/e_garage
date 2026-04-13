@@ -17,7 +17,7 @@ def empresa_contexto(request):
 
     try:
         # Intentamos obtener la empresa vinculada al usuario
-        empresa = Empresa.objects.get(user=request.user)
+        empresa = request.user.empresa
         return {
             "empresa": empresa,
             "nombre_taller": getattr(empresa, "nombre_taller", "eGarage"),
