@@ -9,7 +9,19 @@ def main():
     if os.getenv("EGARAGE_ENV", "dev").lower() != "prod":
         logging.warning("Modo de desarrollo activado. Asegúrate de no usar esto en producción.")
 
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings_prod")
+    
+from dotenv import load_dotenv
+import os
+
+env_path = "/srv/egarage/.env.prod"
+if os.path.exists(env_path):
+    load_dotenv(env_path)
+
+if os.getenv("EGARAGE_ENV") == "prod":
+    os.environ["DJANGO_SETTINGS_MODULE"] = "gestion_taller.settings_prod"
+else:
+    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
+
 
     try:
         from django.core.management import execute_from_command_line

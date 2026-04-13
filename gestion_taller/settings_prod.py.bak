@@ -149,7 +149,7 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = env_bool("ACCOUNT_LOGIN_ON_EMAIL_CONFIRMAT
 #   DJANGO_DB_HOST=127.0.0.1
 #   DJANGO_DB_PORT=5432
 
-DB_ENGINE = env_str("DJANGO_DB_ENGINE", "postgresql").lower()
+DB_ENGINE = env_str("DJANGO_DB_ENGINE", "sqlite3").lower()
 
 if DB_ENGINE == "postgresql" or DB_ENGINE == "postgres":
     # PostgreSQL - Configuración para producción
@@ -211,6 +211,13 @@ STATIC_ROOT = "/srv/egarage/staticfiles"
 MEDIA_ROOT = "/srv/egarage/media"
 
 # Forzar la base de datos a la ruta real de tu servidor
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "/srv/egarage/db.sqlite3",
+    }
+}
+
 # Deshabilitar el bloqueo de SQLite
 # if DATABASES["default"]["ENGINE"].endswith("sqlite3"):
 #     raise RuntimeError("PostgreSQL es obligatorio")

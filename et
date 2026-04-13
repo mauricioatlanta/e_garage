@@ -1,0 +1,67 @@
+[0;1;34m# ]8;;file://egarage-server/etc/systemd/system/gunicorn.service/etc/systemd/system/gunicorn.service]8;;[0m
+[0;1;36m[Unit][0m
+Description=gunicorn daemon for egarage
+After=network.target
+[0;1;38;5;245m[0m
+[0;1;36m[Service][0m
+User=egarage
+Group=www-data
+WorkingDirectory=/srv/egarage
+RuntimeDirectory=gunicorn
+Environment="PYTHONPATH=/srv/egarage"
+Environment="DJANGO_SETTINGS_MODULE=gestion_taller.settings_prod"
+[0;1;38;5;245m[0m
+ExecStart=/srv/egarage/venv/bin/gunicorn --access-logfile - --workers 3 --timeout 300 --bind unix:/run/gunicorn/gunicorn.sock gestion_taller.wsgi:application
+[0;1;38;5;245m[0m
+Restart=on-failure
+RestartSec=2
+[0;1;38;5;245m[0m
+[0;1;36m[Install][0m
+WantedBy=multi-user.target
+
+[0;1;34m# ]8;;file://egarage-server/etc/systemd/system/gunicorn.service.d/override-environment.conf/etc/systemd/system/gunicorn.service.d/override-environment.conf]8;;[0m
+[0;1;38;5;245m# Variables de entorno para que Gunicorn use la misma config que migrate_prod.sh.[0m
+[0;1;38;5;245m# Sin esto, wsgi.py usa gestion_taller.settings y otra base de datos.[0m
+[0;1;38;5;245m#[0m
+[0;1;38;5;245m# Copiar al servidor (junto con override-execstart.conf):[0m
+[0;1;38;5;245m#   sudo cp scripts/gunicorn.service.d/override-environment.conf /etc/systemd/system/gunicorn.service.d/[0m
+[0;1;38;5;245m#   sudo systemctl daemon-reload[0m
+[0;1;38;5;245m#   sudo systemctl restart gunicorn[0m
+[0;1;38;5;245m[0m
+[0;1;36m[Service][0m
+EnvironmentFile=/srv/egarage/.env.prod
+Environment=DJANGO_SETTINGS_MODULE=gestion_taller.settings_prod
+
+[0;1;34m# ]8;;file://egarage-server/etc/systemd/system/gunicorn.service.d/override-execstart.conf/etc/systemd/system/gunicorn.service.d/override-execstart.conf]8;;[0m
+[0;1;38;5;245m# Override para gunicorn.service (modo debug: traceback en journald)[0m
+[0;1;38;5;245m# Copiar al servidor:[0m
+[0;1;38;5;245m#   sudo mkdir -p /etc/systemd/system/gunicorn.service.d[0m
+[0;1;38;5;245m#   sudo cp scripts/gunicorn.service.d/override-execstart.conf /etc/systemd/system/gunicorn.service.d/[0m
+[0;1;38;5;245m#   sudo systemctl daemon-reload[0m
+[0;1;38;5;245m#   sudo systemctl restart gunicorn.service[0m
+[0;1;38;5;245m#[0m
+[0;1;38;5;245m# Ver traceback y logs:[0m
+[0;1;38;5;245m#   sudo journalctl -u gunicorn.service -n 200 --no-pager[0m
+[0;1;38;5;245m#[0m
+[0;1;38;5;245m# Mitigación worker timeout: timeout 60s evita workers colgados eternamente; 3 workers[0m
+[0;1;38;5;245m# para no bloquear todo. Para producción estable subir de nuevo a --timeout 300 --workers 4.[0m
+[0;1;38;5;245m#[0m
+[0;1;38;5;245m# Para volver a logs a archivo, usar --error-logfile /var/log/gunicorn/error.log[0m
+[0;1;38;5;245m# y --access-logfile /var/log/gunicorn/access.log en lugar de -[0m
+[0;1;38;5;245m[0m
+[0;1;36m[Service][0m
+ExecStart=
+ExecStart=/srv/egarage/venv/bin/gunicorn \
+  --umask 007 \
+  --capture-output \
+  --log-level info \
+  --access-logfile - \
+  --error-logfile - \
+  --workers 3 \
+  --timeout 60 \
+  --max-requests 800 \
+  --max-requests-jitter 200 \
+  --bind unix:/run/gunicorn/gunicorn.sock \
+  gestion_taller.wsgi:application
+
+[0;1;34m# ]8;;file://egarage-server/etc/systemd/system/gunicorn.service.d/override.conf/etc/systemd/system/gunicorn.service.d/override.conf]8;;[0m

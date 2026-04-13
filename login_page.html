@@ -1,0 +1,269 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Iniciar sesión - eGarage</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/output.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
+  
+</head>
+<body>
+<div id="vanta-bg" style="position:fixed;width:100%;height:100%;top:0;left:0;z-index:0;background:#0a0a0a;background-image:linear-gradient(rgba(34,211,238,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.06) 1px, transparent 1px);background-size:24px 24px;"></div>
+<div class="grid-bg"></div>
+<header class="login-top-header">
+  <div class="login-top-nav">
+    
+
+
+    <a href="/cl/es/bienvenida/" class="back-button font-futuristic">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+        <span>Volver</span>
+    </a>
+
+
+
+  </div>
+  <div class="login-top-actions">
+    
+  </div>
+</header>
+
+<div class="login-container">
+    <div class="glass-card">
+        <!-- Logo -->
+        <div class="logo-section">
+            <div class="logo-container">
+                <img src="/static/img/egarage_logo.png" alt="eGarage" class="logo">
+            </div>
+            
+            
+            
+                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
+            
+            
+        </div>
+
+        <!-- Formulario -->
+        <form method="POST" action="/accounts/login/" class="space-y-6">
+            <input type="hidden" name="csrfmiddlewaretoken" value="RQ4AvYqgGYcAOLeDcbFq0pSoypb6FftqS83io8FUYBm4yBCh5a8XDLSGWnvAdeTt">
+            <input type="hidden" name="country" value="CL">
+            
+
+            <!-- Email/Usuario -->
+            <div class="form-group">
+                <label for="id_login" class="form-label font-futuristic">
+                    Correo o Usuario
+                </label>
+                
+                    <input type="text" name="login" placeholder="Ingresa tus credenciales" autocomplete="email" class="premium-input form-input" inputmode="email" required id="id_login">
+                
+            </div>
+
+            <!-- Contraseña -->
+            <div class="form-group">
+                <label for="id_password" class="form-label font-futuristic">
+                    Contraseña
+                </label>
+                
+                    <input type="password" name="password" placeholder="Ingresa tu contraseña segura" autocomplete="current-password" class="premium-input form-input" autocapitalize="none" autocorrect="off" spellcheck="false" inputmode="text" required id="id_password">
+                
+            </div>
+
+            <!-- Remember Me -->
+            
+
+            <!-- Botón Submit -->
+            <button type="submit" class="login-button">
+                <span class="relative z-10">
+                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+                    </svg>
+                    Acceder al Sistema
+                </span>
+            </button>
+        </form>
+
+        <!-- Forgot Password -->
+        <div class="forgot-password">
+            <a href="/accounts/password/reset/" class="font-futuristic">
+                <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                Restablecer contraseña
+            </a>
+        </div>
+
+        <!-- Sign Up -->
+        <div class="signup-section">
+            <div class="signup-text">¿Nuevo en eGarage?</div>
+            <a href="/accounts/signup/?from=cl" class="signup-link font-futuristic">
+                Crea tu cuenta →
+            </a>
+        </div>
+    </div>
+</div>
+
+<script>
+// Animación de entrada
+document.addEventListener('DOMContentLoaded', function() {
+    const card = document.querySelector('.glass-card');
+    card.style.opacity = '0';
+    card.style.transform = 'translateY(30px)';
+
+    setTimeout(() => {
+        card.style.transition = 'all 0.8s ease-out';
+        card.style.opacity = '1';
+        card.style.transform = 'translateY(0)';
+    }, 100);
+    
+    // Asegurar que el fix de iOS se aplica a los campos de contraseña
+    const passwordInputs = document.querySelectorAll('input[type="password"]');
+    passwordInputs.forEach(function(input) {
+        // Agregar atributos adicionales si no están presentes
+        if (!input.hasAttribute('autocapitalize')) {
+            input.setAttribute('autocapitalize', 'none');
+        }
+        if (!input.hasAttribute('autocorrect')) {
+            input.setAttribute('autocorrect', 'off');
+        }
+        if (!input.hasAttribute('spellcheck')) {
+            input.setAttribute('spellcheck', 'false');
+        }
+    });
+});
+</script>
+
+<script>
+(function initVanta(){
+  function run(){
+    if(typeof VANTA!=='undefined'&&VANTA.NET){VANTA.NET({el:"#vanta-bg",mouseControls:true,touchControls:true,gyroControls:false,minHeight:200,minWidth:200,scale:1,color:0x22d3ee,backgroundColor:0x0a0a0a,points:8,maxDistance:20,spacing:18});return;}
+    if(typeof window._vantaRetried==='undefined'){window._vantaRetried=1;setTimeout(initVanta,400);}
+  }
+  document.readyState==='loading'?document.addEventListener('DOMContentLoaded',run):run();
+})();
+document.addEventListener('DOMContentLoaded',function(){
+  var c=document.querySelector('.glass-card');if(c){c.style.opacity='0';c.style.transform='translateY(30px)';setTimeout(function(){c.style.transition='all 0.8s ease-out';c.style.opacity='1';c.style.transform='translateY(0)';},100);}
+});
+</script>
+<!-- Estilos del login: al final del body para que ganen sobre el preflight de Tailwind CDN -->
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #0a0a0a !important;
+  font-family: 'Exo 2', sans-serif;
+  color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+.font-futuristic { font-family: 'Orbitron', monospace; letter-spacing: 0.05em; }
+.grid-bg {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background-image: linear-gradient(rgba(34,211,238,0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(34,211,238,0.08) 1px, transparent 1px);
+  background-size: 50px 50px; z-index: 1; pointer-events: none;
+}
+.login-container { position: relative; z-index: 10; width: 100%; max-width: 500px; padding: 20px; }
+.login-top-header {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  right: 1rem;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  pointer-events: none;
+}
+.login-top-nav,
+.login-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  pointer-events: auto;
+}
+.glass-card {
+  background: linear-gradient(135deg, rgba(0,230,255,0.1) 0%, rgba(99,102,241,0.05) 100%);
+  backdrop-filter: blur(30px); border-radius: 2rem; border: 2px solid rgba(0,230,255,0.3);
+  box-shadow: 0 20px 60px rgba(0,230,255,0.2), inset 0 1px 0 rgba(255,255,255,0.1);
+  padding: 3rem 2.5rem; position: relative; overflow: hidden;
+}
+.glass-card::before { content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: linear-gradient(90deg, transparent, rgba(0,230,255,0.15), transparent); animation: shimmer 4s infinite; }
+@keyframes shimmer { 0% { left: -100%; } 100% { left: 100%; } }
+.logo-section { text-align: center; margin-bottom: 2.5rem; }
+.logo-container { position: relative; display: inline-block; margin-bottom: 1.5rem; }
+.logo { height: 100px; width: auto; filter: drop-shadow(0 0 30px rgba(0,230,255,0.8)); animation: pulse-glow 3s ease-in-out infinite; }
+@keyframes pulse-glow { 0%, 100% { filter: drop-shadow(0 0 30px rgba(0,230,255,0.8)); transform: scale(1); } 50% { filter: drop-shadow(0 0 40px rgba(0,230,255,1)); transform: scale(1.02); } }
+.welcome-text { font-size: 1rem; color: #94a3b8; font-weight: 500; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
+.subtitle-text { font-size: 0.875rem; background: linear-gradient(45deg, #00e6ff, #6366f1); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-weight: 600; }
+.country-badge {
+  display: inline-block; background: linear-gradient(135deg, rgba(0,230,255,0.15), rgba(99,102,241,0.1));
+  border: 1px solid rgba(0,230,255,0.4); color: #00e6ff; padding: 8px 20px; border-radius: 25px;
+  font-size: 0.875rem; font-weight: 700; margin-top: 1rem; box-shadow: 0 0 15px rgba(0,230,255,0.3);
+}
+.form-group { margin-bottom: 1.5rem; }
+.form-label { display: block; font-size: 0.875rem; font-weight: 700; color: #00e6ff; margin-bottom: 0.5rem; letter-spacing: 0.05em; text-transform: uppercase; }
+.form-input {
+  width: 100%; padding: 1rem; font-size: 1rem; color: #f1f5f9;
+  background: rgba(15, 23, 42, 0.9); border: 2px solid rgba(0,230,255,0.4);
+  border-radius: 0.75rem; transition: all 0.3s ease;
+  color-scheme: dark;
+}
+.form-input:focus { outline: none; border-color: #00e6ff; background: rgba(15, 23, 42, 0.95); box-shadow: 0 0 20px rgba(0,230,255,0.4); color: #ffffff; }
+.form-input::placeholder { color: #94a3b8; }
+.form-input:-webkit-autofill,
+.form-input:-webkit-autofill:hover,
+.form-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f1f5f9;
+  caret-color: #f1f5f9;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(15, 23, 42, 0.95) inset;
+  box-shadow: 0 0 0px 1000px rgba(15, 23, 42, 0.95) inset;
+  border: 2px solid rgba(0,230,255,0.55);
+}
+.error-message { color: #ef4444; font-size: 0.8125rem; margin-top: 0.5rem; font-weight: 500; display: flex; align-items: center; gap: 0.25rem; }
+.remember-me { display: flex; align-items: center; margin-bottom: 1.5rem; }
+.remember-me input[type="checkbox"] { width: 20px; height: 20px; margin-right: 12px; cursor: pointer; accent-color: #00e6ff; border: 2px solid rgba(0,230,255,0.5); border-radius: 4px; }
+.remember-me label { font-size: 0.875rem; color: #94a3b8; cursor: pointer; user-select: none; }
+.login-button {
+  width: 100%; padding: 1rem; font-size: 1.125rem; font-weight: 700; color: #000000;
+  background: linear-gradient(135deg, #00e6ff 0%, #6366f1 100%); border: none; border-radius: 0.75rem;
+  cursor: pointer; transition: all 0.3s ease; box-shadow: 0 0 30px rgba(0,230,255,0.5);
+  font-family: 'Orbitron', monospace; letter-spacing: 0.1em; text-transform: uppercase; position: relative; overflow: hidden;
+}
+.login-button::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; border-radius: 50%; background: rgba(255,255,255,0.3); transform: translate(-50%,-50%); transition: width 0.6s, height 0.6s; }
+.login-button:hover::before { width: 300px; height: 300px; }
+.login-button:hover { transform: translateY(-2px); box-shadow: 0 0 40px rgba(0,230,255,0.8); }
+.forgot-password { text-align: center; margin-top: 1.25rem; }
+.forgot-password a { color: #00e6ff; text-decoration: none; font-size: 0.875rem; font-weight: 600; transition: all 0.2s; }
+.forgot-password a:hover { text-shadow: 0 0 10px rgba(0,230,255,0.8); }
+.signup-section { text-align: center; margin-top: 2rem; padding-top: 2rem; border-top: 1px solid rgba(0,230,255,0.2); }
+.signup-text { font-size: 0.875rem; color: #94a3b8; }
+.signup-link { color: #00e6ff; text-decoration: none; font-weight: 700; margin-left: 0.5rem; transition: all 0.2s; }
+.signup-link:hover { text-shadow: 0 0 10px rgba(0,230,255,0.8); }
+.alert { padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.5rem; font-size: 0.875rem; font-weight: 500; border: 1px solid; }
+.alert-error { background: rgba(239,68,68,0.1); color: #ef4444; border-color: #ef4444; }
+.alert-success { background: rgba(0,230,255,0.1); color: #00e6ff; border-color: #00e6ff; }
+.nav-button-standard {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.75rem 1.25rem; background: rgba(0,230,255,0.1); border: 1px solid rgba(0,230,255,0.3);
+  border-radius: 0.75rem; color: #00e6ff; text-decoration: none; font-size: 0.875rem; font-weight: 600;
+  transition: all 0.3s ease; backdrop-filter: blur(10px);
+}
+.nav-button-standard:hover { background: rgba(0,230,255,0.2); border-color: #00e6ff; box-shadow: 0 0 20px rgba(0,230,255,0.4); transform: translateX(-3px); }
+@media (max-width: 640px) {
+  .glass-card { padding: 2rem 1.5rem; }
+  .logo { height: 80px; }
+  .login-top-header { top: 0.65rem; left: 0.65rem; right: 0.65rem; }
+  .nav-button-standard { padding: 0.5rem 0.8rem; font-size: 0.8125rem; }
+}
+</style>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9eb3f50d09fbfa92',t:'MTc3NjAxNTAwOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
