@@ -1,4 +1,4 @@
-from django.conf import settings
+﻿from django.conf import settings
 from django.core.exceptions import PermissionDenied
 from django.db.models import ObjectDoesNotExist
 
@@ -8,7 +8,7 @@ from taller.models import Empresa
 def get_user_empresa_safe(user):
     """
     Obtiene la empresa del usuario sin lanzar si no existe.
-    La relación OneToOne inversa (user.empresa) lanza ObjectDoesNotExist
+    La relaciÃ³n OneToOne inversa (user.empresa) lanza ObjectDoesNotExist
     cuando no hay Empresa; getattr() no lo captura.
     """
     if not user or not getattr(user, "is_authenticated", False):
@@ -34,7 +34,7 @@ def get_or_create_empresa(request):
                 return Empresa.objects.get(pk=demo_id)
             except Empresa.DoesNotExist:
                 pass
-        raise PermissionDenied("Debes iniciar sesión para ver este reporte.")
+        raise PermissionDenied("Debes iniciar sesiÃ³n para ver este reporte.")
 
     empresa = get_user_empresa_safe(user)
     if empresa is not None:

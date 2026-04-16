@@ -11,7 +11,8 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.models.clientes import Cliente
 from taller.templatetags.country_url import _country_ns_from_path
-from taller.utils.empresa import get_active_empresa
+from taller.utils.chile_locations import ensure_legacy_chile_locations
+from taller.utils.empresa import get_active_empresa, get_user_empresa_safe
 
 
 def ajax_buscar_clientes(request):
@@ -95,7 +96,11 @@ def obtener_ciudades(request):
         region_id = request.GET.get("region_id")
         if not region_id:
             return JsonResponse([], safe=False)
-        ciudades = TallerCiudad.objects.filter(region_id=region_id).values("id", "nombre")
+        ciudades_qs = TallerCiudad.objects.filter(region_id=region_id)
+        if not ciudades_qs.exists():
+            ensure_legacy_chile_locations(force=True)
+            ciudades_qs = TallerCiudad.objects.filter(region_id=region_id)
+        ciudades = ciudades_qs.values("id", "nombre")
         return JsonResponse(list(ciudades), safe=False)
 
 

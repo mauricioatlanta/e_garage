@@ -57,13 +57,20 @@ class ContextReturnCreateMixin:
         value = getter.get(self.context_return_param) or getter.get("next") or ""
         return get_safe_context_return_url(self.request, value)
 
+    def get_return_to(self) -> str:
+        """Compatibilidad con vistas que ya consumen get_return_to()."""
+        return self.get_context_return_url()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["context_return_url"] = self.get_context_return_url()
         return context
 
     def get_success_url(self):
-        context_return = self.get_context_return_url()
+        context_return = self.get_return_to()
         if context_return:
             return context_return
+        default_success = getattr(self, "get_default_success_url", None)
+        if callable(default_success):
+            return default_success()
         return super().get_success_url()

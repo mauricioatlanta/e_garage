@@ -7,6 +7,7 @@ from taller.models.clientes import Cliente
 from taller.models.region_ciudad import TallerCiudad, TallerRegion
 from taller.models.ubicacion import Ciudad as CiudadUSA
 from taller.models.ubicacion import Estado as EstadoUSA
+from taller.utils.chile_locations import ensure_legacy_chile_locations
 
 
 class ColorSelectWidget(Select):
@@ -146,17 +147,32 @@ class ClienteForm(forms.ModelForm):
         else:
             self.pais = "CL"  # Default a Chile
 
+        if self.pais == "CL" and (
+            not TallerRegion.objects.exists() or not TallerCiudad.objects.exists()
+        ):
+            ensure_legacy_chile_locations()
+
         # Chile: región/ciudad
         if "region" in self.data and self.data.get("region") not in [None, ""]:
             try:
                 region_id = int(self.data.get("region"))
                 self.fields["ciudad"].queryset = TallerCiudad.objects.filter(region_id=region_id)
+                if not self.fields["ciudad"].queryset.exists():
+                    ensure_legacy_chile_locations(force=True)
+                    self.fields["ciudad"].queryset = TallerCiudad.objects.filter(
+                        region_id=region_id
+                    )
             except (ValueError, TypeError):
                 self.fields["ciudad"].queryset = TallerCiudad.objects.none()
         elif self.instance.pk and getattr(self.instance, "region", None):
             self.fields["ciudad"].queryset = TallerCiudad.objects.filter(
                 region=self.instance.region
             )
+            if not self.fields["ciudad"].queryset.exists():
+                ensure_legacy_chile_locations(force=True)
+                self.fields["ciudad"].queryset = TallerCiudad.objects.filter(
+                    region=self.instance.region
+                )
         else:
             self.fields["ciudad"].queryset = TallerCiudad.objects.none()
 
