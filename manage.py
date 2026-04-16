@@ -1,30 +1,26 @@
-#!/usr/bin/env python
+﻿#!/usr/bin/env python
 import os
 import sys
-import logging
+from pathlib import Path
+
+from dotenv import load_dotenv
 
 
 def main():
-    # Warning solo en desarrollo
-    if os.getenv("EGARAGE_ENV", "dev").lower() != "prod":
-        logging.warning("Modo de desarrollo activado. Asegúrate de no usar esto en producción.")
+    base_dir = Path(__file__).resolve().parent
+    env_prod = base_dir / ".env.prod"
 
-    # ?? FIX: usar settings segun entorno
+    if env_prod.exists():
+        load_dotenv(env_prod, override=True)
 
+    env_name = os.getenv("EGARAGE_ENV", "dev").lower()
 
-if os.getenv("DJANGO_SETTINGS_MODULE"):
-    pass
-else:
-    os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
+    if env_name == "prod":
+        os.environ["DJANGO_SETTINGS_MODULE"] = "gestion_taller.settings_prod"
+    else:
+        os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 
-    try:
-        from django.core.management import execute_from_command_line
-    except ImportError as exc:
-        raise ImportError(
-            "Couldn't import Django. Are you sure it's installed and "
-            "available on your PYTHONPATH environment variable? Did you "
-            "forget to activate a virtual environment?"
-        ) from exc
+    from django.core.management import execute_from_command_line
 
     execute_from_command_line(sys.argv)
 
