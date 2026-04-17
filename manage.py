@@ -8,16 +8,18 @@ from dotenv import load_dotenv
 
 def main():
     base_dir = Path(__file__).resolve().parent
-    env_prod = base_dir / ".env.prod"
-
-    if env_prod.exists():
-        load_dotenv(env_prod, override=True)
 
     env_name = os.getenv("EGARAGE_ENV", "dev").lower()
 
     if env_name == "prod":
+        env_prod = base_dir / ".env.prod"
+        if env_prod.exists():
+            load_dotenv(env_prod, override=True)
         os.environ["DJANGO_SETTINGS_MODULE"] = "gestion_taller.settings_prod"
     else:
+        env_local = base_dir / ".env"
+        if env_local.exists():
+            load_dotenv(env_local, override=True)
         os.environ.setdefault("DJANGO_SETTINGS_MODULE", "gestion_taller.settings")
 
     from django.core.management import execute_from_command_line
