@@ -5,7 +5,7 @@
 (function() {
     'use strict';
 
-    var APP_VERSION = '2.2.0';
+    var APP_VERSION = '2.3.7';
 
     window.EG = window.EG || {};
     window.EG.APP_VERSION = APP_VERSION;

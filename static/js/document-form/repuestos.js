@@ -1,4 +1,4 @@
-﻿/**
+/**
  * repuestos.js - Modulo de gestion de repuestos
  */
 
@@ -63,8 +63,8 @@
 
     function buildRepuestoRowHTML(rowId, isFirstRow) {
         return ''
-            + '<div class="doc-row-grid repuesto-row-grid grid grid-cols-12 gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="' + rowId + '">'
-            + '  <div class="col-span-2 sm:col-span-2 relative min-w-0">'
+            + '<div class="doc-row-grid repuesto-row-grid grid gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="' + rowId + '">'
+            + '  <div class="col-span-1 sm:col-span-1 relative min-w-0">'
             +        buildLabel(EG.I18N.code || 'Code', isFirstRow)
             + '    <input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="' + escapeHtml(EG.I18N.code || 'Code') + '" autocomplete="off">'
             + '    <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
@@ -73,13 +73,13 @@
             + '    <input type="hidden" class="rep-pieza-desarme-id">'
             + '    <input type="hidden" class="rep-costo-linea">'
             + '  </div>'
-            + '  <div class="col-span-4 sm:col-span-4 description-field rep-search-container relative min-w-0">'
+            + '  <div class="col-span-8 sm:col-span-8 description-field rep-search-container relative min-w-0" style="grid-column: span 8 / span 8;">'
             + '    <div class="flex items-center justify-between gap-2 mb-1">'
             +          buildLabel(EG.I18N.name || 'Name', isFirstRow)
             + '      <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase">Usado</span>'
             + '    </div>'
-            + '    <div class="flex gap-1">'
-            + '      <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1" placeholder="' + escapeHtml(EG.I18N.type_to_search_parts || 'Buscar...') + '" autocomplete="off">'
+            + '    <div class="flex gap-1" style="min-width: 0;">'
+            + '      <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1" style="min-width: 0; width: 100%;" placeholder="' + escapeHtml(EG.I18N.type_to_search_parts || 'Buscar...') + '" autocomplete="off">'
             + '      <button type="button" class="rep-create-btn btn-add flex-shrink-0 h-10 px-2" title="' + escapeHtml(EG.I18N.create_part || 'Create Part') + '">+</button>'
             + '    </div>'
             + '    <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
@@ -89,12 +89,12 @@
             +        buildLabel(EG.I18N.qty || 'Qty', isFirstRow)
             + '    <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" value="1">'
             + '  </div>'
-            + '  <div class="col-span-2 sm:col-span-2 min-w-0">'
+            + '  <div class="col-span-1 sm:col-span-1 min-w-0">'
             +        buildLabel(EG.I18N.sale_price || 'Price', isFirstRow)
             + '    <div class="relative"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300">$</span>'
             + '      <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6" placeholder="0"></div>'
             + '  </div>'
-            + '  <div class="col-span-2 sm:col-span-2 min-w-0">'
+            + '  <div class="col-span-1 sm:col-span-1 min-w-0">'
             +        buildLabel(EG.I18N.subtotal || 'Subtotal', isFirstRow)
             + '    <input type="hidden" class="rep-subtotal" value="0">'
             + '    <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">' + money(0) + '</div>'
