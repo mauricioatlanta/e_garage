@@ -1277,7 +1277,7 @@ input:disabled, select:disabled, textarea:disabled {
     flex:1 1 100% !important;
   }
 }
-@media (max-width: 639px) {
+@media (max-width: 900px) {
   #doc-shell,
   .doc-shell-workspace,
   .doc-smart-card,
@@ -1288,6 +1288,9 @@ input:disabled, select:disabled, textarea:disabled {
   }
   #doc-shell {
     overflow-x: hidden;
+  }
+  .doc-pos-header {
+    display: none !important;
   }
   .doc-ficha-parts,
   .doc-ficha-services,
@@ -1493,48 +1496,6 @@ input:disabled, select:disabled, textarea:disabled {
     display: block !important;
   }
 }
-
-.mobile-layout-debug-banner {
-  display: none;
-}
-.mobile-layout-debug-banner .debug-900,
-.mobile-layout-debug-banner .debug-639 {
-  display: none;
-}
-@media (max-width: 900px) {
-  .mobile-layout-debug-banner {
-    display: block !important;
-    margin: 0 0 12px;
-    padding: 12px 14px;
-    border: 4px solid #ffffff;
-    border-radius: 12px;
-    background: #1d4ed8 !important;
-    color: #ffffff !important;
-    font-size: 14px;
-    font-weight: 800;
-    letter-spacing: 0.04em;
-    text-align: center;
-    text-transform: uppercase;
-    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.18);
-  }
-  .mobile-layout-debug-banner .debug-900 {
-    display: inline;
-  }
-}
-@media (max-width: 639px) {
-  .mobile-layout-debug-banner {
-    border-color: #fde047;
-    background: #dc2626 !important;
-    color: #fff7ed !important;
-    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.22);
-  }
-  .mobile-layout-debug-banner .debug-900 {
-    display: none;
-  }
-  .mobile-layout-debug-banner .debug-639 {
-    display: inline;
-  }
-}
 </style>
 
 {% endblock extra_css %}
@@ -1644,10 +1605,6 @@ input:disabled, select:disabled, textarea:disabled {
   {% endif %}
 
   <!-- Document workspace - cabecera consola | tarjetas cliente/vehiculo | repuestos/servicios POS | observaciones | totales cockpit -->
-  <div class="mobile-layout-debug-banner" data-mobile-debug-banner>
-    <span class="debug-900">RESPONSIVE TEST LE 900</span>
-    <span class="debug-639">MOBILE-LAYOUT-TEST LE 639</span>
-  </div>
   <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
 
     <!-- 1. CABECERA COMPACTA - fila 1: INV | Fecha | Mecanico | Pago | fila 2: Tipo | Operacion -->
@@ -2103,4 +2060,3 @@ window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
 <script src="{% static 'js/document-form/index.js' %}?v=2.5.4"></script>
 
 {% endblock extra_js %}
-
