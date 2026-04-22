@@ -1,4 +1,4 @@
-{% load static %}
+﻿{% load static %}
 {% load i18n %}
 {% load country_url %}
 {% load dal_form_media %}
@@ -34,7 +34,7 @@
   {# --- PWA Install Prompt CSS --- #}
   <link rel="stylesheet" href="{% static 'css/pwa-install-prompt.css' %}?v=2.1.2">
 
-  {# --- Catálogo i18n --- #}
+  {# --- CatÃ¡logo i18n --- #}
   <script src="{% url 'javascript-catalog' %}"></script>
 
   {# --- CSS principales SIEMPRE cargan --- #}
@@ -69,10 +69,10 @@
         color: #ffffff !important;
     }
     
-    /* Efectos hover y bordes con transparencia para botones de navegación */
+    /* Efectos hover y bordes con transparencia para botones de navegaciÃ³n */
     .nav-button-standard {
         border-color: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }}4D; /* 4D = 30% opacidad */
-        /* Mejora legibilidad del texto en botones de navegación */
+        /* Mejora legibilidad del texto en botones de navegaciÃ³n */
         text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
     
@@ -111,7 +111,7 @@
       50%{text-shadow:0 0 30px rgba(0,255,255,1),0 0 60px rgba(0,212,255,1),0 0 90px rgba(0,212,255,0.8),0 2px 10px rgba(0,0,0,0.8)}
     }
     
-    /* Fix de contraste para móvil - NOMBRE DE EMPRESA VISIBLE */
+    /* Fix de contraste para mÃ³vil - NOMBRE DE EMPRESA VISIBLE */
     @media screen and (max-width: 768px) {
       .company-title {
         color: #00ffff !important;
@@ -132,7 +132,7 @@
       }
     }
 
-    /* Botones de navegación compactos y elegantes */
+    /* Botones de navegaciÃ³n compactos y elegantes */
     .nav-button-standard {
       display: inline-flex;
       align-items: center;
@@ -218,7 +218,7 @@
       text-shadow: 0 0 8px rgba(0, 212, 255, 0.6);
     }
 
-    /* Estilo para botón de salir (rojo eléctrico) */
+    /* Estilo para botÃ³n de salir (rojo elÃ©ctrico) */
     .nav-button-standard.logout-btn {
       border-color: rgba(239, 68, 68, 0.3);
       color: #ffb3b3;
@@ -249,7 +249,7 @@
       text-shadow: 0 0 12px rgba(255, 100, 100, 0.8);
     }
 
-    /* Responsive: botones compactos en móviles */
+    /* Responsive: botones compactos en mÃ³viles */
     @media (max-width: 768px) {
       .nav-button-standard {
         padding: 0.35rem 0.5rem;
@@ -566,25 +566,25 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
-  {# --- ANTI-SCROLL AUTOMÁTICO PARA MÓVILES --- #}
+  {# --- ANTI-SCROLL AUTOMÃTICO PARA MÃ“VILES --- #}
   <script>
   (function() {
-    // Detectar si es móvil
+    // Detectar si es mÃ³vil
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
     
     if (!isMobile) {
-      console.log('✅ Desktop detectado - sin restricciones de scroll');
+      console.log('âœ… Desktop detectado - sin restricciones de scroll');
       return; // En desktop, no aplicar restricciones
     }
 
-    console.log('📱 Móvil detectado - activando protección anti-scroll automático');
+    console.log('ðŸ“± MÃ³vil detectado - activando protecciÃ³n anti-scroll automÃ¡tico');
 
-    // Flag para detectar interacción real del usuario
+    // Flag para detectar interacciÃ³n real del usuario
     let isUserInteraction = false;
     let scrollLock = false;
     let initialScrollPos = 0;
 
-    // Marcar interacción del usuario en eventos táctiles y de mouse
+    // Marcar interacciÃ³n del usuario en eventos tÃ¡ctiles y de mouse
     ['touchstart', 'touchmove', 'mousedown', 'wheel', 'scroll'].forEach(function(event) {
       document.addEventListener(event, function() {
         isUserInteraction = true;
@@ -592,7 +592,7 @@
       }, { passive: true, capture: true });
     });
 
-    // Función para restaurar posición de scroll
+    // FunciÃ³n para restaurar posiciÃ³n de scroll
     function preventAutoScroll() {
       if (scrollLock && !isUserInteraction) {
         window.scrollTo(0, initialScrollPos);
@@ -605,8 +605,8 @@
     const origScrollTo = window.scrollTo;
     window.scrollTo = function(x, y) {
       if (isMobile && !isUserInteraction && scrollLock) {
-        console.log('🚫 Bloqueado: scrollTo(' + x + ',' + y + ') sin interacción del usuario');
-        return; // Bloquear scroll automático
+        console.log('ðŸš« Bloqueado: scrollTo(' + x + ',' + y + ') sin interacciÃ³n del usuario');
+        return; // Bloquear scroll automÃ¡tico
       }
       return origScrollTo.call(window, x, y);
     };
@@ -615,8 +615,8 @@
     const origScrollIntoView = Element.prototype.scrollIntoView;
     Element.prototype.scrollIntoView = function() {
       if (isMobile && !isUserInteraction && scrollLock) {
-        console.log('🚫 Bloqueado: scrollIntoView en', this.tagName, this.id || this.className);
-        return; // Bloquear scrollIntoView automático
+        console.log('ðŸš« Bloqueado: scrollIntoView en', this.tagName, this.id || this.className);
+        return; // Bloquear scrollIntoView automÃ¡tico
       }
       return origScrollIntoView.apply(this, arguments);
     };
@@ -625,32 +625,32 @@
     const origScroll = window.scroll;
     window.scroll = function(x, y) {
       if (isMobile && !isUserInteraction && scrollLock) {
-        console.log('🚫 Bloqueado: scroll(' + x + ',' + y + ') sin interacción del usuario');
+        console.log('ðŸš« Bloqueado: scroll(' + x + ',' + y + ') sin interacciÃ³n del usuario');
         return;
       }
       return origScroll.call(window, x, y);
     };
 
-    // Modificar focus para no hacer scroll en móviles
+    // Modificar focus para no hacer scroll en mÃ³viles
     const origFocus = HTMLElement.prototype.focus;
     HTMLElement.prototype.focus = function(options) {
       if (isMobile) {
-        // En móviles, focus sin scroll
+        // En mÃ³viles, focus sin scroll
         const newOptions = Object.assign({}, options, { preventScroll: true });
         return origFocus.call(this, newOptions);
       }
       return origFocus.call(this, options);
     };
 
-    // Activar protección al cargar la página
+    // Activar protecciÃ³n al cargar la pÃ¡gina
     document.addEventListener('DOMContentLoaded', function() {
       initialScrollPos = window.pageYOffset || document.documentElement.scrollTop || 0;
       scrollLock = true;
       
-      // Mantener lock por 3 segundos después de carga
+      // Mantener lock por 3 segundos despuÃ©s de carga
       setTimeout(function() {
         scrollLock = false;
-        console.log('✅ Protección anti-scroll desactivada - página cargada');
+        console.log('âœ… ProtecciÃ³n anti-scroll desactivada - pÃ¡gina cargada');
       }, 3000);
 
       // Prevenir scroll en focus de inputs
@@ -682,11 +682,11 @@
       lastHeight = currentHeight;
     });
 
-    console.log('✅ Protección anti-scroll activada para móvil');
+    console.log('âœ… ProtecciÃ³n anti-scroll activada para mÃ³vil');
   })();
   </script>
 
-  {# --- jQuery (CRÍTICO: DAL/Select2 lo requieren) --- #}
+  {# --- jQuery (CRÃTICO: DAL/Select2 lo requieren) --- #}
   {# Usar CDN: el archivo local vendor/jquery/ puede ser placeholder. Sin jQuery: $ is not defined, Select2/DAL fallan #}
   <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
 
@@ -710,7 +710,7 @@
     </div>
   {% endif %}
 
-  {# --- Header: signup USA (EN por defecto, ES en /us/es/signup/) — barra mínima + idioma #}
+  {# --- Header: signup USA (EN por defecto, ES en /us/es/signup/) â€” barra mÃ­nima + idioma #}
   {% if eg_us_signup_slim_header|default:False %}
   <header
     class="sticky top-0 z-[500] flex flex-row items-center justify-between gap-3 min-h-[52px] px-4 sm:px-6 py-3 border-b-2 border-cyan-400/50 bg-[#070b14] shadow-[0_8px_32px_rgba(0,0,0,0.85)]"
@@ -734,13 +734,13 @@
         href="/us/es/signup/"
         class="inline-flex items-center justify-center min-h-[44px] min-w-[5.5rem] px-4 py-2 rounded-lg text-sm font-bold uppercase tracking-wide text-black bg-cyan-400 hover:bg-cyan-300 border-2 border-cyan-200 shadow-[0_0_16px_rgba(34,211,238,0.45)] transition-colors"
         style="font-family: 'Inter', sans-serif;"
-      >Español</a>
+      >EspaÃ±ol</a>
       {% endif %}
       <a
         href="/us/login/"
         class="inline-flex items-center justify-center min-h-[44px] px-4 py-2 rounded-lg text-sm font-bold text-white bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 border-2 border-sky-400/80 shadow-[0_0_20px_rgba(56,189,248,0.35)] transition-colors"
         style="font-family: 'Orbitron', monospace;"
-      >{% if eg_us_signup_lang == 'es' %}Iniciar sesión{% else %}Sign in{% endif %}</a>
+      >{% if eg_us_signup_lang == 'es' %}Iniciar sesiÃ³n{% else %}Sign in{% endif %}</a>
     </nav>
   </header>
   {% endif %}
@@ -800,30 +800,30 @@
   </header>
   {% endif %}
 
-  {# --- Navegación principal - DOS FILAS --- #}
+  {# --- NavegaciÃ³n principal - DOS FILAS --- #}
   {% if not eg_us_signup_slim_header|default:False and '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
   <div id="main-navigation" class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}flex flex-row flex-wrap items-center justify-center mt-1 gap-1{% else %}flex flex-col items-center justify-center mt-3 gap-2{% endif %}">
     {% if request.user.is_authenticated %}
       {# Fila 1: Settings, Center, Clients, Documents, Extra #}
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
         <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
-          <span class="nav-icon">⚙️</span>
+          <span class="nav-icon">âš™ï¸</span>
           <span class="nav-text">{% trans "Settings" %}</span>
         </a>
         <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
-          <span class="nav-icon">🚀</span>
+          <span class="nav-icon">ðŸš€</span>
           <span class="nav-text">{% trans "Center" %}</span>
         </a>
         <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
-          <span class="nav-icon">👥</span>
+          <span class="nav-icon">ðŸ‘¥</span>
           <span class="nav-text">{% trans "Clients" %}</span>
         </a>
         <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
-          <span class="nav-icon">📄</span>
+          <span class="nav-icon">ðŸ“„</span>
           <span class="nav-text">{% trans "Documents" %}</span>
         </a>
         <a href="{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}es{% else %}en{% endif %}/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
-          <span class="nav-icon">⭐</span>
+          <span class="nav-icon">â­</span>
           <span class="nav-text">{% trans "Extra" %}</span>
         </a>
       </div>
@@ -831,38 +831,38 @@
       <!-- Row 2: Parts, Reports, Services, Disassembly, Vehicles, Logout -->
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
         <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
-          <span class="nav-icon">🔧</span>
+          <span class="nav-icon">ðŸ”§</span>
           <span class="nav-text">{% trans "Parts" %}</span>
         </a>
         <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
-          <span class="nav-icon">📊</span>
+          <span class="nav-icon">ðŸ“Š</span>
           <span class="nav-text">{% trans "Reports" %}</span>
         </a>
         <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
-          <span class="nav-icon">🛠️</span>
+          <span class="nav-icon">ðŸ› ï¸</span>
           <span class="nav-text">{% trans "Services" %}</span>
         </a>
         {% country_url 'desarme:index' as desarme_url %}
         <a href="{% if desarme_url %}{{ desarme_url }}{% else %}#{% endif %}" class="nav-button-standard">
-          <span class="nav-icon">🧩</span>
+          <span class="nav-icon">ðŸ§©</span>
           <span class="nav-text">{% trans "Disassembly" %}</span>
         </a>
         {% country_url 'vehiculos:lista_vehiculos' as vehiculos_url %}
         {% if vehiculos_url %}
         <a href="{{ vehiculos_url }}" class="nav-button-standard">
-          <span class="nav-icon">🚗</span>
+          <span class="nav-icon">ðŸš—</span>
           <span class="nav-text">{% trans "Vehicles" %}</span>
         </a>
         {% else %}
         <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
-          <span class="nav-icon">🚗</span>
+          <span class="nav-icon">ðŸš—</span>
           <span class="nav-text">{% trans "Vehicles" %}</span>
         </a>
         {% endif %}
         <form action="{% url 'account_logout' %}" method="post" class="inline-block">
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
-            <span class="nav-icon">🚪</span>
+            <span class="nav-icon">ðŸšª</span>
             <span class="nav-text">{% trans "Logout" %}</span>
           </button>
         </form>
@@ -875,7 +875,7 @@
         <div class="w-4 h-4 bg-cyan-400 rounded-sm flex items-center justify-center">
           <div class="w-2 h-2 bg-white rounded-full"></div>
         </div>
-        <span class="font-medium text-sm">INICIAR SESIÓN</span>
+        <span class="font-medium text-sm">INICIAR SESIÃ“N</span>
       </a>
     {% endif %}
     </div>
@@ -927,33 +927,37 @@
 
   {# --- CONTENIDO --- #}
   {% block fondo_extra %}{% endblock %}
-  <main class="flex-1">
+  <main class="flex-1"><style>
+main {
+    color: #e5e7eb !important;
+}
+</style>
     {% block content %}{% endblock %}
     {% block ayuda_contextual %}
     {% include "components/ayuda_contextual.html" %}
     {% endblock %}
   </main>
 
-  {# --- FOOTER ÚNICO (oculto en login/signup para vista full-screen) --- #}
+  {# --- FOOTER ÃšNICO (oculto en login/signup para vista full-screen) --- #}
   {% if not eg_us_signup_slim_header|default:False and '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
   <footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
     <div class="container mx-auto px-4 text-center">
       {% if company_settings.address or company_settings.phone or company_settings.email %}
         <span class="text-xs text-gray-400 block">
           {% if company_settings.address %}{{ company_settings.address }} {% endif %}
-          {% if company_settings.phone %}• {{ company_settings.phone }} {% endif %}
-          {% if company_settings.email %}• {{ company_settings.email }}{% endif %}
+          {% if company_settings.phone %}â€¢ {{ company_settings.phone }} {% endif %}
+          {% if company_settings.email %}â€¢ {{ company_settings.email }}{% endif %}
         </span>
       {% endif %}
       <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm flex-wrap">
         <span class="font-medium">eGarage</span>
-        <span aria-hidden="true">•</span>
-        <span>© 2025</span>
-        <span aria-hidden="true">•</span>
+        <span aria-hidden="true">â€¢</span>
+        <span>Â© 2025</span>
+        <span aria-hidden="true">â€¢</span>
         <a href="mailto:{{ support_email }}" class="text-cyan-400 hover:underline">
           {{ support_email }}
         </a>
-        <span aria-hidden="true">•</span>
+        <span aria-hidden="true">â€¢</span>
         <a href="https://wa.me/{{ support_whatsapp_wa_me }}?text={% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' or LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Hola,%20necesito%20ayuda%20con%20eGarage{% else %}Hi,%20I%20need%20help%20with%20eGarage{% endif %}" 
            target="_blank" 
            rel="noopener noreferrer"
@@ -961,21 +965,21 @@
           <i class="fab fa-whatsapp"></i>
           {{ support_whatsapp_display }}
         </a>
-        <span aria-hidden="true">•</span>
+        <span aria-hidden="true">â€¢</span>
         <a href="/legal/" class="text-cyan-400 hover:underline">
           {% if request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
-            Términos y Privacidad
+            TÃ©rminos y Privacidad
           {% else %}
             Legal
           {% endif %}
         </a>
         {% if request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
-        <span aria-hidden="true">•</span>
+        <span aria-hidden="true">â€¢</span>
         <a href="/legal/#proteccion-datos-tributarios" class="text-emerald-400 hover:underline text-xs">
           Datos Tributarios
         </a>
         {% endif %}
-        <span aria-hidden="true">•</span>
+        <span aria-hidden="true">â€¢</span>
         <span class="text-xs text-gray-500">All Rights Reserved</span>
       </div>
     </div>
@@ -983,11 +987,11 @@
   {% endif %}
 
   {# --- PWA Install Prompt Script --- #}
-  {# NOTA: No usar defer aquí porque beforeinstallprompt puede dispararse antes #}
+  {# NOTA: No usar defer aquÃ­ porque beforeinstallprompt puede dispararse antes #}
   <script src="{% static 'js/pwa-install-prompt.js' %}?v=2.1.4"></script>
   
-  {# --- PWA Install Debug (TEMPORAL - remover en producción) --- #}
-  {# Descomenta la siguiente línea para diagnosticar problemas #}
+  {# --- PWA Install Debug (TEMPORAL - remover en producciÃ³n) --- #}
+  {# Descomenta la siguiente lÃ­nea para diagnosticar problemas #}
   {# <script src="{% static 'js/pwa-install-debug.js' %}"></script> #}
 
   {# Parche DAL: Proxy en window.yl para envolver registerFunction al asignarlo y evitar "select2 has already been registered" #}
@@ -1040,7 +1044,7 @@
   {% block extra_js %}{% endblock %}
   {# JS de form.media (DAL/Select2) - UNA SOLA VEZ por request para evitar "select2 has already been registered" #}
   {% if form %}{% form_media_once form 'js' %}{% endif %}
-  {# TEMP: desactivar starfield para probar scroll en móviles #}
+  {# TEMP: desactivar starfield para probar scroll en mÃ³viles #}
   {# {% if enable_space_bg|default:1 and enable_space_bg != 2 %}
     <script src="{% static 'js/starfield.js' %}"></script>
   {% endif %} #}
@@ -1057,9 +1061,9 @@
     }
     const csrftoken=getCookie('csrftoken');
 
-    // Confirmación eliminar
+    // ConfirmaciÃ³n eliminar
     function confirmarEliminacion(nombreCliente){
-      const message=`⚠️ ¿Está seguro de eliminar a "${nombreCliente}"?\n\nEsta acción NO se puede deshacer.`;
+      const message=`âš ï¸ Â¿EstÃ¡ seguro de eliminar a "${nombreCliente}"?\n\nEsta acciÃ³n NO se puede deshacer.`;
       return confirm(message);
     }
 
@@ -1076,9 +1080,12 @@
           window.location.reload();
         });
 
-        // // navigator.serviceWorker.register('/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js?v=2.2.0?v=2.2.0', { scope: '/' })
+        navigator.serviceWorker.register(
+          '/{{ country_code|lower|default:"cl" }}/{{ lang_code|lower|default:"es" }}/service-worker.js?v=2.2.1',
+          { scope: '/', updateViaCache: 'none' }
+        )
           .then(function(registration) {
-            console.log('✅ Service Worker registrado exitosamente:', registration.scope);
+            console.log('âœ… Service Worker registrado exitosamente:', registration.scope);
             
             // Verificar actualizaciones cada hora
             setInterval(function() {
@@ -1095,8 +1102,8 @@
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
                   console.log('Nueva version de eGarage disponible. Se activara automaticamente.');
                   return;
-                  // Hay una nueva versión disponible
-                  if (confirm('🎉 Nueva versión de eGarage disponible. ¿Deseas actualizar ahora?')) {
+                  // Hay una nueva versiÃ³n disponible
+                  if (confirm('ðŸŽ‰ Nueva versiÃ³n de eGarage disponible. Â¿Deseas actualizar ahora?')) {
                     newWorker.postMessage({ type: 'SKIP_WAITING' });
                     window.location.reload();
                   }
@@ -1105,24 +1112,24 @@
             });
           })
           .catch(function(error) {
-            console.warn('⚠️ Error al registrar Service Worker:', error);
+            console.warn('âš ï¸ Error al registrar Service Worker:', error);
           });
       });
     }
     
     // PWA Install Prompt Handler (maneja beforeinstallprompt y iOS)
-    // El script pwa-install-prompt.js se carga después y maneja todo
+    // El script pwa-install-prompt.js se carga despuÃ©s y maneja todo
   </script>
 
-  <!-- 🆘 Botón de Ayuda Contextual Floating -->
+  <!-- ðŸ†˜ BotÃ³n de Ayuda Contextual Floating -->
   {% if request.user.is_authenticated %}
   <div id="help-fab" class="fixed bottom-6 right-6 z-[9999]">
     <button onclick="openContextualHelp()" class="bg-cyan-500 hover:bg-cyan-400 text-black font-bold w-12 h-12 rounded-full shadow-lg flex items-center justify-center transition-all hover:scale-110 focus:outline-none" title="Ayuda Contextual">
-      <span class="text-xl">❓</span>
+      <span class="text-xl">â“</span>
     </button>
   </div>
 
-  <!-- 📋 Modal de Ayuda Contextual -->
+  <!-- ðŸ“‹ Modal de Ayuda Contextual -->
   <div id="help-modal" class="hidden fixed inset-0 z-[10000] overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="flex items-end justify-center min-height-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
       <div class="fixed inset-0 bg-black bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeContextualHelp()"></div>
@@ -1132,7 +1139,7 @@
           <div class="sm:flex sm:items-start">
             <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
               <h3 class="text-lg leading-6 font-bold text-cyan-400 glow-text mb-4" id="help-modal-title">
-                🚀 Ayuda de eGarage
+                ðŸš€ Ayuda de eGarage
               </h3>
               <div class="mt-2" id="help-modal-content">
                 <div class="animate-pulse flex space-y-4 flex-col">
@@ -1180,7 +1187,7 @@
             html += '<h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Preguntas Frecuentes</h4>';
             data.faqs.slice(0, 3).forEach(faq => {
               html += `<div class="mb-4">
-                <p class="text-cyan-300 font-semibold text-sm">¿${faq.pregunta}?</p>
+                <p class="text-cyan-300 font-semibold text-sm">Â¿${faq.pregunta}?</p>
                 <p class="text-gray-400 text-sm mt-1">${faq.respuesta}</p>
               </div>`;
             });
@@ -1190,7 +1197,7 @@
           return fetch(`/cl/help/api/pasos/${contexto}/`).then(res => res.json()).then(stepData => {
             if (stepData.pasos && stepData.pasos.length > 0) {
               html += '<hr class="border-gray-800 my-4">';
-              html += '<h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">Guía Rápida</h4>';
+              html += '<h4 class="text-sm font-bold text-gray-300 uppercase tracking-wider mb-3">GuÃ­a RÃ¡pida</h4>';
               stepData.pasos.slice(0, 1).forEach(guia => {
                 html += `<p class="text-green-400 font-semibold text-sm mb-2">${guia.titulo}:</p>`;
                 html += '<ul class="list-disc list-inside text-gray-400 text-sm space-y-1">';
@@ -1200,11 +1207,11 @@
                 html += '</ul>';
               });
             }
-            content.innerHTML = html || '<p class="text-gray-400">No hay ayuda específica para esta sección todavía.</p>';
+            content.innerHTML = html || '<p class="text-gray-400">No hay ayuda especÃ­fica para esta secciÃ³n todavÃ­a.</p>';
           });
         })
         .catch(err => {
-          content.innerHTML = '<p class="text-red-400">Error al cargar la ayuda. Por favor intenta más tarde.</p>';
+          content.innerHTML = '<p class="text-red-400">Error al cargar la ayuda. Por favor intenta mÃ¡s tarde.</p>';
           console.error(err);
         });
     }
@@ -1216,3 +1223,5 @@
   {% endif %}
 </body>
 </html>
+
+
