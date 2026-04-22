@@ -1,7 +1,9 @@
 // Service Worker para eGarage PWA (Dinámico para {{ pais }}/{{ idioma }})
 // Versión: {{ version }}
-const CACHE_NAME = 'egarage-v{{ version }}';
-const RUNTIME_CACHE = 'egarage-runtime-v{{ version }}';
+const APP_VERSION = '{{ version }}';
+const CACHE_VERSION_TOKEN = 'v' + APP_VERSION + '-document-form-hotfix-1';
+const CACHE_NAME = 'egarage-' + CACHE_VERSION_TOKEN;
+const RUNTIME_CACHE = 'egarage-runtime-' + CACHE_VERSION_TOKEN;
 
 // Archivos estáticos locales para precache (solo recursos de tu dominio)
 const STATIC_CACHE_URLS = [
@@ -29,9 +31,16 @@ const CACHE_FIRST_PATTERNS = [
   /code\.jquery\.com/
 ];
 
+// El formulario de documentos cambia con frecuencia y no debe quedar pegado
+// detrás de un Cache First del service worker.
+const NETWORK_FIRST_STATIC_PATTERNS = [
+  /\/static\/js\/document-form\//,
+  /\/static\/js\/documentos_form(?:\.[^/]+)?\.js$/
+];
+
 // Instalación del Service Worker
 self.addEventListener('install', (event) => {
-  console.log('[Service Worker] Instalando...');
+  console.log('[Service Worker] install - forzando actualizacion', APP_VERSION);
   
   event.waitUntil(
     caches.open(CACHE_NAME)
@@ -53,15 +62,15 @@ self.addEventListener('install', (event) => {
 
 // Activación del Service Worker
 self.addEventListener('activate', (event) => {
-  console.log('[Service Worker] Activando...');
+  console.log('[Service Worker] activate - tomando control', APP_VERSION);
   
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
-          // Eliminar caches antiguos
-          if (cacheName !== CACHE_NAME && cacheName !== RUNTIME_CACHE) {
-            console.log('[Service Worker] Eliminando cache antiguo:', cacheName);
+          // Eliminar caches de versiones antiguas
+          if (cacheName.indexOf(CACHE_VERSION_TOKEN) === -1) {
+            console.log('[Service Worker] Eliminando cache viejo:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -81,6 +90,29 @@ self.addEventListener('fetch', (event) => {
 
   // Ignorar peticiones que no son GET
   if (request.method !== 'GET') {
+    return;
+  }
+
+  const forceFreshDocumentFormAssets = NETWORK_FIRST_STATIC_PATTERNS.some(
+    (pattern) => pattern.test(url.pathname)
+  );
+
+  if (forceFreshDocumentFormAssets) {
+    event.respondWith(
+      fetch(request, { cache: 'reload' })
+        .then((response) => {
+          if (response.status === 200) {
+            const responseToCache = response.clone();
+            caches.open(RUNTIME_CACHE).then((cache) => {
+              cache.put(request, responseToCache);
+            });
+          }
+          return response;
+        })
+        .catch(() => {
+          return caches.match(request);
+        })
+    );
     return;
   }
 

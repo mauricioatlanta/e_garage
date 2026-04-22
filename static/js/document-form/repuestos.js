@@ -1,84 +1,208 @@
-/**
- * repuestos.js - Módulo de gestión de repuestos
- * 
- * Extraído del código embebido en document_form.html
+﻿/**
+ * repuestos.js - Modulo de gestion de repuestos
  */
 
 (function() {
     'use strict';
 
-    const EG = window.EG = window.EG || {};
+    var EG = window.EG = window.EG || {};
 
-    let currentRepuestoRow = null;
+    function money(value) {
+        return EG.utils.money(EG.utils.parseNumericInput(value || 0));
+    }
+
+    function escapeHtml(text) {
+        return String(text || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    function getContainer() {
+        return document.getElementById('repuestos-container');
+    }
+
+    function generateRowId() {
+        return 'rep_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+    }
 
     function toggleRepuestosEmptyHint() {
-        var container = document.getElementById('repuestos-container');
+        var container = getContainer();
         if (!container) return;
         container.classList.toggle('has-rows', !!container.querySelector('.dynamic-element'));
+    }
+
+    function refreshHeaderLabels() {
+        var rows = Array.from(document.querySelectorAll('#repuestos-container .dynamic-element'));
+        rows.forEach(function(row, index) {
+            row.querySelectorAll('[data-first-row-label]').forEach(function(label) {
+                label.classList.toggle('hidden', index !== 0);
+            });
+            row.querySelectorAll('[data-repeat-row-label]').forEach(function(label) {
+                label.classList.toggle('hidden', index === 0);
+            });
+        });
     }
 
     function removeRow(row) {
         if (!row) return;
         row.remove();
+        refreshHeaderLabels();
         toggleRepuestosEmptyHint();
+        if (typeof window.serializeRows === 'function') window.serializeRows();
         if (typeof window.recalcTotales === 'function') window.recalcTotales();
     }
 
-    /**
-     * Agrega una nueva fila de repuesto al contenedor
-     */
+    function buildLabel(text, isFirstRow) {
+        var baseClass = isFirstRow ? 'block text-cyan-200 text-sm mb-1' : 'hidden';
+        return '<label class="' + baseClass + '" data-first-row-label>' + text + '</label>'
+            + '<label class="hidden" data-repeat-row-label>' + text + '</label>';
+    }
+
+    function buildEyeIcon() {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="rep-eye-icon">'
+            + '<path d="M1.5 12s3.75-6 10.5-6 10.5 6 10.5 6-3.75 6-10.5 6S1.5 12 1.5 12Z"></path>'
+            + '<circle cx="12" cy="12" r="3.25"></circle>'
+            + '</svg>';
+    }
+
+    function buildRepuestoRowHTML(rowId, isFirstRow) {
+        return ''
+            + '<div class="doc-row-grid repuesto-row-grid grid gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="' + rowId + '">'
+            + '  <div class="repuesto-cell repuesto-cell-code relative min-w-0">'
+            +        buildLabel(EG.I18N.code || 'Code', isFirstRow)
+            + '    <input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="' + escapeHtml(EG.I18N.code || 'Code') + '" autocomplete="off">'
+            + '    <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
+            + '    <input type="hidden" class="rep-id">'
+            + '    <input type="hidden" class="rep-origen" value="STOCK_BODEGA">'
+            + '    <input type="hidden" class="rep-pieza-desarme-id">'
+            + '    <input type="hidden" class="rep-costo-linea">'
+            + '  </div>'
+            + '  <div class="repuesto-cell repuesto-cell-name description-field rep-search-container relative min-w-0">'
+            + '    <div class="flex items-center justify-between gap-2 mb-1">'
+            +          buildLabel(EG.I18N.name || 'Name', isFirstRow)
+            + '      <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase">Usado</span>'
+            + '    </div>'
+            + '    <div class="flex gap-1" style="min-width: 0;">'
+            + '      <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1" style="min-width: 0; width: 100%;" placeholder="' + escapeHtml(EG.I18N.type_to_search_parts || 'Buscar...') + '" autocomplete="off">'
+            + '    </div>'
+            + '    <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
+            + '    <input type="hidden" class="rep-nombre">'
+            + '  </div>'
+            + '  <div class="repuesto-mobile-pair repuesto-mobile-pair-values">'
+            + '    <div class="repuesto-cell repuesto-cell-qty min-w-0">'
+            +          buildLabel(EG.I18N.qty || 'Qty', isFirstRow)
+            + '      <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" value="1">'
+            + '    </div>'
+            + '    <div class="repuesto-cell repuesto-cell-price min-w-0">'
+            +          buildLabel(EG.I18N.sale_price || 'Price', isFirstRow)
+            + '      <div class="rep-price-field relative min-w-0">'
+            + '        <div class="relative">'
+            + '          <span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300">$</span>'
+            + '          <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6 pr-10" placeholder="0">'
+            + '          <button type="button" class="rep-toggle-cost" title="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-label="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-expanded="false">'
+            +                buildEyeIcon()
+            + '          </button>'
+            + '        </div>'
+            + '        <div class="rep-cost-panel hidden">'
+            + '          <label class="rep-cost-input-wrap">'
+            + '            <span class="rep-cost-label">' + escapeHtml(EG.I18N.cost || 'Costo') + ':</span>'
+            + '            <div class="rep-cost-input-shell">'
+            + '              <span class="rep-cost-currency">$</span>'
+            + '              <input type="text" class="rep-cost-input" inputmode="numeric" autocomplete="off" placeholder="0">'
+            + '            </div>'
+            + '          </label>'
+            + '          <span class="rep-cost-value">' + money(0) + '</span>'
+            + '        </div>'
+            + '      </div>'
+            + '    </div>'
+            + '  </div>'
+            + '  <div class="repuesto-mobile-pair repuesto-mobile-pair-summary">'
+            + '    <div class="repuesto-cell repuesto-cell-total min-w-0">'
+            +          buildLabel(EG.I18N.subtotal || 'Subtotal', isFirstRow)
+            + '      <input type="hidden" class="rep-subtotal" value="0">'
+            + '      <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">' + money(0) + '</div>'
+            + '    </div>'
+            + '    <div class="repuesto-cell repuesto-cell-action">'
+            + '      <label class="block text-cyan-200 text-sm mb-1 hidden" data-first-row-label>&nbsp;</label>'
+            + '      <button type="button" class="btn-add w-full h-10 rep-remove-btn" title="' + escapeHtml(EG.I18N.remove_row || 'Remove row') + '">X</button>'
+            + '    </div>'
+            + '  </div>'
+            + '</div>';
+    }
+
+    function normalizePartItem(item) {
+        var part = item || {};
+        return {
+            id: part.id || part.pk || '',
+            codigo: part.codigo || part.part_number || part.code || '',
+            nombre: part.nombre || part.name || part.label || part.text || '',
+            precio_venta: part.precio_venta_sugerido !== undefined ? part.precio_venta_sugerido :
+                (part.precio_venta !== undefined ? part.precio_venta :
+                (part.precio !== undefined ? part.precio : 0)),
+            precio_compra: part.precio_compra !== undefined ? part.precio_compra : 0,
+            origen_repuesto: part.origen_repuesto || 'STOCK_BODEGA',
+            pieza_desarme_id: part.pieza_desarme_id || '',
+            costo_linea: part.costo_linea !== undefined ? part.costo_linea : 0,
+        };
+    }
+
+    function getRowById(rowId) {
+        return rowId ? document.querySelector('#repuestos-container .dynamic-element[data-row-id="' + rowId + '"]') : null;
+    }
+
+    function resolveTargetRowId(context) {
+        if (context && context.target_row) {
+            return String(context.target_row);
+        }
+        var stored = EG.utils.restoreActiveRowContext ? EG.utils.restoreActiveRowContext() : null;
+        if (stored && stored.type === 'repuesto' && stored.rowId) {
+            return String(stored.rowId);
+        }
+        return '';
+    }
+
+    function markRowAsActive(row) {
+        if (!row || !row.dataset.rowId || !EG.utils.saveActiveRowContext) {
+            return;
+        }
+        EG.utils.saveActiveRowContext('repuesto', row.dataset.rowId);
+    }
+
     function addRepuestoRow(presetRowId) {
-        var container = document.getElementById('repuestos-container');
+        var container = getContainer();
         if (!container) {
             console.error('Contenedor de repuestos no encontrado');
             return null;
         }
 
-        var row = document.createElement('tr');
+        var rowId = String((presetRowId || '').trim() || generateRowId());
+        var isFirstRow = !container.querySelector('.dynamic-element');
+        var row = document.createElement('div');
         row.className = 'dynamic-element';
-
-        var rowId = (presetRowId && String(presetRowId).trim())
-            ? String(presetRowId).trim()
-            : 'rep_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
-
         row.dataset.rowId = rowId;
-        row.innerHTML = buildRepuestoRowHTML(rowId);
-
+        row.innerHTML = buildRepuestoRowHTML(rowId, isFirstRow);
         container.appendChild(row);
         setupRepuestoRow(row);
+        refreshHeaderLabels();
+        toggleRepuestosEmptyHint();
         return row;
     }
 
-    function buildRepuestoRowHTML(rowId) {
-        return '<td class="doc-sheet-cell relative min-w-0">' +
-            '<input type="text" class="rep-codigo doc-input form-control text-sm" placeholder="' + (EG.I18N.code || 'Code') + '">' +
-            '<div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>' +
-            '<input type="hidden" class="rep-id"><input type="hidden" class="rep-origen" value="STOCK_BODEGA">' +
-            '<input type="hidden" class="rep-pieza-desarme-id"><input type="hidden" class="rep-costo-linea"></td>' +
-            '<td class="doc-sheet-cell description-field rep-search-container relative min-w-0 field-main">' +
-            '<div class="flex items-center justify-between gap-2 mb-1"><span class="sr-only">' + (EG.I18N.name || 'Name') + '</span>' +
-            '<span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase">Usado</span></div>' +
-            '<div class="flex gap-1">' +
-            '<input type="text" class="rep-search doc-input form-control text-sm flex-1" placeholder="' + (EG.I18N.type_to_search_parts || 'Buscar...') + '">' +
-            '<button type="button" class="rep-create-btn btn-row-icon" title="' + (EG.I18N.create_part || 'Create') + '">+</button></div>' +
-            '<div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>' +
-            '<input type="hidden" class="rep-nombre"><input type="hidden" class="rep-row-id" value="' + rowId + '"></td>' +
-            '<td class="doc-sheet-cell"><input type="number" class="rep-cantidad doc-input form-control text-sm" min="1" value="1"></td>' +
-            '<td class="doc-sheet-cell doc-sheet-money"><span>$</span><input type="text" class="rep-precio-venta doc-input form-control text-sm" placeholder="0"></td>' +
-            '<td class="doc-sheet-cell doc-sheet-money cost-column cost-hidden"><span>$</span><input type="text" class="rep-precio-costo doc-input form-control text-sm" placeholder="0"></td>' +
-            '<td class="doc-sheet-cell"><input type="number" class="rep-descuento doc-input form-control text-sm" min="0" max="100" step="0.01" value="0" placeholder="0-100"></td>' +
-            '<td class="doc-sheet-cell field-total"><input type="hidden" class="rep-subtotal" value="0"><div class="rep-subtotal-view doc-sheet-total">$0</div></td>' +
-            '<td class="doc-sheet-cell doc-sheet-row-actions"><button type="button" class="btn-row-icon btn-row-icon-remove rep-remove-btn doc-row-remove" title="Eliminar">&times;</button></td>';
-    }
-
     function setupRepuestoRow(row) {
+        if (!row || row.dataset.egInitRepuesto) {
+            return;
+        }
+        row.dataset.egInitRepuesto = '1';
+
         var searchInput = row.querySelector('.rep-search');
         var drop = row.querySelector('.rep-dropdown');
         var idHidden = row.querySelector('.rep-id');
         var inpCode = row.querySelector('.rep-codigo');
         var codeDrop = row.querySelector('.rep-codigo-dropdown');
         var inpPV = row.querySelector('.rep-precio-venta');
-        var descEl = row.querySelector('.rep-descuento');
         var qEl = row.querySelector('.rep-cantidad');
         var sub = row.querySelector('.rep-subtotal');
         var view = row.querySelector('.rep-subtotal-view');
@@ -88,56 +212,58 @@
         var repNombre = row.querySelector('.rep-nombre');
         var desarmeBadge = row.querySelector('.rep-desarme-badge');
         var removeBtn = row.querySelector('.rep-remove-btn');
-
+        var toggleCostBtn = row.querySelector('.rep-toggle-cost');
+        var costPanel = row.querySelector('.rep-cost-panel');
+        var costInput = row.querySelector('.rep-cost-input');
+        var costValue = row.querySelector('.rep-cost-value');
         var timer = null;
 
-        // Botón crear repuesto
-        var btnCreate = row.querySelector('.rep-create-btn');
-        if (btnCreate) {
-            btnCreate.addEventListener('click', function() {
-                currentRepuestoRow = row;
-                var nombre = (searchInput && searchInput.value || '').split('|')[0].trim();
-                var codigo = (inpCode && inpCode.value || '').trim();
-                var rowId = row.dataset.rowId || '';
-                if (!EG.cfg.URL_REPUESTO_CREATE_WINDOW) {
-                    console.error('URL_REPUESTO_CREATE_WINDOW no configurada');
-                    return;
-                }
-                var next = window.location.pathname + window.location.search;
-                var createUrl = new URL(EG.cfg.URL_REPUESTO_CREATE_WINDOW, window.location.origin);
-                createUrl.searchParams.set('return_to', next);
-                createUrl.searchParams.set('field_target', 'repuesto');
-                createUrl.searchParams.set('target_row', rowId);
-                if (nombre) createUrl.searchParams.set('prefill_nombre', nombre);
-                if (codigo) createUrl.searchParams.set('prefill_code', codigo);
-                if (window.EG && window.EG.borrador && typeof window.EG.borrador.saveDocumentDraftNow === 'function') {
-                    window.EG.borrador.saveDocumentDraftNow();
-                }
-                window.location.href = createUrl.toString();
-            });
+        function recalc() {
+            var cantidad = Number((qEl && qEl.value) || 0) || 0;
+            var precio = EG.utils.parseNumericInput(inpPV && inpPV.value || 0);
+            var subtotal = cantidad * precio;
+            if (sub) sub.value = subtotal;
+            if (view) view.textContent = money(subtotal);
+            if (typeof window.serializeRows === 'function') window.serializeRows();
+            if (typeof window.recalcTotales === 'function') window.recalcTotales();
         }
 
-        // Aplica datos de repuesto a la fila
+        function syncCostField(rawValue, formatInput) {
+            var costo = EG.utils.parseNumericInput(rawValue || 0);
+            if (repCostoLinea) {
+                repCostoLinea.value = costo > 0 ? costo : '';
+            }
+            if (costValue) {
+                costValue.textContent = money(costo);
+            }
+            if (costInput) {
+                if (formatInput) {
+                    costInput.value = costo > 0 ? EG.utils.formatNumberInput(costo) : '';
+                } else if (document.activeElement !== costInput) {
+                    costInput.value = costo > 0 ? EG.utils.formatNumberInput(costo) : '';
+                }
+            }
+            if (typeof window.serializeRows === 'function') window.serializeRows();
+        }
+
         function applyPartData(item) {
-            if (!item) return;
-            if (idHidden) idHidden.value = item.id || '';
-            if (inpCode) inpCode.value = item.codigo || '';
-            if (searchInput) searchInput.value = item.nombre || '';
-            if (repNombre) repNombre.value = item.nombre || '';
-            if (inpPV && item.precio_venta !== undefined) {
-                var precio = EG.utils.parseNumericInput(item.precio_venta);
+            var part = normalizePartItem(item);
+            if (idHidden) idHidden.value = part.id || '';
+            if (inpCode) inpCode.value = part.codigo || '';
+            if (searchInput) searchInput.value = part.nombre || '';
+            if (repNombre) repNombre.value = part.nombre || '';
+            if (inpPV) {
+                var precio = EG.utils.parseNumericInput(part.precio_venta);
                 inpPV.value = precio > 0 ? EG.utils.formatNumberInput(precio) : '';
             }
-            if (repOrigen) repOrigen.value = item.origen_repuesto || 'STOCK_BODEGA';
-            if (repPiezaDesarmeId) repPiezaDesarmeId.value = item.pieza_desarme_id || '';
-            if (repCostoLinea) repCostoLinea.value = item.costo_linea || '';
-            var precioCosto = row.querySelector('.rep-precio-costo');
-            if (precioCosto && item.precio_compra !== undefined) {
-                var costo = EG.utils.parseNumericInput(item.precio_compra);
-                precioCosto.value = costo > 0 ? EG.utils.formatNumberInput(costo) : '';
-            }
+            if (repOrigen) repOrigen.value = part.origen_repuesto || 'STOCK_BODEGA';
+            if (repPiezaDesarmeId) repPiezaDesarmeId.value = part.pieza_desarme_id || '';
+            var costoRaw = part.costo_linea !== undefined && part.costo_linea !== ''
+                ? part.costo_linea
+                : (part.precio_compra || 0);
+            syncCostField(costoRaw, true);
             if (desarmeBadge) {
-                var isDesarme = item.origen_repuesto === 'DESARME' || item.pieza_desarme_id;
+                var isDesarme = part.origen_repuesto === 'DESARME' || !!part.pieza_desarme_id;
                 desarmeBadge.classList.toggle('hidden', !isDesarme);
             }
             recalc();
@@ -145,26 +271,118 @@
 
         row.__applyRepData = function(data) {
             if (!data) return;
-            applyPartData({
-                id: data.id || '',
-                codigo: data.codigo || '',
-                nombre: data.nombre || '',
-                precio_venta: data.precio_venta !== undefined ? data.precio_venta : (data.precio || 0),
-                precio_compra: data.precio_compra,
-                origen_repuesto: data.origen_repuesto,
-                pieza_desarme_id: data.pieza_desarme_id,
-                costo_linea: data.costo_linea
-            });
+            applyPartData(data);
             if (qEl && data.cantidad) {
                 qEl.value = data.cantidad;
-                qEl.dispatchEvent(new Event('input'));
-            }
-            if (descEl && data.descuento !== undefined) {
-                descEl.value = data.descuento;
-                descEl.dispatchEvent(new Event('input'));
             }
             recalc();
         };
+
+        async function searchRepuestos(query, activeDrop) {
+            if (!activeDrop) {
+                return;
+            }
+
+            var q = String(query || '').trim();
+            if (q.length < 2) {
+                activeDrop.classList.add('hidden');
+                return;
+            }
+
+            var localMatches = EG.utils.filterPrefetchItems((EG.PREFETCH && EG.PREFETCH.repuestos) || [], ['codigo', 'nombre', 'part_number'], q, 15);
+            if (localMatches.length) {
+                renderResultadosRepuestos(localMatches, activeDrop);
+            }
+
+            try {
+                var response = await EG.utils.egFetch((EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/') + '?q=' + encodeURIComponent(q));
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status);
+                }
+                var data = await response.json();
+                var items = EG.utils.extractResponseItems(data, ['results', 'items', 'repuestos']);
+                if (!items.length && Array.isArray(data)) {
+                    items = data;
+                }
+                renderResultadosRepuestos(items, activeDrop);
+            } catch (err) {
+                console.error('searchRepuestos', err);
+                if (!localMatches.length) {
+                    activeDrop.innerHTML = '<div class="p-3 text-red-300">' + (EG.I18N.server_error || 'Error') + '</div>';
+                    activeDrop.classList.remove('hidden');
+                }
+            }
+        }
+
+        function renderResultadosRepuestos(lista, activeDrop) {
+            if (!activeDrop) return;
+            activeDrop.innerHTML = '';
+            if (!lista || !lista.length) {
+                activeDrop.innerHTML = '<div class="p-3 text-gray-300">' + (EG.I18N.no_parts || 'Sin repuestos') + '</div>';
+                activeDrop.classList.remove('hidden');
+                return;
+            }
+
+            lista.forEach(function(rawItem) {
+                var item = normalizePartItem(rawItem);
+                var div = document.createElement('div');
+                div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600';
+                div.dataset.id = item.id || '';
+                div.dataset.codigo = item.codigo || '';
+                div.dataset.nombre = item.nombre || '';
+                div.dataset.precio = item.precio_venta || 0;
+                div.dataset.precioCompra = item.precio_compra || 0;
+                div.dataset.origen = item.origen_repuesto || 'STOCK_BODEGA';
+                div.dataset.piezaDesarmeId = item.pieza_desarme_id || '';
+                div.dataset.costoLinea = item.costo_linea || '';
+                div.innerHTML = '<div class="text-cyan-200 font-semibold">'
+                    + escapeHtml((item.codigo ? item.codigo + ' - ' : '') + (item.nombre || ''))
+                    + '</div><div class="text-xs text-gray-300">' + money(item.precio_venta || 0) + '</div>';
+                activeDrop.appendChild(div);
+            });
+            activeDrop.classList.remove('hidden');
+        }
+
+        function seleccionarRepuestoFromElement(el) {
+            if (!el) return;
+            applyPartData({
+                id: el.dataset.id,
+                codigo: el.dataset.codigo,
+                nombre: el.dataset.nombre,
+                precio_venta: el.dataset.precio,
+                precio_compra: el.dataset.precioCompra,
+                origen_repuesto: el.dataset.origen,
+                pieza_desarme_id: el.dataset.piezaDesarmeId,
+                costo_linea: el.dataset.costoLinea,
+            });
+            if (drop) drop.classList.add('hidden');
+            if (codeDrop) codeDrop.classList.add('hidden');
+            markRowAsActive(row);
+        }
+
+        if (toggleCostBtn) {
+            toggleCostBtn.addEventListener('click', function(event) {
+                event.preventDefault();
+                event.stopPropagation();
+                if (!costPanel) {
+                    return;
+                }
+                costPanel.classList.toggle('hidden');
+                var isOpen = !costPanel.classList.contains('hidden');
+                toggleCostBtn.setAttribute('aria-expanded', String(isOpen));
+                if (isOpen && costInput) {
+                    costInput.focus();
+                    costInput.select();
+                }
+            });
+        }
+
+        [row, searchInput, inpCode, inpPV, qEl].forEach(function(node) {
+            if (node) {
+                node.addEventListener('focus', function() { markRowAsActive(row); }, true);
+                node.addEventListener('click', function() { markRowAsActive(row); });
+            }
+        });
 
         if (removeBtn) {
             removeBtn.addEventListener('click', function() {
@@ -172,123 +390,120 @@
             });
         }
 
-        // Busca repuestos
-        async function searchRepuestos(q, targetDrop) {
-            var activeDrop = targetDrop || drop;
-            if (!activeDrop || !q || q.length < 2) {
-                if (drop) drop.classList.add('hidden');
-                if (codeDrop) codeDrop.classList.add('hidden');
-                return;
-            }
-            var localMatches = EG.utils.filterPrefetchItems(EG.PREFETCH.repuestos, ['codigo', 'nombre'], q, 15);
-            if (localMatches.length) renderResultadosRepuestos(localMatches, activeDrop);
-            try {
-                var url = EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/';
-                var r = await EG.utils.egFetch(url + '?q=' + encodeURIComponent(q));
-                if (!r.ok) throw new Error('HTTP ' + r.status);
-                var data = await r.json();
-                var items = Array.isArray(data) ? data : (data.results || data.items || []);
-                if (items.length) renderResultadosRepuestos(items, activeDrop);
-            } catch (err) {
-                console.error('buscarRepuestos', err);
-                if (!localMatches.length && activeDrop) {
-                    activeDrop.innerHTML = '<div class="p-3 text-red-300">' + (EG.I18N.server_error || 'Error') + '</div>';
-                    activeDrop.classList.remove('hidden');
-                }
-            }
-        }
-
-        function renderResultadosRepuestos(lista, targetDrop) {
-            var activeDrop = targetDrop || drop;
-            if (!activeDrop) return;
-            activeDrop.innerHTML = '';
-            if (!lista.length) {
-                activeDrop.innerHTML = '<div class="p-3 text-gray-300">' + (EG.I18N.no_parts || 'Sin repuestos') + '</div>';
-                activeDrop.classList.remove('hidden');
-                return;
-            }
-            lista.forEach(function(item) {
-                var div = document.createElement('div');
-                div.className = 'srv-item px-3 py-2 hover:bg-cyan-700 cursor-pointer border-b border-cyan-600';
-                div.dataset.id = item.id || '';
-                div.dataset.codigo = item.codigo || '';
-                div.dataset.nombre = item.nombre || '';
-                div.dataset.precio = item.precio_venta_sugerido || item.precio_venta || item.precio || 0;
-                div.innerHTML = '<div class="text-cyan-200 font-semibold">' + (item.codigo ? item.codigo + ' - ' : '') + item.nombre + '</div>' +
-                    '<div class="text-xs text-gray-300">' + EG.utils.money(div.dataset.precio) + '</div>';
-                div.addEventListener('click', function() {
-                    seleccionarRepuesto(div);
-                });
-                activeDrop.appendChild(div);
-            });
-            activeDrop.setAttribute('role', 'listbox');
-            activeDrop.classList.remove('hidden');
-        }
-
-        function seleccionarRepuesto(el) {
-            if (!el) return;
-            applyPartData({
-                id: el.dataset.id,
-                codigo: el.dataset.codigo,
-                nombre: el.dataset.nombre,
-                precio_venta: EG.utils.parseNumericInput(el.dataset.precio)
-            });
-            if (drop) drop.classList.add('hidden');
-            if (codeDrop) codeDrop.classList.add('hidden');
-        }
-
-        function recalc() {
-            var q = Number(qEl && qEl.value || 0);
-            var p = EG.utils.parseNumericInput(inpPV && inpPV.value || 0);
-            var d = Number(descEl && descEl.value || 0) || 0;
-            var subtotal = q * p * (1 - (d / 100));
-            if (sub) sub.value = subtotal;
-            if (view) view.textContent = EG.utils.money(subtotal);
-            if (typeof window.recalcTotales === 'function') window.recalcTotales();
-        }
-
-        // Eventos
         if (searchInput) {
-            searchInput.addEventListener('input', function(e) {
+            searchInput.addEventListener('input', function(event) {
+                if (idHidden) idHidden.value = '';
+                if (repNombre) repNombre.value = event.target.value || '';
                 clearTimeout(timer);
-                timer = setTimeout(function() { searchRepuestos(e.target.value.trim(), drop); }, 250);
+                timer = setTimeout(function() {
+                    searchRepuestos(event.target.value.trim(), drop);
+                }, 250);
             });
             searchInput.addEventListener('focus', function() {
-                if (searchInput.value.trim().length >= 2) searchRepuestos(searchInput.value.trim(), drop);
+                if ((searchInput.value || '').trim().length >= 2) {
+                    searchRepuestos(searchInput.value.trim(), drop);
+                }
             });
         }
+
         if (inpCode) {
-            inpCode.addEventListener('input', function(e) {
+            inpCode.addEventListener('input', function(event) {
                 clearTimeout(timer);
-                timer = setTimeout(function() { searchRepuestos(e.target.value.trim(), codeDrop || drop); }, 250);
+                timer = setTimeout(function() {
+                    searchRepuestos(event.target.value.trim(), codeDrop || drop);
+                }, 250);
             });
             inpCode.addEventListener('focus', function() {
-                if (inpCode.value.trim().length >= 2) searchRepuestos(inpCode.value.trim(), codeDrop || drop);
+                if ((inpCode.value || '').trim().length >= 2) {
+                    searchRepuestos(inpCode.value.trim(), codeDrop || drop);
+                }
             });
         }
+
         if (drop) {
-            drop.addEventListener('click', function(e) {
-                var item = e.target.closest('.srv-item');
-                if (item) seleccionarRepuesto(item);
+            drop.addEventListener('click', function(event) {
+                var item = event.target.closest('.srv-item');
+                if (item) seleccionarRepuestoFromElement(item);
             });
         }
         if (codeDrop) {
-            codeDrop.addEventListener('click', function(e) {
-                var item = e.target.closest('.srv-item');
-                if (item) seleccionarRepuesto(item);
+            codeDrop.addEventListener('click', function(event) {
+                var item = event.target.closest('.srv-item');
+                if (item) seleccionarRepuestoFromElement(item);
             });
         }
-        document.addEventListener('click', function(e) {
-            if (!row.contains(e.target) && drop) drop.classList.add('hidden');
-            if (!row.contains(e.target) && codeDrop) codeDrop.classList.add('hidden');
+
+        document.addEventListener('click', function(event) {
+            if (!row.contains(event.target)) {
+                if (drop) drop.classList.add('hidden');
+                if (codeDrop) codeDrop.classList.add('hidden');
+                if (costPanel) costPanel.classList.add('hidden');
+                if (toggleCostBtn) toggleCostBtn.setAttribute('aria-expanded', 'false');
+            }
         });
+
         if (qEl) qEl.addEventListener('input', recalc);
-        if (inpPV) inpPV.addEventListener('input', recalc);
-        if (descEl) descEl.addEventListener('input', recalc);
+        if (inpPV) {
+            inpPV.addEventListener('input', recalc);
+            inpPV.addEventListener('change', recalc);
+        }
+        if (costInput) {
+            costInput.addEventListener('input', function() {
+                syncCostField(costInput.value, false);
+            });
+            costInput.addEventListener('change', function() {
+                syncCostField(costInput.value, true);
+            });
+            costInput.addEventListener('blur', function() {
+                syncCostField(costInput.value, true);
+            });
+            costInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    syncCostField(costInput.value, true);
+                    costInput.blur();
+                }
+            });
+        }
+
         toggleRepuestosEmptyHint();
+        refreshHeaderLabels();
     }
 
-    // Modal piezas usadas (desarme)
+    function handleCreatedRepuestoFromReturn(context) {
+        var repuestoId = context.created_repuesto_id || '';
+        if (!repuestoId) {
+            return;
+        }
+
+        var rowId = resolveTargetRowId(context);
+        var row = getRowById(rowId);
+        if (!row) {
+            row = addRepuestoRow(rowId || null);
+        }
+        if (!row || !row.__applyRepData) {
+            return;
+        }
+
+        row.__applyRepData({
+            id: repuestoId,
+            codigo: context.created_repuesto_codigo || '',
+            nombre: context.created_repuesto_nombre || context.created_repuesto_label || '',
+            precio_venta: context.created_repuesto_precio_venta || context.created_repuesto_precio_compra || 0,
+            cantidad: 1,
+        });
+
+        if (EG.utils.clearActiveRowContext) {
+            EG.utils.clearActiveRowContext();
+        }
+
+        var focusTarget = row.querySelector('.rep-cantidad') || row.querySelector('.rep-search');
+        if (focusTarget) {
+            focusTarget.focus();
+            focusTarget.select && focusTarget.select();
+        }
+    }
+
     function openUsedPartsModal() {
         var modal = document.getElementById('modal-used-parts');
         if (modal) modal.classList.remove('hidden');
@@ -305,48 +520,31 @@
         var modal = document.getElementById('modal-used-parts');
         if (modal && !modal.dataset.egBound) {
             modal.dataset.egBound = '1';
-
             var overlay = document.getElementById('used-parts-overlay');
             if (overlay) {
                 overlay.addEventListener('click', closeUsedPartsModal);
             }
-
             var closeBtn = document.getElementById('close-used-parts');
             if (closeBtn) {
                 closeBtn.addEventListener('click', closeUsedPartsModal);
             }
         }
 
+        refreshHeaderLabels();
         toggleRepuestosEmptyHint();
     }
 
-    function addRowFromCreatedEntity(entity) {
-        if (!entity || !entity.id) return null;
-        var row = addRepuestoRow(entity.target_row || null);
-        if (row && row.__applyRepData) {
-            row.__applyRepData({
-                id: entity.id,
-                codigo: entity.codigo || '',
-                nombre: entity.nombre || entity.label || ('Repuesto #' + entity.id),
-                precio_venta: entity.precio_venta,
-                precio_compra: entity.precio_compra,
-                cantidad: entity.cantidad || 1,
-                descuento: entity.descuento || 0
-            });
-        }
-        return row;
-    }
-
-    // Exports
     EG.repuestos = {
         addRepuestoRow: addRepuestoRow,
-        addRowFromCreatedEntity: addRowFromCreatedEntity,
         setupRepuestoRow: setupRepuestoRow,
         openUsedPartsModal: openUsedPartsModal,
         closeUsedPartsModal: closeUsedPartsModal,
+        handleCreatedRepuestoFromReturn: handleCreatedRepuestoFromReturn,
         init: init
     };
+
     window.addRepuestoRow = addRepuestoRow;
     window.openUsedPartsModal = openUsedPartsModal;
-
 })();
+
+
