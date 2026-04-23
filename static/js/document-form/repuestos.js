@@ -1,4 +1,4 @@
-/**
+﻿/**
  * repuestos.js - Modulo de gestion de repuestos
  */
 
@@ -61,10 +61,17 @@
             + '<label class="hidden" data-repeat-row-label>' + text + '</label>';
     }
 
+    function buildEyeIcon() {
+        return '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" class="rep-eye-icon">'
+            + '<path d="M1.5 12s3.75-6 10.5-6 10.5 6 10.5 6-3.75 6-10.5 6S1.5 12 1.5 12Z"></path>'
+            + '<circle cx="12" cy="12" r="3.25"></circle>'
+            + '</svg>';
+    }
+
     function buildRepuestoRowHTML(rowId, isFirstRow) {
         return ''
             + '<div class="doc-row-grid repuesto-row-grid grid gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="' + rowId + '">'
-            + '  <div class="col-span-1 sm:col-span-1 relative min-w-0">'
+            + '  <div class="repuesto-cell repuesto-cell-code relative min-w-0">'
             +        buildLabel(EG.I18N.code || 'Code', isFirstRow)
             + '    <input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="' + escapeHtml(EG.I18N.code || 'Code') + '" autocomplete="off">'
             + '    <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
@@ -73,35 +80,55 @@
             + '    <input type="hidden" class="rep-pieza-desarme-id">'
             + '    <input type="hidden" class="rep-costo-linea">'
             + '  </div>'
-            + '  <div class="col-span-8 sm:col-span-8 description-field rep-search-container relative min-w-0" style="grid-column: span 8 / span 8;">'
+            + '  <div class="repuesto-cell repuesto-cell-name description-field rep-search-container relative min-w-0">'
             + '    <div class="flex items-center justify-between gap-2 mb-1">'
             +          buildLabel(EG.I18N.name || 'Name', isFirstRow)
             + '      <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase">Usado</span>'
             + '    </div>'
             + '    <div class="flex gap-1" style="min-width: 0;">'
             + '      <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1" style="min-width: 0; width: 100%;" placeholder="' + escapeHtml(EG.I18N.type_to_search_parts || 'Buscar...') + '" autocomplete="off">'
-            + '      <button type="button" class="rep-create-btn btn-add flex-shrink-0 h-10 px-2" title="' + escapeHtml(EG.I18N.create_part || 'Create Part') + '">+</button>'
             + '    </div>'
             + '    <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
             + '    <input type="hidden" class="rep-nombre">'
             + '  </div>'
-            + '  <div class="col-span-1 sm:col-span-1 min-w-0">'
-            +        buildLabel(EG.I18N.qty || 'Qty', isFirstRow)
-            + '    <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" value="1">'
+            + '  <div class="repuesto-mobile-pair repuesto-mobile-pair-values">'
+            + '    <div class="repuesto-cell repuesto-cell-qty min-w-0">'
+            +          buildLabel(EG.I18N.qty || 'Qty', isFirstRow)
+            + '      <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" value="1">'
+            + '    </div>'
+            + '    <div class="repuesto-cell repuesto-cell-price min-w-0">'
+            +          buildLabel(EG.I18N.sale_price || 'Price', isFirstRow)
+            + '      <div class="rep-price-field relative min-w-0">'
+            + '        <div class="relative">'
+            + '          <span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300">$</span>'
+            + '          <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6 pr-10" placeholder="0">'
+            + '          <button type="button" class="rep-toggle-cost" title="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-label="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-expanded="false">'
+            +                buildEyeIcon()
+            + '          </button>'
+            + '        </div>'
+            + '        <div class="rep-cost-panel hidden">'
+            + '          <label class="rep-cost-input-wrap">'
+            + '            <span class="rep-cost-label">' + escapeHtml(EG.I18N.cost || 'Costo') + ':</span>'
+            + '            <div class="rep-cost-input-shell">'
+            + '              <span class="rep-cost-currency">$</span>'
+            + '              <input type="text" class="rep-cost-input" inputmode="numeric" autocomplete="off" placeholder="0">'
+            + '            </div>'
+            + '          </label>'
+            + '          <span class="rep-cost-value">' + money(0) + '</span>'
+            + '        </div>'
+            + '      </div>'
+            + '    </div>'
             + '  </div>'
-            + '  <div class="col-span-1 sm:col-span-1 min-w-0">'
-            +        buildLabel(EG.I18N.sale_price || 'Price', isFirstRow)
-            + '    <div class="relative"><span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300">$</span>'
-            + '      <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6" placeholder="0"></div>'
-            + '  </div>'
-            + '  <div class="col-span-1 sm:col-span-1 min-w-0">'
-            +        buildLabel(EG.I18N.subtotal || 'Subtotal', isFirstRow)
-            + '    <input type="hidden" class="rep-subtotal" value="0">'
-            + '    <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">' + money(0) + '</div>'
-            + '  </div>'
-            + '  <div class="col-span-1 sm:col-span-1">'
-            + '    <label class="block text-cyan-200 text-sm mb-1 hidden" data-first-row-label>&nbsp;</label>'
-            + '    <button type="button" class="btn-add w-full h-10 rep-remove-btn" title="' + escapeHtml(EG.I18N.remove_row || 'Remove row') + '">X</button>'
+            + '  <div class="repuesto-mobile-pair repuesto-mobile-pair-summary">'
+            + '    <div class="repuesto-cell repuesto-cell-total min-w-0">'
+            +          buildLabel(EG.I18N.subtotal || 'Subtotal', isFirstRow)
+            + '      <input type="hidden" class="rep-subtotal" value="0">'
+            + '      <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">' + money(0) + '</div>'
+            + '    </div>'
+            + '    <div class="repuesto-cell repuesto-cell-action">'
+            + '      <label class="block text-cyan-200 text-sm mb-1 hidden" data-first-row-label>&nbsp;</label>'
+            + '      <button type="button" class="btn-add w-full h-10 rep-remove-btn" title="' + escapeHtml(EG.I18N.remove_row || 'Remove row') + '">X</button>'
+            + '    </div>'
             + '  </div>'
             + '</div>';
     }
@@ -185,7 +212,10 @@
         var repNombre = row.querySelector('.rep-nombre');
         var desarmeBadge = row.querySelector('.rep-desarme-badge');
         var removeBtn = row.querySelector('.rep-remove-btn');
-        var btnCreate = row.querySelector('.rep-create-btn');
+        var toggleCostBtn = row.querySelector('.rep-toggle-cost');
+        var costPanel = row.querySelector('.rep-cost-panel');
+        var costInput = row.querySelector('.rep-cost-input');
+        var costValue = row.querySelector('.rep-cost-value');
         var timer = null;
 
         function recalc() {
@@ -196,6 +226,24 @@
             if (view) view.textContent = money(subtotal);
             if (typeof window.serializeRows === 'function') window.serializeRows();
             if (typeof window.recalcTotales === 'function') window.recalcTotales();
+        }
+
+        function syncCostField(rawValue, formatInput) {
+            var costo = EG.utils.parseNumericInput(rawValue || 0);
+            if (repCostoLinea) {
+                repCostoLinea.value = costo > 0 ? costo : '';
+            }
+            if (costValue) {
+                costValue.textContent = money(costo);
+            }
+            if (costInput) {
+                if (formatInput) {
+                    costInput.value = costo > 0 ? EG.utils.formatNumberInput(costo) : '';
+                } else if (document.activeElement !== costInput) {
+                    costInput.value = costo > 0 ? EG.utils.formatNumberInput(costo) : '';
+                }
+            }
+            if (typeof window.serializeRows === 'function') window.serializeRows();
         }
 
         function applyPartData(item) {
@@ -210,7 +258,10 @@
             }
             if (repOrigen) repOrigen.value = part.origen_repuesto || 'STOCK_BODEGA';
             if (repPiezaDesarmeId) repPiezaDesarmeId.value = part.pieza_desarme_id || '';
-            if (repCostoLinea) repCostoLinea.value = part.costo_linea || '';
+            var costoRaw = part.costo_linea !== undefined && part.costo_linea !== ''
+                ? part.costo_linea
+                : (part.precio_compra || 0);
+            syncCostField(costoRaw, true);
             if (desarmeBadge) {
                 var isDesarme = part.origen_repuesto === 'DESARME' || !!part.pieza_desarme_id;
                 desarmeBadge.classList.toggle('hidden', !isDesarme);
@@ -309,30 +360,20 @@
             markRowAsActive(row);
         }
 
-        function openCreatePage() {
-            if (!EG.cfg.URL_REPUESTO_CREATE_WINDOW || !EG.utils || !EG.utils.buildContextualCreateUrl) {
-                console.error('URL_REPUESTO_CREATE_WINDOW no configurada');
-                return;
-            }
-
-            var rowId = row.dataset.rowId || generateRowId();
-            row.dataset.rowId = rowId;
-            markRowAsActive(row);
-
-            var url = EG.utils.buildContextualCreateUrl(EG.cfg.URL_REPUESTO_CREATE_WINDOW, {
-                return_to: EG.utils.getDocumentReturnTo(),
-                select_field: 'repuesto',
-                target_row: rowId,
-                prefill_nombre: searchInput ? searchInput.value.trim() : '',
-                prefill_code: inpCode ? inpCode.value.trim() : '',
-            });
-            window.location.href = url;
-        }
-
-        if (btnCreate) {
-            btnCreate.addEventListener('click', function(event) {
+        if (toggleCostBtn) {
+            toggleCostBtn.addEventListener('click', function(event) {
                 event.preventDefault();
-                openCreatePage();
+                event.stopPropagation();
+                if (!costPanel) {
+                    return;
+                }
+                costPanel.classList.toggle('hidden');
+                var isOpen = !costPanel.classList.contains('hidden');
+                toggleCostBtn.setAttribute('aria-expanded', String(isOpen));
+                if (isOpen && costInput) {
+                    costInput.focus();
+                    costInput.select();
+                }
             });
         }
 
@@ -396,6 +437,8 @@
             if (!row.contains(event.target)) {
                 if (drop) drop.classList.add('hidden');
                 if (codeDrop) codeDrop.classList.add('hidden');
+                if (costPanel) costPanel.classList.add('hidden');
+                if (toggleCostBtn) toggleCostBtn.setAttribute('aria-expanded', 'false');
             }
         });
 
@@ -403,6 +446,24 @@
         if (inpPV) {
             inpPV.addEventListener('input', recalc);
             inpPV.addEventListener('change', recalc);
+        }
+        if (costInput) {
+            costInput.addEventListener('input', function() {
+                syncCostField(costInput.value, false);
+            });
+            costInput.addEventListener('change', function() {
+                syncCostField(costInput.value, true);
+            });
+            costInput.addEventListener('blur', function() {
+                syncCostField(costInput.value, true);
+            });
+            costInput.addEventListener('keydown', function(event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    syncCostField(costInput.value, true);
+                    costInput.blur();
+                }
+            });
         }
 
         toggleRepuestosEmptyHint();
@@ -485,3 +546,5 @@
     window.addRepuestoRow = addRepuestoRow;
     window.openUsedPartsModal = openUsedPartsModal;
 })();
+
+

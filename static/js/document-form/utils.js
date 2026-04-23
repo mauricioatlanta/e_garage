@@ -1,7 +1,7 @@
-/**
+﻿/**
  * utils.js - Utilidades reutilizables del formulario de documentos
  * 
- * Extraído del código embebido en document_form.html
+ * ExtraÃ­do del cÃ³digo embebido en document_form.html
  */
 
 (function() {
@@ -68,7 +68,7 @@
             const el = document.getElementById(id);
             return el ? JSON.parse(el.textContent) : [];
         } catch (err) {
-            console.warn('⚠️ PREFETCH inválido para', id, err);
+            console.warn('âš ï¸ PREFETCH invÃ¡lido para', id, err);
             return [];
         }
     }
@@ -188,17 +188,20 @@
         };
     }
 
-    function extractResponseItems(data, preferredKeys = ['results', 'items']) {
-        if (Array.isArray(data)) return data;
-        for (const key of preferredKeys) {
-            if (Array.isArray(data?.[key])) {
-                return data[key];
-            }
+    
+
+function extractResponseItems(data, preferredKeys = ['results', 'items']) {
+    if (Array.isArray(data)) return data;
+
+    for (const key of preferredKeys) {
+        if (Array.isArray(data?.[key])) {
+            return data[key];
         }
-        return [];
     }
 
-    function getDocumentReturnTo() {
+    return [];
+}
+function getDocumentReturnTo() {
         return window.location.pathname + (window.location.search || '');
     }
 
@@ -280,7 +283,7 @@
         loadPrefetch();
         const country = EG.cfg?.country || 'CL';
         MONEY_FORMATTER = buildMoneyFormatter(country);
-        console.log('🔧 Utils initialized');
+        console.log('ðŸ”§ Utils initialized');
     }
 
     // Exports
@@ -312,3 +315,8 @@
     };
 
 })();
+
+
+
+
+
