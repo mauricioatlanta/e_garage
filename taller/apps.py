@@ -12,7 +12,8 @@ class TallerConfig(AppConfig):
         La app instalada es 'taller', no 'taller.documentos', por eso las señales
         de documentos deben cargarse aquí para que se ejecuten al arrancar.
         """
-        import taller.signals  # noqa: F401
+        import taller.signals
+        import taller.signals.tenant_guard  # noqa: F401
 
         # Señales de inventario (pre_save Documento → mover stock al cambiar estado)
         try:

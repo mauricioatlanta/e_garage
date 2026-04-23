@@ -95,19 +95,19 @@ def _parse_json_list_field(value):
 class DocumentoForm(forms.ModelForm):
     """
     Formulario avanzado para Documento con:
-    - Autocompletado DAL multi-país
-    - Labels dinámicos según país
+    - Autocompletado DAL multi-paÃ­s
+    - Labels dinÃ¡micos segÃºn paÃ­s
     - Filtrado multi-tenant
     - Validaciones robustas
-    - IDs únicos para JavaScript
+    - IDs Ãºnicos para JavaScript
     """
 
     cliente = forms.ModelChoiceField(
-        queryset=Cliente.objects.none(),  # Se ajustará en __init__
+        queryset=Cliente.objects.none(),  # Se ajustarÃ¡ en __init__
         widget=autocomplete.ModelSelect2(
-            url="",  # Se establecerá dinámicamente
+            url="",  # Se establecerÃ¡ dinÃ¡micamente
             attrs={
-                "data-placeholder": "🔍 Buscar cliente...",
+                "data-placeholder": "ðŸ” Buscar cliente...",
                 "data-minimum-input-length": 2,
             },
         ),
@@ -115,19 +115,19 @@ class DocumentoForm(forms.ModelForm):
     )
 
     vehiculo = forms.ModelChoiceField(
-        queryset=Vehiculo.objects.none(),  # Se ajustará en __init__
+        queryset=Vehiculo.objects.none(),  # Se ajustarÃ¡ en __init__
         widget=autocomplete.ModelSelect2(
-            url="",  # Se establecerá dinámicamente
+            url="",  # Se establecerÃ¡ dinÃ¡micamente
             forward=["cliente"],
             attrs={
-                "data-placeholder": "🔍 Buscar vehículo...",
+                "data-placeholder": "ðŸ” Buscar vehÃ­culo...",
                 "data-minimum-input-length": 1,
             },
         ),
         required=False,
     )
 
-    # Campos JSON para filas dinámicas
+    # Campos JSON para filas dinÃ¡micas
     repuestos_json = forms.CharField(widget=forms.HiddenInput(), required=False)
     servicios_json = forms.CharField(widget=forms.HiddenInput(), required=False)
     otros_json = forms.CharField(widget=forms.HiddenInput(), required=False)
@@ -149,7 +149,7 @@ class DocumentoForm(forms.ModelForm):
         label="Kilometraje Actual",
         required=False,
         min_value=0,
-        help_text="Kilometraje del vehículo al momento de crear el documento",
+        help_text="Kilometraje del vehÃ­culo al momento de crear el documento",
     )
 
     class Meta:
@@ -161,7 +161,7 @@ class DocumentoForm(forms.ModelForm):
             "cliente",
             "vehiculo",
             "tecnico_responsable",
-            "kilometraje",  # Mantenido para compatibilidad, pero no se usará
+            "kilometraje",  # Mantenido para compatibilidad, pero no se usarÃ¡
             "millas",
             "observaciones",
             "pagado",
@@ -175,7 +175,7 @@ class DocumentoForm(forms.ModelForm):
             "descuento",
             "apply_vat",
         ]
-        # NOTA: kilometraje_ingreso NO está en fields porque no es un campo del modelo
+        # NOTA: kilometraje_ingreso NO estÃ¡ en fields porque no es un campo del modelo
 
         # Campos obligatorios: solo los esenciales
         # NOTA: 'numero' se autogenera en el modelo, NO es requerido en el form
@@ -187,13 +187,13 @@ class DocumentoForm(forms.ModelForm):
         self.empresa = kwargs.pop("empresa", None)
         self.country = kwargs.pop("country", "CL")
         # Idioma para labels/choices: define textos visibles (es/en/pt)
-        # Si no se pasa, usa get_language() o fallback por país (retrocompat)
+        # Si no se pasa, usa get_language() o fallback por paÃ­s (retrocompat)
         lang = kwargs.pop("language", None)
         self.language = (lang or get_language() or "").split("-")[0] or (
             "en" if (self.country or "").upper() == "US" else "es"
         )
 
-        # Si no se pasó empresa, intentar obtenerla del usuario
+        # Si no se pasÃ³ empresa, intentar obtenerla del usuario
         if not self.empresa and self.user:
             try:
                 self.empresa = getattr(self.user, "empresa", None)
@@ -202,11 +202,11 @@ class DocumentoForm(forms.ModelForm):
 
         super().__init__(*args, **kwargs)
 
-        # Configurar URLs de autocompletado dinámicamente
+        # Configurar URLs de autocompletado dinÃ¡micamente
         self.fields["cliente"].widget.url = f"{_ns(self.country)}:cliente"
         self.fields["vehiculo"].widget.url = f"{_ns(self.country)}:vehiculo"
 
-        # Configurar querysets filtrados por empresa (vehículo solo tipo CLIENTE para documentos)
+        # Configurar querysets filtrados por empresa (vehÃ­culo solo tipo CLIENTE para documentos)
         if self.empresa:
             self.fields["cliente"].queryset = Cliente.objects.filter(empresa=self.empresa)
             self.fields["vehiculo"].queryset = Vehiculo.objects.filter(
@@ -214,25 +214,25 @@ class DocumentoForm(forms.ModelForm):
             )
             self.fields["tecnico_responsable"].queryset = self.empresa.tecnicos.all()
 
-        # Configurar labels según idioma (no país)
+        # Configurar labels segÃºn idioma (no paÃ­s)
         self._configure_labels_by_language()
 
-        # Configurar choices dinámicos (labels por idioma; visibilidad millas por país)
+        # Configurar choices dinÃ¡micos (labels por idioma; visibilidad millas por paÃ­s)
         self._configure_dynamic_choices()
 
-        # Configurar widgets con IDs únicos para JavaScript
+        # Configurar widgets con IDs Ãºnicos para JavaScript
         self._configure_widget_ids()
 
         # Configurar campos requeridos: solo los esenciales
         self._configure_required_fields()
 
-        # Configurar campo kilometraje_ingreso dinámicamente
+        # Configurar campo kilometraje_ingreso dinÃ¡micamente
         self._configure_kilometraje_ingreso()
 
     def _configure_labels_by_language(self):
-        """Configura labels dinámicos según idioma (no país). País solo para rubro técnico."""
-        # Obtener configuración de la empresa para determinar rubro
-        responsable_label = "Técnico Responsable"  # Default
+        """Configura labels dinÃ¡micos segÃºn idioma (no paÃ­s). PaÃ­s solo para rubro tÃ©cnico."""
+        # Obtener configuraciÃ³n de la empresa para determinar rubro
+        responsable_label = "TÃ©cnico Responsable"  # Default
         if self.empresa:
             try:
                 config = getattr(self.empresa, "config", None)
@@ -248,7 +248,7 @@ class DocumentoForm(forms.ModelForm):
                 "vehiculo": "Vehicle",
                 "tecnico_responsable": (
                     responsable_label
-                    if responsable_label != "Técnico Responsable"
+                    if responsable_label != "TÃ©cnico Responsable"
                     else "Assigned Technician"
                 ),
                 "kilometraje": "Mileage",
@@ -268,14 +268,14 @@ class DocumentoForm(forms.ModelForm):
             labels = {
                 "tipo": "Tipo de Documento",
                 "cliente": "Cliente",
-                "vehiculo": "Vehículo",
+                "vehiculo": "VehÃ­culo",
                 "tecnico_responsable": responsable_label,
                 "kilometraje": "Kilometraje",
                 "kilometraje_ingreso": "Kilometraje Actual",
                 "millas": "Millas",
                 "observaciones": "Observaciones",
                 "pagado": "Pagado",
-                "metodo_pago": "Método de Pago",
+                "metodo_pago": "MÃ©todo de Pago",
                 "monto_pagado": "Monto Pagado",
                 "saldo_pendiente": "Saldo Pendiente",
                 "fecha_pago": "Fecha de Pago",
@@ -289,8 +289,8 @@ class DocumentoForm(forms.ModelForm):
                 self.fields[field_name].label = label
 
     def _configure_dynamic_choices(self):
-        """Configura choices dinámicos: labels por idioma; visibilidad millas por país."""
-        # Labels de choices según idioma
+        """Configura choices dinÃ¡micos: labels por idioma; visibilidad millas por paÃ­s."""
+        # Labels de choices segÃºn idioma
         if self.language == "en":
             self.fields["tipo"].choices = [
                 ("OT", "Work Order"),
@@ -315,7 +315,7 @@ class DocumentoForm(forms.ModelForm):
                 ("partial", "Parcial"),
                 ("canceled", "Anulado"),
             ]
-        # Visibilidad de millas por país (US muestra millas; CL/otros la ocultan)
+        # Visibilidad de millas por paÃ­s (US muestra millas; CL/otros la ocultan)
         if "millas" in self.fields:
             if (self.country or "").upper() == "US":
                 self.fields["millas"].required = False
@@ -325,7 +325,7 @@ class DocumentoForm(forms.ModelForm):
                 self.fields["millas"].required = False
 
     def _configure_widget_ids(self):
-        """Configura IDs únicos para todos los campos (para JavaScript)"""
+        """Configura IDs Ãºnicos para todos los campos (para JavaScript)"""
         widget_ids = {
             "tipo": "id_tipo",
             "numero": "id_numero",
@@ -353,7 +353,7 @@ class DocumentoForm(forms.ModelForm):
                 self.fields[field_name].widget.attrs.setdefault("id", widget_id)
 
     def _configure_required_fields(self):
-        """Configura qué campos son requeridos: solo los esenciales"""
+        """Configura quÃ© campos son requeridos: solo los esenciales"""
         # Campos obligatorios: solo los esenciales
         # NOTA: 'numero' se autogenera en el modelo, NO es requerido en el form
         required_fields = ["tipo", "fecha_emision", "cliente"]
@@ -367,15 +367,15 @@ class DocumentoForm(forms.ModelForm):
             if field_name in self.fields:
                 self.fields[field_name].required = True
 
-        # El campo número es opcional: si está vacío se autogenera
+        # El campo nÃºmero es opcional: si estÃ¡ vacÃ­o se autogenera
         if "numero" in self.fields:
             self.fields["numero"].required = False
-            self.fields["numero"].help_text = "Se generará automáticamente si se deja vacío"
+            self.fields["numero"].help_text = "Se generarÃ¡ automÃ¡ticamente si se deja vacÃ­o"
 
     def _configure_kilometraje_ingreso(self):
         """
-        Configura el campo kilometraje_ingreso según el país y si hay vehículo.
-        Si hay un vehículo en la instancia, muestra el kilometraje actual como sugerencia.
+        Configura el campo kilometraje_ingreso segÃºn el paÃ­s y si hay vehÃ­culo.
+        Si hay un vehÃ­culo en la instancia, muestra el kilometraje actual como sugerencia.
         """
         if "kilometraje_ingreso" not in self.fields:
             return
@@ -389,7 +389,7 @@ class DocumentoForm(forms.ModelForm):
             }
         )
 
-        # Si hay una instancia con vehículo, mostrar el kilometraje actual como placeholder
+        # Si hay una instancia con vehÃ­culo, mostrar el kilometraje actual como placeholder
         if self.instance and self.instance.pk and self.instance.vehiculo:
             try:
                 kilometraje_actual = self.instance.vehiculo.kilometraje_actual
@@ -401,7 +401,7 @@ class DocumentoForm(forms.ModelForm):
                 pass
 
         # En USA, el label puede ser "Mileage" o "Current Mileage"
-        # Ya se configuró en _configure_labels_by_language
+        # Ya se configurÃ³ en _configure_labels_by_language
 
     def clean(self):
         """Validaciones robustas multi-tenant"""
@@ -416,25 +416,25 @@ class DocumentoForm(forms.ModelForm):
             raise forms.ValidationError("El cliente seleccionado no pertenece a tu empresa.")
 
         if vehiculo and self.empresa and vehiculo.empresa != self.empresa:
-            raise forms.ValidationError("El vehículo seleccionado no pertenece a tu empresa.")
+            raise forms.ValidationError("El vehÃ­culo seleccionado no pertenece a tu empresa.")
 
-        # Validar que vehículo pertenece al cliente (solo si el vehículo tiene cliente; tipo CLIENTE siempre lo tiene)
+        # Validar que vehÃ­culo pertenece al cliente (solo si el vehÃ­culo tiene cliente; tipo CLIENTE siempre lo tiene)
         if (
             vehiculo
             and cliente
             and getattr(vehiculo, "cliente_id", None) is not None
             and vehiculo.cliente_id != cliente.id
         ):
-            raise forms.ValidationError("El vehículo seleccionado no pertenece al cliente.")
+            raise forms.ValidationError("El vehÃ­culo seleccionado no pertenece al cliente.")
 
-        # Validaciones específicas por país
+        # Validaciones especÃ­ficas por paÃ­s
         if self.country == "CL":
             # En Chile, millas no debe tener valor
             if cleaned_data.get("millas"):
                 raise forms.ValidationError(
                     "El campo millas no puede usarse en documentos de Chile."
                 )
-            # En Chile, si hay vehículo, el kilometraje_ingreso debería ser requerido
+            # En Chile, si hay vehÃ­culo, el kilometraje_ingreso deberÃ­a ser requerido
             vehiculo = cleaned_data.get("vehiculo")
             if vehiculo and not cleaned_data.get("kilometraje_ingreso"):
                 # Advertencia, no error - permitir crear sin kilometraje si es necesario
@@ -448,7 +448,7 @@ class DocumentoForm(forms.ModelForm):
                 millas = cleaned_data.get("millas") if "millas" in self.fields else None
                 if not kilometraje and not millas:
                     raise forms.ValidationError(
-                        "Debe especificar al menos kilometraje o millas cuando hay un vehículo."
+                        "Debe especificar al menos kilometraje o millas cuando hay un vehÃ­culo."
                     )
 
         for field_name in ("repuestos_json", "servicios_json", "otros_json"):
@@ -465,15 +465,15 @@ class DocumentoForm(forms.ModelForm):
         """
         Override save para:
         1. Guardar el documento
-        2. Procesar datos JSON y crear líneas del documento
-        3. Crear el registro de kilometraje si se proporcionó kilometraje_ingreso
+        2. Procesar datos JSON y crear lÃ­neas del documento
+        3. Crear el registro de kilometraje si se proporcionÃ³ kilometraje_ingreso
         """
         # Extraer kilometraje_ingreso antes de guardar (no es campo del modelo)
-        # Lo guardamos en una variable de instancia para usarlo después
+        # Lo guardamos en una variable de instancia para usarlo despuÃ©s
         kilometraje_ingreso = self.cleaned_data.get("kilometraje_ingreso")
 
-        # Guardar el documento (kilometraje_ingreso no está en fields del Meta,
-        # así que Django lo ignorará automáticamente)
+        # Guardar el documento (kilometraje_ingreso no estÃ¡ en fields del Meta,
+        # asÃ­ que Django lo ignorarÃ¡ automÃ¡ticamente)
         documento = super().save(commit=False)
         if self.empresa:
             documento.empresa = self.empresa
@@ -485,13 +485,13 @@ class DocumentoForm(forms.ModelForm):
             documento.save()
             if hasattr(self, "save_m2m"):
                 self.save_m2m()
-            # Procesar datos JSON solo si el documento se guardó
+            # Procesar datos JSON solo si el documento se guardÃ³
             self._process_json_data(documento)
 
-            # Recalcular totales del documento tras crear las líneas
+            # Recalcular totales del documento tras crear las lÃ­neas
             documento.recompute_totals(persist=True)
 
-            # Crear registro de kilometraje si se proporcionó y hay vehículo
+            # Crear registro de kilometraje si se proporcionÃ³ y hay vehÃ­culo
             if kilometraje_ingreso is not None and documento.vehiculo:
                 self._crear_registro_kilometraje(documento, kilometraje_ingreso)
 
@@ -513,9 +513,9 @@ class DocumentoForm(forms.ModelForm):
             if kilometraje_int < 0:
                 return  # No crear registro si es negativo
         except (ValueError, TypeError):
-            return  # No crear registro si no es válido
+            return  # No crear registro si no es vÃ¡lido
 
-        # Obtener técnico responsable (puede ser None)
+        # Obtener tÃ©cnico responsable (puede ser None)
         tecnico = documento.tecnico_responsable
 
         # Crear el registro de kilometraje
@@ -590,8 +590,7 @@ class DocumentoForm(forms.ModelForm):
                 kwargs["pieza_desarme_id"] = pieza_desarme_id
                 kwargs["costo_linea"] = _to_decimal(rep_data.get("costo_linea", 0))
             else:
-                if repuesto_id is not None:
-                    kwargs["repuesto_id"] = repuesto_id
+                # BLOQUEADO: flujo inseguro eliminado
                 if part_id is not None:
                     kwargs["part_id"] = part_id
                 costo_linea = rep_data.get("costo_linea")
@@ -665,7 +664,7 @@ class DocumentoForm(forms.ModelForm):
             )
 
     def _process_json_data_legacy(self, documento):
-        """Procesa los datos JSON y crea las líneas del documento"""
+        """Procesa los datos JSON y crea las lÃ­neas del documento"""
         import json
 
         from taller.models.lineas_documento import (
@@ -704,7 +703,16 @@ class DocumentoForm(forms.ModelForm):
                         kwargs["pieza_desarme_id"] = None
                         rep_id = rep_data.get("id")
                         if rep_id not in (None, ""):
-                            kwargs["repuesto_id"] = int(rep_id)
+                            from taller.models import Repuesto
+
+                        repuesto = Repuesto.objects.filter(
+                            id=int(rep_id), empresa=documento.empresa
+                        ).first()
+
+                        if not repuesto:
+                            raise Exception("SECURITY: intento de acceso cross-tenant")
+
+                        kwargs["repuesto_id"] = repuesto.id
                     LineaRepuesto.objects.create(**kwargs)
             except (json.JSONDecodeError, ValueError):
                 pass
@@ -730,7 +738,7 @@ class DocumentoForm(forms.ModelForm):
                             kwargs["servicio_id"] = servicio_id
                         LineaServicio.objects.create(**kwargs)
             except (json.JSONDecodeError, ValueError):
-                pass  # Ignorar datos JSON inválidos
+                pass  # Ignorar datos JSON invÃ¡lidos
 
         # Procesar otros servicios
         otros_data = self.cleaned_data.get("otros_json", "[]")
@@ -755,4 +763,4 @@ class DocumentoForm(forms.ModelForm):
                             kwargs["servicio_id"] = servicio_id
                         LineaOtroServicio.objects.create(**kwargs)
             except (json.JSONDecodeError, ValueError):
-                pass  # Ignorar datos JSON inválidos
+                pass  # Ignorar datos JSON invÃ¡lidos
