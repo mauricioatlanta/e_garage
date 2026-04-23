@@ -524,55 +524,55 @@
     {% country_url 'company_settings' as ajustes_url %}
     {% if ajustes_url %}
     <a href="{{ ajustes_url }}" class="nav-button-standard">
-      <span class="nav-icon">⚙️</span>
+      <i class="fas fa-gear nav-icon" aria-hidden="true"></i>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Settings{% else %}Ajustes{% endif %}</span>
     </a>
     {% endif %}
 
     <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
-      <span class="nav-icon">🚀</span>
+      <i class="fas fa-rocket nav-icon" aria-hidden="true"></i>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Center{% else %}Centro{% endif %}</span>
     </a>
 
     <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
-      <span class="nav-icon">👥</span>
+      <i class="fas fa-users nav-icon" aria-hidden="true"></i>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Clients{% else %}Clientes{% endif %}</span>
     </a>
 
     <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
-      <span class="nav-icon">📄</span>
+      <i class="fas fa-file-lines nav-icon" aria-hidden="true"></i>
       <span>{{ ui_labels.documents_menu }}</span>
     </a>
 
     <a href="{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/en/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
-      <span class="nav-icon">⭐</span>
+      <i class="fas fa-star nav-icon" aria-hidden="true"></i>
       <span>Extra</span>
     </a>
 
     <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
-      <span class="nav-icon">🔧</span>
+      <i class="fas fa-gears nav-icon" aria-hidden="true"></i>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Parts{% else %}Repuestos{% endif %}</span>
     </a>
 
     <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
-      <span class="nav-icon">📊</span>
+      <i class="fas fa-chart-line nav-icon" aria-hidden="true"></i>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Reports{% else %}Reportes{% endif %}</span>
     </a>
 
     <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
-      <span class="nav-icon">🛠️</span>
+      <i class="fas fa-screwdriver-wrench nav-icon" aria-hidden="true"></i>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Services{% else %}Servicios{% endif %}</span>
     </a>
 
     <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
-      <span class="nav-icon">🚗</span>
+      <i class="fas fa-car-side nav-icon" aria-hidden="true"></i>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Vehicles{% else %}Vehículos{% endif %}</span>
     </a>
 
     <form action="{% url 'account_logout' %}" method="post" style="display: inline;">
       {% csrf_token %}
       <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
-        <span class="nav-icon">🚪</span>
+        <i class="fas fa-right-from-bracket nav-icon" aria-hidden="true"></i>
         <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Logout{% else %}Salir{% endif %}</span>
       </button>
     </form>
@@ -589,7 +589,7 @@
       {% if request.user|has_role:'Owner' or request.user|has_role:'Admin' %}
       <a href="{% country_url 'team:team_list' %}" 
          class="nav-button-standard {% if 'equipo' in request.path %}bg-gray-100 text-gray-900{% endif %}">
-        <span class="nav-icon">👥</span>
+        <i class="fas fa-users-gear nav-icon" aria-hidden="true"></i>
         <span>Equipo</span>
       </a>
       {% endif %}
@@ -598,7 +598,7 @@
       {% if request.user|has_role:'Owner' %}
       <a href="{% country_url 'configuracion' %}" 
          class="nav-button-standard">
-        <span class="nav-icon">⚙️</span>
+        <i class="fas fa-gear nav-icon" aria-hidden="true"></i>
         <span>{% trans "Configuración" %}</span>
       </a>
       {% endif %}
