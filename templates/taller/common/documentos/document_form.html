@@ -515,6 +515,11 @@ input:disabled, select:disabled, textarea:disabled {
 #repuestos-container, #servicios-container {
   padding: 0.25rem 0;
 }
+#repuestos-container {
+  overflow: visible;
+  position: relative;
+  z-index: 20;
+}
 #otros-container {
   padding: 0.25rem 0;
 }
@@ -976,41 +981,32 @@ input:disabled, select:disabled, textarea:disabled {
   border-bottom: 1px solid rgba(71, 85, 105, 0.5);
   align-items: center;
 }
-.doc-pos-header-repuestos { grid-template-columns: repeat(13, minmax(0, 1fr)); }
-.doc-pos-header-repuestos > span:nth-child(1){ grid-column: span 1; }
-.doc-pos-header-repuestos > span:nth-child(2){ grid-column: span 8; }
-.doc-pos-header-repuestos > span:nth-child(3){ grid-column: span 1; }
-.doc-pos-header-repuestos > span:nth-child(4){ grid-column: span 1; }
-.doc-pos-header-repuestos > span:nth-child(5){ grid-column: span 1; }
-.doc-pos-header-repuestos > span:nth-child(6){ grid-column: span 1; }
-.doc-pos-header-services { grid-template-columns: repeat(14, minmax(0, 1fr)); }
-.doc-pos-header-services > span:nth-child(1){ grid-column: span 9; }
-.doc-pos-header-services > span:nth-child(2){ grid-column: span 2; }
-.doc-pos-header-services > span:nth-child(3){ grid-column: span 2; }
-.doc-pos-header-services > span:nth-child(4){ grid-column: span 1; }
-.doc-pos-header-otros { grid-template-columns: repeat(12, minmax(0, 1fr)); }
-.doc-pos-header-otros > span:nth-child(1){ grid-column: span 3; }
-.doc-pos-header-otros > span:nth-child(2){ grid-column: span 3; }
-.doc-pos-header-otros > span:nth-child(3){ grid-column: span 2; }
-.doc-pos-header-otros > span:nth-child(4){ grid-column: span 2; }
-.doc-pos-header-otros > span:nth-child(5){ grid-column: span 1; }
-.doc-pos-header-otros > span:nth-child(6){ grid-column: span 1; }
-/* Dynamic rows */
-#repuestos-container .dynamic-element .doc-row-grid {
-  display: grid !important;
-  grid-template-columns: repeat(13, minmax(0, 1fr));
-  min-height: 40px;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 4px;
-  margin-bottom: 4px;
+.doc-pos-header-repuestos,
+#repuestos-container {
+  --doc-repuestos-columns: 120px minmax(0, 1fr) 80px 140px 140px 50px;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid > :nth-child(1) { grid-column: span 1; }
-#repuestos-container .dynamic-element .repuesto-row-grid > :nth-child(2) { grid-column: span 8; }
-#repuestos-container .dynamic-element .repuesto-row-grid > :nth-child(3) { grid-column: span 1; }
-#repuestos-container .dynamic-element .repuesto-row-grid > :nth-child(4) { grid-column: span 1; }
-#repuestos-container .dynamic-element .repuesto-row-grid > :nth-child(5) { grid-column: span 1; }
-#repuestos-container .dynamic-element .repuesto-row-grid > :nth-child(6) { grid-column: span 1; }
+.doc-pos-header-otros,
+#otros-container {
+  --doc-otros-columns: minmax(0, 5fr) minmax(0, 3fr) 120px 120px 120px 52px;
+}
+.doc-pos-header-repuestos { grid-template-columns: var(--doc-repuestos-columns) !important; }
+.doc-pos-header-services { grid-template-columns: minmax(0, 1fr) 110px 120px 52px !important; }
+.doc-pos-header-otros { grid-template-columns: var(--doc-otros-columns) !important; }
+.doc-pos-header-repuestos > span,
+.doc-pos-header-services > span,
+.doc-pos-header-otros > span {
+  grid-column: auto !important;
+  min-width: 0;
+}
+/* Dynamic rows */
+
+#repuestos-container .repuesto-row-grid {
+  display: grid !important;
+  grid-template-columns: var(--doc-repuestos-columns) !important;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
 #repuestos-container .dynamic-element .repuesto-row-grid .rep-search-container {
   width: 100%;
   max-width: none;
@@ -1028,15 +1024,166 @@ input:disabled, select:disabled, textarea:disabled {
 #repuestos-container .dynamic-element .repuesto-row-grid .rep-create-btn {
   flex: 0 0 auto;
 }
-#servicios-container .dynamic-element .doc-row-grid,
+#repuestos-container .dynamic-element .repuesto-row-grid > * {
+  grid-column: auto !important;
+  min-width: 0;
+}
+#repuestos-container .dynamic-element .repuesto-mobile-pair {
+  display: contents;
+}
+#repuestos-container .dynamic-element .repuesto-row-grid,
+#repuestos-container .dynamic-element .repuesto-cell,
+#repuestos-container .dynamic-element .rep-search-container {
+  overflow: visible !important;
+}
+#repuestos-container .dynamic-element .repuesto-cell-code,
+#repuestos-container .dynamic-element .rep-search-container {
+  position: relative;
+  z-index: 20;
+}
+#repuestos-container .dynamic-element .rep-dropdown,
+#repuestos-container .dynamic-element .rep-codigo-dropdown {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  width: 100%;
+  z-index: 120;
+}
+@media (max-width: 1100px) and (min-width: 769px) {
+  .doc-pos-header-repuestos,
+  #repuestos-container {
+    --doc-repuestos-columns: minmax(96px, 1fr) minmax(250px, 3.8fr) minmax(68px, .8fr) minmax(118px, 1.1fr) minmax(128px, 1.1fr) 48px;
+  }
+}
+@media (max-width: 768px) {
+  #repuestos-container .dynamic-element .repuesto-row-grid {
+    grid-template-columns: 1fr !important;
+    padding: 10px !important;
+  }
+  #repuestos-container .dynamic-element label {
+    display: block !important;
+  }
+}
+
+
+
+#repuestos-container .dynamic-element .rep-price-field {
+  position: relative;
+  min-width: 0;
+}
+#repuestos-container .dynamic-element .rep-price-field > .relative {
+  position: relative;
+  min-width: 0;
+}
+#repuestos-container .dynamic-element .rep-precio-venta {
+  padding-right: 42px !important;
+}
+#repuestos-container .dynamic-element .rep-toggle-cost {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(34, 211, 238, 0.35);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #67e8f9;
+  z-index: 4;
+}
+#repuestos-container .dynamic-element .rep-toggle-cost:hover {
+  background: rgba(8, 145, 178, 0.18);
+}
+#repuestos-container .dynamic-element .rep-eye-icon {
+  width: 16px;
+  height: 16px;
+  pointer-events: none;
+}
+#repuestos-container .dynamic-element .rep-eye-icon path,
+#repuestos-container .dynamic-element .rep-eye-icon circle {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+#repuestos-container .dynamic-element .rep-cost-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  min-width: 132px;
+  padding: 8px 10px;
+  border: 1px solid rgba(250, 204, 21, 0.45);
+  border-radius: 8px;
+  background: rgba(17, 24, 39, 0.96);
+  color: #fef3c7;
+  font-size: 12px;
+  line-height: 1.4;
+  white-space: normal;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.28);
+  z-index: 80;
+}
+#repuestos-container .dynamic-element .rep-cost-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+#repuestos-container .dynamic-element .rep-cost-label {
+  font-weight: 700;
+  margin-right: 0;
+}
+#repuestos-container .dynamic-element .rep-cost-input-shell {
+  position: relative;
+  min-width: 78px;
+  flex: 1 1 auto;
+}
+#repuestos-container .dynamic-element .rep-cost-currency {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #fcd34d;
+  pointer-events: none;
+}
+#repuestos-container .dynamic-element .rep-cost-input {
+  width: 100%;
+  min-height: 30px !important;
+  height: 30px !important;
+  padding: 4px 8px 4px 18px !important;
+  border: 1px solid rgba(250, 204, 21, 0.35);
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.92);
+  color: #fef3c7;
+  font-size: 12px !important;
+  line-height: 1.2;
+}
+#repuestos-container .dynamic-element .rep-cost-input:focus {
+  outline: none;
+  border-color: rgba(250, 204, 21, 0.7);
+  box-shadow: 0 0 0 2px rgba(250, 204, 21, 0.15);
+}
+#repuestos-container .dynamic-element .rep-cost-value {
+  display: block;
+  margin-top: 6px;
+  text-align: right;
+  color: #fde68a;
+}
 #otros-container .dynamic-element .doc-row-grid {
   display: grid !important;
-  grid-template-columns: repeat(14, minmax(0, 1fr));
+  grid-template-columns: var(--doc-otros-columns) !important;
   min-height: 40px;
   border-bottom: 1px solid rgba(71, 85, 105, 0.3);
   background: rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   margin-bottom: 4px;
+}
+#otros-container .dynamic-element .doc-row-grid > * {
+  grid-column: auto !important;
+  min-width: 0;
 }
 #repuestos-container .dynamic-element input,
 #repuestos-container .dynamic-element .form-control,
@@ -1059,16 +1206,17 @@ input:disabled, select:disabled, textarea:disabled {
 #otros-container .dynamic-element .description-field { min-width: 0; }
 #repuestos-container .dynamic-element label,
 #servicios-container .dynamic-element label,
-#otros-container .dynamic-element label { display: none !important; }
+#otros-container .dynamic-element label { display: none; }
 #repuestos-container .dynamic-element {
   overflow: visible !important;
 }
-#repuestos-container .dynamic-element .doc-row-grid {
-  min-width: 0;
+
+@media (max-width: 1100px) and (min-width: 769px) {
+  
 }
 @media (max-width: 768px) {
   .doc-pos-header { display: none !important; }
-  #servicios-container .dynamic-element .doc-row-grid,
+  
   #otros-container .dynamic-element .doc-row-grid {
     grid-template-columns: 1fr !important;
     padding: 10px !important;
@@ -1084,28 +1232,308 @@ input:disabled, select:disabled, textarea:disabled {
 #servicios-container .dynamic-element .doc-row-flex{
   width:100% !important;
   max-width:none !important;
+  overflow:visible !important;
 }
 #servicios-container .dynamic-element .srv-input-container{
   flex:1 1 auto !important;
   width:100% !important;
-  min-width:900px !important;
+  min-width:0 !important;
   max-width:none !important;
 }
-#servicios-container .dynamic-element .srv-input-container > div{
+#servicios-container .dynamic-element .srv-input-container > .srv-input-row{
   display:flex !important;
   width:100% !important;
+  min-width:0 !important;
+  align-items:center;
 }
 #servicios-container .dynamic-element .srv-input{
   flex:1 1 auto !important;
   width:100% !important;
-  min-width:850px !important;
+  min-width:0 !important;
   max-width:none !important;
+}
+#servicios-container .dynamic-element .srv-dropdown{
+  top:calc(100% + 4px);
+  left:0;
+  width:100%;
+  min-width:0;
+  max-width:none;
 }
 #servicios-container .dynamic-element .serv-precio{
   width:100% !important;
 }
 #servicios-container .dynamic-element .serv-subtotal-view{
   width:100% !important;
+}
+#otros-container .dynamic-element,
+#otros-container .dynamic-element .doc-row-grid{
+  overflow:visible !important;
+}
+@media (max-width: 1024px) {
+  #servicios-container .dynamic-element .doc-row-flex{
+    flex-wrap:wrap;
+  }
+  #servicios-container .dynamic-element .srv-input-container{
+    flex:1 1 100% !important;
+  }
+}
+@media (max-width: 639px) {
+  #doc-shell,
+  .doc-shell-workspace,
+  .doc-smart-card,
+  #repuestos-container,
+  #servicios-container,
+  #otros-container {
+    max-width: 100% !important;
+  }
+  #doc-shell {
+    overflow-x: hidden;
+  }
+  .doc-ficha-parts,
+  .doc-ficha-services,
+  .doc-ficha-otros,
+  .doc-ficha-parts.doc-pos-section,
+  .doc-ficha-services.doc-pos-section,
+  .doc-ficha-otros.doc-pos-section {
+    display: block !important;
+    overflow: visible !important;
+  }
+  #servicios-container {
+    margin-top: 0.75rem !important;
+    padding-top: 0.75rem !important;
+  }
+  #repuestos-container,
+  #servicios-container,
+  #otros-container {
+    overflow: visible !important;
+    padding-bottom: 0.5rem;
+  }
+  #repuestos-container .dynamic-element,
+  #servicios-container .dynamic-element,
+  #otros-container .dynamic-element {
+    overflow: visible !important;
+    margin-bottom: 0.75rem;
+    max-width: 100% !important;
+  }
+  #repuestos-container .dynamic-element [data-first-row-label].hidden,
+  #repuestos-container .dynamic-element [data-repeat-row-label].hidden {
+    display: none !important;
+  }
+  #repuestos-container .dynamic-element [data-first-row-label]:not(.hidden),
+  #repuestos-container .dynamic-element [data-repeat-row-label]:not(.hidden),
+  #servicios-container .dynamic-element label,
+  #otros-container .dynamic-element label {
+    display: block !important;
+    font-size: 11px;
+    line-height: 1.2;
+    color: #94a3b8;
+    margin-bottom: 0.35rem;
+  }
+  #repuestos-container .dynamic-element .repuesto-row-grid,
+  #servicios-container .dynamic-element .servicio-row-layout,
+  #otros-container .dynamic-element .otro-row-layout {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 12px;
+    padding: 14px !important;
+    align-items: stretch;
+    border-radius: 14px;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  #repuestos-container .dynamic-element .repuesto-row-grid {
+    grid-template-areas:
+      "code"
+      "name"
+      "values"
+      "summary" !important;
+  }
+  #repuestos-container .dynamic-element .repuesto-cell-code { grid-area: code; }
+  #repuestos-container .dynamic-element .repuesto-cell-name { grid-area: name; }
+  #repuestos-container .dynamic-element .repuesto-mobile-pair-values { grid-area: values; }
+  #repuestos-container .dynamic-element .repuesto-mobile-pair-summary { grid-area: summary; }
+  #repuestos-container .dynamic-element .repuesto-mobile-pair-values {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 10px;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  #repuestos-container .dynamic-element .repuesto-mobile-pair-summary {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) 52px;
+    gap: 10px;
+    align-items: end;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+  #repuestos-container .dynamic-element .repuesto-cell,
+  #servicios-container .dynamic-element .servicio-cell,
+  #otros-container .dynamic-element .otro-cell {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+  #repuestos-container .dynamic-element .repuesto-row-grid .repuesto-cell-action label,
+  #servicios-container .dynamic-element .servicio-cell-action label,
+  #otros-container .dynamic-element .otro-cell-action label {
+    display: none !important;
+  }
+  #repuestos-container .dynamic-element .rep-dropdown,
+  #repuestos-container .dynamic-element .rep-codigo-dropdown,
+  #servicios-container .dynamic-element .srv-dropdown,
+  #otros-container .dynamic-element .otr-dropdown {
+    left: 0;
+    right: auto;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    max-height: 16rem;
+    z-index: 400 !important;
+  }
+  #repuestos-container .dynamic-element .rep-price-field,
+  #repuestos-container .dynamic-element .rep-price-field > .relative,
+  #servicios-container .dynamic-element .srv-input-container,
+  #otros-container .dynamic-element .otr-search-container {
+    overflow: visible !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  #repuestos-container .dynamic-element .rep-codigo,
+  #repuestos-container .dynamic-element .rep-search,
+  #repuestos-container .dynamic-element .rep-cantidad,
+  #repuestos-container .dynamic-element .rep-precio-venta,
+  #servicios-container .dynamic-element .srv-input,
+  #servicios-container .dynamic-element .serv-precio,
+  #otros-container .dynamic-element .otr-search,
+  #otros-container .dynamic-element .otr-empresa,
+  #otros-container .dynamic-element .otr-precio-taller,
+  #otros-container .dynamic-element .otr-precio {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  #repuestos-container .dynamic-element .repuesto-cell-name .rep-desarme-badge {
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+  #repuestos-container .dynamic-element .rep-cost-panel {
+    position: static;
+    width: 100%;
+    min-width: 0;
+    margin-top: 8px;
+    padding: 10px;
+  }
+  #repuestos-container .dynamic-element .rep-cost-input-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+  #repuestos-container .dynamic-element .rep-cost-value {
+    margin-top: 6px;
+    text-align: left;
+  }
+  #repuestos-container .dynamic-element .rep-remove-btn {
+    width: 100% !important;
+    min-width: 52px !important;
+    min-height: 42px !important;
+  }
+  #servicios-container .dynamic-element,
+  #servicios-container .dynamic-element .servicio-row-layout,
+  #otros-container .dynamic-element,
+  #otros-container .dynamic-element .otro-row-layout {
+    overflow: visible !important;
+  }
+  #servicios-container .dynamic-element .servicio-cell-name { order: 1; }
+  #servicios-container .dynamic-element .servicio-cell-price { order: 2; }
+  #servicios-container .dynamic-element .servicio-cell-total { order: 3; }
+  #servicios-container .dynamic-element .servicio-cell-action { order: 4; }
+  #servicios-container .dynamic-element .srv-input-container,
+  #otros-container .dynamic-element .otr-search-container {
+    position: relative;
+    z-index: 60;
+  }
+  #servicios-container .dynamic-element .srv-input-row {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+  }
+  #servicios-container .dynamic-element .serv-subtotal-view {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  #servicios-container .dynamic-element .srv-dropdown {
+    top: calc(100% + 4px);
+  }
+  #servicios-container .dynamic-element .srv-remove-btn,
+  #otros-container .dynamic-element .otr-remove-btn {
+    width: 100% !important;
+    min-height: 42px !important;
+  }
+  #otros-container .dynamic-element .otro-cell-name { order: 1; }
+  #otros-container .dynamic-element .otro-cell-company { order: 2; }
+  #otros-container .dynamic-element .otro-cell-shop { order: 3; }
+  #otros-container .dynamic-element .otro-cell-client { order: 4; }
+  #otros-container .dynamic-element .otro-cell-total { order: 5; }
+  #otros-container .dynamic-element .otro-cell-action { order: 6; }
+  #otros-container .dynamic-element .otr-dropdown {
+    top: calc(100% + 4px);
+  }
+  #otros-container {
+    min-height: 80px !important;
+  }
+  #otros-empty-hint {
+    display: block !important;
+  }
+}
+
+.mobile-layout-debug-banner {
+  display: none;
+}
+.mobile-layout-debug-banner .debug-900,
+.mobile-layout-debug-banner .debug-639 {
+  display: none;
+}
+@media (max-width: 900px) {
+  .mobile-layout-debug-banner {
+    display: block !important;
+    margin: 0 0 12px;
+    padding: 12px 14px;
+    border: 4px solid #ffffff;
+    border-radius: 12px;
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+    font-size: 14px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-transform: uppercase;
+    box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.18);
+  }
+  .mobile-layout-debug-banner .debug-900 {
+    display: inline;
+  }
+}
+@media (max-width: 639px) {
+  .mobile-layout-debug-banner {
+    border-color: #fde047;
+    background: #dc2626 !important;
+    color: #fff7ed !important;
+    box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.22);
+  }
+  .mobile-layout-debug-banner .debug-900 {
+    display: none;
+  }
+  .mobile-layout-debug-banner .debug-639 {
+    display: inline;
+  }
 }
 </style>
 
@@ -1169,7 +1597,7 @@ input:disabled, select:disabled, textarea:disabled {
               data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
               data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
               data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
-              data-url-service-search="/api/v1/servicios/"
+              data-url-service-search="{% country_url 'documentos:api_buscar_servicios' %}"
               data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
               data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}"
               data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
@@ -1216,6 +1644,10 @@ input:disabled, select:disabled, textarea:disabled {
   {% endif %}
 
   <!-- Document workspace - cabecera consola | tarjetas cliente/vehiculo | repuestos/servicios POS | observaciones | totales cockpit -->
+  <div class="mobile-layout-debug-banner" data-mobile-debug-banner>
+    <span class="debug-900">RESPONSIVE TEST LE 900</span>
+    <span class="debug-639">MOBILE-LAYOUT-TEST LE 639</span>
+  </div>
   <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
 
     <!-- 1. CABECERA COMPACTA - fila 1: INV | Fecha | Mecanico | Pago | fila 2: Tipo | Operacion -->
@@ -1383,7 +1815,7 @@ input:disabled, select:disabled, textarea:disabled {
           </div>
         </div>
         <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
-          <span>{% trans "Service" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+          <span>{% trans "Service" %}</span><span>{% trans "Price" %}</span><span></span><span></span>
         </div>
         <div id="servicios-container" class="mt-10 border-t border-white/10 pt-6 space-y-0 min-h-[80px]">
           <!-- Dynamic services rows: click + ADD, then type to search -->
@@ -1623,11 +2055,52 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
 </script>
-<script src="{% static 'js/document-form/index.js' %}?v=2.5.0"></script>
+<script>
+(function() {
+    if (!('caches' in window) || !('serviceWorker' in navigator)) {
+        return;
+    }
+
+    var resetKey = 'eg.documentForm.cacheReset.20260421';
+
+    try {
+        if (window.sessionStorage && window.sessionStorage.getItem(resetKey) === '1') {
+            return;
+        }
+        if (window.sessionStorage) {
+            window.sessionStorage.setItem(resetKey, '1');
+        }
+    } catch (err) {
+        console.warn('No se pudo registrar el reset de cache del formulario:', err);
+    }
+
+    Promise.all([
+        caches.keys().then(function(keys) {
+            return Promise.all(keys.filter(function(key) {
+                return String(key || '').indexOf('egarage-') === 0;
+            }).map(function(key) {
+                return caches.delete(key);
+            }));
+        }),
+        navigator.serviceWorker.getRegistrations().then(function(registrations) {
+            return Promise.all(registrations.map(function(registration) {
+                try {
+                    if (registration.active) {
+                        registration.active.postMessage({ type: 'CLEAR_CACHE' });
+                    }
+                } catch (err) {
+                    console.warn('No se pudo limpiar cache del service worker:', err);
+                }
+                return registration.update();
+            }));
+        })
+    ]).then(function() {
+        }).catch(function(err) {
+        console.warn('Reset de cache del formulario omitido:', err);
+    });
+})();
+</script>
+<script src="{% static 'js/document-form/index.js' %}?v=2.5.4"></script>
 
 {% endblock extra_js %}
-
-
-
-
 
