@@ -1,4 +1,4 @@
-﻿{% extends "taller/documentos/base/base_documento.html" %}
+{% extends "taller/documentos/base/base_documento.html" %}
 {% load i18n %}
 
 {% load static %}
@@ -2100,7 +2100,12 @@ window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
     });
 })();
 </script>
-<script src="{% static 'js/document-form/index.js' %}?v=2.5.4"></script>
+
+<script src="{% static 'js/document-form/config.js' %}?v=2.6.0"></script>
+<script src="{% static 'js/document-form/repuestos.js' %}?v=2.6.0"></script>
+<script src="{% static 'js/document-form/servicios.js' %}?v=2.6.0"></script>
+
+<script src="{% static 'js/document-form/index.js' %}?v=2.6.0"></script>
 
 {% endblock extra_js %}
 

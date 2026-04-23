@@ -1,0 +1,45 @@
+[0;1;34m# ]8;;file://egarage-server/etc/systemd/system/gunicorn.service/etc/systemd/system/gunicorn.service]8;;[0m
+[0;1;36m[Unit][0m
+Description=gunicorn daemon for egarage
+After=network.target
+[0;1;38;5;245m[0m
+[0;1;36m[Service][0m
+User=egarage
+Group=www-data
+WorkingDirectory=/srv/egarage
+RuntimeDirectory=gunicorn
+Environment="PYTHONPATH=/srv/egarage"
+Environment="DJANGO_SETTINGS_MODULE=gestion_taller.settings_prod"
+[0;1;38;5;245m[0m
+ExecStart=/srv/egarage/venv/bin/gunicorn --access-logfile - --workers 1 --timeout 300 --bind unix:/run/gunicorn/gunicorn.sock gestion_taller.wsgi:application
+[0;1;38;5;245m[0m
+Restart=on-failure
+RestartSec=2
+[0;1;38;5;245m[0m
+[0;1;36m[Install][0m
+WantedBy=multi-user.target
+
+[0;1;34m# ]8;;file://egarage-server/etc/systemd/system/gunicorn.service.d/override-environment.conf/etc/systemd/system/gunicorn.service.d/override-environment.conf]8;;[0m
+[0;1;38;5;245m# Variables de entorno para que Gunicorn use la misma config que migrate_prod.sh.[0m
+[0;1;38;5;245m# Sin esto, wsgi.py usa gestion_taller.settings y otra base de datos.[0m
+[0;1;38;5;245m#[0m
+[0;1;38;5;245m# Copiar al servidor (junto con override-execstart.conf):[0m
+[0;1;38;5;245m#   sudo cp scripts/gunicorn.service.d/override-environment.conf /etc/systemd/system/gunicorn.service.d/[0m
+[0;1;38;5;245m#   sudo systemctl daemon-reload[0m
+[0;1;38;5;245m#   sudo systemctl restart gunicorn[0m
+[0;1;38;5;245m[0m
+[0;1;36m[Service][0m
+EnvironmentFile=/srv/egarage/.env.prod
+Environment=DJANGO_SETTINGS_MODULE=gestion_taller.settings_prod
+
+[0;1;34m# ]8;;file://egarage-server/etc/systemd/system/gunicorn.service.d/override.conf/etc/systemd/system/gunicorn.service.d/override.conf]8;;[0m
+[0;1;36m[Service][0m
+ExecStart=
+ExecStart=/srv/egarage/venv/bin/gunicorn \
+  --workers 1 \
+  --threads 2 \
+  --timeout 180 \
+  --max-requests 300 \
+  --max-requests-jitter 50 \
+  --bind unix:/run/gunicorn/gunicorn.sock \
+  gestion_taller.wsgi:application

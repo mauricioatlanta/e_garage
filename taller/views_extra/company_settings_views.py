@@ -63,7 +63,7 @@ def company_settings_view(request):
 
     return render(
         request,
-        "taller/company/settings.html",
+        "settings/company_settings.html",
         {
             "empresa": empresa,
             "config": config,
