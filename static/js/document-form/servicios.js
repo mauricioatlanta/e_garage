@@ -162,10 +162,10 @@
         row.dataset.rowId = rowId;
         row.innerHTML = ''
             + '<div class="doc-row-flex servicio-row-layout flex items-end gap-2 border border-cyan-400/30 rounded-lg p-1 bg-black/20 w-full" data-row-id="' + rowId + '">'
-            + '  <div class="servicio-cell servicio-cell-name flex-1 description-field srv-input-container relative" style="min-width:900px;max-width:none;width:100%;">'
+            + '  <div class="servicio-cell servicio-cell-name flex-1 description-field srv-input-container relative" style="max-width:none;width:100%;">'
             + '    <label class="block text-cyan-200 text-sm mb-1">' + escapeHtml(EG.I18N.service || 'Service') + '</label>'
             + '    <div class="srv-input-row flex gap-1 items-center w-full" style="width:100%;">'
-            + '      <input type="text" class="srv-input form-control h-9 text-sm flex-1" style="width:100%;min-width:850px;max-width:none;flex:1 1 auto;" placeholder="' + escapeHtml(EG.I18N.type_to_search_services || EG.I18N.service || 'Service') + '" autocomplete="off">'
+            + '      <input type="text" class="srv-input form-control h-9 text-sm flex-1" style="width:100%;max-width:none;flex:1 1 auto;" placeholder="' + escapeHtml(EG.I18N.type_to_search_services || EG.I18N.service || 'Service') + '" autocomplete="off">'
             + '    </div>'
             + '    <div class="srv-dropdown absolute z-50 left-0 w-[500px] min-w-[350px] bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-[420px] overflow-y-auto"></div>'
             + '    <input type="hidden" class="srv-id">'
@@ -292,7 +292,7 @@
             dropdown.addEventListener('click', function(e) {
                 var itemEl = e.target.closest('.srv-item');
                 if (!itemEl) return;
-                applyItem({
+                dropdown.classList.add('hidden'); applyItem({
                     id: itemEl.dataset.id,
                     nombre: itemEl.dataset.name,
                     precio: itemEl.dataset.price
@@ -313,7 +313,7 @@
         });
 
         row.__applyServData = function(data) {
-            applyItem({
+            dropdown.classList.add('hidden'); applyItem({
                 id: data && (data.servicio_id || data.id),
                 nombre: data && data.nombre,
                 precio: data && data.precio
@@ -442,7 +442,7 @@
             dropdown.addEventListener('click', function(e) {
                 var itemEl = e.target.closest('.srv-item');
                 if (!itemEl) return;
-                applyItem({
+                dropdown.classList.add('hidden'); applyItem({
                     id: itemEl.dataset.id,
                     nombre: itemEl.dataset.name,
                     precio: itemEl.dataset.price,
@@ -475,7 +475,7 @@
         });
 
         row.__applyOtroData = function(data) {
-            applyItem({
+            dropdown.classList.add('hidden'); applyItem({
                 id: data && data.servicio_id,
                 nombre: data && data.nombre,
                 empresa: data && (data.empresa || data.empresa_ext),

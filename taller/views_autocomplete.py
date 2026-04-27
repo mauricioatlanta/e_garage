@@ -1,4 +1,4 @@
-# taller/views_autocomplete.py
+﻿# taller/views_autocomplete.py
 from dal import autocomplete
 
 from django.db.models import Q
@@ -18,7 +18,7 @@ def _get_empresa(request):
     """
     Obtiene la empresa activa del request de forma robusta.
     """
-    # Si tienes middleware que inyecta request.empresa, úsalo:
+    # Si tienes middleware que inyecta request.empresa, Ãºsalo:
     emp = getattr(request, "empresa", None)
     if emp:
         return emp
@@ -28,7 +28,7 @@ def _get_empresa(request):
     if user_emp:
         return user_emp
 
-    # Último recurso: util existente (si lo usas en tu proyecto)
+    # Ãšltimo recurso: util existente (si lo usas en tu proyecto)
     try:
         from taller.utils.empresa import get_or_create_empresa
 
@@ -56,7 +56,7 @@ def _resolve_country_from_request(request):
 
 
 # -----------------------
-# Técnicos
+# TÃ©cnicos
 # -----------------------
 class TecnicoAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -65,7 +65,7 @@ class TecnicoAutocomplete(autocomplete.Select2QuerySetView):
 
         empresa = _get_empresa(self.request)
         qs = Tecnico.objects.all()
-        # Si Técnicos deben ser por empresa, descomenta:
+        # Si TÃ©cnicos deben ser por empresa, descomenta:
         # qs = qs.filter(empresa=empresa)
 
         if self.q:
@@ -94,7 +94,7 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
 
         qs = Cliente.objects.filter(empresa=empresa)
 
-        # Obtener el término de búsqueda
+        # Obtener el tÃ©rmino de bÃºsqueda
         q = self.request.GET.get("q", "")
         if q:
             qs = qs.filter(
@@ -106,13 +106,13 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
         return qs.order_by("nombre", "apellido")
 
     def get_result_label(self, result):
-        tel = result.telefono or "Sin teléfono"
-        # Muestra: "Nombre Apellido - Teléfono"
+        tel = result.telefono or "Sin telÃ©fono"
+        # Muestra: "Nombre Apellido - TelÃ©fono"
         return f"{result.nombre} {result.apellido} - {tel}"
 
 
 # -----------------------
-# Vehículos (filtra por empresa y por cliente via forward)
+# VehÃ­culos (filtra por empresa y por cliente via forward)
 # -----------------------
 class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
@@ -125,7 +125,7 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
         modelo = getattr(result.modelo, "nombre", "") if getattr(result, "modelo", None) else ""
         patente = getattr(result, "patente", "") or ""
 
-        return f"{anio} {marca} {modelo} {patente}".strip()
+        return f"{anio} {marca} {modelo} - {patente}".strip()
 
 
 # -----------------------

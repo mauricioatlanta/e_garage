@@ -1,4 +1,4 @@
-﻿/**
+/**
  * repuestos.js - Modulo de gestion de repuestos
  */
 
@@ -91,7 +91,7 @@
             + '    <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
             + '    <input type="hidden" class="rep-nombre">'
             + '  </div>'
-            + '  <div class="repuesto-mobile-pair repuesto-mobile-pair-values">'
+            + '  <div class="grid grid-cols-2 gap-2">'
             + '    <div class="repuesto-cell repuesto-cell-qty min-w-0">'
             +          buildLabel(EG.I18N.qty || 'Qty', isFirstRow)
             + '      <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" value="1">'

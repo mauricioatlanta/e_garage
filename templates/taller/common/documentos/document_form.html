@@ -1,4 +1,4 @@
-锘縶% extends "taller/documentos/base/base_documento.html" %}
+{% extends "taller/documentos/base/base_documento.html" %}
 {% load i18n %}
 
 {% load static %}
@@ -1179,7 +1179,7 @@ input:disabled, select:disabled, textarea:disabled {
   {% if messages %}
     {% for message in messages %}
       {% with msg_text=message|stringformat:"s" %}
-      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesi贸n exitosamente" not in msg_text and "Ha cerrado sesi贸n" not in msg_text and "iniciado sesi贸n exitosamente" not in msg_text and "cerrado sesi贸n" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
+      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesi髇 exitosamente" not in msg_text and "Ha cerrado sesi髇" not in msg_text and "iniciado sesi髇 exitosamente" not in msg_text and "cerrado sesi髇" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
         {% if message.tags == 'success' %}
         <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
           <span class="text-2xl flex-shrink-0">OK</span>
@@ -1321,7 +1321,7 @@ input:disabled, select:disabled, textarea:disabled {
             </div>
             <button type="button" id="btn-nuevo-vehiculo" data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
               <span aria-hidden="true">+</span>
-              <span class="doc-action-label text-white font-semibold">Nuevo veh铆culo</span>
+              <span class="doc-action-label text-white font-semibold">Nuevo veh韈ulo</span>
             </button>
           </div>
         </div>
