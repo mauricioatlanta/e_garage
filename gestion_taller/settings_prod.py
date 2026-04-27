@@ -271,3 +271,12 @@ LOGGING = {
         },
     },
 }
+
+SESSION_COOKIE_DOMAIN = ".egarage.cl"
+CSRF_COOKIE_DOMAIN = ".egarage.cl"
+
+# === FIX AUTH COOKIE DOMAIN EGARAGE ===
+SESSION_COOKIE_DOMAIN = ".egarage.cl"
+CSRF_COOKIE_DOMAIN = ".egarage.cl"
+SESSION_COOKIE_PATH = "/"
+CSRF_COOKIE_PATH = "/"
