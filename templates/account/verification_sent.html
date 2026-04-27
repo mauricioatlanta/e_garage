@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Verifique su dirección de correo electrónico" %} | eGarage{% endblock %}
+
+{% block content %}
+<style>
+main {
+    color: #e5e7eb !important;
+}
+main h1, main p, main a, main span, main div {
+    color: white !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+</style>
+
+<div class="flex items-center justify-center min-h-screen px-4">
+  <div class="bg-[#0f172a] border border-slate-700 p-8 rounded-xl shadow-xl max-w-lg w-full text-center">
+    <h1 class="text-2xl font-bold mb-4">
+      {% trans "Verifique su dirección de correo electrónico" %}
+    </h1>
+
+    <p class="mb-4">
+      {% trans "Le hemos enviado un correo electrónico para su verificación." %}
+    </p>
+
+    <p class="text-sm text-gray-400 mb-6">
+      {% trans "Revise su bandeja de entrada o spam." %}
+    </p>
+
+    <a href="/accounts/login/" class="block mt-6 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded">
+      {% trans "Ir a iniciar sesión" %}
+    </a>
+  </div>
+</div>
+{% endblock %}

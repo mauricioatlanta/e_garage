@@ -116,48 +116,16 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
 # -----------------------
 class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        if not self.request.user.is_authenticated:
-            return Vehiculo.objects.none()
-
-        empresa = _get_empresa(self.request)
-        if not empresa:
-            return Vehiculo.objects.none()
-
-        # Solo vehículos de cliente (para documentos); desarme no aparece en selector
-        qs = Vehiculo.objects.select_related("cliente", "marca", "modelo").filter(
-            empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_CLIENTE
-        )
-
-        # Soporta forward de DAL y querystring plano
-        cliente_id = self.forwarded.get("cliente") or self.request.GET.get("cliente")
-        if cliente_id:
-            try:
-                cliente_id = int(cliente_id)
-                qs = qs.filter(cliente_id=cliente_id, cliente__empresa=empresa)
-            except (TypeError, ValueError):
-                return Vehiculo.objects.none()
-
-        # Obtener el término de búsqueda
-        q = self.request.GET.get("q", "")
-        if q:
-            qs = qs.filter(
-                Q(patente__icontains=q)
-                | Q(modelo__nombre__icontains=q)
-                | Q(marca__nombre__icontains=q)
-                | Q(vin__icontains=q)
-            )
-
-        return qs.order_by("patente")
+        qs = super().get_queryset()
+        return qs
 
     def get_result_label(self, result):
-        # Evita coma al final (tupla) -> SOLO string
-        marca = getattr(result.marca, "nombre", None) or "Sin marca"
-        modelo = getattr(result.modelo, "nombre", None) or "Sin modelo"
-        base = f"{result.patente or 'Sin patente'} - {marca} {modelo}"
-        # Puedes agregar VIN si existe
-        if getattr(result, "vin", None):
-            base += f" (VIN {result.vin})"
-        return base
+        anio = getattr(result, "anio", "") or ""
+        marca = getattr(result.marca, "nombre", "") if getattr(result, "marca", None) else ""
+        modelo = getattr(result.modelo, "nombre", "") if getattr(result, "modelo", None) else ""
+        patente = getattr(result, "patente", "") or ""
+
+        return f"{anio} {marca} {modelo} {patente}".strip()
 
 
 # -----------------------
