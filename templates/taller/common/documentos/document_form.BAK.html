@@ -62,8 +62,7 @@
 }
 
 /* Layout horizontal legacy desactivado */
-@media (min-width: 768px) {
-}
+
 
 .doc-form-compact { max-width: 100%; width: 100%; }
 
@@ -122,12 +121,7 @@
   font-weight: 600;
 }
 
-@media (max-width: 640px) {
-  .doc-action-btn {
-    min-height: 42px;
-    padding: 0.55rem 0.8rem;
-    font-size: 0.9rem;
-  }
+
 
   .doc-action-btn .doc-action-label {
     display: inline !important;
@@ -206,12 +200,7 @@
   box-shadow: 0 0 32px 4px #f59e0b99, 0 0 0 1px #f59e0b !important;
 }
 
-@media (min-width: 640px) {
-  .btn-cyan-gradient, .btn-green-gradient {
-    width: auto;
-    padding: 0.375rem 0.75rem;
-    font-size: 0.75rem;
-  }
+
 }
 
 /* Campos deshabilitados - Claramente visibles */
@@ -234,10 +223,7 @@ input:disabled, select:disabled, textarea:disabled {
   gap: 1rem;
 }
 
-@media (max-width: 768px) {
-  .totales-section .grid {
-    grid-template-columns: 1fr;
-  }
+
 }
 
 .totales-section .bg-black\/40 {
@@ -256,55 +242,32 @@ input:disabled, select:disabled, textarea:disabled {
 /* ==================== ESTILOS PARA CAMPOS DE DESCRIPCION ==================== */
 /* Description fields - Better spacing and alignment - Sin !important */
 .description-field {
-  flex: 1 1 auto;
-  min-width: 200px;
+  min-width: 0;
   max-width: 100%;
-  margin-bottom: 0.5rem;
+  margin-bottom: 0;
 }
 
-.description-field input {
+.description-field input,
+.rep-search-container input,
+.srv-input-container input,
+.otr-search-container input {
   width: 100%;
+  max-width: 100%;
 }
-
-/* Container for dynamic rows - Better flexbox distribution */
-/* .dynamic-element > div eliminado - usando grid en su lugar */
 
 /* Specific description field containers */
 .rep-search-container,
 .srv-input-container,
 .otr-search-container {
-  flex: 1 1 auto;
-  min-width: 200px;
+  min-width: 0;
   max-width: 100%;
-  position: relative;
 }
 
 /* Responsive adjustments for description fields */
-@media (max-width: 1024px) {
-  .description-field,
-  .rep-search-container,
-  .srv-input-container,
-  .otr-search-container {
-    min-width: 180px;
-    flex: 1 1 45%;
-  }
+
 }
 
-@media (max-width: 768px) {
-  .description-field,
-  .rep-search-container,
-  .srv-input-container,
-  .otr-search-container {
-    min-width: 100%;
-    flex: 1 1 100%;
-    margin-bottom: 1rem;
-  }
-  
-  /* Stack all fields on mobile */
-  .dynamic-element > div > div {
-    width: 100%;
-    flex: 1 1 100%;
-  }
+
 }
 
 
@@ -322,8 +285,7 @@ input:disabled, select:disabled, textarea:disabled {
 .rep-search-container label,
 .srv-input-container label,
 .otr-search-container label {
-  margin-bottom: 0.5rem;
-  display: block;
+  margin-bottom: 0;
 }
 
 /* Ensure proper alignment of description fields with other fields */
@@ -333,20 +295,14 @@ input:disabled, select:disabled, textarea:disabled {
 /* .dynamic-element > div eliminado - usando grid en su lugar */
 
 /* Improved spacing for description fields on larger screens */
-@media (min-width: 1025px) {
-  .rep-search-container {
-    min-width: 320px;
-    flex: 1 1 35%;
-  }
+
   
   .srv-input-container {
-    min-width: 380px;
-    flex: 1 1 40%;
+    min-width: 0;
   }
   
   .otr-search-container {
-    min-width: 240px;
-    flex: 1 1 30%;
+    min-width: 0;
   }
 }
 
@@ -470,8 +426,7 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-field-with-btn { display: flex; align-items: center; gap: 0.35rem; min-width: 0; }
 .doc-field-with-btn .relative { flex: 1; min-width: 0; }
 .doc-field-with-btn select { flex: 1; min-width: 0; }
-@media (max-width: 600px) {
-  .doc-ficha-body-two-cols { grid-template-columns: 1fr; }
+
 }
 /* Anchos fijos en esta ficha */
 .doc-fichas-row .doc-ficha-client-vehicle #cliente-busqueda { width: 100% !important; max-width: 200px !important; }
@@ -480,11 +435,7 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-fichas-row .doc-ficha:last-child .doc-ficha-body #cliente-busqueda { width: 100% !important; max-width: 200px !important; }
 .doc-fichas-row .doc-ficha:last-child .doc-ficha-body #id_vehiculo { width: 100% !important; max-width: 220px !important; }
 .doc-fichas-row .doc-ficha:last-child .doc-ficha-body .relative { width: 100% !important; max-width: 200px !important; }
-@media (max-width: 768px) {
-  .doc-shell-compact .doc-fichas-row {
-    grid-template-columns: 1fr;
-    max-width: 100%;
-  }
+
 }
 
 /* Fila de Repuestos | Servicios en horizontal (2 cols cuando hay ambos) */
@@ -497,10 +448,7 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-parts-services-row .doc-ficha:only-child {
   grid-column: 1 / -1;
 }
-@media (max-width: 900px) {
-  .doc-parts-services-row {
-    grid-template-columns: 1fr;
-  }
+
 }
 .doc-ficha-parts, .doc-ficha-services {
   min-height: 120px;
@@ -831,10 +779,7 @@ input:disabled, select:disabled, textarea:disabled {
   max-width: 100%;
   box-sizing: border-box;
 }
-@media (max-width: 900px) {
-  .doc-invoice-grid {
-    grid-template-columns: 1fr;
-  }
+
   .doc-console-header {
     padding: 18px;
     border-radius: 16px;
@@ -964,61 +909,47 @@ input:disabled, select:disabled, textarea:disabled {
 .doc-ficha-otros .flex.justify-between {
   align-items: center;
 }
-.doc-pos-header {
+.doc-table { display: grid; row-gap: 0px; }
+.doc-table-grid {
   display: grid;
-  gap: 8px;
-  padding: 6px 8px 8px;
+  width: 100%;
+  column-gap: 0;
+  align-items: start;
+}
+.doc-table-grid > * {
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 0.75rem 0.5rem;
+}
+.doc-table-grid--repuestos { grid-template-columns: 120px 1fr 80px 140px 140px 60px !important; }
+.doc-table-grid--services {
+  grid-template-columns: minmax(0, 1fr) minmax(176px, 0.34fr) minmax(176px, 0.34fr) 56px;
+}
+.doc-table-grid--otros {
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.5fr) minmax(150px, 1fr) minmax(150px, 1fr) minmax(160px, 1fr) 56px;
+}
+.doc-table-header {
   font-size: 10px;
   font-weight: 700;
   letter-spacing: 0.05em;
   color: #64748b;
   text-transform: uppercase;
   border-bottom: 1px solid rgba(71, 85, 105, 0.5);
-  align-items: center;
 }
-.doc-pos-header-repuestos {
-  grid-template-columns: 84px 220px 64px 118px 118px 44px !important;
-  gap: 6px;
-  min-width: 648px;
-  width: max-content;
+.doc-table-header > * {
+  padding-top: 0;
+  padding-bottom: 0.5rem;
 }
-.doc-pos-header-repuestos > span {
-  grid-column: auto !important;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.doc-pos-header-services {
-  grid-template-columns: 320px 118px 118px 44px !important;
-  gap: 6px;
-  min-width: 618px;
-  width: max-content;
-}
-.doc-pos-header-otros {
-  grid-template-columns: 240px 180px 140px 110px 44px !important;
-  gap: 6px;
-  min-width: 714px;
-  width: max-content;
-}
-.doc-pos-header-services > span,
-.doc-pos-header-otros > span {
-  grid-column: auto !important;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.doc-table-row {
-  width: 100%;
-  display: grid !important;
+.doc-table-row { width: 100%; display: grid; display: grid;
   position: relative;
   z-index: 0;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 4px;
-  margin-bottom: 4px;
-  align-items: center !important;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid rgba(71, 85, 105, 0.34);
+  background: transparent;
+  align-items: start;
   overflow: visible;
 }
 .doc-table-row:focus-within {
@@ -1026,96 +957,80 @@ input:disabled, select:disabled, textarea:disabled {
 }
 .doc-table-cell {
   min-width: 0;
-  width: 100%;
 }
+.doc-table-cell input,
+.doc-table-cell .form-control,
+.doc-table-cell .subtotal-field {
+  width: 100%;
+  min-width: 0;
+}
+.doc-table-cell .subtotal-field {
+  min-height: var(--doc-input-h);
+  display: grid;
+  align-items: center;
+  justify-items: end;
+}
+.doc-table-row 
 .position-relative-wrapper {
   position: relative;
   width: 100%;
   min-width: 0;
 }
-.doc-money-prefix {
+.position-relative-wrapper > input,
+.position-relative-wrapper > .form-control,
+.position-relative-wrapper > .subtotal-field {
+  width: 100%;
+  min-width: 0;
+}
+.doc-money-prefix,
+.rep-cost-currency {
   position: absolute;
   top: 50%;
-  left: 0.7rem;
+  left: 0.75rem;
   transform: translateY(-50%);
   color: #67e8f9;
   font-weight: 700;
   pointer-events: none;
 }
-/* Dynamic rows */
-#repuestos-container .dynamic-element .doc-row-grid {
-  display: grid !important;
-  grid-template-columns: 84px 220px 64px 118px 118px 44px !important;
-  gap: 6px !important;
-  align-items: center !important;
-  min-height: 40px;
-  border-bottom: 1px solid rgba(71, 85, 105, 0.3);
-  background: rgba(0, 0, 0, 0.08);
-  border-radius: 4px;
-  margin-bottom: 4px;
-  min-width: 648px;
-  width: max-content;
+.rep-search {
+  padding-right: 4.75rem !important;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid > * {
-  grid-column: auto !important;
-  min-width: 0 !important;
+.rep-precio-venta {
+  padding-left: 1.75rem !important;
+  padding-right: 2.75rem !important;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-search-container {
-  width: 100%;
-  max-width: none;
-  position: relative;
+.serv-precio,
+.otr-precio-taller,
+.otr-precio {
+  padding-left: 1.75rem !important;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-search {
-  width: 100% !important;
-  min-width: 0;
-  padding-right: 3.9rem !important;
+.rep-desarme-badge {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  z-index: 2;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .repuesto-cell-name,
-#repuestos-container .dynamic-element .repuesto-row-grid .repuesto-cell-price,
-#repuestos-container .dynamic-element .repuesto-row-grid .repuesto-cell-action,
-#repuestos-container .dynamic-element .repuesto-row-grid .repuesto-cell-total,
-#repuestos-container .dynamic-element .repuesto-row-grid .repuesto-cell-qty,
-#repuestos-container .dynamic-element .repuesto-row-grid .repuesto-cell-code {
-  width: 100%;
-  min-width: 0;
-}
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-desarme-badge {
+.rep-toggle-cost {
   position: absolute;
   top: 50%;
   right: 0.5rem;
+  width: 1.8rem;
+  height: 1.8rem;
   transform: translateY(-50%);
-  z-index: 2;
-  pointer-events: none;
-}
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-price-field {
-  position: relative;
-  min-width: 0;
-}
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-toggle-cost {
-  position: absolute;
-  top: 50%;
-  right: 0.45rem;
-  width: 1.7rem;
-  height: 1.7rem;
-  transform: translateY(-50%);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
   border: 0;
   border-radius: 9999px;
   background: transparent;
   color: #7dd3fc;
   cursor: pointer;
-  z-index: 3;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-eye-icon {
-  width: 0.95rem;
-  height: 0.95rem;
+.rep-eye-icon {
+  width: 1rem;
+  height: 1rem;
   stroke: currentColor;
   stroke-width: 1.75;
   fill: none;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cost-panel {
+.rep-cost-panel {
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
@@ -1127,15 +1042,12 @@ input:disabled, select:disabled, textarea:disabled {
   background: rgba(2, 6, 23, 0.96);
   box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cost-panel.hidden {
-  display: none !important;
-}
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cost-input-wrap,
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cost-label,
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cost-value {
+.rep-cost-input-wrap,
+.rep-cost-label,
+.rep-cost-value {
   display: block;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cost-label {
+.rep-cost-label {
   margin-bottom: 0.35rem;
   font-size: 10px;
   font-weight: 700;
@@ -1143,232 +1055,155 @@ input:disabled, select:disabled, textarea:disabled {
   color: #94a3b8;
   text-transform: uppercase;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cost-input-shell {
+.rep-cost-input-shell {
   position: relative;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cost-currency {
-  position: absolute;
-  left: 0.7rem;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #7dd3fc;
-}
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cost-input {
+.rep-cost-input {
   width: 100%;
-  padding-left: 1.7rem !important;
+  min-height: var(--doc-input-h);
+  padding: var(--doc-input-pad);
+  padding-left: 1.75rem;
+  border: var(--doc-border);
+  border-radius: 6px;
+  background: var(--doc-bg-input);
+  color: #e2e8f0;
   box-sizing: border-box;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cost-value {
-  margin-top: 0.45rem;
+.rep-cost-value {
+  margin-top: 0.5rem;
   font-size: 12px;
   font-weight: 700;
   color: #cbd5e1;
   text-align: right;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-remove-btn {
-  width: 44px !important;
-  min-width: 44px !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
+
+.doc-table .empty-hint {
+  padding: 0.75rem 0.5rem;
 }
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-subtotal-view,
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-codigo,
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-search,
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-cantidad,
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-precio-venta,
-#repuestos-container .dynamic-element .repuesto-row-grid .rep-remove-btn {
-  min-height: 38px !important;
-  height: 38px !important;
-}
-#servicios-container .dynamic-element .doc-table-row,
-#servicios-container .dynamic-element .doc-table-grid--services {
-  grid-template-columns: 320px 118px 118px 44px !important;
-  gap: 6px !important;
-  min-width: 618px;
-  width: max-content;
-}
-#otros-container .dynamic-element .doc-table-row,
-#otros-container .dynamic-element .doc-table-grid--otros {
-  grid-template-columns: 240px 180px 140px 110px 44px !important;
-  gap: 6px !important;
-  min-width: 714px;
-  width: max-content;
-}
-#servicios-container .dynamic-element .servicio-cell,
-#otros-container .dynamic-element .otro-cell {
-  width: 100%;
-  min-width: 0;
-}
-#servicios-container .dynamic-element .srv-input-container,
-#otros-container .dynamic-element .otr-search-container,
-#otros-container .dynamic-element .otro-cell-company {
-  width: 100%;
-  max-width: none;
-  min-width: 0 !important;
-}
-#servicios-container .dynamic-element .srv-input,
-#otros-container .dynamic-element .otr-search,
-#otros-container .dynamic-element .otr-empresa,
-#servicios-container .dynamic-element .serv-precio,
-#otros-container .dynamic-element .otr-precio-taller,
-#otros-container .dynamic-element .otr-precio,
-#servicios-container .dynamic-element .serv-subtotal-view,
-#otros-container .dynamic-element .otr-subtotal-view,
-#servicios-container .dynamic-element .srv-remove-btn,
-#otros-container .dynamic-element .otr-remove-btn {
-  width: 100% !important;
-  min-height: 38px !important;
-  height: 38px !important;
-}
-#servicios-container .dynamic-element .serv-precio,
-#otros-container .dynamic-element .otr-precio-taller,
-#otros-container .dynamic-element .otr-precio {
-  padding-left: 10px !important;
-}
-#servicios-container .dynamic-element .srv-remove-btn,
-#otros-container .dynamic-element .otr-remove-btn {
-  min-width: 44px !important;
-  padding-left: 0 !important;
-  padding-right: 0 !important;
-}
-#otros-container .dynamic-element .otr-client-price-field {
-  position: relative;
-  min-width: 0;
-}
-#otros-container .dynamic-element .otr-precio {
-  padding-right: 2.6rem !important;
-}
-#otros-container .dynamic-element .otr-toggle-shop {
+.rep-dropdown,
+.rep-codigo-dropdown,
+.srv-dropdown,
+.otr-dropdown {
   position: absolute;
-  top: 50%;
-  right: 0.45rem;
-  width: 1.7rem;
-  height: 1.7rem;
-  transform: translateY(-50%);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 0;
-  border-radius: 9999px;
-  background: transparent;
-  color: #7dd3fc;
-  cursor: pointer;
-  z-index: 3;
-}
-#otros-container .dynamic-element .otr-eye-icon {
-  width: 0.95rem;
-  height: 0.95rem;
-  stroke: currentColor;
-  stroke-width: 1.75;
-  fill: none;
-}
-#otros-container .dynamic-element .otr-shop-panel {
-  position: absolute;
-  top: calc(100% + 6px);
   left: 0;
-  right: 0;
-  z-index: 40;
-  padding: 0.75rem;
-  border: 1px solid rgba(71, 85, 105, 0.65);
-  border-radius: 0.75rem;
-  background: rgba(2, 6, 23, 0.96);
-  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+  top: calc(100% + 4px);
+  width: 100%;
+  min-width: 100%;
+  max-width: none;
+  z-index: 50;
 }
-#otros-container .dynamic-element .otr-shop-panel.hidden {
-  display: none !important;
+.rep-remove-btn,
+.srv-remove-btn,
+.otr-remove-btn {
+  width: 100%;
+  min-width: 44px;
 }
-#otros-container .dynamic-element .otr-shop-input-wrap,
-#otros-container .dynamic-element .otr-shop-label,
-#otros-container .dynamic-element .otr-shop-value {
-  display: block;
-}
-#otros-container .dynamic-element .otr-shop-label {
-  margin-bottom: 0.35rem;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.04em;
-  color: #94a3b8;
-  text-transform: uppercase;
-}
-#otros-container .dynamic-element .otr-shop-value {
-  margin-top: 0.45rem;
-  font-size: 12px;
-  font-weight: 700;
-  color: #cbd5e1;
-  text-align: right;
-}
-#repuestos-container .dynamic-element input,
-#repuestos-container .dynamic-element .form-control,
-#repuestos-container .dynamic-element .rep-subtotal-view,
-#servicios-container .dynamic-element input { min-height: 48px !important; height: 3rem !important; }
-#servicios-container .dynamic-element input,
-#servicios-container .dynamic-element .form-control,
-#otros-container .dynamic-element input,
-#otros-container .dynamic-element .form-control {
-  min-height: 36px !important;
-  height: 2.5rem !important;
-  padding: 4px 8px !important;
-  font-size: 13px !important;
-}
-#repuestos-container .dynamic-element .rep-search-container,
-#repuestos-container .dynamic-element .description-field,
-#servicios-container .dynamic-element .srv-input-container,
-#servicios-container .dynamic-element .description-field,
-#otros-container .dynamic-element .otr-search-container,
-#otros-container .dynamic-element .description-field { min-width: 0; }
-#repuestos-container .dynamic-element label,
-#servicios-container .dynamic-element label,
-#otros-container .dynamic-element label { display: none !important; }
-#repuestos-container .dynamic-element {
-  overflow: visible !important;
-}
-#repuestos-container .dynamic-element .doc-row-grid {
-  min-width: 0;
-}
-@media (max-width: 768px) {
-  .doc-pos-header { display: none !important; }
-  #repuestos-container .dynamic-element .doc-row-grid {
-    min-width: 648px;
-    width: max-content;
+
+  .doc-table-grid--repuestos,
+  .doc-table-grid--services,
+  .doc-table-grid--otros {
+    grid-template-columns: 1fr !important;
   }
-  #servicios-container .dynamic-element .doc-table-row,
-  #otros-container .dynamic-element .doc-table-row {
-    width: max-content;
+  .doc-table-grid > * {
+    padding-left: 0;
+    padding-right: 0;
   }
-  #repuestos-container .dynamic-element label,
-  #servicios-container .dynamic-element label,
-  #otros-container .dynamic-element label { display: none !important; }
+  .doc-table-row 
 }
+
+
+
+
+  #repuestos-container .repuesto-row-grid,
+  #repuestos-container .doc-table-row,
+  #repuestos-container .doc-table-grid--repuestos { grid-template-columns: 120px 1fr 80px 140px 140px 60px !important; }
+
+  #repuestos-container .doc-table-cell {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 4px !important;
+  }
+
+  #repuestos-container 
+
+  #repuestos-container input,
+  #repuestos-container .form-control,
+  #repuestos-container .subtotal-field,
+  #repuestos-container button {
+    height: 38px !important;
+    min-height: 38px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #repuestos-container .position-relative-wrapper {
+    position: relative !important;
+    width: 100% !important;
+  }
+}
+
+
+/* === GRID REAL REPUESTOS (DEFINITIVO) === */
+
+#repuestos-container .doc-table-row {
+    display: grid !important;
+    grid-template-columns: 120px 1fr 80px 140px 140px 60px !important;
+    gap: 8px !important;
+    align-items: center !important;
+    width: 100% !important;
+}
+
+#repuestos-container .doc-table-cell {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+#repuestos-container input,
+#repuestos-container .form-control,
+#repuestos-container .subtotal-field {
+    width: 100% !important;
+    height: 40px !important;
+}
+
+#repuestos-container .rep-remove-btn {
+    width: 100% !important;
+    height: 40px !important;
+}
+
 </style>
 
-<style>
-#servicios-container .dynamic-element,
-#otros-container .dynamic-element{
-  width:100% !important;
-  max-width:none !important;
+
+/* === OVERRIDE FINAL REAL: REPUESTOS HORIZONTAL DESKTOP === */
+
+
+  #repuestos-container .repuesto-row-grid > .doc-table-cell {
+    display: block !important;
+    padding: 6px 4px !important;
+    margin: 0 !important;
+    min-width: 0 !important;
+    width: auto !important;
+  }
+
+  #repuestos-container 
+
+  #repuestos-container .position-relative-wrapper,
+  #repuestos-container input,
+  #repuestos-container .form-control,
+  #repuestos-container .subtotal-field,
+  #repuestos-container button {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    box-sizing: border-box !important;
+  }
+
+  #repuestos-container .dynamic-element {
+    display: block !important;
+    width: 100% !important;
+  }
 }
-#servicios-container .dynamic-element .doc-table-row,
-#otros-container .dynamic-element .doc-table-row{
-  overflow:visible !important;
-}
-#servicios-container .dynamic-element .srv-input-container,
-#otros-container .dynamic-element .otr-search-container,
-#otros-container .dynamic-element .otro-cell-company{
-  width:100% !important;
-  min-width:0 !important;
-  max-width:none !important;
-}
-#servicios-container .dynamic-element .srv-input,
-#otros-container .dynamic-element .otr-search,
-#otros-container .dynamic-element .otr-empresa,
-#servicios-container .dynamic-element .serv-precio,
-#otros-container .dynamic-element .otr-precio-taller,
-#otros-container .dynamic-element .otr-precio,
-#servicios-container .dynamic-element .serv-subtotal-view,
-#otros-container .dynamic-element .otr-subtotal-view{
-  width:100% !important;
-}
-</style>
 
 {% endblock extra_css %}
 
@@ -1430,7 +1265,7 @@ input:disabled, select:disabled, textarea:disabled {
               data-url-repuesto-search="{% country_url 'api:buscar_repuestos_api' %}"
               data-url-repuesto-create="{% country_url 'api:crear_repuesto_api' %}"
               data-url-repuesto-create-page="{% country_url 'repuestos:crear_repuesto' %}"
-              data-url-service-search="/api/v1/servicios/"
+              data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
               data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
               data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}"
               data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}">
@@ -1440,7 +1275,7 @@ input:disabled, select:disabled, textarea:disabled {
   {% if messages %}
     {% for message in messages %}
       {% with msg_text=message|stringformat:"s" %}
-      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesión exitosamente" not in msg_text and "Ha cerrado sesión" not in msg_text and "iniciado sesión exitosamente" not in msg_text and "cerrado sesión" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
+      {% if "Successfully signed in" not in msg_text and "You have signed out" not in msg_text and "Ha iniciado sesiÃ³n exitosamente" not in msg_text and "Ha cerrado sesiÃ³n" not in msg_text and "iniciado sesiÃ³n exitosamente" not in msg_text and "cerrado sesiÃ³n" not in msg_text and "Logo actualizado exitosamente" not in msg_text and "Tema y colores guardados exitosamente" not in msg_text and "Logo subido exitosamente" not in msg_text and "actualizada exitosamente" not in msg_text and "eliminado exitosamente" not in msg_text and "eliminar el cliente" not in msg_text and "Cliente ya eliminado" not in msg_text and "namespace" not in msg_text and "creado exitosamente" not in msg_text and "creado." not in msg_text %}
         {% if message.tags == 'success' %}
         <div class="bg-green-900/30 border border-green-500/50 rounded-xl p-4 mb-4 flex items-center gap-3">
           <span class="text-2xl flex-shrink-0">OK</span>
@@ -1582,7 +1417,7 @@ input:disabled, select:disabled, textarea:disabled {
             </div>
             <button type="button" id="btn-nuevo-vehiculo" data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
               <span aria-hidden="true">+</span>
-              <span class="doc-action-label text-white font-semibold">Nuevo vehículo</span>
+              <span class="doc-action-label text-white font-semibold">Nuevo vehÃ­culo</span>
             </button>
           </div>
         </div>
@@ -1598,7 +1433,6 @@ input:disabled, select:disabled, textarea:disabled {
         {% endif %}
         {% endif %}
         <div id="vehiculo-info" class="doc-smart-summary hidden">
-          <div class="name" id="vehiculo-marca-modelo"></div>
           <div class="detail" id="vehiculo-ano-vin"></div>
           <div class="detail" id="vehiculo-mileage"></div>
           <div class="meta" id="vehiculo-ultima-entrada"></div>
@@ -1626,10 +1460,10 @@ input:disabled, select:disabled, textarea:disabled {
             <button type="button" id="add-used-parts" class="doc-action-btn text-sm bg-amber-600 hover:bg-amber-500 px-3 py-2 rounded-md text-white whitespace-nowrap"><span class="doc-action-label text-white font-semibold">{% trans "Used" %}</span></button>
           </div>
         </div>
-        <div class="doc-pos-header doc-pos-header-repuestos hidden sm:grid">
-          <span>{% trans "Code" %}</span><span>{% trans "Part name" %}</span><span>{% trans "Qty" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+        <div class="doc-table-header doc-table-grid doc-table-grid--repuestos hidden sm:grid">
+          <span>{% trans "Code" %}</span><span>{% trans "Part name" %}</span><span>{% trans "Qty" %}</span><span>{% trans "Sale Price" %}</span><span>{% trans "Subtotal" %}</span><span></span>
         </div>
-        <div id="repuestos-container" class="space-y-0 min-h-[80px]">
+        <div id="repuestos-container" class="doc-table  ">
           <!-- Dynamic parts rows -->
         </div>
       </div>
@@ -1643,10 +1477,10 @@ input:disabled, select:disabled, textarea:disabled {
             <a href="{% country_url 'servicios:crear_servicio' %}?return_to={{ request.get_full_path|urlencode }}&select_field=servicio" class="doc-action-btn text-xs bg-green-600 hover:bg-green-500 px-2 py-2 rounded-md text-white ml-1 inline-flex items-center gap-1"><span aria-hidden="true">+</span><span>Nuevo</span></a>
           </div>
         </div>
-        <div class="doc-pos-header doc-pos-header-services hidden sm:grid">
-          <span>{% trans "Service" %}</span><span>{% trans "Price" %}</span><span>{% trans "Total" %}</span><span></span>
+        <div class="doc-table-header doc-table-grid doc-table-grid--services hidden sm:grid">
+          <span>{% trans "Service" %}</span><span>{% trans "Client Price" %}</span><span>{% trans "Subtotal" %}</span><span></span>
         </div>
-        <div id="servicios-container" class="mt-10 border-t border-white/10 pt-6 space-y-0 min-h-[80px]">
+        <div id="servicios-container" class="doc-table  ">
           <!-- Dynamic services rows: click + ADD, then type to search -->
           <p id="servicios-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add to add services, then type to search." %}</p>
         </div>
@@ -1662,10 +1496,10 @@ input:disabled, select:disabled, textarea:disabled {
           <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="doc-action-btn text-sm bg-slate-600 hover:bg-slate-500 px-3 py-2 rounded-md text-white whitespace-nowrap no-underline" title="{% trans 'Manage external services' %}"><span class="doc-action-label text-white font-semibold">Ajustes</span></a>
         </div>
       </div>
-      <div class="doc-pos-header doc-pos-header-otros hidden sm:grid">
-        <span>{% trans "Service" %}</span><span>{% trans "External Company" %}</span><span>{% trans "Client Price" %}</span><span>{% trans "Total" %}</span><span></span>
+      <div class="doc-table-header doc-table-grid doc-table-grid--otros hidden sm:grid">
+        <span>{% trans "Service" %}</span><span>{% trans "External Company" %}</span><span>{% trans "Shop Price" %}</span><span>{% trans "Client Price" %}</span><span>{% trans "Subtotal" %}</span><span></span>
       </div>
-      <div id="otros-container" class="space-y-0 min-h-[60px]">
+      <div id="otros-container" class="doc-table  ">
         <!-- Dynamic other services rows (external/outsourced) -->
         <p id="otros-empty-hint" class="text-xs text-slate-400 py-2 empty-hint">{% trans "Click + Add for external/outsourced services." %}</p>
       </div>
@@ -1884,9 +1718,21 @@ document.addEventListener('DOMContentLoaded', function() {
 <script>
 window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
 </script>
-<script src="{% static 'js/document-form/index.js' %}?v=3.1.3"></script>
+<script src="{% static 'js/document-form/index.js' %}?v=2.5.0"></script>
 
 {% endblock extra_js %}
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

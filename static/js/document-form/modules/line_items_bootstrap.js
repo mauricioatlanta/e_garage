@@ -87,7 +87,7 @@
             row.__applyServData({
                 servicio_id: serv.servicio_id || serv.id || '',
                 nombre: serv.nombre || '',
-                precio: serv.precio != null ? serv.precio : 0
+                precio: serv.precio != null ? serv.precio : (serv.precio_base != null ? serv.precio_base : 0)
             });
         });
     }
@@ -108,7 +108,7 @@
                 nombre: otro.nombre || '',
                 empresa_ext: otro.empresa_ext || otro.empresa_externa || '',
                 precio_taller: otro.precio_taller != null ? otro.precio_taller : 0,
-                precio: otro.precio != null ? otro.precio : 0
+                precio: otro.precio != null ? otro.precio : (otro.precio_cliente != null ? otro.precio_cliente : 0)
             });
         });
     }

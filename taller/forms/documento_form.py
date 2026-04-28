@@ -557,20 +557,24 @@ class DocumentoForm(forms.ModelForm):
             nombre = (rep_data.get("nombre") or "").strip()
             repuesto_id = _to_optional_int(rep_data.get("repuesto_id") or rep_data.get("id"))
             part_id = _to_optional_int(rep_data.get("part_id"))
+            pieza_desarme_id = _to_optional_int(rep_data.get("pieza_desarme_id"))
 
-            if not (codigo or nombre or repuesto_id or part_id):
+            if not (codigo or nombre or repuesto_id or part_id or pieza_desarme_id):
                 continue
 
             origen = rep_data.get("origen_repuesto")
-            if not origen:
-                if pieza_desarme_id := _to_optional_int(rep_data.get("pieza_desarme_id")):
-                    origen = ORIGEN_DESARME
-                elif repuesto_id is not None or part_id is not None:
-                    origen = ORIGEN_STOCK_BODEGA
-                else:
-                    origen = ORIGEN_EXTERNO
+            if pieza_desarme_id:
+                origen = ORIGEN_DESARME
+            elif repuesto_id is not None or part_id is not None:
+                origen = origen or ORIGEN_STOCK_BODEGA
+            else:
+                origen = ORIGEN_EXTERNO
             if origen not in allowed_origins:
-                origen = ORIGEN_STOCK_BODEGA
+                origen = (
+                    ORIGEN_EXTERNO
+                    if repuesto_id is None and part_id is None
+                    else ORIGEN_STOCK_BODEGA
+                )
 
             kwargs = {
                 "documento": documento,
@@ -585,7 +589,6 @@ class DocumentoForm(forms.ModelForm):
                 "tecnico_responsable_id": _to_optional_int(rep_data.get("tecnico_responsable_id")),
             }
 
-            pieza_desarme_id = _to_optional_int(rep_data.get("pieza_desarme_id"))
             if origen == ORIGEN_DESARME and pieza_desarme_id:
                 kwargs["pieza_desarme_id"] = pieza_desarme_id
                 kwargs["costo_linea"] = _to_decimal(rep_data.get("costo_linea", 0))
@@ -670,6 +673,7 @@ class DocumentoForm(forms.ModelForm):
         from taller.models.lineas_documento import (
             LineaRepuesto,
             ORIGEN_DESARME,
+            ORIGEN_EXTERNO,
             ORIGEN_STOCK_BODEGA,
         )
 
@@ -680,8 +684,15 @@ class DocumentoForm(forms.ModelForm):
                 for rep_data in repuestos:
                     if not (rep_data.get("codigo") or rep_data.get("nombre")):
                         continue
-                    origen = rep_data.get("origen_repuesto") or ORIGEN_STOCK_BODEGA
-                    is_desarme = origen == ORIGEN_DESARME and rep_data.get("pieza_desarme_id")
+                    rep_id = rep_data.get("id")
+                    pieza_desarme_id = rep_data.get("pieza_desarme_id")
+                    if pieza_desarme_id:
+                        origen = ORIGEN_DESARME
+                    elif rep_id not in (None, ""):
+                        origen = rep_data.get("origen_repuesto") or ORIGEN_STOCK_BODEGA
+                    else:
+                        origen = ORIGEN_EXTERNO
+                    is_desarme = origen == ORIGEN_DESARME and pieza_desarme_id
                     kwargs = {
                         "documento": documento,
                         "codigo": rep_data.get("codigo", ""),
@@ -699,20 +710,23 @@ class DocumentoForm(forms.ModelForm):
                         costo = rep_data.get("costo_linea")
                         if costo is not None:
                             kwargs["costo_linea"] = costo
+                    elif origen == ORIGEN_EXTERNO:
+                        kwargs["pieza_desarme_id"] = None
+                        kwargs["repuesto_id"] = None
+                        kwargs["part_id"] = None
                     else:
                         kwargs["pieza_desarme_id"] = None
-                        rep_id = rep_data.get("id")
                         if rep_id not in (None, ""):
                             from taller.models import Repuesto
 
-                        repuesto = Repuesto.objects.filter(
-                            id=int(rep_id), empresa=documento.empresa
-                        ).first()
+                            repuesto = Repuesto.objects.filter(
+                                id=int(rep_id), empresa=documento.empresa
+                            ).first()
 
-                        if not repuesto:
-                            raise Exception("SECURITY: intento de acceso cross-tenant")
+                            if not repuesto:
+                                raise Exception("SECURITY: intento de acceso cross-tenant")
 
-                        kwargs["repuesto_id"] = repuesto.id
+                            kwargs["repuesto_id"] = repuesto.id
                     LineaRepuesto.objects.create(**kwargs)
             except (json.JSONDecodeError, ValueError):
                 pass

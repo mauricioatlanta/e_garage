@@ -222,12 +222,14 @@ def buscar_servicios_api(request):
     # Obtener empresa del usuario
     empresa = getattr(request.user, "empresa", None)
 
-    if empresa:
-        servicios = Servicio.objects.filter(empresa=empresa)
-        if not servicios.exists():
-            servicios = Servicio.objects.all()
-    else:
-        servicios = Servicio.objects.all()
+    if not empresa:
+        return JsonResponse({"servicios": [], "total": 0})
+
+    servicios = (
+        Servicio.objects.filter(empresa=empresa, activo=True)
+        .select_related("categoria", "subcategoria")
+        .prefetch_related("names", "categoria__names", "subcategoria__names")
+    )
 
     country = _detectar_pais(request)
     language = COUNTRY_LANGUAGE_MAP.get(country, "es")
@@ -235,7 +237,11 @@ def buscar_servicios_api(request):
     # Aplicar filtros de búsqueda
     if query:
         servicios = servicios.filter(
-            Q(names__label__icontains=query, names__language=language)
+            Q(nombre__icontains=query)
+            | Q(descripcion__icontains=query)
+            | Q(codigo_interno__icontains=query)
+            | Q(names__label__icontains=query, names__language=language)
+            | Q(names__aliases__icontains=query)
             | Q(categoria__names__label__icontains=query, categoria__names__language=language)
             | Q(subcategoria__names__label__icontains=query, subcategoria__names__language=language)
         ).distinct()
@@ -246,18 +252,22 @@ def buscar_servicios_api(request):
     if subcategoria_code:
         servicios = servicios.filter(subcategoria__code=subcategoria_code)
 
+    total = servicios.count()
+
     # Preparar datos para JSON
     data = []
-    servicios = servicios.select_related("categoria", "subcategoria").prefetch_related(
-        "names", "categoria__names", "subcategoria__names"
-    )
-    servicios = servicios.filter(names__language=language).distinct()
-    for servicio in servicios[:20]:  # Limitar resultados
+    for servicio in servicios.order_by("categoria__orden", "subcategoria__orden", "nombre")[:20]:
         nombre_localizado = servicio.get_label(language)
+        precio_base = servicio.precio_base or 0
         data.append(
             {
+                "id": servicio.pk,
                 "pk": servicio.pk,
                 "nombre": nombre_localizado,
+                "label": nombre_localizado,
+                "text": nombre_localizado,
+                "descripcion": servicio.descripcion or "",
+                "codigo_interno": servicio.codigo_interno or "",
                 "categoria": servicio.categoria.get_label(language) if servicio.categoria else "",
                 "categoria_id": servicio.categoria_id,
                 "categoria_code": servicio.categoria.code if servicio.categoria else "",
@@ -266,6 +276,8 @@ def buscar_servicios_api(request):
                 ),
                 "subcategoria_id": servicio.subcategoria_id,
                 "subcategoria_code": servicio.subcategoria.code if servicio.subcategoria else "",
+                "precio": str(precio_base),
+                "precio_base": str(precio_base),
                 "tipo": SERVICIO_TYPE_LABELS.get(language, {}).get(
                     (getattr(servicio, "tipo", "") or "").strip().lower(),
                     (getattr(servicio, "tipo", "") or "").strip().title(),
@@ -276,7 +288,7 @@ def buscar_servicios_api(request):
     return JsonResponse(
         {
             "servicios": data,
-            "total": servicios.count(),
+            "total": total,
         }
     )
 
@@ -582,10 +594,17 @@ def buscar_otros_servicios_api(request):
 
     data = []
     for servicio in otros_servicios[:20]:
+        precio_taller = servicio.costo_taller or 0
+        precio_cliente = servicio.precio_cliente or 0
         data.append(
             {
+                "id": servicio.pk,
                 "pk": servicio.pk,
                 "nombre": servicio.nombre,
+                "label": servicio.nombre,
+                "text": servicio.nombre,
+                "empresa": servicio.empresa_externa,
+                "empresa_ext": servicio.empresa_externa,
                 "empresa_externa": servicio.empresa_externa,
                 "categoria": servicio.categoria.get_label(language) if servicio.categoria else "",
                 "categoria_id": servicio.categoria_id,
@@ -595,8 +614,10 @@ def buscar_otros_servicios_api(request):
                 ),
                 "subcategoria_id": servicio.subcategoria_id,
                 "subcategoria_code": servicio.subcategoria.code if servicio.subcategoria else "",
-                "costo_taller": str(servicio.costo_taller),
-                "precio_cliente": str(servicio.precio_cliente),
+                "costo_taller": str(precio_taller),
+                "precio_taller": str(precio_taller),
+                "precio": str(precio_cliente),
+                "precio_cliente": str(precio_cliente),
             }
         )
 

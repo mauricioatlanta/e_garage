@@ -123,10 +123,16 @@
 {% endblock %}
 
 {% block main_actions %}
-<a href="{% country_url 'repuestos:crear_repuesto' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-sm font-semibold border border-emerald-400/40 shadow-lg shadow-emerald-900/40 transition-all">
-  <span>➕</span>
-  <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Add Part{% else %}Agregar Repuesto{% endif %}</span>
-</a>
+<div class="flex flex-wrap items-center gap-3">
+  <a href="{% country_url 'repuestos:reabastecimiento' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-black/35 hover:bg-cyan-950/60 text-cyan-100 text-sm font-semibold border border-cyan-400/40 shadow-lg shadow-cyan-950/20 transition-all">
+    <span>📦</span>
+    <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Smart Restock{% else %}Reabastecimiento{% endif %}</span>
+  </a>
+  <a href="{% country_url 'repuestos:crear_repuesto' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-sm font-semibold border border-emerald-400/40 shadow-lg shadow-emerald-900/40 transition-all">
+    <span>➕</span>
+    <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Add Part{% else %}Agregar Repuesto{% endif %}</span>
+  </a>
+</div>
 {% endblock %}
 
 {% block page_stats %}

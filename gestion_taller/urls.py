@@ -636,7 +636,14 @@ urlpatterns = [
     # Analytics global (sin prefijo de país)
     path("analytics/", include(("taller.analytics.urls", "analytics"), namespace="analytics")),
     # APIs globales (sin prefijo de país)
-    path("api/v1/", include("taller.api.urls")),
+    path(
+        "api/v1/",
+        include(("taller.api.urls", "api"), namespace="api_v1"),
+    ),
+    path(
+        "<str:pais>/api/",
+        include(("taller.api.urls", "api"), namespace="api"),
+    ),
     # API de ubicaciones (multi-país)
     path("api/", include(("ubicacion.urls", "ubicacion"), namespace="ubicacion")),
     # Marketplace - APIs para consulta de precios

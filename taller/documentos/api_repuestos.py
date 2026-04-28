@@ -16,8 +16,8 @@ def buscar_repuestos_api(request):
     """
     API ligera para el autocomplete de Alpine.js.
 
-    Busca por código (part_number) o nombre, filtrando por la empresa del usuario.
-    Devuelve un array simple de resultados (sin paginación compleja).
+    Busca por codigo (part_number), nombre o proveedor, filtrando por la empresa del usuario.
+    Devuelve un array simple de resultados (sin paginacion compleja).
 
     Endpoint: GET /taller/api/repuestos/buscar/?q=texto
     Returns: [
@@ -25,6 +25,7 @@ def buscar_repuestos_api(request):
             'id': 1,
             'codigo': 'FIL-001',
             'nombre': 'Filtro de Aceite',
+            'proveedor': 'ACME',
             'precio': 12500.0,
             'stock': 5
         },
@@ -33,11 +34,9 @@ def buscar_repuestos_api(request):
     """
     q = request.GET.get("q", "").strip()
 
-    # Validar query mínima
     if len(q) < 2:
         return JsonResponse([], safe=False)
 
-    # Obtener empresa del usuario (multi-tenant)
     try:
         empresa = request.user.empresa
         if not empresa:
@@ -45,25 +44,26 @@ def buscar_repuestos_api(request):
     except AttributeError:
         return JsonResponse([], safe=False)
 
-    # Búsqueda: Código (part_number) exacto O nombre parcial
-    # Usar Q objects para búsqueda OR
     qs = (
         Repuesto.objects.filter(empresa=empresa)
-        .filter(models.Q(part_number__icontains=q) | models.Q(nombre__icontains=q))
+        .filter(
+            models.Q(part_number__icontains=q)
+            | models.Q(nombre__icontains=q)
+            | models.Q(proveedor__icontains=q)
+        )
         .order_by("nombre")[:20]
-    )  # Limitar a 20 resultados para velocidad
+    )
 
-    # Serializar resultados
     results = []
-    for r in qs:
+    for repuesto in qs:
         results.append(
             {
-                "id": r.id,
-                "codigo": r.part_number or "",  # part_number es el código
-                "nombre": r.nombre or "",
-                # Convertir Decimal a float para JSON
-                "precio": float(r.precio_venta or 0),
-                "stock": int(r.cantidad_stock or 0),
+                "id": repuesto.id,
+                "codigo": repuesto.part_number or "",
+                "nombre": repuesto.nombre or "",
+                "proveedor": repuesto.proveedor or "",
+                "precio": float(repuesto.precio_venta or 0),
+                "stock": int(repuesto.cantidad_stock or 0),
             }
         )
 

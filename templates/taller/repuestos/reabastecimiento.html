@@ -1,0 +1,268 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load country_url %}
+
+{% block page_title %}Panel de Reabastecimiento{% endblock %}
+{% block page_subtitle %}Cobertura, consumo reciente y sugerencia de compra por repuesto{% endblock %}
+{% block page_icon %}📦{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .supply-shell {
+    background: rgba(0, 0, 0, 0.62);
+    border: 1px solid rgba(34, 211, 238, 0.24);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .supply-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .supply-table th,
+  .supply-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  .supply-table th {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #67e8f9;
+    background: rgba(8, 47, 73, 0.34);
+  }
+
+  .supply-table tbody tr:hover {
+    background: rgba(8, 47, 73, 0.24);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border: 1px solid transparent;
+  }
+
+  .status-pill--critical {
+    color: #fecaca;
+    background: rgba(127, 29, 29, 0.52);
+    border-color: rgba(248, 113, 113, 0.38);
+  }
+
+  .status-pill--warning {
+    color: #fde68a;
+    background: rgba(120, 53, 15, 0.42);
+    border-color: rgba(251, 191, 36, 0.34);
+  }
+
+  .status-pill--stable {
+    color: #bbf7d0;
+    background: rgba(20, 83, 45, 0.42);
+    border-color: rgba(74, 222, 128, 0.34);
+  }
+
+  .status-pill--idle {
+    color: #cbd5e1;
+    background: rgba(30, 41, 59, 0.5);
+    border-color: rgba(148, 163, 184, 0.28);
+  }
+
+  .toolbar-form {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+
+  .toolbar-input,
+  .toolbar-select {
+    min-height: 44px;
+    border-radius: 12px;
+    border: 1px solid rgba(34, 211, 238, 0.24);
+    background: rgba(2, 6, 23, 0.62);
+    color: #e2e8f0;
+    padding: 0 14px;
+  }
+
+  .toolbar-input {
+    flex: 1 1 320px;
+  }
+
+  .toolbar-select {
+    flex: 0 0 220px;
+  }
+
+  .toolbar-button {
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(45, 212, 191, 0.28);
+    background: linear-gradient(135deg, rgba(13, 148, 136, 0.88), rgba(14, 116, 144, 0.88));
+    color: white;
+    font-weight: 700;
+  }
+
+  .metric-note {
+    color: #94a3b8;
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 1024px) {
+    .supply-shell {
+      overflow-x: auto;
+    }
+
+    .supply-table {
+      min-width: 1080px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block main_actions %}
+<div class="flex flex-wrap items-center gap-3">
+  <a href="{% country_url 'repuestos:lista_repuestos' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-cyan-400/40 bg-black/35 text-white text-sm font-semibold">
+    <span>←</span>
+    <span>Inventario</span>
+  </a>
+  <a href="{% country_url 'repuestos:crear_repuesto' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-emerald-600 via-lime-600 to-green-600 text-white text-sm font-semibold border border-emerald-400/40">
+    <span>＋</span>
+    <span>Nuevo repuesto</span>
+  </a>
+</div>
+{% endblock %}
+
+{% block page_stats %}
+<div class="mt-4 grid grid-cols-1 sm:grid-cols-3 xl:grid-cols-4 gap-3 text-xs">
+  <div class="flex items-center gap-2 bg-black/40 border border-cyan-400/30 rounded-lg p-3">
+    <span class="text-cyan-300">🧠</span>
+    <div>
+      <div class="text-white font-bold text-lg">{{ panel_summary.total_repuestos }}</div>
+      <div class="text-gray-400">Repuestos analizados</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 bg-black/40 border border-red-400/30 rounded-lg p-3">
+    <span class="text-red-300">⚠</span>
+    <div>
+      <div class="text-white font-bold text-lg">{{ panel_summary.critical_count }}</div>
+      <div class="text-gray-400">Críticos</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 bg-black/40 border border-amber-400/30 rounded-lg p-3">
+    <span class="text-amber-300">△</span>
+    <div>
+      <div class="text-white font-bold text-lg">{{ panel_summary.warning_count }}</div>
+      <div class="text-gray-400">En observación</div>
+    </div>
+  </div>
+  <div class="flex items-center gap-2 bg-black/40 border border-emerald-400/30 rounded-lg p-3">
+    <span class="text-emerald-300">🛒</span>
+    <div>
+      <div class="text-white font-bold text-lg">{{ panel_summary.suggested_units }}</div>
+      <div class="text-gray-400">Unidades sugeridas</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block search_bar %}
+<form method="get" class="toolbar-form">
+  <input
+    type="text"
+    name="q"
+    value="{{ search_query }}"
+    class="toolbar-input"
+    placeholder="Buscar por código, nombre, proveedor o categoría">
+  <select name="status" class="toolbar-select">
+    <option value="" {% if not status_filter %}selected{% endif %}>Todos los estados</option>
+    <option value="critical" {% if status_filter == 'critical' %}selected{% endif %}>Críticos</option>
+    <option value="warning" {% if status_filter == 'warning' %}selected{% endif %}>En observación</option>
+    <option value="stable" {% if status_filter == 'stable' %}selected{% endif %}>Estables</option>
+    <option value="idle" {% if status_filter == 'idle' %}selected{% endif %}>Sin consumo</option>
+  </select>
+  <button type="submit" class="toolbar-button">Filtrar</button>
+</form>
+{% endblock %}
+
+{% block panel_content %}
+<div class="mb-4 metric-note">
+  Ventana analizada: últimos {{ lookback_days }} días. Objetivo de cobertura: {{ target_coverage_days }} días.
+</div>
+
+<div class="supply-shell">
+  <table class="supply-table">
+    <thead>
+      <tr>
+        <th>Código</th>
+        <th>Repuesto</th>
+        <th>Proveedor</th>
+        <th>Stock</th>
+        <th>Mínimo</th>
+        <th>Consumo / día</th>
+        <th>Días cobertura</th>
+        <th>Sugerencia compra</th>
+        <th>Último consumo</th>
+        <th>Estado</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in panel_rows %}
+      <tr>
+        <td class="text-cyan-200 font-semibold">{{ row.repuesto.part_number|default:"-" }}</td>
+        <td>
+          <div class="text-white font-semibold">{{ row.repuesto.nombre }}</div>
+          {% if row.repuesto.categoria %}
+          <div class="text-slate-400 text-xs mt-1">{{ row.repuesto.categoria.nombre }}</div>
+          {% endif %}
+        </td>
+        <td class="text-slate-300">{{ row.repuesto.proveedor|default:"-" }}</td>
+        <td class="text-white font-semibold">{{ row.stock_actual }}</td>
+        <td class="text-slate-300">{{ row.stock_minimo|default:"0" }}</td>
+        <td class="text-slate-200">{{ row.consumo_diario }}</td>
+        <td class="text-slate-200">
+          {% if row.dias_cobertura is not None %}
+            {{ row.dias_cobertura }}
+          {% else %}
+            <span class="text-slate-500">Sin consumo</span>
+          {% endif %}
+        </td>
+        <td class="text-emerald-300 font-semibold">{{ row.sugerencia_compra }}</td>
+        <td class="text-slate-300">
+          {% if row.ultimo_consumo %}
+            {{ row.ultimo_consumo|date:"d/m/Y" }}
+          {% else %}
+            -
+          {% endif %}
+        </td>
+        <td>
+          <span class="status-pill status-pill--{{ row.status }}">
+            {% if row.status == "critical" %}Crítico{% elif row.status == "warning" %}Observación{% elif row.status == "stable" %}Estable{% else %}Sin consumo{% endif %}
+          </span>
+        </td>
+        <td>
+          <a href="{% country_url 'repuestos:editar_repuesto' row.repuesto.pk %}" class="text-cyan-300 hover:text-cyan-200 font-semibold">
+            Editar
+          </a>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td colspan="11" class="text-center py-12">
+          <div class="text-5xl mb-3 opacity-50">📦</div>
+          <div class="text-white text-xl font-bold mb-2">No hay repuestos para mostrar</div>
+          <div class="text-slate-400">Ajusta los filtros o crea repuestos con stock administrado.</div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

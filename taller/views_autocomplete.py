@@ -1,4 +1,4 @@
-﻿# taller/views_autocomplete.py
+# taller/views_autocomplete.py
 from dal import autocomplete
 
 from django.db.models import Q
@@ -53,6 +53,30 @@ def _resolve_country_from_request(request):
     if path.startswith("/mx/"):
         return "MX"
     return None
+
+
+def _vehicle_autocomplete_label(result):
+    anio = getattr(result, "anio", "") or ""
+    marca = getattr(result, "marca_texto", "") or (
+        getattr(getattr(result, "marca", None), "nombre", "")
+        if getattr(result, "marca", None)
+        else ""
+    )
+    modelo = getattr(result, "modelo_texto", "") or (
+        getattr(getattr(result, "modelo", None), "nombre", "")
+        if getattr(result, "modelo", None)
+        else ""
+    )
+    patente = getattr(result, "patente", "") or getattr(result, "placa", "") or ""
+    fallback = patente or getattr(result, "vin", "") or ""
+
+    parts = [
+        str(anio).strip() if anio else "",
+        str(marca).strip(),
+        str(modelo).strip(),
+        str(fallback).strip(),
+    ]
+    return " - ".join(part for part in parts if part) or f"Vehículo #{result.pk}"
 
 
 # -----------------------
@@ -116,16 +140,36 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
 # -----------------------
 class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
-        qs = super().get_queryset()
+        if not self.request.user.is_authenticated:
+            return Vehiculo.objects.none()
+
+        empresa = _get_empresa(self.request)
+        if not empresa:
+            return Vehiculo.objects.none()
+
+        qs = Vehiculo.objects.filter(empresa=empresa).select_related("marca", "modelo")
+
+        cliente_id = self.forwarded.get("cliente") or self.request.GET.get("cliente")
+        if cliente_id:
+            qs = qs.filter(cliente_id=cliente_id)
+
+        q = (self.q or "").strip()
+        if q:
+            qs = qs.filter(
+                Q(patente__icontains=q)
+                | Q(vin__icontains=q)
+                | Q(modelo__nombre__icontains=q)
+                | Q(marca__nombre__icontains=q)
+                | Q(modelo_texto__icontains=q)
+                | Q(marca_texto__icontains=q)
+            )
         return qs
 
     def get_result_label(self, result):
-        anio = getattr(result, "anio", "") or ""
-        marca = getattr(result.marca, "nombre", "") if getattr(result, "marca", None) else ""
-        modelo = getattr(result.modelo, "nombre", "") if getattr(result, "modelo", None) else ""
-        patente = getattr(result, "patente", "") or ""
+        return _vehicle_autocomplete_label(result)
 
-        return f"{anio} {marca} {modelo} - {patente}".strip()
+    def get_selected_result_label(self, result):
+        return _vehicle_autocomplete_label(result)
 
 
 # -----------------------

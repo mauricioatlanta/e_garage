@@ -117,6 +117,7 @@ class RepuestoForm(forms.ModelForm):
             "precio_compra",
             "precio_venta",
             "cantidad_stock",
+            "stock_minimo",
             "proveedor",
         ]
         widgets = {
@@ -152,6 +153,11 @@ class RepuestoForm(forms.ModelForm):
                     "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"
                 }
             ),
+            "stock_minimo": forms.NumberInput(
+                attrs={
+                    "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"
+                }
+            ),
             "proveedor": forms.TextInput(
                 attrs={
                     "class": "w-full bg-black/40 text-white border border-cyan-400/30 rounded-lg p-2"
@@ -179,6 +185,9 @@ class RepuestoForm(forms.ModelForm):
             self.fields["cantidad_stock"].label = "Stock Quantity"
             self.fields["cantidad_stock"].help_text = "Available quantity in stock"
 
+            self.fields["stock_minimo"].label = "Minimum Stock"
+            self.fields["stock_minimo"].help_text = "Optional threshold for replenishment alerts"
+
             self.fields["proveedor"].label = "Supplier"
             self.fields["proveedor"].help_text = "Where you bought the part"
         elif lang == "pt":
@@ -200,6 +209,9 @@ class RepuestoForm(forms.ModelForm):
             self.fields["cantidad_stock"].label = "Quantidade em Estoque"
             self.fields["cantidad_stock"].help_text = "Quantidade disponível em estoque"
 
+            self.fields["stock_minimo"].label = "Estoque Mínimo"
+            self.fields["stock_minimo"].help_text = "Limite opcional para alertas de reposição"
+
             self.fields["proveedor"].label = "Fornecedor"
             self.fields["proveedor"].help_text = "Onde você comprou a peça"
         else:
@@ -220,6 +232,11 @@ class RepuestoForm(forms.ModelForm):
 
             self.fields["cantidad_stock"].label = "Cantidad en Stock"
             self.fields["cantidad_stock"].help_text = "Cantidad disponible en stock"
+
+            self.fields["stock_minimo"].label = "Stock Mínimo"
+            self.fields["stock_minimo"].help_text = (
+                "Umbral opcional para alertas de reabastecimiento"
+            )
 
             self.fields["proveedor"].label = "Proveedor"
             self.fields["proveedor"].help_text = "Donde compraste el repuesto"

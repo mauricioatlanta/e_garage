@@ -87,13 +87,22 @@
 
         var rep = Array.from(document.querySelectorAll('#repuestos-container .dynamic-element')).map(function(row) {
             return {
-                id: (row.querySelector('.rep-id') && row.querySelector('.rep-id').value || '').trim(),
+                repuesto_id: (row.querySelector('.rep-id')?.value || '').trim(),
+                id: (row.querySelector('.rep-id')?.value || '').trim(),
                 codigo: (row.querySelector('.rep-codigo') && row.querySelector('.rep-codigo').value || '').trim(),
                 nombre: (row.querySelector('.rep-nombre') && row.querySelector('.rep-nombre').value || '').trim(),
                 cantidad: Number(row.querySelector('.rep-cantidad') && row.querySelector('.rep-cantidad').value || 0),
                 precio: EG.utils.parseNumericInput(row.querySelector('.rep-precio-venta') && row.querySelector('.rep-precio-venta').value || 0),
                 descuento: Number(row.querySelector('.rep-descuento') && row.querySelector('.rep-descuento').value || 0),
-                origen_repuesto: (row.querySelector('.rep-origen') && row.querySelector('.rep-origen').value || 'STOCK_BODEGA').trim(),
+                origen_repuesto: (function(){
+                    const repId = (row.querySelector('.rep-id')?.value || '').trim();
+                    const partId = (row.querySelector('.rep-part-id')?.value || '').trim();
+                    const piezaId = (row.querySelector('.rep-pieza-desarme-id')?.value || '').trim();
+
+                    if (piezaId) return 'DESARME';
+                    if (repId || partId) return 'STOCK_BODEGA';
+                    return 'EXTERNO';
+                })(),
                 pieza_desarme_id: (row.querySelector('.rep-pieza-desarme-id') && row.querySelector('.rep-pieza-desarme-id').value || '').trim(),
                 costo_linea: EG.utils.parseNumericInput(row.querySelector('.rep-costo-linea') && row.querySelector('.rep-costo-linea').value || 0)
             };
@@ -108,12 +117,18 @@
         });
 
         var otros = Array.from(document.querySelectorAll('#otros-container .dynamic-element')).map(function(row) {
+            var empresa = (row.querySelector('.otr-empresa') && row.querySelector('.otr-empresa').value || '').trim();
+            var precioTaller = EG.utils.parseNumericInput(row.querySelector('.otr-precio-taller') && row.querySelector('.otr-precio-taller').value || 0);
+            var precioCliente = EG.utils.parseNumericInput(row.querySelector('.otr-precio') && row.querySelector('.otr-precio').value || 0);
             return {
                 servicio_id: (row.querySelector('.otr-servicio-id') && row.querySelector('.otr-servicio-id').value || '').trim(),
                 nombre: (row.querySelector('.otr-search') && row.querySelector('.otr-search').value || '').trim(),
-                empresa_ext: (row.querySelector('.otr-empresa') && row.querySelector('.otr-empresa').value || '').trim(),
-                precio_taller: EG.utils.parseNumericInput(row.querySelector('.otr-precio-taller') && row.querySelector('.otr-precio-taller').value || 0),
-                precio: EG.utils.parseNumericInput(row.querySelector('.otr-precio') && row.querySelector('.otr-precio').value || 0)
+                empresa_ext: empresa,
+                empresa_externa: empresa,
+                precio_taller: precioTaller,
+                costo_interno: precioTaller,
+                precio: precioCliente,
+                precio_cliente: precioCliente
             };
         });
 

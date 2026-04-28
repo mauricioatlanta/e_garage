@@ -65,13 +65,19 @@
         });
 
         var otros = collectRows('#otros-container .dynamic-element', function(row) {
+            var empresa = (row.querySelector('.otr-empresa') && row.querySelector('.otr-empresa').value || '').trim();
+            var precioTaller = EG.utils.parseNumericInput(row.querySelector('.otr-precio-taller') && row.querySelector('.otr-precio-taller').value || 0);
+            var precioCliente = EG.utils.parseNumericInput(row.querySelector('.otr-precio') && row.querySelector('.otr-precio').value || 0);
             return {
                 rowId: row.dataset.rowId || '',
                 servicio_id: (row.querySelector('.otr-servicio-id') && row.querySelector('.otr-servicio-id').value || '').trim(),
                 nombre: (row.querySelector('.otr-search') && row.querySelector('.otr-search').value || '').trim(),
-                empresa_ext: (row.querySelector('.otr-empresa') && row.querySelector('.otr-empresa').value || '').trim(),
-                precio_taller: EG.utils.parseNumericInput(row.querySelector('.otr-precio-taller') && row.querySelector('.otr-precio-taller').value || 0),
-                precio: EG.utils.parseNumericInput(row.querySelector('.otr-precio') && row.querySelector('.otr-precio').value || 0)
+                empresa_ext: empresa,
+                empresa_externa: empresa,
+                precio_taller: precioTaller,
+                costo_interno: precioTaller,
+                precio: precioCliente,
+                precio_cliente: precioCliente
             };
         });
 

@@ -52,6 +52,11 @@ class Repuesto(TenantScoped):
     cantidad_stock = models.PositiveIntegerField(
         default=0, help_text="Cantidad disponible en stock"
     )
+    stock_minimo = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Stock minimo recomendado para reabastecimiento",
+    )
     proveedor = models.CharField(
         max_length=200, null=True, blank=True, help_text="Donde compraste el repuesto"
     )

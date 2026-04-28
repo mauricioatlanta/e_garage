@@ -79,56 +79,51 @@
             + '    <input type="hidden" class="rep-origen" value="STOCK_BODEGA">'
             + '    <input type="hidden" class="rep-pieza-desarme-id">'
             + '    <input type="hidden" class="rep-costo-linea">'
+            + '    <input type="hidden" class="rep-stock-disponible">'
+            + '    <input type="hidden" class="rep-stock-minimo">'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-name description-field rep-search-container relative min-w-0">'
-            + '    <div class="flex items-center justify-between gap-2 mb-1">'
-            +          buildLabel(EG.I18N.name || 'Name', isFirstRow)
-            + '      <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase">Usado</span>'
-            + '    </div>'
-            + '    <div class="flex gap-1" style="min-width: 0;">'
-            + '      <input type="text" class="rep-search form-control w-full h-10 text-sm flex-1" style="min-width: 0; width: 100%;" placeholder="' + escapeHtml(EG.I18N.type_to_search_parts || 'Buscar...') + '" autocomplete="off">'
-            + '    </div>'
+            +        buildLabel(EG.I18N.name || 'Name', isFirstRow)
+            + '    <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase">Usado</span>'
+            + '    <input type="text" class="rep-search form-control w-full h-10 text-sm" style="min-width: 0; width: 100%;" placeholder="' + escapeHtml(EG.I18N.type_to_search_parts || 'Buscar...') + '" autocomplete="off">'
             + '    <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
             + '    <input type="hidden" class="rep-nombre">'
+            + '    <div class="rep-stock-alert hidden mt-2 rounded-md border px-2 py-1 text-xs leading-5"></div>'
             + '  </div>'
-            + '  <div class="grid grid-cols-2 gap-2">'
-            + '    <div class="repuesto-cell repuesto-cell-qty min-w-0">'
-            +          buildLabel(EG.I18N.qty || 'Qty', isFirstRow)
-            + '      <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" value="1">'
-            + '    </div>'
-            + '    <div class="repuesto-cell repuesto-cell-price min-w-0">'
-            +          buildLabel(EG.I18N.sale_price || 'Price', isFirstRow)
-            + '      <div class="rep-price-field relative min-w-0">'
-            + '        <div class="relative">'
-            + '          <span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300">$</span>'
-            + '          <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6 pr-10" placeholder="0">'
-            + '          <button type="button" class="rep-toggle-cost" title="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-label="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-expanded="false">'
-            +                buildEyeIcon()
-            + '          </button>'
+            + '  <div class="repuesto-cell repuesto-cell-qty min-w-0">'
+            +        buildLabel(EG.I18N.qty || 'Qty', isFirstRow)
+            + '    <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" value="1">'
+            + '  </div>'
+            + '  <div class="repuesto-cell repuesto-cell-price min-w-0">'
+            +        buildLabel(EG.I18N.sale_price || 'Price', isFirstRow)
+            + '    <div class="rep-price-field relative min-w-0">'
+            + '      <div class="relative">'
+            + '        <span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300">$</span>'
+            + '        <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6 pr-10" placeholder="0">'
+            + '        <button type="button" class="rep-toggle-cost" title="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-label="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-expanded="false">'
+            +              buildEyeIcon()
+            + '        </button>'
+            + '      </div>'
+            + '      <div class="rep-cost-panel hidden">'
+            + '        <div class="rep-cost-input-wrap">'
+            + '          <span class="rep-cost-label">' + escapeHtml(EG.I18N.cost || 'Costo') + ':</span>'
+            + '          <div class="rep-cost-input-shell">'
+            + '            <span class="rep-cost-currency">$</span>'
+            + '            <input type="text" class="rep-cost-input" inputmode="numeric" autocomplete="off" placeholder="0">'
+            + '          </div>'
             + '        </div>'
-            + '        <div class="rep-cost-panel hidden">'
-            + '          <label class="rep-cost-input-wrap">'
-            + '            <span class="rep-cost-label">' + escapeHtml(EG.I18N.cost || 'Costo') + ':</span>'
-            + '            <div class="rep-cost-input-shell">'
-            + '              <span class="rep-cost-currency">$</span>'
-            + '              <input type="text" class="rep-cost-input" inputmode="numeric" autocomplete="off" placeholder="0">'
-            + '            </div>'
-            + '          </label>'
-            + '          <span class="rep-cost-value">' + money(0) + '</span>'
-            + '        </div>'
+            + '        <span class="rep-cost-value">' + money(0) + '</span>'
             + '      </div>'
             + '    </div>'
             + '  </div>'
-            + '  <div class="repuesto-mobile-pair repuesto-mobile-pair-summary">'
-            + '    <div class="repuesto-cell repuesto-cell-total min-w-0">'
-            +          buildLabel(EG.I18N.subtotal || 'Subtotal', isFirstRow)
-            + '      <input type="hidden" class="rep-subtotal" value="0">'
-            + '      <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">' + money(0) + '</div>'
-            + '    </div>'
-            + '    <div class="repuesto-cell repuesto-cell-action">'
-            + '      <label class="block text-cyan-200 text-sm mb-1 hidden" data-first-row-label>&nbsp;</label>'
-            + '      <button type="button" class="btn-add w-full h-10 rep-remove-btn" title="' + escapeHtml(EG.I18N.remove_row || 'Remove row') + '">X</button>'
-            + '    </div>'
+            + '  <div class="repuesto-cell repuesto-cell-total min-w-0">'
+            +        buildLabel(EG.I18N.subtotal || 'Subtotal', isFirstRow)
+            + '    <input type="hidden" class="rep-subtotal" value="0">'
+            + '    <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">' + money(0) + '</div>'
+            + '  </div>'
+            + '  <div class="repuesto-cell repuesto-cell-action">'
+            +        buildLabel('&nbsp;', isFirstRow)
+            + '    <button type="button" class="btn-add w-full h-10 rep-remove-btn" title="' + escapeHtml(EG.I18N.remove_row || 'Remove row') + '">X</button>'
             + '  </div>'
             + '</div>';
     }
@@ -139,10 +134,16 @@
             id: part.id || part.pk || '',
             codigo: part.codigo || part.part_number || part.code || '',
             nombre: part.nombre || part.name || part.label || part.text || '',
+            proveedor: part.proveedor || part.supplier || part.vendor || '',
             precio_venta: part.precio_venta_sugerido !== undefined ? part.precio_venta_sugerido :
                 (part.precio_venta !== undefined ? part.precio_venta :
                 (part.precio !== undefined ? part.precio : 0)),
             precio_compra: part.precio_compra !== undefined ? part.precio_compra : 0,
+            stock: part.stock !== undefined ? part.stock :
+                (part.cantidad_stock !== undefined ? part.cantidad_stock : 0),
+            stock_minimo: part.stock_minimo !== undefined ? part.stock_minimo :
+                (part.stockMinimo !== undefined ? part.stockMinimo :
+                (part.stock_min !== undefined ? part.stock_min : 0)),
             origen_repuesto: part.origen_repuesto || 'STOCK_BODEGA',
             pieza_desarme_id: part.pieza_desarme_id || '',
             costo_linea: part.costo_linea !== undefined ? part.costo_linea : 0,
@@ -209,7 +210,10 @@
         var repOrigen = row.querySelector('.rep-origen');
         var repPiezaDesarmeId = row.querySelector('.rep-pieza-desarme-id');
         var repCostoLinea = row.querySelector('.rep-costo-linea');
+        var repStockDisponible = row.querySelector('.rep-stock-disponible');
+        var repStockMinimo = row.querySelector('.rep-stock-minimo');
         var repNombre = row.querySelector('.rep-nombre');
+        var stockAlert = row.querySelector('.rep-stock-alert');
         var desarmeBadge = row.querySelector('.rep-desarme-badge');
         var removeBtn = row.querySelector('.rep-remove-btn');
         var toggleCostBtn = row.querySelector('.rep-toggle-cost');
@@ -218,12 +222,117 @@
         var costValue = row.querySelector('.rep-cost-value');
         var timer = null;
 
+        function syncOrigenField(explicitOrigin) {
+            var piezaDesarmeId = repPiezaDesarmeId && String(repPiezaDesarmeId.value || '').trim();
+            var repuestoId = idHidden && String(idHidden.value || '').trim();
+            var origin = explicitOrigin || '';
+
+            if (piezaDesarmeId) {
+                origin = 'DESARME';
+            } else if (origin === 'DESARME') {
+                origin = repuestoId ? 'STOCK_BODEGA' : 'EXTERNO';
+            } else if (repuestoId) {
+                origin = 'STOCK_BODEGA';
+            } else {
+                origin = 'EXTERNO';
+            }
+
+            if (repOrigen) {
+                repOrigen.value = origin;
+            }
+            return origin;
+        }
+
+        function clearSelectedPartState() {
+            if (idHidden) idHidden.value = '';
+            if (repPiezaDesarmeId) repPiezaDesarmeId.value = '';
+            if (repStockDisponible) repStockDisponible.value = '';
+            if (repStockMinimo) repStockMinimo.value = '';
+            syncOrigenField('');
+            if (desarmeBadge) {
+                desarmeBadge.classList.add('hidden');
+            }
+            if (stockAlert) {
+                stockAlert.className = 'rep-stock-alert hidden mt-2 rounded-md border px-2 py-1 text-xs leading-5';
+                stockAlert.textContent = '';
+            }
+        }
+
+        function hideCostPanel() {
+            if (costPanel) {
+                costPanel.classList.add('hidden');
+            }
+            if (toggleCostBtn) {
+                toggleCostBtn.setAttribute('aria-expanded', 'false');
+            }
+        }
+
+        function setStockAlertState(message, tone) {
+            if (!stockAlert) {
+                return;
+            }
+            stockAlert.className = 'rep-stock-alert mt-2 rounded-md border px-2 py-1 text-xs leading-5';
+            if (!message) {
+                stockAlert.classList.add('hidden');
+                stockAlert.textContent = '';
+                return;
+            }
+
+            if (tone === 'danger') {
+                stockAlert.classList.add('border-red-400/50', 'bg-red-950/50', 'text-red-200');
+            } else if (tone === 'warning') {
+                stockAlert.classList.add('border-amber-400/50', 'bg-amber-950/40', 'text-amber-200');
+            } else {
+                stockAlert.classList.add('border-cyan-400/40', 'bg-cyan-950/30', 'text-cyan-100');
+            }
+            stockAlert.textContent = message;
+        }
+
+        function updateStockAlert() {
+            var origin = syncOrigenField(repOrigen && repOrigen.value || '');
+            var repuestoId = idHidden && String(idHidden.value || '').trim();
+            var stock = Number((repStockDisponible && repStockDisponible.value) || 0) || 0;
+            var stockMinimo = Number((repStockMinimo && repStockMinimo.value) || 0) || 0;
+            var cantidad = Number((qEl && qEl.value) || 0) || 0;
+
+            if (!repuestoId || origin !== 'STOCK_BODEGA') {
+                setStockAlertState('', '');
+                return;
+            }
+
+            if (stock <= 0) {
+                setStockAlertState('Sin stock disponible en bodega.', 'danger');
+                return;
+            }
+
+            if (cantidad > stock) {
+                setStockAlertState('Solicitas ' + cantidad + ' y solo hay ' + stock + ' en stock.', 'danger');
+                return;
+            }
+
+            if (stockMinimo > 0 && (stock - cantidad) < stockMinimo) {
+                setStockAlertState(
+                    'Después de esta línea quedarían ' + (stock - cantidad) + ' unidades, bajo el mínimo de ' + stockMinimo + '.',
+                    'warning'
+                );
+                return;
+            }
+
+            if (stockMinimo > 0 && stock <= stockMinimo) {
+                setStockAlertState('Stock actual en umbral mínimo: ' + stock + ' / ' + stockMinimo + '.', 'warning');
+                return;
+            }
+
+            setStockAlertState('', '');
+        }
+
         function recalc() {
             var cantidad = Number((qEl && qEl.value) || 0) || 0;
             var precio = EG.utils.parseNumericInput(inpPV && inpPV.value || 0);
             var subtotal = cantidad * precio;
             if (sub) sub.value = subtotal;
             if (view) view.textContent = money(subtotal);
+            updateStockAlert();
             if (typeof window.serializeRows === 'function') window.serializeRows();
             if (typeof window.recalcTotales === 'function') window.recalcTotales();
         }
@@ -256,8 +365,10 @@
                 var precio = EG.utils.parseNumericInput(part.precio_venta);
                 inpPV.value = precio > 0 ? EG.utils.formatNumberInput(precio) : '';
             }
-            if (repOrigen) repOrigen.value = part.origen_repuesto || 'STOCK_BODEGA';
             if (repPiezaDesarmeId) repPiezaDesarmeId.value = part.pieza_desarme_id || '';
+            if (repStockDisponible) repStockDisponible.value = part.stock !== undefined ? part.stock : '';
+            if (repStockMinimo) repStockMinimo.value = part.stock_minimo !== undefined ? part.stock_minimo : '';
+            syncOrigenField(part.origen_repuesto || '');
             var costoRaw = part.costo_linea !== undefined && part.costo_linea !== ''
                 ? part.costo_linea
                 : (part.precio_compra || 0);
@@ -266,6 +377,7 @@
                 var isDesarme = part.origen_repuesto === 'DESARME' || !!part.pieza_desarme_id;
                 desarmeBadge.classList.toggle('hidden', !isDesarme);
             }
+            hideCostPanel();
             recalc();
         }
 
@@ -289,13 +401,18 @@
                 return;
             }
 
-            var localMatches = EG.utils.filterPrefetchItems((EG.PREFETCH && EG.PREFETCH.repuestos) || [], ['codigo', 'nombre', 'part_number'], q, 15);
+            var localMatches = EG.utils.filterPrefetchItems(
+                (EG.PREFETCH && EG.PREFETCH.repuestos) || [],
+                ['codigo', 'nombre', 'part_number', 'proveedor', 'supplier', 'vendor'],
+                q,
+                15
+            );
             if (localMatches.length) {
                 renderResultadosRepuestos(localMatches, activeDrop);
             }
 
             try {
-                var response = await EG.utils.egFetch((EG.cfg.URL_REPUESTO_SEARCH || '/cl/api/repuestos/') + '?q=' + encodeURIComponent(q));
+                var response = await EG.utils.egFetch((EG.cfg.URL_REPUESTO_SEARCH || EG.config.buildEndpoint('/api/repuestos/')) + '?q=' + encodeURIComponent(q));
                 if (!response.ok) {
                     throw new Error('HTTP ' + response.status);
                 }
@@ -332,12 +449,23 @@
                 div.dataset.nombre = item.nombre || '';
                 div.dataset.precio = item.precio_venta || 0;
                 div.dataset.precioCompra = item.precio_compra || 0;
+                div.dataset.proveedor = item.proveedor || '';
+                div.dataset.stock = item.stock || 0;
+                div.dataset.stockMinimo = item.stock_minimo || 0;
                 div.dataset.origen = item.origen_repuesto || 'STOCK_BODEGA';
                 div.dataset.piezaDesarmeId = item.pieza_desarme_id || '';
                 div.dataset.costoLinea = item.costo_linea || '';
+                var stockText = 'Stock: ' + (Number(item.stock || 0) || 0);
+                if ((Number(item.stock_minimo || 0) || 0) > 0) {
+                    stockText += ' | Min: ' + (Number(item.stock_minimo || 0) || 0);
+                }
                 div.innerHTML = '<div class="text-cyan-200 font-semibold">'
                     + escapeHtml((item.codigo ? item.codigo + ' - ' : '') + (item.nombre || ''))
-                    + '</div><div class="text-xs text-gray-300">' + money(item.precio_venta || 0) + '</div>';
+                    + '</div><div class="text-xs text-gray-300">'
+                    + (item.proveedor ? escapeHtml(item.proveedor) + ' | ' : '')
+                    + stockText + ' | '
+                    + money(item.precio_venta || 0)
+                    + '</div>';
                 activeDrop.appendChild(div);
             });
             activeDrop.classList.remove('hidden');
@@ -351,6 +479,8 @@
                 nombre: el.dataset.nombre,
                 precio_venta: el.dataset.precio,
                 precio_compra: el.dataset.precioCompra,
+                stock: el.dataset.stock,
+                stock_minimo: el.dataset.stockMinimo,
                 origen_repuesto: el.dataset.origen,
                 pieza_desarme_id: el.dataset.piezaDesarmeId,
                 costo_linea: el.dataset.costoLinea,
@@ -367,6 +497,16 @@
                 if (!costPanel) {
                     return;
                 }
+                document.querySelectorAll('#repuestos-container .rep-cost-panel').forEach(function(panel) {
+                    if (panel !== costPanel) {
+                        panel.classList.add('hidden');
+                    }
+                });
+                document.querySelectorAll('#repuestos-container .rep-toggle-cost').forEach(function(button) {
+                    if (button !== toggleCostBtn) {
+                        button.setAttribute('aria-expanded', 'false');
+                    }
+                });
                 costPanel.classList.toggle('hidden');
                 var isOpen = !costPanel.classList.contains('hidden');
                 toggleCostBtn.setAttribute('aria-expanded', String(isOpen));
@@ -380,7 +520,12 @@
         [row, searchInput, inpCode, inpPV, qEl].forEach(function(node) {
             if (node) {
                 node.addEventListener('focus', function() { markRowAsActive(row); }, true);
-                node.addEventListener('click', function() { markRowAsActive(row); });
+                node.addEventListener('click', function(event) {
+                    markRowAsActive(row);
+                    if (!event.target.closest('.rep-cost-panel') && !event.target.closest('.rep-toggle-cost')) {
+                        hideCostPanel();
+                    }
+                });
             }
         });
 
@@ -392,7 +537,7 @@
 
         if (searchInput) {
             searchInput.addEventListener('input', function(event) {
-                if (idHidden) idHidden.value = '';
+                clearSelectedPartState();
                 if (repNombre) repNombre.value = event.target.value || '';
                 clearTimeout(timer);
                 timer = setTimeout(function() {
@@ -408,6 +553,7 @@
 
         if (inpCode) {
             inpCode.addEventListener('input', function(event) {
+                clearSelectedPartState();
                 clearTimeout(timer);
                 timer = setTimeout(function() {
                     searchRepuestos(event.target.value.trim(), codeDrop || drop);
@@ -456,16 +602,28 @@
             });
             costInput.addEventListener('blur', function() {
                 syncCostField(costInput.value, true);
+                window.setTimeout(function() {
+                    if (document.activeElement !== toggleCostBtn && !(costPanel && costPanel.contains(document.activeElement))) {
+                        hideCostPanel();
+                    }
+                }, 0);
             });
             costInput.addEventListener('keydown', function(event) {
                 if (event.key === 'Enter') {
                     event.preventDefault();
                     syncCostField(costInput.value, true);
-                    costInput.blur();
+                    hideCostPanel();
+                    if (inpPV) {
+                        inpPV.focus();
+                    } else {
+                        costInput.blur();
+                    }
                 }
             });
         }
 
+        syncOrigenField(repOrigen && repOrigen.value || '');
+        updateStockAlert();
         toggleRepuestosEmptyHint();
         refreshHeaderLabels();
     }
@@ -546,5 +704,3 @@
     window.addRepuestoRow = addRepuestoRow;
     window.openUsedPartsModal = openUsedPartsModal;
 })();
-
-

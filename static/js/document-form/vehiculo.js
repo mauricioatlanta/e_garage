@@ -8,6 +8,29 @@
     var EG = window.EG = window.EG || {};
     var elements = {};
 
+    function joinVehicleLabel(parts) {
+        return parts.filter(function(part) {
+            return String(part || '').trim() !== '';
+        }).map(function(part) {
+            return String(part).trim();
+        }).join(' - ');
+    }
+
+    function buildVehicleLabel(vehicle) {
+        var patente = vehicle.patente || vehicle.placa || vehicle.plate || '';
+        var marca = vehicle.marca || vehicle.brand || vehicle.make || vehicle.marca_nombre || vehicle['marca__nombre'] || '';
+        var modelo = vehicle.modelo || vehicle.model || vehicle.modelo_nombre || vehicle['modelo__nombre'] || '';
+        var anio = vehicle.anio || vehicle.year || '';
+        var vin = vehicle.vin || vehicle.chassis || '';
+
+        return joinVehicleLabel([
+            anio,
+            marca,
+            modelo,
+            patente || vin,
+        ]);
+    }
+
     function getElements() {
         if (!elements.vehiculoSelect) {
             elements.vehiculoSelect = document.getElementById('id_vehiculo');
@@ -34,14 +57,20 @@
         var vehicle = item || {};
         var id = vehicle.id || vehicle.pk || '';
         var patente = vehicle.patente || vehicle.placa || vehicle.plate || '';
-        var marca = vehicle.marca || vehicle.brand || vehicle.make || '';
-        var modelo = vehicle.modelo || vehicle.model || '';
+        var marca = vehicle.marca || vehicle.brand || vehicle.make || vehicle.marca_nombre || vehicle['marca__nombre'] || '';
+        var modelo = vehicle.modelo || vehicle.model || vehicle.modelo_nombre || vehicle['modelo__nombre'] || '';
         var anio = vehicle.anio || vehicle.year || '';
         var vin = vehicle.vin || vehicle.chassis || '';
         var label = vehicle.text
             || vehicle.label
             || vehicle.display_label
-            || [patente, marca, modelo].filter(Boolean).join(' - ')
+            || buildVehicleLabel({
+                patente: patente,
+                marca: marca,
+                modelo: modelo,
+                anio: anio,
+                vin: vin,
+            })
             || ('Vehiculo #' + id);
 
         return {
@@ -164,17 +193,31 @@
             return;
         }
 
+        var labelText = item.label || buildVehicleLabel(item);
+        var vinText = item.vin ? ('VIN: ' + item.vin) : '';
+        var mileageText = item.mileage || '';
+        var metaText = item.meta || '';
+        var hasSummaryDetails = false;
+
         if (els.marcaModeloEl) {
-            els.marcaModeloEl.textContent = item.label || [item.patente, item.marca, item.modelo].filter(Boolean).join(' - ');
+            els.marcaModeloEl.textContent = labelText;
+            hasSummaryDetails = hasSummaryDetails || !!labelText;
         }
         if (els.anoVinEl) {
-            els.anoVinEl.textContent = [item.anio, item.vin].filter(Boolean).join(' | ');
+            els.anoVinEl.textContent = vinText;
+            hasSummaryDetails = hasSummaryDetails || !!vinText;
         }
         if (els.mileageEl) {
-            els.mileageEl.textContent = item.mileage || '';
+            els.mileageEl.textContent = mileageText;
+            hasSummaryDetails = hasSummaryDetails || !!mileageText;
         }
         if (els.ultimaEntradaEl) {
-            els.ultimaEntradaEl.textContent = item.meta || '';
+            els.ultimaEntradaEl.textContent = metaText;
+            hasSummaryDetails = hasSummaryDetails || !!metaText;
+        }
+        if (!hasSummaryDetails) {
+            els.vehiculoInfoBox.classList.add('hidden');
+            return;
         }
         els.vehiculoInfoBox.classList.remove('hidden');
 

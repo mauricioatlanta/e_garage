@@ -1,5 +1,6 @@
 from django.urls import path
 
+from taller.views.reabastecimiento import ReabastecimientoPanelView
 from taller.repuestos.views import (
     buscar_repuestos_ajax,
     crear_repuesto,
@@ -15,6 +16,11 @@ app_name = "repuestos"
 
 urlpatterns = [
     path("", lista_repuestos, name="lista_repuestos"),
+    path(
+        "reabastecimiento/",
+        ReabastecimientoPanelView.as_view(),
+        name="reabastecimiento",
+    ),
     path("crear/", crear_repuesto, name="crear_repuesto"),
     path("<int:pk>/", ver_repuesto, name="ver_repuesto"),
     path("editar/<int:pk>/", editar_repuesto, name="editar_repuesto"),

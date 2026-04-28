@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 import json
 
@@ -50,6 +50,29 @@ def _serialize_otro(linea):
             getattr(linea, "subtotal", 0) or getattr(linea, "precio_cliente", 0) or 0
         ),
     }
+
+
+def _vehicle_form_label(vehiculo):
+    marca = (
+        getattr(vehiculo, "marca_texto", "")
+        or getattr(getattr(vehiculo, "marca", None), "nombre", "")
+        or ""
+    )
+    modelo = (
+        getattr(vehiculo, "modelo_texto", "")
+        or getattr(getattr(vehiculo, "modelo", None), "nombre", "")
+        or ""
+    )
+    patente = getattr(vehiculo, "patente", "") or getattr(vehiculo, "placa", "") or ""
+    anio = getattr(vehiculo, "anio", "") or ""
+
+    parts = [
+        str(anio).strip() if anio else "",
+        str(marca).strip(),
+        str(modelo).strip(),
+        str(patente).strip() or str(getattr(vehiculo, "vin", "") or "").strip(),
+    ]
+    return " - ".join(part for part in parts if part) or f"Vehículo #{vehiculo.pk}"
 
 
 def _empty_line_item_payloads():
@@ -162,10 +185,20 @@ def build_form_payloads(*, form_mode, documento=None):
             }
         ]
     if getattr(source_document, "vehiculo", None):
+        vehiculo = source_document.vehiculo
         payload["vehiculos_prefetch"] = [
             {
-                "id": source_document.vehiculo.id,
-                "label": str(source_document.vehiculo),
+                "id": vehiculo.id,
+                "cliente_id": getattr(vehiculo, "cliente_id", None),
+                "label": _vehicle_form_label(vehiculo),
+                "text": _vehicle_form_label(vehiculo),
+                "display_label": _vehicle_form_label(vehiculo),
+                "patente": vehiculo.patente or "",
+                "placa": vehiculo.patente or "",
+                "vin": vehiculo.vin or "",
+                "anio": vehiculo.anio,
+                "marca": vehiculo.get_marca_display(),
+                "modelo": vehiculo.get_modelo_display(),
             }
         ]
 
@@ -222,8 +255,15 @@ def build_prefetch_payloads(*, empresa, language, mode):
         {
             "id": vehiculo.id,
             "cliente_id": vehiculo.cliente_id,
-            "label": vehiculo.display_label(),
-            "text": vehiculo.display_label(),
+            "label": _vehicle_form_label(vehiculo),
+            "text": _vehicle_form_label(vehiculo),
+            "display_label": _vehicle_form_label(vehiculo),
+            "patente": vehiculo.patente or "",
+            "placa": vehiculo.patente or "",
+            "vin": vehiculo.vin or "",
+            "anio": vehiculo.anio,
+            "marca": vehiculo.get_marca_display(),
+            "modelo": vehiculo.get_modelo_display(),
         }
         for vehiculo in Vehiculo.objects.filter(
             empresa=empresa,
@@ -263,9 +303,12 @@ def build_prefetch_payloads(*, empresa, language, mode):
                 servicio.subcategoria.get_label(language) if servicio.subcategoria else ""
             ),
             "subcategoria_code": servicio.subcategoria.code if servicio.subcategoria else "",
-            "precio": 0.0,
-            "precio_sugerido": 0.0,
-            "precio_cliente": 0.0,
+            "label": servicio.get_label(language),
+            "text": servicio.get_label(language),
+            "precio": float(servicio.precio_base or Decimal("0")),
+            "precio_base": float(servicio.precio_base or Decimal("0")),
+            "precio_sugerido": float(servicio.precio_base or Decimal("0")),
+            "precio_cliente": float(servicio.precio_base or Decimal("0")),
         }
         for servicio in servicios_qs[:50]
     ]
@@ -275,12 +318,17 @@ def build_prefetch_payloads(*, empresa, language, mode):
             "nombre": servicio.nombre,
             "empresa": servicio.empresa_externa,
             "empresa_ext": servicio.empresa_externa,
+            "empresa_externa": servicio.empresa_externa,
             "categoria": servicio.categoria.get_label(language) if servicio.categoria else "",
             "subcategoria": (
                 servicio.subcategoria.get_label(language) if servicio.subcategoria else ""
             ),
             "precio_taller": float(servicio.costo_taller or Decimal("0")),
+            "costo_taller": float(servicio.costo_taller or Decimal("0")),
+            "precio": float(servicio.precio_cliente or Decimal("0")),
             "precio_cliente": float(servicio.precio_cliente or Decimal("0")),
+            "label": servicio.nombre,
+            "text": servicio.nombre,
         }
         for servicio in ServicioExterno.objects.filter(empresa=empresa, activo=True)
         .select_related("categoria", "subcategoria")

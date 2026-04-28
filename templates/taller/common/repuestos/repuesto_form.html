@@ -154,7 +154,7 @@ select option {
           💰 Información Comercial
         </h3>
 
-        <div class="grid-3-cols">
+        <div class="grid-2-cols">
           <div class="form-group">
             <label for="{{ form.precio_compra.id_for_label }}">{{ form.precio_compra.label }}</label>
             {{ form.precio_compra|add_class:"form-control" }}
@@ -185,6 +185,19 @@ select option {
             {% endif %}
             {% if form.cantidad_stock.errors %}
               <div class="text-red-400 text-sm mt-1">{{ form.cantidad_stock.errors.0 }}</div>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="grid-2-cols">
+          <div class="form-group">
+            <label for="{{ form.stock_minimo.id_for_label }}">{{ form.stock_minimo.label }}</label>
+            {{ form.stock_minimo|add_class:"form-control" }}
+            {% if form.stock_minimo.help_text %}
+              <div class="text-gray-400 text-sm mt-1">{{ form.stock_minimo.help_text }}</div>
+            {% endif %}
+            {% if form.stock_minimo.errors %}
+              <div class="text-red-400 text-sm mt-1">{{ form.stock_minimo.errors.0 }}</div>
             {% endif %}
           </div>
         </div>

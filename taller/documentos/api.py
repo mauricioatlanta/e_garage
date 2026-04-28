@@ -36,6 +36,61 @@ def _round2(x: Decimal) -> Decimal:
     return x.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
 
 
+def _vehicle_label(vehiculo) -> str:
+    """Etiqueta consistente para el selector/autocomplete de vehículos."""
+    marca = (
+        getattr(vehiculo, "marca_texto", "")
+        or getattr(getattr(vehiculo, "marca", None), "nombre", "")
+        or ""
+    )
+    modelo = (
+        getattr(vehiculo, "modelo_texto", "")
+        or getattr(getattr(vehiculo, "modelo", None), "nombre", "")
+        or ""
+    )
+    patente = getattr(vehiculo, "patente", "") or getattr(vehiculo, "placa", "") or ""
+    anio = getattr(vehiculo, "anio", "") or ""
+
+    parts = [
+        str(anio).strip() if anio else "",
+        str(marca).strip(),
+        str(modelo).strip(),
+        str(patente).strip() or str(getattr(vehiculo, "vin", "") or "").strip(),
+    ]
+    label = " - ".join(part for part in parts if part)
+    return label or f"Vehículo #{vehiculo.pk}"
+
+
+def _serialize_vehicle(vehiculo):
+    marca = (
+        getattr(vehiculo, "marca_texto", "")
+        or getattr(getattr(vehiculo, "marca", None), "nombre", "")
+        or ""
+    )
+    modelo = (
+        getattr(vehiculo, "modelo_texto", "")
+        or getattr(getattr(vehiculo, "modelo", None), "nombre", "")
+        or ""
+    )
+    patente = getattr(vehiculo, "patente", "") or getattr(vehiculo, "placa", "") or ""
+    vin = getattr(vehiculo, "vin", "") or ""
+    label = _vehicle_label(vehiculo)
+
+    return {
+        "id": vehiculo.id,
+        "cliente_id": getattr(vehiculo, "cliente_id", None),
+        "patente": patente,
+        "placa": patente,
+        "vin": vin,
+        "anio": getattr(vehiculo, "anio", None),
+        "marca": marca,
+        "modelo": modelo,
+        "text": label,
+        "label": label,
+        "display_label": label,
+    }
+
+
 @login_required
 @require_GET
 def api_vehiculos_por_cliente(request):
@@ -53,19 +108,9 @@ def api_vehiculos_por_cliente(request):
     qs = (
         Vehiculo.objects.filter(cliente_id=cid, empresa=empresa)
         .select_related("marca", "modelo")
-        .values(
-            "id",
-            "patente",
-            "vin",
-            "anio",
-            "marca__nombre",
-            "modelo__nombre",
-            "marca_texto",
-            "modelo_texto",
-        )
-        .order_by("patente", "id")
+        .order_by("-anio", "patente", "id")
     )
-    return _json_ok(list(qs))
+    return _json_ok([_serialize_vehicle(vehiculo) for vehiculo in qs])
 
 
 @login_required

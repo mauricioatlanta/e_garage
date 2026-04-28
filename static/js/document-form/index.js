@@ -5,7 +5,7 @@
 (function() {
     'use strict';
 
-    var APP_VERSION = '2.5.4';
+    var APP_VERSION = '3.1.3';
 
     window.EG = window.EG || {};
     window.EG.APP_VERSION = APP_VERSION;
@@ -263,7 +263,15 @@
             return;
         }
 
-        form.addEventListener('submit', function() {
+        form.addEventListener('submit', function(event) {
+            if (
+                window.EG.servicios
+                && typeof window.EG.servicios.validateOtrosRows === 'function'
+                && !window.EG.servicios.validateOtrosRows(true)
+            ) {
+                event.preventDefault();
+                return;
+            }
             if (window.serializeRows) {
                 window.serializeRows();
             }
@@ -372,3 +380,4 @@
     window.EG.initAllModules = initAllModules;
     window.EG.loadModule = loadModule;
 })();
+

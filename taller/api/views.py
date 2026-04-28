@@ -434,9 +434,11 @@ def repuesto_by_code_api(request):
         "id": r.pk,
         "codigo": r.part_number,
         "nombre": getattr(r, "nombre", ""),
+        "proveedor": getattr(r, "proveedor", "") or "",
         "precio_compra": float(getattr(r, "precio_compra", 0) or 0),
         "precio_venta_sugerido": float(getattr(r, "precio_venta", 0) or 0),
         "stock": getattr(r, "cantidad_stock", 0) or 0,
+        "stock_minimo": getattr(r, "stock_minimo", 0) or 0,
     }
     return JsonResponse(data)
 
@@ -453,7 +455,9 @@ def buscar_repuestos_api(request):
         return JsonResponse({"results": []})
 
     qs = Repuesto.objects.filter(empresa=empresa).filter(
-        models.Q(part_number__icontains=q) | models.Q(nombre__icontains=q)
+        models.Q(part_number__icontains=q)
+        | models.Q(nombre__icontains=q)
+        | models.Q(proveedor__icontains=q)
     )
 
     paginated = _paginate(qs.order_by("nombre"), request)
@@ -462,9 +466,11 @@ def buscar_repuestos_api(request):
             "id": r.pk,
             "codigo": r.part_number,
             "nombre": getattr(r, "nombre", ""),
+            "proveedor": getattr(r, "proveedor", "") or "",
             "precio_compra": float(getattr(r, "precio_compra", 0) or 0),
             "precio_venta_sugerido": float(getattr(r, "precio_venta", 0) or 0),
             "stock": getattr(r, "cantidad_stock", 0) or 0,
+            "stock_minimo": getattr(r, "stock_minimo", 0) or 0,
         }
         for r in paginated["queryset"]
     ]

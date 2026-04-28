@@ -598,6 +598,119 @@
   z-index: 9999;
 }
 
+#doc-shell .doc-pos-header-repuestos,
+#doc-shell #repuestos-container .dynamic-element .repuesto-row-grid {
+  grid-template-columns: minmax(96px, 1.05fr) minmax(210px, 4.35fr) minmax(72px, 0.85fr) minmax(132px, 1.3fr) minmax(132px, 1.3fr) 56px !important;
+}
+
+#doc-shell #repuestos-container .dynamic-element .repuesto-row-grid {
+  align-items: start !important;
+  gap: 8px !important;
+}
+
+#doc-shell .doc-pos-header-repuestos > span,
+#doc-shell #repuestos-container .dynamic-element .repuesto-row-grid > * {
+  grid-column: auto !important;
+  min-width: 0 !important;
+}
+
+#doc-shell #repuestos-container .dynamic-element .repuesto-cell {
+  width: 100%;
+  min-width: 0;
+}
+
+#doc-shell #repuestos-container .dynamic-element .rep-desarme-badge {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  z-index: 2;
+}
+
+#doc-shell #repuestos-container .dynamic-element .rep-toggle-cost {
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  width: 1.8rem;
+  height: 1.8rem;
+  transform: translateY(-50%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 9999px;
+  background: transparent;
+  color: #7dd3fc;
+  cursor: pointer;
+}
+
+#doc-shell #repuestos-container .dynamic-element .rep-eye-icon {
+  width: 1rem;
+  height: 1rem;
+  stroke: currentColor;
+  stroke-width: 1.75;
+  fill: none;
+}
+
+#doc-shell #repuestos-container .dynamic-element .rep-cost-panel {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 40;
+  padding: 0.75rem;
+  border: 1px solid rgba(71, 85, 105, 0.65);
+  border-radius: 0.75rem;
+  background: rgba(2, 6, 23, 0.96);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.32);
+}
+
+#doc-shell #repuestos-container .dynamic-element .rep-cost-input-wrap,
+#doc-shell #repuestos-container .dynamic-element .rep-cost-label,
+#doc-shell #repuestos-container .dynamic-element .rep-cost-value {
+  display: block;
+}
+
+#doc-shell #repuestos-container .dynamic-element .rep-cost-label {
+  margin-bottom: 0.35rem;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #94a3b8;
+  text-transform: uppercase;
+}
+
+#doc-shell #repuestos-container .dynamic-element .rep-cost-input-shell {
+  position: relative;
+}
+
+#doc-shell #repuestos-container .dynamic-element .rep-cost-currency {
+  position: absolute;
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #7dd3fc;
+}
+
+#doc-shell #repuestos-container .dynamic-element .rep-cost-input {
+  width: 100%;
+  min-height: var(--doc-input-h);
+  padding: var(--doc-input-pad);
+  padding-left: 1.75rem;
+  border: var(--doc-border);
+  border-radius: 6px;
+  background: var(--doc-bg-input);
+  color: #e2e8f0;
+  box-sizing: border-box;
+}
+
+#doc-shell #repuestos-container .dynamic-element .rep-cost-value {
+  margin-top: 0.5rem;
+  font-size: 12px;
+  font-weight: 700;
+  color: #cbd5e1;
+  text-align: right;
+}
+
 
 #repuestos-container {
   overflow: visible !important;
