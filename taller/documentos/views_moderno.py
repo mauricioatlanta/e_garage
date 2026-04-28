@@ -861,6 +861,7 @@ def documento_form(request, pk=None):
         form = DocumentoForm(
             request.POST, request.FILES or None, instance=documento, user=request.user
         )
+
         if form.is_valid():
             doc = (
                 form.save()
@@ -988,6 +989,9 @@ def documento_form(request, pk=None):
             "company_country": company_country,
             "today": now().date(),
             "settings_url": settings_url,
+            "repuestos_json": request.POST.get("repuestos_json", "[]"),
+            "servicios_json": request.POST.get("servicios_json", "[]"),
+            "otros_json": request.POST.get("otros_json", "[]"),
         },
         status=422,
     )
@@ -1047,6 +1051,9 @@ def documento_form(request, pk=None):
             "company_country": company_country,
             "today": now().date(),
             "settings_url": settings_url,
+            "repuestos_json": request.POST.get("repuestos_json", "[]"),
+            "servicios_json": request.POST.get("servicios_json", "[]"),
+            "otros_json": request.POST.get("otros_json", "[]"),
         },
     )
 

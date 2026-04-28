@@ -1,4 +1,4 @@
-﻿/**
+/**
  * index.js - Punto de entrada del formulario de documentos
  */
 
@@ -138,7 +138,7 @@
         } catch (err) {
             console.warn('Error limpiando estado del documento:', err);
         }
-    })();
+})();
 
     var MODULE_LOAD_ORDER = [
         'config',
@@ -159,7 +159,7 @@
         return new Promise(function(resolve, reject) {
             var script = document.createElement('script');
             script.src = '/static/js/document-form/' + moduleName + '.js?v=' + encodeURIComponent(APP_VERSION);
-            script.onload = resolve;
+            script.onload = function(){ console.log('LOADED:', moduleName); resolve(); };
             script.onerror = function(err) {
                 reject(new Error('Failed to load ' + moduleName + ': ' + err));
             };
@@ -374,10 +374,15 @@
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initAllModules);
     } else {
-        initAllModules();
+        initAllModules(); 
     }
 
     window.EG.initAllModules = initAllModules;
     window.EG.loadModule = loadModule;
 })();
+
+
+
+
+
 

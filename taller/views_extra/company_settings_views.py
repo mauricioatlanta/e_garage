@@ -61,11 +61,14 @@ def company_settings_view(request):
             else:
                 messages.error(request, "El nombre es obligatorio.")
 
+    tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("nombre")
+
     return render(
         request,
         "taller/company/settings.html",
         {
             "empresa": empresa,
+            "tecnicos": tecnicos,
             "config": config,
             "config_empresa": config_empresa,
         },

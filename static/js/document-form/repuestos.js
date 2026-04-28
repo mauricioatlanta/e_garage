@@ -537,7 +537,7 @@
 
         if (searchInput) {
             searchInput.addEventListener('input', function(event) {
-                clearSelectedPartState();
+                
                 if (repNombre) repNombre.value = event.target.value || '';
                 clearTimeout(timer);
                 timer = setTimeout(function() {
@@ -553,7 +553,7 @@
 
         if (inpCode) {
             inpCode.addEventListener('input', function(event) {
-                clearSelectedPartState();
+                
                 clearTimeout(timer);
                 timer = setTimeout(function() {
                     searchRepuestos(event.target.value.trim(), codeDrop || drop);
@@ -704,3 +704,4 @@
     window.addRepuestoRow = addRepuestoRow;
     window.openUsedPartsModal = openUsedPartsModal;
 })();
+

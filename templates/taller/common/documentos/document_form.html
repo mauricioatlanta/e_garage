@@ -1463,18 +1463,24 @@ input:disabled, select:disabled, textarea:disabled {
   {% endif %}
 
   <!-- Validation errors - compacto y legible -->
-  {% if form.errors %}
-    <div class="doc-form-validation-errors">
-      <p class="doc-form-validation-title">{% trans "Validation errors" %}</p>
-      <ul class="doc-form-validation-list">
-        {% for field, errors in form.errors.items %}
-          {% for msg in errors %}
-            <li>{{ msg }}</li>
-          {% endfor %}
-        {% endfor %}
-      </ul>
+  {% if form.non_field_errors %}
+<div class="bg-red-500/10 border border-red-500 text-red-400 p-3 rounded mb-4">
+  {% for error in form.non_field_errors %}
+    <div>{{ error }}</div>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% for field in form %}
+  {% if field.errors %}
+    <div class="text-red-400 text-xs mt-1">
+      <strong>{{ field.label }}:</strong>
+      {% for error in field.errors %}
+        <div>{{ error }}</div>
+      {% endfor %}
     </div>
   {% endif %}
+{% endfor %}
 
   <!-- Document workspace - cabecera consola | tarjetas cliente/vehiculo | repuestos/servicios POS | observaciones | totales cockpit -->
   <div id="doc-shell" class="max-w-7xl mx-auto p-4 space-y-4 doc-shell-workspace">
@@ -1892,3 +1898,8 @@ window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
 
 
 
+<script>
+window.repuestosIniciales = {{ repuestos_json|default:"[]"|safe }};
+window.serviciosIniciales = {{ servicios_json|default:"[]"|safe }};
+window.otrosIniciales = {{ otros_json|default:"[]"|safe }};
+</script>

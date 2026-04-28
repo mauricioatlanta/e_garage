@@ -593,9 +593,11 @@ class DocumentoForm(forms.ModelForm):
                 kwargs["pieza_desarme_id"] = pieza_desarme_id
                 kwargs["costo_linea"] = _to_decimal(rep_data.get("costo_linea", 0))
             else:
-                # BLOQUEADO: flujo inseguro eliminado
-                if part_id is not None:
+                if repuesto_id is not None:
+                    kwargs["repuesto_id"] = repuesto_id
+                elif part_id is not None:
                     kwargs["part_id"] = part_id
+
                 costo_linea = rep_data.get("costo_linea")
                 if costo_linea not in (None, "", "None"):
                     kwargs["costo_linea"] = _to_decimal(costo_linea)
