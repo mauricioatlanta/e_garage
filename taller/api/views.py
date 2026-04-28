@@ -445,7 +445,7 @@ def repuesto_by_code_api(request):
 
 @login_required
 @require_GET
-def buscar_repuestos_api(request):
+def buscar_repuestos_api(request, pais=None):
     empresa = _get_empresa(request)
     if not empresa:
         return JsonResponse({"results": []})
