@@ -37,6 +37,24 @@ import sys
 from pathlib import Path
 
 files = subprocess.check_output(["git", "ls-files", "*.py"], text=True).splitlines()
+runtime_prefixes = (
+    "gestion_taller/",
+    "taller/",
+    "payments/",
+    "documentos/",
+    "desarmaduria/",
+)
+exclude_prefixes = (
+    "scripts/",
+    "scripts/root_scripts/",
+)
+files = [
+    name for name in files
+    if name == "manage.py" or (
+        name.startswith(runtime_prefixes)
+        and not name.startswith(exclude_prefixes)
+    )
+]
 bad = []
 for name in files:
     p = Path(name)
