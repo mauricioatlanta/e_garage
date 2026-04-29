@@ -91,10 +91,10 @@ echo "===== HEALTH CHECK ====="
 curl --fail --max-time 10 --unix-socket "$SOCKET" \
   -H "Host: $HOST_HEADER" \
   -H "X-Forwarded-Proto: https" \
-  http://localhost/healthz/
+  http://dummy/healthz/
 
 echo "===== SMOKE TEST SERVICIOS ====="
-curl --fail --max-time 15 --unix-socket "$SOCKET"   -H "Host: $HOST_HEADER"   -H "X-Forwarded-Proto: https"   -o /dev/null   http://localhost/cl/es/servicios/api/menu/
+curl --fail --max-time 15 --unix-socket "$SOCKET"   -H "Host: $HOST_HEADER"   -H "X-Forwarded-Proto: https"   -o /dev/null   http://dummy/cl/es/servicios/api/menu/
 
 echo "===== OK DEPLOY ====="
 git log --oneline -1
