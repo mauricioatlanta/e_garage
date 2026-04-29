@@ -694,6 +694,7 @@
   {% if form %}{% form_media_once form 'css' %}{% endif %}
   {% block extra_head %}{% endblock %}
   {% block extra_css %}{% endblock %}
+<link rel='stylesheet' href='{% static "css/theme.css" %}'>
 </head>
 
 <body class="min-h-screen flex flex-col{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %} eg-desarme-dashboard-compact{% endif %}">

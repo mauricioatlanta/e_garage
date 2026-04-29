@@ -1,14 +1,14 @@
-{% extends 'base.html' %}
+﻿{% extends 'layouts/app.html' %}
 {% load custom_filters %}
 {% load country_url %}
 {% load static %}
 {% load i18n %}
 
 {% block extra_head %}
-<link href="/static/css/estilo_futurista.css" rel="stylesheet">
-<link href="/static/css/galaxy_theme.css" rel="stylesheet">
+
+
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
   tsParticles.load("tsparticles", {
@@ -206,7 +206,7 @@ body::before {
 }
 
 .form-group label::before {
-  content: '▶';
+  content: 'â–¶';
   position: absolute;
   left: -12px;
   color: #00e6d0;
@@ -345,8 +345,8 @@ h1 {
 {% block content %}
 <div class="max-w-4xl mx-auto cuadro">
   <div class="flex justify-between items-center mb-8">
-    <h1 class="text-4xl font-bold font-orbitron">🚀 {% trans "Create Client" %}</h1>
-    <a href="{% country_url 'clientes:lista_clientes' %}" class="btn-futuristic btn-secondary">← {% trans "Back to list" %}</a>
+    <h1 class="text-4xl font-bold font-orbitron">ðŸš€ {% trans "Create Client" %}</h1>
+    <a href="{% country_url 'clientes:lista_clientes' %}" class="btn-futuristic btn-secondary">â† {% trans "Back to list" %}</a>
   </div>
 
   <div class="form-card">
@@ -356,7 +356,7 @@ h1 {
 
       {% if form.errors %}
         <div class="mb-6 p-4 bg-red-900/30 border border-red-500/50 rounded-lg">
-          <h3 class="text-red-300 font-bold mb-2 font-orbitron">⚠️ {% trans "Form Errors:" %}</h3>
+          <h3 class="text-red-300 font-bold mb-2 font-orbitron">âš ï¸ {% trans "Form Errors:" %}</h3>
           {% for field, errors in form.errors.items %}
             <div class="mb-2">
               <strong class="text-red-200">{{ field }}:</strong>
@@ -487,10 +487,10 @@ h1 {
 
       <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
         <button type="submit" class="btn-futuristic">
-          💾 {% trans "Create Client" %}
+          ðŸ’¾ {% trans "Create Client" %}
         </button>
         <a href="{% country_url 'clientes:lista_clientes' %}" class="btn-futuristic btn-secondary">
-          ❌ {% trans "Cancel" %}
+          âŒ {% trans "Cancel" %}
         </a>
       </div>
     </form>
@@ -623,6 +623,9 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 {% endif %}
 {% endblock %}
+
+
+
 
 
 
