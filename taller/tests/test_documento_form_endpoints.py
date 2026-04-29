@@ -4,6 +4,7 @@ from decimal import Decimal
 import pytest
 
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 from taller.models.clientes import Cliente
 from taller.models.empresa import Empresa
@@ -82,6 +83,85 @@ def test_vehiculo_autocomplete_usa_formato_ano_marca_modelo_patente(auth_client,
 
 
 @pytest.mark.django_db
+def test_servicios_menu_shell_no_prerenderiza_catalogo(auth_client, user_cl):
+    empresa = user_cl.empresa
+    categoria = CategoriaServicio.objects.create(country="CL", code="MANT", activo=True)
+    subcategoria = SubcategoriaServicio.objects.create(
+        categoria=categoria,
+        country="CL",
+        code="ACEITE",
+        activo=True,
+    )
+    servicio = Servicio.objects.create(
+        empresa=empresa,
+        nombre="Cambio de aceite premium",
+        categoria=categoria,
+        subcategoria=subcategoria,
+        precio_base=Decimal("24990.00"),
+        activo=True,
+    )
+
+    response = auth_client.get(reverse("chile:taller:servicios:servicios_menu"))
+
+    assert response.status_code == 200
+    content = response.content.decode()
+    assert 'id="servicios-menu-config"' in content
+    assert 'id="servicesGrid"' in content
+    assert servicio.nombre not in content
+
+
+@pytest.mark.django_db
+def test_servicios_menu_data_api_devuelve_scope_de_empresa_y_urls(auth_client, user_cl):
+    empresa = user_cl.empresa
+    categoria = CategoriaServicio.objects.create(country="CL", code="MANT", activo=True)
+    subcategoria = SubcategoriaServicio.objects.create(
+        categoria=categoria,
+        country="CL",
+        code="ACEITE",
+        activo=True,
+    )
+    servicio_empresa = Servicio.objects.create(
+        empresa=empresa,
+        nombre="Cambio de aceite premium",
+        categoria=categoria,
+        subcategoria=subcategoria,
+        precio_base=Decimal("24990.00"),
+        activo=True,
+    )
+
+    other_user = User.objects.create_user(username="doc-endpoints-other", password="pass")
+    other_empresa = Empresa.objects.create(
+        user=other_user,
+        nombre_taller="EG Otra Empresa",
+        pais="CL",
+    )
+    Servicio.objects.create(
+        empresa=other_empresa,
+        nombre="Cambio de aceite externo",
+        categoria=categoria,
+        subcategoria=subcategoria,
+        precio_base=Decimal("19990.00"),
+        activo=True,
+    )
+
+    response = auth_client.get(
+        reverse("chile:taller:servicios:servicios_menu_data_api"),
+        {"q": "aceite"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    service_ids = [item["id"] for item in payload["servicios"]]
+    assert service_ids == [servicio_empresa.id]
+
+    found = payload["servicios"][0]
+    assert found["nombre"] == "Cambio de aceite premium"
+    assert found["view_url"].endswith(f"/cl/servicios/{servicio_empresa.id}/")
+    assert found["edit_url"].endswith(f"/cl/servicios/{servicio_empresa.id}/editar/")
+    assert found["delete_url"].endswith(f"/cl/servicios/{servicio_empresa.id}/eliminar/")
+
+
+@pytest.mark.django_db
 def test_buscar_servicios_api_busca_por_nombre_y_devuelve_precio(auth_client, user_cl):
     empresa = user_cl.empresa
     categoria = CategoriaServicio.objects.create(country="CL", code="MANT", activo=True)
@@ -100,7 +180,10 @@ def test_buscar_servicios_api_busca_por_nombre_y_devuelve_precio(auth_client, us
         activo=True,
     )
 
-    response = auth_client.get("/cl/servicios/api/buscar/", {"q": "aceite"})
+    response = auth_client.get(
+        reverse("chile:taller:servicios:buscar_servicios_api"),
+        {"q": "aceite"},
+    )
 
     assert response.status_code == 200
     payload = response.json()

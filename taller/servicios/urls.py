@@ -8,6 +8,7 @@ from . import api_servicios_moderno
 
 urlpatterns = [
     path("", views.servicios_menu, name="servicios_menu"),
+    path("api/menu/", views.servicios_menu_data_api, name="servicios_menu_data_api"),
     path("api/buscar/", views.buscar_servicios_api, name="buscar_servicios_api"),
     # Nuevos endpoints modernos
     path(

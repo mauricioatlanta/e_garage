@@ -1,11 +1,10 @@
-from collections import defaultdict
-
 from django.db.models import Q
 from django.http import JsonResponse
+from django.middleware.csrf import get_token
 from django.shortcuts import redirect, render
 
 from taller.templatetags.country_url import reverse_country_url
-from django.utils.translation import get_language
+from django.utils.translation import get_language, gettext as _
 from django.views.decorators.http import require_POST
 
 from django.contrib.auth.decorators import login_required
@@ -45,172 +44,259 @@ SERVICIO_TYPE_LABELS = {
 }
 
 
-# Menú principal de servicios con diseño moderno
-def servicios_menu(request):
-    # Obtener empresa del usuario
+SERVICIOS_MENU_UI_LABELS = {
+    "es": {
+        "deleteConfirm": "¿Seguro que deseas eliminar este servicio?",
+        "deleteError": "No se pudo eliminar el servicio.",
+        "searchError": "No se pudo actualizar el listado.",
+        "emptyTitle": "No se encontraron servicios",
+        "emptyMessage": "Ajusta los filtros o crea un nuevo servicio.",
+        "loading": "Cargando servicios...",
+        "resultsSingle": "1 servicio encontrado",
+        "resultsPluralSuffix": "servicios encontrados",
+    },
+    "en": {
+        "deleteConfirm": "Are you sure you want to delete this service?",
+        "deleteError": "The service could not be deleted.",
+        "searchError": "The list could not be updated.",
+        "emptyTitle": "No services found",
+        "emptyMessage": "Adjust the filters or create a new service.",
+        "loading": "Loading services...",
+        "resultsSingle": "1 service found",
+        "resultsPluralSuffix": "services found",
+    },
+    "pt": {
+        "deleteConfirm": "Tem certeza de que deseja excluir este servico?",
+        "deleteError": "Nao foi possivel excluir o servico.",
+        "searchError": "Nao foi possivel atualizar a lista.",
+        "emptyTitle": "Nenhum servico encontrado",
+        "emptyMessage": "Ajuste os filtros ou crie um novo servico.",
+        "loading": "Carregando servicos...",
+        "resultsSingle": "1 servico encontrado",
+        "resultsPluralSuffix": "servicos encontrados",
+    },
+}
+
+
+def _safe_reverse_country_url(request, view_path, fallback="#", *args, **kwargs):
+    try:
+        return reverse_country_url(request, view_path, *args, **kwargs)
+    except Exception:
+        return fallback
+
+
+def _resolve_servicios_menu_scope(request):
     empresa = getattr(request.user, "empresa", None)
-
-    # Obtener país e idioma del request
     country_code = _detectar_pais(request)
-    lang = get_language() or "es"
-    language = COUNTRY_LANGUAGE_MAP.get(country_code, (lang or "es")[:2])
+    request_lang = get_language() or getattr(request, "LANGUAGE_CODE", None) or "es"
+    language = COUNTRY_LANGUAGE_MAP.get(country_code, (request_lang or "es")[:2])
 
-    # Debug: Log para verificar qué país se está detectando
-    import logging
+    servicios_pais = Servicio.objects.filter(categoria__country=country_code)
+    total_servicios_pais = servicios_pais.count()
 
-    logger = logging.getLogger(__name__)
-    logger.info(
-        f"servicios_menu - country_code: {country_code}, language: {language}, empresa: {empresa}"
-    )
-
-    # Obtener servicios con filtros básicos
-    # Primero filtrar por país (importante para mostrar servicios correctos)
-    servicios = Servicio.objects.filter(categoria__country=country_code)
-
-    # Debug: Contar servicios antes de filtrar por empresa
-    total_servicios_pais = servicios.count()
-    logger.info(f"Total servicios para país {country_code}: {total_servicios_pais}")
-
-    # Si el usuario tiene empresa, priorizar servicios de su empresa
+    servicios_qs = servicios_pais
+    servicios_empresa_count = 0
     if empresa:
-        servicios_empresa = servicios.filter(empresa=empresa)
+        servicios_empresa = servicios_pais.filter(empresa=empresa)
         servicios_empresa_count = servicios_empresa.count()
-        logger.info(f"Servicios de empresa {empresa.id}: {servicios_empresa_count}")
-        if servicios_empresa.exists():
-            servicios = servicios_empresa
-        # Si no tiene servicios en su empresa, mostrar todos del país
-        # (ya está filtrado por país arriba)
+        if servicios_empresa_count:
+            servicios_qs = servicios_empresa
 
     servicios_qs = (
-        servicios.select_related("categoria", "subcategoria")
+        servicios_qs.select_related("categoria", "subcategoria")
         .prefetch_related("names", "categoria__names", "subcategoria__names")
-        .order_by("nombre")
-    )
-    # No filtrar por idioma en los servicios - mostrar todos y localizar después
-    servicios_list = list(servicios_qs)
-    logger.info(f"Servicios finales en lista: {len(servicios_list)}")
-
-    for servicio in servicios_list:
-        servicio.nombre_localizado = servicio.get_label(language)
-        servicio.categoria_label = (
-            servicio.categoria.get_label(language) if servicio.categoria else ""
-        )
-        servicio.subcategoria_label = (
-            servicio.subcategoria.get_label(language) if servicio.subcategoria else ""
-        )
-        raw_tipo = (getattr(servicio, "tipo", "") or "").strip().lower()
-        servicio.tipo_label = SERVICIO_TYPE_LABELS.get(language, {}).get(
-            raw_tipo, raw_tipo.title() if raw_tipo else ""
-        )
-
-    # Obtener subcategorías del país primero (para organizarlas por categoría)
-    subcategorias_qs = (
-        SubcategoriaServicio.objects.filter(country=country_code)
-        .prefetch_related("names", "categoria")
-        .select_related("categoria")
-        .order_by("categoria__code", "code")
-        .distinct()
+        .order_by("categoria__orden", "subcategoria__orden", "nombre")
     )
 
-    total_subcategorias_qs = subcategorias_qs.count()
-    logger.info(f"Total subcategorías para país {country_code}: {total_subcategorias_qs}")
+    return {
+        "empresa": empresa,
+        "country_code": country_code,
+        "language": language,
+        "servicios_qs": servicios_qs,
+        "total_servicios_pais": total_servicios_pais,
+        "servicios_empresa_count": servicios_empresa_count,
+    }
 
-    subcategorias = []
-    subcategorias_por_categoria = defaultdict(list)
-    for subcategoria in subcategorias_qs:
-        # Obtener nombre localizado (más flexible)
-        nombre = subcategoria.get_label(language)
-        # Si no hay nombre en el idioma solicitado, intentar con cualquier idioma
-        if not nombre or nombre == subcategoria.code:
-            # Intentar obtener cualquier nombre disponible
-            try:
-                any_name = subcategoria.names.first()
-                if any_name:
-                    nombre = any_name.label
-            except:
-                nombre = subcategoria.code or f"Subcategory {subcategoria.id}"
 
-        subcategoria.label_localizado = nombre
-        subcategorias.append(subcategoria)
-        # Organizar subcategorías por categoría
-        if subcategoria.categoria:
-            subcategorias_por_categoria[subcategoria.categoria].append(subcategoria)
+def _localize_taxonomy_label(item, language, fallback_prefix):
+    nombre = item.get_label(language)
+    if nombre and nombre != item.code:
+        return nombre
 
-    # Obtener categorías del país, asegurando que tengan nombres en el idioma correcto
+    try:
+        any_name = item.names.first()
+        if any_name:
+            return any_name.label
+    except Exception:
+        pass
+
+    return item.code or f"{fallback_prefix} {item.id}"
+
+
+def _get_servicios_filters(country_code, language):
     categorias_qs = (
         CategoriaServicio.objects.filter(country=country_code)
         .prefetch_related("names")
-        .order_by("code")
-        .distinct()
+        .order_by("orden", "code")
+    )
+    subcategorias_qs = (
+        SubcategoriaServicio.objects.filter(country=country_code)
+        .select_related("categoria")
+        .prefetch_related("names")
+        .order_by("categoria__orden", "orden", "code")
     )
 
-    total_categorias_qs = categorias_qs.count()
-    logger.info(f"Total categorías para país {country_code}: {total_categorias_qs}")
+    categorias = [
+        {
+            "code": categoria.code or "",
+            "label": _localize_taxonomy_label(categoria, language, "Category"),
+        }
+        for categoria in categorias_qs
+    ]
+    subcategorias = [
+        {
+            "code": subcategoria.code or "",
+            "label": _localize_taxonomy_label(subcategoria, language, "Subcategory"),
+            "categoria_code": subcategoria.categoria.code if subcategoria.categoria else "",
+        }
+        for subcategoria in subcategorias_qs
+    ]
 
-    categorias = []
-    for categoria in categorias_qs:
-        # Obtener nombre localizado (más flexible)
-        nombre = categoria.get_label(language)
-        # Si no hay nombre en el idioma solicitado, intentar con cualquier idioma
-        if not nombre or nombre == categoria.code:
-            # Intentar obtener cualquier nombre disponible
-            try:
-                any_name = categoria.names.first()
-                if any_name:
-                    nombre = any_name.label
-            except:
-                nombre = categoria.code or f"Category {categoria.id}"
-
-        categoria.label_localizado = nombre
-        # Attach subcategorias to categoria for template access
-        categoria.subcategorias_list = subcategorias_por_categoria.get(categoria, [])
-        categorias.append(categoria)
-
-    servicios_por_categoria = defaultdict(list)
-    for servicio in servicios_list:
-        if servicio.categoria and servicio.categoria.country == country_code:
-            servicios_por_categoria[servicio.categoria].append(servicio)
-
-    stats = {
-        "total_servicios": len(servicios_list),
-        "total_categorias": len(categorias),
-        "total_subcategorias": len(subcategorias),
-        "categorias_con_servicios": sum(1 for items in servicios_por_categoria.values() if items),
+    return {
+        "categorias": categorias,
+        "subcategorias": subcategorias,
     }
 
-    # Debug info
+
+def _serialize_servicio_menu_item(request, servicio, language):
+    raw_tipo = (getattr(servicio, "tipo", "") or "").strip().lower()
+    return {
+        "id": servicio.pk,
+        "nombre": servicio.get_label(language),
+        "descripcion": servicio.descripcion or "",
+        "codigo_interno": servicio.codigo_interno or "",
+        "categoria": servicio.categoria.get_label(language) if servicio.categoria else "",
+        "categoria_code": servicio.categoria.code if servicio.categoria else "",
+        "subcategoria": servicio.subcategoria.get_label(language) if servicio.subcategoria else "",
+        "subcategoria_code": servicio.subcategoria.code if servicio.subcategoria else "",
+        "tipo": SERVICIO_TYPE_LABELS.get(language, {}).get(
+            raw_tipo, raw_tipo.title() if raw_tipo else ""
+        )
+        or _("Interno"),
+        "view_url": _safe_reverse_country_url(request, "servicios:ver_servicio", "#", servicio.pk),
+        "edit_url": _safe_reverse_country_url(
+            request, "servicios:editar_servicio", "#", servicio.pk
+        ),
+        "delete_url": _safe_reverse_country_url(
+            request, "servicios:eliminar_servicio", "#", servicio.pk
+        ),
+    }
+
+
+def _get_servicios_menu_ui_labels(language):
+    return SERVICIOS_MENU_UI_LABELS.get(language, SERVICIOS_MENU_UI_LABELS["es"]).copy()
+
+
+# Menú principal de servicios con diseño moderno
+def servicios_menu(request):
+    import logging
+
+    logger = logging.getLogger(__name__)
+    scope = _resolve_servicios_menu_scope(request)
+    empresa = scope["empresa"]
+    country_code = scope["country_code"]
+    language = scope["language"]
+    filters = _get_servicios_filters(country_code, language)
+
+    logger.info(
+        f"servicios_menu - country_code: {country_code}, language: {language}, empresa: {empresa}"
+    )
+    stats = {
+        "total_servicios": scope["servicios_qs"].count(),
+        "total_categorias": len(filters["categorias"]),
+        "total_subcategorias": len(filters["subcategorias"]),
+    }
+
     debug_info = {
         "country_code": country_code,
         "language": language,
-        "total_servicios_raw": total_servicios_pais,
-        "total_categorias_raw": total_categorias_qs,
-        "total_subcategorias_raw": total_subcategorias_qs,
+        "total_servicios_raw": scope["total_servicios_pais"],
+        "servicios_empresa_raw": scope["servicios_empresa_count"],
         "empresa_id": empresa.id if empresa else None,
     }
     logger.info(f"Stats finales: {stats}")
     logger.info(f"Debug info: {debug_info}")
 
+    dashboard_url = _safe_reverse_country_url(request, "dashboard", "/")
+    servicios_menu_url = _safe_reverse_country_url(
+        request, "servicios:servicios_menu", request.path
+    )
+    servicios_data_url = _safe_reverse_country_url(
+        request, "servicios:servicios_menu_data_api", request.path
+    )
+    create_url = _safe_reverse_country_url(request, "servicios:crear_servicio", "#")
+
     context = {
-        "servicios": servicios_list[:50],  # Limitar para performance inicial
-        "servicios_por_categoria": servicios_por_categoria,
-        "categorias": categorias,
-        "subcategorias": subcategorias,
-        "subcategorias_por_categoria": subcategorias_por_categoria,
+        "categorias": filters["categorias"],
+        "subcategorias": filters["subcategorias"],
         "stats": stats,
         "empresa": empresa,
         "country_code": country_code,
         "language": language,
-        "debug_info": debug_info,  # Para debugging en template
+        "debug_info": debug_info,
+        "dashboard_url": dashboard_url,
+        "create_url": create_url,
+        "servicios_menu_config": {
+            "dataUrl": servicios_data_url,
+            "menuUrl": servicios_menu_url,
+            "dashboardUrl": dashboard_url,
+            "createUrl": create_url,
+            "csrfToken": get_token(request),
+            "labels": _get_servicios_menu_ui_labels(language),
+        },
     }
 
-    # Para usuarios de USA, usar template específico
-    if country_code == "US":
-        template_name = "us/en/servicios/servicios_menu.html"
-    else:
-        template_name = select_country_lang_template(
-            "servicios/servicios_menu.html", country_code, lang
-        )
-    return render(request, template_name, context)
+    return render(request, "taller/common/servicios/servicios_menu_shell.html", context)
+
+
+def servicios_menu_data_api(request):
+    query = (request.GET.get("q") or "").strip()
+    categoria_code = request.GET.get("categoria") or ""
+    subcategoria_code = request.GET.get("subcategoria") or ""
+
+    try:
+        limit = int(request.GET.get("limit", 24))
+    except (TypeError, ValueError):
+        limit = 24
+    limit = max(1, min(limit, 60))
+
+    scope = _resolve_servicios_menu_scope(request)
+    servicios = scope["servicios_qs"]
+    language = scope["language"]
+
+    if query:
+        servicios = servicios.filter(
+            Q(nombre__icontains=query)
+            | Q(descripcion__icontains=query)
+            | Q(codigo_interno__icontains=query)
+            | Q(names__label__icontains=query, names__language=language)
+            | Q(names__aliases__icontains=query)
+            | Q(categoria__names__label__icontains=query, categoria__names__language=language)
+            | Q(subcategoria__names__label__icontains=query, subcategoria__names__language=language)
+        ).distinct()
+
+    if categoria_code:
+        servicios = servicios.filter(categoria__code=categoria_code)
+
+    if subcategoria_code:
+        servicios = servicios.filter(subcategoria__code=subcategoria_code)
+
+    total = servicios.count()
+    data = [
+        _serialize_servicio_menu_item(request, servicio, language) for servicio in servicios[:limit]
+    ]
+
+    return JsonResponse({"servicios": data, "total": total})
 
 
 # API para búsqueda en tiempo real
@@ -709,7 +795,7 @@ def otros_servicios_menu(request):
     template_name = select_country_lang_template(
         "servicios/otros_servicios_menu.html", country_code, language
     )
-    return render(request, template_name, context)
+    return render(request, "taller/common/servicios/servicios_menu.html", context)
 
 
 # Crear otro servicio
@@ -785,7 +871,7 @@ def crear_otro_servicio(request):
         "servicios/crear_otro_servicio.html", country_code, lang
     )
 
-    return render(request, template_name, context)
+    return render(request, "taller/common/servicios/servicios_menu.html", context)
 
 
 @login_required
@@ -855,7 +941,7 @@ def editar_otro_servicio(request, pk):
         "servicios/editar_otro_servicio.html", country_code, lang
     )
 
-    return render(request, template_name, context)
+    return render(request, "taller/common/servicios/servicios_menu.html", context)
 
 
 @login_required
