@@ -280,3 +280,16 @@ SESSION_COOKIE_DOMAIN = ".egarage.cl"
 CSRF_COOKIE_DOMAIN = ".egarage.cl"
 SESSION_COOKIE_PATH = "/"
 CSRF_COOKIE_PATH = "/"
+
+
+# === REDIS CACHE (SAFE SAAS) ===
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+        "TIMEOUT": 300,
+    }
+}

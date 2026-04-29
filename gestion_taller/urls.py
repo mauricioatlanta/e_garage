@@ -89,8 +89,7 @@ from taller.views_extra.signup_email_verification import (
 )
 from taller.views_extra.signup_redirects import signup_redirect
 from taller.views_extra.pwa import dynamic_manifest, dynamic_service_worker
-from taller.views_health import health_check, health_simple
-
+from taller.views_health import health_check, health_simple, healthz
 
 try:
     from taller.views_extra.compat_redirects import compat_settings_redirect
@@ -246,6 +245,7 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 
 urlpatterns = [
+    path("healthz/", healthz, name="healthz"),
     # PWA Dinámicas (manifest y service worker por país e idioma)
     path("<str:pais>/<str:idioma>/manifest.json", dynamic_manifest, name="pwa_manifest"),
     path(

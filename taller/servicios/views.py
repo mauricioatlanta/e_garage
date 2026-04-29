@@ -1,5 +1,6 @@
 from django.db.models import Q
 from django.http import JsonResponse
+from django.core.cache import cache
 from django.middleware.csrf import get_token
 from django.shortcuts import redirect, render
 
@@ -273,6 +274,14 @@ def servicios_menu_data_api(request):
     scope = _resolve_servicios_menu_scope(request)
     servicios = scope["servicios_qs"]
     language = scope["language"]
+    empresa = scope["empresa"]
+    country = scope["country_code"]
+
+    cache_key = f"servicios_menu:{empresa.id if empresa else 0}:{country}:{language}:{query}:{categoria_code}:{subcategoria_code}:{limit}"
+
+    cached = cache.get(cache_key)
+    if cached:
+        return JsonResponse(cached)
 
     if query:
         servicios = servicios.filter(
@@ -296,7 +305,11 @@ def servicios_menu_data_api(request):
         _serialize_servicio_menu_item(request, servicio, language) for servicio in servicios[:limit]
     ]
 
-    return JsonResponse({"servicios": data, "total": total})
+    result = {"servicios": data, "total": total}
+
+    cache.set(cache_key, result, 300)
+
+    return JsonResponse(result)
 
 
 # API para búsqueda en tiempo real
