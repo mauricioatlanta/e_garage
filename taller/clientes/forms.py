@@ -59,7 +59,6 @@ class ClienteForm(forms.ModelForm):
             attrs={
                 "id": "id_region",
                 "class": "form-control",
-                "data-ciudades-url": "/taller/clientes/ajax/ciudades/",
                 "data-param-name": "region_id",
             }
         ),
@@ -82,7 +81,6 @@ class ClienteForm(forms.ModelForm):
             attrs={
                 "id": "id_estado_usa",
                 "class": "form-control",
-                "data-ciudades-url": "/taller/clientes/ajax/ciudades_usa/",
                 "data-param-name": "estado_id",
             }
         ),
@@ -132,6 +130,7 @@ class ClienteForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.empresa = kwargs.pop("empresa", None)  # Almacenar empresa
+        pais_override = kwargs.pop("pais", None)
         super().__init__(*args, **kwargs)
 
         # Solo nombre, apellido y teléfono son obligatorios (el modelo permite blank en apellido/teléfono).
@@ -142,10 +141,13 @@ class ClienteForm(forms.ModelForm):
         self.fields["direccion"].required = False
 
         # Agregar atributo pais para el template
-        if self.empresa and hasattr(self.empresa, "pais"):
+        if pais_override:
+            self.pais = pais_override
+        elif self.empresa and hasattr(self.empresa, "pais"):
             self.pais = self.empresa.pais
         else:
             self.pais = "CL"  # Default a Chile
+        self.pais = str(self.pais or "CL").upper()
 
         if self.pais == "CL" and (
             not TallerRegion.objects.exists() or not TallerCiudad.objects.exists()
@@ -218,7 +220,7 @@ class ClienteForm(forms.ModelForm):
                 pais = self.empresa.pais
             elif self.instance.pk and hasattr(self.instance, "empresa") and self.instance.empresa:
                 pais = self.instance.empresa.pais
-            self.pais = pais
+            self.pais = str(pais or "CL").upper()
 
         # Ocultar campos según el país
         if self.pais in estados_con_pais:

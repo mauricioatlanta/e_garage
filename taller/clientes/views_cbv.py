@@ -10,7 +10,31 @@ from taller.common.mixins.context_return import ContextReturnCreateMixin
 from taller.mixins import CountryLangTemplateMixin
 from taller.models.clientes import Cliente
 from taller.models.vehiculos import Vehiculo
+from taller.templatetags.country_url import reverse_country_url
 from taller.utils.empresa import get_user_empresa_safe
+
+STATE_CITY_COUNTRIES = {"US", "BR", "VE", "PE", "MX", "CO", "EC"}
+
+
+def _route_country(request, fallback=None):
+    path = ((getattr(request, "path_info", "") or request.path or "").strip()).lower()
+    if path.startswith("/us/"):
+        return "US"
+    if path.startswith("/cl/"):
+        return "CL"
+    if path.startswith("/mx/"):
+        return "MX"
+    if path.startswith("/pe/"):
+        return "PE"
+    if path.startswith("/co/"):
+        return "CO"
+    if path.startswith("/ec/"):
+        return "EC"
+    if path.startswith("/ve/"):
+        return "VE"
+    if path.startswith("/br/"):
+        return "BR"
+    return str(fallback or "").upper() or None
 
 
 class ClienteListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewMixin, ListView):
@@ -184,8 +208,6 @@ class ClienteCreateView(
     def get_default_success_url(self):
         from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
-        from django.urls import reverse
-
         # Flujo "crear cliente desde documento": usar ?next= para volver al formulario
         next_url = (self.request.POST.get("next") or self.request.GET.get("next") or "").strip()
         if next_url:
@@ -202,10 +224,7 @@ class ClienteCreateView(
                 return urlunparse(parsed._replace(query=new_query))
 
         # Obtener el país de la empresa del usuario (usa/chile montan clientes sin "taller")
-        empresa = get_user_empresa_safe(self.request.user)
-        if empresa and empresa.pais == "US":
-            return reverse("usa:clientes:lista_clientes")
-        return reverse("chile:clientes:lista_clientes")
+        return reverse_country_url(self.request, "clientes:lista_clientes")
 
     def get_created_object_payload(self):
         cliente = getattr(self, "object", None)
@@ -248,6 +267,7 @@ class ClienteCreateView(
         empresa = get_user_empresa_safe(self.request.user)
         if empresa:
             kwargs["empresa"] = empresa
+        kwargs["pais"] = _route_country(self.request, getattr(empresa, "pais", None))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -266,11 +286,11 @@ class ClienteCreateView(
         )
 
         # Asegurar que el país esté disponible para el template
-        pais = None
-        if empresa and hasattr(empresa, "pais"):
-            pais = empresa.pais
+        pais = getattr(context.get("form"), "pais", None) or _route_country(
+            self.request, getattr(empresa, "pais", None)
+        )
         context["pais_usuario"] = pais
-        context["usa_estado_ciudad"] = pais in {"US", "BR", "VE", "PE", "MX"}
+        context["usa_estado_ciudad"] = pais in STATE_CITY_COUNTRIES
 
         # Agregar colores disponibles al contexto
         from taller.models.color_cliente import ColorCliente
@@ -282,7 +302,7 @@ class ClienteCreateView(
 
         # También asegurar que el formulario tenga la información del país
         if "form" in context:
-            context["form"].pais = pais
+            context["form"].pais = pais or getattr(context["form"], "pais", "CL")
 
         return context
 
@@ -305,6 +325,7 @@ class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         empresa = get_user_empresa_safe(self.request.user)
         if empresa:
             kwargs["empresa"] = empresa
+        kwargs["pais"] = _route_country(self.request, getattr(empresa, "pais", None))
         return kwargs
 
     def get_context_data(self, **kwargs):
@@ -314,11 +335,11 @@ class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         context["empresa_actual"] = empresa
 
         # Asegurar que el país esté disponible para el template
-        pais = None
-        if empresa and hasattr(empresa, "pais"):
-            pais = empresa.pais
+        pais = getattr(context.get("form"), "pais", None) or _route_country(
+            self.request, getattr(empresa, "pais", None)
+        )
         context["pais_usuario"] = pais
-        context["usa_estado_ciudad"] = pais in {"US", "BR", "VE", "PE", "MX"}
+        context["usa_estado_ciudad"] = pais in STATE_CITY_COUNTRIES
 
         # Agregar colores disponibles al contexto
         from taller.models.color_cliente import ColorCliente
@@ -328,12 +349,13 @@ class ClienteUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, TenantView
         else:
             context["colores_disponibles"] = ColorCliente.objects.filter(activo=True)
 
+        if "form" in context:
+            context["form"].pais = pais or getattr(context["form"], "pais", "CL")
+
         return context
 
     def render_to_response(self, context, **response_kwargs):
         return self.render_country_lang(self.request, context)
 
     def get_success_url(self):
-        from django.urls import reverse
-
-        return reverse("chile:taller:clientes:lista_clientes")
+        return reverse_country_url(self.request, "clientes:lista_clientes")
