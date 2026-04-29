@@ -1,249 +1,74 @@
-{% extends "base.html" %}
-{% load i18n %}
-{% load widget_tweaks %}
+﻿{% extends 'layouts/base_egarage_panel.html' %}
+{% load custom_filters %}
 {% load country_url %}
+{% load static %}
+{% load i18n %}
 
-{% block title %}{% trans "Editar Cliente" %}{% endblock %}
+{% block title %}{% if form.instance.pk %}Editar cliente{% else %}Crear cliente{% endif %} | eGarage{% endblock %}
 
-{% block content %}
-<!-- Fondo futurista animado -->
-<div class="fixed inset-0 overflow-hidden pointer-events-none">
-  <div class="absolute inset-0 bg-gradient-to-br from-[#0a0a0a] via-[#0d1117] to-[#0f172a]"></div>
-  <!-- Partículas animadas -->
-  <div class="absolute top-16 left-12 w-2 h-2 bg-cyan-400 rounded-full animate-ping opacity-20"></div>
-  <div class="absolute top-1/3 right-20 w-1 h-1 bg-fuchsia-400 rounded-full animate-pulse opacity-30"></div>
-  <div class="absolute bottom-24 left-1/4 w-1.5 h-1.5 bg-lime-400 rounded-full animate-bounce opacity-25"></div>
-  <div class="absolute top-2/3 left-1/5 w-1 h-1 bg-emerald-400 rounded-full animate-ping opacity-20"></div>
-  <div class="absolute bottom-1/2 right-1/3 w-2 h-2 bg-purple-400 rounded-full animate-pulse opacity-15"></div>
-</div>
-
-<div class="relative min-h-screen p-4 sm:p-6 md:p-8">
-  <!-- Header del formulario -->
-  <div class="max-w-6xl mx-auto mb-6">
-    <div class="flex items-center justify-between">
-      <h1 class="text-3xl sm:text-4xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-500 mb-2">
-        {% if form.instance.pk %}
-          <span class="inline-flex items-center gap-3">
-            <span class="text-4xl">✏️</span>
-            {% trans "Editar Cliente" %}
-          </span>
-        {% else %}
-          <span class="inline-flex items-center gap-3">
-            <span class="text-4xl">➕</span>
-            {% trans "Nuevo Cliente" %}
-          </span>
-        {% endif %}
-      </h1>
-    </div>
-  </div>
-
-  <!-- Formulario con diseño futurista en grid -->
-  <div class="max-w-6xl mx-auto">
-    <div class="bg-gradient-to-br from-[#0d1b2a]/90 via-[#1b263b]/90 to-[#0d1b2a]/90 backdrop-blur-xl rounded-2xl border border-cyan-500/30 shadow-2xl shadow-cyan-500/20 p-6 sm:p-8">
-      <form method="post" enctype="multipart/form-data" class="space-y-6">
-    {% csrf_token %}
-        
-        <!-- Grid de 2 columnas para campos -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Nombre -->
-          <div class="group">
-            <label for="{{ form.nombre.id_for_label }}" class="block text-sm font-semibold text-cyan-300 mb-2 flex items-center gap-2">
-              <span class="text-lg">👤</span>
-              {{ form.nombre.label }}
-              {% if form.nombre.field.required %}<span class="text-red-400">*</span>{% endif %}
-            </label>
-            <div class="relative">
-              {% render_field form.nombre class="w-full px-4 py-3 bg-white/95 border-2 border-cyan-500/60 rounded-xl text-gray-900 placeholder-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all duration-300 group-hover:border-cyan-400/80 shadow-lg" placeholder="Ingrese nombre" %}
-              <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-            </div>
-            {% if form.nombre.errors %}
-              <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
-                <span>⚠️</span>{{ form.nombre.errors.0 }}
-              </p>
-            {% endif %}
-          </div>
-
-          <!-- Apellido -->
-          <div class="group">
-            <label for="{{ form.apellido.id_for_label }}" class="block text-sm font-semibold text-cyan-300 mb-2 flex items-center gap-2">
-              <span class="text-lg">👥</span>
-              {{ form.apellido.label }}
-              {% if form.apellido.field.required %}<span class="text-red-400">*</span>{% endif %}
-            </label>
-            <div class="relative">
-              {% render_field form.apellido class="w-full px-4 py-3 bg-white/95 border-2 border-cyan-500/60 rounded-xl text-gray-900 placeholder-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all duration-300 group-hover:border-cyan-400/80 shadow-lg" placeholder="Ingrese apellido" %}
-              <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-            </div>
-            {% if form.apellido.errors %}
-              <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
-                <span>⚠️</span>{{ form.apellido.errors.0 }}
-              </p>
-            {% endif %}
-          </div>
-
-          <!-- Email -->
-          <div class="group">
-            <label for="{{ form.email.id_for_label }}" class="block text-sm font-semibold text-cyan-300 mb-2 flex items-center gap-2">
-              <span class="text-lg">📧</span>
-              {{ form.email.label }}
-              {% if form.email.field.required %}<span class="text-red-400">*</span>{% endif %}
-            </label>
-            <div class="relative">
-              {% render_field form.email class="w-full px-4 py-3 bg-white/95 border-2 border-cyan-500/60 rounded-xl text-gray-900 placeholder-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all duration-300 group-hover:border-cyan-400/80 shadow-lg" placeholder="ejemplo@correo.com" %}
-              <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-            </div>
-            {% if form.email.errors %}
-              <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
-                <span>⚠️</span>{{ form.email.errors.0 }}
-              </p>
-            {% endif %}
-          </div>
-
-          <!-- Teléfono -->
-          <div class="group">
-            <label for="{{ form.telefono.id_for_label }}" class="block text-sm font-semibold text-cyan-300 mb-2 flex items-center gap-2">
-              <span class="text-lg">📱</span>
-              {{ form.telefono.label }}
-              {% if form.telefono.field.required %}<span class="text-red-400">*</span>{% endif %}
-            </label>
-            <div class="relative">
-              {% render_field form.telefono class="w-full px-4 py-3 bg-white/95 border-2 border-cyan-500/60 rounded-xl text-gray-900 placeholder-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all duration-300 group-hover:border-cyan-400/80 shadow-lg" placeholder="+1 (555) 123-4567" %}
-              <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-            </div>
-            {% if form.telefono.errors %}
-              <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
-                <span>⚠️</span>{{ form.telefono.errors.0 }}
-              </p>
-            {% endif %}
-          </div>
-
-          <!-- RUT/ID (si existe) -->
-          {% if form.rut %}
-          <div class="group">
-            <label for="{{ form.rut.id_for_label }}" class="block text-sm font-semibold text-cyan-300 mb-2 flex items-center gap-2">
-              <span class="text-lg">🆔</span>
-              {{ form.rut.label }}
-              {% if form.rut.field.required %}<span class="text-red-400">*</span>{% endif %}
-            </label>
-            <div class="relative">
-              {% render_field form.rut class="w-full px-4 py-3 bg-white/95 border-2 border-cyan-500/60 rounded-xl text-gray-900 placeholder-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all duration-300 group-hover:border-cyan-400/80 shadow-lg" placeholder="12.345.678-9" %}
-              <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-            </div>
-            {% if form.rut.errors %}
-              <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
-                <span>⚠️</span>{{ form.rut.errors.0 }}
-              </p>
-            {% endif %}
-          </div>
-          {% endif %}
-
-          <!-- Dirección (si existe) -->
-          {% if form.direccion %}
-          <div class="group">
-            <label for="{{ form.direccion.id_for_label }}" class="block text-sm font-semibold text-cyan-300 mb-2 flex items-center gap-2">
-              <span class="text-lg">📍</span>
-              {{ form.direccion.label }}
-              {% if form.direccion.field.required %}<span class="text-red-400">*</span>{% endif %}
-            </label>
-            <div class="relative">
-              {% render_field form.direccion class="w-full px-4 py-3 bg-white/95 border-2 border-cyan-500/60 rounded-xl text-gray-900 placeholder-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all duration-300 group-hover:border-cyan-400/80 shadow-lg" placeholder="Calle, número, ciudad" %}
-              <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-            </div>
-            {% if form.direccion.errors %}
-              <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
-                <span>⚠️</span>{{ form.direccion.errors.0 }}
-              </p>
-            {% endif %}
-          </div>
-          {% endif %}
-        </div>
-
-        <!-- Campos adicionales en ancho completo si existen -->
-        {% for field in form %}
-          {% if field.name not in "nombre,apellido,email,telefono,rut,direccion" and not field.is_hidden %}
-          <div class="group">
-            <label for="{{ field.id_for_label }}" class="block text-sm font-semibold text-cyan-300 mb-2">
-              {{ field.label }}
-              {% if field.field.required %}<span class="text-red-400">*</span>{% endif %}
-            </label>
-            <div class="relative">
-              {% render_field field class="w-full px-4 py-3 bg-white/95 border-2 border-cyan-500/60 rounded-xl text-gray-900 placeholder-gray-400 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/50 focus:outline-none transition-all duration-300 group-hover:border-cyan-400/80 shadow-lg" %}
-              <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-cyan-500/0 via-cyan-500/10 to-cyan-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"></div>
-            </div>
-            {% if field.errors %}
-              <p class="mt-2 text-sm text-red-400 flex items-center gap-1">
-                <span>⚠️</span>{{ field.errors.0 }}
-              </p>
-            {% endif %}
-          </div>
-          {% endif %}
-        {% endfor %}
-
-        <!-- Botones de acción -->
-        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-cyan-500/20">
-          <button type="submit" class="flex-1 sm:flex-none px-8 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2">
-            <span class="text-xl">💾</span>
-            <span>{% trans "Guardar" %}</span>
-          </button>
-          
-          <a href="{% country_url 'clientes:lista_clientes' %}" class="flex-1 sm:flex-none px-8 py-3 bg-gradient-to-r from-gray-700 to-gray-800 hover:from-gray-600 hover:to-gray-700 text-white font-bold rounded-xl shadow-lg shadow-gray-500/20 hover:shadow-gray-500/30 transform hover:-translate-y-0.5 transition-all duration-300 flex items-center justify-center gap-2">
-            <span class="text-xl">↩️</span>
-            <span>{% trans "Cancelar" %}</span>
-          </a>
-        </div>
-  </form>
-    </div>
-  </div>
-</div>
-
-<style>
-  /* Animaciones suaves para campos de entrada */
-  input:focus, select:focus, textarea:focus {
-    animation: glow-pulse 2s ease-in-out infinite;
-  }
-
-  @keyframes glow-pulse {
-    0%, 100% {
-      box-shadow: 0 0 5px rgba(6, 182, 212, 0.3);
-    }
-    50% {
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.6), 0 0 30px rgba(6, 182, 212, 0.3);
-    }
-  }
-
-  /* Efecto hover en labels */
-  .group:hover label {
-    color: #22d3ee;
-    transition: color 0.3s ease;
-  }
-
-  /* Mejorar select dropdowns */
-  select {
-    background-color: rgba(255, 255, 255, 0.95) !important;
-    color: #111827 !important;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2306b6d4' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: right 1rem center;
-    padding-right: 2.5rem;
-  }
-  
-  select option {
-    background-color: white !important;
-    color: #111827 !important;
-  }
-
-  /* Estilo para campos de autocompletado si existen */
-  .select2-container--default .select2-selection--single {
-    background-color: rgba(10, 25, 41, 0.8) !important;
-    border: 2px solid rgba(6, 182, 212, 0.4) !important;
-    border-radius: 0.75rem !important;
-    height: 3rem !important;
-    padding: 0.5rem 1rem !important;
-  }
-
-  .select2-container--default .select2-selection--single .select2-selection__rendered {
-    color: white !important;
-    line-height: 2rem !important;
-  }
-</style>
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/eg-theme.css' %}?v=clientes-ui-global-02">
 {% endblock %}
+
+{% block panel_content %}
+<!-- CLIENTE_FORM_PANEL_MARKER_20260429 -->
+<div class="eg-container">
+  <div class="eg-card eg-card-form">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="eg-alert eg-alert-danger">
+          {{ form.non_field_errors }}
+        </div>
+      {% endif %}
+
+      <div class="eg-form-grid">
+        <div class="eg-field">
+          <label for="{{ form.nombre.id_for_label }}">Nombre</label>
+          {{ form.nombre }}
+          {{ form.nombre.errors }}
+        </div>
+
+        <div class="eg-field">
+          <label for="{{ form.apellido.id_for_label }}">Apellido</label>
+          {{ form.apellido }}
+          {{ form.apellido.errors }}
+        </div>
+
+        <div class="eg-field">
+          <label for="{{ form.telefono.id_for_label }}">Teléfono</label>
+          {{ form.telefono }}
+          {{ form.telefono.errors }}
+        </div>
+
+        <div class="eg-field">
+          <label for="{{ form.direccion.id_for_label }}">Dirección</label>
+          {{ form.direccion }}
+          {{ form.direccion.errors }}
+        </div>
+
+        <div class="eg-field">
+          <label for="{{ form.region.id_for_label }}">Región</label>
+          {{ form.region }}
+          {{ form.region.errors }}
+        </div>
+
+        <div class="eg-field">
+          <label for="{{ form.ciudad.id_for_label }}">Ciudad</label>
+          {{ form.ciudad }}
+          {{ form.ciudad.errors }}
+        </div>
+      </div>
+
+      <div class="eg-actions">
+        <a href="{% country_url 'clientes:lista_clientes' %}" class="eg-btn eg-btn-secondary">Cancelar</a>
+        <button type="submit" class="eg-btn eg-btn-primary">
+          {% if form.instance.pk %}Guardar cambios{% else %}Crear cliente{% endif %}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}
+
