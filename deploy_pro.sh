@@ -1,4 +1,4 @@
-﻿#!/usr/bin/env bash
+#!/usr/bin/env bash
 set -Eeuo pipefail
 
 APP_DIR="/srv/egarage"
@@ -34,6 +34,8 @@ echo "===== RESTART LIMPIO ====="
 sudo systemctl stop gunicorn || true
 pkill -9 gunicorn || true
 sleep 2
+sudo systemctl start gunicorn
+sudo systemctl restart nginx
 sudo systemctl start gunicorn
 sudo systemctl restart nginx
 
