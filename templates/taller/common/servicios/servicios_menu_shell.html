@@ -1,0 +1,101 @@
+{% load i18n %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="{{ LANGUAGE_CODE|default:language }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% trans "Servicios" %} | eGarage</title>
+  
+  <link rel="stylesheet" href="/static/css/servicios_menu.css">
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div>
+        <p class="eyebrow">{{ country_code }} · {{ language|upper }}</p>
+        <h1>{% trans "Servicios Mecanicos" %}</h1>
+        <p>
+          {% if empresa %}
+            {{ empresa.nombre_taller }} · {% trans "catalogo operativo con carga diferida para reducir el tiempo de respuesta inicial." %}
+          {% else %}
+            {% trans "Catalogo operativo con carga diferida para reducir el tiempo de respuesta inicial." %}
+          {% endif %}
+        </p>
+      </div>
+      <div class="hero-actions">
+        <a class="back-link" href="{{ dashboard_url }}">{% trans "Volver al panel" %}</a>
+        <a class="btn btn-primary" href="{{ create_url }}">{% trans "Agregar servicio" %}</a>
+      </div>
+    </section>
+
+    <section class="stats">
+      <article class="stat-card">
+        <strong>{{ stats.total_servicios }}</strong>
+        <span>{% trans "Servicios disponibles en este alcance" %}</span>
+      </article>
+      <article class="stat-card">
+        <strong>{{ stats.total_categorias }}</strong>
+        <span>{% trans "Categorias listas para filtrar" %}</span>
+      </article>
+      <article class="stat-card">
+        <strong>{{ stats.total_subcategorias }}</strong>
+        <span>{% trans "Subcategorias listas para filtrar" %}</span>
+      </article>
+    </section>
+
+    <section class="toolbar" aria-label="{% trans 'Filtros de servicios' %}">
+      <div class="field">
+        <label for="searchInput">{% trans "Buscar" %}</label>
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="{% trans 'Buscar por nombre, categoria o subcategoria...' %}"
+          autocomplete="off"
+        >
+      </div>
+      <div class="field">
+        <label for="categoriaFilter">{% trans "Categoria" %}</label>
+        <select id="categoriaFilter">
+          <option value="">{% trans "Todas las categorias" %}</option>
+          {% for categoria in categorias %}
+            <option value="{{ categoria.code }}">{{ categoria.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="subcategoriaFilter">{% trans "Subcategoria" %}</label>
+        <select id="subcategoriaFilter">
+          <option value="">{% trans "Todas las subcategorias" %}</option>
+          {% for subcategoria in subcategorias %}
+            <option value="{{ subcategoria.code }}" data-categoria="{{ subcategoria.categoria_code }}">{{ subcategoria.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </section>
+
+    <section class="results">
+      <div class="results-head">
+        <div>
+          <h2>{% trans "Listado de servicios" %}</h2>
+          <p id="resultsSummary">{% blocktrans with total=stats.total_servicios %}{{ total }} servicios disponibles para carga inicial.{% endblocktrans %}</p>
+        </div>
+        <button id="reloadButton" type="button" class="btn btn-secondary">{% trans "Recargar" %}</button>
+      </div>
+
+      <div id="loadingState" class="status">{% trans "Cargando servicios..." %}</div>
+      <div id="errorState" class="error-state hidden"></div>
+      <div id="emptyState" class="empty-state hidden">
+        <strong>{% trans "No hay servicios para mostrar" %}</strong>
+        <p>{% trans "Prueba otros filtros o registra un nuevo servicio." %}</p>
+      </div>
+      <div id="servicesGrid" class="services-grid hidden"></div>
+    </section>
+  </main>
+
+  {{ servicios_menu_config|json_script:"servicios-menu-config" }}
+
+  
+  <script src="/static/js/servicios_menu.js"></script>
+</body>
+</html>
