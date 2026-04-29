@@ -88,7 +88,9 @@ sudo systemctl start gunicorn
 sudo systemctl restart nginx
 
 echo "===== HEALTH CHECK ====="
-curl --fail --max-time 10 --unix-socket "$SOCKET"   -H "Host: $HOST_HEADER"   -H "X-Forwarded-Proto: https"   http://localhost/healthz/
+curl --fail --max-time 10 --unix-socket "$SOCKET"   -H "Host: $HOST_HEADER"   -H "X-Forwarded-Proto: https"   http://localhost/healthz/ \ 
+  -H "Host: www.egarage.cl" \ 
+  --unix-socket "/run/gunicorn/gunicorn.sock"
 
 echo "===== SMOKE TEST SERVICIOS ====="
 curl --fail --max-time 15 --unix-socket "$SOCKET"   -H "Host: $HOST_HEADER"   -H "X-Forwarded-Proto: https"   -o /dev/null   http://localhost/cl/es/servicios/api/menu/
