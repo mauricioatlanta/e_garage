@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+ï»¿#!/usr/bin/env bash
 set -Eeuo pipefail
 
 APP_DIR="/srv/egarage"
@@ -9,11 +9,18 @@ SOCKET="/run/gunicorn/gunicorn.sock"
 cd "$APP_DIR"
 source venv/bin/activate
 
-echo "===== BACKUP PRE-DEPLOY ====="
 PREV_COMMIT="$(git rev-parse HEAD)"
 echo "PREV_COMMIT=$PREV_COMMIT"
 
-# ===== ROLLBACK SI FALLA ===== trap 'echo "DEPLOY FALLÓ ? ROLLBACK"; git reset --hard "$PREV_COMMIT"; sudo systemctl restart gunicorn; exit 1' ERR
+rollback() {
+  echo "DEPLOY FAILED - ROLLBACK"
+  git reset --hard "$PREV_COMMIT"
+  sudo systemctl restart gunicorn
+  sudo systemctl restart nginx
+  exit 1
+}
+trap rollback ERR
+
 echo "===== FETCH ====="
 git fetch origin
 
@@ -35,8 +42,6 @@ echo "===== RESTART LIMPIO ====="
 sudo systemctl stop gunicorn || true
 pkill -9 gunicorn || true
 sleep 2
-sudo systemctl start gunicorn
-sudo systemctl restart nginx
 sudo systemctl start gunicorn
 sudo systemctl restart nginx
 
