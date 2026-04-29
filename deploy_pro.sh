@@ -13,6 +13,7 @@ echo "===== BACKUP PRE-DEPLOY ====="
 PREV_COMMIT="$(git rev-parse HEAD)"
 echo "PREV_COMMIT=$PREV_COMMIT"
 
+# ===== ROLLBACK SI FALLA ===== trap 'echo "DEPLOY FALLÓ ? ROLLBACK"; git reset --hard "$PREV_COMMIT"; sudo systemctl restart gunicorn; exit 1' ERR
 echo "===== FETCH ====="
 git fetch origin
 
