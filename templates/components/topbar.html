@@ -1,0 +1,14 @@
+﻿<header class="eg-topbar">
+  <div>
+    <h1 class="eg-page-title">{% block page_title %}eGarage{% endblock %}</h1>
+    <p class="eg-page-subtitle">{% block page_subtitle %}Control operativo para negocios automotrices{% endblock %}</p>
+  </div>
+
+  <div>
+    {% if request.user.is_authenticated %}
+      <a class="eg-btn eg-btn-secondary" href="/cl/es/accounts/logout/">Salir</a>
+    {% else %}
+      <a class="eg-btn" href="/cl/es/accounts/login/">Ingresar</a>
+    {% endif %}
+  </div>
+</header>
