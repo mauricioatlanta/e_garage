@@ -1,0 +1,176 @@
+{% extends "taller/layout/base_dashboard.html" %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-3 py-5 md:px-4 md:py-8">
+
+  <div class="mb-8">
+    <p class="text-cyan-300 text-sm font-semibold tracking-widest uppercase">Recepción rápida</p>
+    <h1 class="text-4xl font-black text-white mt-2">Ingreso por Patente</h1>
+    <p class="text-slate-400 mt-2">Busca el vehículo por patente. Si cambió la patente o no existe, busca primero al cliente.</p>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-4 md:p-6">
+
+    <section class="rounded-2xl border border-cyan-500/40 bg-slate-900/70 p-4 md:p-6 shadow-xl shadow-cyan-500/10">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="text-3xl">🚗</div>
+        <div>
+          <h2 class="text-xl font-bold text-cyan-300">Buscar por patente</h2>
+          <p class="text-slate-400 text-sm">Ejemplo Chile: ABCD12 / AB1234</p>
+        </div>
+      </div>
+
+      <form method="get" action="/cl/es/ingreso/" class="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          name="patente" autofocus
+          value="{{ patente }}"
+          placeholder="INGRESA PATENTE"
+          autocomplete="off"
+          class="w-full rounded-xl border border-cyan-500/40 bg-slate-950 px-4 py-5 text-2xl md:text-xl font-bold uppercase tracking-widest text-white outline-none focus:ring-2 focus:ring-cyan-400"
+        >
+        <button class="rounded-xl bg-cyan-500 px-4 py-4 md:px-6 font-bold text-slate-950 hover:bg-cyan-300 transition">
+          Buscar
+        </button>
+      </form>
+
+      {% if patente and vehiculo %}
+      <div class="mt-6 rounded-2xl border border-emerald-400/40 bg-emerald-500/10 p-5">
+        <p class="text-emerald-300 font-bold">✅ Vehículo encontrado</p>
+        <h3 class="text-2xl font-black text-white mt-2">{{ vehiculo.patente }}</h3>
+        <p class="text-slate-300 mt-1">
+          {{ vehiculo.anio|default:"" }}
+          {{ vehiculo.marca|default:vehiculo.marca_texto }}
+          {{ vehiculo.modelo|default:vehiculo.modelo_texto }}
+        </p>
+        <p class="text-slate-400 mt-1">Cliente: {{ vehiculo.cliente.nombre }} {{ vehiculo.cliente.apellido }}</p>
+
+        <div class="flex flex-col sm:flex-row gap-3 mt-5">
+          <a href="/cl/es/vehiculos/{{ vehiculo.id }}/" class="rounded-xl bg-emerald-400 px-4 py-3 font-bold text-slate-950">Abrir vehículo</a>
+          <a href="/cl/es/documentos/form/?vehiculo={{ vehiculo.id }}" class="rounded-xl border border-cyan-400 px-4 py-3 font-bold text-cyan-200">Crear documento</a>
+        </div>
+      </div>
+      {% elif patente %}
+      <div class="mt-6 rounded-2xl border border-amber-400/40 bg-amber-500/10 p-5">
+        <p class="text-amber-300 font-bold">⚠️ No encontramos esa patente</p>
+        <p class="text-slate-300 mt-2">Puede haber cambiado la patente o el vehículo aún no está registrado.</p>
+        <div class="flex flex-col sm:flex-row gap-3 mt-5">
+          <a href="/cl/es/vehiculos/crear/?patente={{ patente }}" class="rounded-xl bg-amber-400 px-4 py-3 font-bold text-slate-950">Crear vehículo con esta patente</a>
+          <a href="#buscar-cliente" class="rounded-xl border border-cyan-400 px-4 py-3 font-bold text-cyan-200">Buscar por cliente</a>
+        </div>
+      </div>
+      {% endif %}
+    </section>
+
+    <section id="buscar-cliente" class="rounded-2xl border border-purple-500/40 bg-slate-900/70 p-4 md:p-6 shadow-xl shadow-purple-500/10">
+      <div class="flex items-center gap-3 mb-5">
+        <div class="text-3xl">👤</div>
+        <div>
+          <h2 class="text-xl font-bold text-purple-300">Buscar por cliente</h2>
+          <p class="text-slate-400 text-sm">Nombre, apellido, teléfono, email o RUT</p>
+        </div>
+      </div>
+
+      <form method="get" action="/cl/es/ingreso/" class="flex flex-col sm:flex-row gap-3">
+        <input
+          type="text"
+          name="cliente"
+          value="{{ cliente_q }}"
+          placeholder="Buscar cliente..."
+          autocomplete="off"
+          class="w-full rounded-xl border border-purple-500/40 bg-slate-950 px-4 py-4 text-white outline-none focus:ring-2 focus:ring-purple-400"
+        >
+        {% if patente %}
+        <input type="hidden" name="patente" autofocus value="{{ patente }}">
+        {% endif %}
+        <button class="rounded-xl bg-purple-500 px-4 py-4 md:px-6 font-bold text-white hover:bg-purple-400 transition">
+          Buscar
+        </button>
+      </form>
+
+      {% if cliente_q %}
+      <div class="mt-6 space-y-3">
+        {% for cliente in clientes %}
+        <div class="rounded-xl border border-slate-700 bg-slate-950/70 p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div>
+            <div class="font-bold text-white">{{ cliente.nombre }} {{ cliente.apellido }}</div>
+            <div class="text-sm text-slate-400">{{ cliente.telefono|default:"Sin teléfono" }} · {{ cliente.email|default:"Sin email" }} · {{ cliente.tax_id|default:"Sin RUT" }}</div>
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <a href="/cl/es/vehiculos/crear/?cliente={{ cliente.id }}{% if patente %}&patente={{ patente }}{% endif %}" class="rounded-lg bg-cyan-500 px-3 py-2 text-sm font-bold text-slate-950">Crear vehículo</a>
+            <a href="/cl/es/clientes/" class="rounded-lg border border-slate-600 px-3 py-2 text-sm text-slate-200">Ver clientes</a>
+          </div>
+        </div>
+        {% empty %}
+        <div class="rounded-2xl border border-amber-400/40 bg-amber-500/10 p-5">
+          <p class="text-amber-300 font-bold">No encontramos clientes con esa búsqueda.</p>
+          <a href="/cl/es/clientes/crear/" class="inline-block mt-4 rounded-xl bg-amber-400 px-4 py-3 font-bold text-slate-950">Crear cliente nuevo</a>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </section>
+
+  </div>
+
+  <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+    <a href="/cl/es/centro-operaciones/" class="rounded-xl border border-slate-700 bg-slate-900 p-4 text-center font-bold text-slate-200">⬅ Centro</a>
+    <a href="/cl/es/vehiculos/" class="rounded-xl border border-slate-700 bg-slate-900 p-4 text-center font-bold text-slate-200">🚗 Vehículos</a>
+    <a href="/cl/es/clientes/" class="rounded-xl border border-slate-700 bg-slate-900 p-4 text-center font-bold text-slate-200">👥 Clientes</a>
+    <a href="/cl/es/documentos/form/" class="rounded-xl border border-slate-700 bg-slate-900 p-4 text-center font-bold text-slate-200">📄 Documento</a>
+  
+<div id="autocomplete-clientes" class="mt-4 space-y-2"></div>
+
+<script>
+const input = document.querySelector('input[name="cliente"]');
+const container = document.getElementById('autocomplete-clientes');
+
+let timeout = null;
+
+input.addEventListener('input', function() {
+    clearTimeout(timeout);
+    const q = this.value.trim();
+
+    if (q.length < 2) {
+        container.innerHTML = "";
+        return;
+    }
+
+    timeout = setTimeout(async () => {
+        const res = await fetch(`/cl/es/api/clientes/buscar/?q=${encodeURIComponent(q)}`);
+        const data = await res.json();
+
+        container.innerHTML = "";
+
+        
+        if (data.results.length === 0) {
+            container.innerHTML = `
+                <div class="p-4 rounded-xl border border-amber-400 bg-amber-500/10 text-amber-300">
+                    No se encontraron clientes
+                </div>
+            `;
+            return;
+        }
+
+        data.results.forEach(c => {
+    
+            const el = document.createElement('div');
+            el.className = "p-3 rounded-lg border border-slate-700 bg-slate-900 cursor-pointer hover:bg-slate-800";
+            el.innerHTML = `
+                <div class="font-bold text-white">${c.nombre}</div>
+                <div class="text-sm text-slate-400">${c.telefono} · ${c.email}</div>
+            `;
+
+            el.onclick = () => {
+                window.location.href = `/cl/es/vehiculos/crear/?cliente=${c.id}`;
+            };
+
+            container.appendChild(el);
+        });
+    }, 300);
+});
+</script>
+
+</div>
+{% endblock %}
+
