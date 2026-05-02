@@ -1,0 +1,56 @@
+body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    height: 100vh;
+}
+
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+.login-card {
+    background: rgba(255,255,255,0.06);
+    backdrop-filter: blur(20px);
+    padding: 40px;
+    border-radius: 24px;
+    width: 350px;
+    color: white;
+    box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+}
+
+.logo {
+    text-align: center;
+    margin-bottom: 28px;
+}
+
+.login-card input {
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 15px;
+    padding: 14px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.14);
+    background: rgba(255,255,255,0.08);
+    color: white;
+}
+
+.login-card input::placeholder {
+    color: rgba(255,255,255,0.55);
+}
+
+.login-card button {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #00cfff;
+    color: #020617;
+    font-weight: 800;
+    cursor: pointer;
+}
