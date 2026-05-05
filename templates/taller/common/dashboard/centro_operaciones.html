@@ -1,15 +1,21 @@
-﻿{% extends 'layouts/base_saas.html' %}
-
+{% extends 'layouts/base_saas.html' %}
 {% block title %}Centro de Operaciones | eGarage{% endblock %}
-
 {% block content %}
 <div class='max-w-7xl mx-auto space-y-8'>
-<h1 class='text-3xl font-black'>Centro de Operaciones</h1>
-<div class='grid grid-cols-1 md:grid-cols-4 gap-6'>
-<div class='bg-slate-800 p-6 rounded-xl'><p>Documentos mes</p><h2>{{ documentos_mes }}</h2></div>
-<div class='bg-slate-800 p-6 rounded-xl'><p>Clientes</p><h2>{{ clientes_activos }}</h2></div>
-<div class='bg-slate-800 p-6 rounded-xl'><p>Vehiculos</p><h2>{{ vehiculos_registrados }}</h2></div>
-<div class='bg-slate-800 p-6 rounded-xl'><p>Facturacion</p><h2>{{ facturacion_mes_total }}</h2></div>
-</div>
+<section><p class='text-cyan-300 text-sm font-bold'>Dashboard SaaS</p><h1 class='text-4xl font-black'>Centro de Operaciones</h1><p class='text-slate-400'>{{ empresa.nombre_taller|default:empresa }} - {{ mes_actual }}</p></section>
+<section class='grid grid-cols-1 md:grid-cols-4 gap-6'>
+<div class='bg-slate-800 p-6 rounded-2xl border border-white/10'><p class='text-slate-400 text-sm'>Ordenes generadas</p><h2 class='text-3xl font-black'>{{ documentos_mes }}</h2><p class='text-xs text-slate-500'>Hoy {{ documentos_hoy }} - Semana {{ documentos_semana }}</p></div>
+<div class='bg-slate-800 p-6 rounded-2xl border border-white/10'><p class='text-slate-400 text-sm'>Ingresos del mes</p><h2 class='text-3xl font-black'>{{ moneda }} {{ facturacion_mes_total|floatformat:0 }}</h2><p class='text-xs text-slate-500'>Ticket {{ moneda }} {{ ticket_promedio|floatformat:0 }}</p></div>
+<div class='bg-slate-800 p-6 rounded-2xl border border-white/10'><p class='text-slate-400 text-sm'>Clientes activos</p><h2 class='text-3xl font-black'>{{ clientes_activos }}</h2><p class='text-xs text-slate-500'>Nuevos {{ clientes_nuevos_mes }}</p></div>
+<div class='bg-slate-800 p-6 rounded-2xl border border-white/10'><p class='text-slate-400 text-sm'>Vehiculos</p><h2 class='text-3xl font-black'>{{ vehiculos_registrados }}</h2><p class='text-xs text-slate-500'>Marcas {{ marcas_atendidas }}</p></div>
+</section>
+<section class='grid grid-cols-1 md:grid-cols-2 gap-6'>
+<div class='bg-green-900/40 p-6 rounded-2xl border border-green-400/30'><p class='text-green-300 text-sm'>Proyeccion mensual</p><h2 class='text-3xl font-black'>{{ moneda }} {{ proyeccion_facturacion|floatformat:0 }}</h2><p class='text-xs text-green-200'>Docs proyectados {{ proyeccion_docs_mes }}</p></div>
+<div class='bg-red-900/40 p-6 rounded-2xl border border-red-400/30'><p class='text-red-300 text-sm'>Alertas del negocio</p>{% for a in alertas %}<div class='text-sm'>{{ a.titulo }} - {{ a.descripcion }}</div>{% empty %}<p class='text-green-300'>Sin alertas</p>{% endfor %}</div>
+</section>
+<section class='grid grid-cols-1 lg:grid-cols-2 gap-6'>
+<div class='bg-slate-800 p-6 rounded-2xl border border-white/10'><h3 class='text-xl font-bold mb-4'>Servicios top</h3>{% for s in servicios_top %}<div class='flex justify-between border-b border-slate-700 py-2'><span>{{ s.nombre }}</span><b>{{ s.cantidad }}</b></div>{% empty %}<p class='text-slate-400'>Sin servicios aun.</p>{% endfor %}</div>
+<div class='bg-slate-800 p-6 rounded-2xl border border-white/10'><h3 class='text-xl font-bold mb-4'>Tecnicos productivos</h3>{% for t in tecnicos_productivos %}<div class='flex justify-between border-b border-slate-700 py-2'><span>{{ t.tecnico.nombre|default:'Sin tecnico' }}</span><b>{{ moneda }} {{ t.ingresos_generados|floatformat:0 }}</b></div>{% empty %}<p class='text-slate-400'>Sin datos aun.</p>{% endfor %}</div>
+</section>
 </div>
 {% endblock %}
