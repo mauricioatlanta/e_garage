@@ -1,0 +1,27 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+<meta charset='UTF-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'>
+<title>{% block title %}eGarage{% endblock %}</title>
+<link rel='stylesheet' href='/static/css/output.css'>
+</head>
+<body class='bg-slate-950 text-white'>
+<header class='p-4 border-b border-gray-800'>
+<div class='max-w-7xl mx-auto flex justify-between items-center'>
+<h1 class='font-bold'>eGarage</h1>
+<nav class='flex gap-4 text-sm'>
+<a href='/cl/es/workspace/'>Ingreso rapido</a>
+<a href='/cl/es/clientes/'>Clientes</a>
+<a href='/cl/es/vehiculos/'>Vehiculos</a>
+<a href='/cl/es/documentos/'>Documentos</a>
+<a href='/cl/es/reportes/'>Reportes</a>
+</nav>
+</div>
+</header>
+<main class='p-6'>
+{% block content %}{% endblock %}
+</main>
+</body>
+</html>
