@@ -1,199 +1,28 @@
-{% extends 'base_login.html' %}
-{% load static %}
-{% load widget_tweaks %}
+﻿{% extends "layouts/base_saas.html" %}
 {% load i18n %}
 
-{% block title %}{% trans "Sign In" %} - eGarage
-{% endblock %}
-
-{% block extra_head %}{% endblock %}
-
-{% block back_button %}
-{% with back_country=country|default:"CL" %}
-{% if back_country == 'US' %}
-    <a href="/us/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'UY' %}
-    <a href="/uy/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'AR' %}
-    <a href="/ar/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'MX' %}
-    <a href="/mx/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'CO' %}
-    <a href="/co/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'EC' %}
-    <a href="/ec/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'PE' %}
-    <a href="/pe/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'VE' %}
-    <a href="/ve/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'BR' %}
-    <a href="/br/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% else %}
-    <a href="/cl/es/bienvenida/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>Volver</span>
-    </a>
-{% endif %}
-{% endwith %}
-{% endblock %}
+{% block title %}Ingresar | eGarage{% endblock %}
 
 {% block content %}
-<div class="login-container">
-    <div class="glass-card">
-        <!-- Logo -->
-        <div class="logo-section">
-            <div class="logo-container">
-                <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="logo">
-            </div>
-            {# Badge de país: usa country del contexto (la vista ya pone empresa.pais si usuario logueado) #}
-            {% with badge_country=country|default:"CL" %}
-            {% if badge_country == 'US' %}
-                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-            {% elif badge_country == 'UY' %}
-                <div class="country-badge font-futuristic">🇺🇾 URUGUAY</div>
-            {% elif badge_country == 'AR' %}
-                <div class="country-badge font-futuristic">🇦🇷 ARGENTINA</div>
-            {% elif badge_country == 'MX' %}
-                <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-            {% elif badge_country == 'CO' %}
-                <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-            {% elif badge_country == 'EC' %}
-                <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-            {% elif badge_country == 'PE' %}
-                <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-            {% elif badge_country == 'VE' %}
-                <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-            {% elif badge_country == 'BR' %}
-                <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-            {% else %}
-                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-            {% endif %}
-            {% endwith %}
-        </div>
+<section class="min-h-[70vh] flex items-center justify-center">
+  <div class="w-full max-w-md rounded-2xl border border-cyan-500/30 bg-slate-900/80 p-8 shadow-xl">
+    <h1 class="text-2xl font-bold text-cyan-300 mb-2">Ingresar a eGarage</h1>
+    <p class="text-slate-400 mb-6">Accede a tu panel de gestion automotriz.</p>
 
-        <!-- Formulario -->
-        <form method="POST" action="{{ request.path }}" class="space-y-6">
-            {% csrf_token %}
-            <input type="hidden" name="country" value="{{ country|default:"CL" }}">
-            {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
+    <form method="post" action="{% url 'account_login' %}" class="space-y-4">
+      {% csrf_token %}
+      {{ form.as_p }}
 
-            <!-- Email/Usuario -->
-            <div class="form-group">
-                <label for="id_login" class="form-label font-futuristic">
-                    {% if country == 'US' %}{% trans "Email or Username" %}{% else %}Correo o Usuario{% endif %}
-                </label>
-                {% if country == 'US' %}
-                    {{ form.login|add_class:"form-input"|attr:"placeholder:Enter your credentials"|attr:"autocomplete:email" }}
-                {% else %}
-                    {{ form.login|add_class:"form-input"|attr:"placeholder:Ingresa tus credenciales"|attr:"autocomplete:email" }}
-                {% endif %}
-            </div>
+      <button type="submit" class="w-full rounded-xl bg-cyan-500 px-4 py-3 font-bold text-slate-950 hover:bg-cyan-400">
+        Ingresar
+      </button>
+    </form>
 
-            <!-- Contraseña -->
-            <div class="form-group">
-                <label for="id_password" class="form-label font-futuristic">
-                    {% if country == 'US' %}{% trans "Password" %}{% else %}Contraseña{% endif %}
-                </label>
-                {% if country == 'US' %}
-                    {{ form.password|add_class:"form-input"|attr:"placeholder:Enter your secure password"|attr:"type:password"|attr:"autocomplete:current-password" }}
-                {% else %}
-                    {{ form.password|add_class:"form-input"|attr:"placeholder:Ingresa tu contraseña segura"|attr:"type:password"|attr:"autocomplete:current-password" }}
-                {% endif %}
-            </div>
-
-            <!-- Remember Me -->
-            {% if form.remember %}
-            <div class="remember-me">
-                {{ form.remember }}
-                <label for="id_remember">{% if country == 'US' %}{% trans "Keep me signed in" %}{% else %}Mantenerme conectado{% endif %}</label>
-            </div>
-            {% endif %}
-
-            <!-- Botón Submit -->
-            <button type="submit" class="login-button">
-                <span class="relative z-10">
-                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                    </svg>
-                    {% if country == 'US' %}{% trans "Access System" %}{% else %}Acceder al Sistema{% endif %}
-                </span>
-            </button>
-        </form>
-
-        <!-- Forgot Password -->
-        <div class="forgot-password">
-            <a href="{% url 'account_reset_password' %}" class="font-futuristic">
-                <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-                {% if country == 'US' %}{% trans "Reset password" %}{% else %}Restablecer contraseña{% endif %}
-            </a>
-        </div>
-
-        <!-- Sign Up -->
-        <div class="signup-section">
-            <div class="signup-text">{% if country == 'US' %}{% trans "New to eGarage?" %}{% else %}¿Nuevo en eGarage?{% endif %}</div>
-            <a href="{% url 'account_signup' %}?from={{ country|default:'CL'|lower }}" class="signup-link font-futuristic">
-                {% if country == 'US' %}{% trans "Create your account" %}{% else %}Crea tu cuenta{% endif %} →
-            </a>
-        </div>
-    </div>
-</div>
-
-<script>
-// Animación de entrada
-document.addEventListener('DOMContentLoaded', function() {
-    const card = document.querySelector('.glass-card');
-    card.style.opacity = '0';
-    card.style.transform = 'translateY(30px)';
-
-    setTimeout(() => {
-        card.style.transition = 'all 0.8s ease-out';
-        card.style.opacity = '1';
-        card.style.transform = 'translateY(0)';
-    }, 100);
-    
-    // Asegurar que el fix de iOS se aplica a los campos de contraseña
-    const passwordInputs = document.querySelectorAll('input[type="password"]');
-    passwordInputs.forEach(function(input) {
-        // Agregar atributos adicionales si no están presentes
-        if (!input.hasAttribute('autocapitalize')) {
-            input.setAttribute('autocapitalize', 'none');
-        }
-        if (!input.hasAttribute('autocorrect')) {
-            input.setAttribute('autocorrect', 'off');
-        }
-        if (!input.hasAttribute('spellcheck')) {
-            input.setAttribute('spellcheck', 'false');
-        }
-    });
-});
-</script>
+    <p class="mt-5 text-center text-sm text-slate-400">
+      No tienes cuenta?
+      <a class="text-cyan-300 hover:text-cyan-200" href="{% url 'account_signup' %}">Crear cuenta</a>
+    </p>
+  </div>
+</section>
 {% endblock %}
+
