@@ -1586,16 +1586,21 @@ input:disabled, select:disabled, textarea:disabled {
                 <option value="">{% trans 'Select vehicle...' %}</option>
               </select>
             </div>
-            <button type="button" id="btn-nuevo-vehiculo" data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}" class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0">
-              <span aria-hidden="true">+</span>
-              <span class="doc-action-label text-white font-semibold">Nuevo vehículo</span>
-            </button>
+            
+<a id="btn-nuevo-vehiculo"
+   href="{% country_url 'vehiculos:crear_vehiculo' %}?return_to={{ request.get_full_path|urlencode }}&select_field=vehiculo&cliente_id="
+   data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}"
+   class="doc-action-btn text-sm bg-cyan-600 hover:bg-cyan-500 px-3 py-2 rounded-md text-white flex-shrink-0 inline-flex items-center gap-2 no-underline">
+  <span aria-hidden="true">+</span>
+  <span class="doc-action-label text-white font-semibold">Nuevo vehículo</span>
+</a>
+
           </div>
         </div>
         {% endif %}
         {% if 'kilometraje_ingreso' in form.fields %}
         <div id="miles-section" class="tipo-dependent-miles flex flex-wrap items-center gap-2 mt-2">
-          <label for="id_kilometraje_ingreso" class="text-xs text-slate-400">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% trans "Mileage" %}{% endif %}</label>
+          <label for="id_kilometraje_ingreso" class="text-xs text-slate-400">{% get_current_language as lang %}{% if lang == 'es' %}{% trans "Kilometraje" %}{% else %}{% if request.country == 'US' %}Millas{% else %}Kilometraje{% endif %}{% endif %}</label>
           <div class="flex-1 min-w-0 max-w-[7rem]">{{ form.kilometraje_ingreso }}</div>
           <span class="text-xs text-slate-500">{% get_current_language as lang %}{% if lang == 'es' %}km{% else %}mi{% endif %}</span>
         </div>
@@ -1902,4 +1907,42 @@ window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
 window.repuestosIniciales = {{ repuestos_json|default:"[]"|safe }};
 window.serviciosIniciales = {{ servicios_json|default:"[]"|safe }};
 window.otrosIniciales = {{ otros_json|default:"[]"|safe }};
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const vehiculoBtn = document.getElementById('btn-nuevo-vehiculo');
+
+  if (vehiculoBtn) {
+    vehiculoBtn.addEventListener('click', function(e) {
+
+      const clienteSelect = document.getElementById('id_cliente');
+
+      let clienteId = '';
+
+      if (clienteSelect) {
+        clienteId = clienteSelect.value || '';
+      }
+
+      const baseUrl = vehiculoBtn.dataset.urlCrearVehiculo;
+
+      const returnTo = encodeURIComponent(
+        window.location.pathname + window.location.search
+      );
+
+      let finalUrl =
+        baseUrl +
+        '?return_to=' + returnTo +
+        '&select_field=vehiculo';
+
+      if (clienteId) {
+        finalUrl += '&cliente_id=' + encodeURIComponent(clienteId);
+      }
+
+      vehiculoBtn.href = finalUrl;
+    });
+  }
+
+});
 </script>
