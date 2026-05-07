@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+﻿{% extends 'base.html' %}
 {% load custom_filters %}
 {% load country_url %}
 
@@ -6,32 +6,10 @@
 <link href="/static/css/estilo_futurista.css" rel="stylesheet">
 <link href="/static/css/galaxy_theme.css" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;800&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/tsparticles@2/tsparticles.bundle.min.js"></script>
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  tsParticles.load("tsparticles", {
-    fullScreen: { enable: false },
-    background: { color: { value: "transparent" } },
-    particles: {
-      number: { value: 100 },
-      color: { value: "#00ffff" },
-      size: { value: 2 },
-      move: { enable: true, speed: 0.7 },
-      links: { enable: true, color: "#00e6d0", opacity: 0.3 }
-    }
-  });
-});
-</script>
+
 <style>
-body {
-  background: linear-gradient(120deg, #0f2027 0%, #2c5364 100%) fixed;
-  min-height: 100vh;
-}
-#tsparticles {
-  position: fixed;
-  inset: 0;
-  z-index: 0;
-}
+
+
 .cuadro {
   position: relative;
   z-index: 2;
@@ -145,7 +123,7 @@ body {
   color: rgba(255,255,255,0.6) !important;
 }
 
-/* Para campos múltiples */
+/* Para campos mÃºltiples */
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
   background: rgba(0,230,208,0.2) !important;
   border: 1px solid rgba(0,230,208,0.4) !important;
@@ -204,15 +182,15 @@ body {
 {% endblock %}
 
 {% block fondo_extra %}
-<div id="tsparticles" class="fixed inset-0 -z-10"></div>
+{{ block.super }}
 {% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto cuadro">
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold font-orbitron">Editar Vehículo</h1>
+    <h1 class="text-3xl font-bold font-orbitron">Editar VehÃ­culo</h1>
     <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}"
-       class="btn-futuristic btn-secondary">← Volver a la lista</a>
+       class="btn-futuristic btn-secondary">â† Volver a la lista</a>
   </div>
 
   <div class="form-card">
@@ -241,7 +219,7 @@ body {
         </div>
 
         <div class="form-group">
-          <label for="{{ form.anio.id_for_label }}">Año</label>
+          <label for="{{ form.anio.id_for_label }}">AÃ±o</label>
           {{ form.anio }}
           {% if form.anio.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.anio.errors.0 }}</div>
@@ -315,7 +293,7 @@ body {
         </div>
 
         <div class="form-group">
-          <label for="{{ form.caja.id_for_label }}">Caja/Transmisión</label>
+          <label for="{{ form.caja.id_for_label }}">Caja/TransmisiÃ³n</label>
           {{ form.caja }}
           {% if form.caja.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.caja.errors.0 }}</div>
@@ -325,7 +303,7 @@ body {
             <input type="text"
                    name="caja_nuevo"
                    id="caja_nuevo"
-                   placeholder="Ingresa el nombre de la nueva caja/transmisión"
+                   placeholder="Ingresa el nombre de la nueva caja/transmisiÃ³n"
                    class="form-control"
                    style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
           </div>
@@ -336,13 +314,13 @@ body {
 
       <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
         <button type="submit" class="btn-futuristic">
-          💾 Guardar cambios
+          ðŸ’¾ Guardar cambios
         </button>
 
         {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
         <a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}"
            class="btn-futuristic btn-secondary">
-          ❌ Cancelar
+          âŒ Cancelar
         </a>
       </div>
     </form>
@@ -350,7 +328,7 @@ body {
 </div>
 
 <script>
-// Definir countryPrefix globalmente para que esté disponible en todo el scope
+// Definir countryPrefix globalmente para que estÃ© disponible en todo el scope
 const countryPrefix = (function() {
     const path = window.location.pathname;
     if (path.startsWith('/us/')) return '/us/';
@@ -374,28 +352,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const modeloSelect = document.getElementById('id_modelo');
     const anioSelect = document.getElementById('id_anio');
 
-    // Función para cargar marcas vía AJAX (siempre ejecuta, incluso si hay opciones)
+    // FunciÃ³n para cargar marcas vÃ­a AJAX (siempre ejecuta, incluso si hay opciones)
     function cargarMarcas(forceReload = false) {
         if (!marcaSelect) {
-            console.error('❌ Campo marca (id_marca) no encontrado en el DOM');
+            console.error('âŒ Campo marca (id_marca) no encontrado en el DOM');
             return;
         }
         
-        // Verificar si ya tiene opciones válidas (más que solo la opción vacía)
+        // Verificar si ya tiene opciones vÃ¡lidas (mÃ¡s que solo la opciÃ³n vacÃ­a)
         const hasValidOptions = marcaSelect.options.length > 1 || 
                                (marcaSelect.options.length === 1 && marcaSelect.options[0].value !== '');
         
-        // Si ya tiene opciones válidas y no se fuerza la recarga, no hacer nada
+        // Si ya tiene opciones vÃ¡lidas y no se fuerza la recarga, no hacer nada
         if (hasValidOptions && !forceReload) {
-            console.log('ℹ️ Campo marca ya tiene opciones, omitiendo carga:', {
+            console.log('â„¹ï¸ Campo marca ya tiene opciones, omitiendo carga:', {
                 optionsCount: marcaSelect.options.length,
                 firstOption: marcaSelect.options[0] ? marcaSelect.options[0].text : 'N/A'
             });
             return;
         }
         
-        console.log('🔄 Cargando marcas desde:', urlMarcas);
-        console.log('📋 Estado actual del campo marca:', {
+        console.log('ðŸ”„ Cargando marcas desde:', urlMarcas);
+        console.log('ðŸ“‹ Estado actual del campo marca:', {
             optionsCount: marcaSelect.options.length,
             hasValue: marcaSelect.value,
             options: Array.from(marcaSelect.options).map(opt => ({value: opt.value, text: opt.text}))
@@ -410,7 +388,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         fetch(urlMarcas)
             .then(response => {
-                console.log('📡 Respuesta del servidor:', {
+                console.log('ðŸ“¡ Respuesta del servidor:', {
                     status: response.status,
                     statusText: response.statusText,
                     ok: response.ok,
@@ -423,7 +401,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                console.log('✅ Datos recibidos:', data);
+                console.log('âœ… Datos recibidos:', data);
                 
                 // Limpiar opciones
                 marcaSelect.innerHTML = '<option value="">---------</option>';
@@ -436,25 +414,25 @@ document.addEventListener('DOMContentLoaded', function() {
                         marcaSelect.appendChild(option);
                     });
                     
-                    // Restaurar el valor anterior si existía
+                    // Restaurar el valor anterior si existÃ­a
                     if (valorActual) {
                         marcaSelect.value = valorActual;
                     }
                     
-                    console.log(`✅ Marcas cargadas exitosamente: ${data.length} marcas`);
+                    console.log(`âœ… Marcas cargadas exitosamente: ${data.length} marcas`);
                 } else {
-                    console.warn('⚠️ No se encontraron marcas en la respuesta. Verificar que existan marcas en la base de datos para el país correspondiente.');
+                    console.warn('âš ï¸ No se encontraron marcas en la respuesta. Verificar que existan marcas en la base de datos para el paÃ­s correspondiente.');
                     marcaSelect.innerHTML = '<option value="">No hay marcas disponibles</option>';
                 }
                 
                 marcaSelect.disabled = false;
             })
             .catch(error => {
-                console.error('❌ Error al cargar marcas:', error);
+                console.error('âŒ Error al cargar marcas:', error);
                 marcaSelect.innerHTML = '<option value="">Error al cargar marcas</option>';
                 marcaSelect.disabled = false;
                 
-                // Mostrar mensaje de error más detallado
+                // Mostrar mensaje de error mÃ¡s detallado
                 console.error('Detalles del error:', {
                     message: error.message,
                     url: urlMarcas,
@@ -464,7 +442,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (marcaSelect && modeloSelect) {
-        // Función para cargar modelos por marca y año
+        // FunciÃ³n para cargar modelos por marca y aÃ±o
         function cargarModelos(marcaId, anio = null, modeloSeleccionado = null) {
             // Limpiar opciones del modelo
             modeloSelect.innerHTML = '<option value="">---------</option>';
@@ -476,13 +454,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 loadingOption.textContent = 'Cargando modelos...';
                 modeloSelect.appendChild(loadingOption);
 
-                // Construir URL con parámetros
+                // Construir URL con parÃ¡metros
                 let url = `${urlModelosPorMarcaApi}?marca_id=${marcaId}`;
                 if (anio) {
                     url += `&anio=${anio}`;
                 }
 
-                // Hacer petición AJAX para obtener modelos de la marca (y año si está disponible)
+                // Hacer peticiÃ³n AJAX para obtener modelos de la marca (y aÃ±o si estÃ¡ disponible)
                 fetch(url)
                     .then(response => {
                         console.log('Response status:', response.status);
@@ -535,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Función para cargar motores y cajas por modelo
+        // FunciÃ³n para cargar motores y cajas por modelo
         function cargarMotoresYCajas(modeloId, motorSeleccionado = null, cajaSeleccionada = null) {
             const motorSelect = document.getElementById('id_motor');
             const cajaSelect = document.getElementById('id_caja');
@@ -577,10 +555,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                     
-                    // Agregar opción para crear nuevo motor
+                    // Agregar opciÃ³n para crear nuevo motor
                     const nuevoOption = document.createElement('option');
                     nuevoOption.value = '__nuevo__';
-                    nuevoOption.textContent = '➕ Agregar nuevo motor...';
+                    nuevoOption.textContent = 'âž• Agregar nuevo motor...';
                     motorSelect.appendChild(nuevoOption);
 
                     // Si el valor seleccionado es __nuevo__, seleccionarlo
@@ -620,10 +598,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                     }
                     
-                    // Agregar opción para crear nueva caja
+                    // Agregar opciÃ³n para crear nueva caja
                     const nuevoOption = document.createElement('option');
                     nuevoOption.value = '__nuevo__';
-                    nuevoOption.textContent = '➕ Agregar nueva caja...';
+                    nuevoOption.textContent = 'âž• Agregar nueva caja...';
                     cajaSelect.appendChild(nuevoOption);
 
                     // Si el valor seleccionado es __nuevo__, seleccionarlo
@@ -637,7 +615,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
         }
 
-        // Función para obtener año actual
+        // FunciÃ³n para obtener aÃ±o actual
         function obtenerAnio() {
             if (anioSelect && anioSelect.value) {
                 return anioSelect.value;
@@ -645,14 +623,14 @@ document.addEventListener('DOMContentLoaded', function() {
             return null;
         }
 
-        // Función para recargar modelos cuando cambia marca o año
+        // FunciÃ³n para recargar modelos cuando cambia marca o aÃ±o
         function recargarModelos() {
             const marcaId = marcaSelect.value;
             const anio = obtenerAnio();
             const modeloActual = modeloSelect.value;
             cargarModelos(marcaId, anio, modeloActual);
             
-            // Limpiar motores y cajas cuando cambia la marca o año
+            // Limpiar motores y cajas cuando cambia la marca o aÃ±o
             const motorSelect = document.getElementById('id_motor');
             const cajaSelect = document.getElementById('id_caja');
             if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
@@ -664,7 +642,7 @@ document.addEventListener('DOMContentLoaded', function() {
             recargarModelos();
         });
 
-        // Event listener para cambio de año
+        // Event listener para cambio de aÃ±o
         if (anioSelect) {
             anioSelect.addEventListener('change', function() {
                 if (marcaSelect.value) {
@@ -686,9 +664,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // SIEMPRE cargar marcas al inicio (fuerza recarga si el campo está vacío o solo tiene opción por defecto)
-        console.log('🚀 Iniciando carga de marcas...');
-        // Forzar recarga si el campo tiene menos de 2 opciones (solo la opción vacía)
+        // SIEMPRE cargar marcas al inicio (fuerza recarga si el campo estÃ¡ vacÃ­o o solo tiene opciÃ³n por defecto)
+        console.log('ðŸš€ Iniciando carga de marcas...');
+        // Forzar recarga si el campo tiene menos de 2 opciones (solo la opciÃ³n vacÃ­a)
         const shouldForceReload = marcaSelect.options.length <= 1;
         cargarMarcas(shouldForceReload);
 
@@ -704,15 +682,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     } else {
         // Si no se encontraron los campos, intentar cargar marcas de todos modos
-        console.log('⚠️ Campos marca/modelo no encontrados, intentando cargar marcas de todos modos...');
+        console.log('âš ï¸ Campos marca/modelo no encontrados, intentando cargar marcas de todos modos...');
         cargarMarcas();
     }
     
-    // Fallback: intentar cargar marcas después de un pequeño delay por si el campo se carga dinámicamente
+    // Fallback: intentar cargar marcas despuÃ©s de un pequeÃ±o delay por si el campo se carga dinÃ¡micamente
     setTimeout(function() {
         const marcaSelectDelayed = document.getElementById('id_marca');
         if (marcaSelectDelayed && (marcaSelectDelayed.options.length <= 1 || marcaSelectDelayed.options[0].value === '')) {
-            console.log('🔄 Reintentando carga de marcas (fallback)...');
+            console.log('ðŸ”„ Reintentando carga de marcas (fallback)...');
             cargarMarcas();
         }
     }, 500);
@@ -760,7 +738,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Función para crear nuevo motor vía AJAX
+        // FunciÃ³n para crear nuevo motor vÃ­a AJAX
         function crearNuevoMotor(nombreMotor) {
             const modeloId = modeloSelect.value;
             if (!modeloId) {
@@ -780,7 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Obtener CSRF token
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-            // Crear motor vía AJAX
+            // Crear motor vÃ­a AJAX
             fetch(urlAgregarMotor, {
                 method: 'POST',
                 headers: {
@@ -804,7 +782,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     option.textContent = data.motor.nombre;
                     option.selected = true;
 
-                    // Remover la opción "__nuevo__" y agregar el nuevo motor antes de ella
+                    // Remover la opciÃ³n "__nuevo__" y agregar el nuevo motor antes de ella
                     const nuevoOption = motorSelect.querySelector('option[value="__nuevo__"]');
                     if (nuevoOption) {
                         motorSelect.insertBefore(option, nuevoOption);
@@ -870,7 +848,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
 
-        // Función para crear nueva caja vía AJAX
+        // FunciÃ³n para crear nueva caja vÃ­a AJAX
         function crearNuevaCaja(nombreCaja) {
             const modeloId = modeloSelect.value;
             if (!modeloId) {
@@ -890,7 +868,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Obtener CSRF token
             const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
 
-            // Crear caja vía AJAX
+            // Crear caja vÃ­a AJAX
             fetch(urlAgregarCaja, {
                 method: 'POST',
                 headers: {
@@ -905,7 +883,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 cajaNuevoInput.disabled = false;
-                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmisión';
+                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmisiÃ³n';
 
                 if (data.success) {
                     // Agregar la nueva caja al dropdown
@@ -914,7 +892,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     option.textContent = data.caja.nombre;
                     option.selected = true;
 
-                    // Remover la opción "__nuevo__" y agregar la nueva caja antes de ella
+                    // Remover la opciÃ³n "__nuevo__" y agregar la nueva caja antes de ella
                     const nuevoOption = cajaSelect.querySelector('option[value="__nuevo__"]');
                     if (nuevoOption) {
                         cajaSelect.insertBefore(option, nuevoOption);
@@ -936,7 +914,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error al crear caja:', error);
                 cajaNuevoInput.disabled = false;
-                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmisión';
+                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmisiÃ³n';
                 alert('Error al crear la caja. Por favor intenta nuevamente.');
             });
         }
@@ -962,8 +940,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // ✅ Establecer valores iniciales de motor y caja después de que Select2 se inicialice
-    // Esto es necesario cuando se está editando un vehículo y los campos usan Select2
+    // âœ… Establecer valores iniciales de motor y caja despuÃ©s de que Select2 se inicialice
+    // Esto es necesario cuando se estÃ¡ editando un vehÃ­culo y los campos usan Select2
     {% if vehiculo %}
     (function() {
         var intentos = 0;
@@ -972,7 +950,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function establecerValoresIniciales() {
             intentos++;
             
-            // Verificar que jQuery esté disponible
+            // Verificar que jQuery estÃ© disponible
             if (typeof $ === 'undefined') {
                 if (intentos < maxIntentos) {
                     setTimeout(establecerValoresIniciales, 100);
@@ -990,7 +968,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var motorId = '{{ vehiculo.motor_id }}';
             var motorNombre = '{{ vehiculo.motor.nombre|escapejs }}';
             if (motorSelect.length && motorId) {
-                // Siempre agregar la opción si no existe (importante para Select2 autocomplete)
+                // Siempre agregar la opciÃ³n si no existe (importante para Select2 autocomplete)
                 if (motorSelect.find('option[value="' + motorId + '"]').length === 0) {
                     var newOption = new Option(motorNombre, motorId, true, true);
                     motorSelect.append(newOption);
@@ -999,15 +977,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Establecer el valor primero
                 motorSelect.val(motorId);
                 
-                // Verificar si Select2 está inicializado
+                // Verificar si Select2 estÃ¡ inicializado
                 if (motorSelect.hasClass('select2-hidden-accessible')) {
                     // Establecer usando Select2 API
                     motorSelect.trigger('change.select2');
-                    // Verificar después de un pequeño delay
+                    // Verificar despuÃ©s de un pequeÃ±o delay
                     setTimeout(function() {
                         var currentVal = motorSelect.val();
                         if (currentVal == motorId || motorSelect.find('option[value="' + motorId + '"]:selected').length > 0) {
-                            console.log('✅ Motor inicial establecido (Select2):', motorId, motorNombre);
+                            console.log('âœ… Motor inicial establecido (Select2):', motorId, motorNombre);
                             motorListo = true;
                         } else {
                             // Reintentar
@@ -1016,8 +994,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }, 100);
                 } else {
-                    // Si no es Select2 aún, el valor ya está establecido
-                    console.log('✅ Motor inicial establecido (sin Select2 aún):', motorId);
+                    // Si no es Select2 aÃºn, el valor ya estÃ¡ establecido
+                    console.log('âœ… Motor inicial establecido (sin Select2 aÃºn):', motorId);
                     motorListo = true;
                 }
             } else {
@@ -1032,7 +1010,7 @@ document.addEventListener('DOMContentLoaded', function() {
             var cajaId = '{{ vehiculo.caja_id }}';
             var cajaNombre = '{{ vehiculo.caja.nombre|escapejs }}';
             if (cajaSelect.length && cajaId) {
-                // Siempre agregar la opción si no existe (importante para Select2 autocomplete)
+                // Siempre agregar la opciÃ³n si no existe (importante para Select2 autocomplete)
                 if (cajaSelect.find('option[value="' + cajaId + '"]').length === 0) {
                     var newOption = new Option(cajaNombre, cajaId, true, true);
                     cajaSelect.append(newOption);
@@ -1041,15 +1019,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Establecer el valor primero
                 cajaSelect.val(cajaId);
                 
-                // Verificar si Select2 está inicializado
+                // Verificar si Select2 estÃ¡ inicializado
                 if (cajaSelect.hasClass('select2-hidden-accessible')) {
                     // Establecer usando Select2 API
                     cajaSelect.trigger('change.select2');
-                    // Verificar después de un pequeño delay
+                    // Verificar despuÃ©s de un pequeÃ±o delay
                     setTimeout(function() {
                         var currentVal = cajaSelect.val();
                         if (currentVal == cajaId || cajaSelect.find('option[value="' + cajaId + '"]:selected').length > 0) {
-                            console.log('✅ Caja inicial establecida (Select2):', cajaId, cajaNombre);
+                            console.log('âœ… Caja inicial establecida (Select2):', cajaId, cajaNombre);
                             cajaLista = true;
                         } else {
                             // Reintentar
@@ -1058,8 +1036,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }, 100);
                 } else {
-                    // Si no es Select2 aún, el valor ya está establecido
-                    console.log('✅ Caja inicial establecida (sin Select2 aún):', cajaId);
+                    // Si no es Select2 aÃºn, el valor ya estÃ¡ establecido
+                    console.log('âœ… Caja inicial establecida (sin Select2 aÃºn):', cajaId);
                     cajaLista = true;
                 }
             } else {
@@ -1069,24 +1047,24 @@ document.addEventListener('DOMContentLoaded', function() {
             cajaLista = true; // No hay caja que establecer
             {% endif %}
             
-            // Si ambos están listos o hemos alcanzado el máximo de intentos, detener
+            // Si ambos estÃ¡n listos o hemos alcanzado el mÃ¡ximo de intentos, detener
             if (motorListo && cajaLista) {
-                console.log('✅ Valores iniciales de motor y caja establecidos correctamente');
+                console.log('âœ… Valores iniciales de motor y caja establecidos correctamente');
                 return;
             }
             
-            // Si aún no están listos y no hemos alcanzado el máximo, intentar de nuevo
+            // Si aÃºn no estÃ¡n listos y no hemos alcanzado el mÃ¡ximo, intentar de nuevo
             if (intentos < maxIntentos) {
                 setTimeout(establecerValoresIniciales, 100);
             } else {
-                console.warn('⚠️ No se pudieron establecer todos los valores iniciales después de ' + maxIntentos + ' intentos');
+                console.warn('âš ï¸ No se pudieron establecer todos los valores iniciales despuÃ©s de ' + maxIntentos + ' intentos');
             }
         }
         
-        // Iniciar después de un delay para permitir que form.media y Select2 se carguen
+        // Iniciar despuÃ©s de un delay para permitir que form.media y Select2 se carguen
         setTimeout(establecerValoresIniciales, 800);
         
-        // También intentar después de que la página esté completamente cargada
+        // TambiÃ©n intentar despuÃ©s de que la pÃ¡gina estÃ© completamente cargada
         if (document.readyState === 'complete') {
             setTimeout(establecerValoresIniciales, 1200);
         } else {
@@ -1098,6 +1076,8 @@ document.addEventListener('DOMContentLoaded', function() {
     {% endif %}
 });
 </script>
-{# form.media (DAL/Select2) se carga UNA SOLA VEZ en base.html (CSS en head, JS al final). NO duplicar aquí. #}
+{# form.media (DAL/Select2) se carga UNA SOLA VEZ en base.html (CSS en head, JS al final). NO duplicar aquÃ­. #}
 
 {% endblock %}
+
+
