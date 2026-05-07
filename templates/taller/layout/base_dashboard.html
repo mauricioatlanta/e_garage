@@ -1,23 +1,19 @@
-{% load static %}
+﻿{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta charset="UTF-8">
   <title>{% block title %}Panel - {{ company_name }}{% endblock %}</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600&display=swap" rel="stylesheet">
   <script src="https://kit.fontawesome.com/a2e0e9d62f.js" crossorigin="anonymous"></script>
   {% block extrahead %}{% endblock %}
+<script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-950 text-white font-sans min-h-screen">
   {% block header %}
   <header class="bg-gray-900 shadow p-4 flex justify-between items-center">
     <div class="flex items-center gap-4">
-      <!-- GREEN CROSSES - TALLER DASHBOARD -->
-      <div class="flex items-center gap-2 text-green-500 text-2xl">
-        <span>❌</span>
-        <span>❌</span>
-        <span>❌</span>
-      </div>
 
       {% if company_logo_url %}
         <img src="{{ company_logo_url }}" class="h-8 w-auto" alt="Logo {{ company_name }}">
@@ -27,8 +23,8 @@
       <span class="text-xl font-bold font-orbitron">{{ company_name }} Panel</span>
     </div>
     <nav class="flex gap-6 text-sm">
-      <a href="{% url 'dashboard' %}" class="hover:text-cyan-400">Dashboard</a>
-      {% comment %} Botón Documentos {% endcomment %}
+      <a href="{% url 'taller:centro_operaciones' %}" class="hover:text-cyan-400">Dashboard</a>
+      {% comment %} BotÃ³n Documentos {% endcomment %}
       {% if request.path|slice:":3" == "/cl" %}
         {% url 'documentos_cl:lista_documentos' as url_documentos %}
       {% elif request.path|slice:":3" == "/us" %}
@@ -37,15 +33,16 @@
         {% url 'documentos_cl:lista_documentos' as url_documentos %}
       {% endif %}
       {% if url_documentos %}
-        <a href="{{ url_documentos }}" class="hover:text-cyan-400">📄 Documentos</a>
+        <a href="{{ url_documentos }}" class="hover:text-cyan-400">ðŸ“„ Documentos</a>
       {% endif %}
-      <a href="{% url 'logout' %}" class="hover:text-red-400">Cerrar sesión</a>
+    <a href="/accounts/logout/" class="hover:text-red-400 font-bold">🚪 Salir</a>
     </nav>
   </header>
   {% endblock %}
-  <main class="p-6">
+  <main class="p-3 md:p-6">
     {% block content %}{% endblock %}
   </main>
   {% block extra_scripts %}{% endblock %}
 </body>
 </html>
+
