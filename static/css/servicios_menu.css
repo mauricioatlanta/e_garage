@@ -199,29 +199,65 @@
     .services-grid {
       display: grid;
       gap: 14px;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
     }
 
     .service-card {
-      border-radius: 22px;
+      border-radius: 18px;
       border: 1px solid rgba(143, 182, 204, 0.16);
-      background: var(--panel-strong);
-      padding: 18px;
+      background: linear-gradient(180deg, rgba(10, 25, 42, 0.96), rgba(7, 18, 31, 0.96));
+      padding: 16px;
       display: grid;
-      gap: 14px;
-      min-height: 250px;
+      gap: 12px;
+      min-height: 188px;
+      align-content: start;
+    }
+
+    .service-card__head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .service-card__title-block {
+      min-width: 0;
     }
 
     .service-card h3 {
       margin: 0;
-      font-size: 1.08rem;
-      line-height: 1.35;
+      font-size: 1rem;
+      line-height: 1.3;
+    }
+
+    .service-card__code {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      word-break: break-word;
+    }
+
+    .service-pill {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(79, 209, 197, 0.22);
+      background: rgba(14, 145, 191, 0.14);
+      color: #b8f4ff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
     }
 
     .service-meta {
       display: grid;
       gap: 10px;
       grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-content: start;
     }
 
     .meta-item span {
@@ -238,6 +274,18 @@
       font-size: 0.94rem;
       line-height: 1.45;
       word-break: break-word;
+    }
+
+    .service-card__description {
+      margin: 0;
+      grid-column: 1 / -1;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
     }
 
     .service-actions {
@@ -286,7 +334,8 @@
     @media (max-width: 960px) {
       .hero,
       .toolbar,
-      .stats {
+      .stats,
+      .service-meta {
         grid-template-columns: 1fr;
       }
 

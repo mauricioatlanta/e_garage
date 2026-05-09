@@ -7,7 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% trans "Servicios" %} | eGarage</title>
   
-  <link rel="stylesheet" href="/static/css/servicios_menu.css">
+  <link rel="stylesheet" href="{% static 'css/servicios_menu.css' %}?v=20260508a">
 </head>
 <body>
   <main class="page">
@@ -96,6 +96,6 @@
   {{ servicios_menu_config|json_script:"servicios-menu-config" }}
 
   
-  <script src="/static/js/servicios_menu.js"></script>
+  <script src="{% static 'js/servicios_menu.js' %}?v=20260508a"></script>
 </body>
 </html>

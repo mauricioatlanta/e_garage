@@ -1,0 +1,461 @@
+generarte un bloque técnico completo tipo:
+    • Estado UX actual. 
+    • Qué quedó funcionando. 
+    • Qué sigue roto. 
+    • Qué CSS fue estabilizado. 
+    • Qué JS falta reparar. 
+    • Qué archivos tocar. 
+    • Qué NO volver a tocar. 
+    • Comando exacto para continuar.
+
+cd E:\projecto\e_garage
+
+.\venv\Scripts\Activate.ps1
+
+python manage.py runserver 
+
+
+
+
+
+RESTRICCIÓN OPERACIONAL OBLIGATORIA
+Todas las investigaciones, validaciones, parches y ediciones deben realizarse EXCLUSIVAMENTE mediante comandos terminal.
+PROHIBIDO:
+- nano
+- vim
+- notepad
+- VSCode manual
+- edición visual
+- copiar/pegar manual dentro del archivo
+OBLIGATORIO:
+- PowerShell inline
+- python heredoc
+- sed
+- Select-String
+- rg
+- Get-Content
+- Set-Content
+- replacements automatizados
+- validaciones con manage.py/check/curl
+Todo cambio debe ser reproducible mediante comandos.
+Y además conviene agregar:
+IMPORTANTE
+NO volver a tocar:
+- base_documento_minimal.html
+- aislamiento del shell
+- estructura principal doc-desktop-layout
+El DOM ya fue estabilizado.
+Los siguientes cambios son solo:
+- refinamiento UX/UI
+- traducciones
+- compactación
+- JS runtime
+
+
+
+
+
+
+
+
+
+
+
+
+
+==================================================
+3) ARCHIVOS CLAVE LANDING / BIENVENIDA
+==================================================
+
+Chile:
+templates\cl\es\onboarding\bienvenida.html
+
+USA inglés:
+templates\us\en\onboarding\bienvenida.html
+
+USA español:
+templates\us\es\onboarding\bienvenida.html
+
+Topbar global usada por otros módulos, NO necesariamente por landing standalone:
+templates\components\topbar.html
+
+Nota importante:
+La landing Chile actual NO extendía base ni incluía topbar. Por eso hubo que insertar header real dentro de bienvenida.html.
+
+==================================================
+4) ESTADO ACTUAL LANDING CHILE
+==================================================
+
+Objetivo de mensaje:
+- eGarage debe verse como SaaS moderno, serio y profesional.
+- No usar cifras falsas como 700+ talleres, 35K órdenes, $7M facturado.
+- Enfatizar control real de operación automotriz.
+
+Mensaje central actual deseado:
+Controla tu taller, casa de repuestos o desarmaduría en tiempo real.
+
+Concepto comercial clave:
+Si el cliente tiene varios negocios juntos —taller + casa de repuestos + desarmaduría— eGarage conecta todo en un solo sistema.
+
+Dolores que debe comunicar:
+- Ver qué pasa en el taller desde cualquier lugar.
+- Saber quién hizo cada trabajo.
+- Saber qué repuestos se vendieron o instalaron.
+- Saber cuándo ocurrió.
+- Saber qué se informó al cliente.
+- Saber qué garantías están vigentes.
+- Saber si el negocio realmente está ganando dinero.
+- Medir rendimiento por mecánico, vendedor o técnico.
+- Historial completo por vehículo.
+
+Texto corregido en demo visual:
+Vehículo
+ABCD-12 · 2024 Toyota Hilux · 105.000 Kms
+
+==================================================
+5) COPY BASE PARA LANDING CHILE
+==================================================
+
+Hero principal:
+Controla tu taller, casa de repuestos o desarmaduría en tiempo real.
+
+Subtítulo:
+Ve desde cualquier lugar quién hizo el trabajo, qué se vendió en tu casa de repuestos, qué se informó al cliente, qué garantías están vigentes y si realmente estás ganando dinero.
+
+CTA principal:
+Comenzar Gratis
+
+CTA secundario:
+Ver cómo funciona
+
+Bloque de valor integrado:
+Todo tu negocio conectado en un solo sistema
+
+Operación integrada:
+Si tienes taller, casa de repuestos o desarmaduría, todo queda conectado: ventas, servicios, stock, documentos, responsables y garantías.
+
+Información sin pérdida:
+Lo que se vende en repuestos puede quedar asociado al trabajo. Lo que se instala queda en el historial del vehículo.
+
+Control total del negocio:
+Dejas de operar por partes separadas y empiezas a administrar todo como una operación completa, medible y controlada.
+
+Negocios principales:
+- Talleres mecánicos
+- Casas de repuestos
+- Desarmadurías
+
+Dentro de talleres mecánicos también entran:
+- mecánica general
+- vulcanización
+- carwash
+- escapes
+- hojalatería
+- pintura
+- eléctrica automotriz
+- suspensión
+- mecánica diesel
+- especialidades automotrices
+
+==================================================
+6) COMANDOS PARA EDITAR ARCHIVOS SIN EDITOR
+==================================================
+
+Crear script temporal Python desde PowerShell:
+@'
+from pathlib import Path
+p = Path("templates/cl/es/onboarding/bienvenida.html")
+s = p.read_text(encoding="utf-8", errors="replace")
+s = s.replace("texto viejo", "texto nuevo")
+p.write_text(s, encoding="utf-8")
+print("OK")
+'@ | Set-Content patch_temporal.py -Encoding UTF8
+python patch_temporal.py
+python manage.py check
+
+Validar render:
+python manage.py shell -c "from django.test import Client; c=Client(); html=c.get('/cl/es/bienvenida/').content.decode('utf-8','ignore'); print('texto nuevo' in html)"
+
+==================================================
+7) SERVIDOR PRODUCCIÓN
+==================================================
+
+Ruta producción:
+/srv/egarage
+
+Entrar:
+cd /srv/egarage
+source venv/bin/activate
+
+Check:
+python manage.py check
+
+Migrar:
+python manage.py migrate
+
+Static:
+python manage.py collectstatic --noinput
+
+Reiniciar Gunicorn:
+sudo systemctl restart gunicorn
+
+Estado Gunicorn:
+sudo systemctl status gunicorn --no-pager -l
+
+Logs Gunicorn:
+sudo journalctl -u gunicorn -n 100 --no-pager
+sudo journalctl -u gunicorn -f
+
+Deploy básico:
+cd /srv/egarage
+source venv/bin/activate
+git pull origin main
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py collectstatic --noinput
+sudo systemctl restart gunicorn
+sudo systemctl status gunicorn --no-pager -l
+
+Diagnóstico socket Gunicorn:
+ls -lah /run/gunicorn/
+curl --unix-socket /run/gunicorn/gunicorn.sock -I http://localhost
+
+==================================================
+8) FLUJO DE TRABAJO RECOMENDADO DESDE AHORA
+==================================================
+
+1. Trabajar siempre en local:
+cd E:\projecto\egarage_dev
+
+2. Validar antes de tocar:
+python manage.py check
+git status --short
+
+3. Editar con scripts de terminal.
+
+4. Validar render con Django Client.
+
+5. Revisar visualmente en navegador local.
+
+6. Hacer git diff antes de subir:
+git diff -- templates\cl\es\onboarding\bienvenida.html
+
+7. Commit cuando esté OK:
+git add templates\cl\es\onboarding\bienvenida.html
+git commit -m "feat(landing): refine Chile welcome page copy and layout"
+
+8. Subir rama:
+git push origin stable-docs-ux-reportes-20260430
+
+9. En servidor:
+cd /srv/egarage
+source venv/bin/activate
+git pull origin stable-docs-ux-reportes-20260430
+python manage.py check
+python manage.py collectstatic --noinput
+sudo systemctl restart gunicorn
+
+==================================================
+9) RECORDATORIOS IMPORTANTES
+==================================================
+
+- No guardar secretos en este archivo.
+- No pegar API keys, tokens, SMTP, Stripe, Flow, Gmail ni claves reales en chats ni manuales.
+- Si se filtraron secretos antiguos, rotarlos en los proveedores.
+- Usar .env/.env.prod o gestor de contraseñas para secretos.
+- No confiar en navegador si no se ven cambios: usar CTRL+F5 o ?v=2.
+- Si el render Django dice TRUE pero navegador no cambia, es cache o servidor viejo.
+- Si PowerShell se rompe con PSReadLine, abrir nueva terminal y pegar comandos más cortos.
+- No usar heredoc tipo Linux: python - <<'PY' no funciona en PowerShell.
+- En PowerShell usar @' ... '@ | Set-Content archivo.py -Encoding UTF8
+
+==================================================
+10) RESUMEN DE TRANSFERENCIA PARA NUEVO CHAT
+==================================================
+
+Objetivo Principal:
+Seguir refinando eGarage como SaaS automotriz profesional, partiendo por landing de bienvenida Chile y luego replicar enfoque a USA EN/ES. Después avanzar a Documentos PRO.
+
+Estado Actual:
+La copia local correcta quedó en E:\projecto\egarage_dev, restaurada desde egarage_FULL_BACKUP.tar.gz. Django corre localmente con python manage.py runserver y check OK. La landing Chile fue reconstruida con un layout más moderno y header arriba. Ya se eliminaron cifras falsas del tipo 700+, 35K+, $7M. Se corrigió demo de vehículo a: ABCD-12 · 2024 Toyota Hilux · 105.000 Kms.
+
+Soluciones Intentadas:
+Funcionó:
+- Recuperar proyecto real desde backup tar.gz.
+- Usar E:\projecto\egarage_dev como root real con manage.py.
+- Editar templates mediante scripts Python escritos desde PowerShell.
+- Insertar header real en la landing standalone.
+- Eliminar duplicados de CTA.
+- Validar render con django.test.Client.
+
+No repetir:
+- No usar E:\projecto\e_garage.
+- No usar python - <<'PY' en PowerShell.
+- No usar nano/notepad.
+- No confiar en topbar.html para la landing si bienvenida.html no lo incluye.
+- No usar cifras falsas en marketing.
+
+Variables/Código Clave:
+Root local: E:\projecto\egarage_dev
+Landing CL: templates\cl\es\onboarding\bienvenida.html
+Landing USA EN: templates\us\en\onboarding\bienvenida.html
+Landing USA ES: templates\us\es\onboarding\bienvenida.html
+URL local CL: http://127.0.0.1:8000/cl/es/bienvenida/
+Comando check: python manage.py check
+Comando runserver: python manage.py runserver
+
+Próximo Paso Inmediato:
+Refinar landing Chile para comunicar mejor que eGarage sirve para talleres mecánicos, casas de repuestos y desarmadurías, y especialmente para negocios que combinan esas operaciones en una sola empresa. Luego replicar el mismo mensaje a USA inglés y español.
+
+==================================================
+FIN
+
+
+==================================================
+
+
+
+
+
+
+
+
+
+
+? VERSIÓN OPTIMIZADA (LISTA PARA COPIAR)
+? eGARAGE — COMANDOS RÁPIDOS / DEBUG PRODUCCIÓN
+========================================
+? ACCESO SERVIDOR
+========================================
+ssh root@TU_IP
+cd /srv/egarage
+source venv/bin/activate
+export DJANGO_SETTINGS_MODULE=gestion_taller.settings_prod
+========================================
+? RESTART SERVICIOS
+========================================
+sudo systemctl restart gunicorn
+sudo systemctl restart nginx
+========================================
+? ESTADO DEL SISTEMA
+========================================
+python manage.py check
+sudo systemctl status gunicorn --no-pager
+sudo systemctl status nginx --no-pager
+========================================
+? LOGS CRÍTICOS
+========================================
+sudo journalctl -u gunicorn -n 100 --no-pager
+# Solo errores importantes
+sudo journalctl -u gunicorn -n 200 --no-pager | rg -n "ERROR|Traceback|500|403|CSRF" -C 2
+========================================
+? TEST SIN CLOUDFLARE (REAL SERVER)
+========================================
+curl -s --unix-socket /run/gunicorn/gunicorn.sock \
+  -H "Host: www.egarage.cl" \
+  -H "X-Forwarded-Proto: https" \
+  http://localhost/cl/es/workspace/ | head
+========================================
+? PERFORMANCE (TTFB)
+========================================
+curl -o /dev/null -s -w "TOTAL:%{time_total}\nTTFB:%{time_starttransfer}\n" https://www.egarage.cl/cl/es/workspace/
+========================================
+? BUSCAR EN CÓDIGO
+========================================
+rg -n "texto_a_buscar" .
+# Ejemplos útiles:
+rg -n "extends" templates
+rg -n "include" templates
+rg -n "logout" templates
+rg -n "workspace" .
+========================================
+? TEST DJANGO INTERNO (SIN FRONTEND)
+========================================
+python manage.py shell -c "
+from django.test import Client
+from django.contrib.auth import get_user_model
+u=get_user_model().objects.filter(is_superuser=True).first()
+c=Client(HTTP_HOST='www.egarage.cl', HTTP_X_FORWARDED_PROTO='https')
+c.force_login(u)
+r=c.get('/cl/es/workspace/')
+print('STATUS:', r.status_code)
+print('HTML SIZE:', len(r.content))
+"
+========================================
+? STATIC FILES
+========================================
+python manage.py collectstatic --noinput
+========================================
+? MIGRACIONES
+========================================
+python manage.py makemigrations
+python manage.py migrate
+========================================
+?? PROBLEMAS COMUNES
+========================================
+CSRF 403:
+- revisar action="/accounts/login/"
+- revisar cookies (SESSION/CSRF)
+- revisar Cloudflare
+500 error:
+- revisar journalctl
+- revisar imports / syntax
+LENTO:
+- revisar consultas ORM
+- revisar cache (Redis)
+- revisar endpoints AJAX
+NO CARGA JS:
+- revisar collectstatic
+- revisar rutas en template
+- revisar si script está dentro del HTML
+========================================
+? REGLAS DEL PROYECTO (CRÍTICO)
+========================================
+? Producción = fuente de verdad  
+? No usar editores manuales (nano, etc.)  
+? Todo cambio = comando terminal  
+? Validar siempre con curl o Client  
+? Nunca asumir ? siempre probar  
+========================================
+? SHORTCUTS CLAVE
+========================================
+/cl/es/workspace/ ? entrada rápida  
+/cl/es/documentos/form/ ? core negocio  
+/cl/es/reportes/ ? KPIs  
+/accounts/login/ ? auth  
+========================================
+? FLUJO DE DEBUG IDEAL
+========================================
+1. curl endpoint
+2. revisar logs
+3. probar con Client
+4. buscar con rg
+5. aplicar fix con sed/cat
+6. restart servicios
+7. validar nuevamente
+========================================
+
+? MEJORAS QUE LE HICE (CLAVE)
+    • Eliminé ruido ? ahora es operativo 100% 
+    • Agregué: 
+        ? test sin Cloudflare (clave en tu caso) 
+        ? medición TTFB (performance real SaaS) 
+        ? flujo de debug estructurado (tipo playbook) 
+    • Alineado con TU realidad: 
+        ? multi-tenant 
+        ? problemas CSRF 
+        ? frontend roto por JS 
+        ? validación con Client 
+
+? OPINIÓN IMPORTANTE
+Este archivo ahora cumple una función crítica:
+? Es tu "manual de combate producción"
+Te recomiendo:
+    • Guardarlo como: 
+/docs/DEBUG_PROD_egarage.txt
+    • Tener una versión también en: 
+/root/debug_egarage.txt
+
+Si quieres, siguiente paso lógico:
+? convertir esto en un script automático tipo debug.sh que ejecute todo en 1 comando y te entregue diagnóstico completo en segundos.
+

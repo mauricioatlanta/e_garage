@@ -8,6 +8,7 @@ from django.utils.translation import gettext_lazy as _
 from taller.models import Vehiculo
 from taller.models.clientes import Cliente
 from taller.models.extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
+from taller.vehiculos.catalog_bootstrap import ensure_vehicle_catalog_for_country
 
 # Sentinel global para "Agregar nuevo"
 NEW_SENTINEL = "__nuevo__"
@@ -60,15 +61,89 @@ class VehiculoForm(forms.ModelForm):
         label="Cliente",
     )
 
+    @staticmethod
+    def _resolve_country(user=None, request=None, default="CL"):
+        empresa = getattr(user, "empresa", None)
+        pais = (getattr(empresa, "pais", None) or default).strip().upper()
+
+        if request:
+            path = (request.path or "").lower()
+            if path.startswith("/us/"):
+                pais = "US"
+            elif path.startswith("/cl/"):
+                pais = "CL"
+            elif path.startswith("/mx/"):
+                pais = "MX"
+
+        return pais
+
+    @staticmethod
+    def _normalize_free_text_value(raw_value):
+        return str(raw_value or "").strip()
+
+    @classmethod
+    def _prepare_bound_data(cls, data):
+        if not data:
+            return data, {}
+
+        mutable_data = data.copy()
+        pending = {}
+
+        field_aliases = {
+            "motor": ("motor_nuevo", "nuevo_motor"),
+            "caja": ("caja_nuevo", "nuevo_caja"),
+        }
+
+        for field_name, aliases in field_aliases.items():
+            raw_value = cls._normalize_free_text_value(mutable_data.get(field_name))
+            extra_value = ""
+            for alias in aliases:
+                alias_value = cls._normalize_free_text_value(mutable_data.get(alias))
+                if alias_value:
+                    extra_value = alias_value
+                    break
+
+            pending_value = ""
+            if raw_value == NEW_SENTINEL:
+                pending_value = extra_value
+            elif raw_value and not raw_value.isdigit():
+                pending_value = raw_value
+            elif extra_value:
+                pending_value = extra_value
+
+            if not pending_value:
+                continue
+
+            pending[field_name] = pending_value
+            mutable_data[field_name] = ""
+            for alias in aliases:
+                mutable_data[alias] = pending_value
+
+        return mutable_data, pending
+
     def __init__(self, *args, **kwargs):
         self.user = kwargs.pop("user", None)
         self.request = kwargs.pop("request", None)
-        super().__init__(*args, **kwargs)
+        args_list = list(args)
+        bound_data = kwargs.pop("data", None)
+        if args_list:
+            bound_data = args_list.pop(0)
+
+        prepared_data, pending_custom_choices = self._prepare_bound_data(bound_data)
+        if prepared_data is not None:
+            kwargs["data"] = prepared_data
+
+        super().__init__(*args_list, **kwargs)
         assert self.user is not None, "VehiculoForm requiere user=..."
+
+        self._pending_motor_nombre = pending_custom_choices.get("motor", "")
+        self._pending_caja_nombre = pending_custom_choices.get("caja", "")
+        self._motor_nuevo = bool(self._pending_motor_nombre)
+        self._caja_nuevo = bool(self._pending_caja_nombre)
 
         empresa = getattr(self.user, "empresa", None)
         # Detectar país: primero de empresa, luego de request.path
-        pais = (getattr(empresa, "pais", None) or "CL").strip().upper()
+        pais = self._resolve_country(self.user, self.request, default="CL")
 
         # Si tenemos request, usar detección robusta del path
         if self.request:
@@ -89,6 +164,11 @@ class VehiculoForm(forms.ModelForm):
             else:
                 # Si no hay empresa, usar queryset vacío (el autocomplete lo manejará)
                 self.fields["cliente"].queryset = Cliente.objects.none()
+
+            if hasattr(self.fields["cliente"].widget, "attrs"):
+                self.fields["cliente"].widget.attrs["data-placeholder"] = (
+                    "Buscar cliente por nombre, email o telefono..."
+                )
 
             # Asegurar que el widget tenga la URL correcta del autocomplete según el país
             # Si tenemos request, ajustar la URL según el namespace del país
@@ -223,11 +303,26 @@ class VehiculoForm(forms.ModelForm):
         # Etiqueta de año según el país (UX)
         if pais == "US":
             self.fields["anio"].label = "Year"
+            if "millas" in self.fields:
+                self.fields["millas"].widget.attrs["placeholder"] = "Miles"
             log.info("[VehiculoForm] Configurando campos USA")
             self._configurar_campos_usa()
         else:
             log.info(f"[VehiculoForm] Configurando campos LATAM para país: {pais}")
             self._configurar_campos_latam(pais)
+            if "modelo" in self.fields:
+                self.fields["modelo"].widget.choices = [("", "Selecciona marca y ano primero")]
+            if "motor" in self.fields:
+                self.fields["motor"].widget.attrs["data-placeholder"] = (
+                    "Selecciona o escribe para crear un motor nuevo..."
+                )
+            if "caja" in self.fields:
+                self.fields["caja"].label = "Transmision"
+                self.fields["caja"].widget.attrs["data-placeholder"] = (
+                    "Selecciona o escribe para crear una transmision nueva..."
+                )
+            if "millas" in self.fields:
+                self.fields["millas"].widget.attrs["placeholder"] = "Kilometraje"
 
         # Configurar URLs de autocomplete para motor y caja si existen
         self._configurar_urls_autocomplete_motor_caja()
@@ -269,6 +364,25 @@ class VehiculoForm(forms.ModelForm):
             if "modelo" in self.fields:
                 self.fields["modelo"].required = False
             log.info("[VehiculoForm] Flujo desde documento (next): marca y modelo no requeridos")
+
+        self.pending_motor_nombre = self._pending_motor_nombre
+        self.pending_caja_nombre = self._pending_caja_nombre
+        self._apply_pending_tag_attrs()
+
+    def _apply_pending_tag_attrs(self):
+        pending_map = {
+            "motor": getattr(self, "_pending_motor_nombre", ""),
+            "caja": getattr(self, "_pending_caja_nombre", ""),
+        }
+
+        for field_name, pending_value in pending_map.items():
+            field = self.fields.get(field_name)
+            if not field or not hasattr(field.widget, "attrs"):
+                continue
+            if pending_value:
+                field.widget.attrs["data-pending-free-text"] = pending_value
+            else:
+                field.widget.attrs.pop("data-pending-free-text", None)
 
     def _configurar_color(self, pais):
         """Configurar campo color basado en el país y empresa"""
@@ -676,6 +790,7 @@ class VehiculoForm(forms.ModelForm):
         from taller.models.marca import Marca
 
         empresa = getattr(self.user, "empresa", None)
+        ensure_vehicle_catalog_for_country(pais)
 
         # Eliminar el campo marca si ya existe (del Meta) para reemplazarlo
         if "marca" in self.fields:
@@ -885,7 +1000,7 @@ class VehiculoForm(forms.ModelForm):
 
         empresa = getattr(self.user, "empresa", None)
         # Detectar país: primero de empresa, luego de request.path
-        pais = (getattr(empresa, "pais", None) or "CL").strip().upper()
+        pais = self._resolve_country(self.user, self.request, default="CL")
 
         # Si tenemos request, usar detección robusta del path
         if self.request:
@@ -1360,9 +1475,21 @@ class VehiculoForm(forms.ModelForm):
         vehiculo = super().save(commit=False)
         request = getattr(self, "request", None)
         empresa = getattr(self.user, "empresa", None)
-        pais = (getattr(empresa, "pais", None) or "CL").strip().upper()
+        pais = self._resolve_country(self.user, self.request, default="CL")
 
         modelo = self.cleaned_data.get("modelo")
+        motor_nombre = (
+            getattr(self, "_pending_motor_nombre", "")
+            or (request.POST.get("motor_nuevo") if request else "")
+            or (request.POST.get("nuevo_motor") if request else "")
+        )
+        caja_nombre = (
+            getattr(self, "_pending_caja_nombre", "")
+            or (request.POST.get("caja_nuevo") if request else "")
+            or (request.POST.get("nuevo_caja") if request else "")
+        )
+        motor_nombre = str(motor_nombre or "").strip()
+        caja_nombre = str(caja_nombre or "").strip()
 
         # Tipo carrocería (custom)
         if (
@@ -1385,8 +1512,8 @@ class VehiculoForm(forms.ModelForm):
             vehiculo.color = color_obj
 
         # Motor
-        if getattr(self, "_motor_nuevo", False) and request and request.POST.get("nuevo_motor"):
-            kwargs = {"nombre": request.POST["nuevo_motor"]}
+        if motor_nombre:
+            kwargs = {"nombre": motor_nombre}
             if hasattr(MotorVehiculo, "country"):
                 kwargs["country"] = pais
             if hasattr(MotorVehiculo, "empresa") and empresa:
@@ -1397,8 +1524,8 @@ class VehiculoForm(forms.ModelForm):
                 motor_obj.modelos.add(modelo)
 
         # Caja
-        if getattr(self, "_caja_nuevo", False) and request and request.POST.get("nuevo_caja"):
-            kwargs = {"nombre": request.POST["nuevo_caja"]}
+        if caja_nombre:
+            kwargs = {"nombre": caja_nombre}
             if hasattr(CajaVehiculo, "country"):
                 kwargs["country"] = pais
             if hasattr(CajaVehiculo, "empresa") and empresa:

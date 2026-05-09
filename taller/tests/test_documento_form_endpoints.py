@@ -243,3 +243,62 @@ def test_api_repuestos_general_incluye_stock_y_minimo(auth_client, user_cl):
     assert found["proveedor"] == "Proveedor Sur"
     assert found["stock"] == 8
     assert found["stock_minimo"] == 3
+
+
+@pytest.mark.django_db
+def test_document_form_prefetch_repuestos_incluye_costo_y_stock(auth_client, user_cl):
+    empresa = user_cl.empresa
+    repuesto = Repuesto.objects.create(
+        empresa=empresa,
+        part_number="1040",
+        nombre="Aceite 10W40",
+        proveedor="Proveedor Centro",
+        precio_compra=Decimal("5500.00"),
+        precio_venta=Decimal("12500.00"),
+        cantidad_stock=50,
+        stock_minimo=5,
+    )
+
+    response = auth_client.get("/cl/documentos/form/")
+
+    assert response.status_code == 200
+    repuestos_prefetch = response.context["repuestos_prefetch"]
+    found = next(item for item in repuestos_prefetch if item["id"] == repuesto.id)
+    assert found["codigo"] == "1040"
+    assert found["proveedor"] == "Proveedor Centro"
+    assert found["precio_compra"] == 5500.0
+    assert found["precio_venta_sugerido"] == 12500.0
+    assert found["stock"] == 50
+    assert found["stock_minimo"] == 5
+
+
+@pytest.mark.django_db
+def test_document_form_prefetch_servicios_bootstrapea_catalogo_si_empresa_esta_vacia(
+    auth_client, user_cl
+):
+    empresa = user_cl.empresa
+    assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
+
+    response = auth_client.get("/cl/documentos/form/")
+
+    assert response.status_code == 200
+    servicios_prefetch = response.context["servicios_prefetch"]
+    assert servicios_prefetch
+    assert Servicio.objects.filter(empresa=empresa, categoria__country="CL", activo=True).exists()
+    assert any("aceite" in item["nombre"].lower() for item in servicios_prefetch)
+
+
+@pytest.mark.django_db
+def test_buscar_servicios_api_bootstrapea_catalogo_si_empresa_esta_vacia(auth_client, user_cl):
+    empresa = user_cl.empresa
+    assert not Servicio.objects.filter(empresa=empresa, categoria__country="CL").exists()
+
+    response = auth_client.get(
+        reverse("chile:taller:servicios:buscar_servicios_api"),
+        {"q": "aceite"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["total"] > 0
+    assert any("aceite" in item["nombre"].lower() for item in payload["servicios"])

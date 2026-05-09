@@ -5,7 +5,7 @@
 (function() {
     'use strict';
 
-    var APP_VERSION = '3.1.3';
+    var APP_VERSION = '3.1.8';
 
     window.EG = window.EG || {};
     window.EG.APP_VERSION = APP_VERSION;
@@ -380,9 +380,5 @@
     window.EG.initAllModules = initAllModules;
     window.EG.loadModule = loadModule;
 })();
-
-
-
-
 
 

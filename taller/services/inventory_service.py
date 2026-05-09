@@ -12,6 +12,7 @@ Reglas:
 """
 
 import logging
+from collections import defaultdict
 from typing import List, Optional
 
 from django.db import transaction
@@ -42,6 +43,60 @@ class InventoryService:
 
     TIPOS_SIN_STOCK = ["PRES"]
     TIPOS_CON_STOCK = ["OT", "FAC"]
+
+    @staticmethod
+    def snapshot_lineas_repuesto(documento: Documento) -> list[dict]:
+        """
+        Guarda una fotografia de las lineas que mueven stock antes de que el
+        formulario las elimine y recree en una edicion.
+        """
+        if not documento or not getattr(documento, "pk", None):
+            return []
+
+        snapshot = []
+        for linea in documento.lineas_repuesto.values(
+            "origen_repuesto",
+            "repuesto_id",
+            "pieza_desarme_id",
+            "cantidad",
+        ):
+            origen = linea.get("origen_repuesto")
+            cantidad = int(linea.get("cantidad") or 0)
+            if cantidad <= 0:
+                continue
+            if origen == ORIGEN_STOCK_BODEGA and linea.get("repuesto_id"):
+                snapshot.append(
+                    {
+                        "origen_repuesto": ORIGEN_STOCK_BODEGA,
+                        "repuesto_id": int(linea["repuesto_id"]),
+                        "pieza_desarme_id": None,
+                        "cantidad": cantidad,
+                    }
+                )
+            elif origen == ORIGEN_DESARME and linea.get("pieza_desarme_id"):
+                snapshot.append(
+                    {
+                        "origen_repuesto": ORIGEN_DESARME,
+                        "repuesto_id": None,
+                        "pieza_desarme_id": int(linea["pieza_desarme_id"]),
+                        "cantidad": cantidad,
+                    }
+                )
+        return snapshot
+
+    @staticmethod
+    def _build_reserved_stock_map(snapshot_previo: Optional[list[dict]] = None) -> dict:
+        reservas = defaultdict(int)
+        for item in snapshot_previo or []:
+            origen = item.get("origen_repuesto")
+            cantidad = int(item.get("cantidad") or 0)
+            if cantidad <= 0:
+                continue
+            if origen == ORIGEN_STOCK_BODEGA and item.get("repuesto_id"):
+                reservas[(ORIGEN_STOCK_BODEGA, int(item["repuesto_id"]))] += cantidad
+            elif origen == ORIGEN_DESARME and item.get("pieza_desarme_id"):
+                reservas[(ORIGEN_DESARME, int(item["pieza_desarme_id"]))] += cantidad
+        return reservas
 
     @staticmethod
     @transaction.atomic
@@ -140,7 +195,9 @@ class InventoryService:
         }
 
     @staticmethod
-    def validar_stock_disponible(documento: Documento) -> List[str]:
+    def validar_stock_disponible(
+        documento: Documento, snapshot_previo: Optional[list[dict]] = None
+    ) -> List[str]:
         """
         Valida que hay stock suficiente para todas las líneas que mueven inventario
         (STOCK_BODEGA → Repuesto; DESARME → PiezaDesarme). EXTERNO no se valida.
@@ -149,6 +206,7 @@ class InventoryService:
         if documento.tipo in InventoryService.TIPOS_SIN_STOCK:
             return errores
 
+        reservas_previas = InventoryService._build_reserved_stock_map(snapshot_previo)
         lineas = documento.lineas_repuesto.select_related("repuesto", "pieza_desarme")
         for linea in lineas:
             if linea.origen_repuesto == ORIGEN_EXTERNO:
@@ -159,18 +217,53 @@ class InventoryService:
                         f"⚠️ Repuesto '{linea.repuesto.nombre}' no pertenece a tu empresa."
                     )
                     continue
-                if linea.repuesto.cantidad_stock < linea.cantidad:
+                disponible = int(linea.repuesto.cantidad_stock or 0) + reservas_previas.get(
+                    (ORIGEN_STOCK_BODEGA, int(linea.repuesto_id)), 0
+                )
+                if disponible < linea.cantidad:
                     errores.append(
                         f"❌ Stock insuficiente para '{linea.repuesto.nombre}'. "
-                        f"Requerido: {linea.cantidad}, Disponible: {linea.repuesto.cantidad_stock}"
+                        f"Requerido: {linea.cantidad}, Disponible: {disponible}"
                     )
             elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
-                if not linea.pieza_desarme.activo or linea.pieza_desarme.cantidad < linea.cantidad:
+                reserva_previa = reservas_previas.get(
+                    (ORIGEN_DESARME, int(linea.pieza_desarme_id)), 0
+                )
+                disponible = int(linea.pieza_desarme.cantidad or 0) + reserva_previa
+                if (not linea.pieza_desarme.activo and reserva_previa <= 0) or disponible < linea.cantidad:
                     errores.append(
                         f"❌ Stock insuficiente en pieza de desarme '{linea.pieza_desarme.nombre}'. "
-                        f"Requerido: {linea.cantidad}, Disponible: {linea.pieza_desarme.cantidad}"
+                        f"Requerido: {linea.cantidad}, Disponible: {disponible}"
                     )
         return errores
+
+    @staticmethod
+    @transaction.atomic
+    def procesar_snapshot_movimiento(empresa, snapshot: Optional[list[dict]], accion: str):
+        """
+        Aplica movimientos desde una fotografia previa de lineas.
+        Esto permite reponer o descontar stock aunque las lineas actuales
+        hayan sido borradas y recreadas por completo.
+        """
+        if accion not in {"descontar", "reponer"}:
+            raise ValueError(f"Accion de inventario no soportada: {accion}")
+
+        factor = -1 if accion == "descontar" else 1
+        for item in snapshot or []:
+            cantidad = int(item.get("cantidad") or 0)
+            if cantidad <= 0:
+                continue
+
+            origen = item.get("origen_repuesto")
+            if origen == ORIGEN_STOCK_BODEGA and item.get("repuesto_id"):
+                Repuesto.objects.filter(
+                    id=item["repuesto_id"],
+                    empresa=empresa,
+                ).update(cantidad_stock=F("cantidad_stock") + (cantidad * factor))
+            elif origen == ORIGEN_DESARME and item.get("pieza_desarme_id"):
+                pieza = PiezaDesarme.objects.filter(id=item["pieza_desarme_id"]).first()
+                if pieza:
+                    InventoryService._actualizar_stock_desarme(pieza, cantidad * factor)
 
     @staticmethod
     def validar_y_procesar_emision(documento: Documento) -> tuple[bool, List[str]]:

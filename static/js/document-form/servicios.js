@@ -170,8 +170,19 @@
     }
 
     async function searchWithFallback(options) {
-        var localResults = EG.utils.filterPrefetchItems(options.prefetch || [], options.fields || ['nombre'], options.query, 15)
-            .map(normalizeServicioItem);
+        var query = String(options.query || '').trim();
+        var localResults = [];
+
+        if (!query && options.showAllOnEmpty) {
+            localResults = (options.prefetch || []).slice(0, options.emptyLimit || 12).map(normalizeServicioItem);
+        } else {
+            localResults = EG.utils.filterPrefetchItems(
+                options.prefetch || [],
+                options.fields || ['nombre'],
+                query,
+                15
+            ).map(normalizeServicioItem);
+        }
 
         if (localResults.length) {
             options.onResults(localResults);
@@ -184,8 +195,15 @@
             return;
         }
 
+        if (!query && !options.allowEmptyQuery) {
+            if (!localResults.length) {
+                options.onResults([]);
+            }
+            return;
+        }
+
         try {
-            var response = await EG.utils.egFetch(options.url + '?q=' + encodeURIComponent(options.query));
+            var response = await EG.utils.egFetch(options.url + '?q=' + encodeURIComponent(query));
             if (!response.ok) throw new Error('HTTP ' + response.status);
             var raw = await response.json(); var data = raw.results || raw;
             var normalizedItems = extractServicioItems(data).map(normalizeServicioItem);
@@ -243,8 +261,14 @@
             + '    </div>'
             + '    <input type="hidden" class="srv-id">'
             + '  </div>'
+            + '  <div class="doc-table-cell servicio-cell servicio-cell-qty">'
+            + '    <label class="doc-field-label">' + escapeHtml(EG.I18N.qty || 'Qty') + '</label>'
+            + '    <div class="position-relative-wrapper">'
+            + '      <input type="number" class="serv-cantidad form-control text-sm" min="1" step="1" value="1">'
+            + '    </div>'
+            + '  </div>'
             + '  <div class="doc-table-cell servicio-cell servicio-cell-price">'
-            + '    <label class="doc-field-label">' + escapeHtml(EG.I18N.client_price || 'Price') + '</label>'
+            + '    <label class="doc-field-label">' + escapeHtml(EG.I18N.client_price || 'Unit Price') + '</label>'
             + '    <div class="position-relative-wrapper">'
             + '      <input type="text" class="serv-precio form-control text-sm" placeholder="0">'
             + '    </div>'
@@ -274,6 +298,7 @@
 
         var inputEl = row.querySelector('.srv-input');
         var idEl = row.querySelector('.srv-id');
+        var qtyEl = row.querySelector('.serv-cantidad');
         var priceEl = row.querySelector('.serv-precio');
         var subtotalEl = row.querySelector('.serv-subtotal');
         var subtotalViewEl = row.querySelector('.serv-subtotal-view');
@@ -294,10 +319,14 @@
             var item = normalizeServicioItem(data);
             if (idEl) idEl.value = item.id || '';
             if (inputEl) inputEl.value = item.nombre || '';
+            if (qtyEl) {
+                qtyEl.value = String(Math.max(1, parseInt(data && data.cantidad || 1, 10) || 1));
+            }
             if (priceEl) {
                 priceEl.value = formatCurrencyInputValue(item.precio);
                 priceEl.dispatchEvent(new Event('input', { bubbles: true }));
             }
+            recalcSubtotal();
             hideDropdown();
             saveServicioRowContext(row);
         }
@@ -321,9 +350,35 @@
             window.location.href = url;
         }
 
-        bindMoneyField(priceEl, subtotalEl, subtotalViewEl);
+        function recalcSubtotal() {
+            var qty = Math.max(1, parseInt(qtyEl && qtyEl.value || '1', 10) || 1);
+            var amount = EG.utils.parseNumericInput(priceEl && priceEl.value || 0);
 
-        [row, inputEl, priceEl].forEach(function(node) {
+            if (qtyEl) {
+                qtyEl.value = String(qty);
+            }
+            if (subtotalEl) {
+                subtotalEl.value = amount * qty;
+            }
+            if (subtotalViewEl) {
+                subtotalViewEl.textContent = EG.utils.money(amount * qty);
+            }
+            syncSerializedState();
+            if (typeof window.recalcTotales === 'function') {
+                window.recalcTotales();
+            }
+        }
+
+        bindCurrencyInput(priceEl, recalcSubtotal);
+
+        if (qtyEl && !qtyEl.dataset.egBound) {
+            qtyEl.dataset.egBound = '1';
+            ['input', 'change', 'blur'].forEach(function(eventName) {
+                qtyEl.addEventListener(eventName, recalcSubtotal);
+            });
+        }
+
+        [row, inputEl, qtyEl, priceEl].forEach(function(node) {
             if (node) {
                 node.addEventListener('focus', function() { saveServicioRowContext(row); }, true);
                 node.addEventListener('click', function() { saveServicioRowContext(row); });
@@ -337,40 +392,47 @@
             });
         }
 
+        function requestServiceResults(query) {
+            var normalizedQuery = String(query || '').trim();
+            var requestId = ++searchRequestId;
+            searchWithFallback({
+                query: normalizedQuery,
+                url: EG.cfg.URL_SERVICE_SEARCH,
+                prefetch: EG.PREFETCH && EG.PREFETCH.servicios,
+                fields: ['codigo', 'codigo_interno', 'nombre', 'descripcion', 'categoria', 'subcategoria', 'text', 'label'],
+                showAllOnEmpty: true,
+                allowEmptyQuery: true,
+                emptyLimit: 12,
+                onResults: function(results) {
+                    if (requestId !== searchRequestId) return;
+                    if (((inputEl.value || '').trim()) !== normalizedQuery) return;
+                    renderResults(dropdown, results, function(item) {
+                        var metaParts = [];
+                        if (item.codigo_interno) metaParts.push(item.codigo_interno);
+                        if (item.categoria) metaParts.push(item.categoria);
+                        if (item.precio) metaParts.push(EG.utils.money(item.precio));
+                        return buildDropdownItem(item, item.nombre || '', metaParts.join(' | '));
+                    });
+                }
+            });
+        }
+
         if (inputEl) {
             inputEl.addEventListener('input', function() {
                 if (idEl) idEl.value = '';
                 clearTimeout(searchTimer);
                 var query = (inputEl.value || '').trim();
-                if (query.length < 2) {
-                    hideDropdown();
-                    return;
-                }
                 searchTimer = setTimeout(function() {
-                    var requestId = ++searchRequestId;
-                    searchWithFallback({
-                        query: query,
-                        url: EG.cfg.URL_SERVICE_SEARCH,
-                        prefetch: EG.PREFETCH && EG.PREFETCH.servicios,
-                        fields: ['codigo', 'nombre', 'descripcion', 'text', 'label'],
-                        onResults: function(results) {
-                            if (requestId !== searchRequestId) return;
-                            if (((inputEl.value || '').trim()) !== query) return;
-                            renderResults(dropdown, results, function(item) {
-                                var metaParts = [];
-                                if (item.categoria) metaParts.push(item.categoria);
-                                if (item.precio) metaParts.push(EG.utils.money(item.precio));
-                                return buildDropdownItem(item, item.nombre || '', metaParts.join(' | '));
-                            });
-                        }
-                    });
-                }, 250);
+                    requestServiceResults(query);
+                }, query ? 180 : 60);
             });
 
             inputEl.addEventListener('focus', function() {
-                if ((inputEl.value || '').trim().length >= 2) {
-                    inputEl.dispatchEvent(new Event('input'));
-                }
+                inputEl.dispatchEvent(new Event('input'));
+            });
+
+            inputEl.addEventListener('click', function() {
+                inputEl.dispatchEvent(new Event('input'));
             });
         }
 
@@ -403,6 +465,7 @@
             applyItem({
                 id: data && (data.servicio_id || data.id),
                 nombre: data && data.nombre,
+                cantidad: data && data.cantidad,
                 precio: data && data.precio
             });
         };
@@ -434,27 +497,29 @@
             + '      <input type="text" class="otr-empresa form-control text-sm">'
             + '    </div>'
             + '  </div>'
-            + '  <div class="doc-table-cell otro-cell otro-cell-client">'
-            + '    <label class="doc-field-label">' + escapeHtml(EG.I18N.client_price || 'Client Price') + '</label>'
-            + '    <div class="otr-client-price-field position-relative-wrapper">'
-            + '      <input type="text" class="otr-precio form-control text-sm" placeholder="0">'
-            + '      <button type="button" class="otr-toggle-shop" title="' + escapeHtml(EG.I18N.shop_price || 'Shop Price') + '" aria-label="' + escapeHtml(EG.I18N.shop_price || 'Shop Price') + '" aria-expanded="false">'
+            + '  <div class="doc-table-cell otro-cell otro-cell-shop">'
+            + '    <label class="doc-field-label">' + escapeHtml(EG.I18N.shop_price || 'Precio taller') + '</label>'
+            + '    <div class="otr-shop-toggle-wrap">'
+            + '      <button type="button" class="otr-toggle-shop" title="' + escapeHtml(EG.I18N.shop_price || 'Precio taller') + '" aria-label="' + escapeHtml(EG.I18N.shop_price || 'Precio taller') + '" aria-expanded="false">'
             +            buildEyeIcon('otr-eye-icon')
             + '      </button>'
             + '      <div class="otr-shop-panel hidden">'
             + '        <div class="otr-shop-input-wrap">'
-            + '          <span class="otr-shop-label">' + escapeHtml(EG.I18N.shop_price || 'Shop Price') + ':</span>'
-            + '          <input type="text" class="otr-precio-taller form-control text-sm" placeholder="0">'
+            + '          <span class="otr-shop-label">' + escapeHtml(EG.I18N.shop_price || 'Precio taller') + ':</span>'
+            + '          <div class="otr-shop-input-shell">'
+            + '            <span class="otr-shop-currency">$</span>'
+            + '            <input type="text" class="otr-precio-taller form-control text-sm" inputmode="numeric" autocomplete="off" placeholder="0">'
+            + '          </div>'
             + '        </div>'
             + '        <span class="otr-shop-value">' + EG.utils.money(0) + '</span>'
             + '      </div>'
             + '    </div>'
             + '  </div>'
-            + '  <div class="doc-table-cell otro-cell otro-cell-total">'
-            + '    <label class="doc-field-label">' + escapeHtml(EG.I18N.subtotal || 'Subtotal') + '</label>'
-            + '    <input type="hidden" class="otr-subtotal" value="0">'
-            + '    <div class="position-relative-wrapper">'
-            + '      <div class="otr-subtotal-view subtotal-field text-right font-bold form-control text-sm">' + EG.utils.money(0) + '</div>'
+            + '  <div class="doc-table-cell otro-cell otro-cell-client">'
+            + '    <label class="doc-field-label">' + escapeHtml(EG.I18N.client_price || 'Client Price') + '</label>'
+            + '    <div class="otr-client-price-field">'
+            + '      <input type="text" class="otr-precio form-control text-sm" placeholder="0">'
+            + '      <input type="hidden" class="otr-subtotal" value="0">'
             + '    </div>'
             + '  </div>'
             + '  <div class="doc-table-cell otro-cell otro-cell-action">'
@@ -479,14 +544,13 @@
         var tallerEl = row.querySelector('.otr-precio-taller');
         var clientPriceEl = row.querySelector('.otr-precio');
         var subtotalEl = row.querySelector('.otr-subtotal');
-        var subtotalViewEl = row.querySelector('.otr-subtotal-view');
         var removeBtn = row.querySelector('.otr-remove-btn');
         var dropdown = row.querySelector('.otr-dropdown');
-        var searchTimer = null;
-        var searchRequestId = 0;
         var toggleShopBtn = row.querySelector('.otr-toggle-shop');
         var shopPanel = row.querySelector('.otr-shop-panel');
         var shopValueEl = row.querySelector('.otr-shop-value');
+        var searchTimer = null;
+        var searchRequestId = 0;
 
         function hideDropdown() {
             searchRequestId += 1;
@@ -504,16 +568,52 @@
             }
         }
 
-        function syncShopField(rawValue) {
-            var amount = EG.utils.parseNumericInput(rawValue || 0);
+        function showShopPanel() {
+            if (!shopPanel) {
+                return;
+            }
+            document.querySelectorAll('#otros-container .otr-shop-panel').forEach(function(panel) {
+                if (panel !== shopPanel) {
+                    panel.classList.add('hidden');
+                }
+            });
+            document.querySelectorAll('#otros-container .otr-toggle-shop').forEach(function(button) {
+                if (button !== toggleShopBtn) {
+                    button.setAttribute('aria-expanded', 'false');
+                }
+            });
+            shopPanel.classList.remove('hidden');
+            if (toggleShopBtn) {
+                toggleShopBtn.setAttribute('aria-expanded', 'true');
+            }
             if (tallerEl) {
-                tallerEl.value = formatCurrencyInputValue(amount);
+                tallerEl.focus();
+                tallerEl.select && tallerEl.select();
+            }
+        }
+
+        function syncShopValue(amount) {
+            var shopAmount = amount;
+            if (shopAmount === undefined) {
+                shopAmount = EG.utils.parseNumericInput(tallerEl && tallerEl.value || 0);
             }
             if (shopValueEl) {
-                shopValueEl.textContent = EG.utils.money(amount);
+                shopValueEl.textContent = EG.utils.money(shopAmount);
+            }
+            return shopAmount;
+        }
+
+        function recalcOtroTotals() {
+            var shopAmount = syncShopValue();
+            var clientAmount = EG.utils.parseNumericInput(clientPriceEl && clientPriceEl.value || 0);
+
+            if (subtotalEl) {
+                subtotalEl.value = clientAmount;
             }
             syncSerializedState();
-            return amount;
+            if (typeof window.recalcTotales === 'function') {
+                window.recalcTotales();
+            }
         }
 
         function applyItem(data) {
@@ -521,18 +621,24 @@
             if (idEl) idEl.value = item.id || '';
             if (searchEl) searchEl.value = item.nombre || '';
             if (empresaEl) empresaEl.value = item.empresa || '';
-            syncShopField(item.precio_taller);
+            if (tallerEl) {
+                tallerEl.value = formatCurrencyInputValue(item.precio_taller);
+            }
+            syncShopValue(item.precio_taller);
             if (clientPriceEl) {
                 clientPriceEl.value = formatCurrencyInputValue(item.precio);
                 clientPriceEl.dispatchEvent(new Event('input', { bubbles: true }));
             }
+            recalcOtroTotals();
             hideDropdown();
-            hideShopPanel();
             syncSerializedState();
         }
 
-        bindMoneyField(clientPriceEl, subtotalEl, subtotalViewEl);
-        bindCurrencyInput(tallerEl, syncShopField);
+        bindCurrencyInput(clientPriceEl, recalcOtroTotals);
+        bindCurrencyInput(tallerEl, function(amount) {
+            syncShopValue(amount);
+            recalcOtroTotals();
+        });
 
         function clearValidation(field) {
             if (!field) return;
@@ -591,11 +697,8 @@
             );
 
             if (firstInvalid && report) {
-                if (firstInvalid === tallerEl && shopPanel) {
-                    shopPanel.classList.remove('hidden');
-                    if (toggleShopBtn) {
-                        toggleShopBtn.setAttribute('aria-expanded', 'true');
-                    }
+                if (firstInvalid === tallerEl) {
+                    showShopPanel();
                 }
                 firstInvalid.reportValidity();
                 firstInvalid.focus();
@@ -656,34 +759,24 @@
             });
         }
 
+        if (removeBtn) {
+            removeBtn.addEventListener('click', function() {
+                removeDynamicRow(row, 'otros-container', 'otros-empty-hint');
+            });
+        }
+
         if (toggleShopBtn) {
             toggleShopBtn.addEventListener('click', function(event) {
                 event.preventDefault();
                 event.stopPropagation();
-                if (!shopPanel) return;
-                document.querySelectorAll('#otros-container .otr-shop-panel').forEach(function(panel) {
-                    if (panel !== shopPanel) {
-                        panel.classList.add('hidden');
-                    }
-                });
-                document.querySelectorAll('#otros-container .otr-toggle-shop').forEach(function(button) {
-                    if (button !== toggleShopBtn) {
-                        button.setAttribute('aria-expanded', 'false');
-                    }
-                });
-                shopPanel.classList.toggle('hidden');
-                var isOpen = !shopPanel.classList.contains('hidden');
-                toggleShopBtn.setAttribute('aria-expanded', String(isOpen));
-                if (isOpen && tallerEl) {
-                    tallerEl.focus();
-                    tallerEl.select && tallerEl.select();
+                if (!shopPanel) {
+                    return;
                 }
-            });
-        }
-
-        if (removeBtn) {
-            removeBtn.addEventListener('click', function() {
-                removeDynamicRow(row, 'otros-container', 'otros-empty-hint');
+                if (shopPanel.classList.contains('hidden')) {
+                    showShopPanel();
+                } else {
+                    hideShopPanel();
+                }
             });
         }
 
@@ -698,13 +791,6 @@
             });
             tallerEl.addEventListener('change', function() {
                 clearValidation(tallerEl);
-            });
-            tallerEl.addEventListener('blur', function() {
-                window.setTimeout(function() {
-                    if (document.activeElement !== toggleShopBtn && !(shopPanel && shopPanel.contains(document.activeElement))) {
-                        hideShopPanel();
-                    }
-                }, 0);
             });
         }
 

@@ -130,6 +130,10 @@
 
     function normalizePartItem(item) {
         var part = item || {};
+        var costoLinea = null;
+        if (part.costo_linea !== undefined && part.costo_linea !== null && part.costo_linea !== '') {
+            costoLinea = part.costo_linea;
+        }
         return {
             id: part.id || part.pk || '',
             codigo: part.codigo || part.part_number || part.code || '',
@@ -146,7 +150,7 @@
                 (part.stock_min !== undefined ? part.stock_min : 0)),
             origen_repuesto: part.origen_repuesto || 'STOCK_BODEGA',
             pieza_desarme_id: part.pieza_desarme_id || '',
-            costo_linea: part.costo_linea !== undefined ? part.costo_linea : 0,
+            costo_linea: costoLinea,
         };
     }
 
@@ -369,7 +373,8 @@
             if (repStockDisponible) repStockDisponible.value = part.stock !== undefined ? part.stock : '';
             if (repStockMinimo) repStockMinimo.value = part.stock_minimo !== undefined ? part.stock_minimo : '';
             syncOrigenField(part.origen_repuesto || '');
-            var costoRaw = part.costo_linea !== undefined && part.costo_linea !== ''
+            var costoLineaAmount = EG.utils.parseNumericInput(part.costo_linea || 0);
+            var costoRaw = costoLineaAmount > 0
                 ? part.costo_linea
                 : (part.precio_compra || 0);
             syncCostField(costoRaw, true);
@@ -456,13 +461,9 @@
                 div.dataset.piezaDesarmeId = item.pieza_desarme_id || '';
                 div.dataset.costoLinea = item.costo_linea || '';
                 var stockText = 'Stock: ' + (Number(item.stock || 0) || 0);
-                if ((Number(item.stock_minimo || 0) || 0) > 0) {
-                    stockText += ' | Min: ' + (Number(item.stock_minimo || 0) || 0);
-                }
                 div.innerHTML = '<div class="text-cyan-200 font-semibold">'
                     + escapeHtml((item.codigo ? item.codigo + ' - ' : '') + (item.nombre || ''))
                     + '</div><div class="text-xs text-gray-300">'
-                    + (item.proveedor ? escapeHtml(item.proveedor) + ' | ' : '')
                     + stockText + ' | '
                     + money(item.precio_venta || 0)
                     + '</div>';
@@ -648,6 +649,7 @@
             codigo: context.created_repuesto_codigo || '',
             nombre: context.created_repuesto_nombre || context.created_repuesto_label || '',
             precio_venta: context.created_repuesto_precio_venta || context.created_repuesto_precio_compra || 0,
+            precio_compra: context.created_repuesto_precio_compra || 0,
             cantidad: 1,
         });
 
@@ -704,4 +706,3 @@
     window.addRepuestoRow = addRepuestoRow;
     window.openUsedPartsModal = openUsedPartsModal;
 })();
-

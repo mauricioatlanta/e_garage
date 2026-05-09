@@ -14,6 +14,7 @@ import json
 
 from taller.utils.templates import select_country_lang_template
 
+from .catalog_bootstrap import ensure_company_services_catalog, get_master_catalog_service_items
 from .models import (
     CategoriaServicio,
     CategoriaServicioName,
@@ -55,6 +56,13 @@ SERVICIOS_MENU_UI_LABELS = {
         "loading": "Cargando servicios...",
         "resultsSingle": "1 servicio encontrado",
         "resultsPluralSuffix": "servicios encontrados",
+        "categoryLabel": "Categoria",
+        "subcategoryLabel": "Subcategoria",
+        "typeLabel": "Tipo",
+        "descriptionLabel": "Descripcion",
+        "viewLabel": "Ver",
+        "editLabel": "Editar",
+        "deleteLabel": "Eliminar",
     },
     "en": {
         "deleteConfirm": "Are you sure you want to delete this service?",
@@ -65,6 +73,13 @@ SERVICIOS_MENU_UI_LABELS = {
         "loading": "Loading services...",
         "resultsSingle": "1 service found",
         "resultsPluralSuffix": "services found",
+        "categoryLabel": "Category",
+        "subcategoryLabel": "Subcategory",
+        "typeLabel": "Type",
+        "descriptionLabel": "Description",
+        "viewLabel": "View",
+        "editLabel": "Edit",
+        "deleteLabel": "Delete",
     },
     "pt": {
         "deleteConfirm": "Tem certeza de que deseja excluir este servico?",
@@ -75,6 +90,13 @@ SERVICIOS_MENU_UI_LABELS = {
         "loading": "Carregando servicos...",
         "resultsSingle": "1 servico encontrado",
         "resultsPluralSuffix": "servicos encontrados",
+        "categoryLabel": "Categoria",
+        "subcategoryLabel": "Subcategoria",
+        "typeLabel": "Tipo",
+        "descriptionLabel": "Descricao",
+        "viewLabel": "Ver",
+        "editLabel": "Editar",
+        "deleteLabel": "Excluir",
     },
 }
 
@@ -91,6 +113,9 @@ def _resolve_servicios_menu_scope(request):
     country_code = _detectar_pais(request)
     request_lang = get_language() or getattr(request, "LANGUAGE_CODE", None) or "es"
     language = COUNTRY_LANGUAGE_MAP.get(country_code, (request_lang or "es")[:2])
+
+    if empresa:
+        ensure_company_services_catalog(empresa, country_code)
 
     servicios_pais = Servicio.objects.filter(categoria__country=country_code)
     total_servicios_pais = servicios_pais.count()
@@ -264,6 +289,8 @@ def servicios_menu_data_api(request):
     query = (request.GET.get("q") or "").strip()
     categoria_code = request.GET.get("categoria") or ""
     subcategoria_code = request.GET.get("subcategoria") or ""
+    country = _detectar_pais(request)
+    language = COUNTRY_LANGUAGE_MAP.get(country, "es")
 
     try:
         limit = int(request.GET.get("limit", 24))
@@ -304,6 +331,25 @@ def servicios_menu_data_api(request):
     data = [
         _serialize_servicio_menu_item(request, servicio, language) for servicio in servicios[:limit]
     ]
+    if not data:
+        fallback_items = get_master_catalog_service_items(
+            country,
+            language=language,
+            query=query,
+            category_code=categoria_code,
+            subcategory_code=subcategoria_code,
+            limit=limit,
+        )
+        data = [
+            {
+                **item,
+                "view_url": "",
+                "edit_url": "",
+                "delete_url": "",
+            }
+            for item in fallback_items
+        ]
+        total = len(data)
 
     result = {"servicios": data, "total": total}
 
@@ -317,6 +363,8 @@ def buscar_servicios_api(request):
     query = (request.GET.get("q") or "").strip()
     categoria_code = request.GET.get("categoria") or ""
     subcategoria_code = request.GET.get("subcategoria") or ""
+    country = _detectar_pais(request)
+    language = COUNTRY_LANGUAGE_MAP.get(country, "es")
 
     # Obtener empresa del usuario
     empresa = getattr(request.user, "empresa", None)
@@ -324,14 +372,17 @@ def buscar_servicios_api(request):
     if not empresa:
         return JsonResponse({"servicios": [], "total": 0})
 
+    ensure_company_services_catalog(empresa, country)
+
     servicios = (
-        Servicio.objects.filter(empresa=empresa, activo=True)
+        Servicio.objects.filter(
+            empresa=empresa,
+            activo=True,
+            categoria__country=country,
+        )
         .select_related("categoria", "subcategoria")
         .prefetch_related("names", "categoria__names", "subcategoria__names")
     )
-
-    country = _detectar_pais(request)
-    language = COUNTRY_LANGUAGE_MAP.get(country, "es")
 
     # Aplicar filtros de búsqueda
     if query:
@@ -383,6 +434,16 @@ def buscar_servicios_api(request):
                 ),
             }
         )
+    if not data:
+        data = get_master_catalog_service_items(
+            country,
+            language=language,
+            query=query,
+            category_code=categoria_code,
+            subcategory_code=subcategoria_code,
+            limit=20,
+        )
+        total = len(data)
 
     return JsonResponse(
         {

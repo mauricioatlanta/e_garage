@@ -73,38 +73,51 @@
       };
 
       const renderCard = (item) => {
+        const labels = config.labels || {};
+        const hasView = !!item.view_url;
+        const hasEdit = !!item.edit_url;
+        const hasDelete = !!item.delete_url;
+        const code = escapeHtml(item.codigo_interno || "");
         const descripcion = item.descripcion
-          ? `<div class="meta-item"><span>{% trans "Descripcion" %}</span><strong>${escapeHtml(item.descripcion)}</strong></div>`
+          ? `<p class="service-card__description">${escapeHtml(item.descripcion)}</p>`
           : "";
+
+        const actions = [];
+        if (hasView) {
+          actions.push(`<a class="ghost-btn" href="${escapeHtml(item.view_url)}">${escapeHtml(labels.viewLabel || "Ver")}</a>`);
+        }
+        if (hasEdit) {
+          actions.push(`<a class="ghost-btn" href="${escapeHtml(item.edit_url)}">${escapeHtml(labels.editLabel || "Editar")}</a>`);
+        }
+        if (hasDelete) {
+          actions.push(
+            `<button type="button" class="danger-btn" data-delete-url="${escapeHtml(item.delete_url)}" data-name="${escapeHtml(item.nombre)}">`
+            + `${escapeHtml(labels.deleteLabel || "Eliminar")}`
+            + `</button>`
+          );
+        }
 
         return `
           <article class="service-card">
-            <div>
-              <h3>${escapeHtml(item.nombre)}</h3>
-              <p style="color: var(--muted); margin: 8px 0 0;">${escapeHtml(item.codigo_interno || "")}</p>
+            <div class="service-card__head">
+              <div class="service-card__title-block">
+                <h3>${escapeHtml(item.nombre || "-")}</h3>
+                ${code ? `<p class="service-card__code">${code}</p>` : ""}
+              </div>
+              <span class="service-pill">${escapeHtml(item.tipo || "-")}</span>
             </div>
             <div class="service-meta">
               <div class="meta-item">
-                <span>{% trans "Categoria" %}</span>
+                <span>${escapeHtml(labels.categoryLabel || "Categoria")}</span>
                 <strong>${escapeHtml(item.categoria || "-")}</strong>
               </div>
               <div class="meta-item">
-                <span>{% trans "Subcategoria" %}</span>
+                <span>${escapeHtml(labels.subcategoryLabel || "Subcategoria")}</span>
                 <strong>${escapeHtml(item.subcategoria || "-")}</strong>
-              </div>
-              <div class="meta-item">
-                <span>{% trans "Tipo" %}</span>
-                <strong>${escapeHtml(item.tipo || "-")}</strong>
               </div>
               ${descripcion}
             </div>
-            <div class="service-actions">
-              <a class="ghost-btn" href="${escapeHtml(item.view_url)}">{% trans "Ver" %}</a>
-              <a class="ghost-btn" href="${escapeHtml(item.edit_url)}">{% trans "Editar" %}</a>
-              <button type="button" class="danger-btn" data-delete-url="${escapeHtml(item.delete_url)}" data-name="${escapeHtml(item.nombre)}">
-                {% trans "Eliminar" %}
-              </button>
-            </div>
+            ${actions.length ? `<div class="service-actions">${actions.join("")}</div>` : ""}
           </article>
         `;
       };

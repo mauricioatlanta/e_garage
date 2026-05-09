@@ -472,6 +472,17 @@ class DocumentoForm(forms.ModelForm):
         # Lo guardamos en una variable de instancia para usarlo despuÃ©s
         kilometraje_ingreso = self.cleaned_data.get("kilometraje_ingreso")
 
+        previous_document = None
+        previous_inventory_snapshot = []
+        if self.instance and getattr(self.instance, "pk", None):
+            from taller.services.inventory_service import InventoryService
+
+            previous_document = Documento.objects.filter(pk=self.instance.pk).first()
+            if previous_document:
+                previous_inventory_snapshot = InventoryService.snapshot_lineas_repuesto(
+                    previous_document
+                )
+
         # Guardar el documento (kilometraje_ingreso no estÃ¡ en fields del Meta,
         # asÃ­ que Django lo ignorarÃ¡ automÃ¡ticamente)
         documento = super().save(commit=False)
@@ -482,6 +493,7 @@ class DocumentoForm(forms.ModelForm):
             return documento
 
         with transaction.atomic():
+            documento._skip_inventory_signal = True
             documento.save()
             if hasattr(self, "save_m2m"):
                 self.save_m2m()
@@ -491,11 +503,59 @@ class DocumentoForm(forms.ModelForm):
             # Recalcular totales del documento tras crear las lÃ­neas
             documento.recompute_totals(persist=True)
 
+            self._sync_inventory_after_save(
+                documento,
+                previous_document=previous_document,
+                previous_inventory_snapshot=previous_inventory_snapshot,
+            )
+
             # Crear registro de kilometraje si se proporcionÃ³ y hay vehÃ­culo
             if kilometraje_ingreso is not None and documento.vehiculo:
                 self._crear_registro_kilometraje(documento, kilometraje_ingreso)
 
         return documento
+
+    def _sync_inventory_after_save(
+        self,
+        documento,
+        previous_document=None,
+        previous_inventory_snapshot=None,
+    ):
+        from django.core.exceptions import ValidationError
+
+        from taller.services.inventory_service import InventoryService
+
+        previous_inventory_snapshot = previous_inventory_snapshot or []
+        previous_moves_stock = bool(
+            previous_document
+            and previous_document.estado == "EMITIDO"
+            and previous_document.tipo not in InventoryService.TIPOS_SIN_STOCK
+        )
+        current_moves_stock = bool(
+            documento.estado == "EMITIDO" and documento.tipo not in InventoryService.TIPOS_SIN_STOCK
+        )
+
+        if not previous_moves_stock and not current_moves_stock:
+            return
+
+        snapshot_previo = previous_inventory_snapshot if previous_moves_stock else []
+        if current_moves_stock:
+            errores = InventoryService.validar_stock_disponible(
+                documento,
+                snapshot_previo=snapshot_previo,
+            )
+            if errores:
+                raise ValidationError({"__all__": errores})
+
+        if previous_moves_stock and snapshot_previo:
+            InventoryService.procesar_snapshot_movimiento(
+                documento.empresa,
+                snapshot_previo,
+                "reponer",
+            )
+
+        if current_moves_stock:
+            InventoryService.procesar_movimiento_stock(documento, "descontar")
 
     def _crear_registro_kilometraje(self, documento, kilometraje):
         """
@@ -630,7 +690,7 @@ class DocumentoForm(forms.ModelForm):
                 servicio_id=servicio_id,
                 service_id=service_id,
                 nombre=nombre,
-                cantidad=1,
+                cantidad=_to_positive_int(serv_data.get("cantidad"), default=1),
                 precio_unitario=_to_decimal(
                     serv_data.get("precio", serv_data.get("precio_unitario", 0))
                 ),
@@ -733,7 +793,7 @@ class DocumentoForm(forms.ModelForm):
             except (json.JSONDecodeError, ValueError):
                 pass
 
-        # Procesar servicios (SIN cantidad: forzamos cantidad=1)
+        # Procesar servicios
         servicios_data = self.cleaned_data.get("servicios_json", "[]")
         if servicios_data:
             try:
@@ -747,7 +807,7 @@ class DocumentoForm(forms.ModelForm):
                         kwargs = {
                             "documento": documento,
                             "nombre": nombre,
-                            "cantidad": 1,  # forzamos 1 (sin cantidad en UI)
+                            "cantidad": _to_positive_int(serv_data.get("cantidad"), default=1),
                             "precio_unitario": serv_data.get("precio", 0),
                         }
                         if servicio_id not in (None, ""):

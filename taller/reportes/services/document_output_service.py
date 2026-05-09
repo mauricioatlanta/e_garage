@@ -34,17 +34,19 @@ class DocumentOutputService:
     @staticmethod
     def _check_weasyprint():
         """Verifica si WeasyPrint está disponible"""
-        if DocumentOutputService._weasyprint_available is None:
-            try:
-                from weasyprint import HTML  # noqa: F401
-                from weasyprint.text.fonts import FontConfiguration  # noqa: F401
+        if DocumentOutputService._weasyprint_available is True:
+            return True
 
-                DocumentOutputService._weasyprint_available = True
-            except ImportError:
-                DocumentOutputService._weasyprint_available = False
-                log.warning(
-                    "[DocumentOutputService] WeasyPrint not available. Install with: pip install weasyprint"
-                )
+        try:
+            from weasyprint import HTML  # noqa: F401
+            from weasyprint.text.fonts import FontConfiguration  # noqa: F401
+
+            DocumentOutputService._weasyprint_available = True
+        except ImportError:
+            DocumentOutputService._weasyprint_available = False
+            log.warning(
+                "[DocumentOutputService] WeasyPrint not available. Install with: pip install weasyprint"
+            )
         return DocumentOutputService._weasyprint_available
 
     @staticmethod

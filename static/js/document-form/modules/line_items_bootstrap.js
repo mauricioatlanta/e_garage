@@ -87,6 +87,7 @@
             row.__applyServData({
                 servicio_id: serv.servicio_id || serv.id || '',
                 nombre: serv.nombre || '',
+                cantidad: serv.cantidad || 1,
                 precio: serv.precio != null ? serv.precio : (serv.precio_base != null ? serv.precio_base : 0)
             });
         });

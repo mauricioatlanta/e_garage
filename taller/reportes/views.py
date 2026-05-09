@@ -44,7 +44,7 @@ from taller.models.lineas_documento import (
 )
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
-from taller.utils.empresa import get_or_create_empresa
+from taller.utils.empresa import get_or_create_empresa, get_user_empresa_safe
 from taller.utils.motor_ia import MotorDiagnosticoIA
 from taller.reportes.kilometraje_reportes import ReporteKilometraje
 
@@ -791,8 +791,6 @@ def dashboard_inteligencia_operativa(request):
     garantias_potenciales = 0
     try:
         # Buscar documentos recientes (últimos 90 días) que podrían tener garantías activas
-        from datetime import timedelta
-
         fecha_limite = timezone.now().date() - timedelta(days=90)
 
         documentos_recientes = (

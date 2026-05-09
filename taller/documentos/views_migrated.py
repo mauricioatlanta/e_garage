@@ -9,6 +9,8 @@ from decimal import Decimal, InvalidOperation
 from django import forms
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404
 from django.urls import NoReverseMatch, reverse
 from django.utils import timezone
@@ -110,6 +112,7 @@ def _get_document_ui_config(request, empresa):
             "show_vehicle": True,
         }
 
+    ui_config["show_otros_servicios"] = True
     return _ensure_ui_config_tax_and_currency(request, ui_config, empresa)
 
 
@@ -262,6 +265,50 @@ def _reverse_with_request(request, view_name, kwargs=None):
     raise NoReverseMatch(
         f"No se pudo resolver '{view_name}' para namespaces {namespaces}. Intentos: {tried}"
     )
+
+
+def _safe_reverse_with_request(request, view_name, kwargs=None):
+    try:
+        return _reverse_with_request(request, view_name, kwargs=kwargs)
+    except NoReverseMatch:
+        return ""
+
+
+def _build_detail_action_urls(request, documento):
+    documento_pk = getattr(documento, "pk", None)
+    if not documento_pk:
+        return {}
+
+    lista_url = _safe_reverse_with_request(request, "lista_documentos")
+    editar_url = _safe_reverse_with_request(request, "documento_editar", {"pk": documento_pk})
+    pdf_moderno_url = _safe_reverse_with_request(request, "descargar_pdf", {"pk": documento_pk})
+    pdf_legacy_url = _safe_reverse_with_request(
+        request, "descargar_documento_pdf", {"documento_id": documento_pk}
+    )
+    panel_legacy_url = _safe_reverse_with_request(
+        request, "imprimir_documento", {"documento_id": documento_pk}
+    )
+    whatsapp_legacy_url = _safe_reverse_with_request(
+        request, "compartir_documento_whatsapp", {"documento_id": documento_pk}
+    )
+    email_legacy_url = _safe_reverse_with_request(
+        request, "enviar_documento_email", {"documento_id": documento_pk}
+    )
+
+    panel_url = panel_legacy_url
+    if not panel_url and pdf_moderno_url:
+        separator = "&" if "?" in pdf_moderno_url else "?"
+        panel_url = f"{pdf_moderno_url}{separator}disposition=inline"
+
+    return {
+        "detail_back_url": lista_url,
+        "detail_edit_url": editar_url,
+        "detail_panel_url": panel_url,
+        "detail_pdf_download_url": pdf_legacy_url or pdf_moderno_url,
+        "detail_pdf_export_url": pdf_moderno_url,
+        "detail_whatsapp_url": whatsapp_legacy_url,
+        "detail_email_url": email_legacy_url,
+    }
 
 
 def _normalize_numeric_string(value):
@@ -755,6 +802,7 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
 
 
 @method_decorator(login_required, name="dispatch")
+@method_decorator(ensure_csrf_cookie, name="dispatch")
 class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, CreateView):
     """Vista para crear documentos"""
 
@@ -765,6 +813,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
     def get(self, request, *args, **kwargs):
         """Al abrir el formulario (GET), vaciar mensajes de otras secciones para no mostrar alertas ajenas (desarme, idioma, etc.)."""
         _clear_messages_for_request(request)
+        get_token(request)
         return super().get(request, *args, **kwargs)
 
     def get_form_source_document(self):
@@ -826,6 +875,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
             empresa=empresa,
             language=language,
             mode=form_mode,
+            country_code=country_code,
         )
         cliente_state = initial_state["cliente"]
         vehiculo_preselect_id = initial_state["vehiculo_id"]
@@ -978,7 +1028,16 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
             repuestos_qs = (
                 Repuesto.objects.filter(empresa=empresa)
                 .order_by("nombre")
-                .only("id", "part_number", "nombre", "precio_compra", "precio_venta")
+                .only(
+                    "id",
+                    "part_number",
+                    "nombre",
+                    "proveedor",
+                    "precio_compra",
+                    "precio_venta",
+                    "cantidad_stock",
+                    "stock_minimo",
+                )
             )
             for repuesto in repuestos_qs[:50]:
                 repuestos_prefetch.append(
@@ -986,9 +1045,12 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                         "id": repuesto.id,
                         "codigo": repuesto.part_number or "",
                         "nombre": repuesto.nombre,
+                        "proveedor": repuesto.proveedor or "",
                         "precio_compra": float(repuesto.precio_compra or Decimal("0")),
                         "precio_venta": float(repuesto.precio_venta or Decimal("0")),
                         "precio_venta_sugerido": float(repuesto.precio_venta or Decimal("0")),
+                        "stock": int(repuesto.cantidad_stock or 0),
+                        "stock_minimo": int(repuesto.stock_minimo or 0),
                     }
                 )
 
@@ -1157,6 +1219,15 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         try:
             with transaction.atomic():
                 response = super().form_valid(form)
+                from taller.models.memoria_seguimiento import SeguimientoPublico
+
+                SeguimientoPublico.objects.get_or_create(
+                    documento=self.object,
+                    defaults={
+                        "empresa": self.object.empresa,
+                        "activo": True,
+                    },
+                )
         except ValidationError as exc:
             if hasattr(exc, "message_dict"):
                 for field, errors in exc.message_dict.items():
@@ -1183,6 +1254,15 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
 
                 # Guardar el documento; las líneas se crean desde repuestos_json en DocumentoForm.save()
                 response = super().form_valid(form)
+                from taller.models.memoria_seguimiento import SeguimientoPublico
+
+                SeguimientoPublico.objects.get_or_create(
+                    documento=self.object,
+                    defaults={
+                        "empresa": self.object.empresa,
+                        "activo": True,
+                    },
+                )
 
         # No llamar procesar_items_dinamicos: el formulario usa JSON (repuestos_json)
         # y ya crea las líneas en _process_json_data(); procesar_items_dinamicos
@@ -1253,6 +1333,7 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         documento = self.object
+        action_urls = _build_detail_action_urls(self.request, documento)
 
         # Obtener líneas del documento
         repuestos = list(documento.lineas_repuesto.all().select_related("repuesto", "part"))
@@ -1351,6 +1432,7 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
                 "puede_agregar_video": videos_count < 1,
                 "seguimiento_publico": seguimiento_publico,
                 "es_staff": es_staff,
+                **action_urls,
             }
         )
         return context
@@ -1360,6 +1442,7 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
 
 
 @method_decorator(login_required, name="dispatch")
+@method_decorator(ensure_csrf_cookie, name="dispatch")
 class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, UpdateView):
     """Vista para editar documentos"""
 
@@ -1370,6 +1453,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
     def get(self, request, *args, **kwargs):
         """Al abrir el formulario (GET), vaciar mensajes de otras secciones."""
         _clear_messages_for_request(request)
+        get_token(request)
         return super().get(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -1586,6 +1670,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
             empresa=empresa,
             language=LANGUAGE_BY_COUNTRY.get(country_code, "es"),
             mode=form_mode,
+            country_code=country_code,
         )
         form_bootstrap = build_form_bootstrap(
             form_mode=form_mode,
@@ -1709,6 +1794,15 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         try:
             with transaction.atomic():
                 response = super().form_valid(form)
+                from taller.models.memoria_seguimiento import SeguimientoPublico
+
+                SeguimientoPublico.objects.get_or_create(
+                    documento=self.object,
+                    defaults={
+                        "empresa": self.object.empresa,
+                        "activo": True,
+                    },
+                )
         except ValidationError as exc:
             if hasattr(exc, "message_dict"):
                 for field, errors in exc.message_dict.items():
@@ -1736,6 +1830,15 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         try:
             with transaction.atomic():
                 response = super().form_valid(form)
+                from taller.models.memoria_seguimiento import SeguimientoPublico
+
+                SeguimientoPublico.objects.get_or_create(
+                    documento=self.object,
+                    defaults={
+                        "empresa": self.object.empresa,
+                        "activo": True,
+                    },
+                )
         except ValidationError as exc:
             if hasattr(exc, "message_dict"):
                 for field, errors in exc.message_dict.items():
@@ -1790,3 +1893,4 @@ class DocumentoDeleteView(CountryLangTemplateMixin, RoleRequiredMixin, DeleteVie
         if not empresa:
             return Documento.objects.none()
         return Documento.objects.filter(empresa=empresa)
+

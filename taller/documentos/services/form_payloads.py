@@ -227,7 +227,7 @@ def build_line_item_payloads(*, mode, request=None, source_document=None, source
     return _empty_line_item_payloads()
 
 
-def build_prefetch_payloads(*, empresa, language, mode):
+def build_prefetch_payloads(*, empresa, language, mode, country_code=None):
     if not empresa or getattr(mode, "is_clean", False):
         return _blank_prefetch()
 
@@ -236,7 +236,14 @@ def build_prefetch_payloads(*, empresa, language, mode):
     from taller.models.clientes import Cliente
     from taller.models.repuesto import Repuesto
     from taller.models.vehiculos import Vehiculo
+    from taller.servicios.catalog_bootstrap import (
+        ensure_company_services_catalog,
+        get_master_catalog_service_items,
+    )
     from taller.servicios.models import Servicio, ServicioExterno
+
+    country_code = str(country_code or getattr(empresa, "pais", None) or "CL").upper()
+    ensure_company_services_catalog(empresa, country_code)
 
     payload = _blank_prefetch()
     payload["clientes_prefetch"] = [
@@ -278,17 +285,33 @@ def build_prefetch_payloads(*, empresa, language, mode):
             "id": repuesto.id,
             "codigo": repuesto.part_number or "",
             "nombre": repuesto.nombre,
+            "proveedor": repuesto.proveedor or "",
             "precio_compra": float(repuesto.precio_compra or Decimal("0")),
             "precio_venta": float(repuesto.precio_venta or Decimal("0")),
             "precio_venta_sugerido": float(repuesto.precio_venta or Decimal("0")),
+            "stock": int(repuesto.cantidad_stock or 0),
+            "stock_minimo": int(repuesto.stock_minimo or 0),
         }
         for repuesto in Repuesto.objects.filter(empresa=empresa)
         .order_by("nombre")
-        .only("id", "part_number", "nombre", "precio_compra", "precio_venta")[:50]
+        .only(
+            "id",
+            "part_number",
+            "nombre",
+            "proveedor",
+            "precio_compra",
+            "precio_venta",
+            "cantidad_stock",
+            "stock_minimo",
+        )[:50]
     ]
 
     servicios_qs = (
-        Servicio.objects.filter(empresa=empresa, names__language=language)
+        Servicio.objects.filter(
+            empresa=empresa,
+            categoria__country=country_code,
+            names__language=language,
+        )
         .select_related("categoria", "subcategoria")
         .prefetch_related("names", "categoria__names", "subcategoria__names")
         .distinct()
@@ -297,6 +320,7 @@ def build_prefetch_payloads(*, empresa, language, mode):
         {
             "id": servicio.id,
             "nombre": servicio.get_label(language),
+            "codigo_interno": servicio.codigo_interno or "",
             "categoria": servicio.categoria.get_label(language) if servicio.categoria else "",
             "categoria_code": servicio.categoria.code if servicio.categoria else "",
             "subcategoria": (
@@ -312,6 +336,12 @@ def build_prefetch_payloads(*, empresa, language, mode):
         }
         for servicio in servicios_qs[:50]
     ]
+    if not payload["servicios_prefetch"]:
+        payload["servicios_prefetch"] = get_master_catalog_service_items(
+            country_code,
+            language=language,
+            limit=50,
+        )
     payload["otros_servicios_prefetch"] = [
         {
             "id": servicio.id,
@@ -330,7 +360,11 @@ def build_prefetch_payloads(*, empresa, language, mode):
             "label": servicio.nombre,
             "text": servicio.nombre,
         }
-        for servicio in ServicioExterno.objects.filter(empresa=empresa, activo=True)
+        for servicio in ServicioExterno.objects.filter(
+            empresa=empresa,
+            activo=True,
+            categoria__country=country_code,
+        )
         .select_related("categoria", "subcategoria")
         .prefetch_related("categoria__names", "subcategoria__names")[:50]
     ]

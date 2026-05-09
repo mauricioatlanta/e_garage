@@ -17,64 +17,123 @@
 .cuadro, .cuadro *, .form-card, .form-card * {
   color: #fff !important;
 }
+.vehiculo-shell {
+  max-width: 1360px;
+  padding: 0 18px 28px;
+}
 .form-card {
-  background: rgba(0,0,0,0.6) !important;
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, rgba(10, 24, 45, 0.95), rgba(4, 13, 28, 0.94)) !important;
   color: #fff !important;
-  padding: 24px;
+  padding: 24px 24px 18px;
   margin-bottom: 20px;
-  backdrop-filter: blur(8px) saturate(120%);
-  -webkit-backdrop-filter: blur(8px) saturate(120%);
-  border: 1.5px solid rgba(0,230,208,0.12);
-  border-radius: 8px;
+  backdrop-filter: blur(10px) saturate(120%);
+  -webkit-backdrop-filter: blur(10px) saturate(120%);
+  border: 1px solid rgba(0,230,208,0.2);
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255,255,255,0.04);
+}
+.form-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(0,230,208,0), rgba(0,230,208,0.65), rgba(0,230,208,0));
+  opacity: 0.9;
+}
+.form-card::after {
+  content: "";
+  position: absolute;
+  top: -90px;
+  right: -70px;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background: radial-gradient(circle, rgba(0,230,208,0.12), rgba(0,230,208,0));
+  pointer-events: none;
 }
 .form-group {
-  margin-bottom: 20px;
+  margin-bottom: 0;
+  min-width: 0;
 }
 .form-group label {
   display: block;
   font-weight: 600;
   color: #00e6d0 !important;
-  font-size: 14px;
+  font-size: 11px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-bottom: 8px;
+  letter-spacing: 0.65px;
+  margin-bottom: 7px;
+  opacity: 0.95;
 }
-.form-control, select, input {
+.form-control, select, input:not([type=hidden]) {
   width: 100%;
-  padding: 12px;
-  background: rgba(0,230,208,0.1) !important;
-  border: 1px solid rgba(0,230,208,0.3) !important;
-  border-radius: 6px;
+  height: 46px;
+  min-height: 46px;
+  padding: 10px 14px;
+  background: linear-gradient(180deg, rgba(15, 33, 60, 0.92), rgba(10, 24, 45, 0.92)) !important;
+  border: 1px solid rgba(0,230,208,0.22) !important;
+  border-radius: 10px;
   color: #fff !important;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 500;
+  box-sizing: border-box;
 }
-.form-control:focus, select:focus, input:focus {
+select {
+  color-scheme: dark;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #00e6d0 50%),
+    linear-gradient(135deg, #00e6d0 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) calc(50% - 3px),
+    calc(100% - 12px) calc(50% - 3px);
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+}
+select option,
+select optgroup {
+  background: #0b1730 !important;
+  color: #eaf7ff !important;
+}
+.form-control::placeholder, select::placeholder, input:not([type=hidden])::placeholder {
+  color: rgba(225, 241, 255, 0.48) !important;
+}
+.form-control:focus, select:focus, input:not([type=hidden]):focus {
   outline: none;
   border-color: #00e6d0 !important;
-  background: rgba(0,230,208,0.15) !important;
-  box-shadow: 0 0 0 2px rgba(0,230,208,0.2);
+  background: linear-gradient(180deg, rgba(17, 38, 67, 0.96), rgba(12, 28, 52, 0.96)) !important;
+  box-shadow: 0 0 0 2px rgba(0,230,208,0.14), 0 0 18px rgba(0,230,208,0.08);
 }
 
 /* Estilos para campos con autocomplete (Select2/DAL) */
 .select2-container--default .select2-selection--single,
 .select2-container--default .select2-selection--multiple {
-  background: rgba(0,230,208,0.1) !important;
-  border: 1px solid rgba(0,230,208,0.3) !important;
-  border-radius: 6px !important;
+  height: 46px !important;
+  min-height: 46px !important;
+  background: linear-gradient(180deg, rgba(15, 33, 60, 0.92), rgba(10, 24, 45, 0.92)) !important;
+  border: 1px solid rgba(0,230,208,0.22) !important;
+  border-radius: 10px !important;
   color: #fff !important;
-  min-height: 48px !important;
   padding: 0 !important;
+  box-sizing: border-box !important;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__rendered {
   color: #fff !important;
-  line-height: 48px !important;
-  padding-left: 12px !important;
-  padding-right: 20px !important;
+  line-height: 44px !important;
+  padding-left: 14px !important;
+  padding-right: 30px !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
 }
 
 .select2-container--default .select2-selection--single .select2-selection__arrow {
-  height: 46px !important;
+  height: 44px !important;
   right: 8px !important;
 }
 
@@ -85,8 +144,8 @@
 .select2-container--default.select2-container--focus .select2-selection--single,
 .select2-container--default.select2-container--open .select2-selection--single {
   border-color: #00e6d0 !important;
-  background: rgba(0,230,208,0.15) !important;
-  box-shadow: 0 0 0 2px rgba(0,230,208,0.2) !important;
+  background: linear-gradient(180deg, rgba(17, 38, 67, 0.96), rgba(12, 28, 52, 0.96)) !important;
+  box-shadow: 0 0 0 2px rgba(0,230,208,0.14), 0 0 18px rgba(0,230,208,0.08) !important;
 }
 
 .select2-container--default .select2-search--dropdown .select2-search__field {
@@ -100,22 +159,30 @@
   background: rgba(0,0,0,0.9) !important;
   border: 1px solid rgba(0,230,208,0.3) !important;
   border-radius: 6px !important;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.42) !important;
+  overflow: hidden !important;
+}
+
+.select2-results,
+.select2-results__options {
+  background: linear-gradient(180deg, rgba(12, 28, 52, 0.99), rgba(7, 18, 35, 0.99)) !important;
 }
 
 .select2-container--default .select2-results__option {
   background: transparent !important;
-  color: #fff !important;
+  color: #eaf7ff !important;
   padding: 10px 12px !important;
+  border-bottom: 1px solid rgba(0,230,208,0.08) !important;
 }
 
 .select2-container--default .select2-results__option--highlighted[aria-selected] {
-  background: rgba(0,230,208,0.3) !important;
-  color: #00e6d0 !important;
+  background: linear-gradient(180deg, rgba(0,230,208,0.2), rgba(0,179,160,0.15)) !important;
+  color: #7ff8ec !important;
 }
 
 .select2-container--default .select2-results__option[aria-selected=true] {
-  background: rgba(0,230,208,0.2) !important;
-  color: #00e6d0 !important;
+  background: rgba(0,230,208,0.14) !important;
+  color: #7ff8ec !important;
 }
 
 /* Placeholder para Select2 */
@@ -139,23 +206,102 @@
 
 .select2-container--default .select2-selection--multiple .select2-selection__rendered {
   padding: 6px 12px !important;
-  min-height: 48px !important;
+  min-height: 46px !important;
 }
 
 .select2-container--default .select2-selection--multiple .select2-search--inline .select2-search__field {
   background: transparent !important;
   border: none !important;
   color: #fff !important;
-  margin-top: 6px !important;
+  margin-top: 4px !important;
   padding: 0 !important;
+}
+.vehicle-form-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 18px 18px;
+}
+.field-span-2 {
+  grid-column: span 1;
+}
+.field-span-3 {
+  grid-column: span 1;
+}
+.field-span-4 {
+  grid-column: span 1;
+}
+.field-tight {
+  grid-column: span 1;
+}
+.field-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 7px;
+}
+.field-header label {
+  margin-bottom: 0;
+}
+.field-control-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+.field-control-row > input:not([type=hidden]),
+.field-control-row > select,
+.field-control-row > .select2-container {
+  width: 100%;
+}
+.field-control-row > *:first-child {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.field-control-row .select2-container {
+  width: 100% !important;
+}
+.field-control-row > select,
+.field-control-row > .select2-container .select2-selection--single,
+.field-control-row > .select2-container .select2-selection--multiple,
+.field-control-row > input:not([type=hidden]) {
+  min-height: 46px !important;
+  height: 46px !important;
+}
+.btn-add-record {
+  flex: 0 0 auto;
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  border: 1px solid rgba(0,230,208,0.45);
+  background: linear-gradient(180deg, rgba(0,230,208,0.16), rgba(0,179,160,0.08));
+  color: #67e8f9;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-add-record:hover {
+  background: rgba(0,230,208,0.22);
+  box-shadow: 0 0 0 1px rgba(0,230,208,0.12);
+}
+.btn-add-record:disabled {
+  opacity: 0.45;
+  cursor: wait;
 }
 .btn-futuristic {
   background: linear-gradient(45deg, #00e6d0, #00b3a0);
   border: none;
   color: white;
-  padding: 12px 24px;
-  border-radius: 6px;
+  min-height: 46px;
+  padding: 11px 20px;
+  border-radius: 10px;
   font-weight: 600;
+  font-size: 14px;
   text-decoration: none;
   display: inline-block;
   margin-right: 10px;
@@ -178,6 +324,49 @@
 .font-orbitron {
   font-family: 'Orbitron', 'Arial', sans-serif;
 }
+@media (min-width: 760px) {
+  .vehicle-form-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .field-span-2 {
+    grid-column: span 2;
+  }
+  .field-span-3 {
+    grid-column: span 2;
+  }
+  .field-span-4 {
+    grid-column: span 4;
+  }
+}
+@media (min-width: 1120px) {
+  .vehicle-form-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+  .field-span-2 {
+    grid-column: span 2;
+  }
+  .field-span-3 {
+    grid-column: span 3;
+  }
+  .field-span-4 {
+    grid-column: span 4;
+  }
+}
+@media (min-width: 1280px) {
+  .vehicle-form-grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 20px 18px;
+  }
+  .field-span-2 {
+    grid-column: span 2;
+  }
+  .field-span-3 {
+    grid-column: span 3;
+  }
+  .field-span-4 {
+    grid-column: span 4;
+  }
+}
 </style>
 {% endblock %}
 
@@ -186,11 +375,14 @@
 {% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto cuadro">
+<div class="vehiculo-shell mx-auto cuadro">
+  {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
   <div class="flex justify-between items-center mb-6">
-    <h1 class="text-3xl font-bold font-orbitron">Editar VehÃ­culo</h1>
-    <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}"
-       class="btn-futuristic btn-secondary">â† Volver a la lista</a>
+    <h1 class="text-2xl font-bold font-orbitron">
+      {% if vehiculo %}Editar Veh&iacute;culo{% else %}Crear Veh&iacute;culo{% endif %}
+    </h1>
+    <a href="{% if return_to %}{{ return_to }}{% elif url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}"
+       class="btn-futuristic btn-secondary">Volver</a>
   </div>
 
   <div class="form-card">
@@ -199,42 +391,13 @@
       {% if next %}
       <input type="hidden" name="next" value="{{ next }}">
       {% endif %}
+      {% if return_to %}
+      <input type="hidden" name="return_to" value="{{ return_to }}">
+      {% endif %}
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="vehicle-form-grid">
 
-        <div class="form-group">
-          <label for="{{ form.patente.id_for_label }}">Patente</label>
-          {{ form.patente }}
-          {% if form.patente.errors %}
-            <div class="text-red-400 text-sm mt-1">{{ form.patente.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.vin.id_for_label }}">VIN</label>
-          {{ form.vin }}
-          {% if form.vin.errors %}
-            <div class="text-red-400 text-sm mt-1">{{ form.vin.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.anio.id_for_label }}">AÃ±o</label>
-          {{ form.anio }}
-          {% if form.anio.errors %}
-            <div class="text-red-400 text-sm mt-1">{{ form.anio.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
-          <label for="{{ form.millas.id_for_label }}">{% if request.path|slice:":4" == "/us/" %}Miles{% else %}Kilometraje{% endif %}</label>
-          {{ form.millas }}
-          {% if form.millas.errors %}
-            <div class="text-red-400 text-sm mt-1">{{ form.millas.errors.0 }}</div>
-          {% endif %}
-        </div>
-
-        <div class="form-group">
+        <div class="form-group field-span-4">
           <label for="{{ form.cliente.id_for_label }}">Cliente</label>
           {{ form.cliente }}
           {% if form.cliente.errors %}
@@ -242,25 +405,74 @@
           {% endif %}
         </div>
 
-        <div class="form-group">
-          <label for="{{ form.marca.id_for_label }}">Marca</label>
-          {{ form.marca }}
+        <div class="form-group field-span-2">
+          <label for="{{ form.patente.id_for_label }}">Patente</label>
+          {{ form.patente }}
+          {% if form.patente.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.patente.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group field-span-2">
+          <label for="{{ form.vin.id_for_label }}">VIN</label>
+          {{ form.vin }}
+          {% if form.vin.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.vin.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group field-span-2">
+          <label for="{{ form.anio.id_for_label }}">A&ntilde;o</label>
+          {{ form.anio }}
+          {% if form.anio.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.anio.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group field-span-2">
+          <label for="{{ form.millas.id_for_label }}" style="{% if request.path|slice:':4' == '/us/' %}visibility: visible;{% else %}visibility: hidden;{% endif %}">
+            {% if request.path|slice:":4" == "/us/" %}Miles{% else %}Kilometraje{% endif %}
+          </label>
+          {{ form.millas }}
+          {% if form.millas.errors %}
+            <div class="text-red-400 text-sm mt-1">{{ form.millas.errors.0 }}</div>
+          {% endif %}
+        </div>
+
+        <div class="form-group field-span-2">
+          <div class="field-header">
+            <label for="{{ form.marca.id_for_label }}">Marca</label>
+            <button type="button" class="btn-add-record" data-add="marca" title="Agregar marca">+</button>
+          </div>
+          <div class="field-control-row">
+            {{ form.marca }}
+          </div>
           {% if form.marca.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.marca.errors.0 }}</div>
           {% endif %}
         </div>
 
-        <div class="form-group">
-          <label for="{{ form.modelo.id_for_label }}">Modelo</label>
-          {{ form.modelo }}
+        <div class="form-group field-span-2">
+          <div class="field-header">
+            <label for="{{ form.modelo.id_for_label }}">Modelo</label>
+            <button type="button" class="btn-add-record" data-add="modelo" title="Agregar modelo">+</button>
+          </div>
+          <div class="field-control-row">
+            {{ form.modelo }}
+          </div>
           {% if form.modelo.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.modelo.errors.0 }}</div>
           {% endif %}
         </div>
 
-        <div class="form-group">
-          <label for="{{ form.color.id_for_label }}">Color</label>
-          {{ form.color }}
+        <div class="form-group field-span-2">
+          <div class="field-header">
+            <label for="{{ form.color.id_for_label }}">Color</label>
+            <button type="button" class="btn-add-record" data-add="color" title="Agregar color">+</button>
+          </div>
+          <div class="field-control-row">
+            {{ form.color }}
+          </div>
           {% if form.color.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.color.errors.0 }}</div>
           {% endif %}
@@ -275,9 +487,14 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="{{ form.motor.id_for_label }}">Motor</label>
-          {{ form.motor }}
+        <div class="form-group field-span-3">
+          <div class="field-header">
+            <label for="{{ form.motor.id_for_label }}">Motor</label>
+            <button type="button" class="btn-add-record" data-add="motor" title="Agregar motor">+</button>
+          </div>
+          <div class="field-control-row">
+            {{ form.motor }}
+          </div>
           {% if form.motor.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.motor.errors.0 }}</div>
           {% endif %}
@@ -292,9 +509,14 @@
           </div>
         </div>
 
-        <div class="form-group">
-          <label for="{{ form.caja.id_for_label }}">Caja/TransmisiÃ³n</label>
-          {{ form.caja }}
+        <div class="form-group field-span-3">
+          <div class="field-header">
+            <label for="{{ form.caja.id_for_label }}">Caja/Transmisi&oacute;n</label>
+            <button type="button" class="btn-add-record" data-add="caja" title="Agregar caja">+</button>
+          </div>
+          <div class="field-control-row">
+            {{ form.caja }}
+          </div>
           {% if form.caja.errors %}
             <div class="text-red-400 text-sm mt-1">{{ form.caja.errors.0 }}</div>
           {% endif %}
@@ -303,7 +525,7 @@
             <input type="text"
                    name="caja_nuevo"
                    id="caja_nuevo"
-                   placeholder="Ingresa el nombre de la nueva caja/transmisiÃ³n"
+                   placeholder="Ingresa el nombre de la nueva caja/transmisi&oacute;n"
                    class="form-control"
                    style="background: rgba(0,230,208,0.1) !important; border: 1px solid rgba(0,230,208,0.3) !important; color: #fff !important;">
           </div>
@@ -314,13 +536,12 @@
 
       <div class="flex gap-3 mt-8 pt-6 border-t border-gray-600">
         <button type="submit" class="btn-futuristic">
-          ðŸ’¾ Guardar cambios
+          {% if vehiculo %}Guardar cambios{% else %}Guardar veh&iacute;culo{% endif %}
         </button>
 
-        {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
-        <a href="{% if url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}"
+        <a href="{% if return_to %}{{ return_to }}{% elif url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}"
            class="btn-futuristic btn-secondary">
-          âŒ Cancelar
+          Cancelar
         </a>
       </div>
     </form>
@@ -340,8 +561,11 @@ const countryPrefix = (function() {
 document.addEventListener('DOMContentLoaded', function() {
 
     // URLs para endpoints AJAX
+    const urlAgregarMarca = "{% country_url 'vehiculos:ajax_agregar_marca' %}";
+    const urlAgregarModelo = "{% country_url 'vehiculos:ajax_agregar_modelo' %}";
     const urlAgregarMotor = "{% country_url 'vehiculos:ajax_agregar_motor' %}";
     const urlAgregarCaja = "{% country_url 'vehiculos:ajax_agregar_caja' %}";
+    const urlAgregarColor = "{% country_url 'vehiculos:ajax_agregar_color' %}";
     const urlModelosPorMarca = "{% country_url 'vehiculos:ajax_modelos_por_marca' %}";
     const urlModelosPorMarcaApi = "{% country_url 'vehiculos:modelos_por_marca_api' %}";
     const urlMotoresPorModelo = "{% country_url 'vehiculos:ajax_motores_por_modelo' %}";
@@ -351,6 +575,175 @@ document.addEventListener('DOMContentLoaded', function() {
     const marcaSelect = document.getElementById('id_marca');
     const modeloSelect = document.getElementById('id_modelo');
     const anioSelect = document.getElementById('id_anio');
+    const colorSelectBase = document.getElementById('id_color');
+
+    function syncSelectUi(select) {
+        if (!select) return;
+        if (window.jQuery && window.jQuery(select).hasClass('select2-hidden-accessible')) {
+            window.jQuery(select).trigger('change.select2');
+        }
+    }
+
+    function initEnhancedSelect(select, config) {
+        if (!select || !window.jQuery || !window.jQuery.fn || !window.jQuery.fn.select2) {
+            return;
+        }
+
+        const $select = window.jQuery(select);
+        if ($select.hasClass('django-autocomplete-light-widget') || $select.hasClass('select2-hidden-accessible')) {
+            return;
+        }
+
+        const selectConfig = Object.assign({
+            width: '100%',
+            dropdownAutoWidth: true,
+            allowClear: true
+        }, config || {});
+        selectConfig.placeholder = selectConfig.placeholder
+            || select.getAttribute('data-placeholder')
+            || (select.options[0] ? select.options[0].textContent : '')
+            || '';
+
+        select.__egSelect2Config = selectConfig;
+        $select.select2(selectConfig);
+    }
+
+    function refreshEnhancedSelect(select) {
+        if (!select || !window.jQuery || !window.jQuery.fn || !window.jQuery.fn.select2) {
+            return;
+        }
+
+        const $select = window.jQuery(select);
+        if ($select.hasClass('django-autocomplete-light-widget')) {
+            return;
+        }
+
+        const selectConfig = select.__egSelect2Config;
+        if (!selectConfig) {
+            return;
+        }
+
+        const currentValue = $select.val();
+        if ($select.hasClass('select2-hidden-accessible')) {
+            $select.select2('destroy');
+        }
+
+        $select.select2(selectConfig);
+
+        if (currentValue !== undefined && currentValue !== null && currentValue !== '') {
+            $select.val(currentValue);
+        }
+        $select.trigger('change.select2');
+    }
+
+    function normalizeOptionsPayload(data) {
+        if (Array.isArray(data)) {
+            return data;
+        }
+        if (data && Array.isArray(data.results)) {
+            return data.results;
+        }
+        if (data && Array.isArray(data.modelos)) {
+            return data.modelos;
+        }
+        return [];
+    }
+
+    initEnhancedSelect(marcaSelect, {
+        placeholder: 'Selecciona marca...',
+        minimumResultsForSearch: 0
+    });
+    initEnhancedSelect(modeloSelect, {
+        placeholder: 'Selecciona modelo...',
+        minimumResultsForSearch: 0
+    });
+    initEnhancedSelect(colorSelectBase, {
+        placeholder: 'Selecciona color...',
+        minimumResultsForSearch: 0
+    });
+    initEnhancedSelect(anioSelect, {
+        placeholder: 'Selecciona año...',
+        minimumResultsForSearch: 10
+    });
+
+    function restorePendingFreeText(select) {
+        if (!select) return;
+        const pending = String((select.dataset && select.dataset.pendingFreeText) || '').trim();
+        if (!pending) return;
+        const currentValue = String(select.value || '').trim();
+        if (currentValue) return;
+
+        let option = Array.from(select.options).find(function(item) {
+            return String(item.value) === pending;
+        });
+
+        if (!option) {
+            option = document.createElement('option');
+            option.value = pending;
+            option.textContent = pending;
+            select.appendChild(option);
+        }
+
+        option.selected = true;
+        select.value = pending;
+        syncSelectUi(select);
+    }
+
+    function setSelectValue(select, value) {
+        if (!select) return;
+        select.value = String(value);
+        select.dispatchEvent(new Event('change', { bubbles: true }));
+        syncSelectUi(select);
+    }
+
+    function insertOrSelectOption(select, value, text) {
+        if (!select) return;
+        const normalizedValue = String(value);
+        let option = Array.from(select.options).find(function(item) {
+            return String(item.value) === normalizedValue;
+        });
+
+        if (!option) {
+            option = document.createElement('option');
+            option.value = normalizedValue;
+            option.textContent = text;
+            const sentinel = select.querySelector('option[value="__nuevo__"]');
+            if (sentinel) {
+                select.insertBefore(option, sentinel);
+            } else {
+                select.appendChild(option);
+            }
+        } else {
+            option.textContent = text;
+        }
+
+        option.selected = true;
+    }
+
+    function setDependentsEnabled(enabled) {
+        const motorField = document.getElementById('id_motor');
+        const cajaField = document.getElementById('id_caja');
+        [motorField, cajaField].forEach(function(field) {
+            if (!field) return;
+            field.disabled = !enabled;
+            syncSelectUi(field);
+        });
+    }
+
+    function postJson(url, payload) {
+        const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+        return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrftoken,
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify(payload)
+        }).then(function(response) {
+            return response.json();
+        });
+    }
 
     // FunciÃ³n para cargar marcas vÃ­a AJAX (siempre ejecuta, incluso si hay opciones)
     function cargarMarcas(forceReload = false) {
@@ -426,11 +819,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 marcaSelect.disabled = false;
+                refreshEnhancedSelect(marcaSelect);
             })
             .catch(error => {
                 console.error('âŒ Error al cargar marcas:', error);
                 marcaSelect.innerHTML = '<option value="">Error al cargar marcas</option>';
                 marcaSelect.disabled = false;
+                refreshEnhancedSelect(marcaSelect);
                 
                 // Mostrar mensaje de error mÃ¡s detallado
                 console.error('Detalles del error:', {
@@ -442,26 +837,34 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (marcaSelect && modeloSelect) {
+        let modelosRequestToken = 0;
+
         // FunciÃ³n para cargar modelos por marca y aÃ±o
         function cargarModelos(marcaId, anio = null, modeloSeleccionado = null) {
+            const requestToken = ++modelosRequestToken;
+
             // Limpiar opciones del modelo
             modeloSelect.innerHTML = '<option value="">---------</option>';
+            modeloSelect.disabled = !marcaId;
+            refreshEnhancedSelect(modeloSelect);
+            syncSelectUi(modeloSelect);
+            setDependentsEnabled(false);
 
             if (marcaId) {
                 // Mostrar loading
-                const loadingOption = document.createElement('option');
-                loadingOption.value = '';
-                loadingOption.textContent = 'Cargando modelos...';
-                modeloSelect.appendChild(loadingOption);
+                modeloSelect.innerHTML = '<option value="">Cargando modelos...</option>';
+                modeloSelect.disabled = true;
+                refreshEnhancedSelect(modeloSelect);
+                syncSelectUi(modeloSelect);
 
                 // Construir URL con parÃ¡metros
-                let url = `${urlModelosPorMarcaApi}?marca_id=${marcaId}`;
+                let url = `${urlModelosPorMarcaApi}?marca_id=${encodeURIComponent(marcaId)}`;
                 if (anio) {
-                    url += `&anio=${anio}`;
+                    url += `&anio=${encodeURIComponent(anio)}`;
                 }
 
                 // Hacer peticiÃ³n AJAX para obtener modelos de la marca (y aÃ±o si estÃ¡ disponible)
-                fetch(url)
+                return fetch(url)
                     .then(response => {
                         console.log('Response status:', response.status);
                         if (!response.ok) {
@@ -471,34 +874,42 @@ document.addEventListener('DOMContentLoaded', function() {
                     })
                     .then(data => {
                         console.log('Modelos data:', data);
-                        // Limpiar opciones
-                        modeloSelect.innerHTML = '<option value="">---------</option>';
-
-                        // data es un array de objetos {id, nombre}
-                        if (Array.isArray(data)) {
-                            if (data.length === 0) {
-                                modeloSelect.innerHTML = '<option value="">No hay modelos disponibles</option>';
-                            } else {
-                                data.forEach(modelo => {
-                                    const option = document.createElement('option');
-                                    option.value = modelo.id;
-                                    option.textContent = modelo.nombre;
-
-                                    // Seleccionar el modelo si coincide
-                                    if (modeloSeleccionado && modelo.id == modeloSeleccionado) {
-                                        option.selected = true;
-                                    }
-
-                                    modeloSelect.appendChild(option);
-                                });
-                            }
-                        } else {
-                            console.error('Data is not an array:', data);
-                            modeloSelect.innerHTML = '<option value="">Error: formato de datos incorrecto</option>';
+                        if (requestToken !== modelosRequestToken) {
+                            return;
                         }
 
+                        // Limpiar opciones
+                        modeloSelect.innerHTML = '<option value="">---------</option>';
+                        modeloSelect.disabled = false;
+
+                        const modelos = normalizeOptionsPayload(data).map(function(modelo) {
+                            return {
+                                id: modelo.id,
+                                nombre: modelo.nombre || modelo.text || ''
+                            };
+                        });
+
+                        if (modelos.length === 0) {
+                            modeloSelect.innerHTML = '<option value="">No hay modelos disponibles</option>';
+                        } else {
+                            modelos.forEach(modelo => {
+                                const option = document.createElement('option');
+                                option.value = String(modelo.id);
+                                option.textContent = modelo.nombre;
+
+                                if (modeloSeleccionado && String(modelo.id) === String(modeloSeleccionado)) {
+                                    option.selected = true;
+                                }
+
+                                modeloSelect.appendChild(option);
+                            });
+                        }
+
+                        refreshEnhancedSelect(modeloSelect);
+                        syncSelectUi(modeloSelect);
+
                         // Si hay un modelo seleccionado, cargar sus motores y cajas
-                        if (modeloSeleccionado) {
+                        if (modeloSeleccionado && String(modeloSelect.value || '') === String(modeloSeleccionado)) {
                             const motorSelect = document.getElementById('id_motor');
                             const cajaSelect = document.getElementById('id_caja');
                             const motorActual = motorSelect ? motorSelect.value : null;
@@ -507,10 +918,20 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     })
                     .catch(error => {
+                        if (requestToken !== modelosRequestToken) {
+                            return;
+                        }
                         console.error('Error al cargar modelos:', error);
                         modeloSelect.innerHTML = '<option value="">Error al cargar</option>';
+                        modeloSelect.disabled = false;
+                        refreshEnhancedSelect(modeloSelect);
+                        syncSelectUi(modeloSelect);
                     });
             }
+
+            refreshEnhancedSelect(modeloSelect);
+            syncSelectUi(modeloSelect);
+            return Promise.resolve();
         }
 
         // FunciÃ³n para cargar motores y cajas por modelo
@@ -527,6 +948,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Limpiar y mostrar loading en motores
             motorSelect.innerHTML = '<option value="">Cargando motores...</option>';
             cajaSelect.innerHTML = '<option value="">Cargando cajas...</option>';
+            setDependentsEnabled(false);
 
             // Cargar motores
             fetch(`${urlMotoresPorModelo}?modelo_id=${modeloId}`)
@@ -554,21 +976,13 @@ document.addEventListener('DOMContentLoaded', function() {
                             motorSelect.appendChild(option);
                         });
                     }
-                    
-                    // Agregar opciÃ³n para crear nuevo motor
-                    const nuevoOption = document.createElement('option');
-                    nuevoOption.value = '__nuevo__';
-                    nuevoOption.textContent = 'âž• Agregar nuevo motor...';
-                    motorSelect.appendChild(nuevoOption);
-
-                    // Si el valor seleccionado es __nuevo__, seleccionarlo
-                    if (motorSeleccionado === '__nuevo__') {
-                        motorSelect.value = '__nuevo__';
-                    }
+                    restorePendingFreeText(motorSelect);
+                    syncSelectUi(motorSelect);
                 })
                 .catch(error => {
                     console.error('Error al cargar motores:', error);
                     motorSelect.innerHTML = '<option value="">Error al cargar motores</option>';
+                    syncSelectUi(motorSelect);
                 });
 
             // Cargar cajas
@@ -597,21 +1011,15 @@ document.addEventListener('DOMContentLoaded', function() {
                             cajaSelect.appendChild(option);
                         });
                     }
-                    
-                    // Agregar opciÃ³n para crear nueva caja
-                    const nuevoOption = document.createElement('option');
-                    nuevoOption.value = '__nuevo__';
-                    nuevoOption.textContent = 'âž• Agregar nueva caja...';
-                    cajaSelect.appendChild(nuevoOption);
-
-                    // Si el valor seleccionado es __nuevo__, seleccionarlo
-                    if (cajaSeleccionada === '__nuevo__') {
-                        cajaSelect.value = '__nuevo__';
-                    }
+                    restorePendingFreeText(cajaSelect);
+                    setDependentsEnabled(true);
+                    syncSelectUi(cajaSelect);
                 })
                 .catch(error => {
                     console.error('Error al cargar cajas:', error);
                     cajaSelect.innerHTML = '<option value="">Error al cargar cajas</option>';
+                    setDependentsEnabled(true);
+                    syncSelectUi(cajaSelect);
                 });
         }
 
@@ -625,9 +1033,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // FunciÃ³n para recargar modelos cuando cambia marca o aÃ±o
         function recargarModelos() {
-            const marcaId = marcaSelect.value;
+            const marcaId = String(marcaSelect.value || '').trim();
             const anio = obtenerAnio();
-            const modeloActual = modeloSelect.value;
+            const modeloActual = String(modeloSelect.value || '').trim();
             cargarModelos(marcaId, anio, modeloActual);
             
             // Limpiar motores y cajas cuando cambia la marca o aÃ±o
@@ -635,6 +1043,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const cajaSelect = document.getElementById('id_caja');
             if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
             if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+            setDependentsEnabled(false);
         }
 
         // Event listener para cambio de marca
@@ -661,6 +1070,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const cajaSelect = document.getElementById('id_caja');
                 if (motorSelect) motorSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
                 if (cajaSelect) cajaSelect.innerHTML = '<option value="">Selecciona un modelo primero</option>';
+                setDependentsEnabled(false);
             }
         });
 
@@ -679,6 +1089,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Cargar motores y cajas iniciales si ya hay un modelo seleccionado
         if (modeloSelect.value) {
             cargarMotoresYCajas(modeloSelect.value);
+        } else {
+            setDependentsEnabled(false);
         }
     } else {
         // Si no se encontraron los campos, intentar cargar marcas de todos modos
@@ -695,12 +1107,111 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, 500);
 
+    document.querySelectorAll('.btn-add-record[data-add]').forEach(function(button) {
+        button.addEventListener('click', function() {
+            const tipo = button.getAttribute('data-add');
+            const urls = {
+                marca: urlAgregarMarca,
+                modelo: urlAgregarModelo,
+                color: urlAgregarColor,
+                motor: urlAgregarMotor,
+                caja: urlAgregarCaja
+            };
+
+            let promptText = '';
+            const payload = {};
+
+            if (tipo === 'marca') {
+                promptText = 'Nombre de la nueva marca:';
+            } else if (tipo === 'modelo') {
+                if (!marcaSelect || !marcaSelect.value) {
+                    alert('Selecciona una marca primero.');
+                    return;
+                }
+                payload.marca_id = marcaSelect.value;
+                promptText = 'Nombre del nuevo modelo:';
+            } else if (tipo === 'color') {
+                promptText = 'Nombre del nuevo color:';
+            } else if (tipo === 'motor') {
+                if (!modeloSelect || !modeloSelect.value) {
+                    alert('Selecciona un modelo primero.');
+                    return;
+                }
+                payload.modelo_id = modeloSelect.value;
+                promptText = 'Nombre del nuevo motor:';
+            } else if (tipo === 'caja') {
+                if (!modeloSelect || !modeloSelect.value) {
+                    alert('Selecciona un modelo primero.');
+                    return;
+                }
+                payload.modelo_id = modeloSelect.value;
+                promptText = 'Nombre de la nueva caja:';
+            } else {
+                return;
+            }
+
+            const nombre = window.prompt(promptText);
+            if (!nombre || !nombre.trim()) {
+                return;
+            }
+
+            payload.nombre = nombre.trim();
+            button.disabled = true;
+
+            postJson(urls[tipo], payload)
+                .then(function(data) {
+                    if (!data.success) {
+                        alert(data.error || 'No fue posible agregar el registro.');
+                        return;
+                    }
+
+                    if (tipo === 'marca' && data.marca) {
+                        insertOrSelectOption(marcaSelect, data.marca.id, data.marca.nombre);
+                        setSelectValue(marcaSelect, data.marca.id);
+                    }
+
+                    if (tipo === 'modelo' && data.modelo) {
+                        cargarModelos(marcaSelect.value, obtenerAnio(), data.modelo.id)
+                            .then(function() {
+                                setSelectValue(modeloSelect, data.modelo.id);
+                            });
+                    }
+
+                    if (tipo === 'color' && data.color) {
+                        const colorSelectField = document.getElementById('id_color');
+                        insertOrSelectOption(colorSelectField, data.color.id, data.color.nombre);
+                        setSelectValue(colorSelectField, data.color.id);
+                    }
+
+                    if (tipo === 'motor' && data.motor) {
+                        cargarMotoresYCajas(modeloSelect.value, data.motor.id, null);
+                    }
+
+                    if (tipo === 'caja' && data.caja) {
+                        cargarMotoresYCajas(modeloSelect.value, null, data.caja.id);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error agregando registro:', error);
+                    alert('No fue posible guardar el nuevo registro.');
+                })
+                .finally(function() {
+                    button.disabled = false;
+                });
+        });
+    });
+
     // Manejar campo de color
     const colorSelect = document.getElementById('id_color');
     const colorNuevoContainer = document.getElementById('color-nuevo-container');
     const colorNuevoInput = document.getElementById('color_nuevo');
 
     if (colorSelect && colorNuevoContainer && colorNuevoInput) {
+        const legacyColorOption = colorSelect.querySelector('option[value="__nuevo__"]');
+        if (legacyColorOption) {
+            legacyColorOption.remove();
+        }
+
         colorSelect.addEventListener('change', function() {
             if (this.value === '__nuevo__') {
                 colorNuevoContainer.style.display = 'block';
@@ -726,6 +1237,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const motorNuevoInput = document.getElementById('motor_nuevo');
 
     if (motorSelect && motorNuevoContainer && motorNuevoInput) {
+        restorePendingFreeText(motorSelect);
         motorSelect.addEventListener('change', function() {
             if (this.value === '__nuevo__') {
                 motorNuevoContainer.style.display = 'block';
@@ -836,6 +1348,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const cajaNuevoInput = document.getElementById('caja_nuevo');
 
     if (cajaSelect && cajaNuevaContainer && cajaNuevoInput) {
+        restorePendingFreeText(cajaSelect);
         cajaSelect.addEventListener('change', function() {
             if (this.value === '__nuevo__') {
                 cajaNuevaContainer.style.display = 'block';
@@ -883,7 +1396,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 cajaNuevoInput.disabled = false;
-                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmisiÃ³n';
+                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmision';
 
                 if (data.success) {
                     // Agregar la nueva caja al dropdown
@@ -914,7 +1427,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error al crear caja:', error);
                 cajaNuevoInput.disabled = false;
-                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmisiÃ³n';
+                cajaNuevoInput.placeholder = 'Ingresa el nombre de la nueva caja/transmision';
                 alert('Error al crear la caja. Por favor intenta nuevamente.');
             });
         }
@@ -1079,5 +1592,3 @@ document.addEventListener('DOMContentLoaded', function() {
 {# form.media (DAL/Select2) se carga UNA SOLA VEZ en base.html (CSS en head, JS al final). NO duplicar aquÃ­. #}
 
 {% endblock %}
-
-

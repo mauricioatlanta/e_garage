@@ -36,6 +36,9 @@ def controlar_stock_al_cambiar_estado(sender, instance, **kwargs):
     Importante: Esto solo procesa el cambio. La validación debe hacerse antes.
     """
     # Si es creación nueva, no hay estado anterior que comparar
+    if getattr(instance, "_skip_inventory_signal", False):
+        return
+
     if not instance.pk:
         return
 

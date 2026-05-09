@@ -38,6 +38,7 @@ from taller.common.mixins.context_return import (
     build_context_return_url,
     get_safe_context_return_url,
 )
+from taller.vehiculos.catalog_bootstrap import ensure_vehicle_catalog_for_country
 from taller.vehiculos.forms import VehiculoForm
 
 # CBVs "shim"
@@ -596,6 +597,7 @@ def api_marcas(request):
     """Marcas por país del usuario."""
     country = _get_country(request)
     empresa = getattr(request.user, "empresa", None)
+    ensure_vehicle_catalog_for_country(country)
 
     qs = Marca.objects.filter(country=country)
     # Si Marca tiene FK empresa, descomenta:

@@ -98,9 +98,10 @@
         selTipo = document.getElementById('id_tipo');
         selMode = document.getElementById('doc_mode');
         numeroView = document.getElementById('id_numero');
+        numeroHidden = document.querySelector('input[name="numero"]');
 
         // Crear input oculto para número
-        if (numeroView && !document.querySelector('input[name="numero_documento"]')) {
+        if (!numeroHidden && numeroView && !document.querySelector('input[name="numero_documento"]')) {
             numeroHidden = document.createElement('input');
             numeroHidden.type = 'hidden';
             numeroHidden.name = 'numero_documento';

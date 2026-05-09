@@ -328,43 +328,43 @@
 
     <!-- Botones de acción principales -->
     <div class="flex flex-wrap gap-3 mb-4">
-      <a href="{% country_url 'documentos:imprimir_documento' documento.pk %}"
+      {% if detail_panel_url %}<a href="{{ detail_panel_url }}"
          class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/15">
         Abrir panel documento
-      </a>
-      <a href="{% country_url 'documentos:descargar_documento_pdf' documento.pk %}"
+      </a>{% endif %}
+      {% if detail_pdf_download_url %}<a href="{{ detail_pdf_download_url }}"
          class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/15"
          target="_blank">
         Descargar PDF
-      </a>
-      <a href="{% country_url 'documentos:compartir_documento_whatsapp' documento.pk %}"
+      </a>{% endif %}
+      {% if detail_whatsapp_url %}<a href="{{ detail_whatsapp_url }}"
          class="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-bold text-emerald-200 transition hover:bg-emerald-400/15"
          target="_blank">
         WhatsApp
-      </a>
-      <a href="{% country_url 'documentos:enviar_documento_email' documento.pk %}"
+      </a>{% endif %}
+      {% if detail_email_url %}<a href="{{ detail_email_url }}"
          class="rounded-2xl border border-fuchsia-400/20 bg-fuchsia-400/10 px-4 py-3 text-sm font-bold text-fuchsia-200 transition hover:bg-fuchsia-400/15">
         Enviar email
-      </a>
+      </a>{% endif %}
     </div>
     <div class="flex flex-wrap gap-4 justify-center mb-6">
-      <a href="{% country_url 'documentos:lista_documentos' %}"
+      <a href="{{ detail_back_url }}"
          class="px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors">
         ← Volver a la Lista
       </a>
 
-      <a href="{% country_url 'documentos:documento_editar' documento.pk %}"
+      <a href="{{ detail_edit_url }}"
          class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors">
-        ✏️ {{ ui_labels.edit_button }}
+        ✏️ {{ ui_labels.edit_button|default:"Editar" }}
       </a>
 
-      <a href="{% country_url 'documentos:descargar_pdf' documento.pk %}"
+      <a href="{{ detail_pdf_export_url }}"
          class="px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
          target="_blank">
         📄 Exportar PDF
       </a>
 
-      <a href="{% country_url 'documentos:descargar_documento_pdf' documento.pk %}"
+      <a href="{{ detail_pdf_download_url }}"
          class="inline-flex items-center rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-4 py-3 text-sm font-bold text-cyan-200 transition hover:bg-cyan-400/15"
          target="_blank">
         📥 Descargar PDF

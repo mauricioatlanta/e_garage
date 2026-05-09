@@ -28,6 +28,7 @@
         var rep = sumFromInputs('.rep-subtotal');
         var serv = sumFromInputs('.serv-subtotal');
         var otros = sumFromInputs('.otr-subtotal');
+        var subtotalNeto = rep + serv + otros;
 
         console.log('Totales: rep=' + rep + ', serv=' + serv + ', otros=' + otros);
 
@@ -45,8 +46,10 @@
                     baseAmount = rep;
                 } else if (taxLine.applies_to === 'servicios') {
                     baseAmount = serv;
+                } else if (taxLine.applies_to === 'otros' || taxLine.applies_to === 'otros_servicios') {
+                    baseAmount = otros;
                 } else if (taxLine.applies_to === 'all') {
-                    baseAmount = rep + serv + otros;
+                    baseAmount = subtotalNeto;
                 }
 
                 var taxRate = Number(taxLine.rate) / 100;
@@ -63,9 +66,10 @@
         setText('#t_repuestos', EG.utils.money(rep));
         setText('#t_servicios', EG.utils.money(serv));
         setText('#t_otros', EG.utils.money(otros));
+        setText('#t_subtotal_neto', EG.utils.money(subtotalNeto));
 
         // Calcular total general
-        var grandTotal = rep + serv + otros + totalTaxes;
+        var grandTotal = subtotalNeto + totalTaxes;
         setText('#t_total', EG.utils.money(grandTotal));
 
         // Programar guardado de borrador
@@ -109,9 +113,11 @@
         });
 
         var serv = Array.from(document.querySelectorAll('#servicios-container .dynamic-element')).map(function(row) {
+            var qty = Math.max(1, parseInt(row.querySelector('.serv-cantidad') && row.querySelector('.serv-cantidad').value || 1, 10) || 1);
             return {
                 servicio_id: (row.querySelector('.srv-id') && row.querySelector('.srv-id').value || '').trim(),
                 nombre: (row.querySelector('.srv-input') && row.querySelector('.srv-input').value || '').trim(),
+                cantidad: qty,
                 precio: EG.utils.parseNumericInput(row.querySelector('.serv-precio') && row.querySelector('.serv-precio').value || 0)
             };
         });

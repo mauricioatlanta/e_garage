@@ -8,10 +8,10 @@
     <style>
         @page {
             size: A4;
-            margin: 1.2cm;
+            margin: 0.8cm 0.75cm 0.95cm 0.75cm;
             @bottom-center {
                 content: "Página " counter(page) " de " counter(pages) " | Generado el {{ fecha_generacion|date:'d/m/Y H:i' }}";
-                font-size: 8pt;
+                font-size: 7pt;
                 color: #999;
                 font-family: 'Arial', sans-serif;
             }
@@ -23,23 +23,32 @@
         }
         body {
             font-family: 'Arial', 'Helvetica', sans-serif;
-            font-size: 10pt;
-            line-height: 1.5;
+            font-size: 9pt;
+            line-height: 1.28;
             color: #1a1a1a;
             background: #f0f9ff;
+        }
+        .header,
+        .documento-header,
+        .info-box,
+        .tabla-items,
+        .observaciones,
+        .totales,
+        .firma-seccion {
+            page-break-inside: avoid;
         }
         
         /* ========== HEADER ELITE ========== */
         .header {
-            border-bottom: 5px solid #2563eb;
-            padding-bottom: 20px;
-            margin-bottom: 30px;
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 10px;
+            margin-bottom: 14px;
             display: table;
             width: 100%;
             background: #ffffff;
-            padding: 20px;
-            border-radius: 10px;
-            border: 3px solid #3b82f6;
+            padding: 12px 14px;
+            border-radius: 8px;
+            border: 2px solid #3b82f6;
         }
         .header-left {
             display: table-cell;
@@ -56,22 +65,21 @@
             margin-bottom: 10px;
         }
         .logo {
-            max-height: 70px;
-            max-width: 200px;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
+            max-height: 54px;
+            max-width: 150px;
         }
         .empresa-nombre {
-            font-size: 24pt;
+            font-size: 18pt;
             font-weight: 900;
             color: #2563eb;
             letter-spacing: -0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             text-transform: uppercase;
         }
         .empresa-datos {
-            font-size: 9pt;
+            font-size: 8pt;
             color: #666;
-            line-height: 1.6;
+            line-height: 1.35;
         }
         .empresa-datos strong {
             color: #333;
@@ -81,12 +89,12 @@
         .documento-header {
             background: #1e3a8a;
             color: #ffffff;
-            padding: 25px 30px;
-            margin-bottom: 30px;
-            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 14px;
+            border-radius: 8px;
             display: table;
             width: 100%;
-            border: 4px solid #1e40af;
+            border: 2px solid #1e40af;
         }
         .documento-left {
             display: table-cell;
@@ -100,29 +108,29 @@
             text-align: right;
         }
         .documento-titulo {
-            font-size: 28pt;
+            font-size: 20pt;
             font-weight: 900;
-            letter-spacing: 2px;
-            margin-bottom: 5px;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
             text-transform: uppercase;
         }
         .documento-numero {
-            font-size: 18pt;
+            font-size: 13pt;
             font-weight: 600;
             color: #ffffff;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
         .documento-fecha {
-            font-size: 11pt;
+            font-size: 9pt;
             color: #e0e0e0;
-            margin-top: 8px;
+            margin-top: 5px;
         }
         
         /* ========== INFO BOXES ========== */
         .info-grid {
             display: table;
             width: 100%;
-            margin-bottom: 30px;
+            margin-bottom: 14px;
         }
         .info-row {
             display: table-row;
@@ -131,35 +139,35 @@
             display: table-cell;
             width: 50%;
             vertical-align: top;
-            padding: 0 15px;
+            padding: 0 8px;
         }
         .info-box {
-            border: 3px solid #3b82f6;
-            padding: 18px;
-            border-radius: 10px;
+            border: 2px solid #3b82f6;
+            padding: 10px 12px;
+            border-radius: 8px;
             background: #ffffff;
             height: 100%;
-            border-left: 6px solid #2563eb;
+            border-left: 4px solid #2563eb;
         }
         .info-titulo {
             font-weight: 700;
             color: #2563eb;
-            font-size: 11pt;
-            margin-bottom: 12px;
-            border-bottom: 3px solid #3b82f6;
-            padding-bottom: 6px;
+            font-size: 9pt;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 4px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         .info-campo {
-            margin-bottom: 8px;
-            font-size: 10pt;
+            margin-bottom: 4px;
+            font-size: 8.6pt;
         }
         .info-label {
             font-weight: 600;
             color: #555;
             display: inline-block;
-            min-width: 90px;
+            min-width: 72px;
         }
         .info-value {
             color: #1a1a1a;
@@ -167,21 +175,21 @@
         
         /* ========== TABLAS ========== */
         .subtitulo {
-            font-size: 13pt;
+            font-size: 10pt;
             font-weight: 700;
             color: #2563eb;
-            margin: 25px 0 12px 0;
+            margin: 12px 0 6px 0;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: 3px solid #3b82f6;
-            padding-bottom: 6px;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 4px;
         }
         .tabla-items {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 25px;
-            border: 3px solid #3b82f6;
-            border-radius: 8px;
+            margin-bottom: 12px;
+            border: 2px solid #3b82f6;
+            border-radius: 6px;
             overflow: hidden;
         }
         .tabla-items thead {
@@ -189,10 +197,10 @@
             color: #ffffff;
         }
         .tabla-items th {
-            padding: 12px 10px;
+            padding: 7px 8px;
             text-align: left;
             font-weight: 700;
-            font-size: 9pt;
+            font-size: 8pt;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border-right: 1px solid #333;
@@ -201,10 +209,10 @@
             border-right: none;
         }
         .tabla-items td {
-            padding: 10px;
+            padding: 6px 8px;
             border-bottom: 1px solid #e0e0e0;
             border-right: 1px solid #e0e0e0;
-            font-size: 10pt;
+            font-size: 8.6pt;
         }
         .tabla-items td:last-child {
             border-right: none;
@@ -228,45 +236,45 @@
         /* ========== TOTALES ========== */
         .totales {
             background: #e0f2fe;
-            border: 4px solid #3b82f6;
-            border-radius: 10px;
-            padding: 20px;
-            margin-top: 25px;
+            border: 2px solid #3b82f6;
+            border-radius: 8px;
+            padding: 10px 12px;
+            margin-top: 10px;
             float: right;
-            width: 320px;
-            border-left: 8px solid #2563eb;
+            width: 260px;
+            border-left: 4px solid #2563eb;
         }
         .total-fila {
             display: table;
             width: 100%;
-            margin-bottom: 10px;
+            margin-bottom: 6px;
         }
         .total-label {
             display: table-cell;
             font-weight: 600;
             color: #1e40af;
-            font-size: 10pt;
+            font-size: 8.6pt;
         }
         .total-valor {
             display: table-cell;
             text-align: right;
             font-weight: 700;
-            width: 120px;
+            width: 96px;
             color: #2563eb;
-            font-size: 10pt;
+            font-size: 8.8pt;
         }
         .total-final {
-            border-top: 3px solid #2563eb;
-            padding-top: 12px;
-            margin-top: 12px;
+            border-top: 2px solid #2563eb;
+            padding-top: 7px;
+            margin-top: 8px;
         }
         .total-final .total-label {
-            font-size: 13pt;
+            font-size: 10.5pt;
             color: #1e40af;
             font-weight: 900;
         }
         .total-final .total-valor {
-            font-size: 16pt;
+            font-size: 12pt;
             color: #1e40af;
             font-weight: 900;
         }
@@ -279,43 +287,43 @@
         
         /* ========== OBSERVACIONES ========== */
         .observaciones {
-            margin-top: 30px;
+            margin-top: 10px;
             clear: both;
         }
         .observaciones-box {
             border: 2px solid #3b82f6;
-            padding: 15px;
-            border-radius: 8px;
+            padding: 9px 10px;
+            border-radius: 6px;
             background: #f0f9ff;
-            min-height: 60px;
-            font-size: 10pt;
-            border-left: 6px solid #2563eb;
+            min-height: 36px;
+            font-size: 8.6pt;
+            border-left: 4px solid #2563eb;
         }
         
         /* ========== FIRMAS ========== */
         .firma-seccion {
-            margin-top: 60px;
+            margin-top: 18px;
             clear: both;
         }
         .firma-grid {
             display: table;
             width: 100%;
-            margin-top: 40px;
+            margin-top: 12px;
         }
         .firma-cell {
             display: table-cell;
             width: 50%;
             text-align: center;
             vertical-align: bottom;
-            padding: 20px;
+            padding: 8px 12px;
         }
         .firma-linea {
-            border-top: 3px solid #2563eb;
-            margin-bottom: 8px;
-            height: 50px;
+            border-top: 2px solid #2563eb;
+            margin-bottom: 6px;
+            height: 26px;
         }
         .firma-texto {
-            font-size: 10pt;
+            font-size: 8.4pt;
             color: #666;
         }
         .firma-texto strong {
@@ -325,38 +333,18 @@
         
         /* ========== FOOTER ========== */
         .footer {
-            margin-top: 50px;
+            margin-top: 16px;
             text-align: center;
             border-top: 1px solid #ddd;
-            padding-top: 15px;
-            font-size: 9pt;
+            padding-top: 8px;
+            font-size: 7.8pt;
             color: #666;
         }
-        .footer-total {
-            margin-top: 20px;
-            padding: 20px;
-            background: #1e3a8a;
-            border-radius: 10px;
-            color: #ffffff;
-            border: 4px solid #1e40af;
-        }
-        .footer-total-label {
-            font-size: 11pt;
-            font-weight: 600;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        .footer-total-valor {
-            font-size: 24pt;
-            font-weight: 900;
-            letter-spacing: 1px;
-        }
         .footer-credits {
-            margin-top: 15px;
-            padding-top: 10px;
+            margin-top: 6px;
+            padding-top: 6px;
             border-top: 1px solid #ddd;
-            font-size: 8pt;
+            font-size: 7pt;
             color: #999;
         }
     </style>
@@ -619,6 +607,7 @@
     {% endif %}
 
     <!-- ========== FIRMAS ========== -->
+    {% if documento.tipo != 'FAC' %}
     <div class="firma-seccion">
         <div class="firma-grid">
             <div class="firma-cell">
@@ -637,22 +626,13 @@
             </div>
         </div>
     </div>
+    {% endif %}
 
     <!-- ========== FOOTER ========== -->
     <div class="footer">
-        <!-- Total destacado para Facturas -->
-        {% if documento.tipo == 'FAC' and total %}
-        <div class="footer-total">
-            <div class="footer-total-label">TOTAL A PAGAR</div>
-            <div class="footer-total-valor">{{ total|money_clp }}</div>
-            {% if iva %}
-            <div style="text-align: center; font-size: 10pt; color: #e0e0e0; margin-top: 8px;">
-                IVA incluido
-            </div>
-            {% endif %}
+        <div class="footer-credits">
+            Documento generado el {{ fecha_generacion|date:"d/m/Y H:i" }}
         </div>
-        {% endif %}
-
     </div>
 </body>
 </html>

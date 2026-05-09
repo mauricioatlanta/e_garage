@@ -60,6 +60,7 @@
                 rowId: row.dataset.rowId || '',
                 servicio_id: (row.querySelector('.srv-id') && row.querySelector('.srv-id').value || '').trim(),
                 nombre: (row.querySelector('.srv-input') && row.querySelector('.srv-input').value || '').trim(),
+                cantidad: Math.max(1, parseInt(row.querySelector('.serv-cantidad') && row.querySelector('.serv-cantidad').value || 1, 10) || 1),
                 precio: EG.utils.parseNumericInput(row.querySelector('.serv-precio') && row.querySelector('.serv-precio').value || 0)
             };
         });
@@ -268,6 +269,7 @@
                         row.__applyServData({
                             servicio_id: serv.servicio_id || '',
                             nombre: serv.nombre || '',
+                            cantidad: serv.cantidad || 1,
                             precio: serv.precio != null ? serv.precio : 0
                         });
                     }

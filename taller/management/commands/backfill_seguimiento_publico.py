@@ -1,0 +1,1 @@
+from taller.documentos.management.commands.backfill_seguimiento_publico import Command

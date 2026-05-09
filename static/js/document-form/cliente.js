@@ -228,28 +228,92 @@
         if (els.clienteResultados) {
             els.clienteResultados.classList.add('hidden');
         }
-        if (els.clienteSelect) {
-            els.clienteSelect.value = id;
-            els.clienteSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        try {
+            if (els.clienteSelect) {
+                els.clienteSelect.dataset.egInternalChange = '1';
+                if (options.vehiculoId) {
+                    els.clienteSelect.dataset.pendingVehiculoId = String(options.vehiculoId);
+                } else {
+                    delete els.clienteSelect.dataset.pendingVehiculoId;
+                }
+                els.clienteSelect.value = id;
+                els.clienteSelect.dispatchEvent(new Event('change', { bubbles: true }));
+            }
+            if (window.jQuery && els.clienteSelect && jQuery(els.clienteSelect).hasClass('select2-hidden-accessible')) {
+                jQuery(els.clienteSelect).val(id).trigger('change');
+            }
+
+            updateClienteCard({
+                id: id,
+                nombre: nombre,
+                email: email,
+                telefono: telefono,
+                meta: data && data.meta ? data.meta : ''
+            });
+
+            document.dispatchEvent(new CustomEvent('cliente:seleccionado', {
+                detail: { id: id, nombre: nombre, email: email, telefono: telefono }
+            }));
+
+            if (EG.vehiculo && EG.vehiculo.cargarVehiculosPorCliente) {
+                await EG.vehiculo.cargarVehiculosPorCliente(id, options.vehiculoId || null);
+            }
+        } finally {
+            if (els.clienteSelect) {
+                delete els.clienteSelect.dataset.egInternalChange;
+                delete els.clienteSelect.dataset.pendingVehiculoId;
+            }
         }
-        if (window.jQuery && els.clienteSelect && jQuery(els.clienteSelect).hasClass('select2-hidden-accessible')) {
-            jQuery(els.clienteSelect).val(id).trigger('change');
+    }
+
+    async function handleClienteSelectChange() {
+        var els = getElements();
+        if (!els.clienteSelect) {
+            return;
+        }
+
+        if (els.clienteSelect.dataset.egInternalChange === '1') {
+            return;
+        }
+
+        var selectedId = getSelectedClienteId();
+        if (!selectedId) {
+            updateClienteCard({});
+            if (els.clienteBusqueda) {
+                els.clienteBusqueda.value = '';
+            }
+            if (EG.vehiculo && EG.vehiculo.resetSelection) {
+                EG.vehiculo.resetSelection();
+            }
+            return;
+        }
+
+        var option = els.clienteSelect.options[els.clienteSelect.selectedIndex];
+        var selectedLabel = option && option.textContent ? option.textContent.trim() : '';
+        var clientData = resolveClientDataById(selectedId, selectedLabel) || {
+            id: selectedId,
+            nombre: selectedLabel || ('Cliente #' + selectedId),
+            email: '',
+            telefono: '',
+        };
+
+        if (els.clienteBusqueda && clientData.nombre) {
+            els.clienteBusqueda.value = clientData.nombre;
         }
 
         updateClienteCard({
-            id: id,
-            nombre: nombre,
-            email: email,
-            telefono: telefono,
-            meta: data && data.meta ? data.meta : ''
+            id: clientData.id,
+            nombre: clientData.nombre,
+            email: clientData.email,
+            telefono: clientData.telefono,
+            meta: clientData.meta || ''
         });
 
-        document.dispatchEvent(new CustomEvent('cliente:seleccionado', {
-            detail: { id: id, nombre: nombre, email: email, telefono: telefono }
-        }));
+        var pendingVehiculoId = els.clienteSelect.dataset.pendingVehiculoId || null;
+        delete els.clienteSelect.dataset.pendingVehiculoId;
 
         if (EG.vehiculo && EG.vehiculo.cargarVehiculosPorCliente) {
-            await EG.vehiculo.cargarVehiculosPorCliente(id, options.vehiculoId || null);
+            await EG.vehiculo.cargarVehiculosPorCliente(selectedId, pendingVehiculoId);
         }
     }
 
@@ -331,14 +395,19 @@
             return;
         }
 
-        var label = context.created_cliente_label || ('Cliente #' + id);
-        ensureClienteOption(id, label);
+        var resolvedClient = resolveClientDataById(id, context.created_cliente_label || '') || {
+            id: id,
+            nombre: context.created_cliente_label || ('Cliente #' + id),
+            email: '',
+            telefono: '',
+        };
+        ensureClienteOption(id, resolvedClient.nombre);
 
         await seleccionarCliente({
             id: id,
-            nombre: label,
-            email: '',
-            telefono: ''
+            nombre: resolvedClient.nombre,
+            email: resolvedClient.email,
+            telefono: resolvedClient.telefono
         }, {
             vehiculoId: context.created_vehiculo_id || context.vehiculo_id || null
         });
@@ -374,6 +443,15 @@
             });
         }
 
+        if (els.clienteSelect && !els.clienteSelect.dataset.egSelectBound) {
+            els.clienteSelect.dataset.egSelectBound = '1';
+            els.clienteSelect.addEventListener('change', function() {
+                handleClienteSelectChange().catch(function(err) {
+                    console.error('handleClienteSelectChange', err);
+                });
+            });
+        }
+
         document.addEventListener('click', function(event) {
             if (els.clienteResultados && els.clienteBusqueda && !els.clienteResultados.contains(event.target) && event.target !== els.clienteBusqueda) {
                 els.clienteResultados.classList.add('hidden');
@@ -384,6 +462,12 @@
         if (bootstrap.cliente && bootstrap.cliente.id) {
             setTimeout(function() {
                 seleccionarCliente(bootstrap.cliente, { vehiculoId: bootstrap.vehiculo_id || '' });
+            }, 50);
+        } else if (getSelectedClienteId()) {
+            setTimeout(function() {
+                handleClienteSelectChange().catch(function(err) {
+                    console.error('handleClienteSelectChange:init', err);
+                });
             }, 50);
         }
     }

@@ -7,6 +7,7 @@ Reportes visuales para análisis de rentabilidad y servicios externos
 
 from collections import defaultdict
 from datetime import date, timedelta
+from decimal import Decimal
 
 from django.db.models import Avg, Count, ExpressionWrapper, F, FloatField, Max, Min, Sum
 from django.shortcuts import render
@@ -288,19 +289,19 @@ def dashboard_rentabilidad(request):
         LineaServicio.objects.filter(documento__tipo="FAC").aggregate(total=Sum("precio_unitario"))[
             "total"
         ]
-        or 0
+        or Decimal("0")
     ) + (
         LineaOtroServicio.objects.filter(documento__tipo="FAC").aggregate(
             total=Sum("precio_cliente")
         )["total"]
-        or 0
+        or Decimal("0")
     )
 
     costos_externos = (
         LineaOtroServicio.objects.filter(documento__tipo="FAC").aggregate(
             total=Sum("costo_interno")
         )["total"]
-        or 0
+        or Decimal("0")
     )
 
     ganancia_neta = total_facturado - costos_externos
@@ -310,13 +311,13 @@ def dashboard_rentabilidad(request):
         LineaServicio.objects.filter(documento__tipo="FAC").aggregate(total=Sum("precio_unitario"))[
             "total"
         ]
-        or 0
+        or Decimal("0")
     )
     ingresos_externos = (
         LineaOtroServicio.objects.filter(documento__tipo="FAC").aggregate(
             total=Sum("precio_cliente")
         )["total"]
-        or 0
+        or Decimal("0")
     )
 
     # Mejores y peores márgenes por proveedor
@@ -340,7 +341,9 @@ def dashboard_rentabilidad(request):
         proveedor_margenes.order_by("margen_promedio").first() if proveedor_margenes else None
     )
 
-    margen_general = (ganancia_neta * 100.0 / total_facturado) if total_facturado else 0
+    margen_general = (
+        float((ganancia_neta * Decimal("100")) / total_facturado) if total_facturado else 0.0
+    )
 
     context = {
         "total_facturado": total_facturado,

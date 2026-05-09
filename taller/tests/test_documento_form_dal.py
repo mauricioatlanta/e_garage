@@ -10,8 +10,10 @@ from django.utils import timezone
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
-from taller.models.lineas_documento import LineaRepuesto
+from taller.models.lineas_documento import LineaRepuesto, ORIGEN_STOCK_BODEGA
+from taller.models.repuesto import Repuesto
 from taller.models.vehiculos import Vehiculo
+from taller.services.inventory_service import InventoryService
 
 
 # ---------- Fixtures simples ----------
@@ -310,3 +312,129 @@ def test_form_update_reemplaza_lineas_y_recalcula_totales(user_cl, cliente_y_veh
     assert saved.neto_repuestos == Decimal("270.00")
     assert saved.tax_amount == Decimal("51.00")
     assert saved.total == Decimal("321.00")
+
+
+@pytest.mark.django_db
+def test_documento_form_descuenta_stock_en_creacion_emitida(user_cl):
+    empresa = user_cl.empresa
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Cliente Stock")
+    vehiculo = Vehiculo.objects.create(
+        empresa=empresa,
+        cliente=cliente,
+        patente="STK55",
+        vin="VIN-STOCK-55",
+        anio=2022,
+    )
+    repuesto = Repuesto.objects.create(
+        empresa=empresa,
+        part_number="1040",
+        nombre="Aceite de motor 10/40w",
+        cantidad_stock=50,
+        precio_venta=Decimal("12500.00"),
+    )
+
+    from taller.documentos.forms import DocumentoForm
+
+    data = {
+        "tipo": "OT",
+        "fecha_emision": timezone.now().date(),
+        "cliente": str(cliente.id),
+        "vehiculo": str(vehiculo.id),
+        "repuestos_json": json.dumps(
+            [
+                {
+                    "repuesto_id": repuesto.id,
+                    "codigo": "1040",
+                    "nombre": "Aceite de motor 10/40w",
+                    "cantidad": 5,
+                    "precio": "12500",
+                    "origen_repuesto": ORIGEN_STOCK_BODEGA,
+                }
+            ]
+        ),
+        "servicios_json": "[]",
+        "otros_json": "[]",
+    }
+
+    form = DocumentoForm(data=data, user=user_cl, empresa=empresa, country="CL")
+
+    assert form.is_valid(), form.errors
+    form.save()
+    repuesto.refresh_from_db()
+    assert repuesto.cantidad_stock == 45
+
+
+@pytest.mark.django_db
+def test_documento_form_reajusta_stock_en_edicion_emitida(user_cl):
+    empresa = user_cl.empresa
+    cliente = Cliente.objects.create(empresa=empresa, nombre="Cliente Edicion")
+    vehiculo = Vehiculo.objects.create(
+        empresa=empresa,
+        cliente=cliente,
+        patente="EDT77",
+        vin="VIN-EDIT-77",
+        anio=2021,
+    )
+    repuesto = Repuesto.objects.create(
+        empresa=empresa,
+        part_number="1040",
+        nombre="Aceite de motor 10/40w",
+        cantidad_stock=50,
+        precio_venta=Decimal("12500.00"),
+    )
+    documento = Documento.objects.create(
+        empresa=empresa,
+        cliente=cliente,
+        vehiculo=vehiculo,
+        tipo="OT",
+        estado="EMITIDO",
+        fecha_emision=timezone.now().date(),
+    )
+    LineaRepuesto.objects.create(
+        documento=documento,
+        repuesto=repuesto,
+        codigo="1040",
+        nombre="Aceite de motor 10/40w",
+        cantidad=5,
+        precio_unitario=Decimal("12500.00"),
+        origen_repuesto=ORIGEN_STOCK_BODEGA,
+    )
+    InventoryService.procesar_movimiento_stock(documento, "descontar")
+    repuesto.refresh_from_db()
+    assert repuesto.cantidad_stock == 45
+
+    from taller.documentos.forms import DocumentoForm
+
+    data = {
+        "tipo": "OT",
+        "fecha_emision": timezone.now().date(),
+        "cliente": str(cliente.id),
+        "vehiculo": str(vehiculo.id),
+        "repuestos_json": json.dumps(
+            [
+                {
+                    "repuesto_id": repuesto.id,
+                    "codigo": "1040",
+                    "nombre": "Aceite de motor 10/40w",
+                    "cantidad": 7,
+                    "precio": "12500",
+                    "origen_repuesto": ORIGEN_STOCK_BODEGA,
+                }
+            ]
+        ),
+        "servicios_json": "[]",
+        "otros_json": "[]",
+    }
+
+    form = DocumentoForm(
+        data=data,
+        instance=documento,
+        user=user_cl,
+        empresa=empresa,
+        country="CL",
+    )
+
+    assert form.is_valid(), form.errors
+    form.save()
+    repuesto.refresh_from_db()
+    assert repuesto.cantidad_stock == 43
