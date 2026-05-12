@@ -1,0 +1,87 @@
+{% firstof site_name "eGarage" as brand_name %}
+{% firstof domain "www.egarage.cl" as brand_domain %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="x-apple-disable-message-reformatting">
+    <title>{% block email_title %}{{ brand_name }}{% endblock %}</title>
+</head>
+<body style="margin:0; padding:0; width:100%; background-color:#eef3f9; font-family:Arial, Helvetica, sans-serif; color:#0f172a;">
+    <div style="display:none; font-size:1px; line-height:1px; color:#eef3f9; max-height:0; max-width:0; opacity:0; overflow:hidden;">
+        {% block preheader %}Notificacion automatica de {{ brand_name }}.{% endblock %}
+    </div>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width:100%; border-collapse:collapse; background-color:#eef3f9; margin:0; padding:0;">
+        <tr>
+            <td align="center" style="padding:24px 12px;">
+                <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="max-width:600px; width:100%; border-collapse:separate; background-color:#ffffff; border:1px solid #d7e2ee; border-radius:20px; overflow:hidden;">
+                    <tr>
+                        <td style="background-color:#0f172a; padding:32px 36px 24px 36px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+                                <tr>
+                                    <td align="left" style="font-family:Arial, Helvetica, sans-serif; font-size:28px; line-height:32px; font-weight:700; color:#f8fafc;">
+                                        eGarage
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top:14px;">
+                                        <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="border-collapse:collapse;">
+                                            <tr>
+                                                <td style="background-color:#103047; border:1px solid #1f4b69; border-radius:999px; padding:7px 14px; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:12px; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:#7dd3fc;">
+                                                    {% block badge %}Notificacion{% endblock %}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top:22px; font-family:Arial, Helvetica, sans-serif; font-size:30px; line-height:38px; font-weight:700; color:#f8fafc;">
+                                        {% block hero_title %}{{ brand_name }}{% endblock %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding-top:10px; font-family:Arial, Helvetica, sans-serif; font-size:15px; line-height:24px; color:#cbd5e1;">
+                                        {% block hero_copy %}{% endblock %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:34px 36px 18px 36px; font-family:Arial, Helvetica, sans-serif; font-size:16px; line-height:26px; color:#334155;">
+                            {% block body_content %}{% endblock %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:0 36px 30px 36px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse; background-color:#f8fbff; border:1px solid #d9e8f5; border-radius:16px;">
+                                <tr>
+                                    <td style="padding:18px 20px; font-family:Arial, Helvetica, sans-serif; font-size:14px; line-height:22px; color:#475569;">
+                                        {% block security_box %}{% endblock %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:0 36px 34px 36px;">
+                            <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="border-collapse:collapse;">
+                                <tr>
+                                    <td style="border-top:1px solid #e2e8f0; padding-top:18px; font-family:Arial, Helvetica, sans-serif; font-size:12px; line-height:20px; color:#64748b;">
+                                        {% block footer %}
+                                        <strong style="color:#0f172a;">{{ brand_name }}</strong> · Gestion inteligente para talleres automotrices<br>
+                                        Chile / USA<br>
+                                        &copy; 2026 {{ brand_name }}
+                                        {% endblock %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

@@ -2,6 +2,7 @@ import time
 
 from allauth.account.forms import SignupForm
 from django import forms
+from django.contrib.auth import get_user_model
 
 from taller.config.country_settings import CountrySettings
 from taller.services.registration_service import RegistrationService
@@ -85,8 +86,10 @@ class CustomSignupForm(SignupForm):
     def __init__(self, *args, **kwargs):
         # Extraer kwargs personalizados ANTES de super()
         request = kwargs.pop("request", None)
+        self.request = request
         self.country_code = kwargs.pop("country_code", None)
         self.default_phone_prefix = kwargs.pop("default_phone_prefix", None)
+        self.signup_lang = "es"
 
         super().__init__(*args, **kwargs)
 
@@ -187,10 +190,12 @@ class CustomSignupForm(SignupForm):
             # self.fields["telefono"].initial = self.default_phone_prefix + " "
 
         if request and getattr(request, "eg_us_public_signup_lang", None) == "en":
+            self.signup_lang = "en"
             self._apply_us_public_signup_english()
         elif request:
             signup_path = (request.path or "").rstrip("/") or "/"
             if signup_path == "/us/signup":
+                self.signup_lang = "en"
                 self._apply_us_public_signup_english()
 
     def _apply_us_public_signup_english(self):
@@ -229,6 +234,39 @@ class CustomSignupForm(SignupForm):
         if "telefono" in self.fields:
             self.fields["telefono"].widget.attrs["placeholder"] = "+1 555 123 4567"
 
+    def _duplicate_email_error_message(self):
+        if self.signup_lang == "en":
+            return (
+                "This email address is already registered in eGarage. "
+                "Please sign in or use the password recovery option."
+            )
+        return (
+            "Esta dirección de correo ya está registrada en eGarage. "
+            "Por favor, inicia sesión o usa la opción de recuperar contraseña."
+        )
+
+    def _duplicate_phone_error_message(self):
+        if self.signup_lang == "en":
+            return "This contact number is already linked to a registered eGarage workshop."
+        return "Este número de contacto ya está vinculado a un taller registrado en eGarage."
+
+    def clean_email(self):
+        raw_email = (self.cleaned_data.get("email") or "").strip().lower()
+        if not raw_email:
+            return raw_email
+
+        try:
+            email = super().clean_email()
+        except forms.ValidationError:
+            if get_user_model().objects.filter(email__iexact=raw_email).exists():
+                raise forms.ValidationError(self._duplicate_email_error_message())
+            raise
+
+        if get_user_model().objects.filter(email__iexact=email).exists():
+            raise forms.ValidationError(self._duplicate_email_error_message())
+
+        return email
+
     def clean_telefono(self):
         """
         ✅ Normaliza y valida el número de teléfono a formato E.164 (WhatsApp).
@@ -256,7 +294,13 @@ class CustomSignupForm(SignupForm):
         )
 
         # Obtener prefijo del país
-        country_code = self.country_code or "CL"
+        country_code = (
+            self.cleaned_data.get("country")
+            or self.data.get(self.add_prefix("country"))
+            or self.country_code
+            or "CL"
+        )
+        country_code = str(country_code).upper().strip() or "CL"
         country_config = get_country_config(country_code)
         default_phone_prefix = self.default_phone_prefix or country_config.get(
             "phone_prefix", "+56"
@@ -291,9 +335,7 @@ class CustomSignupForm(SignupForm):
         from taller.models.empresa import Empresa
 
         if Empresa.objects.filter(telefono=telefono_normalizado).exists():
-            raise forms.ValidationError(
-                "Ya existe una cuenta con este teléfono. ¿Deseas iniciar sesión?"
-            )
+            raise forms.ValidationError(self._duplicate_phone_error_message())
 
         return telefono_normalizado
 
@@ -304,8 +346,6 @@ class CustomSignupForm(SignupForm):
 
         Esto es necesario porque Allauth puede requerir username aunque ACCOUNT_AUTHENTICATION_METHOD = "email".
         """
-        from django.contrib.auth import get_user_model
-
         User = get_user_model()
         import random
         import string

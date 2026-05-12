@@ -240,14 +240,30 @@ select:-webkit-autofill:active {
 }
 
 .error-message {
-    color: #f87171;
+    color: #fecaca;
     font-size: 13px;
-    margin-top: 6px;
+    margin-top: 8px;
     font-weight: 500;
-    background: rgba(248, 113, 113, 0.1);
-    padding: 8px 12px;
-    border-radius: 6px;
-    border-left: 3px solid #f87171;
+    background: rgba(127, 29, 29, 0.28);
+    padding: 10px 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(248, 113, 113, 0.45);
+    box-shadow: 0 8px 20px rgba(127, 29, 29, 0.12);
+}
+
+.error-message strong {
+    display: block;
+    color: #fecaca;
+}
+
+.error-message ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.error-message li + li {
+    margin-top: 6px;
 }
 
 /* Pricing Cards */
@@ -562,6 +578,14 @@ select[name="country"] {
                 {{ form.username }}
             {% endif %}
 
+            {% if form.non_field_errors %}
+                <div class="error-message">
+                    {% for error in form.non_field_errors %}
+                        <strong>{{ error }}</strong>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
             <!-- SECCIÓN 1: Datos de Registro (Solo campos obligatorios) -->
             <div class="form-section">
                 <h3 class="section-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Datos de Registro{% else %}{% trans "Registration Data" %}{% endif %}</h3>
@@ -574,6 +598,13 @@ select[name="country"] {
                 <div class="form-group">
                     <label class="form-label">{{ form.email.label }} *</label>
                     {{ form.email }}
+                    {% if form.email.errors %}
+                    <div class="error-message">
+                        {% for error in form.email.errors %}
+                        <strong>{{ error }}</strong>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     {% if form.email.help_text %}
                     <div class="help-text">{{ form.email.help_text }}</div>
                     {% endif %}
@@ -583,6 +614,13 @@ select[name="country"] {
                     <label class="form-label">{{ form.telefono.label }} *</label>
                     {{ form.telefono }}
                     <div id="telefono-error" class="error-message" style="display: none;"></div>
+                    {% if form.telefono.errors %}
+                    <div class="error-message">
+                        {% for error in form.telefono.errors %}
+                        <strong>{{ error }}</strong>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     {% if form.telefono.help_text %}
                     <div class="help-text">{{ form.telefono.help_text }}</div>
                     {% endif %}
@@ -598,6 +636,13 @@ select[name="country"] {
                         {{ form.password1 }}
                         <button type="button" class="password-toggle" onclick="togglePassword('id_password1')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 8px;">👁️</button>
                     </div>
+                    {% if form.password1.errors %}
+                    <div class="error-message">
+                        {% for error in form.password1.errors %}
+                        <strong>{{ error }}</strong>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                     {% if form.password1.help_text %}
                     <div class="help-text">{{ form.password1.help_text }}</div>
                     {% endif %}
@@ -609,6 +654,13 @@ select[name="country"] {
                         {{ form.password2 }}
                         <button type="button" class="password-toggle" onclick="togglePassword('id_password2')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 8px;">👁️</button>
                     </div>
+                    {% if form.password2.errors %}
+                    <div class="error-message">
+                        {% for error in form.password2.errors %}
+                        <strong>{{ error }}</strong>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
                 </div>
             </div>
 

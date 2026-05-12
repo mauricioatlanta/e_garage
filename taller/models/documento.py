@@ -39,7 +39,7 @@ class Documento(AuditMixin, models.Model):
         db_index=True,
     )
     numero = models.CharField(max_length=32, blank=True, default="", db_index=True)
-    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
+    # uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     # numero_documento_db removido - era duplicado de numero
     # correlativo removido - no se actualizaba automáticamente
     # estado del documento (borrador/emitido/anulado, etc.)

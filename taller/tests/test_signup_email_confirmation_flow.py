@@ -4,6 +4,8 @@ import pytest
 from django.contrib.auth import get_user_model
 from django.core import mail
 
+from taller.models.empresa import Empresa
+
 
 User = get_user_model()
 
@@ -83,6 +85,54 @@ class TestSignupEmailConfirmationFlow:
         assert confirm_response.redirect_chain[-1][0].startswith("/us/")
         assert "_auth_user_id" in client.session
 
+    def test_signup_duplicate_email_shows_custom_error(self, client):
+        User.objects.create_user(
+            username="contacto@atlantareciclajes.cl",
+            email="contacto@atlantareciclajes.cl",
+            password="StrongPass123!",
+        )
+
+        response = client.post(
+            "/cl/es/accounts/signup/",
+            self._signup_payload("contacto@atlantareciclajes.cl", "CL", "+56922223333"),
+        )
+
+        assert response.status_code == 200
+        assert User.objects.filter(email__iexact="contacto@atlantareciclajes.cl").count() == 1
+        assert (
+            response.context["form"].errors["email"][0]
+            == "Esta dirección de correo ya está registrada en eGarage. "
+            "Por favor, inicia sesión o usa la opción de recuperar contraseña."
+        )
+        assert len(mail.outbox) == 0
+
+    def test_signup_duplicate_phone_shows_custom_error(self, client):
+        existing_user = User.objects.create_user(
+            username="existing-phone@example.com",
+            email="existing-phone@example.com",
+            password="StrongPass123!",
+        )
+        Empresa.objects.create(
+            user=existing_user,
+            nombre_taller="Taller Existente",
+            pais="CL",
+            telefono="+56911112222",
+            email=existing_user.email,
+        )
+
+        response = client.post(
+            "/cl/es/accounts/signup/",
+            self._signup_payload("nuevo-telefono@example.com", "CL", "+56 9 1111 2222"),
+        )
+
+        assert response.status_code == 200
+        assert not User.objects.filter(email="nuevo-telefono@example.com").exists()
+        assert (
+            response.context["form"].errors["telefono"][0]
+            == "Este número de contacto ya está vinculado a un taller registrado en eGarage."
+        )
+        assert len(mail.outbox) == 0
+
     def test_password_reset_email_uses_clean_subject_and_branded_from(self, client):
         User.objects.create_user(
             username="reset-branding@example.com",
@@ -98,11 +148,14 @@ class TestSignupEmailConfirmationFlow:
 
         assert response.status_code == 200
         assert len(mail.outbox) == 1
-        assert (
-            mail.outbox[0].subject
-            == "[Soporte eGarage] Instrucciones para restablecer tu contraseña"
-        )
+        assert mail.outbox[0].subject == "[eGarage] Restablece tu contraseña"
         assert mail.outbox[0].from_email == "eGarage <support@egarage.cl>"
+        assert mail.outbox[0].alternatives
+        html_body, mimetype = mail.outbox[0].alternatives[0]
+        assert mimetype == "text/html"
+        assert "Restablece tu contrasena" in html_body
+        assert "Seguridad de cuenta" in html_body
+        assert "Gestión inteligente para talleres automotrices" in mail.outbox[0].body
 
     def test_login_and_password_reset_endpoints_still_work(self, client):
         user = User.objects.create_user(
