@@ -15,7 +15,6 @@ from django.contrib.auth.models import User
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def user_usa_empresa(db):
     """Usuario con empresa USA."""
     user = User.objects.create_user(username="usa_user", password="testpass123")
@@ -28,7 +27,6 @@ def user_usa_empresa(db):
 
 
 @pytest.fixture
-@pytest.mark.django_db
 def cliente_a(user_usa_empresa):
     """Cliente A de la empresa USA."""
     empresa = getattr(user_usa_empresa, "empresa", None)

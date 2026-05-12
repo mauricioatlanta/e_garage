@@ -131,10 +131,15 @@ LOGGING = {
 }
 
 # Configuracion de email para produccion por API HTTPS (Resend)
-EMAIL_BACKEND = "taller.email_backends.resend_backend.ResendEmailBackend"
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "support@egarage.cl")
-SERVER_EMAIL = os.getenv("SERVER_EMAIL", "support@egarage.cl")
-RESEND_API_KEY = os.getenv("RESEND_API_KEY", "")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "support@egarage.cl").strip()
+SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL).strip()
+SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", DEFAULT_FROM_EMAIL).strip()
+EMAIL_HOST_USER = SUPPORT_EMAIL
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+ANYMAIL = {
+    "RESEND_API_KEY": os.environ.get("RESEND_API_KEY"),
+}
 
 # Configuración de sesiones
 SESSION_COOKIE_AGE = 86400  # 24 horas

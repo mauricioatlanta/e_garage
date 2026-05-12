@@ -1,3 +1,5 @@
+import json
+
 from django.contrib import admin
 from django.contrib.admin import AdminSite
 from django.db import models
@@ -13,7 +15,9 @@ from taller.models.empresa import Empresa
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
 from taller.models.precio_suscripcion import PrecioSuscripcion
+from taller.models.suscripcion_transaccion import SuscripcionTransaccion
 from taller.models.tecnico import Tecnico
+from taller.services.suscripcion_transaccion_service import SuscripcionTransaccionService
 
 # ✅ Importar modelos de servicios de forma segura (puede fallar si no están disponibles)
 try:
@@ -551,6 +555,86 @@ class ComprobantePagoAdmin(admin.ModelAdmin):
             comprobante.save()
             count += 1
         self.message_user(request, f"Se rechazaron {count} comprobantes.")
+
+
+@admin.register(SuscripcionTransaccion, site=admin_site)
+class SuscripcionTransaccionAdmin(admin.ModelAdmin):
+    list_display = (
+        "empresa",
+        "monto_display",
+        "metodo",
+        "estado_badge",
+        "created_at",
+        "subscription_applied_at",
+    )
+    list_filter = ("payment_method", "status", "created_at")
+    search_fields = ("empresa__nombre_taller", "id", "external_transaction_id", "reference", "uuid")
+    readonly_fields = (
+        "id",
+        "uuid",
+        "created_at",
+        "updated_at",
+        "processed_at",
+        "subscription_applied_at",
+        "payload_historico",
+    )
+    actions = ("aprobar_pagos_manuales",)
+    list_select_related = ("empresa",)
+
+    def monto_display(self, obj):
+        return obj.monto_formateado
+
+    monto_display.short_description = "Monto"
+    monto_display.admin_order_field = "amount"
+
+    def metodo(self, obj):
+        return obj.get_metodo_display()
+
+    metodo.short_description = "Método"
+    metodo.admin_order_field = "payment_method"
+
+    def estado_badge(self, obj):
+        colors = {
+            "approved": "#28a745",
+            "pending": "#ffc107",
+            "processing": "#0d6efd",
+            "rejected": "#dc3545",
+            "cancelled": "#6c757d",
+            "error": "#212529",
+        }
+        text_color = "#212529" if obj.status == "pending" else "#ffffff"
+        return format_html(
+            '<span style="background-color: {}; color: {}; padding: 3px 10px; border-radius: 10px; font-weight: bold; font-size: 11px;">{}</span>',
+            colors.get(obj.status, "#6c757d"),
+            text_color,
+            obj.get_estado_display(),
+        )
+
+    estado_badge.short_description = "Estado"
+    estado_badge.admin_order_field = "status"
+
+    def payload_historico(self, obj):
+        return format_html(
+            '<pre style="margin: 0; white-space: pre-wrap;">{}</pre>',
+            json.dumps(obj.gateway_payload or {}, indent=2, ensure_ascii=False),
+        )
+
+    payload_historico.short_description = "Payload histórico"
+
+    def aprobar_pagos_manuales(self, request, queryset):
+        pendientes = queryset.filter(status="pending")
+        count = 0
+        for tx in pendientes:
+            SuscripcionTransaccionService.finalizar_pago_exitoso(
+                tx,
+                processed_by=request.user.get_username(),
+            )
+            count += 1
+        self.message_user(request, f"Se han procesado {count} pagos exitosamente.")
+
+    aprobar_pagos_manuales.short_description = (
+        "Aprobar transferencias y enviar email de éxito"
+    )
 
 
 @admin.register(PrecioSuscripcion, site=admin_site)

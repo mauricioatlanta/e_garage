@@ -26,6 +26,7 @@ from taller.forms.team_forms import TeamMemberForm, TeamMemberDeactivateForm
 from taller.models.team_member import TeamMember
 from taller.models.empresa import Empresa
 from taller.templatetags.country_url import reverse_country_url
+from taller.utils.email_helper import get_branded_from_email, get_support_reply_to
 
 log = logging.getLogger(__name__)
 
@@ -219,8 +220,9 @@ class TeamCreateView(TeamListSuccessUrlMixin, LoginRequiredMixin, RoleRequiredMi
             email = EmailMultiAlternatives(
                 subject=subject,
                 body=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
                 to=[usuario.email],
+                reply_to=[get_support_reply_to()],
             )
             email.attach_alternative(html_message, "text/html")
             email.send(fail_silently=False)

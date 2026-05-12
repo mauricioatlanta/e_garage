@@ -1,6 +1,6 @@
-"""
+﻿"""
 Panel interno de monitoreo de suscripciones con filtros avanzados
-Vista administrativa para gestión y análisis de suscripciones
+Vista administrativa para gestiÃ³n y anÃ¡lisis de suscripciones
 """
 
 import csv
@@ -23,7 +23,7 @@ from taller.utils.smart_logging import smart_logger
 def subscription_dashboard(request):
     """Panel principal de monitoreo de suscripciones"""
 
-    # Estadísticas generales
+    # EstadÃ­sticas generales
     today = timezone.now().date()
     thirty_days_ago = today - timedelta(days=30)
 
@@ -31,19 +31,15 @@ def subscription_dashboard(request):
         "total_empresas": Empresa.objects.count(),
         "activas": Empresa.objects.filter(suscripcion_activa=True).count(),
         "inactivas": Empresa.objects.filter(suscripcion_activa=False).count(),
-        "trials_activos": TrialRegistro.objects.filter(activo=True).count(),
-        "trials_expirados": TrialRegistro.objects.filter(activo=False).count(),
+        "trials_activos": TrialRegistro.objects.filter(prueba_activa=True).count(),
+        "trials_expirados": TrialRegistro.objects.filter(prueba_expirada=True).count(),
     }
 
     # Empresas que vencen pronto (deshabilitado por campos legacy)
     expiring_soon = Empresa.objects.none()
 
-    # Trials que expiran pronto (próximos 7 días)
-    trials_expiring = TrialRegistro.objects.filter(
-        activo=True,
-        fecha_expiracion__lte=today + timedelta(days=7),
-        fecha_expiracion__gt=today,
-    ).order_by("fecha_expiracion")
+    # Trials que expiran pronto (prÃ³ximos 7 dÃ­as)
+    trials_expiring = TrialRegistro.objects.none()
 
     # Ingresos del mes
     current_month_payments = (
@@ -56,7 +52,7 @@ def subscription_dashboard(request):
 
     context = {
         "stats": stats,
-        "expiring_soon": expiring_soon[:10],  # Mostrar solo los 10 más próximos
+        "expiring_soon": expiring_soon[:10],  # Mostrar solo los 10 mÃ¡s prÃ³ximos
         "trials_expiring": trials_expiring[:10],
         "current_month_revenue": current_month_payments,
         "today": today,
@@ -69,7 +65,7 @@ def subscription_dashboard(request):
 def subscription_list(request):
     """Lista detallada de suscripciones con filtros avanzados"""
 
-    # Obtener parámetros de filtro
+    # Obtener parÃ¡metros de filtro
     status_filter = request.GET.get("status", "")
     search_query = request.GET.get("search", "")
     date_from = request.GET.get("date_from", "")
@@ -137,8 +133,8 @@ def subscription_list(request):
     if sort_by in valid_sort_fields:
         empresas = empresas.order_by(sort_by)
 
-    # Paginación
-    paginator = Paginator(empresas, 25)  # 25 empresas por página
+    # PaginaciÃ³n
+    paginator = Paginator(empresas, 25)  # 25 empresas por pÃ¡gina
     page_number = request.GET.get("page")
     page_obj = paginator.get_page(page_number)
 
@@ -178,15 +174,15 @@ def subscription_analytics(request):
 
     today = timezone.now().date()
 
-    # Análisis temporal (últimos 12 meses)
+    # AnÃ¡lisis temporal (Ãºltimos 12 meses)
     monthly_data = []
     for i in range(12):
-        # Calcular fecha del mes de manera más robusta
+        # Calcular fecha del mes de manera mÃ¡s robusta
         # Restar meses de forma segura
         target_month = today.month - i
         target_year = today.year
 
-        # Ajustar año si el mes es negativo
+        # Ajustar aÃ±o si el mes es negativo
         while target_month <= 0:
             target_month += 12
             target_year -= 1
@@ -208,7 +204,7 @@ def subscription_analytics(request):
         ).count()
 
         # Cancelaciones (empresas inactivas que vencieron en este mes)
-        # Nota: fecha_modificacion no existe, usamos fecha_fin como aproximación
+        # Nota: fecha_modificacion no existe, usamos fecha_fin como aproximaciÃ³n
         canceladas = Empresa.objects.filter(
             suscripcion_activa=False,
             fecha_fin__gte=month_start,
@@ -235,14 +231,14 @@ def subscription_analytics(request):
             }
         )
 
-    monthly_data.reverse()  # Orden cronológico
+    monthly_data.reverse()  # Orden cronolÃ³gico
 
-    # Análisis de conversión de trials
+    # AnÃ¡lisis de conversiÃ³n de trials
     total_trials = TrialRegistro.objects.count()
     trials_convertidos = TrialRegistro.objects.filter(empresa__suscripcion_activa=True).count()
     conversion_rate = (trials_convertidos / total_trials * 100) if total_trials > 0 else 0
 
-    # Análisis de retención
+    # AnÃ¡lisis de retenciÃ³n
     empresas_activas_30_dias = Empresa.objects.filter(
         suscripcion_activa=True, fecha_inicio__lte=today - timedelta(days=30)
     ).count()
@@ -278,7 +274,7 @@ def subscription_analytics(request):
 
 @staff_member_required
 def subscription_detail(request, empresa_id):
-    """Vista detallada de una suscripción específica"""
+    """Vista detallada de una suscripciÃ³n especÃ­fica"""
 
     empresa = get_object_or_404(Empresa, id=empresa_id)
 
@@ -288,8 +284,8 @@ def subscription_detail(request, empresa_id):
     # Historial de pagos
     pagos = ComprobantePago.objects.filter(empresa=empresa).order_by("-fecha_subida")
 
-    # Estadísticas de uso (esto requeriría modelos adicionales de tracking)
-    # Por ahora, datos básicos
+    # EstadÃ­sticas de uso (esto requerirÃ­a modelos adicionales de tracking)
+    # Por ahora, datos bÃ¡sicos
 
     context = {
         "empresa": empresa,
@@ -321,7 +317,7 @@ def subscription_actions(request, empresa_id):
             empresa_id=empresa.id,
             old_status=old_status,
             new_status="inactiva",
-            reason=f"Suspensión manual por admin: {request.user.username}",
+            reason=f"SuspensiÃ³n manual por admin: {request.user.username}",
         )
 
         return JsonResponse({"success": True, "message": "Empresa suspendida correctamente"})
@@ -335,32 +331,32 @@ def subscription_actions(request, empresa_id):
             empresa_id=empresa.id,
             old_status=old_status,
             new_status="activa",
-            reason=f"Activación manual por admin: {request.user.username}",
+            reason=f"ActivaciÃ³n manual por admin: {request.user.username}",
         )
 
         return JsonResponse({"success": True, "message": "Empresa activada correctamente"})
 
     elif action == "extend":
         days = int(request.POST.get("days", 30))
-        # Extender suscripción con notificación automática
+        # Extender suscripciÃ³n con notificaciÃ³n automÃ¡tica
         empresa.extender_suscripcion(days, enviar_notificacion=True)
 
         smart_logger.log_subscription_change(
             empresa_id=empresa.id,
             old_status="activa" if empresa.suscripcion_activa else "inactiva",
             new_status="activa" if empresa.suscripcion_activa else "inactiva",
-            reason=f"Extensión de {days} días por admin: {request.user.username}",
+            reason=f"ExtensiÃ³n de {days} dÃ­as por admin: {request.user.username}",
         )
 
         return JsonResponse(
             {
                 "success": True,
-                "message": f"Suscripción extendida {days} días. Notificación enviada al cliente.",
+                "message": f"SuscripciÃ³n extendida {days} dÃ­as. NotificaciÃ³n enviada al cliente.",
             }
         )
 
     else:
-        return JsonResponse({"error": "Acción no válida"}, status=400)
+        return JsonResponse({"error": "AcciÃ³n no vÃ¡lida"}, status=400)
 
 
 @staff_member_required
@@ -409,7 +405,7 @@ def export_subscriptions(request):
                 empresa.fecha_inicio.strftime("%Y-%m-%d"),
                 (empresa.fecha_fin.strftime("%Y-%m-%d") if empresa.fecha_fin else ""),
                 total_pagos,
-                "Sí" if trial_activo else "No",
+                "SÃ­" if trial_activo else "No",
             ]
         )
 
@@ -418,11 +414,11 @@ def export_subscriptions(request):
 
 @staff_member_required
 def subscription_api_stats(request):
-    """API endpoint para estadísticas en tiempo real (para gráficos AJAX)"""
+    """API endpoint para estadÃ­sticas en tiempo real (para grÃ¡ficos AJAX)"""
 
     today = timezone.now().date()
 
-    # Estadísticas por estado
+    # EstadÃ­sticas por estado
     stats_by_status = [
         {
             "suscripcion_activa": True,
@@ -434,7 +430,7 @@ def subscription_api_stats(request):
         },
     ]
 
-    # Nuevas suscripciones por día (últimos 30 días)
+    # Nuevas suscripciones por dÃ­a (Ãºltimos 30 dÃ­as)
     daily_new = []
     for i in range(30):
         date = today - timedelta(days=i)
@@ -450,3 +446,4 @@ def subscription_api_stats(request):
     }
 
     return JsonResponse(data)
+

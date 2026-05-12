@@ -2,9 +2,9 @@
 Comando para probar la configuración de email
 """
 
-from django.core.management.base import BaseCommand
-from django.core.mail import send_mail
 from django.conf import settings
+from django.core.management.base import BaseCommand
+from taller.utils.email_helper import get_branded_from_email, get_support_reply_to, send_email_with_reply_to
 
 
 class Command(BaseCommand):
@@ -26,33 +26,31 @@ class Command(BaseCommand):
         # 1. Verificar configuración
         self.stdout.write(self.style.WARNING("CONFIGURACION ACTUAL:"))
         self.stdout.write(f"  EMAIL_BACKEND: {settings.EMAIL_BACKEND}")
-        self.stdout.write(f"  EMAIL_HOST: {getattr(settings, 'EMAIL_HOST', 'NO CONFIGURADO')}")
-        self.stdout.write(f"  EMAIL_PORT: {getattr(settings, 'EMAIL_PORT', 'NO CONFIGURADO')}")
         self.stdout.write(
-            f"  EMAIL_USE_SSL: {getattr(settings, 'EMAIL_USE_SSL', 'NO CONFIGURADO')}"
+            f"  DEFAULT_FROM_EMAIL: {getattr(settings, 'DEFAULT_FROM_EMAIL', 'NO CONFIGURADO')}"
         )
+        self.stdout.write(f"  SERVER_EMAIL: {getattr(settings, 'SERVER_EMAIL', 'NO CONFIGURADO')}")
         self.stdout.write(
-            f"  EMAIL_USE_TLS: {getattr(settings, 'EMAIL_USE_TLS', 'NO CONFIGURADO')}"
+            f"  SUPPORT_EMAIL: {getattr(settings, 'SUPPORT_EMAIL', 'NO CONFIGURADO')}"
         )
         self.stdout.write(
             f"  EMAIL_HOST_USER: {getattr(settings, 'EMAIL_HOST_USER', 'NO CONFIGURADO')}"
-        )
-
-        email_password = getattr(settings, "EMAIL_HOST_PASSWORD", None)
-        if email_password:
-            self.stdout.write(
-                f"  EMAIL_HOST_PASSWORD: {'*' * len(email_password)} ({len(email_password)} caracteres)"
-            )
-        else:
-            self.stdout.write(self.style.ERROR("  EMAIL_HOST_PASSWORD: [ERROR] NO CONFIGURADO"))
-
-        self.stdout.write(
-            f"  DEFAULT_FROM_EMAIL: {getattr(settings, 'DEFAULT_FROM_EMAIL', 'NO CONFIGURADO')}"
         )
         self.stdout.write(f"  ADMIN_EMAIL: {getattr(settings, 'ADMIN_EMAIL', 'NO CONFIGURADO')}")
         self.stdout.write(
             f"  EMAIL_TIMEOUT: {getattr(settings, 'EMAIL_TIMEOUT', 'NO CONFIGURADO')}"
         )
+        resend_api_key = (
+            getattr(settings, "RESEND_API_KEY", "")
+            or getattr(settings, "ANYMAIL", {}).get("RESEND_API_KEY", "")
+            or ""
+        )
+        if resend_api_key:
+            self.stdout.write(
+                f"  RESEND_API_KEY: {'*' * max(len(resend_api_key) - 4, 0)}{resend_api_key[-4:]}"
+            )
+        else:
+            self.stdout.write(self.style.ERROR("  RESEND_API_KEY: [ERROR] NO CONFIGURADO"))
         self.stdout.write("")
 
         # 2. Verificar Allauth
@@ -66,25 +64,23 @@ class Command(BaseCommand):
         self.stdout.write("")
 
         # 3. Verificar backend de Resend
-        if settings.EMAIL_BACKEND == "taller.backends.resend_backend.ResendEmailBackend":
+        if settings.EMAIL_BACKEND == "anymail.backends.resend.EmailBackend":
             self.stdout.write(self.style.WARNING("BACKEND DE EMAIL:"))
-            self.stdout.write("  [OK] Usando ResendEmailBackend")
+            self.stdout.write("  [OK] Usando anymail.backends.resend.EmailBackend")
             self.stdout.write("")
 
         # 4. Intentar enviar correo de prueba
-        recipient = options.get("recipient") or getattr(
-            settings, "ADMIN_EMAIL", "subscription@egarage.cl"
-        )
+        recipient = options.get("recipient") or getattr(settings, "ADMIN_EMAIL", None) or get_support_reply_to()
 
         self.stdout.write(self.style.WARNING("ENVIANDO CORREO DE PRUEBA:"))
         self.stdout.write(f"  Destinatario: {recipient}")
         self.stdout.write("")
 
         try:
-            send_mail(
+            send_email_with_reply_to(
                 subject="Prueba de Configuracion - eGarage",
                 message="Este es un correo de prueba para verificar que la configuracion de email funciona correctamente.",
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
                 recipient_list=[recipient],
                 fail_silently=False,
             )
@@ -114,9 +110,11 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR("=" * 60))
             self.stdout.write("")
             self.stdout.write(self.style.WARNING("RECOMENDACIONES:"))
-            self.stdout.write("  1. Verificar que EMAIL_PASSWORD esté configurado en .env")
-            self.stdout.write("  2. Verificar credenciales del servidor SMTP")
-            self.stdout.write("  3. Verificar que el servidor SMTP esté accesible")
+            self.stdout.write("  1. Verificar que RESEND_API_KEY esté configurada en .env/.env.prod")
+            self.stdout.write("  2. Confirmar que django-anymail esté instalado")
+            self.stdout.write(
+                f"  3. Confirmar que {get_support_reply_to()} esté verificado en Resend"
+            )
             self.stdout.write("  4. Revisar logs del servidor para más detalles")
 
             import sys

@@ -6,6 +6,7 @@ Protegidas por UUID único en la URL.
 import logging
 
 from django.contrib import messages
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.views.decorators.http import require_POST
@@ -14,6 +15,36 @@ from taller.models.documento import Documento
 from taller.models.company_settings import CompanySettings
 
 log = logging.getLogger(__name__)
+
+
+def _get_public_branding_context(documento, company_settings):
+    empresa = documento.empresa
+    logo_url = None
+    if company_settings and getattr(company_settings, "logo", None):
+        try:
+            logo_url = company_settings.logo.url
+        except Exception:
+            logo_url = None
+    elif getattr(empresa, "logo", None):
+        try:
+            logo_url = empresa.logo.url
+        except Exception:
+            logo_url = None
+
+    return {
+        "LOGO_PERSONALIZADO": logo_url,
+        "COLOR_PRIMARIO": (
+            getattr(company_settings, "primary_color", None)
+            or getattr(documento.empresa, "color", None)
+            or "#0d6efd"
+        ),
+        "COLOR_SECUNDARIO": getattr(company_settings, "secondary_color", None) or "#6c757d",
+        "NOMBRE_EMPRESA_PERSONALIZADO": (
+            getattr(company_settings, "company_name", None) or documento.empresa.nombre_taller
+        ),
+        "COMPANY_TERMS": getattr(company_settings, "terms_and_conditions", "") or "",
+        "COMPANY_BANK": getattr(company_settings, "bank_details", "") or "",
+    }
 
 
 def detalle_presupuesto_publico(request, uuid):
@@ -34,8 +65,7 @@ def detalle_presupuesto_publico(request, uuid):
             "lineas_repuesto__repuesto", "lineas_servicio", "lineas_otro_servicio"
         ),
         uuid=uuid,
-        tipo="PRES",  # Solo presupuestos
-        estado="EMITIDO",  # Solo documentos emitidos
+        tipo="PRES",
     )
 
     # Verificar que el documento no esté anulado
@@ -46,6 +76,9 @@ def detalle_presupuesto_publico(request, uuid):
             {"documento": documento},
             status=404,
         )
+
+    if documento.estado != "EMITIDO":
+        raise Http404("Documento no disponible")
 
     # Obtener configuración de la empresa para branding
     try:
@@ -78,6 +111,7 @@ def detalle_presupuesto_publico(request, uuid):
         "vehiculo": documento.vehiculo,
         "whatsapp_pago_url": whatsapp_pago_url,
     }
+    context.update(_get_public_branding_context(documento, company_settings))
 
     return render(
         request,
@@ -96,8 +130,11 @@ def aprobar_presupuesto(request, uuid):
         Documento.objects.select_related("empresa", "cliente"),
         uuid=uuid,
         tipo="PRES",
-        estado="EMITIDO",
     )
+
+    if documento.estado != "EMITIDO":
+        messages.error(request, "Este presupuesto ya no esta disponible para aprobacion.")
+        return redirect("publico:ver_presupuesto", uuid=uuid)
 
     # Verificar que no esté ya aprobado
     if documento.approved_at:
@@ -165,15 +202,18 @@ def notificar_aprobacion_taller(documento):
     )
 
     # Enviar email si está configurado
-    if config_notif and config_notif.email_activo and empresa.user.email:
+    email_enabled = config_notif.email_activo if config_notif else True
+    if email_enabled and empresa.user.email:
         try:
-            from django.core.mail import send_mail
             from django.conf import settings
+            from taller.utils.email_helper import get_branded_from_email, send_email_with_reply_to
 
-            send_mail(
+            send_email_with_reply_to(
                 subject=f"✅ Presupuesto Aprobado - {documento.numero_documento or documento.numero}",
                 message=mensaje,
-                from_email=getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@egarage.cl"),
+                from_email=get_branded_from_email(
+                    getattr(settings, "DEFAULT_FROM_EMAIL", "support@egarage.cl")
+                ),
                 recipient_list=[empresa.user.email],
                 fail_silently=True,
             )

@@ -10,9 +10,9 @@ from datetime import timedelta
 
 import requests
 from django.conf import settings
-from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils import timezone
+from taller.utils.email_helper import get_branded_from_email, send_email_with_reply_to
 
 logger = logging.getLogger(__name__)
 
@@ -190,7 +190,7 @@ def enviar_whatsapp_a_numero(numero_telefono, mensaje, empresa=None):
         return False
 
 
-def notificar_nueva_suscripcion(empresa, plan, monto, es_nueva_empresa=False):
+def notificar_nueva_suscripcion(empresa, plan, monto, es_nueva_empresa=False, send_email=True):
     """
     A. NUEVA SUSCRIPCIÓN
     Envía Email de Bienvenida + WhatsApp
@@ -220,6 +220,7 @@ def notificar_nueva_suscripcion(empresa, plan, monto, es_nueva_empresa=False):
             "language": language,
             "es_nueva_empresa": es_nueva_empresa,
         }
+        email_sender = send_email_with_reply_to if send_email else (lambda *args, **kwargs: 0)
 
         # === ENVIAR EMAIL ===
         try:
@@ -228,7 +229,7 @@ def notificar_nueva_suscripcion(empresa, plan, monto, es_nueva_empresa=False):
             else:
                 subject = "🎉 ¡Bienvenido a eGarage - Tu Suscripción está Activa!"
 
-            html_message = render_to_string("email/nueva_suscripcion.html", context)
+            html_message = render_to_string("emails/suscripcion_confirmada.html", context)
 
             # Versión texto plano
             if language == "en":
@@ -276,10 +277,10 @@ Saludos,
 Equipo eGarage
                 """.strip()
 
-            send_mail(
+            email_sender(
                 subject=subject,
                 message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
                 recipient_list=(
                     [empresa.user.email, empresa.email]
                     if empresa.email != empresa.user.email
@@ -368,7 +369,7 @@ Tu suscripción ya está activa.
         return False
 
 
-def notificar_cambio_plan(empresa, plan_anterior, plan_nuevo, monto, fecha_inicio):
+def notificar_cambio_plan(empresa, plan_anterior, plan_nuevo, monto, fecha_inicio, send_email=True):
     """
     B. CAMBIO DE PLAN
     Envía Email de Confirmación + WhatsApp
@@ -396,6 +397,7 @@ def notificar_cambio_plan(empresa, plan_anterior, plan_nuevo, monto, fecha_inici
             "fecha_fin": empresa.fecha_fin,
             "language": language,
         }
+        email_sender = send_email_with_reply_to if send_email else (lambda *args, **kwargs: 0)
 
         # === ENVIAR EMAIL ===
         try:
@@ -444,10 +446,10 @@ Saludos,
 Equipo eGarage
                 """.strip()
 
-            send_mail(
+            email_sender(
                 subject=subject,
                 message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
                 recipient_list=(
                     [empresa.user.email, empresa.email]
                     if empresa.email != empresa.user.email
@@ -505,7 +507,13 @@ Enjoy your new plan! 🎉"""
 
 
 def notificar_renovacion_exitosa(
-    empresa, plan, monto, dias_renovados, is_courtesy=False, duration_months=None
+    empresa,
+    plan,
+    monto,
+    dias_renovados,
+    is_courtesy=False,
+    duration_months=None,
+    send_email=True,
 ):
     """
     C. RENOVACIÓN EXITOSA
@@ -554,6 +562,7 @@ def notificar_renovacion_exitosa(
             "periodo_cortesia": periodo_cortesia,
             "duration_months": duration_months,
         }
+        email_sender = send_email_with_reply_to if send_email else (lambda *args, **kwargs: 0)
 
         # === ENVIAR EMAIL ===
         try:
@@ -638,10 +647,10 @@ Saludos,
 Equipo eGarage
                     """.strip()
 
-            send_mail(
+            email_sender(
                 subject=subject,
                 message=plain_message,
-                from_email=settings.DEFAULT_FROM_EMAIL,
+                from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
                 recipient_list=(
                     [empresa.user.email, empresa.email]
                     if empresa.email != empresa.user.email

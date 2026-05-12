@@ -11,17 +11,17 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.utils.translation import activate
 
+from taller.config.country_settings import CountrySettings
 from taller.models.empresa import Empresa
 from taller.models.suscripcion import Suscripcion
 from taller.utils.country_config import get_country_config, get_config_from_empresa
-from taller.config.country_settings import CountrySettings
+from taller.utils.email_helper import get_branded_from_email, send_email_with_reply_to
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -218,7 +218,7 @@ class RegistrationService:
             zona_horaria=country_config["timezone"],
             plan=plan_type,
             suscripcion_activa=True,
-            # is_trial=obtuvo_trial,  <-- COMENTADO PARA EVITAR ATTRIBUTEERROR
+            is_trial=obtuvo_trial,
             trial_started_at=trial_started_at,
             trial_ends_at=trial_ends_at,
             trial_already_used=(
@@ -325,12 +325,20 @@ class RegistrationService:
             country_config = get_country_config(country_code)
 
         language = country_config.get("lang", "es")
-        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@egarage.cl")
+        from_email = get_branded_from_email(
+            getattr(settings, "DEFAULT_FROM_EMAIL", "support@egarage.cl")
+        )
         subject = f"Bienvenido a eGarage - {empresa.nombre_taller}"
         message = f"Hola {user.first_name}, tu cuenta ha sido creada."
 
         try:
-            send_mail(subject, message, from_email, [user.email], fail_silently=False)
+            send_email_with_reply_to(
+                subject=subject,
+                message=message,
+                from_email=from_email,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
         except Exception:
             pass
 

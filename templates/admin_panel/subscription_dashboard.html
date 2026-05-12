@@ -1,4 +1,4 @@
-{% extends 'base_admin.html' %}
+﻿{% extends 'admin/base_admin.html' %}
 {% load humanize %}
 
 {% block title %}Panel de Suscripciones - eGarage Admin{% endblock %}
@@ -89,17 +89,17 @@
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
                 <div>
-                    <h1 class="h3 mb-0">📊 Panel de Suscripciones</h1>
+                    <h1 class="h3 mb-0">ðŸ“Š Panel de Suscripciones</h1>
                     <p class="text-muted">Monitoreo en tiempo real del estado de suscripciones</p>
                 </div>
                 <div>
-                    <span class="badge badge-info">Última actualización: {{ today|date:"d/m/Y H:i" }}</span>
+                    <span class="badge badge-info">Ãšltima actualizaciÃ³n: {{ today|date:"d/m/Y" }}</span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Estadísticas Principales -->
+    <!-- EstadÃ­sticas Principales -->
     <div class="row mb-4">
         <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
             <div class="dashboard-card text-center">
@@ -144,7 +144,7 @@
         <!-- Suscripciones por Vencer -->
         <div class="col-lg-6 mb-3">
             <div class="dashboard-card">
-                <h5 class="mb-3">⚠️ Vencen en 15 días</h5>
+                <h5 class="mb-3">âš ï¸ Vencen en 15 dÃ­as</h5>
                 {% if expiring_soon %}
                     {% for empresa in expiring_soon %}
                         <div class="alert-item {% if empresa.fecha_fin <= today %}urgent-item{% endif %}">
@@ -166,7 +166,7 @@
                 {% else %}
                     <div class="text-center text-muted py-3">
                         <i class="fas fa-check-circle fa-2x mb-2"></i><br>
-                        No hay suscripciones próximas a vencer
+                        No hay suscripciones prÃ³ximas a vencer
                     </div>
                 {% endif %}
             </div>
@@ -175,7 +175,7 @@
         <!-- Trials por Expirar -->
         <div class="col-lg-6 mb-3">
             <div class="dashboard-card">
-                <h5 class="mb-3">🆓 Trials Expiran Pronto</h5>
+                <h5 class="mb-3">ðŸ†“ Trials Expiran Pronto</h5>
                 {% if trials_expiring %}
                     {% for trial in trials_expiring %}
                         <div class="alert-item">
@@ -185,7 +185,7 @@
                                     <small class="text-muted">{{ trial.email }}</small>
                                 </div>
                                 <div class="text-right">
-                                    <span class="badge badge-info">{{ trial.dias_restantes }} días</span><br>
+                                    <span class="badge badge-info">{{ trial.dias_restantes }} dÃ­as</span><br>
                                     {% if trial.fecha_expiracion %}
                                         <small>{{ trial.fecha_expiracion|date:"d/m/Y" }}</small>
                                     {% elif trial.fecha_activacion %}
@@ -201,18 +201,18 @@
                 {% else %}
                     <div class="text-center text-muted py-3">
                         <i class="fas fa-clock fa-2x mb-2"></i><br>
-                        No hay trials próximos a expirar
+                        No hay trials prÃ³ximos a expirar
                     </div>
                 {% endif %}
             </div>
         </div>
     </div>
 
-    <!-- Gráficos y Métricas -->
+    <!-- GrÃ¡ficos y MÃ©tricas -->
     <div class="row mb-4">
         <div class="col-lg-6 mb-3">
             <div class="dashboard-card">
-                <h5 class="mb-3">📈 Distribución de Estados</h5>
+                <h5 class="mb-3">ðŸ“ˆ DistribuciÃ³n de Estados</h5>
                 <div class="chart-container">
                     <canvas id="statusChart"></canvas>
                 </div>
@@ -220,7 +220,7 @@
         </div>
         <div class="col-lg-6 mb-3">
             <div class="dashboard-card">
-                <h5 class="mb-3">📅 Nuevas Suscripciones (30 días)</h5>
+                <h5 class="mb-3">ðŸ“… Nuevas Suscripciones (30 dÃ­as)</h5>
                 <div class="chart-container">
                     <canvas id="newSubscriptionsChart"></canvas>
                 </div>
@@ -228,16 +228,16 @@
         </div>
     </div>
 
-    <!-- Acciones Rápidas -->
+    <!-- Acciones RÃ¡pidas -->
     <div class="quick-actions">
         <a href="{% url 'admin_monitoring:subscription_list' %}" class="action-btn">
-            📋 Lista Completa
+            ðŸ“‹ Lista Completa
         </a>
         <a href="{% url 'admin_monitoring:subscription_analytics' %}" class="action-btn">
-            📊 Analytics
+            ðŸ“Š Analytics
         </a>
         <a href="{% url 'admin_monitoring:export_subscriptions' %}" class="action-btn">
-            📥 Exportar CSV
+            ðŸ“¥ Exportar CSV
         </a>
     </div>
 </div>
@@ -246,7 +246,7 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// Gráfico de distribución de estados
+// GrÃ¡fico de distribuciÃ³n de estados
 const statusCtx = document.getElementById('statusChart').getContext('2d');
 new Chart(statusCtx, {
     type: 'doughnut',
@@ -269,12 +269,12 @@ new Chart(statusCtx, {
     }
 });
 
-// Actualización automática cada 5 minutos
+// ActualizaciÃ³n automÃ¡tica cada 5 minutos
 setInterval(function() {
     fetch('{% url "admin_monitoring:subscription_api_stats" %}')
         .then(response => response.json())
         .then(data => {
-            // Actualizar estadísticas en tiempo real
+            // Actualizar estadÃ­sticas en tiempo real
             console.log('Datos actualizados:', data.last_updated);
         });
 }, 300000); // 5 minutos
@@ -286,3 +286,7 @@ function showNotification(message, type = 'info') {
 }
 </script>
 {% endblock %}
+
+
+
+

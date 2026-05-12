@@ -53,7 +53,7 @@ class TenantIsolationBaseTest(TestCase):
             nombre="Cliente A",
             apellido="Test",
             telefono="123456789",
-            email_cliente="cliente_a@test.com",
+            email="cliente_a@test.com",
         )
 
         # Vehículo de empresa A
@@ -103,7 +103,7 @@ class TenantIsolationBaseTest(TestCase):
             nombre="Customer B",
             apellido="Test",
             telefono="987654321",
-            email_cliente="cliente_b@test.com",
+            email="cliente_b@test.com",
         )
 
         # Vehículo de empresa B
@@ -310,7 +310,7 @@ class TestAPITenantIsolation(TenantIsolationBaseTest):
 
     def test_api_create_vehiculo_valida_empresa(self):
         """Test: API de crear vehículo valida empresa"""
-        from taller.vehiculos.api import api_create_vehiculo
+        from taller.vehiculos.api import api_create
         import json
 
         # Intentar crear vehículo con cliente de otra empresa
@@ -318,14 +318,13 @@ class TestAPITenantIsolation(TenantIsolationBaseTest):
             "empresa_id": self.empresa_a.id,
             "cliente_id": self.cliente_b.id,  # Cliente de empresa B
             "patente": "HACK123",
-            "marca_texto": "Hacked",
-            "modelo_texto": "Car",
+            "marca": "Hacked",
+            "modelo": "Car",
             "anio": 2023,
         }
 
         # Esto debería fallar porque cliente_b no pertenece a empresa_a
         # La API corregida debería rechazar esto
-        from django.http import JsonResponse
 
         # Simular request
         from django.test import RequestFactory
@@ -337,6 +336,14 @@ class TestAPITenantIsolation(TenantIsolationBaseTest):
             content_type="application/json",
         )
         request.user = self.user_a
+        response = api_create(request)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {"error": "cliente_not_found"})
+        response = api_create(request)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertJSONEqual(response.content, {"error": "cliente_not_found"})
 
         # La API debería validar y rechazar
         # (Nota: Ajustar según implementación real de la API)
@@ -554,7 +561,7 @@ class TestRegresionVulnerabilidadesCorregidas(TenantIsolationBaseTest):
     def test_regresion_vehiculos_api_cliente_get(self):
         """Regresión: taller/vehiculos/api.py - Cliente.objects.get debe filtrar por empresa"""
         # Simular llamada API
-        from taller.vehiculos.api import api_create_vehiculo
+        from taller.vehiculos.api import api_create
         import json
         from django.test import RequestFactory
 
@@ -563,8 +570,8 @@ class TestRegresionVulnerabilidadesCorregidas(TenantIsolationBaseTest):
             "empresa_id": self.empresa_a.id,
             "cliente_id": self.cliente_b.id,  # Cliente de otra empresa
             "patente": "REG123",
-            "marca_texto": "Reg",
-            "modelo_texto": "Test",
+            "marca": "Reg",
+            "modelo": "Test",
             "anio": 2023,
         }
 

@@ -9,6 +9,7 @@ from django.conf import settings
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from taller.utils.email_helper import get_branded_from_email, get_support_reply_to
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,7 @@ def enviar_correo_bienvenida(usuario, enlace_activacion):
         # Datos del correo
         asunto = "¡Bienvenido a eGarage!"
         destinatario = [usuario.email]
-        remitente = settings.DEFAULT_FROM_EMAIL
+        remitente = get_branded_from_email(settings.DEFAULT_FROM_EMAIL)
 
         # Contexto para la plantilla
         context = {
@@ -44,7 +45,11 @@ def enviar_correo_bienvenida(usuario, enlace_activacion):
 
         # Crear email
         email = EmailMultiAlternatives(
-            subject=asunto, body=text_content, from_email=remitente, to=destinatario
+            subject=asunto,
+            body=text_content,
+            from_email=remitente,
+            to=destinatario,
+            reply_to=[get_support_reply_to()],
         )
 
         # Adjuntar versión HTML
@@ -74,7 +79,7 @@ def enviar_correo_prueba(email_destino, nombre="Usuario"):
     """
     try:
         asunto = "Test de correo eGarage"
-        remitente = settings.DEFAULT_FROM_EMAIL
+        remitente = get_branded_from_email(settings.DEFAULT_FROM_EMAIL)
 
         # Mensaje simple para prueba
         mensaje = f"""
@@ -90,7 +95,11 @@ def enviar_correo_prueba(email_destino, nombre="Usuario"):
 
         # Crear email simple
         email = EmailMultiAlternatives(
-            subject=asunto, body=mensaje, from_email=remitente, to=[email_destino]
+            subject=asunto,
+            body=mensaje,
+            from_email=remitente,
+            to=[email_destino],
+            reply_to=[get_support_reply_to()],
         )
 
         # Enviar
@@ -120,7 +129,7 @@ def enviar_correo_activacion_cuenta(usuario, codigo_activacion):
     try:
         asunto = "Activa tu cuenta de eGarage"
         destinatario = [usuario.email]
-        remitente = settings.DEFAULT_FROM_EMAIL
+        remitente = get_branded_from_email(settings.DEFAULT_FROM_EMAIL)
 
         # Contexto para la plantilla
         context = {
@@ -145,7 +154,11 @@ def enviar_correo_activacion_cuenta(usuario, codigo_activacion):
 
         # Crear email
         email = EmailMultiAlternatives(
-            subject=asunto, body=mensaje, from_email=remitente, to=destinatario
+            subject=asunto,
+            body=mensaje,
+            from_email=remitente,
+            to=destinatario,
+            reply_to=[get_support_reply_to()],
         )
 
         # Enviar

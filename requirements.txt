@@ -23,6 +23,7 @@ django-autocomplete-light>=3.9.7
 
 # Variables de Entorno
 python-dotenv>=1.0.0
+django-anymail>=14.0,<15.0
 requests>=2.32.0
 
 # Gmail API (envío por HTTPS, sin SMTP)
@@ -80,8 +81,6 @@ pyarmor>=8.5.0  # Para ofuscar motor_ia_core.py antes de producción
 #   pip install -r requirements.txt
 #
 # ======================================================
-
-
 
 
 

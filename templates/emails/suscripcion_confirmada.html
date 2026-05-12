@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="{% if empresa.pais == 'US' %}en{% else %}es{% endif %}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% if empresa.pais == 'US' %}Subscription confirmed{% else %}Suscripcion confirmada{% endif %}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f7fb;font-family:Helvetica,Arial,sans-serif;color:#172033;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f7fb;">
+        <tr>
+            <td align="center" style="padding:32px 16px;">
+                <table width="640" cellpadding="0" cellspacing="0" style="width:100%;max-width:640px;background-color:#ffffff;border:1px solid #d9e2ef;border-radius:18px;overflow:hidden;">
+                    <tr>
+                        <td style="padding:32px 36px;background:linear-gradient(135deg,#0f172a 0%,#1d4ed8 100%);color:#ffffff;">
+                            <div style="font-size:13px;letter-spacing:0.08em;text-transform:uppercase;opacity:0.82;">eGarage</div>
+                            <h1 style="margin:12px 0 0 0;font-size:30px;line-height:1.2;">
+                                {% if empresa.pais == 'US' %}
+                                    Payment confirmed
+                                {% else %}
+                                    Pago confirmado
+                                {% endif %}
+                            </h1>
+                            <p style="margin:12px 0 0 0;font-size:16px;line-height:1.6;color:#dbe7ff;">
+                                {% if empresa.pais == 'US' %}
+                                    Your subscription is active and your account is ready to keep operating without interruption.
+                                {% else %}
+                                    Tu suscripcion quedo activa y tu cuenta puede seguir operando sin interrupciones.
+                                {% endif %}
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:32px 36px 12px 36px;">
+                            <p style="margin:0 0 20px 0;font-size:16px;line-height:1.7;">
+                                {% if empresa.pais == 'US' %}
+                                    Hello <strong>{{ empresa.nombre }}</strong>,
+                                {% else %}
+                                    Hola <strong>{{ empresa.nombre }}</strong>,
+                                {% endif %}
+                            </p>
+                            <p style="margin:0 0 24px 0;font-size:15px;line-height:1.7;color:#41506a;">
+                                {% if es_nueva_suscripcion %}
+                                    {% if empresa.pais == 'US' %}
+                                        We registered your first successful subscription payment.
+                                    {% else %}
+                                        Registramos correctamente tu primer pago de suscripcion.
+                                    {% endif %}
+                                {% else %}
+                                    {% if empresa.pais == 'US' %}
+                                        We registered your latest successful subscription payment.
+                                    {% else %}
+                                        Registramos correctamente tu ultimo pago de suscripcion.
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+                            <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse:separate;border-spacing:0 10px;">
+                                <tr>
+                                    <td style="width:42%;padding:14px 16px;background-color:#eff4fb;border-radius:12px 0 0 12px;font-size:13px;font-weight:bold;color:#51627c;">
+                                        {% if empresa.pais == 'US' %}Amount{% else %}Monto{% endif %}
+                                    </td>
+                                    <td style="padding:14px 16px;background-color:#f8fbff;border-radius:0 12px 12px 0;font-size:15px;color:#172033;">
+                                        {% if transaccion %}
+                                            {{ transaccion.monto_formateado }}
+                                        {% else %}
+                                            ${{ monto|floatformat:0 }} {{ moneda|default:empresa.moneda|default:"CLP" }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:14px 16px;background-color:#eff4fb;border-radius:12px 0 0 12px;font-size:13px;font-weight:bold;color:#51627c;">
+                                        {% if empresa.pais == 'US' %}Method{% else %}Metodo{% endif %}
+                                    </td>
+                                    <td style="padding:14px 16px;background-color:#f8fbff;border-radius:0 12px 12px 0;font-size:15px;color:#172033;">
+                                        {% if transaccion %}
+                                            {{ transaccion.get_metodo_display }}
+                                        {% else %}
+                                            {{ plan_display|default:plan|default:"Suscripcion" }}
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding:14px 16px;background-color:#eff4fb;border-radius:12px 0 0 12px;font-size:13px;font-weight:bold;color:#51627c;">
+                                        {% if empresa.pais == 'US' %}Valid until{% else %}Vigencia{% endif %}
+                                    </td>
+                                    <td style="padding:14px 16px;background-color:#f8fbff;border-radius:0 12px 12px 0;font-size:15px;color:#172033;">
+                                        {{ empresa.fecha_expiracion|date:"d/m/Y" }}
+                                    </td>
+                                </tr>
+                                {% if transaccion and transaccion.reference %}
+                                <tr>
+                                    <td style="padding:14px 16px;background-color:#eff4fb;border-radius:12px 0 0 12px;font-size:13px;font-weight:bold;color:#51627c;">
+                                        {% if empresa.pais == 'US' %}Reference{% else %}Referencia{% endif %}
+                                    </td>
+                                    <td style="padding:14px 16px;background-color:#f8fbff;border-radius:0 12px 12px 0;font-size:15px;color:#172033;">
+                                        {{ transaccion.reference }}
+                                    </td>
+                                </tr>
+                                {% endif %}
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="padding:12px 36px 32px 36px;">
+                            <div style="padding:18px 20px;background-color:#eefbf4;border:1px solid #ccebd8;border-radius:14px;color:#1c5f3d;font-size:14px;line-height:1.7;">
+                                {% if empresa.pais == 'US' %}
+                                    If you need help with billing or activation, reply to this message or write to {{ support_email|default:"support@egarage.cl" }}.
+                                {% else %}
+                                    Si necesitas ayuda con la facturacion o la activacion, responde este correo o escribe a {{ support_email|default:"support@egarage.cl" }}.
+                                {% endif %}
+                            </div>
+                            <p style="margin:24px 0 0 0;font-size:13px;line-height:1.7;color:#6b7a90;">
+                                {% if empresa.pais == 'US' %}
+                                    This is an automatic confirmation for your subscription transaction.
+                                {% else %}
+                                    Esta es una confirmacion automatica asociada a tu transaccion de suscripcion.
+                                {% endif %}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

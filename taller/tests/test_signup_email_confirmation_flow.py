@@ -51,7 +51,8 @@ class TestSignupEmailConfirmationFlow:
         assert User.objects.filter(email="flow-cl@example.com").exists()
         assert "Te enviamos un correo de confirmacion" in response.content.decode()
         assert len(mail.outbox) == 1
-        assert "support@egarage.cl" in mail.outbox[0].from_email
+        assert mail.outbox[0].subject == "Confirma tu email en eGarage"
+        assert mail.outbox[0].from_email == "eGarage <support@egarage.cl>"
 
         confirm_link = self._extract_confirmation_link(mail.outbox[0].body)
         assert "/cl/es/accounts/confirm-email/" in confirm_link
@@ -81,6 +82,27 @@ class TestSignupEmailConfirmationFlow:
         assert confirm_response.redirect_chain
         assert confirm_response.redirect_chain[-1][0].startswith("/us/")
         assert "_auth_user_id" in client.session
+
+    def test_password_reset_email_uses_clean_subject_and_branded_from(self, client):
+        User.objects.create_user(
+            username="reset-branding@example.com",
+            email="reset-branding@example.com",
+            password="StrongPass123!",
+        )
+
+        response = client.post(
+            "/cl/es/accounts/password/reset/",
+            {"email": "reset-branding@example.com"},
+            follow=True,
+        )
+
+        assert response.status_code == 200
+        assert len(mail.outbox) == 1
+        assert (
+            mail.outbox[0].subject
+            == "[Soporte eGarage] Instrucciones para restablecer tu contraseña"
+        )
+        assert mail.outbox[0].from_email == "eGarage <support@egarage.cl>"
 
     def test_login_and_password_reset_endpoints_still_work(self, client):
         user = User.objects.create_user(

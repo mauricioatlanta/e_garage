@@ -128,7 +128,7 @@ REST_FRAMEWORK = {
 # ---------- Middleware (reorden menor sugerido) ----------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
+    "taller.middleware.safe_session.SafeSessionMiddleware",
     # LocaleMiddleware debe ir DESPUÉS de SessionMiddleware
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -267,8 +267,8 @@ EMAIL_HOST = os.getenv("EMAIL_HOST", "srv24.cpanelhost.cl")
 EMAIL_PORT = int(os.getenv("EMAIL_PORT", "465"))
 EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", True)
 EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "subscription@egarage.cl")
-DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "eGarage <subscription@egarage.cl>")
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "support@egarage.cl")
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "eGarage <support@egarage.cl>")
 
 # En dev, evita KeyError; en prod exige la var.
 _email_pwd = os.getenv("EMAIL_PASSWORD")

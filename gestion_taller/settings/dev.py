@@ -7,6 +7,20 @@ from .base import *
 # Debug habilitado para desarrollo
 DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
+# En desarrollo local permitimos elegir backend:
+# - `console` para no enviar nada realmente.
+# - `resend` para probar flujos reales de confirmación y password reset.
+DEV_EMAIL_BACKEND = (os.getenv("DJANGO_DEV_EMAIL_BACKEND") or "console").strip().lower()
+if DEV_EMAIL_BACKEND == "resend":   
+    EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+else:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+DEFAULT_FROM_EMAIL = "support@egarage.cl"
+SERVER_EMAIL = "support@egarage.cl"
+SUPPORT_EMAIL = DEFAULT_FROM_EMAIL
+EMAIL_HOST_USER = SUPPORT_EMAIL
+
 # Hosts permitidos para desarrollo
 ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "*").split(",")
 
@@ -101,3 +115,4 @@ if not SAFE_MODE:
     # La configuración de logging ya está optimizada en base.py
     # No necesitamos modificar nada aquí
     pass
+

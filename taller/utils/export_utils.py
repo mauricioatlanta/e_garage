@@ -11,12 +11,14 @@ from openpyxl.styles import Alignment, Font, PatternFill
 
 from django.apps import apps
 from django.conf import settings
+from django.core.mail import EmailMultiAlternatives
 from django.http import HttpResponse
 from django.template.loader import get_template
 
 from taller.context_processors.company_branding_unified import company_branding
 from taller.context_processors.company_header import company_header
 from taller.models.company_settings import CompanySettings
+from taller.utils.email_helper import get_branded_from_email, get_support_reply_to
 
 
 class DocumentoPDFExporter:
@@ -401,7 +403,6 @@ class EmailSender:
     @staticmethod
     def enviar_documento_por_email(documento, email_destinatario, adjuntar_pdf=True):
         """Envía documento por email"""
-        from django.core.mail import EmailMessage
         from django.template.loader import render_to_string
 
         # Generar PDF si se solicita
@@ -426,11 +427,12 @@ class EmailSender:
         text_message = render_to_string("taller/emails/documento_email.txt", email_context)
 
         # Crear email
-        email = EmailMessage(
+        email = EmailMultiAlternatives(
             subject=subject,
             body=text_message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
             to=[email_destinatario],
+            reply_to=[get_support_reply_to()],
         )
 
         if html_message:

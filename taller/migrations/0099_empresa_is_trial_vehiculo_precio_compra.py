@@ -18,9 +18,14 @@ class Migration(migrations.Migration):
                 help_text="Indica si la empresa está actualmente en período de prueba",
             ),
         ),
-        migrations.AddField(
-            model_name="vehiculo",
-            name="precio_compra",
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=14, null=True),
+     migrations.SeparateDatabaseAndState(
+            database_operations=[],  # No hagas nada en la base de datos (ya lo hizo la 0097)
+            state_operations=[       # Pero sí regístralo en el estado de Django
+                migrations.AddField(
+                    model_name="vehiculo",
+                    name="precio_compra",
+                    field=models.DecimalField(blank=True, decimal_places=2, max_digits=14, null=True),
+                ),
+            ],
         ),
     ]

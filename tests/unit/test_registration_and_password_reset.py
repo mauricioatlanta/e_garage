@@ -5,7 +5,7 @@ Verifica:
 1. Proceso completo de registro de usuarios
 2. Proceso de recuperación de contraseña (forgot password)
 3. Envío correcto de emails
-4. Configuración de emails (subscription@egarage.cl)
+4. Configuración de emails (support@egarage.cl)
 """
 
 import pytest
@@ -134,8 +134,8 @@ class TestRegistrationProcess:
         days_diff = (empresa.trial_ends_at - empresa.trial_started_at).days
         assert days_diff == 30
 
-    @patch("taller.reportes.services.registration_service.send_mail")
-    def test_registration_sends_welcome_email(self, mock_send_mail):
+    @patch("taller.reportes.services.registration_service.send_email_with_reply_to")
+    def test_registration_sends_welcome_email(self, mock_send_email):
         """Verifica que se envía email de bienvenida al registrar"""
         from django.conf import settings
 
@@ -156,13 +156,13 @@ class TestRegistrationProcess:
             skip_email_verification=True,
         )
 
-        # Verificar que se llamó send_mail
-        assert mock_send_mail.called
+        # Verificar que se llamó el helper centralizado
+        assert mock_send_email.called
 
-        # Verificar que el email se envía desde subscription@egarage.cl
-        call_args = mock_send_mail.call_args
-        from_email = call_args.kwargs.get("from_email") or call_args.args[2]
-        assert "subscription@egarage.cl" in from_email or settings.DEFAULT_FROM_EMAIL == from_email
+        # Verificar que el email se envía desde la casilla oficial configurada
+        call_args = mock_send_email.call_args
+        from_email = call_args.kwargs.get("from_email")
+        assert from_email == "eGarage <support@egarage.cl>"
 
         # Verificar que se envía al email del usuario
         recipient_list = call_args.kwargs.get("recipient_list") or call_args.args[3]
@@ -263,35 +263,35 @@ class TestPasswordResetProcess:
         from django.conf import settings
 
         # Verificar configuración en settings
-        assert "subscription@egarage.cl" in settings.DEFAULT_FROM_EMAIL
-        assert settings.EMAIL_HOST_USER == "subscription@egarage.cl"
+        assert settings.DEFAULT_FROM_EMAIL == "support@egarage.cl"
+        assert settings.EMAIL_HOST_USER == "support@egarage.cl"
 
 
 @pytest.mark.django_db
 class TestEmailConfiguration:
     """Tests para verificar la configuración de emails"""
 
-    def test_email_configuration_uses_subscription_egarage(self):
-        """Verifica que la configuración de email usa subscription@egarage.cl"""
+    def test_email_configuration_uses_support_egarage(self):
+        """Verifica que la configuración de email usa support@egarage.cl"""
         from django.conf import settings
 
         # Verificar DEFAULT_FROM_EMAIL
         assert settings.DEFAULT_FROM_EMAIL is not None
-        assert "subscription@egarage.cl" in settings.DEFAULT_FROM_EMAIL
+        assert settings.DEFAULT_FROM_EMAIL == "support@egarage.cl"
 
         # Verificar EMAIL_HOST_USER
-        assert settings.EMAIL_HOST_USER == "subscription@egarage.cl"
+        assert settings.EMAIL_HOST_USER == "support@egarage.cl"
 
-    def test_support_email_not_configured(self):
-        """Verifica que support@egarage.cl NO está configurado"""
+    def test_subscription_email_not_configured(self):
+        """Verifica que ya no se use la casilla legacy subscription@egarage.cl"""
         from django.conf import settings
 
-        # support@egarage.cl no debería estar en ninguna configuración
+        # subscription@egarage.cl no debería estar en ninguna configuración
         default_from = settings.DEFAULT_FROM_EMAIL
         host_user = settings.EMAIL_HOST_USER
 
-        assert "support@egarage.cl" not in default_from
-        assert "support@egarage.cl" not in host_user
+        assert "subscription@egarage.cl" not in default_from
+        assert "subscription@egarage.cl" not in host_user
 
 
 @pytest.mark.django_db
@@ -330,4 +330,3 @@ class TestRegistrationIntegration:
         if empresas.exists():
             empresa = empresas.first()
             assert empresa.nombre_taller is not None
-

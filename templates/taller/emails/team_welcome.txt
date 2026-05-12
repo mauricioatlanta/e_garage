@@ -11,7 +11,7 @@ Username: {{ username }}
 Password: {{ password }}
 Role: {{ rol }}
 
-⚠️ IMPORTANT:
+IMPORTANT:
 Please log in and change your password as soon as possible for security reasons.
 
 Log in here: {{ login_url }}
@@ -30,7 +30,7 @@ Usuario: {{ username }}
 Contraseña: {{ password }}
 Rol: {{ rol }}
 
-⚠️ IMPORTANTE:
+IMPORTANTE:
 Por favor, inicia sesión y cambia tu contraseña lo antes posible por razones de seguridad.
 
 Inicia sesión aquí: {{ login_url }}
@@ -41,4 +41,3 @@ Este es un mensaje automático de eGarage. Por favor no respondas a este correo.
 
 © {% now "Y" %} eGarage. Todos los derechos reservados.
 {% endif %}
-

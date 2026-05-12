@@ -12,6 +12,8 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
+from taller.utils.payment_config import normalize_company_plan
+
 logger = logging.getLogger(__name__)
 
 
@@ -75,25 +77,27 @@ def handle_payment_completed(payload):
             logger.error(f"Empresa no encontrada con email: {payer_email}")
             return JsonResponse({"status": "error", "message": "Company not found"})
 
-        # Determinar plan según monto
+        # Determinar ciclo de cobro según monto
         if currency == "USD":
             if amount >= 190:
-                plan = "anual"
+                billing_cycle = "anual"
                 dias = 365
             elif amount >= 100:
-                plan = "semestral"
+                billing_cycle = "semestral"
                 dias = 180
             else:
-                plan = "mensual"
+                billing_cycle = "mensual"
                 dias = 30
         else:
-            plan = "mensual"
+            billing_cycle = "mensual"
             dias = 30
+
+        plan = normalize_company_plan(billing_cycle)
 
         # Crear registro de pago
         pago = PagoPendiente.objects.create(
             empresa=empresa,
-            plan=plan,
+            plan=billing_cycle,
             monto=amount,
             referencia=sale_id,
             metodo_pago="paypal",

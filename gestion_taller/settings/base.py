@@ -3,6 +3,7 @@ Configuración base para eGarage - Sistema de Gestión de Taller
 Configuración común para todos los entornos (dev, prod, local)
 """
 
+import importlib.util
 import os
 from pathlib import Path
 
@@ -47,12 +48,15 @@ INSTALLED_APPS = [
     "marketplace.apps.MarketplaceConfig",
 ]
 
+if importlib.util.find_spec("anymail") is not None:
+    INSTALLED_APPS.insert(0, "anymail")
+
 # Middleware común - ORDEN RECOMENDADO POR DJANGO
 MIDDLEWARE = [
     # 1. Seguridad (primero)
     "django.middleware.security.SecurityMiddleware",
     # 2. Sesiones (antes de autenticación)
-    "django.contrib.sessions.middleware.SessionMiddleware",
+    "taller.middleware.safe_session.SafeSessionMiddleware",
     # 2b. Redirigir /accounts/login/ → /cl/accounts/login/ (evita UY por sesión)
     "taller.middleware.force_accounts_to_cl.ForceAccountsToCLMiddleware",
     # 3. Localización (antes de CommonMiddleware)
@@ -81,10 +85,6 @@ MIDDLEWARE = [
 # AccountMiddleware de allauth: agregar dinámicamente si existe
 # Esto resuelve el problema de versiones de allauth que requieren el middleware
 # pero donde el middleware no está disponible
-# Usamos importlib para verificar sin importar directamente (evita AppRegistryNotReady)
-import importlib.util
-
-
 def check_middleware_exists(module_path):
     """Verifica si un módulo existe sin importarlo"""
     try:
@@ -225,15 +225,44 @@ DEFAULT_COUNTRY = EGARAGE_DEFAULT_COUNTRY.upper()
 # Adaptador personalizado para redirección según país
 ACCOUNT_ADAPTER = "taller.views_extra.account_adapter.CountryAwareAccountAdapter"
 
-# Email backend único: Resend (evita mezcla con backend legacy en imports tempranos)
-EMAIL_BACKEND = "taller.backends.resend_backend.ResendEmailBackend"
-EMAIL_HOST = "srv24.cpanelhost.cl"
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
-EMAIL_USE_TLS = False
-EMAIL_HOST_USER = "support@egarage.cl"
-EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_PASSWORD", "laila2013-")
-DEFAULT_FROM_EMAIL = "eGarage <support@egarage.cl>"
+# Email transaccional por API HTTPS (Resend vía Anymail)
+DEFAULT_FROM_EMAIL = (os.getenv("DEFAULT_FROM_EMAIL") or "support@egarage.cl").strip()
+SERVER_EMAIL = (os.getenv("SERVER_EMAIL") or DEFAULT_FROM_EMAIL).strip()
+SUPPORT_EMAIL = (os.getenv("SUPPORT_EMAIL") or DEFAULT_FROM_EMAIL).strip()
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+EMAIL_HOST_USER = SUPPORT_EMAIL  # Compatibilidad con código/tests legacy que aún lo consultan
+EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))
+RESEND_API_KEY = (os.environ.get("RESEND_API_KEY") or "").strip()
+ANYMAIL = {
+    "RESEND_API_KEY": RESEND_API_KEY,
+}
+
+# Pagos - Flow / Mercado Pago / PayPal
+FLOW_API_KEY = (os.getenv("FLOW_API_KEY") or "").strip()
+FLOW_SECRET_KEY = (os.getenv("FLOW_SECRET_KEY") or "").strip()
+FLOW_API_URL = (os.getenv("FLOW_API_URL") or "https://sandbox.flow.cl/api").strip()
+FLOW_URL_RETURN = (os.getenv("FLOW_URL_RETURN") or "").strip()
+FLOW_URL_CONFIRMATION = (os.getenv("FLOW_URL_CONFIRMATION") or "").strip()
+FLOW_TIMEOUT = int(os.getenv("FLOW_TIMEOUT", "15"))
+FLOW_ENABLED = os.getenv(
+    "FLOW_ENABLED",
+    "1" if FLOW_API_KEY and FLOW_SECRET_KEY else "0",
+).strip().lower() in {"1", "true", "yes", "on"}
+
+MERCADOPAGO_ACCESS_TOKEN = (os.getenv("MERCADOPAGO_ACCESS_TOKEN") or "").strip()
+MERCADOPAGO_PUBLIC_KEY = (os.getenv("MERCADOPAGO_PUBLIC_KEY") or "").strip()
+MP_ACCESS_TOKEN = MERCADOPAGO_ACCESS_TOKEN
+MP_PUBLIC_KEY = MERCADOPAGO_PUBLIC_KEY
+MP_URL_SUCCESS = (os.getenv("MP_URL_SUCCESS") or "").strip()
+MP_URL_FAILURE = (os.getenv("MP_URL_FAILURE") or "").strip()
+MP_URL_PENDING = (os.getenv("MP_URL_PENDING") or "").strip()
+MP_URL_WEBHOOK = (os.getenv("MP_URL_WEBHOOK") or "").strip()
+MP_TIMEOUT = int(os.getenv("MP_TIMEOUT", "15"))
+MP_ENABLED = os.getenv(
+    "MP_ENABLED",
+    "1" if MP_ACCESS_TOKEN else "0",
+).strip().lower() in {"1", "true", "yes", "on"}
+PAYPAL_BUSINESS_EMAIL = (os.getenv("PAYPAL_BUSINESS_EMAIL") or SUPPORT_EMAIL).strip()
 
 # Logging útil (errores reales)
 if SAFE_MODE:

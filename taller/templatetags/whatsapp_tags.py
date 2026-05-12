@@ -1,6 +1,6 @@
-from urllib.parse import quote
 from django import template
-from django.conf import settings
+
+from taller.utils.whatsapp_helper import clean_phone_number, get_document_whatsapp_url
 
 register = template.Library()
 
@@ -12,9 +12,11 @@ def whatsapp_url(phone=None, text=""):
     phone: número internacional (solo dígitos). Ej: 56912345678
     text: mensaje opcional
     """
-    phone = (phone or "").strip()
+    phone = clean_phone_number(phone)
     if not phone:
         return ""
+    from urllib.parse import quote
+
     msg = quote(text or "")
     if msg:
         return f"https://wa.me/{phone}?text={msg}"
@@ -30,49 +32,26 @@ def only_digits(value):
 @register.simple_tag(takes_context=True)
 def whatsapp_document_link(context, document=None, text=None):
     """
-    Fallback robusto:
-    - Devuelve un link wa.me con un mensaje armado.
-    - No lanza excepción aunque falten datos.
-    Uso: {% whatsapp_document_link documento "mensaje opcional" %}
+    Genera un link de WhatsApp para el cliente del documento.
+
+    Soporta estos usos:
+    - {% whatsapp_document_link documento as wa_link %}
+    - {% whatsapp_document_link documento request as wa_link %}
+    - {% whatsapp_document_link documento "mensaje opcional" as wa_link %}
     """
     try:
         request = context.get("request")
-        host = request.get_host() if request else ""
-        scheme = "https"
-        if request:
-            scheme = "https" if request.is_secure() else "http"
-        base_url = f"{scheme}://{host}" if host else ""
+        message_override = None
+
+        if hasattr(text, "build_absolute_uri"):
+            request = text
+        elif text:
+            message_override = text
+
+        return get_document_whatsapp_url(
+            document,
+            request=request,
+            message_override=message_override,
+        ) or ""
     except Exception:
-        base_url = ""
-
-    # Número WhatsApp configurable (si existe)
-    phone = getattr(settings, "WHATSAPP_DEFAULT_PHONE", "") or ""
-
-    # Mensaje
-    if not text:
-        text = "Hola, te comparto tu documento."
-
-    # Si tenemos document y tiene algún campo usable, lo agregamos
-    try:
-        if document is not None:
-            # intenta varios nombres típicos
-            num = (
-                getattr(document, "numero", None)
-                or getattr(document, "numero_documento", None)
-                or getattr(document, "folio", None)
-            )
-            if num:
-                text += f" N° {num}."
-            # link al detalle si existe id/pk
-            pk = getattr(document, "pk", None)
-            if pk and base_url:
-                # ruta genérica: ajusta si tienes una url named
-                text += f" {base_url}/"
-    except Exception:
-        pass
-
-    text = "" if text is None else str(text)
-    msg = quote(text, safe="")
-    if phone:
-        return f"https://wa.me/{phone}?text={msg}"
-    return f"https://wa.me/?text={msg}"
+        return ""

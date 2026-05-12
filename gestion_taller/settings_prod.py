@@ -11,6 +11,11 @@ _env_prod_path = Path(__file__).resolve().parent.parent / ".env.prod"
 if _env_prod_path.exists():
     load_dotenv(_env_prod_path, override=True)
 
+# Permitir override desde .env gitignored para secretos rotados localmente/servidor.
+_env_override_path = Path(__file__).resolve().parent.parent / ".env"
+if _env_override_path.exists():
+    load_dotenv(_env_override_path, override=True)
+
 
 # =============================================================================
 # STATIC / MEDIA
@@ -118,11 +123,12 @@ SECURE_REFERRER_POLICY = (
 # Email
 # =========================
 # Backend real por API HTTPS (Resend), sin dependencia de SMTP.
-EMAIL_BACKEND = "taller.email_backends.resend_backend.ResendEmailBackend"
+EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
 
 DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl")
-SERVER_EMAIL = env_str("SERVER_EMAIL", "support@egarage.cl")
-SUPPORT_EMAIL = env_str("SUPPORT_EMAIL", "support@egarage.cl")
+SERVER_EMAIL = env_str("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
+SUPPORT_EMAIL = env_str("SUPPORT_EMAIL", DEFAULT_FROM_EMAIL)
+EMAIL_HOST_USER = SUPPORT_EMAIL
 
 EMAIL_TIMEOUT = env_int("EMAIL_TIMEOUT", 30)
 
@@ -131,6 +137,9 @@ GMAIL_CREDENTIALS_FILE = env_str("GMAIL_CREDENTIALS_FILE", "/srv/egarage/gmail_c
 GMAIL_TOKEN_FILE = env_str("GMAIL_TOKEN_FILE", "/srv/egarage/gmail_token.json")
 GMAIL_USER_ID = env_str("GMAIL_USER_ID", "me")
 RESEND_API_KEY = env_str("RESEND_API_KEY", "")
+ANYMAIL = {
+    "RESEND_API_KEY": RESEND_API_KEY,
+}
 
 # Verificación de correo en producción (allauth); por defecto obligatoria.
 ACCOUNT_EMAIL_VERIFICATION = env_str("ACCOUNT_EMAIL_VERIFICATION", "mandatory")

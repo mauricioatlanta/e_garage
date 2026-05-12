@@ -90,7 +90,7 @@ def email_test_console():
 
     if resultado["status"] == "success":
         # Enviar correo de prueba
-        email_test = "mauricio@atlantareciclajes.cl"  # Cambiar por tu email
+        email_test = "support@egarage.cl"  # Cambiar por tu email
         print(f"\n📧 Enviando correo de prueba a {email_test}...")
 
         resultado_envio = enviar_correo_prueba(email_test, "Desarrollador")
@@ -109,18 +109,18 @@ def test_smtp_connection():
     """Prueba rápida de conexión SMTP desde consola Django"""
     try:
         from django.conf import settings
-        from django.core.mail import send_mail
+        from taller.utils.email_helper import get_branded_from_email, send_email_with_reply_to
 
         print("🔗 Probando conexión SMTP...")
         print(f"Host: {settings.EMAIL_HOST}")
         print(f"Puerto: {settings.EMAIL_PORT}")
         print(f"Usuario: {settings.EMAIL_HOST_USER}")
 
-        resultado = send_mail(
-            "Test de conexión SMTP",
-            "Este es un correo de prueba desde eGarage.",
-            settings.DEFAULT_FROM_EMAIL,
-            ["mauricio@atlantareciclajes.cl"],  # Cambiar por tu email real
+        resultado = send_email_with_reply_to(
+            subject="Test de conexión SMTP",
+            message="Este es un correo de prueba desde eGarage.",
+            from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
+            recipient_list=["support@egarage.cl"],  # Cambiar por tu email real
             fail_silently=False,
         )
 

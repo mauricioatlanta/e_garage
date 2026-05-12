@@ -11,12 +11,12 @@ Configurar en cron para ejecutar diariamente:
 from datetime import timedelta
 
 from django.conf import settings
-from django.core.mail import send_mail
 from django.core.management.base import BaseCommand
 from django.template.loader import render_to_string
 from django.utils import timezone
 
 from taller.models.empresa import Empresa
+from taller.utils.email_helper import get_branded_from_email, send_email_with_reply_to
 
 
 class Command(BaseCommand):
@@ -69,7 +69,7 @@ class Command(BaseCommand):
 
                 # Renderizar email
                 html_message = render_to_string(
-                    "email/recordatorio_vencimiento.html",
+                    "emails/vencimiento_proximo.html",
                     {
                         "empresa": empresa,
                         "plan": empresa.plan,
@@ -91,10 +91,10 @@ class Command(BaseCommand):
                     )
                 else:
                     # Enviar email
-                    send_mail(
+                    send_email_with_reply_to(
                         subject=subject,
                         message="",
-                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
                         recipient_list=[empresa.email],
                         html_message=html_message,
                         fail_silently=False,

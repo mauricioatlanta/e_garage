@@ -30,6 +30,8 @@ LOGIN_EXEMPT_PREFIXES = frozenset(
         "/legal/",
         "/precios/",
         "/portal/",
+        "/p/",
+        "/publico/",
         "/suscripcion-bloqueada/",
         "/suspension/",
         "/contacto-ventas/",

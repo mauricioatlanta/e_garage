@@ -6,6 +6,8 @@ para uso en templates.
 
 from django.conf import settings
 
+from taller.utils.email_helper import get_support_reply_to
+
 
 def support_context(request):
     """
@@ -17,7 +19,7 @@ def support_context(request):
     - support_whatsapp_wa_me: Número WhatsApp sin + ni espacios para wa.me/ (ej: 56953574683)
     """
     return {
-        "support_email": getattr(settings, "SUPPORT_EMAIL", "support@egarage.cl"),
+        "support_email": get_support_reply_to(),
         "support_whatsapp_display": getattr(
             settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683"
         ),

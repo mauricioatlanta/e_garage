@@ -256,7 +256,7 @@ REST_FRAMEWORK = {
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "whitenoise.middleware.WhiteNoiseMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
+    "taller.middleware.safe_session.SafeSessionMiddleware",
     "taller.middleware.force_accounts_to_cl.ForceAccountsToCLMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -559,25 +559,18 @@ WHATSAPP_ADMIN_PHONE_NUMBER_ID = os.getenv("WHATSAPP_ADMIN_PHONE_NUMBER_ID", Non
 WHATSAPP_ADMIN_ACCESS_TOKEN = os.getenv("WHATSAPP_ADMIN_ACCESS_TOKEN", None)
 
 # ---------- Email ----------
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-EMAIL_HOST = "srv24.cpanelhost.cl"
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
-EMAIL_USE_TLS = False
-EMAIL_HOST_USER = SUPPORT_EMAIL
-DEFAULT_FROM_EMAIL = f"eGarage <{SUPPORT_EMAIL}>"
-EMAIL_TIMEOUT = 30
-
-_email_pwd = os.getenv("EMAIL_HOST_PASSWORD")
-if _email_pwd:
-    EMAIL_HOST_PASSWORD = _email_pwd
-elif DEBUG:
-    EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "")
-    if not EMAIL_HOST_PASSWORD:
-        logger = logging.getLogger(__name__)
-        logger.warning("EMAIL_HOST_PASSWORD not set - email functionality will not work")
+DEFAULT_FROM_EMAIL = "support@egarage.cl"
+SERVER_EMAIL = "support@egarage.cl"
+RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
+ANYMAIL = {
+    "RESEND_API_KEY": os.environ.get("RESEND_API_KEY"),
+}
+if DEBUG:
+    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 else:
-    raise RuntimeError("EMAIL_HOST_PASSWORD must be set in production (check .env file)")
+    EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+    EMAIL_HOST_USER = SUPPORT_EMAIL
+    EMAIL_TIMEOUT = 30
 
 # ---------- Sentry ----------
 SENTRY_DSN = os.getenv("SENTRY_DSN")

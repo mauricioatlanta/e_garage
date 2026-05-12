@@ -1,3 +1,4 @@
+import uuid
 from decimal import ROUND_HALF_UP, Decimal
 
 from django.core.exceptions import ValidationError
@@ -38,6 +39,7 @@ class Documento(AuditMixin, models.Model):
         db_index=True,
     )
     numero = models.CharField(max_length=32, blank=True, default="", db_index=True)
+    uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True, db_index=True)
     # numero_documento_db removido - era duplicado de numero
     # correlativo removido - no se actualizaba automáticamente
     # estado del documento (borrador/emitido/anulado, etc.)
@@ -170,8 +172,50 @@ class Documento(AuditMixin, models.Model):
     nota_pago = models.TextField(
         blank=True, null=True, help_text=_("Notas adicionales sobre el pago")
     )
+    approved_at = models.DateTimeField(
+        blank=True,
+        null=True,
+        db_index=True,
+        help_text=_("Fecha y hora en que el cliente aprobo el presupuesto"),
+    )
+    approved_by = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text=_("Nombre del cliente que aprobo el presupuesto"),
+    )
+    approved_ip = models.GenericIPAddressField(
+        blank=True,
+        null=True,
+        help_text=_("Direccion IP desde la cual se aprobo el presupuesto"),
+    )
 
     # --------- Helpers internos ---------
+    def get_public_url(self, request=None):
+        """
+        Retorna la URL publica del presupuesto para revision/aprobacion.
+        """
+        if self.tipo != "PRES" or not self.uuid:
+            return None
+
+        from django.conf import settings
+        from django.urls import reverse
+
+        path = reverse("publico:ver_presupuesto", kwargs={"uuid": self.uuid})
+        if request is not None:
+            return request.build_absolute_uri(path)
+
+        base_url = (
+            getattr(settings, "SITE_URL", None)
+            or getattr(settings, "BASE_URL", None)
+            or "https://egarage.cl"
+        ).rstrip("/")
+        return f"{base_url}{path}"
+
+    @property
+    def is_approved(self):
+        return self.approved_at is not None
+
     def vat_percent(self) -> float:
         """
         Tasa de impuesto por país usando configuración centralizada.

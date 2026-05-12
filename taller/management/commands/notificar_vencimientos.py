@@ -6,7 +6,8 @@ from django.utils import timezone
 
 from taller.models.empresa import Empresa
 from taller.models.suscripcion import Suscripcion
-from taller.utils.email_helper import send_email_with_reply_to
+from taller.utils.email_helper import get_support_reply_to, send_email_with_reply_to
+from taller.utils.payment_config import build_transfer_payment_message
 
 
 class Command(BaseCommand):
@@ -137,7 +138,7 @@ class Command(BaseCommand):
                         continue
 
                 # Obtener variables de soporte centralizadas
-                support_email = getattr(settings, "SUPPORT_EMAIL", "support@egarage.cl")
+                support_email = get_support_reply_to()
                 support_whatsapp_wa_me = getattr(settings, "SUPPORT_WHATSAPP_WA_ME", "56953574683")
                 support_whatsapp_display = getattr(
                     settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683"
@@ -235,7 +236,7 @@ Equipo eGarage
                     continue
 
                 # Obtener variables de soporte centralizadas
-                support_email = getattr(settings, "SUPPORT_EMAIL", "support@egarage.cl")
+                support_email = get_support_reply_to()
                 support_whatsapp_wa_me = getattr(settings, "SUPPORT_WHATSAPP_WA_ME", "56953574683")
                 support_whatsapp_display = getattr(
                     settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683"
@@ -258,10 +259,7 @@ Para reactivar tu cuenta:
 No perderás tus datos - están seguros y se reactivarán cuando renueves.
 
 Datos bancarios:
-- Banco Estado
-- Cuenta: 123-456-789
-- RUT: 12.345.678-9
-- Titular: Atlanta Reciclajes SPA
+{build_transfer_payment_message(empresa.pais)}
 
 ¿Necesitas ayuda?
 Email: {support_email}

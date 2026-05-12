@@ -15,14 +15,18 @@ IMPORTANTE: Estos tests validan la segregación de roles DENTRO de la misma empr
 complementando los tests de aislamiento multi-tenant (test_tenant_isolation.py).
 """
 
-from django.contrib.auth.models import Group, User
+from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group
 from django.core.exceptions import PermissionDenied
 from django.test import Client, TestCase
 from django.urls import reverse
 
+User = get_user_model()
+
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
+from taller.models.marca import Marca
 from taller.models.vehiculos import Vehiculo
 
 
@@ -31,86 +35,77 @@ class RBACSegregationBaseTest(TestCase):
 
     def setUp(self):
         """Configurar empresa única con usuarios de diferentes roles"""
-        # === EMPRESA ÚNICA ===
-        self.empresa = Empresa.objects.create(
-            nombre_taller="Taller Test RBAC",
-            pais="CL",
-        )
-
-        # === CREAR ROLES (si no existen) ===
-        self.owner_group, _ = Group.objects.get_or_create(name="Owner")
-        self.admin_group, _ = Group.objects.get_or_create(name="Admin")
-        self.vendedor_group, _ = Group.objects.get_or_create(name="Vendedor")
-        self.tecnico_group, _ = Group.objects.get_or_create(name="Tecnico")
-
-        # === USUARIO OWNER ===
+        
+        # === 1. CREAR EL USUARIO OWNER PRIMERO ===
         self.user_owner = User.objects.create_user(
             username="owner_test",
             email="owner@test.com",
             password="testpass123",
         )
+
+        # === 2. EMPRESA ÚNICA ===
+        self.empresa = Empresa.objects.create(
+            user=self.user_owner,
+            nombre_taller="Taller Test RBAC",
+            pais="CL",
+        )
+
+        # === 3. CREAR ROLES ===
+        self.owner_group, _ = Group.objects.get_or_create(name="Owner")
+        self.admin_group, _ = Group.objects.get_or_create(name="Admin")
+        self.vendedor_group, _ = Group.objects.get_or_create(name="Vendedor")
+        self.tecnico_group, _ = Group.objects.get_or_create(name="Tecnico")
+
+        # === 4. ASIGNAR EMPRESA Y GRUPO AL OWNER ===
         self.user_owner.empresa = self.empresa
         self.user_owner.groups.add(self.owner_group)
         self.user_owner.save()
 
-        # === USUARIO ADMIN ===
-        self.user_admin = User.objects.create_user(
-            username="admin_test",
-            email="admin@test.com",
-            password="testpass123",
-        )
-        self.user_admin.empresa = self.empresa
-        self.user_admin.groups.add(self.admin_group)
-        self.user_admin.save()
+        # === 5. OTROS USUARIOS ===
+        roles = [
+            ("admin", self.admin_group),
+            ("vendedor", self.vendedor_group),
+            ("tecnico", self.tecnico_group)
+        ]
+        for username, group in roles:
+            user = User.objects.create_user(
+                username=f"{username}_test", 
+                email=f"{username}@test.com", 
+                password="testpass123"
+            )
+            user.empresa = self.empresa
+            user.groups.add(group)
+            user.save()
+            setattr(self, f"user_{username}", user)
 
-        # === USUARIO VENDEDOR ===
-        self.user_vendedor = User.objects.create_user(
-            username="vendedor_test",
-            email="vendedor@test.com",
-            password="testpass123",
-        )
-        self.user_vendedor.empresa = self.empresa
-        self.user_vendedor.groups.add(self.vendedor_group)
-        self.user_vendedor.save()
-
-        # === USUARIO TECNICO ===
-        self.user_tecnico = User.objects.create_user(
-            username="tecnico_test",
-            email="tecnico@test.com",
-            password="testpass123",
-        )
-        self.user_tecnico.empresa = self.empresa
-        self.user_tecnico.groups.add(self.tecnico_group)
-        self.user_tecnico.save()
-
-        # === DATOS COMPARTIDOS (misma empresa) ===
+        # === 6. DATOS COMPARTIDOS ===
         self.cliente = Cliente.objects.create(
             empresa=self.empresa,
             nombre="Cliente Test",
             apellido="RBAC",
             telefono="123456789",
-            email_cliente="cliente@test.com",
+            email="cliente@test.com",
         )
+        self.marca = Marca.objects.create(id=1, nombre="Toyota", country="CL")
 
         self.vehiculo = Vehiculo.objects.create(
             empresa=self.empresa,
             cliente=self.cliente,
-            patente="RBAC123",
-            marca_texto="Toyota",
-            modelo_texto="Corolla",
+            patente="ABCD12",
             anio=2020,
+            marca_id=1 # O una instancia válida de Marca
         )
 
+        # === 7. CREAR DOCUMENTO PARA TESTS DE ELIMINACIÓN ===
+        # Sin esto, TestDocumentoDeleteAccess fallará con un AttributeError
         self.documento = Documento.objects.create(
             empresa=self.empresa,
             cliente=self.cliente,
             vehiculo=self.vehiculo,
             tipo="OT",
-            numero="OT-RBAC-001",
+            estado="abierto"
         )
-
-        # Cliente HTTP para tests
-        self.client = Client()
+        
 
 
 class TestDashboardBIAccess(RBACSegregationBaseTest):

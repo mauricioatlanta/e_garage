@@ -316,6 +316,11 @@ urlpatterns = [
     path("login/", usa_login_view, name="account_login"),
     path("signup/", usa_signup_view, name="account_signup"),
     path("es/signup/", usa_signup_view_es, name="account_signup_es"),
+    path(
+        "accounts/password/reset/",
+        RedirectView.as_view(url="/us/en/accounts/password/reset/", permanent=False),
+        name="account_reset_password",
+    ),
     # 4) Trial y onboarding
     path("activar-trial/", activar_trial, name="activar_trial"),
     path(

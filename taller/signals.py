@@ -4,12 +4,12 @@ Signals para notificaciones automáticas en eGarage
 
 from django.conf import settings
 from django.contrib.auth.signals import user_logged_in
-from django.core.mail import send_mail
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
 
 from taller.models.pago import PagoPendiente
+from taller.utils.email_helper import get_branded_from_email, send_email_with_reply_to
 
 
 @receiver(post_save, sender=PagoPendiente)
@@ -42,10 +42,10 @@ def notificar_pago_nuevo(sender, instance, created, **kwargs):
             },
         )
 
-        send_mail(
+        send_email_with_reply_to(
             subject="💰 Comprobante Recibido - eGarage",
             message="",
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
             recipient_list=[instance.empresa.email],
             html_message=html_message,
             fail_silently=True,  # No fallar si hay error
@@ -61,7 +61,7 @@ def notificar_pago_nuevo(sender, instance, created, **kwargs):
         moneda = "CLP" if instance.empresa.pais == "CL" else "USD"
 
         html_message = render_to_string(
-            "email/admin_pago_nuevo.html",
+            "emails/admin_notificacion_pago.html",
             {
                 "empresa": instance.empresa,
                 "plan": instance.plan,
@@ -75,10 +75,10 @@ def notificar_pago_nuevo(sender, instance, created, **kwargs):
         # Email del admin (configurable)
         admin_email = getattr(settings, "ADMIN_EMAIL", "mauricioatlanta@gmail.com")
 
-        send_mail(
+        send_email_with_reply_to(
             subject=f"🔔 Nuevo Pago Pendiente - {instance.empresa.nombre_taller}",
             message="",
-            from_email=settings.DEFAULT_FROM_EMAIL,
+            from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
             recipient_list=[admin_email],
             html_message=html_message,
             fail_silently=True,

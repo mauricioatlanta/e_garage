@@ -19,6 +19,7 @@ from django.utils import timezone
 from weasyprint import CSS, HTML
 
 from taller.models.documento import Documento
+from taller.utils.email_helper import get_branded_from_email, get_support_reply_to
 
 from .views import _empresa_or_redirect
 
@@ -295,7 +296,9 @@ def enviar_documento_email(request, documento_id):
     email = EmailMessage(
         subject=f"{label} {numero}",
         body=body,
+        from_email=get_branded_from_email(),
         to=[destino],
+        reply_to=[get_support_reply_to()],
     )
     email.attach(
         _document_filename(documento),

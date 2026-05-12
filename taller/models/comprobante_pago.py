@@ -140,7 +140,11 @@ class ComprobantePago(models.Model):
     def enviar_notificacion_aprobacion(self):
         """Envía notificación de que el pago fue aprobado"""
         from django.conf import settings
-        from django.core.mail import send_mail
+        from taller.utils.email_helper import (
+            get_branded_from_email,
+            get_support_reply_to,
+            send_email_with_reply_to,
+        )
 
         subject = f"✅ Pago Aprobado - {self.empresa.nombre_taller}"
         fecha_vencimiento = (
@@ -165,11 +169,11 @@ class ComprobantePago(models.Model):
         """
 
         try:
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                [self.empresa.email, self.empresa.user.email],
+            send_email_with_reply_to(
+                subject=subject,
+                message=message,
+                from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
+                recipient_list=[self.empresa.email, self.empresa.user.email],
                 fail_silently=False,
             )
         except Exception as e:
@@ -178,7 +182,11 @@ class ComprobantePago(models.Model):
     def enviar_notificacion_rechazo(self):
         """Envía notificación de que el pago fue rechazado"""
         from django.conf import settings
-        from django.core.mail import send_mail
+        from taller.utils.email_helper import get_branded_from_email, send_email_with_reply_to
+
+        support_whatsapp_display = getattr(
+            settings, "SUPPORT_WHATSAPP_DISPLAY", "+56 9 5357 4683"
+        )
 
         subject = f"❌ Pago Rechazado - {self.empresa.nombre_taller}"
         message = f"""
@@ -191,16 +199,16 @@ class ComprobantePago(models.Model):
 
         Por favor, revisa el comprobante y vuelve a subirlo o contáctanos para más información.
 
-        WhatsApp: +56 9 XXXX XXXX
-        Email: suscripcion@atlantareciclajes.cl
+        WhatsApp: {support_whatsapp_display}
+        Email: {get_support_reply_to()}
         """
 
         try:
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                [self.empresa.email, self.empresa.user.email],
+            send_email_with_reply_to(
+                subject=subject,
+                message=message,
+                from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
+                recipient_list=[self.empresa.email, self.empresa.user.email],
                 fail_silently=False,
             )
         except Exception as e:
@@ -209,7 +217,11 @@ class ComprobantePago(models.Model):
     def enviar_notificacion_admin(self):
         """Envía notificación al admin de nuevo comprobante"""
         from django.conf import settings
-        from django.core.mail import send_mail
+        from taller.utils.email_helper import (
+            get_branded_from_email,
+            get_support_reply_to,
+            send_email_with_reply_to,
+        )
 
         plan_display = dict(self.empresa.PLAN_CHOICES).get(
             self.plan_solicitado, self.plan_solicitado
@@ -232,11 +244,11 @@ class ComprobantePago(models.Model):
         """
 
         try:
-            send_mail(
-                subject,
-                message,
-                settings.DEFAULT_FROM_EMAIL,
-                ["suscripcion@atlantareciclajes.cl"],
+            send_email_with_reply_to(
+                subject=subject,
+                message=message,
+                from_email=get_branded_from_email(settings.DEFAULT_FROM_EMAIL),
+                recipient_list=[getattr(settings, "ADMIN_EMAIL", None) or get_support_reply_to()],
                 fail_silently=False,
             )
         except Exception as e:
@@ -249,3 +261,7 @@ class ComprobantePago(models.Model):
 
         if is_new:
             self.enviar_notificacion_admin()
+
+        from taller.services.suscripcion_transaccion_service import sync_from_comprobante_pago
+
+        sync_from_comprobante_pago(self)

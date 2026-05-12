@@ -6,8 +6,11 @@ Se disparan cuando hay nueva suscripción o renovación
 import logging
 import uuid
 from typing import Optional
+
 from django.conf import settings
 from django.db import transaction
+
+from taller.utils.email_helper import get_support_reply_to
 
 from .providers import get_whatsapp_provider
 
@@ -87,7 +90,7 @@ def notify_admin_new_subscription(
             return False
 
         # Obtener email de soporte para el mensaje
-        support_email = getattr(settings, "SUPPORT_EMAIL", "support@egarage.cl")
+        support_email = get_support_reply_to()
 
         # Determinar idioma según país
         country = getattr(empresa, "pais", "CL").upper()

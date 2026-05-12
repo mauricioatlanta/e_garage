@@ -1,6 +1,8 @@
 from django.db import models
 from django.utils import timezone
 
+from taller.utils.payment_config import normalize_company_plan
+
 
 class PagoPendiente(models.Model):
     """
@@ -49,6 +51,12 @@ class PagoPendiente(models.Model):
     def __str__(self):
         return f"{self.empresa.nombre_taller} - {self.plan} - ${self.monto} ({self.estado})"
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        from taller.services.suscripcion_transaccion_service import sync_from_pago_pendiente
+
+        sync_from_pago_pendiente(self)
+
     def aprobar_pago(self, admin_user):
         """
         Aprobar pago y activar suscripción
@@ -67,11 +75,12 @@ class PagoPendiente(models.Model):
         dias = dias_plan.get(self.plan, 30)
 
         # Detectar si es nueva suscripción, cambio de plan o renovación
+        plan_nuevo = normalize_company_plan(self.plan)
         plan_anterior = self.empresa.plan
         es_nueva_suscripcion = not self.empresa.suscripcion_activa or self.empresa.plan == "trial"
         es_cambio_plan = (
             self.empresa.suscripcion_activa
-            and plan_anterior != self.plan
+            and plan_anterior != plan_nuevo
             and plan_anterior != "trial"
         )
 
@@ -86,7 +95,7 @@ class PagoPendiente(models.Model):
 
         # Pasar ID del pago para idempotencia
         self.empresa._current_pago_pendiente_id = self.id
-        self.empresa.plan = self.plan
+        self.empresa.plan = plan_nuevo
         self.empresa.valor_mensual = self.monto
         self.empresa.save()
 
@@ -108,7 +117,7 @@ class PagoPendiente(models.Model):
                 # A. NUEVA SUSCRIPCIÓN
                 notificar_nueva_suscripcion(
                     empresa=self.empresa,
-                    plan=self.plan,
+                    plan=plan_nuevo,
                     monto=self.monto,
                     es_nueva_empresa=es_nueva_suscripcion,
                 )
@@ -118,7 +127,7 @@ class PagoPendiente(models.Model):
                 notificar_cambio_plan(
                     empresa=self.empresa,
                     plan_anterior=plan_anterior,
-                    plan_nuevo=self.plan,
+                    plan_nuevo=plan_nuevo,
                     monto=self.monto,
                     fecha_inicio=self.empresa.fecha_inicio,
                 )
@@ -127,7 +136,7 @@ class PagoPendiente(models.Model):
                 # C. RENOVACIÓN EXITOSA
                 notificar_renovacion_exitosa(
                     empresa=self.empresa,
-                    plan=self.plan,
+                    plan=plan_nuevo,
                     monto=self.monto,
                     dias_renovados=dias,
                 )

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
@@ -7,6 +8,7 @@ from django.utils import timezone
 from taller.forms.comprobante_form import ComprobantePagoForm
 from taller.models.comprobante_pago import ComprobantePago
 from taller.models.empresa import Empresa
+from taller.utils.payment_config import get_transfer_payment_details
 
 
 def suspension(request):
@@ -46,7 +48,12 @@ def suspension(request):
         "empresa": empresa,
         "comprobantes_pendientes": comprobantes_pendientes,
         "dias_transcurridos_suspension": dias_transcurridos_suspension,
-        "whatsapp_url": f"https://wa.me/56912345678?text=Hola, necesito renovar mi suscripción de eGarage para {empresa.nombre_taller}",
+        "whatsapp_url": (
+            "https://wa.me/"
+            f"{getattr(settings, 'SUPPORT_WHATSAPP_WA_ME', '56953574683')}"
+            f"?text=Hola, necesito renovar mi suscripcion de eGarage para {empresa.nombre_taller}"
+        ),
+        "datos_transferencia": get_transfer_payment_details(empresa.pais),
         "precios": {
             "basic": 15000,
             "premium": 25000,

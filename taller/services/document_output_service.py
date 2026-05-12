@@ -7,12 +7,13 @@ Implementa la lógica de "The Fulfillment Loop" - el cliente recibe su comproban
 
 import logging
 from pathlib import Path
-from urllib.parse import quote
 
 from django.conf import settings
 from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.text import slugify
+
+from taller.utils.whatsapp_helper import get_document_whatsapp_url
 
 log = logging.getLogger(__name__)
 
@@ -298,77 +299,4 @@ class DocumentOutputService:
         Returns:
             str: URL de WhatsApp con mensaje pre-llenado, o None si no hay teléfono
         """
-        cliente = documento.cliente
-        telefono = getattr(cliente, "telefono", None) or getattr(cliente, "phone", None)
-
-        if not telefono:
-            log.warning(
-                f"[DocumentOutputService] Cliente {cliente.id} no tiene teléfono registrado"
-            )
-            return None
-
-        # Limpiar teléfono (eliminar caracteres no numéricos)
-        # El formato debe ser internacional sin + ni espacios para wa.me
-        telefono_limpio = "".join(filter(str.isdigit, str(telefono)))
-
-        # Si el teléfono no empieza con código de país, intentar inferirlo
-        # Por defecto, asumimos que ya viene en formato internacional
-        # En producción, podrías agregar lógica para detectar código de país según empresa.pais
-
-        # Obtener datos de la empresa para el mensaje
-        empresa = documento.empresa
-        config = DocumentOutputService._get_empresa_config(empresa, request)
-        nombre_empresa = config.get("nombre", empresa.nombre_taller)
-
-        # Obtener tipo de documento formateado
-        tipo_doc = documento.get_tipo_display() or documento.tipo
-        numero_doc = documento.numero_documento or documento.numero or str(documento.id)
-
-        # Formatear total según moneda
-        currency = DocumentOutputService._get_currency_config(empresa)
-        total_formateado = (
-            f"{currency['symbol']}{documento.total:,.{currency['decimals']}f}".replace(",", "X")
-            .replace(".", ",")
-            .replace("X", ".")
-        )
-        if currency["decimals"] == 0:
-            total_formateado = f"{currency['symbol']}{int(documento.total):,}".replace(",", ".")
-
-        # Construir mensaje
-        mensaje_partes = [
-            f"Hola {cliente.nombre},",
-            f"",
-            f"Adjunto {tipo_doc} N°{numero_doc}",
-            f"de {nombre_empresa}",
-            f"por un total de {total_formateado}.",
-            f"",
-            f"Gracias por su preferencia.",
-        ]
-
-        # Si hay URL de PDF, agregarla al mensaje
-        if pdf_url:
-            mensaje_partes.append("")
-            mensaje_partes.append(f"Descargar: {pdf_url}")
-        elif request:
-            # Intentar generar URL de descarga del PDF
-            try:
-                from django.urls import reverse
-
-                pdf_url = request.build_absolute_uri(
-                    reverse("documentos:descargar_pdf", kwargs={"pk": documento.id})
-                )
-                mensaje_partes.append("")
-                mensaje_partes.append(f"Descargar: {pdf_url}")
-            except Exception as e:
-                log.debug(f"[DocumentOutputService] No se pudo generar URL de PDF: {e}")
-
-        mensaje = "\n".join(mensaje_partes)
-
-        # Codificar mensaje para URL
-        mensaje_encoded = quote(mensaje)
-
-        # Construir URL de WhatsApp
-        whatsapp_url = f"https://wa.me/{telefono_limpio}?text={mensaje_encoded}"
-
-        log.info(f"[DocumentOutputService] Enlace WhatsApp generado para {cliente.nombre}")
-        return whatsapp_url
+        return get_document_whatsapp_url(documento, request=request, pdf_url=pdf_url)

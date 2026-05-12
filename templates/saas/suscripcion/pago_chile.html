@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 {% load i18n humanize %}
 
-{% block title %}Pago suscripción — {{ empresa.nombre_taller|default:"eGarage" }}{% endblock %}
+{% block title %}Pago suscripcion - {{ empresa.nombre_taller|default:"eGarage" }}{% endblock %}
 
 {% block content %}
 <div class="max-w-2xl mx-auto px-4 py-8">
   <div class="rounded-2xl border-2 border-cyan-500/40 bg-slate-900/90 shadow-[0_0_40px_rgba(34,211,238,0.15)] overflow-hidden">
     <div class="bg-gradient-to-r from-cyan-900/80 to-slate-900 px-6 py-5 border-b border-cyan-500/30">
-      <h1 class="text-2xl font-bold text-cyan-200 tracking-tight">Pago por transferencia (Chile)</h1>
+      <h1 class="text-2xl font-bold text-cyan-200 tracking-tight">Pago de suscripcion (Chile)</h1>
       <p class="text-cyan-100/80 text-sm mt-1">{{ empresa.nombre_taller }}</p>
     </div>
     <div class="p-6 space-y-6 text-gray-100">
@@ -17,6 +17,44 @@
         <p class="text-2xl font-black text-cyan-300 mt-2">${{ monto_pagar|intcomma }} <span class="text-sm font-normal text-gray-400">CLP</span></p>
         <p class="text-xs text-gray-400 mt-2">Referencia obligatoria en la transferencia: <code class="bg-slate-950 px-2 py-1 rounded text-cyan-200">{{ referencia }}</code></p>
       </section>
+
+      {% if flow_enabled %}
+      <section class="rounded-xl bg-cyan-950/40 border border-cyan-400/30 p-5">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-cyan-200">Pago inmediato con Flow</h2>
+            <p class="text-sm text-cyan-50/85 mt-2">Tarjetas, Webpay y medios compatibles desde una sola pasarela.</p>
+          </div>
+          <form method="post" action="{% url 'start_flow_payment' %}">
+            {% csrf_token %}
+            <input type="hidden" name="plan" value="{{ plan }}">
+            <button type="submit"
+                    class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-bold text-sm transition-colors">
+              Pagar con Flow
+            </button>
+          </form>
+        </div>
+      </section>
+      {% endif %}
+
+      {% if mp_enabled %}
+      <section class="rounded-xl bg-emerald-950/40 border border-emerald-400/30 p-5">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div>
+            <h2 class="text-sm font-semibold uppercase tracking-wide text-emerald-200">Pago rapido con Mercado Pago</h2>
+            <p class="text-sm text-emerald-50/85 mt-2">Checkout Pro con tarjetas y cuenta Mercado Pago desde una sola pantalla.</p>
+          </div>
+          <form method="post" action="{% url 'start_mp_payment' %}">
+            {% csrf_token %}
+            <input type="hidden" name="plan" value="{{ plan }}">
+            <button type="submit"
+                    class="inline-flex items-center justify-center px-5 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-sm transition-colors">
+              Pagar con Mercado Pago
+            </button>
+          </form>
+        </div>
+      </section>
+      {% endif %}
 
       <section class="rounded-xl bg-white text-slate-900 p-5 border border-cyan-600/30 shadow-inner">
         <h2 class="text-sm font-semibold uppercase tracking-wide text-cyan-800 mb-4">Datos para transferir</h2>
@@ -38,18 +76,18 @@
             <dd class="font-mono font-semibold text-right">{{ datos_banco.rut }}</dd>
           </div>
           <div class="flex justify-between gap-4 border-b border-slate-200 pb-2">
-            <dt class="text-slate-600">Número de cuenta</dt>
+            <dt class="text-slate-600">Numero de cuenta</dt>
             <dd class="font-mono font-semibold text-right">{{ datos_banco.numero_cuenta }}</dd>
           </div>
           <div class="flex justify-between gap-4">
-            <dt class="text-slate-600">Confirmación</dt>
+            <dt class="text-slate-600">Confirmacion</dt>
             <dd class="font-semibold text-right break-all">{{ datos_banco.email_confirmacion }}</dd>
           </div>
         </dl>
       </section>
 
       <p class="text-sm text-gray-400">
-        Después de transferir, sube tu comprobante para acelerar la activación de tu plan.
+        Si prefieres transferencia, sube tu comprobante para acelerar la activacion de tu plan.
       </p>
       <div class="flex flex-wrap gap-3">
         <a href="{% url 'subir_comprobante' %}"

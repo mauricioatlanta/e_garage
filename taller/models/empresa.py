@@ -153,6 +153,10 @@ class Empresa(models.Model):
     def __str__(self):
         return self.nombre_taller
 
+    @property
+    def nombre(self):
+        return self.nombre_taller
+
     def save(self, *args, **kwargs):
         # Set de fecha_fin solo al crear si viene vacía
         if not self.pk and not self.fecha_fin:

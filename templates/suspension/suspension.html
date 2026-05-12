@@ -180,16 +180,22 @@
                             </h4>
                             <div class="text-sm text-gray-700 space-y-2">
                                 <div>
-                                    <span class="font-medium">Banco:</span> Banco Estado
+                                    <span class="font-medium">Banco:</span> {{ datos_transferencia.banco }}
                                 </div>
                                 <div>
-                                    <span class="font-medium">Cuenta Corriente:</span> 123-456-789
+                                    <span class="font-medium">Tipo de cuenta:</span> {{ datos_transferencia.tipo_cuenta }}
                                 </div>
                                 <div>
-                                    <span class="font-medium">RUT:</span> 12.345.678-9
+                                    <span class="font-medium">{{ datos_transferencia.account_number_label }}:</span> {{ datos_transferencia.numero_cuenta|default:"Por confirmar" }}
                                 </div>
                                 <div>
-                                    <span class="font-medium">Titular:</span> Atlanta Reciclajes SPA
+                                    <span class="font-medium">{{ datos_transferencia.tax_id_label }}:</span> {{ datos_transferencia.rut|default:"Por confirmar" }}
+                                </div>
+                                <div>
+                                    <span class="font-medium">Titular:</span> {{ datos_transferencia.titular }}
+                                </div>
+                                <div>
+                                    <span class="font-medium">Confirmación:</span> {{ datos_transferencia.email_confirmacion }}
                                 </div>
                             </div>
                         </div>
@@ -198,19 +204,17 @@
             </div>
         </div>
 
-        <!-- Footer con créditos de Atlanta Reciclajes -->
         <div class="text-center mb-6">
             <div class="bg-white rounded-lg shadow-lg p-6 max-w-md mx-auto">
                 <div class="flex items-center justify-center gap-3 mb-2">
-                    <img src="{% static 'img/logo.png' %}" alt="Atlanta Reciclajes Logo" class="h-8 w-auto">
+                    <img src="{% static 'img/logo.png' %}" alt="eGarage Logo" class="h-8 w-auto">
                     <div class="text-left">
                         <div class="text-sm font-semibold text-gray-800">eGarage AI™</div>
-                        <div class="text-xs text-gray-600">Desarrollado por Atlanta Reciclajes</div>
+                        <div class="text-xs text-gray-600">Soporte de suscripción eGarage</div>
                     </div>
                 </div>
                 <div class="text-xs text-gray-500">
-
-                    <a href="mailto:subscription@egarage.cl" class="text-blue-600 hover:text-blue-800">subscription@egarage.cl</a>
+                    <a href="mailto:{{ datos_transferencia.email_confirmacion }}" class="text-blue-600 hover:text-blue-800">{{ datos_transferencia.email_confirmacion }}</a>
                 </div>
             </div>
         </div>

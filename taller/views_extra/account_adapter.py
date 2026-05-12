@@ -1,5 +1,6 @@
 # taller/views_extra/account_adapter.py
 import logging
+from email.utils import formataddr, parseaddr
 
 from allauth.account.adapter import DefaultAccountAdapter
 from django.conf import settings
@@ -29,6 +30,35 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
         if "logged_in" in mt or "logged_out" in mt:
             return
         return super().add_message(request, level, *args, **kwargs)
+
+    def format_email_subject(self, subject):
+        """
+        Evita que allauth agregue automáticamente un prefijo basado en Sites.
+        El branding del asunto debe salir solo del template para no filtrar
+        example.com ni duplicar "eGarage".
+        """
+        return " ".join(str(subject).splitlines()).strip()
+
+    def get_from_email(self) -> str:
+        """
+        Asegura un remitente con display name consistente para correos de allauth.
+        Si settings solo define la casilla, la presentamos como "eGarage <...>".
+        """
+        raw_from = (
+            getattr(settings, "DEFAULT_FROM_EMAIL", None)
+            or getattr(settings, "SUPPORT_EMAIL", None)
+            or "support@egarage.cl"
+        ).strip()
+        display_name, email_address = parseaddr(raw_from)
+        email_address = (email_address or raw_from).strip() or "support@egarage.cl"
+        if display_name:
+            return formataddr((display_name, email_address))
+        brand_name = (
+            getattr(settings, "SITE_NAME", None)
+            or getattr(settings, "DEFAULT_BRAND_NAME", None)
+            or "eGarage"
+        )
+        return formataddr((brand_name, email_address))
 
     def get_client_ip(self, request) -> str:
         """

@@ -11,7 +11,6 @@ from datetime import timedelta
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
-from django.core.mail import send_mail
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
@@ -22,6 +21,7 @@ from taller.models.empresa import Empresa
 from taller.models.suscripcion import Suscripcion
 from taller.utils.country_config import get_country_config, get_config_from_empresa
 from taller.config.country_settings import CountrySettings
+from taller.utils.email_helper import get_branded_from_email, send_email_with_reply_to
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -435,7 +435,9 @@ class RegistrationService:
         if not country_config:
             country_config = get_country_config(country_code)
 
-        from_email = getattr(settings, "DEFAULT_FROM_EMAIL", "contacto@egarage.cl")
+        from_email = get_branded_from_email(
+            getattr(settings, "DEFAULT_FROM_EMAIL", "contacto@egarage.cl")
+        )
         login_url = "https://www.egarage.cl/accounts/login/"
 
         subject = f"🚀 ¡Bienvenido a eGarage! - El centro de operaciones de {empresa.nombre_taller}"
@@ -460,12 +462,18 @@ Tu plan actual: {plan_type.upper()} (30 días de prueba gratuita)
 
 Si tienes dudas, nuestro equipo de soporte está listo para ayudarte.
 
-Atentamente,
+        Atentamente,
 El Equipo de eGarage
 www.egarage.cl
 """
         try:
-            send_mail(subject, message, from_email, [user.email], fail_silently=False)
+            send_email_with_reply_to(
+                subject=subject,
+                message=message,
+                from_email=from_email,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
             log.info(f"[RegistrationService] Email profesional enviado a {user.email}")
         except Exception as e:
             log.error(f"[RegistrationService] Error enviando email: {e}")
