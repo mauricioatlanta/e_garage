@@ -132,6 +132,13 @@ EMAIL_HOST_USER = SUPPORT_EMAIL
 
 EMAIL_TIMEOUT = env_int("EMAIL_TIMEOUT", 30)
 
+EMAIL_HOST = env_str("EMAIL_HOST", "srv24.cpanelhost.cl")
+EMAIL_PORT = env_int("EMAIL_PORT", 465)
+EMAIL_USE_SSL = env_bool("EMAIL_USE_SSL", True)
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", False)
+EMAIL_HOST_USER = env_str("EMAIL_HOST_USER", SUPPORT_EMAIL)
+EMAIL_HOST_PASSWORD = env_str("EMAIL_HOST_PASSWORD", "")
+
 # Gmail API OAuth
 GMAIL_CREDENTIALS_FILE = env_str("GMAIL_CREDENTIALS_FILE", "/srv/egarage/gmail_credentials.json")
 GMAIL_TOKEN_FILE = env_str("GMAIL_TOKEN_FILE", "/srv/egarage/gmail_token.json")

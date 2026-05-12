@@ -260,6 +260,8 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 
 urlpatterns = [
+    path("admin/subcriptores", lambda request: redirect("/admin/suscriptores/")),
+    path("admin/subcriptores/", lambda request: redirect("/admin/suscriptores/")),
     path("healthz/", healthz, name="healthz"),
     # PWA DinÃ¡micas (manifest y service worker por paÃ­s e idioma)
     path("<str:pais>/<str:idioma>/manifest.json", dynamic_manifest, name="pwa_manifest"),
