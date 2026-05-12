@@ -358,6 +358,95 @@
       z-index: 1;
     }
   </style>
+
+
+
+
+<style>
+.premium-hero-actions{
+    display:flex;
+    gap:16px;
+    justify-content:center;
+    align-items:center;
+    flex-wrap:wrap;
+    margin-top:28px;
+}
+
+.hero-btn{
+    position:relative;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    min-width:220px;
+    padding:16px 26px;
+    border-radius:18px;
+    font-weight:800;
+    font-size:15px;
+    letter-spacing:.3px;
+    text-decoration:none;
+    overflow:hidden;
+    transition:all .25s ease;
+    border:1px solid rgba(255,255,255,.08);
+    backdrop-filter:blur(14px);
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.08);
+}
+
+.hero-btn:hover{
+    transform:translateY(-4px) scale(1.02);
+    text-decoration:none;
+}
+
+.hero-btn-primary{
+    color:#fff;
+    background:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
+    box-shadow:
+        0 0 25px rgba(99,102,241,.35),
+        0 10px 35px rgba(37,99,235,.35);
+}
+
+.hero-btn-secondary{
+    color:#e2e8f0;
+    background:linear-gradient(
+        135deg,
+        rgba(15,23,42,.95),
+        rgba(30,41,59,.92)
+    );
+    border:1px solid rgba(56,189,248,.25);
+}
+
+.hero-btn-outline{
+    color:#7dd3fc;
+    background:linear-gradient(
+        135deg,
+        rgba(8,47,73,.85),
+        rgba(15,23,42,.95)
+    );
+    border:1px solid rgba(34,211,238,.35);
+}
+
+.hero-btn-icon{
+    font-size:18px;
+}
+
+@media(max-width:768px){
+
+    .premium-hero-actions{
+        flex-direction:column;
+    }
+
+    .hero-btn{
+        width:100%;
+        min-width:unset;
+    }
+}
+</style>
+
+
+
+
 </head>
 <body class="grid-bg">
   <main class="relative z-10">
