@@ -302,3 +302,7 @@ CACHES = {
         "TIMEOUT": 300,
     }
 }
+
+
+# Fix móvil: evita mismatch entre cookie csrftoken y formulario cacheado/prefetch Cloudflare/Samsung
+CSRF_USE_SESSIONS = True
