@@ -357,7 +357,25 @@
       position: relative;
       z-index: 1;
     }
-  </style>
+  
+/* EG MOBILE TAP FIX START */
+@media (max-width: 768px){
+  .glass-card::before,
+  .btn-primary::before,
+  .hero-btn::before{
+    display:none !important;
+    pointer-events:none !important;
+  }
+
+  .eg-mobile-top-cta,
+  .eg-mobile-top-cta *{
+    pointer-events:auto !important;
+    cursor:pointer !important;
+  }
+}
+/* EG MOBILE TAP FIX END */
+
+</style>
 
 
 
@@ -447,17 +465,20 @@
 
 
 
+
 </head>
 <body class="grid-bg">
 
-  <!-- TOP CTA FIXED FIRST -->
-  <div class="premium-hero-actions" style="position:relative; z-index:9999; padding:24px 16px 0;">
-    <a href="/cl/signup/" class="hero-btn hero-btn-primary">🚀 Comenzar Gratis</a>
-    <a href="/cl/login/" class="hero-btn hero-btn-secondary">🔐 Ingresar</a>
-    <a href="#pricing" class="hero-btn hero-btn-outline">💰 Ver Planes</a>
-  </div>
+<!-- EG MOBILE TOP CTA START -->
+<nav class="eg-mobile-top-cta" aria-label="Accesos rápidos móviles">
+  <a class="eg-start" href="/cl/signup/">🚀 Gratis</a>
+  <a class="eg-login" href="/cl/es/accounts/login/">🔐 Ingresar</a>
+  <a class="eg-plans" href="#pricing">💰 Planes</a>
+</nav>
+<!-- EG MOBILE TOP CTA END -->
 
-  <main class="relative z-10">
+
+<main class="relative z-10">
   
   <!-- Hero Section -->
   <section class="hero-section">
@@ -518,6 +539,29 @@
             <div class="text-center mt-2" style="color:#b0b0b0;font-size:0.95rem;">Desarmadurias</div>
           </p>
         </div>
+
+          <!-- CTA Buttons -->
+          <div class="premium-hero-actions" data-aos="fade-up" data-aos-delay="250">
+            <a href="/cl/signup/" class="hero-btn hero-btn-primary">🚀 Comenzar Gratis</a>
+            <a href="/cl/es/accounts/login/" class="hero-btn hero-btn-secondary">🔐 Ingresar</a>
+            <a href="#pricing" class="hero-btn hero-btn-outline">💰 Ver Planes</a>
+          </div>
+
+          <!-- Stats -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 mb-8">
+            <div class="glass-card p-6 text-center">
+              <div class="stats-number">700+</div>
+              <div class="text-gray-300 font-semibold">Talleres Activos</div>
+            </div>
+            <div class="glass-card p-6 text-center">
+              <div class="stats-number">35K+</div>
+              <div class="text-gray-300 font-semibold">Órdenes de Servicio</div>
+            </div>
+            <div class="glass-card p-6 text-center">
+              <div class="stats-number">$7M+</div>
+              <div class="text-gray-300 font-semibold">Facturado</div>
+            </div>
+          </div>
 
         <!-- Features Section -->
   <section class="py-20 px-4">
@@ -944,6 +988,7 @@
       }
     });
   </script>
+
 
 </body>
 </html>
