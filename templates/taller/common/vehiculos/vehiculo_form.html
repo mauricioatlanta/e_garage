@@ -379,8 +379,10 @@ select optgroup {
   {% country_url 'vehiculos:lista_vehiculos' as url_lista_vehiculos %}
   <div class="flex justify-between items-center mb-6">
     <h1 class="text-2xl font-bold font-orbitron">
-      {% if vehiculo %}Editar Veh?culo{% else %}Crear Veh?culo{% endif %}
-    </h1>
+      
+    // MODO EDICION DESACTIVADO TEMPORALMENTE
+    // BLOQUE AISLADO PARA EVITAR CORRUPCION JS TEMPLATE
+        </h1>
     <a href="{% if return_to %}{{ return_to }}{% elif url_lista_vehiculos %}{{ url_lista_vehiculos }}{% else %}{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}{% endif %}"
        class="btn-futuristic btn-secondary">Volver</a>
   </div>
@@ -1126,6 +1128,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Event listener para cambio de modelo
         modeloSelect.addEventListener('change', function() {
+            console.log('[VehiculoForm] MODELO CHANGE NATIVO:', this.value);
+
             if (this.value) {
                 cargarMotoresYCajas(this.value);
             } else {
@@ -1149,6 +1153,21 @@ document.addEventListener('DOMContentLoaded', function() {
             const anio = obtenerAnio();
             cargarModelos(marcaSelect.value, anio, modeloSelect.value);
         }
+
+
+
+        // FIX DEFINITIVO SELECT2 MODELO
+        if (window.jQuery) {
+            window.jQuery(modeloSelect).on('change select2:select', function() {
+
+                console.log('[VehiculoForm] MODELO SELECT2:', modeloSelect.value);
+
+                if (modeloSelect.value) {
+                    cargarMotoresYCajas(modeloSelect.value);
+                }
+            });
+        }
+
 
         // Cargar motores y cajas iniciales si ya hay un modelo seleccionado
         if (modeloSelect.value) {
