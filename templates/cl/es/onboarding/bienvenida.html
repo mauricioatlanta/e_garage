@@ -358,6 +358,7 @@
       z-index: 1;
     }
   
+
 /* EG MOBILE TAP FIX START */
 @media (max-width: 768px){
   .glass-card::before,
@@ -374,6 +375,128 @@
   }
 }
 /* EG MOBILE TAP FIX END */
+
+/* ===== EG PREMIUM MOBILE TOPBAR ===== */
+
+.eg-mobile-topbar{
+    display:none;
+}
+
+@media(max-width:1400px){
+
+    body{
+        padding-top:86px !important;
+    }
+
+    .eg-mobile-topbar{
+        position:fixed;
+        top:0;
+        left:0;
+        right:0;
+        z-index:999999;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        padding:12px 14px 14px;
+        background:
+            linear-gradient(
+                180deg,
+                rgba(2,6,23,.98) 0%,
+                rgba(15,23,42,.96) 100%
+            );
+        border-bottom:1px solid rgba(59,130,246,.25);
+        backdrop-filter:blur(18px);
+        box-shadow:
+            0 10px 40px rgba(0,0,0,.45),
+            0 0 30px rgba(37,99,235,.12);
+    }
+
+    .eg-mobile-brand{
+        display:flex;
+        flex-direction:column;
+        min-width:0;
+    }
+
+    .eg-mobile-brand-title{
+        color:#fff;
+        font-size:16px;
+        font-weight:900;
+        line-height:1.1;
+        letter-spacing:.2px;
+    }
+
+    .eg-mobile-brand-sub{
+        color:#7dd3fc;
+        font-size:11.5px;
+        font-weight:700;
+        margin-top:2px;
+    }
+
+    .eg-mobile-actions{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        flex-shrink:0;
+    }
+
+    .eg-mobile-btn{
+        height:44px;
+        padding:0 16px;
+        border-radius:14px;
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        text-decoration:none;
+        font-size:13px;
+        font-weight:900;
+        letter-spacing:.2px;
+        transition:.2s ease;
+        white-space:nowrap;
+    }
+
+    .eg-mobile-btn-login{
+        color:#fff;
+        background:
+            linear-gradient(
+                135deg,
+                #2563eb 0%,
+                #7c3aed 100%
+            );
+        box-shadow:
+            0 10px 25px rgba(37,99,235,.35),
+            0 0 20px rgba(99,102,241,.18);
+    }
+
+    .eg-mobile-btn-demo{
+        color:#cbd5e1;
+        background:rgba(15,23,42,.95);
+        border:1px solid rgba(148,163,184,.22);
+    }
+
+    .premium-hero-actions{
+        display:none !important;
+    }
+
+    .hero-section{
+        min-height:auto !important;
+        padding-top:28px !important;
+    }
+
+    .hero-section h1{
+        font-size:3rem !important;
+        line-height:1 !important;
+    }
+
+    .hero-section p{
+        font-size:1.15rem !important;
+    }
+
+    .glass-card{
+        border-radius:22px !important;
+    }
+}
+
 
 </style>
 
@@ -400,7 +523,7 @@
     padding:16px 26px;
     border-radius:18px;
     font-weight:800;
-    font-size:15px;
+    font-size:16px;
     letter-spacing:.3px;
     text-decoration:none;
     overflow:hidden;
@@ -469,13 +592,32 @@
 </head>
 <body class="grid-bg">
 
-<!-- EG MOBILE TOP CTA START -->
-<nav class="eg-mobile-top-cta" aria-label="Accesos rápidos móviles">
-  <a class="eg-start" href="/cl/signup/">🚀 Gratis</a>
-  <a class="eg-login" href="/cl/es/accounts/login/">🔐 Ingresar</a>
-  <a class="eg-plans" href="#pricing">💰 Planes</a>
-</nav>
-<!-- EG MOBILE TOP CTA END -->
+<!-- EG PREMIUM MOBILE TOPBAR -->
+<div class="eg-mobile-topbar">
+
+    <div class="eg-mobile-brand">
+        <div class="eg-mobile-brand-title">
+            eGarage Chile
+        </div>
+
+        <div class="eg-mobile-brand-sub">
+            Plataforma automotriz SaaS
+        </div>
+    </div>
+
+    <div class="eg-mobile-actions">
+        <a href="/cl/es/accounts/login/" class="eg-mobile-btn eg-mobile-btn-demo">
+            Ingresar
+        </a>
+
+        <a href="/cl/signup/" class="eg-mobile-btn eg-mobile-btn-login">
+            Comenzar
+        </a>
+    </div>
+
+</div>
+
+
 
 
 <main class="relative z-10">
