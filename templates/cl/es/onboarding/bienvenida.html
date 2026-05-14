@@ -498,6 +498,110 @@
 }
 
 
+
+/* ===== FIX MOBILE TOPBAR: NO CORTAR BOTONES ===== */
+@media(max-width:768px){
+    body{
+        padding-top:122px !important;
+        overflow-x:hidden !important;
+    }
+
+    .eg-mobile-topbar{
+        display:flex !important;
+        flex-direction:column !important;
+        align-items:stretch !important;
+        justify-content:flex-start !important;
+        gap:8px !important;
+        padding:10px 12px 12px !important;
+    }
+
+    .eg-mobile-brand{
+        width:100% !important;
+        text-align:left !important;
+    }
+
+    .eg-mobile-actions{
+        width:calc(100vw - 24px) !important;
+        max-width:calc(100vw - 24px) !important;
+        margin-left:-6px !important;
+        margin-right:0 !important;
+        display:grid !important;
+        grid-template-columns:1fr 1fr !important;
+        gap:6px !important;
+        justify-content:start !important;
+    }
+
+    .eg-mobile-btn{
+        width:100% !important;
+        min-width:0 !important;
+        height:36px !important;
+        padding:0 4px !important;
+        font-size:11px !important;
+        border-radius:10px !important;
+        overflow:hidden !important;
+        text-overflow:ellipsis !important;
+    }
+}
+
+
+/* ===== MOBILE PERFORMANCE MODE ===== */
+@media(max-width:768px){
+
+    /* Desactivar animaciones pesadas */
+    *,
+    *::before,
+    *::after{
+        animation:none !important;
+        transition:none !important;
+    }
+
+    /* Desactivar AOS */
+    [data-aos]{
+        opacity:1 !important;
+        transform:none !important;
+        transition:none !important;
+    }
+
+    /* Eliminar blur GPU costoso */
+    .glass-card,
+    .hero-btn,
+    .eg-mobile-topbar{
+        backdrop-filter:none !important;
+        -webkit-backdrop-filter:none !important;
+    }
+
+    /* Reducir sombras */
+    .glass-card,
+    .hero-btn,
+    .stats-card,
+    .eg-mobile-topbar{
+        box-shadow:none !important;
+    }
+
+    /* Eliminar glow/filtros caros */
+    .futuristic-glow,
+    .flag-animation,
+    img{
+        filter:none !important;
+    }
+
+    /* Scroll mas fluido */
+    html{
+        scroll-behavior:auto !important;
+    }
+
+    body{
+        overflow-x:hidden !important;
+        background:#050816 !important;
+    }
+
+    /* Desactivar fondos complejos */
+    body::before,
+    body::after{
+        display:none !important;
+    }
+}
+
 </style>
 
 
@@ -629,7 +733,10 @@
         
         <!-- Logo -->
         <div class="mb-8 inline-block">
-          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 57, 166, 0.8));">
+          <picture>
+            <source media="(max-width: 768px)" srcset="{% static 'img/egarage_logo_mobile.webp' %}" type="image/webp">
+            <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-24 md:h-40 w-auto mx-auto" loading="eager" decoding="async">
+          </picture>
         </div>
 
         <!-- Title -->
@@ -1121,7 +1228,7 @@
   <script>
     // Initialize AOS (Animate On Scroll)
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof AOS !== 'undefined') {
+      if (window.innerWidth > 768 && typeof AOS !== 'undefined') {
         AOS.init({
           duration: 1000,
           once: true,
