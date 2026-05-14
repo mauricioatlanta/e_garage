@@ -527,6 +527,57 @@
     }
 }
 
+
+/* ===== MOBILE PERFORMANCE MODE ===== */
+@media(max-width:768px){
+    *,
+    *::before,
+    *::after{
+        animation:none !important;
+        transition:none !important;
+    }
+
+    [data-aos]{
+        opacity:1 !important;
+        transform:none !important;
+        transition:none !important;
+    }
+
+    .glass-card,
+    .hero-btn,
+    .eg-mobile-topbar{
+        backdrop-filter:none !important;
+        -webkit-backdrop-filter:none !important;
+    }
+
+    .glass-card,
+    .hero-btn,
+    .stats-card,
+    .eg-mobile-topbar{
+        box-shadow:none !important;
+    }
+
+    .futuristic-glow,
+    .flag-animation,
+    img{
+        filter:none !important;
+    }
+
+    html{
+        scroll-behavior:auto !important;
+    }
+
+    body{
+        overflow-x:hidden !important;
+        background:#050816 !important;
+    }
+
+    body::before,
+    body::after{
+        display:none !important;
+    }
+}
+
 </style>
 
 
@@ -655,7 +706,10 @@
         
         <!-- Logo -->
         <div class="mb-8 inline-block">
-          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 57, 166, 0.8));">
+          <picture>
+            <source media="(max-width: 768px)" srcset="{% static 'img/egarage_logo_mobile.webp' %}" type="image/webp">
+            <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-24 md:h-40 w-auto mx-auto" loading="eager" decoding="async">
+          </picture>
         </div>
 
         <!-- Title -->
@@ -1124,7 +1178,7 @@
   <script>
     // Initialize AOS (Animate On Scroll)
     document.addEventListener('DOMContentLoaded', function() {
-      if (typeof AOS !== 'undefined') {
+      if (window.innerWidth > 768 && typeof AOS !== 'undefined') {
         AOS.init({
           duration: 1000,
           once: true,
