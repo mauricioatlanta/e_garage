@@ -352,6 +352,13 @@ h1 {
   <div class="form-card">
     <form method="post" id="client-form" enctype="multipart/form-data">
       {% csrf_token %}
+
+      {% if return_to %}
+      <input
+        type="hidden"
+        name="return_to"
+        value="{{ return_to }}">
+      {% endif %}
       <input type="hidden" name="next" value="{% firstof next request.GET.next '' %}">
 
       {% if form.errors %}

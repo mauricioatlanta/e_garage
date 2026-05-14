@@ -126,12 +126,19 @@ def company_settings_view(request):
 
     config_empresa, _ = ConfiguracionEmpresa.objects.get_or_create(
         empresa=empresa,
-        defaults={"sales_tax_rate": Decimal("0")},
+        defaults={"sales_tax_rate": Decimal("19.00"), "tasa_impuesto": Decimal("19.00")},
     )
     config = _get_or_create_company_settings(request.user, empresa)
     is_spanish = getattr(empresa, "pais", "CL") in SPANISH_COUNTRIES
 
     if request.method == "POST":
+        print("===== SETTINGS POST DEBUG =====")
+        print("POST_KEYS=", sorted(list(request.POST.keys())))
+        print("FILES_KEYS=", sorted(list(request.FILES.keys())))
+        print("POST_company_name=", request.POST.get("company_name"))
+        print("POST_section=", request.POST.get("section"))
+        print("POST_crear_tecnico=", request.POST.get("crear_tecnico"))
+        print("POST_toggle_tecnico=", request.POST.get("toggle_tecnico"))
         if "crear_tecnico" in request.POST:
             nombre = request.POST.get("nombre", "").strip()
             telefono = request.POST.get("telefono", "").strip()
@@ -188,9 +195,18 @@ def company_settings_view(request):
 
             return redirect(request.path)
 
-        profile_form = CompanyProfileForm(request.POST, request.FILES, instance=config)
-        financial_form = FinancialSettingsForm(request.POST, instance=config)
-        theme_form = ThemeSettingsForm(request.POST, instance=config)
+        post_data = request.POST.copy()
+
+        # Chile: IVA 19% por defecto. No bloquear guardado si el input no llega por estar en otra pesta?a.
+        if not post_data.get("tax_rate"):
+            post_data["tax_rate"] = "19.00"
+
+        if "apply_tax_by_default" not in post_data:
+            post_data["apply_tax_by_default"] = "on"
+
+        profile_form = CompanyProfileForm(post_data, request.FILES, instance=config)
+        financial_form = FinancialSettingsForm(post_data, instance=config)
+        theme_form = ThemeSettingsForm(post_data, instance=config)
         forms = [profile_form, financial_form, theme_form]
 
         forms_are_valid = True
@@ -204,7 +220,17 @@ def company_settings_view(request):
                         setattr(config, field_name, form.cleaned_data[field_name])
 
             config.save()
+
+            # REFRESH REAL DESDE DB
+            config.refresh_from_db()
+            config_empresa.refresh_from_db()
+
             _sync_company_models(config, config_empresa, empresa)
+
+            # REFRESH POST SYNC
+            config.refresh_from_db()
+            config_empresa.refresh_from_db()
+
             invalidate_company_cache(request.user)
 
             if is_spanish:

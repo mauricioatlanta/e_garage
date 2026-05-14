@@ -45,7 +45,7 @@ from taller.models.lineas_documento import (
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 from taller.utils.empresa import get_or_create_empresa, get_user_empresa_safe
-from taller.utils.motor_ia import MotorDiagnosticoIA
+# LAZY IMPORT IA PARA EVITAR BLOQUEOS WINDOWS/PANDAS
 from taller.reportes.kilometraje_reportes import ReporteKilometraje
 
 # from taller.utils import get_or_create_empresa  # Eliminado: usamos la función local
@@ -130,7 +130,7 @@ from taller.reportes.kilometraje_reportes import ReporteKilometraje
 # from taller.models.tecnico import Tecnico
 # from taller.models.vehiculos import Vehiculo
 # from taller.utils.empresa import get_or_create_empresa
-# from taller.utils.motor_ia import MotorDiagnosticoIA
+# # LAZY IMPORT IA PARA EVITAR BLOQUEOS WINDOWS/PANDAS
 
 
 @login_required_default
