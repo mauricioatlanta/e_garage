@@ -358,24 +358,6 @@
       z-index: 1;
     }
   
-
-/* EG MOBILE TAP FIX START */
-@media (max-width: 768px){
-  .glass-card::before,
-  .btn-primary::before,
-  .hero-btn::before{
-    display:none !important;
-    pointer-events:none !important;
-  }
-
-  .eg-mobile-top-cta,
-  .eg-mobile-top-cta *{
-    pointer-events:auto !important;
-    cursor:pointer !important;
-  }
-}
-/* EG MOBILE TAP FIX END */
-
 /* ===== EG PREMIUM MOBILE TOPBAR ===== */
 
 .eg-mobile-topbar{
@@ -397,8 +379,8 @@
         display:flex;
         align-items:center;
         justify-content:space-between;
-        gap:12px;
-        padding:12px 14px 14px;
+        gap:6px;
+        padding:10px 8px 12px;
         background:
             linear-gradient(
                 180deg,
@@ -420,7 +402,7 @@
 
     .eg-mobile-brand-title{
         color:#fff;
-        font-size:16px;
+        font-size:14px;
         font-weight:900;
         line-height:1.1;
         letter-spacing:.2px;
@@ -428,7 +410,7 @@
 
     .eg-mobile-brand-sub{
         color:#7dd3fc;
-        font-size:11.5px;
+        font-size:10px;
         font-weight:700;
         margin-top:2px;
     }
@@ -436,19 +418,22 @@
     .eg-mobile-actions{
         display:flex;
         align-items:center;
-        gap:10px;
+        justify-content:flex-start;
+        gap:4px;
         flex-shrink:0;
+        margin-left:4px;
+        max-width:none;
     }
 
     .eg-mobile-btn{
-        height:44px;
-        padding:0 16px;
+        height:36px;
+        padding:0 9px;
         border-radius:14px;
         display:inline-flex;
         align-items:center;
         justify-content:center;
         text-decoration:none;
-        font-size:13px;
+        font-size:12px;
         font-weight:900;
         letter-spacing:.2px;
         transition:.2s ease;
@@ -498,7 +483,6 @@
 }
 
 
-
 /* ===== FIX MOBILE TOPBAR: NO CORTAR BOTONES ===== */
 @media(max-width:768px){
     body{
@@ -540,65 +524,6 @@
         border-radius:10px !important;
         overflow:hidden !important;
         text-overflow:ellipsis !important;
-    }
-}
-
-
-/* ===== MOBILE PERFORMANCE MODE ===== */
-@media(max-width:768px){
-
-    /* Desactivar animaciones pesadas */
-    *,
-    *::before,
-    *::after{
-        animation:none !important;
-        transition:none !important;
-    }
-
-    /* Desactivar AOS */
-    [data-aos]{
-        opacity:1 !important;
-        transform:none !important;
-        transition:none !important;
-    }
-
-    /* Eliminar blur GPU costoso */
-    .glass-card,
-    .hero-btn,
-    .eg-mobile-topbar{
-        backdrop-filter:none !important;
-        -webkit-backdrop-filter:none !important;
-    }
-
-    /* Reducir sombras */
-    .glass-card,
-    .hero-btn,
-    .stats-card,
-    .eg-mobile-topbar{
-        box-shadow:none !important;
-    }
-
-    /* Eliminar glow/filtros caros */
-    .futuristic-glow,
-    .flag-animation,
-    img{
-        filter:none !important;
-    }
-
-    /* Scroll mas fluido */
-    html{
-        scroll-behavior:auto !important;
-    }
-
-    body{
-        overflow-x:hidden !important;
-        background:#050816 !important;
-    }
-
-    /* Desactivar fondos complejos */
-    body::before,
-    body::after{
-        display:none !important;
     }
 }
 
@@ -692,7 +617,6 @@
 
 
 
-
 </head>
 <body class="grid-bg">
 
@@ -722,9 +646,7 @@
 </div>
 
 
-
-
-<main class="relative z-10">
+  <main class="relative z-10">
   
   <!-- Hero Section -->
   <section class="hero-section">
@@ -733,10 +655,7 @@
         
         <!-- Logo -->
         <div class="mb-8 inline-block">
-          <picture>
-            <source media="(max-width: 768px)" srcset="{% static 'img/egarage_logo_mobile.webp' %}" type="image/webp">
-            <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-24 md:h-40 w-auto mx-auto" loading="eager" decoding="async">
-          </picture>
+          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 57, 166, 0.8));">
         </div>
 
         <!-- Title -->
@@ -788,29 +707,6 @@
             <div class="text-center mt-2" style="color:#b0b0b0;font-size:0.95rem;">Desarmadurias</div>
           </p>
         </div>
-
-          <!-- CTA Buttons -->
-          <div class="premium-hero-actions" data-aos="fade-up" data-aos-delay="250">
-            <a href="/cl/signup/" class="hero-btn hero-btn-primary">🚀 Comenzar Gratis</a>
-            <a href="/cl/es/accounts/login/" class="hero-btn hero-btn-secondary">🔐 Ingresar</a>
-            <a href="#pricing" class="hero-btn hero-btn-outline">💰 Ver Planes</a>
-          </div>
-
-          <!-- Stats -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-16 mb-8">
-            <div class="glass-card p-6 text-center">
-              <div class="stats-number">700+</div>
-              <div class="text-gray-300 font-semibold">Talleres Activos</div>
-            </div>
-            <div class="glass-card p-6 text-center">
-              <div class="stats-number">35K+</div>
-              <div class="text-gray-300 font-semibold">Órdenes de Servicio</div>
-            </div>
-            <div class="glass-card p-6 text-center">
-              <div class="stats-number">$7M+</div>
-              <div class="text-gray-300 font-semibold">Facturado</div>
-            </div>
-          </div>
 
         <!-- Features Section -->
   <section class="py-20 px-4">
@@ -1228,7 +1124,7 @@
   <script>
     // Initialize AOS (Animate On Scroll)
     document.addEventListener('DOMContentLoaded', function() {
-      if (window.innerWidth > 768 && typeof AOS !== 'undefined') {
+      if (typeof AOS !== 'undefined') {
         AOS.init({
           duration: 1000,
           once: true,
@@ -1237,7 +1133,6 @@
       }
     });
   </script>
-
 
 </body>
 </html>
