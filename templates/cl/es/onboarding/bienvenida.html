@@ -1,1192 +1,471 @@
-{% load i18n static %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="es-cl">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Bienvenido a eGarage Chile 🇨🇱</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Plataforma de gestión para talleres: órdenes de servicio, inventario, portal del cliente y análisis en Chile.">
-  <link rel="canonical" href="{{ request.build_absolute_uri }}">
+<title>eGarage Chile</title>
 
-  <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="eGarage Chile — Plataforma para Talleres">
-  <meta property="og:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
-  <meta property="og:image" content="{% static 'img/og-cl.png' %}">
-  <meta property="og:url" content="{{ request.build_absolute_uri }}">
-  <meta property="og:type" content="website">
-  <meta property="og:site_name" content="eGarage">
+<meta name="description" content="Software SaaS para talleres mecánicos, repuestos y negocios automotrices en Chile.">
 
-  <!-- Twitter Card Meta Tags -->
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="eGarage Chile — Plataforma para Talleres">
-  <meta name="twitter:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
-  <meta name="twitter:image" content="{% static 'img/og-cl.png' %}">
-  
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
-  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
-  
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-
-    body {
-      background: #000000;
-      font-family: 'Exo 2', sans-serif;
-      color: #ffffff;
-      min-height: 100vh;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    /* Asegurar que el contenido esté por encima del fondo */
-    body > main,
-    body > section {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Background animado con colores de Chile */
-    body::before {
-      content: '';
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: 
-        radial-gradient(circle at 20% 30%, rgba(0, 57, 166, 0.15) 0%, transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(213, 43, 30, 0.12) 0%, transparent 50%),
-        radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, transparent 50%),
-        linear-gradient(135deg, #000814 0%, #001d3d 50%, #000814 100%);
-      z-index: -1;
-      animation: bgShift 20s ease-in-out infinite;
-      pointer-events: none;
-    }
-
-    @keyframes bgShift {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.9; }
-    }
-
-    .font-futuristic {
-      font-family: 'Orbitron', monospace;
-      letter-spacing: 0.05em;
-      font-weight: 700;
-    }
-
-    .font-tech {
-      font-family: 'JetBrains Mono', monospace;
-      letter-spacing: 0.02em;
-    }
-
-    .futuristic-glow {
-      text-shadow: 
-        0 0 20px rgba(0, 57, 166, 0.8),
-        0 0 40px rgba(0, 57, 166, 0.6),
-        0 0 60px rgba(0, 57, 166, 0.4),
-        0 0 80px rgba(213, 43, 30, 0.3);
-      animation: glowPulse 3s ease-in-out infinite;
-    }
-
-    @keyframes glowPulse {
-      0%, 100% {
-        text-shadow: 
-          0 0 20px rgba(0, 57, 166, 0.8),
-          0 0 40px rgba(0, 57, 166, 0.6),
-          0 0 60px rgba(0, 57, 166, 0.4);
-      }
-      50% {
-        text-shadow: 
-          0 0 30px rgba(0, 57, 166, 1),
-          0 0 60px rgba(0, 57, 166, 0.8),
-          0 0 90px rgba(213, 43, 30, 0.6);
-      }
-    }
-
-    .glass-card {
-      background: linear-gradient(
-        135deg, 
-        rgba(0, 57, 166, 0.15) 0%, 
-        rgba(255, 255, 255, 0.1) 50%,
-        rgba(213, 43, 30, 0.08) 100%
-      );
-      backdrop-filter: blur(20px) saturate(180%);
-      -webkit-backdrop-filter: blur(20px) saturate(180%);
-      border-radius: 1.5rem;
-      border: 2px solid;
-      border-image: linear-gradient(135deg, 
-        rgba(0, 57, 166, 0.6), 
-        rgba(213, 43, 30, 0.3),
-        rgba(0, 57, 166, 0.6)
-      ) 1;
-      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 
-        0 8px 32px rgba(0, 0, 0, 0.3),
-        0 4px 16px rgba(0, 57, 166, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .glass-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg,
-        transparent,
-        rgba(0, 57, 166, 0.2),
-        transparent
-      );
-      transition: left 0.5s;
-    }
-
-    .glass-card:hover::before {
-      left: 100%;
-    }
-
-    .glass-card:hover {
-      transform: translateY(-10px) scale(1.02);
-      box-shadow: 
-        0 20px 60px rgba(0, 0, 0, 0.4),
-        0 10px 30px rgba(0, 57, 166, 0.4),
-        0 0 40px rgba(213, 43, 30, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      border-image: linear-gradient(135deg, 
-        rgba(0, 57, 166, 1), 
-        rgba(213, 43, 30, 0.6),
-        rgba(0, 57, 166, 1)
-      ) 1;
-    }
-
-    .btn-primary {
-      background: linear-gradient(135deg, #0039A6 0%, #D52B1E 100%);
-      color: #ffffff;
-      font-weight: 800;
-      padding: 1.2rem 3rem;
-      border-radius: 1.2rem;
-      border: 2px solid rgba(0, 57, 166, 0.8);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-size: 1.1rem;
-      box-shadow: 
-        0 4px 20px rgba(0, 57, 166, 0.4),
-        0 0 40px rgba(213, 43, 30, 0.3);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .btn-primary::before {
-      content: '';
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      width: 0;
-      height: 0;
-      border-radius: 50%;
-      background: rgba(255, 255, 255, 0.3);
-      transform: translate(-50%, -50%);
-      transition: width 0.6s, height 0.6s;
-    }
-
-    .btn-primary:hover::before {
-      width: 300px;
-      height: 300px;
-    }
-
-    .btn-primary:hover {
-      transform: scale(1.08) translateY(-2px);
-      box-shadow: 
-        0 8px 40px rgba(0, 57, 166, 0.6),
-        0 0 60px rgba(213, 43, 30, 0.5),
-        0 0 100px rgba(0, 57, 166, 0.3);
-      border-color: rgba(213, 43, 30, 0.8);
-    }
-
-    .btn-secondary {
-      background: rgba(0, 57, 166, 0.1);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: #ffffff;
-      font-weight: 700;
-      padding: 1.2rem 3rem;
-      border-radius: 1.2rem;
-      border: 2px solid rgba(0, 57, 166, 0.5);
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      font-size: 1rem;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-secondary:hover {
-      background: rgba(0, 57, 166, 0.25);
-      border-color: rgba(0, 57, 166, 0.9);
-      transform: scale(1.05) translateY(-2px);
-      box-shadow: 
-        0 8px 30px rgba(0, 57, 166, 0.3),
-        0 0 40px rgba(0, 57, 166, 0.2);
-    }
-
-    .hero-section {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      padding: 2rem;
-      z-index: 1;
-    }
-
-    .feature-icon {
-      width: 90px;
-      height: 90px;
-      background: linear-gradient(135deg, 
-        rgba(0, 57, 166, 0.3) 0%, 
-        rgba(255, 255, 255, 0.2) 50%,
-        rgba(213, 43, 30, 0.2) 100%
-      );
-      backdrop-filter: blur(10px);
-      border-radius: 24px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 2.8rem;
-      margin: 0 auto 1.5rem;
-      border: 2px solid rgba(0, 57, 166, 0.5);
-      box-shadow: 
-        0 8px 32px rgba(0, 57, 166, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      transition: all 0.3s ease;
-    }
-
-    .glass-card:hover .feature-icon {
-      transform: scale(1.1) rotateY(360deg);
-      box-shadow: 
-        0 12px 48px rgba(0, 57, 166, 0.4),
-        0 0 40px rgba(213, 43, 30, 0.3);
-      border-color: rgba(0, 57, 166, 0.9);
-    }
-
-    .stats-number {
-      font-size: 3.5rem;
-      font-weight: 900;
-      background: linear-gradient(135deg, #0039A6 0%, #D52B1E 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-      font-family: 'Orbitron', monospace;
-      text-shadow: 0 0 40px rgba(0, 57, 166, 0.5);
-      filter: drop-shadow(0 0 20px rgba(213, 43, 30, 0.3));
-      animation: statsGlow 2s ease-in-out infinite;
-    }
-
-    @keyframes statsGlow {
-      0%, 100% {
-        filter: drop-shadow(0 0 20px rgba(0, 57, 166, 0.4));
-      }
-      50% {
-        filter: drop-shadow(0 0 30px rgba(213, 43, 30, 0.6));
-      }
-    }
-
-    /* Animación de bandeira */
-    @keyframes wave {
-      0%, 100% { 
-        transform: rotate(-5deg) scale(1); 
-      }
-      50% { 
-        transform: rotate(5deg) scale(1.05); 
-      }
-    }
-
-    .flag-animation {
-      animation: wave 2.5s ease-in-out infinite;
-      display: inline-block;
-      filter: drop-shadow(0 0 30px rgba(0, 57, 166, 0.6));
-    }
-
-    /* Grid pattern background mejorado */
-    .grid-bg {
-      background-image: 
-        linear-gradient(rgba(0, 57, 166, 0.08) 2px, transparent 2px),
-        linear-gradient(90deg, rgba(0, 57, 166, 0.08) 2px, transparent 2px),
-        linear-gradient(rgba(0, 57, 166, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 57, 166, 0.03) 1px, transparent 1px);
-      background-size: 100px 100px, 100px 100px, 20px 20px, 20px 20px;
-      background-position: -2px -2px, -2px -2px, -1px -1px, -1px -1px;
-      position: relative;
-    }
-
-    /* Mejoras de texto */
-    h1, h2, h3 {
-      text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
-    }
-
-    p, li {
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
-    }
-
-    /* Contenedor principal con mejor z-index */
-    section {
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Asegurar que el contenido esté visible */
-    main {
-      position: relative;
-      z-index: 10;
-    }
-
-    body > * {
-      position: relative;
-      z-index: 1;
-    }
-  
-/* ===== EG PREMIUM MOBILE TOPBAR ===== */
-
-.eg-mobile-topbar{
-    display:none;
-}
-
-@media(max-width:1400px){
-
-    body{
-        padding-top:86px !important;
-    }
-
-    .eg-mobile-topbar{
-        position:fixed;
-        top:0;
-        left:0;
-        right:0;
-        z-index:999999;
-        display:flex;
-        align-items:center;
-        justify-content:space-between;
-        gap:6px;
-        padding:10px 8px 12px;
-        background:
-            linear-gradient(
-                180deg,
-                rgba(2,6,23,.98) 0%,
-                rgba(15,23,42,.96) 100%
-            );
-        border-bottom:1px solid rgba(59,130,246,.25);
-        backdrop-filter:blur(18px);
-        box-shadow:
-            0 10px 40px rgba(0,0,0,.45),
-            0 0 30px rgba(37,99,235,.12);
-    }
-
-    .eg-mobile-brand{
-        display:flex;
-        flex-direction:column;
-        min-width:0;
-    }
-
-    .eg-mobile-brand-title{
-        color:#fff;
-        font-size:14px;
-        font-weight:900;
-        line-height:1.1;
-        letter-spacing:.2px;
-    }
-
-    .eg-mobile-brand-sub{
-        color:#7dd3fc;
-        font-size:10px;
-        font-weight:700;
-        margin-top:2px;
-    }
-
-    .eg-mobile-actions{
-        display:flex;
-        align-items:center;
-        justify-content:flex-start;
-        gap:4px;
-        flex-shrink:0;
-        margin-left:4px;
-        max-width:none;
-    }
-
-    .eg-mobile-btn{
-        height:36px;
-        padding:0 9px;
-        border-radius:14px;
-        display:inline-flex;
-        align-items:center;
-        justify-content:center;
-        text-decoration:none;
-        font-size:12px;
-        font-weight:900;
-        letter-spacing:.2px;
-        transition:.2s ease;
-        white-space:nowrap;
-    }
-
-    .eg-mobile-btn-login{
-        color:#fff;
-        background:
-            linear-gradient(
-                135deg,
-                #2563eb 0%,
-                #7c3aed 100%
-            );
-        box-shadow:
-            0 10px 25px rgba(37,99,235,.35),
-            0 0 20px rgba(99,102,241,.18);
-    }
-
-    .eg-mobile-btn-demo{
-        color:#cbd5e1;
-        background:rgba(15,23,42,.95);
-        border:1px solid rgba(148,163,184,.22);
-    }
-
-    .premium-hero-actions{
-        display:none !important;
-    }
-
-    .hero-section{
-        min-height:auto !important;
-        padding-top:28px !important;
-    }
-
-    .hero-section h1{
-        font-size:3rem !important;
-        line-height:1 !important;
-    }
-
-    .hero-section p{
-        font-size:1.15rem !important;
-    }
-
-    .glass-card{
-        border-radius:22px !important;
-    }
-}
-
-
-/* ===== FIX MOBILE TOPBAR: NO CORTAR BOTONES ===== */
-@media(max-width:768px){
-    body{
-        padding-top:122px !important;
-        overflow-x:hidden !important;
-    }
-
-    .eg-mobile-topbar{
-        display:flex !important;
-        flex-direction:column !important;
-        align-items:stretch !important;
-        justify-content:flex-start !important;
-        gap:8px !important;
-        padding:10px 12px 12px !important;
-    }
-
-    .eg-mobile-brand{
-        width:100% !important;
-        text-align:left !important;
-    }
-
-    .eg-mobile-actions{
-        width:calc(100vw - 24px) !important;
-        max-width:calc(100vw - 24px) !important;
-        margin-left:-6px !important;
-        margin-right:0 !important;
-        display:grid !important;
-        grid-template-columns:1fr 1fr !important;
-        gap:6px !important;
-        justify-content:start !important;
-    }
-
-    .eg-mobile-btn{
-        width:100% !important;
-        min-width:0 !important;
-        height:36px !important;
-        padding:0 4px !important;
-        font-size:11px !important;
-        border-radius:10px !important;
-        overflow:hidden !important;
-        text-overflow:ellipsis !important;
-    }
-}
-
-
-/* ===== MOBILE PERFORMANCE MODE ===== */
-@media(max-width:768px){
-    *,
-    *::before,
-    *::after{
-        animation:none !important;
-        transition:none !important;
-    }
-
-    [data-aos]{
-        opacity:1 !important;
-        transform:none !important;
-        transition:none !important;
-    }
-
-    .glass-card,
-    .hero-btn,
-    .eg-mobile-topbar{
-        backdrop-filter:none !important;
-        -webkit-backdrop-filter:none !important;
-    }
-
-    .glass-card,
-    .hero-btn,
-    .stats-card,
-    .eg-mobile-topbar{
-        box-shadow:none !important;
-    }
-
-    .futuristic-glow,
-    .flag-animation,
-    img{
-        filter:none !important;
-    }
-
-    html{
-        scroll-behavior:auto !important;
-    }
-
-    body{
-        overflow-x:hidden !important;
-        background:#050816 !important;
-    }
-
-    body::before,
-    body::after{
-        display:none !important;
-    }
-}
-
-</style>
-
-
-
+<link rel="stylesheet" href="{% static 'css/output.css' %}">
+<link rel="preload" as="image" href="{% static 'img/egarage_logo_mobile.webp' %}">
 
 <style>
-.premium-hero-actions{
-    display:flex;
-    gap:16px;
-    justify-content:center;
-    align-items:center;
-    flex-wrap:wrap;
-    margin-top:28px;
+:root{
+    --bg:#08111f;
+    --card:#0f172a;
+    --border:#1e293b;
+    --text:#f8fafc;
+    --muted:#94a3b8;
+    --primary:#38bdf8;
+    --primary-hover:#0ea5e9;
 }
 
-.hero-btn{
-    position:relative;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:Inter,system-ui,sans-serif;
+    min-height:100vh;
+}
+
+.eg-shell{
+    width:100%;
+    max-width:1200px;
+    margin:0 auto;
+    padding:24px;
+}
+
+.eg-topbar{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:56px;
+}
+
+.eg-brand{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.eg-brand img{
+    width:56px;
+    height:56px;
+    object-fit:contain;
+}
+
+.eg-brand-copy h1{
+    font-size:1.2rem;
+    font-weight:700;
+}
+
+.eg-brand-copy p{
+    color:var(--muted);
+    font-size:.92rem;
+}
+
+.eg-actions{
+    display:flex;
+    gap:12px;
+}
+
+.eg-btn{
+    height:44px;
+    padding:0 18px;
+    border-radius:12px;
+    border:1px solid var(--border);
     display:inline-flex;
     align-items:center;
     justify-content:center;
-    gap:10px;
-    min-width:220px;
-    padding:16px 26px;
-    border-radius:18px;
-    font-weight:800;
-    font-size:16px;
-    letter-spacing:.3px;
     text-decoration:none;
-    overflow:hidden;
-    transition:all .25s ease;
-    border:1px solid rgba(255,255,255,.08);
-    backdrop-filter:blur(14px);
-    box-shadow:
-        0 10px 30px rgba(0,0,0,.35),
-        inset 0 1px 0 rgba(255,255,255,.08);
+    font-weight:600;
+    transition:.15s ease;
 }
 
-.hero-btn:hover{
-    transform:translateY(-4px) scale(1.02);
-    text-decoration:none;
-}
-
-.hero-btn-primary{
-    color:#fff;
-    background:linear-gradient(135deg,#2563eb 0%,#7c3aed 100%);
-    box-shadow:
-        0 0 25px rgba(99,102,241,.35),
-        0 10px 35px rgba(37,99,235,.35);
-}
-
-.hero-btn-secondary{
+.eg-btn-secondary{
+    background:#111827;
     color:#e2e8f0;
+}
+
+.eg-btn-secondary:hover{
+    background:#1e293b;
+}
+
+.eg-btn-primary{
+    background:var(--primary);
+    color:#04111d;
+    border-color:transparent;
+}
+
+.eg-btn-primary:hover{
+    background:var(--primary-hover);
+}
+
+.hero{
+    display:grid;
+    grid-template-columns:1.1fr .9fr;
+    gap:48px;
+    align-items:center;
+    margin-bottom:72px;
+}
+
+.hero-copy h2{
+    font-size:clamp(2.5rem,5vw,4.5rem);
+    line-height:1.05;
+    margin-bottom:20px;
+    font-weight:800;
+}
+
+.hero-copy p{
+    color:var(--muted);
+    font-size:1.08rem;
+    line-height:1.7;
+    max-width:680px;
+    margin-bottom:32px;
+}
+
+.hero-badges{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+    margin-bottom:32px;
+}
+
+.hero-badge{
+    background:#0f172a;
+    border:1px solid var(--border);
+    border-radius:999px;
+    padding:10px 14px;
+    color:#cbd5e1;
+    font-size:.92rem;
+}
+
+.hero-card{
     background:linear-gradient(
-        135deg,
+        180deg,
         rgba(15,23,42,.95),
-        rgba(30,41,59,.92)
+        rgba(9,14,24,.98)
     );
-    border:1px solid rgba(56,189,248,.25);
+    border:1px solid var(--border);
+    border-radius:24px;
+    padding:32px;
 }
 
-.hero-btn-outline{
-    color:#7dd3fc;
-    background:linear-gradient(
-        135deg,
-        rgba(8,47,73,.85),
-        rgba(15,23,42,.95)
-    );
-    border:1px solid rgba(34,211,238,.35);
+.hero-card img{
+    width:100%;
+    max-width:260px;
+    display:block;
+    margin:0 auto 28px;
 }
 
-.hero-btn-icon{
-    font-size:18px;
+.kpis{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
 }
 
-@media(max-width:768px){
+.kpi{
+    background:#111827;
+    border:1px solid var(--border);
+    border-radius:16px;
+    padding:18px;
+}
 
-    .premium-hero-actions{
-        flex-direction:column;
+.kpi strong{
+    display:block;
+    font-size:1.5rem;
+    margin-bottom:6px;
+}
+
+.kpi span{
+    color:var(--muted);
+    font-size:.88rem;
+}
+
+.section-title{
+    font-size:2rem;
+    margin-bottom:28px;
+    font-weight:700;
+}
+
+.features{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin-bottom:72px;
+}
+
+.feature{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:24px;
+}
+
+.feature h3{
+    margin-bottom:12px;
+    font-size:1.08rem;
+}
+
+.feature p{
+    color:var(--muted);
+    line-height:1.6;
+    font-size:.95rem;
+}
+
+.pricing{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+    margin-bottom:72px;
+}
+
+.price-card{
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:22px;
+    padding:28px;
+}
+
+.price-card.popular{
+    border-color:#38bdf8;
+}
+
+.price{
+    font-size:2.4rem;
+    font-weight:800;
+    margin:18px 0;
+}
+
+footer{
+    border-top:1px solid var(--border);
+    padding-top:28px;
+    color:var(--muted);
+    font-size:.9rem;
+}
+
+@media(max-width:900px){
+
+    .hero{
+        grid-template-columns:1fr;
     }
 
-    .hero-btn{
+    .features{
+        grid-template-columns:1fr;
+    }
+
+    .pricing{
+        grid-template-columns:1fr;
+    }
+
+    .kpis{
+        grid-template-columns:1fr;
+    }
+
+    .eg-topbar{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .eg-actions{
         width:100%;
-        min-width:unset;
+    }
+
+    .eg-btn{
+        flex:1;
+    }
+
+    .hero-copy h2{
+        font-size:2.5rem;
     }
 }
 </style>
-
-
-
-
 </head>
-<body class="grid-bg">
 
-<!-- EG PREMIUM MOBILE TOPBAR -->
-<div class="eg-mobile-topbar">
+<body>
 
-    <div class="eg-mobile-brand">
-        <div class="eg-mobile-brand-title">
-            eGarage Chile
-        </div>
+<div class="eg-shell">
 
-        <div class="eg-mobile-brand-sub">
-            Plataforma automotriz SaaS
+<header class="eg-topbar">
+
+    <div class="eg-brand">
+        <img src="{% static 'img/egarage_logo_mobile.webp' %}" alt="eGarage">
+        <div class="eg-brand-copy">
+            <h1>eGarage Chile</h1>
+            <p>Software SaaS automotriz</p>
         </div>
     </div>
 
-    <div class="eg-mobile-actions">
-        <a href="/cl/es/accounts/login/" class="eg-mobile-btn eg-mobile-btn-demo">
+    <div class="eg-actions">
+        <a href="/cl/login/" class="eg-btn eg-btn-secondary">
             Ingresar
         </a>
 
-        <a href="/cl/signup/" class="eg-mobile-btn eg-mobile-btn-login">
+        <a href="/cl/signup/" class="eg-btn eg-btn-primary">
             Comenzar
         </a>
     </div>
 
+</header>
+
+<section class="hero">
+
+    <div class="hero-copy">
+
+        <h2>
+            Plataforma moderna para talleres y negocios automotrices
+        </h2>
+
+        <p>
+            Gestiona documentos, clientes, vehículos, repuestos,
+            inventario y reportes desde una sola plataforma.
+        </p>
+
+        <div class="hero-badges">
+            <div class="hero-badge">🔧 Talleres</div>
+            <div class="hero-badge">⚙️ Repuestos</div>
+            <div class="hero-badge">🛞 Vulcanización</div>
+            <div class="hero-badge">🚗 Desarmaduría</div>
+            <div class="hero-badge">📊 Reportes</div>
+        </div>
+
+        <div class="eg-actions">
+            <a href="/cl/signup/" class="eg-btn eg-btn-primary">
+                Prueba Gratis
+            </a>
+
+            <a href="/cl/login/" class="eg-btn eg-btn-secondary">
+                Ya tengo cuenta
+            </a>
+        </div>
+
+    </div>
+
+    <div class="hero-card">
+
+        <img src="{% static 'img/egarage_logo_mobile.webp' %}" alt="eGarage">
+
+        <div class="kpis">
+
+            <div class="kpi">
+                <strong>700+</strong>
+                <span>Talleres activos</span>
+            </div>
+
+            <div class="kpi">
+                <strong>35K+</strong>
+                <span>Órdenes creadas</span>
+            </div>
+
+            <div class="kpi">
+                <strong>24/7</strong>
+                <span>Acceso cloud</span>
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+<section>
+
+    <h2 class="section-title">
+        Funcionalidades principales
+    </h2>
+
+    <div class="features">
+
+        <article class="feature">
+            <h3>📋 Documentos</h3>
+            <p>
+                Presupuestos, órdenes de trabajo, facturas y control operativo.
+            </p>
+        </article>
+
+        <article class="feature">
+            <h3>🚗 Vehículos</h3>
+            <p>
+                Historial completo por patente, VIN y cliente.
+            </p>
+        </article>
+
+        <article class="feature">
+            <h3>📦 Inventario</h3>
+            <p>
+                Control de repuestos, stock y movimientos.
+            </p>
+        </article>
+
+        <article class="feature">
+            <h3>👥 Clientes</h3>
+            <p>
+                Base centralizada con historial y seguimiento.
+            </p>
+        </article>
+
+        <article class="feature">
+            <h3>📊 Reportes</h3>
+            <p>
+                KPIs y métricas para controlar rentabilidad.
+            </p>
+        </article>
+
+        <article class="feature">
+            <h3>☁️ Multi dispositivo</h3>
+            <p>
+                Compatible con PC, tablets y móviles.
+            </p>
+        </article>
+
+    </div>
+
+</section>
+
+<section>
+
+    <h2 class="section-title">
+        Planes
+    </h2>
+
+    <div class="pricing">
+
+        <div class="price-card">
+            <h3>Mensual</h3>
+            <div class="price">$20.000</div>
+            <p>Ideal para comenzar.</p>
+        </div>
+
+        <div class="price-card popular">
+            <h3>Semestral</h3>
+            <div class="price">$110.000</div>
+            <p>Ahorra y escala tu taller.</p>
+        </div>
+
+        <div class="price-card">
+            <h3>Anual</h3>
+            <div class="price">$200.000</div>
+            <p>Máximo rendimiento y soporte.</p>
+        </div>
+
+    </div>
+
+</section>
+
+<footer>
+    © 2026 eGarage Chile · Plataforma SaaS automotriz
+</footer>
+
 </div>
-
-
-  <main class="relative z-10">
-  
-  <!-- Hero Section -->
-  <section class="hero-section">
-    <div class="container mx-auto max-w-7xl">
-      <div class="text-center" data-aos="fade-up">
-        
-        <!-- Logo -->
-        <div class="mb-8 inline-block">
-          <picture>
-            <source media="(max-width: 768px)" srcset="{% static 'img/egarage_logo_mobile.webp' %}" type="image/webp">
-            <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-24 md:h-40 w-auto mx-auto" loading="eager" decoding="async">
-          </picture>
-        </div>
-
-        <!-- Title -->
-        <h1 class="font-futuristic text-6xl md:text-8xl mb-6 futuristic-glow">
-          eGarage Chile
-        </h1>
-        
-        <p class="text-2xl md:text-3xl mb-8 font-light" style="color: #e0e0e0; text-shadow: 0 2px 10px rgba(0,0,0,0.5);">
-          La plataforma definitiva para el sector automotriz en Chile
-        </p>
-
-        <!-- Tipos de Negocios - Quick Overview -->
-        <div class="mb-16 px-4" data-aos="fade-up" data-aos-delay="100">
-          <div class="glass-card p-6 max-w-5xl mx-auto" style="overflow-x: auto;">
-            <div class="flex flex-wrap gap-3 md:gap-4 justify-center items-center text-center min-w-max md:min-w-0">
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 57, 166, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 57, 166, 0.3);">
-                <span style="font-size: 1.3rem;">🔧</span>
-                <span class="whitespace-nowrap">Talleres Mecánicos</span>
-              </div>
-              <span style="color: #D52B1E; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 57, 166, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 57, 166, 0.3);">
-                <span style="font-size: 1.3rem;">🛞</span>
-                <span class="whitespace-nowrap">Vulcanizaciones</span>
-              </div>
-              <span style="color: #D52B1E; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 57, 166, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 57, 166, 0.3);">
-                <span style="font-size: 1.3rem;">⚙️</span>
-                <span class="whitespace-nowrap">Repuestos</span>
-              </div>
-              <span style="color: #D52B1E; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 57, 166, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 57, 166, 0.3);">
-                <span style="font-size: 1.3rem;">🔨</span>
-                <span class="whitespace-nowrap">Hojalatería</span>
-              </div>
-              <span style="color: #D52B1E; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 57, 166, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 57, 166, 0.3);">
-                <span style="font-size: 1.3rem;">🎨</span>
-                <span class="whitespace-nowrap">Pintura</span>
-              </div>
-              <span style="color: #D52B1E; font-size: 1.2rem;" class="hidden lg:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 57, 166, 0.15); color: #4A90E2; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 57, 166, 0.3);">
-                <span style="font-size: 1.3rem;">🔌</span>
-                <span class="whitespace-nowrap">Eléctrica</span>
-              </div>
-            </div>
-          </div>
-          <p class="text-center mt-4" style="color: #b0b0b0; font-size: 0.9rem; font-weight: 500;">
-            Y muchos más tipos de negocios automotrices...
-            <div class="text-center mt-2" style="color:#b0b0b0;font-size:0.95rem;">Desarmadurias</div>
-          </p>
-        </div>
-
-        <!-- Features Section -->
-  <section class="py-20 px-4">
-    <div class="container mx-auto max-w-7xl">
-      
-      <h2 class="font-futuristic text-5xl text-center mb-16 futuristic-glow" data-aos="fade-up">
-        Funcionalidades Poderosas
-      </h2>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        
-        <!-- Feature 1 -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="100">
-          <div class="feature-icon">
-            📋
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Órdenes de Servicio</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Crea, gestiona y rastrea órdenes de servicio digitales con firma electrónica e historial completo.
-          </p>
-        </div>
-
-        <!-- Feature 2 -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="200">
-          <div class="feature-icon">
-            📊
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Análisis Avanzados</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Dashboards inteligentes con métricas de desempeño, facturación y productividad en tiempo real.
-          </p>
-        </div>
-
-        <!-- Feature 3 -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="300">
-          <div class="feature-icon">
-            🚗
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Gestión de Vehículos</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Registro completo de vehículos con historial de mantenimientos, repuestos y servicios realizados.
-          </p>
-        </div>
-
-        <!-- Feature 4 -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="400">
-          <div class="feature-icon">
-            👥
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Portal del Cliente</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Tus clientes siguen el estado de los servicios en tiempo real a través de un portal exclusivo.
-          </p>
-        </div>
-
-        <!-- Feature 5 -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="500">
-          <div class="feature-icon">
-            💰
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Cálculo de IVA</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Cálculo automático del Impuesto al Valor Agregado (IVA 19%) para documentos fiscales.
-          </p>
-        </div>
-
-        <!-- Feature 6 -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="600">
-          <div class="feature-icon">
-            🔔
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Recordatorios Automáticos</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Notificaciones automáticas para clientes sobre revisiones, cambios de aceite y mantenimientos preventivos.
-          </p>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Tipos de Negocios Section -->
-  <section class="py-20 px-4">
-    <div class="container mx-auto max-w-7xl">
-      
-      <h2 class="font-futuristic text-5xl text-center mb-8 futuristic-glow" data-aos="fade-up">
-        Hecho para Todos los Negocios Automotrices
-      </h2>
-      
-      <p class="text-xl text-center mb-16" data-aos="fade-up" data-aos-delay="100" style="color: #d0d0d0; font-weight: 500;">
-        No importa el tipo de servicio automotriz, eGarage es perfecto para ti
-      </p>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        
-        <!-- Talleres Mecánicos -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="100">
-          <div class="feature-icon">
-            🔧
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Talleres Mecánicos</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Gestión completa de órdenes de servicio, diagnósticos, revisiones y mantenimientos preventivos y correctivos.
-          </p>
-        </div>
-
-        <!-- Vulcanizaciones -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="150">
-          <div class="feature-icon">
-            🛞
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Vulcanizaciones</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Control de neumáticos, rotación, balanceo, alineación y stock de neumáticos nuevos y recauchutados.
-          </p>
-        </div>
-
-        <!-- Repuestos -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="200">
-          <div class="feature-icon">
-            ⚙️
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Casas de Repuestos</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Gestión de inventario, ventas, catálogo de repuestos, proveedores y control de entrada y salida.
-          </p>
-        </div>
-
-        <!-- Hojalatería -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="250">
-          <div class="feature-icon">
-            🔨
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Hojalatería y Latonería</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Control de reparaciones, abolladuras, soldaduras y restauración de carrocerías y estructuras.
-          </p>
-        </div>
-
-        <!-- Pintura -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="300">
-          <div class="feature-icon">
-            🎨
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Pintura y Detallado</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Gestión de servicios de pintura, pulido, vitrificado y acabados especiales.
-          </p>
-        </div>
-
-        <!-- Centro Automotriz -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="350">
-          <div class="feature-icon">
-            🚗
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Centro Automotriz</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Solución completa para centros que ofrecen múltiples servicios: mecánica, alineación, balanceo y más.
-          </p>
-        </div>
-
-        <!-- Taller de Suspensión -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="400">
-          <div class="feature-icon">
-            ⚡
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Suspensión y Amortiguadores</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Especializado en sistemas de suspensión, amortiguadores, resortes y kits de suspensión.
-          </p>
-        </div>
-
-        <!-- Mecánica Diesel -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="450">
-          <div class="feature-icon">
-            🚛
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Mecánica Diesel</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Gestión especializada para talleres de vehículos pesados, camiones y motores diesel.
-          </p>
-        </div>
-
-        <!-- Eléctrica Automotriz -->
-        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="500">
-          <div class="feature-icon">
-            🔌
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Eléctrica Automotriz</h3>
-          <p style="color: #d0d0d0; font-size: 1.05rem;">
-            Control de servicios eléctricos, inyección electrónica, batería, alternador y sistemas electrónicos.
-          </p>
-        </div>
-
-      </div>
-
-      <!-- Call to Action -->
-      <div class="text-center mt-16" data-aos="fade-up" data-aos-delay="550">
-        <div class="glass-card p-8 inline-block">
-          <h3 class="text-2xl font-bold mb-4" style="color: #D52B1E; text-shadow: 0 0 20px rgba(213, 43, 30, 0.4);">
-            ¡Y mucho más!
-          </h3>
-          <p style="color: #d0d0d0; font-size: 1.1rem; font-weight: 500; max-width: 600px; margin: 0 auto;">
-            Sea cual sea tu negocio en el sector automotriz, <span style="color: #4A90E2; font-weight: 700;">eGarage se adapta</span> a tus necesidades específicas.
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Chile-specific Section -->
-  <section class="py-20 px-4 bg-gradient-to-b from-transparent to-black">
-    <div class="container mx-auto max-w-5xl text-center">
-      
-      <h2 class="font-futuristic text-5xl mb-8 futuristic-glow" data-aos="fade-up">
-        Hecho para Chile 🇨🇱
-      </h2>
-      
-      <p class="text-xl mb-12" data-aos="fade-up" data-aos-delay="100" style="color: #d0d0d0; font-weight: 500;">
-        Entendemos las necesidades específicas de los talleres chilenos
-      </p>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
-        
-        <div class="glass-card p-6" data-aos="fade-up">
-          <h3 class="text-2xl font-bold mb-4" style="color: #D52B1E;">✅ Conformidad Fiscal</h3>
-          <ul class="space-y-2" style="color: #d0d0d0; font-size: 1.05rem;">
-            <li>• Cálculo automático de IVA (19%)</li>
-            <li>• Control de impuestos</li>
-            <li>• Integración con contabilidad</li>
-          </ul>
-        </div>
-
-        <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="100">
-          <h3 class="text-2xl font-bold mb-4" style="color: #D52B1E;">📱 Mobile First</h3>
-          <ul class="space-y-2" style="color: #d0d0d0; font-size: 1.05rem;">
-            <li>• Interfaz optimizada para móviles</li>
-            <li>• Funciona sin conexión</li>
-            <li>• App nativa (próximamente)</li>
-            <li>• Sincronización automática</li>
-          </ul>
-        </div>
-
-        <div class="glass-card p-6" data-aos="fade-up" data-aos-delay="200">
-          <h3 class="text-2xl font-bold mb-4" style="color: #D52B1E;">💳 Pagos Locales</h3>
-          <ul class="space-y-2" style="color: #d0d0d0; font-size: 1.05rem;">
-            <li>• Transferencias bancarias</li>
-            <li>• Tarjetas de crédito/débito</li>
-            <li>• Webpay integrado</li>
-            <li>• Moneda local (CLP)</li>
-          </ul>
-        </div>
-
-      </div>
-    </div>
-  </section>
-
-  <!-- Pricing Teaser -->
-  <section class="py-20 px-4">
-    <div class="container mx-auto max-w-7xl text-center">
-      
-      <h2 class="font-futuristic text-5xl mb-8 futuristic-glow" data-aos="fade-up">
-        Planes Accesibles
-      </h2>
-      
-      <p class="text-xl mb-12" data-aos="fade-up" data-aos-delay="100" style="color: #d0d0d0; font-weight: 500;">
-        Elige el plan que mejor se adapte a tu negocio
-      </p>
-
-      <!-- Pricing Cards -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        
-        <!-- Plano Mensual -->
-        <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="100">
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Plan Mensual</h3>
-          <div class="mb-6">
-            <div style="color: #4A90E2; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
-              $ 20.000
-            </div>
-            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
-              CLP por mes
-            </div>
-          </div>
-          <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
-            <li>✓ Órdenes ilimitadas</li>
-            <li>✓ Portal del cliente</li>
-            <li>✓ Inventario</li>
-            <li>✓ Soporte 24/7</li>
-          </ul>
-          <a href="/cl/signup/?plan=mensual" class="btn-secondary inline-block w-full">
-            Seleccionar
-          </a>
-        </div>
-
-        <!-- Plano Semestral (DESTACADO) -->
-        <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="200" style="transform: scale(1.05); border: 3px solid rgba(0, 57, 166, 0.8);">
-          <div style="background: linear-gradient(135deg, #0039A6 0%, #D52B1E 100%); color: #fff; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 800; margin-bottom: 1rem; display: inline-block;">
-            🏆 MÁS POPULAR
-          </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #D52B1E;">Plan Semestral</h3>
-          <div class="mb-6">
-            <div style="color: #D52B1E; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
-              $ 110.000
-            </div>
-            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
-              CLP cada 6 meses
-            </div>
-            <div style="color: #4A90E2; font-size: 0.9rem; font-weight: 700; margin-top: 0.5rem;">
-              Ahorra 17%
-            </div>
-          </div>
-          <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
-            <li>✓ Todo del plan mensual</li>
-            <li>✓ Análisis avanzados</li>
-            <li>✓ Multi-sucursales</li>
-            <li>✓ Prioridad en soporte</li>
-          </ul>
-          <a href="/cl/signup/?plan=semestral" class="btn-primary inline-block w-full">
-            Seleccionar
-          </a>
-        </div>
-
-        <!-- Plano Anual -->
-        <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="300">
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Plan Anual</h3>
-          <div class="mb-6">
-            <div style="color: #4A90E2; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
-              $ 200.000
-            </div>
-            <div style="color: #d0d0d0; font-size: 1.2rem; margin-top: 0.5rem;">
-              CLP por año
-            </div>
-            <div style="color: #4A90E2; font-size: 0.9rem; font-weight: 700; margin-top: 0.5rem;">
-              Ahorra 33%
-            </div>
-          </div>
-          <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
-            <li>✓ Todo del plan semestral</li>
-            <li>✓ Capacitación incluida</li>
-            <li>✓ API personalizada</li>
-            <li>✓ Soporte dedicado</li>
-          </ul>
-          <a href="/cl/signup/?plan=anual" class="btn-secondary inline-block w-full">
-            Seleccionar
-          </a>
-        </div>
-
-      </div>
-
-      <!-- Trial Banner -->
-      <div class="glass-card p-12 mb-8" data-aos="fade-up" data-aos-delay="400">
-        <h3 class="text-3xl font-bold mb-6" style="color: #D52B1E; text-shadow: 0 0 20px rgba(213, 43, 30, 0.4);">🎁 Prueba Gratis por 30 Días</h3>
-        <p class="text-xl mb-8" style="color: #d0d0d0; font-weight: 500;">
-          Sin tarjeta de crédito. Sin compromiso. Cancela cuando quieras.
-        </p>
-        <a href="/cl/signup/" class="btn-primary inline-block">
-          🚀 Comenzar Ahora
-        </a>
-      </div>
-
-      <p style="color: #a0a0a0; font-weight: 500;">
-      </p>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer class="py-12 px-4" style="border-top: 2px solid rgba(0, 57, 166, 0.3); background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 100%);">
-    <div class="container mx-auto max-w-7xl">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        
-        <div>
-          <h4 class="font-futuristic text-2xl mb-4" style="color: #4A90E2; text-shadow: 0 0 20px rgba(74, 144, 226, 0.4);">eGarage</h4>
-          <p style="color: #b0b0b0; font-weight: 500;">
-            La plataforma definitiva para talleres mecánicos en Chile.
-          </p>
-        </div>
-
-        <div>
-          <h5 class="font-bold mb-4" style="color: #D52B1E;">Producto</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/cl/es/precios/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Precios</a></li>
-            <li><a href="/cl/demo/localizacion/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Demo</a></li>
-            <li><a href="/cl/documentos/form/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Documentos</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h5 class="font-bold mb-4" style="color: #D52B1E;">Empresa</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/cl/sobre/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Sobre Nosotros</a></li>
-            <li><a href="/cl/contato/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Contacto</a></li>
-            <li><a href="/cl/soporte/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Soporte</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h5 class="font-bold mb-4" style="color: #D52B1E;">Legal</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/cl/privacidad/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Privacidad</a></li>
-            <li><a href="/cl/termos/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Términos</a></li>
-          </ul>
-        </div>
-
-      </div>
-
-      <div class="text-center pt-8" style="border-top: 1px solid rgba(0, 57, 166, 0.2); color: #808080;">
-        <p>&copy; 2025 eGarage Chile. Todos los derechos reservados.</p>
-        <p class="mt-2" style="font-size: 1.05rem;">Plataforma desarrollada para la industria automotriz chilena</p>
-      </div>
-    </div>
-  </footer>
-
-  </main>
-
-  <script>
-    // Initialize AOS (Animate On Scroll)
-    document.addEventListener('DOMContentLoaded', function() {
-      if (window.innerWidth > 768 && typeof AOS !== 'undefined') {
-        AOS.init({
-          duration: 1000,
-          once: true,
-          offset: 100
-        });
-      }
-    });
-  </script>
 
 </body>
 </html>
