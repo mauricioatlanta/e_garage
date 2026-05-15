@@ -7,7 +7,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'dal','dal_select2','django.contrib.admin','django.contrib.auth',
     'django.contrib.contenttypes','django.contrib.sessions','django.contrib.messages',
-    'django.contrib.staticfiles','django.contrib.sites','allauth','allauth.account',
+    'django.contrib.staticfiles','django.contrib.humanize','django.contrib.sites','allauth','allauth.account',
     'allauth.socialaccount','gestion_taller','taller','marketplace','ubicacion'
 ]
 SITE_ID = 1
