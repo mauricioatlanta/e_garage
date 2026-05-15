@@ -61,7 +61,31 @@
 
 <div class="d-flex gap-2">
     <button type="button" class="btn btn-primary" onclick="finalizarOnboarding()">
-        <i class="fas fa-check"></i> Finalizar
+        <i class="fas fa-check"></i> 
+<div class="mt-6 rounded-2xl border border-cyan-500/30 bg-black/30 p-5">
+  <label class="flex items-start gap-4 cursor-pointer">
+    <input
+      type="checkbox"
+      id="cargar_demo"
+      name="cargar_demo"
+      class="mt-1 h-5 w-5"
+      checked
+    >
+
+    <div>
+      <div class="text-white font-bold text-lg">
+        🚀 Desea cargar datos demo?
+      </div>
+
+      <div class="text-slate-300 text-sm mt-1">
+        Se crearán clientes, vehículos, documentos,
+        repuestos, servicios y reportes demo para probar eGarage.
+      </div>
+    </div>
+  </label>
+</div>
+
+Finalizar
     </button>
 </div>
 {% endblock %}
