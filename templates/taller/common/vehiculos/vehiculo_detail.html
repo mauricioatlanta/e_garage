@@ -56,12 +56,12 @@
 
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
                 <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Engine{% else %}Motor{% endif %}</div>
-                <div class="text-white text-lg">{% if vehiculo.motor %}{{ vehiculo.motor.nombre }}{% else %}N/A{% endif %}</div>
+                <div class="text-white text-lg">{% if vehiculo.motor_display %}{{ vehiculo.motor_display.nombre }}{% else %}N/A{% endif %}</div>
               </div>
 
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
                 <div class="text-cyan-400 text-sm font-semibold uppercase tracking-wider">{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Transmission{% else %}Caja{% endif %}</div>
-                <div class="text-white text-lg">{% if vehiculo.caja %}{{ vehiculo.caja.nombre }}{% else %}N/A{% endif %}</div>
+                <div class="text-white text-lg">{% if vehiculo.caja_display %}{{ vehiculo.caja_display.nombre }}{% else %}N/A{% endif %}</div>
               </div>
 
               <div class="bg-black/30 rounded-xl p-4 border border-cyan-400/20">
@@ -205,4 +205,3 @@ document.getElementById('modalEliminacion').addEventListener('click', function(e
 });
 </script>
 {% endblock %}
-

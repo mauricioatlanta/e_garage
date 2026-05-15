@@ -216,6 +216,44 @@ select optgroup {
   margin-top: 4px !important;
   padding: 0 !important;
 }
+.cliente-fallback-search {
+  position: relative;
+  width: 100%;
+}
+.cliente-fallback-results {
+  position: absolute;
+  z-index: 1200;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  max-height: 260px;
+  overflow-y: auto;
+  background: linear-gradient(180deg, rgba(12, 28, 52, 0.99), rgba(7, 18, 35, 0.99));
+  border: 1px solid rgba(0,230,208,0.3);
+  border-radius: 8px;
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.42);
+}
+.cliente-fallback-item,
+.cliente-fallback-empty {
+  display: block;
+  width: 100%;
+  padding: 10px 12px;
+  border: 0;
+  border-bottom: 1px solid rgba(0,230,208,0.08);
+  background: transparent;
+  color: #eaf7ff !important;
+  text-align: left;
+  font-size: 14px;
+}
+.cliente-fallback-item:hover,
+.cliente-fallback-item:focus {
+  background: linear-gradient(180deg, rgba(0,230,208,0.2), rgba(0,179,160,0.15));
+  color: #7ff8ec !important;
+  outline: none;
+}
+.cliente-fallback-empty {
+  color: rgba(225, 241, 255, 0.68) !important;
+}
 .vehicle-form-grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
@@ -1559,9 +1597,14 @@ document.addEventListener('DOMContentLoaded', function() {
             var cajaLista = false;
             
             // Motor inicial
-            {% if vehiculo.motor_id and vehiculo.motor %}
+            {% if vehiculo.motor_empresa_id and vehiculo.motor_empresa %}
+            var motorId = 'empresa:{{ vehiculo.motor_empresa_id }}';
+            var motorNombre = '{{ vehiculo.motor_empresa.nombre|escapejs }}';
+            {% elif vehiculo.motor_id and vehiculo.motor %}
             var motorId = '{{ vehiculo.motor_id }}';
             var motorNombre = '{{ vehiculo.motor.nombre|escapejs }}';
+            {% endif %}
+            {% if vehiculo.motor_display %}
             if (motorSelect.length && motorId) {
                 // Siempre agregar la opciÃ³n si no existe (importante para Select2 autocomplete)
                 if (motorSelect.find('option[value="' + motorId + '"]').length === 0) {
@@ -1601,9 +1644,14 @@ document.addEventListener('DOMContentLoaded', function() {
             {% endif %}
             
             // Caja inicial
-            {% if vehiculo.caja_id and vehiculo.caja %}
+            {% if vehiculo.caja_empresa_id and vehiculo.caja_empresa %}
+            var cajaId = 'empresa:{{ vehiculo.caja_empresa_id }}';
+            var cajaNombre = '{{ vehiculo.caja_empresa.nombre|escapejs }}';
+            {% elif vehiculo.caja_id and vehiculo.caja %}
             var cajaId = '{{ vehiculo.caja_id }}';
             var cajaNombre = '{{ vehiculo.caja.nombre|escapejs }}';
+            {% endif %}
+            {% if vehiculo.caja_display %}
             if (cajaSelect.length && cajaId) {
                 // Siempre agregar la opciÃ³n si no existe (importante para Select2 autocomplete)
                 if (cajaSelect.find('option[value="' + cajaId + '"]').length === 0) {
@@ -1669,9 +1717,161 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     })();
     {% endif %}
+
+    (function initClienteNativeFallback() {
+        const clienteSelect = document.getElementById('id_cliente');
+        if (!clienteSelect) return;
+
+        function hasWorkingSelect2() {
+            return Boolean(
+                window.jQuery &&
+                window.jQuery.fn &&
+                window.jQuery.fn.select2 &&
+                window.jQuery(clienteSelect).hasClass('select2-hidden-accessible')
+            );
+        }
+
+        function endpointUrl() {
+            return clienteSelect.getAttribute('data-autocomplete-light-url') ||
+                   clienteSelect.getAttribute('data-ajax--url') ||
+                   '';
+        }
+
+        function selectedText() {
+            const option = clienteSelect.options[clienteSelect.selectedIndex];
+            if (!option || !option.value) return '';
+            return option.textContent.trim();
+        }
+
+        function buildFallback() {
+            if (hasWorkingSelect2() || clienteSelect.dataset.egClienteFallback === '1') {
+                return;
+            }
+
+            const url = endpointUrl();
+            if (!url) return;
+
+            clienteSelect.dataset.egClienteFallback = '1';
+            clienteSelect.style.display = 'none';
+
+            const wrapper = document.createElement('div');
+            wrapper.className = 'cliente-fallback-search';
+
+            const input = document.createElement('input');
+            input.type = 'search';
+            input.autocomplete = 'off';
+            input.className = 'form-control';
+            input.placeholder = clienteSelect.getAttribute('data-placeholder') || 'Buscar cliente...';
+            input.value = selectedText();
+
+            const results = document.createElement('div');
+            results.className = 'cliente-fallback-results';
+            results.hidden = true;
+
+            clienteSelect.parentNode.insertBefore(wrapper, clienteSelect);
+            wrapper.appendChild(input);
+            wrapper.appendChild(results);
+            wrapper.appendChild(clienteSelect);
+
+            let timer = null;
+            let controller = null;
+
+            function closeResults() {
+                results.hidden = true;
+                results.innerHTML = '';
+            }
+
+            function setClient(id, text) {
+                let option = Array.from(clienteSelect.options).find(function(opt) {
+                    return opt.value === String(id);
+                });
+                if (!option) {
+                    option = new Option(text, id, true, true);
+                    clienteSelect.appendChild(option);
+                }
+                option.selected = true;
+                clienteSelect.value = String(id);
+                input.value = text;
+                clienteSelect.dispatchEvent(new Event('change', { bubbles: true }));
+                closeResults();
+            }
+
+            function renderItems(items) {
+                results.innerHTML = '';
+                if (!items.length) {
+                    const empty = document.createElement('div');
+                    empty.className = 'cliente-fallback-empty';
+                    empty.textContent = 'No se encontraron clientes';
+                    results.appendChild(empty);
+                    results.hidden = false;
+                    return;
+                }
+
+                items.forEach(function(item) {
+                    const button = document.createElement('button');
+                    button.type = 'button';
+                    button.className = 'cliente-fallback-item';
+                    button.textContent = item.text || item.nombre || '';
+                    button.addEventListener('click', function() {
+                        setClient(item.id, button.textContent);
+                    });
+                    results.appendChild(button);
+                });
+                results.hidden = false;
+            }
+
+            function search(term) {
+                const q = term.trim();
+                if (q.length < 1) {
+                    closeResults();
+                    return;
+                }
+
+                if (controller) controller.abort();
+                controller = new AbortController();
+
+                const separator = url.indexOf('?') === -1 ? '?' : '&';
+                fetch(url + separator + 'q=' + encodeURIComponent(q), {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+                    signal: controller.signal
+                })
+                .then(function(response) {
+                    if (!response.ok) throw new Error('Error buscando clientes');
+                    return response.json();
+                })
+                .then(function(payload) {
+                    renderItems(Array.isArray(payload) ? payload : (payload.results || []));
+                })
+                .catch(function(error) {
+                    if (error.name !== 'AbortError') {
+                        results.innerHTML = '<div class="cliente-fallback-empty">Error al buscar clientes</div>';
+                        results.hidden = false;
+                    }
+                });
+            }
+
+            input.addEventListener('input', function() {
+                clienteSelect.value = '';
+                window.clearTimeout(timer);
+                timer = window.setTimeout(function() {
+                    search(input.value);
+                }, 220);
+            });
+
+            input.addEventListener('focus', function() {
+                if (input.value.trim()) search(input.value);
+            });
+
+            document.addEventListener('click', function(event) {
+                if (!wrapper.contains(event.target)) closeResults();
+            });
+        }
+
+        window.setTimeout(buildFallback, 1200);
+        window.setTimeout(buildFallback, 2500);
+    })();
 });
 </script>
 {# form.media (DAL/Select2) se carga UNA SOLA VEZ en base.html (CSS en head, JS al final). NO duplicar aquÃ­. #}
 
 {% endblock %}
-

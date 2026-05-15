@@ -342,6 +342,7 @@ urlpatterns = [
     ),
     # Login personalizado con contexto de paÃ­s
     path("accounts/login/", country_aware_login, name="account_login"),
+    path("accounts/profile/", country_aware_workspace_redirect, name="account_profile_redirect"),
     path("accounts/logout/", safe_logout_view, name="account_logout"),
     # Signup personalizado con CustomSignupView (ANTES de allauth.urls para que tenga prioridad)
     path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
@@ -912,4 +913,3 @@ if settings.DEBUG:
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     """Redirige registro al nivel global (alias para signup)"""
-

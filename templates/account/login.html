@@ -25,26 +25,33 @@
     </div>
   </div>
 
-  {% if form.errors %}
+  {% if form.non_field_errors %}
+  <div class="alert">
+    {{ form.non_field_errors.0 }}
+  </div>
+  {% elif form.errors %}
   <div class="alert">
     Usuario o contraseña inválidos.
   </div>
   {% endif %}
 
-  <form method="post" action="{% url 'account_login' %}">
+  <form method="post" action="">
     {% csrf_token %}
 
     <div class="form-group">
       <label class="form-label" for="id_login">
-        {% trans "Email" %}
+        {% trans "Usuario o email" %}
       </label>
 
       <input
-        type="email"
+        type="text"
         name="login"
         id="id_login"
         class="form-input"
-        autocomplete="email"
+        autocomplete="username"
+        autocapitalize="none"
+        autocorrect="off"
+        spellcheck="false"
         required
       >
     </div>

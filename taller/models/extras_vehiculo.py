@@ -193,6 +193,51 @@ class MotorVehiculo(models.Model):
         return qs
 
 
+class MotorVehiculoEmpresa(models.Model):
+    """Motor custom privado de una empresa para un modelo concreto."""
+
+    empresa = models.ForeignKey(
+        "taller.Empresa",
+        on_delete=models.CASCADE,
+        related_name="motores_privados",
+        db_index=True,
+    )
+    modelo = models.ForeignKey(
+        Modelo,
+        on_delete=models.CASCADE,
+        related_name="motores_privados",
+        db_index=True,
+    )
+    country = models.CharField(
+        max_length=2,
+        default="CL",
+        choices=[("CL", "Chile"), ("US", "Estados Unidos"), ("MX", "México")],
+        db_index=True,
+        verbose_name="País",
+    )
+    nombre = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ["nombre"]
+        verbose_name = "Motor privado de empresa"
+        verbose_name_plural = "Motores privados de empresa"
+        constraints = [
+            models.UniqueConstraint(
+                Lower("nombre"),
+                "empresa",
+                "modelo",
+                "country",
+                name="uniq_motor_empresa_modelo_country_lowernombre",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["empresa", "modelo", "country", "nombre"]),
+        ]
+
+    def __str__(self):
+        return self.nombre
+
+
 class CajaVehiculo(models.Model):
     """
     Cajas de transmisión de vehículos con scoping por país (y opcionalmente por empresa).
@@ -244,3 +289,48 @@ class CajaVehiculo(models.Model):
         # if empresa is not None:
         #     qs = qs.filter(empresa=empresa)
         return qs
+
+
+class CajaVehiculoEmpresa(models.Model):
+    """Caja/transmisión custom privada de una empresa para un modelo concreto."""
+
+    empresa = models.ForeignKey(
+        "taller.Empresa",
+        on_delete=models.CASCADE,
+        related_name="cajas_privadas",
+        db_index=True,
+    )
+    modelo = models.ForeignKey(
+        Modelo,
+        on_delete=models.CASCADE,
+        related_name="cajas_privadas",
+        db_index=True,
+    )
+    country = models.CharField(
+        max_length=2,
+        default="CL",
+        choices=[("CL", "Chile"), ("US", "Estados Unidos"), ("MX", "México")],
+        db_index=True,
+        verbose_name="País",
+    )
+    nombre = models.CharField(max_length=100)
+
+    class Meta:
+        ordering = ["nombre"]
+        verbose_name = "Caja privada de empresa"
+        verbose_name_plural = "Cajas privadas de empresa"
+        constraints = [
+            models.UniqueConstraint(
+                Lower("nombre"),
+                "empresa",
+                "modelo",
+                "country",
+                name="uniq_caja_empresa_modelo_country_lowernombre",
+            ),
+        ]
+        indexes = [
+            models.Index(fields=["empresa", "modelo", "country", "nombre"]),
+        ]
+
+    def __str__(self):
+        return self.nombre

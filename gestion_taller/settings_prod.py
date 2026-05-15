@@ -123,7 +123,7 @@ SECURE_REFERRER_POLICY = (
 # Email
 # =========================
 # Backend real por API HTTPS (Resend), sin dependencia de SMTP.
-EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+# EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
 
 DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl")
 SERVER_EMAIL = env_str("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
@@ -145,6 +145,17 @@ ANYMAIL = {
 ACCOUNT_EMAIL_VERIFICATION = env_str("ACCOUNT_EMAIL_VERIFICATION", "mandatory")
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = env_bool("ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION", True)
 
+# Allauth usa /accounts/profile/ por defecto si no existe una redireccion explicita.
+# En eGarage, despues de iniciar sesion se debe entrar al workspace country-aware.
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/cl/es/workspace/"
+ACCOUNT_ADAPTER = "taller.views_extra.account_adapter.CountryAwareAccountAdapter"
+ACCOUNT_FORMS = {
+    "login": "taller.forms.custom_login.CustomLoginForm",
+    "signup": "taller.forms.custom_signup.CustomSignupForm",
+}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+
 
 # =========================
 # DB: Configuración unificada para DigitalOcean
@@ -158,7 +169,7 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = env_bool("ACCOUNT_LOGIN_ON_EMAIL_CONFIRMAT
 #   DJANGO_DB_HOST=127.0.0.1
 #   DJANGO_DB_PORT=5432
 
-DB_ENGINE = env_str("DJANGO_DB_ENGINE", "postgresql").lower()
+DB_ENGINE = env_str("DJANGO_DB_ENGINE", "sqlite3").lower()
 
 if DB_ENGINE == "postgresql" or DB_ENGINE == "postgres":
     # PostgreSQL - Configuración para producción
@@ -211,6 +222,29 @@ TEMPLATES[0]["DIRS"] = [str(_base_dir / "templates")]
 
 # Seguridad extra: evita que alguien meta rutas raras por accidente
 TEMPLATES[0]["DIRS"] = [str(Path(p).resolve()) for p in TEMPLATES[0]["DIRS"]]
+
+_context_processors = TEMPLATES[0].setdefault("OPTIONS", {}).setdefault("context_processors", [])
+for _processor in [
+    "django.template.context_processors.media",
+    "django.template.context_processors.static",
+    "django.template.context_processors.tz",
+    "taller.context_processors.empresa_contexto",
+    "taller.context_processors.namespaces.ui_namespaces",
+    "taller.context_processors.company_context",
+    "taller.context_processors.company_branding",
+    "taller.context_processors.company_country",
+    "taller.context_processors.company_header",
+    "taller.context_processors.panel_chrome.us_authenticated_compact_chrome",
+    "taller.context_processors.panel_chrome.us_signup_slim_header",
+    "taller.context_processors.country_config.country_context",
+    "taller.context_processors.feature_flags.country_features",
+    "taller.context_processors.ui_labels.ui_labels_context",
+    "taller.context_processors.subscription_status.subscription_status",
+    "taller.context_processors.support_context",
+    "taller.context_processors.ayuda_contextual.ayuda_contextual",
+]:
+    if _processor not in _context_processors:
+        _context_processors.append(_processor)
 
 # --- FIX FINAL DIGITALOCEAN ---
 DEBUG = False
@@ -306,3 +340,11 @@ CACHES = {
 
 # Fix móvil: evita mismatch entre cookie csrftoken y formulario cacheado/prefetch Cloudflare/Samsung
 CSRF_USE_SESSIONS = True
+
+# BLOQUE SQLITE FINAL DESACTIVADO:
+# La base de datos de producción debe quedar definida arriba por DJANGO_DB_ENGINE.
+# Nunca sobrescribir DATABASES aquí.
+
+EMAIL_BACKEND = 'gestion_taller.resend_backend.ResendBackend'
+RESEND_API_KEY = 're_tu_llave_aqui'
+DEFAULT_FROM_EMAIL = 'support@egarage.cl'

@@ -60,7 +60,13 @@ from .regimen_fiscal import RegimenFiscal
 from .marcas_usa import MarcaVehiculo, ModeloVehiculo
 
 # Modelos de extras de vehículos
-from .extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
+from .extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    ColorVehiculo,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
 
 __all__ = [
     # Modelos básicos
@@ -110,8 +116,10 @@ __all__ = [
     "ModeloVehiculo",
     # Extras de vehículos
     "CajaVehiculo",
+    "CajaVehiculoEmpresa",
     "ColorVehiculo",
     "MotorVehiculo",
+    "MotorVehiculoEmpresa",
 ]
 
 # Intentar importar otros modelos si existen (para compatibilidad)

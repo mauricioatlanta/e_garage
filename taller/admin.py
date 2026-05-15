@@ -12,6 +12,7 @@ from taller.models.color_cliente import ColorCliente
 from taller.models.comprobante_pago import ComprobantePago
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
+from taller.models.extras_vehiculo import CajaVehiculoEmpresa, MotorVehiculoEmpresa
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
 from taller.models.precio_suscripcion import PrecioSuscripcion
@@ -833,6 +834,26 @@ class ConfigEmpresaAdmin(admin.ModelAdmin):
 
     def has_view_permission(self, request, obj=None):
         return request.user.is_staff
+
+
+@admin.register(MotorVehiculoEmpresa, site=admin_site)
+class MotorVehiculoEmpresaAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "empresa", "modelo", "country")
+    list_filter = ("country", "empresa")
+    search_fields = ("nombre", "empresa__nombre_taller", "modelo__nombre")
+    raw_id_fields = ("empresa", "modelo")
+    list_select_related = ("empresa", "modelo", "modelo__marca")
+    ordering = ("empresa__nombre_taller", "modelo__nombre", "nombre")
+
+
+@admin.register(CajaVehiculoEmpresa, site=admin_site)
+class CajaVehiculoEmpresaAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "empresa", "modelo", "country")
+    list_filter = ("country", "empresa")
+    search_fields = ("nombre", "empresa__nombre_taller", "modelo__nombre")
+    raw_id_fields = ("empresa", "modelo")
+    list_select_related = ("empresa", "modelo", "modelo__marca")
+    ordering = ("empresa__nombre_taller", "modelo__nombre", "nombre")
 
 
 # Importar admin de memoria (se auto-registran con @admin.register)

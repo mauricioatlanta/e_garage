@@ -1569,9 +1569,14 @@ $(document).ready(function() {
             var cajaSelect = $('#id_caja');
             
             // Motor inicial
-            {% if vehiculo and vehiculo.motor_id and vehiculo.motor %}
+            {% if vehiculo and vehiculo.motor_empresa_id and vehiculo.motor_empresa %}
+            var motorId = "empresa:{{ vehiculo.motor_empresa_id|escapejs }}";
+            var motorNombre = "{{ vehiculo.motor_empresa.nombre|escapejs }}";
+            {% elif vehiculo and vehiculo.motor_id and vehiculo.motor %}
             var motorId = "{{ vehiculo.motor_id|escapejs }}";
             var motorNombre = "{{ vehiculo.motor.nombre|escapejs }}";
+            {% endif %}
+            {% if vehiculo and vehiculo.motor_display %}
             if (motorSelect.length && motorId) {
                 // Verificar si Select2 está inicializado
                 if (motorSelect.hasClass('select2-hidden-accessible')) {
@@ -1590,9 +1595,14 @@ $(document).ready(function() {
             {% endif %}
             
             // Caja inicial
-            {% if vehiculo and vehiculo.caja_id and vehiculo.caja %}
+            {% if vehiculo and vehiculo.caja_empresa_id and vehiculo.caja_empresa %}
+            var cajaId = 'empresa:{{ vehiculo.caja_empresa_id }}';
+            var cajaNombre = '{{ vehiculo.caja_empresa.nombre|escapejs }}';
+            {% elif vehiculo and vehiculo.caja_id and vehiculo.caja %}
             var cajaId = '{{ vehiculo.caja_id }}';
             var cajaNombre = '{{ vehiculo.caja.nombre|escapejs }}';
+            {% endif %}
+            {% if vehiculo and vehiculo.caja_display %}
             if (cajaSelect.length && cajaId) {
                 // Verificar si Select2 está inicializado
                 if (cajaSelect.hasClass('select2-hidden-accessible')) {

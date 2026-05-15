@@ -1,0 +1,14 @@
+May 15 00:48:22 egarage-server gunicorn[2657603]: [2026-05-15 00:48:22 +0000] [2657603] [INFO] Handling signal: term
+May 15 00:48:22 egarage-server gunicorn[2657605]: [2026-05-14 20:48:22 -0400] [2657605] [INFO] Worker exiting (pid: 2657605)
+May 15 00:48:22 egarage-server systemd[1]: Stopping gunicorn.service - gunicorn daemon for egarage...
+May 15 00:48:22 egarage-server gunicorn[2657603]: [2026-05-15 00:48:22 +0000] [2657603] [INFO] Worker (pid:2657605) was sent SIGTERM!
+May 15 00:48:22 egarage-server gunicorn[2657603]: [2026-05-15 00:48:22 +0000] [2657603] [INFO] Shutting down: Master
+May 15 00:48:22 egarage-server systemd[1]: gunicorn.service: Deactivated successfully.
+May 15 00:48:22 egarage-server systemd[1]: Stopped gunicorn.service - gunicorn daemon for egarage.
+May 15 00:48:22 egarage-server systemd[1]: gunicorn.service: Consumed 8.787s CPU time.
+May 15 00:48:22 egarage-server systemd[1]: Started gunicorn.service - gunicorn daemon for egarage.
+May 15 00:48:22 egarage-server gunicorn[2657933]: [2026-05-15 00:48:22 +0000] [2657933] [INFO] Starting gunicorn 26.0.0
+May 15 00:48:22 egarage-server gunicorn[2657933]: [2026-05-15 00:48:22 +0000] [2657933] [INFO] Listening at: unix:/run/gunicorn/gunicorn.sock (2657933)
+May 15 00:48:22 egarage-server gunicorn[2657933]: [2026-05-15 00:48:22 +0000] [2657933] [INFO] Using worker: sync
+May 15 00:48:22 egarage-server gunicorn[2657935]: [2026-05-15 00:48:22 +0000] [2657935] [INFO] Booting worker with pid: 2657935
+May 15 00:48:22 egarage-server gunicorn[2657933]: [2026-05-15 00:48:22 +0000] [2657933] [INFO] Control socket listening at /root/.gunicorn/gunicorn.ctl

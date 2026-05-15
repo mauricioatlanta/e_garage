@@ -128,7 +128,7 @@ REST_FRAMEWORK = {
 # ---------- Middleware (reorden menor sugerido) ----------
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "taller.middleware.safe_session.SafeSessionMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     # LocaleMiddleware debe ir DESPUÉS de SessionMiddleware
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",

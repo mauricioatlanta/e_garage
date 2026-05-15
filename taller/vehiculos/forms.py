@@ -7,7 +7,13 @@ from django.utils.translation import gettext_lazy as _
 
 from taller.models import Vehiculo
 from taller.models.clientes import Cliente
-from taller.models.extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
+from taller.models.extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    ColorVehiculo,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
 from taller.vehiculos.catalog_bootstrap import ensure_vehicle_catalog_for_country
 
 # Sentinel global para "Agregar nuevo"
@@ -721,11 +727,10 @@ class VehiculoForm(forms.ModelForm):
         else:
             autocomplete_ns = "taller:vehiculos"
 
-        self.fields["motor"] = forms.ModelChoiceField(
-            queryset=MotorVehiculo.objects.filter(country=pais),
+        self.fields["motor"] = forms.CharField(
             required=False,
             label="Engine",
-            widget=autocomplete.ModelSelect2(
+            widget=autocomplete.Select2(
                 url=f"{autocomplete_ns}:motor-autocomplete",
                 attrs={
                     "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
@@ -737,11 +742,10 @@ class VehiculoForm(forms.ModelForm):
             ),
         )
 
-        self.fields["caja"] = forms.ModelChoiceField(
-            queryset=CajaVehiculo.objects.filter(country=pais),
+        self.fields["caja"] = forms.CharField(
             required=False,
             label="Transmission",
-            widget=autocomplete.ModelSelect2(
+            widget=autocomplete.Select2(
                 url=f"{autocomplete_ns}:caja-autocomplete",
                 attrs={
                     "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
@@ -846,11 +850,10 @@ class VehiculoForm(forms.ModelForm):
         else:
             autocomplete_ns = "taller:vehiculos"
 
-        self.fields["motor"] = forms.ModelChoiceField(
-            queryset=MotorVehiculo.objects.filter(country=pais),
+        self.fields["motor"] = forms.CharField(
             required=False,
             label="Motor",
-            widget=autocomplete.ModelSelect2(
+            widget=autocomplete.Select2(
                 url=f"{autocomplete_ns}:motor-autocomplete",
                 attrs={
                     "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
@@ -862,11 +865,10 @@ class VehiculoForm(forms.ModelForm):
             ),
         )
 
-        self.fields["caja"] = forms.ModelChoiceField(
-            queryset=CajaVehiculo.objects.filter(country=pais),
+        self.fields["caja"] = forms.CharField(
             required=False,
             label="Transmisión",
-            widget=autocomplete.ModelSelect2(
+            widget=autocomplete.Select2(
                 url=f"{autocomplete_ns}:caja-autocomplete",
                 attrs={
                     "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
@@ -974,7 +976,9 @@ class VehiculoForm(forms.ModelForm):
 
             # Establecer motor inicial
             motor_initial = None
-            if self.instance.motor_id:
+            if getattr(self.instance, "motor_empresa_id", None):
+                motor_initial = f"empresa:{self.instance.motor_empresa_id}"
+            elif self.instance.motor_id:
                 motor_initial = str(self.instance.motor_id)
             elif self.data and "motor" in self.data:
                 motor_initial = self.data.get("motor")
@@ -984,7 +988,9 @@ class VehiculoForm(forms.ModelForm):
 
             # Establecer caja inicial
             caja_initial = None
-            if self.instance.caja_id:
+            if getattr(self.instance, "caja_empresa_id", None):
+                caja_initial = f"empresa:{self.instance.caja_empresa_id}"
+            elif self.instance.caja_id:
                 caja_initial = str(self.instance.caja_id)
             elif self.data and "caja" in self.data:
                 caja_initial = self.data.get("caja")
@@ -1437,36 +1443,80 @@ class VehiculoForm(forms.ModelForm):
         return None
 
     def clean_motor(self):
-        """Manejar motor - ahora es ModelChoiceField, recibe instancia directamente"""
-        motor = self.cleaned_data.get("motor")
+        """Aceptar motores globales o privados con prefijo empresa:<id>."""
+        raw_value = (self.cleaned_data.get("motor") or "").strip()
+        empresa = getattr(self.user, "empresa", None)
+        pais = self._resolve_country(self.user, self.request, default="CL")
+        modelo = self.cleaned_data.get("modelo")
 
-        # Si está vacío o es None, retornar None
-        if not motor:
+        if not raw_value:
+            self._motor_empresa_obj = None
             return None
 
-        # ✅ Verificar pertenencia al modelo seleccionado (si tu relación es M2M 'modelos')
-        modelo = self.cleaned_data.get("modelo")
-        if modelo and hasattr(motor, "modelos"):
-            # Si el motor no está asociado al modelo, asociarlo automáticamente
-            if not motor.modelos.filter(pk=modelo.pk).exists():
-                motor.modelos.add(modelo)
+        if raw_value.startswith("empresa:"):
+            if not empresa or not modelo:
+                raise forms.ValidationError("Motor privado no válido para esta empresa/modelo")
+            private_id = raw_value.split(":", 1)[1]
+            try:
+                motor_privado = MotorVehiculoEmpresa.objects.get(
+                    pk=private_id,
+                    empresa=empresa,
+                    modelo=modelo,
+                    country=pais,
+                )
+            except (MotorVehiculoEmpresa.DoesNotExist, ValueError):
+                raise forms.ValidationError("Motor privado no válido")
+            self._motor_empresa_obj = motor_privado
+            return None
+
+        motor_id = raw_value.split(":", 1)[1] if raw_value.startswith("global:") else raw_value
+        try:
+            motor = MotorVehiculo.objects.get(pk=motor_id, country=pais)
+        except (MotorVehiculo.DoesNotExist, ValueError):
+            raise forms.ValidationError("Motor no válido")
+
+        self._motor_empresa_obj = None
+        if modelo and hasattr(motor, "modelos") and not motor.modelos.filter(pk=modelo.pk).exists():
+            motor.modelos.add(modelo)
 
         return motor
 
     def clean_caja(self):
-        """Manejar caja - ahora es ModelChoiceField, recibe instancia directamente"""
-        caja = self.cleaned_data.get("caja")
+        """Aceptar cajas globales o privadas con prefijo empresa:<id>."""
+        raw_value = (self.cleaned_data.get("caja") or "").strip()
+        empresa = getattr(self.user, "empresa", None)
+        pais = self._resolve_country(self.user, self.request, default="CL")
+        modelo = self.cleaned_data.get("modelo")
 
-        # Si está vacío o es None, retornar None
-        if not caja:
+        if not raw_value:
+            self._caja_empresa_obj = None
             return None
 
-        # ✅ Verificar pertenencia al modelo seleccionado (M2M 'modelos')
-        modelo = self.cleaned_data.get("modelo")
-        if modelo and hasattr(caja, "modelos"):
-            # Si la caja no está asociada al modelo, asociarla automáticamente
-            if not caja.modelos.filter(pk=modelo.pk).exists():
-                caja.modelos.add(modelo)
+        if raw_value.startswith("empresa:"):
+            if not empresa or not modelo:
+                raise forms.ValidationError("Caja privada no válida para esta empresa/modelo")
+            private_id = raw_value.split(":", 1)[1]
+            try:
+                caja_privada = CajaVehiculoEmpresa.objects.get(
+                    pk=private_id,
+                    empresa=empresa,
+                    modelo=modelo,
+                    country=pais,
+                )
+            except (CajaVehiculoEmpresa.DoesNotExist, ValueError):
+                raise forms.ValidationError("Caja privada no válida")
+            self._caja_empresa_obj = caja_privada
+            return None
+
+        caja_id = raw_value.split(":", 1)[1] if raw_value.startswith("global:") else raw_value
+        try:
+            caja = CajaVehiculo.objects.get(pk=caja_id, country=pais)
+        except (CajaVehiculo.DoesNotExist, ValueError):
+            raise forms.ValidationError("Caja no válida")
+
+        self._caja_empresa_obj = None
+        if modelo and hasattr(caja, "modelos") and not caja.modelos.filter(pk=modelo.pk).exists():
+            caja.modelos.add(modelo)
 
         return caja
 
@@ -1513,27 +1563,49 @@ class VehiculoForm(forms.ModelForm):
 
         # Motor
         if motor_nombre:
-            kwargs = {"nombre": motor_nombre}
-            if hasattr(MotorVehiculo, "country"):
-                kwargs["country"] = pais
-            if hasattr(MotorVehiculo, "empresa") and empresa:
-                kwargs["empresa"] = empresa
-            motor_obj, _ = MotorVehiculo.objects.get_or_create(**kwargs)
-            vehiculo.motor = motor_obj
-            if modelo and hasattr(motor_obj, "modelos"):
-                motor_obj.modelos.add(modelo)
+            if empresa and modelo:
+                motor_obj, _ = MotorVehiculoEmpresa.objects.get_or_create(
+                    empresa=empresa,
+                    modelo=modelo,
+                    country=pais,
+                    nombre=motor_nombre,
+                )
+                vehiculo.motor = None
+                vehiculo.motor_empresa = motor_obj
+            else:
+                kwargs = {"nombre": motor_nombre}
+                if hasattr(MotorVehiculo, "country"):
+                    kwargs["country"] = pais
+                motor_obj, _ = MotorVehiculo.objects.get_or_create(**kwargs)
+                vehiculo.motor = motor_obj
+                vehiculo.motor_empresa = None
+                if modelo and hasattr(motor_obj, "modelos"):
+                    motor_obj.modelos.add(modelo)
+        else:
+            vehiculo.motor_empresa = getattr(self, "_motor_empresa_obj", None)
 
         # Caja
         if caja_nombre:
-            kwargs = {"nombre": caja_nombre}
-            if hasattr(CajaVehiculo, "country"):
-                kwargs["country"] = pais
-            if hasattr(CajaVehiculo, "empresa") and empresa:
-                kwargs["empresa"] = empresa
-            caja_obj, _ = CajaVehiculo.objects.get_or_create(**kwargs)
-            vehiculo.caja = caja_obj
-            if modelo and hasattr(caja_obj, "modelos"):
-                caja_obj.modelos.add(modelo)
+            if empresa and modelo:
+                caja_obj, _ = CajaVehiculoEmpresa.objects.get_or_create(
+                    empresa=empresa,
+                    modelo=modelo,
+                    country=pais,
+                    nombre=caja_nombre,
+                )
+                vehiculo.caja = None
+                vehiculo.caja_empresa = caja_obj
+            else:
+                kwargs = {"nombre": caja_nombre}
+                if hasattr(CajaVehiculo, "country"):
+                    kwargs["country"] = pais
+                caja_obj, _ = CajaVehiculo.objects.get_or_create(**kwargs)
+                vehiculo.caja = caja_obj
+                vehiculo.caja_empresa = None
+                if modelo and hasattr(caja_obj, "modelos"):
+                    caja_obj.modelos.add(modelo)
+        else:
+            vehiculo.caja_empresa = getattr(self, "_caja_empresa_obj", None)
 
         if commit:
             vehiculo.save()
