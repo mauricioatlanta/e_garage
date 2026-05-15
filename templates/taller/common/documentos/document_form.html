@@ -14,7 +14,7 @@
 
 {% block content %}
 {% with active_country=empresa.pais|default:'CL' %}
-{% with current_country=country_code|default:request.country|default:active_country|default:'CL' %}
+{% with current_country=country_code|default:active_country|default:'CL' %}
 <form
   method="post"
   id="document-form"

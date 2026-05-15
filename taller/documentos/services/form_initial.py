@@ -35,7 +35,7 @@ def build_form_initial_state(*, form_mode=None, source_document=None, **kwargs):
     base_initial = dict(kwargs.get("base_initial", {}) or {})
 
     initial = {
-        "fecha_emision": timezone.localdate(),
+        "fecha_emision": timezone.now().date(),
     }
     initial.update(base_initial)
 
