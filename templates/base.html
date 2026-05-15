@@ -85,7 +85,7 @@
       border-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
     }
     .border-primary{border-color:var(--company-primary)!important}
-    .company-logo{max-height:220px;max-width:500px;object-fit:contain;transition:transform 0.3s ease,filter 0.3s ease}
+    .company-logo{max-height:42px;max-width:180px;object-fit:contain;transition:transform 0.3s ease,filter 0.3s ease}
     .company-logo:hover{transform:scale(1.05);filter:drop-shadow(0 0 25px rgba(0,245,255,0.9))!important}
     .company-header{
       background:linear-gradient(135deg,rgba(10,14,39,0.95) 0%,rgba(15,23,52,0.95) 50%,rgba(10,14,39,0.95) 100%);
@@ -759,7 +759,7 @@
         {# Logo personalizado de la empresa del suscriptor - Prioridad: LOGO_PERSONALIZADO > company_logo_url > COMPANY_LOGO #}
         <img src="{% if LOGO_PERSONALIZADO %}{{ LOGO_PERSONALIZADO }}{% elif company_logo_url %}{{ company_logo_url }}{% else %}{{ COMPANY_LOGO }}{% endif %}" 
              alt="{% if NOMBRE_EMPRESA_PERSONALIZADO %}{{ NOMBRE_EMPRESA_PERSONALIZADO }}{% elif company_name %}{{ request.empresa.nombre_taller }}{% elif COMPANY_NAME %}{{ COMPANY_NAME }}{% else %}Logo{% endif %}"
-             class="company-logo h-24 sm:h-32 w-auto object-contain rounded-lg shadow-2xl border-2 border-opacity-40"
+             class="company-logo w-auto object-contain rounded-md shadow-lg border border-opacity-30"
              style="border-color: {{ COLOR_PRIMARIO|default:company_color|default:'#00ffff' }}; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));">
       {% endif %}
 
