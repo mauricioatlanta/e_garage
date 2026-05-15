@@ -94,10 +94,24 @@ document.addEventListener('DOMContentLoaded', function(){
 
   if (!form || !button) return;
 
-  button.addEventListener('click', function(e){
-    e.preventDefault();
-    form.submit();
-  });
+  let humanInteracted = false;
+
+    ['touchstart','pointerdown','mousedown','keydown'].forEach(function(evt){
+      button.addEventListener(evt, function(){
+        humanInteracted = true;
+      }, {passive:true});
+    });
+
+    button.addEventListener('click', function(e){
+      e.preventDefault();
+
+      if (!humanInteracted) {
+        console.warn('Blocked non-human login submit');
+        return;
+      }
+
+      HTMLFormElement.prototype.submit.call(form);
+    });
 });
 </script>
 {% endblock %}
