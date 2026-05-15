@@ -1,2 +1,0 @@
-# Para formateo de montos en palabras
-num2words==0.5.13

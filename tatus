@@ -1,9 +1,0 @@
-warning: in the working copy of 'static/js/document-form/index.js', CRLF will be replaced by LF the next time Git touches it
-warning: in the working copy of 'templates/taller/common/documentos/document_form.html', CRLF will be replaced by LF the next time Git touches it
- .vscode/settings.json                              |    3 [32m+[m[31m-[m
- static/js/document-form/index.js                   |   26 [32m+[m[31m-[m
- static/js/emergency_fix_vehiculos.js               |  201 [31m--[m
- static/js/fix_vehiculos_select2.js                 |  299 [31m--[m
- static/js/formulario_documento.js                  |  640 [31m-----[m
- .../taller/common/documentos/document_form.html    | 2882 [32m++[m[31m------------------[m
- 6 files changed, 262 insertions(+), 3789 deletions(-)

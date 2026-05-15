@@ -1,1 +1,0 @@
-{% extends "taller/common/documentos/editar_documento_nuevo.html" %}
