@@ -35,7 +35,7 @@
   </div>
   {% endif %}
 
-  <form method="post" action="">
+  <form method="post" action="" id="eg-login-form" autocomplete="off">
     {% csrf_token %}
 
     <div class="form-group">
@@ -48,7 +48,7 @@
         name="login"
         id="id_login"
         class="form-input"
-        autocomplete="username"
+        autocomplete="off"
         autocapitalize="none"
         autocorrect="off"
         spellcheck="false"
@@ -66,12 +66,12 @@
         name="password"
         id="id_password"
         class="form-input"
-        autocomplete="current-password"
+        autocomplete="off"
         required
       >
     </div>
 
-    <button type="submit" class="login-button">
+    <button type="button" class="login-button" id="eg-login-button">
       {% trans "Ingresar" %}
     </button>
 
@@ -85,37 +85,20 @@
 
 </div>
 
-{% endblock %}
-
-
+{% endblock %}\n\n
 {% block extra_js %}
 <script>
 document.addEventListener('DOMContentLoaded', function(){
-  const form = document.querySelector('form');
-  const button = document.querySelector('.login-button');
+  const form = document.getElementById('eg-login-form');
+  const button = document.getElementById('eg-login-button');
 
   if (!form || !button) return;
 
-  let explicitSubmit = false;
-
-  button.addEventListener('pointerdown', function(){
-    explicitSubmit = true;
-  });
-
-  button.addEventListener('click', function(){
-    explicitSubmit = true;
-  });
-
-  form.addEventListener('submit', function(e){
-    if (explicitSubmit) return true;
-
+  button.addEventListener('click', function(e){
     e.preventDefault();
-    e.stopPropagation();
-
-    console.log('Blocked mobile implicit login submit');
-    return false;
-  }, true);
+    form.submit();
+  });
 });
 </script>
 {% endblock %}
-
+\n
