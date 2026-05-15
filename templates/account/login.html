@@ -86,3 +86,36 @@
 </div>
 
 {% endblock %}
+
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  const form = document.querySelector('form');
+  const button = document.querySelector('.login-button');
+
+  if (!form || !button) return;
+
+  let explicitSubmit = false;
+
+  button.addEventListener('pointerdown', function(){
+    explicitSubmit = true;
+  });
+
+  button.addEventListener('click', function(){
+    explicitSubmit = true;
+  });
+
+  form.addEventListener('submit', function(e){
+    if (explicitSubmit) return true;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    console.log('Blocked mobile implicit login submit');
+    return false;
+  }, true);
+});
+</script>
+{% endblock %}
+
