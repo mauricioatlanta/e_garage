@@ -129,3 +129,27 @@ logs/
 *.tar
 *.gz
 *.7z
+
+# Root garbage discovered after production audit
+There
+for
+from
+et
+tatus
+atlantar
+atlantarecic
+atlantareciclajes@ss
+ir agregando tus otras apps si el sitio principal falla
+ecurity.SecurityMiddleware',
+sages.middleware.MessageMiddleware',
+.path.join(BASE_DIR, 'static')
+.path.join(BASE_DIR, 'templates')],
+diagnostico_fondos_runtime.txt
+backup_20251204.html
+*.backup_error
+
+# Root sqlite/dumps/env backups
+*.sqlite3
+*.sql
+*.bak
+*.BAK*
