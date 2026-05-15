@@ -153,3 +153,4 @@ backup_20251204.html
 *.sql
 *.bak
 *.BAK*
+scripts/diagnostico_bienvenida.py
