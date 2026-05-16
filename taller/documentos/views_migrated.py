@@ -376,7 +376,17 @@ def _parse_prefixed_items(post_data, prefix, fields):
 
 
 class DocumentoLineItemsMixin:
-    REPUESTO_FIELDS = ("codigo", "nombre", "cantidad", "precio_unitario", "precio_compra")
+    REPUESTO_FIELDS = (
+        "codigo",
+        "nombre",
+        "cantidad",
+        "precio_unitario",
+        "precio_compra",
+        "repuesto_id",
+        "part_id",
+        "pieza_desarme_id",
+        "origen_repuesto",
+    )
     SERVICIO_FIELDS = ("nombre", "cantidad", "precio_unitario")
     OTRO_FIELDS = ("proveedor", "descripcion", "costo_interno", "precio_cliente")
 
@@ -402,6 +412,18 @@ class DocumentoLineItemsMixin:
             precio_unitario = _to_decimal(data.get("precio_unitario"), Decimal("0"))
             repuesto_id = data.get("repuesto_id")
             part_id = data.get("part_id")
+            pieza_desarme_id = data.get("pieza_desarme_id")
+            origen_repuesto = (data.get("origen_repuesto") or "").strip()
+
+            if pieza_desarme_id:
+                origen_repuesto = "DESARME"
+
+            elif repuesto_id or part_id:
+                origen_repuesto = "STOCK_BODEGA"
+
+            else:
+                origen_repuesto = "EXTERNO"
+
             linea = LineaRepuesto(
                 documento=documento,
                 codigo=codigo or nombre,
@@ -410,7 +432,8 @@ class DocumentoLineItemsMixin:
                 precio_unitario=precio_unitario,
                 repuesto_id=repuesto_id or None,
                 part_id=part_id or None,
-                origen_repuesto="STOCK_BODEGA" if (repuesto_id or part_id) else "EXTERNO",
+                pieza_desarme_id=pieza_desarme_id or None,
+                origen_repuesto=origen_repuesto,
             )
             linea.save()
 
