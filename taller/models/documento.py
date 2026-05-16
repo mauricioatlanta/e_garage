@@ -476,28 +476,49 @@ class Documento(AuditMixin, models.Model):
             # Si no es numérico, devolver el número tal cual con prefijo
             return f"{prefijo}{self.numero}"
 
+    @transaction.atomic
     def generar_numero_documento(self):
-        """Genera el próximo número secuencial para el tipo de documento"""
+        """
+        Genera correlativo seguro evitando race conditions.
+        """
+
+        import re
+
         if self.numero:
             return self.numero
 
-        # Buscar el último número para este tipo de documento en esta empresa
-        ultimo_doc = (
-            Documento.objects.filter(empresa=self.empresa, tipo=self.tipo)
-            .order_by("-numero")
-            .first()
+        qs = (
+            Documento.objects
+            .select_for_update()
+            .filter(
+                empresa=self.empresa,
+                tipo=self.tipo,
+            )
+            .exclude(numero__isnull=True)
+            .exclude(numero="")
         )
 
-        if ultimo_doc and ultimo_doc.numero:
-            # Convertir el número a entero, sumar 1, y volver a string
+        secuencia_max = 0
+
+        for valor in qs.values_list("numero", flat=True):
+
+            valor = str(valor).strip()
+
+            match = re.search(r"(\d+)$", valor)
+
+            if not match:
+                continue
+
             try:
-                numero_anterior = int(ultimo_doc.numero)
-                self.numero = str(numero_anterior + 1)
-            except (ValueError, TypeError):
-                # Si no se puede convertir a entero, empezar desde 1
-                self.numero = "1"
-        else:
-            self.numero = "1"
+                numero = int(match.group(1))
+
+                if numero > secuencia_max:
+                    secuencia_max = numero
+
+            except Exception:
+                continue
+
+        self.numero = str(secuencia_max + 1)
 
         return self.numero
 
@@ -728,6 +749,13 @@ class Documento(AuditMixin, models.Model):
         self.total = val
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["empresa", "tipo", "numero"],
+                name="uniq_documento_empresa_tipo_numero",
+            )
+        ]
+
         app_label = "taller"
         verbose_name = _("Documento")
         verbose_name_plural = _("Documentos")
