@@ -116,7 +116,13 @@ def calcular_dias_recuperacion(vehiculo):
     first = qs.order_by("documento__fecha_emision").first()
     if not first:
         return None
-    delta = first - vehiculo.fecha_ingreso_desarme
+    first_date = first.date() if hasattr(first, "date") else first
+
+    ingreso = vehiculo.fecha_ingreso_desarme
+    ingreso_date = ingreso.date() if hasattr(ingreso, "date") else ingreso
+
+    delta = first_date - ingreso_date
+
     return delta.days if hasattr(delta, "days") else None
 
 
