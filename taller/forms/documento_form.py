@@ -307,7 +307,7 @@ class DocumentoForm(forms.ModelForm):
             self.fields["tipo"].choices = [
                 ("OT", "Orden de Trabajo"),
                 ("PRES", "Presupuesto"),
-                ("FAC", "Factura/Boleta"),
+                ("FAC", "Factura"),
             ]
             self.fields["payment_status"].choices = [
                 ("pending", "Pendiente"),

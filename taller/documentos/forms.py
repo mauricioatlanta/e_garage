@@ -91,7 +91,7 @@ class DocumentoForm(forms.ModelForm):
                 self.fields["tipo"].choices = [
                     ("OT", "Orden de Trabajo"),
                     ("PRES", "Presupuesto"),
-                    ("FAC", "Factura/Boleta"),
+                    ("FAC", "Factura"),
                 ]
             if "cliente" in self.fields:
                 self.fields["cliente"].label = "Cliente"
@@ -121,7 +121,7 @@ class DocumentoForm(forms.ModelForm):
                 self.fields["tipo"].choices = [
                     ("OT", "Orden de Trabajo"),
                     ("PRES", "Presupuesto"),
-                    ("FAC", "Factura/Boleta"),
+                    ("FAC", "Factura"),
                 ]
             if "cliente" in self.fields:
                 self.fields["cliente"].label = "Cliente"
