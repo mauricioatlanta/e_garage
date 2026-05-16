@@ -61,7 +61,7 @@ def dashboard_centro_operaciones(request):
                 return redirect("/configuracion/")
 
     # 📅 Fechas de referencia
-    hoy = timezone.localdate()
+    hoy = date.today()
     hace_7_dias = hoy - timedelta(days=7)
     hace_30_dias = hoy - timedelta(days=30)
     inicio_mes = date(hoy.year, hoy.month, 1)
@@ -392,7 +392,7 @@ def dashboard_centro_operaciones_espacial(request):
                 return redirect("/configuracion/")
 
     # 📅 Fechas de referencia (MISMA LÓGICA QUE dashboard_centro_operaciones)
-    hoy = timezone.localdate()
+    hoy = date.today()
     hace_7_dias = hoy - timedelta(days=7)
     hace_30_dias = hoy - timedelta(days=30)
     inicio_mes = date(hoy.year, hoy.month, 1)
