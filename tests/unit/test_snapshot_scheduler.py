@@ -52,11 +52,18 @@ def test_snapshot_queue_process_pending_executes_services(monkeypatch):
     worker_query = Mock()
     worker_query.order_by.return_value = [item]
 
+    current_query = Mock()
+    current_query.values.return_value.first.return_value = {
+        "processed_at": None,
+        "attempts": 0,
+    }
+
     filter_responses = [
         released_query,
         candidate_query,
         claimed_query,
         worker_query,
+        current_query,
     ]
 
     def fake_filter(*args, **kwargs):
@@ -135,11 +142,18 @@ def test_snapshot_queue_releases_stale_lock(monkeypatch):
     worker_query = Mock()
     worker_query.order_by.return_value = [stale_item]
 
+    current_query = Mock()
+    current_query.values.return_value.first.return_value = {
+        "processed_at": None,
+        "attempts": 0,
+    }
+
     filter_responses = [
         released_query,
         candidate_query,
         claimed_query,
         worker_query,
+        current_query,
     ]
 
     def fake_filter(*args, **kwargs):
