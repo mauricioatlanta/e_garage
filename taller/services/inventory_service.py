@@ -25,7 +25,13 @@ from taller.models.lineas_documento import (
     ORIGEN_EXTERNO,
     ORIGEN_STOCK_BODEGA,
 )
-from taller.models.pieza_desarme import PiezaDesarme, ESTADO_DISPONIBLE, ESTADO_VENDIDA
+from taller.models.pieza_desarme import (
+    PiezaDesarme,
+    ESTADO_DISPONIBLE,
+    ESTADO_VENDIDA,
+    ESTADO_RESERVADA,
+)
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.repuesto import Repuesto
 
 log = logging.getLogger(__name__)
@@ -390,11 +396,28 @@ class InventoryService:
         """
         PiezaDesarme.objects.filter(id=pieza.id).update(cantidad=F("cantidad") + cantidad)
         pieza.refresh_from_db()
+
         if pieza.cantidad <= 0:
             PiezaDesarme.objects.filter(id=pieza.id).update(
                 estado_pieza=ESTADO_VENDIDA, activo=False
             )
             pieza.refresh_from_db()
+            # Si el vehículo asociado no tiene más piezas vendibles reales, marcar como AGOTADO
+            # Piezas vendibles reales: activo=True, cantidad>0, estado_pieza in [DISPONIBLE, RESERVADA]
+            try:
+                veh_id = getattr(pieza, "vehiculo_id", None)
+                if veh_id is not None:
+                    remaining = PiezaDesarme.objects.filter(
+                        vehiculo_id=veh_id,
+                        empresa=pieza.empresa,
+                        activo=True,
+                        cantidad__gt=0,
+                        estado_pieza__in=[ESTADO_DISPONIBLE, ESTADO_RESERVADA],
+                    ).exists()
+                    if not remaining:
+                        VehiculoDesarme.objects.filter(id=veh_id).update(estado_desarme="AGOTADO")
+            except Exception:
+                log.exception("Error al actualizar estado del vehículo tras agotar piezas")
         elif pieza.estado_pieza == ESTADO_VENDIDA and pieza.cantidad > 0:
             # Reposición: volver a disponible
             PiezaDesarme.objects.filter(id=pieza.id).update(

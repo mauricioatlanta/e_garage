@@ -43,6 +43,10 @@ from .pieza_desarme import (
     PrecioHistoricoPieza,
 )
 from .vehiculo_desarme import VehiculoDesarme
+from .vehiculo_financial import (
+    VehiculoFinancialSnapshot,
+    VehicleFinancialEvent,
+)
 from .vendedor_desarme import VendedorDesarme
 
 # Modelos de ubicación
@@ -100,6 +104,8 @@ __all__ = [
     "PiezaDesarmeCompanyLabel",
     "PrecioHistoricoPieza",
     "VehiculoDesarme",
+    "VehiculoFinancialSnapshot",
+    "VehicleFinancialEvent",
     "VendedorDesarme",
     # Ubicación
     "Estado",

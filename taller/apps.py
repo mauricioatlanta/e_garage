@@ -21,6 +21,12 @@ class TallerConfig(AppConfig):
         except ImportError:
             pass
 
+        # Señales financieras para desarme: eventos, snapshots y lifecycle
+        try:
+            import taller.documentos.signals_financial  # noqa: F401
+        except ImportError:
+            pass
+
         # Señales legacy de LineaDocumento desactivadas.
         # El sistema operativo actual usa LineaRepuesto / LineaServicio / LineaOtroServicio.
 

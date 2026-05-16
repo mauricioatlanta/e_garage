@@ -16,6 +16,9 @@ ESTADO_DESARME_CHOICES = [
     ("INGRESADO", "Ingresado"),
     ("DESARMANDO", "Desarmando"),
     ("DESARMADO", "Desarmado"),
+    ("AGOTADO", "Agotado"),
+    ("RECUPERADO", "Recuperado"),
+    ("CERRADO", "Cerrado"),
     ("BAJA", "Baja"),
 ]
 
