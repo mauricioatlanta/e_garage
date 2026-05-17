@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tu trial de eGarage está por vencer</title>
+    <title>Tu Trial de eGarage está por terminar</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -86,8 +86,8 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>⚠️ eGarage</h1>
-            <p>Tu trial está por vencer</p>
+            <h1>eGarage</h1>
+            <p>Tu Trial está por terminar</p>
         </div>
 
         <div class="content">
@@ -95,21 +95,21 @@
 
             <div class="warning-box">
                 <div class="warning-icon">⏰</div>
-                <h3>Tu trial expira en {{ days_remaining }} día{{ days_remaining|pluralize:",s" }}</h3>
+                <h3>Tu Trial termina en {{ days_remaining }} día{{ days_remaining|pluralize:",s" }}</h3>
                 <p><strong>{{ empresa_name }}</strong></p>
             </div>
 
-            <p>Tu período de prueba gratuito de eGarage está llegando a su fin. ¡No pierdas acceso a todas las funcionalidades que te ayudan a gestionar tu taller!</p>
+            <p>Tu período de 30 días gratis está llegando a su fin. Puedes elegir Entry, Growth o Business cuando quieras para mantener tu taller activo.</p>
 
             <div class="benefits">
-                <h4>🚀 Lo que perderás si no activas tu suscripción:</h4>
+                <h4>Elige el plan que calza con tu equipo:</h4>
                 <ul>
-                    <li>✨ Inteligencia Artificial para diagnósticos</li>
-                    <li>📊 Reportes avanzados y analíticas</li>
-                    <li>🔧 Gestión completa de inventario</li>
-                    <li>💰 Facturación automática</li>
-                    <li>📱 App móvil</li>
-                    <li>☁️ Backup automático en la nube</li>
+                    <li>Entry: 1 usuario</li>
+                    <li>Growth: 2 a 4 usuarios</li>
+                    <li>Business: 5 a 10 usuarios</li>
+                    <li>Elige mensual o anual</li>
+                    <li>Ahorra pagando anual</li>
+                    <li>Cancela cuando quieras</li>
                 </ul>
             </div>
 
@@ -119,7 +119,7 @@
             </div>
 
             <p><strong>¿Por qué elegir eGarage?</strong></p>
-            <p>Más de 10,000 talleres confían en nosotros para:</p>
+            <p>Los talleres usan eGarage para:</p>
             <ul>
                 <li>Aumentar sus ventas hasta un 40%</li>
                 <li>Reducir tiempo de gestión en 60%</li>
@@ -132,7 +132,7 @@
         <div class="footer">
             <p>📧 <strong>¿Necesitas ayuda?</strong> Escríbenos a {{ support_email }}</p>
             <p>© {{ today.year }} eGarage - La plataforma #1 para talleres</p>
-            <p><small>Este email fue enviado porque tu trial está próximo a vencer.</small></p>
+            <p><small>Este email fue enviado porque tu Trial está próximo a terminar.</small></p>
         </div>
     </div>
 </body>

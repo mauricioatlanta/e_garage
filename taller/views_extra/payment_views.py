@@ -21,19 +21,35 @@ from taller.services.suscripcion_transaccion_service import (
 )
 from taller.utils.flow_helper import FlowAPIError, create_payment_order, get_payment_status
 from taller.utils.mp_helper import MPAPIError, create_mp_preference, get_mp_payment
-from taller.utils.payment_config import (
-    get_paypal_business_email,
-    get_transfer_payment_details,
-    normalize_company_plan,
+from taller.utils.payment_config import get_paypal_business_email, get_transfer_payment_details
+from taller.utils.plan_catalog import (
+    BILLING_ANNUAL,
+    BILLING_MONTHLY,
+    PAYMENT_METHOD_BANK_TRANSFER,
+    PAYMENT_METHOD_FLOW,
+    PAYMENT_METHOD_MERCADOPAGO,
+    PAYMENT_METHOD_PAYPAL,
+    PLAN_TRIAL,
+    PLAN_ENTRY,
+    PLAN_GROWTH,
+    PLAN_BUSINESS,
+    get_plan_display_name,
+    get_plan_price,
+    get_supported_payment_methods,
+    normalize_billing_cycle,
+    normalize_plan_code,
 )
 
 
 logger = logging.getLogger(__name__)
 
 CHILE_PAYMENT_PRICING = {
-    "mensual": {"valor": 10000, "dias": 30, "nombre": "Mensual"},
-    "semestral": {"valor": 55000, "dias": 180, "nombre": "Semestral"},
-    "anual": {"valor": 100000, "dias": 365, "nombre": "Anual"},
+    "individual_mensual": {"valor": 20000, "dias": 30, "nombre": "Individual Mensual (1 Usu)"},
+    "individual_anual": {"valor": 200000, "dias": 365, "nombre": "Individual Anual (1 Usu)"},
+    "equipo_mensual": {"valor": 35000, "dias": 30, "nombre": "Equipo Mensual (2-5 Usu)"},
+    "equipo_anual": {"valor": 350000, "dias": 365, "nombre": "Equipo Anual (2-5 Usu)"},
+    "empresa_mensual": {"valor": 50000, "dias": 30, "nombre": "Corporativo Mensual (6-10 Usu)"},
+    "empresa_anual": {"valor": 500000, "dias": 365, "nombre": "Corporativo Anual (6-10 Usu)"},
 }
 
 MEXICO_PAYMENT_PRICING = {
@@ -63,6 +79,32 @@ def _mp_is_enabled():
         getattr(settings, "MP_ENABLED", False)
         and (getattr(settings, "MP_ACCESS_TOKEN", "") or "").strip()
     )
+
+
+def _plan_context_for_country(country, raw_plan, lang="es"):
+    raw_plan = (raw_plan or "").strip().lower() or "mensual"
+    plan_code = normalize_plan_code(raw_plan)
+    billing_cycle = normalize_billing_cycle(raw_plan)
+
+    # Fallback para valores desconocidos: usar la opción mensual/entry en vez de trial.
+    if plan_code == PLAN_TRIAL and raw_plan not in {"trial"}:
+        plan_code = PLAN_ENTRY
+        billing_cycle = BILLING_MONTHLY
+
+    plan_price = get_plan_price(country, plan_code, billing_cycle)
+    plan_name = get_plan_display_name(plan_code, lang=lang)
+    plan_days = 30 if billing_cycle == BILLING_MONTHLY else 365
+    return plan_code, billing_cycle, plan_price, plan_name, plan_days
+
+
+def _supported_payment_flags(country):
+    methods = get_supported_payment_methods(country)
+    return {
+        "flow_enabled": PAYMENT_METHOD_FLOW in methods and _flow_is_enabled(),
+        "mp_enabled": PAYMENT_METHOD_MERCADOPAGO in methods and _mp_is_enabled(),
+        "paypal_enabled": PAYMENT_METHOD_PAYPAL in methods,
+        "bank_transfer_enabled": PAYMENT_METHOD_BANK_TRANSFER in methods,
+    }
 
 
 def _dashboard_path_for_company(empresa):
@@ -278,21 +320,27 @@ def payment_chile(request):
         )
         return redirect("chile:dashboard")
 
-    plan = request.GET.get("plan", "mensual")
-    if plan not in CHILE_PAYMENT_PRICING:
-        plan = "mensual"
-    plan_info = CHILE_PAYMENT_PRICING[plan]
+    raw_plan = (request.GET.get("plan") or "mensual").strip().lower()
+    plan_code, billing_cycle, plan_price, plan_name, plan_days = _plan_context_for_country(
+        "CL", raw_plan, lang="es"
+    )
     datos_banco = get_transfer_payment_details("CL")
+    flags = _supported_payment_flags("CL")
+
+    plan_info = {
+        "valor": plan_price["price"],
+        "dias": plan_days,
+        "nombre": plan_name,
+    }
 
     context = {
         "empresa": empresa,
-        "plan": plan,
+        "plan": raw_plan,
         "plan_info": plan_info,
         "datos_banco": datos_banco,
-        "monto_pagar": plan_info["valor"],
-        "referencia": f"eGarage-{empresa.id}-{plan}",
-        "flow_enabled": _flow_is_enabled(),
-        "mp_enabled": _mp_is_enabled(),
+        "monto_pagar": plan_price["price"],
+        "referencia": f"eGarage-{empresa.id}-{raw_plan}",
+        **flags,
     }
     return render(request, "saas/suscripcion/pago_chile.html", context)
 
@@ -311,19 +359,27 @@ def payment_mexico(request):
         )
         return redirect("mexico:dashboard_mexico")
 
-    plan = request.GET.get("plan", "mensual")
-    if plan not in MEXICO_PAYMENT_PRICING:
-        plan = "mensual"
-    plan_info = MEXICO_PAYMENT_PRICING[plan]
+    raw_plan = (request.GET.get("plan") or "mensual").strip().lower()
+    plan_code, billing_cycle, plan_price, plan_name, plan_days = _plan_context_for_country(
+        "MX", raw_plan, lang="es"
+    )
     datos_banco = get_transfer_payment_details("MX")
+    flags = _supported_payment_flags("MX")
+
+    plan_info = {
+        "valor": plan_price["price"],
+        "dias": plan_days,
+        "nombre": plan_name,
+    }
 
     context = {
         "empresa": empresa,
-        "plan": plan,
+        "plan": raw_plan,
         "plan_info": plan_info,
         "datos_banco": datos_banco,
-        "monto_pagar": plan_info["valor"],
-        "referencia": f"eGarage-MX-{empresa.id}-{plan}",
+        "monto_pagar": plan_price["price"],
+        "referencia": f"eGarage-MX-{empresa.id}-{raw_plan}",
+        **flags,
     }
 
     return render(request, "saas/suscripcion/pago_mexico.html", context)
@@ -343,28 +399,38 @@ def payment_usa(request):
         )
         return redirect("usa:dashboard")
 
-    plan = request.GET.get("plan", "mensual")
-    if plan not in USA_PAYMENT_PRICING:
-        plan = "mensual"
-    plan_info = USA_PAYMENT_PRICING[plan]
+    raw_plan = (request.GET.get("plan") or "mensual").strip().lower()
+    plan_code, billing_cycle, plan_price, plan_name, plan_days = _plan_context_for_country(
+        "US", raw_plan, lang="en"
+    )
+    datos_banco = get_transfer_payment_details("US")
+    flags = _supported_payment_flags("US")
 
     paypal_config = {
         "business_email": get_paypal_business_email(),
-        "currency": "USD",
-        "item_name": f'eGarage {plan_info["nombre"]} Subscription',
-        "item_number": f"egarage-{plan}",
+        "currency": plan_price["currency"],
+        "item_name": f'eGarage {plan_name} Subscription',
+        "item_number": f"egarage-{raw_plan}",
         "return_url": request.build_absolute_uri("/us/en/payment/success/"),
         "cancel_url": request.build_absolute_uri("/us/en/payment/cancel/"),
         "notify_url": request.build_absolute_uri("/webhooks/paypal/"),
     }
 
+    plan_info = {
+        "valor": plan_price["price"],
+        "dias": plan_days,
+        "nombre": plan_name,
+    }
+
     context = {
         "empresa": empresa,
-        "plan": plan,
+        "plan": raw_plan,
         "plan_info": plan_info,
         "paypal_config": paypal_config,
-        "amount": plan_info["valor"],
-        "reference": f"eGarage-{empresa.id}-{plan}",
+        "datos_banco": datos_banco,
+        "amount": plan_price["price"],
+        "reference": f"eGarage-{empresa.id}-{raw_plan}",
+        **flags,
     }
 
     return render(request, "us/en/suscripcion/pago.html", context)
@@ -386,23 +452,22 @@ def start_flow_payment(request):
         )
         return redirect("chile:dashboard")
 
-    plan = (request.POST.get("plan") or "mensual").strip().lower()
-    if plan not in CHILE_PAYMENT_PRICING:
-        messages.error(request, "El plan solicitado no es valido.")
-        return redirect("/cl/es/suscripcion/pago/?plan=mensual")
+    raw_plan = (request.POST.get("plan") or "mensual").strip().lower()
+    plan_code, billing_cycle, plan_price, plan_name, _ = _plan_context_for_country(
+        "CL", raw_plan, lang="es"
+    )
 
-    plan_info = CHILE_PAYMENT_PRICING[plan]
     transaccion = create_gateway_transaction(
         empresa=empresa,
         source_type="flow",
         payment_method="flow",
-        amount=Decimal(str(plan_info["valor"])),
+        amount=Decimal(str(plan_price["price"])),
         currency="CLP",
-        billing_cycle=plan,
-        plan_code=normalize_company_plan(plan),
+        billing_cycle=billing_cycle,
+        plan_code=plan_code,
         reference=f"SUB-{uuid.uuid4().hex}",
         customer_email=empresa.email or request.user.email,
-        description=f"Suscripcion eGarage - {plan_info['nombre']}",
+        description=f"Suscripcion eGarage - {plan_name}",
         gateway_payload={
             "gateway": "flow",
             "created_via": "payment_chile",
@@ -433,7 +498,7 @@ def start_flow_payment(request):
         )
         logger.exception("Error creando la orden en Flow para la empresa %s", empresa.pk)
         messages.error(request, "No fue posible iniciar el pago con Flow. Intenta nuevamente.")
-        return redirect(f"/cl/es/suscripcion/pago/?plan={plan}")
+        return redirect(f"/cl/es/suscripcion/pago/?plan={raw_plan}")
 
     return redirect(checkout_url)
 
@@ -454,23 +519,22 @@ def start_mp_payment(request):
         )
         return redirect("chile:dashboard")
 
-    plan = (request.POST.get("plan") or "mensual").strip().lower()
-    if plan not in CHILE_PAYMENT_PRICING:
-        messages.error(request, "El plan solicitado no es valido.")
-        return redirect("/cl/es/suscripcion/pago/?plan=mensual")
+    raw_plan = (request.POST.get("plan") or "mensual").strip().lower()
+    plan_code, billing_cycle, plan_price, plan_name, _ = _plan_context_for_country(
+        "CL", raw_plan, lang="es"
+    )
 
-    plan_info = CHILE_PAYMENT_PRICING[plan]
     transaccion = create_gateway_transaction(
         empresa=empresa,
         source_type="mercadopago",
         payment_method="mercadopago",
-        amount=Decimal(str(plan_info["valor"])),
+        amount=Decimal(str(plan_price["price"])),
         currency="CLP",
-        billing_cycle=plan,
-        plan_code=normalize_company_plan(plan),
+        billing_cycle=billing_cycle,
+        plan_code=plan_code,
         reference=str(uuid.uuid4().int),
         customer_email=empresa.email or request.user.email,
-        description=f"Suscripcion eGarage - {plan_info['nombre']}",
+        description=f"Suscripcion eGarage - {plan_name}",
         gateway_payload={
             "gateway": "mercadopago",
             "created_via": "payment_chile",
@@ -505,7 +569,7 @@ def start_mp_payment(request):
         )
         logger.exception("Error creando preferencia en Mercado Pago para la empresa %s", empresa.pk)
         messages.error(request, "No fue posible iniciar el pago con Mercado Pago. Intenta nuevamente.")
-        return redirect(f"/cl/es/suscripcion/pago/?plan={plan}")
+        return redirect(f"/cl/es/suscripcion/pago/?plan={raw_plan}")
 
     return redirect(checkout_url)
 

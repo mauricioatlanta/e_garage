@@ -158,15 +158,12 @@ def obtener_datos_formulario(empresa):
     if empresa.pais == "US":
         tipos_base = [
             {"value": "PRES", "label": "Estimate", "color": "#4CAF50"},
-            {"value": "OT", "label": "Work Order", "color": "#FF9800"},
             {"value": "FAC", "label": "Invoice", "color": "#F44336"},
         ]
     else:
         tipos_base = [
             {"value": "PRES", "label": "Presupuesto", "color": "#4CAF50"},
             {"value": "OT", "label": "Orden de Trabajo", "color": "#FF9800"},
-            {"value": "FAC", "label": "Factura", "color": "#F44336"},
-            {"value": "BOL", "label": "Boleta", "color": "#2196F3"},
         ]
 
     for tipo in tipos_base:

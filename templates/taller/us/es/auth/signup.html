@@ -165,43 +165,43 @@ body { background: #0a0a0a; font-family: 'Inter', sans-serif; color: #fff; min-h
                 <div class="pricing-grid">
                     <div class="plan-card selected" data-plan="trial" onclick="selectPlan('trial')">
                         <div class="plan-badge">{% trans "FREE" %}</div>
-                        <div class="plan-name">Prueba</div>
+                        <div class="plan-name">Trial</div>
                         <div class="plan-price">$0</div>
                         <div class="plan-period">30 {% trans "days" %}</div>
                         <ul class="plan-features">
                             <li>{% trans "Full access" %}</li>
-                            <li>{% trans "No credit card" %}</li>
-                            <li>{% trans "Cancel anytime" %}</li>
+                            <li>{% trans "Sin tarjeta" %}</li>
+                            <li>{% trans "Cancela cuando quieras" %}</li>
                         </ul>
                     </div>
-                    <div class="plan-card" data-plan="mensual" onclick="selectPlan('mensual')">
-                        <div class="plan-name">Mensual</div>
-                        <div class="plan-price"><span class="price-us">$20</span><span class="price-cl" style="display:none;">$20.000</span><span class="price-ar" style="display:none;">$29.100</span><span class="price-br" style="display:none;">R$ 100</span><span class="price-ve" style="display:none;">Bs. 730</span><span class="price-pe" style="display:none;">S/ 70</span><span class="price-co" style="display:none;">$80.000</span><span class="price-ec" style="display:none;">$20</span><span class="price-uy" style="display:none;">$ 800</span><span class="price-mx" style="display:none;">$350</span></div>
-                        <div class="plan-period"><span class="period-us">/ mes</span><span class="period-cl" style="display:none;">/ mes</span><span class="period-ar" style="display:none;">ARS / mes</span><span class="period-br" style="display:none;">/ mês</span><span class="period-ve" style="display:none;">/ mes</span><span class="period-pe" style="display:none;">/ mes</span><span class="period-co" style="display:none;">COP / mes</span><span class="period-ec" style="display:none;">USD / mes</span><span class="period-uy" style="display:none;">UYU / mes</span><span class="period-mx" style="display:none;">MXN / mes</span></div>
+                    <div class="plan-card" data-plan="entry" onclick="selectPlan('entry')">
+                        <div class="plan-name">Entry</div>
+                        <div class="plan-price"><span class="price-us">$20</span><span class="price-cl" style="display:none;">$20</span><span class="price-ar" style="display:none;">$29.100</span><span class="price-br" style="display:none;">R$ 100</span><span class="price-ve" style="display:none;">Bs. 730</span><span class="price-pe" style="display:none;">S/ 70</span><span class="price-co" style="display:none;">$80</span><span class="price-ec" style="display:none;">$20</span><span class="price-uy" style="display:none;">$ 800</span><span class="price-mx" style="display:none;">$350</span></div>
+                        <div class="plan-period"><span class="period-us">mensual / anual</span><span class="period-cl" style="display:none;">mensual / anual</span><span class="period-ar" style="display:none;">ARS mensual / anual</span><span class="period-br" style="display:none;">/ mês</span><span class="period-ve" style="display:none;">mensual / anual</span><span class="period-pe" style="display:none;">mensual / anual</span><span class="period-co" style="display:none;">COP mensual / anual</span><span class="period-ec" style="display:none;">USD mensual / anual</span><span class="period-uy" style="display:none;">UYU mensual / anual</span><span class="period-mx" style="display:none;">MXN mensual / anual</span></div>
                         <ul class="plan-features">
-                            <li>{% trans "Unlimited users" %}</li>
+                            <li>{% trans "1 user" %}</li>
                             <li>{% trans "All features" %}</li>
                         </ul>
                     </div>
-                    <div class="plan-card recommended" data-plan="semestral" onclick="selectPlan('semestral')">
-                        <div class="plan-badge gold">⭐ {% trans "BEST VALUE" %}</div>
-                        <div class="plan-name">Semestral</div>
-                        <div class="plan-price"><span class="price-us">$110</span><span class="price-cl" style="display:none;">$110.000</span><span class="price-ar" style="display:none;">$160.050</span><span class="price-br" style="display:none;">R$ 500</span><span class="price-ve" style="display:none;">Bs. 3,650</span><span class="price-pe" style="display:none;">S/ 350</span><span class="price-co" style="display:none;">$440.000</span><span class="price-ec" style="display:none;">$110</span><span class="price-uy" style="display:none;">$ 4.400</span><span class="price-mx" style="display:none;">$1,925</span></div>
-                        <div class="plan-period"><span class="period-us">/ 6 meses</span><span class="period-cl" style="display:none;">/ 6 meses</span><span class="period-ar" style="display:none;">ARS / 6 meses</span><span class="period-br" style="display:none;">/ 6 meses</span><span class="period-ve" style="display:none;">/ 6 meses</span><span class="period-pe" style="display:none;">/ 6 meses</span><span class="period-co" style="display:none;">COP / 6 meses</span><span class="period-ec" style="display:none;">USD / 6 meses</span><span class="period-uy" style="display:none;">UYU / 6 meses</span><span class="period-mx" style="display:none;">MXN / 6 meses</span></div>
+                    <div class="plan-card recommended" data-plan="growth" onclick="selectPlan('growth')">
+                        <div class="plan-badge gold">⭐ {% trans "Save with annual" %}</div>
+                        <div class="plan-name">Growth</div>
+                        <div class="plan-price"><span class="price-us">$110</span><span class="price-cl" style="display:none;">$110</span><span class="price-ar" style="display:none;">$160.050</span><span class="price-br" style="display:none;">R$ 500</span><span class="price-ve" style="display:none;">Bs. 3,650</span><span class="price-pe" style="display:none;">S/ 350</span><span class="price-co" style="display:none;">$440</span><span class="price-ec" style="display:none;">$110</span><span class="price-uy" style="display:none;">$ 4.400</span><span class="price-mx" style="display:none;">$1,925</span></div>
+                        <div class="plan-period"><span class="period-us">mensual / anual</span><span class="period-cl" style="display:none;">mensual / anual</span><span class="period-ar" style="display:none;">ARS mensual / anual</span><span class="period-br" style="display:none;">mensual / anual</span><span class="period-ve" style="display:none;">mensual / anual</span><span class="period-pe" style="display:none;">mensual / anual</span><span class="period-co" style="display:none;">COP mensual / anual</span><span class="period-ec" style="display:none;">USD mensual / anual</span><span class="period-uy" style="display:none;">UYU mensual / anual</span><span class="period-mx" style="display:none;">MXN mensual / anual</span></div>
                         <div class="plan-savings">{% trans "Save" %} 17%</div>
                         <ul class="plan-features">
-                            <li>{% trans "Everything in Monthly" %}</li>
+                            <li>{% trans "Everything in Entry" %}</li>
                             <li>{% trans "Priority support" %}</li>
                         </ul>
                     </div>
-                    <div class="plan-card" data-plan="anual" onclick="selectPlan('anual')">
-                        <div class="plan-badge gold">💎 {% trans "BEST PRICE" %}</div>
-                        <div class="plan-name">Anual</div>
-                        <div class="plan-price"><span class="price-us">$200</span><span class="price-cl" style="display:none;">$200.000</span><span class="price-ar" style="display:none;">$291.000</span><span class="price-br" style="display:none;">R$ 1.000</span><span class="price-ve" style="display:none;">Bs. 7,300</span><span class="price-pe" style="display:none;">S/ 700</span><span class="price-co" style="display:none;">$800.000</span><span class="price-ec" style="display:none;">$200</span><span class="price-uy" style="display:none;">$ 8.000</span><span class="price-mx" style="display:none;">$3,500</span></div>
-                        <div class="plan-period"><span class="period-us">/ año</span><span class="period-cl" style="display:none;">/ año</span><span class="period-ar" style="display:none;">ARS / año</span><span class="period-br" style="display:none;">/ ano</span><span class="period-ve" style="display:none;">/ año</span><span class="period-pe" style="display:none;">/ año</span><span class="period-co" style="display:none;">COP / año</span><span class="period-ec" style="display:none;">USD / año</span><span class="period-uy" style="display:none;">UYU / año</span><span class="period-mx" style="display:none;">MXN / año</span></div>
+                    <div class="plan-card" data-plan="business" onclick="selectPlan('business')">
+                        <div class="plan-badge gold">💎 {% trans "Save with annual" %}</div>
+                        <div class="plan-name">Business</div>
+                        <div class="plan-price"><span class="price-us">$200</span><span class="price-cl" style="display:none;">$200</span><span class="price-ar" style="display:none;">$291</span><span class="price-br" style="display:none;">R$ 1</span><span class="price-ve" style="display:none;">Bs. 7,300</span><span class="price-pe" style="display:none;">S/ 700</span><span class="price-co" style="display:none;">$800</span><span class="price-ec" style="display:none;">$200</span><span class="price-uy" style="display:none;">$ 8</span><span class="price-mx" style="display:none;">$3,500</span></div>
+                        <div class="plan-period"><span class="period-us">mensual / anual</span><span class="period-cl" style="display:none;">mensual / anual</span><span class="period-ar" style="display:none;">ARS mensual / anual</span><span class="period-br" style="display:none;">/ ano</span><span class="period-ve" style="display:none;">mensual / anual</span><span class="period-pe" style="display:none;">mensual / anual</span><span class="period-co" style="display:none;">COP mensual / anual</span><span class="period-ec" style="display:none;">USD mensual / anual</span><span class="period-uy" style="display:none;">UYU mensual / anual</span><span class="period-mx" style="display:none;">MXN mensual / anual</span></div>
                         <div class="plan-savings">{% trans "Save" %} 33%</div>
                         <ul class="plan-features">
-                            <li>{% trans "Everything in Semi-Annual" %}</li>
+                            <li>{% trans "Everything in Growth" %}</li>
                             <li>{% trans "Best value" %}</li>
                         </ul>
                     </div>

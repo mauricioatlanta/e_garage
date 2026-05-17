@@ -219,7 +219,9 @@ class SubscriptionAccessService:
         expiration_date = cls._get_expiration_date(empresa)
         if expiration_date is None:
             return None
-        return max((timezone.localdate() - expiration_date).days, 0)
+        now = timezone.now()
+        today = timezone.localtime(now).date() if timezone.is_aware(now) else now.date()
+        return max((today - expiration_date).days, 0)
 
     @staticmethod
     def _get_expiration_date(empresa) -> date | None:

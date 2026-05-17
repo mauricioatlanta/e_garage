@@ -1278,9 +1278,10 @@
 {% endblock %}
 
 {% block page_extra_js %}
+{% firstof LANGUAGE_CODE request.LANGUAGE_CODE "es" as current_lang %}
 <script>
 // Idioma actual para traducciones JavaScript
-const CURRENT_LANG = '{{ LANGUAGE_CODE|default:request.LANGUAGE_CODE|default:"es" }}';
+const CURRENT_LANG = '{{ current_lang }}';
 
 function toggleView(view, element) {
   const cardsView = document.getElementById('vista-cards');

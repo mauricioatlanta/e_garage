@@ -1,0 +1,55 @@
+{% comment %}
+Reusable plan card.
+Expected variables:
+plan, pricing, billing_cycle, country, payment_methods, highlight, cta_url
+{% endcomment %}
+<article class="plan-card{% if highlight %} recommended{% endif %}" data-plan="{{ plan }}" {% if not cta_url %}onclick="selectPlan('{{ plan }}')"{% endif %}>
+    {% if highlight %}
+    <div class="plan-badge gold">Ahorra pagando anual</div>
+    {% elif plan == "trial" %}
+    <div class="plan-badge">30 días gratis</div>
+    {% endif %}
+
+    <div class="plan-name">
+        {% if plan == "trial" %}Trial{% elif plan == "entry" %}Entry{% elif plan == "growth" %}Growth{% elif plan == "business" %}Business{% else %}{{ plan|title }}{% endif %}
+    </div>
+
+    <div class="plan-price">{{ pricing }}</div>
+
+    <div class="plan-period">
+        {% if plan == "trial" %}
+            Sin tarjeta
+        {% else %}
+            Elige mensual o anual
+        {% endif %}
+    </div>
+
+    <ul class="plan-features">
+        {% if plan == "trial" %}
+            <li>Sin tarjeta</li>
+            <li>1 usuario</li>
+            <li>Cancela cuando quieras</li>
+        {% elif plan == "entry" %}
+            <li>1 usuario</li>
+            <li>Mensual y anual disponibles</li>
+        {% elif plan == "growth" %}
+            <li>2 a 4 usuarios</li>
+            <li>Mensual y anual disponibles</li>
+        {% elif plan == "business" %}
+            <li>5 a 10 usuarios</li>
+            <li>Mensual y anual disponibles</li>
+        {% endif %}
+        {% if plan != "trial" %}
+            <li>Ahorra pagando anual</li>
+            <li>Cancela cuando quieras</li>
+        {% endif %}
+    </ul>
+
+    {% if payment_methods %}
+    <div class="plan-period">{{ payment_methods }}</div>
+    {% endif %}
+
+    {% if cta_url %}
+    <a href="{{ cta_url }}" class="plan-cta">Seleccionar</a>
+    {% endif %}
+</article>

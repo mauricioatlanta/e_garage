@@ -23,6 +23,7 @@ class SafeSessionMiddleware(SessionMiddleware):
         try:
             return super().__call__(request)
         except SessionInterrupted:
+            if getattr(settings, "DEBUG", False): raise
             logger.warning(
                 "Suppressed SessionInterrupted from downstream middleware",
                 extra={
@@ -38,6 +39,7 @@ class SafeSessionMiddleware(SessionMiddleware):
         try:
             return super().process_response(request, response)
         except SessionInterrupted:
+            if getattr(settings, "DEBUG", False): raise
             logger.info(
                 "Suppressed SessionInterrupted during response processing",
                 extra={

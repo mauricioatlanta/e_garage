@@ -12,6 +12,14 @@ class CountryAwareLoginView(LoginView):
 
     def dispatch(self, request, *args, **kwargs):
         self._apply_country_context(request)
+        # En allauth 65+, si el usuario ya está autenticado el padre redirige
+        # a LOGIN_REDIRECT_URL. Lo evitamos para mostrar siempre el formulario.
+        if request.user.is_authenticated:
+            from django.shortcuts import redirect
+            next_url = request.GET.get('next', '')
+            if next_url:
+                return redirect(next_url)
+            return super(type(self).__mro__[2], self).get(request, *args, **kwargs)
         return super().dispatch(request, *args, **kwargs)
 
     # ------------------------------------------------------------------ #
@@ -212,6 +220,18 @@ class CountryAwareLoginView(LoginView):
         # Ocultar starfield del base; el login usa su propio fondo (Vanta/grid)
         context["enable_space_bg"] = 0
         return context
+
+    def get_success_url(self):
+        next_url = self.request.GET.get("next") or self.request.POST.get("next")
+        if next_url:
+            return next_url
+
+        country = getattr(self.request, "country", "CL")
+        if country == "US":
+            return "/us/en/workspace/"
+        if country == "BR":
+            return "/br/pt/workspace/"
+        return f"/{country.lower()}/es/workspace/"
 
 
 # Vista funcional como alternativa

@@ -7,6 +7,7 @@ Centraliza la lógica común para evitar duplicación.
 
 import logging
 from datetime import timedelta
+from types import SimpleNamespace
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -19,9 +20,11 @@ from django.utils.translation import activate
 
 from taller.models.empresa import Empresa
 from taller.models.suscripcion import Suscripcion
+from taller.services.trial_service import can_start_trial
 from taller.utils.country_config import get_country_config, get_config_from_empresa
 from taller.config.country_settings import CountrySettings
 from taller.utils.email_helper import get_branded_from_email, send_email_with_reply_to
+from taller.utils.plan_catalog import normalize_plan_code
 
 log = logging.getLogger(__name__)
 User = get_user_model()
@@ -103,6 +106,8 @@ class RegistrationService:
         Raises:
             ValueError: Si el email ya existe o datos inválidos
         """
+        plan_type = normalize_plan_code(plan_type)
+
         # Normalizar email
         email = RegistrationService.normalize_email(user_data.get("email"))
         if not email:
@@ -228,6 +233,8 @@ class RegistrationService:
         Raises:
             ValueError: Si el usuario ya tiene empresa o datos inválidos
         """
+        plan_type = normalize_plan_code(plan_type)
+
         # Verificar que el usuario no tenga empresa
         if hasattr(user, "empresa") and user.empresa:
             raise ValueError(f"El usuario {user.email} ya tiene una empresa asociada")
@@ -267,17 +274,17 @@ class RegistrationService:
         trial_ends_at = None
 
         if plan_type == "trial":
-            # Buscar si existe alguna empresa con trial_already_used = True
-            # que tenga el mismo email o teléfono
-            empresa_con_trial_previo = Empresa.objects.filter(
-                Q(email=email) | Q(telefono=telefono), trial_already_used=True
-            ).first()
+            trial_allowed, trial_reason = can_start_trial(
+                SimpleNamespace(email=email, telefono=telefono),
+                user=user,
+            )
 
-            if empresa_con_trial_previo:
+            if not trial_allowed:
                 # Ya se usó trial con este email o teléfono
                 log.info(
-                    f"[RegistrationService] Email {email} o teléfono {telefono} ya usó trial. "
-                    f"No se otorga nuevo trial."
+                    "[RegistrationService] No se otorga trial a %s: %s",
+                    email,
+                    trial_reason,
                 )
                 obtuvo_trial = False
                 trial_already_used = True
@@ -327,7 +334,17 @@ class RegistrationService:
             if plan_type == "trial":
                 dias_trial = getattr(settings, "TRIAL_DAYS", 30)
                 fecha_fin = fecha_inicio + timedelta(days=dias_trial)
-            elif plan_type in ["basic", "premium", "enterprise", "mensual", "semestral", "anual"]:
+            elif plan_type in [
+                "entry",
+                "growth",
+                "business",
+                "basic",
+                "premium",
+                "enterprise",
+                "mensual",
+                "semestral",
+                "anual",
+            ]:
                 fecha_fin = fecha_inicio + timedelta(days=30)
 
             suscripcion = Suscripcion.objects.create(

@@ -2,6 +2,7 @@ from django.db import models
 from django.utils import timezone
 
 from taller.models.empresa import Empresa
+from taller.utils.payment_config import normalize_company_plan
 
 
 class ComprobantePago(models.Model):
@@ -61,11 +62,12 @@ class ComprobantePago(models.Model):
         self.procesado_por = procesado_por
 
         # Detectar si es nueva suscripción, cambio de plan o renovación
-        plan_anterior = self.empresa.plan
+        plan_anterior = normalize_company_plan(self.empresa.plan)
+        plan_nuevo = normalize_company_plan(self.plan_solicitado)
         es_nueva_suscripcion = not self.empresa.suscripcion_activa or self.empresa.plan == "trial"
         es_cambio_plan = (
             self.empresa.suscripcion_activa
-            and plan_anterior != self.plan_solicitado
+            and plan_anterior != plan_nuevo
             and plan_anterior != "trial"
         )
 
@@ -74,7 +76,8 @@ class ComprobantePago(models.Model):
         # 🔒 ANTI-DUPLICADO: No enviar notificación aquí, la enviaremos después
         # Esto evita doble notificación si extender_suscripcion() también notifica
         self.empresa.extender_suscripcion(dias_extension, enviar_notificacion=False)
-        self.empresa.plan = self.plan_solicitado
+        self.plan_solicitado = plan_nuevo
+        self.empresa.plan = plan_nuevo
         self.empresa.valor_mensual = self.monto / self.meses_pagados
         self.empresa.save()
 
@@ -100,7 +103,7 @@ class ComprobantePago(models.Model):
                 # A. NUEVA SUSCRIPCIÓN
                 notificar_nueva_suscripcion(
                     empresa=self.empresa,
-                    plan=self.plan_solicitado,
+                    plan=plan_nuevo,
                     monto=self.monto,
                     es_nueva_empresa=es_nueva_suscripcion,
                 )
@@ -109,7 +112,7 @@ class ComprobantePago(models.Model):
                 notificar_cambio_plan(
                     empresa=self.empresa,
                     plan_anterior=plan_anterior,
-                    plan_nuevo=self.plan_solicitado,
+                    plan_nuevo=plan_nuevo,
                     monto=self.monto,
                     fecha_inicio=self.empresa.fecha_inicio,
                 )
@@ -117,7 +120,7 @@ class ComprobantePago(models.Model):
                 # C. RENOVACIÓN EXITOSA
                 notificar_renovacion_exitosa(
                     empresa=self.empresa,
-                    plan=self.plan_solicitado,
+                    plan=plan_nuevo,
                     monto=self.monto,
                     dias_renovados=dias_extension,
                 )

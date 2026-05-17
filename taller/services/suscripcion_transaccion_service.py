@@ -5,6 +5,16 @@ from django.utils import timezone
 
 from taller.utils.email_helper import send_template_email
 from taller.utils.payment_config import normalize_company_plan
+from taller.utils.plan_catalog import (
+    ALL_BILLING_PERIODS,
+    ALL_PLAN_CODES,
+    BILLING_ANNUAL,
+    BILLING_MONTHLY,
+    LEGACY_BILLING_MAPPING,
+    LEGACY_PLAN_MAPPING,
+    get_months_paid,
+    normalize_billing_cycle as normalize_catalog_billing_cycle,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -23,15 +33,31 @@ COMPROBANTE_STATUS_MAP = {
 }
 
 MONTHS_BY_BILLING_CYCLE = {
+    BILLING_MONTHLY: 1,
+    BILLING_ANNUAL: 12,
     "mensual": 1,
     "semestral": 6,
     "anual": 12,
+    "individual_mensual": 1,
+    "individual_anual": 12,
+    "equipo_mensual": 1,
+    "equipo_anual": 12,
+    "empresa_mensual": 1,
+    "empresa_anual": 12,
 }
 
 DAYS_BY_BILLING_CYCLE = {
+    BILLING_MONTHLY: 30,
+    BILLING_ANNUAL: 365,
     "mensual": 30,
     "semestral": 180,
     "anual": 365,
+    "individual_mensual": 30,
+    "individual_anual": 365,
+    "equipo_mensual": 30,
+    "equipo_anual": 365,
+    "empresa_mensual": 30,
+    "empresa_anual": 365,
 }
 
 
@@ -61,8 +87,27 @@ def _normalize_payment_method(value, default="transferencia"):
 
 
 def _normalize_billing_cycle(value):
-    value = (value or "mensual").strip().lower()
-    return value if value in MONTHS_BY_BILLING_CYCLE else "otro"
+    raw_value = (value or "").strip().lower()
+    valid_values = (
+        ALL_BILLING_PERIODS
+        | ALL_PLAN_CODES
+        | set(LEGACY_BILLING_MAPPING)
+        | set(LEGACY_PLAN_MAPPING)
+        | set(MONTHS_BY_BILLING_CYCLE)
+    )
+    if raw_value and raw_value not in valid_values:
+        return "otro"
+    billing_cycle = normalize_catalog_billing_cycle(raw_value)
+    if billing_cycle in ALL_BILLING_PERIODS:
+        return billing_cycle
+    return "otro"
+
+
+def _months_paid_for_billing_cycle(value):
+    billing_cycle = _normalize_billing_cycle(value)
+    if billing_cycle == "otro":
+        return MONTHS_BY_BILLING_CYCLE.get((value or "").strip().lower(), 1)
+    return get_months_paid(billing_cycle)
 
 
 def _merge_gateway_payload(instance, payload=None):
@@ -217,7 +262,7 @@ def sync_from_pago_pendiente(pago_pendiente):
         "payment_method": _normalize_payment_method(pago_pendiente.metodo_pago),
         "billing_cycle": billing_cycle,
         "plan_code": normalize_company_plan(pago_pendiente.plan),
-        "months_paid": MONTHS_BY_BILLING_CYCLE.get(billing_cycle, 1),
+        "months_paid": _months_paid_for_billing_cycle(pago_pendiente.plan),
         "amount": pago_pendiente.monto,
         "currency": "CLP" if pago_pendiente.empresa.pais == "CL" else "USD",
         "reference": pago_pendiente.referencia or f"pago-pendiente-{pago_pendiente.pk}",
@@ -258,7 +303,7 @@ def sync_from_comprobante_pago(comprobante_pago):
                 12: "anual",
             }.get(comprobante_pago.meses_pagados, "otro")
         ),
-        "plan_code": comprobante_pago.plan_solicitado,
+        "plan_code": normalize_company_plan(comprobante_pago.plan_solicitado),
         "months_paid": comprobante_pago.meses_pagados or 1,
         "amount": comprobante_pago.monto,
         "currency": comprobante_pago.moneda or "CLP",
@@ -309,8 +354,8 @@ def create_gateway_transaction(
         raw_status="pending",
         payment_method=_normalize_payment_method(payment_method),
         billing_cycle=_normalize_billing_cycle(billing_cycle),
-        plan_code=plan_code,
-        months_paid=MONTHS_BY_BILLING_CYCLE.get(_normalize_billing_cycle(billing_cycle), 1),
+        plan_code=normalize_company_plan(plan_code),
+        months_paid=_months_paid_for_billing_cycle(billing_cycle),
         amount=amount,
         currency=currency,
         reference=reference,

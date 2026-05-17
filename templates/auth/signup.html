@@ -426,76 +426,20 @@ body {
                     <div class="error-message">{{ form.plan.errors }}</div>
                     {% endif %}
                 </div>
+                <div class="form-group">
+                    <label class="form-label">Elige mensual o anual</label>
+                    {{ form.billing_cycle }}
+                    {% if form.billing_cycle.errors %}
+                    <div class="error-message">{{ form.billing_cycle.errors }}</div>
+                    {% endif %}
+                    <div class="help-text">Ahorra pagando anual. Cancela cuando quieras.</div>
+                </div>
 
-                <!-- Pricing Cards -->
                 <div class="pricing-grid">
-                    <!-- Trial -->
-                    <div class="plan-card" data-plan="trial" onclick="selectPlan('trial')">
-                        <div class="plan-badge">{% trans "FREE" %}</div>
-                        <div class="plan-name">Trial</div>
-                        <div class="plan-price">$0</div>
-                        <div class="plan-period">30 {% trans "days" %}</div>
-                        <ul class="plan-features">
-                            <li>{% trans "Full access" %}</li>
-                            <li>{% trans "No credit card" %}</li>
-                            <li>{% trans "Cancel anytime" %}</li>
-                        </ul>
-                    </div>
-
-                    <!-- Mensual -->
-                    <div class="plan-card" data-plan="mensual" onclick="selectPlan('mensual')">
-                        <div class="plan-name">{% trans "Monthly" %}</div>
-                        <div class="plan-price">
-                            <span class="price-cl">$20.000</span>
-                            <span class="price-us" style="display:none;">$20</span>
-                        </div>
-                        <div class="plan-period">
-                            <span class="period-cl">/ mes</span>
-                            <span class="period-us" style="display:none;">/ month</span>
-                        </div>
-                        <ul class="plan-features">
-                            <li>{% trans "Unlimited users" %}</li>
-                            <li>{% trans "All features" %}</li>
-                        </ul>
-                    </div>
-
-                    <!-- Semestral -->
-                    <div class="plan-card recommended" data-plan="semestral" onclick="selectPlan('semestral')">
-                        <div class="plan-badge gold">⭐ {% trans "BEST VALUE" %}</div>
-                        <div class="plan-name">{% trans "Semi-Annual" %}</div>
-                        <div class="plan-price">
-                            <span class="price-cl">$100.000</span>
-                            <span class="price-us" style="display:none;">$110</span>
-                        </div>
-                        <div class="plan-period">
-                            <span class="period-cl">/ 6 meses</span>
-                            <span class="period-us" style="display:none;">/ 6 months</span>
-                        </div>
-                        <div class="plan-savings">{% trans "Save" %} 17%</div>
-                        <ul class="plan-features">
-                            <li>{% trans "Everything in Monthly" %}</li>
-                            <li>{% trans "Priority support" %}</li>
-                        </ul>
-                    </div>
-
-                    <!-- Anual -->
-                    <div class="plan-card" data-plan="anual" onclick="selectPlan('anual')">
-                        <div class="plan-badge gold">💎 {% trans "BEST PRICE" %}</div>
-                        <div class="plan-name">{% trans "Annual" %}</div>
-                        <div class="plan-price">
-                            <span class="price-cl">$200.000</span>
-                            <span class="price-us" style="display:none;">$200</span>
-                        </div>
-                        <div class="plan-period">
-                            <span class="period-cl">/ año</span>
-                            <span class="period-us" style="display:none;">/ year</span>
-                        </div>
-                        <div class="plan-savings">{% trans "Save" %} 17%</div>
-                        <ul class="plan-features">
-                            <li>{% trans "Everything in Semi-Annual" %}</li>
-                            <li>{% trans "Best value" %}</li>
-                        </ul>
-                    </div>
+                    {% include "includes/pricing_plan_card.html" with plan="trial" pricing="$0" billing_cycle="monthly" country=from_country payment_methods="" highlight=False cta_url="" %}
+                    {% include "includes/pricing_plan_card.html" with plan="entry" pricing="$20.000 CLP mensual / $200.000 CLP anual" billing_cycle="monthly" country=from_country payment_methods="" highlight=False cta_url="" %}
+                    {% include "includes/pricing_plan_card.html" with plan="growth" pricing="$39.000 CLP mensual / $390.000 CLP anual" billing_cycle="monthly" country=from_country payment_methods="" highlight=True cta_url="" %}
+                    {% include "includes/pricing_plan_card.html" with plan="business" pricing="$69.000 CLP mensual / $690.000 CLP anual" billing_cycle="monthly" country=from_country payment_methods="" highlight=False cta_url="" %}
                 </div>
             </div>
 
@@ -614,6 +558,16 @@ function updatePlanPrices(country) {
 
 // Seleccionar plan
 function selectPlan(planName) {
+    const legacyPlans = {
+        mensual: 'entry',
+        semestral: 'growth',
+        anual: 'business',
+        entry: 'entry',
+        growth: 'growth',
+        business: 'business'
+    };
+    planName = legacyPlans[planName] || planName;
+
     // Actualizar select
     document.getElementById('id_plan').value = planName;
 
@@ -647,17 +601,17 @@ const translations = {
         // Sección 3: Plan
         'Choose Your Plan': 'Elige tu Plan',
         'Free Trial': 'Prueba Gratis',
-        '30 days free': '30 días gratis',
-        'No credit card required': 'Sin tarjeta de crédito',
+        '30 días gratis free': '30 días gratis',
+        'Sin tarjeta required': 'Sin tarjeta',
         'Full access': 'Acceso completo',
-        'Monthly': 'Mensual',
+        'Entry': 'Entry',
         'Everything in Trial': 'Todo de Prueba',
-        'Unlimited users': 'Usuarios ilimitados',
-        'Semi-Annual': 'Semestral',
-        'Everything in Monthly': 'Todo del plan Mensual',
+        '1 user': '1 usuario',
+        'Growth': 'Growth',
+        'Everything in Entry': 'Todo de Entry',
         'Save': 'Ahorra',
-        'Annual': 'Anual',
-        'Everything in Semi-Annual': 'Todo del plan Semestral',
+        'Business': 'Business',
+        'Everything in Growth': 'Todo de Growth',
         'Best value': 'Mejor valor',
 
         // Sección 4: Seguridad
@@ -686,17 +640,17 @@ const translations = {
         'Country': 'Country',
         'Choose Your Plan': 'Choose Your Plan',
         'Free Trial': 'Free Trial',
-        '30 days free': '30 days free',
-        'No credit card required': 'No credit card required',
+        '30 días gratis free': '30 días gratis free',
+        'Sin tarjeta required': 'Sin tarjeta required',
         'Full access': 'Full access',
-        'Monthly': 'Monthly',
+        'Entry': 'Entry',
         'Everything in Trial': 'Everything in Trial',
-        'Unlimited users': 'Unlimited users',
-        'Semi-Annual': 'Semi-Annual',
-        'Everything in Monthly': 'Everything in Monthly',
+        '1 user': '1 user',
+        'Growth': 'Growth',
+        'Everything in Entry': 'Everything in Entry',
         'Save': 'Save',
-        'Annual': 'Annual',
-        'Everything in Semi-Annual': 'Everything in Semi-Annual',
+        'Business': 'Business',
+        'Everything in Growth': 'Everything in Growth',
         'Best value': 'Best value',
         'Security': 'Security',
         'Password': 'Password',

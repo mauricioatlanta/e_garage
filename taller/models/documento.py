@@ -522,6 +522,41 @@ class Documento(AuditMixin, models.Model):
 
         return self.numero
 
+    def convertir_documento_final(self):
+        """
+        Conversión operacional automática:
+
+        Chile:
+            PRES -> OT
+
+        USA:
+            PRES -> FAC
+
+        Mantiene el mismo documento,
+        pero cambia:
+        - tipo
+        - correlativo
+        - prefijo
+        """
+
+        if self.tipo != "PRES":
+            return False
+
+        nuevo_tipo = "FAC" if self.country == "US" else "OT"
+
+        self.tipo = nuevo_tipo
+
+        # Forzar regeneración de número
+        self.numero = ""
+
+        self.generar_numero_documento()
+
+        self.save(update_fields=["tipo", "numero"])
+
+        return True
+
+
+
     def save(self, *args, **kwargs):
         """Override save para generar número automáticamente y recalcular totales"""
         # Asegura moneda/país por empresa si los tienes en el modelo de Documento
@@ -755,7 +790,6 @@ class Documento(AuditMixin, models.Model):
                 name="uniq_documento_empresa_tipo_numero",
             )
         ]
-
         app_label = "taller"
         verbose_name = _("Documento")
         verbose_name_plural = _("Documentos")

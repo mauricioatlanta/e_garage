@@ -196,6 +196,17 @@ body {
     display: inline-block;
     margin-top: 8px;
 }
+
+.method-note {
+    background: #f8fafc;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    color: #475569;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-bottom: 24px;
+    padding: 16px;
+}
 </style>
 {% endblock %}
 
@@ -220,11 +231,17 @@ body {
         </ul>
     </div>
 
+    {% if paypal_enabled %}
     <!-- Security Badge -->
     <div class="security-badge">
         <span class="security-text">
-            🔒 Secure payment powered by PayPal
+            🔒 Secure online payment with PayPal
         </span>
+    </div>
+
+    <div class="method-note">
+        PayPal is the fastest option. Your subscription is updated when the payment is confirmed.
+        You can also use bank transfer if you prefer manual confirmation.
     </div>
 
     <!-- Reference -->
@@ -268,22 +285,25 @@ body {
             </form>
 
             <div style="margin-top: 16px; font-size: 12px; color: #64748b;">
-                You will be redirected to PayPal to complete the payment
+            You will be redirected to PayPal to complete the payment
             </div>
         </div>
     </div>
+    {% endif %}
 
+    {% if bank_transfer_enabled %}
     <!-- Alternative: Manual Payment -->
     <div style="text-align: center; margin: 24px 0; color: #94a3b8;">
         <div style="border-top: 1px solid #e2e8f0; margin-bottom: 16px;"></div>
         <div style="font-size: 13px;">
-            Or send payment directly to PayPal account:
-            <strong style="color: #1a202c;">{{ paypal_config.business_email }}</strong>
+            Or request bank transfer details:
+            <strong style="color: #1a202c;">{{ datos_banco.email_confirmacion }}</strong>
         </div>
         <div style="font-size: 12px; margin-top: 8px;">
-            Include reference: <strong>{{ reference }}</strong>
+            Include reference: <strong>{{ reference }}</strong>. Manual activation usually takes 24-48 business hours.
         </div>
     </div>
+    {% endif %}
 
     <!-- Back Link -->
     <div class="back-link">

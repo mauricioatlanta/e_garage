@@ -138,6 +138,7 @@ TEMPLATES = [
                 "taller.context_processors.panel_chrome.us_authenticated_compact_chrome",
                 "taller.context_processors.panel_chrome.us_signup_slim_header",
                 "taller.context_processors.ui_labels.ui_labels_context",
+                "taller.context_processors.subscription_notice.subscription_notice",
             ],
         },
     },
@@ -310,6 +311,6 @@ else:
         },
     }
 
-EMAIL_BACKEND = 'gestion_taller.resend_backend.ResendBackend'
-RESEND_API_KEY = 're_tu_llave_aqui'
-DEFAULT_FROM_EMAIL = 'support@egarage.cl'
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "gestion_taller.resend_backend.ResendBackend")
+RESEND_API_KEY = (os.getenv("RESEND_API_KEY") or "").strip()
+DEFAULT_FROM_EMAIL = (os.getenv("DEFAULT_FROM_EMAIL") or "support@egarage.cl").strip()

@@ -2,6 +2,10 @@ from django.db import models
 from django.utils import timezone
 
 from taller.utils.payment_config import normalize_company_plan
+from taller.utils.plan_catalog import (
+    BILLING_ANNUAL,
+    normalize_billing_cycle,
+)
 
 
 class PagoPendiente(models.Model):
@@ -66,13 +70,8 @@ class PagoPendiente(models.Model):
         from django.core.mail import send_mail
         from django.template.loader import render_to_string
 
-        dias_plan = {
-            "mensual": 30,
-            "semestral": 180,
-            "anual": 365,
-        }
-
-        dias = dias_plan.get(self.plan, 30)
+        billing_cycle = normalize_billing_cycle(self.plan)
+        dias = 365 if billing_cycle == BILLING_ANNUAL else 30
 
         # Detectar si es nueva suscripción, cambio de plan o renovación
         plan_nuevo = normalize_company_plan(self.plan)

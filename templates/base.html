@@ -2,6 +2,8 @@
 {% load i18n %}
 {% load country_url %}
 {% load dal_form_media %}
+{% firstof COLOR_PRIMARIO company_color "#00ffff" as brand_primary_color %}
+{% firstof COLOR_SECUNDARIO secondary_color "#0d6efd" as brand_secondary_color %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
@@ -50,12 +52,12 @@
   <style>
     /* Prioridad: COLOR_PRIMARIO desde logo_empresa > company_color desde company_branding > default */
     :root{
-      --company-primary: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }};
-      --company-secondary: {{ COLOR_SECUNDARIO|default:secondary_color|default:"#0d6efd" }};
+      --company-primary: {{ brand_primary_color }};
+      --company-secondary: {{ brand_secondary_color }};
       
       /* Variables de Bootstrap para compatibilidad */
-      --bs-primary: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }};
-      --bs-secondary: {{ COLOR_SECUNDARIO|default:secondary_color|default:"#0d6efd" }};
+      --bs-primary: {{ brand_primary_color }};
+      --bs-secondary: {{ brand_secondary_color }};
     }
     
     /* Estilos base con colores personalizados */
@@ -71,13 +73,13 @@
     
     /* Efectos hover y bordes con transparencia para botones de navegación */
     .nav-button-standard {
-        border-color: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }}4D; /* 4D = 30% opacidad */
+        border-color: {{ brand_primary_color }}4D; /* 4D = 30% opacidad */
         /* Mejora legibilidad del texto en botones de navegación */
         text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
     
     .nav-button-standard:hover {
-        box-shadow: 0 0 20px {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }}66; /* 66 = 40% opacidad */
+        box-shadow: 0 0 20px {{ brand_primary_color }}66; /* 66 = 40% opacidad */
         border-color: var(--company-primary);
     }
     .btn-primary:hover{
@@ -760,7 +762,7 @@
         <img src="{% if LOGO_PERSONALIZADO %}{{ LOGO_PERSONALIZADO }}{% elif company_logo_url %}{{ company_logo_url }}{% else %}{{ COMPANY_LOGO }}{% endif %}" 
              alt="{% if NOMBRE_EMPRESA_PERSONALIZADO %}{{ NOMBRE_EMPRESA_PERSONALIZADO }}{% elif company_name %}{{ request.empresa.nombre_taller }}{% elif COMPANY_NAME %}{{ COMPANY_NAME }}{% else %}Logo{% endif %}"
              class="company-logo w-auto object-contain rounded-md shadow-lg border border-opacity-30"
-             style="border-color: {{ COLOR_PRIMARIO|default:company_color|default:'#00ffff' }}; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));">
+             style="border-color: {{ brand_primary_color }}; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));">
       {% endif %}
 
       <div class="flex flex-col">
@@ -883,43 +885,13 @@
   </div>
   {% endif %}
 
-  {% if request.user.is_authenticated and subscription_state != "active" %}
+  {% if subscription_notice.show %}
   <div class="px-4 mt-4" aria-live="polite">
-    <div class="mx-auto max-w-6xl rounded-2xl border px-4 py-4 shadow-[0_12px_40px_rgba(15,23,42,0.28)] {% if subscription_state == 'blocked' %}border-red-400/60 bg-red-950/80 text-red-50{% else %}border-amber-300/60 bg-amber-950/70 text-amber-50{% endif %}">
+    <div class="mx-auto max-w-6xl rounded-xl border px-4 py-3 shadow-[0_8px_28px_rgba(15,23,42,0.18)] {% if subscription_notice.level == 'blocked' %}border-red-200 bg-red-50 text-red-950{% elif subscription_notice.level == 'grace' %}border-orange-200 bg-orange-50 text-orange-950{% elif subscription_notice.level == 'warning' %}border-amber-200 bg-amber-50 text-amber-950{% else %}border-sky-200 bg-sky-50 text-sky-950{% endif %}">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          {% if request.LANGUAGE_CODE == 'en' %}
-            <p class="text-[11px] font-semibold uppercase tracking-[0.28em] {% if subscription_state == 'blocked' %}text-red-200{% else %}text-amber-200{% endif %}">Subscription status</p>
-            {% if subscription_state == "grace" %}
-              <p class="mt-1 text-sm font-semibold sm:text-base">Your subscription expired, but you are still within the grace period.</p>
-              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">You keep full access for now, but renewal is already pending.</p>
-            {% elif subscription_state == "restricted" %}
-              <p class="mt-1 text-sm font-semibold sm:text-base">Some modules are currently restricted due to an overdue subscription.</p>
-              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">You can keep browsing core records, but critical actions remain blocked until renewal.</p>
-            {% elif subscription_state == "blocked" %}
-              <p class="mt-1 text-sm font-semibold sm:text-base">Your account is suspended due to an overdue subscription.</p>
-              <p class="mt-1 text-xs sm:text-sm text-red-100/80">Only billing, support and account access remain available until renewal.</p>
-            {% endif %}
-          {% else %}
-            <p class="text-[11px] font-semibold uppercase tracking-[0.28em] {% if subscription_state == 'blocked' %}text-red-200{% else %}text-amber-200{% endif %}">Estado de suscripcion</p>
-            {% if subscription_state == "grace" %}
-              <p class="mt-1 text-sm font-semibold sm:text-base">Tu suscripcion vencio, pero sigues dentro del periodo de gracia.</p>
-              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">Mantienes acceso completo por ahora, pero la renovacion ya esta pendiente.</p>
-            {% elif subscription_state == "restricted" %}
-              <p class="mt-1 text-sm font-semibold sm:text-base">Algunos modulos estan restringidos por suscripcion vencida.</p>
-              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">Puedes seguir navegando modulos clave, pero las acciones criticas quedan bloqueadas hasta renovar.</p>
-            {% elif subscription_state == "blocked" %}
-              <p class="mt-1 text-sm font-semibold sm:text-base">Tu cuenta esta suspendida por falta de pago.</p>
-              <p class="mt-1 text-xs sm:text-sm text-red-100/80">Solo billing, soporte y cuenta siguen disponibles hasta regularizar la suscripcion.</p>
-            {% endif %}
-          {% endif %}
-        </div>
-        <a href="{{ billing_renew_url|default:'/cl/es/suscripcion/pago/' }}" class="{% if subscription_state == 'blocked' %}bg-red-500 hover:bg-red-400 text-white{% else %}bg-amber-300 hover:bg-amber-200 text-slate-950{% endif %} inline-flex min-h-[44px] items-center justify-center rounded-xl px-4 py-2 text-sm font-bold shadow-[0_8px_24px_rgba(15,23,42,0.24)] transition-colors">
-          {% if request.LANGUAGE_CODE == 'en' %}
-            Go to billing
-          {% else %}
-            Ir a facturacion
-          {% endif %}
+        <p class="text-sm font-medium leading-6">{{ subscription_notice.message }}</p>
+        <a href="{{ subscription_notice.renew_url|default:billing_renew_url|default:'/cl/es/suscripcion/pago/' }}" class="inline-flex min-h-[40px] items-center justify-center rounded-lg px-4 py-2 text-sm font-bold transition-colors {% if subscription_notice.level == 'blocked' %}bg-red-600 text-white hover:bg-red-500{% elif subscription_notice.level == 'grace' %}bg-orange-500 text-white hover:bg-orange-400{% elif subscription_notice.level == 'warning' %}bg-amber-400 text-slate-950 hover:bg-amber-300{% else %}bg-sky-500 text-white hover:bg-sky-400{% endif %}">
+          Renovar ahora
         </a>
       </div>
     </div>
@@ -1254,5 +1226,3 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 </body>
 </html>
-
-

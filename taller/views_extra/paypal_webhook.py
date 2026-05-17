@@ -5,6 +5,7 @@ Webhook de PayPal para procesar pagos automáticamente
 import json
 import logging
 from datetime import timedelta
+from decimal import Decimal
 
 from django.conf import settings
 from django.http import HttpResponse, JsonResponse
@@ -12,9 +13,59 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 
-from taller.utils.payment_config import normalize_company_plan
+from taller.utils.plan_catalog import (
+    BILLING_MONTHLY,
+    PLAN_ENTRY,
+    PLAN_TRIAL,
+    normalize_billing_cycle,
+    normalize_plan_code,
+)
 
 logger = logging.getLogger(__name__)
+
+
+def _text_values(*values):
+    for value in values:
+        if value is None:
+            continue
+        text = str(value).strip().lower()
+        if text:
+            yield text
+
+
+def _extract_paypal_plan_context(resource, amount, currency):
+    candidates = list(
+        _text_values(
+            resource.get("custom"),
+            resource.get("invoice_number"),
+            resource.get("item_number"),
+            resource.get("description"),
+        )
+    )
+
+    for transaction in resource.get("transactions") or []:
+        candidates.extend(
+            _text_values(
+                transaction.get("custom"),
+                transaction.get("invoice_number"),
+                transaction.get("item_number"),
+                transaction.get("description"),
+            )
+        )
+        for item in ((transaction.get("item_list") or {}).get("items") or []):
+            candidates.extend(_text_values(item.get("sku"), item.get("name")))
+
+    for candidate in candidates:
+        for token in candidate.replace("/", "-").replace("_", "-").split("-"):
+            plan = normalize_plan_code(token)
+            if plan != PLAN_TRIAL or token == PLAN_TRIAL:
+                return plan, normalize_billing_cycle(token)
+
+    if currency == "USD" and amount >= 190:
+        return normalize_plan_code("anual"), normalize_billing_cycle("anual")
+    if currency == "USD" and amount >= 100:
+        return normalize_plan_code("semestral"), normalize_billing_cycle("semestral")
+    return PLAN_ENTRY, BILLING_MONTHLY
 
 
 @csrf_exempt
@@ -67,7 +118,8 @@ def handle_payment_completed(payload):
         # Extraer datos del payload
         sale_id = payload["resource"]["id"]
         payer_email = payload["resource"]["payer"]["email_address"]
-        amount = float(payload["resource"]["amount"]["total"])
+        resource = payload["resource"]
+        amount = Decimal(str(resource["amount"]["total"]))
         currency = payload["resource"]["amount"]["currency"]
 
         # Buscar empresa por email
@@ -78,26 +130,22 @@ def handle_payment_completed(payload):
             return JsonResponse({"status": "error", "message": "Company not found"})
 
         # Determinar ciclo de cobro según monto
-        if currency == "USD":
-            if amount >= 190:
-                billing_cycle = "anual"
-                dias = 365
-            elif amount >= 100:
-                billing_cycle = "semestral"
-                dias = 180
-            else:
-                billing_cycle = "mensual"
-                dias = 30
-        else:
-            billing_cycle = "mensual"
-            dias = 30
+        plan, billing_cycle = _extract_paypal_plan_context(resource, amount, currency)
+        dias = 30 if billing_cycle == BILLING_MONTHLY else 365
 
-        plan = normalize_company_plan(billing_cycle)
+        existing_payment = PagoPendiente.objects.filter(
+            referencia=sale_id,
+            metodo_pago="paypal",
+            estado="procesado",
+        ).first()
+        if existing_payment:
+            logger.info("Webhook PayPal duplicado ignorado para sale_id=%s", sale_id)
+            return JsonResponse({"status": "success", "duplicate": True})
 
-        # Crear registro de pago
+        # Crear registro de pago usando el plan moderno; el save sincroniza SuscripcionTransaccion.
         pago = PagoPendiente.objects.create(
             empresa=empresa,
-            plan=billing_cycle,
+            plan=plan,
             monto=amount,
             referencia=sale_id,
             metodo_pago="paypal",
@@ -118,6 +166,27 @@ def handle_payment_completed(payload):
         empresa.fecha_inicio = timezone.now()
         empresa.fecha_fin = timezone.now() + timedelta(days=dias)
         empresa.save()
+        transaccion = getattr(pago, "suscripcion_transaccion", None)
+        if transaccion:
+            transaccion.billing_cycle = billing_cycle
+            transaccion.plan_code = plan
+            transaccion.currency = currency
+            transaccion.raw_status = "PAYMENT.SALE.COMPLETED"
+            transaccion.gateway_payload = {"paypal_webhook_payload": payload}
+            transaccion.processed_at = timezone.now()
+            transaccion.subscription_applied_at = transaccion.processed_at
+            transaccion.save(
+                update_fields=[
+                    "billing_cycle",
+                    "plan_code",
+                    "currency",
+                    "raw_status",
+                    "gateway_payload",
+                    "processed_at",
+                    "subscription_applied_at",
+                    "updated_at",
+                ]
+            )
 
         logger.info(f"✅ Pago PayPal procesado para {empresa.nombre_taller}")
 

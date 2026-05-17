@@ -240,6 +240,7 @@ for _processor in [
     "taller.context_processors.feature_flags.country_features",
     "taller.context_processors.ui_labels.ui_labels_context",
     "taller.context_processors.subscription_status.subscription_status",
+    "taller.context_processors.subscription_notice.subscription_notice",
     "taller.context_processors.support_context",
     "taller.context_processors.ayuda_contextual.ayuda_contextual",
 ]:
@@ -345,6 +346,6 @@ CSRF_USE_SESSIONS = True
 # La base de datos de producción debe quedar definida arriba por DJANGO_DB_ENGINE.
 # Nunca sobrescribir DATABASES aquí.
 
-EMAIL_BACKEND = 'gestion_taller.resend_backend.ResendBackend'
-RESEND_API_KEY = 're_tu_llave_aqui'
-DEFAULT_FROM_EMAIL = 'support@egarage.cl'
+EMAIL_BACKEND = env_str("EMAIL_BACKEND", "gestion_taller.resend_backend.ResendBackend")
+RESEND_API_KEY = env_str("RESEND_API_KEY", "")
+DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl")

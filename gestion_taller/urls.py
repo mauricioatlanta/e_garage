@@ -281,6 +281,26 @@ urlpatterns = [
     # PÃ¡gina de inicio - SelecciÃ³n de paÃ­s
     path("", TemplateView.as_view(template_name="landing/seleccionar_pais.html"), name="home"),
     # Panel de administraciÃ³n de suscriptores (ANTES de admin.site.urls para que no sea capturado)
+    path(
+        "cl/admin/subcriptores",
+        RedirectView.as_view(url="/admin/suscriptores/", permanent=False, query_string=True),
+        name="admin_subcriptores_typo_cl_no_slash",
+    ),
+    path(
+        "cl/admin/subcriptores/",
+        RedirectView.as_view(url="/admin/suscriptores/", permanent=False, query_string=True),
+        name="admin_subcriptores_typo_cl",
+    ),
+    path(
+        "cl/admin/suscriptores",
+        RedirectView.as_view(url="/admin/suscriptores/", permanent=False, query_string=True),
+        name="admin_suscriptores_cl_no_slash",
+    ),
+    path(
+        "cl/admin/suscriptores/",
+        RedirectView.as_view(url="/admin/suscriptores/", permanent=False, query_string=True),
+        name="admin_suscriptores_cl",
+    ),
     path("admin/suscriptores/", admin_suscriptores, name="admin_suscriptores"),
     path(
         "admin/suscriptores/<int:empresa_id>/", detalle_suscriptor, name="admin_detalle_suscriptor"

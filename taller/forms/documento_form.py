@@ -293,9 +293,8 @@ class DocumentoForm(forms.ModelForm):
         # Labels de choices segÃºn idioma
         if self.language == "en":
             self.fields["tipo"].choices = [
-                ("OT", "Work Order"),
                 ("PRES", "Estimate"),
-                ("FAC", "Invoice/Receipt"),
+                ("FAC", "Invoice"),
             ]
             self.fields["payment_status"].choices = [
                 ("pending", "Pending"),

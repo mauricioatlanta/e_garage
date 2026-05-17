@@ -135,14 +135,11 @@
                         <select name="tipo_documento" class="form-control" required>
                             <option value="">-- Seleccionar Tipo --</option>
                             {% if country == 'us' %}
-                                <option value="ESTIMATE">Estimate</option>
-                                <option value="WORK_ORDER">Work Order</option>
-                                <option value="INVOICE">Invoice</option>
+                                <option value="PRES">Estimate</option>
+                                <option value="FAC">Invoice</option>
                             {% else %}
-                                <option value="PRESUPUESTO">Presupuesto</option>
-                                <option value="ORDEN_TRABAJO">Orden de Trabajo</option>
-                                <option value="FACTURA">Recibo/Boleta</option>
-                                <option value="BOLETA">Boleta</option>
+                                <option value="PRES">Presupuesto</option>
+                                <option value="OT">Orden de Trabajo</option>
                             {% endif %}
                         </select>
                     </div>

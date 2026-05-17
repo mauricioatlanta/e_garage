@@ -9,6 +9,8 @@ from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.utils import timezone
 
+from taller.utils.plan_catalog import PLAN_BUSINESS, PLAN_ENTRY, PLAN_GROWTH, PLAN_TRIAL
+
 # Si usas Django ≥4, evita pytz y usa zoneinfo:
 # from zoneinfo import ZoneInfo
 # from django.utils.timezone import localtime  # recomendado
@@ -16,7 +18,12 @@ from django.utils import timezone
 
 class Empresa(models.Model):
     PLAN_CHOICES = [
-        ("trial", "Prueba Gratuita"),
+        # Nuevos planes modernos
+        (PLAN_TRIAL, "Trial"),
+        (PLAN_ENTRY, "Entry"),
+        (PLAN_GROWTH, "Growth"),
+        (PLAN_BUSINESS, "Business"),
+        # Valores legacy de compatibilidad (mantener temporalmente)
         ("basic", "Plan Básico"),
         ("premium", "Plan Premium"),
         ("enterprise", "Plan Empresarial"),
@@ -299,6 +306,11 @@ class Empresa(models.Model):
             plan: Plan de suscripción (opcional)
             enviar_notificacion: Si True, envía notificación de renovación (Email + WhatsApp)
         """
+        if plan:
+            from taller.utils.plan_catalog import normalize_plan_code
+
+            plan = normalize_plan_code(plan)
+
         # Guardar estado anterior para detectar tipo de evento
         plan_anterior = self.plan
         es_nueva_suscripcion = not self.suscripcion_activa or self.plan == "trial"

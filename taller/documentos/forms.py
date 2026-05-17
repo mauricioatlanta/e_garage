@@ -60,9 +60,8 @@ class DocumentoForm(forms.ModelForm):
             if "tipo" in self.fields:
                 self.fields["tipo"].label = "Document Type"
                 self.fields["tipo"].choices = [
-                    ("OT", "Work Order"),
                     ("PRES", "Estimate"),
-                    ("FAC", "Invoice/Receipt"),
+                    ("FAC", "Invoice"),
                 ]
             if "cliente" in self.fields:
                 self.fields["cliente"].label = "Customer"

@@ -1,1075 +1,288 @@
-{% extends 'base.html' %}
-{% load static %}
 {% load i18n %}
-
-{% block title %}{% trans "Create Account" %} - eGarage{% endblock %}
-
-{% block extra_head %}
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js" defer></script>
-<style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    background: #0a0a0a;
-    font-family: 'Inter', sans-serif;
-    color: #ffffff;
-    min-height: 100vh;
-    overflow-x: hidden;
-}
-
-.grid-bg {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-image:
-        linear-gradient(rgba(34, 211, 238, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(34, 211, 238, 0.03) 1px, transparent 1px);
-    background-size: 50px 50px;
-    z-index: 1;
-}
-
-.signup-container {
-    position: relative;
-    z-index: 10;
-    max-width: 900px;
-    margin: 40px auto;
-    padding: 20px;
-    color-scheme: dark;
-}
-
-.glass-card {
-    background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(26, 34, 62, 0.9) 100%);
-    backdrop-filter: blur(25px);
-    border-radius: 24px;
-    border: 2px solid rgba(34, 211, 238, 0.4);
-    box-shadow: 0 8px 32px rgba(34, 211, 238, 0.2), inset 0 0 60px rgba(34, 211, 238, 0.05);
-    padding: 48px 40px;
-}
-
-.logo-section {
-    text-align: center;
-    margin-bottom: 32px;
-}
-
-.logo {
-    width: 120px;
-    height: 120px;
-    margin-bottom: 24px;
-    filter: drop-shadow(0 0 15px rgba(34, 211, 238, 0.6));
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.brand-name {
-    font-size: 32px;
-    font-weight: 900;
-    color: #22d3ee;
-    font-family: 'Orbitron', monospace;
-    text-shadow: 0 0 20px rgba(34, 211, 238, 0.6);
-    margin-bottom: 8px;
-}
-
-.subtitle {
-    color: #94a3b8;
-    font-size: 14px;
-}
-
-.signup-title {
-    font-size: 24px;
-    font-weight: 700;
-    color: #22d3ee;
-    margin-bottom: 32px;
-    text-align: center;
-    font-family: 'Orbitron', monospace;
-}
-
-.form-section {
-    margin-bottom: 32px;
-}
-
-.section-title {
-    font-size: 18px;
-    font-weight: 700;
-    color: #22d3ee;
-    margin-bottom: 20px;
-    font-family: 'Orbitron', monospace;
-    letter-spacing: 0.05em;
-    text-shadow: 0 0 15px rgba(34, 211, 238, 0.5);
-    padding-bottom: 12px;
-    border-bottom: 2px solid rgba(34, 211, 238, 0.3);
-}
-
-.form-group {
-    margin-bottom: 24px;
-}
-
-/* Mejorar visibilidad de los campos en el grid */
-.grid .form-group {
-    margin-bottom: 20px;
-}
-
-.form-label {
-    display: block;
-    font-size: 14px;
-    font-weight: 600;
-    color: #22d3ee;
-    margin-bottom: 8px;
-    text-shadow: 0 0 8px rgba(34, 211, 238, 0.3);
-}
-
-/* Estilos para todos los campos de formulario - FORZAR fondos oscuros */
-.form-input, 
-.form-select,
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="password"],
-input[type="number"],
-select,
-textarea,
-.input-futurista,
-#signup-form input,
-#signup-form select,
-#signup-form textarea,
-form input,
-form select,
-form textarea {
-    width: 100%;
-    padding: 14px 16px;
-    font-size: 15px;
-    font-family: 'Inter', sans-serif;
-    color: #f1f5f9 !important;
-    -webkit-text-fill-color: #f1f5f9 !important;
-    caret-color: #22d3ee;
-    background: #0f172a !important;
-    background-color: #0f172a !important;
-    border: 2px solid rgba(34, 211, 238, 0.5) !important;
-    border-radius: 10px;
-    transition: all 0.3s;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-}
-
-.form-input:focus, 
-.form-select:focus,
-input[type="text"]:focus,
-input[type="email"]:focus,
-input[type="tel"]:focus,
-input[type="password"]:focus,
-input[type="number"]:focus,
-select:focus,
-textarea:focus,
-.input-futurista:focus,
-#signup-form input:focus,
-#signup-form select:focus,
-#signup-form textarea:focus,
-form input:focus,
-form select:focus,
-form textarea:focus {
-    outline: none !important;
-    border-color: #22d3ee !important;
-    background: #020617 !important;
-    background-color: #020617 !important;
-    box-shadow: 0 0 25px rgba(34, 211, 238, 0.6), inset 0 0 10px rgba(34, 211, 238, 0.1) !important;
-    transform: translateY(-1px);
-}
-
-.form-input::placeholder,
-input::placeholder,
-textarea::placeholder,
-#signup-form input::placeholder,
-#signup-form textarea::placeholder {
-    color: #94a3b8 !important;
-    opacity: 0.9;
-    font-style: italic;
-}
-
-/* Select específico - estilo personalizado */
-select.form-select,
-select.input-futurista,
-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2322d3ee' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 16px center !important;
-    background-size: 12px !important;
-    padding-right: 40px !important;
-    cursor: pointer;
-}
-
-select.form-select option,
-select.input-futurista option,
-select option {
-    background: #1a1a2e !important;
-    color: #ffffff !important;
-    padding: 10px;
-}
-
-/* Eliminar cualquier fondo blanco del navegador */
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
-input:-webkit-autofill:active,
-select:-webkit-autofill,
-select:-webkit-autofill:hover,
-select:-webkit-autofill:focus,
-select:-webkit-autofill:active {
-    -webkit-box-shadow: 0 0 0 30px #0f172a inset !important;
-    -webkit-text-fill-color: #f1f5f9 !important;
-    background-color: #0f172a !important;
-    border-color: rgba(34, 211, 238, 0.5) !important;
-}
-
-.help-text {
-    font-size: 12px;
-    color: #94a3b8;
-    margin-top: 6px;
-    font-style: italic;
-    opacity: 0.9;
-}
-
-.error-message {
-    color: #fecaca;
-    font-size: 13px;
-    margin-top: 8px;
-    font-weight: 500;
-    background: rgba(127, 29, 29, 0.28);
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(248, 113, 113, 0.45);
-    box-shadow: 0 8px 20px rgba(127, 29, 29, 0.12);
-}
-
-.error-message strong {
-    display: block;
-    color: #fecaca;
-}
-
-.error-message ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.error-message li + li {
-    margin-top: 6px;
-}
-
-/* Pricing Cards */
-.pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 16px;
-    margin-top: 20px;
-}
-
-.plan-card {
-    background: rgba(0, 0, 0, 0.6);
-    border: 2px solid rgba(34, 211, 238, 0.2);
-    border-radius: 16px;
-    padding: 20px;
-    text-align: center;
-    transition: all 0.3s;
-    cursor: pointer;
-    position: relative;
-}
-
-.plan-card:hover {
-    border-color: #22d3ee;
-    transform: translateY(-4px);
-    box-shadow: 0 8px 24px rgba(34, 211, 238, 0.3);
-}
-
-.plan-card.selected {
-    border-color: #22d3ee;
-    background: rgba(34, 211, 238, 0.1);
-    box-shadow: 0 0 30px rgba(34, 211, 238, 0.4);
-}
-
-.plan-card.recommended {
-    border-color: #fbbf24;
-}
-
-.plan-badge {
-    display: inline-block;
-    background: linear-gradient(135deg, #22d3ee, #3b82f6);
-    color: #000;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 11px;
-    font-weight: 700;
-    margin-bottom: 12px;
-}
-
-.plan-badge.gold {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-}
-
-.plan-name {
-    font-size: 18px;
-    font-weight: 700;
-    color: #ffffff;
-    margin-bottom: 12px;
-    font-family: 'Orbitron', monospace;
-}
-
-.plan-price {
-    font-size: 28px;
-    font-weight: 900;
-    color: #22d3ee;
-    margin-bottom: 4px;
-    font-family: 'Orbitron', monospace;
-}
-
-.plan-period {
-    font-size: 12px;
-    color: #94a3b8;
-    margin-bottom: 12px;
-}
-
-.plan-savings {
-    background: rgba(34, 211, 238, 0.15);
-    color: #22d3ee;
-    padding: 4px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    display: inline-block;
-}
-
-.plan-features {
-    list-style: none;
-    padding: 0;
-    margin-top: 16px;
-    font-size: 13px;
-    color: #94a3b8;
-    text-align: left;
-}
-
-.plan-features li {
-    margin-bottom: 8px;
-    padding-left: 20px;
-    position: relative;
-}
-
-.plan-features li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: #22d3ee;
-    font-weight: 700;
-}
-
-.checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin: 20px 0;
-}
-
-.form-checkbox {
-    width: 20px;
-    height: 20px;
-    accent-color: #22d3ee;
-    cursor: pointer;
-}
-
-.checkbox-label {
-    font-size: 14px;
-    color: #94a3b8;
-    cursor: pointer;
-}
-
-.checkbox-label a {
-    color: #22d3ee;
-    text-decoration: none;
-}
-
-.checkbox-label a:hover {
-    text-decoration: underline;
-}
-
-.signup-button {
-    width: 100%;
-    padding: 18px;
-    font-size: 18px;
-    font-weight: 700;
-    color: #000000;
-    background: linear-gradient(135deg, #22d3ee 0%, #3b82f6 100%);
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.3s;
-    box-shadow: 0 0 25px rgba(34, 211, 238, 0.5);
-    font-family: 'Orbitron', monospace;
-    letter-spacing: 0.05em;
-}
-
-.signup-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 35px rgba(34, 211, 238, 0.8);
-}
-
-.login-link {
-    text-align: center;
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid rgba(34, 211, 238, 0.2);
-}
-
-.login-text {
-    font-size: 14px;
-    color: #94a3b8;
-}
-
-.login-link a {
-    color: #22d3ee;
-    text-decoration: none;
-    font-weight: 600;
-    margin-left: 4px;
-}
-
-.login-link a:hover {
-    text-shadow: 0 0 10px rgba(34, 211, 238, 0.8);
-}
-
-/* Estilos adicionales para mejorar contraste y visibilidad - Aplicar a TODOS los inputs */
-#signup-form input,
-#signup-form select,
-#signup-form textarea,
-form input,
-form select,
-form textarea,
-.glass-card input,
-.glass-card select,
-.glass-card textarea {
-    background: #0f172a !important;
-    background-color: #0f172a !important;
-    color: #f1f5f9 !important;
-    -webkit-text-fill-color: #f1f5f9 !important;
-    caret-color: #22d3ee;
-    border: 2px solid rgba(34, 211, 238, 0.5) !important;
-}
-
-#signup-form input:focus,
-#signup-form select:focus,
-#signup-form textarea:focus,
-form input:focus,
-form select:focus,
-form textarea:focus,
-.glass-card input:focus,
-.glass-card select:focus,
-.glass-card textarea:focus {
-    background: #020617 !important;
-    background-color: #020617 !important;
-    border-color: #22d3ee !important;
-    box-shadow: 0 0 25px rgba(34, 211, 238, 0.6), inset 0 0 10px rgba(34, 211, 238, 0.1) !important;
-}
-
-/* Mejorar visibilidad de los labels */
-.form-label {
-    text-shadow: 0 0 8px rgba(34, 211, 238, 0.4);
-    font-weight: 700;
-}
-
-/* Mejorar contraste de las tarjetas de planes */
-.plan-card {
-    background: rgba(0, 0, 0, 0.7) !important;
-    border: 2px solid rgba(34, 211, 238, 0.3) !important;
-}
-
-.plan-card:hover {
-    background: rgba(0, 0, 0, 0.8) !important;
-    border-color: #22d3ee !important;
-}
-
-.plan-card.selected {
-    background: rgba(34, 211, 238, 0.15) !important;
-    border-color: #22d3ee !important;
-}
-
-/* Asegurar que el texto en los campos sea siempre visible */
-input[type="text"],
-input[type="email"],
-input[type="tel"],
-input[type="password"],
-input[type="number"],
-select,
-textarea,
-#signup-form input,
-#signup-form select,
-#signup-form textarea {
-    color: #f1f5f9 !important;
-    -webkit-text-fill-color: #f1f5f9 !important;
-    caret-color: #22d3ee;
-    font-weight: 500;
-}
-
-/* Mejorar visibilidad del texto en select cuando está abierto */
-select option {
-    background: #1a1a2e !important;
-    color: #ffffff !important;
-    padding: 12px !important;
-    font-weight: 500;
-}
-
-select option:hover,
-select option:focus,
-select option:checked {
-    background: rgba(34, 211, 238, 0.2) !important;
-    color: #22d3ee !important;
-}
-
-/* Estilos para el campo select (país) */
-select#id_country,
-select[name="country"] {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2322d3ee' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
-    background-repeat: no-repeat !important;
-    background-position: right 16px center !important;
-    background-size: 12px !important;
-    background-color: #0f172a !important;
-    padding-right: 40px !important;
-    cursor: pointer;
-    color: #f1f5f9 !important;
-    -webkit-text-fill-color: #f1f5f9 !important;
-}
-
-@media (max-width: 768px) {
-    .glass-card {
-        padding: 32px 24px;
-    }
-
-    .pricing-grid {
-        grid-template-columns: 1fr;
-    }
-    
-    .form-group {
-        margin-bottom: 20px;
-    }
-}
-</style>
-{% endblock %}
-
-{% block content %}
-<!-- Vanta.js background -->
-<div id="vanta-bg" style="position: fixed; width: 100%; height: 100%; top: 0; left: 0; z-index: 0;"></div>
-<div class="grid-bg"></div>
-
-<div class="signup-container">
-    <div class="glass-card">
-        <h2 class="signup-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Crea Tu Cuenta{% else %}{% trans "Create Your Account" %}{% endif %}</h2>
-
-        <form method="POST" id="signup-form">
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crea tu cuenta - eGarage</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background:
+                radial-gradient(circle at 12% 0%, rgba(14, 165, 233, 0.28), transparent 32%),
+                radial-gradient(circle at 88% 10%, rgba(56, 189, 248, 0.16), transparent 30%),
+                linear-gradient(180deg, #071527 0%, #0b2542 48%, #06111f 100%);
+            color: #eaf6ff;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            min-height: 100vh;
+        }
+
+        body::before {
+            background-image:
+                linear-gradient(rgba(186, 230, 253, 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(186, 230, 253, 0.06) 1px, transparent 1px);
+            background-size: 56px 56px;
+            content: "";
+            inset: 0;
+            pointer-events: none;
+            position: fixed;
+        }
+
+        .signup-shell {
+            margin: 0 auto;
+            max-width: 1080px;
+            padding: 28px 16px 44px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .signup-panel {
+            background: rgba(8, 28, 52, 0.92);
+            border: 1px solid rgba(125, 211, 252, 0.28);
+            border-radius: 14px;
+            box-shadow: 0 24px 70px rgba(2, 6, 23, 0.42);
+            backdrop-filter: blur(14px);
+            padding: 24px;
+        }
+
+        .field label {
+            color: #dbeafe;
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .field input,
+        .field select {
+            background: #f8fcff;
+            border: 1px solid #7dd3fc;
+            border-radius: 10px;
+            color: #0f172a;
+            min-height: 46px;
+            padding: 10px 12px;
+            width: 100%;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.16);
+            outline: none;
+        }
+
+        .form-error {
+            color: #b91c1c;
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        .pricing-grid {
+            display: grid;
+            gap: 14px;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        }
+
+        .plan-card {
+            background: linear-gradient(180deg, rgba(15, 45, 78, 0.96) 0%, rgba(9, 31, 56, 0.96) 100%);
+            border: 1px solid rgba(125, 211, 252, 0.30);
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            min-height: 100%;
+            padding: 18px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .plan-card:hover,
+        .plan-card.active {
+            border-color: #7dd3fc;
+            box-shadow: 0 16px 38px rgba(14, 165, 233, 0.24);
+            transform: translateY(-2px);
+        }
+
+        .plan-card.recommended {
+            border-color: #38bdf8;
+            background: linear-gradient(180deg, rgba(12, 74, 110, 0.98) 0%, rgba(8, 47, 73, 0.98) 100%);
+            position: relative;
+        }
+
+        .plan-card.recommended::before {
+            background: #0ea5e9;
+            border-radius: 999px;
+            color: #ffffff;
+            content: "Más popular";
+            font-size: 0.75rem;
+            font-weight: 800;
+            left: 16px;
+            padding: 5px 9px;
+            position: absolute;
+            top: -12px;
+        }
+
+        .plan-badge {
+            align-self: flex-start;
+            background: #dcfce7;
+            border-radius: 999px;
+            color: #166534;
+            font-size: 0.75rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            padding: 6px 10px;
+        }
+
+        .plan-badge.gold {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .plan-name {
+            color: #f8fafc;
+            font-size: 1.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .plan-price {
+            color: #e0f2fe;
+            font-size: 1.15rem;
+            font-weight: 800;
+            line-height: 1.3;
+            min-height: 48px;
+        }
+
+        .plan-period {
+            color: #bae6fd;
+            font-size: 0.88rem;
+            line-height: 1.45;
+            margin-top: 8px;
+        }
+
+        .plan-features {
+            color: #dbeafe;
+            display: grid;
+            gap: 8px;
+            list-style: none;
+            margin: 14px 0 0;
+            padding: 0;
+        }
+
+        .plan-features li {
+            line-height: 1.4;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .plan-features li::before {
+            color: #059669;
+            content: "✓";
+            font-weight: 900;
+            left: 0;
+            position: absolute;
+        }
+
+        .signup-lead,
+        .section-hint,
+        .field-help {
+            color: #bae6fd;
+        }
+
+        .trial-chip {
+            background: rgba(125, 211, 252, 0.16);
+            border: 1px solid rgba(125, 211, 252, 0.28);
+            color: #e0f2fe;
+        }
+
+        .submit-button {
+            background: #0284c7;
+            color: #ffffff;
+        }
+
+        .submit-button:hover {
+            background: #0369a1;
+        }
+
+        @media (max-width: 640px) {
+            .signup-panel {
+                padding: 18px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="signup-shell">
+        <div class="mb-8 text-center">
+            <img src="{% static 'img/brand/egarage-logo-primary.png' %}" alt="eGarage" class="mx-auto mb-4 h-16 w-auto">
+            <h1 class="text-3xl font-extrabold tracking-tight md:text-5xl">Crea tu cuenta</h1>
+            <p class="signup-lead mx-auto mt-3 max-w-2xl">
+                Empieza con 30 días gratis, sin tarjeta. Elige mensual o anual cuando tu taller esté listo.
+            </p>
+        </div>
+
+        <form method="post" action="." class="signup-panel space-y-8">
             {% csrf_token %}
-
-            <!-- Campo oculto username (se genera automáticamente) -->
-            {% if form.username %}
-                {{ form.username }}
-            {% endif %}
-
             {% if form.non_field_errors %}
-                <div class="error-message">
-                    {% for error in form.non_field_errors %}
-                        <strong>{{ error }}</strong>
-                    {% endfor %}
+                <div class="rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                    {{ form.non_field_errors }}
                 </div>
             {% endif %}
 
-            <!-- SECCIÓN 1: Datos de Registro (Solo campos obligatorios) -->
-            <div class="form-section">
-                <h3 class="section-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Datos de Registro{% else %}{% trans "Registration Data" %}{% endif %}</h3>
-
-                <div class="form-group">
-                    <label class="form-label">{{ form.country.label }}</label>
-                    {{ form.country }}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">{{ form.email.label }} *</label>
-                    {{ form.email }}
-                    {% if form.email.errors %}
-                    <div class="error-message">
-                        {% for error in form.email.errors %}
-                        <strong>{{ error }}</strong>
+            <section class="grid gap-4 md:grid-cols-2">
+                {% for field in form.visible_fields %}
+                    {% if field.name != "plan" %}
+                    <div class="field">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <p class="field-help mt-1 text-xs">{{ field.help_text }}</p>
+                        {% endif %}
+                        {% for error in field.errors %}
+                            <p class="form-error">{{ error }}</p>
                         {% endfor %}
                     </div>
                     {% endif %}
-                    {% if form.email.help_text %}
-                    <div class="help-text">{{ form.email.help_text }}</div>
-                    {% endif %}
+                {% endfor %}
+            </section>
+
+            <section>
+                <div class="mb-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <h2 class="text-xl font-extrabold">Selecciona tu plan</h2>
+                        <p class="section-hint text-sm">Cancela cuando quieras. Ahorra pagando anual.</p>
+                    </div>
+                    <div class="trial-chip rounded-full px-3 py-2 text-sm font-bold">
+                        30 días gratis
+                    </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">{{ form.telefono.label }} *</label>
-                    {{ form.telefono }}
-                    <div id="telefono-error" class="error-message" style="display: none;"></div>
-                    {% if form.telefono.errors %}
-                    <div class="error-message">
-                        {% for error in form.telefono.errors %}
-                        <strong>{{ error }}</strong>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    {% if form.telefono.help_text %}
-                    <div class="help-text">{{ form.telefono.help_text }}</div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- SECCIÓN 2: Contraseña -->
-            <div class="form-section">
-                <h3 class="section-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Seguridad{% else %}{% trans "Security" %}{% endif %}</h3>
-                <div class="form-group">
-                    <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Contraseña{% else %}{% trans "Password" %}{% endif %} *</label>
-                    <div style="position: relative;">
-                        {{ form.password1 }}
-                        <button type="button" class="password-toggle" onclick="togglePassword('id_password1')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 8px;">👁️</button>
-                    </div>
-                    {% if form.password1.errors %}
-                    <div class="error-message">
-                        {% for error in form.password1.errors %}
-                        <strong>{{ error }}</strong>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                    {% if form.password1.help_text %}
-                    <div class="help-text">{{ form.password1.help_text }}</div>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Confirmar Contraseña{% else %}{% trans "Confirm Password" %}{% endif %} *</label>
-                    <div style="position: relative;">
-                        {{ form.password2 }}
-                        <button type="button" class="password-toggle" onclick="togglePassword('id_password2')" style="position: absolute; right: 12px; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer; font-size: 18px; padding: 4px 8px;">👁️</button>
-                    </div>
-                    {% if form.password2.errors %}
-                    <div class="error-message">
-                        {% for error in form.password2.errors %}
-                        <strong>{{ error }}</strong>
-                        {% endfor %}
-                    </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- SECCIÓN 3: Selección de Plan -->
-            <div class="form-section">
-                <h3 class="section-title">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Selecciona Tu Plan{% else %}{% trans "Select Your Plan" %}{% endif %}</h3>
-
-                <!-- Pricing Cards -->
-                <div class="pricing-grid">
-                    <!-- Trial -->
-                    <div class="plan-card" data-plan="trial" onclick="selectPlan('trial')">
-                        <div class="plan-badge">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}GRATIS{% else %}{% trans "FREE" %}{% endif %}</div>
-                        <div class="plan-name">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Prueba{% else %}Trial{% endif %}</div>
-                        <div class="plan-price">$0</div>
-                        <div class="plan-period">30 {% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}días{% else %}{% trans "days" %}{% endif %}</div>
-                        <ul class="plan-features">
-                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Acceso completo{% else %}{% trans "Full access" %}{% endif %}</li>
-                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Sin tarjeta de crédito{% else %}{% trans "No credit card" %}{% endif %}</li>
-                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Cancela cuando quieras{% else %}{% trans "Cancel anytime" %}{% endif %}</li>
-                        </ul>
-                    </div>
-
-                    <!-- Mensual -->
-                    <div class="plan-card" data-plan="mensual" onclick="selectPlan('mensual')">
-                        <div class="plan-name">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Mensual{% else %}{% trans "Monthly" %}{% endif %}</div>
-                        <div class="plan-price">
-                            <span class="price-cl">$20.000</span>
-                            <span class="price-us" style="display:none;">$20</span>
-                            <span class="price-ar" style="display:none;">$29.100</span>
-                            <span class="price-br" style="display:none;">R$ 100</span>
-                            <span class="price-ve" style="display:none;">Bs. 730</span>
-                            <span class="price-pe" style="display:none;">S/ 70</span>
-                            <span class="price-co" style="display:none;">$80.000</span>
-                            <span class="price-ec" style="display:none;">$20</span>
-                            <span class="price-uy" style="display:none;">$ 800</span>
-                            <span class="price-mx" style="display:none;">$350</span>
-                        </div>
-                        <div class="plan-period">
-                            <span class="period-cl">/ mes</span>
-                            <span class="period-us" style="display:none;">/ month</span>
-                            <span class="period-ar" style="display:none;">ARS / mes</span>
-                            <span class="period-br" style="display:none;">/ mês</span>
-                            <span class="period-ve" style="display:none;">/ mes</span>
-                            <span class="period-pe" style="display:none;">/ mes</span>
-                            <span class="period-co" style="display:none;">COP / mes</span>
-                            <span class="period-ec" style="display:none;">USD / mes</span>
-                            <span class="period-uy" style="display:none;">UYU / mes</span>
-                            <span class="period-mx" style="display:none;">MXN / mes</span>
-                        </div>
-                        <ul class="plan-features">
-                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Usuarios ilimitados{% else %}{% trans "Unlimited users" %}{% endif %}</li>
-                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Todas las funcionalidades{% else %}{% trans "All features" %}{% endif %}</li>
-                        </ul>
-                    </div>
-
-                    <!-- Semestral -->
-                    <div class="plan-card recommended" data-plan="semestral" onclick="selectPlan('semestral')">
-                        <div class="plan-badge gold">⭐ {% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}MEJOR VALOR{% else %}{% trans "BEST VALUE" %}{% endif %}</div>
-                        <div class="plan-name">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Semestral{% else %}{% trans "Semi-Annual" %}{% endif %}</div>
-                        <div class="plan-price">
-                            <span class="price-cl">$110.000</span>
-                            <span class="price-us" style="display:none;">$110</span>
-                            <span class="price-ar" style="display:none;">$160.050</span>
-                            <span class="price-br" style="display:none;">R$ 500</span>
-                            <span class="price-ve" style="display:none;">Bs. 3,650</span>
-                            <span class="price-pe" style="display:none;">S/ 350</span>
-                            <span class="price-co" style="display:none;">$440.000</span>
-                            <span class="price-ec" style="display:none;">$110</span>
-                            <span class="price-uy" style="display:none;">$ 4.400</span>
-                            <span class="price-mx" style="display:none;">$1,925</span>
-                        </div>
-                        <div class="plan-period">
-                            <span class="period-cl">/ 6 meses</span>
-                            <span class="period-us" style="display:none;">/ 6 months</span>
-                            <span class="period-ar" style="display:none;">ARS / 6 meses</span>
-                            <span class="period-br" style="display:none;">/ 6 meses</span>
-                            <span class="period-ve" style="display:none;">/ 6 meses</span>
-                            <span class="period-pe" style="display:none;">/ 6 meses</span>
-                            <span class="period-co" style="display:none;">COP / 6 meses</span>
-                            <span class="period-ec" style="display:none;">USD / 6 meses</span>
-                            <span class="period-uy" style="display:none;">UYU / 6 meses</span>
-                            <span class="period-mx" style="display:none;">MXN / 6 meses</span>
-                        </div>
-                        <div class="plan-savings">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Ahorra{% else %}{% trans "Save" %}{% endif %} 17%</div>
-                        <ul class="plan-features">
-                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Todo del plan Mensual{% else %}{% trans "Everything in Monthly" %}{% endif %}</li>
-                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Soporte priorizado{% else %}{% trans "Priority support" %}{% endif %}</li>
-                        </ul>
-                    </div>
-
-                    <!-- Anual -->
-                    <div class="plan-card" data-plan="anual" onclick="selectPlan('anual')">
-                        <div class="plan-badge gold">💎 {% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}MEJOR PRECIO{% else %}{% trans "BEST PRICE" %}{% endif %}</div>
-                        <div class="plan-name">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Anual{% else %}{% trans "Annual" %}{% endif %}</div>
-                        <div class="plan-price">
-                            <span class="price-cl">$200.000</span>
-                            <span class="price-us" style="display:none;">$200</span>
-                            <span class="price-ar" style="display:none;">$291.000</span>
-                            <span class="price-br" style="display:none;">R$ 1.000</span>
-                            <span class="price-ve" style="display:none;">Bs. 7,300</span>
-                            <span class="price-pe" style="display:none;">S/ 700</span>
-                            <span class="price-co" style="display:none;">$800.000</span>
-                            <span class="price-ec" style="display:none;">$200</span>
-                            <span class="price-uy" style="display:none;">$ 8.000</span>
-                            <span class="price-mx" style="display:none;">$3,500</span>
-                        </div>
-                        <div class="plan-period">
-                            <span class="period-cl">/ año</span>
-                            <span class="period-us" style="display:none;">/ year</span>
-                            <span class="period-ar" style="display:none;">ARS / año</span>
-                            <span class="period-br" style="display:none;">/ ano</span>
-                            <span class="period-ve" style="display:none;">/ año</span>
-                            <span class="period-pe" style="display:none;">/ año</span>
-                            <span class="period-co" style="display:none;">COP / año</span>
-                            <span class="period-ec" style="display:none;">USD / año</span>
-                            <span class="period-uy" style="display:none;">UYU / año</span>
-                            <span class="period-mx" style="display:none;">MXN / año</span>
-                        </div>
-                        <div class="plan-savings">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Ahorra{% else %}{% trans "Save" %}{% endif %} 33%</div>
-                        <ul class="plan-features">
-                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Todo del plan Semestral{% else %}{% trans "Everything in Semi-Annual" %}{% endif %}</li>
-                            <li>{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Mejor valor{% else %}{% trans "Best value" %}{% endif %}</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <!-- Campo oculto para el plan seleccionado -->
                 <input type="hidden" name="plan" id="id_plan" value="trial">
-            </div>
+                <div class="pricing-grid">
+                    {% include "includes/pricing_plan_card.html" with plan="trial" pricing="$0" billing_cycle="monthly" country="" payment_methods="" highlight=False cta_url="" %}
+                    {% include "includes/pricing_plan_card.html" with plan="entry" pricing="$20.000 CLP mensual / $200.000 CLP anual" billing_cycle="monthly" country="CL" payment_methods="" highlight=False cta_url="" %}
+                    {% include "includes/pricing_plan_card.html" with plan="growth" pricing="$39.000 CLP mensual / $390.000 CLP anual" billing_cycle="monthly" country="CL" payment_methods="" highlight=True cta_url="" %}
+                    {% include "includes/pricing_plan_card.html" with plan="business" pricing="$69.000 CLP mensual / $690.000 CLP anual" billing_cycle="monthly" country="CL" payment_methods="" highlight=False cta_url="" %}
+                </div>
+            </section>
 
-
-            <!-- Botón Submit -->
-            <button type="submit" class="signup-button">
-                {% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}CREAR CUENTA{% else %}{% trans "CREATE ACCOUNT" %}{% endif %}
+            <button type="submit" class="submit-button w-full rounded-xl px-5 py-4 text-base font-extrabold transition">
+                Crear cuenta
             </button>
         </form>
+    </main>
 
-        <!-- Link a Login -->
-        <div class="login-link">
-            <span class="login-text">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}¿Ya tienes una cuenta?{% else %}{% trans "Already have an account?" %}{% endif %}</span>
-            <a href="/accounts/login/">{% if request.path|slice:':3' == '/cl' or request.GET.from == 'cl' or request.GET.from == 'uy' %}Iniciar sesión{% else %}{% trans "Sign in" %}{% endif %}</a>
-        </div>
-    </div>
-</div>
-
-<script>
-// Initialize Vanta.js
-document.addEventListener('DOMContentLoaded', function() {
-    if (typeof VANTA !== 'undefined' && VANTA.NET) {
-        VANTA.NET({
-            el: "#vanta-bg",
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200.00,
-            minWidth: 200.00,
-            scale: 1.00,
-            scaleMobile: 1.00,
-            color: 0x22d3ee,
-            backgroundColor: 0x0a0a0a,
-            points: 8.00,
-            maxDistance: 20.00,
-            spacing: 18.00
-        });
-    }
-});
-
-// Actualizar precios según país
-function updatePlanPrices(country) {
-    // Ocultar todos los precios primero
-    document.querySelectorAll('.price-cl, .period-cl, .price-us, .period-us, .price-ar, .period-ar, .price-br, .period-br, .price-ve, .period-ve, .price-pe, .period-pe, .price-co, .period-co, .price-ec, .period-ec, .price-uy, .period-uy, .price-mx, .period-mx').forEach(el => {
-        el.style.display = 'none';
-    });
-
-    // Mostrar precios según el país seleccionado
-    if (country === 'CL') {
-        document.querySelectorAll('.price-cl, .period-cl').forEach(el => {
-            el.style.display = 'inline';
-        });
-    } else if (country === 'US') {
-        document.querySelectorAll('.price-us, .period-us').forEach(el => {
-            el.style.display = 'inline';
-        });
-    } else if (country === 'AR') {
-        // Argentina: precios en ARS al dólar oficial ($1.455) — $20→$29.100, $110→$160.050, $200→$291.000
-        document.querySelectorAll('.price-ar, .period-ar').forEach(el => {
-            el.style.display = 'inline';
-        });
-    } else if (country === 'BR') {
-        document.querySelectorAll('.price-br, .period-br').forEach(el => {
-            el.style.display = 'inline';
-        });
-    } else if (country === 'VE') {
-        document.querySelectorAll('.price-ve, .period-ve').forEach(el => {
-            el.style.display = 'inline';
-        });
-    } else if (country === 'PE') {
-        document.querySelectorAll('.price-pe, .period-pe').forEach(el => {
-            el.style.display = 'inline';
-        });
-    } else if (country === 'CO') {
-        document.querySelectorAll('.price-co, .period-co').forEach(el => {
-            el.style.display = 'inline';
-        });
-    } else if (country === 'EC') {
-        document.querySelectorAll('.price-ec, .period-ec').forEach(el => {
-            el.style.display = 'inline';
-        });
-    } else if (country === 'UY') {
-        document.querySelectorAll('.price-uy, .period-uy').forEach(el => {
-            el.style.display = 'inline';
-        });
-    } else if (country === 'MX') {
-        // México: MXN equivalente a USD (~17.5) — $20→$350, $110→$1,925, $200→$3,500
-        document.querySelectorAll('.price-mx, .period-mx').forEach(el => {
-            el.style.display = 'inline';
-        });
-    }
-}
-
-// Seleccionar plan
-function selectPlan(planName) {
-    // Actualizar select
-    document.getElementById('id_plan').value = planName;
-
-    // Visual feedback
-    document.querySelectorAll('.plan-card').forEach(card => {
-        card.classList.remove('selected');
-    });
-
-    const selected = document.querySelector(`[data-plan="${planName}"]`);
-    if (selected) {
-        selected.classList.add('selected');
-    }
-}
-
-// Highlight plan cuando se selecciona del dropdown
-const planInput = document.getElementById('id_plan');
-if (planInput) {
-    planInput.addEventListener('change', function() {
-        selectPlan(this.value);
-    });
-}
-
-// Inicializar con país por defecto
-window.addEventListener('load', function() {
-    // Detectar país desde la URL: ?from=uy, ?country=xx o path
-    const path = window.location.pathname;
-    const urlParams = new URLSearchParams(window.location.search);
-    const countryParam = urlParams.get('country');
-    const fromParam = urlParams.get('from');
-    const country = (countryParam || fromParam || '').toUpperCase();
-
-    if (country) {
-        updatePlanPrices(country);
-    } else if (path.includes('/ve/')) {
-        updatePlanPrices('VE');
-    } else if (path.includes('/br/')) {
-        updatePlanPrices('BR');
-    } else if (path.includes('/ar/')) {
-        updatePlanPrices('AR');
-    } else if (path.includes('/pe/')) {
-        updatePlanPrices('PE');
-    } else if (path.includes('/us/')) {
-        updatePlanPrices('US');
-    } else if (path.includes('/cl/')) {
-        updatePlanPrices('CL');
-    } else if (path.includes('/uy/')) {
-        updatePlanPrices('UY');
-    } else if (path.includes('/co/')) {
-        updatePlanPrices('CO');
-    } else if (path.includes('/ec/')) {
-        updatePlanPrices('EC');
-    } else if (path.includes('/mx/')) {
-        updatePlanPrices('MX');
-    }
-    
-    // ✅ Actualizar precios al cambiar el país
-    const countrySelect = document.getElementById('id_country');
-    if (countrySelect) {
-        countrySelect.addEventListener('change', function() {
-            updatePlanPrices(this.value || 'CL');
-        });
-    }
-
-    // ✅ Validación de teléfono en tiempo real
-    const telefonoInput = document.getElementById('id_telefono');
-    const telefonoError = document.getElementById('telefono-error');
-    
-    if (telefonoInput) {
-        telefonoInput.addEventListener('blur', validatePhone);
-        telefonoInput.addEventListener('input', function() {
-            // Limpiar error mientras escribe
-            if (telefonoError) {
-                telefonoError.style.display = 'none';
-                telefonoError.textContent = '';
-            }
-        });
-    }
-});
-
-// ✅ Función para validar teléfono en frontend
-function validatePhone() {
-    const telefonoInput = document.getElementById('id_telefono');
-    const telefonoError = document.getElementById('telefono-error');
-    
-    if (!telefonoInput || !telefonoError) return;
-    
-    let telefono = telefonoInput.value.trim();
-    
-    if (!telefono) {
-        telefonoError.textContent = 'El teléfono es obligatorio';
-        telefonoError.style.display = 'block';
-        return false;
-    }
-    
-    // Normalizar: quitar espacios, guiones, paréntesis
-    let telefonoNormalizado = telefono.replace(/\s+/g, '').replace(/-/g, '').replace(/[()]/g, '');
-    
-    // Si no empieza con +, asumir que es número local (agregar validación básica)
-    if (!telefonoNormalizado.startsWith('+')) {
-        // Contar solo dígitos
-        const digitos = telefonoNormalizado.replace(/\D/g, '');
-        
-        // Validar longitud mínima (ej: 8 dígitos para número local)
-        if (digitos.length < 8) {
-            telefonoError.textContent = 'El número de teléfono es demasiado corto. Usa formato internacional (+código número)';
-            telefonoError.style.display = 'block';
-            return false;
+    <script>
+        function selectPlan(planCode) {
+            document.getElementById('id_plan').value = planCode;
+            document.querySelectorAll('.plan-card').forEach(function(card) {
+                card.classList.remove('active');
+            });
+            var selectedCard = document.querySelector('[data-plan="' + planCode + '"]');
+            if (selectedCard) selectedCard.classList.add('active');
         }
-        
-        if (digitos.length > 15) {
-            telefonoError.textContent = 'El número de teléfono es demasiado largo';
-            telefonoError.style.display = 'block';
-            return false;
-        }
-    } else {
-        // Si tiene +, validar que después del + solo haya dígitos
-        const numeroSinPrefijo = telefonoNormalizado.substring(1);
-        const digitos = numeroSinPrefijo.replace(/\D/g, '');
-        
-        if (digitos.length < 8) {
-            telefonoError.textContent = 'El número después del código de país es demasiado corto (mínimo 8 dígitos)';
-            telefonoError.style.display = 'block';
-            return false;
-        }
-        
-        if (digitos.length > 15) {
-            telefonoError.textContent = 'El número de teléfono es demasiado largo (máximo 15 dígitos después del +)';
-            telefonoError.style.display = 'block';
-            return false;
-        }
-        
-        // Validar que después del + solo haya dígitos
-        if (!/^\+\d+$/.test(telefonoNormalizado)) {
-            telefonoError.textContent = 'El formato no es válido. Usa: +código número (solo números después del +)';
-            telefonoError.style.display = 'block';
-            return false;
-        }
-    }
-    
-    // Si pasó todas las validaciones, ocultar error
-    telefonoError.style.display = 'none';
-    return true;
-}
-
-// ✅ Función para mostrar/ocultar contraseña
-function togglePassword(inputId) {
-    const input = document.getElementById(inputId);
-    const button = event.target;
-    
-    if (!input) return;
-    
-    if (input.type === 'password') {
-        input.type = 'text';
-        button.textContent = '🙈';
-    } else {
-        input.type = 'password';
-        button.textContent = '👁️';
-    }
-}
-
-// ✅ Validar formulario antes de enviar
-document.getElementById('signup-form')?.addEventListener('submit', function(e) {
-    if (!validatePhone()) {
-        e.preventDefault();
-        const telefonoInput = document.getElementById('id_telefono');
-        if (telefonoInput) {
-            telefonoInput.focus();
-        }
-        return false;
-    }
-});
-</script>
-
-<style>
-/* ✅ Estilos para el botón de mostrar/ocultar contraseña */
-.password-toggle {
-    z-index: 10;
-    transition: color 0.3s;
-}
-
-.password-toggle:hover {
-    color: #22d3ee !important;
-}
-
-/* ✅ Asegurar que los inputs de contraseña tengan padding-right para el botón */
-#id_password1, #id_password2 {
-    padding-right: 50px !important;
-}
-</style>
-{% endblock %}
+        selectPlan('trial');
+    </script>
+</body>
+</html>

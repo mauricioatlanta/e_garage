@@ -50,7 +50,9 @@
                                 <table width="100%" style="color: #ffffff;">
                                     <tr>
                                         <td style="padding: 8px 0;"><strong>{% if language == 'en' %}Current Plan:{% else %}Plan Actual:{% endif %}</strong></td>
-                                        <td style="padding: 8px 0; text-align: right;">{{ plan|title }}</td>
+                                        <td style="padding: 8px 0; text-align: right;">
+                                            {% if plan == "basic" or plan == "entry" %}Entry{% elif plan == "premium" or plan == "growth" %}Growth{% elif plan == "enterprise" or plan == "business" %}Business{% elif plan == "trial" %}Trial{% else %}{{ plan|title }}{% endif %}
+                                        </td>
                                     </tr>
                                     <tr>
                                         <td style="padding: 8px 0;"><strong>{% if language == 'en' %}Expiration Date:{% else %}Fecha de Vencimiento:{% endif %}</strong></td>

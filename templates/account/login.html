@@ -71,7 +71,7 @@
       >
     </div>
 
-    <button type="button" class="login-button" id="eg-login-button">
+    <button type="submit" class="login-button" id="eg-login-button">
       {% trans "Ingresar" %}
     </button>
 
@@ -86,33 +86,3 @@
 </div>
 
 {% endblock %}\n\n
-{% block extra_js %}
-<script>
-document.addEventListener('DOMContentLoaded', function(){
-  const form = document.getElementById('eg-login-form');
-  const button = document.getElementById('eg-login-button');
-
-  if (!form || !button) return;
-
-  let humanInteracted = false;
-
-    ['touchstart','pointerdown','mousedown','keydown'].forEach(function(evt){
-      button.addEventListener(evt, function(){
-        humanInteracted = true;
-      }, {passive:true});
-    });
-
-    button.addEventListener('click', function(e){
-      e.preventDefault();
-
-      if (!humanInteracted) {
-        console.warn('Blocked non-human login submit');
-        return;
-      }
-
-      HTMLFormElement.prototype.submit.call(form);
-    });
-});
-</script>
-{% endblock %}
-\n
