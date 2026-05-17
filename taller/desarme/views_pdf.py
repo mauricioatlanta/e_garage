@@ -80,6 +80,72 @@ def _generated_at():
     return timezone.localtime(now) if timezone.is_aware(now) else now
 
 
+def _line_subtotal(linea):
+    try:
+        if isinstance(linea, dict):
+            return linea.get("subtotal", 0) or 0
+        return getattr(linea, "subtotal", 0) or 0
+    except Exception:
+        return 0
+
+
+def _build_pdf_line_items(documento):
+    items = []
+
+    try:
+        lineas_repuesto = list(documento.lineas_repuesto.all().order_by("id"))
+    except Exception:
+        lineas_repuesto = []
+    try:
+        lineas_servicio = list(documento.lineas_servicio.all().order_by("id"))
+    except Exception:
+        lineas_servicio = []
+    try:
+        lineas_otro_servicio = list(documento.lineas_otro_servicio.all().order_by("id"))
+    except Exception:
+        lineas_otro_servicio = []
+
+    for linea in lineas_repuesto:
+        code = getattr(linea, "codigo", "") or getattr(getattr(linea, "repuesto", None), "codigo", "")
+        items.append(
+            {
+                "tipo": "Repuesto",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "repuesto", "")),
+                "codigo": code,
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_unitario", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    for linea in lineas_servicio:
+        items.append(
+            {
+                "tipo": "Servicio",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "servicio", "")),
+                "codigo": "",
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_unitario", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    for linea in lineas_otro_servicio:
+        empresa_externa = getattr(linea, "empresa_externa", "") or ""
+        items.append(
+            {
+                "tipo": "Servicio externo",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "servicio", "")),
+                "codigo": empresa_externa,
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_cliente", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    return items, lineas_repuesto, lineas_servicio, lineas_otro_servicio
+
+
 def _build_pdf_context(request, documento):
     empresa = getattr(documento, "empresa", None)
     cliente = getattr(documento, "cliente", None)
@@ -91,20 +157,21 @@ def _build_pdf_context(request, documento):
     except Exception:
         cs = None
 
-    try:
-        lineas_repuesto = list(documento.lineas_repuesto.all().order_by("id"))
-    except Exception:
-        lineas_repuesto = []
+    line_items, lineas_repuesto, lineas_servicio, lineas_otro_servicio = _build_pdf_line_items(
+        documento
+    )
 
-    subtotal = getattr(documento, "neto_repuestos", None) or getattr(documento, "subtotal", None)
+    line_subtotal = sum(_line_subtotal(item) for item in line_items)
+    subtotal = line_subtotal or (
+        (getattr(documento, "neto_repuestos", 0) or 0)
+        + (getattr(documento, "neto_servicios", 0) or 0)
+        + (getattr(documento, "neto_otros_servicios", 0) or 0)
+    )
     total = getattr(documento, "total", None)
-    if subtotal is None:
-        try:
-            subtotal = sum(getattr(x, "subtotal", 0) or 0 for x in lineas_repuesto)
-        except Exception:
-            subtotal = 0
-    if total is None:
-        total = subtotal
+    if not total:
+        total = subtotal + (getattr(documento, "tax_amount", 0) or 0) - (
+            getattr(documento, "descuento", 0) or 0
+        )
 
     public_url = _public_document_url(request, documento)
     qr_data_uri = None
@@ -132,8 +199,13 @@ def _build_pdf_context(request, documento):
         "company_website": (getattr(cs, "website", "") or "").strip(),
         "cliente": cliente,
         "vehiculo": vehiculo,
+        "line_items": line_items,
         "lineas_repuesto": lineas_repuesto,
+        "lineas_servicio": lineas_servicio,
+        "lineas_otro_servicio": lineas_otro_servicio,
         "subtotal": subtotal,
+        "tax_amount": getattr(documento, "tax_amount", 0) or 0,
+        "descuento": getattr(documento, "descuento", 0) or 0,
         "total": total,
         "document_label": _document_label(documento),
         "logo_url": _get_logo_url(request, empresa),
