@@ -12,7 +12,7 @@
             @bottom-center {
                 content: "Página " counter(page) " de " counter(pages) " | Generado el {{ fecha_generacion|date:'d/m/Y H:i' }}";
                 font-size: 7pt;
-                color: #999;
+                color: #94a3b8;
                 font-family: 'Arial', sans-serif;
             }
         }
@@ -25,8 +25,8 @@
             font-family: 'Arial', 'Helvetica', sans-serif;
             font-size: 9pt;
             line-height: 1.28;
-            color: #111827;
-            background: #ffffff;
+            color: #e5edf8;
+            background: #071426;
         }
         .header,
         .documento-header,
@@ -40,12 +40,13 @@
         
         /* ========== HEADER PROFESIONAL ========== */
         .header {
-            border-bottom: 1px solid #d1d5db;
+            border: 1px solid #1e3a5f;
+            border-left: 4px solid #38bdf8;
             margin-bottom: 14px;
             display: table;
             width: 100%;
-            background: #ffffff;
-            padding: 0 0 12px 0;
+            background: #0c1b2f;
+            padding: 12px 14px;
         }
         .header-left {
             display: table-cell;
@@ -68,29 +69,29 @@
         .empresa-nombre {
             font-size: 15pt;
             font-weight: 800;
-            color: #111827;
+            color: #f8fafc;
             letter-spacing: 0;
             margin-bottom: 4px;
             text-transform: uppercase;
         }
         .empresa-datos {
             font-size: 8pt;
-            color: #4b5563;
+            color: #b6c3d1;
             line-height: 1.35;
         }
         .empresa-datos strong {
-            color: #374151;
+            color: #dbeafe;
         }
         
         /* ========== DOCUMENTO HEADER ========== */
         .documento-header {
-            background: #ffffff;
-            color: #111827;
-            padding: 0 0 12px 0;
+            background: #0f2742;
+            color: #f8fafc;
+            padding: 13px 16px;
             margin-bottom: 14px;
             display: table;
             width: 100%;
-            border-bottom: 1px solid #e5e7eb;
+            border: 1px solid #1e3a5f;
         }
         .documento-left {
             display: table-cell;
@@ -113,12 +114,12 @@
         .documento-numero {
             font-size: 12pt;
             font-weight: 600;
-            color: #374151;
+            color: #bae6fd;
             letter-spacing: 0;
         }
         .documento-fecha {
             font-size: 9pt;
-            color: #4b5563;
+            color: #cbd5e1;
             margin-top: 5px;
         }
         
@@ -138,17 +139,17 @@
             padding: 0 8px;
         }
         .info-box {
-            border: 1px solid #e5e7eb;
+            border: 1px solid #1e3a5f;
             padding: 10px 12px;
-            background: #ffffff;
+            background: #0c1b2f;
             height: 100%;
         }
         .info-titulo {
             font-weight: 700;
-            color: #111827;
+            color: #7dd3fc;
             font-size: 9pt;
             margin-bottom: 8px;
-            border-bottom: 1px solid #e5e7eb;
+            border-bottom: 1px solid #1e3a5f;
             padding-bottom: 4px;
             text-transform: uppercase;
             letter-spacing: 0.4px;
@@ -159,35 +160,35 @@
         }
         .info-label {
             font-weight: 600;
-            color: #555;
+            color: #94a3b8;
             display: inline-block;
             min-width: 72px;
         }
         .info-value {
-            color: #1a1a1a;
+            color: #f1f5f9;
         }
         
         /* ========== TABLAS ========== */
         .subtitulo {
             font-size: 10pt;
             font-weight: 700;
-            color: #111827;
+            color: #7dd3fc;
             margin: 12px 0 6px 0;
             text-transform: uppercase;
             letter-spacing: 0.4px;
-            border-bottom: 1px solid #d1d5db;
+            border-bottom: 1px solid #1e3a5f;
             padding-bottom: 4px;
         }
         .tabla-items {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 12px;
-            border: 1px solid #d1d5db;
+            border: 1px solid #1e3a5f;
             overflow: hidden;
         }
         .tabla-items thead {
-            background: #f3f4f6;
-            color: #111827;
+            background: #132f4f;
+            color: #f8fafc;
         }
         .tabla-items th {
             padding: 7px 8px;
@@ -196,16 +197,17 @@
             font-size: 8pt;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-right: 1px solid #d1d5db;
+            border-right: 1px solid #1e3a5f;
         }
         .tabla-items th:last-child {
             border-right: none;
         }
         .tabla-items td {
             padding: 6px 8px;
-            border-bottom: 1px solid #e0e0e0;
-            border-right: 1px solid #e0e0e0;
+            border-bottom: 1px solid #1e3a5f;
+            border-right: 1px solid #1e3a5f;
             font-size: 8.6pt;
+            color: #e5edf8;
         }
         .tabla-items td:last-child {
             border-right: none;
@@ -214,10 +216,10 @@
             border-bottom: none;
         }
         .tabla-items tbody tr:nth-child(even) {
-            background: #f9fafb;
+            background: #0f2138;
         }
         .tabla-items tbody tr:nth-child(odd) {
-            background: #ffffff;
+            background: #0b1a2d;
         }
         .texto-derecha {
             text-align: right;
@@ -228,8 +230,8 @@
         
         /* ========== TOTALES ========== */
         .totales {
-            background: #ffffff;
-            border: 1px solid #d1d5db;
+            background: #0f2742;
+            border: 1px solid #38bdf8;
             padding: 10px 12px;
             margin-top: 10px;
             float: right;
@@ -243,7 +245,7 @@
         .total-label {
             display: table-cell;
             font-weight: 600;
-            color: #374151;
+            color: #cbd5e1;
             font-size: 8.6pt;
         }
         .total-valor {
@@ -251,28 +253,28 @@
             text-align: right;
             font-weight: 700;
             width: 96px;
-            color: #111827;
+            color: #f8fafc;
             font-size: 8.8pt;
         }
         .total-final {
-            border-top: 1px solid #111827;
+            border-top: 1px solid #38bdf8;
             padding-top: 7px;
             margin-top: 8px;
         }
         .total-final .total-label {
             font-size: 10.5pt;
-            color: #111827;
+            color: #f8fafc;
             font-weight: 900;
         }
         .total-final .total-valor {
             font-size: 12pt;
-            color: #111827;
+            color: #7dd3fc;
             font-weight: 900;
         }
         
         /* ========== SERVICIOS EXTERNOS ========== */
         .servicio-externo {
-            background: #f9fafb !important;
+            background: #102943 !important;
         }
         
         /* ========== OBSERVACIONES ========== */
@@ -281,11 +283,12 @@
             clear: both;
         }
         .observaciones-box {
-            border: 1px solid #e5e7eb;
+            border: 1px solid #1e3a5f;
             padding: 9px 10px;
-            background: #ffffff;
+            background: #0c1b2f;
             min-height: 36px;
             font-size: 8.6pt;
+            color: #e5edf8;
         }
         
         /* ========== FIRMAS ========== */
@@ -306,16 +309,16 @@
             padding: 8px 12px;
         }
         .firma-linea {
-            border-top: 1px solid #111827;
+            border-top: 1px solid #7dd3fc;
             margin-bottom: 6px;
             height: 26px;
         }
         .firma-texto {
             font-size: 8.4pt;
-            color: #666;
+            color: #cbd5e1;
         }
         .firma-texto strong {
-            color: #1a1a1a;
+            color: #f8fafc;
             font-weight: 700;
         }
         
@@ -323,17 +326,17 @@
         .footer {
             margin-top: 16px;
             text-align: center;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid #1e3a5f;
             padding-top: 8px;
             font-size: 7.8pt;
-            color: #666;
+            color: #94a3b8;
         }
         .footer-credits {
             margin-top: 6px;
             padding-top: 6px;
-            border-top: 1px solid #ddd;
+            border-top: 1px solid #1e3a5f;
             font-size: 7pt;
-            color: #999;
+            color: #94a3b8;
         }
     </style>
 </head>
