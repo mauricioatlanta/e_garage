@@ -206,12 +206,20 @@ def _get_documento_queryset():
     )
 
 
-@login_required
-def descargar_documento_pdf(request, documento_id):
+def _get_documento_for_request(request, documento_id):
+    queryset = _get_documento_queryset()
+    if getattr(request.user, "is_staff", False) or getattr(request.user, "is_superuser", False):
+        return get_object_or_404(queryset, pk=documento_id)
+
     empresa = _empresa_or_redirect(request)
     if not empresa:
         raise Http404("Sin empresa.")
-    documento = get_object_or_404(_get_documento_queryset(), pk=documento_id, empresa=empresa)
+    return get_object_or_404(queryset, pk=documento_id, empresa=empresa)
+
+
+@login_required
+def descargar_documento_pdf(request, documento_id):
+    documento = _get_documento_for_request(request, documento_id)
     pdf_bytes = _render_documento_pdf_bytes(request, documento)
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{_document_filename(documento)}"'
@@ -220,10 +228,7 @@ def descargar_documento_pdf(request, documento_id):
 
 @login_required
 def imprimir_documento(request, documento_id):
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        raise Http404("Sin empresa.")
-    documento = get_object_or_404(_get_documento_queryset(), pk=documento_id, empresa=empresa)
+    documento = _get_documento_for_request(request, documento_id)
     context = _build_pdf_context(request, documento)
     context["public_url"] = _public_document_url(request, documento)
     context["print_mode"] = True
@@ -243,10 +248,7 @@ def ver_documento_publico(request, token):
 
 @login_required
 def compartir_documento_whatsapp(request, documento_id):
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        raise Http404("Sin empresa.")
-    documento = get_object_or_404(_get_documento_queryset(), pk=documento_id, empresa=empresa)
+    documento = _get_documento_for_request(request, documento_id)
     cliente = getattr(documento, "cliente", None)
     public_url = _public_document_url(request, documento)
     label = _document_label(documento)
@@ -266,10 +268,7 @@ def compartir_documento_whatsapp(request, documento_id):
 
 @login_required
 def enviar_documento_email(request, documento_id):
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        raise Http404("Sin empresa.")
-    documento = get_object_or_404(_get_documento_queryset(), pk=documento_id, empresa=empresa)
+    documento = _get_documento_for_request(request, documento_id)
     cliente = getattr(documento, "cliente", None)
     destino = getattr(cliente, "email", None)
 
