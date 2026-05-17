@@ -34,7 +34,7 @@
   </header>
   <section class="hero-band">
     <div class="hero-band__title">{{ document_label }} generado correctamente</div>
-    <div class="hero-band__subtitle">Documento comercial emitido para repuestos vendidos desde inventario.</div>
+    <div class="hero-band__subtitle">Documento comercial emitido por el taller.</div>
   </section>
   <section class="info-grid">
     <div class="info-card">
@@ -52,13 +52,13 @@
     </div>
   </section>
   <section class="section-block">
-    <div class="section-title">Detalle de repuestos</div>
+    <div class="section-title">Detalle del documento</div>
     <table class="lines-table">
       <thead><tr><th class="col-name">Descripción</th><th class="col-qty">Cant.</th><th class="col-price">Precio</th><th class="col-subtotal">Subtotal</th></tr></thead>
       <tbody>
-        {% for linea in lineas_repuesto %}
+        {% for linea in line_items %}
         <tr>
-          <td class="col-name"><div class="cell-title">{{ linea.nombre }}</div>{% if linea.codigo %}<div class="cell-subtitle">Código: {{ linea.codigo }}</div>{% elif linea.repuesto and linea.repuesto.codigo %}<div class="cell-subtitle">Código: {{ linea.repuesto.codigo }}</div>{% endif %}</td>
+          <td class="col-name"><div class="cell-title">{{ linea.nombre }}</div><div class="cell-subtitle">{{ linea.tipo }}</div>{% if linea.codigo %}<div class="cell-subtitle">Código: {{ linea.codigo }}</div>{% endif %}</td>
           <td class="col-qty">{{ linea.cantidad }}</td>
           <td class="col-price">${{ linea.precio_unitario|default_if_none:0|floatformat:0|intcomma }}</td>
           <td class="col-subtotal">${{ linea.subtotal|default_if_none:0|floatformat:0|intcomma }}</td>
@@ -72,6 +72,8 @@
   <section class="totals-wrap">
     <div class="totals-card">
       <div class="totals-row"><span>Subtotal</span><strong>${{ subtotal|default_if_none:0|floatformat:0|intcomma }}</strong></div>
+      {% if descuento %}<div class="totals-row"><span>Descuento</span><strong>-${{ descuento|default_if_none:0|floatformat:0|intcomma }}</strong></div>{% endif %}
+      {% if tax_amount %}<div class="totals-row"><span>Impuesto</span><strong>${{ tax_amount|default_if_none:0|floatformat:0|intcomma }}</strong></div>{% endif %}
       <div class="totals-row totals-row--grand"><span>Total</span><strong>${{ total|default_if_none:0|floatformat:0|intcomma }}</strong></div>
     </div>
   </section>
