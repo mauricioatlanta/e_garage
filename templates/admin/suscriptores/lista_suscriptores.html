@@ -46,12 +46,12 @@
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Status</label>
+                <label class="block text-sm font-medium text-gray-300 mb-1">Estado</label>
                 <select name="status" class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600 text-sm">
                     <option value="">Todos</option>
                     <option value="activa" {% if status_filter == 'activa' %}selected{% endif %}>Activa</option>
                     <option value="vencida" {% if status_filter == 'vencida' %}selected{% endif %}>Vencida</option>
-                    <option value="trial" {% if status_filter == 'trial' %}selected{% endif %}>Trial</option>
+                    <option value="trial" {% if status_filter == 'trial' %}selected{% endif %}>Prueba</option>
                 </select>
             </div>
             <div>
@@ -249,11 +249,11 @@
                 </div>
                 <div class="flex flex-wrap gap-2">
                     {% if page_obj.has_previous %}
-                    <a href="?page={{ page_obj.previous_page_number }}{% if pais_filter %}&pais={{ pais_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if dias_filter %}&dias={{ dias_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if ord %}&ord={{ ord|urlencode }}{% endif %}{% if incluir_bajas %}&incluir_bajas=1{% endif %}"
+                    <a href="{{ previous_page_url }}"
                        class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1.5 rounded text-sm whitespace-nowrap">Anterior</a>
                     {% endif %}
                     {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}{% if pais_filter %}&pais={{ pais_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if dias_filter %}&dias={{ dias_filter }}{% endif %}{% if search_query %}&search={{ search_query }}{% endif %}{% if ord %}&ord={{ ord|urlencode }}{% endif %}{% if incluir_bajas %}&incluir_bajas=1{% endif %}"
+                    <a href="{{ next_page_url }}"
                        class="bg-gray-600 hover:bg-gray-500 text-white px-3 py-1.5 rounded text-sm whitespace-nowrap">Siguiente</a>
                     {% endif %}
                 </div>

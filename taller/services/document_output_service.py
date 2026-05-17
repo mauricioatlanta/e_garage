@@ -18,6 +18,11 @@ from taller.utils.whatsapp_helper import get_document_whatsapp_url
 log = logging.getLogger(__name__)
 
 
+def _generated_at():
+    now = timezone.now()
+    return timezone.localtime(now) if timezone.is_aware(now) else now
+
+
 class DocumentOutputService:
     """
     Servicio dedicado para generar PDFs y enlaces de WhatsApp de documentos.
@@ -230,7 +235,7 @@ class DocumentOutputService:
             "total": total,
             "document_label": document_label,
             "logo_url": logo_url,
-            "generated_at": timezone.localtime(),
+            "generated_at": _generated_at(),
             "pdf_mode": True,
             "public_url": None,
             "qr_data_uri": None,
