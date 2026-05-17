@@ -66,6 +66,16 @@ def _estado_sort_rank(empresa: Empresa) -> int:
     )
 
 
+def _subscription_started_at(empresa: Empresa):
+    """Fecha visible de alta/suscripción para el panel admin."""
+    suscripcion = getattr(getattr(empresa, "user", None), "suscripcion", None)
+    return (
+        getattr(suscripcion, "fecha_inicio", None)
+        or getattr(empresa, "fecha_inicio", None)
+        or getattr(getattr(empresa, "user", None), "date_joined", None)
+    )
+
+
 def _apply_empresas_sort(empresas_list: list, ord_param: str) -> None:
     """Ordena in-place la lista de empresas (ya materializada)."""
     if ord_param == "empresa":
@@ -159,6 +169,7 @@ def admin_suscriptores(request):
                 # Verificar que la empresa tenga los datos necesarios
                 _ = empresa.dias_restantes
                 _ = empresa.estado_suscripcion
+                empresa.admin_fecha_suscripcion = _subscription_started_at(empresa)
                 empresas_list.append(empresa)
             except (AttributeError, TypeError, ValueError) as e:
                 # Si hay un error con alguna empresa, loguear y continuar
