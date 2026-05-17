@@ -124,13 +124,18 @@
                             </a>
                         </th>
                         <th scope="col" class="hidden md:table-cell w-[110px] px-2 py-2 align-top text-xs font-semibold text-gray-300 uppercase tracking-wide">Días rest.</th>
+                        <th scope="col" class="w-[92px] px-2 py-2 align-top text-xs font-semibold uppercase tracking-wide">
+                            <a href="{{ sort_href.fecha }}" class="inline-flex items-center gap-0.5 text-gray-200 hover:text-cyan-300 no-underline">
+                                Fecha
+                                {% if ord == "fecha" %}<span class="text-cyan-400" title="Ascendente">▲</span>{% elif ord == "-fecha" %}<span class="text-cyan-400" title="Descendente">▼</span>{% endif %}
+                            </a>
+                        </th>
                         <th scope="col" class="w-[120px] px-2 py-2 align-top text-xs font-semibold uppercase tracking-wide">
                             <a href="{{ sort_href.estado }}" class="inline-flex items-center gap-0.5 text-gray-200 hover:text-cyan-300 no-underline">
                                 Estado
                                 {% if ord == "estado" %}<span class="text-cyan-400" title="Ascendente">▲</span>{% elif ord == "-estado" %}<span class="text-cyan-400" title="Descendente">▼</span>{% endif %}
                             </a>
                         </th>
-                        <th scope="col" class="hidden lg:table-cell w-[110px] px-2 py-2 align-top text-xs font-semibold text-gray-300 uppercase tracking-wide">Suscrito</th>
                         <th scope="col" class="hidden md:table-cell w-[110px] px-2 py-2 align-top text-xs font-semibold text-gray-300 uppercase tracking-wide">Vence</th>
                         <th scope="col" class="w-[210px] px-2 py-2 align-top text-xs font-semibold text-gray-300 uppercase tracking-wide">Acciones</th>
                     </tr>
@@ -148,14 +153,6 @@
                             {% if empresa.telefono %}
                             <div class="text-xs text-gray-400 mt-0.5 truncate" title="{{ empresa.telefono }}">📱 {{ empresa.telefono }}</div>
                             {% endif %}
-                            <div class="lg:hidden text-[11px] text-gray-500 mt-0.5">
-                                Suscrito:
-                                {% if empresa.admin_fecha_suscripcion %}
-                                {{ empresa.admin_fecha_suscripcion|date:"d/m/Y" }}
-                                {% else %}
-                                N/A
-                                {% endif %}
-                            </div>
                         </td>
                         <td class="px-2 py-2 align-top">
                             <span class="inline-block px-1.5 py-0.5 text-[10px] sm:text-xs rounded bg-cyan-900 text-cyan-300 whitespace-nowrap">
@@ -179,6 +176,13 @@
                                 {% if empresa.dias_restantes is not None %}{{ empresa.dias_restantes }} días{% else %}N/A{% endif %}
                             </span>
                         </td>
+                        <td class="px-2 py-2 align-top text-gray-300 text-[11px] sm:text-xs whitespace-nowrap">
+                            {% if empresa.admin_fecha_suscripcion %}
+                            {{ empresa.admin_fecha_suscripcion|date:"d/m/y" }}
+                            {% else %}
+                            N/A
+                            {% endif %}
+                        </td>
                         <td class="px-2 py-2 align-top">
                             {% if empresa.estado_suscripcion == 'activa' %}
                             <span class="inline-block px-1.5 py-0.5 text-[10px] sm:text-xs rounded bg-green-900 text-green-300 whitespace-nowrap">✅ Activa</span>
@@ -188,13 +192,6 @@
                             <span class="inline-block px-1.5 py-0.5 text-[10px] sm:text-xs rounded bg-red-900 text-red-300 whitespace-nowrap">🔴 Crítico</span>
                             {% else %}
                             <span class="inline-block px-1.5 py-0.5 text-[10px] sm:text-xs rounded bg-gray-900 text-gray-300 whitespace-nowrap">❌ Vencida</span>
-                            {% endif %}
-                        </td>
-                        <td class="hidden lg:table-cell px-2 py-2 align-top text-gray-300 text-xs whitespace-nowrap">
-                            {% if empresa.admin_fecha_suscripcion %}
-                            {{ empresa.admin_fecha_suscripcion|date:"d/m/Y" }}
-                            {% else %}
-                            N/A
                             {% endif %}
                         </td>
                         <td class="hidden md:table-cell px-2 py-2 align-top text-gray-300 text-xs whitespace-nowrap">

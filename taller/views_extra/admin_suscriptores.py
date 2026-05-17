@@ -10,7 +10,7 @@ Vista administrativa para gestionar suscriptores:
 """
 
 import logging
-from datetime import timedelta
+from datetime import date, datetime, timedelta
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -38,6 +38,8 @@ _ALLOWED_ORD = frozenset(
         "-plan",
         "estado",
         "-estado",
+        "fecha",
+        "-fecha",
         "dias",
         "-dias",
     }
@@ -76,6 +78,16 @@ def _subscription_started_at(empresa: Empresa):
     )
 
 
+def _date_sort_value(value) -> int:
+    if not value:
+        return 0
+    if isinstance(value, datetime):
+        return value.date().toordinal()
+    if isinstance(value, date):
+        return value.toordinal()
+    return 0
+
+
 def _apply_empresas_sort(empresas_list: list, ord_param: str) -> None:
     """Ordena in-place la lista de empresas (ya materializada)."""
     if ord_param == "empresa":
@@ -94,6 +106,13 @@ def _apply_empresas_sort(empresas_list: list, ord_param: str) -> None:
         empresas_list.sort(key=_estado_sort_rank)
     elif ord_param == "-estado":
         empresas_list.sort(key=_estado_sort_rank, reverse=True)
+    elif ord_param == "fecha":
+        empresas_list.sort(key=lambda e: _date_sort_value(getattr(e, "admin_fecha_suscripcion", None)))
+    elif ord_param == "-fecha":
+        empresas_list.sort(
+            key=lambda e: _date_sort_value(getattr(e, "admin_fecha_suscripcion", None)),
+            reverse=True,
+        )
     elif ord_param == "dias":
         empresas_list.sort(key=lambda e: e.dias_restantes if e.dias_restantes is not None else -1)
     elif ord_param == "-dias":
@@ -191,7 +210,7 @@ def admin_suscriptores(request):
 
         sort_href = {
             field: _sort_querystring(request, _next_ord_value(ord_param, field))
-            for field in ("empresa", "pais", "plan", "estado")
+            for field in ("empresa", "pais", "plan", "fecha", "estado")
         }
 
         # Paginación
