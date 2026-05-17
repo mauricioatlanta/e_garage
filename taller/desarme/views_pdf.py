@@ -74,6 +74,11 @@ def _get_logo_url(request, empresa):
     return None
 
 
+def _generated_at():
+    now = timezone.now()
+    return timezone.localtime(now) if timezone.is_aware(now) else now
+
+
 def _build_pdf_context(request, documento):
     empresa = getattr(documento, "empresa", None)
     cliente = getattr(documento, "cliente", None)
@@ -131,7 +136,7 @@ def _build_pdf_context(request, documento):
         "total": total,
         "document_label": _document_label(documento),
         "logo_url": _get_logo_url(request, empresa),
-        "generated_at": timezone.localtime(),
+        "generated_at": _generated_at(),
         "pdf_mode": True,
         "public_url": public_url,
         "qr_data_uri": qr_data_uri,

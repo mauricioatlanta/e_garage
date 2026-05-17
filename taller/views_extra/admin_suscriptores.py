@@ -60,6 +60,12 @@ def _sort_querystring(request, new_ord: str) -> str:
     return "?" + q.urlencode()
 
 
+def _page_querystring(request, page_number: int) -> str:
+    q = request.GET.copy()
+    q["page"] = page_number
+    return "?" + q.urlencode()
+
+
 def _estado_sort_rank(empresa: Empresa) -> int:
     return {"vencida": 0, "critico": 1, "advertencia": 2, "activa": 3}.get(
         empresa.estado_suscripcion, 9
@@ -187,6 +193,14 @@ def admin_suscriptores(request):
         paginator = Paginator(empresas, 25)  # 25 por página (empresas ya es una lista ordenada)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
+        previous_page_url = (
+            _page_querystring(request, page_obj.previous_page_number())
+            if page_obj.has_previous()
+            else ""
+        )
+        next_page_url = (
+            _page_querystring(request, page_obj.next_page_number()) if page_obj.has_next() else ""
+        )
 
         # Estadísticas generales (mismo alcance que el listado: usuarios activos salvo ?incluir_bajas=1)
         _stats_base = Empresa.objects.filter(user__isnull=False)
@@ -224,6 +238,8 @@ def admin_suscriptores(request):
 
         context = {
             "page_obj": page_obj,
+            "previous_page_url": previous_page_url,
+            "next_page_url": next_page_url,
             "empresas": page_obj,
             "pais_filter": pais_filter,
             "status_filter": status_filter,
