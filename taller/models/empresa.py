@@ -121,6 +121,8 @@ class Empresa(models.Model):
     plan = models.CharField(max_length=20, choices=PLAN_CHOICES, default="trial")
     dias_prueba = models.PositiveIntegerField(default=30)
     suscripcion_activa = models.BooleanField(default=True)
+    status_suscripcion = models.CharField(max_length=20, default='trial')
+    suscripcion_vence = models.DateField(null=True, blank=True)
 
     ultimo_pago = models.DateTimeField(null=True, blank=True)
     valor_mensual = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal("0.00"))
