@@ -481,21 +481,45 @@ def approve_transaction(
             locked.save(update_fields=update_fields)
             return locked
 
-        empresa = locked.empresa
-        suscripcion_activa_anterior = bool(empresa.suscripcion_activa)
-        plan_anterior = empresa.plan
-        fecha_inicio_notificacion = empresa.fecha_inicio
-        dias_renovados = DAYS_BY_BILLING_CYCLE.get(locked.billing_cycle, 30)
+        from taller.models.subscription_change import SubscriptionChange
 
-        empresa.extender_suscripcion(dias=dias_renovados, enviar_notificacion=False)
-        empresa.plan = normalized_plan
-        empresa.valor_mensual = locked.amount
-        empresa.save()
+        plan_change = locked.subscription_changes.select_for_update().filter(
+            change_type=SubscriptionChange.CHANGE_UPGRADE,
+            status=SubscriptionChange.STATUS_PENDING,
+        ).first()
+        if plan_change:
+            empresa = locked.empresa
+            suscripcion_activa_anterior = bool(empresa.suscripcion_activa)
+            plan_anterior = empresa.plan
+            fecha_inicio_notificacion = empresa.fecha_inicio
 
-        locked.processed_at = timezone.now()
-        locked.subscription_applied_at = locked.processed_at
-        update_fields.extend(["processed_at", "subscription_applied_at"])
-        locked.save(update_fields=update_fields)
+            from taller.services.plan_change_service import complete_paid_plan_change
+
+            completed_change = complete_paid_plan_change(change=plan_change)
+            normalized_plan = completed_change.requested_plan
+            locked.plan_code = normalized_plan
+            locked.processed_at = timezone.now()
+            locked.subscription_applied_at = locked.processed_at
+            update_fields.extend(["processed_at", "subscription_applied_at"])
+            locked.save(update_fields=update_fields)
+
+            dias_renovados = 0
+        else:
+            empresa = locked.empresa
+            suscripcion_activa_anterior = bool(empresa.suscripcion_activa)
+            plan_anterior = empresa.plan
+            fecha_inicio_notificacion = empresa.fecha_inicio
+            dias_renovados = DAYS_BY_BILLING_CYCLE.get(locked.billing_cycle, 30)
+
+            empresa.extender_suscripcion(dias=dias_renovados, enviar_notificacion=False)
+            empresa.plan = normalized_plan
+            empresa.valor_mensual = locked.amount
+            empresa.save()
+
+            locked.processed_at = timezone.now()
+            locked.subscription_applied_at = locked.processed_at
+            update_fields.extend(["processed_at", "subscription_applied_at"])
+            locked.save(update_fields=update_fields)
 
     _send_subscription_notifications(
         empresa=empresa,

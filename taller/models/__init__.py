@@ -55,6 +55,7 @@ from .ubicacion import Estado, Ciudad
 # Modelos de suscripción y pagos
 from .comprobante_pago import ComprobantePago
 from .suscripcion_transaccion import SuscripcionTransaccion
+from .subscription_change import SubscriptionChange
 from .trial import TrialRegistro
 
 # Modelos legacy / compatibilidad (deben importarse para que Django los registre)
@@ -113,6 +114,7 @@ __all__ = [
     # Suscripción y pagos
     "ComprobantePago",
     "SuscripcionTransaccion",
+    "SubscriptionChange",
     "TrialRegistro",
     # Legacy / compatibilidad
     "LogAuditoria",

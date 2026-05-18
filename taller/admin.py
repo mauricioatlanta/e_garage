@@ -16,6 +16,7 @@ from taller.models.extras_vehiculo import CajaVehiculoEmpresa, MotorVehiculoEmpr
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
 from taller.models.precio_suscripcion import PrecioSuscripcion
+from taller.models.subscription_change import SubscriptionChange
 from taller.models.suscripcion_transaccion import SuscripcionTransaccion
 from taller.models.tecnico import Tecnico
 from taller.services.suscripcion_transaccion_service import SuscripcionTransaccionService
@@ -635,6 +636,32 @@ class SuscripcionTransaccionAdmin(admin.ModelAdmin):
 
     aprobar_pagos_manuales.short_description = (
         "Aprobar transferencias y enviar email de éxito"
+    )
+
+
+@admin.register(SubscriptionChange, site=admin_site)
+class SubscriptionChangeAdmin(admin.ModelAdmin):
+    list_display = (
+        "empresa",
+        "current_plan",
+        "requested_plan",
+        "change_type",
+        "status",
+        "prorated_amount",
+        "currency",
+        "scheduled_at",
+        "applied_at",
+        "created_at",
+    )
+    list_filter = ("status", "change_type", "current_plan", "requested_plan", "currency")
+    search_fields = ("empresa__nombre_taller", "empresa__user__email", "requested_by__email")
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "applied_at",
+        "cancelled_at",
+        "validation_snapshot",
+        "transaction",
     )
 
 
