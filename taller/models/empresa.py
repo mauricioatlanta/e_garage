@@ -4,6 +4,7 @@ from math import ceil
 
 import pytz
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models
 from django.db.models import CheckConstraint, Q
@@ -444,7 +445,7 @@ class Empresa(models.Model):
 
         Args:
             user_email: Email del usuario al que se le otorga la cortesía
-            duration_months: Duración en meses (1, 6 o 12)
+            duration_months: Duración en meses. El admin puede usar cualquier entero entre 1 y 60.
             reason: Razón de la cortesía (opcional)
             admin_user: Usuario administrador que ejecuta la acción (opcional)
 
@@ -471,22 +472,17 @@ class Empresa(models.Model):
         except cls.DoesNotExist:
             raise ValueError(f"Empresa asociada al usuario '{user_email}' no encontrada")
 
-        # Validar duración
-        valid_durations = [1, 6, 12]
-        if duration_months not in valid_durations:
+        # Validar duración. Es una acción administrativa, no un catálogo público de planes.
+        try:
+            duration_months = int(duration_months)
+        except (TypeError, ValueError):
+            raise ValueError("Duración inválida. Debe ser un número entero de meses.")
+        if duration_months < 1 or duration_months > 60:
             raise ValueError(
-                f"Duración inválida. Debe ser 1, 6 o 12 meses. Recibido: {duration_months}"
+                f"Duración inválida. Debe estar entre 1 y 60 meses. Recibido: {duration_months}"
             )
 
         # 2. Calcular la extensión
-        # Calcular días según meses
-        days_map = {
-            1: 30,
-            6: 180,
-            12: 365,
-        }
-        dias_a_anadir = days_map[duration_months]
-
         # Obtener fecha base (actual o fecha_fin si es futura)
         fecha_base = (
             empresa.fecha_fin
@@ -495,7 +491,8 @@ class Empresa(models.Model):
         )
 
         # Calcular nueva fecha de expiración
-        nueva_fecha_fin = fecha_base + timedelta(days=dias_a_anadir)
+        nueva_fecha_fin = fecha_base + relativedelta(months=duration_months)
+        dias_a_anadir = max((nueva_fecha_fin - fecha_base).days, 1)
 
         # Guardar estado anterior para auditoría
         datos_antes = {
