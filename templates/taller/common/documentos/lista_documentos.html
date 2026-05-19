@@ -1346,7 +1346,7 @@ function convertirAOT(presupuestoId) {
 function crearFactura(otId) {
   const msg = CURRENT_LANG === 'en'
     ? 'Create invoice from this Work Order?'
-    : '¿Crear factura desde esta Orden de Trabajo?';
+    : '¿Crear comprobante desde esta Orden de Trabajo?';
   if (confirm(msg)) {
     // Aquí implementarías la lógica para crear FAC desde OT
     window.location.href = `/cl/es/documentos/${otId}/crear-factura/`;

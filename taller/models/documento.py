@@ -31,8 +31,8 @@ class Documento(AuditMixin, models.Model):
         choices=[
             ("OT", _("Orden de Trabajo")),
             ("PRES", _("Presupuesto")),
-            ("FAC", _("Factura")),
-            ("PTS", _("Part Sale")),  # Venta de repuestos/piezas (sin vehículo)
+            ("FAC", _("Comprobante")),
+            ("PTS", _("Venta Repuestos")),
             # ("REC", _("Recibo (LEGACY)")),  # Legacy, no mostrar en forms
             # ("BOL", _("Boleta (LEGACY)")),   # Legacy, no mostrar en forms
         ],
