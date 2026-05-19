@@ -182,3 +182,43 @@ def country_url_direct(context, view_path, *args, app_namespace="taller", **kwar
       <a href="{% country_url_direct 'clientes:lista_clientes' %}">Clientes</a>
     """
     return country_url(context, view_path, app_namespace, *args, **kwargs)
+
+
+@register.simple_tag(takes_context=True)
+def nav_url(context, section: str) -> str:
+    """
+    URL canónica para la navegación principal.
+
+    Evita depender de namespaces heterogéneos entre módulos antiguos
+    (`/cl/es/...`) y módulos montados directamente por país (`/cl/documentos/`,
+    `/cl/reportes/`).
+    """
+    request = context.get("request")
+    path = getattr(request, "path", "") if request else ""
+
+    if path.startswith("/us/es/") or path == "/us/es":
+        prefix = "/us/es"
+        docs_prefix = "/us/documentos"
+        reports_prefix = "/us/reportes"
+    elif path.startswith("/us/") or path == "/us":
+        prefix = "/us/en"
+        docs_prefix = "/us/documentos"
+        reports_prefix = "/us/reportes"
+    else:
+        prefix = "/cl/es"
+        docs_prefix = "/cl/documentos"
+        reports_prefix = "/cl/reportes"
+
+    routes = {
+        "settings": f"{prefix}/settings/",
+        "center": f"{prefix}/centro-operaciones/",
+        "clients": f"{prefix}/clientes/",
+        "documents": f"{docs_prefix}/",
+        "extra": f"{prefix}/servicios/otros-servicios/",
+        "parts": f"{prefix}/repuestos/",
+        "reports": f"{reports_prefix}/",
+        "services": f"{prefix}/servicios/",
+        "disassembly": f"{prefix}/desarme/",
+        "vehicles": f"{prefix}/vehiculos/",
+    }
+    return routes.get(section, f"{prefix}/workspace/")
