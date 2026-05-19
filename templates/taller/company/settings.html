@@ -156,6 +156,32 @@
         z-index: 2;
     }
 
+    .settings-subscription-note {
+        align-items: center;
+        background: rgba(10, 14, 39, 0.5);
+        border: 1px solid rgba(0, 255, 255, 0.18);
+        border-radius: 999px;
+        color: rgba(255, 255, 255, 0.82);
+        display: inline-flex;
+        font-size: 0.88rem;
+        font-weight: 600;
+        gap: 0.45rem;
+        margin-top: 1rem;
+        padding: 0.42rem 0.78rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .settings-subscription-note i {
+        color: var(--neon-cyan);
+        font-size: 0.86rem;
+    }
+
+    .settings-subscription-note strong {
+        color: var(--text-primary);
+        font-weight: 800;
+    }
+
     /* Navigation Tabs - Futuristic Style */
     .settings-nav {
         background: rgba(21, 25, 50, 0.6);
@@ -942,6 +968,13 @@
             font-size: 0.9rem;
         }
 
+        .settings-subscription-note {
+            align-items: flex-start;
+            border-radius: 12px;
+            font-size: 0.82rem;
+            line-height: 1.3;
+        }
+
         .settings-nav {
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -1054,6 +1087,16 @@
             {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Centro de Configuración{% else %}Settings Center{% endif %}
         </h1>
         <p>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Panel de control avanzado para personalizar tu empresa{% else %}Advanced control panel to customize your company{% endif %}</p>
+        <div class="settings-subscription-note">
+            <i class="fas fa-calendar-check"></i>
+            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                Suscripción vigente hasta <strong>{{ empresa.fecha_expiracion|date:"d/m/Y" }}</strong>
+                <span>({{ empresa.dias_restantes|default:"0" }} días restantes)</span>
+            {% else %}
+                Subscription valid until <strong>{{ empresa.fecha_expiracion|date:"m/d/Y" }}</strong>
+                <span>({{ empresa.dias_restantes|default:"0" }} days left)</span>
+            {% endif %}
+        </div>
     </div>
 
     <!-- Messages -->
