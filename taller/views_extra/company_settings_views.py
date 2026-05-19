@@ -2,6 +2,7 @@ from decimal import Decimal
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.messages import get_messages
 from django.shortcuts import redirect, render
 
 from taller.context_processors import invalidate_company_cache
@@ -14,9 +15,44 @@ from taller.models import Tecnico
 from taller.models.company_settings import CompanySettings
 from taller.models.configuracion import ConfiguracionEmpresa
 from taller.utils.country_config import get_country_config
+from taller.utils.empresa import get_or_create_empresa
+from taller.utils.payment_config import get_transfer_payment_details
+from taller.utils.plan_catalog import (
+    BILLING_ANNUAL,
+    BILLING_MONTHLY,
+    PLAN_ENTRY,
+    get_plan_price,
+    normalize_plan_code,
+)
 
 
 SPANISH_COUNTRIES = {"CL", "MX", "PE", "VE", "CO", "EC", "AR", "UY", "BR"}
+
+NOISY_FLASH_FRAGMENTS = (
+    "Ha iniciado sesión exitosamente",
+    "Successfully signed in",
+    "Selecciona o crea tu empresa para continuar",
+    "Usuario sin empresa asignada",
+    "Usuario sin empresa asociada",
+)
+
+
+def _discard_noisy_flash_messages(request):
+    """Limpia avisos internos acumulados sin borrar mensajes útiles de settings."""
+    kept = []
+    for message in get_messages(request):
+        text = str(message)
+        if any(fragment in text for fragment in NOISY_FLASH_FRAGMENTS):
+            continue
+        kept.append(message)
+
+    for message in kept:
+        messages.add_message(
+            request,
+            message.level,
+            str(message),
+            extra_tags=message.extra_tags,
+        )
 
 
 def _get_or_create_company_settings(user, empresa):
@@ -117,12 +153,26 @@ def _sync_company_models(config, config_empresa, empresa):
         config_empresa.save(update_fields=config_updates)
 
 
+def _subscription_price_context(empresa):
+    country = (getattr(empresa, "pais", "") or "CL").upper()
+    plan_code = normalize_plan_code(getattr(empresa, "plan", "") or PLAN_ENTRY)
+    if plan_code == "trial":
+        plan_code = PLAN_ENTRY
+
+    monthly = get_plan_price(country, plan_code, BILLING_MONTHLY)
+    annual = get_plan_price(country, plan_code, BILLING_ANNUAL)
+    return {
+        "monthly": monthly["price"],
+        "annual": annual["price"],
+        "currency": monthly["currency"],
+    }
+
+
 @login_required(login_url=None)
 def company_settings_view(request):
-    empresa = getattr(request.user, "empresa", None)
-
-    if not empresa:
-        return redirect("/cl/es/workspace/")
+    empresa = get_or_create_empresa(request)
+    if request.method == "GET":
+        _discard_noisy_flash_messages(request)
 
     config_empresa, _ = ConfiguracionEmpresa.objects.get_or_create(
         empresa=empresa,
@@ -132,13 +182,6 @@ def company_settings_view(request):
     is_spanish = getattr(empresa, "pais", "CL") in SPANISH_COUNTRIES
 
     if request.method == "POST":
-        print("===== SETTINGS POST DEBUG =====")
-        print("POST_KEYS=", sorted(list(request.POST.keys())))
-        print("FILES_KEYS=", sorted(list(request.FILES.keys())))
-        print("POST_company_name=", request.POST.get("company_name"))
-        print("POST_section=", request.POST.get("section"))
-        print("POST_crear_tecnico=", request.POST.get("crear_tecnico"))
-        print("POST_toggle_tecnico=", request.POST.get("toggle_tecnico"))
         if "crear_tecnico" in request.POST:
             nombre = request.POST.get("nombre", "").strip()
             telefono = request.POST.get("telefono", "").strip()
@@ -262,5 +305,7 @@ def company_settings_view(request):
             "tecnicos": tecnicos,
             "config": config,
             "config_empresa": config_empresa,
+            "datos_transferencia": get_transfer_payment_details(empresa.pais),
+            "subscription_prices": _subscription_price_context(empresa),
         },
     )

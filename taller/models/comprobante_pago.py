@@ -27,8 +27,8 @@ class ComprobantePago(models.Model):
     moneda = models.CharField(max_length=3, default="CLP")
 
     # Archivos
-    comprobante = models.ImageField(
-        upload_to="comprobantes/", help_text="Imagen del comprobante de pago"
+    comprobante = models.FileField(
+        upload_to="comprobantes/", help_text="Archivo del comprobante de pago"
     )
     numero_transaccion = models.CharField(
         max_length=100, blank=True, help_text="Número de transacción o referencia"
@@ -71,8 +71,9 @@ class ComprobantePago(models.Model):
             and plan_anterior != "trial"
         )
 
-        # Extender suscripción de la empresa
-        dias_extension = self.meses_pagados * 30
+        # Extender suscripción de la empresa usando días reales por ciclo
+        dias_por_periodo = {1: 30, 6: 182, 12: 365}
+        dias_extension = dias_por_periodo.get(self.meses_pagados, self.meses_pagados * 30)
         # 🔒 ANTI-DUPLICADO: No enviar notificación aquí, la enviaremos después
         # Esto evita doble notificación si extender_suscripcion() también notifica
         self.empresa.extender_suscripcion(dias_extension, enviar_notificacion=False)
@@ -89,7 +90,7 @@ class ComprobantePago(models.Model):
         # Pasar ID del comprobante para idempotencia
         self.empresa._current_comprobante_pago_id = self.id
 
-        self.save()
+        self.save(from_approve=True)
 
         # Enviar notificaciones automáticas (Email + WhatsApp)
         try:
@@ -258,13 +259,30 @@ class ComprobantePago(models.Model):
             print(f"Error enviando email al admin: {e}")
 
     def save(self, *args, **kwargs):
-        """Al crear nuevo comprobante, enviar notificación al admin"""
-        is_new = not self.pk
+        """Al crear o actualizar un comprobante.
+
+        - En nuevo comprobante, notificar al admin.
+        - Si el estado cambia a aprobado desde pendiente, disparar la aprobación.
+        """
+        from taller.services.suscripcion_transaccion_service import sync_from_comprobante_pago
+
+        from_approve = kwargs.pop("from_approve", False)
+        is_new = self.pk is None
+        previous_estado = None
+        if not is_new and not from_approve:
+            previous = self.__class__.objects.filter(pk=self.pk).first()
+            if previous:
+                previous_estado = previous.estado
+
         super().save(*args, **kwargs)
 
         if is_new:
             self.enviar_notificacion_admin()
+            sync_from_comprobante_pago(self)
+            return
 
-        from taller.services.suscripcion_transaccion_service import sync_from_comprobante_pago
+        if not from_approve and previous_estado != self.estado and self.estado == "aprobado":
+            self.aprobar(procesado_por=self.procesado_por or "Admin")
+            return
 
         sync_from_comprobante_pago(self)

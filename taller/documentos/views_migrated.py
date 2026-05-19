@@ -31,8 +31,10 @@ from django.db.models import (
     DecimalField,
     ExpressionWrapper,
     F,
+    OuterRef,
     Q,
     Sum,
+    Subquery,
     Value,
     When,
 )
@@ -53,6 +55,7 @@ from taller.documentos.services import (
 from taller.mixins import CountryLangTemplateMixin
 from taller.models import Documento, Tecnico
 from taller.models.clientes import Cliente
+from taller.models.lineas_documento import LineaOtroServicio, LineaRepuesto, LineaServicio
 from taller.models.vehiculos import Vehiculo
 from taller.models.repuesto import Repuesto
 from taller.servicios.models import Servicio, ServicioExterno
@@ -577,39 +580,68 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
                 Decimal("0"),
                 output_field=DecimalField(max_digits=14, decimal_places=2),
             )
+            money_field = DecimalField(max_digits=14, decimal_places=2)
+
+            rep_sum = Subquery(
+                LineaRepuesto.objects.filter(documento_id=OuterRef("pk"))
+                .values("documento_id")
+                .annotate(
+                    total=Sum(
+                        ExpressionWrapper(
+                            F("cantidad")
+                            * F("precio_unitario")
+                            * (
+                                Value(Decimal("1.0"), output_field=money_field)
+                                - F("descuento")
+                                / Value(Decimal("100.0"), output_field=money_field)
+                            ),
+                            output_field=money_field,
+                        )
+                    )
+                )
+                .values("total")[:1],
+                output_field=money_field,
+            )
+            serv_sum = Subquery(
+                LineaServicio.objects.filter(documento_id=OuterRef("pk"))
+                .values("documento_id")
+                .annotate(
+                    total=Sum(
+                        ExpressionWrapper(
+                            F("cantidad")
+                            * F("precio_unitario")
+                            * (
+                                Value(Decimal("1.0"), output_field=money_field)
+                                - F("descuento")
+                                / Value(Decimal("100.0"), output_field=money_field)
+                            ),
+                            output_field=money_field,
+                        )
+                    )
+                )
+                .values("total")[:1],
+                output_field=money_field,
+            )
+            otros_sum = Subquery(
+                LineaOtroServicio.objects.filter(documento_id=OuterRef("pk"))
+                .values("documento_id")
+                .annotate(
+                    total=Sum(
+                        ExpressionWrapper(
+                            F("cantidad") * F("precio_cliente"),
+                            output_field=money_field,
+                        )
+                    )
+                )
+                .values("total")[:1],
+                output_field=money_field,
+            )
 
             qs = (
                 base_queryset.annotate(
-                    rep_sum=Coalesce(
-                        Sum(
-                            ExpressionWrapper(
-                                F("lineas_repuesto__cantidad")
-                                * F("lineas_repuesto__precio_unitario"),
-                                output_field=DecimalField(max_digits=14, decimal_places=2),
-                            )
-                        ),
-                        decimal_zero,
-                    ),
-                    serv_sum=Coalesce(
-                        Sum(
-                            ExpressionWrapper(
-                                F("lineas_servicio__cantidad")
-                                * F("lineas_servicio__precio_unitario"),
-                                output_field=DecimalField(max_digits=14, decimal_places=2),
-                            )
-                        ),
-                        decimal_zero,
-                    ),
-                    otros_sum=Coalesce(
-                        Sum(
-                            ExpressionWrapper(
-                                F("lineas_otro_servicio__cantidad")
-                                * F("lineas_otro_servicio__precio_cliente"),
-                                output_field=DecimalField(max_digits=14, decimal_places=2),
-                            )
-                        ),
-                        decimal_zero,
-                    ),
+                    rep_sum=Coalesce(rep_sum, decimal_zero),
+                    serv_sum=Coalesce(serv_sum, decimal_zero),
+                    otros_sum=Coalesce(otros_sum, decimal_zero),
                     servicios_count=Count("lineas_servicio", distinct=True),
                 )
                 .annotate(
@@ -1916,4 +1948,3 @@ class DocumentoDeleteView(CountryLangTemplateMixin, RoleRequiredMixin, DeleteVie
         if not empresa:
             return Documento.objects.none()
         return Documento.objects.filter(empresa=empresa)
-

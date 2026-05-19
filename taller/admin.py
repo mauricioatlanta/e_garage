@@ -558,6 +558,17 @@ class ComprobantePagoAdmin(admin.ModelAdmin):
             count += 1
         self.message_user(request, f"Se rechazaron {count} comprobantes.")
 
+    def save_model(self, request, obj, form, change):
+        previous_estado = None
+        if change and obj.pk:
+            previous = ComprobantePago.objects.filter(pk=obj.pk).first()
+            previous_estado = previous.estado if previous else None
+
+        super().save_model(request, obj, form, change)
+
+        if change and previous_estado != "aprobado" and obj.estado == "aprobado":
+            obj.aprobar(procesado_por=request.user.username)
+
 
 @admin.register(SuscripcionTransaccion, site=admin_site)
 class SuscripcionTransaccionAdmin(admin.ModelAdmin):

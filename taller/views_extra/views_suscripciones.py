@@ -9,6 +9,7 @@ from taller.forms.comprobante_form import ComprobantePagoForm
 from taller.models.comprobante_pago import ComprobantePago
 from taller.models.empresa import Empresa
 from taller.utils.payment_config import get_transfer_payment_details
+from taller.utils.empresa import get_or_create_empresa
 from taller.utils.plan_catalog import (
     BILLING_ANNUAL,
     BILLING_MONTHLY,
@@ -127,6 +128,52 @@ def estado_suscripcion(request):
         return JsonResponse(data)
     except Empresa.DoesNotExist:
         return JsonResponse({"error": "Empresa no encontrada"}, status=404)
+
+
+@login_required
+def registrar_transferencia_ajax(request):
+    """Registra un comprobante de transferencia bancaria para revisión manual."""
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    empresa = get_or_create_empresa(request)
+
+    post_data = request.POST.copy()
+    post_data["metodo_pago"] = "transferencia"
+    post_data["plan_solicitado"] = empresa.plan or "basic"
+    if request.POST.get("referencia") and not post_data.get("numero_transaccion"):
+        post_data["numero_transaccion"] = request.POST.get("referencia")
+    if request.POST.get("notas") and not post_data.get("descripcion"):
+        post_data["descripcion"] = request.POST.get("notas")
+
+    files_data = request.FILES.copy()
+    if "archivo" in files_data and "comprobante" not in files_data:
+        files_data.setlist("comprobante", files_data.getlist("archivo"))
+
+    form = ComprobantePagoForm(post_data, files_data)
+    if not form.is_valid():
+        return JsonResponse({"errors": form.errors}, status=400)
+
+    comprobante = form.save(commit=False)
+    comprobante.empresa = empresa
+    comprobante.estado = "pendiente"
+
+    renewal_period = (
+        request.POST.get("renewal_period") or request.POST.get("periodo") or "mensual"
+    ).strip().lower()
+    annual_keys = {"anual", "annual", "12", "yearly", "year"}
+    comprobante.meses_pagados = 12 if renewal_period in annual_keys else 1
+
+    # El comprobante se guarda en estado pendiente y no extiende la suscripción aún.
+    comprobante.save()
+
+    return JsonResponse(
+        {
+            "success": True,
+            "message": "Comprobante recibido. Estamos validando la transferencia.",
+            "comprobante_id": comprobante.id,
+        }
+    )
 
 
 def precios(request):

@@ -20,6 +20,8 @@ ENV/
 # Django
 staticfiles/
 media/
+company_logos/
+comprobantes/
 *.log
 local_settings.py
 

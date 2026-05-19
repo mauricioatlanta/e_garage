@@ -140,6 +140,7 @@ from taller.views_extra.views_trial import registro_trial
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.views_extra.views_suscripciones import (
     precios,
+    registrar_transferencia_ajax,
     subir_comprobante,
     suspension,
 )
@@ -345,6 +346,7 @@ urlpatterns = [
     # SuspensiÃ³n por suscripciÃ³n vencida (bloqueo desde middleware)
     path("suspension/", suspension, name="suspension"),
     path("comprobante-pago/", subir_comprobante, name="subir_comprobante"),
+    path("suscripcion/registrar-transferencia/", registrar_transferencia_ajax, name="registrar_transferencia_ajax"),
     path("precios/", precios, name="precios"),
     # Contacto de ventas
     path(

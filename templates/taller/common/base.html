@@ -158,28 +158,38 @@
       border-bottom: 4px solid var(--company-primary);
       box-shadow: 0 10px 30px rgba(0,0,0,.3);
     }
+    .company-brand {
+      min-width: 0;
+    }
     .company-logo {
-      max-height: 80px;
-      max-width: 200px;
+      max-height: 112px;
+      max-width: 280px;
       object-fit: contain;
       border-radius: 10px;
       border: 2px solid var(--company-primary);
       background: #fff;
       box-shadow: 0 2px 8px rgba(0,0,0,0.08);
     }
+    .company-brand-copy {
+      min-width: 0;
+    }
     .company-title {
       color: var(--company-primary);
-      text-shadow: 0 0 20px var(--company-primary),0 0 40px var(--company-primary);
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: 1px;
+      text-shadow: 0 0 14px color-mix(in srgb, var(--company-primary) 60%, transparent);
+      font-size: clamp(1.25rem, 2vw, 1.65rem);
+      line-height: 1.1;
+      font-weight: 750;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
     }
     .company-tagline {
       color: #b3e5fc;
-      font-size: 1.1rem;
-      font-weight: 500;
-      margin-top: 2px;
-      letter-spacing: 1px;
+      font-size: clamp(0.78rem, 1.25vw, 0.95rem);
+      line-height: 1.25;
+      font-weight: 400;
+      margin-top: 4px;
+      letter-spacing: 0;
+      overflow-wrap: anywhere;
     }
     /* Estilo cinematográfico futurista para botones de navegación */
     .nav-button-standard {
@@ -383,6 +393,21 @@
 
     /* Responsive: Asegurar que los botones se mantengan en dos filas en móviles */
     @media (max-width: 768px) {
+      .company-header .container {
+        align-items: flex-start !important;
+        flex-direction: column;
+      }
+
+      .company-brand {
+        align-items: center;
+        gap: 1rem !important;
+      }
+
+      .company-logo {
+        max-height: 92px;
+        max-width: 150px;
+      }
+
       .nav-button-standard {
         padding: 0.5rem 0.7rem;
         font-size: 0.7rem;
@@ -446,14 +471,14 @@
   {% if form %}{% form_media_once form 'css' %}{% endif %}
 </head>
 <body class="bg-dark text-light">
-  <header class="company-header py-4 mb-3">
+  <header class="company-header py-3 mb-3">
     <div class="container d-flex align-items-center justify-content-between gap-4">
-      <div class="d-flex align-items-center gap-4">
+      <div class="company-brand d-flex align-items-center gap-4">
         {% if company_logo_url %}
-          <img src="{{ company_logo_url }}" alt="Logo" class="company-logo">
+          <img src="{{ company_logo_url }}" alt='{{ company_name|default:request.empresa.nombre_taller|default:"eGarage" }}' class="company-logo">
         {% endif %}
-        <div>
-          <div class="company-title">{{ company_name|default:"eGarage" }}</div>
+        <div class="company-brand-copy">
+          <div class="company-title">{{ company_name|default:request.empresa.nombre_taller|default:"eGarage" }}</div>
           {% if company_tagline %}
             <div class="company-tagline">{{ company_tagline }}</div>
           {% endif %}
@@ -470,50 +495,52 @@
   <nav class="main-navigation">
     {# Para Chile: siempre español. Para USA: inglés. Si no es /us/, es Chile #}
     <!-- Botones de navegación principal - ORDEN ALFABÉTICO -->
-    {% country_url 'company_settings' as ajustes_url %}
-    {% if ajustes_url %}
-    <a href="{{ ajustes_url }}" class="nav-button-standard">
+    <a href="{% nav_url 'settings' %}" class="nav-button-standard">
       <span class="nav-icon">⚙️</span>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Settings{% else %}Ajustes{% endif %}</span>
     </a>
-    {% endif %}
 
-    <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
+    <a href="{% nav_url 'center' %}" class="nav-button-standard">
       <span class="nav-icon">🚀</span>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Center{% else %}Centro{% endif %}</span>
     </a>
 
-    <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
+    <a href="{% nav_url 'clients' %}" class="nav-button-standard">
       <span class="nav-icon">👥</span>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Clients{% else %}Clientes{% endif %}</span>
     </a>
 
-    <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
+    <a href="{% nav_url 'documents' %}" class="nav-button-standard">
       <span class="nav-icon">📄</span>
       <span>{{ ui_labels.documents_menu }}</span>
     </a>
 
-    <a href="{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/en/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
+    <a href="{% nav_url 'extra' %}" class="nav-button-standard">
       <span class="nav-icon">⭐</span>
       <span>Extra</span>
     </a>
 
-    <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
+    <a href="{% nav_url 'parts' %}" class="nav-button-standard">
       <span class="nav-icon">🔧</span>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Parts{% else %}Repuestos{% endif %}</span>
     </a>
 
-    <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
+    <a href="{% nav_url 'reports' %}" class="nav-button-standard">
       <span class="nav-icon">📊</span>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Reports{% else %}Reportes{% endif %}</span>
     </a>
 
-    <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
+    <a href="{% nav_url 'services' %}" class="nav-button-standard">
       <span class="nav-icon">🛠️</span>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Services{% else %}Servicios{% endif %}</span>
     </a>
 
-    <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
+    <a href="{% nav_url 'disassembly' %}" class="nav-button-standard">
+      <span class="nav-icon">🧩</span>
+      <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Disassembly{% else %}Desarme{% endif %}</span>
+    </a>
+
+    <a href="{% nav_url 'vehicles' %}" class="nav-button-standard">
       <span class="nav-icon">🚗</span>
       <span>{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}Vehicles{% else %}Vehículos{% endif %}</span>
     </a>

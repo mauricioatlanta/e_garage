@@ -6,7 +6,7 @@ from django.views.decorators.http import require_GET
 
 from taller.models import Cliente
 from taller.models.vehiculos import Vehiculo
-from taller.utils.empresa import get_active_empresa, get_user_empresa_safe
+from taller.utils.empresa import get_active_empresa, get_or_create_empresa, get_user_empresa_safe
 
 
 def _workspace_prefix_from_request(request):
@@ -37,6 +37,8 @@ def _full_name(nombre, apellido):
 @login_required
 def ingreso_centro(request, *args, **kwargs):
     empresa = get_active_empresa(request) or get_user_empresa_safe(request.user)
+    if not empresa:
+        empresa = get_or_create_empresa(request)
     workspace_prefix = _workspace_prefix_from_request(request)
 
     return render(
@@ -45,7 +47,8 @@ def ingreso_centro(request, *args, **kwargs):
         {
             "workspace_debug": True,
             "workspace_base_prefix": workspace_prefix,
-            "workspace_company_name": getattr(empresa, "nombre_taller", "") if empresa else "",
+            "workspace_company_name": getattr(empresa, "nombre_taller", None) if empresa else None,
+            "company_name": getattr(empresa, "nombre_taller", None) if empresa else None,
             "workspace_search_url": f"{workspace_prefix}/workspace/buscar/",
         },
     )
@@ -73,6 +76,8 @@ def ingreso_buscar(request, *args, **kwargs):
         )
 
     empresa = get_active_empresa(request) or get_user_empresa_safe(request.user)
+    if not empresa:
+        empresa = get_or_create_empresa(request)
     if not empresa:
         return JsonResponse(
             {

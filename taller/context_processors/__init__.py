@@ -46,6 +46,15 @@ def empresa_contexto(request):  # noqa: D401
     return _empresa_contexto_impl(request)
 
 
+def _first_nonempty(*values):
+    for value in values:
+        if value:
+            value = str(value).strip()
+            if value:
+                return value
+    return ""
+
+
 def company_branding(request):
     """
     Context processor unificado de branding.
@@ -83,8 +92,9 @@ def company_branding(request):
         }
 
     # Defaults del sistema
+    default_logo_url = getattr(settings, "DEFAULT_BRAND_LOGO_URL", None)
     brand = {
-        "logo_url": getattr(settings, "DEFAULT_BRAND_LOGO_URL", None),
+        "logo_url": default_logo_url,
         "name": getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"),
         "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Control total para tu taller"),
         "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
@@ -122,8 +132,10 @@ def company_branding(request):
             company_settings = CompanySettings.objects.get(user=user)
             if company_settings.logo:
                 brand["logo_url"] = company_settings.logo.url
-            if hasattr(company_settings, "company_name") and company_settings.company_name:
-                brand["name"] = company_settings.company_name
+            brand["name"] = _first_nonempty(
+                getattr(company_settings, "company_name", ""),
+                brand["name"],
+            )
             if hasattr(company_settings, "tagline") and company_settings.tagline:
                 brand["tagline"] = company_settings.tagline
             if hasattr(company_settings, "primary_color") and company_settings.primary_color:
@@ -136,10 +148,12 @@ def company_branding(request):
         # 2. SEGUNDA PRIORIDAD: ConfiguracionEmpresa (si no hay CompanySettings)
         try:
             conf = ConfiguracionEmpresa.objects.get(empresa=empresa)
-            if conf.logo and not brand["logo_url"]:
+            if conf.logo and brand["logo_url"] == default_logo_url:
                 brand["logo_url"] = conf.logo.url
-            if hasattr(conf, "nombre_publico") and conf.nombre_publico:
-                brand["name"] = conf.nombre_publico
+            brand["name"] = _first_nonempty(
+                getattr(conf, "nombre_publico", ""),
+                brand["name"],
+            )
             if hasattr(conf, "tagline") and conf.tagline:
                 brand["tagline"] = conf.tagline
             if hasattr(conf, "brand_color") and conf.brand_color:
@@ -160,10 +174,17 @@ def company_branding(request):
             pass
 
         # 3. TERCERA PRIORIDAD: Empresa directamente (fallback)
-        if not brand["logo_url"] and hasattr(empresa, "logo") and empresa.logo:
+        if brand["logo_url"] == default_logo_url and hasattr(empresa, "logo") and empresa.logo:
             brand["logo_url"] = empresa.logo.url
-        if brand["name"] == getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"):
-            brand["name"] = empresa.nombre_taller
+        default_name = getattr(settings, "DEFAULT_BRAND_NAME", "eGarage")
+        if brand["name"] == default_name:
+            brand["name"] = _first_nonempty(
+                getattr(empresa, "nombre_taller", ""),
+                getattr(empresa, "empresa", ""),
+                default_name,
+            )
+        else:
+            brand["name"] = _first_nonempty(brand["name"], default_name)
         if hasattr(empresa, "pais") and empresa.pais:
             brand["country"] = empresa.pais.lower()
         if hasattr(empresa, "moneda") and empresa.moneda:
