@@ -114,7 +114,10 @@ self.addEventListener('fetch', (event) => {
           
           return fetch(request).then((response) => {
             // Solo cachear respuestas exitosas
-            if (response.status === 200) {
+              const requestUrl = new URL(request.url);
+              const isHttpRequest = requestUrl.protocol === 'http:' || requestUrl.protocol === 'https:';
+
+              if (response.status === 200 && isHttpRequest) {
               const responseToCache = response.clone();
               caches.open(CACHE_NAME).then((cache) => {
                 cache.put(request, responseToCache);
@@ -145,7 +148,10 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then((response) => {
           // Si la respuesta es exitosa, cachearla
-          if (response.status === 200) {
+              const requestUrl = new URL(request.url);
+              const isHttpRequest = requestUrl.protocol === 'http:' || requestUrl.protocol === 'https:';
+
+              if (response.status === 200 && isHttpRequest) {
             const responseToCache = response.clone();
             caches.open(RUNTIME_CACHE).then((cache) => {
               cache.put(request, responseToCache);
