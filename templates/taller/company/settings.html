@@ -1153,6 +1153,16 @@
         </ul>
     </div>
 
+                        <!-- Zona de Peligro: Cancelación de cuenta SaaS -->
+                        <div class="mt-12 pt-6 border-t border-gray-200 text-left max-w-2xl bg-red-50/50 p-4 rounded-xl border border-red-100">
+                            <h4 class="text-sm font-bold text-red-900 mb-1 flex items-center"><i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>Zona de Peligro</h4>
+                            <p class="text-xs text-red-700 mb-4 font-medium">Si decides cancelar tu suscripción, congelaremos el acceso a tu cuenta y despacharemos automáticamente un respaldo con el 100% de tus datos (Clientes, Vehículos y Órdenes de Trabajo) en formato JSON a tu email corporativo.</p>
+                            <a href="/suscripcion/cancelar/" class="inline-flex items-center text-xs font-bold text-red-600 hover:text-white border border-red-300 hover:bg-red-600 px-3 py-2 rounded-lg transition duration-150 shadow-sm bg-white">
+                                <i class="fas fa-ban mr-1.5"></i> Cancelar Suscripción de Taller
+                            </a>
+                        </div>
+
+
     <form method="post" enctype="multipart/form-data" id="settingsForm">
         {% csrf_token %}
         <input type="hidden" name="section" id="sectionInput" value="profile">
