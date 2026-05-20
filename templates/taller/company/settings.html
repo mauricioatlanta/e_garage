@@ -1098,11 +1098,11 @@
             {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
                 <span>Vence</span>
                 <strong>{{ empresa.fecha_expiracion|date:"d/m/Y" }}</strong>
-                <span>· {{ empresa.dias_restantes|default:"0" }} días</span>
+                <span>· {{ empresa_dias_restantes|default:"0" }} días</span>
             {% else %}
                 <span>Expires</span>
                 <strong>{{ empresa.fecha_expiracion|date:"m/d/Y" }}</strong>
-                <span>· {{ empresa.dias_restantes|default:"0" }} days</span>
+                <span>· {{ empresa_dias_restantes|default:"0" }} days</span>
             {% endif %}
         </div>
     </div>
@@ -1151,6 +1151,15 @@
                 </button>
             </li>
         </ul>
+    </div>
+
+                        <!-- Zona de Peligro: Cancelación de cuenta SaaS -->
+                        <div class="mt-12 pt-6 border-t border-gray-200 text-left max-w-2xl bg-red-50/50 p-4 rounded-xl border border-red-100">
+                            <h4 class="text-sm font-bold text-red-900 mb-1 flex items-center"><i class="fas fa-exclamation-triangle mr-2 text-red-500"></i>Zona de Peligro</h4>
+                            <p class="text-xs text-red-700 mb-4 font-medium">Si decides cancelar tu suscripción, congelaremos el acceso a tu cuenta y despacharemos automáticamente un respaldo con el 100% de tus datos (Clientes, Vehículos y Órdenes de Trabajo) en formato JSON a tu email corporativo.</p>
+                            <a href="/suscripcion/cancelar/" class="inline-flex items-center text-xs font-bold text-red-600 hover:text-white border border-red-300 hover:bg-red-600 px-3 py-2 rounded-lg transition duration-150 shadow-sm bg-white">
+                                <i class="fas fa-ban mr-1.5"></i> Cancelar Suscripción de Taller
+                            </a>
                         </div>
 
 
@@ -1339,20 +1348,7 @@
 
             <!-- Tab: Subscription -->
             <div class="tab-pane fade" id="subscription" role="tabpanel">
-
-                    < Apartado de gestión de baja (Solo visible en pestaña Suscripción) -->
-                    <div class="form-section mt-5 pt-4" style="border-top: 1px solid rgba(229, 231, 235, 0.1); margin-top: 3rem;">
-                        <h4 style="font-size: 0.85rem; font-weight: 600; color: #9ca3af; margin-bottom: 0.5rem;">Opciones de la cuenta</h4>
-                        <p style="font-size: 0.75rem; color: #6b7280; margin-bottom: 1rem; max-w: 2xl;">
-                            Para dar de baja el taller y solicitar la portabilidad de tus registros (Clientes, Vehículos y OTs) en un archivo JSON seguro enviado a tu email, haz clic en el siguiente enlace.
-                        </p>
-                        <a href="/suscripcion/cancelar/" class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem; color: #9ca3af; border-color: #4b5563; padding: 0.35rem 0.75rem;">
-                            <i class="fas fa-ban mr-1"></i> Cancelar Suscripción
-                        </a>
-                    </div>
-
-
-                                <div class="form-section">
+                <div class="form-section">
                     <h4>
                         <i class="fas fa-credit-card"></i>
                         {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Suscripción{% else %}Subscription{% endif %}
@@ -1361,13 +1357,13 @@
                     <div class="subscription-panel">
                         <div class="subscription-status-card">
                             <div class="subscription-kicker">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Estado actual{% else %}Current status{% endif %}</div>
-                            <h5 class="subscription-plan">{{ empresa.plan|default:'basic'|upper }}</h5>
-                            <span class="subscription-status-pill" style="background: {{ empresa.color_estado|default:'#0d6efd' }};">
+                            <h5 class="subscription-plan">{{ empresa_plan|default:'basic'|upper }}</h5>
+                            <span class="subscription-status-pill" style="background: {{ empresa_color_estado|default:'#0d6efd' }};">
                                 <i class="fas fa-circle"></i>
                                 {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
-                                    {% if empresa.estado_suscripcion == 'vencida' %}Vencida{% elif empresa.estado_suscripcion == 'critico' %}Crítico{% elif empresa.estado_suscripcion == 'advertencia' %}Advertencia{% else %}Activa{% endif %}
+                                    {% if empresa_estado_suscripcion == 'vencida' %}Vencida{% elif empresa_estado_suscripcion == 'critico' %}Crítico{% elif empresa_estado_suscripcion == 'advertencia' %}Advertencia{% else %}Activa{% endif %}
                                 {% else %}
-                                    {% if empresa.estado_suscripcion == 'vencida' %}Expired{% elif empresa.estado_suscripcion == 'critico' %}Critical{% elif empresa.estado_suscripcion == 'advertencia' %}Warning{% else %}Active{% endif %}
+                                    {% if empresa_estado_suscripcion == 'vencida' %}Expired{% elif empresa_estado_suscripcion == 'critico' %}Critical{% elif empresa_estado_suscripcion == 'advertencia' %}Warning{% else %}Active{% endif %}
                                 {% endif %}
                             </span>
                             <div class="subscription-meta-grid">
@@ -1379,10 +1375,12 @@
                                 </div>
                                 <div class="subscription-meta-item">
                                     <div class="subscription-meta-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Días restantes{% else %}Days left{% endif %}</div>
-                                    <div class="subscription-meta-value">{{ empresa.dias_restantes|default:"0" }}</div>
+                                    <div class="subscription-meta-value">{{ empresa_dias_restantes|default:"0" }}</div>
                                 </div>
                             </div>
-                                                <div class="subscription-action-card">
+                        </div>
+
+                        <div class="subscription-action-card">
                             <div>
                                 <div class="subscription-action-title">
                                     <i class="fas fa-rocket me-2"></i>
@@ -1406,16 +1404,6 @@
                                     <i class="fas fa-credit-card me-2"></i>
                                     {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovar ahora{% else %}Renew now{% endif %}
                                 </button>
-
-                        <!-- Sección discreta de gestión de cuenta SaaS -->
-                        <div class="mt-8 pt-6 border-t border-gray-200 text-left max-w-xl">
-                            <h5 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Opciones de cuenta</h5>
-                            <p class="text-xs text-gray-500 mb-3">Para dar de baja el taller y solicitar la portabilidad de tus registros (Clientes, Vehículos y OTs) en un archivo JSON seguro despachado a tu email, inicia el asistente de salida.</p>
-                            <a href="/suscripcion/cancelar/" class="inline-flex items-center text-xs font-medium text-gray-400 hover:text-gray-600 border border-gray-200 hover:bg-gray-50 px-2.5 py-1.5 rounded-lg transition duration-150 bg-white shadow-sm">
-                                <i class="fas fa-ban mr-1.5 text-gray-400"></i> Cancelar Suscripción
-                            </a>
-                        </div>
-
                             {% else %}
                                 <div class="alert alert-info mt-3 mb-0">
                                     {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
@@ -1428,7 +1416,9 @@
                         </div>
                     </div>
                 </div>
-                        <!-- Tab: Employees -->
+            </div>
+
+            <!-- Tab: Employees -->
             <div class="tab-pane fade" id="tecnicos" role="tabpanel">
                 <div class="tecnicos-section">
                     <h4>
@@ -1473,7 +1463,9 @@
                         <button type="submit" name="crear_tecnico" class="btn btn-save">
                             <i class="fas fa-plus me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Agregar Empleado{% else %}Add Employee{% endif %}
                         </button>
-                                        <!-- Employee List -->
+                    </div>
+
+                    <!-- Employee List -->
                     {% if tecnicos %}
                         <h5 class="mb-3" style="color: var(--neon-cyan); font-family: 'Orbitron', sans-serif; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
                             <i class="fas fa-list me-2"></i>
@@ -1516,7 +1508,9 @@
                     {% endif %}
                 </div>
             </div>
-                <!-- Action Buttons -->
+        </div>
+
+        <!-- Action Buttons -->
         <div class="form-section">
             <div class="d-flex align-items-center flex-wrap" style="gap: 24px;">
                 <div style="display:flex; align-items:center; gap:22px;">
@@ -1569,7 +1563,9 @@
                             <div class="alert alert-secondary text-white mb-0" role="alert">
                                 {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Selecciona el plazo que quieres renovar y luego elige el medio de pago.{% else %}Select the renewal period and then choose the payment method.{% endif %}
                             </div>
-                                                <div id="subscriptionModalStep2" class="subscription-modal-card" style="display: none;">
+                        </div>
+
+                        <div id="subscriptionModalStep2" class="subscription-modal-card" style="display: none;">
                             <div class="subscription-kicker">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Paso 2{% else %}Step 2{% endif %}</div>
                             <h6 class="text-neon mb-3">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Elige el medio de pago{% else %}Choose payment method{% endif %}</h6>
                             <div class="subscription-method-grid">
@@ -1604,7 +1600,9 @@
                                     <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Muestra los datos bancarios y permite subir el comprobante para revisión.{% else %}Shows bank details and lets you upload the receipt for review.{% endif %}</span>
                                     <span class="subscription-pay-cta">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ver datos bancarios{% else %}View bank details{% endif %}<i class="fas fa-chevron-down"></i></span>
                                 </button>
-                                                        <div id="bankTransferSection" style="display: none;" class="subscription-modal-card">
+                            </div>
+
+                            <div id="bankTransferSection" style="display: none;" class="subscription-modal-card">
                                 <h6 class="mb-3">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Datos bancarios{% else %}Bank transfer details{% endif %}</h6>
                                 <div class="bank-detail-grid">
                                     <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Banco{% else %}Bank{% endif %}</small><strong>{{ datos_transferencia.banco|default:"Por configurar" }}</strong></div>
@@ -1613,7 +1611,9 @@
                                     <div class="bank-detail"><small>{{ datos_transferencia.tax_id_label|default:"RUT" }}</small><strong>{{ datos_transferencia.rut|default:"Por configurar" }}</strong></div>
                                     <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Titular{% else %}Holder{% endif %}</small><strong>{{ datos_transferencia.titular|default:"Por configurar" }}</strong></div>
                                     <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Correo de confirmación{% else %}Confirmation email{% endif %}</small><strong>{{ datos_transferencia.email_confirmacion|default:"Por configurar" }}</strong></div>
-                                                                <div class="mb-3">
+                                </div>
+
+                                <div class="mb-3">
                                     <label class="form-label text-white">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Monto pagado{% else %}Amount paid{% endif %}</label>
                                     <input type="number" id="transferAmount" class="form-control" placeholder="{{ subscription_prices.monthly|default:'20000' }}" min="1000" step="1000">
                                 </div>
@@ -1629,8 +1629,10 @@
                                     <label class="form-label text-white">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Notas (opcional){% else %}Notes (optional){% endif %}</label>
                                     <textarea id="transferNotes" class="form-control" rows="3" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ej: depósito realizado en sucursal X{% else %}E.g. deposit made at branch X{% endif %}"></textarea>
                                 </div>
-                                                        <input type="hidden" id="subscriptionModalPeriod" value="mensual">
-                            <input type="hidden" id="subscriptionModalPlan" value="{{ empresa.plan|default:'basic' }}">
+                            </div>
+
+                            <input type="hidden" id="subscriptionModalPeriod" value="mensual">
+                            <input type="hidden" id="subscriptionModalPlan" value="{{ empresa_plan|default:'basic' }}">
                             <input type="hidden" id="subscriptionMonthlyAmount" value="{{ subscription_prices.monthly|default:'0' }}">
                             <input type="hidden" id="subscriptionAnnualAmount" value="{{ subscription_prices.annual|default:'0' }}">
                         </div>
@@ -1878,13 +1880,3 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 {% endblock %}
-
-
-                        < Apartado discreto de cancelacion de cuenta SaaS -->
-                        <div class="form-section mt-12 pt-6 border-t border-gray-200 text-left max-w-2xl">
-                            <h4 class="text-xs font-semibold text-gray-700 mb-1" style="color: #e5e7eb;">Opciones de la cuenta</h4>
-                            <p style="color: #9ca3af; font-size: 0.75rem; margin-bottom: 1rem;">Si deseas dar de baja este taller, se congelará el acceso a la plataforma y recibirás un archivo de respaldo con el 100% de tus datos en formato JSON en tu email corporativo.</p>
-                            <a href="/suscripcion/cancelar/" class="btn btn-outline-secondary" style="font-size: 0.75rem; padding: 0.4rem 0.8rem; border: 1px solid #4b5563; color: #9ca3af; background: transparent; border-radius: 0.375rem; text-decoration: none;">
-                                <i class="fas fa-ban mr-1.5" style="margin-right: 0.35rem;"></i> Cancelar Suscripción
-                            </a>
-                        </div>

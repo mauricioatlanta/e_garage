@@ -295,7 +295,34 @@ def company_settings_view(request):
                 "Please review the form fields: " + "; ".join(error_messages),
             )
 
-    tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("nombre")
+    tecnicos = Tecnico.objects.filter(user=request.user).order_by("nombre")
+
+    # SUBSCRIPTION CONTEXT
+    subscription = None
+    subscription_is_active = False
+    subscription_status = "inactive"
+
+    try:
+        from taller.models.suscripcion import Suscripcion
+
+        subscription = (
+            Suscripcion.objects
+            .filter(user=request.user)
+            .first()
+        )
+
+        if subscription:
+            subscription_is_active = bool(subscription.activa)
+
+            if subscription.esta_vencida():
+                subscription_status = "expired"
+            elif subscription.activa:
+                subscription_status = "active"
+            else:
+                subscription_status = "inactive"
+
+    except Exception as exc:
+        print(f"[SUBSCRIPTION CONTEXT ERROR] {exc}")
 
     return render(
         request,
@@ -307,5 +334,17 @@ def company_settings_view(request):
             "config_empresa": config_empresa,
             "datos_transferencia": get_transfer_payment_details(empresa.pais),
             "subscription_prices": _subscription_price_context(empresa),
+
+            # SUBSCRIPTION
+            "subscription": subscription,
+            "subscription_is_active": subscription_is_active,
+            "subscription_status": subscription_status,
+
+            # UI DERIVED SUBSCRIPTION
+            "empresa_plan": empresa_plan,
+            "empresa_estado_suscripcion": empresa_estado_suscripcion,
+            "empresa_dias_restantes": empresa_dias_restantes,
+            "empresa_fecha_vencimiento": empresa_fecha_vencimiento,
+            "empresa_color_estado": empresa_color_estado,
         },
     )
