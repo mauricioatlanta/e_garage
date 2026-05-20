@@ -620,3 +620,18 @@ class Empresa(models.Model):
                 name="uq_empresa_telefono_present",
             ),
         ]
+
+    # Campo de control para la política de retención de 6 meses
+    fecha_baja = models.DateTimeField(
+        null=True, 
+        blank=True, 
+        help_text="Fecha exacta de cancelación o suspensión para calcular la purga de datos a los 180 días"
+    )
+
+    @property
+    def activa_y_vigente(self):
+        if not self.suscripcion_activa:
+            return False
+        if self.fecha_fin and timezone.now() > self.fecha_fin:
+            return False
+        return True

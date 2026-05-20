@@ -1,3 +1,4 @@
+from taller.views_extra.views_subscription import cancelar_suscripcion_view
 from django.urls import include, path
 from django.views.generic import RedirectView
 
@@ -111,4 +112,6 @@ urlpatterns = [
     #     "autocomplete/",
     #     include(("taller.autocomplete.urls", "autocomplete"), namespace="autocomplete"),
     # ),
+    # Cancelación de cuenta y portabilidad SaaS
+    path("suscripcion/cancelar/", cancelar_suscripcion_view, name="cancelar_suscripcion"),
 ]

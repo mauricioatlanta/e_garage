@@ -119,13 +119,14 @@ class TeamMemberForm(forms.ModelForm):
         if es_creacion and not cleaned_data.get("password"):
             raise ValidationError("La contraseña es obligatoria al crear un nuevo usuario")
 
-        # 🔒 CANDADO DE PLANES: Si es una creación y tenemos la empresa, validamos los cupos
+        # 🔒 CANDADO DE PLANES: Si es una creación y tenemos la empresa, validamos los cupos reales
         if es_creacion and self.empresa:
-            try:
-                PlanLimitValidation.validar_cupo_usuario(self.empresa)
-            except ValidationError as e:
-                # Si el validador tira error, se lo inyectamos directo al formulario en pantalla
-                raise ValidationError(e.message)
+            can_add, count, limite = PlanLimitValidation.can_add_user(self.empresa)
+            if not can_add:
+                raise ValidationError(
+                    f"No puedes agregar más usuarios. Tu plan actual permite un máximo de {limite} "
+                    f"usuarios administrativos y actualmente tienes {count} activos."
+                )
 
         return cleaned_data
 
@@ -189,23 +190,7 @@ class TeamMemberDeactivateForm(forms.Form):
     """Formulario simple para desactivar un miembro del equipo."""
     motivo = forms.CharField(
         widget=forms.Textarea(attrs={"rows": 3}),
-        required=False,
-        label="Motivo de desactivación",
-        help_text="Opcional: razón por la que se desactiva al usuario",
+        required=True,
+        label="Motivo de Desactivación",
+        help_text="Explique brevemente por qué se desactiva a este miembro del equipo",
     )
-
-    def __init__(self, *args, team_member=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.team_member = team_member
-
-    def save(self):
-        if self.team_member:
-            motivo = self.cleaned_data.get("motivo", "")
-            if motivo:
-                self.team_member.notas = (
-                    f"{self.team_member.notas or ''}\n[Desactivado]: {motivo}".strip()
-                )
-            self.team_member.is_active = False
-            self.team_member.save()
-            return self.team_member
-        return None

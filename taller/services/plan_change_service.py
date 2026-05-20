@@ -1,29 +1,20 @@
-from django.core.exceptions import ValidationError
 from django.contrib.auth import get_user_model
-
-User = get_user_model()
+from django.db.models import Q
 
 class PlanLimitValidation:
-    LIMITES_PLANES = {
-        'express': 1,
-        'taller': 4,
-        'pro': 10
-    }
+    LIMITES_PLANES = {'express': 1, 'taller': 4, 'pro': 10}
 
     @classmethod
-    def validar_cupo_usuario(cls, empresa_actual):
-        # Intentamos obtener el plan. Si no tiene o falla, asumimos 'express' (1 usuario)
-        plan_codigo = getattr(empresa_actual, 'plan_activo', 'express') or 'express'
-        limite_maximo = cls.LIMITES_PLANES.get(str(plan_codigo).lower(), 1)
-
-        # Contamos cuántos usuarios administrativos activos tiene la empresa hoy
-        usuarios_activos = User.objects.filter(
-            empresa=empresa_actual, 
+    def get_count(cls, empresa):
+        return get_user_model().objects.filter(
+            empresa=empresa, 
             is_active=True
+        ).filter(
+            Q(rol__iexact='administrador') | Q(rol__iexact='vendedor')
         ).count()
 
-        if usuarios_activos >= limite_maximo:
-            raise ValidationError(
-                f"Límite alcanzado. Tu plan '{plan_codigo.upper()}' "
-                f"solo permite {limite_maximo} usuario(s) administrativo(s)."
-            )
+    @classmethod
+    def can_add_user(cls, empresa):
+        limite = cls.LIMITES_PLANES.get(empresa.plan, 1)
+        count = cls.get_count(empresa)
+        return count < limite, count, limite
