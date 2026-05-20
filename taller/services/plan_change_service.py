@@ -5,16 +5,14 @@ class PlanLimitValidation:
     LIMITES_PLANES = {'express': 1, 'taller': 4, 'pro': 10}
 
     @classmethod
-    def get_count(cls, empresa):
-        return get_user_model().objects.filter(
-            empresa=empresa, 
+    def validar_cupo_usuario(cls, empresa_actual):
+        plan_codigo = getattr(empresa_actual, 'plan_activo', 'express') or 'express'
+        limite_maximo = cls.LIMITES_PLANES.get(str(plan_codigo).lower(), 1)
+        
+        # Filtro estricto: solo Administrador y Vendedor
+        usuarios_activos = get_user_model().objects.filter(
+            empresa=empresa_actual,
             is_active=True
-        ).filter(
-            Q(rol__iexact='administrador') | Q(rol__iexact='vendedor')
-        ).count()
-
-    @classmethod
-    def can_add_user(cls, empresa):
-        limite = cls.LIMITES_PLANES.get(empresa.plan, 1)
-        count = cls.get_count(empresa)
-        return count < limite, count, limite
+        ).filter(Q(rol__iexact='administrador') | Q(rol__iexact='vendedor')).count()
+        
+        return usuarios_activos < limite_maximo, usuarios_activos, limite_maximo

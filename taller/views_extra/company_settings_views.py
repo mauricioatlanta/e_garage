@@ -324,6 +324,47 @@ def company_settings_view(request):
     except Exception as exc:
         print(f"[SUBSCRIPTION CONTEXT ERROR] {exc}")
 
+
+    # UI SUBSCRIPTION DERIVED STATE
+    empresa_plan = "trial"
+    empresa_estado_suscripcion = "inactiva"
+    empresa_dias_restantes = 0
+    empresa_fecha_vencimiento = None
+    empresa_color_estado = "#dc3545"
+
+    if subscription:
+        empresa_plan = getattr(subscription, "tipo", "trial")
+
+        empresa_fecha_vencimiento = getattr(
+            subscription,
+            "fecha_fin",
+            None
+        )
+
+        if subscription.esta_vencida():
+            empresa_estado_suscripcion = "vencida"
+            empresa_color_estado = "#dc3545"
+
+        elif subscription.por_vencer():
+            empresa_estado_suscripcion = "advertencia"
+            empresa_color_estado = "#ffc107"
+
+        elif getattr(subscription, "activa", False):
+            empresa_estado_suscripcion = "activa"
+            empresa_color_estado = "#198754"
+
+        if empresa_fecha_vencimiento:
+            from django.utils import timezone
+
+            empresa_dias_restantes = max(
+                0,
+                (
+                    empresa_fecha_vencimiento
+                    - timezone.now().date()
+                ).days
+            )
+
+
     return render(
         request,
         "taller/company/settings.html",
