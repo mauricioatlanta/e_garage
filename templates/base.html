@@ -928,7 +928,7 @@
       <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm flex-wrap">
         <span class="font-medium">eGarage</span>
         <span aria-hidden="true">•</span>
-        <span>© 2025</span>
+        <span>© {% now "Y" %}</span>
         <span aria-hidden="true">•</span>
         <a href="mailto:{{ support_email }}" class="text-cyan-400 hover:underline">
           {{ support_email }}
@@ -956,7 +956,13 @@
         </a>
         {% endif %}
         <span aria-hidden="true">•</span>
-        <span class="text-xs text-gray-500">All Rights Reserved</span>
+        <span class="text-xs text-gray-500">
+          {% if request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
+            Todos los derechos reservados
+          {% else %}
+            All Rights Reserved
+          {% endif %}
+        </span>
       </div>
     </div>
   </footer>

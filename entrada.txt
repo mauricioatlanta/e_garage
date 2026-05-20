@@ -459,3 +459,65 @@ Te recomiendo:
 Si quieres, siguiente paso lógico:
 ? convertir esto en un script automático tipo debug.sh que ejecute todo en 1 comando y te entregue diagnóstico completo en segundos.
 
+
+
+Torpedo Despliegue y Debugging eGarage
+Torpedo de Despliegue y Debugging (eGarage)
+
+Este torpedo consolida el flujo de trabajo estándar para resolver errores y desplegar cambios de forma rápida en el servidor de DigitalOcean.
+
+1. Flujo de Trabajo Local (Desarrollador)
+
+  - Revisar y reparar: Corregir el error en el entorno local.
+  - Validar localmente:
+    python manage.py check
+    python manage.py makemigrations
+    python manage.py migrate
+    python manage.py test
+  - Commit: Confirmar los cambios en Git antes de subir.
+
+2. Comandos en el Servidor (DigitalOcean)
+
+Pasos secuenciales para aplicar los cambios en producción:
+
+1. Traer los cambios
+
+git fetch origin
+git pull origin main
+
+2. Actualizar Django
+
+source venv/bin/activate
+python manage.py migrate
+python manage.py collectstatic --noinput
+
+3. Reiniciar servicios
+
+sudo systemctl restart gunicorn
+sudo systemctl restart nginx
+
+3. Debugging Rápido en Producción
+
+Si se reportan caídas o errores en rutas específicas (ej: /cl/es/settings/):
+
+Ver Logs Recientes de Gunicorn:
+
+sudo journalctl -u gunicorn --since "5 minutes ago" --no-pager | tail -n 160
+
+Reproducir Error desde la Consola (Django Shell):
+
+cd /srv/egarage
+source venv/bin/activate
+python manage.py shell -c "
+from django.test import Client
+from django.contrib.auth import get_user_model
+User = get_user_model()
+u = User.objects.filter(is_active=True).first()
+c = Client(HTTP_HOST='www.egarage.cl')
+c.force_login(u)
+r = c.get('/cl/es/settings/')
+print('STATUS:', r.status_code)
+print(r.content[:1000])
+"
+
+Nota: Si aparece cualquier conflicto de Git o error en los comandos anteriores, pegar la salida completa en el chat para resolver paso a paso.

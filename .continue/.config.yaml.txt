@@ -1,12 +1,16 @@
-name: eGarage AI
-version: 1.0.0
-schema: v1
-
 models:
-  - name: DeepSeek Chat
-    provider: openai
-    model: deepseek-chat
-    apiKey: "sk-8ab5033baa5945bd96c958bd5a243157"
-    apiBase: https://api.deepseek.com
+  - title: Qwen Local
+    provider: ollama
+    model: qwen2.5-coder:7b
+    apiBase: http://127.0.0.1:11434
 
-defaultModel: DeepSeek Chat
+  - title: Llama Local
+    provider: ollama
+    model: llama3.1:8b
+    apiBase: http://127.0.0.1:11434
+
+autocompleteModel:
+  title: Qwen Local
+  provider: ollama
+  model: qwen2.5-coder:7b
+  apiBase: http://127.0.0.1:11434

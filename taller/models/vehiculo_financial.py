@@ -1,6 +1,7 @@
 from decimal import Decimal
 
 from django.db import models
+from django.db.models import Q
 from django.utils import timezone
 
 from .vehiculos import Vehiculo
@@ -141,7 +142,8 @@ class VehicleFinancialEvent(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=["event_hash"],
-                name="unique_vehicle_financial_event_hash",
+                condition=Q(event_hash__isnull=False),
+                name="uniq_vehicle_financial_event_hash",
             )
         ]
         indexes = [

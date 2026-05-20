@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from taller.documentos.forms import DocumentoForm
 from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 from taller.models.documento import Documento
+from taller.services.snapshot_queue import SnapshotQueue
 
 
 @login_required
@@ -165,6 +166,9 @@ def crear_documento_alpine(request):
 
                     # 5. Recalcular totales finales y guardar
                     doc.recompute_totals(persist=True)
+
+                    if doc.estado == "EMITIDO":
+                        SnapshotQueue.enqueue_for_document(doc)
 
                     messages.success(
                         request, f"Documento {doc.numero_documento} creado exitosamente."
@@ -327,6 +331,9 @@ def editar_documento_alpine(request, documento_id):
 
                     # 6. Recalcular totales
                     doc.recompute_totals(persist=True)
+
+                    if doc.estado == "EMITIDO":
+                        SnapshotQueue.enqueue_for_document(doc)
 
                     messages.success(
                         request, f"Documento {doc.numero_documento} actualizado exitosamente."

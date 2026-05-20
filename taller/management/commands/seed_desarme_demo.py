@@ -15,6 +15,7 @@ from taller.models.pieza_desarme import (
 from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 from taller.services.financial_event_service import FinancialEventService
+from taller.services.snapshot_generator_service import SnapshotGeneratorService
 
 
 class Command(BaseCommand):
@@ -151,6 +152,8 @@ class Command(BaseCommand):
             Decimal("200000"),
             "Costo transporte/grúa demo",
         )
+
+        SnapshotGeneratorService.generate_snapshot_for_vehicle(vehiculo)
 
         self.stdout.write(self.style.SUCCESS("✅ Seed de desarme creada correctamente."))
         self.stdout.write(self.style.SUCCESS(f"Vehículo DESARME: {vehiculo.id}"))

@@ -86,3 +86,6 @@ pyarmor>=8.5.0  # Para ofuscar motor_ia_core.py antes de producción
 
 
 
+pytz==2026.2
+pandas==3.0.3
+openpyxl==3.1.5
