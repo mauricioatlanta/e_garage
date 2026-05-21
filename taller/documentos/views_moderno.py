@@ -945,24 +945,24 @@ def documento_form(request, pk=None):
             elif request.path.startswith("/cl/"):
                 # Para Chile, intentar chile:company_settings primero, luego fallback
                 try:
-                    settings_url = reverse("chile:company_settings")
+                    settings_url = reverse("company_settings")
                 except NoReverseMatch:
-                    settings_url = reverse("taller:company_settings")
+                    settings_url = reverse("company_settings")
             else:
                 # Fallback: construir URL basada en el path o usar default
-                settings_url = reverse("taller:company_settings")
+                settings_url = reverse("company_settings")
         except NoReverseMatch:
             # Fallback final: construir URL manualmente basada en el path
             if request.path.startswith("/us/"):
                 settings_url = "/us/settings/"
             else:
-                settings_url = "/cl/es/settings/"
+                settings_url = reverse("company_settings")
         except Exception as e:
             # Fallback de emergencia
             if request.path.startswith("/us/"):
                 settings_url = "/us/settings/"
             else:
-                settings_url = "/cl/es/settings/"
+                settings_url = reverse("company_settings")
 
         # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
@@ -1007,24 +1007,24 @@ def documento_form(request, pk=None):
         elif request.path.startswith("/cl/"):
             # Para Chile, intentar chile:company_settings primero, luego fallback
             try:
-                settings_url = reverse("chile:company_settings")
+                settings_url = reverse("company_settings")
             except NoReverseMatch:
-                settings_url = reverse("taller:company_settings")
+                settings_url = reverse("company_settings")
         else:
             # Fallback: construir URL basada en el path o usar default
-            settings_url = reverse("taller:company_settings")
+            settings_url = reverse("company_settings")
     except NoReverseMatch:
         # Fallback final: construir URL manualmente basada en el path
         if request.path.startswith("/us/"):
             settings_url = "/us/settings/"
         else:
-            settings_url = "/cl/es/settings/"
+            settings_url = reverse("company_settings")
     except Exception as e:
         # Fallback de emergencia
         if request.path.startswith("/us/"):
             settings_url = "/us/settings/"
         else:
-            settings_url = "/cl/es/settings/"
+            settings_url = reverse("company_settings")
 
     # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
