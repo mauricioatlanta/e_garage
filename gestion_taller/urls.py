@@ -5,6 +5,10 @@ urlpatterns = [
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     path('accounts/', include('allauth.urls')),
     path('', include('taller.urls_payment')),
+    path("us/en/", include(("taller.urls", "taller"), namespace="us_en")),
+    path("us/es/", include(("taller.urls", "taller"), namespace="us_es")),
+    path("us/", include(("taller.urls_extra.usa", "usa"), namespace="usa")),
+
     path("cl/es/", include(("taller.urls_extra.chile", "chile"), namespace="chile")),
 
     path("", include(("taller.urls", "taller"), namespace="taller")),
