@@ -25,28 +25,32 @@ TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates','DIRS
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3','NAME': BASE_DIR / 'db.sqlite3'}}
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-ALLOWED_HOSTS = ['egarage.cl', 'www.egarage.cl', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://egarage.cl', 'https://www.egarage.cl']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-ALLOWED_HOSTS = ['egarage.cl', 'www.egarage.cl', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = ['https://egarage.cl', 'https://www.egarage.cl']
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-EMAIL_BACKEND = 'gestion_taller.resend_backend.ResendBackend'
 RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')
 DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', 'support@egarage.cl')
 SUPPORT_EMAIL = os.getenv('SUPPORT_EMAIL', DEFAULT_FROM_EMAIL)
+# Local: console para ver emails en terminal. Producción: sobreescribir con env var.
+EMAIL_BACKEND = os.getenv('EMAIL_BACKEND', 'django.core.mail.backends.console.EmailBackend')
 
 # --- Auth / allauth ---
 LOGIN_REDIRECT_URL = '/'
 ACCOUNT_AUTHENTICATED_LOGIN_REDIRECTS = False
-ACCOUNT_EMAIL_VERIFICATION = 'none'
+ACCOUNT_ADAPTER = 'taller.views_extra.account_adapter.CountryAwareAccountAdapter'
+# 'optional': allauth envía el email de verificación pero no lo exige para hacer login.
+# En producción sobreescribir con ACCOUNT_EMAIL_VERIFICATION=mandatory en el env.
+ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'optional')
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
-ACCOUNT_SIGNUP_FIELDS = ['email', 'username*', 'password1*', 'password2*']
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 
 # Compatibilidad con versiones anteriores de allauth.
 ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_REQUIRED = False
+ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = True
 
 # --- Payments: Flow / MercadoPago / PayPal ---
