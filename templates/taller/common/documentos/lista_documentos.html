@@ -994,7 +994,17 @@
 {% endblock %}
 
 {% block panel_content %}
+
+<div style="background:red;color:white;padding:10px;font-size:20px;">
+DEBUG documentos:
+{{ documentos|length }}
+<br>
+DEBUG object_list:
+{{ object_list|length }}
+</div>
+
 <div class="documentos-container">
+
   <!-- Toggle de vista -->
   <div class="view-toggle">
     <button class="toggle-view-btn active" data-view="cards" onclick="toggleView('cards', this)">

@@ -507,6 +507,12 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
     def get_queryset(self):
         """Filtrar documentos por empresa del usuario con filtros funcionales"""
         empresa = _get_empresa_safe(self.request)
+
+
+
+
+
+
         if not empresa:
             return Documento.objects.none()
         try:
@@ -683,12 +689,16 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             )
 
             return qs
-        except Exception:
-            return Documento.objects.none()
+        except Exception as e:
+            print("ERROR REAL DOCUMENTOS:", repr(e))
+            raise
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["documentos"] = context.get("object_list", [])
         empresa = _get_empresa_safe(self.request)
+
+
         context["country"] = (
             (getattr(empresa, "pais", None) or "cl").lower()
             if empresa
@@ -1358,6 +1368,8 @@ class DocumentoDuplicateView(DocumentoCreateView):
     def get_form_source_document(self):
         if not hasattr(self, "_duplicate_source_document"):
             empresa = _get_empresa_safe(self.request) or getattr(self.request, "empresa", None)
+
+
             queryset = (
                 Documento.objects.filter(empresa=empresa)
                 .select_related("cliente", "vehiculo", "tecnico_responsable")
@@ -1381,6 +1393,8 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
     def get_queryset(self):
         """Asegurar que solo se vean documentos de la empresa"""
         empresa = _get_empresa_safe(self.request)
+
+
         if not empresa:
             return Documento.objects.none()
         return Documento.objects.filter(empresa=empresa)
@@ -1945,6 +1959,8 @@ class DocumentoDeleteView(CountryLangTemplateMixin, RoleRequiredMixin, DeleteVie
     def get_queryset(self):
         """🔒 MULTI-TENANT: Asegurar que solo se eliminen documentos de la empresa"""
         empresa = _get_empresa_safe(self.request)
+
+
         if not empresa:
             return Documento.objects.none()
         return Documento.objects.filter(empresa=empresa)
