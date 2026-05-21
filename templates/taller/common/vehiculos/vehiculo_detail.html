@@ -120,6 +120,82 @@
       </div>
     </div>
 
+
+    <!-- Galería de imágenes del vehículo -->
+    <div class="bg-black/40 backdrop-blur-xl rounded-3xl border border-cyan-400/30 shadow-2xl p-8 mb-8">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 mb-6">
+        <div>
+          <h3 class="text-2xl font-bold text-cyan-300">
+            {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Vehicle Photos{% else %}Fotos del vehículo{% endif %}
+          </h3>
+          <p class="text-gray-300 text-sm mt-1">
+            {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}
+              Upload front, rear, side, interior, engine or damage photos.
+            {% else %}
+              Sube fotos frontal, trasera, lateral, interior, motor o daños.
+            {% endif %}
+          </p>
+        </div>
+
+        <form id="vehiculoImagenForm"
+              class="flex flex-col sm:flex-row gap-3"
+              method="post"
+              enctype="multipart/form-data"
+              action="{% url 'vehiculos:subir_imagenes_vehiculo' vehiculo.id %}">
+          {% csrf_token %}
+
+          <select name="tipo"
+                  class="px-4 py-3 rounded-xl bg-black/50 border border-cyan-400/30 text-cyan-100 focus:outline-none">
+            <option value="otro">Tipo</option>
+            <option value="frontal">Frontal</option>
+            <option value="trasera">Trasera</option>
+            <option value="lateral">Lateral</option>
+            <option value="interior">Interior</option>
+            <option value="motor">Motor</option>
+            <option value="danio">Daño</option>
+            <option value="documento">Documento</option>
+            <option value="pieza">Pieza</option>
+          </select>
+
+          <input id="vehiculoImagenInput"
+                 type="file"
+                 name="imagenes"
+                 accept="image/*"
+                 multiple
+                 class="block text-sm text-gray-300 file:mr-4 file:py-3 file:px-4 file:rounded-xl file:border-0 file:bg-cyan-500 file:text-white hover:file:bg-cyan-400">
+
+          <button type="submit"
+                  class="px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold rounded-xl transition-all">
+            Subir
+          </button>
+        </form>
+      </div>
+
+      <div id="vehiculoImagenMensaje" class="hidden mb-4 rounded-xl px-4 py-3 text-sm"></div>
+
+      <div id="vehiculoImagenGaleria" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        {% for imagen in imagenes %}
+          <a href="{{ imagen.imagen.url }}" target="_blank"
+             class="group block bg-black/30 rounded-2xl border border-cyan-400/20 overflow-hidden hover:border-cyan-300 transition-all">
+            <img src="{{ imagen.imagen.url }}"
+                 alt="{{ imagen.tipo }}"
+                 class="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300">
+            <div class="px-3 py-2 text-xs text-cyan-200 uppercase tracking-wide">
+              {{ imagen.get_tipo_display }}
+            </div>
+          </a>
+        {% empty %}
+          <div class="col-span-full text-center text-gray-300 border border-dashed border-cyan-400/30 rounded-2xl py-8">
+            {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}
+              No photos uploaded yet.
+            {% else %}
+              Aún no hay fotos cargadas.
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
     <!-- Acciones -->
     <div class="flex flex-col sm:flex-row gap-4 justify-center">
       <a href="{% if request.path|slice:":4" == "/us/" %}/us/vehiculos/{% else %}/cl/vehiculos/{% endif %}"

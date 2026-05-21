@@ -40,6 +40,8 @@ from taller.models.extras_vehiculo import (
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.vehiculos import Vehiculo  # Modelo Vehiculo principal
+from taller.models.vehiculo_imagen import VehiculoImagen
+from taller.models.vehiculo_imagen import VehiculoImagen
 from taller.common.mixins.context_return import (
     build_context_return_url,
     get_safe_context_return_url,
@@ -496,7 +498,16 @@ def ver_vehiculo(request, vehiculo_id):
         lang,
     )
 
-    return TemplateResponse(request, template_name, {"vehiculo": vehiculo})
+    imagenes = vehiculo.imagenes.all()
+
+    return TemplateResponse(
+        request,
+        template_name,
+        {
+            "vehiculo": vehiculo,
+            "imagenes": imagenes,
+        },
+    )
 
 
 @login_required
@@ -1204,3 +1215,51 @@ def ajax_agregar_color(request):
             },
         )
         return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+@login_required
+@require_POST
+def subir_imagenes_vehiculo(request, vehiculo_id):
+    empresa = getattr(request.user, "empresa", None)
+
+    vehiculo = get_object_or_404(
+        Vehiculo,
+        pk=vehiculo_id,
+        empresa=empresa,
+    )
+
+    imagenes = request.FILES.getlist("imagenes")
+
+    if not imagenes:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "No se recibieron imágenes",
+            },
+            status=400,
+        )
+
+    creadas = []
+
+    for imagen in imagenes:
+        item = VehiculoImagen.objects.create(
+            empresa=empresa,
+            vehiculo=vehiculo,
+            imagen=imagen,
+            tipo=request.POST.get("tipo", "otro"),
+        )
+
+        creadas.append(
+            {
+                "id": item.id,
+                "url": item.imagen.url,
+                "tipo": item.tipo,
+            }
+        )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "imagenes": creadas,
+        }
+    )

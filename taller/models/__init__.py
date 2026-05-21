@@ -14,6 +14,7 @@ from .team_member import TeamMember
 # Modelos de clientes y vehículos
 from .clientes import Cliente
 from .vehiculos import Vehiculo
+from .vehiculo_imagen import VehiculoImagen
 from .marca import Marca
 from .modelo import Modelo
 
@@ -82,6 +83,7 @@ __all__ = [
     # Clientes y vehículos
     "Cliente",
     "Vehiculo",
+    "VehiculoImagen",
     "Marca",
     "Modelo",
     # Kilometraje
