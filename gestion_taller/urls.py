@@ -1,8 +1,10 @@
 from django.views.i18n import JavaScriptCatalog
-from django.urls import path, include, include
+from django.urls import path, include
 
 urlpatterns = [
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
+    path('accounts/', include('allauth.urls')),
+    path('', include('taller.urls_payment')),
     path("cl/es/", include(("taller.urls_extra.chile", "chile"), namespace="chile")),
 
     path("", include(("taller.urls", "taller"), namespace="taller")),

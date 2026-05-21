@@ -315,7 +315,7 @@ if len(CSRF_TRUSTED_ORIGINS) == 0:
 
 # ---------- Branding Defaults ----------
 # Fallbacks amables para cuando no hay empresa configurada
-DEFAULT_BRAND_LOGO_URL = "/static/branding/egarage_logo.svg"
+DEFAULT_BRAND_LOGO_URL = "/static/img/logo.png"
 DEFAULT_BRAND_NAME = "eGarage"
 DEFAULT_BRAND_TAGLINE = "Control total para tu taller"
 DEFAULT_BRAND_COUNTRY = "cl"

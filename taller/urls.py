@@ -18,10 +18,12 @@ from taller.views_extra.dashboard_empresa import (
 from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views import dashboard
 from taller.views.dashboard_bi import DashboardHomeView
+from taller.main_views import seleccionar_pais
 
 app_name = "taller"
 
 urlpatterns = [
+    path("", seleccionar_pais),
     # ✅ Gestión de Equipo (Team Management)
     path("equipo/", include(("taller.team.urls", "team"), namespace="team")),
     path("clientes/", include(("taller.clientes.urls", "clientes"), namespace="clientes")),

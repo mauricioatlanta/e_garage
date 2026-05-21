@@ -18,7 +18,7 @@ def company_branding(request):
 
     brand = {
         "logo_url": getattr(
-            settings, "DEFAULT_BRAND_LOGO_URL", "/static/branding/egarage_logo.svg"
+            settings, "DEFAULT_BRAND_LOGO_URL", "/static/img/logo.png"
         ),
         "name": getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"),
         "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Control total para tu taller"),
