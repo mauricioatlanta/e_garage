@@ -101,6 +101,19 @@
 {% block panel_content %}
 <div class="form-desarme-wrapper">
   <div class="glass-panel-desarme p-4 lg:p-5 form-desarme">
+    {% if messages %}
+    <div class="mb-3 space-y-1">
+      {% for message in messages %}
+      <div class="p-3 rounded text-sm border
+        {% if message.tags == 'error' %}bg-red-900/60 border-red-500 text-red-300
+        {% elif message.tags == 'warning' %}bg-yellow-900/60 border-yellow-500 text-yellow-200
+        {% else %}bg-cyan-900/60 border-cyan-500 text-cyan-200{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
     <form method="post" action="" enctype="multipart/form-data">
       {% csrf_token %}
 

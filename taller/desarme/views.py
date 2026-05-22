@@ -390,8 +390,11 @@ def crear_vehiculo(request):
                 messages.success(
                     request, f"Vehículo de desarme {vehiculo.patente or vehiculo.vin} creado."
                 )
-                # Generar inventario automático y redirigir al Scanner
-                generar_inventario_vehiculo(vehiculo, empresa)
+                try:
+                    generar_inventario_vehiculo(vehiculo, empresa)
+                except Exception as inv_err:
+                    log.exception("Error generando inventario para vehículo pk=%s", vehiculo.pk)
+                    messages.warning(request, f"Vehículo guardado, pero falló la generación del inventario: {inv_err}")
                 return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/scanner/"))
             except IntegrityError:
                 messages.error(
