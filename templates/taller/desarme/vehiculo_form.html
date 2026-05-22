@@ -104,6 +104,12 @@
     <form method="post" action="" enctype="multipart/form-data">
       {% csrf_token %}
 
+      {% if form.non_field_errors %}
+      <div class="mb-3 p-3 rounded bg-red-900/60 border border-red-500 text-red-300 text-sm">
+        {% for error in form.non_field_errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+      </div>
+      {% endif %}
+
       <div class="form-desarme-grid">
         <!-- Sección 1: Identificación del vehículo -->
         <div class="space-y-0.5 form-desarme-col-full">

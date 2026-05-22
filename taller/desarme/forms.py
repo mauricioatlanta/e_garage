@@ -235,10 +235,16 @@ class VehiculoDesarmeForm(forms.ModelForm):
         elif not anio:
             raise ValidationError({"anio": "Seleccione un año o ingrese uno personalizado."})
 
+        # Al menos VIN o Patente deben estar presentes (el modelo lo exige en clean() pero
+        # como error non-field que el template no muestra; lo capturamos aquí con add_error).
+        vin = (data.get("vin") or "").strip()
+        patente = (data.get("patente") or "").strip()
+        if not vin and not patente:
+            self.add_error("patente", "Debe registrar al menos Patente o VIN.")
+            self.add_error("vin", "Debe registrar al menos Patente o VIN.")
+
         # Validar unicidad VIN y patente por empresa (evitar IntegrityError en save)
         if self.empresa:
-            vin = (data.get("vin") or "").strip()
-            patente = (data.get("patente") or "").strip()
             if vin:
                 qs = Vehiculo.objects.filter(empresa=self.empresa, vin=vin)
                 if self.instance.pk:
