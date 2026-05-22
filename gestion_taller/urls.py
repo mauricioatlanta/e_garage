@@ -13,6 +13,7 @@ urlpatterns = [
 
     path("", include(("taller.urls", "taller"), namespace="taller")),
 
+    path("cl/admin/subcriptores/", include("taller.urls_admin_suscriptores")),
     path("cl/documentos/", include("taller.documentos.urls", namespace="cl_documentos")),
     path("us/documentos/", include("taller.documentos.urls", namespace="us_documentos")),
     path("uy/documentos/", include("taller.documentos.urls", namespace="uy_documentos")),
