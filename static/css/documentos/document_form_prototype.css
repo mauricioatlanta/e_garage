@@ -573,7 +573,7 @@
 
 #document-form #doc-shell .doc-table-head--parts,
 #document-form #doc-shell .repuesto-row-grid {
-  grid-template-columns: minmax(92px, 0.8fr) minmax(210px, 1.98fr) minmax(58px, 0.44fr) minmax(92px, 0.72fr) minmax(86px, 0.68fr) minmax(72px, 0.5fr);
+  grid-template-columns: minmax(92px, 0.8fr) minmax(210px, 1.98fr) minmax(58px, 0.44fr) minmax(92px, 0.72fr) minmax(86px, 0.68fr) minmax(72px, 0.5fr) !important;
 }
 
 #document-form #doc-shell .doc-table-head--services,
@@ -589,6 +589,7 @@
 #document-form #doc-shell .doc-lines-container {
   display: grid;
   gap: 8px;
+  overflow-x: auto;
 }
 
 #document-form #doc-shell .dynamic-element {
@@ -600,8 +601,8 @@
 #document-form #doc-shell .otro-row-layout {
   display: grid !important;
   gap: 8px;
-  align-items: start;
-  padding: 11px 12px !important;
+  align-items: center;
+  padding: 6px 12px !important;
   border-radius: 12px !important;
   border: 1px solid rgba(95, 126, 163, 0.2) !important;
   background: rgba(9, 20, 34, 0.82) !important;
@@ -1107,7 +1108,7 @@
   }
 }
 
-@media (max-width: 959px) {
+@media (max-width: 640px) {
   #document-form #doc-shell .doc-table-head {
     display: none;
   }
@@ -1125,7 +1126,7 @@
   }
 }
 
-@media (min-width: 960px) {
+@media (min-width: 641px) {
   #document-form #doc-shell .doc-field-label,
   #document-form #doc-shell [data-first-row-label],
   #document-form #doc-shell [data-repeat-row-label] {

@@ -73,6 +73,15 @@
                 costo_linea: rep.costo_linea != null ? rep.costo_linea : 0
             });
         });
+
+        if (window.DESARME_PREFILL && rows.length > 0) {
+            try {
+                sessionStorage.setItem('eg_desarme_rows_backup', JSON.stringify({
+                    rows: rows,
+                    savedAt: Date.now()
+                }));
+            } catch (e) {}
+        }
     }
 
     function hydrateServicios(rows) {
@@ -159,6 +168,7 @@
     EG.lineItemsBootstrap = {
         clearRows: clearRows,
         hydrateLineItems: hydrateLineItems,
+        hydrateRepuestos: hydrateRepuestos,
         init: init
     };
 })();

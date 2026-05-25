@@ -68,12 +68,11 @@
             + '</svg>';
     }
 
-    function buildRepuestoRowHTML(rowId, isFirstRow) {
+    function buildRepuestoRowHTML(rowId) {
         return ''
-            + '<div class="doc-row-grid repuesto-row-grid grid gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="' + rowId + '">'
+            + '<div class="doc-row-grid repuesto-row-grid" data-row-id="' + rowId + '">'
             + '  <div class="repuesto-cell repuesto-cell-code relative min-w-0">'
-            +        buildLabel(EG.I18N.code || 'Code', isFirstRow)
-            + '    <input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="' + escapeHtml(EG.I18N.code || 'Code') + '" autocomplete="off">'
+            + '    <input type="text" class="rep-codigo form-control w-full" placeholder="' + escapeHtml(EG.I18N.code || 'Code') + '" autocomplete="off">'
             + '    <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
             + '    <input type="hidden" class="rep-id">'
             + '    <input type="hidden" class="rep-origen" value="STOCK_BODEGA">'
@@ -83,23 +82,20 @@
             + '    <input type="hidden" class="rep-stock-minimo">'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-name description-field rep-search-container relative min-w-0">'
-            +        buildLabel(EG.I18N.name || 'Name', isFirstRow)
             + '    <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase">Usado</span>'
-            + '    <input type="text" class="rep-search form-control w-full h-10 text-sm" style="min-width: 0; width: 100%;" placeholder="' + escapeHtml(EG.I18N.type_to_search_parts || 'Buscar...') + '" autocomplete="off">'
+            + '    <input type="text" class="rep-search form-control w-full" placeholder="' + escapeHtml(EG.I18N.type_to_search_parts || 'Buscar...') + '" autocomplete="off">'
             + '    <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
             + '    <input type="hidden" class="rep-nombre">'
-            + '    <div class="rep-stock-alert hidden mt-2 rounded-md border px-2 py-1 text-xs leading-5"></div>'
+            + '    <div class="rep-stock-alert hidden mt-1 rounded-md border px-2 py-0.5 text-xs leading-4"></div>'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-qty min-w-0">'
-            +        buildLabel(EG.I18N.qty || 'Qty', isFirstRow)
-            + '    <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" value="1">'
+            + '    <input type="number" class="rep-cantidad form-control w-full" min="1" value="1">'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-price min-w-0">'
-            +        buildLabel(EG.I18N.sale_price || 'Price', isFirstRow)
             + '    <div class="rep-price-field relative min-w-0">'
             + '      <div class="relative">'
             + '        <span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300">$</span>'
-            + '        <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6 pr-10" placeholder="0">'
+            + '        <input type="text" class="rep-precio-venta form-control w-full pl-6 pr-8" placeholder="0">'
             + '        <button type="button" class="rep-toggle-cost" title="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-label="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-expanded="false">'
             +              buildEyeIcon()
             + '        </button>'
@@ -117,13 +113,11 @@
             + '    </div>'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-total min-w-0">'
-            +        buildLabel(EG.I18N.subtotal || 'Subtotal', isFirstRow)
             + '    <input type="hidden" class="rep-subtotal" value="0">'
-            + '    <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">' + money(0) + '</div>'
+            + '    <div class="rep-subtotal-view subtotal-field w-full text-right font-bold form-control flex items-center justify-end">' + money(0) + '</div>'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-action">'
-            +        buildLabel('&nbsp;', isFirstRow)
-            + '    <button type="button" class="btn-add w-full h-10 rep-remove-btn" title="' + escapeHtml(EG.I18N.remove_row || 'Remove row') + '">X</button>'
+            + '    <button type="button" class="btn-add w-full rep-remove-btn" title="' + escapeHtml(EG.I18N.remove_row || 'Remove row') + '">X</button>'
             + '  </div>'
             + '</div>';
     }
@@ -184,11 +178,10 @@
         }
 
         var rowId = String((presetRowId || '').trim() || generateRowId());
-        var isFirstRow = !container.querySelector('.dynamic-element');
         var row = document.createElement('div');
         row.className = 'dynamic-element';
         row.dataset.rowId = rowId;
-        row.innerHTML = buildRepuestoRowHTML(rowId, isFirstRow);
+        row.innerHTML = buildRepuestoRowHTML(rowId);
         container.appendChild(row);
         setupRepuestoRow(row);
         refreshHeaderLabels();
