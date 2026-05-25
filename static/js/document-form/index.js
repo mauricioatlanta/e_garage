@@ -5,7 +5,7 @@
 (function() {
     'use strict';
 
-    var APP_VERSION = '3.1.8';
+    var APP_VERSION = '3.1.9';
 
     window.EG = window.EG || {};
     window.EG.APP_VERSION = APP_VERSION;
@@ -110,6 +110,10 @@
             ['id_repuestos_json', 'id_servicios_json', 'id_otros_json'].forEach(function(id) {
                 var input = document.getElementById(id);
                 if (input) {
+                    try {
+                        var current = JSON.parse(input.value || '[]');
+                        if (Array.isArray(current) && current.length > 0) { return; }
+                    } catch(e) {}
                     input.value = '[]';
                 }
             });
@@ -130,7 +134,9 @@
             });
 
             if (window.EG.state && typeof window.EG.state.reset === 'function') {
-                window.EG.state.reset();
+                if (!window.DESARME_PREFILL) {
+                    window.EG.state.reset();
+                }
             }
 
             clearDynamicVisualState();

@@ -467,7 +467,7 @@
     </div>
   </div>
 
-  <input type="hidden" name="repuestos_json" id="id_repuestos_json">
+  <input type="hidden" name="repuestos_json" id="id_repuestos_json" value="{{ repuestos_json|default:"[]" }}">
   <input type="hidden" name="servicios_json" id="id_servicios_json">
   <input type="hidden" name="otros_json" id="id_otros_json">
 </form>
@@ -492,6 +492,22 @@
 {{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
 {{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
 {{ document_form_bootstrap|json_script:"documentFormBootstrap" }}
+{% if desarme_origen_label %}<script>window.DESARME_PREFILL = true;</script>{% endif %}
+{% if has_server_line_items %}
+<script>
+if (window.DESARME_PREFILL) {
+    window.addEventListener('load', function() {
+        setTimeout(function() {
+            var form = document.getElementById('document-form');
+            if (form) delete form.dataset.egLineItemsHydrated;
+            if (window.EG && window.EG.lineItemsBootstrap) {
+                window.EG.lineItemsBootstrap.hydrateLineItems();
+            }
+        }, 500);
+    });
+}
+</script>
+{% endif %}
 {% endwith %}
 {% endwith %}
 {% endblock content %}
@@ -586,6 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script>
 window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
+window.DESARME_PREFILL = {% if has_server_line_items %}true{% else %}false{% endif %};
 </script>
-<script src="{% static 'js/document-form/index.js' %}?v=3.1.8"></script>
+<script src="{% static 'js/document-form/index.js' %}?v=3.1.9"></script>
 {% endblock extra_js %}

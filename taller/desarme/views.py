@@ -1087,3 +1087,86 @@ def api_piezas_bulk_precio(request):
             p.save(update_fields=["precio_venta_sugerido"])
             updated += 1
     return JsonResponse({"success": True, "updated": updated, "factor": str(factor)})
+
+
+@login_required
+@require_POST
+def iniciar_venta_desde_lista(request):
+    """
+    Inicia una venta desde la lista de repuestos (carrito multi-vehículo),
+    guardando un prefill de repuestos en sesión y redirigiendo al formulario de documentos.
+    """
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+    pieza_ids = request.POST.getlist("pieza_ids") or []
+    pieza_ids_int = []
+    for raw_id in pieza_ids:
+        try:
+            pieza_ids_int.append(int(raw_id))
+        except (TypeError, ValueError):
+            continue
+    if not pieza_ids_int:
+        messages.warning(request, "No se seleccionaron repuestos para la venta.")
+        return redirect(_desarme_url(request, "piezas/"))
+    valid_estados = {ESTADO_DISPONIBLE, ESTADO_RESERVADA}
+    piezas_qs = PiezaDesarme.objects.filter(
+        pk__in=pieza_ids_int,
+        empresa=empresa,
+        activo=True,
+        estado_pieza__in=valid_estados,
+        cantidad__gt=0,
+    ).prefetch_related("names", "company_labels")
+    piezas_by_id = {p.pk: p for p in piezas_qs}
+    repuestos_prefill = []
+    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
+    for pieza_id in pieza_ids_int:
+        pieza = piezas_by_id.get(pieza_id)
+        if not pieza:
+            continue
+        raw_cantidad = request.POST.get(f"cantidad_{pieza_id}", "").strip() or "1"
+        try:
+            cantidad_solicitada = int(raw_cantidad)
+        except (TypeError, ValueError):
+            cantidad_solicitada = 0
+        if cantidad_solicitada <= 0:
+            continue
+        if cantidad_solicitada > pieza.cantidad:
+            cantidad_solicitada = pieza.cantidad
+        try:
+            precio_venta = float(pieza.precio_venta_sugerido or 0)
+        except (TypeError, ValueError):
+            precio_venta = 0.0
+        try:
+            costo_linea = float(pieza.costo_asignado or 0)
+        except (TypeError, ValueError):
+            costo_linea = 0.0
+        repuestos_prefill.append(
+            {
+                "codigo": pieza.codigo or "",
+                "nombre": pieza.get_display_label(empresa=empresa, language=lang)
+                or pieza.nombre
+                or "",
+                "cantidad": cantidad_solicitada,
+                "precio": precio_venta,
+                "descuento": 0,
+                "origen_repuesto": ORIGEN_DESARME,
+                "pieza_desarme_id": pieza.id,
+                "costo_linea": costo_linea,
+                "vehiculo_origen_label": str(pieza.vehiculo),
+            }
+        )
+    if not repuestos_prefill:
+        messages.warning(request, "Las piezas seleccionadas no son vendibles o no tienen stock disponible.")
+        return redirect(_desarme_url(request, "piezas/"))
+    request.session["desarme_repuestos_prefill"] = repuestos_prefill
+    request.session["desarme_origen_label"] = "Lista de repuestos"
+    try:
+        doc_url = _reverse_with_request(request, "documento_crear")
+    except Exception:
+        path = (request.path or "").lower()
+        if path.startswith("/us/"):
+            doc_url = "/us/en/documentos/form/"
+        else:
+            doc_url = "/cl/es/documentos/form/"
+    return redirect(doc_url)

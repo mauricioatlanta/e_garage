@@ -128,6 +128,10 @@
 
     function reset() {
         console.log('Reset completo de state');
+        if (window.DESARME_PREFILL) {
+            console.log('Saltando reset por DESARME_PREFILL');
+            return;
+        }
         state.data = buildDefaultData();
         setBootstrap({
             mode: 'clean',
@@ -145,7 +149,7 @@
     function init() {
         syncDataFromBootstrap();
 
-        if (window.FORCE_NEW_DOCUMENT) {
+        if (window.FORCE_NEW_DOCUMENT && !window.DESARME_PREFILL) {
             reset();
         }
     }

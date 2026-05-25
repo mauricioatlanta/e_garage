@@ -975,7 +975,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 "servicios_json": line_item_payloads["servicios_json"],
                 "otros_json": line_item_payloads["otros_json"],
                 "document_form_bootstrap": form_bootstrap,
-                "has_server_line_items": has_server_line_items(line_item_payloads),
+                "has_server_line_items": has_server_line_items(line_item_payloads) or bool(form_bootstrap.get("line_items", {}).get("repuestos")),
                 "cliente_preselect_id": cliente_state["id"] or "",
                 "vehiculo_preselect_id": vehiculo_preselect_id or "",
                 "cliente_preselect_nombre": cliente_state["nombre"] or "",
@@ -984,9 +984,6 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 **prefetch_payloads,
             }
         )
-        return context
-        empresa = self.request.user.empresa
-
         # Prefill desde flujo de desarme (solo creación, prioridad menor que edición)
         if not context.get("es_edicion"):
             session_prefill = self.request.session.get("desarme_repuestos_prefill")
@@ -994,11 +991,15 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
             repuestos_json_actual = context.get("repuestos_json")
             if not repuestos_json_actual and session_prefill:
                 context["repuestos_json"] = session_prefill
+                context["has_server_line_items"] = True
                 if session_label:
                     context["desarme_origen_label"] = session_label
             # Consumir siempre una sola vez
             self.request.session.pop("desarme_repuestos_prefill", None)
             self.request.session.pop("desarme_origen_label", None)
+        return context
+        empresa = self.request.user.empresa
+
 
         # Cargar mecánicos activos del taller
         mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)

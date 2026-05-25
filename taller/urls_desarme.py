@@ -61,6 +61,11 @@ try:
             name="inventario_inteligente",
         ),
         path(
+            "piezas/vender/",
+            views.iniciar_venta_desde_lista,
+            name="iniciar_venta_desde_lista",
+        ),
+        path(
             "vehiculos/<int:pk>/vender/",
             views.iniciar_venta_desde_inventario,
             name="iniciar_venta_desde_inventario",

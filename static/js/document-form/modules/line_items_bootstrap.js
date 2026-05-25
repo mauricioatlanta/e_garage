@@ -120,7 +120,7 @@
             return;
         }
 
-        if (window.FORCE_NEW_DOCUMENT || (EG.state && EG.state.isCleanMode && EG.state.isCleanMode())) {
+        if ((window.FORCE_NEW_DOCUMENT && !window.DESARME_PREFILL) || (EG.state && EG.state.isCleanMode && EG.state.isCleanMode())) {
             clearRows();
             form.dataset.egLineItemsHydrated = '1';
             return;
@@ -149,7 +149,14 @@
     }
 
     function init() {
-        hydrateLineItems();
+        if (window.DESARME_PREFILL) {
+            setTimeout(function() {
+                delete document.getElementById('document-form').dataset.egLineItemsHydrated;
+                hydrateLineItems();
+            }, 300);
+        } else {
+            hydrateLineItems();
+        }
     }
 
     EG.lineItemsBootstrap = {
