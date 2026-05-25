@@ -129,7 +129,7 @@
       {% trans "Vehículo" %}: <a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_id %}">{{ p.vehiculo.patente|default:p.vehiculo.vin|default:p.vehiculo.id }}</a>
     </p>
     <div class="flex gap-1 mt-2">
-      <a href="{% country_url 'desarme:editar_repuesto' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
+      <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
       <a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_id %}" class="interactive-btn">{% trans "Inventario" %}</a>
     </div>
   </div>

@@ -275,7 +275,7 @@
 <div
   x-data="inventarioUltra({ items: JSON.parse('{{ repuestos_json|escapejs }}') })"
   x-init="editUrlPattern = $el.getAttribute('data-edit-pattern') || ''; labelApiUrlPattern = $el.getAttribute('data-label-api-pattern') || ''; currentLang = $el.getAttribute('data-current-lang') || 'es'"
-  data-edit-pattern="{% country_url 'desarme:editar_repuesto' 0 %}"
+  data-edit-pattern="{% country_url 'desarme:editar_pieza' 0 %}"
   data-label-api-pattern="{% country_url 'desarme:api_repuesto_label_empresa_guardar' 0 %}"
   data-current-lang="{{ request.LANGUAGE_CODE|default:'es' }}"
   x-cloak
