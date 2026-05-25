@@ -219,6 +219,14 @@
         if (window.recalcTotales) {
             window.recalcTotales();
         }
+
+        if (window.DESARME_PREFILL) {
+            var form = document.getElementById('document-form');
+            if (form) delete form.dataset.egLineItemsHydrated;
+            if (window.EG && window.EG.lineItemsBootstrap) {
+                window.EG.lineItemsBootstrap.hydrateLineItems();
+            }
+        }
     }
 
     function setupAddButtons() {
