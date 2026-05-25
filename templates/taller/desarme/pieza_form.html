@@ -2,8 +2,8 @@
 {% load i18n %}
 {% load country_url %}
 
-{% block page_title %}{% trans "Desarme" %} – {{ titulo|default:"Pieza" }}{% endblock %}
-{% block page_subtitle %}{% trans "Alta/edición de pieza de desarme" %}{% endblock %}
+{% block page_title %}{% trans "Desarme" %} – {{ titulo|default:"Repuesto" }}{% endblock %}
+{% block page_subtitle %}{% trans "Alta/edición de repuesto de desarme" %}{% endblock %}
 {% block page_icon %}📦{% endblock %}
 
 {% block page_extra_css %}
@@ -41,7 +41,7 @@
     border-color: var(--ds-cyan);
     box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.2);
   }
-  .form-desarme textarea.pieza-obs {
+  .form-desarme textarea.repuesto-obs {
     resize: vertical;
     min-height: 4.5rem;
     max-height: 8rem;
@@ -111,9 +111,9 @@
   ← {% trans "Inventario vehículo" %}
 </a>
 {% else %}
-<a href="{% country_url 'desarme:lista_piezas' %}"
+<a href="{% country_url 'desarme:lista_repuestos' %}"
    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-500 text-gray-300 hover:bg-gray-700 text-sm">
-  ← {% trans "Listado piezas" %}
+  ← {% trans "Listado repuestos" %}
 </a>
 {% endif %}
 {% endblock %}
@@ -162,7 +162,7 @@
           {% endif %}
         {% endfor %}
         {% for field in form %}
-          {% if field.name == "estado_pieza" %}
+          {% if field.name == "estado_repuesto" %}
         <div class="form-group">
           <label for="{{ field.id_for_label }}">{{ field.label }}</label>
           {{ field }}
@@ -207,8 +207,8 @@
     </div>
 
     <div class="form-section">
-      <p class="toggle-opcional" data-toggle="opcional-pieza">▼ {% trans "Más opciones (lado, zona, posición)" %}</p>
-      <div id="opcional-pieza" class="opcional-fields" style="display: none;">
+      <p class="toggle-opcional" data-toggle="opcional-repuesto">▼ {% trans "Más opciones (lado, zona, posición)" %}</p>
+      <div id="opcional-repuesto" class="opcional-fields" style="display: none;">
         <div class="form-row form-row-3">
           {% for field in form %}
             {% if field.name == "lado" or field.name == "zona" or field.name == "posicion" %}
@@ -227,13 +227,13 @@
       <button type="submit" class="btn px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md">
         {% trans "Guardar" %}
       </button>
-      {% if pieza and pieza.vehiculo_id %}
-      <a href="{% country_url 'desarme:inventario_vehiculo' pieza.vehiculo_id %}"
+      {% if repuesto and repuesto.vehiculo_id %}
+      <a href="{% country_url 'desarme:inventario_vehiculo' repuesto.vehiculo_id %}"
          class="btn px-4 py-2 rounded-lg border border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20 font-medium text-sm">
         {% trans "Cancelar" %}
       </a>
       {% else %}
-      <a href="{% country_url 'desarme:lista_piezas' %}"
+      <a href="{% country_url 'desarme:lista_repuestos' %}"
          class="btn px-4 py-2 rounded-lg border border-slate-500/50 text-slate-300 hover:bg-slate-500/20 font-medium text-sm">
         {% trans "Cancelar" %}
       </a>
@@ -242,8 +242,8 @@
   </form>
 </div>
 <script>
-document.querySelector('[data-toggle="opcional-pieza"]')?.addEventListener('click', function() {
-  var el = document.getElementById('opcional-pieza');
+document.querySelector('[data-toggle="opcional-repuesto"]')?.addEventListener('click', function() {
+  var el = document.getElementById('opcional-repuesto');
   if (el.style.display === 'none') {
     el.style.display = 'block';
     this.textContent = '▲ {% trans "Ocultar opciones" %}';

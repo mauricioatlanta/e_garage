@@ -223,8 +223,8 @@
   {# —— B. Métricas vivas (actualizables en tiempo real) —— #}
   <div class="flex flex-wrap gap-4" id="stats-row">
     <div class="glass-panel stat-card stat-cyan">
-      <div class="stat-val text-cyan-300" id="stat-total">{{ total_piezas }}</div>
-      <div class="stat-lab text-slate-400">{% trans "TOTAL PIEZAS" %}</div>
+      <div class="stat-val text-cyan-300" id="stat-total">{{ total_repuestos }}</div>
+      <div class="stat-lab text-slate-400">{% trans "TOTAL REPUESTOS" %}</div>
     </div>
     <div class="glass-panel stat-card stat-emerald">
       <div class="stat-val" id="stat-disponibles">{{ disponibles }}</div>
@@ -258,7 +258,7 @@
   <div class="glass-panel p-4" id="revision-progress-block">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
       <span class="ds-font text-cyan-300 text-sm uppercase tracking-wider">{% trans "Revisión" %}</span>
-      <span class="text-slate-400 text-sm" id="revision-progress-text">0 / {{ total_piezas }} {% trans "revisadas" %}</span>
+      <span class="text-slate-400 text-sm" id="revision-progress-text">0 / {{ total_repuestos }} {% trans "revisadas" %}</span>
     </div>
     <div class="revision-progress-bar">
       <div class="revision-progress-fill" id="revision-progress-fill" style="width: 0%;"></div>
@@ -287,7 +287,7 @@
       <div>
         <div class="text-xs uppercase tracking-wider text-slate-400 mb-1">{% trans "Sin precio" %}</div>
         <div class="commercial-val text-amber-400" id="commercial-sin-precio">{{ sin_precio|default:0 }}</div>
-        <div class="text-xs text-slate-500">{% trans "piezas por valorizar" %}</div>
+        <div class="text-xs text-slate-500">{% trans "repuestos por valorizar" %}</div>
       </div>
       <div>
         <div class="text-xs uppercase tracking-wider text-slate-400 mb-1">{% trans "Top 5 más valiosas" %}</div>
@@ -313,7 +313,7 @@
     </div>
   </div>
 
-  {% if zonas_con_piezas %}
+  {% if zonas_con_repuestos %}
   {# —— D. Centro visual: blueprint + zonas —— #}
   <div class="glass-panel p-8 flex flex-col md:flex-row items-center justify-center gap-8">
     <div class="blueprint-ring">
@@ -323,10 +323,10 @@
       </div>
     </div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="zonas-buttons">
-      {% for zona, piezas_list in zonas_con_piezas %}
+      {% for zona, repuestos_list in zonas_con_repuestos %}
       <button type="button" class="zona-btn scroll-zona text-left" data-zona="{{ zona|slugify }}" data-zona-name="{{ zona }}">
         <span class="font-semibold">{{ zona }}</span>
-        <span class="text-slate-500 text-xs block mt-1">{{ piezas_list|length }} {% trans "piezas" %}</span>
+        <span class="text-slate-500 text-xs block mt-1">{{ repuestos_list|length }} {% trans "repuestos" %}</span>
       </button>
       {% endfor %}
     </div>
@@ -362,20 +362,20 @@
     </button>
     <span id="revision-hint" class="revision-rapida-bar hidden items-center gap-2 text-cyan-300 text-sm font-medium">
       <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-      {% trans "Modo compacto: más piezas en pantalla" %}
+      {% trans "Modo compacto: más repuestos en pantalla" %}
     </span>
   </div>
 
   {# —— G. Inventario por zona (cards premium) + selección para venta —— #}
   <form method="post" action="{% country_url 'desarme:iniciar_venta_desde_inventario' vehiculo.pk %}">
     {% csrf_token %}
-    <section id="inventario-piezas">
-      {% for zona, piezas_list in zonas_con_piezas %}
+    <section id="inventario-repuestos">
+      {% for zona, repuestos_list in zonas_con_repuestos %}
       <div id="zona-{{ zona|slugify }}" class="mb-10 piece-zona" data-zona="{{ zona|slugify }}">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 class="ds-font text-xl text-cyan-300 flex items-center gap-2">
             <span>{{ zona }}</span>
-            <span class="text-slate-500 text-sm font-normal">{{ piezas_list|length }} {% trans "piezas" %}</span>
+            <span class="text-slate-500 text-sm font-normal">{{ repuestos_list|length }} {% trans "repuestos" %}</span>
           </h2>
           <div class="flex flex-wrap gap-2 items-center">
             <span class="text-xs text-slate-500 uppercase tracking-wider">{% trans "Toda la zona" %}:</span>
@@ -388,8 +388,8 @@
           </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 piece-grid" data-zona="{{ zona }}">
-          {% for p in piezas_list %}
-        {% with estado=p.estado_pieza %}
+          {% for p in repuestos_list %}
+        {% with estado=p.estado_repuesto %}
         <article class="piece-card piece-item
           {% if estado == 'DISPONIBLE' %}glow-disponible
           {% elif estado == 'DANADA' %}glow-danada
@@ -398,7 +398,7 @@
           {% elif estado == 'VENDIDA' %}glow-vendida
           {% else %}glow-faltante{% endif %}
           {% if not p.precio_venta_sugerido and estado == 'DISPONIBLE' or not p.precio_venta_sugerido and estado == 'RESERVADA' %}piece-sin-precio{% endif %}"
-                 data-pieza-id="{{ p.pk }}"
+                 data-repuesto-id="{{ p.pk }}"
                  data-estado="{{ estado }}"
                  data-nombre="{{ p.display_nombre|default:p.nombre|lower }}"
                  data-codigo="{{ p.codigo|lower }}"
@@ -408,11 +408,11 @@
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-xs uppercase tracking-wider text-slate-400">{% trans "Pieza" %}</span>
+                <span class="text-xs uppercase tracking-wider text-slate-400">{% trans "Repuesto" %}</span>
                 {% if p.activo and p.cantidad > 0 %}
-                  {% if p.estado_pieza == 'DISPONIBLE' or p.estado_pieza == 'RESERVADA' %}
+                  {% if p.estado_repuesto == 'DISPONIBLE' or p.estado_repuesto == 'RESERVADA' %}
                 <span class="inline-flex items-center gap-1 text-[11px] text-emerald-300 bg-emerald-900/40 border border-emerald-400/50 rounded-full px-2 py-0.5">
-                  <input type="checkbox" name="pieza_ids" value="{{ p.pk }}" class="w-3 h-3 align-middle">
+                  <input type="checkbox" name="repuesto_ids" value="{{ p.pk }}" class="w-3 h-3 align-middle">
                   <span>{% trans "Vender" %}</span>
                   <input type="number" name="cantidad_{{ p.pk }}" value="1" min="1" max="{{ p.cantidad }}" class="w-14 ml-1 text-[11px] bg-slate-950/80 border border-emerald-500/50 rounded px-1 py-0.5 text-emerald-100">
                 </span>
@@ -432,7 +432,7 @@
               {% elif estado == 'RESERVADA' %}border-amber-400/50 text-amber-300
               {% elif estado == 'VENDIDA' %}border-blue-400/50 text-blue-300
               {% else %}border-slate-400/50 text-slate-300{% endif %}">
-              {{ p.get_estado_pieza_display|default:estado }}
+              {{ p.get_estado_repuesto_display|default:estado }}
             </span>
           </div>
 
@@ -450,7 +450,7 @@
               </button>
             </div>
             <div class="piece-price-edit hidden mt-2">
-              <input type="number" class="precio-edit w-full piece-price-input" value="{% if request.path|slice:':4' == '/us/' %}{{ p.precio_venta_sugerido|floatformat:2|default:0 }}{% else %}{{ p.precio_venta_sugerido|floatformat:0|default:0 }}{% endif %}" min="0" step="{% if request.path|slice:':4' == '/us/' %}0.01{% else %}1{% endif %}" data-pieza-id="{{ p.pk }}">
+              <input type="number" class="precio-edit w-full piece-price-input" value="{% if request.path|slice:':4' == '/us/' %}{{ p.precio_venta_sugerido|floatformat:2|default:0 }}{% else %}{{ p.precio_venta_sugerido|floatformat:0|default:0 }}{% endif %}" min="0" step="{% if request.path|slice:':4' == '/us/' %}0.01{% else %}1{% endif %}" data-repuesto-id="{{ p.pk }}">
               <button type="button" class="piece-save-price mt-2 text-cyan-400 text-sm font-medium hover:underline">{% trans "Guardar" %}</button>
             </div>
           </div>
@@ -478,15 +478,15 @@
   {# —— J. Estado vacío —— #}
   <div class="glass-panel p-10 text-center">
     <p class="text-slate-300 text-lg mb-2">{% trans "Este vehículo aún no tiene inventario generado" %}</p>
-    <p class="text-slate-500 text-sm mb-6">{% trans "Genera el inventario base desde el catálogo o agrega piezas manualmente." %}</p>
+    <p class="text-slate-500 text-sm mb-6">{% trans "Genera el inventario base desde el catálogo o agrega repuestos manualmente." %}</p>
     <div class="flex flex-wrap justify-center gap-4">
       <a href="{% country_url 'desarme:generar_inventario' vehiculo.pk %}"
          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/90 hover:bg-cyan-400 text-white font-semibold text-base shadow-lg shadow-cyan-500/25 transition">
         📡 {% trans "Generar inventario" %}
       </a>
-      <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}"
+      <a href="{% country_url 'desarme:crear_repuesto' %}?vehiculo={{ vehiculo.pk }}"
          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-500/50 text-slate-300 hover:bg-slate-500/20 font-medium transition">
-        ➕ {% trans "Agregar pieza manual" %}
+        ➕ {% trans "Agregar repuesto manual" %}
       </a>
     </div>
   </div>
@@ -538,7 +538,7 @@
     var valorPotencial = 0;
     var valorPerdidoDanadas = 0;
     var revisadas = 0;
-    var topPiezas = [];
+    var topRepuestos = [];
     for (var i = 0; i < cards.length; i++) {
       var c = cards[i];
       var est = c.dataset.estado || '';
@@ -554,11 +554,11 @@
       if (est === 'DANADA' && precio > 0) valorPerdidoDanadas += precio * cant;
       if (precio > 0 || est === 'DANADA' || est === 'FALTANTE') revisadas++;
       if ((est === 'DISPONIBLE' || est === 'RESERVADA') && precio > 0) {
-        topPiezas.push({ nombre: c.querySelector('.piece-name') ? c.querySelector('.piece-name').textContent : '', precio: precio });
+        topRepuestos.push({ nombre: c.querySelector('.piece-name') ? c.querySelector('.piece-name').textContent : '', precio: precio });
       }
     }
-    topPiezas.sort(function(a, b) { return b.precio - a.precio; });
-    var top5 = topPiezas.slice(0, 5);
+    topRepuestos.sort(function(a, b) { return b.precio - a.precio; });
+    var top5 = topRepuestos.slice(0, 5);
     var pct = total ? Math.round((revisadas / total) * 100) : 0;
     var elPerdido = document.getElementById('commercial-perdido-dano');
     if (elPerdido) elPerdido.textContent = fmtMoney(valorPerdidoDanadas);
@@ -595,10 +595,10 @@
     }
   }
 
-  function updatePiezaEstado(pk, estado) {
-    var card = document.querySelector('[data-pieza-id="' + pk + '"]');
+  function updateRepuestoEstado(pk, estado) {
+    var card = document.querySelector('[data-repuesto-id="' + pk + '"]');
     if (card) card.classList.add('is-saving');
-    var url = apiBase + '/api/piezas/' + pk + '/estado/';
+    var url = apiBase + '/api/repuestos/' + pk + '/estado/';
     fetch(url, {
       method: 'POST',
       headers: {
@@ -641,10 +641,10 @@
       });
   }
 
-  function updatePiezaPrecio(pk, precio) {
-    var card = document.querySelector('[data-pieza-id="' + pk + '"]');
+  function updateRepuestoPrecio(pk, precio) {
+    var card = document.querySelector('[data-repuesto-id="' + pk + '"]');
     if (card) card.classList.add('is-saving');
-    var url = apiBase + '/api/piezas/' + pk + '/precio/';
+    var url = apiBase + '/api/repuestos/' + pk + '/precio/';
     fetch(url, {
       method: 'POST',
       headers: {
@@ -694,8 +694,8 @@
   document.querySelectorAll('.piece-set-estado').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var card = btn.closest('.piece-card');
-      var pk = card && card.dataset.piezaId;
-      if (pk) updatePiezaEstado(pk, btn.dataset.estado);
+      var pk = card && card.dataset.repuestoId;
+      if (pk) updateRepuestoEstado(pk, btn.dataset.estado);
     });
   });
 
@@ -714,8 +714,8 @@
     btn.addEventListener('click', function() {
       var card = btn.closest('.piece-card');
       var input = card.querySelector('.piece-price-input');
-      var pk = input && input.dataset.piezaId;
-      if (pk && input) updatePiezaPrecio(pk, input.value);
+      var pk = input && input.dataset.repuestoId;
+      if (pk && input) updateRepuestoPrecio(pk, input.value);
     });
   });
 
@@ -817,11 +817,11 @@
       if (!zoneDiv) return;
       var cards = zoneDiv.querySelectorAll('.piece-item');
       var ids = [];
-      cards.forEach(function(c) { ids.push(c.dataset.piezaId); });
+      cards.forEach(function(c) { ids.push(c.dataset.repuestoId); });
       if (ids.length === 0) return;
       btn.disabled = true;
-      showToast('{% trans "Actualizando" %} ' + ids.length + ' {% trans "piezas..." %}');
-      fetch(apiBase + '/api/piezas/bulk-estado/', {
+      showToast('{% trans "Actualizando" %} ' + ids.length + ' {% trans "repuestos..." %}');
+      fetch(apiBase + '/api/repuestos/bulk-estado/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'Accept': 'application/json' },
         body: JSON.stringify({ ids: ids, estado: estado })
@@ -862,11 +862,11 @@
       if (!zoneDiv) return;
       var cards = zoneDiv.querySelectorAll('.piece-item');
       var ids = [];
-      cards.forEach(function(c) { ids.push(c.dataset.piezaId); });
+      cards.forEach(function(c) { ids.push(c.dataset.repuestoId); });
       if (ids.length === 0) return;
       btn.disabled = true;
       showToast((factor > 1 ? '+10%' : '−10%') + ' {% trans "precio zona..." %}');
-      fetch(apiBase + '/api/piezas/bulk-precio/', {
+      fetch(apiBase + '/api/repuestos/bulk-precio/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'Accept': 'application/json' },
         body: JSON.stringify({ ids: ids, factor: factor })

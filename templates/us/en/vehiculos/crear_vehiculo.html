@@ -559,7 +559,7 @@ $(document).ready(function() {
             // 🔧 FIX: asegurar que la URL del autocomplete tenga el prefijo del país (/us/, /cl/, etc.)
             if (autocompleteUrl) {
                 const originalUrl = autocompleteUrl;
-                // Si la URL NO empieza con el prefijo de país, lo agregamos
+                // Si la URL NO emrepuesto con el prefijo de país, lo agregamos
                 if (!autocompleteUrl.startsWith(countryPrefix)) {
                     // Remover cualquier slash inicial y agregar el prefijo de país
                     const nuevaUrl = countryPrefix + autocompleteUrl.replace(/^\/+/, '');

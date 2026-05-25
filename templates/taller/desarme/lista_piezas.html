@@ -2,8 +2,8 @@
 {% load i18n %}
 {% load country_url %}
 
-{% block page_title %}{% trans "Desarme" %} – {% trans "Piezas" %}{% endblock %}
-{% block page_subtitle %}{% trans "Piezas extraídas de vehículos de desarme" %}{% endblock %}
+{% block page_title %}{% trans "Desarme" %} – {% trans "Repuestos" %}{% endblock %}
+{% block page_subtitle %}{% trans "Repuestos extraídas de vehículos de desarme" %}{% endblock %}
 {% block page_icon %}📦{% endblock %}
 
 {% block page_extra_css %}
@@ -70,14 +70,14 @@
 <div class="desarme-nav-module flex flex-wrap gap-2 mt-4">
   <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">{% trans "Dashboard" %}</a>
   <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🚗 {% trans "Vehículos" %}</a>
-  <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">📦 {% trans "Piezas" %}</a>
+  <a href="{% country_url 'desarme:lista_repuestos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">📦 {% trans "Repuestos" %}</a>
 </div>
 {% endblock %}
 
 {% block main_actions %}
-<a href="{% country_url 'desarme:crear_pieza' %}"
+<a href="{% country_url 'desarme:crear_repuesto' %}"
    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold">
-  ➕ {% trans "Nueva pieza" %}
+  ➕ {% trans "Nueva repuesto" %}
 </a>
 <a href="{% country_url 'desarme:lista_vehiculos' %}"
    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600/80 hover:bg-cyan-500 text-white text-sm font-semibold">
@@ -95,7 +95,7 @@
     <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Código o nombre...' %}" aria-label="{% trans 'Buscar' %}">
     <select name="estado" class="text-sm">
       <option value="">{% trans "Estado" %}</option>
-      {% for value, label in estado_pieza_choices %}
+      {% for value, label in estado_repuesto_choices %}
       <option value="{{ value }}" {% if estado_filtro == value %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
@@ -109,27 +109,27 @@
     </select>
     <button type="submit" class="interactive-btn px-4 py-2">{% trans "Filtrar" %}</button>
     {% if q or estado_filtro or vehiculo_filtro %}
-    <a href="{% country_url 'desarme:lista_piezas' %}" class="text-gray-400 hover:text-cyan-300 text-sm">{% trans "Limpiar" %}</a>
+    <a href="{% country_url 'desarme:lista_repuestos' %}" class="text-gray-400 hover:text-cyan-300 text-sm">{% trans "Limpiar" %}</a>
     {% endif %}
   </form>
 </div>
 {% endblock %}
 
 {% block panel_content %}
-{% if piezas %}
+{% if repuestos %}
 <div class="pieces-grid">
-  {% for p in piezas %}
+  {% for p in repuestos %}
   <div class="piece-card">
     <div class="flex justify-between items-start mb-2">
       <span class="font-mono text-cyan-300 font-semibold">{{ p.codigo }}</span>
-      <span class="badge-estado badge-{{ p.estado_pieza }}">{{ p.get_estado_pieza_display|default:p.estado_pieza }}</span>
+      <span class="badge-estado badge-{{ p.estado_repuesto }}">{{ p.get_estado_repuesto_display|default:p.estado_repuesto }}</span>
     </div>
     <p class="text-white text-sm mb-1">{{ p.nombre }}</p>
     <p class="vehiculo-origen">
       {% trans "Vehículo" %}: <a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_id %}">{{ p.vehiculo.patente|default:p.vehiculo.vin|default:p.vehiculo.id }}</a>
     </p>
     <div class="flex gap-1 mt-2">
-      <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
+      <a href="{% country_url 'desarme:editar_repuesto' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
       <a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_id %}" class="interactive-btn">{% trans "Inventario" %}</a>
     </div>
   </div>
@@ -137,11 +137,11 @@
 </div>
 {% else %}
 <div class="rounded-xl border border-cyan-400/30 bg-black/30 p-8 text-center text-gray-400">
-  <p class="mb-4">{% if q or estado_filtro or vehiculo_filtro %}{% trans "No hay resultados con los filtros aplicados." %}{% else %}{% trans "No hay piezas de desarme." %}{% endif %}</p>
+  <p class="mb-4">{% if q or estado_filtro or vehiculo_filtro %}{% trans "No hay resultados con los filtros aplicados." %}{% else %}{% trans "No hay repuestos de desarme." %}{% endif %}</p>
   {% if q or estado_filtro or vehiculo_filtro %}
-  <a href="{% country_url 'desarme:lista_piezas' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "Ver todas" %}</a>
+  <a href="{% country_url 'desarme:lista_repuestos' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "Ver todas" %}</a>
   {% else %}
-  <a href="{% country_url 'desarme:crear_pieza' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "Crear la primera" %}</a>
+  <a href="{% country_url 'desarme:crear_repuesto' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "Crear la primera" %}</a>
   o
   <a href="{% country_url 'desarme:lista_vehiculos' %}" class="text-cyan-400 hover:text-cyan-300">{% trans "ir a vehículos" %}</a>
   {% endif %}

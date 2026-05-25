@@ -32,13 +32,13 @@
     </div>
   </div>
 
-  <h2>{% trans "Top piezas" %}</h2>
+  <h2>{% trans "Top repuestos" %}</h2>
   <table class="table">
     <thead>
       <tr><th>{% trans "Código" %}</th><th>{% trans "Nombre" %}</th><th>{% trans "Vendidas" %}</th><th>{% trans "Ingresos" %}</th></tr>
     </thead>
     <tbody>
-      {% for p in top_piezas %}
+      {% for p in top_repuestos %}
       <tr>
         <td>{{ p.codigo }}</td>
         <td>{{ p.nombre }}</td>
@@ -54,7 +54,7 @@
   <h2>{% trans "Top vehículos" %}</h2>
   <table class="table">
     <thead>
-      <tr><th>{% trans "Patente / VIN" %}</th><th>{% trans "Piezas vendidas" %}</th><th>{% trans "Ingresos" %}</th></tr>
+      <tr><th>{% trans "Patente / VIN" %}</th><th>{% trans "Repuestos vendidas" %}</th><th>{% trans "Ingresos" %}</th></tr>
     </thead>
     <tbody>
       {% for v in top_vehiculos %}
