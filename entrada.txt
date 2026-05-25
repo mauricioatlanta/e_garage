@@ -1,3 +1,5 @@
+$ ! python manage.py changepassword mauricio
+
 generarte un bloque técnico completo tipo:
     • Estado UX actual. 
     • Qué quedó funcionando. 
