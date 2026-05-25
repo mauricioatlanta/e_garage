@@ -72,7 +72,7 @@
   <a href="{% country_url 'desarme:editar_vehiculo' vehiculo.pk %}" class="btn-action btn-action-cyan">
     ✏️ {% trans "Editar vehículo" %}
   </a>
-  <a href="{% country_url 'desarme:crear_repuesto' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-outline">
+  <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-outline">
     ➕ {% trans "Nueva repuesto manual" %}
   </a>
   <a href="{% country_url 'desarme:lista_vehiculos' %}" class="btn-action btn-action-outline">
@@ -187,7 +187,7 @@
   <p>{% trans "Sin repuestos registradas." %}</p>
   <div class="mt-4 flex flex-wrap justify-center gap-3">
     <a href="{% country_url 'desarme:generar_inventario' vehiculo.pk %}" class="btn-action btn-scanner">📡 {% trans "Generar inventario" %}</a>
-    <a href="{% country_url 'desarme:crear_repuesto' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-cyan">➕ {% trans "Agregar repuesto" %}</a>
+    <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-cyan">➕ {% trans "Agregar repuesto" %}</a>
   </div>
 </div>
 {% endif %}

@@ -24,7 +24,7 @@
       <a href="{% country_url 'desarme:ver_vehiculo' v.pk %}" class="interactive-btn">{% trans "Ver" %}</a>
       <a href="{% country_url 'desarme:editar_vehiculo' v.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
       <a href="{% country_url 'desarme:inventario_vehiculo' v.pk %}" class="interactive-btn font-medium">📦 {% trans "Inventario" %}</a>
-      <a href="{% country_url 'desarme:crear_repuesto' %}?vehiculo={{ v.pk }}" class="interactive-btn font-medium">➕ {% trans "Nueva repuesto" %}</a>
+      <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ v.pk }}" class="interactive-btn font-medium">➕ {% trans "Nueva repuesto" %}</a>
     </div>
   </div>
   {% endfor %}

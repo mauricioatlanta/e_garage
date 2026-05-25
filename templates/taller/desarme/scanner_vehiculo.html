@@ -484,7 +484,7 @@
          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/90 hover:bg-cyan-400 text-white font-semibold text-base shadow-lg shadow-cyan-500/25 transition">
         📡 {% trans "Generar inventario" %}
       </a>
-      <a href="{% country_url 'desarme:crear_repuesto' %}?vehiculo={{ vehiculo.pk }}"
+      <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}"
          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-500/50 text-slate-300 hover:bg-slate-500/20 font-medium transition">
         ➕ {% trans "Agregar repuesto manual" %}
       </a>

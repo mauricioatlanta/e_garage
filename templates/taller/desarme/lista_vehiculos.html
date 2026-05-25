@@ -81,7 +81,7 @@
 <div class="desarme-nav-module flex flex-wrap gap-2 mt-4">
   <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">{% trans "Dashboard" %}</a>
   <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">🚗 {% trans "Vehículos" %}</a>
-  <a href="{% country_url 'desarme:lista_repuestos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 {% trans "Repuestos" %}</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 {% trans "Repuestos" %}</a>
 </div>
 {% endblock %}
 
@@ -91,7 +91,7 @@
   <span>➕</span>
   <span>{% trans "Nuevo vehículo desarme" %}</span>
 </a>
-<a href="{% country_url 'desarme:lista_repuestos' %}"
+<a href="{% country_url 'desarme:lista_piezas' %}"
    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600/80 hover:bg-cyan-500 text-white text-sm font-semibold border border-cyan-400/40">
   <span>📦</span>
   <span>{% trans "Repuestos" %}</span>
@@ -147,7 +147,7 @@
       <a href="{% country_url 'desarme:ver_vehiculo' v.pk %}" class="interactive-btn">{% trans "Ver" %}</a>
       <a href="{% country_url 'desarme:editar_vehiculo' v.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
       <a href="{% country_url 'desarme:inventario_vehiculo' v.pk %}" class="interactive-btn font-medium">📦 {% trans "Inventario" %}</a>
-      <a href="{% country_url 'desarme:crear_repuesto' %}?vehiculo={{ v.pk }}" class="interactive-btn font-medium">➕ {% trans "Nueva repuesto" %}</a>
+      <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ v.pk }}" class="interactive-btn font-medium">➕ {% trans "Nueva repuesto" %}</a>
     </div>
   </div>
   {% endfor %}

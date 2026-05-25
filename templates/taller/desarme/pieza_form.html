@@ -111,7 +111,7 @@
   ← {% trans "Inventario vehículo" %}
 </a>
 {% else %}
-<a href="{% country_url 'desarme:lista_repuestos' %}"
+<a href="{% country_url 'desarme:lista_piezas' %}"
    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-500 text-gray-300 hover:bg-gray-700 text-sm">
   ← {% trans "Listado repuestos" %}
 </a>
@@ -233,7 +233,7 @@
         {% trans "Cancelar" %}
       </a>
       {% else %}
-      <a href="{% country_url 'desarme:lista_repuestos' %}"
+      <a href="{% country_url 'desarme:lista_piezas' %}"
          class="btn px-4 py-2 rounded-lg border border-slate-500/50 text-slate-300 hover:bg-slate-500/20 font-medium text-sm">
         {% trans "Cancelar" %}
       </a>
