@@ -220,12 +220,20 @@
             window.recalcTotales();
         }
 
+        console.log('[DESARME] initAllModules terminó. DESARME_PREFILL:', window.DESARME_PREFILL);
         if (window.DESARME_PREFILL) {
             var form = document.getElementById('document-form');
+            console.log('[DESARME] egLineItemsHydrated antes de delete:', form && form.dataset.egLineItemsHydrated);
+            console.log('[DESARME] window.addRepuestoRow disponible:', typeof window.addRepuestoRow);
+            console.log('[DESARME] EG.repuestos.addRepuestoRow disponible:', window.EG && window.EG.repuestos && typeof window.EG.repuestos.addRepuestoRow);
+            var bootstrap = window.EG && window.EG.state && window.EG.state.getBootstrap ? window.EG.state.getBootstrap() : null;
+            console.log('[DESARME] bootstrap.line_items:', bootstrap && bootstrap.line_items);
             if (form) delete form.dataset.egLineItemsHydrated;
             if (window.EG && window.EG.lineItemsBootstrap) {
                 window.EG.lineItemsBootstrap.hydrateLineItems();
             }
+            console.log('[DESARME] egLineItemsHydrated después de hydrate:', form && form.dataset.egLineItemsHydrated);
+            console.log('[DESARME] filas repuesto en DOM:', document.querySelectorAll('#repuestos-container .dynamic-element').length);
         }
     }
 

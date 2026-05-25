@@ -49,8 +49,10 @@
     }
 
     function hydrateRepuestos(rows) {
+        console.log('[DESARME] hydrateRepuestos: rows.length=', rows.length, ' window.addRepuestoRow=', typeof window.addRepuestoRow);
         rows.forEach(function(rep) {
             if (typeof window.addRepuestoRow !== 'function') {
+                console.warn('[DESARME] window.addRepuestoRow no disponible — fila saltada');
                 return;
             }
 
