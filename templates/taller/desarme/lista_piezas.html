@@ -95,7 +95,7 @@
     <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Código o nombre...' %}" aria-label="{% trans 'Buscar' %}">
     <select name="estado" class="text-sm">
       <option value="">{% trans "Estado" %}</option>
-      {% for value, label in estado_repuesto_choices %}
+      {% for value, label in estado_pieza_choices %}
       <option value="{{ value }}" {% if estado_filtro == value %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
@@ -116,13 +116,13 @@
 {% endblock %}
 
 {% block panel_content %}
-{% if repuestos %}
+{% if piezas %}
 <div class="pieces-grid">
-  {% for p in repuestos %}
+  {% for p in piezas %}
   <div class="piece-card">
     <div class="flex justify-between items-start mb-2">
       <span class="font-mono text-cyan-300 font-semibold">{{ p.codigo }}</span>
-      <span class="badge-estado badge-{{ p.estado_repuesto }}">{{ p.get_estado_repuesto_display|default:p.estado_repuesto }}</span>
+      <span class="badge-estado badge-{{ p.estado_pieza }}">{{ p.get_estado_pieza_display|default:p.estado_pieza }}</span>
     </div>
     <p class="text-white text-sm mb-1">{{ p.nombre }}</p>
     <p class="vehiculo-origen">
