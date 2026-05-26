@@ -2,6 +2,9 @@ from django.urls import path
 
 from taller.views_extra.payment_views import (
     flow_return,
+    flow_webhook,
+    mp_return,
+    mp_webhook,
     payment_cancel,
     payment_chile,
     payment_success,
@@ -28,8 +31,11 @@ urlpatterns = [
     # Flow (Chile) - pasarela de pago online
     path("suscripcion/flow/iniciar/", start_flow_payment, name="start_flow_payment"),
     path("suscripcion/flow/retorno/", flow_return, name="flow_return"),
+    path("suscripcion/flow/webhook/", flow_webhook, name="flow_webhook"),
     # MercadoPago (Chile/MX/AR)
     path("suscripcion/mp/iniciar/", start_mp_payment, name="start_mp_payment"),
+    path("suscripcion/mp/retorno/", mp_return, name="mp_return"),
+    path("suscripcion/mp/webhook/", mp_webhook, name="mp_webhook"),
     # Transferencia bancaria (AJAX)
     path("suscripcion/transferencia/registrar/", registrar_transferencia_ajax, name="registrar_transferencia_ajax"),
 ]

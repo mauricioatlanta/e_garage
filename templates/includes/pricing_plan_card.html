@@ -20,8 +20,11 @@ Variables esperadas: plan, pricing, highlight, cta_url, empresa_actual, cupo_act
                 <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 1 Usuario administrativo</li>
                 <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Módulos base taller</li>
             {% elif plan == "entry" or plan == "taller" %}
+                <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> 1 Usuario administrativo</li>
+                <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Documentos, vehículos e inventario</li>
+            {% elif plan == "growth" %}
                 <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Hasta 4 Usuarios administrativos</li>
-                <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Gestión avanzada</li>
+                <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Reportes y control operacional</li>
             {% else %}
                 <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Hasta 10 Usuarios administrativos</li>
                 <li class="flex items-center"><i class="fas fa-check text-green-500 mr-2"></i> Soporte prioritario</li>
@@ -33,7 +36,10 @@ Variables esperadas: plan, pricing, highlight, cta_url, empresa_actual, cupo_act
         {% if cupo_actual and plan == "express" and cupo_actual > 1 or cupo_actual and plan == "trial" and cupo_actual > 1 %}
             <div class="p-2 mb-2 bg-red-50 text-red-700 text-xs font-medium rounded border border-red-100 text-center"><i class="fas fa-lock mr-1"></i> Tienes {{ cupo_actual }} usuarios (Límite: 1)</div>
             <button disabled class="w-full py-2.5 px-4 bg-gray-200 text-gray-400 text-sm font-semibold rounded-lg cursor-not-allowed shadow-none">Cupos Insuficientes</button>
-        {% elif cupo_actual and plan == "taller" and cupo_actual > 4 or cupo_actual and plan == "entry" and cupo_actual > 4 %}
+        {% elif cupo_actual and plan == "entry" and cupo_actual > 1 or cupo_actual and plan == "taller" and cupo_actual > 1 %}
+            <div class="p-2 mb-2 bg-red-50 text-red-700 text-xs font-medium rounded border border-red-100 text-center"><i class="fas fa-lock mr-1"></i> Tienes {{ cupo_actual }} usuarios (Límite: 1)</div>
+            <button disabled class="w-full py-2.5 px-4 bg-gray-200 text-gray-400 text-sm font-semibold rounded-lg cursor-not-allowed shadow-none">Cupos Insuficientes</button>
+        {% elif cupo_actual and plan == "growth" and cupo_actual > 4 %}
             <div class="p-2 mb-2 bg-red-50 text-red-700 text-xs font-medium rounded border border-red-100 text-center"><i class="fas fa-lock mr-1"></i> Tienes {{ cupo_actual }} usuarios (Límite: 4)</div>
             <button disabled class="w-full py-2.5 px-4 bg-gray-200 text-gray-400 text-sm font-semibold rounded-lg cursor-not-allowed shadow-none">Cupos Insuficientes</button>
         {% else %}
