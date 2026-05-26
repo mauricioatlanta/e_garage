@@ -170,11 +170,11 @@ urlpatterns = [
     # Allauth para el resto de funcionalidades (excluyendo signup)
     path("accounts/", include("allauth.urls")),
     # Wrappers country-aware para login y signup
-    path("cl/accounts/login/", redirect_qs("/accounts/login/")),
+    path("cl/accounts/login/", country_aware_login),
     path("cl/accounts/signup/", redirect_qs("/cl/es/accounts/signup/")),
     # Redirects amigables para login
-    path("cl/login/", redirect_qs("/cl/accounts/login/")),
-    path("cl/es/login/", redirect_qs("/cl/accounts/login/")),
+    path("cl/login/", country_aware_login),
+    path("cl/es/login/", country_aware_login),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
     # Password reset (solicitud + enviado + confirm + completo)
