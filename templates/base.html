@@ -914,57 +914,9 @@
     {% endblock %}
   </main>
 
-  {# --- FOOTER ÚNICO (oculto en login/signup para vista full-screen) --- #}
   {% if not eg_us_signup_slim_header|default:False and '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
-  <footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
-    <div class="container mx-auto px-4 text-center">
-      {% if company_settings.address or company_settings.phone or company_settings.email %}
-        <span class="text-xs text-gray-400 block">
-          {% if company_settings.address %}{{ company_settings.address }} {% endif %}
-          {% if company_settings.phone %}• {{ company_settings.phone }} {% endif %}
-          {% if company_settings.email %}• {{ company_settings.email }}{% endif %}
-        </span>
-      {% endif %}
-      <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm flex-wrap">
-        <span class="font-medium">eGarage</span>
-        <span aria-hidden="true">•</span>
-        <span>© {% now "Y" %}</span>
-        <span aria-hidden="true">•</span>
-        <a href="mailto:{{ support_email }}" class="text-cyan-400 hover:underline">
-          {{ support_email }}
-        </a>
-        <span aria-hidden="true">•</span>
-        <a href="https://wa.me/{{ support_whatsapp_wa_me }}?text={% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' or LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Hola,%20necesito%20ayuda%20con%20eGarage{% else %}Hi,%20I%20need%20help%20with%20eGarage{% endif %}" 
-           target="_blank" 
-           rel="noopener noreferrer"
-           class="text-green-400 hover:underline flex items-center gap-1">
-          <i class="fab fa-whatsapp"></i>
-          {{ support_whatsapp_display }}
-        </a>
-        <span aria-hidden="true">•</span>
-        <a href="/legal/" class="text-cyan-400 hover:underline">
-          {% if request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
-            Términos y Privacidad
-          {% else %}
-            Legal
-          {% endif %}
-        </a>
-        {% if request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
-        <span aria-hidden="true">•</span>
-        <a href="/legal/#proteccion-datos-tributarios" class="text-emerald-400 hover:underline text-xs">
-          Datos Tributarios
-        </a>
-        {% endif %}
-        <span aria-hidden="true">•</span>
-        <span class="text-xs text-gray-500">
-          {% if request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
-            Todos los derechos reservados
-          {% else %}
-            All Rights Reserved
-          {% endif %}
-        </span>
-      </div>
-    </div>
+  <footer style="border-top:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.35);padding:1rem 0;text-align:center;margin-top:auto;">
+    <span style="color:#9ca3af;font-size:0.82rem;">eGarage &bull; &copy; 2026 &bull; <a href="/legal/" style="color:#67e8f9;text-decoration:none;">Legal</a> &bull; All Rights Reserved</span>
   </footer>
   {% endif %}
 
