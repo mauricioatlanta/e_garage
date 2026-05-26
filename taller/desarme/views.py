@@ -710,6 +710,7 @@ def inventario_vehiculo(request, pk):
         {
             "vehiculo": vehiculo,
             "piezas": piezas,
+            "repuestos": piezas,
             "empresa": empresa,
             "total_piezas": total_piezas,
             "disponibles": disponibles,
@@ -717,6 +718,7 @@ def inventario_vehiculo(request, pk):
             "faltantes": faltantes,
             "valor_potencial": valor_potencial,
             "piezas_json": piezas_json,
+            "repuestos_json": piezas_json,
         },
     )
 

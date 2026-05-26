@@ -276,7 +276,7 @@
   x-data="inventarioUltra({ items: JSON.parse('{{ repuestos_json|escapejs }}') })"
   x-init="editUrlPattern = $el.getAttribute('data-edit-pattern') || ''; labelApiUrlPattern = $el.getAttribute('data-label-api-pattern') || ''; currentLang = $el.getAttribute('data-current-lang') || 'es'"
   data-edit-pattern="{% country_url 'desarme:editar_pieza' 0 %}"
-  data-label-api-pattern="{% country_url 'desarme:api_repuesto_label_empresa_guardar' 0 %}"
+  data-label-api-pattern="{% country_url 'desarme:api_pieza_label_empresa_guardar' 0 %}"
   data-current-lang="{{ request.LANGUAGE_CODE|default:'es' }}"
   x-cloak
   class="min-h-[60vh] rounded-2xl border border-cyan-400/20 bg-[radial-gradient(circle_at_top,rgba(8,47,73,0.85),#020617_35%,#01030a_100%)] text-white"
