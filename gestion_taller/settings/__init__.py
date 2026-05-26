@@ -84,3 +84,6 @@ PAYPAL_BUSINESS_EMAIL = (os.getenv('PAYPAL_BUSINESS_EMAIL') or SUPPORT_EMAIL).st
 
 
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'

@@ -1138,6 +1138,32 @@
             </li>
         </ul>
     </div>
+
+    <form method="post" enctype="multipart/form-data" id="settingsForm">
+        {% csrf_token %}
+        <input type="hidden" name="section" id="sectionInput" value="profile">
+
+        <div class="tab-content" id="settingsTabsContent">
+            <!-- Tab: Company Information -->
+            <div class="tab-pane fade show active" id="profile" role="tabpanel">
+                <!-- Name and Tagline -->
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-tag"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Identidad de la Empresa{% else %}Company Identity{% endif %}
+                    </h4>
+
+                    <div class="row">
+                        <div class="col-md-8 mb-4">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Nombre de la Empresa *{% else %}Company Name *{% endif %}</label>
+                            <input type="text" name="company_name" id="id_company_name" class="form-control" value="{{ config.company_name|default:'' }}" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ingrese el nombre de su empresa{% else %}Enter your company name{% endif %}" required>
+                            <small class="form-text text-muted" style="color: var(--text-secondary);">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Este nombre aparecerá en lugar de "eGarage" en toda la plataforma{% else %}This name will appear instead of "eGarage" throughout the platform{% endif %}</small>
+                        </div>
+                        <div class="col-md-4 mb-4">
+                            <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Eslogan / Lema{% else %}Tagline / Slogan{% endif %}</label>
+                            <input type="text" name="tagline" id="id_tagline" class="form-control" value="{{ config.tagline|default:'' }}" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Su eslogan aquí{% else %}Your tagline here{% endif %}">
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Logo -->
@@ -1229,6 +1255,7 @@
                         <div class="col-md-6 mb-3">
                             <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Licencia Comercial{% else %}Business License{% endif %}</label>
                             <input type="text" name="business_license" id="id_business_license" class="form-control" value="{{ config.business_license|default:'' }}" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Licencia comercial o registro{% else %}Business license or registration{% endif %}">
+                        </div>
                     </div>
                 </div>
             </div>

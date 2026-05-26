@@ -94,8 +94,16 @@ def _sync_company_models(config, config_empresa, empresa):
         empresa.direccion = config.address
         empresa_updates.append("direccion")
     if empresa.telefono != config.phone:
-        empresa.telefono = config.phone
-        empresa_updates.append("telefono")
+        from taller.models.empresa import Empresa as EmpresaModel
+        phone_taken = (
+            config.phone
+            and EmpresaModel.objects.filter(telefono=config.phone)
+            .exclude(pk=empresa.pk)
+            .exists()
+        )
+        if not phone_taken:
+            empresa.telefono = config.phone
+            empresa_updates.append("telefono")
     if empresa.email != config.email:
         empresa.email = config.email
         empresa_updates.append("email")
@@ -148,7 +156,14 @@ def _sync_company_models(config, config_empresa, empresa):
             config_updates.append("logo")
 
     if empresa_updates:
-        empresa.save(update_fields=empresa_updates)
+        from django.db import IntegrityError
+        try:
+            empresa.save(update_fields=empresa_updates)
+        except IntegrityError:
+            # Constraint en empresa — guarda sin telefono como fallback
+            safe = [f for f in empresa_updates if f != "telefono"]
+            if safe:
+                empresa.save(update_fields=safe)
     if config_updates:
         config_empresa.save(update_fields=config_updates)
 
@@ -295,7 +310,7 @@ def company_settings_view(request):
                 "Please review the form fields: " + "; ".join(error_messages),
             )
 
-    tecnicos = Tecnico.objects.filter(user=request.user).order_by("nombre")
+    tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("nombre")
 
     # SUBSCRIPTION CONTEXT
     subscription = None
