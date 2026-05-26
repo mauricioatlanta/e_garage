@@ -44,7 +44,7 @@
      * Wrapper fetch con CSRF y headers por defecto
      */
     async function egFetch(url, opts = {}) {
-        const CSRF = getCookie('csrftoken');
+        const CSRF = getCookie('csrftoken') || (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value || '';
         const defaults = {
             credentials: 'same-origin',
             headers: {
