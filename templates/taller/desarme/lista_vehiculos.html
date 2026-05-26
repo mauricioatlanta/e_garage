@@ -1,6 +1,7 @@
 {% extends "layouts/base_egarage_panel.html" %}
 {% load i18n %}
 {% load country_url %}
+{% load eg_money %}
 
 {% block page_title %}{% trans "Desarme" %} – {% trans "Vehículos" %}{% endblock %}
 {% block page_subtitle %}{% trans "Vehículos para desarme (yarda)" %}{% endblock %}
@@ -140,7 +141,7 @@
     </div>
     <div class="mb-3">
       <span class="ganancia-vehiculo {% if v.ganancia >= 0 %}positiva{% else %}negativa{% endif %}" title="{% trans 'Ingresos por repuestos vendidas menos costo del vehículo' %}">
-        {% trans "Ganancia" %}: ${{ v.ganancia|floatformat:2 }}
+        {% trans "Ganancia" %}: {{ v.ganancia|money_fmt:empresa_moneda }}
       </span>
     </div>
     <div class="flex flex-wrap gap-1">

@@ -1,5 +1,6 @@
 {% load i18n %}
 {% load country_url %}
+{% load eg_money %}
 {% if vehiculos %}
 <div class="vehicles-grid">
   {% for v in vehiculos %}
@@ -17,7 +18,7 @@
     </div>
     <div class="mb-3">
       <span class="ganancia-vehiculo {% if v.ganancia >= 0 %}positiva{% else %}negativa{% endif %}" title="{% trans 'Ingresos por repuestos vendidas menos costo del vehículo' %}">
-        {% trans "Ganancia" %}: ${{ v.ganancia|floatformat:2 }}
+        {% trans "Ganancia" %}: {{ v.ganancia|money_fmt:empresa_moneda }}
       </span>
     </div>
     <div class="flex flex-wrap gap-1">

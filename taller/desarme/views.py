@@ -345,6 +345,8 @@ def lista_vehiculos(request):
         .order_by("estado_desarme")
     )
 
+    empresa_moneda = empresa.formato_moneda
+
     # Respuesta parcial para búsqueda en tiempo real (AJAX)
     if request.GET.get("partial") or request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return render(
@@ -354,6 +356,7 @@ def lista_vehiculos(request):
                 "vehiculos": qs,
                 "q": q,
                 "estado_filtro": estado,
+                "empresa_moneda": empresa_moneda,
             },
         )
 
@@ -366,6 +369,7 @@ def lista_vehiculos(request):
             "q": q,
             "estado_filtro": estado,
             "estados": list(estados),
+            "empresa_moneda": empresa_moneda,
         },
     )
 
