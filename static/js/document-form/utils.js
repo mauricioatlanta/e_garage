@@ -22,6 +22,8 @@
         'created_repuesto_codigo',
         'created_repuesto_precio_venta',
         'created_repuesto_precio_compra',
+        'created_repuesto_costo_linea',
+        'pieza_desarme_id',
         'created_servicio_id',
         'created_servicio_label',
         'created_servicio_precio',

@@ -169,6 +169,8 @@
         clearRows: clearRows,
         hydrateLineItems: hydrateLineItems,
         hydrateRepuestos: hydrateRepuestos,
+        hydrateServicios: hydrateServicios,
+        hydrateOtros: hydrateOtros,
         init: init
     };
 })();

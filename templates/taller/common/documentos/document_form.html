@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/documentos/document_form_prototype.css' %}?v=20260525b">
+<link rel="stylesheet" href="{% static 'css/documentos/document_form_prototype.css' %}?v=20260525d">
 {% endblock extra_css %}
 
 {% block documento_title %}
@@ -297,7 +297,7 @@
             <div class="doc-section-actions">
               <button type="button" id="add-repuesto" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span>AGREGAR</span></button>
               <a href="{% country_url 'repuestos:crear_repuesto' %}?return_to={{ request.get_full_path|urlencode }}&select_field=repuesto" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span>Nuevo</span></a>
-              <button type="button" id="add-used-parts" class="doc-action-btn doc-action-btn--warning"><span>Usado</span></button>
+              <a id="goto-used-parts" href="{% country_url 'desarme:lista_piezas' %}?return_to={{ request.get_full_path|urlencode }}&select_field=pieza_desarme" class="doc-action-btn doc-action-btn--warning"><span>Usado</span></a>
             </div>
           </div>
 
@@ -602,7 +602,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 <script>
 window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
-window.DESARME_PREFILL = {% if has_server_line_items %}true{% else %}false{% endif %};
+window.DESARME_PREFILL = window.DESARME_PREFILL || {% if has_server_line_items %}true{% else %}false{% endif %};
 </script>
-<script src="{% static 'js/document-form/index.js' %}?v=3.2.1"></script>
+<script src="{% static 'js/document-form/index.js' %}?v=3.2.4"></script>
 {% endblock extra_js %}
