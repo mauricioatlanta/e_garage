@@ -415,7 +415,7 @@ def crear_vehiculo(request):
     return render(
         request,
         "taller/desarme/vehiculo_form.html",
-        {"form": form, "empresa": empresa, "titulo": "Nuevo vehículo de desarme"},
+        {"form": form, "empresa": empresa, "titulo": "Nuevo vehículo de desarme", "empresa_moneda": empresa.formato_moneda},
     )
 
 
@@ -509,6 +509,7 @@ def editar_vehiculo(request, pk):
             "vehiculo": vehiculo,
             "empresa": empresa,
             "titulo": "Editar vehículo de desarme",
+            "empresa_moneda": empresa.formato_moneda,
         },
     )
 

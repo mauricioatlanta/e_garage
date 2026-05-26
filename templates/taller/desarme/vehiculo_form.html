@@ -526,5 +526,33 @@ document.getElementById('btn-agregar-anio')?.addEventListener('click', function(
     });
   });
 })();
+
+// Formato de miles CLP en campos monetarios (data-money-cl)
+(function() {
+  function fmtCLP(val) {
+    var n = parseInt((val + '').replace(/\./g, '').replace(/\D/g, ''), 10);
+    return isNaN(n) ? '' : n.toLocaleString('es-CL');
+  }
+  var moneyFields = document.querySelectorAll('[data-money-cl]');
+  moneyFields.forEach(function(el) {
+    if (el.value) el.value = fmtCLP(el.value);
+    el.addEventListener('input', function() {
+      var pos = this.selectionStart;
+      var raw = this.value.replace(/\./g, '');
+      var fmt = fmtCLP(raw);
+      var added = fmt.length - this.value.length;
+      this.value = fmt;
+      try { this.setSelectionRange(pos + added, pos + added); } catch(e) {}
+    });
+  });
+  var form = document.querySelector('form[method="post"]');
+  if (form) {
+    form.addEventListener('submit', function() {
+      moneyFields.forEach(function(el) {
+        el.value = (el.value + '').replace(/\./g, '');
+      });
+    }, true);
+  }
+})();
 </script>
 {% endblock %}
