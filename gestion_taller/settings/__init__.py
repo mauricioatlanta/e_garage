@@ -8,7 +8,8 @@ INSTALLED_APPS = [
     'dal','dal_select2','django.contrib.admin','django.contrib.auth',
     'django.contrib.contenttypes','django.contrib.sessions','django.contrib.messages',
     'django.contrib.staticfiles','django.contrib.humanize','django.contrib.sites','allauth','allauth.account',
-    'allauth.socialaccount','gestion_taller','taller','marketplace','ubicacion'
+    'allauth.socialaccount','gestion_taller','taller','marketplace','ubicacion',
+    'widget_tweaks'
 ]
 SITE_ID = 1
 LANGUAGE_CODE = 'es'

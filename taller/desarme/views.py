@@ -541,6 +541,9 @@ def lista_piezas(request):
     )
     from taller.models.pieza_desarme import ESTADO_PIEZA_CHOICES
 
+    return_to = request.GET.get("return_to", "").strip()
+    select_field = request.GET.get("select_field", "").strip()
+
     return render(
         request,
         "taller/desarme/lista_piezas.html",
@@ -552,6 +555,8 @@ def lista_piezas(request):
             "vehiculo_filtro": vehiculo_id,
             "vehiculos_choices": vehiculos_choices,
             "estado_pieza_choices": ESTADO_PIEZA_CHOICES,
+            "return_to": return_to,
+            "select_field": select_field,
         },
     )
 

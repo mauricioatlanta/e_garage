@@ -589,7 +589,6 @@
 #document-form #doc-shell .doc-lines-container {
   display: grid;
   gap: 8px;
-  overflow-x: auto;
 }
 
 #document-form #doc-shell .dynamic-element {
@@ -1042,6 +1041,20 @@
 #document-form .doc-used-modal__empty {
   margin: 0 0 14px;
   color: var(--doc-muted);
+}
+
+#document-form .doc-used-modal__item {
+  padding: 10px 14px;
+  border-radius: 8px;
+  border: 1px solid rgba(6, 182, 212, 0.2);
+  background: rgba(6, 182, 212, 0.06);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+#document-form .doc-used-modal__item:hover {
+  background: rgba(6, 182, 212, 0.15);
+  border-color: rgba(6, 182, 212, 0.5);
 }
 
 @media (max-width: 1149px) {

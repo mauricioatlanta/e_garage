@@ -22,6 +22,18 @@
   </div>
 </div>
 <script>
+{% if select_field == 'pieza_desarme' and return_to %}
+var EG_RETURN_TO = '{{ return_to|escapejs }}';
+function seleccionarPieza(pk, codigo, nombre, precio, costo) {
+  var sep = EG_RETURN_TO.indexOf('?') >= 0 ? '&' : '?';
+  window.location.href = EG_RETURN_TO + sep
+    + 'pieza_desarme_id=' + pk
+    + '&created_repuesto_codigo=' + encodeURIComponent(codigo)
+    + '&created_repuesto_nombre=' + encodeURIComponent(nombre)
+    + '&created_repuesto_precio_venta=' + (precio || 0)
+    + '&created_repuesto_costo_linea=' + (costo || 0);
+}
+{% endif %}
 var carrito = {};
 function toggleCarrito(id, codigo, nombre, precio) {
   if (carrito[id]) {
@@ -150,6 +162,12 @@ function actualizarUI() {
   <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🚗 {% trans "Vehículos" %}</a>
   <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">📦 {% trans "Repuestos" %}</a>
 </div>
+{% if select_field == 'pieza_desarme' and return_to %}
+<div style="margin-top:12px;padding:10px 16px;border-radius:10px;background:rgba(243,154,19,0.12);border:1px solid rgba(243,154,19,0.4);color:#fcd34d;font-size:13px;display:flex;align-items:center;gap:10px;">
+  <span>📄</span>
+  <span>{% trans "Selecciona una pieza para agregarla al documento" %} — <a href="{{ return_to }}" style="color:#67e8f9;text-decoration:underline;">{% trans "Volver sin seleccionar" %}</a></span>
+</div>
+{% endif %}
 {% endblock %}
 
 {% block main_actions %}
@@ -209,10 +227,18 @@ function actualizarUI() {
     <div class="flex gap-1 mt-2 flex-wrap">
       <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
       <a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_id %}" class="interactive-btn">{% trans "Inventario" %}</a>
+      {% if select_field == 'pieza_desarme' and return_to %}
+      <button type="button"
+        onclick="seleccionarPieza({{ p.pk }}, '{{ p.codigo|escapejs }}', '{{ p.nombre|escapejs }}', {{ p.precio_venta_sugerido|default:0 }}, {{ p.costo_asignado|default:0 }})"
+        style="background:rgba(243,154,19,0.2);border:1px solid rgba(243,154,19,0.6);border-radius:8px;padding:6px 12px;color:#fcd34d;font-size:12px;font-weight:600;cursor:pointer;">
+        ✓ Seleccionar
+      </button>
+      {% else %}
       <button type="button" class="btn-carrito" id="btn-{{ p.pk }}"
         onclick="toggleCarrito({{ p.pk }}, '{{ p.codigo }}', '{{ p.nombre|escapejs }}', {{ p.precio_venta_sugerido|default:0 }})">
         🛒 Agregar
       </button>
+      {% endif %}
     </div>
   </div>
   {% endfor %}

@@ -10,6 +10,7 @@ from taller.views_extra.payment_views import (
     start_mp_payment,
     subir_comprobante,
 )
+from taller.views_extra.views_suscripciones import registrar_transferencia_ajax
 
 urlpatterns = [
     # Chile - Transferencia Bancaria
@@ -29,4 +30,6 @@ urlpatterns = [
     path("suscripcion/flow/retorno/", flow_return, name="flow_return"),
     # MercadoPago (Chile/MX/AR)
     path("suscripcion/mp/iniciar/", start_mp_payment, name="start_mp_payment"),
+    # Transferencia bancaria (AJAX)
+    path("suscripcion/transferencia/registrar/", registrar_transferencia_ajax, name="registrar_transferencia_ajax"),
 ]

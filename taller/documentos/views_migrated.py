@@ -1269,8 +1269,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
             self.request,
             getattr(self.request.user, "empresa", None),
         )
-        # Idioma efectivo para labels/choices (no inferir de país)
-        kwargs["language"] = getattr(self.request, "LANGUAGE_CODE", None) or get_language() or "es"
+        kwargs["language"] = LANGUAGE_BY_COUNTRY.get((kwargs["country"] or "CL").upper(), "es")
         if self.request.method == "GET":
             kwargs.setdefault("initial", self.get_initial())
         return kwargs
@@ -1813,8 +1812,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         else:
             country = _get_request_country_code(self.request, empresa)
         kwargs["country"] = country
-        # Idioma efectivo para labels/choices (no inferir de país)
-        kwargs["language"] = getattr(self.request, "LANGUAGE_CODE", None) or get_language() or "es"
+        kwargs["language"] = LANGUAGE_BY_COUNTRY.get((country or "CL").upper(), "es")
 
         return kwargs
 
