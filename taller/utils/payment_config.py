@@ -59,14 +59,14 @@ def get_transfer_payment_details(country="CL"):
 
     defaults = {
         "CL": {
-            "banco": "BancoEstado",
-            "tipo_cuenta": "Cuenta Corriente",
-            "titular": _setting("SITE_NAME", "eGarage") or "eGarage",
-            "rut": "",
-            "numero_cuenta": "",
+            "banco": "Banco Estado",
+            "tipo_cuenta": "Chequera Electrónica (Cuenta Vista)",
+            "titular": "ATLANTA RECICLAJES SPA",
+            "rut": "77.350.892-5",
+            "numero_cuenta": "23572156761",
             "email_confirmacion": get_support_reply_to(),
             "tax_id_label": "RUT",
-            "account_number_label": "Numero de cuenta",
+            "account_number_label": "Número de cuenta",
         },
         "MX": {
             "banco": "BBVA Mexico",

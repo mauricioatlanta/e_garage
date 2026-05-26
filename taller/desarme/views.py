@@ -262,12 +262,12 @@ def index(request):
     # Últimos vehículos
     ultimos_vehiculos = (
         base_qs.select_related("marca", "modelo")
-        .annotate(piezas_count=Count("piezas_desarme"))
+        .annotate(repuestos_count=Count("piezas_desarme"))
         .order_by("-fecha_ingreso_desarme", "-id")[:6]
     )
 
-    # Piezas recientes (últimas 5)
-    ultimas_piezas = piezas_qs.select_related("vehiculo").filter(activo=True).order_by("-id")[:5]
+    # Repuestos recientes (últimos 5)
+    ultimas_repuestos = piezas_qs.select_related("vehiculo").filter(activo=True).order_by("-id")[:5]
 
     return render(
         request,
@@ -277,13 +277,13 @@ def index(request):
             "eg_desarme_dashboard_compact": True,
             "empresa": empresa,
             "total_vehiculos": total_vehiculos,
-            "total_piezas": total_piezas,
-            "piezas_activas": piezas_activas,
+            "total_repuestos": total_piezas,
+            "repuestos_activas": piezas_activas,
             "inventario_valor": inventario_valor,
-            "chart_piezas_estado": chart_piezas_estado,
+            "chart_repuestos_estado": chart_piezas_estado,
             "chart_vehiculos_mes": chart_vehiculos_mes,
             "ultimos_vehiculos": ultimos_vehiculos,
-            "ultimas_piezas": ultimas_piezas,
+            "ultimas_repuestos": ultimas_repuestos,
         },
     )
 

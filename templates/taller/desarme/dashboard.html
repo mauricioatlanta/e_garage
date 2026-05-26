@@ -258,7 +258,7 @@
       <tr>
         <td><strong>{{ p.codigo }}</strong></td>
         <td>{{ p.nombre|truncatechars:25 }}</td>
-        <td><span class="badge-mini {{ p.estado_repuesto|lower|slice:":4" }}">{{ p.get_estado_repuesto_display }}</span></td>
+        <td><span class="badge-mini {{ p.estado_pieza|lower|slice:":4" }}">{{ p.get_estado_pieza_display }}</span></td>
         <td><a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ p.vehiculo_id }}">{{ p.vehiculo.patente|default:p.vehiculo.vin|default:"" }}</a></td>
       </tr>
       {% endfor %}

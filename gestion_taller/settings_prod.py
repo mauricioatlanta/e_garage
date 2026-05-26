@@ -349,3 +349,4 @@ CSRF_USE_SESSIONS = True
 EMAIL_BACKEND = env_str("EMAIL_BACKEND", "gestion_taller.resend_backend.ResendBackend")
 RESEND_API_KEY = env_str("RESEND_API_KEY", "")
 DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl")
+ACCOUNT_LOGIN_METHODS = {'email'}
