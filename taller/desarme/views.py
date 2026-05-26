@@ -523,13 +523,23 @@ def lista_piezas(request):
 
     piezas = (
         PiezaDesarme.objects.filter(empresa=empresa)
-        .select_related("vehiculo")
+        .select_related("vehiculo", "vehiculo__marca", "vehiculo__modelo")
         .order_by("vehiculo__patente", "codigo")
     )
 
     q = request.GET.get("q", "").strip()
     if q:
-        piezas = piezas.filter(Q(codigo__icontains=q) | Q(nombre__icontains=q))
+        for term in q.split():
+            piezas = piezas.filter(
+                Q(codigo__icontains=term)
+                | Q(nombre__icontains=term)
+                | Q(vehiculo__patente__icontains=term)
+                | Q(vehiculo__vin__icontains=term)
+                | Q(vehiculo__marca_texto__icontains=term)
+                | Q(vehiculo__modelo_texto__icontains=term)
+                | Q(vehiculo__marca__nombre__icontains=term)
+                | Q(vehiculo__modelo__nombre__icontains=term)
+            )
 
     estado = request.GET.get("estado", "").strip()
     if estado:

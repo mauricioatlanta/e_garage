@@ -1,5 +1,19 @@
 $ ! python manage.py changepassword mauricio
 
+12:53
+
+Veamos el error en los logs del servidor:
+bash
+
+journalctl -u gunicorn -n 50 --no-pager
+
+O si tiene log propio:
+bash
+
+tail -50 /srv/egarage/logs/*.log
+
+
+
 generarte un bloque técnico completo tipo:
     • Estado UX actual. 
     • Qué quedó funcionando. 
@@ -523,3 +537,11 @@ print(r.content[:1000])
 "
 
 Nota: Si aparece cualquier conflicto de Git o error en los comandos anteriores, pegar la salida completa en el chat para resolver paso a paso.
+
+
+
+
+
+
+
+

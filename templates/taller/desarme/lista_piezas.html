@@ -222,7 +222,7 @@ function actualizarUI() {
     </div>
     <p class="text-white text-sm mb-1">{{ p.nombre }}</p>
     <p class="vehiculo-origen">
-      {% trans "Vehículo" %}: <a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_id %}">{{ p.vehiculo.patente|default:p.vehiculo.vin|default:p.vehiculo.id }}</a>
+      {% trans "Vehículo" %}: <a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_id %}">{% if p.vehiculo.anio %}{{ p.vehiculo.anio }} {% endif %}{% if p.vehiculo.marca_texto %}{{ p.vehiculo.marca_texto }} {% elif p.vehiculo.marca %}{{ p.vehiculo.marca }} {% endif %}{% if p.vehiculo.modelo_texto %}{{ p.vehiculo.modelo_texto }}{% elif p.vehiculo.modelo %}{{ p.vehiculo.modelo }}{% endif %}{% if p.vehiculo.patente %} – {{ p.vehiculo.patente }}{% elif p.vehiculo.vin %} – {{ p.vehiculo.vin }}{% endif %}</a>
     </p>
     <div class="flex gap-1 mt-2 flex-wrap">
       <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>

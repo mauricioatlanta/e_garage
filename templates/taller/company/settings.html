@@ -1608,12 +1608,12 @@
                             <h6 class="text-neon mb-3">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Elige el medio de pago{% else %}Choose payment method{% endif %}</h6>
                             <div class="subscription-method-grid">
                                 {% if empresa.pais == 'CL' %}
-                                    <form method="post" action="{% url 'start_mp_payment' %}" class="subscription-payment-form">
+                                    <form method="post" action="{% url 'start_flow_payment' %}" class="subscription-payment-form">
                                         {% csrf_token %}
                                         <input type="hidden" name="plan" value="mensual" data-payment-plan-input>
-                                        <button type="submit" class="subscription-pay-card subscription-method-btn" data-method="mercadopago">
+                                        <button type="submit" class="subscription-pay-card subscription-method-btn" data-method="flow">
                                             <strong><i class="fas fa-credit-card me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tarjeta de Crédito / Débito{% else %}Credit / Debit Card{% endif %}</strong>
-                                            <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Pago seguro con tarjeta mediante Mercado Pago.{% else %}Secure card payment via Mercado Pago.{% endif %}</span>
+                                            <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Pago seguro con tarjeta mediante pasarela chilena.{% else %}Secure card payment via Chilean gateway.{% endif %}</span>
                                             <span class="subscription-pay-cta">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Pagar con tarjeta{% else %}Pay with card{% endif %}<i class="fas fa-arrow-right"></i></span>
                                         </button>
                                     </form>
