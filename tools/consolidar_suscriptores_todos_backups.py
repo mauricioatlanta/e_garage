@@ -2,7 +2,7 @@
 """
 Script para consolidar TODOS los suscriptores de TODOS los backups
 Extrae suscripciones de múltiples backups y consolida en una lista única
-Ejecutar en PythonAnywhere: python tools/consolidar_suscriptores_todos_backups.py > suscripciones_consolidadas.json
+Ejecutar en DigitalOcean: python tools/consolidar_suscriptores_todos_backups.py > suscripciones_consolidadas.json
 """
 
 import os

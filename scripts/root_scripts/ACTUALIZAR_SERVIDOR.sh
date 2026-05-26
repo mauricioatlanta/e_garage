@@ -17,7 +17,7 @@ NC='\033[0m' # No Color
 
 # Configuración del servidor
 SERVIDOR_USER="atlantareciclajes"
-SERVIDOR_HOST="atlantareciclajes.pythonanywhere.com"
+SERVIDOR_HOST="atlantareciclajes"
 PROJECT_DIR="/home/atlantareciclajes/apps/egarage/current"
 VENV_PATH="/home/atlantareciclajes/.virtualenvs/venv_egarage310"
 
@@ -84,7 +84,7 @@ echo ""
 echo "Conectarse al servidor y ejecutar:"
 echo ""
 echo -e "${YELLOW}# Conectar al servidor${NC}"
-echo "ssh $SERVIDOR_USER@ssh.pythonanywhere.com"
+echo "ssh $SERVIDOR_USER@ssh"
 echo ""
 echo -e "${YELLOW}# Ir al directorio del proyecto${NC}"
 echo "cd $PROJECT_DIR"
@@ -108,7 +108,7 @@ echo -e "${YELLOW}# Ejecutar comando para arreglar testuser_usa${NC}"
 echo "python manage.py fix_testuser_usa"
 echo ""
 echo -e "${YELLOW}# Reiniciar aplicación web${NC}"
-echo "touch /var/www/${SERVIDOR_USER}_pythonanywhere_com_wsgi.py"
+echo "touch /var/www/${SERVIDOR_USER}_digitalocean_com_wsgi.py"
 echo ""
 echo -e "${YELLOW}# Verificar logs${NC}"
 echo "tail -f ~/logs/user/error.log"
@@ -171,7 +171,7 @@ fi
 # Reiniciar aplicación
 echo ""
 echo "🔄 Reiniciando aplicación web..."
-touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
+touch /var/www/atlantareciclajes_digitalocean_com_wsgi.py
 
 echo ""
 echo "✅ Actualización completada!"
@@ -189,8 +189,8 @@ echo -e "${GREEN}✅ Script generado: actualizar_en_servidor.sh${NC}"
 echo ""
 echo "Puedes copiar este archivo al servidor y ejecutarlo:"
 echo ""
-echo "   scp actualizar_en_servidor.sh $SERVIDOR_USER@ssh.pythonanywhere.com:~/"
-echo "   ssh $SERVIDOR_USER@ssh.pythonanywhere.com"
+echo "   scp actualizar_en_servidor.sh $SERVIDOR_USER@ssh:~/"
+echo "   ssh $SERVIDOR_USER@ssh"
 echo "   bash ~/actualizar_en_servidor.sh"
 echo ""
 
@@ -201,40 +201,40 @@ cat > COMANDOS_COPIAR_ARCHIVOS.txt << 'EOFFILES'
 
 # 1. Copiar archivos de gestión de usuarios
 scp taller/management/commands/fix_testuser_usa.py \
-    atlantareciclajes@ssh.pythonanywhere.com:/home/atlantareciclajes/apps/egarage/current/taller/management/commands/
+    atlantareciclajes@ssh:/home/atlantareciclajes/apps/egarage/current/taller/management/commands/
 
 # 2. Copiar archivos de multi-tenant hardening
 scp taller/managers/empresa_aware.py \
-    atlantareciclajes@ssh.pythonanywhere.com:/home/atlantareciclajes/apps/egarage/current/taller/managers/
+    atlantareciclajes@ssh:/home/atlantareciclajes/apps/egarage/current/taller/managers/
 
 scp taller/mixins/empresa_required.py \
-    atlantareciclajes@ssh.pythonanywhere.com:/home/atlantareciclajes/apps/egarage/current/taller/mixins/
+    atlantareciclajes@ssh:/home/atlantareciclajes/apps/egarage/current/taller/mixins/
 
 scp taller/middleware/tenant_isolation.py \
-    atlantareciclajes@ssh.pythonanywhere.com:/home/atlantareciclajes/apps/egarage/current/taller/middleware/
+    atlantareciclajes@ssh:/home/atlantareciclajes/apps/egarage/current/taller/middleware/
 
 scp taller/utils/tenant_audit.py \
-    atlantareciclajes@ssh.pythonanywhere.com:/home/atlantareciclajes/apps/egarage/current/taller/utils/
+    atlantareciclajes@ssh:/home/atlantareciclajes/apps/egarage/current/taller/utils/
 
 # 3. Copiar archivos de formularios y vistas actualizados
 scp taller/vehiculos/forms.py \
-    atlantareciclajes@ssh.pythonanywhere.com:/home/atlantareciclajes/apps/egarage/current/taller/vehiculos/
+    atlantareciclajes@ssh:/home/atlantareciclajes/apps/egarage/current/taller/vehiculos/
 
 scp taller/vehiculos/views_fbv.py \
-    atlantareciclajes@ssh.pythonanywhere.com:/home/atlantareciclajes/apps/egarage/current/taller/vehiculos/
+    atlantareciclajes@ssh:/home/atlantareciclajes/apps/egarage/current/taller/vehiculos/
 
 # 4. Copiar templates actualizados
 scp templates/taller/us/en/vehiculos/crear_vehiculo.html \
-    atlantareciclajes@ssh.pythonanywhere.com:/home/atlantareciclajes/apps/egarage/current/templates/taller/us/en/vehiculos/
+    atlantareciclajes@ssh:/home/atlantareciclajes/apps/egarage/current/templates/taller/us/en/vehiculos/
 
 # 5. Ejecutar en el servidor después de copiar
-ssh atlantareciclajes@ssh.pythonanywhere.com << 'ENDSSH'
+ssh atlantareciclajes@ssh << 'ENDSSH'
 cd /home/atlantareciclajes/apps/egarage/current
 source ~/.virtualenvs/venv_egarage310/bin/activate
 python manage.py migrate
 python manage.py collectstatic --noinput
 python manage.py fix_testuser_usa
-touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
+touch /var/www/atlantareciclajes_digitalocean_com_wsgi.py
 ENDSSH
 EOFFILES
 
@@ -252,7 +252,7 @@ echo "   2. COMANDOS_COPIAR_ARCHIVOS.txt - Comandos para copiar archivos especí
 echo ""
 echo "🚀 Próximos pasos:"
 echo "   1. Subir cambios a GitHub (si aún no lo hiciste)"
-echo "   2. Conectarte al servidor: ssh $SERVIDOR_USER@ssh.pythonanywhere.com"
+echo "   2. Conectarte al servidor: ssh $SERVIDOR_USER@ssh"
 echo "   3. Ejecutar: bash actualizar_en_servidor.sh"
 echo "   O seguir las instrucciones manuales mostradas arriba"
 echo ""

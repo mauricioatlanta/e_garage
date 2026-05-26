@@ -1,7 +1,7 @@
 #!/bin/bash
 # ======================================================
 # Script 2: ACTUALIZAR EGARAGE - ESTRUCTURA COMPLETA
-# Para: atlantareciclajes @ PythonAnywhere
+# Para: atlantareciclajes @ DigitalOcean
 # Ruta: /home/atlantareciclajes/apps/egarage/current
 # Incluye todos los cambios estructurales de templates
 # ======================================================
@@ -317,13 +317,13 @@ echo "   • Estáticos: Recolectados"
 echo ""
 echo "⏭️  SIGUIENTE PASO - RELOAD DE LA APP:"
 echo ""
-echo "   1. Ir a: https://www.pythonanywhere.com/user/atlantareciclajes/"
+echo "   1. Ir a: https://www/user/atlantareciclajes/"
 echo "   2. Clic en pestaña 'Web'"
-echo "   3. Buscar: atlantareciclajes.pythonanywhere.com"
+echo "   3. Buscar: atlantareciclajes"
 echo "   4. Clic en botón verde grande:"
-echo "      'Reload atlantareciclajes.pythonanywhere.com'"
+echo "      'Reload atlantareciclajes'"
 echo "   5. Esperar 15 segundos"
-echo "   6. Probar: https://atlantareciclajes.pythonanywhere.com/cl/"
+echo "   6. Probar: https://atlantareciclajes/cl/"
 echo ""
 echo "Luego ejecuta: ./3_verificar_FIXED.sh"
 echo ""

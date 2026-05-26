@@ -3,7 +3,7 @@
 ## Problema
 El ZIP se descomprimió pero los archivos están directamente en `egarage_update/` en lugar de en `egarage_update/deploy_atlantareciclajes/`.
 
-## Solución: Ejecutar en la consola de PythonAnywhere
+## Solución: Ejecutar en la consola de DigitalOcean
 
 Copia y pega estos comandos en la consola bash:
 

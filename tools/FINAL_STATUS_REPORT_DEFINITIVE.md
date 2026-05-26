@@ -79,7 +79,7 @@
 
 6. **🔧 Configuración de Despliegue**
    - ✅ **Render.com**: `render.yaml` configurado
-   - ✅ **PythonAnywhere**: WSGI file listo
+   - ✅ **DigitalOcean**: WSGI file listo
    - ✅ **Comandos**: Documentados
 
 7. **📋 Listas de Documentos**
@@ -123,7 +123,7 @@ git commit -m "✅ Sistema 100% operativo - Todos los errores resueltos definiti
 git push origin main
 
 # 3. Deploy en Render.com (automático)
-# O configurar PythonAnywhere según guía
+# O configurar DigitalOcean según guía
 ```
 
 ### **Verificación Post-Deploy**
@@ -185,7 +185,7 @@ curl https://yourdomain.com/us/documentos/
 - ✅ **Configuración de producción completa**
 - ✅ **Documentación de despliegue lista**
 
-**El sistema puede ser desplegado inmediatamente en Render.com o PythonAnywhere sin problemas.**
+**El sistema puede ser desplegado inmediatamente en Render.com o DigitalOcean sin problemas.**
 
 ### **🎯 GARANTÍA DE FUNCIONAMIENTO:**
 

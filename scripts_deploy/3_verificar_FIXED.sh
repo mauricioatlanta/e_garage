@@ -1,7 +1,7 @@
 #!/bin/bash
 # ======================================================
 # Script 3: VERIFICAR (RUTA CORREGIDA)
-# Para: atlantareciclajes @ PythonAnywhere
+# Para: atlantareciclajes @ DigitalOcean
 # Ruta: /home/atlantareciclajes/apps/egarage/current
 # ======================================================
 
@@ -111,31 +111,31 @@ echo ""
 echo "Abre estas URLs en tu navegador:"
 echo ""
 echo "1. Homepage:"
-echo "   https://atlantareciclajes.pythonanywhere.com/"
+echo "   https://atlantareciclajes/"
 echo "   ¿Carga sin errores? □"
 echo ""
 echo "2. Landing Chile (NUEVA):"
-echo "   https://atlantareciclajes.pythonanywhere.com/cl/"
+echo "   https://atlantareciclajes/cl/"
 echo "   ¿Se ve completa con pricing y testimonios? □"
 echo ""
 echo "3. Registro:"
-echo "   https://atlantareciclajes.pythonanywhere.com/accounts/signup/?from=cl"
+echo "   https://atlantareciclajes/accounts/signup/?from=cl"
 echo "   ¿Está en español? □"
 echo "   ¿País pre-seleccionado: Chile? □"
 echo ""
 echo "4. Login existente:"
-echo "   https://atlantareciclajes.pythonanywhere.com/accounts/login/"
+echo "   https://atlantareciclajes/accounts/login/"
 echo "   ¿Funciona con usuario existente? □"
 echo ""
 echo "======================================================"
 echo "📋 LOGS DE ERROR:"
 echo "======================================================"
 echo ""
-echo "Ver en: https://www.pythonanywhere.com/user/atlantareciclajes/"
+echo "Ver en: https://www/user/atlantareciclajes/"
 echo "Pestaña Web → Error log"
 echo ""
 echo "O en consola:"
-echo "tail -50 /var/log/atlantareciclajes.pythonanywhere.com.error.log"
+echo "tail -50 /var/log/atlantareciclajes.error.log"
 echo ""
 echo "======================================================"
 

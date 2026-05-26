@@ -1,7 +1,7 @@
 #!/bin/bash
 # ======================================================
 # Script 3: VERIFICAR ACTUALIZACIÓN
-# Para: atlantareciclajes @ PythonAnywhere
+# Para: atlantareciclajes @ DigitalOcean
 # ======================================================
 
 echo "======================================================"
@@ -96,25 +96,25 @@ echo ""
 echo "🌐 Verificaciones Manuales Pendientes:"
 echo ""
 echo "1. Homepage:"
-echo "   https://atlantareciclajes.pythonanywhere.com/"
+echo "   https://atlantareciclajes/"
 echo "   ¿Carga sin errores?"
 echo ""
 echo "2. Landing Chile:"
-echo "   https://atlantareciclajes.pythonanywhere.com/cl/"
+echo "   https://atlantareciclajes/cl/"
 echo "   ¿Se ve la nueva landing completa?"
 echo ""
 echo "3. Login:"
-echo "   https://atlantareciclajes.pythonanywhere.com/accounts/login/"
+echo "   https://atlantareciclajes/accounts/login/"
 echo "   ¿Funciona con usuario existente?"
 echo ""
 echo "4. Registro:"
-echo "   https://atlantareciclajes.pythonanywhere.com/accounts/signup/"
+echo "   https://atlantareciclajes/accounts/signup/"
 echo "   ¿Pide confirmación de email?"
 echo ""
 echo "======================================================"
 echo ""
 echo "📋 LOGS DE ERROR:"
-echo "   Ver en: https://www.pythonanywhere.com/user/atlantareciclajes/"
+echo "   Ver en: https://www/user/atlantareciclajes/"
 echo "   Pestaña Web → Error log"
 echo ""
 echo "======================================================"

@@ -1,7 +1,7 @@
 #!/bin/bash
 # ======================================================
 # Script 2: ACTUALIZAR EGARAGE
-# Para: atlantareciclajes @ PythonAnywhere
+# Para: atlantareciclajes @ DigitalOcean
 # ======================================================
 
 set -e  # Detener si hay error
@@ -204,10 +204,10 @@ echo "✅ ACTUALIZACIÓN COMPLETADA"
 echo "======================================================"
 echo ""
 echo "⏭️  Siguiente paso:"
-echo "   1. Ir a: https://www.pythonanywhere.com/user/atlantareciclajes/"
+echo "   1. Ir a: https://www/user/atlantareciclajes/"
 echo "   2. Pestaña 'Web'"
-echo "   3. Clic en 'Reload atlantareciclajes.pythonanywhere.com'"
+echo "   3. Clic en 'Reload atlantareciclajes'"
 echo "   4. Esperar 10-15 segundos"
-echo "   5. Probar: https://atlantareciclajes.pythonanywhere.com/"
+echo "   5. Probar: https://atlantareciclajes/"
 echo ""
 echo "======================================================"

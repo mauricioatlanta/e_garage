@@ -1,12 +1,12 @@
-# Guía: Transferir Suscriptores de PythonAnywhere a DigitalOcean
+# Guía: Transferir Suscriptores de DigitalOcean a DigitalOcean
 
-Esta guía te muestra cómo transferir el archivo `suscripciones_consolidadas.json` desde PythonAnywhere a DigitalOcean.
+Esta guía te muestra cómo transferir el archivo `suscripciones_consolidadas.json` desde DigitalOcean a DigitalOcean.
 
-## Opción 1: Usando la interfaz web de PythonAnywhere (MÁS FÁCIL)
+## Opción 1: Usando la interfaz web de DigitalOcean (MÁS FÁCIL)
 
-### Paso 1: Descargar desde PythonAnywhere
+### Paso 1: Descargar desde DigitalOcean
 
-1. **Accede a PythonAnywhere** → https://www.pythonanywhere.com
+1. **Accede a DigitalOcean** → https://www
 2. **Ve a la pestaña "Files"**
 3. **Navega a:** `/home/atlantareciclajes/apps/egarage/current/`
 4. **Busca el archivo:** `suscripciones_consolidadas.json`
@@ -72,7 +72,7 @@ python tools/importar_suscripciones.py suscripciones_consolidadas.json
 
 Si tienes acceso SSH a ambos servidores, puedes transferir directamente:
 
-### Desde PythonAnywhere (consola Bash)
+### Desde DigitalOcean (consola Bash)
 
 ```bash
 cd /home/atlantareciclajes/apps/egarage/current
@@ -84,13 +84,13 @@ ls -lh suscripciones_consolidadas.json
 scp suscripciones_consolidadas.json root@159.223.200.106:/srv/egarage/app/
 ```
 
-**Nota:** Esto requiere que PythonAnywhere tenga acceso SSH a DigitalOcean. Si no funciona, usa la Opción 1.
+**Nota:** Esto requiere que DigitalOcean tenga acceso SSH a DigitalOcean. Si no funciona, usa la Opción 1.
 
 ---
 
 ## Opción 3: Usando un servicio intermedio (Google Drive, Dropbox, etc.)
 
-1. **Sube el archivo desde PythonAnywhere** a Google Drive/Dropbox
+1. **Sube el archivo desde DigitalOcean** a Google Drive/Dropbox
 2. **Descárgalo en tu PC**
 3. **Súbelo a DigitalOcean** usando FileZilla o SCP
 
@@ -151,7 +151,7 @@ python -c "import json; json.load(open('suscripciones_consolidadas.json'))"
 
 ## Resumen rápido
 
-1. ✅ **Descargar** `suscripciones_consolidadas.json` desde PythonAnywhere (interfaz web)
+1. ✅ **Descargar** `suscripciones_consolidadas.json` desde DigitalOcean (interfaz web)
 2. ✅ **Subir** a DigitalOcean usando FileZilla/SCP/WinSCP
 3. ✅ **Verificar** que el archivo llegó correctamente
 4. ✅ **Importar** con `python tools/importar_suscripciones.py suscripciones_consolidadas.json`

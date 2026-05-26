@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Script para listar todos los suscriptores/usuarios con sus datos
-Ejecutar en PythonAnywhere para ver todos los usuarios y sus empresas
+Ejecutar en DigitalOcean para ver todos los usuarios y sus empresas
 """
 
 import os

@@ -1,7 +1,7 @@
 #!/bin/bash
 # ======================================================
 # Script 1: BACKUP COMPLETO (RUTA CORREGIDA)
-# Para: atlantareciclajes @ PythonAnywhere
+# Para: atlantareciclajes @ DigitalOcean
 # Ruta: /home/atlantareciclajes/apps/egarage/current
 # ======================================================
 
@@ -109,7 +109,7 @@ echo "   /home/atlantareciclajes/backup_completo_${BACKUP_DATE}.tar.gz (${SIZE})
 echo ""
 echo "📥 IMPORTANTE: Descarga con FileZilla a tu PC:"
 echo "   Archivo: backup_completo_${BACKUP_DATE}.tar.gz"
-echo "   Guardar en: E:\\backups_egarage_pythonanywhere\\"
+echo "   Guardar en: E:\\backups_egarage_digitalocean\\"
 echo ""
 echo "⏭️  Siguiente paso:"
 echo "   1. Descargar backup a tu PC"

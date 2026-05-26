@@ -27,7 +27,7 @@ def check_critical_files():
         "static/taller/common/js/documentos_form.js",
         "gestion_taller/settings/production.py",
         "render.yaml",
-        "pythonanywhere_wsgi.py",
+        "digitalocean_wsgi.py",
         "taller/views_health.py",
     ]
 
@@ -229,7 +229,7 @@ def main():
         print("Multi-tenant operativo")
         print("Archivos estaticos optimizados")
         print("Base de datos estable")
-        print("\nLISTO PARA DESPLEGAR EN RENDER O PYTHONANYWHERE")
+        print("\nLISTO PARA DESPLEGAR EN RENDER O DIGITALOCEAN")
     else:
         print(f"\n{total - passed} problemas encontrados")
         print("Revisar y corregir antes del despliegue")

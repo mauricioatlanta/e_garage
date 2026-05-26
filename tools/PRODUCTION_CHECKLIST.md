@@ -201,7 +201,7 @@ git commit -m "backend==frontend sync ✅"
 git push origin main
 ```
 
-### **3. PythonAnywhere**
+### **3. DigitalOcean**
 ```bash
 # WSGI: apunta a gestion_taller.wsgi:application
 

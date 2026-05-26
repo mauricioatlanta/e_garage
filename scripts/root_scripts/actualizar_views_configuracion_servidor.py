@@ -117,5 +117,5 @@ with open(file_path, "r", encoding="utf-8") as f:
         print("✅ Verificación: No hay imports redundantes dentro de la función")
 
 print("\n⚠️  IMPORTANTE: Reinicia el servidor Django/uWSGI para que los cambios surtan efecto")
-print("   Ejecuta: touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py")
+print("   Ejecuta: touch /var/www/atlantareciclajes_digitalocean_com_wsgi.py")
 print("=" * 70)

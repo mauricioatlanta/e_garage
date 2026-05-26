@@ -67,17 +67,17 @@ DEBUG = env_bool("DJANGO_DEBUG", False)
 # Para acceso directo por IP debe incluir la IP del servidor (ej. 159.223.200.106).
 ALLOWED_HOSTS = env_list(
     "DJANGO_ALLOWED_HOSTS",
-    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,.pythonanywhere.com,localhost,127.0.0.1,159.223.200.106",
+    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,localhost,127.0.0.1,159.223.200.106",
 )
 
 CSRF_TRUSTED_ORIGINS = env_list(
     "DJANGO_CSRF_TRUSTED_ORIGINS",
-    "https://egarage.cl,https://www.egarage.cl,https://atlantareciclajes.cl,https://www.atlantareciclajes.cl,https://*.pythonanywhere.com",
+    "https://egarage.cl,https://www.egarage.cl,https://atlantareciclajes.cl,https://www.atlantareciclajes.cl",
 )
 
 
 # =========================
-# HTTPS detrás de proxy (PythonAnywhere)
+# HTTPS detrás de proxy (Nginx / DigitalOcean)
 # =========================
 # 🔥 IMPRESCINDIBLE: Configuración fija para producción (no controlada por env)
 # Este header es CRÍTICO cuando Django está detrás de un proxy (Nginx, Cloudflare, etc.)

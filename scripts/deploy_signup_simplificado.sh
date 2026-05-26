@@ -103,9 +103,9 @@ elif ssh "$SERVER" "systemctl is-active --quiet uwsgi" 2>/dev/null; then
     ssh "$SERVER" "sudo systemctl restart uwsgi"
     echo -e "${GREEN}✓ uWSGI reiniciado${NC}"
 elif ssh "$SERVER" "test -f /var/www/*_wsgi.py" 2>/dev/null; then
-    echo "  Reiniciando PythonAnywhere..."
+    echo "  Reiniciando DigitalOcean..."
     ssh "$SERVER" "touch /var/www/*_wsgi.py"
-    echo -e "${GREEN}✓ PythonAnywhere reiniciado (touch wsgi.py)${NC}"
+    echo -e "${GREEN}✓ DigitalOcean reiniciado (touch wsgi.py)${NC}"
 else
     echo -e "${YELLOW}⚠ No se detectó método de restart automático${NC}"
     echo -e "${YELLOW}Reinicia manualmente la aplicación Django${NC}"

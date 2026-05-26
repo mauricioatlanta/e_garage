@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
-Script para exportar suscripciones desde PythonAnywhere
-Ejecutar en PythonAnywhere: python exportar_suscripciones.py > suscripciones_export.json
+Script para exportar suscripciones desde DigitalOcean
+Ejecutar en DigitalOcean: python exportar_suscripciones.py > suscripciones_export.json
 """
 
 import os

@@ -72,7 +72,7 @@ pyarmor>=8.5.0  # Para ofuscar motor_ia_core.py antes de producción
 # Para desarrollo:
 #   pip install -r requirements.txt
 #
-# Para producción en PythonAnywhere u otro servidor:
+# Para producción en DigitalOcean u otro servidor:
 #   pip install -r requirements.txt
 #
 # Para crear un entorno virtual:

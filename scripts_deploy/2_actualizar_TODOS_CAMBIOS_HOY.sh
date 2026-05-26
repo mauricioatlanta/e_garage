@@ -84,5 +84,5 @@ python manage.py collectstatic --noinput
 echo ""
 echo "======================================================"
 echo "ACTUALIZACION COMPLETA LISTA"
-echo "Recuerda hacer Reload en el panel Web de PythonAnywhere."
+echo "Recuerda hacer Reload en el panel Web de DigitalOcean."
 echo "======================================================"

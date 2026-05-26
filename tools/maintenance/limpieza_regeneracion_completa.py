@@ -650,7 +650,7 @@ def generar_archivo_informe(usuarios_creados, datos_creados):
 ## 🔐 CREDENCIALES DE ACCESO
 
 ### 🌐 URL de Login
-**https://atlantareciclajes.pythonanywhere.com/accounts/login/**
+**https://atlantareciclajes/accounts/login/**
 
 ---
 
@@ -730,10 +730,10 @@ def generar_archivo_informe(usuarios_creados, datos_creados):
 
 ### 🎯 URLs de Acceso Directo:
 
-- **Login:** https://atlantareciclajes.pythonanywhere.com/accounts/login/
-- **Dashboard:** https://atlantareciclajes.pythonanywhere.com/dashboard/
-- **Analytics:** https://atlantareciclajes.pythonanywhere.com/analytics/dashboard/
-- **Admin Dashboard:** https://atlantareciclajes.pythonanywhere.com/analytics/admin/dashboard/
+- **Login:** https://atlantareciclajes/accounts/login/
+- **Dashboard:** https://atlantareciclajes/dashboard/
+- **Analytics:** https://atlantareciclajes/analytics/dashboard/
+- **Admin Dashboard:** https://atlantareciclajes/analytics/admin/dashboard/
 
 ---
 
@@ -838,8 +838,8 @@ def test_info_view(request):
         <div style="background: #e8f4f8; padding: 20px; border-radius: 8px; margin: 20px 0;">
             <h3>🔐 URL de Login</h3>
             <div class="credential">
-                <a href="https://atlantareciclajes.pythonanywhere.com/accounts/login/" target="_blank">
-                    https://atlantareciclajes.pythonanywhere.com/accounts/login/
+                <a href="https://atlantareciclajes/accounts/login/" target="_blank">
+                    https://atlantareciclajes/accounts/login/
                 </a>
             </div>
         </div>
@@ -940,7 +940,7 @@ def main():
 
         print("\n📋 PRÓXIMOS PASOS:")
         print("1. 📄 Revisar archivo: pruebas_suscripciones_creadas.md")
-        print("2. 🌐 Probar login: https://atlantareciclajes.pythonanywhere.com/accounts/login/")
+        print("2. 🌐 Probar login: https://atlantareciclajes/accounts/login/")
         print("3. 🔍 Verificar datos: /admin/test/info/ (como admin)")
         print("4. 📊 Probar analytics: /analytics/admin/dashboard/")
 

@@ -124,11 +124,11 @@ sudo systemctl restart uwsgi
 sudo systemctl status uwsgi
 ```
 
-#### Si usas PythonAnywhere:
+#### Si usas DigitalOcean:
 
 ```bash
 # Tocar el archivo WSGI para forzar reload
-touch /var/www/egarage_pythonanywhere_com_wsgi.py
+touch /var/www/egarage_digitalocean_com_wsgi.py
 ```
 
 #### Si usas otros métodos:

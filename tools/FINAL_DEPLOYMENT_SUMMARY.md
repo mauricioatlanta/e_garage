@@ -12,7 +12,7 @@ Hemos implementado exitosamente el checklist completo de pre-despliegue a produc
 - ✅ **Logging configurado**
 - ✅ **Health checks implementados**
 - ✅ **Configuración para Render.com**
-- ✅ **Configuración para PythonAnywhere**
+- ✅ **Configuración para DigitalOcean**
 - ✅ **Plan de rollback**
 
 ---
@@ -22,7 +22,7 @@ Hemos implementado exitosamente el checklist completo de pre-despliegue a produc
 ### **1. Configuración de Producción**
 - `gestion_taller/settings/production.py` - Settings de producción
 - `render.yaml` - Configuración para Render.com
-- `pythonanywhere_wsgi.py` - WSGI para PythonAnywhere
+- `digitalocean_wsgi.py` - WSGI para DigitalOcean
 
 ### **2. Health Checks**
 - `taller/views_health.py` - Endpoints de monitoreo
@@ -106,7 +106,7 @@ LOGGING = {
 - ✅ Variables de entorno configuradas
 - ✅ Build command con collectstatic y migrate
 
-### **PythonAnywhere**
+### **DigitalOcean**
 - ✅ WSGI file configurado
 - ✅ Mapeos de static/media documentados
 - ✅ Comandos de despliegue listos
@@ -182,7 +182,7 @@ git push origin main
 # 3. En Render: el deploy se ejecuta automáticamente
 ```
 
-### **PythonAnywhere**
+### **DigitalOcean**
 ```bash
 # 1. Ir al proyecto
 cd /home/tu_usuario/e_garage
@@ -217,7 +217,7 @@ El sistema eGarage Django está completamente preparado para despliegue en produ
 
 El sistema puede ser desplegado inmediatamente en:
 - **Render.com** (recomendado)
-- **PythonAnywhere**
+- **DigitalOcean**
 - **Cualquier plataforma compatible con Django**
 
 ---

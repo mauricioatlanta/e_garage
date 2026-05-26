@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script para consultar suscripciones en PythonAnywhere.
+Script para consultar suscripciones en DigitalOcean.
 Usa la conexión de Django directamente sin cargar toda la configuración.
 Ejecutar: python tools/consultar_suscripciones_pa.py
 """

@@ -79,7 +79,7 @@ if [ -d "${DEPLOY_PATH}/templates" ]; then
     echo "======================================================"
     echo ""
     echo "⏭️  SIGUIENTE PASO:"
-    echo "   1. Reload en Web panel de PythonAnywhere"
+    echo "   1. Reload en Web panel de DigitalOcean"
     echo "   2. Limpiar caché del navegador (Ctrl+Shift+R)"
     echo ""
 else

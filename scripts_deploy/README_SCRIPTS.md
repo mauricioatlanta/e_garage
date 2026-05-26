@@ -1,6 +1,6 @@
 # 🚀 SCRIPTS DE ACTUALIZACIÓN AUTOMÁTICA - EGARAGE
 
-**Para**: atlantareciclajes @ PythonAnywhere
+**Para**: atlantareciclajes @ DigitalOcean
 **Fecha**: 26 de octubre de 2025
 
 ---
@@ -24,15 +24,15 @@ scripts_deploy/
 
 ```bash
 # 1. Subir scripts con FileZilla
-Conectar a: atlantareciclajes.pythonanywhere.com (puerto 22, SFTP)
+Conectar a: atlantareciclajes (puerto 22, SFTP)
 Crear carpeta: /home/atlantareciclajes/scripts_deploy/
 Subir todos los archivos .sh
 ```
 
-### **Ejecución en PythonAnywhere:**
+### **Ejecución en DigitalOcean:**
 
 ```bash
-# 1. Abrir Console Bash en PythonAnywhere
+# 1. Abrir Console Bash en DigitalOcean
 cd /home/atlantareciclajes/scripts_deploy/
 
 # 2. Dar permisos de ejecución
@@ -50,7 +50,7 @@ chmod +x *.sh
 ./2_actualizar.sh
 
 # PASO 4: Reload en Web panel
-# (Ir a https://www.pythonanywhere.com/user/atlantareciclajes/ → Web → Reload)
+# (Ir a https://www/user/atlantareciclajes/ → Web → Reload)
 
 # PASO 5: Verificar
 ./3_verificar.sh
@@ -214,7 +214,7 @@ cd /home/atlantareciclajes/scripts_deploy/
 ### **Paso a Paso:**
 
 ```bash
-# === EN PYTHONANYWHERE CONSOLE ===
+# === EN DIGITALOCEAN CONSOLE ===
 
 # 1. BACKUP (OBLIGATORIO)
 cd /home/atlantareciclajes/scripts_deploy/
@@ -226,13 +226,13 @@ cd /home/atlantareciclajes/scripts_deploy/
 
 # 2. DESCARGAR BACKUP
 # Descargar: backup_completo_20251026_*.tar.gz
-# Guardar en: E:\backups_egarage_pythonanywhere\
+# Guardar en: E:\backups_egarage_digitalocean\
 
 # 3. SUBIR ACTUALIZACIÓN
 # Subir a: /home/atlantareciclajes/egarage_update/
 # Archivo: egarage_update_atlantareciclajes.zip
 
-# === EN PYTHONANYWHERE CONSOLE ===
+# === EN DIGITALOCEAN CONSOLE ===
 
 # 4. ACTUALIZAR
 ./2_actualizar.sh
@@ -242,12 +242,12 @@ cd /home/atlantareciclajes/scripts_deploy/
 # === EN NAVEGADOR ===
 
 # 5. RELOAD WEB APP
-# Ir a: https://www.pythonanywhere.com/user/atlantareciclajes/
+# Ir a: https://www/user/atlantareciclajes/
 # Pestaña: Web
-# Clic: Reload atlantareciclajes.pythonanywhere.com
+# Clic: Reload atlantareciclajes
 # ⏱️ Esperar 10-15 segundos
 
-# === EN PYTHONANYWHERE CONSOLE ===
+# === EN DIGITALOCEAN CONSOLE ===
 
 # 6. VERIFICAR
 ./3_verificar.sh
@@ -257,9 +257,9 @@ cd /home/atlantareciclajes/scripts_deploy/
 # === EN NAVEGADOR ===
 
 # 7. PRUEBAS MANUALES
-# Homepage: https://atlantareciclajes.pythonanywhere.com/
-# Landing: https://atlantareciclajes.pythonanywhere.com/cl/
-# Login: https://atlantareciclajes.pythonanywhere.com/accounts/login/
+# Homepage: https://atlantareciclajes/
+# Landing: https://atlantareciclajes/cl/
+# Login: https://atlantareciclajes/accounts/login/
 ```
 
 ### **Si Todo Está OK:**
@@ -324,10 +324,10 @@ TOTAL:              15-25 minutos
 ```bash
 # Ver último comando que falló (en pantalla)
 # Ver error log:
-tail -50 /var/log/atlantareciclajes.pythonanywhere.com.error.log
+tail -50 /var/log/atlantareciclajes.error.log
 
 # Ver log en Web panel:
-https://www.pythonanywhere.com/user/atlantareciclajes/
+https://www/user/atlantareciclajes/
 → Web → Error log
 ```
 

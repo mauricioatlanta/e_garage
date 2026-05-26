@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script para buscar TODOS los backups de SQLite en PythonAnywhere
+Script para buscar TODOS los backups de SQLite en DigitalOcean
 y mostrar cuántos suscriptores tiene cada uno
 """
 

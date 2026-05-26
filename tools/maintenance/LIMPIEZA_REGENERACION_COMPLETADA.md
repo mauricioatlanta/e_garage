@@ -88,8 +88,8 @@
 
 ### 🌐 Sistema Principal
 ```
-Login: https://atlantareciclajes.pythonanywhere.com/accounts/login/
-Dashboard: https://atlantareciclajes.pythonanywhere.com/dashboard/
+Login: https://atlantareciclajes/accounts/login/
+Dashboard: https://atlantareciclajes/dashboard/
 ```
 
 ### 📊 Analytics
@@ -186,7 +186,7 @@ Vista de Prueba: /analytics/admin/test/info/
 ### 🎯 LISTO PARA PRUEBAS
 
 **🔑 Contraseña Universal:** `test1234`
-**🌐 URL Principal:** https://atlantareciclajes.pythonanywhere.com/accounts/login/
+**🌐 URL Principal:** https://atlantareciclajes/accounts/login/
 **📊 Dashboard Admin:** Acceso para staff/admin con datos diferenciados
 **🚀 Dashboard Avanzado:** Funcionalidades IA y analytics en tiempo real
 

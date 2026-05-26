@@ -69,9 +69,9 @@ python manage.py check || {
 # Reiniciar aplicación
 echo ""
 echo "🔄 Reiniciando aplicación web..."
-touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py 2>/dev/null || {
+touch /var/www/atlantareciclajes_digitalocean_com_wsgi.py 2>/dev/null || {
     echo "⚠️  No se pudo tocar archivo WSGI (puede requerir permisos)"
-    echo "   Reiniciar manualmente desde el dashboard de PythonAnywhere"
+    echo "   Reiniciar manualmente desde el dashboard de DigitalOcean"
 }
 
 echo ""

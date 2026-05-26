@@ -1,7 +1,7 @@
 #!/bin/bash
 # ======================================================
 # Script 4: ROLLBACK (Restaurar Backup)
-# Para: atlantareciclajes @ PythonAnywhere
+# Para: atlantareciclajes @ DigitalOcean
 # ======================================================
 
 echo "======================================================"
@@ -90,9 +90,9 @@ echo "✅ ROLLBACK COMPLETADO"
 echo "======================================================"
 echo ""
 echo "⏭️  Siguiente paso:"
-echo "   1. Ir a: https://www.pythonanywhere.com/user/atlantareciclajes/"
+echo "   1. Ir a: https://www/user/atlantareciclajes/"
 echo "   2. Pestaña 'Web'"
-echo "   3. Clic en 'Reload atlantareciclajes.pythonanywhere.com'"
+echo "   3. Clic en 'Reload atlantareciclajes'"
 echo "   4. El sitio volverá al estado anterior"
 echo ""
 echo "======================================================"

@@ -96,7 +96,7 @@ git commit -m "backend==frontend sync ✅ - Production ready"
 git push origin main
 
 # En Render: el deploy se ejecuta automáticamente
-# En PythonAnywhere: reiniciar app desde dashboard
+# En DigitalOcean: reiniciar app desde dashboard
 ```
 
 ## **9. Verificación Post-Deploy**

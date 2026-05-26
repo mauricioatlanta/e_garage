@@ -123,11 +123,11 @@ curl -I https://egarage.onrender.com/us/en/documentos/form/
 
 ---
 
-## **🐍 PYTHONANYWHERE**
+## **🐍 DIGITALOCEAN**
 
 ### **1. Archivo WSGI**
 ```python
-# /<tu-usuario>_pythonanywhere_com_wsgi.py
+# /<tu-usuario>_digitalocean_com_wsgi.py
 import os
 import sys
 from pathlib import Path

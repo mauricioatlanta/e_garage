@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """
-Script para consultar suscripciones en PythonAnywhere usando PyMySQL.
+Script para consultar suscripciones en DigitalOcean usando PyMySQL.
 Conecta directamente a la base de datos sin pasar por Django.
 """
 
@@ -15,8 +15,8 @@ env_path = BASE_DIR / ".env"
 if env_path.exists():
     load_dotenv(env_path)
 
-# Configuración de base de datos para PythonAnywhere
-DB_HOST = os.getenv("DB_HOST", "atlantareciclajes.mysql.pythonanywhere-services.com")
+# Configuración de base de datos para DigitalOcean
+DB_HOST = os.getenv("DB_HOST", "atlantareciclajes.mysql.digitalocean-services.com")
 DB_NAME = os.getenv("DB_NAME", "atlantareciclajes$egarage").replace("$", "")
 DB_USER = os.getenv("DB_USER", "atlantareciclajes")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "laila2013")

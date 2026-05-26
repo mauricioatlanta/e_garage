@@ -2,9 +2,9 @@
 
 Este proceso te permite extraer TODOS los suscriptores de TODOS los backups y consolidarlos en una sola lista antes de importarlos al nuevo servidor.
 
-## Paso 1: Consolidar suscriptores en PythonAnywhere
+## Paso 1: Consolidar suscriptores en DigitalOcean
 
-**Ejecuta en la consola Bash de PythonAnywhere:**
+**Ejecuta en la consola Bash de DigitalOcean:**
 
 ```bash
 cd /home/atlantareciclajes/apps/egarage/current
@@ -36,8 +36,8 @@ python -c "import json; data=json.load(open('suscripciones_consolidadas.json'));
 
 ## Paso 2: Descargar el archivo JSON
 
-Descarga `suscripciones_consolidadas.json` desde PythonAnywhere a tu PC usando:
-- La interfaz de archivos de PythonAnywhere
+Descarga `suscripciones_consolidadas.json` desde DigitalOcean a tu PC usando:
+- La interfaz de archivos de DigitalOcean
 - O `scp` si tienes acceso SSH
 
 ## Paso 3: Subir al nuevo servidor (OceanDigital)

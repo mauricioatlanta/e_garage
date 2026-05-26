@@ -1,8 +1,8 @@
 # ============================================================
-# 🏭 CONFIGURACIÓN DE PRODUCCIÓN PARA PYTHONANYWHERE
+# 🏭 CONFIGURACIÓN DE PRODUCCIÓN PARA DIGITALOCEAN
 # ============================================================
 # Archivo: settings_production.py
-# URL de producción: https://e-garage-atlantareciclajes.pythonanywhere.com
+# URL de producción: https://e-garage-atlantareciclajes
 
 import os
 from pathlib import Path
@@ -16,11 +16,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "laila2013-production-key-change-in-server")
 DEBUG = False
 
-# Dominios permitidos para PythonAnywhere
+# Dominios permitidos para DigitalOcean
 ALLOWED_HOSTS = [
-    "e-garage-atlantareciclajes.pythonanywhere.com",
-    "www.e-garage-atlantareciclajes.pythonanywhere.com",
-    "atlantareciclajes.pythonanywhere.com",
+    "e-garage-atlantareciclajes",
+    "www.e-garage-atlantareciclajes",
+    "atlantareciclajes",
     "127.0.0.1",
 ]
 
@@ -93,7 +93,7 @@ ACCOUNT_LOGIN_METHODS = {"username", "email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
 
 # ============================================================
-# 🗄️ BASE DE DATOS - MYSQL PARA PYTHONANYWHERE
+# 🗄️ BASE DE DATOS - MYSQL PARA DIGITALOCEAN
 # ============================================================
 DATABASES = {
     "default": {
@@ -101,7 +101,7 @@ DATABASES = {
         "NAME": os.environ.get("DB_NAME", "atlantareciclajes$egarage"),
         "USER": os.environ.get("DB_USER", "atlantareciclajes"),
         "PASSWORD": os.environ.get("DB_PASSWORD", "laila2013"),
-        "HOST": os.environ.get("DB_HOST", "atlantareciclajes.mysql.pythonanywhere-services.com"),
+        "HOST": os.environ.get("DB_HOST", "atlantareciclajes.mysql.digitalocean-services.com"),
         "PORT": os.environ.get("DB_PORT", "3306"),
         "OPTIONS": {
             "charset": "utf8mb4",
@@ -152,7 +152,7 @@ LOCALE_PATHS = [
 DEFAULT_USA_TIMEZONE = "America/New_York"
 
 # ============================================================
-# 🎨 ARCHIVOS ESTÁTICOS Y MEDIA PARA PYTHONANYWHERE
+# 🎨 ARCHIVOS ESTÁTICOS Y MEDIA PARA DIGITALOCEAN
 # ============================================================
 STATIC_URL = "/static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
@@ -307,4 +307,4 @@ MANAGERS = ADMINS
 FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 
-print("🚀 CONFIGURACIÓN DE PRODUCCIÓN CARGADA PARA PYTHONANYWHERE")
+print("🚀 CONFIGURACIÓN DE PRODUCCIÓN CARGADA PARA DIGITALOCEAN")

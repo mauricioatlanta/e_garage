@@ -13,12 +13,11 @@ if os.environ.get("FORCE_DEBUG", "0") == "1":
 # Hosts permitidos para producción
 ALLOWED_HOSTS = [
     "atlantareciclajes.cl",
-    "*.pythonanywhere.com",
     "127.0.0.1",
     "localhost",
 ]
 
-# Configuración para proxy SSL (PythonAnywhere)
+# Configuración para proxy SSL (Nginx / DigitalOcean)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 
 # Configuración de seguridad SSL
@@ -57,7 +56,6 @@ SECURE_HSTS_PRELOAD = True
 # CSRF trusted origins para dominios de producción
 CSRF_TRUSTED_ORIGINS = [
     "https://atlantareciclajes.cl",
-    "https://*.pythonanywhere.com",
 ]
 
 # Cabeceras de seguridad adicionales

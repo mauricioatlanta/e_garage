@@ -51,7 +51,7 @@ There are **three parallel settings hierarchies** — use the right one:
 | `gestion_taller.settings` (package `__init__.py`) | Default — pytest, `manage.py runserver`, production |
 | `gestion_taller.settings.dev` | Development with PostgreSQL or email testing |
 | `gestion_taller.settings.prod` | Production deploy (reads env vars strictly) |
-| `gestion_taller/settings.py` | Legacy root-level file (kept for PythonAnywhere compatibility) |
+| `gestion_taller/settings.py` | Legacy root-level file (kept for DigitalOcean compatibility) |
 | `gestion_taller/compacto/settings.py` | Slim variant for compacto sub-project |
 
 `pytest.ini` sets `DJANGO_SETTINGS_MODULE = gestion_taller.settings` (the package).
