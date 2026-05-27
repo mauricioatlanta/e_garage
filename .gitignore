@@ -156,3 +156,14 @@ backup_20251204.html
 *.bak
 *.BAK*
 scripts/diagnostico_bienvenida.py
+
+# deploy local
+deploy_atlantareciclajes/
+
+# backups
+backups/
+*.BAK
+*.bak
+*.tar.gz
+company_logos/
+comprobantes/

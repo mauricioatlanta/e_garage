@@ -421,10 +421,15 @@ def crear_vehiculo(request):
 
 @login_required
 def ver_vehiculo(request, pk):
-    """Detalle de un vehículo de desarme con resumen operativo (piezas activas/vendidas, costo)."""
+    """Detalle rediseñado: cabecera, compra, resumen piezas, P&L y recientes. Solo propietario."""
     empresa = _empresa_or_redirect(request)
     if not empresa:
         return redirect("/")
+
+    es_propietario = getattr(empresa, "user_id", None) == request.user.id
+    if not es_propietario and not request.user.is_superuser:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("Acceso restringido al propietario de la cuenta.")
 
     vehiculo = get_object_or_404(
         Vehiculo,
@@ -432,24 +437,57 @@ def ver_vehiculo(request, pk):
         empresa=empresa,
         tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
+
+    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
+
     piezas = list(
         vehiculo.piezas_desarme.filter(activo=True)
         .prefetch_related("names", "company_labels")
         .order_by("codigo")
     )
-    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
     for p in piezas:
         p.display_nombre = p.get_display_label(empresa=empresa, language=lang)
-    piezas_activas_count = len(piezas)
-    piezas_vendidas_count = vehiculo.piezas_desarme.filter(estado_pieza=ESTADO_VENDIDA).count()
+
     disponibles = sum(1 for p in piezas if p.estado_pieza == ESTADO_DISPONIBLE)
+    vendidas = vehiculo.piezas_desarme.filter(estado_pieza=ESTADO_VENDIDA).count()
     danadas = sum(1 for p in piezas if p.estado_pieza == ESTADO_DANADA)
     faltantes = sum(1 for p in piezas if p.estado_pieza == ESTADO_FALTANTE)
+    total_piezas_count = disponibles + vendidas + danadas + faltantes
+
     valor_potencial = sum(
         (p.precio_venta_sugerido or Decimal("0")) * p.cantidad
         for p in piezas
         if p.estado_pieza in (ESTADO_DISPONIBLE, ESTADO_RESERVADA)
     )
+
+    costo_compra = vehiculo.precio_compra or Decimal("0")
+    costo_transporte = vehiculo.transporte_grua_desarme or Decimal("0")
+    costo_otros = vehiculo.otros_gastos_desarme or Decimal("0")
+    costo_total = costo_compra + costo_transporte + costo_otros
+
+    total_recaudado = (
+        LineaRepuesto.objects.filter(
+            origen_repuesto=ORIGEN_DESARME,
+            pieza_desarme__vehiculo=vehiculo,
+        ).aggregate(total=Sum(F("precio_unitario") * F("cantidad")))["total"]
+        or Decimal("0")
+    )
+
+    ganancia_neta = total_recaudado - costo_total
+    proyeccion_total = total_recaudado + valor_potencial - costo_total
+    monto_chatarra = vehiculo.monto_chatarra or Decimal("0")
+    es_dado_de_baja = bool(vehiculo.fecha_baja_desarme)
+    ganancia_final = (
+        total_recaudado + monto_chatarra - costo_total if es_dado_de_baja else ganancia_neta
+    )
+
+    repuestos_recientes = list(
+        vehiculo.piezas_desarme.filter(activo=True)
+        .prefetch_related("names", "company_labels")
+        .order_by("-id")[:5]
+    )
+    for p in repuestos_recientes:
+        p.display_nombre = p.get_display_label(empresa=empresa, language=lang)
 
     return render(
         request,
@@ -458,14 +496,77 @@ def ver_vehiculo(request, pk):
             "vehiculo": vehiculo,
             "piezas": piezas,
             "empresa": empresa,
-            "piezas_activas_count": piezas_activas_count,
-            "piezas_vendidas_count": piezas_vendidas_count,
+            "empresa_moneda": empresa.formato_moneda,
+            "es_dado_de_baja": es_dado_de_baja,
+            "es_superusuario": request.user.is_superuser,
             "disponibles": disponibles,
+            "vendidas": vendidas,
             "danadas": danadas,
             "faltantes": faltantes,
+            "total_piezas_count": total_piezas_count,
             "valor_potencial": valor_potencial,
+            "costo_total": costo_total,
+            "costo_compra": costo_compra,
+            "costo_transporte": costo_transporte,
+            "costo_otros": costo_otros,
+            "total_recaudado": total_recaudado,
+            "ganancia_neta": ganancia_neta,
+            "proyeccion_total": proyeccion_total,
+            "monto_chatarra": monto_chatarra,
+            "ganancia_final": ganancia_final,
+            "repuestos_recientes": repuestos_recientes,
         },
     )
+
+
+@login_required
+@require_POST
+def dar_de_baja_vehiculo(request, pk):
+    """Marca un vehículo de desarme como dado de baja. Solo para el propietario de la cuenta."""
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    es_propietario = getattr(empresa, "user_id", None) == request.user.id
+    if not es_propietario and not request.user.is_superuser:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("Acceso restringido al propietario de la cuenta.")
+
+    vehiculo = get_object_or_404(
+        Vehiculo,
+        pk=pk,
+        empresa=empresa,
+        tipo_uso=Vehiculo.TIPO_USO_DESARME,
+    )
+
+    if vehiculo.fecha_baja_desarme:
+        messages.warning(request, "Este vehículo ya está dado de baja.")
+        return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/"))
+
+    from decimal import InvalidOperation as _InvalidOp
+
+    monto_raw = request.POST.get("monto_chatarra", "").strip().replace(".", "").replace(",", "")
+    try:
+        monto = Decimal(monto_raw) if monto_raw else Decimal("0")
+        if monto < 0:
+            monto = Decimal("0")
+    except (_InvalidOp, ValueError):
+        monto = Decimal("0")
+
+    observaciones = request.POST.get("observaciones_baja", "").strip()
+
+    vehiculo.fecha_baja_desarme = timezone.now().date()
+    vehiculo.monto_chatarra = monto
+    update_fields = ["fecha_baja_desarme", "monto_chatarra"]
+    if observaciones:
+        existing = (vehiculo.observaciones_desarme or "").rstrip()
+        sep = "\n" if existing else ""
+        vehiculo.observaciones_desarme = f"{existing}{sep}[BAJA] {observaciones}"
+        update_fields.append("observaciones_desarme")
+    vehiculo.save(update_fields=update_fields)
+
+    messages.success(request, f"Vehículo dado de baja el {vehiculo.fecha_baja_desarme}.")
+    return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/"))
 
 
 @login_required
