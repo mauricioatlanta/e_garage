@@ -350,3 +350,16 @@ EMAIL_BACKEND = env_str("EMAIL_BACKEND", "gestion_taller.resend_backend.ResendBa
 RESEND_API_KEY = env_str("RESEND_API_KEY", "")
 DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl")
 ACCOUNT_LOGIN_METHODS = {'email'}
+
+# Pasarelas de pago
+FLOW_API_KEY = env_str("FLOW_API_KEY", "")
+FLOW_SECRET_KEY = env_str("FLOW_SECRET_KEY", "")
+FLOW_API_URL = env_str("FLOW_API_URL", "https://www.flow.cl/api")
+FLOW_ENABLED = bool(
+    os.getenv("FLOW_ENABLED", "1" if (FLOW_API_KEY and FLOW_SECRET_KEY) else "0") not in ("0", "false", "False", "")
+)
+
+MP_ACCESS_TOKEN = env_str("MP_ACCESS_TOKEN", "")
+MP_ENABLED = bool(
+    os.getenv("MP_ENABLED", "1" if MP_ACCESS_TOKEN else "0") not in ("0", "false", "False", "")
+)
