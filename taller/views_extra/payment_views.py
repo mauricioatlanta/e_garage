@@ -466,7 +466,7 @@ def start_flow_payment(request):
         billing_cycle=billing_cycle,
         plan_code=plan_code,
         reference=f"SUB-{uuid.uuid4().hex}",
-        customer_email=empresa.email or request.user.email,
+        customer_email=request.user.email or empresa.email,
         description=f"Suscripcion eGarage - {plan_name}",
         gateway_payload={
             "gateway": "flow",
