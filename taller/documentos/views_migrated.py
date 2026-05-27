@@ -920,7 +920,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = self.request.user.empresa
+        empresa = self.request.empresa
         form_mode = self.get_form_mode()
         initial_state = self.get_form_initial_state()
         source_document = self.get_form_source_document()
@@ -998,7 +998,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
             self.request.session.pop("desarme_repuestos_prefill", None)
             self.request.session.pop("desarme_origen_label", None)
         return context
-        empresa = self.request.user.empresa
+        empresa = self.request.empresa
 
 
         # Cargar mecánicos activos del taller
@@ -1279,7 +1279,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         return _reverse_with_request(self.request, "lista_documentos")
 
     def form_valid(self, form):
-        form.instance.empresa = self.request.user.empresa
+        form.instance.empresa = self.request.empresa
 
         try:
             with transaction.atomic():
@@ -1313,7 +1313,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         return response
 
     def form_valid_legacy(self, form):
-        form.instance.empresa = self.request.user.empresa
+        form.instance.empresa = self.request.empresa
         try:
             with transaction.atomic():
 
@@ -1857,7 +1857,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         return self.render_country_lang(self.request, context)
 
     def form_valid(self, form):
-        form.instance.empresa = self.request.user.empresa
+        form.instance.empresa = self.request.empresa
 
         try:
             with transaction.atomic():
@@ -1893,7 +1893,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         # En edición, borrar líneas existentes antes de guardar para que
         # DocumentoForm.save() las recree desde repuestos_json (evita duplicados).
         # No usar procesar_items_dinamicos: el formulario usa JSON, no POST con prefijos rep-*.
-        form.instance.empresa = self.request.user.empresa
+        form.instance.empresa = self.request.empresa
 
         try:
             with transaction.atomic():

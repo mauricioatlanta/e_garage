@@ -20,6 +20,7 @@
   id="document-form"
   class="document-prototype-form"
   enctype="multipart/form-data"
+  action="{% if es_edicion and documento %}{% country_url 'documentos:documento_editar' documento.pk %}{% else %}{% country_url 'documentos:documento_crear' %}{% endif %}"
   data-mode="{% if es_edicion %}edit{% else %}create{% endif %}"
   data-form-mode="{{ document_form_bootstrap.mode|default:'clean' }}"
   data-document-id="{% if es_edicion and documento %}{{ documento.id }}{% endif %}"

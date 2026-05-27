@@ -19,12 +19,16 @@ from taller.utils.plan_catalog import PLAN_BUSINESS, PLAN_ENTRY, PLAN_GROWTH, PL
 
 class Empresa(models.Model):
     PLAN_CHOICES = [
-        # Nuevos planes modernos
+        # Nombres canónicos internos
         (PLAN_TRIAL, "Trial"),
         (PLAN_ENTRY, "Entry"),
         (PLAN_GROWTH, "Growth"),
         (PLAN_BUSINESS, "Business"),
-        # Valores legacy de compatibilidad (mantener temporalmente)
+        # Nombres de negocio (UI: Express / Taller / Pro)
+        ("express", "Express (1 usuario)"),
+        ("taller", "Taller (hasta 4 usuarios)"),
+        ("pro", "Pro (hasta 10 usuarios)"),
+        # Legacy
         ("basic", "Plan Básico"),
         ("premium", "Plan Premium"),
         ("enterprise", "Plan Empresarial"),

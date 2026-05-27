@@ -978,10 +978,6 @@
   {% block extra_js %}{% endblock %}
   {# JS de form.media (DAL/Select2) - UNA SOLA VEZ por request para evitar "select2 has already been registered" #}
   {% if form %}{% form_media_once form 'js' %}{% endif %}
-  {# TEMP: desactivar starfield para probar scroll en móviles #}
-  {# {% if enable_space_bg|default:1 and enable_space_bg != 2 %}
-    <script src="{% static 'js/starfield.js' %}"></script>
-  {% endif %} #}
 
   <script>
     // CSRF helper

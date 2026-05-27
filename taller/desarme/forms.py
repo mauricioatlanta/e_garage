@@ -136,10 +136,24 @@ class VehiculoDesarmeForm(forms.ModelForm):
         for _fname in ("precio_compra", "transporte_grua", "otros_gastos"):
             if _fname not in self.fields:
                 continue
-            self.fields[_fname].decimal_places = _decs
             if _is_integer:
-                # TextInput con formato de miles (JS formatea y limpia antes del submit)
-                self.fields[_fname].widget = forms.TextInput(
+                _f = self.fields[_fname]
+                # Parchar to_python para limpiar separadores de miles CLP ("120.000" → "120000")
+                # ANTES de que DecimalField ejecute sus validadores. Sin esto, Django falla
+                # en field.clean() antes de que llegue a clean_<fieldname>().
+                _orig_tp = _f.to_python
+                def _cl_to_python(v, _o=_orig_tp):
+                    if isinstance(v, str):
+                        v = v.replace(".", "").replace(",", "").strip()
+                    return _o(v)
+                _f.to_python = _cl_to_python
+                # Actualizar decimal_places y el DecimalValidator al nuevo valor
+                _f.decimal_places = 0
+                from django.core.validators import DecimalValidator as _DV
+                _f.validators = [v for v in _f.validators if not isinstance(v, _DV)]
+                if getattr(_f, "max_digits", None):
+                    _f.validators.append(_DV(_f.max_digits, 0))
+                _f.widget = forms.TextInput(
                     attrs={
                         "class": "input-desarme",
                         "inputmode": "numeric",
@@ -155,6 +169,7 @@ class VehiculoDesarmeForm(forms.ModelForm):
                     except Exception:
                         pass
             else:
+                self.fields[_fname].decimal_places = _decs
                 self.fields[_fname].widget = forms.NumberInput(
                     attrs={"class": "input-desarme", "step": "0.01", "placeholder": "0.00"}
                 )
@@ -254,6 +269,16 @@ class VehiculoDesarmeForm(forms.ModelForm):
         ):
             if f in self.fields:
                 self.fields[f].required = False
+
+    def _post_clean(self):
+        # Para países con catálogo FK (no USA), limpiar marca_texto/modelo_texto del
+        # instance ANTES de que ModelForm llame a instance.full_clean(). Sin esto,
+        # el model.clean() rechaza vehículos creados con campos de texto libre (ej: seed demo).
+        _pais = str(getattr(self.empresa, "pais", "US") or "US").upper()[:2]
+        if _pais not in {"US"} and self.instance:
+            self.instance.marca_texto = ""
+            self.instance.modelo_texto = ""
+        super()._post_clean()
 
     def _clean_money_cl(self, field_name):
         """Limpia separadores de miles CLP antes de validar (ej: '20.000' → Decimal(20000))."""

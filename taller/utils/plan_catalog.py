@@ -42,39 +42,55 @@ SUPPORTED_PAYMENT_METHODS_BY_COUNTRY = {
 DEFAULT_PAYMENT_METHODS = [PAYMENT_METHOD_PAYPAL, PAYMENT_METHOD_BANK_TRANSFER]
 
 PLAN_LIMITS = {
-    PLAN_TRIAL: {"users_min": 1, "users_max": 1},
-    PLAN_ENTRY: {"users_min": 1, "users_max": 1},
-    PLAN_GROWTH: {"users_min": 2, "users_max": 4},
+    PLAN_TRIAL:    {"users_min": 1, "users_max": 1},
+    PLAN_ENTRY:    {"users_min": 1, "users_max": 1},
+    PLAN_GROWTH:   {"users_min": 2, "users_max": 4},
     PLAN_BUSINESS: {"users_min": 5, "users_max": 10},
+    # Aliases de negocio (Express / Taller / Pro)
+    "express": {"users_min": 1, "users_max": 1},
+    "taller":  {"users_min": 2, "users_max": 4},
+    "pro":     {"users_min": 5, "users_max": 10},
 }
 
 PLAN_DISPLAY_NAMES = {
     "en": {
         PLAN_TRIAL: "Trial",
-        PLAN_ENTRY: "Entry",
-        PLAN_GROWTH: "Growth",
-        PLAN_BUSINESS: "Business",
+        PLAN_ENTRY: "Express",
+        PLAN_GROWTH: "Taller",
+        PLAN_BUSINESS: "Pro",
+        "express": "Express",
+        "taller": "Taller",
+        "pro": "Pro",
     },
     "es": {
         PLAN_TRIAL: "Trial",
-        PLAN_ENTRY: "Entry",
-        PLAN_GROWTH: "Growth",
-        PLAN_BUSINESS: "Business",
+        PLAN_ENTRY: "Express",
+        PLAN_GROWTH: "Taller",
+        PLAN_BUSINESS: "Pro",
+        "express": "Express",
+        "taller": "Taller",
+        "pro": "Pro",
     },
 }
 
 PLAN_DESCRIPTIONS = {
     "en": {
         PLAN_TRIAL: "30 days free",
-        PLAN_ENTRY: "Best for solo workshops",
-        PLAN_GROWTH: "Great for small teams",
-        PLAN_BUSINESS: "Designed for growing businesses",
+        PLAN_ENTRY: "1 user — best for solo workshops",
+        PLAN_GROWTH: "Up to 4 users — great for small teams",
+        PLAN_BUSINESS: "Up to 10 users — designed for growing businesses",
+        "express": "1 user — best for solo workshops",
+        "taller": "Up to 4 users — great for small teams",
+        "pro": "Up to 10 users — designed for growing businesses",
     },
     "es": {
         PLAN_TRIAL: "30 días gratis",
-        PLAN_ENTRY: "Ideal para un solo usuario",
-        PLAN_GROWTH: "Perfecto para equipos pequeños",
-        PLAN_BUSINESS: "Para talleres con varios usuarios",
+        PLAN_ENTRY: "1 usuario — ideal para un solo operador",
+        PLAN_GROWTH: "Hasta 4 usuarios — perfecto para equipos pequeños",
+        PLAN_BUSINESS: "Hasta 10 usuarios — para talleres en crecimiento",
+        "express": "1 usuario — ideal para un solo operador",
+        "taller": "Hasta 4 usuarios — perfecto para equipos pequeños",
+        "pro": "Hasta 10 usuarios — para talleres en crecimiento",
     },
 }
 

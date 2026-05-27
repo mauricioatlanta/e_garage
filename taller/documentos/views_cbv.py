@@ -468,7 +468,7 @@ class DocumentoUpdateView(
         obj = super().get_object(queryset)
         # Verificar que el documento pertenece a la empresa del usuario
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
             if obj.empresa != empresa:
                 from django.http import Http404
 

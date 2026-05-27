@@ -104,8 +104,8 @@ class ClienteAutocomplete(autocomplete.Select2QuerySetView):
         qs = Cliente.objects.all()
 
         # Filtrar por empresa si está disponible
-        if hasattr(self.request.user, "empresa") and self.request.user.empresa:
-            qs = qs.filter(empresa=self.request.user.empresa)
+        if self.request.empresa:
+            qs = qs.filter(empresa=self.request.empresa)
 
         if self.q:
             qs = qs.filter(Q(nombre__icontains=self.q) | Q(apellido__icontains=self.q))

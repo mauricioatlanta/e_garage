@@ -58,7 +58,7 @@ class VehiculoAutocomplete(autocomplete.Select2QuerySetView):
     def get_queryset(self):
         if not self.request.user.is_authenticated:
             return Vehiculo.objects.none()
-        qs = Vehiculo.objects.filter(empresa=self.request.user.empresa).select_related(
+        qs = Vehiculo.objects.filter(empresa=self.request.empresa).select_related(
             "marca", "modelo"
         )
         # Filtro por cliente desde forward

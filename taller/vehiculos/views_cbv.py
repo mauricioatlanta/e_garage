@@ -41,7 +41,7 @@ class VehiculoListView(CountryLangTemplateMixin, LoginRequiredMixin, TenantViewM
         if not getattr(self.request, "empresa", None) and getattr(
             self.request.user, "empresa", None
         ):
-            qs = self.model.objects.for_tenant(self.request.user.empresa)
+            qs = self.model.objects.for_tenant(self.request.empresa)
         else:
             qs = super().get_queryset()
         q = (self.request.GET.get("q") or "").strip()

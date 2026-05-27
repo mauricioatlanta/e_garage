@@ -752,7 +752,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = self.request.user.empresa
+        empresa = self.request.empresa
 
         # Prefill desde flujo de desarme (solo creación, prioridad menor que edición)
         if not context.get("es_edicion"):
@@ -1042,7 +1042,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
             f"[DEBUG DocumentoCreateView] CSRF token: {self.request.POST.get('csrfmiddlewaretoken', 'NO ENCONTRADO')}"
         )
 
-        form.instance.empresa = self.request.user.empresa
+        form.instance.empresa = self.request.empresa
 
         # Guardar el documento; las líneas se crean desde repuestos_json en DocumentoForm.save()
         response = super().form_valid(form)

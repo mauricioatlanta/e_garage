@@ -25,7 +25,7 @@ class DocumentoFormView(CountryLangTemplateMixin, LoginRequiredMixin, CreateView
 
         # Get country from empresa
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
             country = getattr(empresa, "pais", "CL") if empresa else "CL"
         except AttributeError:
             country = "CL"
@@ -38,7 +38,7 @@ class DocumentoFormView(CountryLangTemplateMixin, LoginRequiredMixin, CreateView
 
         # Obtener empresa del usuario
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
         except AttributeError:
             empresa, created = Empresa.objects.get_or_create(
                 user=self.request.user,
@@ -104,7 +104,7 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
     def get_object(self, queryset=None):
         """Asegurar que solo se puedan editar documentos de la empresa del usuario"""
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
         except AttributeError:
             raise Http404("Usuario sin empresa asociada")
 
@@ -127,7 +127,7 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
 
         # Get country from empresa
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
             country = getattr(empresa, "pais", "CL") if empresa else "CL"
         except AttributeError:
             country = "CL"
@@ -140,7 +140,7 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
 
         # Obtener empresa del usuario
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
         except AttributeError:
             empresa = None
 

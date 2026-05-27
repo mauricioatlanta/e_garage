@@ -480,45 +480,40 @@ class Documento(AuditMixin, models.Model):
     def generar_numero_documento(self):
         """
         Genera correlativo seguro evitando race conditions.
+        Usa DocumentSequence con select_for_update para garantizar unicidad.
+        Al primer uso siembra el contador desde los documentos existentes.
         """
-
         import re
+        from taller.models.sequence import DocumentSequence
 
         if self.numero:
             return self.numero
 
-        qs = (
-            Documento.objects
-            .select_for_update()
-            .filter(
-                empresa=self.empresa,
-                tipo=self.tipo,
-            )
-            .exclude(numero__isnull=True)
-            .exclude(numero="")
+        seq, _ = DocumentSequence.objects.select_for_update().get_or_create(
+            empresa=self.empresa,
+            tipo=self.tipo,
+            defaults={"current": 0},
         )
 
-        secuencia_max = 0
+        if seq.current == 0:
+            # Siembra el contador con el máximo existente para esta empresa/tipo
+            for valor in (
+                Documento.objects
+                .filter(empresa=self.empresa, tipo=self.tipo)
+                .exclude(numero__isnull=True)
+                .exclude(numero="")
+                .values_list("numero", flat=True)
+            ):
+                m = re.search(r"(\d+)$", str(valor).strip())
+                if m:
+                    try:
+                        seq.current = max(seq.current, int(m.group(1)))
+                    except Exception:
+                        pass
 
-        for valor in qs.values_list("numero", flat=True):
-
-            valor = str(valor).strip()
-
-            match = re.search(r"(\d+)$", valor)
-
-            if not match:
-                continue
-
-            try:
-                numero = int(match.group(1))
-
-                if numero > secuencia_max:
-                    secuencia_max = numero
-
-            except Exception:
-                continue
-
-        self.numero = str(secuencia_max + 1)
+        seq.current += 1
+        seq.save(update_fields=["current"])
+        self.numero = str(seq.current)
 
         return self.numero
 
@@ -583,7 +578,12 @@ class Documento(AuditMixin, models.Model):
         if not hasattr(self, "payment_status") or not self.payment_status:
             self.payment_status = "pending"
 
-        if not self.numero:
+        if self.pk is None:
+            # Siempre regenerar para nuevos registros: evita race conditions
+            # cuando el form pre-rellena 'numero' desde una llamada AJAX previa.
+            self.numero = ""
+            self.generar_numero_documento()
+        elif not self.numero:
             self.generar_numero_documento()
 
         # Primer guardado para obtener PK si no la tiene
