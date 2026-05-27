@@ -15,15 +15,7 @@ from django.contrib.auth import logout
 from django.shortcuts import redirect
 
 from taller.utils.empresa import get_user_empresa_safe
-
-EXEMPT_PREFIXES = (
-    "/admin/",
-    "/accounts/",
-    "/static/",
-    "/media/",
-    "/robots.txt",
-    "/favicon.ico",
-)
+from taller.utils.login_exempt import is_login_exempt_path
 
 
 class EmpresaResolverMiddleware:
@@ -51,4 +43,4 @@ class EmpresaResolverMiddleware:
 
     @staticmethod
     def _is_exempt(path: str) -> bool:
-        return any(path.startswith(prefix) for prefix in EXEMPT_PREFIXES)
+        return is_login_exempt_path(path)
