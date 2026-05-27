@@ -127,7 +127,30 @@ class Vehiculo(TenantScoped):
         blank=True,
         help_text="Ubicación en la yarda (ej: fila 3, posición 12)",
     )
+
     fecha_baja_desarme = models.DateField(null=True, blank=True)
+    monto_chatarra = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Monto venta chatarra",
+        help_text="Monto recibido al dar de baja el vehículo como chatarra",
+    )
+    otros_gastos_desarme = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Otros gastos de adquisición",
+    )
+    transporte_grua_desarme = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Costo transporte/grúa",
+    )
     observaciones_desarme = models.TextField(blank=True, null=True)
     # Vendedor estructurado (evita duplicados, permite reportes)
     vendedor_desarme = models.ForeignKey(
