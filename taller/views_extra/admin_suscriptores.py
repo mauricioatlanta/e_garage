@@ -17,7 +17,7 @@ from django.contrib.auth.decorators import login_required, user_passes_test
 
 staff_member_required = user_passes_test(
     lambda u: u.is_active and u.is_staff,
-    login_url="/cl/es/login/",
+    login_url="/accounts/login/",
 )
 from django.core.paginator import Paginator
 from django.db.models import Q
