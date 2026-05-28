@@ -192,6 +192,10 @@ def usa_login_view(request):
         resp["X-ACTIVE-OK"] = active_ok
         return resp
 
+    # Descartar mensajes flash residuales de otras vistas antes de mostrar el login
+    from django.contrib.messages import get_messages
+    list(get_messages(request))
+
     resp = render(
         request,
         template_name,
