@@ -51,11 +51,6 @@ ACCOUNT_EMAIL_VERIFICATION = os.getenv('ACCOUNT_EMAIL_VERIFICATION', 'optional')
 ACCOUNT_LOGIN_METHODS = {'username', 'email'}
 ACCOUNT_SIGNUP_FIELDS = ['email*', 'username*', 'password1*', 'password2*']
 
-# Compatibilidad con versiones anteriores de allauth.
-ACCOUNT_AUTHENTICATION_METHOD = 'username_email'
-ACCOUNT_EMAIL_REQUIRED = True
-ACCOUNT_USERNAME_REQUIRED = True
-
 # --- Payments: Flow / MercadoPago / PayPal ---
 FLOW_API_KEY = (os.getenv('FLOW_API_KEY') or '').strip()
 FLOW_SECRET_KEY = (os.getenv('FLOW_SECRET_KEY') or '').strip()

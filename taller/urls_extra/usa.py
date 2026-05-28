@@ -32,7 +32,19 @@ from taller.views_extra.views_configuracion import configuracion_tecnicos
 from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.documentos import views_country_aware as views_documentos
-from allauth.account.views import password_reset_done, password_reset_from_key_done
+from allauth.account.views import (
+    AccountInactiveView,
+    ConfirmEmailView,
+    ConfirmLoginCodeView,
+    EmailVerificationSentView,
+    EmailView,
+    LogoutView,
+    ReauthenticateView,
+    password_change,
+    password_reset_done,
+    password_reset_from_key_done,
+    password_set,
+)
 from taller.views_extra.usa_password_reset import (
     USAPasswordResetFromKeyView,
     USAPasswordResetView,
@@ -345,15 +357,18 @@ urlpatterns = [
         password_reset_done,
         name="account_reset_password_done",
     ),
-    # Resto de accounts/* (signup, confirm-email, logout, etc.) → allauth global
-    path(
-        "accounts/",
-        lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else "")),
-    ),
-    path(
-        "accounts/<path:rest>",
-        lambda r, rest: redirect("/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")),
-    ),
+    # Resto de rutas allauth bajo /us/accounts/ — vistas directas (no redirects)
+    path("accounts/login/", usa_login_view, name="account_login_accounts"),
+    path("accounts/signup/", usa_signup_view, name="account_signup_accounts"),
+    path("accounts/logout/", LogoutView.as_view(), name="account_logout"),
+    path("accounts/inactive/", AccountInactiveView.as_view(), name="account_inactive"),
+    path("accounts/confirm-email/", EmailVerificationSentView.as_view(), name="account_email_verification_sent"),
+    re_path(r"^accounts/confirm-email/(?P<key>[-:\w]+)/$", ConfirmEmailView.as_view(), name="account_confirm_email"),
+    path("accounts/email/", EmailView.as_view(), name="account_email"),
+    path("accounts/reauthenticate/", ReauthenticateView.as_view(), name="account_reauthenticate"),
+    path("accounts/password/change/", password_change, name="account_change_password"),
+    path("accounts/password/set/", password_set, name="account_set_password"),
+    path("accounts/login/code/confirm/", ConfirmLoginCodeView.as_view(), name="account_confirm_login_code"),
     # 4) Trial y onboarding
     path("activar-trial/", activar_trial, name="activar_trial"),
     path(
