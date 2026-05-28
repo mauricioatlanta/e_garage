@@ -14,6 +14,9 @@ urlpatterns = [
     path("<str:pais>/<str:idioma>/service-worker.js", dynamic_service_worker, name="service_worker"),
     path("<str:pais>/<str:idioma>/manifest.json", dynamic_manifest, name="pwa_manifest"),
     path('', include('taller.urls_payment')),
+    # /us/en/accounts/* y /us/es/accounts/* no tienen rutas allauth — redirigen al namespace usa
+    path("us/en/accounts/<path:rest>", lambda r, rest: redirect(f"/us/accounts/{rest}")),
+    path("us/es/accounts/<path:rest>", lambda r, rest: redirect(f"/us/accounts/{rest}")),
     path("us/en/", include(("taller.urls", "taller"), namespace="us_en")),
     path("us/es/", include(("taller.urls", "taller"), namespace="us_es")),
     path("us/", include(("taller.urls_extra.usa", "usa"), namespace="usa")),
