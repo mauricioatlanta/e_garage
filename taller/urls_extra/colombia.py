@@ -33,15 +33,15 @@ urlpatterns = [
         TemplateView.as_view(template_name="co/es/suscripcion/pago.html"),
         name="pago_suscripcion_colombia",
     ),
-    # Login Colombia (opcional, si quieres una vista visual distinta de allauth)
+    # Login Colombia → login universal (template propio aún no existe)
     path(
         "accounts/login/",
-        TemplateView.as_view(template_name="co/es/account/login.html"),
-        name="account_login_colombia",
+        lambda r: redirect("/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        name="account_login",
     ),
     path(
         "login/",
-        lambda r: redirect("/co/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        lambda r: redirect("/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_login_short",
     ),
     # Signup Colombia - redirect a signup universal con parámetro from=co

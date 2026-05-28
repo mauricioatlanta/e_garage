@@ -37,7 +37,7 @@ urlpatterns = [
     path(
         "accounts/login/",
         TemplateView.as_view(template_name="pe/es/account/login.html"),
-        name="account_login_peru",
+        name="account_login",
     ),
     path(
         "login/",
@@ -48,7 +48,12 @@ urlpatterns = [
     path(
         "accounts/signup/",
         lambda r: signup_redirect(r, "pe"),
-        name="account_signup_peru",
+        name="account_signup",
+    ),
+    path(
+        "signup/",
+        lambda r: redirect("/pe/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        name="signup",
     ),
     # Redirect resto de accounts/* → /accounts/* (password reset, logout, etc.)
     path(
