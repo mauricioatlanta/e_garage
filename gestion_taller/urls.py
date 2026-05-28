@@ -439,11 +439,11 @@ urlpatterns = [
         "uy/",
         include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay"),
     ),
-    # 🇺🇸 USA - Bloqueo de rutas legacy /us/en/accounts/ y /us/es/accounts/
-    path("us/en/accounts/", lambda r: HttpResponseNotFound()),
-    path("us/en/accounts/<path:rest>", lambda r, rest: HttpResponseNotFound()),
-    path("us/es/accounts/", lambda r: HttpResponseNotFound()),
-    path("us/es/accounts/<path:rest>", lambda r, rest: HttpResponseNotFound()),
+    # 🇺🇸 USA - /us/en/accounts/* y /us/es/accounts/* redirigen al namespace usa
+    path("us/en/accounts/", lambda r: redirect("/us/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))),
+    path("us/en/accounts/<path:rest>", lambda r, rest: redirect(f"/us/accounts/{rest}")),
+    path("us/es/accounts/", lambda r: redirect("/us/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))),
+    path("us/es/accounts/<path:rest>", lambda r, rest: redirect(f"/us/accounts/{rest}")),
     # 🇺🇸 USA - Bienvenida explícita ANTES de us/en/ y us/es/ (evita 502: taller.urls no tiene bienvenida/)
     path("us/en/bienvenida/", bienvenida_usa_en, name="us_en_bienvenida"),
     path("us/es/bienvenida/", bienvenida_usa_es, name="us_es_bienvenida"),
