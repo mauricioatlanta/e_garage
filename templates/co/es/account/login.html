@@ -2,7 +2,7 @@
 {% load static %}
 {% load widget_tweaks %}
 
-{% block title %}Iniciar Sesión - eGarage Uruguay{% endblock %}
+{% block title %}Iniciar Sesión - eGarage Colombia{% endblock %}
 
 {% block extra_head %}
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -26,8 +26,8 @@ body {
 
 .tech-grid {
     background-image:
-        linear-gradient(rgba(94, 182, 228, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(94, 182, 228, 0.08) 1px, transparent 1px);
+        linear-gradient(rgba(252, 209, 22, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(252, 209, 22, 0.08) 1px, transparent 1px);
     background-size: 50px 50px;
     animation: grid-move 20s linear infinite;
     position: fixed;
@@ -43,11 +43,11 @@ body {
 .login-container { position: relative; z-index: 10; width: 100%; max-width: 500px; padding: 20px; }
 
 .glass-card {
-    background: linear-gradient(135deg, rgba(94, 182, 228, 0.12) 0%, rgba(234, 178, 32, 0.08) 100%);
+    background: linear-gradient(135deg, rgba(252, 209, 22, 0.12) 0%, rgba(0, 48, 135, 0.08) 100%);
     backdrop-filter: blur(30px);
     border-radius: 2rem;
-    border: 2px solid rgba(94, 182, 228, 0.4);
-    box-shadow: 0 20px 60px rgba(94, 182, 228, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    border: 2px solid rgba(252, 209, 22, 0.4);
+    box-shadow: 0 20px 60px rgba(252, 209, 22, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     padding: 3rem 2.5rem;
     position: relative;
     overflow: hidden;
@@ -60,7 +60,7 @@ body {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: conic-gradient(from 0deg, transparent 0deg, rgba(94, 182, 228, 0.1) 60deg, transparent 120deg);
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(252, 209, 22, 0.1) 60deg, transparent 120deg);
     animation: shimmer 4s linear infinite;
 }
 
@@ -76,13 +76,13 @@ body {
     width: 80px;
     height: 80px;
     margin: 0 auto 1rem;
-    filter: drop-shadow(0 0 20px rgba(94, 182, 228, 0.6));
+    filter: drop-shadow(0 0 20px rgba(252, 209, 22, 0.6));
 }
 
 .brand-title {
     font-size: 2rem;
     font-weight: 900;
-    background: linear-gradient(135deg, #5EB6E4 0%, #EAB220 100%);
+    background: linear-gradient(135deg, #FCD116 0%, #CE1126 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -94,14 +94,14 @@ body {
 .login-title {
     font-size: 1.8rem;
     font-weight: 700;
-    color: #5EB6E4;
+    color: #FCD116;
     margin-bottom: 2rem;
     text-align: center;
-    text-shadow: 0 0 15px rgba(94, 182, 228, 0.4);
+    text-shadow: 0 0 15px rgba(252, 209, 22, 0.4);
 }
 
 .form-group { margin-bottom: 1.5rem; }
-.form-label { display: block; font-size: 0.9rem; font-weight: 600; color: #5EB6E4; margin-bottom: 0.5rem; }
+.form-label { display: block; font-size: 0.9rem; font-weight: 600; color: #FCD116; margin-bottom: 0.5rem; }
 
 .form-input {
     width: 100%;
@@ -109,22 +109,22 @@ body {
     font-size: 1rem;
     color: #ffffff;
     background: rgba(0, 0, 0, 0.5);
-    border: 2px solid rgba(94, 182, 228, 0.3);
+    border: 2px solid rgba(252, 209, 22, 0.3);
     border-radius: 0.75rem;
     transition: all 0.3s ease;
 }
 
 .form-input:focus {
     outline: none;
-    border-color: #5EB6E4;
+    border-color: #FCD116;
     background: rgba(0, 0, 0, 0.7);
-    box-shadow: 0 0 20px rgba(94, 182, 228, 0.3);
+    box-shadow: 0 0 20px rgba(252, 209, 22, 0.3);
 }
 
 .form-input::placeholder { color: #64748b; }
 
 .checkbox-container { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
-.checkbox-container input[type="checkbox"] { width: 20px; height: 20px; accent-color: #5EB6E4; cursor: pointer; }
+.checkbox-container input[type="checkbox"] { width: 20px; height: 20px; accent-color: #FCD116; cursor: pointer; }
 .checkbox-label { color: #94a3b8; font-size: 0.9rem; cursor: pointer; }
 
 .login-button {
@@ -133,34 +133,34 @@ body {
     font-size: 1.1rem;
     font-weight: 700;
     color: #000000;
-    background: linear-gradient(135deg, #5EB6E4 0%, #EAB220 100%);
+    background: linear-gradient(135deg, #FCD116 0%, #CE1126 100%);
     border: none;
     border-radius: 0.75rem;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 0 25px rgba(94, 182, 228, 0.5);
+    box-shadow: 0 0 25px rgba(252, 209, 22, 0.5);
     text-transform: uppercase;
     letter-spacing: 0.05em;
 }
 
-.login-button:hover { transform: translateY(-3px); box-shadow: 0 0 40px rgba(94, 182, 228, 0.8); }
+.login-button:hover { transform: translateY(-3px); box-shadow: 0 0 40px rgba(252, 209, 22, 0.8); }
 
 .forgot-password { text-align: center; margin-top: 1rem; }
-.forgot-password a { color: #5EB6E4; text-decoration: none; font-size: 0.9rem; }
-.forgot-password a:hover { text-shadow: 0 0 10px rgba(94, 182, 228, 0.8); }
+.forgot-password a { color: #FCD116; text-decoration: none; font-size: 0.9rem; }
+.forgot-password a:hover { text-shadow: 0 0 10px rgba(252, 209, 22, 0.8); }
 
 .divider { margin: 2rem 0; text-align: center; position: relative; }
-.divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(94, 182, 228, 0.2); }
+.divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(252, 209, 22, 0.2); }
 .divider span { background: rgba(0, 0, 0, 0.8); padding: 0 1rem; position: relative; color: #64748b; font-size: 0.9rem; }
 
-.signup-link { text-align: center; padding-top: 1.5rem; border-top: 1px solid rgba(94, 182, 228, 0.2); }
+.signup-link { text-align: center; padding-top: 1.5rem; border-top: 1px solid rgba(252, 209, 22, 0.2); }
 .signup-link-text { color: #94a3b8; font-size: 0.9rem; }
-.signup-link a { color: #5EB6E4; text-decoration: none; font-weight: 600; margin-left: 0.3rem; }
-.signup-link a:hover { text-shadow: 0 0 10px rgba(94, 182, 228, 0.8); }
+.signup-link a { color: #FCD116; text-decoration: none; font-weight: 600; margin-left: 0.3rem; }
+.signup-link a:hover { text-shadow: 0 0 10px rgba(252, 209, 22, 0.8); }
 
 .error-message {
-    background: rgba(213, 43, 30, 0.2);
-    border: 1px solid rgba(213, 43, 30, 0.5);
+    background: rgba(206, 17, 38, 0.2);
+    border: 1px solid rgba(206, 17, 38, 0.5);
     color: #ff6b6b;
     padding: 1rem;
     border-radius: 0.75rem;
@@ -184,7 +184,7 @@ body {
         <div class="login-content">
             <div class="logo-section">
                 <img src="{% static 'img/brand/egarage-logo-primary.png' %}" alt="eGarage Logo" class="logo">
-                <h1 class="brand-title font-futuristic">eGarage Uruguay 🇺🇾</h1>
+                <h1 class="brand-title font-futuristic">eGarage Colombia 🇨🇴</h1>
                 <p class="subtitle">Gestión Profesional para Talleres</p>
             </div>
 
@@ -226,7 +226,7 @@ body {
 
             <div class="signup-link">
                 <span class="signup-link-text">¿No tienes cuenta?</span>
-                <a href="/uy/es/accounts/signup/">Regístrate gratis →</a>
+                <a href="/co/es/accounts/signup/">Regístrate gratis →</a>
             </div>
         </div>
     </div>

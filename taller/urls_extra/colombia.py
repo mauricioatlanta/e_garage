@@ -33,10 +33,10 @@ urlpatterns = [
         TemplateView.as_view(template_name="co/es/suscripcion/pago.html"),
         name="pago_suscripcion_colombia",
     ),
-    # Login Colombia → login universal (template propio aún no existe)
+    # Login Colombia con template personalizado
     path(
         "accounts/login/",
-        lambda r: redirect("/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        TemplateView.as_view(template_name="co/es/account/login.html"),
         name="account_login",
     ),
     path(
