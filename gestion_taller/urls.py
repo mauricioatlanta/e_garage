@@ -16,6 +16,14 @@ urlpatterns = [
     path("us/", include(("taller.urls_extra.usa", "usa"), namespace="usa")),
 
     path("cl/es/", include(("taller.urls_extra.chile", "chile"), namespace="chile")),
+    path("ar/es/", include(("taller.urls_extra.argentina", "argentina"), namespace="argentina")),
+    path("uy/es/", include(("taller.urls_extra.uruguay", "uruguay"), namespace="uruguay")),
+    path("mx/es/", include("taller.urls_extra.mexico", namespace="mexico")),
+    path("pe/es/", include("taller.urls_extra.peru", namespace="peru")),
+    path("br/", include("taller.urls_extra.brasil", namespace="brasil")),
+    path("ve/es/", include("taller.urls_extra.venezuela", namespace="venezuela")),
+    path("co/es/", include("taller.urls_extra.colombia", namespace="colombia")),
+    path("ec/es/", include("taller.urls_extra.ecuador", namespace="ecuador")),
 
     path("", include(("taller.urls", "taller"), namespace="taller")),
 
@@ -24,4 +32,10 @@ urlpatterns = [
     path("us/documentos/", include("taller.documentos.urls", namespace="us_documentos")),
     path("uy/documentos/", include("taller.documentos.urls", namespace="uy_documentos")),
     path("ar/documentos/", include("taller.documentos.urls", namespace="ar_documentos")),
+    path("mx/documentos/", include("taller.documentos.urls", namespace="mx_documentos")),
+    path("pe/documentos/", include("taller.documentos.urls", namespace="pe_documentos")),
+    path("br/documentos/", include("taller.documentos.urls", namespace="br_documentos")),
+    path("ve/documentos/", include("taller.documentos.urls", namespace="ve_documentos")),
+    path("co/documentos/", include("taller.documentos.urls", namespace="co_documentos")),
+    path("ec/documentos/", include("taller.documentos.urls", namespace="ec_documentos")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
