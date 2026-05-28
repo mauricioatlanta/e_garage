@@ -28,6 +28,9 @@ from taller.views_extra.payment_views import payment_chile
 from taller.views_extra.views_suscripciones import precios
 from taller.documentos import views_country_aware as views_documentos
 from allauth.account.views import (
+    AccountInactiveView,
+    ConfirmEmailView,
+    EmailVerificationSentView,
     password_change,
     password_reset_done,
     password_reset_from_key_done,
@@ -106,6 +109,9 @@ urlpatterns = [
     ),
     path("accounts/password/change/", password_change, name="account_change_password"),
     path("accounts/password/set/", password_set, name="account_set_password"),
+    path("accounts/confirm-email/", EmailVerificationSentView.as_view(), name="account_email_verification_sent"),
+    re_path(r"^accounts/confirm-email/(?P<key>[-:\w]+)/$", ConfirmEmailView.as_view(), name="account_confirm_email"),
+    path("accounts/inactive/", AccountInactiveView.as_view(), name="account_inactive"),
     path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
     # Signup corto /cl/es/signup/ -> /cl/es/accounts/signup/ (preserva ?plan=, etc.)
     path(
