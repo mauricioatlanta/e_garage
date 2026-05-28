@@ -195,18 +195,21 @@ class CountryAwareLoginView(LoginView):
         country = getattr(self.request, "country", "CL")
         lang = get_language() or "es"
 
-        if country == "US":
-            return ["account/login.html"]  # misma gráfica; labels EN vía {% if country == 'US' %}
-        if country == "UY":
-            return ["uy/es/account/login.html"]
-        if country == "MX" and lang == "en":
-            return ["us/en/account/login.html"]
-        # Venezuela: template propio ve/es/account/login.html
-        if country == "VE":
-            return ["ve/es/account/login.html"]
-        # MX, CL, AR, CO, EC, PE: base_login + _login_form (reutilizable, misma gráfica)
-        if country in ("MX", "CL", "AR", "CO", "EC", "PE"):
-            return ["account/login.html"]
+        country_templates = {
+            "CL": "cl/es/account/login.html",
+            "AR": "ar/es/account/login.html",
+            "MX": "mx/es/account/login.html",
+            "PE": "pe/es/account/login.html",
+            "CO": "co/es/account/login.html",
+            "EC": "ec/es/account/login.html",
+            "UY": "uy/es/account/login.html",
+            "VE": "ve/es/account/login.html",
+            "BR": "br/pt/account/login.html",
+            "US": "us/en/account/login.html" if lang == "en" else "us/es/account/login.html",
+        }
+
+        if country in country_templates:
+            return [country_templates[country]]
 
         if lang == "en":
             return ["us/en/account/login.html"]

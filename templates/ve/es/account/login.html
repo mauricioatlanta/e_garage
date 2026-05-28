@@ -282,6 +282,8 @@ body {
     font-size: 0.9rem;
 }
 
+.flag-bar { display: flex; width: 72px; height: 8px; border-radius: 4px; overflow: hidden; margin: 0 auto 0.75rem; }
+.flag-bar div { flex: 1; }
 @media (max-width: 640px) {
     .glass-card {
         padding: 2rem 1.5rem;
@@ -304,8 +306,8 @@ body {
         <div class="login-content">
             <!-- Logo y título -->
             <div class="logo-section">
-                <img src="{% static 'img/brand/egarage-logo-primary.png' %}" alt="eGarage Logo" class="logo">
-                <h1 class="brand-title font-futuristic">eGarage Venezuela 🇻🇪</h1>
+                <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="logo">
+                <div class="flag-bar"><div class="flag-s1" style="background:#CF142B"></div><div class="flag-s2" style="background:#FFCC00"></div><div class="flag-s3" style="background:#00247D"></div></div><h1 class="brand-title font-futuristic">eGarage Venezuela</h1>
                 <p class="subtitle">Gestión Profesional para Talleres</p>
             </div>
 

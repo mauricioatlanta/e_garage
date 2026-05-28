@@ -9,6 +9,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.template import loader, TemplateDoesNotExist
 from django.urls import include, path
+from taller.views.country_aware_auth import country_aware_login
 
 from taller.views_extra.views import dashboard_suscripciones
 from taller.views_extra.company_settings_views import company_settings_view
@@ -100,7 +101,7 @@ urlpatterns = [
         uruguay_bienvenida_page,
         name="bienvenida_uruguay_alt",
     ),
-    # Redirect /uy/accounts/* y /uy/es/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
+    path("accounts/login/", country_aware_login, name="account_login"),
     path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
     path(
         "accounts/", lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))
@@ -111,11 +112,9 @@ urlpatterns = [
             "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
         ),
     ),
-    # Login para Uruguay: redirige a /accounts/login/?from=uy (registration/login.html no existe)
     path(
         "login/",
-        lambda r: redirect("/accounts/login/?from=uy" + ("&" + r.GET.urlencode() if r.GET else "")),
-        name="account_login",
+        lambda r: redirect("/uy/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
     ),
     # Signup para Uruguay: redirige a /uy/es/accounts/signup/ (preserva ?plan=, etc.)
     path(

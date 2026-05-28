@@ -10,6 +10,7 @@ from django.urls import path
 from django.utils import translation
 from django.views.generic import RedirectView, TemplateView
 
+from taller.views.country_aware_auth import country_aware_login
 from taller.views_extra.signup_redirects import signup_redirect
 
 app_name = "taller_brasil"
@@ -40,6 +41,11 @@ urlpatterns = [
         lambda r: signup_redirect(r, "br"),
         name="signup_pt",
     ),
+    path(
+        "pt/accounts/login/",
+        country_aware_login,
+        name="account_login",
+    ),
     # Redirect /br/pt/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
     path(
         "pt/accounts/",
@@ -51,10 +57,9 @@ urlpatterns = [
             "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
         ),
     ),
-    # Login corto /br/login/ → /accounts/login/
     path(
         "login/",
-        lambda r: redirect("/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        lambda r: redirect("/br/pt/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_login_short",
     ),
     # --- ESPAÑOL (legacy) → redirige a PT ---

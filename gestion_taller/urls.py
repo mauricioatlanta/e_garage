@@ -4,8 +4,10 @@ from django.views.i18n import JavaScriptCatalog
 from django.urls import path, include
 from django.shortcuts import redirect
 from taller.views_extra.pwa import dynamic_service_worker, dynamic_manifest
+from taller.views_extra.lang_switch import set_language_us
 
 urlpatterns = [
+    path("lang/set/", set_language_us, name="set_language_us"),
     path('jsi18n/', JavaScriptCatalog.as_view(), name='javascript-catalog'),
     path('accounts/', include('allauth.urls')),
     # PWA: service worker y manifest dinámicos por país/idioma
