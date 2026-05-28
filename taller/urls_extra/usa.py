@@ -8,7 +8,7 @@ def _has_ops_urls() -> bool:
         return False
 
 
-from django.urls import include, path
+from django.urls import include, path, re_path
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import RedirectView, TemplateView
 
@@ -32,6 +32,11 @@ from taller.views_extra.views_configuracion import configuracion_tecnicos
 from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.documentos import views_country_aware as views_documentos
+from allauth.account.views import password_reset_done, password_reset_from_key_done
+from taller.views_extra.usa_password_reset import (
+    USAPasswordResetFromKeyView,
+    USAPasswordResetView,
+)
 
 # from taller.views_extra.crear_motor_caja import crear_motor, crear_caja, crear_color  # ❌ Desactivado - usando views_create_parts
 
@@ -316,6 +321,26 @@ urlpatterns = [
     path("login/", usa_login_view, name="account_login"),
     path("signup/", usa_signup_view, name="account_signup"),
     path("es/signup/", usa_signup_view_es, name="account_signup_es"),
+    path(
+        "accounts/password/reset/",
+        USAPasswordResetView.as_view(),
+        name="account_reset_password",
+    ),
+    path(
+        "accounts/password/reset/key/done/",
+        password_reset_from_key_done,
+        name="account_reset_password_from_key_done",
+    ),
+    re_path(
+        r"^accounts/password/reset/key/(?P<uidb36>[0-9A-Za-z]+)-(?P<key>.+)/$",
+        USAPasswordResetFromKeyView.as_view(),
+        name="account_reset_password_from_key",
+    ),
+    path(
+        "accounts/password/reset/done/",
+        password_reset_done,
+        name="account_reset_password_done",
+    ),
     # 4) Trial y onboarding
     path("activar-trial/", activar_trial, name="activar_trial"),
     path(
