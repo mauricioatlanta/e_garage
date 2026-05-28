@@ -8,7 +8,7 @@ from urllib.parse import quote
 from django.contrib.sites.shortcuts import get_current_site
 from django.urls import reverse
 from allauth.utils import build_absolute_uri
-from django.utils.translation import activate
+from django.utils.translation import activate, override as lang_override
 
 logger = logging.getLogger(__name__)
 
@@ -94,11 +94,20 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
 
     def get_reset_password_from_key_url(self, key):
         """
-        Si el usuario pidió reset desde /cl/es/accounts/password/reset/, el enlace del mail
-        debe apuntar a la misma jerarquía (no a /accounts/... sin país/idioma).
+        Genera el enlace de reset apuntando a la jerarquía de país correcta.
+        USA  → /us/accounts/password/reset/key/{uid}-{key}/
+        Chile → /cl/es/accounts/password/reset/key/{uid}-{key}/
+        Otros → allauth global /accounts/password/reset/key/{uid}-{key}/
         """
         req = getattr(self, "request", None)
         path = (req.path or "") if req else ""
+        if path.startswith("/us/"):
+            p = reverse(
+                "usa:account_reset_password_from_key",
+                kwargs={"uidb36": "UID", "key": "KEY"},
+            )
+            p = p.replace("UID-KEY", quote(key, safe=""))
+            return build_absolute_uri(req, p)
         if path.startswith("/cl/es/"):
             p = reverse(
                 "chile:account_reset_password_from_key",
@@ -136,33 +145,66 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
         lang = "en" if country == "US" else "es"
         return country, lang
 
+    def _is_usa_user(self, user=None, request=None):
+        """True si el usuario pertenece a una empresa USA o la request viene de /us/."""
+        if user is not None:
+            empresa = getattr(user, "empresa", None)
+            if (getattr(empresa, "pais", None) or "").upper() == "US":
+                return True
+        if request is not None and (request.path or "").startswith("/us/"):
+            return True
+        return False
+
     def get_email_confirmation_url(self, request, emailconfirmation):
         """
-        Genera enlace de confirmacion con contexto de pais/idioma para no perder routing.
+        Genera el enlace de confirmación apuntando a la ruta directa por país.
+        USA  → /us/accounts/confirm-email/{key}/   (ruta directa, sin prefijo de idioma)
+        CL   → /cl/es/accounts/confirm-email/{key}/
+        Otros → /{cc}/{lang}/accounts/confirm-email/{key}/
         """
         user = getattr(getattr(emailconfirmation, "email_address", None), "user", None)
         country, lang = self._country_lang_from_request_or_user(request=request, user=user)
-        path = f"/{country.lower()}/{lang}/accounts/confirm-email/{emailconfirmation.key}/"
+        if country == "US":
+            path = f"/us/accounts/confirm-email/{emailconfirmation.key}/"
+        else:
+            path = f"/{country.lower()}/{lang}/accounts/confirm-email/{emailconfirmation.key}/"
         return build_absolute_uri(request, path)
 
     def send_confirmation_mail(self, request, emailconfirmation, signup):
         """
-        Fuerza activate_url country-aware en el email de confirmacion.
+        Fuerza activate_url country-aware y envía el template en el idioma correcto.
+        USA → template en inglés (account/email/us_en/).
         """
+        user = emailconfirmation.email_address.user
         activate_url = self.get_email_confirmation_url(request, emailconfirmation)
         ctx = {
-            "user": emailconfirmation.email_address.user,
+            "user": user,
             "activate_url": activate_url,
             "current_site": get_current_site(request),
             "key": emailconfirmation.key,
             "request": request,
             "email": emailconfirmation.email_address.email,
+            "expiration_days": 2,
         }
-        if signup:
+        if self._is_usa_user(user=user, request=request):
+            template = "account/email/us_en/email_confirmation"
+        elif signup:
             template = "account/email/email_confirmation_signup"
         else:
             template = "account/email/email_confirmation"
         self.send_mail(template, emailconfirmation.email_address.email, ctx)
+
+    def send_password_reset_mail(self, user, email, context):
+        """
+        USA → template en inglés con asunto en inglés.
+        Otros → template español estándar.
+        """
+        req = getattr(self, "request", None)
+        if self._is_usa_user(user=user, request=req):
+            template_prefix = "account/email/us_en/password_reset_key"
+        else:
+            template_prefix = "account/email/password_reset_key"
+        self.send_mail(template_prefix, email, context)
 
     def send_mail(self, template_prefix, email, context):
         """
