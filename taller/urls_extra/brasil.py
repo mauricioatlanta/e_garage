@@ -51,6 +51,12 @@ urlpatterns = [
             "/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")
         ),
     ),
+    # Login corto /br/login/ → /accounts/login/
+    path(
+        "login/",
+        lambda r: redirect("/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        name="account_login_short",
+    ),
     # --- ESPAÑOL (legacy) → redirige a PT ---
     path("es/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),
     path("es/bienvenida/", RedirectView.as_view(url="/br/pt/bienvenida/", permanent=False)),

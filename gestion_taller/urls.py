@@ -2,6 +2,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.views.i18n import JavaScriptCatalog
 from django.urls import path, include
+from django.shortcuts import redirect
 from taller.views_extra.pwa import dynamic_service_worker, dynamic_manifest
 
 urlpatterns = [
@@ -24,6 +25,15 @@ urlpatterns = [
     path("ve/es/", include("taller.urls_extra.venezuela", namespace="venezuela")),
     path("co/es/", include("taller.urls_extra.colombia", namespace="colombia")),
     path("ec/es/", include("taller.urls_extra.ecuador", namespace="ecuador")),
+
+    # Catch-all: /xx/<path> → /xx/es/<path> para países sin prefijo de idioma en URLs cortas
+    path("ar/<path:rest>", lambda r, rest: redirect(f"/ar/es/{rest}")),
+    path("uy/<path:rest>", lambda r, rest: redirect(f"/uy/es/{rest}")),
+    path("mx/<path:rest>", lambda r, rest: redirect(f"/mx/es/{rest}")),
+    path("pe/<path:rest>", lambda r, rest: redirect(f"/pe/es/{rest}")),
+    path("ve/<path:rest>", lambda r, rest: redirect(f"/ve/es/{rest}")),
+    path("co/<path:rest>", lambda r, rest: redirect(f"/co/es/{rest}")),
+    path("ec/<path:rest>", lambda r, rest: redirect(f"/ec/es/{rest}")),
 
     path("", include(("taller.urls", "taller"), namespace="taller")),
 

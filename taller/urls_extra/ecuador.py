@@ -39,6 +39,11 @@ urlpatterns = [
         TemplateView.as_view(template_name="ec/es/account/login.html"),
         name="account_login_ecuador",
     ),
+    path(
+        "login/",
+        lambda r: redirect("/ec/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        name="account_login_short",
+    ),
     # Signup Ecuador - redirect a signup universal con parámetro from=ec
     path(
         "accounts/signup/",
