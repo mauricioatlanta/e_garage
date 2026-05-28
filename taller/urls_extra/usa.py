@@ -341,6 +341,15 @@ urlpatterns = [
         password_reset_done,
         name="account_reset_password_done",
     ),
+    # Resto de accounts/* (signup, confirm-email, logout, etc.) → allauth global
+    path(
+        "accounts/",
+        lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else "")),
+    ),
+    path(
+        "accounts/<path:rest>",
+        lambda r, rest: redirect("/accounts/" + rest.rstrip("/") + ("?" + r.GET.urlencode() if r.GET else "")),
+    ),
     # 4) Trial y onboarding
     path("activar-trial/", activar_trial, name="activar_trial"),
     path(
