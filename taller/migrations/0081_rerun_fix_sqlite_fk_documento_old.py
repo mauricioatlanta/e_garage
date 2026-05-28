@@ -25,7 +25,7 @@ def fix_sqlite_fk_documento_old(apps, schema_editor):
 
     for tbl in TABLES_FK_DOCUMENTO_OLD:
         row = cursor.execute(
-            "SELECT sql FROM sqlite_master WHERE type='table' AND name=?",
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name=%s",
             (tbl,),
         ).fetchone()
 
@@ -36,7 +36,7 @@ def fix_sqlite_fk_documento_old(apps, schema_editor):
         create_sql = create_sql.replace("taller_documento_old", "taller_documento")
 
         indexes = cursor.execute(
-            "SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name=? AND sql IS NOT NULL",
+            "SELECT sql FROM sqlite_master WHERE type='index' AND tbl_name=%s AND sql IS NOT NULL",
             (tbl,),
         ).fetchall()
 
