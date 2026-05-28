@@ -37,10 +37,8 @@ class TeamMember(models.Model):
     rol = models.CharField(
         max_length=50,
         choices=[
-            ("Admin", "Administrador"),
+            ("Admin",    "Administrador"),
             ("Vendedor", "Vendedor"),
-            ("Tecnico", "Técnico"),
-            ("MIXTO", "Mixto (Vendedor + Técnico)"),
         ],
         default="Vendedor",
         verbose_name="Rol en el Taller",
@@ -93,31 +91,14 @@ class TeamMember(models.Model):
         return f"{self.user.get_full_name() or self.user.username} - {self.empresa.nombre_taller} ({self.rol})"
 
     def save(self, *args, **kwargs):
-        """Sobrescribir save para asignar el rol al grupo de Django automáticamente"""
+        """Asigna el rol al grupo de Django automáticamente al crear."""
         is_new = self.pk is None
-
         super().save(*args, **kwargs)
-
-        # Asignar rol al grupo de Django si el usuario aún no lo tiene
         if is_new or "rol" in kwargs.get("update_fields", []):
             from django.contrib.auth.models import Group
-
-            # Obtener o crear el grupo correspondiente
             group, _ = Group.objects.get_or_create(name=self.rol)
-
-            # Asignar grupo al usuario si no lo tiene
             if not self.user.groups.filter(name=self.rol).exists():
                 self.user.groups.add(group)
-
-            # Para rol MIXTO, asignar Vendedor y Técnico
-            if self.rol == "MIXTO":
-                vendedor_group, _ = Group.objects.get_or_create(name="Vendedor")
-                tecnico_group, _ = Group.objects.get_or_create(name="Tecnico")
-
-                if not self.user.groups.filter(name="Vendedor").exists():
-                    self.user.groups.add(vendedor_group)
-                if not self.user.groups.filter(name="Tecnico").exists():
-                    self.user.groups.add(tecnico_group)
 
     @property
     def email(self):

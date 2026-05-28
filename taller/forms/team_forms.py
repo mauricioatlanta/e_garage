@@ -40,13 +40,11 @@ class TeamMemberForm(forms.ModelForm):
 
     rol = forms.ChoiceField(
         choices=[
-            ("Admin", "Administrador"),
+            ("Admin",    "Administrador"),
             ("Vendedor", "Vendedor"),
-            ("Tecnico", "Técnico"),
-            ("MIXTO", "Mixto (Vendedor + Técnico)"),
         ],
         required=True,
-        label="Rol en el Taller",
+        label="Rol en el Negocio",
         help_text="El rol determina qué permisos tendrá el usuario",
     )
 
