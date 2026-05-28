@@ -7,7 +7,7 @@
 
     <div class="logo-section">
       <div class="logo-container">
-        <img src="{% static 'taller/common/img/egarage-logo-simple.1884a8f7.svg' %}" alt="eGarage" class="logo">
+        <img src="{% static 'taller/common/img/egarage-logo-neon.png' %}" alt="eGarage" class="logo">
       </div>
       {% with c=country|default:request.country|default:"EG" %}
       {% if c == 'CO' or request.path|slice:":4" == '/co/' %}
