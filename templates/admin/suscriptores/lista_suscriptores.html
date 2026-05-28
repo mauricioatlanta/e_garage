@@ -4,98 +4,51 @@
 {% block title %}Panel de Administración - Suscriptores{% endblock %}
 
 {% block content %}
-<div class="w-full max-w-[1400px] mx-auto px-2 sm:px-4 py-6">
-    <div class="mb-5">
-        <h1 class="text-2xl sm:text-3xl font-bold text-cyan-400 mb-1">📊 Panel de Administración de Suscriptores</h1>
-        <p class="text-sm sm:text-base text-gray-300">Gestiona suscriptores, extiende planes y envía notificaciones</p>
-    </div>
-
-    <!-- Estadísticas Generales -->
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5">
-        <div class="bg-gray-800 rounded-lg p-3 sm:p-4 border border-cyan-500">
-            <div class="text-gray-400 text-xs sm:text-sm">Total Empresas</div>
-            <div class="text-xl sm:text-2xl font-bold text-cyan-400">{{ total_empresas }}</div>
-        </div>
-        <div class="bg-gray-800 rounded-lg p-3 sm:p-4 border border-green-500">
-            <div class="text-gray-400 text-xs sm:text-sm">Activas</div>
-            <div class="text-xl sm:text-2xl font-bold text-green-400">{{ empresas_activas }}</div>
-        </div>
-        <div class="bg-gray-800 rounded-lg p-3 sm:p-4 border border-red-500">
-            <div class="text-gray-400 text-xs sm:text-sm">Vencidas</div>
-            <div class="text-xl sm:text-2xl font-bold text-red-400">{{ empresas_vencidas }}</div>
-        </div>
-        <div class="bg-gray-800 rounded-lg p-3 sm:p-4 border border-yellow-500 col-span-2 lg:col-span-1">
-            <div class="text-gray-400 text-xs sm:text-sm">Críticas (&lt;5 días)</div>
-            <div class="text-xl sm:text-2xl font-bold text-yellow-400">{{ empresas_criticas|length }}</div>
+<div class="w-full max-w-[1400px] mx-auto px-2 sm:px-4 py-3 mt-4">
+    <!-- Cabecera + stats compactos -->
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 mb-2">
+        <h1 class="text-base font-bold text-cyan-400 whitespace-nowrap">📊 Suscriptores</h1>
+        <div class="flex flex-wrap gap-2 text-xs">
+            <span class="bg-gray-800 border border-cyan-700 rounded px-2 py-0.5 text-cyan-300">Total <strong>{{ total_empresas }}</strong></span>
+            <span class="bg-gray-800 border border-green-700 rounded px-2 py-0.5 text-green-300">Activas <strong>{{ empresas_activas }}</strong></span>
+            <span class="bg-gray-800 border border-red-700 rounded px-2 py-0.5 text-red-300">Vencidas <strong>{{ empresas_vencidas }}</strong></span>
+            <span class="bg-gray-800 border border-yellow-700 rounded px-2 py-0.5 text-yellow-300">Críticas <strong>{{ empresas_criticas|length }}</strong></span>
         </div>
     </div>
 
-    <!-- Filtros -->
-    <div class="bg-gray-800 rounded-lg p-3 sm:p-4 mb-5 border border-gray-700">
-        <form method="get" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
+    <!-- Filtros compactos en una línea -->
+    <div class="bg-gray-800 rounded px-3 py-2 mb-3 border border-gray-700">
+        <form method="get" class="flex flex-wrap items-center gap-2">
             {% if ord %}<input type="hidden" name="ord" value="{{ ord }}">{% endif %}
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">País</label>
-                <select name="pais" class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600 text-sm">
-                    <option value="">Todos</option>
-                    {% for codigo, config in paises.items %}
-                    <option value="{{ codigo }}" {% if pais_filter == codigo %}selected{% endif %}>
-                        {{ config.name|default:codigo }}
-                    </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Estado</label>
-                <select name="status" class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600 text-sm">
-                    <option value="">Todos</option>
-                    <option value="activa" {% if status_filter == 'activa' %}selected{% endif %}>Activa</option>
-                    <option value="vencida" {% if status_filter == 'vencida' %}selected{% endif %}>Vencida</option>
-                    <option value="trial" {% if status_filter == 'trial' %}selected{% endif %}>Prueba</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Días Restantes</label>
-                <select name="dias" class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600 text-sm">
-                    <option value="">Todos</option>
-                    <option value="critico" {% if dias_filter == 'critico' %}selected{% endif %}>🔴 Crítico (≤1 día)</option>
-                    <option value="advertencia" {% if dias_filter == 'advertencia' %}selected{% endif %}>⚠️ Advertencia (≤5 días)</option>
-                    <option value="vencido" {% if dias_filter == 'vencido' %}selected{% endif %}>❌ Vencido</option>
-                </select>
-            </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-300 mb-1">Búsqueda</label>
-                <input type="text" name="search" value="{{ search_query }}"
-                       placeholder="Nombre, email, teléfono..."
-                       class="w-full bg-gray-700 text-white rounded px-3 py-2 border border-gray-600 text-sm">
-            </div>
-            <div class="flex items-end sm:col-span-2 lg:col-span-1">
-                <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-2 px-3 rounded text-sm">
-                    🔍 Filtrar
-                </button>
-            </div>
-            <div class="sm:col-span-2 lg:col-span-5 flex flex-wrap items-center gap-2 pt-3 mt-1 border-t border-gray-600/80">
-                <label class="inline-flex items-center gap-2 text-sm text-gray-300 cursor-pointer select-none">
-                    <input type="checkbox" name="incluir_bajas" value="1" {% if incluir_bajas %}checked{% endif %} class="rounded border-gray-600 bg-gray-700 text-cyan-500 focus:ring-cyan-500">
-                    Incluir dados de baja (usuarios con cuenta desactivada)
-                </label>
-            </div>
+            <select name="pais" class="bg-gray-700 text-white rounded px-2 py-1 border border-gray-600 text-xs">
+                <option value="">País</option>
+                {% for codigo, config in paises.items %}
+                <option value="{{ codigo }}" {% if pais_filter == codigo %}selected{% endif %}>{{ config.name|default:codigo }}</option>
+                {% endfor %}
+            </select>
+            <select name="status" class="bg-gray-700 text-white rounded px-2 py-1 border border-gray-600 text-xs">
+                <option value="">Estado</option>
+                <option value="activa" {% if status_filter == 'activa' %}selected{% endif %}>Activa</option>
+                <option value="vencida" {% if status_filter == 'vencida' %}selected{% endif %}>Vencida</option>
+                <option value="trial" {% if status_filter == 'trial' %}selected{% endif %}>Prueba</option>
+            </select>
+            <select name="dias" class="bg-gray-700 text-white rounded px-2 py-1 border border-gray-600 text-xs">
+                <option value="">Días rest.</option>
+                <option value="critico" {% if dias_filter == 'critico' %}selected{% endif %}>🔴 Crítico</option>
+                <option value="advertencia" {% if dias_filter == 'advertencia' %}selected{% endif %}>⚠️ Advertencia</option>
+                <option value="vencido" {% if dias_filter == 'vencido' %}selected{% endif %}>❌ Vencido</option>
+            </select>
+            <input type="text" name="search" value="{{ search_query }}"
+                   placeholder="Nombre, email…"
+                   class="bg-gray-700 text-white rounded px-2 py-1 border border-gray-600 text-xs w-44">
+            <label class="inline-flex items-center gap-1 text-xs text-gray-400 cursor-pointer select-none whitespace-nowrap">
+                <input type="checkbox" name="incluir_bajas" value="1" {% if incluir_bajas %}checked{% endif %} class="rounded border-gray-600 bg-gray-700 text-cyan-500 focus:ring-cyan-500">
+                Incluir bajas
+            </label>
+            <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white text-xs font-semibold py-1 px-3 rounded">
+                🔍 Filtrar
+            </button>
         </form>
-    </div>
-
-    <!-- Estadísticas por País -->
-    <div class="bg-gray-800 rounded-lg p-3 sm:p-4 mb-5 border border-gray-700">
-        <h2 class="text-lg sm:text-xl font-bold text-cyan-400 mb-3">📈 Estadísticas por País</h2>
-        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {% for codigo, stats in stats_por_pais.items %}
-            <div class="bg-gray-700 rounded p-3 min-w-0">
-                <div class="font-bold text-cyan-300 truncate text-sm">{{ stats.nombre }}</div>
-                <div class="text-xs sm:text-sm text-gray-400">Total: {{ stats.total }}</div>
-                <div class="text-xs sm:text-sm text-green-400">Activas: {{ stats.activas }}</div>
-                <div class="text-xs sm:text-sm text-red-400">Vencidas: {{ stats.vencidas }}</div>
-            </div>
-            {% endfor %}
-        </div>
     </div>
 
     <!-- Tabla de Suscriptores: table-fixed + columnas ocultas en breakpoints para evitar scroll horizontal en medianas -->
