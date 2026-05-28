@@ -2,22 +2,14 @@
 {% load i18n %}
 {% load country_url %}
 {% load dal_form_media %}
-{% firstof COLOR_PRIMARIO company_color "#00ffff" as brand_primary_color %}
-{% firstof COLOR_SECUNDARIO secondary_color "#0d6efd" as brand_secondary_color %}
 <!DOCTYPE html>
 <html lang="{{ LANGUAGE_CODE }}">
 <head>
   <meta charset="UTF-8">
   <title>
     {% block title %}
-      {% if request.user.is_authenticated %}
-        {% if company_name %}
-          {{ company_name }} | Panel
-        {% elif request.empresa and request.empresa.nombre_taller %}
-          {{ request.empresa.nombre_taller }} | Panel
-        {% else %}
-          eGarage | Control total
-        {% endif %}
+      {% if request.user.is_authenticated and company_name %}
+        {{ request.empresa.nombre_taller }} | Panel
       {% else %}
         eGarage | Control total
       {% endif %}
@@ -58,12 +50,12 @@
   <style>
     /* Prioridad: COLOR_PRIMARIO desde logo_empresa > company_color desde company_branding > default */
     :root{
-      --company-primary: {{ brand_primary_color }};
-      --company-secondary: {{ brand_secondary_color }};
+      --company-primary: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }};
+      --company-secondary: {{ COLOR_SECUNDARIO|default:secondary_color|default:"#0d6efd" }};
       
       /* Variables de Bootstrap para compatibilidad */
-      --bs-primary: {{ brand_primary_color }};
-      --bs-secondary: {{ brand_secondary_color }};
+      --bs-primary: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }};
+      --bs-secondary: {{ COLOR_SECUNDARIO|default:secondary_color|default:"#0d6efd" }};
     }
     
     /* Estilos base con colores personalizados */
@@ -79,13 +71,13 @@
     
     /* Efectos hover y bordes con transparencia para botones de navegación */
     .nav-button-standard {
-        border-color: {{ brand_primary_color }}4D; /* 4D = 30% opacidad */
+        border-color: {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }}4D; /* 4D = 30% opacidad */
         /* Mejora legibilidad del texto en botones de navegación */
         text-shadow: 0 1px 2px rgba(0,0,0,0.8);
     }
     
     .nav-button-standard:hover {
-        box-shadow: 0 0 20px {{ brand_primary_color }}66; /* 66 = 40% opacidad */
+        box-shadow: 0 0 20px {{ COLOR_PRIMARIO|default:company_color|default:"#00ffff" }}66; /* 66 = 40% opacidad */
         border-color: var(--company-primary);
     }
     .btn-primary:hover{
@@ -93,7 +85,7 @@
       border-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
     }
     .border-primary{border-color:var(--company-primary)!important}
-    .company-logo{max-height:112px;max-width:320px;width:auto;height:auto;object-fit:contain;transition:transform 0.3s ease,filter 0.3s ease}
+    .company-logo{max-height:220px;max-width:500px;object-fit:contain;transition:transform 0.3s ease,filter 0.3s ease}
     .company-logo:hover{transform:scale(1.05);filter:drop-shadow(0 0 25px rgba(0,245,255,0.9))!important}
     .company-header{
       background:linear-gradient(135deg,rgba(10,14,39,0.95) 0%,rgba(15,23,52,0.95) 50%,rgba(10,14,39,0.95) 100%);
@@ -111,16 +103,8 @@
         0 2px 10px rgba(0,0,0,0.8) !important;
       filter:drop-shadow(0 4px 12px rgba(0,212,255,0.5));
       font-weight:900 !important;
-      letter-spacing:0 !important;
-      font-size:clamp(1.15rem,1.8vw,1.55rem) !important;
-      line-height:1.12 !important;
-      animation:none
-    }
-    .company-tagline{
-      font-size:clamp(0.78rem,1.1vw,0.95rem) !important;
-      line-height:1.25 !important;
-      font-weight:500 !important;
-      letter-spacing:0 !important;
+      letter-spacing:2px !important;
+      animation:title-glow 3s ease-in-out infinite
     }
     @keyframes title-glow{
       0%,100%{text-shadow:0 0 20px rgba(0,255,255,1),0 0 40px rgba(0,212,255,0.8),0 0 60px rgba(0,212,255,0.6),0 2px 10px rgba(0,0,0,0.8)}
@@ -289,7 +273,7 @@
         text-shadow: 0 0 4px rgba(0, 212, 255, 0.5) !important;
         opacity: 1 !important;
         visibility: visible !important;
-        white-space: normal !important;
+        white-space: nowrap !important;
         text-align: center !important;
         line-height: 1.2 !important;
         margin-top: 0.15rem !important;
@@ -314,11 +298,11 @@
       }
 
       #main-navigation .flex.flex-col > div:first-child {
-        grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+        grid-template-columns: repeat(5, 1fr);
       }
 
       #main-navigation .flex.flex-col > div:last-child {
-        grid-template-columns: repeat(auto-fit, minmax(82px, 1fr));
+        grid-template-columns: repeat(5, 1fr);
       }
 
       @media (max-width: 480px) {
@@ -389,7 +373,7 @@
         font-weight: 600 !important;
         color: #00d4ff !important;
         text-align: center !important;
-        white-space: normal !important;
+        white-space: nowrap !important;
         margin-top: 0.15rem !important;
       }
 
@@ -453,7 +437,7 @@
         line-height: 1.15 !important;
         text-transform: none !important;
         text-align: center !important;
-        white-space: normal !important;
+        white-space: nowrap !important;
         text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95) !important;
       }
     }
@@ -774,37 +758,35 @@
       {% if LOGO_PERSONALIZADO or company_logo_url or COMPANY_LOGO %}
         {# Logo personalizado de la empresa del suscriptor - Prioridad: LOGO_PERSONALIZADO > company_logo_url > COMPANY_LOGO #}
         <img src="{% if LOGO_PERSONALIZADO %}{{ LOGO_PERSONALIZADO }}{% elif company_logo_url %}{{ company_logo_url }}{% else %}{{ COMPANY_LOGO }}{% endif %}" 
-             alt="{% if NOMBRE_EMPRESA_PERSONALIZADO %}{{ NOMBRE_EMPRESA_PERSONALIZADO }}{% elif company_name %}{{ company_name }}{% elif COMPANY_NAME %}{{ COMPANY_NAME }}{% elif request.empresa and request.empresa.nombre_taller %}{{ request.empresa.nombre_taller }}{% else %}Logo{% endif %}"
-             class="company-logo w-auto object-contain rounded-md shadow-lg border border-opacity-30"
-             style="border-color: {{ brand_primary_color }}; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));">
+             alt="{% if NOMBRE_EMPRESA_PERSONALIZADO %}{{ NOMBRE_EMPRESA_PERSONALIZADO }}{% elif company_name %}{{ request.empresa.nombre_taller }}{% elif COMPANY_NAME %}{{ COMPANY_NAME }}{% else %}Logo{% endif %}"
+             class="company-logo h-24 sm:h-32 w-auto object-contain rounded-lg shadow-2xl border-2 border-opacity-40"
+             style="border-color: {{ COLOR_PRIMARIO|default:company_color|default:'#00ffff' }}; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));">
       {% endif %}
 
       <div class="flex flex-col">
-        <h1 class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-lg sm:text-xl md:text-2xl{% else %}text-2xl sm:text-3xl md:text-4xl{% endif %} font-black bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,255,255,0.8)]" style="font-family: 'Orbitron', 'Arial Black', monospace; letter-spacing: 2px;">
+        <h1 class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-lg sm:text-xl md:text-2xl{% else %}text-3xl sm:text-4xl md:text-5xl{% endif %} font-black bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,255,255,0.8)]" style="font-family: 'Orbitron', 'Arial Black', monospace; letter-spacing: 2px;">
           {% if request.path == '/' or request.path == '' or 'seleccionar_pais' in request.path %}
             eGarage
           {% else %}
             {% if NOMBRE_EMPRESA_PERSONALIZADO %}
               {{ NOMBRE_EMPRESA_PERSONALIZADO }}
             {% elif company_name %}
-              {{ company_name }}
+              {{ request.empresa.nombre_taller }}
             {% elif COMPANY_NAME %}
               {{ COMPANY_NAME }}
-            {% elif request.empresa and request.empresa.nombre_taller %}
-              {{ request.empresa.nombre_taller }}
             {% else %}
               Mi Taller
             {% endif %}
           {% endif %}
         </h1>
         {% if TAGLINE_PERSONALIZADO %}
-          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-sm sm:text-base{% endif %} text-cyan-200 font-medium {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ TAGLINE_PERSONALIZADO }}</span>
+          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ TAGLINE_PERSONALIZADO }}</span>
         {% elif company_tagline %}
-          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-sm sm:text-base{% endif %} text-cyan-200 font-medium {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ company_tagline }}</span>
+          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ company_tagline }}</span>
         {% elif COMPANY_TAGLINE %}
-          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-sm sm:text-base{% endif %} text-cyan-200 font-medium {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ COMPANY_TAGLINE }}</span>
+          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ COMPANY_TAGLINE }}</span>
         {% else %}
-          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-sm sm:text-base{% endif %} text-cyan-200 font-medium {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{% trans "the best in town" %}</span>
+          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{% trans "the best in town" %}</span>
         {% endif %}
       </div>
     </div>
@@ -825,55 +807,64 @@
     {% if request.user.is_authenticated %}
       {# Fila 1: Settings, Center, Clients, Documents, Extra #}
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
-        <a href="{% nav_url 'settings' %}" class="nav-button-standard">
+        <a href="{% country_url 'company_settings' %}" class="nav-button-standard">
           <span class="nav-icon">⚙️</span>
-          <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Ajustes{% else %}{% trans "Settings" %}{% endif %}</span>
+          <span class="nav-text">{% trans "Settings" %}</span>
         </a>
-        <a href="{% nav_url 'center' %}" class="nav-button-standard">
+        <a href="{% country_url 'centro_operaciones' %}" class="nav-button-standard">
           <span class="nav-icon">🚀</span>
-          <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Centro{% else %}{% trans "Center" %}{% endif %}</span>
+          <span class="nav-text">{% trans "Center" %}</span>
         </a>
-        <a href="{% nav_url 'clients' %}" class="nav-button-standard">
+        <a href="{% country_url 'clientes:lista_clientes' %}" class="nav-button-standard">
           <span class="nav-icon">👥</span>
-          <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Clientes{% else %}{% trans "Clients" %}{% endif %}</span>
+          <span class="nav-text">{% trans "Clients" %}</span>
         </a>
-        <a href="{% nav_url 'documents' %}" class="nav-button-standard">
+        <a href="{% country_url 'documentos:lista_documentos' %}" class="nav-button-standard">
           <span class="nav-icon">📄</span>
-          <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Documentos{% else %}{% trans "Documents" %}{% endif %}</span>
+          <span class="nav-text">{% trans "Documents" %}</span>
         </a>
-        <a href="{% nav_url 'extra' %}" class="nav-button-standard">
+        <a href="{% if country == 'US' or request.path|slice:':4' == '/us/' or request.path|slice:':3' == '/us' %}/us/{% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}es{% else %}en{% endif %}/servicios/otros-servicios/{% else %}/cl/es/servicios/otros-servicios/{% endif %}" class="nav-button-standard">
           <span class="nav-icon">⭐</span>
-          <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Extra{% else %}{% trans "Extra" %}{% endif %}</span>
+          <span class="nav-text">{% trans "Extra" %}</span>
         </a>
       </div>
 
       <!-- Row 2: Parts, Reports, Services, Disassembly, Vehicles, Logout -->
       <div class="flex items-center justify-center gap-2 flex-wrap max-w-6xl w-full px-3">
-        <a href="{% nav_url 'parts' %}" class="nav-button-standard">
+        <a href="{% country_url 'repuestos:lista_repuestos' %}" class="nav-button-standard">
           <span class="nav-icon">🔧</span>
-          <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Repuestos{% else %}{% trans "Parts" %}{% endif %}</span>
+          <span class="nav-text">{% trans "Parts" %}</span>
         </a>
-        <a href="{% nav_url 'reports' %}" class="nav-button-standard">
+        <a href="{% country_url 'reportes:reportes_dashboard' %}" class="nav-button-standard">
           <span class="nav-icon">📊</span>
-          <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Reportes{% else %}{% trans "Reports" %}{% endif %}</span>
+          <span class="nav-text">{% trans "Reports" %}</span>
         </a>
-        <a href="{% nav_url 'services' %}" class="nav-button-standard">
+        <a href="{% country_url 'servicios:servicios_menu' %}" class="nav-button-standard">
           <span class="nav-icon">🛠️</span>
-          <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Servicios{% else %}{% trans "Services" %}{% endif %}</span>
+          <span class="nav-text">{% trans "Services" %}</span>
         </a>
-        <a href="{% nav_url 'disassembly' %}" class="nav-button-standard">
+        {% country_url 'desarme:index' as desarme_url %}
+        <a href="{% if desarme_url %}{{ desarme_url }}{% else %}#{% endif %}" class="nav-button-standard">
           <span class="nav-icon">🧩</span>
-          <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Desarme{% else %}{% trans "Disassembly" %}{% endif %}</span>
+          <span class="nav-text">{% trans "Disassembly" %}</span>
         </a>
-        <a href="{% nav_url 'vehicles' %}" class="nav-button-standard">
+        {% country_url 'vehiculos:lista_vehiculos' as vehiculos_url %}
+        {% if vehiculos_url %}
+        <a href="{{ vehiculos_url }}" class="nav-button-standard">
           <span class="nav-icon">🚗</span>
-          <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Vehículos{% else %}{% trans "Vehicles" %}{% endif %}</span>
+          <span class="nav-text">{% trans "Vehicles" %}</span>
         </a>
+        {% else %}
+        <a href="{% country_url 'vehiculos:lista_vehiculos' %}" class="nav-button-standard">
+          <span class="nav-icon">🚗</span>
+          <span class="nav-text">{% trans "Vehicles" %}</span>
+        </a>
+        {% endif %}
         <form action="{% url 'account_logout' %}" method="post" class="inline-block">
           {% csrf_token %}
           <button type="submit" class="nav-button-standard logout-btn" style="cursor: pointer;">
             <span class="nav-icon">🚪</span>
-            <span class="nav-text">{% if request.path|slice:':3' == '/cl' %}Salir{% else %}{% trans "Logout" %}{% endif %}</span>
+            <span class="nav-text">{% trans "Logout" %}</span>
           </button>
         </form>
       </div>
@@ -892,13 +883,43 @@
   </div>
   {% endif %}
 
-  {% if subscription_notice.show %}
+  {% if request.user.is_authenticated and subscription_state != "active" %}
   <div class="px-4 mt-4" aria-live="polite">
-    <div class="mx-auto max-w-6xl rounded-xl border px-4 py-3 shadow-[0_8px_28px_rgba(15,23,42,0.18)] {% if subscription_notice.level == 'blocked' %}border-red-200 bg-red-50 text-red-950{% elif subscription_notice.level == 'grace' %}border-orange-200 bg-orange-50 text-orange-950{% elif subscription_notice.level == 'warning' %}border-amber-200 bg-amber-50 text-amber-950{% else %}border-sky-200 bg-sky-50 text-sky-950{% endif %}">
+    <div class="mx-auto max-w-6xl rounded-2xl border px-4 py-4 shadow-[0_12px_40px_rgba(15,23,42,0.28)] {% if subscription_state == 'blocked' %}border-red-400/60 bg-red-950/80 text-red-50{% else %}border-amber-300/60 bg-amber-950/70 text-amber-50{% endif %}">
       <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p class="text-sm font-medium leading-6">{{ subscription_notice.message }}</p>
-        <a href="{{ subscription_notice.renew_url|default:billing_renew_url|default:'/cl/es/suscripcion/pago/' }}" class="inline-flex min-h-[40px] items-center justify-center rounded-lg px-4 py-2 text-sm font-bold transition-colors {% if subscription_notice.level == 'blocked' %}bg-red-600 text-white hover:bg-red-500{% elif subscription_notice.level == 'grace' %}bg-orange-500 text-white hover:bg-orange-400{% elif subscription_notice.level == 'warning' %}bg-amber-400 text-slate-950 hover:bg-amber-300{% else %}bg-sky-500 text-white hover:bg-sky-400{% endif %}">
-          Renovar ahora
+        <div>
+          {% if request.LANGUAGE_CODE == 'en' %}
+            <p class="text-[11px] font-semibold uppercase tracking-[0.28em] {% if subscription_state == 'blocked' %}text-red-200{% else %}text-amber-200{% endif %}">Subscription status</p>
+            {% if subscription_state == "grace" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Your subscription expired, but you are still within the grace period.</p>
+              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">You keep full access for now, but renewal is already pending.</p>
+            {% elif subscription_state == "restricted" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Some modules are currently restricted due to an overdue subscription.</p>
+              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">You can keep browsing core records, but critical actions remain blocked until renewal.</p>
+            {% elif subscription_state == "blocked" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Your account is suspended due to an overdue subscription.</p>
+              <p class="mt-1 text-xs sm:text-sm text-red-100/80">Only billing, support and account access remain available until renewal.</p>
+            {% endif %}
+          {% else %}
+            <p class="text-[11px] font-semibold uppercase tracking-[0.28em] {% if subscription_state == 'blocked' %}text-red-200{% else %}text-amber-200{% endif %}">Estado de suscripcion</p>
+            {% if subscription_state == "grace" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Tu suscripcion vencio, pero sigues dentro del periodo de gracia.</p>
+              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">Mantienes acceso completo por ahora, pero la renovacion ya esta pendiente.</p>
+            {% elif subscription_state == "restricted" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Algunos modulos estan restringidos por suscripcion vencida.</p>
+              <p class="mt-1 text-xs sm:text-sm text-amber-100/80">Puedes seguir navegando modulos clave, pero las acciones criticas quedan bloqueadas hasta renovar.</p>
+            {% elif subscription_state == "blocked" %}
+              <p class="mt-1 text-sm font-semibold sm:text-base">Tu cuenta esta suspendida por falta de pago.</p>
+              <p class="mt-1 text-xs sm:text-sm text-red-100/80">Solo billing, soporte y cuenta siguen disponibles hasta regularizar la suscripcion.</p>
+            {% endif %}
+          {% endif %}
+        </div>
+        <a href="{{ billing_renew_url|default:'/cl/es/suscripcion/pago/' }}" class="{% if subscription_state == 'blocked' %}bg-red-500 hover:bg-red-400 text-white{% else %}bg-amber-300 hover:bg-amber-200 text-slate-950{% endif %} inline-flex min-h-[44px] items-center justify-center rounded-xl px-4 py-2 text-sm font-bold shadow-[0_8px_24px_rgba(15,23,42,0.24)] transition-colors">
+          {% if request.LANGUAGE_CODE == 'en' %}
+            Go to billing
+          {% else %}
+            Ir a facturacion
+          {% endif %}
         </a>
       </div>
     </div>
@@ -914,9 +935,51 @@
     {% endblock %}
   </main>
 
+  {# --- FOOTER ÚNICO (oculto en login/signup para vista full-screen) --- #}
   {% if not eg_us_signup_slim_header|default:False and '/accounts/login' not in request.path and '/accounts/signup' not in request.path %}
-  <footer style="border-top:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.35);padding:1rem 0;text-align:center;margin-top:auto;">
-    <span style="color:#9ca3af;font-size:0.82rem;">eGarage &bull; &copy; 2026 &bull; <a href="/legal/" style="color:#67e8f9;text-decoration:none;">Legal</a> &bull; All Rights Reserved</span>
+  <footer class="bg-black/80 border-t border-cyan-700/40 py-4 mt-auto">
+    <div class="container mx-auto px-4 text-center">
+      {% if company_settings.address or company_settings.phone or company_settings.email %}
+        <span class="text-xs text-gray-400 block">
+          {% if company_settings.address %}{{ company_settings.address }} {% endif %}
+          {% if company_settings.phone %}• {{ company_settings.phone }} {% endif %}
+          {% if company_settings.email %}• {{ company_settings.email }}{% endif %}
+        </span>
+      {% endif %}
+      <div class="mt-3 flex items-center justify-center gap-3 text-gray-400 text-sm flex-wrap">
+        <span class="font-medium">eGarage</span>
+        <span aria-hidden="true">•</span>
+        <span>© 2025</span>
+        <span aria-hidden="true">•</span>
+        <a href="mailto:{{ support_email }}" class="text-cyan-400 hover:underline">
+          {{ support_email }}
+        </a>
+        <span aria-hidden="true">•</span>
+        <a href="https://wa.me/{{ support_whatsapp_wa_me }}?text={% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' or LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}Hola,%20necesito%20ayuda%20con%20eGarage{% else %}Hi,%20I%20need%20help%20with%20eGarage{% endif %}" 
+           target="_blank" 
+           rel="noopener noreferrer"
+           class="text-green-400 hover:underline flex items-center gap-1">
+          <i class="fab fa-whatsapp"></i>
+          {{ support_whatsapp_display }}
+        </a>
+        <span aria-hidden="true">•</span>
+        <a href="/legal/" class="text-cyan-400 hover:underline">
+          {% if request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
+            Términos y Privacidad
+          {% else %}
+            Legal
+          {% endif %}
+        </a>
+        {% if request.LANGUAGE_CODE == 'es' or LANGUAGE_CODE == 'es' %}
+        <span aria-hidden="true">•</span>
+        <a href="/legal/#proteccion-datos-tributarios" class="text-emerald-400 hover:underline text-xs">
+          Datos Tributarios
+        </a>
+        {% endif %}
+        <span aria-hidden="true">•</span>
+        <span class="text-xs text-gray-500">All Rights Reserved</span>
+      </div>
+    </div>
   </footer>
   {% endif %}
 
@@ -978,6 +1041,10 @@
   {% block extra_js %}{% endblock %}
   {# JS de form.media (DAL/Select2) - UNA SOLA VEZ por request para evitar "select2 has already been registered" #}
   {% if form %}{% form_media_once form 'js' %}{% endif %}
+  {# TEMP: desactivar starfield para probar scroll en móviles #}
+  {# {% if enable_space_bg|default:1 and enable_space_bg != 2 %}
+    <script src="{% static 'js/starfield.js' %}"></script>
+  {% endif %} #}
 
   <script>
     // CSRF helper
@@ -1148,7 +1215,6 @@
     }
   </script>
   {% endif %}
-<script src="{% static 'js/password-toggle.js' %}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script>
 console.log("?? CUSTOM TABS LOADED");
@@ -1186,5 +1252,9 @@ document.addEventListener("DOMContentLoaded", function() {
     activateTab("#profile");
 });
 </script>
+<script src="{% static 'js/password-toggle.js' %}"></script>
 </body>
 </html>
+
+
+
