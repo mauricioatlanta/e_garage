@@ -342,7 +342,7 @@
     }
 
     function openVehiculoModal() {
-        var trigger = document.getElementById('btn-nuevo-vehiculo');
+        var trigger = document.getElementById('btn-nuevo-vehiculo') || document.getElementById('btn-nuevo-vehiculo-empty');
         var baseUrl = trigger && trigger.dataset ? trigger.dataset.urlCrearVehiculo : '';
         if (!baseUrl || !EG.utils || !EG.utils.buildContextualCreateUrl) {
             return;
@@ -384,14 +384,16 @@
             updateVehiculoCard();
         });
 
-        var btnNuevoVehiculo = document.getElementById('btn-nuevo-vehiculo');
-        if (btnNuevoVehiculo && !btnNuevoVehiculo.dataset.egBound) {
-            btnNuevoVehiculo.dataset.egBound = '1';
-            btnNuevoVehiculo.addEventListener('click', function(event) {
-                event.preventDefault();
-                openVehiculoModal();
-            });
-        }
+        ['btn-nuevo-vehiculo', 'btn-nuevo-vehiculo-empty'].forEach(function(id) {
+            var btn = document.getElementById(id);
+            if (btn && !btn.dataset.egBound) {
+                btn.dataset.egBound = '1';
+                btn.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    openVehiculoModal();
+                });
+            }
+        });
 
         if (els.vehiculoSelect.value) {
             updateVehiculoCard();
