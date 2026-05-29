@@ -75,52 +75,39 @@
                     {% endif %}
                 </div>
 
-                <!-- Bilingual Names (Optional) -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div class="space-y-2">
-                        <label for="{{ form.nombre_es.id_for_label }}" class="block text-cyan-400 font-semibold">
-                            {% if language == 'en' %}
-                                Name (Spanish)
-                            {% else %}
-                                Nombre (Español)
-                            {% endif %}
-                        </label>
-                        <input type="text" 
-                               name="{{ form.nombre_es.name }}" 
-                               id="{{ form.nombre_es.id_for_label }}"
-                               value="{{ form.nombre_es.value|default:'' }}"
-                               class="space-input w-full {% if form.nombre_es.errors %}border-red-500{% endif %}"
-                               placeholder="{% if language == 'en' %}Spanish translation{% else %}Traducción en español{% endif %}">
-                        {% if form.nombre_es.errors %}
-                        <div class="text-red-400 text-sm mt-1">
-                            {{ form.nombre_es.errors.0 }}
-                        </div>
-                        {% endif %}
-                    </div>
-
-                    <div class="space-y-2">
-                        <label for="{{ form.nombre_en.id_for_label }}" class="block text-cyan-400 font-semibold">
-                            {% if language == 'en' %}
-                                Name (English)
-                            {% else %}
-                                Nombre (Inglés)
-                            {% endif %}
-                        </label>
-                        <input type="text" 
-                               name="{{ form.nombre_en.name }}" 
-                               id="{{ form.nombre_en.id_for_label }}"
-                               value="{{ form.nombre_en.value|default:'' }}"
-                               class="space-input w-full {% if form.nombre_en.errors %}border-red-500{% endif %}"
-                               placeholder="{% if language == 'en' %}English translation{% else %}Traducción en inglés{% endif %}">
-                        {% if form.nombre_en.errors %}
-                        <div class="text-red-400 text-sm mt-1">
-                            {{ form.nombre_en.errors.0 }}
-                        </div>
-                        {% endif %}
-                    </div>
+                <!-- Translation field: only show relevant language -->
+                {% if language == 'en' %}
+                <div class="space-y-2">
+                    <label for="{{ form.nombre_en.id_for_label }}" class="block text-cyan-400 font-semibold">
+                        Name (English)
+                    </label>
+                    <input type="text"
+                           name="{{ form.nombre_en.name }}"
+                           id="{{ form.nombre_en.id_for_label }}"
+                           value="{{ form.nombre_en.value|default:'' }}"
+                           class="space-input w-full {% if form.nombre_en.errors %}border-red-500{% endif %}"
+                           placeholder="English translation">
+                    {% if form.nombre_en.errors %}
+                    <div class="text-red-400 text-sm mt-1">{{ form.nombre_en.errors.0 }}</div>
+                    {% endif %}
                 </div>
-
-                <!-- Subcategory -->
+                {% else %}
+                <div class="space-y-2">
+                    <label for="{{ form.nombre_es.id_for_label }}" class="block text-cyan-400 font-semibold">
+                        Nombre (Español)
+                    </label>
+                    <input type="text"
+                           name="{{ form.nombre_es.name }}"
+                           id="{{ form.nombre_es.id_for_label }}"
+                           value="{{ form.nombre_es.value|default:'' }}"
+                           class="space-input w-full {% if form.nombre_es.errors %}border-red-500{% endif %}"
+                           placeholder="Traducción en español">
+                    {% if form.nombre_es.errors %}
+                    <div class="text-red-400 text-sm mt-1">{{ form.nombre_es.errors.0 }}</div>
+                    {% endif %}
+                </div>
+                {% endif %}
+                                <!-- Subcategory -->
                 <div class="space-y-2">
                     <label for="{{ form.subcategoria.id_for_label }}" class="block text-cyan-400 font-semibold">
                         {% if language == 'en' %}
