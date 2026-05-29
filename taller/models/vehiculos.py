@@ -228,10 +228,8 @@ class Vehiculo(TenantScoped):
     def display_label(self):
         """Helper de etiqueta para listar en el select AJAX"""
         parts = []
-        if self.patente:
-            parts.append(self.patente)
-        elif self.vin:
-            parts.append(self.vin)
+        if self.anio:
+            parts.append(str(self.anio))
 
         marca = self.get_marca_display()
         modelo = self.get_modelo_display()
@@ -240,8 +238,11 @@ class Vehiculo(TenantScoped):
             parts.append(marca)
         if modelo and modelo != "Sin modelo":
             parts.append(modelo)
-        if self.anio:
-            parts.append(str(self.anio))
+
+        if self.patente:
+            parts.append(self.patente)
+        elif self.vin:
+            parts.append(self.vin)
 
         return " · ".join(parts) or f"Vehículo {self.pk}"
 

@@ -396,10 +396,19 @@ def crear_vehiculo(request, *args, **kwargs):
                             or request.GET.get("cliente_id")
                             or request.GET.get("cliente")
                         )
+                        cliente_obj = getattr(vehiculo, "cliente", None)
+                        cliente_label = ""
+                        if cliente_obj:
+                            cliente_label = (
+                                getattr(cliente_obj, "nombre_completo", None)
+                                or getattr(cliente_obj, "razon_social", None)
+                                or str(cliente_obj)
+                            )
                         redirect_url = build_context_return_url(
                             return_to,
                             {
                                 "cliente_id": cliente_id,
+                                "created_cliente_label": cliente_label,
                                 "vehiculo_id": vehiculo.id,
                                 "created_vehiculo_id": vehiculo.id,
                                 "created_vehiculo_label": vehiculo.display_label(),
