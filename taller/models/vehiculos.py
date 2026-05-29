@@ -6,7 +6,13 @@ from django.urls import reverse
 from core.models import TenantScoped
 
 from .clientes import Cliente
-from .extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
+from .extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    ColorVehiculo,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
 from .marca import Marca
 from .modelo import Modelo
 
@@ -86,6 +92,22 @@ class Vehiculo(TenantScoped):
     vin = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     motor = models.ForeignKey(MotorVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
     caja = models.ForeignKey(CajaVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
+    motor_empresa = models.ForeignKey(
+        MotorVehiculoEmpresa,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vehiculos",
+        verbose_name="Motor privado",
+    )
+    caja_empresa = models.ForeignKey(
+        CajaVehiculoEmpresa,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vehiculos",
+        verbose_name="Caja privada",
+    )
     tipo_carroceria = models.CharField(
         max_length=80,
         blank=True,
@@ -105,7 +127,30 @@ class Vehiculo(TenantScoped):
         blank=True,
         help_text="Ubicación en la yarda (ej: fila 3, posición 12)",
     )
+
     fecha_baja_desarme = models.DateField(null=True, blank=True)
+    monto_chatarra = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Monto venta chatarra",
+        help_text="Monto recibido al dar de baja el vehículo como chatarra",
+    )
+    otros_gastos_desarme = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Otros gastos de adquisición",
+    )
+    transporte_grua_desarme = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Costo transporte/grúa",
+    )
     observaciones_desarme = models.TextField(blank=True, null=True)
     # Vendedor estructurado (evita duplicados, permite reportes)
     vendedor_desarme = models.ForeignKey(
@@ -171,6 +216,14 @@ class Vehiculo(TenantScoped):
         elif self.modelo:
             return str(self.modelo)
         return "Sin modelo"
+
+    @property
+    def motor_display(self):
+        return self.motor_empresa or self.motor
+
+    @property
+    def caja_display(self):
+        return self.caja_empresa or self.caja
 
     def display_label(self):
         """Helper de etiqueta para listar en el select AJAX"""

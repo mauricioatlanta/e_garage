@@ -8,6 +8,7 @@ from taller.config.country_settings import CountrySettings
 from taller.services.registration_service import RegistrationService
 from taller.services.registro_embudo_service import registrar_signup
 from taller.utils.country_config import get_country_config
+from taller.utils.plan_catalog import normalize_plan_code
 
 
 class CustomSignupForm(SignupForm):
@@ -503,9 +504,10 @@ class CustomSignupForm(SignupForm):
         # ✅ Telefono opcional - usar valor normalizado o vacío
         telefono_usuario = data.get("telefono", "").strip() if data.get("telefono") else ""
 
-        # ✅ Plan seleccionado por el usuario (trial, mensual, semestral, anual)
+        # ✅ Plan seleccionado por el usuario. Mantiene entrada legacy, guarda moderno.
         plan_type = (request.POST.get("plan", "") or "trial").strip().lower()
-        if plan_type not in ("trial", "mensual", "semestral", "anual"):
+        plan_type = normalize_plan_code(plan_type)
+        if plan_type not in ("trial", "entry", "growth", "business"):
             plan_type = "trial"
 
         try:

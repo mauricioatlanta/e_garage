@@ -70,31 +70,9 @@ class Migration(migrations.Migration):
                 "abstract": False,
             },
         ),
-        # RegistroEmbudoSuscriptor: idempotente - crear solo si no existe.
-        migrations.RunSQL(
-            sql="""
-            CREATE TABLE IF NOT EXISTS taller_registroembudosuscriptor (
-                id INTEGER PRIMARY KEY ,
-                pais VARCHAR(5) NOT NULL,
-                fecha_registro DATETIME NOT NULL,
-                email_confirmado_at DATETIME NULL,
-                primer_login_at DATETIME NULL,
-                empresa_creada_at DATETIME NULL,
-                obtuvo_trial SMALLINT NOT NULL DEFAULT 0,
-                trial_started_at DATETIME NULL,
-                trial_ends_at DATETIME NULL,
-                created_at DATETIME NOT NULL,
-                updated_at DATETIME NOT NULL,
-                user_id INTEGER NOT NULL UNIQUE REFERENCES auth_user(id)
-            );
-            """,
-            reverse_sql="DROP TABLE IF EXISTS taller_registroembudosuscriptor;",
-        ),
-        migrations.SeparateDatabaseAndState(
-            state_operations=[
-                migrations.CreateModel(
-                    name="RegistroEmbudoSuscriptor",
-                    fields=[
+        migrations.CreateModel(
+            name="RegistroEmbudoSuscriptor",
+            fields=[
                         (
                             "id",
                             models.BigAutoField(
@@ -173,15 +151,12 @@ class Migration(migrations.Migration):
                         ),
                         ("created_at", models.DateTimeField(auto_now_add=True)),
                         ("updated_at", models.DateTimeField(auto_now=True)),
-                    ],
-                    options={
-                        "verbose_name": "Embudo de Registro Suscriptor",
-                        "verbose_name_plural": "Embudo de Registro Suscriptores",
-                        "ordering": ["-fecha_registro"],
-                    },
-                ),
             ],
-            database_operations=[],
+            options={
+                "verbose_name": "Embudo de Registro Suscriptor",
+                "verbose_name_plural": "Embudo de Registro Suscriptores",
+                "ordering": ["-fecha_registro"],
+            },
         ),
         migrations.RemoveField(
             model_name="checklistingreso",

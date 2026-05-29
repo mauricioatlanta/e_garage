@@ -11,7 +11,12 @@ from django.db.models import Q, Value, CharField
 from django.db.models.functions import Coalesce, Concat
 
 from taller.models.clientes import Cliente
-from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
+from taller.models.extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
 from taller.models.modelo import Modelo
 
 logger = logging.getLogger(__name__)
@@ -176,143 +181,91 @@ def _get_country_from_request(request):
     return "CL"
 
 
-class MotorAutocomplete(autocomplete.Select2QuerySetView):
+class MotorAutocomplete(autocomplete.Select2ListView):
     """
     Autocompletado para motores con soporte de tags (creación al vuelo)
     Filtrado por país y modelo (si se proporciona)
     """
 
-    def get_queryset(self):
-        """Base queryset filtrado por país y modelo"""
+    def get_list(self):
+        """Lista mixta: catálogo global eGarage + motores privados de la empresa."""
         if not self.request.user.is_authenticated:
-            return MotorVehiculo.objects.none()
+            return []
 
         country = _get_country_from_request(self.request)
-        qs = MotorVehiculo.objects.filter(country=country)
+        empresa = getattr(self.request.user, "empresa", None)
+        global_qs = MotorVehiculo.objects.filter(country=country)
 
-        # Filtrar por modelo si se proporciona (via forward o GET)
-        modelo_id = self.forwarded.get("modelo") or self.request.GET.get("modelo_id")
-        if modelo_id:
-            try:
-                modelo = Modelo.objects.get(pk=modelo_id, country=country)
-                # Filtrar motores que están asociados a este modelo
-                qs = qs.filter(modelos=modelo)
-            except Modelo.DoesNotExist:
-                pass
-
-        # Filtrar por término de búsqueda
-        if self.q:
-            qs = qs.filter(nombre__icontains=self.q)
-
-        return qs.order_by("nombre")
-
-    def get_result_label(self, result):
-        """Etiqueta para mostrar en el dropdown"""
-        return result.nombre
-
-    def get_result_value(self, result):
-        """Valor que se guarda (ID del motor)"""
-        return result.pk
-
-    def create_option(self, text, page=None):
-        """
-        Permite crear un nuevo motor cuando el usuario escribe un término que no existe.
-        Este método es llamado por ModelSelect2TagWidget cuando se detecta un nuevo tag.
-        """
-        # Obtener país
-        country = _get_country_from_request(self.request)
-
-        # Obtener modelo si está disponible
         modelo_id = self.forwarded.get("modelo") or self.request.GET.get("modelo_id")
         modelo = None
         if modelo_id:
             try:
                 modelo = Modelo.objects.get(pk=modelo_id, country=country)
+                global_qs = global_qs.filter(modelos=modelo)
             except Modelo.DoesNotExist:
-                pass
+                global_qs = MotorVehiculo.objects.none()
 
-        # Crear el nuevo motor
-        motor, created = MotorVehiculo.objects.get_or_create(
-            nombre=text.strip(), country=country, defaults={"nombre": text.strip()}
-        )
+        if self.q:
+            global_qs = global_qs.filter(nombre__icontains=self.q)
 
-        # Asociar al modelo si está disponible
-        if modelo and hasattr(motor, "modelos"):
-            motor.modelos.add(modelo)
+        results = [(str(obj.pk), obj.nombre) for obj in global_qs.order_by("nombre")]
 
-        return {
-            "id": str(motor.pk),
-            "text": motor.nombre,
-            "create_id": True,
-        }
+        if empresa and modelo:
+            private_qs = MotorVehiculoEmpresa.objects.filter(
+                empresa=empresa,
+                modelo=modelo,
+                country=country,
+            )
+            if self.q:
+                private_qs = private_qs.filter(nombre__icontains=self.q)
+            results.extend(
+                (f"empresa:{obj.pk}", f"{obj.nombre} (privado)")
+                for obj in private_qs.order_by("nombre")
+            )
+
+        return results
 
 
-class CajaAutocomplete(autocomplete.Select2QuerySetView):
+class CajaAutocomplete(autocomplete.Select2ListView):
     """
     Autocompletado para cajas con soporte de tags (creación al vuelo)
     Filtrado por país y modelo (si se proporciona)
     """
 
-    def get_queryset(self):
-        """Base queryset filtrado por país y modelo"""
+    def get_list(self):
+        """Lista mixta: catálogo global eGarage + cajas privadas de la empresa."""
         if not self.request.user.is_authenticated:
-            return CajaVehiculo.objects.none()
+            return []
 
         country = _get_country_from_request(self.request)
-        qs = CajaVehiculo.objects.filter(country=country)
+        empresa = getattr(self.request.user, "empresa", None)
+        global_qs = CajaVehiculo.objects.filter(country=country)
 
-        # Filtrar por modelo si se proporciona (via forward o GET)
-        modelo_id = self.forwarded.get("modelo") or self.request.GET.get("modelo_id")
-        if modelo_id:
-            try:
-                modelo = Modelo.objects.get(pk=modelo_id, country=country)
-                # Filtrar cajas que están asociadas a este modelo
-                qs = qs.filter(modelos=modelo)
-            except Modelo.DoesNotExist:
-                pass
-
-        # Filtrar por término de búsqueda
-        if self.q:
-            qs = qs.filter(nombre__icontains=self.q)
-
-        return qs.order_by("nombre")
-
-    def get_result_label(self, result):
-        """Etiqueta para mostrar en el dropdown"""
-        return result.nombre
-
-    def get_result_value(self, result):
-        """Valor que se guarda (ID de la caja)"""
-        return result.pk
-
-    def create_option(self, text, page=None):
-        """
-        Permite crear una nueva caja cuando el usuario escribe un término que no existe.
-        Este método es llamado por ModelSelect2TagWidget cuando se detecta un nuevo tag.
-        """
-        # Obtener país
-        country = _get_country_from_request(self.request)
-
-        # Obtener modelo si está disponible
         modelo_id = self.forwarded.get("modelo") or self.request.GET.get("modelo_id")
         modelo = None
         if modelo_id:
             try:
                 modelo = Modelo.objects.get(pk=modelo_id, country=country)
+                global_qs = global_qs.filter(modelos=modelo)
             except Modelo.DoesNotExist:
-                pass
+                global_qs = CajaVehiculo.objects.none()
 
-        # Crear la nueva caja
-        caja, created = CajaVehiculo.objects.get_or_create(
-            nombre=text.strip(), country=country, defaults={"nombre": text.strip()}
-        )
+        if self.q:
+            global_qs = global_qs.filter(nombre__icontains=self.q)
 
-        # Asociar al modelo si está disponible
-        if modelo and hasattr(caja, "modelos"):
-            caja.modelos.add(modelo)
+        results = [(str(obj.pk), obj.nombre) for obj in global_qs.order_by("nombre")]
 
-        return {
-            "id": str(caja.pk),
-            "text": caja.nombre,
-            "create_id": True,
-        }
+        if empresa and modelo:
+            private_qs = CajaVehiculoEmpresa.objects.filter(
+                empresa=empresa,
+                modelo=modelo,
+                country=country,
+            )
+            if self.q:
+                private_qs = private_qs.filter(nombre__icontains=self.q)
+            results.extend(
+                (f"empresa:{obj.pk}", f"{obj.nombre} (privada)")
+                for obj in private_qs.order_by("nombre")
+            )
+
+        return results

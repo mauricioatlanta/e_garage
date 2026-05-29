@@ -104,6 +104,18 @@ class CompanyProfileForm(forms.ModelForm):
 class FinancialSettingsForm(forms.ModelForm):
     """Formulario para configuración financiera (moneda, impuestos)"""
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Chile: IVA 19% por defecto, pero no bloquear guardado si el campo no llega en POST.
+        if "tax_rate" in self.fields:
+            self.fields["tax_rate"].required = False
+            self.fields["tax_rate"].initial = 19.00
+
+        if self.instance and getattr(self.instance, "tax_rate", None) in (None, ""):
+            self.instance.tax_rate = 19.00
+
+
     class Meta:
         model = CompanySettings
         fields = [

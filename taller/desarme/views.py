@@ -262,12 +262,12 @@ def index(request):
     # Últimos vehículos
     ultimos_vehiculos = (
         base_qs.select_related("marca", "modelo")
-        .annotate(piezas_count=Count("piezas_desarme"))
+        .annotate(repuestos_count=Count("piezas_desarme"))
         .order_by("-fecha_ingreso_desarme", "-id")[:6]
     )
 
-    # Piezas recientes (últimas 5)
-    ultimas_piezas = piezas_qs.select_related("vehiculo").filter(activo=True).order_by("-id")[:5]
+    # Repuestos recientes (últimos 5)
+    ultimas_repuestos = piezas_qs.select_related("vehiculo").filter(activo=True).order_by("-id")[:5]
 
     return render(
         request,
@@ -277,13 +277,13 @@ def index(request):
             "eg_desarme_dashboard_compact": True,
             "empresa": empresa,
             "total_vehiculos": total_vehiculos,
-            "total_piezas": total_piezas,
-            "piezas_activas": piezas_activas,
+            "total_repuestos": total_piezas,
+            "repuestos_activas": piezas_activas,
             "inventario_valor": inventario_valor,
-            "chart_piezas_estado": chart_piezas_estado,
+            "chart_repuestos_estado": chart_piezas_estado,
             "chart_vehiculos_mes": chart_vehiculos_mes,
             "ultimos_vehiculos": ultimos_vehiculos,
-            "ultimas_piezas": ultimas_piezas,
+            "ultimas_repuestos": ultimas_repuestos,
         },
     )
 
@@ -345,6 +345,8 @@ def lista_vehiculos(request):
         .order_by("estado_desarme")
     )
 
+    empresa_moneda = empresa.formato_moneda
+
     # Respuesta parcial para búsqueda en tiempo real (AJAX)
     if request.GET.get("partial") or request.headers.get("X-Requested-With") == "XMLHttpRequest":
         return render(
@@ -354,6 +356,7 @@ def lista_vehiculos(request):
                 "vehiculos": qs,
                 "q": q,
                 "estado_filtro": estado,
+                "empresa_moneda": empresa_moneda,
             },
         )
 
@@ -366,6 +369,7 @@ def lista_vehiculos(request):
             "q": q,
             "estado_filtro": estado,
             "estados": list(estados),
+            "empresa_moneda": empresa_moneda,
         },
     )
 
@@ -390,8 +394,11 @@ def crear_vehiculo(request):
                 messages.success(
                     request, f"Vehículo de desarme {vehiculo.patente or vehiculo.vin} creado."
                 )
-                # Generar inventario automático y redirigir al Scanner
-                generar_inventario_vehiculo(vehiculo, empresa)
+                try:
+                    generar_inventario_vehiculo(vehiculo, empresa)
+                except Exception as inv_err:
+                    log.exception("Error generando inventario para vehículo pk=%s", vehiculo.pk)
+                    messages.warning(request, f"Vehículo guardado, pero falló la generación del inventario: {inv_err}")
                 return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/scanner/"))
             except IntegrityError:
                 messages.error(
@@ -408,16 +415,21 @@ def crear_vehiculo(request):
     return render(
         request,
         "taller/desarme/vehiculo_form.html",
-        {"form": form, "empresa": empresa, "titulo": "Nuevo vehículo de desarme"},
+        {"form": form, "empresa": empresa, "titulo": "Nuevo vehículo de desarme", "empresa_moneda": empresa.formato_moneda},
     )
 
 
 @login_required
 def ver_vehiculo(request, pk):
-    """Detalle de un vehículo de desarme con resumen operativo (piezas activas/vendidas, costo)."""
+    """Detalle rediseñado: cabecera, compra, resumen piezas, P&L y recientes. Solo propietario."""
     empresa = _empresa_or_redirect(request)
     if not empresa:
         return redirect("/")
+
+    es_propietario = getattr(empresa, "user_id", None) == request.user.id
+    if not es_propietario and not request.user.is_superuser:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("Acceso restringido al propietario de la cuenta.")
 
     vehiculo = get_object_or_404(
         Vehiculo,
@@ -425,24 +437,57 @@ def ver_vehiculo(request, pk):
         empresa=empresa,
         tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
+
+    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
+
     piezas = list(
         vehiculo.piezas_desarme.filter(activo=True)
         .prefetch_related("names", "company_labels")
         .order_by("codigo")
     )
-    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
     for p in piezas:
         p.display_nombre = p.get_display_label(empresa=empresa, language=lang)
-    piezas_activas_count = len(piezas)
-    piezas_vendidas_count = vehiculo.piezas_desarme.filter(estado_pieza=ESTADO_VENDIDA).count()
+
     disponibles = sum(1 for p in piezas if p.estado_pieza == ESTADO_DISPONIBLE)
+    vendidas = vehiculo.piezas_desarme.filter(estado_pieza=ESTADO_VENDIDA).count()
     danadas = sum(1 for p in piezas if p.estado_pieza == ESTADO_DANADA)
     faltantes = sum(1 for p in piezas if p.estado_pieza == ESTADO_FALTANTE)
+    total_piezas_count = disponibles + vendidas + danadas + faltantes
+
     valor_potencial = sum(
         (p.precio_venta_sugerido or Decimal("0")) * p.cantidad
         for p in piezas
         if p.estado_pieza in (ESTADO_DISPONIBLE, ESTADO_RESERVADA)
     )
+
+    costo_compra = vehiculo.precio_compra or Decimal("0")
+    costo_transporte = vehiculo.transporte_grua_desarme or Decimal("0")
+    costo_otros = vehiculo.otros_gastos_desarme or Decimal("0")
+    costo_total = costo_compra + costo_transporte + costo_otros
+
+    total_recaudado = (
+        LineaRepuesto.objects.filter(
+            origen_repuesto=ORIGEN_DESARME,
+            pieza_desarme__vehiculo=vehiculo,
+        ).aggregate(total=Sum(F("precio_unitario") * F("cantidad")))["total"]
+        or Decimal("0")
+    )
+
+    ganancia_neta = total_recaudado - costo_total
+    proyeccion_total = total_recaudado + valor_potencial - costo_total
+    monto_chatarra = vehiculo.monto_chatarra or Decimal("0")
+    es_dado_de_baja = bool(vehiculo.fecha_baja_desarme)
+    ganancia_final = (
+        total_recaudado + monto_chatarra - costo_total if es_dado_de_baja else ganancia_neta
+    )
+
+    repuestos_recientes = list(
+        vehiculo.piezas_desarme.filter(activo=True)
+        .prefetch_related("names", "company_labels")
+        .order_by("-id")[:5]
+    )
+    for p in repuestos_recientes:
+        p.display_nombre = p.get_display_label(empresa=empresa, language=lang)
 
     return render(
         request,
@@ -451,14 +496,77 @@ def ver_vehiculo(request, pk):
             "vehiculo": vehiculo,
             "piezas": piezas,
             "empresa": empresa,
-            "piezas_activas_count": piezas_activas_count,
-            "piezas_vendidas_count": piezas_vendidas_count,
+            "empresa_moneda": empresa.formato_moneda,
+            "es_dado_de_baja": es_dado_de_baja,
+            "es_superusuario": request.user.is_superuser,
             "disponibles": disponibles,
+            "vendidas": vendidas,
             "danadas": danadas,
             "faltantes": faltantes,
+            "total_piezas_count": total_piezas_count,
             "valor_potencial": valor_potencial,
+            "costo_total": costo_total,
+            "costo_compra": costo_compra,
+            "costo_transporte": costo_transporte,
+            "costo_otros": costo_otros,
+            "total_recaudado": total_recaudado,
+            "ganancia_neta": ganancia_neta,
+            "proyeccion_total": proyeccion_total,
+            "monto_chatarra": monto_chatarra,
+            "ganancia_final": ganancia_final,
+            "repuestos_recientes": repuestos_recientes,
         },
     )
+
+
+@login_required
+@require_POST
+def dar_de_baja_vehiculo(request, pk):
+    """Marca un vehículo de desarme como dado de baja. Solo para el propietario de la cuenta."""
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    es_propietario = getattr(empresa, "user_id", None) == request.user.id
+    if not es_propietario and not request.user.is_superuser:
+        from django.http import HttpResponseForbidden
+        return HttpResponseForbidden("Acceso restringido al propietario de la cuenta.")
+
+    vehiculo = get_object_or_404(
+        Vehiculo,
+        pk=pk,
+        empresa=empresa,
+        tipo_uso=Vehiculo.TIPO_USO_DESARME,
+    )
+
+    if vehiculo.fecha_baja_desarme:
+        messages.warning(request, "Este vehículo ya está dado de baja.")
+        return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/"))
+
+    from decimal import InvalidOperation as _InvalidOp
+
+    monto_raw = request.POST.get("monto_chatarra", "").strip().replace(".", "").replace(",", "")
+    try:
+        monto = Decimal(monto_raw) if monto_raw else Decimal("0")
+        if monto < 0:
+            monto = Decimal("0")
+    except (_InvalidOp, ValueError):
+        monto = Decimal("0")
+
+    observaciones = request.POST.get("observaciones_baja", "").strip()
+
+    vehiculo.fecha_baja_desarme = timezone.now().date()
+    vehiculo.monto_chatarra = monto
+    update_fields = ["fecha_baja_desarme", "monto_chatarra"]
+    if observaciones:
+        existing = (vehiculo.observaciones_desarme or "").rstrip()
+        sep = "\n" if existing else ""
+        vehiculo.observaciones_desarme = f"{existing}{sep}[BAJA] {observaciones}"
+        update_fields.append("observaciones_desarme")
+    vehiculo.save(update_fields=update_fields)
+
+    messages.success(request, f"Vehículo dado de baja el {vehiculo.fecha_baja_desarme}.")
+    return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/"))
 
 
 @login_required
@@ -502,6 +610,7 @@ def editar_vehiculo(request, pk):
             "vehiculo": vehiculo,
             "empresa": empresa,
             "titulo": "Editar vehículo de desarme",
+            "empresa_moneda": empresa.formato_moneda,
         },
     )
 
@@ -515,13 +624,23 @@ def lista_piezas(request):
 
     piezas = (
         PiezaDesarme.objects.filter(empresa=empresa)
-        .select_related("vehiculo")
+        .select_related("vehiculo", "vehiculo__marca", "vehiculo__modelo")
         .order_by("vehiculo__patente", "codigo")
     )
 
     q = request.GET.get("q", "").strip()
     if q:
-        piezas = piezas.filter(Q(codigo__icontains=q) | Q(nombre__icontains=q))
+        for term in q.split():
+            piezas = piezas.filter(
+                Q(codigo__icontains=term)
+                | Q(nombre__icontains=term)
+                | Q(vehiculo__patente__icontains=term)
+                | Q(vehiculo__vin__icontains=term)
+                | Q(vehiculo__marca_texto__icontains=term)
+                | Q(vehiculo__modelo_texto__icontains=term)
+                | Q(vehiculo__marca__nombre__icontains=term)
+                | Q(vehiculo__modelo__nombre__icontains=term)
+            )
 
     estado = request.GET.get("estado", "").strip()
     if estado:
@@ -538,6 +657,9 @@ def lista_piezas(request):
     )
     from taller.models.pieza_desarme import ESTADO_PIEZA_CHOICES
 
+    return_to = request.GET.get("return_to", "").strip()
+    select_field = request.GET.get("select_field", "").strip()
+
     return render(
         request,
         "taller/desarme/lista_piezas.html",
@@ -549,6 +671,8 @@ def lista_piezas(request):
             "vehiculo_filtro": vehiculo_id,
             "vehiculos_choices": vehiculos_choices,
             "estado_pieza_choices": ESTADO_PIEZA_CHOICES,
+            "return_to": return_to,
+            "select_field": select_field,
         },
     )
 
@@ -697,6 +821,7 @@ def inventario_vehiculo(request, pk):
         {
             "vehiculo": vehiculo,
             "piezas": piezas,
+            "repuestos": piezas,
             "empresa": empresa,
             "total_piezas": total_piezas,
             "disponibles": disponibles,
@@ -704,6 +829,7 @@ def inventario_vehiculo(request, pk):
             "faltantes": faltantes,
             "valor_potencial": valor_potencial,
             "piezas_json": piezas_json,
+            "repuestos_json": piezas_json,
         },
     )
 
@@ -1084,3 +1210,86 @@ def api_piezas_bulk_precio(request):
             p.save(update_fields=["precio_venta_sugerido"])
             updated += 1
     return JsonResponse({"success": True, "updated": updated, "factor": str(factor)})
+
+
+@login_required
+@require_POST
+def iniciar_venta_desde_lista(request):
+    """
+    Inicia una venta desde la lista de repuestos (carrito multi-vehículo),
+    guardando un prefill de repuestos en sesión y redirigiendo al formulario de documentos.
+    """
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+    pieza_ids = request.POST.getlist("pieza_ids") or []
+    pieza_ids_int = []
+    for raw_id in pieza_ids:
+        try:
+            pieza_ids_int.append(int(raw_id))
+        except (TypeError, ValueError):
+            continue
+    if not pieza_ids_int:
+        messages.warning(request, "No se seleccionaron repuestos para la venta.")
+        return redirect(_desarme_url(request, "piezas/"))
+    valid_estados = {ESTADO_DISPONIBLE, ESTADO_RESERVADA}
+    piezas_qs = PiezaDesarme.objects.filter(
+        pk__in=pieza_ids_int,
+        empresa=empresa,
+        activo=True,
+        estado_pieza__in=valid_estados,
+        cantidad__gt=0,
+    ).prefetch_related("names", "company_labels")
+    piezas_by_id = {p.pk: p for p in piezas_qs}
+    repuestos_prefill = []
+    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
+    for pieza_id in pieza_ids_int:
+        pieza = piezas_by_id.get(pieza_id)
+        if not pieza:
+            continue
+        raw_cantidad = request.POST.get(f"cantidad_{pieza_id}", "").strip() or "1"
+        try:
+            cantidad_solicitada = int(raw_cantidad)
+        except (TypeError, ValueError):
+            cantidad_solicitada = 0
+        if cantidad_solicitada <= 0:
+            continue
+        if cantidad_solicitada > pieza.cantidad:
+            cantidad_solicitada = pieza.cantidad
+        try:
+            precio_venta = float(pieza.precio_venta_sugerido or 0)
+        except (TypeError, ValueError):
+            precio_venta = 0.0
+        try:
+            costo_linea = float(pieza.costo_asignado or 0)
+        except (TypeError, ValueError):
+            costo_linea = 0.0
+        repuestos_prefill.append(
+            {
+                "codigo": pieza.codigo or "",
+                "nombre": pieza.get_display_label(empresa=empresa, language=lang)
+                or pieza.nombre
+                or "",
+                "cantidad": cantidad_solicitada,
+                "precio": precio_venta,
+                "descuento": 0,
+                "origen_repuesto": ORIGEN_DESARME,
+                "pieza_desarme_id": pieza.id,
+                "costo_linea": costo_linea,
+                "vehiculo_origen_label": str(pieza.vehiculo),
+            }
+        )
+    if not repuestos_prefill:
+        messages.warning(request, "Las piezas seleccionadas no son vendibles o no tienen stock disponible.")
+        return redirect(_desarme_url(request, "piezas/"))
+    request.session["desarme_repuestos_prefill"] = repuestos_prefill
+    request.session["desarme_origen_label"] = "Lista de repuestos"
+    try:
+        doc_url = _reverse_with_request(request, "documento_crear")
+    except Exception:
+        path = (request.path or "").lower()
+        if path.startswith("/us/"):
+            doc_url = "/us/en/documentos/form/"
+        else:
+            doc_url = "/cl/es/documentos/form/"
+    return redirect(doc_url)

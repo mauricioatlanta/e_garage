@@ -369,7 +369,7 @@
         
         <!-- Logo -->
         <div class="mb-8 inline-block">
-          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 156, 59, 0.8));">
+          <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 156, 59, 0.8));">
         </div>
 
         <!-- Title -->
@@ -432,22 +432,6 @@
           <a href="/br/precos/" class="btn-secondary">
             💰 Ver Planos
           </a>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20" data-aos="fade-up" data-aos-delay="200">
-          <div class="glass-card p-8">
-            <div class="stats-number">1000+</div>
-            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Oficinas Ativas</p>
-          </div>
-          <div class="glass-card p-8">
-            <div class="stats-number">50K+</div>
-            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Ordens de Serviço</p>
-          </div>
-          <div class="glass-card p-8">
-            <div class="stats-number">R$ 10M+</div>
-            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Faturado</p>
-          </div>
         </div>
       </div>
     </div>
@@ -747,12 +731,12 @@
           </a>
         </div>
 
-        <!-- Plano Semestral (DESTACADO) -->
+        <!-- Growth (DESTACADO) -->
         <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="200" style="transform: scale(1.05); border: 3px solid rgba(0, 156, 59, 0.8);">
           <div style="background: linear-gradient(135deg, #009c3b 0%, #ffdf00 100%); color: #000; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 800; margin-bottom: 1rem; display: inline-block;">
             🏆 MAIS POPULAR
           </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #ffdf00;">Plano Semestral</h3>
+          <h3 class="text-2xl font-bold mb-4" style="color: #ffdf00;">Growth</h3>
           <div class="mb-6">
             <div style="color: #ffdf00; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
               R$ 500
@@ -770,14 +754,14 @@
             <li>✓ Multi-filiais</li>
             <li>✓ Prioridade no suporte</li>
           </ul>
-          <a href="/br/signup/?plan=semestral" class="btn-primary inline-block w-full">
+          <a href="/br/signup/?plan=growth" class="btn-primary inline-block w-full">
             Selecionar
           </a>
         </div>
 
-        <!-- Plano Anual -->
+        <!-- Business -->
         <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="300">
-          <h3 class="text-2xl font-bold mb-4" style="color: #00ff5e;">Plano Anual</h3>
+          <h3 class="text-2xl font-bold mb-4" style="color: #00ff5e;">Business</h3>
           <div class="mb-6">
             <div style="color: #00ff5e; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
               R$ 1.000
@@ -790,12 +774,12 @@
             </div>
           </div>
           <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
-            <li>✓ Tudo do plano semestral</li>
+            <li>✓ Tudo do Growth</li>
             <li>✓ Capacitação incluída</li>
             <li>✓ API personalizada</li>
             <li>✓ Suporte dedicado</li>
           </ul>
-          <a href="/br/signup/?plan=anual" class="btn-secondary inline-block w-full">
+          <a href="/br/signup/?plan=business" class="btn-secondary inline-block w-full">
             Selecionar
           </a>
         </div>
@@ -820,51 +804,9 @@
   </section>
 
   <!-- Footer -->
-  <footer class="py-12 px-4" style="border-top: 2px solid rgba(0, 156, 59, 0.3); background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 100%);">
-    <div class="container mx-auto max-w-7xl">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        
-        <div>
-          <h4 class="font-futuristic text-2xl mb-4" style="color: #00ff5e; text-shadow: 0 0 20px rgba(0, 255, 94, 0.4);">eGarage</h4>
-          <p style="color: #b0b0b0; font-weight: 500;">
-            A plataforma definitiva para oficinas mecânicas no Brasil.
-          </p>
-        </div>
-
-        <div>
-          <h5 class="font-bold mb-4" style="color: #ffdf00;">Produto</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/br/precos/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Preços</a></li>
-            <li><a href="/br/demo/localizacao/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Demo</a></li>
-            <li><a href="/br/documentos/form/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Documentos</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h5 class="font-bold mb-4" style="color: #ffdf00;">Empresa</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/br/sobre/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Sobre Nós</a></li>
-            <li><a href="/br/contato/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Contato</a></li>
-            <li><a href="/br/suporte/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Suporte</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h5 class="font-bold mb-4" style="color: #ffdf00;">Legal</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/br/privacidade/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Privacidade</a></li>
-            <li><a href="/br/termos/" style="transition: color 0.3s;" onmouseover="this.style.color='#00ff5e'" onmouseout="this.style.color='#b0b0b0'">Termos</a></li>
-          </ul>
-        </div>
-
-      </div>
-
-      <div class="text-center pt-8" style="border-top: 1px solid rgba(0, 156, 59, 0.2); color: #808080;">
-        <p>&copy; 2025 eGarage Brasil. Todos os direitos reservados.</p>
-        <p class="mt-2" style="font-size: 1.2rem;">🇧🇷 Feito com <span style="color: #ff4444;">❤️</span> no Brasil</p>
-      </div>
-    </div>
-  </footer>
+  <footer style="border-top:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.35);padding:1rem 0;text-align:center;margin-top:auto;">
+  <span style="color:#9ca3af;font-size:0.82rem;">eGarage &bull; &copy; 2026 &bull; <a href="/legal/" style="color:#67e8f9;text-decoration:none;">Legal</a> &bull; All Rights Reserved</span>
+</footer>
 
   </main>
 

@@ -3,7 +3,12 @@ from django.test import RequestFactory, TestCase
 
 from taller.models.clientes import Cliente
 from taller.models.empresa import Empresa
-from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
+from taller.models.extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.vehiculos.forms import VehiculoForm
@@ -54,11 +59,27 @@ class VehiculoFormFreeTextTests(TestCase):
         vehiculo.empresa = self.empresa
         vehiculo.save()
 
-        self.assertEqual(vehiculo.motor.nombre, "5.7 V8")
-        self.assertEqual(vehiculo.caja.nombre, "Automatica 8AT")
-        self.assertTrue(MotorVehiculo.objects.filter(nombre="5.7 V8", country="CL").exists())
-        self.assertTrue(
+        self.assertIsNone(vehiculo.motor)
+        self.assertIsNone(vehiculo.caja)
+        self.assertEqual(vehiculo.motor_empresa.nombre, "5.7 V8")
+        self.assertEqual(vehiculo.caja_empresa.nombre, "Automatica 8AT")
+        self.assertFalse(MotorVehiculo.objects.filter(nombre="5.7 V8", country="CL").exists())
+        self.assertFalse(
             CajaVehiculo.objects.filter(nombre="Automatica 8AT", country="CL").exists()
         )
-        self.assertTrue(vehiculo.motor.modelos.filter(pk=self.modelo.pk).exists())
-        self.assertTrue(vehiculo.caja.modelos.filter(pk=self.modelo.pk).exists())
+        self.assertTrue(
+            MotorVehiculoEmpresa.objects.filter(
+                empresa=self.empresa,
+                modelo=self.modelo,
+                nombre="5.7 V8",
+                country="CL",
+            ).exists()
+        )
+        self.assertTrue(
+            CajaVehiculoEmpresa.objects.filter(
+                empresa=self.empresa,
+                modelo=self.modelo,
+                nombre="Automatica 8AT",
+                country="CL",
+            ).exists()
+        )

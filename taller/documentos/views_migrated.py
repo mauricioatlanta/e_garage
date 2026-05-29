@@ -31,8 +31,10 @@ from django.db.models import (
     DecimalField,
     ExpressionWrapper,
     F,
+    OuterRef,
     Q,
     Sum,
+    Subquery,
     Value,
     When,
 )
@@ -53,6 +55,7 @@ from taller.documentos.services import (
 from taller.mixins import CountryLangTemplateMixin
 from taller.models import Documento, Tecnico
 from taller.models.clientes import Cliente
+from taller.models.lineas_documento import LineaOtroServicio, LineaRepuesto, LineaServicio
 from taller.models.vehiculos import Vehiculo
 from taller.models.repuesto import Repuesto
 from taller.servicios.models import Servicio, ServicioExterno
@@ -376,7 +379,17 @@ def _parse_prefixed_items(post_data, prefix, fields):
 
 
 class DocumentoLineItemsMixin:
-    REPUESTO_FIELDS = ("codigo", "nombre", "cantidad", "precio_unitario", "precio_compra")
+    REPUESTO_FIELDS = (
+        "codigo",
+        "nombre",
+        "cantidad",
+        "precio_unitario",
+        "precio_compra",
+        "repuesto_id",
+        "part_id",
+        "pieza_desarme_id",
+        "origen_repuesto",
+    )
     SERVICIO_FIELDS = ("nombre", "cantidad", "precio_unitario")
     OTRO_FIELDS = ("proveedor", "descripcion", "costo_interno", "precio_cliente")
 
@@ -402,6 +415,18 @@ class DocumentoLineItemsMixin:
             precio_unitario = _to_decimal(data.get("precio_unitario"), Decimal("0"))
             repuesto_id = data.get("repuesto_id")
             part_id = data.get("part_id")
+            pieza_desarme_id = data.get("pieza_desarme_id")
+            origen_repuesto = (data.get("origen_repuesto") or "").strip()
+
+            if pieza_desarme_id:
+                origen_repuesto = "DESARME"
+
+            elif repuesto_id or part_id:
+                origen_repuesto = "STOCK_BODEGA"
+
+            else:
+                origen_repuesto = "EXTERNO"
+
             linea = LineaRepuesto(
                 documento=documento,
                 codigo=codigo or nombre,
@@ -410,7 +435,8 @@ class DocumentoLineItemsMixin:
                 precio_unitario=precio_unitario,
                 repuesto_id=repuesto_id or None,
                 part_id=part_id or None,
-                origen_repuesto="STOCK_BODEGA" if (repuesto_id or part_id) else "EXTERNO",
+                pieza_desarme_id=pieza_desarme_id or None,
+                origen_repuesto=origen_repuesto,
             )
             linea.save()
 
@@ -481,6 +507,12 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
     def get_queryset(self):
         """Filtrar documentos por empresa del usuario con filtros funcionales"""
         empresa = _get_empresa_safe(self.request)
+
+
+
+
+
+
         if not empresa:
             return Documento.objects.none()
         try:
@@ -554,39 +586,68 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
                 Decimal("0"),
                 output_field=DecimalField(max_digits=14, decimal_places=2),
             )
+            money_field = DecimalField(max_digits=14, decimal_places=2)
+
+            rep_sum = Subquery(
+                LineaRepuesto.objects.filter(documento_id=OuterRef("pk"))
+                .values("documento_id")
+                .annotate(
+                    total=Sum(
+                        ExpressionWrapper(
+                            F("cantidad")
+                            * F("precio_unitario")
+                            * (
+                                Value(Decimal("1.0"), output_field=money_field)
+                                - F("descuento")
+                                / Value(Decimal("100.0"), output_field=money_field)
+                            ),
+                            output_field=money_field,
+                        )
+                    )
+                )
+                .values("total")[:1],
+                output_field=money_field,
+            )
+            serv_sum = Subquery(
+                LineaServicio.objects.filter(documento_id=OuterRef("pk"))
+                .values("documento_id")
+                .annotate(
+                    total=Sum(
+                        ExpressionWrapper(
+                            F("cantidad")
+                            * F("precio_unitario")
+                            * (
+                                Value(Decimal("1.0"), output_field=money_field)
+                                - F("descuento")
+                                / Value(Decimal("100.0"), output_field=money_field)
+                            ),
+                            output_field=money_field,
+                        )
+                    )
+                )
+                .values("total")[:1],
+                output_field=money_field,
+            )
+            otros_sum = Subquery(
+                LineaOtroServicio.objects.filter(documento_id=OuterRef("pk"))
+                .values("documento_id")
+                .annotate(
+                    total=Sum(
+                        ExpressionWrapper(
+                            F("cantidad") * F("precio_cliente"),
+                            output_field=money_field,
+                        )
+                    )
+                )
+                .values("total")[:1],
+                output_field=money_field,
+            )
 
             qs = (
                 base_queryset.annotate(
-                    rep_sum=Coalesce(
-                        Sum(
-                            ExpressionWrapper(
-                                F("lineas_repuesto__cantidad")
-                                * F("lineas_repuesto__precio_unitario"),
-                                output_field=DecimalField(max_digits=14, decimal_places=2),
-                            )
-                        ),
-                        decimal_zero,
-                    ),
-                    serv_sum=Coalesce(
-                        Sum(
-                            ExpressionWrapper(
-                                F("lineas_servicio__cantidad")
-                                * F("lineas_servicio__precio_unitario"),
-                                output_field=DecimalField(max_digits=14, decimal_places=2),
-                            )
-                        ),
-                        decimal_zero,
-                    ),
-                    otros_sum=Coalesce(
-                        Sum(
-                            ExpressionWrapper(
-                                F("lineas_otro_servicio__cantidad")
-                                * F("lineas_otro_servicio__precio_cliente"),
-                                output_field=DecimalField(max_digits=14, decimal_places=2),
-                            )
-                        ),
-                        decimal_zero,
-                    ),
+                    rep_sum=Coalesce(rep_sum, decimal_zero),
+                    serv_sum=Coalesce(serv_sum, decimal_zero),
+                    otros_sum=Coalesce(otros_sum, decimal_zero),
                     servicios_count=Count("lineas_servicio", distinct=True),
                 )
                 .annotate(
@@ -628,12 +689,16 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
             )
 
             return qs
-        except Exception:
-            return Documento.objects.none()
+        except Exception as e:
+            print("ERROR REAL DOCUMENTOS:", repr(e))
+            raise
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context["documentos"] = context.get("object_list", [])
         empresa = _get_empresa_safe(self.request)
+
+
         context["country"] = (
             (getattr(empresa, "pais", None) or "cl").lower()
             if empresa
@@ -855,7 +920,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        empresa = self.request.user.empresa
+        empresa = self.request.empresa
         form_mode = self.get_form_mode()
         initial_state = self.get_form_initial_state()
         source_document = self.get_form_source_document()
@@ -910,7 +975,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 "servicios_json": line_item_payloads["servicios_json"],
                 "otros_json": line_item_payloads["otros_json"],
                 "document_form_bootstrap": form_bootstrap,
-                "has_server_line_items": has_server_line_items(line_item_payloads),
+                "has_server_line_items": has_server_line_items(line_item_payloads) or bool(form_bootstrap.get("line_items", {}).get("repuestos")),
                 "cliente_preselect_id": cliente_state["id"] or "",
                 "vehiculo_preselect_id": vehiculo_preselect_id or "",
                 "cliente_preselect_nombre": cliente_state["nombre"] or "",
@@ -919,9 +984,6 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 **prefetch_payloads,
             }
         )
-        return context
-        empresa = self.request.user.empresa
-
         # Prefill desde flujo de desarme (solo creación, prioridad menor que edición)
         if not context.get("es_edicion"):
             session_prefill = self.request.session.get("desarme_repuestos_prefill")
@@ -929,11 +991,15 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
             repuestos_json_actual = context.get("repuestos_json")
             if not repuestos_json_actual and session_prefill:
                 context["repuestos_json"] = session_prefill
+                context["has_server_line_items"] = True
                 if session_label:
                     context["desarme_origen_label"] = session_label
             # Consumir siempre una sola vez
             self.request.session.pop("desarme_repuestos_prefill", None)
             self.request.session.pop("desarme_origen_label", None)
+        return context
+        empresa = self.request.empresa
+
 
         # Cargar mecánicos activos del taller
         mecanicos = Tecnico.objects.filter(empresa=empresa, activo=True)
@@ -1203,8 +1269,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
             self.request,
             getattr(self.request.user, "empresa", None),
         )
-        # Idioma efectivo para labels/choices (no inferir de país)
-        kwargs["language"] = getattr(self.request, "LANGUAGE_CODE", None) or get_language() or "es"
+        kwargs["language"] = LANGUAGE_BY_COUNTRY.get((kwargs["country"] or "CL").upper(), "es")
         if self.request.method == "GET":
             kwargs.setdefault("initial", self.get_initial())
         return kwargs
@@ -1214,7 +1279,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         return _reverse_with_request(self.request, "lista_documentos")
 
     def form_valid(self, form):
-        form.instance.empresa = self.request.user.empresa
+        form.instance.empresa = self.request.empresa
 
         try:
             with transaction.atomic():
@@ -1248,7 +1313,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         return response
 
     def form_valid_legacy(self, form):
-        form.instance.empresa = self.request.user.empresa
+        form.instance.empresa = self.request.empresa
         try:
             with transaction.atomic():
 
@@ -1303,6 +1368,8 @@ class DocumentoDuplicateView(DocumentoCreateView):
     def get_form_source_document(self):
         if not hasattr(self, "_duplicate_source_document"):
             empresa = _get_empresa_safe(self.request) or getattr(self.request, "empresa", None)
+
+
             queryset = (
                 Documento.objects.filter(empresa=empresa)
                 .select_related("cliente", "vehiculo", "tecnico_responsable")
@@ -1326,6 +1393,8 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
     def get_queryset(self):
         """Asegurar que solo se vean documentos de la empresa"""
         empresa = _get_empresa_safe(self.request)
+
+
         if not empresa:
             return Documento.objects.none()
         return Documento.objects.filter(empresa=empresa)
@@ -1743,8 +1812,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         else:
             country = _get_request_country_code(self.request, empresa)
         kwargs["country"] = country
-        # Idioma efectivo para labels/choices (no inferir de país)
-        kwargs["language"] = getattr(self.request, "LANGUAGE_CODE", None) or get_language() or "es"
+        kwargs["language"] = LANGUAGE_BY_COUNTRY.get((country or "CL").upper(), "es")
 
         return kwargs
 
@@ -1789,7 +1857,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         return self.render_country_lang(self.request, context)
 
     def form_valid(self, form):
-        form.instance.empresa = self.request.user.empresa
+        form.instance.empresa = self.request.empresa
 
         try:
             with transaction.atomic():
@@ -1825,7 +1893,7 @@ class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Upd
         # En edición, borrar líneas existentes antes de guardar para que
         # DocumentoForm.save() las recree desde repuestos_json (evita duplicados).
         # No usar procesar_items_dinamicos: el formulario usa JSON, no POST con prefijos rep-*.
-        form.instance.empresa = self.request.user.empresa
+        form.instance.empresa = self.request.empresa
 
         try:
             with transaction.atomic():
@@ -1890,7 +1958,8 @@ class DocumentoDeleteView(CountryLangTemplateMixin, RoleRequiredMixin, DeleteVie
     def get_queryset(self):
         """🔒 MULTI-TENANT: Asegurar que solo se eliminen documentos de la empresa"""
         empresa = _get_empresa_safe(self.request)
+
+
         if not empresa:
             return Documento.objects.none()
         return Documento.objects.filter(empresa=empresa)
-

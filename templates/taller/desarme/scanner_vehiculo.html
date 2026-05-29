@@ -44,18 +44,18 @@
 .stat-card:hover { transform: translateY(-3px); }
 .stat-val { font-family: 'Orbitron', monospace; font-size: 1.5rem; font-weight: 700; }
 .stat-lab { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.2em; margin-top: 6px; opacity: 0.85; }
-.stat-cyan { border-color: rgba(6, 182, 212, 0.45); color: var(--ds-cyan); }
-.stat-emerald { border-color: rgba(16, 185, 129, 0.5); color: var(--ds-emerald); box-shadow: 0 0 14px rgba(16, 185, 129, 0.15); }
-.stat-rose { border-color: rgba(244, 63, 94, 0.5); color: #f43f5e; box-shadow: 0 0 14px rgba(244, 63, 94, 0.12); }
-.stat-slate { border-color: rgba(100, 116, 139, 0.45); color: #94a3b8; }
-.stat-lime { border-color: rgba(132, 204, 22, 0.5); color: #84cc16; box-shadow: 0 0 14px rgba(132, 204, 22, 0.12); }
-.stat-amber { border-color: rgba(245, 158, 11, 0.4); color: var(--ds-amber); }
+.stat-cyan { border-color: rgba(6, 182, 212, 0.45); color: var(--ds-cyan) !important; }
+.stat-emerald { border-color: rgba(16, 185, 129, 0.5); color: var(--ds-emerald) !important; box-shadow: 0 0 14px rgba(16, 185, 129, 0.15); }
+.stat-rose { border-color: rgba(244, 63, 94, 0.5); color: #f43f5e !important; box-shadow: 0 0 14px rgba(244, 63, 94, 0.12); }
+.stat-slate { border-color: rgba(100, 116, 139, 0.45); color: #94a3b8 !important; }
+.stat-lime { border-color: rgba(132, 204, 22, 0.5); color: #84cc16 !important; box-shadow: 0 0 14px rgba(132, 204, 22, 0.12); }
+.stat-amber { border-color: rgba(245, 158, 11, 0.4); color: var(--ds-amber) !important; }
 
 /* Piece cards: glow por estado */
 .piece-card {
   border-radius: var(--ds-radius);
   border: 1px solid;
-  padding: 1rem 1.25rem;
+  padding: 0.55rem 0.85rem;
   backdrop-filter: blur(12px);
   transition: transform 0.15s, box-shadow 0.2s;
 }
@@ -98,22 +98,22 @@
   animation: pulse-ring 3s ease-in-out infinite;
 }
 @keyframes pulse-ring { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
-.blueprint-center { font-size: 0.7rem; text-align: center; color: var(--ds-cyan); font-family: 'Orbitron', monospace; }
+.blueprint-center { font-size: 0.7rem; text-align: center; color: var(--ds-cyan) !important; font-family: 'Orbitron', monospace; }
 .zona-btn {
   display: block;
   padding: 10px 16px;
   border-radius: var(--ds-radius-sm);
   border: 1px solid rgba(6, 182, 212, 0.3);
   background: rgba(0, 0, 0, 0.5);
-  color: #94a3b8;
+  color: #94a3b8 !important;
   text-decoration: none;
   font-size: 0.85rem;
   transition: all 0.2s;
 }
-.zona-btn:hover { border-color: var(--ds-cyan); color: var(--ds-cyan); background: rgba(6, 182, 212, 0.08); }
+.zona-btn:hover { border-color: var(--ds-cyan); color: var(--ds-cyan) !important; background: rgba(6, 182, 212, 0.08); }
 
 /* Botones estado y precio */
-.btn-estado { padding: 6px 12px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; transition: all 0.15s; }
+.btn-estado { padding: 3px 8px; border-radius: 8px; font-size: 0.68rem; font-weight: 700; transition: all 0.15s; }
 .btn-estado {
   color: #ffffff !important;
   text-shadow: 0 1px 2px rgba(0,0,0,0.9);
@@ -127,13 +127,13 @@
 /* Filtros rápidos */
 .filter-chip { padding: 8px 16px; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; border: 1px solid; cursor: pointer; transition: all 0.2s; }
 .filter-chip.active { box-shadow: 0 0 14px currentColor; }
-.filter-chip.filter-all { border-color: rgba(6, 182, 212, 0.5); color: var(--ds-cyan); background: rgba(6, 182, 212, 0.08); }
-.filter-chip.filter-disponible { border-color: rgba(16, 185, 129, 0.5); color: var(--ds-emerald); background: rgba(16, 185, 129, 0.08); }
-.filter-chip.filter-danada { border-color: rgba(244, 63, 94, 0.5); color: #f43f5e; background: rgba(244, 63, 94, 0.08); }
-.filter-chip.filter-faltante { border-color: rgba(100, 116, 139, 0.5); color: #94a3b8; background: rgba(100, 116, 139, 0.08); }
-.filter-chip.filter-sin-precio { border-color: rgba(245, 158, 11, 0.5); color: var(--ds-amber); background: rgba(245, 158, 11, 0.08); }
-.filter-chip.filter-valiosas { border-color: rgba(132, 204, 22, 0.5); color: #84cc16; background: rgba(132, 204, 22, 0.08); }
-.filter-chip.filter-pendientes { border-color: rgba(245, 158, 11, 0.5); color: var(--ds-amber); background: rgba(245, 158, 11, 0.08); }
+.filter-chip.filter-all { border-color: rgba(6, 182, 212, 0.5); color: var(--ds-cyan) !important; background: rgba(6, 182, 212, 0.08); }
+.filter-chip.filter-disponible { border-color: rgba(16, 185, 129, 0.5); color: var(--ds-emerald) !important; background: rgba(16, 185, 129, 0.08); }
+.filter-chip.filter-danada { border-color: rgba(244, 63, 94, 0.5); color: #f43f5e !important; background: rgba(244, 63, 94, 0.08); }
+.filter-chip.filter-faltante { border-color: rgba(100, 116, 139, 0.5); color: #94a3b8 !important; background: rgba(100, 116, 139, 0.08); }
+.filter-chip.filter-sin-precio { border-color: rgba(245, 158, 11, 0.5); color: var(--ds-amber) !important; background: rgba(245, 158, 11, 0.08); }
+.filter-chip.filter-valiosas { border-color: rgba(132, 204, 22, 0.5); color: #84cc16 !important; background: rgba(132, 204, 22, 0.08); }
+.filter-chip.filter-pendientes { border-color: rgba(245, 158, 11, 0.5); color: var(--ds-amber) !important; background: rgba(245, 158, 11, 0.08); }
 
 /* Toast */
 .scanner-toast {
@@ -162,16 +162,37 @@
 /* Barra de progreso revisión */
 .revision-progress-bar { height: 8px; border-radius: 9999px; background: rgba(6, 182, 212, 0.2); overflow: hidden; }
 .revision-progress-fill { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, var(--ds-cyan), var(--ds-emerald)); transition: width 0.4s ease; }
-.zona-btn.zona-active { border-color: var(--ds-cyan); color: var(--ds-cyan); background: rgba(6, 182, 212, 0.15); box-shadow: 0 0 12px rgba(6, 182, 212, 0.25); }
+.zona-btn.zona-active { border-color: var(--ds-cyan); color: var(--ds-cyan) !important; background: rgba(6, 182, 212, 0.15); box-shadow: 0 0 12px rgba(6, 182, 212, 0.25); }
 .piece-card.piece-sin-precio { position: relative; }
 .piece-card.piece-sin-precio::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, var(--ds-amber), transparent); opacity: 0.8; border-radius: var(--ds-radius) var(--ds-radius) 0 0; }
-.badge-sin-precio { font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; background: rgba(245, 158, 11, 0.25); color: var(--ds-amber); border: 1px solid rgba(245, 158, 11, 0.5); }
+.badge-sin-precio { font-size: 0.65rem; padding: 2px 6px; border-radius: 6px; background: rgba(245, 158, 11, 0.25); color: var(--ds-amber) !important; border: 1px solid rgba(245, 158, 11, 0.5); }
 .piece-card.is-saving { opacity: 0.7; pointer-events: none; }
 .piece-card.is-saving .piece-saving-dot { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--ds-cyan); animation: saving-pulse 0.8s ease infinite; margin-left: 4px; }
 @keyframes saving-pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(0.9); } }
 .btn-bulk-zone { padding: 4px 10px; font-size: 0.7rem; border-radius: 8px; font-weight: 600; transition: all 0.2s; }
 .commercial-panel .commercial-val { font-family: 'Orbitron', monospace; font-size: 1.25rem; font-weight: 700; }
-.commercial-panel .top-item { font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.06); }
+.commercial-panel .top-item { font-size: 0.8rem; padding: 4px 0; border-bottom: 1px solid rgba(255,255,255,0.06); color: #e2e8f0 !important; }
+
+/* Override force_black_text.css: headings y texto en paneles oscuros */
+.glass-panel h1, .glass-panel h2, .glass-panel h3,
+.glass-panel h4, .glass-panel h5, .glass-panel h6 { color: #94a3b8 !important; }
+.commercial-panel h3 { color: #94a3b8 !important; }
+
+/* Clases Tailwind de color ausentes en output.css */
+.text-white      { color: #ffffff !important; }
+.text-slate-200  { color: #e2e8f0 !important; }
+.text-slate-300  { color: #cbd5e1 !important; }
+.text-slate-400  { color: #94a3b8 !important; }
+.text-slate-500  { color: #64748b !important; }
+.text-cyan-300   { color: #67e8f9 !important; }
+.text-cyan-400   { color: #22d3ee !important; }
+.text-emerald-400 { color: #34d399 !important; }
+.text-rose-400   { color: #fb7185 !important; }
+.text-amber-400  { color: #fbbf24 !important; }
+.text-lime-400   { color: #a3e635 !important; }
+.text-blue-400   { color: #60a5fa !important; }
+.text-red-300    { color: #fca5a5 !important; }
+.text-gray-400   { color: #9ca3af !important; }
 </style>
 {% endblock %}
 
@@ -223,8 +244,8 @@
   {# —— B. Métricas vivas (actualizables en tiempo real) —— #}
   <div class="flex flex-wrap gap-4" id="stats-row">
     <div class="glass-panel stat-card stat-cyan">
-      <div class="stat-val text-cyan-300" id="stat-total">{{ total_piezas }}</div>
-      <div class="stat-lab text-slate-400">{% trans "TOTAL PIEZAS" %}</div>
+      <div class="stat-val text-cyan-300" id="stat-total">{{ total_repuestos }}</div>
+      <div class="stat-lab text-slate-400">{% trans "TOTAL REPUESTOS" %}</div>
     </div>
     <div class="glass-panel stat-card stat-emerald">
       <div class="stat-val" id="stat-disponibles">{{ disponibles }}</div>
@@ -258,7 +279,7 @@
   <div class="glass-panel p-4" id="revision-progress-block">
     <div class="flex flex-wrap items-center justify-between gap-3 mb-2">
       <span class="ds-font text-cyan-300 text-sm uppercase tracking-wider">{% trans "Revisión" %}</span>
-      <span class="text-slate-400 text-sm" id="revision-progress-text">0 / {{ total_piezas }} {% trans "revisadas" %}</span>
+      <span class="text-slate-400 text-sm" id="revision-progress-text">0 / {{ total_repuestos }} {% trans "revisadas" %}</span>
     </div>
     <div class="revision-progress-bar">
       <div class="revision-progress-fill" id="revision-progress-fill" style="width: 0%;"></div>
@@ -287,7 +308,7 @@
       <div>
         <div class="text-xs uppercase tracking-wider text-slate-400 mb-1">{% trans "Sin precio" %}</div>
         <div class="commercial-val text-amber-400" id="commercial-sin-precio">{{ sin_precio|default:0 }}</div>
-        <div class="text-xs text-slate-500">{% trans "piezas por valorizar" %}</div>
+        <div class="text-xs text-slate-500">{% trans "repuestos por valorizar" %}</div>
       </div>
       <div>
         <div class="text-xs uppercase tracking-wider text-slate-400 mb-1">{% trans "Top 5 más valiosas" %}</div>
@@ -296,10 +317,15 @@
     </div>
   </div>
 
-  {# —— C. Cómo funciona (didáctico) —— #}
-  <div class="glass-panel p-5 how-panel">
-    <div class="ds-font text-cyan-300 text-sm font-semibold uppercase tracking-wider mb-3">{% trans "Cómo usar el escáner" %}</div>
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-slate-300">
+  {# —— C. Cómo funciona (colapsable, cerrado por defecto) —— #}
+  <div class="glass-panel how-panel">
+    <button type="button" id="btn-how-toggle"
+            class="w-full flex items-center justify-between px-5 py-3 text-left focus:outline-none"
+            aria-expanded="false">
+      <span class="ds-font text-cyan-300 text-sm font-semibold uppercase tracking-wider">{% trans "Cómo usar el escáner" %}</span>
+      <span id="how-chevron" class="text-slate-400 text-xs" style="transition:transform 0.2s;">▼</span>
+    </button>
+    <div id="how-content" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 text-slate-300 px-5 pb-4" style="display:none">
       <div class="flex items-center gap-2"><span class="dot emerald"></span><span>{% trans "Disponible" %} = {% trans "Listo para venta" %}</span></div>
       <div class="flex items-center gap-2"><span class="dot rose"></span><span>{% trans "Dañada" %} = {% trans "No vendible" %}</span></div>
       <div class="flex items-center gap-2"><span class="dot slate"></span><span>{% trans "Faltante" %} = {% trans "No existe en el vehículo" %}</span></div>
@@ -308,7 +334,7 @@
     </div>
   </div>
 
-  {% if zonas_con_piezas %}
+  {% if zonas_con_repuestos %}
   {# —— D. Centro visual: blueprint + zonas —— #}
   <div class="glass-panel p-8 flex flex-col md:flex-row items-center justify-center gap-8">
     <div class="blueprint-ring">
@@ -318,10 +344,10 @@
       </div>
     </div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="zonas-buttons">
-      {% for zona, piezas_list in zonas_con_piezas %}
+      {% for zona, repuestos_list in zonas_con_repuestos %}
       <button type="button" class="zona-btn scroll-zona text-left" data-zona="{{ zona|slugify }}" data-zona-name="{{ zona }}">
         <span class="font-semibold">{{ zona }}</span>
-        <span class="text-slate-500 text-xs block mt-1">{{ piezas_list|length }} {% trans "piezas" %}</span>
+        <span class="text-slate-500 text-xs block mt-1">{{ repuestos_list|length }} {% trans "repuestos" %}</span>
       </button>
       {% endfor %}
     </div>
@@ -357,20 +383,20 @@
     </button>
     <span id="revision-hint" class="revision-rapida-bar hidden items-center gap-2 text-cyan-300 text-sm font-medium">
       <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-      {% trans "Modo compacto: más piezas en pantalla" %}
+      {% trans "Modo compacto: más repuestos en pantalla" %}
     </span>
   </div>
 
   {# —— G. Inventario por zona (cards premium) + selección para venta —— #}
   <form method="post" action="{% country_url 'desarme:iniciar_venta_desde_inventario' vehiculo.pk %}">
     {% csrf_token %}
-    <section id="inventario-piezas">
-      {% for zona, piezas_list in zonas_con_piezas %}
+    <section id="inventario-repuestos">
+      {% for zona, repuestos_list in zonas_con_repuestos %}
       <div id="zona-{{ zona|slugify }}" class="mb-10 piece-zona" data-zona="{{ zona|slugify }}">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 class="ds-font text-xl text-cyan-300 flex items-center gap-2">
             <span>{{ zona }}</span>
-            <span class="text-slate-500 text-sm font-normal">{{ piezas_list|length }} {% trans "piezas" %}</span>
+            <span class="text-slate-500 text-sm font-normal">{{ repuestos_list|length }} {% trans "repuestos" %}</span>
           </h2>
           <div class="flex flex-wrap gap-2 items-center">
             <span class="text-xs text-slate-500 uppercase tracking-wider">{% trans "Toda la zona" %}:</span>
@@ -383,8 +409,8 @@
           </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 piece-grid" data-zona="{{ zona }}">
-          {% for p in piezas_list %}
-        {% with estado=p.estado_pieza %}
+          {% for p in repuestos_list %}
+        {% with estado=p.estado_repuesto %}
         <article class="piece-card piece-item
           {% if estado == 'DISPONIBLE' %}glow-disponible
           {% elif estado == 'DANADA' %}glow-danada
@@ -393,7 +419,7 @@
           {% elif estado == 'VENDIDA' %}glow-vendida
           {% else %}glow-faltante{% endif %}
           {% if not p.precio_venta_sugerido and estado == 'DISPONIBLE' or not p.precio_venta_sugerido and estado == 'RESERVADA' %}piece-sin-precio{% endif %}"
-                 data-pieza-id="{{ p.pk }}"
+                 data-repuesto-id="{{ p.pk }}"
                  data-estado="{{ estado }}"
                  data-nombre="{{ p.display_nombre|default:p.nombre|lower }}"
                  data-codigo="{{ p.codigo|lower }}"
@@ -403,11 +429,11 @@
           <div class="flex items-start justify-between gap-3">
             <div class="min-w-0">
               <div class="flex items-center gap-2 flex-wrap">
-                <span class="text-xs uppercase tracking-wider text-slate-400">{% trans "Pieza" %}</span>
+                <span class="text-xs uppercase tracking-wider text-slate-400">{% trans "Repuesto" %}</span>
                 {% if p.activo and p.cantidad > 0 %}
-                  {% if p.estado_pieza == 'DISPONIBLE' or p.estado_pieza == 'RESERVADA' %}
+                  {% if p.estado_repuesto == 'DISPONIBLE' or p.estado_repuesto == 'RESERVADA' %}
                 <span class="inline-flex items-center gap-1 text-[11px] text-emerald-300 bg-emerald-900/40 border border-emerald-400/50 rounded-full px-2 py-0.5">
-                  <input type="checkbox" name="pieza_ids" value="{{ p.pk }}" class="w-3 h-3 align-middle">
+                  <input type="checkbox" name="repuesto_ids" value="{{ p.pk }}" class="w-3 h-3 align-middle">
                   <span>{% trans "Vender" %}</span>
                   <input type="number" name="cantidad_{{ p.pk }}" value="1" min="1" max="{{ p.cantidad }}" class="w-14 ml-1 text-[11px] bg-slate-950/80 border border-emerald-500/50 rounded px-1 py-0.5 text-emerald-100">
                 </span>
@@ -417,9 +443,8 @@
                 <span class="badge-sin-precio">{% trans "Sin precio" %}</span>
                 {% endif %}
               </div>
-              <h3 class="mt-1 text-lg font-semibold text-white truncate piece-name">{{ p.display_nombre|default:p.nombre }}</h3>
-              <div class="mt-1 text-sm text-slate-400">{% trans "Categoría" %}: {{ p.zona|default:"—" }}</div>
-              {% if p.codigo %}<div class="mt-0.5 text-xs font-mono text-slate-500">{{ p.codigo }}</div>{% endif %}
+              <h3 class="mt-0.5 text-sm font-semibold text-white truncate piece-name">{{ p.display_nombre|default:p.nombre }}</h3>
+              {% if p.codigo %}<div class="text-xs font-mono text-slate-500">{{ p.codigo }}</div>{% endif %}
             </div>
             <span class="piece-status-badge rounded-full border px-2.5 py-0.5 text-xs font-medium shrink-0
               {% if estado == 'DISPONIBLE' %}border-emerald-400/50 text-emerald-300
@@ -428,13 +453,12 @@
               {% elif estado == 'RESERVADA' %}border-amber-400/50 text-amber-300
               {% elif estado == 'VENDIDA' %}border-blue-400/50 text-blue-300
               {% else %}border-slate-400/50 text-slate-300{% endif %}">
-              {{ p.get_estado_pieza_display|default:estado }}
+              {{ p.get_estado_repuesto_display|default:estado }}
             </span>
           </div>
 
-          <div class="mt-4 rounded-xl border border-white/10 bg-slate-950/40 p-3">
-            <div class="text-xs uppercase tracking-wider text-slate-400">{% trans "Precio" %} — {% trans "clic para editar" %}</div>
-            <div class="mt-2 flex items-center justify-between gap-2">
+          <div class="mt-2 rounded-xl border border-white/10 bg-slate-950/40 p-2">
+            <div class="flex items-center justify-between gap-2">
               <span class="piece-price-display text-xl font-semibold text-white">
                 {% if request.path|slice:":4" == "/us/" %}
                   ${{ p.precio_venta_sugerido|floatformat:2|default:"0"|intcomma }}
@@ -447,12 +471,12 @@
               </button>
             </div>
             <div class="piece-price-edit hidden mt-2">
-              <input type="number" class="precio-edit w-full piece-price-input" value="{% if request.path|slice:':4' == '/us/' %}{{ p.precio_venta_sugerido|floatformat:2|default:0 }}{% else %}{{ p.precio_venta_sugerido|floatformat:0|default:0 }}{% endif %}" min="0" step="{% if request.path|slice:':4' == '/us/' %}0.01{% else %}1{% endif %}" data-pieza-id="{{ p.pk }}">
+              <input type="number" class="precio-edit w-full piece-price-input" value="{% if request.path|slice:':4' == '/us/' %}{{ p.precio_venta_sugerido|floatformat:2|default:0 }}{% else %}{{ p.precio_venta_sugerido|floatformat:0|default:0 }}{% endif %}" min="0" step="{% if request.path|slice:':4' == '/us/' %}0.01{% else %}1{% endif %}" data-repuesto-id="{{ p.pk }}">
               <button type="button" class="piece-save-price mt-2 text-cyan-400 text-sm font-medium hover:underline">{% trans "Guardar" %}</button>
             </div>
           </div>
 
-          <div class="mt-4 grid grid-cols-3 gap-2 text-sm">
+          <div class="mt-2 grid grid-cols-3 gap-1 text-sm">
             <button type="button" class="btn-estado rounded-xl border border-emerald-300/30 bg-emerald-400/10 text-emerald-200 piece-set-estado {% if estado == 'DISPONIBLE' %}active{% endif %}" data-estado="DISPONIBLE">{% trans "Disponible" %}</button>
             <button type="button" class="btn-estado rounded-xl border border-rose-300/30 bg-rose-400/10 text-rose-200 piece-set-estado {% if estado == 'DANADA' %}active{% endif %}" data-estado="DANADA">{% trans "Dañada" %}</button>
             <button type="button" class="btn-estado rounded-xl border border-slate-300/20 bg-slate-400/10 text-slate-200 piece-set-estado {% if estado == 'FALTANTE' %}active{% endif %}" data-estado="FALTANTE">{% trans "Faltante" %}</button>
@@ -475,7 +499,7 @@
   {# —— J. Estado vacío —— #}
   <div class="glass-panel p-10 text-center">
     <p class="text-slate-300 text-lg mb-2">{% trans "Este vehículo aún no tiene inventario generado" %}</p>
-    <p class="text-slate-500 text-sm mb-6">{% trans "Genera el inventario base desde el catálogo o agrega piezas manualmente." %}</p>
+    <p class="text-slate-500 text-sm mb-6">{% trans "Genera el inventario base desde el catálogo o agrega repuestos manualmente." %}</p>
     <div class="flex flex-wrap justify-center gap-4">
       <a href="{% country_url 'desarme:generar_inventario' vehiculo.pk %}"
          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-cyan-500/90 hover:bg-cyan-400 text-white font-semibold text-base shadow-lg shadow-cyan-500/25 transition">
@@ -483,7 +507,7 @@
       </a>
       <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}"
          class="inline-flex items-center gap-2 px-6 py-3 rounded-xl border border-slate-500/50 text-slate-300 hover:bg-slate-500/20 font-medium transition">
-        ➕ {% trans "Agregar pieza manual" %}
+        ➕ {% trans "Agregar repuesto manual" %}
       </a>
     </div>
   </div>
@@ -525,13 +549,17 @@
   }
 
   function refreshLiveMetrics() {
+    document.querySelectorAll('.piece-item').forEach(function(card) {
+      var d = card.querySelector('.piece-price-display');
+      if (d) d.textContent = fmtMoney(card.dataset.precio || 0);
+    });
     var cards = document.querySelectorAll('.piece-item');
     var total = cards.length;
     var disponibles = 0, danadas = 0, faltantes = 0, sinPrecio = 0;
     var valorPotencial = 0;
     var valorPerdidoDanadas = 0;
     var revisadas = 0;
-    var topPiezas = [];
+    var topRepuestos = [];
     for (var i = 0; i < cards.length; i++) {
       var c = cards[i];
       var est = c.dataset.estado || '';
@@ -547,11 +575,11 @@
       if (est === 'DANADA' && precio > 0) valorPerdidoDanadas += precio * cant;
       if (precio > 0 || est === 'DANADA' || est === 'FALTANTE') revisadas++;
       if ((est === 'DISPONIBLE' || est === 'RESERVADA') && precio > 0) {
-        topPiezas.push({ nombre: c.querySelector('.piece-name') ? c.querySelector('.piece-name').textContent : '', precio: precio });
+        topRepuestos.push({ nombre: c.querySelector('.piece-name') ? c.querySelector('.piece-name').textContent : '', precio: precio });
       }
     }
-    topPiezas.sort(function(a, b) { return b.precio - a.precio; });
-    var top5 = topPiezas.slice(0, 5);
+    topRepuestos.sort(function(a, b) { return b.precio - a.precio; });
+    var top5 = topRepuestos.slice(0, 5);
     var pct = total ? Math.round((revisadas / total) * 100) : 0;
     var elPerdido = document.getElementById('commercial-perdido-dano');
     if (elPerdido) elPerdido.textContent = fmtMoney(valorPerdidoDanadas);
@@ -588,10 +616,10 @@
     }
   }
 
-  function updatePiezaEstado(pk, estado) {
-    var card = document.querySelector('[data-pieza-id="' + pk + '"]');
+  function updateRepuestoEstado(pk, estado) {
+    var card = document.querySelector('[data-repuesto-id="' + pk + '"]');
     if (card) card.classList.add('is-saving');
-    var url = apiBase + '/api/piezas/' + pk + '/estado/';
+    var url = apiBase + '/api/repuestos/' + pk + '/estado/';
     fetch(url, {
       method: 'POST',
       headers: {
@@ -634,10 +662,10 @@
       });
   }
 
-  function updatePiezaPrecio(pk, precio) {
-    var card = document.querySelector('[data-pieza-id="' + pk + '"]');
+  function updateRepuestoPrecio(pk, precio) {
+    var card = document.querySelector('[data-repuesto-id="' + pk + '"]');
     if (card) card.classList.add('is-saving');
-    var url = apiBase + '/api/piezas/' + pk + '/precio/';
+    var url = apiBase + '/api/repuestos/' + pk + '/precio/';
     fetch(url, {
       method: 'POST',
       headers: {
@@ -687,8 +715,8 @@
   document.querySelectorAll('.piece-set-estado').forEach(function(btn) {
     btn.addEventListener('click', function() {
       var card = btn.closest('.piece-card');
-      var pk = card && card.dataset.piezaId;
-      if (pk) updatePiezaEstado(pk, btn.dataset.estado);
+      var pk = card && card.dataset.repuestoId;
+      if (pk) updateRepuestoEstado(pk, btn.dataset.estado);
     });
   });
 
@@ -707,8 +735,8 @@
     btn.addEventListener('click', function() {
       var card = btn.closest('.piece-card');
       var input = card.querySelector('.piece-price-input');
-      var pk = input && input.dataset.piezaId;
-      if (pk && input) updatePiezaPrecio(pk, input.value);
+      var pk = input && input.dataset.repuestoId;
+      if (pk && input) updateRepuestoPrecio(pk, input.value);
     });
   });
 
@@ -810,11 +838,11 @@
       if (!zoneDiv) return;
       var cards = zoneDiv.querySelectorAll('.piece-item');
       var ids = [];
-      cards.forEach(function(c) { ids.push(c.dataset.piezaId); });
+      cards.forEach(function(c) { ids.push(c.dataset.repuestoId); });
       if (ids.length === 0) return;
       btn.disabled = true;
-      showToast('{% trans "Actualizando" %} ' + ids.length + ' {% trans "piezas..." %}');
-      fetch(apiBase + '/api/piezas/bulk-estado/', {
+      showToast('{% trans "Actualizando" %} ' + ids.length + ' {% trans "repuestos..." %}');
+      fetch(apiBase + '/api/repuestos/bulk-estado/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'Accept': 'application/json' },
         body: JSON.stringify({ ids: ids, estado: estado })
@@ -855,11 +883,11 @@
       if (!zoneDiv) return;
       var cards = zoneDiv.querySelectorAll('.piece-item');
       var ids = [];
-      cards.forEach(function(c) { ids.push(c.dataset.piezaId); });
+      cards.forEach(function(c) { ids.push(c.dataset.repuestoId); });
       if (ids.length === 0) return;
       btn.disabled = true;
       showToast((factor > 1 ? '+10%' : '−10%') + ' {% trans "precio zona..." %}');
-      fetch(apiBase + '/api/piezas/bulk-precio/', {
+      fetch(apiBase + '/api/repuestos/bulk-precio/', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'Accept': 'application/json' },
         body: JSON.stringify({ ids: ids, factor: factor })
@@ -902,6 +930,18 @@
   });
 
   if (document.querySelectorAll('.piece-item').length) refreshLiveMetrics();
+
+  var btnHow = document.getElementById('btn-how-toggle');
+  if (btnHow) {
+    btnHow.addEventListener('click', function() {
+      var content = document.getElementById('how-content');
+      var chevron = document.getElementById('how-chevron');
+      var expanded = btnHow.getAttribute('aria-expanded') === 'true';
+      if (content) content.style.display = expanded ? 'none' : 'grid';
+      if (chevron) chevron.style.transform = expanded ? '' : 'rotate(180deg)';
+      btnHow.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+    });
+  }
 })();
 </script>
 {% endblock %}

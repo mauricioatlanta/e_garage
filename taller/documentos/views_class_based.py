@@ -25,7 +25,7 @@ class DocumentoFormView(CountryLangTemplateMixin, LoginRequiredMixin, CreateView
 
         # Get country from empresa
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
             country = getattr(empresa, "pais", "CL") if empresa else "CL"
         except AttributeError:
             country = "CL"
@@ -38,7 +38,7 @@ class DocumentoFormView(CountryLangTemplateMixin, LoginRequiredMixin, CreateView
 
         # Obtener empresa del usuario
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
         except AttributeError:
             empresa, created = Empresa.objects.get_or_create(
                 user=self.request.user,
@@ -59,24 +59,24 @@ class DocumentoFormView(CountryLangTemplateMixin, LoginRequiredMixin, CreateView
             elif self.request.path.startswith("/cl/"):
                 # Para Chile, intentar chile:company_settings primero, luego fallback
                 try:
-                    settings_url = reverse("chile:company_settings")
+                    settings_url = reverse("company_settings")
                 except NoReverseMatch:
-                    settings_url = reverse("taller:company_settings")
+                    settings_url = reverse("company_settings")
             else:
                 # Fallback: usar default
-                settings_url = reverse("taller:company_settings")
+                settings_url = reverse("company_settings")
         except NoReverseMatch:
             # Fallback: construir URL manualmente basada en el path
             if self.request.path.startswith("/us/"):
                 settings_url = "/us/settings/"
             else:
-                settings_url = "/cl/es/settings/"
+                settings_url = reverse("company_settings")
         except Exception:
             # Fallback de emergencia
             if self.request.path.startswith("/us/"):
                 settings_url = "/us/settings/"
             else:
-                settings_url = "/cl/es/settings/"
+                settings_url = reverse("company_settings")
 
         context.update(
             {
@@ -104,7 +104,7 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
     def get_object(self, queryset=None):
         """Asegurar que solo se puedan editar documentos de la empresa del usuario"""
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
         except AttributeError:
             raise Http404("Usuario sin empresa asociada")
 
@@ -127,7 +127,7 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
 
         # Get country from empresa
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
             country = getattr(empresa, "pais", "CL") if empresa else "CL"
         except AttributeError:
             country = "CL"
@@ -140,7 +140,7 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
 
         # Obtener empresa del usuario
         try:
-            empresa = self.request.user.empresa
+            empresa = self.request.empresa
         except AttributeError:
             empresa = None
 
@@ -158,24 +158,24 @@ class DocumentoUpdateView(CountryLangTemplateMixin, LoginRequiredMixin, UpdateVi
             elif self.request.path.startswith("/cl/"):
                 # Para Chile, intentar chile:company_settings primero, luego fallback
                 try:
-                    settings_url = reverse("chile:company_settings")
+                    settings_url = reverse("company_settings")
                 except NoReverseMatch:
-                    settings_url = reverse("taller:company_settings")
+                    settings_url = reverse("company_settings")
             else:
                 # Fallback: usar default
-                settings_url = reverse("taller:company_settings")
+                settings_url = reverse("company_settings")
         except NoReverseMatch:
             # Fallback: construir URL manualmente basada en el path
             if self.request.path.startswith("/us/"):
                 settings_url = "/us/settings/"
             else:
-                settings_url = "/cl/es/settings/"
+                settings_url = reverse("company_settings")
         except Exception:
             # Fallback de emergencia
             if self.request.path.startswith("/us/"):
                 settings_url = "/us/settings/"
             else:
-                settings_url = "/cl/es/settings/"
+                settings_url = reverse("company_settings")
 
         context.update(
             {

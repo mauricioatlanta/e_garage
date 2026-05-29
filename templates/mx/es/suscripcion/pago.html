@@ -171,6 +171,32 @@ body {
     color: #166534;
 }
 
+.method-grid {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.method-card {
+    background: #f8fafc;
+    border: 1px solid #dbe7df;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.method-card strong {
+    display: block;
+    color: #0f172a;
+    margin-bottom: 6px;
+}
+
+.method-card p {
+    color: #475569;
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0;
+}
+
 .back-link {
     text-align: center;
     margin-top: 24px;
@@ -221,7 +247,7 @@ body {
     <div class="payment-header">
         <h1 class="payment-title">Pago de suscripción - eGarage México 🇲🇽</h1>
         <p class="payment-subtitle">
-            Completa la transferencia bancaria para activar tu plan. Envíanos el comprobante para validar tu cuenta.
+            Elige el método que te acomode. Mantendremos tu referencia lista para validar el pago sin vueltas.
         </p>
     </div>
 
@@ -233,6 +259,31 @@ body {
         <div class="plan-period">Incluye {{ plan_info.dias }} días de acceso ilimitado</div>
     </div>
 
+    <div class="method-grid">
+        {% if mp_enabled %}
+        <div class="method-card">
+            <strong>Mercado Pago</strong>
+            <p>Pago en línea para tarjetas y medios locales cuando el checkout esté disponible en este entorno.</p>
+        </div>
+        {% endif %}
+
+        {% if paypal_enabled %}
+        <div class="method-card">
+            <strong>PayPal</strong>
+            <p>Paga usando la referencia <strong>{{ referencia }}</strong> para que podamos asociar la transacción a tu taller.</p>
+        </div>
+        {% endif %}
+
+        {% if bank_transfer_enabled %}
+        <div class="method-card">
+            <strong>Transferencia bancaria SPEI</strong>
+            <p>Envía el comprobante y activaremos tu suscripción en 24-48 horas hábiles.</p>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if bank_transfer_enabled %}
+    {% firstof datos_banco.clabe datos_banco.numero_cuenta as mx_clabe %}
     <div class="bank-details">
         <div class="bank-title">
             <span>🏦</span> Datos bancarios para transferencia
@@ -251,8 +302,8 @@ body {
         </div>
         <div class="bank-row">
             <span class="bank-label">CLABE</span>
-            <span class="bank-value">{{ datos_banco.clabe }}</span>
-            <button class="copy-btn" onclick="copyToClipboard('{{ datos_banco.clabe }}')">Copiar</button>
+            <span class="bank-value">{{ mx_clabe }}</span>
+            <button class="copy-btn" onclick="copyToClipboard('{{ mx_clabe }}')">Copiar</button>
         </div>
         <div class="bank-row">
             <span class="bank-label">Confirmación</span>
@@ -272,8 +323,9 @@ body {
 
     <div class="alert alert-info">
         Si prefieres facturación electrónica con CFDI, por favor envíanos tus datos fiscales a
-        {{ datos_banco.email_confirmacion }}.
+            {{ datos_banco.email_confirmacion }}.
     </div>
+    {% endif %}
 
     <div class="back-link">
         <a href="/mx/es/dashboard/">&larr; Volver al panel</a>
@@ -288,4 +340,3 @@ function copyToClipboard(text) {
 }
 </script>
 {% endblock %}
-

@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<div class="container">
+  <h1>{% trans "Dashboard Financiero - Desarme" %}</h1>
+
+  <div class="kpi-grid">
+    <div class="kpi">
+      <strong>{% trans "Inversión total" %}:</strong>
+      <div>{{ kpis.inversion_total }}</div>
+    </div>
+    <div class="kpi">
+      <strong>{% trans "Ingresos" %}:</strong>
+      <div>{{ kpis.ingresos }}</div>
+    </div>
+    <div class="kpi">
+      <strong>{% trans "Ganancia real" %}:</strong>
+      <div>{{ kpis.ganancia }}</div>
+    </div>
+    <div class="kpi">
+      <strong>{% trans "Recuperación (%)" %}:</strong>
+      <div>{{ kpis.recuperacion_pct }}%</div>
+    </div>
+    <div class="kpi">
+      <strong>{% trans "ROI (%)" %}:</strong>
+      <div>{{ kpis.roi_pct }}%</div>
+    </div>
+    <div class="kpi">
+      <strong>{% trans "Inventario vivo" %}:</strong>
+      <div>{{ kpis.inventario_vivo }}</div>
+    </div>
+  </div>
+
+  <h2>{% trans "Top repuestos" %}</h2>
+  <table class="table">
+    <thead>
+      <tr><th>{% trans "Código" %}</th><th>{% trans "Nombre" %}</th><th>{% trans "Vendidas" %}</th><th>{% trans "Ingresos" %}</th></tr>
+    </thead>
+    <tbody>
+      {% for p in top_repuestos %}
+      <tr>
+        <td>{{ p.codigo }}</td>
+        <td>{{ p.nombre }}</td>
+        <td>{{ p.sold }}</td>
+        <td>{{ p.revenue }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">{% trans "No hay datos" %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <h2>{% trans "Top vehículos" %}</h2>
+  <table class="table">
+    <thead>
+      <tr><th>{% trans "Patente / VIN" %}</th><th>{% trans "Repuestos vendidas" %}</th><th>{% trans "Ingresos" %}</th></tr>
+    </thead>
+    <tbody>
+      {% for v in top_vehiculos %}
+      <tr>
+        <td>{{ v.patente }}</td>
+        <td>{{ v.sold }}</td>
+        <td>{{ v.revenue }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="3">{% trans "No hay datos" %}</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+</div>
+{% endblock %}

@@ -35,7 +35,7 @@ grep -n "AccountMiddleware" gestion_taller/settings/base.py gestion_taller/setti
 
 echo ""
 echo "✅ Corrección completada. Reiniciando servidor..."
-touch /var/www/www_atlantareciclajes_pythonanywhere_com_wsgi.py
+touch /var/www/www_atlantareciclajes_digitalocean_com_wsgi.py
 echo "✅ Servidor reiniciado"
 
 

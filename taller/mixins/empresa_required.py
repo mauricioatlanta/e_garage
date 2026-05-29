@@ -121,16 +121,11 @@ class EmpresaContextMixin:
         """Agregar empresa al contexto"""
         context = super().get_context_data(**kwargs)
 
-        if self.request.user.is_authenticated:
-            try:
-                context["empresa"] = self.request.user.empresa
-                context["empresa_nombre"] = self.request.user.empresa.nombre_taller
-                context["empresa_pais"] = getattr(self.request.user.empresa, "pais", "CL")
-            except AttributeError:
-                context["empresa"] = None
-
-        # También agregar desde request (si middleware lo inyectó)
-        context["empresa"] = context.get("empresa") or getattr(self.request, "empresa", None)
+        empresa = self.request.empresa
+        context["empresa"] = empresa
+        if empresa:
+            context["empresa_nombre"] = empresa.nombre_taller
+            context["empresa_pais"] = getattr(empresa, "pais", "CL")
 
         return context
 

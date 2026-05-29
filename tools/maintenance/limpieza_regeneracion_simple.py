@@ -561,7 +561,7 @@ except Exception as e:
 ## 🔐 CREDENCIALES DE ACCESO
 
 ### 🌐 URL de Login
-**https://atlantareciclajes.pythonanywhere.com/accounts/login/**
+**https://atlantareciclajes/accounts/login/**
 
 ---
 
@@ -637,12 +637,12 @@ except Exception as e:
 
 ### 🎯 URLs de Acceso Directo:
 
-- **Login:** https://atlantareciclajes.pythonanywhere.com/accounts/login/
-- **Dashboard:** https://atlantareciclajes.pythonanywhere.com/dashboard/
-- **Analytics:** https://atlantareciclajes.pythonanywhere.com/analytics/dashboard/
-- **Admin Dashboard:** https://atlantareciclajes.pythonanywhere.com/analytics/admin/dashboard/
-- **Dashboard Avanzado:** https://atlantareciclajes.pythonanywhere.com/analytics/admin/dashboard/avanzado/
-- **Info de Prueba:** https://atlantareciclajes.pythonanywhere.com/analytics/admin/test/info/
+- **Login:** https://atlantareciclajes/accounts/login/
+- **Dashboard:** https://atlantareciclajes/dashboard/
+- **Analytics:** https://atlantareciclajes/analytics/dashboard/
+- **Admin Dashboard:** https://atlantareciclajes/analytics/admin/dashboard/
+- **Dashboard Avanzado:** https://atlantareciclajes/analytics/admin/dashboard/avanzado/
+- **Info de Prueba:** https://atlantareciclajes/analytics/admin/test/info/
 
 ---
 
@@ -695,7 +695,7 @@ except Exception as e:
 
     print("\n📋 PRÓXIMOS PASOS:")
     print("1. 📄 Revisar archivo: pruebas_suscripciones_creadas.md")
-    print("2. 🌐 Probar login: https://atlantareciclajes.pythonanywhere.com/accounts/login/")
+    print("2. 🌐 Probar login: https://atlantareciclajes/accounts/login/")
     print("3. 🔍 Verificar datos: /analytics/admin/test/info/ (como admin)")
     print("4. 📊 Probar dashboards:")
     print("   - Principal: /analytics/dashboard/")
@@ -714,5 +714,5 @@ if __name__ == "__main__":
     if success:
         print("\n🚀 ¡LISTO PARA PRUEBAS!")
         print("🔑 Contraseña universal: test1234")
-        print("🌐 URL: https://atlantareciclajes.pythonanywhere.com/accounts/login/")
+        print("🌐 URL: https://atlantareciclajes/accounts/login/")
     sys.exit(0 if success else 1)

@@ -14,11 +14,11 @@ El script `preparar_actualizacion.ps1` ya se ejecutó y creó:
 
 1. Abre **FileZilla** (o cualquier cliente SFTP)
 2. Configura la conexión:
-   - **Host**: `atlantareciclajes.pythonanywhere.com`
+   - **Host**: `atlantareciclajes`
    - **Puerto**: `22` (SFTP)
    - **Protocolo**: SFTP - SSH File Transfer Protocol
    - **Usuario**: `atlantareciclajes`
-   - **Contraseña**: [tu contraseña de PythonAnywhere]
+   - **Contraseña**: [tu contraseña de DigitalOcean]
 
 ### 2.2. Subir el archivo ZIP
 
@@ -32,9 +32,9 @@ El script `preparar_actualizacion.ps1` ya se ejecutó y creó:
 
 ## 🔧 PASO 3: EJECUTAR SCRIPTS EN EL SERVIDOR
 
-### 3.1. Abrir Console en PythonAnywhere
+### 3.1. Abrir Console en DigitalOcean
 
-1. Ve a: https://www.pythonanywhere.com/user/atlantareciclajes/
+1. Ve a: https://www/user/atlantareciclajes/
 2. Inicia sesión con tus credenciales
 3. Ve a la pestaña **"Consoles"**
 4. Haz clic en **"Bash"** (o abre una consola bash existente)
@@ -102,10 +102,10 @@ ACCOUNT_CONFIRM_EMAIL_ON_GET = True
 
 ## 🔄 PASO 5: RELOAD DE LA APLICACIÓN
 
-1. Ve a: https://www.pythonanywhere.com/user/atlantareciclajes/
+1. Ve a: https://www/user/atlantareciclajes/
 2. Ve a la pestaña **"Web"**
-3. Busca tu aplicación: `atlantareciclajes.pythonanywhere.com`
-4. Haz clic en el botón verde: **"Reload atlantareciclajes.pythonanywhere.com"**
+3. Busca tu aplicación: `atlantareciclajes`
+4. Haz clic en el botón verde: **"Reload atlantareciclajes"**
 5. Espera 15-20 segundos hasta que aparezca "reloaded successfully"
 
 ---
@@ -129,9 +129,9 @@ Este script verificará:
 
 Prueba estas URLs:
 
-- **Homepage**: https://atlantareciclajes.pythonanywhere.com/
-- **Landing Chile**: https://atlantareciclajes.pythonanywhere.com/cl/
-- **Login**: https://atlantareciclajes.pythonanywhere.com/accounts/login/
+- **Homepage**: https://atlantareciclajes/
+- **Landing Chile**: https://atlantareciclajes/cl/
+- **Login**: https://atlantareciclajes/accounts/login/
 
 ---
 
@@ -194,7 +194,7 @@ Si todos los pasos se completaron correctamente, tu servidor está actualizado c
 
 ---
 
-**¿Necesitas ayuda?** Revisa los logs de error en el Web panel de PythonAnywhere.
+**¿Necesitas ayuda?** Revisa los logs de error en el Web panel de DigitalOcean.
 
 
 

@@ -5,7 +5,7 @@
 (function() {
     'use strict';
 
-    var APP_VERSION = '3.1.8';
+    var APP_VERSION = '3.2.4';
 
     window.EG = window.EG || {};
     window.EG.APP_VERSION = APP_VERSION;
@@ -110,6 +110,10 @@
             ['id_repuestos_json', 'id_servicios_json', 'id_otros_json'].forEach(function(id) {
                 var input = document.getElementById(id);
                 if (input) {
+                    try {
+                        var current = JSON.parse(input.value || '[]');
+                        if (Array.isArray(current) && current.length > 0) { return; }
+                    } catch(e) {}
                     input.value = '[]';
                 }
             });
@@ -130,7 +134,9 @@
             });
 
             if (window.EG.state && typeof window.EG.state.reset === 'function') {
-                window.EG.state.reset();
+                if (!window.DESARME_PREFILL) {
+                    window.EG.state.reset();
+                }
             }
 
             clearDynamicVisualState();
@@ -213,6 +219,42 @@
         if (window.recalcTotales) {
             window.recalcTotales();
         }
+
+        console.log('[DESARME] initAllModules terminó. DESARME_PREFILL:', window.DESARME_PREFILL);
+        if (window.DESARME_PREFILL) {
+            var form = document.getElementById('document-form');
+            console.log('[DESARME] egLineItemsHydrated antes de delete:', form && form.dataset.egLineItemsHydrated);
+            console.log('[DESARME] window.addRepuestoRow disponible:', typeof window.addRepuestoRow);
+            console.log('[DESARME] EG.repuestos.addRepuestoRow disponible:', window.EG && window.EG.repuestos && typeof window.EG.repuestos.addRepuestoRow);
+            var bootstrap = window.EG && window.EG.state && window.EG.state.getBootstrap ? window.EG.state.getBootstrap() : null;
+            console.log('[DESARME] bootstrap.line_items:', bootstrap && bootstrap.line_items);
+            if (form) delete form.dataset.egLineItemsHydrated;
+            if (window.EG && window.EG.lineItemsBootstrap) {
+                window.EG.lineItemsBootstrap.hydrateLineItems();
+            }
+            console.log('[DESARME] egLineItemsHydrated después de hydrate:', form && form.dataset.egLineItemsHydrated);
+            console.log('[DESARME] filas repuesto en DOM:', document.querySelectorAll('#repuestos-container .dynamic-element').length);
+        }
+    }
+
+    function savePrenavRowsSnapshot() {
+        try {
+            if (window.serializeRows) window.serializeRows();
+            var payload = window.EG && window.EG.borrador && window.EG.borrador.collectRows
+                ? window.EG.borrador.collectRows()
+                : null;
+            if (!payload) return;
+            var hasRows = (payload.repuestos && payload.repuestos.length)
+                || (payload.servicios && payload.servicios.length)
+                || (payload.otros && payload.otros.length);
+            if (!hasRows) return;
+            sessionStorage.setItem('eg_prenav_rows', JSON.stringify({
+                repuestos: payload.repuestos || [],
+                servicios: payload.servicios || [],
+                otros: payload.otros || [],
+                savedAt: Date.now()
+            }));
+        } catch (e) {}
     }
 
     function setupAddButtons() {
@@ -246,14 +288,10 @@
             });
         }
 
-        var btnAddUsed = document.getElementById('add-used-parts');
-        if (btnAddUsed && !btnAddUsed.dataset.egBound) {
-            btnAddUsed.dataset.egBound = '1';
-            btnAddUsed.addEventListener('click', function() {
-                if (window.EG.repuestos && window.EG.repuestos.openUsedPartsModal) {
-                    window.EG.repuestos.openUsedPartsModal();
-                }
-            });
+        var gotoUsedParts = document.getElementById('goto-used-parts');
+        if (gotoUsedParts && !gotoUsedParts.dataset.egBound) {
+            gotoUsedParts.dataset.egBound = '1';
+            gotoUsedParts.addEventListener('click', savePrenavRowsSnapshot);
         }
     }
 
@@ -280,8 +318,69 @@
 
     async function restoreDraftOnLoad() {
         if (window.EG.state && window.EG.state.isCleanMode && window.EG.state.isCleanMode()) {
-            if (window.EG.lineItemsBootstrap && window.EG.lineItemsBootstrap.clearRows) {
-                window.EG.lineItemsBootstrap.clearRows();
+            var restored = false;
+
+            // Restore pre-navigation snapshot when returning from any selection context
+            try {
+                var searchParams = new URLSearchParams(window.location.search || '');
+                var hasReturnCtx = ['pieza_desarme_id', 'created_repuesto_id', 'created_servicio_id', 'created_cliente_id', 'created_vehiculo_id'].some(function(k) {
+                    return searchParams.has(k);
+                });
+                if (hasReturnCtx) {
+                    var snapStr = sessionStorage.getItem('eg_prenav_rows');
+                    if (snapStr) {
+                        var snap = JSON.parse(snapStr);
+                        sessionStorage.removeItem('eg_prenav_rows');
+                        if (snap && typeof snap.savedAt === 'number' && (Date.now() - snap.savedAt) < 3600000) {
+                            if (window.EG.lineItemsBootstrap) {
+                                window.EG.lineItemsBootstrap.clearRows();
+                                if (Array.isArray(snap.repuestos) && snap.repuestos.length) {
+                                    window.EG.lineItemsBootstrap.hydrateRepuestos(snap.repuestos);
+                                }
+                                if (Array.isArray(snap.servicios) && snap.servicios.length) {
+                                    window.EG.lineItemsBootstrap.hydrateServicios(snap.servicios);
+                                }
+                                if (Array.isArray(snap.otros) && snap.otros.length) {
+                                    window.EG.lineItemsBootstrap.hydrateOtros(snap.otros);
+                                }
+                            }
+                            restored = true;
+                        }
+                    }
+                }
+            } catch (e) {}
+
+            // Restore desarme prefill backup (existing flow)
+            if (!restored) {
+                try {
+                    var backupStr = sessionStorage.getItem('eg_desarme_rows_backup');
+                    if (backupStr) {
+                        var backup = JSON.parse(backupStr);
+                        sessionStorage.removeItem('eg_desarme_rows_backup');
+                        if (
+                            backup
+                            && Array.isArray(backup.rows)
+                            && backup.rows.length > 0
+                            && typeof backup.savedAt === 'number'
+                            && (Date.now() - backup.savedAt) < 1800000
+                        ) {
+                            if (window.EG.lineItemsBootstrap && window.EG.lineItemsBootstrap.clearRows) {
+                                window.EG.lineItemsBootstrap.clearRows();
+                            }
+                            if (window.EG.lineItemsBootstrap && window.EG.lineItemsBootstrap.hydrateRepuestos) {
+                                window.EG.lineItemsBootstrap.hydrateRepuestos(backup.rows);
+                            }
+                            restored = true;
+                            console.log('[DESARME] Backup restaurado desde sessionStorage:', backup.rows.length, 'filas');
+                        }
+                    }
+                } catch (e) {}
+            }
+
+            if (!restored) {
+                if (window.EG.lineItemsBootstrap && window.EG.lineItemsBootstrap.clearRows) {
+                    window.EG.lineItemsBootstrap.clearRows();
+                }
             }
             return;
         }
@@ -353,7 +452,7 @@
                 await window.EG.vehiculo.handleCreatedVehiculoFromReturn(context);
             }
 
-            if (context.created_repuesto_id && window.EG.repuestos && window.EG.repuestos.handleCreatedRepuestoFromReturn) {
+            if ((context.created_repuesto_id || context.pieza_desarme_id) && window.EG.repuestos && window.EG.repuestos.handleCreatedRepuestoFromReturn) {
                 window.EG.repuestos.handleCreatedRepuestoFromReturn(context);
             }
 

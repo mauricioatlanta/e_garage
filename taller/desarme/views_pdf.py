@@ -75,6 +75,77 @@ def _get_logo_url(request, empresa):
     return None
 
 
+def _generated_at():
+    now = timezone.now()
+    return timezone.localtime(now) if timezone.is_aware(now) else now
+
+
+def _line_subtotal(linea):
+    try:
+        if isinstance(linea, dict):
+            return linea.get("subtotal", 0) or 0
+        return getattr(linea, "subtotal", 0) or 0
+    except Exception:
+        return 0
+
+
+def _build_pdf_line_items(documento):
+    items = []
+
+    try:
+        lineas_repuesto = list(documento.lineas_repuesto.all().order_by("id"))
+    except Exception:
+        lineas_repuesto = []
+    try:
+        lineas_servicio = list(documento.lineas_servicio.all().order_by("id"))
+    except Exception:
+        lineas_servicio = []
+    try:
+        lineas_otro_servicio = list(documento.lineas_otro_servicio.all().order_by("id"))
+    except Exception:
+        lineas_otro_servicio = []
+
+    for linea in lineas_repuesto:
+        code = getattr(linea, "codigo", "") or getattr(getattr(linea, "repuesto", None), "codigo", "")
+        items.append(
+            {
+                "tipo": "Repuesto",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "repuesto", "")),
+                "codigo": code,
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_unitario", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    for linea in lineas_servicio:
+        items.append(
+            {
+                "tipo": "Servicio",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "servicio", "")),
+                "codigo": "",
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_unitario", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    for linea in lineas_otro_servicio:
+        empresa_externa = getattr(linea, "empresa_externa", "") or ""
+        items.append(
+            {
+                "tipo": "Servicio externo",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "servicio", "")),
+                "codigo": empresa_externa,
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_cliente", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    return items, lineas_repuesto, lineas_servicio, lineas_otro_servicio
+
+
 def _build_pdf_context(request, documento):
     empresa = getattr(documento, "empresa", None)
     cliente = getattr(documento, "cliente", None)
@@ -86,20 +157,21 @@ def _build_pdf_context(request, documento):
     except Exception:
         cs = None
 
-    try:
-        lineas_repuesto = list(documento.lineas_repuesto.all().order_by("id"))
-    except Exception:
-        lineas_repuesto = []
+    line_items, lineas_repuesto, lineas_servicio, lineas_otro_servicio = _build_pdf_line_items(
+        documento
+    )
 
-    subtotal = getattr(documento, "neto_repuestos", None) or getattr(documento, "subtotal", None)
+    line_subtotal = sum(_line_subtotal(item) for item in line_items)
+    subtotal = line_subtotal or (
+        (getattr(documento, "neto_repuestos", 0) or 0)
+        + (getattr(documento, "neto_servicios", 0) or 0)
+        + (getattr(documento, "neto_otros_servicios", 0) or 0)
+    )
     total = getattr(documento, "total", None)
-    if subtotal is None:
-        try:
-            subtotal = sum(getattr(x, "subtotal", 0) or 0 for x in lineas_repuesto)
-        except Exception:
-            subtotal = 0
-    if total is None:
-        total = subtotal
+    if not total:
+        total = subtotal + (getattr(documento, "tax_amount", 0) or 0) - (
+            getattr(documento, "descuento", 0) or 0
+        )
 
     public_url = _public_document_url(request, documento)
     qr_data_uri = None
@@ -127,12 +199,17 @@ def _build_pdf_context(request, documento):
         "company_website": (getattr(cs, "website", "") or "").strip(),
         "cliente": cliente,
         "vehiculo": vehiculo,
+        "line_items": line_items,
         "lineas_repuesto": lineas_repuesto,
+        "lineas_servicio": lineas_servicio,
+        "lineas_otro_servicio": lineas_otro_servicio,
         "subtotal": subtotal,
+        "tax_amount": getattr(documento, "tax_amount", 0) or 0,
+        "descuento": getattr(documento, "descuento", 0) or 0,
         "total": total,
         "document_label": _document_label(documento),
         "logo_url": _get_logo_url(request, empresa),
-        "generated_at": timezone.localtime(),
+        "generated_at": _generated_at(),
         "pdf_mode": True,
         "public_url": public_url,
         "qr_data_uri": qr_data_uri,
@@ -202,12 +279,20 @@ def _get_documento_queryset():
     )
 
 
-@login_required
-def descargar_documento_pdf(request, documento_id):
+def _get_documento_for_request(request, documento_id):
+    queryset = _get_documento_queryset()
+    if getattr(request.user, "is_staff", False) or getattr(request.user, "is_superuser", False):
+        return get_object_or_404(queryset, pk=documento_id)
+
     empresa = _empresa_or_redirect(request)
     if not empresa:
         raise Http404("Sin empresa.")
-    documento = get_object_or_404(_get_documento_queryset(), pk=documento_id, empresa=empresa)
+    return get_object_or_404(queryset, pk=documento_id, empresa=empresa)
+
+
+@login_required
+def descargar_documento_pdf(request, documento_id):
+    documento = _get_documento_for_request(request, documento_id)
     pdf_bytes = _render_documento_pdf_bytes(request, documento)
     response = HttpResponse(pdf_bytes, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="{_document_filename(documento)}"'
@@ -216,10 +301,7 @@ def descargar_documento_pdf(request, documento_id):
 
 @login_required
 def imprimir_documento(request, documento_id):
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        raise Http404("Sin empresa.")
-    documento = get_object_or_404(_get_documento_queryset(), pk=documento_id, empresa=empresa)
+    documento = _get_documento_for_request(request, documento_id)
     context = _build_pdf_context(request, documento)
     context["public_url"] = _public_document_url(request, documento)
     context["print_mode"] = True
@@ -239,10 +321,7 @@ def ver_documento_publico(request, token):
 
 @login_required
 def compartir_documento_whatsapp(request, documento_id):
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        raise Http404("Sin empresa.")
-    documento = get_object_or_404(_get_documento_queryset(), pk=documento_id, empresa=empresa)
+    documento = _get_documento_for_request(request, documento_id)
     cliente = getattr(documento, "cliente", None)
     public_url = _public_document_url(request, documento)
     label = _document_label(documento)
@@ -262,10 +341,7 @@ def compartir_documento_whatsapp(request, documento_id):
 
 @login_required
 def enviar_documento_email(request, documento_id):
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        raise Http404("Sin empresa.")
-    documento = get_object_or_404(_get_documento_queryset(), pk=documento_id, empresa=empresa)
+    documento = _get_documento_for_request(request, documento_id)
     cliente = getattr(documento, "cliente", None)
     destino = getattr(cliente, "email", None)
 

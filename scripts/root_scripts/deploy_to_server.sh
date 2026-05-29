@@ -1,6 +1,6 @@
 #!/bin/bash
 # ========================================
-# SCRIPT: Deployment a PythonAnywhere
+# SCRIPT: Deployment a DigitalOcean
 # ========================================
 # USO: ./deploy_to_server.sh
 # Este script prepara el proyecto para deployment
@@ -103,6 +103,6 @@ echo "  2. En el servidor, ejecutar:"
 echo "     - python manage.py migrate"
 echo "     - python manage.py collectstatic --noinput"
 echo "     - python manage.py compilemessages --locale es"
-echo "  3. Reiniciar el servidor web (touch WSGI file en PythonAnywhere)"
+echo "  3. Reiniciar el servidor web (touch WSGI file en DigitalOcean)"
 echo ""
 

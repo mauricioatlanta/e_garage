@@ -22,6 +22,8 @@
         'created_repuesto_codigo',
         'created_repuesto_precio_venta',
         'created_repuesto_precio_compra',
+        'created_repuesto_costo_linea',
+        'pieza_desarme_id',
         'created_servicio_id',
         'created_servicio_label',
         'created_servicio_precio',
@@ -42,7 +44,7 @@
      * Wrapper fetch con CSRF y headers por defecto
      */
     async function egFetch(url, opts = {}) {
-        const CSRF = getCookie('csrftoken');
+        const CSRF = getCookie('csrftoken') || (document.querySelector('[name=csrfmiddlewaretoken]') || {}).value || '';
         const defaults = {
             credentials: 'same-origin',
             headers: {

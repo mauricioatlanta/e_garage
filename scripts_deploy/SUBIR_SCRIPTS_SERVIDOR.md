@@ -9,7 +9,7 @@ Los scripts `1_backup_FIXED.sh` y `2_actualizar_ESTRUCTURA_COMPLETA.sh` no está
 
 1. Abre **FileZilla**
 2. Conecta a:
-   - **Host**: `atlantareciclajes.pythonanywhere.com`
+   - **Host**: `atlantareciclajes`
    - **Puerto**: `22` (SFTP)
    - **Usuario**: `atlantareciclajes`
    - **Contraseña**: [tu contraseña]
@@ -33,7 +33,7 @@ Los scripts `1_backup_FIXED.sh` y `2_actualizar_ESTRUCTURA_COMPLETA.sh` no está
 
 ### Paso 4: Dar permisos de ejecución
 
-En la consola de PythonAnywhere, ejecuta:
+En la consola de DigitalOcean, ejecuta:
 
 ```bash
 cd /home/atlantareciclajes/scripts_deploy/

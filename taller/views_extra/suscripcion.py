@@ -52,8 +52,16 @@ def registro(request):
     - URLs dinámicas con CountrySettings
     """
     if request.method == "POST":
-        form = FormularioRegistro(request.POST, request=request)
-        tipo_registro = request.POST.get("tipo_registro")
+        post_data = request.POST.copy()
+        tipo_registro = post_data.get("tipo_registro")
+
+        if not post_data.get("plan"):
+            if tipo_registro == "trial":
+                post_data["plan"] = "trial"
+            elif tipo_registro == "pago":
+                post_data["plan"] = "mensual"
+
+        form = FormularioRegistro(post_data, request=request)
 
         if not form.is_valid():
             return render(request, "saas/suscripcion/registro.html", {"form": form})

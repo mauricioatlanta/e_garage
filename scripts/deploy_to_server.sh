@@ -1,6 +1,6 @@
 #!/bin/bash
 # ========================================
-# SCRIPT: Deployment ROBUSTO a PythonAnywhere
+# SCRIPT: Deployment ROBUSTO a DigitalOcean
 # ========================================
 # USO: ./scripts/deploy_to_server.sh
 # REQUIERE: Git configurado, SSH keys configuradas
@@ -11,10 +11,10 @@ set -e  # Salir si algo falla
 # CONFIGURACIÓN
 # ========================================
 SERVER_USER="atlantareciclajes"
-SERVER_HOST="ssh.pythonanywhere.com"
+SERVER_HOST="ssh"
 REMOTE_PATH="/home/atlantareciclajes/apps/egarage"
 VENV_NAME="venv_egarage310"
-WSGI_FILE="/var/www/www_atlantareciclajes_pythonanywhere_com_wsgi.py"
+WSGI_FILE="/var/www/www_atlantareciclajes_digitalocean_com_wsgi.py"
 GIT_REPO="git@github.com:TU-USUARIO/egarage.git"  # 👈 CAMBIAR POR TU REPO
 
 # Colores
@@ -209,7 +209,7 @@ from pathlib import Path
 # Contiene configuración específica del servidor
 
 DEBUG = False
-ALLOWED_HOSTS = ['atlantareciclajes.pythonanywhere.com', 'www.egarage.cl']
+ALLOWED_HOSTS = ['atlantareciclajes', 'www.egarage.cl']
 
 # Base de datos (usar la del servidor)
 DATABASES = {
@@ -289,7 +289,7 @@ echo "========================================="
 echo "✅ DEPLOYMENT COMPLETADO"
 echo "========================================="
 echo ""
-print_success "Verifica en: https://atlantareciclajes.pythonanywhere.com"
+print_success "Verifica en: https://atlantareciclajes"
 echo ""
 print_step "Si algo salió mal, puedes rollback con:"
 echo "  ssh $SERVER_USER@$SERVER_HOST"

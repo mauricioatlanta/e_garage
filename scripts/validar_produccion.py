@@ -1,7 +1,7 @@
 # ===============================================================
 # 🚀 SCRIPT DE VALIDACIÓN PRE-DESPLIEGUE
 # ===============================================================
-# Validar que todos los archivos estén listos para PythonAnywhere
+# Validar que todos los archivos estén listos para DigitalOcean
 # ===============================================================
 
 import os
@@ -88,9 +88,9 @@ def verificar_dependencias():
 
 def generar_resumen():
     """Generar resumen final"""
-    print("📋 RESUMEN DEL PROYECTO PARA PYTHONANYWHERE")
+    print("📋 RESUMEN DEL PROYECTO PARA DIGITALOCEAN")
     print("=" * 60)
-    print("🌐 URL: https://e-garage-atlantareciclajes.pythonanywhere.com")
+    print("🌐 URL: https://e-garage-atlantareciclajes")
     print("🐍 Python: 3.10+")
     print("🗄️  Base de datos: MySQL")
     print("🚀 Framework: Django 5.2.3")
@@ -107,7 +107,7 @@ def generar_resumen():
 
 
 if __name__ == "__main__":
-    print("🔍 VALIDACIÓN PRE-DESPLIEGUE PARA PYTHONANYWHERE")
+    print("🔍 VALIDACIÓN PRE-DESPLIEGUE PARA DIGITALOCEAN")
     print("=" * 60)
 
     verificar_archivos_produccion()
@@ -116,4 +116,4 @@ if __name__ == "__main__":
     generar_resumen()
 
     print("\n✅ VALIDACIÓN COMPLETADA")
-    print("🚀 El proyecto está listo para PythonAnywhere!")
+    print("🚀 El proyecto está listo para DigitalOcean!")

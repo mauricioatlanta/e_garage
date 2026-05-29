@@ -116,8 +116,8 @@
               <div class="bg-black/40 rounded-xl p-4 border border-blue-400/20">
                 <div class="text-blue-400 text-sm font-semibold uppercase tracking-wider mb-2">{% trans "Engine" %}</div>
                 <div class="text-white text-lg font-semibold">
-                  {% if vehiculo.motor %}
-                    {{ vehiculo.motor.nombre }}
+                  {% if vehiculo.motor_display %}
+                    {{ vehiculo.motor_display.nombre }}
                   {% else %}
                     <span class="text-gray-400">Not Assigned</span>
                   {% endif %}
@@ -127,8 +127,8 @@
               <div class="bg-black/40 rounded-xl p-4 border border-blue-400/20">
                 <div class="text-blue-400 text-sm font-semibold uppercase tracking-wider mb-2">{% trans "Transmission" %}</div>
                 <div class="text-white text-lg font-semibold">
-                  {% if vehiculo.caja %}
-                    {{ vehiculo.caja.nombre }}
+                  {% if vehiculo.caja_display %}
+                    {{ vehiculo.caja_display.nombre }}
                   {% else %}
                     <span class="text-gray-400">Not Assigned</span>
                   {% endif %}

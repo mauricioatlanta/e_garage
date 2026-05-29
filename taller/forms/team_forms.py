@@ -5,8 +5,8 @@ Formularios para gestión de equipo (Team Management)
 from django import forms
 from django.contrib.auth.models import User, Group
 from django.core.exceptions import ValidationError
-
 from taller.models.team_member import TeamMember
+from taller.services.plan_change_service import PlanLimitValidation
 
 
 class TeamMemberForm(forms.ModelForm):
@@ -18,6 +18,7 @@ class TeamMemberForm(forms.ModelForm):
     - Permite seleccionar el Rol de una lista limpia
     - Valida que el email no esté duplicado
     - No permite crear Owners (solo el creador original es Owner)
+    - [CANDADO] Valida los límites del plan activo antes de crear nuevos usuarios
     """
 
     # Campos del formulario
@@ -39,13 +40,11 @@ class TeamMemberForm(forms.ModelForm):
 
     rol = forms.ChoiceField(
         choices=[
-            ("Admin", "Administrador"),
+            ("Admin",    "Administrador"),
             ("Vendedor", "Vendedor"),
-            ("Tecnico", "Técnico"),
-            ("MIXTO", "Mixto (Vendedor + Técnico)"),
         ],
         required=True,
-        label="Rol en el Taller",
+        label="Rol en el Negocio",
         help_text="El rol determina qué permisos tendrá el usuario",
     )
 
@@ -63,10 +62,6 @@ class TeamMemberForm(forms.ModelForm):
     def __init__(self, *args, empresa=None, creador=None, **kwargs):
         """
         Inicializa el formulario con empresa y creador.
-
-        Args:
-            empresa: Empresa a la que pertenecerá el miembro
-            creador: Usuario que está creando el miembro
         """
         super().__init__(*args, **kwargs)
         self.empresa = empresa
@@ -114,22 +109,27 @@ class TeamMemberForm(forms.ModelForm):
         return email
 
     def clean(self):
-        """Validaciones adicionales"""
+        """Validaciones adicionales y candado de suscripciones"""
         cleaned_data = super().clean()
 
         # Si estamos creando, password es obligatorio
-        if not self.instance.pk and not cleaned_data.get("password"):
+        es_creacion = not (self.instance and self.instance.pk)
+        if es_creacion and not cleaned_data.get("password"):
             raise ValidationError("La contraseña es obligatoria al crear un nuevo usuario")
+
+        # 🔒 CANDADO DE PLANES: Si es una creación y tenemos la empresa, validamos los cupos reales
+        if es_creacion and self.empresa:
+            can_add, count, limite = PlanLimitValidation.can_add_user(self.empresa)
+            if not can_add:
+                raise ValidationError(
+                    f"No puedes agregar más usuarios. Tu plan actual permite un máximo de {limite} "
+                    f"usuarios administrativos y actualmente tienes {count} activos."
+                )
 
         return cleaned_data
 
     def save(self, commit=True):
-        """
-        Guarda el miembro del equipo y crea/actualiza el usuario asociado.
-
-        Returns:
-            TeamMember: Instancia guardada
-        """
+        """Guarda el miembro del equipo y crea/actualiza el usuario asociado."""
         email = self.cleaned_data["email"].strip().lower()
         first_name = self.cleaned_data["first_name"]
         last_name = self.cleaned_data["last_name"]
@@ -154,7 +154,7 @@ class TeamMemberForm(forms.ModelForm):
             user.first_name = first_name
             user.last_name = last_name
             user.email = email
-            user.username = email  # Usar email como username
+            user.username = email
             user.save()
 
         # Si se proporcionó nueva contraseña, actualizarla
@@ -177,40 +177,18 @@ class TeamMemberForm(forms.ModelForm):
         if not created:
             team_member.rol = rol
             team_member.notas = notas
-            team_member.is_active = True  # Reactivar si estaba desactivado
+            team_member.is_active = True
             team_member.save()
 
-        # Guardar instancia para compatibilidad con ModelForm
         self.instance = team_member
-
         return team_member
 
 
 class TeamMemberDeactivateForm(forms.Form):
-    """
-    Formulario simple para desactivar un miembro del equipo.
-    """
-
+    """Formulario simple para desactivar un miembro del equipo."""
     motivo = forms.CharField(
         widget=forms.Textarea(attrs={"rows": 3}),
-        required=False,
-        label="Motivo de desactivación",
-        help_text="Opcional: razón por la que se desactiva al usuario",
+        required=True,
+        label="Motivo de Desactivación",
+        help_text="Explique brevemente por qué se desactiva a este miembro del equipo",
     )
-
-    def __init__(self, *args, team_member=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.team_member = team_member
-
-    def save(self):
-        """Desactiva el miembro del equipo"""
-        if self.team_member:
-            motivo = self.cleaned_data.get("motivo", "")
-            if motivo:
-                self.team_member.notas = (
-                    f"{self.team_member.notas or ''}\n[Desactivado]: {motivo}".strip()
-                )
-            self.team_member.is_active = False
-            self.team_member.save()
-            return self.team_member
-        return None

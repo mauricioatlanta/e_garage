@@ -68,12 +68,11 @@
             + '</svg>';
     }
 
-    function buildRepuestoRowHTML(rowId, isFirstRow) {
+    function buildRepuestoRowHTML(rowId) {
         return ''
-            + '<div class="doc-row-grid repuesto-row-grid grid gap-2 items-center border border-cyan-400/30 rounded-lg p-2 sm:p-3 bg-black/20" data-row-id="' + rowId + '">'
+            + '<div class="doc-row-grid repuesto-row-grid" data-row-id="' + rowId + '">'
             + '  <div class="repuesto-cell repuesto-cell-code relative min-w-0">'
-            +        buildLabel(EG.I18N.code || 'Code', isFirstRow)
-            + '    <input type="text" class="rep-codigo form-control w-full h-10 text-sm" placeholder="' + escapeHtml(EG.I18N.code || 'Code') + '" autocomplete="off">'
+            + '    <input type="text" class="rep-codigo form-control w-full" placeholder="' + escapeHtml(EG.I18N.code || 'Code') + '" autocomplete="off">'
             + '    <div class="rep-codigo-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
             + '    <input type="hidden" class="rep-id">'
             + '    <input type="hidden" class="rep-origen" value="STOCK_BODEGA">'
@@ -83,23 +82,20 @@
             + '    <input type="hidden" class="rep-stock-minimo">'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-name description-field rep-search-container relative min-w-0">'
-            +        buildLabel(EG.I18N.name || 'Name', isFirstRow)
             + '    <span class="rep-desarme-badge hidden text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-900/60 border border-amber-400/70 text-amber-200 uppercase">Usado</span>'
-            + '    <input type="text" class="rep-search form-control w-full h-10 text-sm" style="min-width: 0; width: 100%;" placeholder="' + escapeHtml(EG.I18N.type_to_search_parts || 'Buscar...') + '" autocomplete="off">'
+            + '    <input type="text" class="rep-search form-control w-full" placeholder="' + escapeHtml(EG.I18N.type_to_search_parts || 'Buscar...') + '" autocomplete="off">'
             + '    <div class="rep-dropdown absolute z-50 w-full bg-gray-800 border border-cyan-400 rounded-lg shadow-lg hidden max-h-60 overflow-y-auto"></div>'
             + '    <input type="hidden" class="rep-nombre">'
-            + '    <div class="rep-stock-alert hidden mt-2 rounded-md border px-2 py-1 text-xs leading-5"></div>'
+            + '    <div class="rep-stock-alert hidden mt-1 rounded-md border px-2 py-0.5 text-xs leading-4"></div>'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-qty min-w-0">'
-            +        buildLabel(EG.I18N.qty || 'Qty', isFirstRow)
-            + '    <input type="number" class="rep-cantidad form-control w-full h-10 text-sm" min="1" value="1">'
+            + '    <input type="number" class="rep-cantidad form-control w-full" min="1" value="1">'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-price min-w-0">'
-            +        buildLabel(EG.I18N.sale_price || 'Price', isFirstRow)
             + '    <div class="rep-price-field relative min-w-0">'
             + '      <div class="relative">'
             + '        <span class="absolute left-2 top-1/2 -translate-y-1/2 text-cyan-300">$</span>'
-            + '        <input type="text" class="rep-precio-venta form-control w-full h-10 text-sm pl-6 pr-10" placeholder="0">'
+            + '        <input type="text" class="rep-precio-venta form-control w-full pl-6 pr-8" placeholder="0">'
             + '        <button type="button" class="rep-toggle-cost" title="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-label="' + escapeHtml(EG.I18N.cost || 'Costo') + '" aria-expanded="false">'
             +              buildEyeIcon()
             + '        </button>'
@@ -117,13 +113,11 @@
             + '    </div>'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-total min-w-0">'
-            +        buildLabel(EG.I18N.subtotal || 'Subtotal', isFirstRow)
             + '    <input type="hidden" class="rep-subtotal" value="0">'
-            + '    <div class="rep-subtotal-view subtotal-field w-full h-10 text-right font-bold form-control text-sm flex items-center justify-end">' + money(0) + '</div>'
+            + '    <div class="rep-subtotal-view subtotal-field w-full text-right font-bold form-control flex items-center justify-end">' + money(0) + '</div>'
             + '  </div>'
             + '  <div class="repuesto-cell repuesto-cell-action">'
-            +        buildLabel('&nbsp;', isFirstRow)
-            + '    <button type="button" class="btn-add w-full h-10 rep-remove-btn" title="' + escapeHtml(EG.I18N.remove_row || 'Remove row') + '">X</button>'
+            + '    <button type="button" class="btn-add w-full rep-remove-btn" title="' + escapeHtml(EG.I18N.remove_row || 'Remove row') + '">X</button>'
             + '  </div>'
             + '</div>';
     }
@@ -184,11 +178,10 @@
         }
 
         var rowId = String((presetRowId || '').trim() || generateRowId());
-        var isFirstRow = !container.querySelector('.dynamic-element');
         var row = document.createElement('div');
         row.className = 'dynamic-element';
         row.dataset.rowId = rowId;
-        row.innerHTML = buildRepuestoRowHTML(rowId, isFirstRow);
+        row.innerHTML = buildRepuestoRowHTML(rowId);
         container.appendChild(row);
         setupRepuestoRow(row);
         refreshHeaderLabels();
@@ -631,7 +624,8 @@
 
     function handleCreatedRepuestoFromReturn(context) {
         var repuestoId = context.created_repuesto_id || '';
-        if (!repuestoId) {
+        var piezaDesarmeId = context.pieza_desarme_id || '';
+        if (!repuestoId && !piezaDesarmeId) {
             return;
         }
 
@@ -650,7 +644,10 @@
             nombre: context.created_repuesto_nombre || context.created_repuesto_label || '',
             precio_venta: context.created_repuesto_precio_venta || context.created_repuesto_precio_compra || 0,
             precio_compra: context.created_repuesto_precio_compra || 0,
+            costo_linea: context.created_repuesto_costo_linea || 0,
             cantidad: 1,
+            origen_repuesto: piezaDesarmeId ? 'DESARME' : 'STOCK_BODEGA',
+            pieza_desarme_id: piezaDesarmeId,
         });
 
         if (EG.utils.clearActiveRowContext) {
@@ -666,7 +663,20 @@
 
     function openUsedPartsModal() {
         var modal = document.getElementById('modal-used-parts');
-        if (modal) modal.classList.remove('hidden');
+        if (!modal) return;
+        modal.classList.remove('hidden');
+        var searchInput = document.getElementById('used-parts-search');
+        var resultsEl = document.getElementById('used-parts-results');
+        var emptyEl = document.getElementById('used-parts-empty');
+        if (searchInput) {
+            searchInput.value = '';
+            searchInput.focus();
+        }
+        if (resultsEl) resultsEl.innerHTML = '';
+        if (emptyEl) {
+            emptyEl.textContent = 'Escriba al menos 2 caracteres para buscar';
+            emptyEl.classList.remove('hidden');
+        }
     }
 
     function closeUsedPartsModal() {
@@ -680,6 +690,7 @@
         var modal = document.getElementById('modal-used-parts');
         if (modal && !modal.dataset.egBound) {
             modal.dataset.egBound = '1';
+
             var overlay = document.getElementById('used-parts-overlay');
             if (overlay) {
                 overlay.addEventListener('click', closeUsedPartsModal);
@@ -687,6 +698,116 @@
             var closeBtn = document.getElementById('close-used-parts');
             if (closeBtn) {
                 closeBtn.addEventListener('click', closeUsedPartsModal);
+            }
+
+            var usedPartsSearch = document.getElementById('used-parts-search');
+            var usedPartsResults = document.getElementById('used-parts-results');
+            var usedPartsEmpty = document.getElementById('used-parts-empty');
+            var usedPartsTimer = null;
+
+            function resetUsedPartsUI(message) {
+                if (usedPartsResults) usedPartsResults.innerHTML = '';
+                if (usedPartsEmpty) {
+                    usedPartsEmpty.textContent = message || 'Escriba al menos 2 caracteres para buscar';
+                    usedPartsEmpty.classList.remove('hidden');
+                }
+            }
+
+            function renderUsedPartsResults(items) {
+                if (!usedPartsResults) return;
+                usedPartsResults.innerHTML = '';
+
+                if (!items || !items.length) {
+                    resetUsedPartsUI('No se encontraron piezas disponibles');
+                    return;
+                }
+
+                if (usedPartsEmpty) usedPartsEmpty.classList.add('hidden');
+
+                items.forEach(function(item) {
+                    var precio = item.precio_venta_sugerido != null ? item.precio_venta_sugerido : (item.precio || 0);
+                    var div = document.createElement('div');
+                    div.className = 'doc-used-modal__item';
+                    div.dataset.piezaId = item.id || '';
+                    div.dataset.codigo = item.codigo || '';
+                    div.dataset.nombre = item.nombre || '';
+                    div.dataset.precio = precio;
+                    div.dataset.costo = item.costo_asignado || 0;
+                    div.dataset.cantidad = item.cantidad || 0;
+                    div.innerHTML = '<div class="font-semibold text-cyan-200">'
+                        + escapeHtml((item.codigo ? item.codigo + ' - ' : '') + (item.nombre || ''))
+                        + '</div>'
+                        + '<div class="text-xs text-gray-400">'
+                        + 'Disponibles: ' + (item.cantidad || 0)
+                        + (item.vehiculo_origen ? ' • ' + escapeHtml(item.vehiculo_origen) : '')
+                        + ' • ' + money(precio)
+                        + '</div>';
+                    div.addEventListener('click', function() {
+                        var newRow = addRepuestoRow(null);
+                        if (newRow && newRow.__applyRepData) {
+                            newRow.__applyRepData({
+                                id: '',
+                                codigo: div.dataset.codigo,
+                                nombre: div.dataset.nombre,
+                                precio_venta: parseFloat(div.dataset.precio) || 0,
+                                costo_linea: parseFloat(div.dataset.costo) || 0,
+                                cantidad: 1,
+                                origen_repuesto: 'DESARME',
+                                pieza_desarme_id: div.dataset.piezaId,
+                            });
+                        }
+                        closeUsedPartsModal();
+                    });
+                    usedPartsResults.appendChild(div);
+                });
+            }
+
+            async function searchUsedParts(query) {
+                var q = String(query || '').trim();
+                if (q.length < 2) {
+                    resetUsedPartsUI();
+                    return;
+                }
+                var url = (EG.cfg && EG.cfg.URL_USED_PARTS) || '';
+                if (!url) {
+                    resetUsedPartsUI('URL de búsqueda no configurada');
+                    return;
+                }
+                try {
+                    var response = await EG.utils.egFetch(url + '?q=' + encodeURIComponent(q));
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    var data = await response.json();
+                    var items = (data && Array.isArray(data.results)) ? data.results : (Array.isArray(data) ? data : []);
+                    renderUsedPartsResults(items);
+                } catch (err) {
+                    console.error('searchUsedParts:', err);
+                    if (usedPartsResults) {
+                        usedPartsResults.innerHTML = '<div class="p-3 text-red-300">Error al buscar piezas</div>';
+                    }
+                    if (usedPartsEmpty) usedPartsEmpty.classList.add('hidden');
+                }
+            }
+
+            if (usedPartsSearch) {
+                usedPartsSearch.addEventListener('input', function(event) {
+                    clearTimeout(usedPartsTimer);
+                    usedPartsTimer = setTimeout(function() {
+                        searchUsedParts(event.target.value);
+                    }, 250);
+                });
+                usedPartsSearch.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') {
+                        closeUsedPartsModal();
+                    }
+                });
+            }
+
+            if (usedPartsResults) {
+                usedPartsResults.addEventListener('keydown', function(event) {
+                    if (event.key === 'Escape') {
+                        closeUsedPartsModal();
+                    }
+                });
             }
         }
 

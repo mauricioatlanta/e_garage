@@ -78,9 +78,9 @@ sudo journalctl -u sync_subscriptions.service -n 50
 sudo systemctl start sync_subscriptions.service
 ```
 
-## Opción 3: PythonAnywhere (Si usas PythonAnywhere)
+## Opción 3: DigitalOcean (Si usas DigitalOcean)
 
-En PythonAnywhere, usa las Tasks programadas:
+En DigitalOcean, usa las Tasks programadas:
 
 1. Ve a la pestaña "Tasks"
 2. Crea una nueva tarea:

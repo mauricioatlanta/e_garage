@@ -135,7 +135,7 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "support@egarage.cl").strip
 SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL).strip()
 SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", DEFAULT_FROM_EMAIL).strip()
 EMAIL_HOST_USER = SUPPORT_EMAIL
-EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+# EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 ANYMAIL = {
     "RESEND_API_KEY": os.environ.get("RESEND_API_KEY"),
@@ -151,3 +151,6 @@ SESSION_SAVE_EVERY_REQUEST = True
 # Archivos más grandes se guardan en disco temporal automáticamente
 FILE_UPLOAD_MAX_MEMORY_SIZE = 20971520  # 20MB
 DATA_UPLOAD_MAX_MEMORY_SIZE = 20971520  # 20MB
+EMAIL_BACKEND = 'gestion_taller.resend_backend.ResendBackend'
+RESEND_API_KEY = 're_tu_llave_aqui'
+DEFAULT_FROM_EMAIL = 'support@egarage.cl'

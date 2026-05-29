@@ -1,200 +1,230 @@
-{% extends 'base_login.html' %}
+{% extends 'base.html' %}
 {% load static %}
 {% load widget_tweaks %}
-{% load i18n %}
 
-{% block title %}{% trans "Sign In" %} - eGarage{% endblock %}
+{% block title %}Login - eGarage USA{% endblock %}
 
-{% block extra_head %}{% endblock %}
+{% block extra_head %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
 
-{% block back_button %}
-{% with back_country=country|default:"CL" %}
-{% if back_country == 'US' %}
-    <a href="/us/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'UY' %}
-    <a href="/uy/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'AR' %}
-    <a href="/ar/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'MX' %}
-    <a href="/mx/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'CO' %}
-    <a href="/co/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'EC' %}
-    <a href="/ec/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'PE' %}
-    <a href="/pe/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'VE' %}
-    <a href="/ve/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% elif back_country == 'BR' %}
-    <a href="/br/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% else %}
-    <a href="/cl/es/bienvenida/" class="back-button font-futuristic">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-        <span>{% trans "Back" %}</span>
-    </a>
-{% endif %}
-{% endwith %}
+body {
+    background: linear-gradient(135deg, #000814 0%, #001428 50%, #000814 100%);
+    font-family: 'Exo 2', sans-serif;
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.font-futuristic { font-family: 'Orbitron', monospace; letter-spacing: 0.05em; }
+
+.tech-grid {
+    background-image:
+        linear-gradient(rgba(0, 40, 104, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 40, 104, 0.08) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: grid-move 20s linear infinite;
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+}
+
+@keyframes grid-move {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+.login-container { position: relative; z-index: 10; width: 100%; max-width: 500px; padding: 20px; }
+
+.glass-card {
+    background: linear-gradient(135deg, rgba(0, 40, 104, 0.12) 0%, rgba(191, 10, 48, 0.08) 100%);
+    backdrop-filter: blur(30px);
+    border-radius: 2rem;
+    border: 2px solid rgba(0, 40, 104, 0.4);
+    box-shadow: 0 20px 60px rgba(0, 40, 104, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 3rem 2.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.glass-card::before {
+    content: '';
+    position: absolute;
+    top: -50%; left: -50%;
+    width: 200%; height: 200%;
+    background: conic-gradient(from 0deg, transparent 0deg, rgba(0, 40, 104, 0.1) 60deg, transparent 120deg);
+    animation: shimmer 4s linear infinite;
+}
+
+@keyframes shimmer {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.login-content { position: relative; z-index: 1; }
+.logo-section { text-align: center; margin-bottom: 2rem; }
+
+.logo {
+    width: 80px; height: 80px;
+    margin: 0 auto 1rem;
+    filter: drop-shadow(0 0 20px rgba(0, 40, 104, 0.8));
+}
+
+.brand-title {
+    font-size: 2rem; font-weight: 900;
+    background: linear-gradient(135deg, #002868 0%, #BF0A30 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+}
+
+.subtitle { color: #94a3b8; font-size: 0.9rem; }
+
+.login-title {
+    font-size: 1.8rem; font-weight: 700;
+    color: #4a90d9;
+    margin-bottom: 2rem; text-align: center;
+    text-shadow: 0 0 15px rgba(0, 40, 104, 0.6);
+}
+
+.form-group { margin-bottom: 1.5rem; }
+.form-label { display: block; font-size: 0.9rem; font-weight: 600; color: #4a90d9; margin-bottom: 0.5rem; }
+
+.form-input {
+    width: 100%; padding: 1rem; font-size: 1rem; color: #ffffff;
+    background: rgba(0, 0, 0, 0.5);
+    border: 2px solid rgba(0, 40, 104, 0.4);
+    border-radius: 0.75rem; transition: all 0.3s ease;
+}
+
+.form-input:focus {
+    outline: none; border-color: #4a90d9;
+    background: rgba(0, 0, 0, 0.7);
+    box-shadow: 0 0 20px rgba(0, 40, 104, 0.4);
+}
+
+.form-input::placeholder { color: #64748b; }
+
+.checkbox-container { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+.checkbox-container input[type="checkbox"] { width: 20px; height: 20px; accent-color: #4a90d9; cursor: pointer; }
+.checkbox-label { color: #94a3b8; font-size: 0.9rem; cursor: pointer; }
+
+.login-button {
+    width: 100%; padding: 1.2rem; font-size: 1.1rem; font-weight: 700;
+    color: #ffffff;
+    background: linear-gradient(135deg, #002868 0%, #BF0A30 100%);
+    border: none; border-radius: 0.75rem; cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 25px rgba(0, 40, 104, 0.5);
+    text-transform: uppercase; letter-spacing: 0.05em;
+}
+
+.login-button:hover { transform: translateY(-3px); box-shadow: 0 0 40px rgba(0, 40, 104, 0.8); }
+
+.forgot-password { text-align: center; margin-top: 1rem; }
+.forgot-password a { color: #4a90d9; text-decoration: none; font-size: 0.9rem; }
+.forgot-password a:hover { text-shadow: 0 0 10px rgba(0, 40, 104, 0.8); }
+
+.divider { margin: 2rem 0; text-align: center; position: relative; }
+.divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: rgba(0, 40, 104, 0.3); }
+.divider span { background: rgba(0, 0, 0, 0.8); padding: 0 1rem; position: relative; color: #64748b; font-size: 0.9rem; }
+
+.signup-link { text-align: center; padding-top: 1.5rem; border-top: 1px solid rgba(0, 40, 104, 0.3); }
+.signup-link-text { color: #94a3b8; font-size: 0.9rem; }
+.signup-link a { color: #4a90d9; text-decoration: none; font-weight: 600; margin-left: 0.3rem; }
+.signup-link a:hover { text-shadow: 0 0 10px rgba(0, 40, 104, 0.8); }
+
+.error-message {
+    background: rgba(191, 10, 48, 0.2);
+    border: 1px solid rgba(191, 10, 48, 0.5);
+    color: #ff6b6b; padding: 1rem; border-radius: 0.75rem;
+    margin-bottom: 1.5rem; font-size: 0.9rem;
+}
+
+.flag-bar { display: flex; width: 72px; height: 8px; border-radius: 4px; overflow: hidden; margin: 0 auto 0.75rem; }
+.flag-bar div { flex: 1; }
+@media (max-width: 640px) {
+    .glass-card { padding: 2rem 1.5rem; }
+    .brand-title { font-size: 1.5rem; }
+    .login-title { font-size: 1.5rem; }
+}
+</style>
 {% endblock %}
 
 {% block content %}
+<div class="tech-grid"></div>
+
 <div class="login-container">
     <div class="glass-card">
-        <div class="logo-section">
-            <div class="logo-container">
-                <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage" class="logo">
-            </div>
-            {% with badge_country=country|default:"CL" %}
-            {% if badge_country == 'US' %}
-                <div class="country-badge font-futuristic">🇺🇸 UNITED STATES</div>
-            {% elif badge_country == 'UY' %}
-                <div class="country-badge font-futuristic">🇺🇾 URUGUAY</div>
-            {% elif badge_country == 'AR' %}
-                <div class="country-badge font-futuristic">🇦🇷 ARGENTINA</div>
-            {% elif badge_country == 'MX' %}
-                <div class="country-badge font-futuristic">🇲🇽 MÉXICO</div>
-            {% elif badge_country == 'CO' %}
-                <div class="country-badge font-futuristic">🇨🇴 COLOMBIA</div>
-            {% elif badge_country == 'EC' %}
-                <div class="country-badge font-futuristic">🇪🇨 ECUADOR</div>
-            {% elif badge_country == 'PE' %}
-                <div class="country-badge font-futuristic">🇵🇪 PERÚ</div>
-            {% elif badge_country == 'VE' %}
-                <div class="country-badge font-futuristic">🇻🇪 VENEZUELA</div>
-            {% elif badge_country == 'BR' %}
-                <div class="country-badge font-futuristic">🇧🇷 BRASIL</div>
-            {% else %}
-                <div class="country-badge font-futuristic">🇨🇱 CHILE</div>
-            {% endif %}
-            {% endwith %}
-        </div>
-
-        {% if form.non_field_errors %}
-        <div class="alert alert-error">
-            {% for error in form.non_field_errors %}
-                <div class="flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                    {{ error }}
-                </div>
-            {% endfor %}
-        </div>
-        {% endif %}
-
-        {# En login no mostramos mensajes residuales de otras vistas.
-           Solo se muestran errores del formulario (arriba). #}
-        {# {% if messages %}{% for message in messages %}...{% endfor %}{% endif %} #}
-
-        <form method="POST" action="{% url 'account_login' %}" class="space-y-6">
-            {% csrf_token %}
-            {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
-
-            <div class="form-group">
-                <label for="id_login" class="form-label font-futuristic">{% trans "Email or Username" %}</label>
-                {{ form.login|add_class:"form-input"|attr:"placeholder:Enter your credentials"|attr:"autocomplete:email" }}
-                {% if form.login.errors %}
-                <div class="error-message">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                    {% for error in form.login.errors %}{{ error }}{% endfor %}
-                </div>
-                {% endif %}
+        <div class="login-content">
+            <div class="logo-section">
+                <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="logo">
+                <div class="flag-bar"><div class="flag-s1" style="background:#B22234"></div><div class="flag-s2" style="background:#FFFFFF"></div><div class="flag-s3" style="background:#3C3B6E"></div></div><h1 class="brand-title font-futuristic">eGarage USA</h1>
+                <p class="subtitle">Professional Auto Shop Management</p>
             </div>
 
-            <div class="form-group">
-                <label for="id_password" class="form-label font-futuristic">{% trans "Password" %}</label>
-                {{ form.password|add_class:"form-input"|attr:"placeholder:Enter your secure password"|attr:"type:password"|attr:"autocomplete:current-password" }}
-                {% if form.password.errors %}
-                <div class="error-message">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                    {% for error in form.password.errors %}{{ error }}{% endfor %}
-                </div>
-                {% endif %}
-            </div>
+            <h2 class="login-title font-futuristic">Sign In</h2>
 
-            {% if form.remember %}
-            <div class="remember-me">
-                {{ form.remember }}
-                <label for="id_remember">{% trans "Keep me signed in" %}</label>
-            </div>
+            {% if form.non_field_errors %}
+            <div class="error-message">{{ form.non_field_errors }}</div>
             {% endif %}
 
-            <button type="submit" class="login-button">
-                <span class="relative z-10">
-                    <svg class="inline-block w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-                    </svg>
-                    {% trans "Access System" %}
-                </span>
-            </button>
-        </form>
+            <form method="POST" action="{% url 'usa:account_login' %}">
+                {% csrf_token %}
+                {% if redirect_field_value %}<input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}">{% elif request.GET.next %}<input type="hidden" name="next" value="{{ request.GET.next }}">{% endif %}
 
-        <div class="forgot-password">
-            <a href="{% url 'account_reset_password' %}" class="font-futuristic">
-                <svg class="inline-block w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                </svg>
-                {% trans "Reset password" %}
-            </a>
-        </div>
+                <div class="form-group">
+                    <label class="form-label">Username or Email</label>
+                    {{ form.login|add_class:"form-input" }}
+                    {% if form.login.errors %}<div class="error-message">{{ form.login.errors }}</div>{% endif %}
+                </div>
 
-        <div class="signup-section">
-            <div class="signup-text">{% trans "New to eGarage?" %}</div>
-            <a href="{% url 'account_signup' %}?from={{ country|default:'CL'|lower }}" class="signup-link font-futuristic">
-                {% trans "Create your account" %} →
-            </a>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    {{ form.password|add_class:"form-input" }}
+                    {% if form.password.errors %}<div class="error-message">{{ form.password.errors }}</div>{% endif %}
+                </div>
+
+                <div class="checkbox-container">
+                    {{ form.remember_me|add_class:"form-checkbox" }}
+                    <label for="id_remember_me" class="checkbox-label">Remember me</label>
+                </div>
+
+                <button type="submit" class="login-button font-futuristic">🔐 Sign In</button>
+
+                <div class="forgot-password">
+                    <a href="/us/en/accounts/password/reset/">Forgot your password?</a>
+                </div>
+            </form>
+
+            <div class="divider"><span>or</span></div>
+
+            <div class="signup-link">
+                <span class="signup-link-text">Don't have an account?</span>
+                <a href="/us/en/accounts/signup/">Sign up free</a>
+            </div>
         </div>
     </div>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    var card = document.querySelector('.glass-card');
-    if (card) {
-        card.style.opacity = '0';
-        card.style.transform = 'translateY(30px)';
-        setTimeout(function() {
-            card.style.transition = 'all 0.8s ease-out';
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, 100);
-    }
-    var passwordInputs = document.querySelectorAll('input[type="password"]');
-    passwordInputs.forEach(function(input) {
-        if (!input.hasAttribute('autocapitalize')) input.setAttribute('autocapitalize', 'none');
-        if (!input.hasAttribute('autocorrect')) input.setAttribute('autocorrect', 'off');
-        if (!input.hasAttribute('spellcheck')) input.setAttribute('spellcheck', 'false');
-    });
-});
+const particlesContainer = document.createElement('div');
+particlesContainer.className = 'particles';
+document.body.appendChild(particlesContainer);
+for (let i = 0; i < 20; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = `${Math.random() * 100}%`;
+    particle.style.animationDelay = `${Math.random() * 10}s`;
+    particle.style.animationDuration = `${10 + Math.random() * 10}s`;
+    particlesContainer.appendChild(particle);
+}
 </script>
 {% endblock %}

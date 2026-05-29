@@ -6,17 +6,34 @@ from taller.models import Empresa
 
 
 def get_user_empresa_safe(user):
-    """
-    Obtiene la empresa del usuario sin lanzar si no existe.
-    La relaciÃ³n OneToOne inversa (user.empresa) lanza ObjectDoesNotExist
-    cuando no hay Empresa; getattr() no lo captura.
+    """Resuelve la empresa del usuario de forma segura.
+
+    Orden de resolución:
+    1. Owner directo: user.empresa (OneToOne).
+    2. Team member: primer TeamMember activo del usuario.
+    3. None si no hay ninguna.
     """
     if not user or not getattr(user, "is_authenticated", False):
         return None
+    # 1. Owner directo
     try:
         return user.empresa
     except ObjectDoesNotExist:
-        return None
+        pass
+    # 2. Team member (importación diferida para evitar AppRegistryNotReady)
+    try:
+        from taller.models.team_member import TeamMember
+        membership = (
+            TeamMember.objects
+            .filter(user=user, is_active=True)
+            .select_related("empresa")
+            .first()
+        )
+        if membership:
+            return membership.empresa
+    except Exception:
+        pass
+    return None
 
 
 def get_or_create_empresa(request):

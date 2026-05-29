@@ -328,6 +328,7 @@
         loadDocumentDraftParsed: loadDocumentDraftParsed,
         clearDocumentFormDraftStorage: clearDocumentFormDraftStorage,
         restoreDocumentDraftAfterHydrate: restoreDocumentDraftAfterHydrate,
+        collectRows: collectDocumentDraftPayload,
         init: init
     };
 

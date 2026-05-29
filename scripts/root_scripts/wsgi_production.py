@@ -2,14 +2,14 @@
 
 # """
 # ===============================================================
-# 🚀 CONFIGURACIÓN WSGI PARA PYTHONANYWHERE - eGARAGE
+# 🚀 CONFIGURACIÓN WSGI PARA DIGITALOCEAN - eGARAGE
 # ===============================================================
-# Configuración WSGI optimizada para el despliegue en PythonAnywhere
-# URL: https://e-garage-atlantareciclajes.pythonanywhere.com
+# Configuración WSGI optimizada para el despliegue en DigitalOcean
+# URL: https://e-garage-atlantareciclajes
 # Usuario: atlantareciclajes
 # Fecha: 24 de julio de 2025
 
-# INSTRUCCIONES PARA PYTHONANYWHERE:
+# INSTRUCCIONES PARA DIGITALOCEAN:
 # 1. Copiar este archivo como wsgi.py en el directorio principal
 # 2. Asegurarse de que la ruta del proyecto sea correcta
 # 3. Verificar que el módulo de configuración esté disponible
@@ -23,7 +23,7 @@ from pathlib import Path
 # ============================================================
 # 📁 CONFIGURACIÓN DE RUTAS
 # ============================================================
-# Ruta del proyecto en PythonAnywhere
+# Ruta del proyecto en DigitalOcean
 PROJECT_PATH = "/home/atlantareciclajes/e_garage"
 VENV_PATH = "/home/atlantareciclajes/.virtualenvs/e_garage_env"
 
@@ -49,7 +49,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "e_garage.settings_production")
 os.environ.setdefault("DB_NAME", "atlantareciclajes$egarage")
 os.environ.setdefault("DB_USER", "atlantareciclajes")
 os.environ.setdefault("DB_PASSWORD", "laila2013@")
-os.environ.setdefault("DB_HOST", "atlantareciclajes.mysql.pythonanywhere-services.com")
+os.environ.setdefault("DB_HOST", "atlantareciclajes.mysql.digitalocean-services.com")
 os.environ.setdefault("DB_PORT", "3306")
 
 # Clave secreta (en producción debería estar en variables de entorno)
@@ -70,9 +70,9 @@ try:
     # Obtener la aplicación WSGI
     application = get_wsgi_application()
 
-    print("✅ WSGI configurado exitosamente para PythonAnywhere")
+    print("✅ WSGI configurado exitosamente para DigitalOcean")
     print(f"📁 Proyecto: {PROJECT_PATH}")
-    print("🗄️ Base de datos: MySQL en PythonAnywhere")
+    print("🗄️ Base de datos: MySQL en DigitalOcean")
     print("🌐 Configuración: e_garage.settings_production")
 
 except Exception as e:
@@ -81,7 +81,7 @@ except Exception as e:
 
 
 # ============================================================
-# 🔧 CONFIGURACIÓN ADICIONAL PARA PYTHONANYWHERE
+# 🔧 CONFIGURACIÓN ADICIONAL PARA DIGITALOCEAN
 # ============================================================
 def application_with_logging(environ, start_response):
     """
@@ -127,14 +127,14 @@ def application_with_logging(environ, start_response):
 # application = application_with_logging  # Descomenta si quieres logging adicional
 
 # ============================================================
-# 📝 NOTAS IMPORTANTES PARA PYTHONANYWHERE:
+# 📝 NOTAS IMPORTANTES PARA DIGITALOCEAN:
 # ============================================================
 # """
-# CONFIGURACIÓN EN PYTHONANYWHERE WEB APP:
+# CONFIGURACIÓN EN DIGITALOCEAN WEB APP:
 
 # 1. WSGI configuration file:
-#    - Ubicación: /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
-#    - Copiar este contenido al archivo WSGI de PythonAnywhere
+#    - Ubicación: /var/www/atlantareciclajes_digitalocean_com_wsgi.py
+#    - Copiar este contenido al archivo WSGI de DigitalOcean
 
 # 2. Static files:
 #    - URL: /static/
@@ -156,6 +156,6 @@ def application_with_logging(environ, start_response):
 # - python manage.py createsuperuser (si es necesario)
 
 # VARIABLES DE ENTORNO:
-# - Configurar en .bashrc o en el dashboard de PythonAnywhere
+# - Configurar en .bashrc o en el dashboard de DigitalOcean
 # - DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DJANGO_SECRET_KEY
 # """

@@ -22,7 +22,7 @@ else:
     print("⚠️  .env no encontrado, usando valores por defecto")
 
 # Leer configuración
-DB_HOST = os.getenv("DB_HOST", "atlantareciclajes.mysql.pythonanywhere-services.com")
+DB_HOST = os.getenv("DB_HOST", "atlantareciclajes.mysql.digitalocean-services.com")
 DB_NAME = os.getenv("DB_NAME", "atlantareciclajes$egarage")
 DB_USER = os.getenv("DB_USER", "atlantareciclajes")
 DB_PASSWORD = os.getenv("DB_PASSWORD", "")
@@ -96,5 +96,5 @@ else:
     print("\n❌ No se pudo conectar con ninguna contraseña.")
     print("\n💡 Solución:")
     print("1. Verifica el archivo .env en el servidor")
-    print("2. O verifica las credenciales en el dashboard de PythonAnywhere")
+    print("2. O verifica las credenciales en el dashboard de DigitalOcean")
     print("3. O ejecuta: cat .env | grep DB_")

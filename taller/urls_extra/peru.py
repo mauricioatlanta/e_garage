@@ -7,6 +7,7 @@ Usa TemplateView para no depender de vistas Python especiales
 from django.shortcuts import redirect
 from django.urls import path
 from django.views.generic import RedirectView, TemplateView
+from taller.views.country_aware_auth import country_aware_login
 
 from taller.views_extra.signup_redirects import signup_redirect
 
@@ -33,17 +34,26 @@ urlpatterns = [
         TemplateView.as_view(template_name="pe/es/suscripcion/pago.html"),
         name="pago_suscripcion_peru",
     ),
-    # Login Perú (opcional, si quieres una vista visual distinta de allauth)
     path(
         "accounts/login/",
-        TemplateView.as_view(template_name="pe/es/account/login.html"),
-        name="account_login_peru",
+        country_aware_login,
+        name="account_login",
+    ),
+    path(
+        "login/",
+        lambda r: redirect("/pe/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        name="account_login_short",
     ),
     # Signup Perú - redirect a signup universal con parámetro from=pe
     path(
         "accounts/signup/",
         lambda r: signup_redirect(r, "pe"),
-        name="account_signup_peru",
+        name="account_signup",
+    ),
+    path(
+        "signup/",
+        lambda r: redirect("/pe/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        name="signup",
     ),
     # Redirect resto de accounts/* → /accounts/* (password reset, logout, etc.)
     path(

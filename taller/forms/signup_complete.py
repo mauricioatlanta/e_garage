@@ -2,6 +2,17 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
 
+from taller.utils.plan_catalog import (
+    ALL_PLAN_CODES,
+    BILLING_ANNUAL,
+    BILLING_MONTHLY,
+    LEGACY_BILLING_MAPPING,
+    LEGACY_PLAN_MAPPING,
+    PLAN_TRIAL,
+    normalize_billing_cycle,
+    normalize_plan_code,
+)
+
 
 class SignupCompleteForm(forms.Form):
     """
@@ -97,23 +108,34 @@ class SignupCompleteForm(forms.Form):
     )
 
     # === SELECCIÓN DE PLAN ===
-    plan = forms.ChoiceField(
-        choices=[
-            ("", "--- Selecciona tu plan ---"),
-            ("trial", "🎁 Prueba Gratuita (30 días)"),
-            ("mensual", "📅 Plan Mensual"),
-            ("semestral", "⭐ Plan Semestral (Recomendado)"),
-            ("anual", "💎 Plan Anual (Mejor precio)"),
-        ],
+    plan = forms.CharField(
         label="Plan de Suscripción",
         required=True,
         widget=forms.Select(
+            choices=[
+                ("", "--- Selecciona tu plan ---"),
+                ("trial", "🎁 Trial (30 días)"),
+                ("entry", "Entry"),
+                ("growth", "Growth"),
+                ("business", "Business"),
+            ],
             attrs={
                 "class": "form-input",
                 "onchange": "highlightPlan(this.value)",
                 "required": "required",
-            }
+            },
         ),
+    )
+
+    billing_cycle = forms.ChoiceField(
+        choices=[
+            (BILLING_MONTHLY, "Mensual"),
+            (BILLING_ANNUAL, "Anual"),
+        ],
+        label="Periodicidad de pago",
+        required=False,
+        initial=BILLING_MONTHLY,
+        widget=forms.Select(attrs={"class": "form-input"}),
     )
 
     # === CONTRASEÑA ===
@@ -218,9 +240,25 @@ class SignupCompleteForm(forms.Form):
         return pais
 
     def clean_plan(self):
-        plan = self.cleaned_data.get("plan")
-        if not plan:
+        raw_plan = self.cleaned_data.get("plan")
+        if not raw_plan:
             raise ValidationError("Debes seleccionar un plan de suscripción")
+
+        raw_plan = str(raw_plan).strip().lower()
+        valid_legacy_values = set(LEGACY_PLAN_MAPPING) | set(LEGACY_BILLING_MAPPING)
+        if raw_plan not in ALL_PLAN_CODES and raw_plan not in valid_legacy_values:
+            raise ValidationError("El plan seleccionado no es válido")
+
+        plan = normalize_plan_code(raw_plan)
+        if plan == PLAN_TRIAL and raw_plan != PLAN_TRIAL:
+            raise ValidationError("El plan seleccionado no es válido")
+
+        raw_billing_cycle = self.cleaned_data.get("billing_cycle")
+        if raw_plan in LEGACY_BILLING_MAPPING:
+            billing_cycle = normalize_billing_cycle(raw_plan)
+        else:
+            billing_cycle = normalize_billing_cycle(raw_billing_cycle)
+        self.cleaned_data["billing_cycle"] = billing_cycle
         return plan
 
     def clean(self):

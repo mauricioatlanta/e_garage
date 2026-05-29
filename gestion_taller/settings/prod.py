@@ -147,7 +147,7 @@ DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "support@egarage.cl").strip
 SERVER_EMAIL = os.getenv("SERVER_EMAIL", DEFAULT_FROM_EMAIL).strip()
 SUPPORT_EMAIL = os.getenv("SUPPORT_EMAIL", DEFAULT_FROM_EMAIL).strip()
 EMAIL_HOST_USER = SUPPORT_EMAIL
-EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+# EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 ANYMAIL = {
     "RESEND_API_KEY": os.environ.get("RESEND_API_KEY"),

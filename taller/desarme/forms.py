@@ -13,10 +13,10 @@ ANIOS_CHOICES = [("", "---------")] + [
 ESTADO_DESARME_CHOICES = [
     ("", _("---------")),
     ("en_yarda", _("En yarda")),
-    ("en_proceso", _("In process")),
-    ("completado", _("Completed")),
-    ("vendido", _("Sold")),
-    ("baja", _("Disposed")),
+    ("en_proceso", _("En proceso")),
+    ("completado", _("Completado")),
+    ("vendido", _("Vendido")),
+    ("baja", _("De baja")),
 ]
 
 CARROCERIA_CHOICES = [
@@ -128,6 +128,52 @@ class VehiculoDesarmeForm(forms.ModelForm):
         if self.empresa and hasattr(self.empresa, "pais") and self.empresa.pais:
             pais = str(self.empresa.pais).upper()[:2] or "US"
 
+        # Ajustar campos monetarios según país
+        _PAISES_ENTERO = {"CL", "AR", "UY", "PE", "VE", "CO"}
+        _is_integer = pais in _PAISES_ENTERO
+        self._is_money_integer = _is_integer
+        _decs = 0 if _is_integer else 2
+        for _fname in ("precio_compra", "transporte_grua", "otros_gastos"):
+            if _fname not in self.fields:
+                continue
+            if _is_integer:
+                _f = self.fields[_fname]
+                # Parchar to_python para limpiar separadores de miles CLP ("120.000" → "120000")
+                # ANTES de que DecimalField ejecute sus validadores. Sin esto, Django falla
+                # en field.clean() antes de que llegue a clean_<fieldname>().
+                _orig_tp = _f.to_python
+                def _cl_to_python(v, _o=_orig_tp):
+                    if isinstance(v, str):
+                        v = v.replace(".", "").replace(",", "").strip()
+                    return _o(v)
+                _f.to_python = _cl_to_python
+                # Actualizar decimal_places y el DecimalValidator al nuevo valor
+                _f.decimal_places = 0
+                from django.core.validators import DecimalValidator as _DV
+                _f.validators = [v for v in _f.validators if not isinstance(v, _DV)]
+                if getattr(_f, "max_digits", None):
+                    _f.validators.append(_DV(_f.max_digits, 0))
+                _f.widget = forms.TextInput(
+                    attrs={
+                        "class": "input-desarme",
+                        "inputmode": "numeric",
+                        "placeholder": "0",
+                        "data-money-cl": "1",
+                    }
+                )
+                # Mostrar valor inicial con separador de miles: 20000 → "20.000"
+                if _fname in self.initial and self.initial[_fname] is not None:
+                    try:
+                        from decimal import Decimal as _D
+                        self.initial[_fname] = f"{int(_D(str(self.initial[_fname]))):,}".replace(",", ".")
+                    except Exception:
+                        pass
+            else:
+                self.fields[_fname].decimal_places = _decs
+                self.fields[_fname].widget = forms.NumberInput(
+                    attrs={"class": "input-desarme", "step": "0.01", "placeholder": "0.00"}
+                )
+
         # Motor: Select nativo (evitar dal-select2 que a veces no renderiza)
         if "motor" in self.fields:
             self.fields["motor"].widget = forms.Select(attrs={"class": "input-desarme"})
@@ -224,6 +270,37 @@ class VehiculoDesarmeForm(forms.ModelForm):
             if f in self.fields:
                 self.fields[f].required = False
 
+    def _post_clean(self):
+        # Para países con catálogo FK (no USA), limpiar marca_texto/modelo_texto del
+        # instance ANTES de que ModelForm llame a instance.full_clean(). Sin esto,
+        # el model.clean() rechaza vehículos creados con campos de texto libre (ej: seed demo).
+        _pais = str(getattr(self.empresa, "pais", "US") or "US").upper()[:2]
+        if _pais not in {"US"} and self.instance:
+            self.instance.marca_texto = ""
+            self.instance.modelo_texto = ""
+        super()._post_clean()
+
+    def _clean_money_cl(self, field_name):
+        """Limpia separadores de miles CLP antes de validar (ej: '20.000' → Decimal(20000))."""
+        raw = self.data.get(self.add_prefix(field_name) or field_name, "").strip()
+        raw = raw.replace(".", "").replace(",", "") if raw else raw
+        return self.fields[field_name].clean(raw)
+
+    def clean_precio_compra(self):
+        if getattr(self, "_is_money_integer", False):
+            return self._clean_money_cl("precio_compra")
+        return self.cleaned_data.get("precio_compra")
+
+    def clean_transporte_grua(self):
+        if getattr(self, "_is_money_integer", False):
+            return self._clean_money_cl("transporte_grua")
+        return self.cleaned_data.get("transporte_grua")
+
+    def clean_otros_gastos(self):
+        if getattr(self, "_is_money_integer", False):
+            return self._clean_money_cl("otros_gastos")
+        return self.cleaned_data.get("otros_gastos")
+
     def clean(self):
         from django.core.exceptions import ValidationError
 
@@ -235,10 +312,16 @@ class VehiculoDesarmeForm(forms.ModelForm):
         elif not anio:
             raise ValidationError({"anio": "Seleccione un año o ingrese uno personalizado."})
 
+        # Al menos VIN o Patente deben estar presentes (el modelo lo exige en clean() pero
+        # como error non-field que el template no muestra; lo capturamos aquí con add_error).
+        vin = (data.get("vin") or "").strip()
+        patente = (data.get("patente") or "").strip()
+        if not vin and not patente:
+            self.add_error("patente", "Debe registrar al menos Patente o VIN.")
+            self.add_error("vin", "Debe registrar al menos Patente o VIN.")
+
         # Validar unicidad VIN y patente por empresa (evitar IntegrityError en save)
         if self.empresa:
-            vin = (data.get("vin") or "").strip()
-            patente = (data.get("patente") or "").strip()
             if vin:
                 qs = Vehiculo.objects.filter(empresa=self.empresa, vin=vin)
                 if self.instance.pk:

@@ -59,7 +59,7 @@ def health_check(request):
 
 def health_simple(request):
     """
-    Health check minimalista para Render/PythonAnywhere
+    Health check minimalista para Render/DigitalOcean
     Devuelve solo {"status": "ok"} si todo está bien
     """
     try:

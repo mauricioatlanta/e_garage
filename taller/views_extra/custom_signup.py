@@ -119,9 +119,12 @@ class CustomSignupView(SignupView):
         self.request.session["django_language"] = language
         self.request.session["country"] = country_config.get("namespace", country_code.lower())
 
-        # Guardar el usuario (Allauth maneja el envío de email si ACCOUNT_EMAIL_VERIFICATION = "mandatory")
-        # CustomSignupForm.save() crea la empresa automáticamente
-        user = form.save(self.request)
+        # allauth 65.x: try_save() maneja el caso account_already_exists sin crash.
+        # save() directo lanzaría ValueError → 500 cuando PREVENT_ENUMERATION=True.
+        user, resp = form.try_save(self.request)
+        if resp:
+            # Email ya existía: allauth envió aviso al dueño. Mostrar respuesta de allauth.
+            return resp
         _send_confirmation_compat(self.request, user, signup=True)
 
         # Guardar contexto del signup para pantalla intermedia y reenvío de confirmación.

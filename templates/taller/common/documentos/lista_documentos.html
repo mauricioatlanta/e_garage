@@ -244,8 +244,8 @@
   /* Grid de documentos (vista cards) */
   .documentos-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 0.75rem;
   }
 
   /* Colores específicos por tipo */
@@ -278,17 +278,17 @@
 
   .documento-card {
     background: linear-gradient(135deg, rgba(10, 14, 39, 0.9) 0%, rgba(20, 25, 50, 0.7) 100%);
-    border-radius: 12px;
-    padding: 1rem 1.15rem;
+    border-radius: 8px;
+    padding: 0.7rem 0.8rem;
     border: 1px solid rgba(0, 230, 208, 0.25);
     backdrop-filter: blur(15px);
-    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.2s ease;
     position: relative;
     overflow: hidden;
     display: flex;
     flex-direction: column;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    min-height: 100%;
+    min-height: 0;
     box-sizing: border-box;
   }
   
@@ -323,23 +323,24 @@
   }
 
   .documento-card:hover {
-    transform: translateY(-8px) scale(1.02);
+    transform: translateY(-3px);
     border-color: #00fff7;
-    box-shadow: 0 20px 60px rgba(0, 230, 208, 0.4), 0 0 40px rgba(0, 255, 247, 0.3);
+    box-shadow: 0 10px 28px rgba(0, 230, 208, 0.28), 0 0 22px rgba(0, 255, 247, 0.18);
   }
 
   .documento-card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1rem;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
     position: relative;
     z-index: 1;
   }
 
   .documento-tipo {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.1rem;
+    font-size: 0.88rem;
     font-weight: 700;
     color: #00e6d0;
     text-shadow: 0 0 10px rgba(0, 230, 208, 0.5);
@@ -349,9 +350,9 @@
   }
 
   .documento-estado {
-    padding: 0.4rem 0.8rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.65rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -375,15 +376,15 @@
 
   .documento-numero {
     font-family: 'Orbitron', sans-serif;
-    font-size: 0.9rem;
+    font-size: 0.78rem;
     color: #b0b3b8;
-    margin-bottom: 1rem;
+    margin-bottom: 0.55rem;
     position: relative;
     z-index: 1;
   }
 
   .documento-info {
-    margin-bottom: 1rem;
+    margin-bottom: 0.55rem;
     position: relative;
     z-index: 1;
   }
@@ -391,16 +392,16 @@
   .info-row {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    font-size: 0.9rem;
+    gap: 0.45rem;
+    margin-bottom: 0.38rem;
+    font-size: 0.82rem;
   }
 
   .info-icon {
-    font-size: 1rem;
+    font-size: 0.85rem;
     color: #00e6d0;
     filter: drop-shadow(0 0 5px rgba(0, 230, 208, 0.5));
-    width: 20px;
+    width: 16px;
     text-align: center;
   }
 
@@ -416,9 +417,9 @@
   /* Badge de edad del documento */
   .edad-badge {
     display: inline-block;
-    padding: 0.25rem 0.6rem;
+    padding: 0.18rem 0.45rem;
     border-radius: 12px;
-    font-size: 0.75rem;
+    font-size: 0.66rem;
     font-weight: 600;
     margin-left: 0.5rem;
   }
@@ -444,9 +445,9 @@
   /* Estado de pago */
   .pago-badge {
     display: inline-block;
-    padding: 0.3rem 0.7rem;
+    padding: 0.22rem 0.5rem;
     border-radius: 12px;
-    font-size: 0.75rem;
+    font-size: 0.66rem;
     font-weight: 700;
     text-transform: uppercase;
     margin-top: 0.5rem;
@@ -468,15 +469,15 @@
   }
 
   .documento-total {
-    margin-top: 1rem;
-    padding-top: 1rem;
+    margin-top: 0.55rem;
+    padding-top: 0.55rem;
     border-top: 1px solid rgba(0, 230, 208, 0.2);
     position: relative;
     z-index: 1;
   }
 
   .total-label {
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     color: #b0b3b8;
     text-transform: uppercase;
     letter-spacing: 1px;
@@ -485,7 +486,7 @@
 
   .total-value {
     font-family: 'Orbitron', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     font-weight: 900;
     color: #00fff7;
     text-shadow: 0 0 15px rgba(0, 255, 247, 0.6);
@@ -493,10 +494,10 @@
 
   .documento-acciones {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.35rem;
     flex-wrap: wrap;
     margin-top: auto;
-    padding-top: 1rem;
+    padding-top: 0.55rem;
     border-top: 1px solid rgba(0, 230, 208, 0.2);
     position: relative;
     z-index: 10;
@@ -507,16 +508,18 @@
   }
 
   .accion-btn {
-    flex: 1;
-    min-width: 80px;
-    padding: 0.6rem 1rem;
+    flex: 0 0 34px;
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    padding: 0;
     background: linear-gradient(135deg, rgba(0, 230, 208, 0.2) 0%, rgba(0, 255, 247, 0.2) 100%);
     border: 1px solid rgba(0, 255, 247, 0.3);
-    border-radius: 12px;
+    border-radius: 8px;
     color: #00fff7;
     font-family: 'Rajdhani', sans-serif;
     font-weight: 600;
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     text-decoration: none;
     text-align: center;
     transition: all 0.3s ease;
@@ -533,6 +536,15 @@
     transform: translateY(-2px);
     color: #00fff7;
     text-decoration: none;
+  }
+
+  .accion-btn span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 
   .accion-btn.danger {
@@ -704,7 +716,7 @@
     }
 
     .documento-card {
-      padding: 1.25rem;
+      padding: 0.85rem;
     }
 
     .documento-tipo {
@@ -755,8 +767,10 @@
     }
 
     .accion-btn {
-      padding: 0.75rem 0.875rem;
-      min-height: 44px;
+      flex-basis: 40px;
+      width: 40px;
+      height: 40px;
+      min-height: 40px;
       font-size: 0.8rem;
     }
 
@@ -824,17 +838,17 @@
     }
 
     .documento-card {
-      padding: 1rem;
+      padding: 0.8rem;
     }
 
     .documento-acciones {
-      flex-direction: column;
+      flex-direction: row;
       gap: 0.5rem;
     }
 
     .accion-btn {
-      width: 100%;
-      padding: 0.875rem;
+      width: 40px;
+      padding: 0;
     }
 
     .tipo-seccion {
@@ -980,7 +994,9 @@
 {% endblock %}
 
 {% block panel_content %}
+
 <div class="documentos-container">
+
   <!-- Toggle de vista -->
   <div class="view-toggle">
     <button class="toggle-view-btn active" data-view="cards" onclick="toggleView('cards', this)">
@@ -1111,8 +1127,12 @@
                 <div class="documento-total">
                   <div class="total-label">Total</div>
                   <div class="total-value">
-                    {% if documento.total and documento.total > 0 %}
+                    {% if documento.total_display and documento.total_display > 0 %}
+                      {{ documento.total_display|money_by_country:country }}
+                    {% elif documento.total and documento.total > 0 %}
                       {{ documento.total|money_by_country:country }}
+                    {% elif documento.legacy_total_general and documento.legacy_total_general > 0 %}
+                      {{ documento.legacy_total_general|money_by_country:country }}
                     {% else %}
                       {% if country == 'cl' or country == 'CL' %}
                         $0
@@ -1238,7 +1258,7 @@
             </td>
             <td>{{ documento.neto_repuestos|add:documento.neto_servicios|money_by_country:country|default:"$0" }}</td>
             <td>{{ documento.tax_amount|money_by_country:country|default:"$0" }}</td>
-            <td><strong>{{ documento.total|money_by_country:country|default:"$0" }}</strong></td>
+            <td><strong>{% firstof documento.total_display documento.total as total_tabla %}{{ total_tabla|money_by_country:country|default:"$0" }}</strong></td>
             <td>
               <span class="documento-estado estado-{{ documento.estado|lower|default:'borrador' }}" style="font-size: 0.7rem; padding: 0.25rem 0.5rem;">
                 {{ documento.estado|default:"BORRADOR"|title }}
@@ -1278,9 +1298,10 @@
 {% endblock %}
 
 {% block page_extra_js %}
+{% firstof LANGUAGE_CODE request.LANGUAGE_CODE "es" as current_lang %}
 <script>
 // Idioma actual para traducciones JavaScript
-const CURRENT_LANG = '{{ LANGUAGE_CODE|default:request.LANGUAGE_CODE|default:"es" }}';
+const CURRENT_LANG = '{{ current_lang }}';
 
 function toggleView(view, element) {
   const cardsView = document.getElementById('vista-cards');
@@ -1324,7 +1345,7 @@ document.addEventListener('DOMContentLoaded', function() {
   const documentCards = document.querySelectorAll('.documento-card');
   documentCards.forEach(card => {
     card.addEventListener('mouseenter', function() {
-      this.style.transform = 'translateY(-8px) scale(1.02)';
+      this.style.transform = 'translateY(-3px)';
     });
     card.addEventListener('mouseleave', function() {
       this.style.transform = 'translateY(0) scale(1)';
@@ -1345,7 +1366,7 @@ function convertirAOT(presupuestoId) {
 function crearFactura(otId) {
   const msg = CURRENT_LANG === 'en'
     ? 'Create invoice from this Work Order?'
-    : '¿Crear factura desde esta Orden de Trabajo?';
+    : '¿Crear comprobante desde esta Orden de Trabajo?';
   if (confirm(msg)) {
     // Aquí implementarías la lógica para crear FAC desde OT
     window.location.href = `/cl/es/documentos/${otId}/crear-factura/`;

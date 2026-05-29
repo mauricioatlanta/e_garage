@@ -10,10 +10,15 @@ Vista administrativa para gestionar suscriptores:
 """
 
 import logging
-from datetime import timedelta
+from datetime import date, datetime, timedelta
 
 from django.contrib import messages
-from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required, user_passes_test
+
+staff_member_required = user_passes_test(
+    lambda u: u.is_active and u.is_staff,
+    login_url="/accounts/login/",
+)
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
@@ -38,6 +43,8 @@ _ALLOWED_ORD = frozenset(
         "-plan",
         "estado",
         "-estado",
+        "fecha",
+        "-fecha",
         "dias",
         "-dias",
     }
@@ -60,10 +67,36 @@ def _sort_querystring(request, new_ord: str) -> str:
     return "?" + q.urlencode()
 
 
+def _page_querystring(request, page_number: int) -> str:
+    q = request.GET.copy()
+    q["page"] = page_number
+    return "?" + q.urlencode()
+
+
 def _estado_sort_rank(empresa: Empresa) -> int:
     return {"vencida": 0, "critico": 1, "advertencia": 2, "activa": 3}.get(
         empresa.estado_suscripcion, 9
     )
+
+
+def _subscription_started_at(empresa: Empresa):
+    """Fecha visible de alta/suscripción para el panel admin."""
+    suscripcion = getattr(getattr(empresa, "user", None), "suscripcion", None)
+    return (
+        getattr(suscripcion, "fecha_inicio", None)
+        or getattr(empresa, "fecha_inicio", None)
+        or getattr(getattr(empresa, "user", None), "date_joined", None)
+    )
+
+
+def _date_sort_value(value) -> int:
+    if not value:
+        return 0
+    if isinstance(value, datetime):
+        return value.date().toordinal()
+    if isinstance(value, date):
+        return value.toordinal()
+    return 0
 
 
 def _apply_empresas_sort(empresas_list: list, ord_param: str) -> None:
@@ -84,6 +117,13 @@ def _apply_empresas_sort(empresas_list: list, ord_param: str) -> None:
         empresas_list.sort(key=_estado_sort_rank)
     elif ord_param == "-estado":
         empresas_list.sort(key=_estado_sort_rank, reverse=True)
+    elif ord_param == "fecha":
+        empresas_list.sort(key=lambda e: _date_sort_value(getattr(e, "admin_fecha_suscripcion", None)))
+    elif ord_param == "-fecha":
+        empresas_list.sort(
+            key=lambda e: _date_sort_value(getattr(e, "admin_fecha_suscripcion", None)),
+            reverse=True,
+        )
     elif ord_param == "dias":
         empresas_list.sort(key=lambda e: e.dias_restantes if e.dias_restantes is not None else -1)
     elif ord_param == "-dias":
@@ -159,6 +199,7 @@ def admin_suscriptores(request):
                 # Verificar que la empresa tenga los datos necesarios
                 _ = empresa.dias_restantes
                 _ = empresa.estado_suscripcion
+                empresa.admin_fecha_suscripcion = _subscription_started_at(empresa)
                 empresas_list.append(empresa)
             except (AttributeError, TypeError, ValueError) as e:
                 # Si hay un error con alguna empresa, loguear y continuar
@@ -180,13 +221,21 @@ def admin_suscriptores(request):
 
         sort_href = {
             field: _sort_querystring(request, _next_ord_value(ord_param, field))
-            for field in ("empresa", "pais", "plan", "estado")
+            for field in ("empresa", "pais", "plan", "fecha", "estado")
         }
 
         # Paginación
         paginator = Paginator(empresas, 25)  # 25 por página (empresas ya es una lista ordenada)
         page_number = request.GET.get("page")
         page_obj = paginator.get_page(page_number)
+        previous_page_url = (
+            _page_querystring(request, page_obj.previous_page_number())
+            if page_obj.has_previous()
+            else ""
+        )
+        next_page_url = (
+            _page_querystring(request, page_obj.next_page_number()) if page_obj.has_next() else ""
+        )
 
         # Estadísticas generales (mismo alcance que el listado: usuarios activos salvo ?incluir_bajas=1)
         _stats_base = Empresa.objects.filter(user__isnull=False)
@@ -224,6 +273,8 @@ def admin_suscriptores(request):
 
         context = {
             "page_obj": page_obj,
+            "previous_page_url": previous_page_url,
+            "next_page_url": next_page_url,
             "empresas": page_obj,
             "pais_filter": pais_filter,
             "status_filter": status_filter,

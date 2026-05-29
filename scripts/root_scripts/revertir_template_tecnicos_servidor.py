@@ -48,5 +48,5 @@ with open(file_path, "r", encoding="utf-8") as f:
     if "{% extends 'base.html' %}" in check or '{% extends "base.html" %}' in check:
         print("✅ Verificación: Template ahora extiende 'base.html'")
 
-print("\n⚠️  Reinicia el servidor: touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py")
+print("\n⚠️  Reinicia el servidor: touch /var/www/atlantareciclajes_digitalocean_com_wsgi.py")
 print("=" * 70)

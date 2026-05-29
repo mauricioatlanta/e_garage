@@ -112,5 +112,5 @@ with open(file_path, "r", encoding="utf-8") as f:
         print("⚠️  Advertencia: El emoji del edificio aún existe en el archivo")
 
 print("\n⚠️  IMPORTANTE: Reinicia el servidor Django/uWSGI para que los cambios surtan efecto")
-print("   Ejecuta: touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py")
+print("   Ejecuta: touch /var/www/atlantareciclajes_digitalocean_com_wsgi.py")
 print("=" * 70)

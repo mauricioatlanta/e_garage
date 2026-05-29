@@ -18,6 +18,66 @@ from taller.utils.whatsapp_helper import get_document_whatsapp_url
 log = logging.getLogger(__name__)
 
 
+def _generated_at():
+    now = timezone.now()
+    return timezone.localtime(now) if timezone.is_aware(now) else now
+
+
+def _line_subtotal(linea):
+    try:
+        if isinstance(linea, dict):
+            return linea.get("subtotal", 0) or 0
+        return getattr(linea, "subtotal", 0) or 0
+    except Exception:
+        return 0
+
+
+def _build_pdf_line_items(documento):
+    lineas_repuesto = list(documento.lineas_repuesto.select_related("repuesto").all())
+    lineas_servicio = list(documento.lineas_servicio.all())
+    lineas_otro_servicio = list(documento.lineas_otro_servicio.all())
+    items = []
+
+    for linea in lineas_repuesto:
+        code = getattr(linea, "codigo", "") or getattr(getattr(linea, "repuesto", None), "codigo", "")
+        items.append(
+            {
+                "tipo": "Repuesto",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "repuesto", "")),
+                "codigo": code,
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_unitario", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    for linea in lineas_servicio:
+        items.append(
+            {
+                "tipo": "Servicio",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "servicio", "")),
+                "codigo": "",
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_unitario", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    for linea in lineas_otro_servicio:
+        items.append(
+            {
+                "tipo": "Servicio externo",
+                "nombre": getattr(linea, "nombre", "") or str(getattr(linea, "servicio", "")),
+                "codigo": getattr(linea, "empresa_externa", "") or "",
+                "cantidad": getattr(linea, "cantidad", 1) or 1,
+                "precio_unitario": getattr(linea, "precio_cliente", 0) or 0,
+                "subtotal": _line_subtotal(linea),
+            }
+        )
+
+    return items, lineas_repuesto, lineas_servicio, lineas_otro_servicio
+
+
 class DocumentOutputService:
     """
     Servicio dedicado para generar PDFs y enlaces de WhatsApp de documentos.
@@ -176,10 +236,9 @@ class DocumentOutputService:
         cliente = documento.cliente
         vehiculo = getattr(documento, "vehiculo", None)
 
-        # Prefetch líneas de documento para optimizar queries
-        lineas_repuesto = list(documento.lineas_repuesto.select_related("repuesto").all())
-        lineas_servicio = list(documento.lineas_servicio.all())
-        lineas_otro_servicio = list(documento.lineas_otro_servicio.all())
+        line_items, lineas_repuesto, lineas_servicio, lineas_otro_servicio = _build_pdf_line_items(
+            documento
+        )
 
         # Etiqueta del documento (Invoice / Recibo)
         tipo = (getattr(documento, "tipo", "") or "").lower()
@@ -194,14 +253,17 @@ class DocumentOutputService:
             document_label = "Recibo"
 
         # Subtotal y total (compatibles con documento_profesional.html)
-        subtotal = getattr(documento, "neto_repuestos", None) or getattr(
-            documento, "subtotal", None
+        line_subtotal = sum(_line_subtotal(item) for item in line_items)
+        subtotal = line_subtotal or (
+            (getattr(documento, "neto_repuestos", 0) or 0)
+            + (getattr(documento, "neto_servicios", 0) or 0)
+            + (getattr(documento, "neto_otros_servicios", 0) or 0)
         )
         total = getattr(documento, "total", None)
-        if subtotal is None:
-            subtotal = sum(getattr(x, "subtotal", 0) or 0 for x in lineas_repuesto)
-        if total is None:
-            total = subtotal
+        if not total:
+            total = subtotal + (getattr(documento, "tax_amount", 0) or 0) - (
+                getattr(documento, "descuento", 0) or 0
+            )
 
         # Logo URL absoluta para WeasyPrint
         logo_url = None
@@ -225,12 +287,17 @@ class DocumentOutputService:
             "company_website": config.get("website", ""),
             "cliente": cliente,
             "vehiculo": vehiculo,
+            "line_items": line_items,
             "lineas_repuesto": lineas_repuesto,
+            "lineas_servicio": lineas_servicio,
+            "lineas_otro_servicio": lineas_otro_servicio,
             "subtotal": subtotal,
+            "tax_amount": getattr(documento, "tax_amount", 0) or 0,
+            "descuento": getattr(documento, "descuento", 0) or 0,
             "total": total,
             "document_label": document_label,
             "logo_url": logo_url,
-            "generated_at": timezone.localtime(),
+            "generated_at": _generated_at(),
             "pdf_mode": True,
             "public_url": None,
             "qr_data_uri": None,

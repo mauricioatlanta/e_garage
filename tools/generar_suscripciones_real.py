@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Script para generar suscripciones consolidadas del backup real
-Ejecutar en PythonAnywhere
+Ejecutar en DigitalOcean
 """
 import os, sys, sqlite3, json
 from datetime import date, datetime, timedelta

@@ -30,10 +30,18 @@ log = logging.getLogger(__name__)
 from taller.models.clientes import Cliente
 
 # Extras de vehículo (definir aquí la fuente AUTORITATIVA)
-from taller.models.extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
+from taller.models.extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    ColorVehiculo,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.vehiculos import Vehiculo  # Modelo Vehiculo principal
+from taller.models.vehiculo_imagen import VehiculoImagen
+from taller.models.vehiculo_imagen import VehiculoImagen
 from taller.common.mixins.context_return import (
     build_context_return_url,
     get_safe_context_return_url,
@@ -490,7 +498,16 @@ def ver_vehiculo(request, vehiculo_id):
         lang,
     )
 
-    return TemplateResponse(request, template_name, {"vehiculo": vehiculo})
+    imagenes = vehiculo.imagenes.all()
+
+    return TemplateResponse(
+        request,
+        template_name,
+        {
+            "vehiculo": vehiculo,
+            "imagenes": imagenes,
+        },
+    )
 
 
 @login_required
@@ -1078,30 +1095,37 @@ def ajax_agregar_modelo(request):
 @require_POST
 @login_required
 def ajax_agregar_motor(request):
-    """Agregar nuevo motor via AJAX. modelo_id opcional (desarme puede crear sin modelo)."""
+    """Agregar nuevo motor privado de la empresa via AJAX."""
     try:
         data = json.loads(request.body)
         nombre = data.get("nombre", "").strip()
         modelo_id = data.get("modelo_id")
+        empresa = getattr(request.user, "empresa", None)
 
         if not nombre:
             return JsonResponse({"success": False, "error": "Nombre requerido"}, status=400)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "Empresa requerida"}, status=400)
+        if not modelo_id:
+            return JsonResponse({"success": False, "error": "Modelo requerido"}, status=400)
 
         country = _get_country(request)
 
-        # Crear motor con country
-        kwargs = {"nombre": nombre, "country": country}
-        motor, created = MotorVehiculo.objects.get_or_create(**kwargs)
-        # Asociar a modelo si se proporciona
-        if modelo_id:
-            modelo = Modelo.objects.filter(id=modelo_id, country=country).first()
-            if modelo:
-                motor.modelos.add(modelo)
+        modelo = Modelo.objects.filter(id=modelo_id, country=country).first()
+        if not modelo:
+            return JsonResponse({"success": False, "error": "Modelo no válido"}, status=400)
+
+        motor, created = MotorVehiculoEmpresa.objects.get_or_create(
+            empresa=empresa,
+            modelo=modelo,
+            country=country,
+            nombre=nombre,
+        )
 
         return JsonResponse(
             {
                 "success": True,
-                "motor": {"id": str(motor.pk), "nombre": motor.nombre},
+                "motor": {"id": f"empresa:{motor.pk}", "nombre": motor.nombre},
                 "created": created,
             }
         )
@@ -1113,30 +1137,37 @@ def ajax_agregar_motor(request):
 @require_POST
 @login_required
 def ajax_agregar_caja(request):
-    """Agregar nueva caja via AJAX. modelo_id opcional (desarme puede crear sin modelo)."""
+    """Agregar nueva caja privada de la empresa via AJAX."""
     try:
         data = json.loads(request.body)
         nombre = data.get("nombre", "").strip()
         modelo_id = data.get("modelo_id")
+        empresa = getattr(request.user, "empresa", None)
 
         if not nombre:
             return JsonResponse({"success": False, "error": "Nombre requerido"}, status=400)
+        if not empresa:
+            return JsonResponse({"success": False, "error": "Empresa requerida"}, status=400)
+        if not modelo_id:
+            return JsonResponse({"success": False, "error": "Modelo requerido"}, status=400)
 
         country = _get_country(request)
 
-        # Crear caja con country
-        kwargs = {"nombre": nombre, "country": country}
-        caja, created = CajaVehiculo.objects.get_or_create(**kwargs)
-        # Asociar a modelo si se proporciona
-        if modelo_id:
-            modelo = Modelo.objects.filter(id=modelo_id, country=country).first()
-            if modelo:
-                caja.modelos.add(modelo)
+        modelo = Modelo.objects.filter(id=modelo_id, country=country).first()
+        if not modelo:
+            return JsonResponse({"success": False, "error": "Modelo no válido"}, status=400)
+
+        caja, created = CajaVehiculoEmpresa.objects.get_or_create(
+            empresa=empresa,
+            modelo=modelo,
+            country=country,
+            nombre=nombre,
+        )
 
         return JsonResponse(
             {
                 "success": True,
-                "caja": {"id": str(caja.pk), "nombre": caja.nombre},
+                "caja": {"id": f"empresa:{caja.pk}", "nombre": caja.nombre},
                 "created": created,
             }
         )
@@ -1184,3 +1215,51 @@ def ajax_agregar_color(request):
             },
         )
         return JsonResponse({"success": False, "error": str(e)}, status=500)
+
+
+@login_required
+@require_POST
+def subir_imagenes_vehiculo(request, vehiculo_id):
+    empresa = getattr(request.user, "empresa", None)
+
+    vehiculo = get_object_or_404(
+        Vehiculo,
+        pk=vehiculo_id,
+        empresa=empresa,
+    )
+
+    imagenes = request.FILES.getlist("imagenes")
+
+    if not imagenes:
+        return JsonResponse(
+            {
+                "success": False,
+                "error": "No se recibieron imágenes",
+            },
+            status=400,
+        )
+
+    creadas = []
+
+    for imagen in imagenes:
+        item = VehiculoImagen.objects.create(
+            empresa=empresa,
+            vehiculo=vehiculo,
+            imagen=imagen,
+            tipo=request.POST.get("tipo", "otro"),
+        )
+
+        creadas.append(
+            {
+                "id": item.id,
+                "url": item.imagen.url,
+                "tipo": item.tipo,
+            }
+        )
+
+    return JsonResponse(
+        {
+            "success": True,
+            "imagenes": creadas,
+        }
+    )

@@ -9,6 +9,17 @@ from taller.forms.comprobante_form import ComprobantePagoForm
 from taller.models.comprobante_pago import ComprobantePago
 from taller.models.empresa import Empresa
 from taller.utils.payment_config import get_transfer_payment_details
+from taller.utils.empresa import get_or_create_empresa
+from taller.utils.plan_catalog import (
+    BILLING_ANNUAL,
+    BILLING_MONTHLY,
+    PLAN_BUSINESS,
+    PLAN_ENTRY,
+    PLAN_GROWTH,
+    PLAN_TRIAL,
+    get_plan_price,
+    get_supported_payment_methods,
+)
 
 
 def suspension(request):
@@ -55,9 +66,9 @@ def suspension(request):
         ),
         "datos_transferencia": get_transfer_payment_details(empresa.pais),
         "precios": {
-            "basic": 15000,
-            "premium": 25000,
-            "enterprise": 45000,
+            "basic": get_plan_price(empresa.pais, "basic", "mensual")["price"],
+            "premium": get_plan_price(empresa.pais, "premium", "semestral")["price"],
+            "enterprise": get_plan_price(empresa.pais, "enterprise", "anual")["price"],
         },
     }
 
@@ -119,6 +130,52 @@ def estado_suscripcion(request):
         return JsonResponse({"error": "Empresa no encontrada"}, status=404)
 
 
+@login_required
+def registrar_transferencia_ajax(request):
+    """Registra un comprobante de transferencia bancaria para revisión manual."""
+    if request.method != "POST":
+        return JsonResponse({"error": "Método no permitido"}, status=405)
+
+    empresa = get_or_create_empresa(request)
+
+    post_data = request.POST.copy()
+    post_data["metodo_pago"] = "transferencia"
+    post_data["plan_solicitado"] = empresa.plan or "basic"
+    if request.POST.get("referencia") and not post_data.get("numero_transaccion"):
+        post_data["numero_transaccion"] = request.POST.get("referencia")
+    if request.POST.get("notas") and not post_data.get("descripcion"):
+        post_data["descripcion"] = request.POST.get("notas")
+
+    files_data = request.FILES.copy()
+    if "archivo" in files_data and "comprobante" not in files_data:
+        files_data.setlist("comprobante", files_data.getlist("archivo"))
+
+    form = ComprobantePagoForm(post_data, files_data)
+    if not form.is_valid():
+        return JsonResponse({"errors": form.errors}, status=400)
+
+    comprobante = form.save(commit=False)
+    comprobante.empresa = empresa
+    comprobante.estado = "pendiente"
+
+    renewal_period = (
+        request.POST.get("renewal_period") or request.POST.get("periodo") or "mensual"
+    ).strip().lower()
+    annual_keys = {"anual", "annual", "12", "yearly", "year"}
+    comprobante.meses_pagados = 12 if renewal_period in annual_keys else 1
+
+    # El comprobante se guarda en estado pendiente y no extiende la suscripción aún.
+    comprobante.save()
+
+    return JsonResponse(
+        {
+            "success": True,
+            "message": "Comprobante recibido. Estamos validando la transferencia.",
+            "comprobante_id": comprobante.id,
+        }
+    )
+
+
 def precios(request):
     """Vista pública con información de precios diferenciada por país"""
     from taller.models.precio_suscripcion import PrecioSuscripcion
@@ -129,6 +186,75 @@ def precios(request):
             return f"${int(float(value)):,}".replace(",", ".")
         except (TypeError, ValueError):
             return "$0"
+
+    def format_catalog_price(country, plan, billing):
+        price_data = get_plan_price(country, plan, billing)
+        amount = price_data["price"]
+        currency = price_data["currency"]
+        if currency == "CLP":
+            return f"{format_clp(amount)} CLP"
+        if currency == "MXN":
+            return f"${amount:,.0f} MXN"
+        return f"USD {amount:,.0f}"
+
+    def build_pricing_cards(country):
+        methods = ", ".join(get_supported_payment_methods(country)).replace("_", " ")
+        signup_paths = {
+            "AR": "/ar/es/accounts/signup/",
+            "BR": "/br/es/accounts/signup/",
+            "CL": "/cl/es/accounts/signup/",
+            "CO": "/co/es/accounts/signup/",
+            "EC": "/ec/es/accounts/signup/",
+            "MX": "/mx/es/accounts/signup/",
+            "PE": "/pe/es/accounts/signup/",
+            "US": "/us/signup/",
+            "UY": "/uy/es/accounts/signup/",
+            "VE": "/ve/es/accounts/signup/",
+        }
+        signup_path = signup_paths.get(country, "/accounts/signup/")
+        return [
+            {
+                "plan": PLAN_TRIAL,
+                "pricing": "$0",
+                "billing_cycle": BILLING_MONTHLY,
+                "payment_methods": "Sin tarjeta",
+                "highlight": False,
+                "cta_url": f"{signup_path}?plan=trial",
+            },
+            {
+                "plan": PLAN_ENTRY,
+                "pricing": (
+                    f"{format_catalog_price(country, PLAN_ENTRY, BILLING_MONTHLY)} mensual / "
+                    f"{format_catalog_price(country, PLAN_ENTRY, BILLING_ANNUAL)} anual"
+                ),
+                "billing_cycle": BILLING_MONTHLY,
+                "payment_methods": methods,
+                "highlight": False,
+                "cta_url": f"{signup_path}?plan={PLAN_ENTRY}",
+            },
+            {
+                "plan": PLAN_GROWTH,
+                "pricing": (
+                    f"{format_catalog_price(country, PLAN_GROWTH, BILLING_MONTHLY)} mensual / "
+                    f"{format_catalog_price(country, PLAN_GROWTH, BILLING_ANNUAL)} anual"
+                ),
+                "billing_cycle": BILLING_MONTHLY,
+                "payment_methods": methods,
+                "highlight": True,
+                "cta_url": f"{signup_path}?plan={PLAN_GROWTH}",
+            },
+            {
+                "plan": PLAN_BUSINESS,
+                "pricing": (
+                    f"{format_catalog_price(country, PLAN_BUSINESS, BILLING_MONTHLY)} mensual / "
+                    f"{format_catalog_price(country, PLAN_BUSINESS, BILLING_ANNUAL)} anual"
+                ),
+                "billing_cycle": BILLING_MONTHLY,
+                "payment_methods": methods,
+                "highlight": False,
+                "cta_url": f"{signup_path}?plan={PLAN_BUSINESS}",
+            },
+        ]
 
     # Detectar país del usuario desde la URL o empresa
     pais_usuario = "US"  # Default USA para la ruta /us/pricing/
@@ -171,8 +297,8 @@ def precios(request):
                     "nombre": "Monthly Plan USA",
                     "nombre_en": "Monthly Plan USA",
                     "nombre_es": "Plan Mensual USA",
-                    "precio": 20,
-                    "moneda": "USD",
+                    "precio": get_plan_price("US", "entry", "mensual")["price"],
+                    "moneda": get_plan_price("US", "entry", "mensual")["currency"],
                     "caracteristicas": [
                         "Unlimited documents",
                         "Up to 5 users",
@@ -196,8 +322,8 @@ def precios(request):
                     "nombre": "Semi-Annual Plan USA",
                     "nombre_en": "Semi-Annual Plan USA",
                     "nombre_es": "Plan Semestral USA",
-                    "precio": 110,
-                    "moneda": "USD",
+                    "precio": get_plan_price("US", "growth", "semestral")["price"],
+                    "moneda": get_plan_price("US", "growth", "semestral")["currency"],
                     "caracteristicas": [
                         "Unlimited documents",
                         "Up to 8 users",
@@ -227,8 +353,8 @@ def precios(request):
                     "nombre": "Annual Plan USA",
                     "nombre_en": "Annual Plan USA",
                     "nombre_es": "Plan Anual USA",
-                    "precio": 200,
-                    "moneda": "USD",
+                    "precio": get_plan_price("US", "business", "anual")["price"],
+                    "moneda": get_plan_price("US", "business", "anual")["currency"],
                     "caracteristicas": [
                         "Unlimited documents",
                         "Unlimited users",
@@ -570,6 +696,7 @@ def precios(request):
 
     context = {
         "planes": planes,
+        "pricing_cards": build_pricing_cards(pais_usuario),
         "pais_usuario": pais_usuario,
         "whatsapp_contacto": whatsapp_contacto,
         "moneda_simbolo": simbolos_moneda.get(pais_usuario, "$"),

@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{% if request.LANGUAGE_CODE == 'en' %}Workspace Search{% else %}Workspace de Ingreso{% endif %} - eGarage
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'taller/css/workspace_search.css' %}?v=20260512">
+{% endblock %}
+
+{% block content %}
+<section
+  class="workspace-shell"
+  data-workspace-search-root
+  data-search-url="{{ workspace_search_url|default:'/cl/es/workspace/buscar/' }}"
+  data-base-prefix="{{ workspace_base_prefix|default:'/cl/es' }}"
+  data-min-chars="2"
+>
+  <header class="workspace-header">
+    <div class="workspace-header-copy">
+      <p class="workspace-meta">
+        {{ workspace_company_name|default:company_name|default:'eGarage' }}
+      </p>
+      <h1 class="workspace-title">
+        {% if request.LANGUAGE_CODE == 'en' %}Workspace{% else %}Workspace{% endif %}
+      </h1>
+    </div>
+    <div class="workspace-header-actions">
+      <span class="workspace-keyhint">/</span>
+      <span class="workspace-keyhint">Ctrl+K</span>
+    </div>
+  </header>
+
+  <div class="workspace-search-panel">
+    <label class="workspace-search-label" for="workspace-live-search">
+      {% if request.LANGUAGE_CODE == 'en' %}Vehicle or customer{% else %}Vehículo o cliente{% endif %}
+    </label>
+    <div class="workspace-search-input-wrap">
+      <span class="workspace-search-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M10.5 18a7.5 7.5 0 1 1 5.303-2.197L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <input
+        id="workspace-live-search"
+        class="workspace-search-input"
+        type="search"
+        autocomplete="off"
+        spellcheck="false"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-expanded="false"
+        aria-controls="workspace-search-dropdown"
+        placeholder="{% if request.LANGUAGE_CODE == 'en' %}Search plate, VIN, name, phone or email{% else %}Busca patente, VIN, nombre, teléfono o correo{% endif %}"
+        data-search-input
+      >
+      <button type="button" class="workspace-search-shortcut" data-search-shortcut aria-label="{% if request.LANGUAGE_CODE == 'en' %}Focus search{% else %}Enfocar búsqueda{% endif %}">
+        <span>/</span>
+      </button>
+    </div>
+
+    <div
+      id="workspace-search-dropdown"
+      class="workspace-search-dropdown"
+      role="listbox"
+      aria-label="{% if request.LANGUAGE_CODE == 'en' %}Live search results{% else %}Resultados de búsqueda en vivo{% endif %}"
+      data-search-dropdown
+      hidden
+    >
+      <div class="workspace-search-content" data-search-content></div>
+    </div>
+
+    <div class="workspace-sr-only" aria-live="polite" data-search-live></div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  window.workspaceSearchI18n = {
+    vehicles: "{% if request.LANGUAGE_CODE == 'en' %}Vehicles{% else %}Vehículos{% endif %}",
+    customers: "{% if request.LANGUAGE_CODE == 'en' %}Customers{% else %}Clientes{% endif %}",
+    loadingTitle: "{% if request.LANGUAGE_CODE == 'en' %}Searching live{% else %}Buscando en vivo{% endif %}",
+    loadingBody: "{% if request.LANGUAGE_CODE == 'en' %}Checking matching vehicles and customers...{% else %}Consultando vehículos y clientes coincidentes...{% endif %}",
+    hintTitle: "{% if request.LANGUAGE_CODE == 'en' %}Start typing{% else %}Comienza a escribir{% endif %}",
+    hintBody: "{% if request.LANGUAGE_CODE == 'en' %}Use at least 2 characters to search by plate, VIN, customer name, phone, email or tax ID.{% else %}Usa al menos 2 caracteres para buscar por patente, VIN, nombre, teléfono, correo o RUT.{% endif %}",
+    emptyTitle: "{% if request.LANGUAGE_CODE == 'en' %}No matches found{% else %}Sin coincidencias{% endif %}",
+    emptyBody: "{% if request.LANGUAGE_CODE == 'en' %}Try another plate, VIN or customer detail.{% else %}Prueba con otra patente, VIN o dato del cliente.{% endif %}",
+    errorTitle: "{% if request.LANGUAGE_CODE == 'en' %}Search unavailable{% else %}Búsqueda no disponible{% endif %}",
+    errorBody: "{% if request.LANGUAGE_CODE == 'en' %}The request could not be completed right now. Try again in a moment.{% else %}No se pudo completar la consulta ahora mismo. Intenta nuevamente en un momento.{% endif %}",
+    openLabel: "{% if request.LANGUAGE_CODE == 'en' %}Open{% else %}Abrir{% endif %}",
+    vehicleBadge: "{% if request.LANGUAGE_CODE == 'en' %}Vehicle{% else %}Vehículo{% endif %}",
+    customerBadge: "{% if request.LANGUAGE_CODE == 'en' %}Customer{% else %}Cliente{% endif %}",
+    untitledVehicle: "{% if request.LANGUAGE_CODE == 'en' %}Vehicle without plate{% else %}Vehículo sin patente{% endif %}",
+    unassignedCustomer: "{% if request.LANGUAGE_CODE == 'en' %}No linked customer{% else %}Sin cliente asociado{% endif %}",
+    resultsLabel: "{% if request.LANGUAGE_CODE == 'en' %}results{% else %}resultados{% endif %}"
+  };
+</script>
+<script src="{% static 'taller/js/workspace_search.js' %}?v=20260512"></script>
+{% endblock %}

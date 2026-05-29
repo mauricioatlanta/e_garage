@@ -12,9 +12,11 @@ from taller.models.color_cliente import ColorCliente
 from taller.models.comprobante_pago import ComprobantePago
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
+from taller.models.extras_vehiculo import CajaVehiculoEmpresa, MotorVehiculoEmpresa
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
 from taller.models.precio_suscripcion import PrecioSuscripcion
+from taller.models.subscription_change import SubscriptionChange
 from taller.models.suscripcion_transaccion import SuscripcionTransaccion
 from taller.models.tecnico import Tecnico
 from taller.services.suscripcion_transaccion_service import SuscripcionTransaccionService
@@ -556,6 +558,17 @@ class ComprobantePagoAdmin(admin.ModelAdmin):
             count += 1
         self.message_user(request, f"Se rechazaron {count} comprobantes.")
 
+    def save_model(self, request, obj, form, change):
+        previous_estado = None
+        if change and obj.pk:
+            previous = ComprobantePago.objects.filter(pk=obj.pk).first()
+            previous_estado = previous.estado if previous else None
+
+        super().save_model(request, obj, form, change)
+
+        if change and previous_estado != "aprobado" and obj.estado == "aprobado":
+            obj.aprobar(procesado_por=request.user.username)
+
 
 @admin.register(SuscripcionTransaccion, site=admin_site)
 class SuscripcionTransaccionAdmin(admin.ModelAdmin):
@@ -634,6 +647,32 @@ class SuscripcionTransaccionAdmin(admin.ModelAdmin):
 
     aprobar_pagos_manuales.short_description = (
         "Aprobar transferencias y enviar email de éxito"
+    )
+
+
+@admin.register(SubscriptionChange, site=admin_site)
+class SubscriptionChangeAdmin(admin.ModelAdmin):
+    list_display = (
+        "empresa",
+        "current_plan",
+        "requested_plan",
+        "change_type",
+        "status",
+        "prorated_amount",
+        "currency",
+        "scheduled_at",
+        "applied_at",
+        "created_at",
+    )
+    list_filter = ("status", "change_type", "current_plan", "requested_plan", "currency")
+    search_fields = ("empresa__nombre_taller", "empresa__user__email", "requested_by__email")
+    readonly_fields = (
+        "created_at",
+        "updated_at",
+        "applied_at",
+        "cancelled_at",
+        "validation_snapshot",
+        "transaction",
     )
 
 
@@ -833,6 +872,26 @@ class ConfigEmpresaAdmin(admin.ModelAdmin):
 
     def has_view_permission(self, request, obj=None):
         return request.user.is_staff
+
+
+@admin.register(MotorVehiculoEmpresa, site=admin_site)
+class MotorVehiculoEmpresaAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "empresa", "modelo", "country")
+    list_filter = ("country", "empresa")
+    search_fields = ("nombre", "empresa__nombre_taller", "modelo__nombre")
+    raw_id_fields = ("empresa", "modelo")
+    list_select_related = ("empresa", "modelo", "modelo__marca")
+    ordering = ("empresa__nombre_taller", "modelo__nombre", "nombre")
+
+
+@admin.register(CajaVehiculoEmpresa, site=admin_site)
+class CajaVehiculoEmpresaAdmin(admin.ModelAdmin):
+    list_display = ("nombre", "empresa", "modelo", "country")
+    list_filter = ("country", "empresa")
+    search_fields = ("nombre", "empresa__nombre_taller", "modelo__nombre")
+    raw_id_fields = ("empresa", "modelo")
+    list_select_related = ("empresa", "modelo", "modelo__marca")
+    ordering = ("empresa__nombre_taller", "modelo__nombre", "nombre")
 
 
 # Importar admin de memoria (se auto-registran con @admin.register)

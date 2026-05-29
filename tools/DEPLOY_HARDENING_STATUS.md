@@ -87,7 +87,7 @@ python manage.py shell -c "exec(open('tools/qa_final_minimal.py').read())"
 git add . && git commit -m "backend==frontend sync ✅"
 # Push a main
 git push origin main
-# Deploy a Render/PythonAnywhere
+# Deploy a Render/DigitalOcean
 ```
 
 ---

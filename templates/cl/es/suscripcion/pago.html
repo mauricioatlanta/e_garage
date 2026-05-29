@@ -189,6 +189,42 @@ body {
     color: #1e40af;
 }
 
+.method-summary {
+    display: grid;
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.method-card {
+    background: #f8fafc;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+.method-card strong {
+    display: block;
+    color: #1a202c;
+    margin-bottom: 6px;
+}
+
+.method-card span {
+    color: #475569;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.method-badge {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0369a1;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 10px;
+    margin-bottom: 10px;
+}
+
 .back-link {
     text-align: center;
     margin-top: 24px;
@@ -216,15 +252,31 @@ body {
         <div class="plan-period">{{ plan_info.dias }} días de acceso</div>
     </div>
 
+    {% if flow_enabled %}
+    <div class="method-summary">
+        <div class="method-card">
+            <div class="method-badge">Más rápido</div>
+            <strong>Pago en línea con Flow</strong>
+            <span>Completa el pago de forma segura y activaremos tu suscripción cuando Flow confirme la transacción.</span>
+            <form method="post" action="{% url 'start_flow_payment' %}" style="margin-top: 12px;">
+                {% csrf_token %}
+                <input type="hidden" name="plan" value="{{ plan }}">
+                <button type="submit" class="upload-button">Pagar con Flow</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if bank_transfer_enabled %}
     <!-- Instrucciones -->
     <div class="instructions">
-        <div class="instructions-title">📋 Instrucciones de Pago</div>
+        <div class="instructions-title">📋 Transferencia bancaria</div>
         <ol>
             <li>Realiza una <strong>transferencia bancaria</strong> por el monto indicado</li>
             <li>Usa la referencia: <strong>{{ referencia }}</strong></li>
             <li>Toma una <strong>foto o screenshot</strong> del comprobante</li>
             <li>Sube el comprobante usando el botón de abajo</li>
-            <li>Tu suscripción será activada en <strong>24-48 horas</strong></li>
+            <li>Tu suscripción será activada en <strong>24-48 horas hábiles</strong></li>
         </ol>
     </div>
 
@@ -305,10 +357,11 @@ body {
             </button>
         </form>
     </div>
+    {% endif %}
 
     <!-- Back Link -->
     <div class="back-link">
-        <a href="/cl/es/dashboard/">← Volver al Dashboard</a>
+        <a href="/cl/es/dashboard/">← Volver al Panel</a>
     </div>
 </div>
 

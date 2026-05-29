@@ -31,9 +31,9 @@ class Documento(AuditMixin, models.Model):
         choices=[
             ("OT", _("Orden de Trabajo")),
             ("PRES", _("Presupuesto")),
-            ("FAC", _("Factura/Boleta")),
-            ("PTS", _("Part Sale")),  # Venta de repuestos/piezas (sin vehículo)
-            # ("REC", _("Recibo/Boleta (LEGACY)")),  # Legacy, no mostrar en forms
+            ("FAC", _("Comprobante")),
+            ("PTS", _("Venta Repuestos")),
+            # ("REC", _("Recibo (LEGACY)")),  # Legacy, no mostrar en forms
             # ("BOL", _("Boleta (LEGACY)")),   # Legacy, no mostrar en forms
         ],
         db_index=True,
@@ -476,30 +476,81 @@ class Documento(AuditMixin, models.Model):
             # Si no es numérico, devolver el número tal cual con prefijo
             return f"{prefijo}{self.numero}"
 
+    @transaction.atomic
     def generar_numero_documento(self):
-        """Genera el próximo número secuencial para el tipo de documento"""
+        """
+        Genera correlativo seguro evitando race conditions.
+        Usa DocumentSequence con select_for_update para garantizar unicidad.
+        Al primer uso siembra el contador desde los documentos existentes.
+        """
+        import re
+        from taller.models.sequence import DocumentSequence
+
         if self.numero:
             return self.numero
 
-        # Buscar el último número para este tipo de documento en esta empresa
-        ultimo_doc = (
-            Documento.objects.filter(empresa=self.empresa, tipo=self.tipo)
-            .order_by("-numero")
-            .first()
+        seq, _ = DocumentSequence.objects.select_for_update().get_or_create(
+            empresa=self.empresa,
+            tipo=self.tipo,
+            defaults={"current": 0},
         )
 
-        if ultimo_doc and ultimo_doc.numero:
-            # Convertir el número a entero, sumar 1, y volver a string
-            try:
-                numero_anterior = int(ultimo_doc.numero)
-                self.numero = str(numero_anterior + 1)
-            except (ValueError, TypeError):
-                # Si no se puede convertir a entero, empezar desde 1
-                self.numero = "1"
-        else:
-            self.numero = "1"
+        if seq.current == 0:
+            # Siembra el contador con el máximo existente para esta empresa/tipo
+            for valor in (
+                Documento.objects
+                .filter(empresa=self.empresa, tipo=self.tipo)
+                .exclude(numero__isnull=True)
+                .exclude(numero="")
+                .values_list("numero", flat=True)
+            ):
+                m = re.search(r"(\d+)$", str(valor).strip())
+                if m:
+                    try:
+                        seq.current = max(seq.current, int(m.group(1)))
+                    except Exception:
+                        pass
+
+        seq.current += 1
+        seq.save(update_fields=["current"])
+        self.numero = str(seq.current)
 
         return self.numero
+
+    def convertir_documento_final(self):
+        """
+        Conversión operacional automática:
+
+        Chile:
+            PRES -> OT
+
+        USA:
+            PRES -> FAC
+
+        Mantiene el mismo documento,
+        pero cambia:
+        - tipo
+        - correlativo
+        - prefijo
+        """
+
+        if self.tipo != "PRES":
+            return False
+
+        nuevo_tipo = "FAC" if self.country == "US" else "OT"
+
+        self.tipo = nuevo_tipo
+
+        # Forzar regeneración de número
+        self.numero = ""
+
+        self.generar_numero_documento()
+
+        self.save(update_fields=["tipo", "numero"])
+
+        return True
+
+
 
     def save(self, *args, **kwargs):
         """Override save para generar número automáticamente y recalcular totales"""
@@ -527,7 +578,12 @@ class Documento(AuditMixin, models.Model):
         if not hasattr(self, "payment_status") or not self.payment_status:
             self.payment_status = "pending"
 
-        if not self.numero:
+        if self.pk is None:
+            # Siempre regenerar para nuevos registros: evita race conditions
+            # cuando el form pre-rellena 'numero' desde una llamada AJAX previa.
+            self.numero = ""
+            self.generar_numero_documento()
+        elif not self.numero:
             self.generar_numero_documento()
 
         # Primer guardado para obtener PK si no la tiene
@@ -728,6 +784,12 @@ class Documento(AuditMixin, models.Model):
         self.total = val
 
     class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["empresa", "tipo", "numero"],
+                name="uniq_documento_empresa_tipo_numero",
+            )
+        ]
         app_label = "taller"
         verbose_name = _("Documento")
         verbose_name_plural = _("Documentos")

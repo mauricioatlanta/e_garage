@@ -1,10 +1,9 @@
 from datetime import date, datetime, timedelta
 from decimal import Decimal
 
-from django.contrib import messages
+from django.conf import settings
 from django.db.models import Count, DecimalField, ExpressionWrapper, F, Q, Sum, Value
 from django.db.models.functions import Coalesce
-from django.shortcuts import redirect
 from django.utils import timezone
 
 from taller.auth.decorators import country_login_required
@@ -13,6 +12,7 @@ from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, LineaServicio
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
+from taller.utils.empresa import get_or_create_empresa
 
 # --- CONSTANTS ---
 SUBTOTAL_EXPR = ExpressionWrapper(
@@ -24,6 +24,14 @@ ZERO_DEC = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, decim
 
 
 # --- HELPER FUNCTIONS ---
+def inicio_mes_datetime(hoy):
+    """Devuelve inicio de mes compatible con USE_TZ=True/False."""
+    inicio = datetime(hoy.year, hoy.month, 1, 0, 0, 0)
+    if settings.USE_TZ:
+        return timezone.make_aware(inicio, timezone.get_current_timezone())
+    return inicio
+
+
 def total_servicios(qs_base):
     """Calcula el total de servicios usando subtotal (precio * cantidad)"""
     return qs_base.aggregate(total=Coalesce(Sum(SUBTOTAL_EXPR), ZERO_DEC))["total"]
@@ -42,38 +50,15 @@ def dashboard_centro_operaciones(request):
     Incluye KPIs, reportes rápidos y navegación a todas las funciones
     """
 
-    # 🔒 Obtener empresa del usuario logueado - NO crear silenciosamente
-    try:
-        empresa = request.user.empresa
-    except Exception:
-        messages.error(request, "Selecciona o crea tu empresa para continuar.")
-
-        # Detectar país y redirigir al namespace correcto
-        if "/us/" in request.path:
-            return redirect("usa:configuracion")
-        elif "/cl/" in request.path:
-            return redirect("chile:configuracion")
-        else:
-            # Fallback al namespace global o a un path seguro
-            try:
-                return redirect("taller:configuracion")
-            except:
-                return redirect("/configuracion/")
+    empresa = get_or_create_empresa(request)
 
     # 📅 Fechas de referencia
-    hoy = timezone.localdate()
+    hoy = date.today()
     hace_7_dias = hoy - timedelta(days=7)
     hace_30_dias = hoy - timedelta(days=30)
     inicio_mes = date(hoy.year, hoy.month, 1)
 
-    # Zona horaria para clientes nuevos del mes
-    tz = timezone.get_current_timezone()
-    # Corregir para zoneinfo (Python 3.9+) que no tiene localize()
-    if hasattr(tz, "localize"):
-        inicio_mes_dt = tz.localize(datetime(hoy.year, hoy.month, 1, 0, 0, 0))
-    else:
-        # Para zoneinfo, usar datetime con tzinfo directamente
-        inicio_mes_dt = datetime(hoy.year, hoy.month, 1, 0, 0, 0, tzinfo=tz)
+    inicio_mes_dt = inicio_mes_datetime(hoy)
 
     # --- FALLBACK DECIMAL PARA COALESCE ---
     ZERO_DEC = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2))
@@ -376,33 +361,15 @@ def dashboard_centro_operaciones_espacial(request):
     # El idioma ya está establecido por LanguagePolicyMiddleware
     # No forzar ningún idioma aquí, respetar la preferencia del usuario
 
-    # 🔒 Obtener empresa del usuario logueado - NO crear silenciosamente
-    try:
-        empresa = request.user.empresa
-    except Exception:
-        messages.error(request, "Selecciona o crea tu empresa para continuar.")
-        if "/us/" in request.path:
-            return redirect("usa:configuracion")
-        elif "/cl/" in request.path:
-            return redirect("chile:configuracion")
-        else:
-            try:
-                return redirect("taller:configuracion")
-            except:
-                return redirect("/configuracion/")
+    empresa = get_or_create_empresa(request)
 
     # 📅 Fechas de referencia (MISMA LÓGICA QUE dashboard_centro_operaciones)
-    hoy = timezone.localdate()
+    hoy = date.today()
     hace_7_dias = hoy - timedelta(days=7)
     hace_30_dias = hoy - timedelta(days=30)
     inicio_mes = date(hoy.year, hoy.month, 1)
 
-    # Zona horaria para clientes nuevos del mes
-    tz = timezone.get_current_timezone()
-    if hasattr(tz, "localize"):
-        inicio_mes_dt = tz.localize(datetime(hoy.year, hoy.month, 1, 0, 0, 0))
-    else:
-        inicio_mes_dt = datetime(hoy.year, hoy.month, 1, 0, 0, 0, tzinfo=tz)
+    inicio_mes_dt = inicio_mes_datetime(hoy)
 
     # --- FALLBACK DECIMAL PARA COALESCE ---
     ZERO_DEC = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, decimal_places=2))

@@ -87,7 +87,7 @@ echo ""
 echo -e "${YELLOW}📋 Instrucciones para actualizar el servidor:${NC}"
 echo ""
 echo "1. Conectarse al servidor:"
-echo -e "   ${GREEN}ssh atlantareciclajes@ssh.pythonanywhere.com${NC}"
+echo -e "   ${GREEN}ssh atlantareciclajes@ssh${NC}"
 echo ""
 echo "2. Ejecutar estos comandos en el servidor:"
 echo ""
@@ -96,7 +96,7 @@ echo -e "${GREEN}git pull origin main && \\${NC}"
 echo -e "${GREEN}pip3.10 install --user -r requirements.txt && \\${NC}"
 echo -e "${GREEN}python3.10 manage.py migrate && \\${NC}"
 echo -e "${GREEN}python3.10 manage.py collectstatic --noinput && \\${NC}"
-echo -e "${GREEN}touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py${NC}"
+echo -e "${GREEN}touch /var/www/atlantareciclajes_digitalocean_com_wsgi.py${NC}"
 echo ""
 echo "3. Verificar que funciona:"
 echo -e "   ${GREEN}curl -I https://www.egarage.cl/${NC}"
@@ -134,7 +134,7 @@ python3.10 manage.py collectstatic --noinput
 
 # Reiniciar
 echo "🔄 Reiniciando aplicación..."
-touch /var/www/atlantareciclajes_pythonanywhere_com_wsgi.py
+touch /var/www/atlantareciclajes_digitalocean_com_wsgi.py
 
 echo "✅ Actualización completada!"
 echo ""

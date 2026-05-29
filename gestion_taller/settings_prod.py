@@ -67,17 +67,17 @@ DEBUG = env_bool("DJANGO_DEBUG", False)
 # Para acceso directo por IP debe incluir la IP del servidor (ej. 159.223.200.106).
 ALLOWED_HOSTS = env_list(
     "DJANGO_ALLOWED_HOSTS",
-    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,.pythonanywhere.com,localhost,127.0.0.1,159.223.200.106",
+    "egarage.cl,www.egarage.cl,atlantareciclajes.cl,www.atlantareciclajes.cl,localhost,127.0.0.1,159.223.200.106",
 )
 
 CSRF_TRUSTED_ORIGINS = env_list(
     "DJANGO_CSRF_TRUSTED_ORIGINS",
-    "https://egarage.cl,https://www.egarage.cl,https://atlantareciclajes.cl,https://www.atlantareciclajes.cl,https://*.pythonanywhere.com",
+    "https://egarage.cl,https://www.egarage.cl,https://atlantareciclajes.cl,https://www.atlantareciclajes.cl",
 )
 
 
 # =========================
-# HTTPS detrás de proxy (PythonAnywhere)
+# HTTPS detrás de proxy (Nginx / DigitalOcean)
 # =========================
 # 🔥 IMPRESCINDIBLE: Configuración fija para producción (no controlada por env)
 # Este header es CRÍTICO cuando Django está detrás de un proxy (Nginx, Cloudflare, etc.)
@@ -123,7 +123,7 @@ SECURE_REFERRER_POLICY = (
 # Email
 # =========================
 # Backend real por API HTTPS (Resend), sin dependencia de SMTP.
-EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+# EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
 
 DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl")
 SERVER_EMAIL = env_str("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
@@ -152,6 +152,17 @@ ANYMAIL = {
 ACCOUNT_EMAIL_VERIFICATION = env_str("ACCOUNT_EMAIL_VERIFICATION", "mandatory")
 ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = env_bool("ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION", True)
 
+# Allauth usa /accounts/profile/ por defecto si no existe una redireccion explicita.
+# En eGarage, despues de iniciar sesion se debe entrar al workspace country-aware.
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/cl/es/workspace/"
+ACCOUNT_ADAPTER = "taller.views_extra.account_adapter.CountryAwareAccountAdapter"
+ACCOUNT_FORMS = {
+    "login": "taller.forms.custom_login.CustomLoginForm",
+    "signup": "taller.forms.custom_signup.CustomSignupForm",
+}
+ACCOUNT_SIGNUP_FIELDS = ["email*", "username*", "password1*", "password2*"]
+
 
 # =========================
 # DB: Configuración unificada para DigitalOcean
@@ -165,7 +176,7 @@ ACCOUNT_LOGIN_ON_EMAIL_CONFIRMATION = env_bool("ACCOUNT_LOGIN_ON_EMAIL_CONFIRMAT
 #   DJANGO_DB_HOST=127.0.0.1
 #   DJANGO_DB_PORT=5432
 
-DB_ENGINE = env_str("DJANGO_DB_ENGINE", "postgresql").lower()
+DB_ENGINE = env_str("DJANGO_DB_ENGINE", "sqlite3").lower()
 
 if DB_ENGINE == "postgresql" or DB_ENGINE == "postgres":
     # PostgreSQL - Configuración para producción
@@ -218,6 +229,30 @@ TEMPLATES[0]["DIRS"] = [str(_base_dir / "templates")]
 
 # Seguridad extra: evita que alguien meta rutas raras por accidente
 TEMPLATES[0]["DIRS"] = [str(Path(p).resolve()) for p in TEMPLATES[0]["DIRS"]]
+
+_context_processors = TEMPLATES[0].setdefault("OPTIONS", {}).setdefault("context_processors", [])
+for _processor in [
+    "django.template.context_processors.media",
+    "django.template.context_processors.static",
+    "django.template.context_processors.tz",
+    "taller.context_processors.empresa_contexto",
+    "taller.context_processors.namespaces.ui_namespaces",
+    "taller.context_processors.company_context",
+    "taller.context_processors.company_branding",
+    "taller.context_processors.company_country",
+    "taller.context_processors.company_header",
+    "taller.context_processors.panel_chrome.us_authenticated_compact_chrome",
+    "taller.context_processors.panel_chrome.us_signup_slim_header",
+    "taller.context_processors.country_config.country_context",
+    "taller.context_processors.feature_flags.country_features",
+    "taller.context_processors.ui_labels.ui_labels_context",
+    "taller.context_processors.subscription_status.subscription_status",
+    "taller.context_processors.subscription_notice.subscription_notice",
+    "taller.context_processors.support_context",
+    "taller.context_processors.ayuda_contextual.ayuda_contextual",
+]:
+    if _processor not in _context_processors:
+        _context_processors.append(_processor)
 
 # --- FIX FINAL DIGITALOCEAN ---
 DEBUG = False
@@ -309,3 +344,29 @@ CACHES = {
         "TIMEOUT": 300,
     }
 }
+
+
+# Fix móvil: evita mismatch entre cookie csrftoken y formulario cacheado/prefetch Cloudflare/Samsung
+CSRF_USE_SESSIONS = True
+
+# BLOQUE SQLITE FINAL DESACTIVADO:
+# La base de datos de producción debe quedar definida arriba por DJANGO_DB_ENGINE.
+# Nunca sobrescribir DATABASES aquí.
+
+EMAIL_BACKEND = env_str("EMAIL_BACKEND", "gestion_taller.resend_backend.ResendBackend")
+RESEND_API_KEY = env_str("RESEND_API_KEY", "")
+DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl")
+ACCOUNT_LOGIN_METHODS = {'email'}
+
+# Pasarelas de pago
+FLOW_API_KEY = env_str("FLOW_API_KEY", "")
+FLOW_SECRET_KEY = env_str("FLOW_SECRET_KEY", "")
+FLOW_API_URL = env_str("FLOW_API_URL", "https://www.flow.cl/api")
+FLOW_ENABLED = bool(
+    os.getenv("FLOW_ENABLED", "1" if (FLOW_API_KEY and FLOW_SECRET_KEY) else "0") not in ("0", "false", "False", "")
+)
+
+MP_ACCESS_TOKEN = env_str("MP_ACCESS_TOKEN", "")
+MP_ENABLED = bool(
+    os.getenv("MP_ENABLED", "1" if MP_ACCESS_TOKEN else "0") not in ("0", "false", "False", "")
+)

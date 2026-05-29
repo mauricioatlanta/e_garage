@@ -99,7 +99,7 @@
         backdrop-filter: blur(20px);
         border: 1px solid rgba(0, 255, 255, 0.3);
         border-radius: 20px;
-        padding: 3rem;
+        padding: 3rem 15rem 3rem 3rem;
         margin-bottom: 2rem;
         box-shadow: 
             0 8px 32px rgba(0, 0, 0, 0.3),
@@ -154,6 +154,36 @@
         font-weight: 400;
         position: relative;
         z-index: 2;
+    }
+
+    .settings-subscription-note {
+        align-items: center;
+        background: rgba(10, 14, 39, 0.42);
+        border: 1px solid rgba(0, 255, 255, 0.14);
+        border-radius: 999px;
+        color: rgba(255, 255, 255, 0.68);
+        display: inline-flex;
+        font-size: 0.76rem;
+        font-weight: 600;
+        gap: 0.35rem;
+        line-height: 1;
+        padding: 0.35rem 0.62rem;
+        position: absolute;
+        right: 1.35rem;
+        top: 1.2rem;
+        white-space: nowrap;
+        z-index: 2;
+    }
+
+    .settings-subscription-note i {
+        color: var(--neon-cyan);
+        font-size: 0.78rem;
+        opacity: 0.82;
+    }
+
+    .settings-subscription-note strong {
+        color: var(--text-primary);
+        font-weight: 700;
     }
 
     /* Navigation Tabs - Futuristic Style */
@@ -700,6 +730,234 @@
         font-size: 0.9rem;
     }
 
+    .subscription-panel {
+        display: grid;
+        grid-template-columns: minmax(260px, 0.9fr) minmax(320px, 1.2fr);
+        gap: 1.25rem;
+        align-items: stretch;
+    }
+
+    .subscription-status-card,
+    .subscription-action-card {
+        background: linear-gradient(145deg, rgba(10, 14, 39, 0.92), rgba(21, 25, 50, 0.74));
+        border: 1px solid rgba(0, 255, 255, 0.22);
+        border-radius: 14px;
+        padding: 1.35rem;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28);
+    }
+
+    .subscription-kicker {
+        color: var(--text-secondary);
+        font-size: 0.76rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 0.35rem;
+    }
+
+    .subscription-plan {
+        color: var(--text-primary);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.55rem;
+        font-weight: 800;
+        line-height: 1.15;
+        margin: 0;
+    }
+
+    .subscription-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .subscription-meta-item {
+        background: rgba(255, 255, 255, 0.045);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 0.75rem;
+    }
+
+    .subscription-meta-label {
+        color: var(--text-secondary);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .subscription-meta-value {
+        color: var(--text-primary);
+        font-size: 1.05rem;
+        font-weight: 700;
+        margin-top: 0.15rem;
+    }
+
+    .subscription-status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        border-radius: 999px;
+        padding: 0.45rem 0.7rem;
+        color: #fff;
+        font-size: 0.8rem;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-top: 1rem;
+    }
+
+    .subscription-action-card {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        min-height: 100%;
+    }
+
+    .subscription-action-title {
+        color: var(--neon-cyan);
+        font-family: 'Orbitron', sans-serif;
+        font-size: 1.2rem;
+        font-weight: 800;
+        margin-bottom: 0.55rem;
+    }
+
+    .subscription-flow-list {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.6rem;
+        margin: 1rem 0 1.2rem;
+    }
+
+    .subscription-flow-step {
+        background: rgba(0, 255, 255, 0.055);
+        border: 1px solid rgba(0, 255, 255, 0.15);
+        border-radius: 10px;
+        padding: 0.7rem;
+        color: var(--text-secondary);
+        font-size: 0.85rem;
+        line-height: 1.25;
+    }
+
+    .subscription-flow-step strong {
+        display: block;
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        margin-bottom: 0.15rem;
+    }
+
+    .subscription-modal-card {
+        background: rgba(10, 14, 39, 0.76);
+        border: 1px solid rgba(0, 255, 255, 0.18);
+        border-radius: 12px;
+        padding: 1rem;
+    }
+
+    .subscription-period-card,
+    .subscription-pay-card {
+        background: linear-gradient(145deg, rgba(255,255,255,0.055), rgba(0,255,255,0.035));
+        border: 1px solid rgba(0, 255, 255, 0.18);
+        border-radius: 12px;
+        color: var(--text-primary);
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        font: inherit;
+        gap: 0.35rem;
+        min-height: 128px;
+        padding: 1rem;
+        text-align: left;
+        width: 100%;
+        transition: all 0.18s ease;
+    }
+
+    .subscription-period-card:hover,
+    .subscription-pay-card:hover,
+    .subscription-period-card.is-selected,
+    .subscription-pay-card.is-selected {
+        border-color: var(--neon-cyan);
+        box-shadow: 0 0 22px rgba(0, 255, 255, 0.2);
+        transform: translateY(-2px);
+    }
+
+    .subscription-period-card strong,
+    .subscription-pay-card strong {
+        display: block;
+        color: var(--text-primary);
+        font-size: 1.05rem;
+        margin-bottom: 0.2rem;
+    }
+
+    .subscription-period-card span,
+    .subscription-pay-card span {
+        color: var(--text-secondary);
+        font-size: 0.88rem;
+    }
+
+    .subscription-method-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1rem;
+        margin: 0 0 1.25rem;
+    }
+
+    .subscription-payment-form {
+        margin: 0;
+        min-width: 0;
+    }
+
+    .subscription-pay-card {
+        min-height: 148px;
+    }
+
+    .subscription-pay-card .subscription-pay-cta {
+        align-items: center;
+        color: var(--neon-cyan);
+        display: inline-flex;
+        font-size: 0.78rem;
+        font-weight: 800;
+        gap: 0.35rem;
+        margin-top: auto;
+        text-transform: uppercase;
+    }
+
+    #bankTransferSection {
+        margin-top: 1rem;
+    }
+
+    .bank-detail-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .bank-detail {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 10px;
+        padding: 0.7rem;
+    }
+
+    .bank-detail small {
+        color: var(--text-secondary);
+        display: block;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .bank-detail strong {
+        color: var(--text-primary);
+        overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 992px) {
+        .subscription-panel,
+        .subscription-flow-list,
+        .bank-detail-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+
     /* Responsive */
     @media (max-width: 768px) {
         .settings-container {
@@ -712,6 +970,15 @@
 
         .settings-header p {
             font-size: 0.9rem;
+        }
+
+        .settings-subscription-note {
+            font-size: 0.72rem;
+            margin-top: 0.9rem;
+            max-width: 100%;
+            position: relative;
+            right: auto;
+            top: auto;
         }
 
         .settings-nav {
@@ -826,23 +1093,21 @@
             {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Centro de Configuración{% else %}Settings Center{% endif %}
         </h1>
         <p>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Panel de control avanzado para personalizar tu empresa{% else %}Advanced control panel to customize your company{% endif %}</p>
+        <div class="settings-subscription-note">
+            <i class="fas fa-calendar-check"></i>
+            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                <span>Vence</span>
+                <strong>{{ empresa.fecha_expiracion|date:"d/m/Y" }}</strong>
+                <span>· {{ empresa_dias_restantes|default:"0" }} días</span>
+            {% else %}
+                <span>Expires</span>
+                <strong>{{ empresa.fecha_expiracion|date:"m/d/Y" }}</strong>
+                <span>· {{ empresa_dias_restantes|default:"0" }} days</span>
+            {% endif %}
+        </div>
     </div>
 
-    <!-- Messages -->
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert alert-settings alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                {% if message.tags == 'success' %}
-                    <i class="fas fa-check-circle me-2"></i>
-                {% else %}
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                {% endif %}
-                {{ message }}
-                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert"></button>
-            </div>
-        {% endfor %}
-    {% endif %}
-
+    {# Messages removidos: no mostrar allauth/system messages en settings header #}
     <!-- Navigation Tabs -->
     <div class="settings-nav">
         <ul class="nav nav-pills" id="settingsTabs" role="tablist">
@@ -859,6 +1124,11 @@
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="theme-tab" data-bs-toggle="pill" data-bs-target="#theme" type="button" role="tab">
                     <i class="fas fa-palette"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tema y Colores{% else %}Theme & Colors{% endif %}
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="subscription-tab" data-bs-toggle="pill" data-bs-target="#subscription" type="button" role="tab">
+                    <i class="fas fa-credit-card"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Suscripción{% else %}Subscription{% endif %}
                 </button>
             </li>
             <li class="nav-item" role="presentation">
@@ -906,15 +1176,27 @@
                     <div class="row">
                         <div class="col-md-6">
                             <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Logo{% else %}Logo{% endif %}</label>
-                            <div class="logo-preview" onclick="document.getElementById('id_logo').click()">
-                                {% if config.logo %}
-                                    <img src="{{ config.logo.url }}" alt="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Logo actual{% else %}Current logo{% endif %}" id="logoPreview">
-                                {% else %}
-                                    <div id="logoPreview">
-                                        <i class="fas fa-upload fa-3x" style="color: var(--neon-cyan); margin-bottom: 1rem;"></i>
-                                        <p style="color: var(--text-secondary); margin: 0;">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Haga clic para subir logo{% else %}Click to upload logo{% endif %}</p>
-                                    </div>
-                                {% endif %}
+                            <div class="logo-preview" id="logoPreviewBox" onclick="document.getElementById('id_logo').click()" style="cursor:pointer; overflow:hidden; display:flex; align-items:center; justify-content:center;">
+                                
+                                <img
+                                    id="logoPreviewImg"
+                                    src="{% if config.logo %}{{ config.logo.url }}{% endif %}"
+                                    alt="Logo preview"
+                                    style="{% if not config.logo %}display:none;{% endif %} width:100%; height:100%; object-fit:contain;"
+                                >
+
+                                <div id="logoPreviewPlaceholder" style="{% if config.logo %}display:none;{% endif %} text-align:center;">
+                                    <i class="fas fa-upload fa-3x" style="color: var(--neon-cyan); margin-bottom: 1rem;"></i>
+
+                                    <p style="color: var(--text-secondary); margin: 0;">
+                                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                                            Haga clic para subir logo
+                                        {% else %}
+                                            Click to upload logo
+                                        {% endif %}
+                                    </p>
+                                </div>
+
                             </div>
                             <input type="file" name="logo" id="id_logo" accept="image/*" style="display: none;" onchange="previewLogo(this)">
                             <small class="form-text text-muted" style="color: var(--text-secondary);">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Formatos: PNG, JPG, JPEG, SVG, WEBP (máx. 2MB){% else %}Formats: PNG, JPG, JPEG, SVG, WEBP (max. 2MB){% endif %}</small>
@@ -1052,6 +1334,99 @@
                 </div>
             </div>
 
+            <!-- Tab: Subscription -->
+            <div class="tab-pane fade" id="subscription" role="tabpanel">
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-credit-card"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Suscripción{% else %}Subscription{% endif %}
+                    </h4>
+
+                    <div class="subscription-panel">
+                        <div class="subscription-status-card">
+                            <div class="subscription-kicker">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Estado actual{% else %}Current status{% endif %}</div>
+                            <h5 class="subscription-plan">{{ empresa_plan|default:'basic'|upper }}</h5>
+                            <span class="subscription-status-pill" style="background: {{ empresa_color_estado|default:'#0d6efd' }};">
+                                <i class="fas fa-circle"></i>
+                                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                                    {% if empresa_estado_suscripcion == 'vencida' %}Vencida{% elif empresa_estado_suscripcion == 'critico' %}Crítico{% elif empresa_estado_suscripcion == 'advertencia' %}Advertencia{% else %}Activa{% endif %}
+                                {% else %}
+                                    {% if empresa_estado_suscripcion == 'vencida' %}Expired{% elif empresa_estado_suscripcion == 'critico' %}Critical{% elif empresa_estado_suscripcion == 'advertencia' %}Warning{% else %}Active{% endif %}
+                                {% endif %}
+                            </span>
+                            <div class="subscription-meta-grid">
+                                <div class="subscription-meta-item">
+                                    <div class="subscription-meta-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Vencimiento{% else %}Expiration{% endif %}</div>
+                                    <div class="subscription-meta-value">
+                                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}{{ empresa.fecha_expiracion|date:"d/m/Y" }}{% else %}{{ empresa.fecha_expiracion|date:"m/d/Y" }}{% endif %}
+                                    </div>
+                                </div>
+                                <div class="subscription-meta-item">
+                                    <div class="subscription-meta-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Días restantes{% else %}Days left{% endif %}</div>
+                                    <div class="subscription-meta-value">{{ empresa_dias_restantes|default:"0" }}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="subscription-action-card">
+                            <div>
+                                <div class="subscription-action-title">
+                                    <i class="fas fa-rocket me-2"></i>
+                                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovar suscripción{% else %}Renew subscription{% endif %}
+                                </div>
+                                <p style="color: var(--text-secondary); margin-bottom: 0;">
+                                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                                        Elige mensual o anual, paga con pasarela o sube tu comprobante de transferencia para revisión manual.
+                                    {% else %}
+                                        Choose monthly or annual renewal, pay through the gateway, or upload a bank transfer receipt for manual review.
+                                    {% endif %}
+                                </p>
+                                
+                                <div class="subscription-flow-list" style="display:grid; gap:.65rem; margin:1rem 0;">
+                                    <div style="display:flex; justify-content:space-between; gap:1rem; padding:.75rem 1rem; border:1px solid rgba(0,255,255,.16); border-radius:14px; background:rgba(255,255,255,.035);">
+                                        <span style="color:rgba(255,255,255,.62);">Periodo</span>
+                                        <strong style="color:rgba(255,255,255,.9);">Mensual o anual</strong>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; gap:1rem; padding:.75rem 1rem; border:1px solid rgba(0,255,255,.16); border-radius:14px; background:rgba(255,255,255,.035);">
+                                        <span style="color:rgba(255,255,255,.62);">Pago</span>
+                                        <strong style="color:rgba(255,255,255,.9);">Tarjeta de Crédito / Débito · Transferencia</strong>
+                                    </div>
+                                    <div style="display:flex; justify-content:space-between; gap:1rem; padding:.75rem 1rem; border:1px solid rgba(0,255,255,.16); border-radius:14px; background:rgba(255,255,255,.035);">
+                                        <span style="color:rgba(255,255,255,.62);">Validación</span>
+                                        <strong style="color:rgba(255,255,255,.9);">Automática o administrativa</strong>
+                                    </div>
+                                </div>
+
+                            </div>
+                            {% if empresa.pais == 'CL' or empresa.pais == 'US' %}
+                                <button type="button" class="btn btn-save w-100" data-open-subscription-modal>
+                                    <i class="fas fa-credit-card me-2"></i>
+                                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovar ahora{% else %}Renew now{% endif %}
+                                </button>
+                                <div style="margin-top:.9rem; text-align:center;">
+                                    <button type="button"
+                                            class="btn btn-link btn-sm"
+                                            style="color:rgba(255,255,255,.48); text-decoration:none;"
+                                            data-bs-toggle="modal"
+                                            onclick="openCancelSubscriptionModal(event)">
+                                        Solicitar cancelación de suscripción
+                                    </button>
+                                </div>
+
+                            {% else %}
+                                <div class="alert alert-info mt-3 mb-0">
+                                    {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}
+                                        Su país no tiene una pasarela de pago activa en este momento. Contacte a soporte para renovar su suscripción.
+                                    {% else %}
+                                        Your country does not currently have an active payment gateway. Contact support to renew your subscription.
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Tab: Employees -->
             <div class="tab-pane fade" id="tecnicos" role="tabpanel">
                 <div class="tecnicos-section">
@@ -1083,7 +1458,7 @@
                         <div class="row">
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Nombre Completo *{% else %}Full Name *{% endif %}</label>
-                                <input type="text" name="nombre" id="id_tecnico_nombre" class="form-control" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Nombre del empleado{% else %}Employee name{% endif %}" required>
+                                <input type="text" name="nombre" id="id_tecnico_nombre" class="form-control" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Nombre del empleado{% else %}Employee name{% endif %}">
                             </div>
                             <div class="col-md-4 mb-3">
                                 <label class="form-label">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Teléfono{% else %}Phone{% endif %}</label>
@@ -1124,17 +1499,13 @@
                                             <i class="fas fa-times-circle me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Inactivo{% else %}Inactive{% endif %}
                                         {% endif %}
                                     </span>
-                                    <form method="post" style="display: inline;">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="toggle_tecnico" value="{{ tecnico.id }}">
-                                        <button type="submit" class="btn btn-sm {% if tecnico.activo %}btn-warning{% else %}btn-success{% endif %}">
+                                        <button type="submit" name="toggle_tecnico" value="{{ tecnico.id }}" class="btn btn-sm {% if tecnico.activo %}btn-warning{% else %}btn-success{% endif %}">
                                             {% if tecnico.activo %}
                                                 <i class="fas fa-ban me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Desactivar{% else %}Deactivate{% endif %}
                                             {% else %}
                                                 <i class="fas fa-check me-1"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Activar{% else %}Activate{% endif %}
                                             {% endif %}
                                         </button>
-                                    </form>
                                 </div>
                             </div>
                         {% endfor %}
@@ -1150,12 +1521,12 @@
 
         <!-- Action Buttons -->
         <div class="form-section">
-            <div class="d-flex justify-content-between align-items-center flex-wrap">
-                <div>
-                    <button type="submit" class="btn btn-save" id="saveBtn">
+            <div class="d-flex align-items-center flex-wrap" style="gap: 24px;">
+                <div style="display:flex; align-items:center; gap:22px;">
+                    <button type="submit" form="settingsForm" class="btn btn-save" id="saveBtn" style="min-width:280px;">
                         <i class="fas fa-save me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Guardar Configuración{% else %}Save Settings{% endif %}
                     </button>
-                    <a href="{% url 'taller:dashboard' %}" class="btn btn-secondary ms-2">
+                    <a href="{% url 'taller:dashboard' %}" class="btn btn-secondary" style="margin-left: 22px; min-width:180px;">
                         <i class="fas fa-times me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Cancelar{% else %}Cancel{% endif %}
                     </a>
                 </div>
@@ -1168,32 +1539,151 @@
             </div>
         </div>
     </form>
-</div>
-{% endblock %}
 
-{% block extra_js %}
+        <!-- Subscription Modal -->
+        
+        <div class="modal fade" id="cancelSubscriptionModal" tabindex="-1" aria-labelledby="cancelSubscriptionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content subscription-modal-card">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="cancelSubscriptionModalLabel">
+                            Solicitar cancelación
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p style="color:rgba(255,255,255,.68);">
+                            Antes de cerrar la cuenta enviaremos un respaldo de la información al correo registrado.
+                        </p>
+                        <p style="color:rgba(255,255,255,.45); font-size:.85rem;">
+                            Esta acción puede ser revisada por administración antes de aplicar el cierre definitivo.
+                        </p>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-outline-light" data-bs-dismiss="modal">Volver</button>
+                        <button type="button" class="btn btn-danger">
+                            Confirmar solicitud
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="modal fade" id="subscriptionModal" tabindex="-1" aria-labelledby="subscriptionModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-centered">
+                <div class="modal-content bg-dark text-white" style="border: 1px solid rgba(0,255,255,0.24); border-radius: 18px; overflow: hidden;">
+                    <div class="modal-header border-0">
+                        <h5 class="modal-title" id="subscriptionModalLabel">
+                            <i class="fas fa-bolt me-2" style="color: var(--neon-cyan);"></i>
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovación de suscripción{% else %}Subscription renewal{% endif %}
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="subscriptionModalStep1" class="subscription-modal-card">
+                            <div class="subscription-kicker">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Paso 1{% else %}Step 1{% endif %}</div>
+                            <h6 class="text-neon mb-3">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Selecciona el periodo{% else %}Select the period{% endif %}</h6>
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <button type="button" class="subscription-period-card" data-subscription-period="mensual">
+                                        <strong>30 {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}días{% else %}days{% endif %}</strong>
+                                        <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovación mensual. Ideal para continuidad operativa.{% else %}Monthly renewal for operational continuity.{% endif %}</span>
+                                    </button>
+                                </div>
+                                <div class="col-md-6">
+                                    <button type="button" class="subscription-period-card" data-subscription-period="anual">
+                                        <strong>365 {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}días{% else %}days{% endif %}</strong>
+                                        <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Renovación anual. Menos gestión durante el año.{% else %}Annual renewal with fewer interruptions.{% endif %}</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="alert alert-secondary text-white mb-0" role="alert">
+                                {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Selecciona el plazo que quieres renovar y luego elige el medio de pago.{% else %}Select the renewal period and then choose the payment method.{% endif %}
+                            </div>
+                        </div>
+
+                        <div id="subscriptionModalStep2" class="subscription-modal-card" style="display: none;">
+                            <div class="subscription-kicker">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Paso 2{% else %}Step 2{% endif %}</div>
+                            <h6 class="text-neon mb-3">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Elige el medio de pago{% else %}Choose payment method{% endif %}</h6>
+                            <div class="subscription-method-grid">
+                                {% if empresa.pais == 'CL' %}
+                                    <form method="post" action="{% url 'start_flow_payment' %}" class="subscription-payment-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="plan" value="mensual" data-payment-plan-input>
+                                        <button type="submit" class="subscription-pay-card subscription-method-btn" data-method="flow">
+                                            <strong><i class="fas fa-credit-card me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tarjeta de Crédito / Débito{% else %}Credit / Debit Card{% endif %}</strong>
+                                            <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Pago seguro con tarjeta mediante pasarela chilena.{% else %}Secure card payment via Chilean gateway.{% endif %}</span>
+                                            <span class="subscription-pay-cta">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Pagar con tarjeta{% else %}Pay with card{% endif %}<i class="fas fa-arrow-right"></i></span>
+                                        </button>
+                                    </form>
+                                {% elif empresa.pais == 'US' %}
+                                    <a href="{% url 'payment_usa' %}?plan=mensual" class="subscription-pay-card subscription-method-btn text-decoration-none" data-method="paypal">
+                                        <strong><i class="fab fa-cc-paypal me-2"></i>PayPal</strong>
+                                        <span>Automatic payment for US subscriptions.</span>
+                                        <span class="subscription-pay-cta">Go to PayPal<i class="fas fa-arrow-right"></i></span>
+                                    </a>
+                                {% endif %}
+                                <button type="button" class="subscription-pay-card subscription-method-btn" data-method="transferencia">
+                                    <strong><i class="fas fa-university me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Transferencia bancaria{% else %}Bank transfer{% endif %}</strong>
+                                    <span>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Muestra los datos bancarios y permite subir el comprobante para revisión.{% else %}Shows bank details and lets you upload the receipt for review.{% endif %}</span>
+                                    <span class="subscription-pay-cta">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ver datos bancarios{% else %}View bank details{% endif %}<i class="fas fa-chevron-down"></i></span>
+                                </button>
+                            </div>
+
+                            <div id="bankTransferSection" style="display: none;" class="subscription-modal-card">
+                                <h6 class="mb-3">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Datos bancarios{% else %}Bank transfer details{% endif %}</h6>
+                                <div class="bank-detail-grid">
+                                    <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Banco{% else %}Bank{% endif %}</small><strong>{{ datos_transferencia.banco|default:"Por configurar" }}</strong></div>
+                                    <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Tipo de cuenta{% else %}Account type{% endif %}</small><strong>{{ datos_transferencia.tipo_cuenta|default:"Por configurar" }}</strong></div>
+                                    <div class="bank-detail"><small>{{ datos_transferencia.account_number_label|default:"Número de cuenta" }}</small><strong>{{ datos_transferencia.numero_cuenta|default:"Por configurar" }}</strong></div>
+                                    <div class="bank-detail"><small>{{ datos_transferencia.tax_id_label|default:"RUT" }}</small><strong>{{ datos_transferencia.rut|default:"Por configurar" }}</strong></div>
+                                    <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Titular{% else %}Holder{% endif %}</small><strong>{{ datos_transferencia.titular|default:"Por configurar" }}</strong></div>
+                                    <div class="bank-detail"><small>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Correo de confirmación{% else %}Confirmation email{% endif %}</small><strong>{{ datos_transferencia.email_confirmacion|default:"Por configurar" }}</strong></div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label text-white">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Monto pagado{% else %}Amount paid{% endif %}</label>
+                                    <input type="number" id="transferAmount" class="form-control" placeholder="{{ subscription_prices.monthly|default:'20000' }}" min="1000" step="1000">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-white">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Número de operación{% else %}Transaction number{% endif %}</label>
+                                    <input type="text" id="transferReference" class="form-control" placeholder="1234567890">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-white">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Comprobante{% else %}Receipt{% endif %}</label>
+                                    <input type="file" id="transferReceipt" class="form-control" accept=".pdf,.jpg,.jpeg,.png">
+                                </div>
+                                <div class="mb-3">
+                                    <label class="form-label text-white">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Notas (opcional){% else %}Notes (optional){% endif %}</label>
+                                    <textarea id="transferNotes" class="form-control" rows="3" placeholder="{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ej: depósito realizado en sucursal X{% else %}E.g. deposit made at branch X{% endif %}"></textarea>
+                                </div>
+                            </div>
+
+                            <input type="hidden" id="subscriptionModalPeriod" value="mensual">
+                            <input type="hidden" id="subscriptionModalPlan" value="{{ empresa_plan|default:'basic' }}">
+                            <input type="hidden" id="subscriptionMonthlyAmount" value="{{ subscription_prices.monthly|default:'0' }}">
+                            <input type="hidden" id="subscriptionAnnualAmount" value="{{ subscription_prices.annual|default:'0' }}">
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Cerrar{% else %}Close{% endif %}</button>
+                        <button type="button" id="subscriptionTransferSubmit" class="btn btn-save" style="display: none;">
+                            {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Enviar comprobante{% else %}Send receipt{% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Create floating particles
-    const particlesContainer = document.getElementById('particles');
-    const particleCount = 50;
-    
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.top = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 15 + 's';
-        particle.style.animationDuration = (10 + Math.random() * 10) + 's';
-        particlesContainer.appendChild(particle);
-    }
-
     // Update section input when tab changes
     const tabs = document.querySelectorAll('[data-bs-toggle="pill"]');
     const sectionMapping = {
         'profile': 'profile',
         'tax': 'financial',
         'theme': 'theme',
+        'subscription': 'subscription',
         'tecnicos': 'profile'
     };
     
@@ -1201,19 +1691,180 @@ document.addEventListener('DOMContentLoaded', function() {
         tab.addEventListener('shown.bs.tab', function(e) {
             const targetId = e.target.getAttribute('data-bs-target').replace('#', '');
             const section = sectionMapping[targetId] || 'profile';
-            document.getElementById('sectionInput').value = section;
+            const sectionInput = document.getElementById('sectionInput');
+            if (sectionInput) {
+                sectionInput.value = section;
+            }
         });
     });
 
+    const subscriptionStep1 = document.getElementById('subscriptionModalStep1');
+    const subscriptionStep2 = document.getElementById('subscriptionModalStep2');
+    const bankTransferSection = document.getElementById('bankTransferSection');
+    const transferSubmitBtn = document.getElementById('subscriptionTransferSubmit');
+    const subscriptionModalPeriod = document.getElementById('subscriptionModalPeriod');
+    const subscriptionModalPlan = document.getElementById('subscriptionModalPlan');
+    const transferReceiptInput = document.getElementById('transferReceipt');
+    const transferAmountInput = document.getElementById('transferAmount');
+    const transferReferenceInput = document.getElementById('transferReference');
+    const transferNotesInput = document.getElementById('transferNotes');
+    const paymentMethodButtons = document.querySelectorAll('#subscriptionModal .subscription-method-btn');
+    const paymentPlanInputs = document.querySelectorAll('#subscriptionModal [data-payment-plan-input]');
+    const subscriptionMonthlyAmount = document.getElementById('subscriptionMonthlyAmount');
+    const subscriptionAnnualAmount = document.getElementById('subscriptionAnnualAmount');
+    const paypalUrl = '{% url "payment_usa" %}';
+
+    function getAmountForPeriod(period) {
+        const source = period === 'anual' ? subscriptionAnnualAmount : subscriptionMonthlyAmount;
+        return source?.value || '';
+    }
+
+    function updatePaymentLinks(period) {
+        paymentPlanInputs.forEach(input => {
+            input.value = period;
+        });
+        if (transferAmountInput && !transferAmountInput.value) {
+            transferAmountInput.value = getAmountForPeriod(period);
+        }
+        paymentMethodButtons.forEach(button => {
+            const method = button.dataset.method;
+            if (!method) return;
+            if (method === 'paypal') {
+                button.setAttribute('href', `${paypalUrl}?plan=${period}`);
+            }
+        });
+    }
+
+    function showBankTransferSection() {
+        transferAmountInput.value = transferAmountInput.value || getAmountForPeriod(subscriptionModalPeriod.value);
+        bankTransferSection.style.display = 'block';
+        transferSubmitBtn.style.display = 'inline-block';
+        paymentMethodButtons.forEach(button => button.classList.toggle('is-selected', button.dataset.method === 'transferencia'));
+        bankTransferSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    const subscriptionModalElement = document.getElementById('subscriptionModal');
+    if (subscriptionModalElement) {
+        subscriptionModalElement.addEventListener('hidden.bs.modal', function() {
+            subscriptionStep1.style.display = 'block';
+            subscriptionStep2.style.display = 'none';
+            bankTransferSection.style.display = 'none';
+            transferSubmitBtn.style.display = 'none';
+            paymentMethodButtons.forEach(button => button.classList.remove('is-selected'));
+        });
+    }
+
+    subscriptionModalPeriod.value = 'mensual';
+    updatePaymentLinks(subscriptionModalPeriod.value);
+
+    document.querySelectorAll('[data-subscription-period]').forEach(button => {
+        button.addEventListener('click', function() {
+            const period = this.dataset.subscriptionPeriod;
+            subscriptionModalPeriod.value = period;
+            document.querySelectorAll('[data-subscription-period]').forEach(periodButton => {
+                periodButton.classList.toggle('is-selected', periodButton === this);
+            });
+            updatePaymentLinks(period);
+            subscriptionStep1.style.display = 'none';
+            subscriptionStep2.style.display = 'block';
+            bankTransferSection.style.display = 'none';
+            transferSubmitBtn.style.display = 'none';
+            transferAmountInput.value = getAmountForPeriod(period);
+            paymentMethodButtons.forEach(button => button.classList.remove('is-selected'));
+        });
+    });
+
+    paymentMethodButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            const method = this.dataset.method;
+            if (method === 'transferencia') {
+                event.preventDefault();
+                showBankTransferSection();
+                return;
+            }
+            paymentMethodButtons.forEach(item => item.classList.remove('is-selected'));
+            this.classList.add('is-selected');
+        });
+    });
+
+    function getCsrfToken() {
+        return document.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
+    }
+
+    async function submitBankTransferReceipt() {
+        if (!transferAmountInput.value || Number(transferAmountInput.value) <= 0) {
+            alert(`{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Ingresa el monto pagado antes de enviar.{% else %}Enter the paid amount before submitting.{% endif %}`);
+            transferAmountInput.focus();
+            return;
+        }
+
+        if (!transferReceiptInput.files.length) {
+            alert(`{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Debes adjuntar el comprobante antes de enviar.{% else %}Please attach the receipt before submitting.{% endif %}`);
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('monto', transferAmountInput.value);
+        formData.append('referencia', transferReferenceInput.value);
+        formData.append('periodo', subscriptionModalPeriod.value);
+        formData.append('renewal_period', subscriptionModalPeriod.value);
+        formData.append('plan', subscriptionModalPlan.value);
+        formData.append('comprobante', transferReceiptInput.files[0]);
+        formData.append('notas', transferNotesInput.value);
+        formData.append('csrfmiddlewaretoken', getCsrfToken());
+
+        transferSubmitBtn.disabled = true;
+        transferSubmitBtn.innerHTML = `<i class="fas fa-spinner fa-spin me-2"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Enviando...{% else %}Submitting...{% endif %}`;
+
+        try {
+            const response = await fetch('{% url "registrar_transferencia_ajax" %}', {
+                method: 'POST',
+                body: formData,
+                credentials: 'same-origin'
+            });
+            const result = await response.json();
+            if (result.success) {
+                alert(result.message || `{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Comprobante enviado exitosamente. Espera la confirmación del equipo.{% else %}Receipt uploaded successfully. Please wait for approval.{% endif %}`);
+                const modalClose = document.querySelector('#subscriptionModal button[data-bs-dismiss="modal"]');
+                modalClose?.click();
+            } else {
+                alert(result.error || `{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Error al enviar el comprobante, inténtalo de nuevo.{% else %}Error submitting receipt, please try again.{% endif %}`);
+            }
+        } catch (error) {
+            console.error(error);
+            alert(`{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Error del servidor. Intenta nuevamente más tarde.{% else %}Server error. Please try again later.{% endif %}`);
+        } finally {
+            transferSubmitBtn.disabled = false;
+            transferSubmitBtn.innerHTML = `{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Enviar comprobante{% else %}Send receipt{% endif %}`;
+        }
+    }
+
+    if (transferSubmitBtn) {
+        transferSubmitBtn.addEventListener('click', submitBankTransferReceipt);
+    }
+
     // Logo preview
     function previewLogo(input) {
-        if (input.files && input.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                const preview = document.getElementById('logoPreview');
-                preview.innerHTML = '<img src="' + e.target.result + '" alt="Logo preview">';
-            };
-            reader.readAsDataURL(input.files[0]);
+
+        if (!input.files || !input.files[0]) return;
+
+        const file = input.files[0];
+
+        if (!file.type.startsWith('image/')) {
+            alert('Selecciona una imagen válida');
+            return;
+        }
+
+        const img = document.getElementById('logoPreviewImg');
+        const placeholder = document.getElementById('logoPreviewPlaceholder');
+
+        const objectUrl = URL.createObjectURL(file);
+
+        img.src = objectUrl;
+        img.style.display = 'block';
+
+        if (placeholder) {
+            placeholder.style.display = 'none';
         }
     }
 
@@ -1238,8 +1889,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Update section before form submit
     const form = document.getElementById('settingsForm');
+    const saveBtn = document.getElementById('saveBtn');
+
     form.addEventListener('submit', function(e) {
-        if (e.submitter && (e.submitter.name === 'crear_tecnico' || e.submitter.closest('form') && e.submitter.closest('form').querySelector('[name="toggle_tecnico"]'))) {
+        console.log('SETTINGS FORM SUBMIT DISPARADO');
+
+        if (saveBtn) {
+            saveBtn.disabled = true;
+            saveBtn.style.opacity = '0.7';
+            saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Guardando...';
+        }
+        if (e.submitter && (e.submitter.name === 'crear_tecnico' || e.submitter.name === 'toggle_tecnico')) {
             return;
         }
         
@@ -1247,7 +1907,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activeTab) {
             const targetId = activeTab.getAttribute('data-bs-target').replace('#', '');
             const section = sectionMapping[targetId] || 'profile';
-            document.getElementById('sectionInput').value = section;
+            const sectionInput = document.getElementById('sectionInput');
+            if (sectionInput) {
+                sectionInput.value = section;
+            }
         }
     });
 
@@ -1265,5 +1928,95 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+    document.querySelectorAll('[data-open-subscription-modal]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const modalEl = document.getElementById('subscriptionModal');
+            if (!modalEl) {
+                console.error('No existe #subscriptionModal');
+                return;
+            }
+
+            if (window.bootstrap && bootstrap.Modal) {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } else {
+                modalEl.classList.add('show');
+                modalEl.style.display = 'block';
+                modalEl.removeAttribute('aria-hidden');
+                modalEl.setAttribute('aria-modal', 'true');
+                document.body.classList.add('modal-open');
+            }
+        });
+    });
+
+    document.querySelectorAll('[onclick="openCancelSubscriptionModal(event)"]').forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const modalEl = document.getElementById('cancelSubscriptionModal');
+            if (!modalEl) {
+                console.error('No existe #cancelSubscriptionModal');
+                return;
+            }
+
+            if (window.bootstrap && bootstrap.Modal) {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } else {
+                modalEl.classList.add('show');
+                modalEl.style.display = 'block';
+                modalEl.removeAttribute('aria-hidden');
+                modalEl.setAttribute('aria-modal', 'true');
+                document.body.classList.add('modal-open');
+            }
+        });
+    });
+
+
+    window.openSubscriptionModal = function(event) {
+        if (event) event.preventDefault();
+
+        const modalEl = document.getElementById('subscriptionModal');
+        if (!modalEl) {
+            alert('No se encontró el modal de renovación.');
+            return false;
+        }
+
+        if (window.bootstrap && bootstrap.Modal) {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        } else {
+            modalEl.style.display = 'block';
+            modalEl.classList.add('show');
+            modalEl.removeAttribute('aria-hidden');
+            modalEl.setAttribute('aria-modal', 'true');
+            document.body.classList.add('modal-open');
+        }
+
+        return false;
+    };
+
+    window.openCancelSubscriptionModal = function(event) {
+        if (event) event.preventDefault();
+
+        const modalEl = document.getElementById('cancelSubscriptionModal');
+        if (!modalEl) {
+            alert('No se encontró el modal de cancelación.');
+            return false;
+        }
+
+        if (window.bootstrap && bootstrap.Modal) {
+            bootstrap.Modal.getOrCreateInstance(modalEl).show();
+        } else {
+            modalEl.style.display = 'block';
+            modalEl.classList.add('show');
+            modalEl.removeAttribute('aria-hidden');
+            modalEl.setAttribute('aria-modal', 'true');
+            document.body.classList.add('modal-open');
+        }
+
+        return false;
+    };
+
 </script>
 {% endblock %}

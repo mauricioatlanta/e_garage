@@ -27,7 +27,7 @@ chmod +x 0_detectar_ruta.sh
 
 ```
 1. Conectar FileZilla:
-   Host: atlantareciclajes.pythonanywhere.com
+   Host: atlantareciclajes
    Puerto: 22 (SFTP)
    Usuario: atlantareciclajes
    Password: [tu password]
@@ -35,7 +35,7 @@ chmod +x 0_detectar_ruta.sh
 2. Descargar backup:
    Navegar a: /home/atlantareciclajes/
    Descargar: backup_completo_20251106_*.tar.gz
-   Guardar en: E:\backups_egarage_pythonanywhere\
+   Guardar en: E:\backups_egarage_digitalocean\
 
 3. Preparar actualización en tu PC:
    - Ir a: E:\projecto\e_garage\
@@ -71,7 +71,7 @@ chmod +x 0_detectar_ruta.sh
 
 ---
 
-## 🚀 **VOLVER A CONSOLA PYTHONANYWHERE**
+## 🚀 **VOLVER A CONSOLA DIGITALOCEAN**
 
 ```bash
 # 3. ACTUALIZAR
@@ -90,10 +90,10 @@ cd /home/atlantareciclajes/scripts_deploy/
 ## 🌐 **RELOAD EN NAVEGADOR**
 
 ```
-1. Ir a: https://www.pythonanywhere.com/user/atlantareciclajes/
+1. Ir a: https://www/user/atlantareciclajes/
 2. Pestaña: "Web"
 3. Buscar tu app
-4. Clic botón verde: "Reload atlantareciclajes.pythonanywhere.com"
+4. Clic botón verde: "Reload atlantareciclajes"
 5. Esperar 15 segundos
 ```
 
@@ -107,7 +107,7 @@ cd /home/atlantareciclajes/scripts_deploy/
 ./3_verificar_FIXED.sh
 
 # Luego probar en navegador:
-https://atlantareciclajes.pythonanywhere.com/cl/
+https://atlantareciclajes/cl/
 ```
 
 ---
@@ -162,7 +162,7 @@ TOTAL:              33 minutos
 
 ## 🎯 **SIGUIENTE ACCIÓN**
 
-En PythonAnywhere Console, ejecuta:
+En DigitalOcean Console, ejecuta:
 
 ```bash
 cd /home/atlantareciclajes/scripts_deploy/

@@ -22,6 +22,7 @@ from django.db.models import (
     ExpressionWrapper,
     F,
     FloatField,
+    IntegerField,
     Q,
     Sum,
     Value,
@@ -35,7 +36,7 @@ from django.utils.dateparse import parse_date
 
 from taller.auth.decorators import login_required_default
 from taller.middleware.rate_limiting import rate_limit
-from taller.models import Documento
+from taller.models import ConfiguracionEmpresa, Documento
 from taller.models.clientes import Cliente
 from taller.models.lineas_documento import (
     LineaOtroServicio,
@@ -45,7 +46,7 @@ from taller.models.lineas_documento import (
 from taller.models.tecnico import Tecnico
 from taller.models.vehiculos import Vehiculo
 from taller.utils.empresa import get_or_create_empresa, get_user_empresa_safe
-from taller.utils.motor_ia import MotorDiagnosticoIA
+# LAZY IMPORT IA PARA EVITAR BLOQUEOS WINDOWS/PANDAS
 from taller.reportes.kilometraje_reportes import ReporteKilometraje
 
 # from taller.utils import get_or_create_empresa  # Eliminado: usamos la función local
@@ -130,7 +131,7 @@ from taller.reportes.kilometraje_reportes import ReporteKilometraje
 # from taller.models.tecnico import Tecnico
 # from taller.models.vehiculos import Vehiculo
 # from taller.utils.empresa import get_or_create_empresa
-# from taller.utils.motor_ia import MotorDiagnosticoIA
+# # LAZY IMPORT IA PARA EVITAR BLOQUEOS WINDOWS/PANDAS
 
 
 @login_required_default
@@ -954,18 +955,83 @@ def reportes_mecanicos(request):
         f"DEBUG - Filtros aplicados: fecha_desde={fecha_desde}, fecha_hasta={fecha_hasta}, mecanico_id={mecanico_id}"
     )
 
-    # Filtrar documentos base - FILTRADO POR EMPRESA Y SOLO FACTURAS (INGRESOS REALES)
-    documentos_qs = Documento.objects.filter(
+    dividir_por_tecnico = (
+        ConfiguracionEmpresa.objects.filter(empresa=empresa)
+        .values_list("dividir_por_tecnico", flat=True)
+        .first()
+        or False
+    )
+
+    # Base SaaS: todos los documentos validos del periodo. El filtro por tecnico se
+    # aplica por documento o por linea segun dividir_por_tecnico, no descartando
+    # documentos sin tecnico a nivel cabecera.
+    documentos_base = Documento.objects.filter(
         fecha_emision__range=[fecha_desde, fecha_hasta],
-        tecnico_responsable__isnull=False,
         empresa=empresa,  # 🔒 FILTRO EMPRESA
-        tipo="FAC",  # 💰 FILTRO CRÍTICO: Solo facturas (ingresos reales)
-    ).order_by("tecnico_responsable__nombre")
+    ).exclude(estado="ANULADO")
+
+    line_total_expr = ExpressionWrapper(
+        F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100),
+        output_field=DecimalField(max_digits=14, decimal_places=2),
+    )
+    otro_total_expr = ExpressionWrapper(
+        F("cantidad") * F("precio_cliente"),
+        output_field=DecimalField(max_digits=14, decimal_places=2),
+    )
+
+    def lineas_servicio_base():
+        return LineaServicio.objects.filter(documento__in=documentos_base).annotate(
+            tecnico_efectivo_id=Coalesce(
+                F("tecnico_responsable_id"),
+                F("documento__tecnico_responsable_id"),
+                output_field=IntegerField(),
+            )
+        )
+
+    def lineas_repuesto_base():
+        return LineaRepuesto.objects.filter(documento__in=documentos_base).annotate(
+            tecnico_efectivo_id=Coalesce(
+                F("tecnico_responsable_id"),
+                F("documento__tecnico_responsable_id"),
+                output_field=IntegerField(),
+            )
+        )
+
+    def lineas_otro_base():
+        return LineaOtroServicio.objects.filter(documento__in=documentos_base).annotate(
+            tecnico_efectivo_id=Coalesce(
+                F("tecnico_responsable_id"),
+                F("documento__tecnico_responsable_id"),
+                output_field=IntegerField(),
+            )
+        )
+
+    def documentos_para_tecnico(tecnico_id):
+        if dividir_por_tecnico:
+            servicio_doc_ids = lineas_servicio_base().filter(
+                tecnico_efectivo_id=tecnico_id
+            ).values("documento_id")
+            repuesto_doc_ids = lineas_repuesto_base().filter(
+                tecnico_efectivo_id=tecnico_id
+            ).values("documento_id")
+            otro_doc_ids = lineas_otro_base().filter(
+                tecnico_efectivo_id=tecnico_id
+            ).values("documento_id")
+            return documentos_base.filter(
+                Q(tecnico_responsable_id=tecnico_id)
+                | Q(id__in=servicio_doc_ids)
+                | Q(id__in=repuesto_doc_ids)
+                | Q(id__in=otro_doc_ids)
+            ).distinct()
+
+        return documentos_base.filter(tecnico_responsable_id=tecnico_id)
+
+    documentos_qs = documentos_base.order_by("-fecha_emision", "-id")
 
     print(f"DEBUG - Documentos antes del filtro de técnico: {documentos_qs.count()}")
 
     if mecanico_id and mecanico_id != "todos":
-        documentos_qs = documentos_qs.filter(tecnico_responsable_id=mecanico_id)
+        documentos_qs = documentos_para_tecnico(mecanico_id).order_by("-fecha_emision", "-id")
         print(
             f"DEBUG - Documentos después del filtro de técnico {mecanico_id}: {documentos_qs.count()}"
         )
@@ -978,38 +1044,26 @@ def reportes_mecanicos(request):
     # Calcular total generado correctamente (incluyendo cantidad y descuentos)
 
     # Total de servicios
-    total_servicios = (
-        documentos_qs.aggregate(
-            total=Sum(
-                F("lineas_servicio__cantidad")
-                * F("lineas_servicio__precio_unitario")
-                * (1 - F("lineas_servicio__descuento") / 100)
-            )
-        )["total"]
-        or 0
-    )
+    servicios_qs = lineas_servicio_base()
+    repuestos_qs = lineas_repuesto_base()
+    otros_qs = lineas_otro_base()
+    if mecanico_id and mecanico_id != "todos":
+        if dividir_por_tecnico:
+            servicios_qs = servicios_qs.filter(tecnico_efectivo_id=mecanico_id)
+            repuestos_qs = repuestos_qs.filter(tecnico_efectivo_id=mecanico_id)
+            otros_qs = otros_qs.filter(tecnico_efectivo_id=mecanico_id)
+        else:
+            servicios_qs = servicios_qs.filter(documento__tecnico_responsable_id=mecanico_id)
+            repuestos_qs = repuestos_qs.filter(documento__tecnico_responsable_id=mecanico_id)
+            otros_qs = otros_qs.filter(documento__tecnico_responsable_id=mecanico_id)
+
+    total_servicios = servicios_qs.aggregate(total=Sum(line_total_expr))["total"] or 0
 
     # Total de repuestos
-    total_repuestos = (
-        documentos_qs.aggregate(
-            total=Sum(
-                F("lineas_repuesto__cantidad")
-                * F("lineas_repuesto__precio_unitario")
-                * (1 - F("lineas_repuesto__descuento") / 100)
-            )
-        )["total"]
-        or 0
-    )
+    total_repuestos = repuestos_qs.aggregate(total=Sum(line_total_expr))["total"] or 0
 
     # Total de otros servicios
-    total_otros = (
-        documentos_qs.aggregate(
-            total=Sum(
-                F("lineas_otro_servicio__cantidad") * F("lineas_otro_servicio__precio_cliente")
-            )
-        )["total"]
-        or 0
-    )
+    total_otros = otros_qs.aggregate(total=Sum(otro_total_expr))["total"] or 0
 
     # Calcular IVA (19% solo sobre repuestos según la lógica de negocio)
     iva_repuestos = total_repuestos * Decimal("0.19")
@@ -1034,46 +1088,37 @@ def reportes_mecanicos(request):
     mecanicos_data = []
     for tecnico in tecnicos:
         # Documentos del técnico en el período
-        docs_tecnico = documentos_qs.filter(tecnico_responsable=tecnico)
+        docs_tecnico = documentos_para_tecnico(tecnico.id)
         total_docs_tecnico = docs_tecnico.count()
 
         if total_docs_tecnico == 0:
             continue  # Saltar técnicos sin documentos
 
         # Servicios del técnico
-        servicios_tecnico = LineaServicio.objects.filter(documento__in=docs_tecnico)
+        if dividir_por_tecnico:
+            servicios_tecnico = lineas_servicio_base().filter(tecnico_efectivo_id=tecnico.id)
+            repuestos_tecnico = lineas_repuesto_base().filter(tecnico_efectivo_id=tecnico.id)
+            otros_tecnico = lineas_otro_base().filter(tecnico_efectivo_id=tecnico.id)
+        else:
+            servicios_tecnico = LineaServicio.objects.filter(documento__in=docs_tecnico)
+            repuestos_tecnico = LineaRepuesto.objects.filter(documento__in=docs_tecnico)
+            otros_tecnico = LineaOtroServicio.objects.filter(documento__in=docs_tecnico)
+
         total_servicios_count = servicios_tecnico.count()
 
         # Total generado por el técnico (incluyendo cantidad y descuentos)
         # Servicios del técnico
-        total_servicios_tecnico = (
-            servicios_tecnico.aggregate(
-                total=Sum(F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100))
-            )["total"]
-            or 0
-        )
+        total_servicios_tecnico = servicios_tecnico.aggregate(total=Sum(line_total_expr))[
+            "total"
+        ] or 0
 
         # Repuestos del técnico
-        repuestos_tecnico = LineaRepuesto.objects.filter(documento__in=docs_tecnico)
-        total_repuestos_tecnico = (
-            repuestos_tecnico.aggregate(
-                total=Sum(F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100))
-            )["total"]
-            or 0
-        )
+        total_repuestos_tecnico = repuestos_tecnico.aggregate(total=Sum(line_total_expr))[
+            "total"
+        ] or 0
 
         # Otros servicios del técnico
-        otros_tecnico = LineaOtroServicio.objects.filter(documento__in=docs_tecnico)
-        total_otros_tecnico = (
-            otros_tecnico.aggregate(
-                total=Sum(
-                    ExpressionWrapper(
-                        F("cantidad") * F("precio_cliente"), output_field=DecimalField()
-                    )
-                )
-            )["total"]
-            or 0
-        )
+        total_otros_tecnico = otros_tecnico.aggregate(total=Sum(otro_total_expr))["total"] or 0
 
         # Calcular IVA del técnico (19% solo sobre repuestos)
         iva_repuestos_tecnico = total_repuestos_tecnico * Decimal("0.19")
@@ -1094,7 +1139,7 @@ def reportes_mecanicos(request):
 
         # Top servicios del técnico (simplificado para evitar errores de agregación)
         servicios_top = (
-            servicios_tecnico.values("servicio__nombre")
+            servicios_tecnico.values("nombre")
             .annotate(cantidad=Count("id"))
             .order_by("-cantidad")[:5]
         )
@@ -1123,21 +1168,23 @@ def reportes_mecanicos(request):
             tecnico_nombre = tecnico.nombre
 
             # Obtener documentos del técnico
-            docs_tecnico = documentos_qs.filter(tecnico_responsable=tecnico)
+            docs_tecnico = documentos_para_tecnico(tecnico.id)
 
             # Obtener todos los servicios del técnico con información del documento
-            servicios_detallados = (
-                LineaServicio.objects.filter(documento__in=docs_tecnico)
-                .select_related(
-                    "documento",
-                    "documento__cliente",
-                    "documento__vehiculo",
-                    "documento__vehiculo__marca",
-                    "documento__vehiculo__modelo",
+            servicios_detallados_qs = LineaServicio.objects.filter(documento__in=docs_tecnico)
+            if dividir_por_tecnico:
+                servicios_detallados_qs = lineas_servicio_base().filter(
+                    tecnico_efectivo_id=tecnico.id
                 )
-                .annotate(
-                    precio_total=F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100)
-                )
+
+            servicios_detallados = servicios_detallados_qs.select_related(
+                "documento",
+                "documento__cliente",
+                "documento__vehiculo",
+                "documento__vehiculo__marca",
+                "documento__vehiculo__modelo",
+            ).annotate(
+                precio_total=line_total_expr
             )
 
             # Calcular total de servicios del técnico

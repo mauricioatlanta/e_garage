@@ -101,8 +101,27 @@
 {% block panel_content %}
 <div class="form-desarme-wrapper">
   <div class="glass-panel-desarme p-4 lg:p-5 form-desarme">
-    <form method="post" action="" enctype="multipart/form-data">
+    {% if messages %}
+    <div class="mb-3 space-y-1">
+      {% for message in messages %}
+      <div class="p-3 rounded text-sm border
+        {% if message.tags == 'error' %}bg-red-900/60 border-red-500 text-red-300
+        {% elif message.tags == 'warning' %}bg-yellow-900/60 border-yellow-500 text-yellow-200
+        {% else %}bg-cyan-900/60 border-cyan-500 text-cyan-200{% endif %}">
+        {{ message }}
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% if vehiculo %}{% country_url 'desarme:editar_vehiculo' vehiculo.pk %}{% else %}{% country_url 'desarme:crear_vehiculo' %}{% endif %}" enctype="multipart/form-data">
       {% csrf_token %}
+
+      {% if form.non_field_errors %}
+      <div class="mb-3 p-3 rounded bg-red-900/60 border border-red-500 text-red-300 text-sm">
+        {% for error in form.non_field_errors %}{{ error }}{% if not forloop.last %}<br>{% endif %}{% endfor %}
+      </div>
+      {% endif %}
 
       <div class="form-desarme-grid">
         <!-- Sección 1: Identificación del vehículo -->
@@ -506,6 +525,34 @@ document.getElementById('btn-agregar-anio')?.addEventListener('click', function(
         .finally(function() { btn.disabled = false; });
     });
   });
+})();
+
+// Formato de miles CLP en campos monetarios (data-money-cl)
+(function() {
+  function fmtCLP(val) {
+    var n = parseInt((val + '').replace(/\./g, '').replace(/\D/g, ''), 10);
+    return isNaN(n) ? '' : n.toLocaleString('es-CL');
+  }
+  var moneyFields = document.querySelectorAll('[data-money-cl]');
+  moneyFields.forEach(function(el) {
+    if (el.value) el.value = fmtCLP(el.value);
+    el.addEventListener('input', function() {
+      var pos = this.selectionStart;
+      var raw = this.value.replace(/\./g, '');
+      var fmt = fmtCLP(raw);
+      var added = fmt.length - this.value.length;
+      this.value = fmt;
+      try { this.setSelectionRange(pos + added, pos + added); } catch(e) {}
+    });
+  });
+  var form = document.querySelector('form[method="post"]');
+  if (form) {
+    form.addEventListener('submit', function() {
+      moneyFields.forEach(function(el) {
+        el.value = (el.value + '').replace(/\./g, '');
+      });
+    }, true);
+  }
 })();
 </script>
 {% endblock %}

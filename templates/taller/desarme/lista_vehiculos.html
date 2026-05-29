@@ -1,6 +1,7 @@
 {% extends "layouts/base_egarage_panel.html" %}
 {% load i18n %}
 {% load country_url %}
+{% load eg_money %}
 
 {% block page_title %}{% trans "Desarme" %} – {% trans "Vehículos" %}{% endblock %}
 {% block page_subtitle %}{% trans "Vehículos para desarme (yarda)" %}{% endblock %}
@@ -57,7 +58,7 @@
     outline: none;
     border-color: rgba(168, 85, 247, 0.6);
   }
-  .badge-piezas {
+  .badge-repuestos {
     background: rgba(34, 197, 94, 0.25);
     color: #86efac;
     font-size: 11px;
@@ -81,7 +82,7 @@
 <div class="desarme-nav-module flex flex-wrap gap-2 mt-4">
   <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">{% trans "Dashboard" %}</a>
   <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">🚗 {% trans "Vehículos" %}</a>
-  <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 {% trans "Piezas" %}</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 {% trans "Repuestos" %}</a>
 </div>
 {% endblock %}
 
@@ -94,7 +95,7 @@
 <a href="{% country_url 'desarme:lista_piezas' %}"
    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600/80 hover:bg-cyan-500 text-white text-sm font-semibold border border-cyan-400/40">
   <span>📦</span>
-  <span>{% trans "Piezas" %}</span>
+  <span>{% trans "Repuestos" %}</span>
 </a>
 <a href="{% country_url 'desarme:index' %}"
    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-purple-600/80 hover:bg-purple-500 text-white text-sm font-semibold border border-purple-400/40">
@@ -132,22 +133,22 @@
         <h3 class="text-white font-bold text-sm">{{ v.patente|default:v.vin|default:"—" }}</h3>
         <p class="text-cyan-400 text-xs">{{ v.get_marca_display|default:"-" }} {{ v.get_modelo_display|default:"" }} · {{ v.anio|default:"—" }}</p>
       </div>
-      <span class="badge-piezas" title="{% trans 'Piezas registradas' %}">{{ v.piezas_count }} {% trans "piezas" %}</span>
+      <span class="badge-repuestos" title="{% trans 'Repuestos registradas' %}">{{ v.repuestos_count }} {% trans "repuestos" %}</span>
     </div>
     <div class="space-y-1 mb-2 text-xs text-gray-400">
       {% if v.estado_desarme %}<span>{{ v.estado_desarme }}</span>{% endif %}
       {% if v.ubicacion_fisica %}<span> · {{ v.ubicacion_fisica }}</span>{% endif %}
     </div>
     <div class="mb-3">
-      <span class="ganancia-vehiculo {% if v.ganancia >= 0 %}positiva{% else %}negativa{% endif %}" title="{% trans 'Ingresos por piezas vendidas menos costo del vehículo' %}">
-        {% trans "Ganancia" %}: ${{ v.ganancia|floatformat:2 }}
+      <span class="ganancia-vehiculo {% if v.ganancia >= 0 %}positiva{% else %}negativa{% endif %}" title="{% trans 'Ingresos por repuestos vendidas menos costo del vehículo' %}">
+        {% trans "Ganancia" %}: {{ v.ganancia|money_fmt:empresa_moneda }}
       </span>
     </div>
     <div class="flex flex-wrap gap-1">
       <a href="{% country_url 'desarme:ver_vehiculo' v.pk %}" class="interactive-btn">{% trans "Ver" %}</a>
       <a href="{% country_url 'desarme:editar_vehiculo' v.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
       <a href="{% country_url 'desarme:inventario_vehiculo' v.pk %}" class="interactive-btn font-medium">📦 {% trans "Inventario" %}</a>
-      <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ v.pk }}" class="interactive-btn font-medium">➕ {% trans "Nueva pieza" %}</a>
+      <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ v.pk }}" class="interactive-btn font-medium">➕ {% trans "Nueva repuesto" %}</a>
     </div>
   </div>
   {% endfor %}

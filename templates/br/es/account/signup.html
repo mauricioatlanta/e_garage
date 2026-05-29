@@ -346,7 +346,7 @@ body {
 
 <!-- Header simplificado con solo el logo -->
 <div class="signup-header">
-    <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
+    <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="logo">
     <div class="brand-name">eGarage</div>
 </div>
 
@@ -432,7 +432,7 @@ body {
                         </ul>
                     </div>
 
-                    <!-- Plan Mensual -->
+                    <!-- Entry -->
                     <div class="pricing-card" onclick="selectPlan('monthly')">
                         <input type="radio" name="plan" value="monthly" id="plan-monthly">
                         <div class="plan-name">Mensal</div>
@@ -444,13 +444,13 @@ body {
                         </ul>
                     </div>
 
-                    <!-- Plan Semestral -->
+                    <!-- Growth -->
                     <div class="pricing-card" onclick="selectPlan('semiannual')">
                         <input type="radio" name="plan" value="semiannual" id="plan-semiannual">
                         <div class="plan-badge">⭐ MELHOR VALOR</div>
-                        <div class="plan-name">Semestral</div>
+                        <div class="plan-name">Growth</div>
                         <div class="plan-price">R$ 500</div>
-                        <div class="plan-period">/ 6 meses</div>
+                        <div class="plan-period">mensual / anual</div>
                         <div class="plan-savings">Economize 17%</div>
                         <ul class="plan-features">
                             <li>Tudo do Mensal</li>
@@ -458,16 +458,16 @@ body {
                         </ul>
                     </div>
 
-                    <!-- Plan Anual -->
+                    <!-- Business -->
                     <div class="pricing-card" onclick="selectPlan('annual')" style="display: none;">
                         <input type="radio" name="plan" value="annual" id="plan-annual">
                         <div class="plan-badge">💎 MELHOR PREÇO</div>
-                        <div class="plan-name">Anual</div>
-                        <div class="plan-price">R$ 1.000</div>
+                        <div class="plan-name">Business</div>
+                        <div class="plan-price">R$ 1</div>
                         <div class="plan-period">/ ano</div>
                         <div class="plan-savings">Economize 33%</div>
                         <ul class="plan-features">
-                            <li>Tudo do Semestral</li>
+                            <li>Tudo do Growth</li>
                             <li>Melhor valor</li>
                         </ul>
                     </div>

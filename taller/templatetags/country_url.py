@@ -182,3 +182,52 @@ def country_url_direct(context, view_path, *args, app_namespace="taller", **kwar
       <a href="{% country_url_direct 'clientes:lista_clientes' %}">Clientes</a>
     """
     return country_url(context, view_path, app_namespace, *args, **kwargs)
+
+
+def _nav_prefix_from_path(path: str) -> str:
+    """Devuelve el prefijo país/idioma canónico para la navegación principal."""
+    normalized = (path or "").lower()
+    if normalized.startswith("/us/en/") or normalized == "/us/en":
+        return "/us/en"
+    elif normalized.startswith("/us/es/") or normalized == "/us/es":
+        return "/us/es"
+    elif normalized.startswith("/us/") or normalized == "/us":
+        return "/us/en"
+
+    segments = normalized.strip("/").split("/") if normalized else []
+    country = segments[0] if segments else "cl"
+    lang = segments[1] if len(segments) > 1 else "es"
+
+    if country == "br":
+        return "/br/pt"
+    if country in ("cl", "uy", "mx", "pe", "co", "ec", "ar", "ve"):
+        return f"/{country}/{lang if lang in ('es', 'en', 'pt') else 'es'}"
+    return "/cl/es"
+
+
+@register.simple_tag(takes_context=True)
+def nav_url(context, section: str) -> str:
+    """
+    URL canónica para la navegación principal.
+
+    Evita depender de namespaces heterogéneos entre módulos antiguos
+    (`/cl/es/...`) y módulos montados directamente por país (`/cl/documentos/`,
+    `/cl/reportes/`).
+    """
+    request = context.get("request")
+    path = getattr(request, "path", "") if request else ""
+    prefix = _nav_prefix_from_path(path)
+
+    routes = {
+        "settings": f"{prefix}/settings/",
+        "center": f"{prefix}/centro-operaciones-espacial/",
+        "clients": f"{prefix}/clientes/",
+        "documents": f"{prefix}/documentos/",
+        "extra": f"{prefix}/servicios/otros-servicios/",
+        "parts": f"{prefix}/repuestos/",
+        "reports": f"{prefix}/reportes/",
+        "services": f"{prefix}/servicios/",
+        "disassembly": f"{prefix}/desarme/",
+        "vehicles": f"{prefix}/vehiculos/",
+    }
+    return routes.get(section, f"{prefix}/workspace/")

@@ -2,193 +2,390 @@
 {% load i18n %}
 {% load country_url %}
 {% load humanize %}
+{% load eg_money %}
 
-{% block page_title %}{% trans "Desarme" %} – {{ vehiculo.patente|default:vehiculo.vin|default:vehiculo.id }}{% endblock %}
-{% block page_subtitle %}{% trans "Centro operativo del vehículo" %}{% endblock %}
+{% block page_title %}{{ vehiculo.anio|default:"" }} {{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}{% endblock %}
+{% block page_subtitle %}{% trans "Ficha de vehículo en desarme" %}{% endblock %}
 {% block page_icon %}🔧{% endblock %}
 
 {% block page_extra_css %}
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
 :root {
-  --ds-cyan: #06b6d4;
   --ds-radius: 16px;
   --ds-radius-sm: 12px;
 }
-.ds-font { font-family: 'Orbitron', monospace; }
-.glass-panel {
-  background: rgba(0, 0, 0, 0.45);
+.ds-panel {
+  background: rgba(0,0,0,0.45);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(6, 182, 212, 0.28);
+  border: 1px solid rgba(6,182,212,0.28);
   border-radius: var(--ds-radius);
-  box-shadow: 0 0 20px rgba(6, 182, 212, 0.12);
+  box-shadow: 0 0 20px rgba(6,182,212,0.10);
 }
-.resumen-card {
-  padding: 14px 18px;
-  text-align: center;
-  border-radius: var(--ds-radius-sm);
-  border: 1px solid rgba(6, 182, 212, 0.28);
-  background: rgba(0, 0, 0, 0.35);
-  transition: transform 0.2s, box-shadow 0.2s;
+.ds-panel-baja {
+  background: rgba(240,149,149,0.06) !important;
+  border-color: rgba(240,149,149,0.40) !important;
+  box-shadow: 0 0 20px rgba(240,149,149,0.10) !important;
 }
-.resumen-card:hover { transform: translateY(-2px); box-shadow: 0 0 18px rgba(6, 182, 212, 0.18); }
-.resumen-card .valor { font-family: 'Orbitron', monospace; font-size: 1.35rem; font-weight: 700; color: var(--ds-cyan); }
-.resumen-card .etiqueta { font-size: 0.7rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.12em; margin-top: 4px; }
-.btn-scanner { background: linear-gradient(135deg, rgba(6, 182, 212, 0.9), rgba(16, 185, 129, 0.8)); color: white; border: 1px solid rgba(255,255,255,0.2); font-weight: 700; padding: 12px 20px; box-shadow: 0 0 20px rgba(6, 182, 212, 0.3); transition: all 0.2s; }
-.btn-scanner:hover { filter: brightness(1.1); color: white; box-shadow: 0 0 28px rgba(6, 182, 212, 0.4); }
-.btn-action { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; border-radius: var(--ds-radius-sm); font-weight: 600; font-size: 14px; transition: all 0.2s; }
-.btn-action-cyan { background: rgba(6, 182, 212, 0.2); color: #67e8f9; border: 1px solid rgba(6, 182, 212, 0.5); }
-.btn-action-cyan:hover { background: rgba(6, 182, 212, 0.35); color: #a5f3fc; }
-.btn-action-outline { background: transparent; color: #94a3b8; border: 1px solid rgba(148, 163, 184, 0.4); }
-.btn-action-outline:hover { background: rgba(148, 163, 184, 0.15); color: #e2e8f0; }
-.badge-estado { padding: 4px 10px; border-radius: 9999px; font-size: 0.75rem; font-weight: 600; }
-.badge-disponible { border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; background: rgba(16, 185, 129, 0.1); }
-.badge-danada { border: 1px solid rgba(244, 63, 94, 0.5); color: #f43f5e; background: rgba(244, 63, 94, 0.1); }
-.badge-faltante { border: 1px solid rgba(100, 116, 139, 0.5); color: #94a3b8; background: rgba(100, 116, 139, 0.1); }
-.badge-reservada { border: 1px solid rgba(245, 158, 11, 0.5); color: #f59e0b; background: rgba(245, 158, 11, 0.1); }
-.badge-vendida { border: 1px solid rgba(59, 130, 246, 0.5); color: #3b82f6; background: rgba(59, 130, 246, 0.1); }
-.tabla-piezas thead th { font-family: 'Orbitron', monospace; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--ds-cyan); }
-.tabla-piezas tbody tr { border-bottom: 1px solid rgba(6, 182, 212, 0.08); transition: background 0.15s; }
-.tabla-piezas tbody tr:hover { background: rgba(6, 182, 212, 0.04); }
-@media (max-width: 640px) {
-  .resumen-card .valor { font-size: 1.15rem; }
-  .resumen-card { padding: 10px 12px; }
-}
+.ds-label { font-size: 0.7rem; color: #94a3b8 !important; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 2px; }
+.ds-value { font-size: 0.92rem; color: #e2e8f0 !important; }
+.ds-badge { display: inline-flex; align-items: center; gap: 4px; padding: 2px 10px; border-radius: 9999px; font-size: 0.72rem; font-weight: 600; }
+.ds-badge-activo { background: rgba(16,185,129,0.12); color: #10b981 !important; border: 1px solid rgba(16,185,129,0.4); }
+.ds-badge-baja { background: rgba(240,149,149,0.15); color: #f09595 !important; border: 1px solid rgba(240,149,149,0.5); }
+.ds-badge-admin { background: rgba(139,92,246,0.12); color: #a78bfa !important; border: 1px solid rgba(139,92,246,0.4); }
+.ds-badge-pieza { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 9999px; font-size: 0.68rem; font-weight: 600; }
+.ds-badge-disponible { background: rgba(16,185,129,0.10); color: #10b981 !important; border: 1px solid rgba(16,185,129,0.35); }
+.ds-badge-vendida    { background: rgba(59,130,246,0.10); color: #60a5fa !important; border: 1px solid rgba(59,130,246,0.35); }
+.ds-badge-danada     { background: rgba(244,63,94,0.10); color: #f43f5e !important; border: 1px solid rgba(244,63,94,0.35); }
+.ds-badge-faltante   { background: rgba(100,116,139,0.10); color: #94a3b8 !important; border: 1px solid rgba(100,116,139,0.35); }
+.btn-ds { display: inline-flex; align-items: center; gap: 7px; padding: 9px 16px; border-radius: var(--ds-radius-sm); font-weight: 600; font-size: 13px; transition: all 0.18s; }
+.btn-ds-outline { background: transparent; color: #94a3b8 !important; border: 1px solid rgba(148,163,184,0.38); }
+.btn-ds-outline:hover { background: rgba(148,163,184,0.12); color: #e2e8f0 !important; }
+.btn-ds-cyan { background: rgba(6,182,212,0.18); color: #67e8f9 !important; border: 1px solid rgba(6,182,212,0.45); }
+.btn-ds-cyan:hover { background: rgba(6,182,212,0.32); color: #a5f3fc !important; }
+.btn-ds-red { background: rgba(239,68,68,0.18); color: #fca5a5 !important; border: 1px solid rgba(239,68,68,0.45); }
+.btn-ds-red:hover { background: rgba(239,68,68,0.32); color: #fecaca !important; }
+.metric-card { padding: 16px 20px; border-radius: var(--ds-radius-sm); border: 1px solid rgba(6,182,212,0.18); background: rgba(0,0,0,0.28); }
+.metric-val { font-size: 1.25rem; font-weight: 700; }
+.metric-lbl { font-size: 0.68rem; color: #94a3b8 !important; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 3px; }
+.prog-bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,0.07); overflow: hidden; margin-top: 6px; }
+.prog-fill { height: 100%; border-radius: 3px; }
+[x-cloak] { display: none !important; }
+.modal-overlay { position: fixed; inset: 0; z-index: 50; background: rgba(0,0,0,0.65); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.modal-box { background: #0f172a; border: 1px solid rgba(240,149,149,0.4); border-radius: 18px; padding: 28px 28px 24px; max-width: 420px; width: 100%; box-shadow: 0 0 60px rgba(240,149,149,0.18); }
+.input-modal { width: 100%; background: rgba(255,255,255,0.05) !important; border: 1px solid rgba(148,163,184,0.25); border-radius: 10px; padding: 10px 14px; color: #e2e8f0 !important; font-size: 0.95rem; outline: none; transition: border-color 0.18s; }
+.input-modal:focus { border-color: rgba(240,149,149,0.55); }
+.pieza-row { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(6,182,212,0.06); }
+.pieza-row:last-child { border-bottom: none; }
+
+/* Override force_black_text.css para elementos dentro de paneles */
+.ds-panel h1, .ds-panel h2, .ds-panel h3,
+.ds-panel h4, .ds-panel h5, .ds-panel h6 { color: #94a3b8 !important; }
+.modal-box h1, .modal-box h2, .modal-box h3 { color: #fca5a5 !important; }
+
+/* Clases Tailwind de color que force_black_text.css rompe */
+.text-white { color: #ffffff !important; }
+.text-slate-300 { color: #cbd5e1 !important; }
+.text-slate-400 { color: #94a3b8 !important; }
+.text-slate-500 { color: #64748b !important; }
+.text-cyan-300  { color: #67e8f9 !important; }
+.text-blue-400  { color: #60a5fa !important; }
+.text-emerald-400 { color: #34d399 !important; }
+.text-rose-400  { color: #fb7185 !important; }
+.text-amber-400 { color: #fbbf24 !important; }
+.text-lime-400  { color: #a3e635 !important; }
+.text-red-300   { color: #fca5a5 !important; }
 </style>
 {% endblock %}
 
 {% block main_actions %}
-<div class="flex flex-wrap gap-3">
-  <a href="{% country_url 'desarme:scanner_vehiculo' vehiculo.pk %}" class="btn-action btn-scanner">
-    📡 {% trans "Abrir escáner de inventario" %}
+<div class="flex flex-wrap gap-2" x-data="{ modalBaja: false }">
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="btn-ds btn-ds-outline">
+    &larr; {% trans "Listado" %}
   </a>
-  <a href="{% country_url 'desarme:inventario_inteligente' vehiculo.pk %}" class="btn-action btn-action-cyan">
-    📦 {% trans "Inventario inteligente" %}
+  {% if not es_dado_de_baja %}
+  <a href="{% country_url 'desarme:editar_vehiculo' vehiculo.pk %}" class="btn-ds btn-ds-cyan">
+    &#9999;&#65039; {% trans "Editar vehículo" %}
   </a>
-  <a href="{% country_url 'desarme:inventario_vehiculo' vehiculo.pk %}" class="btn-action btn-action-outline">
-    📋 {% trans "Ver inventario clásico" %}
-  </a>
-  <a href="{% country_url 'desarme:editar_vehiculo' vehiculo.pk %}" class="btn-action btn-action-cyan">
-    ✏️ {% trans "Editar vehículo" %}
-  </a>
-  <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-outline">
-    ➕ {% trans "Nueva pieza manual" %}
-  </a>
-  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="btn-action btn-action-outline">
-    ← {% trans "Listado" %}
-  </a>
+  <button @click="modalBaja = true" type="button" class="btn-ds btn-ds-red">
+    {% trans "Dar de baja" %}
+  </button>
+  {% endif %}
+
+  <div x-cloak x-show="modalBaja" class="modal-overlay" @click.self="modalBaja = false">
+    <div class="modal-box" @click.stop>
+      <h3 class="text-base font-semibold text-red-300 mb-1">{% trans "Dar de baja el vehículo" %}</h3>
+      <p class="text-slate-400 text-xs mb-5">{% trans "Esta acción marca el vehículo como inactivo. No se puede deshacer desde la UI." %}</p>
+      <form method="post" action="{% country_url 'desarme:dar_de_baja_vehiculo' vehiculo.pk %}" id="form-baja">
+        {% csrf_token %}
+        <div class="mb-4">
+          <label class="ds-label block mb-1.5">
+            {% trans "Monto venta chatarra" %} <span class="text-slate-400 normal-case">({% trans "opcional" %})</span>
+          </label>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400 text-sm font-medium">{{ empresa_moneda.simbolo }}</span>
+            <input type="text" name="monto_chatarra" id="id_monto_chatarra_modal"
+              class="input-modal" inputmode="numeric" placeholder="0" autocomplete="off"
+              oninput="fmtMoneyInput(this)">
+          </div>
+          <p class="text-slate-400 text-xs mt-1">{% trans "Dejar en 0 si se desecha sin recuperar valor." %}</p>
+        </div>
+        <div class="mb-5">
+          <label class="ds-label block mb-1.5">
+            {% trans "Observaciones" %} <span class="text-slate-400 normal-case">({% trans "opcional" %})</span>
+          </label>
+          <textarea name="observaciones_baja" rows="2" class="input-modal"
+            placeholder="{% trans 'Motivo de baja, destino del vehículo...' %}"></textarea>
+        </div>
+        <div class="flex gap-3">
+          <button type="button" @click="modalBaja = false" class="btn-ds btn-ds-outline flex-1 justify-center">{% trans "Cancelar" %}</button>
+          <button type="submit" class="btn-ds btn-ds-red flex-1 justify-center">{% trans "Confirmar baja" %}</button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 {% endblock %}
 
 {% block panel_content %}
-{# Resumen operativo: métricas del vehículo #}
-<div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
-  <div class="glass-panel resumen-card">
-    <div class="valor">{{ piezas_activas_count }}</div>
-    <div class="etiqueta">{% trans "Piezas activas" %}</div>
-  </div>
-  <div class="glass-panel resumen-card">
-    <div class="valor text-emerald-400">{{ disponibles }}</div>
-    <div class="etiqueta">{% trans "Disponibles" %}</div>
-  </div>
-  <div class="glass-panel resumen-card">
-    <div class="valor text-rose-400">{{ danadas }}</div>
-    <div class="etiqueta">{% trans "Dañadas" %}</div>
-  </div>
-  <div class="glass-panel resumen-card">
-    <div class="valor text-slate-400">{{ faltantes }}</div>
-    <div class="etiqueta">{% trans "Faltantes" %}</div>
-  </div>
-  {% if piezas_vendidas_count %}
-  <div class="glass-panel resumen-card">
-    <div class="valor text-blue-400">{{ piezas_vendidas_count }}</div>
-    <div class="etiqueta">{% trans "Vendidas" %}</div>
-  </div>
-  {% endif %}
-  <div class="glass-panel resumen-card">
-    <div class="valor text-lime-400">
-      {% if request.path|slice:":4" == "/us/" %}
-        ${{ valor_potencial|floatformat:2|intcomma }}
-      {% else %}
-        ${{ valor_potencial|floatformat:0|intcomma }}
+
+{% if es_dado_de_baja %}
+<div class="mb-5 flex items-start gap-3 p-4 rounded-xl border border-red-400/40 bg-red-900/20">
+  <div>
+    <p class="text-red-300 font-semibold text-sm">{% trans "Vehículo dado de baja" %}</p>
+    <p class="text-slate-400 text-xs mt-0.5">
+      {% trans "Fecha de baja:" %} {{ vehiculo.fecha_baja_desarme|date:"d/m/Y" }}.
+      {% if monto_chatarra %}
+        {% trans "Chatarra:" %} <span class="text-red-300 font-medium">{{ monto_chatarra|money_fmt:empresa_moneda }}</span>.
       {% endif %}
-    </div>
-    <div class="etiqueta">{% trans "Valor potencial" %}</div>
-  </div>
-</div>
-
-{# Header detalle vehículo #}
-<div class="glass-panel p-6 mb-6">
-  <h2 class="ds-font text-xl text-cyan-300 mb-4">{{ vehiculo.patente|default:vehiculo.vin|default:vehiculo.id }} — {{ vehiculo.get_marca_display|default:"" }} {{ vehiculo.get_modelo_display|default:"" }}</h2>
-  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-    <div><span class="text-slate-400">{% trans "Año" %}:</span> <span class="text-white">{{ vehiculo.anio|default:"—" }}</span></div>
-    <div><span class="text-slate-400">{% trans "VIN" %}:</span> <span class="text-white font-mono text-xs">{{ vehiculo.vin|default:"—" }}</span></div>
-    <div><span class="text-slate-400">{% trans "Estado" %}:</span> <span class="text-white">{{ vehiculo.estado_desarme|default:"—" }}</span></div>
-    <div><span class="text-slate-400">{% trans "Ubicación" %}:</span> <span class="text-white">{{ vehiculo.ubicacion_fisica|default:"—" }}</span></div>
-    <div><span class="text-slate-400">{% trans "Ingreso" %}:</span> <span class="text-white">{{ vehiculo.fecha_ingreso_desarme|default:"—" }}</span></div>
-    <div><span class="text-slate-400">{% trans "Costo adq." %}:</span> <span class="text-white">{{ vehiculo.precio_compra|default:"—" }}</span></div>
-  </div>
-  {% if vehiculo.observaciones_desarme %}
-  <p class="mt-4 text-slate-400 text-sm border-t border-cyan-400/10 pt-4">{{ vehiculo.observaciones_desarme }}</p>
-  {% endif %}
-</div>
-
-{# Piezas: tabla premium o resumen #}
-<h3 class="ds-font text-lg text-cyan-300 mb-3">{% trans "Piezas" %} ({{ piezas.count }})</h3>
-<p class="text-slate-500 text-sm mb-4">{% trans "Recomendado: usar el escáner para revisar y valorizar piezas." %}</p>
-{% if piezas %}
-<div class="glass-panel overflow-hidden rounded-2xl">
-  <div class="overflow-x-auto">
-    <table class="min-w-full text-sm tabla-piezas">
-      <thead class="bg-black/50">
-        <tr>
-          <th class="px-4 py-3 text-left">{% trans "Código" %}</th>
-          <th class="px-4 py-3 text-left">{% trans "Nombre" %}</th>
-          <th class="px-4 py-3 text-right">{% trans "Precio sug." %}</th>
-          <th class="px-4 py-3 text-center">{% trans "Estado" %}</th>
-          <th class="px-4 py-3"></th>
-        </tr>
-      </thead>
-      <tbody class="text-slate-300">
-        {% for p in piezas %}
-        <tr>
-          <td class="px-4 py-2.5 font-mono text-xs text-slate-400">{{ p.codigo }}</td>
-          <td class="px-4 py-2.5 text-white">{{ p.display_nombre|default:p.nombre }}</td>
-          <td class="px-4 py-2.5 text-right font-medium">
-            {% if request.path|slice:":4" == "/us/" %}
-              ${{ p.precio_venta_sugerido|floatformat:2|default:"—"|intcomma }}
-            {% else %}
-              ${{ p.precio_venta_sugerido|floatformat:0|default:"—"|intcomma }}
-            {% endif %}
-          </td>
-          <td class="px-4 py-2.5 text-center">
-            <span class="badge-estado
-              {% if p.estado_pieza == 'DISPONIBLE' %}badge-disponible
-              {% elif p.estado_pieza == 'DANADA' %}badge-danada
-              {% elif p.estado_pieza == 'FALTANTE' %}badge-faltante
-              {% elif p.estado_pieza == 'RESERVADA' %}badge-reservada
-              {% elif p.estado_pieza == 'VENDIDA' %}badge-vendida
-              {% else %}badge-faltante{% endif %}">
-              {{ p.get_estado_pieza_display|default:p.estado_pieza }}
-            </span>
-          </td>
-          <td class="px-4 py-2.5">
-            <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="text-cyan-400 hover:text-cyan-300 text-xs font-medium">{% trans "Editar" %}</a>
-          </td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
-</div>
-{% else %}
-<div class="glass-panel p-8 text-center text-slate-400">
-  <p>{% trans "Sin piezas registradas." %}</p>
-  <div class="mt-4 flex flex-wrap justify-center gap-3">
-    <a href="{% country_url 'desarme:generar_inventario' vehiculo.pk %}" class="btn-action btn-scanner">📡 {% trans "Generar inventario" %}</a>
-    <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-cyan">➕ {% trans "Agregar pieza" %}</a>
+      {% trans "Vista de solo lectura." %}
+    </p>
   </div>
 </div>
 {% endif %}
+
+<!-- CABECERA -->
+<div class="ds-panel {% if es_dado_de_baja %}ds-panel-baja{% endif %} p-5 mb-5">
+  <div class="flex flex-wrap items-start justify-between gap-3">
+    <div>
+      <h2 class="text-xl font-bold {% if es_dado_de_baja %}line-through text-slate-500{% else %}text-white{% endif %}">
+        {{ vehiculo.anio|default:"" }} {{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}
+      </h2>
+      <div class="flex flex-wrap items-center gap-2 mt-2 text-sm text-slate-400">
+        {% if vehiculo.color %}
+        <span class="flex items-center gap-1.5">
+          <span class="inline-block w-3 h-3 rounded-full border border-white/20 flex-shrink-0"
+            style="background-color: {{ vehiculo.color.hex|default:'#64748b' }}"></span>
+          {{ vehiculo.color.nombre }}
+        </span>
+        <span class="text-slate-400">&middot;</span>
+        {% endif %}
+        {% if vehiculo.tipo_carroceria %}
+        <span>{{ vehiculo.tipo_carroceria|capfirst }}</span>
+        <span class="text-slate-400">&middot;</span>
+        {% endif %}
+        {% if vehiculo.vin %}
+        <span class="font-mono text-xs text-slate-500">{{ vehiculo.vin }}</span>
+        {% elif vehiculo.patente %}
+        <span class="font-mono text-xs text-slate-500">{{ vehiculo.patente }}</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      {% if es_dado_de_baja %}
+      <span class="ds-badge ds-badge-baja">{% trans "Dado de baja" %}</span>
+      {% else %}
+      <span class="ds-badge ds-badge-activo">{% trans "Activo" %}</span>
+      {% endif %}
+      {% if es_superusuario %}
+      <span class="ds-badge ds-badge-admin">{% trans "Solo superusuario" %}</span>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<!-- GRILLA 2 COLUMNAS -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
+
+  <!-- TARJETA INFORMACIÓN DE COMPRA -->
+  <div class="ds-panel {% if es_dado_de_baja %}ds-panel-baja{% endif %} p-5">
+    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{% trans "Información de compra" %}</h3>
+    <div class="space-y-3">
+      <div>
+        <div class="ds-label">{% trans "Proveedor" %}</div>
+        <div class="ds-value">{{ vehiculo.vendedor_desarme.nombre|default:"—" }}</div>
+      </div>
+      <div>
+        <div class="ds-label">{% trans "Fecha de compra" %}</div>
+        <div class="ds-value">{{ vehiculo.fecha_ingreso_desarme|date:"d/m/Y"|default:"—" }}</div>
+      </div>
+      <div>
+        <div class="ds-label">{% trans "Costo total del vehículo" %}</div>
+        <div class="ds-value text-lg font-bold text-cyan-300">{{ costo_total|money_fmt:empresa_moneda }}</div>
+        {% if costo_transporte or costo_otros %}
+        <div class="mt-1 space-y-0.5 text-xs text-slate-500">
+          <div>{% trans "Compra:" %} {{ costo_compra|money_fmt:empresa_moneda }}</div>
+          {% if costo_transporte %}<div>{% trans "Transporte/Grúa:" %} {{ costo_transporte|money_fmt:empresa_moneda }}</div>{% endif %}
+          {% if costo_otros %}<div>{% trans "Otros gastos:" %} {{ costo_otros|money_fmt:empresa_moneda }}</div>{% endif %}
+        </div>
+        {% endif %}
+      </div>
+      <div>
+        <div class="ds-label">{% trans "Ubicación" %}</div>
+        <div class="ds-value">{{ vehiculo.ubicacion_fisica|default:"—" }}</div>
+      </div>
+      {% if es_dado_de_baja %}
+      <div class="pt-2 border-t border-red-400/20">
+        <div class="ds-label" style="color:#f09595">{% trans "Fecha de baja" %}</div>
+        <div class="ds-value" style="color:#f09595">{{ vehiculo.fecha_baja_desarme|date:"d/m/Y" }}</div>
+        {% if monto_chatarra %}
+        <div class="ds-label mt-2" style="color:#f09595">{% trans "Monto chatarra" %}</div>
+        <div class="ds-value font-semibold" style="color:#f09595">{{ monto_chatarra|money_fmt:empresa_moneda }}</div>
+        {% endif %}
+      </div>
+      {% endif %}
+    </div>
+    {% if not es_dado_de_baja %}
+    <div class="flex gap-2 mt-5 pt-4 border-t border-cyan-400/10">
+      <a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ vehiculo.pk }}"
+        class="btn-ds btn-ds-outline text-xs py-2 px-3">
+        {% trans "Ver documentos" %}
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- TARJETA RESUMEN DE REPUESTOS -->
+  <div class="ds-panel {% if es_dado_de_baja %}ds-panel-baja{% endif %} p-5">
+    <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{% trans "Resumen de repuestos" %}</h3>
+    {% if total_piezas_count > 0 %}
+    <div class="space-y-4">
+      <div>
+        <div class="flex justify-between items-baseline">
+          <span class="text-sm text-slate-300">{% trans "En stock" %}</span>
+          <span class="text-base font-bold text-emerald-400">{{ disponibles }}</span>
+        </div>
+        <div class="prog-bar">
+          <div class="prog-fill bg-emerald-400" style="width:{% widthratio disponibles total_piezas_count 100 %}%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline">
+          <span class="text-sm text-slate-300">{% trans "Vendidos" %}</span>
+          <span class="text-base font-bold text-blue-400">{{ vendidas }}</span>
+        </div>
+        <div class="prog-bar">
+          <div class="prog-fill bg-blue-400" style="width:{% widthratio vendidas total_piezas_count 100 %}%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline">
+          <span class="text-sm text-slate-300">{% trans "Dañados" %}</span>
+          <span class="text-base font-bold text-rose-400">{{ danadas }}</span>
+        </div>
+        <div class="prog-bar">
+          <div class="prog-fill bg-rose-400" style="width:{% widthratio danadas total_piezas_count 100 %}%"></div>
+        </div>
+      </div>
+      <div>
+        <div class="flex justify-between items-baseline">
+          <span class="text-sm text-slate-300">{% trans "Faltantes" %}</span>
+          <span class="text-base font-bold text-slate-400">{{ faltantes }}</span>
+        </div>
+        <div class="prog-bar">
+          <div class="prog-fill bg-slate-400" style="width:{% widthratio faltantes total_piezas_count 100 %}%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="mt-4 pt-4 border-t border-cyan-400/10 text-xs text-slate-500">
+      {% trans "Total registrados:" %} <span class="text-slate-400 font-medium">{{ total_piezas_count }}</span>
+    </div>
+    {% else %}
+    <div class="text-center text-slate-500 py-8 text-sm">{% trans "Sin repuestos registrados." %}</div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- SECCIÓN P&L -->
+<div class="ds-panel {% if es_dado_de_baja %}ds-panel-baja{% endif %} p-5 mb-5">
+  <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{% trans "Cierre financiero" %}</h3>
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="metric-card">
+      <div class="metric-val text-slate-300">{{ costo_total|money_fmt:empresa_moneda }}</div>
+      <div class="metric-lbl">{% trans "Costo total" %}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val text-blue-400">{{ total_recaudado|money_fmt:empresa_moneda }}</div>
+      <div class="metric-lbl">{% trans "Total recaudado" %}</div>
+    </div>
+    <div class="metric-card">
+      {% if ganancia_final >= 0 %}
+      <div class="metric-val text-emerald-400">{{ ganancia_final|money_fmt:empresa_moneda }}</div>
+      {% else %}
+      <div class="metric-val text-rose-400">{{ ganancia_final|money_fmt:empresa_moneda }}</div>
+      {% endif %}
+      <div class="metric-lbl">{% if es_dado_de_baja %}{% trans "Ganancia final" %}{% else %}{% trans "Ganancia neta" %}{% endif %}</div>
+    </div>
+    {% if not es_dado_de_baja %}
+    <div class="metric-card">
+      {% if proyeccion_total >= 0 %}
+      <div class="metric-val text-lime-400">{{ proyeccion_total|money_fmt:empresa_moneda }}</div>
+      {% else %}
+      <div class="metric-val text-amber-400">{{ proyeccion_total|money_fmt:empresa_moneda }}</div>
+      {% endif %}
+      <div class="metric-lbl">{% trans "Proyección total" %}</div>
+    </div>
+    {% else %}
+    <div class="metric-card">
+      <div class="metric-val text-red-300">{{ monto_chatarra|money_fmt:empresa_moneda }}</div>
+      <div class="metric-lbl">{% trans "Valor chatarra" %}</div>
+    </div>
+    {% endif %}
+  </div>
+  {% if not es_dado_de_baja %}
+  <p class="mt-3 text-xs text-slate-400">{% trans "Proyección: si se vende todo el stock disponible al precio sugerido." %}</p>
+  {% endif %}
+</div>
+
+<!-- REPUESTOS RECIENTES -->
+<div class="ds-panel {% if es_dado_de_baja %}ds-panel-baja{% endif %} p-5">
+  <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-4">{% trans "Repuestos recientes" %}</h3>
+  {% if repuestos_recientes %}
+  <div>
+    {% for p in repuestos_recientes %}
+    <div class="pieza-row">
+      <div class="flex-1 min-w-0">
+        <div class="text-sm text-white truncate">{{ p.display_nombre|default:p.nombre }}</div>
+        <div class="text-xs text-slate-500 font-mono">{{ p.codigo }}</div>
+      </div>
+      <div class="text-sm font-semibold text-cyan-300 whitespace-nowrap">
+        {{ p.precio_venta_sugerido|money_fmt:empresa_moneda|default:"—" }}
+      </div>
+      <span class="ds-badge-pieza
+        {% if p.estado_pieza == 'DISPONIBLE' %}ds-badge-disponible
+        {% elif p.estado_pieza == 'VENDIDA' %}ds-badge-vendida
+        {% elif p.estado_pieza == 'DANADA' %}ds-badge-danada
+        {% else %}ds-badge-faltante{% endif %}">
+        {{ p.get_estado_pieza_display|default:p.estado_pieza }}
+      </span>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center text-slate-500 py-6 text-sm">{% trans "Sin repuestos registrados aún." %}</div>
+  {% endif %}
+  <div class="mt-5 pt-4 border-t border-cyan-400/10">
+    <a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ vehiculo.pk }}"
+      class="btn-ds btn-ds-cyan w-full justify-center">
+      {% trans "Ir a repuestos completos" %}
+    </a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block page_extra_js %}
+<script>
+function fmtMoneyInput(el) {
+  var raw = el.value.replace(/\D/g, '');
+  if (!raw) { el.value = ''; return; }
+  var n = parseInt(raw, 10);
+  {% if empresa_moneda.codigo == 'CLP' %}
+  el.value = n.toLocaleString('es-CL');
+  {% elif empresa_moneda.decimales == 0 %}
+  el.value = n.toLocaleString('es');
+  {% else %}
+  el.value = n.toLocaleString('en-US');
+  {% endif %}
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var form = document.getElementById('form-baja');
+  if (form) {
+    form.addEventListener('submit', function() {
+      var inp = document.getElementById('id_monto_chatarra_modal');
+      if (inp) inp.value = inp.value.replace(/[^0-9]/g, '');
+    });
+  }
+});
+</script>
 {% endblock %}

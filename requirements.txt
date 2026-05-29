@@ -36,7 +36,7 @@ google-auth-httplib2
 whitenoise>=6.5.0
 
 # Base de Datos (SQLite incluido en Python)
-# Para PostgreSQL: psycopg2-binary>=2.9.7
+psycopg2-binary>=2.9.7
 
 # Monitoreo de Errores (Opcional pero recomendado)
 sentry-sdk>=1.32.0
@@ -72,7 +72,7 @@ pyarmor>=8.5.0  # Para ofuscar motor_ia_core.py antes de producción
 # Para desarrollo:
 #   pip install -r requirements.txt
 #
-# Para producción en PythonAnywhere u otro servidor:
+# Para producción en DigitalOcean u otro servidor:
 #   pip install -r requirements.txt
 #
 # Para crear un entorno virtual:
@@ -86,3 +86,8 @@ pyarmor>=8.5.0  # Para ofuscar motor_ia_core.py antes de producción
 
 
 
+pytz==2026.2
+pandas==3.0.3
+openpyxl==3.1.5
+resend>=2.0.0
+django-redis>=5.4.0

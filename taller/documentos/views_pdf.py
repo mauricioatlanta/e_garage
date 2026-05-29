@@ -12,6 +12,21 @@ from taller.models.documento import Documento
 from taller.services.document_output_service import DocumentOutputService
 
 
+def _get_documento_for_request(request, pk):
+    queryset = Documento.objects.select_related("empresa", "cliente").prefetch_related(
+        "lineas_repuesto__repuesto", "lineas_servicio", "lineas_otro_servicio"
+    )
+    if getattr(request.user, "is_staff", False) or getattr(request.user, "is_superuser", False):
+        return get_object_or_404(queryset, pk=pk)
+
+    empresa = getattr(request.user, "empresa", None)
+    if not empresa:
+        messages.error(request, "Usuario sin empresa asociada.")
+        return None
+
+    return get_object_or_404(queryset, pk=pk, empresa=empresa)
+
+
 @login_required
 @require_GET
 def descargar_pdf_documento(request, pk):
@@ -24,19 +39,9 @@ def descargar_pdf_documento(request, pk):
     Returns:
         HttpResponse con PDF o error
     """
-    empresa = getattr(request.user, "empresa", None)
-    if not empresa:
-        messages.error(request, "Usuario sin empresa asociada.")
+    documento = _get_documento_for_request(request, pk)
+    if documento is None:
         return redirect("documentos:lista_documentos")
-
-    # Seguridad Multi-tenant
-    documento = get_object_or_404(
-        Documento.objects.select_related("empresa", "cliente").prefetch_related(
-            "lineas_repuesto__repuesto", "lineas_servicio", "lineas_otro_servicio"
-        ),
-        pk=pk,
-        empresa=empresa,  # 🔒 Multi-tenant
-    )
 
     try:
         pdf_bytes, filename = DocumentOutputService.generate_pdf(documento, request)

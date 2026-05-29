@@ -415,7 +415,7 @@
         
         <!-- Logo -->
         <div class="mb-8 inline-block">
-          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 40, 104, 0.8));">
+          <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 40, 104, 0.8));">
         </div>
 
         <!-- Title -->
@@ -478,22 +478,6 @@
           <a href="/us/pricing/" class="btn-secondary">
             💰 View Plans
           </a>
-        </div>
-
-        <!-- Quick Stats -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20" data-aos="fade-up" data-aos-delay="200">
-          <div class="glass-card p-8">
-            <div class="stats-number">900+</div>
-            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Active Shops</p>
-          </div>
-          <div class="glass-card p-8">
-            <div class="stats-number">45K+</div>
-            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Work Orders</p>
-          </div>
-          <div class="glass-card p-8">
-            <div class="stats-number">$ 9M+</div>
-            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Revenue</p>
-          </div>
         </div>
       </div>
     </div>
@@ -771,9 +755,9 @@
       <!-- Pricing Cards -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         
-        <!-- Monthly Plan -->
+        <!-- Entry -->
         <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="100">
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Monthly Plan</h3>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Entry</h3>
           <div class="mb-6">
             <div style="color: #4A90E2; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
               $ 20
@@ -793,12 +777,12 @@
           </a>
         </div>
 
-        <!-- Semi-Annual Plan (HIGHLIGHTED) -->
+        <!-- Growth (HIGHLIGHTED) -->
         <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="200" style="transform: scale(1.05); border: 3px solid rgba(0, 40, 104, 0.8);">
           <div style="background: linear-gradient(135deg, #002868 0%, #BF0A30 100%); color: #fff; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 800; margin-bottom: 1rem; display: inline-block;">
             🏆 MOST POPULAR
           </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #BF0A30;">Semi-Annual Plan</h3>
+          <h3 class="text-2xl font-bold mb-4" style="color: #BF0A30;">Growth</h3>
           <div class="mb-6">
             <div style="color: #BF0A30; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
               $ 110
@@ -821,9 +805,9 @@
           </a>
         </div>
 
-        <!-- Annual Plan -->
+        <!-- Business -->
         <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="300">
-          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Annual Plan</h3>
+          <h3 class="text-2xl font-bold mb-4" style="color: #4A90E2;">Business</h3>
           <div class="mb-6">
             <div style="color: #4A90E2; font-size: 3rem; font-weight: 900; font-family: 'Orbitron', monospace;">
               $ 200
@@ -852,7 +836,7 @@
       <div class="glass-card p-12 mb-8" data-aos="fade-up" data-aos-delay="400">
         <h3 class="text-3xl font-bold mb-6" style="color: #BF0A30; text-shadow: 0 0 20px rgba(191, 10, 48, 0.4);">🎁 Try Free for 30 Days</h3>
         <p class="text-xl mb-8" style="color: #d0d0d0; font-weight: 500;">
-          No credit card. No commitment. Cancel anytime.
+          Sin tarjeta. No commitment. Cancel anytime.
         </p>
         <a href="/us/signup/" class="btn-primary inline-block">
           🚀 Start Now
@@ -866,51 +850,9 @@
   </section>
 
   <!-- Footer -->
-  <footer class="py-12 px-4" style="border-top: 2px solid rgba(0, 40, 104, 0.3); background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 100%);">
-    <div class="container mx-auto max-w-7xl">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        
-        <div>
-          <h4 class="font-futuristic text-2xl mb-4" style="color: #4A90E2; text-shadow: 0 0 20px rgba(74, 144, 226, 0.4);">eGarage</h4>
-          <p style="color: #b0b0b0; font-weight: 500;">
-            The definitive platform for auto repair shops in the USA.
-          </p>
-        </div>
-
-        <div>
-          <h5 class="font-bold mb-4" style="color: #BF0A30;">Product</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/us/pricing/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Pricing</a></li>
-            <li><a href="/us/demo/location/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Demo</a></li>
-            <li><a href="/us/documents/form/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Documents</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h5 class="font-bold mb-4" style="color: #BF0A30;">Company</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/us/about/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">About Us</a></li>
-            <li><a href="/us/contact/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Contact</a></li>
-            <li><a href="/us/support/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Support</a></li>
-          </ul>
-        </div>
-
-        <div>
-          <h5 class="font-bold mb-4" style="color: #BF0A30;">Legal</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="/us/privacy/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Privacy</a></li>
-            <li><a href="/us/terms/" style="transition: color 0.3s;" onmouseover="this.style.color='#4A90E2'" onmouseout="this.style.color='#b0b0b0'">Terms</a></li>
-          </ul>
-        </div>
-
-      </div>
-
-      <div class="text-center pt-8" style="border-top: 1px solid rgba(0, 40, 104, 0.2); color: #808080;">
-        <p>&copy; 2025 eGarage USA. All rights reserved.</p>
-        <p class="mt-3" style="font-size: 0.95rem; color: #909090; letter-spacing: 0.02em;">International platform for automotive service management.</p>
-      </div>
-    </div>
-  </footer>
+  <footer style="border-top:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.35);padding:1rem 0;text-align:center;margin-top:auto;">
+  <span style="color:#9ca3af;font-size:0.82rem;">eGarage &bull; &copy; 2026 &bull; <a href="/legal/" style="color:#67e8f9;text-decoration:none;">Legal</a> &bull; All Rights Reserved</span>
+</footer>
 
   </main>
 

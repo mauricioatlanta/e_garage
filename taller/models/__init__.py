@@ -14,6 +14,7 @@ from .team_member import TeamMember
 # Modelos de clientes y vehículos
 from .clientes import Cliente
 from .vehiculos import Vehiculo
+from .vehiculo_imagen import VehiculoImagen
 from .marca import Marca
 from .modelo import Modelo
 
@@ -43,6 +44,10 @@ from .pieza_desarme import (
     PrecioHistoricoPieza,
 )
 from .vehiculo_desarme import VehiculoDesarme
+from .vehiculo_financial import (
+    VehiculoFinancialSnapshot,
+    VehicleFinancialEvent,
+)
 from .vendedor_desarme import VendedorDesarme
 
 # Modelos de ubicación
@@ -51,6 +56,7 @@ from .ubicacion import Estado, Ciudad
 # Modelos de suscripción y pagos
 from .comprobante_pago import ComprobantePago
 from .suscripcion_transaccion import SuscripcionTransaccion
+from .subscription_change import SubscriptionChange
 from .trial import TrialRegistro
 
 # Modelos legacy / compatibilidad (deben importarse para que Django los registre)
@@ -60,7 +66,13 @@ from .regimen_fiscal import RegimenFiscal
 from .marcas_usa import MarcaVehiculo, ModeloVehiculo
 
 # Modelos de extras de vehículos
-from .extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
+from .extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    ColorVehiculo,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
 
 __all__ = [
     # Modelos básicos
@@ -71,6 +83,7 @@ __all__ = [
     # Clientes y vehículos
     "Cliente",
     "Vehiculo",
+    "VehiculoImagen",
     "Marca",
     "Modelo",
     # Kilometraje
@@ -94,6 +107,8 @@ __all__ = [
     "PiezaDesarmeCompanyLabel",
     "PrecioHistoricoPieza",
     "VehiculoDesarme",
+    "VehiculoFinancialSnapshot",
+    "VehicleFinancialEvent",
     "VendedorDesarme",
     # Ubicación
     "Estado",
@@ -101,6 +116,7 @@ __all__ = [
     # Suscripción y pagos
     "ComprobantePago",
     "SuscripcionTransaccion",
+    "SubscriptionChange",
     "TrialRegistro",
     # Legacy / compatibilidad
     "LogAuditoria",
@@ -110,8 +126,10 @@ __all__ = [
     "ModeloVehiculo",
     # Extras de vehículos
     "CajaVehiculo",
+    "CajaVehiculoEmpresa",
     "ColorVehiculo",
     "MotorVehiculo",
+    "MotorVehiculoEmpresa",
 ]
 
 # Intentar importar otros modelos si existen (para compatibilidad)

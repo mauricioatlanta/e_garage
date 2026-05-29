@@ -158,15 +158,12 @@ def obtener_datos_formulario(empresa):
     if empresa.pais == "US":
         tipos_base = [
             {"value": "PRES", "label": "Estimate", "color": "#4CAF50"},
-            {"value": "OT", "label": "Work Order", "color": "#FF9800"},
             {"value": "FAC", "label": "Invoice", "color": "#F44336"},
         ]
     else:
         tipos_base = [
             {"value": "PRES", "label": "Presupuesto", "color": "#4CAF50"},
             {"value": "OT", "label": "Orden de Trabajo", "color": "#FF9800"},
-            {"value": "FAC", "label": "Factura", "color": "#F44336"},
-            {"value": "BOL", "label": "Boleta", "color": "#2196F3"},
         ]
 
     for tipo in tipos_base:
@@ -948,24 +945,24 @@ def documento_form(request, pk=None):
             elif request.path.startswith("/cl/"):
                 # Para Chile, intentar chile:company_settings primero, luego fallback
                 try:
-                    settings_url = reverse("chile:company_settings")
+                    settings_url = reverse("company_settings")
                 except NoReverseMatch:
-                    settings_url = reverse("taller:company_settings")
+                    settings_url = reverse("company_settings")
             else:
                 # Fallback: construir URL basada en el path o usar default
-                settings_url = reverse("taller:company_settings")
+                settings_url = reverse("company_settings")
         except NoReverseMatch:
             # Fallback final: construir URL manualmente basada en el path
             if request.path.startswith("/us/"):
                 settings_url = "/us/settings/"
             else:
-                settings_url = "/cl/es/settings/"
+                settings_url = reverse("company_settings")
         except Exception as e:
             # Fallback de emergencia
             if request.path.startswith("/us/"):
                 settings_url = "/us/settings/"
             else:
-                settings_url = "/cl/es/settings/"
+                settings_url = reverse("company_settings")
 
         # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse
@@ -1010,24 +1007,24 @@ def documento_form(request, pk=None):
         elif request.path.startswith("/cl/"):
             # Para Chile, intentar chile:company_settings primero, luego fallback
             try:
-                settings_url = reverse("chile:company_settings")
+                settings_url = reverse("company_settings")
             except NoReverseMatch:
-                settings_url = reverse("taller:company_settings")
+                settings_url = reverse("company_settings")
         else:
             # Fallback: construir URL basada en el path o usar default
-            settings_url = reverse("taller:company_settings")
+            settings_url = reverse("company_settings")
     except NoReverseMatch:
         # Fallback final: construir URL manualmente basada en el path
         if request.path.startswith("/us/"):
             settings_url = "/us/settings/"
         else:
-            settings_url = "/cl/es/settings/"
+            settings_url = reverse("company_settings")
     except Exception as e:
         # Fallback de emergencia
         if request.path.startswith("/us/"):
             settings_url = "/us/settings/"
         else:
-            settings_url = "/cl/es/settings/"
+            settings_url = reverse("company_settings")
 
     # Usar template resolution en lugar de template hardcodeado
     from django.template.response import TemplateResponse

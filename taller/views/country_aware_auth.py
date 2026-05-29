@@ -12,6 +12,14 @@ class CountryAwareLoginView(LoginView):
 
     def dispatch(self, request, *args, **kwargs):
         self._apply_country_context(request)
+        # En allauth 65+, si el usuario ya está autenticado el padre redirige
+        # a LOGIN_REDIRECT_URL. Lo evitamos para mostrar siempre el formulario.
+        if request.user.is_authenticated:
+            from django.shortcuts import redirect
+            next_url = request.GET.get('next', '')
+            if next_url:
+                return redirect(next_url)
+            return super(type(self).__mro__[2], self).get(request, *args, **kwargs)
         return super().dispatch(request, *args, **kwargs)
 
     # ------------------------------------------------------------------ #
@@ -187,18 +195,21 @@ class CountryAwareLoginView(LoginView):
         country = getattr(self.request, "country", "CL")
         lang = get_language() or "es"
 
-        if country == "US":
-            return ["account/login.html"]  # misma gráfica; labels EN vía {% if country == 'US' %}
-        if country == "UY":
-            return ["uy/es/account/login.html"]
-        if country == "MX" and lang == "en":
-            return ["us/en/account/login.html"]
-        # Venezuela: template propio ve/es/account/login.html
-        if country == "VE":
-            return ["ve/es/account/login.html"]
-        # MX, CL, AR, CO, EC, PE: base_login + _login_form (reutilizable, misma gráfica)
-        if country in ("MX", "CL", "AR", "CO", "EC", "PE"):
-            return ["account/login.html"]
+        country_templates = {
+            "CL": "cl/es/account/login.html",
+            "AR": "ar/es/account/login.html",
+            "MX": "mx/es/account/login.html",
+            "PE": "pe/es/account/login.html",
+            "CO": "co/es/account/login.html",
+            "EC": "ec/es/account/login.html",
+            "UY": "uy/es/account/login.html",
+            "VE": "ve/es/account/login.html",
+            "BR": "br/pt/account/login.html",
+            "US": "us/en/account/login.html" if lang == "en" else "us/es/account/login.html",
+        }
+
+        if country in country_templates:
+            return [country_templates[country]]
 
         if lang == "en":
             return ["us/en/account/login.html"]
@@ -212,6 +223,18 @@ class CountryAwareLoginView(LoginView):
         # Ocultar starfield del base; el login usa su propio fondo (Vanta/grid)
         context["enable_space_bg"] = 0
         return context
+
+    def get_success_url(self):
+        next_url = self.request.GET.get("next") or self.request.POST.get("next")
+        if next_url:
+            return next_url
+
+        country = getattr(self.request, "country", "CL")
+        if country == "US":
+            return "/us/en/workspace/"
+        if country == "BR":
+            return "/br/pt/workspace/"
+        return f"/{country.lower()}/es/workspace/"
 
 
 # Vista funcional como alternativa

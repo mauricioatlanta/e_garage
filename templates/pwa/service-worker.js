@@ -7,7 +7,6 @@ const RUNTIME_CACHE = 'egarage-runtime-' + CACHE_VERSION_TOKEN;
 
 // Archivos estáticos locales para precache (solo recursos de tu dominio)
 const STATIC_CACHE_URLS = [
-  '{{ start_url }}',
   '/static/css/dashboard.css',
   '/static/css/output.css',
   '/static/css/starfield.css',
@@ -86,6 +85,13 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Las páginas HTML autenticadas deben venir siempre de red.
+  // Cachearlas puede dejar navegación, permisos o contenido de sesión obsoleto.
+  if (request.mode === 'navigate' || request.destination === 'document') {
+    event.respondWith(fetch(request));
+    return;
+  }
+
   // Ignorar peticiones a APIs que requieren autenticación en tiempo real
   if (url.pathname.includes('/api/') && 
       (url.pathname.includes('/auth/') || url.pathname.includes('/ajax/'))) {
@@ -108,7 +114,10 @@ self.addEventListener('fetch', (event) => {
           
           return fetch(request).then((response) => {
             // Solo cachear respuestas exitosas
-            if (response.status === 200) {
+              const requestUrl = new URL(request.url);
+              const isHttpRequest = requestUrl.protocol === 'http:' || requestUrl.protocol === 'https:';
+
+              if (response.status === 200 && isHttpRequest) {
               const responseToCache = response.clone();
               caches.open(CACHE_NAME).then((cache) => {
                 cache.put(request, responseToCache);
@@ -139,7 +148,10 @@ self.addEventListener('fetch', (event) => {
       fetch(request)
         .then((response) => {
           // Si la respuesta es exitosa, cachearla
-          if (response.status === 200) {
+              const requestUrl = new URL(request.url);
+              const isHttpRequest = requestUrl.protocol === 'http:' || requestUrl.protocol === 'https:';
+
+              if (response.status === 200 && isHttpRequest) {
             const responseToCache = response.clone();
             caches.open(RUNTIME_CACHE).then((cache) => {
               cache.put(request, responseToCache);
@@ -153,10 +165,7 @@ self.addEventListener('fetch', (event) => {
             if (cachedResponse) {
               return cachedResponse;
             }
-            // Si es una página HTML y no hay caché, devolver la página principal
-            if (request.destination === 'document') {
-              return caches.match('{{ start_url }}');
-            }
+            return undefined;
           });
         })
     );

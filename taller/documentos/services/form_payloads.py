@@ -213,6 +213,16 @@ def build_line_item_payloads(*, mode, request=None, source_document=None, source
             "otros_json": _safe_json_list(request.POST.get("otros_json")),
         }
 
+    # Prefill desde sesión de desarme
+    if request is not None:
+        session_prefill = request.session.get("desarme_repuestos_prefill")
+        if session_prefill:
+            return {
+                "repuestos_json": session_prefill,
+                "servicios_json": [],
+                "otros_json": [],
+            }
+
     if getattr(mode, "is_clean", False):
         return _empty_line_item_payloads()
 

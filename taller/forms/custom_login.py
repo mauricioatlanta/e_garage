@@ -29,7 +29,10 @@ class CustomLoginForm(LoginForm):
                 "class": "premium-input",
                 "placeholder": "Usuario o email",
                 "autocomplete": "username",
-                "inputmode": "email",
+                "inputmode": "text",
+                "autocapitalize": "none",
+                "autocorrect": "off",
+                "spellcheck": "false",
             }
         )
         self.fields["password"].widget.attrs.update(
@@ -45,11 +48,46 @@ class CustomLoginForm(LoginForm):
             }
         )
 
+    def _ensure_staff_email_verified(self, login):
+        if not login:
+            return
+
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
+        login = login.strip()
+        user = User.objects.filter(username__iexact=login).first()
+
+        if not user:
+            user = User.objects.filter(email__iexact=login, is_active=True).first()
+
+        if not user or not (user.is_superuser or user.is_staff) or not user.email:
+            return
+
+        from allauth.account.models import EmailAddress
+
+        email_addr, _ = EmailAddress.objects.get_or_create(
+            user=user,
+            email=user.email,
+            defaults={"verified": True, "primary": True},
+        )
+        changed = False
+        if not email_addr.verified:
+            email_addr.verified = True
+            changed = True
+        if not email_addr.primary:
+            email_addr.primary = True
+            changed = True
+        if changed:
+            email_addr.save(update_fields=["verified", "primary"])
+
     def clean(self):
         """
         Validar formulario, pero permitir login a superusuarios sin verificación
         """
-        # Llamar al clean del padre primero
+        self._ensure_staff_email_verified(self.data.get("login"))
+
+        # Llamar al clean del padre después de normalizar staff/superuser.
         cleaned_data = super().clean()
 
         # Si hay un usuario y es superuser/staff, saltar verificación de email
@@ -98,8 +136,6 @@ class CustomLoginForm(LoginForm):
         if self.cleaned_data.get("remember_me"):
             # Configurar sesión para que dure 30 días
             request.session.set_expiry(60 * 60 * 24 * 30)  # 30 días
-            # No expirar al cerrar el navegador
-            request.session.cycle_key()
         else:
             # Configurar sesión normal (expira al cerrar navegador)
             request.session.set_expiry(0)

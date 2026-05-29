@@ -50,7 +50,7 @@
 
 6. **🔧 Configuración de Despliegue**
    - **Render.com**: ✅ `render.yaml` configurado
-   - **PythonAnywhere**: ✅ WSGI file listo
+   - **DigitalOcean**: ✅ WSGI file listo
    - **Comandos**: ✅ Documentados
 
 ---
@@ -74,7 +74,7 @@
 ✅ static/taller/common/js/documentos_form.js
 ✅ gestion_taller/settings/production.py
 ✅ render.yaml
-✅ pythonanywhere_wsgi.py
+✅ digitalocean_wsgi.py
 ✅ taller/views_health.py
 ```
 
@@ -108,7 +108,7 @@ git commit -m "✅ Sistema 100% listo para producción"
 git push origin main
 
 # 3. Deploy en Render.com (automático)
-# O configurar PythonAnywhere según guía
+# O configurar DigitalOcean según guía
 ```
 
 ### **Verificación Post-Deploy**
@@ -157,4 +157,4 @@ Todos los problemas críticos han sido resueltos:
 - ✅ Configuración de producción completa
 - ✅ Documentación de despliegue lista
 
-**El sistema puede ser desplegado inmediatamente en Render.com o PythonAnywhere.**
+**El sistema puede ser desplegado inmediatamente en Render.com o DigitalOcean.**

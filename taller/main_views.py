@@ -4,6 +4,10 @@ from taller.documentos.forms import DocumentoForm
 from taller.models.documento import Documento
 
 
+def seleccionar_pais(request):
+    return render(request, 'landing/seleccionar_pais.html')
+
+
 def crear_documento(request):
     print("✅ Usando vista corregida crear_documento desde taller.documentos.views")
 

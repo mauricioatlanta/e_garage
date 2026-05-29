@@ -13,7 +13,7 @@
   <!-- Open Graph Meta Tags -->
   <meta property="og:title" content="eGarage México — Plataforma para Talleres">
   <meta property="og:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
-  <meta property="og:image" content="{% static 'img/egarage_logo.png' %}">
+  <meta property="og:image" content="{% static 'img/logo_egarage.png' %}?v=2">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="eGarage">
@@ -22,7 +22,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="eGarage México — Plataforma para Talleres">
   <meta name="twitter:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
-  <meta name="twitter:image" content="{% static 'img/egarage_logo.png' %}">
+  <meta name="twitter:image" content="{% static 'img/logo_egarage.png' %}?v=2">
   
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
@@ -336,7 +336,7 @@
       <div class="text-center" data-aos="fade-up">
         
         <div class="mb-8 inline-block">
-          <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 104, 71, 0.8));">
+          <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="h-32 md:h-40 w-auto mx-auto" style="filter: drop-shadow(0 0 30px rgba(0, 104, 71, 0.8));">
         </div>
 
         <h1 class="font-futuristic text-6xl md:text-8xl mb-6 futuristic-glow">
@@ -391,21 +391,6 @@
           <a href="{% country_url 'account_signup' %}" class="btn-primary">🚀 Comenzar Gratis</a>
           <a href="{% country_url 'account_login' %}" class="btn-secondary">🔐 Ingresar</a>
           <a href="#precios" class="btn-secondary">💰 Ver Planes</a>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-20" data-aos="fade-up" data-aos-delay="200">
-          <div class="glass-card p-8">
-            <div class="stats-number">500+</div>
-            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Talleres Activos</p>
-          </div>
-          <div class="glass-card p-8">
-            <div class="stats-number">30K+</div>
-            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">Órdenes de Servicio</p>
-          </div>
-          <div class="glass-card p-8">
-            <div class="stats-number">$5M+</div>
-            <p class="text-xl mt-2" style="color: #ffffff; font-weight: 600;">MXN Facturado</p>
-          </div>
         </div>
       </div>
     </div>
@@ -584,9 +569,9 @@
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
         
-        <!-- Plan Mensual -->
+        <!-- Entry -->
         <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="100">
-          <h3 class="text-2xl font-bold mb-4" style="color: #006847;">Plan Mensual</h3>
+          <h3 class="text-2xl font-bold mb-4" style="color: #006847;">Entry</h3>
           <div class="mb-6">
             <div style="color: #006847; font-size: 3.5rem; font-weight: 900; font-family: 'Orbitron', monospace; line-height: 1;">
               $370
@@ -604,15 +589,15 @@
             <li>✓ Inventario</li>
             <li>✓ Soporte 24/7</li>
           </ul>
-          <a href="{% country_url 'account_signup' %}?plan=mensual" class="btn-secondary inline-block w-full">Seleccionar</a>
+          <a href="{% country_url 'account_signup' %}?plan=entry" class="btn-secondary inline-block w-full">Seleccionar</a>
         </div>
 
-        <!-- Plan Semestral (MÁS POPULAR) -->
+        <!-- Growth (MÁS POPULAR) -->
         <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="200" style="transform: scale(1.05); border: 3px solid rgba(255, 255, 255, 0.6);">
           <div style="background: linear-gradient(135deg, #006847 0%, #FFFFFF 100%); color: #000; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 800; margin-bottom: 1rem; display: inline-block;">
             🏆 MÁS POPULAR
           </div>
-          <h3 class="text-2xl font-bold mb-4" style="color: #FFFFFF;">Plan Semestral</h3>
+          <h3 class="text-2xl font-bold mb-4" style="color: #FFFFFF;">Growth</h3>
           <div class="mb-6">
             <div style="color: #FFFFFF; font-size: 3.5rem; font-weight: 900; font-family: 'Orbitron', monospace; line-height: 1;">
               $2,035
@@ -628,17 +613,17 @@
             </div>
           </div>
           <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
-            <li>✓ Todo del plan mensual</li>
+            <li>✓ Todo de Entry</li>
             <li>✓ Análisis avanzados</li>
             <li>✓ Multi-sucursales</li>
             <li>✓ Prioridad en soporte</li>
           </ul>
-          <a href="{% country_url 'account_signup' %}?plan=semestral" class="btn-primary inline-block w-full">Seleccionar</a>
+          <a href="{% country_url 'account_signup' %}?plan=growth" class="btn-primary inline-block w-full">Seleccionar</a>
         </div>
 
-        <!-- Plan Anual -->
+        <!-- Business -->
         <div class="glass-card p-8" data-aos="fade-up" data-aos-delay="300">
-          <h3 class="text-2xl font-bold mb-4" style="color: #006847;">Plan Anual</h3>
+          <h3 class="text-2xl font-bold mb-4" style="color: #006847;">Business</h3>
           <div class="mb-6">
             <div style="color: #006847; font-size: 3.5rem; font-weight: 900; font-family: 'Orbitron', monospace; line-height: 1;">
               $3,700
@@ -654,12 +639,12 @@
             </div>
           </div>
           <ul class="space-y-3 text-left mb-6" style="color: #d0d0d0;">
-            <li>✓ Todo del plan semestral</li>
+            <li>✓ Todo de Growth</li>
             <li>✓ Capacitación incluida</li>
             <li>✓ API personalizada</li>
             <li>✓ Soporte dedicado</li>
           </ul>
-          <a href="{% country_url 'account_signup' %}?plan=anual" class="btn-secondary inline-block w-full">Seleccionar</a>
+          <a href="{% country_url 'account_signup' %}?plan=business" class="btn-secondary inline-block w-full">Seleccionar</a>
         </div>
 
       </div>
@@ -668,51 +653,16 @@
       <div class="glass-card p-12 mb-8" data-aos="fade-up" data-aos-delay="400">
         <h3 class="text-3xl font-bold mb-6" style="color: #FFFFFF; text-shadow: 0 0 20px rgba(255, 255, 255, 0.4);">🎁 Prueba Gratis por 30 Días</h3>
         <p class="text-xl mb-8" style="color: #d0d0d0; font-weight: 500;">
-          Sin tarjeta de crédito. Sin compromiso. Cancela cuando quieras.
+          Sin tarjeta. Sin compromiso. Cancela cuando quieras.
         </p>
       </div>
-
-      <p style="color: #a0a0a0; font-weight: 500;">
-        Más de 500 talleres confían en eGarage para gestionar sus negocios
-      </p>
     </div>
   </section>
 
   <!-- Footer -->
-  <footer class="py-12 px-4" style="border-top: 2px solid rgba(0, 104, 71, 0.3); background: linear-gradient(180deg, transparent 0%, rgba(0, 0, 0, 0.5) 100%);">
-    <div class="container mx-auto max-w-7xl">
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
-        <div>
-          <h4 class="font-futuristic text-2xl mb-4" style="color: #006847; text-shadow: 0 0 20px rgba(0, 104, 71, 0.4);">eGarage</h4>
-          <p style="color: #b0b0b0; font-weight: 500;">La plataforma definitiva para talleres mecánicos en México.</p>
-        </div>
-        <div>
-          <h5 class="font-bold mb-4" style="color: #FFFFFF;">Producto</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="#precios" style="transition: color 0.3s;" onmouseover="this.style.color='#006847'" onmouseout="this.style.color='#b0b0b0'">Precios</a></li>
-          </ul>
-        </div>
-        <div>
-          <h5 class="font-bold mb-4" style="color: #FFFFFF;">Cuenta</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="{% country_url 'account_login' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#006847'" onmouseout="this.style.color='#b0b0b0'">Ingresar</a></li>
-            <li><a href="{% country_url 'account_signup' %}" style="transition: color 0.3s;" onmouseover="this.style.color='#006847'" onmouseout="this.style.color='#b0b0b0'">Registrarse</a></li>
-          </ul>
-        </div>
-        <div>
-          <h5 class="font-bold mb-4" style="color: #FFFFFF;">Legal</h5>
-          <ul class="space-y-2" style="color: #b0b0b0;">
-            <li><a href="#" style="transition: color 0.3s;" onmouseover="this.style.color='#006847'" onmouseout="this.style.color='#b0b0b0'">Privacidad</a></li>
-            <li><a href="#" style="transition: color 0.3s;" onmouseover="this.style.color='#006847'" onmouseout="this.style.color='#b0b0b0'">Términos</a></li>
-          </ul>
-        </div>
-      </div>
-      <div class="text-center pt-8" style="border-top: 1px solid rgba(0, 104, 71, 0.2); color: #808080;">
-        <p>&copy; 2025 eGarage México. Todos los derechos reservados.</p>
-        <p class="mt-2" style="font-size: 1.2rem;">🇲🇽 Hecho con <span style="color: #CE1126;">❤️</span> para México</p>
-      </div>
-    </div>
-  </footer>
+  <footer style="border-top:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.35);padding:1rem 0;text-align:center;margin-top:auto;">
+  <span style="color:#9ca3af;font-size:0.82rem;">eGarage &bull; &copy; 2026 &bull; <a href="/legal/" style="color:#67e8f9;text-decoration:none;">Legal</a> &bull; All Rights Reserved</span>
+</footer>
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {

@@ -8,7 +8,7 @@ El script `2_actualizar_ESTRUCTURA_COMPLETA.sh` no está en el servidor.
 ### Paso 1: Conectar con FileZilla
 1. Abre **FileZilla**
 2. Conecta a:
-   - **Host**: `atlantareciclajes.pythonanywhere.com`
+   - **Host**: `atlantareciclajes`
    - **Puerto**: `22` (SFTP)
    - **Usuario**: `atlantareciclajes`
    - **Contraseña**: [tu contraseña]
@@ -21,7 +21,7 @@ El script `2_actualizar_ESTRUCTURA_COMPLETA.sh` no está en el servidor.
 - **Arrastra** el archivo al servidor
 
 ### Paso 4: Dar permisos de ejecución
-En la consola de PythonAnywhere, ejecuta:
+En la consola de DigitalOcean, ejecuta:
 
 ```bash
 cd /home/atlantareciclajes/scripts_deploy/

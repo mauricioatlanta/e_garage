@@ -1,7 +1,7 @@
 #!/bin/bash
 # ======================================================
 # Script 1: BACKUP COMPLETO
-# Para: atlantareciclajes @ PythonAnywhere
+# Para: atlantareciclajes @ DigitalOcean
 # ======================================================
 
 set -e  # Detener si hay error

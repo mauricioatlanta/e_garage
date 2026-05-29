@@ -60,9 +60,8 @@ class DocumentoForm(forms.ModelForm):
             if "tipo" in self.fields:
                 self.fields["tipo"].label = "Document Type"
                 self.fields["tipo"].choices = [
-                    ("OT", "Work Order"),
                     ("PRES", "Estimate"),
-                    ("FAC", "Invoice/Receipt"),
+                    ("FAC", "Invoice"),
                 ]
             if "cliente" in self.fields:
                 self.fields["cliente"].label = "Customer"
@@ -91,7 +90,7 @@ class DocumentoForm(forms.ModelForm):
                 self.fields["tipo"].choices = [
                     ("OT", "Orden de Trabajo"),
                     ("PRES", "Presupuesto"),
-                    ("FAC", "Factura/Boleta"),
+                    ("FAC", "Comprobante"),
                 ]
             if "cliente" in self.fields:
                 self.fields["cliente"].label = "Cliente"
@@ -121,7 +120,7 @@ class DocumentoForm(forms.ModelForm):
                 self.fields["tipo"].choices = [
                     ("OT", "Orden de Trabajo"),
                     ("PRES", "Presupuesto"),
-                    ("FAC", "Factura/Boleta"),
+                    ("FAC", "Comprobante"),
                 ]
             if "cliente" in self.fields:
                 self.fields["cliente"].label = "Cliente"

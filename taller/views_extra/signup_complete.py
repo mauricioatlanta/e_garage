@@ -1,6 +1,4 @@
 from datetime import timedelta
-from decimal import Decimal
-
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login
@@ -12,7 +10,75 @@ from django.utils.translation import activate
 
 from taller.forms.signup_complete import SignupCompleteForm
 from taller.models.empresa import Empresa
+from taller.services.trial_service import can_start_trial
 from taller.utils.pais_utils import get_configuracion_pais
+from taller.utils.plan_catalog import (
+    BILLING_MONTHLY,
+    PLAN_TRIAL,
+    PLAN_ENTRY,
+    PLAN_GROWTH,
+    PLAN_BUSINESS,
+    get_months_paid,
+    get_plan_price,
+    normalize_billing_cycle,
+    normalize_plan_code,
+)
+
+
+def _format_signup_price(country, plan_code, billing_cycle):
+    price_data = get_plan_price(country, plan_code, billing_cycle)
+    price = price_data["price"]
+    if price == price.to_integral_value():
+        formatted = f"{int(price):,}"
+        return formatted.replace(",", ".") if country == "CL" else formatted
+    return f"{price:.2f}"
+
+
+def _signup_price_context():
+    return {
+        "CL": {
+            "mensual": {
+                "valor": _format_signup_price("CL", PLAN_ENTRY, BILLING_MONTHLY),
+                "periodo": "mes",
+            },
+            "semestral": {
+                "valor": _format_signup_price("CL", PLAN_GROWTH, "semestral"),
+                "periodo": "año",
+            },
+            "anual": {
+                "valor": _format_signup_price("CL", PLAN_BUSINESS, "anual"),
+                "periodo": "año",
+            },
+        },
+        "US": {
+            "mensual": {
+                "valor": _format_signup_price("US", PLAN_ENTRY, BILLING_MONTHLY),
+                "periodo": "month",
+            },
+            "semestral": {
+                "valor": _format_signup_price("US", PLAN_GROWTH, "semestral"),
+                "periodo": "year",
+            },
+            "anual": {
+                "valor": _format_signup_price("US", PLAN_BUSINESS, "anual"),
+                "periodo": "year",
+            },
+        },
+        "MX": {
+            "mensual": {
+                "valor": _format_signup_price("MX", PLAN_ENTRY, BILLING_MONTHLY),
+                "periodo": "mes",
+            },
+            "semestral": {
+                "valor": _format_signup_price("MX", PLAN_GROWTH, "semestral"),
+                "periodo": "año",
+            },
+            "anual": {
+                "valor": _format_signup_price("MX", PLAN_BUSINESS, "anual"),
+                "periodo": "año",
+            },
+        },
+    }
 
 
 def signup_complete(request):
@@ -67,8 +133,31 @@ def signup_complete(request):
             telefono = form.cleaned_data.get("telefono") or ""
             # El país se determina desde ?from=cl o desde el formulario
             pais = form.cleaned_data.get("pais") or initial_country
-            plan = form.cleaned_data["plan"]
+            plan = normalize_plan_code(form.cleaned_data["plan"])
+            billing_cycle = normalize_billing_cycle(
+                form.cleaned_data.get("billing_cycle") or plan
+            )
             password = form.cleaned_data["password1"]
+
+            if plan == PLAN_TRIAL:
+                trial_allowed, _trial_reason = can_start_trial(
+                    type("TrialCandidate", (), {"email": email, "telefono": telefono})()
+                )
+                if not trial_allowed:
+                    form.add_error(
+                        "plan",
+                        "La prueba gratis ya fue usada para estos datos. Puedes elegir Entry, Growth o Business sin tarjeta.",
+                    )
+                    return render(
+                        request,
+                        "auth/signup.html",
+                        {
+                            "form": form,
+                            "from_country": from_country,
+                            "language_code": language_code,
+                            "precios": _signup_price_context(),
+                        },
+                    )
 
             try:
                 with transaction.atomic():
@@ -83,66 +172,11 @@ def signup_complete(request):
                     )
 
                     # 🔥 PASO 2: CONFIGURACIÓN POR PLAN
-                    plan_config = {
-                        "trial": {
-                            "dias": 30,
-                            "valores": {
-                                "BR": Decimal("0.00"),
-                                "CL": Decimal("0.00"),
-                                "MX": Decimal("0.00"),
-                                "PE": Decimal("0.00"),
-                                "US": Decimal("0.00"),
-                                "VE": Decimal("0.00"),
-                            },
-                            "suscripcion_activa": True,  # Trial activo inmediatamente
-                            "plan_nombre": "trial",
-                        },
-                        "mensual": {
-                            "dias": 30,
-                            "valores": {
-                                "BR": Decimal("100.00"),  # R$ 100 BRL
-                                "CL": Decimal("10000.00"),  # $10,000 CLP
-                                "MX": Decimal("399.00"),  # $399 MXN
-                                "PE": Decimal("70.00"),  # S/ 70 PEN
-                                "US": Decimal("20.00"),  # $20 USD
-                                "VE": Decimal("730.00"),  # Bs. 730 VES
-                            },
-                            "suscripcion_activa": False,  # Debe pagar primero
-                            "plan_nombre": "basic",
-                        },
-                        "semestral": {
-                            "dias": 180,
-                            "valores": {
-                                "BR": Decimal("500.00"),  # R$ 500 BRL
-                                "CL": Decimal("55000.00"),  # $55,000 CLP
-                                "MX": Decimal("2199.00"),  # $2,199 MXN
-                                "PE": Decimal("350.00"),  # S/ 350 PEN
-                                "US": Decimal("110.00"),  # $110 USD
-                                "VE": Decimal("3650.00"),  # Bs. 3,650 VES
-                            },
-                            "suscripcion_activa": False,
-                            "plan_nombre": "premium",
-                        },
-                        "anual": {
-                            "dias": 365,
-                            "valores": {
-                                "BR": Decimal("1000.00"),  # R$ 1,000 BRL
-                                "CL": Decimal("100000.00"),  # $100,000 CLP
-                                "MX": Decimal("3990.00"),  # $3,990 MXN
-                                "PE": Decimal("700.00"),  # S/ 700 PEN
-                                "US": Decimal("200.00"),  # $200 USD
-                                "VE": Decimal("7300.00"),  # Bs. 7,300 VES
-                            },
-                            "suscripcion_activa": False,
-                            "plan_nombre": "enterprise",
-                        },
-                    }
-
-                    config = plan_config[plan]
-
-                    # Determinar valor según país
-                    valores_por_pais = config["valores"]
-                    valor_mensual = valores_por_pais.get(pais, valores_por_pais.get("CL"))
+                    is_trial = plan == PLAN_TRIAL
+                    plan_price = get_plan_price(pais, plan, billing_cycle)
+                    valor_mensual = plan_price["price"]
+                    days_to_expire = 30 if billing_cycle == BILLING_MONTHLY else 365
+                    meses_pagados = get_months_paid(billing_cycle)
 
                     pais_config = get_configuracion_pais(type("TmpEmpresa", (), {"pais": pais})())
 
@@ -157,14 +191,14 @@ def signup_complete(request):
                         moneda=pais_config["moneda"],
                         zona_horaria=pais_config["zona_horaria_default"],
                         # Configuración del plan
-                        plan=config["plan_nombre"],
-                        dias_prueba=config["dias"],
+                        plan=plan,
+                        dias_prueba=30 if is_trial else 0,
                         valor_mensual=valor_mensual,
                         # Fechas
                         fecha_inicio=timezone.now(),
-                        fecha_fin=timezone.now() + timedelta(days=config["dias"]),
+                        fecha_fin=timezone.now() + timedelta(days=days_to_expire),
                         # Estado de suscripción
-                        suscripcion_activa=config["suscripcion_activa"],
+                        suscripcion_activa=is_trial,
                     )
 
                     # 🔥 PASO 4: VERIFICAR SI SE REQUIERE VERIFICACIÓN DE EMAIL
@@ -292,27 +326,27 @@ def signup_complete(request):
                         # Planes pagados: a página de pago
                         if pais == "BR":
                             return redirect(
-                                f"/br/pt/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
+                                f"/br/pt/suscripcion/pago/?plan={plan}&billing={billing_cycle}&amount={valor_mensual}"
                             )
                         elif pais == "CL":
                             return redirect(
-                                f"/cl/es/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
+                                f"/cl/es/suscripcion/pago/?plan={plan}&billing={billing_cycle}&amount={valor_mensual}"
                             )
                         elif pais == "MX":
                             return redirect(
-                                f"/mx/es/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
+                                f"/mx/es/suscripcion/pago/?plan={plan}&billing={billing_cycle}&amount={valor_mensual}"
                             )
                         elif pais == "PE":
                             return redirect(
-                                f"/pe/es/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
+                                f"/pe/es/suscripcion/pago/?plan={plan}&billing={billing_cycle}&amount={valor_mensual}"
                             )
                         elif pais == "VE":
                             return redirect(
-                                f"/ve/es/suscripcion/pago/?plan={plan}&amount={valor_mensual}"
+                                f"/ve/es/suscripcion/pago/?plan={plan}&billing={billing_cycle}&amount={valor_mensual}"
                             )
                         else:
                             return redirect(
-                                f"/us/en/subscription/payment/?plan={plan}&amount={valor_mensual}"
+                                f"/us/en/subscription/payment/?plan={plan}&billing={billing_cycle}&amount={valor_mensual}"
                             )
 
             except Exception as e:
@@ -328,23 +362,7 @@ def signup_complete(request):
         "form": form,
         "from_country": from_country,  # 'cl', 'us' o 'mx'
         "language_code": language_code,  # 'es' o 'en'
-        "precios": {
-            "CL": {
-                "mensual": {"valor": "10.000", "periodo": "mes"},
-                "semestral": {"valor": "55.000", "periodo": "6 meses", "ahorro": "8%"},
-                "anual": {"valor": "100.000", "periodo": "año", "ahorro": "17%"},
-            },
-            "US": {
-                "mensual": {"valor": "20", "periodo": "month"},
-                "semestral": {"valor": "110", "periodo": "6 months", "ahorro": "8%"},
-                "anual": {"valor": "200", "periodo": "year", "ahorro": "17%"},
-            },
-            "MX": {
-                "mensual": {"valor": "399", "periodo": "mes"},
-                "semestral": {"valor": "2,199", "periodo": "6 meses", "ahorro": "8%"},
-                "anual": {"valor": "3,990", "periodo": "año", "ahorro": "17%"},
-            },
-        },
+        "precios": _signup_price_context(),
     }
 
     return render(request, "auth/signup.html", context)

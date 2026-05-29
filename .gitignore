@@ -1,78 +1,169 @@
-# Python / venv
-venv/
-.venv/
+# Python
 __pycache__/
 *.py[cod]
 *.pyo
-*.pyc
-
-# Node
-node_modules/
-package-lock.json
-
-# Env / backups
-.env
-.env.*
-*.env
-*.bak_*
-*.backup_*
-*.BAK_*
-
-# Logs
-logs/*.log
-logs/*.log.*
-logs/**/*.log
-*.log
-
-# Deploy / backups / zips
-_deploy_atlantareciclajes_BACKUP_*/
-*_BACKUP_*/
-*.zip
-*.zip.backup_*
-templates_completo.zip
-templates/copy.zip
-
-# Health reports / artifacts
-logs/health_report_*.json
-tools/reports/
-tools/maintenance/
-
-# Django / DB local
-db.sqlite3
-*.sqlite3
-db.sqlite3.*
-
-# Django collectstatic / media
-staticfiles/
-media/
-
-# Test / tooling caches
+*.pyd
+*.so
+.Python
 .pytest_cache/
 .mypy_cache/
 .ruff_cache/
 .coverage
 htmlcov/
-playwright-report/
-test-results/
-.aider.tags.cache.v4/
 
-# Scripts locales / sensibles
-verificar_*.py
-diagnostico_*.py
-corregir_*.py
-CREDENCIALES_PRUEBA.md
-eg_cl_demo_20251115.json
-scripts/gmail_credentials.json
-scripts/gmail_token.json
-scripts/deploy_rapido.sh
+# Virtualenv
+venv/
+env/
+.venv/
+ENV/
 
-# Local backups / archives
-backups/templates_archive/
-backups/templates_bak/
-reports/templates_audit/
-legacy_templates/
+# Django
+staticfiles/
+media/
+company_logos/
+comprobantes/
+*.log
+local_settings.py
 
-# OS / editor
+# Databases / dumps
+*.sqlite3
+db.sqlite3*
+*.sql
+*.dump
+*.bak
+*.backup
+
+# Env / secrets
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Build/cache
+dist/
+build/
+.cache/
+tmp/
+temp/
+
+# Backups / archives / legacy
+_backup/
+_backups/
+_templates_archive/
+_disabled_templates/
+_legacy/
+archive/
+root_legacy/
+deploy_atlantareciclajes/
+deploy_pythonanywhere/
+egarage_update*/
+revision templates/
+*.BAK*
+*.bak*
+*.old
+*.orig
+*.tmp
+
+# OS / editors
 .DS_Store
 Thumbs.db
-Desktop.ini
+*.swp
+*.swo
+
+# Generated root junk
+cookies.txt
+headers_login_get.txt
+login_page.html
+document_form_corrected.html
+diagnostico_*.txt
+diagnostico_*.js
+tmp_*.py
+fix_*.py
+patch_*.py
+check_*.py
+deepseek.py
+atlantarecic
+atlantar
+atlantareciclajes@ss
+for
+from
+et
+There
+tatus
+*SecurityMiddleware*
+*MessageMiddleware*
+
+# Massive contaminated roots
+Z_BORRAR_DUPLICADOS/
+backups/
+backup_static_cleanup/
+deploy/
+deploy_atlantareciclajes/
+deploy_pythonanywhere/
+revision templates/
+actualizacion_pythonanywhere/
+egarage_update*/
+migrations_conflict_backup/
+
+# Secrets / local env
+.env.local
+.env.prod
+
+# Root garbage discovered
+There
+from
+for
+et
+tatus
+*ecurity.SecurityMiddleware*
+*sages.middleware.MessageMiddleware'*
+*.html.backup
+
+# Generated junk
+node_modules/
+logs/
+*.zip
+*.tar
+*.gz
+*.7z
+
+# Root garbage discovered after production audit
+There
+for
+from
+et
+tatus
+atlantar
+atlantarecic
+atlantareciclajes@ss
+ir agregando tus otras apps si el sitio principal falla
+ecurity.SecurityMiddleware',
+sages.middleware.MessageMiddleware',
+.path.join(BASE_DIR, 'static')
+.path.join(BASE_DIR, 'templates')],
+diagnostico_fondos_runtime.txt
+backup_20251204.html
+*.backup_error
+
+# Root sqlite/dumps/env backups
+*.sqlite3
+*.sql
+*.bak
+*.BAK*
+scripts/diagnostico_bienvenida.py
+
+# deploy local
+deploy_atlantareciclajes/
+
+# backups
+backups/
+*.BAK
+*.bak
+*.tar.gz
+company_logos/
+comprobantes/

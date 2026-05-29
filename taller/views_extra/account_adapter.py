@@ -358,110 +358,26 @@ class CountryAwareAccountAdapter(DefaultAccountAdapter):
             return "/cl/es/accounts/login/"
 
     def get_login_redirect_url(self, request):
+        next_url = request.GET.get("next") or request.POST.get("next")
+
+        if next_url:
+            next_clean = (next_url or "").strip()
+            if next_clean and next_clean not in ["/cl", "/cl/", "/us", "/us/"]:
+                return next_clean
+
+        country = "CL"
+
         try:
-            if request.user.is_authenticated and (
-                request.user.is_superuser or request.user.is_staff
-            ):
-                next_url = request.GET.get("next") or request.POST.get("next")
-                if next_url and "/admin/" in next_url:
-                    return next_url
-                elif "/admin/" in request.path:
-                    return "/admin/"
-
-            next_url = request.GET.get("next") or request.POST.get("next")
-            if next_url:
-                next_clean = (next_url or "").strip().rstrip("/") or "/"
-                if (
-                    next_clean in ("/us", "/us/", "/cl", "/cl/")
-                    or next_clean.startswith("/us?")
-                    or next_clean.startswith("/cl?")
-                ):
-                    pass
-                else:
-                    return next_url
-
-            # Prioridad: (1) empresa/perfil si autenticado (2) URL actual (3) sesión (4) request.country (5) GET (6) CL.
-            # USA subscriber usando /cl/accounts/login/ debe ir a /us/en/workspace/, no Chile.
-            country = None
-            path = (request.path or "").lower()
-
-            # PRIORIDAD 1: Usuario autenticado - país de su empresa (USA subscriber → USA workspace)
             if request.user.is_authenticated:
                 empresa = getattr(request.user, "empresa", None)
-                country = (
-                    self._normalize_country(getattr(empresa, "pais", None)) if empresa else None
-                )
-                if not country:
-                    perfil = getattr(request.user, "perfil", None)
-                    country = (
-                        self._normalize_country(getattr(perfil, "pais", None)) if perfil else None
-                    )
-
-            # PRIORIDAD 2: Path actual (/us/login/ → US)
-            if not country and path.startswith("/us/"):
-                country = "US"
-            elif not country and path.startswith("/cl/"):
-                country = "CL"
-
-            # PRIORIDAD 3: Sesión
-            if not country:
-                session_country = (request.session.get("country") or "").strip().upper()
-                if session_country in ("US", "USA"):
-                    country = "US"
-                elif session_country in ("CL",):
-                    country = "CL"
-
-            # PRIORIDAD 4: request.country (middleware)
-            if not country:
-                country = self._normalize_country(getattr(request, "country", None))
-
-            # PRIORIDAD 5: GET country
-            if not country:
-                country = self._normalize_country(request.GET.get("country"))
-
-            if not country:
-                country = "CL"
-
-            if country == "US":
-                meta_us = self.COUNTRY_MAP["US"]
-                activate(meta_us["lang"])
-                try:
-                    request.session["django_language"] = meta_us["lang"]
-                    request.session["country"] = meta_us["ns"]
-                except Exception:
-                    pass
-                try:
-                    return reverse("us_en:centro_trabajo")
-                except Exception:
-                    return "/us/en/workspace/"
-
-            meta = self.COUNTRY_MAP.get(country, self.COUNTRY_MAP["CL"])
-            activate(meta["lang"])
-
-            try:
-                request.session["django_language"] = meta["lang"]
-                request.session["country"] = meta["ns"]
-            except Exception:
-                pass
-
-            default_view = meta.get("default_url_name", "centro_operaciones")
-            try:
-                return self._reverse_by_country(country, default_view)
-            except Exception:
-                if country == "US":
-                    return "/us/en/workspace/"
-                return "/cl/es/workspace/"
+                if empresa and getattr(empresa, "pais", None):
+                    pais = str(empresa.pais).upper()
+                    if pais in ("US", "USA"):
+                        country = "US"
         except Exception:
-            # No caer siempre en Chile: usar path/sesión para decidir destino.
-            try:
-                path = (request.path or "").lower()
-                if path.startswith("/us/"):
-                    return "/us/en/workspace/"
-                if (request.session.get("country") or "").strip().lower() in ("us", "usa"):
-                    return "/us/en/workspace/"
-            except Exception:
-                pass
-            try:
-                return self._reverse_by_country("CL", "centro_trabajo")
-            except Exception:
-                return "/cl/es/workspace/"
+            pass
+
+        if country == "US":
+            return "/us/en/workspace/"
+
+        return "/cl/es/workspace/"

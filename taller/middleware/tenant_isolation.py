@@ -7,7 +7,6 @@ import logging
 
 from django.shortcuts import redirect
 
-from taller.models import Empresa
 from taller.utils.login_exempt import is_login_exempt_path
 
 logger = logging.getLogger(__name__)
@@ -51,48 +50,30 @@ class TenantIsolationMiddleware:
             request.empresa = None
             return request
 
-        # Obtener empresa del usuario
-        try:
-            empresa = request.user.empresa
-            request.empresa = empresa
+        # request.empresa ya fue resuelto por EmpresaResolverMiddleware
+        # (resuelve owner OneToOne y TeamMember activo).
+        empresa = getattr(request, "empresa", None)
 
-            # Verificar que la empresa esté activa
-            if hasattr(empresa, "debe_bloquear") and empresa.debe_bloquear:
-                if not self.is_exempt_url(request.path):
-                    logger.warning(
-                        f"Intento de acceso bloqueado para usuario {request.user.username} "
-                        f"(empresa: {empresa.id}, path: {request.path})"
-                    )
-                    return redirect("suspension")
+        if empresa is None:
+            logger.warning(
+                f"Usuario {request.user.username} sin empresa al llegar a "
+                f"TenantIsolationMiddleware — path: {request.path}"
+            )
+            return request
 
-            # Log para auditoría (solo en rutas críticas)
-            if self.is_critical_path(request.path):
-                logger.info(
-                    f"Acceso: usuario={request.user.username}, "
-                    f"empresa={empresa.id}, path={request.path}"
-                )
-
-        except AttributeError:
-            # Usuario sin empresa asignada
-            request.empresa = None
-
-            # Bloquear acceso a rutas privadas
-            if not self.is_public_url(request.path) and not self.is_exempt_url(request.path):
+        if hasattr(empresa, "debe_bloquear") and empresa.debe_bloquear:
+            if not self.is_exempt_url(request.path):
                 logger.warning(
-                    f"Usuario {request.user.username} intentó acceder sin empresa: {request.path}"
+                    f"Acceso bloqueado: usuario={request.user.username} "
+                    f"empresa={empresa.id} path={request.path}"
                 )
-                # Redirigir a página de configuración o mostrar error
-                if request.path.startswith("/admin/"):
-                    # Permitir admin sin empresa
-                    pass
-                else:
-                    # Para usuarios normales, bloquear acceso
-                    # Podrías redirigir a una página de "configurar empresa"
-                    pass
+                return redirect("suspension")
 
-        except Empresa.DoesNotExist:
-            request.empresa = None
-            logger.warning(f"Usuario {request.user.username} no tiene empresa asociada")
+        if self.is_critical_path(request.path):
+            logger.info(
+                f"Acceso: usuario={request.user.username}, "
+                f"empresa={empresa.id}, path={request.path}"
+            )
 
         return request
 

@@ -21,7 +21,12 @@ def company_header(request):
             )
             data = {
                 "COMPANY_ID": empresa.id,
-                "COMPANY_NAME": cfg.nombre_publico or getattr(empresa, "nombre", "eGarage"),
+                "COMPANY_NAME": (
+                    cfg.nombre_publico
+                    or getattr(empresa, "nombre_taller", "")
+                    or getattr(empresa, "empresa", "")
+                    or "eGarage"
+                ),
                 "COMPANY_TAGLINE": cfg.tagline or "",
                 "COMPANY_LOGO": getattr(cfg.logo, "url", "") if cfg.logo else "",
                 "COMPANY_ADDRESS": cfg.direccion or "",

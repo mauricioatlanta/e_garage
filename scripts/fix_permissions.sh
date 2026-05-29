@@ -204,7 +204,7 @@ echo ""
 print_success "El servidor web (uwsgi) ahora debería poder leer los templates"
 echo ""
 print_step "Próximos pasos:"
-echo "  1. Recargar WSGI: touch /var/www/www_atlantareciclajes_pythonanywhere_com_wsgi.py"
+echo "  1. Recargar WSGI: touch /var/www/www_atlantareciclajes_digitalocean_com_wsgi.py"
 echo "  2. Probar URL: https://www.egarage.cl/us/es/bienvenida/"
 echo ""
 

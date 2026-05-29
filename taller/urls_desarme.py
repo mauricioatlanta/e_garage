@@ -52,6 +52,7 @@ try:
             name="generar_inventario",
         ),
         path("vehiculos/<int:pk>/editar/", views.editar_vehiculo, name="editar_vehiculo"),
+        path("vehiculos/<int:pk>/dar-de-baja/", views.dar_de_baja_vehiculo, name="dar_de_baja_vehiculo"),
         path(
             "vehiculos/<int:pk>/inventario/", views.inventario_vehiculo, name="inventario_vehiculo"
         ),
@@ -59,6 +60,11 @@ try:
             "vehiculos/<int:pk>/inventario-inteligente/",
             inventario_inteligente,
             name="inventario_inteligente",
+        ),
+        path(
+            "piezas/vender/",
+            views.iniciar_venta_desde_lista,
+            name="iniciar_venta_desde_lista",
         ),
         path(
             "vehiculos/<int:pk>/vender/",

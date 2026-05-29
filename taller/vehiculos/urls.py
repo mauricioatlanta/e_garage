@@ -51,6 +51,12 @@ urlpatterns = [
     ),
     path("<int:vehiculo_id>/", views.ver_vehiculo, name="ver_vehiculo"),
     path("<int:vehiculo_id>/editar/", views.editar_vehiculo, name="editar_vehiculo"),
+
+    path(
+        "<int:vehiculo_id>/imagenes/subir/",
+        views.subir_imagenes_vehiculo,
+        name="subir_imagenes_vehiculo",
+    ),
     path(
         "<int:vehiculo_id>/eliminar/",
         views.eliminar_vehiculo,

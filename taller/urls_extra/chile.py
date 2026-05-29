@@ -85,7 +85,7 @@ urlpatterns = [
     ),
     # Login y password (allauth) bajo /cl/es/accounts/ para conservar país e idioma.
     # EXCEPCIÓN histórica: accounts/login/ aquí (no redirect) para evitar ERR_TOO_MANY_REDIRECTS.
-    path("accounts/login/", country_aware_login),
+    path("accounts/login/", country_aware_login, name="account_login"),
     # Misma superficie que allauth bajo /accounts/, sin 302 a /accounts/... (se pierde país/idioma).
     path(
         "accounts/password/reset/",
@@ -119,11 +119,9 @@ urlpatterns = [
         lambda r: redirect("/cl/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_signup_cl_es",
     ),
-    # Login para suscriptores de Chile (redirige al login global, pero aquí puedes poner una vista personalizada si lo deseas)
     path(
         "login/",
-        TemplateView.as_view(template_name="registration/login.html"),
-        name="account_login",
+        lambda r: redirect("/cl/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
     ),
     # Activación de trial para Chile
     path("activar-trial/", activar_trial, name="activar_trial"),

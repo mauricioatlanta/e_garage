@@ -56,7 +56,7 @@ MIDDLEWARE = [
     # 1. Seguridad (primero)
     "django.middleware.security.SecurityMiddleware",
     # 2. Sesiones (antes de autenticación)
-    "taller.middleware.safe_session.SafeSessionMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
     # 2b. Redirigir /accounts/login/ → /cl/accounts/login/ (evita UY por sesión)
     "taller.middleware.force_accounts_to_cl.ForceAccountsToCLMiddleware",
     # 3. Localización (antes de CommonMiddleware)
@@ -75,7 +75,7 @@ MIDDLEWARE = [
     # 10. Middlewares personalizados (orden específico)
     # "taller.middleware.country_url_migration.CountryURLRedirectMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.force_home_test.ForceHomeTestMiddleware",  # DESHABILITADO - Ya verificamos que funciona
-    "taller.middleware.empresa_middleware.EmpresaMiddleware",
+    "taller.middleware.empresa_resolver.EmpresaResolverMiddleware",
     # "gestion_taller.middleware.country_prefix.EnforceCountryPrefixMiddleware",  # DESHABILITADO - Causa bucles infinitos
     # "taller.middleware.country_context.CountryContextMiddleware",  # DESHABILITADO - Causa bucles infinitos con /es/
     # "taller.middleware.fix_language_middleware.FixLanguageMiddleware",  # DESHABILITADO - Causa bucles infinitos
@@ -138,6 +138,7 @@ TEMPLATES = [
                 "taller.context_processors.panel_chrome.us_authenticated_compact_chrome",
                 "taller.context_processors.panel_chrome.us_signup_slim_header",
                 "taller.context_processors.ui_labels.ui_labels_context",
+                "taller.context_processors.subscription_notice.subscription_notice",
             ],
         },
     },
@@ -229,7 +230,7 @@ ACCOUNT_ADAPTER = "taller.views_extra.account_adapter.CountryAwareAccountAdapter
 DEFAULT_FROM_EMAIL = (os.getenv("DEFAULT_FROM_EMAIL") or "support@egarage.cl").strip()
 SERVER_EMAIL = (os.getenv("SERVER_EMAIL") or DEFAULT_FROM_EMAIL).strip()
 SUPPORT_EMAIL = (os.getenv("SUPPORT_EMAIL") or DEFAULT_FROM_EMAIL).strip()
-EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
+# EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
 EMAIL_HOST_USER = SUPPORT_EMAIL  # Compatibilidad con código/tests legacy que aún lo consultan
 EMAIL_TIMEOUT = int(os.getenv("EMAIL_TIMEOUT", "30"))
 RESEND_API_KEY = (os.environ.get("RESEND_API_KEY") or "").strip()
@@ -309,3 +310,7 @@ else:
             "taller": {"handlers": ["console"], "level": "INFO"},
         },
     }
+
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "gestion_taller.resend_backend.ResendBackend")
+RESEND_API_KEY = (os.getenv("RESEND_API_KEY") or "").strip()
+DEFAULT_FROM_EMAIL = (os.getenv("DEFAULT_FROM_EMAIL") or "support@egarage.cl").strip()

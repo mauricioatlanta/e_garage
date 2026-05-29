@@ -148,7 +148,7 @@ if [ $? -eq 0 ]; then
     echo "======================================================"
     echo ""
     echo "📝 Próximos pasos:"
-    echo "   1. Recarga la aplicación en el panel de PythonAnywhere"
+    echo "   1. Recarga la aplicación en el panel de DigitalOcean"
     echo "   2. Prueba acceder a las rutas de IA"
     echo ""
 else

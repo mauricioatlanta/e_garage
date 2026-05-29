@@ -4,10 +4,13 @@ from math import ceil
 
 import pytz
 
+from dateutil.relativedelta import relativedelta
 from django.conf import settings
 from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.utils import timezone
+
+from taller.utils.plan_catalog import PLAN_BUSINESS, PLAN_ENTRY, PLAN_GROWTH, PLAN_TRIAL
 
 # Si usas Django ≥4, evita pytz y usa zoneinfo:
 # from zoneinfo import ZoneInfo
@@ -16,7 +19,16 @@ from django.utils import timezone
 
 class Empresa(models.Model):
     PLAN_CHOICES = [
-        ("trial", "Prueba Gratuita"),
+        # Nombres canónicos internos
+        (PLAN_TRIAL, "Trial"),
+        (PLAN_ENTRY, "Entry"),
+        (PLAN_GROWTH, "Growth"),
+        (PLAN_BUSINESS, "Business"),
+        # Nombres de negocio (UI: Express / Taller / Pro)
+        ("express", "Express (1 usuario)"),
+        ("taller", "Taller (hasta 4 usuarios)"),
+        ("pro", "Pro (hasta 10 usuarios)"),
+        # Legacy
         ("basic", "Plan Básico"),
         ("premium", "Plan Premium"),
         ("enterprise", "Plan Empresarial"),
@@ -299,6 +311,11 @@ class Empresa(models.Model):
             plan: Plan de suscripción (opcional)
             enviar_notificacion: Si True, envía notificación de renovación (Email + WhatsApp)
         """
+        if plan:
+            from taller.utils.plan_catalog import normalize_plan_code
+
+            plan = normalize_plan_code(plan)
+
         # Guardar estado anterior para detectar tipo de evento
         plan_anterior = self.plan
         es_nueva_suscripcion = not self.suscripcion_activa or self.plan == "trial"
@@ -432,7 +449,7 @@ class Empresa(models.Model):
 
         Args:
             user_email: Email del usuario al que se le otorga la cortesía
-            duration_months: Duración en meses (1, 6 o 12)
+            duration_months: Duración en meses. El admin puede usar cualquier entero entre 1 y 60.
             reason: Razón de la cortesía (opcional)
             admin_user: Usuario administrador que ejecuta la acción (opcional)
 
@@ -459,22 +476,17 @@ class Empresa(models.Model):
         except cls.DoesNotExist:
             raise ValueError(f"Empresa asociada al usuario '{user_email}' no encontrada")
 
-        # Validar duración
-        valid_durations = [1, 6, 12]
-        if duration_months not in valid_durations:
+        # Validar duración. Es una acción administrativa, no un catálogo público de planes.
+        try:
+            duration_months = int(duration_months)
+        except (TypeError, ValueError):
+            raise ValueError("Duración inválida. Debe ser un número entero de meses.")
+        if duration_months < 1 or duration_months > 60:
             raise ValueError(
-                f"Duración inválida. Debe ser 1, 6 o 12 meses. Recibido: {duration_months}"
+                f"Duración inválida. Debe estar entre 1 y 60 meses. Recibido: {duration_months}"
             )
 
         # 2. Calcular la extensión
-        # Calcular días según meses
-        days_map = {
-            1: 30,
-            6: 180,
-            12: 365,
-        }
-        dias_a_anadir = days_map[duration_months]
-
         # Obtener fecha base (actual o fecha_fin si es futura)
         fecha_base = (
             empresa.fecha_fin
@@ -483,7 +495,8 @@ class Empresa(models.Model):
         )
 
         # Calcular nueva fecha de expiración
-        nueva_fecha_fin = fecha_base + timedelta(days=dias_a_anadir)
+        nueva_fecha_fin = fecha_base + relativedelta(months=duration_months)
+        dias_a_anadir = max((nueva_fecha_fin - fecha_base).days, 1)
 
         # Guardar estado anterior para auditoría
         datos_antes = {
@@ -611,3 +624,18 @@ class Empresa(models.Model):
                 name="uq_empresa_telefono_present",
             ),
         ]
+
+    # Campo de control para la política de retención de 6 meses
+    fecha_baja = models.DateTimeField(
+        null=True, 
+        blank=True, 
+        help_text="Fecha exacta de cancelación o suspensión para calcular la purga de datos a los 180 días"
+    )
+
+    @property
+    def activa_y_vigente(self):
+        if not self.suscripcion_activa:
+            return False
+        if self.fecha_fin and timezone.now() > self.fecha_fin:
+            return False
+        return True

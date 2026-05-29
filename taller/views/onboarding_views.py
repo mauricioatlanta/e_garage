@@ -1,3 +1,4 @@
+import subprocess
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.db import transaction
@@ -193,6 +194,35 @@ def onboarding_guardar_paso(request, paso):
                 )
 
             elif paso == 3:  # Finalizar
+
+                cargar_demo = (
+                    str(request.POST.get("cargar_demo", ""))
+                    .lower()
+                    .strip()
+                    in ["1", "true", "on", "yes", "si"]
+                )
+
+                if cargar_demo:
+                    try:
+                        subprocess.run(
+                            [
+                                "python",
+                                "manage.py",
+                                "seed_demo_mauricio",
+                                "--email",
+                                request.user.email,
+                            ],
+                            cwd="/srv/egarage",
+                            check=True,
+                        )
+                    except Exception as e:
+                        return JsonResponse(
+                            {
+                                "success": False,
+                                "error": f"ERROR_CARGA_DEMO: {e}",
+                            }
+                        )
+
                 empresa.onboarding_completado = True
                 empresa.onboarding_completed_at = timezone.now()
                 empresa.save(update_fields=["onboarding_completado", "onboarding_completed_at"])

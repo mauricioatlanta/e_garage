@@ -73,7 +73,7 @@ def mostrar_enlaces_finales():
     print("🌐 ENLACES DE BIENVENIDA EN PRODUCCIÓN")
     print("=" * 60)
 
-    base_url = "https://e-garage-atlantareciclajes.pythonanywhere.com"
+    base_url = "https://e-garage-atlantareciclajes"
 
     enlaces = [
         ("Chile", f"{base_url}/bienvenida/cl/", "🇨🇱"),

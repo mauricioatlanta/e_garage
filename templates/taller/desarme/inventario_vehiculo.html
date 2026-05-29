@@ -4,7 +4,7 @@
 {% load humanize %}
 
 {% block page_title %}{% trans "Inventario" %} – {{ vehiculo.patente|default:vehiculo.vin|default:vehiculo.id }}{% endblock %}
-{% block page_subtitle %}{% trans "Piezas del vehículo — selección para venta" %}{% endblock %}
+{% block page_subtitle %}{% trans "Repuestos del vehículo — selección para venta" %}{% endblock %}
 {% block page_icon %}📦{% endblock %}
 
 {% block page_extra_css %}
@@ -262,7 +262,7 @@
     🔧 {% trans "Detalle vehículo" %}
   </a>
   <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-outline">
-    ➕ {% trans "Nueva pieza" %}
+    ➕ {% trans "Nueva repuesto" %}
   </a>
   <a href="{% country_url 'desarme:lista_vehiculos' %}" class="btn-action btn-action-outline">
     ← {% trans "Vehículos" %}
@@ -271,9 +271,9 @@
 {% endblock %}
 
 {% block panel_content %}
-{% if piezas %}
+{% if repuestos %}
 <div
-  x-data="inventarioUltra({ items: JSON.parse('{{ piezas_json|escapejs }}') })"
+  x-data="inventarioUltra({ items: JSON.parse('{{ repuestos_json|escapejs }}') })"
   x-init="editUrlPattern = $el.getAttribute('data-edit-pattern') || ''; labelApiUrlPattern = $el.getAttribute('data-label-api-pattern') || ''; currentLang = $el.getAttribute('data-current-lang') || 'es'"
   data-edit-pattern="{% country_url 'desarme:editar_pieza' 0 %}"
   data-label-api-pattern="{% country_url 'desarme:api_pieza_label_empresa_guardar' 0 %}"
@@ -298,7 +298,7 @@
               {% trans "Inventario inteligente" %}
             </h2>
             <p class="mt-1 text-sm text-slate-400">
-              {% trans "Selecciona piezas tocando las fichas. Busca, filtra y vende sin salir de pantalla." %}
+              {% trans "Selecciona repuestos tocando las fichas. Busca, filtra y vende sin salir de pantalla." %}
             </p>
           </div>
 
@@ -444,7 +444,7 @@
       <div>
         <template x-if="filteredItems.length === 0">
           <div class="rounded-2xl border border-dashed border-cyan-400/20 bg-slate-900/50 p-10 text-center text-slate-400">
-            {% trans "No hay piezas con esos criterios." %}
+            {% trans "No hay repuestos con esos criterios." %}
           </div>
         </template>
 
@@ -736,19 +736,19 @@
 </div>
 {% else %}
 <div class="glass-panel p-10 text-center">
-  <p class="text-lg mb-2" style="color:#e2e8f0 !important;">{% trans "Este vehículo no tiene piezas registradas." %}</p>
-  <p class="text-sm mb-6" style="color:#94a3b8 !important;">{% trans "Abre el escáner HUD o agrega piezas manualmente." %}</p>
+  <p class="text-lg mb-2" style="color:#e2e8f0 !important;">{% trans "Este vehículo no tiene repuestos registradas." %}</p>
+  <p class="text-sm mb-6" style="color:#94a3b8 !important;">{% trans "Abre el escáner HUD o agrega repuestos manualmente." %}</p>
   <div class="flex flex-wrap justify-center gap-4">
     <a href="{% country_url 'desarme:scanner_vehiculo' vehiculo.pk %}" class="btn-scanner-cta">📡 {% trans "Escáner" %}</a>
     <a href="{% country_url 'desarme:generar_inventario' vehiculo.pk %}" class="btn-action btn-action-cyan">{% trans "Generar inventario" %}</a>
-    <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-outline">➕ {% trans "Agregar pieza" %}</a>
+    <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-outline">➕ {% trans "Agregar repuesto" %}</a>
   </div>
 </div>
 {% endif %}
 {% endblock %}
 
 {% block page_extra_js %}
-{% if piezas %}
+{% if repuestos %}
 <script>
 document.addEventListener('alpine:init', function() {
   Alpine.data('inventarioUltra', function(config) {

@@ -13,7 +13,12 @@ from django.views.decorators.http import require_GET, require_POST
 
 from taller.models.clientes import Cliente
 from taller.models.documento import Documento
-from taller.models.extras_vehiculo import CajaVehiculo, MotorVehiculo
+from taller.models.extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
 from taller.models.pieza_desarme import ESTADO_DISPONIBLE, ESTADO_RESERVADA, PiezaDesarme
 from taller.models.repuesto import Repuesto
 from taller.models.tienda import Tienda
@@ -79,6 +84,15 @@ def _format_item(obj, fmt="default"):
         return {"id": obj.pk, "text": nombre}
     else:
         return {"id": obj.pk, "nombre": nombre}
+
+
+def _format_private_item(obj, fmt="default"):
+    """Formatea item privado con ID prefijado para no colisionar con IDs globales."""
+    item_id = f"empresa:{obj.pk}"
+    nombre = getattr(obj, "nombre", str(obj))
+    if fmt == "select2":
+        return {"id": item_id, "text": f"{nombre} (privado)"}
+    return {"id": item_id, "nombre": nombre, "privado": True}
 
 
 def _get_modelo_cls(country: str):
@@ -147,6 +161,15 @@ def buscar_motores_api(request):
 
     paginated = _paginate(qs.order_by("nombre"), request)
     data = [_format_item(m, fmt) for m in paginated["queryset"]]
+    if empresa:
+        private_qs = MotorVehiculoEmpresa.objects.filter(
+            empresa=empresa,
+            modelo_id=modelo_id,
+            country=country,
+        )
+        if q:
+            private_qs = private_qs.filter(nombre__icontains=q)
+        data.extend(_format_private_item(m, fmt) for m in private_qs.order_by("nombre"))
     return JsonResponse({"results": data, "pagination": paginated["pagination"]})
 
 
@@ -196,6 +219,15 @@ def buscar_cajas_api(request):
 
     paginated = _paginate(qs.order_by("nombre"), request)
     data = [_format_item(c, fmt) for c in paginated["queryset"]]
+    if empresa:
+        private_qs = CajaVehiculoEmpresa.objects.filter(
+            empresa=empresa,
+            modelo_id=modelo_id,
+            country=country,
+        )
+        if q:
+            private_qs = private_qs.filter(nombre__icontains=q)
+        data.extend(_format_private_item(c, fmt) for c in private_qs.order_by("nombre"))
     return JsonResponse({"results": data, "pagination": paginated["pagination"]})
 
 

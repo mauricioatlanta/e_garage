@@ -49,8 +49,10 @@
     }
 
     function hydrateRepuestos(rows) {
+        console.log('[DESARME] hydrateRepuestos: rows.length=', rows.length, ' window.addRepuestoRow=', typeof window.addRepuestoRow);
         rows.forEach(function(rep) {
             if (typeof window.addRepuestoRow !== 'function') {
+                console.warn('[DESARME] window.addRepuestoRow no disponible — fila saltada');
                 return;
             }
 
@@ -71,6 +73,15 @@
                 costo_linea: rep.costo_linea != null ? rep.costo_linea : 0
             });
         });
+
+        if (window.DESARME_PREFILL && rows.length > 0) {
+            try {
+                sessionStorage.setItem('eg_desarme_rows_backup', JSON.stringify({
+                    rows: rows,
+                    savedAt: Date.now()
+                }));
+            } catch (e) {}
+        }
     }
 
     function hydrateServicios(rows) {
@@ -120,7 +131,7 @@
             return;
         }
 
-        if (window.FORCE_NEW_DOCUMENT || (EG.state && EG.state.isCleanMode && EG.state.isCleanMode())) {
+        if (!window.DESARME_PREFILL && ((window.FORCE_NEW_DOCUMENT) || (EG.state && EG.state.isCleanMode && EG.state.isCleanMode()))) {
             clearRows();
             form.dataset.egLineItemsHydrated = '1';
             return;
@@ -149,12 +160,17 @@
     }
 
     function init() {
-        hydrateLineItems();
+        if (!window.DESARME_PREFILL) {
+            hydrateLineItems();
+        }
     }
 
     EG.lineItemsBootstrap = {
         clearRows: clearRows,
         hydrateLineItems: hydrateLineItems,
+        hydrateRepuestos: hydrateRepuestos,
+        hydrateServicios: hydrateServicios,
+        hydrateOtros: hydrateOtros,
         init: init
     };
 })();

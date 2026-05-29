@@ -350,7 +350,7 @@ body {
     <div class="glass-card">
         <!-- Logo -->
         <div class="logo-section">
-            <img src="{% static 'img/egarage_logo.png' %}" alt="eGarage Logo" class="logo">
+            <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="logo">
             <div class="brand-name">eGarage</div>
             <div class="subtitle">Gestión Profesional Automotriz</div>
         </div>
@@ -419,54 +419,63 @@ body {
                     {% endif %}
                 </div>
 
+                <div class="form-group">
+                    <label class="form-label">Elige mensual o anual</label>
+                    {{ form.billing_cycle }}
+                    {% if form.billing_cycle.errors %}
+                    <div class="error-message">{{ form.billing_cycle.errors }}</div>
+                    {% endif %}
+                    <div class="help-text">Ahorra pagando anual. Cancela cuando quieras.</div>
+                </div>
+
                 <!-- Pricing Cards -->
                 <div class="pricing-grid">
                     <!-- Trial -->
                     <div class="plan-card" data-plan="trial" onclick="selectPlan('trial')">
                         <div class="plan-badge">GRATIS</div>
-                        <div class="plan-name">Prueba</div>
+                        <div class="plan-name">Trial</div>
                         <div class="plan-price">$0</div>
-                        <div class="plan-period">30 días</div>
+                        <div class="plan-period">30 días gratis</div>
                         <ul class="plan-features">
                             <li>Acceso completo</li>
-                            <li>Sin tarjeta de crédito</li>
-                            <li>Cancela en cualquier momento</li>
+                            <li>Sin tarjeta</li>
+                            <li>Cancela cuando quieras</li>
                         </ul>
                     </div>
 
-                    <!-- Mensual -->
-                    <div class="plan-card" data-plan="mensual" onclick="selectPlan('mensual')">
-                        <div class="plan-name">Mensual</div>
-                        <div class="plan-price">$20.000</div>
-                        <div class="plan-period">/ mes</div>
+                    <!-- Entry -->
+                    <div class="plan-card" data-plan="entry" onclick="selectPlan('entry')">
+                        <div class="plan-name">Entry</div>
+                        <div class="plan-price">$20</div>
+                        <div class="plan-period">mensual / anual</div>
                         <ul class="plan-features">
-                            <li>Usuarios ilimitados</li>
+                            <li>1 usuario</li>
                             <li>Todas las características</li>
                         </ul>
                     </div>
 
-                    <!-- Semestral -->
-                    <div class="plan-card recommended" data-plan="semestral" onclick="selectPlan('semestral')">
-                        <div class="plan-badge gold">⭐ MEJOR VALOR</div>
-                        <div class="plan-name">Semestral</div>
-                        <div class="plan-price">$100.000</div>
-                        <div class="plan-period">/ 6 meses</div>
-                        <div class="plan-savings">Ahorra 17%</div>
+                    <!-- Growth -->
+                    <div class="plan-card recommended" data-plan="growth" onclick="selectPlan('growth')">
+                        <div class="plan-badge gold">⭐ Ahorra pagando anual</div>
+                        <div class="plan-name">Growth</div>
+                        <div class="plan-price">$100</div>
+                        <div class="plan-period">mensual / anual</div>
+                        <div class="plan-savings">Ahorra pagando anual</div>
                         <ul class="plan-features">
-                            <li>Todo del plan Mensual</li>
+                            <li>Todo de Entry</li>
                             <li>Soporte priorizado</li>
                         </ul>
                     </div>
 
-                    <!-- Anual -->
-                    <div class="plan-card" data-plan="anual" onclick="selectPlan('anual')">
-                        <div class="plan-badge gold">💎 MEJOR PRECIO</div>
-                        <div class="plan-name">Anual</div>
-                        <div class="plan-price">$200.000</div>
-                        <div class="plan-period">/ año</div>
-                        <div class="plan-savings">Ahorra 17%</div>
+                    <!-- Business -->
+                    <div class="plan-card" data-plan="business" onclick="selectPlan('business')">
+                        <div class="plan-badge gold">💎 Ahorra pagando anual</div>
+                        <div class="plan-name">Business</div>
+                        <div class="plan-price">$69</div>
+                        <div class="plan-period">mensual / anual</div>
+                        <div class="plan-savings">Ahorra pagando anual</div>
                         <ul class="plan-features">
-                            <li>Todo del plan Semestral</li>
+                            <li>Todo de Growth</li>
                             <li>Mejor valor</li>
                         </ul>
                     </div>

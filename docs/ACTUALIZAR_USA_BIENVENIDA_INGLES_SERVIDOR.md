@@ -29,9 +29,9 @@ Sube los que correspondan a la **estructura que use tu servidor** (raíz del pro
 
 `lang_policy.py` es código Python: **el proceso tiene que recargarse** o seguirá usando la versión anterior.
 
-### PythonAnywhere
+### DigitalOcean
 ```bash
-# En la consola de PythonAnywhere, o vía:
+# En la consola de DigitalOcean, o vía:
 touch /var/www/egarage/ tmp/restart.txt
 # (ajusta la ruta a la de tu proyecto)
 ```

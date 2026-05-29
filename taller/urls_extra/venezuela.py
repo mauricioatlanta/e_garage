@@ -43,6 +43,11 @@ urlpatterns = [
         country_aware_login,
         name="account_login",
     ),
+    path(
+        "login/",
+        lambda r: redirect("/ve/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        name="account_login_short",
+    ),
     # Signup Venezuela - redirect a signup universal con parámetro from=ve
     path(
         "accounts/signup/",

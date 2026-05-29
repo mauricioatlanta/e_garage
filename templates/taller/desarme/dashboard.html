@@ -4,7 +4,7 @@
 {% load humanize %}
 
 {% block page_title %}{% trans "Desarme" %} – {% trans "Centro de Operaciones" %}{% endblock %}
-{% block page_subtitle %}{% trans "Yarda de desarmaduría · Gestión de vehículos y piezas" %}{% endblock %}
+{% block page_subtitle %}{% trans "Yarda de desarmaduría · Gestión de vehículos y repuestos" %}{% endblock %}
 {% block page_icon %}🧩{% endblock %}
 
 {% block page_extra_css %}
@@ -107,6 +107,7 @@
     letter-spacing: 0.03em;
   }
   .desarme-table td {
+    color: #e2e8f0;
     padding: 0.35rem 0.5rem;
     border-top: 1px solid rgba(255, 255, 255, 0.06);
   }
@@ -167,7 +168,7 @@
     ➕ {% trans "Nuevo vehículo" %}
   </a>
   <a href="{% country_url 'desarme:crear_pieza' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-cyan-600/85 hover:bg-cyan-500 text-white text-xs font-semibold">
-    📦 {% trans "Nueva pieza" %}
+    📦 {% trans "Nueva repuesto" %}
   </a>
 </div>
 {% endblock %}
@@ -176,12 +177,12 @@
 <div class="desarme-nav">
   <a href="{% country_url 'desarme:index' %}" class="active">{% trans "Dashboard" %}</a>
   <a href="{% country_url 'desarme:lista_vehiculos' %}">🚗 {% trans "Vehículos" %}</a>
-  <a href="{% country_url 'desarme:lista_piezas' %}">📦 {% trans "Piezas" %}</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}">📦 {% trans "Repuestos" %}</a>
 </div>
 <div class="kpi-grid">
   <div class="kpi-card"><div class="kpi-value">{{ total_vehiculos }}</div><div class="kpi-label">{% trans "Vehículos" %}</div></div>
-  <div class="kpi-card"><div class="kpi-value">{{ total_piezas }}</div><div class="kpi-label">{% trans "Piezas" %}</div></div>
-  <div class="kpi-card"><div class="kpi-value">{{ piezas_activas }}</div><div class="kpi-label">{% trans "Activas" %}</div></div>
+  <div class="kpi-card"><div class="kpi-value">{{ total_repuestos }}</div><div class="kpi-label">{% trans "Repuestos" %}</div></div>
+  <div class="kpi-card"><div class="kpi-value">{{ repuestos_activas }}</div><div class="kpi-label">{% trans "Activas" %}</div></div>
   <div class="kpi-card"><div class="kpi-value">
     {% if request.path|slice:":4" == "/us/" %}
       ${{ inventario_valor|floatformat:2|intcomma }}
@@ -196,10 +197,10 @@
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
   <div>
     <div class="chart-box">
-      <h3>📊 {% trans "Piezas por estado" %}</h3>
-      {% if chart_piezas_estado %}
+      <h3>📊 {% trans "Repuestos por estado" %}</h3>
+      {% if chart_repuestos_estado %}
       <div class="chart-canvas-wrap">
-        <canvas id="chartPiezasEstado"></canvas>
+        <canvas id="chartRepuestosEstado"></canvas>
       </div>
       {% else %}
       <div class="empty-chart">{% trans "Sin datos para graficar" %}</div>
@@ -226,13 +227,13 @@
     <h3>🚗 {% trans "Últimos vehículos" %}</h3>
     {% if ultimos_vehiculos %}
     <table class="desarme-table">
-      <thead><tr><th>{% trans "Patente/VIN" %}</th><th>{% trans "Marca/Modelo" %}</th><th>{% trans "Piezas" %}</th><th></th></tr></thead>
+      <thead><tr><th>{% trans "Patente/VIN" %}</th><th>{% trans "Marca/Modelo" %}</th><th>{% trans "Repuestos" %}</th><th></th></tr></thead>
       <tbody>
       {% for v in ultimos_vehiculos %}
       <tr>
         <td><strong>{{ v.patente|default:v.vin|default:"—" }}</strong></td>
         <td>{{ v.get_marca_display|default:"-" }} {{ v.get_modelo_display|default:"" }}</td>
-        <td>{{ v.piezas_count }}</td>
+        <td>{{ v.repuestos_count }}</td>
         <td>
           <a href="{% country_url 'desarme:ver_vehiculo' v.pk %}">{% trans "Ver" %}</a> ·
           <a href="{% country_url 'desarme:inventario_vehiculo' v.pk %}">📦</a>
@@ -248,12 +249,12 @@
     {% endif %}
   </div>
   <div class="chart-box">
-    <h3>📦 {% trans "Últimas piezas" %}</h3>
-    {% if ultimas_piezas %}
+    <h3>📦 {% trans "Últimas repuestos" %}</h3>
+    {% if ultimas_repuestos %}
     <table class="desarme-table">
       <thead><tr><th>{% trans "Código" %}</th><th>{% trans "Nombre" %}</th><th>{% trans "Estado" %}</th><th></th></tr></thead>
       <tbody>
-      {% for p in ultimas_piezas %}
+      {% for p in ultimas_repuestos %}
       <tr>
         <td><strong>{{ p.codigo }}</strong></td>
         <td>{{ p.nombre|truncatechars:25 }}</td>
@@ -265,7 +266,7 @@
     </table>
     <a href="{% country_url 'desarme:lista_piezas' %}" class="text-cyan-400 hover:text-cyan-300 text-xs mt-1.5 inline-block">{% trans "Ver todas" %} →</a>
     {% else %}
-    <div class="empty-chart">{% trans "No hay piezas registradas" %}</div>
+    <div class="empty-chart">{% trans "No hay repuestos registradas" %}</div>
     <a href="{% country_url 'desarme:crear_pieza' %}" class="text-cyan-400 hover:text-cyan-300 text-xs">{% trans "Registrar la primera" %}</a>
     {% endif %}
   </div>
@@ -273,18 +274,18 @@
 {% endblock %}
 
 {% block page_extra_js %}
-{% if chart_piezas_estado or chart_vehiculos_mes %}
-{{ chart_piezas_estado|json_script:"chartPiezasData" }}
+{% if chart_repuestos_estado or chart_vehiculos_mes %}
+{{ chart_repuestos_estado|json_script:"chartRepuestosData" }}
 {{ chart_vehiculos_mes|json_script:"chartVehiculosData" }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
   const colorsRgba = ['rgba(34, 197, 94, 0.8)', 'rgba(234, 179, 8, 0.8)', 'rgba(59, 130, 246, 0.8)', 'rgba(239, 68, 68, 0.8)', 'rgba(107, 114, 128, 0.8)'];
 
-  var elPie = document.getElementById('chartPiezasData');
+  var elPie = document.getElementById('chartRepuestosData');
   if (elPie) {
     var data = JSON.parse(elPie.textContent);
-    var ctxPie = document.getElementById('chartPiezasEstado');
+    var ctxPie = document.getElementById('chartRepuestosEstado');
     if (ctxPie && data && data.length > 0) {
       new Chart(ctxPie, {
         type: 'doughnut',
