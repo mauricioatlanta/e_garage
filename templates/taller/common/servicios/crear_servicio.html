@@ -67,15 +67,15 @@
         {% if form.nombre.errors %}<p class="cs-error">{{ form.nombre.errors.0 }}</p>{% endif %}
       </div>
 
-      <div class="cs-field">
-        <label for="{{ form.subcategoria.id_for_label }}">{% if language == 'en' %}Subcategory{% else %}Subcategoría{% endif %} <span class="req">*</span></label>
-        <select name="{{ form.subcategoria.name }}" id="{{ form.subcategoria.id_for_label }}" required {% if form.subcategoria.errors %}style="border-color:#f87171"{% endif %}>
-          <option value="">{% if language == 'en' %}Select a subcategory...{% else %}Selecciona una subcategoría...{% endif %}</option>
-          {% for subcat in form.subcategoria.field.queryset %}
-          <option value="{{ subcat.id }}" {% if form.subcategoria.value == subcat.id %}selected{% endif %} data-categoria="{{ subcat.categoria.code }}">{{ subcat.get_label|default:subcat.code }}</option>
+            <div class="cs-field">
+        <label for="{{ form.categoria.id_for_label }}">{% if language == 'en' %}Category{% else %}Categoría{% endif %} <span class="req">*</span></label>
+        <select name="{{ form.categoria.name }}" id="{{ form.categoria.id_for_label }}" required {% if form.categoria.errors %}style="border-color:#f87171"{% endif %}>
+          <option value="">{% if language == 'en' %}Select a category...{% else %}Selecciona una categoría...{% endif %}</option>
+          {% for cat in form.categoria.field.queryset %}
+          <option value="{{ cat.id }}" {% if form.categoria.value == cat.id %}selected{% endif %}>{{ cat.get_label|default:cat.code }}</option>
           {% endfor %}
         </select>
-        {% if form.subcategoria.errors %}<p class="cs-error">{{ form.subcategoria.errors.0 }}</p>{% endif %}
+        {% if form.categoria.errors %}<p class="cs-error">{{ form.categoria.errors.0 }}</p>{% endif %}
       </div>
 
       <div class="cs-field">
