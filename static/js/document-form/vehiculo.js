@@ -144,7 +144,28 @@
         }
     }
 
+    function showNoVehiclesForClient() {
+        var emptyEl = document.getElementById('vehiculo-empty');
+        if (!emptyEl) return;
+        if (emptyEl.querySelector('.vehiculo-empty-cta')) return;
+        var cta = document.createElement('button');
+        cta.type = 'button';
+        cta.className = 'doc-action-btn doc-action-btn--cyan vehiculo-empty-cta';
+        cta.style.marginTop = '8px';
+        cta.innerHTML = '<span aria-hidden="true">+</span> <span>' + (EG.I18N.add_vehicle || 'Agregar vehículo') + '</span>';
+        cta.addEventListener('click', function() { openVehiculoModal(); });
+        emptyEl.appendChild(cta);
+    }
+
+    function hideNoVehiclesForClient() {
+        var emptyEl = document.getElementById('vehiculo-empty');
+        if (!emptyEl) return;
+        var cta = emptyEl.querySelector('.vehiculo-empty-cta');
+        if (cta) cta.remove();
+    }
+
     function resetSelection() {
+        hideNoVehiclesForClient();
         var els = getElements();
         if (els.vehiculoSelect) {
             els.vehiculoSelect.innerHTML = '';
@@ -285,9 +306,11 @@
                 setVehicleOptions([], '', '');
                 els.vehiculoSelect.options[0].textContent = EG.I18N.no_vehicles || 'No vehicles registered';
                 els.vehiculoSelect.dataset.source = 'empty';
+                showNoVehiclesForClient();
                 return;
             }
 
+            hideNoVehiclesForClient();
             setVehicleOptions(items, vehiculoIdToSelect, preferredLabel);
             els.vehiculoSelect.dataset.source = 'fetch';
             if (vehiculoIdToSelect) {
