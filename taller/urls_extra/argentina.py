@@ -24,7 +24,6 @@ from django.urls import include, path
 from django.shortcuts import redirect, render
 from django.template import loader, TemplateDoesNotExist
 from django.views.generic import TemplateView
-from taller.views.country_aware_auth import country_aware_login
 
 
 def argentina_home(request):
@@ -56,6 +55,7 @@ from taller.views_extra.views_configuracion import (
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.documentos import views_country_aware as views_documentos
 from taller.views_extra.custom_signup import CustomSignupView
+from taller.views.country_aware_auth import country_aware_login
 
 # Configuración de logging para este módulo
 logger = logging.getLogger(__name__)
@@ -92,7 +92,7 @@ urlpatterns = [
         TemplateView.as_view(template_name="ar/es/onboarding/bienvenida.html"),
         name="bienvenida_argentina_alt",
     ),
-    path("accounts/login/", country_aware_login, name="account_login"),
+    # Redirect /ar/accounts/* y /ar/es/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
     path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
     path(
         "accounts/", lambda r: redirect("/accounts/" + ("?" + r.GET.urlencode() if r.GET else ""))
@@ -109,9 +109,11 @@ urlpatterns = [
         lambda r: redirect("/ar/es/accounts/signup/" + ("?" + r.GET.urlencode() if r.GET else "")),
         name="account_signup_ar",
     ),
+    # Login para suscriptores de Argentina
     path(
         "login/",
-        lambda r: redirect("/ar/es/accounts/login/" + ("?" + r.GET.urlencode() if r.GET else "")),
+        country_aware_login,
+        name="account_login",
     ),
     # Activación de trial para Argentina
     path("activar-trial/", activar_trial, name="activar_trial"),
