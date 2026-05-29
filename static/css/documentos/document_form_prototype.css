@@ -1134,6 +1134,7 @@
 
   #document-form #doc-shell .doc-lines-container--parts .repuesto-row-grid {
     min-width: 640px;
+    grid-template-columns: minmax(92px, 0.8fr) minmax(210px, 1.98fr) minmax(58px, 0.44fr) minmax(92px, 0.72fr) minmax(86px, 0.68fr) minmax(72px, 0.5fr) !important;
   }
 
   #document-form #doc-shell .servicio-row-layout,

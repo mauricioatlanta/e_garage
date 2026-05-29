@@ -541,8 +541,25 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     var kmInput = document.getElementById('id_kilometraje_ingreso');
-    if (kmInput && !kmInput.getAttribute('placeholder')) {
-        kmInput.setAttribute('placeholder', 'km');
+    if (kmInput) {
+        if (!kmInput.getAttribute('placeholder')) {
+            kmInput.setAttribute('placeholder', 'km');
+        }
+        kmInput.addEventListener('blur', function() {
+            var raw = String(this.value || '').replace(/[^0-9]/g, '');
+            if (!raw) return;
+            var num = parseInt(raw, 10);
+            if (!isNaN(num)) {
+                var country = (window.EG && EG.cfg && EG.cfg.country) || 'CL';
+                var locales = { CL:'es-CL', MX:'es-MX', AR:'es-AR', PE:'es-PE', US:'en-US' };
+                var locale = locales[country] || 'es-CL';
+                this.value = new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(num);
+            }
+        });
+        kmInput.addEventListener('focus', function() {
+            var raw = String(this.value || '').replace(/[^0-9]/g, '');
+            this.value = raw;
+        });
     }
 
     function buildContextualCreateUrl(baseUrl, params) {
