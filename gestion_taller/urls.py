@@ -266,6 +266,7 @@ urlpatterns = [
     # Página de inicio - Selección de país
     path("", TemplateView.as_view(template_name="landing/seleccionar_pais.html"), name="home"),
     # Panel de administración de suscriptores (ANTES de admin.site.urls para que no sea capturado)
+    path("cl/admin/subcriptores/", include("taller.urls_admin_suscriptores")),
     path("admin/suscriptores/", admin_suscriptores, name="admin_suscriptores"),
     path(
         "admin/suscriptores/<int:empresa_id>/", detalle_suscriptor, name="admin_detalle_suscriptor"
