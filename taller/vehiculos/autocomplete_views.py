@@ -219,7 +219,7 @@ class MotorAutocomplete(autocomplete.Select2ListView):
             if self.q:
                 private_qs = private_qs.filter(nombre__icontains=self.q)
             results.extend(
-                (f"empresa:{obj.pk}", f"{obj.nombre} (privado)")
+                (f"empresa:{obj.pk}", obj.nombre)
                 for obj in private_qs.order_by("nombre")
             )
 
@@ -264,7 +264,7 @@ class CajaAutocomplete(autocomplete.Select2ListView):
             if self.q:
                 private_qs = private_qs.filter(nombre__icontains=self.q)
             results.extend(
-                (f"empresa:{obj.pk}", f"{obj.nombre} (privada)")
+                (f"empresa:{obj.pk}", obj.nombre)
                 for obj in private_qs.order_by("nombre")
             )
 
