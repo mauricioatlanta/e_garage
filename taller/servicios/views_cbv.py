@@ -47,7 +47,7 @@ class ServicioDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
 class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
     model = Servicio
     template_name = "taller/common/servicios/crear_servicio.html"
-    fields = ["nombre", "categoria", "precio_base"]
+    fields = ["nombre", "categoria"]
 
     def get_template_names(self):
         return ["taller/common/servicios/crear_servicio.html", "servicios/crear_servicio.html"]
@@ -72,20 +72,23 @@ class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
 
     def get_form(self, form_class=None):
         form = super().get_form(form_class)
-        try:
-            from taller.servicios.views import _detectar_pais
-            country_code = _detectar_pais(self.request)
-        except Exception:
-            country_code = 'CL'
+        from taller.utils.country import get_country_for_request
+        country_code = get_country_for_request(self.request) if hasattr(self.request, 'empresa') else None
+        if not country_code:
+            try:
+                from taller.servicios.views import _detectar_pais
+                country_code = _detectar_pais(self.request)
+            except Exception:
+                country_code = 'CL'
+        if 'subcategoria' in form.fields:
+            form.fields['subcategoria'].queryset = SubcategoriaServicio.objects.filter(
+                country=country_code
+            ).order_by('orden', 'code')
         if 'categoria' in form.fields:
             from taller.servicios.models import CategoriaServicio
-            EXCLUDE_CODES = ['ELECTRICO','FRENOS','MANT','electrico','frenos','motor',
-                             'suspension','transmision','emergencias','especiales']
-            qs = CategoriaServicio.objects.filter(
+            form.fields['categoria'].queryset = CategoriaServicio.objects.filter(
                 country=country_code
-            ).exclude(code__in=EXCLUDE_CODES).order_by('orden', 'code')
-            form.fields['categoria'].queryset = qs
-            form.fields['categoria'].label_from_instance = lambda obj: obj.get_label()
+            ).order_by('orden', 'code')
         return form
 
     def get_context_data(self, **kwargs):

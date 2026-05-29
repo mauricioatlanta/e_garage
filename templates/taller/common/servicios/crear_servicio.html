@@ -67,40 +67,22 @@
         {% if form.nombre.errors %}<p class="cs-error">{{ form.nombre.errors.0 }}</p>{% endif %}
       </div>
 
-            <div class="cs-field">
-        <label for="{{ form.categoria.id_for_label }}">{% if language == 'en' %}Category{% else %}Categoría{% endif %} <span class="req">*</span></label>
-        <select name="{{ form.categoria.name }}" id="{{ form.categoria.id_for_label }}" required {% if form.categoria.errors %}style="border-color:#f87171"{% endif %}>
-          <option value="">{% if language == 'en' %}Select a category...{% else %}Selecciona una categoría...{% endif %}</option>
-          {% for cat in form.categoria.field.queryset %}
-          <option value="{{ cat.id }}" {% if form.categoria.value == cat.id %}selected{% endif %}>{{ cat.get_label|default:cat.code }}</option>
+      <div class="cs-field">
+        <label for="{{ form.subcategoria.id_for_label }}">{% if language == 'en' %}Subcategory{% else %}Subcategoría{% endif %} <span class="req">*</span></label>
+        <select name="{{ form.subcategoria.name }}" id="{{ form.subcategoria.id_for_label }}" required {% if form.subcategoria.errors %}style="border-color:#f87171"{% endif %}>
+          <option value="">{% if language == 'en' %}Select a subcategory...{% else %}Selecciona una subcategoría...{% endif %}</option>
+          {% for subcat in form.subcategoria.field.queryset %}
+          <option value="{{ subcat.id }}" {% if form.subcategoria.value == subcat.id %}selected{% endif %} data-categoria="{{ subcat.categoria.code }}">{{ subcat.get_label|default:subcat.code }}</option>
           {% endfor %}
         </select>
-        {% if form.categoria.errors %}<p class="cs-error">{{ form.categoria.errors.0 }}</p>{% endif %}
+        {% if form.subcategoria.errors %}<p class="cs-error">{{ form.subcategoria.errors.0 }}</p>{% endif %}
       </div>
 
-      <div class="cs-field">
-        <label for="{{ form.precio_base.id_for_label }}">{% if language == 'en' %}Base price{% else %}Precio base{% endif %}</label>
-        <div class="cs-price-wrap">
-          <span class="cs-sym">$</span>
-          <input type="number" step="0.01" min="0" name="{{ form.precio_base.name }}" id="{{ form.precio_base.id_for_label }}" value="{{ form.precio_base.value|default:'' }}" placeholder="{% if language == 'en' %}Optional{% else %}Opcional{% endif %}">
-        </div>
+      
         {% if form.precio_base.errors %}<p class="cs-error">{{ form.precio_base.errors.0 }}</p>{% endif %}
       </div>
 
-      <hr class="cs-divider">
-
-      {% if language == 'en' %}
-      <div class="cs-field">
-        <label for="{{ form.nombre_en.id_for_label }}">Name (English)</label>
-        <input type="text" name="{{ form.nombre_en.name }}" id="{{ form.nombre_en.id_for_label }}" value="{{ form.nombre_en.value|default:'' }}" placeholder="English translation">
-        {% if form.nombre_en.errors %}<p class="cs-error">{{ form.nombre_en.errors.0 }}</p>{% endif %}
-      </div>
-      {% else %}
-      <div class="cs-field">
-        <label for="{{ form.nombre_es.id_for_label }}">Nombre (Español)</label>
-        <input type="text" name="{{ form.nombre_es.name }}" id="{{ form.nombre_es.id_for_label }}" value="{{ form.nombre_es.value|default:'' }}" placeholder="Traducción en español">
-        {% if form.nombre_es.errors %}<p class="cs-error">{{ form.nombre_es.errors.0 }}</p>{% endif %}
-      </div>
+      
       {% endif %}
 
       <div class="cs-actions">
