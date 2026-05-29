@@ -280,11 +280,11 @@
               id="btn-nuevo-vehiculo-empty"
               href="{% country_url 'vehiculos:crear_vehiculo' %}?return_to={{ request.get_full_path|urlencode }}&select_field=vehiculo&cliente_id="
               data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}"
-              class="doc-action-btn doc-action-btn--cyan"
+              class="doc-action-btn doc-action-btn--cyan hidden"
               style="margin-left:auto"
             >
               <span aria-hidden="true">+</span>
-              <span>Nuevo vehículo</span>
+              <span>Nuevo vehículo para este cliente</span>
             </a>
           </div>
         </section>
