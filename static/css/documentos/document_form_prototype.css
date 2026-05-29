@@ -1126,7 +1126,16 @@
     display: none;
   }
 
-  #document-form #doc-shell .repuesto-row-grid,
+  /* En pantallas pequeñas: scroll horizontal en vez de colapsar a columna única */
+  #document-form #doc-shell .doc-lines-container--parts {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #document-form #doc-shell .doc-lines-container--parts .repuesto-row-grid {
+    min-width: 640px;
+  }
+
   #document-form #doc-shell .servicio-row-layout,
   #document-form #doc-shell .otro-row-layout {
     grid-template-columns: minmax(0, 1fr) !important;
