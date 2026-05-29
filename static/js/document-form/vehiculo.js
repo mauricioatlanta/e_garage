@@ -216,7 +216,9 @@
 
         var labelText = item.label || buildVehicleLabel(item);
         var vinText = item.vin ? ('VIN: ' + item.vin) : '';
-        var mileageText = item.mileage || '';
+        var mileageText = item.mileage
+            ? (EG.utils && EG.utils.formatMileage ? EG.utils.formatMileage(item.mileage) : String(item.mileage))
+            : '';
         var metaText = item.meta || '';
         var hasSummaryDetails = false;
 
