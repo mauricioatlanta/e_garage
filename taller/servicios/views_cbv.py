@@ -70,6 +70,41 @@ class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantVie
 
         return super().form_valid(form)
 
+    def get_form(self, form_class=None):
+        form = super().get_form(form_class)
+        from taller.utils.country import get_country_for_request
+        country_code = get_country_for_request(self.request) if hasattr(self.request, 'empresa') else None
+        if not country_code:
+            try:
+                from taller.servicios.views import _detectar_pais
+                country_code = _detectar_pais(self.request)
+            except Exception:
+                country_code = 'CL'
+        if 'subcategoria' in form.fields:
+            form.fields['subcategoria'].queryset = SubcategoriaServicio.objects.filter(
+                country=country_code
+            ).order_by('orden', 'code')
+        if 'categoria' in form.fields:
+            from taller.servicios.models import CategoriaServicio
+            form.fields['categoria'].queryset = CategoriaServicio.objects.filter(
+                country=country_code
+            ).order_by('orden', 'code')
+        return form
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        try:
+            from taller.servicios.views import _detectar_pais
+            from django.utils.translation import get_language
+            from taller.servicios.views import COUNTRY_LANGUAGE_MAP
+            country_code = _detectar_pais(self.request)
+            request_lang = get_language() or 'es'
+            context['language'] = COUNTRY_LANGUAGE_MAP.get(country_code, request_lang[:2])
+        except Exception:
+            context['language'] = 'es'
+        context['return_to'] = self.request.GET.get('return_to', '')
+        return context
+
     def get_default_success_url(self):
         return reverse_country_url(self.request, "servicios:servicios_menu")
 
