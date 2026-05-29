@@ -47,7 +47,7 @@ class ServicioDetailView(LoginRequiredMixin, TenantViewMixin, DetailView):
 class ServicioCreateView(ContextReturnCreateMixin, LoginRequiredMixin, TenantViewMixin, CreateView):
     model = Servicio
     template_name = "taller/common/servicios/crear_servicio.html"
-    fields = ["nombre", "categoria", "subcategoria", "precio_base"]
+    fields = ["nombre", "categoria"]
 
     def get_template_names(self):
         return ["taller/common/servicios/crear_servicio.html", "servicios/crear_servicio.html"]
