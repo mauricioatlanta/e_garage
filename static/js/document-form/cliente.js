@@ -60,6 +60,23 @@
         if (els.clienteInfoBox) {
             els.clienteInfoBox.classList.toggle('hidden', !data.id);
         }
+        // Actualizar botón "Nuevo vehículo para este cliente" con el cliente seleccionado
+        var btnEmpty = document.getElementById('btn-nuevo-vehiculo-empty');
+        if (btnEmpty) {
+            if (data.id) {
+                var baseUrl = btnEmpty.dataset.urlCrearVehiculo || '';
+                if (baseUrl) {
+                    var params = new URLSearchParams(window.location.search || '');
+                    params.set('select_field', 'vehiculo');
+                    params.set('cliente_id', String(data.id));
+                    params.set('return_to', window.location.pathname + (window.location.search || ''));
+                    btnEmpty.href = baseUrl + '?' + params.toString();
+                }
+                btnEmpty.classList.remove('hidden');
+            } else {
+                btnEmpty.classList.add('hidden');
+            }
+        }
     }
 
     function clearSelection() {
