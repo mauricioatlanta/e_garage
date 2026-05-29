@@ -91,7 +91,7 @@ def _format_private_item(obj, fmt="default"):
     item_id = f"empresa:{obj.pk}"
     nombre = getattr(obj, "nombre", str(obj))
     if fmt == "select2":
-        return {"id": item_id, "text": f"{nombre} (privado)"}
+        return {"id": item_id, "text": nombre}
     return {"id": item_id, "nombre": nombre, "privado": True}
 
 
