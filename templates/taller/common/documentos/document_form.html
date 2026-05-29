@@ -276,6 +276,16 @@
               <strong>Sin vehículo seleccionado</strong>
               <p>Seleccione un vehículo para ver información</p>
             </div>
+            <a
+              id="btn-nuevo-vehiculo-empty"
+              href="{% country_url 'vehiculos:crear_vehiculo' %}?return_to={{ request.get_full_path|urlencode }}&select_field=vehiculo&cliente_id="
+              data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}"
+              class="doc-action-btn doc-action-btn--cyan"
+              style="margin-left:auto"
+            >
+              <span aria-hidden="true">+</span>
+              <span>Nuevo vehículo</span>
+            </a>
           </div>
         </section>
       </div>
