@@ -3,8 +3,8 @@
  * Gestiona el caché y permite funcionamiento offline
  */
 
-const CACHE_NAME = 'egarage-v1';
-const RUNTIME_CACHE = 'egarage-runtime-v1';
+const CACHE_NAME = 'egarage-v3';
+const RUNTIME_CACHE = 'egarage-runtime-v3';
 
 // Archivos estáticos críticos para el funcionamiento inicial
 const STATIC_CACHE_FILES = [
@@ -93,6 +93,11 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Nunca cachear endpoints AJAX — siempre pasar directo a la red
+    if (url.pathname.includes('/ajax/')) {
+        return;
+    }
+
     // Determinar estrategia según el tipo de recurso
     const isStatic = CACHE_STRATEGIES.static.some(pattern => pattern.test(url.pathname));
     const isDynamic = CACHE_STRATEGIES.dynamic.some(pattern => pattern.test(url.pathname));
@@ -150,24 +155,27 @@ async function cacheFirst(request) {
 async function networkFirst(request) {
     try {
         const networkResponse = await fetch(request);
-        
-        // Si la respuesta es exitosa, actualizar caché
+
+        // Guardar en caché sin bloquear — si falla el caché, igual retornamos la respuesta de red
         if (networkResponse.ok) {
-            const cache = await caches.open(RUNTIME_CACHE);
-            cache.put(request, networkResponse.clone());
+            try {
+                const cache = await caches.open(RUNTIME_CACHE);
+                await cache.put(request, networkResponse.clone());
+            } catch (_cacheErr) {
+                // Ignorar errores de caché — no afecta la respuesta
+            }
         }
 
         return networkResponse;
     } catch (error) {
         console.log('[Service Worker] Network failed, trying cache:', error);
-        
-        // Si falla la red, buscar en caché
+
+        // Solo usar caché si la red falló completamente
         const cachedResponse = await caches.match(request);
         if (cachedResponse) {
             return cachedResponse;
         }
 
-        // Si no hay caché, devolver página offline genérica
         return new Response('Offline', {
             status: 503,
             statusText: 'Service Unavailable',
