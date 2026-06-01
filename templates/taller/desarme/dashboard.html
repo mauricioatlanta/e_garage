@@ -159,6 +159,75 @@
     padding-bottom: 0.35rem;
     font-size: 0.75rem;
   }
+  /* Charts compact row */
+  .charts-row {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  @media (max-width: 640px) {
+    .charts-row { grid-template-columns: 1fr; }
+  }
+  .donut-widget {
+    background: rgba(0,0,0,0.28);
+    border: 1px solid rgba(168,85,247,0.22);
+    border-radius: 10px;
+    padding: 0.65rem 0.7rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+  }
+  .donut-widget h3 { font-size: 0.75rem; color: #c084fc; font-weight: 600; margin: 0; }
+  .donut-canvas-wrap { position: relative; height: 110px; }
+  .donut-metrics { display: flex; gap: 0.5rem; }
+  .donut-metric { flex: 1; background: rgba(168,85,247,0.1); border-radius: 6px; padding: 0.3rem 0.4rem; text-align: center; }
+  .donut-metric .val { font-size: 0.9rem; font-weight: 700; color: #c084fc; line-height: 1.2; }
+  .donut-metric .lbl { font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.03em; }
+  /* Vehicle cards */
+  .vehs-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.6rem;
+    margin-top: 0.1rem;
+  }
+  .veh-card {
+    background: rgba(0,0,0,0.32);
+    border: 1px solid rgba(168,85,247,0.22);
+    border-radius: 10px;
+    padding: 0.6rem 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: stretch;
+    gap: 0.6rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .veh-card:hover {
+    border-color: rgba(168,85,247,0.45);
+    box-shadow: 0 2px 14px rgba(168,85,247,0.1);
+  }
+  .veh-card-left { flex: 1; min-width: 0; }
+  .veh-card-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; min-width: 90px; }
+  .veh-ident { font-size: 0.95rem; font-weight: 800; color: #e2e8f0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .veh-model { font-size: 0.78rem; color: #94a3b8; margin-top: 0.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .veh-pills { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.35rem; }
+  .veh-pill { font-size: 0.62rem; padding: 2px 6px; border-radius: 9999px; line-height: 1.4; }
+  .veh-pill.repuestos { background: rgba(168,85,247,0.2); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.3); }
+  .veh-pill.disp { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.25); }
+  .veh-pill.fecha { background: rgba(100,116,139,0.2); color: #94a3b8; border: 1px solid rgba(100,116,139,0.25); }
+  .veh-card-links { margin-top: 0.4rem; display: flex; gap: 0.4rem; }
+  .veh-card-links a { font-size: 0.7rem; color: #67e8f9; text-decoration: none; }
+  .veh-card-links a:hover { text-decoration: underline; }
+  /* Ganancia badge */
+  .ganancia-badge { font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 9999px; white-space: nowrap; }
+  .ganancia-badge.pos { background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
+  .ganancia-badge.neg { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
+  .ganancia-badge.neu { background: rgba(100,116,139,0.2); color: #94a3b8; border: 1px solid rgba(100,116,139,0.3); }
+  /* Progress bar */
+  .stock-bar-wrap { width: 100%; margin-top: 0.5rem; }
+  .stock-bar-label { font-size: 0.62rem; color: #64748b; text-align: right; margin-bottom: 2px; }
+  .stock-bar-track { height: 5px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden; }
+  .stock-bar-fill { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, #a855f7, #7c3aed); transition: width 0.4s ease; }
 </style>
 {% endblock %}
 
@@ -194,82 +263,107 @@
 {% endblock %}
 
 {% block panel_content %}
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
-  <div>
-    <div class="chart-box">
-      <h3>📊 {% trans "Repuestos por estado" %}</h3>
-      {% if chart_repuestos_estado %}
-      <div class="chart-canvas-wrap">
-        <canvas id="chartRepuestosEstado"></canvas>
+{# Charts: donut widget (220px) + bar chart side by side #}
+<div class="charts-row">
+  <div class="donut-widget">
+    <h3>📊 {% trans "Repuestos" %}</h3>
+    {% if chart_repuestos_estado %}
+    <div class="donut-canvas-wrap">
+      <canvas id="chartRepuestosEstado"></canvas>
+    </div>
+    {% else %}
+    <div class="empty-chart">{% trans "Sin datos" %}</div>
+    {% endif %}
+    <div class="donut-metrics">
+      <div class="donut-metric">
+        <div class="val">{{ total_repuestos }}</div>
+        <div class="lbl">{% trans "Total" %}</div>
       </div>
-      {% else %}
-      <div class="empty-chart">{% trans "Sin datos para graficar" %}</div>
-      {% endif %}
+      <div class="donut-metric">
+        <div class="val">{{ repuestos_activas }}</div>
+        <div class="lbl">{% trans "Activas" %}</div>
+      </div>
     </div>
   </div>
-  <div>
-    <div class="chart-box">
-      <h3>📈 {% trans "Vehículos por mes (ingresos)" %}</h3>
-      {% if chart_vehiculos_mes %}
-      <div class="chart-canvas-wrap">
-        <canvas id="chartVehiculosMes"></canvas>
-      </div>
-      {% else %}
-      <div class="empty-chart">{% trans "Sin ingresos en los últimos 6 meses" %}</div>
-      {% endif %}
+  <div class="chart-box" style="margin-bottom:0;">
+    <h3>📈 {% trans "Vehículos ingresados por mes" %}</h3>
+    {% if chart_vehiculos_mes %}
+    <div class="chart-canvas-wrap">
+      <canvas id="chartVehiculosMes"></canvas>
     </div>
+    {% else %}
+    <div class="empty-chart">{% trans "Sin ingresos en los últimos 6 meses" %}</div>
+    {% endif %}
   </div>
 </div>
 
-<div class="section-title">📋 {% trans "Actividad reciente" %}</div>
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-3 lg:gap-4">
-  <div class="chart-box">
-    <h3>🚗 {% trans "Últimos vehículos" %}</h3>
-    {% if ultimos_vehiculos %}
-    <table class="desarme-table">
-      <thead><tr><th>{% trans "Patente/VIN" %}</th><th>{% trans "Marca/Modelo" %}</th><th>{% trans "Repuestos" %}</th><th></th></tr></thead>
-      <tbody>
-      {% for v in ultimos_vehiculos %}
-      <tr>
-        <td><strong>{{ v.patente|default:v.vin|default:"—" }}</strong></td>
-        <td>{{ v.get_marca_display|default:"-" }} {{ v.get_modelo_display|default:"" }}</td>
-        <td>{{ v.repuestos_count }}</td>
-        <td>
-          <a href="{% country_url 'desarme:ver_vehiculo' v.pk %}">{% trans "Ver" %}</a> ·
-          <a href="{% country_url 'desarme:inventario_vehiculo' v.pk %}">📦</a>
-        </td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-    <a href="{% country_url 'desarme:lista_vehiculos' %}" class="text-cyan-400 hover:text-cyan-300 text-xs mt-1.5 inline-block">{% trans "Ver todos" %} →</a>
-    {% else %}
-    <div class="empty-chart">{% trans "No hay vehículos" %}</div>
-    <a href="{% country_url 'desarme:crear_vehiculo' %}" class="text-cyan-400 hover:text-cyan-300 text-xs">{% trans "Crear el primero" %}</a>
-    {% endif %}
+{# Vehicle cards #}
+<div class="section-title">🚗 {% trans "Últimos vehículos" %}</div>
+{% if ultimos_vehiculos %}
+<div class="vehs-grid">
+  {% for item in ultimos_vehiculos %}
+  {% with v=item.vehiculo %}
+  <div class="veh-card">
+    <div class="veh-card-left">
+      <div class="veh-ident">{{ v.patente|default:v.vin|default:"—" }}</div>
+      <div class="veh-model">{{ v.get_marca_display }} {{ v.get_modelo_display }}{% if v.anio %} · {{ v.anio }}{% endif %}</div>
+      <div class="veh-pills">
+        <span class="veh-pill repuestos">📦 {{ item.repuestos_count }} {% trans "piezas" %}</span>
+        {% if item.piezas_disponibles %}<span class="veh-pill disp">✓ {{ item.piezas_disponibles }} {% trans "disp." %}</span>{% endif %}
+        {% if v.fecha_ingreso_desarme %}<span class="veh-pill fecha">{{ v.fecha_ingreso_desarme|date:"d/m/y" }}</span>{% endif %}
+      </div>
+      <div class="veh-card-links">
+        <a href="{% country_url 'desarme:ver_vehiculo' v.pk %}">{% trans "Ver" %}</a>
+        <a href="{% country_url 'desarme:inventario_vehiculo' v.pk %}">📦 {% trans "Inventario" %}</a>
+      </div>
+    </div>
+    <div class="veh-card-right">
+      {% if item.ganancia > 0 %}
+        <span class="ganancia-badge pos">+${{ item.ganancia|floatformat:0|intcomma }}</span>
+      {% elif item.ganancia < 0 %}
+        <span class="ganancia-badge neg">-${{ item.ganancia|floatformat:0|intcomma|slice:"1:" }}</span>
+      {% else %}
+        <span class="ganancia-badge neu">{% trans "Sin ventas" %}</span>
+      {% endif %}
+      <div class="stock-bar-wrap">
+        <div class="stock-bar-label">{{ item.pct_vendido }}% {% trans "vendido" %}</div>
+        <div class="stock-bar-track">
+          <div class="stock-bar-fill" style="width:{{ item.pct_vendido }}%"></div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="chart-box">
-    <h3>📦 {% trans "Últimas repuestos" %}</h3>
-    {% if ultimas_repuestos %}
-    <table class="desarme-table">
-      <thead><tr><th>{% trans "Código" %}</th><th>{% trans "Nombre" %}</th><th>{% trans "Estado" %}</th><th></th></tr></thead>
-      <tbody>
-      {% for p in ultimas_repuestos %}
-      <tr>
-        <td><strong>{{ p.codigo }}</strong></td>
-        <td>{{ p.nombre|truncatechars:25 }}</td>
-        <td><span class="badge-mini {{ p.estado_pieza|lower|slice:":4" }}">{{ p.get_estado_pieza_display }}</span></td>
-        <td><a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ p.vehiculo_id }}">{{ p.vehiculo.patente|default:p.vehiculo.vin|default:"" }}</a></td>
-      </tr>
-      {% endfor %}
-      </tbody>
-    </table>
-    <a href="{% country_url 'desarme:lista_piezas' %}" class="text-cyan-400 hover:text-cyan-300 text-xs mt-1.5 inline-block">{% trans "Ver todas" %} →</a>
-    {% else %}
-    <div class="empty-chart">{% trans "No hay repuestos registradas" %}</div>
-    <a href="{% country_url 'desarme:crear_pieza' %}" class="text-cyan-400 hover:text-cyan-300 text-xs">{% trans "Registrar la primera" %}</a>
-    {% endif %}
-  </div>
+  {% endwith %}
+  {% endfor %}
+</div>
+<a href="{% country_url 'desarme:lista_vehiculos' %}" class="text-cyan-400 hover:text-cyan-300 text-xs mt-2 inline-block">{% trans "Ver todos" %} →</a>
+{% else %}
+<div class="empty-chart">{% trans "No hay vehículos" %}</div>
+<a href="{% country_url 'desarme:crear_vehiculo' %}" class="text-cyan-400 hover:text-cyan-300 text-xs">{% trans "Crear el primero" %}</a>
+{% endif %}
+
+{# Recent parts #}
+<div class="section-title" style="margin-top:0.75rem;">📦 {% trans "Últimas repuestos" %}</div>
+<div class="chart-box">
+  {% if ultimas_repuestos %}
+  <table class="desarme-table">
+    <thead><tr><th>{% trans "Código" %}</th><th>{% trans "Nombre" %}</th><th>{% trans "Estado" %}</th><th></th></tr></thead>
+    <tbody>
+    {% for p in ultimas_repuestos %}
+    <tr>
+      <td><strong>{{ p.codigo }}</strong></td>
+      <td>{{ p.nombre|truncatechars:28 }}</td>
+      <td><span class="badge-mini {{ p.estado_pieza|lower|slice:":4" }}">{{ p.get_estado_pieza_display }}</span></td>
+      <td><a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ p.vehiculo_id }}">{{ p.vehiculo.patente|default:p.vehiculo.vin|default:"" }}</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <a href="{% country_url 'desarme:lista_piezas' %}" class="text-cyan-400 hover:text-cyan-300 text-xs mt-1.5 inline-block">{% trans "Ver todas" %} →</a>
+  {% else %}
+  <div class="empty-chart">{% trans "No hay repuestos registradas" %}</div>
+  <a href="{% country_url 'desarme:crear_pieza' %}" class="text-cyan-400 hover:text-cyan-300 text-xs">{% trans "Registrar la primera" %}</a>
+  {% endif %}
 </div>
 {% endblock %}
 
@@ -296,7 +390,7 @@ document.addEventListener('DOMContentLoaded', function() {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } } }
+          plugins: { legend: { position: 'bottom', labels: { boxWidth: 8, font: { size: 9 }, padding: 6 } } }
         }
       });
     }

@@ -148,8 +148,7 @@
     function formatNumberInput(value) {
         const num = Number(value);
         if (!Number.isFinite(num)) return '';
-        const digits = EG.config?.MONEY_FORMATS?.[EG.cfg?.country]?.max ?? 2;
-        return num.toFixed(digits);
+        return String(Math.round(num));
     }
 
     const MILEAGE_LOCALES = {
