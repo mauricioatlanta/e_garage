@@ -257,12 +257,24 @@
         <div class="cliente-form-field">
           <label for="{{ form.estado_usa.id_for_label }}">{{ form.estado_usa.label }}</label>
           {{ form.estado_usa }}
+          <div class="cliente-form-field-actions">
+            <button type="button" id="btn-agregar-estado" class="cliente-inline-btn">
+              + Agregar {{ form.estado_usa.label|lower }}
+            </button>
+            <span class="cliente-inline-help">Si no aparece en el listado, créalo aquí.</span>
+          </div>
           {{ form.estado_usa.errors }}
         </div>
 
         <div class="cliente-form-field">
           <label for="{{ form.ciudad_usa.id_for_label }}">{{ form.ciudad_usa.label }}</label>
           {{ form.ciudad_usa }}
+          <div class="cliente-form-field-actions">
+            <button type="button" id="btn-agregar-ciudad-usa" class="cliente-inline-btn" disabled>
+              + Agregar {{ form.ciudad_usa.label|lower }}
+            </button>
+            <span class="cliente-inline-help">Si no aparece en el listado, créala aquí.</span>
+          </div>
           {{ form.ciudad_usa.errors }}
         </div>
 
@@ -448,10 +460,22 @@ document.addEventListener("DOMContentLoaded", function() {
 document.addEventListener("DOMContentLoaded", function() {
   const stateSelect = document.getElementById("id_estado_usa");
   const citySelect = document.getElementById("id_ciudad_usa");
-  const url = "{% country_url 'clientes:obtener_ciudades_usa' %}";
+  const loadCitiesUrl = "{% country_url 'clientes:obtener_ciudades_usa' %}";
+  const createStateUrl = "{% country_url 'clientes:agregar_estado' %}";
+  const createCityUrl = "{% country_url 'clientes:agregar_ciudad_usa' %}";
+  const addStateBtn = document.getElementById("btn-agregar-estado");
+  const addCityBtn = document.getElementById("btn-agregar-ciudad-usa");
+  const csrfTokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
 
   if (!stateSelect || !citySelect) {
     return;
+  }
+
+  function updateAddCityButtonState() {
+    if (!addCityBtn) return;
+    const hasState = !!stateSelect.value;
+    addCityBtn.disabled = !hasState;
+    addCityBtn.title = hasState ? "" : "Seleccione un estado primero";
   }
 
   function setPlaceholder(message) {
@@ -466,46 +490,33 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!stateId) {
       setPlaceholder("{% trans 'Select State first' %}");
       citySelect.disabled = false;
-      return;
+      return Promise.resolve();
     }
-
     citySelect.disabled = true;
     setPlaceholder("{% trans 'Loading cities...' %}");
-
-    fetch(`${url}?estado_id=${encodeURIComponent(stateId)}`, {
-      headers: {
-        "Accept": "application/json",
-        "X-Requested-With": "XMLHttpRequest"
-      },
+    return fetch(`${loadCitiesUrl}?estado_id=${encodeURIComponent(stateId)}`, {
+      headers: { "Accept": "application/json", "X-Requested-With": "XMLHttpRequest" },
       credentials: "same-origin"
     })
       .then(function(response) {
-        if (!response.ok) {
-          throw new Error("city-load-failed");
-        }
+        if (!response.ok) throw new Error("city-load-failed");
         return response.json();
       })
       .then(function(data) {
         const ciudades = Array.isArray(data) ? data : [];
         const preservedValue = selectedCityId || citySelect.dataset.selected || "";
-
         citySelect.innerHTML = "";
         const defaultOption = document.createElement("option");
         defaultOption.value = "";
         defaultOption.textContent = "{% trans 'Select City' %}";
         citySelect.appendChild(defaultOption);
-
         ciudades.forEach(function(ciudad) {
           const option = document.createElement("option");
           option.value = ciudad.id;
           option.textContent = ciudad.nombre;
           citySelect.appendChild(option);
         });
-
-        if (preservedValue) {
-          citySelect.value = String(preservedValue);
-        }
-
+        if (preservedValue) citySelect.value = String(preservedValue);
         citySelect.disabled = false;
       })
       .catch(function() {
@@ -514,14 +525,89 @@ document.addEventListener("DOMContentLoaded", function() {
       });
   }
 
+  async function createState() {
+    const etiqueta = (addStateBtn ? addStateBtn.textContent.replace(/^\+\s*/, "").trim() : "estado");
+    const nombre = (window.prompt("Ingresa el nombre del " + etiqueta + ":") || "").trim();
+    if (!nombre) return;
+    if (addStateBtn) addStateBtn.disabled = true;
+    try {
+      const response = await fetch(createStateUrl, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": csrfTokenInput ? csrfTokenInput.value : "",
+        },
+        credentials: "same-origin",
+        body: JSON.stringify({ nombre: nombre }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success || !data.estado) {
+        throw new Error((data && data.error) || "No se pudo crear");
+      }
+      const opt = document.createElement("option");
+      opt.value = data.estado.id;
+      opt.textContent = data.estado.nombre;
+      stateSelect.appendChild(opt);
+      stateSelect.value = String(data.estado.id);
+      citySelect.dataset.selected = "";
+      updateAddCityButtonState();
+      loadCities(data.estado.id, "");
+    } catch (error) {
+      window.alert(error.message || "No se pudo crear el estado.");
+    } finally {
+      if (addStateBtn) addStateBtn.disabled = false;
+    }
+  }
+
+  async function createCity() {
+    if (!stateSelect.value) {
+      window.alert("Seleccione un estado antes de agregar una ciudad.");
+      return;
+    }
+    const nombre = (window.prompt("Ingresa el nombre de la nueva ciudad:") || "").trim();
+    if (!nombre) return;
+    if (addCityBtn) addCityBtn.disabled = true;
+    try {
+      const response = await fetch(createCityUrl, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          "X-Requested-With": "XMLHttpRequest",
+          "X-CSRFToken": csrfTokenInput ? csrfTokenInput.value : "",
+        },
+        credentials: "same-origin",
+        body: JSON.stringify({ nombre: nombre, estado_id: stateSelect.value }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success || !data.ciudad) {
+        throw new Error((data && data.error) || "No se pudo crear");
+      }
+      citySelect.dataset.selected = String(data.ciudad.id);
+      await loadCities(stateSelect.value, String(data.ciudad.id));
+    } catch (error) {
+      window.alert(error.message || "No se pudo crear la ciudad.");
+    } finally {
+      updateAddCityButtonState();
+    }
+  }
+
   stateSelect.addEventListener("change", function() {
     citySelect.dataset.selected = "";
+    updateAddCityButtonState();
     loadCities(this.value, "");
   });
+
+  if (addStateBtn) addStateBtn.addEventListener("click", createState);
+  if (addCityBtn) addCityBtn.addEventListener("click", createCity);
 
   if (stateSelect.value) {
     loadCities(stateSelect.value, citySelect.dataset.selected || citySelect.value || "");
   }
+
+  updateAddCityButtonState();
 });
 </script>
 {% endif %}
