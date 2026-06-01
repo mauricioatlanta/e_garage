@@ -1065,14 +1065,14 @@
                   <strong>#{{ documento.numero|default:documento.id }}</strong>
                   {% now "Y-m-d" as hoy %}
                   {% if documento.fecha_emision %}
-                    {% with dias_diferencia=documento.fecha_emision|timesince %}
+                    {% with dias_diferencia=documento.created_at|timesince %}
                       {% if documento.estado == 'BORRADOR' or documento.estado == 'EMITIDO' %}
-                        {% if documento.fecha_emision|timesince|slice:":1"|add:"0" > 15 %}
-                          <span class="edad-badge edad-critica">⚠️ Hace {{ documento.fecha_emision|timesince }}</span>
-                        {% elif documento.fecha_emision|timesince|slice:":1"|add:"0" > 7 %}
-                          <span class="edad-badge edad-alerta">Hace {{ documento.fecha_emision|timesince }}</span>
+                        {% if documento.created_at|timesince|slice:":1"|add:"0" > 15 %}
+                          <span class="edad-badge edad-critica">⚠️ Hace {{ documento.created_at|timesince }}</span>
+                        {% elif documento.created_at|timesince|slice:":1"|add:"0" > 7 %}
+                          <span class="edad-badge edad-alerta">Hace {{ documento.created_at|timesince }}</span>
                         {% else %}
-                          <span class="edad-badge edad-normal">Hace {{ documento.fecha_emision|timesince }}</span>
+                          <span class="edad-badge edad-normal">Hace {{ documento.created_at|timesince }}</span>
                         {% endif %}
                       {% endif %}
                     {% endwith %}

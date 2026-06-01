@@ -172,7 +172,9 @@ body {
 
             <h2 class="login-title font-futuristic">Iniciar Sesión</h2>
 
-            {% if form.non_field_errors %}
+            {% if error %}
+            <div class="error-message">{{ error }}</div>
+            {% elif form.non_field_errors %}
             <div class="error-message">{{ form.non_field_errors }}</div>
             {% endif %}
 

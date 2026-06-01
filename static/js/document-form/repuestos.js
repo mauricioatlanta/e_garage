@@ -360,7 +360,7 @@
             if (repNombre) repNombre.value = part.nombre || '';
             if (inpPV) {
                 var precio = EG.utils.parseNumericInput(part.precio_venta);
-                inpPV.value = precio > 0 ? EG.utils.formatNumberInput(precio) : '';
+                inpPV.value = precio > 0 ? String(precio) : '';
             }
             if (repPiezaDesarmeId) repPiezaDesarmeId.value = part.pieza_desarme_id || '';
             if (repStockDisponible) repStockDisponible.value = part.stock !== undefined ? part.stock : '';

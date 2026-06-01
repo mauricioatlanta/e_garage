@@ -1,84 +1,81 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# eGarage English translations
+# Copyright (C) eGarage
 #
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: eGarage\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-09-22 09:30+0000\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"PO-Revision-Date: 2026-06-01 00:00+0000\n"
+"Last-Translator: eGarage Team\n"
+"Language-Team: English\n"
 "Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 msgid "Configuración"
-msgstr "Configuración"
+msgstr "Settings"
 
 msgid "Cerrar sesión"
-msgstr "Cerrar sesión"
+msgstr "Sign out"
 
 msgid "Iniciar sesión o registrarse"
-msgstr "Iniciar sesión o registrarse"
+msgstr "Sign in or register"
 
 msgid "o"
-msgstr "o"
+msgstr "or"
 
 msgid "Iniciar sesión"
-msgstr "Iniciar sesión"
+msgstr "Sign in"
 
 msgid "Gestión inteligente para talleres"
-msgstr "Gestión inteligente para talleres"
+msgstr "Smart management for auto shops"
 
 msgid "Welcome to eGarage USA"
-msgstr "Bienvenido a eGarage USA"
+msgstr "Welcome to eGarage USA"
 
 msgid "Sectors We Empower"
-msgstr "Sectores que potenciamos"
+msgstr "Sectors We Empower"
 
 msgid "Auto Repair Shop"
-msgstr "Taller Mecánico"
+msgstr "Auto Repair Shop"
 
 msgid "Tire & Vulcanization"
-msgstr "Vulcanización y Neumáticos"
+msgstr "Tire & Vulcanization"
 
 msgid "Paint & Body Shop"
-msgstr "Pintura y Hojalatería"
+msgstr "Paint & Body Shop"
 
 msgid "Parts Store"
-msgstr "Casa de Repuestos"
+msgstr "Parts Store"
 
 msgid "Simple Plans, No Fine Print"
-msgstr "Planes simples y sin letra chica"
+msgstr "Simple Plans, No Fine Print"
 
 msgid "Monthly"
-msgstr "Mensual"
+msgstr "Monthly"
 
 msgid "Semi-Annual"
-msgstr "Semestral"
+msgstr "Semi-Annual"
 
 msgid "Annual"
-msgstr "Anual"
+msgstr "Annual"
 
 msgid "Real Stories from Real Shops"
-msgstr "Historias reales de talleres reales"
+msgstr "Real Stories from Real Shops"
 
 msgid "Higher average revenue"
-msgstr "Mayor facturación promedio"
+msgstr "Higher average revenue"
 
 msgid "Less time in reception"
-msgstr "Menos tiempo en recepción"
+msgstr "Less time in reception"
 
 msgid "Customer satisfaction"
-msgstr "Satisfacción de clientes"
+msgstr "Customer satisfaction"
 
 msgid "Language"
-msgstr "Idioma"
+msgstr "Language"
 
 msgid "Agregar nuevo color..."
 msgstr "Add new color..."
@@ -96,7 +93,7 @@ msgid "See Pricing"
 msgstr "See Pricing"
 
 msgid "Recommended"
-msgstr "Recomendado"
+msgstr "Recommended"
 
 msgid "Choose Semi-Annual"
 msgstr "Choose Semi-Annual"
@@ -114,52 +111,52 @@ msgid "per year"
 msgstr "per year"
 
 msgid "Unlimited users"
-msgstr "Usuarios ilimitados"
+msgstr "Unlimited users"
 
 msgid "Digital documents"
-msgstr "Documentos digitales"
+msgstr "Digital documents"
 
 msgid "Bilingual support"
-msgstr "Soporte bilingüe"
+msgstr "Bilingual support"
 
 msgid "Everything from Monthly plan"
-msgstr "Todo del plan Mensual"
+msgstr "Everything from Monthly plan"
 
 msgid "Automatic reminders"
-msgstr "Recordatorios automáticos"
+msgstr "Automatic reminders"
 
 msgid "Profit reports"
-msgstr "Reportes de utilidad"
+msgstr "Profit reports"
 
 msgid "Everything from Semi-Annual plan"
-msgstr "Todo del plan Semestral"
+msgstr "Everything from Semi-Annual plan"
 
 msgid "Volume discounts"
-msgstr "Descuentos por volumen"
+msgstr "Volume discounts"
 
 msgid "Priority support"
-msgstr "Soporte priorizado"
+msgstr "Priority support"
 
 msgid "Work orders, reception checklists, technician times and performance tracking."
-msgstr "Órdenes de trabajo, checklist de recepción, tiempos y desempeño por técnico."
+msgstr "Work orders, reception checklists, technician times and performance tracking."
 
 msgid "Rotation, balancing, tire set history, stock alerts and quick quotes."
-msgstr "Rotación, balanceo, historial por juego, alertas de stock y cotizaciones rápidas."
+msgstr "Rotation, balancing, tire set history, stock alerts and quick quotes."
 
 msgid "Process stages, materials per job, before/after photos and estimates."
-msgstr "Etapas del proceso, materiales por trabajo, fotos antes/después y presupuestos."
+msgstr "Process stages, materials per job, before/after photos and estimates."
 
 msgid "Catalog, part numbers, margins, sales and digital document integration."
-msgstr "Catálogo, part number, márgenes, ventas e integración con documentos digitales."
+msgstr "Catalog, part numbers, margins, sales and digital document integration."
 
 msgid "This software changed how we work; now everything is tracked and we get paid faster."
-msgstr "Este software cambió cómo trabajamos; ahora todo queda trazado y cobramos más rápido."
+msgstr "This software changed how we work; now everything is tracked and we get paid faster."
 
 msgid "Bilingual support and quick migration. Perfect for growing shops."
-msgstr "Soporte bilingüe y migración rápida. Ideal para talleres que crecen."
+msgstr "Bilingual support and quick migration. Perfect for growing shops."
 
 msgid "The free trial convinced us. Now everything is digital and customers notice."
-msgstr "La prueba gratis nos convenció. Hoy todo es digital y los clientes lo notan."
+msgstr "The free trial convinced us. Now everything is digital and customers notice."
 
 # Desarme / disassembly (USA i18n)
 msgid "Vehículos para desarme (yarda)"

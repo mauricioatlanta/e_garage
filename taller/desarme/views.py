@@ -35,6 +35,7 @@ from taller.models.vendedor_desarme import VendedorDesarme
 from taller.documentos.views_migrated import _reverse_with_request
 from .forms import PiezaDesarmeForm, VehiculoDesarmeForm
 from .services import generar_inventario_vehiculo
+from taller.services.desarme_financial_service import calcular_ganancia_vehiculo
 
 log = logging.getLogger(__name__)
 
@@ -259,12 +260,35 @@ def index(request):
         for v in vehiculos_por_mes
     ]
 
-    # Últimos vehículos
-    ultimos_vehiculos = (
+    # Últimos vehículos con datos financieros para cards
+    vehiculos_qs = (
         base_qs.select_related("marca", "modelo")
-        .annotate(repuestos_count=Count("piezas_desarme"))
+        .annotate(
+            repuestos_count=Count("piezas_desarme"),
+            piezas_disp=Count(
+                "piezas_desarme",
+                filter=Q(piezas_desarme__estado_pieza=ESTADO_DISPONIBLE, piezas_desarme__activo=True),
+            ),
+            piezas_vend=Count(
+                "piezas_desarme",
+                filter=Q(piezas_desarme__estado_pieza=ESTADO_VENDIDA),
+            ),
+        )
         .order_by("-fecha_ingreso_desarme", "-id")[:6]
     )
+
+    ultimos_vehiculos = []
+    for v in vehiculos_qs:
+        ganancia = calcular_ganancia_vehiculo(v)
+        total_piezas_v = (v.piezas_disp or 0) + (v.piezas_vend or 0)
+        pct_vendido = int((v.piezas_vend or 0) / total_piezas_v * 100) if total_piezas_v > 0 else 0
+        ultimos_vehiculos.append({
+            "vehiculo": v,
+            "ganancia": ganancia,
+            "pct_vendido": pct_vendido,
+            "piezas_disponibles": v.piezas_disp or 0,
+            "repuestos_count": v.repuestos_count or 0,
+        })
 
     # Repuestos recientes (últimos 5)
     ultimas_repuestos = piezas_qs.select_related("vehiculo").filter(activo=True).order_by("-id")[:5]
