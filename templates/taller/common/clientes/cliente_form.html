@@ -457,23 +457,29 @@ document.addEventListener("DOMContentLoaded", function() {
 </script>
 {% else %}
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-  const stateSelect = document.getElementById("id_estado_usa");
-  const citySelect = document.getElementById("id_ciudad_usa");
-  const loadCitiesUrl = "{% country_url 'clientes:obtener_ciudades_usa' %}";
-  const createStateUrl = "{% country_url 'clientes:agregar_estado' %}";
-  const createCityUrl = "{% country_url 'clientes:agregar_ciudad_usa' %}";
-  const addStateBtn = document.getElementById("btn-agregar-estado");
-  const addCityBtn = document.getElementById("btn-agregar-ciudad-usa");
-  const csrfTokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
+(function() {
+  var loadCitiesUrl = "{% country_url 'clientes:obtener_ciudades_usa' %}";
+  var createStateUrl = "{% country_url 'clientes:agregar_estado' %}";
+  var createCityUrl = "{% country_url 'clientes:agregar_ciudad_usa' %}";
+
+  function initUbicacionUSA() {
+  var stateSelect = document.getElementById("id_estado_usa");
+  var citySelect = document.getElementById("id_ciudad_usa");
+  var addStateBtn = document.getElementById("btn-agregar-estado");
+  var addCityBtn = document.getElementById("btn-agregar-ciudad-usa");
+  var csrfTokenInput = document.querySelector('input[name="csrfmiddlewaretoken"]');
 
   if (!stateSelect || !citySelect) {
     return;
   }
 
+  // Evitar doble inicialización
+  if (stateSelect.dataset.ubInit) return;
+  stateSelect.dataset.ubInit = "1";
+
   function updateAddCityButtonState() {
     if (!addCityBtn) return;
-    const hasState = !!stateSelect.value;
+    var hasState = !!stateSelect.value;
     addCityBtn.disabled = !hasState;
     addCityBtn.title = hasState ? "" : "Seleccione un estado primero";
   }
@@ -608,7 +614,17 @@ document.addEventListener("DOMContentLoaded", function() {
   }
 
   updateAddCityButtonState();
-});
+  } // end initUbicacionUSA
+
+  // Intentar init inmediato (script está al final del body)
+  if (document.readyState !== "loading") {
+    initUbicacionUSA();
+  } else {
+    document.addEventListener("DOMContentLoaded", initUbicacionUSA);
+  }
+  // Reintento por si algún script mueve el DOM después
+  setTimeout(initUbicacionUSA, 300);
+})();
 </script>
 {% endif %}
 {% endblock %}
