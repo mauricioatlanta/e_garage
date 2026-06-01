@@ -437,7 +437,7 @@ def agregar_estado(request):
     if not empresa or not pais:
         return JsonResponse({"success": False, "error": "Empresa sin país configurado"}, status=400)
 
-    if pais not in ["US", "BR", "VE", "PE", "MX"]:
+    if pais not in ["US", "BR", "VE", "PE", "MX", "CO", "EC"]:
         return JsonResponse(
             {"success": False, "error": "El país no admite creación dinámica de estados"},
             status=400,
