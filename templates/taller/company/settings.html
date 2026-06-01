@@ -1618,7 +1618,8 @@
                                         </button>
                                     </form>
                                 {% elif empresa.pais == 'US' %}
-                                    <a href="{% url 'payment_usa' %}?plan=mensual" class="subscription-pay-card subscription-method-btn text-decoration-none" data-method="paypal">
+                                    {% url 'payment_usa' as paypal_payment_url %}
+                                    <a href="{{ paypal_payment_url|default:'#' }}?plan=mensual" class="subscription-pay-card subscription-method-btn text-decoration-none" data-method="paypal">
                                         <strong><i class="fab fa-cc-paypal me-2"></i>PayPal</strong>
                                         <span>Automatic payment for US subscriptions.</span>
                                         <span class="subscription-pay-cta">Go to PayPal<i class="fas fa-arrow-right"></i></span>
@@ -1712,7 +1713,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const paymentPlanInputs = document.querySelectorAll('#subscriptionModal [data-payment-plan-input]');
     const subscriptionMonthlyAmount = document.getElementById('subscriptionMonthlyAmount');
     const subscriptionAnnualAmount = document.getElementById('subscriptionAnnualAmount');
-    const paypalUrl = '{% url "payment_usa" %}';
+    {% url 'payment_usa' as paypal_js_url %}
+    const paypalUrl = '{{ paypal_js_url|default:"" }}';
 
     function getAmountForPeriod(period) {
         const source = period === 'anual' ? subscriptionAnnualAmount : subscriptionMonthlyAmount;
