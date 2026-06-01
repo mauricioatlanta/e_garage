@@ -92,10 +92,14 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Nunca cachear endpoints AJAX — siempre pasar directo a la red
+  if (url.pathname.includes('/ajax/')) {
+    event.respondWith(fetch(request));
+    return;
+  }
+
   // Ignorar peticiones a APIs que requieren autenticación en tiempo real
-  if (url.pathname.includes('/api/') && 
-      (url.pathname.includes('/auth/') || url.pathname.includes('/ajax/'))) {
-    // Para APIs dinámicas, usar solo network
+  if (url.pathname.includes('/api/') && url.pathname.includes('/auth/')) {
     event.respondWith(fetch(request));
     return;
   }
