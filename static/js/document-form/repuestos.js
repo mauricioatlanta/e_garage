@@ -138,7 +138,7 @@
                 (part.precio !== undefined ? part.precio : 0)),
             precio_compra: part.precio_compra !== undefined ? part.precio_compra : 0,
             stock: part.stock !== undefined ? part.stock :
-                (part.cantidad_stock !== undefined ? part.cantidad_stock : 0),
+                (part.cantidad_stock !== undefined ? part.cantidad_stock : null),
             stock_minimo: part.stock_minimo !== undefined ? part.stock_minimo :
                 (part.stockMinimo !== undefined ? part.stockMinimo :
                 (part.stock_min !== undefined ? part.stock_min : 0)),
@@ -288,11 +288,20 @@
         function updateStockAlert() {
             var origin = syncOrigenField(repOrigen && repOrigen.value || '');
             var repuestoId = idHidden && String(idHidden.value || '').trim();
-            var stock = Number((repStockDisponible && repStockDisponible.value) || 0) || 0;
+            var stockRawValue = repStockDisponible ? repStockDisponible.value : null;
+            var stockKnown = stockRawValue !== '' && stockRawValue !== null && stockRawValue !== undefined;
+            var stock = stockKnown ? (Number(stockRawValue) || 0) : null;
             var stockMinimo = Number((repStockMinimo && repStockMinimo.value) || 0) || 0;
             var cantidad = Number((qEl && qEl.value) || 0) || 0;
 
             if (!repuestoId || origin !== 'STOCK_BODEGA') {
+                setStockAlertState('', '');
+                return;
+            }
+
+            // stock === null means the value wasn't loaded from the API (e.g. draft restore);
+            // don't show a false "out of stock" warning in that case.
+            if (stock === null) {
                 setStockAlertState('', '');
                 return;
             }
@@ -363,8 +372,8 @@
                 inpPV.value = precio > 0 ? String(precio) : '';
             }
             if (repPiezaDesarmeId) repPiezaDesarmeId.value = part.pieza_desarme_id || '';
-            if (repStockDisponible) repStockDisponible.value = part.stock !== undefined ? part.stock : '';
-            if (repStockMinimo) repStockMinimo.value = part.stock_minimo !== undefined ? part.stock_minimo : '';
+            if (repStockDisponible) repStockDisponible.value = part.stock != null ? part.stock : '';
+            if (repStockMinimo) repStockMinimo.value = part.stock_minimo != null ? part.stock_minimo : '';
             syncOrigenField(part.origen_repuesto || '');
             var costoLineaAmount = EG.utils.parseNumericInput(part.costo_linea || 0);
             var costoRaw = costoLineaAmount > 0

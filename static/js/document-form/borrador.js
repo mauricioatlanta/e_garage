@@ -40,6 +40,8 @@
         if (!form || window.__DOC_DRAFT_RESTORING__) return null;
 
         var repuestos = collectRows('#repuestos-container .dynamic-element', function(row) {
+            var stockRaw = row.querySelector('.rep-stock-disponible') && row.querySelector('.rep-stock-disponible').value;
+            var stockMinRaw = row.querySelector('.rep-stock-minimo') && row.querySelector('.rep-stock-minimo').value;
             return {
                 rowId: row.dataset.rowId || '',
                 id: (row.querySelector('.rep-id') && row.querySelector('.rep-id').value || '').trim(),
@@ -51,7 +53,9 @@
                 descuento: Number(row.querySelector('.rep-descuento') && row.querySelector('.rep-descuento').value || 0) || 0,
                 origen_repuesto: (row.querySelector('.rep-origen') && row.querySelector('.rep-origen').value || 'STOCK_BODEGA').trim(),
                 pieza_desarme_id: (row.querySelector('.rep-pieza-desarme-id') && row.querySelector('.rep-pieza-desarme-id').value || '').trim(),
-                costo_linea: EG.utils.parseNumericInput(row.querySelector('.rep-costo-linea') && row.querySelector('.rep-costo-linea').value || 0)
+                costo_linea: EG.utils.parseNumericInput(row.querySelector('.rep-costo-linea') && row.querySelector('.rep-costo-linea').value || 0),
+                stock: stockRaw !== '' && stockRaw != null ? Number(stockRaw) : null,
+                stock_minimo: stockMinRaw !== '' && stockMinRaw != null ? Number(stockMinRaw) : null
             };
         });
 
@@ -248,7 +252,7 @@
                     if (typeof window.addRepuestoRow !== 'function') return;
                     var row = window.addRepuestoRow(rep.rowId || null);
                     if (row && row.__applyRepData) {
-                        row.__applyRepData({
+                        var repData = {
                             id: rep.id || '',
                             nombre: rep.nombre || rep.nombre_input || '',
                             codigo: rep.codigo || '',
@@ -258,7 +262,10 @@
                             origen_repuesto: rep.origen_repuesto || 'STOCK_BODEGA',
                             pieza_desarme_id: rep.pieza_desarme_id || '',
                             costo_linea: rep.costo_linea != null ? rep.costo_linea : 0
-                        });
+                        };
+                        if (rep.stock != null) repData.stock = rep.stock;
+                        if (rep.stock_minimo != null) repData.stock_minimo = rep.stock_minimo;
+                        row.__applyRepData(repData);
                     }
                 });
 
