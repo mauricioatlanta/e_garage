@@ -1629,12 +1629,16 @@ class VehiculoForm(forms.ModelForm):
         widgets = {
             "patente": forms.TextInput(
                 attrs={
-                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "style": "text-transform:uppercase;",
+                    "oninput": "this.value=this.value.toUpperCase()"
                 }
             ),
             "vin": forms.TextInput(
                 attrs={
-                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400"
+                    "class": "w-full px-4 py-3 rounded-lg bg-black border border-emerald-500/30 text-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-400/50 focus:border-emerald-400",
+                    "style": "text-transform:uppercase;",
+                    "oninput": "this.value=this.value.toUpperCase()"
                 }
             ),
             "tipo_carroceria": forms.TextInput(

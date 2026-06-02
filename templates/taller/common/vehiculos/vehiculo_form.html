@@ -1718,6 +1718,20 @@ document.addEventListener('DOMContentLoaded', function() {
     })();
     {% endif %}
 
+    // Forzar Title Case en campos de texto libre
+    (function initTextCaseFormatting() {
+        var titleCaseFields = ['id_color_nuevo', 'id_tipo_carroceria'];
+        titleCaseFields.forEach(function(fieldId) {
+            var el = document.getElementById(fieldId);
+            if (else:) return;
+            el.addEventListener('input', function() {
+                var pos = this.selectionStart;
+                this.value = this.value.replace(/\w/g, function(c) { return c.toUpperCase(); });
+                this.setSelectionRange(pos, pos);
+            });
+        });
+    })();
+
     (function initClienteNativeFallback() {
         const clienteSelect = document.getElementById('id_cliente');
         if (!clienteSelect) return;
