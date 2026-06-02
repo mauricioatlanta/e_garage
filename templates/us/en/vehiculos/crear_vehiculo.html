@@ -903,18 +903,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-        });
-        if (btnAddTipoCarroceria) {
-            btnAddTipoCarroceria.addEventListener('click', function() {
-                tipoCarroceriaSelect.value = '__nuevo__';
-                tipoCarroceriaSelect.dispatchEvent(new Event('change'));
-            });
-        }
-        if (tipoCarroceriaSelect.value === '__nuevo__') {
-            tipoCarroceriaNuevoContainer.style.display = 'block';
-            tipoCarroceriaNuevoInput.required = true;
-        }
-    }
 
     // Manejar campo de motor (Select2)
     const motorSelect = $('#id_motor');
