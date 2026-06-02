@@ -169,6 +169,11 @@ class Cliente(AuditModelMixin, TenantScoped):
                 name="uq_cliente_empresa_email_present",
             ),
             UniqueConstraint(
+                fields=["empresa", "telefono"],
+                condition=Q(telefono__isnull=False) & ~Q(telefono=""),
+                name="uq_cliente_empresa_telefono_present",
+            ),
+            UniqueConstraint(
                 fields=["empresa", "tax_id"],
                 condition=Q(tax_id__isnull=False) & ~Q(tax_id=""),
                 name="uq_cliente_empresa_taxid_present",

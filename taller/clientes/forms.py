@@ -37,18 +37,25 @@ class CiudadChoiceField(forms.ModelChoiceField):
 class ClienteForm(forms.ModelForm):
     def clean(self):
         cleaned_data = super().clean()
-        email = cleaned_data.get("email")
         empresa = (
             self.initial.get("empresa") or self.instance.empresa
             if hasattr(self.instance, "empresa")
             else None
         )
+        email = cleaned_data.get("email")
         if email and empresa:
             qs = Cliente.objects.filter(empresa=empresa, email=email)
             if self.instance.pk:
                 qs = qs.exclude(pk=self.instance.pk)
             if qs.exists():
                 self.add_error("email", "Ya existe un cliente con este email para esta empresa.")
+        telefono = cleaned_data.get("telefono")
+        if telefono and empresa:
+            qs = Cliente.objects.filter(empresa=empresa, telefono=telefono)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                self.add_error("telefono", "Ya existe un cliente con este teléfono para esta empresa.")
         return cleaned_data
 
     # Campos para Chile
