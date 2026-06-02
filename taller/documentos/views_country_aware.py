@@ -193,7 +193,7 @@ def documento_crear(request, country_code="cl", lang_code="es"):
         initial = {}
         cliente_obj = None
         vehiculo_obj = None
-        cliente_id_raw = request.GET.get("cliente_id", "").strip()
+        cliente_id_raw = (request.GET.get("created_cliente_id") or request.GET.get("cliente_id") or "").strip()
         vehiculo_id_raw = request.GET.get("vehiculo_id", "").strip()
 
         if cliente_id_raw:

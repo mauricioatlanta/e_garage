@@ -341,6 +341,40 @@ class DocumentoCreateView(
                 )
 
 
+    def get_context_data(self, **kwargs):
+        ctx = super().get_context_data(**kwargs)
+        req = self.request
+        cliente_id_raw = (req.GET.get("created_cliente_id") or req.GET.get("cliente_id") or "").strip()
+        vehiculo_id_raw = (req.GET.get("created_vehiculo_id") or req.GET.get("vehiculo_id") or "").strip()
+        cliente_obj = None
+        vehiculo_obj = None
+        empresa = getattr(req.user, "empresa", None)
+        if cliente_id_raw and empresa:
+            from taller.models.cliente import Cliente
+            try:
+                cliente_obj = Cliente.objects.filter(pk=int(cliente_id_raw), empresa=empresa).first()
+            except (ValueError, TypeError):
+                pass
+        if vehiculo_id_raw and empresa:
+            from taller.models.vehiculo import Vehiculo
+            try:
+                vehiculo_obj = Vehiculo.objects.filter(pk=int(vehiculo_id_raw), empresa=empresa).first()
+            except (ValueError, TypeError):
+                pass
+        nombre = ""
+        if cliente_obj:
+            nombre = (cliente_obj.nombre or "")
+            if getattr(cliente_obj, "apellido", None):
+                nombre = f"{nombre} {cliente_obj.apellido}".strip()
+        ctx.update({
+            "cliente_preselect_id": cliente_obj.pk if cliente_obj else "",
+            "cliente_preselect_nombre": nombre,
+            "cliente_preselect_email": getattr(cliente_obj, "email", "") or "" if cliente_obj else "",
+            "cliente_preselect_telefono": getattr(cliente_obj, "telefono", "") or "" if cliente_obj else "",
+            "vehiculo_preselect_id": vehiculo_obj.pk if vehiculo_obj else "",
+        })
+        return ctx
+
 class DocumentoUpdateView(
     LoginRequiredMixin, TenantViewMixin, CountryLangTemplateMixin, UpdateView
 ):

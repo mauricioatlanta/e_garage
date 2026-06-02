@@ -578,7 +578,7 @@
 
 #document-form #doc-shell .doc-table-head--services,
 #document-form #doc-shell .servicio-row-layout {
-  grid-template-columns: minmax(168px, 1.78fr) minmax(50px, 0.38fr) minmax(82px, 0.58fr) minmax(76px, 0.56fr) minmax(62px, 0.42fr);
+  grid-template-columns: minmax(168px, 2.2fr) minmax(82px, 0.7fr) minmax(76px, 0.6fr) minmax(62px, 0.42fr);
 }
 
 #document-form #doc-shell .doc-table-head--others,
