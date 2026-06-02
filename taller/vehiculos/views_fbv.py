@@ -350,6 +350,9 @@ def lista_vehiculos(request):
 def crear_vehiculo(request, *args, **kwargs):
     """Crear vehículo con reglas CL/US y multi-tenant."""
     lang = kwargs.pop("lang", None)
+    # Si lang no viene en kwargs, detectar desde el path
+    if not lang:
+        _, lang = _get_country_from_path(request.path)
     compat_redirect = _compat_canonical_redirect(request, "vehiculos:crear_vehiculo")
     if compat_redirect:
         return compat_redirect
@@ -481,7 +484,9 @@ def crear_vehiculo(request, *args, **kwargs):
         "cliente_id": cliente_id or "",
     }
 
-    template_name = _vehicle_template("crear", country)
+    # Usar key con idioma para seleccionar template correcto (US_es vs US_en)
+    template_key = f"{country.upper()}_{lang}" if lang and country.upper() == "US" else country
+    template_name = _vehicle_template("crear", template_key)
     return render(request, template_name, ctx)
 
 
