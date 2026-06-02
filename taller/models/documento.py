@@ -561,7 +561,7 @@ class Documento(AuditMixin, models.Model):
 
             config = get_config_from_empresa(self.empresa)
             self.moneda = config["currency"]
-        if not getattr(self, "country", None) and getattr(self, "empresa", None):
+        if getattr(self, "empresa", None) and getattr(self.empresa, "pais", None):
             self.country = self.empresa.pais
 
         # Inicializar campos de totales si no tienen valor
