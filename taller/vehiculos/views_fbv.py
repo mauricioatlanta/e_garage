@@ -83,7 +83,7 @@ VEHICLE_TEMPLATES = {
 }
 
 DEFAULT_VEHICLE_TEMPLATES = {
-    "crear": "taller/vehiculos/crear_vehiculo.html",
+    "crear": "us/en/vehiculos/crear_vehiculo.html",
 }
 
 
