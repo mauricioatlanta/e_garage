@@ -309,11 +309,14 @@ def format_currency(amount, country_code, include_symbol=True):
     """
     from decimal import Decimal, ROUND_HALF_UP
 
-    if amount is None:
+    if amount is None or amount == "":
         amount = Decimal("0")
 
     if not isinstance(amount, Decimal):
-        amount = Decimal(str(amount))
+        try:
+            amount = Decimal(str(amount))
+        except Exception:
+            amount = Decimal("0")
 
     config = get_country_config(country_code)
     decimals = config["decimals"]
