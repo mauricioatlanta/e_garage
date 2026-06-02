@@ -246,6 +246,8 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 urlpatterns = [
     path("healthz/", healthz, name="healthz"),
+    # Payment URLs globales (sin namespace para compatibilidad con templates)
+    path("", include("taller.urls_payment")),
     # PWA Dinámicas (manifest y service worker por país e idioma)
     path("<str:pais>/<str:idioma>/manifest.json", dynamic_manifest, name="pwa_manifest"),
     path(

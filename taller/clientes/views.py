@@ -49,7 +49,7 @@ def ajax_buscar_clientes(request):
 
 
 from taller.models.region_ciudad import TallerCiudad, TallerRegion
-from taller.models.ubicacion import Ciudad as CiudadUSA
+from taller.models.ubicacion import Ciudad as Ciudad
 from taller.models.ubicacion import Estado as EstadoUSA
 
 DEFAULT_ESTADO_TIMEZONES = {
@@ -80,14 +80,14 @@ def obtener_ciudades(request):
         if empresa and getattr(empresa, "pais", None):
             pais_usuario = empresa.pais
 
-    if pais_usuario in ["US", "BR", "VE", "PE", "MX"]:
+    if request.GET.get("estado_id") or pais_usuario in ["US", "BR", "VE", "PE", "MX"]:
         # Usuarios de USA, Brasil, Venezuela, Perú: usar modelo Estado/Ciudad unificado
         estado_id = request.GET.get("estado_id")
         if not estado_id:
             return JsonResponse([], safe=False)
 
         # Filtrar ciudades por estado
-        ciudades = CiudadUSA.objects.filter(estado_id=estado_id, estado__pais=pais_usuario).values(
+        ciudades = Ciudad.objects.filter(estado_id=estado_id).values(
             "id", "nombre"
         )
         return JsonResponse(list(ciudades), safe=False)
@@ -112,7 +112,7 @@ def obtener_ciudades_usa(request):
     estado_id = request.GET.get("estado_id")
     if not estado_id:
         return JsonResponse([], safe=False)
-    ciudades = CiudadUSA.objects.filter(estado_id=estado_id).values("id", "nombre")
+    ciudades = Ciudad.objects.filter(estado_id=estado_id).values("id", "nombre")
     return JsonResponse(list(ciudades), safe=False)
 
 
@@ -299,11 +299,11 @@ def agregar_ciudad_usa(request):
             return JsonResponse({"success": False, "error": "State not found"})
 
         # Verificar si la ciudad ya existe en ese estado
-        if CiudadUSA.objects.filter(nombre__iexact=nombre_ciudad, estado=estado).exists():
+        if Ciudad.objects.filter(nombre__iexact=nombre_ciudad, estado=estado).exists():
             return JsonResponse({"success": False, "error": "City already exists in this state"})
 
         # Crear la nueva ciudad
-        nueva_ciudad = CiudadUSA.objects.create(nombre=nombre_ciudad, estado=estado)
+        nueva_ciudad = Ciudad.objects.create(nombre=nombre_ciudad, estado=estado)
 
         return JsonResponse(
             {
@@ -346,7 +346,7 @@ def agregar_ciudad(request):
         # Detectar país del usuario para usar el modelo correcto
         pais_usuario = empresa.pais if hasattr(empresa, "pais") else "CL"
 
-        if pais_usuario in ["US", "BR", "VE", "PE", "MX"]:
+        if request.GET.get("estado_id") or pais_usuario in ["US", "BR", "VE", "PE", "MX"]:
             from taller.models.ubicacion import Ciudad, Estado
 
             estado_id = data.get("estado_id") or region_id
@@ -358,12 +358,12 @@ def agregar_ciudad(request):
             except Estado.DoesNotExist:
                 return JsonResponse({"success": False, "error": "Estado no encontrado"})
 
-            if CiudadUSA.objects.filter(estado=estado, nombre__iexact=nombre_ciudad).exists():
+            if Ciudad.objects.filter(estado=estado, nombre__iexact=nombre_ciudad).exists():
                 return JsonResponse(
                     {"success": False, "error": "La ciudad ya existe en este estado"}
                 )
 
-            nueva_ciudad = CiudadUSA.objects.create(estado=estado, nombre=nombre_ciudad)
+            nueva_ciudad = Ciudad.objects.create(estado=estado, nombre=nombre_ciudad)
 
         elif pais_usuario == "CL":
             from taller.models.region_ciudad import TallerCiudad, TallerRegion

@@ -116,4 +116,6 @@ urlpatterns = [
     # ),
     # Cancelación de cuenta y portabilidad SaaS
     path("suscripcion/cancelar/", cancelar_suscripcion_view, name="cancelar_suscripcion"),
+    # Payment URLs
+    path("", include("taller.urls_payment")),
 ]
