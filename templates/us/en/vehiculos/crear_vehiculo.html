@@ -407,29 +407,6 @@ input:focus {
           {% endif %}
         </div>
 
-        <div class="form-group">
-          <label for="{{ form.tipo_carroceria.id_for_label }}">Body Type / Style</label>
-          <div class="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start">
-            <div class="flex-1 w-full">{{ form.tipo_carroceria }}</div>
-            <button type="button"
-                    id="btn-add-tipo-carroceria"
-                    class="btn-futuristic py-2 px-4 text-sm sm:text-base w-full sm:w-auto"
-                    style="margin: 0; white-space: nowrap; flex-shrink: 0;"
-                    title="Add new body type">
-              ➕ Add
-            </button>
-          </div>
-          {% if form.tipo_carroceria.errors %}
-            <div class="text-red-400 text-sm mt-1">{{ form.tipo_carroceria.errors.0 }}</div>
-          {% endif %}
-          <div id="tipo-carroceria-nuevo-container" style="display: none;" class="mt-2">
-            <input type="text"
-                   name="nuevo_tipo_carroceria"
-                   id="tipo_carroceria_nuevo"
-                   placeholder="Enter new body type (e.g. Limousine, Off-road)"
-                   class="form-control">
-          </div>
-        </div>
 
         <div class="form-group">
           <label for="{{ form.color.id_for_label }}">Color</label>
@@ -926,23 +903,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Manejar campo tipo de carrocería (body type)
-    const tipoCarroceriaSelect = document.getElementById('id_tipo_carroceria');
-    const tipoCarroceriaNuevoContainer = document.getElementById('tipo-carroceria-nuevo-container');
-    const tipoCarroceriaNuevoInput = document.getElementById('tipo_carroceria_nuevo');
-    const btnAddTipoCarroceria = document.getElementById('btn-add-tipo-carroceria');
-
-    if (tipoCarroceriaSelect && tipoCarroceriaNuevoContainer && tipoCarroceriaNuevoInput) {
-        tipoCarroceriaSelect.addEventListener('change', function() {
-            if (this.value === '__nuevo__') {
-                tipoCarroceriaNuevoContainer.style.display = 'block';
-                tipoCarroceriaNuevoInput.required = true;
-                tipoCarroceriaNuevoInput.focus();
-            } else {
-                tipoCarroceriaNuevoContainer.style.display = 'none';
-                tipoCarroceriaNuevoInput.required = false;
-                tipoCarroceriaNuevoInput.value = '';
-            }
         });
         if (btnAddTipoCarroceria) {
             btnAddTipoCarroceria.addEventListener('click', function() {
