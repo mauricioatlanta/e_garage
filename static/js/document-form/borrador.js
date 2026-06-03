@@ -390,20 +390,9 @@
         // Periodic autosave every 10 seconds
         setInterval(saveDocumentDraftNow, 10000);
 
-        // Dirty tracking for beforeunload warning
+        // Dirty tracking (no native beforeunload — browser dialog ignores app language)
         form.addEventListener('input', function() { docDraftDirty = true; });
         form.addEventListener('change', function() { docDraftDirty = true; });
-
-        window.addEventListener('beforeunload', function(event) {
-            if (!docDraftDirty) return;
-            var key = getDocumentFormDraftKey();
-            if (!key) return;
-            try {
-                if (!window.localStorage.getItem(key)) return;
-            } catch (e) { return; }
-            event.preventDefault();
-            event.returnValue = '';
-        });
     }
 
     EG.borrador = {
@@ -415,6 +404,7 @@
         restoreDocumentDraftAfterHydrate: restoreDocumentDraftAfterHydrate,
         showDraftRestoreModal: showDraftRestoreModal,
         collectRows: collectDocumentDraftPayload,
+        isDirty: function() { return docDraftDirty; },
         init: init
     };
 

@@ -464,7 +464,7 @@
         </section>
 
         <div class="doc-form-actions">
-          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn doc-action-btn--ghost doc-action-btn--wide" data-i18n="cancelar">CANCELAR</a>
+          <a href="{% country_url 'documentos:lista_documentos' %}" id="btn-cancelar-doc" class="doc-action-btn doc-action-btn--ghost doc-action-btn--wide" data-i18n="cancelar">CANCELAR</a>
           <button type="button" id="save-draft-btn" class="doc-action-btn doc-action-btn--cyan doc-action-btn--wide" data-i18n="guardar_borrador">GUARDAR BORRADOR</button>
           <button type="submit" class="doc-action-btn doc-action-btn--success doc-action-btn--wide">
             {% if es_edicion %}
@@ -482,6 +482,19 @@
   <input type="hidden" name="servicios_json" id="id_servicios_json">
   <input type="hidden" name="otros_json" id="id_otros_json">
 </form>
+
+<!-- Modal: cambios sin guardar / unsaved changes -->
+<div id="modal-unsaved" style="display:none;position:fixed;inset:0;z-index:60;align-items:center;justify-content:center">
+  <div style="position:absolute;inset:0;background:rgba(0,0,0,0.65)" id="modal-unsaved-overlay"></div>
+  <div style="position:relative;z-index:1;background:#0d1b2e;border:1px solid rgba(95,126,163,0.35);border-radius:14px;padding:28px 28px 22px;max-width:380px;width:calc(100% - 32px);box-shadow:0 28px 80px rgba(1,8,18,0.6)">
+    <h3 id="modal-unsaved-title" style="margin:0 0 10px;font-size:16px;font-weight:800;color:#f4f9ff">¿Salir sin guardar?</h3>
+    <p id="modal-unsaved-body" style="margin:0 0 22px;font-size:13px;color:#95abc2;line-height:1.5">Tienes cambios sin guardar. Si sales ahora se perderán.</p>
+    <div style="display:flex;gap:10px;justify-content:flex-end">
+      <button type="button" id="modal-unsaved-stay" style="padding:8px 16px;border-radius:6px;border:1.5px solid #4a5a72;background:#1e2a3a;color:#cbd5e1;font-size:12px;font-weight:700;cursor:pointer">Quedarme</button>
+      <button type="button" id="modal-unsaved-leave" style="padding:8px 16px;border-radius:6px;border:none;background:#dc2626;color:#fff;font-size:12px;font-weight:700;cursor:pointer">Salir</button>
+    </div>
+  </div>
+</div>
 
 <div id="modal-used-parts" class="doc-used-modal hidden">
   <div id="used-parts-overlay" class="doc-used-modal__overlay"></div>
@@ -660,6 +673,67 @@ if (window.DESARME_PREFILL) {
     var saved = 'es';
     try { saved = localStorage.getItem('eg_doc_lang') || 'es'; } catch(e) {}
     if (saved !== 'es') applyLang(saved);
+
+    // Unsaved-changes modal — replaces native browser beforeunload dialog
+    var UNSAVED_COPY = {
+      es: { title: '¿Salir sin guardar?', body: 'Tienes cambios sin guardar. Si sales ahora se perderán.', stay: 'Quedarme', leave: 'Salir de todas formas' },
+      en: { title: 'Leave without saving?', body: 'You have unsaved changes. If you leave now they will be lost.', stay: 'Stay', leave: 'Leave anyway' }
+    };
+
+    function updateUnsavedModal(lang) {
+      var c = UNSAVED_COPY[lang] || UNSAVED_COPY.es;
+      var t = document.getElementById('modal-unsaved-title');
+      var b = document.getElementById('modal-unsaved-body');
+      var s = document.getElementById('modal-unsaved-stay');
+      var l = document.getElementById('modal-unsaved-leave');
+      if (t) t.textContent = c.title;
+      if (b) b.textContent = c.body;
+      if (s) s.textContent = c.stay;
+      if (l) l.textContent = c.leave;
+    }
+
+    // Keep modal text in sync when language toggles
+    var origApplyLang = window.EG_setLang;
+    window.EG_setLang = function(lang) { origApplyLang(lang); updateUnsavedModal(lang); };
+
+    // Init modal text with current language
+    updateUnsavedModal(saved);
+
+    var modal = document.getElementById('modal-unsaved');
+    var leaveUrl = null;
+
+    function showUnsavedModal(href) {
+      leaveUrl = href;
+      if (modal) modal.style.display = 'flex';
+    }
+    function hideUnsavedModal() {
+      if (modal) modal.style.display = 'none';
+      leaveUrl = null;
+    }
+
+    function isFormDirty() {
+      return window.EG && window.EG.borrador && typeof window.EG.borrador.isDirty === 'function'
+        ? window.EG.borrador.isDirty()
+        : false;
+    }
+
+    var cancelBtn = document.getElementById('btn-cancelar-doc');
+    if (cancelBtn) {
+      cancelBtn.addEventListener('click', function(e) {
+        if (!isFormDirty()) return;
+        e.preventDefault();
+        showUnsavedModal(cancelBtn.href);
+      });
+    }
+
+    var stayBtn = document.getElementById('modal-unsaved-stay');
+    var leaveBtn = document.getElementById('modal-unsaved-leave');
+    var overlay = document.getElementById('modal-unsaved-overlay');
+    if (stayBtn) stayBtn.addEventListener('click', hideUnsavedModal);
+    if (overlay) overlay.addEventListener('click', hideUnsavedModal);
+    if (leaveBtn) leaveBtn.addEventListener('click', function() {
+      if (leaveUrl) window.location.href = leaveUrl;
+    });
   });
 })();
 </script>
