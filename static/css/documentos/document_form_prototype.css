@@ -341,7 +341,7 @@
 }
 
 #document-form #doc-shell .doc-client-controls {
-  grid-template-columns: minmax(0, 0.92fr) auto minmax(0, 1.14fr);
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
 }
 
 #document-form #doc-shell .doc-vehicle-controls {

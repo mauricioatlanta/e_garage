@@ -153,6 +153,16 @@
         <section class="doc-panel doc-panel--entity">
           <div class="doc-panel__heading">
             <h2 data-i18n="cliente">CLIENTE</h2>
+            <a
+              id="btn-nuevo-cliente"
+              href="{% country_url 'clientes:crear_cliente' %}?return_to={{ request.get_full_path|urlencode }}&select_field=cliente"
+              data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
+              onclick="if (window.openClienteModal) { event.preventDefault(); window.openClienteModal(); return false; }"
+              class="doc-action-btn doc-action-btn--cyan-alt"
+            >
+              <span aria-hidden="true">+</span>
+              <span data-i18n="nuevo">Nuevo</span>
+            </a>
           </div>
 
           <div class="doc-client-controls">
@@ -176,17 +186,6 @@
               </span>
               <div id="cliente-resultados" class="doc-results-dropdown hidden"></div>
             </div>
-
-            <a
-              id="btn-nuevo-cliente"
-              href="{% country_url 'clientes:crear_cliente' %}?return_to={{ request.get_full_path|urlencode }}&select_field=cliente"
-              data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
-              onclick="if (window.openClienteModal) { event.preventDefault(); window.openClienteModal(); return false; }"
-              class="doc-action-btn doc-action-btn--cyan-alt"
-            >
-              <span aria-hidden="true">+</span>
-              <span data-i18n="nuevo">Nuevo</span>
-            </a>
 
             <div class="doc-select-wrap">
               <label for="id_cliente" class="sr-only">Cliente</label>
