@@ -17,7 +17,7 @@ from taller.forms.company_settings_forms import (
 )
 from taller.models import Tecnico
 from taller.models.company_settings import CompanySettings
-from taller.utils.empresa import get_or_create_empresa
+from taller.utils.empresa import get_or_create_empresa, get_user_empresa_safe
 from taller.utils.pais_utils import get_configuracion_pais
 
 

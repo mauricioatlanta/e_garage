@@ -705,7 +705,7 @@ def api_obtener_numero_documento(request):
                 return None
 
             # Intentar extraer los dígitos finales (soporta formatos como OT-001)
-            match = re.search(r"(\\d+)$", text)
+            match = re.search(r"(\d+)$", text)
             if match:
                 try:
                     return int(match.group(1))

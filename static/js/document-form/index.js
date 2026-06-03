@@ -5,7 +5,7 @@
 (function() {
     'use strict';
 
-    var APP_VERSION = '3.2.6';
+    var APP_VERSION = '3.2.7';
 
     window.EG = window.EG || {};
     window.EG.APP_VERSION = APP_VERSION;
@@ -50,6 +50,10 @@
                 }
 
                 var normalizedKey = String(key).toLowerCase();
+                // Preserve borrador.js autosave drafts — managed via restore modal
+                if (normalizedKey.indexOf('doc_draft_v') === 0) {
+                    continue;
+                }
                 if (
                     normalizedKey.indexOf('document') !== -1
                     || normalizedKey.indexOf('draft') !== -1
@@ -380,6 +384,14 @@
             if (!restored) {
                 if (window.EG.lineItemsBootstrap && window.EG.lineItemsBootstrap.clearRows) {
                     window.EG.lineItemsBootstrap.clearRows();
+                }
+                // Offer to restore autosave draft when no other context was found
+                if (window.restoreDocumentDraftAfterHydrate) {
+                    try {
+                        await window.restoreDocumentDraftAfterHydrate({ hasServerLines: false });
+                    } catch (err) {
+                        console.warn('Error restaurando borrador:', err);
+                    }
                 }
             }
             return;

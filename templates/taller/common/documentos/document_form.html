@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/documentos/document_form_prototype.css' %}?v=20260525d">
+<link rel="stylesheet" href="{% static 'css/documentos/document_form_prototype.css' %}?v=20260603b">
 {% endblock extra_css %}
 
 {% block documento_title %}
@@ -95,14 +95,18 @@
           </svg>
         </span>
         <div>
-          <h1>{% if es_edicion %}EDITAR DOCUMENTO{% else %}CREAR DOCUMENTO{% endif %}</h1>
-          <span id="draft-indicator" class="doc-draft-indicator hidden" role="status" aria-live="polite">Borrador guardado</span>
+          <h1 data-i18n="{% if es_edicion %}editar_documento{% else %}crear_documento{% endif %}">{% if es_edicion %}EDITAR DOCUMENTO{% else %}CREAR DOCUMENTO{% endif %}</h1>
+          <span id="draft-indicator" class="doc-draft-indicator hidden" role="status" aria-live="polite" data-i18n="borrador_guardado">Borrador guardado</span>
+        </div>
+        <div class="doc-lang-toggle" id="doc-lang-toggle" role="group" aria-label="Idioma / Language">
+          <button type="button" class="doc-lang-btn doc-lang-btn--active" data-lang="es">ES</button>
+          <button type="button" class="doc-lang-btn" data-lang="en">EN</button>
         </div>
       </div>
 
       <div class="doc-top-grid">
         <div class="doc-field-card doc-field-card--number">
-          <label>Documento N°</label>
+          <label data-i18n="doc_numero">Documento N°</label>
           <span id="id_numero" class="doc-field-display" data-placeholder="Se generará automáticamente">
             {% if es_edicion %}
               {{ documento.numero|default:form.numero.value|default:"-" }}
@@ -113,34 +117,34 @@
         </div>
 
         <div class="doc-field-card">
-          <label for="id_fecha_emision">Fecha</label>
+          <label for="id_fecha_emision" data-i18n="fecha">Fecha</label>
           {{ form.fecha_emision }}
         </div>
 
         <div class="doc-field-card">
-          <label for="id_tipo">Tipo de documento</label>
+          <label for="id_tipo" data-i18n="tipo_doc">Tipo de documento</label>
           {{ form.tipo }}
         </div>
 
         {% with current_label=responsable_label|default:form.tecnico_responsable.label %}
         <div class="doc-field-card">
-          <label id="tecnico-label" for="id_tecnico_responsable" data-label-default="{{ current_label }}" data-label-pts="Vendedor">{{ current_label }}</label>
+          <label id="tecnico-label" for="id_tecnico_responsable" data-label-default="{{ current_label }}" data-label-pts="Vendedor" data-i18n="mecanico_responsable">{{ current_label }}</label>
           {{ form.tecnico_responsable }}
         </div>
         {% endwith %}
 
         <div class="doc-field-card">
-          <label for="id_payment_status">Estado de pago</label>
+          <label for="id_payment_status" data-i18n="estado_pago">Estado de pago</label>
           <div id="payment-status-badge" class="doc-payment-shell doc-console-payment doc-console-payment-pending">
             {{ form.payment_status }}
           </div>
         </div>
 
         <div class="doc-field-card">
-          <label for="doc_mode">Operación</label>
+          <label for="doc_mode" data-i18n="operacion">Operación</label>
           <select id="doc_mode" name="doc_mode">
-            <option value="services">Servicios</option>
-            <option value="parts">Solo venta de repuestos</option>
+            <option value="services" data-i18n="op_servicios">Servicios</option>
+            <option value="parts" data-i18n="op_solo_repuestos">Solo venta de repuestos</option>
           </select>
         </div>
       </div>
@@ -148,7 +152,7 @@
       <div class="doc-entity-grid">
         <section class="doc-panel doc-panel--entity">
           <div class="doc-panel__heading">
-            <h2>CLIENTE</h2>
+            <h2 data-i18n="cliente">CLIENTE</h2>
           </div>
 
           <div class="doc-client-controls">
@@ -178,10 +182,11 @@
               href="{% country_url 'clientes:crear_cliente' %}?return_to={{ request.get_full_path|urlencode }}&select_field=cliente"
               data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
               onclick="if (window.openClienteModal) { event.preventDefault(); window.openClienteModal(); return false; }"
-              class="doc-action-btn doc-action-btn--cyan doc-action-btn--fixed"
+              class="doc-action-btn doc-action-btn--ghost"
+              style="justify-self:start"
             >
               <span aria-hidden="true">+</span>
-              <span>Nuevo</span>
+              <span data-i18n="nuevo">Nuevo</span>
             </a>
 
             <div class="doc-select-wrap">
@@ -210,15 +215,26 @@
               </svg>
             </span>
             <div>
-              <strong>Sin cliente seleccionado</strong>
-              <p>Seleccione un cliente para ver información</p>
+              <strong data-i18n="cliente_empty_title">Sin cliente seleccionado</strong>
+              <p data-i18n="cliente_empty_hint">Seleccione un cliente para ver información</p>
             </div>
           </div>
         </section>
 
         <section class="doc-panel doc-panel--entity" id="vehicle-section">
           <div class="doc-panel__heading">
-            <h2>VEHÍCULO</h2>
+            <h2 data-i18n="vehiculo">VEHÍCULO</h2>
+            {% if ui_config.show_vehicle %}
+            <a
+              id="btn-nuevo-vehiculo"
+              href="{% country_url 'vehiculos:crear_vehiculo' %}?return_to={{ request.get_full_path|urlencode }}&select_field=vehiculo&cliente_id="
+              data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}"
+              class="doc-action-btn doc-action-btn--cyan"
+            >
+              <span aria-hidden="true">+</span>
+              <span data-i18n="nuevo_vehiculo">Nuevo vehículo</span>
+            </a>
+            {% endif %}
           </div>
 
           {% if ui_config.show_vehicle %}
@@ -235,20 +251,10 @@
 
             {% if 'kilometraje_ingreso' in form.fields %}
             <div id="miles-section" class="doc-inline-field">
-              <label for="id_kilometraje_ingreso">Kilometraje</label>
+              <label for="id_kilometraje_ingreso" data-i18n="km_label">Kilometraje</label>
               {{ form.kilometraje_ingreso }}
             </div>
             {% endif %}
-
-            <a
-              id="btn-nuevo-vehiculo"
-              href="{% country_url 'vehiculos:crear_vehiculo' %}?return_to={{ request.get_full_path|urlencode }}&select_field=vehiculo&cliente_id="
-              data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}"
-              class="doc-action-btn doc-action-btn--cyan doc-action-btn--wide"
-            >
-              <span aria-hidden="true">+</span>
-              <span>Nuevo vehículo</span>
-            </a>
           </div>
           {% endif %}
 
@@ -273,19 +279,9 @@
               </svg>
             </span>
             <div>
-              <strong>Sin vehículo seleccionado</strong>
-              <p>Seleccione un vehículo para ver información</p>
+              <strong data-i18n="vehiculo_empty_title">Sin vehículo seleccionado</strong>
+              <p data-i18n="vehiculo_empty_hint">Seleccione un vehículo para ver información</p>
             </div>
-            <a
-              id="btn-nuevo-vehiculo-empty"
-              href="{% country_url 'vehiculos:crear_vehiculo' %}?return_to={{ request.get_full_path|urlencode }}&select_field=vehiculo&cliente_id="
-              data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}"
-              class="doc-action-btn doc-action-btn--cyan hidden"
-              style="margin-left:auto"
-            >
-              <span aria-hidden="true">+</span>
-              <span>Nuevo vehículo para este cliente</span>
-            </a>
           </div>
         </section>
       </div>
@@ -297,7 +293,7 @@
         <section class="doc-panel doc-panel--section">
           <div class="doc-section-head">
             <div>
-              <h2>REPUESTOS / REPUESTOS USADAS</h2>
+              <h2 data-i18n="repuestos">REPUESTOS / REPUESTOS USADAS</h2>
               {% if desarme_origen_label %}
                 <p class="doc-section-note">
                   <span class="doc-pill doc-pill--warning">Usado</span>
@@ -306,19 +302,26 @@
               {% endif %}
             </div>
             <div class="doc-section-actions">
-              <button type="button" id="add-repuesto" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span>AGREGAR</span></button>
-              <a href="{% country_url 'repuestos:crear_repuesto' %}?return_to={{ request.get_full_path|urlencode }}&select_field=repuesto" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span>Nuevo</span></a>
-              <a id="goto-used-parts" href="{% country_url 'desarme:lista_piezas' %}?return_to={{ request.get_full_path|urlencode }}&select_field=pieza_desarme" class="doc-action-btn doc-action-btn--warning"><span>Usado</span></a>
+              <button type="button" id="add-repuesto" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span></button>
+              <a href="{% country_url 'repuestos:crear_repuesto' %}?return_to={{ request.get_full_path|urlencode }}&select_field=repuesto" class="doc-action-btn doc-action-btn--ghost"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
+              <a id="goto-used-parts" href="{% country_url 'desarme:lista_piezas' %}?return_to={{ request.get_full_path|urlencode }}&select_field=pieza_desarme" class="doc-action-btn doc-action-btn--ghost">
+                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" style="width:13px;height:13px;stroke:currentColor;stroke-width:1.7;flex-shrink:0;stroke-linecap:round;stroke-linejoin:round">
+                  <path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h12A2.25 2.25 0 0 1 20.25 6v1a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 7V6Z"/>
+                  <path d="M3.75 9.25v8A2.25 2.25 0 0 0 6 19.5h12a2.25 2.25 0 0 0 2.25-2.25v-8"/>
+                  <path d="M9.75 13.25h4.5"/>
+                </svg>
+                <span data-i18n="usado">Usado</span>
+              </a>
             </div>
           </div>
 
           <div class="doc-table-head doc-table-head--parts">
-            <span>Código</span>
-            <span>Repuesto / Nombre</span>
-            <span>Cant.</span>
-            <span>Precio unit.</span>
-            <span>Total</span>
-            <span>Acciones</span>
+            <span data-i18n="codigo">Código</span>
+            <span data-i18n="rep_nombre">Repuesto / Nombre</span>
+            <span data-i18n="cant">Cant.</span>
+            <span data-i18n="precio_unit">Precio unit.</span>
+            <span data-i18n="total">Total</span>
+            <span data-i18n="acciones">Acciones</span>
           </div>
 
           <div id="repuestos-container" class="doc-lines-container doc-lines-container--parts">
@@ -328,8 +331,8 @@
                   <path d="M8 4.75 4.75 6.5v11L12 21l7.25-3.5v-11L16 4.75M8 4.75 12 7l4-2.25M8 4.75V9.5L12 12l4-2.5V4.75M12 12v9" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
                 </svg>
               </span>
-              <strong>Aún no agregas repuestos</strong>
-              <p>Haz clic en AGREGAR para añadir la primera línea</p>
+              <strong data-i18n="rep_empty_title">Aún no agregas repuestos</strong>
+              <p data-i18n="rep_empty_hint">Haz clic en AGREGAR para añadir la primera línea</p>
             </div>
           </div>
         </section>
@@ -338,18 +341,18 @@
         {% if ui_config.show_services %}
         <section class="doc-panel doc-panel--section">
           <div class="doc-section-head">
-            <h2>SERVICIOS</h2>
+            <h2 data-i18n="servicios">SERVICIOS</h2>
             <div class="doc-section-actions">
-              <button type="button" id="add-servicio" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span>AGREGAR</span></button>
-              <a href="{% country_url 'servicios:crear_servicio' %}?return_to={{ request.get_full_path|urlencode }}&select_field=servicio" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span>Nuevo</span></a>
+              <button type="button" id="add-servicio" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span></button>
+              <a href="{% country_url 'servicios:crear_servicio' %}?return_to={{ request.get_full_path|urlencode }}&select_field=servicio" class="doc-action-btn doc-action-btn--ghost"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
             </div>
           </div>
 
           <div class="doc-table-head doc-table-head--services">
-            <span>Servicio / Nombre</span>
-            <span>Precio unit.</span>
-            <span>Total</span>
-            <span>Acciones</span>
+            <span data-i18n="srv_nombre">Servicio / Nombre</span>
+            <span data-i18n="precio_unit">Precio unit.</span>
+            <span data-i18n="total">Total</span>
+            <span data-i18n="acciones">Acciones</span>
           </div>
 
           <div id="servicios-container" class="doc-lines-container doc-lines-container--services">
@@ -361,8 +364,8 @@
                   <path d="M5 18.5h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
                 </svg>
               </span>
-              <strong>Aún no agregas servicios</strong>
-              <p>Haz clic en AGREGAR para añadir el primer servicio</p>
+              <strong data-i18n="srv_empty_title">Aún no agregas servicios</strong>
+              <p data-i18n="srv_empty_hint">Haz clic en AGREGAR para añadir el primer servicio</p>
             </div>
           </div>
         </section>
@@ -371,18 +374,18 @@
         {% if ui_config.show_otros_servicios %}
         <section class="doc-panel doc-panel--section">
           <div class="doc-section-head">
-            <h2>OTROS SERVICIOS / TERCEROS</h2>
+            <h2 data-i18n="otros_servicios">OTROS SERVICIOS / TERCEROS</h2>
             <div class="doc-section-actions">
-              <button type="button" id="add-otro" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span>AGREGAR</span></button>
-              <a href="{% country_url 'servicios:crear_otro_servicio' %}?return_to={{ request.get_full_path|urlencode }}" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span>Nuevo</span></a>
+              <button type="button" id="add-otro" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span></button>
+              <a href="{% country_url 'servicios:crear_otro_servicio' %}?return_to={{ request.get_full_path|urlencode }}" class="doc-action-btn doc-action-btn--ghost"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
             </div>
           </div>
 
           <div class="doc-table-head doc-table-head--others">
-            <span>Servicio / Nombre</span>
-            <span>Empresa externa</span>
+            <span data-i18n="srv_nombre">Servicio / Nombre</span>
+            <span data-i18n="empresa_externa">Empresa externa</span>
             <span aria-hidden="true"></span>
-            <span>Precio cliente</span>
+            <span data-i18n="precio_cliente">Precio cliente</span>
             <span aria-hidden="true"></span>
           </div>
 
@@ -403,31 +406,31 @@
                 <path d="M8 12h8M8 15.5h8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
               </svg>
             </span>
-            <h2>TOTALES</h2>
+            <h2 data-i18n="totales">TOTALES</h2>
           </div>
 
           <div class="doc-totals-list">
             <div class="doc-total-row">
-              <span>Subtotal repuestos</span>
+              <span data-i18n="subtotal_rep">Subtotal repuestos</span>
               <span id="t_repuestos">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
             </div>
 
             {% if ui_config.show_services %}
             <div class="doc-total-row">
-              <span>Subtotal servicios</span>
+              <span data-i18n="subtotal_srv">Subtotal servicios</span>
               <span id="t_servicios">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
             </div>
             {% endif %}
 
             {% if ui_config.show_otros_servicios %}
             <div class="doc-total-row">
-              <span>Subtotal otros servicios</span>
+              <span data-i18n="subtotal_otros">Subtotal otros servicios</span>
               <span id="t_otros">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
             </div>
             {% endif %}
 
             <div class="doc-total-row">
-              <span>Subtotal neto</span>
+              <span data-i18n="subtotal_neto">Subtotal neto</span>
               <span id="t_subtotal_neto">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</span>
             </div>
 
@@ -450,26 +453,26 @@
           </div>
 
           <div class="doc-grand-total">
-            <span>TOTAL A PAGAR</span>
+            <span data-i18n="total_pagar">TOTAL A PAGAR</span>
             <strong id="t_total">{% if country_features %}{{ country_features.currency_symbol|default:"$" }}{% else %}{{ ui_config.currency_symbol|default:"$" }}{% endif %}0</strong>
           </div>
         </section>
 
         <section class="doc-panel doc-panel--notes">
           <div class="doc-panel__heading">
-            <h2>NOTAS</h2>
+            <h2 data-i18n="notas">NOTAS</h2>
           </div>
           {{ form.observaciones }}
         </section>
 
         <div class="doc-form-actions">
-          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn doc-action-btn--ghost doc-action-btn--wide">CANCELAR</a>
-          <button type="button" id="save-draft-btn" class="doc-action-btn doc-action-btn--cyan-alt doc-action-btn--wide">GUARDAR BORRADOR</button>
+          <a href="{% country_url 'documentos:lista_documentos' %}" class="doc-action-btn doc-action-btn--ghost doc-action-btn--wide" data-i18n="cancelar">CANCELAR</a>
+          <button type="button" id="save-draft-btn" class="doc-action-btn doc-action-btn--cyan doc-action-btn--wide" data-i18n="guardar_borrador">GUARDAR BORRADOR</button>
           <button type="submit" class="doc-action-btn doc-action-btn--success doc-action-btn--wide">
             {% if es_edicion %}
-              Guardar cambios
+              <span data-i18n="guardar_cambios">Guardar cambios</span>
             {% else %}
-              GUARDAR Y CONTINUAR
+              <span data-i18n="guardar_continuar">GUARDAR Y CONTINUAR</span>
             {% endif %}
           </button>
         </div>
@@ -524,6 +527,124 @@ if (window.DESARME_PREFILL) {
 
 {% block extra_js %}
 {{ block.super }}
+<script>
+(function() {
+  var T = {
+    es: {
+      crear_documento: 'CREAR DOCUMENTO', editar_documento: 'EDITAR DOCUMENTO',
+      borrador_guardado: 'Borrador guardado',
+      doc_numero: 'Documento N°', fecha: 'Fecha', tipo_doc: 'Tipo de documento',
+      estado_pago: 'Estado de pago', operacion: 'Operación',
+      op_servicios: 'Servicios', op_solo_repuestos: 'Solo venta de repuestos',
+      cliente: 'CLIENTE', vehiculo: 'VEHÍCULO',
+      repuestos: 'REPUESTOS / REPUESTOS USADAS', servicios: 'SERVICIOS',
+      otros_servicios: 'OTROS SERVICIOS / TERCEROS', totales: 'TOTALES', notas: 'NOTAS',
+      agregar: 'AGREGAR', nuevo: 'Nuevo', usado: 'Usado',
+      nuevo_vehiculo: 'Nuevo vehículo',
+      cancelar: 'CANCELAR', guardar_borrador: 'GUARDAR BORRADOR',
+      guardar_continuar: 'GUARDAR Y CONTINUAR', guardar_cambios: 'Guardar cambios',
+      codigo: 'Código', rep_nombre: 'Repuesto / Nombre', cant: 'Cant.',
+      precio_unit: 'Precio unit.', total: 'Total', acciones: 'Acciones',
+      srv_nombre: 'Servicio / Nombre', empresa_externa: 'Empresa externa',
+      precio_cliente: 'Precio cliente',
+      subtotal_rep: 'Subtotal repuestos', subtotal_srv: 'Subtotal servicios',
+      subtotal_otros: 'Subtotal otros servicios', subtotal_neto: 'Subtotal neto',
+      total_pagar: 'TOTAL A PAGAR',
+      rep_empty_title: 'Aún no agregas repuestos',
+      rep_empty_hint: 'Haz clic en AGREGAR para añadir la primera línea',
+      srv_empty_title: 'Aún no agregas servicios',
+      srv_empty_hint: 'Haz clic en AGREGAR para añadir el primer servicio',
+      cliente_empty_title: 'Sin cliente seleccionado',
+      cliente_empty_hint: 'Seleccione un cliente para ver información',
+      vehiculo_empty_title: 'Sin vehículo seleccionado',
+      vehiculo_empty_hint: 'Seleccione un vehículo para ver información',
+      km_label: 'Kilometraje', mecanico_responsable: 'Mecánico responsable',
+      notas_ph: 'Escribe una nota (opcional)...',
+      buscar_cliente_ph: 'Buscar cliente...', sel_vehiculo_ph: 'Seleccionar vehículo...',
+    },
+    en: {
+      crear_documento: 'CREATE DOCUMENT', editar_documento: 'EDIT DOCUMENT',
+      borrador_guardado: 'Draft saved',
+      doc_numero: 'Document No.', fecha: 'Date', tipo_doc: 'Document type',
+      estado_pago: 'Payment status', operacion: 'Operation',
+      op_servicios: 'Services', op_solo_repuestos: 'Parts only',
+      cliente: 'CLIENT', vehiculo: 'VEHICLE',
+      repuestos: 'PARTS / USED PARTS', servicios: 'SERVICES',
+      otros_servicios: 'OTHER SERVICES / THIRD PARTIES', totales: 'TOTALS', notas: 'NOTES',
+      agregar: 'ADD', nuevo: 'New', usado: 'Used',
+      nuevo_vehiculo: 'New vehicle',
+      cancelar: 'CANCEL', guardar_borrador: 'SAVE DRAFT',
+      guardar_continuar: 'SAVE AND CONTINUE', guardar_cambios: 'Save changes',
+      codigo: 'Code', rep_nombre: 'Part / Name', cant: 'Qty.',
+      precio_unit: 'Unit price', total: 'Total', acciones: 'Actions',
+      srv_nombre: 'Service / Name', empresa_externa: 'External company',
+      precio_cliente: 'Client price',
+      subtotal_rep: 'Parts subtotal', subtotal_srv: 'Services subtotal',
+      subtotal_otros: 'Other services subtotal', subtotal_neto: 'Net subtotal',
+      total_pagar: 'TOTAL DUE',
+      rep_empty_title: 'No parts added yet',
+      rep_empty_hint: 'Click ADD to add the first line',
+      srv_empty_title: 'No services added yet',
+      srv_empty_hint: 'Click ADD to add the first service',
+      cliente_empty_title: 'No client selected',
+      cliente_empty_hint: 'Select a client to view info',
+      vehiculo_empty_title: 'No vehicle selected',
+      vehiculo_empty_hint: 'Select a vehicle to view info',
+      km_label: 'Mileage', mecanico_responsable: 'Lead mechanic',
+      notas_ph: 'Write a note (optional)...',
+      buscar_cliente_ph: 'Search client...', sel_vehiculo_ph: 'Select vehicle...',
+    }
+  };
+
+  function applyLang(lang) {
+    var t = T[lang] || T.es;
+    window.EG_LANG = lang;
+    try { localStorage.setItem('eg_doc_lang', lang); } catch(e) {}
+
+    // Toggle button states
+    document.querySelectorAll('#doc-lang-toggle .doc-lang-btn').forEach(function(btn) {
+      var active = btn.dataset.lang === lang;
+      btn.classList.toggle('doc-lang-btn--active', active);
+      btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+    });
+
+    // Translate all data-i18n elements
+    document.querySelectorAll('[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.textContent = t[key];
+    });
+
+    // Translate option text (select options with data-i18n)
+    document.querySelectorAll('option[data-i18n]').forEach(function(el) {
+      var key = el.getAttribute('data-i18n');
+      if (t[key] !== undefined) el.text = t[key];
+    });
+
+    // Update placeholders
+    var cBusq = document.getElementById('cliente-busqueda');
+    if (cBusq) cBusq.placeholder = t.buscar_cliente_ph || '';
+    var vSel = document.getElementById('id_vehiculo');
+    if (vSel && vSel.options[0] && vSel.options[0].value === '') {
+      vSel.options[0].text = t.sel_vehiculo_ph || '';
+    }
+    var notesEl = document.getElementById('id_observaciones');
+    if (notesEl) notesEl.placeholder = t.notas_ph || '';
+  }
+
+  window.EG_setLang = applyLang;
+
+  document.addEventListener('DOMContentLoaded', function() {
+    // Wire up lang toggle buttons
+    document.querySelectorAll('#doc-lang-toggle .doc-lang-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() { applyLang(btn.dataset.lang); });
+    });
+    // Apply persisted language
+    var saved = 'es';
+    try { saved = localStorage.getItem('eg_doc_lang') || 'es'; } catch(e) {}
+    if (saved !== 'es') applyLang(saved);
+  });
+})();
+</script>
 <script src="{% static 'js/marketplace_tooltip_fixed.js' %}"></script>
 <script>
 window.__PRESELECT_CLIENTE_ID__ = "{{ cliente_preselect_id|default:''|escapejs }}";
@@ -635,5 +756,5 @@ document.addEventListener('DOMContentLoaded', function() {
 window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
 window.DESARME_PREFILL = window.DESARME_PREFILL || {% if has_server_line_items %}true{% else %}false{% endif %};
 </script>
-<script src="{% static 'js/document-form/index.js' %}?v=3.2.4"></script>
+<script src="{% static 'js/document-form/index.js' %}?v=3.2.7"></script>
 {% endblock extra_js %}

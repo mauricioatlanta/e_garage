@@ -167,22 +167,6 @@
         return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(num) + ' ' + unit;
     }
 
-    const MILEAGE_LOCALES = {
-        US: 'en-US', CL: 'es-CL', MX: 'es-MX', AR: 'es-AR',
-        UY: 'es-UY', PE: 'es-PE', VE: 'es-VE', CO: 'es-CO',
-        EC: 'es-EC', BR: 'pt-BR',
-    };
-    const MILEAGE_UNIT = { US: 'mi' };
-
-    function formatMileage(value) {
-        const num = parseInt(value, 10);
-        if (!Number.isFinite(num) || isNaN(num)) return String(value || '');
-        const country = (EG.cfg && EG.cfg.country) || 'CL';
-        const locale = MILEAGE_LOCALES[country] || 'es-CL';
-        const unit = MILEAGE_UNIT[country] || 'km';
-        return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(num) + ' ' + unit;
-    }
-
     function parseNumericInput(value) {
         if (value === undefined || value === null) return 0;
         const num = Number(value.toString().replace(/[^0-9.-]/g, ''));

@@ -345,7 +345,7 @@
 }
 
 #document-form #doc-shell .doc-vehicle-controls {
-  grid-template-columns: minmax(0, 1.04fr) minmax(128px, 0.42fr) minmax(148px, auto);
+  grid-template-columns: minmax(0, 1fr) minmax(128px, auto);
   align-items: end;
 }
 
@@ -499,12 +499,11 @@
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  gap: 8px;
-  min-height: 40px !important;
-  padding: 0 16px !important;
-  border: 1px solid transparent !important;
-  border-radius: 10px !important;
-  font-size: 14px !important;
+  gap: 6px;
+  padding: 6px 12px !important;
+  border: 1.5px solid transparent !important;
+  border-radius: 6px !important;
+  font-size: 12px !important;
   font-weight: 700 !important;
   line-height: 1 !important;
   text-decoration: none !important;
@@ -526,34 +525,27 @@
   flex: 1 1 0;
 }
 
+/* SECUNDARIO — acción principal de sección (Agregar, Nuevo vehículo) */
 #document-form #doc-shell .doc-action-btn--cyan {
-  color: #f8feff !important;
-  background: linear-gradient(180deg, #14c7f2 0%, #0da7d7 100%) !important;
-  border-color: rgba(19, 198, 242, 0.44) !important;
+  color: #22d3ee !important;
+  background: #0a1a22 !important;
+  border-color: #22d3ee !important;
 }
 
-#document-form #doc-shell .doc-action-btn--cyan-alt {
-  color: #f8feff !important;
-  background: linear-gradient(180deg, rgba(26, 182, 221, 0.95), rgba(14, 145, 191, 0.95)) !important;
-  border-color: rgba(19, 198, 242, 0.3) !important;
-}
-
-#document-form #doc-shell .doc-action-btn--warning {
-  color: #fff8ee !important;
-  background: linear-gradient(180deg, #f39a13 0%, #d47d0b 100%) !important;
-  border-color: rgba(243, 154, 19, 0.42) !important;
-}
-
-#document-form #doc-shell .doc-action-btn--success {
-  color: #f6fff9 !important;
-  background: linear-gradient(180deg, #1ab759 0%, #149347 100%) !important;
-  border-color: rgba(26, 183, 89, 0.44) !important;
-}
-
+/* GHOST — acciones auxiliares (Nuevo, Usado, Cancelar) */
+#document-form #doc-shell .doc-action-btn--cyan-alt,
+#document-form #doc-shell .doc-action-btn--warning,
 #document-form #doc-shell .doc-action-btn--ghost {
-  color: #e7f1fb !important;
-  background: linear-gradient(180deg, rgba(41, 59, 83, 0.95), rgba(27, 40, 59, 0.95)) !important;
-  border-color: rgba(95, 126, 163, 0.28) !important;
+  color: #cbd5e1 !important;
+  background: #1e2a3a !important;
+  border-color: #4a5a72 !important;
+}
+
+/* PRIMARIO — acción global verde */
+#document-form #doc-shell .doc-action-btn--success {
+  color: #fff !important;
+  background: #16a34a !important;
+  border-color: transparent !important;
 }
 
 #document-form #doc-shell .doc-table-head {
@@ -966,29 +958,34 @@
 #document-form #doc-shell .doc-form-actions {
   margin-top: 2px;
   display: grid;
-  grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr) minmax(0, 1.38fr);
+  grid-template-columns: 1fr 1fr 1fr;
   gap: 12px;
 }
 
 #document-form #doc-shell .doc-form-actions .doc-action-btn {
   min-width: 0;
   width: 100%;
-  min-height: 38px !important;
-  padding: 0 12px !important;
-  font-size: 12px !important;
+  padding: 10px 12px !important;
+  font-size: 11px !important;
   font-weight: 800 !important;
   letter-spacing: 0.01em;
-  white-space: nowrap;
-}
-
-#document-form #doc-shell .doc-form-actions #save-draft-btn,
-#document-form #doc-shell .doc-form-actions button[type="submit"] {
-  min-height: 46px !important;
-  padding: 6px 12px !important;
-  font-size: 11px !important;
-  line-height: 1.12 !important;
   white-space: normal !important;
   text-align: center;
+  line-height: 1.2 !important;
+}
+
+/* Footer Cancelar — tono más atenuado que el ghost de sección */
+#document-form #doc-shell .doc-form-actions .doc-action-btn--ghost {
+  background: #1a1f2e !important;
+  border: 1.5px solid #4a5568 !important;
+  color: #94a3b8 !important;
+}
+
+/* Footer Guardar Borrador — SECUNDARIO explícito */
+#document-form #doc-shell .doc-form-actions .doc-action-btn--cyan {
+  background: #0a1a22 !important;
+  border: 1.5px solid #22d3ee !important;
+  color: #22d3ee !important;
 }
 
 #document-form .doc-used-modal {
@@ -1195,4 +1192,36 @@
   #document-form #doc-shell .doc-grand-total strong {
     font-size: 28px;
   }
+}
+
+/* ── Language toggle ───────────────────────────────────── */
+#document-form #doc-shell .doc-lang-toggle {
+  display: inline-flex;
+  margin-left: auto;
+  border-radius: 6px;
+  border: 1px solid rgba(95, 126, 163, 0.3);
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+#document-form #doc-shell .doc-lang-btn {
+  padding: 4px 10px;
+  border: none;
+  background: transparent;
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+#document-form #doc-shell .doc-lang-btn--active {
+  background: #22d3ee;
+  color: #0a0f1a;
+}
+
+#document-form #doc-shell .doc-lang-btn:not(.doc-lang-btn--active):hover {
+  background: rgba(34, 211, 238, 0.1);
+  color: #22d3ee;
 }

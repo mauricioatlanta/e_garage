@@ -121,9 +121,10 @@
                 applyTheme(t);
                 updateDocumentNumber();
             });
-            // Aplicar tema inicial
+            // Aplicar tema y número inicial
             var t0 = selTipo.value || 'OT';
             applyTheme(t0);
+            if (t0) updateDocumentNumber();
         }
 
         // Modo según operación

@@ -9,8 +9,9 @@
 
     var DOC_DRAFT_VERSION = 2;
     var DOC_DRAFT_TTL_MS = 7 * 24 * 60 * 60 * 1000;
-    var SHOULD_LOAD_DRAFT = false;
+    var SHOULD_LOAD_DRAFT = true;
     var docDraftSaveTimer = null;
+    var docDraftDirty = false;
 
     function getDocumentFormDraftKey() {
         var form = document.getElementById('document-form');
@@ -21,14 +22,59 @@
         return 'doc_draft_v' + DOC_DRAFT_VERSION + ':' + path + ':' + mode + ':' + docId;
     }
 
-    function showDraftSavedIndicator() {
+    function showDraftIndicator(message) {
         var el = document.getElementById('draft-indicator');
         if (!el) return;
+        el.textContent = message || 'Borrador guardado';
         el.classList.remove('hidden');
-        clearTimeout(showDraftSavedIndicator._t);
-        showDraftSavedIndicator._t = setTimeout(function() {
+        clearTimeout(showDraftIndicator._t);
+        showDraftIndicator._t = setTimeout(function() {
             el.classList.add('hidden');
-        }, 1600);
+        }, 2200);
+    }
+
+    function showDraftSavedIndicator() {
+        showDraftIndicator('Borrador guardado');
+    }
+
+    function showDraftRestoreModal(draft) {
+        return new Promise(function(resolve) {
+            var existing = document.getElementById('eg-draft-restore-modal');
+            if (existing) existing.remove();
+
+            var savedAt = draft && draft.savedAt ? new Date(Number(draft.savedAt)) : null;
+            var timeStr = savedAt ? savedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+            var dateStr = savedAt ? savedAt.toLocaleDateString([], { day: '2-digit', month: '2-digit', year: 'numeric' }) : '';
+
+            var overlay = document.createElement('div');
+            overlay.id = 'eg-draft-restore-modal';
+            overlay.style.cssText = [
+                'position:fixed;top:0;left:0;right:0;bottom:0',
+                'background:rgba(0,0,0,0.72)',
+                'display:flex;align-items:center;justify-content:center',
+                'z-index:9999'
+            ].join(';');
+
+            overlay.innerHTML = '<div style="background:#0f141a;border:1px solid rgba(0,255,255,0.25);border-radius:12px;padding:28px 32px;max-width:400px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.65);color:#fff;">' +
+                '<h3 style="margin:0 0 8px;font-size:15px;font-weight:700;color:#00ffff;text-transform:uppercase;letter-spacing:0.06em;">Draft Found</h3>' +
+                '<p style="margin:0 0 6px;color:#b0b8c1;font-size:14px;">A previous document draft was found.</p>' +
+                (timeStr ? '<p style="margin:0 0 22px;color:#606d7a;font-size:12px;">Saved ' + dateStr + ' at ' + timeStr + '</p>' : '<div style="height:22px"></div>') +
+                '<div style="display:flex;gap:10px;justify-content:flex-end;">' +
+                '<button id="eg-draft-discard-btn" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.14);color:#9aacba;border-radius:8px;padding:9px 18px;cursor:pointer;font-size:13px;font-weight:600;">Discard Draft</button>' +
+                '<button id="eg-draft-restore-btn" style="background:rgba(0,255,255,0.1);border:1px solid rgba(0,255,255,0.38);color:#00ffff;border-radius:8px;padding:9px 18px;cursor:pointer;font-size:13px;font-weight:700;">Restore Draft</button>' +
+                '</div></div>';
+
+            document.body.appendChild(overlay);
+
+            overlay.querySelector('#eg-draft-restore-btn').addEventListener('click', function() {
+                overlay.remove();
+                resolve(true);
+            });
+            overlay.querySelector('#eg-draft-discard-btn').addEventListener('click', function() {
+                overlay.remove();
+                resolve(false);
+            });
+        });
     }
 
     function collectRows(selector, mapper) {
@@ -124,11 +170,15 @@
     }
 
     function saveDocumentDraftNow() {
+        // Only save if the user has interacted — prevents overwriting a prior draft
+        // with a blank form on the first 10-second tick after page load.
+        if (!docDraftDirty) return;
         var key = getDocumentFormDraftKey();
         if (!key) return;
         try {
             var payload = collectDocumentDraftPayload();
             if (!payload) return;
+            showDraftIndicator('Guardando...');
             localStorage.setItem(key, JSON.stringify(payload));
             showDraftSavedIndicator();
         } catch (err) {
@@ -143,7 +193,7 @@
     }
 
     function loadDocumentDraftParsed() {
-        if (!SHOULD_LOAD_DRAFT || window.FORCE_NEW_DOCUMENT) {
+        if (!SHOULD_LOAD_DRAFT) {
             return null;
         }
 
@@ -201,7 +251,7 @@
     }
 
     async function restoreDocumentDraftAfterHydrate(opts) {
-        if (!SHOULD_LOAD_DRAFT || window.FORCE_NEW_DOCUMENT) {
+        if (!SHOULD_LOAD_DRAFT) {
             return;
         }
 
@@ -209,6 +259,12 @@
         var draft = loadDocumentDraftParsed();
         if (!draft) return;
 
+        var userWantsRestore = await showDraftRestoreModal(draft);
+        if (!userWantsRestore) {
+            clearDocumentFormDraftStorage();
+            return;
+        }
+        showDraftIndicator('Restaurando borrador...');
         window.__DOC_DRAFT_RESTORING__ = true;
         try {
             var draftHasLines = ((draft.repuestos && draft.repuestos.length) || 0) > 0
@@ -313,6 +369,7 @@
             window.__DOC_DRAFT_RESTORING__ = false;
             if (typeof window.serializeRows === 'function') window.serializeRows();
             if (typeof window.recalcTotales === 'function') window.recalcTotales();
+            showDraftIndicator('Borrador restaurado');
         }
     }
 
@@ -325,7 +382,28 @@
         form.dataset.egDraftBound = '1';
         form.addEventListener('input', scheduleDocumentDraftSave);
         form.addEventListener('change', scheduleDocumentDraftSave);
-        form.addEventListener('submit', clearDocumentFormDraftStorage);
+        form.addEventListener('submit', function() {
+            clearDocumentFormDraftStorage();
+            docDraftDirty = false;
+        });
+
+        // Periodic autosave every 10 seconds
+        setInterval(saveDocumentDraftNow, 10000);
+
+        // Dirty tracking for beforeunload warning
+        form.addEventListener('input', function() { docDraftDirty = true; });
+        form.addEventListener('change', function() { docDraftDirty = true; });
+
+        window.addEventListener('beforeunload', function(event) {
+            if (!docDraftDirty) return;
+            var key = getDocumentFormDraftKey();
+            if (!key) return;
+            try {
+                if (!window.localStorage.getItem(key)) return;
+            } catch (e) { return; }
+            event.preventDefault();
+            event.returnValue = '';
+        });
     }
 
     EG.borrador = {
@@ -335,6 +413,7 @@
         loadDocumentDraftParsed: loadDocumentDraftParsed,
         clearDocumentFormDraftStorage: clearDocumentFormDraftStorage,
         restoreDocumentDraftAfterHydrate: restoreDocumentDraftAfterHydrate,
+        showDraftRestoreModal: showDraftRestoreModal,
         collectRows: collectDocumentDraftPayload,
         init: init
     };
