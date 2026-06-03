@@ -8,6 +8,7 @@ def _has_ops_urls() -> bool:
         return False
 
 
+from django.shortcuts import redirect
 from django.urls import include, path, re_path
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.generic import RedirectView, TemplateView

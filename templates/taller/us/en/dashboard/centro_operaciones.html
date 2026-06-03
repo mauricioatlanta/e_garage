@@ -1,0 +1,543 @@
+{% extends 'base.html' %}
+{% load country_url %}
+{% load static %}
+{% load i18n %}
+{% load humanize %}
+
+{% block title %}{% trans "Operations Center" %} — {{ empresa.nombre_taller }}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ============================================================
+   COMPACT SAAS DASHBOARD — fits 1366×768 without scroll
+   ============================================================ */
+
+/* ── Force compact header ── */
+header.company-header {
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 0.5rem !important;
+  padding: 0.3rem 1rem !important;
+  min-height: 44px !important;
+  max-height: 44px !important;
+  overflow: hidden;
+}
+header.company-header h1 {
+  font-size: 0.95rem !important;
+  letter-spacing: 0.05em !important;
+  line-height: 1.2 !important;
+}
+header.company-header .company-tagline { display: none !important; }
+header.company-header .company-logo {
+  height: 32px !important;
+  max-height: 32px !important;
+}
+header.company-header > .flex.items-center { gap: 0.4rem !important; }
+
+/* ── Force single-row nav ── */
+#main-navigation {
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 0.2rem !important;
+  padding: 0.2rem 0.5rem !important;
+  min-height: 40px !important;
+  max-height: 40px !important;
+  overflow: hidden;
+  margin-top: 0.15rem !important;
+}
+#main-navigation > div { display: contents !important; }
+#main-navigation .nav-button-standard {
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 0.2rem !important;
+  padding: 0.2rem 0.45rem !important;
+  min-height: 28px !important;
+  white-space: nowrap !important;
+}
+#main-navigation .nav-button-standard .nav-text {
+  display: inline !important;
+  font-size: 0.58rem !important;
+  margin-top: 0 !important;
+}
+#main-navigation .nav-button-standard .nav-icon { font-size: 0.8rem !important; }
+
+/* ── Dashboard variables ── */
+:root {
+  --d-cyan:   #00d4ff;
+  --d-green:  #00ff88;
+  --d-gold:   #ffd700;
+  --d-purple: #8a2be2;
+  --d-red:    #ff3b3b;
+  --d-panel:  rgba(5, 15, 25, 0.88);
+  --d-border: rgba(0, 212, 255, 0.22);
+  --d-gap:    0.45rem;
+}
+
+/* ── Layout container ── */
+.ops-dashboard {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0.35rem 0.75rem;
+  display: grid;
+  gap: var(--d-gap);
+}
+
+/* ──────────────────────────────────────────
+   1. ONBOARDING STRIP  (~52px)
+   ────────────────────────────────────────── */
+.ob-strip {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(255, 215, 0, 0.05);
+  border: 1px solid rgba(255, 215, 0, 0.28);
+  border-radius: 8px;
+  min-height: 44px;
+  max-height: 52px;
+  flex-wrap: wrap;
+}
+.ob-label {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--d-gold);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+  font-family: 'Orbitron', monospace;
+}
+.ob-steps {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 1;
+  flex-wrap: wrap;
+}
+.ob-step {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 20px;
+  font-size: 0.6rem;
+  font-weight: 600;
+  border: 1px solid;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s;
+}
+.ob-step.done {
+  background: rgba(0, 255, 136, 0.09);
+  border-color: rgba(0, 255, 136, 0.35);
+  color: #00ff88;
+}
+.ob-step.todo {
+  background: rgba(255, 215, 0, 0.07);
+  border-color: rgba(255, 215, 0, 0.28);
+  color: var(--d-gold);
+}
+.ob-step.todo:hover {
+  background: rgba(255, 215, 0, 0.16);
+  border-color: rgba(255, 215, 0, 0.65);
+}
+
+/* ──────────────────────────────────────────
+   2. KPI ROW  (~66px)
+   ────────────────────────────────────────── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.4rem;
+  min-height: 62px;
+  max-height: 66px;
+}
+.kpi-chip {
+  background: rgba(0, 212, 255, 0.05);
+  border: 1px solid var(--d-border);
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.15rem;
+  text-align: center;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.kpi-chip:hover {
+  border-color: var(--d-cyan);
+  box-shadow: 0 0 10px rgba(0, 212, 255, 0.18);
+}
+.kpi-val {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: var(--d-cyan);
+  line-height: 1;
+  font-family: 'Orbitron', monospace;
+}
+.kpi-lab {
+  font-size: 0.46rem;
+  color: #6688aa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 0.12rem;
+  line-height: 1.15;
+}
+
+/* ──────────────────────────────────────────
+   3. MID ROW: Resumen | Servicios+Técnicos (~160px)
+   ────────────────────────────────────────── */
+.mid-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--d-gap);
+  min-height: 155px;
+  max-height: 164px;
+}
+.ops-panel {
+  background: var(--d-panel);
+  border: 1px solid var(--d-border);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  overflow: hidden;
+}
+.panel-title {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--d-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'Orbitron', monospace;
+  margin-bottom: 0.4rem;
+}
+
+/* Resumen operativo: 3-column × 2-row grid */
+.res-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.35rem 0.5rem;
+}
+.res-item { display: flex; flex-direction: column; }
+.res-lab {
+  font-size: 0.46rem;
+  color: #5577aa;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.res-val {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #e0f0ff;
+  line-height: 1.1;
+  font-family: 'Orbitron', monospace;
+}
+
+/* Two-column layout inside right panel */
+.two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.4rem;
+  height: calc(100% - 1.2rem);
+}
+.col-box {
+  background: rgba(0, 212, 255, 0.035);
+  border: 1px solid rgba(0, 212, 255, 0.14);
+  border-radius: 7px;
+  padding: 0.4rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.col-title {
+  font-size: 0.52rem;
+  font-weight: 700;
+  color: var(--d-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-family: 'Orbitron', monospace;
+  margin-bottom: 0.3rem;
+}
+.col-empty {
+  font-size: 0.55rem;
+  color: #334455;
+  text-align: center;
+  padding-top: 0.5rem;
+}
+.rank-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.55rem;
+  color: #8899bb;
+  padding: 0.12rem 0;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.05);
+}
+.rank-row:last-child { border-bottom: none; }
+.rank-name {
+  font-weight: 600;
+  color: #c0d8f0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 72px;
+}
+.rank-val { color: var(--d-green); font-weight: 700; white-space: nowrap; }
+
+/* ──────────────────────────────────────────
+   4. CHART (~170px)
+   ────────────────────────────────────────── */
+.chart-wrap {
+  background: var(--d-panel);
+  border: 1px solid var(--d-border);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  height: 170px;
+  display: flex;
+  flex-direction: column;
+}
+.chart-title {
+  font-size: 0.58rem;
+  font-weight: 700;
+  color: var(--d-cyan);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'Orbitron', monospace;
+  margin-bottom: 0.3rem;
+  flex-shrink: 0;
+}
+.chart-canvas-wrap {
+  flex: 1;
+  min-height: 0;
+  position: relative;
+}
+
+/* ── Responsive: tablets / small screens ── */
+@media (max-width: 960px) {
+  .kpi-row  { grid-template-columns: repeat(3, 1fr); max-height: none; }
+  .mid-row  { grid-template-columns: 1fr; max-height: none; }
+  .chart-wrap { height: auto; min-height: 160px; }
+  header.company-header,
+  #main-navigation { max-height: none !important; overflow: visible !important; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="ops-dashboard">
+
+  {% if not checklist_completo %}
+  <div class="ob-strip">
+    <span class="ob-label">{% trans "Setup" %}:</span>
+    <div class="ob-steps">
+
+      {% if checklist_onboarding.empresa_configurada %}
+        <span class="ob-step done">✓ {% trans "Company" %}</span>
+      {% else %}
+        <a href="/us/settings/" class="ob-step todo">→ {% trans "Company" %}</a>
+      {% endif %}
+
+      {% if checklist_onboarding.tecnico_creado %}
+        <span class="ob-step done">✓ {% trans "Technician" %}</span>
+      {% else %}
+        <a href="/us/tecnicos/crear/" class="ob-step todo">→ {% trans "Technician" %}</a>
+      {% endif %}
+
+      {% if checklist_onboarding.cliente_creado %}
+        <span class="ob-step done">✓ {% trans "Client" %}</span>
+      {% else %}
+        <a href="/us/clientes/crear/" class="ob-step todo">→ {% trans "Client" %}</a>
+      {% endif %}
+
+      {% if checklist_onboarding.vehiculo_creado %}
+        <span class="ob-step done">✓ {% trans "Vehicle" %}</span>
+      {% else %}
+        <a href="/us/vehiculos/crear/" class="ob-step todo">→ {% trans "Vehicle" %}</a>
+      {% endif %}
+
+      {% if checklist_onboarding.documento_creado %}
+        <span class="ob-step done">✓ {% trans "Document" %}</span>
+      {% else %}
+        <a href="/us/en/documentos/new/" class="ob-step todo">→ {% trans "Document" %}</a>
+      {% endif %}
+
+    </div>
+  </div>
+  {% endif %}
+
+  {# ──────────────────────────────────────────
+     2. KPI ROW
+     ────────────────────────────────────────── #}
+  <div class="kpi-row">
+    <div class="kpi-chip">
+      <div class="kpi-val">{{ documentos_hoy }}</div>
+      <div class="kpi-lab">📄 {% trans "Docs Today" %}</div>
+    </div>
+    <div class="kpi-chip">
+      <div class="kpi-val">{{ documentos_semana }}</div>
+      <div class="kpi-lab">📅 {% trans "Docs Week" %}</div>
+    </div>
+    <div class="kpi-chip">
+      <div class="kpi-val">{{ moneda }}{{ facturacion_servicios_hoy|floatformat:0 }}</div>
+      <div class="kpi-lab">💰 {% trans "Sales Today" %}</div>
+    </div>
+    <div class="kpi-chip">
+      <div class="kpi-val">{{ moneda }}{{ facturacion_mes_total|floatformat:0 }}</div>
+      <div class="kpi-lab">📈 {% trans "Sales Month" %}</div>
+    </div>
+    <div class="kpi-chip">
+      <div class="kpi-val">{{ clientes_atendidos_semana }}</div>
+      <div class="kpi-lab">👥 {% trans "Clients Week" %}</div>
+    </div>
+    <div class="kpi-chip">
+      <div class="kpi-val">{{ tecnicos_activos }}</div>
+      <div class="kpi-lab">🔧 {% trans "Active Tech" %}</div>
+    </div>
+  </div>
+
+  {# ──────────────────────────────────────────
+     3. MID ROW: Resumen | Services + Technicians
+     ────────────────────────────────────────── #}
+  <div class="mid-row">
+
+    {# Left — Resumen Operativo #}
+    <div class="ops-panel">
+      <div class="panel-title">📋 {% trans "Operational Summary" %}</div>
+      <div class="res-grid">
+        <div class="res-item">
+          <span class="res-lab">{% trans "Pending" %}</span>
+          <span class="res-val">{{ presupuestos_pendientes }}</span>
+        </div>
+        <div class="res-item">
+          <span class="res-lab">{% trans "In Progress" %}</span>
+          <span class="res-val">{{ ordenes_en_proceso }}</span>
+        </div>
+        <div class="res-item">
+          <span class="res-lab">{% trans "Invoices" %}</span>
+          <span class="res-val">{{ facturas_mes }}</span>
+        </div>
+        <div class="res-item">
+          <span class="res-lab">{% trans "Avg Ticket" %}</span>
+          <span class="res-val" style="font-size:.78rem;">{{ moneda }}{{ ticket_promedio|floatformat:0 }}</span>
+        </div>
+        <div class="res-item">
+          <span class="res-lab">{% trans "Conversion" %}</span>
+          <span class="res-val" style="color:var(--d-green);">{{ eficiencia_conversion|floatformat:1 }}%</span>
+        </div>
+        <div class="res-item">
+          <span class="res-lab">{% trans "Projected" %}</span>
+          <span class="res-val" style="font-size:.74rem;color:var(--d-gold);">{{ moneda }}{{ proyeccion_facturacion|floatformat:0 }}</span>
+        </div>
+      </div>
+    </div>
+
+    {# Right — Services + Technicians side-by-side #}
+    <div class="ops-panel">
+      <div class="panel-title">⚙️ {% trans "Top 30 days" %}</div>
+      <div class="two-col">
+
+        <div class="col-box">
+          <div class="col-title">{% trans "Services" %}</div>
+          {% for s in servicios_top %}
+          <div class="rank-row">
+            <span class="rank-name">{{ s.nombre|truncatechars:20 }}</span>
+            <span class="rank-val">×{{ s.cantidad }}</span>
+          </div>
+          {% empty %}
+          <div class="col-empty">{% trans "No data" %}</div>
+          {% endfor %}
+        </div>
+
+        <div class="col-box">
+          <div class="col-title">{% trans "Technicians" %}</div>
+          {% for t in tecnicos_productivos %}
+          <div class="rank-row">
+            <span class="rank-name">
+              {% if t.tecnico %}{{ t.tecnico.nombre|truncatechars:15 }}{% else %}—{% endif %}
+            </span>
+            <span class="rank-val">{{ moneda }}{{ t.ingresos_generados|floatformat:0 }}</span>
+          </div>
+          {% empty %}
+          <div class="col-empty">{% trans "No data" %}</div>
+          {% endfor %}
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  {# ──────────────────────────────────────────
+     4. CHART
+     ────────────────────────────────────────── #}
+  <div class="chart-wrap">
+    <div class="chart-title">💹 {% trans "Revenue trend" %} — {{ mes_actual }}</div>
+    <div class="chart-canvas-wrap">
+      <canvas id="chartOpsRevenue"></canvas>
+    </div>
+  </div>
+
+</div>{# /ops-dashboard #}
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+(function () {
+  const el = document.getElementById('chartOpsRevenue');
+  if (!el || !window.Chart) return;
+
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const today  = new Date();
+  const labels = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date(today.getFullYear(), today.getMonth() - i, 1);
+    labels.push(months[d.getMonth()]);
+  }
+
+  // Only current month has real data; past months would require additional context
+  const cur = parseFloat('{{ facturacion_mes_total|floatformat:2 }}') || 0;
+  const data = [0, 0, 0, 0, 0, 0, cur];
+
+  new Chart(el, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        borderColor: '#00d4ff',
+        backgroundColor: 'rgba(0, 212, 255, 0.07)',
+        fill: true,
+        tension: 0.4,
+        borderWidth: 2,
+        pointBackgroundColor: '#00d4ff',
+        pointRadius: 3,
+        pointHoverRadius: 5
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 500 },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => '{{ moneda }}' + ctx.parsed.y.toLocaleString()
+          }
+        }
+      },
+      scales: {
+        x: {
+          ticks: { color: '#446688', font: { size: 9 } },
+          grid: { color: 'rgba(0,212,255,0.05)' }
+        },
+        y: {
+          ticks: { color: '#446688', font: { size: 9 }, maxTicksLimit: 4 },
+          grid: { color: 'rgba(0,212,255,0.05)' }
+        }
+      }
+    }
+  });
+})();
+</script>
+{% endblock %}
