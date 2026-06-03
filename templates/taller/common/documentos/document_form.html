@@ -182,7 +182,7 @@
               href="{% country_url 'clientes:crear_cliente' %}?return_to={{ request.get_full_path|urlencode }}&select_field=cliente"
               data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
               onclick="if (window.openClienteModal) { event.preventDefault(); window.openClienteModal(); return false; }"
-              class="doc-action-btn doc-action-btn--cyan"
+              class="doc-action-btn doc-action-btn--cyan-alt"
             >
               <span aria-hidden="true">+</span>
               <span data-i18n="nuevo">Nuevo</span>
@@ -228,7 +228,7 @@
               id="btn-nuevo-vehiculo"
               href="{% country_url 'vehiculos:crear_vehiculo' %}?return_to={{ request.get_full_path|urlencode }}&select_field=vehiculo&cliente_id="
               data-url-crear-vehiculo="{% country_url 'vehiculos:crear_vehiculo' %}"
-              class="doc-action-btn doc-action-btn--cyan"
+              class="doc-action-btn doc-action-btn--cyan-alt"
             >
               <span aria-hidden="true">+</span>
               <span data-i18n="nuevo_vehiculo">Nuevo vehículo</span>
@@ -302,7 +302,7 @@
             </div>
             <div class="doc-section-actions">
               <button type="button" id="add-repuesto" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span></button>
-              <a href="{% country_url 'repuestos:crear_repuesto' %}?return_to={{ request.get_full_path|urlencode }}&select_field=repuesto" class="doc-action-btn doc-action-btn--ghost"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
+              <a href="{% country_url 'repuestos:crear_repuesto' %}?return_to={{ request.get_full_path|urlencode }}&select_field=repuesto" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
               <a id="goto-used-parts" href="{% country_url 'desarme:lista_piezas' %}?return_to={{ request.get_full_path|urlencode }}&select_field=pieza_desarme" class="doc-action-btn doc-action-btn--ghost">
                 <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" style="width:13px;height:13px;stroke:currentColor;stroke-width:1.7;flex-shrink:0;stroke-linecap:round;stroke-linejoin:round">
                   <path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h12A2.25 2.25 0 0 1 20.25 6v1a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 7V6Z"/>
@@ -343,7 +343,7 @@
             <h2 data-i18n="servicios">SERVICIOS</h2>
             <div class="doc-section-actions">
               <button type="button" id="add-servicio" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span></button>
-              <a href="{% country_url 'servicios:crear_servicio' %}?return_to={{ request.get_full_path|urlencode }}&select_field=servicio" class="doc-action-btn doc-action-btn--ghost"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
+              <a href="{% country_url 'servicios:crear_servicio' %}?return_to={{ request.get_full_path|urlencode }}&select_field=servicio" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
             </div>
           </div>
 
@@ -376,7 +376,7 @@
             <h2 data-i18n="otros_servicios">OTROS SERVICIOS / TERCEROS</h2>
             <div class="doc-section-actions">
               <button type="button" id="add-otro" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span></button>
-              <a href="{% country_url 'servicios:crear_otro_servicio' %}?return_to={{ request.get_full_path|urlencode }}" class="doc-action-btn doc-action-btn--ghost"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
+              <a href="{% country_url 'servicios:crear_otro_servicio' %}?return_to={{ request.get_full_path|urlencode }}" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
             </div>
           </div>
 
