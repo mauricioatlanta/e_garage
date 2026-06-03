@@ -5,7 +5,7 @@
 
 {% block extra_css %}
 {{ block.super }}
-<link rel="stylesheet" href="{% static 'css/documentos/document_form_prototype.css' %}?v=20260603b">
+<link rel="stylesheet" href="{% static 'css/documentos/document_form_prototype.css' %}?v=20260603c">
 {% endblock extra_css %}
 
 {% block documento_title %}
@@ -182,8 +182,7 @@
               href="{% country_url 'clientes:crear_cliente' %}?return_to={{ request.get_full_path|urlencode }}&select_field=cliente"
               data-url-crear-cliente="{% country_url 'clientes:crear_cliente' %}"
               onclick="if (window.openClienteModal) { event.preventDefault(); window.openClienteModal(); return false; }"
-              class="doc-action-btn doc-action-btn--ghost"
-              style="justify-self:start"
+              class="doc-action-btn doc-action-btn--cyan"
             >
               <span aria-hidden="true">+</span>
               <span data-i18n="nuevo">Nuevo</span>
@@ -536,6 +535,8 @@ if (window.DESARME_PREFILL) {
       doc_numero: 'Documento N°', fecha: 'Fecha', tipo_doc: 'Tipo de documento',
       estado_pago: 'Estado de pago', operacion: 'Operación',
       op_servicios: 'Servicios', op_solo_repuestos: 'Solo venta de repuestos',
+      tipo_opts: { OT: 'Orden de Trabajo', PRES: 'Presupuesto', FAC: 'Comprobante', PTS: 'Venta Repuestos' },
+      pay_opts: { pending: 'Pendiente', paid: 'Pagado', partial: 'Parcial', canceled: 'Anulado' },
       cliente: 'CLIENTE', vehiculo: 'VEHÍCULO',
       repuestos: 'REPUESTOS / REPUESTOS USADAS', servicios: 'SERVICIOS',
       otros_servicios: 'OTROS SERVICIOS / TERCEROS', totales: 'TOTALES', notas: 'NOTAS',
@@ -568,6 +569,8 @@ if (window.DESARME_PREFILL) {
       doc_numero: 'Document No.', fecha: 'Date', tipo_doc: 'Document type',
       estado_pago: 'Payment status', operacion: 'Operation',
       op_servicios: 'Services', op_solo_repuestos: 'Parts only',
+      tipo_opts: { OT: 'Work Order', PRES: 'Estimate', FAC: 'Invoice', PTS: 'Parts Sale' },
+      pay_opts: { pending: 'Pending', paid: 'Paid', partial: 'Partial', canceled: 'Canceled' },
       cliente: 'CLIENT', vehiculo: 'VEHICLE',
       repuestos: 'PARTS / USED PARTS', servicios: 'SERVICES',
       otros_servicios: 'OTHER SERVICES / THIRD PARTIES', totales: 'TOTALS', notas: 'NOTES',
@@ -629,6 +632,22 @@ if (window.DESARME_PREFILL) {
     }
     var notesEl = document.getElementById('id_observaciones');
     if (notesEl) notesEl.placeholder = t.notas_ph || '';
+
+    // Translate id_tipo options (rendered by Django, no data-i18n)
+    var tipoSel = document.getElementById('id_tipo');
+    if (tipoSel && t.tipo_opts) {
+      Array.prototype.forEach.call(tipoSel.options, function(opt) {
+        if (t.tipo_opts[opt.value]) opt.text = t.tipo_opts[opt.value];
+      });
+    }
+
+    // Translate id_payment_status options
+    var paySel = document.getElementById('id_payment_status');
+    if (paySel && t.pay_opts) {
+      Array.prototype.forEach.call(paySel.options, function(opt) {
+        if (t.pay_opts[opt.value]) opt.text = t.pay_opts[opt.value];
+      });
+    }
   }
 
   window.EG_setLang = applyLang;
