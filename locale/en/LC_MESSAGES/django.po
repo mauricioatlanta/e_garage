@@ -236,3 +236,257 @@ msgstr "Disposed"
 
 msgid "Auto-saved"
 msgstr "Auto-saved"
+
+# Centro Contable / Accounting Center
+msgid "Centro Contable – Contador Virtual"
+msgstr "Accounting Center – Virtual Accountant"
+
+msgid "Todo lo que tu contador necesita, ordenado por eGarage en 3 clics."
+msgstr "Everything your accountant needs, organized by eGarage in 3 clicks."
+
+msgid "Filtros"
+msgstr "Filters"
+
+msgid "Empresa"
+msgstr "Company"
+
+msgid "Período"
+msgstr "Period"
+
+msgid "Mes Actual"
+msgstr "Current Month"
+
+msgid "Mes Anterior"
+msgstr "Previous Month"
+
+msgid "Año Actual"
+msgstr "Current Year"
+
+msgid "Desde"
+msgstr "From"
+
+msgid "Hasta"
+msgstr "To"
+
+msgid "Actualizar Resumen"
+msgstr "Update Summary"
+
+msgid "Estado contable del período: %(score)s% listo"
+msgstr "Accounting status for the period: %(score)s% ready"
+
+msgid "%(count)s documento en borrador"
+msgid_plural "%(count)s documentos en borrador"
+msgstr[0] "%(count)s document in draft"
+msgstr[1] "%(count)s documents in draft"
+
+msgid "%(count)s documento sin RUT de cliente"
+msgid_plural "%(count)s documentos sin RUT de cliente"
+msgstr[0] "%(count)s document without client tax ID"
+msgstr[1] "%(count)s documents without client tax ID"
+
+msgid "Listo"
+msgstr "Ready"
+
+msgid "Neto afecto (Repuestos)"
+msgstr "Taxable Net (Parts)"
+
+msgid "Base imponible 19% (según líneas de repuestos)"
+msgstr "19% tax base (according to parts lines)"
+
+msgid "Neto exento (Servicios)"
+msgstr "Tax-exempt Net (Services)"
+
+msgid "Servicios sin IVA (regla Chile actual de eGarage)"
+msgstr "Services without VAT (current Chile eGarage rule)"
+
+msgid "IVA del período"
+msgstr "VAT for the period"
+
+msgid "Cálculo automático 19% sobre neto afecto"
+msgstr "Automatic 19% calculation on taxable net"
+
+msgid "Total Ventas"
+msgstr "Total Sales"
+
+msgid "Neto afecto + exento + IVA"
+msgstr "Taxable + exempt + VAT"
+
+msgid "Estos montos son la base sugerida para el IVA ventas del período."
+msgstr "These amounts are the suggested base for sales VAT for the period."
+
+msgid "Tu contador puede usar directamente los PDF/Excel de abajo."
+msgstr "Your accountant can use the PDF/Excel files below directly."
+
+msgid "Ventas Diarias"
+msgstr "Daily Sales"
+
+msgid "Libro de Ventas eGarage"
+msgstr "eGarage Sales Ledger"
+
+msgid "Tipo de documento"
+msgstr "Document type"
+
+msgid "Factura"
+msgstr "Invoice"
+
+msgid "Boleta"
+msgstr "Receipt"
+
+msgid "Interno"
+msgstr "Internal"
+
+msgid "Incluir anulados"
+msgstr "Include voided"
+
+msgid "Solo emitidos"
+msgstr "Issued only"
+
+msgid "PDF Libro de Ventas"
+msgstr "Sales Ledger PDF"
+
+msgid "Excel Libro de Ventas"
+msgstr "Sales Ledger Excel"
+
+msgid "Pack para Contador (ZIP)"
+msgstr "Accountant Pack (ZIP)"
+
+msgid "Incluye resumen IVA, libro de ventas, repuestos vendidos y servicios realizados."
+msgstr "Includes VAT summary, sales ledger, parts sold and services performed."
+
+msgid "Fecha emisión"
+msgstr "Issue date"
+
+msgid "Tipo doc"
+msgstr "Doc type"
+
+msgid "N° doc eGarage"
+msgstr "eGarage Doc #"
+
+msgid "RUT cliente"
+msgstr "Client Tax ID"
+
+msgid "Nombre cliente"
+msgstr "Client name"
+
+msgid "Neto afecto"
+msgstr "Taxable net"
+
+msgid "Neto exento"
+msgstr "Exempt net"
+
+msgid "IVA"
+msgstr "VAT"
+
+msgid "Total documento"
+msgstr "Document total"
+
+msgid "Estado"
+msgstr "Status"
+
+msgid "No hay documentos en el período seleccionado"
+msgstr "No documents in the selected period"
+
+msgid "Sin número"
+msgstr "No number"
+
+msgid "Sin cliente"
+msgstr "No client"
+
+msgid "Emitido"
+msgstr "Issued"
+
+msgid "Anulado"
+msgstr "Voided"
+
+msgid "Borrador"
+msgstr "Draft"
+
+msgid "Ver Doc #%(id)s"
+msgstr "View Doc #%(id)s"
+
+msgid "y %(count)s más..."
+msgstr "and %(count)s more..."
+
+msgid "Acciones"
+msgstr "Actions"
+
+msgid "Volver a Reportes"
+msgstr "Back to Reports"
+
+msgid "Repuestos vendidos en el período"
+msgstr "Parts sold in the period"
+
+msgid "PDF"
+msgstr "PDF"
+
+msgid "Excel"
+msgstr "Excel"
+
+msgid "Código"
+msgstr "Code"
+
+msgid "Nombre"
+msgstr "Name"
+
+msgid "Cantidad"
+msgstr "Quantity"
+
+msgid "Neto Total"
+msgstr "Net Total"
+
+msgid "Sin nombre"
+msgstr "No name"
+
+msgid "No hay repuestos en el período"
+msgstr "No parts in the period"
+
+msgid "Servicios realizados en el período"
+msgstr "Services performed in the period"
+
+msgid "Nombre servicio"
+msgstr "Service name"
+
+msgid "Monto Total"
+msgstr "Total amount"
+
+msgid "No hay servicios en el período"
+msgstr "No services in the period"
+
+msgid "Alertas contables del período"
+msgstr "Accounting alerts for the period"
+
+msgid "Críticas:"
+msgstr "Critical:"
+
+msgid "Advertencias:"
+msgstr "Warnings:"
+
+msgid "Info:"
+msgstr "Info:"
+
+msgid "Todo en orden"
+msgstr "All clear"
+
+msgid "No se detectaron problemas en el período."
+msgstr "No issues detected for the period."
+
+msgid "Función de exportación PDF Libro de Ventas en desarrollo"
+msgstr "Sales Ledger PDF export feature under development"
+
+msgid "Función de exportación Excel Libro de Ventas en desarrollo"
+msgstr "Sales Ledger Excel export feature under development"
+
+msgid "Función de exportación Pack para Contador (ZIP) en desarrollo"
+msgstr "Accountant Pack (ZIP) export feature under development"
+
+msgid "Función de exportación PDF Repuestos en desarrollo"
+msgstr "Parts PDF export feature under development"
+
+msgid "Función de exportación Excel Repuestos en desarrollo"
+msgstr "Parts Excel export feature under development"
+
+msgid "Función de exportación PDF Servicios en desarrollo"
+msgstr "Services PDF export feature under development"
+
+msgid "Función de exportación Excel Servicios en desarrollo"
+msgstr "Services Excel export feature under development"

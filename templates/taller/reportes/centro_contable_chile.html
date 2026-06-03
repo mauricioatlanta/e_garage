@@ -1,8 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load moneda %}
+{% load i18n %}
 
-{% block title %}🧮 Centro Contable – Contador Virtual{% endblock %}
+{% block title %}🧮 {% trans "Centro Contable – Contador Virtual" %}{% endblock %}
 
 {% block extra_head %}
 <link href="/static/css/estilo_futurista.css" rel="stylesheet">
@@ -549,20 +550,20 @@
     
     <!-- Header -->
     <div class="header-contable">
-      <h1><i class="fas fa-calculator"></i> Centro Contable – Contador Virtual</h1>
-      <p class="subtitle">Todo lo que tu contador necesita, ordenado por eGarage en 3 clics.</p>
+      <h1><i class="fas fa-calculator"></i> {% trans "Centro Contable – Contador Virtual" %}</h1>
+      <p class="subtitle">{% trans "Todo lo que tu contador necesita, ordenado por eGarage en 3 clics." %}</p>
     </div>
     
     <!-- FILA 1: Filtros + Estado -->
     <div class="fila-filtros-estado">
       <!-- Panel de Filtros -->
       <div class="panel-filtros">
-        <h3><i class="fas fa-filter"></i> Filtros</h3>
+        <h3><i class="fas fa-filter"></i> {% trans "Filtros" %}</h3>
         <form method="get" id="formFiltros">
           <div class="filtros-grid">
             <div class="filtro-grupo">
               <label class="filtro-label">
-                <i class="fas fa-building"></i> Empresa
+                <i class="fas fa-building"></i> {% trans "Empresa" %}
               </label>
               <select name="empresa" class="filtro-select">
                 <option value="{{ empresa.id }}" selected>{{ empresa.nombre|default:"Mi Empresa" }}</option>
@@ -571,37 +572,37 @@
             
             <div class="filtro-grupo">
               <label class="filtro-label">
-                <i class="fas fa-calendar-alt"></i> Período
+                <i class="fas fa-calendar-alt"></i> {% trans "Período" %}
               </label>
               <div class="botones-rapidos">
                 <button type="button" class="btn-rapido" onclick="setPeriodoRapido('mes_actual')">
-                  <i class="fas fa-calendar-day"></i> Mes Actual
+                  <i class="fas fa-calendar-day"></i> {% trans "Mes Actual" %}
                 </button>
                 <button type="button" class="btn-rapido" onclick="setPeriodoRapido('mes_anterior')">
-                  <i class="fas fa-calendar-minus"></i> Mes Anterior
+                  <i class="fas fa-calendar-minus"></i> {% trans "Mes Anterior" %}
                 </button>
                 <button type="button" class="btn-rapido" onclick="setPeriodoRapido('año_actual')">
-                  <i class="fas fa-calendar"></i> Año Actual
+                  <i class="fas fa-calendar"></i> {% trans "Año Actual" %}
                 </button>
               </div>
             </div>
             
             <div class="filtro-grupo">
               <label class="filtro-label">
-                <i class="fas fa-calendar-check"></i> Desde
+                <i class="fas fa-calendar-check"></i> {% trans "Desde" %}
               </label>
               <input type="date" name="fecha_desde" class="filtro-input" value="{{ fecha_desde_str }}">
             </div>
-            
+
             <div class="filtro-grupo">
               <label class="filtro-label">
-                <i class="fas fa-calendar-check"></i> Hasta
+                <i class="fas fa-calendar-check"></i> {% trans "Hasta" %}
               </label>
               <input type="date" name="fecha_hasta" class="filtro-input" value="{{ fecha_hasta_str }}">
             </div>
           </div>
           <button type="submit" class="btn-actualizar">
-            <i class="fas fa-sync-alt"></i> Actualizar Resumen
+            <i class="fas fa-sync-alt"></i> {% trans "Actualizar Resumen" %}
           </button>
         </form>
       </div>
@@ -609,10 +610,10 @@
       <!-- Panel de Estado -->
       <div class="panel-estado">
         <div class="estado-texto">
-          <div class="estado-texto-grande">Estado contable del período: {{ calidad_datos.score }}% listo</div>
+          <div class="estado-texto-grande">{% blocktrans with score=calidad_datos.score %}Estado contable del período: {{ score }}% listo{% endblocktrans %}</div>
           <div class="estado-subtexto">
-            {% if docs_borrador > 0 %}{{ docs_borrador }} documento{{ docs_borrador|pluralize }} en borrador<br>{% endif %}
-            {% if docs_sin_rut > 0 %}{{ docs_sin_rut }} documento{{ docs_sin_rut|pluralize }} sin RUT de cliente{% endif %}
+            {% if docs_borrador > 0 %}{% blocktrans count count=docs_borrador %}{{ count }} documento en borrador{% plural %}{{ count }} documentos en borrador{% endblocktrans %}<br>{% endif %}
+            {% if docs_sin_rut > 0 %}{% blocktrans count count=docs_sin_rut %}{{ count }} documento sin RUT de cliente{% plural %}{{ count }} documentos sin RUT de cliente{% endblocktrans %}{% endif %}
           </div>
         </div>
         
@@ -627,7 +628,7 @@
           </svg>
           <div class="medidor-texto">
             <div class="medidor-porcentaje">{{ calidad_datos.score }}%</div>
-            <div class="medidor-label">Listo</div>
+            <div class="medidor-label">{% trans "Listo" %}</div>
           </div>
         </div>
       </div>
@@ -638,37 +639,37 @@
       <div class="card-resumen">
         <div class="card-resumen-header">
           <i class="fas fa-dollar-sign card-resumen-icon"></i>
-          <div class="card-resumen-title">💵 Neto afecto (Repuestos)</div>
+          <div class="card-resumen-title">💵 {% trans "Neto afecto (Repuestos)" %}</div>
         </div>
         <div class="card-resumen-value">{{ neto_afecto|clp }}</div>
-        <div class="card-resumen-label">Base imponible 19% (según líneas de repuestos)</div>
+        <div class="card-resumen-label">{% trans "Base imponible 19% (según líneas de repuestos)" %}</div>
       </div>
-      
+
       <div class="card-resumen">
         <div class="card-resumen-header">
           <i class="fas fa-file-invoice-dollar card-resumen-icon"></i>
-          <div class="card-resumen-title">🧾 Neto exento (Servicios)</div>
+          <div class="card-resumen-title">🧾 {% trans "Neto exento (Servicios)" %}</div>
         </div>
         <div class="card-resumen-value">{{ neto_exento|clp }}</div>
-        <div class="card-resumen-label">Servicios sin IVA (regla Chile actual de eGarage)</div>
+        <div class="card-resumen-label">{% trans "Servicios sin IVA (regla Chile actual de eGarage)" %}</div>
       </div>
-      
+
       <div class="card-resumen">
         <div class="card-resumen-header">
           <i class="fas fa-calculator card-resumen-icon"></i>
-          <div class="card-resumen-title">🧮 IVA del período</div>
+          <div class="card-resumen-title">🧮 {% trans "IVA del período" %}</div>
         </div>
         <div class="card-resumen-value">{{ iva_periodo|clp }}</div>
-        <div class="card-resumen-label">Cálculo automático 19% sobre neto afecto</div>
+        <div class="card-resumen-label">{% trans "Cálculo automático 19% sobre neto afecto" %}</div>
       </div>
-      
+
       <div class="card-resumen">
         <div class="card-resumen-header">
           <i class="fas fa-chart-bar card-resumen-icon"></i>
-          <div class="card-resumen-title">📊 Total Ventas</div>
+          <div class="card-resumen-title">📊 {% trans "Total Ventas" %}</div>
         </div>
         <div class="card-resumen-value">{{ total_ventas|clp }}</div>
-        <div class="card-resumen-label">Neto afecto + exento + IVA</div>
+        <div class="card-resumen-label">{% trans "Neto afecto + exento + IVA" %}</div>
       </div>
     </div>
     
@@ -677,12 +678,12 @@
       <div style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.1), rgba(139, 92, 246, 0.1)); border-radius: 16px; padding: 1.5rem; border: 2px solid rgba(6, 182, 212, 0.3); backdrop-filter: blur(10px); display: flex; align-items: center;">
         <div>
           <p style="color: #b0b3b8; font-size: 0.95rem; line-height: 1.6; margin: 0;">
-            <strong style="color: #00e6d0;">Estos montos son la base sugerida para el IVA ventas del período.</strong> Tu contador puede usar directamente los PDF/Excel de abajo.
+            <strong style="color: #00e6d0;">{% trans "Estos montos son la base sugerida para el IVA ventas del período." %}</strong> {% trans "Tu contador puede usar directamente los PDF/Excel de abajo." %}
           </p>
         </div>
       </div>
       <div style="background: linear-gradient(135deg, rgba(10, 25, 41, 0.9), rgba(13, 17, 27, 0.9)); border-radius: 16px; padding: 1.5rem; border: 2px solid rgba(6, 182, 212, 0.3); backdrop-filter: blur(10px);">
-        <h4 style="color: #00e6d0; font-size: 1rem; margin-bottom: 1rem; font-weight: 600;">Ventas Diarias</h4>
+        <h4 style="color: #00e6d0; font-size: 1rem; margin-bottom: 1rem; font-weight: 600;">{% trans "Ventas Diarias" %}</h4>
         <canvas id="chartVentasDiarias" style="max-height: 150px;"></canvas>
       </div>
     </div>
@@ -691,28 +692,28 @@
     <div class="fila-libro-ventas">
       <!-- Libro de Ventas -->
       <div class="panel-libro-ventas">
-        <h3><i class="fas fa-book"></i> Libro de Ventas eGarage</h3>
+        <h3><i class="fas fa-book"></i> {% trans "Libro de Ventas eGarage" %}</h3>
         
         <!-- Filtros -->
         <div style="margin-bottom: 1.5rem; display: flex; gap: 1rem; flex-wrap: wrap; align-items: center;">
           <div style="flex: 1; min-width: 200px;">
             <label style="display: block; color: #b0b3b8; font-size: 0.9rem; margin-bottom: 0.5rem;">
-              <i class="fas fa-filter"></i> Tipo de documento
+              <i class="fas fa-filter"></i> {% trans "Tipo de documento" %}
             </label>
             <select id="filtroTipoDoc" class="filtro-input" style="width: 100%;" multiple>
-              <option value="FAC" selected>Factura</option>
-              <option value="BOL" selected>Boleta</option>
-              <option value="INTERNO">Interno</option>
+              <option value="FAC" selected>{% trans "Factura" %}</option>
+              <option value="BOL" selected>{% trans "Boleta" %}</option>
+              <option value="INTERNO">{% trans "Interno" %}</option>
             </select>
           </div>
           <div style="display: flex; gap: 1rem; align-items: flex-end;">
             <label style="display: flex; align-items: center; gap: 0.5rem; color: #b0b3b8; cursor: pointer;">
               <input type="checkbox" id="incluirAnulados" style="accent-color: #00e6d0;">
-              <span>Incluir anulados</span>
+              <span>{% trans "Incluir anulados" %}</span>
             </label>
             <label style="display: flex; align-items: center; gap: 0.5rem; color: #b0b3b8; cursor: pointer;">
               <input type="checkbox" id="soloEmitidos" checked style="accent-color: #00e6d0;">
-              <span>Solo emitidos</span>
+              <span>{% trans "Solo emitidos" %}</span>
             </label>
           </div>
         </div>
@@ -720,13 +721,13 @@
         <!-- Botones de acción encima de la tabla -->
         <div style="display: flex; gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;">
           <button class="btn-accion" onclick="exportarPDFLibro()" style="flex: 1; min-width: 150px;">
-            <i class="fas fa-file-pdf"></i> PDF Libro de Ventas
+            <i class="fas fa-file-pdf"></i> {% trans "PDF Libro de Ventas" %}
           </button>
           <button class="btn-accion" onclick="exportarExcelLibro()" style="flex: 1; min-width: 150px;">
-            <i class="fas fa-file-excel"></i> Excel Libro de Ventas
+            <i class="fas fa-file-excel"></i> {% trans "Excel Libro de Ventas" %}
           </button>
-          <button class="btn-accion" onclick="exportarPackContador()" style="flex: 1; min-width: 180px; background: linear-gradient(135deg, #00e6d0, #8b5cf6); color: #000; font-weight: 700;" title="Incluye resumen IVA, libro de ventas, repuestos vendidos y servicios realizados.">
-            <i class="fas fa-file-archive"></i> Pack para Contador (ZIP)
+          <button class="btn-accion" onclick="exportarPackContador()" style="flex: 1; min-width: 180px; background: linear-gradient(135deg, #00e6d0, #8b5cf6); color: #000; font-weight: 700;" title="{% trans "Incluye resumen IVA, libro de ventas, repuestos vendidos y servicios realizados." %}">
+            <i class="fas fa-file-archive"></i> {% trans "Pack para Contador (ZIP)" %}
           </button>
         </div>
         
@@ -734,16 +735,16 @@
           <table class="tabla-libro-ventas">
             <thead>
               <tr>
-                <th>Fecha emisión</th>
-                <th>Tipo doc</th>
-                <th>N° doc eGarage</th>
-                <th>RUT cliente</th>
-                <th>Nombre cliente</th>
-                <th>Neto afecto</th>
-                <th>Neto exento</th>
-                <th>IVA</th>
-                <th>Total documento</th>
-                <th>Estado</th>
+                <th>{% trans "Fecha emisión" %}</th>
+                <th>{% trans "Tipo doc" %}</th>
+                <th>{% trans "N° doc eGarage" %}</th>
+                <th>{% trans "RUT cliente" %}</th>
+                <th>{% trans "Nombre cliente" %}</th>
+                <th>{% trans "Neto afecto" %}</th>
+                <th>{% trans "Neto exento" %}</th>
+                <th>{% trans "IVA" %}</th>
+                <th>{% trans "Total documento" %}</th>
+                <th>{% trans "Estado" %}</th>
               </tr>
             </thead>
             <tbody>
@@ -751,29 +752,29 @@
               <tr>
                 <td>{{ item.doc.fecha_emision|date:"d/m/Y" }}</td>
                 <td>
-                  {% if item.doc.tipo == 'FAC' %}Factura
-                  {% elif item.doc.tipo == 'BOL' %}Boleta
-                  {% elif item.doc.tipo == 'OT' %}Interno
+                  {% if item.doc.tipo == 'FAC' %}{% trans "Factura" %}
+                  {% elif item.doc.tipo == 'BOL' %}{% trans "Boleta" %}
+                  {% elif item.doc.tipo == 'OT' %}{% trans "Interno" %}
                   {% else %}{{ item.doc.tipo }}{% endif %}
                 </td>
-                <td>{{ item.doc.numero|default:"Sin número" }}</td>
+                <td>{% if item.doc.numero %}{{ item.doc.numero }}{% else %}{% trans "Sin número" %}{% endif %}</td>
                 <td>{{ item.doc.cliente.tax_id|default:"-" }}</td>
-                <td>{{ item.doc.cliente|default:"Sin cliente" }}</td>
+                <td>{% if item.doc.cliente %}{{ item.doc.cliente }}{% else %}{% trans "Sin cliente" %}{% endif %}</td>
                 <td>{{ item.doc.neto_repuestos|clp }}</td>
                 <td>{{ item.neto_exento|clp }}</td>
                 <td>{{ item.doc.tax_amount|clp }}</td>
                 <td><strong>{{ item.doc.total|clp }}</strong></td>
                 <td>
-                  {% if item.doc.estado == 'EMITIDO' %}<span style="color: #10b981;">Emitido</span>
-                  {% elif item.doc.estado == 'ANULADO' %}<span style="color: #ef4444;">Anulado</span>
-                  {% elif item.doc.estado == 'BORRADOR' %}<span style="color: #f59e0b;">Borrador</span>
+                  {% if item.doc.estado == 'EMITIDO' %}<span style="color: #10b981;">{% trans "Emitido" %}</span>
+                  {% elif item.doc.estado == 'ANULADO' %}<span style="color: #ef4444;">{% trans "Anulado" %}</span>
+                  {% elif item.doc.estado == 'BORRADOR' %}<span style="color: #f59e0b;">{% trans "Borrador" %}</span>
                   {% else %}{{ item.doc.estado }}{% endif %}
                 </td>
               </tr>
               {% empty %}
               <tr>
                 <td colspan="10" style="text-align: center; color: #b0b3b8; padding: 2rem;">
-                  No hay documentos en el período seleccionado
+                  {% trans "No hay documentos en el período seleccionado" %}
                 </td>
               </tr>
               {% endfor %}
@@ -784,9 +785,9 @@
       
       <!-- Panel de Acciones -->
       <div class="panel-acciones">
-        <h3><i class="fas fa-tools"></i> Acciones</h3>
+        <h3><i class="fas fa-tools"></i> {% trans "Acciones" %}</h3>
         <a href="{% url 'taller:reportes:reportes_dashboard' %}" class="btn-accion" style="text-decoration: none;">
-          <i class="fas fa-arrow-left"></i> Volver a Reportes
+          <i class="fas fa-arrow-left"></i> {% trans "Volver a Reportes" %}
         </a>
       </div>
     </div>
@@ -795,37 +796,37 @@
     <div class="fila-detalle-inteligente">
       <!-- Repuestos Vendidos -->
       <div class="panel-detalle">
-        <h3><i class="fas fa-cog"></i> 🔧 Repuestos vendidos en el período</h3>
+        <h3><i class="fas fa-cog"></i> 🔧 {% trans "Repuestos vendidos en el período" %}</h3>
         <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
           <button class="btn-accion" onclick="exportarPDFRepuestos()" style="flex: 1; padding: 0.75rem; font-size: 0.85rem;">
-            <i class="fas fa-file-pdf"></i> PDF
+            <i class="fas fa-file-pdf"></i> {% trans "PDF" %}
           </button>
           <button class="btn-accion" onclick="exportarExcelRepuestos()" style="flex: 1; padding: 0.75rem; font-size: 0.85rem;">
-            <i class="fas fa-file-excel"></i> Excel
+            <i class="fas fa-file-excel"></i> {% trans "Excel" %}
           </button>
         </div>
         <div style="max-height: 400px; overflow-y: auto;">
           <table class="tabla-libro-ventas" style="font-size: 0.85rem;">
             <thead>
               <tr>
-                <th>Código</th>
-                <th>Nombre</th>
-                <th>Cantidad</th>
-                <th>Neto Total</th>
+                <th>{% trans "Código" %}</th>
+                <th>{% trans "Nombre" %}</th>
+                <th>{% trans "Cantidad" %}</th>
+                <th>{% trans "Neto Total" %}</th>
               </tr>
             </thead>
             <tbody>
               {% for rep in repuestos_vendidos %}
               <tr>
                 <td>{{ rep.codigo|default:"-" }}</td>
-                <td>{{ rep.nombre|default:"Sin nombre" }}</td>
+                <td>{% if rep.nombre %}{{ rep.nombre }}{% else %}{% trans "Sin nombre" %}{% endif %}</td>
                 <td>{{ rep.cantidad_total|default:0 }}</td>
                 <td>{{ rep.neto_total|clp }}</td>
               </tr>
               {% empty %}
               <tr>
                 <td colspan="4" style="text-align: center; color: #b0b3b8; padding: 1rem;">
-                  No hay repuestos en el período
+                  {% trans "No hay repuestos en el período" %}
                 </td>
               </tr>
               {% endfor %}
@@ -836,35 +837,35 @@
       
       <!-- Servicios Realizados -->
       <div class="panel-detalle">
-        <h3><i class="fas fa-wrench"></i> 🛠 Servicios realizados en el período</h3>
+        <h3><i class="fas fa-wrench"></i> 🛠 {% trans "Servicios realizados en el período" %}</h3>
         <div style="margin-bottom: 1rem; display: flex; gap: 0.5rem;">
           <button class="btn-accion" onclick="exportarPDFServicios()" style="flex: 1; padding: 0.75rem; font-size: 0.85rem;">
-            <i class="fas fa-file-pdf"></i> PDF
+            <i class="fas fa-file-pdf"></i> {% trans "PDF" %}
           </button>
           <button class="btn-accion" onclick="exportarExcelServicios()" style="flex: 1; padding: 0.75rem; font-size: 0.85rem;">
-            <i class="fas fa-file-excel"></i> Excel
+            <i class="fas fa-file-excel"></i> {% trans "Excel" %}
           </button>
         </div>
         <div style="max-height: 400px; overflow-y: auto;">
           <table class="tabla-libro-ventas" style="font-size: 0.85rem;">
             <thead>
               <tr>
-                <th>Nombre servicio</th>
-                <th>Cantidad</th>
-                <th>Monto Total</th>
+                <th>{% trans "Nombre servicio" %}</th>
+                <th>{% trans "Cantidad" %}</th>
+                <th>{% trans "Monto Total" %}</th>
               </tr>
             </thead>
             <tbody>
               {% for serv in servicios_realizados %}
               <tr>
-                <td>{{ serv.nombre|default:"Sin nombre" }}</td>
+                <td>{% if serv.nombre %}{{ serv.nombre }}{% else %}{% trans "Sin nombre" %}{% endif %}</td>
                 <td>{{ serv.cantidad_total|default:0 }}</td>
                 <td>{{ serv.monto_total|clp }}</td>
               </tr>
               {% empty %}
               <tr>
                 <td colspan="3" style="text-align: center; color: #b0b3b8; padding: 1rem;">
-                  No hay servicios en el período
+                  {% trans "No hay servicios en el período" %}
                 </td>
               </tr>
               {% endfor %}
@@ -875,11 +876,11 @@
       
       <!-- Alertas Contables -->
       <div class="panel-detalle">
-        <h3><i class="fas fa-exclamation-triangle"></i> ⚠ Alertas contables del período</h3>
+        <h3><i class="fas fa-exclamation-triangle"></i> ⚠ {% trans "Alertas contables del período" %}</h3>
         <div style="max-height: 500px; overflow-y: auto;">
           {% if alertas_criticas %}
           <div style="margin-bottom: 1.5rem;">
-            <h4 style="color: #ef4444; font-size: 1rem; margin-bottom: 0.75rem; font-weight: 700;">🔴 Críticas:</h4>
+            <h4 style="color: #ef4444; font-size: 1rem; margin-bottom: 0.75rem; font-weight: 700;">🔴 {% trans "Críticas:" %}</h4>
             {% for alerta in alertas_criticas %}
             <div class="alerta-item error" style="margin-bottom: 0.75rem;">
               <div class="alerta-titulo">
@@ -890,11 +891,11 @@
               <div style="margin-top: 0.5rem;">
                 {% for doc_id in alerta.documentos|slice:":3" %}
                 <a href="{% url 'taller:documentos:ver_documento' doc_id %}" target="_blank" style="display: inline-block; margin-right: 0.5rem; margin-top: 0.25rem; padding: 0.25rem 0.75rem; background: rgba(239, 68, 68, 0.2); border: 1px solid #ef4444; border-radius: 6px; color: #ef4444; text-decoration: none; font-size: 0.8rem; transition: all 0.3s;">
-                  Ver Doc #{{ doc_id }}
+                  {% blocktrans with id=doc_id %}Ver Doc #{{ id }}{% endblocktrans %}
                 </a>
                 {% endfor %}
                 {% if alerta.documentos|length > 3 %}
-                <span style="color: #b0b3b8; font-size: 0.8rem;">y {{ alerta.documentos|length|add:"-3" }} más...</span>
+                {% with remaining=alerta.documentos|length|add:"-3" %}<span style="color: #b0b3b8; font-size: 0.8rem;">{% blocktrans with count=remaining %}y {{ count }} más...{% endblocktrans %}</span>{% endwith %}
                 {% endif %}
               </div>
               {% endif %}
@@ -905,7 +906,7 @@
           
           {% if alertas_advertencias %}
           <div style="margin-bottom: 1.5rem;">
-            <h4 style="color: #f59e0b; font-size: 1rem; margin-bottom: 0.75rem; font-weight: 700;">🟡 Advertencias:</h4>
+            <h4 style="color: #f59e0b; font-size: 1rem; margin-bottom: 0.75rem; font-weight: 700;">🟡 {% trans "Advertencias:" %}</h4>
             {% for alerta in alertas_advertencias %}
             <div class="alerta-item warning" style="margin-bottom: 0.75rem;">
               <div class="alerta-titulo">
@@ -920,7 +921,7 @@
                 </a>
                 {% endfor %}
                 {% if alerta.documentos|length > 3 %}
-                <span style="color: #b0b3b8; font-size: 0.8rem;">y {{ alerta.documentos|length|add:"-3" }} más...</span>
+                {% with remaining=alerta.documentos|length|add:"-3" %}<span style="color: #b0b3b8; font-size: 0.8rem;">{% blocktrans with count=remaining %}y {{ count }} más...{% endblocktrans %}</span>{% endwith %}
                 {% endif %}
               </div>
               {% endif %}
@@ -931,7 +932,7 @@
           
           {% if alertas_info %}
           <div>
-            <h4 style="color: #3b82f6; font-size: 1rem; margin-bottom: 0.75rem; font-weight: 700;">🟢 Info:</h4>
+            <h4 style="color: #3b82f6; font-size: 1rem; margin-bottom: 0.75rem; font-weight: 700;">🟢 {% trans "Info:" %}</h4>
             {% for alerta in alertas_info %}
             <div class="alerta-item info" style="margin-bottom: 0.75rem;">
               <div class="alerta-titulo">
@@ -947,9 +948,9 @@
           <div class="alerta-item info">
             <div class="alerta-titulo">
               <i class="fas fa-check-circle"></i>
-              Todo en orden
+              {% trans "Todo en orden" %}
             </div>
-            <div class="alerta-mensaje">No se detectaron problemas en el período.</div>
+            <div class="alerta-mensaje">{% trans "No se detectaron problemas en el período." %}</div>
           </div>
           {% endif %}
         </div>
@@ -988,7 +989,7 @@ document.addEventListener('DOMContentLoaded', function() {
       data: {
         labels: labels,
         datasets: [{
-          label: 'Ventas Diarias',
+          label: '{% trans "Ventas Diarias" %}',
           data: data,
           backgroundColor: 'rgba(6, 182, 212, 0.3)',
           borderColor: '#00e6d0',
@@ -1047,31 +1048,31 @@ function setPeriodoRapido(periodo) {
 }
 
 function exportarPDFLibro() {
-  alert('Función de exportación PDF Libro de Ventas en desarrollo');
+  alert('{% trans "Función de exportación PDF Libro de Ventas en desarrollo" %}');
 }
 
 function exportarExcelLibro() {
-  alert('Función de exportación Excel Libro de Ventas en desarrollo');
+  alert('{% trans "Función de exportación Excel Libro de Ventas en desarrollo" %}');
 }
 
 function exportarPackContador() {
-  alert('Función de exportación Pack para Contador (ZIP) en desarrollo');
+  alert('{% trans "Función de exportación Pack para Contador (ZIP) en desarrollo" %}');
 }
 
 function exportarPDFRepuestos() {
-  alert('Función de exportación PDF Repuestos en desarrollo');
+  alert('{% trans "Función de exportación PDF Repuestos en desarrollo" %}');
 }
 
 function exportarExcelRepuestos() {
-  alert('Función de exportación Excel Repuestos en desarrollo');
+  alert('{% trans "Función de exportación Excel Repuestos en desarrollo" %}');
 }
 
 function exportarPDFServicios() {
-  alert('Función de exportación PDF Servicios en desarrollo');
+  alert('{% trans "Función de exportación PDF Servicios en desarrollo" %}');
 }
 
 function exportarExcelServicios() {
-  alert('Función de exportación Excel Servicios en desarrollo');
+  alert('{% trans "Función de exportación Excel Servicios en desarrollo" %}');
 }
 </script>
 {% endblock %}
