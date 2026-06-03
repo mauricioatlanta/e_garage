@@ -203,9 +203,6 @@ def company_branding(request):
         "company_country": brand["country"],
         "company_currency": brand["currency"],
     }
-    print(
-        f"[COMPANY_BRANDING] Retornando: company_tagline='{result.get('company_tagline')}', company_logo_url='{result.get('company_logo_url')}'"
-    )
     return result
 
 
@@ -225,18 +222,14 @@ def company_country(request):
 
 
 def invalidate_company_cache(user):
-    """Invalida el caché de branding para un usuario específico.
-
-    Args:
-            user: Puede ser un objeto User o un ID de usuario (int)
-    """
-    if hasattr(user, "id"):
-        user_id = user.id
-    else:
-        user_id = user  # Es un ID directamente
-
-    cache_key = f"company_branding_{user_id}"
-    cache.delete(cache_key)
+    """Invalida el caché de company_header para un usuario específico."""
+    user_id = user.id if hasattr(user, "id") else user
+    try:
+        from taller.models.empresa import Empresa
+        empresa = Empresa.objects.get(user_id=user_id)
+        cache.delete(f"header_conf_{empresa.id}")
+    except Exception:
+        pass
 
 
 __all__ = [
