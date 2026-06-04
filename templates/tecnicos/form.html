@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load country_url %}
+
+{% block title %}{% if modo == 'crear' %}New Technician{% else %}Edit Technician{% endif %} — eGarage{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8 max-w-2xl">
+
+  <!-- Header -->
+  <div class="bg-black/60 backdrop-blur border border-cyan-400/30 rounded-lg p-6 text-center mb-6">
+    <h1 class="text-2xl font-bold text-white font-mono mb-1">
+      {% if modo == 'crear' %}➕ New Technician{% else %}✏️ Edit Technician{% endif %}
+    </h1>
+    <p class="text-gray-400 text-sm">{{ empresa.nombre }}</p>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 px-4 py-3 rounded border {% if message.tags == 'success' %}bg-green-900/40 border-green-500/40 text-green-300{% else %}bg-red-900/40 border-red-500/40 text-red-300{% endif %}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- Form -->
+  <div class="bg-black/60 backdrop-blur border border-cyan-400/30 rounded-lg p-6">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <!-- Nombre -->
+      <div class="mb-6">
+        <label for="{{ form.nombre.id_for_label }}" class="block text-cyan-400 text-sm font-semibold uppercase tracking-wide mb-2">
+          Name / Nombre
+        </label>
+        {{ form.nombre }}
+        {% if form.nombre.errors %}
+          {% for error in form.nombre.errors %}
+            <p class="text-red-400 text-xs mt-1">{{ error }}</p>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <!-- Activo -->
+      <div class="mb-8 flex items-center gap-3">
+        {{ form.activo }}
+        <label for="{{ form.activo.id_for_label }}" class="text-gray-300 text-sm cursor-pointer">
+          Active / Activo
+        </label>
+        {% if form.activo.errors %}
+          {% for error in form.activo.errors %}
+            <p class="text-red-400 text-xs mt-1">{{ error }}</p>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <!-- Actions -->
+      <div class="flex gap-3">
+        <button type="submit" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+          {% if modo == 'crear' %}💾 Create{% else %}💾 Save Changes{% endif %}
+        </button>
+        <a href="{% country_url 'tecnicos:lista' %}" class="flex-1 text-center bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg transition-colors">
+          Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+</div>
+
+<style>
+  input[type="text"].form-control,
+  input[type="text"] {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(0, 230, 208, 0.08);
+    border: 1px solid rgba(0, 230, 208, 0.3);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 15px;
+  }
+  input[type="text"]:focus {
+    outline: none;
+    border-color: #00e6d0;
+    background: rgba(0, 230, 208, 0.12);
+    box-shadow: 0 0 0 2px rgba(0, 230, 208, 0.15);
+  }
+  input[type="checkbox"].form-check-input {
+    width: 18px;
+    height: 18px;
+    accent-color: #00e6d0;
+    cursor: pointer;
+  }
+</style>
+{% endblock %}

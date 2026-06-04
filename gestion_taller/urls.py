@@ -557,6 +557,11 @@ urlpatterns = [
         name="us_vehiculo_eliminar_redirect",
     ),
     path(
+        "us/tecnicos/crear/",
+        RedirectView.as_view(url="/us/tecnicos/nuevo/", permanent=False),
+        name="us_tecnico_create_redirect",
+    ),
+    path(
         "cl/vehiculos/<int:pk>/",
         RedirectView.as_view(url="/cl/es/vehiculos/%(pk)s/", permanent=False),
         name="cl_vehiculo_detail_redirect",

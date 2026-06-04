@@ -341,7 +341,7 @@ header.company-header > .flex.items-center { gap: 0.4rem !important; }
       {% if checklist_onboarding.tecnico_creado %}
         <span class="ob-step done">✓ {% trans "Technician" %}</span>
       {% else %}
-        <a href="/us/tecnicos/crear/" class="ob-step todo">→ {% trans "Technician" %}</a>
+        <a href="{% url 'tecnicos:nuevo' %}" class="ob-step todo">→ {% trans "Technician" %}</a>
       {% endif %}
 
       {% if checklist_onboarding.cliente_creado %}
