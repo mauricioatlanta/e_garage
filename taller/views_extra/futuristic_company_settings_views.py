@@ -17,6 +17,7 @@ from taller.forms.company_settings_forms import (
 )
 from taller.models import Tecnico
 from taller.models.company_settings import CompanySettings
+from taller.models.configuracion import ConfiguracionEmpresa
 from taller.utils.empresa import get_or_create_empresa, get_user_empresa_safe
 from taller.utils.pais_utils import get_configuracion_pais
 
@@ -132,12 +133,17 @@ def futuristic_company_settings_view(request):
                 try:
                     cfg = form.save()
 
-                    # Invalidar caché de branding para que se actualice en todas las páginas
-                    cache_key = f"company_branding_{request.user.id}"
-                    cache.delete(cache_key)
+                    # Sincronizar logo a ConfiguracionEmpresa para que aparezca en el header
+                    if "logo" in request.FILES:
+                        conf_empresa, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
+                        conf_empresa.logo = cfg.logo
+                        conf_empresa.save(update_fields=["logo"])
+
+                    # Invalidar caché del header
+                    cache.delete(f"header_conf_{empresa.id}")
 
                     # Mensaje específico si se subió logo
-                    if section == "profile" and "logo" in request.FILES:
+                    if "logo" in request.FILES:
                         if empresa.pais in {"CL", "MX", "PE", "VE", "BR"}:
                             messages.success(
                                 request,
