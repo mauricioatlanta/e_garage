@@ -30,14 +30,49 @@
 
       <!-- Nombre -->
       <div class="mb-6">
-        <label for="{{ form.nombre.id_for_label }}" class="block text-cyan-400 text-sm font-semibold uppercase tracking-wide mb-2">
-          Name / Nombre
+        <label class="block text-cyan-400 text-sm font-semibold uppercase tracking-wide mb-2">
+          Technician / Vendor Name
         </label>
-        {{ form.nombre }}
+
+        {% if team_member_names %}
+          {# Dropdown with team members from settings #}
+          <select id="nombre-select" class="nombre-field" onchange="handleNombreSelect(this)">
+            <option value="">— Select from your team —</option>
+            {% for name in team_member_names %}
+              <option value="{{ name }}" {% if form.nombre.value == name %}selected{% endif %}>
+                {{ name }}
+              </option>
+            {% endfor %}
+            <option value="__custom__" {% if form.nombre.value and form.nombre.value not in team_member_names %}selected{% endif %}>
+              ✏️ Write a different name…
+            </option>
+          </select>
+
+          {# Free-text fallback, shown only when "Write a different name" is chosen #}
+          <input
+            type="text"
+            id="nombre-custom"
+            name="nombre"
+            class="nombre-field mt-2"
+            placeholder="Enter name manually"
+            value="{{ form.nombre.value|default:'' }}"
+            style="display:none"
+          >
+        {% else %}
+          {# No team members yet — plain text input #}
+          {{ form.nombre }}
+        {% endif %}
+
         {% if form.nombre.errors %}
           {% for error in form.nombre.errors %}
             <p class="text-red-400 text-xs mt-1">{{ error }}</p>
           {% endfor %}
+        {% endif %}
+
+        {% if not team_member_names and modo == 'crear' %}
+          <p class="text-gray-500 text-xs mt-2">
+            Add team members in <a href="{% country_url 'company_settings' %}" class="text-cyan-500 hover:underline">Settings</a> to enable the dropdown.
+          </p>
         {% endif %}
       </div>
 
@@ -69,6 +104,25 @@
 </div>
 
 <style>
+  .nombre-field {
+    width: 100%;
+    padding: 10px 12px;
+    background: rgba(0, 230, 208, 0.08);
+    border: 1px solid rgba(0, 230, 208, 0.3);
+    border-radius: 6px;
+    color: #fff;
+    font-size: 15px;
+  }
+  .nombre-field:focus {
+    outline: none;
+    border-color: #00e6d0;
+    background: rgba(0, 230, 208, 0.12);
+    box-shadow: 0 0 0 2px rgba(0, 230, 208, 0.15);
+  }
+  select.nombre-field option {
+    background: #1a2a2a;
+    color: #fff;
+  }
   input[type="text"].form-control,
   input[type="text"] {
     width: 100%;
@@ -79,12 +133,6 @@
     color: #fff;
     font-size: 15px;
   }
-  input[type="text"]:focus {
-    outline: none;
-    border-color: #00e6d0;
-    background: rgba(0, 230, 208, 0.12);
-    box-shadow: 0 0 0 2px rgba(0, 230, 208, 0.15);
-  }
   input[type="checkbox"].form-check-input {
     width: 18px;
     height: 18px;
@@ -92,4 +140,49 @@
     cursor: pointer;
   }
 </style>
+
+{% if team_member_names %}
+<script>
+  (function () {
+    const select = document.getElementById('nombre-select');
+    const customInput = document.getElementById('nombre-custom');
+
+    function syncHiddenNombre() {
+      // When a real name is selected, disable the custom input so it doesn't post
+      if (select.value && select.value !== '__custom__') {
+        customInput.removeAttribute('name');
+        select.setAttribute('name', 'nombre');
+        customInput.style.display = 'none';
+      } else if (select.value === '__custom__') {
+        select.removeAttribute('name');
+        customInput.setAttribute('name', 'nombre');
+        customInput.style.display = '';
+        customInput.focus();
+      } else {
+        // Nothing selected yet — keep select as nombre so validation fires
+        customInput.removeAttribute('name');
+        select.setAttribute('name', 'nombre');
+        customInput.style.display = 'none';
+      }
+    }
+
+    window.handleNombreSelect = function (el) {
+      syncHiddenNombre();
+    };
+
+    // On load: if editing and current value is not in the list, show custom input
+    const currentValue = "{{ form.nombre.value|default:''|escapejs }}";
+    const knownNames = [{% for name in team_member_names %}"{{ name|escapejs }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+
+    if (currentValue && !knownNames.includes(currentValue)) {
+      select.value = '__custom__';
+      customInput.value = currentValue;
+      syncHiddenNombre();
+    } else {
+      syncHiddenNombre();
+    }
+  })();
+</script>
+{% endif %}
+
 {% endblock %}

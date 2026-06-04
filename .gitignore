@@ -1,3 +1,6 @@
+# FUSE filesystem artifacts
+.fuse_hidden*
+
 # Python
 __pycache__/
 *.py[cod]

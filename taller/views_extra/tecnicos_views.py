@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.forms.tecnico import TecnicoForm
 from taller.models import Empresa, Tecnico
+from taller.models.team_member import TeamMember
 
 
 def _empresa_activa(request):
@@ -13,6 +14,23 @@ def _empresa_activa(request):
     if eid:
         qs = qs.filter(id=eid)
     return qs.order_by("id").first()
+
+
+def _team_member_names(empresa):
+    """Names of active team members registered in settings, excluding already-linked tecnicos."""
+    linked_names = set(
+        Tecnico.objects.filter(empresa=empresa).values_list("nombre", flat=True)
+    )
+    members = (
+        TeamMember.objects.filter(empresa=empresa, is_active=True)
+        .select_related("user")
+        .order_by("user__first_name", "user__last_name")
+    )
+    return [
+        m.user.get_full_name() or m.user.username
+        for m in members
+        if (m.user.get_full_name() or m.user.username) not in linked_names
+    ]
 
 
 @login_required
@@ -39,7 +57,12 @@ def tecnicos_crear(request):
     return render(
         request,
         "tecnicos/form.html",
-        {"form": form, "empresa": empresa, "modo": "crear"},
+        {
+            "form": form,
+            "empresa": empresa,
+            "modo": "crear",
+            "team_member_names": _team_member_names(empresa),
+        },
     )
 
 
@@ -59,7 +82,12 @@ def tecnicos_editar(request, tecnico_id):
     return render(
         request,
         "tecnicos/form.html",
-        {"form": form, "empresa": empresa, "modo": "editar"},
+        {
+            "form": form,
+            "empresa": empresa,
+            "modo": "editar",
+            "team_member_names": _team_member_names(empresa),
+        },
     )
 
 
