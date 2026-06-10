@@ -125,9 +125,29 @@ SECURE_REFERRER_POLICY = (
 # Backend real por API HTTPS (Resend), sin dependencia de SMTP.
 # EMAIL_BACKEND = "anymail.backends.resend.EmailBackend"
 
-DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl")
-SERVER_EMAIL = env_str("SERVER_EMAIL", DEFAULT_FROM_EMAIL)
-SUPPORT_EMAIL = env_str("SUPPORT_EMAIL", DEFAULT_FROM_EMAIL)
+def _sane_egarage_email(raw, default="support@egarage.cl", brand="eGarage"):
+    """Normaliza remitentes a un buzon real y enrutado de egarage.cl.
+
+    Evita rebotes 550 cuando el .env del servidor trae direcciones que no
+    reciben correo: dominios legacy (atlantareciclajes.cl) o buzones tipo
+    no-reply@ que no estan configurados en Cloudflare Email Routing.
+    Preserva el display name si venia uno (p.ej. "eGarage <...>").
+    """
+    from email.utils import formataddr, parseaddr
+
+    display_name, address = parseaddr((raw or "").strip())
+    address = (address or (raw or "")).strip()
+    local = address.split("@", 1)[0].lower() if "@" in address else ""
+    bad_domain = address.lower().endswith("@atlantareciclajes.cl")
+    bad_local = local in {"no-reply", "noreply", "no_reply"}
+    if not address or bad_domain or bad_local:
+        address = default
+    return formataddr((display_name or brand, address))
+
+
+DEFAULT_FROM_EMAIL = _sane_egarage_email(env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl"))
+SERVER_EMAIL = _sane_egarage_email(env_str("SERVER_EMAIL", DEFAULT_FROM_EMAIL))
+SUPPORT_EMAIL = _sane_egarage_email(env_str("SUPPORT_EMAIL", DEFAULT_FROM_EMAIL))
 EMAIL_HOST_USER = SUPPORT_EMAIL
 
 EMAIL_TIMEOUT = env_int("EMAIL_TIMEOUT", 30)

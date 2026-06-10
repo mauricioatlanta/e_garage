@@ -1,10 +1,17 @@
 import logging
+from email.utils import parseaddr
 
 import resend
 from django.conf import settings
 from django.core.mail.backends.base import BaseEmailBackend
 
 logger = logging.getLogger(__name__)
+
+
+def _bare_address(raw):
+    """Devuelve solo la direccion (sin display name) de un "Nombre <addr>"."""
+    _, address = parseaddr((raw or "").strip())
+    return (address or (raw or "")).strip()
 
 
 class ResendBackend(BaseEmailBackend):
@@ -36,12 +43,36 @@ class ResendBackend(BaseEmailBackend):
                 if not html_content:
                     html_content = f"<p>{message.body}</p>".replace("\n", "<br>")
 
+                from_email = message.from_email or getattr(
+                    settings, "DEFAULT_FROM_EMAIL", "support@egarage.cl"
+                )
+
+                # Reply-To real: el del mensaje, o SUPPORT_EMAIL como fallback.
+                # Evita que las respuestas reboten contra buzones inexistentes.
+                reply_to = [_bare_address(addr) for addr in (message.reply_to or []) if addr]
+                if not reply_to:
+                    fallback = _bare_address(
+                        getattr(settings, "SUPPORT_EMAIL", None)
+                        or getattr(settings, "DEFAULT_FROM_EMAIL", "support@egarage.cl")
+                    )
+                    if fallback:
+                        reply_to = [fallback]
+
                 params = {
-                    "from": getattr(settings, "DEFAULT_FROM_EMAIL", "support@egarage.cl"),
+                    "from": from_email,
                     "to": message.to,
                     "subject": message.subject,
                     "html": html_content,
                 }
+                if message.body:
+                    params["text"] = message.body
+                if message.cc:
+                    params["cc"] = message.cc
+                if message.bcc:
+                    params["bcc"] = message.bcc
+                if reply_to:
+                    params["reply_to"] = reply_to
+
                 resend.Emails.send(params)
                 sent_count += 1
             except Exception as e:
