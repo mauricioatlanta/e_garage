@@ -39,41 +39,80 @@
           <section>
             <h2 class="text-xl font-semibold text-cyan-300 mb-3">
               {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                Términos y Condiciones
+                Términos y Condiciones de Servicio (TOS)
               {% else %}
-                Terms and Conditions
+                Terms and Conditions of Service (TOS)
               {% endif %}
             </h2>
-            <p class="text-gray-300 text-sm mb-3">
+            <p class="text-gray-300 text-sm mb-4">
               {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                El uso de eGarage implica la aceptación de estos términos. El servicio se provee "tal cual" y puede cambiar sin previo aviso. El usuario es responsable de la veracidad de los datos ingresados y del uso adecuado de la plataforma.
+                El uso de eGarage implica la plena aceptación de estos términos. El servicio se provee "tal cual" y según disponibilidad, pudiendo cambiar o actualizarse sin previo aviso.
               {% else %}
-                The use of eGarage implies acceptance of these terms. The service is provided "as is" and may change without notice. The user is responsible for the veracity of the data entered and the appropriate use of the platform.
+                The use of eGarage implies full acceptance of these terms. The service is provided "as is" and as available, and may change or be updated without prior notice.
               {% endif %}
             </p>
-            <ul class="list-disc list-inside text-gray-400 text-sm space-y-1 ml-4">
-              <li>
+
+            <h3 class="text-base font-semibold text-cyan-200 mb-2">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                1. Uso de la Plataforma y Responsabilidad
+              {% else %}
+                1. Use of the Platform and Responsibility
+              {% endif %}
+            </h3>
+            <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                El usuario es el único responsable de la veracidad, exactitud y legalidad de todos los datos ingresados en el sistema. No se permite el uso de la plataforma para actividades ilícitas o ajenas a la gestión administrativa automotriz. Nos reservamos el derecho exclusivo de suspender o rescindir cuentas por mal uso o comportamiento sospechoso sin derecho a indemnización.
+              {% else %}
+                The user is solely responsible for the truthfulness, accuracy and legality of all data entered into the system. Use of the platform for illegal activities or activities unrelated to automotive administrative management is not permitted. We reserve the exclusive right to suspend or terminate accounts for misuse or suspicious behavior without any right to compensation.
+              {% endif %}
+            </p>
+
+            <div class="rounded-lg border border-fuchsia-400/30 bg-fuchsia-900/10 p-4 mb-4">
+              <h3 class="text-base font-semibold text-fuchsia-300 mb-2">
                 {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                  No se permite el uso para actividades ilícitas.
+                  2. Restricción de Acceso y Uso para Competidores
                 {% else %}
-                  Use for illegal activities is not permitted.
+                  2. Access and Use Restriction for Competitors
                 {% endif %}
-              </li>
-              <li>
+              </h3>
+              <p class="text-gray-300 text-sm leading-relaxed">
                 {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                  La información ingresada es responsabilidad del usuario.
+                  Queda estrictamente prohibido el registro, acceso o uso de eGarage —independiente de si es bajo un plan gratuito, de prueba o de pago— por parte de competidores directos o indirectos, desarrolladores de software competidor o terceros cuyo propósito sea el espionaje industrial, benchmarking, copia de interfaz (UX/UI), clonación de lógicas operativas o ingeniería inversa. El incumplimiento de esta cláusula facultará a eGarage a cerrar la cuenta inmediatamente y ejercer las acciones judiciales pertinentes por competencia desleal e infracción de propiedad intelectual.
                 {% else %}
-                  The information entered is the responsibility of the user.
+                  The registration, access or use of eGarage —regardless of whether under a free, trial or paid plan— is strictly prohibited for direct or indirect competitors, developers of competing software, or third parties whose purpose is industrial espionage, benchmarking, interface (UX/UI) copying, cloning of operational logic, or reverse engineering. Breach of this clause will entitle eGarage to immediately close the account and pursue the relevant legal actions for unfair competition and intellectual property infringement.
                 {% endif %}
-              </li>
-              <li>
-                {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                  Nos reservamos el derecho de suspender cuentas por mal uso.
-                {% else %}
-                  We reserve the right to suspend accounts for misuse.
-                {% endif %}
-              </li>
-            </ul>
+              </p>
+            </div>
+
+            <h3 class="text-base font-semibold text-cyan-200 mb-2">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                3. Restricciones de Planes y Cuentas
+              {% else %}
+                3. Plan and Account Restrictions
+              {% endif %}
+            </h3>
+            <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                Los cupos de usuarios de cada plan se aplican estrictamente al personal administrativo y son intransferibles. Queda prohibida la compartición de credenciales de acceso para burlar los límites del plan.
+              {% else %}
+                The user quotas of each plan apply strictly to administrative staff and are non-transferable. Sharing access credentials to circumvent plan limits is prohibited.
+              {% endif %}
+            </p>
+
+            <h3 class="text-base font-semibold text-cyan-200 mb-2">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                4. Limitación de Responsabilidad
+              {% else %}
+                4. Limitation of Liability
+              {% endif %}
+            </h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                eGarage no garantiza que la plataforma esté libre de interrupciones o errores. En ningún caso eGarage o AtlantaReciclajes serán responsables por daños directos, indirectos, lucro cesante o pérdidas de información derivados del uso o de la imposibilidad de uso del software.
+              {% else %}
+                eGarage does not guarantee that the platform will be free of interruptions or errors. In no event shall eGarage or AtlantaReciclajes be liable for direct or indirect damages, loss of profit, or loss of information arising from the use or inability to use the software.
+              {% endif %}
+            </p>
           </section>
 
           <section>
@@ -84,36 +123,43 @@
                 Privacy Policy
               {% endif %}
             </h2>
-            <p class="text-gray-300 text-sm mb-3">
+            <p class="text-gray-300 text-sm mb-4">
               {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                Respetamos tu privacidad. Los datos personales se usan solo para la operación del sistema y no se comparten con terceros salvo obligación legal. Puedes solicitar la eliminación de tu cuenta y datos en cualquier momento.
+                Respetamos tu privacidad. Solo recolectamos y procesamos los datos estrictamente necesarios para la correcta operación del sistema.
               {% else %}
-                We respect your privacy. Personal data is used only for system operation and is not shared with third parties except legal obligation. You can request the deletion of your account and data at any time.
+                We respect your privacy. We only collect and process the data strictly necessary for the correct operation of the system.
               {% endif %}
             </p>
-            <ul class="list-disc list-inside text-gray-400 text-sm space-y-1 ml-4">
-              <li>
-                {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                  Solo recolectamos datos necesarios para el funcionamiento.
-                {% else %}
-                  We only collect data necessary for operation.
-                {% endif %}
-              </li>
-              <li>
-                {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                  No vendemos ni compartimos datos con terceros.
-                {% else %}
-                  We do not sell or share data with third parties.
-                {% endif %}
-              </li>
-              <li>
-                {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                  Puedes contactarnos para ejercer tus derechos ARCO.
-                {% else %}
-                  You can contact us to exercise your ARCO rights.
-                {% endif %}
-              </li>
-            </ul>
+
+            <h3 class="text-base font-semibold text-cyan-200 mb-2">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                1. Tratamiento de Datos
+              {% else %}
+                1. Data Processing
+              {% endif %}
+            </h3>
+            <p class="text-gray-400 text-sm mb-4 leading-relaxed">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                Los datos personales o del taller se utilizan exclusivamente para las funcionalidades internas de la plataforma y no se venden, comparten ni transfieren a terceros, salvo obligación legal expresa.
+              {% else %}
+                Personal or workshop data is used exclusively for the platform's internal features and is not sold, shared or transferred to third parties, except by express legal obligation.
+              {% endif %}
+            </p>
+
+            <h3 class="text-base font-semibold text-cyan-200 mb-2">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                2. Derechos del Usuario
+              {% else %}
+                2. User Rights
+              {% endif %}
+            </h3>
+            <p class="text-gray-400 text-sm leading-relaxed">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                El titular de la cuenta puede solicitar la rectificación, portabilidad o eliminación total de sus datos y cuenta en cualquier momento escribiendo a los canales oficiales. Puede contactarnos para ejercer sus derechos ARCO bajo la legislación vigente.
+              {% else %}
+                The account holder may request the rectification, portability or complete deletion of their data and account at any time by writing to the official channels. You may contact us to exercise your ARCO rights under applicable law.
+              {% endif %}
+            </p>
           </section>
 
           {# Sección específica para Chile: Protección de Datos Tributarios #}
@@ -199,26 +245,26 @@
           <section>
             <h2 class="text-xl font-semibold text-cyan-300 mb-3">
               {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                Propiedad Intelectual
+                Propiedad Intelectual y Jurisdicción
               {% else %}
-                Intellectual Property
+                Intellectual Property and Jurisdiction
               {% endif %}
             </h2>
             <p class="text-gray-300 text-sm mb-3">
               {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                El código fuente, algoritmos, lógica de negocio y documentación de eGarage son propiedad intelectual exclusiva de eGarage. Todos los derechos reservados.
+                El código fuente, algoritmos, flujo de pantallas, lógica de negocio y documentación de eGarage son propiedad intelectual exclusiva de eGarage / AtlantaReciclajes. Todos los derechos reservados.
               {% else %}
-                The source code, algorithms, business logic and documentation of eGarage are the exclusive intellectual property of eGarage. All rights reserved.
+                The source code, algorithms, screen flow, business logic and documentation of eGarage are the exclusive intellectual property of eGarage / AtlantaReciclajes. All rights reserved.
               {% endif %}
             </p>
             <p class="text-gray-400 text-sm mb-3">
               {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
-                Queda estrictamente prohibida la copia, modificación, distribución, venta o ingeniería inversa no autorizada de este software. El acceso y uso está regido por los Términos de Servicio (TOS) y Acuerdos de Licencia de Usuario Final (EULA) de eGarage.
+                Queda estrictamente prohibida la copia, modificación, distribución, venta o ingeniería inversa no autorizada de este software. El acceso y uso está regido por estos Términos de Servicio (TOS) y los Acuerdos de Licencia de Usuario Final (EULA) de eGarage.
               {% else %}
-                Copying, modification, distribution, sale or unauthorized reverse engineering of this software is strictly prohibited. Access and use is governed by eGarage's Terms of Service (TOS) and End User License Agreements (EULA).
+                Copying, modification, distribution, sale or unauthorized reverse engineering of this software is strictly prohibited. Access and use is governed by these Terms of Service (TOS) and eGarage's End User License Agreements (EULA).
               {% endif %}
             </p>
-            <p class="text-gray-400 text-sm">
+            <p class="text-gray-400 text-sm mb-3">
               <strong class="text-cyan-400">
                 {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
                   Para más información, consulte el archivo LICENSE en el repositorio del código fuente.
@@ -227,8 +273,15 @@
                 {% endif %}
               </strong>
             </p>
-            <p class="text-xs text-gray-500 mt-2">
+            <p class="text-xs text-gray-500 mb-3">
               <strong>US Patent Pending.</strong> <strong>Chile Software Registration Pending.</strong>
+            </p>
+            <p class="text-gray-400 text-sm">
+              {% if LANGUAGE_CODE == 'es' or request.LANGUAGE_CODE == 'es' %}
+                Cualquier disputa legal se someterá y resolverá bajo las leyes de la República de Chile ante los tribunales correspondientes de su domicilio legal.
+              {% else %}
+                Any legal dispute shall be submitted to and resolved under the laws of the Republic of Chile before the corresponding courts of its legal domicile.
+              {% endif %}
             </p>
           </section>
 
