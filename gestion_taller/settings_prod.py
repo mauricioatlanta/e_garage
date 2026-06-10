@@ -375,7 +375,9 @@ CSRF_USE_SESSIONS = True
 
 EMAIL_BACKEND = env_str("EMAIL_BACKEND", "gestion_taller.resend_backend.ResendBackend")
 RESEND_API_KEY = env_str("RESEND_API_KEY", "")
-DEFAULT_FROM_EMAIL = env_str("DEFAULT_FROM_EMAIL", "support@egarage.cl")
+# Normaliza tambien aqui: esta reasignacion pisaba el valor saneado de arriba
+# y reintroducia no-reply@/dominios legacy desde el .env (rebotes 550).
+DEFAULT_FROM_EMAIL = _sane_egarage_email(env_str("DEFAULT_FROM_EMAIL", DEFAULT_FROM_EMAIL))
 ACCOUNT_LOGIN_METHODS = {'email'}
 
 # Pasarelas de pago
