@@ -120,6 +120,32 @@ Billing: `monthly` or `annual`.
 `taller/models/suscripcion.py`, `suscripcion_transaccion.py` — subscription lifecycle.  
 `taller/models/trial.py` — trial period logic.
 
+## Email / Deliverability
+
+Outbound mail goes through **Resend** (HTTP API, no SMTP). Production uses
+`gestion_taller.resend_backend.ResendBackend` (set via `EMAIL_BACKEND`).
+
+**Sender rules — avoid 550 "Address does not exist" bounces:**
+- `egarage.cl` receives mail via **Cloudflare Email Routing**; only addresses
+  with a routing rule are deliverable. `support@egarage.cl` is the real,
+  monitored inbox. **Never send from `no-reply@egarage.cl`** — it has no rule
+  and any reply bounces.
+- All sends must carry a real `Reply-To`. Use the helpers in
+  `taller/utils/email_helper.py` (`get_branded_from_email`,
+  `get_support_reply_to`, `send_email_with_reply_to`, `send_template_email`),
+  never `send_mail` directly.
+- `settings_prod.py` normalizes `DEFAULT_FROM_EMAIL` / `SERVER_EMAIL` /
+  `SUPPORT_EMAIL`: legacy `@atlantareciclajes.cl` or `no-reply@` addresses are
+  forced to `support@egarage.cl`, so a stale server `.env` cannot reintroduce
+  bounces. `ResendBackend` honors per-message `from` and always sends a
+  `Reply-To` (message's, or `SUPPORT_EMAIL` fallback).
+- **Resend campaigns/broadcasts are sent from the dashboard, not code** — set
+  their sender or Reply-To to `support@egarage.cl` manually.
+
+**Verify after deploy:** `python scripts/verificar_email_deploy.py` (config
+check) or `python scripts/verificar_email_deploy.py you@example.com` (real test
+send). See `docs/EMAIL_DEPLOY.md`.
+
 ## Tailwind CSS
 
 Config in root `tailwind.config.js` scans `templates/**/*.html` and `static/js/**/*.js`. Custom fonts: Orbitron, Poppins. Extended colors: cyan, fuchsia, lime.
