@@ -3,6 +3,48 @@
 from django.db import migrations, models
 
 
+def _dedupe_telefonos(apps, schema_editor):
+    """Antes de crear el indice unico (empresa, telefono), resuelve duplicados.
+
+    No destructivo: conserva el cliente mas antiguo (id menor) de cada grupo y
+    deja el telefono en blanco (NULL) en los demas, para que dejen de violar la
+    restriccion (que solo aplica cuando telefono no es NULL ni vacio). Asi el
+    deploy no falla por datos historicos duplicados en ningun entorno.
+    """
+    Cliente = apps.get_model("taller", "Cliente")
+    from django.db.models import Count
+
+    grupos = (
+        Cliente.objects.exclude(telefono__isnull=True)
+        .exclude(telefono="")
+        .values("empresa_id", "telefono")
+        .annotate(n=Count("id"))
+        .filter(n__gt=1)
+    )
+
+    total = 0
+    for g in grupos:
+        ids = list(
+            Cliente.objects.filter(
+                empresa_id=g["empresa_id"], telefono=g["telefono"]
+            )
+            .order_by("id")
+            .values_list("id", flat=True)
+        )
+        # Conserva el primero (id menor); limpia el telefono del resto.
+        sobrantes = ids[1:]
+        if sobrantes:
+            actualizados = Cliente.objects.filter(id__in=sobrantes).update(telefono=None)
+            total += actualizados
+            print(
+                f"  [dedupe] empresa={g['empresa_id']} tel={g['telefono']} "
+                f"conserva id={ids[0]} limpia ids={sobrantes}"
+            )
+
+    if total:
+        print(f"  [dedupe] telefonos duplicados limpiados: {total}")
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -10,6 +52,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
+        migrations.RunPython(_dedupe_telefonos, migrations.RunPython.noop),
         migrations.AddConstraint(
             model_name='cliente',
             constraint=models.UniqueConstraint(condition=models.Q(('telefono__isnull', False), models.Q(('telefono', ''), _negated=True)), fields=('empresa', 'telefono'), name='uq_cliente_empresa_telefono_present'),
