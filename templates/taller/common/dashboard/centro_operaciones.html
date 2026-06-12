@@ -37,12 +37,16 @@ body {
     background: linear-gradient(145deg, var(--glass-bg), rgba(0, 255, 255, 0.05));
     border: 1px solid var(--cyber-blue);
     border-radius: 12px;
-    padding: 0.5rem;
+    padding: 1rem 0.75rem;
     text-align: center;
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
-    min-height: 56px;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 .kpi-card:hover {
@@ -67,24 +71,26 @@ body {
 }
 
 .kpi-value {
-    font-size: 0.9rem;
-    font-weight: bold;
+    font-size: 2rem;
+    font-weight: 800;
     color: var(--cyber-blue);
-    text-shadow: 0 0 10px var(--cyber-blue);
-    line-height: 1.1;
+    text-shadow: 0 0 12px var(--cyber-blue);
+    line-height: 1;
+    letter-spacing: -0.5px;
 }
 
 .kpi-label {
-    color: #b0b8c1;
-    font-size: 0.5rem;
+    color: #6b7a8d;
+    font-size: 0.62rem;
     text-transform: uppercase;
-    letter-spacing: 1px;
-    line-height: 1.1;
+    letter-spacing: 1.5px;
+    line-height: 1.2;
+    margin-top: 0.3rem;
 }
 
 .alert-card {
     background: var(--card-bg);
-    border-left: 4px solid var(--cyber-red);
+    border-left: 4px solid var(--cyber-gold);
     border-radius: 8px;
     padding: 1rem;
     margin-bottom: 0.5rem;
@@ -92,8 +98,19 @@ body {
 }
 
 .alert-card:hover {
-    border-left-color: var(--cyber-gold);
-    box-shadow: 0 4px 16px rgba(255, 0, 68, 0.2);
+    box-shadow: 0 4px 16px rgba(255, 215, 0, 0.15);
+}
+
+.alert-card.danger {
+    border-left-color: var(--cyber-red);
+}
+
+.alert-card.info {
+    border-left-color: var(--cyber-blue);
+}
+
+.alert-card.success {
+    border-left-color: var(--cyber-green);
 }
 
 .cyber-button {
@@ -238,7 +255,7 @@ body {
     border: 1px solid var(--cyber-blue);
     border-radius: 12px;
     padding: 1rem;
-    height: 220px;
+    height: 300px;
 }
 
 @keyframes pulse {
@@ -261,7 +278,7 @@ body {
     background: var(--card-bg);
     border: 1px solid var(--cyber-purple);
     border-radius: 12px;
-    padding: 1.5rem;
+    padding: 1.25rem 1rem;
     text-align: center;
     text-decoration: none;
     color: inherit;
@@ -270,8 +287,32 @@ body {
 
 .nav-card:hover {
     border-color: var(--cyber-green);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(128, 0, 255, 0.3);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(128, 0, 255, 0.3);
+}
+
+.nav-group {
+    margin-bottom: 1.5rem;
+}
+
+.nav-group:last-child {
+    margin-bottom: 0;
+}
+
+.nav-group-header {
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: rgba(0, 255, 255, 0.45);
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(0, 255, 255, 0.12);
+    margin-bottom: 0.75rem;
+}
+
+.nav-group-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 0.75rem;
 }
 </style>
 {% endblock %}
@@ -281,61 +322,25 @@ body {
 
     <!-- 🚀 Checklist de Onboarding (Solo si no está completo) -->
     {% if not checklist_completo %}
-    <div class="cyber-container p-4 mb-4" style="border-color: var(--cyber-gold); box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);">
-        <div class="flex items-center justify-between mb-3">
-            <h3 class="section-title mb-0" style="color: var(--cyber-gold); text-shadow: 0 0 10px var(--cyber-gold);">
-                🚀 Completa tu Configuración Inicial
-            </h3>
-            <span class="status-badge status-pending">Incompleto</span>
-        </div>
-        <p class="text-sm text-gray-400 mb-4">Sigue estos pasos para activar todas las funcionalidades de eGarage:</p>
-        
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-3">
-            <!-- Empresa -->
-            <div class="p-3 rounded-lg {% if checklist_onboarding.empresa_configurada %}bg-green-900/20 border border-green-500/50{% else %}bg-gray-800/50 border border-gray-700{% endif %} text-center transition-all">
-                <div class="text-2xl mb-1">{% if checklist_onboarding.empresa_configurada %}✅{% else %}🏢{% endif %}</div>
-                <div class="text-xs font-bold {% if checklist_onboarding.empresa_configurada %}text-green-400{% else %}text-gray-400{% endif %}">Empresa</div>
-                {% if not checklist_onboarding.empresa_configurada %}
-                <a href="{% url 'taller:onboarding_step' step='identidad' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Configurar</a>
-                {% endif %}
-            </div>
-            
-            <!-- Técnico -->
-            <div class="p-3 rounded-lg {% if checklist_onboarding.tecnico_creado %}bg-green-900/20 border border-green-500/50{% else %}bg-gray-800/50 border border-gray-700{% endif %} text-center transition-all">
-                <div class="text-2xl mb-1">{% if checklist_onboarding.tecnico_creado %}✅{% else %}👨‍🔧{% endif %}</div>
-                <div class="text-xs font-bold {% if checklist_onboarding.tecnico_creado %}text-green-400{% else %}text-gray-400{% endif %}">Técnico</div>
-                {% if not checklist_onboarding.tecnico_creado %}
-                <a href="{% url 'taller:onboarding_step' step='equipo' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Agregar</a>
-                {% endif %}
-            </div>
-            
-            <!-- Cliente -->
-            <div class="p-3 rounded-lg {% if checklist_onboarding.cliente_creado %}bg-green-900/20 border border-green-500/50{% else %}bg-gray-800/50 border border-gray-700{% endif %} text-center transition-all">
-                <div class="text-2xl mb-1">{% if checklist_onboarding.cliente_creado %}✅{% else %}👥{% endif %}</div>
-                <div class="text-xs font-bold {% if checklist_onboarding.cliente_creado %}text-green-400{% else %}text-gray-400{% endif %}">Cliente</div>
-                {% if not checklist_onboarding.cliente_creado %}
-                <a href="{% url 'taller:clientes:cliente_crear' %}?next={{ request.get_full_path }}&return_target=documento_cliente" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Crear</a>
-                {% endif %}
-            </div>
-            
-            <!-- Vehículo -->
-            <div class="p-3 rounded-lg {% if checklist_onboarding.vehiculo_creado %}bg-green-900/20 border border-green-500/50{% else %}bg-gray-800/50 border border-gray-700{% endif %} text-center transition-all">
-                <div class="text-2xl mb-1">{% if checklist_onboarding.vehiculo_creado %}✅{% else %}🚗{% endif %}</div>
-                <div class="text-xs font-bold {% if checklist_onboarding.vehiculo_creado %}text-green-400{% else %}text-gray-400{% endif %}">Vehículo</div>
-                {% if not checklist_onboarding.vehiculo_creado %}
-                <a href="{% url 'taller:vehiculos:crear_vehiculo' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Registrar</a>
-                {% endif %}
-            </div>
-            
-            <!-- Documento -->
-            <div class="p-3 rounded-lg {% if checklist_onboarding.documento_creado %}bg-green-900/20 border border-green-500/50{% else %}bg-gray-800/50 border border-gray-700{% endif %} text-center transition-all">
-                <div class="text-2xl mb-1">{% if checklist_onboarding.documento_creado %}✅{% else %}📄{% endif %}</div>
-                <div class="text-xs font-bold {% if checklist_onboarding.documento_creado %}text-green-400{% else %}text-gray-400{% endif %}">Documento</div>
-                {% if not checklist_onboarding.documento_creado %}
-                <a href="{% country_url 'documentos:documento_crear' %}" class="text-[10px] text-cyan-400 hover:underline mt-1 block">Emitir</a>
-                {% endif %}
-            </div>
-        </div>
+    <div class="mb-3 px-3 py-2 rounded-lg flex items-center gap-3 flex-wrap" style="background: rgba(255,215,0,0.06); border: 1px solid rgba(255,215,0,0.3);">
+        <span class="text-xs font-bold shrink-0" style="color: var(--cyber-gold);">🚀 Configura tu taller:</span>
+        {% with steps=checklist_onboarding %}
+        <a href="{% url 'taller:onboarding_step' step='identidad' %}" class="flex items-center gap-1 text-xs px-2 py-1 rounded {% if steps.empresa_configurada %}text-green-400 bg-green-900/20{% else %}text-amber-300 bg-amber-900/20 hover:bg-amber-900/40{% endif %} transition-all">
+            {% if steps.empresa_configurada %}✅{% else %}🏢{% endif %} Empresa
+        </a>
+        <a href="{% url 'taller:onboarding_step' step='equipo' %}" class="flex items-center gap-1 text-xs px-2 py-1 rounded {% if steps.tecnico_creado %}text-green-400 bg-green-900/20{% else %}text-amber-300 bg-amber-900/20 hover:bg-amber-900/40{% endif %} transition-all">
+            {% if steps.tecnico_creado %}✅{% else %}👨‍🔧{% endif %} Técnico
+        </a>
+        <a href="{% url 'taller:clientes:cliente_crear' %}?next={{ request.get_full_path }}&return_target=documento_cliente" class="flex items-center gap-1 text-xs px-2 py-1 rounded {% if steps.cliente_creado %}text-green-400 bg-green-900/20{% else %}text-amber-300 bg-amber-900/20 hover:bg-amber-900/40{% endif %} transition-all">
+            {% if steps.cliente_creado %}✅{% else %}👥{% endif %} Cliente
+        </a>
+        <a href="{% url 'taller:vehiculos:crear_vehiculo' %}" class="flex items-center gap-1 text-xs px-2 py-1 rounded {% if steps.vehiculo_creado %}text-green-400 bg-green-900/20{% else %}text-amber-300 bg-amber-900/20 hover:bg-amber-900/40{% endif %} transition-all">
+            {% if steps.vehiculo_creado %}✅{% else %}🚗{% endif %} Vehículo
+        </a>
+        <a href="{% country_url 'documentos:documento_crear' %}" class="flex items-center gap-1 text-xs px-2 py-1 rounded {% if steps.documento_creado %}text-green-400 bg-green-900/20{% else %}text-amber-300 bg-amber-900/20 hover:bg-amber-900/40{% endif %} transition-all">
+            {% if steps.documento_creado %}✅{% else %}📄{% endif %} Documento
+        </a>
+        {% endwith %}
     </div>
     {% endif %}
 
@@ -358,7 +363,7 @@ body {
     </div>
 
     <!-- 📊 KPIs Principales -->
-    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-2 mb-3">
+    <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3 mb-5">
 
         <!-- Documentos -->
         <div class="kpi-card">
@@ -396,7 +401,7 @@ body {
     </div>
 
     <!-- 📈 Estado Operativo -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-5">
 
         <!-- Estado de Documentos -->
         <div class="cyber-container p-4">
@@ -453,7 +458,7 @@ body {
     </div>
 
     <!-- 🔧 Rankings y Tops -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mb-5">
 
         <!-- Top Servicios -->
         <div class="cyber-container p-4">
@@ -494,7 +499,7 @@ body {
 
     <!-- ⚠️ Alertas y Oportunidades -->
     {% if alertas %}
-    <div class="cyber-container p-4 mb-4">
+    <div class="cyber-container p-4 mb-5">
         <h3 class="section-title">⚠️ Alertas y Oportunidades</h3>
         {% for alerta in alertas %}
         <div class="alert-card">
@@ -513,67 +518,76 @@ body {
     <!-- 🚀 Navegación Rápida -->
     <div class="cyber-container p-4">
         <h3 class="section-title">🚀 Acceso Rápido a Funciones</h3>
-        <div class="nav-grid">
 
-            <a href="/cl/reportes/" class="nav-card">
-                <div class="text-3xl mb-2">📊</div>
-                <div class="font-semibold">Reportes Completos</div>
-                <div class="text-sm text-gray-400">Análisis detallados</div>
-            </a>
+        <!-- Grupo: Reportes -->
+        <div class="nav-group">
+            <div class="nav-group-header">Reportes e Inteligencia</div>
+            <div class="nav-group-grid">
+                <a href="/cl/reportes/" class="nav-card">
+                    <div class="text-3xl mb-2">📊</div>
+                    <div class="font-semibold">Reportes</div>
+                    <div class="text-xs text-gray-400">Análisis detallados</div>
+                </a>
+                <a href="/cl/reportes/inteligencia/" class="nav-card">
+                    <div class="text-3xl mb-2">🚀</div>
+                    <div class="font-semibold">Inteligencia Operativa</div>
+                    <div class="text-xs text-gray-400">Dashboard futurista</div>
+                </a>
+                <a href="/cl/taller/reportes/mecanicos/" class="nav-card">
+                    <div class="text-3xl mb-2">👨‍🔧</div>
+                    <div class="font-semibold">Por Técnico</div>
+                    <div class="text-xs text-gray-400">Productividad individual</div>
+                </a>
+                <a href="/analytics/" class="nav-card">
+                    <div class="text-3xl mb-2">📈</div>
+                    <div class="font-semibold">Business Intelligence</div>
+                    <div class="text-xs text-gray-400">Análisis avanzado</div>
+                </a>
+            </div>
+        </div>
 
-            <a href="/cl/reportes/inteligencia/" class="nav-card">
-                <div class="text-3xl mb-2">🚀</div>
-                <div class="font-semibold">Inteligencia Operativa</div>
-                <div class="text-sm text-gray-400">Dashboard futurista</div>
-            </a>
+        <!-- Grupo: Operaciones -->
+        <div class="nav-group">
+            <div class="nav-group-header">Operaciones</div>
+            <div class="nav-group-grid">
+                <a href="/documentos/" class="nav-card">
+                    <div class="text-3xl mb-2">📄</div>
+                    <div class="font-semibold">Documentos</div>
+                    <div class="text-xs text-gray-400">Crear y administrar</div>
+                </a>
+                <a href="/cl/clientes/" class="nav-card">
+                    <div class="text-3xl mb-2">👥</div>
+                    <div class="font-semibold">Clientes</div>
+                    <div class="text-xs text-gray-400">Base de clientes</div>
+                </a>
+                <a href="/cl/vehiculos/" class="nav-card">
+                    <div class="text-3xl mb-2">🚗</div>
+                    <div class="font-semibold">Vehículos</div>
+                    <div class="text-xs text-gray-400">Flota del taller</div>
+                </a>
+                <a href="{% country_url 'vehiculos:ingreso_foto' %}" class="nav-card">
+                    <div class="text-3xl mb-2">📸</div>
+                    <div class="font-semibold">Ingreso por Foto</div>
+                    <div class="text-xs text-gray-400">Identificar patente</div>
+                </a>
+            </div>
+        </div>
 
-            <a href="/cl/taller/reportes/mecanicos/" class="nav-card">
-                <div class="text-3xl mb-2">👨‍🔧</div>
-                <div class="font-semibold">Reportes por Técnico</div>
-                <div class="text-sm text-gray-400">Productividad individual</div>
-            </a>
-
-            <a href="/analytics/" class="nav-card">
-                <div class="text-3xl mb-2">📈</div>
-                <div class="font-semibold">Business Intelligence</div>
-                <div class="text-sm text-gray-400">Análisis avanzado</div>
-            </a>
-
-            <a href="/documentos/" class="nav-card">
-                <div class="text-3xl mb-2">📄</div>
-                <div class="font-semibold">Gestión Documentos</div>
-                <div class="text-sm text-gray-400">Crear y administrar</div>
-            </a>
-
-            <a href="/cl/clientes/" class="nav-card">
-                <div class="text-3xl mb-2">👥</div>
-                <div class="font-semibold">Gestión Clientes</div>
-                <div class="text-sm text-gray-400">Base de clientes</div>
-            </a>
-
-            <a href="/cl/vehiculos/" class="nav-card">
-                <div class="text-3xl mb-2">🚗</div>
-                <div class="font-semibold">Gestión Vehículos</div>
-                <div class="text-sm text-gray-400">Flota de vehículos</div>
-            </a>
-
-            <a href="{% country_url 'vehiculos:ingreso_foto' %}" class="nav-card">
-                <div class="text-3xl mb-2">📸</div>
-                <div class="font-semibold">Ingreso por Foto</div>
-                <div class="text-sm text-gray-400">Identificar patente</div>
-            </a>
-
-            <a href="{% country_url 'configuracion' %}" class="nav-card">
-                <div class="text-3xl mb-2">⚙️</div>
-                <div class="font-semibold">Configuración</div>
-                <div class="text-sm text-gray-400">Ajustes del taller</div>
-            </a>
-
-            <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="nav-card">
-                <div class="text-3xl mb-2">🏢</div>
-                <div class="font-semibold">Otros Servicios</div>
-                <div class="text-sm text-gray-400">Servicios externos</div>
-            </a>
+        <!-- Grupo: Sistema -->
+        <div class="nav-group">
+            <div class="nav-group-header">Sistema</div>
+            <div class="nav-group-grid">
+                <a href="{% country_url 'configuracion' %}" class="nav-card">
+                    <div class="text-3xl mb-2">⚙️</div>
+                    <div class="font-semibold">Configuración</div>
+                    <div class="text-xs text-gray-400">Ajustes del taller</div>
+                </a>
+                <a href="{% country_url 'servicios:otros_servicios_menu' %}" class="nav-card">
+                    <div class="text-3xl mb-2">🏢</div>
+                    <div class="font-semibold">Otros Servicios</div>
+                    <div class="text-xs text-gray-400">Servicios externos</div>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -626,8 +640,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     label: 'Facturación',
                     data: [120000, 190000, 300000, 250000, 220000, 350000],
                     borderColor: '#00ffff',
-                    backgroundColor: 'rgba(0, 255, 255, 0.1)',
-                    tension: 0.4
+                    borderWidth: 2,
+                    backgroundColor: 'rgba(0, 255, 255, 0.18)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 5,
+                    pointHoverRadius: 8,
+                    pointBackgroundColor: '#00ffff',
+                    pointBorderColor: '#0a0a0a',
+                    pointBorderWidth: 2,
                 }]
             },
             options: {
@@ -635,19 +656,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 maintainAspectRatio: false,
                 plugins: {
                     legend: {
-                        labels: {
-                            color: '#ffffff'
+                        labels: { color: 'rgba(255,255,255,0.7)', font: { size: 12 } }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: ctx => ' $' + ctx.parsed.y.toLocaleString('es-CL')
                         }
                     }
                 },
                 scales: {
                     x: {
-                        ticks: { color: '#ffffff' },
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        ticks: { color: 'rgba(255,255,255,0.6)', font: { size: 11 } },
+                        grid: { color: 'rgba(255,255,255,0.06)' }
                     },
                     y: {
-                        ticks: { color: '#ffffff' },
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        ticks: {
+                            color: 'rgba(255,255,255,0.6)',
+                            font: { size: 11 },
+                            callback: v => '$' + (v / 1000).toFixed(0) + 'k'
+                        },
+                        grid: { color: 'rgba(255,255,255,0.06)' }
                     }
                 }
             }
