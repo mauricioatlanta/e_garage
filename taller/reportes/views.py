@@ -1204,6 +1204,27 @@ def reportes_mecanicos(request):
         except Tecnico.DoesNotExist:
             pass
 
+    # Datos para charts (embebidos en el template, sin fetch)
+    import json as _json
+    chart_mecanicos = _json.dumps([
+        {"nombre": d["mecanico"].nombre, "total": float(d["total_generado"])}
+        for d in mecanicos_data
+    ])
+    # Evolución diaria últimos 7 días
+    from django.db.models.functions import TruncDate
+    evolucion_qs = (
+        documentos_base
+        .filter(fecha_emision__gte=date.today() - timedelta(days=6))
+        .annotate(dia=TruncDate("fecha_emision"))
+        .values("dia")
+        .annotate(total=Sum("total"))
+        .order_by("dia")
+    )
+    chart_evolucion = _json.dumps([
+        {"fecha": str(r["dia"]), "total": float(r["total"] or 0)}
+        for r in evolucion_qs
+    ])
+
     # Preparar contexto
     context = {
         "documentos": documentos_qs,
@@ -1213,6 +1234,8 @@ def reportes_mecanicos(request):
         "tecnicos": tecnicos,
         "todos_mecanicos": tecnicos,  # Alias para el template
         "mecanicos_data": mecanicos_data,  # Datos detallados por mecánico
+        "chart_mecanicos": chart_mecanicos,
+        "chart_evolucion": chart_evolucion,
         "fecha_desde": fecha_desde,
         "fecha_hasta": fecha_hasta,
         "mecanico_id": mecanico_id,

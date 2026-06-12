@@ -1759,11 +1759,13 @@ if (typeof particlesJS !== 'undefined') particlesJS('particles-js', {
     retina_detect: true
 });
 
-// Cargar datos para gráficos
-fetch('api/mecanicos/chart-data/?' + new URLSearchParams({{ request.GET.urlencode|safe }}))
-    .then(response => response.json())
-    .then(data => {
-        console.log('Datos recibidos:', data);
+// Datos embebidos desde Django (sin fetch)
+(function() {
+    const data = {
+        mecanicos: {{ chart_mecanicos|safe }},
+        evolucion: {{ chart_evolucion|safe }}
+    };
+    console.log('Datos charts:', data);
 
         // Verificar si hay datos para el gráfico de mecánicos
         if (data.mecanicos && data.mecanicos.length > 0) {
@@ -1890,15 +1892,8 @@ fetch('api/mecanicos/chart-data/?' + new URLSearchParams({{ request.GET.urlencod
             document.getElementById('chartEvolucion').style.display = 'none';
             document.getElementById('noDataEvolucion').style.display = 'block';
         }
-    })
-    .catch(error => {
-        console.error('Error cargando datos:', error);
-        // Mostrar mensajes de error si falla la API
-        document.getElementById('chartMecanicos').style.display = 'none';
-        document.getElementById('noDataMecanicos').style.display = 'block';
-        document.getElementById('chartEvolucion').style.display = 'none';
-        document.getElementById('noDataEvolucion').style.display = 'block';
-    });
+    }
+})();
 
 // Función para generar resumen WhatsApp
 function generarWhatsApp(mecanicoId) {
