@@ -1247,10 +1247,55 @@ def generar_resumen_whatsapp_mecanico(request, mecanico_id):
 
 
 @login_required_default
+@login_required_default
 def api_mecanicos_chart_data(request):
-    """API para datos de gráficos de mecánicos"""
+    """API para datos de gráficos de mecánicos — alimenta los charts del reporte"""
+    empresa = get_user_empresa_safe(request.user)
 
-    return JsonResponse({"data": [], "labels": []})
+    fecha_desde = request.GET.get("fecha_desde") or (date.today() - timedelta(days=30)).strftime("%Y-%m-%d")
+    fecha_hasta = request.GET.get("fecha_hasta") or date.today().strftime("%Y-%m-%d")
+
+    line_total_expr = ExpressionWrapper(
+        F("cantidad") * F("precio_unitario") * (1 - F("descuento") / 100),
+        output_field=DecimalField(max_digits=14, decimal_places=2),
+    )
+    otro_total_expr = ExpressionWrapper(
+        F("cantidad") * F("precio_cliente"),
+        output_field=DecimalField(max_digits=14, decimal_places=2),
+    )
+
+    documentos_base = Documento.objects.filter(
+        empresa=empresa,
+        fecha_emision__range=[fecha_desde, fecha_hasta],
+    ).exclude(estado="ANULADO")
+
+    # Datos por técnico
+    mecanicos = []
+    for tecnico in Tecnico.objects.filter(empresa=empresa).order_by("nombre"):
+        docs = documentos_base.filter(tecnico_responsable=tecnico)
+        if not docs.exists():
+            continue
+        servicios = LineaServicio.objects.filter(documento__in=docs).aggregate(t=Sum(line_total_expr))["t"] or 0
+        repuestos = LineaRepuesto.objects.filter(documento__in=docs).aggregate(t=Sum(line_total_expr))["t"] or 0
+        otros = LineaOtroServicio.objects.filter(documento__in=docs).aggregate(t=Sum(otro_total_expr))["t"] or 0
+        iva = repuestos * Decimal("0.19")
+        total = float(servicios + repuestos + otros + iva)
+        mecanicos.append({"nombre": tecnico.nombre, "total": round(total, 0)})
+
+    # Evolución diaria (últimos 7 días dentro del rango)
+    desde_evolucion = (date.today() - timedelta(days=6)).strftime("%Y-%m-%d")
+    evolucion_raw = (
+        documentos_base.filter(fecha_emision__gte=desde_evolucion)
+        .values("fecha_emision")
+        .annotate(total=Sum("total_general"))
+        .order_by("fecha_emision")
+    )
+    evolucion = [
+        {"fecha": str(r["fecha_emision"]), "total": float(r["total"] or 0)}
+        for r in evolucion_raw
+    ]
+
+    return JsonResponse({"mecanicos": mecanicos, "evolucion": evolucion})
 
 
 @login_required_default
