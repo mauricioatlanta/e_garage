@@ -1287,7 +1287,7 @@ def api_mecanicos_chart_data(request):
     evolucion_raw = (
         documentos_base.filter(fecha_emision__gte=desde_evolucion)
         .values("fecha_emision")
-        .annotate(total=Sum("total_general"))
+        .annotate(total=Sum("total"))
         .order_by("fecha_emision")
     )
     evolucion = [
