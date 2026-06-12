@@ -228,6 +228,10 @@ else:
         "default": {
             "ENGINE": "django.db.backends.sqlite3",
             "NAME": env_str("DJANGO_DB_NAME", "/srv/egarage/db.sqlite3"),
+            "OPTIONS": {
+                # Esperar hasta 20 segundos si la db está bloqueada (múltiples workers)
+                "timeout": 20,
+            },
         }
     }
 

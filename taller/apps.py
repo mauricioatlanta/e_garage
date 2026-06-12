@@ -12,6 +12,18 @@ class TallerConfig(AppConfig):
         La app instalada es 'taller', no 'taller.documentos', por eso las señales
         de documentos deben cargarse aquí para que se ejecuten al arrancar.
         """
+        from django.db.backends.signals import connection_created
+
+        def _sqlite_wal(sender, connection, **kwargs):
+            # WAL mode + synchronous NORMAL: previene corrupción con múltiples workers
+            # y mejora resiliencia ante apagados sin desmontar el filesystem.
+            if connection.vendor == "sqlite":
+                cursor = connection.cursor()
+                cursor.execute("PRAGMA journal_mode=WAL;")
+                cursor.execute("PRAGMA synchronous=NORMAL;")
+
+        connection_created.connect(_sqlite_wal)
+
         import taller.signals
         import taller.signals.tenant_guard  # noqa: F401
 
