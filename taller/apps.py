@@ -1,4 +1,15 @@
 from django.apps import AppConfig
+from django.db.backends.signals import connection_created
+
+
+def _sqlite_wal(sender, connection, **kwargs):
+    # WAL mode + synchronous NORMAL: previene corrupción con múltiples workers
+    # y mejora resiliencia ante apagados sin desmontar el filesystem.
+    # Usa la conexión raw (sqlite3.Connection) para saltarse el wrapper de Django.
+    # Definida a nivel de módulo para que la referencia débil del signal no la garbage-collect.
+    if connection.vendor == "sqlite" and connection.connection is not None:
+        connection.connection.execute("PRAGMA journal_mode=WAL")
+        connection.connection.execute("PRAGMA synchronous=NORMAL")
 
 
 class TallerConfig(AppConfig):
@@ -12,18 +23,7 @@ class TallerConfig(AppConfig):
         La app instalada es 'taller', no 'taller.documentos', por eso las señales
         de documentos deben cargarse aquí para que se ejecuten al arrancar.
         """
-        from django.db.backends.signals import connection_created
-
-        def _sqlite_wal(sender, connection, **kwargs):
-            # WAL mode + synchronous NORMAL: previene corrupción con múltiples workers
-            # y mejora resiliencia ante apagados sin desmontar el filesystem.
-            # Usa la conexión raw (sqlite3.Connection) para saltarse el wrapper de Django,
-            # que puede estar dentro de una transacción implícita al dispararse el signal.
-            if connection.vendor == "sqlite" and connection.connection is not None:
-                connection.connection.execute("PRAGMA journal_mode=WAL")
-                connection.connection.execute("PRAGMA synchronous=NORMAL")
-
-        connection_created.connect(_sqlite_wal)
+        connection_created.connect(_sqlite_wal, weak=False)
 
         import taller.signals
         import taller.signals.tenant_guard  # noqa: F401
