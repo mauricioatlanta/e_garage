@@ -1210,11 +1210,10 @@ def reportes_mecanicos(request):
         {"nombre": d["mecanico"].nombre, "total": float(d["total_generado"])}
         for d in mecanicos_data
     ])
-    # Evolución diaria últimos 7 días
+    # Evolución diaria del rango seleccionado (no hardcodeado a 7 días)
     from django.db.models.functions import TruncDate
     evolucion_qs = (
         documentos_base
-        .filter(fecha_emision__gte=date.today() - timedelta(days=6))
         .annotate(dia=TruncDate("fecha_emision"))
         .values("dia")
         .annotate(total=Sum("total"))
