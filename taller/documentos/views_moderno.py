@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 
 from taller.services.empresa_service import get_empresa_safe
 from taller.services.documento_service import calcular_totales
+from taller.models.memoria_seguimiento import EvidenciaDocumento
 
 
 # Helper para obtener el parámetro country del request
@@ -237,6 +238,7 @@ def procesar_documento_moderno(request, empresa):
         )  # millas/odómetro
         estado = request.POST.get("estado", "borrador")
         incluir_impuesto = request.POST.get("incluir_impuesto") == "on"
+        observaciones = request.POST.get("observaciones", "").strip() or None
 
         # Validaciones básicas
         if not all([tipo, fecha_emision, cliente_id]):
@@ -263,6 +265,7 @@ def procesar_documento_moderno(request, empresa):
             estado=estado,
             country=empresa.pais,
             moneda="USD" if empresa.pais == "US" else "CLP",
+            observaciones=observaciones,
             # Asignar millas/odómetro si el modelo lo tiene
             **(
                 {"kilometraje": kilometraje}
@@ -538,12 +541,35 @@ def procesar_documento_moderno(request, empresa):
             ]
         )
 
+        # 11) Guardar evidencias (fotos + video) si se adjuntaron
+        fotos = request.FILES.getlist("evidencia_foto")
+        video = request.FILES.get("evidencia_video")
+
+        fotos_guardadas = 0
+        for foto in fotos[:4]:
+            if foto.content_type.startswith("image/"):
+                EvidenciaDocumento.objects.create(
+                    empresa=empresa,
+                    documento=documento,
+                    tipo="FOTO",
+                    archivo=foto,
+                )
+                fotos_guardadas += 1
+
+        if video and video.content_type.startswith("video/"):
+            EvidenciaDocumento.objects.create(
+                empresa=empresa,
+                documento=documento,
+                tipo="VIDEO",
+                archivo=video,
+            )
+
         messages.success(
             request,
             f"Documento {documento.tipo}-{documento.numero} creado exitosamente",
         )
 
-        # 11) Redirección al listado (requisito #2)
+        # 12) Redirección al listado
         return redirect("documentos:lista_documentos")
 
     except Exception as e:

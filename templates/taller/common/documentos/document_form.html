@@ -461,6 +461,39 @@
             <h2 data-i18n="notas">NOTAS</h2>
           </div>
           {{ form.observaciones }}
+
+          <!-- Adjuntar evidencias: hasta 4 fotos + 1 video -->
+          <div class="doc-media-upload" id="doc-media-upload">
+            <div class="doc-media-upload__label">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              <span data-i18n="adjuntar_evidencias">Adjuntar evidencias</span>
+              <small class="doc-media-upload__hint" data-i18n="evidencias_hint">hasta 4 fotos · 1 video</small>
+            </div>
+
+            <!-- Zona de drop para fotos -->
+            <div class="doc-media-slots">
+              <div class="doc-media-slot" id="foto-slot-0" data-slot="0" data-type="foto">
+                <input type="file" name="evidencia_foto" accept="image/*" class="doc-media-input" id="evidencia-foto-0" multiple style="display:none">
+                <label for="evidencia-foto-0" class="doc-media-slot__inner" title="Agregar foto">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                  <span class="doc-media-slot__count" id="foto-count">0/4</span>
+                </label>
+              </div>
+              <div class="doc-media-previews" id="fotos-preview"></div>
+            </div>
+
+            <!-- Zona de video -->
+            <div class="doc-media-slots" style="margin-top:8px">
+              <div class="doc-media-slot doc-media-slot--video" id="video-slot" data-type="video">
+                <input type="file" name="evidencia_video" accept="video/*" class="doc-media-input" id="evidencia-video" style="display:none">
+                <label for="evidencia-video" class="doc-media-slot__inner" title="Agregar video">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+                  <span id="video-label" data-i18n="agregar_video">Video</span>
+                </label>
+              </div>
+              <div id="video-preview"></div>
+            </div>
+          </div>
         </section>
 
         <div class="doc-form-actions">
@@ -574,6 +607,9 @@ if (window.DESARME_PREFILL) {
       km_label: 'Kilometraje', mecanico_responsable: 'Mecánico responsable',
       notas_ph: 'Escribe una nota (opcional)...',
       buscar_cliente_ph: 'Buscar cliente...', sel_vehiculo_ph: 'Seleccionar vehículo...',
+      adjuntar_evidencias: 'Adjuntar evidencias',
+      evidencias_hint: 'hasta 4 fotos · 1 video',
+      agregar_video: 'Video',
     },
     en: {
       crear_documento: 'CREATE DOCUMENT', editar_documento: 'EDIT DOCUMENT',
@@ -608,6 +644,9 @@ if (window.DESARME_PREFILL) {
       km_label: 'Mileage', mecanico_responsable: 'Lead mechanic',
       notas_ph: 'Write a note (optional)...',
       buscar_cliente_ph: 'Search client...', sel_vehiculo_ph: 'Select vehicle...',
+      adjuntar_evidencias: 'Attach evidence',
+      evidencias_hint: 'up to 4 photos · 1 video',
+      agregar_video: 'Video',
     }
   };
 
@@ -849,4 +888,207 @@ window.FORCE_NEW_DOCUMENT = {% if es_edicion %}false{% else %}true{% endif %};
 window.DESARME_PREFILL = window.DESARME_PREFILL || {% if has_server_line_items %}true{% else %}false{% endif %};
 </script>
 <script src="{% static 'js/document-form/index.js' %}?v=3.2.7"></script>
+<style>
+/* --- Módulo de carga de evidencias en notas --- */
+.doc-media-upload {
+  margin-top: 14px;
+  border-top: 1px solid rgba(95,126,163,0.2);
+  padding-top: 14px;
+}
+.doc-media-upload__label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #5f7ea3;
+  margin-bottom: 10px;
+}
+.doc-media-upload__label svg { flex-shrink: 0; }
+.doc-media-upload__hint {
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  color: #3a4d63;
+  margin-left: auto;
+}
+.doc-media-slots { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-start; }
+.doc-media-slot {
+  width: 60px;
+  height: 60px;
+  border: 1.5px dashed rgba(95,126,163,0.35);
+  border-radius: 8px;
+  overflow: hidden;
+  flex-shrink: 0;
+  transition: border-color .2s;
+}
+.doc-media-slot:hover { border-color: #06b6d4; }
+.doc-media-slot--video { border-color: rgba(139,92,246,0.4); }
+.doc-media-slot--video:hover { border-color: #8b5cf6; }
+.doc-media-slot__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  gap: 3px;
+  color: #5f7ea3;
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.doc-media-slot__inner:hover { color: #06b6d4; }
+.doc-media-slot--video .doc-media-slot__inner:hover { color: #8b5cf6; }
+.doc-media-slot__count { font-size: 9px; color: #3a4d63; }
+.doc-media-previews, #video-preview { display: flex; gap: 6px; flex-wrap: wrap; }
+.doc-media-thumb {
+  position: relative;
+  width: 60px;
+  height: 60px;
+  border-radius: 7px;
+  overflow: hidden;
+  border: 1px solid rgba(95,126,163,0.25);
+  flex-shrink: 0;
+}
+.doc-media-thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.doc-media-thumb__remove {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: none;
+  background: rgba(220,38,38,0.85);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  padding: 0;
+}
+.doc-media-thumb--video {
+  width: 90px;
+  background: #0d1b2e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  color: #8b5cf6;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px;
+  text-align: center;
+}
+</style>
+<script>
+(function() {
+  var MAX_FOTOS = 4;
+  var fotoFiles = [];
+  var videoFile = null;
+
+  var fotoInput = document.getElementById('evidencia-foto-0');
+  var videoInput = document.getElementById('evidencia-video');
+  var fotosPreview = document.getElementById('fotos-preview');
+  var videoPreview = document.getElementById('video-preview');
+  var fotoCount = document.getElementById('foto-count');
+
+  if (!fotoInput || !videoInput) return;
+
+  function refreshFotoCount() {
+    if (fotoCount) fotoCount.textContent = fotoFiles.length + '/' + MAX_FOTOS;
+  }
+
+  function renderFotoPreviews() {
+    fotosPreview.innerHTML = '';
+    fotoFiles.forEach(function(f, idx) {
+      var thumb = document.createElement('div');
+      thumb.className = 'doc-media-thumb';
+      var img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      img.alt = f.name;
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'doc-media-thumb__remove';
+      btn.title = 'Eliminar';
+      btn.textContent = '×';
+      btn.addEventListener('click', function() {
+        fotoFiles.splice(idx, 1);
+        syncFotoInput();
+        renderFotoPreviews();
+        refreshFotoCount();
+      });
+      thumb.appendChild(img);
+      thumb.appendChild(btn);
+      fotosPreview.appendChild(thumb);
+    });
+    refreshFotoCount();
+  }
+
+  function syncFotoInput() {
+    var dt = new DataTransfer();
+    fotoFiles.forEach(function(f) { dt.items.add(f); });
+    fotoInput.files = dt.files;
+  }
+
+  fotoInput.addEventListener('change', function() {
+    var remaining = MAX_FOTOS - fotoFiles.length;
+    if (remaining <= 0) return;
+    Array.from(fotoInput.files).slice(0, remaining).forEach(function(f) {
+      if (f.type.startsWith('image/')) fotoFiles.push(f);
+    });
+    syncFotoInput();
+    renderFotoPreviews();
+  });
+
+  function renderVideoPreview() {
+    videoPreview.innerHTML = '';
+    if (!videoFile) return;
+    var thumb = document.createElement('div');
+    thumb.className = 'doc-media-thumb doc-media-thumb--video';
+    var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('width', '20'); icon.setAttribute('height', '20');
+    icon.setAttribute('viewBox', '0 0 24 24'); icon.setAttribute('fill', 'none');
+    icon.setAttribute('stroke', 'currentColor'); icon.setAttribute('stroke-width', '1.5');
+    icon.innerHTML = '<polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/>';
+    var name = document.createElement('span');
+    name.textContent = videoFile.name.length > 12 ? videoFile.name.substring(0, 12) + '…' : videoFile.name;
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'doc-media-thumb__remove';
+    btn.title = 'Eliminar';
+    btn.textContent = '×';
+    btn.addEventListener('click', function() {
+      videoFile = null;
+      videoInput.value = '';
+      renderVideoPreview();
+    });
+    thumb.appendChild(icon);
+    thumb.appendChild(name);
+    thumb.appendChild(btn);
+    videoPreview.appendChild(thumb);
+  }
+
+  videoInput.addEventListener('change', function() {
+    if (videoInput.files.length) {
+      videoFile = videoInput.files[0];
+    }
+    renderVideoPreview();
+  });
+})();
+</script>
 {% endblock extra_js %}
