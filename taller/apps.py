@@ -17,10 +17,11 @@ class TallerConfig(AppConfig):
         def _sqlite_wal(sender, connection, **kwargs):
             # WAL mode + synchronous NORMAL: previene corrupción con múltiples workers
             # y mejora resiliencia ante apagados sin desmontar el filesystem.
-            if connection.vendor == "sqlite":
-                cursor = connection.cursor()
-                cursor.execute("PRAGMA journal_mode=WAL;")
-                cursor.execute("PRAGMA synchronous=NORMAL;")
+            # Usa la conexión raw (sqlite3.Connection) para saltarse el wrapper de Django,
+            # que puede estar dentro de una transacción implícita al dispararse el signal.
+            if connection.vendor == "sqlite" and connection.connection is not None:
+                connection.connection.execute("PRAGMA journal_mode=WAL")
+                connection.connection.execute("PRAGMA synchronous=NORMAL")
 
         connection_created.connect(_sqlite_wal)
 
