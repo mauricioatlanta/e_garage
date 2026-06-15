@@ -199,22 +199,27 @@ def signup_complete(request):
                         fecha_fin=timezone.now() + timedelta(days=days_to_expire),
                         # Estado de suscripción
                         suscripcion_activa=is_trial,
+                        trial_already_used=is_trial,
+                        trial_started_at=timezone.now() if is_trial else None,
+                        trial_ends_at=timezone.now() + timedelta(days=30) if is_trial else None,
                     )
 
-                    # 🔥 PASO 4: VERIFICAR SI SE REQUIERE VERIFICACIÓN DE EMAIL
-                    # FORZAR verificación de email SIEMPRE (independiente de configuración)
-                    account_email_verification = getattr(
-                        settings, "ACCOUNT_EMAIL_VERIFICATION", "mandatory"
+                    # 🔥 CREAR SUSCRIPCION
+                    from taller.models.suscripcion import Suscripcion
+                    fecha_inicio_sus = timezone.now()
+                    fecha_fin_sus = fecha_inicio_sus + timedelta(days=days_to_expire)
+                    Suscripcion.objects.create(
+                        user=user,
+                        tipo=plan,
+                        fecha_inicio=fecha_inicio_sus.date(),
+                        fecha_fin=fecha_fin_sus.date(),
+                        activa=True,
                     )
-                    requires_email_verification = account_email_verification == "mandatory"
 
-                    # DEBUG: Log para verificar configuración
-                    print(f"🔍 DEBUG: ACCOUNT_EMAIL_VERIFICATION = {account_email_verification}")
-                    print(f"🔍 DEBUG: requires_email_verification = {requires_email_verification}")
-
-                    # FORZAR verificación SIEMPRE (comentar esta línea si quieres respetar la configuración)
-                    requires_email_verification = True
-                    print(f"🔍 DEBUG: FORZANDO requires_email_verification = True")
+                    # 🔥 PASO 4: VERIFICACIÓN DE EMAIL
+                    # Trial → acceso inmediato, sin verificación
+                    # Planes pagados → verificación obligatoria
+                    requires_email_verification = (plan != PLAN_TRIAL)
 
                     # 🔥 PASO 5: CREAR EmailAddress Y ENVIAR EMAIL DE VERIFICACIÓN
                     if requires_email_verification:
@@ -251,6 +256,12 @@ def signup_complete(request):
                             logger = logging.getLogger(__name__)
                             logger.warning(f"⚠️  Error creando EmailAddress o enviando email: {e}")
                             # No bloquear el registro si hay problemas con el email
+
+                    # 🔥 PASO 5b: marcar trial usado en empresa
+                    if is_trial:
+                        empresa.ha_usado_prueba = True
+                        empresa.save(update_fields=["ha_usado_prueba", "trial_already_used",
+                                                    "trial_started_at", "trial_ends_at"])
 
                     # 🔥 PASO 6: SI SE REQUIERE VERIFICACIÓN, NO HACER LOGIN - REDIRIGIR A CONFIRMACIÓN
                     if requires_email_verification:

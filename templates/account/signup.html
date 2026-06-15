@@ -284,6 +284,55 @@
             if (selectedCard) selectedCard.classList.add('active');
         }
         selectPlan('trial');
+
+        (function () {
+            var hint = null;
+
+            function getHint() {
+                if (hint) return hint;
+                hint = document.createElement('p');
+                hint.style.cssText = 'font-size:.85rem;margin-top:6px;display:none;';
+                var pw2 = document.getElementById('id_password2');
+                if (pw2 && pw2.closest('.field')) {
+                    pw2.closest('.field').appendChild(hint);
+                }
+                return hint;
+            }
+
+            function checkMatch() {
+                var p1 = document.getElementById('id_password1');
+                var p2 = document.getElementById('id_password2');
+                if (!p1 || !p2 || !p2.value) { if (hint) hint.style.display = 'none'; return; }
+                var h = getHint();
+                h.style.display = 'block';
+                if (p1.value === p2.value) {
+                    h.textContent = '✓ Las contraseñas coinciden';
+                    h.style.color = '#059669';
+                } else {
+                    h.textContent = '✗ Las contraseñas no coinciden';
+                    h.style.color = '#b91c1c';
+                }
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                var p1 = document.getElementById('id_password1');
+                var p2 = document.getElementById('id_password2');
+                if (p1) p1.addEventListener('input', checkMatch);
+                if (p2) p2.addEventListener('input', checkMatch);
+
+                var form = document.querySelector('form[method="post"]');
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!p1 || !p2) return;
+                        if (p1.value && p2.value && p1.value !== p2.value) {
+                            e.preventDefault();
+                            checkMatch();
+                            p2.focus();
+                        }
+                    });
+                }
+            });
+        })();
     </script>
     <script src="{% static 'js/password-toggle.js' %}"></script>
 </body>
