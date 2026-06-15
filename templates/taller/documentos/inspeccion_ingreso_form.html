@@ -1,0 +1,220 @@
+{% extends "base.html" %}
+{% load static %}
+{% load country_url %}
+
+{% block title %}Inspección de Ingreso – {{ documento.numero_documento }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+<div class="container mx-auto px-4 py-6 max-w-2xl">
+
+  <!-- Header -->
+  <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-5 mb-5">
+    <h1 class="text-2xl font-bold text-cyan-200 mb-1">🔍 Inspección de Ingreso</h1>
+    <p class="text-gray-400 text-sm">
+      {{ documento.numero_documento }} &mdash; {{ documento.vehiculo }}
+    </p>
+    <p class="text-gray-500 text-xs mt-1">{{ documento.cliente }}</p>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" id="form-inspeccion">
+    {% csrf_token %}
+
+    <!-- Kilometraje y combustible -->
+    <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-4">
+      <h2 class="text-lg font-semibold text-cyan-300 mb-4">Condiciones al ingreso</h2>
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm text-gray-300 mb-1" for="id_km">Kilometraje</label>
+          <input type="number" id="id_km" name="kilometraje_ingreso" min="0"
+                 placeholder="ej: 85000"
+                 class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-400 focus:outline-none">
+        </div>
+        <div>
+          <label class="block text-sm text-gray-300 mb-1" for="id_combustible">Combustible</label>
+          <select id="id_combustible" name="nivel_combustible"
+                  class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-400 focus:outline-none">
+            {% for val, label in nivel_combustible_choices %}
+            <option value="{{ val }}" {% if val == "medio" %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- Medidor visual de combustible -->
+      <div class="mt-4">
+        <p class="text-xs text-gray-400 mb-2">Nivel visual</p>
+        <div class="flex items-center gap-1">
+          <span class="text-xs text-gray-500">E</span>
+          <div class="flex gap-1 flex-1">
+            {% for val, label in nivel_combustible_choices %}
+            <button type="button" onclick="setCombustible('{{ val }}')"
+                    id="fuel-{{ val }}"
+                    class="fuel-btn flex-1 h-8 rounded text-xs font-bold transition-all border-2
+                           {% if val == 'medio' %}border-cyan-400 bg-cyan-400/30 text-cyan-200
+                           {% else %}border-gray-600 bg-gray-700/50 text-gray-400{% endif %}"
+                    data-val="{{ val }}">
+              {{ label }}
+            </button>
+            {% endfor %}
+          </div>
+          <span class="text-xs text-gray-500">F</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Daños preexistentes -->
+    <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-4">
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold text-cyan-300">Daños preexistentes</h2>
+        <button type="button" onclick="agregarDano()"
+                class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm rounded-lg transition">
+          + Agregar
+        </button>
+      </div>
+
+      <div id="lista-danos" class="space-y-3">
+        <!-- Los daños se agregan dinámicamente -->
+      </div>
+
+      <p id="sin-danos" class="text-gray-500 text-sm text-center py-4">
+        Sin daños registrados. Toca "Agregar" para documentar un daño.
+      </p>
+    </div>
+
+    <!-- Fotos -->
+    <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-4">
+      <h2 class="text-lg font-semibold text-cyan-300 mb-3">Fotos del vehículo</h2>
+      <p class="text-xs text-gray-400 mb-3">Puedes seleccionar varias fotos a la vez desde la cámara o galería.</p>
+
+      <label class="block w-full cursor-pointer">
+        <div class="border-2 border-dashed border-cyan-400/40 rounded-xl p-6 text-center hover:border-cyan-400/70 transition">
+          <div class="text-4xl mb-2">📷</div>
+          <p class="text-cyan-300 font-semibold text-sm">Tomar fotos / Seleccionar archivos</p>
+          <p class="text-gray-500 text-xs mt-1">JPG, PNG, MP4 · hasta 10 archivos</p>
+        </div>
+        <input type="file" name="fotos" id="id_fotos" accept="image/*,video/*" multiple capture="environment"
+               class="hidden" onchange="previsualizarFotos(this)">
+      </label>
+
+      <div id="previews" class="grid grid-cols-3 gap-2 mt-3"></div>
+    </div>
+
+    <!-- Observaciones -->
+    <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-4">
+      <h2 class="text-lg font-semibold text-cyan-300 mb-3">Observaciones generales</h2>
+      <textarea name="observaciones_generales" rows="3"
+                placeholder="Condición general del vehículo, accesorios, pendientes..."
+                class="w-full bg-gray-700 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:border-cyan-400 focus:outline-none resize-none"></textarea>
+    </div>
+
+    <!-- Firma del cliente -->
+    <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-6">
+      <label class="flex items-center gap-3 cursor-pointer">
+        <input type="checkbox" name="firma_cliente" value="1"
+               class="w-5 h-5 rounded accent-cyan-400">
+        <span class="text-gray-200 text-sm">El cliente confirmó y aceptó la inspección</span>
+      </label>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex gap-3 pb-8">
+      <a href="{% country_url 'documentos:ver_documento' documento.pk %}"
+         class="flex-1 py-3 bg-gray-600 hover:bg-gray-700 text-white text-center rounded-lg transition font-semibold">
+        Cancelar
+      </a>
+      <button type="submit"
+              class="flex-1 py-3 bg-cyan-600 hover:bg-cyan-700 text-white rounded-lg transition font-semibold">
+        Guardar Inspección
+      </button>
+    </div>
+  </form>
+
+</div>
+</div>
+
+<!-- Template para una fila de daño -->
+<template id="tmpl-dano">
+  <div class="dano-row bg-gray-700/50 rounded-lg p-3 border border-gray-600/40">
+    <div class="grid grid-cols-2 gap-2 mb-2">
+      <select name="zona_INDEX" required
+              class="bg-gray-600 border border-gray-500 rounded px-2 py-1.5 text-white text-sm focus:border-cyan-400 focus:outline-none">
+        <option value="">— Zona —</option>
+        {% for val, label in zonas_choices %}
+        <option value="{{ val }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+      <select name="tipo_dano_INDEX" required
+              class="bg-gray-600 border border-gray-500 rounded px-2 py-1.5 text-white text-sm focus:border-cyan-400 focus:outline-none">
+        <option value="">— Tipo —</option>
+        {% for val, label in tipos_dano_choices %}
+        <option value="{{ val }}">{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="flex gap-2">
+      <input type="text" name="descripcion_INDEX" placeholder="Descripción adicional (opcional)"
+             class="flex-1 bg-gray-600 border border-gray-500 rounded px-2 py-1.5 text-white text-sm focus:border-cyan-400 focus:outline-none">
+      <button type="button" onclick="this.closest('.dano-row').remove(); actualizarSinDanos()"
+              class="px-2 py-1 text-red-400 hover:text-red-300 text-lg leading-none">&times;</button>
+    </div>
+  </div>
+</template>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let danoCont = 0;
+
+function agregarDano() {
+  const tmpl = document.getElementById('tmpl-dano');
+  const clone = tmpl.content.cloneNode(true);
+  // Reemplazar INDEX por el contador actual
+  clone.querySelectorAll('[name]').forEach(el => {
+    el.name = el.name.replace('INDEX', danoCont);
+  });
+  document.getElementById('lista-danos').appendChild(clone);
+  danoCont++;
+  actualizarSinDanos();
+}
+
+function actualizarSinDanos() {
+  const n = document.querySelectorAll('.dano-row').length;
+  document.getElementById('sin-danos').style.display = n ? 'none' : 'block';
+}
+
+function setCombustible(val) {
+  document.getElementById('id_combustible').value = val;
+  document.querySelectorAll('.fuel-btn').forEach(btn => {
+    const isSelected = btn.dataset.val === val;
+    btn.className = btn.className
+      .replace(/border-cyan-400 bg-cyan-400\/30 text-cyan-200/g, '')
+      .replace(/border-gray-600 bg-gray-700\/50 text-gray-400/g, '')
+      .trim();
+    btn.classList.add(
+      ...(isSelected
+        ? ['border-cyan-400', 'bg-cyan-400/30', 'text-cyan-200']
+        : ['border-gray-600', 'bg-gray-700/50', 'text-gray-400'])
+    );
+  });
+}
+
+function previsualizarFotos(input) {
+  const cont = document.getElementById('previews');
+  cont.innerHTML = '';
+  Array.from(input.files).slice(0, 10).forEach((file, i) => {
+    const div = document.createElement('div');
+    div.className = 'relative rounded-lg overflow-hidden bg-gray-700 aspect-square';
+    if (file.type.startsWith('video/')) {
+      div.innerHTML = `<div class="w-full h-full flex items-center justify-center text-3xl">🎥</div>
+                       <p class="absolute bottom-0 left-0 right-0 text-center text-xs text-gray-300 bg-black/50 py-0.5 truncate">${file.name}</p>`;
+    } else {
+      const url = URL.createObjectURL(file);
+      div.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+    }
+    cont.appendChild(div);
+  });
+}
+</script>
+{% endblock %}

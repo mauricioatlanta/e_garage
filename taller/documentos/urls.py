@@ -14,6 +14,7 @@ from .views_migrated import DocumentoListView
 from .views_migrated import DocumentoUpdateView as MigratedUpdateView
 from .api_repuestos import buscar_repuestos_api  # ✅ API de autocomplete para Alpine.js
 from . import views_seguimiento  # ✅ Vistas de seguimiento y memoria
+from . import views_inspeccion  # ✅ Inspección de ingreso de vehículos
 
 try:
     from taller.desarme.views_pdf import (
@@ -211,5 +212,21 @@ urlpatterns += [
         "<int:documento_id>/crear-seguimiento/",
         views_seguimiento.crear_seguimiento_publico,
         name="crear_seguimiento_publico",
+    ),
+    # Inspección de ingreso de vehículos
+    path(
+        "<int:documento_id>/inspeccion/",
+        views_inspeccion.crear_inspeccion_ingreso,
+        name="crear_inspeccion_ingreso",
+    ),
+    path(
+        "inspeccion/<int:pk>/",
+        views_inspeccion.ver_inspeccion_ingreso,
+        name="ver_inspeccion_ingreso",
+    ),
+    path(
+        "inspeccion/<int:pk>/firmar/",
+        views_inspeccion.marcar_firmada,
+        name="marcar_inspeccion_firmada",
     ),
 ]

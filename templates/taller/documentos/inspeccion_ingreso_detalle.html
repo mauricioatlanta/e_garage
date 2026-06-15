@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+{% load static %}
+{% load country_url %}
+
+{% block title %}Inspección #{{ inspeccion.pk }} – {{ inspeccion.vehiculo }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
+<div class="container mx-auto px-4 py-6 max-w-2xl">
+
+  <!-- Header -->
+  <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-cyan-400/30 p-5 mb-5">
+    <div class="flex justify-between items-start">
+      <div>
+        <h1 class="text-2xl font-bold text-cyan-200 mb-1">🔍 Inspección de Ingreso</h1>
+        <p class="text-gray-400 text-sm">{{ inspeccion.vehiculo }}</p>
+        {% if inspeccion.documento %}
+        <p class="text-gray-500 text-xs mt-0.5">
+          Vinculada a: <a href="{% country_url 'documentos:ver_documento' inspeccion.documento.pk %}"
+                          class="text-cyan-400 hover:underline">{{ inspeccion.documento.numero_documento }}</a>
+        </p>
+        {% endif %}
+      </div>
+      <span class="px-3 py-1 rounded-full text-xs font-bold
+        {% if inspeccion.estado_inspeccion == 'firmada' %}bg-green-500/20 text-green-300 border border-green-500/40
+        {% elif inspeccion.estado_inspeccion == 'completada' %}bg-cyan-500/20 text-cyan-300 border border-cyan-500/40
+        {% else %}bg-yellow-500/20 text-yellow-300 border border-yellow-500/40{% endif %}">
+        {{ inspeccion.get_estado_inspeccion_display }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Condiciones -->
+  <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-4">
+    <h2 class="text-base font-semibold text-cyan-300 mb-3">Condiciones al ingreso</h2>
+    <div class="grid grid-cols-2 gap-4 text-sm">
+      <div>
+        <p class="text-gray-400">Kilometraje</p>
+        <p class="text-white font-semibold">
+          {% if inspeccion.kilometraje_ingreso %}
+            {{ inspeccion.kilometraje_ingreso|floatformat:"0" }} km
+          {% else %}
+            <span class="text-gray-500">No registrado</span>
+          {% endif %}
+        </p>
+      </div>
+      <div>
+        <p class="text-gray-400">Combustible</p>
+        <p class="text-white font-semibold">{{ inspeccion.get_nivel_combustible_display }}</p>
+      </div>
+      <div>
+        <p class="text-gray-400">Fecha y hora</p>
+        <p class="text-white font-semibold">{{ inspeccion.fecha_hora|date:"d/m/Y H:i" }}</p>
+      </div>
+      <div>
+        <p class="text-gray-400">Realizada por</p>
+        <p class="text-white font-semibold">
+          {% if inspeccion.realizada_por %}{{ inspeccion.realizada_por.get_full_name|default:inspeccion.realizada_por.username }}{% else %}<span class="text-gray-500">—</span>{% endif %}
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daños -->
+  <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-4">
+    <h2 class="text-base font-semibold text-cyan-300 mb-3">
+      Daños preexistentes
+      <span class="ml-2 px-2 py-0.5 bg-gray-700 rounded-full text-xs text-gray-400">{{ danos.count }}</span>
+    </h2>
+    {% if danos %}
+    <div class="space-y-2">
+      {% for dano in danos %}
+      <div class="flex items-start gap-3 bg-gray-700/40 rounded-lg p-3">
+        <span class="text-yellow-400 text-lg mt-0.5">⚠️</span>
+        <div>
+          <p class="text-white text-sm font-medium">{{ dano.get_zona_display }} — {{ dano.get_tipo_dano_display }}</p>
+          {% if dano.descripcion %}
+          <p class="text-gray-400 text-xs mt-0.5">{{ dano.descripcion }}</p>
+          {% endif %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-gray-500 text-sm">Sin daños registrados.</p>
+    {% endif %}
+  </div>
+
+  <!-- Observaciones -->
+  {% if inspeccion.observaciones_generales %}
+  <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-4">
+    <h2 class="text-base font-semibold text-cyan-300 mb-2">Observaciones</h2>
+    <p class="text-gray-300 text-sm whitespace-pre-line">{{ inspeccion.observaciones_generales }}</p>
+  </div>
+  {% endif %}
+
+  <!-- Fotos -->
+  {% if evidencias %}
+  <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-4">
+    <h2 class="text-base font-semibold text-cyan-300 mb-3">Evidencias fotográficas</h2>
+    <div class="grid grid-cols-2 gap-3">
+      {% for ev in evidencias %}
+      {% if ev.tipo == "FOTO" %}
+      <a href="{{ ev.archivo.url }}" target="_blank" class="block rounded-lg overflow-hidden border border-gray-600 hover:border-cyan-400 transition">
+        <img src="{{ ev.archivo.url }}" alt="{{ ev.descripcion|default:'Foto' }}"
+             class="w-full aspect-square object-cover">
+        {% if ev.descripcion %}
+        <p class="text-xs text-gray-400 p-1.5 truncate">{{ ev.descripcion }}</p>
+        {% endif %}
+      </a>
+      {% else %}
+      <div class="rounded-lg overflow-hidden border border-gray-600">
+        <video src="{{ ev.archivo.url }}" controls class="w-full"></video>
+        {% if ev.descripcion %}
+        <p class="text-xs text-gray-400 p-1.5 truncate">{{ ev.descripcion }}</p>
+        {% endif %}
+      </div>
+      {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- Firma -->
+  <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-5">
+    <h2 class="text-base font-semibold text-cyan-300 mb-2">Conformidad del cliente</h2>
+    {% if inspeccion.firma_cliente %}
+    <p class="text-green-400 font-semibold text-sm">✅ Confirmada por el cliente</p>
+    {% else %}
+    <p class="text-yellow-400 text-sm mb-3">⏳ Pendiente de confirmación</p>
+    <form method="post" action="{% country_url 'documentos:marcar_inspeccion_firmada' inspeccion.pk %}">
+      {% csrf_token %}
+      <button type="submit"
+              class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white text-sm rounded-lg transition font-semibold">
+        Marcar como confirmada
+      </button>
+    </form>
+    {% endif %}
+  </div>
+
+  <!-- Botones de navegación -->
+  <div class="flex gap-3 pb-8">
+    {% if inspeccion.documento %}
+    <a href="{% country_url 'documentos:ver_documento' inspeccion.documento.pk %}"
+       class="flex-1 py-3 bg-gray-600 hover:bg-gray-700 text-white text-center rounded-lg transition font-semibold">
+      ← Volver al documento
+    </a>
+    {% endif %}
+    <a href="#" onclick="window.print()"
+       class="px-5 py-3 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition font-semibold text-sm">
+      🖨️ Imprimir
+    </a>
+  </div>
+
+</div>
+</div>
+{% endblock %}

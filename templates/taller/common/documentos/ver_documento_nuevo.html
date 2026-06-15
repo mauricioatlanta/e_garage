@@ -370,6 +370,21 @@
         📥 Descargar PDF
       </a>
 
+      <!-- Botón: Inspección de ingreso -->
+      {% if documento.vehiculo %}
+        {% if documento.inspeccion_ingreso %}
+        <a href="{% country_url 'documentos:ver_inspeccion_ingreso' documento.inspeccion_ingreso.pk %}"
+           class="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors">
+          🔍 Ver Inspección de Ingreso
+        </a>
+        {% else %}
+        <a href="{% country_url 'documentos:crear_inspeccion_ingreso' documento.pk %}"
+           class="px-6 py-3 bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors">
+          🔍 Registrar Inspección
+        </a>
+        {% endif %}
+      {% endif %}
+
       <!-- Botón: Copiar link de seguimiento -->
       {% if seguimiento_publico %}
       <button onclick="copiarLinkSeguimiento()"

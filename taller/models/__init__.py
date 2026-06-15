@@ -65,6 +65,9 @@ from .pago import PagoPendiente
 from .regimen_fiscal import RegimenFiscal
 from .marcas_usa import MarcaVehiculo, ModeloVehiculo
 
+# Inspección de ingreso de vehículos
+from .inspeccion_ingreso import InspeccionIngreso, DanoInspeccion, EvidenciaInspeccion
+
 # Modelos de extras de vehículos
 from .extras_vehiculo import (
     CajaVehiculo,
@@ -124,6 +127,10 @@ __all__ = [
     "RegimenFiscal",
     "MarcaVehiculo",
     "ModeloVehiculo",
+    # Inspección de ingreso
+    "InspeccionIngreso",
+    "DanoInspeccion",
+    "EvidenciaInspeccion",
     # Extras de vehículos
     "CajaVehiculo",
     "CajaVehiculoEmpresa",

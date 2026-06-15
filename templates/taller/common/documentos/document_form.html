@@ -392,6 +392,118 @@
           </div>
         </section>
         {% endif %}
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- Sección opcional: Inspección de Ingreso                -->
+        <!-- Solo visible si hay vehículo (se activa por JS)        -->
+        <!-- ══════════════════════════════════════════════════════ -->
+        {% if not es_edicion %}
+        <section class="doc-section doc-section--inspeccion" id="seccion-inspeccion" style="display:none">
+          <div class="doc-section__heading" style="cursor:pointer;user-select:none" onclick="toggleInspeccion()">
+            <span style="font-size:1.1em">🔍</span>
+            <h2 style="margin:0;font-size:14px;font-weight:700;letter-spacing:.06em">INSPECCIÓN DE INGRESO</h2>
+            <span id="inspeccion-chevron" style="margin-left:auto;transition:transform .2s">▼</span>
+          </div>
+
+          <div id="inspeccion-body" style="display:none;padding:12px 0 0">
+            <input type="hidden" name="inspeccion_activa" value="0" id="id_inspeccion_activa">
+
+            <!-- Toggle activar inspección -->
+            <label style="display:flex;align-items:center;gap:10px;margin-bottom:14px;cursor:pointer">
+              <input type="checkbox" id="chk-inspeccion" onchange="activarInspeccion(this.checked)"
+                     style="width:18px;height:18px;accent-color:#06b6d4">
+              <span style="font-size:13px;color:#cbd5e1">Registrar inspección junto con este documento</span>
+            </label>
+
+            <div id="inspeccion-campos" style="display:none">
+
+              <!-- Km y combustible -->
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+                <div>
+                  <label style="display:block;font-size:12px;color:#94a3b8;margin-bottom:4px">Kilometraje al ingreso</label>
+                  <input type="number" name="insp_kilometraje" id="id_insp_km" min="0" placeholder="ej: 85000"
+                         style="width:100%;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:7px 10px;color:#f1f5f9;font-size:13px">
+                </div>
+                <div>
+                  <label style="display:block;font-size:12px;color:#94a3b8;margin-bottom:4px">Nivel de combustible</label>
+                  <select name="insp_combustible" id="id_insp_combustible"
+                          style="width:100%;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:7px 10px;color:#f1f5f9;font-size:13px">
+                    <option value="vacio">Vacío</option>
+                    <option value="cuarto">1/4</option>
+                    <option value="medio" selected>1/2</option>
+                    <option value="tres_cuartos">3/4</option>
+                    <option value="lleno">Lleno</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Medidor combustible visual -->
+              <div style="display:flex;align-items:center;gap:6px;margin-bottom:16px">
+                <span style="font-size:11px;color:#64748b">E</span>
+                <div style="display:flex;gap:4px;flex:1" id="fuel-btns">
+                  {% for val, label in insp_combustible_choices %}
+                  <button type="button" onclick="setFuel('{{ val }}')" data-fuel="{{ val }}"
+                          class="insp-fuel-btn"
+                          style="flex:1;padding:5px 2px;border-radius:5px;font-size:11px;font-weight:700;cursor:pointer;transition:all .15s;
+                                 {% if val == 'medio' %}background:#0e7490;color:#fff;border:2px solid #06b6d4
+                                 {% else %}background:#1e293b;color:#64748b;border:2px solid #334155{% endif %}">
+                    {{ label }}
+                  </button>
+                  {% endfor %}
+                </div>
+                <span style="font-size:11px;color:#64748b">F</span>
+              </div>
+
+              <!-- Daños preexistentes -->
+              <div style="margin-bottom:12px">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                  <span style="font-size:12px;color:#94a3b8;font-weight:600">Daños preexistentes</span>
+                  <button type="button" onclick="inspeccionAddDano()"
+                          style="font-size:11px;padding:4px 10px;background:#0e7490;color:#fff;border:none;border-radius:5px;cursor:pointer;font-weight:700">
+                    + Agregar
+                  </button>
+                </div>
+                <div id="insp-danos-lista" style="display:flex;flex-direction:column;gap:6px"></div>
+                <p id="insp-sin-danos" style="font-size:12px;color:#475569;text-align:center;padding:8px 0">
+                  Sin daños registrados.
+                </p>
+              </div>
+
+              <!-- Fotos de inspección -->
+              <div style="margin-bottom:12px">
+                <label style="display:block;font-size:12px;color:#94a3b8;font-weight:600;margin-bottom:6px">Fotos de inspección</label>
+                <label style="display:block;cursor:pointer">
+                  <div style="border:2px dashed #0e7490;border-radius:8px;padding:14px;text-align:center;transition:border-color .15s"
+                       onmouseover="this.style.borderColor='#06b6d4'" onmouseout="this.style.borderColor='#0e7490'">
+                    <span style="font-size:22px">📷</span>
+                    <p style="margin:4px 0 0;font-size:12px;color:#67e8f9">Seleccionar fotos / desde cámara</p>
+                    <p style="margin:2px 0 0;font-size:11px;color:#475569">JPG, PNG · hasta 6 fotos</p>
+                  </div>
+                  <input type="file" name="insp_fotos" accept="image/*" multiple capture="environment"
+                         style="display:none" onchange="inspeccionPreviews(this)" id="id_insp_fotos">
+                </label>
+                <div id="insp-fotos-preview" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px"></div>
+              </div>
+
+              <!-- Observaciones inspección -->
+              <div style="margin-bottom:12px">
+                <label style="display:block;font-size:12px;color:#94a3b8;font-weight:600;margin-bottom:4px">Observaciones</label>
+                <textarea name="insp_observaciones" rows="2" placeholder="Condición general, accesorios, pendientes..."
+                          style="width:100%;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:7px 10px;color:#f1f5f9;font-size:13px;resize:none"></textarea>
+              </div>
+
+              <!-- Firma cliente -->
+              <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:4px">
+                <input type="checkbox" name="insp_firma_cliente" value="1"
+                       style="width:16px;height:16px;accent-color:#06b6d4">
+                <span style="font-size:12px;color:#cbd5e1">Cliente confirmó la inspección</span>
+              </label>
+
+            </div><!-- /inspeccion-campos -->
+          </div><!-- /inspeccion-body -->
+        </section>
+        {% endif %}
+
       </div>
 
       <aside class="doc-side-column">
@@ -1089,6 +1201,117 @@ window.DESARME_PREFILL = window.DESARME_PREFILL || {% if has_server_line_items %
     }
     renderVideoPreview();
   });
+})();
+</script>
+
+<script>
+// ── Inspección de Ingreso ──────────────────────────────────────
+(function() {
+  var seccion = document.getElementById('seccion-inspeccion');
+  if (!seccion) return;
+
+  // Mostrar la sección sólo cuando hay vehículo seleccionado
+  var vehiculoSel = document.getElementById('id_vehiculo');
+  function checkVehiculo() {
+    if (!vehiculoSel) return;
+    seccion.style.display = vehiculoSel.value ? '' : 'none';
+    if (!vehiculoSel.value) {
+      var chk = document.getElementById('chk-inspeccion');
+      if (chk && chk.checked) { chk.checked = false; activarInspeccion(false); }
+    }
+  }
+  if (vehiculoSel) { vehiculoSel.addEventListener('change', checkVehiculo); checkVehiculo(); }
+
+  var inspDanoCont = 0;
+  var inspFotos = [];
+
+  window.toggleInspeccion = function() {
+    var body = document.getElementById('inspeccion-body');
+    var chev = document.getElementById('inspeccion-chevron');
+    var open = body.style.display !== 'none';
+    body.style.display = open ? 'none' : '';
+    chev.style.transform = open ? '' : 'rotate(180deg)';
+  };
+
+  window.activarInspeccion = function(on) {
+    document.getElementById('id_inspeccion_activa').value = on ? '1' : '0';
+    document.getElementById('inspeccion-campos').style.display = on ? '' : 'none';
+  };
+
+  window.setFuel = function(val) {
+    document.getElementById('id_insp_combustible').value = val;
+    document.querySelectorAll('.insp-fuel-btn').forEach(function(btn) {
+      var sel = btn.dataset.fuel === val;
+      btn.style.background = sel ? '#0e7490' : '#1e293b';
+      btn.style.color = sel ? '#fff' : '#64748b';
+      btn.style.borderColor = sel ? '#06b6d4' : '#334155';
+    });
+  };
+
+  window.inspeccionAddDano = function() {
+    var lista = document.getElementById('insp-danos-lista');
+    var sinDanos = document.getElementById('insp-sin-danos');
+    var i = inspDanoCont++;
+    var row = document.createElement('div');
+    row.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:6px;align-items:start';
+    row.innerHTML =
+      '<select name="insp_zona_' + i + '" style="background:#1e293b;border:1px solid #334155;border-radius:5px;padding:6px 8px;color:#f1f5f9;font-size:12px">' +
+        '<option value="">— Zona —</option>' +
+        '<option value="capo">Capó</option>' +
+        '<option value="techo">Techo</option>' +
+        '<option value="maletero">Maletero</option>' +
+        '<option value="puerta_di">Puerta del. izq.</option>' +
+        '<option value="puerta_dd">Puerta del. der.</option>' +
+        '<option value="puerta_ti">Puerta tra. izq.</option>' +
+        '<option value="puerta_td">Puerta tra. der.</option>' +
+        '<option value="parachoque_del">Paragolpe del.</option>' +
+        '<option value="parachoque_tra">Paragolpe tra.</option>' +
+        '<option value="guardabarro_di">Guardabarro del. izq.</option>' +
+        '<option value="guardabarro_dd">Guardabarro del. der.</option>' +
+        '<option value="guardabarro_ti">Guardabarro tra. izq.</option>' +
+        '<option value="guardabarro_td">Guardabarro tra. der.</option>' +
+        '<option value="espejo_i">Espejo izq.</option>' +
+        '<option value="espejo_d">Espejo der.</option>' +
+        '<option value="vidrio_del">Parabrisas del.</option>' +
+        '<option value="vidrio_tra">Luneta tra.</option>' +
+        '<option value="interior">Interior</option>' +
+        '<option value="otro">Otro</option>' +
+      '</select>' +
+      '<select name="insp_tipo_dano_' + i + '" style="background:#1e293b;border:1px solid #334155;border-radius:5px;padding:6px 8px;color:#f1f5f9;font-size:12px">' +
+        '<option value="">— Tipo —</option>' +
+        '<option value="golpe">Golpe / abolladura</option>' +
+        '<option value="rayon">Rayón</option>' +
+        '<option value="faltante">Faltante</option>' +
+        '<option value="rotura">Rotura / rajadura</option>' +
+        '<option value="mancha">Mancha severa</option>' +
+        '<option value="corrosion">Corrosión / óxido</option>' +
+        '<option value="otro">Otro</option>' +
+      '</select>' +
+      '<button type="button" onclick="this.parentElement.remove();inspeccionSinDanos()" ' +
+              'style="padding:6px 10px;background:#7f1d1d;color:#fca5a5;border:none;border-radius:5px;cursor:pointer;font-size:14px;font-weight:700">×</button>';
+    lista.appendChild(row);
+    sinDanos.style.display = 'none';
+  };
+
+  window.inspeccionSinDanos = function() {
+    var lista = document.getElementById('insp-danos-lista');
+    document.getElementById('insp-sin-danos').style.display = lista.children.length ? 'none' : '';
+  };
+
+  window.inspeccionPreviews = function(input) {
+    var cont = document.getElementById('insp-fotos-preview');
+    cont.innerHTML = '';
+    var files = Array.from(input.files).slice(0, 6);
+    files.forEach(function(f) {
+      var div = document.createElement('div');
+      div.style.cssText = 'position:relative;border-radius:6px;overflow:hidden;background:#1e293b;aspect-ratio:1';
+      var img = document.createElement('img');
+      img.src = URL.createObjectURL(f);
+      img.style.cssText = 'width:100%;height:100%;object-fit:cover';
+      div.appendChild(img);
+      cont.appendChild(div);
+    });
+  };
 })();
 </script>
 {% endblock extra_js %}

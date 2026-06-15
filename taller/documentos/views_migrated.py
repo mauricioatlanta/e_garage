@@ -982,6 +982,10 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 "cliente_preselect_email": cliente_state["email"] or "",
                 "cliente_preselect_telefono": cliente_state["telefono"] or "",
                 **prefetch_payloads,
+                "insp_combustible_choices": [
+                    ("vacio", "Vacío"), ("cuarto", "1/4"), ("medio", "1/2"),
+                    ("tres_cuartos", "3/4"), ("lleno", "Lleno"),
+                ],
             }
         )
         # Prefill desde flujo de desarme (solo creación, prioridad menor que edición)
@@ -1293,6 +1297,7 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                         "activo": True,
                     },
                 )
+                self._guardar_inspeccion_ingreso(self.object)
         except ValidationError as exc:
             if hasattr(exc, "message_dict"):
                 for field, errors in exc.message_dict.items():
@@ -1311,6 +1316,49 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         )
 
         return response
+
+    def _guardar_inspeccion_ingreso(self, documento):
+        """Crea InspeccionIngreso si el usuario activó la sección opcional."""
+        if self.request.POST.get("inspeccion_activa") != "1":
+            return
+        if not documento.vehiculo_id:
+            return
+
+        from taller.models.inspeccion_ingreso import DanoInspeccion, EvidenciaInspeccion, InspeccionIngreso
+
+        km_raw = self.request.POST.get("insp_kilometraje", "").strip()
+        inspeccion = InspeccionIngreso.objects.create(
+            empresa=documento.empresa,
+            documento=documento,
+            vehiculo=documento.vehiculo,
+            realizada_por=self.request.user,
+            kilometraje_ingreso=int(km_raw) if km_raw.isdigit() else None,
+            nivel_combustible=self.request.POST.get("insp_combustible", "medio"),
+            observaciones_generales=self.request.POST.get("insp_observaciones", ""),
+            firma_cliente=bool(self.request.POST.get("insp_firma_cliente")),
+            estado_inspeccion="firmada" if self.request.POST.get("insp_firma_cliente") else "completada",
+        )
+
+        # Daños
+        i = 0
+        while f"insp_zona_{i}" in self.request.POST:
+            zona = self.request.POST.get(f"insp_zona_{i}", "").strip()
+            tipo = self.request.POST.get(f"insp_tipo_dano_{i}", "").strip()
+            if zona and tipo:
+                DanoInspeccion.objects.create(
+                    inspeccion=inspeccion,
+                    zona=zona,
+                    tipo_dano=tipo,
+                )
+            i += 1
+
+        # Fotos
+        for archivo in self.request.FILES.getlist("insp_fotos"):
+            EvidenciaInspeccion.objects.create(
+                inspeccion=inspeccion,
+                tipo="FOTO",
+                archivo=archivo,
+            )
 
     def form_valid_legacy(self, form):
         form.instance.empresa = self.request.empresa
