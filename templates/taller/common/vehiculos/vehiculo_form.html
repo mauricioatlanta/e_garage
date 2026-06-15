@@ -1723,7 +1723,7 @@ document.addEventListener('DOMContentLoaded', function() {
         var titleCaseFields = ['id_color_nuevo', 'id_tipo_carroceria'];
         titleCaseFields.forEach(function(fieldId) {
             var el = document.getElementById(fieldId);
-            if (else:) return;
+            if (!el) return;
             el.addEventListener('input', function() {
                 var pos = this.selectionStart;
                 this.value = this.value.replace(/\w/g, function(c) { return c.toUpperCase(); });
