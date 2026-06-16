@@ -1326,7 +1326,8 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
 
         from taller.models.inspeccion_ingreso import DanoInspeccion, EvidenciaInspeccion, InspeccionIngreso
 
-        km_raw = self.request.POST.get("insp_kilometraje", "").strip()
+        # Km viene del campo principal del formulario (kilometraje_ingreso), no de la sección inspección
+        km_raw = self.request.POST.get("kilometraje_ingreso", "").strip()
         inspeccion = InspeccionIngreso.objects.create(
             empresa=documento.empresa,
             documento=documento,

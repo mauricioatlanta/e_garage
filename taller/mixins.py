@@ -1,8 +1,15 @@
 from django.template.response import TemplateResponse
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.utils.translation import get_language
 
 from .utils.templates import select_country_lang_template
+
+
+_COUNTRY_LANG = {"US": "en", "BR": "pt"}
+
+
+def _lang_for_country(country: str) -> str:
+    """Idioma canónico para un país. Chile, Perú, México, etc. → es."""
+    return _COUNTRY_LANG.get((country or "CL").upper(), "es")
 
 
 class CountryLangTemplateMixin:
@@ -55,7 +62,7 @@ class CountryLangTemplateMixin:
         else:
             country = "CL"
 
-        lang = getattr(request, "LANGUAGE_CODE", None) or get_language() or "es"
+        lang = _lang_for_country(country)
 
         try:
             template_name = select_country_lang_template(base_template, country, lang)
@@ -103,7 +110,7 @@ class CountryLangTemplateMixin:
         else:
             country = "CL"  # default
 
-        lang = get_language() or "es"
+        lang = _lang_for_country(country)
 
         # Seleccionar template apropiado
         try:
