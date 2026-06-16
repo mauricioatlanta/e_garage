@@ -793,15 +793,22 @@ if (window.DESARME_PREFILL) {
 
   window.EG_setLang = applyLang;
 
+  // Idioma derivado del país del suscriptor (servidor siempre gana sobre localStorage)
+  var SERVER_LANG = (function() {
+    var c = '{{ country_code|default:"CL" }}'.toUpperCase();
+    if (c === 'US') return 'en';
+    if (c === 'BR') return 'pt';
+    return 'es';
+  })();
+
   document.addEventListener('DOMContentLoaded', function() {
     // Wire up lang toggle buttons
     document.querySelectorAll('#doc-lang-toggle .doc-lang-btn').forEach(function(btn) {
       btn.addEventListener('click', function() { applyLang(btn.dataset.lang); });
     });
-    // Apply persisted language
-    var saved = 'es';
-    try { saved = localStorage.getItem('eg_doc_lang') || 'es'; } catch(e) {}
-    if (saved !== 'es') applyLang(saved);
+    // Usar idioma del servidor; sobrescribir lo que haya en localStorage
+    try { localStorage.setItem('eg_doc_lang', SERVER_LANG); } catch(e) {}
+    applyLang(SERVER_LANG);
 
     // Unsaved-changes modal — replaces native browser beforeunload dialog
     var UNSAVED_COPY = {
