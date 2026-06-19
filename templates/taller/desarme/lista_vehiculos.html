@@ -127,7 +127,7 @@
 {% if vehiculos %}
 <div class="vehicles-grid">
   {% for v in vehiculos %}
-  <div class="vehicle-card" {% if v.color.hex %}style="border-color:{{ v.color.hex }}40;box-shadow:0 0 0 1px {{ v.color.hex }}28;"{% endif %}>
+  <div class="vehicle-card" {% if v.color.hex %}style="border-color:{{ v.color.hex }};box-shadow:0 0 8px {{ v.color.hex }}66;"{% endif %}>
     <div class="flex items-center justify-between mb-2">
       <div>
         <h3 class="text-white font-bold text-sm">{{ v.patente|default:v.vin|default:"—" }}</h3>
