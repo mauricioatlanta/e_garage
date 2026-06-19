@@ -85,7 +85,7 @@
       border-color: color-mix(in srgb, var(--company-primary) 85%, black)!important;
     }
     .border-primary{border-color:var(--company-primary)!important}
-    .company-logo{max-height:220px;max-width:500px;object-fit:contain;transition:transform 0.3s ease,filter 0.3s ease}
+    .company-logo{max-height:52px;max-width:200px;object-fit:contain;transition:transform 0.3s ease,filter 0.3s ease}
     .company-logo:hover{transform:scale(1.05);filter:drop-shadow(0 0 25px rgba(0,245,255,0.9))!important}
     .company-header{
       background:linear-gradient(135deg,rgba(10,14,39,0.95) 0%,rgba(15,23,52,0.95) 50%,rgba(10,14,39,0.95) 100%);
@@ -751,20 +751,20 @@
   {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}
   <header class="company-header flex flex-row items-center justify-between gap-2 p-2">
   {% else %}
-  <header class="company-header flex flex-col sm:flex-row items-center justify-between gap-4 sm:gap-6 p-4 sm:p-6">
+  <header class="company-header flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-4 p-2 sm:p-3">
   {% endif %}
     <!-- Logo y nombre de la empresa -->
-    <div class="flex items-center {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}gap-2 sm:gap-3{% else %}gap-4 sm:gap-6{% endif %}">
+    <div class="flex items-center {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}gap-2 sm:gap-3{% else %}gap-2 sm:gap-3{% endif %}">
       {% if LOGO_PERSONALIZADO or company_logo_url or COMPANY_LOGO %}
         {# Logo personalizado de la empresa del suscriptor - Prioridad: LOGO_PERSONALIZADO > company_logo_url > COMPANY_LOGO #}
         <img src="{% if LOGO_PERSONALIZADO %}{{ LOGO_PERSONALIZADO }}{% elif company_logo_url %}{{ company_logo_url }}{% else %}{{ COMPANY_LOGO }}{% endif %}" 
              alt="{% if NOMBRE_EMPRESA_PERSONALIZADO %}{{ NOMBRE_EMPRESA_PERSONALIZADO }}{% elif company_name %}{{ request.empresa.nombre_taller }}{% elif COMPANY_NAME %}{{ COMPANY_NAME }}{% else %}Logo{% endif %}"
-             class="company-logo h-24 sm:h-32 w-auto object-contain rounded-lg shadow-2xl border-2 border-opacity-40"
+             class="company-logo h-10 sm:h-12 w-auto object-contain rounded-lg shadow-lg border border-opacity-40"
              style="border-color: {{ COLOR_PRIMARIO|default:company_color|default:'#00ffff' }}; filter: drop-shadow(0 0 15px rgba(0, 245, 255, 0.7));">
       {% endif %}
 
       <div class="flex flex-col">
-        <h1 class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-lg sm:text-xl md:text-2xl{% else %}text-3xl sm:text-4xl md:text-5xl{% endif %} font-black bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_30px_rgba(0,255,255,0.8)]" style="font-family: 'Orbitron', 'Arial Black', monospace; letter-spacing: 2px;">
+        <h1 class="{% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-base sm:text-lg{% else %}text-lg sm:text-xl md:text-2xl{% endif %} font-black bg-gradient-to-r from-cyan-300 via-cyan-400 to-blue-400 bg-clip-text text-transparent drop-shadow-[0_0_20px_rgba(0,255,255,0.7)]" style="font-family: 'Orbitron', 'Arial Black', monospace; letter-spacing: 1px;">
           {% if request.path == '/' or request.path == '' or 'seleccionar_pais' in request.path %}
             eGarage
           {% else %}
@@ -780,13 +780,13 @@
           {% endif %}
         </h1>
         {% if TAGLINE_PERSONALIZADO %}
-          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ TAGLINE_PERSONALIZADO }}</span>
+          <span class="company-tagline text-xs sm:text-sm text-cyan-200 font-semibold mt-0.5 drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]">{{ TAGLINE_PERSONALIZADO }}</span>
         {% elif company_tagline %}
-          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ company_tagline }}</span>
+          <span class="company-tagline text-xs sm:text-sm text-cyan-200 font-semibold mt-0.5 drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]">{{ company_tagline }}</span>
         {% elif COMPANY_TAGLINE %}
-          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{{ COMPANY_TAGLINE }}</span>
+          <span class="company-tagline text-xs sm:text-sm text-cyan-200 font-semibold mt-0.5 drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]">{{ COMPANY_TAGLINE }}</span>
         {% else %}
-          <span class="company-tagline {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}text-xs sm:text-sm{% else %}text-lg sm:text-xl{% endif %} text-cyan-200 font-semibold {% if eg_desarme_dashboard_compact or eg_us_panel_compact_chrome %}mt-0.5{% else %}mt-1{% endif %} drop-shadow-[0_0_10px_rgba(0,255,255,0.5)]">{% trans "the best in town" %}</span>
+          <span class="company-tagline text-xs sm:text-sm text-cyan-200 font-semibold mt-0.5 drop-shadow-[0_0_8px_rgba(0,255,255,0.4)]">{% trans "the best in town" %}</span>
         {% endif %}
       </div>
     </div>

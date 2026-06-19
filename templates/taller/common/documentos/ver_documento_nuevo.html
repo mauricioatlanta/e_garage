@@ -85,11 +85,11 @@
           </p>
           <p class="text-white">
             <span class="text-cyan-300">Marca:</span>
-            {{ documento.vehiculo.marca }}
+            {{ documento.vehiculo.get_marca_display }}
           </p>
           <p class="text-white">
             <span class="text-cyan-300">Modelo:</span>
-            {{ documento.vehiculo.modelo }}
+            {{ documento.vehiculo.get_modelo_display }}
           </p>
           {% if documento.vehiculo.ano %}
           <p class="text-white">
@@ -338,9 +338,10 @@
         Descargar PDF
       </a>{% endif %}
       {% if detail_whatsapp_url %}<a href="{{ detail_whatsapp_url }}"
-         class="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 px-4 py-3 text-sm font-bold text-emerald-200 transition hover:bg-emerald-400/15"
+         class="rounded-2xl px-4 py-3 text-sm font-bold transition"
+         style="background:#25D366;color:#ffffff!important;border:1px solid rgba(255,255,255,0.25);"
          target="_blank">
-        WhatsApp
+        <i class="fab fa-whatsapp mr-1"></i> WhatsApp
       </a>{% endif %}
       {% if detail_email_url %}<a href="{{ detail_email_url }}"
          class="rounded-2xl border border-fuchsia-400/20 bg-fuchsia-400/10 px-4 py-3 text-sm font-bold text-fuchsia-200 transition hover:bg-fuchsia-400/15">
@@ -406,11 +407,11 @@
       {% load whatsapp_tags %}
       {% whatsapp_document_link documento request as wa_link %}
       {% if wa_link %}
-      <a href="{{ wa_link }}" 
+      <a href="{{ wa_link }}"
          target="_blank"
-         class="px-6 py-3 text-white rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center inline-block"
-         style="background: linear-gradient(135deg, #25D366 0%, #128C7E 100%); border: 2px solid rgba(255, 255, 255, 0.3);">
-        <i class="fab fa-whatsapp mr-2"></i>
+         class="px-6 py-3 rounded-lg transition-all shadow-lg hover:shadow-xl flex items-center justify-center inline-block"
+         style="background:linear-gradient(135deg,#25D366 0%,#128C7E 100%);color:#ffffff!important;border:2px solid rgba(255,255,255,0.3);">
+        <i class="fab fa-whatsapp mr-2" style="color:#ffffff!important;"></i>
         💬 WhatsApp
       </a>
       {% else %}

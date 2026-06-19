@@ -1,3 +1,6 @@
+import datetime
+import zoneinfo
+
 from django.contrib.auth.decorators import login_required
 from django.db.models import Q
 from django.http import JsonResponse
@@ -5,6 +8,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_GET
 
 from taller.models import Cliente
+from taller.models.documento import Documento
 from taller.models.vehiculos import Vehiculo
 from taller.utils.empresa import get_active_empresa, get_or_create_empresa, get_user_empresa_safe
 
@@ -207,3 +211,69 @@ def panel_ingreso_vehiculo(request, pk, *args, **kwargs):
             continue
 
     return redirect(f"{_workspace_prefix_from_request(request)}/vehiculos/{vehiculo.pk}/")
+
+
+@require_GET
+@login_required
+def workspace_live_feed(request, *args, **kwargs):
+    empresa = get_active_empresa(request) or get_user_empresa_safe(request.user)
+    if not empresa:
+        return JsonResponse(
+            {"en_taller": [], "entregados_hoy": [], "kpis": {"en_taller": 0, "entregados_hoy": 0}}
+        )
+
+    tz = zoneinfo.ZoneInfo(empresa.zona_horaria or "UTC")
+    hoy_local = datetime.datetime.now(tz=tz).date()
+    workspace_prefix = _workspace_prefix_from_request(request)
+
+    en_taller_qs = (
+        Documento.objects.filter(empresa=empresa, estado="BORRADOR")
+        .select_related(
+            "vehiculo", "vehiculo__marca", "vehiculo__modelo", "cliente", "tecnico_responsable"
+        )
+        .order_by("fecha_emision")[:30]
+    )
+
+    entregados_hoy_qs = (
+        Documento.objects.filter(empresa=empresa, estado="EMITIDO", fecha_emision=hoy_local)
+        .select_related(
+            "vehiculo", "vehiculo__marca", "vehiculo__modelo", "cliente", "tecnico_responsable"
+        )
+        .order_by("-fecha_emision")[:15]
+    )
+
+    def _serialize(doc):
+        v = doc.vehiculo
+        c = doc.cliente
+        t = doc.tecnico_responsable
+        marca_modelo = ""
+        if v:
+            partes = [v.get_marca_display() or "", v.get_modelo_display() or ""]
+            marca_modelo = " ".join(p for p in partes if p).strip()
+        url = f"{workspace_prefix}/documentos/ver/{doc.pk}/"
+        return {
+            "id": doc.id,
+            "patente": (v.patente if v else "") or "",
+            "vehiculo": marca_modelo,
+            "cliente": _full_name(c.nombre, c.apellido) if c else "",
+            "tecnico": t.nombre if t else "",
+            "creado_en": doc.created_at.astimezone(tz).isoformat(),
+            "url": url,
+        }
+
+    en_taller = [_serialize(d) for d in en_taller_qs]
+    entregados_hoy = [_serialize(d) for d in entregados_hoy_qs]
+
+    return JsonResponse(
+        {
+            "en_taller": en_taller,
+            "entregados_hoy": entregados_hoy,
+            "kpis": {"en_taller": len(en_taller), "entregados_hoy": len(entregados_hoy)},
+        }
+    )
+
+
+@login_required
+def centro_de_mando(request, *args, **kwargs):
+    empresa = get_active_empresa(request) or get_user_empresa_safe(request.user)
+    return render(request, "taller/workspace/centro_de_mando.html", {"empresa": empresa})

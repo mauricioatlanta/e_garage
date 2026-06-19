@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Centro de Mando - eGarage{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'taller/css/centro_de_mando.css' %}?v=20260618b">
+{% endblock %}
+
+{% block content %}
+<section class="cdm-shell">
+  <div class="cdm-kpis">
+    <div class="cdm-kpi">
+      <p class="cdm-kpi-label">En taller</p>
+      <p class="cdm-kpi-value" id="kpi-en-taller">—</p>
+    </div>
+    <div class="cdm-kpi">
+      <p class="cdm-kpi-label">Entregados hoy</p>
+      <p class="cdm-kpi-value" id="kpi-entregados">—</p>
+    </div>
+  </div>
+
+  <div class="cdm-columns">
+    <div class="cdm-column">
+      <div class="cdm-column-header">
+        <span class="cdm-column-title-progreso">En taller</span>
+        <span class="cdm-live-badge">
+          <span class="cdm-live-dot"></span>live
+        </span>
+      </div>
+      <div id="en-taller-list" class="cdm-job-list"></div>
+    </div>
+    <div class="cdm-column">
+      <div class="cdm-column-header">
+        <span class="cdm-column-title-listo">Entregados hoy</span>
+      </div>
+      <div id="entregados-list" class="cdm-job-list"></div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'taller/js/centro_de_mando.js' %}?v=20260618b"></script>
+{% endblock %}

@@ -21,7 +21,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="min-h-screen bg-black relative overflow-hidden">
+<div class="min-h-screen bg-black relative overflow-hidden {% block page_body_class %}{% endblock %}">
   <div class="absolute inset-0">
     <div class="stars"></div>
     <div class="twinkling"></div>

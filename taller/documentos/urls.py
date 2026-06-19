@@ -229,4 +229,9 @@ urlpatterns += [
         views_inspeccion.marcar_firmada,
         name="marcar_inspeccion_firmada",
     ),
+    path(
+        "inspeccion/<int:pk>/enviar-email/",
+        views_inspeccion.enviar_inspeccion_email,
+        name="enviar_inspeccion_email",
+    ),
 ]

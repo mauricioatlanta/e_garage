@@ -63,24 +63,245 @@
       </div>
     </div>
 
-    <!-- Daños preexistentes -->
-    <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-4">
-      <div class="flex justify-between items-center mb-4">
+    <!-- ====== INSPECTOR DE DAÑOS SVG ====== -->
+    <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 mb-4 overflow-hidden">
+
+      <!-- Card header -->
+      <div class="flex items-center justify-between px-5 py-3 border-b border-gray-700">
         <h2 class="text-lg font-semibold text-cyan-300">Daños preexistentes</h2>
-        <button type="button" onclick="agregarDano()"
-                class="px-3 py-1.5 bg-cyan-600 hover:bg-cyan-700 text-white text-sm rounded-lg transition">
-          + Agregar
-        </button>
+        <span id="insp-badge" class="text-xs font-mono border border-cyan-800 text-cyan-500 rounded px-2 py-0.5">0 marcados</span>
       </div>
 
-      <div id="lista-danos" class="space-y-3">
-        <!-- Los daños se agregan dinámicamente -->
+      <!-- View tabs -->
+      <div class="flex border-b border-gray-700">
+        <button type="button" class="insp-tab flex-1 py-2 text-xs font-semibold tracking-widest uppercase on" data-view="f" onclick="switchView('f')">Frontal</button>
+        <button type="button" class="insp-tab flex-1 py-2 text-xs font-semibold tracking-widest uppercase" data-view="t" onclick="switchView('t')">Trasera</button>
+        <button type="button" class="insp-tab flex-1 py-2 text-xs font-semibold tracking-widest uppercase" data-view="li" onclick="switchView('li')">Lat. Izq</button>
+        <button type="button" class="insp-tab flex-1 py-2 text-xs font-semibold tracking-widest uppercase" data-view="ld" onclick="switchView('ld')">Lat. Der</button>
+        <button type="button" class="insp-tab flex-1 py-2 text-xs font-semibold tracking-widest uppercase" data-view="i" onclick="switchView('i')">Interior</button>
       </div>
 
-      <p id="sin-danos" class="text-gray-500 text-sm text-center py-4">
-        Sin daños registrados. Toca "Agregar" para documentar un daño.
-      </p>
-    </div>
+      <!-- SVG panels -->
+      <div class="bg-[#040c18]">
+
+        <!-- FRONTAL -->
+        <div id="pf">
+          <svg viewBox="0 0 400 228" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
+            <rect width="400" height="228" fill="#040c18"/>
+            <line x1="0" y1="57" x2="400" y2="57" stroke="#0b1e30" stroke-width=".5"/>
+            <line x1="0" y1="114" x2="400" y2="114" stroke="#0b1e30" stroke-width=".5"/>
+            <line x1="0" y1="171" x2="400" y2="171" stroke="#0b1e30" stroke-width=".5"/>
+            <line x1="200" y1="0" x2="200" y2="228" stroke="#0b1e30" stroke-width=".5"/>
+            <path d="M 64,215 L 66,138 C 66,95 105,54 150,42 L 200,36 L 250,42 C 295,54 334,95 334,138 L 336,215 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1.5"/>
+            <path d="M 154,45 L 246,45 C 298,55 312,85 315,95 L 85,95 Z" fill="#060f1e" stroke="#162e48" stroke-width="1"/>
+            <path d="M 200,40 L 175,95 M 200,40 L 225,95" stroke="#0c1c2e" stroke-width="1"/>
+            <path d="M 85,95 L 315,95 L 340,145 L 60,145 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1.2"/>
+            <path d="M 140,95 L 155,145 M 260,95 L 245,145 M 200,95 L 200,145" stroke="#162e48" stroke-width="1" fill="none"/>
+            <path d="M 60,115 L 140,122 L 138,138 L 62,132 Z" fill="#091424" stroke="#00c8e0" stroke-width="1"/>
+            <path d="M 65,118 L 135,124" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M 340,115 L 260,122 L 262,138 L 338,132 Z" fill="#091424" stroke="#00c8e0" stroke-width="1"/>
+            <path d="M 335,118 L 265,124" stroke="#ffffff" stroke-width="2" stroke-linecap="round"/>
+            <path d="M 152,124 L 248,124 L 265,175 L 135,175 Z" fill="#050c14" stroke="#1e4a6e" stroke-width="1.5"/>
+            <path d="M 155,135 H 245 M 145,148 H 255 M 140,162 H 260 M 175,124 L 160,175 M 200,124 L 200,175 M 225,124 L 240,175" stroke="#152b44" stroke-width="0.8"/>
+            <polygon points="194,142 200,135 206,142 200,149" fill="none" stroke="#00c8e0" stroke-width="1.5"/>
+            <path d="M 46,92 Q 36,92 36,100 Q 36,108 48,106 L 68,101 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/>
+            <line x1="38" y1="99" x2="52" y2="101" stroke="#00c8e0" stroke-width="1.5"/>
+            <path d="M 354,92 Q 364,92 364,100 Q 364,108 352,106 L 332,101 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/>
+            <line x1="362" y1="99" x2="348" y2="101" stroke="#00c8e0" stroke-width="1.5"/>
+            <path d="M 60,145 L 45,145 L 42,192 C 45,210 52,215 62,215 L 62,145 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/>
+            <path d="M 340,145 L 355,145 L 358,192 C 355,210 348,215 338,215 L 338,145 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/>
+            <path d="M 62,175 L 135,175 L 125,215 L 62,215 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <path d="M 338,175 L 265,175 L 275,215 L 338,215 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <rect x="72" y="185" width="40" height="15" rx="3" fill="#040a12" stroke="#1a3a5c"/>
+            <circle cx="92" cy="192" r="3" fill="#00c8e0" opacity="0.7"/>
+            <rect x="288" y="185" width="40" height="15" rx="3" fill="#040a12" stroke="#1a3a5c"/>
+            <circle cx="308" cy="192" r="3" fill="#00c8e0" opacity="0.7"/>
+            <path d="M 50,215 L 350,215 C 365,215 365,223 350,223 L 50,223 C 35,223 35,215 50,215 Z" fill="#050e1a" stroke="#1e4a6e" stroke-width="1"/>
+            <!-- Clickable zones -->
+            <path class="insp-zone" data-p="Parabrisas" onclick="cy(this)" d="M 154,45 L 246,45 C 298,55 312,85 315,95 L 85,95 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Capot" onclick="cy(this)" d="M 85,95 L 315,95 L 340,145 L 60,145 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Faro izquierdo" onclick="cy(this)" d="M 60,115 L 140,122 L 138,138 L 62,132 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Faro derecho" onclick="cy(this)" d="M 340,115 L 260,122 L 262,138 L 338,132 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Parrilla" onclick="cy(this)" d="M 152,124 L 248,124 L 265,175 L 135,175 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Guardabarro izq." onclick="cy(this)" d="M 60,145 L 42,145 L 42,192 C 45,215 62,215 62,215 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Guardabarro der." onclick="cy(this)" d="M 340,145 L 358,145 L 358,192 C 355,215 338,215 338,215 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Espejo izq." onclick="cy(this)" d="M 36,92 Q 36,110 55,105 L 68,100 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Espejo der." onclick="cy(this)" d="M 364,92 Q 364,110 345,105 L 332,100 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Parachoque del." onclick="cy(this)" d="M 50,175 L 350,175 L 365,223 L 35,223 Z" fill="transparent" stroke="none"/>
+            <!-- Labels -->
+            <text x="200" y="72" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">parabrisas</text>
+            <text x="200" y="112" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">capot</text>
+            <text x="100" y="132" text-anchor="middle" font-size="7" fill="#00c8e0" pointer-events="none">faro izq</text>
+            <text x="300" y="132" text-anchor="middle" font-size="7" fill="#00c8e0" pointer-events="none">faro der</text>
+            <text x="200" y="162" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">parrilla</text>
+            <text x="200" y="202" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">parachoque del.</text>
+          </svg>
+        </div>
+
+        <!-- TRASERA -->
+        <div id="pt" style="display:none">
+          <svg viewBox="0 0 400 228" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
+            <rect width="400" height="228" fill="#040c18"/>
+            <line x1="0" y1="57" x2="400" y2="57" stroke="#0b1e30" stroke-width=".5"/><line x1="0" y1="114" x2="400" y2="114" stroke="#0b1e30" stroke-width=".5"/><line x1="0" y1="171" x2="400" y2="171" stroke="#0b1e30" stroke-width=".5"/><line x1="200" y1="0" x2="200" y2="228" stroke="#0b1e30" stroke-width=".5"/>
+            <path d="M 64,215 L 66,138 C 66,95 105,54 150,42 L 200,36 L 250,42 C 295,54 334,95 334,138 L 336,215 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1.5"/>
+            <path d="M 132,47 L 268,47 C 298,56 310,82 308,95 L 92,95 C 90,82 102,56 132,47 Z" fill="#060f1e" stroke="#162e48" stroke-width="1"/>
+            <path d="M 200,47 L 198,95 M 166,48 L 160,95 M 234,48 L 240,95" stroke="#0c1c2e" stroke-width="1"/>
+            <path d="M 92,95 L 308,95 L 326,155 L 74,155 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1.2"/>
+            <path d="M 148,95 L 143,155 M 252,95 L 257,155 M 200,95 L 200,155" stroke="#162e48" stroke-width="1" fill="none"/>
+            <path d="M 63,108 L 128,116 L 124,142 L 65,136 Z" fill="#1a0404" stroke="#ef4444" stroke-width="1.2"/>
+            <path d="M 71,113 L 120,119 M 71,121 L 118,127 M 71,129 L 116,134" stroke="#ef444455" stroke-width="1"/>
+            <path d="M 337,108 L 272,116 L 276,142 L 335,136 Z" fill="#1a0404" stroke="#ef4444" stroke-width="1.2"/>
+            <path d="M 329,113 L 280,119 M 329,121 L 282,127 M 329,129 L 284,134" stroke="#ef444455" stroke-width="1"/>
+            <path d="M 66,155 L 45,155 L 42,192 C 45,210 52,215 64,215 L 66,155 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/>
+            <path d="M 334,155 L 355,155 L 358,192 C 355,210 348,215 336,215 L 334,155 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1"/>
+            <path d="M 66,175 L 128,175 L 118,215 L 66,215 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <path d="M 334,175 L 272,175 L 282,215 L 334,215 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <path d="M 128,175 L 272,175 L 282,215 L 118,215 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <path d="M 50,215 L 350,215 C 365,215 365,223 350,223 L 50,223 C 35,223 35,215 50,215 Z" fill="#050e1a" stroke="#1e4a6e" stroke-width="1"/>
+            <rect x="166" y="183" width="68" height="20" rx="3" fill="#040a12" stroke="#1a3a5c"/>
+            <rect x="170" y="186" width="60" height="14" rx="1" fill="#0a1828" stroke="#2a5a79" stroke-width=".5"/>
+            <ellipse cx="148" cy="219" rx="6" ry="3" fill="#050c18" stroke="#1a3a5c"/>
+            <ellipse cx="252" cy="219" rx="6" ry="3" fill="#050c18" stroke="#1a3a5c"/>
+            <!-- Clickable zones -->
+            <path class="insp-zone" data-p="Luneta" onclick="cy(this)" d="M 132,47 L 268,47 C 298,56 310,82 308,95 L 92,95 C 90,82 102,56 132,47 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Maletero" onclick="cy(this)" d="M 92,95 L 308,95 L 326,155 L 74,155 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Faro tras. izq." onclick="cy(this)" d="M 63,108 L 128,116 L 124,142 L 65,136 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Faro tras. der." onclick="cy(this)" d="M 337,108 L 272,116 L 276,142 L 335,136 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Guard. tras. izq." onclick="cy(this)" d="M 64,155 L 42,155 L 42,215 L 64,215 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Guard. tras. der." onclick="cy(this)" d="M 336,155 L 358,155 L 358,215 L 336,215 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Parachoque tras." onclick="cy(this)" d="M 50,175 L 350,175 L 360,223 L 40,223 Z" fill="transparent" stroke="none"/>
+            <!-- Labels -->
+            <text x="200" y="72" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">luneta</text>
+            <text x="200" y="128" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">maletero</text>
+            <text x="94" y="130" text-anchor="middle" font-size="7" fill="#ef4444" pointer-events="none">faro tras. izq</text>
+            <text x="306" y="130" text-anchor="middle" font-size="7" fill="#ef4444" pointer-events="none">faro tras. der</text>
+            <text x="200" y="202" text-anchor="middle" font-size="8" fill="#2a5a79" pointer-events="none">parachoque tras.</text>
+          </svg>
+        </div>
+
+        <!-- LATERAL (shared for Izq / Der, side toggled by tab) -->
+        <div id="pl" style="display:none">
+          <div class="text-center text-xs py-1 border-b border-[#1a3a5c]" id="lat-side-label" style="color:#00c8e0;letter-spacing:2px;font-family:monospace;">◈ LADO IZQUIERDO</div>
+          <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
+            <rect width="520" height="220" fill="#040c18"/>
+            <line x1="0" y1="55" x2="520" y2="55" stroke="#0b1e30" stroke-width=".5"/>
+            <line x1="0" y1="110" x2="520" y2="110" stroke="#0b1e30" stroke-width=".5"/>
+            <line x1="0" y1="165" x2="520" y2="165" stroke="#0b1e30" stroke-width=".5"/>
+            <line x1="260" y1="0" x2="260" y2="220" stroke="#0b1e30" stroke-width=".5"/>
+            <path d="M 15,160 L 18,140 C 18,118 42,108 75,108 L 125,108 C 150,75 185,52 245,48 L 355,48 C 420,48 452,78 472,108 L 502,108 C 518,112 518,132 505,142 L 502,165 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1.8"/>
+            <path d="M 152,103 L 154,70 C 180,60 215,53 255,53 L 255,103 Z" fill="#060f1e" stroke="#162e48" stroke-width="1"/>
+            <path d="M 260,53 L 345,53 C 380,55 405,75 422,103 Z" fill="#060f1e" stroke="#162e48" stroke-width="1"/>
+            <line x1="257" y1="53" x2="257" y2="103" stroke="#1a3a5c" stroke-width="2.5"/>
+            <line x1="152" y1="72" x2="152" y2="103" stroke="#1a3a5c" stroke-width="1.5"/>
+            <line x1="365" y1="58" x2="385" y2="103" stroke="#1a3a5c" stroke-width="1.5"/>
+            <path d="M 75,108 C 130,108 170,113 220,116 L 472,116" stroke="#1e4a6e" stroke-width="1" fill="none"/>
+            <path d="M 115,148 L 435,148" stroke="#11253a" stroke-width="2" fill="none"/>
+            <path d="M 504,115 L 480,115 C 470,115 462,120 458,126 L 458,134 L 503,134 Z" fill="#2d0808" stroke="#ef4444" stroke-width="1"/>
+            <path d="M 15,115 L 38,117 C 48,117 54,122 58,128 L 16,134 Z" fill="#0c223c" stroke="#00c8e0" stroke-width="1"/>
+            <path d="M 144,88 Q 128,88 128,94 Q 128,100 144,99 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <circle cx="95" cy="165" r="32" fill="#050d18" stroke="#1e4a6e" stroke-width="3"/>
+            <circle cx="95" cy="165" r="24" fill="#0c1e36" stroke="#00c8e0" stroke-width="1"/>
+            <path d="M 95,133 L 95,197 M 63,165 L 127,165 M 72,142 L 118,188 M 72,188 L 118,142" stroke="#1e4a6e" stroke-width="1.5"/>
+            <circle cx="95" cy="165" r="6" fill="#040c18" stroke="#1e4a6e"/>
+            <circle cx="435" cy="165" r="32" fill="#050d18" stroke="#1e4a6e" stroke-width="3"/>
+            <circle cx="435" cy="165" r="24" fill="#0c1e36" stroke="#00c8e0" stroke-width="1"/>
+            <path d="M 435,133 L 435,197 M 403,165 L 467,165 M 412,142 L 458,188 M 412,188 L 458,142" stroke="#1e4a6e" stroke-width="1.5"/>
+            <circle cx="435" cy="165" r="6" fill="#040c18" stroke="#1e4a6e"/>
+            <!-- Clickable lateral zones -->
+            <path class="insp-zone lat-zone" data-p="Techo / Ventanas lat." onclick="cyLat(this)" d="M 145,70 L 355,48 C 420,48 435,75 440,103 L 135,103 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone lat-zone" data-p="Capó / Frente lat." onclick="cyLat(this)" d="M 15,108 L 135,108 L 135,145 L 15,145 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone lat-zone" data-p="Fender delantero lat." onclick="cyLat(this)" d="M 15,145 L 135,145 L 135,195 L 45,195 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone lat-zone" data-p="Puerta delantera" onclick="cyLat(this)" d="M 135,103 L 257,103 L 257,165 L 135,165 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone lat-zone" data-p="Puerta trasera lat." onclick="cyLat(this)" d="M 257,103 L 385,103 L 385,165 L 257,165 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone lat-zone" data-p="Fender trasero lat." onclick="cyLat(this)" d="M 385,103 L 460,103 L 460,195 L 385,195 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone lat-zone" data-p="Baúl / Zona tras. lat." onclick="cyLat(this)" d="M 460,103 L 515,103 L 515,165 L 460,165 Z" fill="transparent" stroke="none"/>
+            <circle class="insp-zone lat-zone" data-p="Llanta delantera lat." onclick="cyLat(this)" cx="95" cy="165" r="32" fill="transparent" stroke="none"/>
+            <circle class="insp-zone lat-zone" data-p="Llanta trasera lat." onclick="cyLat(this)" cx="435" cy="165" r="32" fill="transparent" stroke="none"/>
+            <path class="insp-zone lat-zone" data-p="Espejo lateral" onclick="cyLat(this)" d="M 125,85 L 150,85 L 150,103 L 125,103 Z" fill="transparent" stroke="none"/>
+            <!-- Labels -->
+            <text x="260" y="80" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">techo / ventanas</text>
+            <text x="75" y="132" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">frente</text>
+            <text x="195" y="136" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">puerta del.</text>
+            <text x="320" y="136" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">puerta tras.</text>
+            <text x="490" y="132" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">baúl</text>
+          </svg>
+        </div>
+
+        <!-- INTERIOR -->
+        <div id="pi" style="display:none">
+          <svg viewBox="0 0 480 210" xmlns="http://www.w3.org/2000/svg" style="display:block;width:100%;height:auto;">
+            <rect width="480" height="210" fill="#040c18"/>
+            <line x1="0" y1="52.5" x2="480" y2="52.5" stroke="#0b1e30" stroke-width=".5"/>
+            <line x1="0" y1="105" x2="480" y2="105" stroke="#0b1e30" stroke-width=".5"/>
+            <line x1="0" y1="157.5" x2="480" y2="157.5" stroke="#0b1e30" stroke-width=".5"/>
+            <line x1="240" y1="0" x2="240" y2="210" stroke="#0b1e30" stroke-width=".5"/>
+            <path d="M 58,18 Q 58,10 68,10 L 412,10 Q 422,10 424,22 L 438,96 Q 442,110 438,124 L 424,188 Q 422,198 412,198 L 68,198 Q 58,198 58,188 Z" fill="#0a1628" stroke="#1e4a6e" stroke-width="1.5"/>
+            <path d="M 66,10 L 414,10 L 420,54 Q 378,64 240,66 Q 102,64 60,54 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <path d="M 70,11 L 410,11 L 416,50 Q 378,58 240,60 Q 102,58 64,50 Z" fill="#060f1e" stroke="#162e48" stroke-width=".5"/>
+            <circle cx="116" cy="74" r="22" fill="none" stroke="#1e4a6e" stroke-width="2"/>
+            <circle cx="116" cy="74" r="9" fill="#0c1e36" stroke="#1a3a5c" stroke-width="1"/>
+            <line x1="116" y1="54" x2="116" y2="65" stroke="#1e4a6e" stroke-width="1.5"/>
+            <line x1="94" y1="74" x2="107" y2="74" stroke="#1e4a6e" stroke-width="1.5"/>
+            <line x1="125" y1="74" x2="138" y2="74" stroke="#1e4a6e" stroke-width="1.5"/>
+            <line x1="116" y1="83" x2="116" y2="96" stroke="#1e4a6e" stroke-width="1.5"/>
+            <rect x="194" y="24" width="92" height="34" rx="4" fill="#050c14" stroke="#1a3a5c"/>
+            <rect x="198" y="27" width="84" height="26" rx="2" fill="#040a10" stroke="#1a3a5c" stroke-width=".4"/>
+            <rect x="296" y="28" width="72" height="26" rx="3" fill="#060e1c" stroke="#1a3a5c"/>
+            <circle cx="310" cy="41" r="7" fill="#050c18" stroke="#1a3a5c"/>
+            <circle cx="352" cy="41" r="7" fill="#050c18" stroke="#1a3a5c"/>
+            <path d="M 208,9 L 272,9 L 276,20 L 204,20 Z" fill="#060e1c" stroke="#1a3a5c" stroke-width=".5"/>
+            <rect x="196" y="80" width="48" height="52" rx="6" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <circle cx="220" cy="100" r="8" fill="#060e1c" stroke="#1a3a5c"/>
+            <rect x="60" y="52" width="14" height="108" rx="4" fill="#0c1e36" stroke="#1e4a6e"/>
+            <rect x="406" y="52" width="14" height="108" rx="4" fill="#0c1e36" stroke="#1e4a6e"/>
+            <path d="M 74,78 L 176,78 L 176,126 Q 176,134 165,134 L 86,134 Q 74,134 74,126 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <rect x="90" y="72" width="72" height="14" rx="6" fill="#0a1828" stroke="#162e48"/>
+            <path d="M 250,78 L 406,78 L 406,126 Q 406,134 394,134 L 262,134 Q 250,134 250,126 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <rect x="278" y="72" width="100" height="14" rx="6" fill="#0a1828" stroke="#162e48"/>
+            <path d="M 74,148 L 406,148 L 406,192 Q 406,200 394,200 L 86,200 Q 74,200 74,192 Z" fill="#0c1e36" stroke="#1e4a6e" stroke-width="1"/>
+            <rect x="88" y="142" width="64" height="14" rx="6" fill="#0a1828" stroke="#162e48"/>
+            <rect x="172" y="142" width="64" height="14" rx="6" fill="#0a1828" stroke="#162e48"/>
+            <rect x="256" y="142" width="64" height="14" rx="6" fill="#0a1828" stroke="#162e48"/>
+            <!-- Clickable interior zones -->
+            <path class="insp-zone" data-p="Espejo retrovisor" onclick="cy(this)" d="M 204,8 L 276,8 L 280,22 L 200,22 Z" fill="transparent" stroke="none"/>
+            <rect class="insp-zone" data-p="Tablero" onclick="cy(this)" x="58" y="10" width="386" height="60" fill="transparent" stroke="none"/>
+            <rect class="insp-zone" data-p="Radio / pantalla" onclick="cy(this)" x="190" y="20" width="100" height="42" rx="4" fill="transparent" stroke="none"/>
+            <rect class="insp-zone" data-p="Climatizador" onclick="cy(this)" x="292" y="24" width="80" height="34" rx="3" fill="transparent" stroke="none"/>
+            <circle class="insp-zone" data-p="Volante" onclick="cy(this)" cx="116" cy="74" r="24" fill="transparent" stroke="none"/>
+            <rect class="insp-zone" data-p="Consola central" onclick="cy(this)" x="192" y="76" width="56" height="60" rx="6" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Asiento conductor" onclick="cy(this)" d="M 74,70 L 176,70 L 176,136 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Asiento pasajero" onclick="cy(this)" d="M 250,70 L 406,70 L 406,136 Z" fill="transparent" stroke="none"/>
+            <path class="insp-zone" data-p="Asiento trasero" onclick="cy(this)" d="M 74,140 L 406,140 L 406,202 L 74,202 Z" fill="transparent" stroke="none"/>
+            <rect class="insp-zone" data-p="Panel puerta izq." onclick="cy(this)" x="58" y="48" width="18" height="116" rx="4" fill="transparent" stroke="none"/>
+            <rect class="insp-zone" data-p="Panel puerta der." onclick="cy(this)" x="404" y="48" width="18" height="116" rx="4" fill="transparent" stroke="none"/>
+            <!-- Labels -->
+            <text x="240" y="18" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">retrovisor</text>
+            <text x="240" y="44" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">radio / pantalla</text>
+            <text x="330" y="44" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">climatiz.</text>
+            <text x="116" y="78" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">volante</text>
+            <text x="118" y="110" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">asiento cond.</text>
+            <text x="326" y="110" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">asiento pas.</text>
+            <text x="240" y="176" text-anchor="middle" font-size="7" fill="#2a5a79" pointer-events="none">asiento trasero</text>
+          </svg>
+        </div>
+
+      </div><!-- /bg-[#040c18] -->
+
+      <!-- Legend -->
+      <div class="flex gap-4 flex-wrap px-5 py-3 border-t border-gray-700 text-xs text-gray-400">
+        <span class="flex items-center gap-1.5"><span class="inline-block w-2 h-2 rounded-sm" style="background:#f59e0b"></span>Rayón</span>
+        <span class="flex items-center gap-1.5"><span class="inline-block w-2 h-2 rounded-sm" style="background:#f97316"></span>Golpe</span>
+        <span class="flex items-center gap-1.5"><span class="inline-block w-2 h-2 rounded-sm" style="background:#ef4444"></span>Roto</span>
+        <span class="flex items-center gap-1.5"><span class="inline-block w-2 h-2 rounded-sm" style="background:#a855f7"></span>Falta pieza</span>
+        <span class="flex items-center gap-1.5"><span class="inline-block w-2 h-2 rounded-sm" style="background:#6b7280"></span>Sucio</span>
+      </div>
+
+      <!-- Damage list with description inputs -->
+      <div id="insp-list" class="px-5 pb-4">
+        <p class="text-sm text-gray-500 text-center py-3">Toca una zona del vehículo para registrar daño.</p>
+      </div>
+
+    </div><!-- /inspector card -->
 
     <!-- Fotos -->
     <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-gray-600/40 p-5 mb-4">
@@ -117,6 +338,34 @@
       </label>
     </div>
 
+    <!-- Contacto del cliente -->
+    {% if cliente %}
+    <div class="bg-gray-800/60 backdrop-blur-lg rounded-xl border border-cyan-500/30 p-5 mb-4">
+      <h2 class="text-base font-semibold text-cyan-300 mb-3">Notificar al cliente</h2>
+      <p class="text-gray-400 text-xs mb-3">{{ cliente }}</p>
+
+      <div class="space-y-2">
+        {% if whatsapp_url_previo %}
+        <a href="{{ whatsapp_url_previo }}" target="_blank" rel="noopener noreferrer"
+           class="flex items-center gap-2 w-full justify-center px-4 py-2.5
+                  bg-green-600 hover:bg-green-700 text-white font-semibold rounded-lg transition text-sm">
+          <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          Avisar por WhatsApp que está en el taller
+        </a>
+        {% else %}
+        <p class="text-gray-600 text-xs">Sin teléfono registrado — no se puede notificar por WhatsApp.</p>
+        {% endif %}
+
+        <p class="text-gray-500 text-xs pt-1">
+          Al guardar la inspección podrás enviar el reporte completo
+          (con daños y fotos) al cliente por WhatsApp o correo.
+        </p>
+      </div>
+    </div>
+    {% endif %}
+
     <!-- Botones -->
     <div class="flex gap-3 pb-8">
       <a href="{% country_url 'documentos:ver_documento' documento.pk %}"
@@ -132,86 +381,282 @@
 
 </div>
 </div>
-
-<!-- Template para una fila de daño -->
-<template id="tmpl-dano">
-  <div class="dano-row bg-gray-700/50 rounded-lg p-3 border border-gray-600/40">
-    <div class="grid grid-cols-2 gap-2 mb-2">
-      <select name="zona_INDEX" required
-              class="bg-gray-600 border border-gray-500 rounded px-2 py-1.5 text-white text-sm focus:border-cyan-400 focus:outline-none">
-        <option value="">— Zona —</option>
-        {% for val, label in zonas_choices %}
-        <option value="{{ val }}">{{ label }}</option>
-        {% endfor %}
-      </select>
-      <select name="tipo_dano_INDEX" required
-              class="bg-gray-600 border border-gray-500 rounded px-2 py-1.5 text-white text-sm focus:border-cyan-400 focus:outline-none">
-        <option value="">— Tipo —</option>
-        {% for val, label in tipos_dano_choices %}
-        <option value="{{ val }}">{{ label }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div class="flex gap-2">
-      <input type="text" name="descripcion_INDEX" placeholder="Descripción adicional (opcional)"
-             class="flex-1 bg-gray-600 border border-gray-500 rounded px-2 py-1.5 text-white text-sm focus:border-cyan-400 focus:outline-none">
-      <button type="button" onclick="this.closest('.dano-row').remove(); actualizarSinDanos()"
-              class="px-2 py-1 text-red-400 hover:text-red-300 text-lg leading-none">&times;</button>
-    </div>
-  </div>
-</template>
-
 {% endblock %}
 
 {% block extra_js %}
+<style>
+.insp-tab {
+  color: #4a7a99;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  border-left: none; border-right: none; border-top: none;
+  transition: color .15s, border-color .15s;
+}
+.insp-tab.on { color: #00c8e0; border-bottom-color: #00c8e0; }
+.insp-zone { cursor: pointer; transition: fill .15s, stroke .15s; }
+</style>
 <script>
-let danoCont = 0;
+// ===== INSPECTOR DE DAÑOS =====
+var TIPOS = ['none','rayon','golpe','rotura','faltante','mancha'];
+var TIPO_LABEL = { none:'—', rayon:'Rayón', golpe:'Golpe', rotura:'Roto', faltante:'Falta pieza', mancha:'Sucio' };
+var TIPO_COLOR = { none:'transparent', rayon:'#f59e0b', golpe:'#f97316', rotura:'#ef4444', faltante:'#a855f7', mancha:'#6b7280' };
 
-function agregarDano() {
-  const tmpl = document.getElementById('tmpl-dano');
-  const clone = tmpl.content.cloneNode(true);
-  // Reemplazar INDEX por el contador actual
-  clone.querySelectorAll('[name]').forEach(el => {
-    el.name = el.name.replace('INDEX', danoCont);
+// DATA[zoneKey] = { tipo, desc }
+// For interior sub-zones the key is "interior::<SubName>" — zona='interior', desc=SubName
+var DATA = {};
+var latSide = 'izq';
+var activeView = 'f';
+
+var FRONTAL_MAP = {
+  'Parabrisas':       'vidrio_del',
+  'Capot':            'capo',
+  'Faro izquierdo':   'faro_di',
+  'Faro derecho':     'faro_dd',
+  'Parrilla':         'parrilla',
+  'Guardabarro izq.': 'guardabarro_di',
+  'Guardabarro der.': 'guardabarro_dd',
+  'Espejo izq.':      'espejo_i',
+  'Espejo der.':      'espejo_d',
+  'Parachoque del.':  'parachoque_del',
+};
+
+var TRASERA_MAP = {
+  'Luneta':            'vidrio_tra',
+  'Maletero':          'maletero',
+  'Faro tras. izq.':   'faro_ti',
+  'Faro tras. der.':   'faro_td',
+  'Guard. tras. izq.': 'guardabarro_ti',
+  'Guard. tras. der.': 'guardabarro_td',
+  'Parachoque tras.':  'parachoque_tra',
+};
+
+var LAT_MAP = {
+  'Techo / Ventanas lat.': { izq: 'techo',          der: 'techo' },
+  'Capó / Frente lat.':    { izq: 'capo',            der: 'capo' },
+  'Fender delantero lat.': { izq: 'guardabarro_di',  der: 'guardabarro_dd' },
+  'Puerta delantera':      { izq: 'puerta_di',       der: 'puerta_dd' },
+  'Puerta trasera lat.':   { izq: 'puerta_ti',       der: 'puerta_td' },
+  'Fender trasero lat.':   { izq: 'guardabarro_ti',  der: 'guardabarro_td' },
+  'Baúl / Zona tras. lat.':{ izq: 'maletero',        der: 'maletero' },
+  'Llanta delantera lat.': { izq: 'llanta_di',       der: 'llanta_dd' },
+  'Llanta trasera lat.':   { izq: 'llanta_ti',       der: 'llanta_td' },
+  'Espejo lateral':        { izq: 'espejo_i',        der: 'espejo_d' },
+};
+
+var INTERIOR_MAP = {
+  'Espejo retrovisor':  { zona: 'interior', defDesc: 'Espejo retrovisor' },
+  'Tablero':            { zona: 'interior', defDesc: 'Tablero' },
+  'Radio / pantalla':   { zona: 'interior', defDesc: 'Radio/pantalla' },
+  'Climatizador':       { zona: 'interior', defDesc: 'Climatizador' },
+  'Volante':            { zona: 'interior', defDesc: 'Volante' },
+  'Consola central':    { zona: 'interior', defDesc: 'Consola central' },
+  'Asiento conductor':  { zona: 'interior', defDesc: 'Asiento conductor' },
+  'Asiento pasajero':   { zona: 'interior', defDesc: 'Asiento pasajero' },
+  'Asiento trasero':    { zona: 'interior', defDesc: 'Asiento trasero' },
+  'Panel puerta izq.':  { zona: 'puerta_di', defDesc: 'Panel interior' },
+  'Panel puerta der.':  { zona: 'puerta_dd', defDesc: 'Panel interior' },
+};
+
+var ZONE_LABELS = {
+  'vidrio_del':'Parabrisas','vidrio_tra':'Luneta trasera','capo':'Capó',
+  'faro_di':'Faro del. izq.','faro_dd':'Faro del. der.',
+  'faro_ti':'Faro tras. izq.','faro_td':'Faro tras. der.',
+  'parrilla':'Parrilla','guardabarro_di':'Guard. del. izq.','guardabarro_dd':'Guard. del. der.',
+  'guardabarro_ti':'Guard. tras. izq.','guardabarro_td':'Guard. tras. der.',
+  'espejo_i':'Espejo izq.','espejo_d':'Espejo der.','parachoque_del':'Parachoque del.',
+  'parachoque_tra':'Parachoque tras.','techo':'Techo','maletero':'Maletero',
+  'puerta_di':'Puerta del. izq.','puerta_dd':'Puerta del. der.',
+  'puerta_ti':'Puerta tras. izq.','puerta_td':'Puerta tras. der.',
+  'llanta_di':'Llanta del. izq.','llanta_dd':'Llanta del. der.',
+  'llanta_ti':'Llanta tras. izq.','llanta_td':'Llanta tras. der.','interior':'Interior',
+};
+
+function zoneLabel(k) {
+  if (k.indexOf('::') !== -1) return 'Interior – ' + k.split('::')[1];
+  return ZONE_LABELS[k] || k;
+}
+
+function cycleZone(zoneKey, defDesc) {
+  var current = DATA[zoneKey] ? DATA[zoneKey].tipo : 'none';
+  var next = TIPOS[(TIPOS.indexOf(current) + 1) % TIPOS.length];
+  if (next === 'none') {
+    delete DATA[zoneKey];
+  } else if (!DATA[zoneKey]) {
+    DATA[zoneKey] = { tipo: next, desc: defDesc || '' };
+  } else {
+    DATA[zoneKey].tipo = next;
+  }
+  renderList();
+  updateBadge();
+  updateAllVisuals();
+}
+
+function cy(el) {
+  var p = el.getAttribute('data-p');
+  var zk, defDesc = '';
+  if (activeView === 'f') {
+    zk = FRONTAL_MAP[p];
+  } else if (activeView === 't') {
+    zk = TRASERA_MAP[p];
+  } else if (activeView === 'i') {
+    var im = INTERIOR_MAP[p];
+    if (im) { zk = im.zona + '::' + im.defDesc; defDesc = im.defDesc; }
+  }
+  if (zk) cycleZone(zk, defDesc);
+}
+
+function cyLat(el) {
+  var p = el.getAttribute('data-p');
+  var entry = LAT_MAP[p];
+  if (!entry) return;
+  cycleZone(entry[latSide], '');
+}
+
+function elVisual(el, tipo) {
+  var c = TIPO_COLOR[tipo] || 'transparent';
+  if (tipo === 'none') {
+    el.setAttribute('fill', 'transparent');
+    el.setAttribute('stroke', 'none');
+    el.setAttribute('stroke-width', '0');
+  } else {
+    el.setAttribute('fill', c + '33');
+    el.setAttribute('stroke', c);
+    el.setAttribute('stroke-width', '2.5');
+    el.setAttribute('stroke-dasharray', 'none');
+  }
+}
+
+function refreshLatVisuals() {
+  document.querySelectorAll('.lat-zone').forEach(function(el) {
+    var p = el.getAttribute('data-p');
+    var entry = LAT_MAP[p];
+    var zk = entry ? entry[latSide] : null;
+    elVisual(el, zk && DATA[zk] ? DATA[zk].tipo : 'none');
   });
-  document.getElementById('lista-danos').appendChild(clone);
-  danoCont++;
-  actualizarSinDanos();
 }
 
-function actualizarSinDanos() {
-  const n = document.querySelectorAll('.dano-row').length;
-  document.getElementById('sin-danos').style.display = n ? 'none' : 'block';
+function updateAllVisuals() {
+  document.querySelectorAll('#pf .insp-zone').forEach(function(el) {
+    var zk = FRONTAL_MAP[el.getAttribute('data-p')];
+    elVisual(el, zk && DATA[zk] ? DATA[zk].tipo : 'none');
+  });
+  document.querySelectorAll('#pt .insp-zone').forEach(function(el) {
+    var zk = TRASERA_MAP[el.getAttribute('data-p')];
+    elVisual(el, zk && DATA[zk] ? DATA[zk].tipo : 'none');
+  });
+  refreshLatVisuals();
+  document.querySelectorAll('#pi .insp-zone').forEach(function(el) {
+    var im = INTERIOR_MAP[el.getAttribute('data-p')];
+    if (!im) return;
+    var zk = im.zona + '::' + im.defDesc;
+    elVisual(el, DATA[zk] ? DATA[zk].tipo : 'none');
+  });
 }
 
+function updateBadge() {
+  var n = Object.keys(DATA).length;
+  document.getElementById('insp-badge').textContent = n + ' marcado' + (n !== 1 ? 's' : '');
+}
+
+function escH(s) { return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function escJ(s) { return (s||'').replace(/\\/g,'\\\\').replace(/'/g,"\\'"); }
+
+function renderList() {
+  var cont = document.getElementById('insp-list');
+  var keys = Object.keys(DATA);
+  if (!keys.length) {
+    cont.innerHTML = '<p class="text-sm text-gray-500 text-center py-3">Toca una zona del vehículo para registrar daño.</p>';
+    return;
+  }
+  cont.innerHTML = '<div class="divide-y divide-gray-700/50">' +
+    keys.map(function(k) {
+      var d = DATA[k];
+      var c = TIPO_COLOR[d.tipo];
+      return '<div class="flex items-center gap-2 py-2">' +
+        '<span style="background:' + c + ';flex-shrink:0" class="w-2 h-2 rounded-full"></span>' +
+        '<span class="text-xs text-gray-300 w-36 flex-shrink-0 truncate" title="' + escH(zoneLabel(k)) + '">' + escH(zoneLabel(k)) + '</span>' +
+        '<span style="color:' + c + '" class="text-xs font-medium w-20 flex-shrink-0">' + TIPO_LABEL[d.tipo] + '</span>' +
+        '<input type="text" class="flex-1 min-w-0 bg-gray-700 border border-gray-600 rounded px-2 py-0.5 text-xs text-white focus:border-cyan-400 focus:outline-none"' +
+        ' placeholder="Descripción…" value="' + escH(d.desc) + '"' +
+        ' oninput="DATA[\'' + escJ(k) + '\'].desc=this.value">' +
+        '<button type="button" onclick="removeZone(\'' + escJ(k) + '\')" class="text-gray-500 hover:text-red-400 text-lg leading-none ml-1 flex-shrink-0">&times;</button>' +
+        '</div>';
+    }).join('') + '</div>';
+}
+
+function removeZone(k) {
+  delete DATA[k];
+  updateBadge();
+  renderList();
+  updateAllVisuals();
+}
+
+function switchView(v) {
+  activeView = v;
+  document.querySelectorAll('.insp-tab').forEach(function(t) {
+    t.classList.toggle('on', t.getAttribute('data-view') === v);
+  });
+  var panels = { f:'pf', t:'pt', li:'pl', ld:'pl', i:'pi' };
+  document.querySelectorAll('#pf,#pt,#pl,#pi').forEach(function(p) { p.style.display='none'; });
+  document.getElementById(panels[v]).style.display = 'block';
+  if (v === 'li' || v === 'ld') {
+    latSide = v === 'li' ? 'izq' : 'der';
+    document.getElementById('lat-side-label').textContent = '◈ LADO ' + (latSide === 'izq' ? 'IZQUIERDO' : 'DERECHO');
+    refreshLatVisuals();
+  }
+}
+
+// Inject hidden fields before submit
+document.getElementById('form-inspeccion').addEventListener('submit', function() {
+  document.querySelectorAll('.dano-h').forEach(function(e) { e.remove(); });
+  var i = 0;
+  Object.keys(DATA).forEach(function(k) {
+    var d = DATA[k];
+    var zona, desc;
+    if (k.indexOf('::') !== -1) {
+      zona = 'interior';
+      desc = d.desc || k.split('::')[1];
+    } else {
+      zona = k;
+      desc = d.desc || '';
+    }
+    [['zona_'+i, zona], ['tipo_dano_'+i, d.tipo], ['descripcion_'+i, desc]].forEach(function(pair) {
+      var inp = document.createElement('input');
+      inp.type = 'hidden'; inp.name = pair[0]; inp.value = pair[1]; inp.className = 'dano-h';
+      document.getElementById('form-inspeccion').appendChild(inp);
+    });
+    i++;
+  });
+});
+
+// ===== COMBUSTIBLE =====
 function setCombustible(val) {
   document.getElementById('id_combustible').value = val;
-  document.querySelectorAll('.fuel-btn').forEach(btn => {
-    const isSelected = btn.dataset.val === val;
+  document.querySelectorAll('.fuel-btn').forEach(function(btn) {
+    var sel = btn.dataset.val === val;
     btn.className = btn.className
       .replace(/border-cyan-400 bg-cyan-400\/30 text-cyan-200/g, '')
       .replace(/border-gray-600 bg-gray-700\/50 text-gray-400/g, '')
       .trim();
-    btn.classList.add(
-      ...(isSelected
-        ? ['border-cyan-400', 'bg-cyan-400/30', 'text-cyan-200']
-        : ['border-gray-600', 'bg-gray-700/50', 'text-gray-400'])
-    );
+    btn.classList.add.apply(btn.classList, sel
+      ? ['border-cyan-400', 'bg-cyan-400/30', 'text-cyan-200']
+      : ['border-gray-600', 'bg-gray-700/50', 'text-gray-400']);
   });
 }
 
+// ===== FOTOS =====
 function previsualizarFotos(input) {
-  const cont = document.getElementById('previews');
+  var cont = document.getElementById('previews');
   cont.innerHTML = '';
-  Array.from(input.files).slice(0, 10).forEach((file, i) => {
-    const div = document.createElement('div');
+  Array.from(input.files).slice(0, 10).forEach(function(file) {
+    var div = document.createElement('div');
     div.className = 'relative rounded-lg overflow-hidden bg-gray-700 aspect-square';
     if (file.type.startsWith('video/')) {
-      div.innerHTML = `<div class="w-full h-full flex items-center justify-center text-3xl">🎥</div>
-                       <p class="absolute bottom-0 left-0 right-0 text-center text-xs text-gray-300 bg-black/50 py-0.5 truncate">${file.name}</p>`;
+      div.innerHTML = '<div class="w-full h-full flex items-center justify-center text-3xl">🎥</div>' +
+                      '<p class="absolute bottom-0 left-0 right-0 text-center text-xs text-gray-300 bg-black/50 py-0.5 truncate">' + escH(file.name) + '</p>';
     } else {
-      const url = URL.createObjectURL(file);
-      div.innerHTML = `<img src="${url}" class="w-full h-full object-cover">`;
+      var url = URL.createObjectURL(file);
+      div.innerHTML = '<img src="' + url + '" class="w-full h-full object-cover">';
     }
     cont.appendChild(div);
   });

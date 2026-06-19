@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'taller/css/workspace_search.css' %}?v=20260512">
+<link rel="stylesheet" href="{% static 'taller/css/workspace_search.css' %}?v={{ STATIC_VERSION }}">
 {% endblock %}
 
 {% block content %}
@@ -17,61 +17,81 @@
   data-base-prefix="{{ workspace_base_prefix|default:'/cl/es' }}"
   data-min-chars="2"
 >
-  <header class="workspace-header">
-    <div class="workspace-header-copy">
-      <p class="workspace-meta">
-        {{ workspace_company_name|default:company_name|default:'eGarage' }}
-      </p>
-      <h1 class="workspace-title">
-        {% if request.LANGUAGE_CODE == 'en' %}Workspace{% else %}Workspace{% endif %}
-      </h1>
-    </div>
-    <div class="workspace-header-actions">
-      <span class="workspace-keyhint">/</span>
-      <span class="workspace-keyhint">Ctrl+K</span>
-    </div>
-  </header>
+  {% include "taller/partials/header_workspace.html" %}
 
-  <div class="workspace-search-panel">
-    <label class="workspace-search-label" for="workspace-live-search">
-      {% if request.LANGUAGE_CODE == 'en' %}Vehicle or customer{% else %}Vehículo o cliente{% endif %}
-    </label>
-    <div class="workspace-search-input-wrap">
-      <span class="workspace-search-icon" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none">
-          <path d="M10.5 18a7.5 7.5 0 1 1 5.303-2.197L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </span>
-      <input
-        id="workspace-live-search"
-        class="workspace-search-input"
-        type="search"
-        autocomplete="off"
-        spellcheck="false"
-        role="combobox"
-        aria-autocomplete="list"
-        aria-expanded="false"
-        aria-controls="workspace-search-dropdown"
-        placeholder="{% if request.LANGUAGE_CODE == 'en' %}Search plate, VIN, name, phone or email{% else %}Busca patente, VIN, nombre, teléfono o correo{% endif %}"
-        data-search-input
-      >
-      <button type="button" class="workspace-search-shortcut" data-search-shortcut aria-label="{% if request.LANGUAGE_CODE == 'en' %}Focus search{% else %}Enfocar búsqueda{% endif %}">
-        <span>/</span>
-      </button>
+  <div class="workspace-action-grid">
+
+    <div class="workspace-search-card">
+      <div class="wsc-header">
+        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+        <span>buscar vehículo o cliente</span>
+      </div>
+
+      <div class="workspace-search-panel">
+        <label class="workspace-search-label" for="workspace-live-search">
+          {% if request.LANGUAGE_CODE == 'en' %}Vehicle or customer{% else %}Vehículo o cliente{% endif %}
+        </label>
+        <div class="workspace-search-input-wrap">
+          <span class="workspace-search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path d="M10.5 18a7.5 7.5 0 1 1 5.303-2.197L21 21" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <input
+            id="workspace-live-search"
+            class="workspace-search-input"
+            type="search"
+            autocomplete="off"
+            spellcheck="false"
+            role="combobox"
+            aria-autocomplete="list"
+            aria-expanded="false"
+            aria-controls="workspace-search-dropdown"
+            placeholder="{% if request.LANGUAGE_CODE == 'en' %}Search plate, VIN, name, phone or email{% else %}Busca patente, VIN, nombre, teléfono o correo{% endif %}"
+            data-search-input
+          >
+          <button type="button" class="workspace-search-shortcut" data-search-shortcut aria-label="{% if request.LANGUAGE_CODE == 'en' %}Focus search{% else %}Enfocar búsqueda{% endif %}">
+            <span>/</span>
+          </button>
+        </div>
+
+        <div
+          id="workspace-search-dropdown"
+          class="workspace-search-dropdown"
+          role="listbox"
+          aria-label="{% if request.LANGUAGE_CODE == 'en' %}Live search results{% else %}Resultados de búsqueda en vivo{% endif %}"
+          data-search-dropdown
+          hidden
+        >
+          <div class="workspace-search-content" data-search-content></div>
+        </div>
+
+        <div class="workspace-sr-only" aria-live="polite" data-search-live></div>
+      </div>
+
+      <p class="wsc-hint">la acción que más vas a usar, todo el día</p>
     </div>
 
-    <div
-      id="workspace-search-dropdown"
-      class="workspace-search-dropdown"
-      role="listbox"
-      aria-label="{% if request.LANGUAGE_CODE == 'en' %}Live search results{% else %}Resultados de búsqueda en vivo{% endif %}"
-      data-search-dropdown
-      hidden
-    >
-      <div class="workspace-search-content" data-search-content></div>
-    </div>
+    <a href="{{ workspace_base_prefix|default:'/cl/es' }}/workspace/centro-de-mando/" class="workspace-cdm-card">
+      <div class="cdm-card-header">
+        <span class="cdm-dot"></span>
+        <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
+        <span>centro de mando</span>
+      </div>
+      <div class="cdm-card-metric">
+        <span id="cdm-live-count">—</span>
+        <span class="cdm-metric-label">en el taller</span>
+      </div>
+      <svg id="cdm-sparkline" viewBox="0 0 100 24" preserveAspectRatio="none" class="cdm-sparkline">
+        <polyline points="" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <div class="cdm-card-footer">
+        <span class="cdm-pulse"></span>
+        <span>en vivo · ver detalle</span>
+        <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+      </div>
+    </a>
 
-    <div class="workspace-sr-only" aria-live="polite" data-search-live></div>
   </div>
 </section>
 {% endblock %}
@@ -97,5 +117,6 @@
     resultsLabel: "{% if request.LANGUAGE_CODE == 'en' %}results{% else %}resultados{% endif %}"
   };
 </script>
-<script src="{% static 'taller/js/workspace_search.js' %}?v=20260512"></script>
+<script src="{% static 'taller/js/workspace_search.js' %}?v={{ STATIC_VERSION }}"></script>
+<script src="{% static 'taller/js/workspace_live_kpi.js' %}?v={{ STATIC_VERSION }}"></script>
 {% endblock %}

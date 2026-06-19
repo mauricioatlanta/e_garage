@@ -1,17 +1,17 @@
 .workspace-shell {
     max-width: 980px;
     margin: 0 auto;
-    padding: 1rem 0.9rem 2rem;
+    padding: 0.5rem 0.75rem 1.5rem;
     color: #e5eef9;
     font-family: "Space Grotesk", "Segoe UI", "Helvetica Neue", sans-serif;
 }
 
 .workspace-header {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     justify-content: space-between;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+    margin-bottom: 0.4rem;
 }
 
 .workspace-header-copy {
@@ -19,41 +19,165 @@
 }
 
 .workspace-meta {
-    margin: 0 0 0.15rem;
+    margin: 0 0 0.1rem;
     color: #8ca0b8;
-    font-size: 0.78rem;
+    font-size: 0.69rem;
     font-weight: 500;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
 }
 
 .workspace-title {
     margin: 0;
     color: #f8fbff;
-    font-size: clamp(1.5rem, 3vw, 1.85rem);
-    font-weight: 650;
-    line-height: 1.05;
+    font-size: 0.94rem;
+    font-weight: 500;
+    line-height: 1.2;
 }
 
 .workspace-header-actions {
     display: flex;
     align-items: center;
-    gap: 0.35rem;
+    gap: 0.5rem;
     flex-wrap: wrap;
 }
 
-.workspace-keyhint {
+.workspace-keyhint-mini {
     display: inline-flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    min-height: 1.75rem;
-    padding: 0 0.55rem;
-    border: 1px solid rgba(140, 160, 184, 0.22);
-    border-radius: 0.55rem;
-    background: rgba(15, 23, 42, 0.55);
-    color: #9fb2c8;
-    font-size: 0.76rem;
-    font-weight: 600;
+    gap: 2px;
+    color: #6f8898;
+    cursor: default;
+}
+
+.workspace-keyhint-mini i {
+    font-size: 0.8rem;
+}
+
+.workspace-keyhint-label {
+    font-size: 0.625rem;
+    line-height: 1;
+    color: #6f8898;
+    letter-spacing: 0.02em;
+}
+
+/* ─── Action grid (search card + CDM card) ──────────────────────────────── */
+.workspace-action-grid {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 10px;
+    margin: 10px 0 14px;
+}
+
+@media (max-width: 640px) {
+    .workspace-action-grid { grid-template-columns: 1fr; }
+}
+
+.workspace-search-card {
+    background: #0f2330;
+    border: 0.5px solid rgba(93, 202, 165, 0.35);
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.wsc-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: #9fe1cb;
+    margin-bottom: 10px;
+}
+
+.wsc-header i { color: #5dcaa5; font-size: 16px; }
+
+.wsc-hint { margin: 10px 0 0; font-size: 10px; color: #46606f; }
+
+/* ─── CDM card (violet) ─────────────────────────────────────────────────── */
+.workspace-cdm-card {
+    --cdm-violet: #7f77dd;
+    --cdm-violet-text: #cecbf6;
+    --cdm-violet-dim: #8a83c9;
+    background: #150f2e;
+    border: 0.5px solid rgba(127, 119, 221, 0.4);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    text-decoration: none;
+    color: var(--cdm-violet-text);
+    transition: border-color 140ms ease;
+}
+
+.workspace-cdm-card:hover {
+    border-color: rgba(127, 119, 221, 0.7);
+    text-decoration: none;
+}
+
+.cdm-card-header {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    margin-bottom: 8px;
+}
+
+.cdm-card-header i { font-size: 15px; }
+
+.cdm-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--cdm-violet);
+    display: inline-block;
+}
+
+.cdm-card-metric {
+    display: flex;
+    align-items: baseline;
+    gap: 5px;
+    margin: 2px 0;
+}
+
+.cdm-card-metric span:first-child {
+    font-size: 26px;
+    font-weight: 500;
+    color: #eeedfe;
+}
+
+.cdm-metric-label { font-size: 11px; color: var(--cdm-violet); }
+
+.cdm-sparkline {
+    width: 100%;
+    height: 20px;
+    margin: 4px 0 8px;
+    color: var(--cdm-violet);
+}
+
+.cdm-card-footer {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: auto;
+    font-size: 10px;
+    color: var(--cdm-violet-dim);
+}
+
+.cdm-card-footer i { margin-left: auto; }
+
+.cdm-pulse {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--cdm-violet);
+    display: inline-block;
+    animation: cdm-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes cdm-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.3; }
 }
 
 .workspace-search-panel {

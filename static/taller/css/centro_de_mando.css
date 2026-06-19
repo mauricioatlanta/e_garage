@@ -1,0 +1,185 @@
+/* ─── Centro de Mando — design tokens ──────────────────────────────────── */
+.cdm-shell {
+  --cdm-bg:        #0a1929;
+  --cdm-bg2:       #0d1f2f;
+  --cdm-card-bg:   #102236;
+  --cdm-border:    rgba(255,255,255,.06);
+  --cdm-text:      #eaf6f1;
+  --cdm-muted:     #6f8898;
+  --cdm-teal:      #5dcaa5;
+  --cdm-teal-dim:  #1d9e75;
+  --cdm-amber:     #fac775;
+  --cdm-avatar-bg: #1c3548;
+  --cdm-avatar-fg: #9fb4c4;
+  --cdm-radius:    8px;
+}
+
+/* ─── Shell ─────────────────────────────────────────────────────────────── */
+.cdm-shell {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 0.5rem 0.75rem 1.5rem;
+  color: var(--cdm-text);
+  font-family: "Space Grotesk", "Segoe UI", "Helvetica Neue", sans-serif;
+  background: var(--cdm-bg);
+  border-radius: 12px;
+}
+
+/* ─── Live badge ─────────────────────────────────────────────────────────── */
+.cdm-live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: var(--cdm-teal);
+  border: 0.5px solid var(--cdm-teal-dim);
+  border-radius: 8px;
+  padding: 3px 9px;
+}
+.cdm-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cdm-teal);
+  animation: cdm-pulse 1.6s ease-in-out infinite;
+}
+@keyframes cdm-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+
+/* ─── KPIs ───────────────────────────────────────────────────────────────── */
+.cdm-kpis {
+  display: flex;
+  gap: 10px;
+  margin: 14px 0;
+}
+.cdm-kpi {
+  background: var(--cdm-card-bg);
+  border-radius: var(--cdm-radius);
+  padding: 10px 14px;
+  flex: 1;
+}
+.cdm-kpi-label {
+  font-size: 11px;
+  color: var(--cdm-muted);
+  margin: 0 0 4px;
+}
+.cdm-kpi-value {
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--cdm-text);
+  margin: 0;
+}
+
+/* ─── Columns ────────────────────────────────────────────────────────────── */
+.cdm-columns {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 640px) {
+  .cdm-columns { grid-template-columns: 1fr; }
+}
+
+.cdm-column {
+  background: var(--cdm-bg2);
+  border-radius: var(--cdm-radius);
+  padding: 10px;
+}
+.cdm-column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.cdm-column-title-progreso {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cdm-amber);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.cdm-column-title-listo {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cdm-teal);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.cdm-job-list {
+  min-height: 60px;
+}
+
+/* ─── Cards ──────────────────────────────────────────────────────────────── */
+.cdm-card {
+  background: var(--cdm-card-bg);
+  border-radius: var(--cdm-radius);
+  padding: 8px 10px;
+  margin-bottom: 6px;
+  border: 1px solid var(--cdm-border);
+}
+.cdm-card-vehiculo {
+  font-size: 12px;
+  color: var(--cdm-text);
+  font-weight: 500;
+  margin: 0 0 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.cdm-card-patente {
+  font-size: 10px;
+  color: var(--cdm-muted);
+  margin: 0 0 6px;
+}
+.cdm-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.cdm-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--cdm-avatar-bg);
+  font-size: 9px;
+  color: var(--cdm-avatar-fg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.cdm-elapsed {
+  font-size: 11px;
+  color: var(--cdm-amber);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.03em;
+}
+.cdm-check {
+  color: var(--cdm-teal);
+  font-size: 14px;
+}
+
+/* ─── Clickable card ─────────────────────────────────────────────────────── */
+a.cdm-card--link {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+}
+a.cdm-card--link:hover {
+  border-color: rgba(93, 202, 165, 0.4);
+  background: #153040;
+}
+a.cdm-card--link .cdm-card-vehiculo,
+a.cdm-card--link .cdm-card-patente {
+  color: inherit;
+}
+
+/* ─── Empty state ────────────────────────────────────────────────────────── */
+.cdm-empty {
+  font-size: 11px;
+  color: var(--cdm-muted);
+  text-align: center;
+  padding: 18px 0;
+}

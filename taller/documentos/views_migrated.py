@@ -1345,11 +1345,13 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
         while f"insp_zona_{i}" in self.request.POST:
             zona = self.request.POST.get(f"insp_zona_{i}", "").strip()
             tipo = self.request.POST.get(f"insp_tipo_dano_{i}", "").strip()
+            desc = self.request.POST.get(f"insp_descripcion_{i}", "").strip()
             if zona and tipo:
                 DanoInspeccion.objects.create(
                     inspeccion=inspeccion,
                     zona=zona,
                     tipo_dano=tipo,
+                    descripcion=desc,
                 )
             i += 1
 

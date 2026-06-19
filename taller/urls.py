@@ -3,9 +3,11 @@ from django.urls import include, path
 from django.views.generic import RedirectView
 
 from taller.views_ingreso import (
+    centro_de_mando,
     ingreso_buscar,
     ingreso_centro,
     panel_ingreso_vehiculo,
+    workspace_live_feed,
 )
 
 centro_trabajo = ingreso_centro
@@ -84,6 +86,8 @@ urlpatterns = [
     # Centro de Trabajo / Workspace (canonical /us/en/workspace/ y /us/es/workspace/)
     path("workspace/", centro_trabajo, name="centro_trabajo"),
     path("workspace/buscar/", centro_trabajo_buscar, name="centro_trabajo_buscar"),
+    path("workspace/live-feed/", workspace_live_feed, name="workspace_live_feed"),
+    path("workspace/centro-de-mando/", centro_de_mando, name="centro_de_mando"),
     # Desarmaduría: mapa interactivo, plantillas, piezas
     path("desarme/", include(("taller.urls_desarme", "desarme"), namespace="desarme")),
     # Centro de Ingreso Vehicular

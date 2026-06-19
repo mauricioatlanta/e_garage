@@ -7,9 +7,16 @@
 {% block page_subtitle %}{% trans "Yarda de desarmaduría · Gestión de vehículos y repuestos" %}{% endblock %}
 {% block page_icon %}🧩{% endblock %}
 
+{% block page_body_class %}eg-desarme-soft{% endblock %}
 {% block page_extra_css %}
 <style>
-  /* Navegación módulo: barra compacta, una sola franja con wrap */
+  /* ── Fondo más claro: apaga estrellas y cambia el negro a slate-800 ── */
+  .eg-desarme-soft { background-color: #1e293b !important; }
+  .eg-desarme-soft .stars,
+  .eg-desarme-soft .twinkling,
+  .eg-desarme-soft .clouds { opacity: 0.07 !important; animation-duration: 200s !important; }
+
+  /* ── Navegación módulo ── */
   .desarme-nav {
     display: flex;
     flex-wrap: wrap;
@@ -18,7 +25,7 @@
     margin-bottom: 0.5rem;
     margin-top: 0.35rem;
     padding-top: 0.35rem;
-    border-top: 1px solid rgba(34, 211, 238, 0.12);
+    border-top: 1px solid rgba(148, 163, 184, 0.15);
   }
   .desarme-nav a {
     padding: 0.28rem 0.65rem;
@@ -26,43 +33,46 @@
     font-size: 0.72rem;
     font-weight: 600;
     line-height: 1.2;
-    background: rgba(168, 85, 247, 0.18);
-    border: 1px solid rgba(168, 85, 247, 0.35);
-    color: #d8b4fe;
+    background: rgba(99, 102, 241, 0.15);
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    color: #a5b4fc;
     text-decoration: none;
     transition: border-color 0.15s, background 0.15s, color 0.15s;
   }
   .desarme-nav a:hover {
-    background: rgba(168, 85, 247, 0.32);
-    color: #f5e1ff;
-    border-color: rgba(168, 85, 247, 0.55);
+    background: rgba(99, 102, 241, 0.28);
+    color: #e0e7ff;
+    border-color: rgba(99, 102, 241, 0.5);
   }
   .desarme-nav a.active {
-    background: linear-gradient(135deg, #6d28d9, #9333ea);
-    border-color: rgba(192, 132, 252, 0.6);
+    background: linear-gradient(135deg, #4338ca, #6366f1);
+    border-color: rgba(165, 180, 252, 0.5);
     color: #fff;
   }
+
+  /* ── KPI grid ── */
   .kpi-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     gap: 0.5rem;
   }
   .kpi-card {
-    background: rgba(0, 0, 0, 0.35);
-    border: 1px solid rgba(168, 85, 247, 0.28);
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(148, 163, 184, 0.18);
     border-radius: 10px;
     padding: 0.55rem 0.5rem;
     text-align: center;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   }
   .kpi-card:hover {
-    border-color: rgba(168, 85, 247, 0.5);
-    box-shadow: 0 2px 14px rgba(168, 85, 247, 0.12);
+    background: rgba(255, 255, 255, 0.11);
+    border-color: rgba(99, 102, 241, 0.4);
+    box-shadow: 0 2px 12px rgba(99, 102, 241, 0.1);
   }
   .kpi-value {
     font-size: 1.35rem;
     font-weight: 800;
-    color: #c084fc;
+    color: #818cf8;
     line-height: 1.15;
   }
   .kpi-label {
@@ -72,16 +82,18 @@
     letter-spacing: 0.04em;
     margin-top: 0.15rem;
   }
+
+  /* ── Chart boxes ── */
   .chart-box {
-    background: rgba(0, 0, 0, 0.28);
-    border: 1px solid rgba(168, 85, 247, 0.22);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(148, 163, 184, 0.15);
     border-radius: 10px;
     padding: 0.65rem 0.75rem;
     margin-bottom: 0.5rem;
   }
   .chart-box h3 {
     font-size: 0.8rem;
-    color: #c084fc;
+    color: #a5b4fc;
     margin-bottom: 0.4rem;
     font-weight: 600;
   }
@@ -90,13 +102,10 @@
     height: 130px;
     max-height: 140px;
   }
-  .chart-box canvas {
-    max-height: 140px;
-  }
-  .desarme-table {
-    width: 100%;
-    font-size: 0.8125rem;
-  }
+  .chart-box canvas { max-height: 140px; }
+
+  /* ── Tabla ── */
+  .desarme-table { width: 100%; font-size: 0.8125rem; }
   .desarme-table th {
     text-align: left;
     padding: 0.35rem 0.5rem;
@@ -109,30 +118,24 @@
   .desarme-table td {
     color: #e2e8f0;
     padding: 0.35rem 0.5rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
   }
-  .desarme-table tr:hover td {
-    background: rgba(168, 85, 247, 0.05);
-  }
-  .desarme-table a {
-    color: #67e8f9;
-  }
-  .desarme-table a:hover {
-    text-decoration: underline;
-  }
-  .badge-mini {
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 9999px;
-  }
-  .badge-mini.disp { background: rgba(34, 197, 94, 0.3); color: #86efac; }
-  .badge-mini.rese { background: rgba(234, 179, 8, 0.3); color: #fde047; }
-  .badge-mini.vend { background: rgba(59, 130, 246, 0.3); color: #93c5fd; }
-  .badge-mini.dana { background: rgba(239, 68, 68, 0.3); color: #fca5a5; }
-  .badge-mini.scra { background: rgba(107, 114, 128, 0.4); color: #d1d5db; }
+  .desarme-table tr:hover td { background: rgba(99, 102, 241, 0.06); }
+  .desarme-table a { color: #67e8f9; }
+  .desarme-table a:hover { text-decoration: underline; }
+
+  /* ── Badges ── */
+  .badge-mini { font-size: 10px; padding: 2px 6px; border-radius: 9999px; }
+  .badge-mini.disp { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+  .badge-mini.rese { background: rgba(234, 179, 8, 0.2); color: #fde047; }
+  .badge-mini.vend { background: rgba(59, 130, 246, 0.2); color: #93c5fd; }
+  .badge-mini.dana { background: rgba(239, 68, 68, 0.2); color: #fca5a5; }
+  .badge-mini.scra { background: rgba(107, 114, 128, 0.3); color: #d1d5db; }
+
+  /* ── Section title ── */
   .section-title {
     font-size: 0.85rem;
-    color: #e2e8f0;
+    color: #cbd5e1;
     margin-bottom: 0.45rem;
     margin-top: 0.25rem;
     display: flex;
@@ -140,51 +143,44 @@
     gap: 0.35rem;
     font-weight: 600;
   }
-  .empty-chart {
-    color: #64748b;
-    font-size: 0.8rem;
-    padding: 1rem;
-    text-align: center;
-  }
-  .desarme-dash-subtitle {
-    display: block;
-  }
-  @media (max-width: 480px) {
-    .desarme-dash-subtitle {
-      display: none;
-    }
-  }
-  .desarme-dash-actions a {
-    padding-top: 0.35rem;
-    padding-bottom: 0.35rem;
-    font-size: 0.75rem;
-  }
-  /* Charts compact row */
+  .empty-chart { color: #64748b; font-size: 0.8rem; padding: 1rem; text-align: center; }
+
+  .desarme-dash-subtitle { display: block; }
+  @media (max-width: 480px) { .desarme-dash-subtitle { display: none; } }
+  .desarme-dash-actions a { padding-top: 0.35rem; padding-bottom: 0.35rem; font-size: 0.75rem; }
+
+  /* ── Charts row ── */
   .charts-row {
     display: grid;
     grid-template-columns: 220px 1fr;
     gap: 0.75rem;
     margin-bottom: 0.75rem;
   }
-  @media (max-width: 640px) {
-    .charts-row { grid-template-columns: 1fr; }
-  }
+  @media (max-width: 640px) { .charts-row { grid-template-columns: 1fr; } }
+
   .donut-widget {
-    background: rgba(0,0,0,0.28);
-    border: 1px solid rgba(168,85,247,0.22);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(148, 163, 184, 0.15);
     border-radius: 10px;
     padding: 0.65rem 0.7rem;
     display: flex;
     flex-direction: column;
     gap: 0.45rem;
   }
-  .donut-widget h3 { font-size: 0.75rem; color: #c084fc; font-weight: 600; margin: 0; }
+  .donut-widget h3 { font-size: 0.75rem; color: #a5b4fc; font-weight: 600; margin: 0; }
   .donut-canvas-wrap { position: relative; height: 110px; }
   .donut-metrics { display: flex; gap: 0.5rem; }
-  .donut-metric { flex: 1; background: rgba(168,85,247,0.1); border-radius: 6px; padding: 0.3rem 0.4rem; text-align: center; }
-  .donut-metric .val { font-size: 0.9rem; font-weight: 700; color: #c084fc; line-height: 1.2; }
+  .donut-metric {
+    flex: 1;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 6px;
+    padding: 0.3rem 0.4rem;
+    text-align: center;
+  }
+  .donut-metric .val { font-size: 0.9rem; font-weight: 700; color: #818cf8; line-height: 1.2; }
   .donut-metric .lbl { font-size: 0.6rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.03em; }
-  /* Vehicle cards */
+
+  /* ── Vehicle cards ── */
   .vehs-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
@@ -192,42 +188,45 @@
     margin-top: 0.1rem;
   }
   .veh-card {
-    background: rgba(0,0,0,0.32);
-    border: 1px solid rgba(168,85,247,0.22);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(148, 163, 184, 0.16);
     border-radius: 10px;
     padding: 0.6rem 0.75rem;
     display: flex;
     justify-content: space-between;
     align-items: stretch;
     gap: 0.6rem;
-    transition: border-color 0.2s, box-shadow 0.2s;
+    transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
   }
   .veh-card:hover {
-    border-color: rgba(168,85,247,0.45);
-    box-shadow: 0 2px 14px rgba(168,85,247,0.1);
+    background: rgba(255, 255, 255, 0.09);
+    border-color: rgba(99, 102, 241, 0.38);
+    box-shadow: 0 3px 16px rgba(99, 102, 241, 0.1);
   }
   .veh-card-left { flex: 1; min-width: 0; }
   .veh-card-right { display: flex; flex-direction: column; align-items: flex-end; justify-content: space-between; min-width: 90px; }
-  .veh-ident { font-size: 0.95rem; font-weight: 800; color: #e2e8f0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .veh-ident { font-size: 0.95rem; font-weight: 800; color: #f1f5f9; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .veh-model { font-size: 0.78rem; color: #94a3b8; margin-top: 0.1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .veh-pills { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.35rem; }
   .veh-pill { font-size: 0.62rem; padding: 2px 6px; border-radius: 9999px; line-height: 1.4; }
-  .veh-pill.repuestos { background: rgba(168,85,247,0.2); color: #d8b4fe; border: 1px solid rgba(168,85,247,0.3); }
-  .veh-pill.disp { background: rgba(34,197,94,0.15); color: #86efac; border: 1px solid rgba(34,197,94,0.25); }
-  .veh-pill.fecha { background: rgba(100,116,139,0.2); color: #94a3b8; border: 1px solid rgba(100,116,139,0.25); }
+  .veh-pill.repuestos { background: rgba(99, 102, 241, 0.18); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.28); }
+  .veh-pill.disp { background: rgba(34,197,94,0.13); color: #86efac; border: 1px solid rgba(34,197,94,0.22); }
+  .veh-pill.fecha { background: rgba(100,116,139,0.18); color: #94a3b8; border: 1px solid rgba(100,116,139,0.22); }
   .veh-card-links { margin-top: 0.4rem; display: flex; gap: 0.4rem; }
   .veh-card-links a { font-size: 0.7rem; color: #67e8f9; text-decoration: none; }
   .veh-card-links a:hover { text-decoration: underline; }
-  /* Ganancia badge */
+
+  /* ── Ganancia badge ── */
   .ganancia-badge { font-size: 0.72rem; font-weight: 700; padding: 3px 8px; border-radius: 9999px; white-space: nowrap; }
-  .ganancia-badge.pos { background: rgba(34,197,94,0.2); color: #86efac; border: 1px solid rgba(34,197,94,0.3); }
-  .ganancia-badge.neg { background: rgba(239,68,68,0.2); color: #fca5a5; border: 1px solid rgba(239,68,68,0.3); }
-  .ganancia-badge.neu { background: rgba(100,116,139,0.2); color: #94a3b8; border: 1px solid rgba(100,116,139,0.3); }
-  /* Progress bar */
+  .ganancia-badge.pos { background: rgba(34,197,94,0.18); color: #86efac; border: 1px solid rgba(34,197,94,0.28); }
+  .ganancia-badge.neg { background: rgba(239,68,68,0.18); color: #fca5a5; border: 1px solid rgba(239,68,68,0.28); }
+  .ganancia-badge.neu { background: rgba(148,163,184,0.15); color: #94a3b8; border: 1px solid rgba(148,163,184,0.25); }
+
+  /* ── Progress bar ── */
   .stock-bar-wrap { width: 100%; margin-top: 0.5rem; }
   .stock-bar-label { font-size: 0.62rem; color: #64748b; text-align: right; margin-bottom: 2px; }
-  .stock-bar-track { height: 5px; background: rgba(255,255,255,0.1); border-radius: 9999px; overflow: hidden; }
-  .stock-bar-fill { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, #a855f7, #7c3aed); transition: width 0.4s ease; }
+  .stock-bar-track { height: 5px; background: rgba(255,255,255,0.08); border-radius: 9999px; overflow: hidden; }
+  .stock-bar-fill { height: 100%; border-radius: 9999px; background: linear-gradient(90deg, #6366f1, #4f46e5); transition: width 0.4s ease; }
 </style>
 {% endblock %}
 
@@ -310,6 +309,12 @@
       <div class="veh-pills">
         <span class="veh-pill repuestos">📦 {{ item.repuestos_count }} {% trans "piezas" %}</span>
         {% if item.piezas_disponibles %}<span class="veh-pill disp">✓ {{ item.piezas_disponibles }} {% trans "disp." %}</span>{% endif %}
+        {% if v.color %}
+          <span class="veh-pill fecha" style="display:inline-flex;align-items:center;gap:4px;">
+            {% if v.color.hex %}<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:{{ v.color.hex }};border:1px solid rgba(255,255,255,0.25);flex-shrink:0;"></span>{% endif %}
+            {{ v.color.nombre }}
+          </span>
+        {% endif %}
         {% if v.fecha_ingreso_desarme %}<span class="veh-pill fecha">{{ v.fecha_ingreso_desarme|date:"d/m/y" }}</span>{% endif %}
       </div>
       <div class="veh-card-links">
@@ -405,7 +410,7 @@ document.addEventListener('DOMContentLoaded', function() {
         type: 'bar',
         data: {
           labels: dataBar.map(function(d) { return d.mes; }),
-          datasets: [{ label: 'Vehículos', data: dataBar.map(function(d) { return d.count; }), backgroundColor: 'rgba(168, 85, 247, 0.7)', borderColor: '#a855f7', borderWidth: 1 }]
+          datasets: [{ label: 'Vehículos', data: dataBar.map(function(d) { return d.count; }), backgroundColor: 'rgba(99, 102, 241, 0.65)', borderColor: '#6366f1', borderWidth: 1, borderRadius: 4 }]
         },
         options: {
           responsive: true,

@@ -27,6 +27,18 @@ def _country_ns_from_path(path: str) -> str:
         return "mexico"
     elif path.startswith("/mx/") or path == "/mx":
         return "mexico"
+    elif path.startswith("/ar/es/") or path == "/ar/es":
+        return "argentina_es"
+    elif path.startswith("/ar/") or path == "/ar":
+        return "argentina"
+    elif path.startswith("/ve/es/") or path == "/ve/es":
+        return "venezuela"
+    elif path.startswith("/ve/") or path == "/ve":
+        return "venezuela"
+    elif path.startswith("/pe/") or path == "/pe":
+        return "peru"
+    elif path.startswith("/br/") or path == "/br":
+        return "brasil"
     return "chile"
 
 
@@ -52,6 +64,14 @@ def _country_ns_from_empresa(empresa) -> str:
         return "chile"
     if pais == "MX" or country == "MX":
         return "mexico"
+    if pais == "AR" or country == "AR":
+        return "argentina"
+    if pais == "VE" or country == "VE":
+        return "venezuela"
+    if pais == "PE" or country == "PE":
+        return "peru"
+    if pais == "BR" or country == "BR":
+        return "brasil"
     return "chile"
 
 

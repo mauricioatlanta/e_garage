@@ -31,6 +31,7 @@ from taller.models.pieza_desarme import (
 )
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
 from taller.models.vehiculos import Vehiculo
+from taller.models.inspeccion_ingreso import DanoInspeccion, InspeccionIngreso
 from taller.models.vendedor_desarme import VendedorDesarme
 from taller.documentos.views_migrated import _reverse_with_request
 from .forms import PiezaDesarmeForm, VehiculoDesarmeForm
@@ -398,6 +399,37 @@ def lista_vehiculos(request):
     )
 
 
+def _guardar_danos_carroceria(request, vehiculo, empresa):
+    """Crea/reemplaza la InspeccionIngreso de un vehículo de desarme con los daños del POST."""
+    zonas = []
+    i = 0
+    while f"zona_{i}" in request.POST:
+        zona = request.POST.get(f"zona_{i}", "").strip()
+        tipo = request.POST.get(f"tipo_dano_{i}", "").strip()
+        desc = request.POST.get(f"descripcion_{i}", "").strip()
+        if zona and tipo:
+            zonas.append((zona, tipo, desc))
+        i += 1
+
+    if not zonas:
+        return
+
+    inspeccion, _ = InspeccionIngreso.objects.update_or_create(
+        vehiculo=vehiculo,
+        documento=None,
+        defaults={
+            "empresa": empresa,
+            "realizada_por": request.user,
+            "estado_inspeccion": "completada",
+        },
+    )
+    inspeccion.danos.all().delete()
+    DanoInspeccion.objects.bulk_create([
+        DanoInspeccion(inspeccion=inspeccion, zona=zona, tipo_dano=tipo, descripcion=desc)
+        for zona, tipo, desc in zonas
+    ])
+
+
 @login_required
 def crear_vehiculo(request):
     """Alta de vehículo de desarme."""
@@ -415,6 +447,7 @@ def crear_vehiculo(request):
                     vehiculo.tipo_uso = Vehiculo.TIPO_USO_DESARME
                     vehiculo.cliente = None
                     vehiculo.save()
+                    _guardar_danos_carroceria(request, vehiculo, empresa)
                 messages.success(
                     request, f"Vehículo de desarme {vehiculo.patente or vehiculo.vin} creado."
                 )
@@ -611,7 +644,9 @@ def editar_vehiculo(request, pk):
         form = VehiculoDesarmeForm(request.POST, request.FILES, instance=vehiculo, empresa=empresa)
         if form.is_valid():
             try:
-                form.save()
+                with transaction.atomic():
+                    form.save()
+                    _guardar_danos_carroceria(request, vehiculo, empresa)
                 messages.success(request, "Vehículo actualizado.")
                 return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/"))
             except IntegrityError:

@@ -15,6 +15,12 @@
     <div class="space-y-1 mb-2 text-xs text-gray-400">
       {% if v.estado_desarme %}<span>{{ v.estado_desarme }}</span>{% endif %}
       {% if v.ubicacion_fisica %}<span> · {{ v.ubicacion_fisica }}</span>{% endif %}
+      {% if v.color %}
+        <span style="display:inline-flex;align-items:center;gap:4px;margin-left:{% if v.estado_desarme or v.ubicacion_fisica %}4px{% else %}0{% endif %};">
+          {% if v.color.hex %}<span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:{{ v.color.hex }};border:1px solid rgba(255,255,255,0.25);flex-shrink:0;"></span>{% endif %}
+          {{ v.color.nombre }}
+        </span>
+      {% endif %}
     </div>
     <div class="mb-3">
       <span class="ganancia-vehiculo {% if v.ganancia >= 0 %}positiva{% else %}negativa{% endif %}" title="{% trans 'Ingresos por repuestos vendidas menos costo del vehículo' %}">
