@@ -519,11 +519,41 @@
                 </div>
 
                 <!-- Firma cliente -->
-                <label style="display:flex;align-items:center;gap:6px;cursor:pointer">
+                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;margin-bottom:10px">
                   <input type="checkbox" name="insp_firma_cliente" value="1"
                          style="width:14px;height:14px;accent-color:#06b6d4">
                   <span style="font-size:11px;color:#cbd5e1">Cliente confirmó la inspección</span>
                 </label>
+
+                <!-- Enviar reporte al cliente -->
+                <div style="border-top:1px solid rgba(6,182,212,.15);padding-top:10px">
+                  <p style="font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#67e8f9;margin:0 0 8px">Enviar reporte al cliente</p>
+
+                  <!-- WhatsApp -->
+                  <div id="di-wa-wrap" style="margin-bottom:8px">
+                    <a id="di-btn-wa" href="#" target="_blank" rel="noopener noreferrer"
+                       style="display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:8px;background:#16a34a;color:#fff;font-size:11px;font-weight:700;border-radius:6px;text-decoration:none;transition:background .15s"
+                       onmouseover="this.style.background='#15803d'" onmouseout="this.style.background='#16a34a'">
+                      <svg style="width:14px;height:14px;flex-shrink:0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                      </svg>
+                      Enviar por WhatsApp
+                    </a>
+                    <p id="di-wa-notel" style="display:none;font-size:10px;color:#475569;margin:4px 0 0">Sin teléfono registrado — no disponible</p>
+                  </div>
+
+                  <!-- Email -->
+                  <div style="display:flex;gap:6px;align-items:center">
+                    <input type="email" name="insp_enviar_email" id="di-insp-email"
+                           placeholder="correo@cliente.com"
+                           style="flex:1;padding:6px 8px;background:#1e293b;border:1px solid #334155;border-radius:5px;color:#f1f5f9;font-size:11px">
+                    <label style="display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap">
+                      <input type="checkbox" name="insp_enviar_email_check" id="di-insp-email-check"
+                             style="width:13px;height:13px;accent-color:#06b6d4">
+                      <span style="font-size:10px;color:#94a3b8">Enviar al guardar</span>
+                    </label>
+                  </div>
+                </div>
 
               </div><!-- /inspeccion-campos -->
             </div><!-- /inspeccion-body -->
@@ -1525,6 +1555,105 @@ window.DESARME_PREFILL = window.DESARME_PREFILL || {% if has_server_line_items %
       cont.appendChild(div);
     });
   };
+
+  /* ── WhatsApp + email en inspección embebida ── */
+  (function () {
+    var PAIS = "{{ empresa.pais|default:'CL'|escapejs }}";
+    var EMPRESA_NOMBRE = "{{ empresa.nombre_taller|escapejs }}";
+    var DIAL = {'CL':'56','US':'1','MX':'52','AR':'54','UY':'598','BR':'55','PE':'51','VE':'58'};
+
+    function normalizeTel(raw) {
+      raw = (raw || '').replace(/[^\d]/g, '');
+      if (!raw) return '';
+      var code = DIAL[PAIS] || '56';
+      if (raw.startsWith(code)) return raw;
+      return code + raw.replace(/^0+/, '');
+    }
+
+    function buildDiWaUrl(tel) {
+      var vehiculoEl = document.getElementById('vehiculo-nombre') || document.querySelector('[id*="vehiculo"]');
+      var vehiculo = vehiculoEl ? vehiculoEl.textContent.trim() : 'vehículo';
+      var now = new Date();
+      var fecha = now.toLocaleDateString('es-CL') + ' ' + now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
+      var selComb = document.getElementById('id_insp_combustible');
+      var comb = selComb ? (selComb.options[selComb.selectedIndex] || {}).text || '' : '';
+      var kmEl = document.querySelector('[name="kilometraje_ingreso"]');
+      var km = kmEl ? kmEl.value : '';
+
+      var msg = '*Inspección de Ingreso – ' + EMPRESA_NOMBRE + '*\n';
+      msg += 'Vehículo: ' + vehiculo + '\n';
+      msg += 'Fecha: ' + fecha + '\n';
+      if (km) msg += 'Kilometraje: ' + parseInt(km).toLocaleString('es-CL') + ' km\n';
+      if (comb) msg += 'Combustible: ' + comb + '\n';
+      msg += '\nDaños preexistentes:\n';
+
+      var data = (typeof DI_DATA !== 'undefined') ? DI_DATA : {};
+      var keys = Object.keys(data);
+      var labels = (typeof DI_ZLABELS !== 'undefined') ? DI_ZLABELS : {};
+      if (keys.length === 0) {
+        msg += '  Sin daños registrados\n';
+      } else {
+        keys.forEach(function(k) {
+          var d = data[k];
+          var zonaKey = k.indexOf('::') !== -1 ? k.split('::')[1] : k;
+          msg += '  • ' + (labels[zonaKey] || zonaKey) + ' → ' + (d.tipo || '');
+          if (d.desc) msg += ': ' + d.desc;
+          msg += '\n';
+        });
+      }
+      var obs = (document.querySelector('[name="insp_observaciones"]') || {}).value || '';
+      if (obs) msg += '\nObservaciones:\n' + obs + '\n';
+      msg += '\nEste reporte fue generado al momento de la recepción del vehículo.';
+      return 'https://wa.me/' + tel + '?text=' + encodeURIComponent(msg);
+    }
+
+    function refreshDiWa() {
+      var telEl = document.getElementById('cliente-telefono');
+      var rawTel = telEl ? telEl.textContent.replace(/^Tel:\s*/,'').trim() : '';
+      var tel = normalizeTel(rawTel);
+      var btnWa = document.getElementById('di-btn-wa');
+      var noTel = document.getElementById('di-wa-notel');
+      if (!btnWa) return;
+      if (tel) {
+        btnWa.style.display = '';
+        if (noTel) noTel.style.display = 'none';
+        btnWa.href = buildDiWaUrl(tel);
+      } else {
+        btnWa.style.display = 'none';
+        if (noTel) noTel.style.display = '';
+      }
+      /* Pre-fill email */
+      var emailEl = document.getElementById('di-insp-email');
+      var emailCheck = document.getElementById('di-insp-email-check');
+      if (emailEl && !emailEl.value) {
+        var clienteEmailEl = document.getElementById('cliente-email');
+        var rawEmail = clienteEmailEl ? clienteEmailEl.textContent.replace(/^Email:\s*/,'').trim() : '';
+        if (rawEmail) {
+          emailEl.value = rawEmail;
+          if (emailCheck) emailCheck.checked = true;
+        }
+      }
+    }
+
+    /* Actualizar WA al hacer click (captura datos actuales) */
+    var btnWa = document.getElementById('di-btn-wa');
+    if (btnWa) {
+      btnWa.addEventListener('click', function() {
+        var telEl = document.getElementById('cliente-telefono');
+        var tel = normalizeTel((telEl ? telEl.textContent.replace(/^Tel:\s*/,'') : '').trim());
+        if (tel) this.href = buildDiWaUrl(tel);
+      });
+    }
+
+    /* Observar cambios en #cliente-telefono (se actualiza al elegir cliente) */
+    var obs = new MutationObserver(refreshDiWa);
+    var clienteTelEl = document.getElementById('cliente-telefono');
+    if (clienteTelEl) obs.observe(clienteTelEl, {childList:true, subtree:true, characterData:true});
+    var clienteEmailEl = document.getElementById('cliente-email');
+    if (clienteEmailEl) obs.observe(clienteEmailEl, {childList:true, subtree:true, characterData:true});
+
+    refreshDiWa();
+  }());
 })();
 </script>
 {% endblock extra_js %}

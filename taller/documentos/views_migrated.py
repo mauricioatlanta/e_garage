@@ -1363,6 +1363,22 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Cre
                 archivo=archivo,
             )
 
+        # Email opcional al guardar
+        email_destino = self.request.POST.get("insp_enviar_email", "").strip()
+        if email_destino and self.request.POST.get("insp_enviar_email_check"):
+            from taller.documentos.views_inspeccion import _generar_texto_inspeccion
+            from taller.utils.email_helper import send_email_with_reply_to
+            texto = _generar_texto_inspeccion(inspeccion, documento.empresa.nombre_taller).replace("*", "")
+            try:
+                send_email_with_reply_to(
+                    subject=f"Inspección de ingreso – {inspeccion.vehiculo}",
+                    message=texto,
+                    recipient_list=[email_destino],
+                    fail_silently=True,
+                )
+            except Exception:
+                pass
+
     def form_valid_legacy(self, form):
         form.instance.empresa = self.request.empresa
         try:
