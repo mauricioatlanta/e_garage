@@ -63,6 +63,7 @@ def inventario_inteligente(request, pk):
                 "stock": int(p.cantidad or 0),
                 "vehiculo": str(vehiculo),
                 "imagen": "",
+                "estado_pieza": p.estado_pieza,
                 "vendible": (
                     p.activo
                     and p.cantidad > 0

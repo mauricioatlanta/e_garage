@@ -399,6 +399,79 @@ def lista_vehiculos(request):
     )
 
 
+# Mapeo zona de inspección → códigos de catálogo afectados (legacy CL/MX y USA)
+_ZONA_A_CODIGOS = {
+    "capo":           ["CAR-01", "hood"],
+    "maletero":       ["CAR-07", "trunk_lid"],
+    "puerta_di":      ["CAR-02"],
+    "puerta_dd":      ["CAR-03"],
+    "puerta_ti":      ["CAR-04"],
+    "puerta_td":      ["CAR-05"],
+    "parachoque_del": ["CAR-08", "front_bumper_cover"],
+    "parachoque_tra": ["CAR-09", "rear_bumper_cover"],
+    "guardabarro_di": ["CAR-10", "fender"],
+    "guardabarro_dd": ["CAR-11"],
+    "guardabarro_ti": [],
+    "guardabarro_td": [],
+    "espejo_i":       ["CAR-14", "side_mirror"],
+    "espejo_d":       ["CAR-15"],
+    "vidrio_del":     ["CAR-16"],
+    "vidrio_tra":     ["CAR-17"],
+    "faro_di":        ["ILU-01", "headlight_left"],
+    "faro_dd":        ["ILU-02", "headlight_right"],
+    "faro_ti":        ["ILU-03", "tail_light_left"],
+    "faro_td":        ["ILU-04", "tail_light_right"],
+    "parrilla":       [],
+    "techo":          [],
+    "interior":       [],
+}
+
+# Tipos de daño que dejan la pieza no vendible
+_TIPOS_EXCLUIR = {"faltante", "rotura", "golpe", "corrosion"}
+
+# Todos los códigos gestionados automáticamente
+_TODOS_CODIGOS = list({c for codes in _ZONA_A_CODIGOS.values() for c in codes})
+
+
+def _sincronizar_estado_piezas(vehiculo, empresa, zonas):
+    """
+    Actualiza estado_pieza de PiezaDesarme según daños de la inspección.
+    - faltante  → FALTANTE
+    - rotura/golpe/corrosion → DANADA
+    - zonas sin daño crítico → vuelven a DISPONIBLE
+    zonas: list of (zona_code, tipo_dano, descripcion)
+    """
+    # Construir mapa código → estado destino
+    codigos_nuevo_estado = {}
+    for zona, tipo, _ in zonas:
+        for codigo in _ZONA_A_CODIGOS.get(zona, []):
+            if tipo == "faltante":
+                codigos_nuevo_estado[codigo] = ESTADO_FALTANTE
+            elif tipo in _TIPOS_EXCLUIR:
+                if codigos_nuevo_estado.get(codigo) != ESTADO_FALTANTE:
+                    codigos_nuevo_estado[codigo] = ESTADO_DANADA
+
+    # Resetear piezas que ya no tienen daño crítico (solo si están en DANADA o FALTANTE)
+    codigos_a_resetear = [c for c in _TODOS_CODIGOS if c not in codigos_nuevo_estado]
+    if codigos_a_resetear:
+        PiezaDesarme.objects.filter(
+            vehiculo=vehiculo,
+            empresa=empresa,
+            codigo__in=codigos_a_resetear,
+            estado_pieza__in=[ESTADO_DANADA, ESTADO_FALTANTE],
+        ).update(estado_pieza=ESTADO_DISPONIBLE)
+
+    # Aplicar estados nuevos
+    for codigo, estado in codigos_nuevo_estado.items():
+        PiezaDesarme.objects.filter(
+            vehiculo=vehiculo,
+            empresa=empresa,
+            codigo=codigo,
+        ).exclude(
+            estado_pieza__in=[ESTADO_VENDIDA, ESTADO_SCRAP],  # no tocar vendidas/scrap
+        ).update(estado_pieza=estado)
+
+
 def _guardar_danos_carroceria(request, vehiculo, empresa):
     """Crea/reemplaza la InspeccionIngreso de un vehículo de desarme con los daños del POST."""
     zonas = []
@@ -410,6 +483,9 @@ def _guardar_danos_carroceria(request, vehiculo, empresa):
         if zona and tipo:
             zonas.append((zona, tipo, desc))
         i += 1
+
+    # Sincronizar estados de piezas (incluso si zonas está vacío → resetea todo)
+    _sincronizar_estado_piezas(vehiculo, empresa, zonas)
 
     if not zonas:
         return
