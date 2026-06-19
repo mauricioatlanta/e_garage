@@ -98,6 +98,8 @@ def crear_inspeccion_ingreso(request, documento_id):
     empresa = request.user.empresa
     documento = get_object_or_404(Documento, pk=documento_id, empresa=empresa)
 
+    empresa_nombre = empresa.nombre_taller
+
     # Si ya existe, redirigir al detalle
     if hasattr(documento, "inspeccion_ingreso"):
         url = reverse_country_url(request, "documentos:ver_inspeccion_ingreso", documento.inspeccion_ingreso.pk)
@@ -143,27 +145,32 @@ def crear_inspeccion_ingreso(request, documento_id):
                 descripcion=desc,
             )
 
-        messages.success(request, "Inspección de ingreso registrada.")
+        # Enviar email si se solicitó
+        email_destino = request.POST.get("enviar_email", "").strip()
+        if email_destino and request.POST.get("enviar_email_check"):
+            texto = _generar_texto_inspeccion(inspeccion, empresa_nombre).replace("*", "")
+            try:
+                send_email_with_reply_to(
+                    subject=f"Inspección de ingreso – {inspeccion.vehiculo}",
+                    message=texto,
+                    recipient_list=[email_destino],
+                    fail_silently=True,
+                )
+                messages.success(request, f"Inspección registrada y enviada por correo a {email_destino}.")
+            except Exception:
+                messages.success(request, "Inspección de ingreso registrada.")
+                messages.warning(request, "No se pudo enviar el correo al cliente.")
+        else:
+            messages.success(request, "Inspección de ingreso registrada.")
+
         url = reverse_country_url(request, "documentos:ver_inspeccion_ingreso", inspeccion.pk)
         return redirect(url)
 
     cliente = documento.cliente
     pais = getattr(empresa, "pais", "CL")
-    empresa_nombre = empresa.nombre_taller
 
-    # Pre-armar el link de WhatsApp aunque la inspección aún no exista,
-    # para que el técnico pueda avisar al cliente que la está registrando.
-    whatsapp_url_previo = None
     telefono_cliente = getattr(cliente, "telefono", None) if cliente else None
-    if telefono_cliente:
-        tel_wa = _telefono_para_wame(telefono_cliente, pais)
-        if tel_wa:
-            aviso = (
-                f"Hola, estamos registrando la inspección de ingreso de su vehículo "
-                f"({documento.vehiculo}) en {empresa_nombre}. "
-                f"En breve le enviaremos el reporte completo."
-            )
-            whatsapp_url_previo = f"https://wa.me/{tel_wa}?text={quote(aviso)}"
+    tel_wa = _telefono_para_wame(telefono_cliente, pais) if telefono_cliente else ""
 
     ctx = {
         "documento": documento,
@@ -172,7 +179,8 @@ def crear_inspeccion_ingreso(request, documento_id):
         "tipos_dano_choices": TIPOS_DANO,
         "cliente": cliente,
         "cliente_email": getattr(cliente, "email", "") or "",
-        "whatsapp_url_previo": whatsapp_url_previo,
+        "telefono_wa": tel_wa,
+        "empresa_nombre": empresa_nombre,
     }
     return render(request, "taller/documentos/inspeccion_ingreso_form.html", ctx)
 
