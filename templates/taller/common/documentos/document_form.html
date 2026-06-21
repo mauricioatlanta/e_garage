@@ -331,11 +331,11 @@
                       <span id="di-badge" style="font-size:9px;font-family:monospace;color:#06b6d4;border:1px solid rgba(6,182,212,.4);border-radius:4px;padding:1px 6px">0 marcados</span>
                     </div>
                     <div style="display:flex;border-bottom:1px solid rgba(6,182,212,.2)" id="di-tabs">
-                      <button type="button" class="di-tab di-on" data-view="f" onclick="diSwitchView('f')" style="flex:1;padding:5px 0;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Frontal</button>
-                      <button type="button" class="di-tab" data-view="t" onclick="diSwitchView('t')" style="flex:1;padding:5px 0;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Trasera</button>
-                      <button type="button" class="di-tab" data-view="li" onclick="diSwitchView('li')" style="flex:1;padding:5px 0;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Lat. Izq</button>
-                      <button type="button" class="di-tab" data-view="ld" onclick="diSwitchView('ld')" style="flex:1;padding:5px 0;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Lat. Der</button>
-                      <button type="button" class="di-tab" data-view="i" onclick="diSwitchView('i')" style="flex:1;padding:5px 0;font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase">Interior</button>
+                      <button type="button" class="di-tab di-on" data-view="f" onclick="diSwitchView('f')" style="flex:1;padding:6px 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Frontal</button>
+                      <button type="button" class="di-tab" data-view="t" onclick="diSwitchView('t')" style="flex:1;padding:6px 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Trasera</button>
+                      <button type="button" class="di-tab" data-view="li" onclick="diSwitchView('li')" style="flex:1;padding:6px 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Lat. Izq</button>
+                      <button type="button" class="di-tab" data-view="ld" onclick="diSwitchView('ld')" style="flex:1;padding:6px 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Lat. Der</button>
+                      <button type="button" class="di-tab" data-view="i" onclick="diSwitchView('i')" style="flex:1;padding:6px 0;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase">Interior</button>
                     </div>
                     <div style="background:#040c18">
                       <div id="di-pf">
@@ -485,12 +485,12 @@
                         </svg>
                       </div>
                     </div>
-                    <div style="display:flex;gap:12px;flex-wrap:wrap;padding:6px 12px;border-top:1px solid rgba(6,182,212,.15);font-size:9px;color:#4a7a99">
-                      <span><span style="display:inline-block;width:7px;height:7px;border-radius:1px;background:#f59e0b;margin-right:3px"></span>Rayón</span>
-                      <span><span style="display:inline-block;width:7px;height:7px;border-radius:1px;background:#f97316;margin-right:3px"></span>Golpe</span>
-                      <span><span style="display:inline-block;width:7px;height:7px;border-radius:1px;background:#ef4444;margin-right:3px"></span>Roto</span>
-                      <span><span style="display:inline-block;width:7px;height:7px;border-radius:1px;background:#a855f7;margin-right:3px"></span>Falta pieza</span>
-                      <span><span style="display:inline-block;width:7px;height:7px;border-radius:1px;background:#6b7280;margin-right:3px"></span>Sucio</span>
+                    <div style="display:flex;gap:12px;flex-wrap:wrap;padding:8px 12px;border-top:1px solid rgba(6,182,212,.15);font-size:12px;color:#4a7a99">
+                      <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#f59e0b;margin-right:4px;vertical-align:middle"></span>Rayón</span>
+                      <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#f97316;margin-right:4px;vertical-align:middle"></span>Golpe</span>
+                      <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#ef4444;margin-right:4px;vertical-align:middle"></span>Roto</span>
+                      <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#a855f7;margin-right:4px;vertical-align:middle"></span>Falta pieza</span>
+                      <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#6b7280;margin-right:4px;vertical-align:middle"></span>Sucio</span>
                     </div>
                     <div id="di-list" style="padding:0 12px 8px">
                       <p style="font-size:10px;color:#475569;text-align:center;padding:8px 0;margin:0">Toca una zona del vehículo para registrar daño.</p>
@@ -1487,15 +1487,15 @@ window.DESARME_PREFILL = window.DESARME_PREFILL || {% if has_server_line_items %
     function diRender() {
       var cont=document.getElementById('di-list');if(!cont)return;
       var keys=Object.keys(DI_DATA);
-      if(!keys.length){cont.innerHTML='<p style="font-size:10px;color:#475569;text-align:center;padding:8px 0;margin:0">Toca una zona del vehículo para registrar daño.</p>';return;}
+      if(!keys.length){cont.innerHTML='<p style="font-size:12px;color:#475569;text-align:center;padding:8px 0;margin:0">Toca una zona del vehículo para registrar daño.</p>';return;}
       cont.innerHTML='<div style="border-top:1px solid rgba(6,182,212,.1)">'+keys.map(function(k){
         var d=DI_DATA[k],c=DI_COLOR[d.tipo];
-        return '<div style="display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid rgba(6,182,212,.07)">'+
-          '<span style="width:7px;height:7px;border-radius:50%;background:'+c+';flex-shrink:0"></span>'+
-          '<span style="font-size:9px;color:#94a3b8;flex-shrink:0;width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+diEH(diLbl(k))+'</span>'+
-          '<span style="font-size:9px;font-weight:600;color:'+c+';flex-shrink:0;width:60px">'+DI_LABEL[d.tipo]+'</span>'+
-          '<input type="text" style="flex:1;min-width:0;background:#1e293b;border:1px solid #334155;border-radius:4px;padding:2px 5px;font-size:9px;color:#f1f5f9" placeholder="Descripción…" value="'+diEH(d.desc)+'" oninput="window._diData[\''+diEJ(k)+'\'].desc=this.value">'+
-          '<button type="button" onclick="window._diRemove(\''+diEJ(k)+'\')" style="color:#475569;font-size:12px;background:none;border:none;cursor:pointer;flex-shrink:0">×</button>'+
+        return '<div style="display:flex;align-items:center;gap:6px;padding:5px 0;border-bottom:1px solid rgba(6,182,212,.07)">'+
+          '<span style="width:9px;height:9px;border-radius:50%;background:'+c+';flex-shrink:0"></span>'+
+          '<span style="font-size:12px;color:#94a3b8;flex-shrink:0;width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+diEH(diLbl(k))+'</span>'+
+          '<span style="font-size:12px;font-weight:700;color:'+c+';flex-shrink:0;width:70px">'+DI_LABEL[d.tipo]+'</span>'+
+          '<input type="text" style="flex:1;min-width:0;background:#1e293b;border:1px solid #334155;border-radius:4px;padding:3px 6px;font-size:12px;color:#f1f5f9" placeholder="Descripción…" value="'+diEH(d.desc)+'" oninput="window._diData[\''+diEJ(k)+'\'].desc=this.value">'+
+          '<button type="button" onclick="window._diRemove(\''+diEJ(k)+'\')" style="color:#475569;font-size:14px;background:none;border:none;cursor:pointer;flex-shrink:0">×</button>'+
           '</div>';
       }).join('')+'</div>';
     }
