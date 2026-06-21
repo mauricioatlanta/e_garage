@@ -259,3 +259,64 @@ def enviar_inspeccion_email(request, pk):
 
     url = reverse_country_url(request, "documentos:ver_inspeccion_ingreso", pk)
     return redirect(url)
+
+
+@login_required
+@require_POST
+def enviar_reporte_previo(request):
+    """Envía el reporte de daños por email antes de guardar el OT (datos vienen del formulario vía JS)."""
+    import json
+    from datetime import datetime
+    from django.http import JsonResponse
+
+    empresa = request.user.empresa
+    email = request.POST.get("email", "").strip()
+    if not email:
+        return JsonResponse({"ok": False, "error": "Email requerido"})
+
+    vehiculo = request.POST.get("vehiculo", "Vehículo").strip()
+    km = request.POST.get("km", "").strip()
+    combustible = request.POST.get("combustible", "").strip()
+
+    try:
+        danos = json.loads(request.POST.get("danos", "[]"))
+    except Exception:
+        danos = []
+
+    now = datetime.now()
+    fecha = now.strftime("%d/%m/%Y %H:%M")
+
+    lineas = []
+    for d in danos:
+        zona = d.get("zona", "")
+        tipo = d.get("tipo", "")
+        desc = d.get("desc", "")
+        linea = f"  • {zona} → {tipo}"
+        if desc:
+            linea += f": {desc}"
+        lineas.append(linea)
+
+    texto = (
+        f"Inspección de Ingreso – {empresa.nombre_taller}\n"
+        f"Vehículo: {vehiculo}\n"
+        f"Fecha: {fecha}\n"
+        + (f"Kilometraje: {km} km\n" if km else "")
+        + (f"Combustible: {combustible}\n" if combustible else "")
+        + "\nDaños preexistentes:\n"
+        + ("\n".join(lineas) if lineas else "  Sin daños registrados")
+        + "\n\nEste reporte fue generado al momento de la recepción del vehículo."
+    )
+
+    try:
+        send_email_with_reply_to(
+            subject=f"Inspección de ingreso – {vehiculo}",
+            message=texto,
+            recipient_list=[email],
+            fail_silently=False,
+        )
+        return JsonResponse({"ok": True})
+    except Exception as exc:
+        return JsonResponse({"ok": False, "error": str(exc)})
+
+    url = reverse_country_url(request, "documentos:ver_inspeccion_ingreso", pk)
+    return redirect(url)

@@ -234,4 +234,9 @@ urlpatterns += [
         views_inspeccion.enviar_inspeccion_email,
         name="enviar_inspeccion_email",
     ),
+    path(
+        "inspeccion/enviar-reporte-previo/",
+        views_inspeccion.enviar_reporte_previo,
+        name="enviar_reporte_previo",
+    ),
 ]
