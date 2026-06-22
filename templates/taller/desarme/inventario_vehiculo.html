@@ -12,47 +12,33 @@
 <style>
 [x-cloak] { display: none !important; }
 :root {
-  --inv-hud-cyan: #22d3ee;
-  --inv-hud-cyan-dim: rgba(34, 211, 238, 0.35);
-  --inv-hud-panel: rgba(8, 20, 35, 0.92);
-  --inv-hud-input-bg: #f0fdfa;
-  --inv-hud-input-text: #0c4a6e;
-  --inv-hud-glow: 0 0 24px rgba(34, 211, 238, 0.25);
+  --inv-cyan: #22d3ee;
+  --inv-cyan-dim: rgba(34, 211, 238, 0.35);
+  --inv-panel: rgba(8, 20, 35, 0.92);
+  --inv-input-bg: #07101c;
+  --inv-input-text: #f1f5f9;
+  --inv-glow: 0 0 24px rgba(34, 211, 238, 0.25);
 }
 .ds-font { font-family: 'Orbitron', monospace; }
 
-/* === Forzar contraste en TODOS los inputs del HUD (evita negro sobre negro / autofill) === */
-.inv-hud input[type="number"],
-.inv-hud input[type="search"],
-.inv-hud input[type="text"] {
+/* Inputs y selects: fondo oscuro uniforme, sin fondo blanco del browser */
+.inv-field {
   -webkit-appearance: none !important;
   appearance: none !important;
-  color: var(--inv-hud-input-text) !important;
-  background-color: var(--inv-hud-input-bg) !important;
-  -webkit-text-fill-color: var(--inv-hud-input-text) !important;
-  caret-color: #0e7490 !important;
-  border: 2px solid #0e7490 !important;
-  border-radius: 10px !important;
-  font-weight: 700 !important;
-  box-sizing: border-box !important;
+  color: var(--inv-input-text) !important;
+  background-color: var(--inv-input-bg) !important;
+  -webkit-text-fill-color: var(--inv-input-text) !important;
+  caret-color: #22d3ee !important;
 }
-.inv-hud input::placeholder {
-  color: #64748b !important;
-  -webkit-text-fill-color: #64748b !important;
-  opacity: 1 !important;
+.inv-field::placeholder { color: #475569 !important; -webkit-text-fill-color: #475569 !important; opacity: 1 !important; }
+.inv-field:-webkit-autofill,
+.inv-field:-webkit-autofill:hover,
+.inv-field:-webkit-autofill:focus {
+  -webkit-box-shadow: 0 0 0 1000px var(--inv-input-bg) inset !important;
+  -webkit-text-fill-color: var(--inv-input-text) !important;
 }
-.inv-hud input:-webkit-autofill,
-.inv-hud input:-webkit-autofill:hover,
-.inv-hud input:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0 1000px var(--inv-hud-input-bg) inset !important;
-  -webkit-text-fill-color: var(--inv-hud-input-text) !important;
-  border: 2px solid #0e7490 !important;
-}
-.inv-hud input:focus {
-  outline: none !important;
-  border-color: var(--inv-hud-cyan) !important;
-  box-shadow: 0 0 0 4px rgba(34, 211, 238, 0.35) !important;
-}
+/* Opciones del select en navegadores que lo soportan */
+.inv-field option { background-color: #07101c; color: #f1f5f9; }
 
 .glass-panel {
   background: rgba(0, 0, 0, 0.45);
@@ -286,155 +272,144 @@
   </div>
 
   <div class="relative mx-auto max-w-[1700px] px-3 sm:px-4 lg:px-6 py-4 sm:py-5 pb-28 xl:pb-8">
-    <!-- HEADER V2 -->
-    <div class="mb-4 rounded-2xl border border-cyan-400/20 bg-slate-900/60 backdrop-blur-xl shadow-[0_0_40px_rgba(34,211,238,0.08)]">
-      <div class="p-4 sm:p-5">
-        <div class="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <div class="mb-1 inline-flex items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-[10px] uppercase tracking-[0.28em] text-cyan-200">
-              {% trans "Terminal de venta" %}
-            </div>
-            <h2 class="text-xl sm:text-2xl font-black tracking-wide text-white">
-              {% trans "Inventario inteligente" %}
-            </h2>
-            <p class="mt-1 text-sm text-slate-400">
-              {% trans "Selecciona repuestos tocando las fichas. Busca, filtra y vende sin salir de pantalla." %}
-            </p>
-          </div>
+    <!-- HEADER COMPACTO -->
+    <div class="mb-4 rounded-2xl border border-cyan-400/20 bg-slate-900/70 backdrop-blur-xl">
+      <div class="p-3 sm:p-4 space-y-3">
 
-          <div class="grid grid-cols-3 gap-2 sm:gap-3">
-            <div class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-2 text-center">
-              <div class="text-[10px] uppercase tracking-[0.2em] text-cyan-200">{% trans "Visibles" %}</div>
-              <div class="text-lg font-bold text-white" x-text="filteredItems.length"></div>
+        <!-- Fila 1: título + stats inline -->
+        <div class="flex flex-wrap items-center gap-2.5">
+          <div class="min-w-0 flex-1">
+            <span class="rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-0.5 text-[9px] uppercase tracking-[0.28em] text-cyan-300">{% trans "Inventario" %}</span>
+          </div>
+          <div class="flex shrink-0 items-center gap-1.5">
+            <div class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-center min-w-[3.5rem]">
+              <div class="text-[8px] uppercase tracking-[0.18em] text-cyan-400">{% trans "Visibles" %}</div>
+              <div class="text-base font-black text-white tabular-nums leading-tight" x-text="filteredItems.length"></div>
             </div>
-            <div class="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2 text-center">
-              <div class="text-[10px] uppercase tracking-[0.2em] text-emerald-200">{% trans "Seleccionados" %}</div>
-              <div class="text-lg font-bold text-white" x-text="selectedItems.length"></div>
+            <div class="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-center min-w-[3.5rem]">
+              <div class="text-[8px] uppercase tracking-[0.18em] text-emerald-400">{% trans "Sel." %}</div>
+              <div class="text-base font-black text-white tabular-nums leading-tight" x-text="selectedItems.length"></div>
             </div>
-            <div class="rounded-xl border border-fuchsia-400/20 bg-fuchsia-400/10 px-3 py-2 text-center">
-              <div class="text-[10px] uppercase tracking-[0.2em] text-fuchsia-200">{% trans "Subtotal" %}</div>
-              <div class="text-sm sm:text-base font-bold text-white" x-text="formatMoney(totalPrice)"></div>
+            <div class="rounded-xl border border-fuchsia-400/20 bg-fuchsia-400/10 px-3 py-1 text-center min-w-[5rem]">
+              <div class="text-[8px] uppercase tracking-[0.18em] text-fuchsia-400">{% trans "Total" %}</div>
+              <div class="text-sm font-black text-white tabular-nums leading-tight" x-text="formatMoney(totalPrice)"></div>
             </div>
           </div>
         </div>
 
-        <!-- BUSCADOR + SUGERENCIAS -->
-        <div class="mt-4 grid grid-cols-1 xl:grid-cols-12 gap-3">
-          <div class="xl:col-span-7">
-            <label class="mb-2 block text-[11px] uppercase tracking-[0.24em] text-slate-500">
-              {% trans "Búsqueda en tiempo real" %}
-            </label>
-            <div class="relative">
-              <input
-                x-model="search"
-                @focus="searchFocused = true"
-                @click.away="searchFocused = false"
-                type="text"
-                placeholder="{% trans 'Buscar por nombre, código, zona, vehículo...' %}"
-                class="w-full rounded-2xl border border-cyan-400/20 bg-[#07101c]/90 px-4 py-3.5 pr-12 text-sm text-white placeholder:text-slate-500 outline-none ring-0 transition focus:border-cyan-300 focus:shadow-[0_0_0_4px_rgba(34,211,238,0.10)]"
-              >
-              <div class="absolute right-4 top-1/2 -translate-y-1/2 text-cyan-300">⌕</div>
+        <!-- Fila 2: búsqueda + orden + acciones en una sola línea -->
+        <div class="flex flex-col sm:flex-row gap-2">
+          <!-- Búsqueda -->
+          <div class="relative flex-1 min-w-0">
+            <input
+              x-model="search"
+              @focus="searchFocused = true"
+              @click.away="searchFocused = false"
+              type="text"
+              placeholder="{% trans 'Buscar por nombre, código, zona...' %}"
+              class="inv-field w-full rounded-xl border border-cyan-400/25 px-4 py-2.5 pr-10 text-sm outline-none transition focus:border-cyan-300 focus:shadow-[0_0_0_3px_rgba(34,211,238,0.12)]"
+            >
+            <div class="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 text-sm">⌕</div>
 
-              <div
-                x-show="searchFocused && search.trim().length > 0 && suggestions.length > 0"
-                x-transition
-                class="absolute left-0 right-0 top-[calc(100%+10px)] z-40 overflow-hidden rounded-2xl border border-cyan-400/20 bg-slate-950/95 shadow-[0_0_30px_rgba(34,211,238,0.12)] backdrop-blur-xl"
-              >
-                <template x-for="suggestion in suggestions" :key="suggestion.label + suggestion.type">
-                  <button
-                    type="button"
-                    @click="applySuggestion(suggestion)"
-                    class="flex w-full items-center justify-between border-b border-white/5 px-4 py-3 text-left transition hover:bg-cyan-400/10"
-                  >
-                    <div>
-                      <div class="text-sm font-medium text-white" x-text="suggestion.label"></div>
-                      <div class="text-[11px] uppercase tracking-[0.18em] text-slate-500" x-text="suggestion.type"></div>
-                    </div>
-                    <span class="text-cyan-300 text-xs">{% trans "usar" %}</span>
-                  </button>
-                </template>
+            <div
+              x-show="searchFocused && search.trim().length > 0 && suggestions.length > 0"
+              x-transition:enter="transition ease-out duration-100"
+              x-transition:enter-start="opacity-0 -translate-y-1"
+              x-transition:enter-end="opacity-100 translate-y-0"
+              class="absolute left-0 right-0 top-[calc(100%+6px)] z-40 overflow-hidden rounded-xl border border-cyan-400/25 bg-[#060d18] shadow-[0_8px_32px_rgba(0,0,0,0.6),0_0_0_1px_rgba(34,211,238,0.08)]"
+            >
+              <div class="px-3 py-1.5 border-b border-white/5 flex items-center justify-between">
+                <span class="text-[9px] uppercase tracking-[0.2em] text-slate-600">{% trans "Sugerencias" %}</span>
+                <span class="text-[9px] text-slate-600" x-text="filteredItems.length + ' resultado' + (filteredItems.length !== 1 ? 's' : '')"></span>
               </div>
+              <template x-for="(suggestion, idx) in suggestions" :key="suggestion.label">
+                <button
+                  type="button"
+                  @click="applySuggestion(suggestion)"
+                  class="flex w-full items-center gap-3 border-b border-white/4 px-3 py-2 text-left transition hover:bg-cyan-400/8 last:border-0"
+                >
+                  <div class="shrink-0 w-5 h-5 rounded-full border border-white/10 bg-slate-900 flex items-center justify-center text-[7px] font-black text-slate-500" x-text="idx + 1"></div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-[11px] font-semibold text-slate-200 truncate" x-text="suggestion.label"></div>
+                    <div class="text-[8px] uppercase tracking-[0.14em] text-slate-600" x-text="suggestion.type"></div>
+                  </div>
+                  <div class="shrink-0 flex items-center gap-1.5">
+                    <span class="rounded-full bg-cyan-950/60 border border-cyan-500/25 px-1.5 py-px text-[8px] font-bold text-cyan-400 tabular-nums" x-text="suggestion.count + ' item' + (suggestion.count !== 1 ? 's' : '')"></span>
+                  </div>
+                </button>
+              </template>
             </div>
           </div>
 
-          <div class="xl:col-span-2">
-            <label class="mb-2 block text-[11px] uppercase tracking-[0.24em] text-slate-500">
-              {% trans "Orden" %}
-            </label>
+          <!-- Orden -->
+          <div class="relative shrink-0 w-full sm:w-40">
             <select
               x-model="sortBy"
-              class="w-full rounded-2xl border border-cyan-400/20 bg-[#07101c]/90 px-4 py-3.5 text-sm text-white outline-none transition focus:border-cyan-300"
+              class="inv-field w-full rounded-xl border border-cyan-400/25 px-3 py-2.5 pr-8 text-sm outline-none transition focus:border-cyan-300 cursor-pointer"
             >
-              <option value="name">{% trans "Nombre" %}</option>
+              <option value="name">{% trans "Nombre A–Z" %}</option>
               <option value="stock_desc">{% trans "Mayor stock" %}</option>
               <option value="price_desc">{% trans "Mayor precio" %}</option>
               <option value="price_asc">{% trans "Menor precio" %}</option>
             </select>
+            <div class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs">▾</div>
           </div>
 
-          <div class="xl:col-span-3 flex items-end">
-            <div class="grid w-full grid-cols-3 gap-2">
-              <button
-                type="button"
-                @click="clearFilters()"
-                class="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-xs font-semibold text-slate-300 transition hover:border-cyan-400/30 hover:text-cyan-200"
-              >
-                {% trans "Limpiar" %}
-              </button>
-              <button
-                type="button"
-                @click="clearSelection()"
-                class="rounded-xl border border-white/10 bg-white/5 px-3 py-3 text-xs font-semibold text-slate-300 transition hover:border-rose-400/30 hover:text-rose-200"
-              >
-                {% trans "Vaciar" %}
-              </button>
-              <button
-                type="button"
-                @click="selectVisible()"
-                class="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-3 text-xs font-semibold text-emerald-200 transition hover:bg-emerald-400/15"
-              >
-                {% trans "Todos visibles" %}
-              </button>
-            </div>
+          <!-- Botones de acción -->
+          <div class="flex shrink-0 gap-1.5">
+            <button
+              type="button"
+              @click="clearFilters()"
+              title="{% trans 'Limpiar filtros' %}"
+              class="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-semibold text-slate-400 transition hover:border-cyan-400/30 hover:text-cyan-300"
+            >✕ {% trans "Filtros" %}</button>
+            <button
+              type="button"
+              @click="clearSelection()"
+              title="{% trans 'Vaciar selección' %}"
+              class="rounded-xl border border-white/10 bg-white/5 px-3 py-2.5 text-xs font-semibold text-slate-400 transition hover:border-rose-400/30 hover:text-rose-300"
+            >✕ {% trans "Sel." %}</button>
+            <button
+              type="button"
+              @click="selectVisible()"
+              class="rounded-xl border border-emerald-400/20 bg-emerald-400/10 px-3 py-2.5 text-xs font-semibold text-emerald-300 transition hover:bg-emerald-400/15 whitespace-nowrap"
+            >+ {% trans "Todos" %}</button>
           </div>
         </div>
 
-        <!-- CHIPS ZONA / STOCK -->
-        <div class="mt-4 flex flex-wrap gap-2">
+        <!-- Fila 3: chips zona / stock -->
+        <div class="flex flex-wrap gap-1.5">
           <button
             type="button"
             @click="category=''"
             :class="category === '' ? activeChipClass : chipClass"
-            class="rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] transition"
-          >
-            {% trans "Todas" %}
-          </button>
+            class="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] transition"
+          >{% trans "Todas" %}</button>
           <template x-for="cat in categories" :key="cat">
             <button
               type="button"
               @click="category = cat"
               :class="category === cat ? activeChipClass : chipClass"
-              class="rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] transition"
+              class="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] transition"
               x-text="cat"
             ></button>
           </template>
-          <button
-            type="button"
-            @click="stockFilter = stockFilter === 'in_stock' ? '' : 'in_stock'"
-            :class="stockFilter === 'in_stock' ? 'border-emerald-400/30 bg-emerald-400/15 text-emerald-200' : chipClass"
-            class="rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] transition"
-          >
-            {% trans "Solo con stock" %}
-          </button>
-          <button
-            type="button"
-            @click="stockFilter = stockFilter === 'out_stock' ? '' : 'out_stock'"
-            :class="stockFilter === 'out_stock' ? 'border-rose-400/30 bg-rose-400/15 text-rose-200' : chipClass"
-            class="rounded-full px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] transition"
-          >
-            {% trans "Sin stock" %}
-          </button>
+          <div class="ml-auto flex gap-1.5">
+            <button
+              type="button"
+              @click="stockFilter = stockFilter === 'in_stock' ? '' : 'in_stock'"
+              :class="stockFilter === 'in_stock' ? 'border-emerald-400/30 bg-emerald-400/15 text-emerald-300' : chipClass"
+              class="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] transition"
+            >● {% trans "Con stock" %}</button>
+            <button
+              type="button"
+              @click="stockFilter = stockFilter === 'out_stock' ? '' : 'out_stock'"
+              :class="stockFilter === 'out_stock' ? 'border-rose-400/30 bg-rose-400/15 text-rose-300' : chipClass"
+              class="rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] transition"
+            >○ {% trans "Sin stock" %}</button>
+          </div>
         </div>
+
       </div>
     </div>
 
@@ -448,73 +423,66 @@
           </div>
         </template>
 
-        <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-3" x-show="filteredItems.length > 0">
+        <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-8 gap-1.5" x-show="filteredItems.length > 0">
           <template x-for="item in visibleItems" :key="item.id">
             <article
               @click="toggleSelect(item)"
-              :class="!item.vendible ? 'cursor-default opacity-75' : (isSelected(item.id) ? 'border-cyan-300 bg-cyan-400/10 shadow-[0_0_22px_rgba(34,211,238,0.22)] scale-[1.015]' : 'border-white/10 bg-slate-900/55 hover:border-cyan-400/30 hover:bg-slate-900/75 cursor-pointer')"
-              class="group relative overflow-hidden rounded-2xl border p-2.5 backdrop-blur-xl transition-all duration-200"
+              :class="!item.vendible
+                ? 'opacity-50 cursor-not-allowed border-white/5 bg-slate-950'
+                : isSelected(item.id)
+                  ? 'border-cyan-400/80 bg-[linear-gradient(145deg,rgba(6,182,212,0.13),rgba(2,6,23,0.95))] shadow-[0_0_14px_rgba(34,211,238,0.22)] scale-[1.015]'
+                  : 'border-white/8 bg-slate-950/90 hover:border-cyan-400/35 hover:bg-slate-900/90 cursor-pointer'"
+              class="group relative rounded-xl border transition-all duration-150 overflow-hidden"
             >
-              <div class="absolute inset-0 opacity-0 transition group-hover:opacity-100 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.10),transparent_65%)]" x-show="item.vendible"></div>
+              <!-- glow seleccionado -->
+              <div x-show="isSelected(item.id)" class="pointer-events-none absolute inset-0 rounded-xl bg-[radial-gradient(circle_at_30%_20%,rgba(34,211,238,0.1),transparent_65%)]"></div>
 
-              <div class="absolute right-2 top-2 z-20">
-                <div
-                  :class="isSelected(item.id) ? 'bg-cyan-300 text-slate-950 shadow-[0_0_12px_rgba(34,211,238,0.45)]' : 'border border-white/10 bg-slate-950/70 text-slate-400'"
-                  class="flex h-7 w-7 items-center justify-center rounded-full text-[11px] font-black transition"
-                >
-                  <span x-show="isSelected(item.id)">✓</span>
-                  <span x-show="!isSelected(item.id)" x-text="item.vendible ? '+' : '−'"></span>
-                </div>
-              </div>
+              <div class="relative p-2 flex flex-col gap-1">
 
-              <div class="relative mb-2 h-20 sm:h-24 overflow-hidden rounded-xl border border-white/10 bg-[#07101c] flex items-center justify-center">
-                <span class="text-[10px] text-slate-500">eGarage</span>
-              </div>
-
-              <div class="relative z-10">
-                <div class="mb-1 flex items-center justify-between gap-2">
-                  <div class="truncate rounded-full border border-cyan-400/20 bg-cyan-400/10 px-2 py-1 text-[9px] uppercase tracking-[0.18em] text-cyan-200" x-text="item.categoria"></div>
-                  <div
-                    :class="Number(item.stock) > 0 ? 'text-emerald-300 border-emerald-400/20 bg-emerald-400/10' : 'text-rose-300 border-rose-400/20 bg-rose-400/10'"
-                    class="rounded-full border px-2 py-1 text-[9px] font-bold uppercase tracking-[0.18em]"
-                  >
-                    <span x-text="Number(item.stock) > 0 ? '{% trans "stock" %}' : '{% trans "agotado" %}'"></span>
-                  </div>
+                <!-- fila 1: zona + stock + check -->
+                <div class="flex items-center gap-1">
+                  <span class="flex-1 truncate text-[7px] font-bold uppercase tracking-[0.1em] text-slate-600" x-text="item.categoria || '—'"></span>
+                  <span
+                    :class="Number(item.stock) > 0 ? 'text-emerald-400 border-emerald-500/30 bg-emerald-950/60' : 'text-rose-400 border-rose-500/25 bg-rose-950/40'"
+                    class="shrink-0 rounded border text-[6px] font-black px-1 py-px tabular-nums leading-none"
+                    x-text="'×' + item.stock"
+                  ></span>
+                  <span
+                    :class="isSelected(item.id) ? 'bg-cyan-400 text-slate-900 shadow-[0_0_6px_rgba(34,211,238,0.7)]' : 'border border-white/10 bg-slate-900 text-slate-600'"
+                    class="shrink-0 flex h-[14px] w-[14px] items-center justify-center rounded-full text-[7px] font-black transition-all"
+                    x-text="isSelected(item.id) ? '✓' : (item.vendible ? '+' : '−')"
+                  ></span>
                 </div>
 
-                <h3 class="line-clamp-2 min-h-[2.6rem] text-xs sm:text-sm font-bold text-white" x-text="item.nombre"></h3>
+                <!-- nombre -->
+                <h3 class="line-clamp-2 text-[10px] sm:text-[11px] font-semibold text-slate-100 leading-snug" x-text="item.nombre"></h3>
 
-                <div class="mt-2 flex items-center justify-between gap-2">
-                  <div class="truncate rounded-lg border border-white/10 bg-black/20 px-2 py-1 text-[10px] text-slate-400" x-text="item.sku || '{% trans "Sin código" %}'"></div>
-                  <div class="text-[10px] text-slate-500">x<span x-text="item.stock"></span></div>
-                </div>
+                <!-- sku -->
+                <div class="text-[7px] font-mono text-slate-700 truncate" x-text="item.sku"></div>
 
-                <div class="mt-2 space-y-1 text-[10px] text-slate-500" x-show="item.ubicacion">
-                  <div class="truncate"><span class="text-slate-600">{% trans "Ubicación:" %}</span> <span x-text="item.ubicacion"></span></div>
-                </div>
-
-                <div class="mt-3 flex items-end justify-between gap-2">
-                  <div>
-                    <div class="text-[9px] uppercase tracking-[0.18em] text-slate-600">{% trans "Precio" %}</div>
-                    <div class="text-sm font-black text-cyan-300" x-text="formatMoney(item.precio)"></div>
-                  </div>
-                  <div class="flex flex-col gap-1 items-end">
+                <!-- precio + acciones hover -->
+                <div class="flex items-center justify-between mt-0.5 pt-1 border-t border-white/5">
+                  <span
+                    :class="item.precio > 0 ? 'text-cyan-300' : 'text-slate-700'"
+                    class="text-[10px] font-black tabular-nums"
+                    x-text="item.precio > 0 ? formatMoney(item.precio) : '—'"
+                  ></span>
+                  <div class="flex gap-px opacity-0 group-hover:opacity-100 transition-opacity duration-100">
                     <a
                       :href="(editUrlPattern || '').replace(/\/0\//, '/' + item.id + '/').replace(/\/0$/, '/' + item.id)"
                       @click.stop
-                      class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 px-2.5 py-2 text-[10px] font-bold uppercase tracking-[0.16em] text-cyan-200 transition hover:bg-cyan-400/15"
-                    >
-                      {% trans "Editar" %}
-                    </a>
+                      title="{% trans 'Editar pieza' %}"
+                      class="rounded border border-white/8 bg-white/4 px-1 py-0.5 text-[7px] text-slate-500 hover:text-cyan-300 hover:border-cyan-400/30 transition-colors"
+                    >✎</a>
                     <button
                       type="button"
                       @click.stop="openEditLabel(item)"
-                      class="rounded-xl border border-white/20 bg-white/5 px-2.5 py-1.5 text-[10px] font-semibold text-slate-300 transition hover:bg-cyan-400/10 hover:text-cyan-200"
-                    >
-                      {% trans "Editar nombre" %}
-                    </button>
+                      title="{% trans 'Editar nombre visible' %}"
+                      class="rounded border border-white/8 bg-white/4 px-1 py-0.5 text-[7px] text-slate-500 hover:text-fuchsia-300 hover:border-fuchsia-400/30 transition-colors"
+                    >Aa</button>
                   </div>
                 </div>
+
               </div>
             </article>
           </template>
@@ -571,18 +539,18 @@
                   </div>
                   <div class="mt-3 grid grid-cols-2 gap-2">
                     <div class="rounded-xl border border-white/10 bg-black/20 px-3 py-2">
-                      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">{% trans "Precio" %}</div>
+                      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">{% trans "Precio" %}</div>
                       <div class="text-sm font-bold text-cyan-300" x-text="formatMoney(item.precio)"></div>
                     </div>
                     <div class="rounded-xl border border-white/10 bg-black/20 px-3 py-2">
-                      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-500">{% trans "Cantidad" %}</div>
+                      <div class="text-[10px] uppercase tracking-[0.16em] text-slate-400">{% trans "Cantidad" %}</div>
                       <input
                         type="number"
                         min="1"
                         :max="item.stock"
                         x-model.number="quantities[item.id]"
                         @click.stop
-                        class="mt-1 w-full bg-transparent text-sm font-bold text-white outline-none"
+                        class="inv-field mt-1 w-full rounded-lg border border-white/20 px-2 py-1 text-sm font-bold outline-none focus:border-cyan-400/60 text-center"
                       >
                     </div>
                   </div>
@@ -593,12 +561,12 @@
             <div class="border-t border-white/10 p-4">
               <div class="space-y-2 rounded-2xl border border-white/10 bg-black/20 p-4">
                 <div class="flex items-center justify-between text-sm">
-                  <span class="text-slate-400">{% trans "Cantidad total" %}</span>
-                  <span class="font-bold text-white" x-text="totalQuantity"></span>
+                  <span class="text-slate-300">{% trans "Cantidad total" %}</span>
+                  <span class="font-bold text-white tabular-nums" x-text="totalQuantity"></span>
                 </div>
                 <div class="flex items-center justify-between text-sm">
-                  <span class="text-slate-400">{% trans "Subtotal" %}</span>
-                  <span class="font-black text-cyan-300" x-text="formatMoney(totalPrice)"></span>
+                  <span class="text-slate-300">{% trans "Subtotal" %}</span>
+                  <span class="font-black text-cyan-300 tabular-nums" x-text="formatMoney(totalPrice)"></span>
                 </div>
               </div>
 
@@ -646,14 +614,14 @@
           type="text"
           x-model="editLabelValue"
           maxlength="255"
-          class="w-full rounded-xl border border-cyan-400/20 bg-[#07101c] px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-cyan-400"
+          class="inv-field w-full rounded-xl border border-cyan-400/20 px-4 py-3 text-sm outline-none focus:border-cyan-400"
           placeholder="{% trans 'Nombre para este idioma' %}"
         >
         <label class="block text-[11px] uppercase tracking-wider text-slate-500">{% trans "Alias (opcional, separados por coma)" %}</label>
         <input
           type="text"
           x-model="editLabelAliases"
-          class="w-full rounded-xl border border-cyan-400/20 bg-[#07101c] px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-cyan-400"
+          class="inv-field w-full rounded-xl border border-cyan-400/20 px-4 py-3 text-sm outline-none focus:border-cyan-400"
           placeholder="ej. motor, engine"
         >
         <div class="flex gap-2 pt-2">
@@ -724,7 +692,7 @@
                   min="1"
                   :max="item.stock"
                   x-model.number="quantities[item.id]"
-                  class="w-20 rounded-xl border border-white/10 bg-black/20 px-3 py-2 text-center text-sm font-bold text-white outline-none"
+                  class="inv-field w-20 rounded-xl border border-white/10 px-3 py-2 text-center text-sm font-bold outline-none"
                 >
               </div>
             </div>
@@ -778,29 +746,79 @@ document.addEventListener('alpine:init', function() {
         return [...new Set(this.items.map(i => i.categoria).filter(Boolean))].sort();
       },
 
+      // Normaliza texto: minúsculas + sin tildes
+      normalize(s) {
+        return (s || '').toString().toLowerCase()
+          .normalize('NFD').replace(/[̀-ͯ]/g, '');
+      },
+
+      // Puntúa qué tan bien matchea `text` con `q` (0 = no matchea, 100 = exacto)
+      scoreText(text, q) {
+        if (!text || !q) return 0;
+        const t = this.normalize(text);
+        if (t === q) return 100;
+        if (t.startsWith(q)) return 90;
+        const words = t.split(/[\s\-_/]+/);
+        if (words.some(w => w.startsWith(q))) return 78;
+        if (t.includes(q)) return 62;
+        // fuzzy: todos los chars de q aparecen en orden en t
+        let ti = 0, qi = 0, consecutive = 0, fuzzyScore = 0;
+        while (ti < t.length && qi < q.length) {
+          if (t[ti] === q[qi]) { qi++; consecutive++; fuzzyScore += consecutive * 2; }
+          else { consecutive = 0; }
+          ti++;
+        }
+        return qi === q.length ? Math.min(45, fuzzyScore) : 0;
+      },
+
+      // Puntúa un ítem contra la query (pondera por campo)
+      scoreItem(item, q) {
+        if (!q) return 1;
+        const fields = [
+          { v: item.nombre,    w: 10 },
+          { v: item.sku,       w: 9  },
+          { v: item.categoria, w: 5  },
+          { v: item.ubicacion, w: 3  },
+        ];
+        if (Array.isArray(item.search_terms)) {
+          item.search_terms.forEach(t => fields.push({ v: t, w: 9 }));
+        }
+        return Math.max(...fields.map(f => (this.scoreText(f.v, q) * f.w) / 10));
+      },
+
       get suggestions() {
-        const q = this.search.trim().toLowerCase();
-        if (!q) return [];
-        const pool = [];
+        const q = this.normalize(this.search.trim());
+        if (q.length < 1) return [];
+        const termBest = new Map();  // label → best score
+        const termCount = new Map(); // label → # items que incluyen ese término
+
         this.items.forEach(item => {
-          const terms = item.search_terms && Array.isArray(item.search_terms) ? item.search_terms : [item.nombre, item.sku].filter(Boolean);
-          terms.forEach(t => {
-            if (t && t.toLowerCase().includes(q)) pool.push({ label: t, type: 'nombre' });
+          const seen = new Set();
+          const fields = [
+            { v: item.nombre,    type: 'nombre'    },
+            { v: item.sku,       type: 'código'    },
+            { v: item.categoria, type: 'zona'      },
+            { v: item.ubicacion, type: 'ubicación' },
+            ...(Array.isArray(item.search_terms) ? item.search_terms.map(t => ({ v: t, type: 'nombre' })) : []),
+          ];
+          fields.forEach(({ v, type }) => {
+            if (!v || seen.has(v)) return;
+            seen.add(v);
+            const s = this.scoreText(v, q);
+            if (s === 0) return;
+            const prev = termBest.get(v);
+            if (!prev || s > prev.score) termBest.set(v, { score: s, type });
+            termCount.set(v, (termCount.get(v) || 0) + 1);
           });
-          if (item.sku && item.sku.toLowerCase().includes(q))
-            pool.push({ label: item.sku, type: 'código' });
-          if (item.categoria && item.categoria.toLowerCase().includes(q))
-            pool.push({ label: item.categoria, type: 'zona' });
-          if (item.ubicacion && item.ubicacion.toLowerCase().includes(q))
-            pool.push({ label: item.ubicacion, type: 'ubicación' });
         });
-        const seen = new Set();
-        return pool.filter(s => {
-          const key = s.type + '-' + s.label;
-          if (seen.has(key)) return false;
-          seen.add(key);
-          return true;
-        }).slice(0, 6);
+
+        return [...termBest.entries()]
+          .sort((a, b) => b[1].score - a[1].score)
+          .slice(0, 8)
+          .map(([label, { score, type }]) => ({
+            label, score, type,
+            count: termCount.get(label) || 1,
+          }));
       },
 
       applySuggestion(suggestion) {
@@ -846,17 +864,30 @@ document.addEventListener('alpine:init', function() {
       },
 
       get filteredItems() {
-        let result = [...this.items];
-        const q = this.search.trim().toLowerCase();
+        const q = this.normalize(this.search.trim());
+        let result;
+
         if (q) {
-          result = result.filter(item => {
-            if (item.search_terms && Array.isArray(item.search_terms)) {
-              if (item.search_terms.some(t => (t || '').toString().toLowerCase().includes(q))) return true;
-            }
-            return [item.nombre, item.sku, item.categoria, item.ubicacion, item.vehiculo]
-              .some(val => (val || '').toString().toLowerCase().includes(q));
-          });
+          // Filtrar + ordenar por relevancia cuando hay búsqueda activa
+          result = this.items
+            .map(item => ({ item, score: this.scoreItem(item, q) }))
+            .filter(({ score }) => score > 0)
+            .sort((a, b) => b.score - a.score)
+            .map(({ item }) => item);
+        } else {
+          result = [...this.items];
+          // Sin búsqueda: respetar el sort seleccionado
+          if (this.sortBy === 'name') {
+            result.sort((a, b) => this.normalize(a.nombre).localeCompare(this.normalize(b.nombre)));
+          } else if (this.sortBy === 'stock_desc') {
+            result.sort((a, b) => Number(b.stock || 0) - Number(a.stock || 0));
+          } else if (this.sortBy === 'price_desc') {
+            result.sort((a, b) => Number(b.precio || 0) - Number(a.precio || 0));
+          } else if (this.sortBy === 'price_asc') {
+            result.sort((a, b) => Number(a.precio || 0) - Number(b.precio || 0));
+          }
         }
+
         if (this.category) {
           result = result.filter(item => item.categoria === this.category);
         }
@@ -865,15 +896,6 @@ document.addEventListener('alpine:init', function() {
         }
         if (this.stockFilter === 'out_stock') {
           result = result.filter(item => Number(item.stock) <= 0);
-        }
-        if (this.sortBy === 'name') {
-          result.sort((a, b) => (a.nombre || '').localeCompare(b.nombre || ''));
-        } else if (this.sortBy === 'stock_desc') {
-          result.sort((a, b) => Number(b.stock || 0) - Number(a.stock || 0));
-        } else if (this.sortBy === 'price_desc') {
-          result.sort((a, b) => Number(b.precio || 0) - Number(a.precio || 0));
-        } else if (this.sortBy === 'price_asc') {
-          result.sort((a, b) => Number(a.precio || 0) - Number(b.precio || 0));
         }
         return result;
       },
