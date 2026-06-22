@@ -1539,6 +1539,149 @@ window.DESARME_PREFILL = window.DESARME_PREFILL || {% if has_server_line_items %
     var s=document.createElement('style');
     s.textContent='.di-tab{color:rgba(100,160,200,.5);border-bottom:2px solid transparent;background:transparent;border-left:none;border-right:none;border-top:none;cursor:pointer;transition:color .15s,border-color .15s}.di-tab.di-on{color:#06b6d4;border-bottom-color:#06b6d4}.di-zone{cursor:pointer;transition:fill .15s,stroke .15s}';
     document.head.appendChild(s);
+
+    // ── WhatsApp + Email (acceso a DI_DATA/DI_ZLABELS en este scope) ──
+    (function() {
+      var PAIS = "{{ empresa.pais|default:'CL'|escapejs }}";
+      var EMPRESA_NOMBRE = "{{ empresa.nombre_taller|escapejs }}";
+      var DIAL = {'CL':'56','US':'1','MX':'52','AR':'54','UY':'598','BR':'55','PE':'51','VE':'58'};
+      var URL_ENVIAR_PREVIO = "{% country_url 'documentos:enviar_reporte_previo' %}";
+      var CSRF = (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
+
+      function normalizeTel(raw) {
+        raw = (raw || '').replace(/[^\d]/g, '');
+        if (!raw) return '';
+        var code = DIAL[PAIS] || '56';
+        if (raw.startsWith(code)) return raw;
+        return code + raw.replace(/^0+/, '');
+      }
+
+      function getCurrentTel() {
+        var telEl = document.getElementById('cliente-telefono');
+        return normalizeTel((telEl ? telEl.textContent.replace(/^Tel:\s*/, '') : '').trim());
+      }
+
+      function buildWaMsg() {
+        var vehiculoEl = document.getElementById('vehiculo-nombre');
+        var vehiculo = vehiculoEl ? vehiculoEl.textContent.trim() : 'vehículo';
+        var now = new Date();
+        var fecha = now.toLocaleDateString('es-CL') + ' ' + now.toLocaleTimeString('es-CL', {hour:'2-digit',minute:'2-digit'});
+        var selComb = document.getElementById('id_insp_combustible');
+        var comb = selComb ? (selComb.options[selComb.selectedIndex] || {}).text || '' : '';
+        var kmEl = document.querySelector('[name="kilometraje_ingreso"]');
+        var km = kmEl ? kmEl.value : '';
+
+        var msg = '*Inspección de Ingreso – ' + EMPRESA_NOMBRE + '*\n';
+        msg += 'Vehículo: ' + vehiculo + '\n';
+        msg += 'Fecha: ' + fecha + '\n';
+        if (km) msg += 'Kilometraje: ' + parseInt(km).toLocaleString('es-CL') + ' km\n';
+        if (comb) msg += 'Combustible: ' + comb + '\n';
+        msg += '\nDaños preexistentes:\n';
+
+        var keys = Object.keys(DI_DATA);
+        if (keys.length === 0) {
+          msg += '  Sin daños registrados\n';
+        } else {
+          keys.forEach(function(k) {
+            var d = DI_DATA[k];
+            var zonaKey = k.indexOf('::') !== -1 ? k.split('::')[1] : k;
+            msg += '  • ' + (DI_ZLABELS[zonaKey] || zonaKey) + ' → ' + (DI_LABEL[d.tipo] || d.tipo);
+            if (d.desc) msg += ': ' + d.desc;
+            msg += '\n';
+          });
+        }
+        var obsEl = document.querySelector('[name="insp_observaciones"]');
+        var obs = obsEl ? obsEl.value : '';
+        if (obs) msg += '\nObservaciones:\n' + obs + '\n';
+        msg += '\nEste reporte fue generado al momento de la recepción del vehículo.';
+        return msg;
+      }
+
+      // WhatsApp
+      var btnWa = document.getElementById('di-btn-wa');
+      var noTel = document.getElementById('di-wa-notel');
+      if (btnWa) {
+        btnWa.addEventListener('click', function() {
+          var tel = getCurrentTel();
+          if (!tel) return;
+          window.open('https://wa.me/' + tel + '?text=' + encodeURIComponent(buildWaMsg()), '_blank', 'noopener,noreferrer');
+        });
+      }
+
+      // Email
+      var btnEmail = document.getElementById('di-btn-email');
+      if (btnEmail) {
+        btnEmail.addEventListener('click', function() {
+          var emailEl = document.getElementById('di-insp-email');
+          var statusEl = document.getElementById('di-email-status');
+          var email = (emailEl ? emailEl.value : '').trim();
+          if (!email) { if (emailEl) emailEl.focus(); return; }
+
+          var vehiculoEl = document.getElementById('vehiculo-nombre');
+          var vehiculo = vehiculoEl ? vehiculoEl.textContent.trim() : '';
+          var selComb = document.getElementById('id_insp_combustible');
+          var comb = selComb ? (selComb.options[selComb.selectedIndex] || {}).text || '' : '';
+          var kmEl = document.querySelector('[name="kilometraje_ingreso"]');
+          var km = kmEl ? kmEl.value : '';
+
+          var danos = Object.keys(DI_DATA).map(function(k) {
+            var d = DI_DATA[k];
+            var zonaKey = k.indexOf('::') !== -1 ? k.split('::')[1] : k;
+            return {zona: DI_ZLABELS[zonaKey] || zonaKey, tipo: DI_LABEL[d.tipo] || d.tipo, desc: d.desc || ''};
+          });
+
+          var body = 'csrfmiddlewaretoken=' + encodeURIComponent(CSRF) +
+            '&email=' + encodeURIComponent(email) +
+            '&vehiculo=' + encodeURIComponent(vehiculo) +
+            '&km=' + encodeURIComponent(km) +
+            '&combustible=' + encodeURIComponent(comb) +
+            '&danos=' + encodeURIComponent(JSON.stringify(danos));
+
+          this.disabled = true;
+          this.textContent = 'Enviando…';
+          if (statusEl) { statusEl.style.display = 'none'; statusEl.textContent = ''; }
+
+          var self = this;
+          fetch(URL_ENVIAR_PREVIO, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded', 'X-CSRFToken': CSRF},
+            body: body
+          })
+          .then(function(r) { return r.json(); })
+          .then(function(r) {
+            if (statusEl) {
+              statusEl.style.display = '';
+              statusEl.style.color = r.ok ? '#4ade80' : '#f87171';
+              statusEl.textContent = r.ok ? '✓ Correo enviado a ' + email : '✗ ' + (r.error || 'Error desconocido');
+            }
+          })
+          .catch(function() {
+            if (statusEl) { statusEl.style.display = ''; statusEl.style.color = '#f87171'; statusEl.textContent = '✗ Error de red'; }
+          })
+          .finally(function() { self.disabled = false; self.textContent = '✉ Enviar ahora'; });
+        });
+      }
+
+      // Pre-fill email y visibilidad WA al cambiar cliente
+      function syncClienteInfo() {
+        var tel = getCurrentTel();
+        if (btnWa) btnWa.style.display = tel ? '' : 'none';
+        if (noTel) noTel.style.display = tel ? 'none' : '';
+        var emailEl = document.getElementById('di-insp-email');
+        if (emailEl && !emailEl.value) {
+          var clienteEmailEl = document.getElementById('cliente-email');
+          var rawEmail = clienteEmailEl ? clienteEmailEl.textContent.replace(/^Email:\s*/, '').trim() : '';
+          if (rawEmail) emailEl.value = rawEmail;
+        }
+      }
+
+      var mut = new MutationObserver(syncClienteInfo);
+      ['cliente-telefono', 'cliente-email'].forEach(function(id) {
+        var el = document.getElementById(id);
+        if (el) mut.observe(el, {childList:true, subtree:true, characterData:true});
+      });
+      syncClienteInfo();
+    }());
   })();
 
   window.inspeccionPreviews = function(input) {
@@ -1556,162 +1699,6 @@ window.DESARME_PREFILL = window.DESARME_PREFILL || {% if has_server_line_items %
     });
   };
 
-  /* ── WhatsApp + email en inspección embebida ── */
-  (function () {
-    var PAIS = "{{ empresa.pais|default:'CL'|escapejs }}";
-    var EMPRESA_NOMBRE = "{{ empresa.nombre_taller|escapejs }}";
-    var DIAL = {'CL':'56','US':'1','MX':'52','AR':'54','UY':'598','BR':'55','PE':'51','VE':'58'};
-
-    function normalizeTel(raw) {
-      raw = (raw || '').replace(/[^\d]/g, '');
-      if (!raw) return '';
-      var code = DIAL[PAIS] || '56';
-      if (raw.startsWith(code)) return raw;
-      return code + raw.replace(/^0+/, '');
-    }
-
-    function buildDiWaUrl(tel) {
-      var vehiculoEl = document.getElementById('vehiculo-nombre') || document.querySelector('[id*="vehiculo"]');
-      var vehiculo = vehiculoEl ? vehiculoEl.textContent.trim() : 'vehículo';
-      var now = new Date();
-      var fecha = now.toLocaleDateString('es-CL') + ' ' + now.toLocaleTimeString('es-CL',{hour:'2-digit',minute:'2-digit'});
-      var selComb = document.getElementById('id_insp_combustible');
-      var comb = selComb ? (selComb.options[selComb.selectedIndex] || {}).text || '' : '';
-      var kmEl = document.querySelector('[name="kilometraje_ingreso"]');
-      var km = kmEl ? kmEl.value : '';
-
-      var msg = '*Inspección de Ingreso – ' + EMPRESA_NOMBRE + '*\n';
-      msg += 'Vehículo: ' + vehiculo + '\n';
-      msg += 'Fecha: ' + fecha + '\n';
-      if (km) msg += 'Kilometraje: ' + parseInt(km).toLocaleString('es-CL') + ' km\n';
-      if (comb) msg += 'Combustible: ' + comb + '\n';
-      msg += '\nDaños preexistentes:\n';
-
-      var data = (typeof DI_DATA !== 'undefined') ? DI_DATA : {};
-      var keys = Object.keys(data);
-      var labels = (typeof DI_ZLABELS !== 'undefined') ? DI_ZLABELS : {};
-      if (keys.length === 0) {
-        msg += '  Sin daños registrados\n';
-      } else {
-        keys.forEach(function(k) {
-          var d = data[k];
-          var zonaKey = k.indexOf('::') !== -1 ? k.split('::')[1] : k;
-          msg += '  • ' + (labels[zonaKey] || zonaKey) + ' → ' + (d.tipo || '');
-          if (d.desc) msg += ': ' + d.desc;
-          msg += '\n';
-        });
-      }
-      var obs = (document.querySelector('[name="insp_observaciones"]') || {}).value || '';
-      if (obs) msg += '\nObservaciones:\n' + obs + '\n';
-      msg += '\nEste reporte fue generado al momento de la recepción del vehículo.';
-      return 'https://wa.me/' + tel + '?text=' + encodeURIComponent(msg);
-    }
-
-    var URL_ENVIAR_PREVIO = "{% country_url 'documentos:enviar_reporte_previo' %}";
-    var CSRF = (document.cookie.match(/csrftoken=([^;]+)/) || [])[1] || '';
-
-    function getCurrentTel() {
-      var telEl = document.getElementById('cliente-telefono');
-      return normalizeTel((telEl ? telEl.textContent.replace(/^Tel:\s*/,'') : '').trim());
-    }
-
-    function refreshDiWa() {
-      var tel = getCurrentTel();
-      var btnWa = document.getElementById('di-btn-wa');
-      var noTel = document.getElementById('di-wa-notel');
-      if (!btnWa) return;
-      if (tel) {
-        btnWa.style.display = '';
-        if (noTel) noTel.style.display = 'none';
-      } else {
-        btnWa.style.display = 'none';
-        if (noTel) noTel.style.display = '';
-      }
-      /* Pre-fill email */
-      var emailEl = document.getElementById('di-insp-email');
-      if (emailEl && !emailEl.value) {
-        var clienteEmailEl = document.getElementById('cliente-email');
-        var rawEmail = clienteEmailEl ? clienteEmailEl.textContent.replace(/^Email:\s*/,'').trim() : '';
-        if (rawEmail) emailEl.value = rawEmail;
-      }
-    }
-
-    /* WhatsApp: window.open evita el draft dialog del formulario */
-    var btnWa = document.getElementById('di-btn-wa');
-    if (btnWa) {
-      btnWa.addEventListener('click', function(e) {
-        e.preventDefault();
-        var tel = getCurrentTel();
-        if (!tel) return;
-        window.open(buildDiWaUrl(tel), '_blank', 'noopener,noreferrer');
-      });
-    }
-
-    /* Email: fetch inmediato sin guardar el OT */
-    var btnEmail = document.getElementById('di-btn-email');
-    if (btnEmail) {
-      btnEmail.addEventListener('click', function() {
-        var emailEl = document.getElementById('di-insp-email');
-        var statusEl = document.getElementById('di-email-status');
-        var email = (emailEl ? emailEl.value : '').trim();
-        if (!email) { emailEl && emailEl.focus(); return; }
-
-        var vehiculoEl = document.getElementById('vehiculo-nombre') || document.querySelector('#vehiculo-nombre');
-        var vehiculo = vehiculoEl ? vehiculoEl.textContent.trim() : '';
-        var selComb = document.getElementById('id_insp_combustible');
-        var comb = selComb ? (selComb.options[selComb.selectedIndex]||{}).text||'' : '';
-        var kmEl = document.querySelector('[name="kilometraje_ingreso"]');
-        var km = kmEl ? kmEl.value : '';
-
-        var data = (typeof DI_DATA !== 'undefined') ? DI_DATA : {};
-        var labels = (typeof DI_ZLABELS !== 'undefined') ? DI_ZLABELS : {};
-        var danos = Object.keys(data).map(function(k) {
-          var d = data[k];
-          var zonaKey = k.indexOf('::') !== -1 ? k.split('::')[1] : k;
-          return {zona: labels[zonaKey] || zonaKey, tipo: d.tipo || '', desc: d.desc || ''};
-        });
-
-        var body = new URLSearchParams({
-          csrfmiddlewaretoken: CSRF,
-          email: email,
-          vehiculo: vehiculo,
-          km: km,
-          combustible: comb,
-          danos: JSON.stringify(danos),
-        });
-
-        btnEmail.disabled = true;
-        btnEmail.textContent = 'Enviando…';
-        if (statusEl) { statusEl.style.display = 'none'; statusEl.textContent = ''; }
-
-        fetch(URL_ENVIAR_PREVIO, {method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded','X-CSRFToken':CSRF}, body: body.toString()})
-          .then(function(r){ return r.json(); })
-          .then(function(r){
-            if (statusEl) {
-              statusEl.style.display = '';
-              statusEl.style.color = r.ok ? '#4ade80' : '#f87171';
-              statusEl.textContent = r.ok ? '✓ Correo enviado a ' + email : '✗ Error: ' + (r.error || 'desconocido');
-            }
-          })
-          .catch(function(){
-            if (statusEl) { statusEl.style.display=''; statusEl.style.color='#f87171'; statusEl.textContent='✗ Error de red'; }
-          })
-          .finally(function(){
-            btnEmail.disabled = false;
-            btnEmail.textContent = '✉ Enviar ahora';
-          });
-      });
-    }
-
-    /* Observar cambios en cliente (al seleccionar diferente cliente) */
-    var obs = new MutationObserver(refreshDiWa);
-    var clienteTelEl = document.getElementById('cliente-telefono');
-    if (clienteTelEl) obs.observe(clienteTelEl, {childList:true, subtree:true, characterData:true});
-    var clienteEmailEl = document.getElementById('cliente-email');
-    if (clienteEmailEl) obs.observe(clienteEmailEl, {childList:true, subtree:true, characterData:true});
-
-    refreshDiWa();
-  }());
 })();
 </script>
 {% endblock extra_js %}
