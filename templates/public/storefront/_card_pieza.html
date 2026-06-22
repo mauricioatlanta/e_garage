@@ -1,0 +1,52 @@
+{% load humanize %}
+{# Expects: pieza (with pieza.wa_url pre-set, pieza.empresa loaded via select_related) #}
+{# Optional context var: show_empresa=True muestra el nombre del taller (kiosko multi-empresa) #}
+<article class="card-pieza overflow-hidden flex flex-col">
+
+  {# Imagen #}
+  <div class="h-44 overflow-hidden rounded-t-xl">
+    {% if pieza.imagen %}
+      <img src="{{ pieza.imagen.url }}" alt="{{ pieza.nombre }}"
+           class="w-full h-full object-cover">
+    {% else %}
+      <div class="sin-imagen w-full h-full rounded-t-xl">⚙️</div>
+    {% endif %}
+  </div>
+
+  {# Cuerpo #}
+  <div class="p-4 flex flex-col flex-1 gap-2">
+    <div class="flex items-start justify-between gap-2">
+      <h2 class="text-sm font-semibold text-white leading-snug">{{ pieza.nombre }}</h2>
+      <span class="badge-condicion badge-{{ pieza.condicion }} flex-shrink-0">
+        {{ pieza.get_condicion_display }}
+      </span>
+    </div>
+
+    {% if show_empresa %}
+      <p class="text-xs text-cyan-400/70 truncate">{{ pieza.empresa.nombre_taller }}</p>
+    {% endif %}
+
+    {% if pieza.observaciones %}
+      <p class="text-xs text-slate-400 leading-relaxed line-clamp-2">{{ pieza.observaciones }}</p>
+    {% endif %}
+
+    <div class="flex items-end justify-between mt-auto pt-3 border-t border-slate-700">
+      <div>
+        {% if pieza.precio_venta_sugerido %}
+          <span class="precio">${{ pieza.precio_venta_sugerido|floatformat:"0"|intcomma }}</span>
+        {% elif pieza.precio_sugerido %}
+          <span class="precio">${{ pieza.precio_sugerido|floatformat:"0"|intcomma }}</span>
+        {% else %}
+          <span class="text-sm text-slate-400">Consultar precio</span>
+        {% endif %}
+      </div>
+      {% if pieza.wa_url %}
+        <a href="{{ pieza.wa_url }}" target="_blank" rel="noopener" class="btn-wa">
+          <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.531 5.847L0 24l6.305-1.507A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.795 9.795 0 01-4.994-1.366l-.358-.213-3.742.895.939-3.633-.234-.374A9.774 9.774 0 012.182 12c0-5.41 4.408-9.818 9.818-9.818 5.41 0 9.818 4.408 9.818 9.818 0 5.41-4.408 9.818-9.818 9.818z"/></svg>
+          WhatsApp
+        </a>
+      {% endif %}
+    </div>
+  </div>
+
+</article>

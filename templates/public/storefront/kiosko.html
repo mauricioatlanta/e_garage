@@ -1,0 +1,193 @@
+{% extends "public/base_tienda.html" %}
+{% load static humanize %}
+
+{% block title %}Kiosko de repuestos — eGarage{% endblock %}
+
+{% block extra_css %}
+<style>
+  .kiosko-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-bottom: 1px solid rgba(34,211,238,.2);
+  }
+  .filtro-input {
+    background: #1e293b;
+    border: 1px solid rgba(34,211,238,.2);
+    border-radius: 8px;
+    color: #e2e8f0;
+    padding: .55rem .9rem;
+    width: 100%;
+    outline: none;
+  }
+  .filtro-input:focus { border-color: #22d3ee; }
+  .filtro-input::placeholder { color: #64748b; }
+  .filtro-select {
+    background: #1e293b;
+    border: 1px solid rgba(34,211,238,.2);
+    border-radius: 8px;
+    color: #e2e8f0;
+    padding: .55rem .9rem;
+    width: 100%;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+  }
+  .filtro-select:focus { border-color: #22d3ee; }
+  .filtro-label {
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+    color: #64748b;
+    margin-bottom: .25rem;
+  }
+  .chip-active {
+    background: rgba(34,211,238,.15);
+    border: 1px solid rgba(34,211,238,.4);
+    color: #22d3ee;
+    font-size: .75rem;
+    padding: .2rem .65rem;
+    border-radius: 999px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{# ── Header ───────────────────────────────────────────────────── #}
+<header class="kiosko-header px-4 py-6">
+  <div class="max-w-6xl mx-auto">
+    <h1 class="text-2xl font-bold text-white" style="font-family:'Orbitron',monospace;">
+      Kiosko de repuestos
+    </h1>
+    <p class="text-sm text-slate-400 mt-1">
+      Piezas de desarme de talleres verificados en eGarage
+    </p>
+  </div>
+</header>
+
+{# ── Filtros en cascada ────────────────────────────────────────── #}
+<section class="max-w-6xl mx-auto px-4 mt-6">
+  <form method="get" class="space-y-4">
+
+    {# Fila 1: Año → Marca → Modelo #}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div>
+        <p class="filtro-label">Año</p>
+        <select name="anio" class="filtro-select" onchange="this.form.submit()">
+          <option value="">Todos los años</option>
+          {% for anio in anios_disponibles %}
+            <option value="{{ anio }}" {% if anio_sel == anio|stringformat:"s" %}selected{% endif %}>{{ anio }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <p class="filtro-label">Marca</p>
+        <select name="marca" class="filtro-select" onchange="this.form.submit()">
+          <option value="">Todas las marcas</option>
+          {% for marca in marcas_disponibles %}
+            <option value="{{ marca }}" {% if marca_sel == marca %}selected{% endif %}>{{ marca }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <p class="filtro-label">Modelo</p>
+        <select name="modelo" class="filtro-select" onchange="this.form.submit()">
+          <option value="">Todos los modelos</option>
+          {% for modelo in modelos_disponibles %}
+            <option value="{{ modelo }}" {% if modelo_sel == modelo %}selected{% endif %}>{{ modelo }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    {# Fila 2: Pieza (nombre) → Nuevo/Usado → Región #}
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div>
+        <p class="filtro-label">Pieza</p>
+        <input type="search" name="q" value="{{ q }}"
+               placeholder="Ej: alternador, radiador…"
+               class="filtro-input" autocomplete="off">
+      </div>
+      <div>
+        <p class="filtro-label">Estado</p>
+        <select name="tipo" class="filtro-select" onchange="this.form.submit()">
+          <option value="">Nuevo y usado</option>
+          <option value="NUEVO" {% if tipo_sel == "NUEVO" %}selected{% endif %}>Solo nuevos</option>
+          <option value="USADO" {% if tipo_sel == "USADO" %}selected{% endif %}>Solo usados</option>
+        </select>
+      </div>
+      <div>
+        <p class="filtro-label">Región</p>
+        <select name="region" class="filtro-select" onchange="this.form.submit()">
+          <option value="">Todas las regiones</option>
+          {% for region in regiones_disponibles %}
+            <option value="{{ region }}" {% if region_sel == region %}selected{% endif %}>{{ region }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    {# Botones y chips de filtros activos #}
+    <div class="flex flex-wrap items-center gap-2">
+      <button type="submit"
+              class="px-5 py-2 rounded-lg font-semibold text-sm text-black bg-cyan-400 hover:bg-cyan-300 transition-colors">
+        Buscar
+      </button>
+      {% if anio_sel or marca_sel or modelo_sel or q or tipo_sel or region_sel %}
+        <a href="/tienda/kiosko/"
+           class="px-4 py-2 rounded-lg text-sm text-slate-400 border border-slate-700 hover:border-slate-500 transition-colors">
+          Limpiar filtros
+        </a>
+        {# Chips de filtros activos #}
+        {% if anio_sel %}<span class="chip-active">{{ anio_sel }}</span>{% endif %}
+        {% if marca_sel %}<span class="chip-active">{{ marca_sel }}</span>{% endif %}
+        {% if modelo_sel %}<span class="chip-active">{{ modelo_sel }}</span>{% endif %}
+        {% if q %}<span class="chip-active">«{{ q }}»</span>{% endif %}
+        {% if tipo_sel == "NUEVO" %}<span class="chip-active">Nuevo</span>{% endif %}
+        {% if tipo_sel == "USADO" %}<span class="chip-active">Usado</span>{% endif %}
+        {% if region_sel %}<span class="chip-active">📍 {{ region_sel }}</span>{% endif %}
+      {% endif %}
+    </div>
+
+  </form>
+
+  <p class="text-xs text-slate-500 mt-3">
+    {{ piezas.paginator.count }} repuesto{{ piezas.paginator.count|pluralize }} encontrado{{ piezas.paginator.count|pluralize }}
+  </p>
+</section>
+
+{# ── Grilla de piezas ─────────────────────────────────────────── #}
+<main class="max-w-6xl mx-auto px-4 mt-6 pb-8">
+
+  {% if not piezas %}
+    <div class="text-center py-20 text-slate-500">
+      <p class="text-4xl mb-3">🔍</p>
+      <p class="text-lg">No encontramos repuestos con esos criterios.</p>
+      <a href="/tienda/kiosko/" class="mt-4 inline-block text-cyan-400 hover:underline text-sm">Ver todos</a>
+    </div>
+  {% else %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+      {% for pieza in piezas %}
+        {% include "public/storefront/_card_pieza.html" %}
+      {% endfor %}
+    </div>
+
+    {# Paginación #}
+    {% if piezas.has_other_pages %}
+    <nav class="mt-8 flex justify-center gap-2 text-sm">
+      {% if piezas.has_previous %}
+        <a href="?{{ qs_base }}{% if qs_base %}&{% endif %}page={{ piezas.previous_page_number }}"
+           class="px-3 py-2 rounded border border-slate-700 text-slate-300 hover:border-cyan-400 transition-colors">← Anterior</a>
+      {% endif %}
+      <span class="px-3 py-2 text-slate-500">{{ piezas.number }} / {{ piezas.paginator.num_pages }}</span>
+      {% if piezas.has_next %}
+        <a href="?{{ qs_base }}{% if qs_base %}&{% endif %}page={{ piezas.next_page_number }}"
+           class="px-3 py-2 rounded border border-slate-700 text-slate-300 hover:border-cyan-400 transition-colors">Siguiente →</a>
+      {% endif %}
+    </nav>
+    {% endif %}
+
+  {% endif %}
+</main>
+
+{% endblock %}

@@ -109,6 +109,7 @@ try:
         ),
         path("piezas/", views.lista_piezas, name="lista_piezas"),
         path("piezas/crear/", views.crear_pieza, name="crear_pieza"),
+        path("piezas/nueva-suelta/", views.crear_pieza_suelta, name="crear_pieza_suelta"),
         path("piezas/<int:pk>/editar/", views.editar_pieza, name="editar_pieza"),
     ]
 except ImportError:

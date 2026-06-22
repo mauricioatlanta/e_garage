@@ -130,8 +130,13 @@
   <div class="vehicle-card" {% if v.color.hex %}style="border-color:{{ v.color.hex }};box-shadow:0 0 8px {{ v.color.hex }}66;"{% endif %}>
     <div class="flex items-center justify-between mb-2">
       <div>
+        {% if v.es_placeholder %}
+        <span style="display:inline-block;background:rgba(6,182,212,0.15);border:1px solid rgba(6,182,212,0.4);border-radius:5px;color:#06b6d4;font-size:0.65rem;padding:1px 6px;letter-spacing:0.05em;margin-bottom:2px;">PIEZA SUELTA</span><br>
+        <h3 class="text-white font-bold text-sm">{{ v.get_marca_display|default:"Sin marca" }} {{ v.get_modelo_display|default:"" }}{% if v.anio %} ({{ v.anio }}){% endif %}</h3>
+        {% else %}
         <h3 class="text-white font-bold text-sm">{{ v.patente|default:v.vin|default:"—" }}</h3>
         <p class="text-cyan-400 text-xs">{{ v.get_marca_display|default:"-" }} {{ v.get_modelo_display|default:"" }} · {{ v.anio|default:"—" }}</p>
+        {% endif %}
       </div>
       <span class="badge-repuestos" title="{% trans 'Repuestos registradas' %}">{{ v.repuestos_count }} {% trans "repuestos" %}</span>
     </div>

@@ -2,7 +2,7 @@ from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from taller.models.extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
-from taller.models.pieza_desarme import PiezaDesarme
+from taller.models.pieza_desarme import CONDICION_CHOICES, PiezaDesarme
 from taller.models.vehiculos import Vehiculo
 from taller.models.vendedor_desarme import VendedorDesarme
 
@@ -83,6 +83,22 @@ class VehiculoDesarmeForm(forms.ModelForm):
         max_length=80,
         widget=forms.TextInput(
             attrs={"class": "input-desarme", "placeholder": "Ej: Limousine, Off-road"}
+        ),
+    )
+    marca_otro = forms.CharField(
+        required=False,
+        label="Marca (otro)",
+        max_length=100,
+        widget=forms.TextInput(
+            attrs={"class": "input-desarme", "placeholder": "Ej: BYD, Great Wall, Chery"}
+        ),
+    )
+    modelo_otro = forms.CharField(
+        required=False,
+        label="Modelo (otro)",
+        max_length=150,
+        widget=forms.TextInput(
+            attrs={"class": "input-desarme", "placeholder": "Ej: Tiggo 3, Jolion"}
         ),
     )
 
@@ -274,10 +290,13 @@ class VehiculoDesarmeForm(forms.ModelForm):
         # Para países con catálogo FK (no USA), limpiar marca_texto/modelo_texto del
         # instance ANTES de que ModelForm llame a instance.full_clean(). Sin esto,
         # el model.clean() rechaza vehículos creados con campos de texto libre (ej: seed demo).
+        # Excepción: si el usuario eligió "Otro", se conserva el texto libre.
         _pais = str(getattr(self.empresa, "pais", "US") or "US").upper()[:2]
         if _pais not in {"US"} and self.instance:
-            self.instance.marca_texto = ""
-            self.instance.modelo_texto = ""
+            if not self.cleaned_data.get("marca_otro"):
+                self.instance.marca_texto = ""
+            if not self.cleaned_data.get("modelo_otro"):
+                self.instance.modelo_texto = ""
         super()._post_clean()
 
     def _clean_money_cl(self, field_name):
@@ -311,6 +330,12 @@ class VehiculoDesarmeForm(forms.ModelForm):
             data["anio"] = anio_otro
         elif not anio:
             raise ValidationError({"anio": "Seleccione un año o ingrese uno personalizado."})
+
+        # Marca/modelo con escape "Otro": si eligió texto libre, limpia la FK para evitar conflicto
+        if data.get("marca_otro"):
+            data["marca"] = None
+        if data.get("modelo_otro"):
+            data["modelo"] = None
 
         # Al menos VIN o Patente deben estar presentes (el modelo lo exige en clean() pero
         # como error non-field que el template no muestra; lo capturamos aquí con add_error).
@@ -352,6 +377,15 @@ class VehiculoDesarmeForm(forms.ModelForm):
             instance.tipo_carroceria = tc_otro
         elif tc:
             instance.tipo_carroceria = tc
+        # Marca/modelo con escape "Otro": guardar texto libre en marca_texto/modelo_texto
+        marca_otro = (self.cleaned_data.get("marca_otro") or "").strip()
+        if marca_otro:
+            instance.marca = None
+            instance.marca_texto = marca_otro
+        modelo_otro = (self.cleaned_data.get("modelo_otro") or "").strip()
+        if modelo_otro:
+            instance.modelo = None
+            instance.modelo_texto = modelo_otro
         # Añadir transporte/grua y otros gastos a observaciones (vendedor_desarme ya es FK)
         extras = []
         t = self.cleaned_data.get("transporte_grua")
@@ -382,6 +416,7 @@ class PiezaDesarmeForm(forms.ModelForm):
             "codigo",
             "nombre",
             "cantidad",
+            "condicion",
             "estado_pieza",
             "ubicacion_fisica",
             "observaciones",
@@ -408,8 +443,77 @@ class PiezaDesarmeForm(forms.ModelForm):
         ):
             if f in self.fields:
                 self.fields[f].required = False
+        # Condición: select nativo
+        if "condicion" in self.fields:
+            from taller.models.pieza_desarme import CONDICION_CHOICES
+            self.fields["condicion"].widget = forms.Select(
+                attrs={"class": "input-desarme"},
+                choices=CONDICION_CHOICES,
+            )
         # Observaciones: textarea compacto (pocas líneas)
         if "observaciones" in self.fields:
             self.fields["observaciones"].widget = forms.Textarea(
                 attrs={"rows": 3, "class": "input-desarme pieza-obs", "placeholder": ""}
             )
+
+
+class PiezaSueltaForm(forms.Form):
+    """
+    Formulario corto para registrar una pieza suelta sin vehículo completo.
+    Crea un Vehiculo placeholder automáticamente al guardar.
+    """
+
+    nombre = forms.CharField(
+        max_length=255,
+        label="Nombre de la pieza",
+        widget=forms.TextInput(attrs={"class": "input-desarme", "placeholder": "Ej: Tambor de freno trasero"}),
+    )
+    condicion = forms.ChoiceField(
+        choices=CONDICION_CHOICES,
+        label="Condición",
+        widget=forms.Select(attrs={"class": "input-desarme"}),
+    )
+    precio_venta_sugerido = forms.DecimalField(
+        required=False,
+        max_digits=12,
+        decimal_places=2,
+        label="Precio de venta sugerido",
+        widget=forms.NumberInput(attrs={"class": "input-desarme", "min": "0", "step": "1"}),
+    )
+    codigo = forms.CharField(
+        required=False,
+        max_length=100,
+        label="Código (opcional)",
+        widget=forms.TextInput(attrs={"class": "input-desarme", "placeholder": "Se auto-genera si se deja vacío"}),
+    )
+    cantidad = forms.IntegerField(
+        required=False,
+        min_value=1,
+        initial=1,
+        label="Cantidad",
+        widget=forms.NumberInput(attrs={"class": "input-desarme", "min": "1"}),
+    )
+    imagen = forms.ImageField(
+        required=False,
+        label="Foto de la pieza (opcional)",
+    )
+    # Datos del vehículo de origen (solo trazabilidad, todos opcionales)
+    marca_texto = forms.CharField(
+        required=False,
+        max_length=100,
+        label="Marca del auto de origen",
+        widget=forms.TextInput(attrs={"class": "input-desarme", "placeholder": "Ej: Toyota"}),
+    )
+    modelo_texto = forms.CharField(
+        required=False,
+        max_length=150,
+        label="Modelo del auto de origen",
+        widget=forms.TextInput(attrs={"class": "input-desarme", "placeholder": "Ej: Corolla"}),
+    )
+    anio_origen = forms.IntegerField(
+        required=False,
+        min_value=1900,
+        max_value=2100,
+        label="Año del auto de origen",
+        widget=forms.NumberInput(attrs={"class": "input-desarme", "placeholder": "Ej: 2018"}),
+    )

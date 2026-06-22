@@ -1,0 +1,125 @@
+{% extends "public/base_tienda.html" %}
+{% load static humanize %}
+
+{% block title %}{{ empresa.nombre_taller }} — Repuestos disponibles{% endblock %}
+
+{% block extra_css %}
+<style>
+  .tienda-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    border-bottom: 1px solid rgba(34,211,238,.2);
+  }
+  .filtro-input {
+    background: #1e293b;
+    border: 1px solid rgba(34,211,238,.2);
+    border-radius: 8px;
+    color: #e2e8f0;
+    padding: .55rem .9rem;
+    width: 100%;
+    outline: none;
+  }
+  .filtro-input:focus { border-color: #22d3ee; }
+  .filtro-input::placeholder { color: #64748b; }
+  .filtro-select {
+    background: #1e293b;
+    border: 1px solid rgba(34,211,238,.2);
+    border-radius: 8px;
+    color: #e2e8f0;
+    padding: .55rem .9rem;
+    width: 100%;
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+  }
+  .filtro-select:focus { border-color: #22d3ee; }
+</style>
+{% endblock %}
+
+{% block content %}
+
+{# ── Header de la tienda ──────────────────────────────────────── #}
+<header class="tienda-header px-4 py-6">
+  <div class="max-w-5xl mx-auto flex items-center gap-4">
+    {% if empresa.logo %}
+      <img src="{{ empresa.logo.url }}" alt="{{ empresa.nombre_taller }}"
+           class="h-14 w-auto object-contain rounded-lg">
+    {% endif %}
+    <div>
+      <h1 class="text-2xl font-bold text-white" style="font-family:'Orbitron',monospace;">
+        {{ empresa.nombre_taller }}
+      </h1>
+      {% if empresa.comuna %}
+        <p class="text-sm text-slate-400 mt-1">📍 {{ empresa.comuna }}{% if empresa.region %}, {{ empresa.region }}{% endif %}</p>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+{# ── Filtros ──────────────────────────────────────────────────── #}
+<section class="max-w-5xl mx-auto px-4 mt-6">
+  <form method="get" class="flex flex-col sm:flex-row gap-3">
+    <div class="flex-1">
+      <input type="search" name="q" value="{{ q }}" placeholder="Buscar repuesto…"
+             class="filtro-input" autocomplete="off">
+    </div>
+    <div class="sm:w-48">
+      <select name="condicion" class="filtro-select">
+        <option value="">Todas las condiciones</option>
+        {% for val, label in condiciones %}
+          <option value="{{ val }}" {% if condicion_sel == val %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit"
+            class="px-5 py-2 rounded-lg font-semibold text-sm text-black bg-cyan-400 hover:bg-cyan-300 transition-colors">
+      Buscar
+    </button>
+    {% if q or condicion_sel %}
+      <a href="?{% if condicion_sel %}condicion={{ condicion_sel }}{% endif %}"
+         class="px-4 py-2 rounded-lg text-sm text-slate-400 border border-slate-700 hover:border-slate-500 transition-colors self-center">
+        Limpiar
+      </a>
+    {% endif %}
+  </form>
+
+  <p class="text-xs text-slate-500 mt-2">
+    {{ piezas.paginator.count }} repuesto{{ piezas.paginator.count|pluralize }} disponible{{ piezas.paginator.count|pluralize }}
+    {% if q %} para «{{ q }}»{% endif %}
+  </p>
+</section>
+
+{# ── Grilla de piezas ─────────────────────────────────────────── #}
+<main class="max-w-5xl mx-auto px-4 mt-6 pb-8">
+
+  {% if not piezas %}
+    <div class="text-center py-20 text-slate-500">
+      <p class="text-4xl mb-3">🔍</p>
+      <p class="text-lg">No encontramos repuestos con esos criterios.</p>
+      <a href="?" class="mt-4 inline-block text-cyan-400 hover:underline text-sm">Ver todos</a>
+    </div>
+  {% else %}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      {% for pieza in piezas %}
+        {% include "public/storefront/_card_pieza.html" %}
+      {% endfor %}
+    </div>
+
+    {# Paginación simple #}
+    {% if piezas.has_other_pages %}
+    <nav class="mt-8 flex justify-center gap-2 text-sm">
+      {% if piezas.has_previous %}
+        <a href="?page={{ piezas.previous_page_number }}{% if q %}&q={{ q }}{% endif %}{% if condicion_sel %}&condicion={{ condicion_sel }}{% endif %}"
+           class="px-3 py-2 rounded border border-slate-700 text-slate-300 hover:border-cyan-400 transition-colors">← Anterior</a>
+      {% endif %}
+      <span class="px-3 py-2 text-slate-500">{{ piezas.number }} / {{ piezas.paginator.num_pages }}</span>
+      {% if piezas.has_next %}
+        <a href="?page={{ piezas.next_page_number }}{% if q %}&q={{ q }}{% endif %}{% if condicion_sel %}&condicion={{ condicion_sel }}{% endif %}"
+           class="px-3 py-2 rounded border border-slate-700 text-slate-300 hover:border-cyan-400 transition-colors">Siguiente →</a>
+      {% endif %}
+    </nav>
+    {% endif %}
+
+  {% endif %}
+</main>
+
+{% endblock %}

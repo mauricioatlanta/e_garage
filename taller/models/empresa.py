@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db import models
 from django.db.models import CheckConstraint, Q
 from django.utils import timezone
+from django.utils.text import slugify
 
 from taller.utils.plan_catalog import PLAN_BUSINESS, PLAN_ENTRY, PLAN_GROWTH, PLAN_TRIAL
 
@@ -79,6 +80,12 @@ class Empresa(models.Model):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="empresa"
     )
+    slug = models.SlugField(
+        max_length=80,
+        unique=True,
+        blank=True,
+        help_text="Identificador URL de la tienda pública (/tienda/{slug})",
+    )
     nombre_taller = models.CharField(
         max_length=100, default="Mi Taller"
     )  # Migrado desde TallerInfo
@@ -93,6 +100,9 @@ class Empresa(models.Model):
 
     logo = models.ImageField(upload_to="logos_talleres/", null=True, blank=True)
     direccion = models.CharField(max_length=200, blank=True)
+    region = models.CharField(max_length=100, blank=True)
+    comuna = models.CharField(max_length=100, blank=True)
+    ciudad = models.CharField(max_length=100, blank=True)
     telefono = models.CharField(max_length=32, blank=True)  # Migrado desde TallerInfo
     # Indica si la empresa ya usó la prueba gratuita (migrado desde TallerInfo.ha_usado_prueba)
     ha_usado_prueba = models.BooleanField(default=False)
@@ -196,7 +206,20 @@ class Empresa(models.Model):
             if not self.zona_horaria:
                 self.zona_horaria = "UTC"
 
+        if not self.slug:
+            self._generar_slug_unico()
+
         super().save(*args, **kwargs)
+
+    def _generar_slug_unico(self):
+        base = slugify(self.nombre_taller)[:72] or "taller"
+        candidato = base
+        sufijo = 2
+        qs = Empresa.objects.exclude(pk=self.pk)
+        while qs.filter(slug=candidato).exists():
+            candidato = f"{base}-{sufijo}"
+            sufijo += 1
+        self.slug = candidato
 
     @property
     def es_usa(self):

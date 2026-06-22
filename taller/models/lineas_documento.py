@@ -76,6 +76,21 @@ class LineaServicio(models.Model):
         related_name="lineas_servicio",
         help_text="Técnico responsable de esta línea (si no se especifica, hereda del documento)",
     )
+    vendedor = models.ForeignKey(
+        "taller.TeamMember",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="lineas_servicio_comision",
+        help_text="Vendedor que generó esta línea (para comisión)",
+    )
+    porcentaje_comision = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="% de comisión congelado al momento de la venta. No se recalcula.",
+    )
 
     def clean(self):
         """Validaciones de consistencia para LineaServicio"""
@@ -339,6 +354,21 @@ class LineaRepuesto(models.Model):
         on_delete=models.SET_NULL,
         related_name="lineas_repuesto",
         help_text="Técnico responsable de esta línea (si no se especifica, hereda del documento)",
+    )
+    vendedor = models.ForeignKey(
+        "taller.TeamMember",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="lineas_repuesto_comision",
+        help_text="Vendedor que generó esta línea (para comisión)",
+    )
+    porcentaje_comision = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="% de comisión congelado al momento de la venta. No se recalcula.",
     )
 
     origen_repuesto = models.CharField(

@@ -9,6 +9,12 @@
 
 {% block content %}
 <section class="cdm-shell">
+  <div class="cdm-topbar">
+    <a href="{{ workspace_base_prefix|default:'/cl/es' }}/workspace/" class="cdm-back-btn">
+      <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+      Workspace
+    </a>
+  </div>
   <div class="cdm-kpis">
     <div class="cdm-kpi">
       <p class="cdm-kpi-label">En taller</p>

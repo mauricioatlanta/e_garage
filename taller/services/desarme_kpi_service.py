@@ -25,7 +25,7 @@ from .desarme_financial_service import (
 
 def kpis_resumen(empresa):
     """Devuelve un dict con KPIs principales listos para mostrar en dashboard."""
-    vehs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+    vehs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME, es_placeholder=False)
     total_inversion = Decimal("0")
     total_ingresos = Decimal("0")
     total_ganancia = Decimal("0")
@@ -192,7 +192,7 @@ def top_modelos(empresa, limit=10):
 
 
 def top_roi_vehiculos(empresa, limit=10):
-    vehs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+    vehs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME, es_placeholder=False)
     scored = []
     for v in vehs:
         roi = calcular_roi_vehiculo(v)

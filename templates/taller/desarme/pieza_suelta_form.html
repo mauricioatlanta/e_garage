@@ -1,0 +1,160 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+
+{% block page_title %}Desarme – Agregar pieza suelta{% endblock %}
+{% block page_subtitle %}Registra una pieza sin necesidad de ingresar un vehículo completo{% endblock %}
+{% block page_icon %}🔩{% endblock %}
+
+{% block page_extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --ds-cyan: #06b6d4; --ds-radius: 10px; --ds-radius-sm: 8px; }
+  .glass-panel-desarme {
+    background: rgba(0,0,0,0.4);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(6,182,212,0.25);
+    border-radius: var(--ds-radius);
+    box-shadow: 0 0 16px rgba(6,182,212,0.08);
+    max-width: 640px;
+  }
+  .form-desarme input, .form-desarme select, .form-desarme textarea {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(6,182,212,0.3);
+    border-radius: var(--ds-radius-sm);
+    padding: 6px 10px;
+    color: #e0e7ff;
+    font-size: 0.875rem;
+    width: 100%;
+    min-height: 32px;
+  }
+  .form-desarme input:focus, .form-desarme select:focus {
+    outline: none;
+    border-color: var(--ds-cyan);
+    box-shadow: 0 0 0 2px rgba(6,182,212,0.2);
+  }
+  .form-row { display: grid; gap: 0.75rem 1rem; margin-bottom: 0.75rem; }
+  .form-row-2 { grid-template-columns: 1fr 1fr; }
+  .form-row-3 { grid-template-columns: 1fr 1fr 1fr; }
+  @media (max-width: 520px) { .form-row-2, .form-row-3 { grid-template-columns: 1fr; } }
+  .form-group { margin-bottom: 0; min-width: 0; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label {
+    display: block; font-size: 0.75rem; font-weight: 500;
+    color: var(--ds-cyan); margin-bottom: 3px; letter-spacing: 0.02em;
+  }
+  .form-section { margin-bottom: 1rem; }
+  .form-section:last-of-type { margin-bottom: 0.5rem; }
+  .form-section h4 {
+    font-family: 'Orbitron', monospace; font-size: 0.7rem; color: #94a3b8;
+    text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(6,182,212,0.15); padding-bottom: 4px;
+  }
+  .form-actions {
+    display: flex; flex-wrap: wrap; gap: 0.5rem;
+    padding-top: 0.75rem; margin-top: 0.5rem;
+    border-top: 1px solid rgba(6,182,212,0.15);
+  }
+  .form-actions .btn { padding: 6px 14px; font-size: 0.875rem; border-radius: 8px; }
+  .badge-suelta {
+    display: inline-block; background: rgba(6,182,212,0.15);
+    border: 1px solid rgba(6,182,212,0.4); border-radius: 6px;
+    color: var(--ds-cyan); font-size: 0.7rem; padding: 2px 8px;
+    letter-spacing: 0.05em; margin-bottom: 0.75rem;
+  }
+  .hint { font-size: 0.7rem; color: #64748b; margin-top: 2px; }
+</style>
+{% endblock %}
+
+{% block main_actions %}
+<a href="{% country_url 'desarme:lista_piezas' %}"
+   class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-500 text-gray-300 hover:bg-gray-700 text-sm">
+  ← Listado de piezas
+</a>
+{% endblock %}
+
+{% block panel_content %}
+<div class="glass-panel-desarme p-4 form-desarme">
+
+  <div class="badge-suelta">PIEZA SUELTA — sin vehículo completo</div>
+
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% if messages %}
+    <div class="mb-3">
+      {% for msg in messages %}
+      <p class="text-red-400 text-sm">{{ msg }}</p>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="form-section">
+      <h4>Datos de la pieza</h4>
+      <div class="form-row form-row-2">
+        <div class="form-group full">
+          <label for="{{ form.nombre.id_for_label }}">{{ form.nombre.label }} *</label>
+          {{ form.nombre }}
+          {% if form.nombre.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.nombre.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.condicion.id_for_label }}">{{ form.condicion.label }} *</label>
+          {{ form.condicion }}
+          {% if form.condicion.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.condicion.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.precio_venta_sugerido.id_for_label }}">{{ form.precio_venta_sugerido.label }}</label>
+          {{ form.precio_venta_sugerido }}
+          {% if form.precio_venta_sugerido.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.precio_venta_sugerido.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.codigo.id_for_label }}">{{ form.codigo.label }}</label>
+          {{ form.codigo }}
+          <p class="hint">Se auto-genera si se deja vacío</p>
+          {% if form.codigo.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.codigo.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.cantidad.id_for_label }}">{{ form.cantidad.label }}</label>
+          {{ form.cantidad }}
+          {% if form.cantidad.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.cantidad.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.imagen.id_for_label }}">{{ form.imagen.label }}</label>
+          {{ form.imagen }}
+          {% if form.imagen.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.imagen.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-section">
+      <h4>Vehículo de origen <span style="font-weight:400;color:#475569">(solo para trazabilidad, todo opcional)</span></h4>
+      <div class="form-row form-row-3">
+        <div class="form-group">
+          <label for="{{ form.marca_texto.id_for_label }}">{{ form.marca_texto.label }}</label>
+          {{ form.marca_texto }}
+          {% if form.marca_texto.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.marca_texto.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.modelo_texto.id_for_label }}">{{ form.modelo_texto.label }}</label>
+          {{ form.modelo_texto }}
+          {% if form.modelo_texto.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.modelo_texto.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="form-group">
+          <label for="{{ form.anio_origen.id_for_label }}">{{ form.anio_origen.label }}</label>
+          {{ form.anio_origen }}
+          {% if form.anio_origen.errors %}<p class="text-red-400 text-xs mt-0.5">{{ form.anio_origen.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn bg-cyan-600 hover:bg-cyan-500 text-white font-semibold">
+        Guardar pieza suelta
+      </button>
+      <a href="{% country_url 'desarme:lista_piezas' %}" class="btn border border-gray-500 text-gray-300 hover:bg-gray-700">
+        Cancelar
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}

@@ -64,6 +64,8 @@ from .auditoria import LogAuditoria
 from .pago import PagoPendiente
 from .regimen_fiscal import RegimenFiscal
 from .marcas_usa import MarcaVehiculo, ModeloVehiculo
+from .comision import ConfiguracionComisionEmpresa, VendedorComision
+from .alias_repuesto import AliasRepuesto
 
 # Inspección de ingreso de vehículos
 from .inspeccion_ingreso import InspeccionIngreso, DanoInspeccion, EvidenciaInspeccion
@@ -127,6 +129,10 @@ __all__ = [
     "RegimenFiscal",
     "MarcaVehiculo",
     "ModeloVehiculo",
+    # Kiosko / comisiones
+    "ConfiguracionComisionEmpresa",
+    "VendedorComision",
+    "AliasRepuesto",
     # Inspección de ingreso
     "InspeccionIngreso",
     "DanoInspeccion",

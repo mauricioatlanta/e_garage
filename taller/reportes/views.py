@@ -638,7 +638,7 @@ def dashboard_inteligencia_operativa(request):
         empresa=empresa,  # 🔒 FILTRO EMPRESA
     ).count()
     total_clientes = Cliente.objects.filter(empresa=empresa).count()  # 🔒 FILTRO EMPRESA
-    total_vehiculos = Vehiculo.objects.filter(empresa=empresa).count()  # 🔒 FILTRO EMPRESA
+    total_vehiculos = Vehiculo.objects.filter(empresa=empresa, es_placeholder=False).count()  # 🔒 FILTRO EMPRESA
 
     # Facturación del mes actual vs mes anterior - FILTRADO POR EMPRESA
     hoy = timezone.now().date()

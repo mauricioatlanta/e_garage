@@ -388,11 +388,44 @@ class InventoryService:
 
     @staticmethod
     @transaction.atomic
+    def reservar_pieza(pieza_id: int) -> None:
+        """DISPONIBLE → RESERVADA. No-op si ya está en otro estado."""
+        PiezaDesarme.objects.filter(
+            id=pieza_id, estado_pieza=ESTADO_DISPONIBLE
+        ).update(estado_pieza=ESTADO_RESERVADA)
+
+    @staticmethod
+    @transaction.atomic
+    def liberar_pieza_si_libre(pieza_id: int) -> None:
+        """
+        RESERVADA → DISPONIBLE solo si ningún documento BORRADOR activo sigue usando
+        esta pieza. Llamar tras borrar una línea o emitir/anular/cancelar el documento.
+        """
+        pieza = (
+            PiezaDesarme.objects.select_for_update()
+            .filter(id=pieza_id, estado_pieza=ESTADO_RESERVADA)
+            .first()
+        )
+        if not pieza:
+            return  # ya DISPONIBLE, VENDIDA, etc.
+
+        still_reserved = LineaRepuesto.objects.filter(
+            pieza_desarme_id=pieza_id,
+            documento__estado="BORRADOR",
+            documento__tipo__in=InventoryService.TIPOS_CON_STOCK,
+        ).exists()
+        if not still_reserved:
+            PiezaDesarme.objects.filter(id=pieza_id).update(
+                estado_pieza=ESTADO_DISPONIBLE, activo=True
+            )
+
+    @staticmethod
+    @transaction.atomic
     def _actualizar_stock_desarme(pieza: "PiezaDesarme", cantidad: int):
         """
         Actualiza cantidad de PiezaDesarme. cantidad: + reponer, - descontar.
         Cuando cantidad llega a 0: estado_pieza=VENDIDA, activo=False.
-        Cuando se repone y pasa de 0 a >0: estado_pieza=DISPONIBLE, activo=True.
+        Cuando se repone y pasa de 0 a >0 desde VENDIDA: estado_pieza=DISPONIBLE, activo=True.
         """
         PiezaDesarme.objects.filter(id=pieza.id).update(cantidad=F("cantidad") + cantidad)
         pieza.refresh_from_db()
@@ -419,7 +452,7 @@ class InventoryService:
             except Exception:
                 log.exception("Error al actualizar estado del vehículo tras agotar piezas")
         elif pieza.estado_pieza == ESTADO_VENDIDA and pieza.cantidad > 0:
-            # Reposición: volver a disponible
+            # Reposición desde cero: volver a disponible
             PiezaDesarme.objects.filter(id=pieza.id).update(
                 estado_pieza=ESTADO_DISPONIBLE, activo=True
             )

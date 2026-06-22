@@ -178,6 +178,17 @@
                                         data-nombre="{{ empresa.nombre_taller|default:'Empresa'|escape }}">
                                     🗑️ Eliminar
                                 </button>
+                                {% with kiosko=empresa.configuracion_comision.kiosko_autorizado %}
+                                <div role="button" tabindex="0"
+                                        class="inline-flex items-center justify-center text-[11px] px-2 py-1 rounded whitespace-nowrap border cursor-pointer kiosko-toggle-btn
+                                            {% if kiosko %}bg-emerald-900/80 hover:bg-emerald-800 text-emerald-300 border-emerald-700{% else %}bg-gray-700/80 hover:bg-gray-600 text-gray-400 border-gray-600{% endif %}"
+                                        data-accion="toggle-kiosko"
+                                        data-url="{% url 'admin_toggle_kiosko' empresa.id %}"
+                                        data-nombre="{{ empresa.nombre_taller|default:'Empresa'|escape }}"
+                                        data-estado="{{ kiosko|yesno:'true,false' }}">
+                                    🏪 {% if kiosko %}Kiosko ✓{% else %}Kiosko{% endif %}
+                                </div>
+                                {% endwith %}
                             </div>
                         </td>
                     </tr>
@@ -401,6 +412,60 @@ document.addEventListener('click', function(e) {
             window.alert(data.error || 'Error desconocido');
             btn.disabled = false;
         }
+    })
+    .catch(function(err) {
+        window.alert('Error: ' + (err.message || String(err)));
+        btn.disabled = false;
+    });
+});
+
+document.addEventListener('click', function(e) {
+    var btn = e.target.closest('[data-accion="toggle-kiosko"]');
+    if (!btn || btn.disabled) return;
+    var url = btn.getAttribute('data-url');
+    var nombre = btn.getAttribute('data-nombre') || 'esta empresa';
+    var estadoActual = btn.getAttribute('data-estado') === 'true';
+    if (!url) return;
+
+    var msg = estadoActual
+        ? '¿Deshabilitar el kiosko para "' + nombre + '"? Sus piezas dejarán de aparecer en el marketplace.'
+        : '¿Habilitar el kiosko para "' + nombre + '"? Sus piezas aparecerán en el marketplace público.';
+    if (!window.confirm(msg)) return;
+
+    var csrftoken = egAdminSuscriptoresCsrf();
+    btn.disabled = true;
+    fetch(url, {
+        method: 'POST',
+        headers: csrftoken ? { 'X-CSRFToken': csrftoken } : {},
+        credentials: 'same-origin'
+    })
+    .then(function(response) {
+        var ct = response.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+            throw new Error('Respuesta no JSON (status ' + response.status + ')');
+        }
+        return response.json().then(function(data) {
+            if (!response.ok) throw new Error(data.error || ('Error HTTP ' + response.status));
+            return data;
+        });
+    })
+    .then(function(data) {
+        if (data.success) {
+            var activo = data.kiosko_autorizado;
+            btn.setAttribute('data-estado', activo ? 'true' : 'false');
+            btn.textContent = activo ? '🏪 Kiosko ✓' : '🏪 Kiosko';
+            btn.className = btn.className
+                .replace(/bg-\S+|text-\S+|border-\S+/g, '')
+                .trim();
+            if (activo) {
+                btn.classList.add('bg-emerald-900/80', 'hover:bg-emerald-800', 'text-emerald-300', 'border-emerald-700');
+            } else {
+                btn.classList.add('bg-gray-700/80', 'hover:bg-gray-600', 'text-gray-400', 'border-gray-600');
+            }
+        } else {
+            window.alert(data.error || 'Error desconocido');
+        }
+        btn.disabled = false;
     })
     .catch(function(err) {
         window.alert('Error: ' + (err.message || String(err)));

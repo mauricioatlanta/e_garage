@@ -7,6 +7,7 @@ from taller.views_extra.admin_suscriptores import (
     detalle_suscriptor,
     eliminar_suscriptor_ajax,
     extender_suscripcion_ajax,
+    toggle_kiosko_autorizado,
 )
 
 urlpatterns = [
@@ -25,5 +26,10 @@ urlpatterns = [
         "<int:empresa_id>/actualizar-telefono/",
         actualizar_telefono_ajax,
         name="admin_actualizar_telefono",
+    ),
+    path(
+        "<int:empresa_id>/kiosko/toggle/",
+        toggle_kiosko_autorizado,
+        name="admin_toggle_kiosko",
     ),
 ]

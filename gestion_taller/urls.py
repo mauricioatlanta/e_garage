@@ -246,6 +246,8 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 urlpatterns = [
     path("healthz/", healthz, name="healthz"),
+    # Storefront público individual por empresa
+    path("tienda/", include(("taller.urls_public", "tienda"), namespace="tienda")),
     # Payment URLs globales (sin namespace para compatibilidad con templates)
     path("", include("taller.urls_payment")),
     # PWA Dinámicas (manifest y service worker por país e idioma)

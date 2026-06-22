@@ -160,9 +160,9 @@ def admin_suscriptores(request):
         # Suscripcion está relacionada con User, no directamente con Empresa
         # Filtrar empresas que tienen usuario para evitar errores
         try:
-            empresas = Empresa.objects.select_related("user", "user__suscripcion").filter(
-                user__isnull=False
-            )
+            empresas = Empresa.objects.select_related(
+                "user", "user__suscripcion", "configuracion_comision"
+            ).filter(user__isnull=False)
             if not incluir_bajas:
                 empresas = empresas.filter(user__is_active=True)
         except Exception as e:
@@ -567,4 +567,44 @@ def eliminar_suscriptor_ajax(request, empresa_id):
         return JsonResponse(
             {"success": False, "error": f"No se pudo completar la baja: {str(e)}"},
             status=500,
+        )
+
+
+@staff_member_required
+@require_http_methods(["POST"])
+def toggle_kiosko_autorizado(request, empresa_id):
+    """
+    Activa o desactiva kiosko_autorizado para una empresa.
+    Crea ConfiguracionComisionEmpresa si no existe.
+    Solo accesible por staff — el subscriptor nunca puede llamar esta URL.
+    """
+    empresa = get_object_or_404(Empresa, id=empresa_id)
+
+    try:
+        from taller.models.comision import ConfiguracionComisionEmpresa
+
+        config, _ = ConfiguracionComisionEmpresa.objects.get_or_create(empresa=empresa)
+        config.kiosko_autorizado = not config.kiosko_autorizado
+        config.save(update_fields=["kiosko_autorizado"])
+
+        logger.info(
+            "Admin %s %s kiosko empresa_id=%s (%s)",
+            getattr(request.user, "pk", None),
+            "habilitó" if config.kiosko_autorizado else "deshabilitó",
+            empresa_id,
+            empresa.nombre_taller,
+        )
+        return JsonResponse(
+            {
+                "success": True,
+                "kiosko_autorizado": config.kiosko_autorizado,
+                "message": (
+                    "Kiosko habilitado." if config.kiosko_autorizado else "Kiosko deshabilitado."
+                ),
+            }
+        )
+    except Exception as e:
+        logger.error("Error en toggle_kiosko empresa %s: %s", empresa_id, e, exc_info=True)
+        return JsonResponse(
+            {"success": False, "error": f"Error al actualizar kiosko: {str(e)}"}, status=500
         )

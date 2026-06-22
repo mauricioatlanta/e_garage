@@ -34,7 +34,7 @@ from taller.models.vehiculos import Vehiculo
 from taller.models.inspeccion_ingreso import DanoInspeccion, InspeccionIngreso
 from taller.models.vendedor_desarme import VendedorDesarme
 from taller.documentos.views_migrated import _reverse_with_request
-from .forms import PiezaDesarmeForm, VehiculoDesarmeForm
+from .forms import PiezaDesarmeForm, PiezaSueltaForm, VehiculoDesarmeForm
 from .services import generar_inventario_vehiculo
 from taller.services.desarme_financial_service import calcular_ganancia_vehiculo
 
@@ -221,8 +221,8 @@ def index(request):
     base_qs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
     piezas_qs = PiezaDesarme.objects.filter(empresa=empresa)
 
-    # KPIs
-    total_vehiculos = base_qs.count()
+    # KPIs — excluir placeholders del conteo de vehículos desarmados
+    total_vehiculos = base_qs.filter(es_placeholder=False).count()
     total_piezas = piezas_qs.count()
     piezas_activas = piezas_qs.filter(activo=True).count()
 
@@ -244,10 +244,11 @@ def index(request):
         v=Sum(F("costo_asignado") * F("cantidad"))
     )["v"] or Decimal("0")
 
-    # Vehículos por mes (últimos 6 meses)
+    # Vehículos por mes (últimos 6 meses) — excluir placeholders
     seis_meses_atras = timezone.now().date() - timedelta(days=180)
     vehiculos_por_mes = (
         base_qs.filter(
+            es_placeholder=False,
             fecha_ingreso_desarme__gte=seis_meses_atras,
             fecha_ingreso_desarme__isnull=False,
         )
@@ -859,6 +860,66 @@ def crear_pieza(request):
             "vehiculo": vehiculo,
             "titulo": "Nueva pieza de desarme",
         },
+    )
+
+
+@login_required
+def crear_pieza_suelta(request):
+    """Registra una pieza suelta sin vehículo completo. Crea un Vehiculo placeholder automáticamente."""
+    import uuid as _uuid
+
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    if request.method == "POST":
+        form = PiezaSueltaForm(request.POST, request.FILES)
+        if form.is_valid():
+            d = form.cleaned_data
+            marca = d.get("marca_texto") or ""
+            modelo = d.get("modelo_texto") or ""
+            anio = d.get("anio_origen")
+
+            partes = [p for p in [marca, modelo, str(anio) if anio else ""] if p]
+            origen_label = " ".join(partes) if partes else "sin especificar"
+
+            try:
+                with transaction.atomic():
+                    patente_sintetica = f"SLT-{_uuid.uuid4().hex[:12]}"
+                    vehiculo = Vehiculo.objects.create(
+                        empresa=empresa,
+                        tipo_uso=Vehiculo.TIPO_USO_DESARME,
+                        es_placeholder=True,
+                        patente=patente_sintetica,
+                        marca_texto=marca or None,
+                        modelo_texto=modelo or None,
+                        anio=anio,
+                    )
+                    codigo = d.get("codigo") or f"SLT-{_uuid.uuid4().hex[:8].upper()}"
+                    pieza = PiezaDesarme.objects.create(
+                        empresa=empresa,
+                        vehiculo=vehiculo,
+                        nombre=d["nombre"],
+                        codigo=codigo,
+                        condicion=d["condicion"],
+                        cantidad=d.get("cantidad") or 1,
+                        precio_venta_sugerido=d.get("precio_venta_sugerido"),
+                        imagen=d.get("imagen"),
+                    )
+                messages.success(request, f"Pieza «{pieza.nombre}» registrada (origen: {origen_label}).")
+                return redirect(_desarme_url(request, "piezas/"))
+            except Exception:
+                log.exception("Error creando pieza suelta")
+                messages.error(request, "Error al guardar la pieza suelta.")
+        else:
+            messages.error(request, "Corrija los errores del formulario.")
+    else:
+        form = PiezaSueltaForm()
+
+    return render(
+        request,
+        "taller/desarme/pieza_suelta_form.html",
+        {"form": form, "empresa": empresa, "titulo": "Agregar pieza suelta"},
     )
 
 

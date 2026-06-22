@@ -40,6 +40,18 @@ ORIGEN_PRECIO_CHOICES = [
     (ORIGEN_PRECIO_MANUAL, "Manual"),
 ]
 
+# Condición física de la pieza (compartida con Part para el kiosko)
+CONDICION_NUEVA = "NUEVO"
+CONDICION_EXCELENTE = "EXCELENTE"
+CONDICION_BUENA = "BUENA"
+CONDICION_REGULAR = "REGULAR"
+CONDICION_CHOICES = [
+    (CONDICION_NUEVA, "Nuevo"),
+    (CONDICION_EXCELENTE, "Excelente"),
+    (CONDICION_BUENA, "Buena"),
+    (CONDICION_REGULAR, "Regular"),
+]
+
 
 class PiezaDesarme(TenantScoped):
     """
@@ -74,6 +86,12 @@ class PiezaDesarme(TenantScoped):
 
     codigo = models.CharField(max_length=100, db_index=True)
     nombre = models.CharField(max_length=255)
+    imagen = models.ImageField(
+        upload_to="piezas_desarme/",
+        null=True,
+        blank=True,
+        help_text="Foto de la pieza (visible en storefront y kiosko).",
+    )
     cantidad = models.PositiveIntegerField(default=1)
     costo_asignado = models.DecimalField(
         max_digits=12,
@@ -129,6 +147,13 @@ class PiezaDesarme(TenantScoped):
         choices=ESTADO_PIEZA_CHOICES,
         default=ESTADO_DISPONIBLE,
         db_index=True,
+    )
+    condicion = models.CharField(
+        max_length=10,
+        choices=CONDICION_CHOICES,
+        default=CONDICION_BUENA,
+        db_index=True,
+        help_text="Condición física de la pieza (visible en kiosko y storefront).",
     )
     ubicacion_fisica = models.CharField(max_length=120, null=True, blank=True)
     observaciones = models.TextField(blank=True, null=True)

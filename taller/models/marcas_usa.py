@@ -81,6 +81,13 @@ class ModeloVehiculo(models.Model):
         default="sedan",
     )
     activo = models.BooleanField(_("Activo"), default=True)
+    paises = models.CharField(
+        _("Países"),
+        max_length=50,
+        blank=True,
+        default="",
+        help_text="Códigos de país separados por coma donde se comercializó este modelo. Ej: 'CL,MX,US'. Vacío = todos los mercados.",
+    )
 
     class Meta:
         verbose_name = _("Modelo de Vehículo")

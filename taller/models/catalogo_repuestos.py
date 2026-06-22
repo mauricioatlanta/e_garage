@@ -13,6 +13,8 @@ from decimal import Decimal
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from .pieza_desarme import CONDICION_BUENA, CONDICION_CHOICES, CONDICION_NUEVA
+
 
 class TaxPolicy(models.Model):
     """
@@ -193,6 +195,14 @@ class Part(models.Model):
     # Status
     active = models.BooleanField(
         _("Activo"), default=True, help_text="Si el repuesto está disponible para venta"
+    )
+    condicion = models.CharField(
+        _("Condición"),
+        max_length=10,
+        choices=CONDICION_CHOICES,
+        default=CONDICION_NUEVA,
+        db_index=True,
+        help_text="Condición del repuesto: Nuevo (stock bodega) o usado (pieza desarme). Visible en kiosko.",
     )
 
     # Metadata

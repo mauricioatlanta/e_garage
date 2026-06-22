@@ -183,3 +183,26 @@ a.cdm-card--link .cdm-card-patente {
   text-align: center;
   padding: 18px 0;
 }
+
+/* ─── Top bar / back button ──────────────────────────────────────────────── */
+.cdm-topbar {
+  padding: 0.5rem 0 0.75rem;
+}
+
+.cdm-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cdm-muted);
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: color 0.15s, background 0.15s;
+}
+
+.cdm-back-btn:hover {
+  color: var(--cdm-teal);
+  background: rgba(93, 202, 165, 0.08);
+}

@@ -87,7 +87,11 @@ class Vehiculo(TenantScoped):
     )
 
     patente = models.CharField(max_length=20, db_index=True)
-    anio = models.PositiveIntegerField(verbose_name="Año")
+    anio = models.PositiveIntegerField(verbose_name="Año", null=True, blank=True)
+    es_placeholder = models.BooleanField(
+        default=False,
+        help_text="True cuando se creó automáticamente para agrupar una pieza suelta sin vehículo real.",
+    )
     color = models.ForeignKey(ColorVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
     vin = models.CharField(max_length=50, blank=True, null=True, db_index=True)
     motor = models.ForeignKey(MotorVehiculo, on_delete=models.SET_NULL, null=True, blank=True)
@@ -196,7 +200,11 @@ class Vehiculo(TenantScoped):
     objects = VehiculoQuerySet.as_manager()
 
     def __str__(self):
-        # Mostrar marca y modelo según el sistema usado
+        if self.es_placeholder:
+            marca_str = self.get_marca_display()
+            modelo_str = self.get_modelo_display()
+            anio_str = f" ({self.anio})" if self.anio else ""
+            return f"Pieza suelta — {marca_str} {modelo_str}{anio_str}".strip(" —")
         marca_str = self.get_marca_display()
         modelo_str = self.get_modelo_display()
         return f"{self.patente} - {marca_str} {modelo_str}".strip()
@@ -276,7 +284,8 @@ class Vehiculo(TenantScoped):
 
         # 3) Consistencia marca/modelo (modo CL vs modo texto USA)
         # Si usas catálogos FK en CL, evita mezclar con *_texto.
-        if pais == "CL":
+        # Los placeholders siempre usan texto libre (el usuario escribe marca/modelo sin catálogo).
+        if pais == "CL" and not self.es_placeholder:
             if self.marca_texto or self.modelo_texto:
                 raise ValidationError("En Chile use marca/modelo del catálogo (no *_texto).")
         elif pais == "US":
