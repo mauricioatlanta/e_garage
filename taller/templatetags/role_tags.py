@@ -94,7 +94,15 @@ def is_owner(user):
     if user.is_superuser:
         return True
 
-    return user.groups.filter(name="Owner").exists()
+    if user.groups.filter(name="Owner").exists():
+        return True
+
+    # Fallback: users who own an Empresa directly (pre-TeamMember legacy owners)
+    try:
+        from taller.models.empresa import Empresa
+        return Empresa.objects.filter(user=user).exists()
+    except Exception:
+        return False
 
 
 @register.filter(name="is_admin_or_owner")
