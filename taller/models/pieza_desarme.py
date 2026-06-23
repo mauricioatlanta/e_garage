@@ -297,6 +297,12 @@ class PiezaDesarme(TenantScoped):
             Index(fields=["empresa", "codigo"]),
             Index(fields=["empresa", "estado_pieza"]),
         ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["empresa", "vehiculo", "codigo"],
+                name="unique_codigo_por_empresa_vehiculo",
+            )
+        ]
 
     def __str__(self):
         return f"{self.nombre} ({self.codigo}) x{self.cantidad} — {self.vehiculo}"

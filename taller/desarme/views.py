@@ -843,6 +843,13 @@ def crear_pieza(request):
                         _desarme_url(request, f"vehiculos/{pieza.vehiculo_id}/inventario/")
                     )
                 return redirect(_desarme_url(request, "piezas/"))
+            except IntegrityError:
+                messages.error(
+                    request,
+                    f"Ya existe una pieza con el código "
+                    f"'{form.cleaned_data.get('codigo', '')}' en este vehículo. "
+                    "Usa otro código.",
+                )
             except Exception as e:
                 log.exception("Error creando pieza de desarme")
                 messages.error(request, f"Error al guardar: {e}")
@@ -908,6 +915,13 @@ def crear_pieza_suelta(request):
                     )
                 messages.success(request, f"Pieza «{pieza.nombre}» registrada (origen: {origen_label}).")
                 return redirect(_desarme_url(request, "piezas/"))
+            except IntegrityError:
+                codigo_display = d.get("codigo") or "(auto)"
+                messages.error(
+                    request,
+                    f"Ya existe una pieza con el código '{codigo_display}' en tu empresa. "
+                    "Usa otro código o deja el campo vacío para generar uno automático.",
+                )
             except Exception:
                 log.exception("Error creando pieza suelta")
                 messages.error(request, "Error al guardar la pieza suelta.")
