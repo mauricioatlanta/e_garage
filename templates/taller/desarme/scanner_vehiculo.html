@@ -344,7 +344,7 @@
     </div>
   </div>
 
-  {% if zonas_con_repuestos %}
+  {% if zonas_con_piezas %}
   {# —— D. Centro visual: blueprint + zonas —— #}
   <div class="glass-panel p-8 flex flex-col md:flex-row items-center justify-center gap-8">
     <div class="blueprint-ring">
@@ -354,7 +354,7 @@
       </div>
     </div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3" id="zonas-buttons">
-      {% for zona, repuestos_list in zonas_con_repuestos %}
+      {% for zona, repuestos_list in zonas_con_piezas %}
       <button type="button" class="zona-btn scroll-zona text-left" data-zona="{{ zona|slugify }}" data-zona-name="{{ zona }}">
         <span class="font-semibold">{{ zona }}</span>
         <span class="text-slate-500 text-xs block mt-1">{{ repuestos_list|length }} {% trans "repuestos" %}</span>
@@ -397,11 +397,52 @@
     </span>
   </div>
 
+  {# —— Edición masiva por precio fijo —— #}
+  <div class="glass-panel p-4" id="panel-precio-fijo">
+    <div class="flex flex-wrap items-center gap-2 mb-3">
+      <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-fuchsia-400">{% trans "Precio fijo masivo" %}</span>
+      <span class="text-[10px] text-slate-500">— {% trans "aplica un precio absoluto a un grupo de piezas" %}</span>
+    </div>
+    <div class="flex flex-wrap gap-2 items-end">
+      <div>
+        <label class="block text-[9px] uppercase tracking-wider text-slate-500 mb-1">{% trans "Nombre contiene" %}</label>
+        <input type="text" id="pmf-texto" placeholder="{% trans 'ej. tambor, puerta...' %}" autocomplete="off"
+               style="background:rgba(15,23,42,0.9);border:1px solid rgba(167,139,250,0.35);color:#f1f5f9;"
+               class="rounded-xl px-3 py-2 text-sm w-44 focus:outline-none focus:border-fuchsia-400">
+      </div>
+      <div>
+        <label class="block text-[9px] uppercase tracking-wider text-slate-500 mb-1">{% trans "Zona" %}</label>
+        <div class="relative">
+          <select id="pmf-zona"
+                  style="background:rgba(15,23,42,0.9);border:1px solid rgba(167,139,250,0.35);color:#f1f5f9;appearance:none;-webkit-appearance:none;"
+                  class="rounded-xl px-3 py-2 pr-8 text-sm w-44 focus:outline-none focus:border-fuchsia-400 cursor-pointer">
+            <option value="">— {% trans "todas las zonas" %} —</option>
+            {% for zona, _ in zonas_con_piezas %}
+            <option value="{{ zona }}">{{ zona }}</option>
+            {% endfor %}
+          </select>
+          <div class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-500 text-xs">▾</div>
+        </div>
+      </div>
+      <div>
+        <label class="block text-[9px] uppercase tracking-wider text-slate-500 mb-1">{% trans "Nuevo precio" %} ($)</label>
+        <input type="number" id="pmf-precio" min="0" step="1" placeholder="15000"
+               style="background:rgba(15,23,42,0.9);border:1px solid rgba(167,139,250,0.35);color:#f1f5f9;"
+               class="rounded-xl px-3 py-2 text-sm w-36 focus:outline-none focus:border-fuchsia-400">
+      </div>
+      <button type="button" id="pmf-aplicar" disabled
+              class="rounded-xl px-4 py-2 text-sm font-bold border border-fuchsia-400/40 bg-fuchsia-400/10 text-fuchsia-300 transition hover:bg-fuchsia-400/20 disabled:opacity-35 disabled:cursor-not-allowed">
+        {% trans "Aplicar precio fijo" %}
+      </button>
+    </div>
+    <p class="mt-2 text-[9px] text-slate-600">{% trans "Se requiere al menos Nombre o Zona para evitar actualizar todo el inventario por error." %}</p>
+  </div>
+
   {# —— G. Inventario por zona (cards premium) + selección para venta —— #}
   <form method="post" action="{% country_url 'desarme:iniciar_venta_desde_inventario' vehiculo.pk %}">
     {% csrf_token %}
     <section id="inventario-repuestos">
-      {% for zona, repuestos_list in zonas_con_repuestos %}
+      {% for zona, repuestos_list in zonas_con_piezas %}
       <div id="zona-{{ zona|slugify }}" class="mb-10 piece-zona" data-zona="{{ zona|slugify }}">
         <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
           <h2 class="ds-font text-xl text-cyan-300 flex items-center gap-2">
@@ -953,6 +994,99 @@
       btnHow.setAttribute('aria-expanded', expanded ? 'false' : 'true');
     });
   }
+
+  // ── Edición masiva por precio fijo ────────────────────────────────────────
+  (function() {
+    var inpTexto  = document.getElementById('pmf-texto');
+    var selZona   = document.getElementById('pmf-zona');
+    var inpPrecio = document.getElementById('pmf-precio');
+    var btnApl    = document.getElementById('pmf-aplicar');
+    if (!inpTexto || !selZona || !inpPrecio || !btnApl) return;
+
+    function syncBtn() {
+      btnApl.disabled = !inpTexto.value.trim() && !selZona.value.trim();
+    }
+    inpTexto.addEventListener('input', syncBtn);
+    selZona.addEventListener('change', syncBtn);
+
+    btnApl.addEventListener('click', function() {
+      var texto = inpTexto.value.trim();
+      var zona  = selZona.value.trim();
+      if (!texto && !zona) return;
+
+      var precio = parseInt(inpPrecio.value.trim(), 10);
+      if (isNaN(precio) || precio < 0) {
+        showToast('{% trans "Ingresa un precio válido (≥ 0)" %}', true);
+        return;
+      }
+
+      btnApl.disabled = true;
+
+      // 1ª llamada: solo preview/conteo
+      fetch(apiBase + '/api/piezas/bulk-precio/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'Accept': 'application/json' },
+        body: JSON.stringify({ precio_absoluto: precio, zona: zona, texto_filtro: texto, solo_contar: true })
+      })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (!data.success) {
+          showToast(data.error || '{% trans "Error" %}', true);
+          btnApl.disabled = false;
+          return;
+        }
+        var n = data.count;
+        if (n === 0) {
+          showToast('{% trans "Ninguna pieza coincide con ese filtro" %}', true);
+          btnApl.disabled = false;
+          return;
+        }
+        var fmt = fmtMoney(precio);
+        var msg = '{% trans "Esto va a actualizar" %} ' + n + ' {% trans "pieza" %}' + (n !== 1 ? 's' : '') + ' {% trans "a" %} ' + fmt + '. {% trans "¿Confirmar?" %}';
+        if (!confirm(msg)) {
+          btnApl.disabled = false;
+          return;
+        }
+
+        // 2ª llamada: aplicar
+        fetch(apiBase + '/api/piezas/bulk-precio/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrfToken, 'Accept': 'application/json' },
+          body: JSON.stringify({ precio_absoluto: precio, zona: zona, texto_filtro: texto })
+        })
+        .then(function(r) { return r.json(); })
+        .then(function(d) {
+          btnApl.disabled = false;
+          if (!d.success) { showToast(d.error || '{% trans "Error" %}', true); return; }
+
+          // Actualizar DOM de las cards visibles
+          document.querySelectorAll('.piece-item').forEach(function(card) {
+            var cardNombre = (card.dataset.nombre || '').toLowerCase();
+            var cardGrid   = card.closest('.piece-grid');
+            var cardZona   = cardGrid ? (cardGrid.dataset.zona || '') : '';
+            var match = true;
+            if (texto && !cardNombre.includes(texto.toLowerCase())) match = false;
+            if (zona  && cardZona.toLowerCase() !== zona.toLowerCase())  match = false;
+            if (!match) return;
+
+            card.dataset.precio  = String(precio);
+            card.dataset.sinPrecio = precio > 0 ? '0' : '1';
+            var display = card.querySelector('.piece-price-display');
+            if (display) display.textContent = fmt;
+            var inp = card.querySelector('.piece-price-input');
+            if (inp) { inp.value = precio; inp.dataset.valorAlFocus = String(precio); }
+            card.classList.toggle('piece-sin-precio',
+              precio === 0 && (card.dataset.estado === 'DISPONIBLE' || card.dataset.estado === 'RESERVADA'));
+          });
+          refreshLiveMetrics();
+          showToast('{% trans "Precio fijo aplicado a" %} ' + d.updated + ' {% trans "pieza" %}' + (d.updated !== 1 ? 's' : ''));
+        })
+        .catch(function() { btnApl.disabled = false; showToast('{% trans "Error de conexión" %}', true); });
+      })
+      .catch(function() { btnApl.disabled = false; showToast('{% trans "Error de conexión" %}', true); });
+    });
+  })();
+
 })();
 </script>
 {% endblock %}

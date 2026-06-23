@@ -1368,9 +1368,21 @@ def api_piezas_bulk_estado(request):
 @require_POST
 def api_piezas_bulk_precio(request):
     """
-    Reajusta precio de varias piezas por factor.
-    Body: { "ids": [1, 2, 3], "factor": 1.1 }  (1.1 = +10%, 0.9 = -10%)
-    Solo piezas de la empresa del usuario. Solo aplica a piezas con precio > 0.
+    Dos modos de operación:
+
+    Modo A — ajuste porcentual (comportamiento original, intacto):
+        Body: { "ids": [1, 2, 3], "factor": 1.1 }
+        Multiplica precio_venta_sugerido × factor en las piezas indicadas.
+
+    Modo B — precio absoluto por filtro de zona/texto:
+        Body: {
+            "precio_absoluto": 15000,
+            "zona": "motor",          # opcional, vacío = no filtrar por zona
+            "texto_filtro": "tambor", # opcional, case-insensitive sobre nombre
+            "solo_contar": true       # si true, devuelve conteo sin modificar nada
+        }
+        Exige al menos uno de zona o texto_filtro (nunca actualiza todo el
+        inventario sin filtro). Aplica solo a piezas activas de la empresa.
     """
     empresa = _empresa_or_redirect(request)
     if not empresa:
@@ -1381,31 +1393,68 @@ def api_piezas_bulk_precio(request):
     except json.JSONDecodeError:
         return JsonResponse({"success": False, "error": "JSON inválido"}, status=400)
 
-    ids = data.get("ids")
-    if not isinstance(ids, list):
-        return JsonResponse({"success": False, "error": "ids debe ser una lista"}, status=400)
-    ids = [int(x) for x in ids if str(x).isdigit()][:100]
-    if not ids:
-        return JsonResponse({"success": False, "error": "No hay IDs válidos"}, status=400)
+    # ── Modo A: ajuste porcentual (ids + factor) ──────────────────────────────
+    if "ids" in data:
+        ids = data.get("ids")
+        if not isinstance(ids, list):
+            return JsonResponse({"success": False, "error": "ids debe ser una lista"}, status=400)
+        ids = [int(x) for x in ids if str(x).isdigit()][:100]
+        if not ids:
+            return JsonResponse({"success": False, "error": "No hay IDs válidos"}, status=400)
+
+        try:
+            factor = Decimal(str(data.get("factor", 1)))
+            if factor <= 0 or factor > 5:
+                raise ValueError
+        except (ValueError, TypeError):
+            return JsonResponse({"success": False, "error": "Factor inválido (0 < factor ≤ 5)"}, status=400)
+
+        piezas = list(PiezaDesarme.objects.filter(pk__in=ids, empresa=empresa))
+        updated = 0
+        for p in piezas:
+            if p.precio_venta_sugerido and p.precio_venta_sugerido > 0:
+                nuevo = (p.precio_venta_sugerido * factor).quantize(Decimal("1"))
+                p.precio_venta_sugerido = max(nuevo, Decimal("0"))
+                p.save(update_fields=["precio_venta_sugerido"])
+                updated += 1
+        return JsonResponse({"success": True, "updated": updated, "factor": str(factor)})
+
+    # ── Modo B: precio absoluto por zona / texto ──────────────────────────────
+    if "precio_absoluto" not in data:
+        return JsonResponse(
+            {"success": False, "error": "Se requiere 'ids'+'factor' o 'precio_absoluto'"},
+            status=400,
+        )
 
     try:
-        factor = Decimal(str(data.get("factor", 1)))
-        if factor <= 0 or factor > 5:
-            raise ValueError("Factor debe estar entre 0 y 5 (seguridad)")
-    except (ValueError, TypeError):
-        return JsonResponse({"success": False, "error": "Factor inválido"}, status=400)
+        precio_absoluto = Decimal(str(data["precio_absoluto"])).quantize(Decimal("1"))
+        if precio_absoluto < 0:
+            raise ValueError
+    except (ValueError, TypeError, Exception):
+        return JsonResponse({"success": False, "error": "precio_absoluto debe ser un número ≥ 0"}, status=400)
 
-    piezas = list(PiezaDesarme.objects.filter(pk__in=ids, empresa=empresa))
-    updated = 0
-    for p in piezas:
-        if p.precio_venta_sugerido and p.precio_venta_sugerido > 0:
-            nuevo = (p.precio_venta_sugerido * factor).quantize(Decimal("1"))
-            if nuevo < 0:
-                nuevo = Decimal("0")
-            p.precio_venta_sugerido = nuevo
-            p.save(update_fields=["precio_venta_sugerido"])
-            updated += 1
-    return JsonResponse({"success": True, "updated": updated, "factor": str(factor)})
+    zona = (data.get("zona") or "").strip()
+    texto_filtro = (data.get("texto_filtro") or "").strip()
+    solo_contar = bool(data.get("solo_contar", False))
+
+    # Seguridad: exige al menos un filtro real
+    if not zona and not texto_filtro:
+        return JsonResponse(
+            {"success": False, "error": "Debes indicar al menos 'zona' o 'texto_filtro' para aplicar un precio absoluto"},
+            status=400,
+        )
+
+    qs = PiezaDesarme.objects.filter(empresa=empresa, activo=True)
+    if zona:
+        qs = qs.filter(zona__iexact=zona)
+    if texto_filtro:
+        qs = qs.filter(nombre__icontains=texto_filtro)
+
+    if solo_contar:
+        return JsonResponse({"success": True, "count": qs.count()})
+
+    updated = qs.update(precio_venta_sugerido=precio_absoluto)
+    return JsonResponse({"success": True, "updated": updated, "precio_absoluto": str(precio_absoluto)})
 
 
 @login_required
