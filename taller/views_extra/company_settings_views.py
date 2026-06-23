@@ -3,7 +3,10 @@ from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect, render
+
+from taller.templatetags.role_tags import is_owner
 
 from taller.context_processors import invalidate_company_cache
 from taller.forms.company_settings_forms import (
@@ -185,6 +188,8 @@ def _subscription_price_context(empresa):
 
 @login_required(login_url=None)
 def company_settings_view(request):
+    if not is_owner(request.user):
+        raise PermissionDenied("Solo el dueño puede acceder a la configuración.")
     empresa = get_or_create_empresa(request)
     if request.method == "GET":
         _discard_noisy_flash_messages(request)

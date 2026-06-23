@@ -27,7 +27,7 @@ from django.db.models import (
     Sum,
     Value,
 )
-from django.core.exceptions import ObjectDoesNotExist
+from django.core.exceptions import ObjectDoesNotExist, PermissionDenied
 from django.db.models.functions import Coalesce
 from django.http import HttpResponse, JsonResponse, Http404
 from django.shortcuts import render
@@ -36,6 +36,7 @@ from django.utils.dateparse import parse_date
 
 from taller.auth.decorators import login_required_default
 from taller.middleware.rate_limiting import rate_limit
+from taller.templatetags.role_tags import is_owner
 from taller.models import ConfiguracionEmpresa, Documento
 from taller.models.clientes import Cliente
 from taller.models.lineas_documento import (
@@ -1365,6 +1366,8 @@ def centro_contable_chile(request):
     - Validación de consistencia contable
     - Flujo optimizado para el dueño del taller (3 clics)
     """
+    if not is_owner(request.user):
+        raise PermissionDenied("Solo el dueño puede acceder al centro contable.")
     from datetime import datetime, timedelta
     from decimal import Decimal
 

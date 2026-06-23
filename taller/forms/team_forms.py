@@ -137,20 +137,18 @@ class TeamMemberForm(forms.ModelForm):
         rol = self.cleaned_data["rol"]
         notas = self.cleaned_data.get("notas", "")
 
-        # Obtener o crear usuario
-        user, created = User.objects.get_or_create(
-            email__iexact=email,
-            defaults={
-                "username": email,
-                "email": email,
-                "first_name": first_name,
-                "last_name": last_name,
-                "is_active": True,
-            },
-        )
-
-        # Si el usuario ya existía, actualizar datos
-        if not created:
+        # Buscar usuario existente por email (case-insensitive)
+        user = User.objects.filter(email__iexact=email).first()
+        created = user is None
+        if created:
+            user = User.objects.create(
+                username=email,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+                is_active=True,
+            )
+        else:
             user.first_name = first_name
             user.last_name = last_name
             user.email = email

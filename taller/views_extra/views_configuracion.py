@@ -110,6 +110,8 @@ def configuracion_tecnicos(request):
     """
     Vista para gestionar los técnicos del taller
     """
+    if not is_owner(request.user):
+        raise PermissionDenied("Solo el dueño puede gestionar los técnicos.")
     empresa = get_empresa_safe(request)
     if not empresa:
         # Si no tiene empresa, crear una básica

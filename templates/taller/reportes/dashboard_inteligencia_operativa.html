@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load humanize %}
 {% load static %}
+{% load role_tags %}
 {% block extra_head %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
@@ -320,6 +321,7 @@
         </div>
       </div>
 
+      {% if request.user|is_owner %}
       <div class="kpi-card">
         <div class="kpi-value">${{ ingresos_por_hora|floatformat:0|intcomma }}</div>
         <div class="kpi-label">Ingresos/Hora</div>
@@ -335,6 +337,7 @@
           <span>📈 Excelente rentabilidad</span>
         </div>
       </div>
+      {% endif %}
 
       <div class="kpi-card">
         <div class="kpi-value">{{ vehiculos_por_semana }}</div>

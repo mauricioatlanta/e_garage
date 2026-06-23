@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.core.exceptions import ValidationError
 from unittest.mock import patch
-from taller.models import Empresa
+from taller.models import Empresa, TeamMember
 from taller.services.plan_change_service import PlanLimitValidation
 from taller.forms_subscription import PlanPagoForm
 from taller.forms.team_forms import TeamMemberForm
@@ -82,3 +82,45 @@ class PlanLimitValidationTestCase(TestCase):
         }
         form = TeamMemberForm(data=form_data, empresa=self.empresa_taller)
         self.assertTrue(form.is_valid())
+
+
+class TestGetCountIntegracion(TestCase):
+    """
+    Tests de integración para PlanLimitValidation.get_count() sin mocks.
+
+    Verifican el conteo real contra DB para detectar regressions como el
+    bug de double-counting del owner (Fix 1, 2026-06-22).
+    """
+
+    def setUp(self):
+        from django.contrib.auth import get_user_model
+        User = get_user_model()
+        self.User = User
+        self.owner = User.objects.create_user(username="owner_count_integ", password="pass123")
+        # El signal ensure_owner_rbac crea TeamMember(rol="Owner") al guardar la Empresa.
+        self.empresa = Empresa.objects.create(plan="taller", user=self.owner)
+
+    def test_get_count_empresa_nueva_es_1(self):
+        """
+        Empresa recién creada: el signal crea el TeamMember del owner.
+        get_count() debe retornar 1, no 2 — regresión exacta del bug de
+        double-counting que sumaba 1 fijo + el TeamMember del owner.
+        """
+        self.assertTrue(
+            TeamMember.objects.filter(
+                empresa=self.empresa, user=self.owner, is_active=True
+            ).exists(),
+            "El signal ensure_owner_rbac debió crear el TeamMember del owner al guardar Empresa.",
+        )
+        self.assertEqual(PlanLimitValidation.get_count(self.empresa), 1)
+
+    def test_get_count_owner_mas_dos_miembros_es_3(self):
+        """
+        Owner + 2 TeamMembers activos adicionales → get_count() debe retornar 3,
+        no 4 (regresión: el double-count habría dado 1+3=4).
+        """
+        miembro_1 = self.User.objects.create_user(username="miembro1_integ", password="pass123")
+        miembro_2 = self.User.objects.create_user(username="miembro2_integ", password="pass123")
+        TeamMember.objects.create(user=miembro_1, empresa=self.empresa, rol="Vendedor", is_active=True)
+        TeamMember.objects.create(user=miembro_2, empresa=self.empresa, rol="Admin", is_active=True)
+        self.assertEqual(PlanLimitValidation.get_count(self.empresa), 3)

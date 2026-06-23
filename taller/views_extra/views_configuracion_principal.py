@@ -1,12 +1,16 @@
 from django.contrib.auth.decorators import login_required
+from django.core.exceptions import PermissionDenied
 from django.shortcuts import render
 
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.tecnico import Tecnico
+from taller.templatetags.role_tags import is_owner
 
 
 @login_required
 def configuracion_principal(request):
+    if not is_owner(request.user):
+        raise PermissionDenied("Solo el dueño puede acceder a la configuración.")
     """
     Vista principal de configuración del taller
     """

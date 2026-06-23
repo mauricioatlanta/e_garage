@@ -9,16 +9,20 @@ from collections import defaultdict
 from datetime import date, timedelta
 from decimal import Decimal
 
+from django.core.exceptions import PermissionDenied
 from django.db.models import Avg, Count, ExpressionWrapper, F, FloatField, Max, Min, Sum
 from django.shortcuts import render
 
 from taller.models.lineas_documento import LineaOtroServicio, LineaServicio
+from taller.templatetags.role_tags import is_owner
 
 
 def reportes_rentabilidad(request):
     """
     🎯 Reporte de rentabilidad por tipo de servicio
     """
+    if not is_owner(request.user):
+        raise PermissionDenied("Solo el dueño puede ver reportes de rentabilidad.")
     # Servicios internos - rentabilidad (usamos LineaServicio)
     servicios_internos = (
         LineaServicio.objects.filter(documento__tipo="FAC")
@@ -123,6 +127,8 @@ def reporte_comparativo_precios(request):
     """
     💰 Comparativa precio cliente vs. costo proveedor
     """
+    if not is_owner(request.user):
+        raise PermissionDenied("Solo el dueño puede ver reportes de rentabilidad.")
     # Análisis detallado por servicio
     analisis_servicios = []
 
@@ -200,6 +206,8 @@ def reporte_servicios_subcontratados(request):
     """
     🔧 Servicios subcontratados más frecuentes
     """
+    if not is_owner(request.user):
+        raise PermissionDenied("Solo el dueño puede ver reportes de rentabilidad.")
     # Servicios más frecuentes
     servicios_frecuentes = (
         LineaOtroServicio.objects.values(nombre_servicio=F("nombre"))
@@ -284,6 +292,8 @@ def dashboard_rentabilidad(request):
     """
     📈 Dashboard general de rentabilidad
     """
+    if not is_owner(request.user):
+        raise PermissionDenied("Solo el dueño puede ver el dashboard de rentabilidad.")
     # KPIs principales
     total_facturado = (
         LineaServicio.objects.filter(documento__tipo="FAC").aggregate(total=Sum("precio_unitario"))[

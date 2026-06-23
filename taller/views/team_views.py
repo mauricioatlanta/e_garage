@@ -42,14 +42,14 @@ class TeamListView(LoginRequiredMixin, RoleRequiredMixin, ListView):
     """
     Lista de miembros del equipo.
 
-    Solo accesible para Owner y Admin.
+    Solo accesible para Owner.
     """
 
     model = TeamMember
     template_name = "taller/team/team_list.html"
     context_object_name = "miembros"
-    allowed_roles = ["Owner", "Admin"]
-    permission_denied_message = "Solo el dueño y administradores pueden ver el equipo."
+    allowed_roles = ["Owner"]
+    permission_denied_message = "Solo el dueño puede ver el equipo."
 
     def get_queryset(self):
         """
@@ -269,10 +269,16 @@ class TeamUpdateView(TeamListSuccessUrlMixin, LoginRequiredMixin, RoleRequiredMi
         return kwargs
 
     def form_valid(self, form):
-        """Guarda los cambios"""
         try:
             with transaction.atomic():
+                old_rol = (
+                    TeamMember.objects.filter(pk=self.object.pk)
+                    .values_list("rol", flat=True)
+                    .first()
+                )
                 team_member = form.save(commit=True)
+                if old_rol and old_rol != team_member.rol:
+                    TeamMember.sincronizar_grupos(team_member.user, team_member.rol, old_rol)
 
                 log.info(
                     f"[TeamManagement] Usuario {self.request.user.username} editó miembro del equipo: "

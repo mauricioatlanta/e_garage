@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load role_tags %}
 
 {% block content %}
 <div class="container mx-auto py-8 px-4 md:px-8">
@@ -71,6 +72,7 @@
   </div>
 
   <!-- Panel: Mayor Margen -->
+  {% if request.user|is_owner %}
   <div id="panel-margen" class="enfoque-panel" style="display:none;">
     <div class="panel-card">
       <h2 class="panel-title">Repuestos con Mayor Margen de Ganancia</h2>
@@ -104,6 +106,7 @@
       </div>
     </div>
   </div>
+  {% endif %}
 
   <!-- Panel: Bajo Stock -->
   <div id="panel-stock" class="enfoque-panel" style="display:none;">
@@ -166,6 +169,7 @@
   </div>
 
   <!-- Resumen Económico Global -->
+  {% if request.user|is_owner %}
   <div class="mt-10">
     <div class="flex items-center gap-3 mb-4">
       <div class="w-1 h-6 bg-cyan-500/60 rounded-full"></div>
@@ -193,6 +197,7 @@
       </div>
     </div>
   </div>
+  {% endif %}
 
 </div>
 

@@ -90,15 +90,22 @@ class TeamMember(models.Model):
     def __str__(self):
         return f"{self.user.get_full_name() or self.user.username} - {self.empresa.nombre_taller} ({self.rol})"
 
+    @staticmethod
+    def sincronizar_grupos(user, rol_nuevo, rol_anterior=None):
+        """Asigna el grupo del nuevo rol y remueve el del anterior si cambió."""
+        from django.contrib.auth.models import Group
+        nuevo_grupo, _ = Group.objects.get_or_create(name=rol_nuevo)
+        user.groups.add(nuevo_grupo)
+        if rol_anterior and rol_anterior != rol_nuevo:
+            viejo_grupo = Group.objects.filter(name=rol_anterior).first()
+            if viejo_grupo:
+                user.groups.remove(viejo_grupo)
+
     def save(self, *args, **kwargs):
-        """Asigna el rol al grupo de Django automáticamente al crear."""
         is_new = self.pk is None
         super().save(*args, **kwargs)
         if is_new or "rol" in kwargs.get("update_fields", []):
-            from django.contrib.auth.models import Group
-            group, _ = Group.objects.get_or_create(name=self.rol)
-            if not self.user.groups.filter(name=self.rol).exists():
-                self.user.groups.add(group)
+            self.sincronizar_grupos(self.user, self.rol)
 
     @property
     def email(self):

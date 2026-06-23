@@ -3,10 +3,13 @@ import json
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.cache import cache
+from django.core.exceptions import PermissionDenied
 from django.http import JsonResponse
 from django.shortcuts import redirect, render
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
+
+from taller.templatetags.role_tags import is_owner
 
 from taller.context_processors import invalidate_company_cache
 from taller.forms.company_settings_forms import (
@@ -28,6 +31,8 @@ def futuristic_company_settings_view(request):
     Vista futurista para configuración de empresa y gestión de técnicos
     Usa el mismo template que company_settings_view para mantener consistencia
     """
+    if not is_owner(request.user):
+        raise PermissionDenied("Solo el dueño puede acceder a la configuración.")
     empresa = get_user_empresa_safe(request.user)
 
     # Usar CompanySettings en lugar de ConfiguracionEmpresa (igual que company_settings_view)

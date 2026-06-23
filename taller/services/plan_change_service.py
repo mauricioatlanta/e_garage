@@ -22,9 +22,8 @@ class PlanLimitValidation:
 
     @classmethod
     def get_count(cls, empresa) -> int:
-        """Cuenta usuarios activos: owner (1 fijo) + team members activos."""
-        team_count = TeamMember.objects.filter(empresa=empresa, is_active=True).count()
-        return 1 + team_count
+        """Cuenta usuarios activos (owner incluido, ya es TeamMember con rol=Owner)."""
+        return TeamMember.objects.filter(empresa=empresa, is_active=True).count()
 
     @classmethod
     def can_add_user(cls, empresa) -> tuple[bool, int, int]:
