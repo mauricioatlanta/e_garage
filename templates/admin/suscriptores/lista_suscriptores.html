@@ -160,6 +160,10 @@
                                         class="inline-flex items-center justify-center bg-cyan-600 hover:bg-cyan-700 text-white text-[11px] px-2 py-1 rounded whitespace-nowrap">
                                     ⏱️ Extender
                                 </button>
+                                <button type="button" onclick="mostrarModalCambiarPlan({{ empresa.id }}, '{{ empresa.nombre_taller|escapejs }}', '{{ empresa.plan|escapejs }}')"
+                                        class="inline-flex items-center justify-center bg-violet-700 hover:bg-violet-600 text-white text-[11px] px-2 py-1 rounded whitespace-nowrap">
+                                    📋 Plan
+                                </button>
                                 <a href="{% url 'admin_detalle_suscriptor' empresa.id %}"
                                    class="inline-flex items-center justify-center bg-blue-600 hover:bg-blue-700 text-white text-[11px] px-2 py-1 rounded whitespace-nowrap no-underline">
                                     👁️ Ver
@@ -268,6 +272,65 @@
     </div>
 </div>
 
+<!-- Modal Cambiar Plan -->
+<div id="modalCambiarPlan" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-gray-800 rounded-lg p-6 max-w-md w-full border border-violet-500">
+        <h3 class="text-xl font-bold text-violet-400 mb-1">📋 Cambiar Plan</h3>
+        <p class="text-gray-300 mb-4 text-sm">Empresa: <span id="modalPlanNombre" class="font-bold text-white"></span></p>
+
+        <form id="formCambiarPlan" onsubmit="enviarCambiarPlan(event)">
+            {% csrf_token %}
+            <input type="hidden" id="modalPlanEmpresaId" name="empresa_id">
+
+            <div class="mb-5">
+                <label class="block text-sm font-medium text-gray-300 mb-2">Nuevo plan</label>
+                <div class="flex flex-col gap-2" id="planOpciones">
+                    <label class="flex items-center gap-3 bg-gray-700 rounded px-3 py-2 cursor-pointer border border-gray-600 hover:border-violet-500 transition-colors">
+                        <input type="radio" name="plan" value="trial" class="accent-violet-500">
+                        <span class="text-sm text-gray-200">
+                            <span class="font-semibold">Trial</span>
+                            <span class="text-gray-400 ml-1">— 1 usuario, acceso de prueba</span>
+                        </span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-gray-700 rounded px-3 py-2 cursor-pointer border border-gray-600 hover:border-violet-500 transition-colors">
+                        <input type="radio" name="plan" value="express" class="accent-violet-500">
+                        <span class="text-sm text-gray-200">
+                            <span class="font-semibold">Express</span>
+                            <span class="text-gray-400 ml-1">— 1 usuario</span>
+                        </span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-gray-700 rounded px-3 py-2 cursor-pointer border border-gray-600 hover:border-violet-500 transition-colors">
+                        <input type="radio" name="plan" value="taller" class="accent-violet-500">
+                        <span class="text-sm text-gray-200">
+                            <span class="font-semibold">Taller</span>
+                            <span class="text-gray-400 ml-1">— hasta 4 usuarios</span>
+                        </span>
+                    </label>
+                    <label class="flex items-center gap-3 bg-gray-700 rounded px-3 py-2 cursor-pointer border border-gray-600 hover:border-violet-500 transition-colors">
+                        <input type="radio" name="plan" value="pro" class="accent-violet-500">
+                        <span class="text-sm text-gray-200">
+                            <span class="font-semibold">Pro</span>
+                            <span class="text-gray-400 ml-1">— hasta 10 usuarios</span>
+                        </span>
+                    </label>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">⚠️ Cambiar a un plan con menor límite no desactiva usuarios existentes — eso es responsabilidad del dueño del taller.</p>
+            </div>
+
+            <div class="flex gap-2">
+                <button type="submit" class="flex-1 bg-violet-600 hover:bg-violet-700 text-white font-bold py-2 px-4 rounded">
+                    ✅ Cambiar Plan
+                </button>
+                <button type="button" onclick="cerrarModalPlan()" class="flex-1 bg-gray-600 hover:bg-gray-500 text-white font-bold py-2 px-4 rounded">
+                    Cancelar
+                </button>
+            </div>
+        </form>
+
+        <div id="mensajePlanResultado" class="mt-4 hidden"></div>
+    </div>
+</div>
+
 <script>
 function mostrarModalExtension(empresaId, empresaNombre) {
     document.getElementById('modalEmpresaId').value = empresaId;
@@ -280,6 +343,87 @@ function cerrarModal() {
     document.getElementById('mensajeResultado').classList.add('hidden');
     document.getElementById('formExtension').reset();
 }
+
+function mostrarModalCambiarPlan(empresaId, empresaNombre, planActual) {
+    document.getElementById('modalPlanEmpresaId').value = empresaId;
+    document.getElementById('modalPlanNombre').textContent = empresaNombre;
+    document.getElementById('mensajePlanResultado').classList.add('hidden');
+    // Preseleccionar el plan actual
+    var radios = document.querySelectorAll('#planOpciones input[type=radio]');
+    radios.forEach(function(r) {
+        r.checked = (r.value === planActual);
+        var label = r.closest('label');
+        if (label) {
+            label.classList.toggle('border-violet-500', r.checked);
+            label.classList.toggle('bg-violet-900/30', r.checked);
+        }
+    });
+    document.getElementById('modalCambiarPlan').classList.remove('hidden');
+}
+
+function cerrarModalPlan() {
+    document.getElementById('modalCambiarPlan').classList.add('hidden');
+    document.getElementById('mensajePlanResultado').classList.add('hidden');
+    document.getElementById('formCambiarPlan').reset();
+}
+
+function enviarCambiarPlan(event) {
+    event.preventDefault();
+    var empresaId = document.getElementById('modalPlanEmpresaId').value;
+    var planSeleccionado = document.querySelector('#planOpciones input[type=radio]:checked');
+    var mensajeDiv = document.getElementById('mensajePlanResultado');
+
+    if (!planSeleccionado) {
+        mensajeDiv.innerHTML = '<div class="bg-red-900 text-red-300 p-3 rounded text-sm">❌ Selecciona un plan.</div>';
+        mensajeDiv.classList.remove('hidden');
+        return;
+    }
+
+    mensajeDiv.innerHTML = '<div class="text-violet-400 text-sm">⏳ Actualizando plan...</div>';
+    mensajeDiv.classList.remove('hidden');
+
+    var formData = new FormData();
+    formData.append('plan', planSeleccionado.value);
+
+    var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]')?.value ||
+        document.cookie.split('; ').find(function(r) { return r.startsWith('csrftoken='); })?.split('=')[1];
+
+    fetch('/admin/suscriptores/' + empresaId + '/cambiar-plan/', {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-CSRFToken': csrftoken }
+    })
+    .then(function(response) {
+        if (!response.headers.get('content-type')?.includes('application/json')) {
+            return response.text().then(function(t) { throw new Error('Error del servidor: ' + t.substring(0, 200)); });
+        }
+        return response.json();
+    })
+    .then(function(data) {
+        if (data.success) {
+            mensajeDiv.innerHTML = '<div class="bg-green-900 text-green-300 p-3 rounded text-sm">✅ ' + data.message + '<br><span class="text-xs text-gray-400">Límite de usuarios: ' + data.limite_usuarios + '</span></div>';
+            setTimeout(function() { window.location.reload(); }, 1800);
+        } else {
+            mensajeDiv.innerHTML = '<div class="bg-red-900 text-red-300 p-3 rounded text-sm">❌ ' + data.error + '</div>';
+        }
+    })
+    .catch(function(error) {
+        mensajeDiv.innerHTML = '<div class="bg-red-900 text-red-300 p-3 rounded text-sm">❌ ' + error.message + '</div>';
+    });
+}
+
+// Resaltar opción seleccionada al hacer clic en el radio
+document.addEventListener('change', function(e) {
+    if (e.target.name === 'plan' && e.target.closest('#planOpciones')) {
+        document.querySelectorAll('#planOpciones label').forEach(function(l) {
+            l.classList.remove('border-violet-500', 'bg-violet-900/30');
+        });
+        var selectedLabel = e.target.closest('label');
+        if (selectedLabel) {
+            selectedLabel.classList.add('border-violet-500', 'bg-violet-900/30');
+        }
+    }
+});
 
 function extenderSuscripcion(event) {
     event.preventDefault();
@@ -360,9 +504,10 @@ function extenderSuscripcion(event) {
 
 // Cerrar modal al hacer clic fuera
 document.getElementById('modalExtension').addEventListener('click', function(e) {
-    if (e.target === this) {
-        cerrarModal();
-    }
+    if (e.target === this) cerrarModal();
+});
+document.getElementById('modalCambiarPlan').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalPlan();
 });
 
 function egAdminSuscriptoresCsrf() {

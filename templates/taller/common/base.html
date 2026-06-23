@@ -557,6 +557,24 @@
     </form>
 
     {% load role_tags %}
+    <!-- SECCIÓN STAFF eGarage: Solo superuser/staff -->
+    {% if request.user.is_staff %}
+    <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(156, 163, 175, 0.3);">
+      <h3 style="padding: 0 0.75rem; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(156, 163, 175, 0.8); margin-bottom: 0.5rem;">
+        eGarage Staff
+      </h3>
+      <a href="/admin/suscriptores/"
+         class="nav-button-standard {% if 'suscriptores' in request.path %}bg-gray-100 text-gray-900{% endif %}">
+        <span class="nav-icon">📊</span>
+        <span>Suscriptores</span>
+      </a>
+      <a href="/admin/"
+         class="nav-button-standard">
+        <span class="nav-icon">🔧</span>
+        <span>Django Admin</span>
+      </a>
+    </div>
+    {% endif %}
     <!-- SECCIÓN ADMINISTRACIÓN: Solo Owner -->
     {% if request.user|has_role:'Owner' %}
     <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(156, 163, 175, 0.3);">

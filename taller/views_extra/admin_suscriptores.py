@@ -570,6 +570,62 @@ def eliminar_suscriptor_ajax(request, empresa_id):
         )
 
 
+_PLANES_VALIDOS = {
+    "trial":    {"label": "Trial (1 usuario)",           "limite": 1},
+    "express":  {"label": "Express (1 usuario)",         "limite": 1},
+    "taller":   {"label": "Taller (hasta 4 usuarios)",   "limite": 4},
+    "pro":      {"label": "Pro (hasta 10 usuarios)",     "limite": 10},
+}
+
+
+@staff_member_required
+@require_http_methods(["POST"])
+def cambiar_plan_ajax(request, empresa_id):
+    """
+    Cambia el plan de una empresa directamente desde el panel de admin.
+    Actualiza Empresa.plan y Suscripcion.tipo si existe.
+    """
+    empresa = get_object_or_404(Empresa.objects.select_related("user"), id=empresa_id)
+
+    nuevo_plan = (request.POST.get("plan") or "").strip().lower()
+    if nuevo_plan not in _PLANES_VALIDOS:
+        return JsonResponse(
+            {"success": False, "error": f"Plan inválido: '{nuevo_plan}'. Opciones: {', '.join(_PLANES_VALIDOS)}."},
+            status=400,
+        )
+
+    plan_anterior = empresa.plan
+    empresa.plan = nuevo_plan
+    empresa.save(update_fields=["plan"])
+
+    try:
+        suscripcion = empresa.user.suscripcion
+        if suscripcion:
+            suscripcion.tipo = nuevo_plan
+            suscripcion.save(update_fields=["tipo"])
+    except Suscripcion.DoesNotExist:
+        pass
+    except Exception as ex:
+        logger.warning("No se pudo actualizar Suscripcion.tipo para empresa %s: %s", empresa_id, ex)
+
+    logger.info(
+        "Admin %s cambió plan empresa_id=%s (%s): %s → %s",
+        getattr(request.user, "pk", None),
+        empresa_id,
+        empresa.nombre_taller,
+        plan_anterior,
+        nuevo_plan,
+    )
+    info = _PLANES_VALIDOS[nuevo_plan]
+    return JsonResponse({
+        "success": True,
+        "message": f"✅ Plan actualizado a {info['label']}.",
+        "plan_nuevo": nuevo_plan,
+        "plan_label": info["label"],
+        "limite_usuarios": info["limite"],
+    })
+
+
 @staff_member_required
 @require_http_methods(["POST"])
 def toggle_kiosko_autorizado(request, empresa_id):

@@ -106,6 +106,7 @@ from taller.views_extra.suscripcion import registro, suscripcion_bloqueada
 from taller.views_extra.admin_suscriptores import (
     admin_suscriptores,
     actualizar_telefono_ajax,
+    cambiar_plan_ajax,
     desactivar_suscripcion_ajax,
     detalle_suscriptor,
     eliminar_suscriptor_ajax,
@@ -279,6 +280,11 @@ urlpatterns = [
         "admin/suscriptores/<int:empresa_id>/extender/",
         extender_suscripcion_ajax,
         name="admin_extender_suscripcion",
+    ),
+    path(
+        "admin/suscriptores/<int:empresa_id>/cambiar-plan/",
+        cambiar_plan_ajax,
+        name="admin_cambiar_plan",
     ),
     path(
         "admin/suscriptores/<int:empresa_id>/desactivar/",
