@@ -346,14 +346,22 @@ def company_settings_view(request):
 
 
     # UI SUBSCRIPTION DERIVED STATE
-    empresa_plan = "trial"
+    # Fallback: usa empresa.plan si no hay Suscripcion o si es trial
+    empresa_plan = getattr(empresa, "plan", "trial") or "trial"
     empresa_estado_suscripcion = "inactiva"
     empresa_dias_restantes = 0
     empresa_fecha_vencimiento = None
     empresa_color_estado = "#dc3545"
 
     if subscription:
-        empresa_plan = getattr(subscription, "tipo", "trial")
+        suscripcion_tipo = getattr(subscription, "tipo", None)
+        # Suscripcion.tipo usa códigos legacy distintos; solo lo usa si no es trial o si empresa.plan es trial
+        if suscripcion_tipo and suscripcion_tipo != "trial":
+            empresa_plan = suscripcion_tipo
+        # Si empresa.plan es más específico (pro/taller/express), prevalece sobre el tipo legacy
+        empresa_plan_directo = getattr(empresa, "plan", None)
+        if empresa_plan_directo and empresa_plan_directo not in ("trial",):
+            empresa_plan = empresa_plan_directo
 
         empresa_fecha_vencimiento = getattr(
             subscription,
