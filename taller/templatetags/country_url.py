@@ -249,5 +249,6 @@ def nav_url(context, section: str) -> str:
         "services": f"{prefix}/servicios/",
         "disassembly": f"{prefix}/desarme/",
         "vehicles": f"{prefix}/vehiculos/",
+        "team": f"{prefix}/equipo/",
     }
     return routes.get(section, f"{prefix}/workspace/")
