@@ -29,8 +29,26 @@
     <a class="btn" href="{% country_url 'documentos:compartir_documento_whatsapp' documento.id %}">WhatsApp</a>
     <a class="btn" href="{% country_url 'documentos:enviar_documento_email' documento.id %}">Enviar email</a>
     <a class="btn" href="{{ public_url }}" target="_blank">Ver enlace público</a>
+    {% if tax_amount %}
+    <button class="btn" id="toggle-tax-btn" onclick="toggleTax()">Sin impuesto</button>
+    {% endif %}
     <button class="btn" onclick="window.print()">Imprimir</button>
   </div>
+  <script>
+    var taxVisible = true;
+    function toggleTax() {
+      var taxRow = document.querySelector('[data-tax-row]');
+      var totalRow = document.getElementById('grand-total-row');
+      var totalEl = document.getElementById('grand-total-value');
+      var btn = document.getElementById('toggle-tax-btn');
+      if (!taxRow || !totalRow || !totalEl) return;
+      taxVisible = !taxVisible;
+      taxRow.style.display = taxVisible ? '' : 'none';
+      var amount = taxVisible ? totalRow.dataset.conTax : totalRow.dataset.sinTax;
+      totalEl.textContent = '$' + parseInt(amount).toLocaleString('en-US');
+      btn.textContent = taxVisible ? 'Sin impuesto' : 'Con impuesto';
+    }
+  </script>
 
   <div class="frame">
     {% include "taller/documentos/pdf/documento_profesional_inner.html" %}

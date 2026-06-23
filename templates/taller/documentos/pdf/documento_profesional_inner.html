@@ -47,8 +47,11 @@
     </div>
     <div class="info-card">
       <div class="info-card__title">Vehículo</div>
-      <div class="info-main">{% if vehiculo %}{{ vehiculo }}{% else %}Sin vehículo asociado{% endif %}</div>
-      {% if vehiculo %}{% if vehiculo.patente %}<div class="info-line"><span>Patente:</span> {{ vehiculo.patente }}</div>{% endif %}{% if vehiculo.vin %}<div class="info-line"><span>VIN:</span> {{ vehiculo.vin }}</div>{% endif %}{% if vehiculo.marca %}<div class="info-line"><span>Marca:</span> {{ vehiculo.marca }}</div>{% endif %}{% if vehiculo.modelo %}<div class="info-line"><span>Modelo:</span> {{ vehiculo.modelo }}</div>{% endif %}{% endif %}
+      {% if vehiculo %}
+        <div class="info-main">{{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}</div>
+      {% else %}
+        <div class="info-main">Sin vehículo asociado</div>
+      {% endif %}
     </div>
   </section>
   <section class="section-block">
@@ -73,8 +76,8 @@
     <div class="totals-card">
       <div class="totals-row"><span>Subtotal</span><strong>${{ subtotal|default_if_none:0|floatformat:0|intcomma }}</strong></div>
       {% if descuento %}<div class="totals-row"><span>Descuento</span><strong>-${{ descuento|default_if_none:0|floatformat:0|intcomma }}</strong></div>{% endif %}
-      {% if tax_amount %}<div class="totals-row"><span>Impuesto</span><strong>${{ tax_amount|default_if_none:0|floatformat:0|intcomma }}</strong></div>{% endif %}
-      <div class="totals-row totals-row--grand"><span>Total</span><strong>${{ total|default_if_none:0|floatformat:0|intcomma }}</strong></div>
+      {% if tax_amount %}<div class="totals-row" data-tax-row><span>Impuesto</span><strong>${{ tax_amount|default_if_none:0|floatformat:0|intcomma }}</strong></div>{% endif %}
+      <div class="totals-row totals-row--grand" id="grand-total-row" data-con-tax="{{ total|default_if_none:0|floatformat:0 }}" data-sin-tax="{{ total_sin_tax|default_if_none:0|floatformat:0 }}"><span>Total</span><strong id="grand-total-value">${{ total|default_if_none:0|floatformat:0|intcomma }}</strong></div>
     </div>
   </section>
   {% if documento.observaciones %}

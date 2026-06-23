@@ -207,6 +207,7 @@ def _build_pdf_context(request, documento):
         "tax_amount": getattr(documento, "tax_amount", 0) or 0,
         "descuento": getattr(documento, "descuento", 0) or 0,
         "total": total,
+        "total_sin_tax": total - (getattr(documento, "tax_amount", 0) or 0),
         "document_label": _document_label(documento),
         "logo_url": _get_logo_url(request, empresa),
         "generated_at": _generated_at(),
