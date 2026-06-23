@@ -170,3 +170,7 @@ backups/
 *.tar.gz
 company_logos/
 comprobantes/
+reporte_cambios_*.md
+seed_datos_mauricio.py
+reporte_cambios_*.md
+seed_datos_mauricio.py
