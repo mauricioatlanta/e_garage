@@ -3,6 +3,7 @@
 {% load humanize %}
 {% load country_url %}
 {% load money %}
+{% load role_tags %}
 {% load i18n %}
 
 {% block page_title %}{{ ui_labels.document_center }}{% endblock %}
@@ -888,10 +889,12 @@
 
 {% block main_actions %}
 <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
+  {% if request.user|is_admin_or_owner %}
   <a href="{% country_url 'documentos:crear_documento' %}" class="crear-documento-btn">
     <i class="fas fa-plus-circle"></i>
     <span>{{ ui_labels.new_document }}</span>
   </a>
+  {% endif %}
 </div>
 {% endblock %}
 
@@ -1288,10 +1291,12 @@
       <p class="empty-description">
         {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}No documents have been created in the system yet. Create your first document to start managing the workshop.{% else %}Aún no se han creado documentos en el sistema. Crea tu primer documento para comenzar a gestionar el taller.{% endif %}
       </p>
+      {% if request.user|is_admin_or_owner %}
       <a href="{% country_url 'documentos:crear_documento' %}" class="crear-documento-btn">
         <i class="fas fa-plus-circle"></i>
         <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Create First Document{% else %}Crear Primer Documento{% endif %}</span>
       </a>
+      {% endif %}
     </div>
   {% endif %}
 </div>

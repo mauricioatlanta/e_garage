@@ -2,6 +2,7 @@
 {% load country_url %}
 {% load static %}
 {% load humanize %}
+{% load role_tags %}
 
 {% block title %}{{ empresa.nombre_taller }} - Centro de Operaciones{% endblock %}
 
@@ -337,9 +338,11 @@ body {
         <a href="{% url 'taller:vehiculos:crear_vehiculo' %}" class="flex items-center gap-1 text-xs px-2 py-1 rounded {% if steps.vehiculo_creado %}text-green-400 bg-green-900/20{% else %}text-amber-300 bg-amber-900/20 hover:bg-amber-900/40{% endif %} transition-all">
             {% if steps.vehiculo_creado %}✅{% else %}🚗{% endif %} Vehículo
         </a>
+        {% if request.user|is_admin_or_owner %}
         <a href="{% country_url 'documentos:documento_crear' %}" class="flex items-center gap-1 text-xs px-2 py-1 rounded {% if steps.documento_creado %}text-green-400 bg-green-900/20{% else %}text-amber-300 bg-amber-900/20 hover:bg-amber-900/40{% endif %} transition-all">
             {% if steps.documento_creado %}✅{% else %}📄{% endif %} Documento
         </a>
+        {% endif %}
         {% endwith %}
     </div>
     {% endif %}

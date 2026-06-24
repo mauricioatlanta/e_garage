@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load country_url %}
+{% load role_tags %}
 
 {% block title %}Patente Identificada | {{ empresa.nombre_taller }}{% endblock %}
 
@@ -214,12 +215,12 @@
             </div>
 
             <div class="btn-group">
-                {% if vehiculo.cliente %}
-                <a href="{% country_url 'documentos:documento_crear' %}?vehiculo_id={{ vehiculo.id }}&cliente_id={{ vehiculo.cliente.id }}" 
+                {% if vehiculo.cliente and request.user|is_admin_or_owner %}
+                <a href="{% country_url 'documentos:documento_crear' %}?vehiculo_id={{ vehiculo.id }}&cliente_id={{ vehiculo.cliente.id }}"
                    class="btn-cyber btn-cyber-success">
                     🛠️ Crear Orden de Trabajo
                 </a>
-                <a href="{% country_url 'documentos:documento_crear' %}?vehiculo_id={{ vehiculo.id }}&cliente_id={{ vehiculo.cliente.id }}&tipo=PRES" 
+                <a href="{% country_url 'documentos:documento_crear' %}?vehiculo_id={{ vehiculo.id }}&cliente_id={{ vehiculo.cliente.id }}&tipo=PRES"
                    class="btn-cyber">
                     📄 Crear Presupuesto
                 </a>

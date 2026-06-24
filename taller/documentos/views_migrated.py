@@ -868,12 +868,14 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(ensure_csrf_cookie, name="dispatch")
-class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, CreateView):
+class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, RoleRequiredMixin, CreateView):
     """Vista para crear documentos"""
 
     model = Documento
     form_class = DocumentoForm
     base_template_name = "documentos/document_form.html"
+    allowed_roles = ["Owner", "Admin"]
+    permission_denied_message = "Solo el dueño y administradores pueden crear documentos."
 
     def get(self, request, *args, **kwargs):
         """Al abrir el formulario (GET), vaciar mensajes de otras secciones para no mostrar alertas ajenas (desarme, idioma, etc.)."""
@@ -1579,12 +1581,14 @@ class DocumentoDetailView(CountryLangTemplateMixin, DetailView):
 
 @method_decorator(login_required, name="dispatch")
 @method_decorator(ensure_csrf_cookie, name="dispatch")
-class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, UpdateView):
+class DocumentoUpdateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, RoleRequiredMixin, UpdateView):
     """Vista para editar documentos"""
 
     model = Documento
     form_class = DocumentoForm
     base_template_name = "documentos/document_form.html"  # Usar el mismo template que CreateView
+    allowed_roles = ["Owner", "Admin"]
+    permission_denied_message = "Solo el dueño y administradores pueden editar documentos."
 
     def get(self, request, *args, **kwargs):
         """Al abrir el formulario (GET), vaciar mensajes de otras secciones."""

@@ -8,6 +8,8 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+
+from taller.auth.decorators_role import role_required
 from django.db import IntegrityError, transaction
 from django.db.models import Count, F, OuterRef, Q, Subquery, Sum
 from django.db.models.functions import Coalesce, TruncMonth
@@ -528,12 +530,14 @@ def crear_vehiculo(request):
                 messages.success(
                     request, f"Vehículo de desarme {vehiculo.patente or vehiculo.vin} creado."
                 )
+                # No genera piezas en BD — el usuario las confirma en /revisar/
                 try:
-                    generar_inventario_vehiculo(vehiculo, empresa)
+                    from .services import inicializar_sugerencias
+                    inicializar_sugerencias(vehiculo, empresa)
                 except Exception as inv_err:
-                    log.exception("Error generando inventario para vehículo pk=%s", vehiculo.pk)
-                    messages.warning(request, f"Vehículo guardado, pero falló la generación del inventario: {inv_err}")
-                return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/scanner/"))
+                    log.exception("Error inicializando sugerencias para vehículo pk=%s", vehiculo.pk)
+                    messages.warning(request, f"Vehículo guardado, pero falló la carga del catálogo: {inv_err}")
+                return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/revisar/"))
             except IntegrityError:
                 messages.error(
                     request, "Ya existe un vehículo con ese VIN o patente en esta empresa."
@@ -814,6 +818,7 @@ def lista_piezas(request):
 
 
 @login_required
+@role_required("Owner", "Admin")
 def crear_pieza(request):
     """Alta de pieza de desarme. Opcional ?vehiculo=<id> para pre-seleccionar vehículo."""
     empresa = _empresa_or_redirect(request)
@@ -871,6 +876,7 @@ def crear_pieza(request):
 
 
 @login_required
+@role_required("Owner", "Admin")
 def crear_pieza_suelta(request):
     """Registra una pieza suelta sin vehículo completo. Crea un Vehiculo placeholder automáticamente."""
     import uuid as _uuid
@@ -938,6 +944,7 @@ def crear_pieza_suelta(request):
 
 
 @login_required
+@role_required("Owner", "Admin")
 def editar_pieza(request, pk):
     """Edición de pieza de desarme."""
     empresa = _empresa_or_redirect(request)
@@ -1346,6 +1353,7 @@ def api_pieza_label_empresa_guardar(request, pk):
 
 
 @login_required
+@role_required("Owner", "Admin")
 @require_POST
 def api_piezas_bulk_estado(request):
     """
@@ -1379,6 +1387,7 @@ def api_piezas_bulk_estado(request):
 
 
 @login_required
+@role_required("Owner", "Admin")
 @require_POST
 def api_piezas_bulk_precio(request):
     """
@@ -1552,3 +1561,262 @@ def iniciar_venta_desde_lista(request):
         else:
             doc_url = "/cl/es/documentos/form/"
     return redirect(doc_url)
+
+
+# ── Pantalla fusionada de revisión ───────────────────────────────────────────
+
+@login_required
+def revisar_vehiculo(request, pk):
+    """
+    GET  → pantalla de revisión: sugerencias del catálogo (PENDIENTE/CONFIRMADA/DESCARTADA).
+    POST → AJAX JSON con action=confirmar|descartar|reabrir|agregar.
+    PiezaDesarme real solo se crea al confirmar; progreso persiste en SugerenciaPiezaDesarme.
+    """
+    from taller.models.sugerencia_pieza_desarme import SugerenciaPiezaDesarme
+    from taller.models.pieza_desarme import CONDICION_CHOICES
+    from .services import inicializar_sugerencias
+
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        if request.method == "POST":
+            return JsonResponse({"success": False, "error": "Sin empresa"}, status=403)
+        return redirect("/")
+
+    vehiculo = get_object_or_404(
+        Vehiculo, pk=pk, empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME
+    )
+
+    if request.method == "POST":
+        try:
+            data = json.loads(request.body) if request.body else {}
+        except json.JSONDecodeError:
+            return JsonResponse({"success": False, "error": "JSON inválido"}, status=400)
+
+        action = (data.get("action") or "").strip()
+        if action == "confirmar":
+            return _revisar_confirmar(data, vehiculo, empresa)
+        if action == "descartar":
+            return _revisar_descartar(data, vehiculo, empresa)
+        if action == "reabrir":
+            return _revisar_reabrir(data, vehiculo, empresa)
+        if action == "agregar":
+            return _revisar_agregar(data, vehiculo, empresa)
+        return JsonResponse({"success": False, "error": "Acción desconocida"}, status=400)
+
+    # GET ──────────────────────────────────────────────────────────────────────
+    sugerencias_qs = (
+        SugerenciaPiezaDesarme.objects
+        .filter(empresa=empresa, vehiculo=vehiculo)
+        .select_related("pieza_creada")
+    )
+    if not sugerencias_qs.exists():
+        # Auto-inicializar solo si el vehículo aún no tiene piezas
+        if not PiezaDesarme.objects.filter(empresa=empresa, vehiculo=vehiculo).exists():
+            inicializar_sugerencias(vehiculo, empresa)
+            sugerencias_qs = (
+                SugerenciaPiezaDesarme.objects
+                .filter(empresa=empresa, vehiculo=vehiculo)
+                .select_related("pieza_creada")
+            )
+
+    sugerencias = list(sugerencias_qs.order_by("zona", "codigo"))
+
+    from .catalogo_operativo import get_zonas_orden_desarme
+    sug_por_zona: dict = {}
+    for s in sugerencias:
+        sug_por_zona.setdefault(s.zona or "Otros", []).append(s)
+
+    zonas_orden = [z for z in get_zonas_orden_desarme(empresa) if z in sug_por_zona]
+    zonas_orden.extend(z for z in sorted(sug_por_zona) if z not in zonas_orden)
+    zonas_con_sugerencias = [(z, sug_por_zona[z]) for z in zonas_orden]
+
+    total      = len(sugerencias)
+    pendientes = sum(1 for s in sugerencias if s.estado == SugerenciaPiezaDesarme.PENDIENTE)
+    confirmadas = sum(1 for s in sugerencias if s.estado == SugerenciaPiezaDesarme.CONFIRMADA)
+    descartadas = sum(1 for s in sugerencias if s.estado == SugerenciaPiezaDesarme.DESCARTADA)
+    pct = round((confirmadas + descartadas) / total * 100) if total else 0
+
+    return render(request, "taller/desarme/revisar_vehiculo.html", {
+        "vehiculo": vehiculo,
+        "empresa": empresa,
+        "zonas_con_sugerencias": zonas_con_sugerencias,
+        "total": total,
+        "pendientes": pendientes,
+        "confirmadas": confirmadas,
+        "descartadas": descartadas,
+        "pct_completado": pct,
+        "condicion_choices": CONDICION_CHOICES,
+        "empresa_moneda": empresa.formato_moneda,
+        "PENDIENTE":  SugerenciaPiezaDesarme.PENDIENTE,
+        "CONFIRMADA": SugerenciaPiezaDesarme.CONFIRMADA,
+        "DESCARTADA": SugerenciaPiezaDesarme.DESCARTADA,
+    })
+
+
+def _revisar_confirmar(data, vehiculo, empresa):
+    from taller.models.sugerencia_pieza_desarme import SugerenciaPiezaDesarme
+    from taller.models.pieza_desarme import CONDICION_BUENA
+
+    sug_id = data.get("sugerencia_id")
+    if not sug_id:
+        return JsonResponse({"success": False, "error": "sugerencia_id requerido"}, status=400)
+    sug = get_object_or_404(
+        SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo=vehiculo
+    )
+    if sug.estado != SugerenciaPiezaDesarme.PENDIENTE:
+        return JsonResponse({"success": False, "error": f"La sugerencia ya está {sug.estado}"}, status=400)
+
+    nombre    = (data.get("nombre") or sug.nombre).strip()
+    condicion = (data.get("condicion") or CONDICION_BUENA).strip()
+    ubicacion = (data.get("ubicacion") or "").strip() or None
+    lado      = (data.get("lado") or "").strip() or None
+    posicion  = (data.get("posicion") or "").strip() or None
+    obs       = (data.get("observaciones") or "").strip() or None
+    try:
+        precio = Decimal(str(data["precio"])) if "precio" in data and data["precio"] not in (None, "") else sug.precio_sugerido
+    except Exception:
+        precio = sug.precio_sugerido
+
+    try:
+        with transaction.atomic():
+            # Si ya existe pieza con este código (vehículo legacy), vincular en lugar de crear
+            existente = PiezaDesarme.objects.filter(
+                empresa=empresa, vehiculo=vehiculo, codigo=sug.codigo
+            ).first()
+            if existente:
+                pieza = existente
+                if not pieza.revisado:
+                    PiezaDesarme.objects.filter(pk=pieza.pk).update(
+                        revisado=True, fecha_revision=timezone.now(),
+                        estado_pieza=ESTADO_DISPONIBLE, activo=True,
+                    )
+                    pieza.refresh_from_db()
+            else:
+                pieza = PiezaDesarme.objects.create(
+                    empresa=empresa, vehiculo=vehiculo, codigo=sug.codigo,
+                    nombre=nombre, zona=sug.zona, precio_venta_sugerido=precio,
+                    condicion=condicion, ubicacion_fisica=ubicacion,
+                    lado=lado, posicion=posicion, observaciones=obs,
+                    estado_pieza=ESTADO_DISPONIBLE, activo=True,
+                    revisado=True, fecha_revision=timezone.now(), cantidad=1,
+                )
+            sug.estado = SugerenciaPiezaDesarme.CONFIRMADA
+            sug.pieza_creada = pieza
+            sug.save(update_fields=["estado", "pieza_creada", "updated_at"])
+    except IntegrityError:
+        return JsonResponse({"success": False, "error": "Ya existe una pieza con ese código"}, status=400)
+
+    pendientes = SugerenciaPiezaDesarme.objects.filter(
+        empresa=empresa, vehiculo=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
+    ).count()
+    return JsonResponse({
+        "success": True,
+        "pieza_id": pieza.pk,
+        "pieza_nombre": pieza.nombre,
+        "pieza_precio": float(pieza.precio_venta_sugerido or 0),
+        "pieza_condicion": pieza.condicion,
+        "pendientes": pendientes,
+    })
+
+
+def _revisar_descartar(data, vehiculo, empresa):
+    from taller.models.sugerencia_pieza_desarme import SugerenciaPiezaDesarme
+
+    sug_id = data.get("sugerencia_id")
+    if not sug_id:
+        return JsonResponse({"success": False, "error": "sugerencia_id requerido"}, status=400)
+    sug = get_object_or_404(
+        SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo=vehiculo
+    )
+    sug.estado = SugerenciaPiezaDesarme.DESCARTADA
+    sug.save(update_fields=["estado", "updated_at"])
+
+    pendientes = SugerenciaPiezaDesarme.objects.filter(
+        empresa=empresa, vehiculo=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
+    ).count()
+    return JsonResponse({"success": True, "pendientes": pendientes})
+
+
+def _revisar_reabrir(data, vehiculo, empresa):
+    from taller.models.sugerencia_pieza_desarme import SugerenciaPiezaDesarme
+
+    sug_id = data.get("sugerencia_id")
+    if not sug_id:
+        return JsonResponse({"success": False, "error": "sugerencia_id requerido"}, status=400)
+    sug = get_object_or_404(
+        SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo=vehiculo
+    )
+    with transaction.atomic():
+        if sug.estado == SugerenciaPiezaDesarme.CONFIRMADA and sug.pieza_creada_id:
+            pieza = sug.pieza_creada
+            if pieza.lineas_repuesto.exists():
+                return JsonResponse({
+                    "success": False,
+                    "error": "No se puede reabrir: la pieza ya tiene ventas asociadas",
+                }, status=400)
+            pieza.delete()
+            sug.pieza_creada = None
+        sug.estado = SugerenciaPiezaDesarme.PENDIENTE
+        sug.save(update_fields=["estado", "pieza_creada", "updated_at"])
+
+    pendientes = SugerenciaPiezaDesarme.objects.filter(
+        empresa=empresa, vehiculo=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
+    ).count()
+    return JsonResponse({"success": True, "pendientes": pendientes})
+
+
+def _revisar_agregar(data, vehiculo, empresa):
+    """Agrega pieza extra fuera del catálogo sugerido."""
+    from taller.models.sugerencia_pieza_desarme import SugerenciaPiezaDesarme
+    from taller.models.pieza_desarme import CONDICION_BUENA
+
+    codigo = (data.get("codigo") or "").strip()
+    nombre = (data.get("nombre") or "").strip()
+    zona   = (data.get("zona") or "Otros").strip()
+    if not codigo or not nombre:
+        return JsonResponse({"success": False, "error": "código y nombre son requeridos"}, status=400)
+
+    condicion = (data.get("condicion") or CONDICION_BUENA).strip()
+    ubicacion = (data.get("ubicacion") or "").strip() or None
+    obs       = (data.get("observaciones") or "").strip() or None
+    try:
+        precio = Decimal(str(data.get("precio") or 0))
+    except Exception:
+        precio = Decimal("0")
+    try:
+        cantidad = max(1, int(data.get("cantidad") or 1))
+    except Exception:
+        cantidad = 1
+
+    try:
+        with transaction.atomic():
+            pieza = PiezaDesarme.objects.create(
+                empresa=empresa, vehiculo=vehiculo, codigo=codigo,
+                nombre=nombre, zona=zona, precio_venta_sugerido=precio,
+                condicion=condicion, ubicacion_fisica=ubicacion, observaciones=obs,
+                estado_pieza=ESTADO_DISPONIBLE, activo=True,
+                revisado=True, fecha_revision=timezone.now(), cantidad=cantidad,
+            )
+            # Registrar como CONFIRMADA para que aparezca en la pantalla de revisión
+            SugerenciaPiezaDesarme.objects.get_or_create(
+                vehiculo=vehiculo, codigo=codigo,
+                defaults={
+                    "empresa": empresa, "nombre": nombre, "zona": zona,
+                    "precio_sugerido": precio,
+                    "estado": SugerenciaPiezaDesarme.CONFIRMADA,
+                    "pieza_creada": pieza,
+                },
+            )
+    except IntegrityError:
+        return JsonResponse({
+            "success": False,
+            "error": f"Ya existe una pieza con código '{codigo}' en este vehículo",
+        }, status=400)
+
+    return JsonResponse({
+        "success": True,
+        "pieza_id": pieza.pk,
+        "pieza_nombre": pieza.nombre,
+        "pieza_codigo": pieza.codigo,
+        "pieza_zona": pieza.zona,
+    })

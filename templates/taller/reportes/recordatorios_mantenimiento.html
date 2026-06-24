@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load role_tags %}
 
 {% block title %}Recordatorios de Mantenimiento{% endblock %}
 
@@ -421,10 +422,12 @@
                                 ✉️ Email
                             </a>
                         {% endif %}
-                        <a href="{% url 'documentos:crear_documento' %}?vehiculo_id={{ recordatorio.vehiculo.id }}" 
+                        {% if request.user|is_admin_or_owner %}
+                        <a href="{% url 'documentos:crear_documento' %}?vehiculo_id={{ recordatorio.vehiculo.id }}"
                            class="btn-action btn-crear-documento">
                             📝 Crear Documento
                         </a>
+                        {% endif %}
                     </div>
                 </div>
             {% endfor %}

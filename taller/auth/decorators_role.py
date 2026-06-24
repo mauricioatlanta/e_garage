@@ -44,6 +44,17 @@ def role_required(*roles):
                 log.debug(f"[RBAC] Superuser {request.user.id} accediendo a {view_func.__name__}")
                 return view_func(request, *args, **kwargs)
 
+            # Fallback Owner legacy: usuarios que son dueños directos de una Empresa
+            # (creados antes de TeamMember/Groups). Sin esto quedarían bloqueados
+            # aunque sean los dueños del taller.
+            if "Owner" in roles:
+                try:
+                    from taller.models.empresa import Empresa
+                    if Empresa.objects.filter(user=request.user).exists():
+                        return view_func(request, *args, **kwargs)
+                except Exception:
+                    pass
+
             # Obtener grupos del usuario
             user_groups = set(request.user.groups.values_list("name", flat=True))
             allowed_roles = set(roles)

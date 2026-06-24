@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load country_url %}
 {% load humanize %}
+{% load role_tags %}
 
 {% block page_title %}{% trans "Inventario" %} – {{ vehiculo.patente|default:vehiculo.vin|default:vehiculo.id }}{% endblock %}
 {% block page_subtitle %}{% trans "Repuestos del vehículo — selección para venta" %}{% endblock %}
@@ -247,9 +248,11 @@
   <a href="{% country_url 'desarme:ver_vehiculo' vehiculo.pk %}" class="btn-action btn-action-cyan">
     🔧 {% trans "Detalle vehículo" %}
   </a>
+  {% if request.user|is_admin_or_owner %}
   <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-outline">
     ➕ {% trans "Nueva repuesto" %}
   </a>
+  {% endif %}
   <a href="{% country_url 'desarme:lista_vehiculos' %}" class="btn-action btn-action-outline">
     ← {% trans "Vehículos" %}
   </a>
@@ -709,7 +712,7 @@
   <div class="flex flex-wrap justify-center gap-4">
     <a href="{% country_url 'desarme:scanner_vehiculo' vehiculo.pk %}" class="btn-scanner-cta">📡 {% trans "Escáner" %}</a>
     <a href="{% country_url 'desarme:generar_inventario' vehiculo.pk %}" class="btn-action btn-action-cyan">{% trans "Generar inventario" %}</a>
-    <a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-outline">➕ {% trans "Agregar repuesto" %}</a>
+    {% if request.user|is_admin_or_owner %}<a href="{% country_url 'desarme:crear_pieza' %}?vehiculo={{ vehiculo.pk }}" class="btn-action btn-action-outline">➕ {% trans "Agregar repuesto" %}</a>{% endif %}
   </div>
 </div>
 {% endif %}

@@ -2,6 +2,7 @@
 {% load i18n %}
 {% load country_url %}
 {% load humanize %}
+{% load role_tags %}
 
 {% block page_title %}{% trans "Desarme" %} – {% trans "Centro de Operaciones" %}{% endblock %}
 {% block page_subtitle %}{% trans "Yarda de desarmaduría · Gestión de vehículos y repuestos" %}{% endblock %}
@@ -235,9 +236,11 @@
   <a href="{% country_url 'desarme:crear_vehiculo' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white text-xs font-semibold">
     ➕ {% trans "Nuevo vehículo" %}
   </a>
+  {% if request.user|is_admin_or_owner %}
   <a href="{% country_url 'desarme:crear_pieza' %}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-cyan-600/85 hover:bg-cyan-500 text-white text-xs font-semibold">
     📦 {% trans "Nueva repuesto" %}
   </a>
+  {% endif %}
 </div>
 {% endblock %}
 
@@ -367,7 +370,7 @@
   <a href="{% country_url 'desarme:lista_piezas' %}" class="text-cyan-400 hover:text-cyan-300 text-xs mt-1.5 inline-block">{% trans "Ver todas" %} →</a>
   {% else %}
   <div class="empty-chart">{% trans "No hay repuestos registradas" %}</div>
-  <a href="{% country_url 'desarme:crear_pieza' %}" class="text-cyan-400 hover:text-cyan-300 text-xs">{% trans "Registrar la primera" %}</a>
+  {% if request.user|is_admin_or_owner %}<a href="{% country_url 'desarme:crear_pieza' %}" class="text-cyan-400 hover:text-cyan-300 text-xs">{% trans "Registrar la primera" %}</a>{% endif %}
   {% endif %}
 </div>
 {% endblock %}

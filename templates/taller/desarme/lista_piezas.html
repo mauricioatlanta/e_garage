@@ -1,6 +1,7 @@
 {% extends "layouts/base_egarage_panel.html" %}
 {% load i18n %}
 {% load country_url %}
+{% load role_tags %}
 
 {% block page_title %}{% trans "Desarme" %} – {% trans "Repuestos" %}
 <div id="carrito-flotante" style="display:none;position:fixed;bottom:24px;right:24px;z-index:999;width:320px;">
@@ -171,10 +172,12 @@ function actualizarUI() {
 {% endblock %}
 
 {% block main_actions %}
+{% if request.user|is_admin_or_owner %}
 <a href="{% country_url 'desarme:crear_pieza' %}"
    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold">
   ➕ {% trans "Nueva repuesto" %}
 </a>
+{% endif %}
 <a href="{% country_url 'desarme:lista_vehiculos' %}"
    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600/80 hover:bg-cyan-500 text-white text-sm font-semibold">
   🚗 {% trans "Vehículos" %}
