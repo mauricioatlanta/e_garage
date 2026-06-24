@@ -230,6 +230,13 @@ function actualizarUI() {
     <div class="flex gap-1 mt-2 flex-wrap">
       <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
       <a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_id %}" class="interactive-btn">{% trans "Inventario" %}</a>
+      {% if request.user|is_vendedor %}
+      <a href="{% country_url 'desarme:avisar_owner_pieza' p.pk %}"
+         class="interactive-btn"
+         style="background:rgba(37,211,102,0.15);border-color:rgba(37,211,102,0.4);color:#4ade80;">
+        📱 {% trans "Avisar" %}
+      </a>
+      {% endif %}
       {% if select_field == 'pieza_desarme' and return_to %}
       <button type="button"
         onclick="seleccionarPieza({{ p.pk }}, '{{ p.codigo|escapejs }}', '{{ p.nombre|escapejs }}', {{ p.precio_venta_sugerido|default:0 }}, {{ p.costo_asignado|default:0 }})"

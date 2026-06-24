@@ -46,6 +46,7 @@ try:
         path("vehiculos/crear/", views.crear_vehiculo, name="crear_vehiculo"),
         path("vehiculos/<int:pk>/", views.ver_vehiculo, name="ver_vehiculo"),
         path("vehiculos/<int:pk>/scanner/", views.scanner_vehiculo, name="scanner_vehiculo"),
+        path("vehiculos/<int:pk>/revisar/", views.revisar_vehiculo, name="revisar_vehiculo"),
         path(
             "vehiculos/<int:pk>/generar-inventario/",
             views.generar_inventario_view,
@@ -111,6 +112,7 @@ try:
         path("piezas/crear/", views.crear_pieza, name="crear_pieza"),
         path("piezas/nueva-suelta/", views.crear_pieza_suelta, name="crear_pieza_suelta"),
         path("piezas/<int:pk>/editar/", views.editar_pieza, name="editar_pieza"),
+        path("piezas/<int:pk>/avisar-owner/", views.avisar_owner_pieza, name="avisar_owner_pieza"),
     ]
 except ImportError:
     app_name = "desarme"

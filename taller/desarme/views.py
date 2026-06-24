@@ -5,6 +5,7 @@ import logging
 import re
 from decimal import Decimal
 from datetime import timedelta
+from urllib.parse import urlencode
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -36,6 +37,7 @@ from taller.models.vehiculos import Vehiculo
 from taller.models.inspeccion_ingreso import DanoInspeccion, InspeccionIngreso
 from taller.models.vendedor_desarme import VendedorDesarme
 from taller.documentos.views_migrated import _reverse_with_request
+from taller.utils.empresa import get_user_empresa_safe
 from .forms import PiezaDesarmeForm, PiezaSueltaForm, VehiculoDesarmeForm
 from .services import generar_inventario_vehiculo
 from taller.services.desarme_financial_service import calcular_ganancia_vehiculo
@@ -1820,3 +1822,53 @@ def _revisar_agregar(data, vehiculo, empresa):
         "pieza_codigo": pieza.codigo,
         "pieza_zona": pieza.zona,
     })
+
+
+@login_required
+@role_required("Owner", "Admin", "Vendedor")
+def avisar_owner_pieza(request, pk):
+    """Genera redirect a wa.me para que Vendedor notifique al owner sobre una pieza."""
+    pieza = get_object_or_404(PiezaDesarme, pk=pk)
+    empresa = get_user_empresa_safe(request.user)
+
+    if not empresa or pieza.empresa_id != empresa.pk:
+        messages.error(request, "No tienes acceso a esta pieza.")
+        return redirect(_desarme_url(request, "piezas/"))
+
+    raw_phone = (pieza.empresa.telefono or "").strip()
+    owner_phone = re.sub(r"\D", "", raw_phone)
+    if not owner_phone:
+        messages.error(
+            request,
+            "El owner no tiene teléfono registrado. Agréguelo en Configuración.",
+        )
+        return redirect(_desarme_url(request, "piezas/"))
+
+    precio_val = pieza.precio_venta_sugerido
+    if precio_val is None:
+        precio_str = "No especificado"
+    else:
+        fmt = pieza.empresa.formato_moneda
+        simbolo = fmt["simbolo"]
+        if fmt["decimales"] == 2:
+            precio_str = f"{simbolo}{precio_val:,.2f}"
+        else:
+            miles = f"{int(precio_val):,}".replace(",", ".")
+            precio_str = f"{simbolo}{miles}"
+
+    inventario_url = request.build_absolute_uri(
+        _desarme_url(request, f"vehiculos/{pieza.vehiculo_id}/inventario/")
+    )
+    vendedor_nombre = request.user.get_full_name() or request.user.username
+
+    mensaje = (
+        f"Hola, quiero vender esta pieza:\n\n"
+        f"📌 Código: {pieza.codigo}\n"
+        f"📝 Nombre: {pieza.nombre}\n"
+        f"💰 Precio sugerido: {precio_str}\n"
+        f"🔗 Ver inventario: {inventario_url}\n\n"
+        f"Contacto: {vendedor_nombre} / {request.user.email}"
+    )
+
+    wa_url = f"https://wa.me/{owner_phone}?{urlencode({'text': mensaje})}"
+    return redirect(wa_url)
