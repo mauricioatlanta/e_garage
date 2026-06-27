@@ -12,7 +12,7 @@ from urllib.parse import quote
 from django.core.paginator import Paginator
 from django.db.models import Case, IntegerField, Q, Value, When
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.utils import timezone
 
 from taller.models.alias_repuesto import AliasRepuesto
@@ -30,18 +30,17 @@ def _telefono_wa(telefono: str) -> str:
     return re.sub(r"\D", "", telefono or "")
 
 
-def tienda_storefront(request, slug: str):
+def tienda_storefront(request, empresa_id: int):
     """
     Storefront público de una empresa: listado de PiezaDesarme DISPONIBLES.
+    Solo accesible si la empresa tiene kiosko_autorizado=True.
     Filtros: ?q=texto  ?condicion=BUENA
     """
-    empresa = (
-        Empresa.objects.filter(slug=slug)
-        .select_related()
-        .first()
+    empresa = get_object_or_404(
+        Empresa.objects.select_related("configuracion_comision"),
+        id=empresa_id,
+        configuracion_comision__kiosko_autorizado=True,
     )
-    if not empresa:
-        raise Http404
 
     if not empresa.activa_y_vigente:
         return render(request, "public/storefront/tienda_inactiva.html", {"empresa": empresa}, status=410)

@@ -121,7 +121,7 @@ def crear_venta_desde_inventario(request, pk):
     piezas_qs = PiezaDesarme.objects.filter(
         pk__in=[row.get("id") for row in selected_data if row.get("id")],
         empresa=empresa,
-        vehiculo=vehiculo,
+        vehiculo_desarme=vehiculo,
         activo=True,
         estado_pieza__in=valid_estados,
         cantidad__gt=0,
@@ -199,11 +199,13 @@ def _get_venta_session_data(request, vehiculo):
         return None
 
     ids = [row["id"] for row in items if "id" in row]
-    piezas_qs = PiezaDesarme.objects.filter(vehiculo=vehiculo, pk__in=ids).prefetch_related(
-        "names", "company_labels"
-    )
-    piezas = {p.pk: p for p in piezas_qs}
     empresa = getattr(request.user, "empresa", None) if getattr(request, "user", None) else None
+    piezas_qs = PiezaDesarme.objects.filter(
+        empresa=empresa,
+        vehiculo_desarme=vehiculo,
+        pk__in=ids,
+    ).prefetch_related("names", "company_labels")
+    piezas = {p.pk: p for p in piezas_qs}
     lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
 
     resumen = []

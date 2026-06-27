@@ -1,4 +1,4 @@
-{% extends "public/base_tienda.html" %}
+1{% extends "public/base_tienda.html" %}
 {% load static humanize %}
 
 {% block title %}Kiosko de repuestos — eGarage{% endblock %}
@@ -174,17 +174,19 @@
 
     {# Paginación #}
     {% if piezas.has_other_pages %}
+    {% with base_qs="anio="|add:anio_sel|add:"&marca="|add:marca_sel|add:"&modelo="|add:modelo_sel|add:"&q="|add:q|add:"&tipo="|add:tipo_sel|add:"&region="|add:region_sel %}
     <nav class="mt-8 flex justify-center gap-2 text-sm">
       {% if piezas.has_previous %}
-        <a href="?{{ qs_base }}{% if qs_base %}&{% endif %}page={{ piezas.previous_page_number }}"
+        <a href="?{{ base_qs }}&page={{ piezas.previous_page_number }}"
            class="px-3 py-2 rounded border border-slate-700 text-slate-300 hover:border-cyan-400 transition-colors">← Anterior</a>
       {% endif %}
       <span class="px-3 py-2 text-slate-500">{{ piezas.number }} / {{ piezas.paginator.num_pages }}</span>
       {% if piezas.has_next %}
-        <a href="?{{ qs_base }}{% if qs_base %}&{% endif %}page={{ piezas.next_page_number }}"
+        <a href="?{{ base_qs }}&page={{ piezas.next_page_number }}"
            class="px-3 py-2 rounded border border-slate-700 text-slate-300 hover:border-cyan-400 transition-colors">Siguiente →</a>
       {% endif %}
     </nav>
+    {% endwith %}
     {% endif %}
 
   {% endif %}

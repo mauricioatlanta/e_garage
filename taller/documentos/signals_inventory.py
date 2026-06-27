@@ -7,18 +7,18 @@ Detecta cambios de estado del documento y actualiza stock automáticamente:
 - ANULADO → EMITIDO: Descontar stock nuevamente
 - Ediciones: Ajustar diferencia
 
-Importante: Estas señales solo procesan cambios de estado.
-La validación de stock debe hacerse ANTES en la vista.
+Los borradores NO reservan stock. Las piezas de desarme permanecen DISPONIBLE
+mientras el documento es borrador; solo cambian a VENDIDA al emitir.
+La validación de stock debe hacerse en la vista, con select_for_update(), justo
+antes de cambiar el estado a EMITIDO.
 """
 
 import logging
 
-from django.db import transaction
-from django.db.models.signals import pre_save, post_save, post_delete
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 
 from taller.models.documento import Documento
-from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
 from taller.services.inventory_service import InventoryService
 
 log = logging.getLogger(__name__)
@@ -150,61 +150,3 @@ def registrar_cambio_estado(sender, instance, created, **kwargs):
     # Los cambios de estado ya se registran en pre_save
 
 
-@receiver(post_save, sender=Documento, dispatch_uid="inventory_liberar_reservas_al_cambiar_estado")
-def liberar_reservas_al_cambiar_estado(sender, instance, created, **kwargs):
-    """
-    Libera piezas RESERVADAS cuando el documento ya no está en BORRADOR.
-
-    BORRADOR → EMITIDO: _actualizar_stock_desarme ya marcó VENDIDA las que llegaron a 0.
-      Aquí liberamos las que quedaron con cantidad > 0 (ya no están comprometidas).
-    BORRADOR → ANULADO: el stock nunca se descontó; liberamos sin tocar cantidades.
-    """
-    if created:
-        return
-    estado_anterior = getattr(instance, "_estado_anterior_inventario", None)
-    if estado_anterior != "BORRADOR":
-        return
-    if instance.estado not in ("EMITIDO", "ANULADO"):
-        return
-    if instance.tipo in InventoryService.TIPOS_SIN_STOCK:
-        return
-
-    lineas_desarme = instance.lineas_repuesto.filter(
-        origen_repuesto=ORIGEN_DESARME
-    ).values_list("pieza_desarme_id", flat=True)
-
-    for pieza_id in lineas_desarme:
-        if pieza_id:
-            InventoryService.liberar_pieza_si_libre(pieza_id)
-            log.debug(f"[InventorySignal] Pieza {pieza_id} liberada tras {estado_anterior}→{instance.estado}")
-
-
-@receiver(post_save, sender=LineaRepuesto, dispatch_uid="inventory_reservar_pieza_al_crear_linea")
-def reservar_pieza_al_crear_linea(sender, instance, created, **kwargs):
-    """
-    Al agregar una pieza de desarme a cualquier documento (OT/FAC), la reserva
-    inmediatamente para que el kiosko no la muestre como disponible.
-    """
-    if not created:
-        return
-    if instance.origen_repuesto != ORIGEN_DESARME or not instance.pieza_desarme_id:
-        return
-    # Presupuestos no mueven stock
-    if Documento.objects.filter(
-        pk=instance.documento_id, tipo__in=InventoryService.TIPOS_SIN_STOCK
-    ).exists():
-        return
-    InventoryService.reservar_pieza(instance.pieza_desarme_id)
-    log.info(f"[InventorySignal] Pieza {instance.pieza_desarme_id} → RESERVADA (línea {instance.pk} creada en doc {instance.documento_id})")
-
-
-@receiver(post_delete, sender=LineaRepuesto, dispatch_uid="inventory_liberar_pieza_al_borrar_linea")
-def liberar_pieza_al_borrar_linea(sender, instance, **kwargs):
-    """
-    Al eliminar una línea de desarme, libera la pieza si ningún otro documento
-    BORRADOR sigue usándola. Cubre tanto borrado manual como CASCADE desde Documento.
-    """
-    if instance.origen_repuesto != ORIGEN_DESARME or not instance.pieza_desarme_id:
-        return
-    InventoryService.liberar_pieza_si_libre(instance.pieza_desarme_id)
-    log.debug(f"[InventorySignal] Pieza {instance.pieza_desarme_id} verificada para liberación (línea {instance.pk} eliminada)")

@@ -23,7 +23,13 @@
     </div>
 
     {% if show_empresa %}
-      <p class="text-xs text-cyan-400/70 truncate">{{ pieza.empresa.nombre_taller }}</p>
+      <div class="flex items-center justify-between gap-2">
+        <p class="text-xs text-cyan-400/70 truncate">{{ pieza.empresa.nombre_taller }}</p>
+        <a href="{% url 'tienda:tienda_storefront' empresa_id=pieza.empresa.id %}"
+           class="flex-shrink-0 text-xs text-slate-400 hover:text-cyan-400 underline underline-offset-2 transition-colors">
+          Ver tienda
+        </a>
+      </div>
     {% endif %}
 
     {% if pieza.observaciones %}

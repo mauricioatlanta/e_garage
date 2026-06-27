@@ -16,6 +16,7 @@ from django.test import Client
 from taller.models import Empresa
 from taller.models.pieza_desarme import PiezaDesarme
 from taller.models.team_member import TeamMember
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 
 
@@ -97,9 +98,8 @@ def admin_user(db, empresa_cl):
 def vehiculo_cl(db, empresa_cl):
     """Vehículo de desarme perteneciente a empresa_cl."""
     empresa, _ = empresa_cl
-    return Vehiculo.objects.create(
+    return VehiculoDesarme.objects.create(
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
         patente="ABCD12",
     )
 
@@ -110,7 +110,7 @@ def pieza_cl(db, empresa_cl, vehiculo_cl):
     empresa, _ = empresa_cl
     return PiezaDesarme.objects.create(
         empresa=empresa,
-        vehiculo=vehiculo_cl,
+        vehiculo_desarme=vehiculo_cl,
         codigo="MOT-01",
         nombre="Motor V8",
         precio_venta_sugerido=Decimal("150000"),
@@ -123,7 +123,7 @@ def pieza_sin_precio(db, empresa_cl, vehiculo_cl):
     empresa, _ = empresa_cl
     return PiezaDesarme.objects.create(
         empresa=empresa,
-        vehiculo=vehiculo_cl,
+        vehiculo_desarme=vehiculo_cl,
         codigo="RUE-01",
         nombre="Rueda delantera",
         precio_venta_sugerido=None,
@@ -134,14 +134,13 @@ def pieza_sin_precio(db, empresa_cl, vehiculo_cl):
 def pieza_usa(db, empresa_usa):
     """PiezaDesarme en empresa USA para test de formato precio."""
     empresa, _ = empresa_usa
-    vehiculo = Vehiculo.objects.create(
+    vehiculo = VehiculoDesarme.objects.create(
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
         patente="USA001",
     )
     return PiezaDesarme.objects.create(
         empresa=empresa,
-        vehiculo=vehiculo,
+        vehiculo_desarme=vehiculo,
         codigo="ENG-01",
         nombre="Engine V8",
         precio_venta_sugerido=Decimal("150000"),
@@ -158,14 +157,13 @@ def pieza_otra_empresa(db):
         pais="CL",
         telefono="+56900000000",
     )
-    vehiculo = Vehiculo.objects.create(
+    vehiculo = VehiculoDesarme.objects.create(
         empresa=otra_empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
         patente="OTR001",
     )
     return PiezaDesarme.objects.create(
         empresa=otra_empresa,
-        vehiculo=vehiculo,
+        vehiculo_desarme=vehiculo,
         codigo="OTR-01",
         nombre="Pieza ajena",
     )
@@ -270,14 +268,13 @@ def test_pieza_sin_precio_muestra_no_especificado(db, vendedor_user, pieza_sin_p
 def test_owner_sin_telefono_muestra_error(db, empresa_sin_telefono, vehiculo_cl=None):
     """Owner sin teléfono → 302 a lista_piezas con mensaje de error."""
     empresa, owner = empresa_sin_telefono
-    vehiculo = Vehiculo.objects.create(
+    vehiculo = VehiculoDesarme.objects.create(
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
         patente="NOPH01",
     )
     pieza = PiezaDesarme.objects.create(
         empresa=empresa,
-        vehiculo=vehiculo,
+        vehiculo_desarme=vehiculo,
         codigo="NOPH-01",
         nombre="Pieza sin tel",
     )

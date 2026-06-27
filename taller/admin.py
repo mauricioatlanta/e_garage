@@ -14,6 +14,7 @@ from taller.models.documento import Documento
 from taller.models.empresa import Empresa
 from taller.models.extras_vehiculo import CajaVehiculoEmpresa, MotorVehiculoEmpresa
 from taller.models.perfil_usuario import PerfilUsuario
+from taller.models.interchange_pieza import InterchangePieza
 from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
 from taller.models.precio_suscripcion import PrecioSuscripcion
 from taller.models.subscription_change import SubscriptionChange
@@ -384,7 +385,7 @@ class PiezaDesarmeAdmin(admin.ModelAdmin):
     list_display = (
         "codigo",
         "nombre",
-        "vehiculo",
+        "vehiculo_desarme",
         "cantidad",
         "estado_pieza",
         "activo",
@@ -392,8 +393,28 @@ class PiezaDesarmeAdmin(admin.ModelAdmin):
     )
     list_filter = ("empresa", "estado_pieza", "activo")
     search_fields = ("codigo", "nombre")
-    list_select_related = ("vehiculo", "empresa")
-    raw_id_fields = ("vehiculo", "repuesto", "part")
+    list_select_related = ("vehiculo_desarme", "empresa")
+    raw_id_fields = ("vehiculo_desarme", "repuesto", "part")
+    ordering = ("-created_at",)
+
+
+@admin.register(InterchangePieza, site=admin_site)
+class InterchangePiezaAdmin(admin.ModelAdmin):
+    list_display = (
+        "codigo_pieza",
+        "nombre_pieza",
+        "marca_origen",
+        "modelo_origen",
+        "marca_compatible",
+        "modelo_compatible",
+        "veces_confirmado",
+        "confirmado_por_vendedor",
+        "empresa",
+    )
+    list_filter = ("empresa", "marca_origen", "marca_compatible", "confirmado_por_vendedor")
+    search_fields = ("codigo_pieza", "nombre_pieza", "marca_origen", "modelo_origen",
+                     "marca_compatible", "modelo_compatible")
+    list_select_related = ("empresa",)
     ordering = ("-created_at",)
 
 

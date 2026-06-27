@@ -1,0 +1,234 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+
+{% block page_title %}{% trans "Desarme" %} – {% trans "Registrar compatibilidad" %}{% endblock %}
+{% block page_subtitle %}{% trans "Nueva entrada de interchange manual" %}{% endblock %}
+{% block page_icon %}🔄{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .ic-form {
+    max-width: 680px;
+  }
+  .ic-section {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(0,255,255,0.2);
+    border-radius: 12px;
+    padding: 20px 24px;
+    margin-bottom: 20px;
+  }
+  .ic-section-title {
+    color: #67e8f9;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(0,255,255,0.15);
+  }
+  .ic-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .ic-field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .ic-field.full { grid-column: 1 / -1; }
+  .ic-label {
+    color: #94a3b8;
+    font-size: 11px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .ic-label .req { color: #f87171; }
+  .ic-input, .ic-select {
+    background: rgba(0,0,0,0.45);
+    border: 1px solid rgba(0,255,255,0.25);
+    border-radius: 8px;
+    padding: 9px 12px;
+    color: #e0e7ff;
+    font-size: 13px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .ic-input:focus, .ic-select:focus {
+    outline: none;
+    border-color: rgba(0,255,255,0.6);
+    background: rgba(0,0,0,0.6);
+  }
+  .ic-select option { background: #0f172a; }
+  .separator-arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #a78bfa;
+    font-size: 24px;
+    padding: 8px 0;
+  }
+  .btn-submit {
+    background: linear-gradient(135deg, #059669, #16a34a);
+    border: none;
+    border-radius: 8px;
+    padding: 11px 28px;
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+  }
+  .btn-submit:hover { background: linear-gradient(135deg, #16a34a, #22c55e); }
+  .btn-cancel {
+    display: inline-block;
+    text-align: center;
+    padding: 11px 28px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: #94a3b8;
+    font-size: 14px;
+    text-decoration: none;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .btn-cancel:hover { color: #e2e8f0; border-color: rgba(255,255,255,0.3); }
+  .hint-text {
+    color: #64748b;
+    font-size: 11px;
+    margin-top: 4px;
+  }
+</style>
+{% endblock %}
+
+{% block page_stats %}
+<div class="flex flex-wrap gap-2 mt-4">
+  <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">{% trans "Dashboard" %}</a>
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🚗 {% trans "Vehículos" %}</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 {% trans "Repuestos" %}</a>
+  <a href="{% country_url 'desarme:lista_interchange' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">🔄 {% trans "Interchange" %}</a>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+<div class="ic-form">
+  {% if messages %}
+  <div style="margin-bottom:16px;">
+    {% for msg in messages %}
+    <div style="padding:10px 16px;border-radius:8px;
+      {% if msg.tags == 'error' %}background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.35);color:#fca5a5;
+      {% else %}background:rgba(16,185,129,0.12);border:1px solid rgba(16,185,129,0.35);color:#6ee7b7;{% endif %}
+      font-size:13px;">{{ msg }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <form method="post" action="">
+    {% csrf_token %}
+
+    {# Pieza #}
+    <div class="ic-section">
+      <div class="ic-section-title">{% trans "Pieza" %}</div>
+      <div class="ic-grid">
+        <div class="ic-field full">
+          <label class="ic-label">{% trans "Código de pieza" %} <span class="req">*</span></label>
+          <select name="codigo_pieza" class="ic-select" required>
+            <option value="">— {% trans "Seleccionar pieza" %} —</option>
+            {% regroup catalogo by zona as zonas_list %}
+            {% for zona_group in zonas_list %}
+            <optgroup label="{{ zona_group.grouper }}">
+              {% for item in zona_group.list %}
+              <option value="{{ item.codigo }}"
+                {% if post.codigo_pieza == item.codigo %}selected{% endif %}>
+                {{ item.codigo }} — {{ item.nombre }}
+              </option>
+              {% endfor %}
+            </optgroup>
+            {% endfor %}
+          </select>
+          <span class="hint-text">{% trans "Lista del catálogo operativo de la empresa" %}</span>
+        </div>
+        <div class="ic-field full">
+          <label class="ic-label">{% trans "Nombre visible" %} <span style="color:#64748b;">({% trans "opcional — se completa solo si se deja vacío" %})</span></label>
+          <input type="text" name="nombre_pieza" class="ic-input" maxlength="200"
+                 value="{{ post.nombre_pieza|default:'' }}" placeholder="{% trans 'Ej: Alternador 90A' %}">
+        </div>
+      </div>
+    </div>
+
+    {# Auto origen #}
+    <div class="ic-section">
+      <div class="ic-section-title">🚗 {% trans "Auto de origen" %} <span style="font-size:11px;color:#64748b;">({% trans "del que salió la pieza" %})</span></div>
+      <div class="ic-grid">
+        <div class="ic-field">
+          <label class="ic-label">{% trans "Marca" %} <span class="req">*</span></label>
+          <input type="text" name="marca_origen" class="ic-input" required maxlength="100"
+                 value="{{ post.marca_origen|default:'' }}" placeholder="{% trans 'Ej: TOYOTA' %}">
+        </div>
+        <div class="ic-field">
+          <label class="ic-label">{% trans "Modelo" %} <span class="req">*</span></label>
+          <input type="text" name="modelo_origen" class="ic-input" required maxlength="100"
+                 value="{{ post.modelo_origen|default:'' }}" placeholder="{% trans 'Ej: COROLLA' %}">
+        </div>
+        <div class="ic-field">
+          <label class="ic-label">{% trans "Año desde" %} <span class="req">*</span></label>
+          <input type="number" name="anio_origen_desde" class="ic-input" required
+                 min="1950" max="2050" value="{{ post.anio_origen_desde|default:'' }}" placeholder="2000">
+        </div>
+        <div class="ic-field">
+          <label class="ic-label">{% trans "Año hasta" %} <span class="req">*</span></label>
+          <input type="number" name="anio_origen_hasta" class="ic-input" required
+                 min="1950" max="2050" value="{{ post.anio_origen_hasta|default:'' }}" placeholder="2006">
+        </div>
+      </div>
+    </div>
+
+    <div class="separator-arrow">⇄</div>
+
+    {# Auto compatible #}
+    <div class="ic-section">
+      <div class="ic-section-title">🔄 {% trans "Auto compatible" %} <span style="font-size:11px;color:#64748b;">({% trans "donde también funciona la pieza" %})</span></div>
+      <div class="ic-grid">
+        <div class="ic-field">
+          <label class="ic-label">{% trans "Marca" %} <span class="req">*</span></label>
+          <input type="text" name="marca_compatible" class="ic-input" required maxlength="100"
+                 value="{{ post.marca_compatible|default:'' }}" placeholder="{% trans 'Ej: TOYOTA' %}">
+        </div>
+        <div class="ic-field">
+          <label class="ic-label">{% trans "Modelo" %} <span class="req">*</span></label>
+          <input type="text" name="modelo_compatible" class="ic-input" required maxlength="100"
+                 value="{{ post.modelo_compatible|default:'' }}" placeholder="{% trans 'Ej: YARIS' %}">
+        </div>
+        <div class="ic-field">
+          <label class="ic-label">{% trans "Año desde" %} <span class="req">*</span></label>
+          <input type="number" name="anio_compatible_desde" class="ic-input" required
+                 min="1950" max="2050" value="{{ post.anio_compatible_desde|default:'' }}" placeholder="2002">
+        </div>
+        <div class="ic-field">
+          <label class="ic-label">{% trans "Año hasta" %} <span class="req">*</span></label>
+          <input type="number" name="anio_compatible_hasta" class="ic-input" required
+                 min="1950" max="2050" value="{{ post.anio_compatible_hasta|default:'' }}" placeholder="2008">
+        </div>
+      </div>
+    </div>
+
+    {# Notas #}
+    <div class="ic-section">
+      <div class="ic-section-title">{% trans "Notas" %} <span style="font-size:11px;color:#64748b;">({% trans "opcional" %})</span></div>
+      <div class="ic-field">
+        <textarea name="notas" class="ic-input" rows="2"
+                  placeholder="{% trans 'Ej: mismo conector, verificar largo del cable...' %}">{{ post.notas|default:'' }}</textarea>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;">
+      <a href="{% country_url 'desarme:lista_interchange' %}" class="btn-cancel">{% trans "Cancelar" %}</a>
+      <button type="submit" class="btn-submit">✓ {% trans "Guardar compatibilidad" %}</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

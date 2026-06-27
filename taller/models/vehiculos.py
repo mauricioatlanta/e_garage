@@ -41,6 +41,40 @@ class Vehiculo(TenantScoped):
         (TIPO_USO_DESARME, "Desarme"),
     ]
 
+    CARROCERIA_SEDAN         = "sedan"
+    CARROCERIA_SUV           = "suv"
+    CARROCERIA_PICKUP        = "pickup"
+    CARROCERIA_HATCHBACK     = "hatchback"
+    CARROCERIA_COUPE         = "coupe"
+    CARROCERIA_STATION_WAGON = "station_wagon"
+    CARROCERIA_VAN           = "van"
+    CARROCERIA_MINIVAN       = "minivan"
+    CARROCERIA_CONVERTIBLE   = "convertible"
+    CARROCERIA_CROSSOVER     = "crossover"
+    CARROCERIA_COMPACTO      = "compacto"
+    CARROCERIA_UTILITARIO    = "utilitario"
+    CARROCERIA_CAMION        = "camion"
+    CARROCERIA_MOTO          = "moto"
+    CARROCERIA_OTRO          = "otro"
+
+    TIPO_CARROCERIA_CHOICES = [
+        (CARROCERIA_SEDAN,         "Sedán"),
+        (CARROCERIA_SUV,           "SUV"),
+        (CARROCERIA_PICKUP,        "Pickup"),
+        (CARROCERIA_HATCHBACK,     "Hatchback"),
+        (CARROCERIA_COUPE,         "Coupé"),
+        (CARROCERIA_STATION_WAGON, "Station Wagon"),
+        (CARROCERIA_VAN,           "Van"),
+        (CARROCERIA_MINIVAN,       "Minivan"),
+        (CARROCERIA_CONVERTIBLE,   "Convertible"),
+        (CARROCERIA_CROSSOVER,     "Crossover"),
+        (CARROCERIA_COMPACTO,      "Compacto"),
+        (CARROCERIA_UTILITARIO,    "Utilitario"),
+        (CARROCERIA_CAMION,        "Camión"),
+        (CARROCERIA_MOTO,          "Motocicleta"),
+        (CARROCERIA_OTRO,          "Otro"),
+    ]
+
     # Nullable cuando tipo_uso == DESARME
     cliente = models.ForeignKey(
         Cliente,
@@ -113,11 +147,11 @@ class Vehiculo(TenantScoped):
         verbose_name="Caja privada",
     )
     tipo_carroceria = models.CharField(
-        max_length=80,
+        max_length=20,
+        choices=TIPO_CARROCERIA_CHOICES,
         blank=True,
         null=True,
         verbose_name="Tipo de carrocería",
-        help_text="Ej: Sedan, SUV, Pickup, Hatchback, Coupe, etc.",
     )
     millas = models.PositiveIntegerField(blank=True, null=True, verbose_name="Millas/Kilometraje")
 

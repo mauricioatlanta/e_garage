@@ -1,5 +1,7 @@
 {% extends "layouts/base_egarage_panel.html" %}
 {% load i18n %}
+{% load humanize %}
+{% load custom_filters %}
 {% load country_url %}
 {% load role_tags %}
 
@@ -162,6 +164,8 @@ function actualizarUI() {
   <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">{% trans "Dashboard" %}</a>
   <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🚗 {% trans "Vehículos" %}</a>
   <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">📦 {% trans "Repuestos" %}</a>
+  <a href="{% country_url 'desarme:lista_interchange' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🔄 {% trans "Interchange" %}</a>
+  <a href="{% country_url 'desarme:reportes' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📊 {% trans "Reportes" %}</a>
 </div>
 {% if select_field == 'pieza_desarme' and return_to %}
 <div style="margin-top:12px;padding:10px 16px;border-radius:10px;background:rgba(243,154,19,0.12);border:1px solid rgba(243,154,19,0.4);color:#fcd34d;font-size:13px;display:flex;align-items:center;gap:10px;">
@@ -176,6 +180,10 @@ function actualizarUI() {
 <a href="{% country_url 'desarme:crear_pieza' %}"
    class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold">
   ➕ {% trans "Nueva repuesto" %}
+</a>
+<a href="{% country_url 'desarme:crear_pieza_suelta' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600/80 hover:bg-indigo-500 text-white text-sm font-semibold">
+  📦 {% trans "Pieza suelta" %}
 </a>
 {% endif %}
 <a href="{% country_url 'desarme:lista_vehiculos' %}"
@@ -224,12 +232,17 @@ function actualizarUI() {
       <span class="badge-estado badge-{{ p.estado_pieza }}">{{ p.get_estado_pieza_display|default:p.estado_pieza }}</span>
     </div>
     <p class="text-white text-sm mb-1">{{ p.nombre }}</p>
+    <p class="text-cyan-400 font-semibold text-sm mb-1">
+      {% if p.precio_venta_sugerido %}
+        {% if request.path|slice:':4' == '/us/' %}${{ p.precio_venta_sugerido|floatformat:2|intcomma }}{% else %}${{ p.precio_venta_sugerido|add_thousands_separator }}{% endif %}
+      {% else %}—{% endif %}
+    </p>
     <p class="vehiculo-origen">
-      {% trans "Vehículo" %}: <a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_id %}">{% if p.vehiculo.anio %}{{ p.vehiculo.anio }} {% endif %}{% if p.vehiculo.marca_texto %}{{ p.vehiculo.marca_texto }} {% elif p.vehiculo.marca %}{{ p.vehiculo.marca }} {% endif %}{% if p.vehiculo.modelo_texto %}{{ p.vehiculo.modelo_texto }}{% elif p.vehiculo.modelo %}{{ p.vehiculo.modelo }}{% endif %}{% if p.vehiculo.patente %} – {{ p.vehiculo.patente }}{% elif p.vehiculo.vin %} – {{ p.vehiculo.vin }}{% endif %}</a>
+      {% trans "Vehículo" %}: {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_desarme_id %}">{{ p.vehiculo_desarme }}</a>{% else %}—{% endif %}
     </p>
     <div class="flex gap-1 mt-2 flex-wrap">
       <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
-      <a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_id %}" class="interactive-btn">{% trans "Inventario" %}</a>
+      {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_desarme_id %}" class="interactive-btn">{% trans "Inventario" %}</a>{% endif %}
       {% if request.user|is_vendedor %}
       <a href="{% country_url 'desarme:avisar_owner_pieza' p.pk %}"
          class="interactive-btn"

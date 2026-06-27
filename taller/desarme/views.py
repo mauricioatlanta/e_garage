@@ -3,6 +3,7 @@
 import json
 import logging
 import re
+import uuid as _uuid
 from decimal import Decimal
 from datetime import timedelta
 from urllib.parse import urlencode
@@ -33,13 +34,14 @@ from taller.models.pieza_desarme import (
     PiezaDesarmeCompanyLabel,
 )
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 from taller.models.inspeccion_ingreso import DanoInspeccion, InspeccionIngreso
 from taller.models.vendedor_desarme import VendedorDesarme
 from taller.documentos.views_migrated import _reverse_with_request
 from taller.utils.empresa import get_user_empresa_safe
 from .forms import PiezaDesarmeForm, PiezaSueltaForm, VehiculoDesarmeForm
-from .services import generar_inventario_vehiculo
+from .services import generar_inventario_vehiculo, _ensure_vehiculo_desarme
 from taller.services.desarme_financial_service import calcular_ganancia_vehiculo
 
 log = logging.getLogger(__name__)
@@ -206,6 +208,44 @@ def _desarme_base_prefix(request):
     return "/cl/es"
 
 
+def _auto_codigo_pieza(nombre, empresa, vehiculo_desarme):
+    """Genera un código automático para una pieza nueva.
+
+    Busca el nombre en el catálogo operativo para usar el código estándar
+    (ej. 'Alternador' → 'MOT-01'). Si ya existe ese código para el mismo
+    vehículo, añade sufijo -B, -C… Si no hay coincidencia en el catálogo
+    genera 'PIE-XXXXXX'.
+    """
+    from .catalogo_operativo import get_catalogo_operativo_desarme
+
+    nombre_lower = (nombre or "").strip().lower()
+    catalogo = get_catalogo_operativo_desarme(empresa)
+    base_codigo = None
+    for item in catalogo:
+        if item.get("nombre", "").strip().lower() == nombre_lower:
+            base_codigo = item["codigo"]
+            break
+
+    if not base_codigo:
+        return f"PIE-{_uuid.uuid4().hex[:6].upper()}"
+
+    # Verificar unicidad dentro del mismo vehiculo_desarme
+    existentes = set(
+        PiezaDesarme.objects.filter(
+            empresa=empresa,
+            vehiculo_desarme=vehiculo_desarme,
+            codigo__startswith=base_codigo,
+        ).values_list("codigo", flat=True)
+    )
+    if base_codigo not in existentes:
+        return base_codigo
+    for letra in "BCDEFGHIJKLMNOPQRSTUVWXYZ":
+        candidato = f"{base_codigo}-{letra}"
+        if candidato not in existentes:
+            return candidato
+    return f"{base_codigo}-{_uuid.uuid4().hex[:4].upper()}"
+
+
 def _desarme_url(request, suffix):
     """
     Construye una URL absoluta al módulo desarme respetando el prefijo país/idioma.
@@ -222,7 +262,7 @@ def index(request):
     if not empresa:
         return redirect("/")
 
-    base_qs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+    base_qs = VehiculoDesarme.objects.filter(empresa=empresa)
     piezas_qs = PiezaDesarme.objects.filter(empresa=empresa)
 
     # KPIs — excluir placeholders del conteo de vehículos desarmados
@@ -297,7 +337,7 @@ def index(request):
         })
 
     # Repuestos recientes (últimos 5)
-    ultimas_repuestos = piezas_qs.select_related("vehiculo").filter(activo=True).order_by("-id")[:5]
+    ultimas_repuestos = piezas_qs.select_related("vehiculo_desarme").filter(activo=True).order_by("-id")[:5]
 
     return render(
         request,
@@ -323,9 +363,9 @@ def _ingresos_desarme_subquery():
     return (
         LineaRepuesto.objects.filter(
             origen_repuesto=ORIGEN_DESARME,
-            pieza_desarme__vehiculo_id=OuterRef("pk"),
+            pieza_desarme__vehiculo_desarme_id=OuterRef("pk"),
         )
-        .values("pieza_desarme__vehiculo_id")
+        .values("pieza_desarme__vehiculo_desarme_id")
         .annotate(total=Sum(F("precio_unitario") * F("cantidad")))
         .values("total")
     )
@@ -340,7 +380,7 @@ def lista_vehiculos(request):
 
     ingresos_subq = _ingresos_desarme_subquery()
     qs = (
-        Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+        VehiculoDesarme.objects.filter(empresa=empresa)
         .select_related("marca", "modelo", "color")
         .annotate(piezas_count=Count("piezas_desarme"))
         .annotate(
@@ -367,7 +407,7 @@ def lista_vehiculos(request):
         qs = qs.filter(estado_desarme=estado)
 
     estados = (
-        Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+        VehiculoDesarme.objects.filter(empresa=empresa)
         .exclude(estado_desarme__isnull=True)
         .exclude(estado_desarme="")
         .values_list("estado_desarme", flat=True)
@@ -460,7 +500,7 @@ def _sincronizar_estado_piezas(vehiculo, empresa, zonas):
     codigos_a_resetear = [c for c in _TODOS_CODIGOS if c not in codigos_nuevo_estado]
     if codigos_a_resetear:
         PiezaDesarme.objects.filter(
-            vehiculo=vehiculo,
+            vehiculo_desarme=vehiculo,
             empresa=empresa,
             codigo__in=codigos_a_resetear,
             estado_pieza__in=[ESTADO_DANADA, ESTADO_FALTANTE],
@@ -469,7 +509,7 @@ def _sincronizar_estado_piezas(vehiculo, empresa, zonas):
     # Aplicar estados nuevos
     for codigo, estado in codigos_nuevo_estado.items():
         PiezaDesarme.objects.filter(
-            vehiculo=vehiculo,
+            vehiculo_desarme=vehiculo,
             empresa=empresa,
             codigo=codigo,
         ).exclude(
@@ -572,10 +612,9 @@ def ver_vehiculo(request, pk):
         return HttpResponseForbidden("Acceso restringido al propietario de la cuenta.")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
     lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
@@ -608,7 +647,7 @@ def ver_vehiculo(request, pk):
     total_recaudado = (
         LineaRepuesto.objects.filter(
             origen_repuesto=ORIGEN_DESARME,
-            pieza_desarme__vehiculo=vehiculo,
+            pieza_desarme__vehiculo_desarme=vehiculo,
         ).aggregate(total=Sum(F("precio_unitario") * F("cantidad")))["total"]
         or Decimal("0")
     )
@@ -673,10 +712,9 @@ def dar_de_baja_vehiculo(request, pk):
         return HttpResponseForbidden("Acceso restringido al propietario de la cuenta.")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
     if vehiculo.fecha_baja_desarme:
@@ -717,10 +755,9 @@ def editar_vehiculo(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
     if request.method == "POST":
@@ -766,8 +803,8 @@ def lista_piezas(request):
 
     piezas = (
         PiezaDesarme.objects.filter(empresa=empresa)
-        .select_related("vehiculo", "vehiculo__marca", "vehiculo__modelo")
-        .order_by("vehiculo__patente", "codigo")
+        .select_related("vehiculo_desarme", "vehiculo_desarme__marca", "vehiculo_desarme__modelo")
+        .order_by("vehiculo_desarme__patente", "codigo")
     )
 
     q = request.GET.get("q", "").strip()
@@ -776,12 +813,12 @@ def lista_piezas(request):
             piezas = piezas.filter(
                 Q(codigo__icontains=term)
                 | Q(nombre__icontains=term)
-                | Q(vehiculo__patente__icontains=term)
-                | Q(vehiculo__vin__icontains=term)
-                | Q(vehiculo__marca_texto__icontains=term)
-                | Q(vehiculo__modelo_texto__icontains=term)
-                | Q(vehiculo__marca__nombre__icontains=term)
-                | Q(vehiculo__modelo__nombre__icontains=term)
+                | Q(vehiculo_desarme__patente__icontains=term)
+                | Q(vehiculo_desarme__vin__icontains=term)
+                | Q(vehiculo_desarme__marca_texto__icontains=term)
+                | Q(vehiculo_desarme__modelo_texto__icontains=term)
+                | Q(vehiculo_desarme__marca__nombre__icontains=term)
+                | Q(vehiculo_desarme__modelo__nombre__icontains=term)
             )
 
     estado = request.GET.get("estado", "").strip()
@@ -790,10 +827,10 @@ def lista_piezas(request):
 
     vehiculo_id = request.GET.get("vehiculo", "").strip()
     if vehiculo_id:
-        piezas = piezas.filter(vehiculo_id=vehiculo_id)
+        piezas = piezas.filter(vehiculo_desarme_id=vehiculo_id)
 
     vehiculos_choices = list(
-        Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+        VehiculoDesarme.objects.filter(empresa=empresa)
         .order_by("patente", "vin")
         .values_list("id", "patente", "vin")
     )
@@ -830,10 +867,9 @@ def crear_pieza(request):
     vehiculo = None
     vehiculo_id = request.GET.get("vehiculo")
     if vehiculo_id:
-        vehiculo = Vehiculo.objects.filter(
+        vehiculo = VehiculoDesarme.objects.filter(
             pk=vehiculo_id,
             empresa=empresa,
-            tipo_uso=Vehiculo.TIPO_USO_DESARME,
         ).first()
 
     if request.method == "POST":
@@ -843,11 +879,15 @@ def crear_pieza(request):
                 with transaction.atomic():
                     pieza = form.save(commit=False)
                     pieza.empresa = empresa
+                    if not pieza.codigo:
+                        pieza.codigo = _auto_codigo_pieza(
+                            pieza.nombre, empresa, pieza.vehiculo_desarme
+                        )
                     pieza.save()
                 messages.success(request, f"Pieza {pieza.codigo} creada.")
-                if pieza.vehiculo_id:
+                if pieza.vehiculo_desarme_id:
                     return redirect(
-                        _desarme_url(request, f"vehiculos/{pieza.vehiculo_id}/inventario/")
+                        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario/")
                     )
                 return redirect(_desarme_url(request, "piezas/"))
             except IntegrityError:
@@ -901,19 +941,18 @@ def crear_pieza_suelta(request):
             try:
                 with transaction.atomic():
                     patente_sintetica = f"SLT-{_uuid.uuid4().hex[:12]}"
-                    vehiculo = Vehiculo.objects.create(
+                    vehiculo = VehiculoDesarme.objects.create(
                         empresa=empresa,
-                        tipo_uso=Vehiculo.TIPO_USO_DESARME,
                         es_placeholder=True,
                         patente=patente_sintetica,
-                        marca_texto=marca or None,
-                        modelo_texto=modelo or None,
+                        marca_texto=marca or "",
+                        modelo_texto=modelo or "",
                         anio=anio,
                     )
                     codigo = d.get("codigo") or f"SLT-{_uuid.uuid4().hex[:8].upper()}"
                     pieza = PiezaDesarme.objects.create(
                         empresa=empresa,
-                        vehiculo=vehiculo,
+                        vehiculo_desarme=vehiculo,
                         nombre=d["nombre"],
                         codigo=codigo,
                         condicion=d["condicion"],
@@ -961,9 +1000,9 @@ def editar_pieza(request, pk):
             try:
                 form.save()
                 messages.success(request, "Pieza actualizada.")
-                if pieza.vehiculo_id:
+                if pieza.vehiculo_desarme_id:
                     return redirect(
-                        _desarme_url(request, f"vehiculos/{pieza.vehiculo_id}/inventario/")
+                        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario/")
                     )
                 return redirect(_desarme_url(request, "piezas/"))
             except Exception as e:
@@ -989,10 +1028,9 @@ def inventario_vehiculo(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
     piezas = (
         vehiculo.piezas_desarme.filter(activo=True)
@@ -1065,10 +1103,9 @@ def iniciar_venta_desde_inventario(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
     pieza_ids = request.POST.getlist("pieza_ids") or []
@@ -1087,7 +1124,7 @@ def iniciar_venta_desde_inventario(request, pk):
     piezas_qs = PiezaDesarme.objects.filter(
         pk__in=pieza_ids_int,
         empresa=empresa,
-        vehiculo=vehiculo,
+        vehiculo_desarme=vehiculo,
         activo=True,
         estado_pieza__in=valid_estados,
         cantidad__gt=0,
@@ -1135,7 +1172,7 @@ def iniciar_venta_desde_inventario(request, pk):
                 "origen_repuesto": ORIGEN_DESARME,
                 "pieza_desarme_id": pieza.id,
                 "costo_linea": costo_linea,
-                "vehiculo_origen_label": str(pieza.vehiculo),
+                "vehiculo_origen_label": str(pieza.vehiculo_desarme),
             }
         )
 
@@ -1171,10 +1208,9 @@ def generar_inventario_view(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
     generar_inventario_vehiculo(vehiculo, empresa)
     messages.success(request, "Inventario generado. Revisa el escáner.")
@@ -1192,10 +1228,9 @@ def scanner_vehiculo(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
     # Compatibilidad defensiva: en algunos deploys el related_name `piezas_desarme`
@@ -1204,7 +1239,7 @@ def scanner_vehiculo(request, pk):
         piezas_qs = vehiculo.piezas_desarme.filter(activo=True).prefetch_related("names", "company_labels")  # type: ignore[attr-defined]
     except Exception:
         piezas_qs = PiezaDesarme.objects.filter(
-            vehiculo=vehiculo, activo=True, empresa=empresa
+            vehiculo_desarme=vehiculo, activo=True, empresa=empresa
         ).prefetch_related("names", "company_labels")
     piezas = list(piezas_qs.order_by("zona", "codigo"))
     lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
@@ -1546,7 +1581,7 @@ def iniciar_venta_desde_lista(request):
                 "origen_repuesto": ORIGEN_DESARME,
                 "pieza_desarme_id": pieza.id,
                 "costo_linea": costo_linea,
-                "vehiculo_origen_label": str(pieza.vehiculo),
+                "vehiculo_origen_label": str(pieza.vehiculo_desarme),
             }
         )
     if not repuestos_prefill:
@@ -1584,9 +1619,14 @@ def revisar_vehiculo(request, pk):
             return JsonResponse({"success": False, "error": "Sin empresa"}, status=403)
         return redirect("/")
 
-    vehiculo = get_object_or_404(
-        Vehiculo, pk=pk, empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME
-    )
+    vehiculo = VehiculoDesarme.objects.filter(pk=pk, empresa=empresa).first()
+    if vehiculo is None:
+        vehiculo_legacy = Vehiculo.objects.filter(
+            pk=pk, empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME
+        ).first()
+        if vehiculo_legacy is None:
+            return get_object_or_404(VehiculoDesarme, pk=pk, empresa=empresa)
+        vehiculo = _ensure_vehiculo_desarme(vehiculo_legacy, empresa)
 
     if request.method == "POST":
         try:
@@ -1608,16 +1648,16 @@ def revisar_vehiculo(request, pk):
     # GET ──────────────────────────────────────────────────────────────────────
     sugerencias_qs = (
         SugerenciaPiezaDesarme.objects
-        .filter(empresa=empresa, vehiculo=vehiculo)
+        .filter(empresa=empresa, vehiculo_desarme=vehiculo)
         .select_related("pieza_creada")
     )
     if not sugerencias_qs.exists():
         # Auto-inicializar solo si el vehículo aún no tiene piezas
-        if not PiezaDesarme.objects.filter(empresa=empresa, vehiculo=vehiculo).exists():
+        if not PiezaDesarme.objects.filter(empresa=empresa, vehiculo_desarme=vehiculo).exists():
             inicializar_sugerencias(vehiculo, empresa)
             sugerencias_qs = (
                 SugerenciaPiezaDesarme.objects
-                .filter(empresa=empresa, vehiculo=vehiculo)
+                .filter(empresa=empresa, vehiculo_desarme=vehiculo)
                 .select_related("pieza_creada")
             )
 
@@ -1663,7 +1703,7 @@ def _revisar_confirmar(data, vehiculo, empresa):
     if not sug_id:
         return JsonResponse({"success": False, "error": "sugerencia_id requerido"}, status=400)
     sug = get_object_or_404(
-        SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo=vehiculo
+        SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo_desarme=vehiculo
     )
     if sug.estado != SugerenciaPiezaDesarme.PENDIENTE:
         return JsonResponse({"success": False, "error": f"La sugerencia ya está {sug.estado}"}, status=400)
@@ -1683,7 +1723,7 @@ def _revisar_confirmar(data, vehiculo, empresa):
         with transaction.atomic():
             # Si ya existe pieza con este código (vehículo legacy), vincular en lugar de crear
             existente = PiezaDesarme.objects.filter(
-                empresa=empresa, vehiculo=vehiculo, codigo=sug.codigo
+                empresa=empresa, vehiculo_desarme=vehiculo, codigo=sug.codigo
             ).first()
             if existente:
                 pieza = existente
@@ -1695,7 +1735,7 @@ def _revisar_confirmar(data, vehiculo, empresa):
                     pieza.refresh_from_db()
             else:
                 pieza = PiezaDesarme.objects.create(
-                    empresa=empresa, vehiculo=vehiculo, codigo=sug.codigo,
+                    empresa=empresa, vehiculo_desarme=vehiculo, codigo=sug.codigo,
                     nombre=nombre, zona=sug.zona, precio_venta_sugerido=precio,
                     condicion=condicion, ubicacion_fisica=ubicacion,
                     lado=lado, posicion=posicion, observaciones=obs,
@@ -1709,7 +1749,7 @@ def _revisar_confirmar(data, vehiculo, empresa):
         return JsonResponse({"success": False, "error": "Ya existe una pieza con ese código"}, status=400)
 
     pendientes = SugerenciaPiezaDesarme.objects.filter(
-        empresa=empresa, vehiculo=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
+        empresa=empresa, vehiculo_desarme=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
     ).count()
     return JsonResponse({
         "success": True,
@@ -1728,13 +1768,13 @@ def _revisar_descartar(data, vehiculo, empresa):
     if not sug_id:
         return JsonResponse({"success": False, "error": "sugerencia_id requerido"}, status=400)
     sug = get_object_or_404(
-        SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo=vehiculo
+        SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo_desarme=vehiculo
     )
     sug.estado = SugerenciaPiezaDesarme.DESCARTADA
     sug.save(update_fields=["estado", "updated_at"])
 
     pendientes = SugerenciaPiezaDesarme.objects.filter(
-        empresa=empresa, vehiculo=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
+        empresa=empresa, vehiculo_desarme=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
     ).count()
     return JsonResponse({"success": True, "pendientes": pendientes})
 
@@ -1746,7 +1786,7 @@ def _revisar_reabrir(data, vehiculo, empresa):
     if not sug_id:
         return JsonResponse({"success": False, "error": "sugerencia_id requerido"}, status=400)
     sug = get_object_or_404(
-        SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo=vehiculo
+        SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo_desarme=vehiculo
     )
     with transaction.atomic():
         if sug.estado == SugerenciaPiezaDesarme.CONFIRMADA and sug.pieza_creada_id:
@@ -1762,7 +1802,7 @@ def _revisar_reabrir(data, vehiculo, empresa):
         sug.save(update_fields=["estado", "pieza_creada", "updated_at"])
 
     pendientes = SugerenciaPiezaDesarme.objects.filter(
-        empresa=empresa, vehiculo=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
+        empresa=empresa, vehiculo_desarme=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
     ).count()
     return JsonResponse({"success": True, "pendientes": pendientes})
 
@@ -1793,7 +1833,7 @@ def _revisar_agregar(data, vehiculo, empresa):
     try:
         with transaction.atomic():
             pieza = PiezaDesarme.objects.create(
-                empresa=empresa, vehiculo=vehiculo, codigo=codigo,
+                empresa=empresa, vehiculo_desarme=vehiculo, codigo=codigo,
                 nombre=nombre, zona=zona, precio_venta_sugerido=precio,
                 condicion=condicion, ubicacion_fisica=ubicacion, observaciones=obs,
                 estado_pieza=ESTADO_DISPONIBLE, activo=True,
@@ -1801,7 +1841,7 @@ def _revisar_agregar(data, vehiculo, empresa):
             )
             # Registrar como CONFIRMADA para que aparezca en la pantalla de revisión
             SugerenciaPiezaDesarme.objects.get_or_create(
-                vehiculo=vehiculo, codigo=codigo,
+                vehiculo_desarme=vehiculo, codigo=codigo,
                 defaults={
                     "empresa": empresa, "nombre": nombre, "zona": zona,
                     "precio_sugerido": precio,
@@ -1857,7 +1897,7 @@ def avisar_owner_pieza(request, pk):
             precio_str = f"{simbolo}{miles}"
 
     inventario_url = request.build_absolute_uri(
-        _desarme_url(request, f"vehiculos/{pieza.vehiculo_id}/inventario/")
+        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario/")
     )
     vendedor_nombre = request.user.get_full_name() or request.user.username
 
@@ -1872,3 +1912,176 @@ def avisar_owner_pieza(request, pk):
 
     wa_url = f"https://wa.me/{owner_phone}?{urlencode({'text': mensaje})}"
     return redirect(wa_url)
+
+
+# ── Interchange manual de piezas ───────────────────────────────────────────────
+
+@login_required
+def lista_interchange(request):
+    """Lista los patrones de interchange registrados por la empresa."""
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    from taller.models.interchange_pieza import InterchangePieza
+
+    qs = InterchangePieza.objects.filter(empresa=empresa).order_by("codigo_pieza", "-veces_confirmado")
+    q = request.GET.get("q", "").strip()
+    if q:
+        qs = qs.filter(
+            Q(codigo_pieza__icontains=q)
+            | Q(nombre_pieza__icontains=q)
+            | Q(marca_origen__icontains=q)
+            | Q(modelo_origen__icontains=q)
+            | Q(marca_compatible__icontains=q)
+            | Q(modelo_compatible__icontains=q)
+        )
+
+    return render(request, "taller/desarme/lista_interchange.html", {
+        "interchanges": qs,
+        "q": q,
+    })
+
+
+@login_required
+def crear_interchange(request):
+    """
+    GET  → formulario.
+    POST → upsert: si ya existe la combinación (empresa+pieza+marca/modelo origen+compatible),
+           incrementa veces_confirmado; si no existe, crea con veces_confirmado=1.
+    """
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    from taller.models.interchange_pieza import InterchangePieza
+    from .catalogo_operativo import get_catalogo_operativo_desarme
+
+    catalogo = get_catalogo_operativo_desarme(empresa)
+
+    if request.method == "POST":
+        codigo_pieza      = request.POST.get("codigo_pieza", "").strip()
+        nombre_pieza      = request.POST.get("nombre_pieza", "").strip()
+        marca_origen      = request.POST.get("marca_origen", "").strip().upper()
+        modelo_origen     = request.POST.get("modelo_origen", "").strip().upper()
+        marca_compatible  = request.POST.get("marca_compatible", "").strip().upper()
+        modelo_compatible = request.POST.get("modelo_compatible", "").strip().upper()
+        notas             = request.POST.get("notas", "").strip()
+
+        # Años — validación básica
+        try:
+            anio_origen_desde    = int(request.POST.get("anio_origen_desde", 0))
+            anio_origen_hasta    = int(request.POST.get("anio_origen_hasta", 0))
+            anio_compatible_desde = int(request.POST.get("anio_compatible_desde", 0))
+            anio_compatible_hasta = int(request.POST.get("anio_compatible_hasta", 0))
+        except (ValueError, TypeError):
+            messages.error(request, "Los años deben ser números válidos.")
+            return render(request, "taller/desarme/crear_interchange.html", {
+                "catalogo": catalogo, "post": request.POST,
+            })
+
+        campos_requeridos = [codigo_pieza, marca_origen, modelo_origen, marca_compatible, modelo_compatible]
+        if not all(campos_requeridos) or not all([anio_origen_desde, anio_origen_hasta, anio_compatible_desde, anio_compatible_hasta]):
+            messages.error(request, "Todos los campos marcados con * son obligatorios.")
+            return render(request, "taller/desarme/crear_interchange.html", {
+                "catalogo": catalogo, "post": request.POST,
+            })
+
+        # Si nombre_pieza vacío, tomarlo del catálogo
+        if not nombre_pieza:
+            for item in catalogo:
+                if item["codigo"] == codigo_pieza:
+                    nombre_pieza = item["nombre"]
+                    break
+
+        # Upsert: el constraint unique NO incluye años, así que buscamos por los 5 campos del constraint
+        existing = InterchangePieza.objects.filter(
+            empresa=empresa,
+            codigo_pieza=codigo_pieza,
+            marca_origen=marca_origen,
+            modelo_origen=modelo_origen,
+            marca_compatible=marca_compatible,
+            modelo_compatible=modelo_compatible,
+        ).first()
+
+        if existing:
+            InterchangePieza.objects.filter(pk=existing.pk).update(
+                veces_confirmado=F("veces_confirmado") + 1
+            )
+            existing.refresh_from_db(fields=["veces_confirmado"])
+            messages.success(
+                request,
+                f"Compatibilidad ya conocida — confirmada ×{existing.veces_confirmado} veces.",
+            )
+        else:
+            InterchangePieza.objects.create(
+                empresa=empresa,
+                codigo_pieza=codigo_pieza,
+                nombre_pieza=nombre_pieza,
+                marca_origen=marca_origen,
+                modelo_origen=modelo_origen,
+                anio_origen_desde=anio_origen_desde,
+                anio_origen_hasta=anio_origen_hasta,
+                marca_compatible=marca_compatible,
+                modelo_compatible=modelo_compatible,
+                anio_compatible_desde=anio_compatible_desde,
+                anio_compatible_hasta=anio_compatible_hasta,
+                notas=notas,
+            )
+            messages.success(request, "Interchange registrado correctamente.")
+
+        return redirect(_desarme_url(request, "interchange/"))
+
+    return render(request, "taller/desarme/crear_interchange.html", {
+        "catalogo": catalogo,
+        "post": {},
+    })
+
+
+@login_required
+@require_POST
+def eliminar_interchange(request, pk):
+    """Elimina un registro de interchange — solo si pertenece a la empresa del usuario."""
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    from taller.models.interchange_pieza import InterchangePieza
+
+    ix = get_object_or_404(InterchangePieza, pk=pk, empresa=empresa)
+    ix.delete()
+    messages.success(request, "Registro de interchange eliminado.")
+    return redirect(_desarme_url(request, "interchange/"))
+
+
+@login_required
+def reportes_desarme(request):
+    """Reportes financieros y de inventario exclusivos del módulo Desarme."""
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    from taller.services.desarme_kpi_service import (
+        kpis_resumen,
+        top_piezas,
+        top_vehiculos,
+        top_marcas,
+        top_modelos,
+        top_roi_vehiculos,
+    )
+
+    kpis = kpis_resumen(empresa)
+    return render(
+        request,
+        "taller/desarme/reportes.html",
+        {
+            "eg_desarme_dashboard_compact": True,
+            "empresa": empresa,
+            "kpis": kpis,
+            "top_piezas": top_piezas(empresa, limit=10),
+            "top_vehiculos": top_vehiculos(empresa, limit=10),
+            "top_marcas": top_marcas(empresa, limit=5),
+            "top_modelos": top_modelos(empresa, limit=5),
+            "top_roi": top_roi_vehiculos(empresa, limit=5),
+        },
+    )

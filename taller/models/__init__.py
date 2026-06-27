@@ -43,6 +43,8 @@ from .pieza_desarme import (
     PiezaDesarmeCompanyLabel,
     PrecioHistoricoPieza,
 )
+from .interchange_pieza import InterchangePieza
+from .sugerencia_pieza_desarme import SugerenciaPiezaDesarme
 from .vehiculo_desarme import VehiculoDesarme
 from .vehiculo_financial import (
     VehiculoFinancialSnapshot,
@@ -111,6 +113,8 @@ __all__ = [
     "PiezaDesarmeName",
     "PiezaDesarmeCompanyLabel",
     "PrecioHistoricoPieza",
+    "InterchangePieza",
+    "SugerenciaPiezaDesarme",
     "VehiculoDesarme",
     "VehiculoFinancialSnapshot",
     "VehicleFinancialEvent",

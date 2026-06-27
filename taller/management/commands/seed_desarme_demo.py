@@ -55,7 +55,7 @@ class Command(BaseCommand):
             observaciones_desarme="Vehículo demo append-only event sourcing",
         )
 
-        VehiculoDesarme.objects.create(
+        vehiculo_desarme = VehiculoDesarme.objects.create(
             empresa=empresa,
             vehiculo_origen_id=vehiculo.id,
             marca_texto="BMW",
@@ -93,7 +93,7 @@ class Command(BaseCommand):
         for data in piezas:
             pieza = PiezaDesarme.objects.create(
                 empresa=empresa,
-                vehiculo=vehiculo,
+                vehiculo_desarme=vehiculo_desarme,
                 codigo=data["codigo"],
                 nombre=data["nombre"],
                 cantidad=data["cantidad"],
@@ -141,19 +141,19 @@ class Command(BaseCommand):
         FinancialEventService.sync_events_for_documento(documento)
 
         FinancialEventService.create_purchase_event(
-            vehiculo,
+            vehiculo_desarme,
             empresa,
             Decimal("1500000"),
             "Compra de vehículo de desarme demo",
         )
         FinancialEventService.create_cost_event(
-            vehiculo,
+            vehiculo_desarme,
             empresa,
             Decimal("200000"),
             "Costo transporte/grúa demo",
         )
 
-        SnapshotGeneratorService.generate_snapshot_for_vehicle(vehiculo)
+        SnapshotGeneratorService.generate_snapshot_for_vehicle(vehiculo_desarme)
 
         self.stdout.write(self.style.SUCCESS("✅ Seed de desarme creada correctamente."))
         self.stdout.write(self.style.SUCCESS(f"Vehículo DESARME: {vehiculo.id}"))

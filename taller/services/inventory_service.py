@@ -29,7 +29,6 @@ from taller.models.pieza_desarme import (
     PiezaDesarme,
     ESTADO_DISPONIBLE,
     ESTADO_VENDIDA,
-    ESTADO_RESERVADA,
 )
 from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.repuesto import Repuesto
@@ -232,13 +231,21 @@ class InventoryService:
                         f"Requerido: {linea.cantidad}, Disponible: {disponible}"
                     )
             elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
+                pieza = linea.pieza_desarme
                 reserva_previa = reservas_previas.get(
                     (ORIGEN_DESARME, int(linea.pieza_desarme_id)), 0
                 )
-                disponible = int(linea.pieza_desarme.cantidad or 0) + reserva_previa
-                if (not linea.pieza_desarme.activo and reserva_previa <= 0) or disponible < linea.cantidad:
+                # Sin crédito de edición previa, la pieza debe estar DISPONIBLE
+                if reserva_previa == 0 and pieza.estado_pieza != ESTADO_DISPONIBLE:
                     errores.append(
-                        f"❌ Stock insuficiente en pieza de desarme '{linea.pieza_desarme.nombre}'. "
+                        f"❌ Pieza '{pieza.nombre}' no está disponible "
+                        f"(estado: {pieza.get_estado_pieza_display()})."
+                    )
+                    continue
+                disponible = int(pieza.cantidad or 0) + reserva_previa
+                if disponible < linea.cantidad:
+                    errores.append(
+                        f"❌ Stock insuficiente en pieza de desarme '{pieza.nombre}'. "
                         f"Requerido: {linea.cantidad}, Disponible: {disponible}"
                     )
         return errores
@@ -388,39 +395,6 @@ class InventoryService:
 
     @staticmethod
     @transaction.atomic
-    def reservar_pieza(pieza_id: int) -> None:
-        """DISPONIBLE → RESERVADA. No-op si ya está en otro estado."""
-        PiezaDesarme.objects.filter(
-            id=pieza_id, estado_pieza=ESTADO_DISPONIBLE
-        ).update(estado_pieza=ESTADO_RESERVADA)
-
-    @staticmethod
-    @transaction.atomic
-    def liberar_pieza_si_libre(pieza_id: int) -> None:
-        """
-        RESERVADA → DISPONIBLE solo si ningún documento BORRADOR activo sigue usando
-        esta pieza. Llamar tras borrar una línea o emitir/anular/cancelar el documento.
-        """
-        pieza = (
-            PiezaDesarme.objects.select_for_update()
-            .filter(id=pieza_id, estado_pieza=ESTADO_RESERVADA)
-            .first()
-        )
-        if not pieza:
-            return  # ya DISPONIBLE, VENDIDA, etc.
-
-        still_reserved = LineaRepuesto.objects.filter(
-            pieza_desarme_id=pieza_id,
-            documento__estado="BORRADOR",
-            documento__tipo__in=InventoryService.TIPOS_CON_STOCK,
-        ).exists()
-        if not still_reserved:
-            PiezaDesarme.objects.filter(id=pieza_id).update(
-                estado_pieza=ESTADO_DISPONIBLE, activo=True
-            )
-
-    @staticmethod
-    @transaction.atomic
     def _actualizar_stock_desarme(pieza: "PiezaDesarme", cantidad: int):
         """
         Actualiza cantidad de PiezaDesarme. cantidad: + reponer, - descontar.
@@ -438,14 +412,14 @@ class InventoryService:
             # Si el vehículo asociado no tiene más piezas vendibles reales, marcar como AGOTADO
             # Piezas vendibles reales: activo=True, cantidad>0, estado_pieza in [DISPONIBLE, RESERVADA]
             try:
-                veh_id = getattr(pieza, "vehiculo_id", None)
+                veh_id = getattr(pieza, "vehiculo_desarme_id", None)
                 if veh_id is not None:
                     remaining = PiezaDesarme.objects.filter(
-                        vehiculo_id=veh_id,
+                        vehiculo_desarme_id=veh_id,
                         empresa=pieza.empresa,
                         activo=True,
                         cantidad__gt=0,
-                        estado_pieza__in=[ESTADO_DISPONIBLE, ESTADO_RESERVADA],
+                        estado_pieza=ESTADO_DISPONIBLE,
                     ).exists()
                     if not remaining:
                         VehiculoDesarme.objects.filter(id=veh_id).update(estado_desarme="AGOTADO")

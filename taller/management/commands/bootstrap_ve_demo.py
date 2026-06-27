@@ -231,7 +231,7 @@ class Command(BaseCommand):
                 PiezaDesarme,
                 {
                     "empresa": empresa,
-                    "vehiculo": vehiculo_desarme,
+                    "vehiculo_desarme": vdm,
                     "codigo": codigo,
                     "nombre": nombre,
                     "cantidad": cantidad,
@@ -245,7 +245,7 @@ class Command(BaseCommand):
             )
             pieza_lookup = self._filtered_payload(
                 PiezaDesarme,
-                {"empresa": empresa, "vehiculo": vehiculo_desarme, "codigo": codigo},
+                {"empresa": empresa, "vehiculo_desarme": vdm, "codigo": codigo},
             )
             pieza, pieza_created = PiezaDesarme.objects.get_or_create(
                 **pieza_lookup, defaults=pieza_defaults

@@ -227,14 +227,14 @@
       <button type="submit" class="btn px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white font-semibold text-sm shadow-md">
         {% trans "Guardar" %}
       </button>
-      {% if repuesto and repuesto.vehiculo_id %}
-      <a href="{% country_url 'desarme:inventario_vehiculo' repuesto.vehiculo_id %}"
-         class="btn px-4 py-2 rounded-lg border border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/20 font-medium text-sm">
+      {% if repuesto and repuesto.vehiculo_desarme_id %}
+      <a href="{% country_url 'desarme:inventario_vehiculo' repuesto.vehiculo_desarme_id %}"
+         class="btn px-4 py-2 rounded-lg bg-slate-600 hover:bg-slate-500 text-white font-medium text-sm">
         {% trans "Cancelar" %}
       </a>
       {% else %}
       <a href="{% country_url 'desarme:lista_piezas' %}"
-         class="btn px-4 py-2 rounded-lg border border-slate-500/50 text-slate-300 hover:bg-slate-500/20 font-medium text-sm">
+         class="btn px-4 py-2 rounded-lg bg-slate-600 hover:bg-slate-500 text-white font-medium text-sm">
         {% trans "Cancelar" %}
       </a>
       {% endif %}

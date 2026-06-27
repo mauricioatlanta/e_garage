@@ -3,6 +3,7 @@
 from django import forms
 
 from taller.models.pieza_desarme import PiezaDesarme
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 
 
@@ -60,7 +61,6 @@ class VehiculoDesarmeForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.tipo_uso = Vehiculo.TIPO_USO_DESARME
         instance.cliente = None
         if self.empresa:
             instance.empresa = self.empresa
@@ -70,7 +70,7 @@ class VehiculoDesarmeForm(forms.ModelForm):
 
 
 PIEZA_DESARME_PRINCIPALES = [
-    "vehiculo",
+    "vehiculo_desarme",
     "codigo",
     "nombre",
     "cantidad",
@@ -106,12 +106,12 @@ class PiezaDesarmeForm(forms.ModelForm):
         self.vehiculo = kwargs.pop("vehiculo", None)
         super().__init__(*args, **kwargs)
         if self.empresa:
-            self.fields["vehiculo"].queryset = Vehiculo.objects.filter(
-                empresa=self.empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME
+            self.fields["vehiculo_desarme"].queryset = VehiculoDesarme.objects.filter(
+                empresa=self.empresa,
             ).order_by("patente", "vin")
         if self.vehiculo:
-            self.fields["vehiculo"].initial = self.vehiculo
-            self.fields["vehiculo"].disabled = True
+            self.fields["vehiculo_desarme"].initial = self.vehiculo
+            self.fields["vehiculo_desarme"].disabled = True
         for f in (
             "fecha_extraccion",
             "ubicacion_fisica",

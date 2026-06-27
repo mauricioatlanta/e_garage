@@ -22,6 +22,24 @@ ESTADO_DESARME_CHOICES = [
     ("BAJA", "Baja"),
 ]
 
+TIPO_CARROCERIA_CHOICES = [
+    ("sedan", "Sedán"),
+    ("suv", "SUV"),
+    ("pickup", "Pickup"),
+    ("hatchback", "Hatchback"),
+    ("coupe", "Coupé"),
+    ("station_wagon", "Station Wagon"),
+    ("van", "Van"),
+    ("minivan", "Minivan"),
+    ("convertible", "Convertible"),
+    ("crossover", "Crossover"),
+    ("compacto", "Compacto"),
+    ("utilitario", "Utilitario"),
+    ("camion", "Camión"),
+    ("moto", "Motocicleta"),
+    ("otro", "Otro"),
+]
+
 
 class VehiculoDesarme(TenantScoped):
     """
@@ -124,6 +142,52 @@ class VehiculoDesarme(TenantScoped):
     )
     fecha_baja_desarme = models.DateField(null=True, blank=True)
     observaciones_desarme = models.TextField(blank=True, null=True)
+
+    # Campos para paridad con Vehiculo(tipo_uso=DESARME)
+    es_placeholder = models.BooleanField(
+        default=False,
+        help_text="True cuando se creó para agrupar una pieza suelta sin vehículo real.",
+    )
+    tipo_carroceria = models.CharField(
+        max_length=20,
+        choices=TIPO_CARROCERIA_CHOICES,
+        blank=True,
+        null=True,
+        verbose_name="Tipo de carrocería",
+    )
+    precio_compra = models.DecimalField(
+        max_digits=14,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    monto_chatarra = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    transporte_grua_desarme = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        verbose_name="Costo transporte/grúa",
+    )
+    otros_gastos_desarme = models.DecimalField(
+        max_digits=12,
+        decimal_places=2,
+        null=True,
+        blank=True,
+    )
+    vendedor_desarme = models.ForeignKey(
+        "taller.VendedorDesarme",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vehiculos_en_desarme",
+        verbose_name="Vendedor / comprado a",
+    )
 
     def __str__(self):
         marca_str = self.get_marca_display()

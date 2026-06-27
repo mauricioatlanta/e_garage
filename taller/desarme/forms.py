@@ -1,8 +1,11 @@
+from decimal import Decimal, InvalidOperation
+
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
 from taller.models.extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
 from taller.models.pieza_desarme import CONDICION_CHOICES, PiezaDesarme
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 from taller.models.vendedor_desarme import VendedorDesarme
 
@@ -34,6 +37,7 @@ CARROCERIA_CHOICES = [
     ("compacto", "Compacto"),
     ("utilitario", "Utilitario"),
     ("camion", "Camión"),
+    ("moto", "Motocicleta"),
     ("otro", "Otro"),
 ]
 
@@ -126,8 +130,6 @@ class VehiculoDesarmeForm(forms.ModelForm):
         self.empresa = kwargs.pop("empresa", None)
         super().__init__(*args, **kwargs)
 
-        # Fijar tipo_uso, cliente y empresa ANTES de validación (el modelo exige cliente si tipo_uso=CLIENTE)
-        self.instance.tipo_uso = Vehiculo.TIPO_USO_DESARME
         self.instance.cliente = None
         if self.empresa:
             self.instance.empresa = self.empresa
@@ -196,6 +198,15 @@ class VehiculoDesarmeForm(forms.ModelForm):
             self.fields["motor"].queryset = MotorVehiculo.objects.filter(country=pais).order_by(
                 "nombre"
             )
+            # Leniente: si el valor enviado no está en el queryset (ej. "empresa:N" del AJAX),
+            # tratar como None en lugar de lanzar invalid_choice.
+            _m_clean = self.fields["motor"].clean
+            def _lenient_motor(val, _orig=_m_clean):
+                try:
+                    return _orig(val)
+                except Exception:
+                    return None
+            self.fields["motor"].clean = _lenient_motor
 
         # Caja: Select nativo
         if "caja" in self.fields:
@@ -203,6 +214,13 @@ class VehiculoDesarmeForm(forms.ModelForm):
             self.fields["caja"].queryset = CajaVehiculo.objects.filter(country=pais).order_by(
                 "nombre"
             )
+            _c_clean = self.fields["caja"].clean
+            def _lenient_caja(val, _orig=_c_clean):
+                try:
+                    return _orig(val)
+                except Exception:
+                    return None
+            self.fields["caja"].clean = _lenient_caja
 
         # Color: Select nativo
         if "color" in self.fields:
@@ -212,6 +230,13 @@ class VehiculoDesarmeForm(forms.ModelForm):
             except Exception:
                 pass
             self.fields["color"].queryset = ColorVehiculo.get_colores_para_pais(pais)
+            _col_clean = self.fields["color"].clean
+            def _lenient_color(val, _orig=_col_clean):
+                try:
+                    return _orig(val)
+                except Exception:
+                    return None
+            self.fields["color"].clean = _lenient_color
 
         # Carrocería: CharField con Select para permitir opciones + valor custom vía JS
         if "tipo_carroceria" in self.fields:
@@ -366,7 +391,6 @@ class VehiculoDesarmeForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.tipo_uso = Vehiculo.TIPO_USO_DESARME
         instance.cliente = None
         if self.empresa:
             instance.empresa = self.empresa
@@ -412,12 +436,13 @@ class PiezaDesarmeForm(forms.ModelForm):
         model = PiezaDesarme
         # Subconjunto seguro que debería existir también en producción
         fields = [
-            "vehiculo",
+            "vehiculo_desarme",
             "codigo",
             "nombre",
             "cantidad",
             "condicion",
             "estado_pieza",
+            "precio_venta_sugerido",
             "ubicacion_fisica",
             "observaciones",
         ]
@@ -427,12 +452,12 @@ class PiezaDesarmeForm(forms.ModelForm):
         self.vehiculo = kwargs.pop("vehiculo", None)
         super().__init__(*args, **kwargs)
         if self.empresa:
-            self.fields["vehiculo"].queryset = Vehiculo.objects.filter(
-                empresa=self.empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME
+            self.fields["vehiculo_desarme"].queryset = VehiculoDesarme.objects.filter(
+                empresa=self.empresa,
             ).order_by("patente", "vin")
         if self.vehiculo:
-            self.fields["vehiculo"].initial = self.vehiculo
-            self.fields["vehiculo"].disabled = True
+            self.fields["vehiculo_desarme"].initial = self.vehiculo
+            self.fields["vehiculo_desarme"].disabled = True
         for f in (
             "fecha_extraccion",
             "ubicacion_fisica",
@@ -455,6 +480,37 @@ class PiezaDesarmeForm(forms.ModelForm):
             self.fields["observaciones"].widget = forms.Textarea(
                 attrs={"rows": 3, "class": "input-desarme pieza-obs", "placeholder": ""}
             )
+        # Precio: para países sin decimal (CL y la mayoría de LATAM) usar TextInput
+        # con formato local (punto como separador de miles) y parsear en clean().
+        pais = getattr(self.empresa, "pais", "CL") if self.empresa else "CL"
+        self._precio_pais = pais
+        if "precio_venta_sugerido" in self.fields:
+            if pais in ("US", "BR"):
+                self.fields["precio_venta_sugerido"].widget = forms.NumberInput(
+                    attrs={"class": "input-desarme", "min": "0", "step": "0.01"}
+                )
+            else:
+                self.fields["precio_venta_sugerido"].widget = forms.TextInput(
+                    attrs={"class": "input-desarme", "placeholder": "Ej: 12.500"}
+                )
+                if self.instance and self.instance.pk and self.instance.precio_venta_sugerido:
+                    raw = int(self.instance.precio_venta_sugerido)
+                    self.initial["precio_venta_sugerido"] = f"{raw:,}".replace(",", ".")
+
+    def clean_precio_venta_sugerido(self):
+        val = self.cleaned_data.get("precio_venta_sugerido")
+        if val in (None, ""):
+            return None
+        if isinstance(val, str):
+            # Remover separador de miles (punto en CL) y normalizar coma decimal
+            val = val.replace(".", "").replace(",", ".").strip()
+            if not val:
+                return None
+            try:
+                return Decimal(val)
+            except InvalidOperation:
+                raise forms.ValidationError("Ingrese un valor numérico válido (ej: 12.500).")
+        return val
 
 
 class PiezaSueltaForm(forms.Form):

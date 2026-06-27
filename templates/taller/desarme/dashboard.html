@@ -249,6 +249,8 @@
   <a href="{% country_url 'desarme:index' %}" class="active">{% trans "Dashboard" %}</a>
   <a href="{% country_url 'desarme:lista_vehiculos' %}">🚗 {% trans "Vehículos" %}</a>
   <a href="{% country_url 'desarme:lista_piezas' %}">📦 {% trans "Repuestos" %}</a>
+  <a href="{% country_url 'desarme:lista_interchange' %}">🔄 {% trans "Interchange" %}</a>
+  <a href="{% country_url 'desarme:reportes' %}">📊 {% trans "Reportes" %}</a>
 </div>
 <div class="kpi-grid">
   <div class="kpi-card"><div class="kpi-value">{{ total_vehiculos }}</div><div class="kpi-label">{% trans "Vehículos" %}</div></div>
@@ -362,7 +364,15 @@
       <td><strong>{{ p.codigo }}</strong></td>
       <td>{{ p.nombre|truncatechars:28 }}</td>
       <td><span class="badge-mini {{ p.estado_pieza|lower|slice:":4" }}">{{ p.get_estado_pieza_display }}</span></td>
-      <td><a href="{% country_url 'desarme:lista_piezas' %}?vehiculo={{ p.vehiculo_id }}">{{ p.vehiculo.patente|default:p.vehiculo.vin|default:"" }}</a></td>
+      <td>
+        {% if p.vehiculo_desarme %}
+          <a href="{% country_url 'desarme:lista_piezas' %}?vehiculo_desarme={{ p.vehiculo_desarme_id }}">
+            {{ p.vehiculo_desarme.patente|default:p.vehiculo_desarme.vin|default:"" }}
+          </a>
+        {% else %}
+          —
+        {% endif %}
+      </td>
     </tr>
     {% endfor %}
     </tbody>

@@ -1,6 +1,9 @@
+import logging
 from allauth.account.views import LoginView
 from django.conf import settings
 from django.utils.translation import get_language
+
+_log = logging.getLogger(__name__)
 
 
 class CountryAwareLoginView(LoginView):
@@ -9,6 +12,28 @@ class CountryAwareLoginView(LoginView):
     """
 
     template_name = "cl/es/account/login.html"
+
+    def form_valid(self, form):
+        _log.warning(
+            "[LOGIN_DEBUG] form_valid called user=%s is_auth=%s",
+            getattr(form, 'user', None),
+            self.request.user.is_authenticated,
+        )
+        resp = super().form_valid(form)
+        _log.warning(
+            "[LOGIN_DEBUG] form_valid response status=%s location=%s",
+            resp.status_code,
+            resp.get('Location', '-'),
+        )
+        return resp
+
+    def form_invalid(self, form):
+        _log.warning(
+            "[LOGIN_DEBUG] form_invalid errors=%s non_field=%s",
+            form.errors,
+            form.non_field_errors(),
+        )
+        return super().form_invalid(form)
 
     def dispatch(self, request, *args, **kwargs):
         self._apply_country_context(request)

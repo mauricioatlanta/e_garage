@@ -1,0 +1,212 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+{% load role_tags %}
+
+{% block page_title %}{% trans "Desarme" %} – {% trans "Interchange" %}{% endblock %}
+{% block page_subtitle %}{% trans "Compatibilidad entre piezas de distintos vehículos" %}{% endblock %}
+{% block page_icon %}🔄{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .interchange-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 4px;
+    font-size: 13px;
+  }
+  .interchange-table th {
+    color: #67e8f9;
+    font-weight: 600;
+    padding: 8px 12px;
+    text-align: left;
+    border-bottom: 1px solid rgba(0,255,255,0.2);
+  }
+  .interchange-table td {
+    padding: 10px 12px;
+    background: rgba(0,0,0,0.25);
+    border-top: 1px solid rgba(0,255,255,0.1);
+    border-bottom: 1px solid rgba(0,255,255,0.1);
+    color: #e2e8f0;
+    vertical-align: middle;
+  }
+  .interchange-table tr td:first-child {
+    border-left: 1px solid rgba(0,255,255,0.1);
+    border-radius: 8px 0 0 8px;
+  }
+  .interchange-table tr td:last-child {
+    border-right: 1px solid rgba(0,255,255,0.1);
+    border-radius: 0 8px 8px 0;
+  }
+  .interchange-table tbody tr:hover td {
+    background: rgba(0,255,255,0.04);
+  }
+  .badge-veces {
+    display: inline-block;
+    background: rgba(16,185,129,0.2);
+    border: 1px solid rgba(16,185,129,0.4);
+    color: #6ee7b7;
+    border-radius: 9999px;
+    padding: 1px 10px;
+    font-size: 11px;
+    font-weight: 600;
+  }
+  .codigo-pieza {
+    font-family: monospace;
+    color: #67e8f9;
+    font-weight: 600;
+    font-size: 12px;
+  }
+  .auto-label {
+    color: #e2e8f0;
+    font-size: 12px;
+  }
+  .year-range {
+    color: #94a3b8;
+    font-size: 11px;
+  }
+  .search-bar {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(0,255,255,0.2);
+    border-radius: 10px;
+    padding: 12px 16px;
+    margin-bottom: 1rem;
+  }
+  .search-bar input {
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(0,255,255,0.3);
+    border-radius: 8px;
+    padding: 7px 12px;
+    color: #e0e7ff;
+    min-width: 280px;
+  }
+  .search-bar input:focus {
+    outline: none;
+    border-color: rgba(0,255,255,0.6);
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, rgba(0,255,255,0.15), rgba(0,128,255,0.15));
+    border: 1px solid rgba(0,255,255,0.4);
+    border-radius: 8px;
+    padding: 7px 14px;
+    color: #67e8f9;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .btn-primary:hover { background: rgba(0,255,255,0.2); }
+  .btn-danger {
+    background: rgba(239,68,68,0.1);
+    border: 1px solid rgba(239,68,68,0.35);
+    border-radius: 6px;
+    padding: 4px 10px;
+    color: #fca5a5;
+    font-size: 11px;
+    cursor: pointer;
+  }
+  .btn-danger:hover { background: rgba(239,68,68,0.2); }
+  .arrow-icon { color: #a78bfa; font-size: 16px; }
+</style>
+{% endblock %}
+
+{% block page_stats %}
+<div class="flex flex-wrap gap-2 mt-4">
+  <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">{% trans "Dashboard" %}</a>
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🚗 {% trans "Vehículos" %}</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 {% trans "Repuestos" %}</a>
+  <a href="{% country_url 'desarme:lista_interchange' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">🔄 {% trans "Interchange" %}</a>
+</div>
+{% endblock %}
+
+{% block main_actions %}
+<a href="{% country_url 'desarme:crear_interchange' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-semibold">
+  ➕ {% trans "Registrar compatibilidad" %}
+</a>
+<a href="{% country_url 'desarme:lista_piezas' %}"
+   class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-cyan-600/80 hover:bg-cyan-500 text-white text-sm font-semibold">
+  📦 {% trans "Repuestos" %}
+</a>
+{% endblock %}
+
+{% block search_bar %}
+<div class="search-bar">
+  <form method="get" action="" class="flex flex-wrap items-center gap-3">
+    <input type="search" name="q" value="{{ q }}" placeholder="{% trans 'Pieza, marca, modelo...' %}" aria-label="{% trans 'Buscar' %}">
+    <button type="submit" class="btn-primary">{% trans "Filtrar" %}</button>
+    {% if q %}
+    <a href="{% country_url 'desarme:lista_interchange' %}" class="text-gray-400 hover:text-cyan-300 text-sm">{% trans "Limpiar" %}</a>
+    {% endif %}
+  </form>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+{% if interchanges %}
+<div style="overflow-x:auto;">
+  <table class="interchange-table">
+    <thead>
+      <tr>
+        <th>{% trans "Pieza" %}</th>
+        <th>{% trans "Auto origen" %}</th>
+        <th class="arrow-icon" style="text-align:center;">⇄</th>
+        <th>{% trans "Auto compatible" %}</th>
+        <th style="text-align:center;">{% trans "Confirmaciones" %}</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for ix in interchanges %}
+      <tr>
+        <td>
+          <span class="codigo-pieza">{{ ix.codigo_pieza }}</span>
+          {% if ix.nombre_pieza %}
+          <br><span style="color:#94a3b8;font-size:11px;">{{ ix.nombre_pieza }}</span>
+          {% endif %}
+        </td>
+        <td>
+          <span class="auto-label">{{ ix.marca_origen }} {{ ix.modelo_origen }}</span>
+          <br><span class="year-range">{{ ix.anio_origen_desde }}–{{ ix.anio_origen_hasta }}</span>
+        </td>
+        <td style="text-align:center;color:#a78bfa;font-size:18px;">⇄</td>
+        <td>
+          <span class="auto-label">{{ ix.marca_compatible }} {{ ix.modelo_compatible }}</span>
+          <br><span class="year-range">{{ ix.anio_compatible_desde }}–{{ ix.anio_compatible_hasta }}</span>
+        </td>
+        <td style="text-align:center;">
+          <span class="badge-veces">×{{ ix.veces_confirmado }}</span>
+        </td>
+        <td>
+          <form method="post" action="{% country_url 'desarme:eliminar_interchange' ix.pk %}"
+                onsubmit="return confirm('{% trans "¿Eliminar este registro?" %}')">
+            {% csrf_token %}
+            <button type="submit" class="btn-danger">{% trans "Eliminar" %}</button>
+          </form>
+        </td>
+      </tr>
+      {% if ix.notas %}
+      <tr>
+        <td colspan="6" style="padding:4px 12px 10px;background:rgba(0,0,0,0.15);color:#94a3b8;font-size:11px;border-top:none;">
+          💬 {{ ix.notas }}
+        </td>
+      </tr>
+      {% endif %}
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div style="text-align:center;padding:48px 0;color:#94a3b8;">
+  <div style="font-size:36px;margin-bottom:12px;">🔄</div>
+  {% if q %}
+  <p>{% trans "Sin resultados para" %} "<strong style='color:#e2e8f0;'>{{ q }}</strong>".</p>
+  <a href="{% country_url 'desarme:lista_interchange' %}" style="color:#67e8f9;">{% trans "Ver todos" %}</a>
+  {% else %}
+  <p>{% trans "Aún no hay compatibilidades registradas." %}</p>
+  <a href="{% country_url 'desarme:crear_interchange' %}"
+     style="display:inline-block;margin-top:16px;padding:10px 20px;border-radius:8px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.4);color:#6ee7b7;font-size:14px;">
+    ➕ {% trans "Registrar primera compatibilidad" %}
+  </a>
+  {% endif %}
+</div>
+{% endif %}
+{% endblock %}

@@ -9,6 +9,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
 from taller.models.documento import Documento
+from taller.models.lineas_documento import ORIGEN_DESARME
+from taller.models.pieza_desarme import ESTADO_DISPONIBLE, PiezaDesarme
 from taller.services.inventory_service import InventoryService
 
 
@@ -18,7 +20,11 @@ def emitir_documento(request, documento_id):
     """
     Emite un documento (cambia estado a EMITIDO) validando stock disponible.
 
-    La señal pre_save se encargará de descontar el stock automáticamente.
+    Para piezas de desarme: adquiere select_for_update() y valida con los objetos
+    bloqueados (previene doble venta concurrente). La señal pre_save descuenta el
+    stock automáticamente tras el cambio de estado.
+
+    Para repuestos de bodega (STOCK_BODEGA): delega a InventoryService.validar_stock_disponible().
     """
     empresa = getattr(request.user, "empresa", None)
     if not empresa:
@@ -33,39 +39,65 @@ def emitir_documento(request, documento_id):
         empresa=empresa,  # 🔒 Multi-tenant
     )
 
-    # Validar que no esté ya emitido
     if documento.estado == "EMITIDO":
         messages.warning(request, f"El documento {documento.numero_documento} ya está emitido.")
         return redirect("documentos:ver_documento", pk=documento.pk)
 
-    # Validar que no esté anulado
     if documento.estado == "ANULADO":
         messages.error(
             request, f"No se puede emitir un documento anulado ({documento.numero_documento})."
         )
         return redirect("documentos:ver_documento", pk=documento.pk)
 
-    # Validar stock disponible ANTES de cambiar estado
-    errores = InventoryService.validar_stock_disponible(documento)
-
-    if errores:
-        messages.error(request, f"No se puede emitir el documento {documento.numero_documento}:")
-        for error in errores:
-            messages.error(request, error)
-        return redirect("documentos:ver_documento", pk=documento.pk)
-
-    # Si pasa validación, cambiar estado (la señal procesará el stock)
+    errores_validacion = []
     try:
         with transaction.atomic():
-            documento.estado = "EMITIDO"
-            documento.save()
-            messages.success(
-                request,
-                f"✅ Documento {documento.numero_documento} emitido exitosamente. "
-                "Stock actualizado automáticamente.",
+            # ── Piezas de desarme: lock + validación con datos bloqueados ────────
+            lineas_desarme = list(
+                documento.lineas_repuesto
+                .filter(origen_repuesto=ORIGEN_DESARME, pieza_desarme_id__isnull=False)
+                .select_related("pieza_desarme")
             )
+            if lineas_desarme:
+                pieza_ids = [l.pieza_desarme_id for l in lineas_desarme]
+                locked = {
+                    p.id: p
+                    for p in PiezaDesarme.objects.select_for_update().filter(id__in=pieza_ids)
+                }
+                for linea in lineas_desarme:
+                    pieza = locked[linea.pieza_desarme_id]
+                    if pieza.estado_pieza != ESTADO_DISPONIBLE:
+                        errores_validacion.append(
+                            f"❌ Pieza '{pieza.nombre}' no está disponible "
+                            f"(estado: {pieza.get_estado_pieza_display()})."
+                        )
+                    elif pieza.cantidad < linea.cantidad:
+                        errores_validacion.append(
+                            f"❌ Stock insuficiente en '{pieza.nombre}'. "
+                            f"Requerido: {linea.cantidad}, Disponible: {pieza.cantidad}"
+                        )
+
+            # ── Repuestos de bodega y validaciones generales ─────────────────────
+            if not errores_validacion:
+                errores_validacion = InventoryService.validar_stock_disponible(documento)
+
+            if errores_validacion:
+                raise ValueError("stock_insuficiente")
+
+            documento.estado = "EMITIDO"
+            documento.save()  # → pre_save signal → procesar_movimiento_stock("descontar")
+    except ValueError:
+        messages.error(request, f"No se puede emitir el documento {documento.numero_documento}:")
+        for error in errores_validacion:
+            messages.error(request, error)
     except Exception as e:
         messages.error(request, f"Error al emitir documento: {str(e)}")
+    else:
+        messages.success(
+            request,
+            f"✅ Documento {documento.numero_documento} emitido exitosamente. "
+            "Stock actualizado automáticamente.",
+        )
 
     return redirect("documentos:ver_documento", pk=documento.pk)
 
@@ -76,7 +108,11 @@ def anular_documento(request, documento_id):
     """
     Anula un documento (cambia estado a ANULADO) reponiendo stock automáticamente.
 
-    La señal pre_save se encargará de reponer el stock automáticamente.
+    La señal pre_save repone la cantidad en PiezaDesarme y revierte VENDIDA → DISPONIBLE
+    si la pieza vuelve a tener stock. También repone STOCK_BODEGA.
+
+    # TODO: cuando exista DatosDTE, condicionar esta reversión al estado del DTE
+    # (no revertir automáticamente si ya se emitió un documento fiscal real)
     """
     empresa = getattr(request.user, "empresa", None)
     if not empresa:
@@ -89,7 +125,6 @@ def anular_documento(request, documento_id):
         empresa=empresa,  # 🔒 Multi-tenant
     )
 
-    # Validar que esté emitido
     if documento.estado != "EMITIDO":
         messages.error(
             request,
@@ -98,11 +133,10 @@ def anular_documento(request, documento_id):
         )
         return redirect("documentos:ver_documento", pk=documento.pk)
 
-    # Cambiar estado (la señal procesará la reposición de stock)
     try:
         with transaction.atomic():
             documento.estado = "ANULADO"
-            documento.save()
+            documento.save()  # → pre_save signal → procesar_movimiento_stock("reponer")
             messages.success(
                 request,
                 f"✅ Documento {documento.numero_documento} anulado. "

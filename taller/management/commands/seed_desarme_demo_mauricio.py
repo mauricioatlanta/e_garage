@@ -13,7 +13,7 @@ from taller.models import (
     LineaRepuesto,
     PiezaDesarme,
     Repuesto,
-    Vehiculo,
+    VehiculoDesarme,
     VendedorDesarme,
 )
 
@@ -123,12 +123,10 @@ class Command(BaseCommand):
             anio = RND.randint(2008, 2021)
             patente = cl_patente(7000 + i)
 
-            veh, _ = Vehiculo.objects.get_or_create(
+            veh, _ = VehiculoDesarme.objects.get_or_create(
                 empresa=empresa,
                 patente=patente,
                 defaults={
-                    "cliente": clientes[0],
-                    "tipo_uso": "DESARME",
                     "marca_texto": marca,
                     "modelo_texto": modelo,
                     "anio": anio,
@@ -138,7 +136,6 @@ class Command(BaseCommand):
                     "ubicacion_fisica": f"Patio {RND.randint(1,5)} / Fila {RND.randint(1,12)}",
                     "observaciones_desarme": "Vehículo demo para análisis de rentabilidad.",
                     "vendedor_desarme": RND.choice(vendedores),
-                    "lugar_compra": "Compra demo",
                 },
             )
             vehiculos.append(veh)
@@ -148,7 +145,7 @@ class Command(BaseCommand):
                 costo = (precio * Decimal("0.38")).quantize(Decimal("1"))
                 PiezaDesarme.objects.get_or_create(
                     empresa=empresa,
-                    vehiculo=veh,
+                    vehiculo_desarme=veh,
                     codigo=f"D-{veh.id}-{codigo_base}",
                     defaults={
                         "nombre": f"{nombre_pieza} {marca} {modelo} {anio}",

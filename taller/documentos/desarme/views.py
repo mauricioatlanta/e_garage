@@ -10,6 +10,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from taller.models.empresa import Empresa
 from taller.models.pieza_desarme import ESTADO_VENDIDA, PiezaDesarme
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 
 from .forms import PiezaDesarmeForm, VehiculoDesarmeForm
@@ -40,7 +41,7 @@ def lista_vehiculos(request):
         return redirect("/")
 
     qs = (
-        Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+        VehiculoDesarme.objects.filter(empresa=empresa)
         .select_related("marca", "modelo", "color")
         .annotate(piezas_count=Count("piezas_desarme"))
         .order_by("-fecha_ingreso_desarme", "-id")
@@ -62,7 +63,7 @@ def lista_vehiculos(request):
         qs = qs.filter(estado_desarme=estado)
 
     estados = (
-        Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+        VehiculoDesarme.objects.filter(empresa=empresa)
         .exclude(estado_desarme__isnull=True)
         .exclude(estado_desarme="")
         .values_list("estado_desarme", flat=True)
@@ -97,8 +98,6 @@ def crear_vehiculo(request):
                 with transaction.atomic():
                     vehiculo = form.save(commit=False)
                     vehiculo.empresa = empresa
-                    vehiculo.tipo_uso = Vehiculo.TIPO_USO_DESARME
-                    vehiculo.cliente = None
                     vehiculo.save()
                 messages.success(
                     request, f"Vehículo de desarme {vehiculo.patente or vehiculo.vin} creado."
@@ -127,10 +126,9 @@ def ver_vehiculo(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
     piezas = vehiculo.piezas_desarme.filter(activo=True).order_by("codigo")
     piezas_activas_count = piezas.count()
@@ -157,10 +155,9 @@ def editar_vehiculo(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
     if request.method == "POST":
@@ -199,8 +196,8 @@ def lista_piezas(request):
 
     piezas = (
         PiezaDesarme.objects.filter(empresa=empresa)
-        .select_related("vehiculo")
-        .order_by("vehiculo__patente", "codigo")
+        .select_related("vehiculo_desarme")
+        .order_by("vehiculo_desarme__patente", "codigo")
     )
 
     q = request.GET.get("q", "").strip()
@@ -213,10 +210,10 @@ def lista_piezas(request):
 
     vehiculo_id = request.GET.get("vehiculo", "").strip()
     if vehiculo_id:
-        piezas = piezas.filter(vehiculo_id=vehiculo_id)
+        piezas = piezas.filter(vehiculo_desarme_id=vehiculo_id)
 
     vehiculos_choices = list(
-        Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+        VehiculoDesarme.objects.filter(empresa=empresa)
         .order_by("patente", "vin")
         .values_list("id", "patente", "vin")
     )
@@ -247,10 +244,9 @@ def crear_pieza(request):
     vehiculo = None
     vehiculo_id = request.GET.get("vehiculo")
     if vehiculo_id:
-        vehiculo = Vehiculo.objects.filter(
+        vehiculo = VehiculoDesarme.objects.filter(
             pk=vehiculo_id,
             empresa=empresa,
-            tipo_uso=Vehiculo.TIPO_USO_DESARME,
         ).first()
 
     if request.method == "POST":
@@ -262,8 +258,8 @@ def crear_pieza(request):
                     pieza.empresa = empresa
                     pieza.save()
                 messages.success(request, f"Pieza {pieza.codigo} creada.")
-                if pieza.vehiculo_id:
-                    return redirect("desarme:inventario_vehiculo", pk=pieza.vehiculo_id)
+                if pieza.vehiculo_desarme_id:
+                    return redirect("desarme:inventario_vehiculo", pk=pieza.vehiculo_desarme_id)
                 return redirect("desarme:lista_piezas")
             except Exception as e:
                 log.exception("Error creando pieza de desarme")
@@ -300,8 +296,8 @@ def editar_pieza(request, pk):
             try:
                 form.save()
                 messages.success(request, "Pieza actualizada.")
-                if pieza.vehiculo_id:
-                    return redirect("desarme:inventario_vehiculo", pk=pieza.vehiculo_id)
+                if pieza.vehiculo_desarme_id:
+                    return redirect("desarme:inventario_vehiculo", pk=pieza.vehiculo_desarme_id)
                 return redirect("desarme:lista_piezas")
             except Exception as e:
                 log.exception("Error actualizando pieza de desarme")
@@ -326,10 +322,9 @@ def inventario_vehiculo(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
     piezas = vehiculo.piezas_desarme.all().order_by("codigo")
 

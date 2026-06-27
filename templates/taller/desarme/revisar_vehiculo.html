@@ -1,0 +1,540 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+{% load humanize %}
+
+{% block page_title %}Revisar inventario — {{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }} {{ vehiculo.anio }}{% endblock %}
+{% block page_subtitle %}Confirma qué piezas existen físicamente en este vehículo{% endblock %}
+{% block page_icon %}🔍{% endblock %}
+
+{% block page_extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rv-cyan:    #06b6d4;
+  --rv-emerald: #10b981;
+  --rv-amber:   #f59e0b;
+  --rv-slate:   #64748b;
+  --rv-radius:  14px;
+}
+
+/* Panel base */
+.rv-panel {
+  background: rgba(15,23,42,0.90);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(51,65,85,0.8);
+  border-radius: var(--rv-radius);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  color: #f1f5f9;            /* texto claro en todos los paneles */
+}
+
+/* Cards por estado — fondos sólidos, color de texto explícito */
+.rv-card {
+  border-radius: 10px;
+  border: 2px solid;
+  padding: 0.8rem 1rem;
+  transition: transform .15s;
+  color: #f1f5f9;            /* texto claro por defecto en TODAS las cards */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+.rv-card:hover { transform: translateY(-2px); }
+
+.rv-pendiente {
+  background: #1c0d00;
+  border-color: #d97706;
+}
+.rv-confirmada {
+  background: #001a0d;
+  border-color: #059669;
+}
+.rv-descartada {
+  background: #0f172a;
+  border-color: #334155;
+  opacity: .80;
+}
+
+/* Stats — bloques con color sólido */
+.rv-stat {
+  text-align: center;
+  padding: 12px 20px;
+  border-radius: 12px;
+  min-width: 82px;
+  border: 1.5px solid;
+}
+.rv-stat-val {
+  font-family: 'Orbitron', monospace;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.rv-stat-lab {
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-weight: 700;
+  margin-top: 5px;
+}
+
+.rv-stat-pendiente  { background:#1c0d00; border-color:#d97706; }
+.rv-stat-confirmada { background:#001a0d; border-color:#059669; }
+.rv-stat-descartada { background:#0f172a; border-color:#334155; }
+.rv-stat-total      { background:#061220; border-color:#0e7490; }
+
+/* Inputs — fondo sólido, color explícito */
+.rv-input {
+  background: #1e293b;       /* slate-800 sólido */
+  border: 1px solid #475569; /* slate-600 sólido */
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #f1f5f9 !important;
+  font-size: .85rem;
+  width: 100%;
+}
+.rv-input::placeholder { color: #64748b; }
+.rv-input:focus { outline: none; border-color: #06b6d4; }
+.rv-input option { background: #1e293b; color: #f1f5f9; }
+
+/* Botones — sólidos y legibles */
+.btn-confirm {
+  background: rgba(16,185,129,0.30);
+  border: 1.5px solid rgba(16,185,129,0.75);
+  color: #6ee7b7;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-confirm:hover { background: rgba(16,185,129,0.50); }
+
+.btn-discard {
+  background: rgba(71,85,105,0.30);
+  border: 1.5px solid rgba(100,116,139,0.65);
+  color: #cbd5e1;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: .82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-discard:hover { background: rgba(71,85,105,0.50); }
+
+.btn-reopen {
+  background: rgba(92,45,14,0.35);
+  border: 1px solid rgba(245,158,11,0.65);
+  color: #fcd34d;
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: .75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .15s;
+  white-space: nowrap;
+}
+.btn-reopen:hover { background: rgba(92,45,14,0.60); }
+
+/* Cabecera de zona */
+.zona-header {
+  font-family: 'Orbitron', monospace;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  color: #67e8f9;
+  text-transform: uppercase;
+  border-bottom: 2px solid rgba(6,182,212,0.4);
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+
+/* Barra de progreso */
+#progress-bar { height: 8px; background: rgba(255,255,255,.1); border-radius: 4px; overflow: hidden; }
+#progress-fill { height: 100%; background: linear-gradient(90deg, var(--rv-cyan), var(--rv-emerald)); transition: width .4s ease; }
+
+/* Toast */
+#toast { position: fixed; bottom: 24px; right: 24px; z-index: 9999; pointer-events: none; }
+.toast-msg {
+  background: rgba(15,23,42,0.97);
+  border: 1.5px solid rgba(6,182,212,0.6);
+  border-radius: 10px;
+  padding: 12px 18px;
+  color: #e2e8f0;
+  font-size: .85rem;
+  margin-top: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all .25s;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+.toast-msg.show { opacity: 1; transform: translateY(0); }
+.toast-msg.ok  { border-color: rgba(16,185,129,.75);  color: #6ee7b7; }
+.toast-msg.err { border-color: rgba(244,63,94,.75);   color: #fda4af; }
+
+/* Badge de estado en cards — sólidos */
+.badge-pendiente  { background:#92400e; color:#fef3c7; border:1px solid #d97706; }
+.badge-confirmada { background:#064e3b; color:#d1fae5; border:1px solid #059669; }
+.badge-descartada { background:#1e293b; color:#cbd5e1; border:1px solid #475569; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div id="revisar-app" data-csrf="{{ csrf_token }}"
+     data-url="{% country_url 'desarme:revisar_vehiculo' pk=vehiculo.pk %}">
+
+{# ── Header / Resumen ── #}
+<div class="rv-panel p-5 mb-6">
+  <div class="flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h2 class="text-xl font-bold text-white" style="font-family:'Orbitron',monospace">
+        {{ vehiculo.get_marca_display }} {{ vehiculo.get_modelo_display }}
+        {% if vehiculo.anio %}<span class="text-slate-300 text-base ml-2">{{ vehiculo.anio }}</span>{% endif %}
+      </h2>
+      <p class="text-slate-300 text-sm mt-1">
+        <span class="text-cyan-300 font-mono">{{ vehiculo.patente }}</span>
+        {% if vehiculo.tipo_carroceria %}
+          <span class="text-slate-400 mx-1">·</span>
+          <span class="text-slate-300">{{ vehiculo.get_tipo_carroceria_display }}</span>
+        {% endif %}
+      </p>
+    </div>
+    <a href="{% country_url 'desarme:ver_vehiculo' pk=vehiculo.pk %}"
+       class="text-sm text-cyan-300 hover:text-white border border-cyan-400/40 bg-cyan-500/10 hover:bg-cyan-500/20 px-4 py-2 rounded-lg transition font-medium">
+      ← Ver vehículo
+    </a>
+  </div>
+
+  {# Barra de progreso #}
+  <div class="mt-4">
+    <div class="flex justify-between text-xs mb-2">
+      <span class="text-slate-300 font-medium">Progreso de revisión</span>
+      <span id="pct-text" class="text-cyan-300 font-bold font-mono">{{ pct_completado }}%</span>
+    </div>
+    <div id="progress-bar"><div id="progress-fill" style="width:{{ pct_completado }}%"></div></div>
+  </div>
+
+  {# Stats #}
+  <div class="flex flex-wrap gap-3 mt-5">
+    <div class="rv-stat rv-stat-pendiente">
+      <div class="rv-stat-val" id="cnt-pendientes" style="color:#fcd34d">{{ pendientes }}</div>
+      <div class="rv-stat-lab" style="color:#fbbf24">Pendientes</div>
+    </div>
+    <div class="rv-stat rv-stat-confirmada">
+      <div class="rv-stat-val" id="cnt-confirmadas" style="color:#6ee7b7">{{ confirmadas }}</div>
+      <div class="rv-stat-lab" style="color:#34d399">Confirmadas</div>
+    </div>
+    <div class="rv-stat rv-stat-descartada">
+      <div class="rv-stat-val" id="cnt-descartadas" style="color:#94a3b8">{{ descartadas }}</div>
+      <div class="rv-stat-lab" style="color:#94a3b8">Descartadas</div>
+    </div>
+    <div class="rv-stat rv-stat-total">
+      <div class="rv-stat-val" style="color:#67e8f9">{{ total }}</div>
+      <div class="rv-stat-lab" style="color:#67e8f9">Total</div>
+    </div>
+  </div>
+
+  {% if pendientes == 0 and total > 0 %}
+  <div class="mt-5 p-3 rounded-xl border border-emerald-400/50 bg-emerald-500/15 text-emerald-200 text-sm font-medium">
+    ✅ Revisión completa — {{ confirmadas }} pieza{{ confirmadas|pluralize }} disponible{{ confirmadas|pluralize }} para venta.
+  </div>
+  {% endif %}
+</div>
+
+{# ── Zonas con sugerencias ── #}
+{% for zona, sugerencias in zonas_con_sugerencias %}
+<div class="rv-panel p-5 mb-4">
+  <div class="zona-header">{{ zona }}</div>
+  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+    {% for sug in sugerencias %}
+
+    {# PENDIENTE #}
+    {% if sug.estado == PENDIENTE %}
+    <div class="rv-card rv-pendiente" id="sug-{{ sug.pk }}">
+      <div class="flex justify-between items-start mb-3">
+        <div>
+          <span class="text-xs text-amber-300 font-mono font-bold">{{ sug.codigo }}</span>
+          <div class="text-sm font-semibold text-white mt-0.5">{{ sug.nombre }}</div>
+        </div>
+        <span class="text-xs px-2 py-0.5 rounded-full badge-pendiente whitespace-nowrap ml-2 font-semibold">Pendiente</span>
+      </div>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        <div>
+          <label class="text-xs text-slate-300 font-medium">Precio ({{ empresa_moneda.simbolo }})</label>
+          <input type="number" class="rv-input mt-1" id="precio-{{ sug.pk }}"
+                 value="{{ sug.precio_sugerido|default:'' }}" step="1" min="0" placeholder="0">
+        </div>
+        <div>
+          <label class="text-xs text-slate-300 font-medium">Condición</label>
+          <select class="rv-input mt-1" id="cond-{{ sug.pk }}">
+            {% for val, label in condicion_choices %}
+            <option value="{{ val }}" {% if val == "BUENA" %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <div role="button" tabindex="0" class="btn-confirm flex-1 text-center" onclick="confirmar({{ sug.pk }})">✓ Confirmar</div>
+        <div role="button" tabindex="0" class="btn-discard flex-1 text-center" onclick="descartar({{ sug.pk }})">✗ Descartar</div>
+      </div>
+    </div>
+
+    {# CONFIRMADA #}
+    {% elif sug.estado == CONFIRMADA %}
+    <div class="rv-card rv-confirmada" id="sug-{{ sug.pk }}">
+      <div class="flex justify-between items-start">
+        <div class="flex-1 min-w-0">
+          <span class="text-xs text-emerald-300 font-mono font-bold">{{ sug.codigo }}</span>
+          <div class="text-sm font-semibold text-white mt-0.5">{{ sug.nombre }}</div>
+          {% if sug.pieza_creada %}
+          <div class="text-xs text-slate-300 mt-1">
+            {% if sug.pieza_creada.precio_venta_sugerido %}
+              <span class="text-emerald-300 font-medium">${{ sug.pieza_creada.precio_venta_sugerido|intcomma }}</span>
+              <span class="text-slate-400"> · </span>
+            {% endif %}
+            <span>{{ sug.pieza_creada.get_condicion_display }}</span>
+          </div>
+          {% endif %}
+        </div>
+        <div class="flex flex-col items-end gap-2 ml-3 shrink-0">
+          <span class="text-xs px-2 py-0.5 rounded-full badge-confirmada whitespace-nowrap font-semibold">✓ OK</span>
+          <div role="button" tabindex="0" class="btn-reopen" onclick="reabrir({{ sug.pk }})">Reabrir</div>
+        </div>
+      </div>
+    </div>
+
+    {# DESCARTADA #}
+    {% else %}
+    <div class="rv-card rv-descartada" id="sug-{{ sug.pk }}">
+      <div class="flex justify-between items-center">
+        <div class="min-w-0">
+          <span class="text-xs text-slate-400 font-mono">{{ sug.codigo }}</span>
+          <div class="text-sm text-slate-400 line-through mt-0.5">{{ sug.nombre }}</div>
+        </div>
+        <div class="flex flex-col items-end gap-2 ml-3 shrink-0">
+          <span class="text-xs px-2 py-0.5 rounded-full badge-descartada whitespace-nowrap font-semibold">No existe</span>
+          <div role="button" tabindex="0" class="btn-reopen" onclick="reabrir({{ sug.pk }})">Recuperar</div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    {% endfor %}
+  </div>
+</div>
+{% empty %}
+<div class="rv-panel p-8 text-center text-slate-300 mb-4">
+  No hay sugerencias de catálogo para este vehículo.
+</div>
+{% endfor %}
+
+{# ── Agregar pieza extra ── #}
+<div class="rv-panel p-5 mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <h3 class="text-sm font-bold text-cyan-300">Agregar pieza fuera del catálogo</h3>
+    <div role="button" tabindex="0" id="btn-toggle-form" onclick="toggleAgregarForm()"
+         class="text-sm text-cyan-300 border border-cyan-400/40 bg-cyan-500/10 hover:bg-cyan-500/20 px-3 py-1.5 rounded-lg transition font-medium cursor-pointer">
+      + Agregar pieza
+    </div>
+  </div>
+  <div id="form-agregar" class="hidden">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <label class="text-xs text-slate-300 font-medium">Código *</label>
+        <input type="text" id="extra-codigo" class="rv-input mt-1" placeholder="Ej: MOT-16, VID-01">
+      </div>
+      <div>
+        <label class="text-xs text-slate-300 font-medium">Nombre *</label>
+        <input type="text" id="extra-nombre" class="rv-input mt-1" placeholder="Ej: Tapa válvulas">
+      </div>
+      <div>
+        <label class="text-xs text-slate-300 font-medium">Zona</label>
+        <input type="text" id="extra-zona" class="rv-input mt-1" placeholder="Ej: Motor, Interior">
+      </div>
+      <div>
+        <label class="text-xs text-slate-300 font-medium">Precio ({{ empresa_moneda.simbolo }})</label>
+        <input type="number" id="extra-precio" class="rv-input mt-1" value="0" min="0" step="1">
+      </div>
+      <div>
+        <label class="text-xs text-slate-300 font-medium">Condición</label>
+        <select id="extra-condicion" class="rv-input mt-1">
+          {% for val, label in condicion_choices %}
+          <option value="{{ val }}" {% if val == "BUENA" %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="text-xs text-slate-300 font-medium">Cantidad</label>
+        <input type="number" id="extra-cantidad" class="rv-input mt-1" value="1" min="1">
+      </div>
+    </div>
+    <div class="mb-4">
+      <label class="text-xs text-slate-300 font-medium">Ubicación física (opcional)</label>
+      <input type="text" id="extra-ubicacion" class="rv-input mt-1" placeholder="Ej: Fila 3, Pos 7">
+    </div>
+    <div class="flex gap-2">
+      <div role="button" tabindex="0" class="btn-confirm px-5" onclick="agregarPieza()">✓ Agregar y continuar</div>
+      <div role="button" tabindex="0" class="btn-discard px-4" onclick="toggleAgregarForm()">Cancelar</div>
+    </div>
+  </div>
+</div>
+
+{# ── Botón terminar ── #}
+<div class="text-center pb-8">
+  <a href="{% country_url 'desarme:ver_vehiculo' pk=vehiculo.pk %}"
+     class="inline-block bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-8 py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
+    Terminar revisión →
+  </a>
+</div>
+
+</div>{# /revisar-app #}
+<div id="toast"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function(){
+  const app  = document.getElementById('revisar-app');
+  const CSRF = app.dataset.csrf;
+  const URL  = app.dataset.url;
+
+  async function post(payload){
+    const r = await fetch(URL, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json','X-CSRFToken':CSRF},
+      body: JSON.stringify(payload),
+    });
+    return r.json();
+  }
+
+  function toast(msg, ok){
+    if(ok === undefined) ok = true;
+    const t = document.getElementById('toast');
+    const d = document.createElement('div');
+    d.className = 'toast-msg ' + (ok ? 'ok' : 'err');
+    d.textContent = msg;
+    t.appendChild(d);
+    requestAnimationFrame(function(){ d.classList.add('show'); });
+    setTimeout(function(){ d.classList.remove('show'); setTimeout(function(){ d.remove(); }, 300); }, 3000);
+  }
+
+  function updateCounters(){
+    var conf = document.querySelectorAll('.rv-confirmada').length;
+    var desc = document.querySelectorAll('.rv-descartada').length;
+    var pend = document.querySelectorAll('.rv-pendiente').length;
+    var cEl = document.getElementById('cnt-confirmadas');
+    var dEl = document.getElementById('cnt-descartadas');
+    var pEl = document.getElementById('cnt-pendientes');
+    if(cEl) cEl.textContent = conf;
+    if(dEl) dEl.textContent = desc;
+    if(pEl) pEl.textContent = pend;
+    var allCards = conf + desc + pend;
+    var done = conf + desc;
+    var pct = allCards > 0 ? Math.round(done/allCards*100) : 0;
+    var pctEl = document.getElementById('pct-text');
+    var bar = document.getElementById('progress-fill');
+    if(pctEl) pctEl.textContent = pct + '%';
+    if(bar) bar.style.width = pct + '%';
+  }
+
+  window.confirmar = async function(sugId){
+    var precio = document.getElementById('precio-'+sugId);
+    var cond   = document.getElementById('cond-'+sugId);
+    var res = await post({
+      action: 'confirmar',
+      sugerencia_id: sugId,
+      precio: precio ? precio.value : null,
+      condicion: cond ? cond.value : 'BUENA',
+    });
+    if(res.success){
+      var card = document.getElementById('sug-'+sugId);
+      card.className = 'rv-card rv-confirmada';
+      card.innerHTML = [
+        '<div class="flex justify-between items-start">',
+          '<div class="flex-1 min-w-0">',
+            '<div class="text-sm font-semibold text-white">'+escHtml(res.pieza_nombre)+'</div>',
+            '<div class="text-xs text-slate-300 mt-1">',
+              '<span class="text-emerald-300 font-medium">$'+(res.pieza_precio||0).toLocaleString()+'</span>',
+              '<span class="text-slate-400"> · </span>',
+              escHtml(res.pieza_condicion),
+            '</div>',
+          '</div>',
+          '<div class="flex flex-col items-end gap-2 ml-3 shrink-0">',
+            '<span class="text-xs px-2 py-0.5 rounded-full badge-confirmada whitespace-nowrap font-semibold">✓ OK</span>',
+            '<div role="button" tabindex="0" class="btn-reopen" onclick="reabrir('+sugId+')">Reabrir</div>',
+          '</div>',
+        '</div>',
+      ].join('');
+      updateCounters();
+      toast('Pieza confirmada ✓');
+    } else {
+      toast(res.error || 'Error al confirmar', false);
+    }
+  };
+
+  window.descartar = async function(sugId){
+    var card = document.getElementById('sug-'+sugId);
+    var codeEl = card.querySelector('.font-mono');
+    var nameEl = card.querySelector('.font-semibold');
+    var codigo = codeEl ? codeEl.textContent.trim() : '';
+    var nombre = nameEl ? nameEl.textContent.trim() : '';
+    var res = await post({action:'descartar', sugerencia_id:sugId});
+    if(res.success){
+      card.className = 'rv-card rv-descartada';
+      card.innerHTML = [
+        '<div class="flex justify-between items-center">',
+          '<div class="min-w-0">',
+            '<span class="text-xs text-slate-400 font-mono">'+escHtml(codigo)+'</span>',
+            '<div class="text-sm text-slate-400 line-through mt-0.5">'+escHtml(nombre)+'</div>',
+          '</div>',
+          '<div class="flex flex-col items-end gap-2 ml-3 shrink-0">',
+            '<span class="text-xs px-2 py-0.5 rounded-full badge-descartada whitespace-nowrap font-semibold">No existe</span>',
+            '<div role="button" tabindex="0" class="btn-reopen" onclick="reabrir('+sugId+')">Recuperar</div>',
+          '</div>',
+        '</div>',
+      ].join('');
+      updateCounters();
+      toast('Pieza descartada');
+    } else {
+      toast(res.error || 'Error al descartar', false);
+    }
+  };
+
+  window.reabrir = async function(sugId){
+    var res = await post({action:'reabrir', sugerencia_id:sugId});
+    if(res.success){
+      window.location.reload();
+    } else {
+      toast(res.error || 'Error al reabrir', false);
+    }
+  };
+
+  window.toggleAgregarForm = function(){
+    document.getElementById('form-agregar').classList.toggle('hidden');
+  };
+
+  window.agregarPieza = async function(){
+    var codigo    = (document.getElementById('extra-codigo').value||'').trim();
+    var nombre    = (document.getElementById('extra-nombre').value||'').trim();
+    var zona      = (document.getElementById('extra-zona').value||'').trim() || 'Otros';
+    var precio    = document.getElementById('extra-precio').value;
+    var condicion = document.getElementById('extra-condicion').value;
+    var cantidad  = document.getElementById('extra-cantidad').value;
+    var ubicacion = (document.getElementById('extra-ubicacion').value||'').trim();
+    if(!codigo || !nombre){ toast('Código y nombre son requeridos', false); return; }
+    var res = await post({action:'agregar', codigo:codigo, nombre:nombre, zona:zona,
+                          precio:precio, condicion:condicion, cantidad:cantidad, ubicacion:ubicacion});
+    if(res.success){
+      toast(escHtml(res.pieza_nombre)+' agregada ✓');
+      window.location.reload();
+    } else {
+      toast(res.error || 'Error al agregar', false);
+    }
+  };
+
+  function escHtml(s){
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+})();
+</script>
+{% endblock %}

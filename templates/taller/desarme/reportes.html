@@ -1,0 +1,240 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+{% load humanize %}
+
+{% block page_title %}Reportes – Desarme{% endblock %}
+{% block page_subtitle %}Rentabilidad, rotación y top performers del módulo de desarmaduria{% endblock %}
+{% block page_icon %}📊{% endblock %}
+
+{% block page_body_class %}eg-desarme-soft{% endblock %}
+{% block page_extra_css %}
+<style>
+  .eg-desarme-soft { background-color: #1e293b !important; }
+  .eg-desarme-soft .stars,
+  .eg-desarme-soft .twinkling,
+  .eg-desarme-soft .clouds { opacity: 0.07 !important; animation-duration: 200s !important; }
+
+  .rpt-kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  .rpt-kpi {
+    background: rgba(99,102,241,0.1);
+    border: 1px solid rgba(99,102,241,0.25);
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+  }
+  .rpt-kpi-value {
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #a5b4fc;
+    line-height: 1.2;
+  }
+  .rpt-kpi-label {
+    font-size: 0.7rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 0.25rem;
+  }
+  .rpt-section {
+    background: rgba(15,23,42,0.6);
+    border: 1px solid rgba(99,102,241,0.2);
+    border-radius: 12px;
+    padding: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+  .rpt-section h3 {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #c7d2fe;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 0.75rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(99,102,241,0.2);
+  }
+  .rpt-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+  .rpt-table th { color: #64748b; font-weight: 600; text-align: left; padding: 0.35rem 0.5rem; border-bottom: 1px solid rgba(99,102,241,0.15); }
+  .rpt-table td { color: #cbd5e1; padding: 0.45rem 0.5rem; border-bottom: 1px solid rgba(99,102,241,0.08); }
+  .rpt-table tr:last-child td { border-bottom: none; }
+  .rpt-table .num { text-align: right; font-variant-numeric: tabular-nums; color: #a5b4fc; }
+  .rpt-table .pct { text-align: right; color: #34d399; }
+  .rpt-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  @media (max-width: 640px) { .rpt-grid-2 { grid-template-columns: 1fr; } }
+  .rpt-empty { color: #475569; font-size: 0.8rem; padding: 0.75rem 0; }
+</style>
+{% endblock %}
+
+{% block page_stats %}
+<div class="desarme-nav-module flex flex-wrap gap-2 mt-4">
+  <a href="{% country_url 'desarme:index' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">Dashboard</a>
+  <a href="{% country_url 'desarme:lista_vehiculos' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🚗 Vehículos</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 Repuestos</a>
+  <a href="{% country_url 'desarme:lista_interchange' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🔄 Interchange</a>
+  <a href="{% country_url 'desarme:reportes' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-cyan-500/20 border border-cyan-500/50 text-cyan-200">📊 Reportes</a>
+</div>
+{% endblock %}
+
+{% block panel_content %}
+
+{# ── KPIs globales ── #}
+<div class="rpt-kpi-grid">
+  <div class="rpt-kpi">
+    <div class="rpt-kpi-value">${{ kpis.inversion_total|floatformat:0|intcomma }}</div>
+    <div class="rpt-kpi-label">Inversión total</div>
+  </div>
+  <div class="rpt-kpi">
+    <div class="rpt-kpi-value">${{ kpis.ingresos|floatformat:0|intcomma }}</div>
+    <div class="rpt-kpi-label">Ingresos realizados</div>
+  </div>
+  <div class="rpt-kpi">
+    <div class="rpt-kpi-value">${{ kpis.ganancia|floatformat:0|intcomma }}</div>
+    <div class="rpt-kpi-label">Ganancia neta</div>
+  </div>
+  <div class="rpt-kpi">
+    <div class="rpt-kpi-value">{{ kpis.roi_pct|floatformat:1 }}%</div>
+    <div class="rpt-kpi-label">ROI global</div>
+  </div>
+</div>
+
+<div class="rpt-grid-2">
+
+  {# ── Top piezas ── #}
+  <div class="rpt-section">
+    <h3>🔧 Top repuestos por ingreso</h3>
+    {% if top_piezas %}
+    <table class="rpt-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Nombre</th>
+          <th class="num">Cant.</th>
+          <th class="num">Ingresos</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in top_piezas %}
+        <tr>
+          <td>{{ p.codigo|default:"—" }}</td>
+          <td>{{ p.nombre }}</td>
+          <td class="num">{{ p.sold }}</td>
+          <td class="num">${{ p.revenue|floatformat:0|intcomma }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="rpt-empty">Sin ventas registradas aún.</p>
+    {% endif %}
+  </div>
+
+  {# ── Top vehículos ── #}
+  <div class="rpt-section">
+    <h3>🚗 Top vehículos por ingreso</h3>
+    {% if top_vehiculos %}
+    <table class="rpt-table">
+      <thead>
+        <tr>
+          <th>Patente / VIN</th>
+          <th class="num">Piezas</th>
+          <th class="num">Ingresos</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for v in top_vehiculos %}
+        <tr>
+          <td>
+            {% if v.vehiculo_desarme_id %}
+            <a href="{% country_url 'desarme:ver_vehiculo' v.vehiculo_desarme_id %}" style="color:#a5b4fc;text-decoration:none;">{{ v.patente|default:"—" }}</a>
+            {% else %}{{ v.patente|default:"—" }}{% endif %}
+          </td>
+          <td class="num">{{ v.sold }}</td>
+          <td class="num">${{ v.revenue|floatformat:0|intcomma }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="rpt-empty">Sin ventas registradas aún.</p>
+    {% endif %}
+  </div>
+
+  {# ── Top marcas ── #}
+  <div class="rpt-section">
+    <h3>🏷️ Top marcas por ingreso</h3>
+    {% if top_marcas %}
+    <table class="rpt-table">
+      <thead>
+        <tr><th>Marca</th><th class="num">Ingresos</th></tr>
+      </thead>
+      <tbody>
+        {% for m in top_marcas %}
+        <tr>
+          <td>{{ m.marca|default:"Sin marca" }}</td>
+          <td class="num">${{ m.revenue|floatformat:0|intcomma }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="rpt-empty">Sin datos.</p>
+    {% endif %}
+  </div>
+
+  {# ── Top modelos ── #}
+  <div class="rpt-section">
+    <h3>🚘 Top modelos por ingreso</h3>
+    {% if top_modelos %}
+    <table class="rpt-table">
+      <thead>
+        <tr><th>Modelo</th><th class="num">Ingresos</th></tr>
+      </thead>
+      <tbody>
+        {% for m in top_modelos %}
+        <tr>
+          <td>{{ m.modelo|default:"Sin modelo" }}</td>
+          <td class="num">${{ m.revenue|floatformat:0|intcomma }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <p class="rpt-empty">Sin datos.</p>
+    {% endif %}
+  </div>
+
+</div>
+
+{# ── Top ROI por vehículo ── #}
+{% if top_roi %}
+<div class="rpt-section">
+  <h3>📈 Top ROI por vehículo</h3>
+  <table class="rpt-table">
+    <thead>
+      <tr>
+        <th>Patente / VIN</th>
+        <th class="pct">ROI %</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for r in top_roi %}
+      <tr>
+        <td>
+          <a href="{% country_url 'desarme:ver_vehiculo' r.vehiculo_id %}" style="color:#a5b4fc;text-decoration:none;">
+            {{ r.patente|default:"—" }}
+          </a>
+        </td>
+        <td class="pct">{{ r.roi|floatformat:1 }}%</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+{% endblock %}

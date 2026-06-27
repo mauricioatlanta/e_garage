@@ -6,7 +6,7 @@ from django.db.models import Count
 
 from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto
-from taller.models.vehiculos import Vehiculo
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculo_financial import VehicleFinancialEvent
 from taller.services.financial_event_service import FinancialEventService
 from taller.services.snapshot_generator_service import SnapshotGeneratorService
@@ -38,7 +38,7 @@ class Command(BaseCommand):
         if documento_id:
             query = query.filter(documento_id=documento_id)
         if vehiculo_id:
-            query = query.filter(vehiculo_id=vehiculo_id)
+            query = query.filter(vehiculo_desarme_id=vehiculo_id)
 
         total_missing = query.count()
         self.stdout.write(f"Eventos financieros con event_hash NULL: {total_missing}")
@@ -53,7 +53,7 @@ class Command(BaseCommand):
             for row in existing_collisions:
                 self.stdout.write(f"  - {row['event_hash']} => {row['count']} eventos")
 
-        candidate_events = list(query.order_by("created_at", "id").select_related("documento", "vehiculo", "empresa", "linea_repuesto"))
+        candidate_events = list(query.order_by("created_at", "id").select_related("documento", "vehiculo_desarme", "empresa", "linea_repuesto"))
         hash_groups = defaultdict(list)
         skipped = []
 
@@ -85,7 +85,7 @@ class Command(BaseCommand):
                 )
                 for event in events:
                     self.stdout.write(
-                        f"    - evento #{event.id} tipo={event.event_type} vehiculo={event.vehiculo_id} documento={event.documento_id}"
+                        f"    - evento #{event.id} tipo={event.event_type} vehiculo={event.vehiculo_desarme_id} documento={event.documento_id}"
                     )
                 continue
 
@@ -99,7 +99,7 @@ class Command(BaseCommand):
                 )
                 for event in events[1:]:
                     self.stdout.write(
-                        f"    - evento duplicado #{event.id} tipo={event.event_type} vehiculo={event.vehiculo_id} documento={event.documento_id}"
+                        f"    - evento duplicado #{event.id} tipo={event.event_type} vehiculo={event.vehiculo_desarme_id} documento={event.documento_id}"
                     )
 
             if fix:
@@ -110,13 +110,13 @@ class Command(BaseCommand):
 
             if winner.documento_id:
                 affected_document_ids.add(winner.documento_id)
-            if winner.vehiculo_id:
-                affected_vehicle_ids.add(winner.vehiculo_id)
+            if winner.vehiculo_desarme_id:
+                affected_vehicle_ids.add(winner.vehiculo_desarme_id)
 
         for event in skipped:
             self.stdout.write(
                 self.style.WARNING(
-                    f"No se pudo regenerar hash para evento #{event.id} tipo={event.event_type} documento={event.documento_id} vehiculo={event.vehiculo_id}"
+                    f"No se pudo regenerar hash para evento #{event.id} tipo={event.event_type} documento={event.documento_id} vehiculo={event.vehiculo_desarme_id}"
                 )
             )
 
@@ -142,7 +142,7 @@ class Command(BaseCommand):
                 if affected_vehicle_ids:
                     self.stdout.write("Generando snapshots directos para vehículos sin documento asociado...")
                     for vehiculo_id in sorted(affected_vehicle_ids):
-                        vehiculo = Vehiculo.objects.filter(id=vehiculo_id).first()
+                        vehiculo = VehiculoDesarme.objects.filter(id=vehiculo_id).first()
                         if not vehiculo:
                             continue
                         SnapshotGeneratorService.generate_snapshot_for_vehicle(vehiculo)
@@ -162,7 +162,7 @@ class Command(BaseCommand):
 
         if event.event_type == VehicleFinancialEvent.EVENT_TYPE_COMPRA:
             return FinancialEventService._compute_purchase_hash(
-                event.vehiculo,
+                event.vehiculo_desarme,
                 event.empresa,
                 event.monto,
                 event.descripcion,
@@ -170,7 +170,7 @@ class Command(BaseCommand):
 
         if event.event_type == VehicleFinancialEvent.EVENT_TYPE_COSTO:
             return FinancialEventService._compute_cost_hash(
-                event.vehiculo,
+                event.vehiculo_desarme,
                 event.empresa,
                 event.monto,
                 event.descripcion,

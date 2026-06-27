@@ -113,6 +113,10 @@ try:
         path("piezas/nueva-suelta/", views.crear_pieza_suelta, name="crear_pieza_suelta"),
         path("piezas/<int:pk>/editar/", views.editar_pieza, name="editar_pieza"),
         path("piezas/<int:pk>/avisar-owner/", views.avisar_owner_pieza, name="avisar_owner_pieza"),
+        path("interchange/", views.lista_interchange, name="lista_interchange"),
+        path("interchange/crear/", views.crear_interchange, name="crear_interchange"),
+        path("interchange/<int:pk>/eliminar/", views.eliminar_interchange, name="eliminar_interchange"),
+        path("reportes/", views.reportes_desarme, name="reportes"),
     ]
 except ImportError:
     app_name = "desarme"

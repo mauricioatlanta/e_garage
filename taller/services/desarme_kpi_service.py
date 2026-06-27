@@ -12,7 +12,7 @@ from taller.models.pieza_desarme import (
     ESTADO_DISPONIBLE,
     ESTADO_RESERVADA,
 )
-from taller.models.vehiculos import Vehiculo
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from .desarme_financial_service import (
     calcular_ingresos_vehiculo,
     calcular_inversion_total_vehiculo,
@@ -25,7 +25,7 @@ from .desarme_financial_service import (
 
 def kpis_resumen(empresa):
     """Devuelve un dict con KPIs principales listos para mostrar en dashboard."""
-    vehs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME, es_placeholder=False)
+    vehs = VehiculoDesarme.objects.filter(empresa=empresa, es_placeholder=False)
     total_inversion = Decimal("0")
     total_ingresos = Decimal("0")
     total_ganancia = Decimal("0")
@@ -76,7 +76,7 @@ def top_vehiculos(empresa, limit=10):
         LineaRepuesto.objects.filter(
             documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME
         )
-        .values("pieza_desarme__vehiculo_id", "pieza_desarme__vehiculo__patente")
+        .values("pieza_desarme__vehiculo_desarme_id", "pieza_desarme__vehiculo_desarme__patente")
         .annotate(revenue=Sum(F("precio_unitario") * F("cantidad")), sold=Sum("cantidad"))
         .order_by("-revenue")[:limit]
     )
@@ -84,8 +84,8 @@ def top_vehiculos(empresa, limit=10):
     for r in qs:
         result.append(
             {
-                "vehiculo_id": r.get("pieza_desarme__vehiculo_id"),
-                "patente": r.get("pieza_desarme__vehiculo__patente"),
+                "vehiculo_desarme_id": r.get("pieza_desarme__vehiculo_desarme_id"),
+                "patente": r.get("pieza_desarme__vehiculo_desarme__patente"),
                 "revenue": Decimal(r.get("revenue") or 0),
                 "sold": int(r.get("sold") or 0),
             }
@@ -99,7 +99,7 @@ def dias_stock_promedio(vehiculo):
     """Promedio de días en stock para piezas vendibles del vehículo."""
     today = timezone.now().date()
     piezas = PiezaDesarme.objects.filter(
-        vehiculo_id=vehiculo.id, activo=True, cantidad__gt=0
+        vehiculo_desarme_id=vehiculo.id, activo=True, cantidad__gt=0
     ).exclude(fecha_extraccion__isnull=True)
     total_days = 0
     count = 0
@@ -113,9 +113,9 @@ def dias_stock_promedio(vehiculo):
 def rotacion_piezas(vehiculo):
     """Rotación simple: total vendido / stock medio actual (por vehículo)."""
     sold = LineaRepuesto.objects.filter(
-        origen_repuesto=ORIGEN_DESARME, pieza_desarme__vehiculo_id=vehiculo.id, documento__estado="EMITIDO"
+        origen_repuesto=ORIGEN_DESARME, pieza_desarme__vehiculo_desarme_id=vehiculo.id, documento__estado="EMITIDO"
     ).aggregate(total=Sum("cantidad"))["total"] or 0
-    stock = PiezaDesarme.objects.filter(vehiculo_id=vehiculo.id).aggregate(total=Sum("cantidad"))["total"] or 0
+    stock = PiezaDesarme.objects.filter(vehiculo_desarme_id=vehiculo.id).aggregate(total=Sum("cantidad"))["total"] or 0
     if stock == 0:
         return None
     return float(sold) / float(stock)
@@ -124,7 +124,7 @@ def rotacion_piezas(vehiculo):
 def inventario_muerto(vehiculo):
     """Valor contable de piezas en estados no vendibles (DANADA, SCRAP, FALTANTE)."""
     qs = PiezaDesarme.objects.filter(
-        vehiculo_id=vehiculo.id, estado_pieza__in=[ESTADO_DANADA, ESTADO_SCRAP, ESTADO_FALTANTE]
+        vehiculo_desarme_id=vehiculo.id, estado_pieza__in=[ESTADO_DANADA, ESTADO_SCRAP, ESTADO_FALTANTE]
     )
     total = Decimal("0")
     for p in qs:
@@ -174,25 +174,25 @@ def health_score(vehiculo):
 def top_marcas(empresa, limit=10):
     qs = (
         LineaRepuesto.objects.filter(documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME)
-        .values("pieza_desarme__vehiculo__marca__nombre")
+        .values("pieza_desarme__vehiculo_desarme__marca__nombre")
         .annotate(revenue=Sum(F("precio_unitario") * F("cantidad")))
         .order_by("-revenue")[:limit]
     )
-    return [{"marca": r.get("pieza_desarme__vehiculo__marca__nombre"), "revenue": Decimal(r.get("revenue") or 0)} for r in qs]
+    return [{"marca": r.get("pieza_desarme__vehiculo_desarme__marca__nombre"), "revenue": Decimal(r.get("revenue") or 0)} for r in qs]
 
 
 def top_modelos(empresa, limit=10):
     qs = (
         LineaRepuesto.objects.filter(documento__empresa=empresa, documento__estado="EMITIDO", origen_repuesto=ORIGEN_DESARME)
-        .values("pieza_desarme__vehiculo__modelo__nombre")
+        .values("pieza_desarme__vehiculo_desarme__modelo__nombre")
         .annotate(revenue=Sum(F("precio_unitario") * F("cantidad")))
         .order_by("-revenue")[:limit]
     )
-    return [{"modelo": r.get("pieza_desarme__vehiculo__modelo__nombre"), "revenue": Decimal(r.get("revenue") or 0)} for r in qs]
+    return [{"modelo": r.get("pieza_desarme__vehiculo_desarme__modelo__nombre"), "revenue": Decimal(r.get("revenue") or 0)} for r in qs]
 
 
 def top_roi_vehiculos(empresa, limit=10):
-    vehs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME, es_placeholder=False)
+    vehs = VehiculoDesarme.objects.filter(empresa=empresa, es_placeholder=False)
     scored = []
     for v in vehs:
         roi = calcular_roi_vehiculo(v)

@@ -16,7 +16,7 @@ from taller.models.pieza_desarme import (
     PiezaDesarmeName,
     PiezaDesarmeCompanyLabel,
 )
-from taller.models.vehiculos import Vehiculo
+from taller.models.vehiculo_desarme import VehiculoDesarme
 
 
 @pytest.fixture
@@ -31,10 +31,8 @@ def empresa_user(db):
 @pytest.fixture
 def vehiculo_desarme(empresa_user):
     empresa, _ = empresa_user
-    return Vehiculo.objects.create(
+    return VehiculoDesarme.objects.create(
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
-        cliente=None,
         patente="DES999",
         anio=2020,
     )
@@ -45,7 +43,7 @@ def pieza_sin_nombres(empresa_user, vehiculo_desarme):
     empresa, _ = empresa_user
     return PiezaDesarme.objects.create(
         empresa=empresa,
-        vehiculo=vehiculo_desarme,
+        vehiculo_desarme=vehiculo_desarme,
         codigo="MOT-01",
         nombre="Motor completo",
         cantidad=1,
@@ -113,7 +111,7 @@ class TestInventarioVehiculoSerializaNombre:
         empresa, user = empresa_user
         pieza = PiezaDesarme.objects.create(
             empresa=empresa,
-            vehiculo=vehiculo_desarme,
+            vehiculo_desarme=vehiculo_desarme,
             codigo="VALVE-01",
             nombre="Tapa de válvulas",
             cantidad=1,
@@ -135,8 +133,7 @@ class TestInventarioVehiculoSerializaNombre:
         resp = inventario_vehiculo(request, pk=vehiculo_desarme.pk)
         assert resp.status_code == 200
         content = resp.content.decode("utf-8")
-        assert "piezas_json" in content
-        # Nombre visible: en es no hay catalog es, así que usa pieza.nombre
+        # El template embebe el JSON via repuestos_json|escapejs; verificar el nombre visible
         assert "Tapa de válvulas" in content
 
 
@@ -203,20 +200,17 @@ class TestApiPiezaLabelEmpresaGuardar:
             user=User.objects.create_user("otro", "o@t.com", "x"),
             plan="paid",
         )
-        from taller.models.vehiculos import Vehiculo
         from django.test import RequestFactory
         from taller.desarme.views import api_pieza_label_empresa_guardar
 
-        otro_veh = Vehiculo.objects.create(
+        otro_veh = VehiculoDesarme.objects.create(
             empresa=otra_empresa,
-            tipo_uso=Vehiculo.TIPO_USO_DESARME,
-            cliente=None,
             patente="OTRO",
             anio=2020,
         )
         otra_pieza = PiezaDesarme.objects.create(
             empresa=otra_empresa,
-            vehiculo=otro_veh,
+            vehiculo_desarme=otro_veh,
             codigo="X",
             nombre="Otra",
             cantidad=1,
@@ -228,5 +222,6 @@ class TestApiPiezaLabelEmpresaGuardar:
             content_type="application/json",
         )
         request.user = user
-        resp = api_pieza_label_empresa_guardar(request, pk=otra_pieza.pk)
-        assert resp.status_code == 404
+        from django.http import Http404
+        with pytest.raises(Http404):
+            api_pieza_label_empresa_guardar(request, pk=otra_pieza.pk)

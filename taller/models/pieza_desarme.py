@@ -62,11 +62,10 @@ class PiezaDesarme(TenantScoped):
     estado_pieza VENDIDA = partida agotada (cantidad llegó a 0).
     """
 
-    vehiculo = models.ForeignKey(
-        "taller.Vehiculo",
+    vehiculo_desarme = models.ForeignKey(
+        "taller.VehiculoDesarme",
         on_delete=models.PROTECT,
         related_name="piezas_desarme",
-        limit_choices_to={"tipo_uso": "DESARME"},
     )
 
     repuesto = models.ForeignKey(
@@ -263,13 +262,10 @@ class PiezaDesarme(TenantScoped):
 
     def clean(self):
         super().clean()
-        if not self.vehiculo_id:
+        if not self.vehiculo_desarme_id:
             return
-        # vehiculo debe ser tipo DESARME
-        if self.vehiculo.tipo_uso != "DESARME":
-            raise ValidationError({"vehiculo": "El vehículo debe ser de tipo Desarme."})
         # empresa coherente con vehículo
-        if self.empresa_id and self.vehiculo.empresa_id != self.empresa_id:
+        if self.empresa_id and self.vehiculo_desarme.empresa_id != self.empresa_id:
             raise ValidationError("La pieza y el vehículo deben pertenecer a la misma empresa.")
         # repuesto (si existe) misma empresa
         if self.repuesto_id and self.repuesto.empresa_id != self.empresa_id:
@@ -293,19 +289,19 @@ class PiezaDesarme(TenantScoped):
         verbose_name = "Pieza de desarme"
         verbose_name_plural = "Piezas de desarme"
         indexes = [
-            Index(fields=["empresa", "vehiculo"]),
+            Index(fields=["empresa", "vehiculo_desarme"]),
             Index(fields=["empresa", "codigo"]),
             Index(fields=["empresa", "estado_pieza"]),
         ]
         constraints = [
             models.UniqueConstraint(
-                fields=["empresa", "vehiculo", "codigo"],
-                name="unique_codigo_por_empresa_vehiculo",
+                fields=["empresa", "vehiculo_desarme", "codigo"],
+                name="unique_codigo_por_empresa_vehiculo_desarme",
             )
         ]
 
     def __str__(self):
-        return f"{self.nombre} ({self.codigo}) x{self.cantidad} — {self.vehiculo}"
+        return f"{self.nombre} ({self.codigo}) x{self.cantidad} — {self.vehiculo_desarme}"
 
 
 # Idiomas para nombres canónicos (alineado con servicios)
@@ -430,8 +426,8 @@ class PrecioHistoricoPieza(models.Model):
         blank=True,
         related_name="historial_precios",
     )
-    vehiculo = models.ForeignKey(
-        "taller.Vehiculo",
+    vehiculo_desarme = models.ForeignKey(
+        "taller.VehiculoDesarme",
         on_delete=models.CASCADE,
         related_name="precios_historicos_pieza",
         help_text="Vehículo de origen (contexto del precio).",

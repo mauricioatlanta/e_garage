@@ -4,12 +4,12 @@ from django.db.models import F, Sum, Min, Max
 
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
 from taller.models.pieza_desarme import PiezaDesarme, ESTADO_DISPONIBLE, ESTADO_RESERVADA
-from taller.models.vehiculos import Vehiculo
+from taller.models.vehiculo_desarme import VehiculoDesarme
 
 
 def _lineas_desarme_para_vehiculo(vehiculo):
     return LineaRepuesto.objects.filter(
-        origen_repuesto=ORIGEN_DESARME, pieza_desarme__vehiculo_id=vehiculo.id, documento__estado="EMITIDO"
+        origen_repuesto=ORIGEN_DESARME, pieza_desarme__vehiculo_desarme_id=vehiculo.id, documento__estado="EMITIDO"
     )
 
 
@@ -30,7 +30,7 @@ def _vendidos_por_pieza_vehiculo(vehiculo):
 
 def calcular_inversion_total_vehiculo(vehiculo):
     """Inversión histórica asociada al vehículo (suma costos imputados por unidad)."""
-    piezas = PiezaDesarme.objects.filter(vehiculo_id=vehiculo.id)
+    piezas = PiezaDesarme.objects.filter(vehiculo_desarme_id=vehiculo.id)
     sold_map = _vendidos_por_pieza_vehiculo(vehiculo)
     total = Decimal("0")
     for p in piezas.only("id", "costo_asignado", "cantidad"):
@@ -85,7 +85,7 @@ def calcular_roi_vehiculo(vehiculo):
 
 def calcular_inventario_vivo_vehiculo(vehiculo):
     """Devuelve dict {valor_contable, valor_mercado} para el inventario vivo del vehículo."""
-    piezas = PiezaDesarme.objects.filter(vehiculo_id=vehiculo.id)
+    piezas = PiezaDesarme.objects.filter(vehiculo_desarme_id=vehiculo.id)
     valor_contable = Decimal("0")
     valor_mercado = Decimal("0")
     for p in piezas.only("cantidad", "costo_asignado", "precio_sugerido", "precio_referencia", "precio_venta_sugerido"):
@@ -130,7 +130,7 @@ def calcular_estado_financiero(vehiculo):
     """Determina estado financiero del vehículo: AGOTADO, RECUPERADO, CERRADO, ACTIVO."""
     # AGOTADO: no quedan piezas vendibles reales
     vendibles_exist = PiezaDesarme.objects.filter(
-        vehiculo_id=vehiculo.id,
+        vehiculo_desarme_id=vehiculo.id,
         activo=True,
         cantidad__gt=0,
         estado_pieza__in=[ESTADO_DISPONIBLE, ESTADO_RESERVADA],
@@ -155,7 +155,7 @@ def calcular_estado_financiero(vehiculo):
 # Agregaciones por empresa: iteran sobre vehículos de la empresa
 def calcular_inversion_total(empresa):
     total = Decimal("0")
-    vehs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+    vehs = VehiculoDesarme.objects.filter(empresa=empresa)
     for v in vehs:
         total += calcular_inversion_total_vehiculo(v)
     return total
@@ -163,7 +163,7 @@ def calcular_inversion_total(empresa):
 
 def calcular_ingresos_realizados(empresa):
     total = Decimal("0")
-    vehs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+    vehs = VehiculoDesarme.objects.filter(empresa=empresa)
     for v in vehs:
         total += calcular_ingresos_vehiculo(v)
     return total
@@ -174,7 +174,7 @@ def calcular_roi(empresa):
     if inversion == 0:
         return Decimal("0")
     ganancia = Decimal("0")
-    vehs = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+    vehs = VehiculoDesarme.objects.filter(empresa=empresa)
     for v in vehs:
         ganancia += calcular_ganancia_vehiculo(v)
     return (ganancia / inversion) * Decimal("100")

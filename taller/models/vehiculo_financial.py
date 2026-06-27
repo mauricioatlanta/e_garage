@@ -4,7 +4,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils import timezone
 
-from .vehiculos import Vehiculo
+from .vehiculo_desarme import VehiculoDesarme
 
 
 class VehiculoFinancialSnapshot(models.Model):
@@ -13,7 +13,7 @@ class VehiculoFinancialSnapshot(models.Model):
     Se usa para conservar historiales y alimentar dashboards/timelines.
     """
 
-    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, related_name="financial_snapshots")
+    vehiculo_desarme = models.ForeignKey(VehiculoDesarme, on_delete=models.CASCADE, related_name="financial_snapshots")
     empresa = models.ForeignKey("taller.Empresa", on_delete=models.CASCADE, related_name="vehiculo_snapshots")
     fecha = models.DateTimeField(default=timezone.now, db_index=True)
 
@@ -55,8 +55,8 @@ class VehiculoFinancialSnapshot(models.Model):
         ]
 
         indexes = [
-            models.Index(fields=["vehiculo", "fecha"]),
-            models.Index(fields=["vehiculo", "source_event_count"]),
+            models.Index(fields=["vehiculo_desarme", "fecha"]),
+            models.Index(fields=["vehiculo_desarme", "source_event_count"]),
             models.Index(fields=["snapshot_hash"]),
         ]
 
@@ -91,7 +91,7 @@ class VehicleFinancialEvent(models.Model):
     EVENT_TYPE_OTRO = "OTRO"
     EVENT_TYPE_UNKNOWN = "UNKNOWN"
 
-    vehiculo = models.ForeignKey(Vehiculo, on_delete=models.CASCADE, related_name="financial_events")
+    vehiculo_desarme = models.ForeignKey(VehiculoDesarme, on_delete=models.CASCADE, related_name="financial_events")
     empresa = models.ForeignKey("taller.Empresa", on_delete=models.CASCADE, related_name="financial_events")
     tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, db_index=True)
     fecha = models.DateTimeField(default=timezone.now, db_index=True)
@@ -147,7 +147,7 @@ class VehicleFinancialEvent(models.Model):
             )
         ]
         indexes = [
-            models.Index(fields=["vehiculo", "tipo", "fecha"]),
+            models.Index(fields=["vehiculo_desarme", "tipo", "fecha"]),
             models.Index(fields=["linea_repuesto"]),
             models.Index(fields=["event_hash"]),
             models.Index(fields=["event_type"]),

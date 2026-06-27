@@ -71,7 +71,7 @@ class FinancialEventService:
     def _next_event_version(cls, vehiculo, event_type):
         return (
             VehicleFinancialEvent.objects.filter(
-                vehiculo=vehiculo,
+                vehiculo_desarme=vehiculo,
                 event_type=event_type,
             )
             .order_by("-event_version")
@@ -98,7 +98,7 @@ class FinancialEventService:
             return existing
 
         event = VehicleFinancialEvent(
-            vehiculo=vehiculo,
+            vehiculo_desarme=vehiculo,
             empresa=empresa,
             tipo=event_type,
             event_type=event_type,
@@ -129,7 +129,7 @@ class FinancialEventService:
         pieza = getattr(linea, "pieza_desarme", None)
         if not pieza:
             return None
-        vehiculo_obj = getattr(pieza, "vehiculo", None)
+        vehiculo_obj = getattr(pieza, "vehiculo_desarme", None)
         if not vehiculo_obj:
             return None
 

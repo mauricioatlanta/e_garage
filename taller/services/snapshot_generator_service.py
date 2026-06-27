@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.utils import timezone
 
 from taller.models.vehiculo_financial import VehiculoFinancialSnapshot
-from taller.models.vehiculos import Vehiculo
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.services.desarme_financial_service import (
     calcular_costo_vendido_vehiculo,
     calcular_ganancia_vehiculo,
@@ -21,7 +21,7 @@ class SnapshotGeneratorService:
     """Servicio para generar snapshots financieros de vehículos de desarme."""
 
     @classmethod
-    def generate_snapshot_for_vehicle(cls, vehiculo: Vehiculo, fecha=None) -> VehiculoFinancialSnapshot:
+    def generate_snapshot_for_vehicle(cls, vehiculo: VehiculoDesarme, fecha=None) -> VehiculoFinancialSnapshot:
         fecha = fecha or timezone.now()
         inventario = calcular_inventario_vivo_vehiculo(vehiculo)
         inversion_total = calcular_inversion_total_vehiculo(vehiculo)
@@ -36,7 +36,7 @@ class SnapshotGeneratorService:
         from taller.models.vehiculo_financial import VehicleFinancialEvent
 
         source_event_count = VehicleFinancialEvent.objects.filter(
-            vehiculo=vehiculo
+            vehiculo_desarme=vehiculo
         ).count()
 
         snapshot_hash = "|".join([
@@ -57,7 +57,7 @@ class SnapshotGeneratorService:
             return existing
 
         snapshot = VehiculoFinancialSnapshot.objects.create(
-            vehiculo=vehiculo,
+            vehiculo_desarme=vehiculo,
             empresa=vehiculo.empresa,
             fecha=fecha,
             inversion_total=inversion_total,
@@ -79,7 +79,7 @@ class SnapshotGeneratorService:
     @classmethod
     def generate_snapshots_for_empresa(cls, empresa, fecha=None):
         fecha = fecha or timezone.now()
-        vehiculos = Vehiculo.objects.filter(empresa=empresa, tipo_uso=Vehiculo.TIPO_USO_DESARME)
+        vehiculos = VehiculoDesarme.objects.filter(empresa=empresa)
         snapshots = []
         for vehiculo in vehiculos:
             snapshots.append(cls.generate_snapshot_for_vehicle(vehiculo, fecha=fecha))
@@ -95,7 +95,7 @@ class SnapshotGeneratorService:
 
     @classmethod
     def _vehiculos_from_documento(cls, documento):
-        return Vehiculo.objects.filter(
+        return VehiculoDesarme.objects.filter(
             piezas_desarme__lineas_repuesto__documento=documento,
             piezas_desarme__lineas_repuesto__origen_repuesto="DESARME",
         ).distinct()

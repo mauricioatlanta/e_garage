@@ -23,6 +23,7 @@ from taller.models.lineas_documento import (
 )
 from taller.models.pieza_desarme import PiezaDesarme
 from taller.models.repuesto import Repuesto
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 from taller.services.inventory_service import InventoryService
 
@@ -112,10 +113,8 @@ class TestLineaRepuestoOrigen:
             patente="PAT01",
             anio=2020,
         )
-        self.vehiculo_desarme = Vehiculo.objects.create(
+        self.vehiculo_desarme = VehiculoDesarme.objects.create(
             empresa=self.empresa,
-            tipo_uso=Vehiculo.TIPO_USO_DESARME,
-            cliente=None,
             patente="DES01",
             anio=2018,
         )
@@ -133,7 +132,7 @@ class TestLineaRepuestoOrigen:
         )
         self.pieza = PiezaDesarme.objects.create(
             empresa=self.empresa,
-            vehiculo=self.vehiculo_desarme,
+            vehiculo_desarme=self.vehiculo_desarme,
             codigo="PZ01",
             nombre="Pieza Desarme",
             cantidad=5,
@@ -229,10 +228,8 @@ class TestInventoryServiceDesarme:
             patente="INV01",
             anio=2020,
         )
-        self.vehiculo_desarme = Vehiculo.objects.create(
+        self.vehiculo_desarme = VehiculoDesarme.objects.create(
             empresa=self.empresa,
-            tipo_uso=Vehiculo.TIPO_USO_DESARME,
-            cliente=None,
             patente="INVD",
             anio=2018,
         )
@@ -244,7 +241,7 @@ class TestInventoryServiceDesarme:
         )
         self.pieza = PiezaDesarme.objects.create(
             empresa=self.empresa,
-            vehiculo=self.vehiculo_desarme,
+            vehiculo_desarme=self.vehiculo_desarme,
             codigo="INV-P",
             nombre="Pieza Inv",
             cantidad=5,
