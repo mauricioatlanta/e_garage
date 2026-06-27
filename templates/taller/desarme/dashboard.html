@@ -384,6 +384,30 @@
   {% if request.user|is_admin_or_owner %}<a href="{% country_url 'desarme:crear_pieza' %}" class="text-cyan-400 hover:text-cyan-300 text-xs">{% trans "Registrar la primera" %}</a>{% endif %}
   {% endif %}
 </div>
+{# ── Catálogo público ─────────────────────────────────────────── #}
+<div class="section-title" style="margin-top:0.75rem;">🌐 {% trans "Catálogo público" %}</div>
+<div class="chart-box" style="margin-bottom:0;">
+  {% if empresa.slug %}
+    {% url 'tienda:tienda_storefront_slug' slug=empresa.slug as storefront_url %}
+    <p class="text-xs text-slate-400 mb-2">Comparte este enlace con tus clientes para que vean las piezas disponibles y te contacten por WhatsApp.</p>
+    <div class="flex items-center gap-2 flex-wrap">
+      <code class="text-xs bg-slate-800 border border-slate-600 rounded px-2 py-1 text-cyan-300 select-all break-all" id="storefront-url-text">{{ request.scheme }}://{{ request.get_host }}{{ storefront_url }}</code>
+      <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('storefront-url-text').innerText).then(function(){this.textContent='✓ Copiado';setTimeout(function(){document.querySelector('#storefront-copy-btn').textContent='Copiar';},1500);}.bind(this))" id="storefront-copy-btn"
+              class="text-xs px-3 py-1 rounded border border-indigo-400/40 text-indigo-300 hover:bg-indigo-400/10 transition-colors flex-shrink-0">
+        Copiar
+      </button>
+      <a href="{{ storefront_url }}" target="_blank" rel="noopener"
+         class="text-xs px-3 py-1 rounded border border-cyan-400/40 text-cyan-300 hover:bg-cyan-400/10 transition-colors flex-shrink-0">
+        Ver como cliente →
+      </a>
+    </div>
+    {% if not empresa.telefono %}
+      <p class="text-xs text-amber-400 mt-2">⚠ Sin teléfono configurado — los clientes no verán el botón de WhatsApp. Agrégalo en <strong>Configuración de empresa</strong>.</p>
+    {% endif %}
+  {% else %}
+    <div class="empty-chart">{% trans "No se pudo generar el enlace público (slug no configurado)." %}</div>
+  {% endif %}
+</div>
 {% endblock %}
 
 {% block page_extra_js %}

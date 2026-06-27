@@ -30,60 +30,90 @@ def _telefono_wa(telefono: str) -> str:
     return re.sub(r"\D", "", telefono or "")
 
 
-def tienda_storefront(request, empresa_id: int):
-    """
-    Storefront público de una empresa: listado de PiezaDesarme DISPONIBLES.
-    Solo accesible si la empresa tiene kiosko_autorizado=True.
-    Filtros: ?q=texto  ?condicion=BUENA
-    """
-    empresa = get_object_or_404(
-        Empresa.objects.select_related("configuracion_comision"),
-        id=empresa_id,
-        configuracion_comision__kiosko_autorizado=True,
-    )
-
+def _tienda_storefront_render(request, empresa):
+    """Lógica compartida del storefront público de una empresa."""
     if not empresa.activa_y_vigente:
         return render(request, "public/storefront/tienda_inactiva.html", {"empresa": empresa}, status=410)
 
     q = request.GET.get("q", "").strip()
-    condicion_sel = request.GET.get("condicion", "").strip()
+    anio_sel = request.GET.get("anio", "").strip()
+    marca_sel = request.GET.get("marca", "").strip()
+    modelo_sel = request.GET.get("modelo", "").strip()
 
-    piezas_qs = PiezaDesarme.objects.filter(
+    base_qs = PiezaDesarme.objects.filter(
         empresa=empresa,
         estado_pieza=ESTADO_DISPONIBLE,
         activo=True,
-    ).order_by("-prioridad", "nombre")
+    ).select_related("vehiculo_desarme", "vehiculo_desarme__marca", "vehiculo_desarme__modelo")
 
-    # Filtro por condición
-    if condicion_sel and condicion_sel in dict(CONDICION_CHOICES):
-        piezas_qs = piezas_qs.filter(condicion=condicion_sel)
+    # Opciones de vehículo en cascada (sobre el inventario completo disponible)
+    anios_disponibles = sorted(
+        {v for v in base_qs.values_list("vehiculo_desarme__anio", flat=True) if v},
+        reverse=True,
+    )
+    qs_tras_anio = base_qs.filter(vehiculo_desarme__anio=anio_sel) if anio_sel else base_qs
+    marcas_rows = qs_tras_anio.values(
+        "vehiculo_desarme__marca__nombre", "vehiculo_desarme__marca_texto"
+    ).distinct()
+    marcas_disponibles = sorted({
+        r["vehiculo_desarme__marca__nombre"] or r["vehiculo_desarme__marca_texto"] or ""
+        for r in marcas_rows
+        if r["vehiculo_desarme__marca__nombre"] or r["vehiculo_desarme__marca_texto"]
+    })
 
-    # Filtro texto libre: nombre directo + sinónimos vía AliasRepuesto
+    if marca_sel:
+        qs_tras_marca = qs_tras_anio.filter(
+            Q(vehiculo_desarme__marca__nombre__iexact=marca_sel)
+            | Q(vehiculo_desarme__marca_texto__iexact=marca_sel)
+        )
+    else:
+        qs_tras_marca = qs_tras_anio
+    modelos_rows = qs_tras_marca.values(
+        "vehiculo_desarme__modelo__nombre", "vehiculo_desarme__modelo_texto"
+    ).distinct()
+    modelos_disponibles = sorted({
+        r["vehiculo_desarme__modelo__nombre"] or r["vehiculo_desarme__modelo_texto"] or ""
+        for r in modelos_rows
+        if r["vehiculo_desarme__modelo__nombre"] or r["vehiculo_desarme__modelo_texto"]
+    })
+
+    # Aplicar todos los filtros
+    piezas_qs = qs_tras_marca
+    if modelo_sel:
+        piezas_qs = piezas_qs.filter(
+            Q(vehiculo_desarme__modelo__nombre__iexact=modelo_sel)
+            | Q(vehiculo_desarme__modelo_texto__iexact=modelo_sel)
+        )
     if q:
-        # Nombres canónicos que matchean el término de búsqueda (incluyendo el propio q)
         canonicos = set(
             AliasRepuesto.objects.filter(termino_busqueda__icontains=q)
             .values_list("pieza_canonica", flat=True)
         )
-        canonicos.add(q)  # el término mismo como fallback directo
-        from django.db.models import Q as DQ
-        filtro_texto = DQ(nombre__icontains=q) | DQ(codigo__icontains=q)
+        canonicos.add(q)
+        filtro_texto = Q(nombre__icontains=q) | Q(codigo__icontains=q)
         for canon in canonicos:
-            filtro_texto |= DQ(nombre__icontains=canon)
+            filtro_texto |= Q(nombre__icontains=canon)
         piezas_qs = piezas_qs.filter(filtro_texto)
 
-    # Paginación
-    paginator = Paginator(piezas_qs, 24)
-    page_num = request.GET.get("page", 1)
-    piezas = paginator.get_page(page_num)
+    piezas_qs = piezas_qs.order_by("-prioridad", "nombre")
 
-    # Precalcular URL de WhatsApp para cada pieza
+    paginator = Paginator(piezas_qs, 24)
+    piezas = paginator.get_page(request.GET.get("page", 1))
+
     tel = _telefono_wa(empresa.telefono)
     for pieza in piezas:
+        v = pieza.vehiculo_desarme
+        pieza.vehiculo_label = " ".join(filter(None, [
+            str(v.anio) if v and v.anio else None,
+            v.get_marca_display() if v else None,
+            v.get_modelo_display() if v else None,
+        ])) if v else ""
         if tel:
             msg = f"Hola! Me interesa el repuesto: {pieza.nombre}"
             if pieza.codigo:
                 msg += f" (cód. {pieza.codigo})"
+            if pieza.vehiculo_label:
+                msg += f" — Vehículo: {pieza.vehiculo_label}"
             precio = pieza.precio_venta_sugerido or pieza.precio_sugerido
             if precio:
                 msg += f" — Precio: ${precio:,.0f}"
@@ -91,13 +121,36 @@ def tienda_storefront(request, empresa_id: int):
         else:
             pieza.wa_url = None
 
+    hay_filtros = bool(q or anio_sel or marca_sel or modelo_sel)
     return render(request, "public/storefront/tienda.html", {
         "empresa": empresa,
         "piezas": piezas,
         "q": q,
-        "condicion_sel": condicion_sel,
-        "condiciones": CONDICION_CHOICES,
+        "anio_sel": anio_sel,
+        "marca_sel": marca_sel,
+        "modelo_sel": modelo_sel,
+        "anios_disponibles": anios_disponibles,
+        "marcas_disponibles": marcas_disponibles,
+        "modelos_disponibles": modelos_disponibles,
+        "hay_filtros": hay_filtros,
+        "total": piezas.paginator.count,
     })
+
+
+def tienda_storefront(request, empresa_id: int):
+    """Storefront público por empresa_id (URL legacy). Requiere kiosko_autorizado."""
+    empresa = get_object_or_404(
+        Empresa.objects.select_related("configuracion_comision"),
+        id=empresa_id,
+        configuracion_comision__kiosko_autorizado=True,
+    )
+    return _tienda_storefront_render(request, empresa)
+
+
+def tienda_storefront_slug(request, slug: str):
+    """Storefront público por slug amigable (/tienda/<slug>/). Accesible a cualquier empresa activa."""
+    empresa = get_object_or_404(Empresa, slug=slug)
+    return _tienda_storefront_render(request, empresa)
 
 
 def kiosko_centralizado(request):
