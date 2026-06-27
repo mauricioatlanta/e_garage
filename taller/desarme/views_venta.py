@@ -9,7 +9,15 @@ from django.db import transaction
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 
-from taller.models.pieza_desarme import PiezaDesarme, ESTADO_DISPONIBLE, ESTADO_VENDIDA
+from taller.models.pieza_desarme import (
+    PiezaDesarme,
+    ESTADO_DISPONIBLE,
+    ESTADO_VENDIDA,
+    ESTADO_SCRAP,
+    ESTADO_FALTANTE,
+)
+
+_ESTADOS_NO_VENDIBLES = {ESTADO_VENDIDA, ESTADO_SCRAP, ESTADO_FALTANTE}
 from taller.models.venta_desarme import VentaDesarme, LineaVentaDesarme
 from taller.models.vendedor_desarme import VendedorDesarme
 
@@ -50,9 +58,8 @@ def iniciar_venta_rapida(request):
         pk__in=pieza_ids,
         empresa=empresa,
         activo=True,
-        estado_pieza=ESTADO_DISPONIBLE,
         cantidad__gt=0,
-    )
+    ).exclude(estado_pieza__in=_ESTADOS_NO_VENDIBLES)
     piezas_by_id = {p.pk: p for p in piezas_qs}
 
     items = []
@@ -127,8 +134,8 @@ def confirmar_venta_rapida(request):
                 errores = []
                 for item in items:
                     p = piezas_locked.get(item["id"])
-                    if not p or p.estado_pieza != ESTADO_DISPONIBLE:
-                        errores.append(f"'{item['nombre']}' ya no está disponible.")
+                    if not p or p.estado_pieza in _ESTADOS_NO_VENDIBLES:
+                        errores.append(f"'{item['nombre']}' no está disponible para la venta.")
                     elif p.cantidad < item["cantidad"]:
                         errores.append(
                             f"'{item['nombre']}': stock insuficiente "
