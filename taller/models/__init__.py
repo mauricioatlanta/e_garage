@@ -51,6 +51,7 @@ from .vehiculo_financial import (
     VehicleFinancialEvent,
 )
 from .vendedor_desarme import VendedorDesarme
+from .venta_desarme import VentaDesarme, LineaVentaDesarme
 
 # Modelos de ubicación
 from .ubicacion import Estado, Ciudad

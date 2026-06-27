@@ -30,6 +30,7 @@ def _desarme_fallback_unavailable(request):
 
 try:
     from taller.desarme import views
+    from taller.desarme import views_venta
     from taller.desarme.views_inventario import (
         confirmar_venta_desde_inventario,
         crear_venta_desde_inventario,
@@ -117,6 +118,11 @@ try:
         path("interchange/crear/", views.crear_interchange, name="crear_interchange"),
         path("interchange/<int:pk>/eliminar/", views.eliminar_interchange, name="eliminar_interchange"),
         path("reportes/", views.reportes_desarme, name="reportes"),
+        path("ventas/", views_venta.lista_ventas, name="lista_ventas"),
+        path("ventas/nueva/", views_venta.confirmar_venta_rapida, name="confirmar_venta_rapida"),
+        path("ventas/iniciar/", views_venta.iniciar_venta_rapida, name="iniciar_venta_rapida"),
+        path("ventas/<int:pk>/recibo/", views_venta.recibo_venta, name="recibo_venta"),
+        path("ventas/<int:pk>/anular/", views_venta.anular_venta, name="anular_venta"),
     ]
 except ImportError:
     app_name = "desarme"

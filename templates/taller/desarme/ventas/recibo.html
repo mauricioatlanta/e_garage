@@ -1,0 +1,142 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load humanize %}
+{% load custom_filters %}
+{% load country_url %}
+
+{% block page_title %}Recibo #{{ venta.numero }}{% endblock %}
+{% block page_subtitle %}{{ venta.fecha|date:"d/m/Y H:i" }}{% if venta.cliente_nombre %} — {{ venta.cliente_nombre }}{% endif %}{% endblock %}
+{% block page_icon %}🧾{% endblock %}
+
+{% block page_stats %}
+<div class="desarme-nav-module flex flex-wrap gap-2 mt-4">
+  <a href="{% country_url 'desarme:lista_ventas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">🧾 Ventas</a>
+  <a href="{% country_url 'desarme:lista_piezas' %}" class="px-3 py-1.5 rounded-lg text-sm font-medium bg-black/30 border border-cyan-500/30 text-cyan-300 hover:bg-cyan-500/20">📦 Repuestos</a>
+</div>
+{% endblock %}
+
+{% block page_extra_css %}
+<style>
+  .recibo-wrap { max-width:680px; margin:0 auto; }
+  .recibo-box { background:rgba(15,23,42,.85); border:1px solid rgba(99,102,241,.3); border-radius:14px; padding:2rem; }
+  .recibo-header { text-align:center; margin-bottom:1.5rem; border-bottom:1px solid rgba(99,102,241,.2); padding-bottom:1rem; }
+  .recibo-header .empresa-nombre { font-size:1.2rem; font-weight:700; color:#e2e8f0; }
+  .recibo-header .recibo-num { font-size:2rem; font-weight:800; color:#a5b4fc; font-family:'Orbitron',monospace; letter-spacing:.05em; }
+  .recibo-meta { display:grid; grid-template-columns:1fr 1fr; gap:.5rem; font-size:.82rem; margin-bottom:1.5rem; }
+  .meta-item label { color:#64748b; display:block; font-size:.7rem; text-transform:uppercase; letter-spacing:.05em; }
+  .meta-item span { color:#cbd5e1; font-weight:500; }
+  .recibo-table { width:100%; border-collapse:collapse; font-size:.85rem; margin-bottom:1.5rem; }
+  .recibo-table th { color:#64748b; font-weight:600; padding:.4rem .5rem; border-bottom:1px solid rgba(99,102,241,.2); text-align:left; }
+  .recibo-table td { color:#cbd5e1; padding:.5rem .5rem; border-bottom:1px solid rgba(255,255,255,.04); }
+  .recibo-table .num { text-align:right; font-variant-numeric:tabular-nums; color:#a5b4fc; }
+  .recibo-total { text-align:right; font-size:1.5rem; font-weight:800; color:#34d399; border-top:2px solid rgba(52,211,153,.3); padding-top:.75rem; margin-top:.5rem; }
+  .recibo-footer { text-align:center; font-size:.75rem; color:#475569; margin-top:1.5rem; padding-top:1rem; border-top:1px solid rgba(99,102,241,.15); }
+  .badge-anulada { display:inline-block; background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.4); color:#f87171; border-radius:6px; padding:2px 10px; font-size:.75rem; font-weight:700; }
+  .badge-emitida { display:inline-block; background:rgba(52,211,153,.12); border:1px solid rgba(52,211,153,.35); color:#34d399; border-radius:6px; padding:2px 10px; font-size:.75rem; font-weight:700; }
+  .btn-imprimir { padding:.6rem 1.25rem; border-radius:8px; background:rgba(99,102,241,.2); border:1px solid rgba(99,102,241,.4); color:#a5b4fc; font-size:.85rem; font-weight:600; cursor:pointer; }
+  .btn-anular { padding:.6rem 1.25rem; border-radius:8px; background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.35); color:#f87171; font-size:.85rem; font-weight:600; cursor:pointer; }
+  @media print {
+    nav, header, .desarme-nav-module, .no-print { display:none !important; }
+    body { background:#fff !important; color:#000 !important; }
+    .recibo-box { border:none; background:#fff; color:#000; }
+    .recibo-header .recibo-num, .recibo-total { color:#000; }
+    .recibo-table th, .recibo-table td { color:#000; border-color:#ccc; }
+    .meta-item label { color:#555; }
+    .meta-item span { color:#000; }
+  }
+</style>
+{% endblock %}
+
+{% block panel_content %}
+<div class="recibo-wrap">
+
+  <div class="no-print flex gap-3 mb-4">
+    <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir recibo</button>
+    {% if venta.estado == 'EMITIDA' %}
+    <form method="post" action="{% country_url 'desarme:anular_venta' venta.pk %}" onsubmit="return confirm('¿Anular esta venta? El stock de las piezas se restaurará.');">
+      {% csrf_token %}
+      <button type="submit" class="btn-anular">🚫 Anular venta</button>
+    </form>
+    {% endif %}
+    <a href="{% country_url 'desarme:lista_piezas' %}" style="padding:.6rem 1.25rem;border-radius:8px;background:rgba(71,85,105,.5);color:#cbd5e1;font-size:.85rem;text-decoration:none;">← Nueva venta</a>
+  </div>
+
+  <div class="recibo-box">
+    <div class="recibo-header">
+      <div class="empresa-nombre">{{ request.user.empresa.nombre|default:"Desarmaduria" }}</div>
+      <div class="recibo-num">RECIBO #{{ venta.numero|stringformat:"04d" }}</div>
+      <div style="margin-top:.5rem;">
+        {% if venta.estado == 'ANULADA' %}
+          <span class="badge-anulada">ANULADA</span>
+        {% else %}
+          <span class="badge-emitida">EMITIDA</span>
+        {% endif %}
+      </div>
+    </div>
+
+    <div class="recibo-meta">
+      <div class="meta-item">
+        <label>Fecha</label>
+        <span>{{ venta.fecha|date:"d/m/Y H:i" }}</span>
+      </div>
+      <div class="meta-item">
+        <label>Cliente</label>
+        <span>{{ venta.cliente_nombre|default:"Sin nombre" }}</span>
+      </div>
+      {% if venta.vendedor %}
+      <div class="meta-item">
+        <label>Vendedor</label>
+        <span>{{ venta.vendedor.nombre }}</span>
+      </div>
+      {% endif %}
+      {% if venta.notas %}
+      <div class="meta-item" style="grid-column:1/-1;">
+        <label>Notas</label>
+        <span>{{ venta.notas }}</span>
+      </div>
+      {% endif %}
+    </div>
+
+    <table class="recibo-table">
+      <thead>
+        <tr>
+          <th>Código</th>
+          <th>Repuesto</th>
+          <th class="num">Cant.</th>
+          <th class="num">P. Unit.</th>
+          <th class="num">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for linea in venta.lineas.all %}
+        <tr>
+          <td><span style="font-family:monospace;color:#67e8f9;font-size:.8rem;">{{ linea.codigo_pieza|default:"—" }}</span></td>
+          <td>{{ linea.nombre_pieza }}</td>
+          <td class="num">{{ linea.cantidad }}</td>
+          <td class="num">
+            {% if request.path|slice:':4' == '/us/' %}${{ linea.precio_unitario|floatformat:2|intcomma }}
+            {% else %}${{ linea.precio_unitario|floatformat:0|add_thousands_separator }}{% endif %}
+          </td>
+          <td class="num">
+            {% if request.path|slice:':4' == '/us/' %}${{ linea.subtotal|floatformat:2|intcomma }}
+            {% else %}${{ linea.subtotal|floatformat:0|add_thousands_separator }}{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div class="recibo-total">
+      TOTAL:
+      {% if request.path|slice:':4' == '/us/' %}${{ venta.total|floatformat:2|intcomma }}
+      {% else %}${{ venta.total|floatformat:0|add_thousands_separator }}{% endif %}
+    </div>
+
+    <div class="recibo-footer">
+      Este recibo es válido como garantía de la compra.<br>
+      Gracias por su preferencia.
+    </div>
+  </div>
+
+</div>
+{% endblock %}
