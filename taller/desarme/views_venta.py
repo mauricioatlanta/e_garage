@@ -109,7 +109,7 @@ def confirmar_venta_rapida(request):
         return redirect(_url(request, "piezas/"))
 
     total = sum(i["subtotal"] for i in items)
-    vendedores = VendedorDesarme.objects.filter(empresa=empresa, activo=True).order_by("nombre")
+    vendedores = VendedorDesarme.objects.filter(empresa=empresa).order_by("nombre")
 
     if request.method == "POST":
         cliente_nombre = request.POST.get("cliente_nombre", "").strip()
