@@ -26,29 +26,44 @@
     background: rgba(52, 211, 153, 0.08);
   }
   /* Estado de la ficha */
+  .piece-card { position: relative; overflow: hidden; }
   .piece-card.estado-VENDIDA {
-    background: rgba(30, 27, 75, 0.35);
-    border-color: rgba(99, 102, 241, 0.25);
-    opacity: 0.65;
+    background: rgba(15, 15, 20, 0.7);
+    border-color: rgba(75, 75, 90, 0.4);
+    filter: grayscale(70%);
+    opacity: 0.6;
   }
-  .piece-card.estado-VENDIDA:hover { border-color: rgba(99, 102, 241, 0.45); opacity: 0.8; }
+  .piece-card.estado-VENDIDA::after {
+    content: "VENDIDA";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) rotate(-20deg);
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: rgba(239, 68, 68, 0.18);
+    letter-spacing: .15em;
+    pointer-events: none;
+    white-space: nowrap;
+  }
   .piece-card.estado-SCRAP {
-    background: rgba(20, 20, 20, 0.5);
-    border-color: rgba(107, 114, 128, 0.3);
-    opacity: 0.5;
+    background: rgba(20, 20, 20, 0.7);
+    border-color: rgba(107, 114, 128, 0.25);
+    filter: grayscale(90%);
+    opacity: 0.45;
   }
   .piece-card.estado-DANADA {
-    background: rgba(69, 10, 10, 0.3);
-    border-color: rgba(239, 68, 68, 0.35);
+    background: rgba(60, 8, 8, 0.4);
+    border-color: rgba(239, 68, 68, 0.5);
   }
   .piece-card.estado-RESERVADA {
-    background: rgba(66, 47, 5, 0.3);
-    border-color: rgba(234, 179, 8, 0.45);
+    background: rgba(60, 44, 4, 0.4);
+    border-color: rgba(234, 179, 8, 0.55);
   }
   .piece-card.estado-FALTANTE {
-    background: rgba(30, 20, 40, 0.4);
-    border-color: rgba(139, 92, 246, 0.3);
-    opacity: 0.6;
+    background: rgba(25, 15, 40, 0.5);
+    border-color: rgba(139, 92, 246, 0.35);
+    opacity: 0.55;
   }
   .btn-carrito {
     background: rgba(52, 211, 153, 0.15);
