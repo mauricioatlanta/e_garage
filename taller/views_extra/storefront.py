@@ -103,11 +103,15 @@ def _tienda_storefront_render(request, empresa):
     tel = _telefono_wa(empresa.telefono)
     for pieza in piezas:
         v = pieza.vehiculo_desarme
-        pieza.vehiculo_label = " ".join(filter(None, [
-            str(v.anio) if v and v.anio else None,
+        pieza.vehiculo_anio_str = str(v.anio) if v and v.anio else ""
+        pieza.vehiculo_marcamodelo_str = " ".join(filter(None, [
             v.get_marca_display() if v else None,
             v.get_modelo_display() if v else None,
         ])) if v else ""
+        pieza.vehiculo_label = " ".join(filter(None, [
+            pieza.vehiculo_anio_str,
+            pieza.vehiculo_marcamodelo_str,
+        ]))
         if tel:
             msg = f"Hola! Me interesa el repuesto: {pieza.nombre}"
             if pieza.codigo:

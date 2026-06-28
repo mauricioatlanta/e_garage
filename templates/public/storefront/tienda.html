@@ -155,16 +155,6 @@
   }
   @media (max-width: 480px) { .piezas-grid { grid-template-columns: 1fr 1fr; gap: .6rem; } }
 
-  /* ── Card mejorada ── */
-  .card-veh-label {
-    font-size: .7rem;
-    color: #475569;
-    display: flex;
-    align-items: center;
-    gap: .25rem;
-    margin-top: .15rem;
-  }
-
   /* ── Vacío ── */
   .estado-vacio {
     grid-column: 1/-1;
@@ -272,69 +262,81 @@
 
     {% else %}
       {% for pieza in piezas %}
-      <article class="card-pieza overflow-hidden flex flex-col">
+      <article class="bg-[#0f172a] border border-cyan-500/30 rounded-xl p-4 flex flex-col justify-between shadow-lg shadow-cyan-950/20 hover:border-cyan-400 hover:shadow-cyan-500/10 transition-all duration-300 group">
 
-        {# Imagen #}
-        <div class="h-36 overflow-hidden rounded-t-xl flex-shrink-0">
+        {# Encabezado: ícono/imagen + badge de condición #}
+        <div class="flex justify-between items-start mb-3">
           {% if pieza.imagen %}
             <img src="{{ pieza.imagen.url }}" alt="{{ pieza.nombre }}"
-                 class="w-full h-full object-cover">
+                 class="w-11 h-11 object-cover rounded-lg border border-slate-700 flex-shrink-0">
           {% else %}
-            <div class="sin-imagen w-full h-full rounded-t-xl">⚙️</div>
+            <div class="p-2.5 bg-slate-800/60 rounded-lg border border-slate-700 group-hover:border-cyan-500/40 transition-colors flex-shrink-0">
+              <svg class="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.296 2.247a1.125 1.125 0 0 1-.26 1.43l-1.003.767c-.18.138-.285.337-.295.544a8.75 8.75 0 0 0 0 1.334c.01.207.116.406.295.544l1.004.765a1.125 1.125 0 0 1 .26 1.43l-1.296 2.247a1.125 1.125 0 0 1-1.37.49l-1.216-.456a1.125 1.125 0 0 0-1.075.124 8.08 8.08 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281a1.125 1.125 0 0 0-.646-.87 8.08 8.08 0 0 1-.22-.127c-.324-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.297-2.247a1.125 1.125 0 0 1 .26-1.43l1.004-.767c.18-.138.285-.337.295-.544a8.774 8.774 0 0 0 0-1.334c-.01-.207-.116-.406-.295-.544l-1.004-.765a1.125 1.125 0 0 1-.26-1.43l1.297-2.247a1.125 1.125 0 0 1 1.37-.49l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.645-.869l.214-1.28Z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+              </svg>
+            </div>
           {% endif %}
+          <span class="badge-condicion badge-{{ pieza.condicion }} flex-shrink-0">
+            {{ pieza.get_condicion_display }}
+          </span>
         </div>
 
-        {# Cuerpo #}
-        <div class="p-3 flex flex-col flex-1 gap-1.5">
+        {# Nombre y compatibilidad de vehículo #}
+        <div class="mb-4 flex-1">
+          <h2 class="text-white font-bold text-base leading-snug tracking-tight mb-2 group-hover:text-cyan-300 transition-colors">
+            {{ pieza.nombre }}
+          </h2>
 
-          {# Nombre + condición #}
-          <div class="flex items-start justify-between gap-1.5">
-            <h2 class="text-sm font-semibold text-white leading-snug">{{ pieza.nombre }}</h2>
-            <span class="badge-condicion badge-{{ pieza.condicion }} flex-shrink-0 text-xs">
-              {{ pieza.get_condicion_display }}
-            </span>
-          </div>
-
-          {# Vehículo de origen #}
+          {# Badge de compatibilidad — marca/modelo + año separados y resaltados #}
           {% if pieza.vehiculo_label %}
-          <p class="card-veh-label">
-            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24"
-                 fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-2"/>
-              <circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>
-            </svg>
-            {{ pieza.vehiculo_label }}
-          </p>
-          {% endif %}
-
-          {# Observaciones #}
-          {% if pieza.observaciones %}
-            <p class="text-xs text-slate-400 leading-relaxed line-clamp-2">{{ pieza.observaciones }}</p>
-          {% endif %}
-
-          {# Precio + WhatsApp #}
-          <div class="flex items-end justify-between mt-auto pt-2 border-t border-slate-700/60">
-            <div>
-              {% if pieza.precio_venta_sugerido %}
-                <span class="precio">${{ pieza.precio_venta_sugerido|floatformat:"0"|intcomma }}</span>
-              {% elif pieza.precio_sugerido %}
-                <span class="precio">${{ pieza.precio_sugerido|floatformat:"0"|intcomma }}</span>
-              {% else %}
-                <span class="text-xs text-slate-500">Consultar precio</span>
+          <div class="inline-flex items-center gap-1.5 font-mono text-xs text-slate-200 bg-slate-800 border border-slate-700 px-2.5 py-1 rounded-md">
+            {% if pieza.vehiculo_marcamodelo_str %}
+              <span class="font-bold text-cyan-400">{{ pieza.vehiculo_marcamodelo_str }}</span>
+              {% if pieza.vehiculo_anio_str %}
+                <span class="text-slate-500">|</span>
+                <span>{{ pieza.vehiculo_anio_str }}</span>
               {% endif %}
-            </div>
-            {% if pieza.wa_url %}
-              <a href="{{ pieza.wa_url }}" target="_blank" rel="noopener" class="btn-wa">
-                <svg viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 flex-shrink-0">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.531 5.847L0 24l6.305-1.507A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.795 9.795 0 01-4.994-1.366l-.358-.213-3.742.895.939-3.633-.234-.374A9.774 9.774 0 012.182 12c0-5.41 4.408-9.818 9.818-9.818 5.41 0 9.818 4.408 9.818 9.818 0 5.41-4.408 9.818-9.818 9.818z"/>
-                </svg>
-                Consultar
-              </a>
+            {% else %}
+              <span class="font-bold text-cyan-400">{{ pieza.vehiculo_label }}</span>
             {% endif %}
           </div>
+          {% endif %}
 
+          {# Nota de fotos bajo demanda #}
+          {% if not pieza.imagen %}
+          <p class="text-[11px] text-slate-500 font-mono mt-2">📷 Solicita fotos reales por WhatsApp</p>
+          {% endif %}
+
+          {# Observaciones opcionales #}
+          {% if pieza.observaciones %}
+            <p class="text-xs text-slate-400 leading-relaxed line-clamp-2 mt-2">{{ pieza.observaciones }}</p>
+          {% endif %}
         </div>
+
+        {# Precio + botón WhatsApp #}
+        <div class="flex items-center justify-between pt-3 border-t border-slate-800/80">
+          <div>
+            {% if pieza.precio_venta_sugerido %}
+              <span class="precio">${{ pieza.precio_venta_sugerido|floatformat:"0"|intcomma }}</span>
+            {% elif pieza.precio_sugerido %}
+              <span class="precio">${{ pieza.precio_sugerido|floatformat:"0"|intcomma }}</span>
+            {% else %}
+              <span class="text-xs text-slate-500">Consultar precio</span>
+            {% endif %}
+          </div>
+          {% if pieza.wa_url %}
+            <a href="{{ pieza.wa_url }}" target="_blank" rel="noopener"
+               class="flex items-center gap-1.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs px-3 py-2 rounded-md shadow-md shadow-emerald-950/20 transition-all active:scale-95">
+              <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.124.558 4.118 1.531 5.847L0 24l6.305-1.507A11.942 11.942 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.795 9.795 0 01-4.994-1.366l-.358-.213-3.742.895.939-3.633-.234-.374A9.774 9.774 0 012.182 12c0-5.41 4.408-9.818 9.818-9.818 5.41 0 9.818 4.408 9.818 9.818 0 5.41-4.408 9.818-9.818 9.818z"/>
+              </svg>
+              Consultar
+            </a>
+          {% endif %}
+        </div>
+
       </article>
       {% endfor %}
     {% endif %}
