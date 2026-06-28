@@ -35,6 +35,18 @@
   .badge-emitida { display:inline-block; background:rgba(52,211,153,.12); border:1px solid rgba(52,211,153,.35); color:#34d399; border-radius:6px; padding:2px 10px; font-size:.75rem; font-weight:700; }
   .btn-imprimir { padding:.6rem 1.25rem; border-radius:8px; background:rgba(99,102,241,.2); border:1px solid rgba(99,102,241,.4); color:#a5b4fc; font-size:.85rem; font-weight:600; cursor:pointer; }
   .btn-anular { padding:.6rem 1.25rem; border-radius:8px; background:rgba(239,68,68,.15); border:1px solid rgba(239,68,68,.35); color:#f87171; font-size:.85rem; font-weight:600; cursor:pointer; }
+  .btn-whatsapp { padding:.6rem 1.25rem; border-radius:8px; background:rgba(37,211,102,.15); border:1px solid rgba(37,211,102,.4); color:#25d366; font-size:.85rem; font-weight:600; cursor:pointer; }
+  .wa-modal-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.75); z-index:1000; align-items:center; justify-content:center; }
+  .wa-modal-backdrop.open { display:flex; }
+  .wa-modal { background:#0f172a; border:1px solid rgba(37,211,102,.3); border-radius:14px; padding:1.5rem; width:360px; max-width:95vw; }
+  .wa-modal h3 { color:#25d366; font-size:1rem; font-weight:700; margin-bottom:.75rem; }
+  .wa-input { width:100%; background:rgba(15,23,42,.8); border:1px solid rgba(37,211,102,.3); border-radius:8px; padding:.6rem .75rem; color:#e2e8f0; font-size:.95rem; margin-bottom:.75rem; box-sizing:border-box; }
+  .wa-input:focus { outline:none; border-color:#25d366; }
+  .wa-input::placeholder { color:#475569; }
+  .wa-hint { font-size:.75rem; color:#64748b; margin-bottom:.75rem; }
+  .btn-wa-enviar { width:100%; padding:.65rem; border-radius:8px; background:rgba(37,211,102,.2); border:1px solid rgba(37,211,102,.5); color:#25d366; font-weight:700; font-size:.9rem; cursor:pointer; }
+  .btn-wa-enviar:hover { background:rgba(37,211,102,.3); }
+  .btn-wa-cancel { width:100%; padding:.5rem; border-radius:8px; background:transparent; border:none; color:#64748b; font-size:.85rem; cursor:pointer; margin-top:.5rem; }
   @media print {
     nav, header, .desarme-nav-module, .no-print { display:none !important; }
     body { background:#fff !important; color:#000 !important; }
@@ -50,8 +62,9 @@
 {% block panel_content %}
 <div class="recibo-wrap">
 
-  <div class="no-print flex gap-3 mb-4">
+  <div class="no-print flex gap-3 mb-4 flex-wrap">
     <button class="btn-imprimir" onclick="window.print()">🖨️ Imprimir recibo</button>
+    <button class="btn-whatsapp" onclick="abrirModalWA()">📱 Enviar por WhatsApp</button>
     {% if venta.estado == 'EMITIDA' %}
     <form method="post" action="{% country_url 'desarme:anular_venta' venta.pk %}" onsubmit="return confirm('¿Anular esta venta? El stock de las piezas se restaurará.');">
       {% csrf_token %}
@@ -59,6 +72,17 @@
     </form>
     {% endif %}
     <a href="{% country_url 'desarme:lista_piezas' %}" style="padding:.6rem 1.25rem;border-radius:8px;background:rgba(71,85,105,.5);color:#cbd5e1;font-size:.85rem;text-decoration:none;">← Nueva venta</a>
+  </div>
+
+  {# ── Modal WhatsApp ── #}
+  <div id="waModal" class="wa-modal-backdrop no-print" onclick="if(event.target===this)cerrarModalWA()">
+    <div class="wa-modal">
+      <h3>📱 Enviar recibo por WhatsApp</h3>
+      <p class="wa-hint">Ingresa el número con código de país, sin espacios ni guiones.<br>Ej: <strong style="color:#94a3b8">56912345678</strong></p>
+      <input id="waTelefono" class="wa-input" type="tel" placeholder="56912345678" autofocus>
+      <button class="btn-wa-enviar" onclick="enviarWA()">Abrir WhatsApp →</button>
+      <button class="btn-wa-cancel" onclick="cerrarModalWA()">Cancelar</button>
+    </div>
   </div>
 
   <div class="recibo-box">
@@ -139,4 +163,45 @@
   </div>
 
 </div>
+{% endblock %}
+
+{% block page_extra_js %}
+<script>
+function abrirModalWA() {
+  document.getElementById('waModal').classList.add('open');
+  setTimeout(() => document.getElementById('waTelefono').focus(), 100);
+}
+function cerrarModalWA() {
+  document.getElementById('waModal').classList.remove('open');
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModalWA(); });
+
+function enviarWA() {
+  const raw = document.getElementById('waTelefono').value.trim().replace(/[\s\-\(\)]/g, '');
+  if (!raw) { document.getElementById('waTelefono').focus(); return; }
+
+  const empresa = "{{ request.user.empresa.nombre|default:'Desarmaduria'|escapejs }}";
+  const numero  = "{{ venta.numero|stringformat:'04d' }}";
+  const fecha   = "{{ venta.fecha|date:'d/m/Y H:i' }}";
+  const cliente = "{{ venta.cliente_nombre|default:'Sin nombre'|escapejs }}";
+  const total   = "{{ venta.total|floatformat:0 }}";
+
+  const lineas = [
+    {% for l in venta.lineas.all %}"  • {{ l.nombre_pieza|escapejs }} x{{ l.cantidad }} = ${{ l.subtotal|floatformat:0 }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}
+  ];
+
+  let msg = `🧾 *RECIBO #${numero}*\n`;
+  msg += `📅 ${fecha}\n`;
+  msg += `🏪 ${empresa}\n`;
+  msg += `👤 Cliente: ${cliente}\n\n`;
+  msg += `*Detalle:*\n` + lineas.join('\n') + '\n\n';
+  msg += `*TOTAL: $${parseInt(total).toLocaleString('es-CL')}*\n\n`;
+  msg += `Gracias por su preferencia 🙏`;
+
+  const url = `https://wa.me/${raw}?text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+  cerrarModalWA();
+}
+</script>
 {% endblock %}
