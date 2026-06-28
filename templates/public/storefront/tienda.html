@@ -79,6 +79,9 @@
     grid-template-columns: 1fr 1fr 1fr;
     gap: .5rem;
   }
+  .vehicle-filters.con-motor {
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+  }
   .v-select {
     background: #1e293b;
     border: 1px solid rgba(148,163,184,.2);
@@ -199,7 +202,7 @@
     </div>
 
     {# Filtros de vehículo #}
-    <div class="vehicle-filters">
+    <div class="vehicle-filters{% if motores_disponibles %} con-motor{% endif %}">
       <select name="anio" class="v-select" onchange="this.form.submit()" title="Año">
         <option value="">Año</option>
         {% for anio in anios_disponibles %}
@@ -226,6 +229,17 @@
           </option>
         {% endfor %}
       </select>
+
+      {% if motores_disponibles %}
+      <select name="motor" class="v-select" onchange="this.form.submit()" title="Motor">
+        <option value="">Motor</option>
+        {% for motor in motores_disponibles %}
+          <option value="{{ motor }}" {% if motor_sel == motor %}selected{% endif %}>
+            {{ motor }}
+          </option>
+        {% endfor %}
+      </select>
+      {% endif %}
     </div>
 
     {# Chips de filtros activos #}
@@ -235,6 +249,7 @@
       {% if anio_sel %}<span class="chip">{{ anio_sel }}</span>{% endif %}
       {% if marca_sel %}<span class="chip">{{ marca_sel }}</span>{% endif %}
       {% if modelo_sel %}<span class="chip">{{ modelo_sel }}</span>{% endif %}
+      {% if motor_sel %}<span class="chip">Motor: {{ motor_sel }}</span>{% endif %}
       <a href="?" class="limpiar-todo">Limpiar filtros</a>
     </div>
     {% endif %}
@@ -347,12 +362,12 @@
   {% if piezas.has_other_pages %}
   <nav class="mt-8 flex justify-center gap-2 text-sm">
     {% if piezas.has_previous %}
-      <a href="?q={{ q }}&anio={{ anio_sel }}&marca={{ marca_sel }}&modelo={{ modelo_sel }}&page={{ piezas.previous_page_number }}"
+      <a href="?q={{ q }}&anio={{ anio_sel }}&marca={{ marca_sel }}&modelo={{ modelo_sel }}&motor={{ motor_sel }}&page={{ piezas.previous_page_number }}"
          class="px-4 py-2 rounded-lg border border-slate-700 text-slate-300 hover:border-cyan-400 transition-colors">← Anterior</a>
     {% endif %}
     <span class="px-4 py-2 text-slate-500">{{ piezas.number }} / {{ piezas.paginator.num_pages }}</span>
     {% if piezas.has_next %}
-      <a href="?q={{ q }}&anio={{ anio_sel }}&marca={{ marca_sel }}&modelo={{ modelo_sel }}&page={{ piezas.next_page_number }}"
+      <a href="?q={{ q }}&anio={{ anio_sel }}&marca={{ marca_sel }}&modelo={{ modelo_sel }}&motor={{ motor_sel }}&page={{ piezas.next_page_number }}"
          class="px-4 py-2 rounded-lg border border-slate-700 text-slate-300 hover:border-cyan-400 transition-colors">Siguiente →</a>
     {% endif %}
   </nav>

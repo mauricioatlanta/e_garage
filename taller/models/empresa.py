@@ -86,6 +86,12 @@ class Empresa(models.Model):
         blank=True,
         help_text="Identificador URL de la tienda pública (/tienda/{slug})",
     )
+    marcas_permitidas_catalogo = models.CharField(
+        max_length=255,
+        blank=True,
+        default="",
+        help_text="Marcas visibles en el catálogo público, separadas por coma (ej: Peugeot, Citroen). Vacío = todas.",
+    )
     nombre_taller = models.CharField(
         max_length=100, default="Mi Taller"
     )  # Migrado desde TallerInfo
