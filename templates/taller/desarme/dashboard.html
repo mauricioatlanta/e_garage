@@ -389,11 +389,11 @@
 <div class="chart-box" style="margin-bottom:0;">
   {% if empresa.slug %}
     {% url 'tienda:tienda_storefront_slug' slug=empresa.slug as storefront_url %}
-    <p class="text-xs text-slate-300 mb-2">Comparte este enlace con tus clientes para que vean las piezas disponibles y te contacten por WhatsApp.</p>
+    <p style="font-size:0.75rem;color:#cbd5e1;margin-bottom:0.5rem;">Comparte este enlace con tus clientes para que vean las piezas disponibles y te contacten por WhatsApp.</p>
     <div class="flex items-center gap-2 flex-wrap">
       <code class="text-xs bg-slate-800 border border-slate-600 rounded px-2 py-1 text-cyan-300 select-all break-all" id="storefront-url-text">{{ request.scheme }}://{{ request.get_host }}{{ storefront_url }}</code>
       <button type="button" onclick="navigator.clipboard.writeText(document.getElementById('storefront-url-text').innerText).then(function(){this.textContent='✓ Copiado';setTimeout(function(){document.querySelector('#storefront-copy-btn').textContent='Copiar';},1500);}.bind(this))" id="storefront-copy-btn"
-              class="text-xs px-3 py-1 rounded border border-indigo-400 text-indigo-200 hover:bg-indigo-400/20 transition-colors flex-shrink-0">
+              style="font-size:0.75rem;padding:0.25rem 0.75rem;border-radius:6px;border:1px solid #818cf8;color:#c7d2fe;background:transparent;cursor:pointer;flex-shrink:0;">
         Copiar
       </button>
       <a href="{{ storefront_url }}" target="_blank" rel="noopener"
