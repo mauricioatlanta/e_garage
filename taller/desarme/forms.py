@@ -3,8 +3,15 @@ from decimal import Decimal, InvalidOperation
 from django import forms
 from django.utils.translation import gettext_lazy as _
 
-from taller.models.extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
+from taller.models.extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    ColorVehiculo,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
 from taller.models.pieza_desarme import CONDICION_CHOICES, PiezaDesarme
+from taller.models.vehiculo_desarme import ESTADO_DESARME_CHOICES as _MODELO_ESTADO_DESARME_CHOICES
 from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 from taller.models.vendedor_desarme import VendedorDesarme
@@ -13,14 +20,10 @@ ANIOS_CHOICES = [("", "---------")] + [
     (y, str(y)) for y in range(2026, 1969, -1)
 ]  # 2026-1970 descendente
 
-ESTADO_DESARME_CHOICES = [
-    ("", _("---------")),
-    ("en_yarda", _("En yarda")),
-    ("en_proceso", _("En proceso")),
-    ("completado", _("Completado")),
-    ("vendido", _("Vendido")),
-    ("baja", _("De baja")),
-]
+# Fuente única de verdad: los choices del modelo VehiculoDesarme (no una lista
+# propia del form). ESTADO_DESARME_CHOICES vive como constante a nivel de módulo
+# en taller/models/vehiculo_desarme.py, no como atributo de clase.
+ESTADO_DESARME_CHOICES = [("", _("---------"))] + list(_MODELO_ESTADO_DESARME_CHOICES)
 
 CARROCERIA_CHOICES = [
     ("", "---------"),
@@ -107,7 +110,7 @@ class VehiculoDesarmeForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Vehiculo
+        model = VehiculoDesarme
         fields = [
             "patente",
             "vin",
@@ -130,7 +133,8 @@ class VehiculoDesarmeForm(forms.ModelForm):
         self.empresa = kwargs.pop("empresa", None)
         super().__init__(*args, **kwargs)
 
-        self.instance.cliente = None
+        # VehiculoDesarme no tiene cliente ni tipo_uso -- a diferencia de Vehiculo,
+        # no hace falta forzarlos acá; el modelo ya es "solo desarme" por diseño.
         if self.empresa:
             self.instance.empresa = self.empresa
 
@@ -145,6 +149,9 @@ class VehiculoDesarmeForm(forms.ModelForm):
         pais = "US"
         if self.empresa and hasattr(self.empresa, "pais") and self.empresa.pais:
             pais = str(self.empresa.pais).upper()[:2] or "US"
+        # Guardado para uso en clean_motor/clean_caja (debe ser el mismo país usado aquí
+        # para poblar los <select>, si no los IDs no calzan).
+        self._pais = pais
 
         # Ajustar campos monetarios según país
         _PAISES_ENTERO = {"CL", "AR", "UY", "PE", "VE", "CO"}
@@ -192,35 +199,49 @@ class VehiculoDesarmeForm(forms.ModelForm):
                     attrs={"class": "input-desarme", "step": "0.01", "placeholder": "0.00"}
                 )
 
-        # Motor: Select nativo (evitar dal-select2 que a veces no renderiza)
+        # Motor: CharField (no ModelChoiceField) para poder aceptar "empresa:<id>"
+        # (motor privado creado vía AJAX) además del id del catálogo global. La
+        # resolución real ocurre en clean_motor(); acá solo se arma el <select>.
         if "motor" in self.fields:
-            self.fields["motor"].widget = forms.Select(attrs={"class": "input-desarme"})
-            self.fields["motor"].queryset = MotorVehiculo.objects.filter(country=pais).order_by(
-                "nombre"
+            motor_label = self.fields["motor"].label
+            motor_choices = [("", "---------")] + [
+                (str(m.pk), m.nombre)
+                for m in MotorVehiculo.objects.filter(country=pais).order_by("nombre")
+            ]
+            motor_initial = None
+            if self.instance and self.instance.pk:
+                if getattr(self.instance, "motor_empresa_id", None):
+                    motor_initial = f"empresa:{self.instance.motor_empresa_id}"
+                    motor_choices.append((motor_initial, str(self.instance.motor_empresa)))
+                elif self.instance.motor_id:
+                    motor_initial = str(self.instance.motor_id)
+            self.fields["motor"] = forms.CharField(
+                required=False,
+                label=motor_label,
+                initial=motor_initial,
+                widget=forms.Select(choices=motor_choices, attrs={"class": "input-desarme"}),
             )
-            # Leniente: si el valor enviado no está en el queryset (ej. "empresa:N" del AJAX),
-            # tratar como None en lugar de lanzar invalid_choice.
-            _m_clean = self.fields["motor"].clean
-            def _lenient_motor(val, _orig=_m_clean):
-                try:
-                    return _orig(val)
-                except Exception:
-                    return None
-            self.fields["motor"].clean = _lenient_motor
 
-        # Caja: Select nativo
+        # Caja: mismo patrón que motor.
         if "caja" in self.fields:
-            self.fields["caja"].widget = forms.Select(attrs={"class": "input-desarme"})
-            self.fields["caja"].queryset = CajaVehiculo.objects.filter(country=pais).order_by(
-                "nombre"
+            caja_label = self.fields["caja"].label
+            caja_choices = [("", "---------")] + [
+                (str(c.pk), c.nombre)
+                for c in CajaVehiculo.objects.filter(country=pais).order_by("nombre")
+            ]
+            caja_initial = None
+            if self.instance and self.instance.pk:
+                if getattr(self.instance, "caja_empresa_id", None):
+                    caja_initial = f"empresa:{self.instance.caja_empresa_id}"
+                    caja_choices.append((caja_initial, str(self.instance.caja_empresa)))
+                elif self.instance.caja_id:
+                    caja_initial = str(self.instance.caja_id)
+            self.fields["caja"] = forms.CharField(
+                required=False,
+                label=caja_label,
+                initial=caja_initial,
+                widget=forms.Select(choices=caja_choices, attrs={"class": "input-desarme"}),
             )
-            _c_clean = self.fields["caja"].clean
-            def _lenient_caja(val, _orig=_c_clean):
-                try:
-                    return _orig(val)
-                except Exception:
-                    return None
-            self.fields["caja"].clean = _lenient_caja
 
         # Color: Select nativo
         if "color" in self.fields:
@@ -345,6 +366,87 @@ class VehiculoDesarmeForm(forms.ModelForm):
             return self._clean_money_cl("otros_gastos")
         return self.cleaned_data.get("otros_gastos")
 
+    def clean_motor(self):
+        """Aceptar motor global (id numérico) o privado de empresa ("empresa:<id>").
+
+        Portado de VehiculoForm.clean_motor (taller/vehiculos/forms.py). A diferencia
+        del wrapper "lenient" anterior, acá una referencia inválida es un error de
+        validación explícito, no se traga en silencio.
+        """
+        raw_value = (self.cleaned_data.get("motor") or "").strip()
+        empresa = self.empresa
+        pais = self._pais
+        modelo = self.cleaned_data.get("modelo")
+
+        if not raw_value:
+            self._motor_empresa_obj = None
+            return None
+
+        if raw_value.startswith("empresa:"):
+            if not empresa or not modelo:
+                raise forms.ValidationError(
+                    "Motor privado no válido: falta empresa o modelo."
+                )
+            private_id = raw_value.split(":", 1)[1]
+            try:
+                motor_privado = MotorVehiculoEmpresa.objects.get(
+                    pk=private_id,
+                    empresa=empresa,
+                    modelo=modelo,
+                    country=pais,
+                )
+            except (MotorVehiculoEmpresa.DoesNotExist, ValueError):
+                raise forms.ValidationError("Motor privado no válido.")
+            self._motor_empresa_obj = motor_privado
+            return None
+
+        try:
+            motor = MotorVehiculo.objects.get(pk=raw_value, country=pais)
+        except (MotorVehiculo.DoesNotExist, ValueError):
+            raise forms.ValidationError("Motor no válido.")
+        self._motor_empresa_obj = None
+        return motor
+
+    def clean_caja(self):
+        """Aceptar caja global (id numérico) o privada de empresa ("empresa:<id>").
+
+        Portado de VehiculoForm.clean_caja (taller/vehiculos/forms.py). Fail loud:
+        una referencia inválida levanta ValidationError, no se traga en silencio.
+        """
+        raw_value = (self.cleaned_data.get("caja") or "").strip()
+        empresa = self.empresa
+        pais = self._pais
+        modelo = self.cleaned_data.get("modelo")
+
+        if not raw_value:
+            self._caja_empresa_obj = None
+            return None
+
+        if raw_value.startswith("empresa:"):
+            if not empresa or not modelo:
+                raise forms.ValidationError(
+                    "Caja privada no válida: falta empresa o modelo."
+                )
+            private_id = raw_value.split(":", 1)[1]
+            try:
+                caja_privada = CajaVehiculoEmpresa.objects.get(
+                    pk=private_id,
+                    empresa=empresa,
+                    modelo=modelo,
+                    country=pais,
+                )
+            except (CajaVehiculoEmpresa.DoesNotExist, ValueError):
+                raise forms.ValidationError("Caja privada no válida.")
+            self._caja_empresa_obj = caja_privada
+            return None
+
+        try:
+            caja = CajaVehiculo.objects.get(pk=raw_value, country=pais)
+        except (CajaVehiculo.DoesNotExist, ValueError):
+            raise forms.ValidationError("Caja no válida.")
+        self._caja_empresa_obj = None
+        return caja
+
     def clean(self):
         from django.core.exceptions import ValidationError
 
@@ -370,19 +472,30 @@ class VehiculoDesarmeForm(forms.ModelForm):
             self.add_error("patente", "Debe registrar al menos Patente o VIN.")
             self.add_error("vin", "Debe registrar al menos Patente o VIN.")
 
-        # Validar unicidad VIN y patente por empresa (evitar IntegrityError en save)
+        # Validar unicidad VIN y patente contra Vehiculo Y VehiculoDesarme -- evita
+        # IntegrityError en save y que un mismo VIN quede en un vehículo de cliente
+        # (Vehiculo) y uno de desarme (VehiculoDesarme) a la vez. Se excluye el
+        # Vehiculo legacy origen de este mismo VehiculoDesarme (vehiculo_origen_id),
+        # si lo tiene: no es un duplicado, es su propio par migrado por 0078/0141.
         if self.empresa:
+            origen_id = getattr(self.instance, "vehiculo_origen_id", None)
             if vin:
-                qs = Vehiculo.objects.filter(empresa=self.empresa, vin=vin)
+                qs_vehiculo = Vehiculo.objects.filter(empresa=self.empresa, vin=vin)
+                if origen_id:
+                    qs_vehiculo = qs_vehiculo.exclude(pk=origen_id)
+                qs_desarme = VehiculoDesarme.objects.filter(empresa=self.empresa, vin=vin)
                 if self.instance.pk:
-                    qs = qs.exclude(pk=self.instance.pk)
-                if qs.exists():
+                    qs_desarme = qs_desarme.exclude(pk=self.instance.pk)
+                if qs_vehiculo.exists() or qs_desarme.exists():
                     self.add_error("vin", "Ya existe un vehículo con este VIN en esta empresa.")
             if patente:
-                qs = Vehiculo.objects.filter(empresa=self.empresa, patente=patente)
+                qs_vehiculo = Vehiculo.objects.filter(empresa=self.empresa, patente=patente)
+                if origen_id:
+                    qs_vehiculo = qs_vehiculo.exclude(pk=origen_id)
+                qs_desarme = VehiculoDesarme.objects.filter(empresa=self.empresa, patente=patente)
                 if self.instance.pk:
-                    qs = qs.exclude(pk=self.instance.pk)
-                if qs.exists():
+                    qs_desarme = qs_desarme.exclude(pk=self.instance.pk)
+                if qs_vehiculo.exists() or qs_desarme.exists():
                     self.add_error(
                         "patente", "Ya existe un vehículo con esta patente en esta empresa."
                     )
@@ -391,9 +504,13 @@ class VehiculoDesarmeForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        instance.cliente = None
         if self.empresa:
             instance.empresa = self.empresa
+        # Motor/caja privados de empresa: clean_motor/clean_caja ya resolvieron el
+        # objeto (o None) y devolvieron None para el campo global cuando corresponde,
+        # así que acá solo queda asignar la FK privada calculada.
+        instance.motor_empresa = getattr(self, "_motor_empresa_obj", None)
+        instance.caja_empresa = getattr(self, "_caja_empresa_obj", None)
         # Carrocería: si eligió "otro" y hay texto, guardar ese texto
         tc = (self.cleaned_data.get("tipo_carroceria") or "").strip()
         tc_otro = (self.cleaned_data.get("tipo_carroceria_otro") or "").strip()
