@@ -2,7 +2,7 @@
 {% load static %}
 {% load country_url %}
 
-{% block title %}Inspección #{{ inspeccion.pk }} – {{ inspeccion.vehiculo }}{% endblock %}
+{% block title %}Inspección #{{ inspeccion.pk }} – {{ inspeccion.vehiculo|default:inspeccion.vehiculo_desarme }}{% endblock %}
 
 {% block content %}
 <div class="min-h-screen bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900">
@@ -13,7 +13,7 @@
     <div class="flex justify-between items-start">
       <div>
         <h1 class="text-2xl font-bold text-cyan-200 mb-1">🔍 Inspección de Ingreso</h1>
-        <p class="text-gray-400 text-sm">{{ inspeccion.vehiculo }}</p>
+        <p class="text-gray-400 text-sm">{{ inspeccion.vehiculo|default:inspeccion.vehiculo_desarme }}</p>
         {% if inspeccion.documento %}
         <p class="text-gray-500 text-xs mt-0.5">
           Vinculada a: <a href="{% country_url 'documentos:ver_documento' inspeccion.documento.pk %}"

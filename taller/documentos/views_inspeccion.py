@@ -54,7 +54,9 @@ def _telefono_para_wame(telefono: str, pais: str) -> str:
 
 def _generar_texto_inspeccion(inspeccion, empresa_nombre: str) -> str:
     """Texto plano del reporte de inspección, reutilizable para WhatsApp y email."""
-    vehiculo = str(inspeccion.vehiculo)
+    # vehiculo puede ser None cuando el origen es un VehiculoDesarme
+    # (taller/desarme/views.py:_guardar_danos_carroceria) -- usar vehiculo_desarme.
+    vehiculo = str(inspeccion.vehiculo or inspeccion.vehiculo_desarme)
     fecha = inspeccion.fecha_hora.strftime("%d/%m/%Y %H:%M")
     km = (
         f"{inspeccion.kilometraje_ingreso:,} km"
@@ -151,7 +153,7 @@ def crear_inspeccion_ingreso(request, documento_id):
             texto = _generar_texto_inspeccion(inspeccion, empresa_nombre).replace("*", "")
             try:
                 send_email_with_reply_to(
-                    subject=f"Inspección de ingreso – {inspeccion.vehiculo}",
+                    subject=f"Inspección de ingreso – {inspeccion.vehiculo or inspeccion.vehiculo_desarme}",
                     message=texto,
                     recipient_list=[email_destino],
                     fail_silently=True,
@@ -244,7 +246,7 @@ def enviar_inspeccion_email(request, pk):
     # Quitar marcadores de negrita de WhatsApp (*) para el email
     texto_email = texto.replace("*", "")
 
-    subject = f"Inspección de ingreso – {inspeccion.vehiculo}"
+    subject = f"Inspección de ingreso – {inspeccion.vehiculo or inspeccion.vehiculo_desarme}"
 
     try:
         send_email_with_reply_to(
