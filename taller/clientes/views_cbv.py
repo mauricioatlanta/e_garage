@@ -242,15 +242,45 @@ class ClienteCreateView(
             "created_cliente_label": label,
         }
 
+    CONSTRAINT_FIELD_MESSAGES = {
+        "uq_cliente_empresa_email_present": (
+            "email",
+            "empresa_id, taller_cliente.email",
+            "Ya existe un cliente con este email para esta empresa.",
+        ),
+        "uq_cliente_empresa_telefono_present": (
+            "telefono",
+            "empresa_id, taller_cliente.telefono",
+            "Ya existe un cliente con este teléfono para esta empresa.",
+        ),
+        "uq_cliente_empresa_taxid_present": (
+            "tax_id",
+            "empresa_id, taller_cliente.tax_id",
+            "Ya existe un cliente con este identificador tributario para esta empresa.",
+        ),
+    }
+
     def form_valid(self, form):
         from django.db import IntegrityError
 
         try:
             return super().form_valid(form)
         except IntegrityError as e:
-            if "taller_cliente.empresa_id, taller_cliente.email" in str(e):
-                form.add_error("email", "Ya existe un cliente con este email para esta empresa.")
-                return self.form_invalid(form)
+            # PostgreSQL (psycopg2/psycopg3): el nombre del constraint viene en
+            # e.__cause__.diag.constraint_name. SQLite no lo expone y en su
+            # lugar lista los nombres de columna en el mensaje de texto — de
+            # ahí el fallback por substring de columnas.
+            constraint_name = getattr(getattr(e.__cause__, "diag", None), "constraint_name", None)
+            message = str(e)
+
+            for name, (field, column_hint, error_message) in self.CONSTRAINT_FIELD_MESSAGES.items():
+                if constraint_name == name or name in message or column_hint in message:
+                    if field in form.fields:
+                        form.add_error(field, error_message)
+                    else:
+                        form.add_error(None, error_message)
+                    return self.form_invalid(form)
+
             raise
 
     model = Cliente
