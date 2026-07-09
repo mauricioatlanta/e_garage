@@ -62,6 +62,18 @@ class Documento(AuditMixin, models.Model):
         blank=True,
         related_name="documentos",
     )
+    # Camino nuevo en paralelo a 'vehiculo' (mismo patrón que 0142/0152): FK
+    # nullable a VehiculoDesarme, sin tocar 'vehiculo'. Se usa cuando el
+    # origen es una venta de desarme (tipo=PTS) sobre un VehiculoDesarme
+    # directo, sin Vehiculo real detrás -- ver
+    # taller/desarme/views_inventario.py:finalizar_venta_desde_inventario.
+    vehiculo_desarme = models.ForeignKey(
+        "taller.VehiculoDesarme",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="documentos",
+    )
     moneda = models.CharField(max_length=3, default="CLP")
     country = models.CharField(max_length=2, default="CL")
     neto_repuestos = models.DecimalField(max_digits=14, decimal_places=2, default=Decimal("0.00"))

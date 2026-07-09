@@ -8,7 +8,13 @@ from django.db import models
 
 from core.models import TenantScoped
 
-from .extras_vehiculo import CajaVehiculo, ColorVehiculo, MotorVehiculo
+from .extras_vehiculo import (
+    CajaVehiculo,
+    CajaVehiculoEmpresa,
+    ColorVehiculo,
+    MotorVehiculo,
+    MotorVehiculoEmpresa,
+)
 from .marca import Marca
 from .modelo import Modelo
 
@@ -113,6 +119,22 @@ class VehiculoDesarme(TenantScoped):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
+    )
+    motor_empresa = models.ForeignKey(
+        MotorVehiculoEmpresa,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vehiculos_desarme",
+        verbose_name="Motor privado",
+    )
+    caja_empresa = models.ForeignKey(
+        CajaVehiculoEmpresa,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="vehiculos_desarme",
+        verbose_name="Caja privada",
     )
     millas = models.PositiveIntegerField(
         blank=True,

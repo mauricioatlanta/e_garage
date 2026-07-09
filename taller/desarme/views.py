@@ -535,9 +535,16 @@ def _guardar_danos_carroceria(request, vehiculo, empresa):
     if not zonas:
         return
 
+    # vehiculo acá siempre es un VehiculoDesarme (crear_vehiculo/editar_vehiculo ya
+    # cortaron a ese modelo). InspeccionIngreso.vehiculo exige un Vehiculo real
+    # (on_delete=PROTECT, no nullable) -- usar el campo nuevo vehiculo_desarme
+    # en su lugar, dejando vehiculo=None (no hay Vehiculo legacy detrás).
+    if isinstance(vehiculo, VehiculoDesarme):
+        lookup = {"vehiculo_desarme": vehiculo, "vehiculo": None, "documento": None}
+    else:
+        lookup = {"vehiculo": vehiculo, "vehiculo_desarme": None, "documento": None}
     inspeccion, _ = InspeccionIngreso.objects.update_or_create(
-        vehiculo=vehiculo,
-        documento=None,
+        **lookup,
         defaults={
             "empresa": empresa,
             "realizada_por": request.user,
@@ -565,8 +572,6 @@ def crear_vehiculo(request):
                 with transaction.atomic():
                     vehiculo = form.save(commit=False)
                     vehiculo.empresa = empresa
-                    vehiculo.tipo_uso = Vehiculo.TIPO_USO_DESARME
-                    vehiculo.cliente = None
                     vehiculo.save()
                     _guardar_danos_carroceria(request, vehiculo, empresa)
                 messages.success(

@@ -77,10 +77,29 @@ class InspeccionIngreso(AuditMixin, models.Model):
         blank=True,
         db_index=True,
     )
+    # null=True agregado en Fase 6.3a: a diferencia de Documento.vehiculo (ya
+    # era nullable), este campo era obligatorio -- sin esto, vehiculo_desarme
+    # de abajo es inutilizable (el INSERT revienta con NOT NULL constraint
+    # apenas el origen es un VehiculoDesarme). on_delete=PROTECT sin cambios:
+    # no altera el comportamiento de borrado, solo permite vacío.
     vehiculo = models.ForeignKey(
         "taller.Vehiculo",
         on_delete=models.PROTECT,
         related_name="inspecciones_ingreso",
+        null=True,
+        blank=True,
+        db_index=True,
+    )
+    # Camino nuevo en paralelo a 'vehiculo' (mismo patrón que 0142 para
+    # PiezaDesarme/SugerenciaPiezaDesarme/etc.). Se usa cuando el origen es un
+    # VehiculoDesarme creado directo (sin Vehiculo legacy detrás) -- ver
+    # taller/desarme/views.py:_guardar_danos_carroceria.
+    vehiculo_desarme = models.ForeignKey(
+        "taller.VehiculoDesarme",
+        on_delete=models.PROTECT,
+        related_name="inspecciones_ingreso",
+        null=True,
+        blank=True,
         db_index=True,
     )
     fecha_hora = models.DateTimeField(auto_now_add=True, db_index=True)
