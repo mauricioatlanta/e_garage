@@ -65,6 +65,8 @@
   }
   .btn-add-desarme { flex-shrink: 0; padding: 2px 6px; font-size: 0.7rem; border-radius: 4px; border: 1px solid rgba(0,255,255,0.5); background: rgba(0,255,255,0.1); color: #67e8f9; cursor: pointer; white-space: nowrap; }
   .btn-add-desarme:hover { background: rgba(0,255,255,0.25); }
+  .btn-add-desarme:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-add-desarme:disabled:hover { background: rgba(0,255,255,0.1); }
   .form-row { display: grid; gap: 0.35rem 0.6rem; align-items: end; }
   .form-row-5 { grid-template-columns: repeat(5, 1fr); }
   .form-row-4 { grid-template-columns: repeat(4, 1fr); }
@@ -553,6 +555,7 @@ document.getElementById('btn-agregar-anio')?.addEventListener('click', function(
     const prevModelo = restoreModeloId || modeloSelect.value;
     modeloSelect.innerHTML = '<option value="">---------</option>';
     modeloSelect.disabled = true;
+    modeloSelect.dispatchEvent(new Event('change'));
 
     if (!marcaId) {
       modeloSelect.disabled = false;
@@ -580,7 +583,10 @@ document.getElementById('btn-agregar-anio')?.addEventListener('click', function(
       });
     })
     .catch(function() {})
-    .finally(function() { modeloSelect.disabled = false; });
+    .finally(function() {
+      modeloSelect.disabled = false;
+      modeloSelect.dispatchEvent(new Event('change'));
+    });
   }
 
   marcaSelect.addEventListener('change', function() {
@@ -622,6 +628,19 @@ document.getElementById('btn-agregar-anio')?.addEventListener('click', function(
   };
   const csrf = document.querySelector('[name=csrfmiddlewaretoken]')?.value || '';
 
+  // Motor/caja privados requieren modelo_id (MotorVehiculoEmpresa/CajaVehiculoEmpresa
+  // no admiten modelo nulo); bloquear los botones "+" hasta que haya un modelo elegido.
+  function syncMotorCajaButtons() {
+    const modeloSel = document.getElementById('id_modelo');
+    const habilitado = !!(modeloSel && modeloSel.value);
+    document.querySelectorAll('.btn-add-desarme[data-add="motor"], .btn-add-desarme[data-add="caja"]').forEach(function(btn) {
+      btn.disabled = !habilitado;
+      btn.title = habilitado ? '{% trans "Agregar" %}' : '{% trans "Seleccione un modelo primero" %}';
+    });
+  }
+  syncMotorCajaButtons();
+  document.getElementById('id_modelo')?.addEventListener('change', syncMotorCajaButtons);
+
   function postJson(url, body) {
     return fetch(url, {
       method: 'POST',
@@ -661,11 +680,13 @@ document.getElementById('btn-agregar-anio')?.addEventListener('click', function(
         promptMsg = 'Nombre del nuevo modelo:';
         payload.marca_id = marcaId;
       } else if (tipo === 'motor') {
+        if (!modeloSel?.value) { alert('Seleccione primero un modelo.'); return; }
         promptMsg = 'Nombre del nuevo motor:';
-        if (modeloSel?.value) payload.modelo_id = modeloSel.value;
+        payload.modelo_id = modeloSel.value;
       } else if (tipo === 'caja') {
+        if (!modeloSel?.value) { alert('Seleccione primero un modelo.'); return; }
         promptMsg = 'Nombre de la nueva caja:';
-        if (modeloSel?.value) payload.modelo_id = modeloSel.value;
+        payload.modelo_id = modeloSel.value;
       } else if (tipo === 'color') {
         promptMsg = 'Nombre del nuevo color:';
       } else if (tipo === 'carroceria') {
@@ -694,6 +715,7 @@ document.getElementById('btn-agregar-anio')?.addEventListener('click', function(
             addOption(map[tipo], id, nom);
             if (tipo === 'modelo' && data.modelo) {
               if (modeloSel) modeloSel.value = id;
+              syncMotorCajaButtons();
             }
           } else {
             alert(data.error || 'Error al agregar');
