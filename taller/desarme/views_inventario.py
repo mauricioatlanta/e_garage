@@ -18,7 +18,7 @@ from taller.models.correlativo import CorrelativoDocumento
 from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
 from taller.models.pieza_desarme import ESTADO_DISPONIBLE, ESTADO_RESERVADA, PiezaDesarme
-from taller.models.vehiculos import Vehiculo
+from taller.models.vehiculo_desarme import VehiculoDesarme
 
 from .forms_venta_inventario import ConfirmarVentaDesdeInventarioForm
 from .views import _desarme_url, _empresa_or_redirect
@@ -35,10 +35,9 @@ def inventario_inteligente(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
     piezas_qs = (
@@ -95,10 +94,9 @@ def crear_venta_desde_inventario(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
     if request.method == "GET":
@@ -392,10 +390,9 @@ def confirmar_venta_desde_inventario(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
     resumen = _get_venta_session_data(request, vehiculo)
@@ -430,10 +427,9 @@ def finalizar_venta_desde_inventario(request, pk):
         return redirect("/")
 
     vehiculo = get_object_or_404(
-        Vehiculo,
+        VehiculoDesarme,
         pk=pk,
         empresa=empresa,
-        tipo_uso=Vehiculo.TIPO_USO_DESARME,
     )
 
     resumen = _get_venta_session_data(request, vehiculo)
@@ -496,10 +492,18 @@ def finalizar_venta_desde_inventario(request, pk):
     with transaction.atomic():
         numero_documento = _generar_numero_documento(empresa, tipo_doc)
 
+        # vehiculo acá siempre es un VehiculoDesarme (el corte de
+        # VehiculoDesarmeForm ya no pasa por Vehiculo). Documento.vehiculo
+        # exige un Vehiculo real -- usar vehiculo_desarme en su lugar,
+        # dejando vehiculo=None (no hay Vehiculo legacy detrás).
+        if isinstance(vehiculo, VehiculoDesarme):
+            vehiculo_kwargs = {"vehiculo": None, "vehiculo_desarme": vehiculo}
+        else:
+            vehiculo_kwargs = {"vehiculo": vehiculo, "vehiculo_desarme": None}
         documento = Documento.objects.create(
             empresa=empresa,
             cliente=cliente,
-            vehiculo=vehiculo,
+            **vehiculo_kwargs,
             observaciones=observaciones or None,
             estado="EMITIDO",
             tipo="PTS",
