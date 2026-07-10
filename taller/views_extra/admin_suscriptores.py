@@ -12,13 +12,11 @@ Vista administrativa para gestionar suscriptores:
 import logging
 from datetime import date, datetime, timedelta
 
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required, user_passes_test
+from functools import wraps
 
-staff_member_required = user_passes_test(
-    lambda u: u.is_active and u.is_staff,
-    login_url="/accounts/login/",
-)
+from django.contrib import messages
+from django.contrib.auth.views import redirect_to_login
+from django.core.exceptions import PermissionDenied
 from django.core.paginator import Paginator
 from django.db.models import Q
 from django.http import JsonResponse
@@ -29,6 +27,27 @@ from django.views.decorators.http import require_http_methods
 from taller.models.empresa import Empresa
 from taller.models.suscripcion import Suscripcion
 from taller.utils.country_config import COUNTRY_SETTINGS
+
+
+def staff_member_required(view_func):
+    """
+    Solo redirige a login si el usuario no está autenticado. Si ya está
+    autenticado pero no es staff, devuelve 403 en vez de redirigir a
+    /accounts/login/: CountryAwareLoginView reenvía a usuarios autenticados
+    directo a `next` sin validar permisos, así que redirigir aquí produce
+    un bucle infinito (login → admin/suscriptores → login → ...).
+    """
+
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return redirect_to_login(request.get_full_path(), login_url="/accounts/login/")
+        if not (request.user.is_active and request.user.is_staff):
+            raise PermissionDenied
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped
+
 
 logger = logging.getLogger(__name__)
 
