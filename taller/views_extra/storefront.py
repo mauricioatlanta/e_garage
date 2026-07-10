@@ -264,7 +264,7 @@ def kiosko_centralizado(request):
         empresa_id__in=empresas_ok,
         estado_pieza=ESTADO_DISPONIBLE,
         activo=True,
-    ).select_related("vehiculo", "vehiculo__marca", "vehiculo__modelo", "empresa")
+    ).select_related("vehiculo_desarme", "vehiculo_desarme__marca", "vehiculo_desarme__modelo", "empresa")
 
     # ── Lectura de parámetros GET ──────────────────────────────────────────────
     anio_sel = request.GET.get("anio", "").strip()
@@ -277,32 +277,32 @@ def kiosko_centralizado(request):
     # ── Opciones de cascada (cada nivel filtra el siguiente) ───────────────────
     # Años disponibles
     anios_disponibles = sorted(
-        base_qs.values_list("vehiculo__anio", flat=True).distinct(),
+        base_qs.values_list("vehiculo_desarme__anio", flat=True).distinct(),
         reverse=True,
     )
 
     # Aplicar anio antes de calcular marcas
-    qs_tras_anio = base_qs.filter(vehiculo__anio=anio_sel) if anio_sel else base_qs
-    marcas_rows = qs_tras_anio.values("vehiculo__marca__nombre", "vehiculo__marca_texto").distinct()
+    qs_tras_anio = base_qs.filter(vehiculo_desarme__anio=anio_sel) if anio_sel else base_qs
+    marcas_rows = qs_tras_anio.values("vehiculo_desarme__marca__nombre", "vehiculo_desarme__marca_texto").distinct()
     marcas_disponibles = sorted({
-        row["vehiculo__marca__nombre"] or row["vehiculo__marca_texto"] or ""
+        row["vehiculo_desarme__marca__nombre"] or row["vehiculo_desarme__marca_texto"] or ""
         for row in marcas_rows
-        if row["vehiculo__marca__nombre"] or row["vehiculo__marca_texto"]
+        if row["vehiculo_desarme__marca__nombre"] or row["vehiculo_desarme__marca_texto"]
     })
 
     # Aplicar marca antes de calcular modelos
     if marca_sel:
         qs_tras_marca = qs_tras_anio.filter(
-            Q(vehiculo__marca__nombre__iexact=marca_sel)
-            | Q(vehiculo__marca_texto__iexact=marca_sel)
+            Q(vehiculo_desarme__marca__nombre__iexact=marca_sel)
+            | Q(vehiculo_desarme__marca_texto__iexact=marca_sel)
         )
     else:
         qs_tras_marca = qs_tras_anio
-    modelos_rows = qs_tras_marca.values("vehiculo__modelo__nombre", "vehiculo__modelo_texto").distinct()
+    modelos_rows = qs_tras_marca.values("vehiculo_desarme__modelo__nombre", "vehiculo_desarme__modelo_texto").distinct()
     modelos_disponibles = sorted({
-        row["vehiculo__modelo__nombre"] or row["vehiculo__modelo_texto"] or ""
+        row["vehiculo_desarme__modelo__nombre"] or row["vehiculo_desarme__modelo_texto"] or ""
         for row in modelos_rows
-        if row["vehiculo__modelo__nombre"] or row["vehiculo__modelo_texto"]
+        if row["vehiculo_desarme__modelo__nombre"] or row["vehiculo_desarme__modelo_texto"]
     })
 
     # ── Construir queryset final aplicando todos los filtros ───────────────────
@@ -310,8 +310,8 @@ def kiosko_centralizado(request):
 
     if modelo_sel:
         piezas_qs = piezas_qs.filter(
-            Q(vehiculo__modelo__nombre__icontains=modelo_sel)
-            | Q(vehiculo__modelo_texto__icontains=modelo_sel)
+            Q(vehiculo_desarme__modelo__nombre__icontains=modelo_sel)
+            | Q(vehiculo_desarme__modelo_texto__icontains=modelo_sel)
         )
 
     if q:
