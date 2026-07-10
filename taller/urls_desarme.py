@@ -118,6 +118,7 @@ try:
         path("interchange/crear/", views.crear_interchange, name="crear_interchange"),
         path("interchange/<int:pk>/eliminar/", views.eliminar_interchange, name="eliminar_interchange"),
         path("reportes/", views.reportes_desarme, name="reportes"),
+        path("catalogo/", views.configurar_catalogo, name="configurar_catalogo"),
         path("ventas/", views_venta.lista_ventas, name="lista_ventas"),
         path("ventas/nueva/", views_venta.confirmar_venta_rapida, name="confirmar_venta_rapida"),
         path("ventas/iniciar/", views_venta.iniciar_venta_rapida, name="iniciar_venta_rapida"),

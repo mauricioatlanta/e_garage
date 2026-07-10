@@ -46,6 +46,7 @@ from .pieza_desarme import (
 from .interchange_pieza import InterchangePieza
 from .sugerencia_pieza_desarme import SugerenciaPiezaDesarme
 from .vehiculo_desarme import VehiculoDesarme
+from .catalogo_repuesto_empresa import CatalogoRepuestoEmpresa
 from .vehiculo_financial import (
     VehiculoFinancialSnapshot,
     VehicleFinancialEvent,
@@ -117,6 +118,7 @@ __all__ = [
     "InterchangePieza",
     "SugerenciaPiezaDesarme",
     "VehiculoDesarme",
+    "CatalogoRepuestoEmpresa",
     "VehiculoFinancialSnapshot",
     "VehicleFinancialEvent",
     "VendedorDesarme",

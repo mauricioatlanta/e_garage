@@ -7,8 +7,6 @@ from taller.models.pieza_desarme import PiezaDesarme
 from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 
-from .catalogo_operativo import get_catalogo_operativo_desarme
-
 
 def _ensure_vehiculo_desarme(vehiculo, empresa=None):
     if isinstance(vehiculo, VehiculoDesarme):
@@ -37,13 +35,17 @@ def _ensure_vehiculo_desarme(vehiculo, empresa=None):
 
 def generar_inventario_vehiculo(vehiculo, empresa):
     """
-    Genera piezas de inventario para un vehículo de desarme a partir del catálogo operativo.
+    Genera piezas de inventario para un vehículo de desarme a partir del catálogo
+    operativo, filtrado por tipo_carroceria del vehículo y por la configuración
+    de CatalogoRepuestoEmpresa de la empresa (incluido/precio_predeterminado).
     USA (empresa.pais='US') → catálogo USA (engine_assembly, alternator, etc.).
     Resto → catálogo legacy (MOT-01, CAR-01, etc.).
     Retorna el número de piezas creadas (solo las nuevas, no las ya existentes).
     """
+    from .catalogo_operativo import get_catalogo_para_vehiculo
+
     vehiculo = _ensure_vehiculo_desarme(vehiculo, empresa)
-    catalogo = get_catalogo_operativo_desarme(empresa)
+    catalogo = get_catalogo_para_vehiculo(empresa, vehiculo)
     count = 0
     for item in catalogo:
         codigo = item["codigo"]

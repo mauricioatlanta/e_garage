@@ -2090,3 +2090,83 @@ def reportes_desarme(request):
             "top_roi": top_roi_vehiculos(empresa, limit=5),
         },
     )
+
+
+@login_required
+def configurar_catalogo(request):
+    """
+    Configuración del catálogo de repuestos de la empresa: qué tipos incluir
+    en el kiosko y a qué precio de referencia (CatalogoRepuestoEmpresa).
+    Editable en cualquier momento — no es una configuración de una sola vez.
+    GET: catálogo completo (sin filtrar por vehículo), cruzado con la
+    configuración ya guardada (o precio de referencia + incluido=True default).
+    POST: guarda/actualiza CatalogoRepuestoEmpresa por cada código.
+    """
+    empresa = _empresa_or_redirect(request)
+    if not empresa:
+        return redirect("/")
+
+    from taller.models.catalogo_repuesto_empresa import CatalogoRepuestoEmpresa
+    from .catalogo_operativo import get_catalogo_operativo_desarme, get_zonas_orden_desarme
+
+    catalogo = get_catalogo_operativo_desarme(empresa)
+
+    if request.method == "POST":
+        with transaction.atomic():
+            for item in catalogo:
+                codigo = item["codigo"]
+                incluido = request.POST.get(f"incluido-{codigo}") == "on"
+                precio_raw = (request.POST.get(f"precio-{codigo}") or "").strip()
+                precio = None
+                if precio_raw:
+                    try:
+                        precio = Decimal(precio_raw)
+                    except Exception:
+                        precio = None
+                CatalogoRepuestoEmpresa.objects.update_or_create(
+                    empresa=empresa,
+                    codigo=codigo,
+                    defaults={"incluido": incluido, "precio_predeterminado": precio},
+                )
+        messages.success(request, "Catálogo de repuestos actualizado.")
+        return redirect(_desarme_url(request, "catalogo/"))
+
+    # GET ────────────────────────────────────────────────────────────────────
+    config_por_codigo = {
+        c.codigo: c for c in CatalogoRepuestoEmpresa.objects.filter(empresa=empresa)
+    }
+    por_zona: dict = {}
+    for item in catalogo:
+        cfg = config_por_codigo.get(item["codigo"])
+        incluido = cfg.incluido if cfg is not None else True
+        if cfg is not None and cfg.precio_predeterminado is not None:
+            precio = cfg.precio_predeterminado
+        else:
+            precio = item["precio_base"]
+        # str() de Decimal es locale-independiente (punto decimal siempre) —
+        # necesario porque {{ precio }} directo en template usa coma decimal
+        # con LANGUAGE_CODE=es, lo que invalida el value="" de <input type="number">.
+        precio_str = str(precio) if precio is not None else ""
+        por_zona.setdefault(item["zona"], []).append({
+            "codigo": item["codigo"],
+            "nombre": item["nombre"],
+            "zona": item["zona"],
+            "incluido": incluido,
+            "precio": precio_str,
+        })
+
+    zonas_orden = [z for z in get_zonas_orden_desarme(empresa) if z in por_zona]
+    zonas_orden.extend(z for z in sorted(por_zona) if z not in zonas_orden)
+    zonas_con_items = [(z, por_zona[z]) for z in zonas_orden]
+
+    return render(
+        request,
+        "taller/desarme/configurar_catalogo.html",
+        {
+            "eg_desarme_dashboard_compact": True,
+            "empresa": empresa,
+            "zonas_con_items": zonas_con_items,
+            "total_items": len(catalogo),
+            "empresa_moneda": empresa.formato_moneda,
+        },
+    )

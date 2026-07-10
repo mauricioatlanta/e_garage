@@ -1,0 +1,126 @@
+{% extends "layouts/base_egarage_panel.html" %}
+{% load i18n %}
+{% load country_url %}
+{% load humanize %}
+
+{% block page_title %}Catálogo de repuestos{% endblock %}
+{% block page_subtitle %}Elige qué tipos de repuesto incluir en el kiosko y su precio de referencia{% endblock %}
+{% block page_icon %}📋{% endblock %}
+
+{% block page_extra_css %}
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+.rv-panel {
+  background: rgba(15,23,42,0.90);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(51,65,85,0.8);
+  border-radius: 14px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.5);
+  color: #f1f5f9;
+}
+.rv-input {
+  background: #1e293b;
+  border: 1px solid #475569;
+  border-radius: 8px;
+  padding: 7px 10px;
+  color: #f1f5f9 !important;
+  font-size: .85rem;
+  width: 100%;
+}
+.rv-input::placeholder { color: #64748b; }
+.rv-input:focus { outline: none; border-color: #06b6d4; }
+.zona-header {
+  font-family: 'Orbitron', monospace;
+  font-size: .78rem;
+  font-weight: 700;
+  letter-spacing: .2em;
+  color: #67e8f9;
+  text-transform: uppercase;
+  border-bottom: 2px solid rgba(6,182,212,0.4);
+  padding-bottom: 8px;
+  margin-bottom: 14px;
+}
+.cat-card {
+  border-radius: 10px;
+  border: 2px solid #334155;
+  background: #0f172a;
+  padding: 0.8rem 1rem;
+  color: #f1f5f9;
+  transition: border-color .15s, opacity .15s;
+}
+.cat-card.excluido { opacity: .55; border-color: #475569; }
+.cat-checkbox { width: 18px; height: 18px; accent-color: #06b6d4; cursor: pointer; }
+.btn-guardar {
+  background: rgba(16,185,129,0.30);
+  border: 1.5px solid rgba(16,185,129,0.75);
+  color: #6ee7b7;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font-size: .9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .15s;
+}
+.btn-guardar:hover { background: rgba(16,185,129,0.50); }
+</style>
+{% endblock %}
+
+{% block content %}
+<form method="post" action="{% country_url 'desarme:configurar_catalogo' %}">
+  {% csrf_token %}
+
+  <div class="rv-panel p-5 mb-6">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <h2 class="text-xl font-bold text-white" style="font-family:'Orbitron',monospace">
+          {% trans "Catálogo de repuestos" %}
+        </h2>
+        <p class="text-slate-300 text-sm mt-1">
+          {{ total_items }} {% trans "tipos de repuesto" %} ·
+          {% trans "desmarca los que no vendas y ajusta el precio de referencia — se aplica a los vehículos que crees de aquí en adelante" %}
+        </p>
+      </div>
+      <div role="button" tabindex="0" class="btn-guardar" onclick="this.closest('form').requestSubmit()">
+        💾 {% trans "Guardar cambios" %}
+      </div>
+    </div>
+  </div>
+
+  {% for zona, items in zonas_con_items %}
+  <div class="rv-panel p-5 mb-4">
+    <div class="zona-header">{{ zona }}</div>
+    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+      {% for item in items %}
+      <div class="cat-card {% if not item.incluido %}excluido{% endif %}" id="cat-{{ item.codigo }}">
+        <div class="flex justify-between items-start mb-3 gap-2">
+          <div class="min-w-0">
+            <span class="text-xs text-cyan-300 font-mono font-bold">{{ item.codigo }}</span>
+            <div class="text-sm font-semibold text-white mt-0.5 truncate">{{ item.nombre }}</div>
+          </div>
+          <label class="flex items-center gap-1.5 text-xs text-slate-300 flex-shrink-0 cursor-pointer">
+            <input type="checkbox" class="cat-checkbox"
+                   name="incluido-{{ item.codigo }}"
+                   {% if item.incluido %}checked{% endif %}
+                   onchange="this.closest('.cat-card').classList.toggle('excluido', !this.checked)">
+            {% trans "Incluir" %}
+          </label>
+        </div>
+        <label class="text-xs text-slate-300 font-medium">
+          {% trans "Precio de referencia" %} ({{ empresa_moneda.simbolo }})
+        </label>
+        <input type="number" class="rv-input mt-1" step="1" min="0"
+               name="precio-{{ item.codigo }}"
+               value="{{ item.precio|default:'' }}" placeholder="0">
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endfor %}
+
+  <div class="flex justify-end mb-8">
+    <div role="button" tabindex="0" class="btn-guardar" onclick="this.closest('form').requestSubmit()">
+      💾 {% trans "Guardar cambios" %}
+    </div>
+  </div>
+</form>
+{% endblock %}

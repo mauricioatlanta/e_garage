@@ -28,6 +28,20 @@ ZONAS_ORDEN_USA = [
     "Carrocería",
 ]
 
+# Precio de referencia por zona para el catálogo USA (antes era Decimal("0")
+# fijo para todo el catálogo — dejaba el precio en $0 en el storefront).
+# Las claves deben matchear EXACTO el string de zona producido por
+# USA_CATEGORIA_TO_ZONA (español, con tilde) — no el nombre de categoría en inglés.
+PRECIO_REFERENCIA_POR_ZONA_USA = {
+    "Motor": Decimal("250"),
+    "Transmisión": Decimal("350"),
+    "Suspensión": Decimal("80"),
+    "Frenos": Decimal("60"),
+    "Cooling": Decimal("50"),
+    "Electrónica": Decimal("40"),
+    "Carrocería": Decimal("70"),
+}
+
 
 def _is_empresa_usa(empresa):
     """True si la empresa es mercado USA (pais US)."""
@@ -55,7 +69,7 @@ def _catalogo_legacy_a_operativo():
 
 
 def _catalogo_usa_a_operativo():
-    """Convierte catálogo USA a lista de dicts operativos (nombre_en_oficial, zona mapeada, precio_base=0)."""
+    """Convierte catálogo USA a lista de dicts operativos (nombre_en_oficial, zona mapeada, precio_base de referencia por zona)."""
     from taller.catalogos.catalogo_piezas_desarme_usa import CATALOGO_PIEZAS_DESARME_USA
 
     out = []
@@ -73,7 +87,7 @@ def _catalogo_usa_a_operativo():
                 "codigo": p.get("codigo", ""),
                 "nombre": nombre,
                 "zona": zona,
-                "precio_base": Decimal("0"),
+                "precio_base": PRECIO_REFERENCIA_POR_ZONA_USA.get(zona, Decimal("0")),
             }
         )
     return out
@@ -180,16 +194,52 @@ CODIGOS_MOTO_WHITELIST: frozenset = frozenset({
 })
 
 
+def _aplicar_configuracion_empresa(catalogo: list, empresa) -> list:
+    """
+    Cruza el catálogo con CatalogoRepuestoEmpresa de la empresa:
+    - incluido=False → excluye el ítem.
+    - precio_predeterminado no nulo → sobreescribe el precio_base de referencia.
+    - Sin registro para ese código → el ítem pasa tal cual (precio de referencia
+      global, incluido por default). No bloquea nada si el subscriptor nunca
+      configuró su catálogo.
+    """
+    from taller.models.catalogo_repuesto_empresa import CatalogoRepuestoEmpresa
+
+    config_por_codigo = {
+        c.codigo: c
+        for c in CatalogoRepuestoEmpresa.objects.filter(empresa=empresa)
+    }
+    if not config_por_codigo:
+        return catalogo
+
+    resultado = []
+    for item in catalogo:
+        cfg = config_por_codigo.get(item["codigo"])
+        if cfg is None:
+            resultado.append(item)
+            continue
+        if not cfg.incluido:
+            continue
+        if cfg.precio_predeterminado is not None:
+            item = {**item, "precio_base": cfg.precio_predeterminado}
+        resultado.append(item)
+    return resultado
+
+
 def get_catalogo_para_vehiculo(empresa, vehiculo) -> list:
     """
-    Catálogo sugerido filtrado por tipo_carroceria del vehículo.
+    Catálogo sugerido filtrado por tipo_carroceria del vehículo, y luego
+    cruzado con la configuración de CatalogoRepuestoEmpresa de la empresa
+    (ver _aplicar_configuracion_empresa).
     Fallback a catálogo genérico si tipo es null, vacío o no reconocido.
     """
     base = get_catalogo_operativo_desarme(empresa)
     tipo = (getattr(vehiculo, "tipo_carroceria", None) or "").lower().strip()
 
     if tipo == "moto":
-        return [item for item in base if item["codigo"] in CODIGOS_MOTO_WHITELIST]
+        filtrado = [item for item in base if item["codigo"] in CODIGOS_MOTO_WHITELIST]
+    else:
+        excluidos = EXCLUSIONES_POR_CARROCERIA.get(tipo, frozenset())
+        filtrado = [item for item in base if item["codigo"] not in excluidos]
 
-    excluidos = EXCLUSIONES_POR_CARROCERIA.get(tipo, frozenset())
-    return [item for item in base if item["codigo"] not in excluidos]
+    return _aplicar_configuracion_empresa(filtrado, empresa)
