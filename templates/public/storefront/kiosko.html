@@ -192,4 +192,10 @@
   {% endif %}
 </main>
 
+{% include "public/storefront/_modal_pieza.html" %}
+
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/storefront_pieza_modal.js' %}?v=20260710-1"></script>
 {% endblock %}

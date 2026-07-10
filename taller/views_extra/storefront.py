@@ -32,6 +32,11 @@ def _telefono_wa(telefono: str) -> str:
     return re.sub(r"\D", "", telefono or "")
 
 
+def _telefono_tel(telefono: str) -> str:
+    """Limpia el teléfono para uso en tel:, preservando el + si existe."""
+    return re.sub(r"[^\d+]", "", telefono or "")
+
+
 def _tienda_storefront_render(request, empresa):
     """Lógica compartida del storefront público de una empresa."""
     if not empresa.activa_y_vigente:
@@ -183,7 +188,9 @@ def _tienda_storefront_render(request, empresa):
     piezas = paginator.get_page(request.GET.get("page", 1))
 
     tel = _telefono_wa(empresa.telefono)
+    tel_url = f"tel:{_telefono_tel(empresa.telefono)}" if empresa.telefono else None
     for pieza in piezas:
+        pieza.tel_url = tel_url
         v = pieza.vehiculo_desarme
         pieza.vehiculo_anio_str = str(v.anio) if v and v.anio else ""
         pieza.vehiculo_marcamodelo_str = " ".join(filter(None, [
@@ -349,6 +356,7 @@ def kiosko_centralizado(request):
 
     # Pre-calcular wa_url para cada pieza usando el teléfono de su propia empresa
     for pieza in piezas:
+        pieza.tel_url = f"tel:{_telefono_tel(pieza.empresa.telefono)}" if pieza.empresa.telefono else None
         tel = _telefono_wa(pieza.empresa.telefono)
         if tel:
             msg = f"Hola! Me interesa el repuesto: {pieza.nombre}"
