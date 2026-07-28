@@ -1,46 +1,68 @@
-# eGarage — Arquitectura de Verticales V1
-**Versión:** 1.0  
+# eGarage — Arquitectura de Productos V1
+**Versión:** 2.0  
 **Fecha:** 2026-07-28  
-**Estado:** Diseño aprobado — pendiente de implementación  
+**Estado:** Pendiente de aprobación  
 **Rama:** feature/vertical-architecture-v1  
-**Auditoría base:** docs/auditorias/auditoria_final_verticales_egarage.md
+**Auditoría base:** docs/auditorias/auditoria_final_verticales_egarage.md  
+**Cambios desde V1.0:** Modelo normalizado EmpresaModulo · reorden auth antes de menú · rubro desacoplado de módulos · MenuService · nomenclatura de productos
 
 ---
 
 ## Principios de Diseño
 
-1. **Una sola aplicación.** Un repositorio, un servidor, una base de datos, una autenticación.
+1. **Una sola aplicación.** Un repositorio, un servidor, una base de datos, una autenticación, un despliegue.
 2. **Cambios incrementales.** Cada etapa es independiente, reversible y verificable antes de la siguiente.
-3. **Retrocompatibilidad total.** Las empresas existentes no deben notar ningún cambio hasta que el administrador active su vertical.
-4. **Autorización en backend, no solo en frontend.** Ocultar un enlace del menú no basta; las URLs deben protegerse.
-5. **El `rubro_principal` existente es el punto de anclaje.** Ya existe en `ConfiguracionEmpresa`. No se duplicará con otro campo; se extenderá con flags de módulo.
+3. **Retrocompatibilidad total.** Las empresas existentes no notan ningún cambio de comportamiento hasta que se configuren explícitamente.
+4. **Autorización en backend antes que visibilidad en frontend.** Las URLs se protegen antes de que el menú las oculte — nunca al revés.
+5. **`rubro_principal` es identidad; `EmpresaModulo` es acceso.** Son dimensiones independientes. Una empresa puede ser `WORKSHOP` (identidad) pero tener el producto Salvage habilitado (acceso). No se mezclan.
+6. **El menú lo construye un servicio, no un template.** Los templates iteran sobre una lista. La lógica vive en `MenuService`.
+7. **Tres productos, no tres verticales.** eGarage Workshop, eGarage Salvage, eGarage Parts. Son nombres de producto, no categorías internas.
+
+---
+
+## Nomenclatura de Productos
+
+eGarage se posiciona externamente como tres productos dentro de una misma plataforma:
+
+| Código interno | Nombre de producto | Mercado objetivo | URL pública |
+|---|---|---|---|
+| `WORKSHOP` | eGarage Workshop | Talleres mecánicos, vulcanizaciones, llanteras, carwash, pintura | `/talleres/` · `/us/en/workshops/` |
+| `SALVAGE` | eGarage Salvage | Desarmadurías, recicladores automotrices, patios de chatarra | `/desarmadurias/` · `/us/en/salvage-yards/` · `/us/es/deshuesaderos/` |
+| `PARTS` | eGarage Parts | Casas de repuestos, refaccionarias, distribuidores de autopartes | `/repuestos/` · `/us/en/auto-parts/` |
+
+Los tres productos corren en la misma aplicación Django. No hay repos separados, no hay bases de datos separadas, no hay deploys separados.
+
+**El código interno (`WORKSHOP`, `SALVAGE`, `PARTS`) es el vocabulario canónico usado en modelos, servicios y tests. Los nombres de producto son solo para el portal público y el onboarding.**
 
 ---
 
 ## Modelo Mental
 
 ```
-eGarage SaaS
+eGarage Platform
 │
 ├── Portal Público
-│   ├── / (selector o landing general)
-│   ├── /talleres/          → landing vertical Talleres
-│   ├── /desarmadurias/     → landing vertical Desarmadurías
-│   └── /repuestos/         → landing vertical Casas de Repuestos
+│   ├── /                       → selector de producto o landing general
+│   ├── /talleres/              → eGarage Workshop
+│   ├── /desarmadurias/         → eGarage Salvage
+│   ├── /repuestos/             → eGarage Parts
+│   └── /us/en/...              → variantes en inglés
 │
-├── Core (compartido por todas las verticales)
+├── Core (compartido por los tres productos)
 │   ├── Empresa (tenant raíz)
-│   ├── ConfiguracionEmpresa (rubro, módulos, flags)
+│   ├── ConfiguracionEmpresa (rubro_principal, feature flags de UI)
+│   ├── EmpresaModulo (WORKSHOP / SALVAGE / PARTS — autorización)
+│   ├── MenuService (construye el menú según EmpresaModulo)
 │   ├── Usuario / TeamMember
 │   ├── Cliente
 │   ├── Vehículo (cliente/reparación)
-│   ├── Documento (cotización / OT)
+│   ├── Documento (cotización / OT / boleta)
 │   ├── Impuestos
 │   ├── Suscripción / Plan
 │   ├── Auditoría
 │   └── Notificaciones
 │
-├── Vertical Talleres
+├── Producto Workshop (eGarage Workshop)
 │   ├── Técnicos / Mecánicos
 │   ├── Servicios
 │   ├── Órdenes de Trabajo
@@ -50,7 +72,7 @@ eGarage SaaS
 │   ├── Historial del vehículo
 │   └── Repuestos (consumo en OT)
 │
-├── Vertical Desarmadurías
+├── Producto Salvage (eGarage Salvage)
 │   ├── VehiculoDesarme
 │   ├── PiezaDesarme
 │   ├── VentaDesarme
@@ -60,577 +82,680 @@ eGarage SaaS
 │   ├── Ciclo de vida del vehículo
 │   └── Finanzas por vehículo (snapshot, eventos)
 │
-└── Vertical Casas de Repuestos
+└── Producto Parts (eGarage Parts)
     ├── Proveedor (ficha completa)
-    ├── OrdenCompra
+    ├── OrdenCompra + LineaOrdenCompra
     ├── RecepcionMercaderia
     ├── MovimientoStock
-    ├── CatalogoProducto
     ├── Bodega
     ├── VentaRepuesto (directa, sin OT)
-    └── RentabilidadSKU
+    └── Dashboard de rentabilidad por SKU
 ```
 
 ---
 
-## 1. Núcleo Compartido (Core)
+## 1. `rubro_principal` vs `EmpresaModulo` — Separación de Responsabilidades
 
-### 1.1 Modelo Empresa
+Esta es la decisión de diseño más importante de esta arquitectura. Las dos dimensiones son independientes y no deben mezclarse.
 
-**Archivo actual:** `taller/models/empresa.py:21`
+### `rubro_principal` — Identidad del negocio
 
-El modelo `Empresa` permanece sin cambios estructurales. Su función es ser el tenant raíz. No llevará `tipo_negocio` ni `vertical` directamente.
+**Archivo:** `taller/models/configuracion.py:166`  
+**Propósito:** Describe qué tipo de negocio es la empresa. Controla presentación y UX.
 
-```python
-# Sin cambios en Empresa para la arquitectura de verticales.
-# Los módulos habilitados vivirán en ConfiguracionEmpresa.
+```
+rubro_principal → WORKSHOP | TIRE | BODYSHOP | ELECTRIC | PARTS | EXHAUST | ...
 ```
 
-### 1.2 ConfiguracionEmpresa — Extensión de Módulos
+**Efectos actuales (no se tocan):**
+- Etiqueta del campo "responsable" en documentos (`rubros_responsables.py`)
+- Secciones visibles en el formulario de OT (`get_secciones_visibles()`)
+- Roles permitidos para técnicos (`rubros_logic.py`)
 
-**Archivo actual:** `taller/models/configuracion.py:9`
+**Efectos futuros a agregar:**
+- Texto del onboarding ("tu taller" / "tu desarmaduría" / "tu bodega")
+- Copy del email de bienvenida
+- Nombre del "responsable" en documentos impresos
+- Datos de demo al finalizar onboarding
 
-Este es el único modelo que se extiende en la Etapa 1. Se agregarán tres flags booleanos.
+**Lo que `rubro_principal` NUNCA controla:**
+- Qué URLs son accesibles
+- Qué aparece en el menú
+- Qué módulos están habilitados
 
-```python
-class ConfiguracionEmpresa(models.Model):
-    # ... campos actuales sin modificar ...
+### `EmpresaModulo` — Acceso a productos
 
-    # ── MÓDULOS HABILITADOS (nuevo, Etapa 1) ──────────────────────────────────
-    modulo_taller = models.BooleanField(
-        default=True,
-        verbose_name="Módulo Talleres habilitado",
-        help_text="Activa órdenes de trabajo, técnicos, servicios y agenda.",
-    )
-    modulo_desarmaduria = models.BooleanField(
-        default=True,
-        verbose_name="Módulo Desarmadurías habilitado",
-        help_text="Activa vehículos de desarme, inventario de piezas, interchange y kiosco.",
-    )
-    modulo_repuestos = models.BooleanField(
-        default=True,
-        verbose_name="Módulo Casa de Repuestos habilitado",
-        help_text="Activa catálogo, proveedores, compras y ventas directas de repuestos.",
-    )
+**Archivo futuro:** `taller/models/empresa_modulo.py`  
+**Propósito:** Define a qué productos tiene acceso la empresa. Controla autorización.
+
+```
+EmpresaModulo → WORKSHOP | SALVAGE | PARTS (uno o varios por empresa)
 ```
 
-**Decisión de diseño — `default=True` en los tres:**
-- Todas las empresas existentes mantienen acceso completo sin intervención manual.
-- El onboarding nuevo seteará `modulo_taller=True` y `modulo_desarmaduria=False` por defecto para talleres nuevos.
-- El administrador puede activar/desactivar módulos desde el panel admin de Django.
+**Efectos:**
+- Qué URLs el decorator `@requiere_producto` permite
+- Qué secciones construye `MenuService`
+- Qué tarjetas muestra el workspace
+- Qué sección del dashboard se activa
 
-**Relación con `rubro_principal`:**
-- `rubro_principal` controla **presentación** (etiquetas, secciones del formulario de documentos).
-- Los nuevos flags controlan **acceso** (menú, URLs, dashboard).
-- No son redundantes: una empresa puede ser `WORKSHOP` pero tener `modulo_desarmaduria=True`.
+**Lo que `EmpresaModulo` NUNCA controla:**
+- Etiquetas en documentos
+- Formularios de OT
+- El nombre del responsable
 
-### 1.3 Tabla EmpresaModulo (Etapa 5+ — opcional)
-
-Si en el futuro se necesita granularidad por submódulo (ej. habilitar interchange pero no kiosco), se migra a:
+### Ejemplo: empresa multiproducto
 
 ```python
+# Una empresa puede ser "Taller de mecánica" (rubro_principal=WORKSHOP)
+# pero también tener acceso al producto Salvage porque también desarma:
+
+empresa.config.rubro_principal = "WORKSHOP"       # identidad: "somos un taller"
+empresa.modulos.values_list("codigo", flat=True)  # acceso: ["WORKSHOP", "SALVAGE"]
+```
+
+---
+
+## 2. Modelo `EmpresaModulo` — Diseño Definitivo
+
+Este es el modelo canónico desde el día 1. No se usa como paso intermedio; es la arquitectura permanente.
+
+**Archivo futuro:** `taller/models/empresa_modulo.py`
+
+```python
+from django.db import models
+
+
+PRODUCTO_CHOICES = [
+    ("WORKSHOP", "eGarage Workshop"),
+    ("SALVAGE",  "eGarage Salvage"),
+    ("PARTS",    "eGarage Parts"),
+]
+
+
 class EmpresaModulo(models.Model):
-    empresa = models.ForeignKey("taller.Empresa", on_delete=models.CASCADE, related_name="modulos")
-    codigo = models.CharField(
-        max_length=30,
-        choices=[
-            ("TALLER", "Taller y servicios"),
-            ("DESARMADURIA", "Desarmaduría"),
-            ("REPUESTOS", "Casa de repuestos"),
-            ("KIOSCO", "Kiosco público"),
-            ("INTERCHANGE", "Interchange"),
-        ],
+    """
+    Registra qué productos eGarage tiene habilitados una empresa.
+    Cada fila = un producto activo. Ausencia de fila = producto no habilitado.
+    """
+    empresa = models.ForeignKey(
+        "taller.Empresa",
+        on_delete=models.CASCADE,
+        related_name="modulos",
     )
+    codigo = models.CharField(max_length=20, choices=PRODUCTO_CHOICES)
     activo = models.BooleanField(default=True)
+    activado_en = models.DateTimeField(auto_now_add=True)
+    activado_por = models.ForeignKey(
+        "auth.User",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name="+",
+    )
 
     class Meta:
+        verbose_name = "Módulo de empresa"
+        verbose_name_plural = "Módulos de empresa"
         constraints = [
-            models.UniqueConstraint(fields=["empresa", "codigo"], name="uq_empresa_modulo")
+            models.UniqueConstraint(
+                fields=["empresa", "codigo"],
+                name="uq_empresa_modulo_codigo",
+            )
         ]
+        indexes = [
+            models.Index(fields=["empresa", "activo"]),
+        ]
+
+    def __str__(self):
+        estado = "activo" if self.activo else "inactivo"
+        return f"{self.empresa_id} · {self.codigo} ({estado})"
 ```
 
-Esta tabla no se implementa en las primeras etapas. Los tres flags booleanos son suficientes para los próximos 6-12 meses.
+### Por qué tabla normalizada y no booleanos en `ConfiguracionEmpresa`
+
+| Criterio | Booleanos en Config | Tabla EmpresaModulo |
+|---|---|---|
+| Agregar un cuarto producto en el futuro | Requiere nueva migración y nuevo booleano | Solo nuevo choice en `PRODUCTO_CHOICES` |
+| Auditoría: ¿quién activó el módulo y cuándo? | Imposible sin campos extra | `activado_en` + `activado_por` ya están |
+| Desactivar temporalmente un módulo | Requiere modificar un campo en Config | Setear `activo=False` en la fila |
+| Consultar empresas que usan Salvage | `ConfiguracionEmpresa.objects.filter(modulo_desarmaduria=True)` | `EmpresaModulo.objects.filter(codigo="SALVAGE", activo=True)` |
+| Agregar metadata por módulo (fecha límite, plan, notas) | Requiere campos extra en Config | Nuevos campos en EmpresaModulo |
+| Riesgo de crecer `ConfiguracionEmpresa` que ya tiene 20+ campos | Alto | Ninguno: tabla separada |
+| Complejidad inicial | Menor | Marginalmente mayor |
+
+La única ventaja de los booleanos es menor complejidad inicial. No es suficiente para justificar una arquitectura que bloquea el crecimiento.
+
+### Helper en `Empresa`
+
+Para que el código de vistas y servicios sea limpio, se agrega un helper en el modelo `Empresa`:
+
+```python
+# taller/models/empresa.py — método a agregar
+
+def tiene_producto(self, codigo: str) -> bool:
+    """Verifica si la empresa tiene un producto eGarage habilitado."""
+    return self.modulos.filter(codigo=codigo, activo=True).exists()
+
+def productos_activos(self) -> list[str]:
+    """Devuelve la lista de códigos de productos activos."""
+    return list(self.modulos.filter(activo=True).values_list("codigo", flat=True))
+```
+
+### Retrocompatibilidad con empresas existentes
+
+La migración que crea `EmpresaModulo` incluye un backfill que crea filas para todas las empresas existentes:
+
+```python
+# En la migración:
+def backfill_modulos(apps, schema_editor):
+    Empresa = apps.get_model("taller", "Empresa")
+    EmpresaModulo = apps.get_model("taller", "EmpresaModulo")
+    for empresa in Empresa.objects.all():
+        # Todas las empresas existentes reciben los tres productos
+        # para no cambiar ningún comportamiento activo en producción
+        for codigo in ["WORKSHOP", "SALVAGE", "PARTS"]:
+            EmpresaModulo.objects.get_or_create(empresa=empresa, codigo=codigo)
+```
+
+Las empresas nuevas reciben solo los productos que elijan en el onboarding.
 
 ---
 
-## 2. Sistema de Autorización por Módulo
+## 3. Sistema de Autorización — `@requiere_producto`
 
-### 2.1 Decorator `@requiere_modulo`
+### Decorator para FBVs
 
 **Archivo futuro:** `taller/decorators.py`
 
 ```python
 from functools import wraps
-from django.http import HttpResponseForbidden
-from django.shortcuts import redirect
+from django.http import HttpResponseForbidden, JsonResponse
 
-_MODULO_FIELD = {
-    "TALLER": "modulo_taller",
-    "DESARMADURIA": "modulo_desarmaduria",
-    "REPUESTOS": "modulo_repuestos",
-}
 
-def requiere_modulo(codigo: str):
+def requiere_producto(codigo: str):
     """
-    Decorador que verifica si la empresa tiene habilitado un módulo.
-    Uso: @requiere_modulo("DESARMADURIA")
+    Verifica que la empresa tenga habilitado un producto eGarage.
+
+    Uso:
+        @login_required
+        @requiere_producto("SALVAGE")
+        def lista_vehiculos_desarme(request): ...
     """
     def decorator(view_func):
         @wraps(view_func)
         def wrapper(request, *args, **kwargs):
             empresa = getattr(request, "empresa", None)
             if empresa is None:
+                from django.shortcuts import redirect
                 return redirect("account_login")
 
-            config = getattr(empresa, "config", None)
-            field = _MODULO_FIELD.get(codigo)
-            if field and config and not getattr(config, field, True):
-                # Módulo no habilitado: devolver 403 o redirigir a upgrade
-                if request.headers.get("x-requested-with") == "XMLHttpRequest":
-                    from django.http import JsonResponse
-                    return JsonResponse({"error": "Módulo no habilitado"}, status=403)
-                return HttpResponseForbidden("Módulo no habilitado para tu empresa.")
-
+            if not empresa.tiene_producto(codigo):
+                if _is_api_request(request):
+                    return JsonResponse(
+                        {"error": f"Producto {codigo} no habilitado", "codigo": codigo},
+                        status=403,
+                    )
+                return HttpResponseForbidden(
+                    f"Tu empresa no tiene acceso al producto {codigo}."
+                )
             return view_func(request, *args, **kwargs)
         return wrapper
     return decorator
+
+
+def _is_api_request(request) -> bool:
+    return (
+        request.headers.get("X-Requested-With") == "XMLHttpRequest"
+        or "application/json" in request.headers.get("Accept", "")
+        or "/api/" in request.path
+    )
 ```
 
-### 2.2 Mixin para Class-Based Views
-
-**Archivo futuro:** `taller/mixins.py` (extensión del existente)
+### Mixin para CBVs
 
 ```python
-class RequiereModuloMixin:
-    modulo_requerido: str = None  # "TALLER" | "DESARMADURIA" | "REPUESTOS"
+# taller/mixins.py — agregar junto a los mixins existentes
+
+class RequiereProductoMixin:
+    """
+    Mixin para Class-Based Views.
+
+    Uso:
+        class VehiculoDesarmeListView(RequiereProductoMixin, LoginRequiredMixin, ...):
+            producto_requerido = "SALVAGE"
+    """
+    producto_requerido: str = None
 
     def dispatch(self, request, *args, **kwargs):
-        if self.modulo_requerido:
+        if self.producto_requerido:
             empresa = getattr(request, "empresa", None)
-            config = getattr(empresa, "config", None) if empresa else None
-            field = _MODULO_FIELD.get(self.modulo_requerido)
-            if field and config and not getattr(config, field, True):
-                return HttpResponseForbidden("Módulo no habilitado.")
+            if empresa is None or not empresa.tiene_producto(self.producto_requerido):
+                from django.http import HttpResponseForbidden
+                return HttpResponseForbidden("Producto no habilitado.")
         return super().dispatch(request, *args, **kwargs)
 ```
 
-### 2.3 Aplicación por módulo
+### Aplicación por producto
 
-| Módulo | Archivos a decorar |
+| Producto | Vistas a decorar |
 |---|---|
-| DESARMADURIA | `taller/desarme/views.py`, `views_venta.py`, `views_inventario.py`, `views_pdf.py` |
-| REPUESTOS (vertical) | Vistas nuevas de la Etapa 5 |
-| TALLER | Sin decorador en Etapa inicial (es el módulo por defecto) |
+| SALVAGE | Todas las FBVs/CBVs en `taller/desarme/views.py`, `views_venta.py`, `views_inventario.py`, `views_pdf.py` |
+| PARTS | Vistas nuevas de la Épica E5 (Proveedor, OrdenCompra, MovimientoStock) |
+| WORKSHOP | Sin decorator en etapas iniciales — es el producto por defecto |
 
-**El decorador no se aplica a:**
-- Vistas del núcleo compartido (documentos, clientes, vehículos de reparación).
-- Vistas de kiosco público (son rutas `/public/`, no requieren empresa autenticada).
-- Vistas de administración (`/admin/`).
+**Nunca se decora:**
+- Vistas del núcleo compartido (Documentos, Clientes, Vehículos de reparación)
+- Kiosco público (`/tienda/<slug>/`) — es acceso público sin empresa autenticada
+- Vistas del admin de Django
+
+### Orden obligatorio de decoradores
+
+```python
+@login_required            # primero: ¿está autenticado?
+@requiere_producto("SALVAGE")  # segundo: ¿tiene el producto?
+def lista_vehiculos(request):
+    ...
+```
 
 ---
 
-## 3. Navegación
+## 4. `MenuService` — Construcción Centralizada del Menú
 
-### 3.1 Menú Principal — Diseño Objetivo
+El menú no se construye con condicionales en los templates. Los templates iteran sobre una lista de items que devuelve un servicio Python. Toda la lógica vive en el servicio.
 
-**Archivo a modificar:** `templates/base.html:807-875`
+### Por qué un servicio y no condicionales en templates
 
-El menú se divide en **fila de núcleo** (siempre visible) y **bloques de vertical** (condicionales).
+| Aspecto | Condicionales en template | MenuService |
+|---|---|---|
+| Testear la lógica del menú | Requiere render completo | Test unitario puro |
+| Agregar un item nuevo | Editar base.html (archivo crítico) | Editar MenuService (archivo contenido) |
+| Reutilizar el menú en API, email, mobile | Imposible directamente | `MenuService.build_for(empresa)` desde cualquier código |
+| Auditar qué ve cada empresa | Difícil de razonar en HTML | Inspección directa del objeto retornado |
 
-```html
-{# Fila núcleo: siempre visible para todos #}
-<div class="nav-row-core">
-  ⚙️ Ajustes
-  {% if request.user|is_owner %}👤 Equipo{% endif %}
-  🚀 Centro
-  👥 Clientes
-  📄 Documentos
-  📊 Reportes
-  🚪 Salir
-</div>
+### Diseño del servicio
 
-{# Bloque Taller: visible si modulo_taller #}
-{% if empresa.config.modulo_taller %}
-<div class="nav-row-taller">
-  🚗 Vehículos
-  🛠️ Servicios
-  🔧 Repuestos (consumo)
-  ⭐ Extra
-</div>
-{% endif %}
-
-{# Bloque Desarmaduría: visible si modulo_desarmaduria #}
-{% if empresa.config.modulo_desarmaduria %}
-<div class="nav-row-desarme">
-  🧩 Desarme
-  🔍 Interchange
-  🏪 Kiosco
-</div>
-{% endif %}
-
-{# Bloque Repuestos: visible si modulo_repuestos #}
-{% if empresa.config.modulo_repuestos %}
-<div class="nav-row-repuestos">
-  📦 Catálogo
-  🚚 Proveedores
-  📥 Compras
-</div>
-{% endif %}
-```
-
-### 3.2 Context Processor — `modulos_activos`
-
-**Archivo a modificar:** `taller/context_processors/empresa_contexto.py`
+**Archivo futuro:** `taller/services/menu_service.py`
 
 ```python
+from dataclasses import dataclass, field
+from typing import Optional
+
+
+@dataclass
+class MenuItem:
+    label_es: str
+    label_en: str
+    icon: str
+    url_name: str           # nombre de URL de Django (para {% url %} o reverse())
+    url_args: dict = field(default_factory=dict)
+    grupo: str = "core"     # "core" | "workshop" | "salvage" | "parts"
+    requires_owner: bool = False
+
+
+class MenuService:
+    """
+    Construye la lista de ítems de menú para una empresa.
+    Ningún template contiene lógica de qué mostrar; solo iteran esta lista.
+    """
+
+    # Ítems del núcleo: siempre presentes para cualquier empresa autenticada
+    CORE_ITEMS: list[MenuItem] = [
+        MenuItem("Ajustes",     "Settings",  "⚙️",  "company_settings",  grupo="core"),
+        MenuItem("Equipo",      "Team",      "👤",  "team",              grupo="core", requires_owner=True),
+        MenuItem("Centro",      "Center",    "🚀",  "centro_operaciones",grupo="core"),
+        MenuItem("Clientes",    "Clients",   "👥",  "clientes:lista_clientes",  grupo="core"),
+        MenuItem("Documentos",  "Documents", "📄",  "documentos:lista_documentos", grupo="core"),
+        MenuItem("Reportes",    "Reports",   "📊",  "reportes:reportes_dashboard", grupo="core"),
+    ]
+
+    WORKSHOP_ITEMS: list[MenuItem] = [
+        MenuItem("Vehículos",  "Vehicles", "🚗", "vehiculos:lista_vehiculos", grupo="workshop"),
+        MenuItem("Servicios",  "Services", "🛠️", "servicios:servicios_menu",  grupo="workshop"),
+        MenuItem("Repuestos",  "Parts",    "🔧", "repuestos:lista_repuestos", grupo="workshop"),
+        MenuItem("Extra",      "Extra",    "⭐", "servicios:otros_servicios", grupo="workshop"),
+    ]
+
+    SALVAGE_ITEMS: list[MenuItem] = [
+        MenuItem("Desarme",       "Salvage",       "🧩", "desarme:index",          grupo="salvage"),
+        MenuItem("Interchange",   "Interchange",   "🔍", "desarme:lista_interchange", grupo="salvage"),
+        MenuItem("Kiosco",        "Storefront",    "🏪", "tienda:tienda_publica",   grupo="salvage"),
+    ]
+
+    PARTS_ITEMS: list[MenuItem] = [
+        MenuItem("Catálogo",    "Catalog",   "📦", "parts:catalogo",    grupo="parts"),
+        MenuItem("Proveedores", "Suppliers", "🚚", "parts:proveedores",  grupo="parts"),
+        MenuItem("Compras",     "Purchases", "📥", "parts:compras",      grupo="parts"),
+    ]
+
+    @classmethod
+    def build_for(cls, empresa, user=None) -> list[MenuItem]:
+        """
+        Retorna la lista completa de ítems de menú para la empresa.
+        Respeta el estado de autenticación y los productos habilitados.
+        """
+        items: list[MenuItem] = []
+
+        # Núcleo: siempre presente
+        for item in cls.CORE_ITEMS:
+            if item.requires_owner and user and not _is_owner(user):
+                continue
+            items.append(item)
+
+        # Productos opcionales
+        if empresa and empresa.tiene_producto("WORKSHOP"):
+            items.extend(cls.WORKSHOP_ITEMS)
+
+        if empresa and empresa.tiene_producto("SALVAGE"):
+            items.extend(cls.SALVAGE_ITEMS)
+
+        if empresa and empresa.tiene_producto("PARTS"):
+            items.extend(cls.PARTS_ITEMS)
+
+        return items
+
+    @classmethod
+    def build_groups_for(cls, empresa, user=None) -> dict[str, list[MenuItem]]:
+        """
+        Retorna el menú agrupado por sección, útil para templates con filas separadas.
+        """
+        items = cls.build_for(empresa, user)
+        groups: dict[str, list[MenuItem]] = {}
+        for item in items:
+            groups.setdefault(item.grupo, []).append(item)
+        return groups
+```
+
+### Integración con el Context Processor
+
+```python
+# taller/context_processors/empresa_contexto.py — versión actualizada
+
+from taller.services.menu_service import MenuService
+
 def empresa_contexto(request):
     if not request.user.is_authenticated:
-        return {"empresa": None, "modulos_activos": {}}
+        return {"empresa": None, "menu_items": [], "menu_groups": {}}
     try:
         empresa = request.user.empresa
-        config = getattr(empresa, "config", None)
-        modulos_activos = {
-            "taller": getattr(config, "modulo_taller", True) if config else True,
-            "desarmaduria": getattr(config, "modulo_desarmaduria", True) if config else True,
-            "repuestos": getattr(config, "modulo_repuestos", True) if config else True,
-        }
+        menu_groups = MenuService.build_groups_for(empresa, user=request.user)
         return {
             "empresa": empresa,
             "nombre_taller": getattr(empresa, "nombre_taller", "eGarage"),
-            "modulos_activos": modulos_activos,
+            "menu_groups": menu_groups,
         }
     except Exception:
-        return {"empresa": None, "nombre_taller": None, "modulos_activos": {}}
+        return {"empresa": None, "menu_items": [], "menu_groups": {}}
 ```
 
-En los templates: `{% if modulos_activos.desarmaduria %}` en lugar de `{% if empresa.config.modulo_desarmaduria %}`. Más limpio y sin acoplamiento al modelo.
-
-### 3.3 Sidebar Lateral
-
-El archivo `templates/components/sidebar.html` (actualmente un stub de 21 líneas hardcodeado para CL) se reescribirá en la Etapa 2 para usar las mismas variables condicionales. Hasta entonces permanece sin cambios.
-
----
-
-## 4. Dashboards por Vertical
-
-### 4.1 Arquitectura de Dashboards
-
-No se crean tres dashboards distintos. Existe un **dashboard base** con **secciones condicionales** por módulo.
-
-```
-templates/dashboard/
-├── index.html                    ← base, incluye secciones
-├── sections/
-│   ├── _core_metrics.html        ← siempre visible (clientes, documentos, suscripción)
-│   ├── _taller_metrics.html      ← si modulo_taller
-│   ├── _desarme_metrics.html     ← si modulo_desarmaduria
-│   └── _repuestos_metrics.html   ← si modulo_repuestos
-```
-
-### 4.2 Workspace Home
-
-**Archivo a modificar:** `templates/taller/common/workspace_home.html`
-
-Actualmente muestra tres tarjetas fijas (Vehículos, Documentos, Desarme) para todos. Objetivo:
+### Template base — sin condicionales de lógica
 
 ```html
-{% if modulos_activos.taller %}
-  <a href="{% country_url 'vehiculos:lista_vehiculos' %}">🚗 Vehículos en taller</a>
-{% endif %}
-<a href="{{ base }}/documentos/">📄 Documentos</a>  {# siempre #}
-{% if modulos_activos.desarmaduria %}
-  <a href="{% country_url 'desarme:lista_vehiculos' %}">🧩 Patio de desarme</a>
-{% endif %}
-{% if modulos_activos.repuestos %}
-  <a href="{% country_url 'repuestos:catalogo' %}">📦 Catálogo</a>
-{% endif %}
+{# templates/base.html — sección de navegación #}
+{# El template solo itera; no decide qué mostrar #}
+
+<nav id="main-navigation">
+  {% for grupo, items in menu_groups.items %}
+    <div class="nav-group nav-group--{{ grupo }}">
+      {% for item in items %}
+        <a href="{% country_url item.url_name %}" class="nav-button-standard">
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-text">
+            {% if request.path|slice:":4" == "/us/" %}{{ item.label_en }}{% else %}{{ item.label_es }}{% endif %}
+          </span>
+        </a>
+      {% endfor %}
+    </div>
+  {% endfor %}
+</nav>
 ```
-
-### 4.3 Accesos Rápidos por Vertical
-
-| Vertical | Acceso rápido principal | KPI principal |
-|---|---|---|
-| Taller | Nueva OT | OTs abiertas / técnicos activos |
-| Desarmaduría | Nuevo vehículo de desarme | Piezas disponibles / recuperación % |
-| Casa de Repuestos | Nueva entrada de stock | Valor inventario / SKUs bajo mínimo |
 
 ---
 
 ## 5. Onboarding
 
-### 5.1 Flujo Objetivo
+### Separación de responsabilidades en el onboarding
+
+El onboarding captura dos cosas distintas:
+
+1. **Identidad** → escribe en `ConfiguracionEmpresa.rubro_principal`  
+   *"¿Qué tipo de negocio eres?"* — Workshop, Salvage, Parts
+
+2. **Acceso inicial** → crea filas en `EmpresaModulo`  
+   *"¿Qué productos de eGarage quieres activar?"* — derivado de la identidad, pero ajustable
+
+El administrador puede luego activar o desactivar productos en `EmpresaModulo` sin cambiar el `rubro_principal`.
+
+### Flujo objetivo
 
 ```
 /accounts/signup/
     ↓
-  Crear User + Empresa
+  Crear User + Empresa (vía allauth + CountryAwareAccountAdapter)
     ↓
-/onboarding/identidad/
+/onboarding/identidad/   (paso 1)
   campos: nombre_taller, logo
-  NUEVO: selector de tipo de negocio
-  ─────────────────────────────────
-  ¿Qué tipo de negocio administras?
-  ○ Taller mecánico o servicio automotriz
-  ○ Desarmaduría / Reciclaje automotriz
-  ○ Casa de repuestos / Autopartes
-  ○ Más de uno (multivertical)
+  NUEVO: selector de producto
+  ─────────────────────────────────────────────────
+  ¿Qué administras con eGarage?
+
+  [🔧 Taller / Servicios automotrices]
+     → rubro_principal = WORKSHOP
+     → EmpresaModulo: WORKSHOP
+
+  [🧩 Desarmaduría / Reciclaje automotriz]
+     → rubro_principal = SALVAGE (nuevo choice a agregar)
+     → EmpresaModulo: SALVAGE + PARTS (opcional)
+
+  [📦 Casa de repuestos / Autopartes]
+     → rubro_principal = PARTS
+     → EmpresaModulo: PARTS
+
+  [🔀 Más de uno]
+     → rubro_principal = MIXED
+     → EmpresaModulo: WORKSHOP + SALVAGE + PARTS
+  ─────────────────────────────────────────────────
     ↓
-  Se guarda en ConfiguracionEmpresa:
-    - rubro_principal = "WORKSHOP" | "MIXED" | "PARTS"
-    - modulo_taller = True/False
-    - modulo_desarmaduria = True/False
-    - modulo_repuestos = True/False
+/onboarding/finalizar/   (paso 3)
+  Template elegido según rubro_principal
+  Demo data cargada según EmpresaModulo activos
     ↓
-/onboarding/finalizar/
-  (igual al actual)
+  empresa.onboarding_completado = True
     ↓
-  Redirigir al Dashboard correspondiente a la vertical
+  redirect → dashboard adaptado a los productos activos
 ```
 
-### 5.2 Defaults por Selección
+### Defaults de EmpresaModulo por selección
 
-| Selección usuario | rubro_principal | modulo_taller | modulo_desarmaduria | modulo_repuestos |
-|---|---|---|---|---|
-| Taller | WORKSHOP | True | False | False |
-| Desarmaduría | MIXED | False | True | True |
-| Casa de Repuestos | PARTS | False | False | True |
-| Multivertical | MIXED | True | True | True |
+| Selección | `rubro_principal` | Módulos creados |
+|---|---|---|
+| Taller | `WORKSHOP` | `WORKSHOP` |
+| Desarmaduría | `SALVAGE` | `SALVAGE` |
+| Casa de repuestos | `PARTS` | `PARTS` |
+| Más de uno | `MIXED` | `WORKSHOP` + `SALVAGE` + `PARTS` |
 
-**Retrocompatibilidad:** Las empresas existentes sin ningún módulo guardado asumen `True` en los tres (campo `default=True`). El comportamiento actual no cambia.
-
-### 5.3 Cambios en Archivos
+### Archivos involucrados
 
 | Archivo | Cambio |
 |---|---|
-| `taller/forms/onboarding.py` | Agregar campo `tipo_negocio` (ChoiceField no-modelo) |
-| `templates/onboarding/paso_identidad.html` | Agregar selector de vertical (4 opciones con íconos) |
-| `taller/views/onboarding_views.py:onboarding_guardar_paso` | Mapear `tipo_negocio` → flags de módulo |
-| `taller/services/company_defaults_service.py` | Método `apply_modulos_por_tipo()` |
+| `taller/forms/onboarding.py` | Agregar `tipo_producto` ChoiceField (no-modelo) |
+| `templates/onboarding/paso_identidad.html` | Selector visual de producto (cards con íconos grandes) |
+| `taller/views/onboarding_views.py` | `onboarding_guardar_paso` paso 1: escribir `rubro_principal` y crear filas en `EmpresaModulo` |
+| `taller/services/company_defaults_service.py` | Método `provision_productos(empresa, tipo_producto)` |
 
 ---
 
 ## 6. Portal Público y SEO
 
-### 6.1 Estructura de URLs Públicas
+### Estructura de URLs
 
 ```python
-# gestion_taller/urls.py o taller/urls_public.py
+# En taller/urls_public.py o gestion_taller/urls.py
 
 urlpatterns += [
-    # Landings por vertical (sin prefijo de país — SEO global)
-    path("talleres/", views.landing_talleres, name="landing_talleres"),
-    path("desarmadurias/", views.landing_desarmadurias, name="landing_desarmadurias"),
-    path("repuestos/", views.landing_repuestos, name="landing_repuestos"),
+    # Sin prefijo de país — raíces globales para SEO
+    path("talleres/",      views.landing_workshop,    name="landing_workshop"),
+    path("desarmadurias/", views.landing_salvage,     name="landing_salvage"),
+    path("repuestos/",     views.landing_parts,       name="landing_parts"),
 
-    # Landings con prefijo de país (para SEO local)
-    path("cl/es/talleres/", views.landing_talleres_cl, name="landing_talleres_cl"),
-    path("cl/es/desarmadurias/", views.landing_desarmadurias_cl, name="landing_desarmadurias_cl"),
-    path("us/en/workshops/", views.landing_talleres_us, name="landing_talleres_us"),
-    path("us/en/salvage-yards/", views.landing_desarmadurias_us, name="landing_desarmadurias_us"),
-    path("us/es/desarmadurias/", views.landing_desarmadurias_us_es, name="landing_desarmadurias_us_es"),
+    # Con prefijo de país — SEO local
+    path("cl/es/talleres/",          views.landing_workshop_cl),
+    path("cl/es/desarmadurias/",     views.landing_salvage_cl),
+    path("us/en/workshops/",         views.landing_workshop_us_en),
+    path("us/en/salvage-yards/",     views.landing_salvage_us_en),
+    path("us/es/deshuesaderos/",     views.landing_salvage_us_es),
+    path("us/en/auto-parts/",        views.landing_parts_us_en),
 ]
 ```
 
-### 6.2 Jerarquía de Templates de Landing
+### Templates de landing
 
 ```
 templates/public/
-├── landing_talleres.html
-├── landing_desarmadurias.html
-├── landing_repuestos.html
-├── landing_chile_completa.html   ← existente, no tocar
-└── base_landing.html             ← base común para las tres landings nuevas
+├── base_landing.html                ← base compartida (nav mínimo, footer, SEO head)
+├── landing_workshop.html            ← eGarage Workshop
+├── landing_salvage.html             ← eGarage Salvage (incluye historia Atlanta)
+├── landing_parts.html               ← eGarage Parts
+└── landing_chile_completa.html      ← existente — no tocar hasta E6
 ```
 
-### 6.3 Estrategia SEO
-
-Cada landing tiene:
-- `<title>` específico para la vertical.
-- `<meta name="description">` con la propuesta de valor de esa vertical.
-- `<h1>` con la keyword principal.
-- Open Graph con imagen representativa de cada vertical.
-- Schema.org `SoftwareApplication` con `applicationCategory` diferenciado.
-- `<link rel="canonical">` para evitar duplicación entre variantes de idioma.
-
-**Keywords objetivo por vertical:**
-
-| Vertical | CL | US-ES | US-EN |
-|---|---|---|---|
-| Talleres | "software taller mecánico Chile" | "software taller mecánico USA" | "auto shop management software" |
-| Desarmadurías | "software desarmaduría Chile" | "software deshuesadero USA" | "salvage yard software" / "junkyard software" |
-| Repuestos | "software casa de repuestos Chile" | "software refaccionaria" | "auto parts store software" |
-
-### 6.4 Historia de Atlanta en /desarmadurias/
-
-La landing de desarmadurías incluye obligatoriamente:
+### Historia Atlanta — obligatoria en `landing_salvage.html`
 
 ```html
-<section class="historia-fundador">
-  <h2>Hecho por alguien que conoce el negocio por dentro</h2>
+<section class="historia-fundador" id="historia">
+  <h2>Construido por alguien que conoce el negocio por dentro</h2>
   <p>
     Más de 20 años trabajando en talleres y desarmadurías en Atlanta, Georgia.
     Después de vivir el desorden del inventario, decidí crear el sistema
-    que siempre necesité. Hoy eGarage ayuda a administrar vehículos,
-    piezas, ventas e inventario desde un solo lugar.
+    que siempre necesité. eGarage Salvage es eso: el software que un
+    operador de patio construiría para sí mismo.
   </p>
-  <p class="caso-real">
-    Atlanta Reciclajes SPA — el negocio donde eGarage se usa todos los días.
-  </p>
+  <div class="caso-real">
+    <strong>Atlanta Reciclajes SPA</strong> — el negocio donde eGarage
+    Salvage se usa todos los días desde Chile.
+  </div>
 </section>
 ```
 
-Esto no es marketing genérico. Es un diferenciador que ningún competidor puede copiar.
+### Keywords SEO por producto e idioma
+
+| Producto | Chile (CL/es) | USA-Latino (US/es) | USA-English (US/en) |
+|---|---|---|---|
+| Workshop | "software taller mecánico Chile" | "software taller mecánico USA" | "auto shop management software" |
+| Salvage | "software desarmaduría Chile" | "software deshuesadero" / "software yonke" | "salvage yard software" / "junkyard inventory" |
+| Parts | "software casa de repuestos Chile" | "software refaccionaria" | "auto parts store software" |
 
 ---
 
-## 7. Vertical Talleres — Especificación Técnica
+## 7. Producto Workshop — Estado y Especificación
 
-### 7.1 Estado actual
+### Estado actual: ~80% completo
 
-Aproximadamente 80% completo para el flujo principal. No requiere construcción nueva.
+No requiere construcción nueva. El flujo principal de talleres (cotización → OT → cierre → repuestos) funciona.
 
-### 7.2 Componentes del Core que pertenecen a Taller
+### Componentes exclusivos de Workshop
 
-| Componente | Tabla | ¿Exclusivo Taller? |
+| Componente | Tabla | Archivo |
 |---|---|---|
-| Técnico/Mecánico | `taller_tecnico` | Sí |
-| Servicio | `taller_servicio` (servicios/) | Sí |
-| Cita | `taller_cita` | Sí |
-| InspeccionIngreso | `taller_inspeccioningreso` | Sí |
-| Kilometraje | `taller_kilometraje` | Sí |
-| Vehículo (cliente/reparación) | `taller_vehiculo` | Compartido |
-| Documento (OT/cotización) | `taller_documento` | Compartido |
-| Repuesto (consumo en OT) | `taller_repuesto` | Compartido |
+| Técnico/Mecánico | `taller_tecnico` | `models/tecnico.py` |
+| Servicio | `taller_servicio` | `taller/servicios/` |
+| Cita | `taller_cita` | `models/cita.py` |
+| InspeccionIngreso | `taller_inspeccioningreso` | `models/inspeccion_ingreso.py` |
+| Kilometraje | `taller_kilometraje` | `models/kilometraje.py` |
 
-### 7.3 Accesos rápidos del workspace Taller
+### Dashboard Workshop
 
-- Nueva OT
-- Nueva cotización
-- Vehículos en proceso
-- Agenda del día
-- Repuestos con stock bajo
-
-### 7.4 Dashboard Taller
-
-- OTs abiertas / cerradas / en espera
+Sección del dashboard habilitada si `empresa.tiene_producto("WORKSHOP")`:
+- OTs abiertas / en proceso / cerradas
 - Producción por técnico
 - Repuestos más utilizados
 - Tiempo promedio de reparación
 
 ---
 
-## 8. Vertical Desarmadurías — Especificación Técnica
+## 8. Producto Salvage — Estado y Especificación
 
-### 8.1 Estado actual
+### Estado actual: ~75% completo
 
-Aproximadamente 75% completo. Los modelos, vistas y templates principales existen. Falta: gate de acceso, onboarding especializado, landing propia.
+Los modelos, vistas y templates principales existen y funcionan. Lo que falta es el gate de autorización y la integración con `EmpresaModulo`.
 
-### 8.2 Componentes exclusivos de Desarmaduría
+### Modelos exclusivos de Salvage (ya existen)
 
-| Componente | Tabla | Archivo |
-|---|---|---|
-| VehiculoDesarme | `taller_vehiculodesarme` | `models/vehiculo_desarme.py` |
-| PiezaDesarme | `taller_piezadesarme` | `models/pieza_desarme.py` |
-| VentaDesarme | `taller_ventadesarme` | `models/venta_desarme.py` |
-| VendedorDesarme | `taller_vendedordesarme` | `models/vendedor_desarme.py` |
-| InterchangePieza | `taller_interchangepieza` | `models/interchange_pieza.py` |
-| VehiculoFinancialSnapshot | `taller_vehiculofinancialsnapshot` | `models/vehiculo_financial.py` |
-| VehicleFinancialEvent | `taller_vehiclefinancialevent` | `models/vehiculo_financial.py` |
-| CatalogoRepuestoEmpresa | `taller_catalogorepuestoempresa` | `models/catalogo_repuesto_empresa.py` |
+| Modelo | Archivo actual |
+|---|---|
+| `VehiculoDesarme` | `taller/models/vehiculo_desarme.py` |
+| `PiezaDesarme` | `taller/models/pieza_desarme.py` |
+| `VentaDesarme` | `taller/models/venta_desarme.py` |
+| `VendedorDesarme` | `taller/models/vendedor_desarme.py` |
+| `InterchangePieza` | `taller/models/interchange_pieza.py` |
+| `VehiculoFinancialSnapshot` | `taller/models/vehiculo_financial.py:10` |
+| `VehicleFinancialEvent` | `taller/models/vehiculo_financial.py:64` |
+| `CatalogoRepuestoEmpresa` | `taller/models/catalogo_repuesto_empresa.py` |
 
-### 8.3 Flujo operativo principal
+### Flujo operativo
 
 ```
-1. Ingresar vehículo de desarme (VehiculoDesarme)
-      ↓
-2. Revisar y registrar daños por zona (carrocería, motor, etc.)
-      ↓
-3. Desarmar → crear piezas (PiezaDesarme) con código, precio, condición
-      ↓
-4. Las piezas aparecen en el inventario
-      ↓
-5. Cliente llega o busca en kiosco → iniciar venta
-      ↓
-6. Confirmar venta → se genera VentaDesarme + descuenta stock
-      ↓
-7. Si hay documento → generar desde Documento (integración con core)
-      ↓
-8. Finanzas: VehicleFinancialEvent registra cada ingreso/egreso del vehículo
-      ↓
-9. VehiculoFinancialSnapshot consolida ROI, recuperación %, health score
+1. Ingresar vehículo (VehiculoDesarme)
+2. Registrar daños por zona
+3. Crear piezas (PiezaDesarme) con código, precio, condición
+4. Inventario disponible en lista + kiosco
+5. Venta rápida → VentaDesarme → descuenta stock
+6. Financiero: VehicleFinancialEvent por cada ingreso/egreso
+7. Snapshot → ROI, recuperación %, health score
 ```
 
-### 8.4 Accesos rápidos del workspace Desarmaduría
+### Dashboard Salvage
 
-- Nuevo vehículo de desarme
-- Inventario (piezas disponibles)
-- Venta rápida
-- Dashboard financiero del patio
-- Kiosco (vista pública)
-
-### 8.5 Dashboard Desarmaduría
-
-- Piezas disponibles / vendidas / en scrap
-- Vehículos por estado (INGRESADO, DESARMANDO, DESARMADO, AGOTADO)
+Habilitado si `empresa.tiene_producto("SALVAGE")`:
+- Piezas disponibles / vendidas / scrap
+- Vehículos por estado
 - ROI promedio del patio
-- Top 5 vehículos con mayor recuperación
-- Top 5 piezas más vendidas
+- Top piezas vendidas
 - Ingresos vs. inversión (timeline)
 
 ---
 
-## 9. Vertical Casa de Repuestos — Especificación Técnica
+## 9. Producto Parts — Estado y Especificación
 
-### 9.1 Estado actual
+### Estado actual: ~15% completo
 
-Aproximadamente 15% completo. El modelo `Repuesto` existe pero fue diseñado para consumo en OTs, no para administración de inventario de una casa de repuestos.
+El modelo `Repuesto` existe pero fue diseñado para consumo en OTs. Se reutiliza; no se duplica.
 
-### 9.2 Componentes a construir
+### Modelos a construir
 
-#### Modelo Proveedor
-
+#### `Proveedor`
 ```python
 class Proveedor(TenantScoped):
     nombre = models.CharField(max_length=200)
-    rut = models.CharField(max_length=20, blank=True)
+    rut_o_tax_id = models.CharField(max_length=30, blank=True)
     email = models.EmailField(blank=True)
     telefono = models.CharField(max_length=40, blank=True)
-    direccion = models.CharField(max_length=200, blank=True)
     condicion_pago = models.CharField(
         max_length=20,
-        choices=[("CONTADO", "Contado"), ("CREDITO_30", "30 días"), ("CREDITO_60", "60 días")],
+        choices=[("CONTADO","Contado"),("30_DIAS","30 días"),("60_DIAS","60 días")],
         default="CONTADO",
     )
     activo = models.BooleanField(default=True)
 
     class Meta(TenantScoped.Meta):
         verbose_name = "Proveedor"
-        verbose_name_plural = "Proveedores"
 ```
 
-#### Modelo OrdenCompra
-
+#### `OrdenCompra` + `LineaOrdenCompra`
 ```python
 class OrdenCompra(TenantScoped):
     numero = models.PositiveIntegerField()
     proveedor = models.ForeignKey(Proveedor, on_delete=models.PROTECT)
     fecha = models.DateField(auto_now_add=True)
     estado = models.CharField(
+        max_length=20,
         choices=[
-            ("BORRADOR", "Borrador"),
-            ("ENVIADA", "Enviada al proveedor"),
-            ("RECIBIDA_PARCIAL", "Recibida parcialmente"),
-            ("RECIBIDA_TOTAL", "Recibida completa"),
-            ("ANULADA", "Anulada"),
+            ("BORRADOR","Borrador"), ("ENVIADA","Enviada"),
+            ("RECIBIDA_PARCIAL","Recibida parcialmente"),
+            ("RECIBIDA_TOTAL","Recibida total"), ("ANULADA","Anulada"),
         ],
         default="BORRADOR",
     )
-    observaciones = models.TextField(blank=True)
-```
 
-#### Modelo LineaOrdenCompra
-
-```python
 class LineaOrdenCompra(models.Model):
     orden = models.ForeignKey(OrdenCompra, on_delete=models.CASCADE, related_name="lineas")
     repuesto = models.ForeignKey("taller.Repuesto", on_delete=models.PROTECT)
@@ -639,165 +764,104 @@ class LineaOrdenCompra(models.Model):
     precio_costo = models.DecimalField(max_digits=12, decimal_places=2)
 ```
 
-#### Modelo MovimientoStock
-
+#### `MovimientoStock`
 ```python
 class MovimientoStock(TenantScoped):
-    repuesto = models.ForeignKey("taller.Repuesto", on_delete=models.PROTECT)
-    tipo = models.CharField(
-        choices=[
-            ("ENTRADA_COMPRA", "Entrada por compra"),
-            ("SALIDA_VENTA", "Salida por venta"),
-            ("SALIDA_OT", "Salida por OT"),
-            ("AJUSTE_POS", "Ajuste positivo"),
-            ("AJUSTE_NEG", "Ajuste negativo"),
-            ("DEVOLUCION", "Devolución"),
-        ]
-    )
-    cantidad = models.IntegerField()  # positivo=entrada, negativo=salida
+    repuesto = models.ForeignKey("taller.Repuesto", on_delete=models.PROTECT,
+                                  related_name="movimientos")
+    tipo = models.CharField(max_length=20, choices=[
+        ("ENTRADA_COMPRA","Entrada por compra"),
+        ("SALIDA_VENTA","Salida por venta directa"),
+        ("SALIDA_OT","Salida por OT"),
+        ("AJUSTE_POS","Ajuste positivo"),
+        ("AJUSTE_NEG","Ajuste negativo"),
+        ("DEVOLUCION","Devolución"),
+    ])
+    cantidad = models.IntegerField()          # positivo=entrada, negativo=salida
     stock_antes = models.IntegerField()
     stock_despues = models.IntegerField()
     referencia_id = models.IntegerField(null=True, blank=True)
-    referencia_tipo = models.CharField(max_length=20, blank=True)  # "OrdenCompra", "Documento", etc.
+    referencia_tipo = models.CharField(max_length=30, blank=True)
     fecha = models.DateTimeField(auto_now_add=True)
+    usuario = models.ForeignKey("auth.User", null=True, on_delete=models.SET_NULL)
 ```
 
-### 9.3 Relación con Repuesto existente
+### Relación con `Repuesto` existente
 
-El modelo `Repuesto` actual (`taller/models/repuesto.py`) se **reutiliza** para la vertical Casa de Repuestos. No se duplica.
+`MovimientoStock` traza los movimientos; el campo `cantidad_stock` en `Repuesto` es el saldo actual. Al recibir una `OrdenCompra`, el servicio crea un `MovimientoStock(tipo="ENTRADA_COMPRA")` y actualiza `repuesto.cantidad_stock`. Nunca se modifica `cantidad_stock` directamente.
 
-La diferencia es el **flujo que lo alimenta:**
-- En Talleres: el stock de Repuesto baja cuando se crea una línea en un Documento (OT).
-- En Casa de Repuestos: el stock sube por `MovimientoStock` tipo `ENTRADA_COMPRA` y baja por `SALIDA_VENTA` o `SALIDA_OT`.
+### Dashboard Parts
 
-### 9.4 Flujo operativo objetivo
-
-```
-1. Registrar proveedor (Proveedor)
-      ↓
-2. Crear orden de compra → seleccionar productos (OrdenCompra + LineaOrdenCompra)
-      ↓
-3. Recibir mercadería → crear MovimientoStock tipo ENTRADA_COMPRA
-   → actualiza cantidad_stock en Repuesto
-      ↓
-4. Cliente llega o busca en catálogo
-      ↓
-5. Venta directa → crear MovimientoStock tipo SALIDA_VENTA
-   → descuenta stock → genera Documento (tipo BOLETA/FACTURA)
-      ↓
-6. Dashboard: rentabilidad por SKU, rotación, SKUs bajo mínimo
-```
-
-### 9.5 Dashboard Casa de Repuestos
-
-- Valor total del inventario (precio_costo × stock)
+Habilitado si `empresa.tiene_producto("PARTS")`:
+- Valor total del inventario
 - SKUs bajo stock mínimo
-- Órdenes de compra pendientes
-- Ventas del mes vs. mes anterior
-- Top 10 SKUs por rotación
+- Órdenes de compra pendientes de recibir
+- Ventas directas del mes
 - Margen bruto por categoría
 
 ---
 
 ## 10. Estrategia de Migración
 
-### 10.1 Principio
+### Tabla de migraciones planificadas
 
-Ninguna migración rompe producción. Cada migración es aditiva o tiene un `default` que mantiene el comportamiento actual.
-
-### 10.2 Tabla de Migraciones Planificadas
-
-| # | Nombre | Tipo | Riesgo | Backfill |
+| ID | Nombre | Tipo | Riesgo | Backfill |
 |---|---|---|---|---|
-| M-01 | `add_modulos_configuracion` | ADD COLUMN × 3 en ConfiguracionEmpresa | Ninguno | No (default=True) |
-| M-02 | `add_proveedor` | CREATE TABLE Proveedor | Ninguno | No |
-| M-03 | `add_orden_compra` | CREATE TABLE OrdenCompra + Linea | Ninguno | No |
-| M-04 | `add_movimiento_stock` | CREATE TABLE MovimientoStock | Ninguno | No |
-| M-05 | `backfill_modulos_por_rubro` | UPDATE ConfiguracionEmpresa | Bajo | Sí — basado en rubro_principal |
+| M-01 | `create_empresa_modulo` | CREATE TABLE | Ninguno | Sí — `WORKSHOP + SALVAGE + PARTS` para todas las empresas existentes |
+| M-02 | `add_salvage_to_rubro_choices` | ALTER FIELD choices | Ninguno | No |
+| M-03 | `create_proveedor` | CREATE TABLE | Ninguno | No |
+| M-04 | `create_orden_compra` | CREATE TABLE | Ninguno | No |
+| M-05 | `create_movimiento_stock` | CREATE TABLE | Ninguno | No |
+| M-06 | `backfill_modulos_por_rubro` | UPDATE | Bajo | Sí — ver detalle |
 
-**M-05 detalle:**
-```sql
--- Empresas con rubro_principal PARTS → solo módulo repuestos
-UPDATE configuracionempresa SET modulo_taller=False, modulo_desarmaduria=False WHERE rubro_principal='PARTS';
--- No tocar el resto: ya tienen default=True en los tres
+### Detalle M-06 — Backfill opcional post-lanzamiento
+
+Solo se aplica **después** de que el onboarding lleve algunas semanas capturando la selección de producto, y solo para nuevas empresas. Las empresas existentes no se tocan.
+
+```python
+# M-06: quitar productos que no corresponden para empresas registradas después del lanzamiento de E1
+# Solo para empresas cuyo onboarding fue completado después de la fecha de E1
+def backfill_por_rubro(apps, schema_editor):
+    ConfiguracionEmpresa = apps.get_model("taller", "ConfiguracionEmpresa")
+    EmpresaModulo = apps.get_model("taller", "EmpresaModulo")
+    for config in ConfiguracionEmpresa.objects.filter(
+        empresa__onboarding_completed_at__gte=FECHA_LANZAMIENTO_E1
+    ):
+        if config.rubro_principal == "PARTS":
+            EmpresaModulo.objects.filter(
+                empresa=config.empresa,
+                codigo__in=["WORKSHOP", "SALVAGE"]
+            ).update(activo=False)
 ```
 
-### 10.3 Empresas Existentes
-
-Las empresas actualmente en producción no se verán afectadas hasta que se ejecute M-05. Incluso después de M-05, el único efecto será que las empresas configuradas como `PARTS` no verán el módulo de taller en el menú — lo que ya es correcto.
-
-### 10.4 Rollback por Etapa
+### Rollback por etapa
 
 | Etapa | Rollback |
 |---|---|
-| 0 (landings) | Eliminar los 3-4 archivos nuevos |
-| 1 (migración flags) | `manage.py migrate taller XXXX` hacia atrás + revertir forms/templates onboarding |
-| 2 (menú condicional) | Revertir 1 archivo: `templates/base.html` |
-| 3 (decorator en views) | Revertir los `@requiere_modulo` de las vistas |
-| 4 (onboarding especializado) | Revertir template + form |
-| 5 (vertical repuestos) | Eliminar modelos nuevos + migraciones (sin datos en prod aún) |
+| E0 (landings) | Eliminar los 4 archivos nuevos + revertir `landing_inicio.html` |
+| E1 (EmpresaModulo + onboarding) | `manage.py migrate taller M-00` + revertir forms/views/templates |
+| E2 (auth backend) | Eliminar `taller/decorators.py` + quitar decorators de las vistas de desarme |
+| E3 (MenuService + menú) | Eliminar `menu_service.py` + revertir `base.html` a versión anterior |
+| E4 (onboarding especializado) | Revertir template + lógica de selección de template en `onboarding_views.py` |
+| E5 (Parts completo) | Eliminar modelos + migraciones M-03/04/05 (sin datos en prod aún) |
 
 ---
 
-## 11. Convenciones de Código
+## 11. Resumen de Decisiones Arquitectónicas
 
-### 11.1 Nombres de variables en templates
-
-```html
-{# CORRECTO: usar context processor #}
-{% if modulos_activos.desarmaduria %}
-
-{# EVITAR: acceso directo al modelo desde template #}
-{% if empresa.config.modulo_desarmaduria %}
-```
-
-### 11.2 Verificación de módulo en vistas
-
-```python
-# CORRECTO
-@login_required
-@requiere_modulo("DESARMADURIA")
-def lista_vehiculos(request):
-    ...
-
-# TAMBIÉN CORRECTO para CBVs
-class VehiculoDesarmeListView(RequiereModuloMixin, LoginRequiredMixin, TenantViewMixin, ListView):
-    modulo_requerido = "DESARMADURIA"
-    ...
-
-# INCORRECTO: verificar en lógica de negocio
-def lista_vehiculos(request):
-    if not request.empresa.config.modulo_desarmaduria:
-        return 403
-    ...
-```
-
-### 11.3 Defaults seguros
-
-Cualquier acceso a flags de módulo debe tener un `getattr(..., True)` como fallback para no romper con empresas que aún no tienen `ConfiguracionEmpresa`:
-
-```python
-config = getattr(empresa, "config", None)
-modulo_activo = getattr(config, "modulo_desarmaduria", True) if config else True
-```
+| Decisión | Elección | Alternativa descartada | Razón |
+|---|---|---|---|
+| ¿Modelo para módulos? | Tabla `EmpresaModulo` normalizada | Booleanos en ConfiguracionEmpresa | Extensible, auditable, sin crecer Config |
+| ¿`rubro_principal` controla módulos? | No. Son dimensiones independientes | Derivar módulos del rubro siempre | Una empresa puede cambiar productos sin cambiar identidad |
+| ¿Menú construido dónde? | `MenuService` en Python | Condicionales en `base.html` | Testeable, reutilizable, sin lógica en templates |
+| ¿Qué va antes: auth o menú? | Auth backend (E2) antes que menú (E3) | Menú primero, auth después | Nunca ocultar algo sin protegerlo |
+| ¿Nomenclatura interna? | `WORKSHOP / SALVAGE / PARTS` | `TALLER / DESARMADURIA / REPUESTOS` | Inglés canónico en código, español en UI |
+| ¿Tabla EmpresaModulo ahora o después? | Ahora — es el diseño definitivo | Booleanos como paso intermedio | El paso intermedio crea deuda que hay que migrar |
+| ¿Default para empresas existentes? | Backfill con los tres productos activos | `default=False` + backfill selectivo | No romper producción existente |
+| ¿Dividir la app Django? | No. Sub-paquetes dentro de `taller/` | Nueva app Django por producto | Impacto en URLs, migrations, settings no justificado |
+| ¿Historia de Atlanta en la landing? | Obligatoria en `landing_salvage.html` | Opcional o en sección separada | Es el único diferencial que no puede copiarse |
+| ¿Casa de Repuestos en E1? | No. Solo modelos en E5+ | Todo de una vez | Validar demanda antes de construir |
 
 ---
 
-## 12. Resumen de Decisiones Arquitectónicas
-
-| Decisión | Elección | Alternativa descartada |
-|---|---|---|
-| ¿Cómo modelar módulos? | Flags booleanos en ConfiguracionEmpresa (Etapa 1) | Tabla EmpresaModulo (reservada para Etapa 5+) |
-| ¿Default para empresas existentes? | `default=True` en los tres módulos | `default=False` con backfill previo (riesgo innecesario) |
-| ¿Tipo de campo en onboarding? | ChoiceField no-modelo, se mapea a flags en save() | Campo modelo directo en Empresa |
-| ¿Protección por URL? | Decorator `@requiere_modulo` en vistas | Middleware (afecta toda la cadena) |
-| ¿Menú diferenciado? | Condicionales en templates (variables del context processor) | Tres templates de base distintos |
-| ¿Dashboards? | Un dashboard base con secciones condicionales | Tres dashboards independientes |
-| ¿Landings públicas? | Rutas globales `/talleres/`, `/desarmadurias/`, `/repuestos/` + variantes por país | Solo variantes por país |
-| ¿Casa de Repuestos en Etapa 1? | No. Solo landings y flags. Construir en Etapa 5+ | Construir todo de una vez (alto riesgo) |
-| ¿Dividir repositorio? | No. Una sola app. | Tres repos / tres deploys |
-| ¿Nueva app Django para cada vertical? | No. Sub-paquetes dentro de `taller/`. | Nuevas Django apps (impacto en URLs, migrations, settings) |
-
----
-
-*Este documento es la guía de arquitectura. Ningún cambio de código se realiza hasta que este documento sea aprobado. Ver ROADMAP_VERTICALS.md para el plan de implementación por fases.*
+*Ver ROADMAP_VERTICALS.md para el plan de implementación épica por épica.*
