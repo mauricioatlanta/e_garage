@@ -74,6 +74,9 @@ from .alias_repuesto import AliasRepuesto
 # Inspección de ingreso de vehículos
 from .inspeccion_ingreso import InspeccionIngreso, DanoInspeccion, EvidenciaInspeccion
 
+# Dominios personalizados
+from .empresa_dominio import EmpresaDominio
+
 # Modelos de extras de vehículos
 from .extras_vehiculo import (
     CajaVehiculo,
@@ -144,6 +147,8 @@ __all__ = [
     "InspeccionIngreso",
     "DanoInspeccion",
     "EvidenciaInspeccion",
+    # Dominios personalizados
+    "EmpresaDominio",
     # Extras de vehículos
     "CajaVehiculo",
     "CajaVehiculoEmpresa",
