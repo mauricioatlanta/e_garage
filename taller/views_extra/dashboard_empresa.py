@@ -677,71 +677,10 @@ def dashboard_centro_operaciones_espacial(request):
         }
     )
 
-    # Branding - Usar la misma lógica que el context processor
-    from django.conf import settings
-    from taller.models.configuracion import ConfiguracionEmpresa
-    from taller.models.company_settings import CompanySettings
+    from taller.services.branding_service import BrandingService
 
-    # Inicializar con defaults
-    company_name = getattr(settings, "DEFAULT_BRAND_NAME", "eGarage")
-    logo_url = getattr(settings, "DEFAULT_BRAND_LOGO_URL", None)
-    tagline = getattr(settings, "DEFAULT_BRAND_TAGLINE", None)
-    company_color = getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#00ffff")
-
-    # 1. PRIORIDAD MÁXIMA: CompanySettings (tabla nueva)
-    try:
-        company_settings = CompanySettings.objects.get(user=request.user)
-        if company_settings.logo:
-            logo_url = company_settings.logo.url
-        if hasattr(company_settings, "company_name") and company_settings.company_name:
-            company_name = company_settings.company_name
-        if hasattr(company_settings, "tagline") and company_settings.tagline:
-            tagline = company_settings.tagline
-        if hasattr(company_settings, "primary_color") and company_settings.primary_color:
-            company_color = company_settings.primary_color
-    except CompanySettings.DoesNotExist:
-        pass
-
-    # 2. SEGUNDA PRIORIDAD: ConfiguracionEmpresa (si no hay CompanySettings)
-    # Solo usar si no se estableció desde CompanySettings
-    try:
-        conf = ConfiguracionEmpresa.objects.get(empresa=empresa)
-        if conf.logo and not logo_url:
-            try:
-                logo_url = conf.logo.url
-            except Exception:
-                pass
-        # Solo usar nombre_publico si no se estableció desde CompanySettings
-        if hasattr(conf, "nombre_publico") and conf.nombre_publico:
-            if company_name == getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"):
-                company_name = conf.nombre_publico
-        # Solo usar tagline si no se estableció desde CompanySettings
-        if hasattr(conf, "tagline") and conf.tagline:
-            if not tagline or tagline == getattr(settings, "DEFAULT_BRAND_TAGLINE", None):
-                tagline = conf.tagline
-        # Solo usar brand_color si no se estableció desde CompanySettings
-        if hasattr(conf, "brand_color") and conf.brand_color:
-            if company_color == getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#00ffff"):
-                company_color = conf.brand_color
-    except ConfiguracionEmpresa.DoesNotExist:
-        pass
-
-    # 3. TERCERA PRIORIDAD: Empresa directamente (fallback)
-    if not logo_url and hasattr(empresa, "logo") and empresa.logo:
-        try:
-            logo_url = empresa.logo.url
-        except Exception:
-            pass
-    if company_name == getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"):
-        company_name = empresa.nombre_taller
-    if not tagline:
-        tagline = getattr(empresa, "tagline", None)
-    if (
-        company_color == getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#00ffff")
-        and hasattr(empresa, "color_primario")
-        and empresa.color_primario
-    ):
-        company_color = empresa.color_primario
+    brand = BrandingService.get_brand(empresa, user=request.user)
+    brand_dict = brand.as_dict()
 
     context = {
         # Información de empresa
@@ -784,29 +723,16 @@ def dashboard_centro_operaciones_espacial(request):
         # Fechas
         "fecha_hoy": hoy,
         "mes_actual": hoy.strftime("%B %Y"),
-        # Branding - usando la misma lógica que el context processor
-        "company_name": company_name,
-        "company_logo_url": logo_url,
-        "company_color": company_color,
-        "company_tagline": tagline,
+        # Branding — fuente única de verdad via BrandingService
+        "BRAND": brand_dict,
+        "company_name": brand_dict["name"],
+        "company_logo_url": brand_dict["logo_url"],
+        "company_color": brand_dict["primary_color"],
+        "company_tagline": brand_dict["tagline"],
         "es_dashboard_espacial": True,
         # Datos para gráficos (JSON)
         "chart_data_json": chart_data_json,
     }
-
-    # BRAND object
-    try:
-        context["BRAND"] = {
-            "logo_url": context.get("company_logo_url"),
-            "name": context.get("company_name"),
-            "tagline": context.get("company_tagline"),
-            "primary_color": context.get("company_color"),
-            "secondary_color": context.get("company_color"),
-            "country": getattr(empresa, "pais", None),
-            "currency": getattr(empresa, "simbolo_moneda", None),
-        }
-    except Exception:
-        pass
 
     # Usar template resolution unificado
     from django.template.response import TemplateResponse

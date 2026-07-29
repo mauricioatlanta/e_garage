@@ -18,6 +18,7 @@ from django.template.loader import get_template
 from taller.context_processors.company_branding_unified import company_branding
 from taller.context_processors.company_header import company_header
 from taller.models.company_settings import CompanySettings
+from taller.services.branding_service import BrandingService
 from taller.utils.email_helper import get_branded_from_email, get_support_reply_to
 
 
@@ -73,81 +74,29 @@ class DocumentoPDFExporter:
 
         empresa, config_empresa = self._get_empresa_config()
 
-        branding_ctx = company_branding(self.request) if self.request else {}
-        header_ctx = company_header(self.request) if self.request else {}
-
-        company_settings = None
         request_user = getattr(self.request, "user", None) if self.request else None
-        if request_user and request_user.is_authenticated:
-            try:
-                company_settings = CompanySettings.objects.get(user=request_user)
-            except CompanySettings.DoesNotExist:
-                pass
-        if not company_settings and empresa and getattr(empresa, "user", None):
-            try:
-                company_settings = CompanySettings.objects.get(user=empresa.user)
-            except CompanySettings.DoesNotExist:
-                pass
+        owner = (
+            request_user
+            if (request_user and getattr(request_user, "is_authenticated", False))
+            else getattr(empresa, "user", None)
+        )
+        brand = BrandingService.get_brand(empresa, user=owner)
 
         def _safe_logo_url(obj):
             logo_field = getattr(obj, "logo", None)
             if not logo_field:
                 return ""
-            url = getattr(logo_field, "url", "")
-            return url or ""
+            return getattr(logo_field, "url", "") or ""
 
+        # Mantener empresa_logo_url / config_logo_url porque el template PDF los usa como fallback
         empresa_logo_url = _safe_logo_url(empresa) if empresa else ""
         config_logo_url = _safe_logo_url(config_empresa) if config_empresa else ""
-        empresa_tagline = getattr(empresa, "lema", "") if empresa else ""
-        config_tagline = getattr(config_empresa, "tagline", "") if config_empresa else ""
-        settings_tagline = getattr(company_settings, "tagline", "") if company_settings else ""
 
-        company_name = (
-            (company_settings.company_name if company_settings else "")
-            or branding_ctx.get("company_name")
-            or (config_empresa.nombre_publico if config_empresa else "")
-            or (getattr(empresa, "nombre_taller", "") if empresa else "")
-            or (getattr(empresa, "empresa", "") if empresa else "")
-            or "Taller sin nombre"
-        )
-
-        company_address = (
-            header_ctx.get("COMPANY_ADDRESS")
-            or (company_settings.address if company_settings else "")
-            or (config_empresa.direccion if config_empresa else "")
-            or (
-                str(config_empresa.legal_address)
-                if config_empresa and config_empresa.legal_address
-                else ""
-            )
-            or (getattr(empresa, "direccion", "") if empresa else "")
-            or ""
-        )
-
-        company_phone = (
-            header_ctx.get("COMPANY_PHONE")
-            or (company_settings.phone if company_settings else "")
-            or (config_empresa.telefono if config_empresa else "")
-            or (getattr(empresa, "telefono", "") if empresa else "")
-            or ""
-        )
-
-        company_email = (
-            header_ctx.get("COMPANY_EMAIL")
-            or (company_settings.email if company_settings else "")
-            or (config_empresa.email_contacto if config_empresa else "")
-            or (getattr(empresa, "email", "") if empresa else "")
-            or ""
-        )
-
-        company_site = (
-            header_ctx.get("COMPANY_WEBSITE")
-            or header_ctx.get("COMPANY_SITE")
-            or (company_settings.website if company_settings else "")
-            or (config_empresa.sitio_web if config_empresa else "")
-            or (getattr(empresa, "sitio_web", "") if empresa else "")
-            or ""
-        )
+        company_name    = brand.name or "Taller sin nombre"
+        company_address = brand.address or ""
+        company_phone   = brand.phone or ""
+        company_email   = brand.email or ""
+        company_site    = brand.website or ""
 
         # Prefetch line items once to avoid multiple queries
         repuestos_qs = list(self.documento.lineas_repuesto.all())
@@ -173,22 +122,16 @@ class DocumentoPDFExporter:
             "config_empresa": config_empresa,  # Agregar configuración de empresa
             "empresa_logo_url": empresa_logo_url,
             "config_logo_url": config_logo_url,
-            "empresa_tagline": empresa_tagline,
-            "config_tagline": config_tagline or settings_tagline,
-            "company_tagline": branding_ctx.get("company_tagline")
-            or settings_tagline
-            or config_tagline
-            or empresa_tagline,
+            "empresa_tagline": brand.tagline,
+            "config_tagline": brand.tagline,
+            "company_tagline": brand.tagline,
             "company_name": company_name,
             "company_address": company_address,
             "company_phone": company_phone,
             "company_email": company_email,
             "company_site": company_site,
             "COMPANY_NAME": company_name,
-            "COMPANY_TAGLINE": branding_ctx.get("company_tagline")
-            or settings_tagline
-            or config_tagline
-            or empresa_tagline,
+            "COMPANY_TAGLINE": brand.tagline,
             "company_website": company_site,
             "company_address": company_address,
             "company_phone": company_phone,

@@ -57,153 +57,26 @@ def _first_nonempty(*values):
 
 def company_branding(request):
     """
-    Context processor unificado de branding.
-    Retorna objeto BRAND con todas las propiedades de marca.
-    Usa empresa del request (middleware) o del usuario.
+    Context processor de branding — delega a BrandingService.
+
+    URLs de la landing (/ o seleccionar_pais) siempre devuelven la marca
+    de la plataforma (eGarage) independientemente del usuario autenticado.
     """
-    from django.conf import settings
+    from taller.services.branding_service import BrandingService
+
+    if request.path in ("/", "") or "seleccionar_pais" in request.path:
+        brand = BrandingService._defaults()
+        brand.name = "eGarage"
+        return BrandingService.as_context(brand)
+
     from django.contrib.auth.models import AnonymousUser
 
-    from taller.models import ConfiguracionEmpresa
-    from taller.models.company_settings import CompanySettings
-    from taller.models.empresa import Empresa
-
     user = getattr(request, "user", None)
-
-    # Si estamos en la página raíz o de selección de país, siempre usar "eGarage"
-    if request.path == "/" or request.path == "" or "seleccionar_pais" in request.path:
-        brand = {
-            "logo_url": getattr(settings, "DEFAULT_BRAND_LOGO_URL", None),
-            "name": "eGarage",
-            "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Control total para tu taller"),
-            "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
-            "currency": getattr(settings, "DEFAULT_BRAND_CURRENCY", "CLP"),
-            "primary_color": getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#0d6efd"),
-            "secondary_color": getattr(settings, "DEFAULT_BRAND_SECONDARY_COLOR", "#6c757d"),
-        }
-        return {
-            "BRAND": brand,
-            "company_name": "eGarage",
-            "company_logo_url": brand["logo_url"],
-            "company_tagline": brand.get("tagline"),
-            "primary_color": brand["primary_color"],
-            "secondary_color": brand["secondary_color"],
-            "company_color": brand["primary_color"],
-        }
-
-    # Defaults del sistema
-    default_logo_url = getattr(settings, "DEFAULT_BRAND_LOGO_URL", None)
-    brand = {
-        "logo_url": default_logo_url,
-        "name": getattr(settings, "DEFAULT_BRAND_NAME", "eGarage"),
-        "tagline": getattr(settings, "DEFAULT_BRAND_TAGLINE", "Control total para tu taller"),
-        "country": getattr(settings, "DEFAULT_BRAND_COUNTRY", "cl"),
-        "currency": getattr(settings, "DEFAULT_BRAND_CURRENCY", "CLP"),
-        "primary_color": getattr(settings, "DEFAULT_BRAND_PRIMARY_COLOR", "#0d6efd"),
-        "secondary_color": getattr(settings, "DEFAULT_BRAND_SECONDARY_COLOR", "#6c757d"),
-    }
-
-    # Si no hay usuario autenticado, retornar defaults
     if not user or not user.is_authenticated or isinstance(user, AnonymousUser):
-        return {
-            "BRAND": brand,
-            "company_name": brand["name"],
-            "company_logo_url": brand["logo_url"],
-            "company_tagline": brand.get("tagline"),
-            "primary_color": brand["primary_color"],
-            "secondary_color": brand["secondary_color"],
-            "company_color": brand["primary_color"],
-        }
+        return BrandingService.as_context(BrandingService._defaults())
 
-    # Buscar empresa del usuario
-    empresa = getattr(request, "empresa_actual", None)
-    if not empresa:
-        try:
-            empresa = Empresa.objects.get(user=user)
-        except Empresa.DoesNotExist:
-            try:
-                empresa = Empresa.objects.filter(usuario=user).first()
-            except:
-                pass
-
-    if empresa:
-        # 1. PRIORIDAD MÁXIMA: CompanySettings (tabla nueva)
-        try:
-            company_settings = CompanySettings.objects.get(user=user)
-            if company_settings.logo:
-                brand["logo_url"] = company_settings.logo.url
-            brand["name"] = _first_nonempty(
-                getattr(company_settings, "company_name", ""),
-                brand["name"],
-            )
-            if hasattr(company_settings, "tagline") and company_settings.tagline:
-                brand["tagline"] = company_settings.tagline
-            if hasattr(company_settings, "primary_color") and company_settings.primary_color:
-                brand["primary_color"] = company_settings.primary_color
-            if hasattr(company_settings, "secondary_color") and company_settings.secondary_color:
-                brand["secondary_color"] = company_settings.secondary_color
-        except CompanySettings.DoesNotExist:
-            pass
-
-        # 2. SEGUNDA PRIORIDAD: ConfiguracionEmpresa (si no hay CompanySettings)
-        try:
-            conf = ConfiguracionEmpresa.objects.get(empresa=empresa)
-            if conf.logo and brand["logo_url"] == default_logo_url:
-                brand["logo_url"] = conf.logo.url
-            brand["name"] = _first_nonempty(
-                getattr(conf, "nombre_publico", ""),
-                brand["name"],
-            )
-            if hasattr(conf, "tagline") and conf.tagline:
-                brand["tagline"] = conf.tagline
-            if hasattr(conf, "brand_color") and conf.brand_color:
-                brand["primary_color"] = conf.brand_color
-            if hasattr(conf, "moneda") and conf.moneda:
-                brand["currency"] = conf.moneda
-            if hasattr(conf, "pais") and conf.pais:
-                brand["country"] = conf.pais
-        except ConfiguracionEmpresa.DoesNotExist:
-            pass
-        except Exception as e:
-            # Capturar OperationalError y otros errores de DB (ej: columna 'rubros' no existe)
-            # Esto puede ocurrir si faltan migraciones en la base de datos
-            import logging
-
-            logger = logging.getLogger(__name__)
-            logger.debug(f"Error obteniendo ConfiguracionEmpresa (posible migración faltante): {e}")
-            pass
-
-        # 3. TERCERA PRIORIDAD: Empresa directamente (fallback)
-        if brand["logo_url"] == default_logo_url and hasattr(empresa, "logo") and empresa.logo:
-            brand["logo_url"] = empresa.logo.url
-        default_name = getattr(settings, "DEFAULT_BRAND_NAME", "eGarage")
-        if brand["name"] == default_name:
-            brand["name"] = _first_nonempty(
-                getattr(empresa, "nombre_taller", ""),
-                getattr(empresa, "empresa", ""),
-                default_name,
-            )
-        else:
-            brand["name"] = _first_nonempty(brand["name"], default_name)
-        if hasattr(empresa, "pais") and empresa.pais:
-            brand["country"] = empresa.pais.lower()
-        if hasattr(empresa, "moneda") and empresa.moneda:
-            brand["currency"] = empresa.moneda
-
-    # Retornar objeto BRAND + variables de compatibilidad
-    result = {
-        "BRAND": brand,
-        # Backwards compatibility
-        "company_name": brand["name"],
-        "company_logo_url": brand["logo_url"],
-        "company_tagline": brand.get("tagline"),
-        "primary_color": brand["primary_color"],
-        "secondary_color": brand["secondary_color"],
-        "company_color": brand["primary_color"],
-        "company_country": brand["country"],
-        "company_currency": brand["currency"],
-    }
-    return result
+    brand = BrandingService.get_brand_for_request(request)
+    return BrandingService.as_context(brand)
 
 
 def company_country(request):
