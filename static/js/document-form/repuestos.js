@@ -633,8 +633,7 @@
 
     function handleCreatedRepuestoFromReturn(context) {
         var repuestoId = context.created_repuesto_id || '';
-        var piezaDesarmeId = context.pieza_desarme_id || '';
-        if (!repuestoId && !piezaDesarmeId) {
+        if (!repuestoId) {
             return;
         }
 
@@ -655,8 +654,7 @@
             precio_compra: context.created_repuesto_precio_compra || 0,
             costo_linea: context.created_repuesto_costo_linea || 0,
             cantidad: 1,
-            origen_repuesto: piezaDesarmeId ? 'DESARME' : 'STOCK_BODEGA',
-            pieza_desarme_id: piezaDesarmeId,
+            origen_repuesto: 'STOCK_BODEGA',
         });
 
         if (EG.utils.clearActiveRowContext) {
@@ -670,156 +668,8 @@
         }
     }
 
-    function openUsedPartsModal() {
-        var modal = document.getElementById('modal-used-parts');
-        if (!modal) return;
-        modal.classList.remove('hidden');
-        var searchInput = document.getElementById('used-parts-search');
-        var resultsEl = document.getElementById('used-parts-results');
-        var emptyEl = document.getElementById('used-parts-empty');
-        if (searchInput) {
-            searchInput.value = '';
-            searchInput.focus();
-        }
-        if (resultsEl) resultsEl.innerHTML = '';
-        if (emptyEl) {
-            emptyEl.textContent = 'Escriba al menos 2 caracteres para buscar';
-            emptyEl.classList.remove('hidden');
-        }
-    }
-
-    function closeUsedPartsModal() {
-        var modal = document.getElementById('modal-used-parts');
-        if (modal) modal.classList.add('hidden');
-    }
-
     function init() {
         document.querySelectorAll('#repuestos-container .dynamic-element').forEach(setupRepuestoRow);
-
-        var modal = document.getElementById('modal-used-parts');
-        if (modal && !modal.dataset.egBound) {
-            modal.dataset.egBound = '1';
-
-            var overlay = document.getElementById('used-parts-overlay');
-            if (overlay) {
-                overlay.addEventListener('click', closeUsedPartsModal);
-            }
-            var closeBtn = document.getElementById('close-used-parts');
-            if (closeBtn) {
-                closeBtn.addEventListener('click', closeUsedPartsModal);
-            }
-
-            var usedPartsSearch = document.getElementById('used-parts-search');
-            var usedPartsResults = document.getElementById('used-parts-results');
-            var usedPartsEmpty = document.getElementById('used-parts-empty');
-            var usedPartsTimer = null;
-
-            function resetUsedPartsUI(message) {
-                if (usedPartsResults) usedPartsResults.innerHTML = '';
-                if (usedPartsEmpty) {
-                    usedPartsEmpty.textContent = message || 'Escriba al menos 2 caracteres para buscar';
-                    usedPartsEmpty.classList.remove('hidden');
-                }
-            }
-
-            function renderUsedPartsResults(items) {
-                if (!usedPartsResults) return;
-                usedPartsResults.innerHTML = '';
-
-                if (!items || !items.length) {
-                    resetUsedPartsUI('No se encontraron piezas disponibles');
-                    return;
-                }
-
-                if (usedPartsEmpty) usedPartsEmpty.classList.add('hidden');
-
-                items.forEach(function(item) {
-                    var precio = item.precio_venta_sugerido != null ? item.precio_venta_sugerido : (item.precio || 0);
-                    var div = document.createElement('div');
-                    div.className = 'doc-used-modal__item';
-                    div.dataset.piezaId = item.id || '';
-                    div.dataset.codigo = item.codigo || '';
-                    div.dataset.nombre = item.nombre || '';
-                    div.dataset.precio = precio;
-                    div.dataset.costo = item.costo_asignado || 0;
-                    div.dataset.cantidad = item.cantidad || 0;
-                    div.innerHTML = '<div class="font-semibold text-cyan-200">'
-                        + escapeHtml((item.codigo ? item.codigo + ' - ' : '') + (item.nombre || ''))
-                        + '</div>'
-                        + '<div class="text-xs text-gray-400">'
-                        + 'Disponibles: ' + (item.cantidad || 0)
-                        + (item.vehiculo_origen ? ' • ' + escapeHtml(item.vehiculo_origen) : '')
-                        + ' • ' + money(precio)
-                        + '</div>';
-                    div.addEventListener('click', function() {
-                        var newRow = addRepuestoRow(null);
-                        if (newRow && newRow.__applyRepData) {
-                            newRow.__applyRepData({
-                                id: '',
-                                codigo: div.dataset.codigo,
-                                nombre: div.dataset.nombre,
-                                precio_venta: parseFloat(div.dataset.precio) || 0,
-                                costo_linea: parseFloat(div.dataset.costo) || 0,
-                                cantidad: 1,
-                                origen_repuesto: 'DESARME',
-                                pieza_desarme_id: div.dataset.piezaId,
-                            });
-                        }
-                        closeUsedPartsModal();
-                    });
-                    usedPartsResults.appendChild(div);
-                });
-            }
-
-            async function searchUsedParts(query) {
-                var q = String(query || '').trim();
-                if (q.length < 2) {
-                    resetUsedPartsUI();
-                    return;
-                }
-                var url = (EG.cfg && EG.cfg.URL_USED_PARTS) || '';
-                if (!url) {
-                    resetUsedPartsUI('URL de búsqueda no configurada');
-                    return;
-                }
-                try {
-                    var response = await EG.utils.egFetch(url + '?q=' + encodeURIComponent(q));
-                    if (!response.ok) throw new Error('HTTP ' + response.status);
-                    var data = await response.json();
-                    var items = (data && Array.isArray(data.results)) ? data.results : (Array.isArray(data) ? data : []);
-                    renderUsedPartsResults(items);
-                } catch (err) {
-                    console.error('searchUsedParts:', err);
-                    if (usedPartsResults) {
-                        usedPartsResults.innerHTML = '<div class="p-3 text-red-300">Error al buscar piezas</div>';
-                    }
-                    if (usedPartsEmpty) usedPartsEmpty.classList.add('hidden');
-                }
-            }
-
-            if (usedPartsSearch) {
-                usedPartsSearch.addEventListener('input', function(event) {
-                    clearTimeout(usedPartsTimer);
-                    usedPartsTimer = setTimeout(function() {
-                        searchUsedParts(event.target.value);
-                    }, 250);
-                });
-                usedPartsSearch.addEventListener('keydown', function(event) {
-                    if (event.key === 'Escape') {
-                        closeUsedPartsModal();
-                    }
-                });
-            }
-
-            if (usedPartsResults) {
-                usedPartsResults.addEventListener('keydown', function(event) {
-                    if (event.key === 'Escape') {
-                        closeUsedPartsModal();
-                    }
-                });
-            }
-        }
-
         refreshHeaderLabels();
         toggleRepuestosEmptyHint();
     }
@@ -827,12 +677,9 @@
     EG.repuestos = {
         addRepuestoRow: addRepuestoRow,
         setupRepuestoRow: setupRepuestoRow,
-        openUsedPartsModal: openUsedPartsModal,
-        closeUsedPartsModal: closeUsedPartsModal,
         handleCreatedRepuestoFromReturn: handleCreatedRepuestoFromReturn,
         init: init
     };
 
     window.addRepuestoRow = addRepuestoRow;
-    window.openUsedPartsModal = openUsedPartsModal;
 })();

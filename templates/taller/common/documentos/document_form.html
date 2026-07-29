@@ -36,7 +36,6 @@
   data-url-service-search="{% country_url 'servicios:buscar_servicios_api' %}"
   data-url-service-create="{% country_url 'servicios:crear_servicio' %}"
   data-url-outsourced-services="{% country_url 'servicios:buscar_otros_servicios_api' %}"
-  data-url-used-parts="{% country_url 'api:buscar_piezas_desarme_api' %}"
 >
   {% csrf_token %}
 
@@ -570,25 +569,7 @@
         <section class="doc-panel doc-panel--section">
           <div class="doc-section-head">
             <div>
-              <h2 data-i18n="repuestos">REPUESTOS / REPUESTOS USADAS</h2>
-              {% if desarme_origen_label %}
-                <p class="doc-section-note">
-                  <span class="doc-pill doc-pill--warning">Usado</span>
-                  <span>Venta iniciada desde desarme: {{ desarme_origen_label }}</span>
-                </p>
-              {% endif %}
-            </div>
-            <div class="doc-section-actions">
-              <button type="button" id="add-repuesto" class="doc-action-btn doc-action-btn--cyan"><span aria-hidden="true">+</span><span data-i18n="agregar">AGREGAR</span></button>
-              <a href="{% country_url 'repuestos:crear_repuesto' %}?return_to={{ request.get_full_path|urlencode }}&select_field=repuesto" class="doc-action-btn doc-action-btn--cyan-alt"><span aria-hidden="true">+</span><span data-i18n="nuevo">Nuevo</span></a>
-              <a id="goto-used-parts" href="{% country_url 'desarme:lista_piezas' %}?return_to={{ request.get_full_path|urlencode }}&select_field=pieza_desarme" class="doc-action-btn doc-action-btn--ghost">
-                <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" style="width:13px;height:13px;stroke:currentColor;stroke-width:1.7;flex-shrink:0;stroke-linecap:round;stroke-linejoin:round">
-                  <path d="M3.75 6A2.25 2.25 0 0 1 6 3.75h12A2.25 2.25 0 0 1 20.25 6v1a2.25 2.25 0 0 1-2.25 2.25H6A2.25 2.25 0 0 1 3.75 7V6Z"/>
-                  <path d="M3.75 9.25v8A2.25 2.25 0 0 0 6 19.5h12a2.25 2.25 0 0 0 2.25-2.25v-8"/>
-                  <path d="M9.75 13.25h4.5"/>
-                </svg>
-                <span data-i18n="usado">Usado</span>
-              </a>
+              <h2 data-i18n="repuestos">REPUESTOS</h2>
             </div>
           </div>
 
@@ -809,18 +790,6 @@
   </div>
 </div>
 
-<div id="modal-used-parts" class="doc-used-modal hidden">
-  <div id="used-parts-overlay" class="doc-used-modal__overlay"></div>
-  <div class="doc-used-modal__dialog">
-    <div class="doc-used-modal__panel">
-      <h3>Repuestos usados (de desarme)</h3>
-      <input type="search" id="used-parts-search" placeholder="Buscar por código o nombre..." autocomplete="off">
-      <div id="used-parts-results" class="doc-used-modal__results"></div>
-      <p id="used-parts-empty" class="doc-used-modal__empty hidden">Escriba al menos 2 caracteres para buscar</p>
-      <button type="button" id="close-used-parts" class="doc-action-btn doc-action-btn--ghost">Cerrar</button>
-    </div>
-  </div>
-</div>
 
 {{ clientes_prefetch|json_script:"prefetchClientes" }}
 {{ vehiculos_prefetch|json_script:"prefetchVehiculos" }}
@@ -829,7 +798,6 @@
 {{ otros_servicios_prefetch|json_script:"prefetchOtrosServicios" }}
 {{ ui_config.tax_lines|json_script:"uiConfigTaxLines" }}
 {{ document_form_bootstrap|json_script:"documentFormBootstrap" }}
-{% if desarme_origen_label %}<script>window.DESARME_PREFILL = true;</script>{% endif %}
 {% if has_server_line_items %}
 <script>
 if (window.DESARME_PREFILL) {
@@ -863,9 +831,9 @@ if (window.DESARME_PREFILL) {
       tipo_opts: { OT: 'Orden de Trabajo', PRES: 'Presupuesto', FAC: 'Comprobante', PTS: 'Venta Repuestos' },
       pay_opts: { pending: 'Pendiente', paid: 'Pagado', partial: 'Parcial', canceled: 'Anulado' },
       cliente: 'CLIENTE', vehiculo: 'VEHÍCULO',
-      repuestos: 'REPUESTOS / REPUESTOS USADAS', servicios: 'SERVICIOS',
+      repuestos: 'REPUESTOS', servicios: 'SERVICIOS',
       otros_servicios: 'OTROS SERVICIOS / TERCEROS', totales: 'TOTALES', notas: 'NOTAS',
-      agregar: 'AGREGAR', nuevo: 'Nuevo', usado: 'Usado',
+      agregar: 'AGREGAR', nuevo: 'Nuevo',
       nuevo_vehiculo: 'Nuevo vehículo',
       cancelar: 'CANCELAR', guardar_borrador: 'GUARDAR BORRADOR',
       guardar_continuar: 'GUARDAR Y CONTINUAR', guardar_cambios: 'Guardar cambios',
@@ -900,9 +868,9 @@ if (window.DESARME_PREFILL) {
       tipo_opts: { OT: 'Work Order', PRES: 'Estimate', FAC: 'Invoice', PTS: 'Parts Sale' },
       pay_opts: { pending: 'Pending', paid: 'Paid', partial: 'Partial', canceled: 'Canceled' },
       cliente: 'CLIENT', vehiculo: 'VEHICLE',
-      repuestos: 'PARTS / USED PARTS', servicios: 'SERVICES',
+      repuestos: 'PARTS', servicios: 'SERVICES',
       otros_servicios: 'OTHER SERVICES / THIRD PARTIES', totales: 'TOTALS', notas: 'NOTES',
-      agregar: 'ADD', nuevo: 'New', usado: 'Used',
+      agregar: 'ADD', nuevo: 'New',
       nuevo_vehiculo: 'New vehicle',
       cancelar: 'CANCEL', guardar_borrador: 'SAVE DRAFT',
       guardar_continuar: 'SAVE AND CONTINUE', guardar_cambios: 'Save changes',

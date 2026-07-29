@@ -45,7 +45,6 @@
         EG.cfg.URL_SERVICE_SEARCH = EG.cfg.URL_SERVICE_SEARCH || form.dataset.urlServiceSearch;
         EG.cfg.URL_SERVICE_CREATE = EG.cfg.URL_SERVICE_CREATE || form.dataset.urlServiceCreate;
         EG.cfg.URL_OUTSOURCED_SERVICES = EG.cfg.URL_OUTSOURCED_SERVICES || form.dataset.urlOutsourcedServices;
-        EG.cfg.URL_USED_PARTS = EG.cfg.URL_USED_PARTS || form.dataset.urlUsedParts;
     }
 
     /**
