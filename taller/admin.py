@@ -920,3 +920,95 @@ try:
     from taller.admin_memoria import *  # noqa: F403, F401
 except ImportError:
     pass  # Admin de memoria no disponible aún
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Dominios personalizados
+# Nota: el código de referencia vive en taller/admin/empresa_dominio.py, pero
+# no puede importarse desde allí porque taller/admin.py (este archivo) toma
+# precedencia sobre el directorio taller/admin/ como módulo Python.
+# ─────────────────────────────────────────────────────────────────────────────
+from taller.models.empresa_dominio import EmpresaDominio
+
+
+@admin.register(EmpresaDominio)
+class EmpresaDominioAdmin(admin.ModelAdmin):
+    list_display   = ("dominio", "empresa", "estado_badge", "ssl_emitido", "verificado_en", "creado_en")
+    list_filter    = ("estado", "ssl_emitido")
+    search_fields  = ("dominio", "empresa__nombre_taller", "empresa__user__email")
+    readonly_fields = (
+        "token_verificacion",
+        "verificado_en",
+        "ultimo_check_dns",
+        "intentos_verificacion",
+        "creado_en",
+        "actualizado_en",
+        "txt_record_name",
+        "txt_record_value",
+        "cname_target",
+    )
+    ordering = ("-creado_en",)
+    fieldsets = (
+        ("Dominio", {"fields": ("empresa", "dominio", "estado", "creado_por")}),
+        ("Instrucciones DNS", {
+            "fields": ("txt_record_name", "txt_record_value", "cname_target"),
+            "classes": ("collapse",),
+        }),
+        ("Verificación", {
+            "fields": ("token_verificacion", "verificado_en", "ultimo_check_dns", "intentos_verificacion"),
+            "classes": ("collapse",),
+        }),
+        ("SSL", {
+            "fields": ("ssl_emitido", "ssl_cert_path", "ssl_key_path", "ssl_expira_en"),
+            "classes": ("collapse",),
+        }),
+        ("Auditoría", {"fields": ("creado_en", "actualizado_en"), "classes": ("collapse",)}),
+    )
+    actions = ("suspender_action", "reactivar_action")
+
+    @admin.display(description="Estado")
+    def estado_badge(self, obj):
+        colores = {
+            "PENDIENTE":     ("#f59e0b", "⏳"),
+            "VERIFICANDO":   ("#3b82f6", "🔍"),
+            "ACTIVO":        ("#10b981", "✅"),
+            "ERROR_DNS":     ("#ef4444", "❌"),
+            "SSL_PENDIENTE": ("#8b5cf6", "🔒"),
+            "SUSPENDIDO":    ("#6b7280", "⛔"),
+        }
+        color, icono = colores.get(obj.estado, ("#6b7280", "?"))
+        return format_html(
+            '<span style="color:{}; font-weight:600;">{} {}</span>',
+            color, icono, obj.get_estado_display(),
+        )
+
+    @admin.display(description="Registro TXT — Nombre")
+    def txt_record_name(self, obj):
+        return obj.get_txt_record_name() if obj.pk else "—"
+
+    @admin.display(description="Registro TXT — Valor")
+    def txt_record_value(self, obj):
+        return obj.get_txt_record_value() if obj.pk else "—"
+
+    @admin.display(description="CNAME destino")
+    def cname_target(self, obj):
+        return obj.get_cname_target()
+
+    @admin.action(description="Suspender dominios seleccionados")
+    def suspender_action(self, request, queryset):
+        from taller.services.domain_service import DomainService
+        count = 0
+        for ed in queryset.exclude(estado=EmpresaDominio.Estado.SUSPENDIDO):
+            DomainService.suspender(ed)
+            count += 1
+        self.message_user(request, f"{count} dominio(s) suspendido(s).")
+
+    @admin.action(description="Reactivar → PENDIENTE")
+    def reactivar_action(self, request, queryset):
+        from taller.services.domain_service import DomainService
+
+        count = 0
+        for ed in queryset.filter(estado=EmpresaDominio.Estado.SUSPENDIDO):
+            DomainService.reactivar(ed)
+            count += 1
+
+        self.message_user(request, f"{count} dominio(s) reactivado(s) a PENDIENTE.")
