@@ -7,7 +7,7 @@ name = "egarage"
 version = "1.0.0"
 description = "Sistema multi-país para gestión de talleres automotrices"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.11,<3.13"
 license = {text = "Proprietary"}
 authors = [
     {name = "eGarage Team"}
@@ -21,7 +21,7 @@ Homepage = "https://egarage.cl"
 # ============================================================================
 [tool.black]
 line-length = 100
-target-version = ['py311', 'py312', 'py313']
+target-version = ['py311', 'py312']
 include = '\.pyi?$'
 extend-exclude = '''
 /(

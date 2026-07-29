@@ -1,6 +1,27 @@
 ﻿#!/usr/bin/env python
-import os
 import sys
+
+# ── Guardia de versión Python ──────────────────────────────────────────────────
+# Django 4.2 solo soporta Python 3.8–3.12. Python 3.13+ rompe Context.__copy__
+# en el sistema de templates y el cliente de pruebas (store_rendered_templates),
+# causando fallos en tests y comportamiento indefinido en producción.
+_PY = sys.version_info
+if not ((3, 11) <= _PY < (3, 13)):
+    sys.stderr.write(
+        f"\n[eGarage] Python {_PY.major}.{_PY.minor} no está soportado.\n"
+        "         Versiones requeridas: 3.11 o 3.12.\n\n"
+        "         Para recrear el entorno virtual:\n"
+        "           pyenv install 3.12        # o: sudo apt install python3.12\n"
+        "           pyenv local 3.12\n"
+        "           rm -rf .venv\n"
+        "           python3.12 -m venv .venv\n"
+        "           source .venv/bin/activate\n"
+        "           pip install -r requirements.txt\n\n"
+    )
+    sys.exit(1)
+# ── Fin guardia ────────────────────────────────────────────────────────────────
+
+import os
 from pathlib import Path
 
 from dotenv import load_dotenv

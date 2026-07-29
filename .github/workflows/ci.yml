@@ -13,6 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
+    strategy:
+      fail-fast: false
+      matrix:
+        # Django 4.2 soporta Python 3.8–3.12. Python 3.13+ no está soportado.
+        python-version: ["3.11", "3.12"]
+
+    name: Python ${{ matrix.python-version }}
+
     env:
       DJANGO_SETTINGS_MODULE: gestion_taller.settings
       PYTHONUNBUFFERED: "1"
@@ -21,10 +29,10 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up Python
+      - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: ${{ matrix.python-version }}
           cache: pip
 
       - name: Install system dependencies
