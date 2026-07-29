@@ -91,3 +91,4 @@ pandas==3.0.3
 openpyxl==3.1.5
 resend>=2.0.0
 django-redis>=5.4.0
+dnspython>=2.6.0
