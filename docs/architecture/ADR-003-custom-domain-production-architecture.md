@@ -1,9 +1,9 @@
 # ADR-003 — Arquitectura de Producción para Dominios Personalizados
 
-**Estado:** Propuesto  
-**Fecha:** 2026-07-29  
-**Autores:** Mauricio Alvarado  
-**Revisores:** —  
+**Estado:** Propuesto
+**Fecha:** 2026-07-29
+**Autores:** Mauricio Alvarado
+**Revisores:** —
 **Relacionado con:** ADR-002 (Dominios Personalizados — Modelo y Verificación)
 
 ---
