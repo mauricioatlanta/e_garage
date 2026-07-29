@@ -3,7 +3,7 @@ from decimal import Decimal
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.messages import get_messages
-from django.core.exceptions import PermissionDenied
+from django.core.exceptions import PermissionDenied, ValidationError
 from django.shortcuts import redirect, render
 
 from taller.templatetags.role_tags import is_owner
@@ -11,12 +11,16 @@ from taller.templatetags.role_tags import is_owner
 from taller.context_processors import invalidate_company_cache
 from taller.forms.company_settings_forms import (
     CompanyProfileForm,
+    DominioPersonalizadoForm,
     FinancialSettingsForm,
     ThemeSettingsForm,
 )
+from taller.services.branding_service import BrandingService
 from taller.models import Tecnico
 from taller.models.company_settings import CompanySettings
 from taller.models.configuracion import ConfiguracionEmpresa
+from taller.models.empresa_dominio import EmpresaDominio
+from taller.services.domain_service import DomainService
 from taller.utils.country_config import get_country_config
 from taller.utils.empresa import get_or_create_empresa
 from taller.utils.payment_config import get_transfer_payment_details
@@ -87,88 +91,8 @@ def _collect_form_errors(forms):
 
 
 def _sync_company_models(config, config_empresa, empresa):
-    empresa_updates = []
-    config_updates = []
-
-    if empresa.nombre_taller != config.company_name:
-        empresa.nombre_taller = config.company_name
-        empresa_updates.append("nombre_taller")
-    if empresa.direccion != config.address:
-        empresa.direccion = config.address
-        empresa_updates.append("direccion")
-    if empresa.telefono != config.phone:
-        from taller.models.empresa import Empresa as EmpresaModel
-        phone_taken = (
-            config.phone
-            and EmpresaModel.objects.filter(telefono=config.phone)
-            .exclude(pk=empresa.pk)
-            .exists()
-        )
-        if not phone_taken:
-            empresa.telefono = config.phone
-            empresa_updates.append("telefono")
-    if empresa.email != config.email:
-        empresa.email = config.email
-        empresa_updates.append("email")
-    if config.logo:
-        logo_name = config.logo.name
-        if getattr(empresa.logo, "name", "") != logo_name:
-            empresa.logo = logo_name
-            empresa_updates.append("logo")
-
-    if config_empresa.nombre_publico != config.company_name:
-        config_empresa.nombre_publico = config.company_name
-        config_updates.append("nombre_publico")
-    if config_empresa.tagline != config.tagline:
-        config_empresa.tagline = config.tagline
-        config_updates.append("tagline")
-    if config_empresa.direccion != config.address:
-        config_empresa.direccion = config.address
-        config_updates.append("direccion")
-    if config_empresa.telefono != config.phone:
-        config_empresa.telefono = config.phone
-        config_updates.append("telefono")
-    if config_empresa.email_contacto != config.email:
-        config_empresa.email_contacto = config.email
-        config_updates.append("email_contacto")
-    if config_empresa.sitio_web != config.website:
-        config_empresa.sitio_web = config.website
-        config_updates.append("sitio_web")
-    if config_empresa.moneda != config.currency:
-        config_empresa.moneda = config.currency
-        config_updates.append("moneda")
-    if config_empresa.tasa_impuesto != config.tax_rate:
-        config_empresa.tasa_impuesto = config.tax_rate
-        config_updates.append("tasa_impuesto")
-    if config_empresa.sales_tax_rate != config.tax_rate:
-        config_empresa.sales_tax_rate = config.tax_rate
-        config_updates.append("sales_tax_rate")
-    if config_empresa.aplicar_impuesto_por_defecto != config.apply_tax_by_default:
-        config_empresa.aplicar_impuesto_por_defecto = config.apply_tax_by_default
-        config_updates.append("aplicar_impuesto_por_defecto")
-    if config_empresa.dividir_por_tecnico != config.separate_by_technician:
-        config_empresa.dividir_por_tecnico = config.separate_by_technician
-        config_updates.append("dividir_por_tecnico")
-    if config_empresa.brand_color != config.primary_color:
-        config_empresa.brand_color = config.primary_color
-        config_updates.append("brand_color")
-    if config.logo:
-        logo_name = config.logo.name
-        if getattr(config_empresa.logo, "name", "") != logo_name:
-            config_empresa.logo = logo_name
-            config_updates.append("logo")
-
-    if empresa_updates:
-        from django.db import IntegrityError
-        try:
-            empresa.save(update_fields=empresa_updates)
-        except IntegrityError:
-            # Constraint en empresa — guarda sin telefono como fallback
-            safe = [f for f in empresa_updates if f != "telefono"]
-            if safe:
-                empresa.save(update_fields=safe)
-    if config_updates:
-        config_empresa.save(update_fields=config_updates)
+    """Wrapper de compatibilidad — delega a BrandingService.sync_to_legacy_models."""
+    BrandingService.sync_to_legacy_models(config, config_empresa, empresa)
 
 
 def _subscription_price_context(empresa):
@@ -202,6 +126,44 @@ def company_settings_view(request):
     is_spanish = getattr(empresa, "pais", "CL") in SPANISH_COUNTRIES
 
     if request.method == "POST":
+        if "registrar_dominio" in request.POST:
+            form_dominio = DominioPersonalizadoForm(request.POST)
+            if form_dominio.is_valid():
+                try:
+                    DomainService.registrar(
+                        empresa,
+                        form_dominio.cleaned_data["dominio"],
+                        creado_por=request.user,
+                    )
+                    messages.success(
+                        request,
+                        "Dominio registrado. Configura los registros DNS para verificarlo.",
+                    )
+                except ValidationError as exc:
+                    for msg in exc.messages:
+                        messages.error(request, msg)
+            else:
+                for errs in form_dominio.errors.values():
+                    for err in errs:
+                        messages.error(request, err)
+            return redirect(request.path)
+
+        if "solicitar_verificacion" in request.POST:
+            dominio_id = request.POST.get("solicitar_verificacion")
+            try:
+                ed = EmpresaDominio.objects.get(pk=dominio_id, empresa=empresa)
+                DomainService.preparar_verificacion(ed)
+                messages.success(
+                    request,
+                    f"Verificación iniciada para {ed.dominio}. "
+                    "Revisaremos tus registros DNS en breve.",
+                )
+            except EmpresaDominio.DoesNotExist:
+                messages.error(request, "Dominio no encontrado.")
+            except ValueError as exc:
+                messages.error(request, str(exc))
+            return redirect(request.path)
+
         if "crear_tecnico" in request.POST:
             nombre = request.POST.get("nombre", "").strip()
             telefono = request.POST.get("telefono", "").strip()
@@ -316,6 +278,9 @@ def company_settings_view(request):
             )
 
     tecnicos = Tecnico.objects.filter(empresa=empresa).order_by("nombre")
+    dominios = DomainService.listar_para_empresa(empresa)
+    dominio_activo = DomainService.get_activo_para_empresa(empresa)
+    form_dominio = DominioPersonalizadoForm()
 
     # SUBSCRIPTION CONTEXT
     subscription = None
@@ -403,6 +368,9 @@ def company_settings_view(request):
             "config_empresa": config_empresa,
             "datos_transferencia": get_transfer_payment_details(empresa.pais),
             "subscription_prices": _subscription_price_context(empresa),
+            "dominios": dominios,
+            "dominio_activo": dominio_activo,
+            "form_dominio": form_dominio,
 
             # SUBSCRIPTION
             "subscription": subscription,

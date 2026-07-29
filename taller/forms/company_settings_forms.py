@@ -4,6 +4,26 @@ from django.utils.translation import gettext_lazy as _
 from taller.models.company_settings import CompanySettings
 
 
+class DominioPersonalizadoForm(forms.Form):
+    """Formulario para registrar un dominio personalizado de tenant."""
+
+    dominio = forms.CharField(
+        max_length=253,
+        label=_("Dominio personalizado"),
+        help_text=_("FQDN sin protocolo ni barra final. Ej: taller.midominio.com"),
+        widget=forms.TextInput(
+            attrs={
+                "class": "form-control",
+                "placeholder": "taller.midominio.com",
+                "autocomplete": "off",
+            }
+        ),
+    )
+
+    def clean_dominio(self):
+        return (self.cleaned_data.get("dominio") or "").strip().lower()
+
+
 class CompanyProfileForm(forms.ModelForm):
     """Formulario para perfil de empresa (nombre, logo, contacto, datos fiscales)"""
 

@@ -1136,6 +1136,12 @@
                     <i class="fas fa-users"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Gestión de Empleados{% else %}Employee Management{% endif %}
                 </button>
             </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="dominio-tab" data-bs-toggle="pill" data-bs-target="#dominio" type="button" role="tab">
+                    <i class="fas fa-globe"></i>{% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dominio Personalizado{% else %}Custom Domain{% endif %}
+                    {% if dominio_activo %}<span class="badge bg-success ms-1" style="font-size:0.65rem;">✓</span>{% endif %}
+                </button>
+            </li>
         </ul>
     </div>
 
@@ -1517,6 +1523,86 @@
                     {% endif %}
                 </div>
             </div>
+
+            <!-- Tab: Dominio Personalizado -->
+            <div class="tab-pane fade" id="dominio" role="tabpanel">
+                <div class="form-section">
+                    <h4>
+                        <i class="fas fa-globe"></i>
+                        {% if request.path|slice:':3' == '/cl' or request.path|slice:':4' == '/cl/' or empresa_pais|default:'CL' == 'CL' %}Dominio Personalizado{% else %}Custom Domain{% endif %}
+                    </h4>
+
+                    {% if dominio_activo %}
+                    <div class="alert alert-success mb-4" style="border-radius:8px;">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <strong>{% if request.path|slice:':3' == '/cl' %}Dominio activo{% else %}Active domain{% endif %}:</strong>
+                        <code class="ms-1">{{ dominio_activo.dominio }}</code>
+                    </div>
+                    {% endif %}
+
+                    {% for dom in dominios %}
+                    <div class="mb-3 p-3" style="background:rgba(0,255,255,0.04);border-radius:8px;border:1px solid rgba(0,255,255,0.12);">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap" style="gap:10px;">
+                            <div>
+                                <code style="color:var(--neon-cyan);font-size:1rem;">{{ dom.dominio }}</code>
+                                <span class="badge ms-2"
+                                    style="background:{% if dom.estado == 'ACTIVO' %}#10b981{% elif dom.estado == 'PENDIENTE' %}#f59e0b{% elif dom.estado == 'VERIFICANDO' %}#3b82f6{% elif dom.estado == 'ERROR_DNS' %}#ef4444{% else %}#6b7280{% endif %};">
+                                    {{ dom.get_estado_display }}
+                                </span>
+                            </div>
+                            {% if dom.puede_verificarse %}
+                            <button type="submit" name="solicitar_verificacion" value="{{ dom.pk }}"
+                                class="btn btn-sm btn-outline-info">
+                                <i class="fas fa-search me-1"></i>
+                                {% if request.path|slice:':3' == '/cl' %}Solicitar verificación{% else %}Request verification{% endif %}
+                            </button>
+                            {% endif %}
+                        </div>
+                        {% if dom.estado == 'PENDIENTE' or dom.estado == 'VERIFICANDO' or dom.estado == 'ERROR_DNS' %}
+                        <div class="mt-3 p-3" style="background:rgba(0,0,0,0.3);border-radius:6px;font-size:0.82rem;">
+                            <strong style="color:var(--neon-cyan);">
+                                {% if request.path|slice:':3' == '/cl' %}Instrucciones DNS{% else %}DNS Instructions{% endif %}
+                            </strong>
+                            <p class="mb-1 mt-2">
+                                {% if request.path|slice:':3' == '/cl' %}Crea estos registros en tu proveedor de DNS:{% else %}Create these records in your DNS provider:{% endif %}
+                            </p>
+                            <div class="mb-1">
+                                <span class="badge bg-secondary me-1">TXT</span>
+                                <code>{{ dom.get_txt_record_name }}</code>
+                                <span class="text-muted mx-1">→</span>
+                                <code>{{ dom.get_txt_record_value }}</code>
+                            </div>
+                            <div>
+                                <span class="badge bg-secondary me-1">CNAME</span>
+                                <code>{{ dom.dominio }}</code>
+                                <span class="text-muted mx-1">→</span>
+                                <code>{{ dom.get_cname_target }}</code>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+
+                    {% if not dominio_activo %}
+                    <h5 class="mt-4 mb-3" style="color:var(--neon-cyan);font-family:'Orbitron',sans-serif;font-size:0.85rem;text-transform:uppercase;letter-spacing:1px;">
+                        <i class="fas fa-plus-circle me-2"></i>
+                        {% if request.path|slice:':3' == '/cl' %}Registrar nuevo dominio{% else %}Register new domain{% endif %}
+                    </h5>
+                    <div class="row align-items-end">
+                        <div class="col-md-8 mb-3">
+                            {{ form_dominio.dominio }}
+                            <small class="text-muted">{{ form_dominio.dominio.help_text }}</small>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <button type="submit" name="registrar_dominio" value="1" class="btn btn-save w-100">
+                                <i class="fas fa-globe me-2"></i>
+                                {% if request.path|slice:':3' == '/cl' %}Registrar{% else %}Register{% endif %}
+                            </button>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
         </div>
 
         <!-- Action Buttons -->
@@ -1685,7 +1771,8 @@ document.addEventListener('DOMContentLoaded', function() {
         'tax': 'financial',
         'theme': 'theme',
         'subscription': 'subscription',
-        'tecnicos': 'profile'
+        'tecnicos': 'profile',
+        'dominio': 'dominio'
     };
     
     tabs.forEach(tab => {
