@@ -20,13 +20,13 @@ urlpatterns = [
     path("registro/", views.registro_ubicacion, name="registro"),
     
     # ✅ API nueva (unificada multi-país)
-    path("api/locations/", api.locations, name="locations_api"),
+    path("locations", api.locations, name="locations_api"),
     
     # ✅ API de estados (soporta query param y path param)
-    path("api/locations/states/", api.states_by_country, name="states_by_country"),
-    path("api/locations/states/<str:country_code>/", api.states_by_country, name="states_by_country_path"),
+    path("locations/states/", api.states_by_country, name="states_by_country"),
+    path("locations/states/<str:country_code>/", api.states_by_country, name="states_by_country_path"),
     
     # ✅ API de ciudades (soporta query param y path param)
-    path("api/locations/cities/", api.cities_by_state, name="cities_by_state"),
-    path("api/locations/cities/<int:state_id>/", api.cities_by_state, name="cities_by_state_path"),
+    path("locations/cities/", api.cities_by_state, name="cities_by_state"),
+    path("locations/cities/<int:state_id>/", api.cities_by_state, name="cities_by_state_path"),
 ]

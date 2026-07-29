@@ -311,7 +311,7 @@ def test_all_countries_with_sample_policies(sample_tax_policies):
     countries_config = [
         ("CL", "parts", Decimal("0.19")),
         ("CL", "services", Decimal("0.00")),
-        ("US", "parts", Decimal("0.0725")),  # CA
+        ("US", "parts", Decimal("0.0000")),  # Sin ubicación: no se puede determinar sales tax
         ("BR", "parts", Decimal("0.18")),
         ("PE", "both", Decimal("0.18")),
         ("VE", "both", Decimal("0.16")),

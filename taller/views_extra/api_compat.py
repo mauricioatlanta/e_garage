@@ -22,7 +22,7 @@ import logging
 from django.http import JsonResponse
 from django.views.decorators.http import require_GET
 
-from taller.ubicacion.api import locations
+from ubicacion.api import locations
 
 logger = logging.getLogger(__name__)
 
