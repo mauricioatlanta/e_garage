@@ -3,89 +3,211 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>{% trans "eGarage - Automatiza tu taller" %}</title>
-  <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>eGarage — ¿Qué tipo de negocio tienes?</title>
+  <meta name="description" content="eGarage es la plataforma de gestión automotriz para talleres mecánicos, desarmadurias y casas de repuestos en Latinoamérica.">
+  <meta property="og:title" content="eGarage — ¿Qué tipo de negocio tienes?">
+  <meta property="og:description" content="Workshop, Salvage y Parts. Elige el producto eGarage diseñado para tu negocio automotriz.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="{% static 'images/egarage_icon_512x512.png' %}">
+  <link rel="canonical" href="https://egarage.cl/">
+  <link rel="icon" type="image/png" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
+  <link rel="stylesheet" href="{% static 'css/tailwind.output.css' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;800;900&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
   <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
-      background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+      font-family: 'Exo 2', 'Inter', sans-serif;
       color: #ffffff;
-      font-family: 'Inter', 'Segoe UI', sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+    #vanta-bg {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+    .over {
+      position: relative;
+      z-index: 10;
       min-height: 100vh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 2rem 1rem;
     }
-    .landing-container {
-      text-align: center;
-      padding: 2rem;
-      max-width: 800px;
-    }
+    .font-orbitron { font-family: 'Orbitron', monospace; }
+
+    /* Logo */
     .logo {
-      width: 120px;
-      height: 120px;
-      margin: 0 auto 2rem;
-      border-radius: 50%;
-      border: 2px solid #00e6ff;
-      box-shadow: 0 0 24px 1px #00e6ff;
+      height: 72px;
+      width: auto;
+      filter: drop-shadow(0 0 24px rgba(0, 245, 255, 0.7));
+      animation: glow 2.5s ease-in-out infinite alternate;
     }
-    h1 {
-      font-size: 3rem;
-      margin-bottom: 1rem;
-      color: #00e6ff;
-      text-shadow: 0 0 20px rgba(0, 230, 255, 0.5);
+    @keyframes glow {
+      from { filter: drop-shadow(0 0 20px rgba(0,245,255,0.6)); }
+      to   { filter: drop-shadow(0 0 40px rgba(0,245,255,0.95)); }
     }
-    p {
-      font-size: 1.25rem;
-      margin-bottom: 2rem;
-      color: #cccccc;
-    }
-    .btn {
-      display: inline-block;
-      padding: 1rem 2rem;
-      background: linear-gradient(135deg, #00e6ff 0%, #0099cc 100%);
-      color: #000;
+
+    /* Product cards */
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; width: 100%; max-width: 860px; }
+    @media (max-width: 640px) { .cards { grid-template-columns: 1fr; } }
+
+    .card {
+      display: flex;
+      flex-direction: column;
+      border-radius: 18px;
+      padding: 1.75rem 1.5rem;
+      border: 1.5px solid;
       text-decoration: none;
-      border-radius: 8px;
-      font-weight: bold;
-      transition: transform 0.3s, box-shadow 0.3s;
+      transition: transform 0.25s, box-shadow 0.25s, border-color 0.25s;
+      background: rgba(8, 15, 30, 0.75);
+      backdrop-filter: blur(12px);
     }
-    .btn:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(0, 230, 255, 0.4);
+    .card:hover { transform: translateY(-6px); }
+
+    .card-workshop  { border-color: #00e5ff44; }
+    .card-salvage   { border-color: #d946ef44; }
+    .card-parts     { border-color: #a3e63544; }
+
+    .card-workshop:hover  { border-color: #00e5ff; box-shadow: 0 0 28px rgba(0,229,255,0.25); }
+    .card-salvage:hover   { border-color: #d946ef; box-shadow: 0 0 28px rgba(217,70,239,0.25); }
+    .card-parts:hover     { border-color: #a3e635; box-shadow: 0 0 28px rgba(163,230,53,0.2); }
+
+    .card-icon  { font-size: 2.5rem; margin-bottom: 0.75rem; }
+    .card-badge {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.6rem; font-family: 'Orbitron', monospace; font-weight: 700;
+      letter-spacing: 0.1em; text-transform: uppercase;
+      padding: 0.2rem 0.6rem; border-radius: 99px; border: 1px solid;
+      margin-bottom: 0.6rem;
     }
+    .badge-workshop { color: #00e5ff; border-color: #00e5ff44; background: rgba(0,229,255,0.07); }
+    .badge-salvage  { color: #d946ef; border-color: #d946ef44; background: rgba(217,70,239,0.07); }
+    .badge-parts    { color: #a3e635; border-color: #a3e63544; background: rgba(163,230,53,0.07); }
+
+    .card h2 { font-size: 1.15rem; font-family: 'Orbitron', monospace; font-weight: 700; margin-bottom: 0.5rem; }
+    .card-workshop h2 { color: #00e5ff; }
+    .card-salvage  h2 { color: #e879f9; }
+    .card-parts    h2 { color: #a3e635; }
+
+    .card p { font-size: 0.82rem; color: #94a3b8; line-height: 1.5; flex: 1; margin-bottom: 1.25rem; }
+    .card-cta {
+      font-size: 0.75rem; font-family: 'Orbitron', monospace; font-weight: 600;
+      letter-spacing: 0.05em; padding: 0.5rem 1rem;
+      border-radius: 8px; border: 1px solid; text-align: center; transition: all 0.2s;
+    }
+    .cta-workshop { color: #00e5ff; border-color: #00e5ff55; }
+    .card-workshop:hover .cta-workshop { background: rgba(0,229,255,0.1); }
+    .cta-salvage  { color: #e879f9; border-color: #d946ef55; }
+    .card-salvage:hover .cta-salvage  { background: rgba(217,70,239,0.1); }
+    .cta-parts    { color: #a3e635; border-color: #a3e63555; }
+    .card-parts:hover .cta-parts    { background: rgba(163,230,53,0.08); }
+
+    /* Login link */
+    .login-line { font-size: 0.78rem; color: #475569; }
+    .login-line a { color: #64748b; transition: color 0.2s; }
+    .login-line a:hover { color: #00e5ff; }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(18px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-1 { animation: fadeUp 0.5s ease-out 0.05s both; }
+    .fade-2 { animation: fadeUp 0.5s ease-out 0.15s both; }
+    .fade-3 { animation: fadeUp 0.5s ease-out 0.25s both; }
+    .fade-4 { animation: fadeUp 0.5s ease-out 0.40s both; }
   </style>
 </head>
 <body>
-  <div class="landing-container">
-    <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="logo" />
-    <h1>{% trans "Bienvenido a eGarage" %}</h1>
-    <p>{% trans "Automatiza tu taller mecánico con la mejor herramienta de gestión" %}</p>
-    <a href="/cl/es/" class="btn">{% trans "Ingresar" %}</a>
+  <div id="vanta-bg"></div>
+
+  <div class="over">
+    <!-- Logo -->
+    <div class="fade-1" style="margin-bottom: 1.5rem; text-align: center;">
+      <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage" class="logo" style="display:inline-block;">
+      <p class="font-orbitron" style="color:#00e5ff; font-size:0.65rem; letter-spacing:0.25em; margin-top:0.5rem; opacity:0.7;">PLATAFORMA DE GESTIÓN AUTOMOTRIZ</p>
+    </div>
+
+    <!-- Heading -->
+    <div class="fade-2" style="text-align:center; margin-bottom:2rem;">
+      <h1 class="font-orbitron" style="font-size:clamp(1.4rem,4vw,2.2rem); font-weight:900; color:#fff; margin-bottom:0.5rem;">
+        ¿Qué tipo de negocio tienes?
+      </h1>
+      <p style="color:#64748b; font-size:0.9rem;">Elige tu producto eGarage para ver más.</p>
+    </div>
+
+    <!-- Product cards -->
+    <div class="cards fade-3">
+      <!-- Workshop -->
+      <a href="{% url 'landing_workshop' %}" class="card card-workshop">
+        <div class="card-icon">⚙️</div>
+        <div class="card-badge badge-workshop">eGarage Workshop</div>
+        <h2>Taller Mecánico</h2>
+        <p>Presupuestos, órdenes de trabajo, inventario de repuestos y clientes. Para talleres mecánicos, eléctricos, de carrocería y más.</p>
+        <span class="card-cta cta-workshop">Ver Workshop →</span>
+      </a>
+
+      <!-- Salvage -->
+      <a href="{% url 'landing_salvage' %}" class="card card-salvage">
+        <div class="card-icon">🧩</div>
+        <div class="card-badge badge-salvage">eGarage Salvage</div>
+        <h2>Desarmaduria</h2>
+        <p>Ingreso de vehículos, catálogo de piezas, control de stock por parte y ventas. Construido desde adentro por una desarmaduria real.</p>
+        <span class="card-cta cta-salvage">Ver Salvage →</span>
+      </a>
+
+      <!-- Parts -->
+      <a href="{% url 'landing_parts' %}" class="card card-parts">
+        <div class="card-icon">🏪</div>
+        <div class="card-badge badge-parts">eGarage Parts</div>
+        <h2>Casa de Repuestos</h2>
+        <p>Catálogo digital, inventario multi-bodega, listas de precio y punto de venta para distribuidores y casas de repuestos.</p>
+        <span class="card-cta cta-parts">Ver Parts →</span>
+      </a>
+    </div>
+
+    <!-- Login line -->
+    <div class="fade-4" style="margin-top:2rem; text-align:center;">
+      <p class="login-line">
+        ¿Ya tienes cuenta? <a href="{% url 'account_login' %}">Ingresar →</a>
+        &nbsp;·&nbsp;
+        <a href="{% url 'account_signup' %}">Crear cuenta gratis</a>
+        &nbsp;·&nbsp;
+        <a href="/">Cambiar país</a>
+      </p>
+    </div>
   </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (typeof VANTA !== 'undefined' && VANTA.NET) {
+        VANTA.NET({
+          el: '#vanta-bg',
+          mouseControls: true,
+          touchControls: true,
+          gyroControls: false,
+          minHeight: 200,
+          minWidth: 200,
+          scale: 1.0,
+          scaleMobile: 1.0,
+          color: 0x00f5ff,
+          color2: 0x0044cc,
+          backgroundColor: 0x020817,
+          points: 10.0,
+          maxDistance: 20.0,
+          spacing: 18.0,
+        });
+      }
+    });
+  </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

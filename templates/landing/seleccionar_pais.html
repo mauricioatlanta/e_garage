@@ -5,7 +5,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% trans "eGarage" %} - {% trans "Plataforma de Gestión para Talleres" %}</title>
+    <title>{% trans "eGarage" %} — {% trans "La plataforma para negocios automotrices" %}</title>
+    <meta name="description" content="{% trans "eGarage — Workshop, Salvage y Parts. La plataforma de gestión para talleres mecánicos, desarmadurias y casas de repuestos en Latinoamérica." %}">
+    <meta property="og:title" content="eGarage — La plataforma para negocios automotrices">
+    <meta property="og:description" content="Workshop · Salvage · Parts. Software de gestión para negocios automotrices en Latinoamérica.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{% static 'images/egarage_icon_512x512.png' %}">
+    <link rel="canonical" href="https://egarage.cl/">
+    <link rel="icon" type="image/png" href="{% static 'images/egarage_icon_192x192.png' %}">
+    <link rel="apple-touch-icon" href="{% static 'images/egarage_icon_192x192.png' %}">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Exo+2:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanta/0.5.24/vanta.net.min.js"></script>
@@ -360,6 +368,7 @@
         <!-- Logo -->
         <div class="logo-container">
             <img src="{% static 'img/logo_egarage.png' %}?v=2" alt="eGarage Logo" class="logo" >
+            <p style="font-family:'Orbitron',monospace; font-size:0.6rem; letter-spacing:0.22em; color:#00f5ff88; text-align:center; margin-top:0.5rem; text-transform:uppercase;">La plataforma para negocios automotrices</p>
         </div>
 
         <!-- Countries Container -->
@@ -407,6 +416,13 @@
                     <span class="country-name">Venezuela</span>
                 </a>
             </div>
+        </div>
+
+        <!-- Products row -->
+        <div style="margin-top:1.5rem; display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
+            <a href="{% url 'landing_workshop' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:1px solid #00f5ff44; color:#00f5ffaa; text-decoration:none; transition:all 0.2s; background:rgba(0,245,255,0.04);" onmouseover="this.style.borderColor='#00f5ff';this.style.color='#00f5ff'" onmouseout="this.style.borderColor='#00f5ff44';this.style.color='#00f5ffaa'">⚙ WORKSHOP</a>
+            <a href="{% url 'landing_salvage' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:1px solid #d946ef44; color:#d946efaa; text-decoration:none; transition:all 0.2s; background:rgba(217,70,239,0.04);" onmouseover="this.style.borderColor='#d946ef';this.style.color='#d946ef'" onmouseout="this.style.borderColor='#d946ef44';this.style.color='#d946efaa'">🧩 SALVAGE</a>
+            <a href="{% url 'landing_parts' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:1px solid #a3e63544; color:#a3e635aa; text-decoration:none; transition:all 0.2s; background:rgba(163,230,53,0.04);" onmouseover="this.style.borderColor='#a3e635';this.style.color='#a3e635'" onmouseout="this.style.borderColor='#a3e63544';this.style.color='#a3e635aa'">🏪 PARTS</a>
         </div>
     </div>
 

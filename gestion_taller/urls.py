@@ -129,6 +129,7 @@ from taller.views_extra.views_suscripciones import (
     subir_comprobante,
     suspension,
 )
+from taller.views.landing_views import landing_workshop, landing_salvage, landing_parts
 
 # gestion_taller/urls.py — archivo raíz de URLs con migración a países
 
@@ -270,6 +271,10 @@ urlpatterns = [
     path("portal/", include("taller.portal.urls")),
     # Página de inicio - Selección de país
     path("", TemplateView.as_view(template_name="landing/seleccionar_pais.html"), name="home"),
+    # Landings de productos (sin prefijo de país)
+    path("workshop/", landing_workshop, name="landing_workshop"),
+    path("salvage/", landing_salvage, name="landing_salvage"),
+    path("parts/", landing_parts, name="landing_parts"),
     # Panel de administración de suscriptores (ANTES de admin.site.urls para que no sea capturado)
     path("cl/admin/subcriptores/", include("taller.urls_admin_suscriptores")),
     path("admin/suscriptores/", admin_suscriptores, name="admin_suscriptores"),

@@ -1,0 +1,113 @@
+{% extends "public/base_landing.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}eGarage Parts — Inventario, ventas y catálogo para negocios de repuestos · Beta{% endblock %}
+{% block meta_description %}Inventario, catálogo digital y ventas para casas de repuestos automotrices. Beta abierta — acceso anticipado disponible hoy.{% endblock %}
+{% block canonical_path %}/parts/{% endblock %}
+{% block og_title %}eGarage Parts — Inventario, ventas y catálogo para negocios de repuestos{% endblock %}
+{% block og_description %}La plataforma de gestión para distribuidores y casas de repuestos automotrices. Catálogo, inventario y ventas integrados.{% endblock %}
+
+{% block extra_head %}
+<style>
+  .accent-lime { color: #a3e635; }
+  .border-lime-soft { border-color: #65a30d40; }
+  .card-glow-l:hover { box-shadow: 0 0 30px rgba(163, 230, 53, 0.15), 0 25px 50px -12px rgba(0,0,0,0.5); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="px-6 py-20 text-center max-w-5xl mx-auto animate-in">
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-lime-500/10 border border-lime-500/30 text-lime-400 text-xs font-semibold mb-6 font-orbitron tracking-widest">
+    🏪 eGarage Parts
+  </div>
+  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-lime">
+    Tu repuestería.<br>
+    <span class="text-lime-400">Ordenada y en línea.</span>
+  </h1>
+  <p class="text-xl text-slate-300 max-w-2xl mx-auto mb-10">
+    Inventario, catálogo digital y ventas para negocios de repuestos automotrices. Estamos construyendo esto junto a nuestros primeros clientes — únete a la beta y da forma al producto.
+  </p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+    <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-lime-600 text-slate-950 font-bold text-lg hover:bg-lime-500 transition-all shadow-lg shadow-lime-500/20 font-orbitron">
+      Empezar gratis →
+    </a>
+    <a href="{% url 'account_login' %}" class="px-8 py-4 rounded-xl border border-slate-600 text-slate-300 hover:border-lime-500/50 hover:text-lime-300 transition-all text-lg">
+      Ya tengo cuenta
+    </a>
+  </div>
+  <!-- Próximamente badge -->
+  <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800/80 border border-lime-500/20 text-lime-500/70 text-sm">
+    <span class="w-2 h-2 rounded-full bg-lime-500 animate-pulse"></span>
+    Módulo Parts en desarrollo activo — algunas funciones disponibles en versión beta
+  </div>
+</section>
+
+<!-- Feature grid -->
+<section class="px-6 py-16 max-w-6xl mx-auto">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="animate-in delay-1 bg-slate-900/60 border-lime-soft border rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📚</div>
+      <h3 class="font-orbitron text-lime-400 font-bold mb-3">Catálogo por referencia</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Cada repuesto con su código OEM, marca, precio y compatibilidad. Búsqueda por modelo, año o número de parte.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-900/60 border-lime-soft border rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📦</div>
+      <h3 class="font-orbitron text-lime-400 font-bold mb-3">Inventario multi-bodega</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Controla stock en bodega, mostrador y despacho. Alertas automáticas cuando un repuesto llega al mínimo.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-900/60 border-lime-soft border rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🛒</div>
+      <h3 class="font-orbitron text-lime-400 font-bold mb-3">Punto de venta</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Ventas rápidas con lector de código de barras. Factura electrónica, boleta y guía de despacho integrados.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-900/60 border-lime-soft border rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🔗</div>
+      <h3 class="font-orbitron text-lime-400 font-bold mb-3">Integrado con talleres</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Un taller mecánico en eGarage Workshop puede cotizarte repuestos directamente. Cierra el ciclo sin llamadas.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-900/60 border-lime-soft border rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">💰</div>
+      <h3 class="font-orbitron text-lime-400 font-bold mb-3">Listas de precio</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Define distintos precios para mayorista, minorista y distribuidores. Aplica descuentos por cliente o por volumen.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-900/60 border-lime-soft border rounded-2xl p-6 card-glow-l transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📡</div>
+      <h3 class="font-orbitron text-lime-400 font-bold mb-3">Tienda en línea</h3>
+      <p class="text-slate-400 text-sm leading-relaxed">Tu catálogo disponible como página web. Los clientes consultan disponibilidad y precio antes de llamar.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Waitlist CTA -->
+<section class="px-6 py-16 max-w-2xl mx-auto text-center animate-in delay-2">
+  <div class="bg-slate-900/50 border border-lime-500/20 rounded-2xl p-10">
+    <h2 class="font-orbitron text-2xl font-black text-lime-300 mb-4">¿Tienes una casa de repuestos?</h2>
+    <p class="text-slate-400 mb-6 leading-relaxed">
+      eGarage Parts está en desarrollo activo. Regístrate hoy y sé el primero en acceder a la beta completa. Tu feedback da forma al producto.
+    </p>
+    <a href="{% url 'account_signup' %}" class="inline-block px-8 py-4 rounded-xl bg-lime-600 text-slate-950 font-black text-lg hover:bg-lime-500 transition-all font-orbitron shadow-lg shadow-lime-500/20">
+      Registrarme ahora →
+    </a>
+    <p class="mt-4 text-slate-600 text-sm">Sin compromiso. Sin tarjeta de crédito.</p>
+  </div>
+</section>
+
+<!-- Links a otros productos -->
+<section class="px-6 py-12 text-center animate-in delay-3">
+  <p class="text-slate-600 text-sm">
+    ¿Tienes un taller mecánico? → <a href="{% url 'landing_workshop' %}" class="text-cyan-400 hover:text-cyan-300">eGarage Workshop</a> &nbsp;|&nbsp;
+    ¿Tienes una desarmaduria? → <a href="{% url 'landing_salvage' %}" class="text-fuchsia-400 hover:text-fuchsia-300">eGarage Salvage</a>
+  </p>
+</section>
+
+{% endblock %}
