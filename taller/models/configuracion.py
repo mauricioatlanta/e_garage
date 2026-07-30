@@ -177,6 +177,17 @@ class ConfiguracionEmpresa(models.Model):
         help_text="Lista de rubros que ofrece el taller (múltiples rubros)",
     )
 
+    # —— CONTROL DE MÓDULOS ——
+    modules_configured_at = models.DateTimeField(
+        null=True,
+        blank=True,
+        verbose_name="Módulos configurados el",
+        help_text=(
+            "Fecha en que el usuario configuró explícitamente sus módulos de negocio. "
+            "Si es null, se mostrará el asistente de migración."
+        ),
+    )
+
     # Auditoría
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

@@ -139,6 +139,7 @@ TEMPLATES = [
                 "taller.context_processors.panel_chrome.us_signup_slim_header",
                 "taller.context_processors.ui_labels.ui_labels_context",
                 "taller.context_processors.subscription_notice.subscription_notice",
+                "taller.context_processors.business_modules.business_modules",
             ],
         },
     },

@@ -1,4 +1,4 @@
-﻿{% load static %}
+{% load static %}
 <aside class="eg-sidebar">
   <div class="eg-brand">
     <div class="eg-brand-mark">eG</div>
@@ -9,13 +9,28 @@
   </div>
 
   <nav class="eg-nav">
-    <a href="/cl/es/dashboard/">Inicio</a>
-    <a href="/cl/es/clientes/">Clientes</a>
-    <a href="/cl/es/vehiculos/">Vehículos</a>
-    <a href="/cl/es/documentos/form/">Documentos</a>
-    <a href="/cl/es/repuestos/">Repuestos</a>
-    <a href="/cl/es/servicios/">Servicios</a>
-    <a href="/cl/es/desarme/">Desarme</a>
-    <a href="/cl/es/settings/">Configuración</a>
+    {% if nav_items %}
+      {% for item in nav_items %}
+      <a href="{{ item.url }}"{% if item.is_active %} class="active"{% endif %}>{{ item.label }}</a>
+      {% endfor %}
+    {% else %}
+      {# Fallback para usuarios sin contexto de módulos #}
+      <a href="/cl/es/dashboard/">Inicio</a>
+      <a href="/cl/es/clientes/">Clientes</a>
+      <a href="/cl/es/vehiculos/">Vehículos</a>
+      <a href="/cl/es/documentos/form/">Documentos</a>
+      <a href="/cl/es/repuestos/">Repuestos</a>
+      <a href="/cl/es/servicios/">Servicios</a>
+      <a href="/cl/es/desarme/">Desarme</a>
+      <a href="/cl/es/settings/">Configuración</a>
+    {% endif %}
   </nav>
+
+  {% if needs_module_config %}
+  <div class="eg-module-notice">
+    <a href="/cl/es/settings/" title="Configura los módulos de tu negocio">
+      ⚙ Configura tus módulos
+    </a>
+  </div>
+  {% endif %}
 </aside>

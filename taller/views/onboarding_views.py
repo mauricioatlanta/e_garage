@@ -120,6 +120,9 @@ def onboarding_wizard(request, step=None):
     # Agregar formularios según paso
     if paso_actual == 1:
         context["form"] = OnboardingIdentidadForm(instance=empresa)
+        context["rubro_choices"] = ConfiguracionEmpresa.RUBRO_CHOICES
+        config = getattr(empresa, "config", None)
+        context["rubro_actual"] = getattr(config, "rubro_principal", "WORKSHOP") if config else "WORKSHOP"
     elif paso_actual == 2:
         return redirect("taller:onboarding_step", step="finalizar")
 
