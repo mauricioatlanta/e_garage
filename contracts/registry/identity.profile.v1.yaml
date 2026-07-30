@@ -1,0 +1,31 @@
+id: identity.profile.v1
+display_name: Identity Profile Contract
+category: Truth
+
+owner: identity
+publisher: identity
+write_authority: identity
+consumers:
+  - erp.core
+  - commerce.engine
+
+direction: OnDemand
+frequency: OnDemand
+
+version: "1.0.0"
+status: draft
+breaking_change_policy: semver-major
+min_consumer_version: "1.0.0"
+
+guarantees:
+  idempotent: true
+  ordered: false
+  consistency: eventual
+  completeness: full-snapshot
+  max_staleness: null    # OnDemand: consumer receives current state at request time
+
+schema_ref: schemas/identity.profile.v1.schema.json
+
+pending_decisions:
+  - ADR-006  # Identity linkage: how does a Buyer (Commerce) link to a Cliente (ERP)? By email only, or other keys?
+  - ADR-007  # Guest identity: does a guest checkout session create an Identity record, or is it ephemeral?

@@ -1,0 +1,108 @@
+# meta-contract.yaml
+# Specification and template for all eGarage integration contracts.
+# Every file in registry/ must conform to this structure.
+# Payload structure for each contract is validated by its schema in schemas/.
+
+# ── IDENTITY ──────────────────────────────────────────────────────────────────
+
+# Unique identifier following the convention: {domain}.{contract-name}.{version}
+# Examples: catalog.product-knowledge.v1, commerce.order.v1
+id: "{domain}.{contract-name}.{version}"
+
+# Human-readable name for display in documentation and tooling
+display_name: ""
+
+# Contract category — determines behavioral rules and ownership model
+# Allowed values: Truth | Capability | Behavioral | Session | Event | Infrastructure
+category: ""
+
+# ── OWNERSHIP ─────────────────────────────────────────────────────────────────
+
+# Bounded context that owns and versions this contract
+owner: ""
+
+# Subsystem responsible for emitting (publishing) this contract
+publisher: ""
+
+# Sole subsystem authorized to write the data covered by this contract.
+# Required for Truth contracts. Set to null for all other categories.
+# Rule: if write_authority is set, no other subsystem may write this data — ever.
+write_authority: null
+
+# Exhaustive list of subsystems authorized to consume this contract.
+# If a subsystem is not in this list, it may not consume this contract.
+consumers: []
+
+# ── TRANSPORT ─────────────────────────────────────────────────────────────────
+
+# Direction of data flow
+# Push     — publisher sends to consumers without being asked
+# Pull     — consumers fetch from publisher on their own schedule
+# Event    — publisher emits events; consumers subscribe
+# OnDemand — consumer requests; publisher responds synchronously
+direction: ""
+
+# How often the contract delivers data
+# RealTime     — sub-second, synchronous
+# NearRealtime — seconds to minutes
+# Batch        — scheduled intervals (hourly, daily)
+# Static       — changes only on explicit configuration updates
+# OnDemand     — only when requested
+frequency: ""
+
+# ── VERSIONING ────────────────────────────────────────────────────────────────
+
+# Semantic version of this contract definition: MAJOR.MINOR.PATCH
+# MAJOR: breaking change (see README for definition)
+# MINOR: new optional fields or new authorized consumers
+# PATCH: documentation corrections, clarifications
+version: ""
+
+# Lifecycle status of this contract
+# draft      — under design; must not be consumed in production
+# stable     — approved; ready for production consumption
+# deprecated — replaced by a newer version; consumers must migrate
+status: draft
+
+# Policy governing what triggers a major version bump
+# semver-major        — follow the breaking change table in README
+# negotiated-migration — publisher and all consumers agree on migration plan
+breaking_change_policy: semver-major
+
+# Minimum contract version that consumers are expected to support
+min_consumer_version: null
+
+# ── GUARANTEES ────────────────────────────────────────────────────────────────
+# These are binding commitments from the publisher to all consumers.
+# Consumers may depend on any guarantee listed as true or non-null.
+# Changing a guarantee — in any direction — is a breaking change.
+
+guarantees:
+  # Can the consumer safely process the same message more than once?
+  idempotent: null           # true | false
+
+  # Are messages guaranteed to arrive in the order they were emitted?
+  ordered: null              # true | false
+
+  # How consistent is the data at the time of consumption?
+  consistency: null          # strong | eventual
+
+  # Does each delivery contain the full current state, or only changes?
+  completeness: null         # full-snapshot | delta
+
+  # Maximum acceptable age of data at the time of consumption.
+  # Relevant only for NearRealtime and Batch frequencies.
+  # Format: ISO 8601 duration or human shorthand ("5m", "1h", "24h")
+  max_staleness: null
+
+# ── SCHEMA ────────────────────────────────────────────────────────────────────
+
+# Relative path to the JSON Schema file that validates this contract's payload.
+# Must exist before status can be set to stable.
+schema_ref: ""
+
+# ── PENDING DECISIONS ─────────────────────────────────────────────────────────
+# ADR identifiers that must be resolved before this contract can reach status: stable.
+# Format: ADR-NNN
+# Rule: a non-empty pending_decisions list blocks implementation.
+pending_decisions: []

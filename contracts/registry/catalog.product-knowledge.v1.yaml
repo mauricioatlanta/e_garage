@@ -1,0 +1,31 @@
+id: catalog.product-knowledge.v1
+display_name: Product Knowledge Contract
+category: Truth
+
+owner: erp.catalog
+publisher: erp.catalog
+write_authority: erp.catalog
+consumers:
+  - commerce.engine
+  - analytics
+
+direction: Pull
+frequency: NearRealtime
+
+version: "1.0.0"
+status: draft
+breaking_change_policy: semver-major
+min_consumer_version: "1.0.0"
+
+guarantees:
+  idempotent: true
+  ordered: false
+  consistency: eventual
+  completeness: full-snapshot
+  max_staleness: "5m"
+
+schema_ref: schemas/catalog.product-knowledge.v1.schema.json
+
+pending_decisions:
+  - ADR-001  # Attribute schema: flat key-value map vs typed schema definition
+  - ADR-002  # Publication trigger: manual publish action vs automatic on product save

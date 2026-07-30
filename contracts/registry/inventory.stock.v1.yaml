@@ -1,0 +1,30 @@
+id: inventory.stock.v1
+display_name: Stock Contract
+category: Truth
+
+owner: erp.inventory
+publisher: erp.inventory
+write_authority: erp.inventory
+consumers:
+  - commerce.engine
+
+direction: Push
+frequency: NearRealtime
+
+version: "1.0.0"
+status: draft
+breaking_change_policy: semver-major
+min_consumer_version: "1.0.0"
+
+guarantees:
+  idempotent: false
+  ordered: true    # consumers must discard messages with sequence <= last seen
+  consistency: eventual
+  completeness: delta
+  max_staleness: "2m"
+
+schema_ref: schemas/inventory.stock.v1.schema.json
+
+pending_decisions:
+  - ADR-003  # Stock reservation: does Commerce reserve stock at cart-add or at checkout?
+  - ADR-004  # Multi-warehouse: does stock report per warehouse or as a single aggregate?

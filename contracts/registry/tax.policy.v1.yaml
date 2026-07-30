@@ -1,0 +1,29 @@
+id: tax.policy.v1
+display_name: Tax Policy Contract
+category: Truth
+
+owner: erp.tax-engine
+publisher: erp.tax-engine
+write_authority: erp.tax-engine
+consumers:
+  - commerce.engine
+
+direction: Pull
+frequency: Batch
+
+version: "1.0.0"
+status: draft
+breaking_change_policy: semver-major
+min_consumer_version: "1.0.0"
+
+guarantees:
+  idempotent: true
+  ordered: false
+  consistency: strong    # policies are point-in-time snapshots; no partial states
+  completeness: full-snapshot
+  max_staleness: "24h"
+
+schema_ref: schemas/tax.policy.v1.schema.json
+
+pending_decisions:
+  - ADR-005  # Tax computation ownership: Commerce calculates using exported policy, or calls ERP at checkout time?

@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "egarage/contracts/schemas/meta-contract.schema.json",
+  "title": "eGarage Meta-Contract Schema",
+  "description": "Validates the structure of any eGarage integration contract file in registry/.",
+  "type": "object",
+  "required": [
+    "id",
+    "display_name",
+    "category",
+    "owner",
+    "publisher",
+    "consumers",
+    "direction",
+    "frequency",
+    "version",
+    "status",
+    "breaking_change_policy",
+    "guarantees",
+    "schema_ref"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]+\\.[a-z][a-z0-9-]+\\.v[0-9]+$",
+      "description": "Unique contract identifier: {domain}.{contract-name}.{version}"
+    },
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "category": {
+      "type": "string",
+      "enum": ["Truth", "Capability", "Behavioral", "Session", "Event", "Infrastructure"]
+    },
+    "owner": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Bounded context that owns and versions this contract"
+    },
+    "publisher": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Subsystem that emits this contract"
+    },
+    "write_authority": {
+      "type": ["string", "null"],
+      "description": "Sole authorized writer. Required (non-null) for Truth contracts."
+    },
+    "consumers": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "minItems": 1,
+      "description": "Exhaustive list of authorized consumers"
+    },
+    "direction": {
+      "type": "string",
+      "enum": ["Push", "Pull", "Event", "OnDemand"]
+    },
+    "frequency": {
+      "type": "string",
+      "enum": ["RealTime", "NearRealtime", "Batch", "Static", "OnDemand"]
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "SemVer MAJOR.MINOR.PATCH"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "stable", "deprecated"]
+    },
+    "breaking_change_policy": {
+      "type": "string",
+      "enum": ["semver-major", "negotiated-migration"]
+    },
+    "min_consumer_version": {
+      "type": ["string", "null"]
+    },
+    "guarantees": {
+      "type": "object",
+      "required": ["idempotent", "ordered", "consistency", "completeness", "max_staleness"],
+      "additionalProperties": false,
+      "properties": {
+        "idempotent": {
+          "type": ["boolean", "null"]
+        },
+        "ordered": {
+          "type": ["boolean", "null"]
+        },
+        "consistency": {
+          "type": ["string", "null"],
+          "enum": ["strong", "eventual", null]
+        },
+        "completeness": {
+          "type": ["string", "null"],
+          "enum": ["full-snapshot", "delta", null]
+        },
+        "max_staleness": {
+          "type": ["string", "null"],
+          "description": "ISO 8601 duration or shorthand: '5m', '1h', '24h'. Null for OnDemand."
+        }
+      }
+    },
+    "schema_ref": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Relative path to the JSON Schema file for this contract's payload"
+    },
+    "pending_decisions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ADR-[0-9]+",
+        "description": "ADR identifier, e.g. ADR-001"
+      },
+      "description": "ADR IDs that must be resolved before status can be set to stable"
+    }
+  },
+  "if": {
+    "properties": { "category": { "const": "Truth" } },
+    "required": ["category"]
+  },
+  "then": {
+    "properties": {
+      "write_authority": { "type": "string", "minLength": 1 }
+    },
+    "required": ["write_authority"]
+  }
+}
