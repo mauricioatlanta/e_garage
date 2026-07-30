@@ -129,7 +129,17 @@ from taller.views_extra.views_suscripciones import (
     subir_comprobante,
     suspension,
 )
-from taller.views.landing_views import landing_workshop, landing_salvage, landing_parts
+from taller.views.landing_views import (
+    landing_home,
+    landing_talleres,
+    landing_desarmadurias,
+    landing_repuestos,
+    landing_carwash,
+    landing_vulcanizacion,
+    landing_workshop,
+    landing_salvage,
+    landing_parts,
+)
 
 # gestion_taller/urls.py — archivo raíz de URLs con migración a países
 
@@ -269,9 +279,15 @@ urlpatterns = [
     path("clientes/", include(("taller.urls_clientes", "clientes"), namespace="clientes")),
     # Portal del Cliente
     path("portal/", include("taller.portal.urls")),
-    # Página de inicio - Selección de país
-    path("", TemplateView.as_view(template_name="landing/seleccionar_pais.html"), name="home"),
-    # Landings de productos (sin prefijo de país)
+    # Página de inicio — hub multi-solución
+    path("", landing_home, name="home"),
+    # Landings en español (rutas principales SEO)
+    path("talleres/", landing_talleres, name="landing_talleres"),
+    path("desarmadurias/", landing_desarmadurias, name="landing_desarmadurias"),
+    path("casas-de-repuestos/", landing_repuestos, name="landing_repuestos"),
+    path("carwash/", landing_carwash, name="landing_carwash"),
+    path("vulcanizaciones/", landing_vulcanizacion, name="landing_vulcanizacion"),
+    # Aliases en inglés (backward compat)
     path("workshop/", landing_workshop, name="landing_workshop"),
     path("salvage/", landing_salvage, name="landing_salvage"),
     path("parts/", landing_parts, name="landing_parts"),

@@ -34,7 +34,7 @@
   </style>
   {% block extra_head %}{% endblock %}
 </head>
-<body class="min-h-screen" style="background: linear-gradient(135deg, #020817 0%, #0c1628 50%, #050d1f 100%);">
+<body class="min-h-screen" style="background: linear-gradient(135deg, #060e1e 0%, #0f1e38 50%, #080e20 100%);">
 
   <!-- Nav bar mínima -->
   <nav class="fixed top-0 left-0 right-0 z-50 px-6 py-4 flex items-center justify-between bg-slate-950/80 backdrop-blur border-b border-cyan-500/10">
@@ -53,9 +53,17 @@
   </main>
 
   <!-- Footer mínimo -->
-  <footer class="border-t border-slate-800 py-8 px-6 text-center text-slate-500 text-sm mt-16">
-    <p class="font-orbitron text-xs text-slate-600 mb-2">eGarage</p>
-    <p>© {% now "Y" %} eGarage · <a href="/" class="hover:text-slate-400">Inicio</a> · <a href="{% url 'landing_workshop' %}" class="hover:text-slate-400">Workshop</a> · <a href="{% url 'landing_salvage' %}" class="hover:text-slate-400">Salvage</a> · <a href="{% url 'landing_parts' %}" class="hover:text-slate-400">Parts</a></p>
+  <footer class="border-t border-slate-700 py-8 px-6 text-center text-slate-400 text-sm mt-16">
+    <p class="font-orbitron text-xs text-slate-500 mb-2">eGarage</p>
+    <p>
+      © {% now "Y" %} eGarage ·
+      <a href="/" class="hover:text-slate-400">Inicio</a> ·
+      <a href="{% url 'landing_talleres' %}" class="hover:text-cyan-400">Talleres</a> ·
+      <a href="{% url 'landing_desarmadurias' %}" class="hover:text-fuchsia-400">Desarmadurias</a> ·
+      <a href="{% url 'landing_repuestos' %}" class="hover:text-lime-400">Repuestos</a> ·
+      <a href="{% url 'landing_carwash' %}" class="hover:text-sky-400">Car Wash</a> ·
+      <a href="{% url 'landing_vulcanizacion' %}" class="hover:text-amber-400">Vulcanización</a>
+    </p>
   </footer>
 
   {% block extra_scripts %}{% endblock %}

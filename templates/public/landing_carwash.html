@@ -1,0 +1,143 @@
+{% extends "public/base_landing.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}eGarage Car Wash — Software para Carwash y Lavados de Auto{% endblock %}
+{% block meta_description %}Agenda de turnos, registro de lavados, cobros rápidos y cierre de caja para tu carwash. Más lavados, menos líos. Prueba gratis 30 días.{% endblock %}
+{% block canonical_path %}/carwash/{% endblock %}
+{% block og_title %}eGarage Car Wash — Gestiona tu carwash sin papeles{% endblock %}
+{% block og_description %}Agenda, registro, cobros y reportes para carwash y centros de detailing. Simple, rápido, hecho para el ritmo de un lavadero.{% endblock %}
+
+{% block extra_head %}
+<style>
+  .card-glow-sky:hover { box-shadow: 0 0 30px rgba(56, 189, 248, 0.2), 0 25px 50px -12px rgba(0,0,0,0.5); }
+  .glow-sky { text-shadow: 0 0 20px rgba(56, 189, 248, 0.6); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="px-6 py-20 text-center max-w-5xl mx-auto animate-in">
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 text-xs font-semibold mb-6 font-orbitron tracking-widest">
+    🚿 eGarage · Car Wash
+  </div>
+  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-sky">
+    Tu carwash.<br>
+    <span class="text-sky-400">Más lavados, menos líos.</span>
+  </h1>
+  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10">
+    Agenda de turnos, registro de lavados por tipo, cobros rápidos y cierre de caja automático — todo lo que necesitas para manejar tu carwash sin perder tiempo en papeles.
+  </p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+    <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-sky-500 text-slate-950 font-bold text-lg hover:bg-sky-400 transition-all shadow-lg shadow-sky-500/30 font-orbitron">
+      Prueba gratis 30 días →
+    </a>
+    <a href="{% url 'account_login' %}" class="px-8 py-4 rounded-xl border border-slate-500 text-slate-200 hover:border-sky-500/50 hover:text-sky-300 transition-all text-lg">
+      Ya tengo cuenta
+    </a>
+  </div>
+  <p class="text-slate-400 text-sm">Sin tarjeta de crédito · Cancela cuando quieras</p>
+</section>
+
+<!-- Problema -->
+<section class="px-6 py-10 max-w-3xl mx-auto animate-in delay-1">
+  <div class="bg-slate-800/50 border border-sky-500/20 rounded-2xl p-8 text-center">
+    <p class="text-slate-200 leading-relaxed">
+      En un carwash, el día pasa rápido: veinte autos, distintos tipos de lavado, cobros en efectivo y transferencia, y al final del día nadie sabe exactamente cuánto se hizo.
+      Con eGarage, <span class="text-sky-300 font-semibold">cada lavado queda registrado y el cierre de caja se hace solo</span>.
+    </p>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="px-6 py-16 max-w-6xl mx-auto">
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12 animate-in">Hecho para el ritmo de un lavadero</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-sky-500/25 rounded-2xl p-6 card-glow-sky transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📅</div>
+      <h3 class="font-orbitron text-sky-300 font-bold mb-3">Agenda de turnos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Registra los autos que van llegando, asigna el tipo de lavado y ve la cola del día en pantalla. Sin libretas ni papeles pegados en la pared.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-sky-500/25 rounded-2xl p-6 card-glow-sky transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🚗</div>
+      <h3 class="font-orbitron text-sky-300 font-bold mb-3">Tipos de lavado</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Define tus propios servicios: lavado express, lavado completo, detailing interior, pólish, encerado. Cada uno con su precio. El sistema los aplica al cobrar.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-sky-500/25 rounded-2xl p-6 card-glow-sky transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">💳</div>
+      <h3 class="font-orbitron text-sky-300 font-bold mb-3">Cobros rápidos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Cobra en efectivo, transferencia o tarjeta. El sistema registra el método de pago. Al final del día sabes exactamente cuánto entró por cada medio.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-sky-500/25 rounded-2xl p-6 card-glow-sky transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🏁</div>
+      <h3 class="font-orbitron text-sky-300 font-bold mb-3">Cierre de caja diario</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">¿Cuántos autos? ¿Cuánto efectivo? ¿Cuánto por transferencia? El cierre de caja lo genera el sistema en segundos. Sin contar billetes ni sumar en calculadora.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-sky-500/25 rounded-2xl p-6 card-glow-sky transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">👥</div>
+      <h3 class="font-orbitron text-sky-300 font-bold mb-3">Clientes frecuentes</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Registra a los clientes habituales con sus vehículos. Ve cuántas veces vino este mes. Ideal para ofrecer planes de lavado o abonos mensuales.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-sky-500/25 rounded-2xl p-6 card-glow-sky transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📊</div>
+      <h3 class="font-orbitron text-sky-300 font-bold mb-3">Reportes del mes</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Ingresos por día, por tipo de servicio y por empleado. Ve los días más ocupados, los servicios más pedidos y el rendimiento del equipo.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-sky-500/25 rounded-2xl p-6 card-glow-sky transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">👨‍🏭</div>
+      <h3 class="font-orbitron text-sky-300 font-bold mb-3">Control por operador</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Asigna lavados por operador y mide la productividad de cada uno. ¿Quién lavó más hoy? ¿Quién tuvo los mejores tiempos? Lo ves en tiempo real.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-sky-500/25 rounded-2xl p-6 card-glow-sky transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">💬</div>
+      <h3 class="font-orbitron text-sky-300 font-bold mb-3">Aviso al cliente</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Cuando el auto esté listo, notifica al cliente por WhatsApp. Se fue a tomar un café y no sabe cuándo volver — un mensaje lo trae de vuelta a tiempo.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-sky-500/25 rounded-2xl p-6 card-glow-sky transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📋</div>
+      <h3 class="font-orbitron text-sky-300 font-bold mb-3">Boletas y documentos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Genera boletas o facturas cuando el cliente las necesite. IVA calculado automáticamente según el país. Sin talonarios, sin letra a mano.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Diferenciador -->
+<section class="px-6 py-12 max-w-3xl mx-auto text-center animate-in delay-2">
+  <div class="bg-sky-950/40 border border-sky-500/30 rounded-2xl p-8">
+    <h2 class="font-orbitron text-sky-300 text-lg font-bold mb-3">Para el carwash de barrio y para la cadena de lavados.</h2>
+    <p class="text-slate-300 text-sm leading-relaxed">
+      Tanto si tienes un solo lavadero como si tienes varias sucursales, eGarage se adapta. Empieza con lo básico y agrega funciones cuando las necesites. Sin contratos, sin letra chica.
+    </p>
+  </div>
+</section>
+
+<!-- CTA final -->
+<section class="px-6 py-20 text-center animate-in delay-3">
+  <h2 class="font-orbitron text-3xl font-black text-white mb-4">¿Listo para ordenar tu carwash?</h2>
+  <p class="text-slate-300 mb-8">30 días gratis. Sin tarjeta de crédito. Sin compromiso.</p>
+  <a href="{% url 'account_signup' %}" class="px-10 py-5 rounded-xl bg-sky-500 text-slate-950 font-black text-xl hover:bg-sky-400 transition-all shadow-xl shadow-sky-500/30 font-orbitron">
+    Crear cuenta gratis →
+  </a>
+  <p class="mt-8 text-slate-400 text-sm">
+    ¿Tienes un taller mecánico? →
+    <a href="{% url 'landing_talleres' %}" class="text-cyan-400 hover:text-cyan-300">eGarage Talleres</a>
+    &nbsp;·&nbsp;
+    ¿Tienes una vulcanizadora? →
+    <a href="{% url 'landing_vulcanizacion' %}" class="text-amber-400 hover:text-amber-300">eGarage Vulcanización</a>
+    &nbsp;·&nbsp;
+    <a href="/" class="text-slate-300 hover:text-white">Ver todas las soluciones</a>
+  </p>
+</section>
+
+{% endblock %}

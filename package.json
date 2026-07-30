@@ -1,9 +1,12 @@
 {
   "author": "",
-  "description": "Pruebas E2E con Playwright para egarage.cl - Validaci\u00f3n de flujos de autenticaci\u00f3n y legibilidad visual",
+  "description": "Pruebas E2E con Playwright para egarage.cl - Validación de flujos de autenticación y legibilidad visual",
   "devDependencies": {
     "@playwright/test": "^1.40.0",
-    "@types/node": "^20.0.0"
+    "@types/node": "^20.0.0",
+    "autoprefixer": "^10.5.4",
+    "postcss": "^8.5.25",
+    "tailwindcss": "^3.4.19"
   },
   "keywords": [
     "playwright",

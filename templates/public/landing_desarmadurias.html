@@ -1,0 +1,167 @@
+{% extends "public/base_landing.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}eGarage Desarmadurias — Software para Desarmadurias y Reciclaje Automotriz{% endblock %}
+{% block meta_description %}Controla el ingreso de vehículos, el catálogo de piezas, el stock y las ventas de tu desarmaduria. Construido por una desarmaduria real, para desarmadurias reales. Prueba gratis 30 días.{% endblock %}
+{% block canonical_path %}/desarmadurias/{% endblock %}
+{% block og_title %}eGarage Desarmadurias — Software para Desarmadurias y Reciclaje Automotriz{% endblock %}
+{% block og_description %}El único software construido desde adentro de una desarmaduria. Gestiona vehículos, piezas, precios y ventas en un solo lugar.{% endblock %}
+
+{% block extra_head %}
+<style>
+  .accent-fuchsia { color: #e879f9; }
+  .card-glow-f:hover { box-shadow: 0 0 30px rgba(217, 70, 239, 0.2), 0 25px 50px -12px rgba(0,0,0,0.5); }
+  .atlanta-quote {
+    border-left: 3px solid #d946ef;
+    background: linear-gradient(90deg, rgba(217,70,239,0.08) 0%, transparent 100%);
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="px-6 py-20 text-center max-w-5xl mx-auto animate-in">
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-semibold mb-6 font-orbitron tracking-widest">
+    🧩 eGarage · Desarmadurias
+  </div>
+  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-fuchsia">
+    Una chatarra entra.<br>
+    <span class="text-fuchsia-400">400 piezas salen al mercado.</span>
+  </h1>
+  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10">
+    eGarage entiende cómo funciona una desarmaduria: un vehículo que ingresa se convierte en cientos de piezas individuales, cada una con su estado, su precio y su historia. Lo construimos nosotros mismos.
+  </p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+    <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-fuchsia-600 text-white font-bold text-lg hover:bg-fuchsia-500 transition-all shadow-lg shadow-fuchsia-500/30 font-orbitron">
+      Prueba gratis 30 días →
+    </a>
+    <a href="{% url 'account_login' %}" class="px-8 py-4 rounded-xl border border-slate-500 text-slate-200 hover:border-fuchsia-500/50 hover:text-fuchsia-300 transition-all text-lg">
+      Ya tengo cuenta
+    </a>
+  </div>
+  <p class="text-slate-400 text-sm">Sin tarjeta de crédito · Cancela cuando quieras</p>
+</section>
+
+<!-- Historia de Mauricio / Atlanta -->
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+  <div class="atlanta-quote rounded-2xl p-8">
+    <p class="text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-6">La historia detrás del software</p>
+    <h2 class="font-orbitron text-2xl font-bold text-fuchsia-300 mb-6">Atlanta Reciclajes nació antes que eGarage.</h2>
+    <div class="space-y-4 text-slate-200 text-base leading-relaxed">
+      <p class="text-fuchsia-200 italic text-lg">
+        "Después de años administrando una desarmaduría, desarrollamos el sistema que nosotros mismos necesitábamos."
+      </p>
+      <p>
+        Éramos una desarmaduria en Santiago, Chile. Buscamos software para gestionar nuestro inventario de piezas — y no encontramos nada que entendiera cómo funcionamos realmente.
+      </p>
+      <p>
+        Los sistemas genéricos tratan cada producto como un artículo independiente. Pero en una desarmaduria, un Toyota Corolla 2018 que ingresa se convierte en un motor, cuatro puertas, un capó, dos faroles, cuatro bujes, una dirección hidráulica y otros 380 ítems más. Cada uno con su propio estado, su precio y su condición.
+      </p>
+      <p>
+        Ningún software lo entendía. Entonces Mauricio lo construyó.
+      </p>
+      <p class="text-fuchsia-300 font-semibold">
+        eGarage Desarmadurias es el sistema que Atlanta Reciclajes usó primero. Hoy lo abrimos para que cualquier desarmaduria en Latinoamérica tenga lo mismo.
+      </p>
+    </div>
+    <div class="mt-8 flex items-center gap-3">
+      <div class="h-px flex-1 bg-fuchsia-500/30"></div>
+      <span class="text-slate-400 text-sm">Mauricio Alvarado — Atlanta Reciclajes, Santiago, Chile</span>
+      <div class="h-px flex-1 bg-fuchsia-500/30"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="px-6 py-16 max-w-6xl mx-auto">
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12 animate-in">Diseñado para el flujo real de una desarmaduria</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🚗</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Ingreso de vehículos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Registra cada vehículo con marca, modelo, año, VIN y fotos. Define qué piezas se extraen. El inventario se genera automáticamente por pieza.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🧩</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Catálogo de piezas</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Cada pieza tiene estado (nueva, usada, dañada), precio, foto y compatibilidad. Tu catálogo puede publicarse como tienda para que los clientes busquen antes de llamar.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📦</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Control de stock</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">El stock se descuenta automáticamente al vender. Ves qué piezas están disponibles, cuáles están reservadas y cuáles ya salieron del patio.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🔍</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Búsqueda por compatibilidad</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Un cliente busca un espejo para un Honda Fit 2016 — el sistema le muestra solo las piezas compatibles disponibles en tu patio. Cero confusión.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">💬</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">WhatsApp + ventas</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Responde consultas por WhatsApp con datos reales: precio, disponibilidad y foto de la pieza. Cierra la venta y registra todo sin salir de la plataforma.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📊</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Valorización del patio</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">¿Cuánto vale lo que tienes en el patio? Ve el valor total del inventario por vehículo, por categoría de pieza y por período. Toma decisiones de compra con datos.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📋</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Documentos de venta</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Genera boletas, facturas y notas de venta directamente desde el sistema. IVA calculado según el país. Sin Excel, sin papel carbón.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📷</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Fotos por pieza</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Adjunta fotos a cada pieza para mostrar el estado real. El cliente ve exactamente qué está comprando antes de ir a buscarlo. Menos devoluciones, más confianza.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🌐</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Tienda en línea</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Tu catálogo de piezas disponible como página web pública. Los clientes buscan por modelo y año, y ven lo que tienes disponible antes de llamar.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Diferenciador clave -->
+<section class="px-6 py-12 max-w-3xl mx-auto text-center animate-in delay-2">
+  <div class="bg-fuchsia-950/40 border border-fuchsia-500/30 rounded-2xl p-8">
+    <h2 class="font-orbitron text-fuchsia-300 text-lg font-bold mb-3">No es un ERP adaptado. Es software nativo para desarmadurias.</h2>
+    <p class="text-slate-300 text-sm leading-relaxed">
+      La mayoría del software de inventario fue diseñado para ferreterías o tiendas minoristas: un producto, un código, un precio. En una desarmaduria, un solo automóvil es la fuente de 400 SKUs distintos, cada uno con su propio origen, condición y precio. eGarage fue construido con ese modelo desde el día cero, porque nosotros mismos lo necesitábamos así.
+    </p>
+  </div>
+</section>
+
+<!-- CTA final -->
+<section class="px-6 py-20 text-center animate-in delay-3">
+  <h2 class="font-orbitron text-3xl font-black text-white mb-4">¿Listo para ordenar tu desarmaduria?</h2>
+  <p class="text-slate-300 mb-8">30 días gratis. Sin tarjeta de crédito. Sin compromiso.</p>
+  <a href="{% url 'account_signup' %}" class="px-10 py-5 rounded-xl bg-fuchsia-600 text-white font-black text-xl hover:bg-fuchsia-500 transition-all shadow-xl shadow-fuchsia-500/30 font-orbitron">
+    Crear cuenta gratis →
+  </a>
+  <p class="mt-8 text-slate-400 text-sm">
+    ¿Tienes un taller mecánico? →
+    <a href="{% url 'landing_talleres' %}" class="text-cyan-400 hover:text-cyan-300">eGarage Talleres</a>
+    &nbsp;·&nbsp;
+    ¿Casa de repuestos? →
+    <a href="{% url 'landing_repuestos' %}" class="text-lime-400 hover:text-lime-300">eGarage Repuestos</a>
+    &nbsp;·&nbsp;
+    <a href="/" class="text-slate-300 hover:text-white">Ver todas las soluciones</a>
+  </p>
+</section>
+
+{% endblock %}

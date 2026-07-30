@@ -1,13 +1,38 @@
 from django.shortcuts import render
 
 
+def landing_home(request):
+    return render(request, "public/home.html")
+
+
+def landing_talleres(request):
+    return render(request, "public/landing_talleres.html")
+
+
+def landing_desarmadurias(request):
+    return render(request, "public/landing_desarmadurias.html")
+
+
+def landing_repuestos(request):
+    return render(request, "public/landing_repuestos.html")
+
+
+def landing_carwash(request):
+    return render(request, "public/landing_carwash.html")
+
+
+def landing_vulcanizacion(request):
+    return render(request, "public/landing_vulcanizacion.html")
+
+
+# Aliases en inglés (backward compat)
 def landing_workshop(request):
-    return render(request, "public/landing_workshop.html")
+    return render(request, "public/landing_talleres.html")
 
 
 def landing_salvage(request):
-    return render(request, "public/landing_salvage.html")
+    return render(request, "public/landing_desarmadurias.html")
 
 
 def landing_parts(request):
-    return render(request, "public/landing_parts.html")
+    return render(request, "public/landing_repuestos.html")

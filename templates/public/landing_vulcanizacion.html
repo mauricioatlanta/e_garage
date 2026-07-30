@@ -1,0 +1,143 @@
+{% extends "public/base_landing.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}eGarage Vulcanización — Software para Vulcanizadoras y Cambio de Neumáticos{% endblock %}
+{% block meta_description %}Gestiona montaje, balanceo, rotación y parches. Historial por vehículo, stock de neumáticos y cobros integrados para tu vulcanizadora. Prueba gratis 30 días.{% endblock %}
+{% block canonical_path %}/vulcanizaciones/{% endblock %}
+{% block og_title %}eGarage Vulcanización — Software para vulcanizadoras y neumáticos{% endblock %}
+{% block og_description %}Montaje, balanceo, rotación, parches y stock de neumáticos. Un sistema pensado para el ritmo de una vulcanizadora real.{% endblock %}
+
+{% block extra_head %}
+<style>
+  .card-glow-amber:hover { box-shadow: 0 0 30px rgba(251, 191, 36, 0.2), 0 25px 50px -12px rgba(0,0,0,0.5); }
+  .glow-amber { text-shadow: 0 0 20px rgba(251, 191, 36, 0.5); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="px-6 py-20 text-center max-w-5xl mx-auto animate-in">
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-semibold mb-6 font-orbitron tracking-widest">
+    🔄 eGarage · Vulcanizadoras
+  </div>
+  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-amber">
+    Tu vulcanizadora.<br>
+    <span class="text-amber-400">Un neumático a la vez.</span>
+  </h1>
+  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10">
+    Montaje, desmontaje, balanceo, rotación y parches — todos los servicios de tu vulcanizadora en un solo sistema. Con historial por vehículo, stock de neumáticos y cobros integrados.
+  </p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+    <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-amber-500 text-slate-950 font-bold text-lg hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/30 font-orbitron">
+      Prueba gratis 30 días →
+    </a>
+    <a href="{% url 'account_login' %}" class="px-8 py-4 rounded-xl border border-slate-500 text-slate-200 hover:border-amber-500/50 hover:text-amber-300 transition-all text-lg">
+      Ya tengo cuenta
+    </a>
+  </div>
+  <p class="text-slate-400 text-sm">Sin tarjeta de crédito · Cancela cuando quieras</p>
+</section>
+
+<!-- Problema -->
+<section class="px-6 py-10 max-w-3xl mx-auto animate-in delay-1">
+  <div class="bg-slate-800/50 border border-amber-500/20 rounded-2xl p-8 text-center">
+    <p class="text-slate-200 leading-relaxed">
+      En una vulcanizadora, los servicios son rápidos y los clientes pasan. Al final del día, ¿cuántos balanceos? ¿cuántos montajes? ¿cuánto cobré en efectivo y cuánto en transferencia?
+      Con eGarage, <span class="text-amber-300 font-semibold">cada servicio queda registrado y el cierre de caja es automático</span>.
+    </p>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="px-6 py-16 max-w-6xl mx-auto">
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12 animate-in">Todo lo que necesita tu vulcanizadora</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-amber-500/25 rounded-2xl p-6 card-glow-amber transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🔄</div>
+      <h3 class="font-orbitron text-amber-300 font-bold mb-3">Servicios de neumáticos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Registra montaje, desmontaje, balanceo, rotación y parche en frío o vulcanizado. Cada servicio con su precio, el vehículo y el técnico que lo hizo.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-amber-500/25 rounded-2xl p-6 card-glow-amber transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📋</div>
+      <h3 class="font-orbitron text-amber-300 font-bold mb-3">Orden de servicio rápida</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Abre la orden, selecciona los servicios, cobra y listo. Todo en menos de un minuto. El cliente se va y el registro quedó hecho solo.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-amber-500/25 rounded-2xl p-6 card-glow-amber transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🚗</div>
+      <h3 class="font-orbitron text-amber-300 font-bold mb-3">Historial por vehículo</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">¿Cuándo fue la última rotación de este auto? ¿Le cambiaron los neumáticos traseros? El historial está disponible con la patente o el RUT del cliente.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-amber-500/25 rounded-2xl p-6 card-glow-amber transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📦</div>
+      <h3 class="font-orbitron text-amber-300 font-bold mb-3">Stock de neumáticos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Controla tu inventario de neumáticos por medida, marca y tipo (verano, invierno, todo terreno). El stock se actualiza automáticamente al vender.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-amber-500/25 rounded-2xl p-6 card-glow-amber transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">💳</div>
+      <h3 class="font-orbitron text-amber-300 font-bold mb-3">Cobros integrados</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Efectivo, transferencia, tarjeta. El sistema registra el método. Al final del día el cierre de caja está listo sin sumar nada a mano.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-amber-500/25 rounded-2xl p-6 card-glow-amber transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📊</div>
+      <h3 class="font-orbitron text-amber-300 font-bold mb-3">Reportes del día y del mes</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">¿Cuántos balanceos hiciste esta semana? ¿Cuál es tu servicio más pedido? ¿Qué medida de neumático vendiste más? Lo ves en un clic.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-amber-500/25 rounded-2xl p-6 card-glow-amber transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🛡️</div>
+      <h3 class="font-orbitron text-amber-300 font-bold mb-3">Control de garantías</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Registra la garantía del neumático vendido. Si el cliente vuelve con un reclamo, el sistema muestra la fecha de compra, la medida y el técnico que lo instaló.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-amber-500/25 rounded-2xl p-6 card-glow-amber transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">👥</div>
+      <h3 class="font-orbitron text-amber-300 font-bold mb-3">Clientes registrados</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Guarda la ficha del cliente con sus vehículos. El que viene cada temporada a cambiar neumáticos — lo encuentras en segundos por patente o nombre.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-amber-500/25 rounded-2xl p-6 card-glow-amber transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🧾</div>
+      <h3 class="font-orbitron text-amber-300 font-bold mb-3">Boletas y facturas</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Genera documentos fiscales cuando el cliente los necesite. IVA calculado automáticamente. El cliente se va con su comprobante sin que tú tengas que escribir nada a mano.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Diferenciador -->
+<section class="px-6 py-12 max-w-3xl mx-auto text-center animate-in delay-2">
+  <div class="bg-amber-950/40 border border-amber-500/30 rounded-2xl p-8">
+    <h2 class="font-orbitron text-amber-300 text-lg font-bold mb-3">No es un sistema de taller adaptado. Es para vulcanizadoras.</h2>
+    <p class="text-slate-300 text-sm leading-relaxed">
+      El ritmo de una vulcanizadora es diferente: servicios rápidos, muchos clientes, mucha rotación de stock. eGarage está diseñado para ese ritmo: órdenes en segundos, cierre de caja automático y stock siempre actualizado.
+    </p>
+  </div>
+</section>
+
+<!-- CTA final -->
+<section class="px-6 py-20 text-center animate-in delay-3">
+  <h2 class="font-orbitron text-3xl font-black text-white mb-4">¿Listo para ordenar tu vulcanizadora?</h2>
+  <p class="text-slate-300 mb-8">30 días gratis. Sin tarjeta de crédito. Sin compromiso.</p>
+  <a href="{% url 'account_signup' %}" class="px-10 py-5 rounded-xl bg-amber-500 text-slate-950 font-black text-xl hover:bg-amber-400 transition-all shadow-xl shadow-amber-500/30 font-orbitron">
+    Crear cuenta gratis →
+  </a>
+  <p class="mt-8 text-slate-400 text-sm">
+    ¿Tienes un taller mecánico? →
+    <a href="{% url 'landing_talleres' %}" class="text-cyan-400 hover:text-cyan-300">eGarage Talleres</a>
+    &nbsp;·&nbsp;
+    ¿Tienes un carwash? →
+    <a href="{% url 'landing_carwash' %}" class="text-sky-400 hover:text-sky-300">eGarage Car Wash</a>
+    &nbsp;·&nbsp;
+    <a href="/" class="text-slate-300 hover:text-white">Ver todas las soluciones</a>
+  </p>
+</section>
+
+{% endblock %}

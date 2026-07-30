@@ -1,0 +1,144 @@
+{% extends "public/base_landing.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}eGarage Talleres — Software para Talleres Mecánicos en Latinoamérica{% endblock %}
+{% block meta_description %}Presupuestos digitales, órdenes de trabajo, inventario de repuestos e historial de clientes para tu taller mecánico. Prueba gratis 30 días, sin tarjeta.{% endblock %}
+{% block canonical_path %}/talleres/{% endblock %}
+{% block og_title %}eGarage Talleres — Software pensado para talleres mecánicos{% endblock %}
+{% block og_description %}Gestiona tu taller con presupuestos digitales, órdenes de trabajo, inventario y seguimiento de clientes. Sin papeles, sin complicaciones.{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="px-6 py-20 text-center max-w-5xl mx-auto animate-in">
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold mb-6 font-orbitron tracking-widest">
+    ⚙️ eGarage · Talleres Mecánicos
+  </div>
+  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-cyan">
+    Tu taller mecánico.<br>
+    <span class="text-cyan-400">Sin papeles.</span>
+  </h1>
+  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-10">
+    Presupuestos, órdenes de trabajo, inventario de repuestos y seguimiento de clientes — todo en una plataforma diseñada para talleres mecánicos en Latinoamérica.
+  </p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+    <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-cyan-500 text-slate-950 font-bold text-lg hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/30 font-orbitron">
+      Prueba gratis 30 días →
+    </a>
+    <a href="{% url 'account_login' %}" class="px-8 py-4 rounded-xl border border-slate-500 text-slate-200 hover:border-cyan-500/50 hover:text-cyan-300 transition-all text-lg">
+      Ya tengo cuenta
+    </a>
+  </div>
+  <p class="text-slate-400 text-sm">Sin tarjeta de crédito · Cancela cuando quieras</p>
+</section>
+
+<!-- Problema que resuelve -->
+<section class="px-6 py-10 max-w-3xl mx-auto animate-in delay-1">
+  <div class="bg-slate-800/50 border border-cyan-500/20 rounded-2xl p-8 text-center">
+    <p class="text-slate-200 leading-relaxed">
+      En la mayoría de los talleres, el presupuesto sale en un papel, la orden de trabajo en otro, el inventario está en Excel y el historial del cliente no existe.
+      Con eGarage, <span class="text-cyan-300 font-semibold">todo eso desaparece en un día</span>.
+    </p>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="px-6 py-16 max-w-6xl mx-auto">
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12 animate-in">Lo que necesita tu taller, en un solo lugar</h2>
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📄</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Presupuestos en segundos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Crea el presupuesto mientras el cliente está en el taller. Agrega mano de obra y repuestos, calcula el IVA automáticamente y envíalo por WhatsApp.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🔧</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Órdenes de trabajo</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Convierte el presupuesto aprobado en orden de trabajo con un clic. Asigna técnico, registra los repuestos usados y cierra la OT cuando esté listo.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📦</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Inventario de repuestos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Controla tu stock en bodega. Cada vez que usas un repuesto en una OT, el inventario se descuenta solo. Alertas automáticas al llegar al mínimo.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🚗</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Ficha por vehículo</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Marca, modelo, año, VIN, kilometraje, fotos. Historial completo de todos los servicios realizados. El siguiente mecánico sabe exactamente qué se hizo antes.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">👥</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Historial de clientes</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Cada cliente tiene su ficha con todos sus vehículos, visitas y documentos. ¿Cuándo fue la última vez que trajo el Ford Ranger? Lo ves en dos segundos.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">💬</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Aviso por WhatsApp</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Cuando el vehículo está listo, notifica al cliente por WhatsApp directamente desde la OT. Sin llamadas, sin "¿está el auto de Juan?", sin confusión.</p>
+    </div>
+
+    <div class="animate-in delay-1 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📊</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Reportes del taller</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Ventas del mes, servicios más frecuentes, productividad por técnico, repuestos más usados. Toma decisiones con datos reales, no con intuición.</p>
+    </div>
+
+    <div class="animate-in delay-2 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🧾</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">IVA e impuestos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">IVA 19% en Chile, IGV 18% en Perú, tax por estado en USA. El sistema calcula automáticamente según el país del taller. Sin configuración manual.</p>
+    </div>
+
+    <div class="animate-in delay-3 bg-slate-800/60 border border-cyan-500/25 rounded-2xl p-6 card-glow transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">👨‍🔧</div>
+      <h3 class="font-orbitron text-cyan-300 font-bold mb-3">Gestión de técnicos</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Asigna órdenes de trabajo por técnico. Ve qué está haciendo cada uno en este momento. Mide eficiencia y cierra el mes con números claros.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Multi-país -->
+<section class="px-6 py-12 max-w-3xl mx-auto text-center animate-in delay-2">
+  <div class="bg-slate-800/50 border border-slate-600/50 rounded-2xl p-8">
+    <h2 class="font-orbitron text-slate-200 text-lg font-bold mb-3">Tu taller, en cualquier país</h2>
+    <p class="text-slate-300 text-sm mb-4">Con soporte fiscal para Chile, Perú, USA y más países de Latinoamérica. El sistema se adapta a tu mercado.</p>
+    <div class="flex flex-wrap justify-center gap-2 text-xl">
+      <span title="Chile">🇨🇱</span>
+      <span title="Argentina">🇦🇷</span>
+      <span title="Uruguay">🇺🇾</span>
+      <span title="México">🇲🇽</span>
+      <span title="Perú">🇵🇪</span>
+      <span title="Venezuela">🇻🇪</span>
+      <span title="Brasil">🇧🇷</span>
+      <span title="USA">🇺🇸</span>
+    </div>
+  </div>
+</section>
+
+<!-- CTA final -->
+<section class="px-6 py-20 text-center animate-in delay-3">
+  <h2 class="font-orbitron text-3xl font-black text-white mb-4">¿Listo para digitalizar tu taller?</h2>
+  <p class="text-slate-300 mb-8">30 días gratis. Sin tarjeta de crédito. Sin compromiso.</p>
+  <a href="{% url 'account_signup' %}" class="px-10 py-5 rounded-xl bg-cyan-500 text-slate-950 font-black text-xl hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/30 font-orbitron">
+    Crear cuenta gratis →
+  </a>
+  <p class="mt-8 text-slate-400 text-sm">
+    ¿Tienes una desarmaduria? →
+    <a href="{% url 'landing_desarmadurias' %}" class="text-fuchsia-400 hover:text-fuchsia-300">eGarage Desarmadurias</a>
+    &nbsp;·&nbsp;
+    ¿Casa de repuestos? →
+    <a href="{% url 'landing_repuestos' %}" class="text-lime-400 hover:text-lime-300">eGarage Repuestos</a>
+    &nbsp;·&nbsp;
+    <a href="/" class="text-slate-300 hover:text-white">Ver todas las soluciones</a>
+  </p>
+</section>
+
+{% endblock %}

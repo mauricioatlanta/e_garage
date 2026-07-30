@@ -1,0 +1,178 @@
+{% extends "public/base_landing.html" %}
+{% load static %}
+{% load i18n %}
+
+{% block title %}eGarage — Software para negocios automotrices en Latinoamérica{% endblock %}
+{% block meta_description %}Plataforma de gestión para talleres mecánicos, desarmadurias, casas de repuestos, carwash y vulcanizadoras. Prueba gratis 30 días.{% endblock %}
+{% block canonical_path %}/{% endblock %}
+{% block og_title %}eGarage — Software para tu negocio automotriz{% endblock %}
+{% block og_description %}Talleres, desarmadurias, repuestos, carwash y vulcanizadoras. Una sola plataforma, hecha para tu rubro específico.{% endblock %}
+
+{% block extra_head %}
+<style>
+  .solution-card { transition: all 0.3s ease; }
+  .solution-card:hover { transform: translateY(-4px); }
+  .card-cyan:hover  { box-shadow: 0 0 30px rgba(0, 245, 255, 0.2), 0 25px 50px -12px rgba(0,0,0,0.6); }
+  .card-fuchsia:hover { box-shadow: 0 0 30px rgba(217, 70, 239, 0.2), 0 25px 50px -12px rgba(0,0,0,0.6); }
+  .card-lime:hover  { box-shadow: 0 0 30px rgba(163, 230, 53, 0.15), 0 25px 50px -12px rgba(0,0,0,0.6); }
+  .card-sky:hover   { box-shadow: 0 0 30px rgba(56, 189, 248, 0.2), 0 25px 50px -12px rgba(0,0,0,0.6); }
+  .card-amber:hover { box-shadow: 0 0 30px rgba(251, 191, 36, 0.2), 0 25px 50px -12px rgba(0,0,0,0.6); }
+  .trust-bar { background: linear-gradient(90deg, rgba(0,245,255,0.04) 0%, rgba(217,70,239,0.04) 50%, rgba(163,230,53,0.04) 100%); }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- Hero -->
+<section class="px-6 py-20 text-center max-w-5xl mx-auto">
+  <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 text-xs font-semibold mb-6 font-orbitron tracking-widest animate-in">
+    🚗 Software automotriz para Latinoamérica
+  </div>
+  <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight animate-in delay-1">
+    Hecho para<br>
+    <span class="text-cyan-400 glow-cyan">tu negocio específico.</span>
+  </h1>
+  <p class="text-xl text-slate-300 max-w-2xl mx-auto mb-10 animate-in delay-2">
+    No somos un ERP genérico adaptado. eGarage tiene una versión especializada para cada rubro del mundo automotriz — elige la tuya y empieza gratis hoy.
+  </p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center animate-in delay-3">
+    <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-cyan-500 text-slate-950 font-bold text-lg hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/30 font-orbitron">
+      Prueba gratis 30 días →
+    </a>
+    <a href="{% url 'account_login' %}" class="px-8 py-4 rounded-xl border border-slate-600 text-slate-300 hover:border-cyan-500/50 hover:text-cyan-300 transition-all text-lg">
+      Ya tengo cuenta
+    </a>
+  </div>
+</section>
+
+<!-- Soluciones -->
+<section class="px-6 py-16 max-w-6xl mx-auto">
+  <p class="text-center text-slate-400 text-sm font-orbitron tracking-widest uppercase mb-12 animate-in">Elige tu solución</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+    <!-- Talleres -->
+    <a href="{% url 'landing_talleres' %}" class="solution-card card-cyan group bg-slate-800/60 border border-cyan-500/30 rounded-2xl p-6 block animate-in delay-1">
+      <div class="flex items-start justify-between mb-4">
+        <div class="text-4xl">⚙️</div>
+        <span class="text-xs font-orbitron text-cyan-400 group-hover:text-cyan-300 transition-colors">ver más →</span>
+      </div>
+      <h2 class="font-orbitron text-cyan-300 text-lg font-bold mb-2">Taller Mecánico</h2>
+      <p class="text-slate-300 text-sm leading-relaxed mb-4">Presupuestos, órdenes de trabajo, inventario de repuestos y clientes — sin papeles y sin complicaciones.</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 text-xs">Órdenes de trabajo</span>
+        <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 text-xs">Inventario</span>
+        <span class="px-2 py-0.5 rounded bg-cyan-500/15 text-cyan-300 text-xs">Clientes</span>
+      </div>
+    </a>
+
+    <!-- Desarmadurias -->
+    <a href="{% url 'landing_desarmadurias' %}" class="solution-card card-fuchsia group bg-slate-800/60 border border-fuchsia-500/30 rounded-2xl p-6 block animate-in delay-2">
+      <div class="flex items-start justify-between mb-4">
+        <div class="text-4xl">🧩</div>
+        <span class="text-xs font-orbitron text-fuchsia-400 group-hover:text-fuchsia-300 transition-colors">ver más →</span>
+      </div>
+      <h2 class="font-orbitron text-fuchsia-300 text-lg font-bold mb-2">Desarmaduria</h2>
+      <p class="text-slate-300 text-sm leading-relaxed mb-4">Ingreso de vehículos, catálogo de piezas, control de stock y ventas. Construido por una desarmaduria real.</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">Ingreso de vehículos</span>
+        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">Piezas</span>
+        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">Stock</span>
+      </div>
+    </a>
+
+    <!-- Repuestos -->
+    <a href="{% url 'landing_repuestos' %}" class="solution-card card-lime group bg-slate-800/60 border border-lime-500/30 rounded-2xl p-6 block animate-in delay-3">
+      <div class="flex items-start justify-between mb-4">
+        <div class="text-4xl">🏪</div>
+        <span class="text-xs font-orbitron text-lime-400 group-hover:text-lime-300 transition-colors">ver más →</span>
+      </div>
+      <h2 class="font-orbitron text-lime-300 text-lg font-bold mb-2">Casa de Repuestos</h2>
+      <p class="text-slate-300 text-sm leading-relaxed mb-4">Catálogo por referencia OEM, inventario multi-bodega, punto de venta y tienda en línea integrada.</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-0.5 rounded bg-lime-500/15 text-lime-300 text-xs">Catálogo OEM</span>
+        <span class="px-2 py-0.5 rounded bg-lime-500/15 text-lime-300 text-xs">Multi-bodega</span>
+        <span class="px-2 py-0.5 rounded bg-lime-500/15 text-lime-300 text-xs">Tienda online</span>
+      </div>
+    </a>
+
+    <!-- Carwash -->
+    <a href="{% url 'landing_carwash' %}" class="solution-card card-sky group bg-slate-800/60 border border-sky-500/30 rounded-2xl p-6 block animate-in delay-1">
+      <div class="flex items-start justify-between mb-4">
+        <div class="text-4xl">🚿</div>
+        <span class="text-xs font-orbitron text-sky-400 group-hover:text-sky-300 transition-colors">ver más →</span>
+      </div>
+      <h2 class="font-orbitron text-sky-300 text-lg font-bold mb-2">Car Wash</h2>
+      <p class="text-slate-300 text-sm leading-relaxed mb-4">Registro de lavados, agenda de turnos, cobros rápidos y cierre de caja diario. Para el carwash de barrio o la cadena.</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 text-xs">Agenda</span>
+        <span class="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 text-xs">Cobros</span>
+        <span class="px-2 py-0.5 rounded bg-sky-500/15 text-sky-300 text-xs">Cierre de caja</span>
+      </div>
+    </a>
+
+    <!-- Vulcanización -->
+    <a href="{% url 'landing_vulcanizacion' %}" class="solution-card card-amber group bg-slate-800/60 border border-amber-500/30 rounded-2xl p-6 block animate-in delay-2">
+      <div class="flex items-start justify-between mb-4">
+        <div class="text-4xl">🔄</div>
+        <span class="text-xs font-orbitron text-amber-400 group-hover:text-amber-300 transition-colors">ver más →</span>
+      </div>
+      <h2 class="font-orbitron text-amber-300 text-lg font-bold mb-2">Vulcanizadora</h2>
+      <p class="text-slate-300 text-sm leading-relaxed mb-4">Montaje, balanceo, rotación y parches. Historial por vehículo, stock de neumáticos y cobros integrados.</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 text-xs">Balanceo</span>
+        <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 text-xs">Historial</span>
+        <span class="px-2 py-0.5 rounded bg-amber-500/15 text-amber-300 text-xs">Stock neumáticos</span>
+      </div>
+    </a>
+
+    <!-- CTA card -->
+    <div class="solution-card bg-gradient-to-br from-slate-800/60 to-slate-900/80 border border-slate-700/50 rounded-2xl p-6 flex flex-col justify-center items-center text-center animate-in delay-3">
+      <div class="text-3xl mb-4">🌎</div>
+      <p class="text-slate-300 text-sm mb-2">Disponible en</p>
+      <div class="flex flex-wrap justify-center gap-1 text-lg mb-4">
+        <span title="Chile">🇨🇱</span><span title="Argentina">🇦🇷</span><span title="México">🇲🇽</span>
+        <span title="Perú">🇵🇪</span><span title="Uruguay">🇺🇾</span><span title="Venezuela">🇻🇪</span>
+        <span title="Brasil">🇧🇷</span><span title="USA">🇺🇸</span>
+      </div>
+      <p class="text-slate-400 text-xs">IVA (CL), IGV (PE), taxes por estado (US) y más</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- Por qué eGarage -->
+<section class="px-6 py-16 max-w-4xl mx-auto">
+  <div class="trust-bar rounded-2xl p-8 border border-slate-700/40">
+    <h2 class="font-orbitron text-white text-xl font-bold text-center mb-10">Por qué eGarage es diferente</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="text-center">
+        <div class="text-3xl mb-3">🏗️</div>
+        <h3 class="font-orbitron text-slate-200 text-sm font-bold mb-2">Construido desde adentro</h3>
+        <p class="text-slate-300 text-sm">Nació en una desarmaduria real, no en una sala de reuniones. Sabemos cómo funciona cada rubro porque lo vivimos.</p>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl mb-3">⚡</div>
+        <h3 class="font-orbitron text-slate-200 text-sm font-bold mb-2">Listo en 5 minutos</h3>
+        <p class="text-slate-300 text-sm">Sin implementación, sin consultor, sin semanas de configuración. Crea tu cuenta y empieza a usarlo hoy mismo.</p>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl mb-3">🔒</div>
+        <h3 class="font-orbitron text-slate-200 text-sm font-bold mb-2">Tus datos, solo tuyos</h3>
+        <p class="text-slate-300 text-sm">Cada negocio tiene sus datos completamente aislados. Nadie más tiene acceso a tu inventario ni a tus clientes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA final -->
+<section class="px-6 py-20 text-center animate-in delay-2">
+  <h2 class="font-orbitron text-3xl font-black text-white mb-4">¿Listo para ordenar tu negocio?</h2>
+  <p class="text-slate-300 mb-2">30 días gratis. Sin tarjeta de crédito. Cancela cuando quieras.</p>
+  <p class="text-slate-400 text-sm mb-8">Elige tu solución arriba o empieza con el plan que se ajuste a tu rubro.</p>
+  <a href="{% url 'account_signup' %}" class="px-10 py-5 rounded-xl bg-cyan-500 text-slate-950 font-black text-xl hover:bg-cyan-400 transition-all shadow-xl shadow-cyan-500/30 font-orbitron">
+    Crear cuenta gratis →
+  </a>
+</section>
+
+{% endblock %}
