@@ -37,6 +37,7 @@ from taller.constants.workspaces import (
     WGT_KPI_DOCS_TODAY,
     WGT_KPI_INVENTORY_VALUE,
     WGT_KPI_OT_OPEN,
+    WGT_KPI_QUOTES_PENDING,
     WGT_KPI_SALES_TODAY,
     WGT_KPI_SERVICES_TODAY,
     WGT_KPI_STOCK_CRITICAL,
@@ -258,6 +259,26 @@ class WorkspaceWidgetKeyTests(TestCase):
         self.assertIn(WGT_KPI_STOCK_CRITICAL, ws.widget_keys)
         self.assertIn(WGT_KPI_SALES_TODAY, ws.widget_keys)
 
+    def test_parts_includes_quotes_pending_widget(self):
+        ws = get_workspace_def("PARTS")
+        self.assertIn(WGT_KPI_QUOTES_PENDING, ws.widget_keys)
+
+    def test_parts_excludes_docs_today_widget(self):
+        ws = get_workspace_def("PARTS")
+        self.assertNotIn(WGT_KPI_DOCS_TODAY, ws.widget_keys)
+
+    def test_workshop_still_includes_docs_today(self):
+        ws = get_workspace_def("WORKSHOP")
+        self.assertIn(WGT_KPI_DOCS_TODAY, ws.widget_keys)
+
+    def test_desarm_still_includes_docs_today(self):
+        ws = get_workspace_def("MIXED")
+        self.assertIn(WGT_KPI_DOCS_TODAY, ws.widget_keys)
+
+    def test_carwash_still_includes_docs_today(self):
+        ws = get_workspace_def("DETAILING")
+        self.assertIn(WGT_KPI_DOCS_TODAY, ws.widget_keys)
+
     def test_parts_has_no_desarm_widget(self):
         ws = get_workspace_def("PARTS")
         self.assertNotIn(WGT_KPI_DESARM_AVAIL, ws.widget_keys)
@@ -412,3 +433,85 @@ class WorkspaceDashboardServiceTests(TestCase):
         result = WorkspaceDashboardService.resolve(ws_def, empresa)
         ot = next(w for w in result["widgets"] if w["key"] == WGT_KPI_OT_OPEN)
         self.assertEqual(ot["format"], "number")
+
+
+class WorkspaceQuotesPendingServiceTests(TestCase):
+    """
+    Sprint 2A — WGT_KPI_QUOTES_PENDING data correctness.
+
+    Verifies the aggregate counts presupuestos pendientes accurately:
+      - Includes BORRADOR and EMITIDO (tipo=PRES)
+      - Excludes ANULADO
+      - Excludes converted docs (tipo changed to OT/FAC on conversion)
+      - Enforces multi-tenant isolation
+    """
+
+    def _make_empresa(self):
+        from taller.tests.factories import EmpresaFactory
+        return EmpresaFactory(nombre_taller="Parts Co", pais="CL")
+
+    def _resolve_parts(self, empresa, today=None):
+        from taller.services.workspace_dashboard_service import WorkspaceDashboardService
+        ws_def = get_workspace_def("PARTS")
+        result = WorkspaceDashboardService.resolve(ws_def, empresa, today=today)
+        widget = next(w for w in result["widgets"] if w["key"] == WGT_KPI_QUOTES_PENDING)
+        return widget["value"]
+
+    def _make_doc(self, empresa, tipo, estado):
+        from taller.tests.factories import DocumentoFactory
+        return DocumentoFactory(empresa=empresa, tipo=tipo, estado=estado)
+
+    def test_zero_when_no_documents(self):
+        empresa = self._make_empresa()
+        self.assertEqual(self._resolve_parts(empresa), 0)
+
+    def test_counts_emitido_pres(self):
+        empresa = self._make_empresa()
+        self._make_doc(empresa, "PRES", "EMITIDO")
+        self._make_doc(empresa, "PRES", "EMITIDO")
+        self.assertEqual(self._resolve_parts(empresa), 2)
+
+    def test_counts_borrador_pres(self):
+        empresa = self._make_empresa()
+        self._make_doc(empresa, "PRES", "BORRADOR")
+        self.assertEqual(self._resolve_parts(empresa), 1)
+
+    def test_counts_borrador_and_emitido_together(self):
+        empresa = self._make_empresa()
+        self._make_doc(empresa, "PRES", "BORRADOR")
+        self._make_doc(empresa, "PRES", "EMITIDO")
+        self.assertEqual(self._resolve_parts(empresa), 2)
+
+    def test_excludes_anulado_pres(self):
+        empresa = self._make_empresa()
+        self._make_doc(empresa, "PRES", "EMITIDO")
+        self._make_doc(empresa, "PRES", "ANULADO")
+        self.assertEqual(self._resolve_parts(empresa), 1)
+
+    def test_excludes_converted_docs(self):
+        """Converted PRES change tipo to OT/FAC — they must not appear in count."""
+        empresa = self._make_empresa()
+        self._make_doc(empresa, "OT", "EMITIDO")   # converted CL
+        self._make_doc(empresa, "FAC", "EMITIDO")  # converted US
+        self.assertEqual(self._resolve_parts(empresa), 0)
+
+    def test_excludes_other_tipo_docs(self):
+        empresa = self._make_empresa()
+        self._make_doc(empresa, "PTS", "EMITIDO")  # Venta Repuestos, not a quote
+        self.assertEqual(self._resolve_parts(empresa), 0)
+
+    def test_no_cross_tenant(self):
+        empresa_a = self._make_empresa()
+        empresa_b = self._make_empresa()
+        self._make_doc(empresa_b, "PRES", "EMITIDO")
+        self._make_doc(empresa_b, "PRES", "EMITIDO")
+        self._make_doc(empresa_a, "PRES", "EMITIDO")
+        self.assertEqual(self._resolve_parts(empresa_a), 1)
+
+    def test_quotes_pending_widget_format_is_number(self):
+        from taller.services.workspace_dashboard_service import WorkspaceDashboardService
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("PARTS")
+        result = WorkspaceDashboardService.resolve(ws_def, empresa)
+        widget = next(w for w in result["widgets"] if w["key"] == WGT_KPI_QUOTES_PENDING)
+        self.assertEqual(widget["format"], "number")

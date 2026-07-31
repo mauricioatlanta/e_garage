@@ -40,6 +40,7 @@ from taller.constants.workspaces import (
     WGT_KPI_DOCS_TODAY,
     WGT_KPI_INVENTORY_VALUE,
     WGT_KPI_OT_OPEN,
+    WGT_KPI_QUOTES_PENDING,
     WGT_KPI_SALES_TODAY,
     WGT_KPI_SERVICES_TODAY,
     WGT_KPI_STOCK_CRITICAL,
@@ -52,18 +53,19 @@ _ZERO_DEC = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, deci
 # "number"   → plain integer
 # "currency" → formatted as money (template adds currency symbol)
 WIDGET_DEFINITIONS: dict[str, dict] = {
-    WGT_KPI_OT_OPEN:         {"title": _("OT Abiertas"),          "icon": "fas fa-clipboard-list", "format": "number"},
-    WGT_KPI_DOCS_TODAY:      {"title": _("Documentos hoy"),        "icon": "fas fa-file-alt",       "format": "number"},
-    WGT_KPI_SALES_TODAY:     {"title": _("Ventas del día"),        "icon": "fas fa-dollar-sign",    "format": "currency"},
-    WGT_KPI_CLIENTS_MONTH:   {"title": _("Clientes este mes"),     "icon": "fas fa-user-plus",      "format": "number"},
-    WGT_KPI_STOCK_CRITICAL:  {"title": _("Stock crítico"),         "icon": "fas fa-exclamation-triangle", "format": "number"},
-    WGT_KPI_DESARM_AVAIL:    {"title": _("Vehículos disponibles"), "icon": "fas fa-car-crash",      "format": "number"},
-    WGT_KPI_INVENTORY_VALUE: {"title": _("Valor inventario"),      "icon": "fas fa-boxes",          "format": "currency"},
-    WGT_KPI_SERVICES_TODAY:  {"title": _("Servicios hoy"),         "icon": "fas fa-tint",           "format": "number"},
+    WGT_KPI_OT_OPEN:         {"title": _("OT Abiertas"),               "icon": "fas fa-clipboard-list",      "format": "number"},
+    WGT_KPI_DOCS_TODAY:      {"title": _("Documentos hoy"),             "icon": "fas fa-file-alt",            "format": "number"},
+    WGT_KPI_SALES_TODAY:     {"title": _("Ventas del día"),             "icon": "fas fa-dollar-sign",         "format": "currency"},
+    WGT_KPI_CLIENTS_MONTH:   {"title": _("Clientes este mes"),          "icon": "fas fa-user-plus",           "format": "number"},
+    WGT_KPI_STOCK_CRITICAL:  {"title": _("Stock crítico"),              "icon": "fas fa-exclamation-triangle","format": "number"},
+    WGT_KPI_DESARM_AVAIL:    {"title": _("Vehículos disponibles"),      "icon": "fas fa-car-crash",           "format": "number"},
+    WGT_KPI_INVENTORY_VALUE: {"title": _("Valor inventario"),           "icon": "fas fa-boxes",               "format": "currency"},
+    WGT_KPI_SERVICES_TODAY:  {"title": _("Servicios hoy"),              "icon": "fas fa-tint",                "format": "number"},
+    WGT_KPI_QUOTES_PENDING:  {"title": _("Cotizaciones pendientes"),    "icon": "fas fa-hourglass-half",      "format": "number"},
 }
 
 # Which widget keys belong to each query group
-_GROUP_DOCS      = frozenset({WGT_KPI_OT_OPEN, WGT_KPI_DOCS_TODAY, WGT_KPI_SALES_TODAY, WGT_KPI_SERVICES_TODAY})
+_GROUP_DOCS      = frozenset({WGT_KPI_OT_OPEN, WGT_KPI_DOCS_TODAY, WGT_KPI_SALES_TODAY, WGT_KPI_SERVICES_TODAY, WGT_KPI_QUOTES_PENDING})
 _GROUP_CLIENTS   = frozenset({WGT_KPI_CLIENTS_MONTH})
 _GROUP_INVENTORY = frozenset({WGT_KPI_STOCK_CRITICAL, WGT_KPI_INVENTORY_VALUE})
 _GROUP_DESARM    = frozenset({WGT_KPI_DESARM_AVAIL})
@@ -124,11 +126,15 @@ class WorkspaceDashboardService:
                 _ZERO_DEC,
             ),
             ot_open=Count("id", filter=Q(tipo="OT", estado="EMITIDO")),
+            # Pending quotes: PRES not yet converted (tipo would change on conversion)
+            # and not cancelled. Includes BORRADOR (unsent drafts) + EMITIDO (awaiting response).
+            quotes_pending=Count("id", filter=Q(tipo="PRES", estado__in=["BORRADOR", "EMITIDO"])),
         )
         return {
-            WGT_KPI_DOCS_TODAY:  agg["docs_today"],
-            WGT_KPI_SALES_TODAY: agg["sales_today"],
-            WGT_KPI_OT_OPEN:     agg["ot_open"],
+            WGT_KPI_DOCS_TODAY:     agg["docs_today"],
+            WGT_KPI_SALES_TODAY:    agg["sales_today"],
+            WGT_KPI_OT_OPEN:        agg["ot_open"],
+            WGT_KPI_QUOTES_PENDING: agg["quotes_pending"],
             # Services today = all docs today (carwash context reuses the count)
             WGT_KPI_SERVICES_TODAY: agg["docs_today"],
         }

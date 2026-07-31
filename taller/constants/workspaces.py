@@ -101,6 +101,7 @@ WGT_KPI_STOCK_CRITICAL  = "kpi_stock_critical"    # Parts below stock minimum
 WGT_KPI_DESARM_AVAIL    = "kpi_desarm_available"  # Dismantlable vehicles
 WGT_KPI_INVENTORY_VALUE = "kpi_inventory_value"   # Total inventory value
 WGT_KPI_SERVICES_TODAY  = "kpi_services_today"    # Services registered today
+WGT_KPI_QUOTES_PENDING  = "kpi_quotes_pending"    # PRES not yet converted or cancelled (PARTS)
 
 
 # ---------------------------------------------------------------------------
@@ -262,7 +263,7 @@ WORKSPACE_CASA_REPUESTOS = WorkspaceDef(
     widget_keys=(
         WGT_KPI_SALES_TODAY,
         WGT_KPI_STOCK_CRITICAL,
-        WGT_KPI_DOCS_TODAY,
+        WGT_KPI_QUOTES_PENDING,
         WGT_KPI_CLIENTS_MONTH,
     ),
     quick_actions=(
