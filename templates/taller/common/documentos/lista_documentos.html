@@ -986,7 +986,7 @@
         <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Search{% else %}Buscar{% endif %}</span>
       </button>
       {% if filtros_activos.cliente or filtros_activos.vehiculo or filtros_activos.estado or filtros_activos.tipo or filtros_activos.desde or filtros_activos.hasta or filtros_activos.numero %}
-      <a href="{% url 'documentos:lista_documentos' %}" class="accion-btn" style="margin-top: 0.5rem; background: linear-gradient(135deg, rgba(255, 0, 68, 0.2) 0%, rgba(255, 102, 102, 0.2) 100%); border-color: rgba(255, 0, 68, 0.3); color: #ff4466;">
+      <a href="{{ clear_filters_url }}" class="accion-btn" style="margin-top: 0.5rem; background: linear-gradient(135deg, rgba(255, 0, 68, 0.2) 0%, rgba(255, 102, 102, 0.2) 100%); border-color: rgba(255, 0, 68, 0.3); color: #ff4466;">
         <i class="fas fa-times"></i>
         <span>{% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Clear{% else %}Limpiar{% endif %}</span>
       </a>
@@ -999,6 +999,26 @@
 {% block panel_content %}
 
 <div class="documentos-container">
+
+  {% if filtros_activos.tipo or filtros_activos.estados_list %}
+  <div style="display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem;">
+    <span style="font-size:.75rem;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;">Filtros activos:</span>
+    {% if filtros_activos.tipo %}
+    <span style="background:rgba(0,230,208,.15);border:1px solid rgba(0,230,208,.4);border-radius:6px;padding:.2rem .6rem;font-size:.8rem;color:#00fff7;">
+      Tipo: {{ filtros_activos.tipo_label }}
+    </span>
+    {% endif %}
+    {% if filtros_activos.estados_labels %}
+    <span style="background:rgba(0,230,208,.15);border:1px solid rgba(0,230,208,.4);border-radius:6px;padding:.2rem .6rem;font-size:.8rem;color:#00fff7;">
+      Estado: {% for lbl in filtros_activos.estados_labels %}{{ lbl }}{% if not forloop.last %}, {% endif %}{% endfor %}
+    </span>
+    {% endif %}
+    <a href="{{ clear_filters_url }}"
+       style="background:rgba(255,0,68,.15);border:1px solid rgba(255,0,68,.35);border-radius:6px;padding:.2rem .6rem;font-size:.8rem;color:#ff4466;text-decoration:none;">
+      <i class="fas fa-times"></i> Limpiar filtros
+    </a>
+  </div>
+  {% endif %}
 
   <!-- Toggle de vista -->
   <div class="view-toggle">
@@ -1299,6 +1319,28 @@
       {% endif %}
     </div>
   {% endif %}
+
+  {% if is_paginated %}
+  <nav style="display:flex;justify-content:center;align-items:center;gap:.5rem;margin-top:1.5rem;padding-bottom:.5rem;">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}{% if base_query_string %}&{{ base_query_string }}{% endif %}"
+       style="padding:.4rem .9rem;background:rgba(0,230,208,.15);border:1px solid rgba(0,230,208,.35);border-radius:8px;color:#00fff7;text-decoration:none;font-size:.85rem;">
+      ‹ {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Prev{% else %}Anterior{% endif %}
+    </a>
+    {% endif %}
+    <span style="color:#94a3b8;font-size:.85rem;">
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Page{% else %}Página{% endif %}
+      {{ page_obj.number }} / {{ paginator.num_pages }}
+    </span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}{% if base_query_string %}&{{ base_query_string }}{% endif %}"
+       style="padding:.4rem .9rem;background:rgba(0,230,208,.15);border:1px solid rgba(0,230,208,.35);border-radius:8px;color:#00fff7;text-decoration:none;font-size:.85rem;">
+      {% if LANGUAGE_CODE == 'en' or request.LANGUAGE_CODE == 'en' %}Next{% else %}Siguiente{% endif %} ›
+    </a>
+    {% endif %}
+  </nav>
+  {% endif %}
+
 </div>
 {% endblock %}
 
