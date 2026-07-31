@@ -21,8 +21,14 @@ class InventoryLedgerService:
         linea_repuesto_id,
         cantidad_delta,
         operation_version=1,
+        operation_id=None,
     ):
-        """SHA-256 determinístico para idempotencia del ledger de inventario."""
+        """SHA-256 determinístico para idempotencia del ledger de inventario.
+
+        operation_id: UUID de operación (solo para TipoMovimiento.EDICION).
+        Si es None no se incluye en el payload, preservando compatibilidad con
+        claves EMISION/ANULACION ya existentes en la DB.
+        """
         payload = {
             "v": cls.HASH_VERSION,
             "empresa_id": empresa_id,
@@ -37,6 +43,8 @@ class InventoryLedgerService:
             ),
             "operation_version": operation_version,
         }
+        if operation_id is not None:
+            payload["operation_id"] = str(operation_id)
         canonical = json.dumps(payload, sort_keys=True, separators=(",", ":"))
         return hashlib.sha256(canonical.encode()).hexdigest()
 

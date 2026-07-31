@@ -614,6 +614,279 @@ class InventoryService:
 
     @staticmethod
     @transaction.atomic
+    def procesar_edicion_con_ledger(
+        snapshot_anterior: list,
+        documento: Documento,
+        operation_id: str,
+    ) -> dict:
+        """
+        Registra en el ledger los cambios netos de stock de una edición de documento EMITIDO.
+
+        Compara snapshot_anterior (estado previo de las líneas) con las líneas
+        actuales del documento. Por cada recurso con delta neto ≠ 0:
+          - aplica el delta al stock (Repuesto o PiezaDesarme)
+          - crea un MovimientoInventario con tipo=EDICION
+
+        operation_id (str UUID) permite distinguir ediciones concurrentes e
+        idempotencia: si ya existe una clave para este operation_id, la operación
+        se salta sin re-aplicar.
+
+        Locking: SELECT FOR UPDATE sobre todos los Repuesto y PiezaDesarme
+        afectados, ordenados por pk para evitar deadlocks.
+        """
+        from taller.models.movimiento_inventario import MovimientoInventario
+        from taller.services.inventory_ledger_service import InventoryLedgerService
+
+        if documento.tipo in InventoryService.TIPOS_SIN_STOCK:
+            return {"procesado": False, "razon": "Tipo de documento no mueve stock"}
+
+        # ── 1. Mapa anterior ─────────────────────────────────────────────────
+        anterior_map: dict = defaultdict(int)
+        for item in snapshot_anterior or []:
+            origen = item.get("origen_repuesto")
+            cantidad = int(item.get("cantidad") or 0)
+            if cantidad <= 0:
+                continue
+            if origen == ORIGEN_STOCK_BODEGA and item.get("repuesto_id"):
+                anterior_map[("B", int(item["repuesto_id"]))] += cantidad
+            elif origen == ORIGEN_DESARME and item.get("pieza_desarme_id"):
+                anterior_map[("D", int(item["pieza_desarme_id"]))] += cantidad
+
+        # ── 2. Mapa nuevo ────────────────────────────────────────────────────
+        nuevo_map: dict = defaultdict(int)
+        lineas_nuevo = list(
+            documento.lineas_repuesto.select_related("repuesto", "pieza_desarme").all()
+        )
+        for linea in lineas_nuevo:
+            if linea.origen_repuesto == ORIGEN_EXTERNO:
+                continue
+            cant = int(linea.cantidad or 0)
+            if cant <= 0:
+                continue
+            if linea.origen_repuesto == ORIGEN_STOCK_BODEGA and linea.repuesto_id:
+                nuevo_map[("B", linea.repuesto_id)] += cant
+            elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
+                nuevo_map[("D", linea.pieza_desarme_id)] += cant
+
+        # ── 3. Deltas netos (positivo = reponer al stock, negativo = consumir) ─
+        all_keys = set(anterior_map.keys()) | set(nuevo_map.keys())
+        delta_map = {
+            k: anterior_map.get(k, 0) - nuevo_map.get(k, 0)
+            for k in all_keys
+            if anterior_map.get(k, 0) != nuevo_map.get(k, 0)
+        }
+        if not delta_map:
+            log.info(
+                f"[InventoryService] EDICION doc={documento.pk}: sin cambios netos, no se escribe ledger."
+            )
+            return {"procesado": True, "movimientos": [], "total_movimientos": 0}
+
+        # ── 4. SELECT FOR UPDATE en orden pk ─────────────────────────────────
+        bodega_ids = sorted(id_ for kind, id_ in delta_map if kind == "B")
+        desarme_ids = sorted(id_ for kind, id_ in delta_map if kind == "D")
+
+        saldo_bodega: dict = {}
+        if bodega_ids:
+            saldo_bodega = {
+                r.pk: r.cantidad_stock
+                for r in Repuesto.objects.select_for_update()
+                .filter(id__in=bodega_ids, empresa=documento.empresa)
+                .order_by("pk")
+            }
+
+        saldo_pieza: dict = {}
+        estado_por_pieza_map: dict = {}
+        activo_por_pieza_map: dict = {}
+        if desarme_ids:
+            locked_piezas = list(
+                PiezaDesarme.objects.select_for_update()
+                .filter(id__in=desarme_ids)
+                .order_by("pk")
+            )
+            saldo_pieza = {p.pk: p.cantidad for p in locked_piezas}
+            estado_por_pieza_map = {p.pk: p.estado_pieza for p in locked_piezas}
+            activo_por_pieza_map = {p.pk: p.activo for p in locked_piezas}
+
+        # ── 5. Helper: primera línea nueva para un recurso ───────────────────
+        def _primera_linea(kind, resource_id):
+            for ln in lineas_nuevo:
+                if kind == "B" and ln.origen_repuesto == ORIGEN_STOCK_BODEGA and ln.repuesto_id == resource_id:
+                    return ln
+                if kind == "D" and ln.origen_repuesto == ORIGEN_DESARME and ln.pieza_desarme_id == resource_id:
+                    return ln
+            return None
+
+        # ── 6. Loop: aplicar deltas + ledger ─────────────────────────────────
+        movimientos: list = []
+        for key in sorted(delta_map.keys()):
+            kind, resource_id = key
+            stock_delta = delta_map[key]
+
+            if kind == "B":
+                saldo_antes = saldo_bodega.get(resource_id, 0)
+
+                # Idempotencia ANTES de cualquier modificación
+                ikey = InventoryLedgerService.build_idempotency_key(
+                    empresa_id=documento.empresa_id,
+                    tipo=MovimientoInventario.TipoMovimiento.EDICION,
+                    origen_stock=MovimientoInventario.OrigenStock.STOCK_BODEGA,
+                    repuesto_id=resource_id,
+                    pieza_desarme_id=None,
+                    documento_id=documento.pk,
+                    linea_repuesto_id=None,
+                    cantidad_delta=stock_delta,
+                    operation_id=operation_id,
+                )
+                if MovimientoInventario.objects.filter(idempotency_key=ikey).exists():
+                    movimientos.append({"origen": ORIGEN_STOCK_BODEGA, "repuesto_id": resource_id, "delta": stock_delta, "idempotente": True})
+                    log.info(f"  ♻️ EDICION BODEGA #{resource_id}: idempotente.")
+                    continue
+
+                saldo_nuevo = saldo_antes + stock_delta
+                if saldo_nuevo < 0:
+                    raise ValidationError(
+                        f"Stock insuficiente en edición para repuesto #{resource_id}. "
+                        f"Saldo: {saldo_antes}, delta: {stock_delta}."
+                    )
+
+                filas = Repuesto.objects.filter(
+                    id=resource_id, empresa=documento.empresa
+                ).update(cantidad_stock=F("cantidad_stock") + stock_delta)
+                if filas == 0:
+                    log.warning(f"[InventoryService] EDICION: no actualizó repuesto #{resource_id}")
+                    continue
+                saldo_bodega[resource_id] = saldo_nuevo
+
+                primera_linea = _primera_linea("B", resource_id)
+                MovimientoInventario.objects.create(
+                    empresa=documento.empresa,
+                    tipo=MovimientoInventario.TipoMovimiento.EDICION,
+                    origen_stock=MovimientoInventario.OrigenStock.STOCK_BODEGA,
+                    repuesto_id=resource_id,
+                    pieza_desarme=None,
+                    documento=documento,
+                    linea_repuesto=primera_linea,
+                    cantidad_delta=stock_delta,
+                    saldo_resultante=saldo_nuevo,
+                    costo_unitario=primera_linea.costo_linea if primera_linea else None,
+                    idempotency_key=ikey,
+                    metadata={
+                        "inventory_ledger_version": InventoryLedgerService.HASH_VERSION,
+                        "documento_tipo": documento.tipo,
+                        "documento_estado": documento.estado,
+                        "accion": "edicion",
+                        "operation_id": operation_id,
+                    },
+                )
+                movimientos.append({"origen": ORIGEN_STOCK_BODEGA, "repuesto_id": resource_id, "delta": stock_delta, "saldo_nuevo": saldo_nuevo})
+                log.info(f"  ✅ EDICION BODEGA #{resource_id}: delta={stock_delta}, saldo={saldo_nuevo}")
+
+            elif kind == "D":
+                saldo_antes = saldo_pieza.get(resource_id, 0)
+                estado_antes = estado_por_pieza_map.get(resource_id, ESTADO_DISPONIBLE)
+                activo_antes = activo_por_pieza_map.get(resource_id, True)
+
+                # Idempotencia ANTES de cualquier modificación
+                ikey = InventoryLedgerService.build_idempotency_key(
+                    empresa_id=documento.empresa_id,
+                    tipo=MovimientoInventario.TipoMovimiento.EDICION,
+                    origen_stock=MovimientoInventario.OrigenStock.DESARME,
+                    repuesto_id=None,
+                    pieza_desarme_id=resource_id,
+                    documento_id=documento.pk,
+                    linea_repuesto_id=None,
+                    cantidad_delta=stock_delta,
+                    operation_id=operation_id,
+                )
+                if MovimientoInventario.objects.filter(idempotency_key=ikey).exists():
+                    movimientos.append({"origen": ORIGEN_DESARME, "pieza_id": resource_id, "delta": stock_delta, "idempotente": True})
+                    log.info(f"  ♻️ EDICION DESARME #{resource_id}: idempotente.")
+                    continue
+
+                saldo_nuevo = saldo_antes + stock_delta
+                if saldo_nuevo < 0:
+                    raise ValidationError(
+                        f"Stock insuficiente en edición para pieza #{resource_id}. "
+                        f"Saldo: {saldo_antes}, delta: {stock_delta}."
+                    )
+
+                if saldo_nuevo <= 0:
+                    estado_nuevo = ESTADO_VENDIDA
+                    activo_nuevo = False
+                elif estado_antes == ESTADO_VENDIDA and saldo_nuevo > 0:
+                    estado_nuevo = ESTADO_DISPONIBLE
+                    activo_nuevo = True
+                else:
+                    estado_nuevo = estado_antes
+                    activo_nuevo = activo_antes
+
+                filas = PiezaDesarme.objects.filter(
+                    id=resource_id, empresa=documento.empresa
+                ).update(
+                    cantidad=F("cantidad") + stock_delta,
+                    estado_pieza=estado_nuevo,
+                    activo=activo_nuevo,
+                )
+                if filas == 0:
+                    log.warning(f"[InventoryService] EDICION: no actualizó pieza #{resource_id}")
+                    continue
+                saldo_pieza[resource_id] = saldo_nuevo
+                estado_por_pieza_map[resource_id] = estado_nuevo
+                activo_por_pieza_map[resource_id] = activo_nuevo
+
+                if saldo_nuevo <= 0:
+                    try:
+                        pieza_info = PiezaDesarme.objects.filter(id=resource_id).values("vehiculo_desarme_id").first()
+                        veh_id = pieza_info["vehiculo_desarme_id"] if pieza_info else None
+                        if veh_id:
+                            remaining = PiezaDesarme.objects.filter(
+                                vehiculo_desarme_id=veh_id,
+                                empresa=documento.empresa,
+                                activo=True,
+                                cantidad__gt=0,
+                                estado_pieza=ESTADO_DISPONIBLE,
+                            ).exists()
+                            if not remaining:
+                                VehiculoDesarme.objects.filter(id=veh_id).update(estado_desarme="AGOTADO")
+                    except Exception:
+                        log.exception("Error al actualizar estado del vehículo en edición")
+
+                primera_linea = _primera_linea("D", resource_id)
+                MovimientoInventario.objects.create(
+                    empresa=documento.empresa,
+                    tipo=MovimientoInventario.TipoMovimiento.EDICION,
+                    origen_stock=MovimientoInventario.OrigenStock.DESARME,
+                    repuesto=None,
+                    pieza_desarme_id=resource_id,
+                    documento=documento,
+                    linea_repuesto=primera_linea,
+                    cantidad_delta=stock_delta,
+                    saldo_resultante=saldo_nuevo,
+                    costo_unitario=primera_linea.costo_linea if primera_linea else None,
+                    idempotency_key=ikey,
+                    metadata={
+                        "inventory_ledger_version": InventoryLedgerService.HASH_VERSION,
+                        "documento_tipo": documento.tipo,
+                        "documento_estado": documento.estado,
+                        "accion": "edicion",
+                        "operation_id": operation_id,
+                        "estado_anterior": estado_antes,
+                        "estado_resultante": estado_nuevo,
+                        "activo_anterior": activo_antes,
+                        "activo_resultante": activo_nuevo,
+                    },
+                )
+                movimientos.append({"origen": ORIGEN_DESARME, "pieza_id": resource_id, "delta": stock_delta, "saldo_nuevo": saldo_nuevo})
+                log.info(f"  ✅ EDICION DESARME #{resource_id}: delta={stock_delta}, saldo={saldo_nuevo}")
+
+        return {
+            "procesado": True,
+            "movimientos": movimientos,
+            "total_movimientos": len(movimientos),
+        }
+
+    @staticmethod
+    @transaction.atomic
     def _actualizar_stock(repuesto: Repuesto, cantidad: int):
         """Actualiza stock de un repuesto (STOCK_BODEGA). cantidad: + reponer, - descontar."""
         Repuesto.objects.filter(id=repuesto.id).update(
