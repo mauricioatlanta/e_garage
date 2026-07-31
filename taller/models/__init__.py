@@ -77,6 +77,9 @@ from .inspeccion_ingreso import InspeccionIngreso, DanoInspeccion, EvidenciaInsp
 # Dominios personalizados
 from .empresa_dominio import EmpresaDominio
 
+# Ledger de movimientos de inventario
+from .movimiento_inventario import MovimientoInventario
+
 # Modelos de extras de vehículos
 from .extras_vehiculo import (
     CajaVehiculo,
@@ -155,6 +158,8 @@ __all__ = [
     "ColorVehiculo",
     "MotorVehiculo",
     "MotorVehiculoEmpresa",
+    # Ledger de inventario
+    "MovimientoInventario",
 ]
 
 # Intentar importar otros modelos si existen (para compatibilidad)
