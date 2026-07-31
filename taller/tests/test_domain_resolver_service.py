@@ -42,7 +42,8 @@ def owner(db):
 
 @pytest.fixture
 def empresa(db, owner):
-    return Empresa.objects.create(user=owner, nombre_taller="Taller Servicio", pais="CL")
+    from taller.tests.factories import EmpresaFactory
+    return EmpresaFactory(user=owner, nombre_taller="Taller Servicio", pais="CL")
 
 
 @pytest.fixture(autouse=True)

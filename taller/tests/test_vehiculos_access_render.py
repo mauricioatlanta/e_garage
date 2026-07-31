@@ -22,17 +22,14 @@ def test_lista_vehiculos_requires_login(client):
 @pytest.mark.django_db
 def test_lista_vehiculos_renders_for_logged_user(client):
     user_model = get_user_model()
-    user = user_model.objects.create_user(
-        username="vehiculos_render_user",
-        password="testpass123",
-    )
-    empresa = Empresa.objects.create(
-        user=user,
+    from taller.tests.factories import EmpresaFactory
+    empresa = EmpresaFactory(
         nombre_taller="Taller Vehiculos Test",
         pais="CL",
         moneda="CLP",
         zona_horaria="America/Santiago",
     )
+    user = empresa.user
     cliente = Cliente.objects.create(
         empresa=empresa,
         nombre="Cliente Vehiculos",

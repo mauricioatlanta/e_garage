@@ -22,10 +22,10 @@ def user():
 
 
 @pytest.fixture
-def empresa_chile(user):
+def empresa_chile(db):
     """Fixture para crear una empresa de Chile"""
-    return Empresa.objects.create(
-        user=user,
+    from taller.tests.factories import EmpresaFactory
+    return EmpresaFactory(
         nombre_taller="Taller Chile Test",
         pais="CL",
         moneda="CLP",
@@ -34,10 +34,10 @@ def empresa_chile(user):
 
 
 @pytest.fixture
-def empresa_usa(user):
+def empresa_usa(db):
     """Fixture para crear una empresa de USA"""
-    return Empresa.objects.create(
-        user=user,
+    from taller.tests.factories import EmpresaFactory
+    return EmpresaFactory(
         nombre_taller="USA Garage Test",
         pais="US",
         moneda="USD",
@@ -60,25 +60,15 @@ def test_dias_restantes_ceil(empresa_chile):
 @pytest.mark.django_db
 def test_moneda_por_pais_auto_correccion():
     """Test que verifica la auto-corrección de moneda por país"""
-    user = User.objects.create_user(username="test", password="test")
+    from taller.tests.factories import EmpresaFactory
 
     # Test 1: Empresa USA con moneda incorrecta
-    empresa_usa = Empresa.objects.create(
-        user=user,
-        nombre_taller="Test USA",
-        pais="US",
-        moneda="CLP",  # Incorrecto para USA
-    )
+    empresa_usa = EmpresaFactory(nombre_taller="Test USA", pais="US", moneda="CLP")
     empresa_usa.save()  # Debería auto-corregir
     assert empresa_usa.moneda == "USD"
 
     # Test 2: Empresa Chile con moneda incorrecta
-    empresa_chile = Empresa.objects.create(
-        user=user,
-        nombre_taller="Test Chile",
-        pais="CL",
-        moneda="USD",  # Incorrecto para Chile
-    )
+    empresa_chile = EmpresaFactory(nombre_taller="Test Chile", pais="CL", moneda="USD")
     empresa_chile.save()  # Debería auto-corregir
     assert empresa_chile.moneda == "CLP"
 
@@ -86,25 +76,15 @@ def test_moneda_por_pais_auto_correccion():
 @pytest.mark.django_db
 def test_tz_por_pais_auto_correccion():
     """Test que verifica la auto-corrección de zona horaria por país"""
-    user = User.objects.create_user(username="test2", password="test")
+    from taller.tests.factories import EmpresaFactory
 
     # Test 1: Empresa USA con TZ de Chile
-    empresa_usa = Empresa.objects.create(
-        user=user,
-        nombre_taller="Test USA TZ",
-        pais="US",
-        zona_horaria="America/Santiago",  # Incorrecto para USA
-    )
+    empresa_usa = EmpresaFactory(nombre_taller="Test USA TZ", pais="US", zona_horaria="America/Santiago")
     empresa_usa.save()  # Debería auto-corregir
     assert empresa_usa.zona_horaria == "America/New_York"
 
     # Test 2: Empresa Chile con TZ de USA
-    empresa_chile = Empresa.objects.create(
-        user=user,
-        nombre_taller="Test Chile TZ",
-        pais="CL",
-        zona_horaria="America/New_York",  # Incorrecto para Chile
-    )
+    empresa_chile = EmpresaFactory(nombre_taller="Test Chile TZ", pais="CL", zona_horaria="America/New_York")
     empresa_chile.save()  # Debería auto-corregir
     assert empresa_chile.zona_horaria == "America/Santiago"
 

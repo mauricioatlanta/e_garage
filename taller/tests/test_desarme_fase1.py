@@ -33,14 +33,9 @@ class TestVehiculoDesarme:
     """Vehiculo: CLIENTE exige cliente; DESARME exige cliente null."""
 
     def setup_method(self):
-        self.user = User.objects.create_user(
-            username="test_vehiculo_desarme",
-            email="test_veh@test.com",
-            password="testpass",
-        )
-        self.empresa = Empresa.objects.create(
-            nombre_taller="Taller Test", pais="CL", user=self.user, plan="paid"
-        )
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(nombre_taller="Taller Test", pais="CL", plan="paid")
+        self.user = self.empresa.user
         self.cliente = Cliente.objects.create(
             nombre="Cliente Test", apellido="Uno", email="c1@test.com", empresa=self.empresa
         )
@@ -95,14 +90,9 @@ class TestLineaRepuestoOrigen:
     """LineaRepuesto: STOCK_BODEGA exige repuesto o part; DESARME exige pieza_desarme y stock."""
 
     def setup_method(self):
-        self.user = User.objects.create_user(
-            username="test_linea_desarme",
-            email="test_ln@test.com",
-            password="testpass",
-        )
-        self.empresa = Empresa.objects.create(
-            nombre_taller="Taller Test", pais="CL", user=self.user, plan="paid"
-        )
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(nombre_taller="Taller Test", pais="CL", plan="paid")
+        self.user = self.empresa.user
         self.cliente = Cliente.objects.create(
             nombre="Cliente", apellido="Test", email="c@test.com", empresa=self.empresa
         )
@@ -210,14 +200,9 @@ class TestInventoryServiceDesarme:
     """InventoryService: descuenta Repuesto (STOCK_BODEGA), PiezaDesarme (DESARME); EXTERNO no mueve; repone al anular."""
 
     def setup_method(self):
-        self.user = User.objects.create_user(
-            username="test_inv_desarme",
-            email="test_inv@test.com",
-            password="testpass",
-        )
-        self.empresa = Empresa.objects.create(
-            nombre_taller="Taller Inv", pais="CL", user=self.user, plan="paid"
-        )
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(nombre_taller="Taller Inv", pais="CL", plan="paid")
+        self.user = self.empresa.user
         self.cliente = Cliente.objects.create(
             nombre="Cliente", apellido="Inv", email="ci@test.com", empresa=self.empresa
         )

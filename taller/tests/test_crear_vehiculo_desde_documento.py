@@ -17,12 +17,9 @@ from django.contrib.auth.models import User
 @pytest.fixture
 def user_usa_empresa(db):
     """Usuario con empresa USA."""
+    from taller.tests.factories import EmpresaFactory
     user = User.objects.create_user(username="usa_user", password="testpass123")
-    empresa = Empresa.objects.create(
-        nombre_taller="Taller USA",
-        pais="US",
-        user=user,
-    )
+    EmpresaFactory(user=user, nombre_taller="Taller USA", pais="US")
     return user
 
 

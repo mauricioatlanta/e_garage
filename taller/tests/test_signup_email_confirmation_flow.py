@@ -112,7 +112,8 @@ class TestSignupEmailConfirmationFlow:
             email="existing-phone@example.com",
             password="StrongPass123!",
         )
-        Empresa.objects.create(
+        from taller.tests.factories import EmpresaFactory
+        EmpresaFactory(
             user=existing_user,
             nombre_taller="Taller Existente",
             pais="CL",

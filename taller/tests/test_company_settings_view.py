@@ -20,12 +20,9 @@ def _company_settings_view_settings(settings):
 
 
 def _make_user_and_company(username="settings-user", country="CL"):
-    user = User.objects.create_user(
-        username=username,
-        email=f"{username}@example.com",
-        password="pass12345",
-    )
-    empresa = Empresa.objects.create(
+    from taller.tests.factories import EmpresaFactory, UserFactory
+    user = UserFactory(username=username, email=f"{username}@example.com")
+    empresa = EmpresaFactory(
         user=user,
         nombre_taller=f"Taller {username}",
         pais=country,

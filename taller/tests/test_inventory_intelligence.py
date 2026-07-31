@@ -13,8 +13,8 @@ from taller.services.inventory_intelligence import InventoryIntelligenceService
 
 @pytest.mark.django_db
 def test_inventory_intelligence_calcula_cobertura_y_sugerencia():
-    user = User.objects.create_user(username="stock-panel", password="pass")
-    empresa = Empresa.objects.create(user=user, nombre_taller="EG Stock", pais="CL")
+    from taller.tests.factories import EmpresaFactory
+    empresa = EmpresaFactory(nombre_taller="EG Stock", pais="CL")
     cliente = Cliente.objects.create(empresa=empresa, nombre="Cliente Stock")
     repuesto = Repuesto.objects.create(
         empresa=empresa,

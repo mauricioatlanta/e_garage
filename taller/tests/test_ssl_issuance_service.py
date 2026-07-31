@@ -50,7 +50,8 @@ def owner(db):
 
 @pytest.fixture
 def empresa(db, owner):
-    return Empresa.objects.create(
+    from taller.tests.factories import EmpresaFactory
+    return EmpresaFactory(
         user=owner,
         nombre_taller="Taller SSL",
         pais="CL",

@@ -27,9 +27,9 @@ from taller.desarme.services import inicializar_sugerencias
 
 @pytest.fixture
 def empresa_y_user(db):
-    user = User.objects.create_user(username="rv_test", password="x", email="rv@test.com")
-    emp  = Empresa.objects.create(nombre_taller="Taller RV", pais="CL", user=user, plan="paid")
-    return emp, user
+    from taller.tests.factories import EmpresaFactory
+    emp = EmpresaFactory(nombre_taller="Taller RV", pais="CL", plan="paid")
+    return emp, emp.user
 
 
 @pytest.fixture

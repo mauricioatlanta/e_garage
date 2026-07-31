@@ -44,11 +44,8 @@ class RBACSegregationBaseTest(TestCase):
         )
 
         # === 2. EMPRESA ÚNICA ===
-        self.empresa = Empresa.objects.create(
-            user=self.user_owner,
-            nombre_taller="Taller Test RBAC",
-            pais="CL",
-        )
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(user=self.user_owner, nombre_taller="Taller Test RBAC", pais="CL")
 
         # === 3. CREAR ROLES ===
         self.owner_group, _ = Group.objects.get_or_create(name="Owner")

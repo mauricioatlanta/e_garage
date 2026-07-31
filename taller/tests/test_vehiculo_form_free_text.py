@@ -21,7 +21,8 @@ class VehiculoFormFreeTextTests(TestCase):
             username="vehiculo_free_text_user",
             password="testpass123",
         )
-        self.empresa = Empresa.objects.create(
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(
             user=self.user,
             nombre_taller="Taller Vehiculo Form",
             pais="CL",

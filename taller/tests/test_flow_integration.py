@@ -57,9 +57,8 @@ def _flow_settings(settings):
 
 
 def _empresa(username="flow-user", email="flow@example.com", pais="CL"):
-    user = User.objects.create_user(username=username, email=email, password="pass12345")
-    empresa = Empresa.objects.create(
-        user=user,
+    from taller.tests.factories import EmpresaFactory
+    empresa = EmpresaFactory(
         nombre_taller=f"Taller {username}",
         email=email,
         telefono="+56911112222",
@@ -70,7 +69,7 @@ def _empresa(username="flow-user", email="flow@example.com", pais="CL"):
         fecha_fin=timezone.now() - timedelta(days=1),
         valor_mensual=Decimal("0.00"),
     )
-    return user, empresa
+    return empresa.user, empresa
 
 
 @pytest.mark.django_db

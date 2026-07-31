@@ -16,8 +16,9 @@ User = get_user_model()
 
 
 def _create_empresa(username, email, pais):
+    from taller.tests.factories import EmpresaFactory
     user = User.objects.create_user(username=username, email=email, password="pass12345")
-    empresa = Empresa.objects.create(
+    empresa = EmpresaFactory(
         user=user,
         nombre_taller=f"Taller {pais}",
         email=email,

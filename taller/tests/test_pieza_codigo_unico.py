@@ -18,13 +18,9 @@ from taller.models.vehiculo_desarme import VehiculoDesarme
 
 @pytest.fixture
 def empresa_y_user(db):
-    user = User.objects.create_user(
-        username="test_codigo", email="codigo@test.com", password="testpass"
-    )
-    empresa = Empresa.objects.create(
-        nombre_taller="Taller Código Test", pais="CL", user=user, plan="paid"
-    )
-    return empresa, user
+    from taller.tests.factories import EmpresaFactory
+    empresa = EmpresaFactory(nombre_taller="Taller Código Test", pais="CL", plan="paid")
+    return empresa, empresa.user
 
 
 @pytest.fixture

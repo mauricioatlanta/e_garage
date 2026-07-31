@@ -15,8 +15,9 @@ from taller.servicios.models import CategoriaServicio, Servicio, SubcategoriaSer
 
 @pytest.fixture
 def user_cl(db):
+    from taller.tests.factories import EmpresaFactory
     user = User.objects.create_user(username="doc-endpoints", password="pass")
-    Empresa.objects.create(user=user, nombre_taller="EG Chile", pais="CL")
+    EmpresaFactory(user=user, nombre_taller="EG Chile", pais="CL")
     return user
 
 
@@ -130,11 +131,8 @@ def test_servicios_menu_data_api_devuelve_scope_de_empresa_y_urls(auth_client, u
     )
 
     other_user = User.objects.create_user(username="doc-endpoints-other", password="pass")
-    other_empresa = Empresa.objects.create(
-        user=other_user,
-        nombre_taller="EG Otra Empresa",
-        pais="CL",
-    )
+    from taller.tests.factories import EmpresaFactory
+    other_empresa = EmpresaFactory(user=other_user, nombre_taller="EG Otra Empresa", pais="CL")
     Servicio.objects.create(
         empresa=other_empresa,
         nombre="Cambio de aceite externo",

@@ -20,20 +20,21 @@ class SaasDataRetentionTestCase(TestCase):
         
         Empresa._meta.get_field('plan').choices = [('taller', 'Taller')]
         
-        self.empresa_vigente = Empresa.objects.create(
-            plan="taller", 
+        from taller.tests.factories import EmpresaFactory
+        self.empresa_vigente = EmpresaFactory(
+            plan="taller",
             user=self.user_vigente,
             suscripcion_activa=False,
             fecha_baja=timezone.now() - timedelta(days=60),
-            email="vigente@taller.cl"
+            email="vigente@taller.cl",
         )
-        
-        self.empresa_antigua = Empresa.objects.create(
-            plan="taller", 
+
+        self.empresa_antigua = EmpresaFactory(
+            plan="taller",
             user=self.user_antiguo,
             suscripcion_activa=False,
             fecha_baja=timezone.now() - timedelta(days=210),
-            email="antiguo@taller.cl"
+            email="antiguo@taller.cl",
         )
 
     @patch('taller.services.data_exporter_service.DataExporterService.exportar_y_enviar_datos')
@@ -47,7 +48,8 @@ class SaasDataRetentionTestCase(TestCase):
         mock_get_template.return_value = mock_template
         
         user_test = User.objects.create_user(username="user_cancelar", password="password123", email="test@taller.cl")
-        empresa_test = Empresa.objects.create(plan="taller", user=user_test, suscripcion_activa=True, email="test@taller.cl")
+        from taller.tests.factories import EmpresaFactory
+        empresa_test = EmpresaFactory(plan="taller", user=user_test, suscripcion_activa=True, email="test@taller.cl")
         
         request = self.factory.post("/suscripcion/cancelar/")
         request.user = user_test

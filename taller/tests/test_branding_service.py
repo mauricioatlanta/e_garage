@@ -31,7 +31,8 @@ def owner(db):
 
 @pytest.fixture
 def empresa(db, owner):
-    return Empresa.objects.create(
+    from taller.tests.factories import EmpresaFactory
+    return EmpresaFactory(
         user=owner,
         nombre_taller="Taller Fixture",
         pais="CL",
@@ -223,7 +224,8 @@ def test_sync_no_duplica_telefono_ya_usado(db, empresa, company_settings):
     from decimal import Decimal
 
     user2 = User.objects.create_user("owner2", "owner2@example.com", "pass")
-    empresa2 = Empresa.objects.create(
+    from taller.tests.factories import EmpresaFactory
+    empresa2 = EmpresaFactory(
         user=user2,
         nombre_taller="Taller 2",
         pais="CL",

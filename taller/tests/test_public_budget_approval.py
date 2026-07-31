@@ -11,8 +11,8 @@ from taller.models.empresa import Empresa
 
 @pytest.fixture
 def public_budget(db):
-    user = User.objects.create_user(username="public-budget", password="pass")
-    empresa = Empresa.objects.create(user=user, nombre_taller="Taller Publico", pais="CL")
+    from taller.tests.factories import EmpresaFactory
+    empresa = EmpresaFactory(nombre_taller="Taller Publico", pais="CL")
     cliente = Cliente.objects.create(
         empresa=empresa,
         nombre="Mario",

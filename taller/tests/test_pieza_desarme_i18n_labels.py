@@ -21,11 +21,9 @@ from taller.models.vehiculo_desarme import VehiculoDesarme
 
 @pytest.fixture
 def empresa_user(db):
-    user = User.objects.create_user(
-        username="test_i18n", email="i18n@test.com", password="testpass"
-    )
-    empresa = Empresa.objects.create(nombre_taller="Taller i18n", pais="CL", user=user, plan="paid")
-    return empresa, user
+    from taller.tests.factories import EmpresaFactory
+    empresa = EmpresaFactory(nombre_taller="Taller i18n", pais="CL", plan="paid")
+    return empresa, empresa.user
 
 
 @pytest.fixture
@@ -194,12 +192,8 @@ class TestApiPiezaLabelEmpresaGuardar:
 
     def test_solo_pieza_de_empresa(self, empresa_user, pieza_sin_nombres):
         _, user = empresa_user
-        otra_empresa = Empresa.objects.create(
-            nombre_taller="Otra",
-            pais="CL",
-            user=User.objects.create_user("otro", "o@t.com", "x"),
-            plan="paid",
-        )
+        from taller.tests.factories import EmpresaFactory
+        otra_empresa = EmpresaFactory(nombre_taller="Otra", pais="CL", plan="paid")
         from django.test import RequestFactory
         from taller.desarme.views import api_pieza_label_empresa_guardar
 

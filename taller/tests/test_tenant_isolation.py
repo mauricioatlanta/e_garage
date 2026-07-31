@@ -38,11 +38,8 @@ class TenantIsolationBaseTest(TestCase):
             email="user_a@test.com",
             password="testpass123",
         )
-        self.empresa_a = Empresa.objects.create(
-            nombre_taller="Taller Empresa A",
-            pais="CL",
-            user=self.user_a,
-        )
+        from taller.tests.factories import EmpresaFactory
+        self.empresa_a = EmpresaFactory(nombre_taller="Taller Empresa A", pais="CL", user=self.user_a)
         # Asignar empresa al usuario
         self.user_a.empresa = self.empresa_a
         self.user_a.save()
@@ -88,11 +85,8 @@ class TenantIsolationBaseTest(TestCase):
             email="user_b@test.com",
             password="testpass123",
         )
-        self.empresa_b = Empresa.objects.create(
-            nombre_taller="Auto Shop B",
-            pais="US",
-            user=self.user_b,
-        )
+        from taller.tests.factories import EmpresaFactory
+        self.empresa_b = EmpresaFactory(nombre_taller="Auto Shop B", pais="US", user=self.user_b)
         # Asignar empresa al usuario
         self.user_b.empresa = self.empresa_b
         self.user_b.save()

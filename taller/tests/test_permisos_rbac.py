@@ -34,8 +34,9 @@ URL_EDITAR_DOCUMENTO = "/cl/documentos/form/9999/"  # pk ficticio: 403 llega ant
 @pytest.fixture
 def empresa_test(db):
     """Empresa base con su Owner."""
+    from taller.tests.factories import EmpresaFactory
     owner = User.objects.create_user("owner_rbac", "owner@rbac.com", "pass1234")
-    empresa = Empresa.objects.create(user=owner, nombre_taller="Taller RBAC", pais="CL")
+    empresa = EmpresaFactory(user=owner, nombre_taller="Taller RBAC", pais="CL")
     grupo_owner, _ = Group.objects.get_or_create(name="Owner")
     owner.groups.add(grupo_owner)
     return empresa, owner
