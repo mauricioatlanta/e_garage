@@ -10,8 +10,15 @@ from taller.constants.business_modules import (
     MOD_FLOTA,
     MOD_INICIO,
     MOD_REPUESTOS,
+    MOD_REPORTES,
     MOD_SERVICIOS,
     MOD_VEHICULOS,
+)
+from taller.constants.product_profiles import (
+    PRODUCT_CARWASH,
+    PRODUCT_CASA_REPUESTOS,
+    PRODUCT_DESARMADURIA,
+    PRODUCT_TALLER,
 )
 from taller.context_processors.business_modules import business_modules
 from taller.forms.onboarding import OnboardingIdentidadForm
@@ -22,17 +29,9 @@ from taller.services.business_module_service import BusinessModuleService
 
 class BusinessModuleServiceTests(TestCase):
     def setUp(self):
-        User = get_user_model()
-        self.user = User.objects.create_user(
-            username="business-modules-owner",
-            email="modules@example.com",
-            password="test-password",
-        )
-        self.empresa = Empresa.objects.create(
-            user=self.user,
-            nombre_taller="Empresa Módulos",
-            pais="CL",
-        )
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(nombre_taller="Empresa Módulos", pais="CL")
+        self.user = self.empresa.user
         self.config, _ = ConfiguracionEmpresa.objects.get_or_create(
             empresa=self.empresa
         )
@@ -121,6 +120,7 @@ class BusinessModuleServiceTests(TestCase):
         self.assertIn(MOD_SERVICIOS, active)
 
     def test_nav_items_respeta_orden_url_y_ruta_activa(self):
+        # PARTS → CASA_REPUESTOS profile: Inventario (repuestos) before Ventas (documentos)
         self.config.rubro_principal = "PARTS"
         self.config.rubros = []
 
@@ -136,9 +136,10 @@ class BusinessModuleServiceTests(TestCase):
             keys,
             [
                 MOD_INICIO,
-                MOD_CLIENTES,
-                MOD_DOCUMENTOS,
                 MOD_REPUESTOS,
+                MOD_DOCUMENTOS,
+                MOD_CLIENTES,
+                MOD_REPORTES,
                 MOD_CONFIGURACION,
             ],
         )
@@ -153,17 +154,9 @@ class BusinessModuleServiceTests(TestCase):
 
 class ModuleConfigurationStateTests(TestCase):
     def setUp(self):
-        User = get_user_model()
-        self.user = User.objects.create_user(
-            username="module-state-owner",
-            email="state@example.com",
-            password="test-password",
-        )
-        self.empresa = Empresa.objects.create(
-            user=self.user,
-            nombre_taller="Empresa Estado",
-            pais="CL",
-        )
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(nombre_taller="Empresa Estado", pais="CL")
+        self.user = self.empresa.user
         self.config, _ = ConfiguracionEmpresa.objects.get_or_create(
             empresa=self.empresa
         )
@@ -210,17 +203,9 @@ class ModuleConfigurationStateTests(TestCase):
 
 class OnboardingIdentidadFormTests(TestCase):
     def setUp(self):
-        User = get_user_model()
-        self.user = User.objects.create_user(
-            username="onboarding-modules-owner",
-            email="onboarding@example.com",
-            password="test-password",
-        )
-        self.empresa = Empresa.objects.create(
-            user=self.user,
-            nombre_taller="Nombre Anterior",
-            pais="CL",
-        )
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(nombre_taller="Nombre Anterior", pais="CL")
+        self.user = self.empresa.user
         self.config, _ = ConfiguracionEmpresa.objects.get_or_create(
             empresa=self.empresa
         )
@@ -254,17 +239,9 @@ class OnboardingIdentidadFormTests(TestCase):
 
 class BusinessModulesContextProcessorTests(TestCase):
     def setUp(self):
-        User = get_user_model()
-        self.user = User.objects.create_user(
-            username="context-modules-owner",
-            email="context@example.com",
-            password="test-password",
-        )
-        self.empresa = Empresa.objects.create(
-            user=self.user,
-            nombre_taller="Empresa Contexto",
-            pais="CL",
-        )
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(nombre_taller="Empresa Contexto", pais="CL")
+        self.user = self.empresa.user
         self.config, _ = ConfiguracionEmpresa.objects.get_or_create(
             empresa=self.empresa
         )
@@ -330,3 +307,119 @@ class BusinessModulesContextProcessorTests(TestCase):
             if item["key"] == MOD_REPUESTOS
         )
         self.assertEqual(repuestos["url"], "/us/en/repuestos/")
+
+    def test_context_processor_expone_product_profile_y_prefix(self):
+        self.config.rubro_principal = "PARTS"
+        self.config.rubros = []
+        self.config.save(update_fields=["rubro_principal", "rubros"])
+
+        request = self.factory.get("/cl/es/repuestos/")
+        request.user = self.user
+
+        result = business_modules(request)
+
+        self.assertIn("product_profile", result)
+        self.assertIn("nav_url_prefix", result)
+        self.assertEqual(result["product_profile"]["name"], "eGarage Repuestos")
+        self.assertEqual(result["nav_url_prefix"], "/cl/es")
+
+
+class ProductProfileTests(TestCase):
+    def setUp(self):
+        from taller.tests.factories import EmpresaFactory
+        self.empresa = EmpresaFactory(nombre_taller="Empresa Perfiles", pais="CL")
+        self.user = self.empresa.user
+        self.config, _ = ConfiguracionEmpresa.objects.get_or_create(
+            empresa=self.empresa
+        )
+
+    def _set_rubro(self, rubro):
+        self.config.rubro_principal = rubro
+        self.config.rubros = []
+
+    def test_workshop_resuelve_perfil_taller(self):
+        self._set_rubro("WORKSHOP")
+        profile = BusinessModuleService.get_product_profile(self.config)
+        self.assertEqual(profile["name"], "eGarage Taller")
+
+    def test_mixed_resuelve_perfil_desarmaduria(self):
+        self._set_rubro("MIXED")
+        profile = BusinessModuleService.get_product_profile(self.config)
+        self.assertEqual(profile["name"], "eGarage Desarmaduría")
+
+    def test_parts_resuelve_perfil_casa_repuestos(self):
+        self._set_rubro("PARTS")
+        profile = BusinessModuleService.get_product_profile(self.config)
+        self.assertEqual(profile["name"], "eGarage Repuestos")
+
+    def test_detailing_resuelve_perfil_carwash(self):
+        self._set_rubro("DETAILING")
+        profile = BusinessModuleService.get_product_profile(self.config)
+        self.assertEqual(profile["name"], "eGarage Carwash")
+
+    def test_rubro_desconocido_usa_perfil_taller(self):
+        self._set_rubro("RUBRO_INEXISTENTE")
+        profile = BusinessModuleService.get_product_profile(self.config)
+        self.assertEqual(profile["name"], "eGarage Taller")
+
+    def test_config_none_usa_perfil_taller(self):
+        profile = BusinessModuleService.get_product_profile(None)
+        self.assertEqual(profile["name"], "eGarage Taller")
+
+    def test_desarmaduria_label_vehiculos_de_desarme(self):
+        self._set_rubro("MIXED")
+        self.config.usa_vehiculos = True
+        self.config.usa_servicios = True
+        items = BusinessModuleService.get_nav_items(self.config, "/cl/es", "")
+        desarme = next((i for i in items if i["key"] == MOD_DESARME), None)
+        self.assertIsNotNone(desarme)
+        self.assertEqual(desarme["label"], "Vehículos de Desarme")
+        self.assertEqual(desarme["icon"], "fas fa-car-crash")
+
+    def test_casa_repuestos_label_inventario(self):
+        self._set_rubro("PARTS")
+        items = BusinessModuleService.get_nav_items(self.config, "/cl/es", "")
+        repuestos = next((i for i in items if i["key"] == MOD_REPUESTOS), None)
+        self.assertIsNotNone(repuestos)
+        self.assertEqual(repuestos["label"], "Inventario")
+
+    def test_carwash_label_caja_para_documentos(self):
+        self._set_rubro("DETAILING")
+        self.config.usa_servicios = True
+        items = BusinessModuleService.get_nav_items(self.config, "/cl/es", "")
+        docs = next((i for i in items if i["key"] == MOD_DOCUMENTOS), None)
+        self.assertIsNotNone(docs)
+        self.assertEqual(docs["label"], "Caja")
+
+    def test_taller_label_presupuestos_ot(self):
+        self._set_rubro("WORKSHOP")
+        self.config.usa_vehiculos = True
+        self.config.usa_servicios = True
+        items = BusinessModuleService.get_nav_items(self.config, "/cl/es", "")
+        docs = next((i for i in items if i["key"] == MOD_DOCUMENTOS), None)
+        self.assertIsNotNone(docs)
+        self.assertEqual(docs["label"], "Presupuestos/OT")
+
+    def test_perfil_incluye_quick_access_y_kpi_labels(self):
+        self._set_rubro("WORKSHOP")
+        profile = BusinessModuleService.get_product_profile(self.config)
+        self.assertIn("quick_access", profile)
+        self.assertIn("kpi_labels", profile)
+        self.assertTrue(len(profile["quick_access"]) >= 1)
+        self.assertTrue(len(profile["kpi_labels"]) == 4)
+
+    def test_todos_los_rubros_tienen_perfil(self):
+        from taller.constants.product_profiles import RUBRO_TO_PRODUCT, PRODUCT_PROFILES
+        from taller.models.configuracion import ConfiguracionEmpresa
+        rubro_values = [value for value, _ in ConfiguracionEmpresa.RUBRO_CHOICES]
+        for rubro in rubro_values:
+            product_key = RUBRO_TO_PRODUCT.get(rubro)
+            self.assertIsNotNone(
+                product_key,
+                f"Rubro '{rubro}' no tiene perfil de producto asignado en RUBRO_TO_PRODUCT",
+            )
+            self.assertIn(
+                product_key,
+                PRODUCT_PROFILES,
+                f"Producto '{product_key}' no existe en PRODUCT_PROFILES",
+            )

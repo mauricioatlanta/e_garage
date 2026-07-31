@@ -1,36 +1,50 @@
 {% load static %}
 <aside class="eg-sidebar">
+
   <div class="eg-brand">
-    <div class="eg-brand-mark">eG</div>
+    <div class="eg-brand-mark">
+      {% if product_profile %}
+        <i class="{{ product_profile.icon }}"></i>
+      {% else %}
+        eG
+      {% endif %}
+    </div>
     <div>
-      <div class="eg-brand-title">eGarage</div>
-      <div class="eg-brand-subtitle">Automotive SaaS</div>
+      <div class="eg-brand-title">
+        {% if product_profile %}{{ product_profile.name }}{% else %}eGarage{% endif %}
+      </div>
+      <div class="eg-brand-subtitle">
+        {% if product_profile %}{{ product_profile.tagline }}{% else %}Automotive SaaS{% endif %}
+      </div>
     </div>
   </div>
 
   <nav class="eg-nav">
     {% if nav_items %}
       {% for item in nav_items %}
-      <a href="{{ item.url }}"{% if item.is_active %} class="active"{% endif %}>{{ item.label }}</a>
+      <a href="{{ item.url }}"{% if item.is_active %} class="is-active"{% endif %}>
+        <i class="{{ item.icon }}"></i>
+        {{ item.label }}
+      </a>
       {% endfor %}
     {% else %}
-      {# Fallback para usuarios sin contexto de módulos #}
-      <a href="/cl/es/dashboard/">Inicio</a>
-      <a href="/cl/es/clientes/">Clientes</a>
-      <a href="/cl/es/vehiculos/">Vehículos</a>
-      <a href="/cl/es/documentos/form/">Documentos</a>
-      <a href="/cl/es/repuestos/">Repuestos</a>
-      <a href="/cl/es/servicios/">Servicios</a>
-      <a href="/cl/es/desarme/">Desarme</a>
-      <a href="/cl/es/settings/">Configuración</a>
+      {# Fallback for unauthenticated or no-config users #}
+      <a href="/cl/es/dashboard/"><i class="fas fa-home"></i> Inicio</a>
+      <a href="/cl/es/clientes/"><i class="fas fa-users"></i> Clientes</a>
+      <a href="/cl/es/vehiculos/"><i class="fas fa-car"></i> Vehículos</a>
+      <a href="/cl/es/documentos/form/"><i class="fas fa-file-invoice"></i> Documentos</a>
+      <a href="/cl/es/repuestos/"><i class="fas fa-cogs"></i> Repuestos</a>
+      <a href="/cl/es/reportes/"><i class="fas fa-chart-bar"></i> Reportes</a>
+      <a href="/cl/es/settings/"><i class="fas fa-cog"></i> Configuración</a>
     {% endif %}
   </nav>
 
   {% if needs_module_config %}
   <div class="eg-module-notice">
     <a href="/cl/es/settings/" title="Configura los módulos de tu negocio">
-      ⚙ Configura tus módulos
+      <i class="fas fa-cog"></i> Configura tus módulos
     </a>
   </div>
   {% endif %}
+
 </aside>

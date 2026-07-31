@@ -3,6 +3,7 @@ BusinessModuleService — resuelve los módulos de navegación activos para una 
 
 Deriva el conjunto de módulos desde ConfiguracionEmpresa.rubro_principal y
 ConfiguracionEmpresa.rubros, respetando los flags usa_vehiculos / usa_servicios.
+La navegación final usa el perfil de producto para reordenar y renombrar ítems.
 No modifica la base de datos salvo en mark_modules_configured().
 """
 
@@ -42,15 +43,58 @@ class BusinessModuleService:
         return frozenset(active)
 
     @staticmethod
+    def get_product_profile(config) -> dict:
+        """
+        Devuelve el perfil de producto correspondiente al rubro_principal.
+
+        El perfil define nombre, tagline, orden de navegación, labels/iconos
+        específicos por producto, KPIs y accesos rápidos del dashboard.
+        Nunca retorna None; usa PRODUCT_TALLER como fallback.
+        """
+        from taller.constants.product_profiles import (
+            DEFAULT_PRODUCT,
+            PRODUCT_PROFILES,
+            RUBRO_TO_PRODUCT,
+        )
+        rubro = "WORKSHOP" if config is None else (getattr(config, "rubro_principal", "WORKSHOP") or "WORKSHOP")
+        product_key = RUBRO_TO_PRODUCT.get(rubro, DEFAULT_PRODUCT)
+        return PRODUCT_PROFILES[product_key]
+
+    @staticmethod
     def get_nav_items(config, url_prefix: str = "/cl/es", current_path: str = "") -> list:
         """
         Devuelve lista ordenada de dicts de navegación para los módulos activos.
 
+        El orden, labels e iconos provienen del perfil de producto del rubro.
+        Los módulos activos que no aparezcan en el perfil se añaden al final
+        usando los defaults de NAV_ITEMS, para no perder funcionalidad futura.
+
         Cada dict tiene: key, label, url, icon, is_active.
         """
         active = BusinessModuleService.get_active_modules(config)
+        profile = BusinessModuleService.get_product_profile(config)
+        profile_nav = profile.get("nav", [])
+
         items = []
-        for key in sorted(active, key=lambda k: NAV_ITEMS[k]["order"]):
+        seen = set()
+
+        for nav_def in profile_nav:
+            key = nav_def["key"]
+            if key not in active:
+                continue
+            seen.add(key)
+            base = NAV_ITEMS[key]
+            hint = PATH_HINTS.get(key, "")
+            items.append({
+                "key": key,
+                "label": nav_def["label"],
+                "url": f"{url_prefix}/{base['path']}",
+                "icon": nav_def["icon"],
+                "is_active": bool(hint and hint in current_path),
+            })
+
+        # Append any active modules not covered by the profile (future-proofing)
+        for key in sorted(active - seen, key=lambda k: NAV_ITEMS[k]["order"]):
             defn = NAV_ITEMS[key]
             hint = PATH_HINTS.get(key, "")
             items.append({
@@ -60,6 +104,7 @@ class BusinessModuleService:
                 "icon": defn["icon"],
                 "is_active": bool(hint and hint in current_path),
             })
+
         return items
 
     @staticmethod

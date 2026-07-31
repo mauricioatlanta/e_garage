@@ -12719,3 +12719,172 @@ msgstr ""
 #: .\templates\us\es\vehiculos\crear_vehiculo.html:547
 msgid "Ingresa el nombre de la nueva transmisión"
 msgstr ""
+
+# ---------------------------------------------------------------------------
+# Workspace UI 2.0 — Terminologia de produto (chaves semânticas → PT-BR)
+# ---------------------------------------------------------------------------
+
+msgid "workspace.taller.brand.name"
+msgstr "eGarage Oficina"
+
+msgid "workspace.taller.brand.tagline"
+msgstr "Gestão completa da sua oficina"
+
+msgid "workspace.taller.nav.home"
+msgstr "Início"
+
+msgid "workspace.taller.nav.documents"
+msgstr "Orçamentos/OS"
+
+msgid "workspace.taller.nav.vehicles"
+msgstr "Veículos"
+
+msgid "workspace.taller.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.taller.nav.services"
+msgstr "Serviços"
+
+msgid "workspace.taller.nav.parts"
+msgstr "Peças"
+
+msgid "workspace.taller.nav.fleet"
+msgstr "Frota"
+
+msgid "workspace.taller.nav.reports"
+msgstr "Relatórios"
+
+msgid "workspace.taller.nav.settings"
+msgstr "Configurações"
+
+msgid "workspace.taller.action.new_document"
+msgstr "Nova OS"
+
+msgid "workspace.taller.action.new_vehicle"
+msgstr "Novo Veículo"
+
+msgid "workspace.taller.action.new_client"
+msgstr "Novo Cliente"
+
+msgid "workspace.desarm.brand.name"
+msgstr "eGarage Desmanche"
+
+msgid "workspace.desarm.brand.tagline"
+msgstr "Controle total do seu desmanche"
+
+msgid "workspace.desarm.nav.home"
+msgstr "Início"
+
+msgid "workspace.desarm.nav.vehicles"
+msgstr "Veículos para Desmanche"
+
+msgid "workspace.desarm.nav.parts"
+msgstr "Estoque"
+
+msgid "workspace.desarm.nav.documents"
+msgstr "Vendas"
+
+msgid "workspace.desarm.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.desarm.nav.reports"
+msgstr "Relatórios"
+
+msgid "workspace.desarm.nav.settings"
+msgstr "Configurações"
+
+msgid "workspace.desarm.action.new_vehicle"
+msgstr "Registrar Veículo"
+
+msgid "workspace.desarm.action.new_sale"
+msgstr "Registrar Venda"
+
+msgid "workspace.desarm.action.view_inventory"
+msgstr "Ver Estoque"
+
+msgid "workspace.parts.brand.name"
+msgstr "eGarage Autopeças"
+
+msgid "workspace.parts.brand.tagline"
+msgstr "Sua autopeças digitalizada"
+
+msgid "workspace.parts.nav.home"
+msgstr "Início"
+
+msgid "workspace.parts.nav.parts"
+msgstr "Estoque"
+
+msgid "workspace.parts.nav.documents"
+msgstr "Vendas"
+
+msgid "workspace.parts.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.parts.nav.reports"
+msgstr "Relatórios"
+
+msgid "workspace.parts.nav.settings"
+msgstr "Configurações"
+
+msgid "workspace.parts.action.new_sale"
+msgstr "Nova Venda"
+
+msgid "workspace.parts.action.add_part"
+msgstr "Adicionar Peça"
+
+msgid "workspace.parts.action.view_inventory"
+msgstr "Ver Estoque"
+
+msgid "workspace.carwash.brand.name"
+msgstr "eGarage Lava-Rápido"
+
+msgid "workspace.carwash.brand.tagline"
+msgstr "Gestão simples para seu lava-rápido"
+
+msgid "workspace.carwash.nav.home"
+msgstr "Início"
+
+msgid "workspace.carwash.nav.documents"
+msgstr "Caixa"
+
+msgid "workspace.carwash.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.carwash.nav.services"
+msgstr "Serviços"
+
+msgid "workspace.carwash.nav.reports"
+msgstr "Relatórios"
+
+msgid "workspace.carwash.nav.settings"
+msgstr "Configurações"
+
+msgid "workspace.carwash.action.new_service"
+msgstr "Registrar Serviço"
+
+msgid "workspace.carwash.action.new_client"
+msgstr "Novo Cliente"
+
+msgid "OT Abiertas"
+msgstr "OS em Aberto"
+
+msgid "Documentos hoy"
+msgstr "Documentos hoje"
+
+msgid "Ventas del día"
+msgstr "Vendas do dia"
+
+msgid "Clientes este mes"
+msgstr "Clientes este mês"
+
+msgid "Stock crítico"
+msgstr "Estoque crítico"
+
+msgid "Vehículos disponibles"
+msgstr "Veículos disponíveis"
+
+msgid "Valor inventario"
+msgstr "Valor do estoque"
+
+msgid "Servicios hoy"
+msgstr "Serviços hoje"

@@ -20,6 +20,7 @@ from taller.views_extra.dashboard_empresa import (
 from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views import dashboard
 from taller.views.dashboard_bi import DashboardHomeView
+from taller.views.workspace_dashboard import workspace_dashboard
 from taller.main_views import seleccionar_pais
 
 app_name = "taller"
@@ -73,7 +74,7 @@ urlpatterns = [
     # Agregar el namespace de reportes para que funcione 'taller:reportes:reportes_dashboard'
     path("reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")),
     # === RUTAS PRINCIPALES PARA COMPATIBILIDAD ===
-    path("dashboard/", dashboard, name="dashboard"),  # Dashboard principal
+    path("dashboard/", workspace_dashboard, name="dashboard"),  # Dashboard principal
     path("dashboard/bi/", DashboardHomeView.as_view(), name="dashboard_bi"),  # Dashboard de BI
     path("pricing/", precios, name="pricing"),
     path("precios/", precios, name="precios"),
