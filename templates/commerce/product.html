@@ -1,0 +1,127 @@
+{% extends "commerce/base.html" %}
+{% load humanize %}
+
+{% block title %}{{ product.nombre }} — {{ empresa.nombre }}{% endblock %}
+
+{% block meta %}
+<meta name="description" content="{{ product.meta_description|default:product.descripcion_larga|truncatechars:160 }}">
+{% if product.og_image %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.og_image.url }}">
+{% elif product.primary_image %}
+<meta property="og:image" content="{{ request.scheme }}://{{ request.get_host }}{{ product.primary_image.image.url }}">
+{% endif %}
+<meta property="og:title" content="{{ product.meta_title|default:product.nombre }}">
+<meta property="og:type" content="product">
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Breadcrumb -->
+  <nav class="text-sm text-gray-500 mb-8 flex items-center gap-2">
+    <a href="{% url 'commerce:home' %}" class="hover:text-blue-600">Inicio</a>
+    <span>›</span>
+    {% if product.category %}
+    <a href="{% url 'commerce:category' product.category.slug %}" class="hover:text-blue-600">{{ product.category.name }}</a>
+    <span>›</span>
+    {% endif %}
+    <span class="text-gray-900 font-medium truncate max-w-xs">{{ product.nombre }}</span>
+  </nav>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+
+    <!-- Galería -->
+    <div class="flex flex-col gap-4">
+      <!-- Imagen principal -->
+      <div class="aspect-square bg-gray-50 rounded-xl overflow-hidden flex items-center justify-center border border-gray-200">
+        {% if product.primary_image %}
+        <img id="main-image"
+             src="{{ product.primary_image.image.url }}"
+             alt="{{ product.primary_image.alt_text|default:product.nombre }}"
+             class="h-full w-full object-contain p-6">
+        {% else %}
+        <div class="text-gray-200">
+          <svg class="h-24 w-24" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        {% endif %}
+      </div>
+      <!-- Miniaturas -->
+      {% if images|length > 1 %}
+      <div class="flex gap-3">
+        {% for img in images %}
+        <button onclick="document.getElementById('main-image').src='{{ img.image.url }}'"
+                class="h-16 w-16 rounded-lg border-2 border-gray-200 hover:border-blue-500 overflow-hidden flex-shrink-0 transition-colors">
+          <img src="{{ img.image.url }}" alt="{{ img.alt_text }}" class="h-full w-full object-contain p-1">
+        </button>
+        {% endfor %}
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Detalles -->
+    <div class="flex flex-col gap-5">
+
+      {% if product.part_number %}
+      <p class="text-sm text-gray-400 font-mono">Código: {{ product.part_number }}</p>
+      {% endif %}
+
+      <h1 class="text-2xl font-bold text-gray-900 leading-snug">{{ product.nombre }}</h1>
+
+      <!-- Precio -->
+      <div class="flex items-baseline gap-3">
+        <span class="text-3xl font-bold text-gray-900">${{ product.precio_venta|intcomma }}</span>
+        {% if product.tiene_descuento %}
+        <span class="text-lg text-gray-400 line-through">${{ product.compare_at_price|intcomma }}</span>
+        <span class="rounded-full bg-green-100 px-2 py-0.5 text-sm font-semibold text-green-700">
+          -{{ product.porcentaje_descuento }}%
+        </span>
+        {% endif %}
+      </div>
+      <p class="text-xs text-gray-400">Precio incluye IVA</p>
+
+      <!-- Stock -->
+      <div>
+        {% if product.stock == 0 %}
+        <span class="inline-flex items-center gap-1 text-sm font-medium text-red-600">
+          <span class="h-2 w-2 rounded-full bg-red-500"></span>
+          Sin stock
+        </span>
+        {% elif product.stock <= 3 %}
+        <span class="inline-flex items-center gap-1 text-sm font-medium text-amber-600">
+          <span class="h-2 w-2 rounded-full bg-amber-500"></span>
+          Últimas {{ product.stock }} unidades
+        </span>
+        {% else %}
+        <span class="inline-flex items-center gap-1 text-sm font-medium text-green-600">
+          <span class="h-2 w-2 rounded-full bg-green-500"></span>
+          En stock ({{ product.stock }} disponibles)
+        </span>
+        {% endif %}
+      </div>
+
+      <!-- Descripción -->
+      {% if product.descripcion_larga %}
+      <div class="prose prose-sm text-gray-600 border-t border-gray-100 pt-4">
+        {{ product.descripcion_larga|linebreaks }}
+      </div>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <!-- Productos relacionados -->
+  {% if related %}
+  <section class="mt-16 border-t border-gray-100 pt-10">
+    <h2 class="text-lg font-bold text-gray-900 mb-6">También te puede interesar</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-5">
+      {% for product in related %}
+      {% include "commerce/components/product_card.html" %}
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+</div>
+{% endblock %}
