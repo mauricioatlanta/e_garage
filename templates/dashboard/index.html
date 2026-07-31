@@ -24,7 +24,7 @@
 {% if dashboard_data.widgets %}
 <div class="grid grid-cols-4 gap-6 mb-8">
   {% for widget in dashboard_data.widgets %}
-    {% include "components/ui/kpi_card.html" with title=widget.title value=widget.value icon=widget.icon format=widget.format %}
+    {% include "components/ui/kpi_card.html" with title=widget.title value=widget.value icon=widget.icon format=widget.format has_value=widget.has_value %}
   {% endfor %}
 </div>
 {% endif %}

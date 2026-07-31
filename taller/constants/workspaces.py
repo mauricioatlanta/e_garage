@@ -102,6 +102,7 @@ WGT_KPI_DESARM_AVAIL    = "kpi_desarm_available"  # Dismantlable vehicles
 WGT_KPI_INVENTORY_VALUE = "kpi_inventory_value"   # Total inventory value
 WGT_KPI_SERVICES_TODAY  = "kpi_services_today"    # Services registered today
 WGT_KPI_QUOTES_PENDING  = "kpi_quotes_pending"    # PRES not yet converted or cancelled (PARTS)
+WGT_KPI_MARGIN_MONTH    = "kpi_margin_month"      # Gross margin % this month (PARTS, STOCK_BODEGA lines with known cost)
 
 
 # ---------------------------------------------------------------------------
@@ -262,9 +263,9 @@ WORKSPACE_CASA_REPUESTOS = WorkspaceDef(
     ),
     widget_keys=(
         WGT_KPI_SALES_TODAY,
+        WGT_KPI_MARGIN_MONTH,
         WGT_KPI_STOCK_CRITICAL,
         WGT_KPI_QUOTES_PENDING,
-        WGT_KPI_CLIENTS_MONTH,
     ),
     quick_actions=(
         WorkspaceActionDef("workspace.parts.action.new_sale",        "fas fa-shopping-cart", "documentos/form/"),
