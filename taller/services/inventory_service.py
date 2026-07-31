@@ -193,6 +193,27 @@ class InventoryService:
                 )
             # EXTERNO: no mover inventario
 
+        # Congelar costo_linea para STOCK_BODEGA al emitir (accion="descontar").
+        # El precio de compra puede cambiar entre que el usuario agrega la línea
+        # (BORRADOR) y el momento en que la venta queda comprometida (EMITIDO).
+        # Congelar aquí garantiza que el margen futuro usa el costo real del momento.
+        # DESARME: ya tiene costo_linea desde pieza.costo_asignado — no se toca.
+        # EXTERNO: no tiene repuesto_id en lineas_con_movimiento — se omite.
+        if accion == "descontar":
+            lineas_a_congelar = [
+                ln for ln in lineas_con_movimiento
+                if ln.origen_repuesto == ORIGEN_STOCK_BODEGA and ln.repuesto_id
+            ]
+            if lineas_a_congelar:
+                for ln in lineas_a_congelar:
+                    ln.costo_linea = ln.repuesto.precio_compra
+                LineaRepuesto.objects.bulk_update(lineas_a_congelar, ["costo_linea"])
+                log.info(
+                    f"[InventoryService] 💰 costo_linea congelado "
+                    f"para {len(lineas_a_congelar)} líneas STOCK_BODEGA "
+                    f"en Doc {documento.numero}"
+                )
+
         return {
             "procesado": True,
             "movimientos": movimientos,
