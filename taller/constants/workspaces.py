@@ -157,9 +157,11 @@ TERMINOLOGY: dict[str, object] = {
     "workspace.parts.nav.reports":   _("workspace.parts.nav.reports"),
     "workspace.parts.nav.settings":  _("workspace.parts.nav.settings"),
     # -- Casa de Repuestos: actions --
-    "workspace.parts.action.new_sale":       _("workspace.parts.action.new_sale"),
-    "workspace.parts.action.add_part":       _("workspace.parts.action.add_part"),
-    "workspace.parts.action.view_inventory": _("workspace.parts.action.view_inventory"),
+    "workspace.parts.action.new_sale":        _("workspace.parts.action.new_sale"),
+    "workspace.parts.action.new_quote":       _("workspace.parts.action.new_quote"),
+    "workspace.parts.action.new_parts_sale":  _("workspace.parts.action.new_parts_sale"),
+    "workspace.parts.action.add_part":        _("workspace.parts.action.add_part"),
+    "workspace.parts.action.view_inventory":  _("workspace.parts.action.view_inventory"),
 
     # -- Carwash: brand --
     "workspace.carwash.brand.name":    _("workspace.carwash.brand.name"),
@@ -268,9 +270,10 @@ WORKSPACE_CASA_REPUESTOS = WorkspaceDef(
         WGT_KPI_QUOTES_PENDING,
     ),
     quick_actions=(
-        WorkspaceActionDef("workspace.parts.action.new_sale",        "fas fa-shopping-cart", "documentos/form/"),
-        WorkspaceActionDef("workspace.parts.action.add_part",        "fas fa-plus",          "repuestos/nuevo/"),
-        WorkspaceActionDef("workspace.parts.action.view_inventory",  "fas fa-boxes",         "repuestos/"),
+        WorkspaceActionDef("workspace.parts.action.new_quote",      "fas fa-file-invoice",  "documentos/form/?tipo=PRES"),
+        WorkspaceActionDef("workspace.parts.action.new_parts_sale", "fas fa-shopping-cart", "documentos/form/?tipo=PTS"),
+        WorkspaceActionDef("workspace.parts.action.add_part",       "fas fa-plus",          "repuestos/nuevo/"),
+        WorkspaceActionDef("workspace.parts.action.view_inventory", "fas fa-boxes",         "repuestos/"),
     ),
     theme={"--eg-primary": "#84cc16", "--eg-accent": "#65a30d"},
 )

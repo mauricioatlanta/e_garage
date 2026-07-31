@@ -734,6 +734,12 @@ msgstr "Configuración"
 msgid "workspace.parts.action.new_sale"
 msgstr "Nueva Venta"
 
+msgid "workspace.parts.action.new_quote"
+msgstr "Nueva Cotización"
+
+msgid "workspace.parts.action.new_parts_sale"
+msgstr "Nueva Venta"
+
 msgid "workspace.parts.action.add_part"
 msgstr "Agregar Repuesto"
 

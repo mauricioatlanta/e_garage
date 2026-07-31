@@ -609,6 +609,12 @@ msgstr "Settings"
 msgid "workspace.parts.action.new_sale"
 msgstr "New Sale"
 
+msgid "workspace.parts.action.new_quote"
+msgstr "New Quote"
+
+msgid "workspace.parts.action.new_parts_sale"
+msgstr "New Sale"
+
 msgid "workspace.parts.action.add_part"
 msgstr "Add Part"
 

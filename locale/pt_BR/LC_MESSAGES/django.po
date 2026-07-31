@@ -12829,6 +12829,12 @@ msgstr "Configurações"
 msgid "workspace.parts.action.new_sale"
 msgstr "Nova Venda"
 
+msgid "workspace.parts.action.new_quote"
+msgstr "Novo Orçamento"
+
+msgid "workspace.parts.action.new_parts_sale"
+msgstr "Nova Venda"
+
 msgid "workspace.parts.action.add_part"
 msgstr "Adicionar Peça"
 

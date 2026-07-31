@@ -956,6 +956,10 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
             initial["cliente"] = cliente_id
             initial["cliente_id"] = cliente_id
 
+        tipo_param = self.request.GET.get("tipo", "").strip().upper()
+        if tipo_param in _VALID_TIPOS:
+            initial["tipo"] = tipo_param
+
         return initial
 
     def get_context_data(self, **kwargs):
