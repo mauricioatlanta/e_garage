@@ -118,7 +118,17 @@ class InventoryService:
 
         Returns:
             dict: Resultado del procesamiento con estadísticas
+
+        Flujo para descontar/reponer (EMISION/ANULACION):
+          1. Congelar costo_linea (solo descontar) antes del loop para que el
+             MovimientoInventario lo capture en costo_unitario.
+          2. SELECT FOR UPDATE en Repuesto ordenado por pk → saldo_actual en memoria.
+          3. Por cada línea STOCK_BODEGA: F()-update, actualizar mapa, escribir ledger.
+          Toda la operación está en el mismo transaction.atomic.
         """
+        from taller.models.movimiento_inventario import MovimientoInventario
+        from taller.services.inventory_ledger_service import InventoryLedgerService
+
         if documento.tipo in InventoryService.TIPOS_SIN_STOCK:
             log.debug(
                 f"[InventoryService] Documento {documento.numero} es tipo {documento.tipo}, no mueve stock"
@@ -142,63 +152,12 @@ class InventoryService:
         log.info(
             f"📦 Inventario: Procesando {accion} para Doc {documento.numero} (Tipo: {documento.tipo})"
         )
-        movimientos = []
 
-        for linea in lineas_con_movimiento:
-            if accion == "ajustar" and cantidades_anteriores:
-                cantidad_anterior = cantidades_anteriores.get(linea.id, 0)
-                diferencia = linea.cantidad - cantidad_anterior
-                if diferencia == 0:
-                    continue
-                cantidad_actualizar = -diferencia
-            else:
-                cantidad_actualizar = -linea.cantidad if multiplier < 0 else linea.cantidad
-
-            if linea.origen_repuesto == ORIGEN_STOCK_BODEGA and linea.repuesto_id:
-                stock_anterior = linea.repuesto.cantidad_stock
-                filas = Repuesto.objects.filter(
-                    id=linea.repuesto.id, empresa=documento.empresa
-                ).update(cantidad_stock=F("cantidad_stock") + cantidad_actualizar)
-                if filas == 0:
-                    log.warning(
-                        f"[InventoryService] No se actualizó stock para repuesto {linea.repuesto.id}"
-                    )
-                    continue
-                linea.repuesto.refresh_from_db()
-                movimientos.append(
-                    {
-                        "origen": ORIGEN_STOCK_BODEGA,
-                        "repuesto_id": linea.repuesto.id,
-                        "repuesto_nombre": linea.repuesto.nombre,
-                        "cantidad": abs(cantidad_actualizar),
-                        "accion": "descontado" if cantidad_actualizar < 0 else "repuesto",
-                        "stock_anterior": stock_anterior,
-                        "stock_actual": linea.repuesto.cantidad_stock,
-                    }
-                )
-                log.info(f"  ✅ BODEGA {linea.repuesto.nombre}: {abs(cantidad_actualizar)} u.")
-            elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
-                InventoryService._actualizar_stock_desarme(linea.pieza_desarme, cantidad_actualizar)
-                movimientos.append(
-                    {
-                        "origen": ORIGEN_DESARME,
-                        "pieza_desarme_id": linea.pieza_desarme.id,
-                        "nombre": linea.pieza_desarme.nombre,
-                        "cantidad": abs(cantidad_actualizar),
-                        "accion": "descontado" if cantidad_actualizar < 0 else "repuesto",
-                    }
-                )
-                log.info(
-                    f"  ✅ DESARME {linea.pieza_desarme.nombre}: {abs(cantidad_actualizar)} u."
-                )
-            # EXTERNO: no mover inventario
-
-        # Congelar costo_linea para STOCK_BODEGA al emitir (accion="descontar").
-        # El precio de compra puede cambiar entre que el usuario agrega la línea
-        # (BORRADOR) y el momento en que la venta queda comprometida (EMITIDO).
-        # Congelar aquí garantiza que el margen futuro usa el costo real del momento.
-        # DESARME: ya tiene costo_linea desde pieza.costo_asignado — no se toca.
-        # EXTERNO: no tiene repuesto_id en lineas_con_movimiento — se omite.
+        # ── 1. Congelar costo_linea ANTES del loop ────────────────────────────
+        # Debe preceder a la creación del MovimientoInventario para que
+        # costo_unitario reciba el valor congelado en esta transacción.
+        # DESARME: ya tiene costo desde pieza.costo_asignado — no se toca.
+        # EXTERNO: no llega a lineas_con_movimiento — se omite.
         if accion == "descontar":
             lineas_a_congelar = [
                 ln for ln in lineas_con_movimiento
@@ -215,6 +174,104 @@ class InventoryService:
                     f"para {len(lineas_a_congelar)} líneas STOCK_BODEGA "
                     f"en Doc {documento.numero}"
                 )
+
+        # ── 2. Bloquear Repuesto en orden pk + mapa de saldo en memoria ───────
+        # Solo para descontar/reponer; ajustar opera fuera del ledger.
+        # ORDER BY pk previene deadlocks entre transacciones concurrentes.
+        saldo_actual: dict = {}
+        if accion in ("descontar", "reponer"):
+            lineas_bodega = [
+                ln for ln in lineas_con_movimiento
+                if ln.origen_repuesto == ORIGEN_STOCK_BODEGA and ln.repuesto_id
+            ]
+            if lineas_bodega:
+                rep_ids = sorted({ln.repuesto_id for ln in lineas_bodega})
+                saldo_actual = {
+                    r.pk: r.cantidad_stock
+                    for r in Repuesto.objects.select_for_update()
+                    .filter(id__in=rep_ids, empresa=documento.empresa)
+                    .order_by("pk")
+                }
+
+        # ── 3. Loop principal ─────────────────────────────────────────────────
+        movimientos = []
+
+        for linea in lineas_con_movimiento:
+            if accion == "ajustar" and cantidades_anteriores:
+                cantidad_anterior = cantidades_anteriores.get(linea.id, 0)
+                diferencia = linea.cantidad - cantidad_anterior
+                if diferencia == 0:
+                    continue
+                cantidad_actualizar = -diferencia
+            else:
+                cantidad_actualizar = -linea.cantidad if multiplier < 0 else linea.cantidad
+
+            if linea.origen_repuesto == ORIGEN_STOCK_BODEGA and linea.repuesto_id:
+                saldo_antes = saldo_actual.get(linea.repuesto_id, linea.repuesto.cantidad_stock)
+                saldo_nuevo = saldo_antes + cantidad_actualizar
+
+                filas = Repuesto.objects.filter(
+                    id=linea.repuesto_id, empresa=documento.empresa
+                ).update(cantidad_stock=F("cantidad_stock") + cantidad_actualizar)
+                if filas == 0:
+                    log.warning(
+                        f"[InventoryService] No se actualizó stock para repuesto {linea.repuesto_id}"
+                    )
+                    continue
+
+                saldo_actual[linea.repuesto_id] = saldo_nuevo
+
+                movimientos.append(
+                    {
+                        "origen": ORIGEN_STOCK_BODEGA,
+                        "repuesto_id": linea.repuesto_id,
+                        "repuesto_nombre": linea.repuesto.nombre,
+                        "cantidad": abs(cantidad_actualizar),
+                        "accion": "descontado" if cantidad_actualizar < 0 else "repuesto",
+                        "stock_anterior": saldo_antes,
+                        "stock_actual": saldo_nuevo,
+                    }
+                )
+                log.info(f"  ✅ BODEGA {linea.repuesto.nombre}: {abs(cantidad_actualizar)} u.")
+
+                if accion in ("descontar", "reponer"):
+                    tipo_mov = (
+                        MovimientoInventario.TipoMovimiento.EMISION
+                        if accion == "descontar"
+                        else MovimientoInventario.TipoMovimiento.ANULACION
+                    )
+                    InventoryLedgerService.record_stock_movement(
+                        empresa=documento.empresa,
+                        tipo=tipo_mov,
+                        repuesto=linea.repuesto,
+                        documento=documento,
+                        linea_repuesto=linea,
+                        cantidad_delta=cantidad_actualizar,
+                        saldo_resultante=saldo_nuevo,
+                        costo_unitario=linea.costo_linea,
+                        metadata={
+                            "inventory_ledger_version": InventoryLedgerService.HASH_VERSION,
+                            "documento_tipo": documento.tipo,
+                            "documento_estado": documento.estado,
+                            "accion": accion,
+                        },
+                    )
+
+            elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
+                InventoryService._actualizar_stock_desarme(linea.pieza_desarme, cantidad_actualizar)
+                movimientos.append(
+                    {
+                        "origen": ORIGEN_DESARME,
+                        "pieza_desarme_id": linea.pieza_desarme.id,
+                        "nombre": linea.pieza_desarme.nombre,
+                        "cantidad": abs(cantidad_actualizar),
+                        "accion": "descontado" if cantidad_actualizar < 0 else "repuesto",
+                    }
+                )
+                log.info(
+                    f"  ✅ DESARME {linea.pieza_desarme.nombre}: {abs(cantidad_actualizar)} u."
+                )
+            # EXTERNO: no mover inventario
 
         return {
             "procesado": True,
