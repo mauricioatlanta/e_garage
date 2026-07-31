@@ -9,21 +9,24 @@ regardless of future price updates.
 Covers:
   1.  STOCK_BODEGA: costo_linea set from repuesto.precio_compra at emission
   2.  Snapshot: changing precio_compra after does NOT alter costo_linea
-  3.  BORRADOR: costo_linea is NULL before emission (not frozen early)
-  4.  ANULADO: costo_linea preserved on cancellation (not cleared)
-  5.  DESARME: existing costo_linea not overwritten
-  6.  EXTERNO: not in movement lines, not touched
-  7.  Reactivation (ANULADO → EMITIDO): re-frozen to current precio_compra
-  8.  precio_compra = 0 → costo_linea = 0 (zero is honest, not NULL)
-  9.  Multiple lines frozen in a single bulk_update
-  10. Signal integration: doc.save(estado=EMITIDO) triggers freeze end-to-end
-  11. PRES documents never trigger freeze (not in TIPOS_CON_STOCK)
+  3.  No overwrite: existing costo_linea is NOT overwritten on re-emit
+  4.  BORRADOR: costo_linea is NULL before emission (not frozen early)
+  5.  ANULADO: costo_linea preserved on cancellation (not cleared)
+  6.  Reactivation (ANULADO → EMITIDO): original snapshot preserved
+  7.  precio_compra = 0 → costo_linea = 0 (zero is honest, not NULL)
+  8.  Multiple lines frozen in a single bulk_update
+  9.  Origin filter: only STOCK_BODEGA lines are frozen
+  10. PRES documents never trigger freeze (not in TIPOS_CON_STOCK)
+  11. Signal integration: doc.save(estado=EMITIDO) triggers freeze end-to-end
+  12. Rollback atómico: bulk_update failure rolls back both stock and costo_linea
 """
 
 from decimal import Decimal
+from unittest.mock import patch
 
 import pytest
 from django.db import transaction
+from django.db.models import QuerySet
 
 from taller.models.lineas_documento import (
     LineaRepuesto,
@@ -129,27 +132,52 @@ def test_costo_preservado_al_anular():
 
 
 @pytest.mark.django_db
-def test_costo_reactivacion_congela_precio_actual():
-    """ANULADO → EMITIDO (reactivación) vuelve a congelar al precio_compra vigente."""
+def test_no_sobrescribe_snapshot_existente():
+    """Un costo_linea ya congelado NO se sobreescribe en re-emisiones."""
     empresa = EmpresaFactory(pais="CL")
     repuesto = RepuestoFactory(empresa=empresa, precio_compra=Decimal("100.00"), cantidad_stock=10)
     doc = DocumentoFactory(empresa=empresa, tipo="OT", estado="BORRADOR")
     linea = _make_linea(doc, repuesto)
 
     _emit(doc)
+    linea.refresh_from_db()
+    assert linea.costo_linea == Decimal("100.00")
+
+    # El proveedor subió el precio
+    repuesto.precio_compra = Decimal("999.00")
+    repuesto.save(update_fields=["precio_compra"])
+
+    # Segunda llamada "descontar" (simula doble-save o bug de señal)
+    _emit(doc)
+    linea.refresh_from_db()
+
+    # El snapshot original no fue sobreescrito
+    assert linea.costo_linea == Decimal("100.00")
+
+
+@pytest.mark.django_db
+def test_snapshot_preservado_en_reactivacion():
+    """ANULADO → EMITIDO (reactivación) preserva el costo_linea original."""
+    empresa = EmpresaFactory(pais="CL")
+    repuesto = RepuestoFactory(empresa=empresa, precio_compra=Decimal("100.00"), cantidad_stock=10)
+    doc = DocumentoFactory(empresa=empresa, tipo="OT", estado="BORRADOR")
+    linea = _make_linea(doc, repuesto)
+
+    _emit(doc)
+    linea.refresh_from_db()
+    assert linea.costo_linea == Decimal("100.00")
 
     # El proveedor cambió el precio antes de la reactivación
-    repuesto.precio_compra = Decimal("120.00")
+    repuesto.precio_compra = Decimal("200.00")
     repuesto.save(update_fields=["precio_compra"])
-    repuesto.refresh_from_db()
 
     # Reponer (anulación) + volver a descontar (reactivación)
     InventoryService.procesar_movimiento_stock(doc, "reponer")
     _emit(doc)
 
     linea.refresh_from_db()
-    # Al reemitir, el costo se congela al precio vigente
-    assert linea.costo_linea == Decimal("120.00")
+    # El snapshot original debe quedar intacto — no re-congela al nuevo precio
+    assert linea.costo_linea == Decimal("100.00")
 
 
 @pytest.mark.django_db
@@ -261,3 +289,31 @@ def test_signal_integration_congela_al_guardar_emitido():
 
     linea.refresh_from_db()
     assert linea.costo_linea == Decimal("75.00")
+
+
+@pytest.mark.django_db
+def test_rollback_atomico_si_falla_bulk_update():
+    """
+    Si bulk_update falla, la transacción completa se revierte:
+    el stock NO se descuenta y costo_linea permanece NULL.
+    """
+    empresa = EmpresaFactory(pais="CL")
+    repuesto = RepuestoFactory(empresa=empresa, precio_compra=Decimal("100.00"), cantidad_stock=10)
+    doc = DocumentoFactory(empresa=empresa, tipo="OT", estado="BORRADOR")
+    _make_linea(doc, repuesto)
+
+    stock_antes = repuesto.cantidad_stock
+
+    with patch.object(
+        QuerySet, "bulk_update", side_effect=Exception("DB failure simulado")
+    ):
+        with pytest.raises(Exception, match="DB failure simulado"):
+            _emit(doc)
+
+    repuesto.refresh_from_db()
+    # Toda la transacción se revirtió: stock intacto
+    assert repuesto.cantidad_stock == stock_antes
+
+    # costo_linea también intacto (la línea nunca fue actualizada)
+    linea = doc.lineas_repuesto.filter(origen_repuesto=ORIGEN_STOCK_BODEGA).first()
+    assert linea.costo_linea is None

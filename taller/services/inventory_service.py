@@ -202,7 +202,9 @@ class InventoryService:
         if accion == "descontar":
             lineas_a_congelar = [
                 ln for ln in lineas_con_movimiento
-                if ln.origen_repuesto == ORIGEN_STOCK_BODEGA and ln.repuesto_id
+                if ln.origen_repuesto == ORIGEN_STOCK_BODEGA
+                and ln.repuesto_id
+                and ln.costo_linea is None  # preservar snapshot existente
             ]
             if lineas_a_congelar:
                 for ln in lineas_a_congelar:
