@@ -1,6 +1,7 @@
 from django.shortcuts import render
 
 from taller.auth.decorators import country_login_required
+from taller.constants.product_profiles import PRODUCT_CASA_REPUESTOS
 from taller.services.workspace_dashboard_service import WorkspaceDashboardService
 from taller.services.workspace_service import WorkspaceService
 from taller.utils.empresa import get_or_create_empresa
@@ -14,8 +15,14 @@ def workspace_dashboard(request):
     ws_def = WorkspaceService.get_workspace_def(config)
     dashboard_data = WorkspaceDashboardService.resolve(ws_def, empresa)
     prefix = _workspace_prefix_from_request(request)
+
+    if ws_def.product_key == PRODUCT_CASA_REPUESTOS:
+        search_url = f"{prefix}/repuestos/buscar/"
+    else:
+        search_url = f"{prefix}/workspace/buscar/"
+
     return render(request, "dashboard/index.html", {
         "dashboard_data": dashboard_data,
-        "workspace_search_url": f"{prefix}/workspace/buscar/",
+        "workspace_search_url": search_url,
         "workspace_base_prefix": prefix,
     })
