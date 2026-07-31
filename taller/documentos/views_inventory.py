@@ -9,8 +9,9 @@ from django.shortcuts import get_object_or_404, redirect
 from django.views.decorators.http import require_POST
 
 from taller.models.documento import Documento
-from taller.models.lineas_documento import ORIGEN_DESARME
+from taller.models.lineas_documento import ORIGEN_DESARME, ORIGEN_STOCK_BODEGA
 from taller.models.pieza_desarme import ESTADO_DISPONIBLE, PiezaDesarme
+from taller.models.repuesto import Repuesto
 from taller.services.inventory_service import InventoryService
 
 
@@ -20,11 +21,11 @@ def emitir_documento(request, documento_id):
     """
     Emite un documento (cambia estado a EMITIDO) validando stock disponible.
 
-    Para piezas de desarme: adquiere select_for_update() y valida con los objetos
-    bloqueados (previene doble venta concurrente). La señal pre_save descuenta el
-    stock automáticamente tras el cambio de estado.
-
-    Para repuestos de bodega (STOCK_BODEGA): delega a InventoryService.validar_stock_disponible().
+    Patrón: SELECT FOR UPDATE → validar → save → signal descuenta.
+    - DESARME: lock en PiezaDesarme, validación con objetos bloqueados.
+    - STOCK_BODEGA: lock en Repuesto antes de validar_stock_disponible(),
+      evitando TOCTOU entre emisiones concurrentes del mismo repuesto.
+    - EXTERNO: no mueve stock, no requiere lock.
     """
     empresa = getattr(request.user, "empresa", None)
     if not empresa:
@@ -77,7 +78,20 @@ def emitir_documento(request, documento_id):
                             f"Requerido: {linea.cantidad}, Disponible: {pieza.cantidad}"
                         )
 
-            # ── Repuestos de bodega y validaciones generales ─────────────────────
+            # ── Repuestos de bodega: lock + validación ────────────────────────────
+            # SELECT FOR UPDATE antes de leer cantidad_stock previene que dos
+            # emisiones concurrentes validen contra el mismo saldo y descuenten doble.
+            repuesto_ids_bodega = list(
+                documento.lineas_repuesto.filter(
+                    origen_repuesto=ORIGEN_STOCK_BODEGA, repuesto_id__isnull=False
+                ).values_list("repuesto_id", flat=True)
+            )
+            if repuesto_ids_bodega:
+                list(
+                    Repuesto.objects.select_for_update().filter(
+                        id__in=repuesto_ids_bodega, empresa=empresa
+                    )
+                )
             if not errores_validacion:
                 errores_validacion = InventoryService.validar_stock_disponible(documento)
 
