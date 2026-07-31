@@ -75,6 +75,7 @@ urlpatterns = [
     path("reportes/", include(("taller.reportes.urls", "reportes"), namespace="reportes")),
     # === RUTAS PRINCIPALES PARA COMPATIBILIDAD ===
     path("dashboard/", workspace_dashboard, name="dashboard"),  # Dashboard principal
+    path("dashboard/live-feed/", workspace_live_feed, name="dashboard_live_feed"),  # alias para workspace_live_kpi.js
     path("dashboard/bi/", DashboardHomeView.as_view(), name="dashboard_bi"),  # Dashboard de BI
     path("pricing/", precios, name="pricing"),
     path("precios/", precios, name="precios"),

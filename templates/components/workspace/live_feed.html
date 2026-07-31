@@ -1,0 +1,28 @@
+{#
+  live_feed.html — Card de "centro de mando" con contador en vivo y sparkline.
+
+  Variables requeridas (del contexto de la vista):
+    workspace_base_prefix  → prefijo de país/idioma (ej: /cl/es)
+
+  JS: workspace_live_kpi.js hace fetch("live-feed/") relativo a la URL actual.
+  La URL /dashboard/live-feed/ debe existir en urls.py (alias de workspace_live_feed).
+#}
+<a href="{{ workspace_base_prefix }}/workspace/centro-de-mando/" class="workspace-cdm-card">
+  <div class="cdm-card-header">
+    <span class="cdm-dot"></span>
+    <i class="fa-solid fa-gauge-high" aria-hidden="true"></i>
+    <span>{% if request.LANGUAGE_CODE == 'en' %}command center{% else %}centro de mando{% endif %}</span>
+  </div>
+  <div class="cdm-card-metric">
+    <span id="cdm-live-count">—</span>
+    <span class="cdm-metric-label">{% if request.LANGUAGE_CODE == 'en' %}in workshop{% else %}en el taller{% endif %}</span>
+  </div>
+  <svg id="cdm-sparkline" viewBox="0 0 100 24" preserveAspectRatio="none" class="cdm-sparkline">
+    <polyline points="" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <div class="cdm-card-footer">
+    <span class="cdm-pulse"></span>
+    <span>{% if request.LANGUAGE_CODE == 'en' %}live · see detail{% else %}en vivo · ver detalle{% endif %}</span>
+    <i class="fa-solid fa-chevron-right" aria-hidden="true"></i>
+  </div>
+</a>
