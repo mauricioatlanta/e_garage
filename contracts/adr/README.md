@@ -64,6 +64,7 @@ whether stock is tracked as an aggregate or distributed across warehouses.
 
 | ADR | Title | Status | Contracts Affected |
 |-----|-------|--------|--------------------|
+| [ADR-000](ADR-000-meta-contract-evolution.md) | Meta-Contract Evolution: Message Types, Interaction, Transport | **Accepted** | **todos** |
 | [ADR-001](ADR-001-attribute-schema.md) | Attribute Schema | Proposed | `catalog.product-knowledge.v1` |
 | [ADR-002](ADR-002-catalog-publication-trigger.md) | Catalog Publication Trigger | Proposed | `catalog.product-knowledge.v1` |
 | [ADR-003](ADR-003-stock-reservation.md) | Stock Reservation | Proposed | `inventory.stock.v1` |

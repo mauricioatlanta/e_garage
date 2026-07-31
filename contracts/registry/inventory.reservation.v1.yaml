@@ -1,0 +1,118 @@
+id: inventory.reservation.v1
+display_name: Reservation Lifecycle Contract
+category: Event
+
+owner: erp.inventory
+publisher: erp.inventory
+write_authority: erp.inventory
+
+message_types:
+
+  - id: inventory.reservation.created
+    description: >-
+      Emitted when erp.inventory accepts a reservation request triggered by
+      order.placed. Commerce must transition the order to reservation_active
+      state. erp.inventory also emits inventory.stock.updated reflecting the
+      updated aggregate_available after this reservation.
+    version: "1.0.0"
+    schema_ref: schemas/inventory.reservation.created.schema.json
+    interaction: event
+    transport: queue
+    frequency: near-realtime
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: eventual
+      completeness: delta
+      max_staleness: "30s"
+
+  - id: inventory.reservation.confirmed
+    description: >-
+      Emitted when a reservation is converted into a dispatched fulfillment
+      following confirmed payment. The reserved units are decremented from
+      quantity_on_hand and the reservation is closed. erp.inventory also emits
+      inventory.stock.updated for the corresponding aggregate_available change.
+    version: "1.0.0"
+    schema_ref: schemas/inventory.reservation.confirmed.schema.json
+    interaction: event
+    transport: queue
+    frequency: near-realtime
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: eventual
+      completeness: delta
+      max_staleness: "30s"
+
+  - id: inventory.reservation.rejected
+    description: >-
+      Emitted when erp.inventory cannot fulfill a reservation request, typically
+      because aggregate_available is insufficient. No inventory.stock.updated
+      is emitted for a rejection since aggregate_available was not modified.
+      Commerce must cancel or hold the order and notify the buyer.
+    version: "1.0.0"
+    schema_ref: schemas/inventory.reservation.rejected.schema.json
+    interaction: event
+    transport: queue
+    frequency: near-realtime
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: eventual
+      completeness: delta
+      max_staleness: "30s"
+
+  - id: inventory.reservation.expired
+    description: >-
+      Emitted when a reservation's TTL elapses without confirmed payment.
+      The reserved units are returned to aggregate_available. erp.inventory
+      also emits inventory.stock.updated. Commerce must cancel or re-queue
+      the order and notify the buyer. TTL values are defined per payment
+      method in the reservation_policy (ADR-003).
+    version: "1.0.0"
+    schema_ref: schemas/inventory.reservation.expired.schema.json
+    interaction: event
+    transport: queue
+    frequency: near-realtime
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: eventual
+      completeness: delta
+      max_staleness: "2m"
+
+  - id: inventory.reservation.released
+    description: >-
+      Emitted when a reservation is manually released before TTL: buyer
+      cancellation, operator cancellation, or definitive payment failure.
+      The released units are returned to aggregate_available. erp.inventory
+      also emits inventory.stock.updated.
+    version: "1.0.0"
+    schema_ref: schemas/inventory.reservation.released.schema.json
+    interaction: event
+    transport: queue
+    frequency: near-realtime
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: eventual
+      completeness: delta
+      max_staleness: "30s"
+
+consumers:
+  - subsystem: commerce.engine
+    message_types:
+      - inventory.reservation.created
+      - inventory.reservation.confirmed
+      - inventory.reservation.rejected
+      - inventory.reservation.expired
+      - inventory.reservation.released
+
+version: "1.0.0"
+status: draft
+breaking_change_policy: semver-major
+min_consumer_version: null
+
+pending_decisions:
+  - ADR-003  # Reservation policy TTL values per payment method
+  - ADR-008  # Domain boundary: this contract covers reservation lifecycle only, not stock state

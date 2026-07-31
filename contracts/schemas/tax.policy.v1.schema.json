@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "egarage/contracts/schemas/tax.policy.v1.schema.json",
-  "title": "Tax Policy Contract — Payload Schema",
-  "description": "Draft. Tax policies exported by erp.tax-engine. This contract exports policy definitions — not calculations. commerce.engine is responsible for applying the policy to compute the tax amount at checkout. Pending ADR-005.",
+  "title": "Tax Policy Contract — Payload Schema (SUPERSEDED)",
+  "description": "SUPERSEDED. This monolithic schema was replaced when tax.policy.v1 was migrated to meta-contract v2. Use: tax.policy.snapshot.schema.json. Kept for historical reference only.",
   "type": "object",
   "required": ["policies", "effective_from"],
   "additionalProperties": false,

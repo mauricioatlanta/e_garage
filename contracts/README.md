@@ -68,7 +68,8 @@ top-level domains (`erp.catalog` → `catalog`, not `erp`).
 | Contract ID | Category | Publisher | Consumers | Status |
 |-------------|----------|-----------|-----------|--------|
 | `catalog.product-knowledge.v1` | Truth | `erp.catalog` | `commerce.engine`, `analytics` | Draft |
-| `inventory.stock.v1` | Truth | `erp.inventory` | `commerce.engine` | Draft |
+| `inventory.stock.v1` | Truth | `erp.inventory` | `commerce.engine`, `analytics` | Draft |
+| `inventory.reservation.v1` | Event | `erp.inventory` | `commerce.engine` | Draft |
 | `tax.policy.v1` | Truth | `erp.tax-engine` | `commerce.engine` | Draft |
 | `identity.profile.v1` | Truth | `identity` | `erp.core`, `commerce.engine` | Draft |
 
@@ -117,15 +118,38 @@ top-level domains (`erp.catalog` → `catalog`, not `erp`).
 contracts/
 ├── README.md                                      ← registry index (this file)
 ├── meta-contract.yaml                             ← template every contract must follow
+├── adr/                                           ← Architecture Decision Records
+│   ├── ADR-000-meta-contract-evolution.md         ← Accepted
+│   ├── ADR-001-attribute-schema.md
+│   ├── ADR-002-catalog-publication-trigger.md
+│   ├── ADR-003-stock-reservation.md
+│   ├── ADR-004-multi-warehouse.md
+│   ├── ADR-005-tax-calculation-authority.md
+│   ├── ADR-006-identity-linkage-key.md
+│   ├── ADR-007-guest-identity.md
+│   └── ADR-008-stock-reservation-domain-boundary.md
 ├── registry/                                      ← one file per registered contract
 │   ├── catalog.product-knowledge.v1.yaml
 │   ├── inventory.stock.v1.yaml
+│   ├── inventory.reservation.v1.yaml
 │   ├── tax.policy.v1.yaml
 │   └── identity.profile.v1.yaml
 └── schemas/                                       ← JSON Schema for each contract payload
     ├── meta-contract.schema.json
-    ├── catalog.product-knowledge.v1.schema.json
-    ├── inventory.stock.v1.schema.json
-    ├── tax.policy.v1.schema.json
-    └── identity.profile.v1.schema.json
+    ├── catalog.product-knowledge.v1.schema.json   ← SUPERSEDED (split into 3 schemas)
+    ├── catalog.product.changed.schema.json
+    ├── catalog.product.snapshot.schema.json
+    ├── catalog.product.tombstone.schema.json
+    ├── inventory.stock.v1.schema.json             ← SUPERSEDED (split into 2 schemas)
+    ├── inventory.stock.updated.schema.json
+    ├── inventory.stock.snapshot.schema.json
+    ├── inventory.reservation.created.schema.json
+    ├── inventory.reservation.confirmed.schema.json
+    ├── inventory.reservation.rejected.schema.json
+    ├── inventory.reservation.expired.schema.json
+    ├── inventory.reservation.released.schema.json
+    ├── tax.policy.v1.schema.json                  ← SUPERSEDED (see tax.policy.snapshot)
+    ├── tax.policy.snapshot.schema.json
+    ├── identity.profile.v1.schema.json            ← SUPERSEDED (see identity.profile.resolved)
+    └── identity.profile.resolved.schema.json
 ```

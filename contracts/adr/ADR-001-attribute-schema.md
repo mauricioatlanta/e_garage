@@ -1,7 +1,8 @@
 # ADR-001 — Attribute Schema
 
-- **Estado:** Proposed
+- **Estado:** Accepted with amendments
 - **Fecha:** 2026-07-30
+- **Revisado:** 2026-07-30
 - **Decisores:** Mauricio Alvarado
 - **Contratos afectados:** `catalog.product-knowledge.v1`
 - **Sustituye:** —
@@ -185,3 +186,29 @@ Si `erp.catalog` deja de publicar el `attribute_schema`:
 - Conversación de arquitectura eGarage Commerce v1.0, julio 2026.
 - Patrón Entity-Attribute-Value y sus alternativas: [Martin Fowler — Schema-less databases](https://martinfowler.com/articles/schemaless/).
 - Elasticsearch mapping types como referencia para tipado de atributos de búsqueda.
+
+---
+
+## 15. Historial de revisión
+
+### 2026-07-30 — Revisión arquitectónica inicial
+
+**Resultado:** Accepted with amendments
+
+**Decisión aceptada:** Opción C (esquema declarativo y versionado, propiedad exclusiva de `erp.catalog`). La argumentación de las secciones 5 y 6 es correcta. Los principios protegidos (Autonomía, write_authority) son consistentes con la arquitectura eGarage.
+
+**Amendments incorporados en esta revisión:**
+
+- **Amendment 1 (aplicado):** El enum de tipos en `catalog.product-knowledge.v1.schema.json` fue actualizado al conjunto canónico de 8 tipos (`string`, `integer`, `decimal`, `boolean`, `date`, `datetime`, `enum`, `reference`). La propiedad `data_type` reemplaza a `type` para el tipo semántico del atributo. `type` queda reservado para palabras estructurales de JSON Schema.
+
+- **Amendment 2 (aplicado):** La representación de `attribute_schema` fue reescrita: de `additionalProperties` a una estructura `version` + `definitions[]`. Se incorporaron los campos `cardinality`, `nullable`, `searchable`, `filterable`, `sortable`, `facetable` y `unit` como parte del contrato formal. El campo `version` con patrón SemVer permite a los consumidores detectar cambios de esquema sin bumps del contrato padre.
+
+**Amendments pendientes — bloquean el paso a Stable:**
+
+- **Amendment 3 (abierto):** El tipo `reference` está declarado en el enum de `data_type` pero su semántica de resolución no está definida. Debe especificarse: entidad referenciada, formato del valor, comportamiento ante eliminación de la entidad, y si Commerce Engine resuelve el display name o solo indexa el identificador. Alternativa: excluir `reference` de v1 y reservarlo para un ADR posterior.
+
+- **Amendment 4 (abierto):** La estrategia i18n del campo `label` no está decidida. El tipo actual (`string | null`) es temporal. Opciones: translation key, mapa por locale `{locale: string}`, o bare string para tenants monoidioma. Debe resolverse antes de Stable dado que eGarage ya tiene locale files para `es`, `en` y `pt_BR`.
+
+**Estado del contrato:** `catalog.product-knowledge.v1` permanece en `draft`. No puede avanzar a `Stable` hasta que Amendments 3 y 4 sean cerrados y los criterios de aceptación del §12 sean verificables automáticamente.
+
+**Próximo ADR revisable:** ADR-002 (Publication Trigger) puede abrirse en paralelo.

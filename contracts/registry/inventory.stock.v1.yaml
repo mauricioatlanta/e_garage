@@ -5,26 +5,63 @@ category: Truth
 owner: erp.inventory
 publisher: erp.inventory
 write_authority: erp.inventory
-consumers:
-  - commerce.engine
 
-direction: Push
-frequency: NearRealtime
+message_types:
+
+  - id: inventory.stock.updated
+    description: >-
+      Incremental update emitted by erp.inventory whenever aggregate_available
+      changes for a (product_id, location_id) pair. Published atomically with
+      every transaction that modifies stock: physical receipts, adjustments,
+      and all reservation lifecycle transitions (created, rejected, expired,
+      released, confirmed). Consumers must update their availability index on
+      every receipt.
+    version: "1.0.0"
+    schema_ref: schemas/inventory.stock.updated.schema.json
+    interaction: event
+    transport: queue
+    frequency: near-realtime
+    guarantees:
+      idempotent: true
+      ordered: true
+      consistency: eventual
+      completeness: delta
+      max_staleness: "2m"
+
+  - id: inventory.stock.snapshot
+    description: >-
+      Full snapshot of aggregate_available for all (product_id, location_id)
+      pairs. Used for initial indexing and to recover from sequence gaps in
+      inventory.stock.updated. Consumers that detect a dropped stock_sequence
+      must trigger snapshot reconciliation before resuming incremental updates.
+    version: "1.0.0"
+    schema_ref: schemas/inventory.stock.snapshot.schema.json
+    interaction: snapshot
+    transport: queue
+    frequency: batch
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: eventual
+      completeness: full-snapshot
+      max_staleness: "24h"
+
+consumers:
+  - subsystem: commerce.engine
+    message_types:
+      - inventory.stock.updated
+      - inventory.stock.snapshot
+
+  - subsystem: analytics
+    message_types:
+      - inventory.stock.snapshot
 
 version: "1.0.0"
 status: draft
 breaking_change_policy: semver-major
-min_consumer_version: "1.0.0"
-
-guarantees:
-  idempotent: false
-  ordered: true    # consumers must discard messages with sequence <= last seen
-  consistency: eventual
-  completeness: delta
-  max_staleness: "2m"
-
-schema_ref: schemas/inventory.stock.v1.schema.json
+min_consumer_version: null
 
 pending_decisions:
-  - ADR-003  # Stock reservation: does Commerce reserve stock at cart-add or at checkout?
-  - ADR-004  # Multi-warehouse: does stock report per warehouse or as a single aggregate?
+  - ADR-003  # Accepted in principle; full implementation of reservation motor deferred to Phase 2
+  - ADR-004  # Accepted in principle; location_id mandatory, single-warehouse uses 'warehouse-main'
+  - ADR-008  # Domain boundary between stock and reservation — governs this contract's scope

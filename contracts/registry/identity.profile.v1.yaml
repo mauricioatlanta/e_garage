@@ -5,27 +5,44 @@ category: Truth
 owner: identity
 publisher: identity
 write_authority: identity
-consumers:
-  - erp.core
-  - commerce.engine
 
-direction: OnDemand
-frequency: OnDemand
+message_types:
+
+  - id: identity.profile.resolved
+    description: >-
+      Response from the identity subsystem to a query for a profile by
+      identity_id or email. An Identity bridges a Buyer (Commerce) and a
+      Cliente (ERP). Linkage is optional and never forced. A Buyer can exist
+      without a Cliente, and vice versa. Guest identities are ephemeral and
+      may not produce a persistent Identity record (pending ADR-007). Linkage
+      always requires explicit verification; no automatic irreversible merges
+      (ADR-006).
+    version: "1.0.0"
+    schema_ref: schemas/identity.profile.resolved.schema.json
+    interaction: request-response
+    transport: http
+    frequency: on-demand
+    guarantees:
+      idempotent: true
+      ordered: false
+      consistency: eventual
+      completeness: full-snapshot
+      max_staleness: null
+
+consumers:
+  - subsystem: erp.core
+    message_types:
+      - identity.profile.resolved
+
+  - subsystem: commerce.engine
+    message_types:
+      - identity.profile.resolved
 
 version: "1.0.0"
 status: draft
 breaking_change_policy: semver-major
-min_consumer_version: "1.0.0"
-
-guarantees:
-  idempotent: true
-  ordered: false
-  consistency: eventual
-  completeness: full-snapshot
-  max_staleness: null    # OnDemand: consumer receives current state at request time
-
-schema_ref: schemas/identity.profile.v1.schema.json
+min_consumer_version: null
 
 pending_decisions:
-  - ADR-006  # Identity linkage: how does a Buyer (Commerce) link to a Cliente (ERP)? By email only, or other keys?
-  - ADR-007  # Guest identity: does a guest checkout session create an Identity record, or is it ephemeral?
+  - ADR-006  # Identity linkage key: email only, or also RUT/EIN?
+  - ADR-007  # Guest identity: ephemeral session or persistent record?

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "egarage/contracts/schemas/inventory.stock.snapshot.schema.json",
+  "title": "inventory.stock.snapshot — Payload Schema",
+  "description": "Full snapshot of observable stock state across all products and locations, published by erp.inventory for initial indexing and periodic reconciliation. Each entry includes aggregate_available, which Commerce must use as the sole source of truth for availability. Consumers that detect a gap in stock_sequence values must trigger a snapshot reconciliation.",
+  "type": "object",
+  "required": ["entries", "snapshotted_at"],
+  "additionalProperties": false,
+  "properties": {
+
+    "entries": {
+      "type": "array",
+      "description": "Complete list of (product_id, location_id) stock records at the time of snapshot generation. A product absent from this list has zero stock at that location.",
+      "items": {
+        "type": "object",
+        "required": ["product_id", "location_id", "stock_sequence", "quantity_on_hand", "quantity_reserved", "quantity_blocked", "aggregate_available"],
+        "additionalProperties": false,
+        "properties": {
+          "product_id": {
+            "type": "string",
+            "description": "Stable product identifier from ERP Core."
+          },
+          "location_id": {
+            "type": "string",
+            "description": "Warehouse or storage location identifier. Single-warehouse tenants use 'warehouse-main'."
+          },
+          "stock_sequence": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "Sequence value at the time the snapshot was taken for this (product_id, location_id) pair. Consumers can use this to resume processing incremental updates after the snapshot is applied."
+          },
+          "quantity_on_hand": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Physical units confirmed in inventory at snapshot time."
+          },
+          "quantity_reserved": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Units with an active reservation at snapshot time."
+          },
+          "quantity_blocked": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Units blocked for operational reasons at snapshot time."
+          },
+          "quantity_adjustment": {
+            "type": "integer",
+            "description": "Signed correction applied at snapshot time. May be negative."
+          },
+          "aggregate_available": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Units that Commerce may sell. Computed by erp.inventory. Consumers must use this value directly and not recompute it."
+          }
+        }
+      }
+    },
+
+    "snapshotted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when erp.inventory generated this snapshot."
+    }
+  }
+}

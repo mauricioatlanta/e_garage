@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "egarage/contracts/schemas/inventory.stock.v1.schema.json",
-  "title": "Stock Contract — Payload Schema",
-  "description": "Draft. Delta update pushed by erp.inventory under inventory.stock.v1. Consumers must process messages in sequence order and discard any message with a sequence number <= the last processed sequence for that product.",
+  "title": "Stock Contract — Payload Schema (SUPERSEDED)",
+  "description": "SUPERSEDED. This schema was split into two schemas when inventory.stock.v1 was migrated to meta-contract v2 format and the domain boundary with inventory.reservation.v1 was established (ADR-008). Use: inventory.stock.updated.schema.json, inventory.stock.snapshot.schema.json. Kept for historical reference only.",
   "type": "object",
   "required": ["updates", "batch_sequence", "timestamp"],
   "additionalProperties": false,

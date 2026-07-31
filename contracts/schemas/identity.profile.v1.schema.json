@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "egarage/contracts/schemas/identity.profile.v1.schema.json",
-  "title": "Identity Profile Contract — Payload Schema",
-  "description": "Draft. An Identity record bridges a Buyer (Commerce) and a Cliente (ERP). Linkage is optional and never forced. A Buyer can exist without a Cliente, and a Cliente can exist without a Buyer. Guest identities are ephemeral and may not produce a persistent Identity record (pending ADR-007).",
+  "title": "Identity Profile Contract — Payload Schema (SUPERSEDED)",
+  "description": "SUPERSEDED. This monolithic schema was replaced when identity.profile.v1 was migrated to meta-contract v2. Use: identity.profile.resolved.schema.json. Kept for historical reference only.",
   "type": "object",
   "required": ["identity_id", "linkage_status", "created_at"],
   "additionalProperties": false,
