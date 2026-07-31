@@ -325,11 +325,11 @@ def test_costo_unitario_usa_costo_linea_preexistente_en_anulacion():
 
 
 # ---------------------------------------------------------------------------
-# 12. Línea DESARME no crea MovimientoInventario
+# 12. Línea DESARME crea MovimientoInventario con origen_stock=DESARME (Sprint D)
 # ---------------------------------------------------------------------------
 
 @pytest.mark.django_db
-def test_linea_desarme_no_crea_movimiento_inventario():
+def test_linea_desarme_crea_movimiento_origen_desarme():
     empresa = EmpresaFactory(pais="CL")
     pieza = _make_pieza(empresa)
     doc = DocumentoFactory(empresa=empresa, tipo="FAC", estado="BORRADOR")
@@ -346,7 +346,9 @@ def test_linea_desarme_no_crea_movimiento_inventario():
 
     InventoryService.procesar_movimiento_stock(doc, "descontar")
 
-    assert MovimientoInventario.objects.filter(documento=doc).count() == 0
+    movimientos = MovimientoInventario.objects.filter(documento=doc)
+    assert movimientos.count() == 1
+    assert movimientos.first().origen_stock == MovimientoInventario.OrigenStock.DESARME
 
 
 # ---------------------------------------------------------------------------

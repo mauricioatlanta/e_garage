@@ -15,6 +15,7 @@ import logging
 from collections import defaultdict
 from typing import List, Optional
 
+from django.core.exceptions import ValidationError
 from django.db import transaction
 from django.db.models import F
 
@@ -193,6 +194,28 @@ class InventoryService:
                     .order_by("pk")
                 }
 
+        # ── 2b. Bloquear PiezaDesarme en orden pk + mapas de estado en memoria ─
+        # ORDER BY pk previene deadlocks. Los mapas evitan re-lecturas y permiten
+        # encadenar saldo cuando varias líneas referencian la misma pieza.
+        saldo_por_pieza: dict = {}
+        estado_por_pieza: dict = {}
+        activo_por_pieza: dict = {}
+        if accion in ("descontar", "reponer"):
+            lineas_desarme_list = [
+                ln for ln in lineas_con_movimiento
+                if ln.origen_repuesto == ORIGEN_DESARME and ln.pieza_desarme_id
+            ]
+            if lineas_desarme_list:
+                pieza_ids = sorted({ln.pieza_desarme_id for ln in lineas_desarme_list})
+                locked_piezas = list(
+                    PiezaDesarme.objects.select_for_update()
+                    .filter(id__in=pieza_ids)
+                    .order_by("pk")
+                )
+                saldo_por_pieza = {p.pk: p.cantidad for p in locked_piezas}
+                estado_por_pieza = {p.pk: p.estado_pieza for p in locked_piezas}
+                activo_por_pieza = {p.pk: p.activo for p in locked_piezas}
+
         # ── 3. Loop principal ─────────────────────────────────────────────────
         movimientos = []
 
@@ -258,19 +281,144 @@ class InventoryService:
                     )
 
             elif linea.origen_repuesto == ORIGEN_DESARME and linea.pieza_desarme_id:
-                InventoryService._actualizar_stock_desarme(linea.pieza_desarme, cantidad_actualizar)
-                movimientos.append(
-                    {
+                if accion in ("descontar", "reponer"):
+                    pieza_id = linea.pieza_desarme_id
+                    saldo_antes = saldo_por_pieza.get(pieza_id, linea.pieza_desarme.cantidad)
+                    estado_antes = estado_por_pieza.get(pieza_id, linea.pieza_desarme.estado_pieza)
+                    activo_antes = activo_por_pieza.get(pieza_id, linea.pieza_desarme.activo)
+
+                    saldo_nuevo = saldo_antes + cantidad_actualizar
+                    if saldo_nuevo < 0:
+                        raise ValidationError(
+                            f"Stock insuficiente para pieza '{linea.pieza_desarme.nombre}'. "
+                            f"Saldo: {saldo_antes}, delta: {cantidad_actualizar}."
+                        )
+
+                    if saldo_nuevo <= 0:
+                        estado_nuevo = ESTADO_VENDIDA
+                        activo_nuevo = False
+                    elif estado_antes == ESTADO_VENDIDA and saldo_nuevo > 0:
+                        estado_nuevo = ESTADO_DISPONIBLE
+                        activo_nuevo = True
+                    else:
+                        estado_nuevo = estado_antes
+                        activo_nuevo = activo_antes
+
+                    tipo_mov = (
+                        MovimientoInventario.TipoMovimiento.EMISION
+                        if accion == "descontar"
+                        else MovimientoInventario.TipoMovimiento.ANULACION
+                    )
+                    idempotency_key = InventoryLedgerService.build_idempotency_key(
+                        empresa_id=documento.empresa_id,
+                        tipo=tipo_mov,
+                        origen_stock=MovimientoInventario.OrigenStock.DESARME,
+                        repuesto_id=None,
+                        pieza_desarme_id=pieza_id,
+                        documento_id=documento.pk,
+                        linea_repuesto_id=linea.pk,
+                        cantidad_delta=cantidad_actualizar,
+                    )
+                    existing_mov = MovimientoInventario.objects.filter(
+                        idempotency_key=idempotency_key
+                    ).first()
+                    if existing_mov is not None:
+                        # La delta ya fue aplicada en una llamada anterior; el DB
+                        # locked refleja ese estado. No tocar mapas ni pieza.
+                        movimientos.append({
+                            "origen": ORIGEN_DESARME,
+                            "pieza_desarme_id": pieza_id,
+                            "nombre": linea.pieza_desarme.nombre,
+                            "cantidad": abs(cantidad_actualizar),
+                            "accion": "descontado" if cantidad_actualizar < 0 else "repuesto",
+                        })
+                        log.info(f"  ♻️ DESARME {linea.pieza_desarme.nombre}: idempotente.")
+                        continue
+
+                    filas = PiezaDesarme.objects.filter(
+                        id=pieza_id, empresa=documento.empresa
+                    ).update(
+                        cantidad=F("cantidad") + cantidad_actualizar,
+                        estado_pieza=estado_nuevo,
+                        activo=activo_nuevo,
+                    )
+                    if filas == 0:
+                        log.warning(
+                            f"[InventoryService] No se actualizó pieza {pieza_id}"
+                        )
+                        continue
+
+                    saldo_por_pieza[pieza_id] = saldo_nuevo
+                    estado_por_pieza[pieza_id] = estado_nuevo
+                    activo_por_pieza[pieza_id] = activo_nuevo
+
+                    if saldo_nuevo <= 0:
+                        try:
+                            veh_id = linea.pieza_desarme.vehiculo_desarme_id
+                            if veh_id is not None:
+                                remaining = PiezaDesarme.objects.filter(
+                                    vehiculo_desarme_id=veh_id,
+                                    empresa=documento.empresa,
+                                    activo=True,
+                                    cantidad__gt=0,
+                                    estado_pieza=ESTADO_DISPONIBLE,
+                                ).exists()
+                                if not remaining:
+                                    VehiculoDesarme.objects.filter(id=veh_id).update(
+                                        estado_desarme="AGOTADO"
+                                    )
+                        except Exception:
+                            log.exception(
+                                "Error al actualizar estado del vehículo tras agotar piezas"
+                            )
+
+                    MovimientoInventario.objects.create(
+                        empresa=documento.empresa,
+                        tipo=tipo_mov,
+                        origen_stock=MovimientoInventario.OrigenStock.DESARME,
+                        pieza_desarme=linea.pieza_desarme,
+                        documento=documento,
+                        linea_repuesto=linea,
+                        cantidad_delta=cantidad_actualizar,
+                        saldo_resultante=saldo_nuevo,
+                        costo_unitario=linea.costo_linea,
+                        idempotency_key=idempotency_key,
+                        metadata={
+                            "inventory_ledger_version": InventoryLedgerService.HASH_VERSION,
+                            "documento_tipo": documento.tipo,
+                            "documento_estado": documento.estado,
+                            "accion": accion,
+                            "estado_anterior": estado_antes,
+                            "estado_resultante": estado_nuevo,
+                            "activo_anterior": activo_antes,
+                            "activo_resultante": activo_nuevo,
+                        },
+                    )
+                    movimientos.append({
+                        "origen": ORIGEN_DESARME,
+                        "pieza_desarme_id": pieza_id,
+                        "nombre": linea.pieza_desarme.nombre,
+                        "cantidad": abs(cantidad_actualizar),
+                        "accion": "descontado" if cantidad_actualizar < 0 else "repuesto",
+                        "saldo_anterior": saldo_antes,
+                        "saldo_actual": saldo_nuevo,
+                    })
+                    log.info(
+                        f"  ✅ DESARME {linea.pieza_desarme.nombre}: {abs(cantidad_actualizar)} u."
+                    )
+                else:
+                    # ajustar: no ledger — mantener helper preexistente
+                    InventoryService._actualizar_stock_desarme(linea.pieza_desarme, cantidad_actualizar)
+                    movimientos.append({
                         "origen": ORIGEN_DESARME,
                         "pieza_desarme_id": linea.pieza_desarme.id,
                         "nombre": linea.pieza_desarme.nombre,
                         "cantidad": abs(cantidad_actualizar),
                         "accion": "descontado" if cantidad_actualizar < 0 else "repuesto",
-                    }
-                )
-                log.info(
-                    f"  ✅ DESARME {linea.pieza_desarme.nombre}: {abs(cantidad_actualizar)} u."
-                )
+                    })
+                    log.info(
+                        f"  ✅ DESARME {linea.pieza_desarme.nombre}: {abs(cantidad_actualizar)} u."
+                    )
             # EXTERNO: no mover inventario
 
         return {
