@@ -10,7 +10,7 @@ class CategoryService:
     def list_tree(empresa):
         """
         Árbol completo construido en Python — soporta profundidad arbitraria.
-        Cada nodo expone ._resolved_children (lista) y .product_count (int).
+        Cada nodo expone .resolved_children (lista) y .product_count (int).
         Una sola consulta a la BD, sin importar cuántos niveles tenga el árbol.
         """
         all_cats = list(
@@ -20,14 +20,14 @@ class CategoryService:
         )
         cat_map = {c.pk: c for c in all_cats}
         for c in all_cats:
-            c._resolved_children = []
+            c.resolved_children = []
 
         roots = []
         for c in all_cats:
             if c.parent_id is None:
                 roots.append(c)
             elif c.parent_id in cat_map:
-                cat_map[c.parent_id]._resolved_children.append(c)
+                cat_map[c.parent_id].resolved_children.append(c)
         return roots
 
     @staticmethod

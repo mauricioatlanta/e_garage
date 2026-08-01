@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "ubicacion.apps.UbicacionConfig",
     "marketplace.apps.MarketplaceConfig",
     "commerce.apps.CommerceConfig",
+    "runtime",
 ]
 
 COMMERCE_TENANT_MAP: dict = {}

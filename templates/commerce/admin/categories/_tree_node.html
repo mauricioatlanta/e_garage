@@ -1,4 +1,4 @@
-{% with has_children=category._resolved_children %}
+{% with has_children=category.resolved_children %}
 <div class="ca-tree-node flex items-center justify-between gap-3" style="margin-left: {{ depth|default:0|add:0 }}rem">
   <div class="flex items-center gap-2 min-w-0">
     {% if has_children %}

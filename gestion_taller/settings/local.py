@@ -41,10 +41,10 @@ DATABASES = {
 }
 
 # Commerce Engine — tenant map para desarrollo local
-# Empresa 2 sirve el catálogo en localhost y monteazul.local
+# Empresa 4 = MonteAzul Import Test (catálogo real, 100 productos)
 COMMERCE_TENANT_MAP = {
-    "localhost": 2,
-    "127.0.0.1": 2,
-    "monteazul.local": 2,
+    "localhost": 4,
+    "127.0.0.1": 4,
+    "monteazul.local": 4,
 }
 ALLOWED_HOSTS = ["*"]
