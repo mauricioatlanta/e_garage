@@ -1,0 +1,142 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "commerce.order.submitted.v1.schema.json",
+  "title": "commerce.order.submitted",
+  "description": "Evento emitido cuando un pedido Commerce es completado y queda listo para procesamiento ERP.",
+  "type": "object",
+  "required": [
+    "event_id",
+    "occurred_at",
+    "schema_version",
+    "empresa_id",
+    "commerce_order_id",
+    "order_number",
+    "buyer",
+    "items",
+    "subtotal",
+    "tax_total",
+    "total",
+    "currency"
+  ],
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "UUID único del evento. Garantiza idempotencia en el consumer."
+    },
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp ISO 8601 del momento en que ocurrió el evento."
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0"
+    },
+    "empresa_id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "PK de la Empresa (tenant) en eGarage."
+    },
+    "commerce_order_id": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "PK del CommerceOrder que originó este evento."
+    },
+    "order_number": {
+      "type": "string",
+      "pattern": "^ORD-\\d+-[A-F0-9]{8}$",
+      "description": "Número de pedido Commerce. Formato ORD-{empresa_id}-{hex8}."
+    },
+    "buyer": {
+      "type": "object",
+      "required": ["full_name", "email"],
+      "properties": {
+        "full_name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "email": {
+          "type": "string",
+          "format": "email"
+        },
+        "phone": {
+          "type": "string",
+          "maxLength": 20,
+          "default": ""
+        }
+      },
+      "additionalProperties": false
+    },
+    "items": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": [
+          "commerce_order_item_id",
+          "sku",
+          "name",
+          "quantity",
+          "unit_price",
+          "line_total"
+        ],
+        "properties": {
+          "commerce_order_item_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "product_reference": {
+            "type": "string",
+            "description": "Slug del CommerceProduct. Referencia informativa, no vinculante."
+          },
+          "sku": {
+            "type": "string",
+            "maxLength": 100,
+            "description": "Código del producto congelado al crear el pedido."
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 255,
+            "description": "Nombre del producto congelado al crear el pedido."
+          },
+          "quantity": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "unit_price": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$",
+            "description": "Precio unitario como string decimal (preserva precisión)."
+          },
+          "line_total": {
+            "type": "string",
+            "pattern": "^\\d+(\\.\\d{1,2})?$",
+            "description": "Total de la línea = unit_price × quantity."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "subtotal": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,2})?$"
+    },
+    "tax_total": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,2})?$"
+    },
+    "total": {
+      "type": "string",
+      "pattern": "^\\d+(\\.\\d{1,2})?$"
+    },
+    "currency": {
+      "type": "string",
+      "enum": ["CLP", "USD", "MXN", "ARS", "PEN", "BRL", "UYU", "VES"],
+      "description": "Código ISO 4217 de la moneda del pedido."
+    }
+  },
+  "additionalProperties": false
+}

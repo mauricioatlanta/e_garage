@@ -11,6 +11,8 @@ INSTALLED_APPS = [
     'allauth.socialaccount','gestion_taller','taller','marketplace','ubicacion',
     'widget_tweaks',
     'commerce',
+    'core',
+    'runtime',
 ]
 
 # Commerce Engine — mapa hostname → empresa_id
