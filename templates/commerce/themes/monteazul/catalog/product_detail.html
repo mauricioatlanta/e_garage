@@ -1,0 +1,776 @@
+{% extends "commerce/themes/monteazul/base.html" %}
+{% load static %}{% load humanize %}
+{% with seo_title=product.meta_title|default:product.nombre %}
+{% with seo_desc=product.meta_description|default:product.descripcion_larga|striptags|truncatechars:155 %}
+{% block meta_title %}{{ seo_title }} | MonteAzul SPA{% endblock %}
+{% block meta_description %}
+  {% if seo_desc %}{{ seo_desc }}{% else %}{{ product.nombre }} en MonteAzul SPA. Repuestos de escape en Santiago: exhibición y ventas en Diez de Julio 354 o despacho a todo Chile.{% endif %}
+{% endblock %}
+{% block og_title %}{{ seo_title }} | MonteAzul SPA{% endblock %}
+{% block og_description %}
+  {% if seo_desc %}{{ seo_desc }}{% else %}{{ product.nombre }} - Repuestos de escape en Chile.{% endif %}
+{% endblock %}
+{% endwith %}
+{% endwith %}
+
+{% block extra_head %}
+{% if seo_vehicle_compatibility %}
+<meta name="vehicle-compatibility" content="{{ seo_vehicle_compatibility }}">
+{% endif %}
+<style>
+  .product-gallery-main { aspect-ratio: 1; }
+  @media (min-width: 768px) { .product-gallery-main { max-height: 480px; aspect-ratio: auto; } }
+  .product-gallery-main img { max-width: 80%; max-height: 80%; width: auto; height: auto; object-fit: contain; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-8">
+  {% if messages %}
+    <div class="mb-6 space-y-2">
+      {% for message in messages %}
+        <div class="p-4 rounded-xl border {% if message.tags == 'success' %}bg-emerald-500/10 border-emerald-500/30 text-emerald-400{% elif message.tags == 'error' %}bg-red-500/10 border-red-500/30 text-red-400{% else %}bg-amber-500/10 border-amber-500/30 text-amber-400{% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <nav class="text-sm text-white/50 mb-6" aria-label="Breadcrumb">
+    <a href="{% url 'commerce:home' %}" class="text-[#00f0ff] hover:underline">Inicio</a>
+    <span class="mx-2">/</span>
+    <a href="{% url 'commerce:home' %}" class="text-[#00f0ff] hover:underline">Productos</a>
+    <span class="mx-2">/</span>
+    <span class="text-white/70">{{ product.nombre|truncatewords:6 }}</span>
+  </nav>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {"@type": "ListItem", "position": 1, "name": "Inicio", "item": "https://monteazulspa.cl/"},
+      {"@type": "ListItem", "position": 2, "name": "Productos", "item": "https://monteazulspa.cl/productos/"},
+      {"@type": "ListItem", "position": 3, "name": "{{ product.nombre|escapejs }}", "item": "{{ request.build_absolute_uri }}"}
+    ]
+  }
+  </script>
+  {% if schema_vehicles %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": "{{ product.nombre|escapejs }}",
+    "brand": {"@type": "Brand", "name": "MonteAzul"},
+    "isAccessoryOrSparePartFor": [
+      {% for v in schema_vehicles %}
+      {"@type": "Car", "brand": "{{ v.brand|escapejs }}", "model": "{{ v.model|escapejs }}"}{% if not forloop.last %},{% endif %}
+      {% endfor %}
+    ]
+  }
+  </script>
+  {% endif %}
+
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <!-- Galería / imagen -->
+    <section class="lg:col-span-7 rounded-2xl border border-white/10 bg-white/5 p-4">
+      <div class="product-gallery-main rounded-xl bg-black/40 flex items-center justify-center overflow-hidden">
+        {% with first_img=product.images.first %}
+          {% if first_img.image %}
+            <img src="{{ first_img.image.url }}" id="mainProductImage" class="w-full h-full object-contain" alt="{{ product.nombre }}" loading="lazy" width="600" height="600">
+          {% else %}
+            <img src="{% static 'img/placeholder-product.svg' %}" id="mainProductImage" class="w-3/4 h-3/4 object-contain opacity-60" alt="{{ product.nombre }}" loading="lazy" width="400" height="400">
+          {% endif %}
+        {% endwith %}
+      </div>
+      {% if product.images.count > 1 %}
+        <div class="grid grid-cols-4 gap-2 mt-4" role="list" aria-label="Galería del producto">
+          {% for image in product.images.all %}
+            {% if image.image %}
+              <button type="button" class="thumbnail-btn rounded-xl border-2 hover:border-[#00f0ff]/50 overflow-hidden bg-white/5 transition-colors focus:border-[#00f0ff] focus:outline-none {% if image.is_primary %}border-[#00f0ff]{% else %}border-white/10{% endif %}" data-src="{{ image.image.url }}" aria-label="{% if image.is_primary %}Imagen principal{% else %}Ver imagen {{ forloop.counter }}{% endif %}" role="listitem">
+                <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:product.nombre }}" class="w-full aspect-square object-cover" loading="lazy">
+              </button>
+            {% endif %}
+          {% endfor %}
+        </div>
+      {% endif %}
+      <div class="mt-4 text-sm opacity-80">
+        <div><span class="opacity-60">SKU:</span> {{ product.part_number|default:"—" }}</div>
+        <div><span class="opacity-60">Categoría:</span> {{ product.category.name|default:"—" }}</div>
+      </div>
+      {% if busqueda_medidas_url and busqueda_medidas_label %}
+      <a href="{{ busqueda_medidas_url }}" class="mt-4 inline-block px-4 py-2 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/30 text-[#00f0ff] text-sm font-semibold hover:bg-[#00f0ff]/20 transition-colors">
+        {{ busqueda_medidas_label }}
+      </a>
+      {% endif %}
+    </section>
+
+    <!-- Buybox -->
+    <aside class="lg:col-span-5 rounded-2xl border border-white/10 bg-white/5 p-5">
+      <div class="text-xs text-emerald-300">
+        {% if product.stock > 0 %}
+          Stock disponible: {{ product.stock }}
+        {% else %}
+          <span class="text-amber-400">Sin stock</span>
+        {% endif %}
+      </div>
+      <h1 class="mt-2 text-2xl font-semibold">{{ product.nombre }}</h1>
+      <p class="mt-2 text-sm text-white/75 leading-relaxed">
+        {% if product.seo_intro %}
+          {{ product.seo_intro }}
+        {% else %}
+          Repuesto de escape automotriz disponible en <strong>Santiago</strong>. Exhibición y ventas en <strong>Diez de Julio 354</strong> o despacho a todo Chile.
+          {% if is_catalitico %}
+            {% if product.category.slug == 'cataliticos-twc-diesel' or product.combustible == 'DIESEL' %} Compatible con sistemas de escape diésel.{% elif product.euro_norm %} Compatible con norma <strong>{{ product.get_euro_norm_display }}</strong>.{% endif %}
+            {% if product.diametro_entrada %} Diámetro <strong>{{ product.diametro_entrada }}"</strong>.{% endif %}
+            {% if product.tiene_sensor %} Incluye rosca para sensor O2.{% endif %}
+          {% endif %}
+        {% endif %}
+      </p>
+      <div class="flex flex-wrap items-center gap-2 mt-2">
+        {% if product.euro_norm and product.combustible != 'DIESEL' %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-[#00f0ff]/10 border border-[#00f0ff]/20 text-[#00f0ff] text-xs font-semibold">{{ product.get_euro_norm_display }}</span>
+        {% endif %}
+        {% if product.combustible %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-white/10 border border-white/20 text-white/90 text-xs font-semibold">{{ product.get_combustible_display }}</span>
+        {% endif %}
+        {% if product.install_type %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-[#ffc800]/10 border border-[#ffc800]/20 text-[#ffc800] text-xs font-semibold">{{ product.get_install_type_display }}</span>
+        {% endif %}
+        {% if product.tiene_sensor %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/30 text-emerald-300 text-xs font-semibold">Con sensor</span>
+        {% endif %}
+        {% if product.celdas %}
+          <span class="inline-flex items-center px-2 py-0.5 rounded-lg bg-white/10 border border-white/20 text-white/90 text-xs font-semibold">{{ product.celdas }} CPSI</span>
+        {% endif %}
+      </div>
+
+      {% if compatibilities or product.compatibility_notes or product.part_number == 'CLF02' or product.part_number == 'CLF04' or product.part_number == 'CLF005' %}
+      <div class="mt-4 rounded-xl border border-white/10 bg-white/5 p-4">
+        <h2 class="text-sm font-semibold text-white/90 mb-2">Compatible con</h2>
+        {% if compatibilities %}
+        {% for brand_name, brand_list, total in compat_preview %}
+        <div class="mb-2 last:mb-0">
+          <span class="font-semibold text-white/90">{{ brand_name }}</span>
+          <div class="mt-1 space-y-0.5 text-sm text-white/80">
+            {% for c in brand_list %}
+            <div>
+              {% if c.model %}{{ c.model.name }}{% else %}Todos los modelos{% endif %}
+              {% if c.year_from and c.year_to %}<span class="text-white/55"> {% if c.year_from == 1900 and c.year_to == 2100 %}consultar aplicación{% else %}{{ c.year_from }}-{{ c.year_to }}{% endif %}</span>{% endif %}
+            </div>
+            {% endfor %}
+            {% if total > 4 %}<div class="text-white/55 text-xs">… y más</div>{% endif %}
+          </div>
+        </div>
+        {% endfor %}
+        {% if compatibilities_by_brand|length > 3 %}<div class="text-white/55 text-xs mt-1">… y más marcas</div>{% endif %}
+        {% endif %}
+        {% if product.compatibility_notes %}
+        <div class="mt-3 pt-3 border-t border-white/10 text-sm text-white/85 whitespace-pre-line">{{ product.compatibility_notes|linebreaksbr }}</div>
+        {% elif product.part_number == 'CLF02' %}
+        <div class="mt-3 pt-3 border-t border-white/10 text-sm text-white/85">
+          <div class="font-medium text-[#00f0ff] mb-1">Aplicaciones de referencia (BMW)</div>
+          <div class="whitespace-pre-line text-xs">1.6–2.0 L (4 en línea): 116i, 118i, 120i, 318i, 320i, X1 sDrive18i
+2.5–3.0 L (6 en línea): 325i, 330i, 523i, 525i, 530i, Z4, X3</div>
+        </div>
+        {% elif product.part_number == 'CLF04' %}
+        <div class="mt-3 pt-3 border-t border-white/10 text-sm text-white/85">
+          <div class="font-medium text-[#00f0ff] mb-1">Cruze y otros (plataforma Delta II)</div>
+          <div class="whitespace-pre-line text-xs">Cruze 1ª gen (J300) 2010–2016 · 1.8 L / 1.4 T
+Sonic, Tracker, Orlando (gasolina) — mismos rangos de años. Ver nota 2016.</div>
+        </div>
+        {% elif product.part_number == 'CLF005' %}
+        <div class="mt-3 pt-3 border-t border-white/10 text-sm text-white/85">
+          <div class="font-medium text-[#00f0ff] mb-1">Honda Accord 6ª gen. (1998–2002)</div>
+          <div class="whitespace-pre-line text-xs">DX, LX, EX, SE · sedán/coupé · motores 2.3 L (F23) y 3.0 L V6 (J30)
+Mismo diseño: Odyssey (1999–2004), Acura CL (2001–2003), TL (2002–2003)
+OEM: 18160-PAA-305 · No Accord 2003 en adelante</div>
+        </div>
+        {% elif direct_fit_application_rows and not product.compatibility_notes and product.sku != 'CLF02' and product.sku != 'CLF04' and product.sku != 'CLF005' %}
+        <div class="mt-3 pt-3 border-t border-white/10 text-sm text-white/85">
+          <div class="font-medium text-[#00f0ff] mb-1">Aplicaciones registradas</div>
+          <ul class="text-xs space-y-1 list-none pl-0 m-0">
+            {% for row in direct_fit_application_rows %}
+              {% if forloop.counter <= 8 %}<li>{{ row.brand }} · {{ row.model }} · {{ row.years }}</li>{% endif %}
+            {% endfor %}
+            {% if direct_fit_application_rows|length > 8 %}<li class="text-white/50">… tabla completa más abajo</li>{% endif %}
+          </ul>
+        </div>
+        {% endif %}
+        <a href="#compat-heading" class="mt-3 inline-block text-sm font-semibold text-[#00f0ff] hover:underline">Ver lista completa</a>
+      </div>
+      {% endif %}
+
+      <div class="mt-4 flex flex-wrap items-end gap-3">
+        {% if product.tiene_descuento %}
+          <span class="inline-flex px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold uppercase">Oferta</span>
+          <span class="text-lg text-white/50 line-through">$ {{ product.compare_at_price|intcomma }}</span>
+          <div class="text-3xl font-bold text-[#ffc800]">$ {{ product.precio_venta|intcomma }}</div>
+          <span class="text-sm text-white/60">IVA incluido</span>
+        {% else %}
+          <div class="text-3xl font-bold text-[#ffc800]">$ {{ product.precio_venta|intcomma }}</div>
+          <span class="text-sm text-white/60">IVA incluido</span>
+        {% endif %}
+      </div>
+
+      <!-- Cantidad -->
+      <div class="mt-4 flex items-center gap-2">
+        <button type="button" class="w-10 h-10 rounded-xl bg-black/30 border border-white/10 hover:bg-white/5 transition-colors" id="qty-minus" aria-label="Menos">−</button>
+        <input id="qty-input" type="number" min="1" max="{{ product.stock }}" class="w-16 h-10 text-center rounded-xl bg-black/30 border border-white/10 text-white [appearance:textfield]" value="1">
+        <button type="button" class="w-10 h-10 rounded-xl bg-black/30 border border-white/10 hover:bg-white/5 transition-colors" id="qty-plus" aria-label="Más">+</button>
+      </div>
+
+      <!-- Add to cart -->
+      <form method="post" action="{% url 'commerce:cart_add' %}" class="mt-4" id="add-to-cart-form">
+        {% csrf_token %}
+        <input type="hidden" name="slug" value="{{ product.slug }}">
+        <input type="hidden" name="quantity" id="qty-hidden" value="1">
+        <button type="submit" class="w-full h-12 rounded-xl bg-[#ffc800] text-[#0a0c10] font-semibold hover:bg-[#e6b300] transition-colors disabled:opacity-50 disabled:cursor-not-allowed" {% if product.stock == 0 %}disabled{% endif %}>
+          Agregar al carro
+        </button>
+      </form>
+      <a href="{% url 'commerce:cart' %}" class="mt-3 block text-center w-full h-12 leading-[48px] rounded-xl bg-white/10 border border-white/20 hover:bg-white/15 transition-colors font-semibold">
+        Comprar ahora
+      </a>
+
+      <!-- Medios de pago -->
+      <div class="mt-6 rounded-xl border border-white/10 bg-black/20 p-4 text-sm">
+        <div class="opacity-70 mb-2">Medios de pago</div>
+        <div class="flex flex-wrap gap-2 opacity-90">
+          <span class="px-2 py-1 rounded-lg bg-white/5 border border-white/10">Webpay</span>
+          <span class="px-2 py-1 rounded-lg bg-white/5 border border-white/10">Transferencia</span>
+          <span class="px-2 py-1 rounded-lg bg-white/5 border border-white/10">CajaVecina</span>
+        </div>
+      </div>
+
+      <!-- Ayuda / Contacto -->
+      <div class="mt-4 rounded-xl border border-white/10 bg-black/20 p-4 text-sm">
+        <div class="opacity-70 mb-2">¿Necesitas ayuda?</div>
+        <a href="https://wsp.cl/Atepara" target="_blank" rel="noopener" class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 font-semibold hover:bg-emerald-500/30 transition-colors">
+          <span aria-hidden="true">💬</span> WhatsApp
+        </a>
+      </div>
+
+      <!-- Calcular llegada -->
+      <button id="btn-estimate" type="button" class="mt-4 w-full h-12 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors font-medium">
+        Calcular cuándo llega mi compra
+      </button>
+      <div id="estimate-result" class="mt-2 text-sm opacity-80"></div>
+    </aside>
+  </div>
+
+  {% if is_catalitico %}
+  {# —— Ficha técnica nivel industrial (catalíticos) —— #}
+  <section class="mt-8 rounded-2xl border border-white/10 bg-white/5 overflow-hidden" aria-labelledby="ficha-header">
+    <div class="p-5 sm:p-6 border-b border-white/10 bg-black/20" id="ficha-header">
+      <div class="text-xs font-mono text-white/60 uppercase tracking-wider">{{ product.part_number }}</div>
+      <h2 class="text-xl font-bold mt-1">Convertidor Catalítico {% if product.install_type == 'PLUG_PLAY' %}Ensamble Directo{% else %}Universal{% endif %}</h2>
+      <p class="text-sm text-white/70 mt-1">
+        {% if product.combustible == 'DIESEL' %}
+          Aplicación: Diésel · Combustible: {{ product.get_combustible_display }}
+        {% else %}
+          Norma: {% if product.euro_norm %}{{ product.get_euro_norm_display }}{% else %}{% endif %} · Combustible: {% if product.combustible %}{{ product.get_combustible_display }}{% else %}{% endif %}
+        {% endif %}
+      </p>
+      <div class="flex flex-wrap gap-3 mt-4">
+        {% if product.euro_norm and product.combustible != 'DIESEL' %}
+          <span class="inline-flex items-center px-4 py-2 rounded-xl bg-[#00f0ff]/15 border border-[#00f0ff]/30 text-[#00f0ff] font-bold text-sm uppercase tracking-wide">{{ product.get_euro_norm_display }}</span>
+        {% endif %}
+        {% if product.install_type == 'SOLDADURA' %}
+          <span class="inline-flex items-center px-4 py-2 rounded-xl bg-[#ffc800]/15 border border-[#ffc800]/30 text-[#ffc800] font-semibold text-sm">Soldable</span>
+        {% endif %}
+        {% if product.tiene_sensor %}
+          <span class="inline-flex items-center px-4 py-2 rounded-xl bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-semibold text-sm">Con sensor</span>
+        {% else %}
+          <span class="inline-flex items-center px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/70 font-medium text-sm">Sin sensor</span>
+        {% endif %}
+        {% if product.celdas %}
+          <span class="inline-flex items-center px-4 py-2 rounded-xl bg-white/10 border border-white/20 text-white/90 font-semibold text-sm">{{ product.celdas }} Celdas</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="p-5 sm:p-6">
+      <h3 class="text-lg font-semibold mb-3 text-white/90">Especificaciones técnicas</h3>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse">
+          <tbody class="text-white/85">
+            {% if product.euro_norm and product.combustible != 'DIESEL' %}
+            <tr class="border-b border-white/10"><td class="py-2 pr-4 text-white/50">Norma ambiental</td><td class="py-2 font-medium">{{ product.get_euro_norm_display }}</td></tr>
+            {% endif %}
+            {% if product.combustible %}
+            <tr class="border-b border-white/10"><td class="py-2 pr-4 text-white/50">Combustible</td><td class="py-2 font-medium">{{ product.get_combustible_display }}</td></tr>
+            {% endif %}
+            {% if product.diametro_entrada is not None %}
+            <tr class="border-b border-white/10"><td class="py-2 pr-4 text-white/50">Diámetro entrada</td><td class="py-2 font-medium">{{ product.diametro_entrada }}"</td></tr>
+            {% endif %}
+            {% if product.diametro_salida is not None %}
+            <tr class="border-b border-white/10"><td class="py-2 pr-4 text-white/50">Diámetro salida</td><td class="py-2 font-medium">{{ product.diametro_salida }}"</td></tr>
+            {% endif %}
+            {% if product.largo_mm %}
+            <tr class="border-b border-white/10"><td class="py-2 pr-4 text-white/50">Largo total</td><td class="py-2 font-medium">{{ product.largo_mm }} mm</td></tr>
+            {% endif %}
+            {% if product.install_type %}
+            <tr class="border-b border-white/10"><td class="py-2 pr-4 text-white/50">Tipo de instalación</td><td class="py-2 font-medium">{{ product.get_install_type_display }}</td></tr>
+            {% endif %}
+            <tr class="border-b border-white/10"><td class="py-2 pr-4 text-white/50">Rosca sensor O2</td><td class="py-2 font-medium">{% if product.tiene_sensor %}Sí{% else %}No{% endif %}</td></tr>
+            {% if product.celdas %}
+            <tr class="border-b border-white/10"><td class="py-2 pr-4 text-white/50">Densidad de celdas</td><td class="py-2 font-medium">{{ product.celdas }} CPSI</td></tr>
+            {% endif %}
+            {% if product.material %}
+            <tr class="border-b border-white/10"><td class="py-2 pr-4 text-white/50">Material carcasa</td><td class="py-2 font-medium">{{ product.get_material_display }}</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+      <div class="mt-6 rounded-xl bg-[#00f0ff]/5 border border-[#00f0ff]/20 p-4">
+        <h4 class="font-semibold text-[#00f0ff] mb-2">Compatibilidad estimada</h4>
+        <ul class="text-sm text-white/80 space-y-1">
+          {% if product.combustible %}
+          <li>
+            Vehículos {{ product.get_combustible_display }}
+            {% if product.combustible != 'DIESEL' and product.euro_norm %}{{ product.get_euro_norm_display }}{% endif %}
+          </li>
+          {% endif %}
+          <li>
+            Sistemas
+            {% if product.combustible != 'DIESEL' and product.euro_norm %}
+              {{ product.get_euro_norm_display }}
+            {% else %}
+              universales
+            {% endif %}
+          </li>
+          <li>Reemplazo universal adaptable</li>
+        </ul>
+      </div>
+      <div class="mt-4 rounded-xl bg-amber-500/10 border border-amber-500/20 p-4">
+        <h4 class="font-semibold text-amber-300 mb-2">Advertencias</h4>
+        <ul class="text-sm text-white/80 space-y-1 list-disc list-inside">
+          <li>La correcta instalación evita códigos de falla.</li>
+          <li>No reemplaza sistema DPF en Diesel.</li>
+          <li>Verifique normativa vigente.</li>
+        </ul>
+      </div>
+      <div class="mt-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 p-4">
+        <h4 class="font-semibold text-emerald-300 mb-2">Ventajas MonteAzul</h4>
+        <ul class="text-sm text-white/80 space-y-1">
+          <li>Producto nuevo</li>
+          <li>Garantía estructural</li>
+          <li>Stock permanente</li>
+          <li>Asesoría técnica</li>
+        </ul>
+      </div>
+      <div class="mt-4 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/25 p-4">
+        {% if product.category.slug == 'cataliticos-twc-diesel' or product.combustible == 'DIESEL' %}
+        <h4 class="font-semibold text-[#00f0ff] mb-2">Aplicación</h4>
+        <ul class="text-sm text-white/80 space-y-1">
+          <li>Aplicación específica para motores diésel</li>
+          <li>No utiliza clasificación visual por norma Euro en esta ficha</li>
+          <li>Diseñado para sistemas de escape diésel</li>
+        </ul>
+        {% else %}
+        <h4 class="font-semibold text-[#00f0ff] mb-2">Certificación y normativa</h4>
+        <ul class="text-sm text-white/80 space-y-1">
+          <li>Cumple normativa MTT Chile</li>
+          <li>Norma Euro correspondiente</li>
+        </ul>
+        {% endif %}
+      </div>
+    </div>
+    {% if product.descripcion_larga %}
+    <div class="p-5 sm:p-6 border-t border-white/10">
+      <h3 class="text-lg font-semibold mb-2 text-white/90">Descripción adicional</h3>
+      <div class="prose prose-invert prose-sm max-w-none text-white/80 whitespace-pre-line">{{ product.descripcion_larga|linebreaksbr }}</div>
+    </div>
+    {% endif %}
+  </section>
+  {% else %}
+  {% if product.descripcion_larga %}
+  <section class="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
+    <h2 class="text-xl font-semibold mb-4">Ficha técnica</h2>
+    <div class="prose prose-invert prose-sm max-w-none text-white/80 whitespace-pre-line">{{ product.descripcion_larga|linebreaksbr }}</div>
+  </section>
+  {% endif %}
+  <!-- Especificaciones (no catalítico) -->
+  <section class="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
+    <h2 class="text-xl font-semibold mb-4">Especificaciones</h2>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 text-sm">
+      {% if flexible_dims %}
+      <div class="col-span-2 sm:col-span-3 md:col-span-4"><span class="text-xs uppercase text-white/50">Medida (tubo flexible)</span><p class="font-medium text-white mt-1">{{ flexible_dims }}</p><p class="text-white/60 text-xs mt-0.5">El formato indica diámetro y largo en pulgadas (ej. 25×6 = 2.5″ × 6″).</p></div>
+      {% endif %}
+      <div><span class="text-xs uppercase text-white/50">Peso</span><p class="font-medium text-white">{% if product.weight is not None %}{{ product.weight }} kg{% else %}—{% endif %}</p></div>
+      <div><span class="text-xs uppercase text-white/50">Largo</span><p class="font-medium text-white">{% if product.length is not None %}{{ product.length }} cm{% else %}—{% endif %}</p></div>
+      <div><span class="text-xs uppercase text-white/50">Ancho</span><p class="font-medium text-white">{% if product.width is not None %}{{ product.width }} cm{% else %}—{% endif %}</p></div>
+      <div><span class="text-xs uppercase text-white/50">Alto</span><p class="font-medium text-white">{% if product.height is not None %}{{ product.height }} cm{% else %}—{% endif %}</p></div>
+      {% if product.euro_norm or product.combustible or product.category.slug == 'cataliticos-twc-diesel' %}
+      <div>
+        <span class="text-xs uppercase text-white/50">{% if product.combustible == 'DIESEL' %}Aplicación{% else %}Norma Euro{% endif %}</span>
+        <p class="font-medium text-white">
+          {% if product.combustible == 'DIESEL' %}
+            Diésel
+          {% elif product.euro_norm %}
+            {{ product.get_euro_norm_display }}
+          {% else %}
+            
+          {% endif %}
+        </p>
+      </div>
+      <div><span class="text-xs uppercase text-white/50">Combustible</span><p class="font-medium text-white">{% if product.combustible %}{{ product.get_combustible_display }}{% else %}—{% endif %}</p></div>
+      {% endif %}
+      <div><span class="text-xs uppercase text-white/50">Material</span><p class="font-medium text-white">{% if product.material %}{{ product.get_material_display }}{% else %}—{% endif %}</p></div>
+      <div><span class="text-xs uppercase text-white/50">Instalación</span><p class="font-medium text-white">{% if product.install_type %}{{ product.get_install_type_display }}{% else %}—{% endif %}</p></div>
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Compatibilidad vehicular (agrupada por marca) -->
+  {% if compatibilities or product.compatibility_notes or product.part_number == 'CLF02' or product.part_number == 'CLF04' or product.part_number == 'CLF005' %}
+  <section class="mt-10 rounded-2xl border border-white/10 bg-white/5 p-6" aria-labelledby="compat-heading">
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-5">
+      <div>
+        <h2 id="compat-heading" class="text-xl font-bold text-white/95">Compatibilidad vehicular</h2>
+        <p class="text-sm text-white/60 mt-1">
+          Revisa las aplicaciones compatibles registradas para este producto.
+        </p>
+      </div>
+    </div>
+
+    {% if product.compatibility_notes %}
+    <div class="mb-6 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/25 p-4 text-sm text-white/90">
+      <h3 class="font-semibold text-[#00f0ff] mb-2">Años, generación y otros modelos compatibles</h3>
+      <div class="prose prose-invert prose-sm max-w-none whitespace-pre-line">{{ product.compatibility_notes|linebreaksbr }}</div>
+    </div>
+    {% elif product.part_number == 'CLF02' %}
+    <div class="mb-6 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/25 p-4 text-sm text-white/90">
+      <h3 class="font-semibold text-[#00f0ff] mb-2">Aplicaciones de referencia (BMW)</h3>
+      <p class="text-white/80 mb-3">Por desplazamiento y configuración del motor.</p>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm border-collapse text-left">
+          <thead>
+            <tr class="text-white/70 border-b border-white/20">
+              <th class="py-2 pr-4 font-semibold">Desplazamiento</th>
+              <th class="py-2 pr-4 font-semibold">Configuración</th>
+              <th class="py-2 font-semibold">Modelos</th>
+            </tr>
+          </thead>
+          <tbody class="text-white/90">
+            <tr class="border-b border-white/10"><td class="py-2 pr-4">1.6 – 2.0 L</td><td class="py-2 pr-4">4 en línea</td><td class="py-2">116i, 118i, 120i, 318i, 320i, X1 sDrive18i</td></tr>
+            <tr class="border-b border-white/10"><td class="py-2 pr-4">2.5 – 3.0 L</td><td class="py-2 pr-4">6 en línea</td><td class="py-2">325i, 330i, 523i, 525i, 530i, Z4, X3</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="text-white/70 text-xs mt-3">Compatibilidad orientativa. Confirmar código de pieza o aplicación exacta antes de comprar.</p>
+    </div>
+    {% elif product.part_number == 'CLF04' %}
+    <div class="mb-6 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/25 p-4 text-sm text-white/90">
+      <h3 class="font-semibold text-[#00f0ff] mb-2">Años, generación y otros modelos compatibles</h3>
+      <div class="prose prose-invert prose-sm max-w-none whitespace-pre-line">Años y modelo principal (Chevrolet Cruze)
+Este diseño corresponde principalmente a la primera generación del Chevrolet Cruze (J300).
+• Años: aproximadamente 2010 hasta 2016.
+• Motores: más común en versiones 1.8 L (atmosférico) y en algunas variantes 1.4 L Turbo.
+• Nota: En 2016 hubo transición en Chile (Cruze Limited vs. modelo nuevo); si el vehículo es de ese año, conviene verificar si es carrocería antigua o nueva.
+
+Otros modelos que usan el mismo convertidor
+Por plataforma Delta II y motorización compartida con General Motors, este catalítico suele ser compatible con:
+• Chevrolet Sonic (2012–2017), especialmente con motor 1.8 L.
+• Chevrolet Tracker (2013–2016), muchas versiones con la misma configuración de escape frontal.
+• Chevrolet Orlando (2011–2015), en versiones a gasolina.</div>
+    </div>
+    {% elif product.part_number == 'CLF005' %}
+    <div class="mb-6 rounded-xl bg-[#00f0ff]/10 border border-[#00f0ff]/25 p-4 text-sm text-white/90">
+      <h3 class="font-semibold text-[#00f0ff] mb-2">Aplicaciones de referencia (Honda / Acura)</h3>
+      <p class="text-white/80 mb-3">Catalítico principal bajo el piso (tras el downpipe, antes del silenciador). No es el tipo integrado en colector de generaciones posteriores.</p>
+      <ul class="list-disc list-inside space-y-2 text-white/90 mb-4">
+        <li><strong>Honda Accord</strong> (6ª generación) <strong>1998–2002</strong> — todas las versiones (DX, LX, EX, SE), sedán y coupé. Motores 2.3 L 4 cil. (F23) y 3.0 L V6 (J30).</li>
+        <li><strong>Honda Odyssey</strong> <strong>1999–2004</strong> (V6 3.5 L) — mismo diseño físico, bridas y montajes.</li>
+        <li><strong>Acura CL</strong> <strong>2001–2003</strong> (V6 3.2 L) · <strong>Acura TL</strong> <strong>2002–2003</strong> (V6 3.2 L).</li>
+      </ul>
+      <p class="text-amber-200/90 text-sm mb-3"><strong>No intercambiable</strong> con Accord 2003–2007, 2008–2017 ni posteriores (diseño distinto, bridas y a menudo catalítico en colector).</p>
+      <p class="text-white/80 text-sm"><strong>Referencia OEM frecuente:</strong> 18160-PAA-305 (reemplaza 18160-PAA-L10, L11, PAB-L00, etc.). Suele estar estampado en el cuerpo (18160-PAA-xxx).</p>
+      <p class="text-white/70 text-xs mt-3">ULEV vs. estándar puede variar el sustrato interno; cuerpo y montajes son los mismos. Compatibilidad orientativa: confirmar código y medidas antes de comprar.</p>
+    </div>
+    {% endif %}
+
+    <div class="space-y-5">
+      {% for brand_name, brand_compatibilities in compatibilities_by_brand %}
+      <div class="rounded-xl bg-black/20 border border-white/10 p-4">
+        <h3 class="text-base font-semibold text-white/95 mb-3">{{ brand_name }}</h3>
+        <div class="flex flex-wrap gap-2">
+          {% for c in brand_compatibilities %}
+          <span class="inline-flex items-center px-3 py-1.5 rounded-lg bg-white/10 border border-white/20 text-sm font-medium text-white/90">
+            {% if c.model %}{{ c.model.name }}{% else %}Todos los modelos{% endif %}
+            {% if c.year_from and c.year_to %}<span class="text-white/55 ml-1">({% if c.year_from == 1900 and c.year_to == 2100 %}consultar aplicación{% else %}{{ c.year_from }}-{{ c.year_to }}{% endif %})</span>{% endif %}
+          </span>
+          {% endfor %}
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+
+    <p class="mt-5 text-xs text-white/50">
+      Compatibilidad orientativa. Confirmar con foto, código, medidas o aplicación exacta antes de comprar.
+    </p>
+
+    <div class="mt-6 rounded-xl border border-[#00f0ff]/20 bg-[#00f0ff]/5 p-4">
+      <p class="text-sm font-semibold text-white/90 mb-2">¿Tu vehículo está en esta lista?</p>
+      {% comment %}TODO EGARAGE: core:vehicle_search no existe en Commerce{% endcomment %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Tabla detallada (búsqueda) -->
+  <section class="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5">
+    <div class="flex flex-wrap items-center justify-between gap-4">
+      <h2 class="text-xl font-semibold">Modelos compatibles</h2>
+      <input id="compat-search" class="h-10 px-3 rounded-xl bg-black/30 border border-white/10 text-white placeholder-white/40 focus:border-[#00f0ff]/50 focus:outline-none text-sm" placeholder="Buscar marca / modelo / año" type="search">
+    </div>
+    {% if compat_count_total > compat_table_limit %}
+    <p class="mt-2 text-sm text-white/60">
+      Mostrando {{ compat_table_limit }} de {{ compat_count_total }}.
+      <a href="#compat-heading" class="text-[#00f0ff] hover:underline font-medium">Ver lista completa por marca</a>
+    </p>
+    {% endif %}
+    <div class="mt-4 overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead class="opacity-70 text-left">
+          <tr>
+            <th class="py-2 pr-4">Marca</th>
+            <th class="py-2 pr-4">Modelo</th>
+            <th class="py-2 pr-4">Años</th>
+            <th class="py-2 pr-4">Motor / Combustible</th>
+            <th class="py-2">Notas / Confianza</th>
+          </tr>
+        </thead>
+        <tbody id="compat-body">
+          {% for f in compat %}
+          <tr class="compat-row border-t border-white/10">
+            <td class="py-2 pr-4">{{ f.brand.name }}</td>
+            <td class="py-2 pr-4">{{ f.model.name }}</td>
+            <td class="py-2 pr-4">{% if f.year_from == 1900 and f.year_to == 2100 %}Consultar aplicación{% else %}{{ f.year_from }} – {{ f.year_to }}{% endif %}</td>
+            <td class="py-2 pr-4 text-white/70">{% if f.engine %}{{ f.engine.name }}{% endif %}{% if f.fuel_type %} · {{ f.get_fuel_type_display }}{% endif %}</td>
+            <td class="py-2 text-white/60 text-xs">{% if f.notes %}{{ f.notes }}{% endif %}{% if f.notes and f.confidence %} · {% endif %}{% if f.confidence %}{{ f.get_confidence_display }}{% endif %}</td>
+          </tr>
+          {% empty %}
+          <tr><td class="py-3 opacity-70" colspan="5">Sin datos de compatibilidad.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- FAQ (SEO) -->
+  <section class="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5" aria-labelledby="faq-title">
+    <div class="flex items-center justify-between gap-3">
+      <h2 id="faq-title" class="text-xl font-semibold">Preguntas frecuentes</h2>
+      <span class="text-xs text-white/50">Respuestas rápidas</span>
+    </div>
+
+    <div class="mt-4 space-y-3">
+      {% if is_catalitico %}
+        <details class="rounded-xl border border-white/10 bg-black/20 p-4">
+          <summary class="cursor-pointer font-semibold text-white/90">¿Este catalítico ayuda a pasar revisión técnica?</summary>
+          <p class="mt-2 text-sm text-white/75 leading-relaxed">
+            Depende del estado del motor, sensores y correcta instalación. Este producto es una solución de reemplazo para sistemas de escape y
+            {% if product.category.slug == 'cataliticos-twc-diesel' or product.combustible == 'DIESEL' %}está diseñado para sistemas de escape diésel{% elif product.euro_norm %}está orientado a norma {{ product.get_euro_norm_display }}{% else %}cumplimiento estándar{% endif %}.
+          </p>
+        </details>
+
+        <details class="rounded-xl border border-white/10 bg-black/20 p-4">
+          <summary class="cursor-pointer font-semibold text-white/90">¿Es universal o ensamble directo?</summary>
+          <p class="mt-2 text-sm text-white/75 leading-relaxed">
+            {% if product.install_type == 'PLUG_PLAY' %}
+              Es <strong>ensamble directo</strong> (plug &amp; play). Se instala con calce específico.
+            {% else %}
+              Es <strong>universal</strong>. Normalmente requiere adaptación/instalación por soldadura según tu sistema de escape.
+            {% endif %}
+          </p>
+        </details>
+
+        <details class="rounded-xl border border-white/10 bg-black/20 p-4">
+          <summary class="cursor-pointer font-semibold text-white/90">¿Incluye sensor o rosca para sensor O2?</summary>
+          <p class="mt-2 text-sm text-white/75 leading-relaxed">
+            {% if product.tiene_sensor %}
+              Sí. Incluye rosca para sensor O2.
+            {% else %}
+              No incluye rosca para sensor O2 en este modelo.
+            {% endif %}
+          </p>
+        </details>
+
+        <details class="rounded-xl border border-white/10 bg-black/20 p-4">
+          <summary class="cursor-pointer font-semibold text-white/90">¿Puedo retirarlo en Santiago?</summary>
+          <p class="mt-2 text-sm text-white/75 leading-relaxed">
+            Sí: exhibición y ventas en <strong>Diez de Julio 354</strong> (Santiago) o despacho a todo Chile.
+          </p>
+        </details>
+      {% else %}
+        <details class="rounded-xl border border-white/10 bg-black/20 p-4">
+          <summary class="cursor-pointer font-semibold text-white/90">¿Cómo sé si esta medida me sirve?</summary>
+          <p class="mt-2 text-sm text-white/75 leading-relaxed">
+            Revisa el diámetro y largo de tu pieza actual. Si tienes dudas, escríbenos por WhatsApp con tu modelo/año y te orientamos.
+          </p>
+        </details>
+
+        <details class="rounded-xl border border-white/10 bg-black/20 p-4">
+          <summary class="cursor-pointer font-semibold text-white/90">¿Hacen despacho?</summary>
+          <p class="mt-2 text-sm text-white/75 leading-relaxed">
+            Sí: despacho a todo Chile o exhibición y ventas en <strong>Diez de Julio 354</strong> (Santiago).
+          </p>
+        </details>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- Reseñas -->
+  <section class="mt-8 rounded-2xl border border-white/10 bg-white/5 p-5" id="reseñas">
+    <h2 class="text-xl font-semibold mb-4">Reseñas ({{ approved_reviews|length }})</h2>
+    {% if approved_reviews %}
+    <div class="flex items-center gap-3 mb-4">
+      <div class="flex text-[#ffc800] text-xl" aria-label="Valoración promedio: {{ review_stats.avg }} de 5">
+        {% for i in "12345" %}
+          <span aria-hidden="true">{% if forloop.counter <= review_stats.avg %}★{% else %}☆{% endif %}</span>
+        {% endfor %}
+      </div>
+      <span class="text-white/80">{{ approved_reviews|length }} valoración{{ approved_reviews|length|pluralize:"es" }}</span>
+    </div>
+    <ul class="space-y-4">
+      {% for r in approved_reviews %}
+      <li class="border-t border-white/10 pt-4 first:border-t-0 first:pt-0">
+        <div class="flex gap-2 text-[#ffc800] text-sm" aria-label="Valoración: {{ r.rating }} de 5">
+          {% for i in "12345" %}<span>{% if forloop.counter <= r.rating %}★{% else %}☆{% endif %}</span>{% endfor %}
+        </div>
+        {% if r.title %}<h3 class="font-semibold mt-1">{{ r.title }}</h3>{% endif %}
+        <p class="text-white/80 text-sm mt-1">{{ r.body }}</p>
+        <p class="text-white/50 text-xs mt-2">— {{ r.user.get_full_name|default:r.user.email|slice:":3" }}*** · Compra verificada</p>
+      </li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% if can_review %}
+    <div class="mt-6 pt-4 border-t border-white/10">
+      <h3 class="font-semibold mb-2">Deja tu opinión</h3>
+      {% comment %}TODO EGARAGE: catalog:review_submit no existe en Commerce{% endcomment %}
+      <form method="post" action="#" class="space-y-3">
+        {% csrf_token %}
+        <div>
+          <label class="block text-sm text-white/70 mb-1">Valoración</label>
+          <select name="rating" required class="rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-white">
+            <option value="5">5 estrellas</option>
+            <option value="4">4 estrellas</option>
+            <option value="3">3 estrellas</option>
+            <option value="2">2 estrellas</option>
+            <option value="1">1 estrella</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-sm text-white/70 mb-1">Comentario</label>
+          <textarea name="body" required rows="3" class="w-full rounded-lg bg-black/30 border border-white/10 px-3 py-2 text-white" placeholder="Cuéntanos tu experiencia..."></textarea>
+        </div>
+        <button type="submit" class="px-4 py-2 rounded-xl bg-[#ffc800] text-[#0a0c10] font-semibold hover:bg-[#e6b300]">Enviar reseña</button>
+      </form>
+    </div>
+    {% elif user_review %}
+    <p class="text-white/60 mt-4">Ya enviaste una reseña. Está pendiente de moderación.</p>
+    {% else %}
+    <p class="text-white/60">{% if approved_reviews %}¿Compraste este producto? Inicia sesión para dejar tu reseña.{% else %}Sé el primero en opinar después de tu compra.{% endif %}</p>
+    {% endif %}
+  </section>
+
+  <!-- Relacionados -->
+  <section class="mt-8">
+    <h2 class="text-xl font-semibold mb-4">Productos relacionados</h2>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+      {% for p in related %}
+        <a href="{% url 'commerce:product' p.slug %}" class="rounded-2xl border border-white/10 bg-white/5 p-3 hover:bg-white/10 transition-colors">
+          <div class="aspect-[4/3] rounded-xl bg-black/30 mb-2 flex items-center justify-center overflow-hidden">
+            {% with img=p.primary_image %}
+              {% if img %}
+                <img src="{{ img.image.url }}" alt="{{ p.nombre }}" class="w-full h-full object-contain" loading="lazy">
+              {% else %}
+                <img src="{% static 'img/placeholder-product.svg' %}" alt="{{ p.nombre }}" class="w-2/3 h-2/3 object-contain opacity-60" loading="lazy">
+              {% endif %}
+            {% endwith %}
+          </div>
+          <div class="text-sm font-semibold line-clamp-2">{{ p.nombre }}</div>
+          <div class="text-[#ffc800] font-bold mt-1">$ {{ p.precio_venta|intcomma }} <span class="text-white/60 text-xs font-normal">IVA incluido</span></div>
+        </a>
+      {% empty %}
+        <p class="text-white/50 col-span-full">No hay productos relacionados.</p>
+      {% endfor %}
+    </div>
+  </section>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{% with first_img=product.images.first %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org/",
+  "@type": "Product",
+  "name": "{{ product.nombre|escapejs }}",
+  "sku": "{{ product.part_number|escapejs }}",
+  "category": "{{ product.category.name|default:'Repuestos de escape'|escapejs }}",
+  "mpn": "{{ product.part_number|escapejs }}",
+  {% if first_img and first_img.image %}"image": ["{{ request.scheme }}://{{ request.get_host }}{{ first_img.image.url }}"],{% endif %}
+  "description": "{% if product.meta_description %}{{ product.meta_description|escapejs }}{% elif product.descripcion_larga %}{{ product.descripcion_larga|striptags|truncatechars:155|escapejs }}{% else %}{{ product.nombre|escapejs }} - Repuesto de escape en Santiago. Exhibición y ventas en Diez de Julio 354 o despacho a todo Chile.{% endif %}",
+  "brand": {"@type": "Brand", "name": "MonteAzul"},
+  {% if review_stats.count > 0 %}
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ review_stats.avg }}",
+    "reviewCount": "{{ review_stats.count }}",
+    "bestRating": "5",
+    "worstRating": "1"
+  },
+  {% endif %}
+  "offers": {
+    "@type": "Offer",
+    "price": "{{ product.precio_venta|floatformat:0 }}",
+    "priceCurrency": "CLP",
+    "availability": "https://schema.org/{% if product.stock > 0 %}InStock{% else %}OutOfStock{% endif %}",
+    "url": "{{ request.build_absolute_uri }}"
+  }
+}
+</script>
+{% endwith %}
+<script>
+(function() {
+  var mainImg = document.getElementById('mainProductImage');
+  var thumbBtns = document.querySelectorAll('.thumbnail-btn');
+  if (mainImg && thumbBtns.length) {
+    thumbBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var src = btn.getAttribute('data-src');
+        if (src) mainImg.src = src;
+        thumbBtns.forEach(function(b) { b.classList.remove('border-[#00f0ff]'); b.classList.add('border-white/10'); });
+        btn.classList.add('border-[#00f0ff]'); btn.classList.remove('border-white/10');
+      });
+    });
+  }
+
+  var qi = document.getElementById('qty-input');
+  var qh = document.getElementById('qty-hidden');
+  var minus = document.getElementById('qty-minus');
+  var plus = document.getElementById('qty-plus');
+  if (qi && qh) {
+    function syncQty() { qh.value = Math.max(1, parseInt(qi.value || '1', 10)); qi.value = qh.value; }
+    if (minus) minus.addEventListener('click', function() { qi.value = Math.max(1, (parseInt(qi.value || '1', 10) - 1)); syncQty(); });
+    if (plus) plus.addEventListener('click', function() { var max = parseInt(qi.getAttribute('max'), 10) || 999; qi.value = Math.min(max, (parseInt(qi.value || '1', 10) + 1)); syncQty(); });
+    qi.addEventListener('input', function() { syncQty(); });
+  }
+
+  {% comment %}TODO EGARAGE: core:shipping_estimate no existe en Commerce{% endcomment %}
+
+  var compatSearch = document.getElementById('compat-search');
+  var compatRows = document.querySelectorAll('#compat-body tr.compat-row');
+  if (compatSearch && compatRows.length) {
+    compatSearch.addEventListener('input', function() {
+      var q = (this.value || '').toLowerCase().trim();
+      compatRows.forEach(function(tr) {
+        var text = (tr.textContent || '').toLowerCase();
+        tr.style.display = (!q || text.indexOf(q) !== -1) ? '' : 'none';
+      });
+    });
+  }
+})();
+</script>
+{% endblock %}
