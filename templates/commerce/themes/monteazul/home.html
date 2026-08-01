@@ -473,10 +473,10 @@
 
   <header class="header">
     <div class="header-inner">
-      <a class="logo-link" href="/">
-        <img src="/media/logomonteazul.png" alt="MonteAzul SPA">
+      <a class="logo-link" href="/" title="{{ brand.brand_name|default:'Monteazul SPA' }}">
+        <img src="/media/logomonteazul.png" alt="{{ brand.brand_name|default:'MonteAzul SPA' }}">
         <span>
-          <span class="logo-text">Monteazul SPA</span>
+          <span class="logo-text truncate">{{ brand.brand_name|default:"Monteazul SPA" }}</span>
           <div class="logo-sub">Ingeniería en escapes</div>
         </span>
       </a>

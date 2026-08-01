@@ -81,7 +81,7 @@ def checkout_view(request):
     else:
         form = CheckoutForm()
 
-    return render(request, "commerce/checkout.html", {
+    return render(request, "commerce/themes/monteazul/cart/checkout.html", {
         "brand": request.commerce_brand,
         "form": form,
         "items": item_list,

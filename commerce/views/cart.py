@@ -29,7 +29,7 @@ def cart_detail(request):
     cart = _get_cart(request)
     items = CartService.get_items(cart)
     total = CartService.total(cart)
-    return render(request, "commerce/cart.html", {
+    return render(request, "commerce/themes/monteazul/cart/view.html", {
         "brand": request.commerce_brand,
         "cart": cart,
         "items": items,

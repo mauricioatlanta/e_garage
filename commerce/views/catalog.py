@@ -13,10 +13,12 @@ def _gateway(request):
 
 def _base_ctx(request, gw):
     """Contexto mínimo presente en todas las páginas del storefront."""
+    root_cats = gw.get_categories()
     return {
         "empresa": getattr(request, "empresa", None) or getattr(request, "commerce_empresa", None),
         "brand": request.commerce_brand,
-        "categories": gw.get_categories(),
+        "categories": root_cats,
+        "root_categories": root_cats,
     }
 
 
@@ -24,7 +26,10 @@ def catalog_home(request):
     gw = _gateway(request)
     ctx = _base_ctx(request, gw)
     ctx["featured"] = gw.list_products(limit=8)
-    return render(request, "commerce/home.html", ctx)
+    brand = ctx.get("brand") or {}
+    ctx["title"] = brand.get("meta_title", "")
+    ctx["meta_description"] = brand.get("meta_description", "")
+    return render(request, "commerce/themes/monteazul/home.html", ctx)
 
 
 def category_detail(request, slug):
@@ -33,10 +38,13 @@ def category_detail(request, slug):
     ctx = _base_ctx(request, gw)
     ctx.update({
         "category": category,
+        "current_category": category,
         "subcategories": gw.get_categories(parent=category),
         "products": gw.list_products(category=category),
+        "q": request.GET.get("q", ""),
+        "is_cataliticos_subcat": False,
     })
-    return render(request, "commerce/category.html", ctx)
+    return render(request, "commerce/themes/monteazul/catalog/product_list.html", ctx)
 
 
 def product_detail(request, slug):
@@ -51,7 +59,7 @@ def product_detail(request, slug):
             if product.category else []
         ),
     })
-    return render(request, "commerce/product.html", ctx)
+    return render(request, "commerce/themes/monteazul/catalog/product_detail.html", ctx)
 
 
 def search_view(request):
@@ -59,7 +67,9 @@ def search_view(request):
     query = request.GET.get("q", "").strip()
     ctx = _base_ctx(request, gw)
     ctx.update({
-        "query": query,
-        "results": gw.search(query),
+        "q": query,
+        "products": gw.search(query),
+        "current_category": None,
+        "is_cataliticos_subcat": False,
     })
-    return render(request, "commerce/search.html", ctx)
+    return render(request, "commerce/themes/monteazul/catalog/product_list.html", ctx)
