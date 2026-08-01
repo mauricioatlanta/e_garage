@@ -264,13 +264,16 @@ Son estrictamente secuenciales: cada hito construye sobre el anterior.
 
 | Hito | Descripción | Tareas | Completadas | % |
 |------|-------------|--------|-------------|---|
-| H1.1 | Dominio de pagos — modelos + estados + tests | 4 | 0 | 0% |
+| H1.1 ✅ | Dominio de pagos — modelos + estados + tests | 4 | 4 | 100% |
 | H1.2 | PaymentGateway + implementaciones + sandbox | 5 | 0 | 0% |
 | H2 | CommercePaymentService + Outbox | 4 | 0 | 0% |
 | H3 | Payment views (start, return, cancel) | 4 | 0 | 0% |
 | H4 | CommercePaidConsumer (Runtime → ERP) | 5 | 0 | 0% |
 | H5 | Ops + email + smoke test | 4 | 0 | 0% |
-| **Total** | | **26** | **0** | **0%** |
+| **Total** | | **26** | **4** | **15%** |
+
+**H1.1 cerrado:** commit `81603ecc` — 2026-07-31  
+Nota técnica: Django 4.2 incluye `{}` en `empty_values`; `raw_response` y `metadata` requieren `blank=True` para permitir dicts vacíos en `full_clean()`. Migración 0006 es metadata-only (sin schema change).
 
 ---
 
