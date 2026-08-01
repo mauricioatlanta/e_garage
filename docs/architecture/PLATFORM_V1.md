@@ -8,6 +8,25 @@ Este documento no es una ADR. Es una foto del sistema en el momento en que eGara
 
 ---
 
+## Visión
+
+eGarage evoluciona como una plataforma de gestión para negocios automotrices.
+
+Los motores existentes deben permitir incorporar nuevos rubros sin reescribir el núcleo, habilitando únicamente nuevos módulos, adapters o configuraciones cuando sea necesario.
+
+---
+
+## Lo que NO es eGarage
+
+- No es un ERP para un rubro específico.
+- No es un e-commerce para una marca específica.
+- No es un conjunto de aplicaciones independientes.
+- No es un desarrollo a medida por cliente.
+
+eGarage es una plataforma multi-tenant compuesta por motores reutilizables que pueden combinarse según el tipo de suscriptor.
+
+---
+
 ## La plataforma
 
 ```
@@ -31,6 +50,20 @@ Este documento no es una ADR. Es una foto del sistema en el momento en que eGara
 ```
 
 El **tenant** no es un tipo de negocio — es un nivel de orquestación. Activa los motores que necesita, no los que le fueron hardcodeados.
+
+### Jerarquía de configuración del tenant
+
+```
+Platform
+  └── Tenant (Empresa)
+        └── Módulos habilitados (WORKSHOP / SALVAGE / PARTS)
+              └── Branding (logo, paleta, dominio)
+                    └── Storefront
+                          └── Dominio propio (opcional)
+                                └── Marketplace / Canales
+```
+
+Esto explica por qué MonteAzul no es un caso especial: es un tenant con el módulo PARTS habilitado, branding propio, storefront activo y dominio configurado. El segundo cliente de ese perfil activa exactamente los mismos niveles.
 
 ---
 
@@ -69,20 +102,32 @@ Lo que varía entre tenants va en `CommerceStorefrontSettings` o en variables de
 
 ---
 
+## Decisiones irreversibles
+
+Estas cinco decisiones no se revisan. Si una propuesta futura las contradice, la propuesta es la que debe cambiar.
+
+1. `Empresa` es el límite del tenant. Todo dato pertenece a una empresa o a ninguna.
+2. Commerce nunca consulta modelos del ERP directamente. La comunicación es solo vía contratos.
+3. Todo catálogo externo entra mediante adapters. No hay código de importación en el núcleo.
+4. El storefront nunca contiene lógica de negocio. Renderiza datos; no los calcula.
+5. Las configuraciones de tenant viven en datos, no en código.
+
+---
+
 ## Regla de priorización — Suscriptor First
 
 A partir de `commerce-engine-v1.0`, ninguna funcionalidad nueva entra al proyecto si no responde afirmativamente a esta pregunta:
 
 > **¿El suscriptor puede hacer su trabajo más rápido, con menos errores o con menos complejidad gracias a este cambio?**
 
-Las mejoras técnicas que no habilitan una capacidad planificada concreta no tienen prioridad. La arquitectura interna ya alcanzó suficiencia para soportar el crecimiento planificado.
+Las mejoras técnicas que no habilitan una capacidad planificada concreta no tienen prioridad. La arquitectura actual se considera suficientemente estable para priorizar mejoras visibles para el suscriptor.
 
 ---
 
 ## Qué pertenece al núcleo vs. qué va en adapters o módulos
 
 **Núcleo (cambia con precaución, afecta a todos los tenants):**
-- Modelo `Empresa` y su cycle de vida
+- Modelo `Empresa` y su ciclo de vida
 - Sistema de documentos (Cotización, OT, Boleta)
 - Motor de impuestos (`taller/impuestos/engine.py`)
 - Sistema de suscripción y planes
@@ -106,7 +151,7 @@ Las mejoras técnicas que no habilitan una capacidad planificada concreta no tie
 
 | Fase | Foco | Criterio de entrada |
 |---|---|---|
-| **7 — Commerce UX** | Editor de categorías, productos, imágenes, SEO, CMS | El administrador del suscriptor opera el catálogo sin fricción |
+| **7 — Suscriptor Experience** | Editor de categorías, productos, imágenes, SEO, CMS; mejoras de UX en ERP y workspace | El suscriptor hace su trabajo con menos clics, menos tiempo, menos errores |
 | **8 — Commerce Business** | Pedidos, clientes, promociones, cupones, reportes | El suscriptor puede vender y medir |
 | **9 — Integración ERP** | ERP → Commerce → Marketplace → Canales | MonteAzul pasa a ser un canal, no un caso especial |
 
