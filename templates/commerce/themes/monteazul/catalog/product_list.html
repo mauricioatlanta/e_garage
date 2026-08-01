@@ -1040,7 +1040,7 @@
                 var p = products[i];
                 var catDisplay = p.category_parent ? escapeHtml(p.category_parent) + ' › ' : '';
                 catDisplay += escapeHtml(p.category_name);
-                var placeholderUrl = '{% static "img/placeholder-product.svg" %}';
+                var placeholderUrl = '{% static "commerce/themes/monteazul/img/placeholder-product.svg" %}';
                 var imgHtml = p.image_url
                     ? '<img src="' + escapeHtml(p.image_url) + '" alt="' + escapeHtml(p.name) + '" loading="lazy">'
                     : '<img src="' + escapeHtml(placeholderUrl) + '" alt="' + escapeHtml(p.name) + '">';

@@ -6,7 +6,7 @@
 <header class="header-space-overlay backdrop-blur-xl bg-[#0a0c10]/80 border-b border-white/10">
   <div class="max-w-6xl mx-auto px-4 sm:px-6 flex flex-wrap items-center justify-between gap-3 py-3 sm:py-4">
     <a href="{% url 'commerce:home' %}" class="flex items-center gap-3 text-white font-extrabold tracking-wide hover:text-[#00f0ff] transition-colors group" aria-label="Monteazul SPA - Inicio">
-      <img src="/media/logomonteazul.png" alt="MonteAzul SPA" class="h-12 sm:h-14 w-auto object-contain block" width="auto" height="56">
+      <img src="{{ brand.logo_url }}" alt="MonteAzul SPA" class="h-12 sm:h-14 w-auto object-contain block" width="auto" height="56">
       <span class="flex flex-col items-start">
         <span class="text-lg sm:text-xl">Monteazul SPA</span>
         <span class="text-xs font-semibold text-white/60 group-hover:text-[#00f0ff]/80">Ingeniería en escapes</span>

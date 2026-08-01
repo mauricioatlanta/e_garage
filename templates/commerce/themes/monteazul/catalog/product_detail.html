@@ -78,7 +78,7 @@
           {% if first_img.image %}
             <img src="{{ first_img.image.url }}" id="mainProductImage" class="w-full h-full object-contain" alt="{{ product.nombre }}" loading="lazy" width="600" height="600">
           {% else %}
-            <img src="{% static 'img/placeholder-product.svg' %}" id="mainProductImage" class="w-3/4 h-3/4 object-contain opacity-60" alt="{{ product.nombre }}" loading="lazy" width="400" height="400">
+            <img src="{% static 'commerce/themes/monteazul/img/placeholder-product.svg' %}" id="mainProductImage" class="w-3/4 h-3/4 object-contain opacity-60" alt="{{ product.nombre }}" loading="lazy" width="400" height="400">
           {% endif %}
         {% endwith %}
       </div>
@@ -685,7 +685,7 @@ Por plataforma Delta II y motorización compartida con General Motors, este cata
               {% if img %}
                 <img src="{{ img.image.url }}" alt="{{ p.nombre }}" class="w-full h-full object-contain" loading="lazy">
               {% else %}
-                <img src="{% static 'img/placeholder-product.svg' %}" alt="{{ p.nombre }}" class="w-2/3 h-2/3 object-contain opacity-60" loading="lazy">
+                <img src="{% static 'commerce/themes/monteazul/img/placeholder-product.svg' %}" alt="{{ p.nombre }}" class="w-2/3 h-2/3 object-contain opacity-60" loading="lazy">
               {% endif %}
             {% endwith %}
           </div>
