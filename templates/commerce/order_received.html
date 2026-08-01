@@ -1,0 +1,96 @@
+{% extends "commerce/base.html" %}
+
+{% block title %}Pedido recibido — {{ brand.brand_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+
+  <!-- Ícono de confirmación -->
+  <div class="inline-flex items-center justify-center w-20 h-20 rounded-full mb-6"
+       style="background-color: color-mix(in srgb, var(--color-primary) 12%, transparent);">
+    <svg class="w-10 h-10" style="color: var(--color-primary);" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+    </svg>
+  </div>
+
+  <h1 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">¡Pedido recibido!</h1>
+  <p class="text-gray-500 mb-1">Gracias, <strong class="text-gray-700">{{ order.customer_name }}</strong>.</p>
+  <p class="text-gray-500 mb-8">
+    Te contactaremos a <strong class="text-gray-700">{{ order.customer_email }}</strong>
+    para coordinar el despacho.
+  </p>
+
+  <!-- Número de pedido -->
+  <div class="inline-block bg-gray-100 rounded-xl px-6 py-3 mb-10">
+    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Número de pedido</p>
+    <p class="text-lg font-bold text-gray-900 font-mono">{{ order.order_number }}</p>
+  </div>
+
+  <!-- Detalle de ítems -->
+  <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden mb-8 text-left shadow-sm">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="text-left px-5 py-3 text-gray-600 font-medium">Producto</th>
+          <th class="text-center px-4 py-3 text-gray-600 font-medium">Cant.</th>
+          <th class="text-right px-5 py-3 text-gray-600 font-medium">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        {% for item in order.items.all %}
+        <tr>
+          <td class="px-5 py-3 text-gray-900">
+            {{ item.name }}
+            {% if item.sku %}
+            <span class="text-xs text-gray-400 ml-1">· {{ item.sku }}</span>
+            {% endif %}
+          </td>
+          <td class="px-4 py-3 text-center text-gray-600">{{ item.quantity }}</td>
+          <td class="px-5 py-3 text-right font-medium text-gray-900">
+            ${{ item.subtotal|floatformat:0 }}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+      <tfoot class="border-t-2 border-gray-200 bg-gray-50">
+        <tr>
+          <td colspan="2" class="px-5 py-4 font-semibold text-gray-900">Total</td>
+          <td class="px-5 py-4 text-right text-lg font-bold text-gray-900">
+            ${{ order.total|floatformat:0 }}
+          </td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  {% if brand.whatsapp.url %}
+  <p class="text-sm text-gray-500 mb-4">¿Tienes dudas sobre tu pedido?</p>
+  <a href="{{ brand.whatsapp.url }}?text=Hola,%20hice%20el%20pedido%20{{ order.order_number }}%20y%20quiero%20consultar."
+     target="_blank" rel="noopener"
+     class="inline-flex items-center gap-2 bg-green-500 hover:bg-green-600 text-white
+            px-6 py-3 rounded-xl font-medium text-sm transition-colors mb-8">
+    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94
+               1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059
+               -.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371
+               -.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01
+               -.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198
+               2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719
+               2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.123.553 4.116 1.522 5.847L.057 23.882a.5.5 0 00.611.611l6.108-1.492
+               A11.937 11.937 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.947 0-3.76-.498-5.337-1.371
+               l-.382-.22-3.962.968.99-3.875-.242-.396A9.956 9.956 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10
+               -4.477 10-10 10z"/>
+    </svg>
+    Consultar por WhatsApp
+  </a>
+  {% endif %}
+
+  <div>
+    <a href="{% url 'commerce:home' %}" class="text-sm text-gray-500 hover:text-brand">
+      ← Volver al catálogo
+    </a>
+  </div>
+
+</div>
+{% endblock %}

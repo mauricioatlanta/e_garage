@@ -31,3 +31,20 @@ from .dev import *
 # Configuración específica para tu entorno local
 # TIME_ZONE = "America/Santiago"
 # LANGUAGE_CODE = "es"
+
+# Usar la misma BD que pytest (tiene los datos reales de desarrollo)
+DATABASES = {
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": "/home/mauricio/.egarage/db.sqlite3",
+    }
+}
+
+# Commerce Engine — tenant map para desarrollo local
+# Empresa 2 sirve el catálogo en localhost y monteazul.local
+COMMERCE_TENANT_MAP = {
+    "localhost": 2,
+    "127.0.0.1": 2,
+    "monteazul.local": 2,
+}
+ALLOWED_HOSTS = ["*"]
