@@ -46,7 +46,10 @@ INSTALLED_APPS = [
     "rest_framework",
     "ubicacion.apps.UbicacionConfig",
     "marketplace.apps.MarketplaceConfig",
+    "commerce.apps.CommerceConfig",
 ]
+
+COMMERCE_TENANT_MAP: dict = {}
 
 if importlib.util.find_spec("anymail") is not None:
     INSTALLED_APPS.insert(0, "anymail")
@@ -67,6 +70,8 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     # 6. Autenticación
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Commerce Engine — resuelve tenant desde hostname antes de las vistas
+    "commerce.middleware.CommerceTenantMiddleware",
     # 7. Mensajes (después de autenticación)
     "django.contrib.messages.middleware.MessageMiddleware",
     # 8. Clickjacking (después de mensajes)

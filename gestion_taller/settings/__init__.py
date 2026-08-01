@@ -9,8 +9,15 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes','django.contrib.sessions','django.contrib.messages',
     'django.contrib.staticfiles','django.contrib.humanize','django.contrib.sites','allauth','allauth.account',
     'allauth.socialaccount','gestion_taller','taller','marketplace','ubicacion',
-    'widget_tweaks'
+    'widget_tweaks',
+    'commerce',
 ]
+
+# Commerce Engine — mapa hostname → empresa_id
+# Añadir entradas en settings.local.py o .env para desarrollo/producción
+COMMERCE_TENANT_MAP: dict = {
+    # "monteazul.local": 1,  # Ejemplo: descomentar con el empresa_id real
+}
 SITE_ID = 1
 LANGUAGE_CODE = 'es'
 LOCALE_PATHS = [BASE_DIR / 'locale']
@@ -19,6 +26,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware','django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.locale.LocaleMiddleware','django.middleware.common.CommonMiddleware','django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'commerce.middleware.CommerceTenantMiddleware',
     'taller.middleware.host_tenant.HostTenantMiddleware',
     'taller.middleware.empresa_resolver.EmpresaResolverMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',

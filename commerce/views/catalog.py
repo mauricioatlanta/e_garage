@@ -11,42 +11,51 @@ def _gateway(request):
     return CommerceCatalogGateway(empresa)
 
 
+def _base_ctx(request, gw):
+    """Contexto mínimo presente en todas las páginas del storefront."""
+    return {
+        "empresa": request.commerce_empresa,
+        "categories": gw.get_categories(),
+    }
+
+
 def catalog_home(request):
     gw = _gateway(request)
-    return render(request, "commerce/home.html", {
-        "categories": gw.get_categories(),
-        "featured": gw.list_products(limit=8),
-        "empresa": request.commerce_empresa,
-    })
+    ctx = _base_ctx(request, gw)
+    ctx["featured"] = gw.list_products(limit=8)
+    return render(request, "commerce/home.html", ctx)
 
 
 def category_detail(request, slug):
     gw = _gateway(request)
     category = gw.get_category(slug)
-    return render(request, "commerce/category.html", {
+    ctx = _base_ctx(request, gw)
+    ctx.update({
         "category": category,
         "subcategories": gw.get_categories(parent=category),
         "products": gw.list_products(category=category),
-        "empresa": request.commerce_empresa,
     })
+    return render(request, "commerce/category.html", ctx)
 
 
 def product_detail(request, slug):
     gw = _gateway(request)
     product = gw.get_product(slug)
-    return render(request, "commerce/product.html", {
+    ctx = _base_ctx(request, gw)
+    ctx.update({
         "product": product,
         "images": product.images.all(),
-        "related": gw.list_products(category=product.category, limit=4) if product.category else [],
-        "empresa": request.commerce_empresa,
+        "related": gw.list_products(category=product.category, limit=4, exclude_product=product) if product.category else [],
     })
+    return render(request, "commerce/product.html", ctx)
 
 
 def search_view(request):
     gw = _gateway(request)
     query = request.GET.get("q", "").strip()
-    return render(request, "commerce/search.html", {
+    ctx = _base_ctx(request, gw)
+    ctx.update({
         "query": query,
         "results": gw.search(query),
-        "empresa": request.commerce_empresa,
     })
+    return render(request, "commerce/search.html", ctx)

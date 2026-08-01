@@ -6,6 +6,11 @@
   <title>{% block title %}{{ empresa.nombre }}{% endblock %}</title>
   {% block meta %}{% endblock %}
   <link rel="stylesheet" href="/static/css/output.css">
+  <style>
+    /* Ocultar scrollbar en nav de categorías manteniendo el scroll funcional */
+    .nav-cats::-webkit-scrollbar { display: none; }
+    .nav-cats { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
 </head>
 <body class="h-full bg-white text-gray-900 flex flex-col">
 
@@ -14,8 +19,11 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16 gap-4">
 
-        <!-- Logo / nombre -->
-        <a href="{% url 'commerce:home' %}" class="flex-shrink-0 font-bold text-xl tracking-tight text-gray-900">
+        <!-- Logo / nombre — max-width para no empujar el buscador en nombres largos -->
+        <a href="{% url 'commerce:home' %}"
+           class="flex-shrink-0 font-bold text-lg sm:text-xl tracking-tight text-gray-900
+                  max-w-[140px] sm:max-w-xs lg:max-w-sm truncate"
+           title="{{ empresa.nombre }}">
           {{ empresa.nombre }}
         </a>
 
@@ -39,16 +47,23 @@
 
       </div>
 
-      <!-- Navegación de categorías -->
+      <!-- Navegación de categorías
+           Desktop: horizontal sin desborde.
+           Móvil: scroll horizontal, sin scrollbar visible, con fade-out lateral. -->
       {% if categories %}
-      <nav class="flex gap-6 pb-2 overflow-x-auto text-sm">
-        {% for cat in categories %}
-        <a href="{% url 'commerce:category' cat.slug %}"
-           class="whitespace-nowrap text-gray-600 hover:text-blue-600 font-medium py-1 border-b-2 border-transparent hover:border-blue-600 transition-colors">
-          {{ cat.name }}
-        </a>
-        {% endfor %}
-      </nav>
+      <div class="relative">
+        <!-- Gradiente derecho para indicar que hay más contenido en móvil -->
+        <div class="pointer-events-none absolute inset-y-0 right-0 w-8 bg-gradient-to-l from-white to-transparent sm:hidden"></div>
+        <nav class="nav-cats flex gap-6 pb-2 overflow-x-auto text-sm">
+          {% for cat in categories %}
+          <a href="{% url 'commerce:category' cat.slug %}"
+             class="whitespace-nowrap text-gray-600 hover:text-blue-600 font-medium py-1
+                    border-b-2 border-transparent hover:border-blue-600 transition-colors flex-shrink-0">
+            {{ cat.name }}
+          </a>
+          {% endfor %}
+        </nav>
+      </div>
       {% endif %}
     </div>
   </header>

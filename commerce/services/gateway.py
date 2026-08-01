@@ -46,7 +46,7 @@ class CommerceCatalogGateway:
             is_publishable=True,
         )
 
-    def list_products(self, category=None, limit=None):
+    def list_products(self, category=None, limit=None, exclude_product=None):
         """Lista productos publicables del tenant, opcionalmente filtrados por categoría."""
         qs = (
             CommerceProduct.objects.filter(empresa=self._empresa, is_publishable=True)
@@ -57,6 +57,8 @@ class CommerceCatalogGateway:
         if category is not None:
             category_ids = self._category_tree_ids(category)
             qs = qs.filter(category_id__in=category_ids)
+        if exclude_product is not None:
+            qs = qs.exclude(pk=exclude_product.pk)
         if limit:
             qs = qs[:limit]
         return qs
