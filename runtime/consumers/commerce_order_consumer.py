@@ -157,7 +157,10 @@ class CommerceOrderConsumer:
         doc.save(update_fields=["numero"])
 
     def _create_lineas(self, doc, items: list) -> None:
-        from taller.models.lineas_documento import LineaRepuesto, ORIGEN_EXTERNO
+        from taller.models.lineas_documento import (
+            LineaRepuesto, ORIGEN_EXTERNO, ORIGEN_STOCK_BODEGA
+        )
+        from taller.models.repuesto import Repuesto
 
         for item in items:
             try:
@@ -173,13 +176,27 @@ class CommerceOrderConsumer:
             codigo = (item.get("sku") or f"COM-{item_id}")[:100]
             nombre = (item.get("name") or f"Producto {item_id}")[:255]
 
+            repuesto_id = item.get("repuesto_id")
+            repuesto = None
+            origen = ORIGEN_EXTERNO
+            if repuesto_id:
+                try:
+                    repuesto = Repuesto.objects.get(pk=repuesto_id, empresa_id=doc.empresa_id)
+                    origen = ORIGEN_STOCK_BODEGA
+                except Repuesto.DoesNotExist:
+                    logger.warning(
+                        "Repuesto pk=%s no encontrado para empresa %s — usando ORIGEN_EXTERNO.",
+                        repuesto_id, doc.empresa_id,
+                    )
+
             linea = LineaRepuesto(
                 documento=doc,
                 codigo=codigo,
                 nombre=nombre,
                 cantidad=cantidad,
                 precio_unitario=precio,
-                origen_repuesto=ORIGEN_EXTERNO,
+                origen_repuesto=origen,
+                repuesto=repuesto,
             )
             linea.save()
 

@@ -1,0 +1,39 @@
+{% extends "commerce/base.html" %}
+
+{% block title %}Pago cancelado — {{ brand.brand_name }}{% endblock %}
+
+{% block content %}
+<div class="max-w-lg mx-auto px-4 sm:px-6 py-20 text-center">
+
+  <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 mb-6">
+    <svg class="w-8 h-8 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732
+               4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+    </svg>
+  </div>
+
+  <h1 class="text-2xl font-bold text-gray-900 mb-3">Pago cancelado</h1>
+  <p class="text-gray-500 mb-8">
+    El proceso de pago fue cancelado o interrumpido. Tu pedido sigue reservado —
+    puedes volver a intentarlo cuando quieras.
+  </p>
+
+  <div class="flex flex-col sm:flex-row gap-3 justify-center">
+    {% if order %}
+    <a href="{% url 'commerce:order_received' order.order_number %}"
+       class="btn-primary inline-flex items-center justify-center gap-2 px-6 py-3
+              rounded-xl font-medium text-sm">
+      Volver a intentar
+    </a>
+    {% endif %}
+    <a href="{% url 'commerce:home' %}"
+       class="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-xl
+              font-medium text-sm border border-gray-300 text-gray-700
+              hover:bg-gray-50 transition-colors">
+      Volver al catálogo
+    </a>
+  </div>
+
+</div>
+{% endblock %}

@@ -31,12 +31,13 @@ def _build_outbox_payload(order: CommerceOrder, items: list) -> dict:
         "items": [
             {
                 "commerce_order_item_id": item.pk,
-                "product_reference": item.product.slug if item.product else "",
+                "product_reference": item.product.slug if item.product_id else "",
                 "sku": item.sku,
                 "name": item.name,
                 "quantity": item.quantity,
                 "unit_price": str(item.unit_price),
                 "line_total": str(item.subtotal),
+                "repuesto_id": item.product.repuesto_id if item.product_id else None,
             }
             for item in items
         ],

@@ -30,6 +30,7 @@ logger = logging.getLogger(__name__)
 # Mapa event_type → import path del consumer
 _CONSUMER_REGISTRY: dict[str, str] = {
     "commerce.order.submitted": "runtime.consumers.commerce_order_consumer.CommerceOrderConsumer",
+    "commerce.order.paid": "runtime.consumers.commerce_paid_consumer.CommercePaidConsumer",
 }
 
 MAX_ATTEMPTS = 3

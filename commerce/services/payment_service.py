@@ -158,6 +158,7 @@ def _apply_success(
             "currency": "CLP",
             "card_last4": confirmation.card_last4,
             "paid_at": now.isoformat(),
+            "items": _collect_item_snapshots(order),
         },
     )
 
@@ -190,6 +191,20 @@ def _apply_failure(
             "error_message": error_msg,
         },
     )
+
+
+def _collect_item_snapshots(order: CommerceOrder) -> list:
+    return [
+        {
+            "commerce_order_item_id": item.pk,
+            "sku": item.sku,
+            "name": item.name,
+            "quantity": item.quantity,
+            "unit_price": str(item.unit_price),
+            "repuesto_id": item.product.repuesto_id if item.product_id else None,
+        }
+        for item in order.items.all()
+    ]
 
 
 def _enqueue_event(event_type: str, order: CommerceOrder, extra: dict) -> None:

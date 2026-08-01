@@ -1,6 +1,6 @@
 from django.urls import path
 
-from commerce.views import cart, catalog, checkout, pages
+from commerce.views import cart, catalog, checkout, pages, payment
 
 app_name = "commerce"
 
@@ -19,4 +19,8 @@ urlpatterns = [
     # Checkout
     path("checkout/", checkout.checkout_view, name="checkout"),
     path("pedido/<str:order_number>/", checkout.order_received, name="order_received"),
+    # Pagos
+    path("pedido/<str:order_number>/pago/iniciar/", payment.payment_start, name="payment_start"),
+    path("pago/retorno/", payment.payment_return, name="payment_return"),
+    path("pedido/<str:order_number>/pago/cancelado/", payment.payment_cancel, name="payment_cancel"),
 ]

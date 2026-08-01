@@ -147,7 +147,7 @@ def test_webpay_initiate_returns_payment_initiation():
 
     assert isinstance(result, PaymentInitiation)
     assert result.gateway_token == "MYTOKEN"
-    assert "MYTOKEN" in result.redirect_url
+    assert result.redirect_url == "https://tbk.cl/init"
     assert result.expires_at is not None
 
 

@@ -115,6 +115,11 @@
             "type": "string",
             "pattern": "^\\d+(\\.\\d{1,2})?$",
             "description": "Total de la línea = unit_price × quantity."
+          },
+          "repuesto_id": {
+            "type": ["integer", "null"],
+            "minimum": 1,
+            "description": "PK del Repuesto ERP vinculado al producto. Null si el producto no tiene Repuesto."
           }
         },
         "additionalProperties": false

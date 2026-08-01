@@ -55,7 +55,7 @@ class WebPayGateway(PaymentGateway, key="webpay"):
             return_url=return_url,
         )
         return PaymentInitiation(
-            redirect_url=f"{r.url}?token_ws={r.token}",
+            redirect_url=r.url,
             gateway_token=r.token,
             expires_at=datetime.now(tz=timezone.utc) + timedelta(minutes=5),
         )
