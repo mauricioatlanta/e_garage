@@ -2,6 +2,13 @@ from django.db import models
 
 from core.models import TenantScoped
 
+FONT_CHOICES = [
+    ("system-ui", "Sistema (sin descarga)"),
+    ("Inter", "Inter"),
+    ("Outfit", "Outfit"),
+    ("Roboto", "Roboto"),
+]
+
 
 class CommerceStorefrontSettings(TenantScoped):
     """
@@ -14,8 +21,15 @@ class CommerceStorefrontSettings(TenantScoped):
 
     schema_version = models.PositiveSmallIntegerField(default=1)
 
+    # Media
+    logo = models.ImageField(upload_to="commerce/logos/", null=True, blank=True)
+    favicon = models.ImageField(upload_to="commerce/favicons/", null=True, blank=True)
+
     # Branding
     tagline = models.CharField(max_length=200, blank=True)
+    font_primary = models.CharField(
+        max_length=20, choices=FONT_CHOICES, default="system-ui"
+    )
     primary_color = models.CharField(
         max_length=7, default="#3B82F6", help_text="Hex: #RRGGBB"
     )

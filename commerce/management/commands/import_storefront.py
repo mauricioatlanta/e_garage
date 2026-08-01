@@ -26,14 +26,16 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("--adapter", required=True, help="Nombre del adaptador (ej: monteazul)")
         parser.add_argument("--empresa", type=int, required=True, help="ID de la Empresa destino")
-        parser.add_argument("--source", default=None, help="Ruta al archivo de datos (JSON)")
-        parser.add_argument("--dry-run", action="store_true", help="Solo muestra; no guarda")
+        parser.add_argument("--source", default=None, help="Ruta al directorio fuente del proyecto")
+        parser.add_argument("--dry-run", action="store_true", help="Solo muestra; no guarda ni copia archivos")
+        parser.add_argument("--overwrite", action="store_true", help="Reemplaza datos existentes (sin esto, conserva cambios manuales)")
 
     def handle(self, *args, **options):
         adapter_name = options["adapter"]
         empresa_id = options["empresa"]
         source = options["source"]
         dry_run = options["dry_run"]
+        overwrite = options["overwrite"]
 
         from taller.models import Empresa
         try:
@@ -59,7 +61,7 @@ class Command(BaseCommand):
         self.stdout.write(f"\n{prefix}Importando storefront para: {empresa.nombre}\n")
         self.stdout.write(f"Adaptador: {adapter_name}\n")
 
-        importer = Importer(empresa, source=source, dry_run=dry_run)
+        importer = Importer(empresa, source=source, dry_run=dry_run, overwrite=overwrite)
         try:
             result = importer.run()
         except FileNotFoundError as exc:

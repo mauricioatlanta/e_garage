@@ -1,7 +1,7 @@
 {% extends "commerce/base.html" %}
 {% load humanize %}
 
-{% block title %}{{ product.nombre }} — {{ empresa.nombre }}{% endblock %}
+{% block title %}{{ product.nombre }} — {{ brand.brand_name }}{% endblock %}
 
 {% block meta %}
 <meta name="description" content="{{ product.meta_description|default:product.descripcion_larga|truncatechars:160 }}">

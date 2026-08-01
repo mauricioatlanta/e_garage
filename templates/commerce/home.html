@@ -1,25 +1,30 @@
 {% extends "commerce/base.html" %}
 {% load humanize %}
 
-{% block title %}{{ empresa.nombre }} — Catálogo{% endblock %}
+{% block title %}{{ brand.meta_title }} — Catálogo{% endblock %}
 
 {% block content %}
 
 <!-- Hero -->
 <section class="bg-gray-900 text-white py-16">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-    <h1 class="text-3xl sm:text-4xl font-bold mb-4">{{ empresa.nombre }}</h1>
-    <p class="text-gray-300 text-lg mb-8">Repuestos de calidad para tu vehículo</p>
+    {% if brand.logo_url %}
+    <img src="{{ brand.logo_url }}" alt="{{ brand.brand_name }}" class="h-16 mx-auto mb-6">
+    {% else %}
+    <h1 class="text-3xl sm:text-4xl font-bold mb-4">{{ brand.brand_name }}</h1>
+    {% endif %}
+    <p class="text-gray-300 text-lg mb-8">
+      {% if brand.tagline %}{{ brand.tagline }}{% else %}Repuestos de calidad para tu vehículo{% endif %}
+    </p>
     <form action="{% url 'commerce:search' %}" method="get" class="max-w-xl mx-auto">
       <div class="flex gap-2">
         <input
           type="search"
           name="q"
           placeholder="Número de parte, SKU, nombre..."
-          class="flex-1 rounded-lg border-0 py-3 px-4 text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-blue-500"
+          class="flex-1 rounded-lg border-0 py-3 px-4 text-gray-900 placeholder-gray-400 focus:ring-2"
         >
-        <button type="submit"
-          class="rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white hover:bg-blue-700 transition-colors">
+        <button type="submit" class="btn-primary rounded-lg px-6 py-3 font-semibold transition-colors">
           Buscar
         </button>
       </div>
@@ -34,7 +39,8 @@
   <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
     {% for cat in categories %}
     <a href="{% url 'commerce:category' cat.slug %}"
-       class="group flex flex-col items-center gap-3 rounded-xl border border-gray-200 p-5 hover:border-blue-500 hover:shadow-md transition-all text-center">
+       class="group flex flex-col items-center gap-3 rounded-xl border border-gray-200 p-5 hover:shadow-md transition-all text-center"
+       style="--hover-border: var(--color-primary)">
       {% if cat.image %}
       <img src="{{ cat.image.url }}" alt="{{ cat.name }}" class="h-16 w-16 object-contain">
       {% else %}
@@ -44,7 +50,7 @@
         </svg>
       </div>
       {% endif %}
-      <span class="text-sm font-semibold text-gray-800 group-hover:text-blue-600">{{ cat.name }}</span>
+      <span class="text-sm font-semibold text-gray-800 group-hover:text-brand">{{ cat.name }}</span>
     </a>
     {% endfor %}
   </div>

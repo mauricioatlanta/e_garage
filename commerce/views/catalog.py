@@ -15,6 +15,7 @@ def _base_ctx(request, gw):
     """Contexto mínimo presente en todas las páginas del storefront."""
     return {
         "empresa": request.commerce_empresa,
+        "brand": request.commerce_brand,
         "categories": gw.get_categories(),
     }
 
@@ -45,7 +46,10 @@ def product_detail(request, slug):
     ctx.update({
         "product": product,
         "images": product.images.all(),
-        "related": gw.list_products(category=product.category, limit=4, exclude_product=product) if product.category else [],
+        "related": (
+            gw.list_products(category=product.category, limit=4, exclude_product=product)
+            if product.category else []
+        ),
     })
     return render(request, "commerce/product.html", ctx)
 
