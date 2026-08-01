@@ -6,7 +6,7 @@ from commerce.services.gateway import CommerceCatalogGateway
 
 
 def _require_empresa(request):
-    empresa = getattr(request, "commerce_empresa", None)
+    empresa = getattr(request, "empresa", None) or getattr(request, "commerce_empresa", None)
     if not empresa:
         raise Http404
     return empresa

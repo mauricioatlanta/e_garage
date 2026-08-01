@@ -5,7 +5,7 @@ from commerce.services.gateway import CommerceCatalogGateway
 
 
 def _gateway(request):
-    empresa = getattr(request, "commerce_empresa", None)
+    empresa = getattr(request, "empresa", None) or getattr(request, "commerce_empresa", None)
     if not empresa:
         raise Http404
     return CommerceCatalogGateway(empresa)
@@ -14,7 +14,7 @@ def _gateway(request):
 def _base_ctx(request, gw):
     """Contexto mínimo presente en todas las páginas del storefront."""
     return {
-        "empresa": request.commerce_empresa,
+        "empresa": getattr(request, "empresa", None) or getattr(request, "commerce_empresa", None),
         "brand": request.commerce_brand,
         "categories": gw.get_categories(),
     }

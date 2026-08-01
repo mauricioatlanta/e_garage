@@ -1,21 +1,15 @@
 """
 CommerceTenantMiddleware
 
-Resuelve el tenant Commerce (Empresa) a partir del hostname del request.
-Setea request.commerce_empresa y request.commerce_brand en cada petición.
+Corre después de HostTenantMiddleware. Fuente de verdad del tenant Commerce:
+  1. request.empresa  — resuelto por HostTenantMiddleware desde EmpresaDominio.
+  2. COMMERCE_TENANT_MAP — fallback para entornos de desarrollo / migración.
 
-Configuración en settings (ejemplo):
-    COMMERCE_TENANT_MAP = {
-        "monteazul.local": 2,   # empresa_id
-        "monteazul.cl": 2,
-    }
+Siempre setea request.commerce_empresa (alias para compatibilidad con código
+legado) y request.commerce_brand.
 
-En producción, Nginx puede rutear monteazul.cl al mismo Django.
-El middleware resuelve el tenant y Commerce sirve el catálogo correcto.
-
-commerce_brand solo se resuelve cuando existe un tenant activo, de modo
-que las URLs del ERP (donde COMMERCE_TENANT_MAP no coincide) no pagan
-el costo de las consultas adicionales.
+Una vez que todos los tenants tengan un EmpresaDominio activo, este middleware
+puede eliminarse: basta con que las vistas lean request.empresa directamente.
 """
 from django.conf import settings
 
@@ -26,8 +20,8 @@ class CommerceTenantMiddleware:
         self._get_response = get_response
 
     def __call__(self, request):
-        empresa = self._resolve_tenant(request)
-        request.commerce_empresa = empresa
+        empresa = getattr(request, "empresa", None) or self._resolve_from_map(request)
+        request.commerce_empresa = empresa  # alias de compatibilidad
         if empresa is not None:
             from commerce.services.storefront_service import CommerceStorefrontService
             request.commerce_brand = CommerceStorefrontService.resolve(empresa)
@@ -36,7 +30,7 @@ class CommerceTenantMiddleware:
         return self._get_response(request)
 
     @staticmethod
-    def _resolve_tenant(request):
+    def _resolve_from_map(request):
         tenant_map = getattr(settings, "COMMERCE_TENANT_MAP", {})
         if not tenant_map:
             return None

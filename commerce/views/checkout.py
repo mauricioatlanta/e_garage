@@ -38,7 +38,7 @@ class CheckoutForm(forms.Form):
 
 
 def _get_empresa_or_404(request):
-    empresa = getattr(request, "commerce_empresa", None)
+    empresa = getattr(request, "empresa", None) or getattr(request, "commerce_empresa", None)
     if not empresa:
         raise Http404
     return empresa
