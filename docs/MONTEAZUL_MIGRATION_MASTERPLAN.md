@@ -1,8 +1,8 @@
 # MonteAzul Migration Masterplan
 
-**Versión:** 1.1  
+**Versión:** 1.2  
 **Fecha:** 2026-07-31  
-**Revisado:** 2026-07-31 — filosofía eventos-only, PaymentAttempt, split H1.1/H1.2  
+**Revisado:** 2026-08-01 — H1.2 cerrado: PaymentGateway + WebPayGateway + BankTransferGateway sandbox  
 **Estado:** ACTIVO — rama `feature/commerce-payments`  
 **Dueño:** Mauricio Alvarado
 
@@ -166,7 +166,7 @@ Componentes:
 ### Pre-producción
 - [ ] H1.1 — `CommerceOrder` campos de pago — migración 0005 aplicada en clon
 - [ ] H1.1 — `CommercePaymentTransaction` + `PaymentAttempt` con admin y tests
-- [ ] H1.2 — `PaymentGateway` protocol + `WebPayGateway` + `BankTransferGateway` — tests con mocks
+- [x] H1.2 — `PaymentGateway` protocol + `WebPayGateway` + `BankTransferGateway` — tests con mocks
 - [ ] H1.2 — Variables de entorno documentadas: `TBK_ENV`, `TBK_COMMERCE_CODE`, `TBK_API_KEY`, `TBK_RETURN_URL`
 - [ ] H1.2 — Test de integración contra sandbox TBK (manual, no CI)
 - [ ] H2 — `CommercePaymentService.initiate()` y `.confirm()` — emite `commerce.order.paid` via Outbox
@@ -180,7 +180,7 @@ Componentes:
 - [ ] H5 — Panel ops: pedidos visibles, estado actualizable
 
 ### Infraestructura
-- [ ] `transbank` SDK instalado en requirements.txt
+- [x] `transbank-sdk>=4.0` instalado en requirements.txt
 - [ ] Variables `TBK_*` en `.env` de producción (nunca en código)
 - [ ] TBK_COMMERCE_CODE de producción gestionado por MonteAzul (NO copiar el código de integración)
 - [ ] `TBK_RETURN_URL` apunta al dominio real (`https://monteazul.cl/storefront/monteazul/payment/return/`)
@@ -265,15 +265,18 @@ Son estrictamente secuenciales: cada hito construye sobre el anterior.
 | Hito | Descripción | Tareas | Completadas | % |
 |------|-------------|--------|-------------|---|
 | H1.1 ✅ | Dominio de pagos — modelos + estados + tests | 4 | 4 | 100% |
-| H1.2 | PaymentGateway + implementaciones + sandbox | 5 | 0 | 0% |
+| H1.2 ✅ | PaymentGateway + implementaciones + sandbox | 5 | 4 | 80% |
 | H2 | CommercePaymentService + Outbox | 4 | 0 | 0% |
 | H3 | Payment views (start, return, cancel) | 4 | 0 | 0% |
 | H4 | CommercePaidConsumer (Runtime → ERP) | 5 | 0 | 0% |
 | H5 | Ops + email + smoke test | 4 | 0 | 0% |
-| **Total** | | **26** | **4** | **15%** |
+| **Total** | | **26** | **8** | **30%** |
 
 **H1.1 cerrado:** commit `81603ecc` — 2026-07-31  
 Nota técnica: Django 4.2 incluye `{}` en `empty_values`; `raw_response` y `metadata` requieren `blank=True` para permitir dicts vacíos en `full_clean()`. Migración 0006 es metadata-only (sin schema change).
+
+**H1.2 cerrado:** commit `ed57437b` — 2026-08-01  
+`commerce/payments/`: gateway.py (PaymentInitiation, PaymentConfirmation, PaymentGateway ABC con registry automático), webpay.py (WebPayGateway, sandbox por defecto, TBK_PRODUCTION flag), bank_transfer.py (BankTransferGateway, token bt_<uuid>, confirm() NotImplementedError). 43 tests H1.1+H1.2 en verde. Pendiente H1.2: documentar variables TBK_* y test manual contra sandbox.
 
 ---
 
