@@ -7,9 +7,11 @@ from commerce.models import (
     CommerceFAQ,
     CommerceOrder,
     CommerceOrderItem,
+    CommercePaymentTransaction,
     CommerceProduct,
     CommerceStorefrontSettings,
     CommerceStaticPage,
+    PaymentAttempt,
     ProductImage,
 )
 
@@ -40,11 +42,66 @@ class CommerceOrderItemInline(admin.TabularInline):
 
 @admin.register(CommerceOrder)
 class CommerceOrderAdmin(admin.ModelAdmin):
-    list_display = ["order_number", "empresa", "customer_name", "customer_email", "status", "total", "created_at"]
-    list_filter = ["empresa", "status"]
+    list_display = [
+        "order_number", "empresa", "customer_name", "customer_email",
+        "status", "payment_status", "total", "created_at",
+    ]
+    list_filter = ["empresa", "status", "payment_status"]
     search_fields = ["order_number", "customer_name", "customer_email"]
-    readonly_fields = ["order_number", "session_key", "total", "created_at", "updated_at"]
+    readonly_fields = [
+        "order_number", "session_key", "total",
+        "payment_status", "payment_method", "payment_gateway_ref", "paid_at",
+        "created_at", "updated_at",
+    ]
     inlines = [CommerceOrderItemInline]
+
+
+# ── Pagos (solo lectura) ──────────────────────────────────────────────────────
+
+class _ReadOnlyAdmin(admin.ModelAdmin):
+    """Base para registros de auditoría: sin add, change ni delete desde admin."""
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+    def get_actions(self, request):
+        return {}
+
+
+@admin.register(CommercePaymentTransaction)
+class CommercePaymentTransactionAdmin(_ReadOnlyAdmin):
+    list_display = [
+        "order", "empresa", "gateway", "status", "amount", "currency",
+        "card_last4", "created_at",
+    ]
+    list_filter = ["empresa", "gateway", "status", "created_at"]
+    search_fields = ["order__order_number", "gateway_ref", "gateway_token"]
+    readonly_fields = [
+        "empresa", "order", "gateway", "gateway_token", "gateway_ref",
+        "status", "amount", "currency", "raw_response", "card_last4",
+        "confirmed_at", "created_at", "updated_at",
+    ]
+
+
+@admin.register(PaymentAttempt)
+class PaymentAttemptAdmin(_ReadOnlyAdmin):
+    list_display = [
+        "order", "empresa", "attempt_number", "gateway", "status", "amount",
+        "raw_status", "created_at",
+    ]
+    list_filter = ["empresa", "gateway", "status", "created_at"]
+    search_fields = ["order__order_number", "gateway_ref", "gateway_token"]
+    readonly_fields = [
+        "empresa", "order", "attempt_number", "gateway", "status", "amount",
+        "gateway_token", "gateway_ref", "raw_status", "error_code",
+        "error_message", "metadata", "completed_at", "created_at", "updated_at",
+    ]
 
 
 # ── Catálogo ─────────────────────────────────────────────────────────────────

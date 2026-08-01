@@ -7,6 +7,7 @@ from .product import CommerceProduct
 
 class CommerceOrder(TenantScoped):
 
+    # ── Estado logístico ──────────────────────────────────────────────────────
     PENDING = "pending"
     CONFIRMED = "confirmed"
     PROCESSING = "processing"
@@ -23,6 +24,23 @@ class CommerceOrder(TenantScoped):
         (CANCELLED, "Cancelado"),
     ]
 
+    # ── Estado de pago (ortogonal al estado logístico) ────────────────────────
+    PAYMENT_NO_PAYMENT = "sin_pago"
+    PAYMENT_INITIATED = "iniciado"
+    PAYMENT_AUTHORIZED = "autorizado"
+    PAYMENT_PAID = "pagado"
+    PAYMENT_FAILED = "fallido"
+    PAYMENT_REFUNDED = "devuelto"
+
+    PAYMENT_STATUS_CHOICES = [
+        (PAYMENT_NO_PAYMENT, "Sin pago"),
+        (PAYMENT_INITIATED, "Iniciado"),
+        (PAYMENT_AUTHORIZED, "Autorizado"),
+        (PAYMENT_PAID, "Pagado"),
+        (PAYMENT_FAILED, "Fallido"),
+        (PAYMENT_REFUNDED, "Devuelto"),
+    ]
+
     order_number = models.CharField(max_length=40, unique=True, db_index=True)
     session_key = models.CharField(max_length=40, db_index=True, blank=True, default="")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default=PENDING)
@@ -35,6 +53,17 @@ class CommerceOrder(TenantScoped):
 
     # Total congelado al crear el pedido
     total = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+
+    # Resumen de pago — detalle completo en PaymentAttempt / CommercePaymentTransaction
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default=PAYMENT_NO_PAYMENT,
+        db_index=True,
+    )
+    payment_method = models.CharField(max_length=30, blank=True, default="")
+    payment_gateway_ref = models.CharField(max_length=100, blank=True, default="")
+    paid_at = models.DateTimeField(null=True, blank=True)
 
     class Meta(TenantScoped.Meta):
         verbose_name = "Pedido"
