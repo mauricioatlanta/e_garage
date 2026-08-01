@@ -1,0 +1,174 @@
+{% extends "commerce/admin/base_admin.html" %}
+
+{% block page_title %}Productos{% endblock %}
+{% block page_subtitle %}Catálogo Commerce — gestión de productos publicables{% endblock %}
+
+{% block page_stats %}
+<div class="flex gap-4 mt-3 pt-3 border-t border-white/5">
+  <span class="text-xs text-gray-400">Total: <strong class="text-cyan-300">{{ stats.total }}</strong></span>
+  <span class="text-xs text-gray-400">Publicados: <strong class="text-green-400">{{ stats.published }}</strong></span>
+  <span class="text-xs text-gray-400">Borradores: <strong class="text-yellow-400">{{ stats.draft }}</strong></span>
+</div>
+{% endblock %}
+
+{% block search_bar %}
+<form method="get" class="ca-search-box">
+  <input type="search" name="q" value="{{ search }}" placeholder="Buscar por nombre, part number…"
+         class="form-input-dark" style="max-width: 360px">
+  <select name="categoria" class="form-input-dark" style="max-width: 200px">
+    <option value="">Todas las categorías</option>
+    {% for cat in categories %}
+    <option value="{{ cat.pk }}" {% if category_pk == cat.pk|stringformat:"s" %}selected{% endif %}>{{ cat.name }}</option>
+    {% endfor %}
+  </select>
+  <select name="estado" class="form-input-dark" style="max-width: 160px">
+    <option value="">Todos</option>
+    <option value="published" {% if published_filter == "published" %}selected{% endif %}>Publicados</option>
+    <option value="draft" {% if published_filter == "draft" %}selected{% endif %}>Borradores</option>
+  </select>
+  <button type="submit" class="ca-btn ca-btn-primary">Filtrar</button>
+  {% if search or category_pk or published_filter %}
+  <a href="{% url 'commerce:admin_product_list' %}" class="ca-btn ca-btn-ghost">✕ Limpiar</a>
+  {% endif %}
+</form>
+{% endblock %}
+
+{% block ca_content %}
+<!-- Bulk actions bar -->
+<div id="bulk-bar" class="hidden flex items-center gap-3 mb-3 px-4 py-2 rounded-lg bg-cyan-900/20 border border-cyan-700/30">
+  <span class="text-sm text-cyan-300"><span id="selected-count">0</span> seleccionados</span>
+  <button onclick="bulkAction('publish')" class="ca-btn ca-btn-primary text-xs">✓ Publicar</button>
+  <button onclick="bulkAction('unpublish')" class="ca-btn ca-btn-ghost text-xs">✗ Despublicar</button>
+</div>
+
+{% if not page_obj.object_list %}
+<div class="text-center py-16 text-gray-500">
+  <p class="text-4xl mb-3">📦</p>
+  <p class="text-lg font-medium text-gray-400 mb-2">Sin productos{% if search %} para "{{ search }}"{% endif %}</p>
+  {% if search or category_pk or published_filter %}
+  <a href="{% url 'commerce:admin_product_list' %}" class="ca-btn ca-btn-ghost mt-3">Limpiar filtros</a>
+  {% endif %}
+</div>
+{% else %}
+<div class="overflow-x-auto rounded-xl border border-white/5">
+  <table class="ca-table">
+    <thead>
+      <tr>
+        <th style="width:2.5rem">
+          <input type="checkbox" id="select-all" class="form-checkbox-dark" onchange="toggleAll(this)">
+        </th>
+        <th>Producto</th>
+        <th>Part number</th>
+        <th>Categoría</th>
+        <th>Precio</th>
+        <th>Stock</th>
+        <th>Estado</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for product in page_obj %}
+      <tr>
+        <td>
+          <input type="checkbox" class="row-checkbox form-checkbox-dark" value="{{ product.pk }}" onchange="updateBulkBar()">
+        </td>
+        <td>
+          <div class="flex items-center gap-2">
+            {% with img=product.primary_image %}
+            {% if img %}
+            <img src="{{ img.image.url }}" alt="{{ img.alt_text }}" class="w-9 h-9 object-cover rounded border border-white/10 shrink-0">
+            {% else %}
+            <div class="w-9 h-9 rounded border border-white/10 bg-white/5 flex items-center justify-center text-gray-600 text-xs shrink-0">📷</div>
+            {% endif %}
+            {% endwith %}
+            <span class="font-medium text-gray-200 truncate max-w-xs">{{ product.nombre }}</span>
+          </div>
+        </td>
+        <td class="font-mono text-xs text-gray-400">{{ product.part_number|default:"—" }}</td>
+        <td class="text-xs">{{ product.category.name|default:"—" }}</td>
+        <td class="text-right text-gray-300">{{ product.precio_venta|floatformat:0 }}</td>
+        <td class="text-center {% if product.stock <= 0 %}text-red-400{% else %}text-gray-300{% endif %}">{{ product.stock }}</td>
+        <td>
+          <button onclick="togglePublishable({{ product.pk }}, this)"
+                  class="{% if product.is_publishable %}ca-badge-pub{% else %}ca-badge-draft{% endif %} cursor-pointer border-none bg-transparent pub-badge-{{ product.pk }}">
+            {% if product.is_publishable %}Publicado{% else %}Borrador{% endif %}
+          </button>
+        </td>
+        <td>
+          <a href="{% url 'commerce:admin_product_edit' product.pk %}" class="ca-btn ca-btn-ghost text-xs">Editar</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<!-- Paginación -->
+{% if page_obj.has_other_pages %}
+<div class="flex items-center justify-between mt-4">
+  <p class="text-xs text-gray-500">
+    Mostrando {{ page_obj.start_index }}–{{ page_obj.end_index }} de {{ page_obj.paginator.count }} productos
+  </p>
+  <div class="flex gap-1">
+    {% if page_obj.has_previous %}
+    <a href="?page={{ page_obj.previous_page_number }}&q={{ search }}&categoria={{ category_pk }}&estado={{ published_filter }}"
+       class="ca-btn ca-btn-ghost text-xs">← Anterior</a>
+    {% endif %}
+    <span class="ca-btn ca-btn-ghost text-xs cursor-default">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}
+    <a href="?page={{ page_obj.next_page_number }}&q={{ search }}&categoria={{ category_pk }}&estado={{ published_filter }}"
+       class="ca-btn ca-btn-ghost text-xs">Siguiente →</a>
+    {% endif %}
+  </div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block ca_extra_js %}
+<script>
+const CSRF = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+
+function togglePublishable(pk, btn) {
+  fetch(`/commerce/admin/products/${pk}/toggle/`, {
+    method: 'POST',
+    headers: {'X-CSRFToken': CSRF},
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.is_publishable) {
+      btn.className = 'ca-badge-pub cursor-pointer border-none bg-transparent';
+      btn.textContent = 'Publicado';
+    } else {
+      btn.className = 'ca-badge-draft cursor-pointer border-none bg-transparent';
+      btn.textContent = 'Borrador';
+    }
+  });
+}
+
+function toggleAll(master) {
+  document.querySelectorAll('.row-checkbox').forEach(cb => cb.checked = master.checked);
+  updateBulkBar();
+}
+
+function updateBulkBar() {
+  const checked = document.querySelectorAll('.row-checkbox:checked');
+  const bar = document.getElementById('bulk-bar');
+  document.getElementById('selected-count').textContent = checked.length;
+  bar.classList.toggle('hidden', checked.length === 0);
+  bar.classList.toggle('flex', checked.length > 0);
+}
+
+function bulkAction(action) {
+  const pks = [...document.querySelectorAll('.row-checkbox:checked')].map(cb => cb.value);
+  if (!pks.length) return;
+  fetch('/commerce/admin/products/bulk/', {
+    method: 'POST',
+    headers: {'X-CSRFToken': CSRF, 'Content-Type': 'application/json'},
+    body: JSON.stringify({action, pks}),
+  })
+  .then(r => r.json())
+  .then(() => location.reload());
+}
+</script>
+{% endblock %}

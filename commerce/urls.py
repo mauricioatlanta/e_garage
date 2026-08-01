@@ -1,10 +1,29 @@
 from django.urls import path
 
 from commerce.views import cart, catalog, checkout, pages, payment
+from commerce.views.admin import categories as admin_cat
+from commerce.views.admin import dashboard as admin_dash
+from commerce.views.admin import media as admin_media
+from commerce.views.admin import products as admin_prod
 
 app_name = "commerce"
 
 urlpatterns = [
+    # ── Commerce Admin (ERP autenticado) ─────────────────────────────────────
+    path("admin/", admin_dash.commerce_admin_dashboard, name="admin_dashboard"),
+    path("admin/categories/", admin_cat.category_list, name="admin_category_list"),
+    path("admin/categories/nueva/", admin_cat.category_create, name="admin_category_create"),
+    path("admin/categories/<int:pk>/editar/", admin_cat.category_edit, name="admin_category_edit"),
+    path("admin/categories/<int:pk>/toggle/", admin_cat.category_toggle_active, name="admin_category_toggle"),
+    path("admin/categories/<int:pk>/eliminar/", admin_cat.category_delete, name="admin_category_delete"),
+    path("admin/products/", admin_prod.product_list, name="admin_product_list"),
+    path("admin/products/<int:pk>/editar/", admin_prod.product_edit, name="admin_product_edit"),
+    path("admin/products/<int:pk>/toggle/", admin_prod.product_toggle_publishable, name="admin_product_toggle"),
+    path("admin/products/bulk/", admin_prod.product_bulk_action, name="admin_product_bulk"),
+    path("admin/media/", admin_media.media_library, name="admin_media_library"),
+    path("admin/products/<int:pk>/images/<int:image_pk>/eliminar/", admin_prod.product_image_delete, name="admin_product_image_delete"),
+    path("admin/products/<int:pk>/images/<int:image_pk>/primary/", admin_prod.product_image_set_primary, name="admin_product_image_primary"),
+
     # Catálogo
     path("", catalog.catalog_home, name="home"),
     path("categoria/<slug:slug>/", catalog.category_detail, name="category"),

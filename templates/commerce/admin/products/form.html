@@ -1,0 +1,132 @@
+{% extends "commerce/admin/base_admin.html" %}
+
+{% block page_title %}Editar Producto{% endblock %}
+{% block page_subtitle %}{{ product.nombre }}{% endblock %}
+
+{% block main_actions %}
+<a href="{% url 'commerce:admin_product_list' %}" class="ca-btn ca-btn-ghost">← Volver</a>
+{% if product.is_publishable %}
+<a href="{{ product.get_absolute_url }}" target="_blank" class="ca-btn ca-btn-ghost">↗ Ver en tienda</a>
+{% endif %}
+{% endblock %}
+
+{% block ca_content %}
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+  <!-- Form principal -->
+  <div class="lg:col-span-2">
+    <div class="ca-stat-card">
+      <h3 class="text-sm font-semibold text-cyan-200 mb-4">Datos del catálogo</h3>
+      <form method="post" enctype="multipart/form-data" class="space-y-5">
+        {% csrf_token %}
+        {% for field in form %}
+        <div>
+          <label class="block text-xs font-medium text-gray-400 uppercase tracking-wider mb-1.5">
+            {{ field.label }}{% if field.field.required %} <span class="text-red-400">*</span>{% endif %}
+          </label>
+          {{ field }}
+          {% if field.help_text %}
+          <p class="text-xs text-gray-600 mt-1">{{ field.help_text }}</p>
+          {% endif %}
+          {% for error in field.errors %}
+          <p class="text-xs text-red-400 mt-1">{{ error }}</p>
+          {% endfor %}
+        </div>
+        {% endfor %}
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="ca-btn ca-btn-primary px-6 py-2 text-sm">Guardar cambios</button>
+          <a href="{% url 'commerce:admin_product_list' %}" class="ca-btn ca-btn-ghost px-6 py-2 text-sm">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Panel lateral -->
+  <div class="space-y-4">
+
+    <!-- Info del ERP (solo lectura) -->
+    <div class="ca-stat-card">
+      <h3 class="text-sm font-semibold text-gray-400 mb-3">📋 Datos ERP (solo lectura)</h3>
+      <dl class="space-y-2 text-xs">
+        <div class="flex justify-between">
+          <dt class="text-gray-500">Part number</dt>
+          <dd class="font-mono text-gray-300">{{ product.part_number|default:"—" }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-500">Precio venta</dt>
+          <dd class="text-gray-300">{{ product.precio_venta|floatformat:0 }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-500">Stock</dt>
+          <dd class="{% if product.stock <= 0 %}text-red-400{% else %}text-green-400{% endif %}">{{ product.stock }}</dd>
+        </div>
+        <div class="flex justify-between">
+          <dt class="text-gray-500">Slug</dt>
+          <dd class="font-mono text-gray-500 truncate max-w-32">{{ product.slug }}</dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Imágenes -->
+    <div class="ca-stat-card">
+      <h3 class="text-sm font-semibold text-cyan-200 mb-3">🖼 Imágenes (máx. 4)</h3>
+      <div class="grid grid-cols-2 gap-2 mb-3">
+        {% for img in product.images.all %}
+        <div class="relative group rounded-lg overflow-hidden border {% if img.is_primary %}border-cyan-500{% else %}border-white/10{% endif %}">
+          <img src="{{ img.image.url }}" alt="{{ img.alt_text }}" class="w-full h-20 object-cover">
+          {% if img.is_primary %}
+          <div class="absolute top-1 left-1">
+            <span class="text-xs bg-cyan-600 text-white px-1.5 py-0.5 rounded">Principal</span>
+          </div>
+          {% endif %}
+          <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5">
+            {% if not img.is_primary %}
+            <button onclick="setPrimary({{ product.pk }}, {{ img.pk }})"
+                    class="ca-btn ca-btn-ghost text-xs py-0.5 px-1.5">⭐</button>
+            {% endif %}
+            <button onclick="deleteImage({{ product.pk }}, {{ img.pk }}, this)"
+                    class="ca-btn ca-btn-danger text-xs py-0.5 px-1.5">✕</button>
+          </div>
+        </div>
+        {% empty %}
+        <p class="col-span-2 text-xs text-gray-600 text-center py-4">Sin imágenes</p>
+        {% endfor %}
+      </div>
+      {% if product.images.count < 4 %}
+      <form method="post" action="" enctype="multipart/form-data" id="img-upload-form">
+        {% csrf_token %}
+        <input type="hidden" name="_upload_image" value="1">
+        <input type="file" name="new_image" accept="image/*" class="form-input-dark text-xs mb-2">
+        <input type="text" name="new_image_alt" placeholder="Texto alternativo" class="form-input-dark text-xs mb-2">
+        <button type="submit" class="ca-btn ca-btn-primary w-full text-xs">+ Agregar imagen</button>
+      </form>
+      {% else %}
+      <p class="text-xs text-gray-600 text-center">Máximo 4 imágenes alcanzado.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+{% endblock %}
+
+{% block ca_extra_js %}
+<script>
+const CSRF = document.cookie.match(/csrftoken=([^;]+)/)?.[1] || '';
+const PK = {{ product.pk }};
+
+function deleteImage(productPk, imagePk, btn) {
+  if (!confirm('¿Eliminar esta imagen?')) return;
+  fetch(`/commerce/admin/products/${productPk}/images/${imagePk}/eliminar/`, {
+    method: 'POST',
+    headers: {'X-CSRFToken': CSRF},
+  }).then(() => location.reload());
+}
+
+function setPrimary(productPk, imagePk) {
+  fetch(`/commerce/admin/products/${productPk}/images/${imagePk}/primary/`, {
+    method: 'POST',
+    headers: {'X-CSRFToken': CSRF},
+  }).then(() => location.reload());
+}
+</script>
+{% endblock %}
