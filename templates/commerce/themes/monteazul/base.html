@@ -5,31 +5,30 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#0a0c10">
-  <!-- Favicon temporal (emoji). Cuando tengas logo: guarda favicon.ico en static/img/ y sustituye por: <link rel="icon" type="image/x-icon" href="{% static 'img/favicon.ico' %}"> -->
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">
-  <title>{% block meta_title %}MonteAzul SPA | Repuestos de Escape{% endblock %}</title>
-  <meta name="description" content="{% block meta_description %}Catalíticos, flexibles reforzados y silenciadores con envío a todo Chile. Exhibición y Ventas en Diez de Julio 354, Santiago.{% endblock %}">
+  {% if brand.favicon_url %}<link rel="icon" type="image/x-icon" href="{{ brand.favicon_url }}">{% else %}<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚗</text></svg>">{% endif %}
+  <title>{% block meta_title %}{{ brand.meta_title }}{% endblock %}</title>
+  <meta name="description" content="{% block meta_description %}{{ brand.meta_description }}{% endblock %}">
   <link rel="canonical" href="{% block canonical_url %}{{ request.build_absolute_uri }}{% endblock %}">
   {% block og_tags %}
-    <meta property="og:title" content="{% block og_title %}MonteAzul SPA | Repuestos de Escape{% endblock %}">
-    <meta property="og:description" content="{% block og_description %}Catalíticos, flexibles reforzados y silenciadores con envío a todo Chile.{% endblock %}">
+    <meta property="og:title" content="{% block og_title %}{{ brand.meta_title }}{% endblock %}">
+    <meta property="og:description" content="{% block og_description %}{{ brand.meta_description }}{% endblock %}">
     <meta property="og:type" content="{% block og_type %}website{% endblock %}">
     <meta property="og:url" content="{{ request.build_absolute_uri }}">
-    <meta property="og:site_name" content="MonteAzul SPA">
+    <meta property="og:site_name" content="{{ brand.brand_name }}">
     <meta property="og:locale" content="es_CL">
   {% endblock %}
 
   {% block twitter_tags %}
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="{% block twitter_title %}MonteAzul SPA | Repuestos de Escape{% endblock %}">
-    <meta name="twitter:description" content="{% block twitter_description %}Catalíticos, flexibles reforzados y silenciadores con envío a todo Chile.{% endblock %}">
+    <meta name="twitter:title" content="{% block twitter_title %}{{ brand.meta_title }}{% endblock %}">
+    <meta name="twitter:description" content="{% block twitter_description %}{{ brand.meta_description }}{% endblock %}">
   {% endblock %}
   {% block jsonld %}
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "LocalBusiness",
-    "name": "Monteazul Spa",
+    "name": "{{ brand.brand_name|escapejs }}",
     "address": {
       "@type": "PostalAddress",
       "streetAddress": "Diez de Julio 354",
@@ -37,8 +36,8 @@
       "addressRegion": "Región Metropolitana",
       "addressCountry": "CL"
     },
-    "url": "https://monteazulspa.cl",
-    "telephone": "+56 9 7950 3154"
+    "url": "{{ request.scheme }}://{{ request.get_host }}",
+    "telephone": "{{ brand.whatsapp.number|escapejs }}"
   }
   </script>
   {% endblock %}
@@ -713,7 +712,7 @@
   {% comment %}TODO EGARAGE: partials/_location_modal.html no existe en Commerce{% endcomment %}
   {% include "commerce/themes/monteazul/partials/_cookies_banner.html" %}
 
-  <a class="whatsapp-float fixed right-5 bottom-5 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-white font-bold text-sm shadow-lg hover:bg-emerald-500/20 hover:shadow-emerald-500/20 transition-all" href="https://wsp.cl/Atepara" target="_blank" rel="noopener" title="Contactar vendedor por WhatsApp">💬 Contactar vendedor</a>
+  {% if brand.whatsapp.url %}<a class="whatsapp-float fixed right-5 bottom-5 z-50 flex items-center gap-2 px-4 py-3 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-white font-bold text-sm shadow-lg hover:bg-emerald-500/20 hover:shadow-emerald-500/20 transition-all" href="{{ brand.whatsapp.url }}" target="_blank" rel="noopener" title="Contactar vendedor por WhatsApp">💬 Contactar vendedor</a>{% endif %}
 
   {% comment %}Mobile Bottom Dock (Premium){% endcomment %}
   <nav class="mobile-dock" aria-label="Navegación móvil">

@@ -92,6 +92,10 @@ class BaseStorefrontImporter:
         """Devuelve un pathlib.Path al archivo de logo, o None si no hay."""
         return None
 
+    def find_logo_in_storage(self) -> "str | None":
+        """Devuelve una ruta relativa al MEDIA_ROOT si el logo ya existe en storage, o None."""
+        return None
+
     # ── Internos ─────────────────────────────────────────────────
 
     def _import_settings(self, result: ImportResult):
@@ -200,23 +204,40 @@ class BaseStorefrontImporter:
                 result.errors.append(f"FAQ '{question[:40]}': {exc}")
 
     def _import_logo(self, result: ImportResult):
-        if self._dry_run:
-            logo = self.find_logo_file()
-            if logo:
-                print(f"  [dry-run] Copiaría logo: {logo}")
-            return
-
         logo_path = self.find_logo_file()
-        if not logo_path:
+        # storage fallback solo cuando no hay --source (modo bootstrap sin importación)
+        storage_path = None
+        if not logo_path and not self._source:
+            storage_path = self.find_logo_in_storage()
+
+        if self._dry_run:
+            if logo_path:
+                print(f"  [dry-run] Copiaría logo: {logo_path}")
+            elif storage_path:
+                print(f"  [dry-run] Asignaría logo desde storage: {storage_path}")
             return
 
-        try:
-            from django.core.files import File
-            from commerce.models import CommerceStorefrontSettings
+        if logo_path:
+            try:
+                from django.core.files import File
+                from commerce.models import CommerceStorefrontSettings
 
-            sf = CommerceStorefrontSettings.objects.get(empresa=self._empresa)
-            with logo_path.open("rb") as f:
-                sf.logo.save(logo_path.name, File(f), save=True)
-            result.logo_copied = True
-        except Exception as exc:
-            result.errors.append(f"Logo: {exc}")
+                sf = CommerceStorefrontSettings.objects.get(empresa=self._empresa)
+                with logo_path.open("rb") as f:
+                    sf.logo.save(logo_path.name, File(f), save=True)
+                result.logo_copied = True
+            except Exception as exc:
+                result.errors.append(f"Logo: {exc}")
+            return
+
+        if storage_path:
+            try:
+                from commerce.models import CommerceStorefrontSettings
+
+                sf = CommerceStorefrontSettings.objects.get(empresa=self._empresa)
+                if self._overwrite or not sf.logo:
+                    sf.logo = storage_path
+                    sf.save(update_fields=["logo"])
+                    result.logo_copied = True
+            except Exception as exc:
+                result.errors.append(f"Logo (storage): {exc}")

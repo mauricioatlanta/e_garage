@@ -11,7 +11,7 @@
           <svg class="w-5 h-5 md:hidden transition-transform" data-accordion-icon aria-hidden="true" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
         </button>
         <div id="footer-about" class="footer-accordion-panel pt-2">
-          <p class="text-sm text-white/60">Monteazul Spa — Especialistas en repuestos de escape y convertidores catalíticos.</p>
+          <p class="text-sm text-white/60">{{ brand.brand_name }}{% if brand.tagline %} — {{ brand.tagline }}{% endif %}</p>
           <p class="text-sm opacity-80 mt-2">Atención en sala: Exhibición y Ventas.</p>
           <div class="space-y-2 mt-2">
             <div>
@@ -94,6 +94,6 @@
       </span>
     </div>
 
-    <p class="text-center text-sm text-white/50 pt-4">© {% now "Y" %} Monteazul SPA • Exhibición y Ventas: <a href="https://www.google.com/maps/search/?api=1&query=Diez%20de%20Julio%20354%2C%20Macul%2C%20Chile" target="_blank" rel="noopener" class="underline text-white/90 hover:text-white">Diez de Julio 354, Macul, Región Metropolitana</a> • Oficina Corporativa: Barros Borgoño 71, Providencia, Santiago • Fundada 07/06/2016</p>
+    <p class="text-center text-sm text-white/50 pt-4">© {% now "Y" %} {{ brand.brand_name }} • Exhibición y Ventas: <a href="https://www.google.com/maps/search/?api=1&query=Diez%20de%20Julio%20354%2C%20Macul%2C%20Chile" target="_blank" rel="noopener" class="underline text-white/90 hover:text-white">Diez de Julio 354, Macul, Región Metropolitana</a> • Oficina Corporativa: Barros Borgoño 71, Providencia, Santiago • Fundada 07/06/2016</p>
   </div>
 </footer>

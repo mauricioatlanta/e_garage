@@ -1,17 +1,12 @@
-﻿{% load static %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <title>{{ title|default:"Inicio" }} | Monteazul SPA</title>
-  {% if meta_description %}<meta name="description" content="{{ meta_description }}">{% endif %}
-  <link rel="canonical" href="{{ request.build_absolute_uri }}">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    :root {
+{% extends "commerce/themes/monteazul/base.html" %}
+{% load static %}
+
+{% block meta_title %}{{ brand.meta_title|default:"Inicio" }}{% endblock %}
+{% block meta_description %}{{ brand.meta_description }}{% endblock %}
+
+{% block extra_head %}
+<style>
+:root {
       --bg: #0a0c10;
       --surface: rgba(255,255,255,0.03);
       --surface-hover: rgba(255,255,255,0.06);
@@ -465,32 +460,11 @@
       .validator-card { padding: 20px 16px; }
       .step-pill .num { width: 22px; height: 22px; font-size: 0.75rem; }
     }
-  </style>
-</head>
-<body>
-  <div class="bg-mesh" aria-hidden="true"></div>
-  <div class="grid-overlay" aria-hidden="true"></div>
+</style>
+{% endblock %}
 
-  <header class="header">
-    <div class="header-inner">
-      <a class="logo-link" href="/" title="{{ brand.brand_name|default:'Monteazul SPA' }}">
-        <img src="{{ brand.logo_url }}" alt="{{ brand.brand_name|default:'MonteAzul SPA' }}">
-        <span>
-          <span class="logo-text truncate">{{ brand.brand_name|default:"Monteazul SPA" }}</span>
-          <div class="logo-sub">Ingeniería en escapes</div>
-        </span>
-      </a>
-      <nav class="nav">
-        <a href="/">Inicio</a>
-        {% comment %}TODO EGARAGE: core:vehicle_search no existe en Commerce{% endcomment %}
-        <a href="{% url 'commerce:home' %}" class="here">Buscar por vehículo</a>
-        <a href="{% url 'commerce:home' %}">Catálogo</a>
-        <a href="#contacto">Contacto</a>
-      </nav>
-    </div>
-  </header>
-
-  <main class="hero">
+{% block content %}
+<main class="hero">
     <div class="hero-badge">Mercado Chile • Desde 1980</div>
     <h1>Repuestos que calzan en tu vehículo</h1>
     <p style="max-width: 620px; margin-top: 0.75rem; color: var(--muted); font-size: 0.98rem;">
@@ -508,7 +482,7 @@
             Estamos mejorando el buscador por vehículo. Por ahora, cotiza directo por WhatsApp o revisa el catálogo.
           </div>
           <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:10px;">
-            <a href="https://wsp.cl/Atepara" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; background: rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.28); color: rgba(255,255,255,0.92); text-decoration:none; font-weight:700;">💬 WhatsApp</a>
+            {% if brand.whatsapp.url %}<a href="{{ brand.whatsapp.url }}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; background: rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.28); color: rgba(255,255,255,0.92); text-decoration:none; font-weight:700;">💬 WhatsApp</a>{% endif %}
             <a href="{% url 'commerce:home' %}" style="display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); text-decoration:none; font-weight:700;">🛒 Ver catálogo</a>
           </div>
         </div>
@@ -607,52 +581,12 @@
     </div>
   </main>
 
-  <a class="wa-float" id="contacto" href="https://wsp.cl/Atepara" target="_blank" rel="noopener" title="Contactar vendedor por WhatsApp">💬 Contactar vendedor</a>
 
-  <div class="toast" id="toast" role="status">
-    <strong id="toastTitle">Listo</strong>
-    <p id="toastMsg">Mensaje</p>
-  </div>
+{% endblock %}
 
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "WebPage",
-    "name": "Buscar repuestos por vehículo | Monteazul SPA",
-    "description": "Encuentra catalíticos y repuestos de escape compatibles con tu auto. Filtra por año, marca y modelo.",
-    "url": "https://monteazulspa.cl/",
-    "mainEntity": {
-      "@type": "WebApplication",
-      "name": "Buscador de compatibilidad por vehículo",
-      "applicationCategory": "AutomotiveApplication",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CLP" }
-    }
-  }
-  </script>
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "LocalBusiness",
-    "name": "Monteazul SPA",
-    "url": "https://www.monteazulspa.cl",
-    "telephone": "+{{ whatsapp_number|default:'56979503154' }}",
-    "areaServed": "CL",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "Diez de Julio 354",
-      "addressLocality": "Santiago",
-      "addressRegion": "Región Metropolitana",
-      "addressCountry": "CL"
-    }
-  }
-  </script>
-  <footer class="footer">
-    © {% now "Y" %} Monteazul SPA • Exhibición y Ventas: <a href="https://www.google.com/maps/search/?api=1&query=Diez%20de%20Julio%20354%2C%20Macul%2C%20Chile" target="_blank" rel="noopener" style="color: rgba(255,255,255,0.95); text-decoration: underline;">Diez de Julio 354, Macul, Región Metropolitana</a> • Oficina Corporativa: Barros Borgoño 71, Providencia, Santiago • Fundada 07/06/2016<br>
-    <span class="footer-credits">Sitio creado por <strong>Atlanta Global Solutions</strong></span>
-  </footer>
-
-  <script>
-    const vehicleForm = document.getElementById('vehicleForm');
+{% block extra_js %}
+<script>
+const vehicleForm = document.getElementById('vehicleForm');
     const urlModelos = vehicleForm ? vehicleForm.getAttribute('data-url-modelos') || '/api/modelos/' : '/api/modelos/';
     const urlMotores = vehicleForm ? vehicleForm.getAttribute('data-url-motores') || '/api/motores/' : '/api/motores/';
     const yearSelect = document.getElementById('year');
@@ -875,7 +809,5 @@
       setStep(2);
     }
     btnSearch.disabled = !canSearch();
-  </script>
-</body>
-</html>
-
+</script>
+{% endblock %}

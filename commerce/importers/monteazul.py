@@ -43,17 +43,17 @@ _LOGO_CANDIDATES = [
 # ── Defaults de arranque (usados si no hay --source o si source no tiene datos) ─
 
 _DEFAULT_SETTINGS = {
-    "tagline": "Repuestos de calidad para tu vehículo",
-    "font_primary": "Inter",
-    "primary_color": "#1E40AF",
-    "secondary_color": "#1E3A8A",
-    "accent_color": "#0EA5E9",
-    "seo_title": "MonteAzul — Repuestos automotrices",
+    "tagline": "Ingeniería en escapes",
+    "font_primary": "Outfit",
+    "primary_color": "#00f0ff",
+    "secondary_color": "#0a0c10",
+    "accent_color": "#00f0ff",
+    "seo_title": "MonteAzul SPA | Repuestos de Escape",
     "seo_description": (
-        "Encuentra repuestos originales y alternativos para tu vehículo. "
-        "Stock permanente, despacho a todo Chile."
+        "Catalíticos, flexibles reforzados y silenciadores con envío a todo Chile. "
+        "Exhibición y Ventas en Diez de Julio 354, Santiago."
     ),
-    "whatsapp_number": "",
+    "whatsapp_number": "+56979503154",
     "instagram_url": "",
     "facebook_url": "",
 }
@@ -190,4 +190,13 @@ class Importer(BaseStorefrontImporter):
             logo = p / candidate
             if logo.exists():
                 return logo
+        return None
+
+    def find_logo_in_storage(self) -> str | None:
+        """Asigna el logo desde un archivo ya presente en Django MEDIA_ROOT."""
+        from django.conf import settings as django_settings
+        media_root = Path(django_settings.MEDIA_ROOT)
+        for candidate in ["commerce/logos/logomonteazul.png"]:
+            if (media_root / candidate).exists():
+                return candidate
         return None
