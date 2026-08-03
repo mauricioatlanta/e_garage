@@ -1,4 +1,4 @@
-{% load static %}{% load humanize %}
+{% load static %}{% load humanize %}{% load money %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -488,7 +488,7 @@
                             <div class="item-info">
                                 <div class="item-name">{{ item.product.nombre }}</div>
                                 <div class="item-sku">SKU: {{ item.product.part_number }}</div>
-                                <div class="item-price">$ {{ item.product.precio_venta|intcomma }} c/u <span class="item-price-iva">IVA incluido</span></div>
+                                <div class="item-price">{{ item.product.precio_venta|money_clp }} c/u <span class="item-price-iva">IVA incluido</span></div>
                             </div>
                             <div class="item-quantity">
                                 <form method="post" action="{% url 'commerce:cart_update' %}" style="display: flex; gap: 10px; align-items: center;">
@@ -503,7 +503,7 @@
                                     <button type="submit" class="btn-remove">Eliminar</button>
                                 </form>
                             </div>
-                            <div class="item-total">$ {{ item.subtotal|intcomma }} <span class="item-price-iva">IVA incluido</span></div>
+                            <div class="item-total">{{ item.subtotal|money_clp }} <span class="item-price-iva">IVA incluido</span></div>
                         </div>
                     {% endfor %}
                 </div>
@@ -516,7 +516,7 @@
                     </div>
                     <div class="summary-row">
                         <span class="summary-label">Total:</span>
-                        <span class="summary-value summary-total">$ {{ total|intcomma }} <span class="item-price-iva">IVA incluido</span></span>
+                        <span class="summary-value summary-total">{{ total|money_clp }} <span class="item-price-iva">IVA incluido</span></span>
                     </div>
                     <a href="{% url 'commerce:checkout' %}" class="btn-checkout">Proceder al Checkout →</a>
                     <a href="{% url 'commerce:home' %}" class="btn-continue">Seguir Comprando</a>

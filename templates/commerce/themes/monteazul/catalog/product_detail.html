@@ -1,5 +1,5 @@
 {% extends "commerce/themes/monteazul/base.html" %}
-{% load static %}{% load humanize %}
+{% load static %}{% load humanize %}{% load money %}
 {% with seo_title=product.meta_title|default:product.nombre %}
 {% with seo_desc=product.meta_description|default:product.descripcion_larga|striptags|truncatechars:155 %}
 {% block meta_title %}{{ seo_title }} | MonteAzul SPA{% endblock %}
@@ -203,11 +203,11 @@ OEM: 18160-PAA-305 · No Accord 2003 en adelante</div>
       <div class="mt-4 flex flex-wrap items-end gap-3">
         {% if product.tiene_descuento %}
           <span class="inline-flex px-2 py-0.5 rounded-lg bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold uppercase">Oferta</span>
-          <span class="text-lg text-white/50 line-through">$ {{ product.compare_at_price|intcomma }}</span>
-          <div class="text-3xl font-bold text-[#ffc800]">$ {{ product.precio_venta|intcomma }}</div>
+          <span class="text-lg text-white/50 line-through">{{ product.compare_at_price|money_clp }}</span>
+          <div class="text-3xl font-bold text-[#ffc800]">{{ product.precio_venta|money_clp }}</div>
           <span class="text-sm text-white/60">IVA incluido</span>
         {% else %}
-          <div class="text-3xl font-bold text-[#ffc800]">$ {{ product.precio_venta|intcomma }}</div>
+          <div class="text-3xl font-bold text-[#ffc800]">{{ product.precio_venta|money_clp }}</div>
           <span class="text-sm text-white/60">IVA incluido</span>
         {% endif %}
       </div>
@@ -690,7 +690,7 @@ Por plataforma Delta II y motorización compartida con General Motors, este cata
             {% endwith %}
           </div>
           <div class="text-sm font-semibold line-clamp-2">{{ p.nombre }}</div>
-          <div class="text-[#ffc800] font-bold mt-1">$ {{ p.precio_venta|intcomma }} <span class="text-white/60 text-xs font-normal">IVA incluido</span></div>
+          <div class="text-[#ffc800] font-bold mt-1">{{ p.precio_venta|money_clp }} <span class="text-white/60 text-xs font-normal">IVA incluido</span></div>
         </a>
       {% empty %}
         <p class="text-white/50 col-span-full">No hay productos relacionados.</p>

@@ -746,7 +746,7 @@
                                 </div>
                                 <ul class="filter-list subcategory">
                                     <li>
-                                        <a href="{% url 'catalog:twg_opciones' %}{% if q %}?q={{ q|urlencode }}{% endif %}" {% if request.resolver_match.url_name == 'twg_opciones' %}class="active"{% endif %}>Convertidores Cataliticos TWG</a>
+                                        <a href="{% url 'commerce:home' %}?cat=cataliticos-twc{% if q %}?q={{ q|urlencode }}{% endif %}" {% if request.resolver_match.url_name == 'twg_opciones' %}class="active"{% endif %}>Convertidores Cataliticos TWG</a>
                                     </li>
                                     <li>
                                         <a href="{% url 'commerce:home' %}?cat=cataliticos-twc-diesel{% if q %}&q={{ q|urlencode }}{% endif %}" {% if current_category and current_category.slug == 'cataliticos-twc-diesel' %}class="active"{% endif %}>Diesel</a>
@@ -812,7 +812,7 @@
                     <div class="cataliticos-assistant">
                         <p class="assistant-label">¿No sabes cuál elegir? Usa el <strong>Asistente de Selección</strong></p>
                         <p class="assistant-hint" style="margin-bottom: 12px;">Combustible → Año → Tipo (Universal TWG o Ensamble Directo). Te mostramos solo los compatibles.</p>
-                        <a href="{% url 'catalog:asistente_cataliticos' %}" class="assistant-btn" style="display: inline-block; text-decoration: none;">Ir al asistente</a>
+                        <a href="{% url 'commerce:home' %}?cat=cataliticos" class="assistant-btn" style="display: inline-block; text-decoration: none;">Ir al asistente</a>
                     </div>
                     <p class="intro-text" style="margin-top: 28px;">Más información: <a href="{% url 'normativas' %}" class="link-normativas">¿Por qué es importante elegir la norma correcta? Historia y normas Euro →</a></p>
 
