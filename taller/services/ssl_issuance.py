@@ -39,7 +39,7 @@ server {{
     ssl_protocols       TLSv1.2 TLSv1.3;
     ssl_ciphers         HIGH:!aNULL:!MD5;
     location / {{
-        proxy_pass http://127.0.0.1:8000;
+        proxy_pass http://unix:/run/gunicorn/gunicorn.sock;
         proxy_set_header Host              $host;
         proxy_set_header X-Forwarded-Host  $host;
         proxy_set_header X-Forwarded-For   $proxy_add_x_forwarded_for;
