@@ -7,11 +7,11 @@
   <title>Bem-vindo ao eGarage Brasil 🇧🇷</title>
 
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Plataforma de gestão para oficinas: ordens de serviço, estoque, portal do cliente e análises no Brasil.">
+  <meta name="description" content="Plataforma de gestão automotriz para oficinas mecânicas, desmanches e lojas de autopeças no Brasil. Teste grátis por 30 dias.">
   <link rel="canonical" href="{{ request.build_absolute_uri }}">
 
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="eGarage Brasil — Plataforma para Oficinas">
+  <meta property="og:title" content="eGarage Brasil — Plataforma Automotriz">
   <meta property="og:description" content="Trabalhe de forma mais inteligente com documentos digitais, lembretes e análises.">
   <meta property="og:image" content="{% static 'img/og-br.png' %}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
@@ -20,7 +20,7 @@
 
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="eGarage Brasil — Plataforma para Oficinas">
+  <meta name="twitter:title" content="eGarage Brasil — Plataforma Automotriz">
   <meta name="twitter:description" content="Trabalhe de forma mais inteligente com documentos digitais, lembretes e análises.">
   <meta name="twitter:image" content="{% static 'img/og-br.png' %}">
   
@@ -46,13 +46,6 @@
       position: relative;
     }
 
-    /* Asegurar que el contenido esté por encima del fondo */
-    body > main,
-    body > section {
-      position: relative;
-      z-index: 1;
-    }
-
     /* Background animado con colores de Brasil */
     body::before {
       content: '';
@@ -66,9 +59,8 @@
         radial-gradient(circle at 80% 70%, rgba(254, 223, 0, 0.1) 0%, transparent 50%),
         radial-gradient(circle at 50% 50%, rgba(0, 39, 118, 0.08) 0%, transparent 50%),
         linear-gradient(135deg, #000814 0%, #001d3d 50%, #000814 100%);
-      z-index: -1;
+      z-index: 0;
       animation: bgShift 20s ease-in-out infinite;
-      pointer-events: none;
     }
 
     @keyframes bgShift {
@@ -346,21 +338,9 @@
       position: relative;
       z-index: 1;
     }
-
-    /* Asegurar que el contenido esté visible */
-    main {
-      position: relative;
-      z-index: 10;
-    }
-
-    body > * {
-      position: relative;
-      z-index: 1;
-    }
   </style>
 </head>
 <body class="grid-bg">
-  <main class="relative z-10">
   
   <!-- Hero Section -->
   <section class="hero-section">
@@ -381,57 +361,36 @@
           A plataforma definitiva para o setor automotivo no Brasil
         </p>
 
-        <!-- Tipos de Negócios - Quick Overview -->
-        <div class="mb-16 px-4" data-aos="fade-up" data-aos-delay="100">
-          <div class="glass-card p-6 max-w-5xl mx-auto" style="overflow-x: auto;">
-            <div class="flex flex-wrap gap-3 md:gap-4 justify-center items-center text-center min-w-max md:min-w-0">
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 156, 59, 0.15); color: #00ff5e; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 156, 59, 0.3);">
-                <span style="font-size: 1.3rem;">🔧</span>
-                <span class="whitespace-nowrap">Oficinas Mecânicas</span>
-              </div>
-              <span style="color: #ffdf00; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 156, 59, 0.15); color: #00ff5e; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 156, 59, 0.3);">
-                <span style="font-size: 1.3rem;">🛞</span>
-                <span class="whitespace-nowrap">Borracharias</span>
-              </div>
-              <span style="color: #ffdf00; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 156, 59, 0.15); color: #00ff5e; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 156, 59, 0.3);">
-                <span style="font-size: 1.3rem;">⚙️</span>
-                <span class="whitespace-nowrap">Autopeças</span>
-              </div>
-              <span style="color: #ffdf00; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 156, 59, 0.15); color: #00ff5e; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 156, 59, 0.3);">
-                <span style="font-size: 1.3rem;">🔨</span>
-                <span class="whitespace-nowrap">Funilaria</span>
-              </div>
-              <span style="color: #ffdf00; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 156, 59, 0.15); color: #00ff5e; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 156, 59, 0.3);">
-                <span style="font-size: 1.3rem;">🎨</span>
-                <span class="whitespace-nowrap">Lanternagem</span>
-              </div>
-              <span style="color: #ffdf00; font-size: 1.2rem;" class="hidden lg:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(0, 156, 59, 0.15); color: #00ff5e; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(0, 156, 59, 0.3);">
-                <span style="font-size: 1.3rem;">🔌</span>
-                <span class="whitespace-nowrap">Elétrica</span>
-              </div>
-            </div>
+        <!-- Selector de Rubro — CTA Principal -->
+        <div class="mb-8 px-4" data-aos="fade-up" data-aos-delay="100">
+          <p class="text-center mb-6" style="color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;">
+            Qual é o tipo do seu negócio?
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <a href="/br/signup/?rubro=oficina" class="rubro-card glass-card p-8 text-center" data-rubro="oficina" style="text-decoration: none; color: inherit; display: block;">
+              <div style="font-size: 3.5rem; margin-bottom: 1rem; line-height: 1;">🔧</div>
+              <h3 class="text-xl font-bold mb-2" style="color: #00ff5e;">Oficina Mecânica</h3>
+              <p style="color: #9ca3af; font-size: 0.88rem; line-height: 1.5;">Ordens de serviço, diagnósticos, clientes e veículos</p>
+            </a>
+            <a href="/br/signup/?rubro=desmanche" class="rubro-card glass-card p-8 text-center" data-rubro="desmanche" style="text-decoration: none; color: inherit; display: block;">
+              <div style="font-size: 3.5rem; margin-bottom: 1rem; line-height: 1;">🚗</div>
+              <h3 class="text-xl font-bold mb-2" style="color: #00ff5e;">Desmanche</h3>
+              <p style="color: #9ca3af; font-size: 0.88rem; line-height: 1.5;">Inventário de peças, vendas por peça e rastreabilidade</p>
+            </a>
+            <a href="/br/signup/?rubro=autopecas" class="rubro-card glass-card p-8 text-center" data-rubro="autopecas" style="text-decoration: none; color: inherit; display: block;">
+              <div style="font-size: 3.5rem; margin-bottom: 1rem; line-height: 1;">📦</div>
+              <h3 class="text-xl font-bold mb-2" style="color: #00ff5e;">Loja de Autopeças</h3>
+              <p style="color: #9ca3af; font-size: 0.88rem; line-height: 1.5;">Catálogo, estoque, cotações e controle de inventário</p>
+            </a>
           </div>
-          <p class="text-center mt-4" style="color: #b0b0b0; font-size: 0.9rem; font-weight: 500;">
-            E muito mais tipos de negócios automotivos...
+          <p class="text-center mt-4" style="color: #6b7280; font-size: 0.82rem;">
+            Também: borracharias, funilaria, car wash e mais...
           </p>
         </div>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-wrap gap-6 justify-center mb-16">
-          <a href="/br/signup/" class="btn-primary">
-            🚀 Começar Grátis
-          </a>
-          <a href="/br/login/" class="btn-secondary">
-            🔐 Entrar
-          </a>
-          <a href="/br/precos/" class="btn-secondary">
-            💰 Ver Planos
-          </a>
+        <!-- CTAs Secundários -->
+        <div class="flex flex-wrap gap-4 justify-center mb-16">
+          <a href="/br/login/" class="btn-secondary">🔐 Já tenho conta</a>
+          <a href="/br/precos/" class="btn-secondary">💰 Ver Planos</a>
         </div>
       </div>
     </div>
@@ -539,6 +498,17 @@
           <h3 class="text-2xl font-bold mb-4" style="color: #00ff5e;">Oficinas Mecânicas</h3>
           <p style="color: #d0d0d0; font-size: 1.05rem;">
             Gestão completa de ordens de serviço, diagnósticos, revisões e manutenções preventivas e corretivas.
+          </p>
+        </div>
+
+        <!-- Desmanches -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="125">
+          <div class="feature-icon">
+            🚗
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #00ff5e;">Desmanches</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Controle de veículos desmontados, inventário de peças usadas, vendas por peça e rastreabilidade completa de cada unidade.
           </p>
         </div>
 
@@ -807,8 +777,6 @@
   <footer style="border-top:1px solid rgba(255,255,255,0.12);background:rgba(0,0,0,0.35);padding:1rem 0;text-align:center;margin-top:auto;">
   <span style="color:#9ca3af;font-size:0.82rem;">eGarage &bull; &copy; 2026 &bull; <a href="/legal/" style="color:#67e8f9;text-decoration:none;">Legal</a> &bull; All Rights Reserved</span>
 </footer>
-
-  </main>
 
   <script>
     // Initialize AOS (Animate On Scroll)
