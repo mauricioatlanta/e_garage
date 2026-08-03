@@ -384,6 +384,12 @@ RESEND_API_KEY = env_str("RESEND_API_KEY", "")
 DEFAULT_FROM_EMAIL = _sane_egarage_email(env_str("DEFAULT_FROM_EMAIL", DEFAULT_FROM_EMAIL))
 ACCOUNT_LOGIN_METHODS = {'email'}
 
+# WebPay Plus — Commerce Engine
+TBK_COMMERCE_CODE = env_str("TBK_COMMERCE_CODE", "597055555532")
+TBK_API_KEY = env_str("TBK_API_KEY", "")
+TBK_PRODUCTION = env_bool("TBK_PRODUCTION", False)
+
+
 # Pasarelas de pago
 FLOW_API_KEY = env_str("FLOW_API_KEY", "")
 FLOW_SECRET_KEY = env_str("FLOW_SECRET_KEY", "")
