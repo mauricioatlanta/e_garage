@@ -46,6 +46,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
   <!-- Tailwind: CSS estático (build con npm run build:css) para velocidad en móvil; sin CDN -->
+  <link rel="stylesheet" href="{% static 'commerce/design-system/design-system.css' %}">
   <link rel="stylesheet" href="{% static 'commerce/themes/monteazul/css/theme.css' %}">
   <style>
     :root {
@@ -687,18 +688,10 @@
   <div class="bg-mesh" aria-hidden="true"></div>
   <div class="grid-bg" aria-hidden="true"></div>
 
-  {% include "commerce/themes/monteazul/partials/_nav_sidebar.html" %}
-
   <div id="page-content" class="relative z-10 flex flex-col min-h-screen">
-    {% block topbar %}
-      {% include "commerce/themes/monteazul/partials/_topbar_promo.html" %}
-    {% endblock %}
-
     {% block header %}
-      {% include "commerce/themes/monteazul/partials/_header_search.html" %}
+      {% include "commerce/themes/monteazul/partials/_header_navigation_v2.html" %}
     {% endblock %}
-
-    {% include "commerce/themes/monteazul/partials/_nav_bar.html" %}
 
     <main class="flex-1">
       {% block content %}{% endblock %}
