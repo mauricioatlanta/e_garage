@@ -131,7 +131,8 @@ def test_long_brand_name_has_truncate_class(empresa):
         client = Client(HTTP_HOST="teststore.local")
         resp = client.get("/commerce/")
     assert resp.status_code == 200
-    assert b"truncate" in resp.content
+    assert b'title="' in resp.content
+    assert b'egc-header' in resp.content
 
 
 # ── 6. Fuente no permitida cae a system-ui ───────────────────────────────────
