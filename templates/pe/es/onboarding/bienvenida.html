@@ -7,11 +7,11 @@
   <title>Bienvenido a eGarage Perú 🇵🇪</title>
 
   <!-- SEO Meta Tags -->
-  <meta name="description" content="Plataforma de gestión para talleres: órdenes de servicio, inventario, portal del cliente y análisis en Perú.">
+  <meta name="description" content="Plataforma de gestión automotriz para talleres mecánicos, desarmadurías y casas de repuestos en Perú. Prueba gratis 30 días.">
   <link rel="canonical" href="{{ request.build_absolute_uri }}">
 
   <!-- Open Graph Meta Tags -->
-  <meta property="og:title" content="eGarage Perú — Plataforma para Talleres">
+  <meta property="og:title" content="eGarage Perú — Plataforma Automotriz">
   <meta property="og:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
   <meta property="og:image" content="{% static 'img/og-pe.png' %}">
   <meta property="og:url" content="{{ request.build_absolute_uri }}">
@@ -20,7 +20,7 @@
 
   <!-- Twitter Card Meta Tags -->
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="eGarage Perú — Plataforma para Talleres">
+  <meta name="twitter:title" content="eGarage Perú — Plataforma Automotriz">
   <meta name="twitter:description" content="Trabaja de forma más inteligente con documentos digitales, recordatorios y análisis.">
   <meta name="twitter:image" content="{% static 'img/og-pe.png' %}">
   
@@ -361,57 +361,36 @@
           La plataforma definitiva para el sector automotriz en Perú
         </p>
 
-        <!-- Tipos de Negocios - Quick Overview -->
-        <div class="mb-16 px-4" data-aos="fade-up" data-aos-delay="100">
-          <div class="glass-card p-6 max-w-5xl mx-auto" style="overflow-x: auto;">
-            <div class="flex flex-wrap gap-3 md:gap-4 justify-center items-center text-center min-w-max md:min-w-0">
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(220, 20, 60, 0.15); color: #DC143C; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(220, 20, 60, 0.3);">
-                <span style="font-size: 1.3rem;">🔧</span>
-                <span class="whitespace-nowrap">Talleres Mecánicos</span>
-              </div>
-              <span style="color: #FFFFFF; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(220, 20, 60, 0.15); color: #DC143C; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(220, 20, 60, 0.3);">
-                <span style="font-size: 1.3rem;">🛞</span>
-                <span class="whitespace-nowrap">Llanterías</span>
-              </div>
-              <span style="color: #FFFFFF; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(220, 20, 60, 0.15); color: #DC143C; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(220, 20, 60, 0.3);">
-                <span style="font-size: 1.3rem;">⚙️</span>
-                <span class="whitespace-nowrap">Repuestos</span>
-              </div>
-              <span style="color: #FFFFFF; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(220, 20, 60, 0.15); color: #DC143C; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(220, 20, 60, 0.3);">
-                <span style="font-size: 1.3rem;">🔨</span>
-                <span class="whitespace-nowrap">Latonería</span>
-              </div>
-              <span style="color: #FFFFFF; font-size: 1.2rem;" class="hidden md:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(220, 20, 60, 0.15); color: #DC143C; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(220, 20, 60, 0.3);">
-                <span style="font-size: 1.3rem;">🎨</span>
-                <span class="whitespace-nowrap">Pintura</span>
-              </div>
-              <span style="color: #FFFFFF; font-size: 1.2rem;" class="hidden lg:inline">•</span>
-              <div class="flex items-center gap-2 px-3 py-2 rounded-lg" style="background: rgba(220, 20, 60, 0.15); color: #DC143C; font-weight: 700; font-size: 0.95rem; border: 1px solid rgba(220, 20, 60, 0.3);">
-                <span style="font-size: 1.3rem;">🔌</span>
-                <span class="whitespace-nowrap">Eléctrica</span>
-              </div>
-            </div>
+        <!-- Selector de Rubro — CTA Principal -->
+        <div class="mb-8 px-4" data-aos="fade-up" data-aos-delay="100">
+          <p class="text-center mb-6" style="color: #9ca3af; font-size: 0.85rem; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;">
+            ¿Qué tipo de negocio tienes?
+          </p>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+            <a href="/pe/signup/?rubro=taller" class="rubro-card glass-card p-8 text-center" data-rubro="taller" style="text-decoration: none; color: inherit; display: block;">
+              <div style="font-size: 3.5rem; margin-bottom: 1rem; line-height: 1;">🔧</div>
+              <h3 class="text-xl font-bold mb-2" style="color: #DC143C;">Taller Mecánico</h3>
+              <p style="color: #9ca3af; font-size: 0.88rem; line-height: 1.5;">Órdenes de trabajo, diagnósticos, clientes y vehículos</p>
+            </a>
+            <a href="/pe/signup/?rubro=desarmaduría" class="rubro-card glass-card p-8 text-center" data-rubro="desarmaduría" style="text-decoration: none; color: inherit; display: block;">
+              <div style="font-size: 3.5rem; margin-bottom: 1rem; line-height: 1;">🚗</div>
+              <h3 class="text-xl font-bold mb-2" style="color: #DC143C;">Desarmaduría</h3>
+              <p style="color: #9ca3af; font-size: 0.88rem; line-height: 1.5;">Inventario de piezas, ventas por pieza y trazabilidad</p>
+            </a>
+            <a href="/pe/signup/?rubro=repuestos" class="rubro-card glass-card p-8 text-center" data-rubro="repuestos" style="text-decoration: none; color: inherit; display: block;">
+              <div style="font-size: 3.5rem; margin-bottom: 1rem; line-height: 1;">📦</div>
+              <h3 class="text-xl font-bold mb-2" style="color: #DC143C;">Casa de Repuestos</h3>
+              <p style="color: #9ca3af; font-size: 0.88rem; line-height: 1.5;">Catálogo, stock, cotizaciones y control de inventario</p>
+            </a>
           </div>
-          <p class="text-center mt-4" style="color: #b0b0b0; font-size: 0.9rem; font-weight: 500;">
-            Y muchos más tipos de negocios automotrices...
+          <p class="text-center mt-4" style="color: #6b7280; font-size: 0.82rem;">
+            También: llanterías, latonería, car wash y más...
           </p>
         </div>
-
-        <!-- CTA Buttons -->
-        <div class="flex flex-wrap gap-6 justify-center mb-16">
-          <a href="/pe/signup/" class="btn-primary">
-            🚀 Comenzar Gratis
-          </a>
-          <a href="/pe/login/" class="btn-secondary">
-            🔐 Ingresar
-          </a>
-          <a href="/pe/precios/" class="btn-secondary">
-            💰 Ver Planes
-          </a>
+        <!-- CTAs Secundarios -->
+        <div class="flex flex-wrap gap-4 justify-center mb-16">
+          <a href="/pe/login/" class="btn-secondary">🔐 Ya tengo cuenta</a>
+          <a href="/pe/precios/" class="btn-secondary">💰 Ver Planes</a>
         </div>
       </div>
     </div>
@@ -519,6 +498,17 @@
           <h3 class="text-2xl font-bold mb-4" style="color: #DC143C;">Talleres Mecánicos</h3>
           <p style="color: #d0d0d0; font-size: 1.05rem;">
             Gestión completa de órdenes de servicio, diagnósticos, revisiones y mantenimientos preventivos y correctivos.
+          </p>
+        </div>
+
+        <!-- Desarmadurías -->
+        <div class="glass-card p-8 text-center" data-aos="fade-up" data-aos-delay="125">
+          <div class="feature-icon">
+            🚗
+          </div>
+          <h3 class="text-2xl font-bold mb-4" style="color: #DC143C;">Desarmadurías</h3>
+          <p style="color: #d0d0d0; font-size: 1.05rem;">
+            Control de vehículos ingresados, inventario de piezas usadas, ventas por pieza y trazabilidad completa de cada unidad.
           </p>
         </div>
 
