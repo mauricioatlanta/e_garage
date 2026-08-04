@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="{% static 'css/app.css' %}?v=3.0.0">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
+  {% if workspace.theme %}<style>:root{ {% for var,val in workspace.theme.items %}{{ var }}:{{ val }};{% endfor %}}</style>{% endif %}
   {% block extra_head %}{% endblock %}
   {% block extra_css %}{% endblock %}
 </head>

@@ -9,17 +9,6 @@
 
 {% block content %}
 
-{# Product header #}
-<div style="margin-bottom: 28px;">
-  <div style="display:flex; align-items:center; gap:12px; margin-bottom:6px;">
-    <i class="{{ workspace.brand.icon }}" style="font-size:1.5rem; color:var(--eg-primary, #38bdf8);"></i>
-    <h2 style="margin:0; font-size:1.4rem; font-weight:800; letter-spacing:-.03em;">
-      {{ workspace.brand.product_name }}
-    </h2>
-  </div>
-  <p style="margin:0; color:#64748b; font-size:.9rem;">{{ workspace.brand.tagline }}</p>
-</div>
-
 {# KPI widget grid #}
 {% if dashboard_data.widgets %}
 <div class="grid grid-cols-4 gap-6 mb-8">
@@ -39,17 +28,10 @@
 {% if workspace.quick_actions %}
 <div class="bg-[#111827] border border-[#1e293b] rounded-xl p-6 mb-6">
   <h3 class="mb-4 font-semibold text-sm uppercase tracking-widest text-slate-400">Accesos rápidos</h3>
-  <div style="display:flex; flex-wrap:wrap; gap:12px;">
+  <div style="display:flex; flex-wrap:wrap; gap:10px;">
     {% for action in workspace.quick_actions %}
-    <a href="{{ action.url }}"
-       style="display:inline-flex; align-items:center; gap:8px; padding:10px 18px;
-              border-radius:10px; border:1px solid rgba(56,189,248,.25);
-              background:rgba(56,189,248,.07); color:#cbd5e1;
-              font-size:.88rem; font-weight:600; transition:.15s ease;
-              text-decoration:none;"
-       onmouseover="this.style.borderColor='rgba(56,189,248,.55)';this.style.color='#fff';"
-       onmouseout="this.style.borderColor='rgba(56,189,248,.25)';this.style.color='#cbd5e1';">
-      <i class="{{ action.icon }}" style="color:var(--eg-primary, #38bdf8);"></i>
+    <a href="{{ action.url }}" class="eg-quick-action">
+      <i class="{{ action.icon }}"></i>
       {{ action.label }}
     </a>
     {% endfor %}

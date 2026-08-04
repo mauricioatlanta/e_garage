@@ -1,12 +1,15 @@
 {% if url %}<a href="{{ url }}" style="display:block;text-decoration:none;color:inherit;">{% endif %}
-<div class="bg-[#111827] border border-[#1e293b] rounded-xl p-6{% if url %} hover:border-blue-500 cursor-pointer{% endif %}">
-  <p class="text-sm text-gray-400">{{ title }}</p>
-  <h3 class="text-2xl font-bold mt-2">
+<div class="bg-[#111827] border border-[#1e293b] rounded-xl p-6{% if url %} hover:border-blue-500 cursor-pointer{% endif %}" style="display:flex;flex-direction:column;gap:8px;">
+  <div style="display:flex;align-items:center;justify-content:space-between;">
+    <p class="text-sm text-gray-400" style="margin:0;">{{ title }}</p>
+    {% if icon %}<i class="{{ icon }}" style="font-size:.85rem;color:var(--eg-primary,#38bdf8);opacity:.7;"></i>{% endif %}
+  </div>
+  <p style="margin:0;font-size:2.4rem;font-weight:800;letter-spacing:-.04em;line-height:1;color:#f1f5f9;">
     {% if format == "percent" %}
       {% if has_value %}{{ value|floatformat:1 }}%{% else %}—{% endif %}
     {% else %}
       {{ value }}
     {% endif %}
-  </h3>
+  </p>
 </div>
 {% if url %}</a>{% endif %}

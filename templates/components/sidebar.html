@@ -28,20 +28,21 @@
       </a>
       {% endfor %}
     {% else %}
-      {# Fallback for unauthenticated or no-config users #}
-      <a href="/cl/es/dashboard/"><i class="fas fa-home"></i> Inicio</a>
-      <a href="/cl/es/clientes/"><i class="fas fa-users"></i> Clientes</a>
-      <a href="/cl/es/vehiculos/"><i class="fas fa-car"></i> Vehículos</a>
-      <a href="/cl/es/documentos/form/"><i class="fas fa-file-invoice"></i> Documentos</a>
-      <a href="/cl/es/repuestos/"><i class="fas fa-cogs"></i> Repuestos</a>
-      <a href="/cl/es/reportes/"><i class="fas fa-chart-bar"></i> Reportes</a>
-      <a href="/cl/es/settings/"><i class="fas fa-cog"></i> Configuración</a>
+      {# Fallback shown only when nav_items absent (no empresa / no config). #}
+      {# nav_url_prefix is in context when empresa exists; defaults to /cl/es otherwise. #}
+      <a href="{{ nav_url_prefix|default:"/cl/es" }}/dashboard/"><i class="fas fa-home"></i> Inicio</a>
+      <a href="{{ nav_url_prefix|default:"/cl/es" }}/clientes/"><i class="fas fa-users"></i> Clientes</a>
+      <a href="{{ nav_url_prefix|default:"/cl/es" }}/vehiculos/"><i class="fas fa-car"></i> Vehículos</a>
+      <a href="{{ nav_url_prefix|default:"/cl/es" }}/documentos/form/"><i class="fas fa-file-invoice"></i> Documentos</a>
+      <a href="{{ nav_url_prefix|default:"/cl/es" }}/repuestos/"><i class="fas fa-cogs"></i> Repuestos</a>
+      <a href="{{ nav_url_prefix|default:"/cl/es" }}/reportes/"><i class="fas fa-chart-bar"></i> Reportes</a>
+      <a href="{{ nav_url_prefix|default:"/cl/es" }}/settings/"><i class="fas fa-cog"></i> Configuración</a>
     {% endif %}
   </nav>
 
   {% if needs_module_config %}
   <div class="eg-module-notice">
-    <a href="/cl/es/settings/" title="Configura los módulos de tu negocio">
+    <a href="{{ nav_url_prefix }}/settings/" title="Configura los módulos de tu negocio">
       <i class="fas fa-cog"></i> Configura tus módulos
     </a>
   </div>

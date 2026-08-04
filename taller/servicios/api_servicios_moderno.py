@@ -87,7 +87,7 @@ def api_buscar_servicios(request):
 
     # Filtro inteligente por rubro: mostrar servicios cuyo rubro coincide
     # o es genérico, o tiene rubro_efectivo que coincide
-    if rubro_empresa and rubro_empresa != "MIXED":
+    if rubro_empresa and rubro_empresa not in ("MIXED", "DESARMADURIA"):
         servicios_qs = servicios_qs.filter(
             Q(rubro_sugerido=rubro_empresa)
             | Q(rubro_efectivo=rubro_empresa)

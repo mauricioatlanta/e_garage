@@ -1,12 +1,18 @@
 ﻿<header class="eg-topbar">
-  <div>
-    <h1 class="eg-page-title">{% block page_title %}eGarage{% endblock %}</h1>
-    <p class="eg-page-subtitle">{% block page_subtitle %}Control operativo para negocios automotrices{% endblock %}</p>
+  <div style="display:flex;align-items:center;gap:10px;">
+    {% if workspace.brand.icon %}<i class="{{ workspace.brand.icon }}" style="font-size:1.1rem;color:var(--eg-primary,#38bdf8);"></i>{% endif %}
+    <div>
+      <h1 class="eg-page-title">{{ workspace.brand.product_name|default:"eGarage" }}</h1>
+      <p class="eg-page-subtitle">{{ workspace.brand.tagline|default:"Control operativo para negocios automotrices" }}</p>
+    </div>
   </div>
 
   <div>
     {% if request.user.is_authenticated %}
-      <a class="eg-btn eg-btn-secondary" href="/cl/es/accounts/logout/">Salir</a>
+      <form action="{% url 'account_logout' %}" method="post" style="margin:0;display:inline">
+        {% csrf_token %}
+        <button type="submit" class="eg-btn eg-btn-secondary">Salir</button>
+      </form>
     {% else %}
       <a class="eg-btn" href="{% url 'account_login' %}">Ingresar</a>
     {% endif %}

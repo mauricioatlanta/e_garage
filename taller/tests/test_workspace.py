@@ -515,3 +515,64 @@ class WorkspaceQuotesPendingServiceTests(TestCase):
         result = WorkspaceDashboardService.resolve(ws_def, empresa)
         widget = next(w for w in result["widgets"] if w["key"] == WGT_KPI_QUOTES_PENDING)
         self.assertEqual(widget["format"], "number")
+
+
+class WorkspaceThemeRenderTests(TestCase):
+    """Render tests: workspace.theme CSS vars appear in HTML output of layouts/app.html.
+
+    Uses /us/en/dashboard/ because that URL maps directly to workspace_dashboard
+    (which renders dashboard/index.html → extends layouts/app.html).
+    The /cl/es/dashboard/ path is a redirect dispatcher to centro-operaciones.
+    """
+
+    _DASH = "/us/en/dashboard/"
+
+    def _make_empresa(self, rubro):
+        from taller.tests.factories import EmpresaFactory, ConfiguracionEmpresaFactory
+        empresa = EmpresaFactory(pais="US")
+        ConfiguracionEmpresaFactory(empresa=empresa, rubro_principal=rubro)
+        return empresa
+
+    def test_parts_theme_vars_in_dashboard_html(self):
+        from django.test import Client
+        empresa = self._make_empresa("PARTS")
+        c = Client()
+        c.force_login(empresa.user)
+        response = c.get(self._DASH)
+        self.assertEqual(response.status_code, 200)
+        content = response.content.decode()
+        self.assertIn("--eg-primary", content)
+        self.assertIn("#84cc16", content)  # PARTS lime primary
+
+    def test_desarmaduria_theme_vars_in_dashboard_html(self):
+        from django.test import Client
+        empresa = self._make_empresa("DESARMADURIA")
+        c = Client()
+        c.force_login(empresa.user)
+        response = c.get(self._DASH)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("#fb923c", response.content.decode())  # DESARMADURIA orange primary
+
+    def test_workshop_theme_vars_in_dashboard_html(self):
+        from django.test import Client
+        empresa = self._make_empresa("WORKSHOP")
+        c = Client()
+        c.force_login(empresa.user)
+        response = c.get(self._DASH)
+        self.assertEqual(response.status_code, 200)
+        self.assertIn("#00f5ff", response.content.decode())  # TALLER cyan primary
+
+    def test_user_without_config_no_crash(self):
+        from django.test import Client
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(pais="US")  # no config
+        c = Client()
+        c.force_login(empresa.user)
+        response = c.get(self._DASH)
+        self.assertIn(response.status_code, [200, 302])
+
+    def test_anonymous_request_redirects_no_crash(self):
+        from django.test import Client
+        c = Client()
+        response = c.get(self._DASH)
+        self.assertEqual(response.status_code, 302)

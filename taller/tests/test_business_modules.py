@@ -71,7 +71,20 @@ class BusinessModuleServiceTests(TestCase):
         self.assertNotIn(MOD_DESARME, active)
         self.assertNotIn(MOD_FLOTA, active)
 
+    def test_desarmaduria_activa_desarme(self):
+        self.config.rubro_principal = "DESARMADURIA"
+        self.config.usa_vehiculos = True
+        self.config.usa_servicios = True
+
+        active = BusinessModuleService.get_active_modules(self.config)
+
+        self.assertIn(MOD_DESARME, active)
+        self.assertIn(MOD_VEHICULOS, active)
+        self.assertIn(MOD_REPUESTOS, active)
+        self.assertIn(MOD_SERVICIOS, active)
+
     def test_mixed_activa_desarme(self):
+        # MIXED = multi-rubro genuino; sigue activando desarme como backward compat
         self.config.rubro_principal = "MIXED"
         self.config.usa_vehiculos = True
         self.config.usa_servicios = True
@@ -108,7 +121,7 @@ class BusinessModuleServiceTests(TestCase):
 
     def test_rubros_extra_agregan_modulos(self):
         self.config.rubro_principal = "PARTS"
-        self.config.rubros = ["MIXED"]
+        self.config.rubros = ["DESARMADURIA"]
         self.config.usa_vehiculos = True
         self.config.usa_servicios = True
 
@@ -342,7 +355,13 @@ class ProductProfileTests(TestCase):
         profile = BusinessModuleService.get_product_profile(self.config)
         self.assertEqual(profile["name"], "eGarage Taller")
 
+    def test_desarmaduria_resuelve_perfil_desarmaduria(self):
+        self._set_rubro("DESARMADURIA")
+        profile = BusinessModuleService.get_product_profile(self.config)
+        self.assertEqual(profile["name"], "eGarage Desarmaduría")
+
     def test_mixed_resuelve_perfil_desarmaduria(self):
+        # MIXED sigue resolviendo al perfil Desarmaduría por compatibilidad
         self._set_rubro("MIXED")
         profile = BusinessModuleService.get_product_profile(self.config)
         self.assertEqual(profile["name"], "eGarage Desarmaduría")
@@ -367,7 +386,7 @@ class ProductProfileTests(TestCase):
         self.assertEqual(profile["name"], "eGarage Taller")
 
     def test_desarmaduria_label_vehiculos_de_desarme(self):
-        self._set_rubro("MIXED")
+        self._set_rubro("DESARMADURIA")
         self.config.usa_vehiculos = True
         self.config.usa_servicios = True
         items = BusinessModuleService.get_nav_items(self.config, "/cl/es", "")

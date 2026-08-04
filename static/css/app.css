@@ -201,6 +201,30 @@ th {
   letter-spacing: .08em;
 }
 
+.eg-quick-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 12px 22px;
+  min-height: 48px;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--eg-primary, #38bdf8) 35%, transparent);
+  background: color-mix(in srgb, var(--eg-primary, #38bdf8) 9%, transparent);
+  color: #cbd5e1;
+  font-size: .9rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color .15s, color .15s, background .15s;
+}
+.eg-quick-action:hover {
+  border-color: color-mix(in srgb, var(--eg-primary, #38bdf8) 70%, transparent);
+  background: color-mix(in srgb, var(--eg-primary, #38bdf8) 16%, transparent);
+  color: #f1f5f9;
+}
+.eg-quick-action i {
+  color: var(--eg-primary, #38bdf8);
+}
+
 @media (max-width: 920px) {
   .eg-shell { grid-template-columns: 1fr; }
   .eg-sidebar {

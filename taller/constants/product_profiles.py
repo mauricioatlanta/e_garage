@@ -48,6 +48,7 @@ RUBRO_TO_PRODUCT = {
     "TUNING":              PRODUCT_TALLER,
     "FLEET":               PRODUCT_TALLER,
     "FLEET_REPAIR":        PRODUCT_TALLER,
+    "DESARMADURIA":        PRODUCT_DESARMADURIA,
     "MIXED":               PRODUCT_DESARMADURIA,
     "PARTS":               PRODUCT_CASA_REPUESTOS,
     "TIRE":                PRODUCT_CASA_REPUESTOS,
@@ -85,7 +86,7 @@ PRODUCT_PROFILES = {
         "tagline":       "Control total de tu desarmaduría",
         "icon":          "fas fa-car-crash",
         "color_class":   "orange",
-        "default_rubro": "MIXED",
+        "default_rubro": "DESARMADURIA",
         "nav": [
             {"key": MOD_INICIO,        "label": "Inicio",               "icon": "fas fa-home"},
             {"key": MOD_DESARME,       "label": "Vehículos de Desarme", "icon": "fas fa-car-crash"},
