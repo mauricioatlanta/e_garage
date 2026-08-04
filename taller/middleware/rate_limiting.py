@@ -316,13 +316,15 @@ class RateLimitMiddleware:
             "/api/",
         ]
 
-        # Rutas específicas de IA que requieren rate limiting estricto
+        # Rutas específicas de IA que requieren rate limiting estricto.
+        # Nota: estas rutas pueden aparecer con prefijo de país (/cl/es/, /us/en/, etc.)
+        # por eso se usa "in path" en lugar de "startswith".
         self.ia_protected_paths = [
             "/analytics/predictive-api/",
             "/analytics/ai-insights/",
             "/taller/reportes/diagnostico/",
             "/analytics/revenue-api/",
-            "/analytics/predictive-api/",
+            "/workspace/briefing/",
         ]
 
     def __call__(self, request):
@@ -332,8 +334,9 @@ class RateLimitMiddleware:
             path.startswith(protected_path) for protected_path in self.protected_paths
         )
 
-        # Verificar si es una ruta de IA (requiere protección más estricta)
-        is_ia_path = any(path.startswith(ia_path) for ia_path in self.ia_protected_paths)
+        # Verificar si es una ruta de IA (requiere protección más estricta).
+        # Usa "in path" porque algunas rutas tienen prefijo de país (/cl/es/workspace/briefing/).
+        is_ia_path = any(ia_path in path for ia_path in self.ia_protected_paths)
 
         if (should_protect or is_ia_path) and request.method in ("GET", "POST", "HEAD", "OPTIONS"):
             ip = get_client_ip(request)

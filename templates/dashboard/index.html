@@ -29,6 +29,8 @@
 </div>
 {% endif %}
 
+{% include "components/workspace/briefing_panel.html" %}
+
 {% include "components/workspace/alerts_panel.html" %}
 
 {# Search + Live Feed #}
@@ -110,4 +112,7 @@
 </script>
 <script src="{% static 'taller/js/workspace_search.js' %}?v={{ STATIC_VERSION }}"></script>
 <script src="{% static 'taller/js/workspace_live_kpi.js' %}?v={{ STATIC_VERSION }}"></script>
+{% if briefing_url %}
+<script src="{% static 'taller/js/workspace_briefing.js' %}?v={{ STATIC_VERSION }}"></script>
+{% endif %}
 {% endblock %}

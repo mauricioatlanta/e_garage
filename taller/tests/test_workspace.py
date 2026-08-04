@@ -1281,3 +1281,517 @@ class WorkspaceAlertsStructureTests(TestCase):
         for alert in alerts:
             if alert["key"] in pieza_keys:
                 self.assertEqual(alert["severity"], "info")
+
+
+# ===========================================================================
+# Workspace AI Briefing tests (Fase IA)
+# ===========================================================================
+
+def _make_desarm_context(
+    empresa_id=1,
+    empresa_nombre="Test Desarme",
+    kpi_snapshot=(),
+    alert_snapshot=(),
+    lang="es",
+    today=None,
+):
+    """Helper: builds a BriefingContext without touching the DB."""
+    from datetime import date as _date
+    from taller.services.workspace_briefing_service import BriefingContext
+    from taller.constants.product_profiles import PRODUCT_DESARMADURIA
+
+    return BriefingContext(
+        empresa_id=empresa_id,
+        empresa_nombre=empresa_nombre,
+        rubro_label="Desarmaduría / Salvage",
+        product_key=PRODUCT_DESARMADURIA,
+        kpi_snapshot=kpi_snapshot,
+        alert_snapshot=alert_snapshot,
+        date=today or _date(2026, 8, 4),
+        lang=lang,
+    )
+
+
+# ---------------------------------------------------------------------------
+# 1. BriefingFallback — deterministic, no DB, no HTTP
+# ---------------------------------------------------------------------------
+
+class BriefingFallbackTests(TestCase):
+
+    def test_returns_briefing_result(self):
+        from taller.services.workspace_briefing_service import BriefingFallback, BriefingResult
+        ctx = _make_desarm_context()
+        result = BriefingFallback.generate(ctx)
+        self.assertIsInstance(result, BriefingResult)
+
+    def test_source_is_fallback(self):
+        from taller.services.workspace_briefing_service import BriefingFallback
+        result = BriefingFallback.generate(_make_desarm_context())
+        self.assertEqual(result.source, "fallback")
+
+    def test_cached_is_false(self):
+        from taller.services.workspace_briefing_service import BriefingFallback
+        result = BriefingFallback.generate(_make_desarm_context())
+        self.assertFalse(result.cached)
+
+    def test_greeting_is_non_empty(self):
+        from taller.services.workspace_briefing_service import BriefingFallback
+        result = BriefingFallback.generate(_make_desarm_context())
+        self.assertTrue(result.greeting.strip())
+
+    def test_summary_non_empty_tuple(self):
+        from taller.services.workspace_briefing_service import BriefingFallback
+        result = BriefingFallback.generate(_make_desarm_context())
+        self.assertIsInstance(result.summary, tuple)
+        self.assertGreater(len(result.summary), 0)
+
+    def test_recommendation_non_empty(self):
+        from taller.services.workspace_briefing_service import BriefingFallback
+        result = BriefingFallback.generate(_make_desarm_context())
+        self.assertTrue(result.recommendation.strip())
+
+    def test_warning_alert_drives_recommendation(self):
+        from taller.services.workspace_briefing_service import BriefingFallback
+        ctx = _make_desarm_context(alert_snapshot=(
+            {"message": "2 vehículos atascados", "count": 2, "severity": "warning"},
+        ))
+        result = BriefingFallback.generate(ctx)
+        self.assertIn("2", result.recommendation)
+
+    def test_info_alert_drives_recommendation_when_no_warning(self):
+        from taller.services.workspace_briefing_service import BriefingFallback
+        ctx = _make_desarm_context(alert_snapshot=(
+            {"message": "3 piezas sin fotografía", "count": 3, "severity": "info"},
+        ))
+        result = BriefingFallback.generate(ctx)
+        self.assertTrue(result.recommendation.strip())
+
+    def test_no_alerts_produces_positive_message(self):
+        from taller.services.workspace_briefing_service import BriefingFallback
+        ctx = _make_desarm_context(alert_snapshot=())
+        result = BriefingFallback.generate(ctx)
+        self.assertEqual(len(result.summary), 1)
+
+    def test_en_language(self):
+        from taller.services.workspace_briefing_service import BriefingFallback
+        ctx = _make_desarm_context(lang="en", alert_snapshot=(
+            {"message": "2 stuck vehicles", "count": 2, "severity": "warning"},
+        ))
+        result = BriefingFallback.generate(ctx)
+        self.assertIn("2", result.recommendation)
+
+    def test_summary_capped_at_max(self):
+        from taller.services.workspace_briefing_service import BriefingFallback, _MAX_SUMMARY_ITEMS
+        ctx = _make_desarm_context(alert_snapshot=tuple(
+            {"message": f"alerta {i}", "count": i, "severity": "info"}
+            for i in range(1, 10)
+        ))
+        result = BriefingFallback.generate(ctx)
+        self.assertLessEqual(len(result.summary), _MAX_SUMMARY_ITEMS)
+
+    def test_generated_at_is_iso_string(self):
+        from taller.services.workspace_briefing_service import BriefingFallback
+        result = BriefingFallback.generate(_make_desarm_context())
+        from datetime import datetime
+        parsed = datetime.fromisoformat(result.generated_at)
+        self.assertIsNotNone(parsed)
+
+
+# ---------------------------------------------------------------------------
+# 2. BriefingAIProvider — all HTTP mocked
+# ---------------------------------------------------------------------------
+
+class BriefingAIProviderTests(TestCase):
+
+    def _good_response(self, text=None):
+        """Returns a mock requests.Response with a valid Anthropic payload."""
+        import json as _json
+        from unittest.mock import MagicMock
+        body = text or _json.dumps({
+            "greeting": "Buenos días equipo.",
+            "summary": ["2 vehículos atascados.", "3 piezas sin foto."],
+            "recommendation": "Atiende los vehículos atascados cuanto antes.",
+        })
+        mock_resp = MagicMock()
+        mock_resp.ok = True
+        mock_resp.json.return_value = {
+            "content": [{"type": "text", "text": body}]
+        }
+        return mock_resp
+
+    @override_settings(ANTHROPIC_API_KEY="test-key-123")
+    def test_happy_path_returns_briefing_result(self):
+        from unittest.mock import patch
+        from taller.services.workspace_briefing_service import BriefingAIProvider, BriefingResult
+        ctx = _make_desarm_context()
+        with patch("taller.services.workspace_briefing_service._requests.post",
+                   return_value=self._good_response()):
+            result = BriefingAIProvider.call(ctx)
+        self.assertIsInstance(result, BriefingResult)
+        self.assertEqual(result.source, "ai")
+        self.assertFalse(result.cached)
+
+    @override_settings(ANTHROPIC_API_KEY="test-key-123")
+    def test_greeting_and_summary_populated(self):
+        from unittest.mock import patch
+        from taller.services.workspace_briefing_service import BriefingAIProvider
+        ctx = _make_desarm_context()
+        with patch("taller.services.workspace_briefing_service._requests.post",
+                   return_value=self._good_response()):
+            result = BriefingAIProvider.call(ctx)
+        self.assertEqual(result.greeting, "Buenos días equipo.")
+        self.assertIn("2 vehículos atascados.", result.summary)
+
+    def test_missing_api_key_raises(self):
+        from taller.services.workspace_briefing_service import BriefingAIProvider, BriefingAIError
+        with override_settings(ANTHROPIC_API_KEY=""):
+            with self.assertRaises(BriefingAIError):
+                BriefingAIProvider.call(_make_desarm_context())
+
+    @override_settings(ANTHROPIC_API_KEY="test-key-123")
+    def test_timeout_raises_briefing_ai_error(self):
+        import requests as req
+        from unittest.mock import patch
+        from taller.services.workspace_briefing_service import BriefingAIProvider, BriefingAIError
+        with patch("taller.services.workspace_briefing_service._requests.post",
+                   side_effect=req.exceptions.Timeout):
+            with self.assertRaises(BriefingAIError):
+                BriefingAIProvider.call(_make_desarm_context())
+
+    @override_settings(ANTHROPIC_API_KEY="test-key-123")
+    def test_http_500_raises_briefing_ai_error(self):
+        from unittest.mock import MagicMock, patch
+        from taller.services.workspace_briefing_service import BriefingAIProvider, BriefingAIError
+        bad = MagicMock()
+        bad.ok = False
+        bad.status_code = 500
+        with patch("taller.services.workspace_briefing_service._requests.post", return_value=bad):
+            with self.assertRaises(BriefingAIError):
+                BriefingAIProvider.call(_make_desarm_context())
+
+    @override_settings(ANTHROPIC_API_KEY="test-key-123")
+    def test_invalid_json_raises(self):
+        from unittest.mock import MagicMock, patch
+        from taller.services.workspace_briefing_service import BriefingAIProvider, BriefingAIError
+        bad_json = MagicMock()
+        bad_json.ok = True
+        bad_json.json.return_value = {"content": [{"type": "text", "text": "not json {{{"}]}
+        with patch("taller.services.workspace_briefing_service._requests.post", return_value=bad_json):
+            with self.assertRaises(BriefingAIError):
+                BriefingAIProvider.call(_make_desarm_context())
+
+    @override_settings(ANTHROPIC_API_KEY="test-key-123")
+    def test_missing_greeting_raises(self):
+        import json as _json
+        from unittest.mock import MagicMock, patch
+        from taller.services.workspace_briefing_service import BriefingAIProvider, BriefingAIError
+        bad_body = _json.dumps({"summary": ["line"], "recommendation": "rec"})
+        resp = MagicMock()
+        resp.ok = True
+        resp.json.return_value = {"content": [{"type": "text", "text": bad_body}]}
+        with patch("taller.services.workspace_briefing_service._requests.post", return_value=resp):
+            with self.assertRaises(BriefingAIError):
+                BriefingAIProvider.call(_make_desarm_context())
+
+    @override_settings(ANTHROPIC_API_KEY="test-key-123")
+    def test_empty_summary_list_raises(self):
+        import json as _json
+        from unittest.mock import MagicMock, patch
+        from taller.services.workspace_briefing_service import BriefingAIProvider, BriefingAIError
+        bad_body = _json.dumps({"greeting": "Hi", "summary": [], "recommendation": "rec"})
+        resp = MagicMock()
+        resp.ok = True
+        resp.json.return_value = {"content": [{"type": "text", "text": bad_body}]}
+        with patch("taller.services.workspace_briefing_service._requests.post", return_value=resp):
+            with self.assertRaises(BriefingAIError):
+                BriefingAIProvider.call(_make_desarm_context())
+
+    @override_settings(ANTHROPIC_API_KEY="test-key-123")
+    def test_summary_capped_at_six(self):
+        import json as _json
+        from unittest.mock import MagicMock, patch
+        from taller.services.workspace_briefing_service import BriefingAIProvider
+        body = _json.dumps({
+            "greeting": "Hi",
+            "summary": [f"line {i}" for i in range(10)],
+            "recommendation": "Do something.",
+        })
+        resp = MagicMock()
+        resp.ok = True
+        resp.json.return_value = {"content": [{"type": "text", "text": body}]}
+        with patch("taller.services.workspace_briefing_service._requests.post", return_value=resp):
+            result = BriefingAIProvider.call(_make_desarm_context())
+        self.assertLessEqual(len(result.summary), 6)
+
+
+# ---------------------------------------------------------------------------
+# 3. WorkspaceBriefingService — cache and budget
+# ---------------------------------------------------------------------------
+
+class WorkspaceBriefingServiceCacheTests(TestCase):
+
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+
+    def tearDown(self):
+        from django.core.cache import cache
+        cache.clear()
+
+    @override_settings(ANTHROPIC_API_KEY="", BRIEFING_CACHE_TTL=300)
+    def test_first_call_is_not_cached(self):
+        from taller.services.workspace_briefing_service import WorkspaceBriefingService
+        ctx = _make_desarm_context()
+        result = WorkspaceBriefingService.resolve(ctx)
+        self.assertFalse(result.cached)
+
+    @override_settings(ANTHROPIC_API_KEY="", BRIEFING_CACHE_TTL=300)
+    def test_second_call_is_cached(self):
+        from taller.services.workspace_briefing_service import WorkspaceBriefingService
+        ctx = _make_desarm_context()
+        WorkspaceBriefingService.resolve(ctx)
+        result2 = WorkspaceBriefingService.resolve(ctx)
+        self.assertTrue(result2.cached)
+
+    @override_settings(ANTHROPIC_API_KEY="", BRIEFING_CACHE_TTL=300)
+    def test_different_lang_different_cache_entry(self):
+        from taller.services.workspace_briefing_service import WorkspaceBriefingService
+        ctx_es = _make_desarm_context(lang="es")
+        ctx_en = _make_desarm_context(lang="en")
+        WorkspaceBriefingService.resolve(ctx_es)
+        result_en = WorkspaceBriefingService.resolve(ctx_en)
+        self.assertFalse(result_en.cached)
+
+    @override_settings(ANTHROPIC_API_KEY="", BRIEFING_CACHE_TTL=300)
+    def test_different_empresa_different_cache_entry(self):
+        from taller.services.workspace_briefing_service import WorkspaceBriefingService
+        ctx1 = _make_desarm_context(empresa_id=1)
+        ctx2 = _make_desarm_context(empresa_id=2)
+        WorkspaceBriefingService.resolve(ctx1)
+        result2 = WorkspaceBriefingService.resolve(ctx2)
+        self.assertFalse(result2.cached)
+
+    @override_settings(ANTHROPIC_API_KEY="", BRIEFING_CACHE_TTL=300)
+    def test_fallback_result_is_also_cached(self):
+        from taller.services.workspace_briefing_service import WorkspaceBriefingService
+        ctx = _make_desarm_context()
+        r1 = WorkspaceBriefingService.resolve(ctx)
+        self.assertEqual(r1.source, "fallback")
+        r2 = WorkspaceBriefingService.resolve(ctx)
+        self.assertTrue(r2.cached)
+        self.assertEqual(r2.source, "fallback")
+
+
+class WorkspaceBriefingServiceBudgetTests(TestCase):
+
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+
+    def tearDown(self):
+        from django.core.cache import cache
+        cache.clear()
+
+    @override_settings(ANTHROPIC_API_KEY="test-key", BRIEFING_DAILY_LIMIT=2)
+    def test_budget_exhausted_uses_fallback(self):
+        import json as _json
+        from unittest.mock import MagicMock, patch
+        from taller.services.workspace_briefing_service import (
+            WorkspaceBriefingService, _budget_key,
+        )
+        from django.core.cache import cache
+        from datetime import date
+
+        ctx = _make_desarm_context(empresa_id=77)
+        # Manually set budget to the limit
+        cache.set(_budget_key(77, date(2026, 8, 4)), 2, 86400)
+
+        good_body = _json.dumps({
+            "greeting": "Hola",
+            "summary": ["línea 1"],
+            "recommendation": "Recomendación.",
+        })
+        resp = MagicMock()
+        resp.ok = True
+        resp.json.return_value = {"content": [{"type": "text", "text": good_body}]}
+
+        with patch("taller.services.workspace_briefing_service._requests.post", return_value=resp) as mock_post:
+            result = WorkspaceBriefingService.resolve(ctx)
+            mock_post.assert_not_called()
+
+        self.assertEqual(result.source, "fallback")
+
+    @override_settings(ANTHROPIC_API_KEY="test-key", BRIEFING_DAILY_LIMIT=5, BRIEFING_CACHE_TTL=1)
+    def test_budget_incremented_on_successful_ai_call(self):
+        import json as _json
+        from unittest.mock import MagicMock, patch
+        from taller.services.workspace_briefing_service import (
+            WorkspaceBriefingService, _budget_key,
+        )
+        from django.core.cache import cache
+        from datetime import date
+
+        ctx = _make_desarm_context(empresa_id=88)
+        good_body = _json.dumps({
+            "greeting": "Buenos días",
+            "summary": ["Línea 1"],
+            "recommendation": "Recomendación.",
+        })
+        resp = MagicMock()
+        resp.ok = True
+        resp.json.return_value = {"content": [{"type": "text", "text": good_body}]}
+
+        with patch("taller.services.workspace_briefing_service._requests.post", return_value=resp):
+            result = WorkspaceBriefingService.resolve(ctx)
+
+        self.assertEqual(result.source, "ai")
+        used = cache.get(_budget_key(88, date(2026, 8, 4)), 0)
+        self.assertEqual(used, 1)
+
+
+# ---------------------------------------------------------------------------
+# 4. DESARMADURIA exclusivity
+# ---------------------------------------------------------------------------
+
+class WorkspaceBriefingDesarmaduriOnlyTests(TestCase):
+
+    def setUp(self):
+        from django.core.cache import cache
+        cache.clear()
+
+    def tearDown(self):
+        from django.core.cache import cache
+        cache.clear()
+
+    def _non_desarm_context(self, product_key):
+        from datetime import date
+        from taller.services.workspace_briefing_service import BriefingContext
+        return BriefingContext(
+            empresa_id=1,
+            empresa_nombre="Test",
+            rubro_label="Taller",
+            product_key=product_key,
+            kpi_snapshot=(),
+            alert_snapshot=(),
+            date=date(2026, 8, 4),
+            lang="es",
+        )
+
+    def test_taller_returns_fallback_immediately(self):
+        from taller.services.workspace_briefing_service import WorkspaceBriefingService
+        from taller.constants.product_profiles import PRODUCT_TALLER
+        result = WorkspaceBriefingService.resolve(self._non_desarm_context(PRODUCT_TALLER))
+        self.assertEqual(result.source, "fallback")
+        self.assertFalse(result.cached)
+
+    def test_carwash_returns_fallback_immediately(self):
+        from taller.services.workspace_briefing_service import WorkspaceBriefingService
+        from taller.constants.product_profiles import PRODUCT_CARWASH
+        result = WorkspaceBriefingService.resolve(self._non_desarm_context(PRODUCT_CARWASH))
+        self.assertEqual(result.source, "fallback")
+
+    def test_casa_repuestos_returns_fallback_immediately(self):
+        from taller.services.workspace_briefing_service import WorkspaceBriefingService
+        from taller.constants.product_profiles import PRODUCT_CASA_REPUESTOS
+        result = WorkspaceBriefingService.resolve(self._non_desarm_context(PRODUCT_CASA_REPUESTOS))
+        self.assertEqual(result.source, "fallback")
+
+
+# ---------------------------------------------------------------------------
+# 5. BriefingContextBuilder — query-level, uses DB
+# ---------------------------------------------------------------------------
+
+class BriefingContextBuilderTests(TestCase):
+
+    def _make_empresa(self):
+        from taller.tests.factories import ConfiguracionEmpresaFactory, EmpresaFactory
+        empresa = EmpresaFactory()
+        ConfiguracionEmpresaFactory(empresa=empresa, rubro_principal="DESARMADURIA")
+        return empresa
+
+    def test_build_returns_briefing_context(self):
+        from taller.services.workspace_briefing_service import BriefingContext, BriefingContextBuilder
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("MIXED")  # DESARMADURIA
+        ctx = BriefingContextBuilder.build(empresa, ws_def, "/cl/es", "es")
+        self.assertIsInstance(ctx, BriefingContext)
+
+    def test_product_key_matches_workspace(self):
+        from taller.services.workspace_briefing_service import BriefingContextBuilder
+        from taller.constants.product_profiles import PRODUCT_DESARMADURIA
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("MIXED")
+        ctx = BriefingContextBuilder.build(empresa, ws_def, "/cl/es", "es")
+        self.assertEqual(ctx.product_key, PRODUCT_DESARMADURIA)
+
+    def test_kpi_snapshot_has_no_url_field(self):
+        from taller.services.workspace_briefing_service import BriefingContextBuilder
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("MIXED")
+        ctx = BriefingContextBuilder.build(empresa, ws_def, "/cl/es", "es")
+        for kpi in ctx.kpi_snapshot:
+            self.assertNotIn("url", kpi, "kpi_snapshot must not contain URLs")
+            self.assertNotIn("key", kpi, "kpi_snapshot must not contain internal keys")
+
+    def test_alert_snapshot_has_no_url_or_icon(self):
+        from taller.services.workspace_briefing_service import BriefingContextBuilder
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("MIXED")
+        ctx = BriefingContextBuilder.build(empresa, ws_def, "/cl/es", "es")
+        for a in ctx.alert_snapshot:
+            self.assertNotIn("url", a, "alert_snapshot must not contain URLs")
+            self.assertNotIn("icon", a, "alert_snapshot must not contain icons")
+
+    def test_empresa_id_is_pk(self):
+        from taller.services.workspace_briefing_service import BriefingContextBuilder
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("MIXED")
+        ctx = BriefingContextBuilder.build(empresa, ws_def, "/cl/es", "es")
+        self.assertEqual(ctx.empresa_id, empresa.pk)
+
+
+# ---------------------------------------------------------------------------
+# 6. Privacy tests — prompt never contains PII
+# ---------------------------------------------------------------------------
+
+class BriefingPrivacyTests(TestCase):
+
+    def _ctx(self):
+        return _make_desarm_context(
+            empresa_id=9999,
+            empresa_nombre="Desarme Test",
+            kpi_snapshot=({"title": "Vehículos disponibles", "value": 5, "format": "number"},),
+            alert_snapshot=({"message": "2 vehículos atascados", "count": 2, "severity": "warning"},),
+        )
+
+    def test_empresa_id_not_in_prompt(self):
+        from taller.services.workspace_briefing_service import BriefingAIProvider
+        _, user_prompt = BriefingAIProvider._build_prompt(self._ctx())
+        self.assertNotIn("9999", user_prompt)
+
+    def test_no_url_in_user_prompt(self):
+        from taller.services.workspace_briefing_service import BriefingAIProvider
+        _, user_prompt = BriefingAIProvider._build_prompt(self._ctx())
+        self.assertNotIn("http", user_prompt)
+        self.assertNotIn("/cl/", user_prompt)
+        self.assertNotIn("/es/", user_prompt)
+
+    def test_kpi_snapshot_no_url_key(self):
+        ctx = self._ctx()
+        for kpi in ctx.kpi_snapshot:
+            self.assertNotIn("url", kpi)
+
+    def test_alert_snapshot_no_url_key(self):
+        ctx = self._ctx()
+        for a in ctx.alert_snapshot:
+            self.assertNotIn("url", a)
+
+    def test_alert_snapshot_no_icon_key(self):
+        ctx = self._ctx()
+        for a in ctx.alert_snapshot:
+            self.assertNotIn("icon", a)
+
+    def test_system_prompt_has_no_raw_empresa_id(self):
+        from taller.services.workspace_briefing_service import BriefingAIProvider
+        system, _ = BriefingAIProvider._build_prompt(self._ctx())
+        self.assertNotIn("9999", system)

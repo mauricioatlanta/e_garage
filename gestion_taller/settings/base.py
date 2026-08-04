@@ -321,3 +321,10 @@ else:
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "gestion_taller.resend_backend.ResendBackend")
 RESEND_API_KEY = (os.getenv("RESEND_API_KEY") or "").strip()
 DEFAULT_FROM_EMAIL = (os.getenv("DEFAULT_FROM_EMAIL") or "support@egarage.cl").strip()
+
+# AI Briefing — Anthropic
+# Si ANTHROPIC_API_KEY está vacía el briefing usa el fallback determinista sin error.
+ANTHROPIC_API_KEY   = (os.getenv("ANTHROPIC_API_KEY") or "").strip()
+ANTHROPIC_MODEL     = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
+BRIEFING_CACHE_TTL  = int(os.getenv("BRIEFING_CACHE_TTL", "1800"))    # segundos
+BRIEFING_DAILY_LIMIT = int(os.getenv("BRIEFING_DAILY_LIMIT", "10"))   # llamadas AI/empresa/día

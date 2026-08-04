@@ -21,6 +21,7 @@ from taller.views_extra.views_suscripciones import precios
 from taller.views_extra.views import dashboard
 from taller.views.dashboard_bi import DashboardHomeView
 from taller.views.workspace_dashboard import workspace_dashboard
+from taller.views.workspace_briefing import workspace_briefing
 from taller.main_views import seleccionar_pais
 
 app_name = "taller"
@@ -90,6 +91,7 @@ urlpatterns = [
     path("workspace/buscar/", centro_trabajo_buscar, name="centro_trabajo_buscar"),
     path("workspace/live-feed/", workspace_live_feed, name="workspace_live_feed"),
     path("workspace/centro-de-mando/", centro_de_mando, name="centro_de_mando"),
+    path("workspace/briefing/", workspace_briefing, name="workspace_briefing"),
     # Desarmaduría: mapa interactivo, plantillas, piezas
     path("desarme/", include(("taller.urls_desarme", "desarme"), namespace="desarme")),
     # Centro de Ingreso Vehicular

@@ -84,9 +84,16 @@ def workspace_dashboard(request):
 
     alerts_data = WorkspaceAlertsService.resolve(ws_def, empresa, prefix)
 
+    briefing_url = (
+        f"{prefix}/workspace/briefing/"
+        if ws_def.product_key == PRODUCT_DESARMADURIA
+        else None
+    )
+
     return render(request, "dashboard/index.html", {
         "dashboard_data": dashboard_data,
         "workspace_search_url": search_url,
         "workspace_base_prefix": prefix,
         "alerts_data": alerts_data,
+        "briefing_url": briefing_url,
     })
