@@ -77,6 +77,19 @@ class WorkspaceActionDef:
 
 
 @dataclass(frozen=True)
+class WorkspaceTextsDef:
+    """Contextual UI text keys — resolved via i18n by WorkspaceService."""
+    search_title_key: str          # card header: "Buscar vehículo o cliente"
+    search_label_key: str          # input label: "Vehículo o cliente"
+    search_placeholder_key: str    # input placeholder
+    search_hint_key: str           # footer hint beneath the card
+    live_feed_title_key: str       # live feed card header: "centro de mando"
+    live_feed_metric_key: str      # metric label: "en el taller"
+    quick_actions_label_key: str   # section heading: "Accesos rápidos"
+    activity_feed_title_key: str   # section heading: "Actividad reciente"
+
+
+@dataclass(frozen=True)
 class WorkspaceDef:
     """Complete declarative workspace for one product experience."""
     product_key: str
@@ -85,6 +98,7 @@ class WorkspaceDef:
     widget_keys: tuple[str, ...]
     quick_actions: tuple[WorkspaceActionDef, ...]
     theme: dict  # CSS custom property overrides: {"--eg-primary": "#00f5ff"}
+    texts: WorkspaceTextsDef
 
 
 # ---------------------------------------------------------------------------
@@ -92,17 +106,20 @@ class WorkspaceDef:
 # WorkspaceDashboardService maps these to queries; templates only iterate.
 # ---------------------------------------------------------------------------
 
-WGT_KPI_DOCS_TODAY      = "kpi_docs_today"       # All docs created today
-WGT_KPI_SALES_TODAY     = "kpi_sales_today"       # Total sales value today
-WGT_KPI_CLIENTS_MONTH   = "kpi_clients_month"     # New clients this month
-WGT_KPI_OT_OPEN         = "kpi_ot_open"           # Open work orders
-WGT_KPI_OT_DONE_TODAY   = "kpi_ot_done_today"     # Completed OTs today
-WGT_KPI_STOCK_CRITICAL  = "kpi_stock_critical"    # Parts below stock minimum
-WGT_KPI_DESARM_AVAIL    = "kpi_desarm_available"  # Dismantlable vehicles
-WGT_KPI_INVENTORY_VALUE = "kpi_inventory_value"   # Total inventory value
-WGT_KPI_SERVICES_TODAY  = "kpi_services_today"    # Services registered today
-WGT_KPI_QUOTES_PENDING  = "kpi_quotes_pending"    # PRES not yet converted or cancelled (PARTS)
-WGT_KPI_MARGIN_MONTH    = "kpi_margin_month"      # Gross margin % this month (PARTS, STOCK_BODEGA lines with known cost)
+WGT_KPI_DOCS_TODAY       = "kpi_docs_today"        # All docs created today
+WGT_KPI_SALES_TODAY      = "kpi_sales_today"        # Total sales value today
+WGT_KPI_CLIENTS_MONTH    = "kpi_clients_month"      # New clients this month
+WGT_KPI_OT_OPEN          = "kpi_ot_open"            # Open work orders
+WGT_KPI_OT_DONE_TODAY    = "kpi_ot_done_today"      # Completed OTs today
+WGT_KPI_STOCK_CRITICAL   = "kpi_stock_critical"     # Parts below stock minimum
+WGT_KPI_DESARM_AVAIL     = "kpi_desarm_available"   # Vehicles in active dismantling
+WGT_KPI_DESARM_DEPLETED  = "kpi_desarm_depleted"    # Vehicles fully depleted (estado=AGOTADO)
+WGT_KPI_INVENTORY_VALUE  = "kpi_inventory_value"    # Total inventory value
+WGT_KPI_SERVICES_TODAY   = "kpi_services_today"     # Services registered today
+WGT_KPI_QUOTES_PENDING   = "kpi_quotes_pending"     # PRES not yet converted or cancelled (PARTS)
+WGT_KPI_MARGIN_MONTH     = "kpi_margin_month"       # Gross margin % this month (PARTS, STOCK_BODEGA lines with known cost)
+WGT_KPI_PARTS_SOLD_TODAY = "kpi_parts_sold_today"   # Sum(LineaRepuesto.cantidad) for completed sales today
+WGT_KPI_PARTS_COUNT      = "kpi_parts_count"        # Total distinct Repuesto records in inventory
 
 
 # ---------------------------------------------------------------------------
@@ -176,6 +193,46 @@ TERMINOLOGY: dict[str, object] = {
     # -- Carwash: actions --
     "workspace.carwash.action.new_service": _("workspace.carwash.action.new_service"),
     "workspace.carwash.action.new_client":  _("workspace.carwash.action.new_client"),
+
+    # -- Taller: texts --
+    "workspace.taller.texts.search_title":       _("workspace.taller.texts.search_title"),
+    "workspace.taller.texts.search_label":       _("workspace.taller.texts.search_label"),
+    "workspace.taller.texts.search_placeholder": _("workspace.taller.texts.search_placeholder"),
+    "workspace.taller.texts.search_hint":        _("workspace.taller.texts.search_hint"),
+    "workspace.taller.texts.live_title":         _("workspace.taller.texts.live_title"),
+    "workspace.taller.texts.live_metric":        _("workspace.taller.texts.live_metric"),
+    "workspace.taller.texts.quick_actions":      _("workspace.taller.texts.quick_actions"),
+    "workspace.taller.texts.activity_feed":      _("workspace.taller.texts.activity_feed"),
+
+    # -- Desarmaduría: texts --
+    "workspace.desarm.texts.search_title":       _("workspace.desarm.texts.search_title"),
+    "workspace.desarm.texts.search_label":       _("workspace.desarm.texts.search_label"),
+    "workspace.desarm.texts.search_placeholder": _("workspace.desarm.texts.search_placeholder"),
+    "workspace.desarm.texts.search_hint":        _("workspace.desarm.texts.search_hint"),
+    "workspace.desarm.texts.live_title":         _("workspace.desarm.texts.live_title"),
+    "workspace.desarm.texts.live_metric":        _("workspace.desarm.texts.live_metric"),
+    "workspace.desarm.texts.quick_actions":      _("workspace.desarm.texts.quick_actions"),
+    "workspace.desarm.texts.activity_feed":      _("workspace.desarm.texts.activity_feed"),
+
+    # -- Casa de Repuestos: texts --
+    "workspace.parts.texts.search_title":       _("workspace.parts.texts.search_title"),
+    "workspace.parts.texts.search_label":       _("workspace.parts.texts.search_label"),
+    "workspace.parts.texts.search_placeholder": _("workspace.parts.texts.search_placeholder"),
+    "workspace.parts.texts.search_hint":        _("workspace.parts.texts.search_hint"),
+    "workspace.parts.texts.live_title":         _("workspace.parts.texts.live_title"),
+    "workspace.parts.texts.live_metric":        _("workspace.parts.texts.live_metric"),
+    "workspace.parts.texts.quick_actions":      _("workspace.parts.texts.quick_actions"),
+    "workspace.parts.texts.activity_feed":      _("workspace.parts.texts.activity_feed"),
+
+    # -- Carwash: texts --
+    "workspace.carwash.texts.search_title":       _("workspace.carwash.texts.search_title"),
+    "workspace.carwash.texts.search_label":       _("workspace.carwash.texts.search_label"),
+    "workspace.carwash.texts.search_placeholder": _("workspace.carwash.texts.search_placeholder"),
+    "workspace.carwash.texts.search_hint":        _("workspace.carwash.texts.search_hint"),
+    "workspace.carwash.texts.live_title":         _("workspace.carwash.texts.live_title"),
+    "workspace.carwash.texts.live_metric":        _("workspace.carwash.texts.live_metric"),
+    "workspace.carwash.texts.quick_actions":      _("workspace.carwash.texts.quick_actions"),
+    "workspace.carwash.texts.activity_feed":      _("workspace.carwash.texts.activity_feed"),
 }
 
 
@@ -214,6 +271,16 @@ WORKSPACE_TALLER = WorkspaceDef(
         WorkspaceActionDef("workspace.taller.action.new_client",   "fas fa-user-plus",  "clientes/crear/"),
     ),
     theme={"--eg-primary": "#00f5ff", "--eg-accent": "#b026ff"},
+    texts=WorkspaceTextsDef(
+        search_title_key="workspace.taller.texts.search_title",
+        search_label_key="workspace.taller.texts.search_label",
+        search_placeholder_key="workspace.taller.texts.search_placeholder",
+        search_hint_key="workspace.taller.texts.search_hint",
+        live_feed_title_key="workspace.taller.texts.live_title",
+        live_feed_metric_key="workspace.taller.texts.live_metric",
+        quick_actions_label_key="workspace.taller.texts.quick_actions",
+        activity_feed_title_key="workspace.taller.texts.activity_feed",
+    ),
 )
 
 WORKSPACE_DESARMADURIA = WorkspaceDef(
@@ -235,9 +302,9 @@ WORKSPACE_DESARMADURIA = WorkspaceDef(
     ),
     widget_keys=(
         WGT_KPI_DESARM_AVAIL,
-        WGT_KPI_INVENTORY_VALUE,
-        WGT_KPI_DOCS_TODAY,
-        WGT_KPI_CLIENTS_MONTH,
+        WGT_KPI_PARTS_COUNT,
+        WGT_KPI_PARTS_SOLD_TODAY,
+        WGT_KPI_DESARM_DEPLETED,
     ),
     quick_actions=(
         WorkspaceActionDef("workspace.desarm.action.new_vehicle",    "fas fa-plus-circle",   "desarme/crear/"),
@@ -245,6 +312,16 @@ WORKSPACE_DESARMADURIA = WorkspaceDef(
         WorkspaceActionDef("workspace.desarm.action.view_inventory", "fas fa-boxes",         "repuestos/"),
     ),
     theme={"--eg-primary": "#fb923c", "--eg-accent": "#f97316"},
+    texts=WorkspaceTextsDef(
+        search_title_key="workspace.desarm.texts.search_title",
+        search_label_key="workspace.desarm.texts.search_label",
+        search_placeholder_key="workspace.desarm.texts.search_placeholder",
+        search_hint_key="workspace.desarm.texts.search_hint",
+        live_feed_title_key="workspace.desarm.texts.live_title",
+        live_feed_metric_key="workspace.desarm.texts.live_metric",
+        quick_actions_label_key="workspace.desarm.texts.quick_actions",
+        activity_feed_title_key="workspace.desarm.texts.activity_feed",
+    ),
 )
 
 WORKSPACE_CASA_REPUESTOS = WorkspaceDef(
@@ -276,6 +353,16 @@ WORKSPACE_CASA_REPUESTOS = WorkspaceDef(
         WorkspaceActionDef("workspace.parts.action.view_inventory", "fas fa-boxes",         "repuestos/"),
     ),
     theme={"--eg-primary": "#84cc16", "--eg-accent": "#65a30d"},
+    texts=WorkspaceTextsDef(
+        search_title_key="workspace.parts.texts.search_title",
+        search_label_key="workspace.parts.texts.search_label",
+        search_placeholder_key="workspace.parts.texts.search_placeholder",
+        search_hint_key="workspace.parts.texts.search_hint",
+        live_feed_title_key="workspace.parts.texts.live_title",
+        live_feed_metric_key="workspace.parts.texts.live_metric",
+        quick_actions_label_key="workspace.parts.texts.quick_actions",
+        activity_feed_title_key="workspace.parts.texts.activity_feed",
+    ),
 )
 
 WORKSPACE_CARWASH = WorkspaceDef(
@@ -305,6 +392,16 @@ WORKSPACE_CARWASH = WorkspaceDef(
         WorkspaceActionDef("workspace.carwash.action.new_client",  "fas fa-user-plus", "clientes/crear/"),
     ),
     theme={"--eg-primary": "#3b82f6", "--eg-accent": "#1d4ed8"},
+    texts=WorkspaceTextsDef(
+        search_title_key="workspace.carwash.texts.search_title",
+        search_label_key="workspace.carwash.texts.search_label",
+        search_placeholder_key="workspace.carwash.texts.search_placeholder",
+        search_hint_key="workspace.carwash.texts.search_hint",
+        live_feed_title_key="workspace.carwash.texts.live_title",
+        live_feed_metric_key="workspace.carwash.texts.live_metric",
+        quick_actions_label_key="workspace.carwash.texts.quick_actions",
+        activity_feed_title_key="workspace.carwash.texts.activity_feed",
+    ),
 )
 
 

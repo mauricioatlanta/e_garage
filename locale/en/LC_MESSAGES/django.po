@@ -654,6 +654,103 @@ msgstr "Register Service"
 msgid "workspace.carwash.action.new_client"
 msgstr "New Client"
 
+# -- Contextual UI texts (workspace.texts) --
+msgid "workspace.taller.texts.search_title"
+msgstr "Search vehicle or customer"
+
+msgid "workspace.taller.texts.search_label"
+msgstr "Vehicle or customer"
+
+msgid "workspace.taller.texts.search_placeholder"
+msgstr "Search plate, VIN, name, phone or email"
+
+msgid "workspace.taller.texts.search_hint"
+msgstr "the action you'll use most, all day"
+
+msgid "workspace.taller.texts.live_title"
+msgstr "command center"
+
+msgid "workspace.taller.texts.live_metric"
+msgstr "in workshop"
+
+msgid "workspace.taller.texts.quick_actions"
+msgstr "Quick access"
+
+msgid "workspace.taller.texts.activity_feed"
+msgstr "Recent activity"
+
+msgid "workspace.desarm.texts.search_title"
+msgstr "Search vehicle or part"
+
+msgid "workspace.desarm.texts.search_label"
+msgstr "Vehicle or part"
+
+msgid "workspace.desarm.texts.search_placeholder"
+msgstr "Search plate, make, model or part number"
+
+msgid "workspace.desarm.texts.search_hint"
+msgstr "locate every vehicle or part instantly"
+
+msgid "workspace.desarm.texts.live_title"
+msgstr "command center"
+
+msgid "workspace.desarm.texts.live_metric"
+msgstr "vehicles in dismantling"
+
+msgid "workspace.desarm.texts.quick_actions"
+msgstr "Quick access"
+
+msgid "workspace.desarm.texts.activity_feed"
+msgstr "Recent movements"
+
+msgid "workspace.parts.texts.search_title"
+msgstr "Search part"
+
+msgid "workspace.parts.texts.search_label"
+msgstr "Part or customer"
+
+msgid "workspace.parts.texts.search_placeholder"
+msgstr "Search by code, SKU, name or supplier"
+
+msgid "workspace.parts.texts.search_hint"
+msgstr "your inventory in real time"
+
+msgid "workspace.parts.texts.live_title"
+msgstr "operations center"
+
+msgid "workspace.parts.texts.live_metric"
+msgstr "critical stock"
+
+msgid "workspace.parts.texts.quick_actions"
+msgstr "Quick actions"
+
+msgid "workspace.parts.texts.activity_feed"
+msgstr "Recent movements"
+
+msgid "workspace.carwash.texts.search_title"
+msgstr "Search customer or vehicle"
+
+msgid "workspace.carwash.texts.search_label"
+msgstr "Customer or vehicle"
+
+msgid "workspace.carwash.texts.search_placeholder"
+msgstr "Search name, plate, phone"
+
+msgid "workspace.carwash.texts.search_hint"
+msgstr "log services instantly"
+
+msgid "workspace.carwash.texts.live_title"
+msgstr "daily register"
+
+msgid "workspace.carwash.texts.live_metric"
+msgstr "services today"
+
+msgid "workspace.carwash.texts.quick_actions"
+msgstr "Quick services"
+
+msgid "workspace.carwash.texts.activity_feed"
+msgstr "Today's services"
+
 # -- Widget titles (dashboard_service) --
 msgid "OT Abiertas"
 msgstr "Open Work Orders"
@@ -678,3 +775,12 @@ msgstr "Inventory value"
 
 msgid "Servicios hoy"
 msgstr "Services today"
+
+msgid "Vehículos agotados"
+msgstr "Depleted vehicles"
+
+msgid "Piezas vendidas hoy"
+msgstr "Parts sold today"
+
+msgid "Piezas inventariadas"
+msgstr "Parts in inventory"

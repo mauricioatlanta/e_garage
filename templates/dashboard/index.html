@@ -29,6 +29,8 @@
 </div>
 {% endif %}
 
+{% include "components/workspace/alerts_panel.html" %}
+
 {# Search + Live Feed #}
 <div class="workspace-action-grid" style="margin-bottom: 24px;">
   {% include "components/workspace/search_panel.html" %}
@@ -38,7 +40,7 @@
 {# Quick actions #}
 {% if workspace.quick_actions %}
 <div class="bg-[#111827] border border-[#1e293b] rounded-xl p-6 mb-6">
-  <h3 class="mb-4 font-semibold text-sm uppercase tracking-widest text-slate-400">Accesos rápidos</h3>
+  <h3 class="mb-4 font-semibold text-sm uppercase tracking-widest text-slate-400">{{ workspace.texts.quick_actions_label }}</h3>
   <div style="display:flex; flex-wrap:wrap; gap:12px;">
     {% for action in workspace.quick_actions %}
     <a href="{{ action.url }}"
@@ -57,35 +59,42 @@
 </div>
 {% endif %}
 
-{# Activity placeholder #}
-<div class="bg-[#111827] border border-[#1e293b] rounded-xl p-6">
-  <h3 class="mb-4 font-semibold">Actividad reciente</h3>
-  <p style="color:#64748b; font-size:.875rem;">
-    {% if dashboard_data.date %}Datos al {{ dashboard_data.date }}{% endif %}
-  </p>
-</div>
+{% include "components/workspace/activity_feed.html" %}
 
 {% endblock %}
 
 {% block extra_js %}
 {{ block.super }}
 <script>
-  {% with is_parts=workspace.product_key|stringformat:"s" %}
   window.workspaceSearchI18n = {
     {% if workspace.product_key == "CASA_REPUESTOS" %}
-    vehicles:    "{% if request.LANGUAGE_CODE == 'en' %}Parts{% else %}Repuestos{% endif %}",
+    vehicles:        "{% if request.LANGUAGE_CODE == 'en' %}Parts{% else %}Repuestos{% endif %}",
     vehicleBadge:    "{% if request.LANGUAGE_CODE == 'en' %}Part{% else %}Repuesto{% endif %}",
     untitledVehicle: "{% if request.LANGUAGE_CODE == 'en' %}No code{% else %}Sin código{% endif %}",
-    loadingBody: "{% if request.LANGUAGE_CODE == 'en' %}Searching parts by SKU, name or supplier...{% else %}Buscando repuestos por número de parte, nombre o proveedor...{% endif %}",
-    hintBody:    "{% if request.LANGUAGE_CODE == 'en' %}Use at least 2 characters to search by part number, name or supplier.{% else %}Usa al menos 2 caracteres para buscar por número de parte, nombre o proveedor.{% endif %}",
-    emptyBody:   "{% if request.LANGUAGE_CODE == 'en' %}Try another part number or name.{% else %}Prueba con otro número de parte o nombre.{% endif %}",
-    {% else %}
-    vehicles:    "{% if request.LANGUAGE_CODE == 'en' %}Vehicles{% else %}Vehículos{% endif %}",
+    loadingBody:     "{{ workspace.texts.search_placeholder }}...",
+    hintBody:        "{{ workspace.texts.search_hint }}",
+    emptyBody:       "{% if request.LANGUAGE_CODE == 'en' %}Try another code, name or supplier.{% else %}Prueba con otro código, nombre o proveedor.{% endif %}",
+    {% elif workspace.product_key == "DESARMADURIA" %}
+    vehicles:        "{% if request.LANGUAGE_CODE == 'en' %}Dismantling vehicles{% else %}Vehículos de Desarme{% endif %}",
     vehicleBadge:    "{% if request.LANGUAGE_CODE == 'en' %}Vehicle{% else %}Vehículo{% endif %}",
     untitledVehicle: "{% if request.LANGUAGE_CODE == 'en' %}Vehicle without plate{% else %}Vehículo sin patente{% endif %}",
-    loadingBody: "{% if request.LANGUAGE_CODE == 'en' %}Checking matching vehicles and customers...{% else %}Consultando vehículos y clientes coincidentes...{% endif %}",
-    hintBody:    "{% if request.LANGUAGE_CODE == 'en' %}Use at least 2 characters to search by plate, VIN, customer name, phone, email or tax ID.{% else %}Usa al menos 2 caracteres para buscar por patente, VIN, nombre, teléfono, correo o RUT.{% endif %}",
-    emptyBody:   "{% if request.LANGUAGE_CODE == 'en' %}Try another plate, VIN or customer detail.{% else %}Prueba con otra patente, VIN o dato del cliente.{% endif %}",
+    loadingBody:     "{{ workspace.texts.search_placeholder }}...",
+    hintBody:        "{{ workspace.texts.search_hint }}",
+    emptyBody:       "{% if request.LANGUAGE_CODE == 'en' %}Try another plate, make or part number.{% else %}Prueba con otra patente, marca o número de pieza.{% endif %}",
+    {% elif workspace.product_key == "CARWASH" %}
+    vehicles:        "{% if request.LANGUAGE_CODE == 'en' %}Vehicles{% else %}Vehículos{% endif %}",
+    vehicleBadge:    "{% if request.LANGUAGE_CODE == 'en' %}Vehicle{% else %}Vehículo{% endif %}",
+    untitledVehicle: "{% if request.LANGUAGE_CODE == 'en' %}Vehicle without plate{% else %}Vehículo sin patente{% endif %}",
+    loadingBody:     "{{ workspace.texts.search_placeholder }}...",
+    hintBody:        "{{ workspace.texts.search_hint }}",
+    emptyBody:       "{% if request.LANGUAGE_CODE == 'en' %}Try another name, plate or phone.{% else %}Prueba con otro nombre, patente o teléfono.{% endif %}",
+    {% else %}
+    vehicles:        "{% if request.LANGUAGE_CODE == 'en' %}Vehicles{% else %}Vehículos{% endif %}",
+    vehicleBadge:    "{% if request.LANGUAGE_CODE == 'en' %}Vehicle{% else %}Vehículo{% endif %}",
+    untitledVehicle: "{% if request.LANGUAGE_CODE == 'en' %}Vehicle without plate{% else %}Vehículo sin patente{% endif %}",
+    loadingBody:     "{{ workspace.texts.search_placeholder }}...",
+    hintBody:        "{{ workspace.texts.search_hint }}",
+    emptyBody:       "{% if request.LANGUAGE_CODE == 'en' %}Try another plate, VIN or customer detail.{% else %}Prueba con otra patente, VIN o dato del cliente.{% endif %}",
     {% endif %}
     customers:          "{% if request.LANGUAGE_CODE == 'en' %}Customers{% else %}Clientes{% endif %}",
     loadingTitle:       "{% if request.LANGUAGE_CODE == 'en' %}Searching live{% else %}Buscando en vivo{% endif %}",
@@ -98,7 +107,6 @@
     unassignedCustomer: "{% if request.LANGUAGE_CODE == 'en' %}No linked customer{% else %}Sin cliente asociado{% endif %}",
     resultsLabel:       "{% if request.LANGUAGE_CODE == 'en' %}results{% else %}resultados{% endif %}"
   };
-  {% endwith %}
 </script>
 <script src="{% static 'taller/js/workspace_search.js' %}?v={{ STATIC_VERSION }}"></script>
 <script src="{% static 'taller/js/workspace_live_kpi.js' %}?v={{ STATIC_VERSION }}"></script>

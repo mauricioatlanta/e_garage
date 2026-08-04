@@ -33,7 +33,10 @@ from taller.models.clientes import Cliente
 from taller.models.configuracion import ConfiguracionEmpresa
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
+from taller.models.lineas_documento import LineaRepuesto, ORIGEN_EXTERNO
+from taller.models.pieza_desarme import PiezaDesarme
 from taller.models.repuesto import Repuesto
+from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 
 # ---------------------------------------------------------------------------
@@ -298,3 +301,105 @@ def RepuestoFactory(*, empresa: Empresa | None = None, **kwargs) -> Repuesto:
     )
     defaults.update(kwargs)
     return Repuesto.objects.create(**defaults)
+
+
+# ---------------------------------------------------------------------------
+# VehiculoDesarmeFactory
+# ---------------------------------------------------------------------------
+
+def VehiculoDesarmeFactory(*, empresa=None, **kwargs) -> VehiculoDesarme:
+    """
+    Creates a VehiculoDesarme for an Empresa.
+
+    Auto-generated fields:
+        estado_desarme → "INGRESADO"
+        es_placeholder → False
+
+    Override:
+        VehiculoDesarmeFactory(empresa=empresa, estado_desarme="AGOTADO")
+    """
+    if empresa is None:
+        empresa = EmpresaFactory()
+
+    defaults = dict(empresa=empresa, estado_desarme="INGRESADO")
+    defaults.update(kwargs)
+    return VehiculoDesarme.objects.create(**defaults)
+
+
+# ---------------------------------------------------------------------------
+# PiezaDesarmeFactory
+# ---------------------------------------------------------------------------
+
+def PiezaDesarmeFactory(*, empresa=None, vehiculo_desarme=None, **kwargs) -> PiezaDesarme:
+    """
+    Creates a PiezaDesarme for an Empresa.
+
+    If no empresa is supplied, one is created via EmpresaFactory().
+    If no vehiculo_desarme is supplied, one is created via VehiculoDesarmeFactory().
+
+    Auto-generated fields:
+        codigo         → "PIE-<n>"
+        nombre         → "Pieza <n>"
+        estado_pieza   → "DISPONIBLE"
+        activo         → True
+
+    Override:
+        PiezaDesarmeFactory(empresa=empresa, imagen=None, precio_venta_sugerido=None)
+    """
+    if empresa is None:
+        empresa = EmpresaFactory()
+
+    if vehiculo_desarme is None:
+        vehiculo_desarme = VehiculoDesarmeFactory(empresa=empresa)
+
+    n = _seq()
+    defaults = dict(
+        empresa=empresa,
+        vehiculo_desarme=vehiculo_desarme,
+        codigo=f"PIE-{n}",
+        nombre=f"Pieza {n}",
+        estado_pieza="DISPONIBLE",
+        activo=True,
+    )
+    defaults.update(kwargs)
+    return PiezaDesarme.objects.create(**defaults)
+
+
+# ---------------------------------------------------------------------------
+# LineaRepuestoFactory
+# ---------------------------------------------------------------------------
+
+def LineaRepuestoFactory(*, documento=None, empresa=None, **kwargs) -> LineaRepuesto:
+    """
+    Creates a LineaRepuesto for a Documento.
+
+    If no documento is supplied, one is created via DocumentoFactory() for
+    the given empresa (or a new one). Uses ORIGEN_EXTERNO to avoid FK
+    requirements on Repuesto/PiezaDesarme.
+
+    Auto-generated fields:
+        codigo         → "COD-<n>"
+        nombre         → "Pieza <n>"
+        cantidad       → 1
+        precio_unitario → Decimal("5000.00")
+        origen_repuesto → ORIGEN_EXTERNO
+
+    Override:
+        LineaRepuestoFactory(documento=doc, cantidad=5)
+    """
+    if documento is None:
+        if empresa is None:
+            empresa = EmpresaFactory()
+        documento = DocumentoFactory(empresa=empresa)
+
+    n = _seq()
+    defaults = dict(
+        documento=documento,
+        codigo=f"COD-{n}",
+        nombre=f"Pieza {n}",
+        cantidad=1,
+        precio_unitario=Decimal("5000.00"),
+        origen_repuesto=ORIGEN_EXTERNO,
+    )
+    defaults.update(kwargs)
+    return LineaRepuesto.objects.create(**defaults)

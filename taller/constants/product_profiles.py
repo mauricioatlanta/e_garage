@@ -48,6 +48,7 @@ RUBRO_TO_PRODUCT = {
     "TUNING":              PRODUCT_TALLER,
     "FLEET":               PRODUCT_TALLER,
     "FLEET_REPAIR":        PRODUCT_TALLER,
+    "DESARMADURIA":        PRODUCT_DESARMADURIA,
     "MIXED":               PRODUCT_DESARMADURIA,
     "PARTS":               PRODUCT_CASA_REPUESTOS,
     "TIRE":                PRODUCT_CASA_REPUESTOS,

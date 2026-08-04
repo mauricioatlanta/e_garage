@@ -56,6 +56,7 @@ class WorkspaceService:
             "quick_actions": WorkspaceService._resolve_actions(ws, url_prefix),
             "theme":         ws.theme,
             "product_key":   ws.product_key,
+            "texts":         WorkspaceService._resolve_texts(ws),
         }
 
     # ------------------------------------------------------------------
@@ -150,3 +151,17 @@ class WorkspaceService:
             }
             for action in ws.quick_actions
         ]
+
+    @staticmethod
+    def _resolve_texts(ws: WorkspaceDef) -> dict:
+        t = ws.texts
+        return {
+            "search_title":        WorkspaceService._term(t.search_title_key),
+            "search_label":        WorkspaceService._term(t.search_label_key),
+            "search_placeholder":  WorkspaceService._term(t.search_placeholder_key),
+            "search_hint":         WorkspaceService._term(t.search_hint_key),
+            "live_feed_title":     WorkspaceService._term(t.live_feed_title_key),
+            "live_feed_metric":    WorkspaceService._term(t.live_feed_metric_key),
+            "quick_actions_label": WorkspaceService._term(t.quick_actions_label_key),
+            "activity_feed_title": WorkspaceService._term(t.activity_feed_title_key),
+        }

@@ -6,23 +6,34 @@ Resolves dashboard data for a given WorkspaceDef and Empresa.
 Contract:
   - Receives: WorkspaceDef, Empresa instance, optional date (defaults to today)
   - Returns: concrete dict — no lazy querysets, no deferred evaluation.
-  - Groups all ORM queries by table; at most 4 queries regardless of widget count.
+  - Groups ORM queries by table; each group executes at most 1 SQL query.
+  - ACTIVITY_FEED always runs (1 query, last 5 EMITIDO docs with select_related).
   - Never renders HTML.
 
 Widget query groups (each group = 1 SQL query max):
-  GROUP_DOCS      Documento table  → kpi_ot_open, kpi_docs_today,
-                                      kpi_sales_today, kpi_services_today
-  GROUP_CLIENTS   Cliente table    → kpi_clients_month
-  GROUP_INVENTORY Repuesto table   → kpi_stock_critical, kpi_inventory_value
-  GROUP_DESARM    VehiculoDesarme  → kpi_desarm_available
+  GROUP_DOCS        Documento table    → kpi_ot_open, kpi_docs_today,
+                                          kpi_sales_today, kpi_services_today,
+                                          kpi_quotes_pending
+  GROUP_CLIENTS     Cliente table      → kpi_clients_month
+  GROUP_INVENTORY   Repuesto table     → kpi_stock_critical, kpi_inventory_value,
+                                          kpi_parts_count
+  GROUP_DESARM      VehiculoDesarme    → kpi_desarm_available, kpi_desarm_depleted
+  GROUP_PARTS_TODAY LineaRepuesto      → kpi_parts_sold_today
+  GROUP_LINEAS      LineaRepuesto      → kpi_margin_month
+  ACTIVITY_FEED     Documento          → always (last 5 EMITIDO docs)
+
+Query totals per workspace (widget groups + activity feed):
+  TALLER:       GROUP_DOCS + GROUP_CLIENTS + ACTIVITY_FEED                          = 3
+  DESARMADURIA: GROUP_INVENTORY + GROUP_DESARM + GROUP_PARTS_TODAY + ACTIVITY_FEED  = 4
+  PARTS:        GROUP_DOCS + GROUP_INVENTORY + GROUP_LINEAS + ACTIVITY_FEED         = 4
+  CARWASH:      GROUP_DOCS + GROUP_CLIENTS + ACTIVITY_FEED                          = 3
 
 Dashboard data structure:
   {
-    "widgets": [
-        {"key": str, "title": str, "icon": str, "value": int|Decimal, "format": str},
-        ...
-    ],
-    "date": date,
+    "widgets":       [{"key", "title", "icon", "value", "format", "has_value"}, ...],
+    "date":          date,
+    "activity_feed": [{"numero", "tipo", "tipo_label", "total", "cliente_nombre",
+                        "fecha"}, ...],
   }
 """
 from __future__ import annotations
@@ -37,10 +48,13 @@ from django.utils.translation import gettext_lazy as _
 from taller.constants.workspaces import (
     WGT_KPI_CLIENTS_MONTH,
     WGT_KPI_DESARM_AVAIL,
+    WGT_KPI_DESARM_DEPLETED,
     WGT_KPI_DOCS_TODAY,
     WGT_KPI_INVENTORY_VALUE,
     WGT_KPI_MARGIN_MONTH,
     WGT_KPI_OT_OPEN,
+    WGT_KPI_PARTS_COUNT,
+    WGT_KPI_PARTS_SOLD_TODAY,
     WGT_KPI_QUOTES_PENDING,
     WGT_KPI_SALES_TODAY,
     WGT_KPI_SERVICES_TODAY,
@@ -56,24 +70,28 @@ _ZERO_DEC = Value(Decimal("0.00"), output_field=DecimalField(max_digits=14, deci
 # "number"   → plain integer
 # "currency" → formatted as money (template adds currency symbol)
 WIDGET_DEFINITIONS: dict[str, dict] = {
-    WGT_KPI_OT_OPEN:         {"title": _("OT Abiertas"),               "icon": "fas fa-clipboard-list",      "format": "number"},
-    WGT_KPI_DOCS_TODAY:      {"title": _("Documentos hoy"),             "icon": "fas fa-file-alt",            "format": "number"},
-    WGT_KPI_SALES_TODAY:     {"title": _("Ventas del día"),             "icon": "fas fa-dollar-sign",         "format": "currency"},
-    WGT_KPI_CLIENTS_MONTH:   {"title": _("Clientes este mes"),          "icon": "fas fa-user-plus",           "format": "number"},
-    WGT_KPI_STOCK_CRITICAL:  {"title": _("Stock crítico"),              "icon": "fas fa-exclamation-triangle","format": "number"},
-    WGT_KPI_DESARM_AVAIL:    {"title": _("Vehículos disponibles"),      "icon": "fas fa-car-crash",           "format": "number"},
-    WGT_KPI_INVENTORY_VALUE: {"title": _("Valor inventario"),           "icon": "fas fa-boxes",               "format": "currency"},
-    WGT_KPI_SERVICES_TODAY:  {"title": _("Servicios hoy"),              "icon": "fas fa-tint",                "format": "number"},
-    WGT_KPI_QUOTES_PENDING:  {"title": _("Cotizaciones pendientes"),    "icon": "fas fa-hourglass-half",      "format": "number"},
-    WGT_KPI_MARGIN_MONTH:    {"title": _("Margen del mes"),             "icon": "fas fa-percentage",          "format": "percent"},
+    WGT_KPI_OT_OPEN:          {"title": _("OT Abiertas"),               "icon": "fas fa-clipboard-list",       "format": "number"},
+    WGT_KPI_DOCS_TODAY:       {"title": _("Documentos hoy"),             "icon": "fas fa-file-alt",             "format": "number"},
+    WGT_KPI_SALES_TODAY:      {"title": _("Ventas del día"),             "icon": "fas fa-dollar-sign",          "format": "currency"},
+    WGT_KPI_CLIENTS_MONTH:    {"title": _("Clientes este mes"),          "icon": "fas fa-user-plus",            "format": "number"},
+    WGT_KPI_STOCK_CRITICAL:   {"title": _("Stock crítico"),              "icon": "fas fa-exclamation-triangle", "format": "number"},
+    WGT_KPI_DESARM_AVAIL:     {"title": _("Vehículos disponibles"),      "icon": "fas fa-car-crash",            "format": "number"},
+    WGT_KPI_DESARM_DEPLETED:  {"title": _("Vehículos agotados"),         "icon": "fas fa-car-alt",              "format": "number"},
+    WGT_KPI_INVENTORY_VALUE:  {"title": _("Valor inventario"),           "icon": "fas fa-boxes",                "format": "currency"},
+    WGT_KPI_SERVICES_TODAY:   {"title": _("Servicios hoy"),              "icon": "fas fa-tint",                 "format": "number"},
+    WGT_KPI_QUOTES_PENDING:   {"title": _("Cotizaciones pendientes"),    "icon": "fas fa-hourglass-half",       "format": "number"},
+    WGT_KPI_MARGIN_MONTH:     {"title": _("Margen del mes"),             "icon": "fas fa-percentage",           "format": "percent"},
+    WGT_KPI_PARTS_SOLD_TODAY: {"title": _("Piezas vendidas hoy"),        "icon": "fas fa-shopping-cart",        "format": "number"},
+    WGT_KPI_PARTS_COUNT:      {"title": _("Piezas inventariadas"),       "icon": "fas fa-layer-group",          "format": "number"},
 }
 
 # Which widget keys belong to each query group
-_GROUP_DOCS      = frozenset({WGT_KPI_OT_OPEN, WGT_KPI_DOCS_TODAY, WGT_KPI_SALES_TODAY, WGT_KPI_SERVICES_TODAY, WGT_KPI_QUOTES_PENDING})
-_GROUP_CLIENTS   = frozenset({WGT_KPI_CLIENTS_MONTH})
-_GROUP_INVENTORY = frozenset({WGT_KPI_STOCK_CRITICAL, WGT_KPI_INVENTORY_VALUE})
-_GROUP_DESARM    = frozenset({WGT_KPI_DESARM_AVAIL})
-_GROUP_LINEAS    = frozenset({WGT_KPI_MARGIN_MONTH})
+_GROUP_DOCS        = frozenset({WGT_KPI_OT_OPEN, WGT_KPI_DOCS_TODAY, WGT_KPI_SALES_TODAY, WGT_KPI_SERVICES_TODAY, WGT_KPI_QUOTES_PENDING})
+_GROUP_CLIENTS     = frozenset({WGT_KPI_CLIENTS_MONTH})
+_GROUP_INVENTORY   = frozenset({WGT_KPI_STOCK_CRITICAL, WGT_KPI_INVENTORY_VALUE, WGT_KPI_PARTS_COUNT})
+_GROUP_DESARM      = frozenset({WGT_KPI_DESARM_AVAIL, WGT_KPI_DESARM_DEPLETED})
+_GROUP_PARTS_TODAY = frozenset({WGT_KPI_PARTS_SOLD_TODAY})
+_GROUP_LINEAS      = frozenset({WGT_KPI_MARGIN_MONTH})
 
 
 class WorkspaceDashboardService:
@@ -116,12 +134,18 @@ class WorkspaceDashboardService:
         if needed & _GROUP_LINEAS:
             raw.update(WorkspaceDashboardService._query_lineas(empresa, month_start, next_month_start))
 
+        # ── GROUP 6: LineaRepuesto table (parts sold today) ───────────────
+        if needed & _GROUP_PARTS_TODAY:
+            raw.update(WorkspaceDashboardService._query_parts_sold_today(empresa, today))
+
         # Build resolved widget list in workspace-defined order
         widgets = WorkspaceDashboardService._build_widgets(workspace_def.widget_keys, raw)
+        activity_feed = WorkspaceDashboardService._query_activity_feed(empresa)
 
         return {
-            "widgets": widgets,
-            "date":    today,
+            "widgets":       widgets,
+            "date":          today,
+            "activity_feed": activity_feed,
         }
 
     # ------------------------------------------------------------------
@@ -175,22 +199,26 @@ class WorkspaceDashboardService:
                 Sum(F("cantidad_stock") * F("precio_venta")),
                 _ZERO_DEC,
             ),
+            parts_count=Count("id"),
         )
         return {
             WGT_KPI_STOCK_CRITICAL:  agg["stock_critical"],
             WGT_KPI_INVENTORY_VALUE: agg["inventory_value"],
+            WGT_KPI_PARTS_COUNT:     agg["parts_count"],
         }
 
     @staticmethod
     def _query_desarm(empresa) -> dict:
         from taller.models.vehiculo_desarme import VehiculoDesarme
 
-        count = VehiculoDesarme.objects.filter(
-            empresa=empresa,
-            estado_desarme__in=["INGRESADO", "DESARMANDO"],
-            es_placeholder=False,
-        ).count()
-        return {WGT_KPI_DESARM_AVAIL: count}
+        agg = VehiculoDesarme.objects.filter(empresa=empresa, es_placeholder=False).aggregate(
+            available=Count("id", filter=Q(estado_desarme__in=["INGRESADO", "DESARMANDO"])),
+            depleted=Count("id", filter=Q(estado_desarme="AGOTADO")),
+        )
+        return {
+            WGT_KPI_DESARM_AVAIL:    agg["available"],
+            WGT_KPI_DESARM_DEPLETED: agg["depleted"],
+        }
 
     @staticmethod
     def _query_lineas(empresa, month_start: date, next_month_start: date) -> dict:
@@ -249,6 +277,49 @@ class WorkspaceDashboardService:
                 "has_value": margin is not None,
             }
         }
+
+    @staticmethod
+    def _query_parts_sold_today(empresa, today: date) -> dict:
+        from taller.models.lineas_documento import LineaRepuesto
+
+        result = LineaRepuesto.objects.filter(
+            documento__empresa=empresa,
+            documento__tipo__in=["OT", "FAC", "PTS"],
+            documento__estado="EMITIDO",
+            documento__fecha_emision=today,
+        ).aggregate(sold=Sum("cantidad"))
+        return {WGT_KPI_PARTS_SOLD_TODAY: result["sold"] or 0}
+
+    @staticmethod
+    def _query_activity_feed(empresa) -> list:
+        from taller.models.documento import Documento
+
+        _TIPO_LABELS = {
+            "OT":   "Orden de Trabajo",
+            "PRES": "Presupuesto",
+            "FAC":  "Comprobante",
+            "PTS":  "Venta Repuestos",
+        }
+        docs = (
+            Documento.objects
+            .filter(empresa=empresa, estado="EMITIDO")
+            .select_related("cliente")
+            .order_by("-created_at")[:5]
+        )
+        return [
+            {
+                "numero":         doc.numero,
+                "tipo":           doc.tipo,
+                "tipo_label":     _TIPO_LABELS.get(doc.tipo, doc.tipo),
+                "total":          doc.total,
+                "cliente_nombre": (
+                    f"{doc.cliente.nombre} {doc.cliente.apellido or ''}".strip()
+                    if doc.cliente_id else None
+                ),
+                "fecha":          doc.created_at,
+            }
+            for doc in docs
+        ]
 
     # ------------------------------------------------------------------
     # Widget builder — combines raw values with WIDGET_DEFINITIONS.

@@ -779,6 +779,103 @@ msgstr "Registrar Servicio"
 msgid "workspace.carwash.action.new_client"
 msgstr "Nuevo Cliente"
 
+# -- Textos contextuales de UI (workspace.texts) --
+msgid "workspace.taller.texts.search_title"
+msgstr "Buscar vehículo o cliente"
+
+msgid "workspace.taller.texts.search_label"
+msgstr "Vehículo o cliente"
+
+msgid "workspace.taller.texts.search_placeholder"
+msgstr "Busca patente, VIN, nombre, teléfono o correo"
+
+msgid "workspace.taller.texts.search_hint"
+msgstr "la acción que más vas a usar, todo el día"
+
+msgid "workspace.taller.texts.live_title"
+msgstr "centro de mando"
+
+msgid "workspace.taller.texts.live_metric"
+msgstr "en el taller"
+
+msgid "workspace.taller.texts.quick_actions"
+msgstr "Accesos rápidos"
+
+msgid "workspace.taller.texts.activity_feed"
+msgstr "Actividad reciente"
+
+msgid "workspace.desarm.texts.search_title"
+msgstr "Buscar vehículo de desarme"
+
+msgid "workspace.desarm.texts.search_label"
+msgstr "Vehículo o pieza"
+
+msgid "workspace.desarm.texts.search_placeholder"
+msgstr "Busca patente, marca, modelo o número de pieza"
+
+msgid "workspace.desarm.texts.search_hint"
+msgstr "localiza cada vehículo o pieza al instante"
+
+msgid "workspace.desarm.texts.live_title"
+msgstr "centro de mando"
+
+msgid "workspace.desarm.texts.live_metric"
+msgstr "vehículos en desarme"
+
+msgid "workspace.desarm.texts.quick_actions"
+msgstr "Accesos rápidos"
+
+msgid "workspace.desarm.texts.activity_feed"
+msgstr "Movimientos recientes"
+
+msgid "workspace.parts.texts.search_title"
+msgstr "Buscar repuesto"
+
+msgid "workspace.parts.texts.search_label"
+msgstr "Repuesto o cliente"
+
+msgid "workspace.parts.texts.search_placeholder"
+msgstr "Busca por código, SKU, nombre o proveedor"
+
+msgid "workspace.parts.texts.search_hint"
+msgstr "tu inventario en tiempo real"
+
+msgid "workspace.parts.texts.live_title"
+msgstr "centro de operaciones"
+
+msgid "workspace.parts.texts.live_metric"
+msgstr "productos críticos"
+
+msgid "workspace.parts.texts.quick_actions"
+msgstr "Acciones rápidas"
+
+msgid "workspace.parts.texts.activity_feed"
+msgstr "Movimientos recientes"
+
+msgid "workspace.carwash.texts.search_title"
+msgstr "Buscar cliente o vehículo"
+
+msgid "workspace.carwash.texts.search_label"
+msgstr "Cliente o vehículo"
+
+msgid "workspace.carwash.texts.search_placeholder"
+msgstr "Busca nombre, patente, teléfono"
+
+msgid "workspace.carwash.texts.search_hint"
+msgstr "registra servicios al instante"
+
+msgid "workspace.carwash.texts.live_title"
+msgstr "caja del día"
+
+msgid "workspace.carwash.texts.live_metric"
+msgstr "servicios hoy"
+
+msgid "workspace.carwash.texts.quick_actions"
+msgstr "Servicios rápidos"
+
+msgid "workspace.carwash.texts.activity_feed"
+msgstr "Servicios del día"
+
 # -- Títulos de widgets (dashboard_service) --
 msgid "OT Abiertas"
 msgstr "OT Abiertas"
@@ -803,3 +900,12 @@ msgstr "Valor inventario"
 
 msgid "Servicios hoy"
 msgstr "Servicios hoy"
+
+msgid "Vehículos agotados"
+msgstr "Vehículos agotados"
+
+msgid "Piezas vendidas hoy"
+msgstr "Piezas vendidas hoy"
+
+msgid "Piezas inventariadas"
+msgstr "Piezas inventariadas"

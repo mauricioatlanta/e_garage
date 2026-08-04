@@ -34,9 +34,12 @@ from taller.constants.product_profiles import (
 from taller.constants.workspaces import (
     WGT_KPI_CLIENTS_MONTH,
     WGT_KPI_DESARM_AVAIL,
+    WGT_KPI_DESARM_DEPLETED,
     WGT_KPI_DOCS_TODAY,
     WGT_KPI_INVENTORY_VALUE,
     WGT_KPI_OT_OPEN,
+    WGT_KPI_PARTS_COUNT,
+    WGT_KPI_PARTS_SOLD_TODAY,
     WGT_KPI_QUOTES_PENDING,
     WGT_KPI_SALES_TODAY,
     WGT_KPI_SERVICES_TODAY,
@@ -248,11 +251,17 @@ class WorkspaceWidgetKeyTests(TestCase):
     def test_desarm_widget_keys(self):
         ws = get_workspace_def("MIXED")
         self.assertIn(WGT_KPI_DESARM_AVAIL, ws.widget_keys)
-        self.assertIn(WGT_KPI_INVENTORY_VALUE, ws.widget_keys)
+        self.assertIn(WGT_KPI_DESARM_DEPLETED, ws.widget_keys)
+        self.assertIn(WGT_KPI_PARTS_COUNT, ws.widget_keys)
+        self.assertIn(WGT_KPI_PARTS_SOLD_TODAY, ws.widget_keys)
 
     def test_desarm_has_no_ot_open_widget(self):
         ws = get_workspace_def("MIXED")
         self.assertNotIn(WGT_KPI_OT_OPEN, ws.widget_keys)
+
+    def test_desarm_excludes_generic_inventory_value(self):
+        ws = get_workspace_def("MIXED")
+        self.assertNotIn(WGT_KPI_INVENTORY_VALUE, ws.widget_keys)
 
     def test_parts_widget_keys(self):
         ws = get_workspace_def("PARTS")
@@ -271,9 +280,10 @@ class WorkspaceWidgetKeyTests(TestCase):
         ws = get_workspace_def("WORKSHOP")
         self.assertIn(WGT_KPI_DOCS_TODAY, ws.widget_keys)
 
-    def test_desarm_still_includes_docs_today(self):
+    def test_desarm_uses_parts_sold_today_not_docs_today(self):
         ws = get_workspace_def("MIXED")
-        self.assertIn(WGT_KPI_DOCS_TODAY, ws.widget_keys)
+        self.assertIn(WGT_KPI_PARTS_SOLD_TODAY, ws.widget_keys)
+        self.assertNotIn(WGT_KPI_DOCS_TODAY, ws.widget_keys)
 
     def test_carwash_still_includes_docs_today(self):
         ws = get_workspace_def("DETAILING")
@@ -358,17 +368,18 @@ class WorkspaceDashboardServiceTests(TestCase):
         return EmpresaFactory(nombre_taller=f"Test {rubro}", pais="CL")
 
     def test_taller_dashboard_query_count(self):
-        # TALLER: GROUP_DOCS + GROUP_CLIENTS = 2 queries
+        # TALLER: GROUP_DOCS + GROUP_CLIENTS + ACTIVITY_FEED = 3 queries
         from taller.services.workspace_dashboard_service import WorkspaceDashboardService
         empresa = self._make_empresa("WORKSHOP")
         ws_def = get_workspace_def("WORKSHOP")
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             result = WorkspaceDashboardService.resolve(ws_def, empresa)
         self.assertIn("widgets", result)
         self.assertIn("date", result)
+        self.assertIn("activity_feed", result)
 
     def test_desarm_dashboard_query_count(self):
-        # DESARM: GROUP_DOCS + GROUP_CLIENTS + GROUP_INVENTORY + GROUP_DESARM = 4 queries
+        # DESARM: GROUP_INVENTORY + GROUP_DESARM + GROUP_PARTS_TODAY + ACTIVITY_FEED = 4 queries
         from taller.services.workspace_dashboard_service import WorkspaceDashboardService
         empresa = self._make_empresa("MIXED")
         ws_def = get_workspace_def("MIXED")
@@ -376,19 +387,19 @@ class WorkspaceDashboardServiceTests(TestCase):
             WorkspaceDashboardService.resolve(ws_def, empresa)
 
     def test_parts_dashboard_query_count(self):
-        # PARTS: GROUP_DOCS + GROUP_CLIENTS + GROUP_INVENTORY = 3 queries
+        # PARTS: GROUP_DOCS + GROUP_INVENTORY + GROUP_LINEAS + ACTIVITY_FEED = 4 queries
         from taller.services.workspace_dashboard_service import WorkspaceDashboardService
         empresa = self._make_empresa("PARTS")
         ws_def = get_workspace_def("PARTS")
-        with self.assertNumQueries(3):
+        with self.assertNumQueries(4):
             WorkspaceDashboardService.resolve(ws_def, empresa)
 
     def test_carwash_dashboard_query_count(self):
-        # CARWASH: GROUP_DOCS + GROUP_CLIENTS = 2 queries
+        # CARWASH: GROUP_DOCS + GROUP_CLIENTS + ACTIVITY_FEED = 3 queries
         from taller.services.workspace_dashboard_service import WorkspaceDashboardService
         empresa = self._make_empresa("DETAILING")
         ws_def = get_workspace_def("DETAILING")
-        with self.assertNumQueries(2):
+        with self.assertNumQueries(3):
             WorkspaceDashboardService.resolve(ws_def, empresa)
 
     def test_widgets_have_required_keys(self):
@@ -515,3 +526,758 @@ class WorkspaceQuotesPendingServiceTests(TestCase):
         result = WorkspaceDashboardService.resolve(ws_def, empresa)
         widget = next(w for w in result["widgets"] if w["key"] == WGT_KPI_QUOTES_PENDING)
         self.assertEqual(widget["format"], "number")
+
+
+class WorkspaceDesarmDepletedTests(TestCase):
+    """WGT_KPI_DESARM_DEPLETED — vehículos agotados, aislamiento por tenant."""
+
+    def _make_empresa(self):
+        from taller.tests.factories import EmpresaFactory
+        return EmpresaFactory()
+
+    def _make_vehiculo(self, empresa, estado):
+        from taller.tests.factories import VehiculoDesarmeFactory
+        return VehiculoDesarmeFactory(empresa=empresa, estado_desarme=estado)
+
+    def _resolve_desarm(self, empresa):
+        from taller.services.workspace_dashboard_service import WorkspaceDashboardService
+        ws_def = get_workspace_def("MIXED")
+        result = WorkspaceDashboardService.resolve(ws_def, empresa)
+        return {w["key"]: w["value"] for w in result["widgets"]}
+
+    def test_zero_when_no_vehicles(self):
+        empresa = self._make_empresa()
+        widgets = self._resolve_desarm(empresa)
+        self.assertEqual(widgets[WGT_KPI_DESARM_DEPLETED], 0)
+
+    def test_counts_agotado_state(self):
+        empresa = self._make_empresa()
+        self._make_vehiculo(empresa, "AGOTADO")
+        self._make_vehiculo(empresa, "AGOTADO")
+        widgets = self._resolve_desarm(empresa)
+        self.assertEqual(widgets[WGT_KPI_DESARM_DEPLETED], 2)
+
+    def test_excludes_non_agotado_states(self):
+        empresa = self._make_empresa()
+        for estado in ["INGRESADO", "DESARMANDO", "DESARMADO", "RECUPERADO", "CERRADO", "BAJA"]:
+            self._make_vehiculo(empresa, estado)
+        widgets = self._resolve_desarm(empresa)
+        self.assertEqual(widgets[WGT_KPI_DESARM_DEPLETED], 0)
+
+    def test_excludes_placeholders(self):
+        empresa = self._make_empresa()
+        from taller.tests.factories import VehiculoDesarmeFactory
+        VehiculoDesarmeFactory(empresa=empresa, estado_desarme="AGOTADO", es_placeholder=True)
+        VehiculoDesarmeFactory(empresa=empresa, estado_desarme="AGOTADO", es_placeholder=False)
+        widgets = self._resolve_desarm(empresa)
+        self.assertEqual(widgets[WGT_KPI_DESARM_DEPLETED], 1)
+
+    def test_tenant_isolation(self):
+        empresa_a = self._make_empresa()
+        empresa_b = self._make_empresa()
+        self._make_vehiculo(empresa_b, "AGOTADO")
+        self._make_vehiculo(empresa_b, "AGOTADO")
+        self._make_vehiculo(empresa_a, "AGOTADO")
+        widgets = self._resolve_desarm(empresa_a)
+        self.assertEqual(widgets[WGT_KPI_DESARM_DEPLETED], 1)
+
+    def test_avail_and_depleted_independent(self):
+        empresa = self._make_empresa()
+        self._make_vehiculo(empresa, "INGRESADO")
+        self._make_vehiculo(empresa, "DESARMANDO")
+        self._make_vehiculo(empresa, "AGOTADO")
+        widgets = self._resolve_desarm(empresa)
+        self.assertEqual(widgets[WGT_KPI_DESARM_AVAIL], 2)
+        self.assertEqual(widgets[WGT_KPI_DESARM_DEPLETED], 1)
+
+
+class WorkspacePartsSoldTodayTests(TestCase):
+    """WGT_KPI_PARTS_SOLD_TODAY — Sum(LineaRepuesto.cantidad) para ventas del día."""
+
+    def _make_empresa(self):
+        from taller.tests.factories import EmpresaFactory
+        return EmpresaFactory()
+
+    def _resolve_parts_sold(self, empresa, today=None):
+        from taller.services.workspace_dashboard_service import WorkspaceDashboardService
+        ws_def = get_workspace_def("MIXED")
+        result = WorkspaceDashboardService.resolve(ws_def, empresa, today=today)
+        return next(w["value"] for w in result["widgets"] if w["key"] == WGT_KPI_PARTS_SOLD_TODAY)
+
+    def _make_linea(self, empresa, tipo="PTS", estado="EMITIDO", fecha=None, cantidad=1):
+        from datetime import date
+        from taller.tests.factories import DocumentoFactory, LineaRepuestoFactory
+        today = fecha or date.today()
+        doc = DocumentoFactory(empresa=empresa, tipo=tipo, estado=estado, fecha_emision=today)
+        return LineaRepuestoFactory(documento=doc, cantidad=cantidad)
+
+    def test_zero_when_no_sales(self):
+        empresa = self._make_empresa()
+        self.assertEqual(self._resolve_parts_sold(empresa), 0)
+
+    def test_sums_cantidad_from_pts(self):
+        empresa = self._make_empresa()
+        self._make_linea(empresa, tipo="PTS", cantidad=3)
+        self._make_linea(empresa, tipo="PTS", cantidad=5)
+        self.assertEqual(self._resolve_parts_sold(empresa), 8)
+
+    def test_includes_ot_and_fac(self):
+        empresa = self._make_empresa()
+        self._make_linea(empresa, tipo="OT",  cantidad=2)
+        self._make_linea(empresa, tipo="FAC", cantidad=4)
+        self.assertEqual(self._resolve_parts_sold(empresa), 6)
+
+    def test_excludes_pres(self):
+        empresa = self._make_empresa()
+        self._make_linea(empresa, tipo="PRES", cantidad=10)
+        self.assertEqual(self._resolve_parts_sold(empresa), 0)
+
+    def test_excludes_anulado(self):
+        empresa = self._make_empresa()
+        self._make_linea(empresa, tipo="PTS", estado="ANULADO", cantidad=10)
+        self.assertEqual(self._resolve_parts_sold(empresa), 0)
+
+    def test_excludes_borrador(self):
+        empresa = self._make_empresa()
+        self._make_linea(empresa, tipo="PTS", estado="BORRADOR", cantidad=10)
+        self.assertEqual(self._resolve_parts_sold(empresa), 0)
+
+    def test_excludes_other_dates(self):
+        from datetime import date, timedelta
+        empresa = self._make_empresa()
+        yesterday = date.today() - timedelta(days=1)
+        self._make_linea(empresa, tipo="PTS", cantidad=10, fecha=yesterday)
+        self.assertEqual(self._resolve_parts_sold(empresa), 0)
+
+    def test_tenant_isolation(self):
+        empresa_a = self._make_empresa()
+        empresa_b = self._make_empresa()
+        self._make_linea(empresa_b, tipo="PTS", cantidad=10)
+        self._make_linea(empresa_a, tipo="PTS", cantidad=3)
+        self.assertEqual(self._resolve_parts_sold(empresa_a), 3)
+
+
+class WorkspacePartsCountTests(TestCase):
+    """WGT_KPI_PARTS_COUNT — total de Repuesto en inventario."""
+
+    def _make_empresa(self):
+        from taller.tests.factories import EmpresaFactory
+        return EmpresaFactory()
+
+    def _resolve_parts_count(self, empresa):
+        from taller.services.workspace_dashboard_service import WorkspaceDashboardService
+        ws_def = get_workspace_def("MIXED")
+        result = WorkspaceDashboardService.resolve(ws_def, empresa)
+        return next(w["value"] for w in result["widgets"] if w["key"] == WGT_KPI_PARTS_COUNT)
+
+    def test_zero_when_no_parts(self):
+        empresa = self._make_empresa()
+        self.assertEqual(self._resolve_parts_count(empresa), 0)
+
+    def test_counts_all_repuestos(self):
+        from taller.tests.factories import RepuestoFactory
+        empresa = self._make_empresa()
+        RepuestoFactory(empresa=empresa)
+        RepuestoFactory(empresa=empresa)
+        RepuestoFactory(empresa=empresa)
+        self.assertEqual(self._resolve_parts_count(empresa), 3)
+
+    def test_tenant_isolation(self):
+        from taller.tests.factories import RepuestoFactory
+        empresa_a = self._make_empresa()
+        empresa_b = self._make_empresa()
+        RepuestoFactory(empresa=empresa_b)
+        RepuestoFactory(empresa=empresa_b)
+        RepuestoFactory(empresa=empresa_a)
+        self.assertEqual(self._resolve_parts_count(empresa_a), 1)
+
+
+class WorkspaceActivityFeedTests(TestCase):
+    """activity_feed — últimos 5 documentos EMITIDO, sin N+1, con aislamiento."""
+
+    def _make_empresa(self):
+        from taller.tests.factories import EmpresaFactory
+        return EmpresaFactory()
+
+    def _resolve_feed(self, empresa, rubro="WORKSHOP"):
+        from taller.services.workspace_dashboard_service import WorkspaceDashboardService
+        ws_def = get_workspace_def(rubro)
+        result = WorkspaceDashboardService.resolve(ws_def, empresa)
+        return result["activity_feed"]
+
+    def _make_doc(self, empresa, tipo="OT", estado="EMITIDO"):
+        from taller.tests.factories import DocumentoFactory
+        return DocumentoFactory(empresa=empresa, tipo=tipo, estado=estado)
+
+    def test_feed_present_in_result(self):
+        empresa = self._make_empresa()
+        from taller.services.workspace_dashboard_service import WorkspaceDashboardService
+        ws_def = get_workspace_def("WORKSHOP")
+        result = WorkspaceDashboardService.resolve(ws_def, empresa)
+        self.assertIn("activity_feed", result)
+        self.assertIsInstance(result["activity_feed"], list)
+
+    def test_empty_when_no_documents(self):
+        empresa = self._make_empresa()
+        feed = self._resolve_feed(empresa)
+        self.assertEqual(feed, [])
+
+    def test_excludes_borrador(self):
+        empresa = self._make_empresa()
+        self._make_doc(empresa, estado="BORRADOR")
+        feed = self._resolve_feed(empresa)
+        self.assertEqual(feed, [])
+
+    def test_excludes_anulado(self):
+        empresa = self._make_empresa()
+        self._make_doc(empresa, estado="ANULADO")
+        feed = self._resolve_feed(empresa)
+        self.assertEqual(feed, [])
+
+    def test_includes_emitido(self):
+        empresa = self._make_empresa()
+        self._make_doc(empresa, estado="EMITIDO")
+        feed = self._resolve_feed(empresa)
+        self.assertEqual(len(feed), 1)
+
+    def test_feed_items_have_required_keys(self):
+        empresa = self._make_empresa()
+        self._make_doc(empresa, estado="EMITIDO")
+        feed = self._resolve_feed(empresa)
+        item = feed[0]
+        for key in ("numero", "tipo", "tipo_label", "total", "cliente_nombre", "fecha"):
+            self.assertIn(key, item, f"Missing key: {key}")
+
+    def test_capped_at_five(self):
+        empresa = self._make_empresa()
+        for _ in range(8):
+            self._make_doc(empresa, estado="EMITIDO")
+        feed = self._resolve_feed(empresa)
+        self.assertLessEqual(len(feed), 5)
+
+    def test_tenant_isolation(self):
+        empresa_a = self._make_empresa()
+        empresa_b = self._make_empresa()
+        for _ in range(3):
+            self._make_doc(empresa_b, estado="EMITIDO")
+        self._make_doc(empresa_a, estado="EMITIDO")
+        feed = self._resolve_feed(empresa_a)
+        self.assertEqual(len(feed), 1)
+
+    def test_feed_present_for_desarm(self):
+        empresa = self._make_empresa()
+        self._make_doc(empresa, tipo="PTS", estado="EMITIDO")
+        feed = self._resolve_feed(empresa, rubro="MIXED")
+        self.assertEqual(len(feed), 1)
+        self.assertEqual(feed[0]["tipo"], "PTS")
+        self.assertEqual(feed[0]["tipo_label"], "Venta Repuestos")
+
+
+# ---------------------------------------------------------------------------
+# Fase 5: KPI card URLs for DESARMADURIA
+# ---------------------------------------------------------------------------
+
+class WorkspaceDesarmWidgetUrlTests(TestCase):
+    """
+    _inject_desarm_widget_urls wires the correct filtered URL into each
+    DESARMADURIA KPI widget so cards are clickable and land on the right list.
+    """
+
+    def setUp(self):
+        from taller.tests.factories import ConfiguracionEmpresaFactory, EmpresaFactory
+        self.empresa = EmpresaFactory()
+        ConfiguracionEmpresaFactory(empresa=self.empresa, rubro_principal="DESARMADURIA")
+        self.config = self.empresa.config
+
+    def _get_urls(self, prefix="/cl/es", ns="documentos_cl_es"):
+        import datetime
+        from taller.services.workspace_dashboard_service import WorkspaceDashboardService
+        from taller.services.workspace_service import WorkspaceService
+        from taller.views.workspace_dashboard import _inject_desarm_widget_urls
+
+        ws_def = WorkspaceService.get_workspace_def(self.config)
+        today = datetime.date.today()
+        widgets = [{"key": k, "url": None} for k in ws_def.widget_keys]
+        _inject_desarm_widget_urls(widgets, prefix, ns, today)
+        return {w["key"]: w["url"] for w in widgets}
+
+    def test_all_four_desarm_widgets_get_url(self):
+        urls = self._get_urls()
+        for key in (
+            WGT_KPI_DESARM_AVAIL,
+            WGT_KPI_DESARM_DEPLETED,
+            WGT_KPI_PARTS_SOLD_TODAY,
+            WGT_KPI_PARTS_COUNT,
+        ):
+            self.assertIsNotNone(urls.get(key), f"{key} should have a URL")
+
+    def test_avail_url_contains_ingresado_and_desarmando(self):
+        url = self._get_urls()[WGT_KPI_DESARM_AVAIL]
+        self.assertIn("INGRESADO", url)
+        self.assertIn("DESARMANDO", url)
+
+    def test_depleted_url_filters_agotado_only(self):
+        url = self._get_urls()[WGT_KPI_DESARM_DEPLETED]
+        self.assertIn("AGOTADO", url)
+        self.assertNotIn("INGRESADO", url)
+
+    def test_parts_sold_today_url_has_emitido_and_todays_date(self):
+        import datetime
+        today = datetime.date.today()
+        url = self._get_urls()[WGT_KPI_PARTS_SOLD_TODAY]
+        self.assertIn("EMITIDO", url)
+        self.assertIn(today.isoformat(), url)
+
+    def test_parts_count_url_points_to_repuestos(self):
+        url = self._get_urls()[WGT_KPI_PARTS_COUNT]
+        self.assertIn("repuesto", url.lower())
+
+    def test_cl_prefix_produces_cl_paths(self):
+        urls = self._get_urls(prefix="/cl/es", ns="documentos_cl_es")
+        self.assertTrue(urls[WGT_KPI_DESARM_AVAIL].startswith("/cl/"))
+        self.assertTrue(urls[WGT_KPI_PARTS_SOLD_TODAY].startswith("/cl/"))
+
+    def test_us_prefix_produces_us_paths(self):
+        urls = self._get_urls(prefix="/us/en", ns="documentos_us_en")
+        self.assertTrue(urls[WGT_KPI_DESARM_AVAIL].startswith("/us/"))
+        self.assertTrue(urls[WGT_KPI_PARTS_SOLD_TODAY].startswith("/us/"))
+
+
+# ---------------------------------------------------------------------------
+# Fase 4: WorkspaceAlertsService — DESARMADURIA only
+# ---------------------------------------------------------------------------
+
+class WorkspaceAlertsQueryCountTests(TestCase):
+    """Service contract: 0 queries for non-DESARM, 2 for DESARM."""
+
+    def _make_empresa(self, rubro="WORKSHOP"):
+        from taller.tests.factories import EmpresaFactory
+        return EmpresaFactory()
+
+    def test_zero_queries_for_taller(self):
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("WORKSHOP")
+        with self.assertNumQueries(0):
+            result = WorkspaceAlertsService.resolve(ws_def, empresa)
+        self.assertEqual(result, [])
+
+    def test_zero_queries_for_casa_repuestos(self):
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("PARTS")
+        with self.assertNumQueries(0):
+            result = WorkspaceAlertsService.resolve(ws_def, empresa)
+        self.assertEqual(result, [])
+
+    def test_zero_queries_for_carwash(self):
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("DETAILING")
+        with self.assertNumQueries(0):
+            result = WorkspaceAlertsService.resolve(ws_def, empresa)
+        self.assertEqual(result, [])
+
+    def test_exactly_two_queries_for_desarmaduria(self):
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("MIXED")
+        with self.assertNumQueries(2):
+            WorkspaceAlertsService.resolve(ws_def, empresa)
+
+    def test_empty_result_when_no_issues(self):
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("MIXED")
+        result = WorkspaceAlertsService.resolve(ws_def, empresa)
+        self.assertEqual(result, [])
+
+
+class WorkspaceAlertsDelayedTests(TestCase):
+    """alrt_desarm_delayed: vehicles stuck > DELAYED_DAYS with no progress."""
+
+    def _make_empresa(self):
+        from taller.tests.factories import EmpresaFactory
+        return EmpresaFactory()
+
+    def _make_vehiculo(self, empresa, **kwargs):
+        from taller.tests.factories import VehiculoDesarmeFactory
+        return VehiculoDesarmeFactory(empresa=empresa, **kwargs)
+
+    def _resolve(self, empresa, today=None):
+        from datetime import date
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        ws_def = get_workspace_def("MIXED")
+        today = today or date.today()
+        return WorkspaceAlertsService.resolve(ws_def, empresa, today=today)
+
+    def _get_alert(self, alerts, key):
+        return next((a for a in alerts if a["key"] == key), None)
+
+    def test_no_alert_when_no_delayed_vehicles(self):
+        from taller.services.workspace_alerts_service import ALRT_DESARM_DELAYED
+        empresa = self._make_empresa()
+        alerts = self._resolve(empresa)
+        self.assertIsNone(self._get_alert(alerts, ALRT_DESARM_DELAYED))
+
+    def test_alert_when_vehicle_over_threshold(self):
+        from datetime import date, timedelta
+        from taller.services.workspace_alerts_service import ALRT_DESARM_DELAYED, DELAYED_DAYS
+        empresa = self._make_empresa()
+        today = date(2026, 6, 1)
+        cutoff = today - timedelta(days=DELAYED_DAYS)
+        old_date = cutoff - timedelta(days=1)
+        self._make_vehiculo(
+            empresa,
+            estado_desarme="INGRESADO",
+            fecha_ingreso_desarme=old_date,
+            es_placeholder=False,
+        )
+        alerts = self._resolve(empresa, today=today)
+        alert = self._get_alert(alerts, ALRT_DESARM_DELAYED)
+        self.assertIsNotNone(alert)
+        self.assertEqual(alert["count"], 1)
+        self.assertEqual(alert["severity"], "warning")
+
+    def test_no_alert_when_vehicle_exactly_at_threshold(self):
+        from datetime import date, timedelta
+        from taller.services.workspace_alerts_service import ALRT_DESARM_DELAYED, DELAYED_DAYS
+        empresa = self._make_empresa()
+        today = date(2026, 6, 1)
+        cutoff = today - timedelta(days=DELAYED_DAYS)
+        self._make_vehiculo(
+            empresa,
+            estado_desarme="INGRESADO",
+            fecha_ingreso_desarme=cutoff,
+            es_placeholder=False,
+        )
+        alerts = self._resolve(empresa, today=today)
+        self.assertIsNone(self._get_alert(alerts, ALRT_DESARM_DELAYED))
+
+    def test_excludes_placeholder_vehicles(self):
+        from datetime import date, timedelta
+        from taller.services.workspace_alerts_service import ALRT_DESARM_DELAYED, DELAYED_DAYS
+        empresa = self._make_empresa()
+        today = date(2026, 6, 1)
+        old_date = today - timedelta(days=DELAYED_DAYS + 5)
+        self._make_vehiculo(
+            empresa,
+            estado_desarme="INGRESADO",
+            fecha_ingreso_desarme=old_date,
+            es_placeholder=True,
+        )
+        alerts = self._resolve(empresa, today=today)
+        self.assertIsNone(self._get_alert(alerts, ALRT_DESARM_DELAYED))
+
+    def test_excludes_vehicles_without_ingreso_date(self):
+        from datetime import date, timedelta
+        from taller.services.workspace_alerts_service import ALRT_DESARM_DELAYED, DELAYED_DAYS
+        empresa = self._make_empresa()
+        today = date(2026, 6, 1)
+        self._make_vehiculo(
+            empresa,
+            estado_desarme="INGRESADO",
+            fecha_ingreso_desarme=None,
+            es_placeholder=False,
+        )
+        alerts = self._resolve(empresa, today=today)
+        self.assertIsNone(self._get_alert(alerts, ALRT_DESARM_DELAYED))
+
+    def test_excludes_non_active_estados(self):
+        from datetime import date, timedelta
+        from taller.services.workspace_alerts_service import ALRT_DESARM_DELAYED, DELAYED_DAYS
+        empresa = self._make_empresa()
+        today = date(2026, 6, 1)
+        old_date = today - timedelta(days=DELAYED_DAYS + 5)
+        for estado in ["AGOTADO", "DESARMADO", "CERRADO", "BAJA"]:
+            self._make_vehiculo(
+                empresa,
+                estado_desarme=estado,
+                fecha_ingreso_desarme=old_date,
+                es_placeholder=False,
+            )
+        alerts = self._resolve(empresa, today=today)
+        self.assertIsNone(self._get_alert(alerts, ALRT_DESARM_DELAYED))
+
+    def test_tenant_isolation(self):
+        from datetime import date, timedelta
+        from taller.services.workspace_alerts_service import ALRT_DESARM_DELAYED, DELAYED_DAYS
+        empresa_a = self._make_empresa()
+        empresa_b = self._make_empresa()
+        today = date(2026, 6, 1)
+        old_date = today - timedelta(days=DELAYED_DAYS + 5)
+        self._make_vehiculo(empresa_b, estado_desarme="INGRESADO", fecha_ingreso_desarme=old_date, es_placeholder=False)
+        self._make_vehiculo(empresa_b, estado_desarme="INGRESADO", fecha_ingreso_desarme=old_date, es_placeholder=False)
+        alerts = self._resolve(empresa_a, today=today)
+        self.assertIsNone(self._get_alert(alerts, ALRT_DESARM_DELAYED))
+
+    def test_plural_message_for_multiple_vehicles(self):
+        from datetime import date, timedelta
+        from taller.services.workspace_alerts_service import ALRT_DESARM_DELAYED, DELAYED_DAYS
+        empresa = self._make_empresa()
+        today = date(2026, 6, 1)
+        old_date = today - timedelta(days=DELAYED_DAYS + 1)
+        self._make_vehiculo(empresa, estado_desarme="INGRESADO", fecha_ingreso_desarme=old_date, es_placeholder=False)
+        self._make_vehiculo(empresa, estado_desarme="DESARMANDO", fecha_ingreso_desarme=old_date, es_placeholder=False)
+        alerts = self._resolve(empresa, today=today)
+        alert = self._get_alert(alerts, ALRT_DESARM_DELAYED)
+        self.assertEqual(alert["count"], 2)
+        self.assertIn("vehículos", alert["message"])
+
+    def test_singular_message_for_one_vehicle(self):
+        from datetime import date, timedelta
+        from taller.services.workspace_alerts_service import ALRT_DESARM_DELAYED, DELAYED_DAYS
+        empresa = self._make_empresa()
+        today = date(2026, 6, 1)
+        old_date = today - timedelta(days=DELAYED_DAYS + 1)
+        self._make_vehiculo(empresa, estado_desarme="INGRESADO", fecha_ingreso_desarme=old_date, es_placeholder=False)
+        alerts = self._resolve(empresa, today=today)
+        alert = self._get_alert(alerts, ALRT_DESARM_DELAYED)
+        self.assertIn("vehículo", alert["message"])
+        self.assertNotIn("vehículos", alert["message"])
+
+    def test_alert_url_contains_ingresado_antes(self):
+        from datetime import date, timedelta
+        from taller.services.workspace_alerts_service import ALRT_DESARM_DELAYED, DELAYED_DAYS
+        empresa = self._make_empresa()
+        today = date(2026, 6, 1)
+        old_date = today - timedelta(days=DELAYED_DAYS + 1)
+        self._make_vehiculo(empresa, estado_desarme="INGRESADO", fecha_ingreso_desarme=old_date, es_placeholder=False)
+        ws_def = get_workspace_def("MIXED")
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        alerts = WorkspaceAlertsService.resolve(ws_def, empresa, prefix="/cl/es", today=today)
+        alert = self._get_alert(alerts, ALRT_DESARM_DELAYED)
+        self.assertIn("ingresado_antes=", alert["url"])
+        self.assertIn("INGRESADO", alert["url"])
+        self.assertIn("DESARMANDO", alert["url"])
+
+
+class WorkspaceAlertsPiezaTests(TestCase):
+    """alrt_pieza_no_foto / sin_precio / sin_ubicacion — aggregate counts."""
+
+    def _make_empresa(self):
+        from taller.tests.factories import EmpresaFactory
+        return EmpresaFactory()
+
+    def _make_pieza(self, empresa, vehiculo=None, **kwargs):
+        from taller.tests.factories import PiezaDesarmeFactory
+        return PiezaDesarmeFactory(empresa=empresa, vehiculo_desarme=vehiculo, **kwargs)
+
+    def _resolve(self, empresa):
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        ws_def = get_workspace_def("MIXED")
+        return WorkspaceAlertsService.resolve(ws_def, empresa)
+
+    def _get_alert(self, alerts, key):
+        return next((a for a in alerts if a["key"] == key), None)
+
+    def test_sin_foto_null_imagen(self):
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_FOTO
+        empresa = self._make_empresa()
+        self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=True, imagen=None)
+        alerts = self._resolve(empresa)
+        alert = self._get_alert(alerts, ALRT_PIEZA_NO_FOTO)
+        self.assertIsNotNone(alert)
+        self.assertEqual(alert["count"], 1)
+
+    def test_sin_foto_empty_string_imagen(self):
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_FOTO
+        empresa = self._make_empresa()
+        self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=True, imagen="")
+        alerts = self._resolve(empresa)
+        alert = self._get_alert(alerts, ALRT_PIEZA_NO_FOTO)
+        self.assertIsNotNone(alert)
+        self.assertEqual(alert["count"], 1)
+
+    def test_sin_precio_both_null(self):
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_PRECIO
+        empresa = self._make_empresa()
+        self._make_pieza(
+            empresa,
+            estado_pieza="DISPONIBLE",
+            activo=True,
+            precio_venta_sugerido=None,
+            precio_sugerido=None,
+        )
+        alerts = self._resolve(empresa)
+        alert = self._get_alert(alerts, ALRT_PIEZA_NO_PRECIO)
+        self.assertIsNotNone(alert)
+        self.assertEqual(alert["count"], 1)
+
+    def test_no_sin_precio_alert_when_precio_venta_set(self):
+        from decimal import Decimal
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_PRECIO
+        empresa = self._make_empresa()
+        self._make_pieza(
+            empresa,
+            estado_pieza="DISPONIBLE",
+            activo=True,
+            precio_venta_sugerido=Decimal("15000"),
+            precio_sugerido=None,
+        )
+        alerts = self._resolve(empresa)
+        self.assertIsNone(self._get_alert(alerts, ALRT_PIEZA_NO_PRECIO))
+
+    def test_no_sin_precio_alert_when_precio_sugerido_set(self):
+        from decimal import Decimal
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_PRECIO
+        empresa = self._make_empresa()
+        self._make_pieza(
+            empresa,
+            estado_pieza="DISPONIBLE",
+            activo=True,
+            precio_venta_sugerido=None,
+            precio_sugerido=Decimal("12000"),
+        )
+        alerts = self._resolve(empresa)
+        self.assertIsNone(self._get_alert(alerts, ALRT_PIEZA_NO_PRECIO))
+
+    def test_sin_ubicacion(self):
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_UBICACION
+        empresa = self._make_empresa()
+        self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=True, ubicacion_fisica=None)
+        alerts = self._resolve(empresa)
+        alert = self._get_alert(alerts, ALRT_PIEZA_NO_UBICACION)
+        self.assertIsNotNone(alert)
+        self.assertEqual(alert["count"], 1)
+
+    def test_no_sin_ubicacion_when_set(self):
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_UBICACION
+        empresa = self._make_empresa()
+        self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=True, ubicacion_fisica="A1")
+        alerts = self._resolve(empresa)
+        self.assertIsNone(self._get_alert(alerts, ALRT_PIEZA_NO_UBICACION))
+
+    def test_excludes_vendida_piezas(self):
+        from taller.services.workspace_alerts_service import (
+            ALRT_PIEZA_NO_FOTO, ALRT_PIEZA_NO_PRECIO, ALRT_PIEZA_NO_UBICACION,
+        )
+        empresa = self._make_empresa()
+        self._make_pieza(empresa, estado_pieza="VENDIDA", activo=True, imagen=None,
+                         precio_venta_sugerido=None, precio_sugerido=None, ubicacion_fisica=None)
+        alerts = self._resolve(empresa)
+        for key in (ALRT_PIEZA_NO_FOTO, ALRT_PIEZA_NO_PRECIO, ALRT_PIEZA_NO_UBICACION):
+            self.assertIsNone(self._get_alert(alerts, key), f"{key} should not fire for VENDIDA")
+
+    def test_excludes_inactive_piezas(self):
+        from taller.services.workspace_alerts_service import (
+            ALRT_PIEZA_NO_FOTO, ALRT_PIEZA_NO_PRECIO, ALRT_PIEZA_NO_UBICACION,
+        )
+        empresa = self._make_empresa()
+        self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=False, imagen=None,
+                         precio_venta_sugerido=None, precio_sugerido=None, ubicacion_fisica=None)
+        alerts = self._resolve(empresa)
+        for key in (ALRT_PIEZA_NO_FOTO, ALRT_PIEZA_NO_PRECIO, ALRT_PIEZA_NO_UBICACION):
+            self.assertIsNone(self._get_alert(alerts, key), f"{key} should not fire for inactive")
+
+    def test_tenant_isolation(self):
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_FOTO
+        empresa_a = self._make_empresa()
+        empresa_b = self._make_empresa()
+        self._make_pieza(empresa_b, estado_pieza="DISPONIBLE", activo=True, imagen=None)
+        self._make_pieza(empresa_b, estado_pieza="DISPONIBLE", activo=True, imagen=None)
+        alerts = self._resolve(empresa_a)
+        self.assertIsNone(self._get_alert(alerts, ALRT_PIEZA_NO_FOTO))
+
+    def test_pieza_url_contains_sin_foto_flag(self):
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_FOTO, WorkspaceAlertsService
+        empresa = self._make_empresa()
+        self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=True, imagen=None)
+        ws_def = get_workspace_def("MIXED")
+        alerts = WorkspaceAlertsService.resolve(ws_def, empresa, prefix="/cl/es")
+        alert = self._get_alert(alerts, ALRT_PIEZA_NO_FOTO)
+        self.assertIn("sin_foto=1", alert["url"])
+        self.assertIn("/cl/", alert["url"])
+
+    def test_pieza_url_contains_sin_precio_flag(self):
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_PRECIO, WorkspaceAlertsService
+        empresa = self._make_empresa()
+        self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=True,
+                         precio_venta_sugerido=None, precio_sugerido=None)
+        ws_def = get_workspace_def("MIXED")
+        alerts = WorkspaceAlertsService.resolve(ws_def, empresa, prefix="/cl/es")
+        alert = self._get_alert(alerts, ALRT_PIEZA_NO_PRECIO)
+        self.assertIn("sin_precio=1", alert["url"])
+
+    def test_pieza_url_contains_sin_ubicacion_flag(self):
+        from taller.services.workspace_alerts_service import ALRT_PIEZA_NO_UBICACION, WorkspaceAlertsService
+        empresa = self._make_empresa()
+        self._make_pieza(empresa, estado_pieza="DISPONIBLE", activo=True, ubicacion_fisica=None)
+        ws_def = get_workspace_def("MIXED")
+        alerts = WorkspaceAlertsService.resolve(ws_def, empresa, prefix="/cl/es")
+        alert = self._get_alert(alerts, ALRT_PIEZA_NO_UBICACION)
+        self.assertIn("sin_ubicacion=1", alert["url"])
+
+
+class WorkspaceAlertsStructureTests(TestCase):
+    """Alert dict keys and values match the contract."""
+
+    def _make_empresa(self):
+        from taller.tests.factories import EmpresaFactory
+        return EmpresaFactory()
+
+    def _make_pieza_sin_foto(self, empresa):
+        from taller.tests.factories import PiezaDesarmeFactory
+        return PiezaDesarmeFactory(empresa=empresa, estado_pieza="DISPONIBLE", activo=True, imagen=None)
+
+    def test_alert_has_required_keys(self):
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        empresa = self._make_empresa()
+        self._make_pieza_sin_foto(empresa)
+        ws_def = get_workspace_def("MIXED")
+        alerts = WorkspaceAlertsService.resolve(ws_def, empresa)
+        self.assertTrue(len(alerts) > 0)
+        for alert in alerts:
+            for key in ("key", "severity", "message", "count", "url", "icon"):
+                self.assertIn(key, alert, f"Alert missing required key: {key}")
+
+    def test_only_nonzero_alerts_returned(self):
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        empresa = self._make_empresa()
+        ws_def = get_workspace_def("MIXED")
+        alerts = WorkspaceAlertsService.resolve(ws_def, empresa)
+        for alert in alerts:
+            self.assertGreater(alert["count"], 0)
+
+    def test_severity_values_are_valid(self):
+        from taller.tests.factories import PiezaDesarmeFactory
+        from taller.services.workspace_alerts_service import WorkspaceAlertsService
+        empresa = self._make_empresa()
+        PiezaDesarmeFactory(empresa=empresa, estado_pieza="DISPONIBLE", activo=True, imagen=None)
+        ws_def = get_workspace_def("MIXED")
+        alerts = WorkspaceAlertsService.resolve(ws_def, empresa)
+        for alert in alerts:
+            self.assertIn(alert["severity"], ("warning", "info"))
+
+    def test_delayed_alert_severity_is_warning(self):
+        from datetime import date, timedelta
+        from taller.tests.factories import VehiculoDesarmeFactory
+        from taller.services.workspace_alerts_service import (
+            ALRT_DESARM_DELAYED, DELAYED_DAYS, WorkspaceAlertsService,
+        )
+        empresa = self._make_empresa()
+        today = date(2026, 6, 1)
+        old_date = today - timedelta(days=DELAYED_DAYS + 1)
+        VehiculoDesarmeFactory(empresa=empresa, estado_desarme="INGRESADO",
+                               fecha_ingreso_desarme=old_date, es_placeholder=False)
+        ws_def = get_workspace_def("MIXED")
+        alerts = WorkspaceAlertsService.resolve(ws_def, empresa, today=today)
+        alert = next(a for a in alerts if a["key"] == ALRT_DESARM_DELAYED)
+        self.assertEqual(alert["severity"], "warning")
+
+    def test_pieza_alerts_severity_is_info(self):
+        from taller.tests.factories import PiezaDesarmeFactory
+        from taller.services.workspace_alerts_service import (
+            ALRT_PIEZA_NO_FOTO, ALRT_PIEZA_NO_PRECIO, ALRT_PIEZA_NO_UBICACION,
+            WorkspaceAlertsService,
+        )
+        empresa = self._make_empresa()
+        PiezaDesarmeFactory(empresa=empresa, estado_pieza="DISPONIBLE", activo=True,
+                            imagen=None, precio_venta_sugerido=None,
+                            precio_sugerido=None, ubicacion_fisica=None)
+        ws_def = get_workspace_def("MIXED")
+        alerts = WorkspaceAlertsService.resolve(ws_def, empresa)
+        pieza_keys = {ALRT_PIEZA_NO_FOTO, ALRT_PIEZA_NO_PRECIO, ALRT_PIEZA_NO_UBICACION}
+        for alert in alerts:
+            if alert["key"] in pieza_keys:
+                self.assertEqual(alert["severity"], "info")

@@ -17,7 +17,7 @@
   <div class="wsc-header">
     <div style="display:flex; align-items:center; gap:10px;">
       <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
-      <span>buscar vehículo o cliente</span>
+      <span>{{ workspace.texts.search_title }}</span>
     </div>
     <div style="display:flex; gap:6px;">
       <span class="workspace-keyhint-mini" title="Atajo de teclado">
@@ -33,7 +33,7 @@
 
   <div class="workspace-search-panel">
     <label class="workspace-search-label" for="workspace-live-search">
-      {% if request.LANGUAGE_CODE == 'en' %}Vehicle or customer{% else %}Vehículo o cliente{% endif %}
+      {{ workspace.texts.search_label }}
     </label>
     <div class="workspace-search-input-wrap">
       <span class="workspace-search-icon" aria-hidden="true">
@@ -51,7 +51,7 @@
         aria-autocomplete="list"
         aria-expanded="false"
         aria-controls="workspace-search-dropdown"
-        placeholder="{% if request.LANGUAGE_CODE == 'en' %}Search plate, VIN, name, phone or email{% else %}Busca patente, VIN, nombre, teléfono o correo{% endif %}"
+        placeholder="{{ workspace.texts.search_placeholder }}"
         data-search-input
       >
       <button type="button" class="workspace-search-shortcut" data-search-shortcut
@@ -74,5 +74,5 @@
     <div class="workspace-sr-only" aria-live="polite" data-search-live></div>
   </div>
 
-  <p class="wsc-hint">{% if request.LANGUAGE_CODE == 'en' %}the action you'll use most, all day{% else %}la acción que más vas a usar, todo el día{% endif %}</p>
+  <p class="wsc-hint">{{ workspace.texts.search_hint }}</p>
 </div>
