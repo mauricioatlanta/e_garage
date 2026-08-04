@@ -1,4 +1,4 @@
-{% load humanize %}
+{% load humanize %}{% load money %}
 {% if url %}<a href="{{ url }}" style="display:block;text-decoration:none;color:inherit;">{% endif %}
 <div class="bg-[#111827] border border-[#1e293b] rounded-xl p-5{% if url %} hover:border-[#38bdf8] cursor-pointer{% endif %}"
      style="position:relative; transition:border-color .15s ease;">
@@ -10,7 +10,7 @@
     {% if format == "percent" %}
       {% if has_value %}{{ value|floatformat:1 }}%{% else %}—{% endif %}
     {% elif format == "currency" %}
-      ${{ value|floatformat:0|intcomma }}
+      {{ value|money_by_country:country }}
     {% else %}
       {{ value }}
     {% endif %}
