@@ -27,6 +27,7 @@ class TallerConfig(AppConfig):
 
         import taller.signals
         import taller.signals.tenant_guard  # noqa: F401
+        import taller.signals.trust  # noqa: F401
 
         # Señales de inventario (pre_save Documento → mover stock al cambiar estado)
         try:
