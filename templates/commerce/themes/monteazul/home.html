@@ -485,42 +485,65 @@
           <div class="step-pill" id="st3"><span class="num">3</span> Modelo</div>
         </div>
 
-        <form method="get" action="{% url 'commerce:search' %}" id="vehicleForm" role="search" aria-labelledby="validator-legend"
+        <form method="get" action="{% url 'commerce:vehicle_search' %}" id="vehicleForm" role="search" aria-labelledby="validator-legend"
               data-url-modelos="{% url 'commerce:api_vehicle_models' %}">
           <div class="form-grid">
             <div class="field">
               <label for="year">Año del vehículo</label>
               <select id="year" name="year" required aria-describedby="year-hint">
                 <option value="">Año</option>
-                {% for y in years %}
-                  <option value="{{ y }}">{{ y }}</option>
-                {% endfor %}
+                {% for y in years %}<option value="{{ y }}">{{ y }}</option>{% endfor %}
               </select>
               <span class="hint" id="year-hint">Paso 1: año del vehículo</span>
             </div>
             <div class="field">
-              <label for="brand_name">Marca del vehículo</label>
-              <select id="brand" name="brand_id" required disabled aria-describedby="brand-hint">
-                <option value="">Marca</option>
-                {% for b in brands %}
-                  <option value="{{ b.id }}" data-name="{{ b.name }}">{{ b.name }}</option>
-                {% endfor %}
+              <label for="fuel_type">Combustible</label>
+              <select id="fuel_type" name="fuel_type" required disabled aria-describedby="fuel-hint">
+                <option value="">Selecciona</option>
+                <option value="GASOLINA">Gasolina</option>
+                <option value="DIESEL">Diésel</option>
+                <option value="HIBRIDO">Híbrido</option>
+                <option value="EV">Eléctrico</option>
               </select>
-              <input type="hidden" id="brand_name" name="brand_name">
-              <span class="hint" id="brand-hint">Paso 2: elige marca</span>
+              <span class="hint" id="fuel-hint">Paso 2: combustible</span>
             </div>
             <div class="field">
-              <label for="model_name">Modelo del vehículo</label>
-              <select id="model" name="model_id" required disabled aria-describedby="model-hint">
+              <label for="brand_label">Marca (opcional)</label>
+              <select id="brand" name="brand_id" disabled aria-describedby="brand-hint">
+                <option value="">Marca</option>
+                {% for b in brands %}<option value="{{ b.id }}" data-name="{{ b.name }}">{{ b.name }}</option>{% endfor %}
+              </select>
+              <input type="hidden" id="brand_name" name="brand_name">
+              <span class="hint" id="brand-hint">Paso 3: marca (opcional)</span>
+            </div>
+            <div class="field">
+              <label for="model_label">Modelo (opcional)</label>
+              <select id="model" name="model_id" disabled aria-describedby="model-hint">
                 <option value="">Modelo</option>
               </select>
               <input type="hidden" id="model_name" name="model_name">
-              <span class="hint" id="model-hint">Paso 3: modelo según la marca elegida</span>
+              <span class="hint" id="model-hint">Paso 4: modelo</span>
+            </div>
+            <div class="field">
+              <label for="displacement">Cilindrada (cc)</label>
+              <select id="displacement" name="displacement_cc" disabled aria-describedby="cc-hint">
+                <option value="">No sé</option>
+                <option value="1000">1.0L · 1000 cc</option>
+                <option value="1200">1.2L · 1200 cc</option>
+                <option value="1400">1.4L · 1400 cc</option>
+                <option value="1600">1.6L · 1600 cc</option>
+                <option value="1800">1.8L · 1800 cc</option>
+                <option value="2000">2.0L · 2000 cc</option>
+                <option value="2500">2.5L · 2500 cc</option>
+                <option value="2700">2.7L · 2700 cc</option>
+                <option value="3000">3.0L · 3000 cc</option>
+              </select>
+              <span class="hint" id="cc-hint">Ayuda a elegir el diámetro de flexibles.</span>
             </div>
           </div>
 
           <div class="actions">
-            <button type="submit" class="btn-submit" id="btnSearch" disabled>Ver productos compatibles</button>
+            <button type="submit" class="btn-submit" id="btnSearch" disabled>Ver repuestos compatibles</button>
             <button type="button" class="btn-clear" id="btnClear">Limpiar</button>
           </div>
         </form>
@@ -542,24 +565,29 @@
   const vehicleForm = document.getElementById('vehicleForm');
   if (!vehicleForm) return;
 
-  const urlModelos = vehicleForm.getAttribute('data-url-modelos') || '/commerce/api/vehicle-models/';
-  const yearSelect  = document.getElementById('year');
-  const brandSelect = document.getElementById('brand');
-  const modelSelect = document.getElementById('model');
+  const urlModelos     = vehicleForm.getAttribute('data-url-modelos') || '/commerce/api/vehicle-models/';
+  const yearSelect     = document.getElementById('year');
+  const fuelSelect     = document.getElementById('fuel_type');
+  const brandSelect    = document.getElementById('brand');
+  const modelSelect    = document.getElementById('model');
+  const dispSelect     = document.getElementById('displacement');
   const brandNameInput = document.getElementById('brand_name');
   const modelNameInput = document.getElementById('model_name');
-  const btnSearch = document.getElementById('btnSearch');
-  const btnClear  = document.getElementById('btnClear');
-  const st1 = document.getElementById('st1');
-  const st2 = document.getElementById('st2');
-  const st3 = document.getElementById('st3');
-  const toast = document.getElementById('toast');
+  const btnSearch      = document.getElementById('btnSearch');
+  const btnClear       = document.getElementById('btnClear');
+  const steps          = [
+    document.getElementById('st1'),
+    document.getElementById('st2'),
+    document.getElementById('st3'),
+  ].filter(Boolean);
+
+  const toast      = document.getElementById('toast');
   const toastTitle = document.getElementById('toastTitle');
   const toastMsg   = document.getElementById('toastMsg');
   let toastT = null;
 
   function showToast(title, msg) {
-    if (!toast) return;
+    if (!toast || !toastTitle || !toastMsg) return;
     toastTitle.textContent = title;
     toastMsg.textContent = msg;
     toast.classList.add('show');
@@ -567,111 +595,107 @@
     toastT = setTimeout(() => toast.classList.remove('show'), 2800);
   }
   function setStep(active) {
-    [st1, st2, st3].forEach((el, i) => {
-      if (!el) return;
+    steps.forEach((el, i) => {
       el.classList.remove('active', 'done');
       if (i + 1 === active) el.classList.add('active');
       if (i + 1 < active) el.classList.add('done');
     });
   }
   function markDone(el) { if (el) { el.classList.add('done'); el.classList.remove('active'); } }
-  function unDone(el)   { if (el) el.classList.remove('done'); }
 
+  // El mínimo para buscar es año + combustible
   function canSearch() {
-    return !!(yearSelect.value && brandSelect.value && modelSelect.value);
+    return !!(yearSelect.value && fuelSelect.value);
   }
 
-  function resetAfterYear() {
-    brandSelect.value = '';
-    brandSelect.disabled = true;
+  function enableAfterYear() {
+    if (fuelSelect) fuelSelect.disabled = false;
+    if (brandSelect) brandSelect.disabled = false;
+    if (dispSelect) dispSelect.disabled = false;
+  }
+  function disableAll() {
+    [fuelSelect, brandSelect, modelSelect, dispSelect].forEach(s => { if (s) s.disabled = true; });
+    if (modelSelect) modelSelect.innerHTML = '<option value="">Modelo</option>';
     if (brandNameInput) brandNameInput.value = '';
-    modelSelect.innerHTML = '<option value="">Modelo</option>';
-    modelSelect.disabled = true;
     if (modelNameInput) modelNameInput.value = '';
-    unDone(st2); unDone(st3);
-    setStep(1);
-    btnSearch.disabled = true;
-  }
-  function resetAfterBrand() {
-    modelSelect.innerHTML = '<option value="">Modelo</option>';
-    modelSelect.disabled = true;
-    if (modelNameInput) modelNameInput.value = '';
-    unDone(st3);
-    setStep(2);
-    btnSearch.disabled = true;
+    if (btnSearch) btnSearch.disabled = true;
   }
 
+  // Año
   yearSelect.addEventListener('change', () => {
-    if (!yearSelect.value) { resetAfterYear(); return; }
-    brandSelect.disabled = false;
-    markDone(st1);
+    if (!yearSelect.value) { disableAll(); setStep(1); return; }
+    enableAfterYear();
+    markDone(steps[0]);
     setStep(2);
-    showToast('Año listo', 'Elige la marca.');
-    btnSearch.disabled = !canSearch();
+    showToast('Año seleccionado', 'Elige combustible para ver repuestos.');
+    if (btnSearch) btnSearch.disabled = !canSearch();
   });
 
-  brandSelect.addEventListener('change', async () => {
-    if (!brandSelect.value) { resetAfterBrand(); return; }
-    const sel = brandSelect.options[brandSelect.selectedIndex];
-    if (brandNameInput) brandNameInput.value = sel ? sel.getAttribute('data-name') || sel.textContent : '';
-    modelSelect.disabled = true;
-    modelSelect.innerHTML = '<option value="">Cargando…</option>';
-    try {
-      const res  = await fetch(urlModelos + '?brand_id=' + encodeURIComponent(brandSelect.value));
-      const data = await res.json();
-      modelSelect.innerHTML = '<option value="">Modelo</option>';
-      (data.models || []).forEach(m => {
-        const o = document.createElement('option');
-        o.value = m.id;
-        o.textContent = m.name;
-        o.setAttribute('data-name', m.name);
-        modelSelect.appendChild(o);
-      });
-      modelSelect.disabled = false;
-      markDone(st2);
-      setStep(3);
-      showToast('Modelos listos', 'Elige el modelo.');
-    } catch (e) {
-      modelSelect.innerHTML = '<option value="">Error cargando modelos</option>';
-      showToast('Error', 'No se pudieron cargar los modelos.');
-    }
-    btnSearch.disabled = !canSearch();
-  });
-
-  modelSelect.addEventListener('change', () => {
-    if (!modelSelect.value) { unDone(st3); btnSearch.disabled = true; return; }
-    const sel = modelSelect.options[modelSelect.selectedIndex];
-    if (modelNameInput) modelNameInput.value = sel ? sel.getAttribute('data-name') || sel.textContent : '';
-    markDone(st3);
-    btnSearch.disabled = false;
-    showToast('Listo', 'Haz clic en "Ver productos compatibles".');
-  });
-
-  vehicleForm.addEventListener('submit', function (e) {
-    e.preventDefault();
-    if (!canSearch()) return;
-    const year      = yearSelect.value;
-    const brandName = (brandNameInput && brandNameInput.value) ||
-                      (brandSelect.options[brandSelect.selectedIndex] && brandSelect.options[brandSelect.selectedIndex].textContent) || '';
-    const modelName = (modelNameInput && modelNameInput.value) ||
-                      (modelSelect.options[modelSelect.selectedIndex] && modelSelect.options[modelSelect.selectedIndex].textContent) || '';
-    const q = [brandName, modelName, year].filter(Boolean).join(' ').trim();
-    const url = vehicleForm.action.replace(/buscar\/?$/, 'buscar/');
-    window.location.href = url + '?q=' + encodeURIComponent(q) + '&year=' + encodeURIComponent(year);
-  });
-
-  btnClear.addEventListener('click', () => {
-    yearSelect.value = '';
-    resetAfterYear();
-    showToast('Limpio', 'Elige el año para comenzar.');
-  });
-
-  if (yearSelect.value) {
-    brandSelect.disabled = false;
-    markDone(st1);
-    setStep(2);
+  // Combustible — habilita el botón (mínimo requerido)
+  if (fuelSelect) {
+    fuelSelect.addEventListener('change', () => {
+      if (btnSearch) btnSearch.disabled = !canSearch();
+      if (fuelSelect.value && yearSelect.value) {
+        markDone(steps[1]);
+        setStep(3);
+        showToast('Listo', 'Puedes ver repuestos o seguir eligiendo marca.');
+      }
+    });
   }
-  btnSearch.disabled = !canSearch();
+
+  // Marca → carga modelos por AJAX
+  if (brandSelect) {
+    brandSelect.addEventListener('change', async () => {
+      if (!brandSelect.value) {
+        if (modelSelect) { modelSelect.innerHTML = '<option value="">Modelo</option>'; modelSelect.disabled = true; }
+        if (modelNameInput) modelNameInput.value = '';
+        return;
+      }
+      const sel = brandSelect.options[brandSelect.selectedIndex];
+      if (brandNameInput) brandNameInput.value = sel ? (sel.getAttribute('data-name') || sel.textContent) : '';
+      if (modelSelect) {
+        modelSelect.disabled = true;
+        modelSelect.innerHTML = '<option value="">Cargando…</option>';
+        try {
+          const res  = await fetch(urlModelos + '?brand_id=' + encodeURIComponent(brandSelect.value));
+          const data = await res.json();
+          modelSelect.innerHTML = '<option value="">Modelo (opcional)</option>';
+          (data.models || []).forEach(m => {
+            const o = document.createElement('option');
+            o.value = m.id;
+            o.textContent = m.name;
+            o.setAttribute('data-name', m.name);
+            modelSelect.appendChild(o);
+          });
+          modelSelect.disabled = false;
+        } catch {
+          modelSelect.innerHTML = '<option value="">Error — intenta de nuevo</option>';
+        }
+      }
+    });
+  }
+
+  // Modelo
+  if (modelSelect) {
+    modelSelect.addEventListener('change', () => {
+      const sel = modelSelect.options[modelSelect.selectedIndex];
+      if (modelNameInput) modelNameInput.value = sel && modelSelect.value ? (sel.getAttribute('data-name') || sel.textContent) : '';
+    });
+  }
+
+  // Limpiar
+  if (btnClear) {
+    btnClear.addEventListener('click', () => {
+      yearSelect.value = '';
+      disableAll();
+      setStep(1);
+      showToast('Limpio', 'Elige el año para comenzar.');
+    });
+  }
+
+  // Estado inicial
+  if (yearSelect.value) { enableAfterYear(); markDone(steps[0]); setStep(2); }
+  if (btnSearch) btnSearch.disabled = !canSearch();
 })();
 </script>
 {% endblock %}

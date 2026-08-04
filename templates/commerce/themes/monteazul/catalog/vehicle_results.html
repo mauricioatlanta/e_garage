@@ -1,0 +1,167 @@
+{% extends "commerce/themes/monteazul/base.html" %}
+{% load static %}{% load humanize %}
+{% block meta_title %}Repuestos compatibles para {{ vehicle_label }} | MonteAzul SPA{% endblock %}
+{% block meta_description %}Catalizadores, flexibles, silenciadores y colas de escape compatibles para {{ vehicle_label }}.{% endblock %}
+
+{% block extra_head %}
+<style>
+:root {
+  --navy: #0c1322; --navy-mid: #121c2e; --navy-light: #1a2742;
+  --navy-surface: rgba(255,255,255,0.04); --navy-border: rgba(255,255,255,0.08);
+  --cyan: #00d4ff; --cyan-soft: rgba(0,212,255,0.15); --cyan-glow: rgba(0,212,255,0.25);
+  --text: #e8ecf4; --text-muted: rgba(255,255,255,0.55);
+}
+.vr-wrap { font-family: 'Outfit', system-ui, sans-serif; color: var(--text); max-width: 1200px; margin: 0 auto; padding: 32px 20px 64px; }
+.vr-header { margin-bottom: 32px; }
+.vr-breadcrumb { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 14px; }
+.vr-breadcrumb a { color: var(--text-muted); text-decoration: none; }
+.vr-breadcrumb a:hover { color: var(--cyan); }
+.vr-breadcrumb .sep { margin: 0 6px; opacity: 0.5; }
+.vr-title { font-size: clamp(1.4rem, 4vw, 2rem); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px; }
+.vr-title span { color: var(--cyan); }
+.vr-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 6px; }
+.vr-tag { display: inline-block; padding: 4px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; }
+.vr-tag.year  { background: rgba(0,212,255,0.12); border: 1px solid rgba(0,212,255,0.3); color: var(--cyan); }
+.vr-tag.fuel  { background: rgba(0,230,118,0.12); border: 1px solid rgba(0,230,118,0.3); color: #00e676; }
+.vr-tag.brand { background: rgba(255,180,0,0.12);  border: 1px solid rgba(255,180,0,0.3);  color: #ffb400; }
+.vr-tag.cc    { background: rgba(180,80,255,0.12); border: 1px solid rgba(180,80,255,0.3); color: #c084fc; }
+.vr-note { color: var(--text-muted); font-size: 0.88rem; margin-top: 6px; }
+.vr-note a { color: var(--cyan); }
+
+/* Secciones */
+.vr-section { margin-bottom: 48px; }
+.vr-section-header { display: flex; align-items: center; gap: 12px; margin-bottom: 6px; }
+.vr-section-icon { font-size: 1.5rem; }
+.vr-section-title { font-size: 1.2rem; font-weight: 700; }
+.vr-section-note { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 18px; padding-left: 44px; }
+.vr-section-link { font-size: 0.8rem; color: var(--cyan); text-decoration: none; margin-left: auto; white-space: nowrap; }
+.vr-section-link:hover { text-decoration: underline; }
+
+/* Grid reutiliza estilos de product_list */
+.products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+.product-card { display: block; text-decoration: none; color: inherit; background: var(--navy-surface); border: 1px solid var(--navy-border); border-radius: 14px; overflow: hidden; backdrop-filter: blur(8px); transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s; }
+.product-card:hover { transform: translateY(-4px); border-color: rgba(0,212,255,0.3); box-shadow: 0 12px 40px rgba(0,212,255,0.12); }
+.product-card-img { width: 100%; aspect-ratio: 1.1; background: var(--navy-light); overflow: hidden; }
+.product-card-img img { width: 100%; height: 100%; object-fit: contain; }
+.product-card-body { padding: 16px; }
+.product-card-cat { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--cyan); margin-bottom: 4px; }
+.product-card-name { font-weight: 600; font-size: 0.95rem; line-height: 1.35; margin-bottom: 6px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.product-card-sku { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 12px; font-family: monospace; }
+.product-card-footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.product-card-price { font-weight: 800; font-size: 1.2rem; color: var(--cyan); }
+.product-card-iva { font-size: 0.7rem; opacity: 0.8; }
+.product-card-cta { padding: 8px 14px; background: var(--cyan-soft); color: var(--cyan); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.04em; border-radius: 8px; border: 1px solid rgba(0,212,255,0.25); }
+.product-card:hover .product-card-cta { background: rgba(0,212,255,0.25); box-shadow: 0 0 16px var(--cyan-glow); }
+
+/* Empty */
+.vr-empty { text-align: center; padding: 64px 24px; background: var(--navy-surface); border: 1px solid var(--navy-border); border-radius: 14px; }
+.vr-empty h3 { font-size: 1.2rem; margin-bottom: 8px; }
+.vr-empty p { color: var(--text-muted); }
+
+/* Nuevo buscador compacto al tope */
+.vr-refine { background: var(--navy-surface); border: 1px solid var(--navy-border); border-radius: 14px; padding: 20px 24px; margin-bottom: 32px; }
+.vr-refine summary { font-weight: 700; font-size: 0.9rem; color: var(--cyan); cursor: pointer; list-style: none; }
+.vr-refine summary::-webkit-details-marker { display: none; }
+.vr-refine summary::before { content: "▸ "; }
+details[open] .vr-refine summary::before { content: "▾ "; }
+.vr-refine-form { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 12px; margin-top: 16px; }
+.vr-refine-form label { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; display: block; margin-bottom: 4px; }
+.vr-refine-form select, .vr-refine-form input[type="hidden"] { width: 100%; padding: 10px 12px; border: 1px solid rgba(0,212,255,0.25); border-radius: 8px; background: rgba(0,20,35,0.8); color: #e8faff; font-size: 0.9rem; }
+.vr-refine-btn { align-self: end; padding: 10px 20px; border-radius: 8px; background: var(--cyan-soft); color: var(--cyan); border: 1px solid rgba(0,212,255,0.3); font-weight: 700; font-size: 0.85rem; cursor: pointer; }
+.vr-refine-btn:hover { background: rgba(0,212,255,0.25); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="vr-wrap">
+
+  <div class="vr-header">
+    <div class="vr-breadcrumb">
+      <a href="{% url 'commerce:home' %}">Inicio</a>
+      <span class="sep">›</span>
+      <a href="{% url 'commerce:home' %}#buscador">Buscador por vehículo</a>
+      <span class="sep">›</span>
+      <span>{{ vehicle_label }}</span>
+    </div>
+    <h1 class="vr-title">Repuestos para <span>{{ vehicle_label }}</span></h1>
+    <div class="vr-tags">
+      {% if year %}<span class="vr-tag year">Año {{ year }}</span>{% endif %}
+      {% if fuel_display %}<span class="vr-tag fuel">{{ fuel_display }}</span>{% endif %}
+      {% if brand_name %}<span class="vr-tag brand">{{ brand_name }}{% if model_name %} {{ model_name }}{% endif %}</span>{% endif %}
+      {% if displacement %}<span class="vr-tag cc">{{ displacement }} cc</span>{% endif %}
+    </div>
+    <p class="vr-note">
+      Resultados aproximados según año y combustible. La compatibilidad exacta por marca/modelo se activará próximamente.
+      ¿Dudas? <a href="{% if brand.whatsapp.url %}{{ brand.whatsapp.url }}{% else %}#{% endif %}" target="_blank" rel="noopener">Consulta por WhatsApp</a>.
+    </p>
+  </div>
+
+  {# Refinar búsqueda #}
+  <details class="vr-refine">
+    <summary>Refinar búsqueda</summary>
+    <form method="get" action="{% url 'commerce:vehicle_search' %}" class="vr-refine-form">
+      <div>
+        <label for="rf-year">Año</label>
+        <select id="rf-year" name="year">
+          <option value="">Año</option>
+          {% for y in years %}<option value="{{ y }}"{% if y == year %} selected{% endif %}>{{ y }}</option>{% endfor %}
+        </select>
+      </div>
+      <div>
+        <label for="rf-fuel">Combustible</label>
+        <select id="rf-fuel" name="fuel_type">
+          <option value="">Selecciona</option>
+          <option value="GASOLINA"{% if fuel_type == "GASOLINA" %} selected{% endif %}>Gasolina</option>
+          <option value="DIESEL"{% if fuel_type == "DIESEL" %} selected{% endif %}>Diésel</option>
+          <option value="HIBRIDO"{% if fuel_type == "HIBRIDO" %} selected{% endif %}>Híbrido</option>
+          <option value="EV"{% if fuel_type == "EV" %} selected{% endif %}>Eléctrico</option>
+        </select>
+      </div>
+      <div>
+        <label for="rf-cc">Cilindrada (cc)</label>
+        <select id="rf-cc" name="displacement_cc">
+          <option value="">No sé</option>
+          <option value="1000"{% if displacement == 1000 %} selected{% endif %}>1000 cc</option>
+          <option value="1200"{% if displacement == 1200 %} selected{% endif %}>1200 cc</option>
+          <option value="1400"{% if displacement == 1400 %} selected{% endif %}>1400 cc</option>
+          <option value="1600"{% if displacement == 1600 %} selected{% endif %}>1600 cc</option>
+          <option value="1800"{% if displacement == 1800 %} selected{% endif %}>1800 cc</option>
+          <option value="2000"{% if displacement == 2000 %} selected{% endif %}>2000 cc</option>
+          <option value="2500"{% if displacement == 2500 %} selected{% endif %}>2500 cc</option>
+          <option value="3000"{% if displacement == 3000 %} selected{% endif %}>3000 cc</option>
+        </select>
+      </div>
+      {% if brand_name %}<input type="hidden" name="brand_name" value="{{ brand_name }}">{% endif %}
+      {% if model_name %}<input type="hidden" name="model_name" value="{{ model_name }}">{% endif %}
+      <div style="align-self:end">
+        <button type="submit" class="vr-refine-btn">Actualizar</button>
+      </div>
+    </form>
+  </details>
+
+  {% if has_results %}
+    {% for section in sections %}
+    <section class="vr-section">
+      <div class="vr-section-header">
+        <span class="vr-section-icon">{{ section.icon }}</span>
+        <h2 class="vr-section-title">{{ section.label }}</h2>
+        <a href="{% url 'commerce:home' %}{{ section.cat_url }}" class="vr-section-link">Ver categoría completa →</a>
+      </div>
+      <p class="vr-section-note">{{ section.note }}</p>
+      <div class="products-grid">
+        {% for product in section.products %}
+          {% include "commerce/themes/monteazul/catalog/_product_card.html" with product=product ops_mode=False is_cataliticos_subcat=False %}
+        {% endfor %}
+      </div>
+    </section>
+    {% endfor %}
+  {% else %}
+  <div class="vr-empty">
+    <h3>Sin resultados</h3>
+    <p>Selecciona al menos el año y el tipo de combustible para ver repuestos compatibles.</p>
+    <p style="margin-top:16px;"><a href="{% url 'commerce:home' %}#buscador" style="color:var(--cyan);">← Volver al buscador</a></p>
+  </div>
+  {% endif %}
+
+</div>
+{% endblock %}
