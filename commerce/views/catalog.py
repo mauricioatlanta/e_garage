@@ -173,15 +173,23 @@ def vehicle_search_view(request):
                     "cat_url": f"?cat={cat_slug}",
                 })
 
-        # Tipo original (ensamble directo) — siempre se muestra como alternativa
+        # Tipo original (ensamble directo) — solo si el nombre del producto coincide con la marca/modelo buscado
         orig = _safe_category(gw, "cataliticos-tipo-original")
         if orig:
-            orig_prods = list(gw.list_products(category=orig))
+            all_orig = list(gw.list_products(category=orig))
+            if brand_name or model_name:
+                search_terms = [t.lower() for t in [brand_name, model_name] if t]
+                orig_prods = [
+                    p for p in all_orig
+                    if any(term in p.nombre.lower() for term in search_terms)
+                ]
+            else:
+                orig_prods = all_orig
             if orig_prods:
                 sections.append({
                     "icon": "🔩",
                     "label": "Tipo Original (Ensamble Directo)",
-                    "note": "Catalizadores plug & play: se instalan sin modificar la tubería.",
+                    "note": "Catalizadores plug & play específicos para tu vehículo.",
                     "products": orig_prods,
                     "cat_url": "?cat=cataliticos-tipo-original",
                 })
