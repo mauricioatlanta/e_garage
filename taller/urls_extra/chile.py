@@ -17,7 +17,7 @@ from taller.views_extra.centro_trabajo import (
     centro_trabajo_buscar,
     vehiculo_historial,
 )
-from taller.views_extra.views import dashboard
+from taller.views.workspace_dashboard import workspace_dashboard
 from taller.views_extra.ai_lab import ai_lab_dashboard
 from taller.views_extra.views_configuracion import (
     configuracion_empresa,
@@ -58,7 +58,7 @@ urlpatterns = [
     path("workspace/buscar/", centro_trabajo_buscar, name="centro_trabajo_buscar"),
     path("vehiculos/<int:vehiculo_id>/historial/", vehiculo_historial, name="vehiculo_historial"),
     # Dashboard / Centro de Operaciones (métricas, reportes)
-    path("dashboard/", dashboard, name="dashboard"),
+    path("dashboard/", workspace_dashboard, name="dashboard"),
     path("lab/", ai_lab_dashboard, name="ai_lab"),
     path("centro-operaciones/", dashboard_centro_operaciones, name="centro_operaciones"),
     path("settings/", company_settings_view, name="company_settings"),  # ⚙️ Centro de Ajustes
