@@ -11,14 +11,12 @@ class PlanLimitValidationTestCase(TestCase):
         from django.contrib.auth import get_user_model
         User = get_user_model()
         
-        self.owner_1 = User.objects.create_user(username="owner_express_dummy", password="password123")
-        self.owner_2 = User.objects.create_user(username="owner_taller_dummy", password="password123")
-        
+        from taller.tests.factories import EmpresaFactory
         self.choices_mock = [('express', 'Express'), ('taller', 'Taller'), ('pro', 'Pro')]
         Empresa._meta.get_field('plan').choices = self.choices_mock
 
-        self.empresa_express = Empresa.objects.create(plan="express", user=self.owner_1)
-        self.empresa_taller = Empresa.objects.create(plan="taller", user=self.owner_2)
+        self.empresa_express = EmpresaFactory(plan="express")
+        self.empresa_taller = EmpresaFactory(plan="taller")
 
     @patch('taller.services.plan_change_service.PlanLimitValidation.get_count')
     def test_plan_express_bloquea_exceso_usuarios(self, mock_get_count):
@@ -96,9 +94,10 @@ class TestGetCountIntegracion(TestCase):
         from django.contrib.auth import get_user_model
         User = get_user_model()
         self.User = User
-        self.owner = User.objects.create_user(username="owner_count_integ", password="pass123")
+        from taller.tests.factories import EmpresaFactory
         # El signal ensure_owner_rbac crea TeamMember(rol="Owner") al guardar la Empresa.
-        self.empresa = Empresa.objects.create(plan="taller", user=self.owner)
+        self.empresa = EmpresaFactory(plan="taller")
+        self.owner = self.empresa.user
 
     def test_get_count_empresa_nueva_es_1(self):
         """

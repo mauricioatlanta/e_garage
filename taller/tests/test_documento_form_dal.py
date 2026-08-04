@@ -19,15 +19,17 @@ from taller.services.inventory_service import InventoryService
 # ---------- Fixtures simples ----------
 @pytest.fixture
 def user_cl(db):
+    from taller.tests.factories import EmpresaFactory
     u = User.objects.create_user(username="mauri", password="pass")
-    Empresa.objects.create(user=u, nombre_taller="EG Chile", pais="CL")  # moneda CLP por save()
+    EmpresaFactory(user=u, nombre_taller="EG Chile", pais="CL")  # moneda CLP por save()
     return u
 
 
 @pytest.fixture
 def user_us(db):
+    from taller.tests.factories import EmpresaFactory
     u = User.objects.create_user(username="john", password="pass")
-    Empresa.objects.create(user=u, nombre_taller="EG USA", pais="US")  # moneda USD por save()
+    EmpresaFactory(user=u, nombre_taller="EG USA", pais="US")  # moneda USD por save()
     return u
 
 
@@ -164,7 +166,8 @@ def test_cliente_autocomplete_filtra_por_empresa(client, user_cl):
     # Un cliente propio y otro de otra empresa
     c_ok = Cliente.objects.create(empresa=emp, nombre="Mi Cliente")
     other_user = User.objects.create_user(username="x", password="pass")
-    Empresa.objects.create(user=other_user, nombre_taller="Otra", pais="CL")
+    from taller.tests.factories import EmpresaFactory
+    EmpresaFactory(user=other_user, nombre_taller="Otra", pais="CL")
     Cliente.objects.create(empresa=other_user.empresa, nombre="Ajeno")
 
     url = reverse("cl_autocomplete:cliente")

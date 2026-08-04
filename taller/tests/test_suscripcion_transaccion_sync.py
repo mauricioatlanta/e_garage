@@ -30,9 +30,8 @@ def _sync_test_settings(settings):
 
 
 def _empresa(username="sync-user", email="sync@example.com", pais="CL"):
-    user = User.objects.create_user(username=username, email=email, password="pass12345")
-    return Empresa.objects.create(
-        user=user,
+    from taller.tests.factories import EmpresaFactory
+    return EmpresaFactory(
         nombre_taller=f"Taller {username}",
         email=email,
         telefono="+56911112222",

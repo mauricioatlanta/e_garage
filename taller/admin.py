@@ -12,6 +12,7 @@ from taller.models.color_cliente import ColorCliente
 from taller.models.comprobante_pago import ComprobantePago
 from taller.models.documento import Documento
 from taller.models.empresa import Empresa
+from taller.models.movimiento_inventario import MovimientoInventario
 from taller.models.extras_vehiculo import CajaVehiculoEmpresa, MotorVehiculoEmpresa
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.interchange_pieza import InterchangePieza
@@ -1012,3 +1013,56 @@ class EmpresaDominioAdmin(admin.ModelAdmin):
             count += 1
 
         self.message_user(request, f"{count} dominio(s) reactivado(s) a PENDIENTE.")
+
+
+# ---------------------------------------------------------------------------
+# MovimientoInventario — ledger append-only, solo lectura
+# ---------------------------------------------------------------------------
+
+@admin.register(MovimientoInventario)
+class MovimientoInventarioAdmin(admin.ModelAdmin):
+    list_display = (
+        "created_at",
+        "empresa",
+        "tipo",
+        "origen_stock",
+        "cantidad_delta",
+        "saldo_resultante",
+        "documento",
+    )
+    list_filter = ("tipo", "origen_stock", "empresa")
+    search_fields = (
+        "idempotency_key",
+        "documento__numero_documento",
+        "repuesto__nombre",
+        "repuesto__part_number",
+        "pieza_desarme__nombre",
+    )
+    readonly_fields = (
+        "empresa",
+        "tipo",
+        "origen_stock",
+        "repuesto",
+        "pieza_desarme",
+        "documento",
+        "linea_repuesto",
+        "cantidad_delta",
+        "saldo_resultante",
+        "costo_unitario",
+        "idempotency_key",
+        "event_version",
+        "created_by",
+        "created_at",
+        "notas",
+        "metadata",
+    )
+    actions = []
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False

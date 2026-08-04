@@ -15,14 +15,9 @@ class TestApiBuscarServicios(TestCase):
         """
 
         # --- Setup: usuario + empresa ---
-        user = User.objects.create_user(username="tester", password="123")
-        empresa = getattr(user, "empresa", None)
-        if not empresa:
-            from taller.models.empresa import Empresa
-
-            empresa = Empresa.objects.create(
-                user=user, nombre_taller="Demo Co", pais="US", moneda="USD"
-            )
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller="Demo Co", pais="US", moneda="USD")
+        user = empresa.user
 
         # --- Crear categorías necesarias ---
         from taller.servicios.models import CategoriaServicio
@@ -37,8 +32,8 @@ class TestApiBuscarServicios(TestCase):
         # --- Servicio de otra empresa (no debería aparecer) ---
         from taller.models.empresa import Empresa
 
-        otra_user = User.objects.create_user(username="otro", password="123")
-        otra = Empresa.objects.create(user=otra_user, nombre_taller="Otra", pais="CL", moneda="CLP")
+        from taller.tests.factories import EmpresaFactory
+        otra = EmpresaFactory(nombre_taller="Otra", pais="CL", moneda="CLP")
         Servicio.objects.create(nombre="Tire Change", empresa=otra, categoria=categoria)
 
         self.client.force_login(user)

@@ -27,49 +27,36 @@ from taller.models.vehiculos import Vehiculo
 @pytest.fixture
 def empresa_cl(db):
     """Empresa Chile con owner y teléfono."""
+    from taller.tests.factories import EmpresaFactory
     owner = User.objects.create_user("owner_wb", "owner@wb.com", "pass1234")
     owner.first_name = "Carlos"
     owner.last_name = "Dueño"
     owner.save()
     grupo_owner, _ = Group.objects.get_or_create(name="Owner")
     owner.groups.add(grupo_owner)
-    empresa = Empresa.objects.create(
-        user=owner,
-        nombre_taller="Taller WB",
-        pais="CL",
-        telefono="+56912345678",
-    )
+    empresa = EmpresaFactory(user=owner, nombre_taller="Taller WB", pais="CL", telefono="+56912345678")
     return empresa, owner
 
 
 @pytest.fixture
 def empresa_usa(db):
     """Empresa USA con owner y teléfono (para test de formato precio)."""
+    from taller.tests.factories import EmpresaFactory
     owner = User.objects.create_user("owner_usa", "owner@usa.com", "pass1234")
     grupo_owner, _ = Group.objects.get_or_create(name="Owner")
     owner.groups.add(grupo_owner)
-    empresa = Empresa.objects.create(
-        user=owner,
-        nombre_taller="Garage USA",
-        pais="US",
-        moneda="USD",
-        telefono="+12025551234",
-    )
+    empresa = EmpresaFactory(user=owner, nombre_taller="Garage USA", pais="US", moneda="USD", telefono="+12025551234")
     return empresa, owner
 
 
 @pytest.fixture
 def empresa_sin_telefono(db):
     """Empresa Chile SIN teléfono (para test de error)."""
+    from taller.tests.factories import EmpresaFactory
     owner = User.objects.create_user("owner_noph", "owner_noph@wb.com", "pass1234")
     grupo_owner, _ = Group.objects.get_or_create(name="Owner")
     owner.groups.add(grupo_owner)
-    empresa = Empresa.objects.create(
-        user=owner,
-        nombre_taller="Taller Sin Tel",
-        pais="CL",
-        telefono="",
-    )
+    empresa = EmpresaFactory(user=owner, nombre_taller="Taller Sin Tel", pais="CL", telefono="")
     return empresa, owner
 
 
@@ -150,13 +137,8 @@ def pieza_usa(db, empresa_usa):
 @pytest.fixture
 def pieza_otra_empresa(db):
     """PiezaDesarme de otra empresa (para test de tenant isolation)."""
-    otro_owner = User.objects.create_user("otro_owner", "otro@test.com", "pass1234")
-    otra_empresa = Empresa.objects.create(
-        user=otro_owner,
-        nombre_taller="Otro Taller",
-        pais="CL",
-        telefono="+56900000000",
-    )
+    from taller.tests.factories import EmpresaFactory
+    otra_empresa = EmpresaFactory(nombre_taller="Otro Taller", pais="CL", telefono="+56900000000")
     vehiculo = VehiculoDesarme.objects.create(
         empresa=otra_empresa,
         patente="OTR001",

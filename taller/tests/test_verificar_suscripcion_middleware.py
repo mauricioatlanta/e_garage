@@ -27,18 +27,10 @@ class VerificarSuscripcionMiddlewareTests(TestCase):
         pais: str = "CL",
         is_staff: bool = False,
     ):
+        from taller.tests.factories import EmpresaFactory, UserFactory
         self._user_index += 1
-        user = User.objects.create_user(
-            username=f"middleware-user-{self._user_index}",
-            email=f"middleware-user-{self._user_index}@test.com",
-            password="testpass123",
-            is_staff=is_staff,
-        )
-        empresa = Empresa.objects.create(
-            user=user,
-            nombre_taller=f"Empresa {self._user_index}",
-            pais=pais,
-        )
+        user = UserFactory(is_staff=is_staff)
+        empresa = EmpresaFactory(user=user, nombre_taller=f"Empresa {self._user_index}", pais=pais)
         empresa.fecha_fin = timezone.now() + timedelta(days=days_offset)
         empresa.suscripcion_activa = suscripcion_activa
         empresa.save()

@@ -46,7 +46,11 @@ INSTALLED_APPS = [
     "rest_framework",
     "ubicacion.apps.UbicacionConfig",
     "marketplace.apps.MarketplaceConfig",
+    "commerce.apps.CommerceConfig",
+    "runtime",
 ]
+
+COMMERCE_TENANT_MAP: dict = {}
 
 if importlib.util.find_spec("anymail") is not None:
     INSTALLED_APPS.insert(0, "anymail")
@@ -67,6 +71,8 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     # 6. Autenticación
     "django.contrib.auth.middleware.AuthenticationMiddleware",
+    # Commerce Engine — resuelve tenant desde hostname antes de las vistas
+    "commerce.middleware.CommerceTenantMiddleware",
     # 7. Mensajes (después de autenticación)
     "django.contrib.messages.middleware.MessageMiddleware",
     # 8. Clickjacking (después de mensajes)
@@ -139,6 +145,7 @@ TEMPLATES = [
                 "taller.context_processors.panel_chrome.us_signup_slim_header",
                 "taller.context_processors.ui_labels.ui_labels_context",
                 "taller.context_processors.subscription_notice.subscription_notice",
+                "taller.context_processors.business_modules.business_modules",
             ],
         },
     },
@@ -314,3 +321,10 @@ else:
 EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "gestion_taller.resend_backend.ResendBackend")
 RESEND_API_KEY = (os.getenv("RESEND_API_KEY") or "").strip()
 DEFAULT_FROM_EMAIL = (os.getenv("DEFAULT_FROM_EMAIL") or "support@egarage.cl").strip()
+
+# AI Briefing — Anthropic
+# Si ANTHROPIC_API_KEY está vacía el briefing usa el fallback determinista sin error.
+ANTHROPIC_API_KEY   = (os.getenv("ANTHROPIC_API_KEY") or "").strip()
+ANTHROPIC_MODEL     = os.getenv("ANTHROPIC_MODEL", "claude-haiku-4-5-20251001")
+BRIEFING_CACHE_TTL  = int(os.getenv("BRIEFING_CACHE_TTL", "1800"))    # segundos
+BRIEFING_DAILY_LIMIT = int(os.getenv("BRIEFING_DAILY_LIMIT", "10"))   # llamadas AI/empresa/día

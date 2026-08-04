@@ -1,0 +1,25 @@
+{% load static %}{% load humanize %}{% load money %}
+{% with img=product.primary_image %}
+<a href="{% url 'commerce:product' product.slug %}" class="product-card{% if not product.is_publishable %} product-card-inactive{% endif %}">
+  <div class="product-card-img">
+    {% if img %}
+      <img src="{{ img.image.url }}" alt="{{ product.nombre }}" loading="lazy">
+    {% else %}
+      <img src="{% static 'commerce/themes/monteazul/img/placeholder-product.svg' %}" alt="{{ product.nombre }}" loading="lazy">
+    {% endif %}
+  </div>
+  <div class="product-card-body">
+    {% if product.category %}
+      <div class="product-card-cat">{{ product.category.name }}</div>
+    {% endif %}
+    <h3 class="product-card-name">{{ product.nombre }}</h3>
+    {% if product.part_number %}
+      <div class="product-card-sku">{{ product.part_number }}</div>
+    {% endif %}
+    <div class="product-card-footer">
+      <span class="product-card-price">{{ product.precio_venta|money_clp }} <span class="product-card-iva">IVA incluido</span></span>
+      <span class="product-card-cta">Ver más</span>
+    </div>
+  </div>
+</a>
+{% endwith %}

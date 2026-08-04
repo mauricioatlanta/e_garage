@@ -1,4 +1,23 @@
-<div class="bg-[#111827] border border-[#1e293b] rounded-xl p-6">
-  <p class="text-sm text-gray-400">{{ title }}</p>
-  <h3 class="text-2xl font-bold mt-2">{{ value }}</h3>
+{% load humanize %}
+{% if url %}<a href="{{ url }}" style="display:block;text-decoration:none;color:inherit;">{% endif %}
+<div class="bg-[#111827] border border-[#1e293b] rounded-xl p-5{% if url %} hover:border-[#38bdf8] cursor-pointer{% endif %}"
+     style="position:relative; transition:border-color .15s ease;">
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:2px;">
+    <p class="text-sm text-gray-400" style="margin:0;">{{ title }}</p>
+    {% if icon %}<i class="{{ icon }}" style="color:var(--eg-primary,#38bdf8); opacity:.5; font-size:.8rem;"></i>{% endif %}
+  </div>
+  <h3 class="text-2xl font-bold mt-2" style="margin-bottom:0;">
+    {% if format == "percent" %}
+      {% if has_value %}{{ value|floatformat:1 }}%{% else %}—{% endif %}
+    {% elif format == "currency" %}
+      ${{ value|floatformat:0|intcomma }}
+    {% else %}
+      {{ value }}
+    {% endif %}
+  </h3>
+  {% if url %}
+  <i class="fas fa-arrow-right" style="position:absolute; bottom:14px; right:16px;
+     font-size:.65rem; color:var(--eg-primary,#38bdf8); opacity:.4;"></i>
+  {% endif %}
 </div>
+{% if url %}</a>{% endif %}

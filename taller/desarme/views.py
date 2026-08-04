@@ -34,7 +34,7 @@ from taller.models.pieza_desarme import (
     PiezaDesarmeCompanyLabel,
 )
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
-from taller.models.vehiculo_desarme import VehiculoDesarme
+from taller.models.vehiculo_desarme import ESTADO_DESARME_CHOICES, VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 from taller.models.inspeccion_ingreso import DanoInspeccion, InspeccionIngreso
 from taller.models.vendedor_desarme import VendedorDesarme
@@ -402,9 +402,24 @@ def lista_vehiculos(request):
             | Q(modelo__nombre__icontains=q)
         )
 
-    estado = request.GET.get("estado", "").strip()
-    if estado:
-        qs = qs.filter(estado_desarme=estado)
+    _VALID_ESTADOS = {c[0] for c in ESTADO_DESARME_CHOICES}
+    estado_raw = request.GET.get("estado", "").strip()
+    estado = estado_raw  # kept for template context (used in select + "Limpiar" check)
+    valid_estados = [e for e in estado_raw.split(",") if e in _VALID_ESTADOS]
+    if valid_estados:
+        qs = qs.filter(estado_desarme__in=valid_estados)
+
+    ingresado_antes_raw = request.GET.get("ingresado_antes", "").strip()
+    if ingresado_antes_raw:
+        from datetime import date as _date
+        try:
+            ingresado_antes = _date.fromisoformat(ingresado_antes_raw)
+            qs = qs.filter(
+                fecha_ingreso_desarme__isnull=False,
+                fecha_ingreso_desarme__lt=ingresado_antes,
+            )
+        except ValueError:
+            pass
 
     estados = (
         VehiculoDesarme.objects.filter(empresa=empresa)
@@ -833,6 +848,17 @@ def lista_piezas(request):
     vehiculo_id = request.GET.get("vehiculo", "").strip()
     if vehiculo_id:
         piezas = piezas.filter(vehiculo_desarme_id=vehiculo_id)
+
+    if request.GET.get("sin_foto") == "1":
+        piezas = piezas.filter(Q(imagen__isnull=True) | Q(imagen=""))
+
+    if request.GET.get("sin_precio") == "1":
+        piezas = piezas.filter(
+            Q(precio_venta_sugerido__isnull=True) & Q(precio_sugerido__isnull=True)
+        )
+
+    if request.GET.get("sin_ubicacion") == "1":
+        piezas = piezas.filter(ubicacion_fisica__isnull=True)
 
     vehiculos_choices = list(
         VehiculoDesarme.objects.filter(empresa=empresa)

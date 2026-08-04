@@ -1,0 +1,64 @@
+{% if briefing_url %}
+<style>
+@keyframes briefing-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: .35; }
+}
+.briefing-skel {
+  animation: briefing-pulse 1.6s ease-in-out infinite;
+  background: rgba(255,255,255,.06);
+  border-radius: 4px;
+}
+</style>
+
+<div id="briefing-panel"
+     data-url="{{ briefing_url }}"
+     style="margin-bottom:24px; border-radius:12px;
+            border:1px solid rgba(56,189,248,.15);
+            background:rgba(15,23,42,.75); overflow:hidden;">
+
+  {# ── Skeleton — visible while fetch is in-flight ── #}
+  <div id="briefing-skeleton" style="padding:20px;">
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+      <div class="briefing-skel" style="width:18px; height:18px; border-radius:50%;"></div>
+      <div class="briefing-skel" style="width:55%; height:13px;"></div>
+    </div>
+    <div class="briefing-skel" style="width:80%; height:10px; margin-bottom:8px;"></div>
+    <div class="briefing-skel" style="width:65%; height:10px; margin-bottom:8px;"></div>
+    <div class="briefing-skel" style="width:72%; height:10px; margin-bottom:18px;"></div>
+    <div class="briefing-skel" style="width:88%; height:10px; border-radius:3px;"></div>
+  </div>
+
+  {# ── Content — hidden until fetch resolves ── #}
+  <div id="briefing-content" style="display:none; padding:20px;">
+
+    {# Greeting row #}
+    <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+      <i class="fas fa-robot"
+         style="color:var(--eg-primary,#38bdf8); font-size:1rem; flex-shrink:0;"></i>
+      <p id="briefing-greeting"
+         style="margin:0; font-size:.9rem; font-weight:600; color:#e2e8f0;"></p>
+    </div>
+
+    {# Summary bullet list #}
+    <ul id="briefing-summary"
+        style="margin:0 0 14px 0; padding-left:20px;
+               color:#94a3b8; font-size:.855rem; line-height:1.75;"></ul>
+
+    {# Recommendation callout #}
+    <div style="padding:10px 14px;
+                background:rgba(56,189,248,.06);
+                border-left:3px solid var(--eg-primary,#38bdf8);
+                border-radius:0 6px 6px 0;">
+      <p id="briefing-recommendation"
+         style="margin:0; font-size:.82rem; color:#cbd5e1; font-style:italic;"></p>
+    </div>
+
+    {# Source badge — shown only for debug awareness; styled subtle #}
+    <p id="briefing-meta"
+       style="margin:10px 0 0; font-size:.7rem; color:rgba(148,163,184,.4);
+              text-align:right;"></p>
+  </div>
+
+</div>
+{% endif %}

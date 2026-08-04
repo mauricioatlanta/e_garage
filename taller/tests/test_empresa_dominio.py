@@ -34,13 +34,14 @@ def usuario(db):
 
 @pytest.fixture
 def empresa(db, usuario):
-    return Empresa.objects.create(user=usuario, nombre_taller="Taller Dominio Test", pais="CL")
+    from taller.tests.factories import EmpresaFactory
+    return EmpresaFactory(user=usuario, nombre_taller="Taller Dominio Test", pais="CL")
 
 
 @pytest.fixture
 def empresa_b(db):
-    user_b = User.objects.create_user("empresa_b_user", "b@test.com", "pass")
-    return Empresa.objects.create(user=user_b, nombre_taller="Taller B", pais="CL")
+    from taller.tests.factories import EmpresaFactory
+    return EmpresaFactory(nombre_taller="Taller B", pais="CL")
 
 
 @pytest.fixture

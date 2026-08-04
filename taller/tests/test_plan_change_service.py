@@ -25,10 +25,9 @@ from taller.utils.plan_catalog import PLAN_BUSINESS, PLAN_ENTRY, PLAN_GROWTH
 
 @pytest.fixture
 def empresa_activa(db):
-    user = User.objects.create_user("owner", "owner@example.com", "password")
+    from taller.tests.factories import EmpresaFactory
     now = timezone.now()
-    return Empresa.objects.create(
-        user=user,
+    return EmpresaFactory(
         nombre_taller="Taller Planes",
         pais="US",
         plan=PLAN_ENTRY,

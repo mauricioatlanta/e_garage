@@ -1,0 +1,70 @@
+{#
+  activity_feed.html — Últimos documentos emitidos de la empresa.
+
+  Variables requeridas (del contexto de la vista):
+    dashboard_data.activity_feed  → lista de dicts del WorkspaceDashboardService
+    workspace.texts.activity_feed_title → heading contextual por rubro
+#}
+{% load humanize %}
+
+<div class="bg-[#111827] border border-[#1e293b] rounded-xl p-6">
+  <h3 class="mb-4 font-semibold text-sm uppercase tracking-widest text-slate-400">
+    {{ workspace.texts.activity_feed_title }}
+  </h3>
+
+  {% if dashboard_data.activity_feed %}
+  <ul style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:10px;">
+    {% for item in dashboard_data.activity_feed %}
+    <li style="display:flex; align-items:center; gap:12px; padding:10px 12px;
+               border-radius:8px; background:rgba(255,255,255,.03);
+               border:1px solid rgba(255,255,255,.05);">
+
+      {# Tipo badge #}
+      <span style="
+        font-size:.7rem; font-weight:700; letter-spacing:.06em; padding:2px 7px;
+        border-radius:4px; white-space:nowrap; flex-shrink:0;
+        {% if item.tipo == 'OT' %}
+          background:rgba(0,240,255,.12); color:#00f0ff; border:1px solid rgba(0,240,255,.25);
+        {% elif item.tipo == 'PRES' %}
+          background:rgba(251,191,36,.12); color:#fbbf24; border:1px solid rgba(251,191,36,.25);
+        {% elif item.tipo == 'FAC' %}
+          background:rgba(167,139,250,.12); color:#a78bfa; border:1px solid rgba(167,139,250,.25);
+        {% elif item.tipo == 'PTS' %}
+          background:rgba(132,204,22,.12); color:#84cc16; border:1px solid rgba(132,204,22,.25);
+        {% else %}
+          background:rgba(100,116,139,.12); color:#94a3b8; border:1px solid rgba(100,116,139,.25);
+        {% endif %}
+      ">{{ item.tipo }}</span>
+
+      {# Número + cliente #}
+      <div style="flex:1; min-width:0;">
+        <p style="margin:0; font-size:.85rem; font-weight:600; color:#e2e8f0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          {% if item.numero %}{{ item.numero }}{% else %}{{ item.tipo_label }}{% endif %}
+        </p>
+        {% if item.cliente_nombre %}
+        <p style="margin:0; font-size:.75rem; color:#64748b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">
+          {{ item.cliente_nombre }}
+        </p>
+        {% endif %}
+      </div>
+
+      {# Total + fecha #}
+      <div style="text-align:right; flex-shrink:0;">
+        <p style="margin:0; font-size:.85rem; font-weight:700; color:#e2e8f0;">
+          ${{ item.total|floatformat:0|intcomma }}
+        </p>
+        <p style="margin:0; font-size:.72rem; color:#475569;">
+          {{ item.fecha|date:"d/m H:i" }}
+        </p>
+      </div>
+
+    </li>
+    {% endfor %}
+  </ul>
+
+  {% else %}
+  <p style="color:#475569; font-size:.875rem; text-align:center; padding:24px 0;">
+    {% if request.LANGUAGE_CODE == 'en' %}No recent activity{% else %}Sin actividad reciente{% endif %}
+  </p>
+  {% endif %}
+</div>

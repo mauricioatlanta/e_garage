@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "egarage/contracts/schemas/meta-contract.schema.json",
+  "title": "eGarage Meta-Contract Schema v2",
+  "description": "Validates any eGarage integration contract file in contracts/registry/. Architecture defined by ADR-000.",
+  "type": "object",
+  "required": [
+    "id",
+    "display_name",
+    "category",
+    "owner",
+    "publisher",
+    "message_types",
+    "consumers",
+    "version",
+    "status",
+    "breaking_change_policy",
+    "pending_decisions"
+  ],
+  "additionalProperties": false,
+  "properties": {
+
+    "meta_description": {
+      "type": "string",
+      "description": "Optional human-readable statement of what this contract represents."
+    },
+
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]+\\.[a-z][a-z0-9-]+\\.v[0-9]+$",
+      "description": "Globally unique contract identifier. Format: {domain}.{contract-name}.v{major}. Examples: catalog.product-knowledge.v1, inventory.stock.v1"
+    },
+
+    "display_name": {
+      "type": "string",
+      "minLength": 1
+    },
+
+    "category": {
+      "type": "string",
+      "enum": ["Truth", "Capability", "Behavioral", "Session", "Event", "Infrastructure"]
+    },
+
+    "owner": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Bounded context that owns and versions this contract."
+    },
+
+    "publisher": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Single subsystem responsible for publishing every Message Type in this contract."
+    },
+
+    "write_authority": {
+      "type": ["string", "null"],
+      "description": "Sole subsystem authorized to write the governed data. Required non-null for Truth contracts. Must be null for all other categories."
+    },
+
+    "message_types": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Independently versioned messages belonging to this contract. Every contract must declare at least one Message Type. Contracts with a single message still use this array — there is no shorthand.",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "description",
+          "version",
+          "schema_ref",
+          "interaction",
+          "transport",
+          "frequency",
+          "guarantees"
+        ],
+        "additionalProperties": false,
+        "properties": {
+
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$",
+            "description": "Globally unique Message Type identifier. Format: {domain}.{entity}.{action}. Examples: catalog.product.changed, inventory.stock.updated. IDs must be unique across the entire platform, not just within the parent contract."
+          },
+
+          "description": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Human-readable explanation of this message's business semantics."
+          },
+
+          "version": {
+            "type": "string",
+            "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+            "description": "SemVer of this Message Type's payload and behavior. Independent from the parent contract version. A breaking schema or semantic change requires a MAJOR increment."
+          },
+
+          "schema_ref": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Path to the JSON Schema that validates this Message Type's payload. Relative to contracts/."
+          },
+
+          "interaction": {
+            "type": "string",
+            "enum": ["event", "request-response", "snapshot", "stream"],
+            "description": "Semantic interaction pattern of this Message Type. event: publisher emits without prior request. request-response: consumer requests, publisher responds. snapshot: complete domain state at emission time. stream: continuous flow, consumer subscribes. Changing interaction is a breaking change."
+          },
+
+          "transport": {
+            "type": "string",
+            "enum": ["queue", "http", "file", "grpc", "webhook"],
+            "description": "Physical delivery mechanism. queue: message broker (Kafka, RabbitMQ, Django Q). http: REST or RPC endpoint. file: filesystem or object storage. grpc: gRPC channel. webhook: publisher calls consumer-registered URL. Changing transport is an implementation change, not a semantic breaking change."
+          },
+
+          "frequency": {
+            "type": "string",
+            "enum": ["realtime", "near-realtime", "batch", "static", "on-demand"],
+            "description": "Expected publication or availability cadence for this specific Message Type."
+          },
+
+          "guarantees": {
+            "type": "object",
+            "required": ["idempotent", "ordered", "consistency", "completeness", "max_staleness"],
+            "additionalProperties": false,
+            "description": "Binding commitments from the publisher for this Message Type. Changing any guarantee — in any direction — is a breaking change.",
+            "properties": {
+
+              "idempotent": {
+                "type": ["boolean", "null"],
+                "description": "Whether a consumer can safely process the same message more than once without side effects."
+              },
+
+              "ordered": {
+                "type": ["boolean", "null"],
+                "description": "Whether messages are guaranteed to arrive in the order they were published."
+              },
+
+              "consistency": {
+                "type": ["string", "null"],
+                "enum": ["strong", "eventual", null],
+                "description": "Data consistency model visible to consumers at delivery time."
+              },
+
+              "completeness": {
+                "type": ["string", "null"],
+                "enum": ["delta", "full-snapshot", null],
+                "description": "Whether the payload represents a change (delta) or the complete current state (full-snapshot)."
+              },
+
+              "max_staleness": {
+                "type": ["string", "null"],
+                "description": "Maximum acceptable age of the delivered data. Format: '5m', '1h', '24h'. Null when staleness does not apply (e.g. on-demand or realtime)."
+              }
+            }
+          }
+        }
+      }
+    },
+
+    "consumers": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Exhaustive list of authorized consumers. Unlisted subsystems are not authorized. Each consumer declares exactly which Message Types it consumes — declaring only the parent contract is not allowed. Cross-reference validation (consumer.message_types[] vs message_types[].id) is enforced by CI script, not by this schema.",
+      "items": {
+        "type": "object",
+        "required": ["subsystem", "message_types"],
+        "additionalProperties": false,
+        "properties": {
+
+          "subsystem": {
+            "type": "string",
+            "minLength": 1,
+            "description": "Identifier of the authorized consumer subsystem."
+          },
+
+          "message_types": {
+            "type": "array",
+            "minItems": 1,
+            "description": "Message Type IDs this consumer is authorized to consume. Each ID must exist in the parent contract's message_types[].id list.",
+            "items": {
+              "type": "string",
+              "pattern": "^[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*\\.[a-z][a-z0-9-]*$",
+              "description": "Message Type ID in {domain}.{entity}.{action} format."
+            }
+          }
+        }
+      }
+    },
+
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "SemVer of this contract definition. Describes the contract collection and governance metadata. Independent from message_types[].version. Increment MAJOR when a message_type is added, removed, or renamed, or when owner/publisher changes."
+    },
+
+    "status": {
+      "type": "string",
+      "enum": ["draft", "stable", "deprecated"],
+      "description": "draft: under design, must not be consumed in production. stable: approved for production. deprecated: replaced, consumers must migrate."
+    },
+
+    "breaking_change_policy": {
+      "type": "string",
+      "enum": ["semver-major", "negotiated-migration"]
+    },
+
+    "min_consumer_version": {
+      "type": ["string", "null"],
+      "description": "Minimum contract version consumers are expected to support. Null until a minimum is formally established."
+    },
+
+    "pending_decisions": {
+      "type": "array",
+      "description": "ADR identifiers that must reach Accepted before this contract can become stable. A non-empty list blocks transition to stable.",
+      "items": {
+        "type": "string",
+        "pattern": "^ADR-[0-9]+",
+        "description": "ADR identifier. Format: ADR-NNN"
+      }
+    }
+  },
+
+  "if": {
+    "properties": { "category": { "const": "Truth" } },
+    "required": ["category"]
+  },
+  "then": {
+    "properties": {
+      "write_authority": { "type": "string", "minLength": 1 }
+    },
+    "required": ["write_authority"]
+  }
+}

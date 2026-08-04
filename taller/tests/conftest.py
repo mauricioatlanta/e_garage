@@ -10,6 +10,7 @@ from django.contrib.auth.models import User
 from taller.models import Empresa, Estado, Ciudad, TaxPolicy
 from ubicacion.models import Address
 from decimal import Decimal
+from taller.tests.factories import EmpresaFactory
 
 
 @pytest.fixture
@@ -23,21 +24,19 @@ def test_user(db):
 @pytest.fixture
 def empresa_chile(db, test_user):
     """Fixture: crear empresa de Chile"""
-    return Empresa.objects.create(user=test_user, nombre_taller="Taller Chile Test", pais="CL")
+    return EmpresaFactory(user=test_user, nombre_taller="Taller Chile Test", pais="CL")
 
 
 @pytest.fixture
 def empresa_peru(db):
     """Fixture: crear empresa de Perú"""
-    user = User.objects.create_user("peru_user", "peru@test.com", "password")
-    return Empresa.objects.create(user=user, nombre_taller="Taller Perú Test", pais="PE")
+    return EmpresaFactory(nombre_taller="Taller Perú Test", pais="PE")
 
 
 @pytest.fixture
 def empresa_usa(db):
     """Fixture: crear empresa de USA"""
-    user = User.objects.create_user("usa_user", "usa@test.com", "password")
-    return Empresa.objects.create(user=user, nombre_taller="Taller USA Test", pais="US")
+    return EmpresaFactory(nombre_taller="Taller USA Test", pais="US")
 
 
 @pytest.fixture

@@ -9,8 +9,17 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes','django.contrib.sessions','django.contrib.messages',
     'django.contrib.staticfiles','django.contrib.humanize','django.contrib.sites','allauth','allauth.account',
     'allauth.socialaccount','gestion_taller','taller','marketplace','ubicacion',
-    'widget_tweaks'
+    'widget_tweaks',
+    'commerce',
+    'core',
+    'runtime',
 ]
+
+# Commerce Engine — mapa hostname → empresa_id
+# Añadir entradas en settings.local.py o .env para desarrollo/producción
+COMMERCE_TENANT_MAP: dict = {
+    # "monteazul.local": 1,  # Ejemplo: descomentar con el empresa_id real
+}
 SITE_ID = 1
 LANGUAGE_CODE = 'es'
 LOCALE_PATHS = [BASE_DIR / 'locale']
@@ -20,13 +29,14 @@ MIDDLEWARE = [
     'django.middleware.locale.LocaleMiddleware','django.middleware.common.CommonMiddleware','django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'taller.middleware.host_tenant.HostTenantMiddleware',
+    'commerce.middleware.CommerceTenantMiddleware',
     'taller.middleware.empresa_resolver.EmpresaResolverMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware','allauth.account.middleware.AccountMiddleware'
 ]
 ROOT_URLCONF = 'gestion_taller.urls'
 WSGI_APPLICATION = 'gestion_taller.wsgi.application'
-TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates','DIRS': [os.path.join(BASE_DIR, 'templates')],'APP_DIRS': True,'OPTIONS': {'context_processors': ['django.template.context_processors.debug','django.template.context_processors.request','django.template.context_processors.i18n','django.contrib.auth.context_processors.auth','django.template.context_processors.media','django.template.context_processors.static','django.template.context_processors.tz','django.contrib.messages.context_processors.messages','taller.context_processors.empresa_contexto','taller.context_processors.namespaces.ui_namespaces','taller.context_processors.company_context','taller.context_processors.company_branding','taller.context_processors.company_header','taller.context_processors.panel_chrome.us_authenticated_compact_chrome','taller.context_processors.panel_chrome.us_signup_slim_header','taller.context_processors.ui_labels.ui_labels_context','taller.context_processors.subscription_notice.subscription_notice'],},}]
+TEMPLATES = [{'BACKEND': 'django.template.backends.django.DjangoTemplates','DIRS': [os.path.join(BASE_DIR, 'templates')],'APP_DIRS': True,'OPTIONS': {'context_processors': ['django.template.context_processors.debug','django.template.context_processors.request','django.template.context_processors.i18n','django.contrib.auth.context_processors.auth','django.template.context_processors.media','django.template.context_processors.static','django.template.context_processors.tz','django.contrib.messages.context_processors.messages','taller.context_processors.empresa_contexto','taller.context_processors.namespaces.ui_namespaces','taller.context_processors.company_context','taller.context_processors.company_branding','taller.context_processors.company_header','taller.context_processors.panel_chrome.us_authenticated_compact_chrome','taller.context_processors.panel_chrome.us_signup_slim_header','taller.context_processors.ui_labels.ui_labels_context','taller.context_processors.subscription_notice.subscription_notice','taller.context_processors.business_modules.business_modules'],},}]
 _db_path = os.getenv('DJANGO_DB_PATH') or str(BASE_DIR / 'db.sqlite3')
 DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': _db_path}}
 STATIC_URL = '/static/'

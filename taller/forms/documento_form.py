@@ -295,6 +295,7 @@ class DocumentoForm(forms.ModelForm):
             self.fields["tipo"].choices = [
                 ("PRES", "Estimate"),
                 ("FAC", "Invoice"),
+                ("PTS", "Parts Sale"),
             ]
             self.fields["payment_status"].choices = [
                 ("pending", "Pending"),
@@ -307,6 +308,7 @@ class DocumentoForm(forms.ModelForm):
                 ("OT", "Orden de Trabajo"),
                 ("PRES", "Presupuesto"),
                 ("FAC", "Comprobante"),
+                ("PTS", "Venta Repuestos"),
             ]
             self.fields["payment_status"].choices = [
                 ("pending", "Pendiente"),
@@ -520,6 +522,8 @@ class DocumentoForm(forms.ModelForm):
         previous_document=None,
         previous_inventory_snapshot=None,
     ):
+        import uuid
+
         from django.core.exceptions import ValidationError
 
         from taller.services.inventory_service import InventoryService
@@ -546,14 +550,23 @@ class DocumentoForm(forms.ModelForm):
             if errores:
                 raise ValidationError({"__all__": errores})
 
-        if previous_moves_stock and snapshot_previo:
+        if previous_moves_stock and current_moves_stock:
+            # EMITIDO → EMITIDO: registrar diferencia neta con TipoMovimiento.EDICION
+            operation_id = str(uuid.uuid4())
+            InventoryService.procesar_edicion_con_ledger(
+                snapshot_anterior=snapshot_previo,
+                documento=documento,
+                operation_id=operation_id,
+            )
+        elif previous_moves_stock and snapshot_previo:
+            # EMITIDO → non-EMITIDO: reponer stock anterior (sin ledger por ahora)
             InventoryService.procesar_snapshot_movimiento(
                 documento.empresa,
                 snapshot_previo,
                 "reponer",
             )
-
-        if current_moves_stock:
+        elif current_moves_stock:
+            # non-EMITIDO → EMITIDO: descontar stock nuevo (EMISION ledger)
             InventoryService.procesar_movimiento_stock(documento, "descontar")
 
     def _crear_registro_kilometraje(self, documento, kilometraje):

@@ -1,0 +1,38 @@
+{% with has_children=category.resolved_children %}
+<div class="ca-tree-node flex items-center justify-between gap-3" style="margin-left: {{ depth|default:0|add:0 }}rem">
+  <div class="flex items-center gap-2 min-w-0">
+    {% if has_children %}
+    <button type="button" id="arrow-{{ category.pk }}" onclick="toggleChildren({{ category.pk }})"
+            class="text-gray-500 hover:text-cyan-300 text-xs w-4 shrink-0 transition-colors">▼</button>
+    {% else %}
+    <span class="w-4 shrink-0"></span>
+    {% endif %}
+    <span class="font-medium text-gray-200 truncate">{{ category.name }}</span>
+    <span class="text-xs text-gray-600">{{ category.slug }}</span>
+    {% if category.is_active %}
+    <span class="status-badge ca-badge-active">Activa</span>
+    {% else %}
+    <span class="status-badge ca-badge-inactive">Inactiva</span>
+    {% endif %}
+    {% if category.product_count is not None %}
+    <span class="text-xs text-gray-600">{{ category.product_count }} prod.</span>
+    {% endif %}
+  </div>
+  <div class="flex items-center gap-2 shrink-0">
+    <a href="{% url 'commerce:admin_category_edit' category.pk %}" class="ca-btn ca-btn-ghost text-xs">Editar</a>
+    <button type="button" onclick="toggleActive({{ category.pk }}, this)"
+            class="ca-btn ca-btn-ghost text-xs">
+      {% if category.is_active %}Desactivar{% else %}Activar{% endif %}
+    </button>
+    <button type="button" onclick="confirmDelete({{ category.pk }})"
+            class="ca-btn ca-btn-danger text-xs">Eliminar</button>
+  </div>
+</div>
+{% if has_children %}
+<div id="children-{{ category.pk }}" class="ca-tree-children">
+  {% for child in has_children %}
+  {% include "commerce/admin/categories/_tree_node.html" with category=child depth=depth|add:1 %}
+  {% endfor %}
+</div>
+{% endif %}
+{% endwith %}

@@ -24,8 +24,8 @@ class TestTaxEngineBasic:
     def test_resolve_tax_rate_returns_decimal(self):
         """Test: resolve_tax_rate retorna Decimal"""
         # Crear empresa de prueba
-        user = User.objects.create_user("test", "test@test.com", "password")
-        empresa = Empresa.objects.create(user=user, nombre_taller="Test Taller", pais="CL")
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller="Test Taller", pais="CL")
 
         rate, inclusive = resolve_tax_rate(empresa, None, "parts")
 
@@ -46,8 +46,8 @@ class TestTaxEngineBasic:
         )
 
         # Crear empresa de Chile
-        user = User.objects.create_user("test_cl", "test@cl.com", "password")
-        empresa = Empresa.objects.create(user=user, nombre_taller="Taller Chile", pais="CL")
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller="Taller Chile", pais="CL")
 
         rate, inclusive = resolve_tax_rate(empresa, None, "parts")
 
@@ -68,8 +68,8 @@ class TestTaxEngineBasic:
         )
 
         # Crear empresa de Chile
-        user = User.objects.create_user("test_cl2", "test2@cl.com", "password")
-        empresa = Empresa.objects.create(user=user, nombre_taller="Taller Chile 2", pais="CL")
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller="Taller Chile 2", pais="CL")
 
         # Servicios deben dar 0%
         rate, inclusive = resolve_tax_rate(empresa, None, "services")
@@ -90,8 +90,8 @@ class TestTaxEngineBasic:
         )
 
         # Crear empresa de Perú
-        user = User.objects.create_user("test_pe", "test@pe.com", "password")
-        empresa = Empresa.objects.create(user=user, nombre_taller="Taller Perú", pais="PE")
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller="Taller Perú", pais="PE")
 
         # Parts → 18%
         rate_parts, _ = resolve_tax_rate(empresa, None, "parts")
@@ -115,8 +115,8 @@ class TestTaxEngineBasic:
         )
 
         # Crear empresa de Venezuela
-        user = User.objects.create_user("test_ve", "test@ve.com", "password")
-        empresa = Empresa.objects.create(user=user, nombre_taller="Taller Venezuela", pais="VE")
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller="Taller Venezuela", pais="VE")
 
         rate, _ = resolve_tax_rate(empresa, None, "both")
         assert rate == Decimal("0.16")
@@ -140,8 +140,8 @@ class TestTaxEngineUSA:
         )
 
         # Crear empresa USA en California
-        user = User.objects.create_user("test_us", "test@us.com", "password")
-        empresa = Empresa.objects.create(user=user, nombre_taller="Taller USA", pais="US")
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller="Taller USA", pais="US")
 
         # Crear estado y ciudad de California
         ca_state = Estado.objects.create(
@@ -168,13 +168,9 @@ class TestTaxEngineUSA:
         )
 
         # Empresas en diferentes estados
-        user_ca = User.objects.create_user("ca_user", "ca@test.com", "password")
-        empresa_ca = Empresa.objects.create(
-            user=user_ca, nombre_taller="California Taller", pais="US"
-        )
-
-        user_fl = User.objects.create_user("fl_user", "fl@test.com", "password")
-        empresa_fl = Empresa.objects.create(user=user_fl, nombre_taller="Florida Taller", pais="US")
+        from taller.tests.factories import EmpresaFactory
+        empresa_ca = EmpresaFactory(nombre_taller="California Taller", pais="US")
+        empresa_fl = EmpresaFactory(nombre_taller="Florida Taller", pais="US")
 
         # Crear estados y ciudades
         ca_state = Estado.objects.create(
@@ -203,8 +199,8 @@ class TestTaxEngineFallbacks:
         # No crear política
 
         # Crear empresa y ciudad
-        user = User.objects.create_user("test_fb", "fb@test.com", "password")
-        empresa = Empresa.objects.create(user=user, nombre_taller="Taller Fallback", pais="PE")
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller="Taller Fallback", pais="PE")
 
         estado = Estado.objects.create(
             nombre="Lima", codigo="LIM", pais="PE", sales_tax=18.00  # Fallback
@@ -222,8 +218,8 @@ class TestTaxEngineFallbacks:
         """Test: fallback a default del país si no hay nada"""
         # No crear política ni estado
 
-        user = User.objects.create_user("test_def", "def@test.com", "password")
-        empresa = Empresa.objects.create(user=user, nombre_taller="Taller Default", pais="BR")
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller="Taller Default", pais="BR")
 
         # Debe usar default de Brasil
         rate, _ = resolve_tax_rate(empresa, None, "parts")
@@ -241,8 +237,8 @@ class TestTaxEngineConventions:
         # Crear política solo para parts
         TaxPolicy.objects.create(country="CL", applies_to="parts", rate=Decimal("0.19"))
 
-        user = User.objects.create_user("cl_conv", "conv@cl.com", "password")
-        empresa = Empresa.objects.create(user=user, nombre_taller="Taller Convención", pais="CL")
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller="Taller Convención", pais="CL")
 
         # Parts → 19%
         rate_parts, _ = resolve_tax_rate(empresa, None, "parts")
@@ -318,10 +314,8 @@ def test_all_countries_with_sample_policies(sample_tax_policies):
     ]
 
     for country, applies_to, expected_rate in countries_config:
-        user = User.objects.create_user(
-            f"user_{country}_{applies_to}", f"{country}@test.com", "password"
-        )
-        empresa = Empresa.objects.create(user=user, nombre_taller=f"Taller {country}", pais=country)
+        from taller.tests.factories import EmpresaFactory
+        empresa = EmpresaFactory(nombre_taller=f"Taller {country}", pais=country)
 
         rate, _ = resolve_tax_rate(empresa, None, applies_to)
 

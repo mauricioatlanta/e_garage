@@ -1,8 +1,91 @@
 {% extends "onboarding/base.html" %}
 
+{% block extra_head %}
+{{ block.super }}
+<style>
+.product-cards {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+    margin-top: 8px;
+}
+
+@media (max-width: 480px) {
+    .product-cards { grid-template-columns: 1fr; }
+}
+
+.product-card {
+    position: relative;
+    padding: 20px 16px;
+    border-radius: 14px;
+    border: 1.5px solid rgba(0, 255, 255, 0.18);
+    background: rgba(10, 14, 39, 0.55);
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.22s ease;
+    user-select: none;
+}
+
+.product-card:hover {
+    border-color: rgba(0, 255, 255, 0.5);
+    background: rgba(0, 255, 255, 0.07);
+    transform: translateY(-2px);
+}
+
+.product-card.selected {
+    border-color: var(--neon-cyan);
+    background: rgba(0, 255, 255, 0.12);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.25);
+}
+
+.product-card.selected::after {
+    content: '✓';
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    color: var(--neon-cyan);
+    font-size: 14px;
+    font-weight: 900;
+}
+
+.product-card-emoji {
+    font-size: 2rem;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.product-card-name {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-family: 'Orbitron', sans-serif;
+    letter-spacing: 0.3px;
+    margin-bottom: 4px;
+}
+
+.product-card-desc {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    line-height: 1.35;
+}
+
+.product-card-nav-preview {
+    margin-top: 10px;
+    font-size: 0.7rem;
+    color: rgba(0, 255, 255, 0.55);
+    text-align: left;
+    display: none;
+}
+
+.product-card.selected .product-card-nav-preview {
+    display: block;
+}
+</style>
+{% endblock %}
+
 {% block step_content %}
 <h3 class="h4 mb-4">Paso 1: Identidad de tu Empresa</h3>
-<p class="text-muted mb-4">Configura la información básica de tu taller mecánico</p>
+<p class="text-muted mb-4">Configura la información básica de tu negocio automotriz</p>
 
 <form id="paso1Form">
     {% csrf_token %}
@@ -10,11 +93,10 @@
     <div class="row">
         <div class="col-md-6">
             <div class="mb-3">
-                <label for="id_nombre_taller" class="form-label onb-label">Nombre del Taller</label>
+                <label for="id_nombre_taller" class="form-label onb-label">Nombre del Negocio</label>
                 <input type="text" class="form-control onb-control" id="id_nombre_taller" name="nombre_taller"
                        value="{{ empresa.nombre_taller }}">
             </div>
-
         </div>
 
         <div class="col-md-6">
@@ -23,7 +105,6 @@
                 <input type="text" class="form-control onb-control" id="id_lema" name="lema"
                        value="{{ form.lema.value|default:'' }}">
             </div>
-
         </div>
     </div>
 
@@ -44,7 +125,6 @@
                 </div>
                 {% endif %}
             </div>
-
         </div>
 
         <div class="col-md-6">
@@ -53,8 +133,94 @@
                 <input type="email" class="form-control onb-control" id="id_email" name="email"
                        value="{{ empresa.email }}">
             </div>
+        </div>
+    </div>
+
+    <!-- Selector de tipo de negocio: tarjetas de producto -->
+    <div class="mb-4 mt-2">
+        <label class="onb-label">¿Qué tipo de negocio tienes?</label>
+        <p style="color: var(--text-secondary); font-size: 0.88rem; margin-bottom: 1rem;">
+            Selecciona el que mejor describe tu operación. Esto personaliza el menú y el dashboard de eGarage.
+        </p>
+
+        <input type="hidden" id="id_rubro_principal" name="rubro_principal" value="{{ rubro_actual|default:'WORKSHOP' }}">
+
+        <div class="product-cards">
+
+            <div class="product-card" data-product="TALLER" data-default-rubro="WORKSHOP"
+                 role="button" tabindex="0" aria-label="Taller Mecánico">
+                <span class="product-card-emoji">🔧</span>
+                <div class="product-card-name">Taller Mecánico</div>
+                <div class="product-card-desc">Órdenes de trabajo, presupuestos, mecánicos, vehículos y repuestos</div>
+                <div class="product-card-nav-preview">Inicio · Presupuestos/OT · Vehículos · Clientes · Servicios · Repuestos</div>
+            </div>
+
+            <div class="product-card" data-product="DESARMADURIA" data-default-rubro="MIXED"
+                 role="button" tabindex="0" aria-label="Desarmaduría">
+                <span class="product-card-emoji">🚗</span>
+                <div class="product-card-name">Desarmaduría</div>
+                <div class="product-card-desc">Vehículos de desarme, inventario de piezas, compatibilidades y ventas</div>
+                <div class="product-card-nav-preview">Inicio · Vehículos de Desarme · Inventario · Ventas · Clientes</div>
+            </div>
+
+            <div class="product-card" data-product="CASA_REPUESTOS" data-default-rubro="PARTS"
+                 role="button" tabindex="0" aria-label="Casa de Repuestos">
+                <span class="product-card-emoji">📦</span>
+                <div class="product-card-name">Casa de Repuestos</div>
+                <div class="product-card-desc">Inventario, ventas de piezas, compras y clientes frecuentes</div>
+                <div class="product-card-nav-preview">Inicio · Inventario · Ventas · Clientes · Reportes</div>
+            </div>
+
+            <div class="product-card" data-product="CARWASH" data-default-rubro="DETAILING"
+                 role="button" tabindex="0" aria-label="Carwash / Detailing">
+                <span class="product-card-emoji">🚘</span>
+                <div class="product-card-name">Carwash / Detailing</div>
+                <div class="product-card-desc">Agenda de servicios, caja diaria y control de clientes</div>
+                <div class="product-card-nav-preview">Inicio · Caja · Clientes · Servicios · Reportes</div>
+            </div>
 
         </div>
     </div>
 </form>
+
+<script>
+(function () {
+    const rubroToProduct = {
+        "WORKSHOP": "TALLER", "WORKSHOP_MOTO": "TALLER", "WORKSHOP_HEAVY": "TALLER",
+        "EXHAUST": "TALLER", "BODYSHOP": "TALLER", "ELECTRIC": "TALLER",
+        "GLASS_AUDIO": "TALLER", "SUSPENSION_STEERING": "TALLER", "BRAKES": "TALLER",
+        "OBD_DIAGNOSTIC": "TALLER", "CLASSIC_CARS": "TALLER", "AUDIO_ENTERTAINMENT": "TALLER",
+        "GAS_CONVERSION": "TALLER", "BODY_GLASS": "TALLER", "TUNING": "TALLER",
+        "FLEET": "TALLER", "FLEET_REPAIR": "TALLER",
+        "MIXED": "DESARMADURIA",
+        "PARTS": "CASA_REPUESTOS", "TIRE": "CASA_REPUESTOS",
+        "DETAILING": "CARWASH",
+    };
+
+    const currentRubro = "{{ rubro_actual|default:'WORKSHOP' }}";
+    const currentProduct = rubroToProduct[currentRubro] || "TALLER";
+    const hiddenInput = document.getElementById('id_rubro_principal');
+    const cards = document.querySelectorAll('.product-card');
+
+    function selectCard(card) {
+        cards.forEach(c => c.classList.remove('selected'));
+        card.classList.add('selected');
+        hiddenInput.value = card.dataset.defaultRubro;
+    }
+
+    cards.forEach(card => {
+        if (card.dataset.product === currentProduct) {
+            card.classList.add('selected');
+        }
+
+        card.addEventListener('click', () => selectCard(card));
+        card.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                selectCard(card);
+            }
+        });
+    });
+}());
+</script>
 {% endblock %}

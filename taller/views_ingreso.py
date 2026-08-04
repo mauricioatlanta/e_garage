@@ -38,24 +38,9 @@ def _full_name(nombre, apellido):
     return " ".join(part for part in [nombre, apellido] if part).strip()
 
 
-@login_required
 def ingreso_centro(request, *args, **kwargs):
-    empresa = get_active_empresa(request) or get_user_empresa_safe(request.user)
-    if not empresa:
-        empresa = get_or_create_empresa(request)
-    workspace_prefix = _workspace_prefix_from_request(request)
-
-    return render(
-        request,
-        "taller/workspace/workspace.html",
-        {
-            "workspace_debug": True,
-            "workspace_base_prefix": workspace_prefix,
-            "workspace_company_name": getattr(empresa, "nombre_taller", None) if empresa else None,
-            "company_name": getattr(empresa, "nombre_taller", None) if empresa else None,
-            "workspace_search_url": f"{workspace_prefix}/workspace/buscar/",
-        },
-    )
+    from taller.views.workspace_dashboard import workspace_dashboard
+    return workspace_dashboard(request, *args, **kwargs)
 
 
 @require_GET

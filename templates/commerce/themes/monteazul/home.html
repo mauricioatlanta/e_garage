@@ -1,0 +1,701 @@
+{% extends "commerce/themes/monteazul/base.html" %}
+{% load static %}
+
+{% block meta_title %}{{ brand.meta_title|default:"Inicio" }}{% endblock %}
+{% block meta_description %}{{ brand.meta_description }}{% endblock %}
+
+{% block extra_head %}
+<style>
+:root {
+      --bg: #0a0c10;
+      --surface: rgba(255,255,255,0.03);
+      --surface-hover: rgba(255,255,255,0.06);
+      --border: rgba(255,255,255,0.08);
+      --text: #f0f2f5;
+      --muted: rgba(255,255,255,0.5);
+      --accent: #00f0ff;
+      --accent-soft: rgba(0,240,255,0.12);
+      --glow: rgba(0,240,255,0.35);
+      --success: #00e676;
+      --radius: 16px;
+      --radius-sm: 10px;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Outfit', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    .bg-mesh {
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 120% 80% at 50% -20%, rgba(0,240,255,0.08), transparent 50%),
+        radial-gradient(ellipse 80% 60% at 100% 50%, rgba(120,80,255,0.06), transparent 45%),
+        linear-gradient(180deg, var(--bg) 0%, #0d1016 100%);
+      pointer-events: none;
+    }
+    .grid-overlay {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+      background-size: 60px 60px;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+      background: rgba(10,12,16,0.7);
+      border-bottom: 1px solid var(--border);
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .logo-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+    .logo-link img { height: 52px; width: auto; display: block; object-fit: contain; }
+    .logo-text {
+      font-weight: 800;
+      font-size: 1.25rem;
+      letter-spacing: 0.06em;
+    }
+    .logo-sub { font-size: 0.8rem; color: var(--muted); margin-top: 2px; }
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .nav a {
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      color: var(--muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: color 0.2s, background 0.2s;
+    }
+    .nav a:hover { color: var(--accent); background: var(--surface-hover); }
+    .nav a.here { color: var(--accent); background: var(--accent-soft); }
+
+    .hero {
+      position: relative;
+      padding: 48px 24px 56px;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      border: 1px solid rgba(0,240,255,0.25);
+      color: var(--accent);
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 20px;
+    }
+    .hero-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 12px var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{ opacity:1 } 50%{ opacity:0.5 } }
+    .hero h1 {
+      font-weight: 800;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+      margin-bottom: 14px;
+      max-width: 640px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero p {
+      color: var(--muted);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      max-width: 480px;
+      margin: 0 auto 36px;
+    }
+
+    .validator-wrap {
+      position: relative;
+      max-width: 720px;
+      margin: 0 auto;
+    }
+    .validator-card {
+      background: rgba(15,18,24,0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius);
+      padding: 32px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.35);
+      backdrop-filter: blur(12px);
+    }
+    .validator-title {
+      font-weight: 700;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.8);
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .steps-line {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 28px;
+      flex-wrap: wrap;
+    }
+    .step-pill {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.02);
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .step-pill .num {
+      width: 24px;
+      height: 24px;
+      border-radius: 8px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.06);
+      color: var(--text);
+    }
+    .step-pill.active {
+      border-color: rgba(0,240,255,0.4);
+      color: var(--text);
+      box-shadow: 0 0 0 1px rgba(0,240,255,0.15);
+    }
+    .step-pill.active .num { background: var(--accent-soft); color: var(--accent); }
+    .step-pill.done { border-color: rgba(0,230,118,0.3); color: var(--success); }
+    .step-pill.done .num { background: rgba(0,230,118,0.15); color: var(--success); }
+    .step-conn { width: 20px; height: 2px; background: var(--border); flex-shrink: 0; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .field label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.88);
+    }
+    .field select {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255,255,255,0.18);
+      background: #151a22 !important;
+      color: #f0f2f5 !important;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    .field select option {
+      background: #151a22 !important;
+      color: #f0f2f5 !important;
+    }
+    .field select:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    .field select:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      background: #0f1218;
+      color: rgba(255,255,255,0.6);
+    }
+    .field .hint {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.7);
+      line-height: 1.4;
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+      padding-top: 24px;
+      border-top: 1px solid var(--border);
+    }
+    .btn-submit {
+      padding: 16px 28px;
+      border-radius: var(--radius-sm);
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #00c4d4);
+      color: #0a0c10;
+      font-family: inherit;
+      font-weight: 800;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 28px var(--glow);
+    }
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-clear {
+      padding: 14px 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: transparent;
+      color: var(--muted);
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-clear:hover { color: var(--text); border-color: var(--muted); }
+
+    .links-row {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 32px;
+    }
+    .links-row a {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: var(--surface-hover);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .links-row a:hover { border-color: var(--accent); color: var(--accent); }
+
+    .wa-float {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      border-radius: 999px;
+      background: rgba(0,230,118,0.12);
+      border: 1px solid rgba(0,230,118,0.3);
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 0.9rem;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+      transition: box-shadow 0.2s;
+    }
+    .wa-float:hover { box-shadow: 0 12px 40px rgba(0,230,118,0.2); }
+
+    .toast {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      z-index: 70;
+      max-width: 360px;
+      padding: 16px 20px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+      background: rgba(10,12,16,0.95);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 16px 48px rgba(0,0,0,0.4);
+      display: none;
+    }
+    .toast.show { display: block; animation: slideIn 0.25s ease; }
+    @keyframes slideIn { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .toast strong { display: block; font-size: 0.9rem; margin-bottom: 4px; }
+    .toast p { font-size: 0.85rem; color: var(--muted); }
+
+    .footer {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px 48px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      line-height: 1.6;
+    }
+    .footer-credits {
+      display: block;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      opacity: 0.85;
+    }
+
+    /* ========== Mobile-First: touch targets ≥48px, sin zoom iOS, uso con pulgar ========== */
+    @media (max-width: 768px) {
+      .header-inner { padding: 12px 16px; gap: 12px; }
+      .nav a {
+        padding: 12px 16px;
+        min-height: 48px;
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.9rem;
+      }
+      .hero { padding: 32px 16px 48px; }
+      .hero h1 { font-size: clamp(1.65rem, 6vw, 2.2rem); }
+      .hero p { font-size: 1rem; margin-bottom: 24px; }
+      .hero-marcas { font-size: 0.8rem !important; }
+      .validator-card { padding: 24px 20px; }
+      .validator-title { margin-bottom: 20px; font-size: 0.9rem; }
+      .steps-line { gap: 6px; margin-bottom: 22px; }
+      .step-pill {
+        padding: 12px 14px;
+        min-height: 44px;
+        font-size: 0.8rem;
+      }
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+      .field select {
+        min-height: 48px;
+        padding: 16px 18px;
+        font-size: 16px; /* Evita zoom automático en iOS al enfocar */
+      }
+      .field .hint { font-size: 0.8rem; }
+      .actions {
+        flex-direction: column;
+        gap: 12px;
+        margin-top: 20px;
+        padding-top: 20px;
+      }
+      .btn-submit {
+        width: 100%;
+        min-height: 52px;
+        padding: 16px 24px;
+        font-size: 1rem;
+      }
+      .btn-clear {
+        width: 100%;
+        min-height: 48px;
+        padding: 14px 24px;
+        font-size: 0.95rem;
+      }
+      .links-row { margin-top: 24px; gap: 12px; }
+      .links-row a {
+        min-height: 48px;
+        padding: 14px 20px;
+        font-size: 0.95rem;
+        justify-content: center;
+      }
+      .wa-float {
+        right: 16px;
+        bottom: max(16px, env(safe-area-inset-bottom));
+        padding: 14px 18px;
+        min-height: 48px;
+        font-size: 0.9rem;
+      }
+      .toast {
+        left: 16px;
+        right: 16px;
+        bottom: max(16px, env(safe-area-inset-bottom));
+        max-width: none;
+      }
+      .footer { padding: 24px 16px 40px; font-size: 0.8rem; }
+    }
+    @media (max-width: 380px) {
+      .validator-card { padding: 20px 16px; }
+      .step-pill .num { width: 22px; height: 22px; font-size: 0.75rem; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="hero">
+    <div class="hero-badge">Mercado Chile • Desde 1980</div>
+    <h1>Repuestos que calzan en tu vehículo</h1>
+    <p style="max-width: 620px; margin-top: 0.75rem; color: var(--muted); font-size: 0.98rem;">
+      Valida compatibilidad por año, marca, modelo y motor exacto en un solo flujo, diseñado para catalíticos y flexibles.
+    </p>
+    <p style="max-width: 620px; margin-top: 0.35rem; color: var(--muted); font-size: 0.9rem;">
+      El motor que eliges (combustible y cilindrada reales) alimenta un motor de reglas técnicas que prioriza coincidencias exactas y sugiere alternativas seguras cuando no hay match directo.
+    </p>
+
+    <div class="validator-wrap" id="buscador">
+      <div class="validator-card">
+        <div class="validator-title" id="validator-legend">Buscar por vehículo</div>
+        <div class="steps-line" aria-label="Progreso">
+          <div class="step-pill active" id="st1"><span class="num">1</span> Año</div>
+          <span class="step-conn"></span>
+          <div class="step-pill" id="st2"><span class="num">2</span> Marca</div>
+          <span class="step-conn"></span>
+          <div class="step-pill" id="st3"><span class="num">3</span> Modelo</div>
+        </div>
+
+        <form method="get" action="{% url 'commerce:vehicle_search' %}" id="vehicleForm" role="search" aria-labelledby="validator-legend"
+              data-url-modelos="{% url 'commerce:api_vehicle_models' %}">
+          <div class="form-grid">
+            <div class="field">
+              <label for="year">Año del vehículo</label>
+              <select id="year" name="year" required aria-describedby="year-hint">
+                <option value="">Año</option>
+                {% for y in years %}<option value="{{ y }}">{{ y }}</option>{% endfor %}
+              </select>
+              <span class="hint" id="year-hint">Paso 1: año del vehículo</span>
+            </div>
+            <div class="field">
+              <label for="fuel_type">Combustible</label>
+              <select id="fuel_type" name="fuel_type" required disabled aria-describedby="fuel-hint">
+                <option value="">Selecciona</option>
+                <option value="GASOLINA">Gasolina</option>
+                <option value="DIESEL">Diésel</option>
+                <option value="HIBRIDO">Híbrido</option>
+                <option value="EV">Eléctrico</option>
+              </select>
+              <span class="hint" id="fuel-hint">Paso 2: combustible</span>
+            </div>
+            <div class="field">
+              <label for="brand_label">Marca (opcional)</label>
+              <select id="brand" name="brand_id" disabled aria-describedby="brand-hint">
+                <option value="">Marca</option>
+                {% for b in brands %}<option value="{{ b.id }}" data-name="{{ b.name }}">{{ b.name }}</option>{% endfor %}
+              </select>
+              <input type="hidden" id="brand_name" name="brand_name">
+              <span class="hint" id="brand-hint">Paso 3: marca (opcional)</span>
+            </div>
+            <div class="field">
+              <label for="model_label">Modelo (opcional)</label>
+              <select id="model" name="model_id" disabled aria-describedby="model-hint">
+                <option value="">Modelo</option>
+              </select>
+              <input type="hidden" id="model_name" name="model_name">
+              <span class="hint" id="model-hint">Paso 4: modelo</span>
+            </div>
+            <div class="field">
+              <label for="displacement">Cilindrada (cc)</label>
+              <select id="displacement" name="displacement_cc" disabled aria-describedby="cc-hint">
+                <option value="">No sé</option>
+                <option value="1000">1.0L · 1000 cc</option>
+                <option value="1200">1.2L · 1200 cc</option>
+                <option value="1400">1.4L · 1400 cc</option>
+                <option value="1600">1.6L · 1600 cc</option>
+                <option value="1800">1.8L · 1800 cc</option>
+                <option value="2000">2.0L · 2000 cc</option>
+                <option value="2500">2.5L · 2500 cc</option>
+                <option value="2700">2.7L · 2700 cc</option>
+                <option value="3000">3.0L · 3000 cc</option>
+              </select>
+              <span class="hint" id="cc-hint">Ayuda a elegir el diámetro de flexibles.</span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button type="submit" class="btn-submit" id="btnSearch" disabled>Ver repuestos compatibles</button>
+            <button type="button" class="btn-clear" id="btnClear">Limpiar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div class="links-row">
+      <a href="{% url 'commerce:home' %}">Ver catálogo completo</a>
+      <a href="#contacto">Hablar con un experto</a>
+    </div>
+  </main>
+
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const vehicleForm = document.getElementById('vehicleForm');
+  if (!vehicleForm) return;
+
+  const urlModelos     = vehicleForm.getAttribute('data-url-modelos') || '/commerce/api/vehicle-models/';
+  const yearSelect     = document.getElementById('year');
+  const fuelSelect     = document.getElementById('fuel_type');
+  const brandSelect    = document.getElementById('brand');
+  const modelSelect    = document.getElementById('model');
+  const dispSelect     = document.getElementById('displacement');
+  const brandNameInput = document.getElementById('brand_name');
+  const modelNameInput = document.getElementById('model_name');
+  const btnSearch      = document.getElementById('btnSearch');
+  const btnClear       = document.getElementById('btnClear');
+  const steps          = [
+    document.getElementById('st1'),
+    document.getElementById('st2'),
+    document.getElementById('st3'),
+  ].filter(Boolean);
+
+  const toast      = document.getElementById('toast');
+  const toastTitle = document.getElementById('toastTitle');
+  const toastMsg   = document.getElementById('toastMsg');
+  let toastT = null;
+
+  function showToast(title, msg) {
+    if (!toast || !toastTitle || !toastMsg) return;
+    toastTitle.textContent = title;
+    toastMsg.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+  function setStep(active) {
+    steps.forEach((el, i) => {
+      el.classList.remove('active', 'done');
+      if (i + 1 === active) el.classList.add('active');
+      if (i + 1 < active) el.classList.add('done');
+    });
+  }
+  function markDone(el) { if (el) { el.classList.add('done'); el.classList.remove('active'); } }
+
+  // El mínimo para buscar es año + combustible
+  function canSearch() {
+    return !!(yearSelect.value && fuelSelect.value);
+  }
+
+  function enableAfterYear() {
+    if (fuelSelect) fuelSelect.disabled = false;
+    if (brandSelect) brandSelect.disabled = false;
+    if (dispSelect) dispSelect.disabled = false;
+  }
+  function disableAll() {
+    [fuelSelect, brandSelect, modelSelect, dispSelect].forEach(s => { if (s) s.disabled = true; });
+    if (modelSelect) modelSelect.innerHTML = '<option value="">Modelo</option>';
+    if (brandNameInput) brandNameInput.value = '';
+    if (modelNameInput) modelNameInput.value = '';
+    if (btnSearch) btnSearch.disabled = true;
+  }
+
+  // Año
+  yearSelect.addEventListener('change', () => {
+    if (!yearSelect.value) { disableAll(); setStep(1); return; }
+    enableAfterYear();
+    markDone(steps[0]);
+    setStep(2);
+    showToast('Año seleccionado', 'Elige combustible para ver repuestos.');
+    if (btnSearch) btnSearch.disabled = !canSearch();
+  });
+
+  // Combustible — habilita el botón (mínimo requerido)
+  if (fuelSelect) {
+    fuelSelect.addEventListener('change', () => {
+      if (btnSearch) btnSearch.disabled = !canSearch();
+      if (fuelSelect.value && yearSelect.value) {
+        markDone(steps[1]);
+        setStep(3);
+        showToast('Listo', 'Puedes ver repuestos o seguir eligiendo marca.');
+      }
+    });
+  }
+
+  // Marca → carga modelos por AJAX
+  if (brandSelect) {
+    brandSelect.addEventListener('change', async () => {
+      if (!brandSelect.value) {
+        if (modelSelect) { modelSelect.innerHTML = '<option value="">Modelo</option>'; modelSelect.disabled = true; }
+        if (modelNameInput) modelNameInput.value = '';
+        return;
+      }
+      const sel = brandSelect.options[brandSelect.selectedIndex];
+      if (brandNameInput) brandNameInput.value = sel ? (sel.getAttribute('data-name') || sel.textContent) : '';
+      if (modelSelect) {
+        modelSelect.disabled = true;
+        modelSelect.innerHTML = '<option value="">Cargando…</option>';
+        try {
+          const res  = await fetch(urlModelos + '?brand_id=' + encodeURIComponent(brandSelect.value));
+          const data = await res.json();
+          modelSelect.innerHTML = '<option value="">Modelo (opcional)</option>';
+          (data.models || []).forEach(m => {
+            const o = document.createElement('option');
+            o.value = m.id;
+            o.textContent = m.name;
+            o.setAttribute('data-name', m.name);
+            modelSelect.appendChild(o);
+          });
+          modelSelect.disabled = false;
+        } catch {
+          modelSelect.innerHTML = '<option value="">Error — intenta de nuevo</option>';
+        }
+      }
+    });
+  }
+
+  // Modelo
+  if (modelSelect) {
+    modelSelect.addEventListener('change', () => {
+      const sel = modelSelect.options[modelSelect.selectedIndex];
+      if (modelNameInput) modelNameInput.value = sel && modelSelect.value ? (sel.getAttribute('data-name') || sel.textContent) : '';
+    });
+  }
+
+  // Limpiar
+  if (btnClear) {
+    btnClear.addEventListener('click', () => {
+      yearSelect.value = '';
+      disableAll();
+      setStep(1);
+      showToast('Limpio', 'Elige el año para comenzar.');
+    });
+  }
+
+  // Estado inicial
+  if (yearSelect.value) { enableAfterYear(); markDone(steps[0]); setStep(2); }
+  if (btnSearch) btnSearch.disabled = !canSearch();
+})();
+</script>
+{% endblock %}

@@ -13,17 +13,9 @@ class SubscriptionAccessServiceTests(TestCase):
         self._user_index = 0
 
     def _create_empresa(self, *, days_offset: int, suscripcion_activa: bool, pais: str = "CL"):
+        from taller.tests.factories import EmpresaFactory
         self._user_index += 1
-        user = User.objects.create_user(
-            username=f"subscription-user-{self._user_index}",
-            email=f"subscription-user-{self._user_index}@test.com",
-            password="testpass123",
-        )
-        empresa = Empresa.objects.create(
-            user=user,
-            nombre_taller=f"Taller {self._user_index}",
-            pais=pais,
-        )
+        empresa = EmpresaFactory(nombre_taller=f"Taller {self._user_index}", pais=pais)
         empresa.fecha_fin = timezone.now() + timedelta(days=days_offset)
         empresa.suscripcion_activa = suscripcion_activa
         empresa.save()

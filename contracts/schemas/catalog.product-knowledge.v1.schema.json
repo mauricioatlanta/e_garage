@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "egarage/contracts/schemas/catalog.product-knowledge.v1.schema.json",
+  "title": "Product Knowledge Contract — Payload Schema (SUPERSEDED)",
+  "description": "SUPERSEDED. This monolithic schema was split into three independent schemas when catalog.product-knowledge.v1 was migrated to meta-contract v2. Use: catalog.product.changed.schema.json, catalog.product.snapshot.schema.json, catalog.product.tombstone.schema.json. Kept for historical reference only.",
+  "type": "object",
+  "required": ["products", "attribute_schema", "publication_rules", "published_at"],
+  "additionalProperties": false,
+  "properties": {
+    "products": {
+      "type": "array",
+      "description": "Current published product catalog. Full snapshot on each delivery.",
+      "items": {
+        "type": "object",
+        "required": ["id", "sku", "name", "base_price", "currency", "published", "attributes"],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Stable identifier from ERP Core. Never reused after deletion."
+          },
+          "sku": { "type": "string" },
+          "name": { "type": "string", "minLength": 1 },
+          "description": { "type": ["string", "null"] },
+          "base_price": {
+            "type": "number",
+            "minimum": 0,
+            "description": "Pre-tax base price. Tax is calculated by commerce.engine using tax.policy.v1."
+          },
+          "currency": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 3,
+            "description": "ISO 4217 currency code"
+          },
+          "published": {
+            "type": "boolean",
+            "description": "False means the product exists in ERP but must not appear in the storefront."
+          },
+          "thumbnail_url": { "type": ["string", "null"] },
+          "attributes": {
+            "type": "object",
+            "description": "Key-value pairs. Keys must conform to attribute_schema. Pending ADR-001."
+          }
+        }
+      }
+    },
+    "attribute_schema": {
+      "type": "object",
+      "description": "Declares which attribute keys are valid for this tenant's catalog, their semantic types, cardinality, and indexing flags. ADR-001 accepted with amendments; Amendments 3 (reference type) and 4 (label i18n) remain open.",
+      "additionalProperties": false,
+      "required": ["version", "definitions"],
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "SemVer version of this attribute schema, independent of the parent contract version. Allows consumers to detect breaking changes in the schema without a full contract version bump.",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?(?:\\+[0-9A-Za-z.-]+)?$"
+        },
+        "definitions": {
+          "type": "array",
+          "description": "Ordered list of attribute definitions. Each entry declares one attribute key and its contract with Commerce Engine.",
+          "minItems": 1,
+          "$comment": "definitions[].key must be semantically unique across all entries. JSON Schema uniqueItems cannot enforce uniqueness by a nested property; key uniqueness must be validated in CI or in the contract validator.",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "key",
+              "data_type",
+              "cardinality",
+              "nullable",
+              "searchable",
+              "filterable",
+              "sortable",
+              "facetable"
+            ],
+            "properties": {
+              "key": {
+                "type": "string",
+                "description": "Canonical dot-separated attribute identifier. Namespace prefix required. E.g. vehicle.brand, part.type, engine.displacement_cc.",
+                "pattern": "^[a-z][a-z0-9_]*(?:\\.[a-z][a-z0-9_]*)*$"
+              },
+              "data_type": {
+                "type": "string",
+                "description": "Semantic type of the attribute value. Determines indexing strategy in Commerce Engine. 'reference' is declared but its resolution semantics are pending Amendment 3.",
+                "enum": [
+                  "string",
+                  "integer",
+                  "decimal",
+                  "boolean",
+                  "date",
+                  "datetime",
+                  "enum",
+                  "reference"
+                ]
+              },
+              "cardinality": {
+                "type": "string",
+                "description": "Whether the attribute value for a product is a scalar (single) or a list (multiple). Determines whether products[].attributes[key] is expected to be a value or an array.",
+                "$comment": "Cross-validation of products[].attributes values against cardinality is not enforced at schema level in v1. This validation will be closed before contract moves to Stable.",
+                "enum": [
+                  "single",
+                  "multiple"
+                ]
+              },
+              "nullable": {
+                "type": "boolean",
+                "description": "If true, the attribute may be absent or null in a product's attributes map. The publisher must declare this explicitly; no default is assumed."
+              },
+              "searchable": {
+                "type": "boolean",
+                "description": "If true, Commerce Engine includes this attribute in full-text search indexing. The publisher must declare this explicitly."
+              },
+              "filterable": {
+                "type": "boolean",
+                "description": "If true, Commerce Engine builds an inverted index to support filter queries on this attribute. The publisher must declare this explicitly."
+              },
+              "sortable": {
+                "type": "boolean",
+                "description": "If true, Commerce Engine maintains a sort index for this attribute. The publisher must declare this explicitly."
+              },
+              "facetable": {
+                "type": "boolean",
+                "description": "If true, Commerce Engine exposes this attribute as a storefront facet. The publisher must declare this explicitly."
+              },
+              "unit": {
+                "type": ["string", "null"],
+                "description": "Physical or semantic unit for the attribute value. Examples: year, mm, cm, cc, kg. Not restricted to a closed enum in v1."
+              },
+              "label": {
+                "type": ["string", "null"],
+                "description": "Display label for storefront facets and filter UI.",
+                "$comment": "ADR-001 Amendment 4 pending: i18n strategy not yet decided. Current type (string | null) is temporary. Will be resolved before contract moves to Stable. Options: translation key, per-locale map, or bare string for single-locale tenants."
+              }
+            }
+          }
+        }
+      }
+    },
+    "publication_rules": {
+      "type": "object",
+      "description": "Rules that determine whether a product is eligible for publication. Evaluated by ERP Core before including a product in the snapshot. Pending ADR-002.",
+      "required": ["requires_stock", "requires_price", "requires_image"],
+      "additionalProperties": false,
+      "properties": {
+        "requires_stock": {
+          "type": "boolean",
+          "description": "If true, products with quantity_available = 0 are excluded from the snapshot."
+        },
+        "requires_price": {
+          "type": "boolean",
+          "description": "If true, products with base_price = 0 are excluded."
+        },
+        "requires_image": {
+          "type": "boolean",
+          "description": "If true, products without thumbnail_url are excluded."
+        }
+      }
+    },
+    "published_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when this snapshot was generated"
+    }
+  }
+}

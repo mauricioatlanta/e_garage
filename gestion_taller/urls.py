@@ -258,6 +258,8 @@ def country_aware_workspace_redirect(request, subpath=""):
 
 urlpatterns = [
     path("healthz/", healthz, name="healthz"),
+    # Commerce Engine — catálogo público por tenant (dominio propio en producción)
+    path("commerce/", include(("commerce.urls", "commerce"), namespace="commerce")),
     # Storefront público individual por empresa
     path("tienda/", include(("taller.urls_public", "tienda"), namespace="tienda")),
     # Payment URLs globales (sin namespace para compatibilidad con templates)

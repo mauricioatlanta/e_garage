@@ -1,4 +1,5 @@
 from django.utils.translation import gettext_lazy as _
+from django.utils import timezone
 from django import forms
 from taller.models.empresa import Empresa
 from taller.models.configuracion import ConfiguracionEmpresa
@@ -9,6 +10,13 @@ class OnboardingIdentidadForm(forms.ModelForm):
 
     nombre_taller = forms.CharField(required=False, label=_("Nombre del Taller"))
     lema = forms.CharField(required=False, label=_("Lema"))
+    rubro_principal = forms.ChoiceField(
+        choices=ConfiguracionEmpresa.RUBRO_CHOICES,
+        initial="WORKSHOP",
+        required=False,
+        label=_("Tipo de negocio"),
+        widget=forms.Select(attrs={"class": "form-control onb-control"}),
+    )
 
     class Meta:
         model = Empresa
@@ -34,6 +42,9 @@ class OnboardingIdentidadForm(forms.ModelForm):
                 config = getattr(self.instance, "config", None)
                 if config:
                     self.fields["lema"].initial = getattr(config, "tagline", "")
+                    self.fields["rubro_principal"].initial = getattr(
+                        config, "rubro_principal", "WORKSHOP"
+                    )
             except Exception:
                 pass
 
@@ -44,10 +55,14 @@ class OnboardingIdentidadForm(forms.ModelForm):
 
         empresa = super().save(commit=commit)
         lema = (self.cleaned_data.get("lema") or "").strip()
+        rubro = self.cleaned_data.get("rubro_principal") or "WORKSHOP"
         if commit:
             config, _ = ConfiguracionEmpresa.objects.get_or_create(empresa=empresa)
             config.tagline = lema
-            config.save(update_fields=["tagline"])
+            config.rubro_principal = rubro
+            if config.modules_configured_at is None:
+                config.modules_configured_at = timezone.now()
+            config.save(update_fields=["tagline", "rubro_principal", "modules_configured_at"])
         return empresa
 
 

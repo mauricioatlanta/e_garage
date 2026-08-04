@@ -615,3 +615,297 @@ msgstr "Haz clic en + Agregar para servicios externos."
 
 msgid "Auto-saved"
 msgstr "Guardado automático"
+
+# ---------------------------------------------------------------------------
+# Workspace UI 2.0 — Terminología por producto (claves semánticas)
+# ---------------------------------------------------------------------------
+
+# -- Taller: marca --
+msgid "workspace.taller.brand.name"
+msgstr "eGarage Taller"
+
+msgid "workspace.taller.brand.tagline"
+msgstr "Gestión integral de tu taller"
+
+# -- Taller: navegación --
+msgid "workspace.taller.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.taller.nav.documents"
+msgstr "Presupuestos/OT"
+
+msgid "workspace.taller.nav.vehicles"
+msgstr "Vehículos"
+
+msgid "workspace.taller.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.taller.nav.services"
+msgstr "Servicios"
+
+msgid "workspace.taller.nav.parts"
+msgstr "Repuestos"
+
+msgid "workspace.taller.nav.fleet"
+msgstr "Flota"
+
+msgid "workspace.taller.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.taller.nav.settings"
+msgstr "Configuración"
+
+# -- Taller: acciones --
+msgid "workspace.taller.action.new_document"
+msgstr "Nueva OT"
+
+msgid "workspace.taller.action.new_vehicle"
+msgstr "Nuevo Vehículo"
+
+msgid "workspace.taller.action.new_client"
+msgstr "Nuevo Cliente"
+
+# -- Desarmaduría: marca --
+msgid "workspace.desarm.brand.name"
+msgstr "eGarage Desarmaduría"
+
+msgid "workspace.desarm.brand.tagline"
+msgstr "Control total de tu desarmaduría"
+
+# -- Desarmaduría: navegación --
+msgid "workspace.desarm.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.desarm.nav.vehicles"
+msgstr "Vehículos de Desarme"
+
+msgid "workspace.desarm.nav.parts"
+msgstr "Inventario"
+
+msgid "workspace.desarm.nav.documents"
+msgstr "Ventas"
+
+msgid "workspace.desarm.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.desarm.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.desarm.nav.settings"
+msgstr "Configuración"
+
+# -- Desarmaduría: acciones --
+msgid "workspace.desarm.action.new_vehicle"
+msgstr "Ingresar Vehículo"
+
+msgid "workspace.desarm.action.new_sale"
+msgstr "Registrar Venta"
+
+msgid "workspace.desarm.action.view_inventory"
+msgstr "Ver Inventario"
+
+# -- Casa de Repuestos: marca --
+msgid "workspace.parts.brand.name"
+msgstr "eGarage Repuestos"
+
+msgid "workspace.parts.brand.tagline"
+msgstr "Tu casa de repuestos digitalizada"
+
+# -- Casa de Repuestos: navegación --
+msgid "workspace.parts.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.parts.nav.parts"
+msgstr "Inventario"
+
+msgid "workspace.parts.nav.documents"
+msgstr "Ventas"
+
+msgid "workspace.parts.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.parts.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.parts.nav.settings"
+msgstr "Configuración"
+
+# -- Casa de Repuestos: acciones --
+msgid "workspace.parts.action.new_sale"
+msgstr "Nueva Venta"
+
+msgid "workspace.parts.action.new_quote"
+msgstr "Nueva Cotización"
+
+msgid "workspace.parts.action.new_parts_sale"
+msgstr "Nueva Venta"
+
+msgid "workspace.parts.action.add_part"
+msgstr "Agregar Repuesto"
+
+msgid "workspace.parts.action.view_inventory"
+msgstr "Ver Inventario"
+
+# -- Carwash: marca --
+msgid "workspace.carwash.brand.name"
+msgstr "eGarage Carwash"
+
+msgid "workspace.carwash.brand.tagline"
+msgstr "Gestión simple para tu carwash"
+
+# -- Carwash: navegación --
+msgid "workspace.carwash.nav.home"
+msgstr "Inicio"
+
+msgid "workspace.carwash.nav.documents"
+msgstr "Caja"
+
+msgid "workspace.carwash.nav.clients"
+msgstr "Clientes"
+
+msgid "workspace.carwash.nav.services"
+msgstr "Servicios"
+
+msgid "workspace.carwash.nav.reports"
+msgstr "Reportes"
+
+msgid "workspace.carwash.nav.settings"
+msgstr "Configuración"
+
+# -- Carwash: acciones --
+msgid "workspace.carwash.action.new_service"
+msgstr "Registrar Servicio"
+
+msgid "workspace.carwash.action.new_client"
+msgstr "Nuevo Cliente"
+
+# -- Textos contextuales de UI (workspace.texts) --
+msgid "workspace.taller.texts.search_title"
+msgstr "Buscar vehículo o cliente"
+
+msgid "workspace.taller.texts.search_label"
+msgstr "Vehículo o cliente"
+
+msgid "workspace.taller.texts.search_placeholder"
+msgstr "Busca patente, VIN, nombre, teléfono o correo"
+
+msgid "workspace.taller.texts.search_hint"
+msgstr "la acción que más vas a usar, todo el día"
+
+msgid "workspace.taller.texts.live_title"
+msgstr "centro de mando"
+
+msgid "workspace.taller.texts.live_metric"
+msgstr "en el taller"
+
+msgid "workspace.taller.texts.quick_actions"
+msgstr "Accesos rápidos"
+
+msgid "workspace.taller.texts.activity_feed"
+msgstr "Actividad reciente"
+
+msgid "workspace.desarm.texts.search_title"
+msgstr "Buscar vehículo de desarme"
+
+msgid "workspace.desarm.texts.search_label"
+msgstr "Vehículo o pieza"
+
+msgid "workspace.desarm.texts.search_placeholder"
+msgstr "Busca patente, marca, modelo o número de pieza"
+
+msgid "workspace.desarm.texts.search_hint"
+msgstr "localiza cada vehículo o pieza al instante"
+
+msgid "workspace.desarm.texts.live_title"
+msgstr "centro de mando"
+
+msgid "workspace.desarm.texts.live_metric"
+msgstr "vehículos en desarme"
+
+msgid "workspace.desarm.texts.quick_actions"
+msgstr "Accesos rápidos"
+
+msgid "workspace.desarm.texts.activity_feed"
+msgstr "Movimientos recientes"
+
+msgid "workspace.parts.texts.search_title"
+msgstr "Buscar repuesto"
+
+msgid "workspace.parts.texts.search_label"
+msgstr "Repuesto o cliente"
+
+msgid "workspace.parts.texts.search_placeholder"
+msgstr "Busca por código, SKU, nombre o proveedor"
+
+msgid "workspace.parts.texts.search_hint"
+msgstr "tu inventario en tiempo real"
+
+msgid "workspace.parts.texts.live_title"
+msgstr "centro de operaciones"
+
+msgid "workspace.parts.texts.live_metric"
+msgstr "productos críticos"
+
+msgid "workspace.parts.texts.quick_actions"
+msgstr "Acciones rápidas"
+
+msgid "workspace.parts.texts.activity_feed"
+msgstr "Movimientos recientes"
+
+msgid "workspace.carwash.texts.search_title"
+msgstr "Buscar cliente o vehículo"
+
+msgid "workspace.carwash.texts.search_label"
+msgstr "Cliente o vehículo"
+
+msgid "workspace.carwash.texts.search_placeholder"
+msgstr "Busca nombre, patente, teléfono"
+
+msgid "workspace.carwash.texts.search_hint"
+msgstr "registra servicios al instante"
+
+msgid "workspace.carwash.texts.live_title"
+msgstr "caja del día"
+
+msgid "workspace.carwash.texts.live_metric"
+msgstr "servicios hoy"
+
+msgid "workspace.carwash.texts.quick_actions"
+msgstr "Servicios rápidos"
+
+msgid "workspace.carwash.texts.activity_feed"
+msgstr "Servicios del día"
+
+# -- Títulos de widgets (dashboard_service) --
+msgid "OT Abiertas"
+msgstr "OT Abiertas"
+
+msgid "Documentos hoy"
+msgstr "Documentos hoy"
+
+msgid "Ventas del día"
+msgstr "Ventas del día"
+
+msgid "Clientes este mes"
+msgstr "Clientes este mes"
+
+msgid "Stock crítico"
+msgstr "Stock crítico"
+
+msgid "Vehículos disponibles"
+msgstr "Vehículos disponibles"
+
+msgid "Valor inventario"
+msgstr "Valor inventario"
+
+msgid "Servicios hoy"
+msgstr "Servicios hoy"
+
+msgid "Vehículos agotados"
+msgstr "Vehículos agotados"
+
+msgid "Piezas vendidas hoy"
+msgstr "Piezas vendidas hoy"
+
+msgid "Piezas inventariadas"
+msgstr "Piezas inventariadas"

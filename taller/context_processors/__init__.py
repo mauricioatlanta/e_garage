@@ -9,6 +9,7 @@ Django obtenga el callable correcto.
 
 from django.core.cache import cache
 
+from .business_modules import business_modules  # módulos de negocio dinámicos
 from .company_header import company_header  # ✅ NUEVO - Información de contacto
 from .support_context import support_context  # ✅ Información de soporte centralizada
 
@@ -106,6 +107,7 @@ def invalidate_company_cache(user):
 
 
 __all__ = [
+    "business_modules",
     "empresa_contexto",
     "company_branding",
     "company_country",

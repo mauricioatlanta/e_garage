@@ -1,0 +1,58 @@
+{% comment %}
+  Menú vertical lateral izquierdo. Toggle para mostrar/ocultar.
+{% endcomment %}
+<button type="button" class="nav-sidebar-toggle" id="nav-sidebar-toggle" aria-expanded="{% if request.path == '/' or request.path == '/inicio/' %}true{% else %}false{% endif %}" aria-controls="nav-sidebar" aria-label="Ver productos y categorías">
+  <i class="fa-solid fa-layer-group"></i>
+  <span class="nav-sidebar-toggle-label">Ver productos</span>
+</button>
+<div class="nav-sidebar-overlay{% if request.path == '/' or request.path == '/inicio/' %} is-open{% endif %}" id="nav-sidebar-overlay" aria-hidden="{% if request.path == '/' or request.path == '/inicio/' %}false{% else %}true{% endif %}"></div>
+<aside class="nav-sidebar{% if request.path == '/' or request.path == '/inicio/' %} is-open{% endif %}" id="nav-sidebar" role="navigation" aria-label="Menú de categorías">
+  <div class="nav-sidebar-header">
+    <span class="nav-sidebar-title">Menú</span>
+    <button type="button" class="nav-sidebar-close" id="nav-sidebar-close" aria-label="Cerrar menú">
+      <i class="fa-solid fa-times"></i>
+    </button>
+  </div>
+  <nav class="nav-sidebar-body">
+    <a href="{% url 'commerce:home' %}" class="nav-sidebar-link{% if request.path == '/' or request.path == '/inicio/' %} active{% endif %}">
+      <i class="fa-solid fa-house"></i>
+      <span>Inicio</span>
+    </a>
+    <span class="nav-sidebar-divider">Categorías</span>
+    <a href="{% url 'commerce:category' slug='cataliticos' %}" class="nav-sidebar-link{% if request.GET.cat == 'cataliticos' or request.GET.cat|slice:':11' == 'cataliticos-' %} active{% endif %}">
+      <i class="fa-solid fa-bolt"></i>
+      <span>Catalíticos</span>
+    </a>
+    <a href="{% url 'commerce:category' slug='flexibles' %}" class="nav-sidebar-link{% if request.GET.cat == 'flexibles' or request.GET.cat|slice:':9' == 'flexibles' %} active{% endif %}">
+      <i class="fa-solid fa-arrows-left-right"></i>
+      <span>Flexibles</span>
+    </a>
+    <a href="{% url 'commerce:category' slug='resonador-deportivo-alto-flujo-ltm' %}" class="nav-sidebar-link{% if request.GET.cat == 'resonador-deportivo-alto-flujo-ltm' %} active{% endif %}">
+      <i class="fa-solid fa-wave-square"></i>
+      <span>Resonadores</span>
+    </a>
+    <a href="{% url 'commerce:category' slug='silenciador-linea-dw' %}" class="nav-sidebar-link{% if request.GET.cat == 'silenciador-linea-dw' %} active{% endif %}">
+      <i class="fa-solid fa-volume-low"></i>
+      <span>Silenciadores</span>
+    </a>
+    <a href="{% url 'commerce:category' slug='colas-de-escape' %}" class="nav-sidebar-link{% if request.GET.cat == 'colas-de-escape' %} active{% endif %}">
+      <i class="fa-solid fa-road"></i>
+      <span>Colas escape</span>
+    </a>
+    <span class="nav-sidebar-divider">Más</span>
+    {% comment %}TODO EGARAGE: core:vehicle_search no existe en Commerce{% endcomment %}
+    {% comment %}TODO EGARAGE: catalog:escape_search no existe en Commerce{% endcomment %}
+    <a href="{% url 'commerce:home' %}#punto-retiro" class="nav-sidebar-link">
+      <i class="fa-solid fa-location-dot"></i>
+      <span>Exhibición y Ventas</span>
+    </a>
+    <a href="#contacto" class="nav-sidebar-link">
+      <i class="fa-solid fa-comment-dots"></i>
+      <span>Contacto</span>
+    </a>
+    <a href="{% url 'commerce:cart' %}" class="nav-sidebar-link nav-sidebar-link-cart">
+      <i class="fa-solid fa-cart-shopping"></i>
+      <span>Carrito</span>
+    </a>
+  </nav>
+</aside>

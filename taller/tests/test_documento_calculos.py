@@ -21,29 +21,15 @@ class TestDocumentoCalculos:
 
         timestamp = int(time.time() * 1000) % 100000
 
-        # Crear usuario Chile
-        self.user_cl = User.objects.create_user(
-            username=f"testuser_cl_{timestamp}",
-            email=f"test_cl_{timestamp}@example.com",
-            password="testpass123",
-        )
-
-        # Crear usuario USA
-        self.user_us = User.objects.create_user(
-            username=f"testuser_us_{timestamp}",
-            email=f"test_us_{timestamp}@example.com",
-            password="testpass123",
-        )
+        from taller.tests.factories import EmpresaFactory
 
         # Crear empresa Chile
-        self.empresa_cl = Empresa.objects.create(
-            nombre_taller="Taller Chile", pais="CL", user=self.user_cl
-        )
+        self.empresa_cl = EmpresaFactory(nombre_taller="Taller Chile", pais="CL")
+        self.user_cl = self.empresa_cl.user
 
         # Crear empresa USA
-        self.empresa_us = Empresa.objects.create(
-            nombre_taller="Taller USA", pais="US", user=self.user_us
-        )
+        self.empresa_us = EmpresaFactory(nombre_taller="Taller USA", pais="US")
+        self.user_us = self.empresa_us.user
 
         # Crear cliente
         self.cliente = Cliente.objects.create(

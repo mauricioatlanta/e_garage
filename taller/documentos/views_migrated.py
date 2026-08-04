@@ -485,6 +485,31 @@ class DocumentoLineItemsMixin:
             documento.recalcular_totales(save=True)
 
 
+_VALID_TIPOS   = frozenset(v for v, _ in Documento._meta.get_field("tipo").choices)
+_VALID_ESTADOS = frozenset(v for v, _ in Documento.ESTADOS_DOC)
+_TIPO_LABELS   = {
+    "OT":   "Orden de Trabajo",
+    "PRES": "Presupuesto",
+    "FAC":  "Comprobante",
+    "PTS":  "Venta Repuestos",
+}
+_ESTADO_LABELS = {"BORRADOR": "Borrador", "EMITIDO": "Emitido", "ANULADO": "Anulado"}
+
+
+def _parse_tipo(raw: str) -> str:
+    """Validates tipo param; returns uppercased value or '' if invalid."""
+    v = raw.strip().upper()
+    return v if v in _VALID_TIPOS else ""
+
+
+def _parse_estados(raw: str) -> list:
+    """Parses comma-separated estado param; returns list of valid uppercase values."""
+    return [
+        e.strip().upper() for e in raw.split(",")
+        if e.strip().upper() in _VALID_ESTADOS
+    ]
+
+
 @method_decorator(login_required, name="dispatch")
 class DocumentoListView(CountryLangTemplateMixin, ListView):
     """Vista para listar documentos de la empresa"""
@@ -545,15 +570,16 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
                     | Q(vehiculo__modelo__nombre__icontains=vehiculo_search)
                 )
 
-            # Filtro por estado
-            estado = self.request.GET.get("estado", "").strip()
-            if estado:
-                base_queryset = base_queryset.filter(estado=estado.upper())
+            # Filtro por estado (acepta valores múltiples: ?estado=BORRADOR,EMITIDO)
+            estado_raw = self.request.GET.get("estado", "").strip()
+            valid_estados = _parse_estados(estado_raw)
+            if valid_estados:
+                base_queryset = base_queryset.filter(estado__in=valid_estados)
 
-            # Filtro por tipo
-            tipo = self.request.GET.get("tipo", "").strip()
+            # Filtro por tipo (valor único validado)
+            tipo = _parse_tipo(self.request.GET.get("tipo", ""))
             if tipo:
-                base_queryset = base_queryset.filter(tipo=tipo.upper())
+                base_queryset = base_queryset.filter(tipo=tipo)
 
             # Filtro por fecha desde
             fecha_desde = self.request.GET.get("desde", "").strip()
@@ -777,13 +803,14 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
                 | Q(vehiculo__modelo__nombre__icontains=vehiculo_search)
             )
 
-        estado = self.request.GET.get("estado", "").strip()
-        if estado:
-            stats_qs = stats_qs.filter(estado=estado.upper())
+        estado_raw = self.request.GET.get("estado", "").strip()
+        valid_estados = _parse_estados(estado_raw)
+        if valid_estados:
+            stats_qs = stats_qs.filter(estado__in=valid_estados)
 
-        tipo = self.request.GET.get("tipo", "").strip()
+        tipo = _parse_tipo(self.request.GET.get("tipo", ""))
         if tipo:
-            stats_qs = stats_qs.filter(tipo=tipo.upper())
+            stats_qs = stats_qs.filter(tipo=tipo)
 
         fecha_desde = self.request.GET.get("desde", "").strip()
         if fecha_desde:
@@ -851,14 +878,25 @@ class DocumentoListView(CountryLangTemplateMixin, ListView):
 
         # Pasar los valores de filtros al template para mantenerlos en el formulario
         context["filtros_activos"] = {
-            "cliente": cliente_search,
-            "vehiculo": vehiculo_search,
-            "estado": estado,
-            "tipo": tipo,
-            "desde": fecha_desde,
-            "hasta": fecha_hasta,
-            "numero": numero,
+            "cliente":       cliente_search,
+            "vehiculo":      vehiculo_search,
+            "estado":        estado_raw,   # raw string — pre-popula el <select> cuando es un único valor
+            "estados_list":  valid_estados,
+            "estados_labels": [_ESTADO_LABELS[e] for e in valid_estados],
+            "estados_raw":   estado_raw,   # para paginación
+            "tipo":          tipo,
+            "tipo_label":    _TIPO_LABELS.get(tipo, "") if tipo else "",
+            "desde":         fecha_desde,
+            "hasta":         fecha_hasta,
+            "numero":        numero,
         }
+
+        # Para que la paginación conserve todos los parámetros GET activos
+        qs_params = self.request.GET.copy()
+        qs_params.pop("page", None)
+        context["base_query_string"] = qs_params.urlencode()
+
+        context["clear_filters_url"] = _safe_reverse_with_request(self.request, "lista_documentos")
 
         return context
 
@@ -917,6 +955,10 @@ class DocumentoCreateView(DocumentoLineItemsMixin, CountryLangTemplateMixin, Rol
         if cliente_id:
             initial["cliente"] = cliente_id
             initial["cliente_id"] = cliente_id
+
+        tipo_param = self.request.GET.get("tipo", "").strip().upper()
+        if tipo_param in _VALID_TIPOS:
+            initial["tipo"] = tipo_param
 
         return initial
 

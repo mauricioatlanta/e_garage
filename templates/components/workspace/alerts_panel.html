@@ -1,0 +1,23 @@
+{% if alerts_data %}
+<div style="margin-bottom: 24px;">
+  <h3 style="margin:0 0 12px; font-size:.75rem; font-weight:700; letter-spacing:.1em;
+             text-transform:uppercase; color:#64748b;">Alertas</h3>
+  <div style="display:flex; flex-direction:column; gap:8px;">
+    {% for alert in alerts_data %}
+    <a href="{{ alert.url }}"
+       style="display:flex; align-items:center; gap:14px; padding:12px 16px;
+              border-radius:10px; border:1px solid {% if alert.severity == 'warning' %}rgba(245,158,11,.3){% else %}rgba(56,189,248,.2){% endif %};
+              background:{% if alert.severity == 'warning' %}rgba(245,158,11,.06){% else %}rgba(56,189,248,.04){% endif %};
+              text-decoration:none; color:inherit; transition:.15s ease;"
+       onmouseover="this.style.borderColor='{% if alert.severity == "warning" %}rgba(245,158,11,.7){% else %}rgba(56,189,248,.5){% endif %}';"
+       onmouseout="this.style.borderColor='{% if alert.severity == "warning" %}rgba(245,158,11,.3){% else %}rgba(56,189,248,.2){% endif %}';">
+      <i class="{{ alert.icon }}"
+         style="font-size:.9rem; width:18px; text-align:center;
+                color:{% if alert.severity == 'warning' %}#f59e0b{% else %}var(--eg-primary,#38bdf8){% endif %};"></i>
+      <span style="flex:1; font-size:.875rem; color:#cbd5e1;">{{ alert.message }}</span>
+      <i class="fas fa-chevron-right" style="font-size:.6rem; color:#475569;"></i>
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}

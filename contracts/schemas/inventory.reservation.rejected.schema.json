@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "egarage/contracts/schemas/inventory.reservation.rejected.schema.json",
+  "title": "inventory.reservation.rejected — Payload Schema",
+  "description": "Emitted by erp.inventory when a reservation request cannot be fulfilled — typically because aggregate_available is insufficient at the requested location. Commerce must cancel or hold the order and notify the buyer. No inventory.stock.updated is emitted for a rejection because aggregate_available was not modified.",
+  "type": "object",
+  "required": ["order_id", "product_id", "location_id", "quantity_requested", "quantity_available", "rejection_reason", "occurred_at"],
+  "additionalProperties": false,
+  "properties": {
+
+    "order_id": {
+      "type": "string",
+      "description": "Identifier of the Commerce order whose reservation was rejected."
+    },
+
+    "product_id": {
+      "type": "string",
+      "description": "Stable product identifier from ERP Core."
+    },
+
+    "location_id": {
+      "type": "string",
+      "description": "Location at which the reservation was attempted."
+    },
+
+    "quantity_requested": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of units requested by the order."
+    },
+
+    "quantity_available": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "aggregate_available at the moment of the attempt. May be zero. Commerce may use this to offer a partial fulfillment alternative, but must not assume this value is still valid by the time the buyer responds."
+    },
+
+    "rejection_reason": {
+      "type": "string",
+      "enum": ["insufficient_stock", "location_unavailable", "product_discontinued"],
+      "description": "Machine-readable reason for rejection. insufficient_stock: not enough aggregate_available. location_unavailable: the location is closed or suspended. product_discontinued: the product was removed from ERP before the reservation could be processed."
+    },
+
+    "occurred_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp of when the rejection was committed in ERP Core."
+    }
+  }
+}

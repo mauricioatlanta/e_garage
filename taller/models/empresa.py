@@ -84,6 +84,7 @@ class Empresa(models.Model):
         max_length=80,
         unique=True,
         blank=True,
+        db_index=False,
         help_text="Identificador URL de la tienda pública (/tienda/{slug})",
     )
     marcas_permitidas_catalogo = models.CharField(
