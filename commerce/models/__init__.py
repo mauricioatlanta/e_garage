@@ -5,6 +5,7 @@ from .pages import CommerceFAQ, CommerceStaticPage
 from .payment import CommercePaymentTransaction, PaymentAttempt
 from .product import CommerceProduct, ProductImage
 from .storefront import CommerceStorefrontSettings
+from .vehicle import CommerceVehicleBrand, CommerceVehicleModel
 
 __all__ = [
     "CommerceCart",
@@ -17,6 +18,8 @@ __all__ = [
     "CommerceFAQ",
     "CommerceStaticPage",
     "CommerceStorefrontSettings",
+    "CommerceVehicleBrand",
+    "CommerceVehicleModel",
     "PaymentAttempt",
     "ProductImage",
 ]

@@ -144,6 +144,7 @@ class ConfiguracionEmpresa(models.Model):
         ("WORKSHOP_MOTO", "Taller de motos"),
         ("WORKSHOP_HEAVY", "Taller de camiones/buses"),
         ("EXHAUST", "Escapes y mufflers"),
+        ("DESARMADURIA", "Desarmaduría / Salvage"),
         ("PARTS", "Casa de repuestos / Autopartes"),
         ("TIRE", "Vulcanización / Neumáticos y llantas"),
         ("BODYSHOP", "Carrocería / Pintura"),
@@ -160,7 +161,7 @@ class ConfiguracionEmpresa(models.Model):
         ("FLEET_REPAIR", "Taller de Reparación de Flotas Corporativas"),
         ("BODY_GLASS", "Taller de Carrocería y Reparación de Vidrios"),
         ("TUNING", "Taller de Tuning / Personalización"),
-        ("MIXED", "Mixto (varios rubros)"),
+        ("MIXED", "Mixto (multi-rubro — varios giros)"),
     ]
 
     rubro_principal = models.CharField(

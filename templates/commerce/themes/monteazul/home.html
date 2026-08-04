@@ -476,30 +476,17 @@
 
     <div class="validator-wrap" id="buscador">
       <div class="validator-card">
-        <div style="margin-bottom:16px; padding:12px 14px; border-radius:12px; border:1px solid rgba(245,196,0,0.35); background: rgba(245,196,0,0.08); color: rgba(255,255,255,0.92);">
-          <div style="font-weight:800; letter-spacing:0.04em;">Módulo en Construcción</div>
-          <div style="margin-top:6px; color: rgba(255,255,255,0.75); font-size:0.9rem; line-height:1.45;">
-            Estamos mejorando el buscador por vehículo. Por ahora, cotiza directo por WhatsApp o revisa el catálogo.
-          </div>
-          <div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:10px;">
-            {% if brand.whatsapp.url %}<a href="{{ brand.whatsapp.url }}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; background: rgba(34,211,238,0.14); border:1px solid rgba(34,211,238,0.28); color: rgba(255,255,255,0.92); text-decoration:none; font-weight:700;">💬 WhatsApp</a>{% endif %}
-            <a href="{% url 'commerce:home' %}" style="display:inline-flex; align-items:center; gap:8px; padding:10px 12px; border-radius:12px; background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.9); text-decoration:none; font-weight:700;">🛒 Ver catálogo</a>
-          </div>
-        </div>
-        <div class="validator-title" id="validator-legend">Validador de compatibilidad por vehículo</div>
+        <div class="validator-title" id="validator-legend">Buscar por vehículo</div>
         <div class="steps-line" aria-label="Progreso">
           <div class="step-pill active" id="st1"><span class="num">1</span> Año</div>
           <span class="step-conn"></span>
           <div class="step-pill" id="st2"><span class="num">2</span> Marca</div>
           <span class="step-conn"></span>
           <div class="step-pill" id="st3"><span class="num">3</span> Modelo</div>
-          <span class="step-conn"></span>
-          <div class="step-pill" id="st4"><span class="num">4</span> Motor</div>
         </div>
 
-        {% comment %}TODO EGARAGE: validate_vehicle / core:api_models / core:api_engines no existen en Commerce — formulario deshabilitado{% endcomment %}
-        <form method="post" action="#" id="vehicleForm" role="search" aria-labelledby="validator-legend" data-url-modelos="#" data-url-motores="#">
-          {% csrf_token %}
+        <form method="get" action="{% url 'commerce:search' %}" id="vehicleForm" role="search" aria-labelledby="validator-legend"
+              data-url-modelos="{% url 'commerce:api_vehicle_models' %}">
           <div class="form-grid">
             <div class="field">
               <label for="year">Año del vehículo</label>
@@ -512,63 +499,28 @@
               <span class="hint" id="year-hint">Paso 1: año del vehículo</span>
             </div>
             <div class="field">
-              <label for="brand">Marca del vehículo</label>
-              <select id="brand" name="brand" required disabled aria-describedby="brand-hint">
+              <label for="brand_name">Marca del vehículo</label>
+              <select id="brand" name="brand_id" required disabled aria-describedby="brand-hint">
                 <option value="">Marca</option>
                 {% for b in brands %}
-                  <option value="{{ b.id }}">{{ b.name }}</option>
+                  <option value="{{ b.id }}" data-name="{{ b.name }}">{{ b.name }}</option>
                 {% endfor %}
               </select>
-              <span class="hint" id="brand-hint">Paso 2: elige marca (Toyota, Chevrolet, Nissan, etc.)</span>
+              <input type="hidden" id="brand_name" name="brand_name">
+              <span class="hint" id="brand-hint">Paso 2: elige marca</span>
             </div>
             <div class="field">
-              <label for="model">Modelo del vehículo</label>
-              <select id="model" name="model" required disabled aria-describedby="model-hint">
+              <label for="model_name">Modelo del vehículo</label>
+              <select id="model" name="model_id" required disabled aria-describedby="model-hint">
                 <option value="">Modelo</option>
               </select>
+              <input type="hidden" id="model_name" name="model_name">
               <span class="hint" id="model-hint">Paso 3: modelo según la marca elegida</span>
             </div>
-            <div class="field">
-              <label for="fuel_type">Combustible</label>
-              <select id="fuel_type" name="fuel_type" aria-describedby="fuel-hint">
-                <option value="">Selecciona</option>
-                <option value="GASOLINA">Gasolina</option>
-                <option value="DIESEL">Diésel</option>
-                <option value="HIBRIDO">Híbrido</option>
-                <option value="EV">Eléctrico</option>
-              </select>
-              <span class="hint" id="fuel-hint">Usamos el combustible para afinar compatibilidades de catalíticos y flexibles.</span>
-            </div>
-            <div class="field">
-              <label for="displacement">Cilindrada (cc)</label>
-              <select id="displacement" name="displacement_cc" aria-describedby="cc-hint">
-                <option value="">No sé / Aproximado</option>
-                <option value="1000">1.0 · 1000 cc aprox.</option>
-                <option value="1200">1.2 · 1200 cc aprox.</option>
-                <option value="1400">1.4 · 1400 cc aprox.</option>
-                <option value="1600">1.6 · 1600 cc aprox.</option>
-                <option value="1800">1.8 · 1800 cc aprox.</option>
-                <option value="2000">2.0 · 2000 cc aprox.</option>
-                <option value="2200">2.2 · 2200 cc aprox.</option>
-                <option value="2400">2.4 · 2400 cc aprox.</option>
-                <option value="2500">2.5 · 2500 cc aprox.</option>
-                <option value="2700">2.7 · 2700 cc aprox.</option>
-                <option value="3000">3.0 · 3000 cc aprox.</option>
-              </select>
-              <span class="hint" id="cc-hint">Si no sabes la cilindrada exacta, puedes elegir un aproximado o dejarlo vacío.</span>
-            </div>
-          </div>
-
-          <div class="field" style="margin-top:18px;">
-            <span class="hint">
-              Usamos el motor (cuando existe) y, si no, el combustible y cilindrada que ingreses para calcular compatibilidades exactas
-              y, cuando no hay match directo, sugerir opciones técnicas seguras.
-            </span>
-            <span class="hint" id="engine-tech-summary" style="display:none; margin-top:6px;"></span>
           </div>
 
           <div class="actions">
-            <button type="submit" class="btn-submit" id="btnSearch" disabled>Módulo en Construcción</button>
+            <button type="submit" class="btn-submit" id="btnSearch" disabled>Ver productos compatibles</button>
             <button type="button" class="btn-clear" id="btnClear">Limpiar</button>
           </div>
         </form>
@@ -586,228 +538,140 @@
 
 {% block extra_js %}
 <script>
-const vehicleForm = document.getElementById('vehicleForm');
-    const urlModelos = vehicleForm ? vehicleForm.getAttribute('data-url-modelos') || '/api/modelos/' : '/api/modelos/';
-    const urlMotores = vehicleForm ? vehicleForm.getAttribute('data-url-motores') || '/api/motores/' : '/api/motores/';
-    const yearSelect = document.getElementById('year');
-    const brandSelect = document.getElementById('brand');
-    const modelSelect = document.getElementById('model');
-    const engineSelect = document.getElementById('engine');  // puede ser null si no renderizamos el campo
-    const fuelTypeSelect = document.getElementById('fuel_type');
-    const displacementSelect = document.getElementById('displacement');
-    const btnSearch = document.getElementById('btnSearch');
-    const btnClear = document.getElementById('btnClear');
-    const st1 = document.getElementById('st1');
-    const st2 = document.getElementById('st2');
-    const st3 = document.getElementById('st3');
-    const st4 = document.getElementById('st4');
-    const toast = document.getElementById('toast');
-    const toastTitle = document.getElementById('toastTitle');
-    const toastMsg = document.getElementById('toastMsg');
-    const engineTechSummary = document.getElementById('engine-tech-summary');
-    let toastT = null;
+(function () {
+  const vehicleForm = document.getElementById('vehicleForm');
+  if (!vehicleForm) return;
 
-    function showToast(title, msg) {
-      toastTitle.textContent = title;
-      toastMsg.textContent = msg;
-      toast.classList.add('show');
-      clearTimeout(toastT);
-      toastT = setTimeout(() => toast.classList.remove('show'), 2800);
-    }
-    function setStep(active) {
-      [st1, st2, st3, st4].forEach((el, i) => {
-        el.classList.remove('active', 'done');
-        if (i + 1 === active) el.classList.add('active');
-        if (i + 1 < active) el.classList.add('done');
+  const urlModelos = vehicleForm.getAttribute('data-url-modelos') || '/commerce/api/vehicle-models/';
+  const yearSelect  = document.getElementById('year');
+  const brandSelect = document.getElementById('brand');
+  const modelSelect = document.getElementById('model');
+  const brandNameInput = document.getElementById('brand_name');
+  const modelNameInput = document.getElementById('model_name');
+  const btnSearch = document.getElementById('btnSearch');
+  const btnClear  = document.getElementById('btnClear');
+  const st1 = document.getElementById('st1');
+  const st2 = document.getElementById('st2');
+  const st3 = document.getElementById('st3');
+  const toast = document.getElementById('toast');
+  const toastTitle = document.getElementById('toastTitle');
+  const toastMsg   = document.getElementById('toastMsg');
+  let toastT = null;
+
+  function showToast(title, msg) {
+    if (!toast) return;
+    toastTitle.textContent = title;
+    toastMsg.textContent = msg;
+    toast.classList.add('show');
+    clearTimeout(toastT);
+    toastT = setTimeout(() => toast.classList.remove('show'), 2800);
+  }
+  function setStep(active) {
+    [st1, st2, st3].forEach((el, i) => {
+      if (!el) return;
+      el.classList.remove('active', 'done');
+      if (i + 1 === active) el.classList.add('active');
+      if (i + 1 < active) el.classList.add('done');
+    });
+  }
+  function markDone(el) { if (el) { el.classList.add('done'); el.classList.remove('active'); } }
+  function unDone(el)   { if (el) el.classList.remove('done'); }
+
+  function canSearch() {
+    return !!(yearSelect.value && brandSelect.value && modelSelect.value);
+  }
+
+  function resetAfterYear() {
+    brandSelect.value = '';
+    brandSelect.disabled = true;
+    if (brandNameInput) brandNameInput.value = '';
+    modelSelect.innerHTML = '<option value="">Modelo</option>';
+    modelSelect.disabled = true;
+    if (modelNameInput) modelNameInput.value = '';
+    unDone(st2); unDone(st3);
+    setStep(1);
+    btnSearch.disabled = true;
+  }
+  function resetAfterBrand() {
+    modelSelect.innerHTML = '<option value="">Modelo</option>';
+    modelSelect.disabled = true;
+    if (modelNameInput) modelNameInput.value = '';
+    unDone(st3);
+    setStep(2);
+    btnSearch.disabled = true;
+  }
+
+  yearSelect.addEventListener('change', () => {
+    if (!yearSelect.value) { resetAfterYear(); return; }
+    brandSelect.disabled = false;
+    markDone(st1);
+    setStep(2);
+    showToast('Año listo', 'Elige la marca.');
+    btnSearch.disabled = !canSearch();
+  });
+
+  brandSelect.addEventListener('change', async () => {
+    if (!brandSelect.value) { resetAfterBrand(); return; }
+    const sel = brandSelect.options[brandSelect.selectedIndex];
+    if (brandNameInput) brandNameInput.value = sel ? sel.getAttribute('data-name') || sel.textContent : '';
+    modelSelect.disabled = true;
+    modelSelect.innerHTML = '<option value="">Cargando…</option>';
+    try {
+      const res  = await fetch(urlModelos + '?brand_id=' + encodeURIComponent(brandSelect.value));
+      const data = await res.json();
+      modelSelect.innerHTML = '<option value="">Modelo</option>';
+      (data.models || []).forEach(m => {
+        const o = document.createElement('option');
+        o.value = m.id;
+        o.textContent = m.name;
+        o.setAttribute('data-name', m.name);
+        modelSelect.appendChild(o);
       });
-    }
-    function markDone(el) { el.classList.add('done'); el.classList.remove('active'); }
-    function unDone(el) { el.classList.remove('done'); }
-
-    function canSearch() {
-      return false;
-    }
-
-    function resetAfterYear() {
-      brandSelect.value = '';
-      brandSelect.disabled = true;
-      modelSelect.innerHTML = '<option value="">Modelo</option>';
-      modelSelect.disabled = true;
-      if (engineSelect) {
-        engineSelect.innerHTML = '<option value="">No sé / No aparece</option>';
-        engineSelect.disabled = true;
-      }
-      unDone(st2); unDone(st3); unDone(st4);
-      setStep(1);
-      btnSearch.disabled = true;
-    }
-    function resetAfterBrand() {
-      modelSelect.innerHTML = '<option value="">Modelo</option>';
-      modelSelect.disabled = true;
-      if (engineSelect) {
-        engineSelect.innerHTML = '<option value="">No sé / No aparece</option>';
-        engineSelect.disabled = true;
-      }
-      unDone(st3); unDone(st4);
-      setStep(2);
-      btnSearch.disabled = true;
-    }
-    function resetAfterModel() {
-      if (engineSelect) {
-        engineSelect.innerHTML = '<option value="">No sé / No aparece</option>';
-        engineSelect.disabled = true;
-        unDone(st4);
-      }
+      modelSelect.disabled = false;
+      markDone(st2);
       setStep(3);
-      btnSearch.disabled = true;
-    }
-
-    yearSelect.addEventListener('change', () => {
-      if (!yearSelect.value) {
-        resetAfterYear();
-        return;
-      }
-      brandSelect.disabled = false;
-      markDone(st1);
-      setStep(2);
-      showToast('Año listo', 'Elige la marca.');
-      btnSearch.disabled = !canSearch();
-    });
-
-    brandSelect.addEventListener('change', async () => {
-      if (!brandSelect.value) {
-        resetAfterBrand();
-        return;
-      }
-      modelSelect.disabled = true;
-      modelSelect.innerHTML = '<option value="">Cargando...</option>';
-      try {
-        const res = await fetch(urlModelos + (urlModelos.includes('?') ? '&' : '?') + 'brand_id=' + encodeURIComponent(brandSelect.value));
-        const data = await res.json();
-        modelSelect.innerHTML = '<option value="">Modelo</option>';
-        (data.models || []).forEach(m => {
-          const o = document.createElement('option');
-          o.value = m.id;
-          o.textContent = m.name;
-          modelSelect.appendChild(o);
-        });
-        modelSelect.disabled = false;
-        markDone(st2);
-        setStep(3);
-        showToast('Modelos listos', 'Elige modelo.');
-      } catch (e) {
-        modelSelect.innerHTML = '<option value="">Error</option>';
-        showToast('Error', 'No se pudieron cargar modelos.');
-      }
-      if (engineSelect) {
-        engineSelect.innerHTML = '<option value="">No sé / No aparece</option>';
-        engineSelect.disabled = true;
-      }
-      btnSearch.disabled = !canSearch();
-    });
-
-    modelSelect.addEventListener('change', async () => {
-      if (!modelSelect.value) {
-        resetAfterModel();
-        return;
-      }
-      if (engineSelect) {
-        engineSelect.disabled = true;
-        engineSelect.innerHTML = '<option value="">Cargando...</option>';
-      }
-      try {
-        const res = await fetch(urlMotores + (urlMotores.includes('?') ? '&' : '?') + 'model_id=' + encodeURIComponent(modelSelect.value));
-        const data = await res.json();
-        if (engineSelect) {
-          engineSelect.innerHTML = '<option value="">No sé / No aparece</option>';
-          (data.engines || []).forEach(e => {
-            const o = document.createElement('option');
-            o.value = e.id;
-            o.textContent = e.name + (e.fuel_type ? ' (' + e.fuel_type + ')' : '');
-            if (typeof e.displacement_cc !== 'undefined' && e.displacement_cc !== null) {
-              o.setAttribute('data-cc', e.displacement_cc);
-            }
-            if (e.fuel_type) {
-              o.setAttribute('data-fuel', e.fuel_type);
-            }
-            engineSelect.appendChild(o);
-          });
-          engineSelect.disabled = false;
-          markDone(st3);
-          setStep(4);
-          showToast('Motores listos', 'Opcional: elige motor.');
-        } else {
-          markDone(st3);
-          setStep(3);
-        }
-      } catch (e) {
-        if (engineSelect) {
-          engineSelect.innerHTML = '<option value="">Motor</option>';
-          engineSelect.disabled = false;
-          setStep(4);
-        } else {
-          setStep(3);
-        }
-      }
-      btnSearch.disabled = !canSearch();
-    });
-
-    if (engineSelect) {
-      engineSelect.addEventListener('change', () => {
-        if (engineSelect.value) {
-          markDone(st4);
-          try {
-            const selected = engineSelect.options[engineSelect.selectedIndex];
-            const fuel = selected.getAttribute('data-fuel') || '';
-            const cc = selected.getAttribute('data-cc') || '';
-            if (fuel || cc) {
-              const parts = [];
-              if (fuel) parts.push(`Combustible: ${fuel}`);
-              if (cc) parts.push(`Cilindrada aprox.: ${cc} cc`);
-              engineTechSummary.textContent = parts.join(' · ');
-              engineTechSummary.style.display = 'inline';
-            } else {
-              engineTechSummary.textContent = '';
-              engineTechSummary.style.display = 'none';
-            }
-          } catch (e) {
-            engineTechSummary.textContent = '';
-            engineTechSummary.style.display = 'none';
-          }
-        } else {
-          unDone(st4);
-          engineTechSummary.textContent = '';
-          engineTechSummary.style.display = 'none';
-        }
-        btnSearch.disabled = !canSearch();
-        if (canSearch()) showToast('Listo', 'Puedes ver repuestos compatibles con tu motor específico.');
-      });
-    }
-
-    btnClear.addEventListener('click', () => {
-      yearSelect.value = '';
-      brandSelect.value = '';
-      brandSelect.disabled = true;
-      modelSelect.innerHTML = '<option value="">Modelo</option>';
-      modelSelect.disabled = true;
-      if (engineSelect) {
-        engineSelect.innerHTML = '<option value="">No sé / No aparece</option>';
-        engineSelect.disabled = true;
-      }
-      if (fuelTypeSelect) fuelTypeSelect.value = '';
-      if (displacementSelect) displacementSelect.value = '';
-      setStep(1);
-      btnSearch.disabled = true;
-      showToast('Limpio', 'Elige año para comenzar.');
-      engineTechSummary.textContent = '';
-      engineTechSummary.style.display = 'none';
-    });
-
-    if (yearSelect.value) {
-      brandSelect.disabled = false;
-      markDone(st1);
-      setStep(2);
+      showToast('Modelos listos', 'Elige el modelo.');
+    } catch (e) {
+      modelSelect.innerHTML = '<option value="">Error cargando modelos</option>';
+      showToast('Error', 'No se pudieron cargar los modelos.');
     }
     btnSearch.disabled = !canSearch();
+  });
+
+  modelSelect.addEventListener('change', () => {
+    if (!modelSelect.value) { unDone(st3); btnSearch.disabled = true; return; }
+    const sel = modelSelect.options[modelSelect.selectedIndex];
+    if (modelNameInput) modelNameInput.value = sel ? sel.getAttribute('data-name') || sel.textContent : '';
+    markDone(st3);
+    btnSearch.disabled = false;
+    showToast('Listo', 'Haz clic en "Ver productos compatibles".');
+  });
+
+  vehicleForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    if (!canSearch()) return;
+    const year      = yearSelect.value;
+    const brandName = (brandNameInput && brandNameInput.value) ||
+                      (brandSelect.options[brandSelect.selectedIndex] && brandSelect.options[brandSelect.selectedIndex].textContent) || '';
+    const modelName = (modelNameInput && modelNameInput.value) ||
+                      (modelSelect.options[modelSelect.selectedIndex] && modelSelect.options[modelSelect.selectedIndex].textContent) || '';
+    const q = [brandName, modelName, year].filter(Boolean).join(' ').trim();
+    const url = vehicleForm.action.replace(/buscar\/?$/, 'buscar/');
+    window.location.href = url + '?q=' + encodeURIComponent(q) + '&year=' + encodeURIComponent(year);
+  });
+
+  btnClear.addEventListener('click', () => {
+    yearSelect.value = '';
+    resetAfterYear();
+    showToast('Limpio', 'Elige el año para comenzar.');
+  });
+
+  if (yearSelect.value) {
+    brandSelect.disabled = false;
+    markDone(st1);
+    setStep(2);
+  }
+  btnSearch.disabled = !canSearch();
+})();
 </script>
 {% endblock %}

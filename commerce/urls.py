@@ -30,6 +30,8 @@ urlpatterns = [
     path("p/<slug:slug>/", catalog.product_detail, name="product"),
     path("buscar/", catalog.search_view, name="search"),
     path("page/<slug:slug>/", pages.static_page_detail, name="page"),
+    # API interna
+    path("api/vehicle-models/", catalog.api_vehicle_models, name="api_vehicle_models"),
     # Carrito
     path("carrito/", cart.cart_detail, name="cart"),
     path("carrito/agregar/", cart.cart_add, name="cart_add"),
