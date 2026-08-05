@@ -2,22 +2,33 @@
 {% load static %}
 {% load i18n %}
 
-{% block title %}eGarage Salvage — Software para Desarmadurias{% endblock %}
-{% block meta_description %}Controla el ingreso de vehículos, el catálogo de piezas, el inventario por parte y las ventas de tu desarmaduria. Construido desde adentro.{% endblock %}
+{% block title %}eGarage Salvage — Automatic kiosk, part traffic light, smart pricing{% endblock %}
+{% block meta_description %}Save the vehicle and your online kiosk is created automatically. Green/Yellow/Red system to choose what you sell. Smart pricing and Warehouse/Shelf location. 30-day free trial. No charge for entering inventory.{% endblock %}
 {% block canonical_path %}/salvage/{% endblock %}
-{% block og_title %}eGarage Salvage — Software para Desarmadurias{% endblock %}
-{% block og_description %}El único sistema construido por una desarmaduria real, para desarmadurias reales. Gestiona vehículos, piezas, precios y ventas en un solo lugar.{% endblock %}
+{% block og_title %}eGarage Salvage — Automatic parts kiosk for salvage yards{% endblock %}
+{% block og_description %}Find any part in your yard in 5 seconds from your phone. No Excel, no notebook, no memory. Born in a real salvage yard in Atlanta, GA.{% endblock %}
 
 {% block extra_head %}
 <style>
   .accent-fuchsia { color: #e879f9; }
-  .border-fuchsia { border-color: #d946ef; }
-  .bg-fuchsia-glow { background: rgba(217, 70, 239, 0.08); }
   .card-glow-f:hover { box-shadow: 0 0 30px rgba(217, 70, 239, 0.2), 0 25px 50px -12px rgba(0,0,0,0.5); }
   .atlanta-quote {
     border-left: 3px solid #d946ef;
-    background: linear-gradient(90deg, rgba(217,70,239,0.06) 0%, transparent 100%);
+    background: linear-gradient(90deg, rgba(217,70,239,0.08) 0%, transparent 100%);
   }
+  .semaforo-verde  { border-color: rgba(34,197,94,0.5);  background: rgba(34,197,94,0.06); }
+  .semaforo-amarillo { border-color: rgba(234,179,8,0.5); background: rgba(234,179,8,0.06); }
+  .semaforo-rojo   { border-color: rgba(239,68,68,0.5);  background: rgba(239,68,68,0.06); }
+  .semaforo-verde:hover  { box-shadow: 0 0 24px rgba(34,197,94,0.25); }
+  .semaforo-amarillo:hover { box-shadow: 0 0 24px rgba(234,179,8,0.25); }
+  .semaforo-rojo:hover   { box-shadow: 0 0 24px rgba(239,68,68,0.25); }
+  @keyframes waPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.5); }
+    50% { box-shadow: 0 0 0 12px rgba(34,197,94,0); }
+  }
+  .wa-pulse { animation: waPulse 2s ease-in-out infinite; }
+  .precio-btn { transition: all 0.2s; }
+  .precio-btn:hover { transform: scale(1.05); }
 </style>
 {% endblock %}
 
@@ -26,119 +37,278 @@
 <!-- Hero -->
 <section class="px-6 py-20 text-center max-w-5xl mx-auto animate-in">
   <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-fuchsia-500/10 border border-fuchsia-500/30 text-fuchsia-400 text-xs font-semibold mb-6 font-orbitron tracking-widest">
-    🧩 eGarage Salvage
+    🧩 eGarage · Salvage Yard
   </div>
   <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight glow-fuchsia">
-    Un vehículo.<br>
-    <span class="text-fuchsia-400">400 piezas en stock.</span>
+    Find any part in your yard<br>
+    <span class="text-fuchsia-400">in 5 seconds from your phone.</span>
   </h1>
-  <p class="text-xl text-slate-300 max-w-2xl mx-auto mb-10">
-    eGarage Salvage entiende cómo funciona una desarmaduria: un vehículo que ingresa se convierte en cientos de piezas individuales, cada una con su estado, su precio y su historia.
+  <p class="text-xl text-slate-200 max-w-2xl mx-auto mb-4">
+    Save the vehicle you're dismantling and your online kiosk is created automatically.<br>
+    No typing part by part. No Excel. No memory.
   </p>
-  <div class="flex flex-col sm:flex-row gap-4 justify-center">
+  <p class="text-lg text-slate-300 max-w-2xl mx-auto mb-10">
+    You choose what you sell. With smart pricing and <strong class="text-fuchsia-300">Warehouse/Shelf location</strong>.
+  </p>
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-6">
+    <a href="https://wa.me/1XXXXXXXX?text=Hi%20I%20want%20to%20try%20eGarage%20Salvage%20free%2030%20days"
+       class="wa-pulse px-8 py-4 rounded-xl bg-green-600 text-white font-bold text-lg hover:bg-green-500 transition-all shadow-lg shadow-green-500/30 font-orbitron flex items-center gap-2 justify-center">
+      💬 WhatsApp — Try it free
+    </a>
     <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-fuchsia-600 text-white font-bold text-lg hover:bg-fuchsia-500 transition-all shadow-lg shadow-fuchsia-500/30 font-orbitron">
-      Empezar gratis →
+      Create free account →
     </a>
-    <a href="{% url 'account_login' %}" class="px-8 py-4 rounded-xl border border-slate-600 text-slate-300 hover:border-fuchsia-500/50 hover:text-fuchsia-300 transition-all text-lg">
-      Ya tengo cuenta
-    </a>
+  </div>
+  <p class="text-slate-400 text-sm">No credit card · No charge for entering inventory · Cancel anytime</p>
+</section>
+
+<!-- Pain points -->
+<section class="px-6 py-12 max-w-4xl mx-auto animate-in delay-1">
+  <div class="bg-slate-800/60 border border-fuchsia-500/20 rounded-2xl p-8">
+    <p class="text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-6">The problem nobody solves</p>
+    <div class="space-y-6">
+      <div class="flex gap-4 items-start">
+        <div class="text-2xl shrink-0">📱</div>
+        <div>
+          <p class="text-slate-200 text-base leading-relaxed"><strong class="text-fuchsia-300">Customer texts "Do you have a headlight for a 2012 V16?"</strong> — You're in the yard with mud on your boots, 20 minutes searching from memory. Sometimes you have it and can't find it.</p>
+        </div>
+      </div>
+      <div class="flex gap-4 items-start">
+        <div class="text-2xl shrink-0">💸</div>
+        <div>
+          <p class="text-slate-200 text-base leading-relaxed"><strong class="text-fuchsia-300">You lose 15% of sales</strong> because you don't know exactly what you have, where it is, or how to price it without going too high or too low.</p>
+        </div>
+      </div>
+      <div class="flex gap-4 items-start">
+        <div class="text-2xl shrink-0">📦</div>
+        <div>
+          <p class="text-slate-200 text-base leading-relaxed"><strong class="text-fuchsia-300">One vehicle coming in is 200 potential parts.</strong> A notebook, scattered photos, and memory don't scale.</p>
+        </div>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- Atlanta story -->
-<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-1">
+<!-- Automatic kiosk - 3 steps -->
+<section class="px-6 py-16 max-w-5xl mx-auto animate-in delay-2">
+  <p class="text-center text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-4">The solution</p>
+  <h2 class="font-orbitron text-3xl font-bold text-center text-white mb-4">Your online kiosk is created automatically in 3 clicks</h2>
+  <p class="text-center text-slate-300 mb-12">No typing parts one by one. No manual catalog.</p>
+
+  <!-- Video placeholder -->
+  <div class="bg-slate-800/40 border border-fuchsia-500/20 border-dashed rounded-2xl p-8 text-center mb-12">
+    <div class="text-4xl mb-3">🎬</div>
+    <p class="text-slate-300 text-sm font-orbitron">37s video recorded in the yard — see script in docs/video_instructions.md</p>
+    <p class="text-slate-500 text-xs mt-2">(0-37s) Real demo: enter vehicle → kiosk generated → WhatsApp link ready</p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1 text-center">
+      <div class="w-12 h-12 rounded-full bg-fuchsia-600 text-white font-black text-xl font-orbitron flex items-center justify-center mx-auto mb-4">1</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Enter the vehicle</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Plate / make-model / year / purchase cost + 3 photos. Done. Under 2 minutes.</p>
+    </div>
+    <div class="bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1 text-center">
+      <div class="w-12 h-12 rounded-full bg-fuchsia-600 text-white font-black text-xl font-orbitron flex items-center justify-center mx-auto mb-4">2</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Kiosk generated automatically</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">The system generates a catalog with 43 standard parts: photo, suggested price, and Warehouse/Shelf location.</p>
+    </div>
+    <div class="bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1 text-center">
+      <div class="w-12 h-12 rounded-full bg-fuchsia-600 text-white font-black text-xl font-orbitron flex items-center justify-center mx-auto mb-4">3</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Link ready for the customer</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Send the link via text. Customer sees photo, price, and <em class="text-fuchsia-300">Warehouse B Shelf 3</em>. No trip to the yard needed.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Traffic Light System -->
+<section class="px-6 py-16 max-w-5xl mx-auto animate-in">
+  <p class="text-center text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-4">Traffic light system</p>
+  <h2 class="font-orbitron text-3xl font-bold text-center text-white mb-4">You decide what you sell and what you don't</h2>
+  <p class="text-center text-slate-300 mb-12">Not every part is worth your time. The traffic light protects you from losing hours on parts that don't pay.</p>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <!-- Green -->
+    <div class="semaforo-verde border rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-4 h-4 rounded-full bg-green-500 shadow-lg shadow-green-500/50"></div>
+        <h3 class="font-orbitron text-green-400 font-bold text-lg">GREEN — Always sell</h3>
+      </div>
+      <p class="text-slate-400 text-xs mb-3">15-min sale · Doesn't break when removed · High demand</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Headlights</span>
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Mirrors</span>
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Doors</span>
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Hoods</span>
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Bumpers</span>
+        <span class="px-2 py-1 rounded bg-green-500/15 text-green-300 text-xs">Fenders</span>
+      </div>
+      <p class="text-green-400 text-xs mt-3 font-semibold">✓ Enabled by default when you save the vehicle</p>
+    </div>
+
+    <!-- Yellow -->
+    <div class="semaforo-amarillo border rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-4 h-4 rounded-full bg-yellow-500 shadow-lg shadow-yellow-500/50"></div>
+        <h3 class="font-orbitron text-yellow-400 font-bold text-lg">YELLOW — With judgment</h3>
+      </div>
+      <p class="text-slate-400 text-xs mb-3">2h + helper · Only if the price justifies it</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-1 rounded bg-yellow-500/15 text-yellow-300 text-xs">Engine</span>
+        <span class="px-2 py-1 rounded bg-yellow-500/15 text-yellow-300 text-xs">Transmission</span>
+        <span class="px-2 py-1 rounded bg-yellow-500/15 text-yellow-300 text-xs">Cylinder head</span>
+        <span class="px-2 py-1 rounded bg-yellow-500/15 text-yellow-300 text-xs">Rear axle</span>
+      </div>
+      <p class="text-yellow-400 text-xs mt-3 font-semibold">⚠ Enable only when customer has committed to a price</p>
+    </div>
+
+    <!-- Red -->
+    <div class="semaforo-rojo border rounded-2xl p-6 transition-all duration-300 hover:-translate-y-1">
+      <div class="flex items-center gap-3 mb-4">
+        <div class="w-4 h-4 rounded-full bg-red-500 shadow-lg shadow-red-500/50"></div>
+        <h3 class="font-orbitron text-red-400 font-bold text-lg">RED — Do not sell / On request</h3>
+      </div>
+      <p class="text-slate-400 text-xs mb-3">3h of work · Sells for $2 · Not worth it</p>
+      <div class="flex flex-wrap gap-2">
+        <span class="px-2 py-1 rounded bg-red-500/15 text-red-300 text-xs">Wire harnesses</span>
+        <span class="px-2 py-1 rounded bg-red-500/15 text-red-300 text-xs">Clips &amp; bolts</span>
+        <span class="px-2 py-1 rounded bg-red-500/15 text-red-300 text-xs">Headliner</span>
+      </div>
+      <p class="text-red-400 text-xs mt-3 font-semibold">✗ Hidden in the kiosk by default</p>
+    </div>
+  </div>
+</section>
+
+<!-- Smart pricing -->
+<section class="px-6 py-16 max-w-4xl mx-auto animate-in delay-1">
+  <p class="text-center text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-4">Smart pricing</p>
+  <h2 class="font-orbitron text-3xl font-bold text-center text-white mb-4">Never too cheap, never too expensive</h2>
+  <p class="text-center text-slate-300 mb-10">The system calculates the base price from what you paid for the car. You adjust with one click.</p>
+
+  <div class="bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-8">
+    <div class="text-center mb-8">
+      <p class="text-slate-400 text-sm mb-2 font-orbitron">Base formula</p>
+      <div class="inline-flex items-center gap-3 bg-fuchsia-950/40 border border-fuchsia-500/30 rounded-xl px-6 py-4">
+        <span class="text-fuchsia-300 text-lg font-bold font-orbitron">(Vehicle cost ÷ 2.5)</span>
+        <span class="text-slate-400">×</span>
+        <span class="text-fuchsia-300 text-lg font-bold font-orbitron">part %</span>
+      </div>
+    </div>
+
+    <div class="bg-slate-900/40 rounded-xl p-6 mb-6">
+      <p class="text-slate-400 text-xs font-orbitron uppercase mb-3">Example: Camry 2015 bought for $3,000</p>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between"><span class="text-slate-300">Base: $3,000 ÷ 2.5</span><span class="text-fuchsia-300 font-bold">$1,200</span></div>
+        <div class="flex justify-between"><span class="text-slate-300">Headlight (5%)</span><span class="text-fuchsia-300 font-bold">$60 suggested</span></div>
+        <div class="flex justify-between"><span class="text-slate-300">Front door (8%)</span><span class="text-fuchsia-300 font-bold">$96 suggested</span></div>
+      </div>
+    </div>
+
+    <p class="text-center text-slate-400 text-sm mb-4">Market different today? Adjust with one click:</p>
+    <div class="flex gap-3 justify-center flex-wrap">
+      <button class="precio-btn px-6 py-3 rounded-xl bg-sky-600/30 border border-sky-500/50 text-sky-300 font-bold text-sm font-orbitron">
+        💧 Cheap −30%
+      </button>
+      <button class="precio-btn px-6 py-3 rounded-xl bg-fuchsia-600/30 border border-fuchsia-500/50 text-fuchsia-300 font-bold text-sm font-orbitron">
+        ⚡ Normal
+      </button>
+      <button class="precio-btn px-6 py-3 rounded-xl bg-amber-600/30 border border-amber-500/50 text-amber-300 font-bold text-sm font-orbitron">
+        🔥 Expensive +30%
+      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Origin story -->
+<section class="px-6 py-16 max-w-3xl mx-auto animate-in delay-2">
   <div class="atlanta-quote rounded-2xl p-8">
-    <p class="text-slate-500 text-xs font-orbitron tracking-widest uppercase mb-6">La historia detrás del software</p>
-    <h2 class="font-orbitron text-2xl font-bold text-fuchsia-300 mb-6">Atlanta Reciclajes nació antes que eGarage.</h2>
-    <div class="space-y-4 text-slate-300 text-base leading-relaxed">
-      <p class="text-fuchsia-200 italic">
-        "Después de años administrando una desarmaduría, desarrollamos el sistema que nosotros mismos necesitábamos."
-      </p>
-      <p>
-        Éramos una desarmaduria. Buscamos software para gestionar nuestro inventario de piezas — y no encontramos nada que entendiera cómo funcionamos realmente.
-      </p>
-      <p>
-        Los sistemas genéricos no comprenden que un vehículo no es un solo producto: es un Toyota Corolla 2018 que se convierte en un motor, cuatro puertas, un capó, dos faroles, cuatro bujes, una dirección hidráulica y otros 380 ítems más, cada uno con su propio stock, su precio y su condición.
-      </p>
-      <p>
-        Entonces lo construimos nosotros.
-      </p>
+    <p class="text-slate-400 text-xs font-orbitron tracking-widest uppercase mb-6">The story behind the software</p>
+    <p class="text-fuchsia-200 italic text-lg mb-4">
+      "After years working in a real salvage yard in Atlanta, GA, we built the system we needed and couldn't find anywhere."
+    </p>
+    <div class="space-y-4 text-slate-200 text-base leading-relaxed">
+      <p>We searched for software to manage parts inventory — and found nothing that understood how a salvage yard actually works.</p>
+      <p>Generic systems treat each part as a standalone item. But a 2015 Camry coming in is 200 parts with different origins, conditions, and prices. Nobody modeled it that way. So we built it ourselves.</p>
       <p class="text-fuchsia-300 font-semibold">
-        eGarage Salvage es el sistema que Atlanta Reciclajes habría querido desde el principio. Lo usamos a diario, y hoy lo abrimos para que cualquier desarmaduria en Latinoamérica pueda tener lo mismo.
+        eGarage Salvage was born in a real salvage yard in the USA. Now we open it to all of Latin America and beyond.
       </p>
     </div>
     <div class="mt-8 flex items-center gap-3">
-      <div class="h-px flex-1 bg-fuchsia-500/20"></div>
-      <span class="text-slate-600 text-sm">Atlanta Reciclajes — Santiago, Chile</span>
-      <div class="h-px flex-1 bg-fuchsia-500/20"></div>
+      <div class="h-px flex-1 bg-fuchsia-500/30"></div>
+      <span class="text-slate-400 text-sm">eGarage Team — Atlanta, GA, USA</span>
+      <div class="h-px flex-1 bg-fuchsia-500/30"></div>
     </div>
   </div>
 </section>
 
 <!-- Features -->
 <section class="px-6 py-16 max-w-6xl mx-auto">
-  <h2 class="font-orbitron text-2xl font-bold text-center text-slate-200 mb-12 animate-in">Diseñado para el flujo real de una desarmaduria</h2>
+  <h2 class="font-orbitron text-2xl font-bold text-center text-white mb-12 animate-in">Everything your salvage yard needs</h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-    <div class="animate-in delay-1 bg-slate-900/60 border border-fuchsia-900/40 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🚗</div>
-      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Ingreso de vehículos</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">Registra cada vehículo con marca, modelo, año, VIN y fotos. Define qué piezas se extraen y cuáles se descartan. El inventario se crea solo.</p>
+    <div class="animate-in delay-1 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📍</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Warehouse/Shelf location</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Every part has its address: "Warehouse B, Shelf 3, Position 2". Go straight there, no memory-searching through the yard.</p>
     </div>
 
-    <div class="animate-in delay-2 bg-slate-900/60 border border-fuchsia-900/40 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🧩</div>
-      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Catálogo de piezas</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">Cada pieza tiene su estado (nueva, usada, dañada), su precio y su foto. Tu catálogo puede publicarse como tienda en línea para que los clientes busquen por compatibilidad.</p>
+    <div class="animate-in delay-2 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📷</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Photo per part</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Customer sees exactly what they're buying. Fewer trips to the yard, fewer misunderstandings, fewer returns.</p>
     </div>
 
-    <div class="animate-in delay-3 bg-slate-900/60 border border-fuchsia-900/40 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">📦</div>
-      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Control de stock</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">El stock se descuenta automáticamente al vender. Ves qué piezas tienes disponibles, cuáles están reservadas y cuáles ya salieron.</p>
+    <div class="animate-in delay-3 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🌐</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Public online kiosk</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Your own link to share via text: <span class="text-fuchsia-300 font-mono text-xs">egarage.cl/your-yard/camry-2015</span>. Customer searches, finds, and asks before calling.</p>
     </div>
 
-    <div class="animate-in delay-1 bg-slate-900/60 border border-fuchsia-900/40 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">🔍</div>
-      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Búsqueda por compatibilidad</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">Un cliente busca un espejo para un Honda Fit 2016 — tu catálogo le muestra solo las piezas compatibles disponibles.</p>
-    </div>
-
-    <div class="animate-in delay-2 bg-slate-900/60 border border-fuchsia-900/40 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
-      <div class="text-4xl mb-4">💬</div>
-      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">WhatsApp + ventas</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">Responde consultas de WhatsApp con datos reales: precio, disponibilidad, foto. Cierra la venta y registra todo sin papeles.</p>
-    </div>
-
-    <div class="animate-in delay-3 bg-slate-900/60 border border-fuchsia-900/40 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+    <div class="animate-in delay-1 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
       <div class="text-4xl mb-4">📊</div>
-      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Valorización de flota</h3>
-      <p class="text-slate-400 text-sm leading-relaxed">¿Cuánto vale lo que tienes en el patio? Ve el valor total del inventario por vehículo, por categoría de pieza y por período.</p>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Yard valuation</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">How much is your inventory worth today? See total value by vehicle, by part category, by period. Buy smarter with data.</p>
     </div>
 
-  </div>
-</section>
+    <div class="animate-in delay-2 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">📋</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">Sales documents</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Invoices and receipts with auto-calculated tax by state/country (US, CL, AR, MX, PE, CO). No carbon paper.</p>
+    </div>
 
-<!-- Diferenciador clave -->
-<section class="px-6 py-12 max-w-3xl mx-auto text-center animate-in delay-2">
-  <div class="bg-fuchsia-950/30 border border-fuchsia-500/20 rounded-2xl p-8">
-    <h2 class="font-orbitron text-fuchsia-300 text-lg font-bold mb-3">No es un ERP adaptado. Es software nativo para desarmadurias.</h2>
-    <p class="text-slate-400 text-sm leading-relaxed">
-      La mayoría del software de inventario fue diseñado para ferreterías o tiendas minoristas. No entienden el modelo de desarmaduria, donde el mismo automóvil es la fuente de 400 SKUs distintos. eGarage Salvage fue construido con ese modelo desde el día cero.
-    </p>
+    <div class="animate-in delay-3 bg-slate-800/60 border border-fuchsia-500/25 rounded-2xl p-6 card-glow-f transition-all duration-300 hover:-translate-y-1">
+      <div class="text-4xl mb-4">🔍</div>
+      <h3 class="font-orbitron text-fuchsia-300 font-bold mb-3">5-second search</h3>
+      <p class="text-slate-300 text-sm leading-relaxed">Customer asks for "headlight 2012 V16" — type it from your phone and in 5 seconds you know if you have it, where it is, and what to charge.</p>
+    </div>
+
   </div>
 </section>
 
 <!-- CTA final -->
 <section class="px-6 py-20 text-center animate-in delay-3">
-  <h2 class="font-orbitron text-3xl font-black text-white mb-4">Listo para ordenar tu desarmaduria?</h2>
-  <p class="text-slate-400 mb-8">Período de prueba gratuito. Sin tarjeta de crédito.</p>
-  <a href="{% url 'account_signup' %}" class="px-10 py-5 rounded-xl bg-fuchsia-600 text-white font-black text-xl hover:bg-fuchsia-500 transition-all shadow-xl shadow-fuchsia-500/30 font-orbitron">
-    Crear cuenta gratis →
-  </a>
-  <p class="mt-6 text-slate-600 text-sm">
-    ¿Tienes un taller mecánico? → <a href="{% url 'landing_workshop' %}" class="text-cyan-400 hover:text-cyan-300">eGarage Workshop</a> &nbsp;|&nbsp;
-    ¿Casa de repuestos? → <a href="{% url 'landing_parts' %}" class="text-lime-400 hover:text-lime-300">eGarage Parts</a>
+  <h2 class="font-orbitron text-3xl font-black text-white mb-4">Ready to organize your salvage yard?</h2>
+  <p class="text-slate-300 mb-2">30 days free. No credit card. No charge for entering inventory.</p>
+  <p class="text-slate-400 text-sm mb-8">Direct WhatsApp support. No long forms.</p>
+
+  <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+    <a href="https://wa.me/1XXXXXXXX?text=Hi%20I%20want%20to%20try%20eGarage%20Salvage%20free%2030%20days"
+       class="wa-pulse px-10 py-5 rounded-xl bg-green-600 text-white font-black text-xl hover:bg-green-500 transition-all shadow-xl shadow-green-500/30 font-orbitron flex items-center gap-3 justify-center">
+      💬 Text us on WhatsApp
+    </a>
+    <a href="{% url 'account_signup' %}" class="px-10 py-5 rounded-xl bg-fuchsia-600 text-white font-black text-xl hover:bg-fuchsia-500 transition-all shadow-xl shadow-fuchsia-500/30 font-orbitron">
+      Create free account →
+    </a>
+  </div>
+
+  <p class="mt-4 text-slate-400 text-sm">
+    Do you have a repair shop? →
+    <a href="{% url 'landing_workshop' %}" class="text-cyan-400 hover:text-cyan-300">eGarage Workshop</a>
+    &nbsp;·&nbsp;
+    Parts store? →
+    <a href="{% url 'landing_parts' %}" class="text-lime-400 hover:text-lime-300">eGarage Parts</a>
+    &nbsp;·&nbsp;
+    <a href="/" class="text-slate-300 hover:text-white">All solutions</a>
   </p>
 </section>
 

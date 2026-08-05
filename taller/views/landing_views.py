@@ -36,7 +36,7 @@ def landing_workshop(request):
 
 
 def landing_salvage(request):
-    return render(request, "public/landing_desarmadurias.html")
+    return render(request, "public/landing_salvage.html")
 
 
 def landing_parts(request):

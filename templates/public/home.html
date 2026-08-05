@@ -29,11 +29,11 @@
     🚗 Software automotriz para Latinoamérica
   </div>
   <h1 class="font-orbitron text-4xl sm:text-5xl lg:text-6xl font-black text-white mb-6 leading-tight animate-in delay-1">
-    Hecho para<br>
-    <span class="text-cyan-400 glow-cyan">tu negocio específico.</span>
+    El sistema operativo del<br>
+    <span class="text-cyan-400 glow-cyan">negocio automotriz independiente.</span>
   </h1>
   <p class="text-xl text-slate-300 max-w-2xl mx-auto mb-10 animate-in delay-2">
-    No somos un ERP genérico adaptado. eGarage tiene una versión especializada para cada rubro del mundo automotriz — elige la tuya y empieza gratis hoy.
+    Un solo cerebro, 15 rubros. De taller de barrio a desarmaduría y casa de repuestos. Con tu fiscalidad y tu lógica por país. Modo mixto incluido.
   </p>
   <div class="flex flex-col sm:flex-row gap-4 justify-center animate-in delay-3">
     <a href="{% url 'account_signup' %}" class="px-8 py-4 rounded-xl bg-cyan-500 text-slate-950 font-bold text-lg hover:bg-cyan-400 transition-all shadow-lg shadow-cyan-500/30 font-orbitron">
@@ -47,7 +47,15 @@
 
 <!-- Soluciones -->
 <section class="px-6 py-16 max-w-6xl mx-auto">
-  <p class="text-center text-slate-400 text-sm font-orbitron tracking-widest uppercase mb-12 animate-in">Elige tu solución</p>
+  <p class="text-center text-slate-400 text-sm font-orbitron tracking-widest uppercase mb-8 animate-in">Elige tu solución</p>
+
+  <!-- CTA Desarmaduría -->
+  <div class="text-center mb-12">
+    <a href="{% url 'landing_desarmadurias' %}" class="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-fuchsia-600 text-white font-bold text-lg hover:bg-fuchsia-500 transition-all shadow-lg shadow-fuchsia-500/30 font-orbitron">
+      🧩 ¿Tienes desarmaduría? Mira cómo tu kiosko se crea solo en 3 clicks →
+    </a>
+    <p class="text-slate-500 text-xs mt-2">La forma más rápida de empezar con eGarage · Sin competencia en LATAM</p>
+  </div>
 
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
@@ -66,18 +74,21 @@
       </div>
     </a>
 
-    <!-- Desarmadurias -->
-    <a href="{% url 'landing_desarmadurias' %}" class="solution-card card-fuchsia group bg-slate-800/60 border border-fuchsia-500/30 rounded-2xl p-6 block animate-in delay-2">
+    <!-- Desarmadurias (destacada 2x) -->
+    <a href="{% url 'landing_desarmadurias' %}" class="solution-card card-fuchsia group bg-slate-800/60 border-2 border-fuchsia-500/60 rounded-2xl p-6 block animate-in delay-2 md:col-span-2 relative shadow-lg shadow-fuchsia-500/20">
+      <span class="absolute -top-2 -right-2 bg-fuchsia-500 text-white text-[10px] px-2 py-1 rounded-full font-bold animate-pulse">🔥 Sin competencia · Más demandado</span>
       <div class="flex items-start justify-between mb-4">
         <div class="text-4xl">🧩</div>
         <span class="text-xs font-orbitron text-fuchsia-400 group-hover:text-fuchsia-300 transition-colors">ver más →</span>
       </div>
-      <h2 class="font-orbitron text-fuchsia-300 text-lg font-bold mb-2">Desarmaduria</h2>
-      <p class="text-slate-300 text-sm leading-relaxed mb-4">Ingreso de vehículos, catálogo de piezas, control de stock y ventas. Construido por una desarmaduria real.</p>
+      <h2 class="font-orbitron text-fuchsia-300 text-xl font-bold mb-2">Desarmaduria · Desarmadero · Deshuesadero · Salvage Yard</h2>
+      <p class="text-slate-300 text-sm leading-relaxed mb-4">Guarda el vehículo y tu kiosko online se crea solo. Elige qué vendes (Verde/Amarillo/Rojo). Precio inteligente y ubicación Bodega/Estante. Sin cobrar por ingresar inventario.</p>
       <div class="flex flex-wrap gap-2">
-        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">Ingreso de vehículos</span>
-        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">Piezas</span>
-        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">Stock</span>
+        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">Kiosko automático</span>
+        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">Semáforo Verde/Amarillo/Rojo</span>
+        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">Precio inteligente</span>
+        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">Bodega/Estante</span>
+        <span class="px-2 py-0.5 rounded bg-fuchsia-500/15 text-fuchsia-300 text-xs">WhatsApp link</span>
       </div>
     </a>
 
