@@ -10,6 +10,90 @@ from taller.services.registro_embudo_service import registrar_signup
 from taller.utils.country_config import get_country_config
 from taller.utils.plan_catalog import normalize_plan_code
 
+# ---------------------------------------------------------------------------
+# Grupos simplificados de rubros para el selector de signup.
+# CASA_REPUESTOS y DESARMADURIA son grupos separados: son negocios distintos
+# con flujos distintos (la desarmaduría requiere vehículos donantes, sesiones
+# de despiece e inventario de piezas desmontadas).
+#
+# Convención de almacenamiento:
+#   config.rubro_principal = primer rubro real del grupo principal seleccionado
+#   config.rubros = lista COMPLETA de rubros reales, incluyendo rubro_principal
+#   Invariante: rubro_principal siempre está en rubros.
+#
+# El límite de 2 grupos adicionales (máx 3 en total) pertenece ÚNICAMENTE
+# al formulario de signup. El modelo y el servicio no imponen ese límite.
+# ---------------------------------------------------------------------------
+SIGNUP_RUBRO_GROUPS = [
+    {
+        "key": "TALLER_MECANICO",
+        "label": "Taller Mecánico",
+        "label_en": "Auto Repair Shop",
+        "description": "Autos, motos, camiones — reparación y mantención",
+        "description_en": "Cars, motorcycles, trucks — repair and maintenance",
+        "icon": "🔧",
+        "rubros": ["WORKSHOP", "WORKSHOP_MOTO", "WORKSHOP_HEAVY"],
+    },
+    {
+        "key": "CASA_REPUESTOS",
+        "label": "Casa de Repuestos",
+        "label_en": "Auto Parts Store",
+        "description": "Venta de partes y repuestos automotrices",
+        "description_en": "Auto parts and accessories sales",
+        "icon": "📦",
+        "rubros": ["PARTS"],
+    },
+    {
+        "key": "DESARMADURIA",
+        "label": "Desarmaduría / Salvage",
+        "label_en": "Salvage Yard / Dismantler",
+        "description": "Desarme de vehículos, venta de piezas desmontadas",
+        "description_en": "Vehicle dismantling and used parts sales",
+        "icon": "🔩",
+        "rubros": ["DESARMADURIA"],
+    },
+    {
+        "key": "NEUMATICOS",
+        "label": "Neumáticos / Vulcanización",
+        "label_en": "Tires / Wheel Shop",
+        "description": "Venta e instalación de neumáticos y llantas",
+        "description_en": "Tire and wheel sales and installation",
+        "icon": "⭕",
+        "rubros": ["TIRE"],
+    },
+    {
+        "key": "CARROCERIA_DETAILING",
+        "label": "Carrocería / Pintura / Detailing",
+        "label_en": "Body Shop / Detailing",
+        "description": "Reparación de chapa, pintura, lavado y estética",
+        "description_en": "Bodywork, paint, wash and detailing",
+        "icon": "🎨",
+        "rubros": ["BODYSHOP", "DETAILING"],
+    },
+    {
+        "key": "ESPECIALISTA",
+        "label": "Especialista",
+        "label_en": "Specialist",
+        "description": "Electricidad, escapes, suspensión, audio u otra especialidad",
+        "description_en": "Electrical, exhaust, suspension, audio or other specialty",
+        "icon": "⚡",
+        "rubros": ["ELECTRIC", "EXHAUST", "SUSPENSION_STEERING", "GLASS_AUDIO", "BRAKES"],
+    },
+    {
+        "key": "OTRO",
+        "label": "Otro / Mixto",
+        "label_en": "Other / Mixed",
+        "description": "Negocio no listado o con múltiples giros",
+        "description_en": "Unlisted business or multiple services",
+        "icon": "⊞",
+        "rubros": ["MIXED"],
+    },
+]
+
+_GROUP_KEY_TO_RUBROS = {g["key"]: g["rubros"] for g in SIGNUP_RUBRO_GROUPS}
+_SIGNUP_GROUP_CHOICES = [(g["key"], g["label"]) for g in SIGNUP_RUBRO_GROUPS]
+_VALID_GROUP_KEYS = frozenset(_GROUP_KEY_TO_RUBROS)
+
 
 class CustomSignupForm(SignupForm):
     """
@@ -82,6 +166,29 @@ class CustomSignupForm(SignupForm):
         label="País / Country",
         required=False,
         widget=forms.Select(attrs={"class": "form-select input-futurista", "id": "id_country"}),
+    )
+
+    # Campo principal: actividad dominante del negocio (determina producto, color, nav).
+    # Se usa HiddenInput porque el template construye el selector visual con JS.
+    rubro_principal_signup = forms.ChoiceField(
+        choices=[("", "")] + _SIGNUP_GROUP_CHOICES,
+        required=True,
+        label="Actividad principal",
+        widget=forms.HiddenInput(),
+        error_messages={
+            "required": "Debes seleccionar la actividad principal de tu negocio.",
+            "invalid_choice": "Selección no válida.",
+        },
+    )
+
+    # Actividades adicionales (opcional, máximo 2 extra).
+    # Límite de 2 solo aplica a este formulario; el modelo no impone máximo.
+    rubros_adicionales = forms.MultipleChoiceField(
+        choices=_SIGNUP_GROUP_CHOICES,
+        required=False,
+        label="Otras actividades",
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "rubro-adicional-cb"}),
+        help_text="Opcional — máximo 2 actividades adicionales",
     )
 
     def __init__(self, *args, **kwargs):
@@ -234,6 +341,15 @@ class CustomSignupForm(SignupForm):
             self.fields["email"].widget.attrs["placeholder"] = "you@example.com"
         if "telefono" in self.fields:
             self.fields["telefono"].widget.attrs["placeholder"] = "+1 555 123 4567"
+        if "rubro_principal_signup" in self.fields:
+            self.fields["rubro_principal_signup"].label = "Primary business type"
+            self.fields["rubro_principal_signup"].error_messages = {
+                "required": "Please select your primary business type.",
+                "invalid_choice": "Invalid selection.",
+            }
+        if "rubros_adicionales" in self.fields:
+            self.fields["rubros_adicionales"].label = "Other activities (optional)"
+            self.fields["rubros_adicionales"].help_text = "Optional — up to 2 additional activities"
 
     def _duplicate_email_error_message(self):
         if self.signup_lang == "en":
@@ -250,6 +366,76 @@ class CustomSignupForm(SignupForm):
         if self.signup_lang == "en":
             return "This contact number is already linked to a registered eGarage workshop."
         return "Este número de contacto ya está vinculado a un taller registrado en eGarage."
+
+    def clean_rubro_principal_signup(self):
+        group = (self.cleaned_data.get("rubro_principal_signup") or "").strip()
+        if not group:
+            raise forms.ValidationError(
+                "Please select your primary business type."
+                if self.signup_lang == "en"
+                else "Debes seleccionar la actividad principal de tu negocio."
+            )
+        if group not in _VALID_GROUP_KEYS:
+            raise forms.ValidationError(
+                "Invalid selection." if self.signup_lang == "en" else "Selección no válida."
+            )
+        return group
+
+    def clean_rubros_adicionales(self):
+        adicionales = list(self.cleaned_data.get("rubros_adicionales") or [])
+        principal = (self.cleaned_data.get("rubro_principal_signup") or "").strip()
+
+        # Si el principal fue enviado como adicional también, silenciosamente ignorarlo
+        adicionales = [g for g in adicionales if g != principal]
+
+        # Validar claves
+        invalid = [g for g in adicionales if g not in _VALID_GROUP_KEYS]
+        if invalid:
+            raise forms.ValidationError(
+                "Invalid selection." if self.signup_lang == "en" else "Selección no válida."
+            )
+
+        # Límite de 2 adicionales — solo aplica al signup, no al modelo
+        if len(adicionales) > 2:
+            raise forms.ValidationError(
+                "You can add up to 2 additional activities."
+                if self.signup_lang == "en"
+                else "Puedes agregar hasta 2 actividades adicionales."
+            )
+        return adicionales
+
+    def _build_rubros_list(self) -> list:
+        """
+        Construye la lista completa de rubros reales para persistir.
+
+        Convenio de almacenamiento:
+          - rubro_principal = rubros_list[0]
+          - config.rubros = rubros_list completo (incluye rubro_principal)
+          - Invariante: rubro_principal in config.rubros
+
+        Orden preservado. Sin duplicados. Sin usar set().
+        """
+        principal_group = self.cleaned_data.get("rubro_principal_signup") or ""
+        adicionales = list(self.cleaned_data.get("rubros_adicionales") or [])
+
+        rubros: list = []
+
+        def _add(r: str) -> None:
+            if r not in rubros:
+                rubros.append(r)
+
+        # Primero: todos los rubros del grupo principal
+        for r in _GROUP_KEY_TO_RUBROS.get(principal_group, []):
+            _add(r)
+
+        # Luego: rubros de cada grupo adicional (excluyendo el principal)
+        for g in adicionales:
+            if g == principal_group:
+                continue
+            for r in _GROUP_KEY_TO_RUBROS.get(g, []):
+                _add(r)
+
+        return rubros
 
     def clean_email(self):
         raw_email = (self.cleaned_data.get("email") or "").strip().lower()
@@ -510,18 +696,21 @@ class CustomSignupForm(SignupForm):
         if plan_type not in ("trial", "entry", "growth", "business"):
             plan_type = "trial"
 
+        # Construir lista completa de rubros (rubro_principal siempre está incluido)
+        rubros_list = self._build_rubros_list()
+
         try:
             result = RegistrationService.create_company_for_user(
                 user=user,
                 company_data={
-                    # ✅ Pasar nombre_taller (puede ser vacío, el servicio lo generará)
                     "nombre_taller": nombre_taller_usuario,
                     "pais": country_code,
-                    "telefono": telefono_usuario,  # ✅ Ya normalizado por clean_telefono (puede ser vacío)
+                    "telefono": telefono_usuario,
                 },
-                plan_type=plan_type,  # Plan elegido por el usuario en el formulario
+                plan_type=plan_type,
                 assign_role="Owner",
                 request=request,
+                rubros_list=rubros_list or None,
             )
             # Obtener información del trial del resultado
             obtuvo_trial = result.get("obtuvo_trial", False)

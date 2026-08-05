@@ -193,6 +193,29 @@ class ConfiguracionEmpresa(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    def has_completed_business_setup(self) -> bool:
+        """
+        True si el negocio fue configurado explícitamente por el usuario
+        (vía signup o vía onboarding paso 1).
+        Usar en lugar de inspeccionar rubro_principal directamente en las vistas.
+        """
+        return self.modules_configured_at is not None
+
+    def get_effective_rubros(self) -> list:
+        """
+        Retorna todos los rubros activos: rubro_principal siempre primero,
+        seguido de los rubros adicionales sin duplicar.
+        Convenio de almacenamiento: rubros[] incluye rubro_principal.
+        Este método es la fuente canónica para código que necesita el conjunto completo.
+        """
+        principal = self.rubro_principal or "WORKSHOP"
+        stored = list(self.rubros or [])
+        result = [principal]
+        for r in stored:
+            if r not in result:
+                result.append(r)
+        return result
+
     def __str__(self):
         if not getattr(self, "empresa", None):
             return "Configuración sin empresa"

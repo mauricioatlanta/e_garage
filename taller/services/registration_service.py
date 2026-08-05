@@ -198,7 +198,7 @@ class RegistrationService:
     @staticmethod
     @transaction.atomic
     def create_company_for_user(
-        user, company_data, plan_type="trial", assign_role="Owner", request=None
+        user, company_data, plan_type="trial", assign_role="Owner", request=None, rubros_list=None
     ):
         """
         Crea empresa para un usuario existente.
@@ -322,8 +322,28 @@ class RegistrationService:
             ),
         )
         log.info(
-            f"[RegistrationService] Empresa creada para usuario existente: {empresa.nombre_taller} ({country_code})"
+            "[RegistrationService] Empresa creada para usuario existente: %s (%s)",
+            empresa.nombre_taller,
+            country_code,
         )
+
+        # Crear ConfiguracionEmpresa con rubros capturados en signup.
+        # rubros_list=None → no se recibieron rubros (flujo sin signup UI, usar defaults del modelo).
+        # rubros_list=[] → lista vacía inválida; no se persiste (no debería ocurrir desde el form).
+        # rubros_list=[...] → lista válida; se persiste completa incluyendo rubro_principal.
+        # Invariante garantizada: config.rubro_principal siempre está en config.rubros.
+        if rubros_list:
+            from taller.models.configuracion import ConfiguracionEmpresa as _Config
+            config, _ = _Config.objects.get_or_create(empresa=empresa)
+            config.rubro_principal = rubros_list[0]
+            config.rubros = list(rubros_list)   # lista completa, incluye rubro_principal
+            config.modules_configured_at = timezone.now()
+            config.save(update_fields=["rubro_principal", "rubros", "modules_configured_at"])
+            log.info(
+                "[RegistrationService] ConfiguracionEmpresa: rubro_principal=%s, rubros=%s",
+                rubros_list[0],
+                rubros_list,
+            )
 
         # Crear suscripción
         suscripcion = None

@@ -206,11 +206,66 @@
             background: #0369a1;
         }
 
-        @media (max-width: 640px) {
-            .signup-panel {
-                padding: 18px;
-            }
+        /* — Rubro cards — */
+        @media (max-width: 640px) { .signup-panel { padding: 18px; } }
+
+        .rubro-grid {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: repeat(4, 1fr);
         }
+        @media (max-width: 700px) { .rubro-grid { grid-template-columns: repeat(2, 1fr); } }
+
+        .rubro-card {
+            background: rgba(12, 36, 64, 0.7);
+            border: 2px solid rgba(125, 211, 252, 0.18);
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+            padding: 10px 12px;
+            position: relative;
+            transition: border-color 0.18s, box-shadow 0.18s, background 0.18s;
+            user-select: none;
+        }
+        .rubro-card:hover:not(.rubro-disabled) {
+            border-color: rgba(125, 211, 252, 0.5);
+            background: rgba(14, 45, 80, 0.85);
+        }
+        .rubro-card.rubro-principal-selected {
+            border-color: #38bdf8;
+            background: rgba(14, 90, 130, 0.45);
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.18);
+        }
+        .rubro-card.rubro-adicional-selected {
+            border-color: #a3e635;
+            background: rgba(20, 60, 20, 0.4);
+            box-shadow: 0 0 0 2px rgba(163, 230, 53, 0.15);
+        }
+        .rubro-card.rubro-disabled {
+            cursor: default;
+            opacity: 0.45;
+        }
+        .rubro-badge {
+            background: #0ea5e9;
+            border-radius: 4px;
+            color: #fff;
+            font-size: 0.6rem;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            padding: 1px 5px;
+            position: absolute;
+            right: 6px;
+            text-transform: uppercase;
+            top: 6px;
+        }
+        .rubro-badge.badge-adicional { background: #65a30d; }
+        .rubro-card-icon { font-size: 1.25rem; line-height: 1; }
+        .rubro-card-label { color: #e0f2fe; font-size: 0.78rem; font-weight: 800; line-height: 1.25; margin-top: 2px; }
+        .rubro-card-desc  { color: #7dd3fc; font-size: 0.68rem; line-height: 1.3; }
+        .rubro-error { color: #b91c1c; font-size: 0.85rem; margin-top: 6px; display: none; }
     </style>
 </head>
 <body>
@@ -231,9 +286,10 @@
                 </div>
             {% endif %}
 
+            {# Campos de cuenta — excluir plan y rubros_seleccionados (se renderizan por separado) #}
             <section class="grid gap-4 md:grid-cols-2">
                 {% for field in form.visible_fields %}
-                    {% if field.name != "plan" %}
+                    {% if field.name != "plan" and field.name != "rubros_seleccionados" and field.name != "rubros_adicionales" %}
                     <div class="field">
                         <label for="{{ field.id_for_label }}">{{ field.label }}</label>
                         {{ field }}
@@ -246,6 +302,122 @@
                     </div>
                     {% endif %}
                 {% endfor %}
+            </section>
+
+            {# --- Selector de rubro (dos pasos) --- #}
+            <section id="rubro-section">
+                {# Campos ocultos que Django valida — JS los actualiza al hacer clic en las cards #}
+                {{ form.rubro_principal_signup }}
+                <div style="display:none" aria-hidden="true">{{ form.rubros_adicionales }}</div>
+
+                {# Paso 1: actividad principal #}
+                <div class="mb-2">
+                    <h2 class="text-xl font-extrabold">¿Cuál es la actividad principal de tu negocio?</h2>
+                    <p class="section-hint text-sm">Elige una — determina el entorno y color de tu cuenta.</p>
+                </div>
+                {% if form.rubro_principal_signup.errors %}
+                    {% for e in form.rubro_principal_signup.errors %}<p class="form-error">{{ e }}</p>{% endfor %}
+                {% endif %}
+                <p class="rubro-error" id="rubro-principal-error">Debes seleccionar la actividad principal.</p>
+
+                <div class="rubro-grid" id="principal-grid">
+                    <div class="rubro-card" data-rubro="TALLER_MECANICO" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">🔧</span>
+                        <span class="rubro-card-label">Taller Mecánico</span>
+                        <span class="rubro-card-desc">Autos, motos, camiones</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="CASA_REPUESTOS" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">📦</span>
+                        <span class="rubro-card-label">Casa de Repuestos</span>
+                        <span class="rubro-card-desc">Partes y repuestos</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="DESARMADURIA" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">🔩</span>
+                        <span class="rubro-card-label">Desarmaduría</span>
+                        <span class="rubro-card-desc">Despiece, piezas usadas</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="NEUMATICOS" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">⭕</span>
+                        <span class="rubro-card-label">Neumáticos / Vulca</span>
+                        <span class="rubro-card-desc">Neumáticos y llantas</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="CARROCERIA_DETAILING" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">🎨</span>
+                        <span class="rubro-card-label">Carrocería / Detailing</span>
+                        <span class="rubro-card-desc">Pintura, lavado, estética</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="ESPECIALISTA" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">⚡</span>
+                        <span class="rubro-card-label">Especialista</span>
+                        <span class="rubro-card-desc">Electricidad, escapes…</span>
+                    </div>
+                    <div class="rubro-card" data-rubro="OTRO" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge" style="display:none">Principal</span>
+                        <span class="rubro-card-icon">⊞</span>
+                        <span class="rubro-card-label">Otro / Mixto</span>
+                        <span class="rubro-card-desc">No listado o multi-giro</span>
+                    </div>
+                </div>
+
+                {# Paso 2: actividades adicionales (aparece tras elegir principal) #}
+                <div id="adicionales-section" style="display:none; margin-top:18px;">
+                    <h3 class="text-base font-extrabold mb-1">¿También realizas otras actividades?</h3>
+                    <p class="section-hint text-sm mb-2">Opcional — máximo 2. Tu actividad principal ya está incluida.</p>
+                    {% if form.rubros_adicionales.errors %}
+                        {% for e in form.rubros_adicionales.errors %}<p class="form-error">{{ e }}</p>{% endfor %}
+                    {% endif %}
+                    <p class="rubro-error" id="rubro-adicional-error">Máximo 2 actividades adicionales.</p>
+                    <div class="rubro-grid" id="adicionales-grid">
+                        <div class="rubro-card" data-rubro="TALLER_MECANICO" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">🔧</span>
+                            <span class="rubro-card-label">Taller Mecánico</span>
+                            <span class="rubro-card-desc">Autos, motos, camiones</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="CASA_REPUESTOS" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">📦</span>
+                            <span class="rubro-card-label">Casa de Repuestos</span>
+                            <span class="rubro-card-desc">Partes y repuestos</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="DESARMADURIA" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">🔩</span>
+                            <span class="rubro-card-label">Desarmaduría</span>
+                            <span class="rubro-card-desc">Despiece, piezas usadas</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="NEUMATICOS" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">⭕</span>
+                            <span class="rubro-card-label">Neumáticos / Vulca</span>
+                            <span class="rubro-card-desc">Neumáticos y llantas</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="CARROCERIA_DETAILING" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">🎨</span>
+                            <span class="rubro-card-label">Carrocería / Detailing</span>
+                            <span class="rubro-card-desc">Pintura, lavado, estética</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="ESPECIALISTA" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">⚡</span>
+                            <span class="rubro-card-label">Especialista</span>
+                            <span class="rubro-card-desc">Electricidad, escapes…</span>
+                        </div>
+                        <div class="rubro-card" data-rubro="OTRO" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge badge-adicional" style="display:none">+</span>
+                            <span class="rubro-card-icon">⊞</span>
+                            <span class="rubro-card-label">Otro / Mixto</span>
+                            <span class="rubro-card-desc">No listado o multi-giro</span>
+                        </div>
+                    </div>
+                </div>
             </section>
 
             <section>
@@ -275,6 +447,135 @@
     </main>
 
     <script>
+        /* ---- Rubro card picker (dos pasos: principal + adicionales) ---- */
+        (function () {
+            var MAX_ADICIONALES = 2;
+            var principalInput = document.querySelector('input[name="rubro_principal_signup"]');
+
+            function getAdicionalCb(key) {
+                return document.querySelector('input[name="rubros_adicionales"][value="' + key + '"]');
+            }
+
+            function countAdicionales() {
+                return document.querySelectorAll('input[name="rubros_adicionales"]:checked').length;
+            }
+
+            function syncAdicionalesGridDisabled(principalKey) {
+                document.querySelectorAll('#adicionales-grid .rubro-card').forEach(function (c) {
+                    if (c.dataset.rubro === principalKey) {
+                        c.classList.add('rubro-disabled');
+                        var cb = getAdicionalCb(principalKey);
+                        if (cb) cb.checked = false;
+                        c.classList.remove('rubro-adicional-selected');
+                        var badge = c.querySelector('.badge-adicional');
+                        if (badge) badge.style.display = 'none';
+                    } else {
+                        c.classList.remove('rubro-disabled');
+                    }
+                });
+            }
+
+            function selectPrincipalCard(key) {
+                if (!principalInput) return;
+                principalInput.value = key;
+
+                document.querySelectorAll('#principal-grid .rubro-card').forEach(function (c) {
+                    var badge = c.querySelector('.rubro-badge');
+                    if (c.dataset.rubro === key) {
+                        c.classList.add('rubro-principal-selected');
+                        if (badge) badge.style.display = '';
+                    } else {
+                        c.classList.remove('rubro-principal-selected');
+                        if (badge) badge.style.display = 'none';
+                    }
+                });
+
+                var sec = document.getElementById('adicionales-section');
+                if (sec) sec.style.display = '';
+
+                syncAdicionalesGridDisabled(key);
+
+                var err = document.getElementById('rubro-principal-error');
+                if (err) err.style.display = 'none';
+            }
+
+            function toggleAdicionalCard(card) {
+                var key = card.dataset.rubro;
+                if (card.classList.contains('rubro-disabled')) return;
+
+                var cb = getAdicionalCb(key);
+                if (!cb) return;
+                var badge = card.querySelector('.badge-adicional');
+
+                if (cb.checked) {
+                    cb.checked = false;
+                    card.classList.remove('rubro-adicional-selected');
+                    if (badge) badge.style.display = 'none';
+                } else {
+                    if (countAdicionales() >= MAX_ADICIONALES) {
+                        var errAd = document.getElementById('rubro-adicional-error');
+                        if (errAd) {
+                            errAd.style.display = 'block';
+                            setTimeout(function () { errAd.style.display = 'none'; }, 3000);
+                        }
+                        return;
+                    }
+                    cb.checked = true;
+                    card.classList.add('rubro-adicional-selected');
+                    if (badge) badge.style.display = '';
+                    var errAd2 = document.getElementById('rubro-adicional-error');
+                    if (errAd2) errAd2.style.display = 'none';
+                }
+            }
+
+            function restoreState() {
+                if (!principalInput || !principalInput.value) return;
+                selectPrincipalCard(principalInput.value);
+                document.querySelectorAll('input[name="rubros_adicionales"]:checked').forEach(function (cb) {
+                    var card = document.querySelector('#adicionales-grid .rubro-card[data-rubro="' + cb.value + '"]');
+                    if (card && !card.classList.contains('rubro-disabled')) {
+                        card.classList.add('rubro-adicional-selected');
+                        var badge = card.querySelector('.badge-adicional');
+                        if (badge) badge.style.display = '';
+                    }
+                });
+            }
+
+            document.addEventListener('DOMContentLoaded', function () {
+                document.querySelectorAll('#principal-grid .rubro-card').forEach(function (card) {
+                    function activate() { selectPrincipalCard(card.dataset.rubro); }
+                    card.addEventListener('click', activate);
+                    card.addEventListener('keydown', function (e) {
+                        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); activate(); }
+                    });
+                });
+
+                document.querySelectorAll('#adicionales-grid .rubro-card').forEach(function (card) {
+                    function toggle() { toggleAdicionalCard(card); }
+                    card.addEventListener('click', toggle);
+                    card.addEventListener('keydown', function (e) {
+                        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggle(); }
+                    });
+                });
+
+                var form = document.querySelector('form[method="post"]');
+                if (form) {
+                    form.addEventListener('submit', function (e) {
+                        if (!principalInput || !principalInput.value) {
+                            e.preventDefault();
+                            var err = document.getElementById('rubro-principal-error');
+                            if (err) {
+                                err.style.display = 'block';
+                                err.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            }
+                        }
+                    });
+                }
+
+                restoreState();
+            });
+        })();
+
         function selectPlan(planCode) {
             document.getElementById('id_plan').value = planCode;
             document.querySelectorAll('.plan-card').forEach(function(card) {
