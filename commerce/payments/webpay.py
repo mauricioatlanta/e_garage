@@ -54,9 +54,11 @@ class WebPayGateway(PaymentGateway, key="webpay"):
             amount=amount,
             return_url=return_url,
         )
+        url = r["url"] if isinstance(r, dict) else r.url
+        token = r["token"] if isinstance(r, dict) else r.token
         return PaymentInitiation(
-            redirect_url=r.url,
-            gateway_token=r.token,
+            redirect_url=url,
+            gateway_token=token,
             expires_at=datetime.now(tz=timezone.utc) + timedelta(minutes=5),
         )
 
