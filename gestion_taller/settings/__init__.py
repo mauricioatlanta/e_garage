@@ -42,10 +42,10 @@ DATABASES = {'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': _db_pat
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://egarage.cl', 'https://www.egarage.cl']
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://egarage.cl', 'https://www.egarage.cl']
+CSRF_TRUSTED_ORIGINS = [
+    'https://egarage.cl', 'https://www.egarage.cl',
+    'https://monteazulspa.cl', 'https://www.monteazulspa.cl',
+]
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 RESEND_API_KEY = os.getenv('RESEND_API_KEY', '')

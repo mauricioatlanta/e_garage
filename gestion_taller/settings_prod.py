@@ -292,7 +292,10 @@ MEDIA_ROOT = "/srv/egarage/media"
 
 # Configuración crítica para el SSL que acabas de instalar
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
-CSRF_TRUSTED_ORIGINS = ["https://egarage.cl", "https://www.egarage.cl"]
+CSRF_TRUSTED_ORIGINS = [
+    "https://egarage.cl", "https://www.egarage.cl",
+    "https://monteazulspa.cl", "https://www.monteazulspa.cl",
+]
 
 
 # ===== FIX IDIOMA USA/CHILE EN PRODUCCION =====
@@ -347,12 +350,9 @@ LOGGING = {
     },
 }
 
-SESSION_COOKIE_DOMAIN = ".egarage.cl"
-CSRF_COOKIE_DOMAIN = ".egarage.cl"
-
-# === FIX AUTH COOKIE DOMAIN EGARAGE ===
-SESSION_COOKIE_DOMAIN = ".egarage.cl"
-CSRF_COOKIE_DOMAIN = ".egarage.cl"
+# Multi-dominio: None = cookie para el dominio del request actual (egarage.cl, monteazulspa.cl, etc.)
+SESSION_COOKIE_DOMAIN = None
+CSRF_COOKIE_DOMAIN = None
 SESSION_COOKIE_PATH = "/"
 CSRF_COOKIE_PATH = "/"
 
