@@ -56,13 +56,13 @@ class Command(BaseCommand):
         # Desglose por empresa (top 10 con piezas publicadas)
         por_empresa = (
             PiezaDesarme.objects.filter(publicada=True)
-            .values("empresa__nombre_empresa")
+            .values("empresa__nombre_taller")
             .annotate(total=Count("id"))
             .order_by("-total")[:10]
         )
         if por_empresa:
             self.stdout.write(f"\n  Top empresas con piezas publicadas:")
             for row in por_empresa:
-                self.stdout.write(f"    {row['empresa__nombre_empresa']:<35} {row['total']:>6,}")
+                self.stdout.write(f"    {row['empresa__nombre_taller']:<35} {row['total']:>6,}")
 
         self.stdout.write(f"{'─'*50}\n")
