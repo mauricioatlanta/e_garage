@@ -140,6 +140,14 @@ class PiezaDesarme(TenantScoped):
     fecha_revision = models.DateTimeField(null=True, blank=True)
     fecha_extraccion = models.DateField(null=True, blank=True)
     activo = models.BooleanField(default=True)
+    publicada = models.BooleanField(
+        default=False,
+        db_index=True,
+        help_text=(
+            "Compuerta del kiosko. True = visible en storefront y kiosko. "
+            "False = en proceso (confirmada pero no publicada aún)."
+        ),
+    )
 
     estado_pieza = models.CharField(
         max_length=20,
@@ -292,6 +300,7 @@ class PiezaDesarme(TenantScoped):
             Index(fields=["empresa", "vehiculo_desarme"]),
             Index(fields=["empresa", "codigo"]),
             Index(fields=["empresa", "estado_pieza"]),
+            Index(fields=["empresa", "publicada", "estado_pieza"]),
         ]
         constraints = [
             models.UniqueConstraint(

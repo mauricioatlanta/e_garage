@@ -17,7 +17,7 @@ from taller.models.clientes import Cliente
 from taller.models.correlativo import CorrelativoDocumento
 from taller.models.documento import Documento
 from taller.models.lineas_documento import LineaRepuesto, ORIGEN_DESARME
-from taller.models.pieza_desarme import ESTADO_DISPONIBLE, ESTADO_RESERVADA, PiezaDesarme
+from taller.models.pieza_desarme import ESTADO_DISPONIBLE, ESTADO_RESERVADA, ESTADO_VENDIDA, PiezaDesarme
 from taller.models.vehiculo_desarme import VehiculoDesarme
 
 from .forms_venta_inventario import ConfirmarVentaDesdeInventarioForm
@@ -358,7 +358,7 @@ def _generar_numero_documento(empresa, tipo):
         return f"{prefijo}-{correlativo.ultimo_numero:06d}"
 
 
-def _redirect_to_documento_or_fallback(documento, vehiculo):
+def _redirect_to_documento_or_fallback(request, documento, vehiculo):
     """
     Intenta redirigir al panel de impresión o a la vista del documento.
     Si no existe una ruta conocida, redirige al inventario inteligente del vehículo.
@@ -476,75 +476,102 @@ def finalizar_venta_desde_inventario(request, pk):
         )
 
     observaciones = (form.cleaned_data.get("observaciones") or "").strip()
-
-    for item in resumen["items"]:
-        if item["cantidad"] > item["stock_actual"]:
-            messages.error(
-                request,
-                f"Stock insuficiente para '{item.get('display_nombre') or item['repuesto'].nombre}'. "
-                f"Disponible: {item['stock_actual']}, solicitado: {item['cantidad']}.",
-            )
-            return redirect(
-                _desarme_url(request, f"vehiculos/{vehiculo.pk}/confirmar-venta-desde-inventario/")
-            )
-
     tipo_doc = _get_tipo_documento_por_pais(empresa)
-    with transaction.atomic():
-        numero_documento = _generar_numero_documento(empresa, tipo_doc)
 
-        # vehiculo acá siempre es un VehiculoDesarme (el corte de
-        # VehiculoDesarmeForm ya no pasa por Vehiculo). Documento.vehiculo
-        # exige un Vehiculo real -- usar vehiculo_desarme en su lugar,
-        # dejando vehiculo=None (no hay Vehiculo legacy detrás).
-        if isinstance(vehiculo, VehiculoDesarme):
-            vehiculo_kwargs = {"vehiculo": None, "vehiculo_desarme": vehiculo}
-        else:
-            vehiculo_kwargs = {"vehiculo": vehiculo, "vehiculo_desarme": None}
-        documento = Documento.objects.create(
-            empresa=empresa,
-            cliente=cliente,
-            **vehiculo_kwargs,
-            observaciones=observaciones or None,
-            estado="EMITIDO",
-            tipo="PTS",
-            numero=numero_documento,
-            fecha_emision=timezone.now().date(),
-            country=getattr(empresa, "pais", "CL") or "CL",
-            moneda=getattr(empresa, "moneda", "CLP") or "CLP",
+    class _StockInsuficiente(Exception):
+        pass
+
+    try:
+        with transaction.atomic():
+            # Bloquear todas las piezas de la venta antes de cualquier lectura
+            # para evitar race conditions entre peticiones concurrentes.
+            pieza_ids = [item["repuesto"].pk for item in resumen["items"]]
+            piezas_locked = {
+                p.pk: p
+                for p in PiezaDesarme.objects.select_for_update().filter(
+                    pk__in=pieza_ids,
+                    empresa=empresa,
+                )
+            }
+
+            # Validación autoritativa con filas bloqueadas (reemplaza el pre-check
+            # fuera de la transacción que usaba datos potencialmente stale).
+            valid_estados = {ESTADO_DISPONIBLE, ESTADO_RESERVADA}
+            for item in resumen["items"]:
+                pieza = piezas_locked.get(item["repuesto"].pk)
+                cant = item["cantidad"]
+                if (
+                    pieza is None
+                    or pieza.estado_pieza not in valid_estados
+                    or (pieza.cantidad or 0) < cant
+                ):
+                    nombre = item.get("display_nombre") or item["repuesto"].nombre
+                    stock = pieza.cantidad if pieza else 0
+                    raise _StockInsuficiente(
+                        f"Stock insuficiente para '{nombre}'. "
+                        f"Disponible: {stock}, solicitado: {cant}."
+                    )
+
+            numero_documento = _generar_numero_documento(empresa, tipo_doc)
+
+            # VehiculoDesarme no tiene un Vehiculo legacy detrás; Documento.vehiculo
+            # exige un Vehiculo real, así que se usa vehiculo_desarme y vehiculo=None.
+            if isinstance(vehiculo, VehiculoDesarme):
+                vehiculo_kwargs = {"vehiculo": None, "vehiculo_desarme": vehiculo}
+            else:
+                vehiculo_kwargs = {"vehiculo": vehiculo, "vehiculo_desarme": None}
+            documento = Documento.objects.create(
+                empresa=empresa,
+                cliente=cliente,
+                **vehiculo_kwargs,
+                observaciones=observaciones or None,
+                estado="EMITIDO",
+                tipo="PTS",
+                numero=numero_documento,
+                fecha_emision=timezone.now().date(),
+                country=getattr(empresa, "pais", "CL") or "CL",
+                moneda=getattr(empresa, "moneda", "CLP") or "CLP",
+            )
+
+            for item in resumen["items"]:
+                pieza = piezas_locked[item["repuesto"].pk]
+                cantidad = item["cantidad"]
+                precio_venta = item["precio_venta"]
+                LineaRepuesto.objects.create(
+                    documento=documento,
+                    repuesto=None,
+                    part=None,
+                    pieza_desarme=pieza,
+                    codigo=pieza.codigo or "",
+                    nombre=pieza.nombre or "",
+                    cantidad=cantidad,
+                    precio_unitario=precio_venta,
+                    descuento=Decimal("0"),
+                    origen_repuesto=ORIGEN_DESARME,
+                )
+                nueva_cantidad = max(0, (pieza.cantidad or 0) - cantidad)
+                nuevo_estado = ESTADO_VENDIDA if nueva_cantidad == 0 else pieza.estado_pieza
+                PiezaDesarme.objects.filter(pk=pieza.pk).update(
+                    cantidad=nueva_cantidad,
+                    estado_pieza=nuevo_estado,
+                )
+
+            documento.refresh_from_db()
+            documento.recompute_totals(persist=True)
+
+    except _StockInsuficiente as exc:
+        messages.error(request, str(exc))
+        return redirect(
+            _desarme_url(request, f"vehiculos/{vehiculo.pk}/confirmar-venta-desde-inventario/")
         )
-
-        for item in resumen["items"]:
-            pieza = item["repuesto"]
-            cantidad = item["cantidad"]
-            precio_venta = item["precio_venta"]
-            LineaRepuesto.objects.create(
-                documento=documento,
-                repuesto=None,
-                part=None,
-                pieza_desarme=pieza,
-                codigo=pieza.codigo or "",
-                nombre=pieza.nombre or "",
-                cantidad=cantidad,
-                precio_unitario=precio_venta,
-                descuento=Decimal("0"),
-                origen_repuesto=ORIGEN_DESARME,
-            )
-
-            PiezaDesarme.objects.filter(pk=pieza.pk).update(
-                cantidad=F("cantidad") - cantidad,
-            )
-
-        documento.refresh_from_db()
-        documento.recompute_totals(persist=True)
 
     request.session.pop(VENTA_SESSION_KEY, None)
     request.session.modified = True
 
-    tipo_doc = _get_tipo_documento_por_pais(empresa)
     nombre_doc = "Invoice" if tipo_doc == "invoice" else "Recibo"
     messages.success(
         request,
         f"{nombre_doc} creado correctamente para {cliente.nombre}. #{documento.pk}",
     )
 
-    return _redirect_to_documento_or_fallback(documento, vehiculo)
+    return _redirect_to_documento_or_fallback(request, documento, vehiculo)

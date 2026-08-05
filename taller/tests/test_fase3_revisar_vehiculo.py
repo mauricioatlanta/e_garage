@@ -200,31 +200,39 @@ class TestInicializarSugerencias:
 @pytest.mark.django_db
 class TestRevisarVehiculoAJAX:
 
-    def test_confirmar_crea_pieza_revisada(self, empresa_y_user, vehiculo_sedan, cliente_django):
+    def test_confirmar_solo_confirma_sugerencia(self, empresa_y_user, vehiculo_sedan, cliente_django):
+        """P3: confirmar no crea inventario definitivo hasta finalizar_sesion."""
         c, emp, _ = cliente_django
         inicializar_sugerencias(vehiculo_sedan, emp)
-        vehiculo_desarme = vehiculo_sedan
+
         sug = SugerenciaPiezaDesarme.objects.filter(
-            empresa=emp, vehiculo_desarme=vehiculo_desarme, estado="PENDIENTE"
+            empresa=emp,
+            vehiculo_desarme=vehiculo_sedan,
+            estado=SugerenciaPiezaDesarme.PENDIENTE,
         ).first()
 
         resp = c.post(
             _revisar_url(vehiculo_sedan.pk),
-            data=json.dumps({"action": "confirmar", "sugerencia_id": sug.pk,
-                             "precio": "50000", "condicion": "BUENA"}),
+            data=json.dumps({
+                "action": "confirmar",
+                "sugerencia_id": sug.pk,
+                "estado_visual": "verde",
+                "precio": "50000",
+            }),
             content_type="application/json",
         )
+
         assert resp.status_code == 200
-        data = resp.json()
-        assert data["success"] is True
+        assert resp.json()["success"] is True
 
         sug.refresh_from_db()
         assert sug.estado == SugerenciaPiezaDesarme.CONFIRMADA
-        assert sug.pieza_creada_id is not None
-        pieza = sug.pieza_creada
-        assert pieza.revisado is True
-        assert pieza.estado_pieza == ESTADO_DISPONIBLE
-        assert pieza.precio_venta_sugerido == Decimal("50000")
+        assert sug.precio_sugerido == Decimal("50000")
+        assert sug.pieza_creada_id is None
+        assert not PiezaDesarme.objects.filter(
+            empresa=emp,
+            vehiculo_desarme=vehiculo_sedan,
+        ).exists()
 
     def test_descartar_no_crea_pieza(self, empresa_y_user, vehiculo_sedan, cliente_django):
         c, emp, _ = cliente_django
@@ -256,49 +264,88 @@ class TestRevisarVehiculoAJAX:
         sug2 = SugerenciaPiezaDesarme.objects.get(pk=sug.pk)
         assert sug2.estado == SugerenciaPiezaDesarme.CONFIRMADA
 
-    def test_reabrir_elimina_pieza_confirmada(self, empresa_y_user, vehiculo_sedan, cliente_django):
+    def test_reabrir_confirma_y_vuelve_a_pendiente_sin_inventario(
+        self, empresa_y_user, vehiculo_sedan, cliente_django
+    ):
+        """P3: reabrir revierte la sugerencia antes de crear inventario."""
         c, emp, _ = cliente_django
         inicializar_sugerencias(vehiculo_sedan, emp)
-        vehiculo_desarme = vehiculo_sedan
+
         sug = SugerenciaPiezaDesarme.objects.filter(
-            empresa=emp, vehiculo_desarme=vehiculo_desarme, estado="PENDIENTE"
+            empresa=emp,
+            vehiculo_desarme=vehiculo_sedan,
+            estado=SugerenciaPiezaDesarme.PENDIENTE,
         ).first()
 
-        c.post(_revisar_url(vehiculo_sedan.pk),
-               data=json.dumps({"action": "confirmar", "sugerencia_id": sug.pk, "precio": "0"}),
-               content_type="application/json")
-        sug.refresh_from_db()
-        pieza_id = sug.pieza_creada_id
+        confirmar = c.post(
+            _revisar_url(vehiculo_sedan.pk),
+            data=json.dumps({
+                "action": "confirmar",
+                "sugerencia_id": sug.pk,
+                "estado_visual": "verde",
+                "precio": "50000",
+            }),
+            content_type="application/json",
+        )
+        assert confirmar.json()["success"] is True
 
-        resp = c.post(_revisar_url(vehiculo_sedan.pk),
-                      data=json.dumps({"action": "reabrir", "sugerencia_id": sug.pk}),
-                      content_type="application/json")
+        resp = c.post(
+            _revisar_url(vehiculo_sedan.pk),
+            data=json.dumps({
+                "action": "reabrir",
+                "sugerencia_id": sug.pk,
+            }),
+            content_type="application/json",
+        )
+
+        assert resp.status_code == 200
         assert resp.json()["success"] is True
+
         sug.refresh_from_db()
         assert sug.estado == SugerenciaPiezaDesarme.PENDIENTE
-        assert not PiezaDesarme.objects.filter(pk=pieza_id).exists()
+        assert sug.precio_sugerido is None
+        assert sug.pieza_creada_id is None
+        assert not PiezaDesarme.objects.filter(
+            empresa=emp,
+            vehiculo_desarme=vehiculo_sedan,
+        ).exists()
 
-    def test_agregar_pieza_inline(self, empresa_y_user, vehiculo_sedan, cliente_django):
+    def test_agregar_pieza_inline_crea_sugerencia_confirmada(
+        self, empresa_y_user, vehiculo_sedan, cliente_django
+    ):
+        """P3: agregar crea pre-inventario; PiezaDesarme nace al finalizar."""
         c, emp, _ = cliente_django
 
-        resp = c.post(_revisar_url(vehiculo_sedan.pk),
-                      data=json.dumps({"action": "agregar", "codigo": "EXTRA-01",
-                                       "nombre": "Pieza extra", "zona": "Motor",
-                                       "precio": "30000", "condicion": "EXCELENTE",
-                                       "cantidad": "1"}),
-                      content_type="application/json")
+        resp = c.post(
+            _revisar_url(vehiculo_sedan.pk),
+            data=json.dumps({
+                "action": "agregar",
+                "codigo": "EXTRA-01",
+                "nombre": "Pieza extra",
+                "zona": "Motor",
+                "precio": "30000",
+                "condicion": "BUENA",
+            }),
+            content_type="application/json",
+        )
+
         assert resp.status_code == 200
-        data = resp.json()
-        assert data["success"] is True
+        assert resp.json()["success"] is True
 
-        vehiculo_desarme = vehiculo_sedan
-        pieza = PiezaDesarme.objects.get(empresa=emp, vehiculo_desarme=vehiculo_desarme, codigo="EXTRA-01")
-        assert pieza.revisado is True
-        assert pieza.estado_pieza == ESTADO_DISPONIBLE
-
-        vehiculo_desarme = vehiculo_sedan
-        sug = SugerenciaPiezaDesarme.objects.get(vehiculo_desarme=vehiculo_desarme, codigo="EXTRA-01")
+        sug = SugerenciaPiezaDesarme.objects.get(
+            empresa=emp,
+            vehiculo_desarme=vehiculo_sedan,
+            codigo="EXTRA-01",
+        )
         assert sug.estado == SugerenciaPiezaDesarme.CONFIRMADA
+        assert sug.precio_sugerido == Decimal("30000")
+        assert sug.pieza_creada_id is None
+
+        assert not PiezaDesarme.objects.filter(
+            empresa=emp,
+            vehiculo_desarme=vehiculo_sedan,
+            codigo="EXTRA-01",
+        ).exists()
 
     def test_accion_desconocida_retorna_400(self, empresa_y_user, vehiculo_sedan, cliente_django):
         c, emp, _ = cliente_django
@@ -307,22 +354,56 @@ class TestRevisarVehiculoAJAX:
                       content_type="application/json")
         assert resp.status_code == 400
 
-    def test_confirmar_doble_retorna_error(self, empresa_y_user, vehiculo_sedan, cliente_django):
+    def test_confirmar_doble_es_idempotente(
+        self, empresa_y_user, vehiculo_sedan, cliente_django
+    ):
+        """P3: repetir confirmar no duplica sugerencias ni crea inventario."""
         c, emp, _ = cliente_django
         inicializar_sugerencias(vehiculo_sedan, emp)
-        vehiculo_desarme = vehiculo_sedan
+
         sug = SugerenciaPiezaDesarme.objects.filter(
-            empresa=emp, vehiculo_desarme=vehiculo_desarme, estado="PENDIENTE"
+            empresa=emp,
+            vehiculo_desarme=vehiculo_sedan,
+            estado=SugerenciaPiezaDesarme.PENDIENTE,
         ).first()
 
-        c.post(_revisar_url(vehiculo_sedan.pk),
-               data=json.dumps({"action": "confirmar", "sugerencia_id": sug.pk, "precio": "0"}),
-               content_type="application/json")
-        # Segunda confirmación sobre la misma sugerencia → error
-        resp2 = c.post(_revisar_url(vehiculo_sedan.pk),
-                       data=json.dumps({"action": "confirmar", "sugerencia_id": sug.pk, "precio": "0"}),
-                       content_type="application/json")
-        assert resp2.json()["success"] is False
+        payload = {
+            "action": "confirmar",
+            "sugerencia_id": sug.pk,
+            "estado_visual": "verde",
+            "precio": "50000",
+        }
+
+        resp1 = c.post(
+            _revisar_url(vehiculo_sedan.pk),
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+        resp2 = c.post(
+            _revisar_url(vehiculo_sedan.pk),
+            data=json.dumps(payload),
+            content_type="application/json",
+        )
+
+        assert resp1.status_code == 200
+        assert resp2.status_code == 200
+        assert resp1.json()["success"] is True
+        assert resp2.json()["success"] is True
+
+        sug.refresh_from_db()
+        assert sug.estado == SugerenciaPiezaDesarme.CONFIRMADA
+        assert sug.precio_sugerido == Decimal("50000")
+        assert sug.pieza_creada_id is None
+
+        assert SugerenciaPiezaDesarme.objects.filter(
+            empresa=emp,
+            vehiculo_desarme=vehiculo_sedan,
+            codigo=sug.codigo,
+        ).count() == 1
+        assert not PiezaDesarme.objects.filter(
+            empresa=emp,
+            vehiculo_desarme=vehiculo_sedan,
+        ).exists()
 
     def test_get_autoinicializa_si_no_hay_piezas(self, empresa_y_user, vehiculo_sedan):
         """Lógica de auto-inicialización del GET: si no hay sugerencias ni piezas, init corre."""

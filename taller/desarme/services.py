@@ -33,41 +33,26 @@ def _ensure_vehiculo_desarme(vehiculo, empresa=None):
     )
 
 
-def generar_inventario_vehiculo(vehiculo, empresa):
+def puede_eliminar_pieza(pieza) -> tuple[bool, str]:
     """
-    Genera piezas de inventario para un vehículo de desarme a partir del catálogo
-    operativo, filtrado por tipo_carroceria del vehículo y por la configuración
-    de CatalogoRepuestoEmpresa de la empresa (incluido/precio_predeterminado).
-    USA (empresa.pais='US') → catálogo USA (engine_assembly, alternator, etc.).
-    Resto → catálogo legacy (MOT-01, CAR-01, etc.).
-    Retorna el número de piezas creadas (solo las nuevas, no las ya existentes).
-    """
-    from .catalogo_operativo import get_catalogo_para_vehiculo
+    Determines whether a PiezaDesarme can be safely deleted.
+    Returns (can_delete, reason_if_blocked).
 
-    vehiculo = _ensure_vehiculo_desarme(vehiculo, empresa)
-    catalogo = get_catalogo_para_vehiculo(empresa, vehiculo)
-    count = 0
-    for item in catalogo:
-        codigo = item["codigo"]
-        nombre = item["nombre"]
-        zona = item["zona"]
-        precio_base = item["precio_base"]
-        _, created = PiezaDesarme.objects.get_or_create(
-            vehiculo_desarme=vehiculo,
-            codigo=codigo,
-            defaults={
-                "empresa": empresa,
-                "nombre": nombre,
-                "zona": zona,
-                "estado_pieza": "DISPONIBLE",
-                "precio_venta_sugerido": precio_base,
-                "cantidad": 1,
-                "activo": True,
-            },
-        )
-        if created:
-            count += 1
-    return count
+    Blocking conditions:
+    - publicada=True (live in storefront)
+    - has LineaRepuesto (PROTECT — referenced by document lines)
+    - has LineaVentaDesarme (direct sales)
+    - has MovimientoInventario (PROTECT — inventory movements)
+    """
+    if pieza.publicada:
+        return False, "La pieza está publicada en el kiosko. Despublícala primero."
+    if pieza.lineas_repuesto.exists():
+        return False, "La pieza tiene líneas de documento asociadas y no puede eliminarse."
+    if pieza.lineas_venta_desarme.exists():
+        return False, "La pieza tiene ventas registradas y no puede eliminarse."
+    if pieza.movimientos_inventario.exists():
+        return False, "La pieza tiene movimientos de inventario y no puede eliminarse."
+    return True, ""
 
 
 def inicializar_sugerencias(vehiculo, empresa) -> int:

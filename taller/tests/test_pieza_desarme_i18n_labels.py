@@ -2,7 +2,7 @@
 """
 Tests para nombres traducibles y por empresa en PiezaDesarme.
 - get_display_label: prioridad company → catalog → nombre
-- inventario_vehiculo serializa nombre con idioma activo
+- inventario_inteligente serializa nombre con idioma activo
 - API api_pieza_label_empresa_guardar crea/actualiza label por empresa
 """
 import json
@@ -102,10 +102,10 @@ class TestGetDisplayLabel:
 
 
 @pytest.mark.django_db
-class TestInventarioVehiculoSerializaNombre:
-    """inventario_vehiculo serializa nombre traducido usando idioma activo (get_display_label)."""
+class TestInventarioInteligenteSerializaNombre:
+    """inventario_inteligente serializa nombre traducido usando idioma activo."""
 
-    def test_inventario_vehiculo_usa_display_label(self, empresa_user, vehiculo_desarme):
+    def test_inventario_inteligente_usa_display_label(self, empresa_user, vehiculo_desarme):
         empresa, user = empresa_user
         pieza = PiezaDesarme.objects.create(
             empresa=empresa,
@@ -123,12 +123,12 @@ class TestInventarioVehiculoSerializaNombre:
         )
         # Llamar a la vista directamente para no depender del ROOT_URLCONF (puede no incluir desarme)
         from django.test import RequestFactory
-        from taller.desarme.views import inventario_vehiculo
+        from taller.desarme.views_inventario import inventario_inteligente
 
-        request = RequestFactory().get("/desarme/vehiculos/1/inventario/")
+        request = RequestFactory().get("/desarme/vehiculos/1/inventario-inteligente/")
         request.user = user
         request.LANGUAGE_CODE = "es"
-        resp = inventario_vehiculo(request, pk=vehiculo_desarme.pk)
+        resp = inventario_inteligente(request, pk=vehiculo_desarme.pk)
         assert resp.status_code == 200
         content = resp.content.decode("utf-8")
         # El template embebe el JSON via repuestos_json|escapejs; verificar el nombre visible

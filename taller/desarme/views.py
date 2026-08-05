@@ -41,7 +41,7 @@ from taller.models.vendedor_desarme import VendedorDesarme
 from taller.documentos.views_migrated import _reverse_with_request
 from taller.utils.empresa import get_user_empresa_safe
 from .forms import PiezaDesarmeForm, PiezaSueltaForm, VehiculoDesarmeForm
-from .services import generar_inventario_vehiculo, _ensure_vehiculo_desarme
+from .services import _ensure_vehiculo_desarme
 from taller.services.desarme_financial_service import calcular_ganancia_vehiculo
 
 log = logging.getLogger(__name__)
@@ -688,6 +688,14 @@ def ver_vehiculo(request, pk):
     for p in repuestos_recientes:
         p.display_nombre = p.get_display_label(empresa=empresa, language=lang)
 
+    from taller.desarme.selectors.vehiculo_operaciones import get_vehicle_operations_summary
+    ops_summary = get_vehicle_operations_summary(
+        empresa=empresa,
+        vehiculo=vehiculo,
+        user=request.user,
+        request=request,
+    )
+
     return render(
         request,
         "taller/desarme/ver_vehiculo.html",
@@ -714,6 +722,7 @@ def ver_vehiculo(request, pk):
             "monto_chatarra": monto_chatarra,
             "ganancia_final": ganancia_final,
             "repuestos_recientes": repuestos_recientes,
+            "ops": ops_summary,
         },
     )
 
@@ -918,7 +927,7 @@ def crear_pieza(request):
                 messages.success(request, f"Pieza {pieza.codigo} creada.")
                 if pieza.vehiculo_desarme_id:
                     return redirect(
-                        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario/")
+                        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario-inteligente/")
                     )
                 return redirect(_desarme_url(request, "piezas/"))
             except IntegrityError:
@@ -1033,7 +1042,7 @@ def editar_pieza(request, pk):
                 messages.success(request, "Pieza actualizada.")
                 if pieza.vehiculo_desarme_id:
                     return redirect(
-                        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario/")
+                        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario-inteligente/")
                     )
                 return redirect(_desarme_url(request, "piezas/"))
             except Exception as e:
@@ -1048,77 +1057,6 @@ def editar_pieza(request, pk):
         request,
         "taller/desarme/pieza_form.html",
         {"form": form, "pieza": pieza, "empresa": empresa, "titulo": "Editar pieza de desarme"},
-    )
-
-
-@login_required
-def inventario_vehiculo(request, pk):
-    """Inventario de piezas de un vehículo de desarme."""
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        return redirect("/")
-
-    vehiculo = get_object_or_404(
-        VehiculoDesarme,
-        pk=pk,
-        empresa=empresa,
-    )
-    piezas = (
-        vehiculo.piezas_desarme.filter(activo=True)
-        .prefetch_related("names", "company_labels")
-        .order_by("zona", "codigo")
-    )
-    total_piezas = piezas.count()
-    disponibles = piezas.filter(estado_pieza=ESTADO_DISPONIBLE).count()
-    danadas = piezas.filter(estado_pieza=ESTADO_DANADA).count()
-    faltantes = piezas.filter(estado_pieza=ESTADO_FALTANTE).count()
-    valor_potencial = sum(
-        (p.precio_venta_sugerido or Decimal("0")) * p.cantidad
-        for p in piezas
-        if p.estado_pieza in (ESTADO_DISPONIBLE, ESTADO_RESERVADA)
-    )
-
-    # JSON para Alpine.js (inventario V2 ultra) — nombre visible por empresa/idioma + términos búsqueda
-    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
-    items_list = []
-    for p in piezas:
-        items_list.append(
-            {
-                "id": p.pk,
-                "nombre": p.get_display_label(empresa=empresa, language=lang),
-                "search_terms": p.get_search_terms(empresa=empresa, language=lang),
-                "sku": p.codigo or "",
-                "categoria": p.zona or "General",
-                "ubicacion": getattr(p, "ubicacion_fisica", None) or "",
-                "precio": float(p.precio_venta_sugerido or 0),
-                "stock": p.cantidad,
-                "vehiculo": str(vehiculo),
-                "imagen": "",
-                "vendible": (
-                    p.activo
-                    and p.cantidad > 0
-                    and p.estado_pieza in (ESTADO_DISPONIBLE, ESTADO_RESERVADA)
-                ),
-            }
-        )
-    piezas_json = json.dumps(items_list, ensure_ascii=False)
-
-    return render(
-        request,
-        "taller/desarme/inventario_vehiculo.html",
-        {
-            "vehiculo": vehiculo,
-            "piezas": piezas,
-            "repuestos": piezas,
-            "empresa": empresa,
-            "total_piezas": total_piezas,
-            "disponibles": disponibles,
-            "danadas": danadas,
-            "faltantes": faltantes,
-            "valor_potencial": valor_potencial,
-            "piezas_json": piezas_json,
-            "repuestos_json": piezas_json,
-        },
     )
 
 
@@ -1149,7 +1087,7 @@ def iniciar_venta_desde_inventario(request, pk):
 
     if not pieza_ids_int:
         messages.warning(request, "No se seleccionaron piezas válidas para la venta.")
-        return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/inventario/"))
+        return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/inventario-inteligente/"))
 
     valid_estados = {ESTADO_DISPONIBLE, ESTADO_RESERVADA}
     piezas_qs = PiezaDesarme.objects.filter(
@@ -1212,7 +1150,7 @@ def iniciar_venta_desde_inventario(request, pk):
             request,
             "Las piezas seleccionadas no son vendibles o no tienen stock disponible.",
         )
-        return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/inventario/"))
+        return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/inventario-inteligente/"))
 
     request.session["desarme_repuestos_prefill"] = repuestos_prefill
     request.session["desarme_origen_label"] = str(vehiculo)
@@ -1228,100 +1166,6 @@ def iniciar_venta_desde_inventario(request, pk):
             doc_url = "/cl/es/documentos/form/"
 
     return redirect(doc_url)
-
-
-@login_required
-@require_GET
-def generar_inventario_view(request, pk):
-    """Genera inventario desde catálogo y redirige al Scanner. Para vehículos sin piezas."""
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        return redirect("/")
-
-    vehiculo = get_object_or_404(
-        VehiculoDesarme,
-        pk=pk,
-        empresa=empresa,
-    )
-    generar_inventario_vehiculo(vehiculo, empresa)
-    messages.success(request, "Inventario generado. Revisa el escáner.")
-    return redirect(_desarme_url(request, f"vehiculos/{vehiculo.pk}/scanner/"))
-
-
-@login_required
-def scanner_vehiculo(request, pk):
-    """
-    Escáner de Inventario del vehículo - UI futurista para revisar y editar piezas.
-    Aparece automáticamente después de crear el vehículo.
-    """
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        return redirect("/")
-
-    vehiculo = get_object_or_404(
-        VehiculoDesarme,
-        pk=pk,
-        empresa=empresa,
-    )
-
-    # Compatibilidad defensiva: en algunos deploys el related_name `piezas_desarme`
-    # puede no estar disponible (migración parcial / código antiguo). Evitar 500.
-    try:
-        piezas_qs = vehiculo.piezas_desarme.filter(activo=True).prefetch_related("names", "company_labels")  # type: ignore[attr-defined]
-    except Exception:
-        piezas_qs = PiezaDesarme.objects.filter(
-            vehiculo_desarme=vehiculo, activo=True, empresa=empresa
-        ).prefetch_related("names", "company_labels")
-    piezas = list(piezas_qs.order_by("zona", "codigo"))
-    lang = (getattr(request, "LANGUAGE_CODE", None) or get_language() or "es")[:2]
-    for p in piezas:
-        p.display_nombre = p.get_display_label(empresa=empresa, language=lang)
-
-    # Stats
-    total = len(piezas)
-    disponibles = sum(1 for p in piezas if p.estado_pieza == ESTADO_DISPONIBLE)
-    danadas = sum(1 for p in piezas if p.estado_pieza == ESTADO_DANADA)
-    faltantes = sum(1 for p in piezas if p.estado_pieza == ESTADO_FALTANTE)
-    sin_precio = sum(
-        1
-        for p in piezas
-        if (p.precio_venta_sugerido is None or p.precio_venta_sugerido == 0)
-        and p.estado_pieza in (ESTADO_DISPONIBLE, ESTADO_RESERVADA)
-    )
-    valor_potencial = sum(
-        (p.precio_venta_sugerido or Decimal("0")) * p.cantidad
-        for p in piezas
-        if p.estado_pieza in (ESTADO_DISPONIBLE, ESTADO_RESERVADA)
-    )
-
-    # Agrupar por zona para el blueprint
-    piezas_por_zona = {}
-    for p in piezas:
-        zona = p.zona or "Otros"
-        piezas_por_zona.setdefault(zona, []).append(p)
-
-    from .catalogo_operativo import get_zonas_orden_desarme
-
-    zonas_orden = [z for z in get_zonas_orden_desarme(empresa) if z in piezas_por_zona]
-    zonas_orden.extend(z for z in sorted(piezas_por_zona) if z not in zonas_orden)
-    zonas_con_piezas = [(z, piezas_por_zona[z]) for z in zonas_orden]
-
-    return render(
-        request,
-        "taller/desarme/scanner_vehiculo.html",
-        {
-            "vehiculo": vehiculo,
-            "piezas": piezas,
-            "zonas_con_piezas": zonas_con_piezas,
-            "empresa": empresa,
-            "total_piezas": total,
-            "disponibles": disponibles,
-            "danadas": danadas,
-            "faltantes": faltantes,
-            "sin_precio": sin_precio,
-            "valor_potencial": valor_potencial,
-        },
-    )
 
 
 @login_required
@@ -1674,6 +1518,8 @@ def revisar_vehiculo(request, pk):
             return _revisar_reabrir(data, vehiculo, empresa)
         if action == "agregar":
             return _revisar_agregar(data, vehiculo, empresa)
+        if action == "finalizar_sesion":
+            return _revisar_finalizar_sesion(data, vehiculo, empresa, request.user, request)
         return JsonResponse({"success": False, "error": "Acción desconocida"}, status=400)
 
     # GET ──────────────────────────────────────────────────────────────────────
@@ -1709,15 +1555,31 @@ def revisar_vehiculo(request, pk):
     descartadas = sum(1 for s in sugerencias if s.estado == SugerenciaPiezaDesarme.DESCARTADA)
     pct = round((confirmadas + descartadas) / total * 100) if total else 0
 
+    from taller.desarme.selectors.sesion_despiece import get_sesion_despiece
+    sesion = get_sesion_despiece(vehiculo.pk, empresa)
+
+    # Valor estimado de las piezas confirmadas (sum de precio_sugerido)
+    from django.db.models import Sum as _Sum
+    valor_estimado = (
+        SugerenciaPiezaDesarme.objects.filter(
+            empresa=empresa,
+            vehiculo_desarme=vehiculo,
+            estado=SugerenciaPiezaDesarme.CONFIRMADA,
+        ).aggregate(total=_Sum("precio_sugerido"))["total"]
+        or Decimal("0")
+    )
+
     return render(request, "taller/desarme/revisar_vehiculo.html", {
         "vehiculo": vehiculo,
         "empresa": empresa,
         "zonas_con_sugerencias": zonas_con_sugerencias,
+        "sesion": sesion,
         "total": total,
         "pendientes": pendientes,
         "confirmadas": confirmadas,
         "descartadas": descartadas,
         "pct_completado": pct,
+        "valor_estimado": valor_estimado,
         "condicion_choices": CONDICION_CHOICES,
         "empresa_moneda": empresa.formato_moneda,
         "PENDIENTE":  SugerenciaPiezaDesarme.PENDIENTE,
@@ -1727,8 +1589,9 @@ def revisar_vehiculo(request, pk):
 
 
 def _revisar_confirmar(data, vehiculo, empresa):
+    """Confirma una sugerencia — guarda precio y condición pero NO crea PiezaDesarme todavía."""
     from taller.models.sugerencia_pieza_desarme import SugerenciaPiezaDesarme
-    from taller.models.pieza_desarme import CONDICION_BUENA
+    from taller.models.pieza_desarme import CONDICION_BUENA, CONDICION_REGULAR
 
     sug_id = data.get("sugerencia_id")
     if not sug_id:
@@ -1736,58 +1599,45 @@ def _revisar_confirmar(data, vehiculo, empresa):
     sug = get_object_or_404(
         SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo_desarme=vehiculo
     )
-    if sug.estado != SugerenciaPiezaDesarme.PENDIENTE:
-        return JsonResponse({"success": False, "error": f"La sugerencia ya está {sug.estado}"}, status=400)
 
-    nombre    = (data.get("nombre") or sug.nombre).strip()
-    condicion = (data.get("condicion") or CONDICION_BUENA).strip()
-    ubicacion = (data.get("ubicacion") or "").strip() or None
-    lado      = (data.get("lado") or "").strip() or None
-    posicion  = (data.get("posicion") or "").strip() or None
-    obs       = (data.get("observaciones") or "").strip() or None
+    # estado_visual cycling: verde=BUENA, amarillo=REGULAR
+    estado_visual = (data.get("estado_visual") or "verde").strip()
+    condicion = CONDICION_REGULAR if estado_visual == "amarillo" else CONDICION_BUENA
+
     try:
         precio = Decimal(str(data["precio"])) if "precio" in data and data["precio"] not in (None, "") else sug.precio_sugerido
     except Exception:
         precio = sug.precio_sugerido
 
-    try:
-        with transaction.atomic():
-            # Si ya existe pieza con este código (vehículo legacy), vincular en lugar de crear
-            existente = PiezaDesarme.objects.filter(
-                empresa=empresa, vehiculo_desarme=vehiculo, codigo=sug.codigo
-            ).first()
-            if existente:
-                pieza = existente
-                if not pieza.revisado:
-                    PiezaDesarme.objects.filter(pk=pieza.pk).update(
-                        revisado=True, fecha_revision=timezone.now(),
-                        estado_pieza=ESTADO_DISPONIBLE, activo=True,
-                    )
-                    pieza.refresh_from_db()
-            else:
-                pieza = PiezaDesarme.objects.create(
-                    empresa=empresa, vehiculo_desarme=vehiculo, codigo=sug.codigo,
-                    nombre=nombre, zona=sug.zona, precio_venta_sugerido=precio,
-                    condicion=condicion, ubicacion_fisica=ubicacion,
-                    lado=lado, posicion=posicion, observaciones=obs,
-                    estado_pieza=ESTADO_DISPONIBLE, activo=True,
-                    revisado=True, fecha_revision=timezone.now(), cantidad=1,
-                )
-            sug.estado = SugerenciaPiezaDesarme.CONFIRMADA
-            sug.pieza_creada = pieza
-            sug.save(update_fields=["estado", "pieza_creada", "updated_at"])
-    except IntegrityError:
-        return JsonResponse({"success": False, "error": "Ya existe una pieza con ese código"}, status=400)
+    with transaction.atomic():
+        sug.estado = SugerenciaPiezaDesarme.CONFIRMADA
+        sug.precio_sugerido = precio
+        sug.condicion_sugerida = condicion
+        sug.save(update_fields=["estado", "precio_sugerido", "condicion_sugerida", "updated_at"])
 
+        # Backward compat: if pieza_creada already exists (legacy data), update its price/condition
+        if sug.pieza_creada_id:
+            PiezaDesarme.objects.filter(pk=sug.pieza_creada_id).update(
+                precio_venta_sugerido=precio,
+                condicion=condicion,
+            )
+
+    from django.db.models import Sum as _Sum
+    valor_acumulado = (
+        SugerenciaPiezaDesarme.objects.filter(
+            empresa=empresa, vehiculo_desarme=vehiculo, estado=SugerenciaPiezaDesarme.CONFIRMADA
+        ).aggregate(total=_Sum("precio_sugerido"))["total"]
+        or Decimal("0")
+    )
     pendientes = SugerenciaPiezaDesarme.objects.filter(
         empresa=empresa, vehiculo_desarme=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
     ).count()
+
     return JsonResponse({
         "success": True,
-        "pieza_id": pieza.pk,
-        "pieza_nombre": pieza.nombre,
-        "pieza_precio": float(pieza.precio_venta_sugerido or 0),
-        "pieza_condicion": pieza.condicion,
+        "estado_visual": estado_visual,
+        "precio": float(precio or 0),
+        "valor_acumulado": float(valor_acumulado),
         "pendientes": pendientes,
     })
 
@@ -1812,6 +1662,7 @@ def _revisar_descartar(data, vehiculo, empresa):
 
 def _revisar_reabrir(data, vehiculo, empresa):
     from taller.models.sugerencia_pieza_desarme import SugerenciaPiezaDesarme
+    from taller.desarme.services import puede_eliminar_pieza
 
     sug_id = data.get("sugerencia_id")
     if not sug_id:
@@ -1820,26 +1671,38 @@ def _revisar_reabrir(data, vehiculo, empresa):
         SugerenciaPiezaDesarme, pk=sug_id, empresa=empresa, vehiculo_desarme=vehiculo
     )
     with transaction.atomic():
-        if sug.estado == SugerenciaPiezaDesarme.CONFIRMADA and sug.pieza_creada_id:
+        if sug.pieza_creada_id:
             pieza = sug.pieza_creada
-            if pieza.lineas_repuesto.exists():
-                return JsonResponse({
-                    "success": False,
-                    "error": "No se puede reabrir: la pieza ya tiene ventas asociadas",
-                }, status=400)
+            can_delete, reason = puede_eliminar_pieza(pieza)
+            if not can_delete:
+                return JsonResponse({"success": False, "error": reason}, status=400)
             pieza.delete()
             sug.pieza_creada = None
         sug.estado = SugerenciaPiezaDesarme.PENDIENTE
-        sug.save(update_fields=["estado", "pieza_creada", "updated_at"])
+        sug.precio_sugerido = None
+        sug.condicion_sugerida = None
+        sug.save(update_fields=["estado", "pieza_creada", "precio_sugerido", "condicion_sugerida", "updated_at"])
 
+    from django.db.models import Sum as _Sum
+    valor_acumulado = (
+        SugerenciaPiezaDesarme.objects.filter(
+            empresa=empresa, vehiculo_desarme=vehiculo, estado=SugerenciaPiezaDesarme.CONFIRMADA
+        ).aggregate(total=_Sum("precio_sugerido"))["total"]
+        or Decimal("0")
+    )
     pendientes = SugerenciaPiezaDesarme.objects.filter(
         empresa=empresa, vehiculo_desarme=vehiculo, estado=SugerenciaPiezaDesarme.PENDIENTE
     ).count()
-    return JsonResponse({"success": True, "pendientes": pendientes})
+    return JsonResponse({
+        "success": True,
+        "pendientes": pendientes,
+        "valor_acumulado": float(valor_acumulado),
+    })
 
 
 def _revisar_agregar(data, vehiculo, empresa):
-    """Agrega pieza extra fuera del catálogo sugerido."""
+    """Agrega pieza extra fuera del catálogo — crea solo SugerenciaPiezaDesarme (CONFIRMADA).
+    PiezaDesarme se crea en bulk al llamar finalizar_sesion."""
     from taller.models.sugerencia_pieza_desarme import SugerenciaPiezaDesarme
     from taller.models.pieza_desarme import CONDICION_BUENA
 
@@ -1850,48 +1713,119 @@ def _revisar_agregar(data, vehiculo, empresa):
         return JsonResponse({"success": False, "error": "código y nombre son requeridos"}, status=400)
 
     condicion = (data.get("condicion") or CONDICION_BUENA).strip()
-    ubicacion = (data.get("ubicacion") or "").strip() or None
-    obs       = (data.get("observaciones") or "").strip() or None
     try:
         precio = Decimal(str(data.get("precio") or 0))
     except Exception:
         precio = Decimal("0")
-    try:
-        cantidad = max(1, int(data.get("cantidad") or 1))
-    except Exception:
-        cantidad = 1
 
     try:
-        with transaction.atomic():
-            pieza = PiezaDesarme.objects.create(
-                empresa=empresa, vehiculo_desarme=vehiculo, codigo=codigo,
-                nombre=nombre, zona=zona, precio_venta_sugerido=precio,
-                condicion=condicion, ubicacion_fisica=ubicacion, observaciones=obs,
-                estado_pieza=ESTADO_DISPONIBLE, activo=True,
-                revisado=True, fecha_revision=timezone.now(), cantidad=cantidad,
-            )
-            # Registrar como CONFIRMADA para que aparezca en la pantalla de revisión
-            SugerenciaPiezaDesarme.objects.get_or_create(
-                vehiculo_desarme=vehiculo, codigo=codigo,
-                defaults={
-                    "empresa": empresa, "nombre": nombre, "zona": zona,
-                    "precio_sugerido": precio,
-                    "estado": SugerenciaPiezaDesarme.CONFIRMADA,
-                    "pieza_creada": pieza,
-                },
-            )
+        sug = SugerenciaPiezaDesarme.objects.create(
+            empresa=empresa,
+            vehiculo_desarme=vehiculo,
+            codigo=codigo,
+            nombre=nombre,
+            zona=zona,
+            precio_sugerido=precio,
+            condicion_sugerida=condicion,
+            estado=SugerenciaPiezaDesarme.CONFIRMADA,
+        )
     except IntegrityError:
         return JsonResponse({
             "success": False,
             "error": f"Ya existe una pieza con código '{codigo}' en este vehículo",
         }, status=400)
 
+    from django.db.models import Sum as _Sum
+    valor_acumulado = (
+        SugerenciaPiezaDesarme.objects.filter(
+            empresa=empresa, vehiculo_desarme=vehiculo, estado=SugerenciaPiezaDesarme.CONFIRMADA
+        ).aggregate(total=_Sum("precio_sugerido"))["total"]
+        or Decimal("0")
+    )
+
     return JsonResponse({
         "success": True,
-        "pieza_id": pieza.pk,
-        "pieza_nombre": pieza.nombre,
-        "pieza_codigo": pieza.codigo,
-        "pieza_zona": pieza.zona,
+        "sugerencia_id": sug.pk,
+        "nombre": sug.nombre,
+        "codigo": sug.codigo,
+        "zona": sug.zona,
+        "valor_acumulado": float(valor_acumulado),
+    })
+
+
+def _revisar_finalizar_sesion(data, vehiculo, empresa, user, request):
+    """
+    Cierra la sesión de despiece:
+    - Crea PiezaDesarme en bulk para cada SugerenciaPiezaDesarme CONFIRMADA sin pieza_creada.
+    - Escribe VehiculoDesarmeEvent(tipo=SESION_DESPIECE_FINALIZADA).
+    - Avanza vehiculo.estado_operativo a EN_PROCESAMIENTO.
+    """
+    from taller.models.sugerencia_pieza_desarme import SugerenciaPiezaDesarme
+    from taller.models.vehiculo_desarme_event import VehiculoDesarmeEvent, TipoEventoDesarme
+    from taller.models.vehiculo_desarme import EstadoOperativo
+    from taller.models.pieza_desarme import CONDICION_BUENA
+
+    with transaction.atomic():
+        confirmadas = list(
+            SugerenciaPiezaDesarme.objects
+            .select_for_update()
+            .filter(
+                empresa=empresa,
+                vehiculo_desarme=vehiculo,
+                estado=SugerenciaPiezaDesarme.CONFIRMADA,
+                pieza_creada__isnull=True,
+            )
+            .order_by("id")
+        )
+
+        if not confirmadas:
+            return JsonResponse(
+                {"success": False, "error": "No hay piezas confirmadas pendientes de crear"},
+                status=400,
+            )
+
+        piezas_nuevas = [
+            PiezaDesarme(
+                empresa=empresa,
+                vehiculo_desarme=vehiculo,
+                codigo=sug.codigo,
+                nombre=sug.nombre,
+                zona=sug.zona or "",
+                precio_venta_sugerido=sug.precio_sugerido,
+                condicion=sug.condicion_sugerida or CONDICION_BUENA,
+                estado_pieza=ESTADO_DISPONIBLE,
+                activo=True,
+                revisado=True,
+                fecha_revision=timezone.now(),
+                cantidad=1,
+            )
+            for sug in confirmadas
+        ]
+        PiezaDesarme.objects.bulk_create(piezas_nuevas)
+
+        # Link each sugerencia to its newly created pieza (bulk_create sets PKs in Django 4.1+)
+        for sug, pieza in zip(confirmadas, piezas_nuevas):
+            sug.pieza_creada = pieza
+            sug.save(update_fields=["pieza_creada", "updated_at"])
+
+        VehiculoDesarmeEvent.objects.create(
+            empresa=empresa,
+            vehiculo=vehiculo,
+            tipo=TipoEventoDesarme.SESION_DESPIECE_FINALIZADA,
+            metadata={"piezas_creadas": len(piezas_nuevas)},
+            created_by=user,
+        )
+
+        from taller.models.vehiculo_desarme import VehiculoDesarme as _VD
+        _VD.objects.filter(pk=vehiculo.pk).update(
+            estado_operativo=EstadoOperativo.EN_PROCESAMIENTO,
+        )
+
+    redirect_url = _desarme_url(request, f"vehiculos/{vehiculo.pk}/")
+    return JsonResponse({
+        "success": True,
+        "piezas_creadas": len(piezas_nuevas),
+        "redirect_url": redirect_url,
     })
 
 
@@ -1928,7 +1862,7 @@ def avisar_owner_pieza(request, pk):
             precio_str = f"{simbolo}{miles}"
 
     inventario_url = request.build_absolute_uri(
-        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario/")
+        _desarme_url(request, f"vehiculos/{pieza.vehiculo_desarme_id}/inventario-inteligente/")
     )
     vendedor_nombre = request.user.get_full_name() or request.user.username
 
