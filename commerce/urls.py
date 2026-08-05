@@ -42,6 +42,7 @@ urlpatterns = [
     path("checkout/", checkout.checkout_view, name="checkout"),
     path("pedido/<str:order_number>/", checkout.order_received, name="order_received"),
     # Pagos
+    path("pedido/<str:order_number>/pago/", payment.payment_select, name="payment_select"),
     path("pedido/<str:order_number>/pago/iniciar/", payment.payment_start, name="payment_start"),
     path("pago/retorno/", payment.payment_return, name="payment_return"),
     path("pedido/<str:order_number>/pago/cancelado/", payment.payment_cancel, name="payment_cancel"),
