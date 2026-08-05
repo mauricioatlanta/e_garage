@@ -1,0 +1,79 @@
+{% extends "commerce/themes/monteazul/base.html" %}
+{% load humanize %}{% load money %}
+{% block meta_title %}Selecciona tu método de pago | MonteAzul SPA{% endblock %}
+
+{% block content %}
+<div class="mx-auto max-w-xl px-4 py-12">
+
+  <h1 class="text-2xl font-semibold text-white mb-2">Elige cómo pagar</h1>
+  <p class="text-white/50 mb-8 text-sm">Pedido <span class="font-mono text-white/70">{{ order.order_number }}</span> — Total: <strong class="text-white">{{ order.total|money_clp }}</strong></p>
+
+  <!-- Resumen de ítems -->
+  <div class="rounded-2xl border border-white/10 bg-white/5 p-5 mb-8">
+    <h2 class="text-sm font-semibold text-white/60 uppercase tracking-wide mb-3">Resumen</h2>
+    <ul class="space-y-2 text-sm text-white/80">
+      {% for item in order.items.all %}
+        <li class="flex justify-between">
+          <span>{{ item.name }} <span class="text-white/40">×{{ item.quantity }}</span></span>
+          <span class="text-white font-medium">{{ item.subtotal|money_clp }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+    <div class="border-t border-white/10 mt-3 pt-3 flex justify-between font-semibold text-white">
+      <span>Total</span>
+      <span>{{ order.total|money_clp }}</span>
+    </div>
+  </div>
+
+  <!-- Opciones de pago -->
+  <div class="space-y-4">
+
+    <!-- Webpay -->
+    <form method="post" action="{% url 'commerce:payment_start' order.order_number %}">
+      {% csrf_token %}
+      <input type="hidden" name="gateway_key" value="webpay">
+      <button type="submit"
+              class="w-full flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 px-6 py-5 text-left transition-colors group">
+        <div class="w-12 h-12 rounded-xl bg-[#00c4e0]/10 flex items-center justify-center flex-shrink-0">
+          <svg class="w-7 h-7 text-[#00c4e0]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="5" width="20" height="14" rx="2"/>
+            <path d="M2 10h20"/>
+          </svg>
+        </div>
+        <div>
+          <div class="font-semibold text-white">Webpay</div>
+          <div class="text-sm text-white/50">Tarjeta de crédito o débito</div>
+        </div>
+        <div class="ml-auto text-white/30 group-hover:text-white/60 transition-colors">→</div>
+      </button>
+    </form>
+
+    <!-- Transferencia bancaria -->
+    <form method="post" action="{% url 'commerce:payment_start' order.order_number %}">
+      {% csrf_token %}
+      <input type="hidden" name="gateway_key" value="bank_transfer">
+      <button type="submit"
+              class="w-full flex items-center gap-4 rounded-2xl border border-white/10 bg-white/5 hover:bg-white/10 px-6 py-5 text-left transition-colors group">
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+          <svg class="w-7 h-7 text-emerald-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 21h18M3 10h18M5 6l7-3 7 3M4 10v11M20 10v11M8 10v11M12 10v11M16 10v11"/>
+          </svg>
+        </div>
+        <div>
+          <div class="font-semibold text-white">Transferencia bancaria</div>
+          <div class="text-sm text-white/50">Te enviamos los datos por correo</div>
+        </div>
+        <div class="ml-auto text-white/30 group-hover:text-white/60 transition-colors">→</div>
+      </button>
+    </form>
+
+  </div>
+
+  <div class="mt-8 text-center">
+    <a href="{% url 'commerce:cart' %}" class="text-sm text-white/40 hover:text-white/70 transition-colors">
+      ← Volver al carrito
+    </a>
+  </div>
+
+</div>
+{% endblock %}

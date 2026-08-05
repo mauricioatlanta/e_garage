@@ -79,7 +79,7 @@ def checkout_view(request):
             except ValueError as exc:
                 form.add_error(None, str(exc))
             else:
-                return redirect("commerce:order_received", order_number=order.order_number)
+                return redirect("commerce:payment_select", order_number=order.order_number)
     else:
         form = CheckoutForm()
 

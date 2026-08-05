@@ -35,6 +35,25 @@ def _get_empresa_or_404(request):
     return empresa
 
 
+@require_http_methods(["GET"])
+def payment_select(request, order_number):
+    """Página de selección de método de pago (GET). Muestra botones Webpay / Transferencia."""
+    empresa = _get_empresa_or_404(request)
+    order = get_object_or_404(CommerceOrder, empresa=empresa, order_number=order_number)
+
+    session_key = request.session.session_key or ""
+    if order.session_key and order.session_key != session_key:
+        raise Http404
+
+    if order.payment_status == CommerceOrder.PAYMENT_PAID:
+        return redirect("commerce:order_received", order_number=order_number)
+
+    return render(request, "commerce/themes/monteazul/payments/select.html", {
+        "brand": request.commerce_brand,
+        "order": order,
+    })
+
+
 @require_POST
 def payment_start(request, order_number):
     """
