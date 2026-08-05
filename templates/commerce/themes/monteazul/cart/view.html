@@ -295,17 +295,24 @@
         .summary-value { font-weight: 700; color: var(--text); }
         .summary-total { font-size: 1.4rem; color: var(--cyan); font-weight: 800; font-family: 'JetBrains Mono', monospace; }
         .btn-checkout {
+            display: block;
+            text-align: center;
+            text-decoration: none;
             width: 100%;
             padding: 16px;
-            background: var(--cyan-soft);
-            color: var(--cyan);
-            border: 1px solid rgba(0,212,255,0.3);
+            background: #ffc800;
+            color: #0a0c10;
+            border: none;
             border-radius: 10px;
             font-size: 1rem;
             font-weight: 700;
-            cursor: default;
+            cursor: pointer;
             margin-top: 20px;
-            opacity: 0.6;
+            transition: background 0.2s, box-shadow 0.2s;
+        }
+        .btn-checkout:hover {
+            background: #e6b300;
+            box-shadow: 0 0 24px rgba(255,200,0,0.3);
         }
         .btn-continue {
             display: block;
