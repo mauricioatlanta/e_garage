@@ -13,10 +13,12 @@ class CheckoutForm(forms.Form):
     name = forms.CharField(
         label="Nombre completo",
         max_length=120,
+        required=False,
         widget=forms.TextInput(attrs={"placeholder": "Tu nombre", "class": "form-input"}),
     )
     email = forms.EmailField(
         label="Correo electrónico",
+        required=False,
         widget=forms.EmailInput(attrs={"placeholder": "correo@ejemplo.com", "class": "form-input"}),
     )
     phone = forms.CharField(
