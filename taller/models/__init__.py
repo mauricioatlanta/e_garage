@@ -77,6 +77,9 @@ from .inspeccion_ingreso import InspeccionIngreso, DanoInspeccion, EvidenciaInsp
 # Dominios personalizados
 from .empresa_dominio import EmpresaDominio
 
+# Trust & Security
+from .sesion_usuario import SesionUsuario
+
 # Ledger de movimientos de inventario
 from .movimiento_inventario import MovimientoInventario
 
@@ -160,6 +163,8 @@ __all__ = [
     "MotorVehiculoEmpresa",
     # Ledger de inventario
     "MovimientoInventario",
+    # Trust & Security
+    "SesionUsuario",
 ]
 
 # Intentar importar otros modelos si existen (para compatibilidad)

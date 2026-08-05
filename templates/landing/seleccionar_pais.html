@@ -363,6 +363,9 @@
     <!-- Vanta.js Background -->
     <div id="vanta-background"></div>
 
+    <!-- SEO H1 oculto para Google -->
+    <h1 class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;">eGarage - Sistema operativo para negocios automotrices en 10 países - Talleres, Desarmadurías, Casas de Repuestos</h1>
+
     <!-- Content -->
     <div class="content-wrapper">
         <!-- Logo -->
@@ -420,10 +423,11 @@
 
         <!-- Products row -->
         <div style="margin-top:1.5rem; display:flex; gap:0.75rem; justify-content:center; flex-wrap:wrap;">
-            <a href="{% url 'landing_workshop' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:1px solid #00f5ff44; color:#00f5ffaa; text-decoration:none; transition:all 0.2s; background:rgba(0,245,255,0.04);" onmouseover="this.style.borderColor='#00f5ff';this.style.color='#00f5ff'" onmouseout="this.style.borderColor='#00f5ff44';this.style.color='#00f5ffaa'">⚙ WORKSHOP</a>
-            <a href="{% url 'landing_salvage' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:1px solid #d946ef44; color:#d946efaa; text-decoration:none; transition:all 0.2s; background:rgba(217,70,239,0.04);" onmouseover="this.style.borderColor='#d946ef';this.style.color='#d946ef'" onmouseout="this.style.borderColor='#d946ef44';this.style.color='#d946efaa'">🧩 SALVAGE</a>
-            <a href="{% url 'landing_parts' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:1px solid #a3e63544; color:#a3e635aa; text-decoration:none; transition:all 0.2s; background:rgba(163,230,53,0.04);" onmouseover="this.style.borderColor='#a3e635';this.style.color='#a3e635'" onmouseout="this.style.borderColor='#a3e63544';this.style.color='#a3e635aa'">🏪 PARTS</a>
+            <a href="{% url 'landing_workshop' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:1px solid #00f5ff44; color:#00f5ffaa; text-decoration:none; transition:all 0.2s; background:rgba(0,245,255,0.04);" onmouseover="this.style.borderColor='#00f5ff';this.style.color='#00f5ff'" onmouseout="this.style.borderColor='#00f5ff44';this.style.color='#00f5ffaa'">⚙ Taller mecánico / Workshop</a>
+            <a href="{% url 'landing_desarmadurias' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:2px solid #d946ef88; color:#d946ef; text-decoration:none; transition:all 0.2s; background:rgba(217,70,239,0.08);" onmouseover="this.style.borderColor='#d946ef';this.style.background='rgba(217,70,239,0.15)'" onmouseout="this.style.borderColor='#d946ef88';this.style.background='rgba(217,70,239,0.08)'">🧩 Desarmaduría · Desarmadero (AR) · Yonke / Deshuesadero (MX) · Salvage Yard (US)</a>
+            <a href="{% url 'landing_parts' %}" style="font-family:'Orbitron',monospace; font-size:0.55rem; font-weight:700; letter-spacing:0.12em; padding:0.3rem 0.9rem; border-radius:99px; border:1px solid #a3e63544; color:#a3e635aa; text-decoration:none; transition:all 0.2s; background:rgba(163,230,53,0.04);" onmouseover="this.style.borderColor='#a3e635';this.style.color='#a3e635'" onmouseout="this.style.borderColor='#a3e63544';this.style.color='#a3e635aa'">🏪 Casa de Repuestos / Autopartes</a>
         </div>
+        <p style="font-size:0.55rem; color:#4b5563; text-align:center; margin-top:1rem; max-width:640px; margin-left:auto; margin-right:auto; line-height:1.5;">eGarage disponible en Chile (desarmaduría), Argentina (desarmadero), México (deshuesadero, yonke), Perú, Colombia, Ecuador, Venezuela, Uruguay, Brasil y USA (salvage yard). Sistema con IVA, IGV, impuestos locales y pagos Mercado Pago, PSE, SPEI.</p>
     </div>
 
     <script>
