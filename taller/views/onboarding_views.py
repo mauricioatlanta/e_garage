@@ -119,9 +119,22 @@ def onboarding_wizard(request, step=None):
 
     # Agregar formularios según paso
     if paso_actual == 1:
+        config = getattr(empresa, "config", None)
+        # Si el rubro ya fue capturado en signup, saltar directamente a finalizar
+        if config is not None and config.has_completed_business_setup():
+            messages.info(
+                request,
+                "Tu negocio ya está configurado como "
+                f"{config.get_rubro_principal_display()}. "
+                "Puedes ajustarlo en Configuración cuando quieras.",
+            )
+            if empresa.onboarding_step <= 1:
+                empresa.onboarding_step = 3
+                empresa.save(update_fields=["onboarding_step"])
+            return redirect("taller:onboarding_step", step="finalizar")
+
         context["form"] = OnboardingIdentidadForm(instance=empresa)
         context["rubro_choices"] = ConfiguracionEmpresa.RUBRO_CHOICES
-        config = getattr(empresa, "config", None)
         context["rubro_actual"] = getattr(config, "rubro_principal", "WORKSHOP") if config else "WORKSHOP"
     elif paso_actual == 2:
         return redirect("taller:onboarding_step", step="finalizar")

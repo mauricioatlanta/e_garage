@@ -50,6 +50,15 @@ body { background: #0a0a0a; font-family: 'Inter', sans-serif; color: #fff; min-h
 .alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 12px; }
 .alert-error, .alert-danger { background: rgba(248, 113, 113, 0.15); color: #f87171; border-left: 4px solid #f87171; }
 @media (max-width: 768px) { .glass-card { padding: 32px 24px; } .pricing-grid { grid-template-columns: 1fr; } }
+/* Rubro picker */
+.rubro-card-v2 { background:rgba(0,0,0,0.5);border:2px solid rgba(34,211,238,0.2);border-radius:10px;padding:10px 12px;cursor:pointer;position:relative;transition:border-color .2s,background .2s; }
+.rubro-card-v2:hover:not(.rubro-disabled) { border-color:rgba(34,211,238,0.5);background:rgba(34,211,238,0.05); }
+.rubro-card-v2.rubro-principal-selected { border-color:#22d3ee;background:rgba(34,211,238,0.12);box-shadow:0 0 12px rgba(34,211,238,0.25); }
+.rubro-card-v2.rubro-adicional-selected { border-color:#a3e635;background:rgba(163,230,53,0.07);box-shadow:0 0 8px rgba(163,230,53,0.15); }
+.rubro-card-v2.rubro-disabled { cursor:default;opacity:0.4;pointer-events:none; }
+.rubro-badge-v2 { position:absolute;top:5px;right:6px;font-size:10px;font-weight:900;padding:1px 5px;border-radius:3px;display:none; }
+.rubro-badge-main { background:#22d3ee;color:#000; }
+.rubro-badge-add  { background:#65a30d;color:#fff; }
 </style>
 {% endblock %}
 
@@ -146,6 +155,116 @@ body { background: #0a0a0a; font-family: 'Inter', sans-serif; color: #fff; min-h
             </div>
             {% endif %}
 
+            <!-- Business type selector (two-step) -->
+            <div class="form-group" id="rubro-section">
+                {{ form.rubro_principal_signup }}
+                <div style="display:none" aria-hidden="true">{{ form.rubros_adicionales }}</div>
+
+                <label class="form-label">Primary business activity <span style="color:#f87171;">*</span></label>
+                <p class="help-text" style="margin-bottom:10px;">Choose one — sets your account theme and default modules.</p>
+                {% if form.rubro_principal_signup.errors %}
+                    {% for e in form.rubro_principal_signup.errors %}<div class="error-message">{{ e }}</div>{% endfor %}
+                {% endif %}
+                <div class="error-message" id="rubro-principal-error" style="display:none;margin-top:4px;">Please select your primary business type.</div>
+
+                <div id="principal-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                    <div class="rubro-card-v2" data-rubro="TALLER_MECANICO" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge-v2 rubro-badge-main">Main</span>
+                        <div style="font-size:1.2rem;">🔧</div>
+                        <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Auto Repair</div>
+                        <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Cars, trucks, motorcycles</div>
+                    </div>
+                    <div class="rubro-card-v2" data-rubro="CASA_REPUESTOS" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge-v2 rubro-badge-main">Main</span>
+                        <div style="font-size:1.2rem;">📦</div>
+                        <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Auto Parts</div>
+                        <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Parts sales &amp; retail</div>
+                    </div>
+                    <div class="rubro-card-v2" data-rubro="DESARMADURIA" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge-v2 rubro-badge-main">Main</span>
+                        <div style="font-size:1.2rem;">🔩</div>
+                        <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Salvage / Dismantler</div>
+                        <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Used parts, donor vehicles</div>
+                    </div>
+                    <div class="rubro-card-v2" data-rubro="NEUMATICOS" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge-v2 rubro-badge-main">Main</span>
+                        <div style="font-size:1.2rem;">⭕</div>
+                        <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Tires / Wheels</div>
+                        <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Tire and wheel shop</div>
+                    </div>
+                    <div class="rubro-card-v2" data-rubro="CARROCERIA_DETAILING" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge-v2 rubro-badge-main">Main</span>
+                        <div style="font-size:1.2rem;">🎨</div>
+                        <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Body Shop / Detailing</div>
+                        <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Paint, wash, detailing</div>
+                    </div>
+                    <div class="rubro-card-v2" data-rubro="ESPECIALISTA" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge-v2 rubro-badge-main">Main</span>
+                        <div style="font-size:1.2rem;">⚡</div>
+                        <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Specialist</div>
+                        <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Electrical, exhaust, audio…</div>
+                    </div>
+                    <div class="rubro-card-v2" data-rubro="OTRO" data-section="principal" role="radio" tabindex="0">
+                        <span class="rubro-badge-v2 rubro-badge-main">Main</span>
+                        <div style="font-size:1.2rem;">⊞</div>
+                        <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Other / Mixed</div>
+                        <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Multiple services or unlisted</div>
+                    </div>
+                </div>
+
+                <div id="adicionales-section" style="display:none;margin-top:16px;">
+                    <p style="font-size:13px;color:#94a3b8;margin-bottom:8px;font-weight:600;">Additional activities <span style="font-weight:400;">(optional, max 2)</span></p>
+                    {% if form.rubros_adicionales.errors %}
+                        {% for e in form.rubros_adicionales.errors %}<div class="error-message">{{ e }}</div>{% endfor %}
+                    {% endif %}
+                    <div class="error-message" id="rubro-adicional-error" style="display:none;margin-bottom:4px;">Maximum 2 additional activities.</div>
+                    <div id="adicionales-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;">
+                        <div class="rubro-card-v2" data-rubro="TALLER_MECANICO" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge-v2 rubro-badge-add">+</span>
+                            <div style="font-size:1.2rem;">🔧</div>
+                            <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Auto Repair</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Cars, trucks, motorcycles</div>
+                        </div>
+                        <div class="rubro-card-v2" data-rubro="CASA_REPUESTOS" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge-v2 rubro-badge-add">+</span>
+                            <div style="font-size:1.2rem;">📦</div>
+                            <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Auto Parts</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Parts sales &amp; retail</div>
+                        </div>
+                        <div class="rubro-card-v2" data-rubro="DESARMADURIA" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge-v2 rubro-badge-add">+</span>
+                            <div style="font-size:1.2rem;">🔩</div>
+                            <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Salvage / Dismantler</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Used parts, donor vehicles</div>
+                        </div>
+                        <div class="rubro-card-v2" data-rubro="NEUMATICOS" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge-v2 rubro-badge-add">+</span>
+                            <div style="font-size:1.2rem;">⭕</div>
+                            <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Tires / Wheels</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Tire and wheel shop</div>
+                        </div>
+                        <div class="rubro-card-v2" data-rubro="CARROCERIA_DETAILING" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge-v2 rubro-badge-add">+</span>
+                            <div style="font-size:1.2rem;">🎨</div>
+                            <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Body Shop / Detailing</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Paint, wash, detailing</div>
+                        </div>
+                        <div class="rubro-card-v2" data-rubro="ESPECIALISTA" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge-v2 rubro-badge-add">+</span>
+                            <div style="font-size:1.2rem;">⚡</div>
+                            <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Specialist</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Electrical, exhaust, audio…</div>
+                        </div>
+                        <div class="rubro-card-v2" data-rubro="OTRO" data-section="adicional" role="checkbox" tabindex="0">
+                            <span class="rubro-badge-v2 rubro-badge-add">+</span>
+                            <div style="font-size:1.2rem;">⊞</div>
+                            <div style="font-size:0.8rem;font-weight:800;color:#fff;margin-top:4px;">Other / Mixed</div>
+                            <div style="font-size:0.7rem;color:#94a3b8;margin-top:2px;">Multiple services or unlisted</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <label for="id_password1" class="form-label">Password *</label>
                 {{ form.password1|add_class:'form-control'|attr:'placeholder:••••••••' }}
@@ -239,6 +358,83 @@ document.addEventListener('DOMContentLoaded', function() {
     updatePlanPrices('US');
     var countrySelect = document.getElementById('id_country');
     if (countrySelect) countrySelect.addEventListener('change', function() { updatePlanPrices(this.value || 'US'); });
+
+    // Rubro card picker (two-section: principal + adicionales)
+    (function() {
+        var MAX_ADICIONALES = 2;
+        var principalInput = document.querySelector('input[name="rubro_principal_signup"]');
+        function getAdicionalCb(key) { return document.querySelector('input[name="rubros_adicionales"][value="'+key+'"]'); }
+        function countAdicionales() { return document.querySelectorAll('input[name="rubros_adicionales"]:checked').length; }
+        function syncAdicionalesGridDisabled(principalKey) {
+            document.querySelectorAll('#adicionales-grid .rubro-card-v2').forEach(function(c) {
+                if (c.dataset.rubro === principalKey) {
+                    c.classList.add('rubro-disabled');
+                    var cb = getAdicionalCb(principalKey); if (cb) cb.checked = false;
+                    c.classList.remove('rubro-adicional-selected');
+                    var b = c.querySelector('.rubro-badge-add'); if (b) b.style.display = 'none';
+                } else { c.classList.remove('rubro-disabled'); }
+            });
+        }
+        function selectPrincipalCard(key) {
+            if (!principalInput) return;
+            principalInput.value = key;
+            document.querySelectorAll('#principal-grid .rubro-card-v2').forEach(function(c) {
+                var b = c.querySelector('.rubro-badge-main');
+                if (c.dataset.rubro === key) { c.classList.add('rubro-principal-selected'); if (b) b.style.display = ''; }
+                else { c.classList.remove('rubro-principal-selected'); if (b) b.style.display = 'none'; }
+            });
+            var sec = document.getElementById('adicionales-section'); if (sec) sec.style.display = '';
+            syncAdicionalesGridDisabled(key);
+            var err = document.getElementById('rubro-principal-error'); if (err) err.style.display = 'none';
+        }
+        function toggleAdicionalCard(card) {
+            if (card.classList.contains('rubro-disabled')) return;
+            var cb = getAdicionalCb(card.dataset.rubro); if (!cb) return;
+            var badge = card.querySelector('.rubro-badge-add');
+            if (cb.checked) {
+                cb.checked = false; card.classList.remove('rubro-adicional-selected'); if (badge) badge.style.display = 'none';
+            } else {
+                if (countAdicionales() >= MAX_ADICIONALES) {
+                    var eAd = document.getElementById('rubro-adicional-error');
+                    if (eAd) { eAd.style.display = 'block'; setTimeout(function() { eAd.style.display = 'none'; }, 3000); }
+                    return;
+                }
+                cb.checked = true; card.classList.add('rubro-adicional-selected'); if (badge) badge.style.display = '';
+                var eAd2 = document.getElementById('rubro-adicional-error'); if (eAd2) eAd2.style.display = 'none';
+            }
+        }
+        document.querySelectorAll('#principal-grid .rubro-card-v2').forEach(function(card) {
+            function act() { selectPrincipalCard(card.dataset.rubro); }
+            card.addEventListener('click', act);
+            card.addEventListener('keydown', function(e) { if (e.key===' '||e.key==='Enter') { e.preventDefault(); act(); } });
+        });
+        document.querySelectorAll('#adicionales-grid .rubro-card-v2').forEach(function(card) {
+            function tog() { toggleAdicionalCard(card); }
+            card.addEventListener('click', tog);
+            card.addEventListener('keydown', function(e) { if (e.key===' '||e.key==='Enter') { e.preventDefault(); tog(); } });
+        });
+        var form = document.querySelector('form');
+        if (form) {
+            form.addEventListener('submit', function(e) {
+                if (!principalInput || !principalInput.value) {
+                    e.preventDefault();
+                    var err = document.getElementById('rubro-principal-error');
+                    if (err) { err.style.display = 'block'; err.scrollIntoView({behavior:'smooth',block:'center'}); }
+                }
+            });
+        }
+        // Restore state after server-side error
+        if (principalInput && principalInput.value) {
+            selectPrincipalCard(principalInput.value);
+            document.querySelectorAll('input[name="rubros_adicionales"]:checked').forEach(function(cb) {
+                var card = document.querySelector('#adicionales-grid .rubro-card-v2[data-rubro="'+cb.value+'"]');
+                if (card && !card.classList.contains('rubro-disabled')) {
+                    card.classList.add('rubro-adicional-selected');
+                    var b = card.querySelector('.rubro-badge-add'); if (b) b.style.display = '';
+                }
+            });
+        }
+    })();
 });
 </script>
 {% endlanguage %}
