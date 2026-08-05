@@ -50,8 +50,10 @@ def _tienda_storefront_render(request, empresa):
 
     base_qs = PiezaDesarme.objects.filter(
         empresa=empresa,
-        estado_pieza=ESTADO_DISPONIBLE,
         activo=True,
+        publicada=True,
+        estado_pieza=ESTADO_DISPONIBLE,
+        cantidad__gt=0,
     ).select_related(
         "vehiculo_desarme", "vehiculo_desarme__marca",
         "vehiculo_desarme__modelo", "vehiculo_desarme__motor",
@@ -269,8 +271,10 @@ def kiosko_centralizado(request):
     # Queryset base: piezas disponibles de empresas autorizadas
     base_qs = PiezaDesarme.objects.filter(
         empresa_id__in=empresas_ok,
-        estado_pieza=ESTADO_DISPONIBLE,
         activo=True,
+        publicada=True,
+        estado_pieza=ESTADO_DISPONIBLE,
+        cantidad__gt=0,
     ).select_related("vehiculo_desarme", "vehiculo_desarme__marca", "vehiculo_desarme__modelo", "empresa")
 
     # ── Lectura de parámetros GET ──────────────────────────────────────────────

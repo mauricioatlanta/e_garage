@@ -17,6 +17,8 @@ from taller.models.extras_vehiculo import CajaVehiculoEmpresa, MotorVehiculoEmpr
 from taller.models.perfil_usuario import PerfilUsuario
 from taller.models.interchange_pieza import InterchangePieza
 from taller.models.pieza_desarme import PiezaDesarme, PiezaDesarmeCompanyLabel
+from taller.models.vehiculo_desarme import VehiculoDesarme
+from taller.models.vehiculo_desarme_event import VehiculoDesarmeEvent
 from taller.models.precio_suscripcion import PrecioSuscripcion
 from taller.models.subscription_change import SubscriptionChange
 from taller.models.suscripcion_transaccion import SuscripcionTransaccion
@@ -389,10 +391,11 @@ class PiezaDesarmeAdmin(admin.ModelAdmin):
         "vehiculo_desarme",
         "cantidad",
         "estado_pieza",
+        "publicada",
         "activo",
         "empresa",
     )
-    list_filter = ("empresa", "estado_pieza", "activo")
+    list_filter = ("empresa", "estado_pieza", "publicada", "activo")
     search_fields = ("codigo", "nombre")
     list_select_related = ("vehiculo_desarme", "empresa")
     raw_id_fields = ("vehiculo_desarme", "repuesto", "part")
@@ -1055,6 +1058,70 @@ class MovimientoInventarioAdmin(admin.ModelAdmin):
         "created_at",
         "notas",
         "metadata",
+    )
+    actions = []
+
+    def has_add_permission(self, request):
+        return False
+
+    def has_change_permission(self, request, obj=None):
+        return False
+
+    def has_delete_permission(self, request, obj=None):
+        return False
+
+
+# ---------------------------------------------------------------------------
+# VehiculoDesarme — admin operacional (P2-DB)
+# ---------------------------------------------------------------------------
+
+@admin.register(VehiculoDesarme, site=admin_site)
+class VehiculoDesarmeAdmin(admin.ModelAdmin):
+    list_display = (
+        "__str__",
+        "empresa",
+        "estado_operativo",
+        "estado_desarme",
+        "fecha_ingreso_desarme",
+        "costo_adquisicion",
+    )
+    list_filter = ("empresa", "estado_operativo", "estado_desarme")
+    search_fields = ("patente", "vin", "marca_texto", "modelo_texto")
+    list_select_related = ("empresa", "marca", "modelo")
+    ordering = ("-fecha_ingreso_desarme", "-id")
+    readonly_fields = ("created_at", "updated_at")
+
+
+# ---------------------------------------------------------------------------
+# VehiculoDesarmeEvent — append-only, principalmente lectura
+# ---------------------------------------------------------------------------
+
+@admin.register(VehiculoDesarmeEvent, site=admin_site)
+class VehiculoDesarmeEventAdmin(admin.ModelAdmin):
+    list_display = (
+        "occurred_at",
+        "empresa",
+        "vehiculo",
+        "tipo",
+        "created_by",
+        "idempotency_key",
+    )
+    list_filter = ("empresa", "tipo")
+    search_fields = ("vehiculo__patente", "vehiculo__vin", "idempotency_key")
+    list_select_related = ("empresa", "vehiculo", "created_by")
+    ordering = ("-occurred_at",)
+    readonly_fields = (
+        "empresa",
+        "vehiculo",
+        "pieza",
+        "documento",
+        "tipo",
+        "metadata",
+        "idempotency_key",
+        "occurred_at",
+        "created_by",
+        "created_at",
+        "updated_at",
     )
     actions = []
 

@@ -106,7 +106,7 @@
 
 {% block main_actions %}
 {% if vehiculo %}
-<a href="{% country_url 'desarme:inventario_vehiculo' vehiculo.pk %}"
+<a href="{% country_url 'desarme:inventario_inteligente' vehiculo.pk %}"
    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg border border-gray-500 text-gray-300 hover:bg-gray-700 text-sm">
   ← {% trans "Inventario vehículo" %}
 </a>
@@ -228,7 +228,7 @@
         {% trans "Guardar" %}
       </button>
       {% if repuesto and repuesto.vehiculo_desarme_id %}
-      <a href="{% country_url 'desarme:inventario_vehiculo' repuesto.vehiculo_desarme_id %}"
+      <a href="{% country_url 'desarme:inventario_inteligente' repuesto.vehiculo_desarme_id %}"
          class="btn px-4 py-2 rounded-lg bg-slate-600 hover:bg-slate-500 text-white font-medium text-sm">
         {% trans "Cancelar" %}
       </a>

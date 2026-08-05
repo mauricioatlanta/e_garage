@@ -209,11 +209,11 @@
       {% else %}—{% endif %}
     </p>
     <p class="vehiculo-origen">
-      {% trans "Vehículo" %}: {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_desarme_id %}">{{ p.vehiculo_desarme }}{% if p.vehiculo_desarme.anio %} ({{ p.vehiculo_desarme.anio }}){% endif %}</a>{% else %}—{% endif %}
+      {% trans "Vehículo" %}: {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:inventario_inteligente' p.vehiculo_desarme_id %}">{{ p.vehiculo_desarme }}{% if p.vehiculo_desarme.anio %} ({{ p.vehiculo_desarme.anio }}){% endif %}</a>{% else %}—{% endif %}
     </p>
     <div class="flex gap-1 mt-2 flex-wrap">
       <a href="{% country_url 'desarme:editar_pieza' p.pk %}" class="interactive-btn">{% trans "Editar" %}</a>
-      {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:inventario_vehiculo' p.vehiculo_desarme_id %}" class="interactive-btn">{% trans "Inventario" %}</a>{% endif %}
+      {% if p.vehiculo_desarme_id %}<a href="{% country_url 'desarme:inventario_inteligente' p.vehiculo_desarme_id %}" class="interactive-btn">{% trans "Inventario" %}</a>{% endif %}
       {% if request.user|is_vendedor %}
       <a href="{% country_url 'desarme:avisar_owner_pieza' p.pk %}"
          class="interactive-btn"

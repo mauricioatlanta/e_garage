@@ -259,7 +259,7 @@ def crear_pieza(request):
                     pieza.save()
                 messages.success(request, f"Pieza {pieza.codigo} creada.")
                 if pieza.vehiculo_desarme_id:
-                    return redirect("desarme:inventario_vehiculo", pk=pieza.vehiculo_desarme_id)
+                    return redirect("desarme:inventario_inteligente", pk=pieza.vehiculo_desarme_id)
                 return redirect("desarme:lista_piezas")
             except Exception as e:
                 log.exception("Error creando pieza de desarme")
@@ -297,7 +297,7 @@ def editar_pieza(request, pk):
                 form.save()
                 messages.success(request, "Pieza actualizada.")
                 if pieza.vehiculo_desarme_id:
-                    return redirect("desarme:inventario_vehiculo", pk=pieza.vehiculo_desarme_id)
+                    return redirect("desarme:inventario_inteligente", pk=pieza.vehiculo_desarme_id)
                 return redirect("desarme:lista_piezas")
             except Exception as e:
                 log.exception("Error actualizando pieza de desarme")
@@ -314,22 +314,3 @@ def editar_pieza(request, pk):
     )
 
 
-@login_required
-def inventario_vehiculo(request, pk):
-    """Inventario de piezas de un vehículo de desarme."""
-    empresa = _empresa_or_redirect(request)
-    if not empresa:
-        return redirect("/")
-
-    vehiculo = get_object_or_404(
-        VehiculoDesarme,
-        pk=pk,
-        empresa=empresa,
-    )
-    piezas = vehiculo.piezas_desarme.all().order_by("codigo")
-
-    return render(
-        request,
-        "taller/desarme/inventario_vehiculo.html",
-        {"vehiculo": vehiculo, "piezas": piezas, "empresa": empresa},
-    )

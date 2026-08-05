@@ -4,7 +4,8 @@ ningún Vehiculo intermedio en ningún momento:
 
   ajax_agregar_motor/caja (privados nuevos)
     -> crear_vehiculo (país USA, sin cliente)
-    -> generar_inventario_vehiculo
+    -> inicializar_sugerencias
+    -> finalizar_sesion
     -> inventario_inteligente
     -> crear_venta_desde_inventario
     -> confirmar_venta_desde_inventario
@@ -25,8 +26,8 @@ from django.contrib.messages.storage.fallback import FallbackStorage
 from django.contrib.sessions.backends.db import SessionStore
 from django.test import RequestFactory
 
-from taller.desarme.services import generar_inventario_vehiculo
-from taller.desarme.views import crear_vehiculo
+from taller.desarme.services import inicializar_sugerencias
+from taller.desarme.views import crear_vehiculo, revisar_vehiculo
 from taller.desarme.views_inventario import (
     VENTA_SESSION_KEY,
     confirmar_venta_desde_inventario,
@@ -38,6 +39,7 @@ from taller.models.documento import Documento
 from taller.models.marca import Marca
 from taller.models.modelo import Modelo
 from taller.models.pieza_desarme import PiezaDesarme
+from taller.models.sugerencia_pieza_desarme import SugerenciaPiezaDesarme
 from taller.models.vehiculo_desarme import VehiculoDesarme
 from taller.models.vehiculos import Vehiculo
 from taller.vehiculos.views_fbv import ajax_agregar_caja, ajax_agregar_motor
@@ -143,15 +145,60 @@ def test_alta_desarme_completa_hasta_venta_sin_pasar_por_vehiculo(
     assert vehiculo.caja_empresa_id is not None
     assert f"/vehiculos/{vehiculo.pk}/revisar/" in resp_crear["Location"]
 
-    # 3) Generar inventario de piezas a partir del catálogo operativo.
-    creadas = generar_inventario_vehiculo(vehiculo, empresa_usa)
-    assert creadas > 0
-    piezas = list(PiezaDesarme.objects.filter(vehiculo_desarme=vehiculo, activo=True))
+    # 3) crear_vehiculo ya inicializa las sugerencias del catálogo.
+    sugerencias = list(
+        SugerenciaPiezaDesarme.objects.filter(
+            empresa=empresa_usa,
+            vehiculo_desarme=vehiculo,
+        )
+    )
+    assert sugerencias
+    creadas = len(sugerencias)
+
+    # La inicialización es idempotente y no debe duplicar registros.
+    assert inicializar_sugerencias(vehiculo, empresa_usa) == 0
+    assert SugerenciaPiezaDesarme.objects.filter(
+        empresa=empresa_usa,
+        vehiculo_desarme=vehiculo,
+    ).count() == creadas
+
+    SugerenciaPiezaDesarme.objects.filter(
+        empresa=empresa_usa,
+        vehiculo_desarme=vehiculo,
+    ).update(
+        estado=SugerenciaPiezaDesarme.CONFIRMADA,
+        precio_sugerido=100,
+        condicion_sugerida="BUENA",
+    )
+
+    req_finalizar_sesion = _post(
+        rf,
+        f"/us/en/desarme/vehiculos/{vehiculo.pk}/revisar/",
+        user_usa,
+        data=json.dumps({"action": "finalizar_sesion"}),
+        content_type="application/json",
+    )
+    resp_finalizar_sesion = revisar_vehiculo(
+        req_finalizar_sesion,
+        pk=vehiculo.pk,
+    )
+    payload_finalizar = json.loads(resp_finalizar_sesion.content)
+    assert resp_finalizar_sesion.status_code == 200, payload_finalizar
+    assert payload_finalizar["success"] is True
+    assert payload_finalizar["piezas_creadas"] == creadas
+
+    piezas = list(
+        PiezaDesarme.objects.filter(
+            vehiculo_desarme=vehiculo,
+            activo=True,
+        )
+    )
     assert len(piezas) == creadas
+
     for p in piezas:
         p.cantidad = 3
         p.precio_venta_sugerido = p.precio_venta_sugerido or 100
-        p.save()
+        p.save(update_fields=["cantidad", "precio_venta_sugerido"])
 
     # 4) inventario_inteligente: arma el grid de piezas del vehículo.
     req_inv = _get(rf, f"/desarme/vehiculos/{vehiculo.pk}/inventario-inteligente/", user_usa)

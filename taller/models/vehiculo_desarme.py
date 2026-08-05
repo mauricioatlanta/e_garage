@@ -5,6 +5,7 @@ Entidad separada de Vehiculo (cliente/reparación).
 
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.db.models import Q
 
 from core.models import TenantScoped
 
@@ -17,6 +18,14 @@ from .extras_vehiculo import (
 )
 from .marca import Marca
 from .modelo import Modelo
+
+class EstadoOperativo(models.TextChoices):
+    INGRESADO       = "INGRESADO",       "Ingresado"
+    EN_REVISION     = "EN_REVISION",     "En revisión"
+    EN_PROCESAMIENTO = "EN_PROCESAMIENTO", "En procesamiento"
+    EN_CIERRE       = "EN_CIERRE",       "En cierre"
+    CERRADO         = "CERRADO",         "Cerrado"
+
 
 ESTADO_DESARME_CHOICES = [
     ("INGRESADO", "Ingresado"),
@@ -156,6 +165,17 @@ class VehiculoDesarme(TenantScoped):
         null=True,
         blank=True,
     )
+    estado_operativo = models.CharField(
+        max_length=24,
+        choices=EstadoOperativo.choices,
+        default=EstadoOperativo.INGRESADO,
+        db_index=True,
+        help_text=(
+            "Estado operacional del ciclo de vida del vehículo. "
+            "Independiente del campo legacy estado_desarme. "
+            "Alimenta el Centro de Operaciones."
+        ),
+    )
     ubicacion_fisica = models.CharField(
         max_length=120,
         null=True,
@@ -245,5 +265,6 @@ class VehiculoDesarme(TenantScoped):
         indexes = [
             models.Index(fields=["empresa"]),
             models.Index(fields=["empresa", "estado_desarme"]),
+            models.Index(fields=["empresa", "estado_operativo"]),
             models.Index(fields=["vehiculo_origen_id"]),
         ]

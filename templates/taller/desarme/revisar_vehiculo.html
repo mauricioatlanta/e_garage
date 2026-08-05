@@ -176,15 +176,49 @@
 .badge-pendiente  { background:#92400e; color:#fef3c7; border:1px solid #d97706; }
 .badge-confirmada { background:#064e3b; color:#d1fae5; border:1px solid #059669; }
 .badge-descartada { background:#1e293b; color:#cbd5e1; border:1px solid #475569; }
+
+/* Click-to-cycle visual states */
+.pieza-gris     { background:#0f172a; border-color:#475569; opacity:.75; }
+.pieza-verde    { background:#001a0d; border-color:#059669; }
+.pieza-amarillo { background:#1a1200; border-color:#d97706; }
+.pieza-rojo     { background:#1a0000; border-color:#dc2626; opacity:.80; }
+
+/* Dot indicator */
+.estado-dot { width:10px; height:10px; border-radius:50%; flex-shrink:0; cursor:pointer; border:2px solid; transition:transform .15s; }
+.estado-dot:hover { transform:scale(1.25); }
+.dot-gris     { background:#475569; border-color:#64748b; }
+.dot-verde    { background:#059669; border-color:#10b981; }
+.dot-amarillo { background:#d97706; border-color:#f59e0b; }
+.dot-rojo     { background:#dc2626; border-color:#ef4444; }
+
+/* Zona tabs */
+.zona-tab { display:inline-flex; align-items:center; gap:5px; padding:7px 14px; border-radius:8px; border:1px solid rgba(100,116,139,0.35); font-size:.75rem; font-weight:600; cursor:pointer; transition:all .15s; color:#94a3b8; background:transparent; white-space:nowrap; }
+.zona-tab.active { background:rgba(6,182,212,0.15); border-color:rgba(6,182,212,0.5); color:#67e8f9; }
+.zona-tab:hover:not(.active) { background:rgba(100,116,139,0.1); }
+.zona-tab .tab-badge { font-size:.65rem; padding:1px 6px; border-radius:9999px; font-weight:700; background:rgba(100,116,139,0.2); }
+.zona-tab.active .tab-badge { background:rgba(6,182,212,0.25); color:#67e8f9; }
+
+/* Sidebar */
+.rv-sidebar { position:sticky; top:72px; }
+.confirmed-list-item { display:flex; justify-content:space-between; align-items:baseline; padding:5px 0; border-bottom:1px solid rgba(6,182,212,0.06); font-size:.8rem; }
+.confirmed-list-item:last-child { border-bottom:none; }
+
+/* Finalizar button */
+.btn-finalizar { display:block; width:100%; text-align:center; padding:12px 0; border-radius:12px; font-weight:700; font-size:.95rem; transition:all .2s; cursor:pointer; }
+.btn-finalizar-active { background:rgba(16,185,129,0.20); border:2px solid rgba(16,185,129,0.6); color:#6ee7b7; }
+.btn-finalizar-active:hover { background:rgba(16,185,129,0.35); }
+.btn-finalizar-disabled { background:rgba(100,116,139,0.1); border:2px solid rgba(100,116,139,0.25); color:#475569; pointer-events:none; }
 </style>
 {% endblock %}
 
 {% block content %}
 <div id="revisar-app" data-csrf="{{ csrf_token }}"
-     data-url="{% country_url 'desarme:revisar_vehiculo' pk=vehiculo.pk %}">
+     data-url="{% country_url 'desarme:revisar_vehiculo' pk=vehiculo.pk %}"
+     data-confirmadas="{{ confirmadas }}"
+     data-valor="{{ valor_estimado }}">
 
-{# ── Header / Resumen ── #}
-<div class="rv-panel p-5 mb-6">
+{# ── Header ── #}
+<div class="rv-panel p-5 mb-4">
   <div class="flex flex-wrap items-start justify-between gap-4">
     <div>
       <h2 class="text-xl font-bold text-white" style="font-family:'Orbitron',monospace">
@@ -200,12 +234,10 @@
       </p>
     </div>
     <a href="{% country_url 'desarme:ver_vehiculo' pk=vehiculo.pk %}"
-       class="text-sm text-cyan-300 hover:text-white border border-cyan-400/40 bg-cyan-500/10 hover:bg-cyan-500/20 px-4 py-2 rounded-lg transition font-medium">
+       class="text-sm text-cyan-300 border border-cyan-400/40 bg-cyan-500/10 hover:bg-cyan-500/20 px-4 py-2 rounded-lg transition font-medium">
       ← Ver vehículo
     </a>
   </div>
-
-  {# Barra de progreso #}
   <div class="mt-4">
     <div class="flex justify-between text-xs mb-2">
       <span class="text-slate-300 font-medium">Progreso de revisión</span>
@@ -213,9 +245,7 @@
     </div>
     <div id="progress-bar"><div id="progress-fill" style="width:{{ pct_completado }}%"></div></div>
   </div>
-
-  {# Stats #}
-  <div class="flex flex-wrap gap-3 mt-5">
+  <div class="flex flex-wrap gap-3 mt-4">
     <div class="rv-stat rv-stat-pendiente">
       <div class="rv-stat-val" id="cnt-pendientes" style="color:#fcd34d">{{ pendientes }}</div>
       <div class="rv-stat-lab" style="color:#fbbf24">Pendientes</div>
@@ -233,159 +263,178 @@
       <div class="rv-stat-lab" style="color:#67e8f9">Total</div>
     </div>
   </div>
-
-  {% if pendientes == 0 and total > 0 %}
-  <div class="mt-5 p-3 rounded-xl border border-emerald-400/50 bg-emerald-500/15 text-emerald-200 text-sm font-medium">
-    ✅ Revisión completa — {{ confirmadas }} pieza{{ confirmadas|pluralize }} disponible{{ confirmadas|pluralize }} para venta.
-  </div>
-  {% endif %}
 </div>
 
-{# ── Zonas con sugerencias ── #}
-{% for zona, sugerencias in zonas_con_sugerencias %}
-<div class="rv-panel p-5 mb-4">
-  <div class="zona-header">{{ zona }}</div>
-  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-    {% for sug in sugerencias %}
+{# ── Zona tabs ── #}
+{% if sesion.zonas %}
+<div class="flex flex-wrap gap-2 mb-4 overflow-x-auto pb-1">
+  {% for zona in sesion.zonas %}
+  {% with conf=zona.piezas|length %}
+  <div role="button" tabindex="0" class="zona-tab {% if forloop.first %}active{% endif %}"
+       onclick="switchZona('zona-{{ forloop.counter0 }}')"
+       id="tab-zona-{{ forloop.counter0 }}">
+    {{ zona.label }}
+    <span class="tab-badge">{{ conf }}</span>
+  </div>
+  {% endwith %}
+  {% endfor %}
+</div>
+{% endif %}
 
-    {# PENDIENTE #}
-    {% if sug.estado == PENDIENTE %}
-    <div class="rv-card rv-pendiente" id="sug-{{ sug.pk }}">
-      <div class="flex justify-between items-start mb-3">
-        <div>
-          <span class="text-xs text-amber-300 font-mono font-bold">{{ sug.codigo }}</span>
-          <div class="text-sm font-semibold text-white mt-0.5">{{ sug.nombre }}</div>
-        </div>
-        <span class="text-xs px-2 py-0.5 rounded-full badge-pendiente whitespace-nowrap ml-2 font-semibold">Pendiente</span>
-      </div>
-      <div class="grid grid-cols-2 gap-2 mb-3">
-        <div>
-          <label class="text-xs text-slate-300 font-medium">Precio ({{ empresa_moneda.simbolo }})</label>
-          <input type="number" class="rv-input mt-1" id="precio-{{ sug.pk }}"
-                 value="{{ sug.precio_sugerido|default:'' }}" step="1" min="0" placeholder="0">
-        </div>
-        <div>
-          <label class="text-xs text-slate-300 font-medium">Condición</label>
-          <select class="rv-input mt-1" id="cond-{{ sug.pk }}">
-            {% for val, label in condicion_choices %}
-            <option value="{{ val }}" {% if val == "BUENA" %}selected{% endif %}>{{ label }}</option>
-            {% endfor %}
-          </select>
-        </div>
-      </div>
-      <div class="flex gap-2">
-        <div role="button" tabindex="0" class="btn-confirm flex-1 text-center" onclick="confirmar({{ sug.pk }})">✓ Confirmar</div>
-        <div role="button" tabindex="0" class="btn-discard flex-1 text-center" onclick="descartar({{ sug.pk }})">✗ Descartar</div>
-      </div>
-    </div>
+{# ── Main + Sidebar layout ── #}
+<div class="flex gap-5 items-start">
 
-    {# CONFIRMADA #}
-    {% elif sug.estado == CONFIRMADA %}
-    <div class="rv-card rv-confirmada" id="sug-{{ sug.pk }}">
-      <div class="flex justify-between items-start">
-        <div class="flex-1 min-w-0">
-          <span class="text-xs text-emerald-300 font-mono font-bold">{{ sug.codigo }}</span>
-          <div class="text-sm font-semibold text-white mt-0.5">{{ sug.nombre }}</div>
-          {% if sug.pieza_creada %}
-          <div class="text-xs text-slate-300 mt-1">
-            {% if sug.pieza_creada.precio_venta_sugerido %}
-              <span class="text-emerald-300 font-medium">${{ sug.pieza_creada.precio_venta_sugerido|intcomma }}</span>
-              <span class="text-slate-400"> · </span>
-            {% endif %}
-            <span>{{ sug.pieza_creada.get_condicion_display }}</span>
+  {# Left: zones + agregar #}
+  <div class="flex-1 min-w-0">
+
+    {# Zonas #}
+    {% for zona in sesion.zonas %}
+    <div id="zona-{{ forloop.counter0 }}" class="zona-section {% if not forloop.first %}hidden{% endif %}">
+    <div class="rv-panel p-5 mb-4">
+      <div class="zona-header">{{ zona.label }}</div>
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
+        {% for pieza in zona.piezas %}
+        <div class="rv-card pieza-{{ pieza.estado_visual }}" id="sug-{{ pieza.sugerencia_id }}"
+             data-sug-id="{{ pieza.sugerencia_id }}"
+             data-estado="{{ pieza.estado_visual }}"
+             data-codigo="{{ pieza.codigo }}"
+             data-nombre="{{ pieza.nombre }}"
+             data-precio="{{ pieza.precio_sugerido|default:0 }}">
+          <div class="flex items-start gap-2 mb-2">
+            {# Click-to-cycle dot #}
+            <div class="estado-dot dot-{{ pieza.estado_visual }} mt-0.5"
+                 title="Clic para cambiar estado"
+                 onclick="cycleEstado({{ pieza.sugerencia_id }})"></div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-mono font-bold
+                {% if pieza.estado_visual == 'verde' %}text-emerald-300
+                {% elif pieza.estado_visual == 'amarillo' %}text-amber-300
+                {% elif pieza.estado_visual == 'rojo' %}text-slate-500
+                {% else %}text-slate-400{% endif %}">{{ pieza.codigo }}</div>
+              <div class="text-sm font-semibold
+                {% if pieza.estado_visual == 'rojo' %}text-slate-500 line-through{% else %}text-white{% endif %}
+                mt-0.5 truncate">{{ pieza.nombre }}</div>
+            </div>
+          </div>
+          {% if pieza.estado_visual != 'rojo' %}
+          <div class="flex items-center gap-2 mt-2">
+            <input type="number" class="rv-input text-xs py-1 px-2" style="height:30px"
+                   id="precio-{{ pieza.sugerencia_id }}"
+                   value="{{ pieza.precio_sugerido|default:'' }}"
+                   step="1" min="0" placeholder="Precio"
+                   onchange="actualizarPrecio({{ pieza.sugerencia_id }})">
           </div>
           {% endif %}
         </div>
-        <div class="flex flex-col items-end gap-2 ml-3 shrink-0">
-          <span class="text-xs px-2 py-0.5 rounded-full badge-confirmada whitespace-nowrap font-semibold">✓ OK</span>
-          <div role="button" tabindex="0" class="btn-reopen" onclick="reabrir({{ sug.pk }})">Reabrir</div>
-        </div>
+        {% endfor %}
       </div>
     </div>
-
-    {# DESCARTADA #}
-    {% else %}
-    <div class="rv-card rv-descartada" id="sug-{{ sug.pk }}">
-      <div class="flex justify-between items-center">
-        <div class="min-w-0">
-          <span class="text-xs text-slate-400 font-mono">{{ sug.codigo }}</span>
-          <div class="text-sm text-slate-400 line-through mt-0.5">{{ sug.nombre }}</div>
-        </div>
-        <div class="flex flex-col items-end gap-2 ml-3 shrink-0">
-          <span class="text-xs px-2 py-0.5 rounded-full badge-descartada whitespace-nowrap font-semibold">No existe</span>
-          <div role="button" tabindex="0" class="btn-reopen" onclick="reabrir({{ sug.pk }})">Recuperar</div>
-        </div>
-      </div>
     </div>
-    {% endif %}
-
+    {% empty %}
+    <div class="rv-panel p-8 text-center text-slate-300 mb-4">
+      No hay sugerencias de catálogo para este vehículo.
+    </div>
     {% endfor %}
-  </div>
-</div>
-{% empty %}
-<div class="rv-panel p-8 text-center text-slate-300 mb-4">
-  No hay sugerencias de catálogo para este vehículo.
-</div>
-{% endfor %}
 
-{# ── Agregar pieza extra ── #}
-<div class="rv-panel p-5 mb-6">
-  <div class="flex items-center justify-between mb-4">
-    <h3 class="text-sm font-bold text-cyan-300">Agregar pieza fuera del catálogo</h3>
-    <div role="button" tabindex="0" id="btn-toggle-form" onclick="toggleAgregarForm()"
-         class="text-sm text-cyan-300 border border-cyan-400/40 bg-cyan-500/10 hover:bg-cyan-500/20 px-3 py-1.5 rounded-lg transition font-medium cursor-pointer">
-      + Agregar pieza
+    {# Agregar pieza extra #}
+    <div class="rv-panel p-5 mb-4">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-bold text-cyan-300">Agregar pieza fuera del catálogo</h3>
+        <div role="button" tabindex="0" onclick="toggleAgregarForm()"
+             class="text-sm text-cyan-300 border border-cyan-400/40 bg-cyan-500/10 hover:bg-cyan-500/20 px-3 py-1.5 rounded-lg transition font-medium cursor-pointer">
+          + Agregar
+        </div>
+      </div>
+      <div id="form-agregar" class="hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+          <div>
+            <label class="text-xs text-slate-300 font-medium">Código *</label>
+            <input type="text" id="extra-codigo" class="rv-input mt-1" placeholder="Ej: MOT-16">
+          </div>
+          <div>
+            <label class="text-xs text-slate-300 font-medium">Nombre *</label>
+            <input type="text" id="extra-nombre" class="rv-input mt-1" placeholder="Ej: Tapa válvulas">
+          </div>
+          <div>
+            <label class="text-xs text-slate-300 font-medium">Zona</label>
+            <input type="text" id="extra-zona" class="rv-input mt-1" placeholder="Ej: Motor">
+          </div>
+          <div>
+            <label class="text-xs text-slate-300 font-medium">Precio ({{ empresa_moneda.simbolo }})</label>
+            <input type="number" id="extra-precio" class="rv-input mt-1" value="0" min="0" step="1">
+          </div>
+          <div>
+            <label class="text-xs text-slate-300 font-medium">Condición</label>
+            <select id="extra-condicion" class="rv-input mt-1">
+              {% for val, label in condicion_choices %}
+              <option value="{{ val }}" {% if val == "BUENA" %}selected{% endif %}>{{ label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <div role="button" tabindex="0" class="btn-confirm px-5" onclick="agregarPieza()">✓ Agregar</div>
+          <div role="button" tabindex="0" class="btn-discard px-4" onclick="toggleAgregarForm()">Cancelar</div>
+        </div>
+      </div>
     </div>
-  </div>
-  <div id="form-agregar" class="hidden">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
-      <div>
-        <label class="text-xs text-slate-300 font-medium">Código *</label>
-        <input type="text" id="extra-codigo" class="rv-input mt-1" placeholder="Ej: MOT-16, VID-01">
+
+  </div>{# /left #}
+
+  {# Right: sidebar #}
+  <div class="rv-sidebar w-72 flex-shrink-0 hidden md:block">
+    <div class="rv-panel p-5 mb-4">
+      <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Valor estimado</div>
+      <div id="sidebar-valor" class="text-2xl font-bold text-emerald-400 font-mono mb-1">
+        {{ empresa_moneda.simbolo }}{{ valor_estimado|floatformat:0 }}
       </div>
-      <div>
-        <label class="text-xs text-slate-300 font-medium">Nombre *</label>
-        <input type="text" id="extra-nombre" class="rv-input mt-1" placeholder="Ej: Tapa válvulas">
-      </div>
-      <div>
-        <label class="text-xs text-slate-300 font-medium">Zona</label>
-        <input type="text" id="extra-zona" class="rv-input mt-1" placeholder="Ej: Motor, Interior">
-      </div>
-      <div>
-        <label class="text-xs text-slate-300 font-medium">Precio ({{ empresa_moneda.simbolo }})</label>
-        <input type="number" id="extra-precio" class="rv-input mt-1" value="0" min="0" step="1">
-      </div>
-      <div>
-        <label class="text-xs text-slate-300 font-medium">Condición</label>
-        <select id="extra-condicion" class="rv-input mt-1">
-          {% for val, label in condicion_choices %}
-          <option value="{{ val }}" {% if val == "BUENA" %}selected{% endif %}>{{ label }}</option>
+      <div class="text-xs text-slate-500" id="sidebar-conf-count">{{ confirmadas }} pieza{{ confirmadas|pluralize }} confirmada{{ confirmadas|pluralize }}</div>
+    </div>
+
+    <div class="rv-panel p-5 mb-4">
+      <div class="text-xs font-semibold text-slate-400 uppercase tracking-widest mb-3">Piezas confirmadas</div>
+      <div id="confirmed-list" class="space-y-0 max-h-64 overflow-y-auto">
+        {% for zona in sesion.zonas %}
+          {% for pieza in zona.piezas %}
+            {% if pieza.estado_visual != 'gris' and pieza.estado_visual != 'rojo' %}
+            <div class="confirmed-list-item" id="cli-{{ pieza.sugerencia_id }}">
+              <span class="text-slate-300 truncate" style="max-width:140px">{{ pieza.nombre }}</span>
+              <span class="text-emerald-300 font-medium ml-2 whitespace-nowrap">
+                {% if pieza.precio_sugerido %}{{ empresa_moneda.simbolo }}{{ pieza.precio_sugerido|floatformat:0 }}{% else %}—{% endif %}
+              </span>
+            </div>
+            {% endif %}
           {% endfor %}
-        </select>
-      </div>
-      <div>
-        <label class="text-xs text-slate-300 font-medium">Cantidad</label>
-        <input type="number" id="extra-cantidad" class="rv-input mt-1" value="1" min="1">
+        {% endfor %}
       </div>
     </div>
-    <div class="mb-4">
-      <label class="text-xs text-slate-300 font-medium">Ubicación física (opcional)</label>
-      <input type="text" id="extra-ubicacion" class="rv-input mt-1" placeholder="Ej: Fila 3, Pos 7">
+
+    <div role="button" tabindex="0"
+         id="btn-finalizar"
+         class="btn-finalizar {% if confirmadas > 0 %}btn-finalizar-active{% else %}btn-finalizar-disabled{% endif %}"
+         onclick="finalizarSesion()">
+      ✓ Finalizar despiece<br>
+      <span class="text-xs font-normal" id="finalizar-label">
+        y crear inventario ({{ confirmadas }} piezas)
+      </span>
     </div>
-    <div class="flex gap-2">
-      <div role="button" tabindex="0" class="btn-confirm px-5" onclick="agregarPieza()">✓ Agregar y continuar</div>
-      <div role="button" tabindex="0" class="btn-discard px-4" onclick="toggleAgregarForm()">Cancelar</div>
-    </div>
+    <p class="text-xs text-slate-600 text-center mt-2">
+      Solo se crean piezas confirmadas (verde o amarillo).
+    </p>
+  </div>
+
+</div>{# /flex #}
+
+{# Mobile: Finalizar button sticky bottom #}
+<div class="md:hidden fixed bottom-0 left-0 right-0 p-4 bg-slate-900/95 backdrop-blur border-t border-cyan-400/20">
+  <div role="button" tabindex="0"
+       id="btn-finalizar-mobile"
+       class="btn-finalizar {% if confirmadas > 0 %}btn-finalizar-active{% else %}btn-finalizar-disabled{% endif %}"
+       onclick="finalizarSesion()">
+    ✓ Finalizar — <span id="finalizar-label-mobile">{{ confirmadas }} piezas · {{ empresa_moneda.simbolo }}{{ valor_estimado|floatformat:0 }}</span>
   </div>
 </div>
-
-{# ── Botón terminar ── #}
-<div class="text-center pb-8">
-  <a href="{% country_url 'desarme:ver_vehiculo' pk=vehiculo.pk %}"
-     class="inline-block bg-cyan-600 hover:bg-cyan-500 text-white font-bold px-8 py-3 rounded-xl transition shadow-lg shadow-cyan-500/20">
-    Terminar revisión →
-  </a>
-</div>
+<div class="md:hidden h-20"></div>
 
 </div>{# /revisar-app #}
 <div id="toast"></div>
@@ -394,14 +443,29 @@
 {% block extra_js %}
 <script>
 (function(){
-  const app  = document.getElementById('revisar-app');
-  const CSRF = app.dataset.csrf;
-  const URL  = app.dataset.url;
+  const app   = document.getElementById('revisar-app');
+  const CSRF  = app.dataset.csrf;
+  const URL   = app.dataset.url;
+  const SIM   = '{{ empresa_moneda.simbolo }}';
+  let   confCount = parseInt(app.dataset.confirmadas) || 0;
+  let   valorAcum = parseFloat(app.dataset.valor) || 0;
 
+  // ── zona tabs ───────────────────────────────────────────────────────────
+  window.switchZona = function(zonaId){
+    document.querySelectorAll('.zona-section').forEach(s => s.classList.add('hidden'));
+    document.querySelectorAll('.zona-tab').forEach(t => t.classList.remove('active'));
+    var sec = document.getElementById(zonaId);
+    if(sec) sec.classList.remove('hidden');
+    var tabIdx = zonaId.replace('zona-','');
+    var tab = document.getElementById('tab-zona-'+tabIdx);
+    if(tab) tab.classList.add('active');
+  };
+
+  // ── helpers ─────────────────────────────────────────────────────────────
   async function post(payload){
     const r = await fetch(URL, {
-      method: 'POST',
-      headers: {'Content-Type':'application/json','X-CSRFToken':CSRF},
+      method:'POST',
+      headers:{'Content-Type':'application/json','X-CSRFToken':CSRF},
       body: JSON.stringify(payload),
     });
     return r.json();
@@ -414,98 +478,148 @@
     d.className = 'toast-msg ' + (ok ? 'ok' : 'err');
     d.textContent = msg;
     t.appendChild(d);
-    requestAnimationFrame(function(){ d.classList.add('show'); });
-    setTimeout(function(){ d.classList.remove('show'); setTimeout(function(){ d.remove(); }, 300); }, 3000);
+    requestAnimationFrame(() => d.classList.add('show'));
+    setTimeout(() => { d.classList.remove('show'); setTimeout(() => d.remove(), 300); }, 3000);
   }
 
-  function updateCounters(){
-    var conf = document.querySelectorAll('.rv-confirmada').length;
-    var desc = document.querySelectorAll('.rv-descartada').length;
-    var pend = document.querySelectorAll('.rv-pendiente').length;
-    var cEl = document.getElementById('cnt-confirmadas');
-    var dEl = document.getElementById('cnt-descartadas');
-    var pEl = document.getElementById('cnt-pendientes');
-    if(cEl) cEl.textContent = conf;
-    if(dEl) dEl.textContent = desc;
-    if(pEl) pEl.textContent = pend;
-    var allCards = conf + desc + pend;
+  function fmtMoney(n){ return SIM+(Math.round(n)||0).toLocaleString('es-CL'); }
+
+  function updateSidebar(valor, conf){
+    var el = document.getElementById('sidebar-valor');
+    if(el) el.textContent = fmtMoney(valor);
+    var cc = document.getElementById('sidebar-conf-count');
+    if(cc) cc.textContent = conf + (conf === 1 ? ' pieza confirmada' : ' piezas confirmadas');
+    // Finalizar button
+    var btn = document.getElementById('btn-finalizar');
+    var btnM = document.getElementById('btn-finalizar-mobile');
+    var lbl  = document.getElementById('finalizar-label');
+    var lblM = document.getElementById('finalizar-label-mobile');
+    if(btn){
+      btn.className = 'btn-finalizar ' + (conf > 0 ? 'btn-finalizar-active' : 'btn-finalizar-disabled');
+    }
+    if(btnM){
+      btnM.className = 'btn-finalizar ' + (conf > 0 ? 'btn-finalizar-active' : 'btn-finalizar-disabled');
+    }
+    if(lbl) lbl.textContent = 'y crear inventario (' + conf + ' piezas)';
+    if(lblM) lblM.textContent = conf + ' piezas · ' + fmtMoney(valor);
+  }
+
+  function updateCounters(pendientes){
+    var conf = document.querySelectorAll('[data-estado="verde"], [data-estado="amarillo"]').length;
+    var desc = document.querySelectorAll('[data-estado="rojo"]').length;
+    var pend = pendientes !== undefined ? pendientes :
+               document.querySelectorAll('[data-estado="gris"]').length;
     var done = conf + desc;
-    var pct = allCards > 0 ? Math.round(done/allCards*100) : 0;
-    var pctEl = document.getElementById('pct-text');
-    var bar = document.getElementById('progress-fill');
-    if(pctEl) pctEl.textContent = pct + '%';
-    if(bar) bar.style.width = pct + '%';
+    var total = conf + desc + pend;
+    var pct = total > 0 ? Math.round(done/total*100) : 0;
+    var el = id => document.getElementById(id);
+    if(el('cnt-confirmadas')) el('cnt-confirmadas').textContent = conf;
+    if(el('cnt-descartadas')) el('cnt-descartadas').textContent = desc;
+    if(el('cnt-pendientes'))  el('cnt-pendientes').textContent = pend;
+    if(el('pct-text'))        el('pct-text').textContent = pct + '%';
+    if(el('progress-fill'))   el('progress-fill').style.width = pct + '%';
   }
 
-  window.confirmar = async function(sugId){
-    var precio = document.getElementById('precio-'+sugId);
-    var cond   = document.getElementById('cond-'+sugId);
-    var res = await post({
-      action: 'confirmar',
-      sugerencia_id: sugId,
-      precio: precio ? precio.value : null,
-      condicion: cond ? cond.value : 'BUENA',
-    });
-    if(res.success){
-      var card = document.getElementById('sug-'+sugId);
-      card.className = 'rv-card rv-confirmada';
-      card.innerHTML = [
-        '<div class="flex justify-between items-start">',
-          '<div class="flex-1 min-w-0">',
-            '<div class="text-sm font-semibold text-white">'+escHtml(res.pieza_nombre)+'</div>',
-            '<div class="text-xs text-slate-300 mt-1">',
-              '<span class="text-emerald-300 font-medium">$'+(res.pieza_precio||0).toLocaleString()+'</span>',
-              '<span class="text-slate-400"> · </span>',
-              escHtml(res.pieza_condicion),
-            '</div>',
-          '</div>',
-          '<div class="flex flex-col items-end gap-2 ml-3 shrink-0">',
-            '<span class="text-xs px-2 py-0.5 rounded-full badge-confirmada whitespace-nowrap font-semibold">✓ OK</span>',
-            '<div role="button" tabindex="0" class="btn-reopen" onclick="reabrir('+sugId+')">Reabrir</div>',
-          '</div>',
-        '</div>',
-      ].join('');
-      updateCounters();
-      toast('Pieza confirmada ✓');
-    } else {
-      toast(res.error || 'Error al confirmar', false);
+  function applyVisual(card, nuevoEstado, precio){
+    if(!card) return;
+    card.dataset.estado = nuevoEstado;
+    // Update card class
+    card.classList.remove('pieza-gris','pieza-verde','pieza-amarillo','pieza-rojo');
+    card.classList.add('pieza-'+nuevoEstado);
+    // Update dot
+    var dot = card.querySelector('.estado-dot');
+    if(dot){
+      dot.className = 'estado-dot dot-'+nuevoEstado+' mt-0.5';
+      dot.title = 'Clic para cambiar estado';
     }
-  };
-
-  window.descartar = async function(sugId){
-    var card = document.getElementById('sug-'+sugId);
+    // Update code text color
     var codeEl = card.querySelector('.font-mono');
+    if(codeEl){
+      codeEl.className = 'text-xs font-mono font-bold mt-0.5 ' + {
+        verde:'text-emerald-300', amarillo:'text-amber-300', rojo:'text-slate-500', gris:'text-slate-400'
+      }[nuevoEstado];
+    }
+    // Update name style
     var nameEl = card.querySelector('.font-semibold');
-    var codigo = codeEl ? codeEl.textContent.trim() : '';
-    var nombre = nameEl ? nameEl.textContent.trim() : '';
-    var res = await post({action:'descartar', sugerencia_id:sugId});
-    if(res.success){
-      card.className = 'rv-card rv-descartada';
-      card.innerHTML = [
-        '<div class="flex justify-between items-center">',
-          '<div class="min-w-0">',
-            '<span class="text-xs text-slate-400 font-mono">'+escHtml(codigo)+'</span>',
-            '<div class="text-sm text-slate-400 line-through mt-0.5">'+escHtml(nombre)+'</div>',
-          '</div>',
-          '<div class="flex flex-col items-end gap-2 ml-3 shrink-0">',
-            '<span class="text-xs px-2 py-0.5 rounded-full badge-descartada whitespace-nowrap font-semibold">No existe</span>',
-            '<div role="button" tabindex="0" class="btn-reopen" onclick="reabrir('+sugId+')">Recuperar</div>',
-          '</div>',
-        '</div>',
-      ].join('');
-      updateCounters();
-      toast('Pieza descartada');
+    if(nameEl){
+      if(nuevoEstado === 'rojo') nameEl.classList.add('text-slate-500','line-through');
+      else nameEl.classList.remove('text-slate-500','line-through');
+    }
+    // Show/hide precio input
+    var priceRow = card.querySelector('input[type="number"]');
+    if(priceRow){
+      priceRow.parentElement.style.display = nuevoEstado === 'rojo' ? 'none' : '';
+    }
+    // Update confirmed-list sidebar item
+    var sugId = card.dataset.sugId;
+    var nombre = card.dataset.nombre || '';
+    var cliEl = document.getElementById('cli-'+sugId);
+    if(nuevoEstado === 'gris' || nuevoEstado === 'rojo'){
+      if(cliEl) cliEl.remove();
     } else {
-      toast(res.error || 'Error al descartar', false);
+      var p = Math.round(precio || card.dataset.precio || 0);
+      if(!cliEl){
+        cliEl = document.createElement('div');
+        cliEl.id = 'cli-'+sugId;
+        cliEl.className = 'confirmed-list-item';
+        var list = document.getElementById('confirmed-list');
+        if(list) list.appendChild(cliEl);
+      }
+      cliEl.innerHTML =
+        '<span class="text-slate-300 truncate" style="max-width:140px">'+escHtml(nombre)+'</span>'+
+        '<span class="text-emerald-300 font-medium ml-2 whitespace-nowrap">'+
+        (p ? SIM+p.toLocaleString('es-CL') : '—')+'</span>';
+    }
+  }
+
+  // ── click-to-cycle ───────────────────────────────────────────────────────
+  const CYCLE = { gris:'verde', verde:'amarillo', amarillo:'rojo', rojo:'gris' };
+
+  window.cycleEstado = async function(sugId){
+    var card = document.getElementById('sug-'+sugId);
+    if(!card) return;
+    var actual = card.dataset.estado || 'gris';
+    var next   = CYCLE[actual] || 'gris';
+    var precioEl = document.getElementById('precio-'+sugId);
+    var precio   = precioEl ? parseFloat(precioEl.value || 0) : 0;
+
+    var res;
+    if(next === 'gris'){
+      res = await post({action:'reabrir', sugerencia_id:sugId});
+    } else if(next === 'rojo'){
+      res = await post({action:'descartar', sugerencia_id:sugId});
+    } else {
+      res = await post({action:'confirmar', sugerencia_id:sugId, estado_visual:next, precio:precio});
+    }
+    if(res.success){
+      applyVisual(card, next, precio);
+      if(res.valor_acumulado !== undefined) valorAcum = res.valor_acumulado;
+      confCount = document.querySelectorAll('[data-estado="verde"],[data-estado="amarillo"]').length;
+      updateCounters(res.pendientes);
+      updateSidebar(valorAcum, confCount);
+    } else {
+      toast(res.error || 'Error', false);
     }
   };
 
-  window.reabrir = async function(sugId){
-    var res = await post({action:'reabrir', sugerencia_id:sugId});
+  window.actualizarPrecio = async function(sugId){
+    var card = document.getElementById('sug-'+sugId);
+    if(!card || card.dataset.estado === 'gris' || card.dataset.estado === 'rojo') return;
+    var precioEl = document.getElementById('precio-'+sugId);
+    var precio   = parseFloat(precioEl ? precioEl.value : 0) || 0;
+    var estado   = card.dataset.estado || 'verde';
+    var res = await post({action:'confirmar', sugerencia_id:sugId, estado_visual:estado, precio:precio});
     if(res.success){
-      window.location.reload();
-    } else {
-      toast(res.error || 'Error al reabrir', false);
+      card.dataset.precio = precio;
+      if(res.valor_acumulado !== undefined) valorAcum = res.valor_acumulado;
+      confCount = document.querySelectorAll('[data-estado="verde"],[data-estado="amarillo"]').length;
+      updateSidebar(valorAcum, confCount);
+      // Update sidebar list price
+      var cliEl = document.getElementById('cli-'+sugId);
+      if(cliEl){
+        var span = cliEl.querySelector('span:last-child');
+        if(span) span.textContent = precio ? SIM+Math.round(precio).toLocaleString('es-CL') : '—';
+      }
     }
   };
 
@@ -519,16 +633,27 @@
     var zona      = (document.getElementById('extra-zona').value||'').trim() || 'Otros';
     var precio    = document.getElementById('extra-precio').value;
     var condicion = document.getElementById('extra-condicion').value;
-    var cantidad  = document.getElementById('extra-cantidad').value;
-    var ubicacion = (document.getElementById('extra-ubicacion').value||'').trim();
     if(!codigo || !nombre){ toast('Código y nombre son requeridos', false); return; }
-    var res = await post({action:'agregar', codigo:codigo, nombre:nombre, zona:zona,
-                          precio:precio, condicion:condicion, cantidad:cantidad, ubicacion:ubicacion});
+    var res = await post({action:'agregar', codigo, nombre, zona, precio, condicion});
     if(res.success){
-      toast(escHtml(res.pieza_nombre)+' agregada ✓');
+      toast(escHtml(res.nombre)+' agregada ✓');
       window.location.reload();
     } else {
       toast(res.error || 'Error al agregar', false);
+    }
+  };
+
+  window.finalizarSesion = async function(){
+    if(confCount === 0){ toast('No hay piezas confirmadas', false); return; }
+    var btn = document.getElementById('btn-finalizar');
+    if(btn) { btn.textContent = 'Creando inventario…'; btn.style.pointerEvents='none'; }
+    var res = await post({action:'finalizar_sesion'});
+    if(res.success){
+      toast('✓ Inventario creado — '+res.piezas_creadas+' piezas');
+      setTimeout(() => { window.location.href = res.redirect_url || '/'; }, 1200);
+    } else {
+      toast(res.error || 'Error al finalizar', false);
+      if(btn){ btn.textContent = '✓ Finalizar despiece'; btn.style.pointerEvents=''; }
     }
   };
 

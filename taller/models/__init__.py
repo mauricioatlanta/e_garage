@@ -45,7 +45,8 @@ from .pieza_desarme import (
 )
 from .interchange_pieza import InterchangePieza
 from .sugerencia_pieza_desarme import SugerenciaPiezaDesarme
-from .vehiculo_desarme import VehiculoDesarme
+from .vehiculo_desarme import VehiculoDesarme, EstadoOperativo
+from .vehiculo_desarme_event import VehiculoDesarmeEvent, TipoEventoDesarme
 from .catalogo_repuesto_empresa import CatalogoRepuestoEmpresa
 from .vehiculo_financial import (
     VehiculoFinancialSnapshot,
