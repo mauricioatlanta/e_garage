@@ -90,6 +90,13 @@ class ForceAccountsToCLMiddleware:
             # Verificar que NO tenga ya prefijo de país
             if not any(path.startswith(f"/{cc}/") for cc in _PATH_COUNTRY_CODES):
                 cc = _country_from_login_request(request)
+
+                # Si el destino es CL (default), NO redirigir: /accounts/login/ ya está
+                # servido por country_aware_login en el conf raíz y detecta CL desde el path.
+                # Redirigir a /cl/es/accounts/login/ provoca loop con allauth 65.
+                if cc == "cl":
+                    return self.get_response(request)
+
                 next_url = (request.GET.get("next") or "").strip()
                 default_lang = _DEFAULT_LANG_BY_CC.get(cc, "es")
 
