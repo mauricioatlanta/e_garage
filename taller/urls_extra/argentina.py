@@ -3,44 +3,21 @@ URLs específicas para Argentina (español)
 Prefijo: /ar/es/
 """
 
-
-def _render_first_existing(request, candidates, context=None):
-    context = context or {}
-    for tname in candidates:
-        try:
-            loader.get_template(tname)
-            return render(request, tname, context)
-        except TemplateDoesNotExist:
-            continue
-    from django.http import HttpResponse
-
-    return HttpResponse("Template de bienvenida no encontrado.", status=500)
-
-
 import logging
 
 from django.http import HttpResponseRedirect
 from django.urls import include, path
-from django.shortcuts import redirect, render
-from django.template import loader, TemplateDoesNotExist
+from django.shortcuts import redirect
 from django.views.generic import TemplateView
 
 
 def argentina_home(request):
-    # Canonicaliza /ar/ -> /ar/es/
     if request.path == "/ar/":
         return redirect("/ar/es/", permanent=False)
-    return _render_first_existing(
-        request,
-        [
-            "ar/es/onboarding/bienvenida.html",
-            "ar/onboarding/bienvenida.html",
-            "onboarding/bienvenida_argentina.html",
-            "onboarding/bienvenida.html",
-        ],
-    )
+    return bienvenida_ar(request)
 
 
+from taller.views_extra.bienvenida import bienvenida_ar
 from taller.views_extra.views import dashboard_suscripciones
 from taller.views_extra.company_settings_views import company_settings_view
 from taller.views_extra.dashboard_empresa import (
@@ -87,11 +64,7 @@ urlpatterns = [
         name="bienvenida_argentina",
     ),
     # Página de bienvenida alternativa (ruta estándar)
-    path(
-        "bienvenida/",
-        TemplateView.as_view(template_name="ar/es/onboarding/bienvenida.html"),
-        name="bienvenida_argentina_alt",
-    ),
+    path("bienvenida/", bienvenida_ar, name="bienvenida_argentina_alt"),
     # Redirect /ar/accounts/* y /ar/es/accounts/* → /accounts/* (allauth montado solo en gestion_taller/urls)
     path("accounts/signup/", CustomSignupView.as_view(), name="account_signup"),
     path(

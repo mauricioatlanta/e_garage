@@ -5,9 +5,8 @@ Prefijo: /uy/es/
 
 import logging
 
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import redirect, render
-from django.template import loader, TemplateDoesNotExist
+from django.http import HttpResponseRedirect
+from django.shortcuts import redirect
 from django.urls import include, path
 from taller.views.country_aware_auth import country_aware_login
 
@@ -24,6 +23,7 @@ from taller.views_extra.views_configuracion import (
 )
 from taller.views_extra.views_trial_activate import activar_trial
 from taller.documentos import views_country_aware as views_documentos
+from taller.views_extra.bienvenida import bienvenida_uy
 from taller.views_extra.custom_signup import CustomSignupView
 
 
@@ -39,31 +39,13 @@ def _render_first_existing(request, candidates, context=None):
 
 
 def uruguay_home(request):
-    # Canonicaliza /uy/ -> /uy/es/
     if request.path == "/uy/":
         return redirect("/uy/es/", permanent=False)
-    return _render_first_existing(
-        request,
-        [
-            "uy/es/onboarding/bienvenida.html",
-            "uy/onboarding/bienvenida.html",
-            "onboarding/bienvenida_uruguay.html",
-            "onboarding/bienvenida.html",
-        ],
-    )
+    return bienvenida_uy(request)
 
 
 def uruguay_bienvenida_page(request):
-    """Misma cadena de plantillas que uruguay_home; evita 500 si falta solo uy/es/…"""
-    return _render_first_existing(
-        request,
-        [
-            "uy/es/onboarding/bienvenida.html",
-            "uy/onboarding/bienvenida.html",
-            "onboarding/bienvenida_uruguay.html",
-            "onboarding/bienvenida.html",
-        ],
-    )
+    return bienvenida_uy(request)
 
 
 # Configuración de logging para este módulo

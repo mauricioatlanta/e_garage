@@ -63,6 +63,20 @@ class CommerceCatalogGateway:
             qs = qs[:limit]
         return qs
 
+    def list_products_recent(self, limit=8):
+        """Productos más recientemente agregados (por pk, proxy de fecha de carga)."""
+        return (
+            CommerceProduct.objects.filter(empresa=self._empresa, is_publishable=True)
+            .select_related("repuesto", "category")
+            .prefetch_related("images")
+            .order_by("-pk")
+        )[:limit]
+
+    def count_products(self):
+        return CommerceProduct.objects.filter(
+            empresa=self._empresa, is_publishable=True
+        ).count()
+
     def search(self, query):
         """Búsqueda por nombre, part_number o slug."""
         if not query:
