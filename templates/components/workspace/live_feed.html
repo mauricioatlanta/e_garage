@@ -1,12 +1,4 @@
-{#
-  live_feed.html — Card de "centro de mando" con contador en vivo y sparkline.
-
-  Variables requeridas (del contexto de la vista):
-    workspace_base_prefix  → prefijo de país/idioma (ej: /cl/es)
-
-  JS: workspace_live_kpi.js hace fetch("live-feed/") relativo a la URL actual.
-  La URL /dashboard/live-feed/ debe existir en urls.py (alias de workspace_live_feed).
-#}
+{% comment %}live_feed.html — ctx: workspace_base_prefix. JS: workspace_live_kpi.js{% endcomment %}
 <a href="{{ workspace_base_prefix }}/workspace/centro-de-mando/" class="workspace-cdm-card">
   <div class="cdm-card-header">
     <span class="cdm-dot"></span>

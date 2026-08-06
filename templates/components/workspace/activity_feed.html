@@ -1,10 +1,4 @@
-{#
-  activity_feed.html — Últimos documentos emitidos de la empresa.
-
-  Variables requeridas (del contexto de la vista):
-    dashboard_data.activity_feed  → lista de dicts del WorkspaceDashboardService
-    workspace.texts.activity_feed_title → heading contextual por rubro
-#}
+{% comment %}activity_feed.html — ctx: dashboard_data.activity_feed, workspace.texts.activity_feed_title{% endcomment %}
 {% load humanize %}
 
 <div class="bg-[#111827] border border-[#1e293b] rounded-xl p-6">

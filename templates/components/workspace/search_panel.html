@@ -1,13 +1,4 @@
-{#
-  search_panel.html — Buscador en vivo de vehículos y clientes.
-
-  Variables requeridas (del contexto de la vista):
-    workspace_search_url   → endpoint JSON del buscador
-    workspace_base_prefix  → prefijo de país/idioma (ej: /cl/es)
-
-  JS: workspace_search.js lee [data-workspace-search-root] para localizar este
-  componente y leer data-search-url / data-base-prefix / data-min-chars.
-#}
+{% comment %}search_panel.html — ctx: workspace_search_url, workspace_base_prefix. JS: workspace_search.js{% endcomment %}
 <div class="workspace-search-card"
      data-workspace-search-root
      data-search-url="{{ workspace_search_url }}"
