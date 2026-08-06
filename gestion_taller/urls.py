@@ -79,7 +79,7 @@ from django.views.i18n import JavaScriptCatalog  # 👈 Para catálogo JS
 from taller.views.country_aware_auth import country_aware_login
 from taller.views_extra.custom_signup import CustomSignupView
 from taller.views_extra.lang_switch import set_language_us
-from taller.views_extra.bienvenida_usa import bienvenida_usa_en, bienvenida_usa_es
+from taller.views_extra.bienvenida import bienvenida_usa_en, bienvenida_usa_es
 from taller.views_extra.login_redirector import login_redirector
 from taller.views_extra.logout_redirect_view import logout_redirect_view
 from taller.views_extra.registro_exitoso import registro_exitoso
@@ -443,6 +443,8 @@ urlpatterns = [
     path("pe/es/login/", redirect_qs("/pe/accounts/login/"), name="pe_es_login_redirect"),
     path("ve/login/", redirect_qs("/ve/es/accounts/login/")),
     path("ve/es/login/", redirect_qs("/ve/es/accounts/login/")),
+    path("mx/login/", redirect_qs("/mx/es/accounts/login/")),
+    path("mx/es/login/", redirect_qs("/mx/es/accounts/login/")),
     # Logout
     path("cl/accounts/logout/", redirect_qs("/accounts/logout/")),
     # Password reset (solicitud + enviado + confirm + completo)
