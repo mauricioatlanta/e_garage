@@ -102,7 +102,7 @@ DASHBOARD_SCENE = {
     "scene": "dashboard",
     "label": "Dashboard eGarage",
     "description": "KPIs en tiempo real: ventas, OTs, stock, agenda y clientes.",
-    "image": "img/welcome/scenes/dashboard.webp",
+    "image": "img/welcome/scenes/control_center.webp",
     "camera": "50mm",
     "lighting": "studio",
     "mood": "clean",

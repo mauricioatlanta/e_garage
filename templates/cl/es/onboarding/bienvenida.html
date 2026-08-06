@@ -268,6 +268,54 @@ margin-top:6px;
 <style>
 .price-meta{color:#bae6fd;font-size:.9rem;font-weight:760;margin-bottom:16px}.plan-features{list-style:none;display:grid;gap:9px;margin-top:18px;color:#cbd5e1;font-size:.9rem;line-height:1.35}.plan-features li:before{content:"";display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--green);margin-right:9px;vertical-align:middle;box-shadow:0 0 12px rgba(52,211,153,.58)}.plan-cta{width:100%;margin-top:22px}
 </style>
+<style>
+/* ── Sprint B2.1 Hero Chile — foto real 60 / texto 40 ──────────────────── */
+.hero{grid-template-columns:2fr 3fr;gap:48px;align-items:center}
+
+/* Marco de la foto */
+.hero-photo{
+  position:relative;
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 24px 64px rgba(0,0,0,.48),0 0 0 1px rgba(148,163,184,.18);
+  aspect-ratio:4/3;
+  align-self:stretch;
+  min-height:420px;
+}
+.hero-photo img{
+  width:100%;height:100%;
+  object-fit:cover;object-position:center top;
+  display:block;
+}
+/* Overlay sutil solo en la franja inferior (10-15%) para legibilidad si hay texto */
+.hero-photo::after{
+  content:"";
+  position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.14) 0%,transparent 38%);
+  pointer-events:none;
+}
+/* Glow de acento detrás del frame */
+.hero-photo::before{
+  content:"";
+  position:absolute;
+  inset:20px -20px -20px 40px;
+  border-radius:30px;
+  background:rgba(56,189,248,.10);
+  filter:blur(38px);
+  z-index:-1;
+}
+
+/* Tablet — apilar verticalmente */
+@media(max-width:1100px){
+  .hero{grid-template-columns:1fr;gap:36px}
+  .hero-photo{aspect-ratio:16/9;min-height:auto;max-width:760px}
+}
+/* Mobile — texto → botón ya visible → foto debajo */
+@media(max-width:640px){
+  .hero{gap:24px}
+  .hero-photo{aspect-ratio:4/3;border-radius:16px}
+}
+</style>
 </head>
 <body>
 <div class="eg-shell">
@@ -278,7 +326,15 @@ margin-top:6px;
 <main>
 <section class="hero" aria-labelledby="hero-title">
     <div class="hero-copy"><div class="eyebrow">Cloud automotriz para Chile y USA</div><h2 id="hero-title">El sistema operativo para negocios automotrices</h2><p>Gestiona talleres, repuestos, vehiculos, documentos, inventario y reportes desde una sola plataforma cloud preparada para Chile y USA.</p><div class="eg-actions"><a href="/cl/es/accounts/signup/" class="eg-btn eg-btn-primary">Prueba Gratis</a><a href="/cl/es/accounts/login/" class="eg-btn eg-btn-secondary">Ya tengo cuenta</a></div><div class="hero-proof" aria-label="Indicadores de plataforma"><div class="proof-item"><strong>24/7</strong><span>Acceso cloud para equipos operativos y administrativos.</span></div><div class="proof-item"><strong>CL + USA</strong><span>Localizacion tributaria, moneda e idioma por mercado.</span></div><div class="proof-item"><strong>360</strong><span>Cliente, vehiculo, documento, inventario y reportes conectados.</span></div></div></div>
-    <div class="product-frame" aria-label="Mockup del dashboard eGarage"><div class="product-mockup"><div class="mockup-top"><div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div><div class="mockup-title">eGarage Operations Dashboard</div></div><div class="mockup-body"><aside class="mockup-nav" aria-label="Navegacion de producto"><div class="nav-pill active">Dashboard</div><div class="nav-pill">Ordenes</div><div class="nav-pill">Vehiculos</div><div class="nav-pill">Inventario</div><div class="nav-pill">Reportes</div><div class="nav-pill">Documentos</div></aside><div class="mockup-main"><div class="mockup-header"><div><h3>Centro de operaciones</h3><p>Vista ejecutiva de taller, ventas e inventario.</p></div><span class="status-chip">En tiempo real</span></div><div class="metric-grid"><div class="metric-card"><span>Ingresos del mes</span><strong>$18.4M</strong><small>+12.8% vs mes anterior</small></div><div class="metric-card"><span>Ordenes activas</span><strong>42</strong><small>9 listas para facturar</small></div><div class="metric-card"><span>Vehiculos</span><strong>1.284</strong><small>historial consolidado</small></div><div class="metric-card"><span>Rentabilidad</span><strong>31.6%</strong><small>margen operativo</small></div></div><div class="chart-card" aria-label="Grafico de rendimiento"><div class="mockup-header"><div><h3>Inventario y ventas</h3><p>Rotacion semanal de repuestos y servicios.</p></div></div><div class="chart-bars" aria-hidden="true"><span style="height:42%"></span><span style="height:64%"></span><span style="height:50%"></span><span style="height:78%"></span><span style="height:58%"></span><span style="height:92%"></span><span style="height:70%"></span></div></div><div class="table-card" aria-label="Resumen operativo"><div class="table-row"><strong>OT-2048</strong><span>Toyota Hilux</span><span>$428.000</span></div><div class="table-row"><strong>REP-883</strong><span>Kit frenos</span><span>38% margen</span></div><div class="table-row"><strong>DOC-761</strong><span>Factura lista</span><span>IVA 19%</span></div></div></div></div></div></div>
+    <div class="hero-photo" aria-label="Técnico mostrando tablet a cliente en taller chileno">
+      <picture>
+        <source srcset="{% static 'img/welcome/cl/hero.webp' %}?v=3a96333e2500" type="image/webp">
+        <img src="{% static 'img/welcome/cl/hero.webp' %}?v=3a96333e2500"
+             alt="Técnico de taller mecánico mostrando el historial del vehículo en tablet al cliente, con Toyota Hilux al fondo"
+             loading="eager"
+             decoding="async">
+      </picture>
+    </div>
 </section>
 <section class="section" aria-labelledby="why-title"><div class="section-head"><div class="section-label">Por que eGarage</div><h2 id="why-title" class="section-title">Una plataforma diseñada para el negocio automotriz moderno</h2><p class="section-copy">Una capa operacional unica para negocios que necesitan controlar procesos, inventario, documentos y rentabilidad sin depender de planillas desconectadas.</p></div><div class="solution-grid"><article class="solution-card"><span>01</span><h3>Talleres mecanicos</h3></article><article class="solution-card"><span>02</span><h3>Casas de repuestos</h3></article><article class="solution-card"><span>03</span><h3>Desarmadurias</h3></article><article class="solution-card"><span>04</span><h3>Carwash</h3></article><article class="solution-card"><span>05</span><h3>Vulcanizacion</h3></article><article class="solution-card"><span>06</span><h3>Flotas</h3></article><article class="solution-card"><span>07</span><h3>Reportes gerenciales</h3></article></div></section>
 <section class="section" aria-labelledby="workflow-title"><div class="section-head"><div class="section-label">Workflow</div><h2 id="workflow-title" class="section-title">Del primer contacto al reporte gerencial</h2><p class="section-copy">eGarage conecta cada paso del flujo operativo para que la informacion comercial, tecnica y financiera avance sin duplicacion.</p></div><div class="workflow"><article class="workflow-step"><span class="step-number">1</span><h3>Cliente</h3></article><article class="workflow-step"><span class="step-number">2</span><h3>Vehiculo</h3></article><article class="workflow-step"><span class="step-number">3</span><h3>Orden de trabajo</h3></article><article class="workflow-step"><span class="step-number">4</span><h3>Repuestos / Servicios</h3></article><article class="workflow-step"><span class="step-number">5</span><h3>Documento</h3></article><article class="workflow-step"><span class="step-number">6</span><h3>Pago</h3></article><article class="workflow-step"><span class="step-number">7</span><h3>Reportes</h3></article></div></section>
